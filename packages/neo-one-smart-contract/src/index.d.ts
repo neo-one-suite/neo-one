@@ -1151,9 +1151,43 @@ export class SmartContract {
    */
   protected readonly deployed: true;
   /**
+   * Override to validate a contract upgrade invocation. Returns `false` by default. Return `true` to indicate the upgrade may proceed.
+   *
+   * @example
+   *
+   * export class Contract extends SmartContract {
+   *  public constructor(private readonly owner = Deploy.senderAddress) {
+   *    super();
+   *  }
+   *
+   *  protected approveUpgrade(): boolean {
+   *    return Address.isCaller(this.owner);
+   *  }
+   * }
+   */
+  protected approveUpgrade(): boolean;
+  /**
+   * Permanently deletes the contract.
+   */
+  protected readonly destroy: () => void;
+  /**
    * Method automatically added for refunding native `Asset`s.
    */
   public readonly refundAssets: (transactionHash: Hash256) => boolean;
+  /**
+   * Used internally by client APIs to upgrade the contract. Control whether an invocation is allowed to upgrade the contract by overriding `approveUpgrade`.
+   */
+  public readonly upgrade: (
+    script: Buffer,
+    parameterList: Buffer,
+    returnType: number,
+    properties: number,
+    contractName: string,
+    codeVersion: string,
+    author: string,
+    email: string,
+    description: string,
+  ) => boolean;
   public static readonly for: <T>(hash: T extends IsValidSmartContract<T> ? Address : never) => T;
 }
 

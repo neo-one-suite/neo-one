@@ -5,7 +5,14 @@ import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { ContractPropertyName } from '../../../constants';
-import { AccessorPropInfo, ContractInfo, DeployPropInfo, FunctionPropInfo, PropertyPropInfo } from '../../../contract';
+import {
+  AccessorPropInfo,
+  ContractInfo,
+  DeployPropInfo,
+  FunctionPropInfo,
+  PropertyPropInfo,
+  UpgradePropInfo,
+} from '../../../contract';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -436,6 +443,52 @@ export class InvokeSmartContractHelper extends Helper {
         sb.emitHelper(node, options, sb.helpers.refundAssets);
       });
 
+    const getUpgradeCase = (info: UpgradePropInfo) =>
+      getCaseBase(node, ContractPropertyName.upgrade, () => {
+        const decl = info.approveUpgrade;
+        if (decl === undefined) {
+          sb.emitPushBoolean(node, false);
+        } else {
+          if (ts.isPropertyDeclaration(decl)) {
+            sb.context.reportUnsupported(decl);
+
+            return;
+          }
+
+          // [booleanVal]
+          sb.emitHelper(decl, options, sb.helpers.invokeSmartContractMethod({ method: decl }));
+          sb.emitHelper(
+            node,
+            options,
+            sb.helpers.if({
+              condition: () => {
+                // [boolean]
+                sb.emitHelper(node, options, sb.helpers.unwrapBoolean);
+              },
+              whenTrue: () => {
+                // [number]
+                sb.emitPushInt(node, 1);
+                // [arg]
+                sb.emitHelper(node, options, sb.helpers.getArgument);
+                // [length, ...args]
+                sb.emitOp(node, 'UNPACK');
+                // [...args]
+                sb.emitOp(node, 'DROP');
+                // [contract]
+                sb.emitSysCall(node, 'Neo.Contract.Migrate');
+                // []
+                sb.emitOp(node, 'DROP');
+                // [boolean]
+                sb.emitPushBoolean(node, true);
+              },
+              whenFalse: () => {
+                sb.emitPushBoolean(node, false);
+              },
+            }),
+          );
+        }
+      });
+
     const allCases = _.flatMap(
       this.contractInfo.propInfos
         .filter((propInfo) => propInfo.isPublic && propInfo.type !== 'deploy')
@@ -466,6 +519,10 @@ export class InvokeSmartContractHelper extends Helper {
               send: false,
               receive: false,
             }));
+          }
+
+          if (propInfo.type === 'upgrade') {
+            return [{ propCase: getUpgradeCase(propInfo), claim: false, send: false, receive: false }];
           }
 
           if (propInfo.type === 'deploy') {

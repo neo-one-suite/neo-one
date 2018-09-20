@@ -1,8 +1,9 @@
-/* @hash b4d2f6bc186a4dd82008c775f5438e48 */
+/* @hash b14292c36b05d9787f4abdccd75e1a04 */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
+  BufferString,
   Event,
   ForwardValue,
   GetOptions,
@@ -144,6 +145,34 @@ export interface TokenSmartContract extends SmartContract<TokenReadSmartContract
       (from: AddressString, to: AddressString, amount: BigNumber, ...approveArgs: ForwardValue[]): Promise<
         InvokeReceipt<boolean, TokenEvent> & { readonly transaction: InvocationTransaction }
       >;
+    };
+  };
+  readonly upgrade: {
+    (
+      script: BufferString,
+      parameterList: BufferString,
+      returnType: BigNumber,
+      properties: BigNumber,
+      contractName: string,
+      codeVersion: string,
+      author: string,
+      email: string,
+      description: string,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        script: BufferString,
+        parameterList: BufferString,
+        returnType: BigNumber,
+        properties: BigNumber,
+        contractName: string,
+        codeVersion: string,
+        author: string,
+        email: string,
+        description: string,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<boolean, TokenEvent> & { readonly transaction: InvocationTransaction }>;
     };
   };
 }

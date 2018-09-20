@@ -44,10 +44,17 @@ export enum ContractPropertyName {
   properties = 'properties',
   refundAssets = 'refundAssets',
   deployed = 'deployed',
+  approveUpgrade = 'approveUpgrade',
+  upgrade = 'upgrade',
+  destroy = 'destroy',
 }
 
 export const VIRTUAL_PROPERTIES: Set<string> = new Set([ContractPropertyName.deploy]);
-export const RESERVED_PROPERTIES: Set<string> = new Set([ContractPropertyName.refundAssets]);
+export const RESERVED_PROPERTIES: Set<string> = new Set([
+  ContractPropertyName.refundAssets,
+  ContractPropertyName.upgrade,
+  ContractPropertyName.destroy,
+]);
 export const BUILTIN_PROPERTIES: Set<string> = new Set([
   ContractPropertyName.processedTransactions,
   ContractPropertyName.allowedRefunds,

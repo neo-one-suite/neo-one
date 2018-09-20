@@ -1,4 +1,4 @@
-/* @hash 47b405c0e50e77059d3e1c7ce04c7bf1 */
+/* @hash f092fda858e7e81a4932c83068fb7bca */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -195,6 +195,52 @@ export const escrowABI: ABI = {
         type: 'Boolean',
       },
       send: true,
+    },
+    {
+      name: 'upgrade',
+      parameters: [
+        {
+          name: 'script',
+          type: 'Buffer',
+        },
+        {
+          name: 'parameterList',
+          type: 'Buffer',
+        },
+        {
+          decimals: 0,
+          name: 'returnType',
+          type: 'Integer',
+        },
+        {
+          decimals: 0,
+          name: 'properties',
+          type: 'Integer',
+        },
+        {
+          name: 'contractName',
+          type: 'String',
+        },
+        {
+          name: 'codeVersion',
+          type: 'String',
+        },
+        {
+          name: 'author',
+          type: 'String',
+        },
+        {
+          name: 'email',
+          type: 'String',
+        },
+        {
+          name: 'description',
+          type: 'String',
+        },
+      ],
+      returnType: {
+        type: 'Boolean',
+      },
     },
     {
       name: 'deploy',

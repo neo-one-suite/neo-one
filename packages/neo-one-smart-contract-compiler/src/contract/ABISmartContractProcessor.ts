@@ -49,6 +49,24 @@ export class ABISmartContractProcessor {
                 returnType: BOOLEAN_RETURN,
               },
             ];
+          case 'upgrade':
+            return [
+              {
+                name: propInfo.name,
+                parameters: [
+                  { name: 'script', type: 'Buffer' },
+                  { name: 'parameterList', type: 'Buffer' },
+                  { name: 'returnType', type: 'Integer', decimals: 0 },
+                  { name: 'properties', type: 'Integer', decimals: 0 },
+                  { name: 'contractName', type: 'String' },
+                  { name: 'codeVersion', type: 'String' },
+                  { name: 'author', type: 'String' },
+                  { name: 'email', type: 'String' },
+                  { name: 'description', type: 'String' },
+                ],
+                returnType: BOOLEAN_RETURN,
+              },
+            ];
           case 'function':
             return [
               {

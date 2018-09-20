@@ -36,6 +36,12 @@ export interface RefundAssetsPropInfo extends PropInfoBase {
   readonly name: string;
 }
 
+export interface UpgradePropInfo extends PropInfoBase {
+  readonly type: 'upgrade';
+  readonly name: string;
+  readonly approveUpgrade: ts.PropertyDeclaration | ts.MethodDeclaration | undefined;
+}
+
 export interface FunctionPropInfo extends PropInfoBase {
   readonly type: 'function';
   readonly name: string;
@@ -78,7 +84,13 @@ export interface AccessorPropInfo extends PropInfoBase {
   readonly propertyType: ts.Type | undefined;
 }
 
-export type PropInfo = PropertyPropInfo | AccessorPropInfo | FunctionPropInfo | DeployPropInfo | RefundAssetsPropInfo;
+export type PropInfo =
+  | PropertyPropInfo
+  | AccessorPropInfo
+  | FunctionPropInfo
+  | DeployPropInfo
+  | RefundAssetsPropInfo
+  | UpgradePropInfo;
 
 export interface ContractInfo {
   readonly smartContract: ts.ClassDeclaration | ts.ClassExpression;
@@ -104,6 +116,13 @@ export class ContractInfoProcessor {
         name: ContractPropertyName.refundAssets,
         classDecl: this.smartContract,
         isPublic: true,
+      },
+      {
+        type: 'upgrade',
+        name: ContractPropertyName.upgrade,
+        classDecl: this.smartContract,
+        isPublic: true,
+        approveUpgrade: this.getApproveUpgradeDecl(result),
       },
     ]);
 
@@ -603,5 +622,19 @@ export class ContractInfoProcessor {
     }
 
     return this.hasDeployInfo(superSmartContract);
+  }
+
+  private getApproveUpgradeDecl(contractInfo: ContractInfo): ts.MethodDeclaration | ts.PropertyDeclaration | undefined {
+    const propInfo = contractInfo.propInfos.find((info) => info.name === ContractPropertyName.approveUpgrade);
+    if (propInfo !== undefined && propInfo.type === 'function' && tsUtils.overload.isImplementation(propInfo.decl)) {
+      return propInfo.decl;
+    }
+
+    const superSmartContract = contractInfo.superSmartContract;
+    if (superSmartContract === undefined) {
+      return undefined;
+    }
+
+    return this.getApproveUpgradeDecl(superSmartContract);
   }
 }

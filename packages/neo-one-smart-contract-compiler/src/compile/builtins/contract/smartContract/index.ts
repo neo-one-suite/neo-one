@@ -5,6 +5,7 @@ import { BuiltinInstanceMemberStorageProperty } from '../../BuiltinInstanceMembe
 import { BuiltinInstanceMemberStructuredStorageProperty } from '../../BuiltinInstanceMemberStructuredStorageProperty';
 import { Builtins } from '../../Builtins';
 import { SmartContractAddress } from './address';
+import { SmartContractDestroy } from './destroy';
 import { SmartContractFor } from './for';
 
 class SmartContractValue extends BuiltinBase {}
@@ -31,4 +32,5 @@ export const add = (builtins: Builtins): void => {
       ContractPropertyName.allowedRefunds,
     ),
   );
+  builtins.addContractMember('SmartContract', 'destroy', new SmartContractDestroy());
 };

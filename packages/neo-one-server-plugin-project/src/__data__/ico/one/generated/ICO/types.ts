@@ -1,8 +1,9 @@
-/* @hash 7e1cb7e0855d08a573f98c370ecefd73 */
+/* @hash 76900619feb62adc7898a536b654717e */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
+  BufferString,
   Event,
   GetOptions,
   Hash256String,
@@ -80,6 +81,34 @@ export interface ICOSmartContract extends SmartContract<ICOReadSmartContract> {
   };
   readonly remaining: () => Promise<BigNumber>;
   readonly startTimeSeconds: () => Promise<BigNumber>;
+  readonly upgrade: {
+    (
+      script: BufferString,
+      parameterList: BufferString,
+      returnType: BigNumber,
+      properties: BigNumber,
+      contractName: string,
+      codeVersion: string,
+      author: string,
+      email: string,
+      description: string,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        script: BufferString,
+        parameterList: BufferString,
+        returnType: BigNumber,
+        properties: BigNumber,
+        contractName: string,
+        codeVersion: string,
+        author: string,
+        email: string,
+        description: string,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }>;
+    };
+  };
 }
 
 export interface ICOReadSmartContract extends ReadSmartContract<ICOEvent> {

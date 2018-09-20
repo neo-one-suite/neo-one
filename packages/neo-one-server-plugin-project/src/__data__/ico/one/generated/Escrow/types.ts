@@ -1,8 +1,9 @@
-/* @hash dac44c77b908fe31c44b847294f5d0d3 */
+/* @hash 9571abbce8e247e9dc4daaed809ed9df */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
+  BufferString,
   ForwardValue,
   GetOptions,
   Hash256String,
@@ -106,6 +107,34 @@ export interface EscrowSmartContract extends SmartContract<EscrowReadSmartContra
       (transactionHash: Hash256String, options?: InvokeSendTransactionOptions & GetOptions): Promise<
         InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }
       >;
+    };
+  };
+  readonly upgrade: {
+    (
+      script: BufferString,
+      parameterList: BufferString,
+      returnType: BigNumber,
+      properties: BigNumber,
+      contractName: string,
+      codeVersion: string,
+      author: string,
+      email: string,
+      description: string,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        script: BufferString,
+        parameterList: BufferString,
+        returnType: BigNumber,
+        properties: BigNumber,
+        contractName: string,
+        codeVersion: string,
+        author: string,
+        email: string,
+        description: string,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
     };
   };
 }

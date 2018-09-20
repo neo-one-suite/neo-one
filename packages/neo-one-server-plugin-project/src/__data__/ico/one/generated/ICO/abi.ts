@@ -1,4 +1,4 @@
-/* @hash b3ab34f478808cb1829ece1bfd4fc3df */
+/* @hash fa06319cf57399afadd16bdbb024d9a2 */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -151,6 +151,52 @@ export const icoABI: ABI = {
         type: 'Boolean',
       },
       send: true,
+    },
+    {
+      name: 'upgrade',
+      parameters: [
+        {
+          name: 'script',
+          type: 'Buffer',
+        },
+        {
+          name: 'parameterList',
+          type: 'Buffer',
+        },
+        {
+          decimals: 0,
+          name: 'returnType',
+          type: 'Integer',
+        },
+        {
+          decimals: 0,
+          name: 'properties',
+          type: 'Integer',
+        },
+        {
+          name: 'contractName',
+          type: 'String',
+        },
+        {
+          name: 'codeVersion',
+          type: 'String',
+        },
+        {
+          name: 'author',
+          type: 'String',
+        },
+        {
+          name: 'email',
+          type: 'String',
+        },
+        {
+          name: 'description',
+          type: 'String',
+        },
+      ],
+      returnType: {
+        type: 'Boolean',
+      },
     },
     {
       name: 'deploy',
