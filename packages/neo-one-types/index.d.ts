@@ -5,3 +5,5 @@
 /// <reference path="./roots/index.d.ts" />
 /// <reference path="./source-map/index.d.ts" />
 /// <reference path="./webpack/index.d.ts" />
+/// <reference path="./@ledgerhq/hw-transport-node-hid/index.d.ts" />
+/// <reference path="./@ledgerhq/hw-transport-u2f/index.d.ts" />

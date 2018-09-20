@@ -71,3 +71,13 @@ export const CannotClaimContractError = makeErrorWithCode(
   'CANNOT_CLAIM_CONTRACT',
   (address: AddressString) => `Contract ${address} does not allow claiming GAS`,
 );
+
+export const LedgerNotSupportedError = makeErrorWithCode(
+  'LEDGER_NOT_SUPPORTED',
+  () => `Ledger not supported by your machine.`,
+);
+
+export const LedgerNotDetectedError = makeErrorWithCode(
+  'LEDGER_NOT_DETECTED',
+  () => `Ledger not detected by your machine.`,
+);
