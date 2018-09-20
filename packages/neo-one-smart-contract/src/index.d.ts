@@ -743,9 +743,12 @@ export const Block: BlockConstructor;
 export type SerializableKeySingle = number | string | boolean | Buffer;
 type SK = SerializableKeySingle;
 export type SerializableKey = SK | [SK, SK] | [SK, SK, SK] | [SK, SK, SK, SK];
-interface SerializableValueArray extends ReadonlyArray<SerializableValue> {}
-interface SerializableValueMap extends ReadonlyMap<SerializableKeySingle, SerializableValue> {}
-interface SerializableValueSet extends ReadonlySet<SerializableValue> {}
+export interface SerializableValueArray extends ReadonlyArray<SerializableValue> {}
+export interface SerializableValueMap extends ReadonlyMap<SerializableKeySingle, SerializableValue> {}
+export interface SerializableValueSet extends ReadonlySet<SerializableValue> {}
+export interface SerializableValueObject {
+  readonly [key: string]: SerializableValue;
+}
 export type SerializableValue =
   | undefined
   | null
@@ -755,7 +758,8 @@ export type SerializableValue =
   | Buffer
   | SerializableValueArray
   | SerializableValueMap
-  | SerializableValueSet;
+  | SerializableValueSet
+  | SerializableValueObject;
 
 /**
  * Persistent smart contract set storage. Only usable as a `SmartContract` property.
