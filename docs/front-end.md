@@ -26,8 +26,7 @@ import { WithContracts } from '../../../one/generated';
 NEO•ONE also generates a DeveloperTools widget to help you test your app's front end.  You can find and play with this in the bottom
 left hand corner of the NEO•ONE Playground.  To use it for testing your apps, simply import the component from the generated folder and add it into your app!
 
-In addition to these tools, NEO•ONE also gives you a whole host of handy react tools found in `@neo-one/react`.  Learn about everything `@neo-one/react` has to offer,
-[here]().
+In addition to these tools, NEO•ONE also gives you a whole host of handy react tools found in `@neo-one/react`.
 
 ## Further Reading
 Hopefully these guides have given you a quick introduction to what is possible with NEO•ONE.  Continue reading to find more specific details on the apis.

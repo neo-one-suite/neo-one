@@ -23,6 +23,9 @@ This is the API documentation for the NEO•ONE Client Types.
     - [Transfer](#Transfer)
     - [UserAccount](#UserAccount)
     - [UserAccountID](#UserAccountID)
+  - [Block Types](#block-types)
+    - [Header](#Header)
+    - [Block](#Block)
   - [Contract Types](#contract-types)
     - [Action](#Action)
     - [Contract](#Contract)
@@ -37,6 +40,12 @@ This is the API documentation for the NEO•ONE Client Types.
     - [Return](#Return)
     - [ReturnArray](#ReturnArray)
     - [StorageItem](#StorageItem)
+  - [ABI Types](#abi-types)
+    - [ABI](#ABI)
+    - [ABIEvent](#ABIEvent)
+    - [ABIFunction](#ABIFunction)
+    - [ABIParameter](#ABIParameter)
+    - [ABIReturn](#ABIReturn)
   - [Transaction Types](#transaction-types)
     - [ClaimTransaction](#ClaimTransaction)
     - [ConfirmedClaimTransaction](#ConfirmedClaimTransaction)
@@ -61,27 +70,32 @@ This is the API documentation for the NEO•ONE Client Types.
     - [TransactionOptions](#TransactionOptions)
     - [TransactionReceipt](#TransactionReceipt)
     - [TransactionResult](#TransactionResult)
-  - [Block Types](#block-types)
-    - [Header](#Header)
-    - [Block](#Block)
-  - [Advanced Types](#advanced-types)
+  - [Transaction Attribute Types](#transaction-attribute-types)
+    - [AddressAttribute](#AddressAttribute)
     - [AddressAttributeUsage](#AddressAttributeUsage)
+    - [Attribute](#Attribute)
+    - [BufferAttribute](#BufferAttribute)
+    - [BufferAttributeUsage](#BufferAttributeUsage)
+    - [Hash256Attribute](#Hash256Attribute)
+    - [Hash256AttributeUsage](#Hash256AttributeUsage)
+    - [PublicKeyAttribute](#PublicKeyAttribute)
+    - [PublicKeyAttributeUsage](#PublicKeyAttributeUsage)
+  - [Advanced Types](#advanced-types)
     - [AddressContractParameter](#AddressContractParameter)
     - [ArrayContractParameter](#ArrayContractParameter)
     - [AssetType](#AssetType)
     - [AttributeUsage](#AttributeUsage)
     - [BlockFilter](#BlockFilter)
     - [BooleanContractParameter](#BooleanContractParameter)
-    - [BufferAttributeUsage](#BufferAttributeUsage)
     - [BufferContractParameter](#BufferContractParameter)
     - [ContractParameter](#ContractParameter)
-    - [Hash256AttributeUsage](#Hash256AttributeUsage)
     - [Hash256ContractParameter](#Hash256ContractParameter)
     - [IntegerContractParameter](#IntegerContractParameter)
     - [InteropInterfaceContractParameter](#InteropInterfaceContractParameter)
+    - [LocalWallet](#LocalWallet)
+    - [LockedWallet](#LockedWallet)
     - [NetworkSettings](#NetworkSettings)
     - [PrivateNetworkSettings](#PrivateNetworkSettings)
-    - [PublicKeyAttributeUsage](#PublicKeyAttributeUsage)
     - [PublicKeyContractParameter](#PublicKeyContractParameter)
     - [SignatureContractParameter](#SignatureContractParameter)
     - [RawAction](#RawAction)
@@ -96,6 +110,7 @@ This is the API documentation for the NEO•ONE Client Types.
     - [RawNotification](#RawNotification)
     - [StringContractParameter](#StringContractParameter)
     - [UpdateAccountNameOptions](#UpdateAccountNameOptions)
+    - [UnlockedWallet](#UnlockedWallet)
     - [VoidContractParameter](#VoidContractParameter)
     - [Witness](#Witness)
 
@@ -260,6 +275,36 @@ These are the types you will need for most common used cases.
     - address: [AddressString](#AddressString)
 
 <br>
+## Block Types
+
+#### Block
+  - Extension of [Header](#Header).
+  - Information contained in a Block.
+  - Properties:
+    - transactions: ReadonlyArray<[ConfirmedTransaction](#ConfirmedTransaction)>
+      - Transactions contained in the Block.
+
+#### Header
+  - Base information about a [Block](#Block).
+  - Properties:
+    - version: number
+      - NEO blockchain version.
+    - hash: [Hash256String](#Hash256String)
+      - [Block](#Block) hash
+    - previousBlockHash: [Hash256String](#Hash256String)
+    - merkleRoot: [Hash256String](#Hash256String)
+    - time: number
+      - [Block](#Block) time persisted
+    - index: number
+      - [Block](#Block) index
+    - nonce: string
+    - nextConsensus: [AddressString](#AddressString)
+      - Next consensus address.
+    - script: [Witness](#Witness)
+    - size: number
+      - Size in bytes of the [Block](#Block)
+
+<br>
 ## Contract Types
 Types related to Smart Contracts.
 
@@ -400,6 +445,100 @@ Types related to Smart Contracts.
       - Key of this StorageItem.
     - value: [BufferString](#BufferString)
       - Value of this StorageItem.
+
+<br>
+## ABI Types
+Types related to Smart Contract ABIs.
+
+#### ABI
+  - Full specification of the functions and events of a smart contract.
+  - Used by the client APIs to generate the smart contract interface.
+  - Properties:
+    - functions: ReadonlyArray<[ABIFunction](#ABIFunction)>
+    - events (optional): ReadonlyArray<[ABIEvent](#ABIEvent)>
+
+#### ABIEvent
+  - Event specification in the [ABI](#ABI) of a smart contract.
+  - Properties:
+    - name: string
+      - Name of the event.
+    - parameters: ReadonlyArray<[ABIParameter](#ABIParameter)>
+      - Parameters of the event.
+
+#### ABIFunction
+  - Event specification in the [ABI](#ABI) of a smart contract.
+  - Properties:
+    - name: string
+      - Name of the function.
+    - parameters (optional): ReadonlyArray<[ABIParameter](#ABIParameter)>
+      - Parameters of the function.
+    - returnType: [ABIReturn](#ABIReturn)
+      - Return type of the function.
+    - constant (optional): boolean
+      - True if the function is constant or read-only.
+    - send (optional): boolean
+      - True if the function is used for sending native assets.
+    - receive (optional): boolean
+      - True if the function is used for receiving native assets.
+    - claim (optional): boolean
+      - True if teh function is used for claiming GAS.
+
+#### ABIParameter
+  - Parameter type specifications of a smart contract.
+  - Extensions of the corresponding [ABIReturn](#ABIReturn)
+    - e.g. Hash256ABIParameter contains all properties in Hash256ABIReturn
+  - Common Properties:
+    - name: string
+      - Name of the parameter.
+    - default (optional): { type: 'sender' }
+      - Runtime default value
+    - rest (optional): boolean
+      - Represents a rest parameter
+  - Types with Additional Properties:
+    - SignatureABIParameter
+    - BooleanABIParameter
+    - AddressABIParameter
+    - Hash256ABIParameter
+    - BufferABIParameter
+    - PublicKeyABIParameter
+    - StringABIParameter
+    - VoidABIParameter
+    - IntegerABIParameter
+    - ArrayABIParameter
+    - ForwardValueABIParameter
+
+#### ABIReturn
+  - Return type specifications of a smart contract.
+  - Common Properties:
+    - optional (optional): boolean
+      - Indicates whether the return is possibly undefined.
+    - forwardedValue (optional): boolean
+      - Indicates whether the return is a forwarded value.
+  - Types with Additional Properties:
+    - SignatureABIReturn
+      - type: 'Signature'
+    - BooleanABIReturn
+      - type: 'Boolean'
+    - AddressABIReturn
+      - type: 'Address'
+    - Hash256ABIReturn
+      - type: 'Hash256'
+    - BufferABIReturn
+      - type: 'Buffer'
+    - PublicKeyABIReturn
+      - type: 'PublicKey'
+    - StringABIReturn
+      - type: 'String'
+    - VoidABIReturn
+      - type: 'Void'
+    - IntegerABIReturn
+      - type: 'Integer'
+      - decimals: number
+    - ArrayABIReturn
+      - type: 'Array'
+      - value: ABIReturn
+    - ForwardValueABIReturn
+      - type: 'ForwardValue;
 
 <br>
 ## Transaction Types
@@ -568,44 +707,80 @@ Types related to Transactions.
       - Function which must be called to confirm the [Transaction](#Transaction) made it into a [Block](#Block).
 
 <br>
-## Block Types
+## Transaction Attribute Types
+All possible Attribute types which can be attached to transactions.
 
-#### Block
-  - Extension of [Header](#Header).
-  - Information contained in a Block.
+#### AddressAttribute
+  - [Attribute](#Attribute) whose data is a [AddressString](#AddressString)
   - Properties:
-    - transactions: ReadonlyArray<[ConfirmedTransaction](#ConfirmedTransaction)>
-      - Transactions contained in the Block.
+    - usage: [AddressAttributeUsage](#AddressAttributeUsage)
+    - data: [AddressString](#AddressString)
 
-#### Header
-  - Base information about a [Block](#Block).
+#### AddressAttributeUsage
+  - Attribute usage flag indicating the data is an Address.
+  - Possible Values:
+    ```ts
+    'Script'
+    ```
+
+#### Attribute
+  - Attributes are used to store additional data on [Transactions](#Transaction).
+  - Most Attributes are used to store arbitrary data, whereas some, like [AddressAttribute](#AddressAttribute), have specific uses in the NEO.
+  - Attribute Types:
+    - [AddressAttribute](#AddressAttribute)
+    - [BufferAttribute](#BufferAttribute)
+    - [Hash256Attribute](#Hash256Attribute)
+    - [PublicKeyAttribute](#PublicKeyAttribute)
+
+#### AttributeUsage
+  - Attribute usage flag indicates the type of the data.
+    - [BufferAttributeUsage](#BufferAttributeUsage)
+    - [AddressAttributeUsage](#AddressAttributeUsage)
+    - [PublicKeyAttributeUsage](#PublicKeyAttributeUsage)
+    - [Hash256AttributeUsage](#Hash256AttributeUsage)
+
+#### BufferAttribute
+  - [Attribute](#Attribute) whose data is a [BufferString](#BufferString)
   - Properties:
-    - version: number
-      - NEO blockchain version.
-    - hash: [Hash256String](#Hash256String)
-      - [Block](#Block) hash
-    - previousBlockHash: [Hash256String](#Hash256String)
-    - merkleRoot: [Hash256String](#Hash256String)
-    - time: number
-      - [Block](#Block) time persisted
-    - index: number
-      - [Block](#Block) index
-    - nonce: string
-    - nextConsensus: [AddressString](#AddressString)
-      - Next consensus address.
-    - script: [Witness](#Witness)
-    - size: number
-      - Size in bytes of the [Block](#Block)
+    - usage: [BufferAttributeUsage](#BufferAttributeUsage)
+    - data: [BufferString](#BufferString)
+
+#### BufferAttributeUsage
+  - Attribute usage flag indicating the data is an arbitrary Buffer.
+  - Possible Values:
+    ```ts
+    'DescriptionUrl' | 'Description' | 'Remark' | 'Remark1' | 'Remark2' | 'Remark3' | 'Remark4' | 'Remark5' | 'Remark6' | 'Remark7' | 'Remark8' | 'Remark9' | 'Remark10' | 'Remark11' | 'Remark12' | 'Remark13' | 'Remark14' | 'Remark15'
+    ```
+
+#### Hash256Attribute
+  - [Attribute](#Attribute) whose data is a [Hash256String](#Hash256String)
+  - Properties:
+    - usage: [Hash256AttributeUsage](#Hash256AttributeUsage)
+    - data: [Hash256String](#Hash256String)
+
+#### Hash256AttributeUsage
+  - Attribute usage flag indicating the data is a Hash256
+  - Possible Values:
+    ```ts
+    'ContractHash' | 'Vote' | 'Hash1' | 'Hash2' | 'Hash3' | 'Hash4' | 'Hash5' | 'Hash6' | 'Hash7' | 'Hash8' | 'Hash9' | 'Hash10' | 'Hash11' | 'Hash12' | 'Hash13' | 'Hash14' | 'Hash15'
+    ```
+
+#### PublicKeyAttribute
+  - [Attribute](#Attribute) whose data is a [PublicKeyString](#PublicKeyString)
+  - Properties:
+    - usage: [PublicKeyAttributeUsage](#PublicKeyAttributeUsage)
+    - data: [PublicKeyString](#PublicKeyString)
+
+#### PublicKeyAttributeUsage
+  - Attribute usage flag indicating the data is a PublicKey
+  - Possible Values:
+    ```ts
+    'ECDH02' | 'ECDH03'
+    ```
 
 <br>
 ## Advanced Types
 The rest of the types are contained here.  These will likely only be used for more advanced use cases.
-
-#### AddressAttributeUsage
-  - Attribute usage flag indicating the data is a PublicKey
-    ```ts
-    'Script'
-    ```
 
 #### AddressContractParameter
   - Invocation stack item for an Address
@@ -627,14 +802,6 @@ The rest of the types are contained here.  These will likely only be used for mo
     'Credit' | 'Duty' | 'Governing' | 'Utility' | 'Currency' | 'Share' | 'Invoice' | 'Token'
     ```
 
-#### AttributeUsage
-  - Attribute usage flag indicates the type of the data.
-    - [BufferAttributeUsage](#BufferAttributeUsage)
-    - [AddressAttributeUsage](#AddressAttributeUsage)
-    - [PublicKeyAttributeUsage](#PublicKeyAttributeUsage)
-    - [Hash256AttributeUsage](#Hash256AttributeUsage)
-
-
 #### BlockFilter
   - Filter user in certain methods which iterate over blocks.
   - Properties (All optional):
@@ -647,12 +814,6 @@ The rest of the types are contained here.  These will likely only be used for mo
   - Properties
     - type: 'Boolean'
     - value: boolean
-
-#### BufferAttributeUsage
-  - Attribute usage flag indicating the data is an arbitrary Buffer
-    ```ts
-    'DescriptionUrl' | 'Description' | 'Remark' | 'Remark1' | 'Remark2' | 'Remark3' | 'Remark4' | 'Remark5' | 'Remark6' | 'Remark7' | 'Remark8' | 'Remark9' | 'Remark10' | 'Remark11' | 'Remark12' | 'Remark13' | 'Remark14' | 'Remark15'
-    ```
 
 #### BufferContractParameter
   - Invocation stack item for a Buffer
@@ -674,12 +835,6 @@ The rest of the types are contained here.  These will likely only be used for mo
     - [ArrayContractParameter](#ArrayContractParameter)
     - [InteropInterfaceContractParameter](#InteropInterfaceContractParameter)
     - [VoidContractParameter](#VoidContractParameter)
-
-#### Hash256AttributeUsage
-  - Attribute usage flag indicating the data is a Hash256
-    ```ts
-    'ContractHash' | 'Vote' | 'Hash1' | 'Hash2' | 'Hash3' | 'Hash4' | 'Hash5' | 'Hash6' | 'Hash7' | 'Hash8' | 'Hash9' | 'Hash10' | 'Hash11' | 'Hash12' | 'Hash13' | 'Hash14' | 'Hash15'
-    ```
 
 #### Hash256ContractParameter
   - Invocation stack item for Hash256
@@ -707,21 +862,33 @@ The rest of the types are contained here.  These will likely only be used for mo
   - Properties
     - type: 'InteropInterface'
 
+#### LocalWallet
+  - Wallet storage for [KeyStore](/docs/en/keystore-api.html).
+  - [LockedWallet](#LockedWallet)
+  - [UnlockedWallet](#UnlockedWallet)
+
+#### LockedWallet
+  - A locked wallet is a [LocalWallet](#LocalWallet) stored in a  [KeyStore](/docs/en/keystore-api.html) which is locked and unable to interact with the blockchain.
+  - Properties:
+    - type: 'locked'
+    - account: [UserAccount](#UserAccount)
+    - nep2: string
+
 #### NetworkSettings
   - Settings of the network.
   - Properties:
     - issueGASFee: [BigNumber](https://github.com/MikeMcl/bignumber.js/)
 
+#### Peer
+  - Peer node on the blockchain.
+  - Properties:
+    - address: string
+    - port: numnber
+
 #### PrivateNetworkSettings
   - Settings specific to a private network.
   - Properties:
     - secondsPerBlock: number
-
-#### PublicKeyAttributeUsage
-  - Attribute usage flag indicating the data is a PublicKey
-    ```ts
-    'ECDH02' | 'ECDH03'
-    ```
 
 #### PublicKeyContractParameter
   - Invocation stack item for PublicKey
@@ -837,6 +1004,14 @@ The rest of the types are contained here.  These will likely only be used for mo
       - ID of account to change name.
     - name: string
       - Name to change to.
+
+#### UnlockedWallet
+  - An unlocked wallet is a [LocalWallet](#LocalWallet) stored in a  [KeyStore](/docs/en/keystore-api.html) which is unlocked and ready to interact with the blockchain.
+  - Properties:
+    - type: 'unlocked'
+    - account: [UserAccount](#UserAccount)
+    - privateKey: [BufferString](#BufferString)
+    - nep2 (optional): string | undefined
 
 #### VoidContractParameter
   - Invocation stack item for void
