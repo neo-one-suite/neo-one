@@ -1,4 +1,4 @@
-/* @hash 335ce599ffa4671cda5ac2d17dcd73d8 */
+/* @hash 72ccda6fe39b491010a1665fb7a327aa */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -135,6 +135,7 @@ export const tokenABI: ABI = {
         type: 'Integer',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -161,6 +162,7 @@ export const tokenABI: ABI = {
         type: 'Integer',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -200,6 +202,7 @@ export const tokenABI: ABI = {
         type: 'Boolean',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -232,6 +235,7 @@ export const tokenABI: ABI = {
         type: 'Boolean',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -264,6 +268,7 @@ export const tokenABI: ABI = {
         type: 'Boolean',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -296,6 +301,7 @@ export const tokenABI: ABI = {
         type: 'Boolean',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -327,6 +333,7 @@ export const tokenABI: ABI = {
         type: 'Void',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -353,19 +360,7 @@ export const tokenABI: ABI = {
         type: 'Boolean',
       },
       send: false,
-    },
-    {
-      name: 'refundAssets',
-      parameters: [
-        {
-          name: 'transactionHash',
-          type: 'Hash256',
-        },
-      ],
-      returnType: {
-        type: 'Boolean',
-      },
-      send: true,
+      sendUnsafe: false,
     },
     {
       name: 'deploy',

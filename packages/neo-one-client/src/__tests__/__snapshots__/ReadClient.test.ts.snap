@@ -186,36 +186,44 @@ Object {
       "functions": Array [
         Object {
           "claim": undefined,
+          "completeSend": undefined,
           "constant": true,
           "name": "name",
           "parameters": Array [],
           "receive": undefined,
+          "refundAssets": undefined,
           "returnType": Object {
             "forwardedValue": undefined,
             "optional": undefined,
             "type": "String",
           },
           "send": undefined,
+          "sendUnsafe": undefined,
         },
         Object {
           "claim": undefined,
+          "completeSend": undefined,
           "constant": true,
           "name": "symbol",
           "parameters": Array [],
           "receive": undefined,
+          "refundAssets": undefined,
           "returnType": Object {
             "forwardedValue": undefined,
             "optional": undefined,
             "type": "String",
           },
           "send": undefined,
+          "sendUnsafe": undefined,
         },
         Object {
           "claim": undefined,
+          "completeSend": undefined,
           "constant": true,
           "name": "decimals",
           "parameters": Array [],
           "receive": undefined,
+          "refundAssets": undefined,
           "returnType": Object {
             "decimals": 0,
             "forwardedValue": undefined,
@@ -223,13 +231,16 @@ Object {
             "type": "Integer",
           },
           "send": undefined,
+          "sendUnsafe": undefined,
         },
         Object {
           "claim": undefined,
+          "completeSend": undefined,
           "constant": true,
           "name": "totalSupply",
           "parameters": Array [],
           "receive": undefined,
+          "refundAssets": undefined,
           "returnType": Object {
             "decimals": 8,
             "forwardedValue": undefined,
@@ -237,9 +248,11 @@ Object {
             "type": "Integer",
           },
           "send": undefined,
+          "sendUnsafe": undefined,
         },
         Object {
           "claim": undefined,
+          "completeSend": undefined,
           "constant": undefined,
           "name": "transfer",
           "parameters": Array [
@@ -269,15 +282,18 @@ Object {
             },
           ],
           "receive": undefined,
+          "refundAssets": undefined,
           "returnType": Object {
             "forwardedValue": undefined,
             "optional": undefined,
             "type": "Boolean",
           },
           "send": undefined,
+          "sendUnsafe": undefined,
         },
         Object {
           "claim": undefined,
+          "completeSend": undefined,
           "constant": true,
           "name": "balanceOf",
           "parameters": Array [
@@ -291,6 +307,7 @@ Object {
             },
           ],
           "receive": undefined,
+          "refundAssets": undefined,
           "returnType": Object {
             "decimals": 8,
             "forwardedValue": undefined,
@@ -298,6 +315,7 @@ Object {
             "type": "Integer",
           },
           "send": undefined,
+          "sendUnsafe": undefined,
         },
       ],
     },

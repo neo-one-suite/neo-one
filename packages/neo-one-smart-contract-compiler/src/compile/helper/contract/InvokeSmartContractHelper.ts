@@ -1,24 +1,234 @@
 // tslint:disable prefer-switch
-import { Op, TransactionType } from '@neo-one/client-core';
-import { tsUtils } from '@neo-one/ts-utils';
+import { TransactionType } from '@neo-one/client-core';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { ContractPropertyName } from '../../../constants';
-import { AccessorPropInfo, ContractInfo, DeployPropInfo, FunctionPropInfo, PropertyPropInfo } from '../../../contract';
+import {
+  AccessorPropInfo,
+  CompleteSendPropInfo,
+  ContractInfo,
+  DeployPropInfo,
+  FunctionPropInfo,
+  PropertyPropInfo,
+  RefundAssetsPropInfo,
+  UpgradePropInfo,
+} from '../../../contract';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 import { Case } from '../statement';
+import { findDeployInfo } from './utils';
 
 export interface InvokeSmartContractHelperOptions {
   readonly contractInfo: ContractInfo;
 }
 
-enum Trigger {
-  application = 'application',
-  verification = 'verification',
-}
+/**
+ * Pseudocode of what's happening here:
+ * const contract = new Contract();
+ *
+ * const handleSend = () => {
+ *  if (isProcessed(Blockchain.currentTransaction.hash)) {
+ *    return false;
+ *  }
+ *
+ *  if (!firstOutputToSelf()) {
+ *    return false;
+ *  }
+ *
+ *  if (!allInputsAreProcessedAndUnclaimed()) {
+ *    return false;
+ *  }
+ *
+ *  if (!netZero()) {
+ *    return false;
+ *  }
+ *
+ *  const args = getArgument(1);
+ *  const { asset, amount } = getSendArgs();
+ *  const result = contract.sendMethod(...args, asset, amount);
+ *  if (result) {
+ *    markProcessed(Blockchain.currentTransaction.hash);
+ *    markClaimed(Blockchain.currentTransaction.hash, receiver);
+ *  }
+ *  return result;
+ * }
+ *
+ * // Completing a pending send fully consumes the first output of claimed transaction(s).
+ * // No additional tracking required since outputs can only be used once.
+ * const completeSend = () => {
+ *  const hash = getSentAssetsTransactionHash();
+ *  if (hash === undefined) {
+ *    return false;
+ *  }
+ *
+ *  const receiver = getClaimed(hash);
+ *  if (receiver === undefined) {
+ *    return false;
+ *  }
+ *
+ *  if (!Address.isCaller(receiver)) {
+ *    return false;
+ *  }
+ *
+ *  if (anyOtherReferenceFromContract()) {
+ *    return false;
+ *  }
+ *
+ *  return true;
+ * }
+ *
+ * const handleSendUnsafe = () => {
+ *  if (isProcessed(Blockchain.currentTransaction.hash)) {
+ *    return false;
+ *  }
+ *
+ *  if (!isReceiveMethod() && !onlySentAssets()) {
+ *    return false;
+ *  }
+ *
+ *  const args = getArgument(1);
+ *  const result = contract.sendUnsafeMethod(...args);
+ *  if (result) {
+ *    markProcessed(Blockchain.currentTransaction.hash);
+ *  }
+ *  return result;
+ * }
+ *
+ * const handleReceive = () => {
+ *  if (isProcessed(Blockchain.currentTransaction.hash)) {
+ *    return false;
+ *  }
+ *
+ *  if (!isSendUnsafeMethod() && !onlyReceivedAssets()) {
+ *    return false;
+ *  }
+ *
+ *  const args = getArgument(1);
+ *  const result = contract.receiveMethod(...args);
+ *  if (result) {
+ *    markProcessed(Blockchain.currentTransaction.hash);
+ *  }
+ *  return result;
+ * }
+ *
+ * // Refunds fully consume the outputs of an unprocessed transaction, which means
+ * // we don't have to do any additional tracking since outputs can only be used once.
+ * const handleRefund = () => {
+ *  const hash = getSentAssetsTransactionHash();
+ *  if (hash === undefined) {
+ *    return false;
+ *  }
+ *
+ *  if (isProcessed(hash)) {
+ *    return false;
+ *  }
+ *
+ *  if (!getTransactionReferences(hash).every((output) => Address.isCaller(output.scriptHash))) {
+ *    return false;
+ *  }
+ *
+ *  return true;
+ * }
+ *
+ * const handleNormal = () => {
+ *  const args = getArgument(1);
+ *  return contract.normalMethod(...args);
+ * }
+ *
+ * const handleUpgrade = () => {
+ *  if (contract.approveUpgrade()) {
+ *    const args = getArgument(1);
+ *    Neo.Contract.Migrate(...args);
+ *    return true;
+ *  }
+ *  return false;
+ * }
+ *
+ * const handleDeploy = () => {
+ *  if (isDeployed()) {
+ *    return false;
+ *  }
+ *
+ *  contract.deploy(...getArgument(1));
+ *  setDeployed(true);
+ *  return true;
+ * }
+ *
+ * const handleClaim = () => {
+ *  return contract.claimMethod(...getArgument(1), System.ExecutionEnginer.GetScriptContainer());
+ * }
+ *
+ * const trigger = Neo.Runtime.GetTrigger()
+ * if (trigger === TriggerType.Application) {
+ *  const method = getArgument(0);
+ *  switch (method) {
+ *    case 'normalMethod':
+ *      return handleNormalMethod();
+ *    case 'sendMethod':
+ *      return handleSend();
+ *    case 'sendUnsafeMethod':
+ *      return handleSendUnsafe();
+ *    case 'receiveMethod':
+ *      return handleReceive();
+ *    case 'upgrade':
+ *      return handleUpgrade();
+ *    case 'refundAssets':
+ *      return handleRefund();
+ *    case 'completeSend':
+ *      return handleCompleteSend();
+ *    case 'deploy':
+ *      return handleDeploy();
+ *    default:
+ *      throw new Error('Unknown method');
+ * } else if (trigger === TriggerType.Verification) {
+ *  const transaction = System.ExecutionEnginer.GetScriptContainer();
+ *  if (transaction.type === TransactionType.Invocation) {
+ *    const method = getArgument(0);
+ *    switch (method) {
+ *      case 'sendMethod':
+ *        if (!applicationScriptMatchesVerification()) {
+ *          return false;
+ *        }
+ *        return handleSend();
+ *      case 'sendUnsafeMethod':
+ *        if (!applicationScriptMatchesVerification()) {
+ *          return false;
+ *        }
+ *        return handleSendUnsafe();
+ *      case 'receiveMethod':
+ *        if (!applicationScriptMatchesVerification()) {
+ *          return false;
+ *        }
+ *        return handleReceive();
+ *      case 'completeSend':
+ *        return handleCompleteSend();
+ *      default:
+ *        if (didSendAssets() || didReceiveAssets()) {
+ *          throw new Error();
+ *        }
+ *        return handleOther();
+ *    }
+ *  } else if (transaction.type === TransactionType.Claim) {
+ *    if (didSendAssets() || didReceiveNonClaimAssets()) {
+ *      return false;
+ *    }
+ *    const method = getArgument(0);
+ *    switch (method) {
+ *      case 'claimMethod':
+ *        return handleClaim();
+ *      default:
+ *        throw new Error();
+ *    } else {
+ *      throw new Error();
+ *    }
+ *  } else {
+ *    throw new Error();
+ *  }
+ * }
+ *
+ */
 
 // Input: []
 // Output: []
@@ -33,31 +243,7 @@ export class InvokeSmartContractHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
 
-    const findSuperDeployPropInfo = (contractInfo: ContractInfo): [ContractInfo, DeployPropInfo] | undefined => {
-      const superSmartContract = contractInfo.superSmartContract;
-      if (superSmartContract === undefined) {
-        return undefined;
-      }
-
-      const superDeployPropInfo = superSmartContract.propInfos.find(
-        (propInfo): propInfo is DeployPropInfo => propInfo.type === 'deploy',
-      );
-      if (superDeployPropInfo !== undefined) {
-        return [superSmartContract, superDeployPropInfo];
-      }
-
-      return findSuperDeployPropInfo(superSmartContract);
-    };
-
-    const findDeployInfo = (): [ContractInfo, DeployPropInfo] | undefined => {
-      const deployInfo = this.contractInfo.propInfos.find(
-        (propInfo): propInfo is DeployPropInfo => propInfo.type === 'deploy',
-      );
-
-      return deployInfo === undefined ? findSuperDeployPropInfo(this.contractInfo) : [this.contractInfo, deployInfo];
-    };
-
-    const getCaseBase = (decl: ts.Node, name: string, whenTrue: (trigger: Trigger) => void) => (trigger: Trigger) => ({
+    const getCaseBase = (decl: ts.Node, name: string, whenTrue: () => void) => ({
       condition: () => {
         // [arg, arg]
         sb.emitOp(decl, 'DUP');
@@ -69,339 +255,35 @@ export class InvokeSmartContractHelper extends Helper {
       whenTrue: () => {
         // []
         sb.emitOp(decl, 'DROP');
-        whenTrue(trigger);
+        whenTrue();
       },
     });
 
-    const wrapParam = (
-      param: ts.ParameterDeclaration | ts.ParameterPropertyDeclaration,
-      innerOptions: VisitOptions,
-    ) => {
-      let type = sb.context.analysis.getType(param);
-      if (type !== undefined && tsUtils.parameter.isRestParameter(param)) {
-        type = tsUtils.type_.getArrayType(type);
-      }
-
-      sb.emitHelper(
-        param,
-        innerOptions,
-        sb.helpers.wrapValRecursive({
-          type,
-          checkValue: true,
-          optional: tsUtils.initializer.getInitializer(param) !== undefined,
-        }),
-      );
-    };
-
-    const getFunctionLikeCase = (
-      name: string,
-      decl: ts.SetAccessorDeclaration | ts.MethodDeclaration | ts.GetAccessorDeclaration | ts.PropertyDeclaration,
-      returnType?: ts.Type,
-      acceptsClaim?: boolean,
-      prelude?: (rest: () => void) => (trigger: Trigger) => void,
-    ) => {
-      const handleCase = () => {
+    const getFunctionCase = (propInfo: FunctionPropInfo) =>
+      getCaseBase(propInfo.decl, propInfo.name, () => {
+        const decl = propInfo.decl;
         if (ts.isPropertyDeclaration(decl)) {
           sb.context.reportUnsupported(decl);
 
           return;
         }
 
-        // [number]
-        sb.emitPushInt(decl, 1);
-        // [arg]
-        sb.emitHelper(decl, options, sb.helpers.getArgument);
-        if (acceptsClaim) {
-          // [arg, arg]
-          sb.emitOp(decl, 'DUP');
-          // [transaction, arg, arg]
-          sb.emitSysCall(decl, 'System.ExecutionEngine.GetScriptContainer');
-          // [transactionVal, arg, arg]
-          sb.emitHelper(decl, options, sb.helpers.wrapTransaction);
-          // [arg]
-          sb.emitOp(decl, 'APPEND');
-        }
-        sb.withScope(decl, options, (innerOptions) => {
-          sb.emitHelper(
-            decl,
-            innerOptions,
-            sb.helpers.parameters({
-              params: tsUtils.parametered.getParameters(decl),
-              mapParam: wrapParam,
-            }),
-          );
-
-          let invokeOptions = innerOptions;
-          if (ts.isSetAccessor(decl)) {
-            invokeOptions = sb.noPushValueOptions(innerOptions);
-          }
-
-          sb.emitHelper(decl, invokeOptions, sb.helpers.invokeSmartContractMethod({ method: decl }));
-          if (ts.isSetAccessor(decl)) {
-            sb.emitPushBuffer(decl, Buffer.alloc(0, 0));
-          } else {
-            sb.emitHelper(decl, innerOptions, sb.helpers.unwrapValRecursive({ type: returnType }));
-          }
-        });
-      };
-
-      return getCaseBase(decl, name, prelude === undefined ? handleCase : prelude(handleCase));
-    };
-
-    const getFunctionCase = (propInfo: FunctionPropInfo) =>
-      getFunctionLikeCase(
-        propInfo.name,
-        propInfo.decl,
-        propInfo.returnType,
-        propInfo.acceptsClaim,
-        (rest) => (trigger) => {
-          const checkReceive = () => {
-            // [boolean]
-            sb.emitHelper(decl, options, sb.helpers.didSendAssets);
-          };
-          const shouldCheckReceive = !propInfo.send && propInfo.receive;
-
-          const checkSend = () => {
-            // [boolean]
-            sb.emitHelper(decl, options, sb.helpers.isValidSend);
-            // [boolean]
-            sb.emitOp(node, 'NOT');
-          };
-
-          const shouldCheckSend = propInfo.send && !propInfo.receive;
-
-          const decl = propInfo.decl;
-          // Check and store that we've already processed this transaction
-          if (trigger === Trigger.application && (propInfo.send || propInfo.receive)) {
-            const check = shouldCheckSend
-              ? checkSend
-              : shouldCheckReceive
-                ? checkReceive
-                : () => {
-                    sb.emitPushBoolean(node, false);
-                  };
-            sb.emitHelper(
-              decl,
-              options,
-              sb.helpers.markRefund({
-                isInvalid: check,
-                execute: rest,
-              }),
-            );
-
-            return;
-          }
-
-          // Check that the verification script is the same as the application script
-          // And also do basic verification of received/sent assets
-          if (trigger === Trigger.verification && (propInfo.send || propInfo.receive)) {
-            // [transaction]
-            sb.emitSysCall(decl, 'System.ExecutionEngine.GetScriptContainer');
-            // [buffer]
-            sb.emitSysCall(decl, 'Neo.InvocationTransaction.GetScript');
-            // [buffer, buffer]
-            sb.emitOp(decl, 'DUP');
-            // [21, buffer, buffer]
-            sb.emitPushInt(decl, 21);
-            // [21, buffer, 21, buffer]
-            sb.emitOp(decl, 'TUCK');
-            // [appCallHash, 21, buffer]
-            sb.emitOp(decl, 'RIGHT');
-            // [appCall, appCallHash, 21, buffer]
-            sb.emitPushBuffer(decl, Buffer.from([Op.APPCALL]));
-            // [hash, appCall, appCallHash, 21, buffer]
-            sb.emitSysCall(decl, 'System.ExecutionEngine.GetExecutingScriptHash');
-            // [appCallHash, appCallHash, 21, buffer]
-            sb.emitOp(decl, 'CAT');
-            sb.emitHelper(
-              decl,
-              options,
-              sb.helpers.if({
-                condition: () => {
-                  // [boolean, 21, buffer]
-                  sb.emitOp(decl, 'EQUAL');
-                },
-                whenTrue: () => {
-                  // [buffer, 21, buffer]
-                  sb.emitOp(decl, 'OVER');
-                  // [size, 21, buffer]
-                  sb.emitOp(decl, 'SIZE');
-                  // [21, size, buffer]
-                  sb.emitOp(decl, 'SWAP');
-                  // [size - 21, buffer]
-                  sb.emitOp(decl, 'SUB');
-                  // [argsBuffer]
-                  sb.emitOp(decl, 'LEFT');
-                  // [argsHash]
-                  sb.emitOp(decl, 'HASH160');
-                  // [entryHash, argsHash]
-                  sb.emitSysCall(decl, 'System.ExecutionEngine.GetEntryScriptHash');
-                  sb.emitHelper(
-                    decl,
-                    options,
-                    sb.helpers.if({
-                      condition: () => {
-                        // [boolean]
-                        sb.emitOp(decl, 'EQUAL');
-                      },
-                      whenTrue: () => {
-                        if (shouldCheckSend || shouldCheckReceive) {
-                          sb.emitHelper(
-                            decl,
-                            options,
-                            sb.helpers.if({
-                              condition: shouldCheckSend ? checkSend : checkReceive,
-                              whenTrue: () => {
-                                // [boolean]
-                                sb.emitPushBoolean(decl, false);
-                              },
-                              whenFalse: () => {
-                                // [boolean]
-                                rest();
-                              },
-                            }),
-                          );
-                        } else {
-                          // [boolean]
-                          rest();
-                        }
-                      },
-                      whenFalse: () => {
-                        // [boolean]
-                        sb.emitPushBoolean(decl, false);
-                      },
-                    }),
-                  );
-                },
-                whenFalse: () => {
-                  // [buffer]
-                  sb.emitOp(decl, 'DROP');
-                  // []
-                  sb.emitOp(decl, 'DROP');
-                  // [boolean]
-                  sb.emitPushBoolean(decl, false);
-                },
-              }),
-            );
-
-            return;
-          }
-
-          // [boolean]
-          rest();
-        },
-      );
-
-    const handleDeployProperties = (contractInfo: ContractInfo, innerOptions: VisitOptions) => {
-      contractInfo.propInfos
-        .filter((prop) => prop.classDecl === contractInfo.smartContract)
-        .forEach((propertyPropInfo) => {
-          if (propertyPropInfo.type === 'property' && propertyPropInfo.structuredStorageType === undefined) {
-            const property = propertyPropInfo.decl;
-            if (ts.isPropertyDeclaration(property)) {
-              const initializer = tsUtils.initializer.getInitializer(property);
-              if (initializer !== undefined) {
-                // [val]
-                sb.visit(initializer, sb.pushValueOptions(innerOptions));
-                // [name, val]
-                sb.emitPushString(property, tsUtils.node.getName(property));
-                // []
-                sb.emitHelper(property, innerOptions, sb.helpers.putCommonStorage);
-              }
-            } else if (ts.isParameterPropertyDeclaration(property)) {
-              const name = tsUtils.node.getName(property);
-              // [val]
-              sb.scope.get(sb, property, sb.pushValueOptions(innerOptions), name);
-              // [name, val]
-              sb.emitPushString(property, name);
-              // []
-              sb.emitHelper(property, innerOptions, sb.helpers.putCommonStorage);
-            }
-          }
-        });
-    };
-
-    const handleDeploy = (
-      currentContractInfo: ContractInfo,
-      propInfo: DeployPropInfo,
-      innerOptions: VisitOptions,
-      entry = true,
-    ) => {
-      const decl = propInfo.decl;
-      const superDeploy = findSuperDeployPropInfo(currentContractInfo);
-
-      if (decl === undefined) {
-        if (superDeploy === undefined) {
-          handleDeployProperties(currentContractInfo, innerOptions);
+        if (propInfo.send) {
+          sb.emitHelper(decl, options, sb.helpers.handleSend({ method: decl }));
+        } else if (propInfo.receive) {
+          sb.emitHelper(decl, options, sb.helpers.handleReceive({ opposite: propInfo.sendUnsafe, method: decl }));
+        } else if (propInfo.sendUnsafe) {
+          sb.emitHelper(decl, options, sb.helpers.handleSendUnsafe({ opposite: propInfo.receive, method: decl }));
         } else {
-          handleDeploy(superDeploy[0], superDeploy[1], innerOptions, entry);
-          handleDeployProperties(currentContractInfo, innerOptions);
+          sb.emitHelper(decl, options, sb.helpers.handleNormal({ propInfo }));
         }
-      } else {
-        if (entry) {
-          // [number]
-          sb.emitPushInt(decl, 1);
-          // [arg]
-          sb.emitHelper(decl, innerOptions, sb.helpers.getArgument);
-        }
-        sb.withScope(decl, innerOptions, (innerInnerOptions) => {
-          sb.emitHelper(
-            decl,
-            innerInnerOptions,
-            sb.helpers.parameters({
-              params: tsUtils.parametered.getParameters(decl),
-              mapParam: entry ? wrapParam : undefined,
-            }),
-          );
-
-          const invokeOptions = sb.handleSuperConstructOptions(
-            sb.noPushValueOptions(innerInnerOptions),
-            (expr, _superExpr, innerInnerInnerOptionsIn) => {
-              if (superDeploy === undefined) {
-                return;
-              }
-
-              const innerInnerInnerOptions = sb.pushValueOptions(innerInnerInnerOptionsIn);
-              // [argsarr]
-              sb.emitHelper(expr, innerInnerInnerOptions, sb.helpers.args);
-              handleDeploy(superDeploy[0], superDeploy[1], innerInnerInnerOptions, false);
-              handleDeployProperties(currentContractInfo, innerInnerInnerOptions);
-            },
-          );
-          if (superDeploy === undefined) {
-            handleDeployProperties(currentContractInfo, innerInnerOptions);
-          }
-          sb.emitHelper(decl, invokeOptions, sb.helpers.invokeSmartContractMethod({ method: decl }));
-        });
-      }
-    };
+      });
 
     const getDeployCase = (contractInfo: ContractInfo, propInfo: DeployPropInfo) => {
       const decl = propInfo.decl === undefined ? propInfo.classDecl : propInfo.decl;
 
       return getCaseBase(decl, propInfo.name, () => {
-        sb.emitHelper(
-          node,
-          options,
-          sb.helpers.if({
-            condition: () => {
-              // [boolean]
-              sb.emitHelper(propInfo.decl === undefined ? node : propInfo.decl, options, sb.helpers.isDeployed);
-            },
-            whenTrue: () => {
-              // [boolean]
-              sb.emitPushBoolean(decl, false);
-            },
-            whenFalse: () => {
-              // []
-              handleDeploy(contractInfo, propInfo, options);
-              // []
-              sb.emitHelper(propInfo.decl === undefined ? node : propInfo.decl, options, sb.helpers.setDeployed);
-              // [boolean]
-              sb.emitPushBoolean(decl, true);
-            },
-          }),
-        );
+        sb.emitHelper(decl, options, sb.helpers.deploy({ contractInfo, propInfo }));
       });
     };
 
@@ -409,31 +291,47 @@ export class InvokeSmartContractHelper extends Helper {
       const decl = propInfo.decl;
 
       return getCaseBase(decl, propInfo.name, () => {
-        sb.emitPushString(decl, propInfo.name);
-        sb.emitHelper(decl, options, sb.helpers.getCommonStorage);
-        sb.emitHelper(decl, options, sb.helpers.unwrapValRecursive({ type: sb.context.analysis.getType(decl) }));
+        sb.emitHelper(decl, options, sb.helpers.handleNormal({ propInfo }));
       });
     };
 
     const getAccessorCase = (propInfo: AccessorPropInfo) => {
-      const mutableCases: Array<(trigger: Trigger) => Case> = [];
+      const mutableCases: Case[] = [];
       const getter = propInfo.getter;
 
       if (getter !== undefined) {
-        mutableCases.push(getFunctionLikeCase(getter.name, getter.decl, propInfo.propertyType));
+        mutableCases.push(
+          getCaseBase(getter.decl, getter.name, () => {
+            sb.emitHelper(getter.decl, options, sb.helpers.handleNormal({ propInfo, getter: true }));
+          }),
+        );
       }
 
       const setter = propInfo.setter;
       if (setter !== undefined) {
-        mutableCases.push(getFunctionLikeCase(setter.name, setter.decl, propInfo.propertyType));
+        mutableCases.push(
+          getCaseBase(setter.decl, setter.name, () => {
+            sb.emitHelper(setter.decl, options, sb.helpers.handleNormal({ propInfo, getter: false }));
+          }),
+        );
       }
 
       return mutableCases;
     };
 
-    const getRefundAssetsCase = () =>
+    const getRefundAssetsCase = (propInfo: RefundAssetsPropInfo) =>
       getCaseBase(node, ContractPropertyName.refundAssets, () => {
-        sb.emitHelper(node, options, sb.helpers.refundAssets);
+        sb.emitHelper(node, options, sb.helpers.handleNormal({ propInfo }));
+      });
+
+    const getCompleteSendCase = (propInfo: CompleteSendPropInfo) =>
+      getCaseBase(node, ContractPropertyName.completeSend, () => {
+        sb.emitHelper(node, options, sb.helpers.handleNormal({ propInfo }));
+      });
+
+    const getUpgradeCase = (propInfo: UpgradePropInfo) =>
+      getCaseBase(node, ContractPropertyName.upgrade, () => {
+        sb.emitHelper(node, options, sb.helpers.handleNormal({ propInfo }));
       });
 
     const allCases = _.flatMap(
@@ -444,28 +342,34 @@ export class InvokeSmartContractHelper extends Helper {
             return [
               {
                 propCase: getFunctionCase(propInfo),
-                claim: propInfo.claim,
-                send: propInfo.send,
-                receive: propInfo.receive,
+                claimVerify: propInfo.claim,
+                invokeVerify: propInfo.send || propInfo.sendUnsafe || propInfo.receive,
               },
             ];
           }
 
           if (propInfo.type === 'refundAssets') {
-            return [{ propCase: getRefundAssetsCase(), claim: false, send: true, receive: false }];
+            return [{ propCase: getRefundAssetsCase(propInfo), claimVerify: false, invokeVerify: true }];
+          }
+
+          if (propInfo.type === 'completeSend') {
+            return [{ propCase: getCompleteSendCase(propInfo), claimVerify: false, invokeVerify: true }];
           }
 
           if (propInfo.type === 'property') {
-            return [{ propCase: getPropertyCase(propInfo), claim: false, send: false, receive: false }];
+            return [{ propCase: getPropertyCase(propInfo), claimVerify: false, invokeVerify: false }];
           }
 
           if (propInfo.type === 'accessor') {
             return getAccessorCase(propInfo).map((propCase) => ({
               propCase,
-              claim: false,
-              send: false,
-              receive: false,
+              claimVerify: false,
+              invokeVerify: false,
             }));
+          }
+
+          if (propInfo.type === 'upgrade') {
+            return [{ propCase: getUpgradeCase(propInfo), claimVerify: false, invokeVerify: false }];
           }
 
           if (propInfo.type === 'deploy') {
@@ -478,25 +382,41 @@ export class InvokeSmartContractHelper extends Helper {
           throw new Error('For TS');
         }),
     );
-    let applicationCases = allCases.filter((propCase) => !propCase.claim).map(({ propCase }) => propCase);
-    const deploy = findDeployInfo();
+    let applicationCases = allCases.filter((propCase) => !propCase.claimVerify).map(({ propCase }) => propCase);
+    const deploy = findDeployInfo(this.contractInfo);
     if (deploy !== undefined) {
       applicationCases = applicationCases.concat(getDeployCase(deploy[0], deploy[1]));
     }
-    const invocationVerifyCases = allCases
-      .filter((propCase) => propCase.receive || propCase.send)
-      .map(({ propCase }) => propCase);
-    const nonVerifyCases = allCases
-      .filter((propCase) => !propCase.receive && !propCase.send && !propCase.claim)
-      .map(({ propCase }) => propCase);
-    const claimCases = allCases.filter((propCase) => propCase.claim).map(({ propCase }) => propCase);
+    const invocationVerifyCases = allCases.filter((propCase) => propCase.invokeVerify).map(({ propCase }) => propCase);
+    const nonVerifyCases = allCases.filter((propCase) => !propCase.invokeVerify).map(({ propCase }) => propCase);
+    const claimCases = allCases.filter((propCase) => propCase.claimVerify).map(({ propCase }) => propCase);
 
     const throwDefault = () => {
       sb.emitOp(node, 'DROP');
       sb.emitOp(node, 'THROW');
     };
 
-    const handleDefaultVerify = () => {
+    const handleInvokeVerify = (func: () => void) => {
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.if({
+          condition: () => {
+            sb.emitHelper(node, options, sb.helpers.applicationMatchesVerification);
+          },
+          whenTrue: () => {
+            func();
+          },
+          whenFalse: () => {
+            // []
+            sb.emitOp(node, 'DROP');
+            sb.emitPushBoolean(node, false);
+          },
+        }),
+      );
+    };
+
+    const handleDefaultInvokeVerify = () => {
       // []
       sb.emitOp(node, 'DROP');
       // [boolean]
@@ -519,11 +439,7 @@ export class InvokeSmartContractHelper extends Helper {
             sb.emitPushInt(node, 0);
             // [arg]
             sb.emitHelper(node, options, sb.helpers.getArgument);
-            sb.emitHelper(
-              node,
-              options,
-              sb.helpers.case(nonVerifyCases.map((propCase) => propCase(Trigger.application)), throwDefault),
-            );
+            sb.emitHelper(node, options, sb.helpers.case(nonVerifyCases, throwDefault));
           },
         }),
       );
@@ -553,11 +469,7 @@ export class InvokeSmartContractHelper extends Helper {
               // [arg]
               sb.emitHelper(node, options, sb.helpers.getArgument);
               // []
-              sb.emitHelper(
-                node,
-                options,
-                sb.helpers.case(applicationCases.map((propCase) => propCase(Trigger.application)), throwDefault),
-              );
+              sb.emitHelper(node, options, sb.helpers.case(applicationCases, throwDefault));
             },
           },
           {
@@ -602,8 +514,13 @@ export class InvokeSmartContractHelper extends Helper {
                           node,
                           options,
                           sb.helpers.case(
-                            invocationVerifyCases.map((propCase) => propCase(Trigger.verification)),
-                            handleDefaultVerify,
+                            invocationVerifyCases.map((propCase) => ({
+                              ...propCase,
+                              whenTrue: () => {
+                                handleInvokeVerify(propCase.whenTrue);
+                              },
+                            })),
+                            handleDefaultInvokeVerify,
                           ),
                         );
                       },
@@ -620,15 +537,29 @@ export class InvokeSmartContractHelper extends Helper {
                       whenTrue: () => {
                         // []
                         sb.emitOp(node, 'DROP');
-                        // [number]
-                        sb.emitPushInt(node, 0);
-                        // [arg]
-                        sb.emitHelper(node, options, sb.helpers.getArgument);
-                        // []
+                        // [boolean]
+                        sb.emitHelper(node, options, sb.helpers.didReceiveNonClaimAssets);
+                        // [boolean, boolean]
+                        sb.emitHelper(node, options, sb.helpers.didSendAssets);
                         sb.emitHelper(
                           node,
                           options,
-                          sb.helpers.case(claimCases.map((propCase) => propCase(Trigger.verification)), throwDefault),
+                          sb.helpers.if({
+                            condition: () => {
+                              // [boolean]
+                              sb.emitOp(node, 'BOOLOR');
+                            },
+                            whenTrue: () => {
+                              sb.emitPushBoolean(node, false);
+                            },
+                            whenFalse: () => {
+                              // [number]
+                              sb.emitPushInt(node, 0);
+                              // [arg]
+                              sb.emitHelper(node, options, sb.helpers.getArgument);
+                              sb.emitHelper(node, options, sb.helpers.case(claimCases, throwDefault));
+                            },
+                          }),
                         );
                       },
                     },

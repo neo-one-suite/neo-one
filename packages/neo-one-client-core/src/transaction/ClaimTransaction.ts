@@ -11,6 +11,7 @@ import { Input, InputJSON } from './Input';
 import { Output } from './Output';
 import {
   FeeContext,
+  GetReferencesOptions,
   TransactionBase,
   TransactionBaseAdd,
   TransactionBaseJSON,
@@ -130,6 +131,10 @@ export class ClaimTransaction extends TransactionBase<TransactionType.Claim, Cla
 
   public async getNetworkFee(_context: FeeContext): Promise<BN> {
     return utils.ZERO;
+  }
+
+  public async getClaimReferences({ getOutput }: GetReferencesOptions): Promise<ReadonlyArray<Output>> {
+    return Promise.all(this.claims.map(async (input) => getOutput(input)));
   }
 
   public async getScriptHashesForVerifying(

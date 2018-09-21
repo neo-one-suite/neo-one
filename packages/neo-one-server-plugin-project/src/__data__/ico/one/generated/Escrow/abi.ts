@@ -1,4 +1,4 @@
-/* @hash 47b405c0e50e77059d3e1c7ce04c7bf1 */
+/* @hash b59267b2b86f7e2e541abe1f4459890a */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -37,6 +37,7 @@ export const escrowABI: ABI = {
         type: 'Integer',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -75,6 +76,7 @@ export const escrowABI: ABI = {
         type: 'Boolean',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -106,6 +108,7 @@ export const escrowABI: ABI = {
         type: 'Void',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -144,6 +147,7 @@ export const escrowABI: ABI = {
         type: 'Boolean',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -182,19 +186,7 @@ export const escrowABI: ABI = {
         type: 'Boolean',
       },
       send: false,
-    },
-    {
-      name: 'refundAssets',
-      parameters: [
-        {
-          name: 'transactionHash',
-          type: 'Hash256',
-        },
-      ],
-      returnType: {
-        type: 'Boolean',
-      },
-      send: true,
+      sendUnsafe: false,
     },
     {
       name: 'deploy',

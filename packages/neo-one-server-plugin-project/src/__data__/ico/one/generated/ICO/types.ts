@@ -1,15 +1,14 @@
-/* @hash 7e1cb7e0855d08a573f98c370ecefd73 */
+/* @hash a44949dd0c4f906f34559ebc2434a0d8 */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
   Event,
   GetOptions,
-  Hash256String,
   InvocationTransaction,
   InvokeReceipt,
   InvokeReceiveTransactionOptions,
-  InvokeSendTransactionOptions,
+  InvokeSendUnsafeTransactionOptions,
   ReadSmartContract,
   SmartContract,
   TransactionOptions,
@@ -69,11 +68,11 @@ export interface ICOSmartContract extends SmartContract<ICOReadSmartContract> {
   };
   readonly owner: () => Promise<AddressString>;
   readonly refundAssets: {
-    (transactionHash: Hash256String, options?: InvokeSendTransactionOptions): Promise<
+    (options?: InvokeSendUnsafeTransactionOptions): Promise<
       TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>
     >;
     readonly confirmed: {
-      (transactionHash: Hash256String, options?: InvokeSendTransactionOptions & GetOptions): Promise<
+      (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<
         InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }
       >;
     };

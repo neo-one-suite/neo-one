@@ -743,9 +743,12 @@ export const Block: BlockConstructor;
 export type SerializableKeySingle = number | string | boolean | Buffer;
 type SK = SerializableKeySingle;
 export type SerializableKey = SK | [SK, SK] | [SK, SK, SK] | [SK, SK, SK, SK];
-interface SerializableValueArray extends ReadonlyArray<SerializableValue> {}
-interface SerializableValueMap extends ReadonlyMap<SerializableKeySingle, SerializableValue> {}
-interface SerializableValueSet extends ReadonlySet<SerializableValue> {}
+export interface SerializableValueArray extends ReadonlyArray<SerializableValue> {}
+export interface SerializableValueMap extends ReadonlyMap<SerializableKeySingle, SerializableValue> {}
+export interface SerializableValueSet extends ReadonlySet<SerializableValue> {}
+export interface SerializableValueObject {
+  readonly [key: string]: SerializableValue;
+}
 export type SerializableValue =
   | undefined
   | null
@@ -755,7 +758,8 @@ export type SerializableValue =
   | Buffer
   | SerializableValueArray
   | SerializableValueMap
-  | SerializableValueSet;
+  | SerializableValueSet
+  | SerializableValueObject;
 
 /**
  * Persistent smart contract set storage. Only usable as a `SmartContract` property.
@@ -1137,24 +1141,66 @@ export class SmartContract {
    */
   public readonly address: Address;
   /**
-   * Stores `Transaction` hashes that have been processed by a method marked with `@receive` or `@send`.
+   * Stores `Transaction` hashes that have been processed by a method marked with `@receive`, `@send`, or `@sendUnsafe`.
    *
-   * Used to enforce that a `Transaction` with native `Asset`s is only ever processed once by an appropriate `@receive` or `@send` method.
+   * Used to enforce that a `Transaction` with native `Asset`s is only ever processed once by an appropriate `@receive`, `@send`, or `@sendUnsafe` method.
+   *
+   * Unprocessed transactions that sent assets to the smart contract can be refunded by using `refundAssets`.
    */
   protected readonly processedTransactions: SetStorage<Hash256>;
   /**
-   * Stores `Transaction` hashes that can be refunded.
+   * Stores `Transaction` hashes that have been claimed by an address with a method marked with `@send`.
+   *
+   * The first contract output of a claimed transaction may be sent to the receiver by using `completeSend`.
    */
-  protected readonly allowedRefunds: SetStorage<Hash256>;
+  protected readonly claimedTransactions: MapStorage<Hash256, Address>;
   /**
    * Property primarily used internally to validate that the smart contract is deployed only once.
    */
   protected readonly deployed: true;
   /**
+   * Override to validate a contract upgrade invocation. Returns `false` by default. Return `true` to indicate the upgrade may proceed.
+   *
+   * @example
+   *
+   * export class Contract extends SmartContract {
+   *  public constructor(private readonly owner = Deploy.senderAddress) {
+   *    super();
+   *  }
+   *
+   *  protected approveUpgrade(): boolean {
+   *    return Address.isCaller(this.owner);
+   *  }
+   * }
+   */
+  protected approveUpgrade(): boolean;
+  /**
+   * Permanently deletes the contract.
+   */
+  protected readonly destroy: () => void;
+  /**
    * Method automatically added for refunding native `Asset`s.
    */
-  public readonly refundAssets: (transactionHash: Hash256) => boolean;
-  public static readonly for: <T>(hash: T extends IsValidSmartContract<T> ? Address : never) => T;
+  public readonly refundAssets: () => boolean;
+  /**
+   * Method automatically added for sending native `Asset`s that have been claimed by a `@send` method.
+   */
+  public readonly completeSend: () => boolean;
+  /**
+   * Used internally by client APIs to upgrade the contract. Control whether an invocation is allowed to upgrade the contract by overriding `approveUpgrade`.
+   */
+  public readonly upgrade: (
+    script: Buffer,
+    parameterList: Buffer,
+    returnType: number,
+    properties: number,
+    contractName: string,
+    codeVersion: string,
+    author: string,
+    email: string,
+    description: string,
+  ) => boolean;
+  public static readonly for: <T>(address: T extends IsValidSmartContract<T> ? Address : never) => T;
 }
 
 export interface LinkedSmartContractConstructor {
@@ -1190,17 +1236,42 @@ export const crypto: Crypto;
 /**
  * Marks a `SmartContract` method that verifies `Asset` transfers from the `SmartContract`.
  *
- * Method must return a boolean indicating whether the `SmartContract` wishes to send the transferred `Asset`s.
+ * Method must return a boolean indicating whether the `SmartContract` wishes to approve sending the transferred `Asset`s.
  *
- * May be used in combination with `@receive`
+ * Method can take the receiving address, asset and amount as the final arguments.
+ *
+ * @example
+ *
+ * export class Contract extends SmartContract {
+ *  @send
+ *  public withdraw(arg0: Address, arg1: Fixed<8>, receiver: Address, asset: Hash256, amount: Fixed<8>): boolean {
+ *    // Don't allow sending anything but NEO
+ *    if (!asset.equals(Hash256.NEO)) {
+ *      return false;
+ *    }
+ *    // Do some additional checks on the receiver and amount being sent and other arguments.
+ *    return true;
+ *  }
+ * }
+ *
  */
 export function send(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
+/**
+ * Marks a `SmartContract` method that verifies `Asset` transfers from the `SmartContract`.
+ *
+ * Method must return a boolean indicating whether the `SmartContract` wishes to approve sending the transferred `Asset`s.
+ *
+ * Note that unlike `@send`, `@sendUnsafe` does not use a two-phase send. Smart contract authors must implement their own logic for safely sending assets from the contract.
+ *
+ * May be used in combination with `@receive`.
+ */
+export function sendUnsafe(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
 /**
  * Marks a `SmartContract` method that verifies receiving `Asset`s to the `SmartContract`.
  *
  * Method must return a boolean indicating whether the `SmartContract` wishes to receive the transferred `Asset`s.
  *
- * May be used in combination with `@send`.
+ * May be used in combination with `@sendUnsafe`.
  */
 export function receive(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
 /**

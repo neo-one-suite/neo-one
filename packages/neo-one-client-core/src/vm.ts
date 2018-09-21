@@ -332,6 +332,7 @@ export enum SysCall {
   'Neo.Contract.Destroy' = 'Neo.Contract.Destroy',
   'Neo.Storage.Put' = 'Neo.Storage.Put',
   'Neo.Storage.Delete' = 'Neo.Storage.Delete',
+  'Neo.ClaimTransaction.GetClaimReferences' = 'Neo.ClaimTransaction.GetClaimReferences',
   'System.ExecutionEngine.GetScriptContainer' = 'System.ExecutionEngine.GetScriptContainer',
   'System.ExecutionEngine.GetExecutingScriptHash' = 'System.ExecutionEngine.GetExecutingScriptHash',
   'System.ExecutionEngine.GetCallingScriptHash' = 'System.ExecutionEngine.GetCallingScriptHash',

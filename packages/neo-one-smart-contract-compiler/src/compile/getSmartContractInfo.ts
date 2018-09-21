@@ -59,7 +59,13 @@ const addContractInfo = (context: Context, contractInfo: ContractInfo) => {
   const propertyNameToOverride = new Map<string, ts.Symbol>();
   getAllPropInfos(contractInfo).forEach((propInfo) => {
     const symbol = context.analysis.getSymbol(propInfo.classDecl);
-    if (symbol !== undefined && propInfo.type !== 'deploy' && propInfo.type !== 'refundAssets') {
+    if (
+      symbol !== undefined &&
+      propInfo.type !== 'deploy' &&
+      propInfo.type !== 'refundAssets' &&
+      propInfo.type !== 'upgrade' &&
+      propInfo.type !== 'completeSend'
+    ) {
       const memberSymbol = propInfo.symbol;
       switch (propInfo.type) {
         case 'function':

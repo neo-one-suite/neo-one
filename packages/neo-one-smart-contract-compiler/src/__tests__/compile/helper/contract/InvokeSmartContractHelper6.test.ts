@@ -16,7 +16,18 @@ describe('InvokeSmartContractHelper', () => {
     const node = await helpers.startNode();
     const accountID = node.masterWallet.account.id;
     const contract = await node.addContract(`
-      import { Address, Deploy, SmartContract, send, receive, claim } from '@neo-one/smart-contract';
+      import {
+        Address,
+        ClaimTransaction,
+        Deploy,
+        Hash256,
+        SmartContract,
+        Fixed,
+        sendUnsafe,
+        send,
+        receive,
+        claim,
+      } from '@neo-one/smart-contract';
 
       export class TestSmartContract extends SmartContract {
         ${properties}
@@ -26,7 +37,12 @@ describe('InvokeSmartContractHelper', () => {
         }
 
         @send
-        public send(): boolean {
+        public send(receiver: Address, asset: Hash256, amount: Fixed<8>): boolean {
+          return receiver.equals(this.owner) && asset.equals(Hash256.NEO) && Address.isCaller(this.owner) && amount > 0;
+        }
+
+        @sendUnsafe
+        public sendUnsafe(): boolean {
           return Address.isCaller(this.owner);
         }
 
@@ -35,15 +51,16 @@ describe('InvokeSmartContractHelper', () => {
           return Address.isCaller(this.owner);
         }
 
-        @send
+        @sendUnsafe
         @receive
-        public sendReceive(): boolean {
+        public sendUnsafeReceive(): boolean {
           return Address.isCaller(this.owner);
         }
 
         @claim
-        public claim(): boolean {
-          return Address.isCaller(this.owner);
+        public claim(transaction: ClaimTransaction): boolean {
+          console.log(transaction.inputs.length);
+          return transaction.inputs.length === 0 && Address.isCaller(this.owner);
         }
       }
     `);
@@ -71,6 +88,8 @@ describe('InvokeSmartContractHelper', () => {
 
     let account = await node.client.read(accountID.network).getAccount(contract.address);
     expect(account.balances[Hash256.NEO].toString()).toEqual('10');
+    account = await node.client.read(accountID.network).getAccount(accountID.address);
+    expect(account.balances[Hash256.NEO].toString()).toEqual('99999990');
 
     const smartContract = node.client.smartContract({
       networks: {
@@ -82,8 +101,8 @@ describe('InvokeSmartContractHelper', () => {
         functions: [
           {
             name: 'refundAssets',
-            send: true,
-            parameters: [{ name: 'transactionHash', type: 'Hash256' }],
+            refundAssets: true,
+            parameters: [],
             returnType: { type: 'Boolean' },
           },
           {
@@ -105,8 +124,20 @@ describe('InvokeSmartContractHelper', () => {
             returnType: { type: 'Boolean' },
           },
           {
-            name: 'sendReceive',
-            send: true,
+            name: 'completeSend',
+            completeSend: true,
+            parameters: [],
+            returnType: { type: 'Boolean' },
+          },
+          {
+            name: 'sendUnsafe',
+            sendUnsafe: true,
+            parameters: [],
+            returnType: { type: 'Boolean' },
+          },
+          {
+            name: 'sendUnsafeReceive',
+            sendUnsafe: true,
             receive: true,
             parameters: [],
             returnType: { type: 'Boolean' },
@@ -116,52 +147,22 @@ describe('InvokeSmartContractHelper', () => {
       sourceMaps: Promise.resolve(node.sourceMaps),
     });
 
-    await expect(
-      smartContract.refundAssets(transferResult.transaction.hash, {
-        sendFrom: [
-          {
-            asset: Hash256.NEO,
-            amount: new BigNumber(9),
-            to: accountID.address,
-          },
-        ],
-      }),
-    ).rejects.toBeDefined();
-
-    const count = await node.client.read(accountID.network).getBlockCount();
-    await Promise.all([
-      node.client.read(accountID.network).getBlock(count, { timeoutMS: 2500 }),
-      node.developerClient.runConsensusNow(),
-    ]);
-
-    account = await node.client.read(accountID.network).getAccount(contract.address);
-    expect(account.balances[Hash256.NEO].toString()).toEqual('10');
-
-    const refundResult = await smartContract.refundAssets(transferResult.transaction.hash, {
-      sendFrom: [
-        {
-          asset: Hash256.NEO,
-          amount: new BigNumber(10),
-          to: accountID.address,
-        },
-      ],
-    });
+    const refundResult = await smartContract.refundAssets(transferResult.transaction.hash);
     const refundReceipt = await refundResult.confirmed();
     expect(refundReceipt.result.state).toEqual('HALT');
+    if (refundReceipt.result.state === 'HALT') {
+      expect(refundReceipt.result.value).toBeTruthy();
+    }
+    expect(refundReceipt.result.gasCost).toMatchSnapshot();
 
-    await expect(
-      smartContract.refundAssets(transferResult.transaction.hash, {
-        sendFrom: [
-          {
-            asset: Hash256.NEO,
-            amount: new BigNumber(10),
-            to: accountID.address,
-          },
-        ],
-      }),
-    ).rejects.toBeDefined();
+    account = await node.client.read(accountID.network).getAccount(contract.address);
+    expect(account.balances[Hash256.NEO]).toBeUndefined();
+    account = await node.client.read(accountID.network).getAccount(accountID.address);
+    expect(account.balances[Hash256.NEO].toString()).toEqual('100000000');
 
-    const claimResult = await smartContract.claim({ claimAll: true });
+    await expect(smartContract.refundAssets(transferResult.transaction.hash)).rejects.toBeDefined();
+
+    const claimResult = await smartContract.claim();
     await claimResult.confirmed();
     expect(claimResult.transaction.outputs.length).toEqual(1);
 
@@ -169,14 +170,18 @@ describe('InvokeSmartContractHelper', () => {
       sendTo: [
         {
           asset: Hash256.NEO,
-          amount: new BigNumber(20),
+          amount: new BigNumber(40),
         },
       ],
     });
     const receiveReceipt = await receiveResult.confirmed();
     expect(receiveReceipt.result.state).toEqual('HALT');
+    if (receiveReceipt.result.state === 'HALT') {
+      expect(receiveReceipt.result.value).toBeTruthy();
+    }
+    expect(receiveReceipt.result.gasCost).toMatchSnapshot();
 
-    const sendResult = await smartContract.send({
+    const sendUnsafeResult = await smartContract.sendUnsafe({
       sendFrom: [
         {
           asset: Hash256.NEO,
@@ -185,25 +190,19 @@ describe('InvokeSmartContractHelper', () => {
         },
       ],
     });
-    const sendReceipt = await sendResult.confirmed();
-    expect(sendReceipt.result.state).toEqual('HALT');
+    const sendUnsafeReceipt = await sendUnsafeResult.confirmed();
+    expect(sendUnsafeReceipt.result.state).toEqual('HALT');
+    if (sendUnsafeReceipt.result.state === 'HALT') {
+      expect(sendUnsafeReceipt.result.value).toBeTruthy();
+    }
+    expect(sendUnsafeReceipt.result.gasCost).toMatchSnapshot();
 
-    await expect(
-      smartContract.refundAssets(sendResult.transaction.hash, {
-        sendFrom: [
-          {
-            asset: Hash256.NEO,
-            amount: new BigNumber(10),
-            to: accountID.address,
-          },
-        ],
-      }),
-    ).rejects.toBeDefined();
+    await expect(smartContract.refundAssets(sendUnsafeResult.transaction.hash)).rejects.toBeDefined();
 
     account = await node.client.read(accountID.network).getAccount(contract.address);
-    expect(account.balances[Hash256.NEO].toString()).toEqual('10');
+    expect(account.balances[Hash256.NEO].toString()).toEqual('30');
 
-    const sendReceiveResult = await smartContract.sendReceive({
+    const sendUnsafeReceiveResult = await smartContract.sendUnsafeReceive({
       sendTo: [
         {
           asset: Hash256.GAS,
@@ -218,20 +217,71 @@ describe('InvokeSmartContractHelper', () => {
         },
       ],
     });
-    const sendReceiveReceipt = await sendReceiveResult.confirmed();
-    expect(sendReceiveReceipt.result.state).toEqual('HALT');
+    const sendUnsafeReceiveReceipt = await sendUnsafeReceiveResult.confirmed();
+    expect(sendUnsafeReceiveReceipt.result.state).toEqual('HALT');
+    expect(sendUnsafeReceiveReceipt.result.gasCost).toMatchSnapshot();
 
-    await expect(
-      smartContract.refundAssets(sendResult.transaction.hash, {
-        sendFrom: [
-          {
-            asset: Hash256.GAS,
-            amount: new BigNumber(20),
-            to: accountID.address,
-          },
-        ],
-      }),
-    ).rejects.toBeDefined();
+    await expect(smartContract.refundAssets(sendUnsafeReceiveResult.transaction.hash)).rejects.toBeDefined();
+
+    account = await node.client.read(accountID.network).getAccount(contract.address);
+    expect(account.balances[Hash256.GAS].toString()).toEqual('20');
+    expect(account.balances[Hash256.NEO].toString()).toEqual('20');
+
+    const sendResult = await smartContract.send({
+      asset: Hash256.NEO,
+      amount: new BigNumber(10),
+      to: accountID.address,
+    });
+    await Promise.all([
+      // Rejected because method returns false
+      expect(
+        smartContract.send({
+          asset: Hash256.GAS,
+          amount: new BigNumber(10),
+          to: accountID.address,
+        }),
+      ).rejects.toBeDefined(),
+      // Rejected because no available outputs
+      expect(
+        smartContract.send({
+          asset: Hash256.NEO,
+          amount: new BigNumber(5),
+          to: accountID.address,
+        }),
+      ).rejects.toBeDefined(),
+    ]);
+    const sendReceipt = await sendResult.confirmed();
+    expect(sendReceipt.result.state).toEqual('HALT');
+    expect(sendReceipt.result.gasCost).toMatchSnapshot();
+
+    account = await node.client.read(accountID.network).getAccount(contract.address);
+    expect(account.balances[Hash256.GAS].toString()).toEqual('20');
+    expect(account.balances[Hash256.NEO].toString()).toEqual('20');
+
+    const completeSendReceipt = await smartContract.completeSend.confirmed(sendResult.transaction.hash);
+    expect(completeSendReceipt.result.state).toEqual('HALT');
+    expect(completeSendReceipt.result.gasCost).toMatchSnapshot();
+
+    account = await node.client.read(accountID.network).getAccount(contract.address);
+    expect(account.balances[Hash256.GAS].toString()).toEqual('20');
+    expect(account.balances[Hash256.NEO].toString()).toEqual('10');
+
+    const sendResult0 = await smartContract.send({
+      asset: Hash256.NEO,
+      amount: new BigNumber(10),
+      to: accountID.address,
+    });
+    const sendReceipt0 = await sendResult0.confirmed();
+    expect(sendReceipt0.result.state).toEqual('HALT');
+    expect(sendReceipt0.result.gasCost).toMatchSnapshot();
+
+    account = await node.client.read(accountID.network).getAccount(contract.address);
+    expect(account.balances[Hash256.GAS].toString()).toEqual('20');
+    expect(account.balances[Hash256.NEO].toString()).toEqual('10');
+
+    const completeSendReceipt0 = await smartContract.completeSend.confirmed(sendResult0.transaction.hash);
+    expect(completeSendReceipt0.result.state).toEqual('HALT');
+    expect(completeSendReceipt0.result.gasCost).toMatchSnapshot();
 
     account = await node.client.read(accountID.network).getAccount(contract.address);
     expect(account.balances[Hash256.GAS].toString()).toEqual('20');

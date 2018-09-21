@@ -36,7 +36,7 @@ export class ABISmartContractProcessor {
             return [
               {
                 name: propInfo.name,
-                parameters: propInfo.isMixinDeploy ? [] : this.getParameters(propInfo.callSignature),
+                parameters: propInfo.isMixinDeploy ? [] : this.getParameters({ callSignature: propInfo.callSignature }),
                 returnType: BOOLEAN_RETURN,
               },
             ];
@@ -44,8 +44,35 @@ export class ABISmartContractProcessor {
             return [
               {
                 name: propInfo.name,
-                send: true,
-                parameters: [{ name: 'transactionHash', type: 'Hash256' }],
+                sendUnsafe: true,
+                parameters: [],
+                returnType: BOOLEAN_RETURN,
+              },
+            ];
+          case 'completeSend':
+            return [
+              {
+                name: propInfo.name,
+                sendUnsafe: true,
+                parameters: [],
+                returnType: BOOLEAN_RETURN,
+              },
+            ];
+          case 'upgrade':
+            return [
+              {
+                name: propInfo.name,
+                parameters: [
+                  { name: 'script', type: 'Buffer' },
+                  { name: 'parameterList', type: 'Buffer' },
+                  { name: 'returnType', type: 'Integer', decimals: 0 },
+                  { name: 'properties', type: 'Integer', decimals: 0 },
+                  { name: 'contractName', type: 'String' },
+                  { name: 'codeVersion', type: 'String' },
+                  { name: 'author', type: 'String' },
+                  { name: 'email', type: 'String' },
+                  { name: 'description', type: 'String' },
+                ],
                 returnType: BOOLEAN_RETURN,
               },
             ];
@@ -53,10 +80,15 @@ export class ABISmartContractProcessor {
             return [
               {
                 name: propInfo.name,
-                parameters: this.getParameters(propInfo.callSignature),
+                parameters: this.getParameters({
+                  callSignature: propInfo.callSignature,
+                  send: propInfo.send,
+                  claim: propInfo.claim,
+                }),
                 returnType: this.toABIReturn(propInfo.decl, propInfo.returnType),
                 constant: propInfo.constant,
                 send: propInfo.send,
+                sendUnsafe: propInfo.sendUnsafe,
                 receive: propInfo.receive,
                 claim: propInfo.claim,
               },
@@ -131,15 +163,40 @@ export class ABISmartContractProcessor {
     return superSmartContract === undefined ? undefined : this.findDeployInfo(superSmartContract);
   }
 
-  private getParameters(callSignature: ts.Signature | undefined): ReadonlyArray<ABIParameter> {
+  private getParameters({
+    callSignature,
+    claim = false,
+    send = false,
+  }: {
+    readonly callSignature: ts.Signature | undefined;
+    readonly claim?: boolean;
+    readonly send?: boolean;
+  }): ReadonlyArray<ABIParameter> {
     if (callSignature === undefined) {
       return [];
     }
 
-    return callSignature
-      .getParameters()
-      .map((parameter) => this.paramToABIParameter(parameter))
-      .filter(utils.notNull);
+    let parameters = callSignature.getParameters();
+    if (claim && this.checkLastParam(parameters, 'ClaimTransaction')) {
+      parameters = parameters.slice(0, -1);
+    }
+
+    if (
+      send &&
+      this.checkLastParamBase(parameters, (decl, type) => this.context.builtins.isType(decl, type, 'Fixed'))
+    ) {
+      parameters = parameters.slice(0, -1);
+    }
+
+    if (send && this.checkLastParam(parameters, 'Hash256')) {
+      parameters = parameters.slice(0, -1);
+    }
+
+    if (send && this.checkLastParam(parameters, 'Address')) {
+      parameters = parameters.slice(0, -1);
+    }
+
+    return parameters.map((parameter) => this.paramToABIParameter(parameter)).filter(utils.notNull);
   }
 
   private processEvents(): ReadonlyArray<ABIEvent> {
@@ -262,7 +319,7 @@ export class ABISmartContractProcessor {
     const parameter = this.toABIParameter(
       tsUtils.symbol.getName(param),
       decl,
-      this.context.analysis.getTypeOfSymbol(param, decl),
+      this.getParamSymbolType(param),
       initializer !== undefined,
     );
 
@@ -286,6 +343,31 @@ export class ABISmartContractProcessor {
     }
 
     return parameter;
+  }
+
+  private checkLastParam(parameters: ReadonlyArray<ts.Symbol>, value: string): boolean {
+    return this.checkLastParamBase(parameters, (decl, type) => this.context.builtins.isInterface(decl, type, value));
+  }
+
+  private checkLastParamBase(
+    parameters: ReadonlyArray<ts.Symbol>,
+    checkParamType: (decl: ts.Node, type: ts.Type) => boolean,
+  ): boolean {
+    if (parameters.length === 0) {
+      return false;
+    }
+
+    const lastParam = parameters[parameters.length - 1];
+    const lastParamType = this.getParamSymbolType(lastParam);
+
+    return lastParamType !== undefined && checkParamType(tsUtils.symbol.getDeclarations(lastParam)[0], lastParamType);
+  }
+
+  private getParamSymbolType(param: ts.Symbol): ts.Type | undefined {
+    const decls = tsUtils.symbol.getDeclarations(param);
+    const decl = utils.nullthrows(decls[0]);
+
+    return this.context.analysis.getTypeOfSymbol(param, decl);
   }
 
   private toABIParameter(

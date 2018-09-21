@@ -1,4 +1,6 @@
 export * from './RawEnumeratorEveryHelper';
+export * from './RawEnumeratorFilterHelper';
+export * from './RawEnumeratorFindHelper';
 export * from './RawEnumeratorForEachFuncHelper';
 export * from './RawEnumeratorForEachHelper';
 export * from './RawEnumeratorReduceHelper';

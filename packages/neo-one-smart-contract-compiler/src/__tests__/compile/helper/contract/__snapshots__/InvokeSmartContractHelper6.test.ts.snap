@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 1`] = `"1.074"`;
+
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 2`] = `"1.9"`;
+
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 3`] = `"1.909"`;
+
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 4`] = `"1.589"`;
+
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 5`] = `"3.208"`;
+
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 6`] = `"0.747"`;
+
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 7`] = `"3.177"`;
+
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 8`] = `"0.747"`;

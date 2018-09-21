@@ -3,6 +3,6 @@ import { IsTransactionHelperBase } from './IsTransactionHelperBase';
 
 // Input: [buffer]
 // Output: [boolean]
-export class IsAllowedRefundHelper extends IsTransactionHelperBase {
-  protected readonly prefix = ContractPropertyName.allowedRefunds;
+export class IsClaimedTransactionHelper extends IsTransactionHelperBase {
+  protected readonly prefix = ContractPropertyName.claimedTransactions;
 }

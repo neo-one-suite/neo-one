@@ -16,7 +16,7 @@ export const contractABI: ABI = {
         optional: false,
         type: 'Void',
       },
-      send: false,
+      sendUnsafe: false,
     },
     {
       name: 'refundAssets',
@@ -29,7 +29,7 @@ export const contractABI: ABI = {
       returnType: {
         type: 'Boolean',
       },
-      send: true,
+      sendUnsafe: true,
     },
     {
       name: 'deploy',

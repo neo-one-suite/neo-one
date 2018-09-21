@@ -487,6 +487,72 @@ describe('MapStorage', () => {
     `);
   });
 
+  test('object values', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { MapStorage, SmartContract } from '@neo-one/smart-contract';
+
+      export class Contract extends SmartContract {
+        private readonly storage = MapStorage.for<string, {
+          readonly foo: string;
+          readonly bar: number;
+          readonly baz: boolean;
+        }>();
+
+        public run(): void {
+          const storage = this.storage;
+          const x = { foo: 'foo', bar: 0, baz: true };
+
+          storage.set('hello', x);
+
+          const result = storage.get('hello');
+
+          if (result !== undefined) {
+            assertEqual(result.foo, x.foo);
+            assertEqual(result.bar, x.bar);
+            assertEqual(result.baz, x.baz);
+          } else {
+            assertEqual(result === undefined, false);
+          }
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('invalid object value - method', () => {
+    helpers.compileString(
+      `
+      import { SmartContract, MapStorage } from '@neo-one/smart-contract';
+
+      export class Contract extends SmartContract {
+        private readonly storage = MapStorage.for<string, {
+          bar(): boolean;
+        }>();
+
+        public run(): void {
+          this.storage.set('foo', {
+            bar(): boolean {
+              return true;
+            },
+          });
+        }
+      }
+    `,
+      { type: 'error' },
+    );
+  });
+
   test('invalid create', () => {
     helpers.compileString(
       `

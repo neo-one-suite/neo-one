@@ -61,7 +61,6 @@ This is the API documentation for the NEO•ONE Client Types.
     - [InvocationResultError](#InvocationResultError)
     - [InvocationResultSuccess](#InvocationResultSuccess)
     - [InvocationTransaction](#InvocationTransaction)
-    - [InvokeClaimTransactionOptions](#InvokeClaimTransactionOptions)
     - [InvokeReceipt](#InvokeReceipt)
     - [IssueTransaction](#IssueTransaction)
     - [MinerTransaction](#MinerTransaction)
@@ -623,13 +622,6 @@ Types related to Transactions.
     - type: 'InvocationTransaction'
     - script: [BufferString](#BufferString)
     - gas: [BigNumber](https://github.com/MikeMcl/bignumber.js/)
-
-#### InvokeClaimTransactionOptions
-  - Extra options available for a [ClaimTransaction](#ClaimTransaction).
-  - Extension of [TransactionOptions](#TransactionOptions).
-  - Properties (optional):
-    - claimAll: boolean
-      - True when the claim should claim all unclaimed GAS.
 
 #### InvokeReceipt
   - Extension of [TransactionReceipt](#TransactionReceipt) for invocations.

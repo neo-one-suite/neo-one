@@ -5,6 +5,7 @@ import { BuiltinInstanceMemberStorageProperty } from '../../BuiltinInstanceMembe
 import { BuiltinInstanceMemberStructuredStorageProperty } from '../../BuiltinInstanceMemberStructuredStorageProperty';
 import { Builtins } from '../../Builtins';
 import { SmartContractAddress } from './address';
+import { SmartContractDestroy } from './destroy';
 import { SmartContractFor } from './for';
 
 class SmartContractValue extends BuiltinBase {}
@@ -13,11 +14,15 @@ class SmartContractValue extends BuiltinBase {}
 export const add = (builtins: Builtins): void => {
   builtins.addContractValue('SmartContract', new SmartContractValue());
   builtins.addContractMember('SmartContract', 'for', new SmartContractFor());
-  builtins.addContractMember('SmartContract', 'address', new SmartContractAddress());
-  builtins.addContractMember('SmartContract', 'deployed', new BuiltinInstanceMemberStorageProperty('deployed'));
+  builtins.addContractMember('SmartContract', ContractPropertyName.address, new SmartContractAddress());
   builtins.addContractMember(
     'SmartContract',
-    'processedTransactions',
+    ContractPropertyName.deployed,
+    new BuiltinInstanceMemberStorageProperty(ContractPropertyName.deployed),
+  );
+  builtins.addContractMember(
+    'SmartContract',
+    ContractPropertyName.processedTransactions,
     new BuiltinInstanceMemberStructuredStorageProperty(
       StructuredStorageType.SetStorage,
       ContractPropertyName.processedTransactions,
@@ -25,10 +30,11 @@ export const add = (builtins: Builtins): void => {
   );
   builtins.addContractMember(
     'SmartContract',
-    'allowedRefunds',
+    ContractPropertyName.claimedTransactions,
     new BuiltinInstanceMemberStructuredStorageProperty(
-      StructuredStorageType.SetStorage,
-      ContractPropertyName.allowedRefunds,
+      StructuredStorageType.MapStorage,
+      ContractPropertyName.claimedTransactions,
     ),
   );
+  builtins.addContractMember('SmartContract', ContractPropertyName.destroy, new SmartContractDestroy());
 };

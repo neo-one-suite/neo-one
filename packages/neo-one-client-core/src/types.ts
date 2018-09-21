@@ -580,9 +580,13 @@ export interface ABIFunction {
    */
   readonly constant?: boolean;
   /**
-   * True if the function is used for sending native assets.
+   * True if the function is used for sending native assets with a two-phase send.
    */
   readonly send?: boolean;
+  /**
+   * True if the function is used for sending native assets.
+   */
+  readonly sendUnsafe?: boolean;
   /**
    * True if the function is used for receiving native assets.
    */
@@ -591,6 +595,14 @@ export interface ABIFunction {
    * True if the function is used for claiming GAS.
    */
   readonly claim?: boolean;
+  /**
+   * True if the function is used for refunding native assets.
+   */
+  readonly refundAssets?: boolean;
+  /**
+   * True if the function is used for the second phase of a send.
+   */
+  readonly completeSend?: boolean;
 }
 
 /**

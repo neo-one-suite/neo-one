@@ -12,8 +12,7 @@ export class DidReceiveAssetsHelper extends Helper {
     // [transaction]
     sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
     // [outputs]
-    sb.emitSysCall(node, 'Neo.Transaction.GetReferences');
-
+    sb.emitSysCall(node, 'Neo.Transaction.GetOutputs');
     // [boolean]
     sb.emitHelper(
       node,

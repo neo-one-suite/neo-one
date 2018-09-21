@@ -18,20 +18,28 @@ const getOptions = (abi: ABIFunction, { withConfirmedOptions = false }: Options 
 
   const type = withConfirmedOptions ? '& GetOptions' : '';
 
-  if (abi.send && abi.receive) {
-    return [`options?: InvokeSendReceiveTransactionOptions${type}`];
+  if (abi.sendUnsafe && abi.receive) {
+    return [`options?: InvokeSendUnsafeReceiveTransactionOptions${type}`];
   }
 
-  if (abi.send) {
-    return [`options?: InvokeSendTransactionOptions${type}`];
+  if (abi.sendUnsafe) {
+    return [`options?: InvokeSendUnsafeTransactionOptions${type}`];
   }
 
   if (abi.receive) {
     return [`options?: InvokeReceiveTransactionOptions${type}`];
   }
 
-  if (abi.claim) {
-    return [`options?: InvokeClaimTransactionOptions${type}`];
+  if (abi.refundAssets) {
+    return [`hash: Hash256String, options?: TransactionOptions${type}`];
+  }
+
+  if (abi.send) {
+    return [`transfer: Transfer, options?: TransactionOptions${type}`];
+  }
+
+  if (abi.completeSend) {
+    return [`hash: Hash256String, options?: TransactionOptions${type}`];
   }
 
   return [`options?: TransactionOptions${type}`];

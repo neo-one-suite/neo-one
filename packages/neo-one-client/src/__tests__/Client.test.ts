@@ -24,6 +24,9 @@ describe('Client', () => {
   const readClient = {};
   const read = jest.fn(() => readClient);
   const invoke = jest.fn(async () => commonTransactionResult);
+  const invokeSend = jest.fn(async () => commonTransactionResult);
+  const invokeRefundAssets = jest.fn(async () => commonTransactionResult);
+  const invokeCompleteSend = jest.fn(async () => commonTransactionResult);
   const invokeClaim = jest.fn(async () => commonTransactionResult);
   const commonRawCallReceipt = factory.createRawCallReceipt();
   const call = jest.fn(async () => commonRawCallReceipt);
@@ -60,6 +63,9 @@ describe('Client', () => {
       issue,
       read,
       invoke,
+      invokeSend,
+      invokeRefundAssets,
+      invokeCompleteSend,
       invokeClaim,
       call,
     };
@@ -82,6 +88,9 @@ describe('Client', () => {
       issue: issue1,
       read: jest.fn(),
       invoke: jest.fn(async () => Promise.resolve()),
+      invokeSend: jest.fn(async () => Promise.resolve()),
+      invokeRefundAssets: jest.fn(async () => Promise.resolve()),
+      invokeCompleteSend: jest.fn(async () => Promise.resolve()),
       invokeClaim: jest.fn(async () => Promise.resolve()),
       call: jest.fn(),
     };

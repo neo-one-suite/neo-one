@@ -22,8 +22,7 @@ import {
   GetOptions,
   Hash256String,
   InvocationTransaction,
-  InvokeClaimTransactionOptions,
-  InvokeSendReceiveTransactionOptions,
+  InvokeSendUnsafeReceiveTransactionOptions,
   IssueTransaction,
   NetworkType,
   Param,
@@ -217,7 +216,7 @@ export class Client<
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
-    optionsIn?: InvokeSendReceiveTransactionOptions,
+    optionsIn?: InvokeSendUnsafeReceiveTransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const options = optionsIn === undefined ? {} : optionsIn;
@@ -228,12 +227,63 @@ export class Client<
     );
   }
 
+  public async __invokeSend(
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    transfer: Transfer,
+    optionsIn?: TransactionOptions,
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+    const options = optionsIn === undefined ? {} : optionsIn;
+    await this.applyBeforeRelayHook(options);
+
+    return this.addTransactionHooks(
+      this.getProvider(options).invokeSend(contract, method, params, paramsZipped, transfer, options, sourceMaps),
+    );
+  }
+
+  public async __invokeCompleteSend(
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    hash: Hash256String,
+    optionsIn?: TransactionOptions,
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+    const options = optionsIn === undefined ? {} : optionsIn;
+    await this.applyBeforeRelayHook(options);
+
+    return this.addTransactionHooks(
+      this.getProvider(options).invokeCompleteSend(contract, method, params, paramsZipped, hash, options, sourceMaps),
+    );
+  }
+
+  public async __invokeRefundAssets(
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    hash: Hash256String,
+    optionsIn?: TransactionOptions,
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+    const options = optionsIn === undefined ? {} : optionsIn;
+    await this.applyBeforeRelayHook(options);
+
+    return this.addTransactionHooks(
+      this.getProvider(options).invokeRefundAssets(contract, method, params, paramsZipped, hash, options, sourceMaps),
+    );
+  }
+
   public async __invokeClaim(
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
-    optionsIn?: InvokeClaimTransactionOptions,
+    optionsIn?: TransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
     const options = optionsIn === undefined ? {} : optionsIn;

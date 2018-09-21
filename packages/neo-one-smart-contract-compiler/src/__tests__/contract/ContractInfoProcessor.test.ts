@@ -318,15 +318,15 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('@send with @constant', () => {
+  test('@sendUnsafe with @constant', () => {
     helpers.compileString(
       `
-      import { SmartContract, send, constant } from '@neo-one/smart-contract';
+      import { SmartContract, sendUnsafe, constant } from '@neo-one/smart-contract';
 
       export class TestSmartContract extends SmartContract {
         ${properties}
 
-        @send
+        @sendUnsafe
         @constant
         public verify(): boolean {
           return true;
@@ -517,15 +517,15 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('invalid @send method with ForwardValue', () => {
+  test('invalid @sendUnsafe method with ForwardValue', () => {
     helpers.compileString(
       `
-      import { SmartContract, ForwardValue, send } from '@neo-one/smart-contract';
+      import { SmartContract, ForwardValue, sendUnsafe } from '@neo-one/smart-contract';
 
       export class TestSmartContract extends SmartContract {
         ${properties}
 
-        @send
+        @sendUnsafe
         public foo(value: ForwardValue): boolean {
           return true;
         }
@@ -571,15 +571,15 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('invalid @send method with ForwardedValue', () => {
+  test('invalid @sendUnsafe method with ForwardedValue', () => {
     helpers.compileString(
       `
-      import { SmartContract, ForwardedValue, send } from '@neo-one/smart-contract';
+      import { SmartContract, ForwardedValue, sendUnsafe } from '@neo-one/smart-contract';
 
       export class TestSmartContract extends SmartContract {
         ${properties}
 
-        @send
+        @sendUnsafe
         public foo(value: ForwardedValue<number>): boolean {
           return true;
         }

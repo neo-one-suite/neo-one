@@ -6,7 +6,7 @@ import {
   Hash256String,
   InvocationTransaction,
   InvokeReceipt,
-  InvokeSendTransactionOptions,
+  InvokeSendUnsafeTransactionOptions,
   ReadSmartContract,
   SmartContract,
   TransactionOptions,
@@ -37,11 +37,11 @@ export interface ContractSmartContract extends SmartContract<ContractReadSmartCo
     };
   };
   readonly refundAssets: {
-    (transactionHash: Hash256String, options?: InvokeSendTransactionOptions): Promise<
+    (transactionHash: Hash256String, options?: InvokeSendUnsafeTransactionOptions): Promise<
       TransactionResult<InvokeReceipt<boolean, ContractEvent>, InvocationTransaction>
     >;
     readonly confirmed: {
-      (transactionHash: Hash256String, options?: InvokeSendTransactionOptions & GetOptions): Promise<
+      (transactionHash: Hash256String, options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<
         InvokeReceipt<boolean, ContractEvent> & { readonly transaction: InvocationTransaction }
       >;
     };

@@ -21,7 +21,7 @@
     "raw-loader": "^0.5.1",
     "react": "^16.5.1",
     "react-dom": "^16.5.1",
-    "react-hot-loader": "^4.3.8",
+    "react-hot-loader": "^4.3.11",
     "react-icons": "^3.1.0",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",

@@ -445,7 +445,7 @@ export const createHandler = ({
       try {
         const [transactionJSON, result] = await Promise.all<TransactionJSON, RelayTransactionResult>([
           transaction.serializeJSON(blockchain.serializeJSONContext),
-          node.relayTransaction(transaction, { forceAdd: true }),
+          node.relayTransaction(transaction, { forceAdd: true, throwVerifyError: true }),
         ]);
         const resultJSON =
           result.verifyResult === undefined

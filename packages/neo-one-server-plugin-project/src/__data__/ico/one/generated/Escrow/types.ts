@@ -1,14 +1,12 @@
-/* @hash dac44c77b908fe31c44b847294f5d0d3 */
+/* @hash 5089d29fea4c55eac2ec8cdfb7317d00 */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
   ForwardValue,
   GetOptions,
-  Hash256String,
   InvocationTransaction,
   InvokeReceipt,
-  InvokeSendTransactionOptions,
   ReadSmartContract,
   SmartContract,
   TransactionOptions,
@@ -96,16 +94,6 @@ export interface EscrowSmartContract extends SmartContract<EscrowReadSmartContra
         amount: BigNumber,
         options?: TransactionOptions & GetOptions,
       ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
-    };
-  };
-  readonly refundAssets: {
-    (transactionHash: Hash256String, options?: InvokeSendTransactionOptions): Promise<
-      TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>
-    >;
-    readonly confirmed: {
-      (transactionHash: Hash256String, options?: InvokeSendTransactionOptions & GetOptions): Promise<
-        InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }
-      >;
     };
   };
 }
