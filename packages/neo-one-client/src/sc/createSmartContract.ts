@@ -1,13 +1,9 @@
-import { ScriptBuilderParam } from '@neo-one/client-core';
+import { RawInvokeReceipt, ScriptBuilderParam } from '@neo-one/client-core';
 import { utils, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
+import * as argAssertions from '../args';
 import { Client } from '../Client';
-import {
-  CannotClaimContractError,
-  CannotSendFromContractError,
-  CannotSendToContractError,
-  NoContractDeployedError,
-} from '../errors';
+import { CannotSendFromContractError, CannotSendToContractError, NoContractDeployedError } from '../errors';
 import { events as traceEvents } from '../trace';
 import {
   ABIEvent,
@@ -18,10 +14,10 @@ import {
   ClaimTransaction,
   Event,
   GetOptions,
+  Hash256String,
   InvocationTransaction,
-  InvokeClaimTransactionOptions,
   InvokeReceipt,
-  InvokeSendReceiveTransactionOptions,
+  InvokeSendUnsafeReceiveTransactionOptions,
   Log,
   NetworkType,
   Param,
@@ -32,6 +28,7 @@ import {
   SmartContractNetworkDefinition,
   TransactionReceipt,
   TransactionResult,
+  Transfer,
 } from '../types';
 import * as common from './common';
 
@@ -48,35 +45,58 @@ const getParamsAndOptions = ({
   definition: { networks },
   parameters,
   args,
-  send,
+  sendUnsafe,
   receive,
-  claim,
+  send,
+  completeSend,
+  refundAssets,
   client,
 }: {
   readonly definition: SmartContractDefinition;
   readonly parameters: ReadonlyArray<ABIParameter>;
   // tslint:disable-next-line no-any
   readonly args: ReadonlyArray<any>;
-  readonly send: boolean;
+  readonly sendUnsafe: boolean;
   readonly receive: boolean;
-  readonly claim: boolean;
+  readonly send: boolean;
+  readonly completeSend: boolean;
+  readonly refundAssets: boolean;
   readonly client: Client;
 }): {
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
   readonly paramsZipped: ReadonlyArray<[string, Param | undefined]>;
-  readonly options: InvokeSendReceiveTransactionOptions | InvokeClaimTransactionOptions;
+  readonly options: InvokeSendUnsafeReceiveTransactionOptions;
   readonly network: NetworkType;
   readonly address: AddressString;
+  readonly transfer?: Transfer;
+  readonly hash?: Hash256String;
 } => {
   const hasRest = parameters.length > 0 && parameters[parameters.length - 1].rest;
-  const optionsArgIndex = hasRest ? parameters.length - 1 : parameters.length;
+  let optionsArgIndex = hasRest ? parameters.length - 1 : parameters.length;
+  if (send || completeSend || refundAssets) {
+    optionsArgIndex += 1;
+  }
+
   const maybeOptionsArg = args[optionsArgIndex] as {} | undefined;
   let params = args;
-  let optionsIn: InvokeSendReceiveTransactionOptions | InvokeClaimTransactionOptions = {};
+  let optionsIn: InvokeSendUnsafeReceiveTransactionOptions = {};
   if (isOptionsArg(maybeOptionsArg)) {
     params = args.slice(0, optionsArgIndex).concat(args.slice(optionsArgIndex + 1));
     // tslint:disable-next-line no-any
     optionsIn = maybeOptionsArg as any;
+  }
+
+  let transfer: Transfer | undefined;
+  let hash: Hash256String | undefined;
+  if (send || completeSend || refundAssets) {
+    const lastArgIndex = hasRest ? parameters.length - 1 : parameters.length;
+    const maybeLastArg = params[lastArgIndex];
+    if (send) {
+      transfer = argAssertions.assertTransfer('transfer', maybeLastArg);
+    } else {
+      hash = argAssertions.assertHash256('hash', maybeLastArg);
+    }
+    params = params.slice(0, lastArgIndex).concat(params.slice(lastArgIndex + 1));
   }
 
   const currentAccount = client.getCurrentAccount();
@@ -94,16 +114,12 @@ const getParamsAndOptions = ({
     throw new NoContractDeployedError(network);
   }
   // tslint:disable-next-line no-any
-  if ((options as any).sendFrom !== undefined && !send) {
+  if ((options as any).sendFrom !== undefined && !sendUnsafe) {
     throw new CannotSendFromContractError(contractNetwork.address);
   }
   // tslint:disable-next-line no-any
   if ((options as any).sendTo !== undefined && !receive) {
     throw new CannotSendToContractError(contractNetwork.address);
-  }
-  // tslint:disable-next-line no-any
-  if ((options as any).claimAll && !claim) {
-    throw new CannotClaimContractError(contractNetwork.address);
   }
 
   const { converted, zipped } = common.convertParams({
@@ -118,6 +134,8 @@ const getParamsAndOptions = ({
     options,
     network,
     address: contractNetwork.address,
+    transfer,
+    hash,
   };
 };
 
@@ -162,9 +180,11 @@ const createCall = ({
     definition,
     parameters,
     args,
-    send: false,
+    sendUnsafe: false,
     receive: false,
-    claim: false,
+    send: false,
+    completeSend: false,
+    refundAssets: false,
     client,
   });
 
@@ -186,7 +206,17 @@ const filterLogs = (actions: ReadonlyArray<Event | Log>): ReadonlyArray<Log> =>
 const createInvoke = ({
   definition,
   client,
-  func: { name, parameters = [], returnType, send = false, receive = false, claim = false },
+  func: {
+    name,
+    parameters = [],
+    returnType,
+    send = false,
+    refundAssets = false,
+    completeSend = false,
+    sendUnsafe = false,
+    receive = false,
+    claim = false,
+  },
 }: {
   readonly definition: SmartContractDefinition;
   readonly client: Client;
@@ -198,13 +228,15 @@ const createInvoke = ({
   ): Promise<
     TransactionResult<InvokeReceipt, InvocationTransaction> | TransactionResult<TransactionReceipt, ClaimTransaction>
   > => {
-    const { params, paramsZipped, options, address } = getParamsAndOptions({
+    const { params, paramsZipped, options, address, transfer, hash } = getParamsAndOptions({
       definition,
       parameters,
       args,
-      send,
+      sendUnsafe,
       receive,
-      claim,
+      send,
+      completeSend,
+      refundAssets,
       client,
     });
 
@@ -212,15 +244,52 @@ const createInvoke = ({
       return client.__invokeClaim(address, name, params, paramsZipped, options, definition.sourceMaps);
     }
 
-    const result = await client.__invoke(
-      address,
-      name,
-      params,
-      paramsZipped,
-      send || receive,
-      options,
-      definition.sourceMaps,
-    );
+    let result: TransactionResult<RawInvokeReceipt, InvocationTransaction>;
+    if (send) {
+      if (transfer === undefined) {
+        throw new Error('Something went wrong.');
+      }
+
+      result = await client.__invokeSend(address, name, params, paramsZipped, transfer, options, definition.sourceMaps);
+    } else if (refundAssets) {
+      if (hash === undefined) {
+        throw new Error('Something went wrong.');
+      }
+
+      result = await client.__invokeRefundAssets(
+        address,
+        name,
+        params,
+        paramsZipped,
+        hash,
+        options,
+        definition.sourceMaps,
+      );
+    } else if (completeSend) {
+      if (hash === undefined) {
+        throw new Error('Something went wrong.');
+      }
+
+      result = await client.__invokeCompleteSend(
+        address,
+        name,
+        params,
+        paramsZipped,
+        hash,
+        options,
+        definition.sourceMaps,
+      );
+    } else {
+      result = await client.__invoke(
+        address,
+        name,
+        params,
+        paramsZipped,
+        sendUnsafe || receive,
+        options,
+        definition.sourceMaps,
+      );
+    }
 
     return {
       transaction: result.transaction,

@@ -2,7 +2,7 @@
 
 exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: deploy consumed 1`] = `"0"`;
 
-exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: deploy cost 1`] = `"2.999"`;
+exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: deploy cost 1`] = `"2.993"`;
 
 exports[`TestToken properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"0"`;
 

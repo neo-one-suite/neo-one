@@ -39,6 +39,8 @@ import {
   NoAccountError,
   NothingToClaimError,
   NothingToIssueError,
+  NothingToRefundError,
+  NothingToSendError,
   NothingToTransferError,
 } from '../errors';
 import { addressToScriptHash } from '../helpers';
@@ -62,9 +64,8 @@ import {
   InvocationResultError,
   InvocationResultSuccess,
   InvocationTransaction,
-  InvokeClaimTransactionOptions,
   InvokeExecuteTransactionOptions,
-  InvokeSendReceiveTransactionOptions,
+  InvokeSendUnsafeReceiveTransactionOptions,
   IssueTransaction,
   NetworkSettings,
   NetworkType,
@@ -542,7 +543,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
-    options: InvokeSendReceiveTransactionOptions = {},
+    options: InvokeSendUnsafeReceiveTransactionOptions = {},
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const { attributes = [] } = options;
@@ -600,19 +601,190 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     });
   }
 
+  public async invokeSend(
+    contract: AddressString,
+    method: string,
+    paramsIn: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    transfer: Transfer,
+    options: TransactionOptions = {},
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+    const transactionOptions = this.getTransactionOptions(options);
+    const { from, attributes } = transactionOptions;
+
+    const contractID: UserAccountID = {
+      address: contract,
+      network: from.network,
+    };
+
+    const params = paramsIn.concat([common.stringToUInt160(addressToScriptHash(transfer.to))]);
+
+    return this.invokeRaw({
+      script: clientUtils.getInvokeMethodScript({
+        address: contract,
+        method,
+        params,
+      }),
+      options: {
+        ...transactionOptions,
+        attributes: attributes.concat(this.getInvokeAttributes(contract, method, paramsZipped, false, from.address)),
+      },
+      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
+        blockIndex: receipt.blockIndex,
+        blockHash: receipt.blockHash,
+        transactionIndex: receipt.transactionIndex,
+        result: data.result,
+        actions: data.actions,
+      }),
+      scripts: this.getInvokeScripts(method, params, true),
+      transfers: [
+        {
+          ...transfer,
+          to: contract,
+          from: contractID,
+        },
+      ],
+      reorderOutputs: (outputs) => {
+        const output = outputs.find(({ value }) => value.isEqualTo(transfer.amount));
+        if (output === undefined) {
+          throw new Error('Something went wrong.');
+        }
+        const outputIdx = outputs.indexOf(output);
+        if (outputIdx === -1) {
+          throw new Error('Something went wrong.');
+        }
+
+        return [outputs[outputIdx]].concat(outputs.slice(0, outputIdx)).concat(outputs.slice(outputIdx + 1));
+      },
+      method: 'invokeSend',
+      labels: {
+        [labelNames.INVOKE_METHOD]: method,
+      },
+      sourceMaps,
+    });
+  }
+
+  public async invokeCompleteSend(
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    hash: Hash256String,
+    options: TransactionOptions = {},
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+    const transactionOptions = this.getTransactionOptions(options);
+    const { from, attributes, monitor } = transactionOptions;
+
+    const sendTransaction = await this.provider.getTransaction(from.network, hash, monitor);
+    if (sendTransaction.outputs.length === 0) {
+      throw new NothingToSendError();
+    }
+    const sendInput = { hash, index: 0 };
+    const sendOutput = {
+      ...sendTransaction.outputs[0],
+      address: from.address,
+    };
+
+    return this.invokeRaw({
+      script: clientUtils.getInvokeMethodScript({
+        address: contract,
+        method,
+        params,
+      }),
+      options: {
+        ...transactionOptions,
+        attributes: attributes.concat(this.getInvokeAttributes(contract, method, paramsZipped, false, from.address)),
+      },
+      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
+        blockIndex: receipt.blockIndex,
+        blockHash: receipt.blockHash,
+        transactionIndex: receipt.transactionIndex,
+        result: data.result,
+        actions: data.actions,
+      }),
+      scripts: this.getInvokeScripts(method, params, true),
+      rawInputs: [sendInput],
+      rawOutputs: [sendOutput],
+      method: 'invokeCompleteSend',
+      labels: {
+        [labelNames.INVOKE_METHOD]: method,
+      },
+      sourceMaps,
+    });
+  }
+
+  public async invokeRefundAssets(
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    hash: Hash256String,
+    options: TransactionOptions = {},
+    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
+    const transactionOptions = this.getTransactionOptions(options);
+    const { from, attributes, monitor } = transactionOptions;
+
+    const refundTransaction = await this.provider.getTransaction(from.network, hash, monitor);
+    const refundOutputs = refundTransaction.outputs
+      .map((output, idx) => ({ output, idx }))
+      .filter(({ output }) => output.address === contract);
+    const inputs = refundOutputs.map(({ idx }) => ({ hash, index: idx }));
+    const outputs = Object.entries(_.groupBy(refundOutputs.map(({ output }) => output), (output) => output.asset)).map(
+      ([asset, assetOutputs]) => ({
+        address: from.address,
+        asset,
+        value: assetOutputs.reduce((acc, output) => acc.plus(output.value), new BigNumber('0')),
+      }),
+    );
+
+    if (inputs.length === 0) {
+      throw new NothingToRefundError();
+    }
+
+    return this.invokeRaw({
+      script: clientUtils.getInvokeMethodScript({
+        address: contract,
+        method,
+        params,
+      }),
+      options: {
+        ...transactionOptions,
+        attributes: attributes.concat(this.getInvokeAttributes(contract, method, paramsZipped, false, from.address)),
+      },
+      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
+        blockIndex: receipt.blockIndex,
+        blockHash: receipt.blockHash,
+        transactionIndex: receipt.transactionIndex,
+        result: data.result,
+        actions: data.actions,
+      }),
+      scripts: this.getInvokeScripts(method, params, true),
+      rawInputs: inputs,
+      rawOutputs: outputs,
+      method: 'invokeRefundAssets',
+      labels: {
+        [labelNames.INVOKE_METHOD]: method,
+      },
+      sourceMaps,
+    });
+  }
+
   public async invokeClaim(
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
-    options: InvokeClaimTransactionOptions = {},
+    options: TransactionOptions = {},
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
     const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
 
     return this.capture(
       async (span) => {
-        const [{ unclaimed: allUnclaimed, amount: allAmount }, { inputs, outputs }] = await Promise.all([
+        const [{ unclaimed, amount }, { inputs, outputs }] = await Promise.all([
           this.provider.getUnclaimed(from.network, contract, span),
           this.getTransfersInputOutputs({
             from,
@@ -621,16 +793,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             monitor: span,
           }),
         ]);
-
-        let unclaimed = allUnclaimed;
-        let amount = allAmount;
-        if (!options.claimAll) {
-          unclaimed = await this.filterUnclaimed(from, unclaimed, monitor);
-          const amounts = await Promise.all(
-            unclaimed.map(async (input) => this.provider.getClaimAmount(from.network, input)),
-          );
-          amount = amounts.reduce((acc, amt) => acc.plus(amt), utils.ZERO_BIG_NUMBER);
-        }
 
         if (unclaimed.length === 0) {
           throw new NothingToClaimError(from);
@@ -798,29 +960,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     ].filter(commonUtils.notNull);
   }
 
-  private async filterUnclaimed(
-    from: UserAccountID,
-    unclaimed: ReadonlyArray<Input>,
-    monitor?: Monitor,
-  ): Promise<ReadonlyArray<Input>> {
-    const inputTransactionOutputs = await Promise.all(
-      unclaimed.map(async (input) => {
-        const transaction = await this.provider.getTransaction(from.network, input.hash, monitor);
-        const outputs = await Promise.all(
-          transaction.inputs.map(async (transactionInput) =>
-            this.provider.getOutput(from.network, transactionInput, monitor),
-          ),
-        );
-
-        return { input, outputs };
-      }),
-    );
-
-    return inputTransactionOutputs
-      .filter(({ outputs }) => outputs.some(({ address }) => from.address === address))
-      .map(({ input }) => input);
-  }
-
   private async getInvocationResultError(
     data: RawInvocationData,
     result: RawInvocationResultError,
@@ -937,7 +1076,10 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     method,
     scripts = [],
     labels = {},
+    rawInputs = [],
+    rawOutputs = [],
     sourceMaps,
+    reorderOutputs = (outputs) => outputs,
   }: {
     readonly script: Buffer;
     readonly transfers?: ReadonlyArray<FullTransfer>;
@@ -952,7 +1094,10 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly method: string;
     readonly scripts?: ReadonlyArray<WitnessModel>;
     readonly labels?: Labels;
+    readonly rawInputs?: ReadonlyArray<Input>;
+    readonly rawOutputs?: ReadonlyArray<Output>;
     readonly sourceMaps?: Promise<SourceMaps>;
+    readonly reorderOutputs?: (outputs: ReadonlyArray<Output>) => ReadonlyArray<Output>;
   }): Promise<TransactionResult<T, InvocationTransaction>> {
     const { from, attributes: attributesIn, networkFee, systemFee, monitor } = this.getTransactionOptions(options);
 
@@ -972,8 +1117,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
 
         const testTransaction = new CoreInvocationTransaction({
           version: 1,
-          inputs: this.convertInputs(testInputs),
-          outputs: this.convertOutputs(testOutputs),
+          inputs: this.convertInputs(rawInputs.concat(testInputs)),
+          outputs: this.convertOutputs(reorderOutputs(rawOutputs.concat(testOutputs))),
           attributes: this.convertAttributes(attributes),
           gas: common.TEN_THOUSAND_FIXED8,
           script,
@@ -1009,8 +1154,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
 
         const invokeTransaction = new CoreInvocationTransaction({
           version: 1,
-          inputs: this.convertInputs(inputs),
-          outputs: this.convertOutputs(outputs),
+          inputs: this.convertInputs(rawInputs.concat(inputs)),
+          outputs: this.convertOutputs(reorderOutputs(rawOutputs.concat(outputs))),
           attributes: this.convertAttributes(attributes),
           gas: bigNumberToBN(gas, 8),
           script,

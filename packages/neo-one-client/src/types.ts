@@ -735,11 +735,7 @@ export interface TransactionOptions {
   // tslint:enable readonly-keyword
 }
 
-export interface InvokeClaimTransactionOptions extends TransactionOptions {
-  readonly claimAll?: boolean;
-}
-
-export interface InvokeSendTransactionOptions extends TransactionOptions {
+export interface InvokeSendUnsafeTransactionOptions extends TransactionOptions {
   readonly sendFrom?: ReadonlyArray<Transfer>;
 }
 
@@ -747,8 +743,8 @@ export interface InvokeReceiveTransactionOptions extends TransactionOptions {
   readonly sendTo?: ReadonlyArray<Omit<Transfer, 'to'>>;
 }
 
-export interface InvokeSendReceiveTransactionOptions
-  extends InvokeSendTransactionOptions,
+export interface InvokeSendUnsafeReceiveTransactionOptions
+  extends InvokeSendUnsafeTransactionOptions,
     InvokeReceiveTransactionOptions {}
 
 export interface InvokeExecuteTransactionOptions extends TransactionOptions {
@@ -894,7 +890,34 @@ export interface UserAccountProvider {
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
-    options?: InvokeSendReceiveTransactionOptions,
+    options?: InvokeSendUnsafeReceiveTransactionOptions,
+    sourceMaps?: Promise<SourceMaps>,
+  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  readonly invokeSend: (
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    transfer: Transfer,
+    options?: TransactionOptions,
+    sourceMaps?: Promise<SourceMaps>,
+  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  readonly invokeCompleteSend: (
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    hash: Hash256String,
+    options?: TransactionOptions,
+    sourceMaps?: Promise<SourceMaps>,
+  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  readonly invokeRefundAssets: (
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    hash: Hash256String,
+    options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
   readonly invokeClaim: (
@@ -902,7 +925,7 @@ export interface UserAccountProvider {
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
-    options?: InvokeClaimTransactionOptions,
+    options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
   readonly call: (

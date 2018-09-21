@@ -1,20 +1,18 @@
-/* @hash b14292c36b05d9787f4abdccd75e1a04 */
+/* @hash ce7873e398511c34d297ce1cf37989a4 */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
-  BufferString,
   Event,
   ForwardValue,
   GetOptions,
-  Hash256String,
   InvocationTransaction,
   InvokeReceipt,
-  InvokeSendTransactionOptions,
   ReadSmartContract,
   SmartContract,
   TransactionOptions,
   TransactionResult,
+  Transfer,
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
@@ -101,16 +99,6 @@ export interface TokenSmartContract extends SmartContract<TokenReadSmartContract
       ): Promise<InvokeReceipt<undefined, TokenEvent> & { readonly transaction: InvocationTransaction }>;
     };
   };
-  readonly refundAssets: {
-    (transactionHash: Hash256String, options?: InvokeSendTransactionOptions): Promise<
-      TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>
-    >;
-    readonly confirmed: {
-      (transactionHash: Hash256String, options?: InvokeSendTransactionOptions & GetOptions): Promise<
-        InvokeReceipt<boolean, TokenEvent> & { readonly transaction: InvocationTransaction }
-      >;
-    };
-  };
   readonly revokeSendTransfer: {
     (from: AddressString, to: AddressString, amount: BigNumber, options?: TransactionOptions): Promise<
       TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>
@@ -145,34 +133,6 @@ export interface TokenSmartContract extends SmartContract<TokenReadSmartContract
       (from: AddressString, to: AddressString, amount: BigNumber, ...approveArgs: ForwardValue[]): Promise<
         InvokeReceipt<boolean, TokenEvent> & { readonly transaction: InvocationTransaction }
       >;
-    };
-  };
-  readonly upgrade: {
-    (
-      script: BufferString,
-      parameterList: BufferString,
-      returnType: BigNumber,
-      properties: BigNumber,
-      contractName: string,
-      codeVersion: string,
-      author: string,
-      email: string,
-      description: string,
-      options?: TransactionOptions,
-    ): Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
-    readonly confirmed: {
-      (
-        script: BufferString,
-        parameterList: BufferString,
-        returnType: BigNumber,
-        properties: BigNumber,
-        contractName: string,
-        codeVersion: string,
-        author: string,
-        email: string,
-        description: string,
-        options?: TransactionOptions & GetOptions,
-      ): Promise<InvokeReceipt<boolean, TokenEvent> & { readonly transaction: InvocationTransaction }>;
     };
   };
 }

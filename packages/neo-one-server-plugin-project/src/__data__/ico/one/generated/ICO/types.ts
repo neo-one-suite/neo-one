@@ -1,20 +1,19 @@
-/* @hash 76900619feb62adc7898a536b654717e */
+/* @hash 713a6252e050a3e0f19ee5ac0970097c */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
-  BufferString,
   Event,
   GetOptions,
-  Hash256String,
   InvocationTransaction,
   InvokeReceipt,
   InvokeReceiveTransactionOptions,
-  InvokeSendTransactionOptions,
+  InvokeSendUnsafeTransactionOptions,
   ReadSmartContract,
   SmartContract,
   TransactionOptions,
   TransactionResult,
+  Transfer,
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
@@ -70,45 +69,17 @@ export interface ICOSmartContract extends SmartContract<ICOReadSmartContract> {
   };
   readonly owner: () => Promise<AddressString>;
   readonly refundAssets: {
-    (transactionHash: Hash256String, options?: InvokeSendTransactionOptions): Promise<
+    (options?: InvokeSendUnsafeTransactionOptions): Promise<
       TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>
     >;
     readonly confirmed: {
-      (transactionHash: Hash256String, options?: InvokeSendTransactionOptions & GetOptions): Promise<
+      (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<
         InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }
       >;
     };
   };
   readonly remaining: () => Promise<BigNumber>;
   readonly startTimeSeconds: () => Promise<BigNumber>;
-  readonly upgrade: {
-    (
-      script: BufferString,
-      parameterList: BufferString,
-      returnType: BigNumber,
-      properties: BigNumber,
-      contractName: string,
-      codeVersion: string,
-      author: string,
-      email: string,
-      description: string,
-      options?: TransactionOptions,
-    ): Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>>;
-    readonly confirmed: {
-      (
-        script: BufferString,
-        parameterList: BufferString,
-        returnType: BigNumber,
-        properties: BigNumber,
-        contractName: string,
-        codeVersion: string,
-        author: string,
-        email: string,
-        description: string,
-        options?: TransactionOptions & GetOptions,
-      ): Promise<InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }>;
-    };
-  };
 }
 
 export interface ICOReadSmartContract extends ReadSmartContract<ICOEvent> {

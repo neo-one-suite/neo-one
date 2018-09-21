@@ -63,7 +63,8 @@ const addContractInfo = (context: Context, contractInfo: ContractInfo) => {
       symbol !== undefined &&
       propInfo.type !== 'deploy' &&
       propInfo.type !== 'refundAssets' &&
-      propInfo.type !== 'upgrade'
+      propInfo.type !== 'upgrade' &&
+      propInfo.type !== 'completeSend'
     ) {
       const memberSymbol = propInfo.symbol;
       switch (propInfo.type) {

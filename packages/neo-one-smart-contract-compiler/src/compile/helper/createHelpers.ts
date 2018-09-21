@@ -2,9 +2,13 @@ import {
   ArrCloneHelper,
   ArrConcatHelper,
   ArrEveryFuncHelper,
+  ArrEveryHelper,
+  ArrEveryHelperOptions,
   ArrFilterFuncHelper,
   ArrFilterHelper,
   ArrFilterHelperOptions,
+  ArrFindHelper,
+  ArrFindHelperOptions,
   ArrForEachFuncHelper,
   ArrForEachHelper,
   ArrForEachHelperOptions,
@@ -48,29 +52,39 @@ import {
   ThrowHelper,
 } from './completionRecord';
 import {
+  ApplicationMatchesVerificationHelper,
+  CompleteSendHelper,
+  DeployHelper,
+  DeployHelperOptions,
   DidReceiveAssetsHelper,
+  DidReceiveNonClaimAssetsHelper,
   DidSendAssetsHelper,
   GetOutputAssetValueMapHelper,
   GetSmartContractPropertyHelper,
   GetSmartContractPropertyHelperOptions,
+  HandleNormalHelper,
+  HandleNormalHelperOptions,
+  HandleReceiveHelper,
+  HandleSendHelper,
+  HandleSendHelperOptions,
+  HandleSendUnsafeHelper,
   InvokeSmartContractHelper,
   InvokeSmartContractHelperOptions,
   InvokeSmartContractMethodHelper,
   InvokeSmartContractMethodHelperOptions,
-  IsAllowedRefundHelper,
   IsCallerHelper,
+  IsClaimedTransactionHelper,
   IsDeployedHelper,
   IsProcessedTransactionHelper,
-  IsValidAssetValueMapForRefundHelper,
-  IsValidAssetValueMapForSendHelper,
-  IsValidSendHelper,
-  MarkRefundHelper,
-  MarkRefundHelperOptions,
   MergeAssetValueMapsHelper,
   MergeAssetValueMapsHelperOptions,
   RefundAssetsHelper,
   SetDeployedHelper,
+  SetProcessedTransactionHelper,
+  UpgradeHelper,
+  UpgradeHelperOptions,
 } from './contract';
+import { HandleSendUnsafeReceiveHelperBaseOptions } from './contract/HandleSendUnsafeReceiveHelperBase';
 import { ThrowTypeErrorHelper } from './error';
 import {
   ArgumentsHelper,
@@ -122,6 +136,10 @@ import {
 import {
   RawEnumeratorEveryHelper,
   RawEnumeratorEveryHelperOptions,
+  RawEnumeratorFilterHelper,
+  RawEnumeratorFilterHelperOptions,
+  RawEnumeratorFindHelper,
+  RawEnumeratorFindHelperOptions,
   RawEnumeratorForEachFuncHelper,
   RawEnumeratorForEachHelper,
   RawEnumeratorForEachHelperOptions,
@@ -394,7 +412,9 @@ export interface Helpers {
   // arr
   readonly arrClone: ArrCloneHelper;
   readonly arrConcat: ArrConcatHelper;
+  readonly arrEvery: (options: ArrEveryHelperOptions) => ArrEveryHelper;
   readonly arrEveryFunc: ArrEveryFuncHelper;
+  readonly arrFind: (options: ArrFindHelperOptions) => ArrFindHelper;
   readonly arrFilter: (options: ArrFilterHelperOptions) => ArrFilterHelper;
   readonly arrFilterFunc: ArrFilterFuncHelper;
   readonly arrLeft: ArrLeftHelper;
@@ -436,24 +456,30 @@ export interface Helpers {
 
   // contract
   readonly didReceiveAssets: DidReceiveAssetsHelper;
+  readonly didReceiveNonClaimAssets: DidReceiveNonClaimAssetsHelper;
   readonly didSendAssets: DidSendAssetsHelper;
   readonly invokeSmartContract: (options: InvokeSmartContractHelperOptions) => InvokeSmartContractHelper;
   readonly invokeSmartContractMethod: (
     options: InvokeSmartContractMethodHelperOptions,
   ) => InvokeSmartContractMethodHelper;
-  readonly markRefund: (options: MarkRefundHelperOptions) => MarkRefundHelper;
   readonly getOutputAssetValueMap: GetOutputAssetValueMapHelper;
-  readonly isAllowedRefund: IsAllowedRefundHelper;
   readonly isCaller: IsCallerHelper;
   readonly isProcessedTransaction: IsProcessedTransactionHelper;
-  readonly isValidAssetValueMapForRefund: IsValidAssetValueMapForRefundHelper;
-  readonly isValidAssetValueMapForSend: IsValidAssetValueMapForSendHelper;
-  readonly isValidSend: IsValidSendHelper;
   readonly refundAssets: RefundAssetsHelper;
   readonly mergeAssetValueMaps: (options: MergeAssetValueMapsHelperOptions) => MergeAssetValueMapsHelper;
   readonly getSmartContractProperty: (options: GetSmartContractPropertyHelperOptions) => GetSmartContractPropertyHelper;
   readonly isDeployed: IsDeployedHelper;
   readonly setDeployed: SetDeployedHelper;
+  readonly isClaimedTransaction: IsClaimedTransactionHelper;
+  readonly setProcessedTransaction: SetProcessedTransactionHelper;
+  readonly completeSend: CompleteSendHelper;
+  readonly deploy: (options: DeployHelperOptions) => DeployHelper;
+  readonly upgrade: (options: UpgradeHelperOptions) => UpgradeHelper;
+  readonly handleNormal: (options: HandleNormalHelperOptions) => HandleNormalHelper;
+  readonly handleSend: (options: HandleSendHelperOptions) => HandleSendHelper;
+  readonly handleReceive: (options: HandleSendUnsafeReceiveHelperBaseOptions) => HandleReceiveHelper;
+  readonly handleSendUnsafe: (options: HandleSendUnsafeReceiveHelperBaseOptions) => HandleSendUnsafeHelper;
+  readonly applicationMatchesVerification: ApplicationMatchesVerificationHelper;
 
   // types/contract
   readonly isContract: IsContractHelper;
@@ -595,6 +621,8 @@ export interface Helpers {
   ) => RawIteratorForEachFuncBaseHelper;
   readonly rawEnumeratorForEachFunc: RawEnumeratorForEachFuncHelper;
   readonly rawEnumeratorForEach: (options: RawEnumeratorForEachHelperOptions) => RawEnumeratorForEachHelper;
+  readonly rawEnumeratorFilter: (options: RawEnumeratorFilterHelperOptions) => RawEnumeratorFilterHelper;
+  readonly rawEnumeratorFind: (options: RawEnumeratorFindHelperOptions) => RawEnumeratorFindHelper;
   readonly rawEnumeratorReduce: (options: RawEnumeratorReduceHelperOptions) => RawEnumeratorReduceHelper;
   readonly rawEnumeratorEvery: (options: RawEnumeratorEveryHelperOptions) => RawEnumeratorEveryHelper;
   readonly rawEnumeratorSome: (options: RawEnumeratorSomeHelperOptions) => RawEnumeratorSomeHelper;
@@ -811,7 +839,9 @@ export const createHelpers = (): Helpers => {
     // arr
     arrClone: new ArrCloneHelper(),
     arrConcat: new ArrConcatHelper(),
+    arrEvery: (options) => new ArrEveryHelper(options),
     arrEveryFunc: new ArrEveryFuncHelper(),
+    arrFind: (options) => new ArrFindHelper(options),
     arrFilter: (options) => new ArrFilterHelper(options),
     arrFilterFunc: new ArrFilterFuncHelper(),
     arrLeft: new ArrLeftHelper(),
@@ -853,22 +883,28 @@ export const createHelpers = (): Helpers => {
 
     // contract
     didReceiveAssets: new DidReceiveAssetsHelper(),
+    didReceiveNonClaimAssets: new DidReceiveNonClaimAssetsHelper(),
     didSendAssets: new DidSendAssetsHelper(),
     invokeSmartContract: (options) => new InvokeSmartContractHelper(options),
     invokeSmartContractMethod: (options) => new InvokeSmartContractMethodHelper(options),
-    markRefund: (options) => new MarkRefundHelper(options),
     getOutputAssetValueMap: new GetOutputAssetValueMapHelper(),
-    isAllowedRefund: new IsAllowedRefundHelper(),
     isCaller: new IsCallerHelper(),
     isProcessedTransaction: new IsProcessedTransactionHelper(),
-    isValidAssetValueMapForRefund: new IsValidAssetValueMapForRefundHelper(),
-    isValidAssetValueMapForSend: new IsValidAssetValueMapForSendHelper(),
-    isValidSend: new IsValidSendHelper(),
     refundAssets: new RefundAssetsHelper(),
     mergeAssetValueMaps: (options) => new MergeAssetValueMapsHelper(options),
     getSmartContractProperty: (options) => new GetSmartContractPropertyHelper(options),
     isDeployed: new IsDeployedHelper(),
     setDeployed: new SetDeployedHelper(),
+    isClaimedTransaction: new IsClaimedTransactionHelper(),
+    setProcessedTransaction: new SetProcessedTransactionHelper(),
+    completeSend: new CompleteSendHelper(),
+    deploy: (options) => new DeployHelper(options),
+    upgrade: (options) => new UpgradeHelper(options),
+    handleNormal: (options) => new HandleNormalHelper(options),
+    handleSend: (options) => new HandleSendHelper(options),
+    handleReceive: (options) => new HandleReceiveHelper(options),
+    handleSendUnsafe: (options) => new HandleSendUnsafeHelper(options),
+    applicationMatchesVerification: new ApplicationMatchesVerificationHelper(),
 
     // types/contract
     isContract: new IsContractHelper(),
@@ -998,6 +1034,8 @@ export const createHelpers = (): Helpers => {
     rawIteratorForEachFuncBase: (options) => new RawIteratorForEachFuncBaseHelper(options),
     rawEnumeratorForEachFunc: new RawEnumeratorForEachFuncHelper(),
     rawEnumeratorForEach: (options) => new RawEnumeratorForEachHelper(options),
+    rawEnumeratorFilter: (options) => new RawEnumeratorFilterHelper(options),
+    rawEnumeratorFind: (options) => new RawEnumeratorFindHelper(options),
     rawEnumeratorReduce: (options) => new RawEnumeratorReduceHelper(options),
     rawEnumeratorEvery: (options) => new RawEnumeratorEveryHelper(options),
     rawEnumeratorSome: (options) => new RawEnumeratorSomeHelper(options),

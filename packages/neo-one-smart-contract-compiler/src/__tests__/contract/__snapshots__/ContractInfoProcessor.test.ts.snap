@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ContractInfoProcessor @claim with @constant 1`] = `
-"snippetCode.ts (15,9): SmartContract methods marked with @send, @receive or @claim cannot be @constant.
+"snippetCode.ts (15,9): SmartContract methods marked with @send, @sendUnsafe, @receive or @claim cannot be @constant.
 
       13 | 
       14 |         @claim
@@ -14,7 +14,7 @@ exports[`ContractInfoProcessor @claim with @constant 1`] = `
 `;
 
 exports[`ContractInfoProcessor @receive with @constant 1`] = `
-"snippetCode.ts (15,9): SmartContract methods marked with @send, @receive or @claim cannot be @constant.
+"snippetCode.ts (15,9): SmartContract methods marked with @send, @sendUnsafe, @receive or @claim cannot be @constant.
 
       13 | 
       14 |         @receive
@@ -27,7 +27,7 @@ exports[`ContractInfoProcessor @receive with @constant 1`] = `
 `;
 
 exports[`ContractInfoProcessor @receive with incorrect return type 1`] = `
-"snippetCode.ts (14,9): SmartContract methods marked with @send, @receive or @claim must return a boolean.
+"snippetCode.ts (14,9): SmartContract methods marked with @send, @sendUnsafe, @receive or @claim must return a boolean.
 
       12 | 
       13 | 
@@ -39,11 +39,11 @@ exports[`ContractInfoProcessor @receive with incorrect return type 1`] = `
 "
 `;
 
-exports[`ContractInfoProcessor @send with @constant 1`] = `
-"snippetCode.ts (15,9): SmartContract methods marked with @send, @receive or @claim cannot be @constant.
+exports[`ContractInfoProcessor @sendUnsafe with @constant 1`] = `
+"snippetCode.ts (15,9): SmartContract methods marked with @send, @sendUnsafe, @receive or @claim cannot be @constant.
 
       13 | 
-      14 |         @send
+      14 |         @sendUnsafe
     > 15 |         @constant
          |         ^
       16 |         public verify(): boolean {
@@ -66,7 +66,7 @@ exports[`ContractInfoProcessor abstract smart contracts 1`] = `
 `;
 
 exports[`ContractInfoProcessor invalid @claim method with ForwardValue 1`] = `
-"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @receive or @claim.
+"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @sendUnsafe, @receive or @claim.
 
       13 | 
       14 |         @claim
@@ -79,7 +79,7 @@ exports[`ContractInfoProcessor invalid @claim method with ForwardValue 1`] = `
 `;
 
 exports[`ContractInfoProcessor invalid @claim method with ForwardedValue 1`] = `
-"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @receive or @claim.
+"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @sendUnsafe, @receive or @claim.
 
       13 | 
       14 |         @claim
@@ -92,7 +92,7 @@ exports[`ContractInfoProcessor invalid @claim method with ForwardedValue 1`] = `
 `;
 
 exports[`ContractInfoProcessor invalid @receive method with ForwardValue 1`] = `
-"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @receive or @claim.
+"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @sendUnsafe, @receive or @claim.
 
       13 | 
       14 |         @receive
@@ -105,7 +105,7 @@ exports[`ContractInfoProcessor invalid @receive method with ForwardValue 1`] = `
 `;
 
 exports[`ContractInfoProcessor invalid @receive method with ForwardedValue 1`] = `
-"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @receive or @claim.
+"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @sendUnsafe, @receive or @claim.
 
       13 | 
       14 |         @receive
@@ -117,11 +117,11 @@ exports[`ContractInfoProcessor invalid @receive method with ForwardedValue 1`] =
 "
 `;
 
-exports[`ContractInfoProcessor invalid @send method with ForwardValue 1`] = `
-"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @receive or @claim.
+exports[`ContractInfoProcessor invalid @sendUnsafe method with ForwardValue 1`] = `
+"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @sendUnsafe, @receive or @claim.
 
       13 | 
-      14 |         @send
+      14 |         @sendUnsafe
     > 15 |         public foo(value: ForwardValue): boolean {
          |                    ^
       16 |           return true;
@@ -130,11 +130,11 @@ exports[`ContractInfoProcessor invalid @send method with ForwardValue 1`] = `
 "
 `;
 
-exports[`ContractInfoProcessor invalid @send method with ForwardedValue 1`] = `
-"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @receive or @claim.
+exports[`ContractInfoProcessor invalid @sendUnsafe method with ForwardedValue 1`] = `
+"snippetCode.ts (15,20): Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @sendUnsafe, @receive or @claim.
 
       13 | 
-      14 |         @send
+      14 |         @sendUnsafe
     > 15 |         public foo(value: ForwardedValue<number>): boolean {
          |                    ^
       16 |           return true;

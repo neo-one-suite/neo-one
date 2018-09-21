@@ -758,8 +758,6 @@ This is the API documentation for NEO•ONE Smart Contracts. This includes all t
     - processedTransactions: [SetStorage<Hash256>](#SetStorage)
       - Stores [Transaction](#Transaction) hashes that have sent or received native assets.
       - Used to enforce that a [Transaction](#Transaction) with native assets is only ever processed appropriately.
-    - allowedRefunds: [SetStorage<Hash256>](#SetStorage)
-      - Stores [Transaction](#Transaction) hashes that can be refunded.
     - deployed: true
       - Property primarily used internally to validate that the smart contract is deployed only once.
   - Methods:

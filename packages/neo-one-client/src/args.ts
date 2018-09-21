@@ -555,8 +555,11 @@ const assertABIFunction = (name: string, value?: unknown): ABIFunction => {
     returnType: assertProperty(value, 'ABIFunction', 'returnType', assertABIReturn),
     constant: assertProperty(value, 'ABIFunction', 'constant', assertNullableBoolean),
     send: assertProperty(value, 'ABIFunction', 'send', assertNullableBoolean),
+    sendUnsafe: assertProperty(value, 'ABIFunction', 'sendUnsafe', assertNullableBoolean),
     receive: assertProperty(value, 'ABIFunction', 'receive', assertNullableBoolean),
     claim: assertProperty(value, 'ABIFunction', 'claim', assertNullableBoolean),
+    refundAssets: assertProperty(value, 'ABIFunction', 'refundAssets', assertNullableBoolean),
+    completeSend: assertProperty(value, 'ABIFunction', 'completeSend', assertNullableBoolean),
   };
 };
 

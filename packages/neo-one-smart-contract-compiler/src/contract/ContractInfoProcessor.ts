@@ -36,10 +36,15 @@ export interface RefundAssetsPropInfo extends PropInfoBase {
   readonly name: string;
 }
 
+export interface CompleteSendPropInfo extends PropInfoBase {
+  readonly type: 'completeSend';
+  readonly name: string;
+}
+
 export interface UpgradePropInfo extends PropInfoBase {
   readonly type: 'upgrade';
   readonly name: string;
-  readonly approveUpgrade: ts.PropertyDeclaration | ts.MethodDeclaration | undefined;
+  readonly approveUpgrade: ts.PropertyDeclaration | ts.MethodDeclaration;
 }
 
 export interface FunctionPropInfo extends PropInfoBase {
@@ -49,6 +54,7 @@ export interface FunctionPropInfo extends PropInfoBase {
   readonly decl: ts.PropertyDeclaration | ts.MethodDeclaration;
   readonly callSignature: ts.Signature | undefined;
   readonly send: boolean;
+  readonly sendUnsafe: boolean;
   readonly receive: boolean;
   readonly claim: boolean;
   readonly constant: boolean;
@@ -90,7 +96,8 @@ export type PropInfo =
   | FunctionPropInfo
   | DeployPropInfo
   | RefundAssetsPropInfo
-  | UpgradePropInfo;
+  | UpgradePropInfo
+  | CompleteSendPropInfo;
 
 export interface ContractInfo {
   readonly smartContract: ts.ClassDeclaration | ts.ClassExpression;
@@ -110,21 +117,40 @@ export class ContractInfoProcessor {
       );
     }
     const result = this.processClass(this.smartContract, this.context.analysis.getType(this.smartContract));
-    const finalPropInfos = result.propInfos.concat([
-      {
-        type: 'refundAssets',
-        name: ContractPropertyName.refundAssets,
-        classDecl: this.smartContract,
-        isPublic: true,
-      },
-      {
-        type: 'upgrade',
-        name: ContractPropertyName.upgrade,
-        classDecl: this.smartContract,
-        isPublic: true,
-        approveUpgrade: this.getApproveUpgradeDecl(result),
-      },
-    ]);
+
+    const hasReceive = result.propInfos.some((propInfo) => propInfo.type === 'function' && propInfo.receive);
+    const refundAssets: PropInfo | undefined = hasReceive
+      ? {
+          type: 'refundAssets',
+          name: ContractPropertyName.refundAssets,
+          classDecl: this.smartContract,
+          isPublic: true,
+        }
+      : undefined;
+
+    const hasSend = result.propInfos.some((propInfo) => propInfo.type === 'function' && propInfo.send);
+    const completeSend: PropInfo | undefined = hasSend
+      ? {
+          type: 'completeSend',
+          name: ContractPropertyName.completeSend,
+          classDecl: this.smartContract,
+          isPublic: true,
+        }
+      : undefined;
+
+    const approveUpgrade = this.getApproveUpgradeDecl(result);
+    const upgrade: PropInfo | undefined =
+      approveUpgrade !== undefined
+        ? {
+            type: 'upgrade',
+            name: ContractPropertyName.upgrade,
+            classDecl: this.smartContract,
+            isPublic: true,
+            approveUpgrade,
+          }
+        : undefined;
+
+    const finalPropInfos = result.propInfos.concat([refundAssets, completeSend, upgrade].filter(utils.notNull));
 
     if (this.hasDeployInfo(result)) {
       return {
@@ -443,10 +469,11 @@ export class ContractInfoProcessor {
       const callSignature = callSignatures[0];
 
       const send = this.hasSend(decl);
+      const sendUnsafe = this.hasSendUnsafe(decl);
       const receive = this.hasReceive(decl);
       const claim = this.hasClaim(decl);
       const constant = this.hasConstant(decl);
-      const requiresBoolean = send || receive || claim;
+      const requiresBoolean = send || sendUnsafe || receive || claim;
 
       if (requiresBoolean && constant) {
         const decorator = tsUtils.decoratable
@@ -468,6 +495,7 @@ export class ContractInfoProcessor {
           .find(
             (dec) =>
               this.isDecorator(dec, Decorator.send) ||
+              this.isDecorator(dec, Decorator.sendUnsafe) ||
               this.isDecorator(dec, Decorator.receive) ||
               this.isDecorator(dec, Decorator.claim),
           );
@@ -514,6 +542,7 @@ export class ContractInfoProcessor {
         symbol: tsUtils.symbol.getTarget(symbol),
         decl,
         send,
+        sendUnsafe,
         receive,
         claim,
         acceptsClaim: callSignatures.length >= 1 && this.isLastParamClaim(decl, callSignatures[0]),
@@ -571,6 +600,10 @@ export class ContractInfoProcessor {
 
   private hasSend(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {
     return this.hasDecorator(decl, Decorator.send);
+  }
+
+  private hasSendUnsafe(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {
+    return this.hasDecorator(decl, Decorator.sendUnsafe);
   }
 
   private hasReceive(decl: ClassInstanceMemberType | ts.ConstructorDeclaration): boolean {

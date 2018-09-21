@@ -40,20 +40,16 @@ const getImportClauses = (text: string) => {
     mutableClauses.push('Event');
   }
 
-  if (text.includes('InvokeSendTransactionOptions')) {
-    mutableClauses.push('InvokeSendTransactionOptions');
+  if (text.includes('InvokeSendUnsafeTransactionOptions')) {
+    mutableClauses.push('InvokeSendUnsafeTransactionOptions');
   }
 
   if (text.includes('InvokeReceiveTransactionOptions')) {
     mutableClauses.push('InvokeReceiveTransactionOptions');
   }
 
-  if (text.includes('InvokeSendReceiveTransactionOptions')) {
-    mutableClauses.push('InvokeSendReceiveTransactionOptions');
-  }
-
-  if (text.includes('InvokeClaimTransactionOptions')) {
-    mutableClauses.push('InvokeClaimTransactionOptions');
+  if (text.includes('InvokeSendUnsafeReceiveTransactionOptions')) {
+    mutableClauses.push('InvokeSendUnsafeReceiveTransactionOptions');
   }
 
   if (text.includes('TransactionReceipt')) {
@@ -90,6 +86,10 @@ const getImportClauses = (text: string) => {
 
   if (text.includes('ReadSmartContract')) {
     mutableClauses.push('ReadSmartContract');
+  }
+
+  if (text.includes('Transfer')) {
+    mutableClauses.push('Transfer');
   }
 
   return mutableClauses;

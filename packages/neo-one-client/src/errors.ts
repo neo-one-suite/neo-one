@@ -33,6 +33,8 @@ export const FundsInUseError = makeErrorWithCode(
 );
 export const NothingToIssueError = makeErrorWithCode('NOTHING_TO_ISSUE', () => 'Nothing to issue.');
 export const NothingToTransferError = makeErrorWithCode('NOTHING_TO_TRANSFER', () => 'Nothing to transfer.');
+export const NothingToSendError = makeErrorWithCode('NOTHING_TO_SEND', () => 'Nothing to send.');
+export const NothingToRefundError = makeErrorWithCode('NOTHING_TO_REFUND', () => 'Nothing to refund.');
 export const NoAccountError = makeErrorWithCode('NO_ACCOUNT', () => 'No account exists.');
 export const NoContractDeployedError = makeErrorWithCode(
   'NO_CONTRACT_DEPLOYED',
@@ -66,8 +68,4 @@ export const CannotSendToContractError = makeErrorWithCode(
 export const CannotSendFromContractError = makeErrorWithCode(
   'CANNOT_SEND_FROM_CONTRACT',
   (address: AddressString) => `Contract ${address} does not allow sending native assets`,
-);
-export const CannotClaimContractError = makeErrorWithCode(
-  'CANNOT_CLAIM_CONTRACT',
-  (address: AddressString) => `Contract ${address} does not allow claiming GAS`,
 );

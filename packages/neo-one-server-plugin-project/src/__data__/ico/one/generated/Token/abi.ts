@@ -1,4 +1,4 @@
-/* @hash 022a136500ae30f846a090bec4014d57 */
+/* @hash 72ccda6fe39b491010a1665fb7a327aa */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -135,6 +135,7 @@ export const tokenABI: ABI = {
         type: 'Integer',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -161,6 +162,7 @@ export const tokenABI: ABI = {
         type: 'Integer',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -200,6 +202,7 @@ export const tokenABI: ABI = {
         type: 'Boolean',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -232,6 +235,7 @@ export const tokenABI: ABI = {
         type: 'Boolean',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -264,6 +268,7 @@ export const tokenABI: ABI = {
         type: 'Boolean',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -296,6 +301,7 @@ export const tokenABI: ABI = {
         type: 'Boolean',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -327,6 +333,7 @@ export const tokenABI: ABI = {
         type: 'Void',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -353,65 +360,7 @@ export const tokenABI: ABI = {
         type: 'Boolean',
       },
       send: false,
-    },
-    {
-      name: 'refundAssets',
-      parameters: [
-        {
-          name: 'transactionHash',
-          type: 'Hash256',
-        },
-      ],
-      returnType: {
-        type: 'Boolean',
-      },
-      send: true,
-    },
-    {
-      name: 'upgrade',
-      parameters: [
-        {
-          name: 'script',
-          type: 'Buffer',
-        },
-        {
-          name: 'parameterList',
-          type: 'Buffer',
-        },
-        {
-          decimals: 0,
-          name: 'returnType',
-          type: 'Integer',
-        },
-        {
-          decimals: 0,
-          name: 'properties',
-          type: 'Integer',
-        },
-        {
-          name: 'contractName',
-          type: 'String',
-        },
-        {
-          name: 'codeVersion',
-          type: 'String',
-        },
-        {
-          name: 'author',
-          type: 'String',
-        },
-        {
-          name: 'email',
-          type: 'String',
-        },
-        {
-          name: 'description',
-          type: 'String',
-        },
-      ],
-      returnType: {
-        type: 'Boolean',
-      },
+      sendUnsafe: false,
     },
     {
       name: 'deploy',

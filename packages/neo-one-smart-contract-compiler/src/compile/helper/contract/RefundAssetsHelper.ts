@@ -8,54 +8,98 @@ import { Helper } from '../Helper';
 export class RefundAssetsHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
+    const references = sb.scope.addUnique();
 
-    // [number]
-    sb.emitPushInt(node, 1);
-    // [argsarr]
-    sb.emitHelper(node, options, sb.helpers.getArgument);
-    // [0, argsarr]
-    sb.emitPushInt(node, 0);
-    // [buffer]
-    sb.emitOp(node, 'PICKITEM');
-    // [buffer, buffer]
-    sb.emitOp(node, 'DUP');
-    // [isProcessedTransaction, buffer]
-    sb.emitHelper(node, options, sb.helpers.isProcessedTransaction);
+    // [transaction]
+    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    // [references]
+    sb.emitSysCall(node, 'Neo.Transaction.GetReferences');
+    // []
+    sb.scope.set(sb, node, options, references);
+    // [transaction]
+    sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+    // [inputs]
+    sb.emitSysCall(node, 'Neo.Transaction.GetInputs');
+    // [map, inputs]
+    sb.emitOp(node, 'NEWMAP');
+    // [map]
     sb.emitHelper(
       node,
       options,
-      sb.helpers.if({
-        condition: () => {
-          // [!isProcessedTransaction, buffer]
-          sb.emitOp(node, 'NOT');
-        },
-        whenTrue: () => {
-          // [transaction]
-          sb.emitSysCall(node, 'Neo.Blockchain.GetTransaction');
-          // [transaction, transaction]
-          sb.emitOp(node, 'DUP');
-          // [references, transaction]
-          sb.emitSysCall(node, 'Neo.Transaction.GetReferences');
+      sb.helpers.arrReduce({
+        withIndex: true,
+        each: (innerOptions) => {
+          // [idx, map, input]
+          sb.emitOp(node, 'ROT');
+          // [references, idx, map, input]
+          sb.scope.get(sb, node, innerOptions, references);
+          // [idx, references, map, input]
+          sb.emitOp(node, 'SWAP');
+          // [reference, map, input]
+          sb.emitOp(node, 'PICKITEM');
           sb.emitHelper(
             node,
             options,
             sb.helpers.if({
               condition: () => {
-                // [boolean, transaction]
-                sb.emitHelper(
-                  node,
-                  options,
-                  sb.helpers.arrSome({
-                    map: () => {
-                      // [buffer]
-                      sb.emitSysCall(node, 'Neo.Output.GetScriptHash');
-                      // [isCaller]
-                      sb.emitHelper(node, options, sb.helpers.isCaller);
-                      // [!isCaller]
-                      sb.emitOp(node, 'NOT');
-                    },
-                  }),
-                );
+                // [buffer, map, input]
+                sb.emitSysCall(node, 'Neo.Output.GetScriptHash');
+                // [buffer, buffer, map, input]
+                sb.emitSysCall(node, 'System.ExecutionEngine.GetExecutingScriptHash');
+                // [boolean, map, input]
+                sb.emitOp(node, 'EQUAL');
+              },
+              whenTrue: () => {
+                // [map, input, map]
+                sb.emitOp(node, 'TUCK');
+                // [input, map, map]
+                sb.emitOp(node, 'SWAP');
+                // [hash, map, map]
+                sb.emitSysCall(node, 'Neo.Input.GetHash');
+                // [boolean, hash, map, map]
+                sb.emitPushBoolean(node, true);
+                // [map]
+                sb.emitOp(node, 'SETITEM');
+              },
+              whenFalse: () => {
+                // [map]
+                sb.emitOp(node, 'NIP');
+              },
+            }),
+          );
+        },
+      }),
+    );
+    sb.emitHelper(
+      node,
+      options,
+      sb.helpers.if({
+        condition: () => {
+          // [map, map]
+          sb.emitOp(node, 'DUP');
+          // [size, map]
+          sb.emitOp(node, 'ARRAYSIZE');
+          // [1, size, map]
+          sb.emitPushInt(node, 1);
+          // [size === 1, map]
+          sb.emitOp(node, 'NUMEQUAL');
+        },
+        whenTrue: () => {
+          // [arr]
+          sb.emitOp(node, 'KEYS');
+          // [0, arr]
+          sb.emitPushInt(node, 0);
+          // [buffer]
+          sb.emitOp(node, 'PICKITEM');
+          // [buffer, buffer]
+          sb.emitOp(node, 'DUP');
+          sb.emitHelper(
+            node,
+            options,
+            sb.helpers.if({
+              condition: () => {
+                // [isProcessedTransaction, buffer]
+                sb.emitHelper(node, options, sb.helpers.isProcessedTransaction);
               },
               whenTrue: () => {
                 // []
@@ -64,25 +108,23 @@ export class RefundAssetsHelper extends Helper {
                 sb.emitPushBoolean(node, false);
               },
               whenFalse: () => {
-                // [outputs]
-                sb.emitSysCall(node, 'Neo.Transaction.GetOutputs');
-                // [map]
-                sb.emitHelper(node, options, sb.helpers.getOutputAssetValueMap);
-                // [transaction, map]
-                sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
-                // [references, map]
+                // [transaction]
+                sb.emitSysCall(node, 'Neo.Blockchain.GetTransaction');
+                // [references]
                 sb.emitSysCall(node, 'Neo.Transaction.GetReferences');
-                // [map]
-                sb.emitHelper(node, options, sb.helpers.mergeAssetValueMaps({ add: false }));
-                // [transaction, map]
-                sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
-                // [outputs, map]
-                sb.emitSysCall(node, 'Neo.Transaction.GetOutputs');
-                // [map]
-                sb.emitHelper(node, options, sb.helpers.mergeAssetValueMaps({ add: true }));
-                // Sum of value to be refunded - sum of value taken from contract + sum of value returned to contract as change must equal 0
                 // [boolean]
-                sb.emitHelper(node, options, sb.helpers.isValidAssetValueMapForRefund);
+                sb.emitHelper(
+                  node,
+                  options,
+                  sb.helpers.arrEvery({
+                    map: () => {
+                      // [buffer]
+                      sb.emitSysCall(node, 'Neo.Output.GetScriptHash');
+                      // [isCaller]
+                      sb.emitHelper(node, options, sb.helpers.isCaller);
+                    },
+                  }),
+                );
               },
             }),
           );

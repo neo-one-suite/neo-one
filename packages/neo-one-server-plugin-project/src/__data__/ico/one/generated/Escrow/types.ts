@@ -1,19 +1,17 @@
-/* @hash 9571abbce8e247e9dc4daaed809ed9df */
+/* @hash e5155b7af16e2cd721ba78ae3790ed1e */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
-  BufferString,
   ForwardValue,
   GetOptions,
-  Hash256String,
   InvocationTransaction,
   InvokeReceipt,
-  InvokeSendTransactionOptions,
   ReadSmartContract,
   SmartContract,
   TransactionOptions,
   TransactionResult,
+  Transfer,
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
@@ -95,44 +93,6 @@ export interface EscrowSmartContract extends SmartContract<EscrowReadSmartContra
         to: AddressString,
         asset: AddressString,
         amount: BigNumber,
-        options?: TransactionOptions & GetOptions,
-      ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
-    };
-  };
-  readonly refundAssets: {
-    (transactionHash: Hash256String, options?: InvokeSendTransactionOptions): Promise<
-      TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>
-    >;
-    readonly confirmed: {
-      (transactionHash: Hash256String, options?: InvokeSendTransactionOptions & GetOptions): Promise<
-        InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }
-      >;
-    };
-  };
-  readonly upgrade: {
-    (
-      script: BufferString,
-      parameterList: BufferString,
-      returnType: BigNumber,
-      properties: BigNumber,
-      contractName: string,
-      codeVersion: string,
-      author: string,
-      email: string,
-      description: string,
-      options?: TransactionOptions,
-    ): Promise<TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>>;
-    readonly confirmed: {
-      (
-        script: BufferString,
-        parameterList: BufferString,
-        returnType: BigNumber,
-        properties: BigNumber,
-        contractName: string,
-        codeVersion: string,
-        author: string,
-        email: string,
-        description: string,
         options?: TransactionOptions & GetOptions,
       ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
     };

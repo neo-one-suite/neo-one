@@ -136,6 +136,9 @@ export const InvalidIndexError = makeErrorWithCode('VM_ERROR', (context: Executi
 export const InvalidInvocationTransactionError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'Expected InvocationTransaction.'),
 );
+export const InvalidClaimTransactionError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Expected ClaimTransaction.'),
+);
 export const ContractNoStorageError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, hash: string) =>
   getMessage(context, `Contract Does Not Have Storage: ${hash}`),
 );

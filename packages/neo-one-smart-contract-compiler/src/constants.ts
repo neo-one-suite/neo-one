@@ -26,6 +26,7 @@ export const DEFAULT_CONTRACT_PROPERTIES = {
 export enum Decorator {
   constant = 'constant',
   send = 'send',
+  sendUnsafe = 'sendUnsafe',
   receive = 'receive',
   claim = 'claim',
 }
@@ -39,10 +40,11 @@ export const DECORATORS_ARRAY = Object.values(Decorator);
 export enum ContractPropertyName {
   deploy = 'deploy',
   processedTransactions = 'processedTransactions',
-  allowedRefunds = 'allowedRefunds',
+  claimedTransactions = 'claimedTransactions',
   address = 'address',
   properties = 'properties',
   refundAssets = 'refundAssets',
+  completeSend = 'completeSend',
   deployed = 'deployed',
   approveUpgrade = 'approveUpgrade',
   upgrade = 'upgrade',
@@ -52,12 +54,13 @@ export enum ContractPropertyName {
 export const VIRTUAL_PROPERTIES: Set<string> = new Set([ContractPropertyName.deploy]);
 export const RESERVED_PROPERTIES: Set<string> = new Set([
   ContractPropertyName.refundAssets,
+  ContractPropertyName.completeSend,
   ContractPropertyName.upgrade,
   ContractPropertyName.destroy,
 ]);
 export const BUILTIN_PROPERTIES: Set<string> = new Set([
   ContractPropertyName.processedTransactions,
-  ContractPropertyName.allowedRefunds,
+  ContractPropertyName.claimedTransactions,
   ContractPropertyName.address,
   ContractPropertyName.deployed,
 ]);

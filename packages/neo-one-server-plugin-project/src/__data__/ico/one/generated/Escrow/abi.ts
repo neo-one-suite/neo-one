@@ -1,4 +1,4 @@
-/* @hash f092fda858e7e81a4932c83068fb7bca */
+/* @hash b59267b2b86f7e2e541abe1f4459890a */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -37,6 +37,7 @@ export const escrowABI: ABI = {
         type: 'Integer',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -75,6 +76,7 @@ export const escrowABI: ABI = {
         type: 'Boolean',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -106,6 +108,7 @@ export const escrowABI: ABI = {
         type: 'Void',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -144,6 +147,7 @@ export const escrowABI: ABI = {
         type: 'Boolean',
       },
       send: false,
+      sendUnsafe: false,
     },
     {
       claim: false,
@@ -182,65 +186,7 @@ export const escrowABI: ABI = {
         type: 'Boolean',
       },
       send: false,
-    },
-    {
-      name: 'refundAssets',
-      parameters: [
-        {
-          name: 'transactionHash',
-          type: 'Hash256',
-        },
-      ],
-      returnType: {
-        type: 'Boolean',
-      },
-      send: true,
-    },
-    {
-      name: 'upgrade',
-      parameters: [
-        {
-          name: 'script',
-          type: 'Buffer',
-        },
-        {
-          name: 'parameterList',
-          type: 'Buffer',
-        },
-        {
-          decimals: 0,
-          name: 'returnType',
-          type: 'Integer',
-        },
-        {
-          decimals: 0,
-          name: 'properties',
-          type: 'Integer',
-        },
-        {
-          name: 'contractName',
-          type: 'String',
-        },
-        {
-          name: 'codeVersion',
-          type: 'String',
-        },
-        {
-          name: 'author',
-          type: 'String',
-        },
-        {
-          name: 'email',
-          type: 'String',
-        },
-        {
-          name: 'description',
-          type: 'String',
-        },
-      ],
-      returnType: {
-        type: 'Boolean',
-      },
+      sendUnsafe: false,
     },
     {
       name: 'deploy',
