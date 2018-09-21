@@ -88,7 +88,7 @@ const getImportClauses = (text: string) => {
     mutableClauses.push('ReadSmartContract');
   }
 
-  if (text.includes('Transfer')) {
+  if (text.includes('Transfer,')) {
     mutableClauses.push('Transfer');
   }
 

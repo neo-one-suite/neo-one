@@ -1,4 +1,4 @@
-/* @hash ce7873e398511c34d297ce1cf37989a4 */
+/* @hash 3a4095eec5c5f12bfbd08ff2d1dd18ae */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -12,7 +12,6 @@ import {
   SmartContract,
   TransactionOptions,
   TransactionResult,
-  Transfer,
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
