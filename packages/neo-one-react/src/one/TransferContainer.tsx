@@ -61,7 +61,7 @@ const makeEffects = (
     state: State;
     setState: (state: Partial<State>) => void;
   }) => {
-    const from = client.getCurrentAccount();
+    const from = client.getCurrentUserAccount();
     if (amount === undefined || to.length === 0 || from === undefined) {
       return;
     }

@@ -1,4 +1,4 @@
-/* @hash bb2ca6b3eaa5b6e554f210dfb5cd1486 */
+/* @hash 25d1f14f98399fd74ca8164bbe553a5b */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -12,6 +12,7 @@ import {
   OneClient,
   NEOONEDataProviderOptions,
   UserAccountProvider,
+  UserAccountProviders,
 } from '@neo-one/client';
 import { projectID } from './projectID';
 
@@ -29,14 +30,15 @@ const isLocalUserAccountProvider = (
   userAccountProvider: UserAccountProvider,
 ): userAccountProvider is LocalUserAccountProvider<any, any> => userAccountProvider instanceof LocalUserAccountProvider;
 
-export const createClient = <
-  TUserAccountProviders extends { readonly [K: string]: UserAccountProvider } = DefaultUserAccountProviders
->(
+export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
   getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders as any,
-): Client<TUserAccountProviders> => {
+): Client<
+  TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never,
+  TUserAccountProviders
+> => {
   const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [];
   if (process.env.NODE_ENV !== 'production') {
-    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 36903 }));
+    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 37568 }));
   }
   const provider = new NEOONEProvider(providers);
 
@@ -116,9 +118,9 @@ export const createClient = <
 };
 
 export const createDeveloperClients = (): { [network: string]: DeveloperClient } => ({
-  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, port: 36903 })),
+  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, port: 37568 })),
 });
 
 export const createOneClients = (): { [network: string]: OneClient } => ({
-  local: new OneClient(36903),
+  local: new OneClient(37568),
 });

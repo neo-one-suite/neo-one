@@ -1,16 +1,13 @@
+import { common, crypto, PrivateKey, UInt160 } from '@neo-one/client-common';
 import {
   Block,
-  common,
-  crypto,
   MinerTransaction,
+  Node,
   Output,
   PrepareRequestConsensusMessage,
-  PrivateKey,
   Transaction,
-  UInt160,
   utils,
-} from '@neo-one/client-core';
-import { Node } from '@neo-one/node-core';
+} from '@neo-one/node-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import BN from 'bn.js';

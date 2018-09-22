@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-core';
+import { common } from '@neo-one/client-common';
 import { BuiltinConstantBufferMemberValue } from '../../BuiltinConstantBufferMemberValue';
 import { BuiltinInterface } from '../../BuiltinInterface';
 import { Builtins } from '../../Builtins';

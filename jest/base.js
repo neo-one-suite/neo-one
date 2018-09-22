@@ -1,12 +1,11 @@
 const nodePath = require('path');
 
-module.exports = ({ babel, path }) => ({
+module.exports = ({ path }) => ({
   rootDir: nodePath.resolve(__dirname, '..'),
   globals: {
     'ts-jest': {
-      skipBabel: babel === undefined,
-      babelConfig: babel,
-      tsConfigFile: 'tsconfig.jest.json',
+      tsConfig: '<rootDir>/tsconfig/tsconfig.es2017.cjs.json',
+      isolatedModules: true,
     },
   },
   moduleFileExtensions: ['js', 'jsx', 'json', 'node', 'ts', 'tsx'],

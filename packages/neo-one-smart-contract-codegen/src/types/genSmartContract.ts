@@ -1,14 +1,17 @@
-import { ABI, createForwardedValueFuncArgsName, createForwardedValueFuncReturnName } from '@neo-one/client-core';
+import { ABI } from '@neo-one/client-common';
+import { createForwardedValueFuncArgsName, createForwardedValueFuncReturnName } from '@neo-one/client-core';
 import _ from 'lodash';
 import { genConstantFunction } from './genConstantFunction';
 import { genForwardArgsFunction } from './genForwardArgsFunction';
 import { genForwardReturnFunction } from './genForwardReturnFunction';
 import { genFunction } from './genFunction';
-import { getReadSmartContractName } from './getReadSmartContractName';
+import { getEventName } from './getEventName';
 import { getSmartContractName } from './getSmartContractName';
 
 export const genSmartContract = (name: string, abi: ABI): string => `
-export interface ${getSmartContractName(name)} extends SmartContract<${getReadSmartContractName(name)}> {
+export interface ${getSmartContractName(
+  name,
+)}<TClient extends Client = Client> extends SmartContract<TClient, ${getEventName(name)}> {
   ${_.flatMap(
     _.sortBy(abi.functions, (func) => func.name).map((func) => {
       const parameters = func.parameters === undefined ? [] : func.parameters;

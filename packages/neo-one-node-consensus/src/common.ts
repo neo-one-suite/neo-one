@@ -1,16 +1,15 @@
+import { common, crypto, ECPoint, PrivateKey } from '@neo-one/client-common';
 import {
+  Blockchain,
   ChangeViewConsensusMessage,
-  common,
   ConsensusMessage,
   ConsensusPayload,
-  crypto,
-  ECPoint,
+  Node,
   PrepareResponseConsensusMessage,
-  PrivateKey,
   Transaction,
   UnsignedConsensusPayload,
-} from '@neo-one/client-core';
-import { Blockchain, Node } from '@neo-one/node-core';
+  Witness,
+} from '@neo-one/node-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import _ from 'lodash';
 import { ConsensusContext } from './ConsensusContext';
@@ -215,11 +214,15 @@ export async function checkSignatures<TContext extends HeaderContext>({
         j += 1;
       }
     }
-    const script = crypto.createMultiSignatureWitness(context.M, context.validators, mutablePublicKeyToSignature);
+    const script = crypto.createMultiSignatureWitness(
+      context.M,
+      context.validators,
+      mutablePublicKeyToSignature,
+      Witness,
+    );
 
     const block = context.header.clone({
       transactions: context.transactionHashes.map((hash) => context.transactions[hash]).filter(commonUtils.notNull),
-
       script,
     });
 

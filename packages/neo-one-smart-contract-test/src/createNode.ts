@@ -1,4 +1,4 @@
-import { common, crypto } from '@neo-one/client-core';
+import { common, crypto } from '@neo-one/client-common';
 import { FullNode } from '@neo-one/node';
 import { createMain } from '@neo-one/node-neo-settings';
 import _ from 'lodash';

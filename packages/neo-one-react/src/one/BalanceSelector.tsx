@@ -85,12 +85,14 @@ export function BalanceSelector() {
                         props$={combineLatest(currentAsset$, client.accountState$.pipe(filter(utils.notNull))).pipe(
                           switchMap(async ([asset, { currentAccount, account }]) => {
                             if (asset.type === 'token') {
-                              const smartContract = nep5.createNEP5ReadSmartContract(
-                                client.read(asset.token.network),
-                                asset.token.address,
+                              const smartContract = nep5.createNEP5SmartContract(
+                                client,
+                                { [asset.token.network]: { address: asset.token.address } },
                                 asset.token.decimals,
                               );
-                              const tokenBalance = await smartContract.balanceOf(currentAccount.id.address);
+                              const tokenBalance = await smartContract.balanceOf(currentAccount.id.address, {
+                                network: asset.token.network,
+                              });
 
                               return tokenBalance.toFormat();
                             }

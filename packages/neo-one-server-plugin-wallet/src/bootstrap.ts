@@ -1,3 +1,4 @@
+import { common, crypto } from '@neo-one/client-common';
 import {
   AssetType,
   Client,
@@ -16,8 +17,7 @@ import {
   Transfer,
   UserAccountID,
   wifToPrivateKey,
-} from '@neo-one/client';
-import { common, crypto } from '@neo-one/client-core';
+} from '@neo-one/client-full';
 import { GetCLIResourceOptions, InteractiveCLI, InteractiveCLIArgs } from '@neo-one/server-plugin';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
 import { compileContract, CompileContractResult } from '@neo-one/smart-contract-compiler';
@@ -1010,7 +1010,7 @@ export const bootstrap = (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs)
           mutableOptions.systemFee = new BigNumber(-1);
         });
 
-        await client.selectAccount(master.accountID);
+        await client.selectUserAccount(master.accountID);
 
         const developerClient = new DeveloperClient(provider.read(network.name));
 

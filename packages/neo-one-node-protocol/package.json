@@ -4,6 +4,7 @@
   "description": "NEO•ONE NEO node and consensus protocol.",
   "main": "./src/index.ts",
   "dependencies": {
+    "@neo-one/client-common": "^1.0.0-preview.0",
     "@neo-one/client-core": "^1.0.0-preview.0",
     "@neo-one/monitor": "^1.0.0-preview.0",
     "@neo-one/node-consensus": "^1.0.0-preview.0",

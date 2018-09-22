@@ -1,4 +1,4 @@
-import { ByteArrayContractParameter, ContractParameter } from '@neo-one/client-core';
+import { ByteArrayContractParameter, ContractParameter } from '@neo-one/node-core';
 import { StackItemBase } from './StackItemBase';
 
 export class BufferStackItem extends StackItemBase {

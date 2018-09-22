@@ -1,15 +1,13 @@
+import { common, crypto, PrivateKey } from '@neo-one/client-common';
 import {
   ChangeViewConsensusMessage,
-  common,
   ConsensusMessageType,
   ConsensusPayload,
-  crypto,
+  Node,
   PrepareRequestConsensusMessage,
   PrepareResponseConsensusMessage,
-  PrivateKey,
   Transaction,
-} from '@neo-one/client-core';
-import { Node } from '@neo-one/node-core';
+} from '@neo-one/node-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import { addTransaction, checkExpectedView, checkSignatures, initializeConsensus } from './common';
 import { ConsensusContext } from './ConsensusContext';

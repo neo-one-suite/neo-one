@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-core';
+import { common } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import { helpers, keys } from '../../../../__data__';
 

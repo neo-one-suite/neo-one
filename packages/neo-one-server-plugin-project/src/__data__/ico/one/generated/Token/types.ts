@@ -1,14 +1,14 @@
-/* @hash 3a4095eec5c5f12bfbd08ff2d1dd18ae */
+/* @hash 755127932cfaf65c9bea19b8dbfa4f5b */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
+  Client,
   Event,
   ForwardValue,
   GetOptions,
   InvocationTransaction,
   InvokeReceipt,
-  ReadSmartContract,
   SmartContract,
   TransactionOptions,
   TransactionResult,
@@ -37,7 +37,7 @@ export interface TokenRevokeSendTransferEvent
   extends Event<'revokeSendTransfer', TokenRevokeSendTransferEventParameters> {}
 export type TokenEvent = TokenTransferEvent | TokenApproveSendTransferEvent | TokenRevokeSendTransferEvent;
 
-export interface TokenSmartContract extends SmartContract<TokenReadSmartContract> {
+export interface TokenSmartContract<TClient extends Client = Client> extends SmartContract<TClient, TokenEvent> {
   readonly approveReceiveTransfer: {
     (from: AddressString, amount: BigNumber, asset: AddressString, options?: TransactionOptions): Promise<
       TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>
@@ -134,13 +134,4 @@ export interface TokenSmartContract extends SmartContract<TokenReadSmartContract
       >;
     };
   };
-}
-
-export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {
-  readonly approvedTransfer: (from: AddressString, to: AddressString) => Promise<BigNumber>;
-  readonly balanceOf: (address: AddressString) => Promise<BigNumber>;
-  readonly decimals: () => Promise<BigNumber>;
-  readonly name: () => Promise<string>;
-  readonly symbol: () => Promise<string>;
-  readonly totalSupply: () => Promise<BigNumber>;
 }

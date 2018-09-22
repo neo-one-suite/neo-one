@@ -1,9 +1,12 @@
-import { Block, common, Output, OutputKey, UInt256 } from '@neo-one/client-core';
+import { common, UInt256 } from '@neo-one/client-common';
 import {
   AddChange,
+  Block,
   Change,
   ChangeSet,
   DeleteChange,
+  Output,
+  OutputKey,
   ReadAllStorage,
   ReadGetAllStorage,
   ReadMetadataStorage,

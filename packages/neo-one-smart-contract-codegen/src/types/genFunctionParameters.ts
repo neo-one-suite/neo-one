@@ -1,4 +1,4 @@
-import { ABIFunction, ABIParameter } from '@neo-one/client-core';
+import { ABIFunction, ABIParameter } from '@neo-one/client-common';
 import _ from 'lodash';
 import { toTypeScriptType } from '../utils';
 

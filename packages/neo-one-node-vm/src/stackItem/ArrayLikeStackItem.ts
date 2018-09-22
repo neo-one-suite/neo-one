@@ -1,5 +1,6 @@
 // tslint:disable readonly-array
-import { ArrayContractParameter, BinaryWriter, ContractParameter } from '@neo-one/client-core';
+import { BinaryWriter } from '@neo-one/client-common';
+import { ArrayContractParameter, ContractParameter } from '@neo-one/node-core';
 import { CircularReferenceError, InvalidValueBufferError } from './errors';
 import { StackItem } from './StackItem';
 import { StackItemBase } from './StackItemBase';

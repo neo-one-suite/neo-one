@@ -1,4 +1,4 @@
-import { SysCallName } from '@neo-one/client-core';
+import { SysCallName } from '@neo-one/client-common';
 import { WrappableType } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';

@@ -1,3 +1,4 @@
+import { common } from '@neo-one/client-common';
 import {
   createPrivateKey,
   LocalWallet,
@@ -6,8 +7,7 @@ import {
   privateKeyToAddress,
   privateKeyToWIF,
   ReadClient,
-} from '@neo-one/client';
-import { common } from '@neo-one/client-core';
+} from '@neo-one/client-full';
 import { compoundName, DescribeTable, PluginManager } from '@neo-one/server-plugin';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
 import { labels } from '@neo-one/utils';
@@ -286,7 +286,7 @@ export class WalletResource {
   }
 
   public async delete(): Promise<void> {
-    await this.client.providers.file.keystore.deleteAccount(this.walletID);
+    await this.client.providers.file.keystore.deleteUserAccount(this.walletID);
     await fs.remove(this.dataPath);
   }
 

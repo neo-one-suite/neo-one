@@ -1,28 +1,19 @@
-import {
-  Account,
-  AccountKey,
-  Action,
-  Asset,
-  Block,
-  BlockKey,
-  Contract,
-  ContractKey,
-  Header,
-  HeaderKey,
-  InvocationData,
-  Output,
-  StorageItem,
-  StorageItemKey,
-  Transaction,
-  TransactionData,
-  UInt256,
-  Validator,
-  ValidatorKey,
-} from '@neo-one/client-core';
+import { UInt256 } from '@neo-one/client-common';
+import { Account, AccountKey } from './Account';
 import { AccountUnclaimed, AccountUnclaimedKey } from './AccountUnclaimed';
 import { AccountUnspent, AccountUnspentKey } from './AccountUnspent';
+import { Action } from './action';
+import { Asset } from './Asset';
+import { Block, BlockKey } from './Block';
 import { Blockchain, ReadStorage } from './Blockchain';
 import { BlockData } from './BlockData';
+import { Contract, ContractKey } from './Contract';
+import { Header, HeaderKey } from './Header';
+import { InvocationData } from './InvocationData';
+import { StorageItem, StorageItemKey } from './StorageItem';
+import { Output, Transaction } from './transaction';
+import { TransactionData } from './TransactionData';
+import { Validator, ValidatorKey } from './Validator';
 import { ValidatorsCount } from './ValidatorsCount';
 
 interface OutputValue {

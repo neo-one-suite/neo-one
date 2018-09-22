@@ -1,13 +1,13 @@
-/* @hash 5089d29fea4c55eac2ec8cdfb7317d00 */
+/* @hash 912635047a992ae37d892936e4acfb6d */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
+  Client,
   ForwardValue,
   GetOptions,
   InvocationTransaction,
   InvokeReceipt,
-  ReadSmartContract,
   SmartContract,
   TransactionOptions,
   TransactionResult,
@@ -16,7 +16,7 @@ import BigNumber from 'bignumber.js';
 
 export type EscrowEvent = never;
 
-export interface EscrowSmartContract extends SmartContract<EscrowReadSmartContract> {
+export interface EscrowSmartContract<TClient extends Client = Client> extends SmartContract<TClient, EscrowEvent> {
   readonly approveReceiveTransfer: {
     (
       from: AddressString,
@@ -96,8 +96,4 @@ export interface EscrowSmartContract extends SmartContract<EscrowReadSmartContra
       ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
     };
   };
-}
-
-export interface EscrowReadSmartContract extends ReadSmartContract<EscrowEvent> {
-  readonly balanceOf: (from: AddressString, to: AddressString, asset: AddressString) => Promise<BigNumber>;
 }

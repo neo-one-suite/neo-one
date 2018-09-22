@@ -4,6 +4,7 @@
   "description": "NEO•ONE node storage common.",
   "main": "./src/index.ts",
   "dependencies": {
+    "@neo-one/client-common": "^1.0.0-preview.0",
     "@neo-one/client-core": "^1.0.0-preview.0",
     "@neo-one/node-core": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",

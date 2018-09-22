@@ -1,4 +1,4 @@
-import { Asset } from '@neo-one/client-core';
+import { Asset } from '@neo-one/node-core';
 import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 
 export class AssetStackItem extends EquatableKeyStackItem<Asset> {

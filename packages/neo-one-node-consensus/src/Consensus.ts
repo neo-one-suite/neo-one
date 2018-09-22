@@ -1,6 +1,6 @@
-import { common, ConsensusPayload, crypto, ECPoint, PrivateKey, Transaction, UInt160 } from '@neo-one/client-core';
+import { common, crypto, ECPoint, PrivateKey, UInt160 } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
-import { Node } from '@neo-one/node-core';
+import { ConsensusPayload, Node, Transaction } from '@neo-one/node-core';
 import { finalize, mergeScanLatest, utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { scan } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/scan';

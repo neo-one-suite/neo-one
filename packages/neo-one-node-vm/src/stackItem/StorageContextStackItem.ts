@@ -1,4 +1,5 @@
-import { common, ContractParameter, Hash160ContractParameter, UInt160 } from '@neo-one/client-core';
+import { common, UInt160 } from '@neo-one/client-common';
+import { ContractParameter, Hash160ContractParameter } from '@neo-one/node-core';
 import { AsStorageContextStackItemOptions, StackItemBase } from './StackItemBase';
 
 export class StorageContextStackItem extends StackItemBase {

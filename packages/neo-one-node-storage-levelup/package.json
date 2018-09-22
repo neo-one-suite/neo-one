@@ -4,6 +4,7 @@
   "description": "NEO•ONE levelup node storage.",
   "main": "./src/index.ts",
   "dependencies": {
+    "@neo-one/client-common": "^1.0.0-preview.0",
     "@neo-one/client-core": "^1.0.0-preview.0",
     "@neo-one/node-core": "^1.0.0-preview.0",
     "@neo-one/node-storage-common": "^1.0.0-preview.0",

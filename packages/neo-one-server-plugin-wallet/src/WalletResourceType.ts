@@ -5,7 +5,7 @@ import {
   LocalUserAccountProvider,
   NEOONEProvider,
   UserAccountID,
-} from '@neo-one/client';
+} from '@neo-one/client-full';
 import {
   CRUD,
   DescribeTable,

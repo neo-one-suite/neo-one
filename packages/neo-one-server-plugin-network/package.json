@@ -4,8 +4,9 @@
   "description": "NEO•ONE Server network plugin.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client": "^1.0.0-preview.0",
+    "@neo-one/client-common": "^1.0.0-preview.0",
     "@neo-one/client-core": "^1.0.0-preview.0",
+    "@neo-one/client-full": "^1.0.0-preview.0",
     "@neo-one/monitor": "^1.0.0-preview.0",
     "@neo-one/node": "^1.0.0-preview.0",
     "@neo-one/node-core": "^1.0.0-preview.0",

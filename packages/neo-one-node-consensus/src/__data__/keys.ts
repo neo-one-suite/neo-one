@@ -1,4 +1,4 @@
-import { common, ECPoint, PrivateKey } from '@neo-one/client-core';
+import { common, ECPoint, PrivateKey } from '@neo-one/client-common';
 
 export const keys: ReadonlyArray<{ readonly privateKey: PrivateKey; readonly publicKey: ECPoint }> = [
   [

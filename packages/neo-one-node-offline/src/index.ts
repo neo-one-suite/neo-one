@@ -1,6 +1,5 @@
 /// <reference types="@neo-one/types" />
-import { BinaryReader, Block, DeserializeWireContext } from '@neo-one/client-core';
-import { Blockchain } from '@neo-one/node-core';
+import { BinaryReader, Block, Blockchain, DeserializeWireContext } from '@neo-one/node-core';
 import { makeErrorWithCode } from '@neo-one/utils';
 import * as fs from 'fs';
 import _ from 'lodash';

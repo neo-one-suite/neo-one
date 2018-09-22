@@ -108,7 +108,9 @@ export const createOneClients = () => ({
 })
   `,
     ts: `
-import { ${mutableImports.join(', ')}, NEOONEDataProviderOptions, UserAccountProvider } from '@neo-one/client';
+import { ${mutableImports.join(
+      ', ',
+    )}, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client';
 import { projectID } from '${getRelativeImport(clientPath, projectIDPath)}';
 
 export type DefaultUserAccountProviders = {
@@ -124,9 +126,9 @@ const getDefaultUserAccountProviders = (provider: NEOONEProvider): DefaultUserAc
 const isLocalUserAccountProvider = (userAccountProvider: UserAccountProvider): userAccountProvider is LocalUserAccountProvider<any, any> =>
   userAccountProvider instanceof LocalUserAccountProvider;
 
-export const createClient = <TUserAccountProviders extends { readonly [K: string]: UserAccountProvider } = DefaultUserAccountProviders>(
+export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
   getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders as any,
-): Client<TUserAccountProviders> => {
+): Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never, TUserAccountProviders> => {
   const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [
     ${networks
       .filter(({ name }) => name !== localDevNetworkName)

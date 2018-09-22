@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-core';
+import { common } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
 import ts from 'typescript';

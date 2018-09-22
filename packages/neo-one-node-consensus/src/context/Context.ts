@@ -1,4 +1,4 @@
-import { common, ECPoint, UInt256 } from '@neo-one/client-core';
+import { common, ECPoint, UInt256 } from '@neo-one/client-common';
 import { BlockSentContext } from './BlockSentContext';
 import { InitialContext } from './InitialContext';
 import { Type } from './types';

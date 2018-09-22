@@ -1,4 +1,4 @@
-import { ABIParameter, ABIReturn } from '@neo-one/client-core';
+import { ABIParameter, ABIReturn } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 
 export interface Options {

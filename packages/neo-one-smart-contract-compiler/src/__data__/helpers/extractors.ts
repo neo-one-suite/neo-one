@@ -1,5 +1,5 @@
-import { SourceMaps } from '@neo-one/client';
-import { CallReceiptJSON, convertCallReceipt, RawCallReceipt } from '@neo-one/client-core';
+import { CallReceiptJSON, RawCallReceipt, SourceMaps } from '@neo-one/client-common';
+import { convertCallReceipt } from '@neo-one/client-core';
 import {
   disableConsoleLogForTest,
   enableConsoleLogForTest,

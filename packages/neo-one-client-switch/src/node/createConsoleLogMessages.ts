@@ -1,4 +1,4 @@
-import { RawAction } from '@neo-one/client-core';
+import { RawAction } from '@neo-one/client-common';
 import { createConsoleLogMessages as createConsoleLogMessagesBase, LogOptions, SourceMaps } from '../common';
 
 export const createConsoleLogMessages = async (

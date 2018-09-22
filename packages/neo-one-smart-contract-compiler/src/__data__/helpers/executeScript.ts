@@ -1,5 +1,4 @@
-import { SourceMaps } from '@neo-one/client';
-import { CallReceiptJSON, common, crypto, scriptHashToAddress } from '@neo-one/client-core';
+import { CallReceiptJSON, common, crypto, scriptHashToAddress, SourceMaps } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { test as testNet } from '@neo-one/node-neo-settings';

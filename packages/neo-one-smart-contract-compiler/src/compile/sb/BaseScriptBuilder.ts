@@ -11,7 +11,7 @@ import {
   UInt160,
   UnknownOpError,
   utils,
-} from '@neo-one/client-core';
+} from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils as commonUtils } from '@neo-one/utils';
 import BN from 'bn.js';

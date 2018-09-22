@@ -1,4 +1,4 @@
-import { InvokeReceipt, TransactionResult } from '@neo-one/client';
+import { InvokeReceipt, TransactionResult } from '@neo-one/client-full';
 import BigNumber from 'bignumber.js';
 import * as path from 'path';
 import { testToken } from '../__data__';

@@ -1,3 +1,4 @@
+import { common, crypto } from '@neo-one/client-common';
 import {
   Client,
   DeveloperClient,
@@ -9,8 +10,7 @@ import {
   SourceMaps,
   TransactionResult,
   UserAccountID,
-} from '@neo-one/client';
-import { common, crypto } from '@neo-one/client-core';
+} from '@neo-one/client-full';
 import { compileContract } from '@neo-one/smart-contract-compiler';
 import { createCompilerHost } from '@neo-one/smart-contract-compiler-node';
 import BigNumber from 'bignumber.js';

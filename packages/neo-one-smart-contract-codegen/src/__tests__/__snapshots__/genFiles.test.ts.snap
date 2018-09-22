@@ -219,20 +219,13 @@ const definition = {
 };
 
 export const createTokenSmartContract = (client) => client.smartContract(definition);
-
-export const createTokenReadSmartContract = (client) =>
-  client.smartContract({
-    address: definition.networks[client.dataProvider.network].address,
-    abi: definition.abi,
-    sourceMaps: definition.sourceMaps,
-  });
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
-import { Client, ReadClient, SmartContractDefinition } from '@neo-one/client';
+import { Client, SmartContractDefinition } from '@neo-one/client';
 import { sourceMaps } from '../sourceMaps';
 import { tokenABI } from './abi';
-import { TokenReadSmartContract, TokenSmartContract } from './types';
+import { TokenSmartContract } from './types';
 
 const definition: SmartContractDefinition = {
   networks: {
@@ -244,15 +237,8 @@ const definition: SmartContractDefinition = {
   sourceMaps,
 };
 
-export const createTokenSmartContract = (client: Client): TokenSmartContract =>
-  client.smartContract<TokenSmartContract>(definition);
-
-export const createTokenReadSmartContract = (client: ReadClient): TokenReadSmartContract =>
-  client.smartContract<TokenReadSmartContract>({
-    address: definition.networks[client.dataProvider.network].address,
-    abi: definition.abi,
-    sourceMaps: definition.sourceMaps,
-  });
+export const createTokenSmartContract = <TClient extends Client>(client: TClient): TokenSmartContract<TClient> =>
+  client.smartContract<TokenSmartContract<TClient>>(definition);
 ",
   },
   "types": Object {
@@ -261,11 +247,11 @@ export const createTokenReadSmartContract = (client: ReadClient): TokenReadSmart
 /* eslint-disable */
 import {
   AddressString,
+  Client,
   Event,
   GetOptions,
   InvocationTransaction,
   InvokeReceipt,
-  ReadSmartContract,
   SmartContract,
   TransactionOptions,
   TransactionResult,
@@ -280,7 +266,7 @@ export interface TokenTransferEventParameters {
 export interface TokenTransferEvent extends Event<'transfer', TokenTransferEventParameters> {}
 export type TokenEvent = TokenTransferEvent;
 
-export interface TokenSmartContract extends SmartContract<TokenReadSmartContract> {
+export interface TokenSmartContract<TClient extends Client = Client> extends SmartContract<TClient, TokenEvent> {
   readonly balanceOf: (account: AddressString) => Promise<BigNumber>;
   readonly decimals: () => Promise<BigNumber>;
   readonly name: () => Promise<string>;
@@ -296,14 +282,6 @@ export interface TokenSmartContract extends SmartContract<TokenReadSmartContract
       >;
     };
   };
-}
-
-export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {
-  readonly balanceOf: (account: AddressString) => Promise<BigNumber>;
-  readonly decimals: () => Promise<BigNumber>;
-  readonly name: () => Promise<string>;
-  readonly symbol: () => Promise<string>;
-  readonly totalSupply: () => Promise<BigNumber>;
 }
 ",
   },

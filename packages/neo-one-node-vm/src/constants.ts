@@ -1,6 +1,6 @@
-import { Block, common, OpCode, ScriptContainer, SysCallName, UInt160, VMState } from '@neo-one/client-core';
+import { common, OpCode, SysCallName, UInt160, VMState } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
-import { ExecutionAction, TriggerType, VMListeners, WriteBlockchain } from '@neo-one/node-core';
+import { Block, ExecutionAction, ScriptContainer, TriggerType, VMListeners, WriteBlockchain } from '@neo-one/node-core';
 import BN from 'bn.js';
 import { StackItem } from './stackItem';
 

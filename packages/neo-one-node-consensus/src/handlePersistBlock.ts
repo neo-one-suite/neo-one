@@ -1,4 +1,4 @@
-import { ECPoint } from '@neo-one/client-core';
+import { ECPoint } from '@neo-one/client-common';
 import { Blockchain } from '@neo-one/node-core';
 import { initializeNewConsensus } from './common';
 import { ConsensusContext } from './ConsensusContext';

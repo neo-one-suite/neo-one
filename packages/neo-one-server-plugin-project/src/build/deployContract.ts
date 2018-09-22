@@ -1,3 +1,4 @@
+import { common, crypto } from '@neo-one/client-common';
 import {
   AddressString,
   Client,
@@ -8,8 +9,7 @@ import {
   NEOONEProvider,
   SourceMaps,
   wifToPrivateKey,
-} from '@neo-one/client';
-import { common, crypto } from '@neo-one/client-core';
+} from '@neo-one/client-full';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
 import BigNumber from 'bignumber.js';
 import { ContractResult } from './compileContract';

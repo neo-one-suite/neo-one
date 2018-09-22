@@ -1,5 +1,4 @@
-import { addressToScriptHash } from '@neo-one/client';
-import { common, ECPoint, UInt160, UInt256 } from '@neo-one/client-core';
+import { addressToScriptHash, common, ECPoint, UInt160, UInt256 } from '@neo-one/client-common';
 import { AnyNameableNode, tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';

@@ -1,5 +1,5 @@
 // tslint:disable prefer-switch
-import { TransactionType } from '@neo-one/client-core';
+import { TransactionTypeModel as TransactionType } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';

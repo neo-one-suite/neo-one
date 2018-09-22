@@ -1,15 +1,15 @@
-/* @hash a44949dd0c4f906f34559ebc2434a0d8 */
+/* @hash 40111576dd4b75816183640324b0c850 */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
+  Client,
   Event,
   GetOptions,
   InvocationTransaction,
   InvokeReceipt,
   InvokeReceiveTransactionOptions,
   InvokeSendUnsafeTransactionOptions,
-  ReadSmartContract,
   SmartContract,
   TransactionOptions,
   TransactionResult,
@@ -37,7 +37,7 @@ export interface ICORevokeSendTransferEventParameters {
 export interface ICORevokeSendTransferEvent extends Event<'revokeSendTransfer', ICORevokeSendTransferEventParameters> {}
 export type ICOEvent = ICOTransferEvent | ICOApproveSendTransferEvent | ICORevokeSendTransferEvent;
 
-export interface ICOSmartContract extends SmartContract<ICOReadSmartContract> {
+export interface ICOSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ICOEvent> {
   readonly amountPerNEO: () => Promise<BigNumber>;
   readonly deploy: {
     (
@@ -77,14 +77,6 @@ export interface ICOSmartContract extends SmartContract<ICOReadSmartContract> {
       >;
     };
   };
-  readonly remaining: () => Promise<BigNumber>;
-  readonly startTimeSeconds: () => Promise<BigNumber>;
-}
-
-export interface ICOReadSmartContract extends ReadSmartContract<ICOEvent> {
-  readonly amountPerNEO: () => Promise<BigNumber>;
-  readonly icoDurationSeconds: () => Promise<BigNumber>;
-  readonly owner: () => Promise<AddressString>;
   readonly remaining: () => Promise<BigNumber>;
   readonly startTimeSeconds: () => Promise<BigNumber>;
 }

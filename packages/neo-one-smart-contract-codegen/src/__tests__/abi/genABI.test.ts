@@ -1,4 +1,4 @@
-import { nep5 } from '@neo-one/client';
+import { nep5 } from '@neo-one/client-full';
 import { genABI } from '../../abi';
 
 describe('genABI', () => {

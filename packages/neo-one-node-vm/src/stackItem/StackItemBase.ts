@@ -1,24 +1,20 @@
+import { BinaryWriter, common, ECPoint, UInt160, UInt256 } from '@neo-one/client-common';
 import {
   Account,
   Asset,
   Attribute,
-  BinaryWriter,
   Block,
   BlockBase,
-  common,
   Contract,
   ContractParameter,
-  ECPoint,
   Equatable,
   Input,
   Output,
   Transaction,
-  UInt160,
-  UInt256,
   utils,
   Validator,
   VMSettings,
-} from '@neo-one/client-core';
+} from '@neo-one/node-core';
 import BN from 'bn.js';
 import { AttributeStackItem } from './AttributeStackItem';
 import {

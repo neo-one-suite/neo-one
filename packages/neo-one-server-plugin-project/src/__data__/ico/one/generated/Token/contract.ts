@@ -1,10 +1,10 @@
-/* @hash e9a7465a88ebb6d2f751d4eb45e2cc9a */
+/* @hash 3a723f147a8770951347c71601f92636 */
 // tslint:disable
 /* eslint-disable */
-import { Client, ReadClient, SmartContractDefinition } from '@neo-one/client';
+import { Client, SmartContractDefinition } from '@neo-one/client';
 import { sourceMaps } from '../sourceMaps';
 import { tokenABI } from './abi';
-import { TokenReadSmartContract, TokenSmartContract } from './types';
+import { TokenSmartContract } from './types';
 
 const definition: SmartContractDefinition = {
   networks: {
@@ -16,12 +16,5 @@ const definition: SmartContractDefinition = {
   sourceMaps,
 };
 
-export const createTokenSmartContract = (client: Client): TokenSmartContract =>
-  client.smartContract<TokenSmartContract>(definition);
-
-export const createTokenReadSmartContract = (client: ReadClient): TokenReadSmartContract =>
-  client.smartContract<TokenReadSmartContract>({
-    address: definition.networks[client.dataProvider.network].address,
-    abi: definition.abi,
-    sourceMaps: definition.sourceMaps,
-  });
+export const createTokenSmartContract = <TClient extends Client>(client: TClient): TokenSmartContract<TClient> =>
+  client.smartContract<TokenSmartContract<TClient>>(definition);

@@ -1,4 +1,4 @@
-import { ABI, ContractRegister } from '@neo-one/client';
+import { ABI, ContractRegister } from '@neo-one/client-full';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../Context';

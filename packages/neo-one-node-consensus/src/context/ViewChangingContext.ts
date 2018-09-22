@@ -1,4 +1,4 @@
-import { ECPoint, UInt256 } from '@neo-one/client-core';
+import { ECPoint, UInt256 } from '@neo-one/client-common';
 import { Context } from './Context';
 
 interface ViewChangingContextAdd {

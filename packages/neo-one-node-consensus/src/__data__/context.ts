@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-core';
+import { common } from '@neo-one/client-common';
 import _ from 'lodash';
 import { Context } from '../context';
 import { keys } from './keys';

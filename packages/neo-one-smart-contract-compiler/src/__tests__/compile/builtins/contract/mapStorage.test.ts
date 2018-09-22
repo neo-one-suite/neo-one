@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-core';
+import { common } from '@neo-one/client-common';
 import { helpers, keys } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
@@ -80,16 +80,11 @@ describe('MapStorage', () => {
       import { MapStorage, SmartContract, Address, Hash256 } from '@neo-one/smart-contract';
 
       const addressA = Address.from('${keys[0].address}');
-      const addressB = Address.from('${keys[1].address}');
       const hashA = Hash256.from('${common.NEO_ASSET_HASH}');
-      const hashB = Hash256.from('${common.GAS_ASSET_HASH}');
       const keyA = 'keyA';
-      const keyB = 'keyB';
-      const keyC = 'keyC';
       const valueA = 1;
       const valueB = 2;
       const valueC = 3;
-      const valueD = 4;
 
       type Storage = MapStorage<[Address, Hash256, string], number>;
 
@@ -155,6 +150,53 @@ describe('MapStorage', () => {
         assertEqual(storage.at(addressA).has([hashA, keyA]), false);
         assertEqual(storage.at(addressA).at(hashA).has(keyA), false);
       }
+
+      export class StorageContract extends SmartContract {
+        public readonly properties = {
+          codeVersion: '1.0',
+          author: 'dicarlo2',
+          email: 'alex.dicarlo@neotracker.io',
+          description: 'StorageContract',
+        };
+        private readonly storage = MapStorage.for<[Address, Hash256, string], number>();
+
+        public run(): void {
+          testAtGetSetHasDelete(this.storage);
+          testAtGetSetHasDelete1(this.storage);
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('multi-tier - level 0', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { MapStorage, SmartContract, Address, Hash256 } from '@neo-one/smart-contract';
+
+      const addressA = Address.from('${keys[0].address}');
+      const addressB = Address.from('${keys[1].address}');
+      const hashA = Hash256.from('${common.NEO_ASSET_HASH}');
+      const hashB = Hash256.from('${common.GAS_ASSET_HASH}');
+      const keyA = 'keyA';
+      const keyB = 'keyB';
+      const keyC = 'keyC';
+      const valueA = 1;
+      const valueB = 2;
+      const valueC = 3;
+      const valueD = 4;
+
+      type Storage = MapStorage<[Address, Hash256, string], number>;
 
       const testLevel0 = (storage: Storage) => {
         storage.set([addressA, hashA, keyA], valueA);
@@ -229,6 +271,56 @@ describe('MapStorage', () => {
         assertEqual(firstResult.value as [[Address, Hash256, string], number] | undefined, undefined);
         assertEqual(firstResult.done, true);
       }
+
+      export class StorageContract extends SmartContract {
+        public readonly properties = {
+          codeVersion: '1.0',
+          author: 'dicarlo2',
+          email: 'alex.dicarlo@neotracker.io',
+          description: 'StorageContract',
+        };
+        private readonly storage = MapStorage.for<[Address, Hash256, string], number>();
+
+        public run(): void {
+          this.storage.set([addressA, hashA, keyA], valueA);
+          this.storage.set([addressA, hashB, keyB], valueB);
+          this.storage.set([addressB, hashB, keyB], valueC);
+          this.storage.set([addressB, hashB, keyC], valueD);
+          testLevel0(this.storage);
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('multi-tier - level 1', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { MapStorage, SmartContract, Address, Hash256 } from '@neo-one/smart-contract';
+
+      const addressA = Address.from('${keys[0].address}');
+      const addressB = Address.from('${keys[1].address}');
+      const hashA = Hash256.from('${common.NEO_ASSET_HASH}');
+      const hashB = Hash256.from('${common.GAS_ASSET_HASH}');
+      const keyA = 'keyA';
+      const keyB = 'keyB';
+      const keyC = 'keyC';
+      const valueA = 1;
+      const valueB = 2;
+      const valueC = 3;
+      const valueD = 4;
+
+      type Storage = MapStorage<[Address, Hash256, string], number>;
 
       const testLevel1 = (storage: Storage) => {
         let count = 0;
@@ -322,6 +414,57 @@ describe('MapStorage', () => {
         assertEqual(hashes.equals(Buffer.concat([hashB, hashB])), true);
         assertEqual(keys, keyB + keyC);
       }
+
+      export class StorageContract extends SmartContract {
+        public readonly properties = {
+          codeVersion: '1.0',
+          author: 'dicarlo2',
+          email: 'alex.dicarlo@neotracker.io',
+          description: 'StorageContract',
+        };
+        private readonly storage = MapStorage.for<[Address, Hash256, string], number>();
+
+        public run(): void {
+          this.storage.set([addressA, hashA, keyA], valueA);
+          this.storage.set([addressA, hashB, keyB], valueB);
+          this.storage.set([addressB, hashB, keyB], valueC);
+          this.storage.set([addressB, hashB, keyC], valueD);
+
+          testLevel1(this.storage);
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('multi-tier - level 2', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { MapStorage, SmartContract, Address, Hash256 } from '@neo-one/smart-contract';
+
+      const addressA = Address.from('${keys[0].address}');
+      const addressB = Address.from('${keys[1].address}');
+      const hashA = Hash256.from('${common.NEO_ASSET_HASH}');
+      const hashB = Hash256.from('${common.GAS_ASSET_HASH}');
+      const keyA = 'keyA';
+      const keyB = 'keyB';
+      const keyC = 'keyC';
+      const valueA = 1;
+      const valueB = 2;
+      const valueC = 3;
+      const valueD = 4;
+
+      type Storage = MapStorage<[Address, Hash256, string], number>;
 
       const testLevel2 = (storage: Storage) => {
         let count = 0;
@@ -467,10 +610,11 @@ describe('MapStorage', () => {
         private readonly storage = MapStorage.for<[Address, Hash256, string], number>();
 
         public run(): void {
-          testAtGetSetHasDelete(this.storage);
-          testAtGetSetHasDelete1(this.storage);
-          testLevel0(this.storage);
-          testLevel1(this.storage);
+          this.storage.set([addressA, hashA, keyA], valueA);
+          this.storage.set([addressA, hashB, keyB], valueB);
+          this.storage.set([addressB, hashB, keyB], valueC);
+          this.storage.set([addressB, hashB, keyC], valueD);
+
           testLevel2(this.storage);
         }
       }

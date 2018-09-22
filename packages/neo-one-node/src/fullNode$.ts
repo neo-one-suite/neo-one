@@ -1,6 +1,6 @@
-import { Settings } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import { Blockchain } from '@neo-one/node-blockchain';
+import { Settings } from '@neo-one/node-core';
 import { backup, BackupRestoreOptions, restore } from '@neo-one/node-data-backup';
 import { rpcServer$, RPCServerEnvironment, RPCServerOptions } from '@neo-one/node-http-rpc';
 import { Network, NetworkEnvironment, NetworkOptions } from '@neo-one/node-network';

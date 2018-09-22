@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-core';
+import { common } from '@neo-one/client-common';
 import { helpers } from '../../../../../__data__';
 
 describe('Account', () => {

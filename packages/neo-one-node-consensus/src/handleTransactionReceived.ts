@@ -1,5 +1,5 @@
-import { PrivateKey, Transaction } from '@neo-one/client-core';
-import { Node } from '@neo-one/node-core';
+import { PrivateKey } from '@neo-one/client-common';
+import { Node, Transaction } from '@neo-one/node-core';
 import { addTransaction } from './common';
 import { ConsensusContext } from './ConsensusContext';
 import { Context, RequestReceivedContext } from './context';

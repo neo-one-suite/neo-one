@@ -1,5 +1,5 @@
-import { SourceMaps } from '@neo-one/client';
-import { CallReceiptJSON, convertCallReceipt } from '@neo-one/client-core';
+import { CallReceiptJSON, SourceMaps } from '@neo-one/client-common';
+import { convertCallReceipt } from '@neo-one/client-core';
 import { createConsoleLogMessages } from '@neo-one/client-switch';
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';

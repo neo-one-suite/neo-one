@@ -1,4 +1,4 @@
-import { ConsensusPayload, Transaction } from '@neo-one/client-core';
+import { ConsensusPayload, Transaction } from '@neo-one/node-core';
 import { ConsensusContext } from './ConsensusContext';
 import { Context } from './context';
 

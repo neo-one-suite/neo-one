@@ -1,9 +1,11 @@
-import { Block, crypto, ScriptContainer, UInt160, utils, VMState } from '@neo-one/client-core';
+import { crypto, UInt160, utils, VMState } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
 import {
+  Block,
   ExecuteScriptsResult,
   ExecutionAction,
   Script,
+  ScriptContainer,
   TriggerType,
   VMListeners,
   WriteBlockchain,

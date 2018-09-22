@@ -1,7 +1,9 @@
-import { Block, ConsensusPayload, Transaction } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
+import { Block } from './Block';
 import { Blockchain, VerifyTransactionResult } from './Blockchain';
 import { Endpoint } from './net';
+import { ConsensusPayload } from './payload';
+import { Transaction } from './transaction';
 
 export interface Consensus {
   readonly runConsensusNow: () => Promise<void>;

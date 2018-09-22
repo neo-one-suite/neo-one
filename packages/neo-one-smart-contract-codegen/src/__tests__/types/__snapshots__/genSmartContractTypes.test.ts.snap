@@ -2,7 +2,7 @@
 
 exports[`genSmartContractTypes NEP5 1`] = `
 Object {
-  "ts": "import { AddressString, ContractParameter, Event, ForwardValue, GetOptions, InvocationTransaction, InvokeReceipt, ReadSmartContract, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+  "ts": "import { AddressString, Client, ContractParameter, Event, ForwardValue, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 
 
@@ -14,7 +14,7 @@ export interface TokenTransferEventParameters {
 export interface TokenTransferEvent extends Event<'transfer', TokenTransferEventParameters> {}
 export type TokenEvent = TokenTransferEvent
 
-export interface TokenSmartContract extends SmartContract<TokenReadSmartContract> {
+export interface TokenSmartContract<TClient extends Client = Client> extends SmartContract<TClient, TokenEvent> {
   readonly balanceOf: (account: AddressString) => Promise<BigNumber>;
   readonly decimals: () => Promise<BigNumber>;
   readonly forward: {
@@ -54,16 +54,6 @@ export interface TokenSmartContract extends SmartContract<TokenReadSmartContract
 (from: AddressString, to: AddressString, value: BigNumber, ...args: ForwardValue[]): Promise<InvokeReceipt<boolean, TokenEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
-}
-
-export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {
-  readonly balanceOf: (account: AddressString) => Promise<BigNumber>;
-  readonly decimals: () => Promise<BigNumber>;
-  readonly forwardConstant: (address: AddressString, ...args: ForwardValue[]) => Promise<ContractParameter>;
-  readonly forwardToConstant: (first: BigNumber, second: BigNumber) => Promise<BigNumber>;
-  readonly name: () => Promise<string>;
-  readonly symbol: () => Promise<string>;
-  readonly totalSupply: () => Promise<BigNumber>;
 }
 ",
 }

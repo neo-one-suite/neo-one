@@ -1,4 +1,4 @@
-import { ContractParameter, InteropInterfaceContractParameter } from '@neo-one/client-core';
+import { ContractParameter, InteropInterfaceContractParameter } from '@neo-one/node-core';
 import { InvalidValueBufferError, UnsupportedStackItemSerdeError } from './errors';
 import { StackItemBase } from './StackItemBase';
 

@@ -1,4 +1,5 @@
-import { common, ContractParameterType, ContractPropertyState, crypto } from '@neo-one/client-core';
+import { common, ContractParameterTypeModel as ContractParameterType, crypto } from '@neo-one/client-common';
+import { ContractPropertyStateModel as ContractPropertyState } from '@neo-one/client-full-common';
 import { helpers } from '../../../../../__data__';
 
 describe('SmartContract#upgrade', () => {

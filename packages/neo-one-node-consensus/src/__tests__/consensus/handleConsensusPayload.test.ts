@@ -1,11 +1,11 @@
 // wallaby.skip
+import { PrivateKey } from '@neo-one/client-common';
 import {
   ChangeViewConsensusMessage,
   ConsensusMessage,
   ConsensusPayload,
-  PrivateKey,
   UnsignedConsensusPayload,
-} from '@neo-one/client-core';
+} from '@neo-one/node-core';
 import { context } from '../../__data__';
 import { ConsensusContext } from '../../ConsensusContext';
 import { Context } from '../../context';

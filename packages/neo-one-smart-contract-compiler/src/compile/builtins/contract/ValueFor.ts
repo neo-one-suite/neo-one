@@ -1,4 +1,4 @@
-import { SysCallName } from '@neo-one/client-core';
+import { SysCallName } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';

@@ -4,12 +4,10 @@ import * as api from '@neo-one/client';
 describe('@neo-one/client', () => {
   const EXPECTED = [
     'Client',
-    'ReadClient',
     'DeveloperClient',
     'Hash256',
     'OneClient',
     'nep5',
-    'typeGuards',
     // ./user
     'LocalUserAccountProvider',
     'LocalKeyStore',
@@ -34,9 +32,6 @@ describe('@neo-one/client', () => {
     'publicKeyToScriptHash',
     'scriptHashToAddress',
     'wifToPrivateKey',
-    // ./preconfigured
-    'createClient',
-    'createReadClient',
   ];
 
   test('has expected exports', () => {

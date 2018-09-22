@@ -1,22 +1,20 @@
 // tslint:disable no-object-mutation no-array-mutation no-loop-statement
+import { common, ECPoint, UInt160, UInt256Hex } from '@neo-one/client-common';
 import {
   Account,
   BinaryReader,
-  common,
-  ECPoint,
   Output,
   StateDescriptor,
   StateTransaction,
   Transaction,
   TransactionType,
-  UInt160,
-  UInt256Hex,
   utils,
   Validator,
   ValidatorKey,
+  ValidatorsCount,
+  ValidatorsCountUpdate,
   ValidatorUpdate,
-} from '@neo-one/client-core';
-import { ValidatorsCount, ValidatorsCountUpdate } from '@neo-one/node-core';
+} from '@neo-one/node-core';
 import BN from 'bn.js';
 import _ from 'lodash';
 import { Blockchain } from './Blockchain';

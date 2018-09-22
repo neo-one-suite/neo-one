@@ -43,10 +43,9 @@ const makeEffects = (
     Promise.resolve()
       .then(async () => {
         const network = client.getCurrentNetwork();
-        const readClient = client.read(network);
-        const decimals = await nep5.getDecimals(readClient, state.address);
-        const smartContract = nep5.createNEP5ReadSmartContract(readClient, state.address, decimals);
-        const symbol = await smartContract.symbol();
+        const decimals = await nep5.getDecimals(client, { [network]: { address: state.address } }, network);
+        const smartContract = nep5.createNEP5SmartContract(client, { [network]: { address: state.address } }, decimals);
+        const symbol = await smartContract.symbol({ network });
         const tokens = await tokens$.pipe(take(1)).toPromise();
 
         onChange(tokens.concat({ network, address: state.address, decimals, symbol }));

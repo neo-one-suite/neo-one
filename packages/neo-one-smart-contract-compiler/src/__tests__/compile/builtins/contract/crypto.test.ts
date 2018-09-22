@@ -1,4 +1,4 @@
-import { crypto } from '@neo-one/client-core';
+import { crypto } from '@neo-one/client-common';
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 

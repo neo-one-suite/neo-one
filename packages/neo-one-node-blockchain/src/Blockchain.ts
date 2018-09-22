@@ -1,38 +1,30 @@
+import { common, crypto, ECPoint, ScriptBuilder, UInt160, VMState } from '@neo-one/client-common';
+import { metrics, Monitor } from '@neo-one/monitor';
 import {
   Action,
   Block,
+  Blockchain as BlockchainType,
   CallReceipt,
-  common,
   ConsensusPayload,
-  crypto,
-  ECPoint,
   Header,
   Input,
   InvocationTransaction,
   LogAction,
   NotificationAction,
+  NULL_ACTION,
   Output,
   OutputKey,
-  ScriptBuilder,
   ScriptContainerType,
   SerializableInvocationData,
   Settings,
+  Storage,
   Transaction,
-  TransactionBase,
   TransactionData,
-  UInt160,
+  TriggerType,
   utils,
   Validator,
   VerifyScriptOptions,
   VerifyScriptResult,
-  VMState,
-} from '@neo-one/client-core';
-import { metrics, Monitor } from '@neo-one/monitor';
-import {
-  Blockchain as BlockchainType,
-  NULL_ACTION,
-  Storage,
-  TriggerType,
   VerifyTransactionResult,
   VM,
 } from '@neo-one/node-core';
@@ -787,7 +779,7 @@ export class Blockchain {
       actions,
     };
   };
-  private readonly tryGetTransactionData = async (transaction: TransactionBase): Promise<TransactionData | undefined> =>
+  private readonly tryGetTransactionData = async (transaction: Transaction): Promise<TransactionData | undefined> =>
     this.transactionData.tryGet({ hash: transaction.hash });
   private readonly getUnclaimed = async (hash: UInt160): Promise<ReadonlyArray<Input>> =>
     this.accountUnclaimed

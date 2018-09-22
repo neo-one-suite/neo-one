@@ -1,4 +1,5 @@
-import { Block, common, ECPoint, MerkleTree, UInt160, UInt256, UInt256Hex } from '@neo-one/client-core';
+import { common, ECPoint, UInt160, UInt256, UInt256Hex } from '@neo-one/client-common';
+import { Block, MerkleTree } from '@neo-one/node-core';
 import BN from 'bn.js';
 import { Context } from './Context';
 import { Transactions, Type } from './types';

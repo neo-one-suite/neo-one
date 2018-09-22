@@ -1,4 +1,4 @@
-import { ABIEvent } from '@neo-one/client-core';
+import { ABIEvent } from '@neo-one/client-common';
 import { toTypeScriptType } from '../utils';
 import { getSingleEventName } from './getSingleEventName';
 

@@ -1,13 +1,11 @@
 import {
-  BinaryReader,
   BinaryWriter,
   createSerializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
   InvalidFormatError,
   SerializableWire,
   SerializeWire,
-} from '@neo-one/client-core';
+} from '@neo-one/client-common';
+import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions } from '@neo-one/node-core';
 import BN from 'bn.js';
 import { Address6 } from 'ip-address';
 

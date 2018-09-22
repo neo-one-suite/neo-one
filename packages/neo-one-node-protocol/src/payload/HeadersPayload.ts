@@ -1,13 +1,5 @@
-import {
-  BinaryReader,
-  BinaryWriter,
-  createSerializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  Header,
-  SerializableWire,
-  SerializeWire,
-} from '@neo-one/client-core';
+import { BinaryWriter, createSerializeWire, SerializableWire, SerializeWire } from '@neo-one/client-common';
+import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions, Header } from '@neo-one/node-core';
 export interface HeadersPayloadAdd {
   readonly headers: ReadonlyArray<Header>;
 }

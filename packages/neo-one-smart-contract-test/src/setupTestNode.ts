@@ -1,4 +1,10 @@
-import { Client, LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider, NEOONEProvider } from '@neo-one/client';
+import {
+  Client,
+  LocalKeyStore,
+  LocalMemoryStore,
+  LocalUserAccountProvider,
+  NEOONEProvider,
+} from '@neo-one/client-full';
 import { createNode } from './createNode';
 
 export const setupTestNode = async (omitCleanup = true) => {

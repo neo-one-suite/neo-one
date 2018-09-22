@@ -1,4 +1,5 @@
-import { StorageItem, utils } from '@neo-one/client-core';
+import { utils } from '@neo-one/client-common';
+import { StorageItem } from '@neo-one/node-core';
 
 // tslint:disable-next-line no-any
 export const verifyBlockchainSnapshot = (blockchain: any) => {

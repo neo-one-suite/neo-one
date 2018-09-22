@@ -1,4 +1,4 @@
-import { common, crypto } from '@neo-one/client-core';
+import { common, crypto } from '@neo-one/client-common';
 import { DefaultMonitor, Monitor } from '@neo-one/monitor';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { createMain } from '@neo-one/node-neo-settings';

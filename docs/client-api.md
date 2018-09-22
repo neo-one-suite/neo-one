@@ -5,8 +5,8 @@ title: Client API
 This is the API documentation for the NEO•ONE Client.
 
 ## Properties
-  - [currentAccount$](#currentAccount)
-  - [accounts$](#accounts)
+  - [currentUserAccount$](#currentAccount)
+  - [userAccounts$](#accounts)
   - [currentNetwork$](#currentNetwork)
   - [networks$](#networks)
   - [block$](#block)
@@ -14,13 +14,13 @@ This is the API documentation for the NEO•ONE Client.
   - [providers](#providers)
   - [hooks](#hooks)
 ## Methods
-  - [getAccount](#getAccount)
-  - [selectAccount](#selectAccount)
+  - [getUserAccount](#getUserAccount)
+  - [selectUserAccount](#selectUserAccount)
   - [selectNetwork](#selectNetwork)
-  - [deleteAccount](#deleteAccount)
-  - [updateAccountName](#updateAccountName)
-  - [getCurrentAccount](#getCurrentAccount)
-  - [getAccounts](#getAccounts)
+  - [deleteUserAccount](#deleteUserAccount)
+  - [updateUserAccountName](#updateUserAccountName)
+  - [getCurrentUserAccount](#getCurrentUserAccount)
+  - [getUserAccounts](#getUserAccounts)
   - [getNetworks](#getNetworks)
   - [transfer](#transfer)
   - [publish](#publish)
@@ -33,12 +33,12 @@ This is the API documentation for the NEO•ONE Client.
 
 ## Properties Reference
 
-#### currentAccount$
+#### currentUserAccount$
 - type: Observable<[UserAccount](/docs/en/client-types.html#UserAccount) | undefined>
 - Observable which returns a stream containing the currently active [UserAccount](/docs/en/client-types.html#UserAccount).
 - The currently active account is the default account from which transactions will be initiated.
 
-#### accounts$
+#### userAccounts$
 - type: Observable<ReadonlyArray<[UserAccount](#UserAccount)>>
 - Observable which returns a stream containing an array of all User Accounts registered with the client.
 
@@ -83,8 +83,8 @@ This is the API documentation for the NEO•ONE Client.
 <br>
 ## Methods Reference
 
-<a id="getAccount"></a>
-#### getAccount([UserAccountID](/docs/en/client-types.html#UserAccountID)): [UserAccount](/docs/en/client-types.html#UserAccount)
+<a id="getUserAccount"></a>
+#### getUserAccount([UserAccountID](/docs/en/client-types.html#UserAccountID)): [UserAccount](/docs/en/client-types.html#UserAccount)
   - Used to obtain a [UserAccount](/docs/en/client-types.html#UserAccount) from an input [UserAccountID](/docs/en/client-types.html#UserAccountID).
   - Example:
     ```ts
@@ -93,12 +93,12 @@ This is the API documentation for the NEO•ONE Client.
       address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR'
     };
 
-    const userAccount = client.getAccount(userAccountID);
+    const userAccount = client.getUserAccount(userAccountID);
     const accountName = userAccount.name;
     ```
 
-<a id="selectAccount"></a>
-#### selectAccount([UserAccountID?](/docs/en/client-types.html#UserAccountID)): Promise\<void\>
+<a id="selectUserAccount"></a>
+#### selectUserAccount([UserAccountID?](/docs/en/client-types.html#UserAccountID)): Promise\<void\>
   - Sets the current account to the account associated with the given [UserAccountID](/docs/en/client-types.html#UserAccountID).
 The selected account will now be the default account from which transactions will be initiated by the client.
   - Example:
@@ -122,8 +122,8 @@ The selected account will now be the default account from which transactions wil
     await client.selectNetwork('private-alt');
     ```
 
-<a id="deleteAccount"></a>
-#### deleteAccount([UserAccountID?](/docs/en/client-types.html#UserAccountID)): Promise\<void\>
+<a id="deleteUserAccount"></a>
+#### deleteUserAccount([UserAccountID?](/docs/en/client-types.html#UserAccountID)): Promise\<void\>
   - Removes the account associated with the given UserAccountID from the list of accounts registered with the client.
   - Example:
     ```ts
@@ -134,8 +134,8 @@ The selected account will now be the default account from which transactions wil
     const account = client.getAccount(userAccount.id);
     ```
 
-<a id="updateAccountName"></a>
-#### updateAccountName([UpdateAccountNameOptions](/docs/en/client-types.html#UpdateAccountNameOptions)): Promise\<void\>
+<a id="updateUserAccountName"></a>
+#### updateUserAccountName([UpdateAccountNameOptions](/docs/en/client-types.html#UpdateAccountNameOptions)): Promise\<void\>
   - Updates the name associated with a given account
   - Example:
     ```ts
@@ -150,8 +150,8 @@ The selected account will now be the default account from which transactions wil
     console.log(newAccount.name);
     ```
 
-<a id="getCurrentAccount"></a>
-#### getCurrentAccount(): [UserAccount](/docs/en/client-types.html#UserAccount) | undefined
+<a id="getCurrentUserAccount"></a>
+#### getCurrentUserAccount(): [UserAccount](/docs/en/client-types.html#UserAccount) | undefined
   - Returns the currently selected User Account. Returns undefined if no account is selected.  This is the default account used for transactions initiated by the client.
   - Example:
     ```ts
@@ -176,8 +176,8 @@ The selected account will now be the default account from which transactions wil
     }
     ```
 
-<a id="getAccounts"></a>
-#### getAccounts(): ReadonlyArray<[UserAccount](/docs/en/client-types.html#UserAccount)>
+<a id="getUserAccounts"></a>
+#### getUserAccounts(): ReadonlyArray<[UserAccount](/docs/en/client-types.html#UserAccount)>
   - Returns an array of all accounts registered with the client.
   - Example:
     ```ts

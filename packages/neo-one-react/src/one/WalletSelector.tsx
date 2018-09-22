@@ -32,7 +32,7 @@ export function WalletSelector(props: ComponentProps<Select<WalletSelectorOption
               {({ client }) => (
                 <FromStream
                   props$={combineLatest(
-                    client.currentAccount$.pipe(
+                    client.currentUserAccount$.pipe(
                       distinctUntilChanged(),
                       map(
                         (value) =>
@@ -56,7 +56,7 @@ export function WalletSelector(props: ComponentProps<Select<WalletSelectorOption
                               network: client.getCurrentNetwork(),
                               privateKey: createPrivateKey(),
                             })
-                            .then(async (wallet) => client.selectAccount(wallet.account.id))
+                            .then(async (wallet) => client.selectUserAccount(wallet.account.id))
                             .catch(addError);
                         };
                       }
@@ -74,7 +74,7 @@ export function WalletSelector(props: ComponentProps<Select<WalletSelectorOption
                               network: client.getCurrentNetwork(),
                               privateKey: createPrivateKey(),
                             })
-                            .then(async (wallet) => client.selectAccount(wallet.account.id))
+                            .then(async (wallet) => client.selectUserAccount(wallet.account.id))
                             .catch(addError);
                         };
                       }
@@ -98,7 +98,7 @@ export function WalletSelector(props: ComponentProps<Select<WalletSelectorOption
                             options={options}
                             onChange={(option) => {
                               if (option != undefined && !Array.isArray(option)) {
-                                client.selectAccount(option.id).catch(addError);
+                                client.selectUserAccount(option.id).catch(addError);
                               }
                             }}
                           />

@@ -1,4 +1,5 @@
 // tslint:disable no-unsafe-any
+import { common, crypto } from '@neo-one/client-common';
 import {
   Event,
   InvokeReceipt,
@@ -6,8 +7,7 @@ import {
   SmartContractAny,
   TransactionResult,
   UserAccountID,
-} from '@neo-one/client';
-import { common, crypto } from '@neo-one/client-core';
+} from '@neo-one/client-full';
 import { withContracts } from '@neo-one/smart-contract-test';
 import BigNumber from 'bignumber.js';
 

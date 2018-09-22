@@ -1,5 +1,11 @@
-import { scriptHashToAddress, SmartContractNetworksDefinition, SourceMaps, wifToPrivateKey } from '@neo-one/client';
-import { common, crypto } from '@neo-one/client-core';
+import {
+  common,
+  crypto,
+  scriptHashToAddress,
+  SmartContractNetworksDefinition,
+  SourceMaps,
+  wifToPrivateKey,
+} from '@neo-one/client-common';
 import { PluginManager, Task, TaskList } from '@neo-one/server-plugin';
 import { getNEOTrackerResourceManager } from '@neo-one/server-plugin-neotracker';
 import { getNetworkResourceManager, Network } from '@neo-one/server-plugin-network';

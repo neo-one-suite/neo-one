@@ -1,7 +1,7 @@
+import { common } from '@neo-one/client-common';
 import {
   Attribute,
   BufferAttribute,
-  common,
   Contract,
   ContractParameterType,
   ContractPropertyState,
@@ -10,7 +10,7 @@ import {
   Output,
   utils,
   Witness,
-} from '@neo-one/client-core';
+} from '@neo-one/node-core';
 import BN from 'bn.js';
 import { keys } from './keys';
 

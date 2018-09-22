@@ -1,4 +1,4 @@
-import { UInt256 } from '@neo-one/client-core';
+import { UInt256 } from '@neo-one/client-common';
 import { Storage } from '@neo-one/node-core';
 import { keys } from '@neo-one/node-storage-common';
 import { utils } from '@neo-one/utils';

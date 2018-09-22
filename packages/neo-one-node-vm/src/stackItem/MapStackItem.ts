@@ -1,5 +1,6 @@
 // tslint:disable readonly-array
-import { BinaryWriter, ContractParameter, InteropInterfaceContractParameter } from '@neo-one/client-core';
+import { BinaryWriter } from '@neo-one/client-common';
+import { ContractParameter, InteropInterfaceContractParameter } from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import { ArrayStackItem } from './ArrayStackItem';

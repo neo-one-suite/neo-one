@@ -1,4 +1,4 @@
-import { Transaction } from '@neo-one/client-core';
+import { Transaction } from '@neo-one/node-core';
 import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 
 export class TransactionStackItem extends EquatableKeyStackItem<Transaction> {

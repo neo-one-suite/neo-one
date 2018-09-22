@@ -10,7 +10,7 @@ import {
   privateKeyToAddress,
   Transfer,
   wifToPrivateKey,
-} from '@neo-one/client';
+} from '@neo-one/client-full';
 import { Network } from '@neo-one/server-plugin-network';
 import BigNumber from 'bignumber.js';
 

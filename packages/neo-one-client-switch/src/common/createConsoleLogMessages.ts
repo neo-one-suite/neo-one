@@ -1,4 +1,4 @@
-import { converters, RawAction } from '@neo-one/client-core';
+import { RawAction, smartContractConverters as converters } from '@neo-one/client-common';
 import { deserializeStackItem, StackItem } from '@neo-one/node-vm';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';

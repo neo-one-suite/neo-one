@@ -1,4 +1,5 @@
-import { BinaryWriter, ContractParameter, IntegerContractParameter, utils } from '@neo-one/client-core';
+import { BinaryWriter, utils } from '@neo-one/client-common';
+import { ContractParameter, IntegerContractParameter } from '@neo-one/node-core';
 import BN from 'bn.js';
 import { InvalidValueStorageContextStackItemError } from './errors';
 import { AsStorageContextStackItemOptions, StackItemBase } from './StackItemBase';

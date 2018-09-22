@@ -1,3 +1,4 @@
+import { common, crypto } from '@neo-one/client-common';
 import {
   ABI,
   Client,
@@ -9,19 +10,17 @@ import {
   LocalUserAccountProvider,
   NEOONEProvider,
   privateKeyToAddress,
-  ReadClient,
   UserAccountID,
   wifToPrivateKey,
-} from '@neo-one/client';
-import { common, crypto } from '@neo-one/client-core';
+} from '@neo-one/client-full';
 import { Network } from '@neo-one/server-plugin-network';
 import { Wallet } from '@neo-one/server-plugin-wallet';
 import { TestOptions } from '@neo-one/smart-contract-test';
 import BigNumber from 'bignumber.js';
 import * as path from 'path';
-import { EscrowReadSmartContract, EscrowSmartContract } from '../__data__/ico/one/generated';
-import { ICOReadSmartContract, ICOSmartContract } from '../__data__/ico/one/generated/ICO/types';
-import { TokenReadSmartContract, TokenSmartContract } from '../__data__/ico/one/generated/Token/types';
+import { EscrowSmartContract } from '../__data__/ico/one/generated';
+import { ICOSmartContract } from '../__data__/ico/one/generated/ICO/types';
+import { TokenSmartContract } from '../__data__/ico/one/generated/Token/types';
 import { Contracts } from '../__data__/ico/one/generated/types';
 
 const TO_PRIVATE_KEY = '7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344';
@@ -90,7 +89,6 @@ const getGeneratedICOCode = (): {
   readonly abi: ABI;
   readonly contract: {
     readonly createSmartContract: (client: Client) => ICOSmartContract;
-    readonly createReadSmartContract: (readClient: ReadClient) => ICOReadSmartContract;
   };
 } => {
   // tslint:disable-next-line no-require-imports
@@ -98,16 +96,14 @@ const getGeneratedICOCode = (): {
   // tslint:disable-next-line no-require-imports
   const contract = require('../__data__/ico/one/generated/ICO/contract');
   const createSmartContract = contract.createICOSmartContract;
-  const createReadSmartContract = contract.createICOReadSmartContract;
 
-  return { abi, contract: { createSmartContract, createReadSmartContract } };
+  return { abi, contract: { createSmartContract } };
 };
 
 const getGeneratedTokenCode = (): {
   readonly abi: ABI;
   readonly contract: {
     readonly createSmartContract: (client: Client) => TokenSmartContract;
-    readonly createReadSmartContract: (readClient: ReadClient) => TokenReadSmartContract;
   };
 } => {
   // tslint:disable-next-line no-require-imports
@@ -115,16 +111,14 @@ const getGeneratedTokenCode = (): {
   // tslint:disable-next-line no-require-imports
   const contract = require('../__data__/ico/one/generated/Token/contract');
   const createSmartContract = contract.createTokenSmartContract;
-  const createReadSmartContract = contract.createTokenReadSmartContract;
 
-  return { abi, contract: { createSmartContract, createReadSmartContract } };
+  return { abi, contract: { createSmartContract } };
 };
 
 const getGeneratedEscrowCode = (): {
   readonly abi: ABI;
   readonly contract: {
     readonly createSmartContract: (client: Client) => EscrowSmartContract;
-    readonly createReadSmartContract: (readClient: ReadClient) => EscrowReadSmartContract;
   };
 } => {
   // tslint:disable-next-line no-require-imports
@@ -132,9 +126,8 @@ const getGeneratedEscrowCode = (): {
   // tslint:disable-next-line no-require-imports
   const contract = require('../__data__/ico/one/generated/Escrow/contract');
   const createSmartContract = contract.createEscrowSmartContract;
-  const createReadSmartContract = contract.createEscrowReadSmartContract;
 
-  return { abi, contract: { createSmartContract, createReadSmartContract } };
+  return { abi, contract: { createSmartContract } };
 };
 
 const getGeneratedCommonCode = (): {
@@ -238,8 +231,6 @@ const verifySmartContracts = async (
   ico: ICOSmartContract,
   token: TokenSmartContract,
   escrow: EscrowSmartContract,
-  icoRead: ICOReadSmartContract,
-  tokenRead: TokenReadSmartContract,
   accountID: UserAccountID,
   toAccountID: UserAccountID,
   nowSeconds: number,
@@ -256,15 +247,15 @@ const verifySmartContracts = async (
     initialTotalSupply,
     [initialRemaining, initialBalance],
   ] = await Promise.all([
-    tokenRead.name(),
-    tokenRead.symbol(),
-    tokenRead.decimals(),
-    icoRead.amountPerNEO(),
-    icoRead.owner(),
-    icoRead.startTimeSeconds(),
-    icoRead.icoDurationSeconds(),
-    tokenRead.totalSupply(),
-    Promise.all([icoRead.remaining(), tokenRead.balanceOf(accountID.address)]),
+    token.name(),
+    token.symbol(),
+    token.decimals(),
+    ico.amountPerNEO(),
+    ico.owner(),
+    ico.startTimeSeconds(),
+    ico.icoDurationSeconds(),
+    token.totalSupply(),
+    Promise.all([ico.remaining(), token.balanceOf(accountID.address)]),
   ]);
   expect(name).toEqual('One');
   expect(symbol).toEqual('ONE');
@@ -325,8 +316,6 @@ const verifySmartContractsTest = async (nowSeconds: number) => {
       ico,
       token,
       escrow,
-      ico.read(networkName),
-      token.read(networkName),
       masterAccountID,
       { network: networkName, address: privateKeyToAddress(TO_PRIVATE_KEY) },
       nowSeconds,
@@ -337,12 +326,12 @@ const verifySmartContractsTest = async (nowSeconds: number) => {
 const verifySmartContractsManual = async (accountID: UserAccountID, toAccountID: UserAccountID, nowSeconds: number) => {
   const {
     abi: icoABI,
-    contract: { createSmartContract: createICOSmartContract, createReadSmartContract: createICOReadSmartContract },
+    contract: { createSmartContract: createICOSmartContract },
   } = getGeneratedICOCode();
   expect(icoABI).toBeDefined();
   const {
     abi: tokenABI,
-    contract: { createSmartContract: createTokenSmartContract, createReadSmartContract: createTokenReadSmartContract },
+    contract: { createSmartContract: createTokenSmartContract },
   } = getGeneratedTokenCode();
   expect(tokenABI).toBeDefined();
   const {
@@ -356,9 +345,7 @@ const verifySmartContractsManual = async (accountID: UserAccountID, toAccountID:
   const developerClient = createDeveloperClients().local;
 
   const ico = createICOSmartContract(client);
-  const icoRead = createICOReadSmartContract(client.read(accountID.network));
   const token = createTokenSmartContract(client);
-  const tokenRead = createTokenReadSmartContract(client.read(accountID.network));
   const escrow = createEscrowSmartContract(client);
 
   await client.providers.memory.keystore.addAccount({
@@ -366,17 +353,7 @@ const verifySmartContractsManual = async (accountID: UserAccountID, toAccountID:
     privateKey: TO_PRIVATE_KEY,
   });
 
-  await verifySmartContracts(
-    ico,
-    token,
-    escrow,
-    icoRead,
-    tokenRead,
-    accountID,
-    toAccountID,
-    nowSeconds,
-    developerClient,
-  );
+  await verifySmartContracts(ico, token, escrow, accountID, toAccountID, nowSeconds, developerClient);
 };
 
 const verifyICOContract = (contract?: Contract): void => {

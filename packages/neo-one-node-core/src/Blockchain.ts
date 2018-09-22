@@ -1,52 +1,35 @@
-import {
-  Account,
-  AccountKey,
-  AccountUpdate,
-  Action,
-  ActionKey,
-  ActionsKey,
-  Asset,
-  AssetKey,
-  AssetUpdate,
-  Block,
-  BlockKey,
-  CallReceipt,
-  ConsensusPayload,
-  Contract,
-  ContractKey,
-  DeserializeWireContext,
-  ECPoint,
-  FeeContext,
-  Header,
-  HeaderKey,
-  Input,
-  InvocationData,
-  InvocationDataKey,
-  InvocationTransaction,
-  Output,
-  OutputKey,
-  SerializeJSONContext,
-  Settings,
-  StorageItem,
-  StorageItemKey,
-  StorageItemsKey,
-  StorageItemUpdate,
-  Transaction,
-  TransactionData,
-  TransactionDataKey,
-  TransactionDataUpdate,
-  TransactionKey,
-  Validator,
-  ValidatorKey,
-  VerifyScriptResult,
-} from '@neo-one/client-core';
+import { ECPoint } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
 import BN from 'bn.js';
 import { Observable } from 'rxjs';
+import { Account, AccountKey, AccountUpdate } from './Account';
 import { AccountUnclaimed, AccountUnclaimedKey, AccountUnclaimedsKey } from './AccountUnclaimed';
 import { AccountUnspent, AccountUnspentKey, AccountUnspentsKey } from './AccountUnspent';
+import { Action, ActionKey, ActionsKey } from './action';
+import { Asset, AssetKey, AssetUpdate } from './Asset';
+import { Block, BlockKey } from './Block';
 import { BlockData, BlockDataKey } from './BlockData';
+import { CallReceipt } from './CallReceipt';
+import { Contract, ContractKey } from './Contract';
+import { Header, HeaderKey } from './Header';
+import { InvocationData, InvocationDataKey } from './InvocationData';
+import { ConsensusPayload } from './payload';
+import { DeserializeWireContext, SerializeJSONContext } from './Serializable';
+import { Settings } from './Settings';
+import { StorageItem, StorageItemKey, StorageItemsKey, StorageItemUpdate } from './StorageItem';
+import {
+  FeeContext,
+  Input,
+  InvocationTransaction,
+  Output,
+  OutputKey,
+  Transaction,
+  TransactionKey,
+} from './transaction';
+import { TransactionData, TransactionDataKey, TransactionDataUpdate } from './TransactionData';
+import { Validator, ValidatorKey } from './Validator';
 import { ValidatorsCount, ValidatorsCountUpdate } from './ValidatorsCount';
+import { VerifyScriptResult } from './vm';
 
 export interface ReadMetadataStorage<Value> {
   readonly get: () => Promise<Value>;

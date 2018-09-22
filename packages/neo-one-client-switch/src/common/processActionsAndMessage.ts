@@ -1,4 +1,4 @@
-import { RawAction } from '@neo-one/client-core';
+import { RawAction } from '@neo-one/client-common';
 import { RawSourceMap } from 'source-map';
 import { processConsoleLogMessages } from '../node/processConsoleLogMessages';
 import { extractErrorTrace } from './extractErrorTrace';

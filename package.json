@@ -125,6 +125,7 @@
     "app-root-dir": "1.0.2",
     "awesome-typescript-loader": "5.2.1",
     "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
     "babel-plugin-dynamic-import-node": "2.1.0",
     "babel-plugin-istanbul": "5.0.1",
     "babel-plugin-jest-hoist": "23.2.0",

@@ -1,4 +1,4 @@
-import { Op } from '@neo-one/client-core';
+import { Op } from '@neo-one/client-common';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';

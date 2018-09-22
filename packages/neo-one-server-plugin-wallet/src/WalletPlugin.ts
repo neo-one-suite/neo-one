@@ -1,4 +1,4 @@
-import { wifToPrivateKey } from '@neo-one/client';
+import { wifToPrivateKey } from '@neo-one/client-full';
 import {
   CLIHookConfig,
   compoundName,

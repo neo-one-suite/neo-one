@@ -1,5 +1,6 @@
 // tslint:disable no-any
 import { Account, Client, Hash256, nep5, UserAccount } from '@neo-one/client';
+import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
 import Select from 'react-select';
@@ -25,7 +26,7 @@ export const makeOption = async ({
 }) => {
   const [assetBalances, tokenBalances] = await Promise.all([
     Promise.all(
-      Object.entries(account.balances).map<Promise<[string, BigNumber]>>(async ([assetHash, value]) => {
+      Object.entries(account.balances).map<Promise<[string, BigNumber] | undefined>>(async ([assetHash, value]) => {
         if (assetHash === Hash256.NEO) {
           return ['NEO', value];
         }
@@ -34,20 +35,20 @@ export const makeOption = async ({
           return ['GAS', value];
         }
 
-        const asset = await client.read(userAccount.id.network).getAsset(assetHash);
-
-        return [asset.name, value];
+        return undefined;
       }),
     ),
     Promise.all(
       tokens
         .filter((token) => token.network === userAccount.id.network)
         .map<Promise<[string, BigNumber]>>(async (token) => {
-          const readSmartContract = nep5
-            .createNEP5SmartContract(client, { [token.network]: { address: token.address } }, token.decimals)
-            .read(token.network);
+          const smartContract = nep5.createNEP5SmartContract(
+            client,
+            { [token.network]: { address: token.address } },
+            token.decimals,
+          );
 
-          const balance = await readSmartContract.balanceOf(userAccount.id.address);
+          const balance = await smartContract.balanceOf(userAccount.id.address, { network: token.network });
 
           return [token.symbol, balance];
         }),
@@ -61,29 +62,32 @@ export const makeOption = async ({
     id: userAccount.id,
     userAccount,
     // tslint:disable-next-line no-array-mutation
-    balances: assetBalances.concat(tokenBalances).sort(([nameA], [nameB]) => {
-      if (nameA.localeCompare(nameB) === 0) {
-        return 0;
-      }
+    balances: assetBalances
+      .filter(utils.notNull)
+      .concat(tokenBalances)
+      .sort(([nameA], [nameB]) => {
+        if (nameA.localeCompare(nameB) === 0) {
+          return 0;
+        }
 
-      if (nameA === 'NEO') {
-        return -1;
-      }
+        if (nameA === 'NEO') {
+          return -1;
+        }
 
-      if (nameB === 'NEO') {
-        return 1;
-      }
+        if (nameB === 'NEO') {
+          return 1;
+        }
 
-      if (nameA === 'GAS') {
-        return -1;
-      }
+        if (nameA === 'GAS') {
+          return -1;
+        }
 
-      if (nameB === 'GAS') {
-        return 1;
-      }
+        if (nameB === 'GAS') {
+          return 1;
+        }
 
-      return nameA.localeCompare(nameB);
-    }),
+        return nameA.localeCompare(nameB);
+      }),
   };
 };
 
@@ -105,15 +109,15 @@ export const getWalletSelectorOptions$ = (
   tokens$: Observable<ReadonlyArray<Token>>,
 ) =>
   concat(
-    client.accounts$.pipe(
+    client.userAccounts$.pipe(
       take(1),
       map((userAccounts) => userAccounts.map((userAccount) => makeWalletSelectorValueOption({ userAccount }))),
     ),
-    combineLatest(client.accounts$.pipe(distinctUntilChanged()), tokens$, client.block$).pipe(
+    combineLatest(client.userAccounts$.pipe(distinctUntilChanged()), tokens$, client.block$).pipe(
       switchMap(async ([userAccounts, tokens]) =>
         Promise.all(
           userAccounts.map(async (userAccount) => {
-            const account = await client.read(userAccount.id.network).getAccount(userAccount.id.address);
+            const account = await client.getAccount(userAccount.id);
 
             return makeOption({
               client,

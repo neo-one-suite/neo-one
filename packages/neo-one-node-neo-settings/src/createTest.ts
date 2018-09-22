@@ -1,4 +1,5 @@
-import { common as clientCommon, crypto, Settings, TransactionType, UInt160 } from '@neo-one/client-core';
+import { common as clientCommon, crypto, UInt160 } from '@neo-one/client-common';
+import { Settings, TransactionType } from '@neo-one/node-core';
 import { common } from './common';
 
 const DEFAULT_VALIDATORS: ReadonlyArray<string> = [

@@ -1,12 +1,15 @@
-import { ABI } from '@neo-one/client-core';
+import { ABI } from '@neo-one/client-common';
 import { genEvent } from './genEvent';
-import { genReadSmartContract } from './genReadSmartContract';
 import { genSmartContract } from './genSmartContract';
 import { getEventName } from './getEventName';
 import { getSingleEventName } from './getSingleEventName';
 
 const getImportClauses = (text: string) => {
   const mutableClauses: string[] = [];
+
+  if (text.includes('Client')) {
+    mutableClauses.push('Client');
+  }
 
   if (text.includes('BufferString')) {
     mutableClauses.push('BufferString');
@@ -84,10 +87,6 @@ const getImportClauses = (text: string) => {
     mutableClauses.push('SmartContract');
   }
 
-  if (text.includes('ReadSmartContract')) {
-    mutableClauses.push('ReadSmartContract');
-  }
-
   if (text.includes('Transfer,')) {
     mutableClauses.push('Transfer');
   }
@@ -103,7 +102,7 @@ export const genSmartContractTypes = (name: string, abi: ABI) => {
   const text = `
 ${events.map((event) => genEvent(name, event)).join('\n')}
 ${eventType}
-${genSmartContract(name, abi)}${genReadSmartContract(name, abi)}`;
+${genSmartContract(name, abi)}`;
 
   const importClauses = getImportClauses(text);
   // tslint:disable-next-line no-array-mutation

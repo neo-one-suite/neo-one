@@ -1,6 +1,6 @@
 // tslint:disable no-implicit-dependencies no-any no-loop-statement prefer-immediate-return no-var-before-return no-console
 import { NEOONEDataProvider, scriptHashToAddress } from '@neo-one/client';
-import { utils } from '@neo-one/client-core';
+import { utils } from '@neo-one/client-common';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { toArray } from '@reactivex/ix-es2015-cjs/asynciterable/toarray';
 
@@ -144,6 +144,7 @@ const getStorage = async (provider: any, item: any): Promise<any> => {
 };
 
 const verifyStorage = async (hash: string): Promise<void> => {
+  // @ts-ignore
   const storageItems = await toArray(AsyncIterableX.from(oneProvider.iterStorage(hash)));
 
   let totalEqual = 0;

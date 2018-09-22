@@ -1,4 +1,4 @@
-import { BinaryReader, utils } from '@neo-one/client-core';
+import { BinaryReader, utils } from '@neo-one/node-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import _ from 'lodash';
 import { ArrayStackItem } from './ArrayStackItem';

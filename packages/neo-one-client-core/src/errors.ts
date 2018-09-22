@@ -1,30 +1,83 @@
+import { AddressString, JSONRPCErrorResponse, UserAccountID } from '@neo-one/client-common';
 import { makeErrorWithCode } from '@neo-one/utils';
-import { ContractParameter } from './types';
+import BigNumber from 'bignumber.js';
 
-export const InvalidFormatError = makeErrorWithCode(
-  'INVALID_FORMAT',
-  (reason?: string) => `Invalid format${reason === undefined ? '.' : `: ${reason}`}`,
+export const UnknownNetworkError = makeErrorWithCode('UNKNOWN_NETWORK', (name: string) => `Unknown network ${name}`);
+export const UnknownAccountError = makeErrorWithCode(
+  'UNKNOWN_ACCOUNT',
+  (address: string) => `Unknown account ${address}`,
 );
-export const VerifyError = makeErrorWithCode(
-  'VERIFY',
-  (reason?: string) => `Verification failed${reason === undefined ? '.' : `: ${reason}`}`,
+export const InvalidArgumentError = makeErrorWithCode(
+  'INVALID_ARGUMENT',
+  // tslint:disable-next-line no-any
+  (typeName: string, argumentName: string, value: any, extra?: string) =>
+    `Expected ${typeName} for ${argumentName}, found ${String(value)}${extra === undefined ? '' : `. ${extra}`}`,
 );
-export const UnsignedBlockError = makeErrorWithCode(
-  'UNSIGNED_BLOCK',
-  (stringHash: string) => `Block script does not exist because it has not been signed. @ block with hash ${stringHash}`,
+export const InvalidContractArgumentCountError = makeErrorWithCode(
+  'INVALID_CONTRACT_ARGUMENT_COUNT',
+  (expectedLength: number, foundLength: number) => `Expected ${expectedLength} parameters, found ${foundLength}.`,
 );
-export const TooManyPublicKeysError = makeErrorWithCode(
-  'TOO_MANY_PUBLIC_KEYS',
-  (amount: number) => `Too many public keys. Found: ${amount}, Max: 1024`,
+export const InvocationCallError = makeErrorWithCode('INVOCATION_CALL', (message: string) => message);
+export const InvalidEventError = makeErrorWithCode('INVALID_EVENT', (message: string) => message);
+export const NoAccountError = makeErrorWithCode('NO_ACCOUNT', () => 'No account exists.');
+export const CannotSendToContractError = makeErrorWithCode(
+  'CANNOT_SEND_TO_CONTRACT',
+  (address: AddressString) => `Contract ${address} does not accept native assets`,
 );
-export const InvalidNumberOfKeysError = makeErrorWithCode(
-  'INVALID_NUMBER_OF_KEYS',
-  (m: number, amount: number) =>
-    `invalid number of keys. Found: ${m} keys, must be between 1 and ${amount} (number of public keys).`,
+export const CannotSendFromContractError = makeErrorWithCode(
+  'CANNOT_SEND_FROM_CONTRACT',
+  (address: AddressString) => `Contract ${address} does not allow sending native assets`,
 );
-
-export const InvalidContractParameterError = makeErrorWithCode(
-  'INVALID_CONTRACT_PARAMETER',
-  (parameter: ContractParameter, expected: ReadonlyArray<ContractParameter['type']>) =>
-    `Expected one of ${JSON.stringify(expected)} ` + `ContractParameterTypes, found ${parameter.type}`,
+export const NoContractDeployedError = makeErrorWithCode(
+  'NO_CONTRACT_DEPLOYED',
+  (networkType: string) => `Contract has not been deployed to network ${networkType}`,
 );
+export const JSONRPCError = makeErrorWithCode(
+  'JSON_RPC',
+  (responseError: JSONRPCErrorResponse) => `${responseError.message}:${responseError.code}`,
+);
+export const InvalidRPCResponseError = makeErrorWithCode(
+  'INVALID_RPC_RESPONSE',
+  () => 'Did not receive valid rpc response',
+);
+export const HTTPError = makeErrorWithCode(
+  'HTTP',
+  (status: number, text?: string) => (text === undefined ? `HTTP Error ${status}` : `HTTP Error ${status}: ${text}`),
+);
+export const UnknownBlockError = makeErrorWithCode('UNKNOWN_BLOCK', () => 'Unknown block');
+export const NothingToSendError = makeErrorWithCode('NOTHING_TO_SEND', () => 'Nothing to send.');
+export const NothingToRefundError = makeErrorWithCode('NOTHING_TO_REFUND', () => 'Nothing to refund.');
+export const NothingToClaimError = makeErrorWithCode(
+  'NEO_NOTHING_TO_CLAIM',
+  (id: UserAccountID) => `Address ${id.address} on network ${id.network} has nothing to claim.`,
+);
+export const InvalidTransactionError = makeErrorWithCode('INVALID_TRANSACTION', (message: string) => message);
+export const InvokeError = makeErrorWithCode('INVOKE', (message: string) => message);
+export const InsufficientFundsError = makeErrorWithCode(
+  'INSUFFICIENT_FUNDS',
+  (total: BigNumber, expected: BigNumber) => `Found ${total.toString()} funds, required: ${expected.toString()}.`,
+);
+export const InsufficientSystemFeeError = makeErrorWithCode(
+  'INSUFFICIENT_SYSTEM_FEE',
+  (total: BigNumber, expected: BigNumber) =>
+    `Found ${total.toString()} allowed system fee, required: ${expected.toString()}.`,
+);
+export const FundsInUseError = makeErrorWithCode(
+  'FUNDS_IN_USE',
+  (total: BigNumber, expected: BigNumber, numInputs: number) =>
+    `Found ${total.toString()} funds, required: ${expected.toString()}; You have ${numInputs} input(s) on the current block, try transfer again on the next`,
+);
+export const MissingTransactionDataError = makeErrorWithCode(
+  'MISSING_TRANSACTION_DATA',
+  (hash: string) => `Missing transaction data for transaction ${hash}`,
+);
+export const RelayTransactionError = makeErrorWithCode('RELAY_TRANSACTION', (message: string) => message);
+export const LockedAccountError = makeErrorWithCode(
+  'LOCKED_ACCOUNT',
+  (address: string) => `Account ${address} is locked`,
+);
+export const PasswordRequiredError = makeErrorWithCode(
+  'PASSWORD_REQUIRED',
+  () => 'A password is required when creating accounts on the MainNet.',
+);
+export const NothingToTransferError = makeErrorWithCode('NOTHING_TO_TRANSFER', () => 'Nothing to transfer.');

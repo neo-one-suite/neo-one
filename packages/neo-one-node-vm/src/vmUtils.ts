@@ -1,4 +1,4 @@
-import { utils } from '@neo-one/client-core';
+import { utils } from '@neo-one/client-common';
 // tslint:disable-next-line:match-default-export-name
 import bitwise from 'bitwise';
 // tslint:disable-next-line:no-submodule-imports

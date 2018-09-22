@@ -1,5 +1,5 @@
-import { Attribute, Input, Output } from '@neo-one/client';
-import { AttributeUsage, common } from '@neo-one/client-core';
+import { AttributeUsageModel as AttributeUsage, common } from '@neo-one/client-common';
+import { Attribute, Input, Output } from '@neo-one/client-full';
 import BigNumber from 'bignumber.js';
 import { helpers, keys } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
@@ -66,16 +66,16 @@ describe('Transaction', () => {
     const references = await Promise.all(transaction.inputs.map(async (input) => node.readClient.getOutput(input)));
 
     await node.executeString(`
-      import { TransactionBase, TransactionType, Transaction, Address, Hash256, Attribute, Output, Input, InvocationTransaction, ContractTransaction, AttributeBase } from '@neo-one/smart-contract';
+      import { TransactionBase, TransactionType, Transaction, Address, Hash256, Attribute, Output, Input, InvocationTransaction, AttributeBase } from '@neo-one/smart-contract';
 
       const invocationTransaction = Transaction.for(Hash256.from('${
         invocationTransaction.hash
       }')) as InvocationTransaction;
       assertEqual(invocationTransaction.script.equals(${helpers.getBufferHash(invocationTransaction.script)}), true);
 
-      const transaction = Transaction.for(Hash256.from('${transaction.hash}')) as ContractTransaction;
+      const transaction = Transaction.for(Hash256.from('${transaction.hash}')) as InvocationTransaction;
 
-      assertEqual(transaction.type, TransactionType.Contract);
+      assertEqual(transaction.type, TransactionType.Invocation);
 
       const attributes = transaction.attributes;
       assertEqual(attributes.length, ${transaction.attributes.length});
