@@ -1066,6 +1066,51 @@ export function createEventNotifier<A0, A1, A2, A3, A4, A5>(
   arg5Name: string,
 ): (arg0: A0, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => void;
 
+export function declareEvent(name: string): void;
+export function declareEvent<A0>(name: string, arg0Name: string): void;
+export function declareEvent<A0, A1>(name: string, arg0Name: string, arg1Name: string): void;
+export function declareEvent<A0, A1, A2>(name: string, arg0Name: string, arg1Name: string, arg2Name: string): void;
+export function declareEvent<A0, A1, A2, A3>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+  arg2Name: string,
+  arg3Name: string,
+): void;
+export function declareEvent<A0, A1, A2, A3, A4>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+  arg2Name: string,
+  arg3Name: string,
+  arg4Name: string,
+): void;
+/**
+ * Creates an event notifier for `SmartContract` notifications.
+ *
+ * Must be explicitly typed and contain string literals for the event name and argument names.
+ *
+ * @example
+ *
+ * const notifyTransfer = declareEvent<Address, Address, Fixed<8>>('transfer', 'from', 'to', 'amount');
+ *
+ * const from = Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW');
+ * const to = Address.from('AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx');
+ * notifyTransfer(from, to, 200);
+ *
+ * @param name Event name
+ * @param argName Event argument name
+ */
+export function declareEvent<A0, A1, A2, A3, A4, A5>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+  arg2Name: string,
+  arg3Name: string,
+  arg4Name: string,
+  arg5Name: string,
+): void;
+
 /**
  * Object with string literals for the contract properties to be used in deployment.
  */
@@ -1101,11 +1146,11 @@ export interface ForwardValueConstructor {
 }
 export const ForwardValue: ForwardValueConstructor;
 
-interface ForwardedValueTag<T extends SmartContractValue> {}
+interface ForwardedValueTag<T extends SmartContractArg> {}
 /**
  * Marks a parameter or return type of a public `SmartContract` method as expecting a forwarded value.
  */
-export type ForwardedValue<T extends SmartContractValue> = T | (T & ForwardedValueTag<T>);
+export type ForwardedValue<T extends SmartContractArg> = T | (T & ForwardedValueTag<T>);
 
 interface SmartContractValueArray extends Array<SmartContractValue> {}
 interface SmartContractValueReadonlyArray<Value extends SmartContractValue = any> extends ReadonlyArray<Value> {}

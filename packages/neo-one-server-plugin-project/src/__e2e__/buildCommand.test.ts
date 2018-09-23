@@ -186,6 +186,17 @@ const verifySmartContractAfterMint = async (
   if (escrowTransferReceipt.result.state === 'FAULT') {
     throw new Error(escrowTransferReceipt.result.message);
   }
+  expect(escrowTransferReceipt.events).toHaveLength(2);
+  const transferEvent = escrowTransferReceipt.events[1];
+  if (transferEvent.name !== 'transfer') {
+    throw new Error('Expected transfer event');
+  }
+  expect(transferEvent.parameters.amount.toString()).toEqual('25');
+  const balanceAvailableEvent = escrowTransferReceipt.events[0];
+  if (balanceAvailableEvent.name !== 'balanceAvailable') {
+    throw new Error('Expected balanceAvailable event');
+  }
+  expect(balanceAvailableEvent.parameters.amount.toString()).toEqual('25');
 
   const tokenAddress = token.definition.networks[accountID.network].address;
   const [escrowBalanceAfterEscrow, balanceAfterEscrow, toBalanceAfterEscrow, escrowPairBalance] = await Promise.all([
@@ -209,6 +220,7 @@ const verifySmartContractAfterMint = async (
     throw new Error(escrowClaimReceipt.result.message);
   }
   expect(escrowClaimReceipt.result.value).toEqual(true);
+  expect(escrowClaimReceipt.events).toHaveLength(2);
 
   const [
     escrowBalanceAfterClaim,

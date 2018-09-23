@@ -1,7 +1,12 @@
 import { ABIFunction, ABIParameter } from '@neo-one/client';
 import { genFunctionParameters } from './genFunctionParameters';
+import { getEventName } from './getEventName';
 
-export const genForwardArgsFunction = (abi: ABIFunction, parameters: ReadonlyArray<ABIParameter>): string =>
-  `(${genFunctionParameters({ ...abi, constant: true }, parameters)[0]}) => [${parameters
-    .map(() => 'ForwardValue')
-    .join(', ')}]`;
+export const genForwardArgsFunction = (
+  name: string,
+  abi: ABIFunction,
+  parameters: ReadonlyArray<ABIParameter>,
+): string =>
+  `(${genFunctionParameters({ ...abi, constant: true }, parameters)[0]}) => [ForwardOptions<${getEventName(
+    name,
+  )}>, ${parameters.map(() => 'ForwardValue').join(', ')}]`;

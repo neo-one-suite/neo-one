@@ -11,6 +11,7 @@ import { add as addBlockchain } from './blockchain';
 import { add as addContract } from './contract';
 import { add as addCreateEventNotifier } from './createEventNotifier';
 import { add as addCrypto } from './crypto';
+import { add as addDeclareEvent } from './declareEvent';
 import { add as addDeploy } from './deploy';
 import { add as addForwardValue } from './forwardValue';
 import { add as addHash256 } from './hash256';
@@ -39,6 +40,7 @@ export const add = (builtins: Builtins): void => {
   addContract(builtins);
   addCreateEventNotifier(builtins);
   addCrypto(builtins);
+  addDeclareEvent(builtins);
   addDeploy(builtins);
   addForwardValue(builtins);
   addHash256(builtins);

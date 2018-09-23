@@ -200,10 +200,14 @@ export class ABISmartContractProcessor {
   }
 
   private processEvents(): ReadonlyArray<ABIEvent> {
-    const decl = tsUtils.symbol.getDeclarations(this.context.builtins.getValueSymbol('createEventNotifier'))[0];
+    const createEventNotifierDecl = tsUtils.symbol.getDeclarations(
+      this.context.builtins.getValueSymbol('createEventNotifier'),
+    )[0];
+    const declareEventDecl = tsUtils.symbol.getDeclarations(this.context.builtins.getValueSymbol('declareEvent'))[0];
 
     const calls = this.context.analysis
-      .findReferencesAsNodes(decl)
+      .findReferencesAsNodes(createEventNotifierDecl)
+      .concat(this.context.analysis.findReferencesAsNodes(declareEventDecl))
       .map((node) => {
         if (ts.isIdentifier(node)) {
           const parent = tsUtils.node.getParent(node);

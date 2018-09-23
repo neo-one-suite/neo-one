@@ -1,26 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`createEventNotifier invalid event name 1`] = `
-"snippetCode.ts (5,26): The arguments to createEventNotifier must be string literals.
+"snippetCode.ts (5,46): Invalid SmartContract event. Event name must be a string literal.
 
       3 | 
       4 |       const foo = 'event';
     > 5 |       const onTransfer = createEventNotifier(foo);
-        |                          ^
+        |                                              ^
       6 |       onTransfer();
-      7 |     
+      7 | 
+      8 |       export class Contract extends SmartContract {}
 "
 `;
 
 exports[`createEventNotifier invalid event parameter type - forward value 1`] = `
 "snippetCode.ts (4,26): Expected 1-7 arguments, but got 1.
 
-      2 |       import { createEventNotifier } from '@neo-one/smart-contract';
+      2 |       import { createEventNotifier, SmartContract } from '@neo-one/smart-contract';
       3 | 
     > 4 |       const onTransfer = createEventNotifier<ForwardValue<string>>('foo');
         |                          ^
       5 |       onTransfer('foo');
-      6 |     
+      6 | 
+      7 |       export class Contract extends SmartContract {}
 "
 `;
 
@@ -33,6 +35,6 @@ exports[`createEventNotifier invalid event parameter type 1`] = `
         |                          ^
       6 |       const foo = new Foo();
       7 |       onTransfer(foo);
-      8 |     
+      8 | 
 "
 `;

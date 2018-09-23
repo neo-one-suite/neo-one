@@ -15,7 +15,7 @@ export interface SmartContract<TClient extends Client = Client, TEvent extends E
   readonly iterEvents: (options?: SmartContractIterOptions) => AsyncIterable<TEvent>;
   readonly iterLogs: (options?: SmartContractIterOptions) => AsyncIterable<Log>;
   readonly iterActions: (options?: SmartContractIterOptions) => AsyncIterable<Action>;
-  readonly convertAction: (action: RawAction) => Action;
+  readonly convertAction: (action: RawAction) => Action | undefined;
 }
 
 export interface SmartContractAny extends SmartContract {

@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`declareEvent invalid event name 1`] = `
+"snippetCode.ts (5,20): Invalid SmartContract event. Event name must be a string literal.
+
+      3 | 
+      4 |       const foo = 'event';
+    > 5 |       declareEvent(foo);
+        |                    ^
+      6 | 
+      7 |       export class Contract extends SmartContract {
+      8 | 
+"
+`;
+
+exports[`declareEvent invalid event parameter type - forward value 1`] = `
+"snippetCode.ts (4,7): Expected 1-7 arguments, but got 1.
+
+      2 |       import { declareEvent, SmartContract } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       declareEvent<ForwardValue<string>>('foo');
+        |       ^
+      5 | 
+      6 |       export class Contract extends SmartContract {
+      7 | 
+"
+`;
+
+exports[`declareEvent invalid event parameter type 1`] = `
+"snippetCode.ts (5,7): Expected 1-7 arguments, but got 1.
+
+      3 | 
+      4 |       class Foo {}
+    > 5 |       declareEvent<Foo>('foo');
+        |       ^
+      6 | 
+      7 |       export class Contract extends SmartContract {
+      8 | 
+"
+`;

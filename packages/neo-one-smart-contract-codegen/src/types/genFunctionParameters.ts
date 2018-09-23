@@ -73,8 +73,21 @@ export const genFunctionParameters = (
   );
 
   const paramOptions = getOptions(abi, options);
-  const withOptions = paramStrings
+  let forwardOptions: ReadonlyArray<string> = [];
+  if (restParameter !== undefined && restParameter.type === 'ForwardValue') {
+    forwardOptions = [`forwardOptions?: ${abi.constant ? 'ForwardOptions' : 'TForwardOptions'}`];
+  }
+  const withParamOptions = paramStrings
     .concat(paramOptions)
+    .concat(restParameter === undefined ? [] : [getRestParameter(restParameter)])
+    .join(', ');
+  const withForwardOptions = paramStrings
+    .concat(forwardOptions)
+    .concat(restParameter === undefined ? [] : [getRestParameter(restParameter)])
+    .join(', ');
+  const withParamForwardOptions = paramStrings
+    .concat(paramOptions)
+    .concat(forwardOptions)
     .concat(restParameter === undefined ? [] : [getRestParameter(restParameter)])
     .join(', ');
   const withoutOptions = paramStrings
@@ -82,12 +95,14 @@ export const genFunctionParameters = (
     .join(', ');
 
   if (restParameter === undefined) {
-    return [withOptions];
+    return [withParamOptions];
   }
 
   if (paramOptions.length === 0) {
-    return [withoutOptions];
+    return forwardOptions.length === 0 ? [withoutOptions] : [withForwardOptions];
   }
 
-  return [withOptions, withoutOptions];
+  return forwardOptions.length === 0
+    ? [withParamOptions, withoutOptions]
+    : [withForwardOptions, withParamForwardOptions];
 };

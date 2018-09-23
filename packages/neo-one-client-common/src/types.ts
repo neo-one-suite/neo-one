@@ -460,6 +460,7 @@ export interface InvokeReceipt<TReturn extends Return = Return, TEvent extends E
   readonly result: InvocationResult<TReturn>;
   readonly events: ReadonlyArray<TEvent>;
   readonly logs: ReadonlyArray<Log>;
+  readonly raw: RawInvokeReceipt;
 }
 
 export interface Transfer {
@@ -640,6 +641,12 @@ export interface TransactionOptions {
   systemFee?: BigNumber;
   monitor?: Monitor;
   // tslint:enable readonly-keyword
+}
+
+// tslint:disable-next-line no-any
+export interface ForwardOptions<TEvent extends Event<string, any> = Event> {
+  readonly events?: ReadonlyArray<ABIEvent>;
+  readonly __tag?: TEvent;
 }
 
 export interface InvokeSendUnsafeTransactionOptions extends TransactionOptions {

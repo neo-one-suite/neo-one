@@ -43,6 +43,7 @@ export {
   ContractTransaction,
   EnrollmentTransaction,
   Event,
+  ForwardOptions,
   ForwardValue,
   ForwardValueABI,
   ForwardValueABIParameter,

@@ -1,7 +1,5 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { DiagnosticCode } from '../../../DiagnosticCode';
-import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import { InternalObjectProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -22,8 +20,6 @@ class CreateEventNotifier extends BuiltinCall {
 
     const arg = args[0];
     if (!ts.isStringLiteral(arg)) {
-      sb.context.reportError(node, DiagnosticCode.InvalidLiteral, DiagnosticMessage.EventNotifierArguments);
-
       return;
     }
 

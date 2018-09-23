@@ -1,8 +1,43 @@
-import { Address, constant, Fixed, ForwardedValue, MapStorage, SmartContract } from '@neo-one/smart-contract';
+import {
+  Address,
+  constant,
+  createEventNotifier,
+  declareEvent,
+  Fixed,
+  ForwardedValue,
+  MapStorage,
+  SmartContract,
+} from '@neo-one/smart-contract';
 
 interface Token {
   readonly transfer: (from: Address, to: Address, amount: Fixed<8>) => boolean;
 }
+
+const notifyBalanceAvailable = createEventNotifier<Address, Address, Address, Fixed<8>>(
+  'balanceAvailable',
+  'from',
+  'to',
+  'asset',
+  'amount',
+);
+
+const notifyBalanceClaimed = createEventNotifier<Address, Address, Address, Fixed<8>>(
+  'balanceClaimed',
+  'from',
+  'to',
+  'asset',
+  'amount',
+);
+
+const notifyBalanceRefunded = createEventNotifier<Address, Address, Address, Fixed<8>>(
+  'balanceRefunded',
+  'from',
+  'to',
+  'asset',
+  'amount',
+);
+
+declareEvent<Address | undefined, Address | undefined, Fixed<8>>('transfer', 'from', 'to', 'amount');
 
 export class Escrow extends SmartContract {
   public readonly properties = {
@@ -26,6 +61,7 @@ export class Escrow extends SmartContract {
     }
 
     this.setBalance(from, to, asset, this.balanceOf(from, to, asset) + amount);
+    notifyBalanceAvailable(from, to, asset, amount);
 
     return true;
   }
@@ -42,6 +78,7 @@ export class Escrow extends SmartContract {
     const contract = SmartContract.for<Token>(asset);
     if (contract.transfer(this.address, to, amount)) {
       this.setBalance(from, to, asset, this.balanceOf(from, to, asset) - amount);
+      notifyBalanceClaimed(from, to, asset, amount);
 
       return true;
     }
@@ -57,6 +94,7 @@ export class Escrow extends SmartContract {
     const contract = SmartContract.for<Token>(asset);
     if (contract.transfer(this.address, from, amount)) {
       this.setBalance(from, to, asset, this.balanceOf(from, to, asset) - amount);
+      notifyBalanceRefunded(from, to, asset, amount);
 
       return true;
     }

@@ -386,7 +386,15 @@ describe('InvokeSmartContractHelper', () => {
     `);
 
     const escrow = await node.addContract(`
-      import { Address, constant, Fixed, ForwardedValue, MapStorage, SmartContract } from '@neo-one/smart-contract';
+      import { Address, constant, Fixed, ForwardedValue, MapStorage, SmartContract, createEventNotifier } from '@neo-one/smart-contract';
+
+      const notifyAvailable = createEventNotifier<Address, Address, Address, Fixed<8>>(
+        'available',
+        'from',
+        'to',
+        'asset',
+        'amount',
+      );
 
       export class Escrow extends SmartContract {
         public readonly properties = {
@@ -410,6 +418,7 @@ describe('InvokeSmartContractHelper', () => {
           }
 
           this.setBalance(from, to, asset, this.balanceOf(from, to, asset) + amount);
+          notifyAvailable(from, to, asset, amount);
 
           return true;
         }
@@ -519,6 +528,30 @@ describe('InvokeSmartContractHelper', () => {
             returnType: { type: 'Boolean' },
           },
         ],
+        events: [
+          {
+            name: 'available',
+            parameters: [
+              {
+                type: 'Address',
+                name: 'from',
+              },
+              {
+                type: 'Address',
+                name: 'to',
+              },
+              {
+                type: 'Address',
+                name: 'asset',
+              },
+              {
+                type: 'Integer',
+                name: 'amount',
+                decimals: 8,
+              },
+            ],
+          },
+        ],
       },
       sourceMaps: Promise.resolve(node.sourceMaps),
     });
@@ -537,37 +570,70 @@ describe('InvokeSmartContractHelper', () => {
     if (receipt.result.state === 'FAULT') {
       throw new Error(receipt.result.message);
     }
+    expect(receipt.events).toHaveLength(2);
+    expect(receipt.events[0].name).toEqual('available');
+    expect(receipt.events[1].name).toEqual('transfer');
     const result = await escrowContract.balanceOf(accountID.address, toAddress, token.address);
     expect(result.toString()).toEqual('10');
   });
 
   test('classes that uses forward args, forwarded args, forward return and forwarded return values', async () => {
     const node = await helpers.startNode();
-    const forward = await node.addContract(`
+    const { contract: forward, definition: forwardDefinition } = await node.addContractWithDefinition(`
       import {
         Address,
         constant,
         ForwardValue,
         SmartContract,
+        createEventNotifier,
       } from '@neo-one/smart-contract';
 
       interface TokenPayableContract {
+        readonly forward: (address: Address, ...args: ForwardValue[]) => ForwardValue;
+        readonly forwardReturn: (address: Address) => ForwardValue;
+        readonly forwardConstant: (address: Address, ...args: ForwardValue[]) => ForwardValue;
         readonly forwardTo: (...args: ForwardValue[]) => ForwardValue;
+        readonly forwardToReturn: (a: number, b: number) => ForwardValue;
         readonly forwardToConstant: (...args: ForwardValue[]) => ForwardValue;
       }
 
+      const forwardEvent = createEventNotifier('forwardEvent');
+      const forwardForwardEvent = createEventNotifier('forwardForwardEvent');
+
       export class Forward extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'NEO•ONE Token',
-        };
+        public forwardForward(address: Address, forwardAddress: Address, ...forwardArgs: ForwardValue[]): ForwardValue {
+          const smartContract = SmartContract.for<TokenPayableContract>(address);
+          forwardForwardEvent();
+
+          return smartContract.forward(forwardAddress, ...forwardArgs);
+        }
+
+        public forwardForwardReturn(address: Address, forwardAddress: Address): ForwardValue {
+          const smartContract = SmartContract.for<TokenPayableContract>(address);
+          forwardForwardEvent();
+
+          return smartContract.forwardReturn(forwardAddress);
+        }
+
+        @constant
+        public forwardForwardConstant(address: Address, forwardAddress: Address, ...forwardArgs: ForwardValue[]): ForwardValue {
+          const smartContract = SmartContract.for<TokenPayableContract>(address);
+
+          return smartContract.forwardConstant(forwardAddress, ...forwardArgs);
+        }
 
         public forward(address: Address, ...forwardArgs: ForwardValue[]): ForwardValue {
           const smartContract = SmartContract.for<TokenPayableContract>(address);
+          forwardEvent();
 
           return smartContract.forwardTo(...forwardArgs);
+        }
+
+        public forwardReturn(address: Address): ForwardValue {
+          const smartContract = SmartContract.for<TokenPayableContract>(address);
+          forwardEvent();
+
+          return smartContract.forwardToReturn(20, 3);
         }
 
         @constant
@@ -579,18 +645,73 @@ describe('InvokeSmartContractHelper', () => {
       }
     `);
 
-    const forwarded = await node.addContract(`
-      import { constant, Fixed, Integer, ForwardedValue, SmartContract } from '@neo-one/smart-contract';
+    const { contract: forwarded, definition: forwardedDefinition } = await node.addContractWithDefinition(`
+      import { constant, Fixed, Integer, ForwardedValue, ForwardValue, Address, SmartContract, createEventNotifier } from '@neo-one/smart-contract';
+
+      interface TokenPayableContract {
+        readonly forwardTo: (first: number, ...args: ForwardValue[]) => ForwardValue;
+        readonly forwardToReturn: (a: number, b: number) => ForwardValue;
+        readonly forwardToConstant: (...args: ForwardValue[]) => ForwardValue;
+      }
+
+      const forwardedForwardEvent = createEventNotifier('forwardedForwardEvent');
+      const forwardedEvent = createEventNotifier('forwardedEvent');
 
       export class Forwarded extends SmartContract {
-        public readonly properties = {
-          codeVersion: '1.0',
-          author: 'dicarlo2',
-          email: 'alex.dicarlo@neotracker.io',
-          description: 'Escrow account',
-        };
+        public forward(address: Address, first: ForwardedValue<Fixed<8>>, ...forwardArgs: ForwardedValue<ForwardValue>[]): ForwardedValue<ForwardValue> {
+          const smartContract = SmartContract.for<TokenPayableContract>(address);
+          forwardedForwardEvent();
+
+          return smartContract.forwardTo(first, ...forwardArgs);
+        }
+
+        public forwardReturn(address: Address): ForwardedValue<ForwardValue> {
+          const smartContract = SmartContract.for<TokenPayableContract>(address);
+          forwardedForwardEvent();
+
+          return smartContract.forwardToReturn(20_00000000, 3);
+        }
+
+        @constant
+        public forwardConstant(address: Address, ...forwardArgs: ForwardedValue<ForwardValue>[]): ForwardedValue<ForwardValue> {
+          const smartContract = SmartContract.for<TokenPayableContract>(address);
+
+          return smartContract.forwardToConstant(...forwardArgs);
+        }
 
         public forwardTo(first: ForwardedValue<Fixed<8>>, second: ForwardedValue<Integer>): ForwardedValue<Fixed<8>> {
+          forwardedEvent();
+          return first * second;
+        }
+
+        public forwardToReturn(first: Fixed<8>, second: Integer): ForwardedValue<Fixed<8>> {
+          forwardedEvent();
+          return first * second;
+        }
+
+        @constant
+        public forwardToConstant(first: ForwardedValue<Fixed<8>>, second: ForwardedValue<Integer>): ForwardedValue<Fixed<8>> {
+          return first * second;
+        }
+      }
+    `);
+
+    const {
+      contract: forwardedForwarded,
+      definition: forwardedForwardedDefinition,
+    } = await node.addContractWithDefinition(`
+      import { constant, Fixed, Integer, ForwardedValue, SmartContract, createEventNotifier } from '@neo-one/smart-contract';
+
+      const forwardedForwardedEvent = createEventNotifier('forwardedForwardedEvent');
+
+      export class ForwardedForwarded extends SmartContract {
+        public forwardTo(first: Fixed<8>, second: ForwardedValue<Integer>): ForwardedValue<Fixed<8>> {
+          forwardedForwardedEvent();
+          return first * second;
+        }
+
+        public forwardToReturn(first: Fixed<8>, second: Integer): ForwardedValue<Fixed<8>> {
+          forwardedForwardedEvent();
           return first * second;
         }
 
@@ -614,74 +735,104 @@ describe('InvokeSmartContractHelper', () => {
       assertEqual(forwarded.deploy(), true);
     `);
 
-    const accountID = node.masterWallet.account.id;
-    const forwardContract = node.client.smartContract({
-      networks: {
-        [accountID.network]: {
-          address: forward.address,
-        },
-      },
-      abi: {
-        functions: [
-          {
-            name: 'forward',
-            parameters: [{ name: 'address', type: 'Address' }, { name: 'args', type: 'ForwardValue', rest: true }],
-            returnType: { type: 'ForwardValue' },
-          },
-          {
-            name: 'forwardConstant',
-            constant: true,
-            parameters: [{ name: 'address', type: 'Address' }, { name: 'args', type: 'ForwardValue', rest: true }],
-            returnType: { type: 'ForwardValue' },
-          },
-        ],
-      },
-      sourceMaps: Promise.resolve(node.sourceMaps),
-    });
+    const forwardContract = node.client.smartContract(forwardDefinition);
+    const forwardedContract = node.client.smartContract(forwardedDefinition);
+    const forwardedForwardedContract = node.client.smartContract(forwardedForwardedDefinition);
 
-    const forwardedContract = node.client.smartContract({
-      networks: {
-        [accountID.network]: {
-          address: forwarded.address,
-        },
-      },
-      abi: {
-        functions: [
-          {
-            name: 'forwardTo',
-            parameters: [
-              { name: 'first', type: 'Integer', decimals: 8, forwardedValue: true },
-              { name: 'second', type: 'Integer', decimals: 0, forwardedValue: true },
-            ],
-            returnType: { type: 'Integer', decimals: 8, forwardedValue: true },
-          },
-          {
-            name: 'forwardToConstant',
-            constant: true,
-            parameters: [
-              { name: 'first', type: 'Integer', decimals: 8, forwardedValue: true },
-              { name: 'second', type: 'Integer', decimals: 0, forwardedValue: true },
-            ],
-            returnType: { type: 'Integer', decimals: 8, forwardedValue: true },
-          },
-        ],
-      },
-      sourceMaps: Promise.resolve(node.sourceMaps),
-    });
+    const testSingle = async () => {
+      const receipt = await forwardContract.forward.confirmed(
+        forwarded.address,
+        ...forwardedContract.forwardForwardToArgs(new BigNumber('20'), new BigNumber('3')),
+      );
+      if (receipt.result.state === 'FAULT') {
+        throw new Error(receipt.result.message);
+      }
+      expect(receipt.events).toHaveLength(2);
+      expect(receipt.events[0].name).toEqual('forwardEvent');
+      expect(receipt.events[1].name).toEqual('forwardedEvent');
+      const forwardForwardedReceipt = forwardedContract.forwardForwardToReturn(receipt);
+      expect(forwardForwardedReceipt.result.value.toString()).toEqual('60');
+      expect(forwardForwardedReceipt.events).toHaveLength(2);
+      expect(forwardForwardedReceipt.events[0].name).toEqual('forwardEvent');
+      expect(forwardForwardedReceipt.events[1].name).toEqual('forwardedEvent');
 
-    const receipt = await forwardContract.forward.confirmed(
-      forwarded.address,
-      ...forwardedContract.forwardForwardToArgs(new BigNumber('20'), new BigNumber('3')),
-    );
-    if (receipt.result.state === 'FAULT') {
-      throw new Error(receipt.result.message);
-    }
-    expect(forwardedContract.forwardForwardToReturn(receipt).result.value.toString()).toEqual('60');
+      const forwardReceipt = await forwardContract.forwardReturn.confirmed(forwarded.address);
+      if (forwardReceipt.result.state === 'FAULT') {
+        throw new Error(forwardReceipt.result.message);
+      }
+      expect(forwardReceipt.events).toHaveLength(1);
+      expect(forwardReceipt.events[0].name).toEqual('forwardEvent');
+      const forwardedReceipt = forwardedContract.forwardForwardToReturnReturn(receipt);
+      expect(forwardedReceipt.result.value.toString()).toEqual('60');
+      expect(forwardedReceipt.events).toHaveLength(2);
+      expect(forwardedReceipt.events[0].name).toEqual('forwardEvent');
+      expect(forwardedReceipt.events[1].name).toEqual('forwardedEvent');
 
-    const result = await forwardContract.forwardConstant(
-      forwarded.address,
-      ...forwardedContract.forwardForwardToConstantArgs(new BigNumber('20'), new BigNumber('3')),
-    );
-    expect(forwardedContract.forwardForwardToConstantReturn(result).toString()).toEqual('60');
+      const result = await forwardContract.forwardConstant(
+        forwarded.address,
+        ...forwardedContract.forwardForwardToConstantArgs(new BigNumber('20'), new BigNumber('3')),
+      );
+      expect(forwardedContract.forwardForwardToConstantReturn(result).toString()).toEqual('60');
+    };
+
+    const testDouble = async () => {
+      const receipt = await forwardContract.forwardForward.confirmed(
+        forwarded.address,
+        forwardedForwarded.address,
+        ...forwardedContract.forwardForwardArgs(
+          new BigNumber('20'),
+          ...forwardedForwardedContract.forwardForwardToArgs(new BigNumber('3')),
+        ),
+      );
+      if (receipt.result.state === 'FAULT') {
+        throw new Error(receipt.result.message);
+      }
+      expect(receipt.events).toHaveLength(3);
+      expect(receipt.events[0].name).toEqual('forwardForwardEvent');
+      expect(receipt.events[1].name).toEqual('forwardedForwardEvent');
+      expect(receipt.events[2].name).toEqual('forwardedForwardedEvent');
+      const forwardForwardedReceipt = forwardedForwardedContract.forwardForwardToReturn(
+        forwardedContract.forwardForwardReturn(receipt),
+      );
+      expect(forwardForwardedReceipt.result.value.toString()).toEqual('60');
+      expect(forwardForwardedReceipt.events).toHaveLength(3);
+      expect(forwardForwardedReceipt.events[0].name).toEqual('forwardForwardEvent');
+      expect(forwardForwardedReceipt.events[1].name).toEqual('forwardedForwardEvent');
+      expect(forwardForwardedReceipt.events[2].name).toEqual('forwardedForwardedEvent');
+
+      const forwardReceipt = await forwardContract.forwardForwardReturn.confirmed(
+        forwarded.address,
+        forwardedForwarded.address,
+      );
+      if (forwardReceipt.result.state === 'FAULT') {
+        throw new Error(forwardReceipt.result.message);
+      }
+      expect(forwardReceipt.events).toHaveLength(1);
+      expect(forwardReceipt.events[0].name).toEqual('forwardForwardEvent');
+      const forwardedReceipt = forwardedForwardedContract.forwardForwardToReturnReturn(
+        forwardedContract.forwardForwardReturnReturn(receipt),
+      );
+      expect(forwardedReceipt.result.value.toString()).toEqual('60');
+      expect(forwardedReceipt.events).toHaveLength(3);
+      expect(forwardedReceipt.events[0].name).toEqual('forwardForwardEvent');
+      expect(forwardedReceipt.events[1].name).toEqual('forwardedForwardEvent');
+      expect(forwardedReceipt.events[2].name).toEqual('forwardedForwardedEvent');
+
+      const result = await forwardContract.forwardForwardConstant(
+        forwarded.address,
+        forwardedForwarded.address,
+        ...forwardedContract.forwardForwardConstantArgs(
+          ...forwardedForwardedContract.forwardForwardToConstantArgs(new BigNumber('20'), new BigNumber('3')),
+        ),
+      );
+      expect(
+        forwardedForwardedContract
+          .forwardForwardToConstantReturn(forwardedContract.forwardForwardConstantReturn(result))
+          .toString(),
+      ).toEqual('60');
+    };
+
+    await testSingle();
+    await testDouble();
   });
 });

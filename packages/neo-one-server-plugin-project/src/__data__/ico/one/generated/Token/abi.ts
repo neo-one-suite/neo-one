@@ -1,4 +1,4 @@
-/* @hash 72ccda6fe39b491010a1665fb7a327aa */
+/* @hash d32f1bef82338bb52029f74d0a8416ae */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -22,6 +22,7 @@ export const tokenABI: ABI = {
         },
         {
           decimals: 8,
+          forwardedValue: false,
           name: 'amount',
           optional: false,
           type: 'Integer',
@@ -45,6 +46,7 @@ export const tokenABI: ABI = {
         },
         {
           decimals: 8,
+          forwardedValue: false,
           name: 'amount',
           optional: false,
           type: 'Integer',
@@ -68,6 +70,7 @@ export const tokenABI: ABI = {
         },
         {
           decimals: 8,
+          forwardedValue: false,
           name: 'amount',
           optional: false,
           type: 'Integer',
@@ -102,6 +105,7 @@ export const tokenABI: ABI = {
       parameters: [],
       returnType: {
         decimals: 0,
+        forwardedValue: false,
         optional: false,
         type: 'Integer',
       },
@@ -112,6 +116,7 @@ export const tokenABI: ABI = {
       parameters: [],
       returnType: {
         decimals: 8,
+        forwardedValue: false,
         optional: false,
         type: 'Integer',
       },
@@ -131,6 +136,7 @@ export const tokenABI: ABI = {
       receive: false,
       returnType: {
         decimals: 8,
+        forwardedValue: false,
         optional: false,
         type: 'Integer',
       },
@@ -158,6 +164,7 @@ export const tokenABI: ABI = {
       receive: false,
       returnType: {
         decimals: 8,
+        forwardedValue: false,
         optional: false,
         type: 'Integer',
       },
@@ -183,6 +190,7 @@ export const tokenABI: ABI = {
         },
         {
           decimals: 8,
+          forwardedValue: false,
           name: 'amount',
           optional: false,
           type: 'Integer',
@@ -223,6 +231,7 @@ export const tokenABI: ABI = {
         },
         {
           decimals: 0,
+          forwardedValue: false,
           name: 'amount',
           optional: false,
           type: 'Integer',
@@ -250,6 +259,7 @@ export const tokenABI: ABI = {
         },
         {
           decimals: 8,
+          forwardedValue: false,
           name: 'amount',
           optional: false,
           type: 'Integer',
@@ -289,6 +299,7 @@ export const tokenABI: ABI = {
         },
         {
           decimals: 8,
+          forwardedValue: false,
           name: 'amount',
           optional: false,
           type: 'Integer',
@@ -316,6 +327,7 @@ export const tokenABI: ABI = {
         },
         {
           decimals: 8,
+          forwardedValue: false,
           name: 'amount',
           optional: false,
           type: 'Integer',
@@ -348,6 +360,7 @@ export const tokenABI: ABI = {
         },
         {
           decimals: 8,
+          forwardedValue: false,
           name: 'amount',
           optional: false,
           type: 'Integer',

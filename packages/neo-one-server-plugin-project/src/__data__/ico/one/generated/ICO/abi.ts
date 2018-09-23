@@ -1,4 +1,4 @@
-/* @hash 8b2149db4d210c60d9bea73e85bf9f75 */
+/* @hash 778600196a40f02a64df654d199b0e44 */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -22,6 +22,7 @@ export const icoABI: ABI = {
         },
         {
           decimals: 8,
+          forwardedValue: false,
           name: 'amount',
           optional: false,
           type: 'Integer',
@@ -45,6 +46,7 @@ export const icoABI: ABI = {
         },
         {
           decimals: 8,
+          forwardedValue: false,
           name: 'amount',
           optional: false,
           type: 'Integer',
@@ -68,6 +70,7 @@ export const icoABI: ABI = {
         },
         {
           decimals: 8,
+          forwardedValue: false,
           name: 'amount',
           optional: false,
           type: 'Integer',
@@ -82,6 +85,7 @@ export const icoABI: ABI = {
       parameters: [],
       returnType: {
         decimals: 0,
+        forwardedValue: false,
         optional: false,
         type: 'Integer',
       },
@@ -102,6 +106,7 @@ export const icoABI: ABI = {
       parameters: [],
       returnType: {
         decimals: 0,
+        forwardedValue: false,
         optional: false,
         type: 'Integer',
       },
@@ -112,6 +117,7 @@ export const icoABI: ABI = {
       parameters: [],
       returnType: {
         decimals: 0,
+        forwardedValue: false,
         optional: false,
         type: 'Integer',
       },
@@ -122,6 +128,7 @@ export const icoABI: ABI = {
       parameters: [],
       returnType: {
         decimals: 8,
+        forwardedValue: false,
         optional: false,
         type: 'Integer',
       },
@@ -162,12 +169,14 @@ export const icoABI: ABI = {
         },
         {
           decimals: 0,
+          forwardedValue: false,
           name: 'startTimeSeconds',
           optional: true,
           type: 'Integer',
         },
         {
           decimals: 0,
+          forwardedValue: false,
           name: 'icoDurationSeconds',
           optional: true,
           type: 'Integer',

@@ -6,6 +6,7 @@ import {
   AddressString,
   ClaimTransaction,
   Event,
+  ForwardOptions,
   GetOptions,
   Hash256String,
   InvocationTransaction,
@@ -25,31 +26,16 @@ import {
   TransactionResult,
   Transfer,
 } from '@neo-one/client-common';
-import { utils, utils as commonUtils } from '@neo-one/utils';
+import { utils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { filter } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/filter';
 import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
-import BigNumber from 'bignumber.js';
 import * as argAssertions from '../args';
 import { Client } from '../Client';
-import {
-  CannotSendFromContractError,
-  CannotSendToContractError,
-  InvalidEventError,
-  NoContractDeployedError,
-} from '../errors';
+import { CannotSendFromContractError, CannotSendToContractError, NoContractDeployedError } from '../errors';
 import { events as traceEvents } from '../trace';
 import { SmartContractAny } from '../types';
 import * as common from './common';
-
-// tslint:disable-next-line no-any
-const isOptionsArg = (finalArg: any) =>
-  finalArg !== undefined &&
-  typeof finalArg === 'object' &&
-  !Array.isArray(finalArg) &&
-  !BigNumber.isBigNumber(finalArg) &&
-  // tslint:disable-next-line no-any
-  finalArg.name === undefined;
 
 const getParamsAndOptions = ({
   definition: { networks },
@@ -76,31 +62,42 @@ const getParamsAndOptions = ({
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
   readonly paramsZipped: ReadonlyArray<[string, Param | undefined]>;
   readonly options: InvokeSendUnsafeReceiveTransactionOptions;
+  readonly forwardOptions: ForwardOptions;
   readonly network: NetworkType;
   readonly address: AddressString;
   readonly transfer?: Transfer;
   readonly hash?: Hash256String;
 } => {
   const hasRest = parameters.length > 0 && parameters[parameters.length - 1].rest;
-  let optionsArgIndex = hasRest ? parameters.length - 1 : parameters.length;
-  if (send || completeSend || refundAssets) {
-    optionsArgIndex += 1;
+  const hasForwardOptions =
+    parameters.length > 0 &&
+    parameters[parameters.length - 1].rest &&
+    parameters[parameters.length - 1].type === 'ForwardValue';
+  let lastArgIndex = hasRest ? parameters.length - 1 : parameters.length;
+
+  let params = args;
+  const maybeForwardOptions = params[lastArgIndex];
+  // tslint:disable-next-line no-any
+  let forwardOptions: any = {};
+  if (common.isOptionsArg(maybeForwardOptions) && hasForwardOptions) {
+    params = params.slice(0, lastArgIndex).concat(params.slice(lastArgIndex + 1));
+    forwardOptions = maybeForwardOptions;
+    lastArgIndex -= 1;
   }
 
-  const maybeOptionsArg = args[optionsArgIndex] as {} | undefined;
-  let params = args;
+  const maybeOptionsArg = params[lastArgIndex] as {} | undefined;
   // tslint:disable-next-line no-any
   let optionsIn: any = {};
-  if (isOptionsArg(maybeOptionsArg)) {
-    params = args.slice(0, optionsArgIndex).concat(args.slice(optionsArgIndex + 1));
+  if (common.isOptionsArg(maybeOptionsArg)) {
+    params = params.slice(0, lastArgIndex).concat(params.slice(lastArgIndex + 1));
     // tslint:disable-next-line no-any
     optionsIn = maybeOptionsArg as any;
+    lastArgIndex -= 1;
   }
 
   let transfer: Transfer | undefined;
   let hash: Hash256String | undefined;
   if (send || completeSend || refundAssets) {
-    const lastArgIndex = hasRest ? parameters.length - 1 : parameters.length;
     const maybeLastArg = params[lastArgIndex];
     if (send) {
       transfer = argAssertions.assertTransfer('transfer', maybeLastArg);
@@ -146,38 +143,12 @@ const getParamsAndOptions = ({
     params: converted,
     paramsZipped: zipped,
     options,
+    forwardOptions,
     network,
     address: contractNetwork.address,
     transfer,
     hash,
   };
-};
-
-const convertActions = ({
-  actions,
-  events,
-}: {
-  readonly actions: ReadonlyArray<RawAction>;
-  readonly events: ReadonlyArray<ABIEvent>;
-}): ReadonlyArray<Action> => {
-  const eventsObj = traceEvents.concat(events).reduce<{ [key: string]: ABIEvent }>(
-    (acc, event) => ({
-      ...acc,
-      [event.name]: event,
-    }),
-    {},
-  );
-
-  return actions
-    .map((action) => {
-      const converted = common.convertAction({
-        action,
-        events: eventsObj,
-      });
-
-      return typeof converted === 'string' ? undefined : converted;
-    })
-    .filter(utils.notNull);
 };
 
 const createCall = ({
@@ -212,11 +183,6 @@ const createCall = ({
   });
 };
 
-const filterEvents = (actions: ReadonlyArray<Event | Log>): ReadonlyArray<Event> =>
-  actions.map((action) => (action.type === 'Event' ? action : undefined)).filter(commonUtils.notNull);
-const filterLogs = (actions: ReadonlyArray<Event | Log>): ReadonlyArray<Log> =>
-  actions.map((action) => (action.type === 'Log' ? action : undefined)).filter(commonUtils.notNull);
-
 const createInvoke = ({
   definition,
   client,
@@ -242,7 +208,7 @@ const createInvoke = ({
   ): Promise<
     TransactionResult<InvokeReceipt, InvocationTransaction> | TransactionResult<TransactionReceipt, ClaimTransaction>
   > => {
-    const { params, paramsZipped, options, address, transfer, hash } = getParamsAndOptions({
+    const { params, paramsZipped, options, forwardOptions, address, transfer, hash } = getParamsAndOptions({
       definition,
       parameters,
       args,
@@ -310,9 +276,10 @@ const createInvoke = ({
       confirmed: async (getOptions?): Promise<InvokeReceipt> => {
         const receipt = await result.confirmed(getOptions);
         const { events = [] } = definition.abi;
-        const actions = convertActions({
+        const { events: forwardEvents = [] } = forwardOptions;
+        const actions = common.convertActions({
           actions: receipt.actions,
-          events,
+          events: events.concat(forwardEvents),
         });
 
         const invocationResult = await common.convertInvocationResult({
@@ -327,8 +294,9 @@ const createInvoke = ({
           blockHash: receipt.blockHash,
           transactionIndex: receipt.transactionIndex,
           result: invocationResult,
-          events: filterEvents(actions),
-          logs: filterLogs(actions),
+          events: common.filterEvents(actions),
+          logs: common.filterLogs(actions),
+          raw: receipt,
         };
       },
     };
@@ -338,7 +306,7 @@ const createInvoke = ({
     // tslint:disable-next-line no-any
     const finalArg = args[args.length - 1];
     let options: GetOptions | undefined;
-    if (isOptionsArg(finalArg)) {
+    if (common.isOptionsArg(finalArg)) {
       options = finalArg;
     }
     const result = await invoke(...args);
@@ -376,17 +344,17 @@ export const createSmartContract = ({
       filter((action) => action.address === definition.networks[network].address),
     );
 
-  const convertAction = (action: RawAction): Action => {
+  const convertAction = (action: RawAction): Action | undefined => {
     const converted = common.convertAction({ action, events });
-    if (typeof converted === 'string') {
-      throw new InvalidEventError(`Unknown event ${converted}`);
-    }
 
-    return converted;
+    return typeof converted === 'string' ? undefined : converted;
   };
 
   const iterActions = (options?: SmartContractIterOptions): AsyncIterable<Action> =>
-    AsyncIterableX.from(iterActionsRaw(options)).pipe(map(convertAction));
+    AsyncIterableX.from(iterActionsRaw(options)).pipe(
+      map(convertAction),
+      filter(utils.notNull),
+    );
 
   const iterEvents = (options?: SmartContractIterOptions): AsyncIterable<Event> =>
     AsyncIterableX.from(iterActions(options)).pipe(
@@ -414,7 +382,7 @@ export const createSmartContract = ({
 
   return definition.abi.functions.reduce<SmartContractAny>(
     (acc, func) =>
-      common.addForward(func, {
+      common.addForward(func, abiEvents, {
         ...acc,
         [func.name]:
           func.constant === true

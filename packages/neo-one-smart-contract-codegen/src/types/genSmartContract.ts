@@ -19,13 +19,17 @@ export interface ${getSmartContractName(
       let decls = [`readonly ${func.name}: ${func.constant ? genConstantFunction(func) : genFunction(name, func)}`];
       if (forwardedParameters.length > 0) {
         decls = decls.concat([
-          `readonly ${createForwardedValueFuncArgsName(func)}: ${genForwardArgsFunction(func, forwardedParameters)}`,
+          `readonly ${createForwardedValueFuncArgsName(func)}: ${genForwardArgsFunction(
+            name,
+            func,
+            forwardedParameters,
+          )}`,
         ]);
       }
 
       if (func.returnType.forwardedValue) {
         decls = decls.concat([
-          `readonly ${createForwardedValueFuncReturnName(func)}: ${genForwardReturnFunction(func)}`,
+          `readonly ${createForwardedValueFuncReturnName(func)}: ${genForwardReturnFunction(name, func)}`,
         ]);
       }
 

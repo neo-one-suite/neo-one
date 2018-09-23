@@ -7,10 +7,13 @@ import {
   AddressString,
   ContractParameter,
   contractParameters,
+  Event,
   EventParameters,
+  ForwardOptions,
   ForwardValue,
   InvocationResult,
   InvokeReceipt,
+  Log,
   Param,
   RawAction,
   RawInvocationResult,
@@ -21,8 +24,10 @@ import {
 } from '@neo-one/client-common';
 import { processActionsAndMessage, processConsoleLogMessages } from '@neo-one/client-switch';
 import { utils } from '@neo-one/utils';
+import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { InvalidContractArgumentCountError, InvalidEventError, InvocationCallError, NoAccountError } from '../errors';
+import { events as traceEvents } from '../trace';
 import { params as paramCheckers } from './params';
 import { createForwardedValueFuncArgsName, createForwardedValueFuncReturnName } from './utils';
 
@@ -35,15 +40,37 @@ export const convertContractParameter = ({
   // tslint:disable-next-line no-any
 }): Return | undefined => (contractParameters[type.type] as any)(parameter, type);
 
+// tslint:disable-next-line no-any
+export const isOptionsArg = (finalArg: any) =>
+  finalArg !== undefined &&
+  typeof finalArg === 'object' &&
+  !Array.isArray(finalArg) &&
+  !BigNumber.isBigNumber(finalArg) &&
+  // tslint:disable-next-line no-any
+  finalArg.name === undefined &&
+  finalArg.amount === undefined;
+
 export const getForwardValues = ({
   parameters,
   args,
+  events,
 }: {
   readonly parameters: ReadonlyArray<ABIParameter>;
   // tslint:disable-next-line no-any
   readonly args: ReadonlyArray<any>;
-}): ReadonlyArray<ForwardValue> => {
-  const params = args;
+  readonly events: ReadonlyArray<ABIEvent>;
+}): ReadonlyArray<ForwardOptions | ForwardValue> => {
+  const hasForwardOptions =
+    parameters.length > 0 &&
+    parameters[parameters.length - 1].rest &&
+    parameters[parameters.length - 1].type === 'ForwardValue';
+  let params = args;
+  let options: ForwardOptions = {};
+  if (hasForwardOptions) {
+    const lastArgIndex = parameters.length - 1;
+    options = params[lastArgIndex];
+    params = params.slice(0, lastArgIndex).concat(params.slice(lastArgIndex + 1));
+  }
 
   const { converted, zipped } = convertParams({
     params,
@@ -51,40 +78,88 @@ export const getForwardValues = ({
     senderAddress: undefined,
   });
 
-  return utils.zip(zipped, converted).map(
-    ([[name, param], convertedParam]) =>
-      ({
-        name,
-        param,
-        converted: convertedParam,
-        // tslint:disable-next-line no-any
-      } as any),
+  return [{ events: events.concat(options.events === undefined ? [] : options.events) }].concat(
+    utils.zip(zipped, converted).map(
+      ([[name, param], convertedParam]) =>
+        ({
+          name,
+          param,
+          converted: convertedParam,
+          // tslint:disable-next-line no-any
+        } as any),
+    ),
   );
 };
 
-// tslint:disable-next-line no-any readonly-array
-const createForwardValueArgs = (parameters: ReadonlyArray<ABIParameter>) => (...args: any[]) =>
-  getForwardValues({ parameters, args });
+const createForwardValueArgs = (parameters: ReadonlyArray<ABIParameter>, events: ReadonlyArray<ABIEvent>) => (
+  // tslint:disable-next-line no-any readonly-array
+  ...args: any[]
+) => getForwardValues({ parameters, events, args });
+
+export const convertActions = ({
+  actions,
+  events,
+}: {
+  readonly actions: ReadonlyArray<RawAction>;
+  readonly events: ReadonlyArray<ABIEvent>;
+}): ReadonlyArray<Action> => {
+  const eventsObj = traceEvents.concat(events).reduce<{ [key: string]: ABIEvent }>(
+    (acc, event) => ({
+      ...acc,
+      [event.name]: event,
+    }),
+    {},
+  );
+
+  return actions
+    .map((action) => {
+      const converted = convertAction({
+        action,
+        events: eventsObj,
+      });
+
+      return typeof converted === 'string' ? undefined : converted;
+    })
+    .filter(utils.notNull);
+};
+
+export const filterEvents = (actions: ReadonlyArray<Event | Log>): ReadonlyArray<Event> =>
+  actions.map((action) => (action.type === 'Event' ? action : undefined)).filter(utils.notNull);
+export const filterLogs = (actions: ReadonlyArray<Event | Log>): ReadonlyArray<Log> =>
+  actions.map((action) => (action.type === 'Log' ? action : undefined)).filter(utils.notNull);
 
 // tslint:disable-next-line no-any
-const isInvokeReceipt = (value: any): value is InvokeReceipt<ContractParameter> => value.result !== undefined;
+const isInvokeReceipt = (value: any): value is InvokeReceipt<ContractParameter> =>
+  typeof value === 'object' && value.result !== undefined && value.events !== undefined && value.logs !== undefined;
 
-const createForwardValueReturn = (returnType: ABIReturn) => (
+const createForwardValueReturn = (returnType: ABIReturn, forwardEvents: ReadonlyArray<ABIEvent>) => (
   receiptOrValue: InvokeReceipt<ContractParameter> | ContractParameter,
   // tslint:disable-next-line no-any
 ): any => {
   if (isInvokeReceipt(receiptOrValue)) {
+    const actions = convertActions({
+      actions: receiptOrValue.raw.actions,
+      events: forwardEvents,
+    });
+    const foundForwardEvents = filterEvents(actions);
+    const events = _.uniqBy(
+      _.sortBy(receiptOrValue.events.concat(foundForwardEvents), (event) => event.index),
+      (event) => event.index,
+    );
     if (receiptOrValue.result.state === 'HALT') {
+      const value = convertContractParameter({ type: returnType, parameter: receiptOrValue.result.value });
+
       return {
         ...receiptOrValue,
+        events,
         result: {
-          ...receiptOrValue,
-          value: convertContractParameter({ type: returnType, parameter: receiptOrValue.result.value }),
+          ...receiptOrValue.result,
+          value,
         },
       };
     }
 
-    return receiptOrValue;
+    return { ...receiptOrValue, events };
   }
 
   return convertContractParameter({ type: returnType, parameter: receiptOrValue });
@@ -285,20 +360,26 @@ export const convertParams = ({
 };
 
 // tslint:disable-next-line no-any
-export const addForward = (func: ABIFunction, value: any): any => {
+export const addForward = (
+  func: ABIFunction,
+  forwardEvents: ReadonlyArray<ABIEvent>,
+  // tslint:disable-next-line no-any
+  value: any,
+  // tslint:disable-next-line no-any
+): any => {
   let result = value;
   const forwardedValues = func.parameters === undefined ? [] : func.parameters.filter((param) => param.forwardedValue);
   if (forwardedValues.length > 0) {
     result = {
       ...result,
-      [createForwardedValueFuncArgsName(func)]: createForwardValueArgs(forwardedValues),
+      [createForwardedValueFuncArgsName(func)]: createForwardValueArgs(forwardedValues, forwardEvents),
     };
   }
 
   if (func.returnType.forwardedValue) {
     result = {
       ...result,
-      [createForwardedValueFuncReturnName(func)]: createForwardValueReturn(func.returnType),
+      [createForwardedValueFuncReturnName(func)]: createForwardValueReturn(func.returnType, forwardEvents),
     };
   }
 

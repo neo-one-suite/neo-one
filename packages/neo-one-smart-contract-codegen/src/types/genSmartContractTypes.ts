@@ -91,6 +91,10 @@ const getImportClauses = (text: string) => {
     mutableClauses.push('Transfer');
   }
 
+  if (text.includes('ForwardOptions')) {
+    mutableClauses.push('ForwardOptions');
+  }
+
   return mutableClauses;
 };
 

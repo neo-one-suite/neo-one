@@ -541,7 +541,7 @@ const assertNullableParam = (name: string, value?: unknown): Param | undefined =
 
 export const assertForwardValue = (name: string, value?: unknown): ForwardValue => {
   if (!isObject(value)) {
-    throw new InvalidArgumentError('UserAccountID', name, value);
+    throw new InvalidArgumentError('ForwardValue', name, value);
   }
 
   return {

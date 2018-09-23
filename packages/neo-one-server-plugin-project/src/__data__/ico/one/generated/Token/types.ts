@@ -1,10 +1,11 @@
-/* @hash 755127932cfaf65c9bea19b8dbfa4f5b */
+/* @hash 307619511e1a6681f806914aa5d8eb44 */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
   Client,
   Event,
+  ForwardOptions,
   ForwardValue,
   GetOptions,
   InvocationTransaction,
@@ -111,26 +112,54 @@ export interface TokenSmartContract<TClient extends Client = Client> extends Sma
   readonly symbol: () => Promise<string>;
   readonly totalSupply: () => Promise<BigNumber>;
   readonly transfer: {
-    (
+    <TForwardOptions extends ForwardOptions<any>>(
+      from: AddressString,
+      to: AddressString,
+      amount: BigNumber,
+      forwardOptions?: TForwardOptions,
+      ...approveArgs: ForwardValue[]
+    ): Promise<
+      TransactionResult<
+        InvokeReceipt<boolean, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent>,
+        InvocationTransaction
+      >
+    >;
+    <TForwardOptions extends ForwardOptions<any>>(
       from: AddressString,
       to: AddressString,
       amount: BigNumber,
       options?: TransactionOptions,
+      forwardOptions?: TForwardOptions,
       ...approveArgs: ForwardValue[]
-    ): Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
-    (from: AddressString, to: AddressString, amount: BigNumber, ...approveArgs: ForwardValue[]): Promise<
-      TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>
+    ): Promise<
+      TransactionResult<
+        InvokeReceipt<boolean, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent>,
+        InvocationTransaction
+      >
     >;
     readonly confirmed: {
-      (
+      <TForwardOptions extends ForwardOptions<any>>(
+        from: AddressString,
+        to: AddressString,
+        amount: BigNumber,
+        forwardOptions?: TForwardOptions,
+        ...approveArgs: ForwardValue[]
+      ): Promise<
+        InvokeReceipt<boolean, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent> & {
+          readonly transaction: InvocationTransaction;
+        }
+      >;
+      <TForwardOptions extends ForwardOptions<any>>(
         from: AddressString,
         to: AddressString,
         amount: BigNumber,
         options?: TransactionOptions & GetOptions,
+        forwardOptions?: TForwardOptions,
         ...approveArgs: ForwardValue[]
-      ): Promise<InvokeReceipt<boolean, TokenEvent> & { readonly transaction: InvocationTransaction }>;
-      (from: AddressString, to: AddressString, amount: BigNumber, ...approveArgs: ForwardValue[]): Promise<
-        InvokeReceipt<boolean, TokenEvent> & { readonly transaction: InvocationTransaction }
+      ): Promise<
+        InvokeReceipt<boolean, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent> & {
+          readonly transaction: InvocationTransaction;
+        }
       >;
     };
   };
