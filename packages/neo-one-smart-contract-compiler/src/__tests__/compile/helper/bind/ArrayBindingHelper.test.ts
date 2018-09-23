@@ -1,5 +1,4 @@
 import { helpers } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('ArrayBindingHelper', () => {
   describe('variable', () => {
@@ -14,21 +13,31 @@ describe('ArrayBindingHelper', () => {
       `);
     });
 
-    test('non-array', async () => {
-      helpers.compileString(
-        `
-        interface Arr {
-          [Symbol.iterator](): IterableIterator<T>;
-        }
-        const x: Arr = {}  as Arr;
+    test('map', async () => {
+      await helpers.executeString(`
+        const map = new Map<string, number>().set('foo', 1).set('bar', 2).set('baz', 3).set('qux', 4);
+        const [a, b, c, ...rest] = map;
 
-        const [a, b] = x;
+        assertEqual(a[0], 'foo');
+        assertEqual(a[1], 1);
+        assertEqual(b[0], 'bar');
+        assertEqual(b[1], 2);
+        assertEqual(c[0], 'baz');
+        assertEqual(c[1], 3);
+        assertEqual(rest[0][0], 'qux');
+        assertEqual(rest[0][1], 4);
+      `);
+    });
 
-        assertEqual(a, 0);
-        assertEqual(b, 1);
-      `,
-        { type: 'error', code: DiagnosticCode.UnsupportedSyntax },
-      );
+    test('set', async () => {
+      await helpers.executeString(`
+        const [a, b, c, ...rest] = new Set([1, 2, 3, 4]);
+
+        assertEqual(a, 1);
+        assertEqual(b, 2);
+        assertEqual(c, 3);
+        assertEqual(rest[0], 4);
+      `);
     });
 
     test('complex', async () => {
