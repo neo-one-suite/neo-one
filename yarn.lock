@@ -10446,9 +10446,9 @@ readline2@^1.0.1:
     is-fullwidth-code-point "^1.0.0"
     mute-stream "0.0.5"
 
-reakit@0.15.0:
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/reakit/-/reakit-0.15.0.tgz#de783302fdfbebe4c6a0c734edd0b5f6042de36d"
+reakit@0.15.2:
+  version "0.15.2"
+  resolved "https://registry.yarnpkg.com/reakit/-/reakit-0.15.2.tgz#de954a41b8da1258a6a695076eadaa79f65faa78"
   dependencies:
     "@emotion/is-prop-valid" "^0.6.6"
     constate "^0.8.2"
