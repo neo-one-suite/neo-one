@@ -1,4 +1,3 @@
-import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
 import { getForwardedValueType } from '../../../utils';
@@ -7,32 +6,33 @@ import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 import { hasAccount } from './account';
-import { hasArray, isOnlyArray } from './array';
-import { hasArrayStorage, isOnlyArrayStorage } from './arrayStorage';
+import { hasArray } from './array';
+import { hasArrayStorage } from './arrayStorage';
 import { hasAsset } from './asset';
-import { hasAttribute, isOnlyAttribute } from './attribute';
+import { hasAttribute } from './attribute';
 import { hasBlock } from './block';
-import { hasBoolean, isOnlyBoolean } from './boolean';
-import { hasBuffer, isOnlyBuffer } from './buffer';
+import { hasBoolean } from './boolean';
+import { hasBuffer } from './buffer';
 import { hasContract } from './contract';
-import { hasError, isOnlyError } from './error';
-import { hasForwardValue, isOnlyForwardValue } from './forwardValue';
+import { hasError } from './error';
+import { hasForwardValue } from './forwardValue';
 import { hasHeader } from './header';
-import { hasInput, isOnlyInput } from './input';
-import { hasIterable, isOnlyIterable } from './iterable';
-import { hasIterableIterator, isOnlyIterableIterator } from './iterableIterator';
-import { hasIteratorResult, isOnlyIteratorResult } from './iteratorResult';
-import { hasMap, isOnlyMap } from './map';
-import { hasMapStorage, isOnlyMapStorage } from './mapStorage';
-import { hasNull, isOnlyNull } from './null';
-import { hasNumber, isOnlyNumber } from './number';
-import { hasOutput, isOnlyOutput } from './output';
-import { hasSet, isOnlySet } from './set';
-import { hasSetStorage, isOnlySetStorage } from './setStorage';
-import { hasString, isOnlyString } from './string';
-import { hasSymbol, isOnlySymbol } from './symbol';
-import { hasTransaction, isOnlyTransaction } from './transaction';
-import { hasUndefined, isOnlyUndefined } from './undefined';
+import { hasInput } from './input';
+import { hasIterable } from './iterable';
+import { hasIterableIterator } from './iterableIterator';
+import { hasIteratorResult } from './iteratorResult';
+import { hasMap } from './map';
+import { hasMapStorage } from './mapStorage';
+import { hasNull } from './null';
+import { hasNumber } from './number';
+import { hasObject } from './object';
+import { hasOutput } from './output';
+import { hasSet } from './set';
+import { hasSetStorage } from './setStorage';
+import { hasString } from './string';
+import { hasSymbol } from './symbol';
+import { hasTransaction } from './transaction';
+import { hasUndefined } from './undefined';
 
 type ProcessType = (options: VisitOptions) => void;
 
@@ -391,37 +391,7 @@ export class ForBuiltinTypeHelper extends Helper {
             process: this.iterable,
           },
           {
-            hasType: (type) =>
-              tsUtils.type_.hasType(
-                type,
-                (hasTpe) =>
-                  !tsUtils.type_.isOnlyType(
-                    hasTpe,
-                    (tp) =>
-                      isOnlyUndefined(sb.context, node, tp) ||
-                      isOnlyNull(sb.context, node, tp) ||
-                      isOnlyBoolean(sb.context, node, tp) ||
-                      isOnlyNumber(sb.context, node, tp) ||
-                      isOnlyString(sb.context, node, tp) ||
-                      isOnlySymbol(sb.context, node, tp) ||
-                      isOnlyBuffer(sb.context, node, tp) ||
-                      isOnlyArray(sb.context, node, tp) ||
-                      isOnlyArrayStorage(sb.context, node, tp) ||
-                      isOnlyMap(sb.context, node, tp) ||
-                      isOnlyMapStorage(sb.context, node, tp) ||
-                      isOnlySet(sb.context, node, tp) ||
-                      isOnlySetStorage(sb.context, node, tp) ||
-                      isOnlyError(sb.context, node, tp) ||
-                      isOnlyForwardValue(sb.context, node, tp) ||
-                      isOnlyIteratorResult(sb.context, node, tp) ||
-                      isOnlyIterable(sb.context, node, tp) ||
-                      isOnlyIterableIterator(sb.context, node, tp) ||
-                      isOnlyTransaction(sb.context, node, tp) ||
-                      isOnlyOutput(sb.context, node, tp) ||
-                      isOnlyAttribute(sb.context, node, tp) ||
-                      isOnlyInput(sb.context, node, tp),
-                  ),
-              ),
+            hasType: (type) => hasObject(sb.context, node, type),
             isRuntimeType: (innerOptions) => {
               sb.emitHelper(node, innerOptions, sb.helpers.isObject);
             },

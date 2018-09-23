@@ -35,7 +35,7 @@ describe('ABISmartContractProcessor', () => {
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
-      class Foo {}
+      class Foo { bar(): string { return ''; } }
 
       export class TestSmartContract extends SmartContract {
         ${properties}
@@ -54,7 +54,7 @@ describe('ABISmartContractProcessor', () => {
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
-      class Foo {}
+      class Foo { bar(): string { return ''; } }
 
       export class TestSmartContract extends SmartContract {
         ${properties}
@@ -95,7 +95,7 @@ describe('ABISmartContractProcessor', () => {
       `
       import { SmartContract } from '@neo-one/smart-contract';
 
-      class Foo {}
+      class Foo { bar(): string { return ''; } }
 
       export class TestSmartContract extends SmartContract {
         ${properties}

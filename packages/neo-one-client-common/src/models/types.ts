@@ -48,6 +48,11 @@ export interface InteropInterfaceContractParameterJSON {
   readonly type: 'InteropInterface';
 }
 
+export interface MapContractParameterJSON {
+  readonly type: 'Map';
+  readonly value: ReadonlyArray<[ContractParameterJSON, ContractParameterJSON]>;
+}
+
 export interface PublicKeyContractParameterJSON {
   readonly type: 'PublicKey';
   readonly value: string;
@@ -74,6 +79,7 @@ export type ContractParameterJSON =
   | Hash160ContractParameterJSON
   | Hash256ContractParameterJSON
   | ByteArrayContractParameterJSON
+  | MapContractParameterJSON
   | PublicKeyContractParameterJSON
   | StringContractParameterJSON
   | ArrayContractParameterJSON

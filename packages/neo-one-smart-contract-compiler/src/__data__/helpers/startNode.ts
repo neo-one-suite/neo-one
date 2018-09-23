@@ -1,4 +1,4 @@
-import { common, crypto, RawInvokeReceipt } from '@neo-one/client-common';
+import { common, crypto, RawInvokeReceipt, SmartContractDefinition } from '@neo-one/client-common';
 import {
   ABI,
   Client,
@@ -44,6 +44,10 @@ interface AddContractOptions {
 
 export interface TestNode {
   readonly addContract: (script: string, options?: AddContractOptions) => Promise<Contract>;
+  readonly addContractWithDefinition: (
+    script: string,
+    options?: AddContractOptions,
+  ) => Promise<{ readonly contract: Contract; readonly definition: SmartContractDefinition }>;
   readonly addContractFromSnippet: (snippetPath: string, linked?: LinkedContracts) => Promise<Contract>;
   // tslint:disable-next-line no-any
   readonly executeString: (
@@ -149,6 +153,32 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
       mutableSourceMaps[result.address] = resolvedSourceMap;
 
       return result;
+    },
+    async addContractWithDefinition(
+      script,
+      options = {},
+    ): Promise<{ contract: Contract; definition: SmartContractDefinition }> {
+      const {
+        contract: { script: outputScript },
+        context,
+        sourceMap,
+        abi,
+      } = getCompiledScript(script, options.fileName);
+
+      const [result, resolvedSourceMap] = await Promise.all([
+        publish(client, developerClient, context, outputScript, outerOptions.ignoreWarnings),
+        sourceMap,
+      ]);
+      mutableSourceMaps[result.address] = resolvedSourceMap;
+
+      return {
+        contract: result,
+        definition: {
+          abi,
+          networks: { [networkName]: { address: result.address } },
+          sourceMaps: Promise.resolve(mutableSourceMaps),
+        },
+      };
     },
     async addContractFromSnippet(snippetPath, linked = {}): Promise<Contract> {
       const filePath = pathResolve(

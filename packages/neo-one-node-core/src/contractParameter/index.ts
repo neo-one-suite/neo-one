@@ -8,6 +8,7 @@ export * from './Hash160ContractParameter';
 export * from './Hash256ContractParameter';
 export * from './IntegerContractParameter';
 export * from './InteropInterfaceContractParameter';
+export * from './MapContractParameter';
 export * from './PublicKeyContractParameter';
 export * from './SignatureContractParameter';
 export * from './StringContractParameter';

@@ -121,6 +121,14 @@ export function convertContractParameter(parameter: ContractParameterJSON): Cont
       };
     case 'InteropInterface':
       return parameter;
+    case 'Map':
+      return {
+        type: 'Map',
+        value: parameter.value.map<[ContractParameter, ContractParameter]>(([key, val]) => [
+          convertContractParameter(key),
+          convertContractParameter(val),
+        ]),
+      };
     case 'PublicKey':
       return parameter;
     case 'Signature':

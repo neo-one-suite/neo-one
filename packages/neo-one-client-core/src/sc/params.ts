@@ -1,4 +1,5 @@
 import {
+  ABIReturn,
   AddressABI,
   addressToScriptHash,
   ArrayABI,
@@ -8,6 +9,8 @@ import {
   ForwardValueABI,
   Hash256ABI,
   IntegerABI,
+  MapABI,
+  ObjectABI,
   Param,
   PublicKeyABI,
   ScriptBuilderParam,
@@ -57,6 +60,51 @@ export const params = {
     const checker = params[value.type] as any;
 
     return paramArray.map((val) => checker(name, val, value));
+  },
+  Map: (name: string, param: Param, parameter: MapABI): ScriptBuilderParam | undefined => {
+    if (parameter.optional && param === undefined) {
+      return undefined;
+    }
+
+    const paramMap = args.assertMap(name, param);
+
+    const { key, value } = parameter;
+    // tslint:disable-next-line no-any
+    const keyChecker = params[key.type] as any;
+    // tslint:disable-next-line no-any
+    const valueChecker = params[value.type] as any;
+
+    const output = new Map<ScriptBuilderParam | undefined, ScriptBuilderParam | undefined>();
+    paramMap.forEach((v, k) => {
+      output.set(keyChecker(name, k, key), valueChecker(name, v, value));
+    });
+
+    return output;
+  },
+  Object: (name: string, param: Param, parameter: ObjectABI): ScriptBuilderParam | undefined => {
+    if (parameter.optional && param === undefined) {
+      return undefined;
+    }
+
+    const paramObject = args.assertObject(name, param);
+
+    return Object.entries(paramObject).reduce<{ readonly [key: string]: ScriptBuilderParam }>(
+      (acc, [keyParam, val]) => {
+        const key = args.assertString(name, keyParam);
+        const value = parameter.properties[key] as ABIReturn | undefined;
+        if (value === undefined) {
+          throw new Error('Invalid abi');
+        }
+        // tslint:disable-next-line no-any
+        const checker = params[value.type] as any;
+
+        return {
+          ...acc,
+          [key]: checker(name, val, value),
+        };
+      },
+      {},
+    );
   },
   Void: (name: string, param: Param, _parameter: VoidABI): ScriptBuilderParam | undefined => {
     if (param !== undefined) {

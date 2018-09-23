@@ -48,5 +48,7 @@ export const add = (builtins: Builtins): void => {
   builtins.addContractMember('ForwardValue', 'asPublicKeyNullable', new ForwardValueAs(Types.Buffer, true));
   builtins.addContractMember('ForwardValue', 'asArray', new ForwardValueAs(Types.Array));
   builtins.addContractMember('ForwardValue', 'asArrayNullable', new ForwardValueAs(Types.Array, true));
+  builtins.addContractMember('ForwardValue', 'asMap', new ForwardValueAs(Types.Map));
+  builtins.addContractMember('ForwardValue', 'asMapNullable', new ForwardValueAs(Types.Map, true));
   builtins.addContractInterface('ForwardValueConstructor', new ForwardValueConstructorInterface());
 };

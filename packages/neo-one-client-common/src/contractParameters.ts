@@ -5,6 +5,7 @@ import { crypto } from './crypto';
 import { InvalidContractParameterError } from './errors';
 import { JSONHelper } from './JSONHelper';
 import {
+  ABIReturn,
   AddressABI,
   AddressString,
   ArrayABI,
@@ -16,6 +17,8 @@ import {
   Hash256ABI,
   Hash256String,
   IntegerABI,
+  MapABI,
+  ObjectABI,
   PublicKeyABI,
   PublicKeyString,
   Return,
@@ -59,6 +62,7 @@ const toBufferBuffer = (contractParameter: ContractParameter): Buffer => {
       value = Buffer.from(contractParameter.value, 'utf8');
       break;
     case 'Array':
+    case 'Map':
       throw new InvalidContractParameterError(contractParameter, [
         'Signature',
         'Boolean',
@@ -173,7 +177,7 @@ const toSignature = (contractParameter: ContractParameter): SignatureString => {
   throw new InvalidContractParameterError(contractParameter, ['Signature']);
 };
 
-const toArray = (contractParameter: ContractParameter, parameter: ArrayABI): ReadonlyArray<Return | undefined> => {
+const toArray = (contractParameter: ContractParameter, parameter: ArrayABI): ReadonlyArray<Return> => {
   if (contractParameter.type !== 'Array') {
     throw new InvalidContractParameterError(contractParameter, ['Array']);
   }
@@ -183,6 +187,46 @@ const toArray = (contractParameter: ContractParameter, parameter: ArrayABI): Rea
   const converter = contractParameters[value.type] as any;
 
   return contractParameter.value.map((val) => converter(val, value));
+};
+
+const toMap = (contractParameter: ContractParameter, parameter: MapABI): ReadonlyMap<Return, Return> => {
+  if (contractParameter.type !== 'Map') {
+    throw new InvalidContractParameterError(contractParameter, ['Map']);
+  }
+
+  const { key, value } = parameter;
+  // tslint:disable-next-line no-any
+  const keyConverter = contractParameters[key.type] as any;
+  // tslint:disable-next-line no-any
+  const valueConverter = contractParameters[value.type] as any;
+
+  return new Map(
+    contractParameter.value.map<[Return | undefined, Return | undefined]>((val) => [
+      keyConverter(val[0], key),
+      valueConverter(val[1], value),
+    ]),
+  );
+};
+
+const toObject = (contractParameter: ContractParameter, parameter: ObjectABI): { readonly [key: string]: Return } => {
+  if (contractParameter.type !== 'Map') {
+    throw new InvalidContractParameterError(contractParameter, ['Map']);
+  }
+
+  return contractParameter.value.reduce<{ readonly [key: string]: Return }>((acc, [keyParam, val]) => {
+    const key = toString(keyParam);
+    const value = parameter.properties[key] as ABIReturn | undefined;
+    if (value === undefined) {
+      throw new InvalidContractParameterError(contractParameter, ['Map']);
+    }
+    // tslint:disable-next-line no-any
+    const converter = contractParameters[value.type] as any;
+
+    return {
+      ...acc,
+      [key]: converter(val, value),
+    };
+  }, {});
 };
 
 const toInteropInterface = (_contractParameter: ContractParameter): undefined => undefined;
@@ -252,6 +296,14 @@ const toArrayNullable = wrapNullableABI(toArray) as (
   param: ContractParameter,
   abi: ArrayABI,
 ) => ReadonlyArray<Return | undefined> | undefined;
+const toMapNullable = wrapNullableABI(toMap) as (
+  param: ContractParameter,
+  abi: MapABI,
+) => ReadonlyMap<Return | undefined, Return | undefined> | undefined;
+const toObjectNullable = wrapNullableABI(toObject) as (
+  param: ContractParameter,
+  abi: ObjectABI,
+) => { readonly [key: string]: Return } | undefined;
 const toInteropInterfaceNullable = wrapNullable(toInteropInterface) as (
   param: ContractParameter,
 ) => undefined | undefined;
@@ -277,6 +329,10 @@ export const contractParameters = {
     parameter.optional ? toBufferNullable(contractParameter) : toBuffer(contractParameter),
   Array: (contractParameter: ContractParameter, parameter: ArrayABI): Return | undefined =>
     parameter.optional ? toArrayNullable(contractParameter, parameter) : toArray(contractParameter, parameter),
+  Map: (contractParameter: ContractParameter, parameter: MapABI): Return | undefined =>
+    parameter.optional ? toMapNullable(contractParameter, parameter) : toMap(contractParameter, parameter),
+  Object: (contractParameter: ContractParameter, parameter: ObjectABI): Return | undefined =>
+    parameter.optional ? toObjectNullable(contractParameter, parameter) : toObject(contractParameter, parameter),
   Void: (contractParameter: ContractParameter, parameter: VoidABI): Return | undefined =>
     parameter.optional ? toVoidNullable(contractParameter) : toVoid(contractParameter),
   ForwardValue: (contractParameter: ContractParameter, parameter: ForwardValueABI): Return | undefined =>
@@ -302,6 +358,10 @@ export const smartContractConverters = {
   toBufferNullable,
   toArray,
   toArrayNullable,
+  toMap,
+  toMapNullable,
+  toObject,
+  toObjectNullable,
   toInteropInterface,
   toInteropInterfaceNullable,
   toVoid,

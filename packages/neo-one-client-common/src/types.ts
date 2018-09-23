@@ -760,6 +760,30 @@ export interface ArrayABIReturn extends ABIReturnBase {
   readonly value: ABIReturn;
 }
 /**
+ * `Map` return type.
+ */
+export interface MapABIReturn extends ABIReturnBase {
+  readonly type: 'Map';
+  /**
+   * Key type of the `Map`.
+   */
+  readonly key: ABIReturn;
+  /**
+   * Value type of the `Map`.
+   */
+  readonly value: ABIReturn;
+}
+/**
+ * `Object` return type.
+ */
+export interface ObjectABIReturn extends ABIReturnBase {
+  readonly type: 'Object';
+  /**
+   * Properties of the `Object`.
+   */
+  readonly properties: { readonly [key: string]: ABIReturn };
+}
+/**
  * `ForwardValue` return type.
  */
 export interface ForwardValueABIReturn extends ABIReturnBase {
@@ -871,6 +895,20 @@ export interface IntegerABIParameter extends ABIParameterBase, IntegerABIReturn 
  */
 export interface ArrayABIParameter extends ABIParameterBase, ArrayABIReturn {}
 /**
+ * `Map` parameter type.
+ *
+ * @see ABIParameter
+ * @see MapABIReturn
+ */
+export interface MapABIParameter extends ABIParameterBase, MapABIReturn {}
+/**
+ * `Object` parameter type.
+ *
+ * @see ABIParameter
+ * @see ObjectABIReturn
+ */
+export interface ObjectABIParameter extends ABIParameterBase, ObjectABIReturn {}
+/**
  * `ForwardValue` parameter type.
  *
  * @see ABIParameter
@@ -890,6 +928,8 @@ export type ABIReturn =
   | PublicKeyABIReturn
   | StringABIReturn
   | ArrayABIReturn
+  | MapABIReturn
+  | ObjectABIReturn
   | VoidABIReturn
   | IntegerABIReturn
   | ForwardValueABIReturn;
@@ -905,11 +945,15 @@ export type ABIParameter =
   | PublicKeyABIParameter
   | StringABIParameter
   | ArrayABIParameter
+  | MapABIParameter
+  | ObjectABIParameter
   | VoidABIParameter
   | IntegerABIParameter
   | ForwardValueABIParameter;
 
 export type ArrayABI = ArrayABIParameter | ArrayABIReturn;
+export type MapABI = MapABIParameter | MapABIReturn;
+export type ObjectABI = ObjectABIParameter | ObjectABIReturn;
 export type SignatureABI = SignatureABIParameter | SignatureABIReturn;
 export type BooleanABI = BooleanABIParameter | BooleanABIReturn;
 export type AddressABI = AddressABIParameter | AddressABIReturn;
@@ -998,6 +1042,10 @@ export interface ForwardValue {
 }
 
 export interface ScriptBuilderParamArray extends Array<ScriptBuilderParam | undefined> {}
+export interface ScriptBuilderParamMap extends Map<ScriptBuilderParam | undefined, ScriptBuilderParam | undefined> {}
+export interface ScriptBuilderParamObject {
+  readonly [key: string]: ScriptBuilderParam;
+}
 export type ScriptBuilderParam =
   | BN
   | number
@@ -1007,9 +1055,15 @@ export type ScriptBuilderParam =
   | string
   | Buffer
   | boolean
-  | ScriptBuilderParamArray;
+  | ScriptBuilderParamArray
+  | ScriptBuilderParamMap
+  | ScriptBuilderParamObject;
 
 export interface ParamArray extends ReadonlyArray<Param> {}
+export interface ParamMap extends ReadonlyMap<Param, Param> {}
+export interface ParamObject {
+  readonly [key: string]: Param;
+}
 /**
  * Valid parameter types for a smart contract function.
  */
@@ -1022,8 +1076,14 @@ export type Param =
   | PublicKeyString
   | boolean
   | ParamArray
+  | ParamMap
+  | ParamObject
   | ForwardValue;
 export interface ReturnArray extends ReadonlyArray<Return> {}
+export interface ReturnMap extends ReadonlyMap<Return, Return> {}
+export interface ReturnObject {
+  readonly [key: string]: Return;
+}
 export type Return =
   | undefined
   | BigNumber
@@ -1033,6 +1093,8 @@ export type Return =
   | PublicKeyString
   | boolean
   | ReturnArray
+  | ReturnMap
+  | ReturnObject
   | ContractParameter;
 
 export type AssetType = 'Credit' | 'Duty' | 'Governing' | 'Utility' | 'Currency' | 'Share' | 'Invoice' | 'Token';
@@ -1241,6 +1303,16 @@ export interface ArrayContractParameter {
 }
 
 /**
+ * Invocation stack item for a `Map`.
+ *
+ * @see ContractParameter
+ */
+export interface MapContractParameter {
+  readonly type: 'Map';
+  readonly value: ReadonlyArray<[ContractParameter, ContractParameter]>;
+}
+
+/**
  * Invocation stack item for anything other than the other valid contract parameters.
  *
  * Examples include the `Block` builtin. If these builtins remain on the stack after invocation, for example, as a return value, then they will be serialized as this empty interface.
@@ -1275,6 +1347,7 @@ export type ContractParameter =
   | PublicKeyContractParameter
   | StringContractParameter
   | ArrayContractParameter
+  | MapContractParameter
   | InteropInterfaceContractParameter
   | VoidContractParameter;
 

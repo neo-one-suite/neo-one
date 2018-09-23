@@ -175,6 +175,8 @@ import {
   MapDeleteHelper,
   MapEveryHelper,
   MapEveryHelperOptions,
+  MapMapHelper,
+  MapMapHelperOptions,
   MapReduceHelper,
   MapReduceHelperOptions,
   MapSomeHelper,
@@ -635,6 +637,7 @@ export interface Helpers {
   // map
   readonly mapDelete: MapDeleteHelper;
   readonly mapEvery: (options: MapEveryHelperOptions) => MapEveryHelper;
+  readonly mapMap: (options: MapMapHelperOptions) => MapMapHelper;
   readonly mapReduce: (options: MapReduceHelperOptions) => MapReduceHelper;
   readonly mapSome: (options: MapSomeHelperOptions) => MapSomeHelper;
 
@@ -1048,6 +1051,7 @@ export const createHelpers = (): Helpers => {
     // map
     mapDelete: new MapDeleteHelper(),
     mapEvery: (options) => new MapEveryHelper(options),
+    mapMap: (options) => new MapMapHelper(options),
     mapReduce: (options) => new MapReduceHelper(options),
     mapSome: (options) => new MapSomeHelper(options),
 

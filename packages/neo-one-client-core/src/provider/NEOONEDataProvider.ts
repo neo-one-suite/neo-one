@@ -564,6 +564,8 @@ export class NEOONEDataProvider implements DeveloperProvider {
         return 'String';
       case 'Array':
         return 'Array';
+      case 'Map':
+        return 'Map';
       case 'InteropInterface':
         return 'InteropInterface';
       case 'Void':

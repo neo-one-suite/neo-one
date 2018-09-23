@@ -2,6 +2,7 @@ import { crypto, UInt160, utils, VMState } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
 import {
   Block,
+  ByteArrayContractParameter,
   ExecuteScriptsResult,
   ExecutionAction,
   Script,
@@ -34,6 +35,7 @@ import {
   UnknownError,
 } from './errors';
 import { lookupOp } from './opcodes';
+import { StackItem } from './stackItem';
 
 const getErrorMessage = (error: Error) => `${error.message}\n${error.stack}`;
 
@@ -253,6 +255,18 @@ export const executeScript = async ({
   });
 };
 
+const safeToContractParameter = (item: StackItem, safe: boolean) => {
+  if (safe) {
+    try {
+      return item.toContractParameter();
+    } catch {
+      return new ByteArrayContractParameter(Buffer.alloc(0, 0));
+    }
+  }
+
+  return item.toContractParameter();
+};
+
 export const execute = async ({
   monitor: monitorIn,
   scripts,
@@ -370,10 +384,13 @@ export const execute = async ({
     gasConsumed = utils.ZERO;
   }
 
+  const state = errorMessage === undefined ? finalContext.state : VMState.Fault;
+  const toContractParameter = (item: StackItem) => safeToContractParameter(item, state === VMState.Fault);
+
   return {
     state: errorMessage === undefined ? finalContext.state : VMState.Fault,
-    stack: finalContext.stack.map((item) => item.toContractParameter()),
-    stackAlt: finalContext.stackAlt.map((item) => item.toContractParameter()),
+    stack: finalContext.stack.map(toContractParameter),
+    stackAlt: finalContext.stackAlt.map(toContractParameter),
     gasConsumed,
     gasCost,
     errorMessage: errorMessage === undefined ? finalContext.errorMessage : errorMessage,

@@ -1,41 +1,41 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ABISmartContractProcessor invalid getter + setter 1`] = `
-"snippetCode.ts (20,9): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
+"snippetCode.ts (5,9): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
 
-      18 | 
-      19 | 
-    > 20 |         public get foo(): Foo {
-         |         ^
-      21 |           return new Foo();
-      22 |         }
-      23 | 
+      3 | 
+      4 |       class Foo {
+    > 5 |         doSomething() {
+        |         ^
+      6 |           // do nothing
+      7 |         }
+      8 |       }
 "
 `;
 
 exports[`ABISmartContractProcessor invalid getter 1`] = `
-"snippetCode.ts (16,9): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
+"snippetCode.ts (4,19): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
 
-      14 | 
-      15 | 
-    > 16 |         public get foo(): Foo {
-         |         ^
-      17 |           return new Foo();
-      18 |         }
-      19 |       }
+      2 |       import { SmartContract } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       class Foo { bar(): string { return ''; } }
+        |                   ^
+      5 | 
+      6 |       export class TestSmartContract extends SmartContract {
+      7 |         
 "
 `;
 
 exports[`ABISmartContractProcessor invalid method parameter 1`] = `
-"snippetCode.ts (16,21): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
+"snippetCode.ts (4,19): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
 
-      14 | 
-      15 | 
-    > 16 |         public test(value: Foo): void {
-         |                     ^
-      17 |           // do nothing
-      18 |         }
-      19 |       }
+      2 |       import { SmartContract } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       class Foo { bar(): string { return ''; } }
+        |                   ^
+      5 | 
+      6 |       export class TestSmartContract extends SmartContract {
+      7 |         
 "
 `;
 
@@ -53,28 +53,28 @@ exports[`ABISmartContractProcessor invalid method return - union 1`] = `
 `;
 
 exports[`ABISmartContractProcessor invalid method return 1`] = `
-"snippetCode.ts (16,9): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
+"snippetCode.ts (4,19): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
 
-      14 | 
-      15 | 
-    > 16 |         public test(): Foo {
-         |         ^
-      17 |           // do nothing
-      18 |         }
-      19 |       }
+      2 |       import { SmartContract } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       class Foo { bar(): string { return ''; } }
+        |                   ^
+      5 | 
+      6 |       export class TestSmartContract extends SmartContract {
+      7 |         
 "
 `;
 
 exports[`ABISmartContractProcessor invalid setter 1`] = `
-"snippetCode.ts (20,9): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
+"snippetCode.ts (5,9): Invalid SmartContract type. See <insert_url> for valid parameter and return types.
 
-      18 | 
-      19 | 
-    > 20 |         public set foo(value: Foo): void {
-         |         ^
-      21 |           value.doSomething();
-      22 |         }
-      23 |       }
+      3 | 
+      4 |       class Foo {
+    > 5 |         doSomething() {
+        |         ^
+      6 |           // do nothing
+      7 |         }
+      8 |       }
 "
 `;
 

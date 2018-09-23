@@ -58,3 +58,31 @@ export interface TokenSmartContract<TClient extends Client = Client> extends Sma
 ",
 }
 `;
+
+exports[`genSmartContractTypes Object 1`] = `
+Object {
+  "ts": "import { Client, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+
+export type TokenEvent = never
+
+export interface TokenSmartContract<TClient extends Client = Client> extends SmartContract<TClient, TokenEvent> {
+  readonly foo: {
+  (bar: {
+      readonly 'baz': {
+      readonly 'qux': string
+    }
+    }, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<undefined, TokenEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (bar: {
+      readonly 'baz': {
+      readonly 'qux': string
+    }
+    }, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<undefined, TokenEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+}
+`;

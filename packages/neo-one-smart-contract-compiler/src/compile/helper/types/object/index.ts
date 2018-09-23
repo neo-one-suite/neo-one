@@ -34,3 +34,4 @@ export * from './SetSymbolObjectPropertyHelper';
 export * from './ToObjectHelper';
 export * from './UnwrapObjectHelper';
 export * from './WrapObjectHelper';
+export * from './typeTests';

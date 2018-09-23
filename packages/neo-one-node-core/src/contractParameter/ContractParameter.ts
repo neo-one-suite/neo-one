@@ -15,6 +15,7 @@ import { Hash160ContractParameter } from './Hash160ContractParameter';
 import { Hash256ContractParameter } from './Hash256ContractParameter';
 import { IntegerContractParameter } from './IntegerContractParameter';
 import { InteropInterfaceContractParameter } from './InteropInterfaceContractParameter';
+import { MapContractParameter } from './MapContractParameter';
 import { PublicKeyContractParameter } from './PublicKeyContractParameter';
 import { SignatureContractParameter } from './SignatureContractParameter';
 import { StringContractParameter } from './StringContractParameter';
@@ -30,6 +31,7 @@ export type ContractParameter =
   | PublicKeyContractParameter
   | StringContractParameter
   | ArrayContractParameter
+  | MapContractParameter
   | InteropInterfaceContractParameter
   | VoidContractParameter;
 
@@ -56,6 +58,9 @@ export const deserializeContractParameterWireBase = (options: DeserializeWireBas
     case ContractParameterType.Array:
       // tslint:disable-next-line
       return (ArrayContractParameter as any).deserializeWireBase(options);
+    case ContractParameterType.Map:
+      // tslint:disable-next-line
+      return (MapContractParameter as any).deserializeWireBase(options);
     case ContractParameterType.InteropInterface:
       return InteropInterfaceContractParameter.deserializeWireBase(options);
     case ContractParameterType.Void:
@@ -86,4 +91,25 @@ export const deserializeWire = createDeserializeWire(deserializeContractParamete
 }).deserializeWire = createDeserializeWire(
   // tslint:disable-next-line no-any
   (ArrayContractParameter as any).deserializeWireBase.bind(ArrayContractParameter),
+);
+
+// tslint:disable-next-line no-object-mutation readonly-keyword
+(MapContractParameter as { deserializeWireBase?: DeserializeWireBase<ContractParameterBase> }).deserializeWireBase = (
+  options,
+): MapContractParameter => {
+  const { reader } = options;
+  reader.readUInt8();
+  const value = reader.readArray(() => reader.readArray(() => deserializeContractParameterWireBase(options)));
+
+  // tslint:disable-next-line no-any
+  return new MapContractParameter(value as any);
+};
+
+// tslint:disable-next-line no-object-mutation
+(MapContractParameter as {
+  // tslint:disable-next-line readonly-keyword
+  deserializeWire?: DeserializeWire<ContractParameterBase>;
+}).deserializeWire = createDeserializeWire(
+  // tslint:disable-next-line no-any
+  (MapContractParameter as any).deserializeWireBase.bind(MapContractParameter),
 );

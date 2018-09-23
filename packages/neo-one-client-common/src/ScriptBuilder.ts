@@ -119,6 +119,10 @@ export class ScriptBuilder {
       return this.emitPushArray(param);
     }
 
+    if (param instanceof Map) {
+      return this.emitPushMap(param);
+    }
+
     if (common.isUInt160(param)) {
       return this.emitPushUInt160(common.asUInt160(param));
     }
@@ -147,6 +151,11 @@ export class ScriptBuilder {
       return this.emitPush(param);
     }
 
+    // tslint:disable-next-line strict-type-predicates
+    if (typeof param === 'object') {
+      return this.emitPushObject(param);
+    }
+
     throw new InvalidParamError(typeof param);
   }
 
@@ -165,6 +174,30 @@ export class ScriptBuilder {
     this.emitPushParam(params.length);
 
     return this.emitOp('PACK');
+  }
+
+  public emitPushMap(params: ReadonlyMap<ScriptBuilderParam | undefined, ScriptBuilderParam | undefined>): this {
+    this.emitOp('NEWMAP');
+    params.forEach((value, key) => {
+      this.emitOp('DUP');
+      this.emitPushParam(key);
+      this.emitPushParam(value);
+      this.emitOp('SETITEM');
+    });
+
+    return this;
+  }
+
+  public emitPushObject(params: { readonly [key: string]: ScriptBuilderParam | undefined }): this {
+    this.emitOp('NEWMAP');
+    Object.entries(params).forEach(([key, value]) => {
+      this.emitOp('DUP');
+      this.emitPushParam(key);
+      this.emitPushParam(value);
+      this.emitOp('SETITEM');
+    });
+
+    return this;
   }
 
   // tslint:disable-next-line readonly-array

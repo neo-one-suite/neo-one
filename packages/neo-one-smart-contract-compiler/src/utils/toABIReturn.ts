@@ -2,7 +2,15 @@ import { ABIReturn } from '@neo-one/client';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DEFAULT_DIAGNOSTIC_OPTIONS, DiagnosticOptions } from '../analysis';
-import { isOnlyArray, isOnlyBoolean, isOnlyBuffer, isOnlyForwardValue, isOnlyString } from '../compile/helper/types';
+import {
+  isOnlyArray,
+  isOnlyBoolean,
+  isOnlyBuffer,
+  isOnlyForwardValue,
+  isOnlyMap,
+  isOnlyObject,
+  isOnlyString,
+} from '../compile/helper/types';
 import { Context } from '../Context';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
@@ -95,12 +103,51 @@ export function toABIReturn(
     }
   }
 
+  if (isOnlyMap(context, node, resolvedType)) {
+    const typeArguments = tsUtils.type_.getTypeArguments(resolvedType);
+    if (typeArguments !== undefined && typeArguments.length === 2) {
+      const key = toABIReturn(context, node, typeArguments[0]);
+      const value = toABIReturn(context, node, typeArguments[1]);
+      if (key !== undefined && value !== undefined) {
+        return { type: 'Map', optional, key, value };
+      }
+    }
+  }
+
   if (isOnlyBuffer(context, node, resolvedType)) {
     return { type: 'Buffer', optional, forwardedValue };
   }
 
   if (isOnlyForwardValue(context, node, resolvedType)) {
     return { type: 'ForwardValue', optional, forwardedValue };
+  }
+
+  if (isOnlyObject(context, node, resolvedType)) {
+    const properties = tsUtils.type_.getProperties(resolvedType).reduce<{ [key: string]: ABIReturn }>((acc, prop) => {
+      const propType = context.analysis.getTypeOfSymbol(prop, node);
+      const decls = tsUtils.symbol.getDeclarations(prop);
+      const nextNode = decls.length === 0 ? node : decls[0];
+      if (!ts.isPropertyDeclaration(nextNode) && !ts.isPropertySignature(nextNode)) {
+        if (options.error) {
+          context.reportError(nextNode, DiagnosticCode.InvalidContractType, DiagnosticMessage.InvalidContractType);
+        } else if (options.warning) {
+          context.reportWarning(nextNode, DiagnosticCode.InvalidContractType, DiagnosticMessage.InvalidContractType);
+        }
+
+        return acc;
+      }
+
+      const returnType = toABIReturn(context, nextNode, propType);
+
+      return returnType === undefined ? acc : { ...acc, [tsUtils.symbol.getName(prop)]: returnType };
+    }, {});
+
+    return {
+      type: 'Object',
+      optional,
+      forwardedValue,
+      properties,
+    };
   }
 
   if (options.error) {

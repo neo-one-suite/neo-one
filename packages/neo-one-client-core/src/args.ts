@@ -145,6 +145,30 @@ export const assertNullableArray = (name: string, value?: unknown): ReadonlyArra
   return assertArray(name, value);
 };
 
+export const assertMap = (name: string, value?: unknown): ReadonlyMap<unknown, unknown> => {
+  if (!(value instanceof Map)) {
+    throw new InvalidArgumentError('Map', name, value);
+  }
+
+  return value;
+};
+
+export const assertObject = (name: string, value?: unknown): { readonly [key: string]: unknown } => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('Object', name, value);
+  }
+
+  return value;
+};
+
+export const assertNullableMap = (name: string, value?: unknown): ReadonlyMap<unknown, unknown> => {
+  if (value == undefined) {
+    return new Map();
+  }
+
+  return assertMap(name, value);
+};
+
 export const isObject = (value?: unknown): value is object => value != undefined && typeof value === 'object';
 export const assertProperty = <T, Name extends string, P>(
   value: T,
@@ -197,6 +221,8 @@ const ABI_TYPES = new Set([
   'PublicKey',
   'String',
   'Array',
+  'Map',
+  'Object',
   'Void',
   'Integer',
   'ForwardValue',
@@ -210,6 +236,14 @@ const assertABIType = (name: string, valueIn?: unknown): ABIReturn['type'] => {
   }
 
   return value as ABIReturn['type'];
+};
+
+const assertABIProperties = (name: string, value?: unknown): { readonly [key: string]: ABIReturn } => {
+  if (!isObject(value)) {
+    throw new InvalidArgumentError('ABIReturn', name, value);
+  }
+
+  return _.fromPairs(Object.entries(value).map(([k, v]) => [assertString(name, k), assertABIReturn(name, v)]));
 };
 
 const assertABIReturn = (name: string, value?: unknown): ABIReturn => {
@@ -237,6 +271,21 @@ const assertABIReturn = (name: string, value?: unknown): ABIReturn => {
       return { type, optional, forwardedValue };
     case 'Array':
       return { type, value: assertProperty(value, 'ABIReturn', 'value', assertABIReturn), optional, forwardedValue };
+    case 'Map':
+      return {
+        type,
+        key: assertProperty(value, 'ABIReturn', 'key', assertABIReturn),
+        value: assertProperty(value, 'ABIReturn', 'value', assertABIReturn),
+        optional,
+        forwardedValue,
+      };
+    case 'Object':
+      return {
+        type,
+        properties: assertProperty(value, 'ABIReturn', 'properties', assertABIProperties),
+        optional,
+        forwardedValue,
+      };
     case 'Void':
       return { type, optional, forwardedValue };
     case 'Integer':
@@ -313,6 +362,27 @@ const assertABIParameter = (propName: string, value?: unknown): ABIParameter => 
         optional,
         default: defaultValue,
         value: assertProperty(value, 'ABIParameter', 'value', assertABIReturn),
+        forwardedValue,
+        rest,
+      };
+    case 'Map':
+      return {
+        type,
+        name,
+        optional,
+        default: defaultValue,
+        key: assertProperty(value, 'ABIParameter', 'key', assertABIReturn),
+        value: assertProperty(value, 'ABIParameter', 'value', assertABIReturn),
+        forwardedValue,
+        rest,
+      };
+    case 'Object':
+      return {
+        type,
+        name,
+        optional,
+        default: defaultValue,
+        properties: assertProperty(value, 'ABIParameter', 'properties', assertABIProperties),
         forwardedValue,
         rest,
       };

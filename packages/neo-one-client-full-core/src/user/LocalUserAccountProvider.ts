@@ -71,6 +71,8 @@ const toContractParameterType = (parameter: ContractParameterType): ContractPara
       return ContractParameterTypeModel.String;
     case 'Array':
       return ContractParameterTypeModel.Array;
+    case 'Map':
+      return ContractParameterTypeModel.Map;
     case 'InteropInterface':
       return ContractParameterTypeModel.InteropInterface;
     case 'Void':

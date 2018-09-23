@@ -102,6 +102,8 @@ describe('ForwardValue', () => {
           publicKeyNullable: ForwardValue,
           array: ForwardValue,
           arrayNullable: ForwardValue,
+          map: ForwardValue,
+          mapNullable: ForwardValue,
         ): boolean {
           assertEqual(str.asString(), 'foo');
           assertEqual(strNullable.asStringNullable(), 'foo');
@@ -119,6 +121,11 @@ describe('ForwardValue', () => {
           assertEqual(array.asArray().length, 2);
           assertEqual(array.asArray()[0] instanceof ForwardValue, true);
           assertEqual(arrayNullable.asArrayNullable(), undefined);
+          assertEqual(map.asMap().size, 2);
+          map.asMap().forEach((value, key) => {
+            assertEqual(map.asMap().get(key) instanceof ForwardValue, true);
+          })
+          assertEqual(mapNullable.asMapNullable(), undefined);
 
           return true;
         }
@@ -146,6 +153,8 @@ describe('ForwardValue', () => {
           publicKeyNullable: PublicKey | undefined,
           array: Array<number>,
           arrayNullable: Array<number> | undefined,
+          map: Map<string, number>,
+          mapNullable: Map<string, number> | undefined,
         ) => boolean;
       }
       const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
@@ -166,7 +175,9 @@ describe('ForwardValue', () => {
         PublicKey.from('${keys[0].publicKeyString}'),
         undefined,
         [1, 2],
-        undefined
+        undefined,
+        new Map<string, number>().set('foo', 1).set('bar', 2),
+        undefined,
       ), true);
     `);
   });

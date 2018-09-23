@@ -28,6 +28,19 @@ export const toTypeScriptType = (
       return addOptional('string');
     case 'Array':
       return addOptional(`Array<${toTypeScriptType(abi.value, { isParameter })}>`);
+    case 'Map':
+      return addOptional(
+        `Map<${toTypeScriptType(abi.key, { isParameter })}, ${toTypeScriptType(abi.value, { isParameter })}>`,
+      );
+    case 'Object':
+      return addOptional(`{
+      ${Object.entries(abi.properties)
+        .reduce<ReadonlyArray<string>>(
+          (acc, [key, val]) => acc.concat([`readonly '${key}': ${toTypeScriptType(val, { isParameter })}`]),
+          [],
+        )
+        .join('\n')}
+    }`);
     case 'Void':
       return 'undefined';
     case 'Integer':

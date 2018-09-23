@@ -1092,6 +1092,8 @@ export interface ForwardValue {
   readonly asPublicKeyNullable: () => PublicKey | undefined;
   readonly asArray: () => Array<ForwardValue>;
   readonly asArrayNullable: () => Array<ForwardValue> | undefined;
+  readonly asMap: () => Map<ForwardValue, ForwardValue>;
+  readonly asMapNullable: () => Map<ForwardValue, ForwardValue> | undefined;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface ForwardValueConstructor {
@@ -1106,7 +1108,14 @@ interface ForwardedValueTag<T extends SmartContractValue> {}
 export type ForwardedValue<T extends SmartContractValue> = T | (T & ForwardedValueTag<T>);
 
 interface SmartContractValueArray extends Array<SmartContractValue> {}
-interface SmartContractValueReadonlyArray extends ReadonlyArray<SmartContractValue> {}
+interface SmartContractValueReadonlyArray<Value extends SmartContractValue = any> extends ReadonlyArray<Value> {}
+interface SmartContractValueMap<Key extends SmartContractValue = any, Value extends SmartContractValue = any>
+  extends Map<Key, Value> {}
+interface SmartContractValueReadonlyMap<Key extends SmartContractValue = any, Value extends SmartContractValue = any>
+  extends ReadonlyMap<Key, Value> {}
+interface SmartContractValueObject {
+  readonly [key: string]: SmartContractValue;
+}
 type SmartContractValue =
   | void
   | null
@@ -1120,7 +1129,10 @@ type SmartContractValue =
   | Hash256
   | PublicKey
   | SmartContractValueArray
-  | SmartContractValueReadonlyArray;
+  | SmartContractValueReadonlyArray
+  | SmartContractValueMap
+  | SmartContractValueReadonlyMap
+  | SmartContractValueObject;
 type SmartContractArg = SmartContractValue | ForwardValue;
 type IsValidSmartContract<T> = {
   [K in keyof T]: T[K] extends Function

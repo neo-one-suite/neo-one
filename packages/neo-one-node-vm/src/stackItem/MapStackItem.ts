@@ -1,10 +1,10 @@
 // tslint:disable readonly-array
 import { BinaryWriter } from '@neo-one/client-common';
-import { ContractParameter, InteropInterfaceContractParameter } from '@neo-one/node-core';
+import { ContractParameter, MapContractParameter } from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import { ArrayStackItem } from './ArrayStackItem';
-import { InvalidValueBufferError, MissingStackItemKeyError } from './errors';
+import { CircularReferenceError, InvalidValueBufferError, MissingStackItemKeyError } from './errors';
 import { getNextID } from './referenceCounter';
 import { StackItem } from './StackItem';
 import { StackItemBase } from './StackItemBase';
@@ -44,8 +44,19 @@ export class MapStackItem extends StackItemBase {
     throw new InvalidValueBufferError();
   }
 
-  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
-    return new InteropInterfaceContractParameter();
+  public toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
+    if (seen.has(this)) {
+      throw new CircularReferenceError();
+    }
+    const newSeen = new Set([...seen]);
+    newSeen.add(this);
+
+    return new MapContractParameter(
+      this.keysArray().map<[ContractParameter, ContractParameter]>((key) => [
+        key.toContractParameter(newSeen),
+        this.get(key).toContractParameter(newSeen),
+      ]),
+    );
   }
 
   public get size(): number {

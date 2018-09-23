@@ -79,6 +79,7 @@ const CONTRACT_PARAMETER_TYPES = new Set([
   'PublicKey',
   'String',
   'Array',
+  'Map',
   'InteropInterface',
   'Void',
 ]);

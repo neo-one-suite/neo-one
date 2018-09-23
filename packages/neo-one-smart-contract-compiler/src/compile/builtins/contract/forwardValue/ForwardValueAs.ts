@@ -41,6 +41,22 @@ export class ForwardValueAs extends BuiltinInstanceMemberCall {
           }),
         );
       }
+
+      if (this.type === Types.Map) {
+        // [map]
+        sb.emitHelper(
+          node,
+          options,
+          sb.helpers.mapMap({
+            map: (innerOptions) => {
+              sb.emitHelper(node, innerOptions, sb.helpers.wrapForwardValue);
+              sb.emitOp(node, 'SWAP');
+              sb.emitHelper(node, innerOptions, sb.helpers.wrapForwardValue);
+              sb.emitOp(node, 'SWAP');
+            },
+          }),
+        );
+      }
       // [val]
       sb.emitHelper(node, options, sb.helpers.wrapVal({ type: this.type }));
     };
