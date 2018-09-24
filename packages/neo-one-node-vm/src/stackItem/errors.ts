@@ -78,3 +78,7 @@ export const InvalidRecursiveSerializeError = makeErrorWithCode(
   'INVALID_RECURSIVE_SERIALIZE',
   () => 'Attempted to serialize a recursive structure.',
 );
+export const IntegerTooLargeError = makeErrorWithCode(
+  'INTEGER_TOO_LARGE',
+  () => 'Integer too large. Max size is 256 bits.',
+);

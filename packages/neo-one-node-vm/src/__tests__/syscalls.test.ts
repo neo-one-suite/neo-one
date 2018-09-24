@@ -397,7 +397,7 @@ const SYSCALLS = [
     mock: ({ blockchain }) => {
       blockchain.transactionData.get = jest.fn(async () => Promise.resolve({ startHeight: 10 }));
     },
-    gas: FEES.ONE,
+    gas: FEES.ONE_HUNDRED,
   },
 
   {
@@ -2742,7 +2742,7 @@ describe('syscalls', () => {
       const result: { [key: string]: any } = {};
       // tslint:disable-next-line no-loop-statement
       for (const [key, val] of Object.entries(value)) {
-        if (key !== 'referenceID') {
+        if (key !== 'referenceID' && key !== 'mutableCount') {
           result[key] = filterMethods(val);
         }
       }
@@ -2856,7 +2856,7 @@ describe('syscalls', () => {
         // tslint:disable-next-line no-any
         const expectedResult = (result as any)({ transaction });
         if (Array.isArray(expectedResult)) {
-          expect(context.stack).toEqual(expectedResult);
+          expect(filterMethods(context.stack)).toEqual(filterMethods(expectedResult));
         } else {
           expectedResult(context.stack);
         }

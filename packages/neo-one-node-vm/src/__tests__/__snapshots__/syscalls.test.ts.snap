@@ -1476,6 +1476,7 @@ exports[`syscalls Neo.Storage.Delete 6`] = `Array []`;
 exports[`syscalls Neo.Storage.Find 1`] = `
 Array [
   IteratorStackItem {
+    "mutableCount": 1,
     "referenceID": 31,
     "value": StackItemIterator {
       "enumerator": Object {

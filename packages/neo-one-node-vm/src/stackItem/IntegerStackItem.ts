@@ -1,7 +1,8 @@
 import { BinaryWriter, utils } from '@neo-one/client-common';
 import { ContractParameter, IntegerContractParameter } from '@neo-one/node-core';
 import BN from 'bn.js';
-import { InvalidValueStorageContextStackItemError } from './errors';
+import { MAX_SIZE_BIG_INTEGER } from '../constants';
+import { IntegerTooLargeError, InvalidValueStorageContextStackItemError } from './errors';
 import { AsStorageContextStackItemOptions, StackItemBase } from './StackItemBase';
 import { StackItemType } from './StackItemType';
 import { StorageContextStackItem } from './StorageContextStackItem';
@@ -12,6 +13,10 @@ export class IntegerStackItem extends StackItemBase {
   public constructor(value: BN) {
     super();
     this.value = value;
+
+    if (this.asBuffer().length > MAX_SIZE_BIG_INTEGER) {
+      throw new IntegerTooLargeError();
+    }
   }
 
   public asBigInteger(): BN {

@@ -29,10 +29,20 @@ import { map as asyncMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map
 import BN from 'bn.js';
 import { defer } from 'rxjs';
 import { concatMap, map, toArray } from 'rxjs/operators';
-import { BLOCK_HEIGHT_YEAR, ExecutionContext, FEES, MAX_VOTES, OpInvoke, OpInvokeArgs, SysCall } from './constants';
+import {
+  BLOCK_HEIGHT_YEAR,
+  ExecutionContext,
+  FEES,
+  MAX_ARRAY_SIZE,
+  MAX_ITEM_SIZE,
+  OpInvoke,
+  OpInvokeArgs,
+  SysCall,
+} from './constants';
 import {
   AccountFrozenError,
   BadWitnessCheckError,
+  ContainerTooLargeError,
   ContractNoStorageError,
   InvalidAssetTypeError,
   InvalidClaimTransactionError,
@@ -41,9 +51,9 @@ import {
   InvalidGetHeaderArgumentsError,
   InvalidIndexError,
   InvalidInvocationTransactionError,
+  ItemTooLargeError,
   NotEligibleVoteError,
   StackUnderflowError,
-  TooManyVotesError,
   UnexpectedScriptContainerError,
   UnknownSysCallError,
 } from './errors';
@@ -86,11 +96,7 @@ export const createSysCall = ({
   inAlt = 0,
   out = 0,
   outAlt = 0,
-  modify = 0,
-  modifyAlt = 0,
   invocation = 0,
-  array = 0,
-  item = 0,
   fee = FEES.ONE,
   invoke,
 }: {
@@ -99,11 +105,7 @@ export const createSysCall = ({
   readonly inAlt?: number;
   readonly out?: number;
   readonly outAlt?: number;
-  readonly modify?: number;
-  readonly modifyAlt?: number;
   readonly invocation?: number;
-  readonly array?: number;
-  readonly item?: number;
   readonly fee?: BN;
   readonly invoke: OpInvoke;
 }): CreateSysCall => ({ context }) => ({
@@ -113,11 +115,7 @@ export const createSysCall = ({
   inAlt,
   out,
   outAlt,
-  modify,
-  modifyAlt,
   invocation,
-  array,
-  item,
   fee,
   invoke,
 });
@@ -390,6 +388,10 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
     invoke: async ({ context, args }) => {
       const serialized = args[0].serialize();
 
+      if (serialized.length > MAX_ITEM_SIZE) {
+        throw new ItemTooLargeError(context);
+      }
+
       return { context, results: [new BufferStackItem(serialized)] };
     },
   }),
@@ -476,6 +478,7 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
     name: 'Neo.Blockchain.GetTransactionHeight',
     in: 1,
     out: 1,
+    fee: FEES.ONE_HUNDRED,
     invoke: async ({ context, args }) => {
       const transactionData = await context.blockchain.transactionData.get({
         hash: args[0].asUInt256(),
@@ -653,12 +656,20 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
     name: 'Neo.Block.GetTransactions',
     in: 1,
     out: 1,
-    invoke: ({ context, args }) => ({
-      context,
-      results: [
-        new ArrayStackItem(args[0].asBlock().transactions.map((transaction) => new TransactionStackItem(transaction))),
-      ],
-    }),
+    invoke: ({ context, args }) => {
+      if (args[0].asBlock().transactions.length > MAX_ARRAY_SIZE) {
+        throw new ContainerTooLargeError(context);
+      }
+
+      return {
+        context,
+        results: [
+          new ArrayStackItem(
+            args[0].asBlock().transactions.map((transaction) => new TransactionStackItem(transaction)),
+          ),
+        ],
+      };
+    },
   }),
 
   'Neo.Block.GetTransaction': createSysCall({
@@ -697,32 +708,50 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
     name: 'Neo.Transaction.GetAttributes',
     in: 1,
     out: 1,
-    invoke: ({ context, args }) => ({
-      context,
-      results: [
-        new ArrayStackItem(args[0].asTransaction().attributes.map((attribute) => new AttributeStackItem(attribute))),
-      ],
-    }),
+    invoke: ({ context, args }) => {
+      if (args[0].asTransaction().attributes.length > MAX_ARRAY_SIZE) {
+        throw new ContainerTooLargeError(context);
+      }
+
+      return {
+        context,
+        results: [
+          new ArrayStackItem(args[0].asTransaction().attributes.map((attribute) => new AttributeStackItem(attribute))),
+        ],
+      };
+    },
   }),
 
   'Neo.Transaction.GetInputs': createSysCall({
     name: 'Neo.Transaction.GetInputs',
     in: 1,
     out: 1,
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new ArrayStackItem(args[0].asTransaction().inputs.map((input) => new InputStackItem(input)))],
-    }),
+    invoke: ({ context, args }) => {
+      if (args[0].asTransaction().inputs.length > MAX_ARRAY_SIZE) {
+        throw new ContainerTooLargeError(context);
+      }
+
+      return {
+        context,
+        results: [new ArrayStackItem(args[0].asTransaction().inputs.map((input) => new InputStackItem(input)))],
+      };
+    },
   }),
 
   'Neo.Transaction.GetOutputs': createSysCall({
     name: 'Neo.Transaction.GetOutputs',
     in: 1,
     out: 1,
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new ArrayStackItem(args[0].asTransaction().outputs.map((output) => new OutputStackItem(output)))],
-    }),
+    invoke: ({ context, args }) => {
+      if (args[0].asTransaction().outputs.length > MAX_ARRAY_SIZE) {
+        throw new ContainerTooLargeError(context);
+      }
+
+      return {
+        context,
+        results: [new ArrayStackItem(args[0].asTransaction().outputs.map((output) => new OutputStackItem(output)))],
+      };
+    },
   }),
 
   'Neo.Transaction.GetReferences': createSysCall({
@@ -731,6 +760,10 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
     out: 1,
     fee: FEES.TWO_HUNDRED,
     invoke: async ({ context, args }) => {
+      if (args[0].asTransaction().inputs.length > MAX_ARRAY_SIZE) {
+        throw new ContainerTooLargeError(context);
+      }
+
       const outputs = await args[0].asTransaction().getReferences({
         getOutput: context.blockchain.output.get,
       });
@@ -763,6 +796,10 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
         outputs = transaction.outputs
           .filter((_output, idx) => (spentCoins.endHeights[idx] as number | undefined) === undefined)
           .map((output) => new OutputStackItem(output));
+      }
+
+      if (outputs.length > MAX_ARRAY_SIZE) {
+        throw new ContainerTooLargeError(context);
       }
 
       return {
@@ -1222,10 +1259,6 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
       // build of the chain
       const address = args[0].asAccount().hash;
       const votes = args[1].asArray().map((vote) => vote.asECPoint());
-      if (votes.length > MAX_VOTES) {
-        throw new TooManyVotesError(context);
-      }
-
       const account = await context.blockchain.account.get({ hash: address });
       const asset = context.blockchain.settings.governingToken.hashHex;
       const currentBalance = account.balances[asset];
@@ -1590,6 +1623,35 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
 export const SYSCALL_ALIASES: { readonly [key: string]: string | undefined } = {
   'Neo.Iterator.Next': 'Neo.Enumerator.Next',
   'Neo.Iterator.Value': 'Neo.Enumerator.Value',
+  'System.Runtime.GetTrigger': 'Neo.Runtime.GetTrigger',
+  'System.Runtime.CheckWitness': 'Neo.Runtime.CheckWitness',
+  'System.Runtime.Notify': 'Neo.Runtime.Notify',
+  'System.Runtime.Log': 'Neo.Runtime.Log',
+  'System.Runtime.GetTime': 'Neo.Runtime.GetTime',
+  'System.Runtime.Serialize': 'Neo.Runtime.Serialize',
+  'System.Runtime.Deserialize': 'Neo.Runtime.Deserialize',
+  'System.Blockchain.GetHeight': 'Neo.Blockchain.GetHeight',
+  'System.Blockchain.GetHeader': 'Neo.Blockchain.GetHeader',
+  'System.Blockchain.GetBlock': 'Neo.Blockchain.GetBlock',
+  'System.Blockchain.GetTransaction': 'Neo.Blockchain.GetTransaction',
+  'System.Blockchain.GetTransactionHeight': 'Neo.Blockchain.GetTransactionHeight',
+  'System.Blockchain.GetContract': 'Neo.Blockchain.GetContract',
+  'System.Header.GetIndex': 'Neo.Header.GetIndex',
+  'System.Header.GetHash': 'Neo.Header.GetHash',
+  'System.Header.GetPrevHash': 'Neo.Header.GetPrevHash',
+  'System.Header.GetTimestamp': 'Neo.Header.GetTimestamp',
+  'System.Block.GetTransactionCount': 'Neo.Block.GetTransactionCount',
+  'System.Block.GetTransactions': 'Neo.Block.GetTransactions',
+  'System.Block.GetTransaction': 'Neo.Block.GetTransaction',
+  'System.Transaction.GetHash': 'Neo.Transaction.GetHash',
+  'System.Contract.Destroy': 'Neo.Contract.Destroy',
+  'System.Contract.GetStorageContext': 'Neo.Contract.GetStorageContext',
+  'System.Storage.GetContext': 'Neo.Storage.GetContext',
+  'System.Storage.GetReadOnlyContext': 'Neo.Storage.GetReadOnlyContext',
+  'System.Storage.Get': 'Neo.Storage.Get',
+  'System.Storage.Put': 'Neo.Storage.Put',
+  'System.Storage.Delete': 'Neo.Storage.Delete',
+  'System.StorageContext.AsReadOnly': 'Neo.StorageContext.AsReadOnly',
   'AntShares.Runtime.CheckWitness': 'Neo.Runtime.CheckWitness',
   'AntShares.Runtime.Notify': 'Neo.Runtime.Notify',
   'AntShares.Runtime.Log': 'Neo.Runtime.Log',

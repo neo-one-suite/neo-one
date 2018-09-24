@@ -1576,6 +1576,36 @@ const monitor = DefaultMonitor.create({
 });
 
 describe('opcodes', () => {
+  // tslint:disable-next-line no-any
+  const filterMethods = (value: any): any => {
+    if (value == undefined) {
+      return value;
+    }
+
+    if (Array.isArray(value)) {
+      return value.map(filterMethods);
+    }
+
+    if (typeof value === 'function') {
+      return undefined;
+    }
+
+    if (typeof value === 'object') {
+      // tslint:disable-next-line no-any
+      const result: { [key: string]: any } = {};
+      // tslint:disable-next-line no-loop-statement
+      for (const [key, val] of Object.entries(value)) {
+        if (key !== 'referenceID' && key !== 'mutableCount') {
+          result[key] = filterMethods(val);
+        }
+      }
+
+      return result;
+    }
+
+    return value;
+  };
+
   for (const testCase of OPCODES) {
     const {
       op,
@@ -1694,13 +1724,11 @@ describe('opcodes', () => {
 
       expect(context.errorMessage).toBeUndefined();
       if (resultAlt) {
-        expect(context.stackAlt).toEqual(resultAlt);
+        expect(filterMethods(context.stackAlt)).toEqual(filterMethods(resultAlt));
       }
 
       if (stackItems.length && ref) {
-        const { referenceID: _refReferenceID, ...restRef } = ref as any;
-        const { referenceID: _resultReferenceID, ...restOther } = result[0] as any;
-        expect(restRef).toEqual(restOther);
+        expect(filterMethods(ref)).toEqual(filterMethods(result[0]));
       } else {
         expect(context.stack.length).toEqual(result.length);
         for (const [idx, item] of context.stack.entries()) {
@@ -1708,9 +1736,7 @@ describe('opcodes', () => {
           if (item instanceof IntegerStackItem && resultItem instanceof IntegerStackItem) {
             expect(item.asBigInteger().toString(10)).toEqual(resultItem.asBigInteger().toString(10));
           } else {
-            const { referenceID: _itemReferenceID, ...restItem } = item as any;
-            const { referenceID: _resultItemReferenceID, ...restResultItem } = resultItem as any;
-            expect(restItem).toEqual(restResultItem);
+            expect(filterMethods(item)).toEqual(filterMethods(resultItem));
           }
         }
       }

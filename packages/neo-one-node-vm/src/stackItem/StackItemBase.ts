@@ -16,8 +16,10 @@ import {
   VMSettings,
 } from '@neo-one/node-core';
 import BN from 'bn.js';
+import { MAX_SIZE_BIG_INTEGER } from '../constants';
 import { AttributeStackItem } from './AttributeStackItem';
 import {
+  IntegerTooLargeError,
   InvalidRecursiveSerializeError,
   InvalidValueAccountError,
   InvalidValueArrayError,
@@ -53,6 +55,40 @@ export interface AsStorageContextStackItemOptions {
 }
 
 export class StackItemBase implements Equatable {
+  private mutableCount = 0;
+
+  public get referenceCount(): number {
+    return this.mutableCount;
+  }
+
+  public increment(seen = new Set<StackItemBase>()): number {
+    if (seen.has(this)) {
+      return 1;
+    }
+    seen.add(this);
+    this.mutableCount += 1;
+
+    if (this.mutableCount > 1) {
+      return 1;
+    }
+
+    return this.incrementInternal(seen) + 1;
+  }
+
+  public decrement(seen = new Set<StackItemBase>()): number {
+    if (seen.has(this)) {
+      return -1;
+    }
+    seen.add(this);
+    this.mutableCount -= 1;
+
+    if (this.mutableCount >= 1) {
+      return -1;
+    }
+
+    return this.decrementInternal(seen) - 1;
+  }
+
   public toStructuralKey(): string {
     return this.asBuffer().toString('hex');
   }
@@ -94,7 +130,12 @@ export class StackItemBase implements Equatable {
   }
 
   public asBigInteger(): BN {
-    return utils.fromSignedBuffer(this.asBuffer());
+    const value = this.asBuffer();
+    if (value.length > MAX_SIZE_BIG_INTEGER) {
+      throw new IntegerTooLargeError();
+    }
+
+    return utils.fromSignedBuffer(value);
   }
 
   public asBuffer(): Buffer {
@@ -223,6 +264,10 @@ export class StackItemBase implements Equatable {
     return false;
   }
 
+  public isMap(): boolean {
+    return false;
+  }
+
   public toContractParameter(): ContractParameter {
     throw new Error('Not Implemented');
   }
@@ -244,6 +289,22 @@ export class StackItemBase implements Equatable {
     nextSeen.add(this);
 
     return this.convertJSONInternal(nextSeen);
+  }
+
+  protected incrementInternal(_seen: Set<StackItemBase>): number {
+    return 0;
+  }
+
+  protected decrementInternal(_seen: Set<StackItemBase>): number {
+    return 0;
+  }
+
+  protected incrementInternalArray(stackItems: ReadonlyArray<StackItem>, seen: Set<StackItemBase>): number {
+    return stackItems.reduce((acc, val) => acc + val.increment(seen), 0);
+  }
+
+  protected decrementInternalArray(stackItems: ReadonlyArray<StackItem>, seen: Set<StackItemBase>): number {
+    return stackItems.reduce((acc, val) => acc + val.decrement(seen), 0);
   }
 
   protected serializeInternal(_seen: Set<StackItemBase>): Buffer {

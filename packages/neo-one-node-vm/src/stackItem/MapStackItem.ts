@@ -36,6 +36,10 @@ export class MapStackItem extends StackItemBase {
     return this === other;
   }
 
+  public isMap(): boolean {
+    return false;
+  }
+
   public asBoolean(): boolean {
     return true;
   }
@@ -110,6 +114,14 @@ export class MapStackItem extends StackItemBase {
 
   public asMapStackItem(): MapStackItem {
     return this;
+  }
+
+  protected incrementInternal(seen: Set<StackItemBase>): number {
+    return this.incrementInternalArray(this.keysArray(), seen) + this.incrementInternalArray(this.valuesArray(), seen);
+  }
+
+  protected decrementInternal(seen: Set<StackItemBase>): number {
+    return this.decrementInternalArray(this.keysArray(), seen) + this.decrementInternalArray(this.valuesArray(), seen);
   }
 
   // tslint:disable-next-line no-any

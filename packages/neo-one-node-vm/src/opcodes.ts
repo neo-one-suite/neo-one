@@ -3,9 +3,20 @@ import { common, crypto, Op as OpCodeToByteCode, OpCode, UInt160, utils, VMState
 import bitwise from 'bitwise';
 import BN from 'bn.js';
 import _ from 'lodash';
-import { ExecutionContext, ExecutionStack, FEES, getResultContext, Op, OpInvoke } from './constants';
+import {
+  ExecutionContext,
+  ExecutionStack,
+  FEES,
+  MAX_ARRAY_SIZE,
+  MAX_ITEM_SIZE,
+  MAX_SHL_SHR,
+  MIN_SHL_SHR,
+  Op,
+  OpInvoke,
+} from './constants';
 import {
   CodeOverflowError,
+  ContainerTooLargeError,
   ContractNoDynamicInvokeError,
   InsufficientReturnValueError,
   InvalidCheckMultisigArgumentsError,
@@ -15,17 +26,20 @@ import {
   InvalidRemoveIndexError,
   InvalidSetItemIndexError,
   InvalidTailCallReturnValueError,
+  ItemTooLargeError,
   LeftNegativeError,
   PickNegativeError,
   RightLengthError,
   RightNegativeError,
   RollNegativeError,
+  ShiftTooLargeError,
   StackUnderflowError,
   SubstrNegativeEndError,
   SubstrNegativeStartError,
   ThrowError,
   UnknownOpError,
   XDropNegativeError,
+  XDropUnderflowError,
   XSwapNegativeError,
   XTuckNegativeError,
 } from './errors';
@@ -72,11 +86,7 @@ export const createOp = ({
   inAlt = 0,
   out = 0,
   outAlt = 0,
-  modify = 0,
-  modifyAlt = 0,
   invocation = 0,
-  array = 0,
-  item = 0,
   fee: feeIn,
   invoke,
 }: {
@@ -85,8 +95,6 @@ export const createOp = ({
   readonly inAlt?: number;
   readonly out?: number;
   readonly outAlt?: number;
-  readonly modify?: number;
-  readonly modifyAlt?: number;
   readonly invocation?: number;
   readonly array?: number;
   readonly item?: number;
@@ -107,11 +115,7 @@ export const createOp = ({
       inAlt,
       out,
       outAlt,
-      modify,
-      modifyAlt,
       invocation,
-      array,
-      item,
       fee,
       invoke,
     },
@@ -147,13 +151,18 @@ const pushData = ({ name, numBytes }: { readonly name: OpCode; readonly numBytes
         throw new CodeOverflowError(context);
       }
 
+      const value = code.slice(pc + numBytes, pc + numBytes + size);
+      if (value.length > MAX_ITEM_SIZE) {
+        throw new ItemTooLargeError(context);
+      }
+
       return {
         context: {
           ...context,
           pc: pc + numBytes + size,
         },
 
-        results: [new BufferStackItem(code.slice(pc + numBytes, pc + numBytes + size))],
+        results: [new BufferStackItem(value)],
       };
     },
   });
@@ -230,8 +239,7 @@ const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: b
             scriptHash: context.scriptHash,
             entryScriptHash: context.entryScriptHash,
             returnValueCount: -1,
-            callerStackCount: context.callerStackCount,
-            callerStackAltCount: context.callerStackAltCount,
+            stackCount: context.stackCount,
           },
         });
 
@@ -256,9 +264,11 @@ const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: b
             pc: pc + 20,
             depth: context.depth,
             returnValueCount: context.returnValueCount,
-            callerStackCount: context.callerStackCount,
-            callerStackAltCount: context.callerStackAltCount,
-            ...getResultContext(resultContext),
+            stackCount: resultContext.stackCount,
+            stack: resultContext.stack,
+            stackAlt: resultContext.stackAlt,
+            gasLeft: resultContext.gasLeft,
+            createdContracts: resultContext.createdContracts,
           },
         };
       },
@@ -310,6 +320,7 @@ const callIsolated = ({
         }
 
         const contract = await context.blockchain.contract.get({ hash });
+        const nextStack = dynamicCall ? args.slice(1) : args;
         const resultContext = await context.engine.executeScript({
           monitor,
           code: contract.script,
@@ -317,19 +328,18 @@ const callIsolated = ({
           init: context.init,
           gasLeft: context.gasLeft,
           options: {
-            stack: dynamicCall ? args.slice(1) : args,
+            stack: nextStack,
             stackAlt: [],
             depth: tailCall ? context.depth : context.depth + 1,
             createdContracts: context.createdContracts,
             scriptHash: context.scriptHash,
             entryScriptHash: context.entryScriptHash,
             returnValueCount,
-            callerStackCount: context.callerStackCount + context.stack.length,
-            callerStackAltCount: context.callerStackAltCount + context.stackAlt.length,
+            stackCount: context.stackCount + nextStack.reduce((acc, value) => acc + value.increment(), 0),
           },
         });
 
-        let { state } = resultContext;
+        let { state, stackCount } = resultContext;
         if (state === VMState.Halt) {
           // If it's a tail call, then the final recursive call executes the rest
           // of the script, and we just return immediately here.
@@ -345,7 +355,10 @@ const callIsolated = ({
           }
 
           stack = resultContext.stack.slice(0, returnValueCount);
+          stackCount += resultContext.stack.slice(returnValueCount).reduce((acc, value) => acc + value.decrement(), 0);
         }
+
+        stackCount += resultContext.stackAlt.reduce((acc, value) => acc + value.decrement(), 0);
 
         return {
           context: {
@@ -361,8 +374,7 @@ const callIsolated = ({
             pc: nextPC,
             depth: context.depth,
             returnValueCount: context.returnValueCount,
-            callerStackCount: context.callerStackCount,
-            callerStackAltCount: context.callerStackAltCount,
+            stackCount,
             stack: stack.concat(context.stack),
             stackAlt: context.stackAlt,
             gasLeft: resultContext.gasLeft,
@@ -410,12 +422,11 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
             entryScriptHash: context.entryScriptHash,
             returnValueCount,
             pc: pc - 1,
-            callerStackCount: context.callerStackCount + context.stack.length,
-            callerStackAltCount: context.callerStackAltCount + context.stackAlt.length,
+            stackCount: context.stackCount + args.reduce((acc, value) => acc + value.increment(), 0),
           },
         });
 
-        let { state } = resultContext;
+        let { state, stackCount } = resultContext;
         if (state === VMState.Halt) {
           state = context.state;
         }
@@ -429,7 +440,10 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
           }
 
           stack = resultContext.stack.slice(0, returnValueCount);
+          stackCount += resultContext.stack.slice(returnValueCount).reduce((acc, value) => acc + value.decrement(), 0);
         }
+
+        stackCount += resultContext.stackAlt.reduce((acc, value) => acc + value.decrement(), 0);
 
         return {
           context: {
@@ -445,9 +459,8 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
             pc: nextPC + 2,
             depth: context.depth,
             returnValueCount: context.returnValueCount,
-            callerStackCount: context.callerStackCount,
-            callerStackAltCount: context.callerStackAltCount,
-            stack,
+            stackCount,
+            stack: stack.concat(context.stack),
             stackAlt: context.stackAlt,
             gasLeft: resultContext.gasLeft,
             createdContracts: resultContext.createdContracts,
@@ -583,11 +596,7 @@ const OPCODE_PAIRS = ([
               inAlt: sysCall.inAlt,
               out: sysCall.out,
               outAlt: sysCall.outAlt,
-              modify: sysCall.modify,
-              modifyAlt: sysCall.modifyAlt,
               invocation: sysCall.invocation,
-              array: sysCall.array,
-              item: sysCall.item,
               fee: sysCall.fee,
               invoke: sysCall.invoke,
             },
@@ -640,7 +649,6 @@ const OPCODE_PAIRS = ([
       createOp({
         name: 'XDROP',
         in: 1,
-        modify: -1,
         invoke: ({ context, args }) => {
           const n = vmUtils.toNumber(context, args[0].asBigInteger());
           if (n < 0) {
@@ -649,10 +657,15 @@ const OPCODE_PAIRS = ([
 
           const { stack } = context;
 
+          if (n >= stack.length) {
+            throw new XDropUnderflowError(context);
+          }
+
           return {
             context: {
               ...context,
               stack: stack.slice(0, n).concat(stack.slice(n + 1)),
+              stackCount: context.stackCount + stack[n].decrement(),
             },
           };
         },
@@ -682,7 +695,6 @@ const OPCODE_PAIRS = ([
       createOp({
         name: 'XTUCK',
         in: 1,
-        modify: 1,
         invoke: ({ context, args }) => {
           const n = vmUtils.toNumber(context, args[0].asBigInteger());
           if (n <= 0) {
@@ -698,6 +710,7 @@ const OPCODE_PAIRS = ([
                 .slice(0, n)
                 .concat([stack[0]])
                 .concat(stack.slice(n)),
+              stackCount: context.stackCount + stack[0].increment(),
             },
           };
         },
@@ -783,7 +796,6 @@ const OPCODE_PAIRS = ([
         name: 'ROLL',
         in: 1,
         out: 1,
-        modify: -1,
         invoke: ({ context, args }) => {
           const n = vmUtils.toNumber(context, args[0].asBigInteger());
           if (n < 0) {
@@ -799,8 +811,8 @@ const OPCODE_PAIRS = ([
             context: {
               ...context,
               stack: stack.slice(0, n).concat(stack.slice(n + 1)),
+              stackCount: context.stackCount + stack[n].decrement(),
             },
-
             results: [context.stack[n]],
           };
         },
@@ -848,10 +860,17 @@ const OPCODE_PAIRS = ([
         name: 'CAT',
         in: 2,
         out: 1,
-        invoke: ({ context, args }) => ({
-          context,
-          results: [new BufferStackItem(Buffer.concat([args[1].asBuffer(), args[0].asBuffer()]))],
-        }),
+        invoke: ({ context, args }) => {
+          const result = Buffer.concat([args[1].asBuffer(), args[0].asBuffer()]);
+          if (result.length > MAX_ITEM_SIZE) {
+            throw new ItemTooLargeError(context);
+          }
+
+          return {
+            context,
+            results: [new BufferStackItem(result)],
+          };
+        },
       }),
     ],
     [
@@ -1174,10 +1193,20 @@ const OPCODE_PAIRS = ([
         name: 'SHL',
         in: 2,
         out: 1,
-        invoke: ({ context, args }) => ({
-          context,
-          results: [new IntegerStackItem(vmUtils.shiftLeft(args[1].asBigInteger(), args[0].asBigInteger()))],
-        }),
+        invoke: ({ context, args }) => {
+          const shift = args[0].asBigInteger();
+          if (shift.toNumber() > MAX_SHL_SHR || shift.toNumber() < MIN_SHL_SHR) {
+            throw new ShiftTooLargeError(context);
+          }
+
+          const value = args[1].asBigInteger();
+          const result = new IntegerStackItem(vmUtils.shiftLeft(value, shift));
+
+          return {
+            context,
+            results: [result],
+          };
+        },
       }),
     ],
     [
@@ -1186,10 +1215,20 @@ const OPCODE_PAIRS = ([
         name: 'SHR',
         in: 2,
         out: 1,
-        invoke: ({ context, args }) => ({
-          context,
-          results: [new IntegerStackItem(vmUtils.shiftRight(args[1].asBigInteger(), args[0].asBigInteger()))],
-        }),
+        invoke: ({ context, args }) => {
+          const shift = args[0].asBigInteger();
+          if (shift.toNumber() > MAX_SHL_SHR || shift.toNumber() < MIN_SHL_SHR) {
+            throw new ShiftTooLargeError(context);
+          }
+
+          const value = args[1].asBigInteger();
+          const result = new IntegerStackItem(vmUtils.shiftRight(value, shift));
+
+          return {
+            context,
+            results: [result],
+          };
+        },
       }),
     ],
     [
@@ -1559,6 +1598,10 @@ const OPCODE_PAIRS = ([
             if (_in < 0) {
               throw new InvalidPackCountError(contextIn);
             }
+
+            if (_in > MAX_ARRAY_SIZE) {
+              throw new ContainerTooLargeError(contextIn);
+            }
           }
 
           const { op } = createOp({
@@ -1583,7 +1626,6 @@ const OPCODE_PAIRS = ([
           const { stack } = contextIn;
           const top = stack[0] as StackItem | undefined;
           const out = top === undefined ? 1 : top.asArray().length + 1;
-
           const { op } = createOp({
             name: 'UNPACK',
             in: 1,
@@ -1653,16 +1695,41 @@ const OPCODE_PAIRS = ([
               throw new InvalidSetItemIndexError(context);
             }
 
+            const existing = mutableValue[index];
             mutableValue[index] = newItem;
+            const innerSeen = new Set([args[2]]);
 
-            return { context };
+            return {
+              context: {
+                ...context,
+                stackCount:
+                  context.stackCount +
+                  (args[2].referenceCount > 0 ? existing.decrement(innerSeen) + newItem.increment(innerSeen) : 0),
+              },
+            };
           }
 
           const key = args[1];
           const value = args[2].asMapStackItem();
+          const existingValue = value.has(key) ? value.get(key) : undefined;
           value.set(key, newItem);
 
-          return { context };
+          if (value.size > MAX_ARRAY_SIZE) {
+            throw new ContainerTooLargeError(context);
+          }
+          const seen = new Set([args[2]]);
+
+          return {
+            context: {
+              ...context,
+              stackCount:
+                context.stackCount +
+                (args[2].referenceCount > 0
+                  ? (existingValue === undefined ? key.increment(seen) : existingValue.decrement()) +
+                    newItem.increment(seen)
+                  : 0),
+            },
+          };
         },
       }),
     ],
@@ -1672,14 +1739,17 @@ const OPCODE_PAIRS = ([
         name: 'NEWARRAY',
         in: 1,
         out: 1,
-        invoke: ({ context, args }) => ({
-          context,
-          results: [
-            new ArrayStackItem(
-              _.range(0, vmUtils.toNumber(context, args[0].asBigInteger())).map(() => new BooleanStackItem(false)),
-            ),
-          ],
-        }),
+        invoke: ({ context, args }) => {
+          const count = vmUtils.toNumber(context, args[0].asBigInteger());
+          if (count > MAX_ARRAY_SIZE) {
+            throw new ContainerTooLargeError(context);
+          }
+
+          return {
+            context,
+            results: [new ArrayStackItem(_.range(0, count).map(() => new BooleanStackItem(false)))],
+          };
+        },
       }),
     ],
     [
@@ -1688,14 +1758,17 @@ const OPCODE_PAIRS = ([
         name: 'NEWSTRUCT',
         in: 1,
         out: 1,
-        invoke: ({ context, args }) => ({
-          context,
-          results: [
-            new StructStackItem(
-              _.range(0, vmUtils.toNumber(context, args[0].asBigInteger())).map(() => new BooleanStackItem(false)),
-            ),
-          ],
-        }),
+        invoke: ({ context, args }) => {
+          const count = vmUtils.toNumber(context, args[0].asBigInteger());
+          if (count > MAX_ARRAY_SIZE) {
+            throw new ContainerTooLargeError(context);
+          }
+
+          return {
+            context,
+            results: [new StructStackItem(_.range(0, count).map(() => new BooleanStackItem(false)))],
+          };
+        },
       }),
     ],
     [
@@ -1722,7 +1795,16 @@ const OPCODE_PAIRS = ([
           const mutableValue = args[1].asArray();
           mutableValue.push(newItem);
 
-          return { context };
+          if (mutableValue.length > MAX_ARRAY_SIZE) {
+            throw new ContainerTooLargeError(context);
+          }
+
+          return {
+            context: {
+              ...context,
+              stackCount: context.stackCount + (args[1].referenceCount > 0 ? newItem.increment(new Set([args[1]])) : 0),
+            },
+          };
         },
       }),
     ],
@@ -1751,14 +1833,36 @@ const OPCODE_PAIRS = ([
             if (index < 0 || index >= mutableValue.length) {
               throw new InvalidRemoveIndexError(context, index);
             }
+            const existing = mutableValue[index];
             mutableValue.splice(index, 1);
 
-            return { context };
+            return {
+              context: {
+                ...context,
+                stackCount:
+                  context.stackCount + (existing.referenceCount > 0 ? existing.decrement(new Set([args[1]])) : 0),
+              },
+            };
           }
 
           const key = args[0];
           const value = args[1].asMapStackItem();
-          value.delete(key);
+          if (value.has(key)) {
+            const val = value.get(key);
+            value.delete(key);
+
+            const seen = new Set([args[1]]);
+
+            return {
+              context: {
+                ...context,
+                stackCount:
+                  context.stackCount +
+                  (key.referenceCount > 0 ? key.decrement(seen) : 0) +
+                  (val.referenceCount > 0 ? val.decrement(seen) : 0),
+              },
+            };
+          }
 
           return { context };
         },

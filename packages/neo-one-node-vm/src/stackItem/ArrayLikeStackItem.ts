@@ -45,6 +45,14 @@ export class ArrayLikeStackItem extends StackItemBase {
     return this.value.length;
   }
 
+  protected incrementInternal(seen: Set<StackItemBase>): number {
+    return this.incrementInternalArray(this.value, seen);
+  }
+
+  protected decrementInternal(seen: Set<StackItemBase>): number {
+    return this.decrementInternalArray(this.value, seen);
+  }
+
   // tslint:disable-next-line no-any
   protected convertJSONInternal(seen: Set<StackItemBase>): any {
     return this.value.map((val) => val.convertJSON(seen));

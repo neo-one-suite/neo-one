@@ -17,17 +17,13 @@ import {
   ExecutionContext,
   ExecutionInit,
   FREE_GAS,
-  MAX_ARRAY_SIZE,
   MAX_INVOCATION_STACK_SIZE,
-  MAX_ITEM_SIZE,
   MAX_STACK_SIZE,
   Options,
 } from './constants';
 import {
   AltStackUnderflowError,
-  ArrayOverflowError,
   InvocationStackOverflowError,
-  ItemOverflowError,
   OutOfGASError,
   StackOverflowError,
   StackUnderflowError,
@@ -69,31 +65,8 @@ const executeNext = async ({
     throw new AltStackUnderflowError(context);
   }
 
-  const stackSize =
-    context.stack.length +
-    context.stackAlt.length +
-    op.out +
-    op.outAlt +
-    op.modify +
-    op.modifyAlt -
-    op.in -
-    op.inAlt +
-    context.callerStackCount +
-    context.callerStackAltCount;
-  if (stackSize > MAX_STACK_SIZE) {
-    throw new StackOverflowError(context);
-  }
-
   if (context.depth + op.invocation > MAX_INVOCATION_STACK_SIZE) {
     throw new InvocationStackOverflowError(context);
-  }
-
-  if (op.array > MAX_ARRAY_SIZE) {
-    throw new ArrayOverflowError(context);
-  }
-
-  if (op.item > MAX_ITEM_SIZE) {
-    throw new ItemOverflowError(context);
   }
 
   const args = context.stack.slice(0, op.in);
@@ -103,6 +76,10 @@ const executeNext = async ({
     ...context,
     stack: context.stack.slice(op.in),
     stackAlt: context.stackAlt.slice(op.inAlt),
+    stackCount:
+      context.stackCount +
+      args.reduce((acc, val) => acc + val.decrement(), 0) +
+      argsAlt.reduce((acc, val) => acc + val.decrement(), 0),
     gasLeft: context.gasLeft.sub(op.fee),
   };
 
@@ -133,6 +110,7 @@ const executeNext = async ({
     context = {
       ...context,
       stack: _.reverse(results).concat(context.stack),
+      stackCount: context.stackCount + results.reduce((acc, value) => acc + value.increment(), 0),
     };
   } else if (results !== undefined) {
     throw new UnknownError(context);
@@ -146,9 +124,14 @@ const executeNext = async ({
     context = {
       ...context,
       stackAlt: _.reverse(resultsAlt).concat(context.stackAlt),
+      stackCount: context.stackCount + resultsAlt.reduce((acc, value) => acc + value.increment(), 0),
     };
   } else if (resultsAlt !== undefined) {
     throw new UnknownError(context);
+  }
+
+  if (context.stackCount > MAX_STACK_SIZE) {
+    throw new StackOverflowError(context);
   }
 
   return context;
@@ -185,8 +168,7 @@ const run = async ({
         gasLeft: context.gasLeft,
         createdContracts: context.createdContracts,
         returnValueCount: context.returnValueCount,
-        callerStackCount: context.callerStackCount,
-        callerStackAltCount: context.callerStackAltCount,
+        stackCount: context.stackCount,
       };
     }
   }
@@ -211,8 +193,7 @@ export const executeScript = async ({
     stackAlt = [],
     createdContracts = {},
     returnValueCount = -1,
-    callerStackCount = 0,
-    callerStackAltCount = 0,
+    stackCount = 0,
     pc = 0,
   } = {},
 }: {
@@ -244,8 +225,7 @@ export const executeScript = async ({
     gasLeft,
     createdContracts,
     returnValueCount,
-    callerStackCount,
-    callerStackAltCount,
+    stackCount,
   };
 
   return monitor.captureSpanLog(async (span) => run({ monitor: span, context }), {
@@ -330,8 +310,7 @@ export const execute = async ({
         scriptHash,
         entryScriptHash,
         returnValueCount,
-        callerStackCount: 0,
-        callerStackAltCount: 0,
+        stackCount: 0,
       };
 
       if (context !== undefined) {
@@ -343,8 +322,7 @@ export const execute = async ({
           scriptHash,
           entryScriptHash,
           returnValueCount,
-          callerStackCount: context.callerStackCount,
-          callerStackAltCount: context.callerStackAltCount,
+          stackCount: context.stackCount,
         };
       }
 

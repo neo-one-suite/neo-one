@@ -120,7 +120,7 @@ export class BinaryReader {
     return Buffer.from(values).toString('utf8');
   }
 
-  public readArray<T>(read: () => T, max = 0x10000000): ReadonlyArray<T> {
+  public readArray<T>(read: () => T, max = 0x1000000): ReadonlyArray<T> {
     const count = this.readVarUIntLE(new BN(max)).toNumber();
 
     return _.range(count).map(read);
@@ -136,7 +136,7 @@ export class BinaryReader {
   ): { readonly [key: string]: V };
   public readObject<V>(
     read: () => { readonly key: string | number; readonly value: V },
-    max = 0x10000000,
+    max = 0x1000000,
   ): { readonly [key: string]: V } {
     const count = this.readVarUIntLE(new BN(max)).toNumber();
 
@@ -147,7 +147,7 @@ export class BinaryReader {
     }, {});
   }
 
-  public readVarBytesLE(max: number = Number.MAX_SAFE_INTEGER): Buffer {
+  public readVarBytesLE(max = 0x1000000): Buffer {
     return this.readBytes(this.readVarUIntLE(new BN(max)).toNumber());
   }
 
@@ -175,7 +175,7 @@ export class BinaryReader {
     return value;
   }
 
-  public readVarString(max = 0x7fffffc7): string {
+  public readVarString(max = 0x1000000): string {
     return this.readVarBytesLE(max).toString('utf8');
   }
 
