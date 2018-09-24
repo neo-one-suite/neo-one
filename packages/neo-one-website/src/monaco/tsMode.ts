@@ -1,7 +1,10 @@
-// tslint:disable promise-function-async
+// tslint:disable promise-function-async no-submodule-imports
+// @ts-ignore
+import * as javascriptModule from 'monaco-editor/esm/vs/basic-languages/javascript/javascript';
 import * as languageFeatures from './languageFeatures';
 import { LanguageServiceDefaultsImpl } from './monaco.contribution';
 import { TypeScriptWorker } from './tsWorker';
+import * as typescriptModule from './typescript';
 import { WorkerManager } from './WorkerManager';
 
 import Promise = monaco.Promise;
@@ -13,8 +16,12 @@ type GetWorker = (first: Uri, ...more: Uri[]) => Promise<TypeScriptWorker>;
 // tslint:disable-next-line readonly-keyword
 const mutableScriptWorkerMap: { [name: string]: GetWorker } = {};
 
-export function setupNamedLanguage(languageName: string, defaults: LanguageServiceDefaultsImpl): void {
-  mutableScriptWorkerMap[`${languageName}Worker`] = setupMode(defaults, languageName);
+export function setupNamedLanguage(
+  languageName: string,
+  defaults: LanguageServiceDefaultsImpl,
+  isTypeScript: boolean,
+): void {
+  mutableScriptWorkerMap[`${languageName}Worker`] = setupMode(defaults, languageName, isTypeScript);
 }
 
 export function getNamedLanguageWorker(languageName: string): Promise<GetWorker> {
@@ -29,7 +36,7 @@ export function getNamedLanguageWorker(languageName: string): Promise<GetWorker>
   });
 }
 
-function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): GetWorker {
+function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string, isTypeScript: boolean): GetWorker {
   const client = new WorkerManager(modeId, defaults);
   const worker = (first: Uri, ...more: Uri[]): Promise<TypeScriptWorker> =>
     client.getLanguageServiceWorker(...[first].concat(more));
@@ -45,6 +52,9 @@ function setupMode(defaults: LanguageServiceDefaultsImpl, modeId: string): GetWo
   monaco.languages.registerOnTypeFormattingEditProvider(modeId, new languageFeatures.FormatOnTypeAdapter(worker));
   // tslint:disable-next-line no-unused-expression
   new languageFeatures.DiagnostcsAdapter(defaults, modeId, worker);
+  const mod = isTypeScript ? typescriptModule : javascriptModule;
+  monaco.languages.setMonarchTokensProvider(modeId, mod.language);
+  monaco.languages.setLanguageConfiguration(modeId, mod.conf);
 
   return worker;
 }

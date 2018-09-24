@@ -30,7 +30,7 @@ const getSource = async (): Promise<string> => {
     return name === '' ? 'lib.d.ts' : `lib.${name}.d.ts`;
   }
   function getVariableName(name: string) {
-    return name === '' ? 'lib_dts' : `lib_${name.replace(/\./g, '')}_dts`;
+    return name === '' ? 'lib_dts' : `lib_${name.replace(/\./g, '_')}_dts`;
   }
   function readLibFile(name: string) {
     const srcPath = path.join(TYPESCRIPT_LIB_SOURCE, getFileName(name));
@@ -49,6 +49,7 @@ const getSource = async (): Promise<string> => {
     mutableQueue.push(name);
   };
 
+  enqueue('');
   enqueue('esnext');
 
   const result = [];

@@ -1,6 +1,9 @@
 // tslint:disable no-implicit-dependencies no-submodule-imports promise-function-async
-// @ts-ignore
-import { lib_esnext_dts } from '!../loaders/libDTSLoaderEntry!../../../../node_modules/typescript/lib/lib.esnext.d.ts';
+import {
+  lib_dts,
+  lib_esnext_dts,
+  // @ts-ignore
+} from '!../loaders/libDTSLoaderEntry!../../../../node_modules/typescript/lib/lib.esnext.d.ts';
 // @ts-ignore
 import scLibICOContents from '!raw-loader!../../../neo-one-smart-contract-lib/src/ICO.ts';
 // @ts-ignore
@@ -15,10 +18,14 @@ import scHarnessContents from '!raw-loader!../../../neo-one-smart-contract/src/h
 import scIndexContents from '!raw-loader!../../../neo-one-smart-contract/src/index.d.ts';
 import { getSemanticDiagnostics } from '@neo-one/smart-contract-compiler';
 import { normalizePath, utils } from '@neo-one/utils';
+// @ts-ignore
+import { TPromise } from 'monaco-editor/esm/vs/base/common/winjs.base';
 import ts from 'typescript';
 
-import Promise = monaco.Promise;
 import IWorkerContext = monaco.worker.IWorkerContext;
+// tslint:disable-next-line no-any
+type Promise<T1 = any, T2 = any> = monaco.Promise<T1, T2>;
+const Promise: typeof monaco.Promise = TPromise;
 
 const throwUnsupported = () => {
   throw new Error('Unsupported');
@@ -38,6 +45,7 @@ const SC_FILES: { readonly [key: string]: string } = {
 
 const LIB_FILES: { readonly [key: string]: string } = {
   [defaultLibName]: lib_esnext_dts,
+  'lib:lib.d.ts': lib_dts,
 };
 
 const createCompilerHost = (host: TypeScriptWorker) => ({
@@ -71,7 +79,7 @@ const createCompilerHost = (host: TypeScriptWorker) => ({
           mutableResolvedModules.push({ resolvedFileName: smartContractLibModule });
         } else if (containingFile.startsWith('scLib')) {
           mutableResolvedModules.push({ resolvedFileName: `scLib:${moduleName.slice('./'.length)}.ts` });
-        } else if (containingFile.startsWith('global')) {
+        } else if (containingFile.startsWith('sc')) {
           mutableResolvedModules.push({ resolvedFileName: `sc:${moduleName.slice('./'.length)}.d.ts` });
         } else {
           const result = ts.resolveModuleName(moduleName, containingFile, options, {
@@ -168,7 +176,7 @@ export class TypeScriptWorker implements ts.LanguageServiceHost {
       return fileNames.concat(Object.keys(SC_FILES));
     }
 
-    return fileNames;
+    return fileNames.concat(Object.keys(LIB_FILES));
   }
 
   public getScriptVersion(fileName: string): string {

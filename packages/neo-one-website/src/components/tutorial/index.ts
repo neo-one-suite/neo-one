@@ -1,1 +1,1 @@
-export * from './MonacoEditor';
+export * from './interactive';

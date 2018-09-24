@@ -1,5 +1,5 @@
 // tslint:disable promise-function-async
-/// <reference types="monaco-editor-core/monaco" />
+/// <reference types="monaco-editor/monaco" />
 import ts from 'typescript';
 import * as tsMode from './tsMode';
 import { TypeScriptWorker } from './tsWorker';
@@ -150,23 +150,6 @@ export class LanguageServiceDefaultsImpl implements LanguageServiceDefaults {
 
 // tslint:disable-next-line readonly-keyword
 const mutableLanguageDefaults: { [name: string]: LanguageServiceDefaultsImpl } = {};
-
-mutableLanguageDefaults.typescript = new LanguageServiceDefaultsImpl(
-  { allowNonTsExtensions: true, target: ts.ScriptTarget.ESNext },
-  { noSemanticValidation: false, noSyntaxValidation: false },
-);
-
-mutableLanguageDefaults['typescript-smart-contract'] = new LanguageServiceDefaultsImpl(
-  { allowNonTsExtensions: true, target: ts.ScriptTarget.ESNext },
-  { noSemanticValidation: false, noSyntaxValidation: false },
-  true,
-);
-
-mutableLanguageDefaults.javascript = new LanguageServiceDefaultsImpl(
-  { allowNonTsExtensions: true, allowJs: true, target: ts.ScriptTarget.ESNext },
-  { noSemanticValidation: true, noSyntaxValidation: false },
-);
-
 // tslint:disable-next-line readonly-array
 type GetWorker = monaco.Promise<(first: monaco.Uri, ...more: monaco.Uri[]) => monaco.Promise<TypeScriptWorker>>;
 
@@ -186,23 +169,107 @@ function getLanguageDefaults(languageName: string): LanguageServiceDefaultsImpl 
   return mutableLanguageDefaults[languageName];
 }
 
-function setupNamedLanguage(
-  languageDefinition: monaco.languages.ILanguageExtensionPoint,
-  isTypescript: boolean,
-  isSmartContract = false,
-): void {
+function setupNamedLanguage(languageDefinition: monaco.languages.ILanguageExtensionPoint, isTypeScript: boolean): void {
   monaco.languages.register(languageDefinition);
-  mutableLanguageDefaults[languageDefinition.id] = isTypescript
-    ? isSmartContract
-      ? mutableLanguageDefaults['typescript-smart-contract']
-      : mutableLanguageDefaults.typescript
-    : mutableLanguageDefaults.javascript;
   monaco.languages.onLanguage(languageDefinition.id, () =>
     getMode().then((mode) =>
-      mode.setupNamedLanguage(languageDefinition.id, mutableLanguageDefaults[languageDefinition.id]),
+      mode.setupNamedLanguage(languageDefinition.id, mutableLanguageDefaults[languageDefinition.id], isTypeScript),
     ),
   );
 }
+
+mutableLanguageDefaults.typescript = new LanguageServiceDefaultsImpl(
+  {
+    target: ts.ScriptTarget.ESNext,
+    module: ts.ModuleKind.ESNext,
+    moduleResolution: ts.ModuleResolutionKind.NodeJs,
+
+    pretty: true,
+
+    noEmit: true,
+    declaration: false,
+
+    allowSyntheticDefaultImports: true,
+    resolveJsonModule: false,
+    experimentalDecorators: true,
+    jsx: ts.JsxEmit.React,
+
+    alwaysStrict: true,
+    strict: true,
+    skipLibCheck: true,
+    noUnusedLocals: true,
+    noImplicitReturns: true,
+    allowUnusedLabels: false,
+    noUnusedParameters: false,
+    allowUnreachableCode: false,
+    noFallthroughCasesInSwitch: true,
+    forceConsistentCasingInFileNames: true,
+  },
+  { noSemanticValidation: false, noSyntaxValidation: false },
+);
+getLanguageDefaults('typescript').setEagerModelSync(true);
+setupNamedLanguage(
+  {
+    id: 'typescript',
+  },
+  true,
+);
+
+mutableLanguageDefaults['typescript-smart-contract'] = new LanguageServiceDefaultsImpl(
+  {
+    target: ts.ScriptTarget.ESNext,
+    module: ts.ModuleKind.ESNext,
+    moduleResolution: ts.ModuleResolutionKind.NodeJs,
+
+    noLib: true,
+    typeRoots: [],
+
+    pretty: true,
+
+    noEmit: true,
+    declaration: false,
+
+    allowSyntheticDefaultImports: true,
+    resolveJsonModule: false,
+    experimentalDecorators: true,
+
+    alwaysStrict: true,
+    strict: true,
+    skipLibCheck: false,
+    noUnusedLocals: true,
+    noImplicitReturns: true,
+    allowUnusedLabels: false,
+    noUnusedParameters: false,
+    allowUnreachableCode: false,
+    noFallthroughCasesInSwitch: true,
+    forceConsistentCasingInFileNames: true,
+  },
+  { noSemanticValidation: false, noSyntaxValidation: false },
+  true,
+);
+getLanguageDefaults('typescript-smart-contract').setEagerModelSync(true);
+setupNamedLanguage(
+  {
+    id: 'typescript-smart-contract',
+  },
+  true,
+);
+
+mutableLanguageDefaults.javascript = new LanguageServiceDefaultsImpl(
+  { allowNonTsExtensions: true, allowJs: true, target: ts.ScriptTarget.ESNext },
+  { noSemanticValidation: true, noSyntaxValidation: false },
+);
+setupNamedLanguage(
+  {
+    id: 'javascript',
+    extensions: ['.js', '.es6', '.jsx'],
+    firstLine: '^#!.*\\bnode',
+    filenames: ['jakefile'],
+    aliases: ['JavaScript', 'javascript', 'js'],
+    mimetypes: ['text/javascript'],
+  },
+  false,
+);
 
 function createAPI() {
   return {
@@ -227,46 +294,6 @@ function getMode(): monaco.Promise<typeof tsMode> {
   return monaco.Promise.wrap(import('./tsMode'));
 }
 
-setupNamedLanguage(
-  {
-    id: 'typescript',
-    extensions: ['.ts', '.tsx'],
-    aliases: ['TypeScript', 'ts', 'typescript'],
-    mimetypes: ['text/typescript'],
-  },
-  true,
-);
-
-getLanguageDefaults('typescript').setEagerModelSync(true);
-getLanguageDefaults('typescript').setCompilerOptions({
-  target: ts.ScriptTarget.ESNext,
-  module: ts.ModuleKind.ESNext,
-  moduleResolution: ts.ModuleResolutionKind.NodeJs,
-
-  lib: ['esnext', 'dom'],
-
-  pretty: true,
-
-  noEmit: true,
-  declaration: false,
-
-  allowSyntheticDefaultImports: true,
-  resolveJsonModule: false,
-  experimentalDecorators: true,
-  jsx: ts.JsxEmit.React,
-
-  alwaysStrict: true,
-  strict: true,
-  skipLibCheck: true,
-  noUnusedLocals: true,
-  noImplicitReturns: true,
-  allowUnusedLabels: false,
-  noUnusedParameters: false,
-  allowUnreachableCode: false,
-  noFallthroughCasesInSwitch: true,
-  forceConsistentCasingInFileNames: true,
-});
-
 // tslint:disable-next-line no-object-mutation no-any
 (global as any).MonacoEnvironment = {
   getWorkerUrl(_moduleId: string, label: string) {
@@ -285,56 +312,3 @@ getLanguageDefaults('typescript').setCompilerOptions({
     return MonacoWorker;
   },
 };
-
-setupNamedLanguage(
-  {
-    id: 'typescript-smart-contract',
-    extensions: ['.ts', '.tsx'],
-    aliases: ['TypeScript', 'ts', 'typescript'],
-    mimetypes: ['text/typescript'],
-  },
-  true,
-  true,
-);
-
-getLanguageDefaults('typescript-smart-contract').setEagerModelSync(true);
-getLanguageDefaults('typescript-smart-contract').setCompilerOptions({
-  target: ts.ScriptTarget.ESNext,
-  module: ts.ModuleKind.ESNext,
-  moduleResolution: ts.ModuleResolutionKind.NodeJs,
-
-  noLib: true,
-  typeRoots: [],
-
-  pretty: true,
-
-  noEmit: true,
-  declaration: false,
-
-  allowSyntheticDefaultImports: true,
-  resolveJsonModule: false,
-  experimentalDecorators: true,
-
-  alwaysStrict: true,
-  strict: true,
-  skipLibCheck: false,
-  noUnusedLocals: true,
-  noImplicitReturns: true,
-  allowUnusedLabels: false,
-  noUnusedParameters: false,
-  allowUnreachableCode: false,
-  noFallthroughCasesInSwitch: true,
-  forceConsistentCasingInFileNames: true,
-});
-
-setupNamedLanguage(
-  {
-    id: 'javascript',
-    extensions: ['.js', '.es6', '.jsx'],
-    firstLine: '^#!.*\\bnode',
-    filenames: ['jakefile'],
-    aliases: ['JavaScript', 'javascript', 'js'],
-    mimetypes: ['text/javascript'],
-  },
-  false,
-);

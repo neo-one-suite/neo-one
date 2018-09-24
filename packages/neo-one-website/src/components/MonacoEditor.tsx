@@ -1,12 +1,13 @@
 // tslint:disable no-submodule-imports no-import-side-effect
-/// <reference types="monaco-editor-core/monaco" />
+/// <reference types="monaco-editor/monaco" />
 import _ from 'lodash';
 // @ts-ignore
-import * as monacoEditor from 'monaco-editor-core/esm/vs/editor/editor.main';
+import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.main';
 import * as React from 'react';
 import { styled } from 'reakit';
 import ResizeObserver from 'resize-observer-polyfill';
-import '../../monaco/monaco.contribution';
+import '../monaco/monaco.contribution';
+import { dark, light } from './theme';
 
 const Container = styled.div`
   width: 100%;
@@ -19,6 +20,11 @@ const Wrapper = styled.div`
 `;
 
 const monac = monacoEditor as typeof monaco;
+
+// tslint:disable-next-line no-any
+monac.editor.defineTheme('light', light as any);
+// tslint:disable-next-line no-any
+monac.editor.defineTheme('dark', dark as any);
 
 // Store editor states such as cursor position, selection and scroll position for each model
 const editorStates = new Map<string, monaco.editor.ICodeEditorViewState>();
@@ -62,6 +68,8 @@ export class MonacoEditor extends React.Component<Props> {
     if (current !== null) {
       this.mutableEditor = monac.editor.create(current, {
         language: this.props.language,
+        theme: 'dark',
+        minimap: { enabled: false },
       });
 
       const { file, autoFocus, entries = [] } = this.props;

@@ -1,4 +1,5 @@
 // tslint:disable
+/// <reference types="monaco-editor/monaco" />
 import ts from 'typescript';
 import { LanguageServiceDefaultsImpl } from './monaco.contribution';
 import { TypeScriptWorker } from './tsWorker';

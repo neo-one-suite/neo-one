@@ -19,7 +19,7 @@ const createWebpackConfig = (): webpack.Configuration => {
     mutablePlugins.push('babel-plugin-istanbul');
   }
   if (!yargs.argv.ci) {
-    // mutablePlugins.push('react-hot-loader/babel');
+    mutablePlugins.push('react-hot-loader/babel');
   }
 
   const atl = {
@@ -54,7 +54,7 @@ const createWebpackConfig = (): webpack.Configuration => {
         'core-js/modules/es7.symbol.async-iterator',
         path.resolve(__dirname, '..', '..', 'packages', 'neo-one-website', 'src', 'entry.tsx'),
       ],
-      'editor.worker': 'monaco-editor-core/esm/vs/editor/editor.worker.js',
+      'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker.js',
       'ts.worker': path.resolve(__dirname, '..', '..', 'packages', 'neo-one-website', 'src', 'monaco', 'ts.worker.ts'),
     },
     resolve: {

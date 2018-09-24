@@ -72,7 +72,7 @@ export const Header = (props: ComponentProps<typeof Wrapper>) => (
         <Toolbar.Focusable data-test="header-logo" as={LogoLink} to="/">
           <Logo />
         </Toolbar.Focusable>
-        <Toolbar.Focusable data-test="header-tutorial" as={NavigationLink} to="/tutorial">
+        <Toolbar.Focusable data-test="header-tutorial" as={NavigationLink} to="/interactive">
           Tutorial
         </Toolbar.Focusable>
       </Toolbar.Content>
