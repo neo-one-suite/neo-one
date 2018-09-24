@@ -14,7 +14,7 @@ const Wrapper = styled(Flex)`
   width: 100%;
 `;
 
-const StyledHeader = styled(Header)`
+const StyledHeader = styled(Header)<{ readonly shadowed: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
