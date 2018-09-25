@@ -274,6 +274,12 @@
   version "0.6.5"
   resolved "https://registry.yarnpkg.com/@emotion/hash/-/hash-0.6.5.tgz#097729b84a5164f71f9acd2570ecfd1354d7b360"
 
+"@emotion/is-prop-valid@^0.6.0":
+  version "0.6.8"
+  resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-0.6.8.tgz#68ad02831da41213a2089d2cab4e8ac8b30cbd85"
+  dependencies:
+    "@emotion/memoize" "^0.6.6"
+
 "@emotion/is-prop-valid@^0.6.6":
   version "0.6.7"
   resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-0.6.7.tgz#1767d39c29ba786b7afc3d8d727a2896995f01eb"
@@ -283,6 +289,10 @@
 "@emotion/memoize@^0.6.1", "@emotion/memoize@^0.6.5":
   version "0.6.5"
   resolved "https://registry.yarnpkg.com/@emotion/memoize/-/memoize-0.6.5.tgz#f868c314b889e7c3d84868a1d1cc323fbb40ca86"
+
+"@emotion/memoize@^0.6.6":
+  version "0.6.6"
+  resolved "https://registry.yarnpkg.com/@emotion/memoize/-/memoize-0.6.6.tgz#004b98298d04c7ca3b4f50ca2035d4f60d2eed1b"
 
 "@emotion/serialize@^0.9.0":
   version "0.9.0"
@@ -10446,11 +10456,11 @@ readline2@^1.0.1:
     is-fullwidth-code-point "^1.0.0"
     mute-stream "0.0.5"
 
-reakit@0.15.2:
-  version "0.15.2"
-  resolved "https://registry.yarnpkg.com/reakit/-/reakit-0.15.2.tgz#de954a41b8da1258a6a695076eadaa79f65faa78"
+reakit@0.15.3:
+  version "0.15.3"
+  resolved "https://registry.yarnpkg.com/reakit/-/reakit-0.15.3.tgz#e56a75c4a801f357c8a18ab6fa8b9c05aa1640e9"
   dependencies:
-    "@emotion/is-prop-valid" "^0.6.6"
+    "@emotion/is-prop-valid" "^0.6.0"
     constate "^0.8.2"
     hoist-non-react-statics "^3.0.1"
     popper.js "^1.14.4"
