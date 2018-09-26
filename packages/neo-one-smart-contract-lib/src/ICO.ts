@@ -1,13 +1,20 @@
-import { Blockchain, constant, Fixed, Hash256, Integer, receive, SmartContract } from '@neo-one/smart-contract';
-import { Token } from './Token';
+import {
+  Address,
+  Blockchain,
+  constant,
+  Fixed,
+  Hash256,
+  Integer,
+  receive,
+  SmartContract,
+} from '@neo-one/smart-contract';
 
-export function ICO<TBase extends Constructor<SmartContract> & ReturnType<typeof Token>>(Base: TBase) {
+export function ICO<TBase extends Constructor<SmartContract>>(Base: TBase) {
   abstract class ICOClass extends Base {
     public abstract readonly icoStartTimeSeconds: Integer;
     public abstract readonly icoDurationSeconds: Integer;
-    public abstract readonly icoAmount: Fixed<8>;
     public abstract readonly amountPerNEO: Fixed<8>;
-    private mutableRemaining: Fixed<8> = this.icoAmount;
+    private mutableRemaining: Fixed<8> = this.getICOAmount();
 
     @constant
     public get remaining(): number {
@@ -47,6 +54,9 @@ export function ICO<TBase extends Constructor<SmartContract> & ReturnType<typeof
 
       return true;
     }
+
+    public abstract getICOAmount(): Fixed<8>;
+    protected abstract issue(addr: Address, amount: Fixed<8>): void;
 
     private hasStarted(): boolean {
       return Blockchain.currentBlockTime >= this.icoStartTimeSeconds;

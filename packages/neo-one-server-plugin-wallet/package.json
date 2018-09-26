@@ -24,8 +24,9 @@
     "lodash": "^4.17.11",
     "ora": "^3.0.0",
     "redux-persist-node-storage": "^2.0.0",
-    "rxjs": "^6.3.2",
+    "rxjs": "^6.3.3",
     "source-map": "^0.7.3",
     "tslib": "^1.9.3"
-  }
+  },
+  "sideEffects": false
 }

@@ -1,5 +1,4 @@
 import { Address, Fixed, Integer, SmartContract } from '@neo-one/smart-contract';
-
 import { ICO } from '../../ICO';
 import { Token } from '../../Token';
 
@@ -22,7 +21,7 @@ export class TestICO extends ICO(Token(SmartContract)) {
     this.icoStartTimeSeconds = startTimeSeconds;
   }
 
-  public get icoAmount(): Fixed<8> {
+  public getICOAmount(): Fixed<8> {
     return 5000_00000000;
   }
 }

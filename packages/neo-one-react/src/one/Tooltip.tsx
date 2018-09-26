@@ -7,6 +7,7 @@ export const StyledTooltip = styled(TooltipBase)`
   background-color: ${prop('theme.gray5')};
   border-color: ${prop('theme.gray5')};
   color: ${prop('theme.gray0')};
+  padding: 8px;
 `;
 
 export function Tooltip(props: ComponentProps<typeof StyledTooltip>) {
@@ -14,5 +15,10 @@ export function Tooltip(props: ComponentProps<typeof StyledTooltip>) {
 }
 
 export const TooltipArrow = styled(TooltipBase.Arrow)`
+  border-color: ${prop('theme.gray5')};
   color: ${prop('theme.gray5')};
+
+  &&& > svg > path {
+    fill: currentColor;
+  }
 `;

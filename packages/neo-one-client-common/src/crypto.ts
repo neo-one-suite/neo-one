@@ -7,11 +7,10 @@ import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypt
 import { ec as EC } from 'elliptic';
 import scrypt from 'scrypt-js';
 import WIF from 'wif';
-import { common, ECPoint, PrivateKey, UInt160, UInt256 } from './common';
+import { common, ECPoint, InvalidFormatError, PrivateKey, UInt160, UInt256 } from './common';
 import {
   Base58CheckError,
   InvalidAddressError,
-  InvalidFormatError,
   InvalidNumberOfKeysError,
   InvalidPrivateKeyError,
   InvalidSignatureError,

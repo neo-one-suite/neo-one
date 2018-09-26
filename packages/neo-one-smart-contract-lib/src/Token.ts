@@ -97,7 +97,7 @@ export function Token<TBase extends Constructor<SmartContract>>(Base: TBase) {
       return true;
     }
 
-    public approveSendTransfer(from: Address, to: Address, amount: Fixed<0>): boolean {
+    public approveSendTransfer(from: Address, to: Address, amount: Fixed<8>): boolean {
       if (amount < 0) {
         throw new Error(`Amount must be greater than 0: ${amount}`);
       }

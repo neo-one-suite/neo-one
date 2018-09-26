@@ -1,9 +1,7 @@
 import { makeErrorWithCode } from '@neo-one/utils';
-import { common, InvalidFormatError, PrivateKey } from './common';
+import { common, PrivateKey } from './common';
 import { ContractParameter } from './types';
 
-// tslint:disable-next-line export-name
-export { InvalidFormatError };
 export const UnknownOpError = makeErrorWithCode('UNKNOWN_OP', (byteCode: string) => `Unknown op: ${byteCode}`);
 export const InvalidContractParameterError = makeErrorWithCode(
   'INVALID_CONTRACT_PARAMETER',

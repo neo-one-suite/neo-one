@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import { BinaryWriter } from '../../BinaryWriter';
-import { InvalidFormatError } from '../../errors';
+import { InvalidFormatError } from '../../common';
 import { utils } from '../../utils';
 import { WitnessModel } from '../WitnessModel';
 import { AttributeModel } from './attribute';

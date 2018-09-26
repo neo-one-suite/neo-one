@@ -251,13 +251,14 @@ describe('InvokeSmartContractHelper', () => {
 
       function ICO<TBase extends Constructor<SmartContract> & ReturnType<typeof Token>>(Base: TBase) {
         abstract class ICOClass extends Base {
-          protected abstract readonly icoAmount: Fixed<8>;
-          private mutableRemaining: Fixed<8> = this.icoAmount;
+          private mutableRemaining: Fixed<8> = this.getICOAmount();
 
           @constant
           public get remaining(): number {
             return this.mutableRemaining;
           }
+
+          protected abstract getICOAmount(): Fixed<8>;
         }
 
         return ICOClass;
@@ -271,7 +272,7 @@ describe('InvokeSmartContractHelper', () => {
           return this.remaining;
         }
 
-        protected get icoAmount(): Fixed<8> {
+        protected getICOAmount(): Fixed<8> {
           return 100_00000000;
         }
       }

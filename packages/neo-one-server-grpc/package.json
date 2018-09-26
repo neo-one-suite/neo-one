@@ -7,5 +7,6 @@
     "@neo-one/types": "^1.0.0-preview.0",
     "google-protobuf": "^3.6.1",
     "tslib": "^1.9.3"
-  }
+  },
+  "sideEffects": false
 }

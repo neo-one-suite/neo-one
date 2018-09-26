@@ -23,8 +23,9 @@
     "execa": "^1.0.0",
     "fs-extra": "^7.0.0",
     "lodash": "^4.17.11",
-    "rxjs": "^6.3.2",
+    "rxjs": "^6.3.3",
     "tslib": "^1.9.3",
     "vorpal": "^1.12.0"
-  }
+  },
+  "sideEffects": false
 }

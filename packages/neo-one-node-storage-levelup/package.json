@@ -13,7 +13,8 @@
     "@types/abstract-leveldown": "^5.0.1",
     "@types/bytewise": "^1.1.0",
     "bytewise": "^1.1.0",
-    "rxjs": "^6.3.2",
+    "rxjs": "^6.3.3",
     "tslib": "^1.9.3"
-  }
+  },
+  "sideEffects": false
 }

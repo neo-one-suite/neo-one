@@ -6,5 +6,6 @@
   "types": "index.d.ts",
   "dependencies": {
     "@types/sharedworker": "^0.0.28"
-  }
+  },
+  "sideEffects": false
 }

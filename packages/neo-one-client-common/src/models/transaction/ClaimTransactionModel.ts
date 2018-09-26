@@ -1,5 +1,5 @@
 import { BinaryWriter } from '../../BinaryWriter';
-import { InvalidFormatError } from '../../errors';
+import { InvalidFormatError } from '../../common';
 import { WitnessModel } from '../WitnessModel';
 import { AttributeModel } from './attribute';
 import { InputModel } from './InputModel';

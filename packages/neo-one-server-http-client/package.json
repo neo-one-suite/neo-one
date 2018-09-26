@@ -8,5 +8,6 @@
     "@neo-one/utils": "^1.0.0-preview.0",
     "cross-fetch": "^2.2.2",
     "tslib": "^1.9.3"
-  }
+  },
+  "sideEffects": false
 }

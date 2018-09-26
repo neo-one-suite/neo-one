@@ -3,5 +3,6 @@
   "version": "1.0.0-preview.0",
   "description": "NEO•ONE smart contract apis.",
   "main": "./src/index.d.ts",
-  "smartContract": true
+  "smartContract": true,
+  "sideEffects": false
 }

@@ -1,6 +1,5 @@
-import React from 'react';
-import { MdOpenInNew } from 'react-icons/md';
-import { NavLink as RouterLink } from 'react-router-dom';
+import * as React from 'react';
+import { Link as RouterLink } from 'react-static';
 import { Flex, styled, Toolbar } from 'reakit';
 import { prop } from 'styled-tools';
 import { Link, Logo } from '../elements';
@@ -19,10 +18,11 @@ const Wrapper = styled(Flex)`
 `;
 
 const StyledToolbar = styled(Toolbar)`
-  height: 100%;
-  grid-gap: 8px;
-  padding: 0 16px;
-  ${prop('theme.maxWidth')};
+  && {
+    height: 100%;
+    grid-gap: 8px;
+    padding: 0 16px;
+  }
 
   ${/* sc-sel */ Toolbar.Focusable} {
     outline: none;
@@ -35,13 +35,15 @@ const StyledToolbar = styled(Toolbar)`
 
 const LogoLink = styled(RouterLink)`
   display: block;
-  width: 100px;
   margin-right: 36px;
-  margin-bottom: 8px;
-  margin-top: 8px;
+  margin-bottom: 12px;
+  margin-top: 12px;
+  height: 56px;
 
   @media (max-width: 768px) {
     margin-right: 0;
+    margin-bottom: 8px;
+    margin-top: 8px;
   }
 `;
 
@@ -72,8 +74,11 @@ export const Header = (props: ComponentProps<typeof Wrapper>) => (
         <Toolbar.Focusable data-test="header-logo" as={LogoLink} to="/">
           <Logo />
         </Toolbar.Focusable>
-        <Toolbar.Focusable data-test="header-tutorial" as={NavigationLink} to="/interactive">
+        <Toolbar.Focusable data-test="header-tutorial" as={NavigationLink} to="/tutorial">
           Tutorial
+        </Toolbar.Focusable>
+        <Toolbar.Focusable data-test="header-tutorial" as={NavigationLink} to="/course">
+          Course
         </Toolbar.Focusable>
       </Toolbar.Content>
       <Toolbar.Content align="end">
@@ -84,7 +89,6 @@ export const Header = (props: ComponentProps<typeof Wrapper>) => (
           target="_blank"
         >
           GitHub
-          <MdOpenInNew />
         </Toolbar.Focusable>
       </Toolbar.Content>
     </StyledToolbar>

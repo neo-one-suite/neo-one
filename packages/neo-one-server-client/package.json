@@ -19,7 +19,8 @@
     "fs-extra": "^7.0.0",
     "grpc": "^1.15.1",
     "is-running": "^2.1.0",
-    "rxjs": "^6.3.2",
+    "rxjs": "^6.3.3",
     "tslib": "^1.9.3"
-  }
+  },
+  "sideEffects": false
 }

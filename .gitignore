@@ -4,6 +4,7 @@
 # Build output folders
 /dist/
 /build/
+/tmp
 /packages/*/lib
 /packages/*/dist
 /packages/*/dist-ts
@@ -14,6 +15,12 @@
 
 # Playground
 /packages/neo-one-playground
+
+/packages/neo-one-website/tmp
+/packages/neo-one-website/build
+/packages/neo-one-website/dist
+/packages/neo-one-website/public
+/packages/neo-one-website/.awcache
 
 # Logs
 logs

@@ -1,6 +1,7 @@
 import { Client, DeveloperClient } from '@neo-one/client';
 import { Client as OneClient } from '@neo-one/server-http-client';
-import { DeveloperToolsDev, DeveloperToolsProd } from './one';
+import { DeveloperToolsDev } from './one/DeveloperToolsDev';
+import { DeveloperToolsProd } from './one/DeveloperToolsProd';
 
 interface NetworkClients<T> {
   readonly [network: string]: T | undefined;

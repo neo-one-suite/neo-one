@@ -1,14 +1,12 @@
-import React from 'react';
+import * as React from 'react';
 import { Box, Flex, styled } from 'reakit';
 import { ifProp, prop } from 'styled-tools';
-import { Header } from '../components';
+import { Footer, Header } from '../components';
 import { ScrollContainer } from '../containers';
 import { ComponentProps } from '../types';
 
 const Wrapper = styled(Flex)`
   flex-direction: column;
-  background-color: ${prop('theme.black')};
-  color: ${prop('theme.black')};
   align-items: center;
   min-height: 100vh;
   width: 100%;
@@ -22,9 +20,9 @@ const StyledHeader = styled(Header)<{ readonly shadowed: boolean }>`
 `;
 
 const Content = styled(Box)`
-  position: relative;
-  margin: 72px 0;
+  margin-top: 80px;
   width: 100%;
+  background-color: ${prop('theme.gray0')};
 `;
 
 interface Props {
@@ -34,5 +32,6 @@ export const CoreLayout = ({ children, ...props }: Props & ComponentProps<typeof
   <Wrapper {...props}>
     <ScrollContainer>{({ y }) => <StyledHeader shadowed={y > 0} />}</ScrollContainer>
     <Content>{children}</Content>
+    <Footer />
   </Wrapper>
 );

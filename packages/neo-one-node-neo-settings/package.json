@@ -12,5 +12,6 @@
     "@types/bn.js": "^4.11.2",
     "bn.js": "^4.11.8",
     "tslib": "^1.9.3"
-  }
+  },
+  "sideEffects": false
 }

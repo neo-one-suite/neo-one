@@ -1,11 +1,16 @@
-// tslint:disable promise-function-async
+// tslint:disable promise-function-async no-submodule-imports no-implicit-dependencies
 /// <reference types="monaco-editor/monaco" />
-import ts from 'typescript';
-import * as tsMode from './tsMode';
-import { TypeScriptWorker } from './tsWorker';
 import Emitter = monaco.Emitter;
 import IEvent = monaco.IEvent;
 import IDisposable = monaco.IDisposable;
+// @ts-ignore
+import ts from 'typescript';
+// @ts-ignore
+import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worker';
+// @ts-ignore
+import TSWorker from './ts.worker';
+import * as tsMode from './tsMode';
+import { TypeScriptWorker } from './tsWorker';
 
 export interface DiagnosticsOptions {
   readonly noSemanticValidation?: boolean;
@@ -296,17 +301,17 @@ function getMode(): monaco.Promise<typeof tsMode> {
 
 // tslint:disable-next-line no-object-mutation no-any
 (global as any).MonacoEnvironment = {
-  getWorkerUrl(_moduleId: string, label: string) {
+  getWorker(_moduleId: string, label: string) {
     let MonacoWorker;
 
     switch (label) {
       case 'typescript-smart-contract':
       case 'typescript':
       case 'javascript':
-        MonacoWorker = 'ts.worker.js';
+        MonacoWorker = TSWorker();
         break;
       default:
-        MonacoWorker = 'editor.worker.js';
+        MonacoWorker = EditorWorker();
     }
 
     return MonacoWorker;

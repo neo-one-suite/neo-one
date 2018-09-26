@@ -117,7 +117,6 @@ const getWorker = (file: string, options: Options) => {
   }
 
   return `module.exports = function() {
-    console.log('hello world');
   return new Worker(${publicWorkerPath});
 };`;
 };

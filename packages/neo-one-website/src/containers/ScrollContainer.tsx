@@ -7,7 +7,8 @@ const getScrollPosition = (element: typeof window) => ({
   x: element.scrollX,
 });
 
-const initialState = getScrollPosition(window);
+// tslint:disable-next-line strict-type-predicates
+const initialState = typeof window === 'undefined' ? { y: 0, x: 0 } : getScrollPosition(window);
 
 type State = ReturnType<typeof getScrollPosition> & {
   readonly handler: () => void;
@@ -15,12 +16,18 @@ type State = ReturnType<typeof getScrollPosition> & {
 
 const onMount = ({ setState }: { readonly setState: (state: Partial<State>) => void }) => {
   const handler = () => setState(getScrollPosition(window));
-  window.addEventListener('scroll', handler);
+  // tslint:disable-next-line strict-type-predicates
+  if (typeof window !== 'undefined') {
+    window.addEventListener('scroll', handler);
+  }
   setState({ handler });
 };
 
 const onUnmount = ({ state }: { readonly state: State }) => {
-  window.removeEventListener('scroll', state.handler);
+  // tslint:disable-next-line strict-type-predicates
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('scroll', state.handler);
+  }
 };
 
 export const ScrollContainer = (props: ContainerProps<State>) => (

@@ -1,0 +1,14 @@
+{
+  "title": "Non-Fungible Tokens",
+  "files": [
+    {
+      "current": "Agent.ts",
+      "solution": "Agent.solution.ts",
+      "type": "contract"
+    },
+    {
+      "solution": "Agent.test.ts",
+      "type": "test"
+    }
+  ]
+}

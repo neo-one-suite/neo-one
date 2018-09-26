@@ -437,16 +437,17 @@ export class ContractInfoProcessor {
       };
     }
 
-    const callSignatures = type.getCallSignatures();
+    let callSignatures = type.getCallSignatures();
     if (ts.isMethodDeclaration(decl) || (ts.isPropertyDeclaration(decl) && callSignatures.length > 0)) {
+      if (callSignatures.length > 1) {
+        callSignatures = callSignatures.filter((signature) => !tsUtils.modifier.isAbstract(signature.getDeclaration()));
+      }
       if (callSignatures.length > 1) {
         this.context.reportError(
           decl,
           DiagnosticCode.InvalidContractMethod,
           DiagnosticMessage.InvalidContractMethodMultipleSignatures,
         );
-
-        return undefined;
       }
       if (callSignatures.length === 0) {
         return undefined;

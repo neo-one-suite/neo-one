@@ -1,2 +1,2 @@
 export * from './CoreLayout';
-export * from './InteractiveLayout';
+export * from './CourseLayout';

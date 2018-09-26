@@ -19,10 +19,11 @@
     "cross-fetch": "^2.2.2",
     "dataloader": "^1.4.0",
     "lodash": "^4.17.11",
-    "rxjs": "^6.3.2",
+    "rxjs": "^6.3.3",
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
     "tapable": "^1.1.0",
     "tslib": "^1.9.3"
-  }
+  },
+  "sideEffects": false
 }

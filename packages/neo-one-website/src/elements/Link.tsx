@@ -6,6 +6,7 @@ export const Link = styled(LinkBase)`
   ${prop('theme.fonts.axiformaBold')};
   font-size: 14px;
   justify-self: flex-end;
+  text-decoration: none;
 
   &:hover {
     color: ${prop('theme.primaryDark')};

@@ -32,6 +32,7 @@ export const theme = {
   primaryDark: '#00d180',
   primaryLight: '#00FF9C',
   black: '#2E2837',
+  lightBlack: '#322B3D',
   accent: '#9B98F6',
   error: '#FF466A',
   gray0: '#F8F5FD',
@@ -70,7 +71,51 @@ export const theme = {
       font-style: normal;
     `,
   },
-  Base: css`
+  fontStyles: {
+    body1: css`
+      font-size: 0.875rem;
+      line-height: 1.46428em;
+      text-align: left;
+      margin: 0;
+    `,
+    body2: css`
+      font-size: 0.875rem;
+      line-height: 1.71428em;
+      text-align: left;
+      margin: 0;
+    `,
+    display1: css`
+      font-size: 2.125rem;
+      line-height: 1.20588em;
+      text-align: left;
+      margin: 0;
+    `,
+    display2: css`
+      font-size: 2.8125rem;
+      line-height: 1.06666em;
+      text-align: left;
+      margin: 0;
+    `,
+    headline: css`
+      font-size: 1.5rem;
+      line-height: 1.35416em;
+      text-align: left;
+      margin: 0;
+    `,
+    subheading: css`
+      font-size: 1rem;
+      line-height: 1.5em;
+      text-align: left;
+      margin: 0;
+    `,
+  },
+  breakpoints: {
+    sm: '600px',
+    md: '960px',
+    lg: '1280px',
+    xl: '1920px',
+  },
+  Box: css`
     box-sizing: border-box;
     ${prop('theme.fonts.axiformaRegular')};
   `,

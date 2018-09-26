@@ -1,6 +1,5 @@
 import BN from 'bn.js';
-import { common, ECPoint } from './common';
-import { InvalidFormatError } from './errors';
+import { common, ECPoint, InvalidFormatError } from './common';
 import { utils } from './utils';
 
 const sizeOfUInt8 = 1;

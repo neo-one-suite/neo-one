@@ -14,7 +14,7 @@ exports[`createEventNotifier invalid event name 1`] = `
 `;
 
 exports[`createEventNotifier invalid event parameter type - forward value 1`] = `
-"snippetCode.ts (4,26): Expected 1-7 arguments, but got 1.
+"snippetCode.ts (4,26): Expected 2 arguments, but got 1.
 
       2 |       import { createEventNotifier, SmartContract } from '@neo-one/smart-contract';
       3 | 
@@ -27,7 +27,7 @@ exports[`createEventNotifier invalid event parameter type - forward value 1`] = 
 `;
 
 exports[`createEventNotifier invalid event parameter type 1`] = `
-"snippetCode.ts (5,26): Expected 1-7 arguments, but got 1.
+"snippetCode.ts (5,26): Expected 2 arguments, but got 1.
 
       3 | 
       4 |       class Foo {}

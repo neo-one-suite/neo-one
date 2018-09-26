@@ -97,12 +97,9 @@ function lazyAsync<Input, Value>(getValue: (input: Input) => Promise<Value>): (i
   };
 }
 
-type Settings<Value> =
-  | { readonly type: 'lazy'; readonly getValue: () => Value }
-  | { readonly type: 'evaluated'; readonly value: Value };
-
 function lazyOrValue<Value>(getValue: (() => Value) | Value): () => Value {
-  let settings: Settings<Value> =
+  // tslint:disable-next-line no-any
+  let settings: any =
     typeof getValue === 'function' ? { type: 'lazy', getValue } : { type: 'evaluated', value: getValue };
 
   return () => {

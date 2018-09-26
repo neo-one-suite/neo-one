@@ -1,0 +1,14 @@
+{
+  "title": "Minting Tokens",
+  "files": [
+    {
+      "current": "Token.ts",
+      "solution": "Token.solution.ts",
+      "type": "contract"
+    },
+    {
+      "solution": "Token.test.ts",
+      "type": "test"
+    }
+  ]
+}

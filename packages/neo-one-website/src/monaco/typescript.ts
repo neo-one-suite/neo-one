@@ -48,6 +48,7 @@ export const language = {
   // Set defaultToken to invalid to see what you do not tokenize yet
   defaultToken: 'invalid',
   tokenPostfix: '.ts',
+  builtins: ['console'],
   keywords: [
     'abstract',
     'as',
@@ -177,18 +178,16 @@ export const language = {
     common: [
       // identifiers and keywords
       [
-        [
-          /([a-zA-Z_\$][\w\$]*)(\s*)(:?)(:?)/,
-          {
-            cases: {
-              '$1@keywords': ['keyword', 'white', 'delimiter', 'delimiter'],
-              $3: ['key.identifier', 'white', 'delimiter', 'delimiter'], // followed by :
-              $4: ['key.identifier', 'white', 'delimiter', 'delimiter'], // followed by =
-              '$1@builtins': ['keyword', 'white', 'delimiter', 'delimiter'],
-              '@default': ['identifier', 'white', 'delimiter', 'delimiter'],
-            },
+        /([a-zA-Z_\$][\w\$]*)(\s*)(:?)(:?)/,
+        {
+          cases: {
+            '$1@keywords': ['keyword', 'white', 'delimiter', 'delimiter'],
+            $3: ['key.identifier', 'white', 'delimiter', 'delimiter'], // followed by :
+            $4: ['key.identifier', 'white', 'delimiter', 'delimiter'], // followed by =
+            '$1@builtins': ['keyword', 'white', 'delimiter', 'delimiter'],
+            '@default': ['identifier', 'white', 'delimiter', 'delimiter'],
           },
-        ],
+        },
       ],
       [/[A-Z][\w\$]*/, 'type.identifier'],
       // [/[A-Z][\w\$]*/, 'identifier'],

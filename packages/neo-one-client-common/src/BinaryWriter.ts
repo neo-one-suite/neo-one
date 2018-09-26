@@ -1,6 +1,5 @@
 import BN from 'bn.js';
-import { common, ECPoint, UInt160, UInt160Hex, UInt256, UInt256Hex } from './common';
-import { InvalidFormatError } from './errors';
+import { common, ECPoint, InvalidFormatError, UInt160, UInt160Hex, UInt256, UInt256Hex } from './common';
 import { utils } from './utils';
 
 export class BinaryWriter {

@@ -9,7 +9,8 @@
     "@neo-one/monitor": "^1.0.0-preview.0",
     "@neo-one/node-core": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",
-    "rxjs": "^6.3.2",
+    "rxjs": "^6.3.3",
     "tslib": "^1.9.3"
-  }
+  },
+  "sideEffects": false
 }

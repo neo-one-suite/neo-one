@@ -21,7 +21,7 @@
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
     "toposort": "^2.0.2",
-    "typescript": "^3.0.3"
+    "typescript": "3.1.0-dev.20180922"
   },
   "devDependencies": {
     "@neo-one/client-common": "^1.0.0-preview.0",
@@ -40,5 +40,6 @@
     "bignumber.js": "7.2.1",
     "levelup": "3.1.1",
     "memdown": "3.0.0"
-  }
+  },
+  "sideEffects": false
 }
