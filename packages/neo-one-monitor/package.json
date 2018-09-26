@@ -12,7 +12,7 @@
     "@types/lodash": "^4.14.116",
     "@types/prometheus-gc-stats": "^0.6.0",
     "koa": "^2.5.3",
-    "koa-mount": "^3.0.0",
+    "koa-mount": "^4.0.0",
     "lodash": "^4.17.11",
     "opentracing": "^0.14.3",
     "prom-client": "^11.1.3",
