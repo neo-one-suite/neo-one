@@ -81,3 +81,15 @@ export const PasswordRequiredError = makeErrorWithCode(
   () => 'A password is required when creating accounts on the MainNet.',
 );
 export const NothingToTransferError = makeErrorWithCode('NOTHING_TO_TRANSFER', () => 'Nothing to transfer.');
+export const LedgerNotSupportedError = makeErrorWithCode(
+  'LEDGER_NOT_SUPPORTED',
+  () => `Ledger not supported by your machine.`,
+);
+export const LedgerNotDetectedError = makeErrorWithCode(
+  'LEDGER_NOT_DETECTED',
+  () => `Ledger not detected by your machine.`,
+);
+export const LedgerStatusCodeError = makeErrorWithCode(
+  'BAD_LEDGER_STATUS_CODE',
+  (code: string) => `Received status code ${code} from ledger.`,
+);
