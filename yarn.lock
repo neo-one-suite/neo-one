@@ -1725,6 +1725,35 @@
   dependencies:
     tslib "^1.8.0"
 
+"@render-props/events@^0.1.2":
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/@render-props/events/-/events-0.1.9.tgz#a00a22967e6e980ff8ebf993c42862b9fa206ab5"
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+
+"@render-props/scrollable@^0.1.16":
+  version "0.1.16"
+  resolved "https://registry.yarnpkg.com/@render-props/scrollable/-/scrollable-0.1.16.tgz#dd0a4bfb32c5238e53561a663fbf2d9612412d46"
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    "@render-props/events" "^0.1.2"
+    "@render-props/throttle" "^0.1.5"
+    "@render-props/utils" "^0.2.1"
+
+"@render-props/throttle@^0.1.5":
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/@render-props/throttle/-/throttle-0.1.12.tgz#4ba90d58ca7017afaa048320d2e56fa011b9195a"
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    "@render-props/utils" "^0.2.0"
+
+"@render-props/utils@^0.2.0", "@render-props/utils@^0.2.1":
+  version "0.2.8"
+  resolved "https://registry.yarnpkg.com/@render-props/utils/-/utils-0.2.8.tgz#a5bb824bf1a8e7596c6845809b6a6d7d3351ee1e"
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    raf "^3.4.0"
+
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@samverschueren/stream-to-observable/-/stream-to-observable-0.3.0.tgz#ecdf48d532c58ea477acfcab80348424f8d0662f"

@@ -1,3 +1,5 @@
+import { EditorFileType } from '../editor';
+
 export interface SelectedCourse {
   readonly course: string;
 }
@@ -42,12 +44,10 @@ export interface Chapter {
   readonly files: ReadonlyArray<ChapterFile>;
 }
 
-export type ChapterFileType = 'contract' | 'typescript' | 'test' | 'tsx';
-
 export interface ChapterFile {
   readonly path: string;
   readonly current?: string;
   readonly solution: string;
-  readonly type: ChapterFileType;
+  readonly type: EditorFileType;
   readonly selected: boolean;
 }

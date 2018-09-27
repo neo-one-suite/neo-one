@@ -3,7 +3,8 @@ import * as fs from 'fs-extra';
 import _ from 'lodash';
 import * as path from 'path';
 import webpack from 'webpack';
-import { Chapter, ChapterFile, ChapterFileType, Course, Lesson } from '../components/course/types';
+import { Chapter, ChapterFile, Course, Lesson } from '../components/course/types';
+import { EditorFileType } from '../components/editor/types';
 
 const COURSES_SOURCE = path.resolve(__dirname, '..', '..', 'courses');
 const CONFIG = 'config.json';
@@ -108,7 +109,7 @@ const getChapter = async (courseDir: string, lesson: string, chapter: string): P
 
 const getChapterFiles = async (
   dir: string,
-  files: ReadonlyArray<{ readonly current?: string; readonly solution: string; readonly type: ChapterFileType }>,
+  files: ReadonlyArray<{ readonly current?: string; readonly solution: string; readonly type: EditorFileType }>,
 ) => {
   let selectedIndex = files.findIndex((file) => file.current !== undefined);
   if (selectedIndex === -1) {
@@ -127,7 +128,7 @@ const getChapterFile = async (
   current: string | undefined,
   solution: string,
   selected: boolean,
-  type: ChapterFileType,
+  type: EditorFileType,
 ): Promise<ChapterFile> => {
   const readFile = async (filePath: string) => {
     const content = await fs.readFile(path.resolve(dir, type === 'contract' ? CONTRACTS : SRC, filePath), 'utf8');

@@ -24,11 +24,7 @@ export const ChapterView = ({ selected }: Props) => (
     <Grid.Item area="progress">
       <ProgressHeader selected={selected} />
     </Grid.Item>
-    <Grid.Item area="docs">
-      <Docs selected={selected} />
-    </Grid.Item>
-    <Grid.Item area="editor">
-      <Editor selected={selected} />
-    </Grid.Item>
+    <Docs selected={selected} />
+    <Editor selected={selected} />
   </StyledGrid>
 );

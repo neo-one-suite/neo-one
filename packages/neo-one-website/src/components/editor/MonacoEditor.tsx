@@ -6,17 +6,25 @@ import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.main';
 import * as React from 'react';
 import { styled } from 'reakit';
 import ResizeObserver from 'resize-observer-polyfill';
-import '../../../monaco/monaco.contribution';
+import '../../monaco/monaco.contribution';
 import { dark, light } from './theme';
+import { FileDiagnostic, FileDiagnosticSeverity, TextRange } from './types';
 
 const Container = styled.div`
-  width: 100%;
-  height: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
 `;
 
 const Wrapper = styled.div`
-  width: 100%;
-  height: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
 `;
 
 const monac = monacoEditor as typeof monaco;
@@ -33,13 +41,16 @@ type Language = 'typescript' | 'typescript-smart-contract';
 export interface FileEntry {
   readonly path: string;
   readonly content: string;
+  readonly language: Language;
 }
 export interface Props {
   readonly file: FileEntry;
-  readonly language: Language;
+  readonly range?: TextRange;
   readonly entries?: ReadonlyArray<FileEntry>;
   readonly autoFocus?: boolean;
+  readonly readOnly?: boolean;
   readonly onValueChange?: (value: string) => void;
+  readonly onUpdateDiagnostics?: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
 }
 
 export class MonacoEditor extends React.Component<Props> {
@@ -47,6 +58,8 @@ export class MonacoEditor extends React.Component<Props> {
   private readonly resizeRef = React.createRef<HTMLDivElement>();
   private mutableEditor: monaco.editor.IStandaloneCodeEditor | undefined;
   private mutableValueSubscription: monaco.IDisposable | undefined;
+  // tslint:disable-next-line readonly-keyword
+  private readonly mutableAnnotationSubscriptions: { [key: string]: monaco.IDisposable } = {};
   private readonly resizeObserver = new ResizeObserver(
     _.debounce(
       () => {
@@ -67,17 +80,17 @@ export class MonacoEditor extends React.Component<Props> {
     const current = this.ref.current;
     if (current !== null) {
       this.mutableEditor = monac.editor.create(current, {
-        language: this.props.language,
+        language: 'typescript',
         theme: 'dark',
-        minimap: { enabled: false },
+        ...this.getEditorOptions(this.props),
       });
 
       const { file, autoFocus, entries = [] } = this.props;
-      this.openFile(file.path, file.content, autoFocus);
+      this.openFile(file, undefined, autoFocus);
 
-      entries.forEach(({ path, content }) => {
-        if (path !== file.path) {
-          this.initializeFile(path, content);
+      entries.forEach((newFile) => {
+        if (newFile.path !== file.path) {
+          this.initializeFile(newFile);
         }
       });
     }
@@ -89,12 +102,21 @@ export class MonacoEditor extends React.Component<Props> {
   }
 
   public componentDidUpdate(prevProps: Props): void {
-    const { file, autoFocus, entries } = this.props;
+    const { file, range, autoFocus, entries } = this.props;
 
     if (file.path !== prevProps.file.path) {
       editorStates.set(prevProps.file.path, this.editor.saveViewState());
 
-      this.openFile(file.path, file.content, autoFocus);
+      this.openFile(file, range, autoFocus);
+    } else if (range !== undefined && !_.isEqual(range, prevProps.range)) {
+      this.editor.setSelection(range);
+    }
+
+    const prevOptions = this.getEditorOptions(prevProps);
+    const options = this.getEditorOptions(this.props);
+    if (!_.isEqual(prevOptions, options) && this.mutableEditor !== undefined) {
+      this.mutableEditor.updateOptions(options);
+      this.editor.focus();
     }
 
     // else if (file.content !== this.editor.getModel().getValue()) {
@@ -108,16 +130,18 @@ export class MonacoEditor extends React.Component<Props> {
 
     if (entries !== undefined && entries !== prevProps.entries) {
       // Update all changed entries for updated intellisense
-      entries.forEach(({ path, content }) => {
-        if (path !== file.path) {
+      entries.forEach((newFile) => {
+        if (newFile.path !== file.path) {
           const previous =
-            prevProps.entries === undefined ? undefined : prevProps.entries.find((entry) => entry.path === path);
+            prevProps.entries === undefined
+              ? undefined
+              : prevProps.entries.find((entry) => entry.path === newFile.path);
 
-          if (previous !== undefined && previous.content === content) {
+          if (previous !== undefined && previous.content === newFile.content) {
             return;
           }
 
-          this.initializeFile(path, content);
+          this.initializeFile(newFile);
         }
       });
     }
@@ -125,6 +149,7 @@ export class MonacoEditor extends React.Component<Props> {
 
   public componentWillUnmount(): void {
     this.disposeValueSubscription();
+    this.disposeAnnotationSubscriptions();
     if (this.mutableEditor !== undefined) {
       this.mutableEditor.dispose();
     }
@@ -148,21 +173,23 @@ export class MonacoEditor extends React.Component<Props> {
     return this.mutableEditor;
   }
 
-  private openFile(path: string, value: string, focus?: boolean): void {
-    this.initializeFile(path, value);
+  private openFile(file: FileEntry, range?: monaco.IRange, focus?: boolean): void {
+    this.initializeFile(file);
 
-    const model = monac.editor.getModels().find((mdl) => mdl.uri.path === path);
+    const model = monac.editor.getModels().find((mdl) => mdl.uri.path === file.path);
 
     if (model !== undefined) {
       this.editor.setModel(model);
     }
 
-    const editorState = editorStates.get(path);
-    if (editorState !== undefined) {
+    const editorState = editorStates.get(file.path);
+    if (range !== undefined) {
+      this.editor.setSelection(range);
+    } else if (editorState !== undefined) {
       this.editor.restoreViewState(editorState);
     }
 
-    if (focus) {
+    if (focus || range !== undefined) {
       this.editor.focus();
     }
 
@@ -184,8 +211,16 @@ export class MonacoEditor extends React.Component<Props> {
     }
   }
 
-  private initializeFile(path: string, value: string): void {
-    let model = monac.editor.getModels().find((mdl) => mdl.uri.path === path);
+  private disposeAnnotationSubscriptions(): void {
+    Object.entries(this.mutableAnnotationSubscriptions).forEach(([key, subscription]) => {
+      // tslint:disable-next-line no-dynamic-delete
+      delete this.mutableAnnotationSubscriptions[key];
+      subscription.dispose();
+    });
+  }
+
+  private initializeFile(file: FileEntry): void {
+    let model = monac.editor.getModels().find((mdl) => mdl.uri.path === file.path);
 
     if (model && !model.isDisposed()) {
       model.pushEditOperations(
@@ -193,17 +228,58 @@ export class MonacoEditor extends React.Component<Props> {
         [
           {
             range: model.getFullModelRange(),
-            text: value,
+            text: file.content,
           },
         ],
         () => [],
       );
     } else {
-      model = monac.editor.createModel(value, this.props.language, new monac.Uri().with({ path }));
+      model = monac.editor.createModel(file.content, file.language, new monac.Uri().with({ path: file.path }));
       model.updateOptions({
         tabSize: 2,
         insertSpaces: true,
       });
+
+      const modelConst = model;
+      this.mutableAnnotationSubscriptions[file.path] = model.onDidChangeDecorations(() => {
+        const { onUpdateDiagnostics } = this.props;
+        if (onUpdateDiagnostics !== undefined) {
+          onUpdateDiagnostics(
+            modelConst.uri.path,
+            this.convertDiagnostics(modelConst, monac.editor.getModelMarkers({ resource: modelConst.uri })),
+          );
+        }
+      });
     }
+  }
+
+  private convertDiagnostics(
+    model: monaco.editor.ITextModel,
+    markers: ReadonlyArray<monaco.editor.IMarker>,
+  ): ReadonlyArray<FileDiagnostic> {
+    return markers.map((marker) => ({
+      path: model.uri.path,
+      owner: marker.owner,
+      message: marker.message,
+      startColumn: marker.startColumn,
+      startLineNumber: marker.startLineNumber,
+      endColumn: marker.endColumn,
+      endLineNumber: marker.endLineNumber,
+      // tslint:disable-next-line no-useless-cast no-unnecessary-type-assertion
+      severity: (marker.severity === 1
+        ? 'hint'
+        : marker.severity === 2
+          ? 'info'
+          : marker.severity === 4
+            ? 'warning'
+            : 'error') as FileDiagnosticSeverity,
+    }));
+  }
+
+  private getEditorOptions(props: Props): monaco.editor.IEditorOptions {
+    return {
+      readOnly: props.readOnly,
+      minimap: { enabled: false },
+    };
   }
 }

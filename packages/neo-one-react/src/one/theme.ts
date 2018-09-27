@@ -35,6 +35,7 @@ export const theme = {
   lightBlack: '#322B3D',
   accent: '#9B98F6',
   error: '#FF466A',
+  warning: '#FFC400',
   gray0: '#F8F5FD',
   grayHalf: '#F2EEF7',
   gray1: '#F2EAFE',
@@ -72,6 +73,12 @@ export const theme = {
     `,
   },
   fontStyles: {
+    caption: css`
+      font-size: 0.8rem;
+      line-height: 1.35em;
+      text-align: left;
+      margin: 0;
+    `,
     body1: css`
       font-size: 0.875rem;
       line-height: 1.46428em;
