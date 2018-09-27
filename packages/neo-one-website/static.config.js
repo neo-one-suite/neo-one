@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 require('ts-node/register/transpile-only');
 const { getCourses } = require('./src/loaders/coursesLoader');
+const { getDocs } = require('./src/utils/getDocs');
 
 // Paths Aliases defined through tsconfig.json
 export default {
@@ -13,6 +14,7 @@ export default {
   }),
   getRoutes: async () => {
     const courses = await getCourses();
+    const docs = await getDocs();
     return [
       {
         path: '/',
@@ -37,6 +39,16 @@ export default {
       {
         path: '/404',
         component: 'src/pages/404',
+      },
+      {
+        path: '/docs',
+        children: docs.map((doc) => ({
+          path: `${doc.slug}`,
+          component: 'src/pages/docs',
+          getData: async () => ({
+            section: doc.section,
+          }),
+        })),
       },
     ];
   },

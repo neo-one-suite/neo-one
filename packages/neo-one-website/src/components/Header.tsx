@@ -86,6 +86,9 @@ export const Header = (props: ComponentProps<typeof Wrapper>) => (
         <NavigationLink data-test="header-tutorial" to="/course">
           Course
         </NavigationLink>
+        <NavigationLink data-test="header-docs" to="/docs/getting-started">
+          Docs
+        </NavigationLink>
       </Toolbar.Content>
       <Toolbar.Content align="end">
         <FocusableLink
