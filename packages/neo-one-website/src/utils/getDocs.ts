@@ -1,8 +1,13 @@
 import * as fs from 'fs-extra';
+import * as matter from 'gray-matter';
 import * as path from 'path';
 
+interface MDDocHeader {
+  readonly title: string;
+  readonly slug: string;
+}
+
 const DOCS_SOURCE = path.resolve(__dirname, '..', '..', 'docs');
-const CONFIG = 'config.json';
 const SECTION = 'section.md';
 
 export const getDocs = async () => {
@@ -12,16 +17,12 @@ export const getDocs = async () => {
 };
 
 const getSection = async (sectionPath: string) => {
-  const [section, config] = await Promise.all([
-    fs.readFile(path.resolve(sectionPath, SECTION), 'utf-8'),
-    fs.readFile(path.resolve(sectionPath, CONFIG), 'utf-8'),
-  ]);
-  const configParsed = JSON.parse(config);
+  const section = matter.read(path.resolve(sectionPath, SECTION));
+  const sectionHeader = section.data as MDDocHeader;
 
   return {
-    title: configParsed.title,
-    slug: configParsed.slug,
-    section,
+    slug: sectionHeader.slug,
+    section: section.content,
   };
 };
 

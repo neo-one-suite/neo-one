@@ -13,8 +13,7 @@ export default {
     title: 'React Static',
   }),
   getRoutes: async () => {
-    const courses = await getCourses();
-    const docs = await getDocs();
+    const [courses, docs] = await Promise.all([getCourses(), getDocs()]);
     return [
       {
         path: '/',
