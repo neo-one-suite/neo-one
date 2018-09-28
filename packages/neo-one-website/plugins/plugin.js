@@ -60,6 +60,10 @@ export default () => ({
         configFileName: path.resolve(__dirname, '..', '..', '..', 'tsconfig', 'tsconfig.es2017.esm.json'),
       },
     };
+    const babelLoader = {
+      loader: 'babel-loader',
+      options: babel,
+    };
 
     config.module.rules = [
       {
@@ -75,20 +79,19 @@ export default () => ({
             use: ['worker-loader', atl],
           },
           {
+            test: /\.worker\.jsx?$/,
+            include: /node_modules/,
+            use: ['worker-loader'],
+          },
+          {
             test: /\.jsx?$/,
-            exclude: /(?:node_modules|\.worker\.jsx?)/,
-            use: {
-              loader: 'babel-loader',
-              options: babel,
-            },
+            exclude: /node_modules/,
+            use: babelLoader,
           },
           {
             test: /\.jsx?$/,
             include: path.resolve(__dirname, '..', '..', '..', 'node_modules', '@reactivex', 'ix-esnext-esm'),
-            use: {
-              loader: 'babel-loader',
-              options: babel,
-            },
+            use: babelLoader,
           },
           defaultLoaders.cssLoader,
           defaultLoaders.fileLoader,

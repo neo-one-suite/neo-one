@@ -2,10 +2,10 @@ import { ActionMap } from 'constate';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Container, Flex, styled } from 'reakit';
-import { ReduxStoreProvider } from '../../containers';
-import { ComponentProps } from '../../types';
-import { Editor } from './Editor';
+import { ReduxStoreProvider } from '../containers';
+import { ComponentProps } from '../types';
 import { EditorToolbar } from './EditorToolbar';
+import { EditorView } from './EditorView';
 import { configureStore, setFileProblems } from './redux';
 import { EditorFile, EditorFiles, FileDiagnostic, TextRange } from './types';
 
@@ -55,7 +55,7 @@ interface Props extends ExternalProps {
   readonly onChangeProblems: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
 }
 
-const SimpleEditorBase = ({
+const EditorBase = ({
   selectedFile,
   files,
   onChangeFile,
@@ -66,7 +66,7 @@ const SimpleEditorBase = ({
   <Container initialState={INITIAL_STATE} actions={actions}>
     {({ range, pendingRange, pendingFile, setRange, setPendingRange }) => (
       <Wrapper {...props}>
-        <Editor
+        <EditorView
           selectedFile={selectedFile}
           files={files}
           onSelectFile={onSelectFile}
@@ -97,17 +97,17 @@ const SimpleEditorBase = ({
   </Container>
 );
 
-const ConnectedSimpleEditor = connect(
+const ConnectedEditor = connect(
   undefined,
   (dispatch) => ({
     // tslint:disable-next-line no-unnecessary-type-annotation
     onChangeProblems: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) =>
       dispatch(setFileProblems({ path, problems: diagnostics })),
   }),
-)(SimpleEditorBase);
+)(EditorBase);
 
-export const SimpleEditor = (props: ExternalProps) => (
+export const Editor = (props: ExternalProps) => (
   <ReduxStoreProvider createStore={configureStore}>
-    <ConnectedSimpleEditor {...props} />
+    <ConnectedEditor {...props} />
   </ReduxStoreProvider>
 );

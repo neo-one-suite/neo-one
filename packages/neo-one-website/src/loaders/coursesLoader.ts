@@ -1,10 +1,10 @@
 // tslint:disable no-array-mutation promise-function-async
+import { EditorFileType } from '@neo-one/editor';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
 import * as path from 'path';
 import webpack from 'webpack';
 import { Chapter, ChapterFile, Course, Lesson } from '../components/course/types';
-import { EditorFileType } from '../components/editor/types';
 
 const COURSES_SOURCE = path.resolve(__dirname, '..', '..', 'courses');
 const CONFIG = 'config.json';

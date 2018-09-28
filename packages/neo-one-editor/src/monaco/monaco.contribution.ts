@@ -1,16 +1,16 @@
 // tslint:disable promise-function-async no-submodule-imports no-implicit-dependencies
 /// <reference types="monaco-editor/monaco" />
-import Emitter = monaco.Emitter;
-import IEvent = monaco.IEvent;
-import IDisposable = monaco.IDisposable;
 // @ts-ignore
+import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker';
 import ts from 'typescript';
-// @ts-ignore
-import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worker';
 // @ts-ignore
 import TSWorker from './ts.worker';
 import * as tsMode from './tsMode';
 import { TypeScriptWorker } from './tsWorker';
+
+import Emitter = monaco.Emitter;
+import IEvent = monaco.IEvent;
+import IDisposable = monaco.IDisposable;
 
 export interface DiagnosticsOptions {
   readonly noSemanticValidation?: boolean;
@@ -220,7 +220,7 @@ setupNamedLanguage(
   true,
 );
 
-mutableLanguageDefaults['typescript-smart-contract'] = new LanguageServiceDefaultsImpl(
+mutableLanguageDefaults.contract = new LanguageServiceDefaultsImpl(
   {
     target: ts.ScriptTarget.ESNext,
     module: ts.ModuleKind.ESNext,
@@ -252,10 +252,10 @@ mutableLanguageDefaults['typescript-smart-contract'] = new LanguageServiceDefaul
   { noSemanticValidation: false, noSyntaxValidation: false },
   true,
 );
-getLanguageDefaults('typescript-smart-contract').setEagerModelSync(true);
+getLanguageDefaults('contract').setEagerModelSync(true);
 setupNamedLanguage(
   {
-    id: 'typescript-smart-contract',
+    id: 'contract',
   },
   true,
 );
@@ -305,7 +305,7 @@ function getMode(): monaco.Promise<typeof tsMode> {
     let MonacoWorker;
 
     switch (label) {
-      case 'typescript-smart-contract':
+      case 'contract':
       case 'typescript':
       case 'javascript':
         MonacoWorker = TSWorker();

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Flex, styled } from 'reakit';
-import { ComponentProps } from '../../types';
+import { ComponentProps } from '../types';
 import { EditorHeader } from './EditorHeader';
-import { EditorView } from './EditorView';
+import { MonacoEditor } from './MonacoEditor';
 import { EditorFile, EditorFiles, FileDiagnostic, TextRange } from './types';
 
 const Wrapper = styled(Flex)`
@@ -21,7 +21,7 @@ interface Props {
   readonly onChangeProblems?: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
 }
 
-export const Editor = ({
+export const EditorView = ({
   selectedFile,
   range,
   files,
@@ -32,12 +32,13 @@ export const Editor = ({
 }: Props & ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <EditorHeader selectedFile={selectedFile} files={files} onSelectFile={onSelectFile} />
-    <EditorView
-      selectedFile={selectedFile}
+    <MonacoEditor
+      file={selectedFile}
       range={range}
       files={files}
-      onChangeFile={onChangeFile}
-      onChangeProblems={onChangeProblems}
+      readOnly={!selectedFile.writable}
+      onValueChange={(content) => onChangeFile({ ...selectedFile, content })}
+      onUpdateDiagnostics={onChangeProblems}
     />
   </Wrapper>
 );

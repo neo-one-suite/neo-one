@@ -11,7 +11,7 @@ interface Props {
 
 const StyledGrid = styled(Grid)`
   overflow: hidden;
-  height: 100%;
+  height: calc(100vh - 56px);
   width: 100%;
   grid:
     'progress progress' 8px

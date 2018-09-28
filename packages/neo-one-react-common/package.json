@@ -1,0 +1,12 @@
+{
+  "name": "@neo-one/react-common",
+  "version": "1.0.0-preview.0",
+  "description": "NEO•ONE shared react.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@types/react": "^16.4.14",
+    "react": "^16.5.1",
+    "reakit": "^0.15.3"
+  },
+  "sideEffects": false
+}

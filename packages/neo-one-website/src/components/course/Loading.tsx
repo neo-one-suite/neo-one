@@ -27,7 +27,7 @@ const Wrapper = styled(Flex)`
 const LoadingWrapper = styled(Box)`
   padding-top: 96px;
   flex: 1 1 auto;
-  min-height: 256px;
+  min-height: 512px;
   background-color: ${prop('theme.gray6')};
 `;
 

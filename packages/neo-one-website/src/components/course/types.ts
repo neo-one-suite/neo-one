@@ -1,4 +1,4 @@
-import { EditorFileType } from '../editor';
+import { EditorFileType } from '@neo-one/editor';
 
 export interface SelectedCourse {
   readonly course: string;

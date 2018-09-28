@@ -1,9 +1,9 @@
+import { Monogram } from '@neo-one/react-common';
 import * as React from 'react';
 import { Image } from 'reakit';
-import reactts from '../../../static/img/icons/reactts.svg';
-import testts from '../../../static/img/icons/testts.svg';
-import typescript from '../../../static/img/icons/typescript.svg';
-import { Monogram } from '../../elements';
+import reactts from '../../static/img/icons/reactts.svg';
+import testts from '../../static/img/icons/testts.svg';
+import typescript from '../../static/img/icons/typescript.svg';
 import { EditorFile } from './types';
 
 const icons = {

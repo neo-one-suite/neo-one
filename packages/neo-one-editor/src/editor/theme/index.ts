@@ -1,9 +1,8 @@
 import * as darkColors from './darkColors';
-import * as lightColors from './lightColors';
 
 const c = (color: string) => color.substr(1);
 
-const theme = ({ ui, syntax }: typeof darkColors | typeof lightColors, base: string) => ({
+const theme = ({ ui, syntax }: typeof darkColors, base: string) => ({
   base,
   inherit: true,
   rules: [
@@ -56,11 +55,6 @@ const theme = ({ ui, syntax }: typeof darkColors | typeof lightColors, base: str
     { token: 'keyword.json', foreground: c(syntax.keyword) },
     { token: 'keyword.flow', foreground: c(syntax.keyword) },
     { token: 'keyword.flow.scss', foreground: c(syntax.keyword) },
-
-    { token: 'operator.scss', foreground: c(syntax.operator) },
-    { token: 'operator.sql', foreground: c(syntax.operator) },
-    { token: 'operator.swift', foreground: c(syntax.operator) },
-    { token: 'predefined.sql', foreground: c(syntax.predefined) },
   ],
   colors: {
     'editor.background': ui.background,
@@ -70,5 +64,5 @@ const theme = ({ ui, syntax }: typeof darkColors | typeof lightColors, base: str
   },
 });
 
-export const light = theme(lightColors, 'vs');
+// tslint:disable-next-line export-name
 export const dark = theme(darkColors, 'vs-dark');

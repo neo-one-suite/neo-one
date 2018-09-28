@@ -1,6 +1,6 @@
+import { Editor as SimpleEditor, EditorFile } from '@neo-one/editor';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { EditorFile, SimpleEditor } from '../../editor';
 import { selectChapter, selectChapterFile, selectFile, State, updateFile } from '../redux';
 import { ChapterFile, SelectedChapter } from '../types';
 

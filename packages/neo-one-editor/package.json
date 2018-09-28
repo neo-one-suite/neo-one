@@ -1,0 +1,42 @@
+{
+  "name": "@neo-one/editor",
+  "version": "1.0.0-preview.0",
+  "description": "NEO•ONE website.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@babel/polyfill": "^7.0.0",
+    "@neo-one/react": "^1.0.0-preview.0",
+    "@neo-one/react-common": "^1.0.0-preview.0",
+    "@neo-one/utils": "^1.0.0-preview.0",
+    "@render-props/scrollable": "^0.1.16",
+    "@types/fs-extra": "^5.0.4",
+    "@types/lodash": "^4.14.116",
+    "@types/react": "^16.4.14",
+    "@types/react-dom": "^16.0.7",
+    "@types/react-redux": "^6.0.9",
+    "@types/webpack": "^4.4.13",
+    "constate": "^0.8.2",
+    "fs-extra": "^7.0.0",
+    "immer": "^1.7.2",
+    "lodash": "^4.17.11",
+    "monaco-editor": "^0.14.3",
+    "raw-loader": "^0.5.1",
+    "react": "^16.5.1",
+    "react-dom": "^16.5.1",
+    "react-icons": "^3.1.0",
+    "react-redux": "^5.0.7",
+    "reakit": "^0.15.3",
+    "redux": "^4.0.0",
+    "resize-observer-polyfill": "^1.5.0",
+    "source-map-support": "^0.5.9",
+    "styled-tools": "^1.5.1",
+    "ts-node": "^7.0.1",
+    "typescript": "3.1.0-dev.20180922",
+    "typescript-fsa": "^3.0.0-beta-2",
+    "typescript-fsa-reducers": "^0.4.5",
+    "webpack": "^4.20.2"
+  },
+  "sideEffects": [
+    "./src/monaco/*"
+  ]
+}

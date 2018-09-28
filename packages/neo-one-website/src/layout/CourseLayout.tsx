@@ -9,7 +9,7 @@ const Wrapper = styled(Flex)`
     flex-direction: column;
     background-color: ${prop('theme.black')};
     color: ${prop('theme.black')};
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
   }
 `;

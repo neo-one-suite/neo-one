@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux';
-import { createSelector } from 'reselect';
 import { SelectedChapter, SelectedLesson } from '../../types';
 import {
   course,
@@ -17,7 +16,7 @@ export interface State {
   readonly course: CourseState;
 }
 
-export const selectCourses = createSelector((state: State) => state.course, selectCourseCourses);
+export const selectCourses = (state: State) => selectCourseCourses(state.course);
 export const selectLesson = (state: State, { selected }: { readonly selected: SelectedLesson }) => ({
   lesson: selectCourseLesson(state.course, selected),
 });
