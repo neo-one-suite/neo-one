@@ -34,9 +34,9 @@
     "@neo-one/node-vm": "^1.0.0-preview.0",
     "@neo-one/smart-contract-compiler-node": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",
-    "@types/memdown": "^3.0.0",
-    "@types/levelup": "^3.1.0",
-    "app-root-dir": "^1.0.2",
+    "@types/memdown": "3.0.0",
+    "@types/levelup": "3.1.0",
+    "app-root-dir": "1.0.2",
     "bignumber.js": "7.2.1",
     "levelup": "3.1.1",
     "memdown": "3.0.0"
