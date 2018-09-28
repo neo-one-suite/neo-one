@@ -15011,9 +15011,9 @@ typescript-template-language-service-decorator@^1.7.1:
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/typescript-template-language-service-decorator/-/typescript-template-language-service-decorator-1.7.1.tgz#60f825b6b2bab725c9a73eaff65cb598e81a1bc8"
 
-typescript@3.1.0-dev.20180922:
-  version "3.1.0-dev.20180922"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.1.0-dev.20180922.tgz#2f84f71e2272eaaa232748a17f1ec9527ee4d486"
+typescript@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.1.1.tgz#3362ba9dd1e482ebb2355b02dfe8bcd19a2c7c96"
 
 typewise-core@^1.2, typewise-core@^1.2.0:
   version "1.2.0"

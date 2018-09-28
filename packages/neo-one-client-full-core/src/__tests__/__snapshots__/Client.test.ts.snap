@@ -693,7 +693,7 @@ Object {
                 "_parent": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -713,7 +713,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -722,7 +722,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -749,25 +749,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parentSubscription": Subscription {
-                  "_parent": null,
-                  "_parents": null,
-                  "_subscriptions": null,
-                  "closed": true,
-                },
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
                     "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       SubjectSubscription {
@@ -801,7 +789,7 @@ Object {
                 "destination": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -821,7 +809,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -830,7 +818,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -1150,7 +1138,7 @@ Object {
                   },
                 ],
               },
-              "_parentSubscription": [Circular],
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 [Circular],
@@ -1170,7 +1158,7 @@ Object {
                 "_parent": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -1190,7 +1178,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -1199,7 +1187,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -1226,25 +1214,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parentSubscription": Subscription {
-                  "_parent": null,
-                  "_parents": null,
-                  "_subscriptions": null,
-                  "closed": true,
-                },
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
                     "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       SubjectSubscription {
@@ -1278,7 +1254,7 @@ Object {
                 "destination": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -1298,7 +1274,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -1307,7 +1283,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -1631,14 +1607,7 @@ Object {
               "syncErrorThrown": false,
               "syncErrorValue": null,
             },
-            "_parentSubscription": SubjectSubscription {
-              "_parent": [Circular],
-              "_parents": null,
-              "_subscriptions": null,
-              "closed": false,
-              "subject": [Circular],
-              "subscriber": [Circular],
-            },
+            "_parentSubscription": null,
             "_parents": null,
             "_subscriptions": Array [
               SubjectSubscription {
@@ -1656,7 +1625,7 @@ Object {
                 "_parent": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -1676,7 +1645,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -1685,7 +1654,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -1712,25 +1681,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parentSubscription": Subscription {
-                  "_parent": null,
-                  "_parents": null,
-                  "_subscriptions": null,
-                  "closed": true,
-                },
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
                     "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       SubjectSubscription {
@@ -1764,7 +1721,7 @@ Object {
                 "destination": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -1784,7 +1741,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -1793,7 +1750,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -2113,7 +2070,7 @@ Object {
                   },
                 ],
               },
-              "_parentSubscription": [Circular],
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 [Circular],
@@ -2133,7 +2090,7 @@ Object {
                 "_parent": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -2153,7 +2110,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -2162,7 +2119,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -2189,25 +2146,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parentSubscription": Subscription {
-                  "_parent": null,
-                  "_parents": null,
-                  "_subscriptions": null,
-                  "closed": true,
-                },
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
                     "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       SubjectSubscription {
@@ -2241,7 +2186,7 @@ Object {
                 "destination": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -2261,7 +2206,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -2270,7 +2215,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -2607,7 +2552,7 @@ Object {
               "_parent": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -2627,7 +2572,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -2636,7 +2581,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -2663,59 +2608,17 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parentSubscription": Subscription {
-                "_parent": null,
-                "_parents": null,
-                "_subscriptions": null,
-                "closed": true,
-              },
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 InnerSubscriber {
                   "_parent": [Circular],
-                  "_parentSubscription": SwitchMapSubscriber {
-                    "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
-                    "_parents": null,
-                    "_subscriptions": Array [
-                      SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
-                        "_subscriptions": null,
-                        "closed": false,
-                        "subject": [Circular],
-                        "subscriber": [Circular],
-                      },
-                    ],
-                    "closed": false,
-                    "destination": [Circular],
-                    "index": 1,
-                    "innerSubscription": undefined,
-                    "isStopped": false,
-                    "project": [Function],
-                    "syncErrorThrowable": false,
-                    "syncErrorThrown": false,
-                    "syncErrorValue": null,
-                  },
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     SwitchMapSubscriber {
                       "_parent": [Circular],
-                      "_parentSubscription": SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
-                        "_subscriptions": null,
-                        "closed": false,
-                        "subject": [Circular],
-                        "subscriber": [Circular],
-                      },
+                      "_parentSubscription": null,
                       "_parents": null,
                       "_subscriptions": Array [
                         SubjectSubscription {
@@ -2761,7 +2664,7 @@ Object {
               "destination": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -2781,7 +2684,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -2790,7 +2693,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -3110,14 +3013,7 @@ Object {
                 },
               ],
             },
-            "_parentSubscription": SubjectSubscription {
-              "_parent": [Circular],
-              "_parents": null,
-              "_subscriptions": null,
-              "closed": false,
-              "subject": [Circular],
-              "subscriber": [Circular],
-            },
+            "_parentSubscription": null,
             "_parents": null,
             "_subscriptions": Array [
               SubjectSubscription {
@@ -3144,7 +3040,7 @@ Object {
               "_parent": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -3164,7 +3060,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -3173,7 +3069,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -3200,59 +3096,17 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parentSubscription": Subscription {
-                "_parent": null,
-                "_parents": null,
-                "_subscriptions": null,
-                "closed": true,
-              },
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 InnerSubscriber {
                   "_parent": [Circular],
-                  "_parentSubscription": SwitchMapSubscriber {
-                    "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
-                    "_parents": null,
-                    "_subscriptions": Array [
-                      SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
-                        "_subscriptions": null,
-                        "closed": false,
-                        "subject": [Circular],
-                        "subscriber": [Circular],
-                      },
-                    ],
-                    "closed": false,
-                    "destination": [Circular],
-                    "index": 1,
-                    "innerSubscription": undefined,
-                    "isStopped": false,
-                    "project": [Function],
-                    "syncErrorThrowable": false,
-                    "syncErrorThrown": false,
-                    "syncErrorValue": null,
-                  },
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     SwitchMapSubscriber {
                       "_parent": [Circular],
-                      "_parentSubscription": SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
-                        "_subscriptions": null,
-                        "closed": false,
-                        "subject": [Circular],
-                        "subscriber": [Circular],
-                      },
+                      "_parentSubscription": null,
                       "_parents": null,
                       "_subscriptions": Array [
                         SubjectSubscription {
@@ -3298,7 +3152,7 @@ Object {
               "destination": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -3318,7 +3172,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -3327,7 +3181,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -3941,7 +3795,7 @@ Object {
                 "_parent": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -3961,7 +3815,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -3970,7 +3824,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -3997,25 +3851,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parentSubscription": Subscription {
-                  "_parent": null,
-                  "_parents": null,
-                  "_subscriptions": null,
-                  "closed": true,
-                },
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
                     "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       SubjectSubscription {
@@ -4049,7 +3891,7 @@ Object {
                 "destination": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -4069,7 +3911,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -4078,7 +3920,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -4398,7 +4240,7 @@ Object {
                   },
                 ],
               },
-              "_parentSubscription": [Circular],
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 [Circular],
@@ -4418,7 +4260,7 @@ Object {
                 "_parent": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -4438,7 +4280,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -4447,7 +4289,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -4474,25 +4316,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parentSubscription": Subscription {
-                  "_parent": null,
-                  "_parents": null,
-                  "_subscriptions": null,
-                  "closed": true,
-                },
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
                     "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       SubjectSubscription {
@@ -4526,7 +4356,7 @@ Object {
                 "destination": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -4546,7 +4376,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -4555,7 +4385,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -4879,14 +4709,7 @@ Object {
               "syncErrorThrown": false,
               "syncErrorValue": null,
             },
-            "_parentSubscription": SubjectSubscription {
-              "_parent": [Circular],
-              "_parents": null,
-              "_subscriptions": null,
-              "closed": false,
-              "subject": [Circular],
-              "subscriber": [Circular],
-            },
+            "_parentSubscription": null,
             "_parents": null,
             "_subscriptions": Array [
               SubjectSubscription {
@@ -4904,7 +4727,7 @@ Object {
                 "_parent": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -4924,7 +4747,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -4933,7 +4756,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -4960,25 +4783,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parentSubscription": Subscription {
-                  "_parent": null,
-                  "_parents": null,
-                  "_subscriptions": null,
-                  "closed": true,
-                },
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
                     "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       SubjectSubscription {
@@ -5012,7 +4823,7 @@ Object {
                 "destination": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -5032,7 +4843,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -5041,7 +4852,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -5361,7 +5172,7 @@ Object {
                   },
                 ],
               },
-              "_parentSubscription": [Circular],
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 [Circular],
@@ -5381,7 +5192,7 @@ Object {
                 "_parent": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -5401,7 +5212,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -5410,7 +5221,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -5437,25 +5248,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parentSubscription": Subscription {
-                  "_parent": null,
-                  "_parents": null,
-                  "_subscriptions": null,
-                  "closed": true,
-                },
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
                     "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       SubjectSubscription {
@@ -5489,7 +5288,7 @@ Object {
                 "destination": MapSubscriber {
                   "_parent": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -5509,7 +5308,7 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -5518,7 +5317,7 @@ Object {
                   "count": 1,
                   "destination": SubjectSubscriber {
                     "_parent": null,
-                    "_parentSubscription": [Circular],
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       [Circular],
@@ -5855,7 +5654,7 @@ Object {
               "_parent": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -5875,7 +5674,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -5884,7 +5683,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -5911,59 +5710,17 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parentSubscription": Subscription {
-                "_parent": null,
-                "_parents": null,
-                "_subscriptions": null,
-                "closed": true,
-              },
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 InnerSubscriber {
                   "_parent": [Circular],
-                  "_parentSubscription": SwitchMapSubscriber {
-                    "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
-                    "_parents": null,
-                    "_subscriptions": Array [
-                      SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
-                        "_subscriptions": null,
-                        "closed": false,
-                        "subject": [Circular],
-                        "subscriber": [Circular],
-                      },
-                    ],
-                    "closed": false,
-                    "destination": [Circular],
-                    "index": 1,
-                    "innerSubscription": undefined,
-                    "isStopped": false,
-                    "project": [Function],
-                    "syncErrorThrowable": false,
-                    "syncErrorThrown": false,
-                    "syncErrorValue": null,
-                  },
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     SwitchMapSubscriber {
                       "_parent": [Circular],
-                      "_parentSubscription": SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
-                        "_subscriptions": null,
-                        "closed": false,
-                        "subject": [Circular],
-                        "subscriber": [Circular],
-                      },
+                      "_parentSubscription": null,
                       "_parents": null,
                       "_subscriptions": Array [
                         SubjectSubscription {
@@ -6009,7 +5766,7 @@ Object {
               "destination": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -6029,7 +5786,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -6038,7 +5795,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -6358,14 +6115,7 @@ Object {
                 },
               ],
             },
-            "_parentSubscription": SubjectSubscription {
-              "_parent": [Circular],
-              "_parents": null,
-              "_subscriptions": null,
-              "closed": false,
-              "subject": [Circular],
-              "subscriber": [Circular],
-            },
+            "_parentSubscription": null,
             "_parents": null,
             "_subscriptions": Array [
               SubjectSubscription {
@@ -6392,7 +6142,7 @@ Object {
               "_parent": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -6412,7 +6162,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -6421,7 +6171,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -6448,59 +6198,17 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parentSubscription": Subscription {
-                "_parent": null,
-                "_parents": null,
-                "_subscriptions": null,
-                "closed": true,
-              },
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 InnerSubscriber {
                   "_parent": [Circular],
-                  "_parentSubscription": SwitchMapSubscriber {
-                    "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
-                    "_parents": null,
-                    "_subscriptions": Array [
-                      SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
-                        "_subscriptions": null,
-                        "closed": false,
-                        "subject": [Circular],
-                        "subscriber": [Circular],
-                      },
-                    ],
-                    "closed": false,
-                    "destination": [Circular],
-                    "index": 1,
-                    "innerSubscription": undefined,
-                    "isStopped": false,
-                    "project": [Function],
-                    "syncErrorThrowable": false,
-                    "syncErrorThrown": false,
-                    "syncErrorValue": null,
-                  },
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     SwitchMapSubscriber {
                       "_parent": [Circular],
-                      "_parentSubscription": SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
-                        "_subscriptions": null,
-                        "closed": false,
-                        "subject": [Circular],
-                        "subscriber": [Circular],
-                      },
+                      "_parentSubscription": null,
                       "_parents": null,
                       "_subscriptions": Array [
                         SubjectSubscription {
@@ -6546,7 +6254,7 @@ Object {
               "destination": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -6566,7 +6274,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -6575,7 +6283,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -9040,7 +8748,7 @@ Object {
               "_parent": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -9060,7 +8768,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -9069,7 +8777,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -9096,25 +8804,13 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parentSubscription": Subscription {
-                "_parent": null,
-                "_parents": null,
-                "_subscriptions": null,
-                "closed": true,
-              },
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 [Circular],
                 InnerSubscriber {
                   "_parent": [Circular],
-                  "_parentSubscription": SubjectSubscription {
-                    "_parent": [Circular],
-                    "_parents": null,
-                    "_subscriptions": null,
-                    "closed": false,
-                    "subject": [Circular],
-                    "subscriber": [Circular],
-                  },
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     SubjectSubscription {
@@ -9148,7 +8844,7 @@ Object {
               "destination": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -9168,7 +8864,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -9177,7 +8873,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -9509,7 +9205,7 @@ Object {
                 },
               ],
             },
-            "_parentSubscription": [Circular],
+            "_parentSubscription": null,
             "_parents": null,
             "_subscriptions": Array [
               [Circular],
@@ -9541,7 +9237,7 @@ Object {
               "_parent": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -9561,7 +9257,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -9570,7 +9266,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -9597,25 +9293,13 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parentSubscription": Subscription {
-                "_parent": null,
-                "_parents": null,
-                "_subscriptions": null,
-                "closed": true,
-              },
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 [Circular],
                 InnerSubscriber {
                   "_parent": [Circular],
-                  "_parentSubscription": SubjectSubscription {
-                    "_parent": [Circular],
-                    "_parents": null,
-                    "_subscriptions": null,
-                    "closed": false,
-                    "subject": [Circular],
-                    "subscriber": [Circular],
-                  },
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     SubjectSubscription {
@@ -9649,7 +9333,7 @@ Object {
               "destination": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -9669,7 +9353,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -9678,7 +9362,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -10014,14 +9698,7 @@ Object {
             "syncErrorThrown": false,
             "syncErrorValue": null,
           },
-          "_parentSubscription": SubjectSubscription {
-            "_parent": [Circular],
-            "_parents": null,
-            "_subscriptions": null,
-            "closed": false,
-            "subject": [Circular],
-            "subscriber": [Circular],
-          },
+          "_parentSubscription": null,
           "_parents": null,
           "_subscriptions": Array [
             SubjectSubscription {
@@ -10039,7 +9716,7 @@ Object {
               "_parent": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -10059,7 +9736,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -10068,7 +9745,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -10095,25 +9772,13 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parentSubscription": Subscription {
-                "_parent": null,
-                "_parents": null,
-                "_subscriptions": null,
-                "closed": true,
-              },
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 [Circular],
                 InnerSubscriber {
                   "_parent": [Circular],
-                  "_parentSubscription": SubjectSubscription {
-                    "_parent": [Circular],
-                    "_parents": null,
-                    "_subscriptions": null,
-                    "closed": false,
-                    "subject": [Circular],
-                    "subscriber": [Circular],
-                  },
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     SubjectSubscription {
@@ -10147,7 +9812,7 @@ Object {
               "destination": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -10167,7 +9832,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -10176,7 +9841,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -10508,7 +10173,7 @@ Object {
                 },
               ],
             },
-            "_parentSubscription": [Circular],
+            "_parentSubscription": null,
             "_parents": null,
             "_subscriptions": Array [
               [Circular],
@@ -10540,7 +10205,7 @@ Object {
               "_parent": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -10560,7 +10225,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -10569,7 +10234,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -10596,25 +10261,13 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parentSubscription": Subscription {
-                "_parent": null,
-                "_parents": null,
-                "_subscriptions": null,
-                "closed": true,
-              },
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 [Circular],
                 InnerSubscriber {
                   "_parent": [Circular],
-                  "_parentSubscription": SubjectSubscription {
-                    "_parent": [Circular],
-                    "_parents": null,
-                    "_subscriptions": null,
-                    "closed": false,
-                    "subject": [Circular],
-                    "subscriber": [Circular],
-                  },
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     SubjectSubscription {
@@ -10648,7 +10301,7 @@ Object {
               "destination": MapSubscriber {
                 "_parent": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -10668,7 +10321,7 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -10677,7 +10330,7 @@ Object {
                 "count": 1,
                 "destination": SubjectSubscriber {
                   "_parent": null,
-                  "_parentSubscription": [Circular],
+                  "_parentSubscription": null,
                   "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
@@ -11026,7 +10679,7 @@ Object {
             "_parent": MapSubscriber {
               "_parent": SubjectSubscriber {
                 "_parent": null,
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -11046,7 +10699,7 @@ Object {
                 "syncErrorThrown": false,
                 "syncErrorValue": null,
               },
-              "_parentSubscription": [Circular],
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 [Circular],
@@ -11055,7 +10708,7 @@ Object {
               "count": 1,
               "destination": SubjectSubscriber {
                 "_parent": null,
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -11082,59 +10735,17 @@ Object {
               "syncErrorValue": null,
               "thisArg": [Circular],
             },
-            "_parentSubscription": Subscription {
-              "_parent": null,
-              "_parents": null,
-              "_subscriptions": null,
-              "closed": true,
-            },
+            "_parentSubscription": null,
             "_parents": null,
             "_subscriptions": Array [
               InnerSubscriber {
                 "_parent": [Circular],
-                "_parentSubscription": SwitchMapSubscriber {
-                  "_parent": [Circular],
-                  "_parentSubscription": SubjectSubscription {
-                    "_parent": [Circular],
-                    "_parents": null,
-                    "_subscriptions": null,
-                    "closed": false,
-                    "subject": [Circular],
-                    "subscriber": [Circular],
-                  },
-                  "_parents": null,
-                  "_subscriptions": Array [
-                    SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
-                  ],
-                  "closed": false,
-                  "destination": [Circular],
-                  "index": 1,
-                  "innerSubscription": undefined,
-                  "isStopped": false,
-                  "project": [Function],
-                  "syncErrorThrowable": false,
-                  "syncErrorThrown": false,
-                  "syncErrorValue": null,
-                },
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   SwitchMapSubscriber {
                     "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       SubjectSubscription {
@@ -11192,7 +10803,7 @@ Object {
             "destination": MapSubscriber {
               "_parent": SubjectSubscriber {
                 "_parent": null,
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -11212,7 +10823,7 @@ Object {
                 "syncErrorThrown": false,
                 "syncErrorValue": null,
               },
-              "_parentSubscription": [Circular],
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 [Circular],
@@ -11221,7 +10832,7 @@ Object {
               "count": 1,
               "destination": SubjectSubscriber {
                 "_parent": null,
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -11553,14 +11164,7 @@ Object {
               },
             ],
           },
-          "_parentSubscription": SubjectSubscription {
-            "_parent": [Circular],
-            "_parents": null,
-            "_subscriptions": null,
-            "closed": false,
-            "subject": [Circular],
-            "subscriber": [Circular],
-          },
+          "_parentSubscription": null,
           "_parents": null,
           "_subscriptions": Array [
             SubjectSubscription {
@@ -11587,7 +11191,7 @@ Object {
             "_parent": MapSubscriber {
               "_parent": SubjectSubscriber {
                 "_parent": null,
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -11607,7 +11211,7 @@ Object {
                 "syncErrorThrown": false,
                 "syncErrorValue": null,
               },
-              "_parentSubscription": [Circular],
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 [Circular],
@@ -11616,7 +11220,7 @@ Object {
               "count": 1,
               "destination": SubjectSubscriber {
                 "_parent": null,
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -11643,59 +11247,17 @@ Object {
               "syncErrorValue": null,
               "thisArg": [Circular],
             },
-            "_parentSubscription": Subscription {
-              "_parent": null,
-              "_parents": null,
-              "_subscriptions": null,
-              "closed": true,
-            },
+            "_parentSubscription": null,
             "_parents": null,
             "_subscriptions": Array [
               InnerSubscriber {
                 "_parent": [Circular],
-                "_parentSubscription": SwitchMapSubscriber {
-                  "_parent": [Circular],
-                  "_parentSubscription": SubjectSubscription {
-                    "_parent": [Circular],
-                    "_parents": null,
-                    "_subscriptions": null,
-                    "closed": false,
-                    "subject": [Circular],
-                    "subscriber": [Circular],
-                  },
-                  "_parents": null,
-                  "_subscriptions": Array [
-                    SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
-                  ],
-                  "closed": false,
-                  "destination": [Circular],
-                  "index": 1,
-                  "innerSubscription": undefined,
-                  "isStopped": false,
-                  "project": [Function],
-                  "syncErrorThrowable": false,
-                  "syncErrorThrown": false,
-                  "syncErrorValue": null,
-                },
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   SwitchMapSubscriber {
                     "_parent": [Circular],
-                    "_parentSubscription": SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
-                      "_subscriptions": null,
-                      "closed": false,
-                      "subject": [Circular],
-                      "subscriber": [Circular],
-                    },
+                    "_parentSubscription": null,
                     "_parents": null,
                     "_subscriptions": Array [
                       SubjectSubscription {
@@ -11753,7 +11315,7 @@ Object {
             "destination": MapSubscriber {
               "_parent": SubjectSubscriber {
                 "_parent": null,
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
@@ -11773,7 +11335,7 @@ Object {
                 "syncErrorThrown": false,
                 "syncErrorValue": null,
               },
-              "_parentSubscription": [Circular],
+              "_parentSubscription": null,
               "_parents": null,
               "_subscriptions": Array [
                 [Circular],
@@ -11782,7 +11344,7 @@ Object {
               "count": 1,
               "destination": SubjectSubscriber {
                 "_parent": null,
-                "_parentSubscription": [Circular],
+                "_parentSubscription": null,
                 "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
