@@ -2196,6 +2196,10 @@
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@types/grpc-error/-/grpc-error-1.0.0.tgz#02cc22a7cc1b8e1d2cbf8499e224aa4ea9bdf8e0"
 
+"@types/highlight.js@^9.12.0":
+  version "9.12.3"
+  resolved "https://registry.yarnpkg.com/@types/highlight.js/-/highlight.js-9.12.3.tgz#b672cfaac25cbbc634a0fd92c515f66faa18dbca"
+
 "@types/history@*":
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/@types/history/-/history-4.7.0.tgz#2fac51050c68f7d6f96c5aafc631132522f4aa3f"
@@ -8609,6 +8613,10 @@ hide-powered-by@1.0.0:
 highcharts@^6.1.2:
   version "6.1.4"
   resolved "https://registry.yarnpkg.com/highcharts/-/highcharts-6.1.4.tgz#753b6d4b99a279ade28276e1b4dc5a53346c7601"
+
+highlight.js@^9.12.0:
+  version "9.12.0"
+  resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-9.12.0.tgz#e6d9dbe57cbefe60751f02af336195870c90c01e"
 
 history@^4.7.2:
   version "4.7.2"

@@ -1,51 +1,88 @@
+// tslint:disable strict-boolean-expressions
 import * as React from 'react';
-import { Link as RouterLink } from 'react-static';
-import { Box, styled, Toolbar } from 'reakit';
+import { MdMenu } from 'react-icons/md';
+import { Box, Button, Hidden, styled } from 'reakit';
 import { prop } from 'styled-tools';
-// import { Link, Logo } from '../elements';
-// import { ComponentProps } from '../types';
+import { Props as SectionProps, Section } from './Section';
 
-const StyledBox = styled(Box)`
+export interface Props {
+  readonly sectionProps: ReadonlyArray<SectionProps>;
+}
+
+const MobileStyledBox = styled(Box)`
+  display: none;
+
+  @media (max-width: ${prop('theme.breakpoints.md')}) {
+    display: block;
+    background-color: ${prop('theme.gray1')};
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    right: 0;
+  }
+`;
+
+const DesktopStyledBox = styled(Box)`
   background-color: ${prop('theme.gray1')};
-`;
-
-const StyledToolbar = styled(Toolbar)`
-  background-color: ${prop('theme.gray2')};
-`;
-
-const Page = styled(Toolbar.Content)`
-  white-space: nowrap;
-`;
-
-const NavigationLink = styled(RouterLink)`
-  display: flex;
-  align-items: center;
-  font-size: 15px;
   height: 100%;
-  width: 100%;
-  padding-top: 5px;
-  border-bottom: 5px solid transparent;
-  color: ${prop('theme.black')};
-  text-decoration: none;
+  width: 320px;
+  position: fixed;
+  right: 0;
 
-  &:hover {
-    border-color: ${prop('theme.accent')};
-    color: ${prop('theme.accent')};
-  }
-
-  &.active {
-    border-color: ${prop('theme.accent')};
+  @media (max-width: ${prop('theme.breakpoints.md')}) {
+    display: none;
   }
 `;
 
-export const Sidebar = () => (
-  <StyledBox>
-    <StyledToolbar>
-      <Page>
-        <Toolbar.Focusable data-test="docs-getting-started-sidebar" as={NavigationLink} to="/docs/getting-started">
-          Getting Started
-        </Toolbar.Focusable>
-      </Page>
-    </StyledToolbar>
-  </StyledBox>
+const MobileNavButton = styled(Button)`
+  display: none;
+
+  @media (max-width: ${prop('theme.breakpoints.md')}) {
+    display: flex;
+    justify-content: center;
+    background-color: ${prop('theme.primary')};
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    margin: 16px;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+  }
+`;
+
+const NavIcon = styled(MdMenu)`
+  color: ${prop('theme.black')};
+  width: 32px;
+  height: 32px;
+`;
+
+export const Sidebar = ({ sectionProps }: Props) => (
+  <Hidden.Container initialState={{ visible: true }}>
+    {({ visible, toggle, hide }) => (
+      <Box>
+        {visible && (
+          <Box>
+            <MobileStyledBox>
+              <ul>
+                {sectionProps.map((props) => (
+                  <Section subsections={props.subsections} title={props.title} onClick={hide} />
+                ))}
+              </ul>
+            </MobileStyledBox>
+            <DesktopStyledBox>
+              <ul>
+                {sectionProps.map((props) => (
+                  <Section subsections={props.subsections} title={props.title} />
+                ))}
+              </ul>
+            </DesktopStyledBox>
+          </Box>
+        )}
+        <MobileNavButton onClick={toggle}>
+          <NavIcon />
+        </MobileNavButton>
+      </Box>
+    )}
+  </Hidden.Container>
 );

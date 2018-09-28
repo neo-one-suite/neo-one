@@ -1,10 +1,11 @@
 ---
 slug: getting-started
+title: Getting Started
+section: Installation
 ---
 # Getting Started
 
-NEO•ONE was designed from the ground up to be easily installed and used to get your
-dapp up and running quickly.
+NEO•ONE was designed from the ground up to be easily installed and used to get your dapp up and running quickly.
 
 ## Requirements
 

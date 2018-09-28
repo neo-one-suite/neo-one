@@ -45,7 +45,25 @@ export default {
           path: `${doc.slug}`,
           component: 'src/pages/docs',
           getData: async () => ({
-            section: doc.section,
+            sidebar: Object.entries(
+              _.groupBy(
+                docs.map((document) => ({
+                  title: document.title,
+                  slug: document.slug,
+                  section: document.section,
+                })),
+                (obj) => obj.section,
+              ),
+            ).map(([section, subsections]) => ({
+              title: section,
+              subsections: subsections.map((subsection) => ({
+                title: subsection.title,
+                slug: subsection.slug,
+              })),
+            })),
+            doc: doc.doc,
+            next: doc.next,
+            previous: doc.previous,
           }),
         })),
       },

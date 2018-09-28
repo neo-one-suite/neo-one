@@ -1,43 +1,49 @@
 import React from 'react';
-import { Box, Flex, Grid, styled } from 'reakit';
+import { Flex, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { Header, Sidebar } from '../components';
-import { Markdown } from '../elements';
+import { DocFooter, Header } from '../components';
 import { ComponentProps } from '../types';
+import { AdjacentInfo } from '../utils';
 
 const Wrapper = styled(Flex)`
   &&& {
     flex-direction: column;
     background-color: ${prop('theme.gray0')};
     color: ${prop('theme.black')};
-    height: 100vh;
+    height: 100%;
     width: 100%;
   }
 `;
 
 const StyledGrid = styled(Grid)`
-  grid-template-columns: 2fr 8fr 3fr;
-  height: 100vh;
-`;
+  grid-template-columns: 8fr 2fr;
+  height: 100%;
+  padding-top: 80px;
+  padding-left: 20%;
+  padding-right: 20%;
+  overflow-wrap: break-word;
 
-const Prebar = styled(Box)`
-  background-color: ${prop('theme.gray0')};
+  @media (max-width: ${prop('theme.breakpoints.md')}) {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 `;
 
 const StyledHeader = styled(Header)`
   flex: 0 0 auto;
+  width: 100%;
+  position: fixed;
 `;
 
 interface Props {
-  readonly source: string;
+  readonly children: React.ReactNode;
+  readonly next?: AdjacentInfo;
+  readonly previous?: AdjacentInfo;
 }
-export const DocsLayout = ({ source, ...props }: Props & ComponentProps<typeof Wrapper>) => (
+export const DocsLayout = ({ children, next, previous, ...props }: Props & ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledHeader />
-    <StyledGrid>
-      <Prebar />
-      <Markdown source={source} />
-      <Sidebar />
-    </StyledGrid>
+    <StyledGrid>{children}</StyledGrid>
+    <DocFooter next={next} previous={previous} />
   </Wrapper>
 );
