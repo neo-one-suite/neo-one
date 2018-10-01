@@ -28,7 +28,7 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "*/*/*/contracts/*.ts",
-    "*/*/*/contracts/*.solution.ts"
+    "*/*/*/one/contracts/*.ts",
+    "*/*/*/one/contracts/*.solution.ts"
   ]
 }

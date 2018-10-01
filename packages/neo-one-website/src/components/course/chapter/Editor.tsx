@@ -1,59 +1,22 @@
-import { Editor as SimpleEditor, EditorFile } from '@neo-one/editor';
+import { FullEditor } from '@neo-one/editor';
 import * as React from 'react';
-import { connect } from 'react-redux';
-import { selectChapter, selectChapterFile, selectFile, State, updateFile } from '../redux';
-import { ChapterFile, SelectedChapter } from '../types';
+import { getChapterTo } from '../common';
+import { selectChapter } from '../coursesData';
+import { SelectedChapter } from '../types';
 
-interface ExternalProps {
+interface Props {
   readonly selected: SelectedChapter;
 }
 
-interface Props extends ExternalProps {
-  readonly file: ChapterFile;
-  readonly files: ReadonlyArray<ChapterFile>;
-  readonly onChangeFile: (file: EditorFile) => void;
-  readonly onSelectFile: (file: EditorFile) => void;
-}
-
-const getEditorFile = (file: ChapterFile): EditorFile => ({
-  path: file.path,
-  content: file.current === undefined ? file.solution : file.current,
-  writable: file.current !== undefined,
-  type: file.type,
-});
-
-const EditorBase = ({ selected: _selected, file, files, onChangeFile, onSelectFile, ...props }: Props) => (
-  <SimpleEditor
+export const Editor = ({ selected, ...props }: Props) => (
+  <FullEditor
     {...props}
-    selectedFile={getEditorFile(file)}
-    files={files.map(getEditorFile)}
-    onChangeFile={onChangeFile}
-    onSelectFile={onSelectFile}
+    id={getChapterTo(selected.course, selected.lesson, selected.chapter)}
+    initialFiles={selectChapter(selected).files.map((file) => ({
+      path: file.path,
+      content: file.initial === undefined ? file.solution : file.initial,
+      writable: file.initial !== undefined,
+      open: true,
+    }))}
   />
 );
-
-export const Editor = connect(
-  (state: State, connectProps: ExternalProps) => ({
-    file: selectChapterFile(state, connectProps).file,
-    files: selectChapter(state, connectProps).chapter.files,
-  }),
-  (dispatch, { selected }) => ({
-    // tslint:disable-next-line no-unnecessary-type-annotation
-    onChangeFile: (file: EditorFile) =>
-      dispatch(
-        updateFile({
-          ...selected,
-          path: file.path,
-          content: file.content,
-        }),
-      ),
-    // tslint:disable-next-line no-unnecessary-type-annotation
-    onSelectFile: (file: EditorFile) =>
-      dispatch(
-        selectFile({
-          ...selected,
-          path: file.path,
-        }),
-      ),
-  }),
-)(EditorBase);

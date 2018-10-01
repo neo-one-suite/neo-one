@@ -1,3 +1,4 @@
+import { basename } from '@neo-one/local-browser';
 import * as React from 'react';
 import { Grid, styled } from 'reakit';
 import { EditorFileIcon } from './EditorFileIcon';
@@ -21,6 +22,6 @@ interface Props {
 export const EditorFileDisplay = ({ file, ...props }: Props) => (
   <GridWrapper {...props}>
     <StyledEditorFileIcon file={file} />
-    {`${file.path}${file.writable ? '' : ' (read-only)'}`}
+    {`${basename(file.path)}${file.writable ? '' : ' (read-only)'}`}
   </GridWrapper>
 );

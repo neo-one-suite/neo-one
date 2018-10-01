@@ -1,3 +1,4 @@
+import { FileSystem } from '@neo-one/local-browser';
 import * as React from 'react';
 import { Flex, styled } from 'reakit';
 import { ComponentProps } from '../types';
@@ -13,31 +14,33 @@ const Wrapper = styled(Flex)`
 `;
 
 interface Props {
-  readonly selectedFile: EditorFile;
+  readonly file?: EditorFile;
   readonly range?: TextRange;
   readonly files: EditorFiles;
+  readonly fs: FileSystem;
+  readonly fileSystemID: string;
   readonly onSelectFile: (file: EditorFile) => void;
-  readonly onChangeFile: (file: EditorFile) => void;
   readonly onChangeProblems?: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
 }
 
 export const EditorView = ({
-  selectedFile,
+  file,
   range,
   files,
-  onChangeFile,
   onChangeProblems,
   onSelectFile,
+  fs,
+  fileSystemID,
   ...props
 }: Props & ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
-    <EditorHeader selectedFile={selectedFile} files={files} onSelectFile={onSelectFile} />
+    <EditorHeader file={file} files={files} onSelectFile={onSelectFile} />
     <MonacoEditor
-      file={selectedFile}
+      file={file}
       range={range}
       files={files}
-      readOnly={!selectedFile.writable}
-      onValueChange={(content) => onChangeFile({ ...selectedFile, content })}
+      fs={fs}
+      fileSystemID={fileSystemID}
       onUpdateDiagnostics={onChangeProblems}
     />
   </Wrapper>

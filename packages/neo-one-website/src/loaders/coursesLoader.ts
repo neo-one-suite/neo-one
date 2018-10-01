@@ -1,5 +1,4 @@
 // tslint:disable no-array-mutation promise-function-async
-import { EditorFileType } from '@neo-one/editor';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
 import * as path from 'path';
@@ -10,8 +9,6 @@ const COURSES_SOURCE = path.resolve(__dirname, '..', '..', 'courses');
 const CONFIG = 'config.json';
 const LESSON = 'lesson.md';
 const CHAPTER = 'chapter.md';
-const CONTRACTS = 'contracts';
-const SRC = 'src';
 
 // tslint:disable-next-line export-name
 export function coursesLoader(this: webpack.loader.LoaderContext) {
@@ -109,29 +106,12 @@ const getChapter = async (courseDir: string, lesson: string, chapter: string): P
 
 const getChapterFiles = async (
   dir: string,
-  files: ReadonlyArray<{ readonly current?: string; readonly solution: string; readonly type: EditorFileType }>,
-) => {
-  let selectedIndex = files.findIndex((file) => file.current !== undefined);
-  if (selectedIndex === -1) {
-    selectedIndex = 0;
-  }
+  files: ReadonlyArray<{ readonly initial?: string; readonly solution: string }>,
+) => Promise.all(files.map(async ({ initial, solution }) => getChapterFile(dir, initial, solution)));
 
-  return Promise.all(
-    files.map(async ({ current, solution, type }, idx) =>
-      getChapterFile(dir, current, solution, selectedIndex === idx, type),
-    ),
-  );
-};
-
-const getChapterFile = async (
-  dir: string,
-  current: string | undefined,
-  solution: string,
-  selected: boolean,
-  type: EditorFileType,
-): Promise<ChapterFile> => {
+const getChapterFile = async (dir: string, initial: string | undefined, solution: string): Promise<ChapterFile> => {
   const readFile = async (filePath: string) => {
-    const content = await fs.readFile(path.resolve(dir, type === 'contract' ? CONTRACTS : SRC, filePath), 'utf8');
+    const content = await fs.readFile(path.resolve(dir, filePath), 'utf8');
 
     return content
       .split('\n')
@@ -139,17 +119,15 @@ const getChapterFile = async (
       .join('\n');
   };
 
-  const [currentContent, solutionContent] = await Promise.all([
-    current === undefined ? Promise.resolve(undefined) : readFile(current),
+  const [initialContent, solutionContent] = await Promise.all([
+    initial === undefined ? Promise.resolve(undefined) : readFile(initial),
     readFile(solution),
   ]);
 
   return {
-    path: current === undefined ? solution : current,
-    current: currentContent,
+    path: initial === undefined ? solution : initial,
+    initial: initialContent,
     solution: solutionContent,
-    selected,
-    type,
   };
 };
 

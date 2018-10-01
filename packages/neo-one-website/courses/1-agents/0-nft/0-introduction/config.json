@@ -2,13 +2,11 @@
   "title": "Non-Fungible Tokens",
   "files": [
     {
-      "current": "Agent.ts",
-      "solution": "Agent.solution.ts",
-      "type": "contract"
+      "initial": "one/contracts/Agent.one.ts",
+      "solution": "one/contracts/Agent.solution.one.ts"
     },
     {
-      "solution": "Agent.test.ts",
-      "type": "test"
+      "solution": "one/tests/Agent.test.ts"
     }
   ]
 }

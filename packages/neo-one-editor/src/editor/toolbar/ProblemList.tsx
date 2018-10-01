@@ -15,8 +15,8 @@ interface Props {
 
 export const ProblemList = ({ file, problems, onSelectRange, ...props }: Props) => (
   <Wrapper {...props}>
-    {problems.map((problem) => (
-      <Problem file={file} problem={problem} onSelectRange={onSelectRange} />
+    {problems.map((problem, idx) => (
+      <Problem key={idx} file={file} problem={problem} onSelectRange={onSelectRange} />
     ))}
   </Wrapper>
 );

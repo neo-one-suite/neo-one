@@ -1,20 +1,15 @@
 import { Button } from '@neo-one/react';
 import * as React from 'react';
-import { connect } from 'react-redux';
 import { Link } from 'react-static';
 import { as, Box, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { Footer } from '../../Footer';
 import { Markdown } from '../common';
-import { selectLesson } from '../redux';
-import { Lesson, SelectedLesson } from '../types';
+import { selectLesson } from '../coursesData';
+import { SelectedLesson } from '../types';
 
-interface ExternalProps {
+interface Props {
   readonly selected: SelectedLesson;
-}
-
-interface Props extends ExternalProps {
-  readonly lesson: Lesson;
 }
 
 const Wrapper = styled(Box)`
@@ -59,14 +54,14 @@ const Text = styled(Box)`
   ${prop('theme.fontStyles.headline')};
 `;
 
-const LessonViewBase = ({ selected, lesson }: Props) => (
+export const LessonView = ({ selected }: Props) => (
   <Wrapper>
     <BoxWrapper>
       <InnerWrapper>
-        <Markdown source={lesson.documentation} />
+        <Markdown source={selectLesson(selected).documentation} />
         <ButtonWrapper>
           <Text>
-            Lesson {selected.lesson + 1}: {lesson.title}
+            Lesson {selected.lesson + 1}: {selectLesson(selected).title}
           </Text>
           <StartButton to={`/course/${selected.course}/${selected.lesson + 1}/1`}>Start</StartButton>
         </ButtonWrapper>
@@ -75,5 +70,3 @@ const LessonViewBase = ({ selected, lesson }: Props) => (
     <Footer />
   </Wrapper>
 );
-
-export const LessonView = connect(selectLesson)(LessonViewBase);

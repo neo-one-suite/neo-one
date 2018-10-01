@@ -1,0 +1,14 @@
+{
+  "name": "@neo-one/local-browser",
+  "version": "1.0.0-preview.0",
+  "description": "NEO•ONE local implementation.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@neo-one/utils": "^1.0.0-preview.0",
+    "@types/localforage": "^0.0.34",
+    "@types/lodash": "^4.14.116",
+    "localforage": "^1.7.2",
+    "lodash": "^4.17.11",
+    "typescript": "3.1.1"
+  }
+}

@@ -1,11 +1,9 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
 import { Box, Flex, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { Background, Tagline } from '../../../elements';
 import { Footer } from '../../Footer';
-import { selectCourses, State } from '../redux';
-import { Courses } from '../types';
+import { courses } from '../coursesData';
 import { CourseSection } from './CourseSection';
 
 const FlexBackground = Flex.as(Background);
@@ -35,12 +33,8 @@ const Wrapper = styled(Flex)`
   flex-direction: column;
 `;
 
-interface Props {
-  readonly courses: Courses;
-}
-
-const CoursesViewComponent = ({ courses }: Props) => (
-  <Wrapper>
+export const CoursesView = (props: {}) => (
+  <Wrapper {...props}>
     <StyledBackground>
       <HeaderWrapper
         gap={24}
@@ -63,5 +57,3 @@ const CoursesViewComponent = ({ courses }: Props) => (
     <Footer />
   </Wrapper>
 );
-
-export const CoursesView = connect((state: State) => ({ courses: selectCourses(state) }))(CoursesViewComponent);

@@ -2,13 +2,11 @@
   "title": "Contracts",
   "files": [
     {
-      "current": "Token.ts",
-      "solution": "Token.solution.ts",
-      "type": "contract"
+      "initial": "one/contracts/Token.one.ts",
+      "solution": "one/contracts/Token.solution.one.ts"
     },
     {
-      "solution": "Token.test.ts",
-      "type": "typescript"
+      "solution": "one/tests/Token.test.ts"
     }
   ]
 }

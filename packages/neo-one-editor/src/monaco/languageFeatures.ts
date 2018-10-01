@@ -1,7 +1,8 @@
 // tslint:disable
 /// <reference types="monaco-editor/monaco" />
+import _ from 'lodash';
 import ts from 'typescript';
-import { LanguageServiceDefaultsImpl } from './monaco.contribution';
+import { LanguageServiceOptions } from './LanguageServiceOptions';
 import { TypeScriptWorker } from './tsWorker';
 import { utils } from '@neo-one/utils';
 
@@ -40,9 +41,10 @@ export abstract class Adapter {
 export class DiagnostcsAdapter extends Adapter {
   private _disposables: IDisposable[] = [];
   private _listener: { [uri: string]: IDisposable } = Object.create(null);
+  private _sources: Set<string> = new Set();
 
   constructor(
-    private _defaults: LanguageServiceDefaultsImpl,
+    private _defaults: LanguageServiceOptions,
     private _selector: string,
     worker: (first: Uri, ...more: Uri[]) => Promise<TypeScriptWorker>,
   ) {
@@ -137,7 +139,22 @@ export class DiagnostcsAdapter extends Adapter {
             .map((d) => this._convertDiagnostics(resource, d))
             .filter(utils.notNull);
 
-          monaco.editor.setModelMarkers(monaco.editor.getModel(resource), this._selector, markers);
+          const seenSources = new Set<string>();
+          Object.entries(_.groupBy(markers, ({ source }) => source)).forEach(([source, sourceMarkers]) => {
+            this._sources.add(source);
+            seenSources.add(source);
+            monaco.editor.setModelMarkers(
+              monaco.editor.getModel(resource),
+              source,
+              sourceMarkers.map(({ data }) => data),
+            );
+          });
+
+          this._sources.forEach((source) => {
+            if (!seenSources.has(source)) {
+              monaco.editor.setModelMarkers(monaco.editor.getModel(resource), source, []);
+            }
+          });
         }
       })
       .done(undefined, (err) => {
@@ -145,7 +162,10 @@ export class DiagnostcsAdapter extends Adapter {
       });
   }
 
-  private _convertDiagnostics(resource: Uri, diag: ts.Diagnostic): monaco.editor.IMarkerData | undefined {
+  private _convertDiagnostics(
+    resource: Uri,
+    diag: ts.Diagnostic,
+  ): { source: string; data: monaco.editor.IMarkerData } | undefined {
     const { start, length } = diag;
     if (start === undefined || length === undefined) {
       return undefined;
@@ -154,7 +174,7 @@ export class DiagnostcsAdapter extends Adapter {
     const { lineNumber: startLineNumber, column: startColumn } = this._offsetToPosition(resource, start);
     const { lineNumber: endLineNumber, column: endColumn } = this._offsetToPosition(resource, start + length);
 
-    return {
+    const data = {
       severity: monaco.MarkerSeverity.Error,
       startLineNumber,
       startColumn,
@@ -162,6 +182,8 @@ export class DiagnostcsAdapter extends Adapter {
       endColumn,
       message: ts.flattenDiagnosticMessageText(diag.messageText, '\n'),
     };
+
+    return { source: diag.source === undefined ? 'ts' : diag.source, data };
   }
 }
 

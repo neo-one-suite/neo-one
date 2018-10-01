@@ -29,7 +29,7 @@ interface Props {
 }
 
 export const EditorFileIcon = ({ file, ...props }: Props) => {
-  if (file.type === 'contract') {
+  if (file.path.endsWith('.one.ts')) {
     return <Monogram {...props} />;
   }
   const type = getFileType(file);

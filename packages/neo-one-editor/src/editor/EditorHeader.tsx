@@ -10,20 +10,20 @@ const Wrapper = styled(Flex)`
 `;
 
 interface Props {
-  readonly selectedFile: EditorFile;
+  readonly file?: EditorFile;
   readonly files: EditorFiles;
   readonly onSelectFile: (file: EditorFile) => void;
 }
 
-export const EditorHeader = ({ selectedFile, files, onSelectFile, ...props }: Props) => (
+export const EditorHeader = ({ file, files, onSelectFile, ...props }: Props) => (
   <Wrapper {...props}>
-    {files.map((file, idx) => (
+    {files.map((otherFile, idx) => (
       <EditorFileTab
-        key={file.path}
+        key={otherFile.path}
         first={idx === 0}
-        selected={selectedFile.path === file.path}
+        selected={file !== undefined && file.path === otherFile.path}
         onSelectFile={onSelectFile}
-        file={file}
+        file={otherFile}
       />
     ))}
   </Wrapper>

@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
 import { styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { Markdown } from '../common';
-import { selectChapter } from '../redux';
-import { Chapter } from '../types';
+import { selectChapter } from '../coursesData';
+import { SelectedChapter } from '../types';
 
 const StyledMarkdown = styled(Markdown)`
   border-right: 1px solid ${prop('theme.gray5')};
@@ -13,9 +12,7 @@ const StyledMarkdown = styled(Markdown)`
 `;
 
 interface Props {
-  readonly chapter: Chapter;
+  readonly selected: SelectedChapter;
 }
 
-const DocsBase = ({ chapter }: Props) => <StyledMarkdown source={chapter.documentation} />;
-
-export const Docs = connect(selectChapter)(DocsBase);
+export const Docs = ({ selected }: Props) => <StyledMarkdown source={selectChapter(selected).documentation} />;

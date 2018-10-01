@@ -1,7 +1,7 @@
+import { Monogram } from '@neo-one/react-common';
 import * as React from 'react';
 import { Box, Flex, Grid, keyframes, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { Monogram } from '../../elements';
 import { Footer } from '../Footer';
 
 const fadeInOut = keyframes`

@@ -1,2 +1,2 @@
-export * from './Editor';
-export * from './types';
+export { Editor } from './Editor';
+export { EditorFile, EditorFiles } from './types';

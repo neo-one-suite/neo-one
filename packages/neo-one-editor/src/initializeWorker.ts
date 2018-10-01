@@ -10,7 +10,10 @@ declare var self: DedicatedWorkerGlobalScope;
 let initialized = false;
 
 // tslint:disable-next-line export-name
-export function initializeWorker(foreignModule: any) {
+export function initializeWorker(
+  foreignModule: any,
+  createHandleMessage: (fallback: (event: MessageEvent) => void) => (event: MessageEvent) => void,
+) {
   if (initialized) {
     return;
   }
@@ -22,14 +25,7 @@ export function initializeWorker(foreignModule: any) {
   }, editorWorker);
 
   // tslint:disable-next-line no-object-mutation
-  self.onmessage = (e) => {
+  self.onmessage = createHandleMessage((e) => {
     simpleWorker.onmessage(e.data);
-  };
+  });
 }
-// tslint:disable-next-line no-object-mutation
-self.onmessage = () => {
-  if (!initialized) {
-    // tslint:disable-next-line no-null-keyword
-    initializeWorker(null);
-  }
-};

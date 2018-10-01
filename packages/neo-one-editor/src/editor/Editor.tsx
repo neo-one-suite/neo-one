@@ -1,3 +1,4 @@
+import { FileSystem } from '@neo-one/local-browser';
 import { ActionMap } from 'constate';
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -19,35 +20,30 @@ const Wrapper = styled(Flex)`
 `;
 
 interface ExternalProps {
-  readonly selectedFile: EditorFile;
   readonly files: EditorFiles;
-  readonly onSelectFile: (file: EditorFile) => void;
-  readonly onChangeFile: (file: EditorFile) => void;
+  readonly fs: FileSystem;
+  readonly fileSystemID: string;
 }
 
 interface State {
-  readonly pendingFile?: EditorFile;
-  readonly pendingRange?: TextRange;
+  readonly file?: EditorFile;
   readonly range?: TextRange;
 }
 
 const INITIAL_STATE: State = {};
 
 interface Actions {
-  readonly setRange: (range: TextRange) => void;
-  readonly setPendingRange: (file: EditorFile, range: TextRange) => void;
+  readonly onSelectFile: (file: EditorFile) => void;
+  readonly onSelectRange: (file: EditorFile, range: TextRange) => void;
 }
 
 const actions: ActionMap<State, Actions> = {
-  setRange: (range: TextRange) => () => ({
-    pendingFile: undefined,
-    pendingRange: undefined,
-    range,
+  onSelectFile: (file: EditorFile) => () => ({
+    file,
   }),
-  setPendingRange: (file: EditorFile, range: TextRange) => () => ({
-    pendingFile: file,
-    pendingRange: range,
-    range: undefined,
+  onSelectRange: (file: EditorFile, range: TextRange) => () => ({
+    file,
+    range,
   }),
 };
 
@@ -56,42 +52,25 @@ interface Props extends ExternalProps {
 }
 
 const EditorBase = ({
-  selectedFile,
   files,
-  onChangeFile,
-  onSelectFile,
   onChangeProblems,
+  fs,
+  fileSystemID,
   ...props
 }: Props & ComponentProps<typeof Wrapper>) => (
-  <Container initialState={INITIAL_STATE} actions={actions}>
-    {({ range, pendingRange, pendingFile, setRange, setPendingRange }) => (
+  <Container initialState={{ ...INITIAL_STATE, file: files[0] }} actions={actions}>
+    {({ range, file, onSelectFile, onSelectRange }) => (
       <Wrapper {...props}>
         <EditorView
-          selectedFile={selectedFile}
+          file={file}
           files={files}
           onSelectFile={onSelectFile}
-          onChangeFile={onChangeFile}
+          fs={fs}
+          fileSystemID={fileSystemID}
           onChangeProblems={onChangeProblems}
-          range={
-            range === undefined
-              ? pendingFile !== undefined && pendingFile.path === selectedFile.path
-                ? pendingRange
-                : undefined
-              : range
-          }
+          range={range}
         />
-        <EditorToolbar
-          selectedFile={selectedFile}
-          files={files}
-          onSelectRange={(file, nextRange) => {
-            if (file.path === selectedFile.path) {
-              setRange(nextRange);
-            } else {
-              setPendingRange(file, nextRange);
-              onSelectFile(file);
-            }
-          }}
-        />
+        <EditorToolbar file={file} files={files} onSelectRange={onSelectRange} />
       </Wrapper>
     )}
   </Container>

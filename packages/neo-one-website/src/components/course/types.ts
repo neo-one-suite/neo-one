@@ -1,5 +1,3 @@
-import { EditorFileType } from '@neo-one/editor';
-
 export interface SelectedCourse {
   readonly course: string;
 }
@@ -46,8 +44,6 @@ export interface Chapter {
 
 export interface ChapterFile {
   readonly path: string;
-  readonly current?: string;
+  readonly initial?: string;
   readonly solution: string;
-  readonly type: EditorFileType;
-  readonly selected: boolean;
 }

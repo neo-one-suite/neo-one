@@ -25,12 +25,12 @@ const ToolbarWrapper = styled(Grid)`
 `;
 
 interface Props {
-  readonly selectedFile: EditorFile;
+  readonly file?: EditorFile;
   readonly files: EditorFiles;
   readonly onSelectRange: (file: EditorFile, range: TextRange) => void;
 }
 
-export const EditorToolbar = ({ selectedFile, files, onSelectRange, ...props }: Props) => (
+export const EditorToolbar = ({ file, files, onSelectRange, ...props }: Props) => (
   <Hidden.Container>
     {(hidden: any) => (
       <Wrapper>
@@ -39,7 +39,7 @@ export const EditorToolbar = ({ selectedFile, files, onSelectRange, ...props }: 
         </Hidden>
         <ToolbarWrapper {...props}>
           <Problems onClick={hidden.toggle} />
-          <FileType file={selectedFile} />
+          <FileType file={file} />
         </ToolbarWrapper>
       </Wrapper>
     )}

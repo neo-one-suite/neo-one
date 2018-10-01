@@ -1,27 +1,29 @@
 // tslint:disable promise-function-async
-import { LanguageServiceDefaultsImpl } from './monaco.contribution';
+import { Disposable, WorkerMirrorFileSystem } from '@neo-one/local-browser';
+import { LanguageServiceOptions } from './LanguageServiceOptions';
 import { TypeScriptWorker } from './tsWorker';
 
 import Promise = monaco.Promise;
 import IDisposable = monaco.IDisposable;
 import Uri = monaco.Uri;
 
+type Clients = [monaco.editor.MonacoWebWorker<TypeScriptWorker>, TypeScriptWorker, Disposable];
+
 // tslint:disable-next-line export-name
 export class WorkerManager {
   private readonly modeID: string;
-  private readonly defaults: LanguageServiceDefaultsImpl;
+  private readonly options: LanguageServiceOptions;
   private readonly idleCheckInterval: NodeJS.Timer;
   private mutableLastUsedTime: number;
   private readonly configChangeListener: IDisposable;
-  private mutableWorker: monaco.editor.MonacoWebWorker<TypeScriptWorker> | undefined;
-  private mutableClient: Promise<TypeScriptWorker> | undefined;
+  private mutableClients: Promise<Clients> | undefined;
 
-  public constructor(modeID: string, defaults: LanguageServiceDefaultsImpl) {
+  public constructor(modeID: string, options: LanguageServiceOptions) {
     this.modeID = modeID;
-    this.defaults = defaults;
+    this.options = options;
     this.idleCheckInterval = setInterval(() => this.checkIfIdle(), 30 * 1000);
     this.mutableLastUsedTime = 0;
-    this.configChangeListener = this.defaults.onDidChange(() => this.stopWorker());
+    this.configChangeListener = this.options.onDidChange(() => this.stopWorker());
   }
 
   public dispose(): void {
@@ -31,62 +33,54 @@ export class WorkerManager {
   }
 
   // tslint:disable-next-line readonly-array
-  public getLanguageServiceWorker(...resources: Uri[]): Promise<TypeScriptWorker> {
-    let mutableClient: TypeScriptWorker;
+  public getScriptWorker(...resources: Uri[]): Promise<TypeScriptWorker> {
+    return toShallowCancelPromise(this.getClients().then(([worker]) => worker.withSyncedResources(resources)));
+  }
 
-    return toShallowCancelPromise(
-      this.getClient()
-        .then((client) => {
-          mutableClient = client;
-        })
-        .then(() => {
-          if (this.mutableWorker === undefined) {
-            throw new Error('Something went wrong');
-          }
-
-          return this.mutableWorker.withSyncedResources(resources);
-        })
-        .then(() => mutableClient),
-    );
+  public getWebWorker(): Promise<Worker> {
+    // tslint:disable-next-line no-any
+    return toShallowCancelPromise(this.getClients().then(([worker]) => (worker as any)._worker._worker.worker));
   }
 
   private stopWorker(): void {
-    if (this.mutableWorker) {
-      this.mutableWorker.dispose();
-      this.mutableWorker = undefined;
+    if (this.mutableClients) {
+      // tslint:disable-next-line no-floating-promises
+      this.mutableClients.then((value) => {
+        value[0].dispose();
+        value[2].dispose();
+      });
+      this.mutableClients = undefined;
     }
-    this.mutableClient = undefined;
   }
 
   private checkIfIdle(): void {
-    if (!this.mutableWorker) {
+    if (!this.mutableClients) {
       return;
     }
-    const maxIdleTime = this.defaults.getWorkerMaxIdleTime();
+    const maxIdleTime = this.options.getWorkerMaxIdleTime();
     const timePassedSinceLastUsed = Date.now() - this.mutableLastUsedTime;
     if (maxIdleTime > 0 && timePassedSinceLastUsed > maxIdleTime) {
       this.stopWorker();
     }
   }
 
-  private getClient(): Promise<TypeScriptWorker> {
+  private getClients(): Promise<Clients> {
     this.mutableLastUsedTime = Date.now();
 
-    if (this.mutableClient === undefined) {
-      this.mutableWorker = monaco.editor.createWebWorker<TypeScriptWorker>({
+    if (this.mutableClients === undefined) {
+      const worker = monaco.editor.createWebWorker<TypeScriptWorker>({
         moduleId: 'unused',
         label: this.modeID,
         createData: {
-          compilerOptions: this.defaults.getCompilerOptions(),
-          extraLibs: this.defaults.getExtraLibs(),
-          isSmartContract: this.defaults.isSmartContract(),
+          compilerOptions: this.options.getCompilerOptions(),
+          isSmartContract: this.options.isSmartContract(),
+          fileSystemID: this.options.getFileSystemID(),
         },
       });
 
-      let p = this.mutableWorker.getProxy();
-      const worker = this.mutableWorker;
+      let p = worker.getProxy();
 
-      if (this.defaults.getEagerModelSync()) {
+      if (this.options.getEagerModelSync()) {
         p = p.then(() =>
           worker.withSyncedResources(
             monaco.editor
@@ -97,10 +91,16 @@ export class WorkerManager {
         );
       }
 
-      this.mutableClient = p;
+      this.mutableClients = p.then<Clients>((client) => {
+        // tslint:disable-next-line no-any
+        const webWorker = (worker as any)._worker._worker.worker;
+        const disposable = WorkerMirrorFileSystem.subscribe(this.options.getFileSystem(), webWorker);
+
+        return [worker, client, disposable];
+      });
     }
 
-    return this.mutableClient;
+    return this.mutableClients;
   }
 }
 
