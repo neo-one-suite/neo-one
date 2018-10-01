@@ -2,7 +2,6 @@ import {
   dirname,
   ensureDir,
   FileSystem,
-  initializeFileSystem,
   LocalForageFileSystem,
   MemoryFileSystem,
   MirrorFileSystem,
@@ -12,6 +11,7 @@ import { Container, OnMountProps } from 'constate';
 import * as React from 'react';
 import { METADATA_FILE } from './constants';
 import { Editor, EditorFiles } from './editor';
+import { initializeFileSystem } from './initializeFileSystem';
 import { Loading } from './Loading';
 import { FileMetadata, FileSystemMetadata } from './types';
 
