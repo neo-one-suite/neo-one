@@ -15118,10 +15118,10 @@ readline2@^1.0.1:
     is-fullwidth-code-point "^1.0.0"
     mute-stream "0.0.5"
 
-reakit@0.15.3, reakit@^0.15.3:
-  version "0.15.3"
-  resolved "https://registry.yarnpkg.com/reakit/-/reakit-0.15.3.tgz#e56a75c4a801f357c8a18ab6fa8b9c05aa1640e9"
-  integrity sha512-VMhoT5xAwZ/rkwGGnrD/U5EaEq+WzqqGAdF5vyrTK+NfASjhYqjbmAajmE5iohXNBPO9mSQVOkqA4c/nW3eKnA==
+reakit@0.15.4:
+  version "0.15.4"
+  resolved "https://registry.yarnpkg.com/reakit/-/reakit-0.15.4.tgz#deb24fa3043905b283ffb7651931ad415ed6a19b"
+  integrity sha512-BMtem6Clddd5KWBKwbJKR4zsk+wz1vTjDXj7iK3tigfRj7Dn5vfm0tDzBhyFvDLpdH44tLdhyjth6QsbiKWF8Q==
   dependencies:
     "@emotion/is-prop-valid" "^0.6.0"
     constate "^0.8.2"
@@ -15143,6 +15143,19 @@ reakit@^0.14.5:
     prop-types "^15.6.2"
     styled-components "^3.0.0"
     styled-tools "^1.4.1"
+
+reakit@^0.15.3:
+  version "0.15.3"
+  resolved "https://registry.yarnpkg.com/reakit/-/reakit-0.15.3.tgz#e56a75c4a801f357c8a18ab6fa8b9c05aa1640e9"
+  integrity sha512-VMhoT5xAwZ/rkwGGnrD/U5EaEq+WzqqGAdF5vyrTK+NfASjhYqjbmAajmE5iohXNBPO9mSQVOkqA4c/nW3eKnA==
+  dependencies:
+    "@emotion/is-prop-valid" "^0.6.0"
+    constate "^0.8.2"
+    hoist-non-react-statics "^3.0.1"
+    popper.js "^1.14.4"
+    prop-types "^15.6.2"
+    styled-components "^3.0.0"
+    styled-tools "^1.5.1"
 
 realpath-native@^1.0.0:
   version "1.0.2"
