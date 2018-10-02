@@ -1,13 +1,11 @@
-import { FileSystem } from '@neo-one/local-browser';
 import { ActionMap } from 'constate';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Container, Flex, styled } from 'reakit';
-import { ReduxStoreProvider } from '../containers';
 import { ComponentProps } from '../types';
 import { EditorToolbar } from './EditorToolbar';
 import { EditorView } from './EditorView';
-import { configureStore, setFileProblems } from './redux';
+import { setFileProblems } from './redux';
 import { EditorFile, EditorFiles, FileDiagnostic, TextRange } from './types';
 
 const Wrapper = styled(Flex)`
@@ -21,8 +19,6 @@ const Wrapper = styled(Flex)`
 
 interface ExternalProps {
   readonly files: EditorFiles;
-  readonly fs: FileSystem;
-  readonly fileSystemID: string;
 }
 
 interface State {
@@ -51,13 +47,7 @@ interface Props extends ExternalProps {
   readonly onChangeProblems: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
 }
 
-const EditorBase = ({
-  files,
-  onChangeProblems,
-  fs,
-  fileSystemID,
-  ...props
-}: Props & ComponentProps<typeof Wrapper>) => (
+const EditorBase = ({ files, onChangeProblems, ...props }: Props & ComponentProps<typeof Wrapper>) => (
   <Container initialState={{ ...INITIAL_STATE, file: files[0] }} actions={actions}>
     {({ range, file, onSelectFile, onSelectRange }) => (
       <Wrapper {...props}>
@@ -65,8 +55,6 @@ const EditorBase = ({
           file={file}
           files={files}
           onSelectFile={onSelectFile}
-          fs={fs}
-          fileSystemID={fileSystemID}
           onChangeProblems={onChangeProblems}
           range={range}
         />
@@ -76,7 +64,7 @@ const EditorBase = ({
   </Container>
 );
 
-const ConnectedEditor = connect(
+export const Editor = connect(
   undefined,
   (dispatch) => ({
     // tslint:disable-next-line no-unnecessary-type-annotation
@@ -84,9 +72,3 @@ const ConnectedEditor = connect(
       dispatch(setFileProblems({ path, problems: diagnostics })),
   }),
 )(EditorBase);
-
-export const Editor = (props: ExternalProps) => (
-  <ReduxStoreProvider createStore={configureStore}>
-    <ConnectedEditor {...props} />
-  </ReduxStoreProvider>
-);

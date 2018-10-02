@@ -248,7 +248,8 @@ export const build = (
                         mutableSourceMaps[address] = contract.sourceMap;
                         const [prodNetworksDefinition] = await Promise.all<SmartContractNetworksDefinition, string>([
                           Promise.resolve({}),
-                          deployContract(network, contract, mutableSourceMaps),
+                          // tslint:disable-next-line no-non-null-assertion
+                          deployContract(network, contract, mutableSourceMaps, getWallet(ctx).wif!),
                         ]);
 
                         mutableLinked[contractPath.filePath] = { [contractPath.name]: address };

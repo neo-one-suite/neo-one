@@ -23,6 +23,8 @@ describe('create network', () => {
 
       const body = await response.text();
       const metrics = body.split('\n').filter((line) => line.includes('# TYPE') && line.includes('neo_'));
+      // tslint:disable-next-line no-array-mutation
+      metrics.sort();
       expect(metrics).toMatchSnapshot();
     });
   });

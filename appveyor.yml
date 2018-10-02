@@ -23,7 +23,6 @@ for:
     test_script:
       - yarn run test-ci-windows-8
       - yarn run e2e-ci-windows-8
-      - yarn run test:playground
     # Don't actually build.
     build: off
   -
@@ -45,7 +44,6 @@ for:
     test_script:
       - yarn run test-ci-windows-9
       - yarn run e2e-ci-windows-9
-      - yarn run test:playground
     # Don't actually build.
     build: off
   -
@@ -67,6 +65,5 @@ for:
     test_script:
       - yarn run test-ci
       - yarn run e2e-ci
-      - yarn run test:playground
     # Don't actually build.
     build: off

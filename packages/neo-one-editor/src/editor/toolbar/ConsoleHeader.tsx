@@ -3,9 +3,17 @@ import * as React from 'react';
 import { MdClose, MdDeleteSweep } from 'react-icons/md';
 import { connect } from 'react-redux';
 import { css, Grid, styled } from 'reakit';
-import { clearConsole, EditorState, selectConsoleProblems, selectConsoleType, setConsoleType } from '../redux';
+import {
+  clearConsole,
+  EditorState,
+  selectConsoleOutputOwner,
+  selectConsoleProblems,
+  selectConsoleType,
+  setConsoleType,
+} from '../redux';
 import { ConsoleType, FileDiagnostic } from '../types';
 import { ConsoleButton } from './ConsoleButton';
+import { ConsoleSelector } from './ConsoleSelector';
 import { ConsoleTab } from './ConsoleTab';
 import { ProblemCount } from './ProblemCount';
 
@@ -45,8 +53,9 @@ const Close = styled(MdClose)`
 
 interface Props {
   readonly consoleType: ConsoleType;
+  readonly consoleOutputOwner: string;
   readonly consoleProblems: ReadonlyArray<FileDiagnostic>;
-  readonly onClearConsole: () => void;
+  readonly onClearConsole: (owner: string) => void;
   readonly onClickProblems: () => void;
   readonly onClickOutput: () => void;
   readonly onCloseConsole: () => void;
@@ -58,6 +67,7 @@ const getErrorOrWarnCount = (consoleProblems: ReadonlyArray<FileDiagnostic>) =>
 
 const ConsoleHeaderBase = ({
   consoleType,
+  consoleOutputOwner,
   consoleProblems,
   onClickOutput,
   onClickProblems,
@@ -77,7 +87,14 @@ const ConsoleHeaderBase = ({
       </TabsWrapper>
       <ButtonsWrapper>
         {consoleType === 'output' ? (
-          <ConsoleButton icon={<Delete />} onClick={onClearConsole} tooltip="Clear Output" />
+          <>
+            <ConsoleSelector owner={consoleOutputOwner} />
+            <ConsoleButton
+              icon={<Delete />}
+              onClick={() => onClearConsole(consoleOutputOwner)}
+              tooltip="Clear Output"
+            />
+          </>
         ) : null}
         <ConsoleButton icon={<Close />} onClick={onCloseConsole} tooltip="Close Panel" />
       </ButtonsWrapper>
@@ -88,11 +105,12 @@ const ConsoleHeaderBase = ({
 export const ConsoleHeader = connect(
   (state: EditorState) => ({
     ...selectConsoleType(state),
+    ...selectConsoleOutputOwner(state),
     ...selectConsoleProblems(state),
   }),
   (dispatch) => ({
     onClickProblems: () => dispatch(setConsoleType('problems')),
     onClickOutput: () => dispatch(setConsoleType('output')),
-    onClearConsole: () => dispatch(clearConsole()),
+    onClearConsole: (owner: string) => dispatch(clearConsole(owner)),
   }),
 )(ConsoleHeaderBase);

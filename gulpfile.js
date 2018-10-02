@@ -79,6 +79,7 @@ const SKIP_PACKAGES = new Set([
   'neo-one-website',
   'neo-one-local-browser',
   'neo-one-node-browser',
+  'neo-one-worker',
 ]);
 const SKIP_PACKAGES_LIST = [...SKIP_PACKAGES];
 

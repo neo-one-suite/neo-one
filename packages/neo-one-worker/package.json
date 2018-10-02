@@ -1,0 +1,12 @@
+{
+  "name": "@neo-one/worker",
+  "version": "1.0.0-preview.0",
+  "description": "NEO•ONE web workers.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@neo-one/types": "^1.0.0-preview.0",
+    "rxjs": "^6.3.3",
+    "tslib": "^1.9.3"
+  },
+  "sideEffects": false
+}

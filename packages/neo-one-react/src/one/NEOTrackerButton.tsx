@@ -8,20 +8,22 @@ import { WithNEOTrackerURL } from './WithNEOTrackerURL';
 export function NEOTrackerButton() {
   return (
     <WithNEOTrackerURL>
-      {(neotrackerURL) => (
-        <ToolbarButton
-          data-test-button="neo-one-neotracker-button"
-          data-test-tooltip="neo-one-neotracker-tooltip"
-          as={Link}
-          href={neotrackerURL}
-          help="Open NEO Tracker..."
-          target="_blank"
-        >
-          <Box>
-            <MdOpenInNew />
-          </Box>
-        </ToolbarButton>
-      )}
+      {(neotrackerURL) =>
+        neotrackerURL === undefined ? null : (
+          <ToolbarButton
+            data-test-button="neo-one-neotracker-button"
+            data-test-tooltip="neo-one-neotracker-tooltip"
+            as={Link}
+            href={neotrackerURL}
+            help="Open NEO Tracker..."
+            target="_blank"
+          >
+            <Box>
+              <MdOpenInNew />
+            </Box>
+          </ToolbarButton>
+        )
+      }
     </WithNEOTrackerURL>
   );
 }

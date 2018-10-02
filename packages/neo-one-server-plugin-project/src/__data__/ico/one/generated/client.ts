@@ -1,4 +1,4 @@
-/* @hash 7df2a8c2ac9d3f8f1a9a5dfc4c6811bd */
+/* @hash 83bfde457ae311a31347a44614332db3 */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -15,6 +15,7 @@ import {
   UserAccountProviders,
 } from '@neo-one/client';
 import { projectID } from './projectID';
+import { LocalClient } from '@neo-one/react';
 
 export type DefaultUserAccountProviders = {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>;
@@ -38,7 +39,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
 > => {
   const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [];
   if (process.env.NODE_ENV !== 'production') {
-    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 16019 }));
+    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 48242 }));
   }
   const provider = new NEOONEProvider(providers);
 
@@ -118,9 +119,30 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
 };
 
 export const createDeveloperClients = (): { [network: string]: DeveloperClient } => ({
-  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, port: 16019 })),
+  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, port: 48242 })),
 });
 
-export const createOneClients = (): { [network: string]: OneClient } => ({
-  local: new OneClient(16019),
-});
+export const createLocalClients = (): { [network: string]: LocalClient } => {
+  const client = new OneClient(48242);
+  return {
+    local: {
+      getNEOTrackerURL: async () => {
+        const result = await client.request({
+          plugin: '@neo-one/server-plugin-project',
+          options: { type: 'neotracker', projectID },
+        });
+
+        return result.response;
+      },
+      reset: async () => {
+        await client.executeTaskList({
+          plugin: '@neo-one/server-plugin-project',
+          options: {
+            command: 'reset',
+            projectID,
+          },
+        });
+      },
+    },
+  };
+};

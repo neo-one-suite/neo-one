@@ -1,17 +1,17 @@
 // tslint:disable no-submodule-imports no-import-side-effect
 /// <reference types="monaco-editor/monaco" />
 import { FileSystem } from '@neo-one/local-browser';
-import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 // @ts-ignore
 import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.main';
 import * as React from 'react';
 import { styled } from 'reakit';
 import ResizeObserver from 'resize-observer-polyfill';
+import { Engine } from '../engine';
 import { getLanguageID, LanguageType, setupLanguages } from '../monaco/language';
-import { getFileType } from '../utils';
 import { dark } from './theme';
 import { EditorFile, EditorFiles, FileDiagnostic, FileDiagnosticSeverity, TextRange } from './types';
+import { getLanguageIDForFile } from './utils';
 
 const Container = styled.div`
   display: flex;
@@ -38,28 +38,11 @@ monac.editor.defineTheme('dark', dark as any);
 // Store editor states such as cursor position, selection and scroll position for each model
 const editorStates = new Map<string, monaco.editor.ICodeEditorViewState>();
 
-const getLanguageIDForFile = (fileSystemID: string, file: EditorFile) => {
-  const type = getFileType(file);
-
-  switch (type) {
-    case 'contract':
-      return getLanguageID(fileSystemID, LanguageType.Contract);
-    case 'typescript':
-      return getLanguageID(fileSystemID, LanguageType.TypeScript);
-    case 'javascript':
-      return getLanguageID(fileSystemID, LanguageType.JavaScript);
-    default:
-      utils.assertNever(type);
-      throw new Error('For TS');
-  }
-};
-
 export interface Props {
   readonly file?: EditorFile;
   readonly range?: TextRange;
   readonly files?: EditorFiles;
-  readonly fs: FileSystem;
-  readonly fileSystemID: string;
+  readonly engine: Engine;
   readonly autoFocus?: boolean;
   readonly onValueChange?: (value: string) => void;
   readonly onUpdateDiagnostics?: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
@@ -69,7 +52,10 @@ export class MonacoEditor extends React.Component<Props> {
   private readonly ref = React.createRef<HTMLDivElement>();
   private readonly resizeRef = React.createRef<HTMLDivElement>();
   private mutableEditor: monaco.editor.IStandaloneCodeEditor | undefined;
+  private mutableFS: FileSystem | undefined;
+  private mutableID: string | undefined;
   private mutableValueSubscription: monaco.IDisposable | undefined;
+  private mutableInitPromise: Promise<void> | undefined;
   // tslint:disable-next-line readonly-keyword
   private readonly mutableAnnotationSubscriptions: { [key: string]: monaco.IDisposable } = {};
   private readonly resizeObserver = new ResizeObserver(
@@ -89,25 +75,34 @@ export class MonacoEditor extends React.Component<Props> {
   );
 
   public componentDidMount(): void {
-    setupLanguages(this.props.fileSystemID, this.props.fs);
     const current = this.ref.current;
     if (current !== null) {
-      this.mutableEditor = monac.editor.create(current, {
-        language: getLanguageID(this.props.fileSystemID, LanguageType.TypeScript),
-        theme: 'dark',
-        ...this.getEditorOptions(this.props),
-      });
+      this.mutableInitPromise = Promise.all([this.props.engine.getID(), this.props.engine.getFileSystem()])
+        .then(([id, fs]) => {
+          setupLanguages(id, fs);
+          this.mutableID = id;
+          this.mutableFS = fs;
+          this.mutableEditor = monac.editor.create(current, {
+            language: getLanguageID(id, LanguageType.TypeScript),
+            theme: 'dark',
+            ...this.getEditorOptions(this.props),
+          });
 
-      const { file, autoFocus, files = [] } = this.props;
-      if (file !== undefined) {
-        this.openFile(file, undefined, autoFocus);
-      }
+          const { file, autoFocus, files = [] } = this.props;
+          if (file !== undefined) {
+            this.openFile(file, undefined, autoFocus);
+          }
 
-      files.forEach((newFile) => {
-        if (file === undefined || newFile.path !== file.path) {
-          this.initializeFile(newFile);
-        }
-      });
+          files.forEach((newFile) => {
+            if (file === undefined || newFile.path !== file.path) {
+              this.initializeFile(newFile);
+            }
+          });
+        })
+        .catch((error) => {
+          // tslint:disable-next-line no-console
+          console.error(error);
+        });
     }
 
     const currentResize = this.resizeRef.current;
@@ -118,39 +113,49 @@ export class MonacoEditor extends React.Component<Props> {
 
   public componentDidUpdate(prevProps: Props): void {
     const { file, range, autoFocus, files } = this.props;
+    if (this.mutableInitPromise !== undefined) {
+      this.mutableInitPromise
+        .then(() => {
+          if (file === undefined) {
+            // tslint:disable-next-line no-null-keyword
+            this.editor.setModel(null);
+          } else if (prevProps.file === undefined || file.path !== prevProps.file.path) {
+            if (prevProps.file !== undefined) {
+              editorStates.set(prevProps.file.path, this.editor.saveViewState());
+            }
 
-    if (file === undefined) {
-      // tslint:disable-next-line no-null-keyword
-      this.editor.setModel(null);
-    } else if (prevProps.file === undefined || file.path !== prevProps.file.path) {
-      if (prevProps.file !== undefined) {
-        editorStates.set(prevProps.file.path, this.editor.saveViewState());
-      }
-
-      this.openFile(file, range, autoFocus);
-    } else if (range !== undefined && !_.isEqual(range, prevProps.range)) {
-      this.editor.setSelection(range);
-    }
-
-    const prevOptions = this.getEditorOptions(prevProps);
-    const options = this.getEditorOptions(this.props);
-    if (!_.isEqual(prevOptions, options) && this.mutableEditor !== undefined) {
-      this.mutableEditor.updateOptions(options);
-      this.editor.focus();
-    }
-
-    if (files !== undefined && files !== prevProps.files) {
-      // Update all changed files for updated intellisense
-      files.forEach((newFile) => {
-        if (file === undefined || newFile.path !== file.path) {
-          const previous =
-            prevProps.files === undefined ? undefined : prevProps.files.find((entry) => entry.path === newFile.path);
-
-          if (previous === undefined) {
-            this.initializeFile(newFile);
+            this.openFile(file, range, autoFocus);
+          } else if (range !== undefined && !_.isEqual(range, prevProps.range)) {
+            this.editor.setSelection(range);
           }
-        }
-      });
+
+          const prevOptions = this.getEditorOptions(prevProps);
+          const options = this.getEditorOptions(this.props);
+          if (!_.isEqual(prevOptions, options)) {
+            this.editor.updateOptions(options);
+            this.editor.focus();
+          }
+
+          if (files !== undefined && files !== prevProps.files) {
+            // Update all changed files for updated intellisense
+            files.forEach((newFile) => {
+              if (file === undefined || newFile.path !== file.path) {
+                const previous =
+                  prevProps.files === undefined
+                    ? undefined
+                    : prevProps.files.find((entry) => entry.path === newFile.path);
+
+                if (previous === undefined) {
+                  this.initializeFile(newFile);
+                }
+              }
+            });
+          }
+        })
+        .catch((error) => {
+          // tslint:disable-next-line no-console
+          console.error(error);
+        });
     }
   }
 
@@ -180,6 +185,22 @@ export class MonacoEditor extends React.Component<Props> {
     return this.mutableEditor;
   }
 
+  private get fs(): FileSystem {
+    if (this.mutableFS === undefined) {
+      throw new Error('FileSystem not created');
+    }
+
+    return this.mutableFS;
+  }
+
+  private get id(): string {
+    if (this.mutableID === undefined) {
+      throw new Error('ID not set');
+    }
+
+    return this.mutableID;
+  }
+
   private openFile(file: EditorFile, range?: monaco.IRange, focus?: boolean): void {
     this.initializeFile(file);
 
@@ -205,7 +226,7 @@ export class MonacoEditor extends React.Component<Props> {
       const editorModel = this.editor.getModel();
       const editorValue = editorModel.getValue();
 
-      this.props.fs.writeFileSync(editorModel.uri.path, editorValue);
+      this.fs.writeFileSync(editorModel.uri.path, editorValue);
 
       const { onValueChange } = this.props;
       if (onValueChange !== undefined) {
@@ -232,7 +253,7 @@ export class MonacoEditor extends React.Component<Props> {
   private initializeFile(file: EditorFile): void {
     let model = monac.editor.getModels().find((mdl) => mdl.uri.path === file.path);
 
-    const content = this.props.fs.readFileSync(file.path);
+    const content = this.fs.readFileSync(file.path);
     if (model && !model.isDisposed()) {
       model.pushEditOperations(
         [],
@@ -247,7 +268,7 @@ export class MonacoEditor extends React.Component<Props> {
     } else {
       model = monac.editor.createModel(
         content,
-        getLanguageIDForFile(this.props.fileSystemID, file),
+        getLanguageIDForFile(this.id, file),
         new monac.Uri().with({ path: file.path }),
       );
       model.updateOptions({

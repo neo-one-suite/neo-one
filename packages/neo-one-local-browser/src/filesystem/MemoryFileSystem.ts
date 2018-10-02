@@ -62,11 +62,13 @@ export class MemoryFileSystem extends SubscribableSyncFileSystem implements File
         throw new Error(`Something went wrong, could not find path: ${parentPath}`);
       }
 
-      this.mutablePaths[parentPath] = {
-        ...parentDir,
-        // tslint:disable-next-line no-array-mutation
-        children: parentDir.children.concat([childPath]).sort(),
-      };
+      if (!parentDir.children.includes(childPath)) {
+        this.mutablePaths[parentPath] = {
+          ...parentDir,
+          // tslint:disable-next-line no-array-mutation
+          children: parentDir.children.concat([childPath]).sort(),
+        };
+      }
     }
   }
 

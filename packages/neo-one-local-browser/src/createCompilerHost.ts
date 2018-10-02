@@ -13,8 +13,7 @@ export const createCompilerHost = ({ fs }: Options) => {
   const fsHost = createFSHost(fs);
 
   return {
-    getAllTypescriptFilesInDir: async (dir: string) =>
-      fsHost.readDirectory(dir.endsWith('/') ? `${dir}**/*.ts` : `${dir}/**/*.ts`),
+    getAllTypescriptFilesInDir: async (dir: string) => fsHost.readDirectory(dir, ['ts']),
     createSnippetFile: (fileName = 'snippetCode.ts') => `/tmp/${fileName}`,
     getSmartContractPath,
     getSmartContractLibPath,

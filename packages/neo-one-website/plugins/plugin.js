@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
 import * as path from 'path';
 import webpack from 'webpack';
+import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
 
 export default () => ({
   webpack: (config, { stage, defaultLoaders }) => {
@@ -105,6 +106,8 @@ export default () => ({
         // tslint:disable-next-line no-object-mutation
         resource.request = resource.request.replace(/^@reactivex\/ix-es2015-cjs(.*)$/, '@reactivex/ix-esnext-esm$1');
       }),
+      new webpack.ProgressPlugin(),
+      new HardSourceWebpackPlugin(),
     ]);
 
     return config;

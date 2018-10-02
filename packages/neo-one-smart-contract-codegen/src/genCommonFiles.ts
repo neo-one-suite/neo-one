@@ -53,7 +53,7 @@ export const genCommonFiles = ({
   const testFile = formatFile(genTest({ contractsPaths, testPath, commonTypesPath }));
   const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }));
   const sourceMapsFile = formatFile(genSourceMaps({ httpServerPort, sourceMapsPath, projectIDPath, sourceMaps }));
-  const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath, projectIDPath }));
+  const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath }));
   const clientFile = formatFile(
     genClient({ localDevNetworkName, wallets, networks, clientPath, projectIDPath, httpServerPort }),
   );

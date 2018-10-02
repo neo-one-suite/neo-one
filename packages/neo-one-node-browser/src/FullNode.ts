@@ -54,6 +54,7 @@ export class FullNode {
     const settings = createMain({
       address: common.uInt160ToString(crypto.privateKeyToScriptHash(primaryPrivateKey)),
       standbyValidators: [common.ecPointToString(primaryPublicKey)],
+      privateNet: true,
     });
     const storage = levelupStorage({
       db: LevelUp(leveljs('neo-one-node')),

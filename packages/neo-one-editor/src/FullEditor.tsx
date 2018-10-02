@@ -1,93 +1,88 @@
-import {
-  dirname,
-  ensureDir,
-  FileSystem,
-  LocalForageFileSystem,
-  MemoryFileSystem,
-  MirrorFileSystem,
-  pathExists,
-} from '@neo-one/local-browser';
+import { OutputMessage } from '@neo-one/local-browser';
 import { Container, OnMountProps } from 'constate';
 import * as React from 'react';
-import { METADATA_FILE } from './constants';
+import { connect } from 'react-redux';
+import { ReduxStoreProvider } from './containers';
 import { Editor, EditorFiles } from './editor';
-import { initializeFileSystem } from './initializeFileSystem';
+import { appendConsole, configureStore } from './editor/redux';
+import { EditorContext } from './EditorContext';
+import { Engine } from './engine';
 import { Loading } from './Loading';
-import { FileMetadata, FileSystemMetadata } from './types';
-
-export interface EditorContentFile {
-  readonly path: string;
-  readonly content: string;
-  readonly writable: boolean;
-  readonly open: boolean;
-}
-
-export type EditorContentFiles = ReadonlyArray<EditorContentFile>;
+import { EngineContentFiles } from './types';
 
 interface State {
-  readonly fileSystemID: string;
-  readonly initialFiles: EditorContentFiles;
+  readonly id: string;
+  readonly initialFiles: EngineContentFiles;
   readonly files: EditorFiles;
-  readonly fs?: FileSystem;
+  readonly engine?: Engine;
+  readonly appendOutput: (output: OutputMessage) => void;
 }
 
-const onMount = ({ state: { fileSystemID, initialFiles }, setState }: OnMountProps<State>) => {
-  MirrorFileSystem.create(new MemoryFileSystem(), new LocalForageFileSystem(fileSystemID))
-    .then(async (fs) => {
-      const exists = pathExists(fs, METADATA_FILE);
-      let metadata: FileSystemMetadata;
-      if (exists) {
-        const metadataContents = fs.readFileSync(METADATA_FILE);
-        metadata = JSON.parse(metadataContents);
-      } else {
-        initializeFileSystem(fs);
-        metadata = {
-          fileMetadata: initialFiles.reduce<FileSystemMetadata['fileMetadata']>(
-            (acc, file) => ({
-              ...acc,
-              [file.path]: { writable: file.writable },
-            }),
-            {},
-          ),
-          files: initialFiles.filter((file) => file.open).map((file) => file.path),
-        };
-        initialFiles.forEach((file) => {
-          ensureDir(fs, dirname(file.path));
-          fs.writeFileSync(file.path, file.content);
-        });
-        fs.writeFileSync(METADATA_FILE, JSON.stringify(metadata));
-      }
+const onMount = ({ state: { id, initialFiles, appendOutput }, setState }: OnMountProps<State>) => {
+  Engine.create({ id, initialFiles })
+    .then(async (engine) =>
+      Promise.all([engine.getOutput$(), engine.getOpenFiles$()]).then(async ([output$, openFiles$]) => {
+        setState({ engine, files: openFiles$.getValue() });
 
-      setState({
-        fs,
-        files: metadata.files.map((file) => {
-          const fileMetadata = metadata.fileMetadata[file] as FileMetadata | undefined;
-
-          return {
-            path: file,
-            writable: fileMetadata === undefined ? true : fileMetadata.writable,
-          };
-        }),
-      });
-    })
+        return Promise.all([
+          openFiles$.subscribe({
+            next: (files) => {
+              setState({ files });
+            },
+          }),
+          output$.subscribe({
+            next: (output) => {
+              appendOutput(output);
+            },
+          }),
+        ]);
+      }),
+    )
     .catch((error) => {
       // tslint:disable-next-line no-console
       console.error(error);
     });
 };
 
-interface Props {
+interface ExternalProps {
   readonly id: string;
-  readonly initialFiles: EditorContentFiles;
+  readonly initialFiles: EngineContentFiles;
 }
-export const FullEditor = ({ id, initialFiles, ...props }: Props) => (
-  <Container initialState={{ fileSystemID: id, initialFiles, files: [] }} onMount={onMount}>
-    {({ files, fs, fileSystemID }) =>
-      fs === undefined ? (
+
+interface Props extends ExternalProps {
+  readonly appendOutput: (output: OutputMessage) => void;
+}
+const FullEditorBase = ({ id, initialFiles, appendOutput, ...props }: Props) => (
+  <Container
+    initialState={{
+      id,
+      initialFiles,
+      files: [],
+      appendOutput,
+    }}
+    onMount={onMount}
+  >
+    {({ files, engine }) =>
+      engine === undefined ? (
         <Loading {...props} />
       ) : (
-        <Editor files={files} fs={fs} fileSystemID={fileSystemID} {...props} />
+        <EditorContext.Provider value={{ engine }}>
+          <Editor files={files} {...props} />
+        </EditorContext.Provider>
       )
     }
   </Container>
+);
+
+const ConnectedFullEditor = connect(
+  undefined,
+  (dispatch) => ({
+    appendOutput: (output: OutputMessage) => dispatch(appendConsole(output)),
+  }),
+)(FullEditorBase);
+
+export const FullEditor = (props: ExternalProps) => (
+  <ReduxStoreProvider createStore={configureStore}>
+    <ConnectedFullEditor {...props} />
+  </ReduxStoreProvider>
 );

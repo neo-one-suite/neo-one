@@ -13,24 +13,18 @@ export function ResetButton() {
     <WithAddError>
       {(addError) => (
         <WithNetworkClient>
-          {({ client, oneClient, projectID }) => (
+          {({ client, localClient }) => (
             <FromStream props$={disabled$}>
               {(disabled) => {
-                if (oneClient === undefined) {
+                if (localClient === undefined) {
                   // tslint:disable-next-line no-null-keyword
                   return null;
                 }
 
                 const onClick = () => {
                   disabled$.next(true);
-                  oneClient
-                    .executeTaskList({
-                      plugin: '@neo-one/server-plugin-project',
-                      options: {
-                        command: 'reset',
-                        projectID,
-                      },
-                    })
+                  localClient
+                    .reset()
                     .then(() => {
                       client.reset();
                       disabled$.next(false);

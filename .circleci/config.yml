@@ -324,7 +324,7 @@ aliases:
 
 node8: &node8
   docker:
-    - image: neotracker/neo-one-circleci-node:8.9.0-3
+    - image: neotracker/neo-one-circleci-node:8.9.0-4
 
 node9: &node9
   docker:
@@ -412,8 +412,6 @@ workflows:
           filters: *filter-ignore-gh-pages
       - test8:
           filters: *filter-ignore-gh-pages
-      - playground8:
-          filters: *filter-ignore-gh-pages
       - e2e8:
           requires:
             - build-e2e8
@@ -424,8 +422,6 @@ workflows:
           filters: *filter-ignore-gh-pages
       - test9:
           filters: *filter-ignore-gh-pages
-      - playground9:
-          filters: *filter-ignore-gh-pages
       - e2e9:
           requires:
             - build-e2e9
@@ -435,8 +431,6 @@ workflows:
       - build-e2e10:
           filters: *filter-ignore-gh-pages
       - test10:
-          filters: *filter-ignore-gh-pages
-      - playground10:
           filters: *filter-ignore-gh-pages
       - lint:
           filters: *filter-ignore-gh-pages

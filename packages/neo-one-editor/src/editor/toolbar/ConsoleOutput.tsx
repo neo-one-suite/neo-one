@@ -5,7 +5,12 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { styled } from 'reakit';
 import { ifProp, prop } from 'styled-tools';
-import { selectConsoleOutput } from '../redux';
+import {
+  ConsoleOutput as ConsoleOutputType,
+  EditorState,
+  selectConsoleOutput,
+  selectConsoleOutputOwner,
+} from '../redux';
 
 const Wrapper = styled.div<{ readonly shadowed: boolean }>`
   color: ${prop('theme.gray0')};
@@ -16,26 +21,36 @@ const Wrapper = styled.div<{ readonly shadowed: boolean }>`
   padding-left: 16px;
   padding-right: 16px;
   ${ifProp('shadowed', 'box-shadow: inset 0 10px 10px -5px rgba(0, 0, 0, 0.25)')};
+  white-space: pre-wrap;
 `;
 
 interface Props {
-  readonly consoleOutput: string;
+  readonly consoleOutput: ConsoleOutputType;
+  readonly consoleOutputOwner: string;
 }
 
-const ConsoleOutputBase = ({ consoleOutput }: Props) => (
+const ConsoleOutputBase = ({ consoleOutput, consoleOutputOwner }: Props) => (
   <Scrollable>
     {({ scrollRef, scrollY, max, scrollToY, clientHeight }: any) => {
       if (clientHeight !== 0 && scrollY !== max.y) {
         scrollToY(max.y);
       }
 
+      let output = consoleOutput[consoleOutputOwner];
+      if (output === undefined) {
+        output = '';
+      }
+
       return (
         <Wrapper innerRef={scrollRef} shadowed={scrollY > 0}>
-          {consoleOutput}
+          {output}
         </Wrapper>
       );
     }}
   </Scrollable>
 );
 
-export const ConsoleOutput = connect(selectConsoleOutput)(ConsoleOutputBase);
+export const ConsoleOutput = connect((state: EditorState) => ({
+  ...selectConsoleOutput(state),
+  ...selectConsoleOutputOwner(state),
+}))(ConsoleOutputBase);

@@ -2,3 +2,4 @@
 export { DeveloperTools } from './DeveloperTools';
 export * from './FromStream';
 export * from './one';
+export { LocalClient } from './types';

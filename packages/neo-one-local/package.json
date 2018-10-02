@@ -1,0 +1,16 @@
+{
+  "name": "@neo-one/local",
+  "version": "1.0.0-preview.0",
+  "description": "NEO•ONE local implementation.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@neo-one/client-common": "^1.0.0-preview.0",
+    "@neo-one/client-full": "^1.0.0-preview.0",
+    "@neo-one/smart-contract-compiler": "^1.0.0-preview.0",
+    "@neo-one/types": "^1.0.0-preview.0",
+    "@neo-one/utils": "^1.0.0-preview.0",
+    "bignumber.js": "^7.2.1",
+    "tslib": "^1.9.3"
+  },
+  "sideEffects": false
+}

@@ -503,11 +503,11 @@ function getFileMatcherPatterns(
   const currentDirectory = normalizePath(currentDirectoryIn);
   const absolutePath = combinePaths(currentDirectory, path);
 
+  const includeFilePatterns = getRegularExpressionsForWildcards(includes, absolutePath, 'files');
+
   return {
-    includeFilePatterns: _.map(
-      getRegularExpressionsForWildcards(includes, absolutePath, 'files'),
-      (pattern) => `^${pattern}$`,
-    ),
+    includeFilePatterns:
+      includeFilePatterns === undefined ? undefined : _.map(includeFilePatterns, (pattern) => `^${pattern}$`),
     includeFilePattern: getRegularExpressionForWildcard(includes, absolutePath, 'files'),
     includeDirectoryPattern: getRegularExpressionForWildcard(includes, absolutePath, 'directories'),
     excludePattern: getRegularExpressionForWildcard(excludes, absolutePath, 'exclude'),

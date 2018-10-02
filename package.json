@@ -107,7 +107,7 @@
     "e2e-ci-windows-8": "yarn run jest-windows-8 --config jest/e2e-ci.js --ci -w 1",
     "e2e-ci-9": "yarn run jest-9 --config jest/e2e-ci.js --ci -w 1",
     "e2e-ci-windows-9": "yarn run jest-windows-9 --config jest/e2e-ci.js --ci -w 1",
-    "website:start": "cd packages/neo-one-website && cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" TS_NODE_PROJECT=../../tsconfig/tsconfig.es2017.cjs.json yarn run react-static start",
+    "website:start": "cd packages/neo-one-website && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=../../tsconfig/tsconfig.es2017.cjs.json yarn run react-static start",
     "website:stage": "cd packages/neo-one-website && cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" TS_NODE_PROJECT=../../tsconfig/tsconfig.es2017.cjs.json yarn run react-static build --staging",
     "website:serve": "cd packages/neo-one-website && cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" TS_NODE_PROJECT=../../tsconfig/tsconfig.es2017.cjs.json yarn run serve dist -p 3000",
     "website:build": "cd packages/neo-one-website && cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" TS_NODE_PROJECT=../../tsconfig/tsconfig.es2017.cjs.json yarn run react-static build"
@@ -121,11 +121,17 @@
     }
   },
   "devDependencies": {
+    "@babel/plugin-syntax-dynamic-import": "7.0.0",
+    "@babel/plugin-syntax-numeric-separator": "7.0.0",
+    "@babel/plugin-syntax-optional-catch-binding": "7.0.0",
+    "@babel/plugin-syntax-typescript": "7.0.0",
     "@reactivex/ix-esnext-esm": "2.3.5",
     "@types/jest": "23.3.2",
     "all-contributors-cli": "5.4.0",
     "app-root-dir": "1.0.2",
     "babel-core": "7.0.0-bridge.0",
+    "babel-plugin-lodash": "3.3.4",
+    "babel-plugin-transform-imports": "1.5.1",
     "codecov": "3.1.0",
     "cross-env": "5.2.0",
     "date-fns": "2.0.0-alpha.16",

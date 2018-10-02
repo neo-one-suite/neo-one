@@ -4,6 +4,7 @@
   "description": "NEO•ONE Node for browsers.",
   "main": "./src/index.ts",
   "dependencies": {
+    "@babel/polyfill": "^7.0.0",
     "@neo-one/client": "^1.0.0-preview.0",
     "@neo-one/client-common": "^1.0.0-preview.0",
     "@neo-one/client-core": "^1.0.0-preview.0",
@@ -17,6 +18,7 @@
     "@neo-one/node-vm": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",
     "@neo-one/utils": "^1.0.0-preview.0",
+    "@neo-one/worker": "^1.0.0-preview.0",
     "@types/levelup": "^3.1.0",
     "level-js": "^3.0.0",
     "levelup": "^3.1.1",

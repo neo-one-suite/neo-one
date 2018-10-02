@@ -144,7 +144,7 @@
     "no-accessor-recursion": true,
     "no-collapsible-if": true,
     "no-unnecessary-else": true,
-    "no-unnecessary-type-annotation": true,
+    "no-unnecessary-type-annotation": false,
     "no-unused": [true, "unused-function-expression-name", "unused-class-expression-name", "unused-catch-binding"],
     "no-var-before-return": true,
     "prefer-while": true,

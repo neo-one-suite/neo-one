@@ -1,16 +1,15 @@
-import { AddressString, Client, DeveloperClient, OneClient } from '@neo-one/client';
+import { AddressString, Client, DeveloperClient } from '@neo-one/client';
 import localforage from 'localforage';
 import * as React from 'react';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { FromStream } from '../FromStream';
-import { NetworkClients, ReactSyntheticEvent } from '../types';
+import { LocalClient, NetworkClients, ReactSyntheticEvent } from '../types';
 
 interface DeveloperToolsContextType {
   readonly client: Client;
   readonly developerClients: NetworkClients<DeveloperClient>;
-  readonly oneClients: NetworkClients<OneClient>;
-  readonly projectID: string;
+  readonly localClients: NetworkClients<LocalClient>;
 }
 // tslint:disable-next-line no-any
 export const DeveloperToolsContext = React.createContext<DeveloperToolsContextType>(undefined as any);
@@ -20,8 +19,7 @@ interface WithNetworkClientProps {
     options: {
       readonly client: Client;
       readonly developerClient?: DeveloperClient;
-      readonly oneClient?: OneClient;
-      readonly projectID: string;
+      readonly localClient?: LocalClient;
     },
   ) => React.ReactNode;
 }
@@ -29,14 +27,14 @@ interface WithNetworkClientProps {
 export function WithNetworkClient({ children }: WithNetworkClientProps) {
   return (
     <DeveloperToolsContext.Consumer>
-      {({ client, developerClients, oneClients, projectID }) => (
+      {({ client, developerClients, localClients }) => (
         <FromStream
           props$={client.currentNetwork$.pipe(
             map((network) => {
-              const oneClient = oneClients[network];
+              const localClient = localClients[network];
               const developerClient = developerClients[network];
 
-              return { client, developerClient, oneClient, projectID };
+              return { client, developerClient, localClient };
             }),
           )}
         >

@@ -1,7 +1,7 @@
 import { Client, DeveloperClient } from '@neo-one/client';
-import { Client as OneClient } from '@neo-one/server-http-client';
 import { DeveloperToolsDev } from './one/DeveloperToolsDev';
 import { DeveloperToolsProd } from './one/DeveloperToolsProd';
+import { LocalClient } from './types';
 
 interface NetworkClients<T> {
   readonly [network: string]: T | undefined;
@@ -10,8 +10,7 @@ interface NetworkClients<T> {
 export interface Props {
   readonly client: Client;
   readonly developerClients: NetworkClients<DeveloperClient>;
-  readonly oneClients: NetworkClients<OneClient>;
-  readonly projectID: string;
+  readonly localClients: NetworkClients<LocalClient>;
 }
 
 export const DeveloperTools = process.env.NODE_ENV === 'production' ? DeveloperToolsProd : DeveloperToolsDev;

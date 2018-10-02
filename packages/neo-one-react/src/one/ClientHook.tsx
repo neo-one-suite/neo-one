@@ -70,22 +70,25 @@ class Hooker {
       }
     });
     client.hooks.afterConfirmed.tap('TransactionToast', (transaction) => {
-      if (this.mutableAddToast !== undefined && this.mutableNEOTrackerURL !== undefined) {
+      if (this.mutableAddToast !== undefined) {
         this.mutableAddToast({
           id: transaction.hash,
           title: <span data-test="neo-one-transaction-toast-title">Transaction Confirmed</span>,
-          message: (
-            <span data-test="neo-one-transaction-toast-message">
-              View on&nbsp;
-              <StyledLink
-                data-test="neo-one-transaction-toast-link"
-                href={`${this.mutableNEOTrackerURL}/tx/${transaction.hash.slice(2)}`}
-                target="_blank"
-              >
-                NEO Tracker
-              </StyledLink>
-            </span>
-          ),
+          message:
+            this.mutableNEOTrackerURL === undefined ? (
+              <span />
+            ) : (
+              <span data-test="neo-one-transaction-toast-message">
+                View on&nbsp;
+                <StyledLink
+                  data-test="neo-one-transaction-toast-link"
+                  href={`${this.mutableNEOTrackerURL}/tx/${transaction.hash.slice(2)}`}
+                  target="_blank"
+                >
+                  NEO Tracker
+                </StyledLink>
+              </span>
+            ),
           autoHide: 5000,
         });
       }

@@ -18,3 +18,8 @@ export type ChildrenProps<C extends React.ComponentType<any> | React.Component<a
 }>
   ? P
   : C extends React.Component<{ readonly children: (p: infer P1) => any }> ? P1 : never;
+
+export interface LocalClient {
+  readonly getNEOTrackerURL: () => Promise<string | undefined>;
+  readonly reset: () => Promise<void>;
+}

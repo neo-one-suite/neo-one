@@ -5,26 +5,22 @@ import { FromStream } from '../FromStream';
 import { WithNetworkClient } from './DeveloperToolsContext';
 
 interface Props {
-  readonly children: (url: string) => React.ReactNode;
+  readonly children: (url?: string) => React.ReactNode;
 }
 
 export function WithNEOTrackerURL({ children }: Props) {
   return (
     <WithNetworkClient>
-      {({ oneClient, projectID }) => (
+      {({ localClient }) => (
         <FromStream
           props$={concat(
             of('https://neotracker.io'),
             defer(async () => {
-              if (oneClient === undefined) {
+              if (localClient === undefined) {
                 return 'https://neotracker.io';
               }
-              const result = await oneClient.request({
-                plugin: '@neo-one/server-plugin-project',
-                options: { type: 'neotracker', projectID },
-              });
 
-              return result.response;
+              return localClient.getNEOTrackerURL();
             }),
           )}
         >

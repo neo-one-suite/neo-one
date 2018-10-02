@@ -4,9 +4,11 @@
   "description": "NEO•ONE shared react.",
   "main": "./src/index.ts",
   "dependencies": {
+    "@neo-one/types": "^1.0.0-preview.0",
     "@types/react": "^16.4.14",
     "react": "^16.5.1",
-    "reakit": "^0.15.3"
+    "reakit": "^0.15.3",
+    "styled-tools": "^1.5.1"
   },
   "sideEffects": false
 }

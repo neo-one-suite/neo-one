@@ -1,15 +1,5 @@
 import { getRelativeImport } from '../utils';
-
-export interface NetworkDefinition {
-  readonly name: string;
-  readonly rpcURL: string;
-  readonly dev: boolean;
-}
-
-export interface Wallet {
-  readonly name: string;
-  readonly privateKey: string;
-}
+import { NetworkDefinition, Wallet } from './types';
 
 export const genClient = ({
   localDevNetworkName,
@@ -103,15 +93,37 @@ export const createDeveloperClients = () => ({${networks
   '${localDevNetworkName}': new DeveloperClient(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, port: ${httpServerPort} })),
 });
 
-export const createOneClients = () => ({
-  '${localDevNetworkName}': new OneClient(${httpServerPort}),
-})
+export const createLocalClients = () => {
+  const client = new OneClient(${httpServerPort});
+  return {
+    '${localDevNetworkName}': {
+      getNEOTrackerURL: async () => {
+        const result = await client.request({
+          plugin: '@neo-one/server-plugin-project',
+          options: { type: 'neotracker', projectID },
+        });
+
+        return result.response;
+      },
+      reset: async () => {
+        await client.executeTaskList({
+          plugin: '@neo-one/server-plugin-project',
+          options: {
+            command: 'reset',
+            projectID,
+          },
+        });
+      },
+    },
+  };
+};
   `,
     ts: `
 import { ${mutableImports.join(
       ', ',
     )}, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client';
 import { projectID } from '${getRelativeImport(clientPath, projectIDPath)}';
+import { LocalClient } from '@neo-one/react';
 
 export type DefaultUserAccountProviders = {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>,
@@ -176,9 +188,30 @@ export const createDeveloperClients = (): { [network: string]: DeveloperClient }
   '${localDevNetworkName}': new DeveloperClient(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, port: ${httpServerPort} })),
 });
 
-export const createOneClients = (): { [network: string]: OneClient } => ({
-  '${localDevNetworkName}': new OneClient(${httpServerPort}),
-})
+export const createLocalClients = (): { [network: string]: LocalClient } => {
+  const client = new OneClient(${httpServerPort});
+  return {
+    '${localDevNetworkName}': {
+      getNEOTrackerURL: async () => {
+        const result = await client.request({
+          plugin: '@neo-one/server-plugin-project',
+          options: { type: 'neotracker', projectID },
+        });
+
+        return result.response;
+      },
+      reset: async () => {
+        await client.executeTaskList({
+          plugin: '@neo-one/server-plugin-project',
+          options: {
+            command: 'reset',
+            projectID,
+          },
+        });
+      },
+    },
+  };
+};
 `,
   };
 };

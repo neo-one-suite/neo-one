@@ -119,11 +119,13 @@ export class LocalForageFileSystem implements AsyncFileSystem {
           if (parentDir === undefined || parentDir.type !== 'dir') {
             throw new Error('Something went wrong');
           }
-          await this.store.setItem(item.path, {
-            ...parentDir,
-            // tslint:disable-next-line no-array-mutation
-            children: parentDir.children.concat([item.child]).sort(),
-          });
+          if (!parentDir.children.includes(item.child)) {
+            await this.store.setItem(item.path, {
+              ...parentDir,
+              // tslint:disable-next-line no-array-mutation
+              children: parentDir.children.concat([item.child]).sort(),
+            });
+          }
           break;
         case 'mkdir':
           await this.store.setItem(item.path, { type: 'dir', children: [] });

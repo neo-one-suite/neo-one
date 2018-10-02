@@ -1,65 +1,33 @@
 import { JSONRPCProvider, JSONRPCRequest, JSONRPCResponse } from '@neo-one/client';
-// tslint:disable-next-line match-default-export-name
-import NodeWorker from './worker.shared-worker';
+import { FullNode } from './FullNode';
 
 // tslint:disable-next-line no-let
-let worker: SharedWorker.SharedWorker | undefined;
-
-const getWorker = (): SharedWorker.SharedWorker => {
-  if (worker === undefined) {
-    worker = NodeWorker();
-    worker.port.start();
+let startPromise: Promise<FullNode> | undefined;
+const start = async () => {
+  if (startPromise === undefined) {
+    const node = new FullNode();
+    startPromise = node.start().then(() => node);
   }
 
-  return worker;
+  return startPromise;
 };
 
-// tslint:disable-next-line no-let
-let currentID = 0;
+const handleRequest = async (req: JSONRPCRequest) => {
+  const node = await start();
+  const { watchTimeoutMS, params = [] } = req;
 
-const getID = () => {
-  const id = currentID;
-  currentID += 1;
-
-  return id;
+  return node.handleRequest({
+    jsonrpc: '2.0',
+    id: 1,
+    method: req.method,
+    params: watchTimeoutMS === undefined ? params : params.concat([watchTimeoutMS]),
+  });
 };
 
 export class JSONRPCLocalProvider extends JSONRPCProvider {
   public async request(req: JSONRPCRequest): Promise<JSONRPCResponse> {
-    const id = getID();
+    const response = await handleRequest(req);
 
-    const result = new Promise<JSONRPCResponse>((resolve, reject) => {
-      const cleanup = () => {
-        getWorker().port.removeEventListener('message', onMessage);
-      };
-
-      const onMessage = (event: MessageEvent) => {
-        const { id: messageID, type, data } = event.data;
-        if (id === messageID) {
-          if (type === 'failure') {
-            cleanup();
-            reject(new Error(data));
-          } else {
-            cleanup();
-            resolve(this.handleResponse(data));
-          }
-        }
-      };
-
-      getWorker().port.addEventListener('message', onMessage);
-    });
-
-    getWorker().port.postMessage({
-      id,
-      data: {
-        ...req,
-        jsonrpc: '2.0',
-        id: 1,
-        method: req.method,
-        params: req.watchTimeoutMS === undefined ? req.params : req.params.concat([req.watchTimeoutMS]),
-      },
-    });
-
-    return result;
+    return this.handleResponse(response);
   }
 }

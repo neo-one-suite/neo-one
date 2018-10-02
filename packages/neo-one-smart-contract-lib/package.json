@@ -8,10 +8,10 @@
     "@neo-one/smart-contract": "^1.0.0-preview.0"
   },
   "devDependencies": {
-    "@neo-one/client-common": "^1.0.0-preview.0",
-    "@neo-one/client-full": "^1.0.0-preview.0",
-    "@neo-one/smart-contract-test": "^1.0.0-preview.0",
-    "@types/app-root-dir": "^0.1.0",
+    "@neo-one/client-common": "1.0.0-preview.0",
+    "@neo-one/client-full": "1.0.0-preview.0",
+    "@neo-one/smart-contract-test": "1.0.0-preview.0",
+    "@types/app-root-dir": "0.1.0",
     "app-root-dir": "1.0.2",
     "bignumber.js": "7.2.1",
     "tslib": "1.9.3"
