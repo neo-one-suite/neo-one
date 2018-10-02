@@ -42,7 +42,7 @@
     "babel-loader": "8.0.4",
     "babel-plugin-lodash": "3.3.4",
     "babel-plugin-styled-components": "1.8.0",
-    "babel-plugin-universal-import": "3.0.3",
+    "babel-plugin-universal-import": "3.1.2",
     "hard-source-webpack-plugin": "0.12.0",
     "react-static-plugin-styled-components": "1.0.6",
     "webpack": "4.20.2",

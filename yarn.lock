@@ -4191,7 +4191,14 @@ babel-plugin-transform-strict-mode@^6.24.1:
     babel-runtime "^6.22.0"
     babel-types "^6.24.1"
 
-babel-plugin-universal-import@3.0.3, babel-plugin-universal-import@^3.0.2:
+babel-plugin-universal-import@3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/babel-plugin-universal-import/-/babel-plugin-universal-import-3.1.2.tgz#1ccd9e46c038c57bb317f6119a382f6e28b49e8c"
+  integrity sha512-p5GISLeu57DHRnFE5uLbzm2yFnYArWVTnMdSObHZfV4yhXrkLITGQkhwQwfAPIfu78pNdBAk3bsvp2Gj3Qo7XQ==
+  dependencies:
+    "@babel/helper-module-imports" "^7.0.0"
+
+babel-plugin-universal-import@^3.0.2:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/babel-plugin-universal-import/-/babel-plugin-universal-import-3.0.3.tgz#fb2fbd63c3f8cc698d9f8ec175dc47e14ec2e8e1"
   integrity sha512-/Ccpz2eSxzTpZB8uubP7CHlPbyg5R/lZpKSc0pY6LksCkdx85Js4UOxjoXzglyAGBCDn0wE//YBCGoCDJns7+Q==
@@ -9286,10 +9293,10 @@ humanize-ms@^1.2.1:
   dependencies:
     ms "^2.0.0"
 
-husky@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/husky/-/husky-1.0.1.tgz#749bc6b3a14bdc9cab73d8cc827b92fcd691fac6"
-  integrity sha512-MxwLwwwgY7mqV4auSpGWKPTCkZ9RmsdGojQQBvRtr6vxnjSOyI5l/M58QdUz0vRKb0igTpbzBeoUsScx4XJwQg==
+husky@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/husky/-/husky-1.1.0.tgz#7271e85f5d98b54349788839b720c9a60cd95dba"
+  integrity sha512-jnUD0PK3xGLB5Jc3f3UEwl8qOZeLd0WiWABhVyHPS5R298HOccGZJMOMBSk3gFksAa1BeK9FQYYEfPNlqkfBxg==
   dependencies:
     cosmiconfig "^5.0.6"
     execa "^0.9.0"
