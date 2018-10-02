@@ -20,24 +20,19 @@ interface State {
 
 const onMount = ({ state: { id, initialFiles, appendOutput }, setState }: OnMountProps<State>) => {
   Engine.create({ id, initialFiles })
-    .then(async (engine) =>
-      Promise.all([engine.getOutput$(), engine.getOpenFiles$()]).then(async ([output$, openFiles$]) => {
-        setState({ engine, files: openFiles$.getValue() });
-
-        return Promise.all([
-          openFiles$.subscribe({
-            next: (files) => {
-              setState({ files });
-            },
-          }),
-          output$.subscribe({
-            next: (output) => {
-              appendOutput(output);
-            },
-          }),
-        ]);
-      }),
-    )
+    .then(async (engine) => {
+      setState({ engine, files: engine.openFiles$.getValue() });
+      engine.openFiles$.subscribe({
+        next: (files) => {
+          setState({ files });
+        },
+      });
+      engine.output$.subscribe({
+        next: (output) => {
+          appendOutput(output);
+        },
+      });
+    })
     .catch((error) => {
       // tslint:disable-next-line no-console
       console.error(error);

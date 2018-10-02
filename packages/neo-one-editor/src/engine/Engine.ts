@@ -10,7 +10,7 @@ import {
   OutputMessage,
   pathExists,
 } from '@neo-one/local-browser';
-import { comlink, WorkerManager } from '@neo-one/worker';
+import { WorkerManager } from '@neo-one/worker';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { METADATA_FILE } from '../constants';
 import { EditorFiles } from '../editor';
@@ -82,37 +82,21 @@ export class Engine {
     return new Engine({ id, output$, builder, fs, files });
   }
 
-  private readonly id: string;
-  private readonly output$: Subject<OutputMessage>;
-  private readonly fs: FileSystem;
-  private readonly openFiles$: BehaviorSubject<EditorFiles>;
+  public readonly id: string;
+  public readonly output$: Subject<OutputMessage>;
+  public readonly fs: FileSystem;
+  public readonly openFiles$: BehaviorSubject<EditorFiles>;
   private readonly builder: WorkerManager<typeof Builder>;
 
   private constructor({ id, output$, fs, builder, files }: EngineOptions) {
     this.id = id;
-    this.output$ = comlink.proxyValue(output$);
-    this.fs = comlink.proxyValue(fs);
-    this.openFiles$ = comlink.proxyValue(new BehaviorSubject(files));
+    this.output$ = output$;
+    this.fs = fs;
+    this.openFiles$ = new BehaviorSubject(files);
     this.builder = builder;
   }
 
-  public async getID(): Promise<string> {
-    return this.id;
-  }
-
-  public async getFileSystem(): Promise<FileSystem> {
-    return this.fs;
-  }
-
-  public async getOutput$(): Promise<Subject<OutputMessage>> {
-    return this.output$;
-  }
-
-  public async getOpenFiles$(): Promise<BehaviorSubject<EditorFiles>> {
-    return this.openFiles$;
-  }
-
-  public async writeFile(path: string, content: string): Promise<void> {
+  public writeFileSync(path: string, content: string): void {
     this.fs.writeFileSync(path, content);
   }
 
@@ -122,7 +106,7 @@ export class Engine {
 
     result.files.forEach((file) => {
       ensureDir(this.fs, dirname(file.path));
-      this.fs.writeFileSync(file.path, file.content);
+      this.writeFileSync(file.path, file.content);
     });
   }
 }

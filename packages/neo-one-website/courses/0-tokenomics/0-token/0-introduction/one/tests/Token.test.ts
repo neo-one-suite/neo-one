@@ -1,6 +1,6 @@
 // tslint:disable
 // @ts-ignore
-import { withContracts } from '../generated';
+import { withContracts } from '../generated/test';
 
 jest.setTimeout(30000);
 

@@ -488,7 +488,7 @@ gulp.task('copyFiles', gulp.parallel(FORMATS.map((format) => copyFiles(format)))
 gulp.task('copyRootPkg', gulp.parallel(FORMATS.map((format) => copyRootPkg(format))));
 gulp.task('copyRootTSConfig', gulp.parallel(FORMATS.map((format) => copyRootTSConfig(format))));
 gulp.task('buildTypescript', gulp.parallel(FORMATS.map((format) => buildTypescript(format))));
-gulp.task('buildAll', gulp.parallel(FORMATS.map((format) => buildAll(format))));
+gulp.task('buildAll', gulp.series(FORMATS.map((format) => buildAll(format))));
 gulp.task('install', gulp.parallel(FORMATS.map((format) => install(format))));
 gulp.task('publish', gulp.parallel(FORMATS.map((format) => publish(format))));
 

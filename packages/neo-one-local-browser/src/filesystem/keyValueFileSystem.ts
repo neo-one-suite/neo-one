@@ -4,10 +4,10 @@ import { createEEXIST, createEISDIR, createENOENT, createENOTDIR } from './error
 import { SimplePath } from './types';
 
 export const normalizePath = (path: string) => {
-  const result = (path === '/' ? path : removeTrailingDirectorySeparator(path));
+  const result = path === '/' ? path : removeTrailingDirectorySeparator(path);
 
   return result.startsWith('/') ? result : `/${result}`;
-}
+};
 
 export const readdir = (path: string, simplePath: SimplePath | undefined) => {
   if (simplePath === undefined) {
