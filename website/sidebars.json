@@ -18,7 +18,6 @@
       "client-api",
       "client-types",
       "read-client-api",
-      "keystore-api",
       "developer-client-api"
     ]
   }
