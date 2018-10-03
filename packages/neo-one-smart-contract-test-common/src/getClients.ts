@@ -3,13 +3,17 @@ import {
   LocalKeyStore,
   LocalMemoryStore,
   LocalUserAccountProvider,
+  NEOONEDataProvider,
   NEOONEProvider,
 } from '@neo-one/client-full';
-import { createNode } from './createNode';
 
-export const setupTestNode = async (omitCleanup = true) => {
-  const { privateKey, rpcURL, node } = await createNode(omitCleanup);
-  const networkName = 'priv';
+interface Options {
+  readonly privateKey: string;
+  readonly dataProvider: NEOONEDataProvider;
+}
+
+export const getClients = async ({ privateKey, dataProvider }: Options) => {
+  const networkName = dataProvider.network;
   const masterWalletName = 'master';
 
   const keystore = new LocalKeyStore({
@@ -22,7 +26,7 @@ export const setupTestNode = async (omitCleanup = true) => {
     privateKey,
   });
 
-  const provider = new NEOONEProvider([{ network: networkName, rpcURL }]);
+  const provider = new NEOONEProvider([dataProvider]);
 
   const localUserAccountProvider = new LocalUserAccountProvider({
     keystore,
@@ -33,5 +37,5 @@ export const setupTestNode = async (omitCleanup = true) => {
   };
   const client = new Client(userAccountProviders);
 
-  return { client, masterWallet, networkName, provider, keystore, privateKey, userAccountProviders, node };
+  return { client, masterWallet, networkName, userAccountProviders };
 };

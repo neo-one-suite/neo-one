@@ -5,3 +5,4 @@ export * from './WithWorkerMirroredFileSystem';
 export * from './WorkerMirrorFileSystem';
 export * from './types';
 export * from './utils';
+export { normalizePath } from './keyValueFileSystem';

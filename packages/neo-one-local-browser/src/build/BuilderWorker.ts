@@ -1,4 +1,5 @@
-// tslint:disable-next-line match-default-export-name
-import BuilderWorker from './builder.worker';
+// tslint:disable match-default-export-name no-submodule-imports no-implicit-dependencies
+// @ts-ignore
+import BuilderWorker from 'worker-loader!./builder.worker';
 
 export { BuilderWorker };

@@ -29,6 +29,8 @@ export class MirrorFileSystem extends SubscribableSyncFileSystem implements File
     return new (this as any)(syncFS, asyncFS);
   }
 
+  private readonly promises = new Set<Promise<void>>();
+
   protected constructor(protected readonly syncFS: FileSystem, private readonly asyncFS: AsyncFileSystem) {
     super();
   }
@@ -37,18 +39,28 @@ export class MirrorFileSystem extends SubscribableSyncFileSystem implements File
   public readonly statSync = (path: string): FileStat => this.syncFS.statSync(path);
   public readonly readFileSync = (path: string): string => this.syncFS.readFileSync(path);
 
+  public async sync(): Promise<void> {
+    await Promise.all([...this.promises]);
+  }
+
   protected writeFileSyncInternal(path: string, contents: string): void {
     this.syncFS.writeFileSync(path, contents);
-    this.asyncFS.writeFile(path, contents).catch((error) => {
-      // tslint:disable-next-line no-console
-      console.error(error);
-    });
+    this.handlePromise(this.asyncFS.writeFile(path, contents));
   }
   protected mkdirSyncInternal(path: string): void {
     this.syncFS.mkdirSync(path);
-    this.asyncFS.mkdir(path).catch((error) => {
-      // tslint:disable-next-line no-console
-      console.error(error);
-    });
+    this.handlePromise(this.asyncFS.mkdir(path));
+  }
+
+  private handlePromise(promise: Promise<void>): void {
+    this.promises.add(promise);
+    promise
+      .then(() => {
+        this.promises.delete(promise);
+      })
+      .catch((error) => {
+        // tslint:disable-next-line no-console
+        console.error(error);
+      });
   }
 }

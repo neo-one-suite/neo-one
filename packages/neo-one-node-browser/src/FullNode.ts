@@ -10,16 +10,28 @@ import { finalize } from '@neo-one/utils';
 // tslint:disable-next-line match-default-export-name
 import leveljs from 'level-js';
 import LevelUp from 'levelup';
+import MemDown from 'memdown';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { constants } from './constants';
 import { Network } from './Network';
+
+export interface PersistentFullNode {
+  readonly type: 'persistent';
+  readonly id: string;
+}
+
+export interface InMemoryFullNode {
+  readonly type: 'memory';
+}
+
+export type FullNodeOptions = PersistentFullNode | InMemoryFullNode;
 
 export class FullNode {
   private readonly monitor: Monitor;
   private mutableSubscription: Subscription | undefined;
   private readonly startPromise: Promise<RPCHandler>;
 
-  public constructor() {
+  public constructor(private readonly options: FullNodeOptions) {
     this.monitor = DefaultMonitor.create({ service: 'node' });
     this.startPromise = this.startInternal();
   }
@@ -57,7 +69,7 @@ export class FullNode {
       privateNet: true,
     });
     const storage = levelupStorage({
-      db: LevelUp(leveljs('neo-one-node')),
+      db: LevelUp(this.options.type === 'persistent' ? leveljs(this.options.id) : MemDown()),
       context: { messageMagic: settings.messageMagic },
     });
 

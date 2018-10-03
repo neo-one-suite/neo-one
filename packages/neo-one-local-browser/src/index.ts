@@ -1,4 +1,5 @@
 /// <reference types="@neo-one/types" />
+export * from './BrowserLocalClient';
 export * from './build';
 export * from './filesystem';
 export * from './createBuilderManager';

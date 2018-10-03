@@ -2,7 +2,6 @@ import * as React from 'react';
 import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
 import * as path from 'path';
 import webpack from 'webpack';
-import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
 
 export default () => ({
   webpack: (config, { stage, defaultLoaders }) => {
@@ -50,43 +49,42 @@ export default () => ({
       ].filter((value) => value !== undefined),
     };
 
-    const atl = {
-      loader: 'awesome-typescript-loader',
-      options: {
-        useTranspileModule: stage === 'dev',
-        transpileOnly: true,
-        useCache: stage === 'dev',
-        useBabel: true,
-        babelOptions: babel,
-        configFileName: path.resolve(__dirname, '..', '..', '..', 'tsconfig', 'tsconfig.es2017.esm.json'),
-      },
-    };
     const babelLoader = {
       loader: 'babel-loader',
-      options: babel,
+      options: {
+        ...babel,
+        cacheDirectory: true,
+      },
     };
+
+    const tsLoaders = [
+      babelLoader,
+      {
+        loader: 'ts-loader',
+        options: {
+          happyPackMode: true,
+          transpileOnly: stage === 'dev',
+          configFile: path.resolve(__dirname, '..', '..', '..', 'tsconfig', 'tsconfig.es2017.esm.json'),
+          onlyCompileBundledFiles: true,
+          experimentalFileCaching: true,
+        },
+      },
+    ];
 
     config.module.rules = [
       {
         oneOf: [
           {
             test: /\.tsx?$/,
-            exclude: /(?:node_modules|\.worker\.tsx?)/,
-            use: atl,
-          },
-          {
-            test: /\.worker\.tsx?$/,
             exclude: /node_modules/,
-            use: ['worker-loader', atl],
-          },
-          {
-            test: /\.worker\.jsx?$/,
-            include: /node_modules/,
-            use: ['worker-loader'],
+            use: [
+              'cache-loader',
+              { loader: 'thread-loader', options: { poolTimeout: Number.POSITIVE_INFINITY } },
+            ].concat(tsLoaders),
           },
           {
             test: /\.jsx?$/,
-            exclude: /node_modules/,
+            include: /react-static-routes/,
             use: babelLoader,
           },
           {
@@ -107,8 +105,22 @@ export default () => ({
         resource.request = resource.request.replace(/^@reactivex\/ix-es2015-cjs(.*)$/, '@reactivex/ix-esnext-esm$1');
       }),
       new webpack.ProgressPlugin(),
-      new HardSourceWebpackPlugin(),
     ]);
+
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      console$: path.resolve(__dirname, 'console.js'),
+    };
+    config.node = {
+      console: 'mock',
+      global: true,
+      process: true,
+      __filename: 'mock',
+      __dirname: 'mock',
+      Buffer: true,
+      setImmediate: true,
+      fs: 'empty',
+    };
 
     return config;
   },

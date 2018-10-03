@@ -1,6 +1,9 @@
 /// <reference types="@neo-one/types" />
 // tslint:disable-next-line no-import-side-effect
 import '@babel/polyfill';
+// tslint:disable-next-line no-import-side-effect
+import './polyfill';
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { App } from './App';

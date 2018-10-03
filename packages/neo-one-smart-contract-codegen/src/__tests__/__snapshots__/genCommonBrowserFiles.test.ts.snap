@@ -1,0 +1,353 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`genCommonBrowserFiles Token 1`] = `
+Object {
+  "client": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+import {
+  Client,
+  DeveloperClient,
+  LocalKeyStore,
+  LocalMemoryStore,
+  LocalUserAccountProvider,
+  NEOONEProvider,
+  NEOONEDataProvider,
+} from '@neo-one/client';
+import { browserLocalClient, jsonRPCLocalProvider } from '@neo-one/local-singleton';
+
+const getDefaultUserAccountProviders = (provider) => ({
+  memory: new LocalUserAccountProvider({
+    keystore: new LocalKeyStore({ store: new LocalMemoryStore() }),
+    provider,
+  }),
+});
+
+const isLocalUserAccountProvider = (userAccountProvider) => userAccountProvider instanceof LocalUserAccountProvider;
+
+export const createClient = (getUserAccountProviders = getDefaultUserAccountProviders) => {
+  const providers = [];
+  providers.push(new NEOONEDataProvider({ network: 'local', rpcURL: jsonRPCLocalProvider }));
+  const provider = new NEOONEProvider(providers);
+  const userAccountProviders = getUserAccountProviders(provider);
+  const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
+  const localUserAccountProvider = localUserAccountProviders.find(
+    (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
+  );
+  if (process.env.NODE_ENV !== 'production') {
+    if (localUserAccountProvider !== undefined) {
+      const localKeyStore = localUserAccountProvider.keystore;
+      if (localKeyStore instanceof LocalKeyStore) {
+        Promise.all([
+          localKeyStore.addAccount({
+            network: 'local',
+            name: 'master',
+            privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
+          }),
+        ]).catch(() => {
+          // do nothing
+        });
+      }
+    }
+  }
+
+  return new Client(userAccountProviders);
+};
+
+export const createDeveloperClients = () => ({
+  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: jsonRPCLocalProvider })),
+});
+
+export const createLocalClients = () => ({
+  local: browserLocalClient,
+});
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
+import {
+  Client,
+  DeveloperClient,
+  LocalKeyStore,
+  LocalMemoryStore,
+  LocalUserAccountProvider,
+  NEOONEProvider,
+  NEOONEDataProvider,
+  LocalClient,
+  NEOONEDataProviderOptions,
+  UserAccountProvider,
+  UserAccountProviders,
+} from '@neo-one/client';
+import { browserLocalClient, jsonRPCLocalProvider } from '@neo-one/local-singleton';
+
+export type DefaultUserAccountProviders = {
+  readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>;
+};
+const getDefaultUserAccountProviders = (provider: NEOONEProvider): DefaultUserAccountProviders => ({
+  memory: new LocalUserAccountProvider({
+    keystore: new LocalKeyStore({ store: new LocalMemoryStore() }),
+    provider,
+  }),
+});
+
+const isLocalUserAccountProvider = (
+  userAccountProvider: UserAccountProvider,
+): userAccountProvider is LocalUserAccountProvider<any, any> => userAccountProvider instanceof LocalUserAccountProvider;
+
+export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
+  getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders as any,
+): Client<
+  TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never,
+  TUserAccountProviders
+> => {
+  const providers: Array<NEOONEDataProvider | NEOONEDataProviderOptions> = [];
+  providers.push(new NEOONEDataProvider({ network: 'local', rpcURL: jsonRPCLocalProvider }));
+  const provider = new NEOONEProvider(providers);
+
+  const userAccountProviders = getUserAccountProviders(provider);
+  const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
+  const localUserAccountProvider = localUserAccountProviders.find(
+    (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
+  );
+
+  if (process.env.NODE_ENV !== 'production') {
+    if (localUserAccountProvider !== undefined) {
+      const localKeyStore = localUserAccountProvider.keystore;
+      if (localKeyStore instanceof LocalKeyStore) {
+        Promise.all([
+          localKeyStore.addAccount({
+            network: 'local',
+            name: 'master',
+            privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
+          }),
+        ]).catch(() => {
+          // do nothing
+        });
+      }
+    }
+  }
+  return new Client(userAccountProviders);
+};
+
+export const createDeveloperClients = (): { [network: string]: DeveloperClient } => ({
+  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: jsonRPCLocalProvider })),
+});
+
+export const createLocalClients = (): { [network: string]: LocalClient } => ({
+  local: browserLocalClient,
+});
+",
+  },
+  "commonTypes": Object {
+    "js": undefined,
+    "ts": "// tslint:disable
+/* eslint-disable */
+import { ICOSmartContract } from './ICO/types';
+import { TokenSmartContract } from './Token/types';
+
+export interface Contracts {
+  readonly ico: ICOSmartContract;
+  readonly token: TokenSmartContract;
+}
+",
+  },
+  "generated": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+export * from './react';
+export * from './client';
+export * from './Token/contract';
+export * from './Token/abi';
+export * from './ICO/contract';
+export * from './ICO/abi';
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
+export * from './types';
+export * from './react';
+export * from './client';
+export * from './Token/contract';
+export * from './Token/types';
+export * from './Token/abi';
+export * from './ICO/contract';
+export * from './ICO/types';
+export * from './ICO/abi';
+",
+  },
+  "react": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+import { DeveloperTools as DeveloperToolsBase } from '@neo-one/react';
+import * as React from 'react';
+import { createClient, createDeveloperClients, createLocalClients } from './client';
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
+
+const Context = React.createContext(undefined);
+
+export const ContractsProvider = ({
+  client: clientIn,
+  developerClients: developerClientsIn,
+  localClients: localClientsIn,
+  children,
+}) => {
+  const client = clientIn === undefined ? createClient() : clientIn;
+  const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
+  const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+
+  return (
+    <Context.Provider
+      value={{
+        client,
+        developerClients,
+        localClients,
+        token: createTokenSmartContract(client),
+        ico: createICOSmartContract(client),
+      }}
+    >
+      {children}
+    </Context.Provider>
+  );
+};
+
+export const WithContracts = ({ children }) => <Context.Consumer>{children}</Context.Consumer>;
+
+export const DeveloperTools = () => (
+  <WithContracts>
+    {({ client, developerClients, localClients }) => (
+      <DeveloperToolsBase client={client} developerClients={developerClients} localClients={localClients} />
+    )}
+  </WithContracts>
+);
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
+import { DeveloperTools as DeveloperToolsBase, LocalClient } from '@neo-one/react';
+import { Client, DeveloperClient } from '@neo-one/client';
+import * as React from 'react';
+import { Contracts } from './types';
+import { createClient, createDeveloperClients, createLocalClients } from './client';
+
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
+
+export interface WithClients<TClient extends Client> {
+  readonly client: TClient;
+  readonly developerClients: {
+    readonly [network: string]: DeveloperClient;
+  };
+  readonly localClients: {
+    readonly [network: string]: LocalClient;
+  };
+}
+export type ContractsWithClients<TClient extends Client> = Contracts & WithClients<TClient>;
+const Context: any = React.createContext<ContractsWithClients<Client>>(undefined as any);
+
+export type ContractsProviderProps<TClient extends Client> = Partial<WithClients<TClient>> & {
+  readonly children?: React.ReactNode;
+};
+export const ContractsProvider = <TClient extends Client>({
+  client: clientIn,
+  developerClients: developerClientsIn,
+  localClients: localClientsIn,
+  children,
+}: ContractsProviderProps<TClient>) => {
+  const client = clientIn === undefined ? createClient() : clientIn;
+  const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
+  const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+
+  return (
+    <Context.Provider
+      value={{
+        client,
+        developerClients,
+        localClients,
+        token: createTokenSmartContract(client),
+        ico: createICOSmartContract(client),
+      }}
+    >
+      {children}
+    </Context.Provider>
+  );
+};
+
+export interface WithContractsProps<TClient extends Client> {
+  readonly children: (contracts: ContractsWithClients<TClient>) => React.ReactNode;
+}
+export const WithContracts = <TClient extends Client>({ children }: WithContractsProps<TClient>) => (
+  <Context.Consumer>{children}</Context.Consumer>
+);
+
+export const DeveloperTools = () => (
+  <WithContracts>
+    {({ client, developerClients, localClients }) => (
+      <DeveloperToolsBase client={client} developerClients={developerClients} localClients={localClients} />
+    )}
+  </WithContracts>
+);
+",
+  },
+  "sourceMaps": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+let sourceMapsIn = Promise.resolve({});
+
+if (process.env.NODE_ENV !== 'production') {
+  sourceMapsIn = Promise.resolve({});
+}
+
+export const sourceMaps = sourceMapsIn;
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
+import { SourceMaps } from '@neo-one/client';
+
+let sourceMapsIn: Promise<SourceMaps> = Promise.resolve({});
+if (process.env.NODE_ENV !== 'production') {
+  sourceMapsIn = Promise.resolve({});
+}
+
+export const sourceMaps = sourceMapsIn;
+",
+  },
+  "test": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+import { withContracts as withContractsBase } from '@neo-one/smart-contract-test-browser';
+import * as path from 'path';
+
+export const withContracts = async (test, options) =>
+  withContractsBase(
+    [
+      { name: 'Token', filePath: path.resolve(__dirname, '../contracts/Token.ts') },
+      { name: 'ICO', filePath: path.resolve(__dirname, '../contracts/ICO.ts') },
+    ],
+    test,
+    options,
+  );
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
+import {
+  TestOptions,
+  withContracts as withContractsBase,
+  WithContractsOptions,
+} from '@neo-one/smart-contract-test-browser';
+import * as path from 'path';
+import { Contracts } from './types';
+
+export const withContracts = async (
+  test: (contracts: Contracts & TestOptions) => Promise<void>,
+  options?: WithContractsOptions,
+): Promise<void> =>
+  withContractsBase<Contracts>(
+    [
+      { name: 'Token', filePath: path.resolve(__dirname, '../contracts/Token.ts') },
+      { name: 'ICO', filePath: path.resolve(__dirname, '../contracts/ICO.ts') },
+    ],
+    test,
+    options,
+  );
+",
+  },
+}
+`;

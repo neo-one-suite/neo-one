@@ -2,7 +2,7 @@ import { EditorFile } from '../editor';
 
 export type EditorFileType = 'contract' | 'javascript' | 'typescript';
 
-export const getFileType = (fileIn: EditorFile | string) => {
+export const getFileType = (fileIn: EditorFile | string): EditorFileType | undefined => {
   const file = typeof fileIn === 'object' ? fileIn.path : fileIn;
 
   if (file.endsWith('.one.ts')) {
@@ -13,5 +13,9 @@ export const getFileType = (fileIn: EditorFile | string) => {
     return 'javascript';
   }
 
-  return 'typescript';
+  if (file.endsWith('.ts') || file.endsWith('.tsx')) {
+    return 'typescript';
+  }
+
+  return undefined;
 };

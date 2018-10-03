@@ -40,7 +40,9 @@ export const genCommonBrowserFiles = ({
   readonly networks: ReadonlyArray<NetworkDefinition>;
   readonly sourceMaps: SourceMaps;
 }): CommonBrowserFilesResult => {
-  const testFile = formatFile(genTest({ contractsPaths, testPath, commonTypesPath }));
+  const testFile = formatFile(
+    genTest({ contractsPaths, testPath, commonTypesPath, mod: '@neo-one/smart-contract-test-browser' }),
+  );
   const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }));
   const sourceMapsFile = formatFile(genBrowserSourceMaps({ sourceMaps }));
   const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath }));

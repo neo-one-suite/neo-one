@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Grid, Hidden, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { BuildAction, Console, FileType, Problems } from './toolbar';
+import { BuildAction, Console, FileType, Problems, RunTestsAction } from './toolbar';
 import { EditorFile, EditorFiles, TextRange } from './types';
 
 const Wrapper = styled(Grid)`
@@ -56,6 +56,7 @@ export const EditorToolbar = ({ file, files, onSelectRange, ...props }: Props) =
           <ToolbarRightWrapper>
             <FileType file={file} />
             <BuildAction file={file} />
+            <RunTestsAction file={file} />
           </ToolbarRightWrapper>
         </ToolbarWrapper>
       </Wrapper>

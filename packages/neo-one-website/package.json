@@ -26,9 +26,10 @@
     "react-transition-group": "^2.5.0",
     "react-universal-component": "^3.0.3",
     "reakit": "^0.15.3",
+    "source-map": "^0.7.3",
     "styled-tools": "^1.5.1",
     "ts-node": "^7.0.1",
-    "webpack": "^4.20.2"
+    "webpack": "4.20.2"
   },
   "devDependencies": {
     "@babel/core": "7.1.2",
@@ -38,14 +39,14 @@
     "@babel/preset-env": "7.1.0",
     "@babel/preset-react": "7.0.0",
     "@neo-one/smart-contract": "1.0.0-preview.0",
-    "awesome-typescript-loader": "5.2.1",
     "babel-loader": "8.0.4",
     "babel-plugin-lodash": "3.3.4",
     "babel-plugin-styled-components": "1.8.0",
     "babel-plugin-universal-import": "3.1.2",
-    "hard-source-webpack-plugin": "0.12.0",
+    "cache-loader": "^1.2.2",
     "react-static-plugin-styled-components": "1.0.6",
-    "webpack": "4.20.2",
+    "thread-loader": "^1.2.0",
+    "ts-loader": "^5.2.1",
     "worker-loader": "2.0.0"
   },
   "scripts": {

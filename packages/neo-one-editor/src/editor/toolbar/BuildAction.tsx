@@ -1,7 +1,7 @@
 // tslint:disable no-null-keyword
 import { EffectMap } from 'constate';
 import * as React from 'react';
-import { MdPlayArrow } from 'react-icons/md';
+import { MdBuild } from 'react-icons/md';
 import { Engine } from '../../engine';
 import { EditorFile } from '../types';
 import { ActionButton } from './ActionButton';
@@ -36,5 +36,5 @@ interface Props {
 }
 
 export const BuildAction = ({ file }: Props) => (
-  <ActionButton file={file} icon={<MdPlayArrow />} text="Build" makeEffects={makeEffects} />
+  <ActionButton file={file} icon={<MdBuild />} text="Build" makeEffects={makeEffects} />
 );

@@ -1,4 +1,5 @@
-// tslint:disable-next-line match-default-export-name
-import JSONRPCLocalProviderWorker from './jsonRPCLocalProvider.worker';
+// tslint:disable match-default-export-name no-implicit-dependencies no-submodule-imports
+// @ts-ignore
+import JSONRPCLocalProviderWorker from 'worker-loader!./jsonRPCLocalProvider.worker';
 
 export { JSONRPCLocalProviderWorker };

@@ -6,13 +6,15 @@ export const genTest = ({
   contractsPaths,
   testPath,
   commonTypesPath,
+  mod = '@neo-one/smart-contract-test',
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly testPath: string;
   readonly commonTypesPath: string;
+  readonly mod?: string;
 }) => ({
   js: `
-import { withContracts as withContractsBase } from '@neo-one/smart-contract-test';
+import { withContracts as withContractsBase } from '${mod}';
 import * as path from 'path';
 
 export const withContracts = async (test, options) =>
@@ -30,7 +32,7 @@ export const withContracts = async (test, options) =>
   );
 `,
   ts: `
-import { TestOptions, withContracts as withContractsBase, WithContractsOptions } from '@neo-one/smart-contract-test';
+import { TestOptions, withContracts as withContractsBase, WithContractsOptions } from '${mod}';
 import * as path from 'path';
 import { Contracts } from '${getRelativeImport(testPath, commonTypesPath)}';
 

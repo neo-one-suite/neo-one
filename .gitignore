@@ -12,6 +12,7 @@
 /reports
 .nyc_output
 .awcache
+.cache-loader
 
 # Playground
 /packages/neo-one-playground
@@ -21,6 +22,7 @@
 /packages/neo-one-website/dist
 /packages/neo-one-website/public
 /packages/neo-one-website/.awcache
+/packages/neo-one-website/.cache-loader
 
 # Logs
 logs

@@ -9,6 +9,7 @@ import {
   InvokeExecuteTransactionOptions,
   LocalKeyStore,
   LocalWallet,
+  NEOONEDataProvider,
   ReadClient,
   scriptHashToAddress,
   SmartContract,
@@ -16,11 +17,12 @@ import {
   UserAccountID,
 } from '@neo-one/client-full';
 import { createCompilerHost, pathResolve } from '@neo-one/smart-contract-compiler-node';
+import { getClients } from '@neo-one/smart-contract-test-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import * as appRootDir from 'app-root-dir';
 import BigNumber from 'bignumber.js';
 import ts from 'typescript';
-import { setupTestNode } from '../../../../neo-one-smart-contract-test/src/setupTestNode';
+import { createNode } from '../../../../neo-one-smart-contract-test/src/createNode';
 import { compile } from '../../compile';
 import { CompileResult, LinkedContracts } from '../../compile/types';
 import { Context } from '../../Context';
@@ -127,8 +129,11 @@ const publish = async (
 };
 
 export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<TestNode> => {
-  const { client, masterWallet, provider, networkName, userAccountProviders } = await setupTestNode(false);
-  const developerClient = new DeveloperClient(provider.read(networkName));
+  const { privateKey, rpcURL } = await createNode(false);
+  const dataProvider = new NEOONEDataProvider({ network: 'priv', rpcURL });
+  const { client, masterWallet, networkName, userAccountProviders } = await getClients({ dataProvider, privateKey });
+
+  const developerClient = new DeveloperClient(dataProvider);
   const mutableSourceMaps: Modifiable<SourceMaps> = {};
   client.hooks.beforeConfirmed.tapPromise('DeveloperClient', async () => {
     await developerClient.runConsensusNow();

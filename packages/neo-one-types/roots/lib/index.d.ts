@@ -25,3 +25,5 @@ declare module '*.svg' {
 declare module '*.png' {
   export default '';
 }
+
+type JestMocked<T> = { [K in keyof T]: jest.Mock<T[K]> };

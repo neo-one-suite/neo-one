@@ -1,3 +1,4 @@
+/// <reference lib="webworker" />
 // tslint:disable no-submodule-imports no-any
 // @ts-ignore
 import { SimpleWorkerServer } from 'monaco-editor/esm/vs/base/common/worker/simpleWorker';

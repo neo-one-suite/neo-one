@@ -12,7 +12,7 @@ export function getSourceFile(program: ts.Program, fileName: string): ts.SourceF
 }
 
 export function getSourceFileOrThrow(program: ts.Program, fileName: string): ts.SourceFile {
-  return utils.throwIfNullOrUndefined(getSourceFile(program, fileName), 'source file');
+  return utils.throwIfNullOrUndefined(getSourceFile(program, fileName), `source file: ${fileName}`);
 }
 
 export function isDeclarationFile(node: ts.SourceFile): boolean {

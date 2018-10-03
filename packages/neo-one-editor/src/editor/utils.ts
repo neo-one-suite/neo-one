@@ -6,6 +6,9 @@ import { EditorFile } from './types';
 // tslint:disable-next-line export-name
 export const getLanguageIDForFile = (id: string, file: EditorFile) => {
   const type = getFileType(file);
+  if (type === undefined) {
+    return 'editor';
+  }
 
   switch (type) {
     case 'contract':

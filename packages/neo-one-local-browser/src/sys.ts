@@ -148,7 +148,7 @@ function getFileUrlVolumeSeparatorEnd(url: string, start: number) {
   return -1;
 }
 
-function combinePaths(path: string, ...paths: (string | undefined)[]): string {
+export function combinePaths(path: string, ...paths: (string | undefined)[]): string {
   if (path) path = normalizeSlashes(path);
   for (let relativePath of paths) {
     if (!relativePath) continue;

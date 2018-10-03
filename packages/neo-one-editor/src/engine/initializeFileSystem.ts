@@ -1,5 +1,9 @@
 // tslint:disable no-submodule-imports no-implicit-dependencies
 // @ts-ignore
+import files from '!../loaders/packagesLoaderEntry!../../../neo-one-smart-contract';
+// @ts-ignore
+import jest_d_ts from '!raw-loader!../../../../node_modules/@types/jest/index.d.ts';
+// @ts-ignore
 import lib_d_ts from '!raw-loader!../../../../node_modules/typescript/lib/lib.d.ts';
 // @ts-ignore
 import lib_dom_d_ts from '!raw-loader!../../../../node_modules/typescript/lib/lib.dom.d.ts';
@@ -77,31 +81,10 @@ import lib_scripthost_d_ts from '!raw-loader!../../../../node_modules/typescript
 import lib_webworker_d_ts from '!raw-loader!../../../../node_modules/typescript/lib/lib.webworker.d.ts';
 // @ts-ignore
 import lib_webworker_importscripts_d_ts from '!raw-loader!../../../../node_modules/typescript/lib/lib.webworker.importscripts.d.ts';
+import { ensureDir, FileSystem, pathExists } from '@neo-one/local-browser';
+import * as nodePath from 'path';
 // @ts-ignore
-import scLibICOContents from '!raw-loader!../../../neo-one-smart-contract-lib/src/ICO.ts';
-// @ts-ignore
-import scLibIndexContents from '!raw-loader!../../../neo-one-smart-contract-lib/src/index.ts';
-// @ts-ignore
-import scLibTokenContents from '!raw-loader!../../../neo-one-smart-contract-lib/src/Token.ts';
-// @ts-ignore
-import scGlobalContents from '!raw-loader!../../../neo-one-smart-contract/src/global.d.ts';
-// @ts-ignore
-import scHarnessContents from '!raw-loader!../../../neo-one-smart-contract/src/harness.d.ts';
-// @ts-ignore
-import scIndexContents from '!raw-loader!../../../neo-one-smart-contract/src/index.d.ts';
-import {
-  ensureDir,
-  FileSystem,
-  getSmartContractBasePath,
-  getSmartContractLibBasePath,
-  getSmartContractLibPath,
-  getSmartContractPath,
-  pathExists,
-} from '@neo-one/local-browser';
-// @ts-ignore
-import scLibPackageJSONContents from '../../../neo-one-smart-contract-lib/package.json';
-// @ts-ignore
-import scPackageJSONContents from '../../../neo-one-smart-contract/package.json';
+import jestPackageJSONContents from '../../../../node_modules/@types/jest/package.json';
 
 const writeFile = (fs: FileSystem, path: string, contents: string) => {
   const exists = pathExists(fs, path);
@@ -110,10 +93,17 @@ const writeFile = (fs: FileSystem, path: string, contents: string) => {
   }
 };
 
+export const METADATA_FILE = '/.neo-one/metadata';
+export const TRANSPILE_PATH = '/.neo-one/transpile';
+export const EMPTY_MODULE_PATH = '/.neo-one/empty';
+
 export const initializeFileSystem = (fs: FileSystem): void => {
   ensureDir(fs, '/node_modules/typescript/lib');
   ensureDir(fs, '/node_modules/@neo-one/smart-contract-lib/src');
   ensureDir(fs, '/node_modules/@neo-one/smart-contract/src');
+  ensureDir(fs, '/node_modules/@types/jest');
+  ensureDir(fs, TRANSPILE_PATH);
+  ensureDir(fs, nodePath.dirname(METADATA_FILE));
 
   writeFile(fs, '/node_modules/typescript/lib/lib.d.ts', lib_d_ts);
   writeFile(fs, '/node_modules/typescript/lib/lib.dom.d.ts', lib_dom_d_ts);
@@ -154,12 +144,12 @@ export const initializeFileSystem = (fs: FileSystem): void => {
   writeFile(fs, '/node_modules/typescript/lib/lib.scripthost.d.ts', lib_scripthost_d_ts);
   writeFile(fs, '/node_modules/typescript/lib/lib.webworker.d.ts', lib_webworker_d_ts);
   writeFile(fs, '/node_modules/typescript/lib/lib.webworker.importscripts.d.ts', lib_webworker_importscripts_d_ts);
-  writeFile(fs, getSmartContractLibPath('ICO.d.ts'), scLibICOContents);
-  writeFile(fs, getSmartContractLibPath('index.d.ts'), scLibIndexContents);
-  writeFile(fs, getSmartContractLibPath('Token.d.ts'), scLibTokenContents);
-  writeFile(fs, getSmartContractLibBasePath('package.json'), JSON.stringify(scLibPackageJSONContents, undefined, 2));
-  writeFile(fs, getSmartContractPath('global.d.ts'), scGlobalContents);
-  writeFile(fs, getSmartContractPath('harness.d.ts'), scHarnessContents);
-  writeFile(fs, getSmartContractPath('index.d.ts'), scIndexContents);
-  writeFile(fs, getSmartContractBasePath('package.json'), JSON.stringify(scPackageJSONContents, undefined, 2));
+  writeFile(fs, '/node_modules/@types/jest/index.d.ts', jest_d_ts);
+  writeFile(fs, '/node_modules/@types/jest/package.json', jestPackageJSONContents);
+  // tslint:disable-next-line no-any
+  Object.entries(files).forEach(([path, contents]: any) => {
+    ensureDir(fs, nodePath.dirname(path));
+    writeFile(fs, path, contents);
+  });
+  writeFile(fs, EMPTY_MODULE_PATH, 'module.exports = undefined');
 };
