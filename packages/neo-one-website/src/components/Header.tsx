@@ -1,6 +1,7 @@
+// tslint:disable no-any
 import * as React from 'react';
 import { Link as RouterLink } from 'react-static';
-import { Flex, styled, Toolbar } from 'reakit';
+import { as, Flex, styled, Toolbar } from 'reakit';
 import { prop } from 'styled-tools';
 import { Link, Logo } from '../elements';
 import { ComponentProps } from '../types';
@@ -24,7 +25,7 @@ const StyledToolbar = styled(Toolbar)`
     padding: 0 16px;
   }
 
-  ${/* sc-sel */ Toolbar.Focusable} {
+  ${/* sc-sel */ Toolbar.Focusable as any} {
     outline: none;
   }
 
@@ -33,7 +34,9 @@ const StyledToolbar = styled(Toolbar)`
   }
 `;
 
-const LogoLink = styled(RouterLink)`
+const FocusableRouterLink = as(RouterLink)(Toolbar.Focusable);
+
+const LogoLink = styled(FocusableRouterLink)`
   display: block;
   margin-right: 36px;
   margin-bottom: 12px;
@@ -47,7 +50,7 @@ const LogoLink = styled(RouterLink)`
   }
 `;
 
-const NavigationLink = styled(RouterLink)`
+const NavigationLink = styled(FocusableRouterLink)`
   display: flex;
   align-items: center;
   font-size: 20px;
@@ -71,15 +74,15 @@ export const Header = (props: ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledToolbar>
       <Toolbar.Content>
-        <Toolbar.Focusable data-test="header-logo" as={LogoLink} to="/">
+        <LogoLink data-test="header-logo" to="/">
           <Logo />
-        </Toolbar.Focusable>
-        <Toolbar.Focusable data-test="header-tutorial" as={NavigationLink} to="/tutorial">
+        </LogoLink>
+        <NavigationLink data-test="header-tutorial" to="/tutorial">
           Tutorial
-        </Toolbar.Focusable>
-        <Toolbar.Focusable data-test="header-tutorial" as={NavigationLink} to="/course">
+        </NavigationLink>
+        <NavigationLink data-test="header-tutorial" to="/course">
           Course
-        </Toolbar.Focusable>
+        </NavigationLink>
       </Toolbar.Content>
       <Toolbar.Content align="end">
         <Toolbar.Focusable

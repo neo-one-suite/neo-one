@@ -1,6 +1,7 @@
+// tslint:disable no-any
 import * as React from 'react';
 import { Link as RouterLink } from 'react-static';
-import { Flex, styled, Toolbar } from 'reakit';
+import { as, Flex, styled, Toolbar } from 'reakit';
 import { prop } from 'styled-tools';
 import { LineLogoPrimary, Link } from '../../elements';
 import { ComponentProps } from '../../types';
@@ -23,12 +24,14 @@ const StyledToolbar = styled(Toolbar)`
     padding: 0 8px;
   }
 
-  ${/* sc-sel */ Toolbar.Focusable} {
+  ${/* sc-sel */ Toolbar.Focusable as any} {
     outline: none;
   }
 `;
 
-const LogoLink = styled(RouterLink)`
+const FocusableRouterLink = as(RouterLink)(Toolbar.Focusable);
+
+const LogoLink = styled(FocusableRouterLink)`
   display: block;
   margin-right: 24px;
   margin-bottom: 16px;
@@ -54,9 +57,9 @@ export const CourseHeader = (props: ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledToolbar>
       <Toolbar.Content>
-        <Toolbar.Focusable as={LogoLink} to="/course">
+        <LogoLink to="/course">
           <LineLogoPrimary />
-        </Toolbar.Focusable>
+        </LogoLink>
       </Toolbar.Content>
       <Toolbar.Content align="end">
         <Toolbar.Focusable as={StyledLink} href="/" target="_blank">

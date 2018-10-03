@@ -116,10 +116,10 @@ export class Engine {
       initialFiles.forEach((file) => {
         engine.writeFileSync(file.path, file.content);
       });
-    }
 
-    // Need to synchronize here so that when we start up the language workers they have an up to date filesystem
-    await fs.sync();
+      // Need to synchronize here so that when we start up the language workers they have an up to date filesystem
+      await fs.sync();
+    }
 
     return engine;
   }

@@ -126,7 +126,7 @@
     "@babel/plugin-syntax-optional-catch-binding": "7.0.0",
     "@babel/plugin-syntax-typescript": "7.0.0",
     "@reactivex/ix-esnext-esm": "2.3.5",
-    "@types/jest": "23.3.2",
+    "@types/jest": "23.3.3",
     "all-contributors-cli": "5.4.0",
     "app-root-dir": "1.0.2",
     "babel-core": "7.0.0-bridge.0",
