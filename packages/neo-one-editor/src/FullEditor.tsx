@@ -4,11 +4,18 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { ReduxStoreProvider } from './containers';
 import { Editor, EditorFiles } from './editor';
-import { appendConsole, configureStore } from './editor/redux';
+import {
+  appendConsole,
+  configureStore,
+  removeTestSuite,
+  setTestsRunning,
+  updateTest,
+  updateTestSuite,
+} from './editor/redux';
 import { EditorContext } from './EditorContext';
 import { Engine } from './engine';
 import { Loading } from './Loading';
-import { EngineContentFiles } from './types';
+import { EngineContentFiles, Test, TestRunnerCallbacks, TestSuite } from './types';
 
 interface State {
   readonly id: string;
@@ -18,8 +25,11 @@ interface State {
   readonly appendOutput: (output: OutputMessage) => void;
 }
 
-const onMount = ({ state: { id, initialFiles, appendOutput }, setState }: OnMountProps<State>) => {
-  Engine.create({ id, initialFiles })
+const createOnMount = (testRunnerCallbacks: TestRunnerCallbacks) => ({
+  state: { id, initialFiles, appendOutput },
+  setState,
+}: OnMountProps<State>) => {
+  Engine.create({ id, initialFiles, testRunnerCallbacks })
     .then(async (engine) => {
       setState({ engine, files: engine.openFiles$.getValue() });
       engine.openFiles$.subscribe({
@@ -46,8 +56,9 @@ interface ExternalProps {
 
 interface Props extends ExternalProps {
   readonly appendOutput: (output: OutputMessage) => void;
+  readonly testRunnerCallbacks: TestRunnerCallbacks;
 }
-const FullEditorBase = ({ id, initialFiles, appendOutput, ...props }: Props) => (
+const FullEditorBase = ({ id, initialFiles, appendOutput, testRunnerCallbacks, ...props }: Props) => (
   <Container
     initialState={{
       id,
@@ -55,7 +66,7 @@ const FullEditorBase = ({ id, initialFiles, appendOutput, ...props }: Props) => 
       files: [],
       appendOutput,
     }}
-    onMount={onMount}
+    onMount={createOnMount(testRunnerCallbacks)}
   >
     {({ files, engine }) =>
       engine === undefined ? (
@@ -73,6 +84,12 @@ const ConnectedFullEditor = connect(
   undefined,
   (dispatch) => ({
     appendOutput: (output: OutputMessage) => dispatch(appendConsole(output)),
+    testRunnerCallbacks: {
+      onUpdateSuite: (suite: TestSuite) => dispatch(updateTestSuite(suite)),
+      onRemoveSuite: (path: string) => dispatch(removeTestSuite(path)),
+      onUpdateTest: (path: string, test: Test) => dispatch(updateTest({ path, test })),
+      setTestsRunning: (running: boolean) => dispatch(setTestsRunning(running)),
+    },
   }),
 )(FullEditorBase);
 

@@ -21,4 +21,4 @@ export interface EditorFile {
   readonly writable: boolean;
 }
 
-export type ConsoleType = 'output' | 'problems';
+export type ConsoleType = 'output' | 'problems' | 'test';

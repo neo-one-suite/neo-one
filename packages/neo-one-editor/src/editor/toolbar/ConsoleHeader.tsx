@@ -9,6 +9,7 @@ import {
   selectConsoleOutputOwner,
   selectConsoleProblems,
   selectConsoleType,
+  setConsoleOpen,
   setConsoleType,
 } from '../redux';
 import { ConsoleType, FileDiagnostic } from '../types';
@@ -57,6 +58,7 @@ interface Props {
   readonly consoleProblems: ReadonlyArray<FileDiagnostic>;
   readonly onClearConsole: (owner: string) => void;
   readonly onClickProblems: () => void;
+  readonly onClickTests: () => void;
   readonly onClickOutput: () => void;
   readonly onCloseConsole: () => void;
 }
@@ -71,6 +73,7 @@ const ConsoleHeaderBase = ({
   consoleProblems,
   onClickOutput,
   onClickProblems,
+  onClickTests,
   onClearConsole,
   onCloseConsole,
   ...props
@@ -84,6 +87,7 @@ const ConsoleHeaderBase = ({
           {problemCount === 0 ? null : <ProblemCount>{problemCount}</ProblemCount>}
         </ConsoleTab>
         <ConsoleTab selected={consoleType === 'output'} onClick={onClickOutput} text="OUTPUT" />
+        <ConsoleTab selected={consoleType === 'test'} onClick={onClickTests} text="TESTS" />
       </TabsWrapper>
       <ButtonsWrapper>
         {consoleType === 'output' ? (
@@ -111,6 +115,8 @@ export const ConsoleHeader = connect(
   (dispatch) => ({
     onClickProblems: () => dispatch(setConsoleType('problems')),
     onClickOutput: () => dispatch(setConsoleType('output')),
+    onClickTests: () => dispatch(setConsoleType('test')),
     onClearConsole: (owner: string) => dispatch(clearConsole(owner)),
+    onCloseConsole: () => dispatch(setConsoleOpen(false)),
   }),
 )(ConsoleHeaderBase);

@@ -16,9 +16,10 @@ import { makeDescribe } from 'jest-circus/build/utils';
 import expect from 'jest-matchers';
 // @ts-ignore
 import jestMock from 'jest-mock';
+import { Test, TestRunnerCallbacks } from '../../types';
 import { Engine } from '../Engine';
 import { ModuleBase } from '../ModuleBase';
-import { JestEvent } from './types';
+import { BlockName, DescribeBlock, JestEvent, TestEntry } from './types';
 
 function resetTestState() {
   // tslint:disable-next-line no-any
@@ -47,53 +48,198 @@ function resetTestState() {
   });
 }
 
-const runners = new Set<TestRunner>();
+// tslint:disable-next-line no-let
+let doHandleEvent: ((event: JestEvent) => void) | undefined;
 const handleEvent = (event: JestEvent) => {
-  runners.forEach((runner) => {
-    runner.handleEvent(event);
-  });
+  if (doHandleEvent !== undefined) {
+    doHandleEvent(event);
+  }
 };
 addEventHandler(handleEvent);
 
-const doRun = async (runner: TestRunner) => {
+const doRun = async (test: ModuleBase, handler: TestEventHandler) => {
   try {
-    runners.add(runner);
+    doHandleEvent = (event) => {
+      handler.handleTestEvent(event);
+    };
     resetTestState();
 
-    const tests = runner.findTests();
-
-    tests.forEach((test) => {
+    try {
       test.evaluate({ force: true });
-    });
+    } catch (error) {
+      handler.onEvaluateError(error);
+
+      return;
+    }
 
     await run();
   } finally {
-    runners.delete(runner);
+    doHandleEvent = undefined;
   }
 };
 
 interface TestQueueEntry {
-  readonly runner: TestRunner;
+  readonly test: ModuleBase;
+  readonly handler: TestEventHandler;
 }
 
 const mutableQueue: TestQueueEntry[] = [];
 // tslint:disable-next-line no-let
 let running = false;
-const runTestsSerially = async (runner: TestRunner) => {
-  mutableQueue.push({ runner });
+const runTestsSerially = async (
+  test: ModuleBase,
+  handler: TestEventHandler,
+  setTestsRunning: (running: boolean) => void,
+) => {
+  mutableQueue.push({ test, handler });
   if (running) {
     return;
   }
   running = true;
+  setTestsRunning(true);
 
   let next = mutableQueue.shift();
   // tslint:disable-next-line no-loop-statement
   while (next !== undefined) {
-    await doRun(next.runner);
+    await doRun(next.test, next.handler);
     next = mutableQueue.shift();
   }
 
   running = false;
+  setTestsRunning(false);
+};
+
+interface TestEventHandler {
+  readonly onEvaluateError: (error: Error) => void;
+  readonly handleTestEvent: (event: JestEvent) => void;
+}
+
+const createHandleTestEvent = (test: ModuleBase, callbacks: TestRunnerCallbacks) => {
+  let paths: ReadonlyArray<string> = [];
+  let blockIndices: ReadonlyArray<number> = [];
+  let tests: ReadonlyArray<Test> = [];
+  let now = Date.now();
+
+  const getBlockName = (blockName: BlockName) => {
+    if (typeof blockName === 'string') {
+      return blockName;
+    }
+
+    return '0';
+
+    // const idx = paths.length;
+    // const blockIndex = blockIndices[idx];
+    // blockIndices = blockIndices.slice(0, idx).concat([blockIndex + 1]).concat(blockIndices.slice(idx + 1));
+
+    // return `${blockIndex}`;
+  };
+
+  const getFinalBlockName = (block: DescribeBlock) => {
+    if (typeof block.name === 'string') {
+      return block.name;
+    }
+
+    return '0';
+  };
+
+  const getTestName = (entry: TestEntry) => {
+    const getBlockNamesWorker = (block: DescribeBlock): ReadonlyArray<string> => {
+      if (block.parent == undefined) {
+        return [];
+      }
+      const parentNames = getBlockNamesWorker(block.parent);
+
+      return parentNames.concat([getFinalBlockName(block)]);
+    };
+
+    return getBlockNamesWorker(entry.parent).concat([entry.name]);
+  };
+
+  return {
+    onEvaluateError: (error: Error) => {
+      callbacks.onUpdateSuite({
+        path: test.path,
+        tests,
+        error,
+      });
+    },
+    handleTestEvent: (event: JestEvent) => {
+      switch (event.name) {
+        case 'start_describe_definition':
+          if (blockIndices.length !== paths.length + 1) {
+            blockIndices = blockIndices.concat([0]);
+          }
+          paths = paths.concat([getBlockName(event.blockName)]);
+          break;
+        case 'finish_describe_definition':
+          paths = paths.slice(0, -1);
+          if (paths.length === 0) {
+            callbacks.onUpdateSuite({
+              path: test.path,
+              tests,
+            });
+          }
+          break;
+        case 'add_test':
+          if (event.mode === 'skip') {
+            tests = tests.concat([
+              {
+                name: paths.concat([event.testName]),
+                status: 'skip',
+              },
+            ]);
+          } else {
+            tests = tests.concat([
+              {
+                name: paths.concat([event.testName]),
+                status: 'running',
+              },
+            ]);
+          }
+          break;
+        case 'test_start':
+          now = Date.now();
+          break;
+        case 'test_skip':
+          callbacks.onUpdateTest(test.path, {
+            name: getTestName(event.test),
+            status: 'skip',
+          });
+          break;
+        case 'test_fn_success':
+          callbacks.onUpdateTest(test.path, {
+            name: getTestName(event.test),
+            status: 'pass',
+            duration: Date.now() - now,
+          });
+          break;
+        case 'test_fn_failure':
+          callbacks.onUpdateTest(test.path, {
+            name: getTestName(event.test),
+            status: 'fail',
+            duration: Date.now() - now,
+            error:
+              event.test.errors[0][0].stack === undefined
+                ? event.test.errors[0][0].toString()
+                : event.test.errors[0][0].stack,
+          });
+          break;
+        case 'add_hook':
+        case 'hook_start':
+        case 'hook_success':
+        case 'hook_failure':
+        case 'test_fn_start':
+        case 'run_describe_start':
+        case 'run_describe_finish':
+        case 'run_start':
+        case 'run_finish':
+          // do nothing
+          break;
+        default:
+        // do nothing
+      }
+    },
+  };
 };
 
 const isTest = (path: string) => {
@@ -110,7 +256,7 @@ const isTest = (path: string) => {
 };
 
 export class TestRunner {
-  public constructor(private readonly engine: Engine) {}
+  public constructor(private readonly engine: Engine, private readonly callbacks: TestRunnerCallbacks) {}
 
   public getTestGlobals(_mod: ModuleBase) {
     return {
@@ -128,12 +274,16 @@ export class TestRunner {
   }
 
   public async runTests() {
-    await runTestsSerially(this);
+    const tests = this.findTests();
+
+    await Promise.all(tests.map(async (test) => this.runTest(test.path)));
   }
 
-  public readonly handleEvent = (_message: JestEvent) => {
-    // do nothing for now
-  };
+  public async runTest(path: string) {
+    const test = this.engine.modules[path];
+
+    await runTestsSerially(test, createHandleTestEvent(test, this.callbacks), this.callbacks.setTestsRunning);
+  }
 
   public findTests(): ReadonlyArray<ModuleBase> {
     return Object.entries(this.engine.modules)

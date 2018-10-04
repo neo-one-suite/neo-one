@@ -1,7 +1,9 @@
 // tslint:disable no-any
 import * as React from 'react';
+import { connect } from 'react-redux';
 import { Grid, Hidden, styled } from 'reakit';
 import { prop } from 'styled-tools';
+import { selectConsoleOpen } from './redux';
 import { BuildAction, Console, FileType, Problems, RunTestsAction } from './toolbar';
 import { EditorFile, EditorFiles, TextRange } from './types';
 
@@ -40,26 +42,25 @@ interface Props {
   readonly file?: EditorFile;
   readonly files: EditorFiles;
   readonly onSelectRange: (file: EditorFile, range: TextRange) => void;
+  readonly consoleOpen: boolean;
 }
 
-export const EditorToolbar = ({ file, files, onSelectRange, ...props }: Props) => (
-  <Hidden.Container>
-    {(hidden: any) => (
-      <Wrapper {...props}>
-        <Hidden {...hidden}>
-          <Console files={files} onClose={hidden.toggle} onSelectRange={onSelectRange} />
-        </Hidden>
-        <ToolbarWrapper>
-          <ToolbarLeftWrapper>
-            <Problems onClick={hidden.toggle} />
-          </ToolbarLeftWrapper>
-          <ToolbarRightWrapper>
-            <FileType file={file} />
-            <BuildAction file={file} />
-            <RunTestsAction file={file} />
-          </ToolbarRightWrapper>
-        </ToolbarWrapper>
-      </Wrapper>
-    )}
-  </Hidden.Container>
+const EditorToolbarBase = ({ file, files, onSelectRange, consoleOpen, ...props }: Props) => (
+  <Wrapper {...props}>
+    <Hidden visible={consoleOpen}>
+      <Console files={files} onSelectRange={onSelectRange} />
+    </Hidden>
+    <ToolbarWrapper>
+      <ToolbarLeftWrapper>
+        <Problems />
+      </ToolbarLeftWrapper>
+      <ToolbarRightWrapper>
+        <FileType file={file} />
+        <BuildAction />
+        <RunTestsAction />
+      </ToolbarRightWrapper>
+    </ToolbarWrapper>
+  </Wrapper>
 );
+
+export const EditorToolbar = connect(selectConsoleOpen)(EditorToolbarBase);

@@ -2,8 +2,9 @@
 import { EffectMap } from 'constate';
 import * as React from 'react';
 import { MdBuild } from 'react-icons/md';
+import { connect } from 'react-redux';
 import { Engine } from '../../engine';
-import { EditorFile } from '../types';
+import { openConsole } from '../redux';
 import { ActionButton } from './ActionButton';
 
 interface State {
@@ -14,8 +15,9 @@ interface Effects {
   readonly onClick: () => void;
 }
 
-const makeEffects = (engine: Engine): EffectMap<State, Effects> => ({
+const createMakeEffects = (openConsoleOutput: () => void) => (engine: Engine): EffectMap<State, Effects> => ({
   onClick: () => ({ setState }) => {
+    openConsoleOutput();
     setState({ loading: true });
 
     engine
@@ -32,9 +34,16 @@ const makeEffects = (engine: Engine): EffectMap<State, Effects> => ({
 });
 
 interface Props {
-  readonly file?: EditorFile;
+  readonly openConsoleOutput: () => void;
 }
 
-export const BuildAction = ({ file }: Props) => (
-  <ActionButton file={file} icon={<MdBuild />} text="Build" makeEffects={makeEffects} />
+const BuildActionBase = ({ openConsoleOutput, ...props }: Props) => (
+  <ActionButton {...props} icon={<MdBuild />} text="Build" makeEffects={createMakeEffects(openConsoleOutput)} />
 );
+
+export const BuildAction = connect(
+  undefined,
+  (dispatch) => ({
+    openConsoleOutput: () => dispatch(openConsole('output')),
+  }),
+)(BuildActionBase);

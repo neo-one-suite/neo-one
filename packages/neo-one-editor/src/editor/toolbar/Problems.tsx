@@ -2,7 +2,7 @@ import * as React from 'react';
 import { MdError, MdWarning } from 'react-icons/md';
 import { connect } from 'react-redux';
 import { as, Grid, styled } from 'reakit';
-import { selectConsoleProblems } from '../redux';
+import { openConsole, selectConsoleProblems } from '../redux';
 import { FileDiagnostic } from '../types';
 import { Text } from './Text';
 import { Wrapper } from './Wrapper';
@@ -28,4 +28,9 @@ const ProblemsBase = ({ consoleProblems, onClick, ...props }: Props) => (
   </Wrapper>
 );
 
-export const Problems = connect(selectConsoleProblems)(ProblemsBase);
+export const Problems = connect(
+  selectConsoleProblems,
+  (dispatch) => ({
+    onClick: () => dispatch(openConsole('problems')),
+  }),
+)(ProblemsBase);

@@ -56,11 +56,15 @@ export type JestEvent =
       readonly test: TestEntry;
     }
   | {
-      readonly name: 'test_success';
+      readonly name: 'test_fn_start';
       readonly test: TestEntry;
     }
   | {
-      readonly name: 'test_failure';
+      readonly name: 'test_fn_success';
+      readonly test: TestEntry;
+    }
+  | {
+      readonly name: 'test_fn_failure';
       readonly error: Exception;
       readonly test: TestEntry;
     }

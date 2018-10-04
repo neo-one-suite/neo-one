@@ -18,7 +18,7 @@ import * as nodePath from 'path';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { EditorFiles } from '../editor';
 import { ModuleNotFoundError } from '../errors';
-import { EngineContentFiles, FileMetadata, FileSystemMetadata } from '../types';
+import { EngineContentFiles, FileMetadata, FileSystemMetadata, TestRunnerCallbacks } from '../types';
 import { getFileType } from '../utils';
 import { EMPTY_MODULE_PATH, initializeFileSystem, METADATA_FILE, TRANSPILE_PATH } from './initializeFileSystem';
 import { ModuleBase } from './ModuleBase';
@@ -32,6 +32,7 @@ import { Exports } from './types';
 export interface EngineCreateOptions {
   readonly id: string;
   readonly initialFiles: EngineContentFiles;
+  readonly testRunnerCallbacks: TestRunnerCallbacks;
 }
 
 interface PathWithExports {
@@ -46,6 +47,7 @@ interface EngineOptions {
   readonly fs: FileSystem;
   readonly files: EditorFiles;
   readonly pathWithExports: ReadonlyArray<PathWithExports>;
+  readonly testRunnerCallbacks: TestRunnerCallbacks;
 }
 
 interface Modules {
@@ -56,7 +58,7 @@ interface Modules {
 const BUILTIN_MODULES = new Set(['path']);
 
 export class Engine {
-  public static async create({ id, initialFiles }: EngineCreateOptions): Promise<Engine> {
+  public static async create({ id, initialFiles, testRunnerCallbacks }: EngineCreateOptions): Promise<Engine> {
     const output$ = new Subject<OutputMessage>();
     const builder = createBuilderManager(output$, id);
     const [fs, builderInstance, jsonRPCLocalProvider] = await Promise.all([
@@ -110,7 +112,7 @@ export class Engine {
       [],
     );
 
-    const engine = new Engine({ id, output$, builder, fs, files, pathWithExports });
+    const engine = new Engine({ id, output$, builder, fs, files, pathWithExports, testRunnerCallbacks });
 
     if (!exists) {
       initialFiles.forEach((file) => {
@@ -135,12 +137,12 @@ export class Engine {
   // tslint:disable-next-line readonly-keyword
   private readonly mutableCachedPaths: { [currentPath: string]: { [path: string]: string } } = {};
 
-  private constructor({ id, output$, fs, builder, files, pathWithExports }: EngineOptions) {
+  private constructor({ id, output$, fs, builder, files, pathWithExports, testRunnerCallbacks }: EngineOptions) {
     this.id = id;
     this.output$ = output$;
     this.fs = fs;
     this.openFiles$ = new BehaviorSubject(files);
-    this.testRunner = new TestRunner(this);
+    this.testRunner = new TestRunner(this, testRunnerCallbacks);
     this.builder = builder;
     this.transpiler = new WorkerManager<typeof Transpiler>(TranspilerWorker, new BehaviorSubject<{}>({}));
     this.mutableModules = pathWithExports.reduce<Modules>(
@@ -177,8 +179,18 @@ export class Engine {
     });
   }
 
-  public async runTests(): Promise<void> {
-    await this.testRunner.runTests();
+  public runTests(): void {
+    this.testRunner.runTests().catch((error) => {
+      // tslint:disable-next-line no-console
+      console.error(error);
+    });
+  }
+
+  public runTest(path: string): void {
+    this.testRunner.runTest(path).catch((error) => {
+      // tslint:disable-next-line no-console
+      console.error(error);
+    });
   }
 
   public getTranspiledPath(path: string): string {

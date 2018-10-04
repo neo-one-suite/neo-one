@@ -1,40 +1,36 @@
 // tslint:disable no-null-keyword
-import { EffectMap } from 'constate';
 import * as React from 'react';
 import { MdPlayArrow } from 'react-icons/md';
-import { Engine } from '../../engine';
-import { EditorFile } from '../types';
-import { ActionButton } from './ActionButton';
-
-interface State {
-  readonly loading: boolean;
-}
-
-interface Effects {
-  readonly onClick: () => void;
-}
-
-const makeEffects = (engine: Engine): EffectMap<State, Effects> => ({
-  onClick: () => ({ setState }) => {
-    setState({ loading: true });
-
-    engine
-      .runTests()
-      .then(() => {
-        setState({ loading: false });
-      })
-      .catch((error) => {
-        setState({ loading: false });
-        // tslint:disable-next-line no-console
-        console.error(error);
-      });
-  },
-});
+import { connect } from 'react-redux';
+import { EditorContext } from '../../EditorContext';
+import { openConsole, selectConsoleTestsRunning } from '../redux';
+import { ActionButtonBase } from './ActionButtonBase';
 
 interface Props {
-  readonly file?: EditorFile;
+  readonly consoleTestsRunning: boolean;
+  readonly openConsoleTests: () => void;
 }
 
-export const RunTestsAction = ({ file }: Props) => (
-  <ActionButton file={file} icon={<MdPlayArrow />} text="Run Tests" makeEffects={makeEffects} />
+const RunTestsActionBase = ({ consoleTestsRunning, openConsoleTests, ...props }: Props) => (
+  <EditorContext.Consumer>
+    {({ engine }) => (
+      <ActionButtonBase
+        {...props}
+        loading={consoleTestsRunning}
+        icon={<MdPlayArrow />}
+        text="Run Tests"
+        onClick={() => {
+          engine.runTests();
+          openConsoleTests();
+        }}
+      />
+    )}
+  </EditorContext.Consumer>
 );
+
+export const RunTestsAction = connect(
+  selectConsoleTestsRunning,
+  (dispatch) => ({
+    openConsoleTests: () => dispatch(openConsole('test')),
+  }),
+)(RunTestsActionBase);

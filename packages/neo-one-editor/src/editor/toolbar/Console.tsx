@@ -17,13 +17,12 @@ const Wrapper = styled(Grid)`
 
 interface Props {
   readonly files: ReadonlyArray<EditorFile>;
-  readonly onClose: () => void;
   readonly onSelectRange: (file: EditorFile, range: TextRange) => void;
 }
 
-export const Console = ({ files, onClose, onSelectRange, ...props }: Props) => (
+export const Console = ({ files, onSelectRange, ...props }: Props) => (
   <Wrapper {...props}>
-    <ConsoleHeader onCloseConsole={onClose} />
+    <ConsoleHeader />
     <ConsoleContent files={files} onSelectRange={onSelectRange} />
   </Wrapper>
 );

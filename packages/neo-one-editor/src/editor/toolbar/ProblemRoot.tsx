@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { MdArrowDropDown } from 'react-icons/md';
-import { styled } from 'reakit';
+import { Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { EditorFileDisplay } from '../EditorFileDisplay';
+import { EditorFileIcon } from '../EditorFileIcon';
 import { EditorFile } from '../types';
+import { FileText } from './FileText';
 import { ProblemCount } from './ProblemCount';
 import { ProblemWrapper } from './ProblemWrapper';
 
@@ -19,10 +20,16 @@ const Expanded = styled(BaseArrow)`
   transform: translate(6px, 2px) scale(1.5) rotate(-45deg);
 `;
 
-const StyledEditorFileDisplay = styled(EditorFileDisplay)`
-  color: ${prop('theme.gray0')};
+const GridWrapper = styled(Grid)`
+  grid-auto-flow: column;
+  gap: 4px;
+  align-items: start;
 `;
 
+const StyledEditorFileIcon = styled(EditorFileIcon)`
+  height: 16px;
+  width: 16px;
+`;
 const StyledProblemCount = styled(ProblemCount)`
   padding-top: 1.5px;
 `;
@@ -37,7 +44,10 @@ interface Props {
 export const ProblemRoot = ({ file, problemCount, expanded, toggle, ...props }: Props) => (
   <ProblemWrapper onClick={toggle} {...props}>
     {expanded ? <Expanded /> : <Collapsed />}
-    <StyledEditorFileDisplay file={file} />
+    <GridWrapper {...props}>
+      <StyledEditorFileIcon file={file} />
+      <FileText path={file.path} />
+    </GridWrapper>
     <StyledProblemCount>{problemCount}</StyledProblemCount>
   </ProblemWrapper>
 );
