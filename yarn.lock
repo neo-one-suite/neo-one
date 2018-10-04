@@ -5580,6 +5580,11 @@ constate@^0.8.0, constate@^0.8.2:
   resolved "https://registry.yarnpkg.com/constate/-/constate-0.8.2.tgz#36974aa47d5243f0f07a92da46eb8c3df40179d8"
   integrity sha512-V7Z5gDWirhSrswd/lEZAMu+QkVI0odNfknbQIDJRqCNobQelsH3jq7gZ+3lQasQY3SLotx++P8q5NykTq6hALw==
 
+constate@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/constate/-/constate-0.9.0.tgz#877197ef8fbcacee95672a7e98f7b21dec818891"
+  integrity sha512-Cgkqefi4GrepnA7gwqbrsU+Kf/xl0sPv3O1UNE/vUZtTgpWlkd+/rSZjjd7npICtExn6yuICro7Vb2zoFCnS/A==
+
 contains-path@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/contains-path/-/contains-path-0.1.0.tgz#fe8cf184ff6670b6baef01a9d4861a5cbec4120a"
