@@ -162,7 +162,7 @@
     "source-map": "0.7.3",
     "stylelint-config-standard": "18.2.0",
     "stylelint-config-styled-components": "0.1.1",
-    "stylelint-processor-styled-components": "1.4.0",
+    "stylelint-processor-styled-components": "1.5.0",
     "through2": "2.0.3",
     "tmp": "0.0.33",
     "ts-jest": "23.10.3",
