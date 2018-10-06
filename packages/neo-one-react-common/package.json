@@ -5,9 +5,9 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/types": "^1.0.0-preview.0",
-    "@types/react": "^16.4.14",
+    "@types/react": "^16.4.15",
     "react": "^16.5.1",
-    "reakit": "^0.15.4",
+    "reakit": "^0.15.5",
     "styled-tools": "^1.5.1"
   },
   "sideEffects": false

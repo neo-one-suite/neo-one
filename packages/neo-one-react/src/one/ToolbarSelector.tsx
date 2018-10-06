@@ -25,10 +25,10 @@ interface Actions {
 }
 
 const actions: ActionMap<State, Actions> = {
-  onMenuOpen: () => ({ menuOpen: true, hover: false }),
-  onMenuClose: () => ({ menuOpen: false, hover: false }),
-  onMouseEnter: () => ({ hover: true }),
-  onMouseLeave: () => ({ hover: false }),
+  onMenuOpen: () => () => ({ menuOpen: true, hover: false }),
+  onMenuClose: () => () => ({ menuOpen: false, hover: false }),
+  onMouseEnter: () => () => ({ hover: true }),
+  onMouseLeave: () => () => ({ hover: false }),
 };
 
 // tslint:disable-next-line no-any

@@ -28,7 +28,7 @@ interface Effects {
 }
 
 const actions: ActionMap<State, Actions> = {
-  onChangeAmount: (event) => {
+  onChangeAmount: (event) => () => {
     const text = event.currentTarget.value;
 
     let amount: BigNumber | undefined;
@@ -43,8 +43,8 @@ const actions: ActionMap<State, Actions> = {
 
     return { text, amount };
   },
-  onChangeAsset: (asset) => ({ asset }),
-  onChangeTo: (to) => ({ to }),
+  onChangeAsset: (asset) => () => ({ asset }),
+  onChangeTo: (to) => () => ({ to }),
 };
 
 export const TOKEN = 'token';
