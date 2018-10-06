@@ -70,6 +70,6 @@
     "react": "16.5.1",
     "react-dom": "16.5.1",
     "react-hot-loader": "4.3.7",
-    "rxjs": "6.3.2"
+    "rxjs": "6.3.3"
   }
 }
