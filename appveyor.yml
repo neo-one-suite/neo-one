@@ -19,7 +19,7 @@ for:
       - yarn --version
       - git clone https://github.com/neo-one-suite/neo-one-playground.git packages\neo-one-playground
       - yarn install --non-interactive
-      - yarn run build
+      - yarn run build:e2e
     test_script:
       - yarn run test-ci-windows-8
       - yarn run e2e-ci-windows-8
@@ -40,7 +40,7 @@ for:
       - yarn --version
       - git clone https://github.com/neo-one-suite/neo-one-playground.git packages\neo-one-playground
       - yarn install --non-interactive
-      - yarn run build
+      - yarn run build:e2e
     test_script:
       - yarn run test-ci-windows-9
       - yarn run e2e-ci-windows-9
@@ -61,7 +61,7 @@ for:
       - yarn --version
       - git clone https://github.com/neo-one-suite/neo-one-playground.git packages\neo-one-playground
       - yarn install --non-interactive
-      - yarn run build
+      - yarn run build:e2e
     test_script:
       - yarn run test-ci
       - yarn run e2e-ci

@@ -106,10 +106,6 @@ aliases:
           name: Lint
           command: yarn lint
           when: always
-      - run:
-          name: Build
-          command: yarn build
-          when: always
 
   - &build-e2e8
     working_directory: ~/neo-one
