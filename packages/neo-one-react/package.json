@@ -13,7 +13,7 @@
     "@types/react-select": "^2.0.4",
     "bignumber.js": "^7.2.1",
     "constate": "^0.9.0",
-    "date-fns": "^2.0.0-alpha.16",
+    "date-fns": "^2.0.0-alpha.21",
     "localforage": "^1.7.2",
     "lodash": "^4.17.11",
     "react": "^16.5.1",

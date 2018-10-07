@@ -36,11 +36,11 @@
     "@neo-one/cli": "1.0.0-preview.0",
     "@neo-one/smart-contract-test": "1.0.0-preview.0",
     "@neo-one/smart-contract-typescript-plugin": "1.0.0-preview.0",
-    "@types/jest": "23.3.2",
-    "@types/react": "16.4.14",
-    "@types/react-dom": "16.0.7",
+    "@types/jest": "23.3.3",
+    "@types/react": "16.4.15",
+    "@types/react-dom": "16.0.8",
     "@types/semver": "5.5.0",
-    "@types/webpack": "4.4.11",
+    "@types/webpack": "4.4.14",
     "awesome-typescript-loader": "5.2.1",
     "connect-history-api-fallback": "1.5.0",
     "cross-env": "5.2.0",
@@ -53,12 +53,12 @@
     "mini-html-webpack-plugin": "0.2.3",
     "semver": "5.5.1",
     "style-loader": "0.23.0",
-    "ts-jest": "23.1.4",
+    "ts-jest": "23.10.4",
     "ts-node": "7.0.1",
     "tslint": "5.11.0",
     "typescript": "3.1.1",
-    "webpack": "4.19.0",
-    "webpack-cli": "3.1.0",
+    "webpack": "4.20.2",
+    "webpack-cli": "3.1.2",
     "webpack-serve": "2.0.2"
   },
   "dependencies": {
@@ -67,9 +67,9 @@
     "@neo-one/smart-contract": "1.0.0-preview.0",
     "bignumber.js": "7.2.1",
     "core-js": "2.5.7",
-    "react": "16.5.1",
-    "react-dom": "16.5.1",
-    "react-hot-loader": "4.3.7",
-    "rxjs": "6.3.2"
+    "react": "16.5.2",
+    "react-dom": "16.5.2",
+    "react-hot-loader": "4.3.11",
+    "rxjs": "6.3.3"
   }
 }
