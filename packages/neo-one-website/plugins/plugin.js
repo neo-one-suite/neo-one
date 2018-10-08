@@ -2,6 +2,8 @@ import * as React from 'react';
 import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
 import * as path from 'path';
 import webpack from 'webpack';
+import WebpackBar from 'webpackbar';
+import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
 
 export default () => ({
   webpack: (config, { stage, defaultLoaders }) => {
@@ -51,10 +53,7 @@ export default () => ({
 
     const babelLoader = {
       loader: 'babel-loader',
-      options: {
-        ...babel,
-        cacheDirectory: true,
-      },
+      options: babel,
     };
 
     const tsLoaders = [
@@ -67,6 +66,7 @@ export default () => ({
           configFile: path.resolve(__dirname, '..', '..', '..', 'tsconfig', 'tsconfig.es2017.esm.json'),
           onlyCompileBundledFiles: true,
           experimentalFileCaching: true,
+          experimentalWatchApi: true,
         },
       },
     ];
@@ -77,10 +77,7 @@ export default () => ({
           {
             test: /\.tsx?$/,
             exclude: /node_modules/,
-            use: [
-              'cache-loader',
-              { loader: 'thread-loader', options: { poolTimeout: Number.POSITIVE_INFINITY } },
-            ].concat(tsLoaders),
+            use: [{ loader: 'thread-loader', options: { poolTimeout: Number.POSITIVE_INFINITY } }].concat(tsLoaders),
           },
           {
             test: /\.jsx?$/,
@@ -114,7 +111,8 @@ export default () => ({
         // tslint:disable-next-line no-object-mutation
         resource.request = resource.request.replace(/^@reactivex\/ix-es2015-cjs(.*)$/, '@reactivex/ix-esnext-esm$1');
       }),
-      new webpack.ProgressPlugin(),
+      new WebpackBar({ profile: true }),
+      new HardSourceWebpackPlugin({ cachePrune: { sizeThreshold: 1024 * 1024 * 1024 } }),
     ]);
 
     config.resolve.alias = {

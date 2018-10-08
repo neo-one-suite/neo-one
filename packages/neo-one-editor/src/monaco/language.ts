@@ -1,12 +1,12 @@
 // tslint:disable promise-function-async no-submodule-imports no-implicit-dependencies
 import { FileSystem } from '@neo-one/local-browser';
 // @ts-ignore
+import TSWorker from '@neo-one/worker-loader!./ts.worker';
+// @ts-ignore
+import EditorWorker from '@neo-one/worker-loader!monaco-editor/esm/vs/editor/editor.worker';
+// @ts-ignore
 import * as javascriptModule from 'monaco-editor/esm/vs/basic-languages/javascript/javascript';
 import ts from 'typescript';
-// @ts-ignore
-import TSWorker from 'worker-loader!./ts.worker';
-// @ts-ignore
-import EditorWorker from 'worker-loader!monaco-editor/esm/vs/editor/editor.worker';
 import * as languageFeatures from './languageFeatures';
 import { LanguageServiceOptions } from './LanguageServiceOptions';
 import { TypeScriptWorker } from './tsWorker';
