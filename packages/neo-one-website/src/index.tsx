@@ -12,6 +12,17 @@ import { App } from './App';
 export default App;
 
 // tslint:disable-next-line strict-type-predicates
+if (typeof window !== 'undefined') {
+  window.addEventListener('unhandledrejection', (e) => {
+    if (e.reason && e.reason.name === 'Canceled') {
+      // This is an error from vscode that vscode uses to cancel some actions
+      // We don't want to show this to the user
+      e.preventDefault();
+    }
+  });
+}
+
+// tslint:disable-next-line strict-type-predicates
 if (typeof document !== 'undefined') {
   // tslint:disable-next-line no-any strict-boolean-expressions
   const renderMethod = (module as any).hot ? ReactDOM.render : ReactDOM.hydrate || ReactDOM.render;

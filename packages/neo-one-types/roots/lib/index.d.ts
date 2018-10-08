@@ -26,4 +26,8 @@ declare module '*.png' {
   export default '';
 }
 
+declare module '*.json' {
+  export default {};
+}
+
 type JestMocked<T> = { [K in keyof T]: jest.Mock<T[K]> };

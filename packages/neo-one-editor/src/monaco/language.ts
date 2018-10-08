@@ -15,6 +15,7 @@ import { WorkerManager } from './WorkerManager';
 
 import Promise = monaco.Promise;
 import Uri = monaco.Uri;
+import { configureGrammar } from './configureGrammar';
 
 const CONTRACT_SUFFIX = '-contract';
 const TYPESCRIPT_SUFFIX = '-typescript';
@@ -184,6 +185,9 @@ function setupLanguage(languageID: string, options: LanguageServiceOptions, isTy
   // tslint:disable-next-line no-unused-expression
   new languageFeatures.DiagnostcsAdapter(options, languageID, worker);
   const mod = isTypeScript ? typescriptModule : javascriptModule;
-  monaco.languages.setMonarchTokensProvider(languageID, mod.language);
   monaco.languages.setLanguageConfiguration(languageID, mod.conf);
+  configureGrammar(languageID).catch((error) => {
+    // tslint:disable-next-line no-console
+    console.error(error);
+  });
 }

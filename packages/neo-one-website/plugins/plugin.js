@@ -97,6 +97,16 @@ export default () => ({
         ],
       },
     ];
+    config.module.defaultRules = [
+      {
+        type: 'javascript/auto',
+        resolve: {},
+      },
+      {
+        test: /\.json$/i,
+        type: 'json',
+      },
+    ];
     config.module.strictExportPresence = false;
     config.optimization.noEmitOnErrors = false;
     config.plugins = config.plugins.filter((plugin) => plugin.constructor.name !== 'NoEmitOnErrorsPlugin').concat([

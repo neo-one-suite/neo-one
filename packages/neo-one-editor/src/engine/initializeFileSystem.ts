@@ -145,7 +145,7 @@ export const initializeFileSystem = (fs: FileSystem): void => {
   writeFile(fs, '/node_modules/typescript/lib/lib.webworker.d.ts', lib_webworker_d_ts);
   writeFile(fs, '/node_modules/typescript/lib/lib.webworker.importscripts.d.ts', lib_webworker_importscripts_d_ts);
   writeFile(fs, '/node_modules/@types/jest/index.d.ts', jest_d_ts);
-  writeFile(fs, '/node_modules/@types/jest/package.json', jestPackageJSONContents);
+  writeFile(fs, '/node_modules/@types/jest/package.json', JSON.stringify(jestPackageJSONContents));
   // tslint:disable-next-line no-any
   Object.entries(files).forEach(([path, contents]: any) => {
     ensureDir(fs, nodePath.dirname(path));

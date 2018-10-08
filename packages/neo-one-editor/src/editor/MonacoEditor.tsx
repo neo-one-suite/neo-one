@@ -9,7 +9,7 @@ import { styled } from 'reakit';
 import ResizeObserver from 'resize-observer-polyfill';
 import { Engine } from '../engine';
 import { getLanguageID, LanguageType, setupLanguages } from '../monaco/language';
-import { dark } from './theme';
+import { defineThemes } from './theme';
 import { EditorFile, EditorFiles, FileDiagnostic, FileDiagnosticSeverity, TextRange } from './types';
 import { getLanguageIDForFile } from './utils';
 
@@ -32,8 +32,7 @@ const Wrapper = styled.div`
 
 const monac = monacoEditor as typeof monaco;
 
-// tslint:disable-next-line no-any
-monac.editor.defineTheme('dark', dark as any);
+defineThemes();
 
 // Store editor states such as cursor position, selection and scroll position for each model
 const editorStates = new Map<string, monaco.editor.ICodeEditorViewState>();
