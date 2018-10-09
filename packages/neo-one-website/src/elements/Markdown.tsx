@@ -1,58 +1,91 @@
 /* @flow */
 import MarkdownIt from 'markdown-it';
 import * as React from 'react';
-import { Box, css, styled } from 'reakit';
+import { css, styled } from 'reakit';
 import { prop } from 'styled-tools';
 
-export const mdOptions = {
+// tslint:disable
+import '../../static/css/prism.css';
+import 'clipboard';
+// @ts-ignore
+import Prism from 'prismjs/components/prism-core';
+// tslint:disable-next-line no-any
+const _self: any =
+  typeof window !== 'undefined'
+    ? window // if in browser
+    : typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope
+      ? self // if in worker
+      : {}; // if in node js
+_self.Prism = Prism;
+import 'prismjs/plugins/toolbar/prism-toolbar.css';
+import 'prismjs/plugins/toolbar/prism-toolbar';
+import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard';
+// @ts-ignore
+import 'prismjs/components/prism-clike';
+// @ts-ignore
+import 'prismjs/components/prism-javascript';
+// @ts-ignore
+import 'prismjs/components/prism-typescript';
+// @ts-ignore
+import 'prismjs/components/prism-markup';
+// tslint:enable
+
+const md = MarkdownIt();
+const langPrefix = 'language-';
+md.set({
   html: false,
   xhtmlOut: false,
   breaks: false,
-  langPrefix: 'language-',
+  langPrefix,
   linkify: true,
   typographer: true,
   quotes: `""''`,
-};
+  highlight: (text, lang) => {
+    const code = md.utils.escapeHtml(text);
+    const classAttribute = lang ? ` class="${langPrefix}${lang}"` : '';
 
-const md = MarkdownIt().set(mdOptions);
+    return `<pre${classAttribute}><code${classAttribute}>${code}</code></pre>`;
+  },
+});
 
 const headerMargins = css`
   margin-top: 16px;
   margin-bottom: 16px;
 `;
 
-const Wrapper = styled(Box)`
+const Wrapper = styled.div`
   ${prop('theme.fontStyles.subheading')};
+  ${prop('theme.fonts.axiformaThin')};
   overflow-wrap: break-word;
 
   & h1 {
-    ${headerMargins};
     ${prop('theme.fontStyles.display1')};
+    ${headerMargins};
   }
 
   & h2 {
-    ${headerMargins};
     ${prop('theme.fontStyles.headline')};
+    ${headerMargins};
   }
 
   & h3 {
-    ${headerMargins};
     ${prop('theme.fontStyles.subheading')};
+    ${headerMargins};
   }
 
   & h4 {
-    ${headerMargins};
     ${prop('theme.fontStyles.body2')};
+    ${headerMargins};
   }
 
   & h5 {
-    ${headerMargins};
     ${prop('theme.fontStyles.body1')};
+    ${headerMargins};
   }
 
   & h6 {
-    ${headerMargins};
     ${prop('theme.fontStyles.body1')};
+    ${headerMargins};
   }
 
   & p {
@@ -91,7 +124,6 @@ const Wrapper = styled(Box)`
     padding-left: 24px;
   }
 
-  ,
   & ol {
     margin-bottom: 8px;
     margin-top: 8px;
@@ -103,11 +135,34 @@ const Wrapper = styled(Box)`
     margin-top: 16px;
     white-space: pre-wrap;
   }
+
+  & code {
+    ${prop('theme.fontStyles.subheading')};
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
 `;
 
 interface Props {
   readonly source: string;
 }
-export const Markdown = ({ source, ...props }: Props) => (
-  <Wrapper {...props} dangerouslySetInnerHTML={{ __html: md.render(source) }} />
-);
+export class Markdown extends React.Component<Props> {
+  private readonly ref = React.createRef<HTMLElement>();
+
+  public componentDidMount(): void {
+    if (this.ref.current) {
+      Prism.highlightAllUnder(this.ref.current);
+    }
+  }
+
+  public componentDidUpdate(): void {
+    if (this.ref.current) {
+      Prism.highlightAllUnder(this.ref.current);
+    }
+  }
+
+  public render() {
+    const { source, ...props } = this.props;
+
+    return <Wrapper {...props} innerRef={this.ref} dangerouslySetInnerHTML={{ __html: md.render(source) }} />;
+  }
+}

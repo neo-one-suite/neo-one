@@ -32,3 +32,10 @@
   font-weight: 200;
   font-style: normal;
 }
+
+@font-face {
+  font-family: 'Axiforma-Thin';
+  src: url('./Axiforma-Thin.woff2') format('woff2'), url('./Axiforma-Thin.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}

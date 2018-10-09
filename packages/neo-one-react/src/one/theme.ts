@@ -71,6 +71,11 @@ export const theme = {
       font-weight: 200;
       font-style: normal;
     `,
+    axiformaThin: css`
+      font-family: ${axiforma('Axiforma-Thin')};
+      font-weight: 400;
+      font-style: normal;
+    `,
   },
   fontStyles: {
     caption: css`

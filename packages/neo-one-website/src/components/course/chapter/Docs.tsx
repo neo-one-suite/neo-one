@@ -8,7 +8,8 @@ import { SelectedChapter } from '../types';
 const StyledMarkdown = styled(Markdown)`
   border-right: 1px solid ${prop('theme.gray5')};
   background-color: ${prop('theme.black')};
-  height: 100%;
+  min-height: 0;
+  overflow-y: scroll;
 `;
 
 interface Props {
