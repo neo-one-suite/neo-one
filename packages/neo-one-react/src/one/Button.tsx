@@ -15,6 +15,8 @@ export const Button = styled(ButtonBase)`
   font-size: 0.875rem;
   line-height: 1em;
   transition: 0.3s;
+  cursor: pointer;
+  text-decoration: none;
 
   &:hover {
     background-color: ${prop('theme.primaryLight')};

@@ -1,8 +1,8 @@
+import { FileIcon } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdArrowDropDown } from 'react-icons/md';
 import { Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { EditorFileIcon } from '../EditorFileIcon';
 import { FileText } from './FileText';
 import { ProblemCount } from './ProblemCount';
 import { ProblemWrapper } from './ProblemWrapper';
@@ -25,7 +25,7 @@ const GridWrapper = styled(Grid)`
   align-items: start;
 `;
 
-const StyledEditorFileIcon = styled(EditorFileIcon)`
+const StyledEditorFileIcon = styled(FileIcon)`
   height: 16px;
   width: 16px;
 `;

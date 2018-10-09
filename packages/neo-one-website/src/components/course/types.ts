@@ -24,21 +24,18 @@ export interface Course {
   readonly title: string;
   readonly description: string;
   readonly image: CourseImage;
-  readonly complete: boolean;
   readonly lessons: ReadonlyArray<Lesson>;
 }
 
 export interface Lesson {
   readonly title: string;
   readonly documentation: string;
-  readonly complete: boolean;
   readonly chapters: ReadonlyArray<Chapter>;
 }
 
 export interface Chapter {
   readonly title: string;
   readonly documentation: string;
-  readonly complete: boolean;
   readonly files: ReadonlyArray<ChapterFile>;
 }
 

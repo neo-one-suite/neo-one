@@ -61,6 +61,7 @@ export const updateTest = actionCreator<UpdateTest>('UPDATE_TEST');
 export const setTestsRunning = actionCreator<boolean>('SET_TESTS_RUNNING');
 export const setConsoleOpen = actionCreator<boolean>('SET_CONSOLE_OPEN');
 export const openConsole = actionCreator<ConsoleType>('OPEN_CONSOLE');
+export const clearStore = actionCreator('CLEAR_STORE');
 
 const reducer = reducerWithInitialState(INITIAL_STATE)
   .case(appendConsole, (state, { owner, message }) =>
@@ -171,7 +172,8 @@ const reducer = reducerWithInitialState(INITIAL_STATE)
       draft.console.open = true;
       draft.console.type = consoleType;
     }),
-  );
+  )
+  .case(clearStore, () => INITIAL_STATE);
 
 export const configureStore = () => createStore(reducer);
 

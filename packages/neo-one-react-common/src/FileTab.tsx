@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Button, styled } from 'reakit';
 import { ifProp, prop, withProp } from 'styled-tools';
-import { EditorFileDisplay } from './EditorFileDisplay';
-import { EditorFile } from './types';
+import { FileDisplay } from './FileDisplay';
+import { File } from './types';
 
 const Wrapper = styled(Button)<{ readonly first: boolean; readonly selected: boolean }>`
   color: ${ifProp('selected', prop('theme.gray0'), prop('theme.gray2'))};
@@ -17,12 +17,13 @@ const Wrapper = styled(Button)<{ readonly first: boolean; readonly selected: boo
 interface Props {
   readonly first: boolean;
   readonly selected: boolean;
-  readonly file: EditorFile;
-  readonly onSelectFile: (file: EditorFile) => void;
+  readonly file: File;
+  readonly omitReadOnly?: boolean;
+  readonly onClick?: () => void;
 }
 
-export const EditorFileTab = ({ first, file, selected, onSelectFile, ...props }: Props) => (
-  <Wrapper first={first} selected={selected} onClick={() => onSelectFile(file)} {...props}>
-    <EditorFileDisplay file={file} />
+export const FileTab = ({ first, file, selected, omitReadOnly, ...props }: Props) => (
+  <Wrapper first={first} selected={selected} {...props}>
+    <FileDisplay file={file} omitReadOnly={omitReadOnly} />
   </Wrapper>
 );

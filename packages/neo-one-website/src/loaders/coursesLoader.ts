@@ -65,7 +65,6 @@ const getCourse = async (courseDir: string): Promise<Course> => {
     title: configParsed.title,
     description: configParsed.description,
     image: configParsed.image,
-    complete: false,
     lessons,
   };
 };
@@ -82,7 +81,6 @@ const getLesson = async (courseDir: string, lesson: string): Promise<Lesson> => 
   return {
     title: JSON.parse(config).title,
     documentation,
-    complete: false,
     chapters,
   };
 };
@@ -99,7 +97,6 @@ const getChapter = async (courseDir: string, lesson: string, chapter: string): P
   return {
     title: configParsed.title,
     documentation,
-    complete: false,
     files,
   };
 };

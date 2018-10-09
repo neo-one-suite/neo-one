@@ -1,19 +1,15 @@
 import { Button } from '@neo-one/react';
 import * as React from 'react';
+import { connect } from 'react-redux';
 import { Box, Flex, Grid, Hidden, styled } from 'reakit';
 import { prop, switchProp } from 'styled-tools';
 import { Collapse } from '../../../containers';
 import { Client, Contract, Debugging, Num } from '../../../elements';
 import { getLessonName, getLessonTo, ProgressBar } from '../common';
-import { Course } from '../types';
+import { ChaptersProgress, CourseState, LessonsProgress, selectCourseProgress } from '../redux';
+import { Course, Lesson } from '../types';
 import { maxWidth } from './constants';
 import { LessonList } from './LessonList';
-
-interface Props {
-  readonly slug: string;
-  readonly course: Course;
-  readonly index: number;
-}
 
 const StyledContract = styled(Contract)`
   display: block;
@@ -44,6 +40,7 @@ const ContentWrapper = styled(Grid)<{ readonly bg: string }>`
     gray5: prop('theme.gray5'),
     dark: prop('theme.black'),
   })};
+  /* stylelint-disable-next-line */
   color: ${switchProp('bg', {
     dark: prop('theme.gray0'),
     light: prop('theme.gray6'),
@@ -109,9 +106,9 @@ const StyledNumber = styled(Num)`
 const TextWrapper = styled(Box)`
   display: grid;
   grid:
-    "title" auto
-    "text" auto
-    / auto
+    'title' auto
+    'text' auto
+    / auto;
   grid-gap: 8px;
 `;
 
@@ -122,7 +119,25 @@ const template = `
   / 1fr 160px
 `;
 
-export const CourseSection = ({ slug, course, index }: Props) => {
+const isLessonComplete = (lesson: Lesson, lessonIndex: number, progress: LessonsProgress) => {
+  if ((progress[lessonIndex] as ChaptersProgress | undefined) === undefined) {
+    return false;
+  }
+
+  return lesson.chapters.every((_chapter, chapter) => progress[lessonIndex][chapter]);
+};
+
+interface ExternalProps {
+  readonly slug: string;
+  readonly course: Course;
+  readonly index: number;
+}
+
+interface Props extends ExternalProps {
+  readonly progress: LessonsProgress;
+}
+
+const CourseSectionBase = ({ slug, course, index, progress }: Props) => {
   const Image = images[course.image];
   const bg = background[index % background.length];
 
@@ -143,7 +158,7 @@ export const CourseSection = ({ slug, course, index }: Props) => {
           <Grid.Item area="progress">
             <ProgressBar
               items={course.lessons.map((lesson, idx) => ({
-                complete: lesson.complete,
+                complete: isLessonComplete(lesson, idx, progress),
                 title: getLessonName(lesson.title, idx),
                 to: getLessonTo(slug, idx),
               }))}
@@ -166,3 +181,7 @@ export const CourseSection = ({ slug, course, index }: Props) => {
     </ContentWrapper>
   );
 };
+
+export const CourseSection = connect((state: CourseState, { slug }: ExternalProps) => ({
+  progress: selectCourseProgress(state, { course: slug }),
+}))(CourseSectionBase);

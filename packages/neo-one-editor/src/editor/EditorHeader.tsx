@@ -1,11 +1,11 @@
+import { FileTab } from '@neo-one/react-common';
 import * as React from 'react';
 import { Flex, styled } from 'reakit';
-import { EditorFileTab } from './EditorFileTab';
 import { EditorFile, EditorFiles } from './types';
 
 const Wrapper = styled(Flex)`
   flex: 0 0 auto;
-  flex-wrap: no-wrap;
+  flex-wrap: nowrap;
   overflow-x: scroll;
 `;
 
@@ -18,11 +18,11 @@ interface Props {
 export const EditorHeader = ({ file, files, onSelectFile, ...props }: Props) => (
   <Wrapper {...props}>
     {files.map((otherFile, idx) => (
-      <EditorFileTab
+      <FileTab
         key={otherFile.path}
         first={idx === 0}
         selected={file !== undefined && file.path === otherFile.path}
-        onSelectFile={onSelectFile}
+        onClick={() => onSelectFile(otherFile)}
         file={otherFile}
       />
     ))}

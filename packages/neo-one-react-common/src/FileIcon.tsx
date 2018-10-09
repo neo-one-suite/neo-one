@@ -1,9 +1,9 @@
-import { Monogram } from '@neo-one/react-common';
 import * as React from 'react';
 import { Image } from 'reakit';
-import reactts from '../../static/img/icons/reactts.svg';
-import testts from '../../static/img/icons/testts.svg';
-import typescript from '../../static/img/icons/typescript.svg';
+import reactts from '../static/img/icons/reactts.svg';
+import testts from '../static/img/icons/testts.svg';
+import typescript from '../static/img/icons/typescript.svg';
+import { Monogram } from './Monogram';
 
 const icons = {
   reactts,
@@ -27,7 +27,7 @@ interface Props {
   readonly path: string;
 }
 
-export const EditorFileIcon = ({ path, ...props }: Props) => {
+export const FileIcon = ({ path, ...props }: Props) => {
   if (path.endsWith('.one.ts')) {
     return <Monogram {...props} />;
   }
