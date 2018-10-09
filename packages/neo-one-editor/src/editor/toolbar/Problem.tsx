@@ -2,13 +2,13 @@ import * as React from 'react';
 import { MdError, MdWarning } from 'react-icons/md';
 import { Box, css, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { EditorFile, FileDiagnostic, TextRange } from '../types';
+import { FileDiagnostic, TextRange } from '../types';
 import { ProblemWrapper } from './ProblemWrapper';
 
 interface Props {
-  readonly file: EditorFile;
+  readonly path: string;
   readonly problem: FileDiagnostic;
-  readonly onSelectRange: (file: EditorFile, range: TextRange) => void;
+  readonly onSelectRange: (path: string, range: TextRange) => void;
 }
 
 const iconCSS = css`
@@ -48,8 +48,8 @@ const LightText = styled(Box)`
   text-overflow: ellipsis;
 `;
 
-export const Problem = ({ file, problem, onSelectRange, ...props }: Props) => (
-  <Wrapper onClick={() => onSelectRange(file, problem)} {...props}>
+export const Problem = ({ path, problem, onSelectRange, ...props }: Props) => (
+  <Wrapper onClick={() => onSelectRange(path, problem)} {...props}>
     {problem.severity === 'error' ? <Error /> : <Warning />}
     <DarkText>{`[${problem.owner}]`}</DarkText>
     <LightText>{problem.message}</LightText>

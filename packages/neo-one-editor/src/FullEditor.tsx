@@ -21,6 +21,7 @@ interface State {
   readonly id: string;
   readonly initialFiles: EngineContentFiles;
   readonly files: EditorFiles;
+  readonly buildFiles: EditorFiles;
   readonly engine?: Engine;
   readonly appendOutput: (output: OutputMessage) => void;
 }
@@ -35,6 +36,11 @@ const createOnMount = (testRunnerCallbacks: TestRunnerCallbacks) => ({
       engine.openFiles$.subscribe({
         next: (files) => {
           setState({ files });
+        },
+      });
+      engine.buildFiles$.subscribe({
+        next: (buildFiles) => {
+          setState({ buildFiles });
         },
       });
       engine.output$.subscribe({
@@ -64,16 +70,17 @@ const FullEditorBase = ({ id, initialFiles, appendOutput, testRunnerCallbacks, .
       id,
       initialFiles,
       files: [],
+      buildFiles: [],
       appendOutput,
     }}
     onMount={createOnMount(testRunnerCallbacks)}
   >
-    {({ files, engine }) =>
+    {({ files, buildFiles, engine }) =>
       engine === undefined ? (
         <Loading {...props} />
       ) : (
         <EditorContext.Provider value={{ engine }}>
-          <Editor files={files} {...props} />
+          <Editor files={files} buildFiles={buildFiles} {...props} />
         </EditorContext.Provider>
       )
     }

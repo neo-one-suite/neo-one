@@ -4,7 +4,6 @@ import { Image } from 'reakit';
 import reactts from '../../static/img/icons/reactts.svg';
 import testts from '../../static/img/icons/testts.svg';
 import typescript from '../../static/img/icons/typescript.svg';
-import { EditorFile } from './types';
 
 const icons = {
   reactts,
@@ -12,12 +11,12 @@ const icons = {
   typescript,
 };
 
-const getFileType = (file: EditorFile): keyof typeof icons => {
-  if (file.path.endsWith('.test.ts')) {
+const getFileType = (path: string): keyof typeof icons => {
+  if (path.endsWith('.test.ts')) {
     return 'testts';
   }
 
-  if (file.path.endsWith('.tsx')) {
+  if (path.endsWith('.tsx')) {
     return 'reactts';
   }
 
@@ -25,14 +24,14 @@ const getFileType = (file: EditorFile): keyof typeof icons => {
 };
 
 interface Props {
-  readonly file: EditorFile;
+  readonly path: string;
 }
 
-export const EditorFileIcon = ({ file, ...props }: Props) => {
-  if (file.path.endsWith('.one.ts')) {
+export const EditorFileIcon = ({ path, ...props }: Props) => {
+  if (path.endsWith('.one.ts')) {
     return <Monogram {...props} />;
   }
-  const type = getFileType(file);
+  const type = getFileType(path);
   const source = icons[type];
 
   return <Image src={source} alt={type} {...props} />;

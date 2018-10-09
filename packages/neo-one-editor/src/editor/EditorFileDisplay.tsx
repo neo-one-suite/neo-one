@@ -21,7 +21,7 @@ interface Props {
 
 export const EditorFileDisplay = ({ file, ...props }: Props) => (
   <GridWrapper {...props}>
-    <StyledEditorFileIcon file={file} />
+    <StyledEditorFileIcon path={file.path} />
     {`${basename(file.path)}${file.writable ? '' : ' (read-only)'}`}
   </GridWrapper>
 );

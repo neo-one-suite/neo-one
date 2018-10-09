@@ -15,7 +15,7 @@ import { SourceMaps } from '@neo-one/client';
 
 let sourceMapsIn: Promise<SourceMaps> = Promise.resolve({});
 if (process.env.NODE_ENV !== 'production') {
-  sourceMapsIn = Promise.resolve(${JSON.stringify(sourceMaps)});
+  sourceMapsIn = Promise.resolve(${JSON.stringify(sourceMaps)} as any);
 }
 
 export const sourceMaps = sourceMapsIn;

@@ -14,9 +14,10 @@ import {
   traverseDirectory,
 } from '@neo-one/local-browser';
 import { WorkerManager } from '@neo-one/worker';
+import * as bignumber from 'bignumber.js';
 import * as nodePath from 'path';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { EditorFiles } from '../editor';
+import { EditorFile, EditorFiles } from '../editor';
 import { ModuleNotFoundError } from '../errors';
 import { EngineContentFiles, FileMetadata, FileSystemMetadata, TestRunnerCallbacks } from '../types';
 import { getFileType } from '../utils';
@@ -130,6 +131,7 @@ export class Engine {
   public readonly output$: Subject<OutputMessage>;
   public readonly fs: FileSystem;
   public readonly openFiles$: BehaviorSubject<EditorFiles>;
+  public readonly buildFiles$: BehaviorSubject<EditorFiles>;
   public readonly transpiler: WorkerManager<typeof Transpiler>;
   private readonly testRunner: TestRunner;
   private readonly builder: WorkerManager<typeof Builder>;
@@ -142,6 +144,7 @@ export class Engine {
     this.output$ = output$;
     this.fs = fs;
     this.openFiles$ = new BehaviorSubject(files);
+    this.buildFiles$ = new BehaviorSubject<EditorFiles>([]);
     this.testRunner = new TestRunner(this, testRunnerCallbacks);
     this.builder = builder;
     this.transpiler = new WorkerManager<typeof Transpiler>(TranspilerWorker, new BehaviorSubject<{}>({}));
@@ -152,6 +155,7 @@ export class Engine {
       }),
       {
         path: new StaticExportsModule(this, 'path', nodePath),
+        'bignumber.js': new StaticExportsModule(this, 'bignumber.js', bignumber),
       },
     );
     this.loadTranspiledModules();
@@ -169,6 +173,14 @@ export class Engine {
     }
   }
 
+  public getFile(path: string): EditorFile {
+    const metadata = this.getMetadata();
+    const fileMetadata = metadata.fileMetadata[path] as FileMetadata | undefined;
+    const buildFiles = new Set(this.buildFiles$.getValue().map(({ path: buildPath }) => buildPath));
+
+    return { path, writable: !buildFiles.has(path) && (fileMetadata === undefined || fileMetadata.writable) };
+  }
+
   public async build(): Promise<void> {
     const instance = await this.builder.getInstance();
     const result = await instance.build();
@@ -177,6 +189,13 @@ export class Engine {
       ensureDir(this.fs, dirname(file.path));
       this.writeFileSync(file.path, file.content);
     });
+
+    this.buildFiles$.next(
+      result.files.map((file) => ({
+        ...file,
+        writable: false,
+      })),
+    );
   }
 
   public runTests(): void {
@@ -249,13 +268,18 @@ export class Engine {
   }
 
   private loadTranspiledModules(): void {
-    const files = [...traverseDirectory(this.fs, TRANSPILE_PATH)];
-    files.forEach((file) => {
-      const path = file.path.slice(TRANSPILE_PATH.length);
-      const mod = new TranspiledModule(this, path, file.content);
+    const paths = [...traverseDirectory(this.fs, TRANSPILE_PATH)];
+    paths.forEach((filePath) => {
+      const path = filePath.slice(TRANSPILE_PATH.length);
+      const content = this.fs.readFileSync(filePath);
+      const mod = new TranspiledModule(this, path, content);
       // Re-transpile in case it has changed.
       mod.transpile();
       this.mutableModules[path] = mod;
     });
+  }
+
+  private getMetadata(): FileSystemMetadata {
+    return JSON.parse(this.fs.readFileSync(METADATA_FILE));
   }
 }

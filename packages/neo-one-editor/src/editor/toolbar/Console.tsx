@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { EditorFile, TextRange } from '../types';
+import { TextRange } from '../types';
 import { ConsoleContent } from './ConsoleContent';
 import { ConsoleHeader } from './ConsoleHeader';
 
@@ -16,13 +16,12 @@ const Wrapper = styled(Grid)`
 `;
 
 interface Props {
-  readonly files: ReadonlyArray<EditorFile>;
-  readonly onSelectRange: (file: EditorFile, range: TextRange) => void;
+  readonly onSelectRange: (path: string, range: TextRange) => void;
 }
 
-export const Console = ({ files, onSelectRange, ...props }: Props) => (
+export const Console = ({ onSelectRange, ...props }: Props) => (
   <Wrapper {...props}>
     <ConsoleHeader />
-    <ConsoleContent files={files} onSelectRange={onSelectRange} />
+    <ConsoleContent onSelectRange={onSelectRange} />
   </Wrapper>
 );

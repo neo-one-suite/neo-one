@@ -2,6 +2,8 @@ import { ActionMap } from 'constate';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Container, Flex, styled } from 'reakit';
+import { EditorContext } from '../EditorContext';
+import { Engine } from '../engine';
 import { ComponentProps } from '../types';
 import { EditorToolbar } from './EditorToolbar';
 import { EditorView } from './EditorView';
@@ -19,6 +21,7 @@ const Wrapper = styled(Flex)`
 
 interface ExternalProps {
   readonly files: EditorFiles;
+  readonly buildFiles: EditorFiles;
 }
 
 interface State {
@@ -30,38 +33,43 @@ const INITIAL_STATE: State = {};
 
 interface Actions {
   readonly onSelectFile: (file: EditorFile) => void;
-  readonly onSelectRange: (file: EditorFile, range: TextRange) => void;
+  readonly onSelectRange: (path: string, range: TextRange) => void;
 }
 
-const actions: ActionMap<State, Actions> = {
+const createActions = (engine: Engine): ActionMap<State, Actions> => ({
   onSelectFile: (file: EditorFile) => () => ({
     file,
   }),
-  onSelectRange: (file: EditorFile, range: TextRange) => () => ({
-    file,
+  onSelectRange: (path: string, range: TextRange) => () => ({
+    file: engine.getFile(path),
     range,
   }),
-};
+});
 
 interface Props extends ExternalProps {
   readonly onChangeProblems: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
 }
 
-const EditorBase = ({ files, onChangeProblems, ...props }: Props & ComponentProps<typeof Wrapper>) => (
-  <Container initialState={{ ...INITIAL_STATE, file: files[0] }} actions={actions}>
-    {({ range, file, onSelectFile, onSelectRange }) => (
-      <Wrapper {...props}>
-        <EditorView
-          file={file}
-          files={files}
-          onSelectFile={onSelectFile}
-          onChangeProblems={onChangeProblems}
-          range={range}
-        />
-        <EditorToolbar file={file} files={files} onSelectRange={onSelectRange} />
-      </Wrapper>
+const EditorBase = ({ files, buildFiles, onChangeProblems, ...props }: Props & ComponentProps<typeof Wrapper>) => (
+  <EditorContext.Consumer>
+    {({ engine }) => (
+      <Container initialState={{ ...INITIAL_STATE, file: files[0] }} actions={createActions(engine)}>
+        {({ range, file, onSelectFile, onSelectRange }) => (
+          <Wrapper {...props}>
+            <EditorView
+              file={file}
+              files={files}
+              buildFiles={buildFiles}
+              onSelectFile={onSelectFile}
+              onChangeProblems={onChangeProblems}
+              range={range}
+            />
+            <EditorToolbar file={file} onSelectRange={onSelectRange} />
+          </Wrapper>
+        )}
+      </Container>
     )}
-  </Container>
+  </EditorContext.Consumer>
 );
 
 export const Editor = connect(

@@ -4,6 +4,12 @@ import files from '!../loaders/packagesLoaderEntry!../../../neo-one-smart-contra
 // @ts-ignore
 import jest_d_ts from '!raw-loader!../../../../node_modules/@types/jest/index.d.ts';
 // @ts-ignore
+import node_d_ts from '!raw-loader!../../../../node_modules/@types/node/index.d.ts';
+// @ts-ignore
+import react_d_ts from '!raw-loader!../../../../node_modules/@types/react/index.d.ts';
+// @ts-ignore
+import bignumber_d_ts from '!raw-loader!../../../../node_modules/bignumber.js/bignumber.d.ts';
+// @ts-ignore
 import lib_d_ts from '!raw-loader!../../../../node_modules/typescript/lib/lib.d.ts';
 // @ts-ignore
 import lib_dom_d_ts from '!raw-loader!../../../../node_modules/typescript/lib/lib.dom.d.ts';
@@ -85,6 +91,12 @@ import { ensureDir, FileSystem, pathExists } from '@neo-one/local-browser';
 import * as nodePath from 'path';
 // @ts-ignore
 import jestPackageJSONContents from '../../../../node_modules/@types/jest/package.json';
+// @ts-ignore
+import nodePackageJSONContents from '../../../../node_modules/@types/node/package.json';
+// @ts-ignore
+import reactPackageJSONContents from '../../../../node_modules/@types/react/package.json';
+// @ts-ignore
+import bignumberPackageJSONContents from '../../../../node_modules/bignumber.js/package.json';
 
 const writeFile = (fs: FileSystem, path: string, contents: string) => {
   const exists = pathExists(fs, path);
@@ -102,6 +114,9 @@ export const initializeFileSystem = (fs: FileSystem): void => {
   ensureDir(fs, '/node_modules/@neo-one/smart-contract-lib/src');
   ensureDir(fs, '/node_modules/@neo-one/smart-contract/src');
   ensureDir(fs, '/node_modules/@types/jest');
+  ensureDir(fs, '/node_modules/@types/node');
+  ensureDir(fs, '/node_modules/@types/react');
+  ensureDir(fs, '/node_modules/bignumber.js');
   ensureDir(fs, TRANSPILE_PATH);
   ensureDir(fs, nodePath.dirname(METADATA_FILE));
 
@@ -146,6 +161,12 @@ export const initializeFileSystem = (fs: FileSystem): void => {
   writeFile(fs, '/node_modules/typescript/lib/lib.webworker.importscripts.d.ts', lib_webworker_importscripts_d_ts);
   writeFile(fs, '/node_modules/@types/jest/index.d.ts', jest_d_ts);
   writeFile(fs, '/node_modules/@types/jest/package.json', JSON.stringify(jestPackageJSONContents));
+  writeFile(fs, '/node_modules/@types/node/index.d.ts', node_d_ts);
+  writeFile(fs, '/node_modules/@types/node/package.json', JSON.stringify(nodePackageJSONContents));
+  writeFile(fs, '/node_modules/@types/react/index.d.ts', react_d_ts);
+  writeFile(fs, '/node_modules/@types/react/package.json', JSON.stringify(reactPackageJSONContents));
+  writeFile(fs, '/node_modules/bignumber.js/bignumber.d.ts', bignumber_d_ts);
+  writeFile(fs, '/node_modules/bignumber.js/package.json', JSON.stringify(bignumberPackageJSONContents));
   // tslint:disable-next-line no-any
   Object.entries(files).forEach(([path, contents]: any) => {
     ensureDir(fs, nodePath.dirname(path));

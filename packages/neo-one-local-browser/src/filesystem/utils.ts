@@ -61,8 +61,7 @@ export function* traverseDirectory(fs: FileSystem, dir: string) {
       if (stat.isDirectory()) {
         mutableQueue.push(path);
       } else if (stat.isFile()) {
-        const content = fs.readFileSync(path);
-        yield { path, content };
+        yield path;
       }
     }
     next = mutableQueue.shift();

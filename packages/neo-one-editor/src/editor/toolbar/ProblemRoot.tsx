@@ -3,7 +3,6 @@ import { MdArrowDropDown } from 'react-icons/md';
 import { Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { EditorFileIcon } from '../EditorFileIcon';
-import { EditorFile } from '../types';
 import { FileText } from './FileText';
 import { ProblemCount } from './ProblemCount';
 import { ProblemWrapper } from './ProblemWrapper';
@@ -35,18 +34,18 @@ const StyledProblemCount = styled(ProblemCount)`
 `;
 
 interface Props {
-  readonly file: EditorFile;
+  readonly path: string;
   readonly problemCount: number;
   readonly expanded: boolean;
   readonly toggle: () => void;
 }
 
-export const ProblemRoot = ({ file, problemCount, expanded, toggle, ...props }: Props) => (
+export const ProblemRoot = ({ path, problemCount, expanded, toggle, ...props }: Props) => (
   <ProblemWrapper onClick={toggle} {...props}>
     {expanded ? <Expanded /> : <Collapsed />}
     <GridWrapper {...props}>
-      <StyledEditorFileIcon file={file} />
-      <FileText path={file.path} />
+      <StyledEditorFileIcon path={path} />
+      <FileText path={path} />
     </GridWrapper>
     <StyledProblemCount>{problemCount}</StyledProblemCount>
   </ProblemWrapper>

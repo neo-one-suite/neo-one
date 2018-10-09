@@ -5,7 +5,7 @@ import { Grid, Hidden, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { selectConsoleOpen } from './redux';
 import { BuildAction, Console, FileType, Problems, RunTestsAction } from './toolbar';
-import { EditorFile, EditorFiles, TextRange } from './types';
+import { EditorFile, TextRange } from './types';
 
 const Wrapper = styled(Grid)`
   flex: 0 0 auto;
@@ -40,15 +40,14 @@ const ToolbarRightWrapper = styled(Grid)`
 
 interface Props {
   readonly file?: EditorFile;
-  readonly files: EditorFiles;
-  readonly onSelectRange: (file: EditorFile, range: TextRange) => void;
+  readonly onSelectRange: (path: string, range: TextRange) => void;
   readonly consoleOpen: boolean;
 }
 
-const EditorToolbarBase = ({ file, files, onSelectRange, consoleOpen, ...props }: Props) => (
+const EditorToolbarBase = ({ file, onSelectRange, consoleOpen, ...props }: Props) => (
   <Wrapper {...props}>
     <Hidden visible={consoleOpen}>
-      <Console files={files} onSelectRange={onSelectRange} />
+      <Console onSelectRange={onSelectRange} />
     </Hidden>
     <ToolbarWrapper>
       <ToolbarLeftWrapper>

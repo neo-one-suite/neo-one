@@ -47,12 +47,12 @@ export const build = async ({ fs, output$, provider: jsonRPCProvider }: BuildOpt
     network: constants.LOCAL_NETWORK_NAME,
     rpcURL: jsonRPCProvider,
   });
-  output$.next({ owner: 'neo-one', message: 'Setting up wallets' });
+  output$.next({ owner: 'neo-one', message: 'Setting up wallets...' });
   const wallets = await setupWallets(provider, constants.PRIVATE_NET_PRIVATE_KEY);
 
   // tslint:disable-next-line no-loop-statement
   for (const contractPath of contractPaths) {
-    output$.next({ owner: 'neo-one', message: `Compiling contract ${contractPath.name}` });
+    output$.next({ owner: 'neo-one', message: `Compiling contract ${contractPath.name}...` });
     const contract = await compileContract(contractPath.filePath, contractPath.name, mutableLinked, fs);
 
     if (contract.diagnostics.some((diagnostic) => diagnostic.category === DiagnosticCategory.Error)) {
@@ -87,7 +87,7 @@ export const build = async ({ fs, output$, provider: jsonRPCProvider }: BuildOpt
   const sourceMapsPath = `${generated}/sourceMaps.ts`;
   const testPath = `${generated}/test.ts`;
   const commonTypesPath = `${generated}/types.ts`;
-  const reactPath = `${generated}/react.jts`;
+  const reactPath = `${generated}/react.tsx`;
   const clientPath = `${generated}/client.ts`;
   const generatedPath = `${generated}/index.ts`;
 
@@ -161,6 +161,8 @@ export const build = async ({ fs, output$, provider: jsonRPCProvider }: BuildOpt
   mutableFiles.push({ path: reactPath, content: reactContents.ts });
   mutableFiles.push({ path: clientPath, content: clientContents.ts });
   mutableFiles.push({ path: generatedPath, content: generatedContents.ts });
+
+  output$.next({ owner: 'neo-one', message: 'Done' });
 
   return { files: mutableFiles };
 };
