@@ -25,9 +25,15 @@ import 'prismjs/components/prism-clike';
 // @ts-ignore
 import 'prismjs/components/prism-javascript';
 // @ts-ignore
-import 'prismjs/components/prism-typescript';
-// @ts-ignore
 import 'prismjs/components/prism-markup';
+
+Prism.languages.typescript = Prism.languages.extend('javascript', {
+  // From JavaScript Prism keyword list and TypeScript language spec: https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#221-reserved-words
+  keyword: /\b(?:as|await|break|case|catch|continue|debugger|default|do|else|export|finally|for|from|if|import|in|instanceof|of|return|switch|throw|try|while|with|yield|require)\b/,
+  keywordBlue: /\b(?:async|class|const|delete|enum|extends|function|get|implements|interface|let|new|package|private|protected|public|set|static|super|this|typeof|var|module|declare|constructor|namespace|abstract|type|readonly)\b/,
+  builtin: /\b(?:string|Function|any|number|boolean|Array|symbol|console|void|null)\b/,
+});
+Prism.languages.ts = Prism.languages.typescript;
 // tslint:enable
 
 const md = MarkdownIt();

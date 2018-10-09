@@ -65,7 +65,8 @@ pre[class*="language-"] {
 	color: #6196cc;
 }
 
-.token.boolean {
+.token.boolean,
+.token.keywordBlue {
 	color: #569CD6;
 }
 .token.number {
@@ -81,15 +82,15 @@ pre[class*="language-"] {
 	color: #f8c555;
 }
 
-.token.class-name {
+.token.class-name,
+.token.builtin {
 	color: #4EC9B0;
 }
 
 .token.selector,
 .token.important,
 .token.atrule,
-.token.keyword,
-.token.builtin {
+.token.keyword {
 	color: #C586C0;
 }
 
@@ -123,11 +124,4 @@ pre[class*="language-"] {
 
 .token.inserted {
 	color: green;
-}
-
-/* export class, etc. */
-.token:not(.keyword) + .token.keyword + .token.keyword,
-.token:not(.keyword) + .token.keyword + .token.keyword + .token.class-name + .token.keyword,
-.token.function-variable.function + .token.operator + .token.keyword {
-	color: #569CD6;
 }
