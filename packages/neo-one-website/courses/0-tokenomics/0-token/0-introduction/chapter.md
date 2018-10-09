@@ -19,9 +19,7 @@ Every NEO•ONE smart contract starts with a typescript source file that exports
 ```typescript
 import { SmartContract } from '@neo-one/smart-contract';
 
-export class Token extends SmartContract {
-
-}
+export class Token extends SmartContract {}
 ```
 
 Let's break this down. First, we import `SmartContract` from `@neo-one/smart-contract`. This package contains all of the NEO•ONE smart contract types and is where the majority of imports will come from. `SmartContract` is a basic class that when extended marks the class as a NEO•ONE smart contract. We've extended it with a class called `Token` which will be used for all of the automatically generated code names that we'll make use of later on, but you can see some of the auto-generated code in action in the `Token.test.ts` file. Notice how the `withContracts` helper passes an object with a property called `token` which is added as a result of calling our smart contract `Token`.
