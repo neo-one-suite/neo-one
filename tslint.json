@@ -138,7 +138,7 @@
     "readonly-array": [true, "ignore-local", {"ignore-prefix": ["mutable", "this.mutable", "draft"] }],
     "no-let": [true, "ignore-local"],
     "no-array-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "ctx.mutable", "draft"] }],
-    "no-object-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "app.proxy", "app.silent", "ctx.", "draft"] }],
+    "no-object-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "app.proxy", "app.silent", "ctx.", "draft", "$el"] }],
     "no-method-signature": true,
     "no-loop-statement": true,
     "no-accessor-recursion": true,

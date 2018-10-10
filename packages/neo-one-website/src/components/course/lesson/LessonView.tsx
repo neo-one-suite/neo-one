@@ -63,7 +63,9 @@ export const LessonView = ({ selected }: Props) => (
           <Text>
             Lesson {selected.lesson + 1}: {selectLesson(selected).title}
           </Text>
-          <StartButton to={`/course/${selected.course}/${selected.lesson + 1}/1`}>Start</StartButton>
+          <StartButton data-test="start" to={`/course/${selected.course}/${selected.lesson + 1}/1`}>
+            Start
+          </StartButton>
         </ButtonWrapper>
       </InnerWrapper>
     </BoxWrapper>

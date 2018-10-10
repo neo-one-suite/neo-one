@@ -47,6 +47,7 @@
     "packages/*/template/**/*.tsx",
     "packages/neo-one-server-plugin-project/src/__data__/ico/one/contracts/*.ts",
     "packages/neo-one-playground",
-    "packages/neo-one-website/courses/**/contracts/*.ts"
+    "packages/neo-one-website/courses/**/contracts/*.ts",
+    "cypress"
   ]
 }

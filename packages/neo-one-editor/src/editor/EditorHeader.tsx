@@ -19,6 +19,7 @@ export const EditorHeader = ({ file, files, onSelectFile, ...props }: Props) => 
   <Wrapper {...props}>
     {files.map((otherFile, idx) => (
       <FileTab
+        data-test={`editor-header-file-tab-${otherFile.path}`}
         key={otherFile.path}
         first={idx === 0}
         selected={file !== undefined && file.path === otherFile.path}

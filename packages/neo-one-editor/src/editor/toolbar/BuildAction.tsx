@@ -38,7 +38,13 @@ interface Props {
 }
 
 const BuildActionBase = ({ openConsoleOutput, ...props }: Props) => (
-  <ActionButton {...props} icon={<MdBuild />} text="Build" makeEffects={createMakeEffects(openConsoleOutput)} />
+  <ActionButton
+    {...props}
+    data-test="build"
+    icon={<MdBuild />}
+    text="Build"
+    makeEffects={createMakeEffects(openConsoleOutput)}
+  />
 );
 
 export const BuildAction = connect(

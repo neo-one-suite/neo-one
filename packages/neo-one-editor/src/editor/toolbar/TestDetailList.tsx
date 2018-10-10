@@ -1,6 +1,8 @@
+// tslint:disable no-map-without-usage
 import * as React from 'react';
 import { Grid, styled } from 'reakit';
 import { TestSuite } from '../..//types';
+import { TestDetailError } from './TestDetailError';
 import { TestDetailListItem } from './TestDetailListItem';
 
 const Wrapper = styled(Grid)`
@@ -14,9 +16,13 @@ interface Props {
   readonly testSuite: TestSuite;
 }
 export const TestDetailList = ({ testSuite, ...props }: Props) => (
-  <Wrapper {...props}>
-    {testSuite.tests.map((test) => (
-      <TestDetailListItem key={test.name.join(':')} test={test} />
-    ))}
+  <Wrapper data-test="test-detail-list" {...props}>
+    {testSuite.error === undefined ? (
+      testSuite.tests.map((test) => <TestDetailListItem key={test.name.join(':')} test={test} />)
+    ) : (
+      <TestDetailError data-test="test-detail-list-error">
+        {testSuite.error.stack === undefined ? testSuite.error.message : testSuite.error.stack}
+      </TestDetailError>
+    )}
   </Wrapper>
 );

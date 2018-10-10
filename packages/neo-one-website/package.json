@@ -19,6 +19,7 @@
     "@types/react-redux": "^6.0.9",
     "@types/redux-persist": "^4.3.1",
     "@types/webpack": "^4.4.15",
+    "babel-plugin-istanbul": "^5.0.1",
     "clipboard": "^2.0.1",
     "constate": "^0.9.0",
     "fs-extra": "^7.0.0",

@@ -13,7 +13,7 @@ const { store, persistor } = configureStore();
 
 export const App = () => (
   <Provider store={store}>
-    <PersistGate loading={Loading} persistor={persistor}>
+    <PersistGate loading={<Loading />} persistor={persistor}>
       <Switch>
         <Route exact path="/course" component={CoursesView} />
         <Route

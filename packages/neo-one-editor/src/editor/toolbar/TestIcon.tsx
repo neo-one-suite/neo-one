@@ -25,16 +25,16 @@ interface Props {
 }
 export const TestIcon = ({ running, failing, passing, ...props }: Props) => {
   if (running) {
-    return <LoadingDots {...props} />;
+    return <LoadingDots {...props} data-test="test-icon-running" />;
   }
 
   if (failing) {
-    return <Failed {...props} />;
+    return <Failed {...props} data-test="test-icon-failing" />;
   }
 
   if (passing) {
-    return <Passed {...props} />;
+    return <Passed {...props} data-test="test-icon-passing" />;
   }
 
-  return <Skipped {...props} />;
+  return <Skipped {...props} data-test="test-icon-skipped" />;
 };

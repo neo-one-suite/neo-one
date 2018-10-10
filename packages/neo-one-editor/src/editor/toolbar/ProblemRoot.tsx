@@ -41,12 +41,12 @@ interface Props {
 }
 
 export const ProblemRoot = ({ path, problemCount, expanded, toggle, ...props }: Props) => (
-  <ProblemWrapper onClick={toggle} {...props}>
+  <ProblemWrapper data-test={`problem-root-${path}`} onClick={toggle} {...props}>
     {expanded ? <Expanded /> : <Collapsed />}
     <GridWrapper {...props}>
       <StyledEditorFileIcon path={path} />
       <FileText path={path} />
     </GridWrapper>
-    <StyledProblemCount>{problemCount}</StyledProblemCount>
+    <StyledProblemCount data-test={`problem-root-${path}-count`}>{problemCount}</StyledProblemCount>
   </ProblemWrapper>
 );

@@ -24,7 +24,9 @@ interface Props {
 
 export const ConsoleButton = ({ onClick, icon, tooltip, ...props }: Props) => (
   <Wrapper {...props}>
-    <IconWrapper onClick={onClick}>{icon}</IconWrapper>
+    <IconWrapper data-test="console-button" onClick={onClick}>
+      {icon}
+    </IconWrapper>
     <Tooltip>
       <TooltipArrow />
       {tooltip}

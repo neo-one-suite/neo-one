@@ -48,6 +48,7 @@ export default () => ({
         'babel-plugin-lodash',
         '@babel/plugin-proposal-object-rest-spread',
         '@babel/plugin-proposal-async-generator-functions',
+        process.env.NEOONE_COVERAGE === 'true' ? 'babel-plugin-istanbul' : undefined,
       ].filter((value) => value !== undefined),
     };
 

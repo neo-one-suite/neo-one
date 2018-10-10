@@ -25,8 +25,8 @@ interface Props {
   readonly [key: string]: any;
 }
 
-export const ProblemWrapper = ({ children, ...props }: Props) => (
-  <Wrapper {...props}>
-    <GridWrapper>{children}</GridWrapper>
+export const ProblemWrapper = ({ children, 'data-test': dataTest, ...props }: Props) => (
+  <Wrapper {...props} data-test={dataTest}>
+    <GridWrapper data-test={dataTest}>{children}</GridWrapper>
   </Wrapper>
 );

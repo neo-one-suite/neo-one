@@ -31,7 +31,7 @@ const normalize = (path: string) => (path.startsWith('/') ? path.slice(1) : path
 
 export const FileText = ({ path, ...props }: Props) => (
   <Wrapper {...props}>
-    <LightText>{nodePath.basename(path)}</LightText>
-    <DarkText>{normalize(nodePath.dirname(path))}</DarkText>
+    <LightText data-test="file-text-basename">{nodePath.basename(path)}</LightText>
+    <DarkText data-test="file-text-dirname">{normalize(nodePath.dirname(path))}</DarkText>
   </Wrapper>
 );

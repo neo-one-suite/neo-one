@@ -75,7 +75,7 @@ export const TestSummaryHeaderCommon = ({
       {titleElement}
       {failing === 0 ? null : (
         <>
-          <StyledTestFailing>
+          <StyledTestFailing data-test="test-summary-header-failing">
             {failing}
             <Tooltip>
               <TooltipArrow />
@@ -87,7 +87,7 @@ export const TestSummaryHeaderCommon = ({
       )}
       {passing === 0 ? null : (
         <>
-          <StyledTestPassing>
+          <StyledTestPassing data-test="test-summary-header-passing">
             {passing}
             <Tooltip>
               <TooltipArrow />
@@ -97,7 +97,7 @@ export const TestSummaryHeaderCommon = ({
           <TestTextDark>/</TestTextDark>
         </>
       )}
-      <StyledTestTextDark>
+      <StyledTestTextDark data-test="test-summary-header-total">
         {total}
         <Tooltip>
           <TooltipArrow />
@@ -106,7 +106,7 @@ export const TestSummaryHeaderCommon = ({
       </StyledTestTextDark>
     </LeftStyledGrid>
     <RightStyledGrid>
-      <TestTextDark>{time} ms</TestTextDark>
+      <TestTextDark data-test="test-summary-header-duration">{time} ms</TestTextDark>
       <TestPlayButton onClick={onClickRun} text={runText} />
     </RightStyledGrid>
     <StyledTestStatusBar passing={passing} failing={failing} skipped={skipped} />

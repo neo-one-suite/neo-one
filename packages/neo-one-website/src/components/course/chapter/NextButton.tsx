@@ -43,7 +43,7 @@ export const NextButton = ({ selected, ...props }: Props) => {
   }
 
   return (
-    <ButtonLink {...props} to={to}>
+    <ButtonLink {...props} data-test="next-button" to={to}>
       {text}
     </ButtonLink>
   );

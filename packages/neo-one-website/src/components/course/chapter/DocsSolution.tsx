@@ -63,6 +63,7 @@ export const DocsSolution = ({ selected, ...props }: Props) => (
         <HeaderWrapper>
           {getFiles(selected).map((file, idx) => (
             <FileTab
+              data-test={`docs-solution-file-tab-${file.path}`}
               first={idx === 0}
               selected={file.path === selectedFilePath}
               file={{ path: file.path, writable: false }}
@@ -72,6 +73,7 @@ export const DocsSolution = ({ selected, ...props }: Props) => (
           ))}
         </HeaderWrapper>
         <StyledMarkdown
+          data-test="docs-solution-markdown"
           source={`\`\`\`typescript\n${
             getFiles(selected).filter((file) => file.path === selectedFilePath)[0].solution
           }\`\`\``}

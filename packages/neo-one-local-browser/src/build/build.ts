@@ -9,12 +9,11 @@ import { common, crypto } from '@neo-one/client-common';
 import { constants, deployContract, setupWallets } from '@neo-one/local';
 import { genCommonBrowserFiles, genFiles } from '@neo-one/smart-contract-codegen';
 import { Subject } from 'rxjs';
-import { DiagnosticCategory } from 'typescript';
 import { FileSystem } from '../filesystem';
 import { OutputMessage } from '../types';
 import { compileContract } from './compileContract';
 import { findContracts } from './findContracts';
-import { BuildFile, BuildFiles, CommonCodeContract } from './types';
+import { BuildFile, BuildFiles, CommonCodeContract, ContractResult } from './types';
 
 interface SmartContractNetworksDefinitions {
   // tslint:disable-next-line readonly-keyword
@@ -35,7 +34,9 @@ export const build = async ({ fs, output$, provider: jsonRPCProvider }: BuildOpt
   output$.next({ owner: 'neo-one', message: 'Scanning for contracts...' });
   const contractPaths = await findContracts(fs);
   if (contractPaths.length === 0) {
-    throw new Error('No contracts found.');
+    output$.next({ owner: 'neo-one', message: 'No contracts found.' });
+
+    return { files: [] };
   }
 
   const mutableSmartContractNetworkDefinitions: SmartContractNetworksDefinitions = {};
@@ -53,10 +54,12 @@ export const build = async ({ fs, output$, provider: jsonRPCProvider }: BuildOpt
   // tslint:disable-next-line no-loop-statement
   for (const contractPath of contractPaths) {
     output$.next({ owner: 'neo-one', message: `Compiling contract ${contractPath.name}...` });
-    const contract = await compileContract(contractPath.filePath, contractPath.name, mutableLinked, fs);
-
-    if (contract.diagnostics.some((diagnostic) => diagnostic.category === DiagnosticCategory.Error)) {
-      throw new Error('Compilation error.');
+    let contract: ContractResult;
+    try {
+      contract = await compileContract(contractPath.filePath, contractPath.name, mutableLinked, fs);
+    } catch (error) {
+      output$.next({ owner: 'neo-one', message: `Compilation failed:\n ${error.message}` });
+      throw new Error(`${contractPath.name} compilation failed.`);
     }
 
     const address = scriptHashToAddress(
