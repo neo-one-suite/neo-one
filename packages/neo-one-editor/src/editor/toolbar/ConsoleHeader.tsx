@@ -84,7 +84,9 @@ const ConsoleHeaderBase = ({
     <Wrapper {...props}>
       <TabsWrapper>
         <ConsoleTab selected={consoleType === 'problems'} onClick={onClickProblems} text="PROBLEMS">
-          {problemCount === 0 ? null : <ProblemCount>{problemCount}</ProblemCount>}
+          {problemCount === 0 ? null : (
+            <ProblemCount data-test="console-header-problem-count">{problemCount}</ProblemCount>
+          )}
         </ConsoleTab>
         <ConsoleTab selected={consoleType === 'output'} onClick={onClickOutput} text="OUTPUT" />
         <ConsoleTab selected={consoleType === 'test'} onClick={onClickTests} text="TESTS" />
@@ -94,13 +96,14 @@ const ConsoleHeaderBase = ({
           <>
             <ConsoleSelector owner={consoleOutputOwner} />
             <ConsoleButton
+              data-test="console-header-clear"
               icon={<Delete />}
               onClick={() => onClearConsole(consoleOutputOwner)}
               tooltip="Clear Output"
             />
           </>
         ) : null}
-        <ConsoleButton icon={<Close />} onClick={onCloseConsole} tooltip="Close Panel" />
+        <ConsoleButton icon={<Close />} onClick={onCloseConsole} tooltip="Close Panel" data-test="console-close" />
       </ButtonsWrapper>
     </Wrapper>
   );

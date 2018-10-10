@@ -15,8 +15,12 @@ export const TestSummaryHeader = ({ testSuites, ...props }: Props) => {
       testSuite.tests.every((test) => test.status === 'pass' || test.status === 'skip') &&
       testSuite.tests.some((test) => test.status === 'pass'),
   ).length;
-  const failing = testSuites.filter((testSuite) => testSuite.tests.some((test) => test.status === 'fail')).length;
-  const skipped = testSuites.filter((testSuite) => testSuite.tests.every((test) => test.status === 'skip')).length;
+  const failing = testSuites.filter(
+    (testSuite) => testSuite.tests.some((test) => test.status === 'fail') || testSuite.error !== undefined,
+  ).length;
+  const skipped = testSuites.filter(
+    (testSuite) => testSuite.tests.length > 0 && testSuite.tests.every((test) => test.status === 'skip'),
+  ).length;
   const all = testSuites.length;
   const time = testSuites.reduce(
     (acc, testSuite) =>
@@ -33,6 +37,7 @@ export const TestSummaryHeader = ({ testSuites, ...props }: Props) => {
       {({ engine }) => (
         <TestSummaryHeaderCommon
           {...props}
+          data-test="test-summary-header"
           titleElement={<TestTextDark>{running ? 'Running Test Suites...' : 'Test Suites'}</TestTextDark>}
           passing={passing}
           failing={failing}

@@ -31,7 +31,7 @@ interface Props {
   readonly skipped: number;
 }
 export const TestStatusBar = ({ passing, failing, skipped, ...props }: Props) => (
-  <Wrapper passing={passing} failing={failing} skipped={skipped} {...props}>
+  <Wrapper {...props} passing={passing} failing={failing} skipped={skipped} data-test="test-status-bar">
     <Failing />
     <Passing />
     <Skipped />

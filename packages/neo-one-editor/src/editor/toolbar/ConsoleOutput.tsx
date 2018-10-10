@@ -42,7 +42,7 @@ const ConsoleOutputBase = ({ consoleOutput, consoleOutputOwner }: Props) => (
       }
 
       return (
-        <Wrapper innerRef={scrollRef} shadowed={scrollY > 0}>
+        <Wrapper data-test="console-output" innerRef={scrollRef} shadowed={scrollY > 0}>
           {output}
         </Wrapper>
       );

@@ -24,7 +24,7 @@ const StyledGrid = styled(Grid)`
   grid:
     'progress progress' 8px
     'docs editor' 1fr
-    / minmax(560px, 2fr) 3fr;
+    / minmax(400px, 2fr) 3fr;
 `;
 
 const ChapterViewBase = ({ selected, progress }: Props) => {

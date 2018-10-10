@@ -21,7 +21,7 @@ interface Props {
 }
 
 export const TestPlayButton = ({ text, onClick, ...props }: Props) => (
-  <PlayButtonWrapper onClick={onClick} {...props}>
+  <PlayButtonWrapper {...props} onClick={onClick} data-test="test-play-button">
     <MdPlayArrow />
     <Tooltip>
       <TooltipArrow />

@@ -15,7 +15,7 @@ interface Props {
   readonly selectedTestSuite?: string;
 }
 export const TestSummaryList = ({ testSuites, selectedTestSuite, ...props }: Props) => (
-  <Wrapper {...props}>
+  <Wrapper data-test="test-summary-list" {...props}>
     {testSuites.map((testSuite) => (
       <TestSummaryListItem key={testSuite.path} selected={selectedTestSuite === testSuite.path} testSuite={testSuite} />
     ))}

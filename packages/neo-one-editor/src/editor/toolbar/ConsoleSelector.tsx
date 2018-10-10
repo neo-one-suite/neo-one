@@ -9,8 +9,14 @@ interface Props {
   readonly onChange: (value: string) => void;
 }
 
-const ConsoleSelectorBase = ({ consoleOutput, owner, onChange }: Props) => (
-  <Selector options={Object.keys(consoleOutput)} selected={owner} onChange={onChange} />
+const ConsoleSelectorBase = ({ consoleOutput, owner, onChange, ...props }: Props) => (
+  <Selector
+    {...props}
+    data-test="console-selector"
+    options={Object.keys(consoleOutput)}
+    selected={owner}
+    onChange={onChange}
+  />
 );
 
 export const ConsoleSelector = connect(

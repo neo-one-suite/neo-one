@@ -19,11 +19,13 @@ interface Props {
   readonly makeEffects: (engine: Engine) => EffectMap<State, Effects>;
 }
 
-export const ActionButton = ({ text, makeEffects, icon }: Props) => (
+export const ActionButton = ({ text, makeEffects, icon, ...props }: Props) => (
   <EditorContext.Consumer>
     {({ engine }) => (
       <Container initialState={{ loading: false }} effects={makeEffects(engine)}>
-        {({ onClick, loading }) => <ActionButtonBase onClick={onClick} loading={loading} text={text} icon={icon} />}
+        {({ onClick, loading }) => (
+          <ActionButtonBase {...props} onClick={onClick} loading={loading} text={text} icon={icon} />
+        )}
       </Container>
     )}
   </EditorContext.Consumer>

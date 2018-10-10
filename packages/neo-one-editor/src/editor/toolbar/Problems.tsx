@@ -18,12 +18,16 @@ interface Props {
 }
 
 const ProblemsBase = ({ consoleProblems, onClick, ...props }: Props) => (
-  <Wrapper onClick={onClick} {...props}>
+  <Wrapper data-test="problems" onClick={onClick} {...props}>
     <GridWrapper>
       <MdError />
-      {consoleProblems.filter((problem) => problem.severity === 'error').length}
+      <span data-test="problems-problem-count">
+        {consoleProblems.filter((problem) => problem.severity === 'error').length}
+      </span>
       <MdWarning />
-      {consoleProblems.filter((problem) => problem.severity === 'warning').length}
+      <span data-test="problems-warning-count">
+        {consoleProblems.filter((problem) => problem.severity === 'warning').length}
+      </span>
     </GridWrapper>
   </Wrapper>
 );

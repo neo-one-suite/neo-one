@@ -148,7 +148,7 @@ export class MonacoEditor extends React.Component<Props> {
   public render() {
     return (
       <Wrapper innerRef={this.resizeRef}>
-        <Container innerRef={this.ref} />
+        <Container data-test="monaco-editor" innerRef={this.ref} />
       </Wrapper>
     );
   }

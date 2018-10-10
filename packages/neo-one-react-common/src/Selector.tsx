@@ -17,8 +17,8 @@ interface Props {
   readonly onChange: (value: string) => void;
 }
 
-export const Selector = ({ options, selected, onChange }: Props) => (
-  <StyledInput as="select" value={selected} onChange={(event) => onChange((event.target as any).value)}>
+export const Selector = ({ options, selected, onChange, ...props }: Props) => (
+  <StyledInput {...props} as="select" value={selected} onChange={(event) => onChange((event.target as any).value)}>
     {options.map((option) => (
       <option key={option}>{option}</option>
     ))}

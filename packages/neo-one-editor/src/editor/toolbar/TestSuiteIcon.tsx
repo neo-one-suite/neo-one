@@ -6,7 +6,7 @@ interface Props {
   readonly testSuite: TestSuite;
 }
 export const TestSuiteIcon = ({ testSuite, ...props }: Props) => {
-  const failing = testSuite.tests.some((test) => test.status === 'fail');
+  const failing = testSuite.tests.some((test) => test.status === 'fail') || testSuite.error !== undefined;
   const somePassing = testSuite.tests.some((test) => test.status === 'pass');
   const someRunning = testSuite.tests.some((test) => test.status === 'running');
 

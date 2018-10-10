@@ -49,10 +49,14 @@ const LightText = styled(Box)`
 `;
 
 export const Problem = ({ path, problem, onSelectRange, ...props }: Props) => (
-  <Wrapper onClick={() => onSelectRange(path, problem)} {...props}>
-    {problem.severity === 'error' ? <Error /> : <Warning />}
-    <DarkText>{`[${problem.owner}]`}</DarkText>
-    <LightText>{problem.message}</LightText>
-    <DarkText>{`(${problem.startLineNumber}, ${problem.startColumn})`}</DarkText>
+  <Wrapper data-test={`problem-${path}`} onClick={() => onSelectRange(path, problem)} {...props}>
+    {problem.severity === 'error' ? (
+      <Error data-test={`problem-${path}-error`} />
+    ) : (
+      <Warning data-test={`problem-${path}-warning`} />
+    )}
+    <DarkText data-test={`problem-${path}-owner`}>{`[${problem.owner}]`}</DarkText>
+    <LightText data-test={`problem-${path}-message`}>{problem.message}</LightText>
+    <DarkText data-test={`problem-${path}-line`}>{`(${problem.startLineNumber}, ${problem.startColumn})`}</DarkText>
   </Wrapper>
 );

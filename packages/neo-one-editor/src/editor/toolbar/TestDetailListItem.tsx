@@ -1,8 +1,9 @@
 // tslint:disable no-null-keyword
 import * as React from 'react';
-import { Box, Grid, styled } from 'reakit';
+import { Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { Test } from '../../types';
+import { TestDetailError } from './TestDetailError';
 import { TestIcon } from './TestIcon';
 import { TestText } from './TestText';
 
@@ -32,20 +33,11 @@ const DurationWrapper = styled(Grid)`
   justify-content: end;
 `;
 
-const ErrorWrapper = styled(Box)`
-  padding: 8px;
-  color: ${prop('theme.gray1')};
-  background-color: ${prop('theme.gray4')};
-  white-space: pre;
-  min-height: 0;
-  overflow: scroll;
-`;
-
 interface Props {
   readonly test: Test;
 }
 export const TestDetailListItem = ({ test, ...props }: Props) => (
-  <Wrapper {...props}>
+  <Wrapper data-test={`test-detail-list-item-${test.name.join('-')}`} {...props}>
     <HeaderWrapper>
       <NameWrapper>
         <TestIcon
@@ -53,12 +45,14 @@ export const TestDetailListItem = ({ test, ...props }: Props) => (
           failing={test.status === 'fail'}
           passing={test.status === 'pass'}
         />
-        <TestText>{test.name.join(' > ')}</TestText>
+        <TestText data-test="test-detail-list-item-text">{test.name.join(' > ')}</TestText>
       </NameWrapper>
-      <DurationWrapper>
+      <DurationWrapper data-test="test-detail-list-item-duration">
         {test.status === 'pass' || test.status === 'fail' ? <TestText>{test.duration} ms</TestText> : <div />}
       </DurationWrapper>
     </HeaderWrapper>
-    {test.status === 'fail' ? <ErrorWrapper>{test.error}</ErrorWrapper> : null}
+    {test.status === 'fail' ? (
+      <TestDetailError data-test="test-detail-list-item-error">{test.error}</TestDetailError>
+    ) : null}
   </Wrapper>
 );

@@ -30,10 +30,10 @@ interface Props extends ExternalProps {
   readonly onClick: () => void;
 }
 const TestSummaryListItemBase = ({ selected, testSuite, onClick, ...props }: Props) => (
-  <Wrapper onClick={onClick} {...props}>
+  <Wrapper {...props} onClick={onClick} data-test={`test-summary-list-item-${testSuite.path}`}>
     <GridWrapper selected={selected}>
       <TestSuiteIcon testSuite={testSuite} />
-      <FileText path={testSuite.path} />
+      <FileText data-test="test-summary-list-item-file-text" path={testSuite.path} />
     </GridWrapper>
   </Wrapper>
 );

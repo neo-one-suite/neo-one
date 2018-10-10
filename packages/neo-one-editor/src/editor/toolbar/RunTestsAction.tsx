@@ -16,6 +16,7 @@ const RunTestsActionBase = ({ consoleTestsRunning, openConsoleTests, ...props }:
     {({ engine }) => (
       <ActionButtonBase
         {...props}
+        data-test="test"
         loading={consoleTestsRunning}
         icon={<MdPlayArrow />}
         text="Run Tests"

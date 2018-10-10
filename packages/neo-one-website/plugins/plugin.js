@@ -48,6 +48,7 @@ export default () => ({
         'babel-plugin-lodash',
         '@babel/plugin-proposal-object-rest-spread',
         '@babel/plugin-proposal-async-generator-functions',
+        process.env.NEOONE_COVERAGE === 'true' ? 'babel-plugin-istanbul' : undefined,
       ].filter((value) => value !== undefined),
     };
 
@@ -106,14 +107,18 @@ export default () => ({
     ];
     config.module.strictExportPresence = false;
     config.optimization.noEmitOnErrors = false;
-    config.plugins = config.plugins.filter((plugin) => plugin.constructor.name !== 'NoEmitOnErrorsPlugin').concat([
-      new webpack.NormalModuleReplacementPlugin(/^@reactivex\/ix-es2015-cjs(.*)$/, (resource) => {
-        // tslint:disable-next-line no-object-mutation
-        resource.request = resource.request.replace(/^@reactivex\/ix-es2015-cjs(.*)$/, '@reactivex/ix-esnext-esm$1');
-      }),
-      new WebpackBar({ profile: true }),
-      new HardSourceWebpackPlugin({ cachePrune: { sizeThreshold: 1024 * 1024 * 1024 } }),
-    ]);
+    config.plugins = config.plugins.filter((plugin) => plugin.constructor.name !== 'NoEmitOnErrorsPlugin').concat(
+      [
+        new webpack.NormalModuleReplacementPlugin(/^@reactivex\/ix-es2015-cjs(.*)$/, (resource) => {
+          // tslint:disable-next-line no-object-mutation
+          resource.request = resource.request.replace(/^@reactivex\/ix-es2015-cjs(.*)$/, '@reactivex/ix-esnext-esm$1');
+        }),
+        new WebpackBar({ profile: true }),
+        stage === 'dev'
+          ? new HardSourceWebpackPlugin({ cachePrune: { sizeThreshold: 1024 * 1024 * 1024 } })
+          : undefined,
+      ].filter((value) => value !== undefined),
+    );
 
     config.resolve.alias = {
       ...(config.resolve.alias || {}),

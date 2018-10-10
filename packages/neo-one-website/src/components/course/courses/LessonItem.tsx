@@ -37,7 +37,7 @@ interface Props {
 
 export const LessonItem = ({ slug, lesson, index }: Props) => (
   <Wrapper>
-    <Title to={getLessonTo(slug, index)}>
+    <Title to={getLessonTo(slug, index)} data-test={`${slug}-lesson-${index}`}>
       Lesson {index + 1}: {lesson.title}
     </Title>
     <LessonProgressBar slug={slug} index={index} lesson={lesson} />

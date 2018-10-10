@@ -9,6 +9,7 @@ import { Chapter, Lesson, SelectedChapter } from '../types';
 
 interface Props {
   readonly selected: SelectedChapter;
+  readonly onClick: () => void;
 }
 
 const getNextChapter = (selected: SelectedChapter) => {
@@ -25,7 +26,7 @@ const getNextLesson = (selected: SelectedChapter) => {
 
 const ButtonLink = as(Link)(Button);
 
-export const NextButton = ({ selected, ...props }: Props) => {
+export const NextButton = ({ selected, onClick, ...props }: Props) => {
   const nextChapter = getNextChapter(selected);
   const nextLesson = getNextLesson(selected);
 
@@ -43,7 +44,7 @@ export const NextButton = ({ selected, ...props }: Props) => {
   }
 
   return (
-    <ButtonLink {...props} to={to}>
+    <ButtonLink {...props} data-test="next-button" to={to} onClick={onClick}>
       {text}
     </ButtonLink>
   );

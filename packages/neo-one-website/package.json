@@ -18,7 +18,8 @@
     "@types/react-dom": "^16.0.9",
     "@types/react-redux": "^6.0.9",
     "@types/redux-persist": "^4.3.1",
-    "@types/webpack": "^4.4.15",
+    "@types/webpack": "^4.4.16",
+    "babel-plugin-istanbul": "^5.0.1",
     "clipboard": "^2.0.1",
     "constate": "^0.9.0",
     "fs-extra": "^7.0.0",
@@ -69,6 +70,8 @@
     "website:start": "yarn run react-static start"
   },
   "sideEffects": [
+    "src/index.tsx",
+    "src/polyfill.ts",
     "*.css"
   ]
 }

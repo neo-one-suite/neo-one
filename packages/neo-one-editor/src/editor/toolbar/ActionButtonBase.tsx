@@ -35,8 +35,8 @@ interface Props {
   readonly loading: boolean;
 }
 
-export const ActionButtonBase = ({ loading, text, onClick, icon }: Props) => (
-  <Wrapper disabled={loading} onClick={onClick}>
+export const ActionButtonBase = ({ loading, text, onClick, icon, ...props }: Props) => (
+  <Wrapper {...props} disabled={loading} onClick={onClick}>
     <GridWrapper>
       {loading ? <Loop /> : icon}
       {text}

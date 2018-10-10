@@ -20,9 +20,10 @@ interface Props {
 
 export const TestDetailHeader = ({ testSuite, ...props }: Props) => {
   const passing = testSuite.tests.filter((test) => test.status === 'pass').length;
-  const failing = testSuite.tests.filter((test) => test.status === 'fail').length;
+  const failing =
+    testSuite.tests.filter((test) => test.status === 'fail').length + (testSuite.error === undefined ? 0 : 1);
   const skipped = testSuite.tests.filter((test) => test.status === 'skip').length;
-  const all = testSuite.tests.length;
+  const all = testSuite.tests.length + (testSuite.error === undefined ? 0 : 1);
   const time = testSuite.tests.reduce(
     (innerAcc, test) => (test.status === 'pass' || test.status === 'fail' ? innerAcc + test.duration : innerAcc),
     0,
@@ -33,10 +34,11 @@ export const TestDetailHeader = ({ testSuite, ...props }: Props) => {
       {({ engine }) => (
         <TestSummaryHeaderCommon
           {...props}
+          data-test="test-detail-header"
           titleElement={
             <TitleElementWrapper>
               <TestSuiteIcon testSuite={testSuite} />
-              <FileText path={testSuite.path} />
+              <FileText data-test="test-detail-header-file-text" path={testSuite.path} />
             </TitleElementWrapper>
           }
           passing={passing}
