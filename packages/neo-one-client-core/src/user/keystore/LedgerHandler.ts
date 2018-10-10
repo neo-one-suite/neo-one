@@ -1,6 +1,14 @@
 import { crypto, PublicKeyString } from '@neo-one/client-common';
 import { HWLedger, LedgerTransport } from '@neo-one/client-switch';
-import { LedgerNotDetectedError, LedgerNotSupportedError, LedgerStatusCodeError } from '../../errors';
+import {
+  LedgerMessageSizeError,
+  LedgerNEOAppError,
+  LedgerNotDetectedError,
+  LedgerNotSupportedError,
+  LedgerParseError,
+  LedgerStatusCodeError,
+  LedgerTransactionDenied,
+} from '../../errors';
 
 export interface LedgerQueueRequest {
   readonly msg: Buffer;
@@ -24,6 +32,26 @@ const chunkBuffer = (buffer: Buffer, chunkLength: number): ReadonlyArray<Buffer>
   }
 
   return [buffer];
+};
+
+const processLedgerStatus = (status: string): void => {
+  switch (status) {
+    case '6d08': {
+      throw new LedgerMessageSizeError();
+    }
+    case '6e00': {
+      throw new LedgerNEOAppError();
+    }
+    case '6985': {
+      throw new LedgerTransactionDenied();
+    }
+    case '6d07': {
+      throw new LedgerParseError();
+    }
+    default: {
+      throw new LedgerStatusCodeError(status);
+    }
+  }
 };
 
 export class LedgerHandler {
@@ -124,9 +152,9 @@ export class LedgerHandler {
   private async doSend(msg: Buffer): Promise<Buffer> {
     const response = await this.ledger.exchange(msg);
 
-    const status = response.slice(response.length - 2);
-    if (status.toString('hex') !== '9000') {
-      throw new LedgerStatusCodeError(status.toString('hex'));
+    const status = response.slice(response.length - 2).toString('hex');
+    if (status !== '9000') {
+      processLedgerStatus(status);
     }
 
     return response.slice(0, response.length - 2);
