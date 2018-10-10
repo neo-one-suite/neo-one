@@ -51,7 +51,9 @@ const DocsFooterBase = ({ selected, complete, ...props }: Props) => (
           <Hidden.Toggle data-test="docs-footer-solution-button" as={Button} {...hidden}>
             {hidden.visible ? 'Hide' : 'Show'} Solution
           </Hidden.Toggle>
-          {complete ? <NextButton data-test="docs-footer-next-button" selected={selected} /> : null}
+          {complete ? (
+            <NextButton data-test="docs-footer-next-button" selected={selected} onClick={hidden.hide} />
+          ) : null}
         </FooterWrapper>
       </Wrapper>
     )}
