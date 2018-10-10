@@ -217,14 +217,27 @@ const checkTest = ({ name, state, error }: Test) => {
   }
 };
 
-export const enterSolution = ({ path }: { readonly path: string }) => {
+export const enterSolution = ({
+  path,
+  skipBackspace = false,
+}: {
+  readonly path: string;
+  readonly skipBackspace?: boolean;
+}) => {
   cy.get('[data-test=docs-footer-solution-button]').click();
   cy.get(`[data-test="docs-solution-file-tab-${path}"]`).click();
   cy.get('[data-test=monaco-editor] .view-lines').click();
   cy.get('[data-test=monaco-editor] > div').should('have.class', 'focused');
+  cy.get('[data-test=monaco-editor] textarea')
+    .type('{cmd}a')
+    .type('{backspace}');
   cy.get('[data-test=docs-solution-markdown] > .code-toolbar > pre > code').then(($outerEl) => {
     cy.get('[data-test=monaco-editor] textarea').type($outerEl.text().replace(/\{/g, '{{}'));
   });
+  if (!skipBackspace) {
+    cy.get('[data-test=monaco-editor] textarea').type('{backspace}');
+    cy.get('[data-test=monaco-editor] textarea').type('{backspace}');
+  }
 };
 
 interface BuildOptions {
