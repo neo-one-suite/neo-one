@@ -67,9 +67,9 @@ describe('Tokenomics', () => {
         },
       ],
     });
-    nextButton();
 
     // Lesson 1: Chapter 2
+    nextButton();
     build({ success: true });
     runTests({
       passing: 0,
@@ -93,6 +93,7 @@ describe('Tokenomics', () => {
     // Check for Problems
     enterSolution({ path: 'one/contracts/Token.one.ts' });
     build({ success: true });
+    // Check problems cleared
     runTests({
       passing: 1,
       failing: 0,
@@ -105,6 +106,51 @@ describe('Tokenomics', () => {
           tests: [
             {
               name: ['Token', 'has name, symbol and decimals properties'],
+              state: 'pass',
+            },
+          ],
+        },
+      ],
+    });
+
+    // Lesson 1: Chapter 3
+    nextButton();
+    build({ success: true });
+    runTests({
+      passing: 0,
+      failing: 1,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 0,
+          failing: 1,
+          tests: [
+            {
+              name: ['Token', 'has name, symbol, decimals and totalSupply properties'],
+              state: 'fail',
+              error: 'TypeError: token.totalSupply is not a function',
+            },
+          ],
+        },
+      ],
+    });
+    // Check for Problems
+    enterSolution({ path: 'one/contracts/Token.one.ts' });
+    build({ success: true });
+    // Check problems cleared
+    runTests({
+      passing: 1,
+      failing: 0,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 1,
+          failing: 0,
+          tests: [
+            {
+              name: ['Token', 'has name, symbol, decimals and totalSupply properties'],
               state: 'pass',
             },
           ],
