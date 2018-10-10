@@ -1220,6 +1220,31 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
+"@ledgerhq/hw-transport-node-hid@4.22.0":
+  version "4.22.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid/-/hw-transport-node-hid-4.22.0.tgz#1ee00dcccd852cb6fb152cd68c781c9689cf9f24"
+  integrity sha1-HuANzM2FLLb7FSzWjHgclonPnyQ=
+  dependencies:
+    "@ledgerhq/hw-transport" "^4.21.0"
+    lodash "^4.17.10"
+    node-hid "^0.7.2"
+    usb "^1.3.2"
+
+"@ledgerhq/hw-transport-u2f@4.21.0":
+  version "4.21.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.21.0.tgz#85695d7e853a5c21af7e7dcb0ce3919f2b65cdd9"
+  integrity sha1-hWldfoU6XCGvfn3LDOORnytlzdk=
+  dependencies:
+    "@ledgerhq/hw-transport" "^4.21.0"
+    u2f-api "0.2.7"
+
+"@ledgerhq/hw-transport@^4.21.0":
+  version "4.21.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-4.21.0.tgz#50f85cfe115ba3f9d5bf94755c701e927175794f"
+  integrity sha1-UPhc/hFbo/nVv5R1XHAeknF1eU8=
+  dependencies:
+    events "^2.0.0"
+
 "@lerna/add@^3.4.1":
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/@lerna/add/-/add-3.4.1.tgz#d41068317e30f530df48220d256b5e79690b1877"
@@ -2430,6 +2455,28 @@
     "@types/koa-compose" "*"
     "@types/node" "*"
 
+"@types/ledgerhq__hw-transport-node-hid@^4.22.0":
+  version "4.22.0"
+  resolved "https://registry.yarnpkg.com/@types/ledgerhq__hw-transport-node-hid/-/ledgerhq__hw-transport-node-hid-4.22.0.tgz#f4e0272c0159c8206f41747d52ccaab14ebf44ed"
+  integrity sha512-QE1gSC0QU7k60Ngc/+LK/Tsm0lu9ttmjCv32uBqjAVOtlj8cb3dMC5KvtGMKUiqdf1N/H5juiHbrLJOJKkplRw==
+  dependencies:
+    "@types/node" "*"
+    "@types/node-hid" "*"
+
+"@types/ledgerhq__hw-transport-u2f@^4.21.0":
+  version "4.21.0"
+  resolved "https://registry.yarnpkg.com/@types/ledgerhq__hw-transport-u2f/-/ledgerhq__hw-transport-u2f-4.21.0.tgz#b3d7af7c42ac063fe98cf0f82dc9aa581a558b3c"
+  integrity sha512-kE5Re3B7Ga6ICx9HYVt/Q/oSuTsITeijw2LbMm2od0qg61Rr76a+QmGmdNhuLmsK8+QFK0G2wvYj73uJQ+OIIg==
+  dependencies:
+    "@types/node" "*"
+
+"@types/ledgerhq__hw-transport@^4.21.0":
+  version "4.21.0"
+  resolved "https://registry.yarnpkg.com/@types/ledgerhq__hw-transport/-/ledgerhq__hw-transport-4.21.0.tgz#d6de28dc1c70622096f6404224e3678fab8345f0"
+  integrity sha512-OKck4LAMglquNqJe+yZ1fG/Btyi7dsiypKLgYsB6i1OwHtF5kBjTZL+7Ki/Mf98FtTnLFoGqODknnZl2MZELag==
+  dependencies:
+    "@types/node" "*"
+
 "@types/leveldown@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/leveldown/-/leveldown-4.0.0.tgz#3725cd6593f723435c5d72215369ef969a2fcce5"
@@ -2536,6 +2583,11 @@
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@types/node-cron/-/node-cron-1.2.0.tgz#aefb50be6c09f7e6a1e4c074168698b526c0b543"
   integrity sha512-A5ABiPYKir3vjEjrq0+a8KFXD9dgXq9EOP6Mi2OWTltx5YxIZDSrJBkBqvlyuhg9fbwTYi09NruciVYP42vkKA==
+
+"@types/node-hid@*":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@types/node-hid/-/node-hid-0.7.0.tgz#f696f39c528059116236e41df90c8fcba077d711"
+  integrity sha512-P46Ed7R+/3peWShb7hNGD/ajvpMiY1tWKG35aQ3oPOxV2Nls6porDqXPvZT4qnx5T8hb6Ot5juxfQS87Tpjk4w==
 
 "@types/node@*", "@types/node@^10.1.0":
   version "10.11.0"
@@ -4482,7 +4534,7 @@ binaryextensions@2:
   resolved "https://registry.yarnpkg.com/binaryextensions/-/binaryextensions-2.1.1.tgz#3209a51ca4a4ad541a3b8d3d6a6d5b83a2485935"
   integrity sha512-XBaoWE9RW8pPdPQNibZsW2zh8TW6gcarXp1FZPwT8Uop8ScSNldJEWf2k9l3HeTqdrEwsOsFcq74RiJECW34yA==
 
-bindings@~1.3.0:
+bindings@^1.3.0, bindings@~1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.3.0.tgz#b346f6ecf6a95f5a815c5839fc7cdb22502f1ed7"
   integrity sha512-DpLh5EzMR2kzvX1KIlVC0VkC3iZtHKTgdtZ0a3pglBZdaQFjt5S9g9xd1lE+YvXyfd6mtCeRnrUfOLYiTMlNSw==
@@ -7437,6 +7489,11 @@ events@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/events/-/events-1.1.1.tgz#9ebdb7635ad099c70dcc4c2a1f5004288e8bd924"
   integrity sha1-nr23Y1rQmccNzEwqH1AEKI6L2SQ=
+
+events@^2.0.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/events/-/events-2.1.0.tgz#2a9a1e18e6106e0e812aa9ebd4a819b3c29c0ba5"
+  integrity sha512-3Zmiobend8P9DjmKAty0Era4jV8oJ0yGYe2nJJAxgymF9+N8F2m0hhZiMoWtcfepExzNKZumFU3ksdQbInGWCg==
 
 eventsource@0.1.6:
   version "0.1.6"
@@ -12680,7 +12737,7 @@ mz@^2.7.0:
     object-assign "^4.0.1"
     thenify-all "^1.0.0"
 
-nan@^2.0.0, nan@^2.10.0, nan@^2.9.2:
+nan@^2.0.0, nan@^2.10.0, nan@^2.8.0, nan@^2.9.2:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.11.0.tgz#574e360e4d954ab16966ec102c0c049fd961a099"
   integrity sha512-F4miItu2rGnV2ySkXOQoA8FKz/SR2Q2sWP0sbTxNxz/tuokeC8WxOhPMcwi0qIyGtVn/rrSeLbvVkznqCdwYnw==
@@ -12816,6 +12873,15 @@ node-gyp@^3.8.0:
     semver "~5.3.0"
     tar "^2.0.0"
     which "1"
+
+node-hid@^0.7.2:
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/node-hid/-/node-hid-0.7.3.tgz#736e9a4dee5eec96c20fbe301e0311bb185cb2f4"
+  integrity sha512-LOCqWqcOlng+Kn1Qj/54zrPVfCagg1O7RlSgMmugykBcoYvUud6BswTrJM2aXuBac+bCCm3lA2srRG8YfmyXZQ==
+  dependencies:
+    bindings "^1.3.0"
+    nan "^2.10.0"
+    prebuild-install "^4.0.0"
 
 node-int64@^0.4.0:
   version "0.4.0"
@@ -17780,6 +17846,11 @@ tz-offset@0.0.1:
   resolved "https://registry.yarnpkg.com/tz-offset/-/tz-offset-0.0.1.tgz#fef920257024d3583ed9072a767721a18bdb8a76"
   integrity sha512-kMBmblijHJXyOpKzgDhKx9INYU4u4E1RPMB0HqmKSgWG8vEcf3exEfLh4FFfzd3xdQOw9EuIy/cP0akY6rHopQ==
 
+u2f-api@0.2.7:
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/u2f-api/-/u2f-api-0.2.7.tgz#17bf196b242f6bf72353d9858e6a7566cc192720"
+  integrity sha512-fqLNg8vpvLOD5J/z4B6wpPg4Lvowz1nJ9xdHcCzdUPKcFE/qNCceV2gNZxSJd5vhAZemHr/K/hbzVA0zxB5mkg==
+
 ua-parser-js@^0.7.17, ua-parser-js@^0.7.18:
   version "0.7.18"
   resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.18.tgz#a7bfd92f56edfb117083b69e31d2aa8882d4b1ed"
@@ -18082,6 +18153,14 @@ urlgrey@^0.4.4:
   version "0.4.4"
   resolved "https://registry.yarnpkg.com/urlgrey/-/urlgrey-0.4.4.tgz#892fe95960805e85519f1cd4389f2cb4cbb7652f"
   integrity sha1-iS/pWWCAXoVRnxzUOJ8stMu3ZS8=
+
+usb@^1.3.2:
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/usb/-/usb-1.3.3.tgz#4e8a4b44ab8833fa1c4fb99778ebae1d2d626970"
+  integrity sha512-WRBxI54yEs2QPj28G6kITI3Wu7VxrtHbqiDvDRUDKdg97lcK1pTP8y9LoDWF22OiCCrEvrdeq0lNcr84QOzjXQ==
+  dependencies:
+    nan "^2.8.0"
+    node-pre-gyp "^0.10.0"
 
 use@^3.1.0:
   version "3.1.1"

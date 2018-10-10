@@ -71,6 +71,7 @@
     "test": "yarn run jest --config jest/unit.js",
     "test-ci": "yarn run jest --config jest/unit-ci.js --ci -w 1",
     "test:playground": "yarn run ts-node ./packages/neo-one-playground/scripts/runCypress.ts",
+    "test:ledger": "yarn run jest --config jest/ledger.js --w 1",
     "e2e": "yarn run jest --config jest/e2e.js",
     "e2e-ci": "yarn run jest --config jest/e2e-ci.js --ci -w 1",
     "tsc": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" tsc && tsc -p packages/neo-one-smart-contract && tsc -p packages/neo-one-smart-contract-lib && tsc -p packages/neo-one-smart-contract-lib/src/__data__/contracts && tsc -p packages/neo-one-smart-contract-compiler/src/__data__/contracts && tsc -p packages/neo-one-server-plugin-project/src/__data__/ico/one/contracts",
