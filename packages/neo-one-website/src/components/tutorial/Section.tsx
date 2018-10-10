@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, styled } from 'reakit';
+import { List, styled } from 'reakit';
 import { SectionTitleLink } from './SectionTitleLink';
 import { SubsectionList } from './SubsectionList';
 
@@ -9,13 +9,13 @@ export interface Props {
   readonly onClick?: () => void;
 }
 
-const List = styled(Box.as('ul'))`
+const TutorialList = styled(List)`
   list-style-type: none;
 `;
 
-export const Section = ({ subsections, section, onClick }: Props) => (
-  <List>
+export const Section = ({ subsections, section, onClick, ...props }: Props) => (
+  <TutorialList {...props}>
     <SectionTitleLink title={section} onClick={onClick} />
     <SubsectionList subsections={subsections} onClick={onClick} />
-  </List>
+  </TutorialList>
 );

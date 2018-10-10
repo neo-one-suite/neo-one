@@ -19,12 +19,8 @@ const ArticleText = styled(Box)`
 `;
 
 const NavigationLink = styled(RouterLink)`
-  display: flex;
-  align-items: center;
   ${prop('theme.fonts.axiformaRegular')};
-  font-size: 24px;
-  height: 100%;
-  width: 100%;
+  ${prop('theme.fontStyles.headline')};
   color: ${prop('theme.primary')};
 
   &:hover {
@@ -37,17 +33,17 @@ const NavigationLink = styled(RouterLink)`
   }
 
   @media (max-width: ${prop('theme.breakpoints.md')}) {
-    font-size: 16px;
+    ${prop('theme.fontStyles.body2')};
   }
 `;
 
-export const AdjacentLink = ({ adjacent, next }: Props) => {
+export const AdjacentLink = ({ adjacent, next, ...props }: Props) => {
   const adjacentPath = `/docs/${adjacent.slug}`;
 
   return (
-    <ul>
+    <Box {...props}>
       <ArticleText>{next ? 'Next Article' : 'Previous Article'}</ArticleText>
       <NavigationLink to={adjacentPath}>{adjacent.title}</NavigationLink>
-    </ul>
+    </Box>
   );
 };

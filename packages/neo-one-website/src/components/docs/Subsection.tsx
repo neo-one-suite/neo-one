@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Link as RouterLink } from 'react-static';
-import { styled } from 'reakit';
+import { Box, styled } from 'reakit';
 import { prop } from 'styled-tools';
 
 export interface Props {
@@ -10,13 +10,8 @@ export interface Props {
 }
 
 const NavigationLink = styled(RouterLink)`
-  display: flex;
-  align-items: center;
   ${prop('theme.fonts.axiformaRegular')};
-  font-size: 16px;
-  height: 100%;
-  width: 100%;
-  padding-top: 8px;
+  ${prop('theme.fontStyles.subheading')};
   color: ${prop('theme.black')};
   text-decoration: none;
 
@@ -29,15 +24,18 @@ const NavigationLink = styled(RouterLink)`
   }
 `;
 
-export const Subsection = ({ slug, title, onClick }: Props) => {
-  const dataTest = `docs-${slug}-sidebar`;
+const ListItem = styled(Box.as('li'))`
+  margin-top: 8px;
+`;
+
+export const Subsection = ({ slug, title, onClick, ...props }: Props) => {
   const path = `/docs/${slug}`;
 
   return (
-    <li data-test={dataTest}>
+    <ListItem {...props}>
       <NavigationLink to={path} onClick={onClick}>
         {title}
       </NavigationLink>
-    </li>
+    </ListItem>
   );
 };

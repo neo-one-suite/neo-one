@@ -10,30 +10,16 @@ interface Props {
 }
 
 const Footer = styled(Grid)`
-  grid-template: 'prev next';
+  grid-auto-flow: column;
   justify-content: space-between;
-  padding: 16px;
-  padding-right: 380px;
   background-color: ${prop('theme.black')};
   min-height: 88px;
-  width: 100%;
-
-  @media (max-width: ${prop('theme.breakpoints.md')}) {
-    padding-right: 32px;
-  }
+  padding: 16px;
 `;
 
-const NextLink = styled(AdjacentLink)`
-  grid-area: next;
-`;
-
-const PrevLink = styled(AdjacentLink)`
-  grid-area: prev;
-`;
-
-export const DocFooter = ({ next, previous }: Props) => (
-  <Footer>
-    {previous === undefined ? <Box grid-area="prev" /> : <PrevLink next={false} adjacent={previous} />}
-    {next === undefined ? <Box grid-area="next" /> : <NextLink next={true} adjacent={next} />}
+export const DocFooter = ({ next, previous, ...props }: Props) => (
+  <Footer {...props}>
+    {previous === undefined ? <Box grid-area="prev" /> : <AdjacentLink next={false} adjacent={previous} />}
+    {next === undefined ? <Box grid-area="next" /> : <AdjacentLink next={true} adjacent={next} />}
   </Footer>
 );

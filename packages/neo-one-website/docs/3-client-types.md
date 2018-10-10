@@ -120,13 +120,8 @@ These are the types you will need for most common used cases.
 
 #### AddressString
   - Base64 encoded string that represents a NEO address.
-    ```ts
-    'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR'
-    ```
+
   - Also accepts Hash160 strings (hex encoded string prefixed by '0x') when used as a parameter to a to a NEO•ONE function.
-    ```ts
-    '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9'
-    ```
 
 #### Account
   - Contains asset balances for a given address.
@@ -177,9 +172,6 @@ These are the types you will need for most common used cases.
 
 #### BufferString
   - Hex encoded string that represents a buffer.
-    ```ts
-    '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef'
-    ```
 
 #### GetOptions
   - Generic options used for different operations.
@@ -190,9 +182,6 @@ These are the types you will need for most common used cases.
 #### Hash256String
   - Hex encoded string prefixed by '0x' that represents a NEO 256 bit hash.
   - Examples of Hash256String include `Block` hashes and[Transaction](#Transaction) hashes.
-    ```ts
-     '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c'
-    ```
 
 #### Input
   - Inputs are a reference to an [Output](#Output) of a [Transaction](#Transaction) that has been persisted to the blockchain.
@@ -228,26 +217,16 @@ These are the types you will need for most common used cases.
 
 #### PrivateKeyString
   - Hex encoded string that represents a signature for a message.
-    ```ts
-    'ccaab040cc25021c91567b75db4778853441869157b8f6aad960cdcf1069812480027a528ca9b98e2205027de20696f848cf81824eeb7af1d5110870870ceb67'
-    ```
 
 #### PublicKeyString
   - WIF string that represents a private key.
-    ```ts
-    'L1QqQJnpBwbsPGAuutuzPTac8piqvbR1HRjrY5qHup48TBCBFe4g'
-    ```
+
   - Also accepts hex encoded strings when used as a parameter to a NEO•ONE function.
-    ```ts
-    '9ab7e154840daca3a2efadaf0df93cd3a5b51768c632f5433f86909d9b994a69'
-    ```
+
   - Always a WIF string when returned from a NEO•ONE function.
 
 #### SignatureString
   - Hex encoded string that represents a signature for a message.
-    ```ts
-    'ccaab040cc25021c91567b75db4778853441869157b8f6aad960cdcf1069812480027a528ca9b98e2205027de20696f848cf81824eeb7af1d5110870870ceb67'
-    ```
 
 #### Transfer
   - Data required to initiate a transfer of an [Asset](#Asset).
@@ -344,9 +323,6 @@ Types related to Smart Contracts.
 
 #### ContractParameterType
   - All possible values of the type field for [ContractParameter](#ContractParameter)
-    ```ts
-    'Signature' | 'Boolean' | 'Integer' | 'Address' | 'Hash256' | 'Buffer' | 'PublicKey' | 'String' | 'Array' | 'InteropInterface' | 'Void'
-    ```
 
 #### ContractRegister
   - Information required to register a [Contract](#Contract).
@@ -720,9 +696,6 @@ All possible Attribute types which can be attached to transactions.
 #### AddressAttributeUsage
   - Attribute usage flag indicating the data is an Address.
   - Possible Values:
-    ```ts
-    'Script'
-    ```
 
 #### Attribute
   - Attributes are used to store additional data on [Transactions](#Transaction).
@@ -749,9 +722,6 @@ All possible Attribute types which can be attached to transactions.
 #### BufferAttributeUsage
   - Attribute usage flag indicating the data is an arbitrary Buffer.
   - Possible Values:
-    ```ts
-    'DescriptionUrl' | 'Description' | 'Remark' | 'Remark1' | 'Remark2' | 'Remark3' | 'Remark4' | 'Remark5' | 'Remark6' | 'Remark7' | 'Remark8' | 'Remark9' | 'Remark10' | 'Remark11' | 'Remark12' | 'Remark13' | 'Remark14' | 'Remark15'
-    ```
 
 #### Hash256Attribute
   - [Attribute](#Attribute) whose data is a [Hash256String](#Hash256String)
@@ -762,9 +732,6 @@ All possible Attribute types which can be attached to transactions.
 #### Hash256AttributeUsage
   - Attribute usage flag indicating the data is a Hash256
   - Possible Values:
-    ```ts
-    'ContractHash' | 'Vote' | 'Hash1' | 'Hash2' | 'Hash3' | 'Hash4' | 'Hash5' | 'Hash6' | 'Hash7' | 'Hash8' | 'Hash9' | 'Hash10' | 'Hash11' | 'Hash12' | 'Hash13' | 'Hash14' | 'Hash15'
-    ```
 
 #### PublicKeyAttribute
   - [Attribute](#Attribute) whose data is a [PublicKeyString](#PublicKeyString)
@@ -775,9 +742,6 @@ All possible Attribute types which can be attached to transactions.
 #### PublicKeyAttributeUsage
   - Attribute usage flag indicating the data is a PublicKey
   - Possible Values:
-    ```ts
-    'ECDH02' | 'ECDH03'
-    ```
 
 <br>
 ## Advanced Types
@@ -799,9 +763,6 @@ The rest of the types are contained here.  These will likely only be used for mo
 
 #### AssetType
   - An enum of string values of all possible Asset Types
-    ```ts
-    'Credit' | 'Duty' | 'Governing' | 'Utility' | 'Currency' | 'Share' | 'Invoice' | 'Token'
-    ```
 
 #### BlockFilter
   - Filter user in certain methods which iterate over blocks.
@@ -848,9 +809,7 @@ The rest of the types are contained here.  These will likely only be used for mo
   - Invocation stack item for a BN
   - Note that unlike most of the client APIs, we use a `BN` instead of a `BigNumber` here to indicate that this is an integer value.
   - For example, an `IntegerContractParameter` that represents a NEO value of 10 would be
-    ```ts
-    new BN(10_00000000)
-    ```
+
   - See [ContractParameter](#ContractParameter)
   - Properties
     - type: 'Boolean'

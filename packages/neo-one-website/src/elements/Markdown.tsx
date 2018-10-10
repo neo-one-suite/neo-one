@@ -39,6 +39,7 @@ Prism.languages.ts = Prism.languages.typescript;
 // tslint:enable
 
 const md = MarkdownIt();
+
 const langPrefix = 'language-';
 md.set({
   html: false,
@@ -54,9 +55,7 @@ md.set({
 
     return `<pre${classAttribute}><code${classAttribute}>${code}</code></pre>`;
   },
-});
-const md = MarkdownIt()
-  .set(mdOptions)
+})
   .use(anchor)
   .use(TOC, { includeLevel: [2] });
 

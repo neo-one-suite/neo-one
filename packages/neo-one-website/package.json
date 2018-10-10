@@ -25,7 +25,6 @@
     "constate": "^0.9.0",
     "fs-extra": "^7.0.0",
     "gray-matter": "^4.0.1",
-    "highlight.js": "^9.12.0",
     "immer": "^1.7.2",
     "loader-utils": "^1.1.0",
     "localforage": "^1.7.2",

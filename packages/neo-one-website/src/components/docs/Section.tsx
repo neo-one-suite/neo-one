@@ -13,14 +13,13 @@ export interface Props {
 }
 
 const SectionButton = styled(Button)`
-  border-bottom: 3px solid transparent;
-  border-color: ${prop('theme.accent')};
+  border-bottom: 3px solid ${prop('theme.accent')};
   ${prop('theme.fonts.axiformaMedium')};
   padding-top: 24px;
 `;
 
-export const Section = ({ subsections, title, onClick }: Props) => (
-  <Hidden.Container>
+export const Section = ({ subsections, title, onClick, ...props }: Props) => (
+  <Hidden.Container {...props}>
     {({ visible, toggle }) => (
       <Box as="ul">
         <SectionButton onClick={toggle}>

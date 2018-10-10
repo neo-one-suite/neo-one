@@ -20,16 +20,14 @@ const MobileStyledBox = styled(Box)`
     height: 100%;
     width: 100%;
     position: fixed;
-    right: 0;
   }
 `;
 
 const DesktopStyledBox = styled(Box)`
   background-color: ${prop('theme.gray1')};
   height: 100%;
-  width: 320px;
+  width: 100%;
   position: fixed;
-  right: 0;
 
   @media (max-width: ${prop('theme.breakpoints.md')}) {
     display: none;
@@ -59,8 +57,8 @@ const NavIcon = styled(MdMenu)`
   height: 32px;
 `;
 
-export const TutorialSidebar = ({ sections }: Props) => (
-  <Hidden.Container initialState={{ visible: true }}>
+export const TutorialSidebar = ({ sections, ...props }: Props) => (
+  <Hidden.Container initialState={{ visible: true }} {...props}>
     {({ visible, toggle, hide }) => (
       <Box>
         {visible && (

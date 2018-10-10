@@ -5,14 +5,13 @@ import { prop } from 'styled-tools';
 
 const TitleBox = styled(Box)`
   display: inline-block;
-  border-bottom: 3px solid transparent;
-  border-color: ${prop('theme.accent')};
+  border-bottom: 3px solid ${prop('theme.accent')};
   ${prop('theme.fonts.axiformaMedium')};
   padding-top: 24px;
 `;
 
-export const SidebarHeader = () => (
-  <TitleBox>
+export const SidebarHeader = ({ ...props }) => (
+  <TitleBox {...props}>
     Tutorial
     <MdArrowDropDown />
   </TitleBox>
