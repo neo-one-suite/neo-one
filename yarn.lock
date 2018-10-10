@@ -2196,10 +2196,6 @@
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@types/grpc-error/-/grpc-error-1.0.0.tgz#02cc22a7cc1b8e1d2cbf8499e224aa4ea9bdf8e0"
 
-"@types/highlight.js@^9.12.0":
-  version "9.12.3"
-  resolved "https://registry.yarnpkg.com/@types/highlight.js/-/highlight.js-9.12.3.tgz#b672cfaac25cbbc634a0fd92c515f66faa18dbca"
-
 "@types/history@*":
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/@types/history/-/history-4.7.0.tgz#2fac51050c68f7d6f96c5aafc631132522f4aa3f"
@@ -2419,6 +2415,16 @@
   dependencies:
     "@types/events" "*"
     "@types/node" "*"
+
+"@types/markdown-it-anchor@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@types/markdown-it-anchor/-/markdown-it-anchor-4.0.1.tgz#f9607c56aaf608fcec26f7de0c4846e1baf80e68"
+  dependencies:
+    "@types/markdown-it" "*"
+
+"@types/markdown-it@*":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@types/markdown-it/-/markdown-it-0.0.5.tgz#5cdcbe08e81075d5dbf15466b311359b02a30c2b"
 
 "@types/markdown-it@^0.0.6":
   version "0.0.6"
@@ -11375,6 +11381,16 @@ markdown-escapes@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/markdown-escapes/-/markdown-escapes-1.0.2.tgz#e639cbde7b99c841c0bacc8a07982873b46d2122"
 
+markdown-it-anchor@^2.0.3:
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/markdown-it-anchor/-/markdown-it-anchor-2.7.1.tgz#372f67da7a4c4632ad0ebe4c9691726efe25342a"
+  dependencies:
+    string "^3.0.1"
+
+markdown-it-table-of-contents@^0.4.3:
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/markdown-it-table-of-contents/-/markdown-it-table-of-contents-0.4.3.tgz#6453925a76e49b9b3d9569a0d89f1c2168b46982"
+
 markdown-it@^8.4.2:
   version "8.4.2"
   resolved "https://registry.yarnpkg.com/markdown-it/-/markdown-it-8.4.2.tgz#386f98998dc15a37722aa7722084f4020bdd9b54"
@@ -15779,6 +15795,10 @@ string-width@^1.0.1, string-width@^1.0.2:
   dependencies:
     is-fullwidth-code-point "^2.0.0"
     strip-ansi "^4.0.0"
+
+string@^3.0.1:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/string/-/string-3.3.3.tgz#5ea211cd92d228e184294990a6cc97b366a77cb0"
 
 string_decoder@^1.0.0, string_decoder@~1.1.1:
   version "1.1.1"

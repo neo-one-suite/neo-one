@@ -4,6 +4,7 @@ import _ from 'lodash';
 require('ts-node/register/transpile-only');
 const { getCourses } = require('./src/loaders/coursesLoader');
 const { getDocs } = require('./src/utils/getDocs');
+const { getTutorial } = require('./src/utils/getTutorial');
 
 // Paths Aliases defined through tsconfig.json
 export default {
@@ -13,7 +14,8 @@ export default {
     title: 'React Static',
   }),
   getRoutes: async () => {
-    const [courses, docs] = await Promise.all([getCourses(), getDocs()]);
+    const [courses, docs, tutorial] = await Promise.all([getCourses(), getDocs(), getTutorial()]);
+
     return [
       {
         path: '/',
@@ -66,6 +68,11 @@ export default {
             previous: doc.previous,
           }),
         })),
+      },
+      {
+        path: '/tutorial',
+        component: 'src/pages/tutorial',
+        getData: async () => tutorial,
       },
     ];
   },
