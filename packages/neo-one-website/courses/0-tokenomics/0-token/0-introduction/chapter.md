@@ -10,7 +10,7 @@ In Lesson 1, we're going to build a token smart contract from scratch. The token
 
 In later lessons we'll add more functionality like pre-approving transfers and forwarding arguments to other contracts.
 
-Before getting started, familiarize yourself with the course editor by taking the editor tour. If it hasn't already shown up automatically, or you want to view it again, click the `Tour` button in the editor toolbar at the bottom of the page.
+Before getting started, let's familiarize ourselves with the editor. The editor works similar to VSCode - errors show up inline, and you can hover over code to get inline help. The editor toolbar at the bottom has two buttons that will be used frequently throughout the course. `Build` builds the smart contract code - files that end with `.one.ts` in the editor. `Run Tests` runs the Jest tests - files that end with `.test.ts`. Each chapter will have a set of tests which must pass before proceeding to the next chapter. If you ever get stuck, you can always click `Show Solution` and copy the code into the editor.
 
 ## Learn
 
@@ -38,7 +38,7 @@ This is the shell of a token smart contract. Since we named it `Token`, the vari
 
 ## Test
 
-At this point, we have a basic compilable NEO•ONE smart contract. Go ahead and click the `Build` button in the lower right hand corner to compile the smart contract. Then click the `Run Tests` button to verify the smart contract. Once the tests pass, you may proceed to the next chapter by clicking `Next Chapter`.
+At this point, we have a basic compilable NEO•ONE smart contract. Go ahead and click the `Build` button in editor toolbar to compile the smart contract. Then click the `Run Tests` button to verify the smart contract. Once the tests pass, you may proceed to the next chapter by clicking `Next Chapter`.
 
 ## Wrap Up
 
