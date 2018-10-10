@@ -6,11 +6,11 @@
   "dependencies": {
     "@neo-one/types": "^1.0.0-preview.0",
     "@types/commondir": "^1.0.0",
-    "@types/lodash": "^4.14.116",
+    "@types/lodash": "^4.14.117",
     "commondir": "^1.0.1",
     "lodash": "^4.17.11",
     "source-map": "^0.7.3",
-    "typescript": "3.1.1"
+    "typescript": "3.1.2"
   },
   "sideEffects": false
 }

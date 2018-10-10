@@ -9,7 +9,7 @@
     "@neo-one/node-core": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",
     "@neo-one/utils": "^1.0.0-preview.0",
-    "@types/lodash": "^4.14.116",
+    "@types/lodash": "^4.14.117",
     "@types/through": "^0.0.29",
     "lodash": "^4.17.11",
     "rxjs": "^6.3.3",

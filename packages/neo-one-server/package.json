@@ -23,7 +23,7 @@
     "@types/koa-compose": "^3.2.2",
     "@types/koa-compress": "^2.0.8",
     "@types/koa-router": "^7.0.32",
-    "@types/lodash": "^4.14.116",
+    "@types/lodash": "^4.14.117",
     "@types/mali": "^0.9.1",
     "@types/mali-compose": "^1.1.0",
     "@types/mali-onerror": "^0.1.0",

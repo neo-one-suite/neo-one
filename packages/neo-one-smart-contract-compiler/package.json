@@ -14,14 +14,14 @@
     "@neo-one/utils": "^1.0.0-preview.0",
     "@types/babel__code-frame": "^7.0.0",
     "@types/bn.js": "^4.11.2",
-    "@types/lodash": "^4.14.116",
+    "@types/lodash": "^4.14.117",
     "@types/toposort": "^2.0.1",
     "bn.js": "^4.11.8",
     "lodash": "^4.17.11",
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
     "toposort": "^2.0.2",
-    "typescript": "3.1.1"
+    "typescript": "3.1.2"
   },
   "devDependencies": {
     "@neo-one/client-common": "1.0.0-preview.0",

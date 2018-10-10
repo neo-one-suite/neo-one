@@ -9,7 +9,7 @@
     "@neo-one/utils": "^1.0.0-preview.0",
     "@types/koa": "^2.0.46",
     "@types/koa-mount": "^3.0.1",
-    "@types/lodash": "^4.14.116",
+    "@types/lodash": "^4.14.117",
     "@types/prometheus-gc-stats": "^0.6.0",
     "koa": "^2.5.3",
     "koa-mount": "^4.0.0",

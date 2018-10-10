@@ -16,7 +16,7 @@
     "@types/bloem": "^0.2.0",
     "@types/bloom-filter": "^0.2.0",
     "@types/bn.js": "^4.11.2",
-    "@types/lodash": "^4.14.116",
+    "@types/lodash": "^4.14.117",
     "@types/ip-address": "^5.8.2",
     "@types/lru-cache": "^4.1.1",
     "bignumber.js": "^7.2.1",
