@@ -232,12 +232,15 @@ export const enterSolution = ({
     .type('{cmd}a')
     .type('{backspace}');
   cy.get('[data-test=docs-solution-markdown] > .code-toolbar > pre > code').then(($outerEl) => {
-    cy.get('[data-test=monaco-editor] textarea').type($outerEl.text().replace(/\{/g, '{{}'));
+    let value = $outerEl.text().replace(/\{/g, '{{}');
+    if (!skipBackspace) {
+      value = $outerEl
+        .text()
+        .replace(/\n(\s*)\}/g, '\n$1')
+        .replace(/\{(.*)\}/g, '{{}$1}');
+    }
+    cy.get('[data-test=monaco-editor] textarea').type(value);
   });
-  if (!skipBackspace) {
-    cy.get('[data-test=monaco-editor] textarea').type('{backspace}');
-    cy.get('[data-test=monaco-editor] textarea').type('{backspace}');
-  }
 };
 
 interface BuildOptions {

@@ -5,7 +5,7 @@ describe('Tokenomics', () => {
     cy.visit('/course');
 
     prepareCourseTest({
-      slugs: ['/course/tokenomics/1/1', '/course/tokenomics/1/2'],
+      slugs: ['/course/tokenomics/1/1', '/course/tokenomics/1/2', '/course/tokenomics/1/3'],
     });
 
     cy.get('[data-test=tokenomics-lesson-0]').click();
