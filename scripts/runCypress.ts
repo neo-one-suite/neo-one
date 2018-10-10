@@ -116,13 +116,7 @@ process.on('SIGTERM', () => {
 });
 
 const run = async ({ report, coverage }: { readonly report: boolean; readonly coverage: boolean }) => {
-  console.log('$ yarn website:stage');
-  await execa('yarn', ['website:stage'], {
-    env: {
-      NEOONE_COVERAGE: coverage ? 'true' : 'false',
-    },
-  });
-
+  console.log('$ yarn website:serve');
   const proc = execa('yarn', ['website:serve']);
   mutableCleanup.push(createKillProcess(proc));
 

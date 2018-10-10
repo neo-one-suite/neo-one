@@ -1,5 +1,7 @@
-// tslint:disable no-object-mutation
-// @ts-ignore
-process.stdout = {
-  isTTY: undefined,
-};
+// tslint:disable no-object-mutation strict-type-predicates
+if (typeof window !== 'undefined') {
+  // @ts-ignore
+  process.stdout = {
+    isTTY: undefined,
+  };
+}

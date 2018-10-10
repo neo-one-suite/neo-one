@@ -70,6 +70,8 @@
     "website:start": "yarn run react-static start"
   },
   "sideEffects": [
+    "src/index.tsx",
+    "src/polyfill.ts",
     "*.css"
   ]
 }
