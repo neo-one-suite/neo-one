@@ -83,13 +83,29 @@ export const PasswordRequiredError = makeErrorWithCode(
 export const NothingToTransferError = makeErrorWithCode('NOTHING_TO_TRANSFER', () => 'Nothing to transfer.');
 export const LedgerNotSupportedError = makeErrorWithCode(
   'LEDGER_NOT_SUPPORTED',
-  () => `Ledger not supported by your machine.`,
+  () => 'Ledger not supported by your machine.',
 );
 export const LedgerNotDetectedError = makeErrorWithCode(
   'LEDGER_NOT_DETECTED',
-  () => `Ledger not detected by your machine.`,
+  () => 'Ledger not detected by your machine.',
 );
 export const LedgerStatusCodeError = makeErrorWithCode(
   'BAD_LEDGER_STATUS_CODE',
-  (code: string) => `Received status code ${code} from ledger.`,
+  (code: string) => `Received unknown status code ${code} from ledger.`,
+);
+export const LedgerMessageSizeError = makeErrorWithCode(
+  'LEDGER_MESSAGE_OVERSIZED',
+  () => 'Ledger signing failed, message too large. [CODE: 6d08]',
+);
+export const LedgerNEOAppError = makeErrorWithCode(
+  'LEDGER_NEO_APP_ERROR',
+  () => 'Ledger NEO App error, check ledger. [CODE: 6e00]',
+);
+export const LedgerTransactionDenied = makeErrorWithCode(
+  'LEDGER_TRANSACTION_DENIED',
+  () => 'Ledger transaction denied. [CODE: 6985]',
+);
+export const LedgerParseError = makeErrorWithCode(
+  'LEDGER_PARSE_ERROR',
+  () => 'Ledger transaction parsing error. [CODE: 6d07]',
 );
