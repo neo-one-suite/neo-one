@@ -1,9 +1,10 @@
 // tslint:disable no-any
+import { Link } from '@neo-one/react-common';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-static';
 import { as, Flex, styled, Toolbar } from 'reakit';
 import { prop } from 'styled-tools';
-import { Link, Logo } from '../elements';
+import { Logo } from '../elements';
 import { ComponentProps } from '../types';
 
 const Wrapper = styled(Flex)`
@@ -70,6 +71,8 @@ const NavigationLink = styled(FocusableRouterLink)`
   }
 `;
 
+const FocusableLink: any = as(Link as any)(Toolbar.Focusable);
+
 export const Header = (props: ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledToolbar>
@@ -85,14 +88,14 @@ export const Header = (props: ComponentProps<typeof Wrapper>) => (
         </NavigationLink>
       </Toolbar.Content>
       <Toolbar.Content align="end">
-        <Toolbar.Focusable
+        <FocusableLink
+          linkColor="gray"
           data-test="header-github"
-          as={Link}
           href="https://github.com/neo-one-suite/neo-one"
           target="_blank"
         >
           GitHub
-        </Toolbar.Focusable>
+        </FocusableLink>
       </Toolbar.Content>
     </StyledToolbar>
   </Wrapper>

@@ -21,7 +21,7 @@ const Wrapper = styled(Grid)`
 
 const FooterWrapper = styled(Grid)`
   grid-gap: 8px;
-  padding: 16px;
+  padding: 8px;
   grid-auto-flow: column;
   grid-auto-columns: auto;
   justify-content: end;

@@ -1,7 +1,6 @@
 export * from './Background';
 export * from './LineLogoPrimary';
 export * from './LineLogo';
-export * from './Link';
 export * from './Logo';
 export * from './Markdown';
 export * from './Monogram';

@@ -1,9 +1,10 @@
 // tslint:disable no-any
+import { Link } from '@neo-one/react-common';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-static';
 import { as, Flex, styled, Toolbar } from 'reakit';
 import { prop } from 'styled-tools';
-import { LineLogoPrimary, Link } from '../../elements';
+import { LineLogoPrimary } from '../../elements';
 import { ComponentProps } from '../../types';
 
 const Wrapper = styled(Flex)`
@@ -43,15 +44,7 @@ const LogoLink = styled(FocusableRouterLink)`
   }
 `;
 
-const StyledLink = styled(Link)`
-  &&& {
-    color: ${prop('theme.primary')};
-
-    &:hover {
-      color: ${prop('theme.primaryDark')};
-    }
-  }
-`;
+const FocusableLink: any = as(Link as any)(Toolbar.Focusable);
 
 export const CourseHeader = (props: ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
@@ -62,9 +55,9 @@ export const CourseHeader = (props: ComponentProps<typeof Wrapper>) => (
         </LogoLink>
       </Toolbar.Content>
       <Toolbar.Content align="end">
-        <Toolbar.Focusable as={StyledLink} href="/" target="_blank">
+        <FocusableLink linkColor="primary" href="/" target="_blank">
           Docs
-        </Toolbar.Focusable>
+        </FocusableLink>
       </Toolbar.Content>
     </StyledToolbar>
   </Wrapper>

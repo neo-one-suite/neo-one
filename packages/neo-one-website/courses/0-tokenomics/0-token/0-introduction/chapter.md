@@ -44,4 +44,4 @@ At this point, we have a basic compilable NEO•ONE smart contract. Go ahead and
 
 `Token.test.ts` is very basic right now, it just checks that the `Token` smart contract exists and was compiled correctly. In later chapters we'll explore the NEO•ONE client APIs which are used to interact with smart contracts both in the front-end and in tests.
 
-If you ever get stuck, click the `Help` link in the editor toolbar for information on where to get help, including a link to the NEO•ONE Discord where you can get live help. See the solution for a particular chapter by clicking `Reveal Solution` at the bottom of the course material.
+If you ever get stuck, click the `Help` link in the editor toolbar for information on where to get help, including a link to the NEO•ONE Discord where you can get live help. See the solution for a particular chapter by clicking `Show Solution` at the bottom of the course material.

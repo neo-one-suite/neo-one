@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Grid, Hidden, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { selectConsoleOpen } from './redux';
-import { BuildAction, Console, FileType, Problems, RunTestsAction } from './toolbar';
+import { BuildAction, Console, Feedback, FileType, Help, Problems, RunTestsAction } from './toolbar';
 import { EditorFile, TextRange } from './types';
 
 const Wrapper = styled(Grid)`
@@ -18,7 +18,6 @@ const Wrapper = styled(Grid)`
 
 const ToolbarWrapper = styled(Grid)`
   width: 100%;
-  overflow-x: scroll;
   background-color: ${prop('theme.accent')};
   padding: 0 4px;
   gap: 8px;
@@ -52,11 +51,13 @@ const EditorToolbarBase = ({ file, onSelectRange, consoleOpen, ...props }: Props
     <ToolbarWrapper>
       <ToolbarLeftWrapper>
         <Problems />
-      </ToolbarLeftWrapper>
-      <ToolbarRightWrapper>
         <FileType file={file} />
         <BuildAction />
         <RunTestsAction />
+      </ToolbarLeftWrapper>
+      <ToolbarRightWrapper>
+        <Help />
+        <Feedback />
       </ToolbarRightWrapper>
     </ToolbarWrapper>
   </Wrapper>

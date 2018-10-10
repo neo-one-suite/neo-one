@@ -26,7 +26,7 @@ Let's call the token 'Eon', give it the symbol 'EON' and make it have 8 decimals
 
 ## Test
 
-Now that we've added the properties, `Build` the contract and then `Run Tests`. Remember, if you ever get stuck feel free to take a look at the solution code by clicking `Reveal Solution` at the bottom of the page.
+Now that we've added the properties, `Build` the contract and then `Run Tests`. Remember, if you ever get stuck feel free to take a look at the solution code by clicking `Show Solution` at the bottom of the page.
 
 ## Wrap Up
 
