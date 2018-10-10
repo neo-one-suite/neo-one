@@ -54,7 +54,7 @@
     "styled-tools": "^1.5.1",
     "sucrase": "^3.5.0",
     "ts-node": "^7.0.1",
-    "typescript": "3.1.1",
+    "typescript": "3.1.2",
     "typescript-fsa": "^3.0.0-beta-2",
     "typescript-fsa-reducers": "^1.0.0",
     "webpack": "4.20.2"

@@ -17,7 +17,7 @@
     "lodash": "^4.17.11",
     "memdown": "^3.0.0",
     "rxjs": "^6.3.3",
-    "typescript": "3.1.1",
+    "typescript": "3.1.2",
     "tslib": "^1.9.3"
   },
   "sideEffects": false
