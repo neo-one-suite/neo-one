@@ -52,7 +52,7 @@
     "koa-connect": "2.0.1",
     "mini-html-webpack-plugin": "0.2.3",
     "semver": "5.5.1",
-    "style-loader": "0.23.0",
+    "style-loader": "0.23.1",
     "ts-jest": "23.10.4",
     "ts-node": "7.0.1",
     "tslint": "5.11.0",
