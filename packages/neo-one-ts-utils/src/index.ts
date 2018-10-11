@@ -29,6 +29,7 @@ export { ArgumentedNode, BodiedNode, BodyableNode, ParameteredNode } from './bas
 export { AnyNameableNode, PropertyNamedNode } from './node';
 export { StatementedNode } from './statement';
 export { ClassInstanceMemberType } from './class_';
+export { symbolKey } from './symbolKey';
 
 // tslint:disable-next-line export-name
 export const tsUtils = {
