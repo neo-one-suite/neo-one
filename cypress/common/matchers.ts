@@ -107,13 +107,13 @@ export const runTests = ({ failing, passing, suites }: Tests) => {
   });
 
   if (passing > 0) {
-    cy.get('[data-test=test-summary-header] [data-test=test-summary-header-passing]').should(
+    cy.get('[data-test=test-summary-header] [data-test=test-summary-header-passing]', { timeout: 30000 }).should(
       'have.text',
       `${passing}Passed`,
     );
   }
   if (failing > 0) {
-    cy.get('[data-test=test-summary-header] [data-test=test-summary-header-failing]').should(
+    cy.get('[data-test=test-summary-header] [data-test=test-summary-header-failing]', { timeout: 30000 }).should(
       'have.text',
       `${failing}Failed`,
     );
@@ -220,21 +220,30 @@ const checkTest = ({ name, state, error }: Test) => {
 export const enterSolution = ({ path }: { readonly path: string }) => {
   cy.get('[data-test=docs-footer-solution-button]').click();
   cy.get(`[data-test="docs-solution-file-tab-${path}"]`).click();
-  cy.get('[data-test=monaco-editor] .view-lines').click();
-  cy.get('[data-test=monaco-editor] > div').should('have.class', 'focused');
   cy.get('[data-test=monaco-editor] textarea')
-    .type('{cmd}a')
-    .type('{backspace}');
+    .type('{cmd}a', { force: true })
+    .type('{backspace}', { force: true });
   cy.get('[data-test=docs-solution-markdown] > .code-toolbar > pre > code').then(($outerEl) => {
     const values = $outerEl.text().split('{');
 
     values.forEach((value, idx) => {
-      cy.get('[data-test=monaco-editor] textarea').type(value);
+      const innerValues = value.split('(');
+      innerValues.forEach((innerValue, innerIdx) => {
+        cy.get('[data-test=monaco-editor] textarea').type(innerValue, { force: true });
+
+        if (innerIdx !== innerValues.length - 1) {
+          cy.get('[data-test=monaco-editor] textarea').type('(', { force: true });
+          cy.wait(50);
+          cy.get('[data-test=monaco-editor] textarea').type('{rightarrow}', { force: true });
+          cy.get('[data-test=monaco-editor] textarea').type('{backspace}', { force: true });
+        }
+      });
+
       if (idx !== values.length - 1) {
-        cy.get('[data-test=monaco-editor] textarea').type('{');
+        cy.get('[data-test=monaco-editor] textarea').type('{', { force: true });
         cy.wait(50);
-        cy.get('[data-test=monaco-editor] textarea').type('{rightarrow}');
-        cy.get('[data-test=monaco-editor] textarea').type('{backspace}');
+        cy.get('[data-test=monaco-editor] textarea').type('{rightarrow}', { force: true });
+        cy.get('[data-test=monaco-editor] textarea').type('{backspace}', { force: true });
       }
     });
   });
