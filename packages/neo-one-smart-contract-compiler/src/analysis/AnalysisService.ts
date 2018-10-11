@@ -1,5 +1,5 @@
 import { addressToScriptHash, common, ECPoint, UInt160, UInt256 } from '@neo-one/client-common';
-import { AnyNameableNode, tsUtils } from '@neo-one/ts-utils';
+import { AnyNameableNode, symbolKey, tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
 import {
@@ -17,7 +17,7 @@ import {
 import { Context } from '../Context';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
-import { createMemoized, nodeKey, symbolKey, typeKey } from '../utils';
+import { createMemoized, nodeKey, typeKey } from '../utils';
 
 export interface ErrorDiagnosticOptions {
   readonly error?: boolean;
