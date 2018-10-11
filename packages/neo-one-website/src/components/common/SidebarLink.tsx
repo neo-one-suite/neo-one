@@ -1,8 +1,7 @@
 import { Link } from '@neo-one/react-common';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-static';
-import { as, Button, Hidden, styled } from 'reakit';
-import { prop } from 'styled-tools';
+import { as, Box, Hidden, styled } from 'reakit';
 import { HiddenAPI } from './types';
 
 export interface Props {
@@ -11,13 +10,9 @@ export interface Props {
   readonly hidden?: HiddenAPI;
 }
 
-const StyledLink = styled(as(RouterLink)(Link))`
-  &:focus {
-    color: ${prop('theme.primaryDark')};
-  }
-`;
+const SectionLink = as(RouterLink)(Link);
 
-const ListItem = styled(Button.as('li'))`
+const ListItem = styled(Box.as('li'))`
   margin-top: 8px;
 `;
 
@@ -25,18 +20,18 @@ export const SidebarLink = ({ path, title, hidden, ...props }: Props) => {
   if (hidden === undefined) {
     return (
       <ListItem {...props}>
-        <StyledLink linkColor="gray" to={path}>
+        <SectionLink linkColor="gray" to={path}>
           {title}
-        </StyledLink>
+        </SectionLink>
       </ListItem>
     );
   }
 
   return (
     <Hidden.Hide as={ListItem} {...hidden} {...props}>
-      <StyledLink linkColor="gray" to={path}>
+      <SectionLink linkColor="gray" to={path}>
         {title}
-      </StyledLink>
+      </SectionLink>
     </Hidden.Hide>
   );
 };

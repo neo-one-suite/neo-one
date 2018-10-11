@@ -7,28 +7,24 @@ import { AdjacentInfo } from '../../utils';
 
 export interface Props {
   readonly adjacent: AdjacentInfo;
-  readonly next: boolean;
+  readonly next?: boolean;
 }
 
 const ArticleText = styled(Box)`
   ${prop('theme.fonts.axiformaRegular')};
+  ${prop('theme.fontStyles.body1')};
   color: ${prop('theme.gray0')};
-
-  @media (max-width: ${prop('theme.breakpoints.md')}) {
-    font-size: 12px;
-  }
 `;
 
 const StyledLink = styled(as(RouterLink)(Link))`
   ${prop('theme.fontStyles.headline')};
-  color: ${prop('theme.primary')};
 
   @media (max-width: ${prop('theme.breakpoints.md')}) {
-    ${prop('theme.fontStyles.body2')};
+    ${prop('theme.fontStyles.subheading')};
   }
 `;
 
-export const AdjacentLink = ({ adjacent, next, ...props }: Props) => {
+export const AdjacentLink = ({ adjacent, next = false, ...props }: Props) => {
   const adjacentPath = `/docs/${adjacent.slug}`;
 
   return (

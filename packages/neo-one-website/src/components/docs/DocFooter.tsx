@@ -19,7 +19,7 @@ const Wrapper = styled(Grid)`
 
 export const DocFooter = ({ next, previous, ...props }: Props) => (
   <Wrapper {...props}>
-    {previous === undefined ? <Box /> : <AdjacentLink next={false} adjacent={previous} />}
-    {next === undefined ? <Box /> : <AdjacentLink next={true} adjacent={next} />}
+    {previous === undefined ? <Box /> : <AdjacentLink adjacent={previous} />}
+    {next === undefined ? <Box /> : <AdjacentLink next adjacent={next} />}
   </Wrapper>
 );
