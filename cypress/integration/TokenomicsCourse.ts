@@ -5,7 +5,13 @@ describe('Tokenomics', () => {
     cy.visit('/course');
 
     prepareCourseTest({
-      slugs: ['/course/tokenomics/1/1', '/course/tokenomics/1/2', '/course/tokenomics/1/3', '/course/tokenomics/1/4'],
+      slugs: [
+        '/course/tokenomics/1/1',
+        '/course/tokenomics/1/2',
+        '/course/tokenomics/1/3',
+        '/course/tokenomics/1/4',
+        '/course/tokenomics/1/5',
+      ],
     });
 
     cy.get('[data-test=tokenomics-lesson-0]').click();
@@ -175,6 +181,51 @@ describe('Tokenomics', () => {
               name: ['Token', 'has NEP-5 properties and methods'],
               state: 'fail',
               error: 'TypeError: token.balanceOf is not a function',
+            },
+          ],
+        },
+      ],
+    });
+    // Check for Problems
+    enterSolution({ path: 'one/contracts/Token.one.ts' });
+    build({ success: true });
+    // Check problems cleared
+    runTests({
+      passing: 1,
+      failing: 0,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 1,
+          failing: 0,
+          tests: [
+            {
+              name: ['Token', 'has NEP-5 properties and methods'],
+              state: 'pass',
+            },
+          ],
+        },
+      ],
+    });
+
+    // Lesson 1: Chapter 5
+    nextButton();
+    build({ success: true });
+    runTests({
+      passing: 0,
+      failing: 1,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 0,
+          failing: 1,
+          tests: [
+            {
+              name: ['Token', 'has NEP-5 properties and methods'],
+              state: 'fail',
+              error: 'TypeError: token.owner is not a function',
             },
           ],
         },
