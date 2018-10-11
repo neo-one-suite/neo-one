@@ -57,7 +57,7 @@ export default {
                 (obj) => obj.section,
               ),
             ).map(([section, subsections]) => ({
-              title: section,
+              section,
               subsections: subsections.map((subsection) => ({
                 title: subsection.title,
                 slug: subsection.slug,

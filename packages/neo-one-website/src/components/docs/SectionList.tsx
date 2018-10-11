@@ -1,20 +1,22 @@
 import * as React from 'react';
 import { List, styled } from 'reakit';
-import { Props as SubsectionProps, Subsection } from './Subsection';
+import { HiddenAPI, SidebarLink, SubsectionData } from '../common';
 
 export interface Props {
-  readonly subsections: ReadonlyArray<SubsectionProps>;
-  readonly onClick?: () => void;
+  readonly subsections: ReadonlyArray<SubsectionData>;
+  readonly hidden?: HiddenAPI;
 }
 
-const DocList = styled(List)`
+const Wrapper = styled(List)`
   list-style-type: none;
 `;
 
-export const SectionList = ({ subsections, onClick, ...props }: Props) => (
-  <DocList {...props}>
-    {subsections.map((subection) => (
-      <Subsection slug={subection.slug} title={subection.title} onClick={onClick} />
-    ))}
-  </DocList>
+export const SectionList = ({ subsections, hidden, ...props }: Props) => (
+  <Wrapper {...props}>
+    {subsections.map((subsection) => {
+      const path = `/docs/${subsection.slug}`;
+
+      return <SidebarLink path={path} title={subsection.title} hidden={hidden} />;
+    })}
+  </Wrapper>
 );

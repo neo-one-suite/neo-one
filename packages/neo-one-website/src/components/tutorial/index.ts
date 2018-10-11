@@ -1,1 +1,2 @@
-export * from './TutorialSidebar';
+export * from './TutorialSection';
+export * from './SidebarHeader';

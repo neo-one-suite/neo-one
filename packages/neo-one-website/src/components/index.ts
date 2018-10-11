@@ -3,3 +3,4 @@ export * from './Header';
 export * from './course';
 export * from './docs';
 export * from './tutorial';
+export * from './common';

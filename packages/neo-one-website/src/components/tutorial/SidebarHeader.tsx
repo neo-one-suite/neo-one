@@ -3,16 +3,16 @@ import { MdArrowDropDown } from 'react-icons/md';
 import { Box, styled } from 'reakit';
 import { prop } from 'styled-tools';
 
-const TitleBox = styled(Box)`
+const Wrapper = styled(Box)`
   display: inline-block;
   border-bottom: 3px solid ${prop('theme.accent')};
-  ${prop('theme.fonts.axiformaMedium')};
+  ${prop('theme.fonts.axiformaBold')};
   padding-top: 24px;
 `;
 
 export const SidebarHeader = ({ ...props }) => (
-  <TitleBox {...props}>
+  <Wrapper {...props}>
     Tutorial
     <MdArrowDropDown />
-  </TitleBox>
+  </Wrapper>
 );

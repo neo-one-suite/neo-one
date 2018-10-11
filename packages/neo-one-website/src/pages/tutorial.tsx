@@ -2,16 +2,16 @@ import * as React from 'react';
 import { withRouteData } from 'react-static';
 import { Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { TutorialSidebar } from '../components';
+import { Sidebar } from '../components';
 import { Markdown } from '../elements';
 import { CoreLayout } from '../layout';
 import { TutorialInfo } from '../utils';
 
-const GridTutorialSidebar = styled(TutorialSidebar)`
+const StyledSidebar = styled(Sidebar)`
   grid-area: sidebar;
 `;
 
-const TutorialMarkdown = styled(Markdown)`
+const StyledMarkdown = styled(Markdown)`
   grid-area: markdown;
   padding-left: 240px;
   padding-right: 240px;
@@ -23,7 +23,7 @@ const TutorialMarkdown = styled(Markdown)`
 `;
 
 const StyledGrid = styled(Grid)`
-  grid-template:
+  grid:
     'markdown sidebar' auto
     / 1fr 380px;
   grid-gap: 0;
@@ -31,7 +31,7 @@ const StyledGrid = styled(Grid)`
   overflow-wrap: break-word;
 
   @media (max-width: ${prop('theme.breakpoints.md')}) {
-    grid-template:
+    grid:
       'sidebar' auto
       'markdown' auto
       / 100%;
@@ -42,8 +42,8 @@ const StyledGrid = styled(Grid)`
 export default withRouteData(({ tutorial, sections }: TutorialInfo) => (
   <CoreLayout>
     <StyledGrid>
-      <TutorialMarkdown source={tutorial} />
-      <GridTutorialSidebar sections={sections} />
+      <StyledMarkdown source={tutorial} />
+      <StyledSidebar sections={sections} tutorial />
     </StyledGrid>
   </CoreLayout>
 ));

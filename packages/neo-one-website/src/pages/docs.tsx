@@ -2,32 +2,32 @@ import * as React from 'react';
 import { Redirect, withRouteData } from 'react-static';
 import { Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { DocFooter, SectionProps, Sidebar } from '../components';
+import { DocFooter, SectionData, Sidebar } from '../components';
 import { Markdown } from '../elements';
 import { CoreLayout } from '../layout';
 import { AdjacentInfo } from '../utils';
 
-const DocMarkdown = styled(Markdown)`
+const StyledMarkdown = styled(Markdown)`
   grid-area: markdown;
   padding-left: 240px;
   padding-right: 240px;
 
-  @media (max-width: ${prop('theme.breakpoints.md')}) {
+  @media (max-width: ${prop('theme.breakpoints.lg')}) {
     padding-left: 16px;
     padding-right: 16px;
   }
 `;
 
-const DocSidebar = styled(Sidebar)`
+const StyledSidebar = styled(Sidebar)`
   grid-area: sidebar;
 `;
 
-const GridDocFooter = styled(DocFooter)`
+const StyledDocFooter = styled(DocFooter)`
   grid-area: footer;
 `;
 
 const StyledGrid = styled(Grid)`
-  grid-template:
+  grid:
     'markdown sidebar' auto
     'footer sidebar' auto
     / 1fr 380px;
@@ -36,7 +36,7 @@ const StyledGrid = styled(Grid)`
   overflow-wrap: break-word;
 
   @media (max-width: ${prop('theme.breakpoints.md')}) {
-    grid-template:
+    grid:
       'sidebar' auto
       'markdown' auto
       'footer' auto
@@ -46,7 +46,7 @@ const StyledGrid = styled(Grid)`
 
 interface DocData {
   readonly doc: string;
-  readonly sidebar: ReadonlyArray<SectionProps>;
+  readonly sidebar: ReadonlyArray<SectionData>;
   readonly next?: AdjacentInfo;
   readonly previous?: AdjacentInfo;
 }
@@ -61,9 +61,9 @@ export default withRouteData((props?: DocData) => {
   return (
     <CoreLayout>
       <StyledGrid>
-        <DocMarkdown source={doc} />
-        <DocSidebar sectionProps={sidebar} />
-        <GridDocFooter next={next} previous={previous} />
+        <StyledMarkdown source={doc} />
+        <StyledSidebar sections={sidebar} />
+        <StyledDocFooter next={next} previous={previous} />
       </StyledGrid>
     </CoreLayout>
   );

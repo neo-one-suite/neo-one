@@ -9,7 +9,7 @@ interface Props {
   readonly previous?: AdjacentInfo;
 }
 
-const Footer = styled(Grid)`
+const Wrapper = styled(Grid)`
   grid-auto-flow: column;
   justify-content: space-between;
   background-color: ${prop('theme.black')};
@@ -18,8 +18,8 @@ const Footer = styled(Grid)`
 `;
 
 export const DocFooter = ({ next, previous, ...props }: Props) => (
-  <Footer {...props}>
-    {previous === undefined ? <Box grid-area="prev" /> : <AdjacentLink next={false} adjacent={previous} />}
-    {next === undefined ? <Box grid-area="next" /> : <AdjacentLink next={true} adjacent={next} />}
-  </Footer>
+  <Wrapper {...props}>
+    {previous === undefined ? <Box /> : <AdjacentLink next={false} adjacent={previous} />}
+    {next === undefined ? <Box /> : <AdjacentLink next={true} adjacent={next} />}
+  </Wrapper>
 );
