@@ -216,5 +216,8 @@ describe('Tokenomics', () => {
 
     // Lesson 2: Chapter 1
     lesson2({ error: "TypeError: Cannot read property 'confirmed' of undefined" });
+
+    // Lesson 2: Chapter 2
+    lesson2({ error: 'Error: expect(received).toBeDefined()' });
   });
 });

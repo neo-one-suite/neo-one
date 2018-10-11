@@ -1,5 +1,5 @@
 {
-  "title": "Receiving NEO and GAS",
+  "title": "Processing Native Assets",
   "files": [
     {
       "initial": "one/contracts/Token.one.ts",
