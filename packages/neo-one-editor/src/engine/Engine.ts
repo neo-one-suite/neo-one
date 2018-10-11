@@ -56,7 +56,7 @@ interface Modules {
   [path: string]: ModuleBase;
 }
 
-const BUILTIN_MODULES = new Set(['path']);
+const BUILTIN_MODULES = new Set(['path', 'bignumber.js']);
 
 export class Engine {
   public static async create({ id, initialFiles, testRunnerCallbacks }: EngineCreateOptions): Promise<Engine> {
