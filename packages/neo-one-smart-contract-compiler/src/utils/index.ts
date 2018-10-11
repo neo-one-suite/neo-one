@@ -5,7 +5,6 @@ export * from './getFixedDecimals';
 export * from './getForwardedValueType';
 export * from './getSetterName';
 export * from './nodeKey';
-export * from './symbolKey';
 export * from './throwOnDiagnosticErrorOrWarning';
 export * from './toABIReturn';
 export * from './typeKey';

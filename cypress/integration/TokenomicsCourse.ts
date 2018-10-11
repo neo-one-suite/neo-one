@@ -5,7 +5,15 @@ describe('Tokenomics', () => {
     cy.visit('/course');
 
     prepareCourseTest({
-      slugs: ['/course/tokenomics/1/1', '/course/tokenomics/1/2'],
+      slugs: [
+        '/course/tokenomics/1/1',
+        '/course/tokenomics/1/2',
+        '/course/tokenomics/1/3',
+        '/course/tokenomics/1/4',
+        '/course/tokenomics/1/5',
+        '/course/tokenomics/1/6',
+        '/course/tokenomics/1/7',
+      ],
     });
 
     cy.get('[data-test=tokenomics-lesson-0]').click();
@@ -46,7 +54,7 @@ describe('Tokenomics', () => {
         ],
       },
     ]);
-    enterSolution({ path: 'one/contracts/Token.one.ts', skipBackspace: true });
+    enterSolution({ path: 'one/contracts/Token.one.ts' });
     build({ success: true });
     // Check problems cleared
     runTests({
@@ -67,9 +75,9 @@ describe('Tokenomics', () => {
         },
       ],
     });
-    nextButton();
 
     // Lesson 1: Chapter 2
+    nextButton();
     build({ success: true });
     runTests({
       passing: 0,
@@ -93,6 +101,7 @@ describe('Tokenomics', () => {
     // Check for Problems
     enterSolution({ path: 'one/contracts/Token.one.ts' });
     build({ success: true });
+    // Check problems cleared
     runTests({
       passing: 1,
       failing: 0,
@@ -105,6 +114,231 @@ describe('Tokenomics', () => {
           tests: [
             {
               name: ['Token', 'has name, symbol and decimals properties'],
+              state: 'pass',
+            },
+          ],
+        },
+      ],
+    });
+
+    // Lesson 1: Chapter 3
+    nextButton();
+    build({ success: true });
+    runTests({
+      passing: 0,
+      failing: 1,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 0,
+          failing: 1,
+          tests: [
+            {
+              name: ['Token', 'has name, symbol, decimals and totalSupply properties'],
+              state: 'fail',
+              error: 'TypeError: token.totalSupply is not a function',
+            },
+          ],
+        },
+      ],
+    });
+    // Check for Problems
+    enterSolution({ path: 'one/contracts/Token.one.ts' });
+    build({ success: true });
+    // Check problems cleared
+    runTests({
+      passing: 1,
+      failing: 0,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 1,
+          failing: 0,
+          tests: [
+            {
+              name: ['Token', 'has name, symbol, decimals and totalSupply properties'],
+              state: 'pass',
+            },
+          ],
+        },
+      ],
+    });
+
+    // Lesson 1: Chapter 4
+    nextButton();
+    build({ success: true });
+    runTests({
+      passing: 0,
+      failing: 1,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 0,
+          failing: 1,
+          tests: [
+            {
+              name: ['Token', 'has NEP-5 properties and methods'],
+              state: 'fail',
+              error: 'TypeError: token.balanceOf is not a function',
+            },
+          ],
+        },
+      ],
+    });
+    // Check for Problems
+    enterSolution({ path: 'one/contracts/Token.one.ts' });
+    build({ success: true });
+    // Check problems cleared
+    runTests({
+      passing: 1,
+      failing: 0,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 1,
+          failing: 0,
+          tests: [
+            {
+              name: ['Token', 'has NEP-5 properties and methods'],
+              state: 'pass',
+            },
+          ],
+        },
+      ],
+    });
+
+    // Lesson 1: Chapter 5
+    nextButton();
+    build({ success: true });
+    runTests({
+      passing: 0,
+      failing: 1,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 0,
+          failing: 1,
+          tests: [
+            {
+              name: ['Token', 'has NEP-5 properties and methods'],
+              state: 'fail',
+              error: 'TypeError: token.owner is not a function',
+            },
+          ],
+        },
+      ],
+    });
+    // Check for Problems
+    enterSolution({ path: 'one/contracts/Token.one.ts' });
+    build({ success: true });
+    // Check problems cleared
+    runTests({
+      passing: 1,
+      failing: 0,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 1,
+          failing: 0,
+          tests: [
+            {
+              name: ['Token', 'has NEP-5 properties and methods'],
+              state: 'pass',
+            },
+          ],
+        },
+      ],
+    });
+
+    // Lesson 1: Chapter 6
+    nextButton();
+    build({ success: true });
+    runTests({
+      passing: 0,
+      failing: 1,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 0,
+          failing: 1,
+          tests: [
+            {
+              name: ['Token', 'has NEP-5 properties and methods'],
+              state: 'fail',
+              error: "TypeError: Cannot read property 'confirmed' of undefined",
+            },
+          ],
+        },
+      ],
+    });
+    // Check for Problems
+    enterSolution({ path: 'one/contracts/Token.one.ts' });
+    build({ success: true });
+    // Check problems cleared
+    runTests({
+      passing: 1,
+      failing: 0,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 1,
+          failing: 0,
+          tests: [
+            {
+              name: ['Token', 'has NEP-5 properties and methods'],
+              state: 'pass',
+            },
+          ],
+        },
+      ],
+    });
+
+    // Lesson 1: Chapter 7
+    nextButton();
+    build({ success: true });
+    runTests({
+      passing: 0,
+      failing: 1,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 0,
+          failing: 1,
+          tests: [
+            {
+              name: ['Token', 'has NEP-5 properties and methods'],
+              state: 'fail',
+              error: 'Error: expect(received).toHaveLength(length)',
+            },
+          ],
+        },
+      ],
+    });
+    // Check for Problems
+    enterSolution({ path: 'one/contracts/Token.one.ts' });
+    build({ success: true });
+    // Check problems cleared
+    runTests({
+      passing: 1,
+      failing: 0,
+      suites: [
+        {
+          basename: 'Token.test.ts',
+          dirname: 'one/tests',
+          passing: 1,
+          failing: 0,
+          tests: [
+            {
+              name: ['Token', 'has NEP-5 properties and methods'],
               state: 'pass',
             },
           ],

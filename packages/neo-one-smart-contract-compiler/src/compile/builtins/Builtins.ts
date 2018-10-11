@@ -1,9 +1,9 @@
-import { tsUtils } from '@neo-one/ts-utils';
+import { symbolKey, tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { Context } from '../../Context';
-import { createMemoized, nodeKey, symbolKey, typeKey } from '../../utils';
+import { createMemoized, nodeKey, typeKey } from '../../utils';
 import { Builtin, isBuiltinValueObject } from './types';
 
 const getMember = (sym: ts.Symbol, name: string) => tsUtils.symbol.getMemberOrThrow(sym, name);

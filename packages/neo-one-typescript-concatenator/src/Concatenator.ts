@@ -1,22 +1,41 @@
-import { AnyNameableNode, tsUtils } from '@neo-one/ts-utils';
+import { AnyNameableNode, symbolKey, tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import toposort from 'toposort';
 import ts from 'typescript';
-import { Context } from '../Context';
-import { symbolKey } from '../utils';
+
+export interface ConcatenatorContext {
+  readonly typeChecker: ts.TypeChecker;
+  readonly program: ts.Program;
+  readonly languageService: ts.LanguageService;
+  readonly getSymbol: (node: ts.Node) => ts.Symbol | undefined;
+  readonly isIgnoreFile: (node: ts.ClassDeclaration) => boolean;
+  readonly isGlobalIdentifier: (value: string) => boolean;
+  readonly isGlobalFile: (node: ts.SourceFile) => boolean;
+  readonly isGlobalSymbol: (node: ts.Symbol) => boolean;
+}
+
+export interface ConcatenatorOptions {
+  readonly context: ConcatenatorContext;
+  readonly sourceFile: ts.SourceFile;
+}
 
 export class Concatenator {
   public readonly sourceFiles: ReadonlyArray<ts.SourceFile>;
+
+  private readonly sourceFile: ts.SourceFile;
+  private readonly context: ConcatenatorContext;
   private readonly duplicateIdentifiers: Set<string>;
+  private readonly sourceFileImported = new Set<ts.SourceFile>();
   private readonly sourceFileToImports: Map<ts.SourceFile, ts.ImportDeclaration> = new Map<
     ts.SourceFile,
     ts.ImportDeclaration
   >();
-  private readonly sourceFileImported = new Set<ts.SourceFile>();
 
-  public constructor(private readonly context: Context, private readonly sourceFile: ts.SourceFile) {
-    this.sourceFiles = this.getAllSourceFiles(sourceFile);
+  public constructor(options: ConcatenatorOptions) {
+    this.sourceFile = options.sourceFile;
+    this.context = options.context;
+    this.sourceFiles = this.getAllSourceFiles(this.sourceFile);
     this.duplicateIdentifiers = this.getAllDuplicateIdentifiers();
     this.consolidateAllImports();
   }
@@ -81,7 +100,8 @@ export class Concatenator {
 
     if (
       ts.isClassDeclaration(node) &&
-      ((tsUtils.modifier.isNamedExport(node) && !this.isSmartContract(node)) || tsUtils.modifier.isDefaultExport(node))
+      ((tsUtils.modifier.isNamedExport(node) && !this.isIgnoreFileInternal(node)) ||
+        tsUtils.modifier.isDefaultExport(node))
     ) {
       return tsUtils.setOriginal(
         ts.updateClassDeclaration(
@@ -188,8 +208,8 @@ export class Concatenator {
     return importDecl === undefined ? tsUtils.setOriginal(ts.createNotEmittedStatement(node), node) : importDecl;
   }
 
-  private isSmartContract(node: ts.ClassDeclaration): boolean {
-    return tsUtils.node.getSourceFile(node) === this.sourceFile && this.context.analysis.isSmartContract(node);
+  private isIgnoreFileInternal(node: ts.ClassDeclaration): boolean {
+    return tsUtils.node.getSourceFile(node) === this.sourceFile && this.context.isIgnoreFile(node);
   }
 
   private getAllSourceFiles(sourceFile: ts.SourceFile): ReadonlyArray<ts.SourceFile> {
@@ -256,7 +276,7 @@ export class Concatenator {
       identifiers.forEach((identifier) => {
         if (
           !duplicateIdentifiers.has(identifier) &&
-          (this.context.builtins.isBuiltinIdentifier(identifier) ||
+          (this.context.isGlobalIdentifier(identifier) ||
             fileIdentifiers.some(
               (otherIdentifiers) => identifiers !== otherIdentifiers && otherIdentifiers.has(identifier),
             ))
@@ -274,7 +294,7 @@ export class Concatenator {
 
     const visit = (node: ts.Node) => {
       if (ts.isIdentifier(node) && this.isContainerSourceFileForDeclaration(node)) {
-        const symbol = this.context.analysis.getSymbol(node);
+        const symbol = this.context.getSymbol(node);
         const declarations = symbol === undefined ? [] : tsUtils.symbol.getDeclarations(symbol);
         if (
           symbol !== undefined &&
@@ -328,7 +348,7 @@ export class Concatenator {
         ),
       );
     const existingImport = this.sourceFileToImports.get(file);
-    const moduleSpecifier = this.context.builtins.isBuiltinFile(file)
+    const moduleSpecifier = this.context.isGlobalFile(file)
       ? ts.isStringLiteral(node.moduleSpecifier)
         ? tsUtils.setOriginal(ts.createStringLiteral(node.moduleSpecifier.text), node.moduleSpecifier)
         : node.moduleSpecifier
@@ -387,7 +407,7 @@ export class Concatenator {
   }
 
   private getIdentifierForNode(node: ts.Node): ts.Identifier | undefined {
-    const identifier = this.getIdentifierStringForSymbol(this.context.analysis.getSymbol(node));
+    const identifier = this.getIdentifierStringForSymbol(this.context.getSymbol(node));
 
     return identifier === undefined ? undefined : tsUtils.setOriginal(ts.createIdentifier(identifier), node);
   }
@@ -398,7 +418,7 @@ export class Concatenator {
     }
 
     let identifier: string | undefined;
-    if (this.context.builtins.isBuiltinSymbol(symbol)) {
+    if (this.context.isGlobalSymbol(symbol)) {
       identifier = tsUtils.symbol.getName(symbol);
     }
 
@@ -417,7 +437,7 @@ export class Concatenator {
   }
 
   private isContainerSourceFileForDeclaration(node: ts.Node): boolean {
-    return this.isContainerSourceFileForDeclarationSymbol(this.context.analysis.getSymbol(node));
+    return this.isContainerSourceFileForDeclarationSymbol(this.context.getSymbol(node));
   }
 
   private isContainerSourceFileForDeclarationSymbol(symbol: ts.Symbol | undefined): boolean {
@@ -450,7 +470,7 @@ export class Concatenator {
       return false;
     }
 
-    return this.context.builtins.isBuiltinFile(file);
+    return this.context.isGlobalFile(file);
   }
 
   private hasValueReference(node: ts.ImportDeclaration): boolean {
