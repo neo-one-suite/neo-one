@@ -1,4 +1,6 @@
-const { disableConsoleLogForTest } = require('@neo-one/client-switch');
+const {
+  disableConsoleLogForTest,
+} = require('../../packages/neo-one-client-switch/src/common/processConsoleLogMessages');
 
 disableConsoleLogForTest();
 jest.setTimeout(360 * 1000);
