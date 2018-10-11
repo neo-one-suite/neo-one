@@ -9,7 +9,7 @@ import { ChapterFile, SelectedChapter } from '../types';
 const Wrapper = styled(Grid)`
   grid:
     'header' auto
-    'solution' auto
+    'solution' 1fr
     / auto;
   grid-gap: 0;
   min-height: 0;
