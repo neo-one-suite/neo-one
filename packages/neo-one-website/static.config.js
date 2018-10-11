@@ -3,6 +3,8 @@ import _ from 'lodash';
 
 require('ts-node/register/transpile-only');
 const { getCourses } = require('./src/loaders/coursesLoader');
+const { getDocs } = require('./src/utils/getDocs');
+const { getTutorial } = require('./src/utils/getTutorial');
 
 // Paths Aliases defined through tsconfig.json
 export default {
@@ -12,7 +14,8 @@ export default {
     title: 'React Static',
   }),
   getRoutes: async () => {
-    const courses = await getCourses();
+    const [courses, docs, tutorial] = await Promise.all([getCourses(), getDocs(), getTutorial()]);
+
     return [
       {
         path: '/',
@@ -37,6 +40,39 @@ export default {
       {
         path: '/404',
         component: 'src/pages/404',
+      },
+      {
+        path: '/docs',
+        children: docs.map((doc) => ({
+          path: `${doc.slug}`,
+          component: 'src/pages/docs',
+          getData: async () => ({
+            sidebar: Object.entries(
+              _.groupBy(
+                docs.map((document) => ({
+                  title: document.title,
+                  slug: document.slug,
+                  section: document.section,
+                })),
+                (obj) => obj.section,
+              ),
+            ).map(([section, subsections]) => ({
+              section,
+              subsections: subsections.map((subsection) => ({
+                title: subsection.title,
+                slug: subsection.slug,
+              })),
+            })),
+            doc: doc.doc,
+            next: doc.next,
+            previous: doc.previous,
+          }),
+        })),
+      },
+      {
+        path: '/tutorial',
+        component: 'src/pages/tutorial',
+        getData: async () => tutorial,
       },
     ];
   },

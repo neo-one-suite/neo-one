@@ -1,5 +1,7 @@
-/* @flow */
 import MarkdownIt from 'markdown-it';
+import anchor from 'markdown-it-anchor';
+// @ts-ignore
+import TOC from 'markdown-it-table-of-contents';
 import * as React from 'react';
 import { css, styled } from 'reakit';
 import { prop } from 'styled-tools';
@@ -37,6 +39,7 @@ Prism.languages.ts = Prism.languages.typescript;
 // tslint:enable
 
 const md = MarkdownIt();
+
 const langPrefix = 'language-';
 md.set({
   html: false,
@@ -52,11 +55,13 @@ md.set({
 
     return `<pre${classAttribute}><code${classAttribute}>${code}</code></pre>`;
   },
-});
+})
+  .use(anchor)
+  .use(TOC, { includeLevel: [2] });
 
 const headerMargins = css`
-  margin-top: 16px;
-  margin-bottom: 16px;
+  margin-top: 40px;
+  margin-bottom: 32px;
 `;
 
 const Wrapper = styled.div`
@@ -65,27 +70,27 @@ const Wrapper = styled.div`
   overflow-wrap: break-word;
 
   & h1 {
-    ${prop('theme.fontStyles.display1')};
+    ${prop('theme.fontStyles.display2')};
     ${headerMargins};
   }
 
   & h2 {
-    ${prop('theme.fontStyles.headline')};
+    ${prop('theme.fontStyles.display1')};
     ${headerMargins};
   }
 
   & h3 {
-    ${prop('theme.fontStyles.subheading')};
+    ${prop('theme.fontStyles.headline')};
     ${headerMargins};
   }
 
   & h4 {
-    ${prop('theme.fontStyles.body2')};
+    ${prop('theme.fontStyles.subheading')};
     ${headerMargins};
   }
 
   & h5 {
-    ${prop('theme.fontStyles.body1')};
+    ${prop('theme.fontStyles.body2')};
     ${headerMargins};
   }
 
@@ -95,8 +100,8 @@ const Wrapper = styled.div`
   }
 
   & p {
-    margin-bottom: 8px;
-    margin-top: 8px;
+    margin-bottom: 16px;
+    margin-top: 16px;
   }
 
   & a {
