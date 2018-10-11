@@ -31,9 +31,12 @@ We've also introduced a few other concepts here. The first is the `Fixed` type -
 
 Finally, we have our first method, a getter that's been marked as `@constant`. This just tells the compiler that the method does not modify any storage properties, and thus can be invoked without submitting a transaction to the blockchain. Again, this will become more clear once we see how non-constant methods are invoked in the tests in later chapters.
 
-## Try
+## Instructions
 
-Phew, that was a lot of information to absorb at once. The good news is, now you get to try it out! Let's add a property called `mutableSupply` that's a `Fixed<8>` with an initial value of `0` to represent the current supply of our token. Additionally, add a `@constant` getter method called `totalSupply` which just returns the value of `mutableSupply`.
+Phew, that was a lot of information to absorb at once. The good news is, now you get to try it out!
+
+  1. Add a property called `mutableSupply` - a `Fixed<8>` with the value of `0`.
+  2. Add a `@constant` getter method called `totalSupply` which just returns the value of `mutableSupply`.
 
 ## Test
 

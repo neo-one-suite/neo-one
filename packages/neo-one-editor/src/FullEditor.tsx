@@ -28,7 +28,9 @@ const TestsPassContainer = connect(selectConsoleTestSuites)(
     if (
       consoleTestSuites.length > 0 &&
       consoleTestSuites.every(
-        (testSuite) => testSuite.tests.length > 0 && testSuite.tests.every((test) => test.status === 'pass'),
+        (testSuite) =>
+          testSuite.tests.length > 0 &&
+          testSuite.tests.every((test) => test.status === 'pass' || test.status === 'skip'),
       ) &&
       onTestsPass !== undefined
     ) {

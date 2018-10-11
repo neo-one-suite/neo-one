@@ -16,13 +16,13 @@ export class Example extends SmartContract {
 
 In this example contract we created a `string` property called `myStringProperty`. Smart contract callers can read this property by calling the `myStringProperty` method on the smart contract. Using the NEO•ONE client APIs, the property would be accessed as `example.myStringProperty()`.
 
-## Try
+## Instructions
 
 Let's call the token 'Eon', give it the symbol 'EON' and make it have 8 decimals. We can represent this by adding a few properties to the smart contract:
 
- - `name` - a `string` property with the value `'Eon'`.
- - `symbol` - a `string` property with the value `'EON'`.
- - `decimal` - a `number` property with the value `8`.
+  1. Add a property called `name` - a `string` with the value `'Eon'`.
+  2. Add a property called `symbol` - a `string` property with the value `'EON'`.
+  3. Add a property called `decimal` - a `number` property with the value `8`.
 
 ## Test
 

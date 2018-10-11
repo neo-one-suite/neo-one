@@ -24,9 +24,9 @@ export class Example extends SmartContract {}
 
 Let's break this down. First, we import `SmartContract` from `@neo-one/smart-contract`. This package contains all of the NEO•ONE smart contract types and is where the majority of imports will come from. `SmartContract` is a basic class that when extended marks the class as a NEO•ONE smart contract. We've extended it with a class called `Example` which will be used for all of the generated variable names in the NEO•ONE client APIs.
 
-## Try
+## Instructions
 
-Go ahead and enter the following into the `Token.one.ts` file:
+  1. Enter the following into the `Token.one.ts` file:
 
 ```typescript
 import { SmartContract } from '@neo-one/smart-contract';

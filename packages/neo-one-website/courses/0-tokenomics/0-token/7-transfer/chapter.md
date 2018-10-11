@@ -30,7 +30,7 @@ export class Example extends SmartContract {
 
 In this example, we attempt the transfer and if it succeeds, we want to run one set of logic, otherwise if it fails a different set of logic. Normally we might us a `try`/`catch` here, but errors don't propagate across smart contract boundaries, instead the entire transaction immediately fails, so instead we expect that the `transfer` method on the `Token` contract we're calling will return `false`.
 
-## Try
+## Instructions
 
 Alrighty, let's finish up the `Token` contract! Implement a `transfer` method that:
 

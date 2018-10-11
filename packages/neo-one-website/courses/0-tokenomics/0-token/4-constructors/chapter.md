@@ -28,13 +28,16 @@ Here we've defined a constructor that takes two arguments, an `Address` that wil
 
 `Address.isCaller` is how you can verify that the smart contract method was invoked directly by the argument `Address`. In this example, we do a sanity check that the `owner` is the one who deployed the smart contract, which eliminates the possibility of accidentally setting the `owner` to an address that the publisher of the smart contract doesn't own.
 
-## Try
+## Instructions
 
-In future chapters we'll want to verify that the smart contract caller is the owner of the contract, so let's go ahead and add a constructor with a single parameter property `owner` just like in the example above. We should also add the same sanity check as in the example.
+In future chapters we'll want to verify that the smart contract caller is the owner of the contract:
+
+  1. Add a constructor with a single parameter property `owner` just like in the example above.
+  2. Add the `Address.isCaller` sanity check.
 
 ## Test
 
-By now you should know the drill - build and run the tests! If all goes well, go ahead and click the `Next Chapter` button.
+By now you should know the drill - build and run the tests! If all goes well, go ahead and click the `Next Chapter` button. This chapter's tests are identical to the previous chapter because `withContracts` automatically deploys the contract to a local private network using the default arguments before passing the contract (as `token`) to our test method.
 
 ## Wrap Up
 

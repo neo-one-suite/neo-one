@@ -25,14 +25,12 @@ Look familiar? This is the same example from Chapter 3: Structured Storage. In t
 
 The main difference for the NEO•ONE client APIs is that methods require relaying a transaction to the blockchain. This makes sense because a non-constant method by definiton mutates storage, and we need to persist those changes to the blockchain.
 
-## Try
+## Instructions
 
-Let's start by adding a simple method `issue` which takes two parameters, the `Address` to issue tokens to and a `Fixed<8>` for the amount of tokens to issue. This method should do two things:
-
-  1. Increase the balance of the `Address` by the `Fixed<8>` amount.
-  2. Increase the `mutableSupply` by the `Fixed<8>` amount.
-
-In addition, let's make it so that only the `owner` of the smart contract can invoke the method by throwing an `Error` when `Address.isCaller` is not true for `owner`.
+  1. Add a simple method `issue` which takes two parameters, the `Address` to issue tokens to and a `Fixed<8>` for the amount of tokens to issue. This method should do two things:
+    1. Increase the balance of the `Address` by the `Fixed<8>` amount.
+    2. Increase the `mutableSupply` by the `Fixed<8>` amount.
+  2. Add a check for `Address.isCaller(owner)` and throw an `Error` if it does not return true.
 
 ## Test
 

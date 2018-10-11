@@ -22,9 +22,10 @@ In this very simple example, every time the `emitEvent` method is invoked, the `
 
 Now, what does that actually do? Well, events (also called notifications) are a way for your contract to communicate that something happened on the blockchain to your app front-end (or back-end), which can be 'listening' for certain events and take action when they happen. You might use this to update an external database, do analytics, or update a UI.
 
-## Try
+## Instructions
 
-Let's add an event called `transfer` with a `from` `Address | undefined` parameter, `to` `Address | undefined` parameter, and an `amount` `Fixed<8>` parameter. We'll use this later when we define the `transfer` method, but we can also use it now to represent issuing tokens - simply call the event notifier in the `issue` method with `from` set to `undefined` to indicate that we're minting new tokens.
+  1. Use `createEventNotifier` to create a notifier for an event called `transfer` with a `from` `Address | undefined` parameter, `to` `Address | undefined` parameter, and an `amount` `Fixed<8>` parameter.
+  2. Call the event notifier in the `issue` method with the `from` parameter set to `undefined` to indicate that we're minting new tokens.
 
 ## Test
 

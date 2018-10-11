@@ -25,9 +25,12 @@ We create `MapStorage` using the static `for` property, which makes it read as "
 
 Notice also that this method is not marked with `@constant` because it modifies the `MapStorage` by calling `set` on it. We won't create a non-constant method in this chapter though, it's only used for illustration.
 
-## Try
+## Instructions
 
-We need to store the balances of holders of Eon, so let's add a `readonly` property `balances` for a `MapStorage` from `Address` (the holder) to `Fixed<8>` (the holder's balance). Let's also add a `@constant` method to make it easy to query a holder's balance. The method should be called `balanceOf`, take a single argument `Address` and return a `Fixed<8>` from the `balances`.
+The token smart contract needs to store the balances of holders of Eon:
+
+  1. Add a `readonly` property `balances` - a `MapStorage` `for` `Address` (the holder) to `Fixed<8>` (the holder's balance).
+  2. Add a `@constant` method `balanceOf` that takes a single argument `Address` and returns a `Fixed<8>` from the `balances` property.
 
 ## Test
 
