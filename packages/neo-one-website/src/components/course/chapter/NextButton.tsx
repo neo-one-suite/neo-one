@@ -1,14 +1,17 @@
 // tslint:disable no-any
 import { Button } from '@neo-one/react';
 import * as React from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-static';
 import { as } from 'reakit';
 import { getChapterTo, getLessonTo } from '../common';
 import { selectCourse, selectLesson } from '../coursesData';
+import { completeChapter } from '../redux';
 import { Chapter, Lesson, SelectedChapter } from '../types';
 
 interface Props {
   readonly selected: SelectedChapter;
+  readonly complete: boolean;
   readonly onClick: () => void;
 }
 
@@ -26,7 +29,7 @@ const getNextLesson = (selected: SelectedChapter) => {
 
 const ButtonLink = as(Link)(Button);
 
-export const NextButton = ({ selected, onClick, ...props }: Props) => {
+const NextButtonBase = ({ selected, onClick, complete, ...props }: Props) => {
   const nextChapter = getNextChapter(selected);
   const nextLesson = getNextLesson(selected);
 
@@ -34,13 +37,13 @@ export const NextButton = ({ selected, onClick, ...props }: Props) => {
   let text: string;
   if (nextChapter !== undefined) {
     to = getChapterTo(selected.course, selected.lesson, selected.chapter + 1);
-    text = 'Next Chapter';
+    text = complete ? 'Next' : 'Skip';
   } else if (nextLesson !== undefined) {
     to = getLessonTo(selected.course, selected.lesson + 1);
-    text = 'Next Lesson';
+    text = complete ? 'Next' : 'Skip';
   } else {
     to = '/course';
-    text = 'Complete Course';
+    text = complete ? 'Complete Course' : 'Skip';
   }
 
   return (
@@ -49,3 +52,15 @@ export const NextButton = ({ selected, onClick, ...props }: Props) => {
     </ButtonLink>
   );
 };
+
+export const NextButton = connect(
+  undefined,
+  (dispatch, { selected, complete, onClick }: Props) => ({
+    onClick: () => {
+      if (!complete) {
+        dispatch(completeChapter(selected));
+      }
+      onClick();
+    },
+  }),
+)(NextButtonBase);

@@ -8,6 +8,7 @@ import { CourseState, selectChapterProgress } from '../redux';
 import { SelectedChapter } from '../types';
 import { DocsSolution } from './DocsSolution';
 import { NextButton } from './NextButton';
+import { PreviousButton } from './PreviousButton';
 
 const Wrapper = styled(Grid)`
   grid:
@@ -19,11 +20,22 @@ const Wrapper = styled(Grid)`
   border-top: 1px solid ${prop('theme.gray5')};
 `;
 
-const FooterWrapper = styled(Grid)`
+const FooterWrapperBase = styled(Grid)`
   grid-gap: 8px;
   padding: 8px;
   grid-auto-flow: column;
   grid-auto-columns: auto;
+`;
+
+const FooterWrapper = styled(FooterWrapperBase)`
+  justify-content: space-between;
+`;
+
+const FooterLeftWrapper = styled(FooterWrapperBase)`
+  justify-content: start;
+`;
+
+const FooterRightWrapper = styled(FooterWrapperBase)`
   justify-content: end;
 `;
 
@@ -48,12 +60,15 @@ const DocsFooterBase = ({ selected, complete, ...props }: Props) => (
           <DocsSolution selected={selected} />
         </StyledHidden>
         <FooterWrapper {...props}>
-          <Hidden.Toggle data-test="docs-footer-solution-button" as={Button} {...hidden}>
-            {hidden.visible ? 'Hide' : 'Show'} Solution
-          </Hidden.Toggle>
-          {complete ? (
-            <NextButton data-test="docs-footer-next-button" selected={selected} onClick={hidden.hide} />
-          ) : null}
+          <FooterLeftWrapper>
+            <PreviousButton selected={selected} onClick={hidden.hide} />
+          </FooterLeftWrapper>
+          <FooterRightWrapper>
+            <Hidden.Toggle data-test="docs-footer-solution-button" as={Button} {...hidden}>
+              {hidden.visible ? 'Hide' : 'Show'} Solution
+            </Hidden.Toggle>
+            <NextButton selected={selected} onClick={hidden.hide} complete={complete} />
+          </FooterRightWrapper>
         </FooterWrapper>
       </Wrapper>
     )}

@@ -2,9 +2,7 @@
 import { build, checkProblems, enterSolution, nextButton, prepareCourseTest, runTests, Test } from '../common';
 
 describe('Tokenomics', () => {
-  it('works e2e', () => {
-    cy.visit('/course');
-
+  beforeEach(() => {
     prepareCourseTest({
       slugs: [
         '/course/tokenomics/1/1',
@@ -16,13 +14,18 @@ describe('Tokenomics', () => {
         '/course/tokenomics/1/7',
         '/course/tokenomics/1/8',
         '/course/tokenomics/2/1',
+        '/course/tokenomics/2/2',
+        '/course/tokenomics/2/3',
       ],
     });
+  });
+
+  it('lesson 1 chapter 1', () => {
+    cy.visit('/course');
 
     cy.get('[data-test=tokenomics-lesson-0]').click();
     cy.get('[data-test=start]').click();
 
-    // Lesson 1: Chapter 1
     build({ success: false });
     runTests({
       passing: 0,
@@ -78,15 +81,28 @@ describe('Tokenomics', () => {
         },
       ],
     });
+  });
 
-    const lesson1 = ({
-      error,
-      testName = 'has NEP-5 properties and methods',
-    }: {
-      error: string;
-      testName?: string;
-    }) => {
-      nextButton();
+  const lesson1 = ({
+    error,
+    chapter,
+    testName = 'has NEP-5 properties and methods',
+  }: {
+    error: string;
+    chapter: number;
+    testName?: string;
+  }) => {
+    it(`Lesson 1 Chapter ${chapter}`, () => {
+      cy.visit('/course');
+
+      cy.get('[data-test=tokenomics-lesson-0]').click();
+      cy.get('[data-test=start]').click();
+
+      // tslint:disable-next-line no-loop-statement
+      for (let i = 0; i < chapter - 1; i += 1) {
+        nextButton();
+      }
+
       build({ success: true });
       runTests({
         passing: 0,
@@ -129,46 +145,47 @@ describe('Tokenomics', () => {
           },
         ],
       });
-    };
-
-    // Lesson 1: Chapter 2
-    lesson1({ testName: 'has name, symbol and decimals properties', error: 'TypeError: token.name is not a function' });
-
-    // Lesson 1: Chapter 3
-    lesson1({
-      testName: 'has name, symbol, decimals and totalSupply properties',
-      error: 'TypeError: token.totalSupply is not a function',
     });
+  };
 
-    // Lesson 1: Chapter 4
-    lesson1({ error: 'TypeError: token.balanceOf is not a function' });
+  lesson1({
+    chapter: 2,
+    testName: 'has name, symbol and decimals properties',
+    error: 'TypeError: token.name is not a function',
+  });
+  lesson1({
+    chapter: 3,
+    testName: 'has name, symbol, decimals and totalSupply properties',
+    error: 'TypeError: token.totalSupply is not a function',
+  });
+  lesson1({ chapter: 4, error: 'TypeError: token.balanceOf is not a function' });
+  lesson1({ chapter: 5, error: 'TypeError: token.owner is not a function' });
+  lesson1({ chapter: 6, error: "TypeError: Cannot read property 'confirmed' of undefined" });
+  lesson1({ chapter: 7, error: 'Error: expect(received).toHaveLength(length)' });
+  lesson1({ chapter: 8, error: "TypeError: Cannot read property 'confirmed' of undefined" });
 
-    // Lesson 1: Chapter 5
-    lesson1({ error: 'TypeError: token.owner is not a function' });
+  const lesson2 = ({
+    chapter,
+    error,
+    testName = 'has NEP-5 properties and methods',
+    skip = false,
+  }: {
+    chapter: number;
+    error: string;
+    testName?: string;
+    skip?: boolean;
+  }) => {
+    it(`Lesson 2 Chapter ${chapter}`, () => {
+      cy.visit('/course');
 
-    // Lesson 1: Chapter 6
-    lesson1({ error: "TypeError: Cannot read property 'confirmed' of undefined" });
+      cy.get('[data-test=tokenomics-lesson-1]').click();
+      cy.get('[data-test=start]').click();
 
-    // Lesson 1: Chapter 7
-    lesson1({ error: 'Error: expect(received).toHaveLength(length)' });
-
-    // Lesson 1: Chapter 8
-    lesson1({ error: "TypeError: Cannot read property 'confirmed' of undefined" });
-
-    const lesson2 = ({
-      error,
-      testName = 'has NEP-5 properties and methods',
-      skip = false,
-      skipNext = false,
-    }: {
-      error: string;
-      testName?: string;
-      skip?: boolean;
-      skipNext?: boolean;
-    }) => {
-      if (skipNext) {
+      // tslint:disable-next-line no-loop-statement
+      for (let i = 0; i < chapter - 1; i += 1) {
         nextButton();
       }
+
       build({ success: true });
       runTests({
         passing: 0,
@@ -229,17 +246,10 @@ describe('Tokenomics', () => {
           },
         ],
       });
-    };
+    });
+  };
 
-    // Lesson 2: Chapter 1
-    nextButton();
-    cy.get('[data-test=start]').click();
-    lesson2({ error: "TypeError: Cannot read property 'confirmed' of undefined", skip: true, skipNext: true });
-
-    // Lesson 2: Chapter 2
-    lesson2({ error: 'Error: expect(received).toBeDefined()', skip: true });
-
-    // Lesson 2: Chapter 3
-    lesson2({ error: 'TypeError: token.amountPerNEO is not a function' });
-  });
+  lesson2({ chapter: 1, error: "TypeError: Cannot read property 'confirmed' of undefined", skip: true });
+  lesson2({ chapter: 2, error: 'Error: expect(received).toBeDefined()', skip: true });
+  lesson2({ chapter: 3, error: 'TypeError: token.amountPerNEO is not a function' });
 });

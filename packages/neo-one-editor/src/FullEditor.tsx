@@ -1,6 +1,7 @@
 import { OutputMessage } from '@neo-one/local-browser';
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { Subscription } from 'rxjs';
 import { ReduxStoreProvider } from './containers';
 import { Editor, EditorFiles } from './editor';
 import {
@@ -62,6 +63,9 @@ interface State {
 
 class FullEditorBase extends React.Component<Props, State> {
   public readonly state: State = { files: [], buildFiles: [] };
+  private mutableOpenFilesSubscription: Subscription | undefined;
+  private mutableBuildFilesSubscription: Subscription | undefined;
+  private mutableOutputSubscription: Subscription | undefined;
 
   public componentDidMount(): void {
     this.initializeEngine(this.props);
@@ -99,31 +103,55 @@ class FullEditorBase extends React.Component<Props, State> {
   }
 
   private initializeEngine({ id, initialFiles, testRunnerCallbacks, appendOutput, clearStore }: Props): void {
+    this.dispose();
     this.setState({ engine: undefined, files: [], buildFiles: [] });
     clearStore();
     Engine.create({ id, initialFiles, testRunnerCallbacks })
       .then(async (engine) => {
-        this.setState({ engine, files: engine.openFiles$.getValue() });
-        engine.openFiles$.subscribe({
-          next: (files) => {
-            this.setState({ files });
-          },
-        });
-        engine.buildFiles$.subscribe({
-          next: (buildFiles) => {
-            this.setState({ buildFiles });
-          },
-        });
-        engine.output$.subscribe({
-          next: (output) => {
-            appendOutput(output);
-          },
-        });
+        if (this.props.id === id) {
+          this.setState({ engine, files: engine.openFiles$.getValue() });
+          this.mutableOpenFilesSubscription = engine.openFiles$.subscribe({
+            next: (files) => {
+              this.setState({ files });
+            },
+          });
+          this.mutableBuildFilesSubscription = engine.buildFiles$.subscribe({
+            next: (buildFiles) => {
+              this.setState({ buildFiles });
+            },
+          });
+          this.mutableOutputSubscription = engine.output$.subscribe({
+            next: (output) => {
+              appendOutput(output);
+            },
+          });
+        }
       })
       .catch((error) => {
         // tslint:disable-next-line no-console
         console.error(error);
       });
+  }
+
+  private dispose(): void {
+    if (this.state.engine !== undefined) {
+      this.state.engine.dispose();
+    }
+
+    this.disposeSubscription(this.mutableOpenFilesSubscription);
+    this.mutableOpenFilesSubscription = undefined;
+
+    this.disposeSubscription(this.mutableBuildFilesSubscription);
+    this.mutableBuildFilesSubscription = undefined;
+
+    this.disposeSubscription(this.mutableOutputSubscription);
+    this.mutableOutputSubscription = undefined;
+  }
+
+  private disposeSubscription(subscription: Subscription | undefined) {
+    if (subscription !== undefined) {
+      subscription.unsubscribe();
+    }
   }
 }
 

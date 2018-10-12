@@ -161,6 +161,10 @@ export class Engine {
     this.loadTranspiledModules();
   }
 
+  public dispose(): void {
+    // do nothing
+  }
+
   public get modules(): { readonly [path: string]: ModuleBase } {
     return this.mutableModules;
   }
