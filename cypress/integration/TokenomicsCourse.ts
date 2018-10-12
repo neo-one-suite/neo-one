@@ -1,4 +1,5 @@
-import { build, checkProblems, enterSolution, nextButton, prepareCourseTest, runTests } from '../common';
+// tslint:disable no-object-literal-type-assertion
+import { build, checkProblems, enterSolution, nextButton, prepareCourseTest, runTests, Test } from '../common';
 
 describe('Tokenomics', () => {
   it('works e2e', () => {
@@ -157,11 +158,17 @@ describe('Tokenomics', () => {
     const lesson2 = ({
       error,
       testName = 'has NEP-5 properties and methods',
+      skip = false,
+      skipNext = false,
     }: {
       error: string;
       testName?: string;
+      skip?: boolean;
+      skipNext?: boolean;
     }) => {
-      nextButton();
+      if (skipNext) {
+        nextButton();
+      }
       build({ success: true });
       runTests({
         passing: 0,
@@ -177,12 +184,17 @@ describe('Tokenomics', () => {
                 name: ['Token', testName],
                 state: 'fail',
                 error,
-              },
-              {
-                name: ['Token', 'has NEP-5 properties and methods'],
-                state: 'skip',
-              },
-            ],
+              } as Test,
+            ].concat(
+              skip
+                ? [
+                    {
+                      name: ['Token', 'has NEP-5 properties and methods'],
+                      state: 'skip',
+                    } as Test,
+                  ]
+                : [],
+            ),
           },
         ],
       });
@@ -203,21 +215,31 @@ describe('Tokenomics', () => {
               {
                 name: ['Token', testName],
                 state: 'pass',
-              },
-              {
-                name: ['Token', 'has NEP-5 properties and methods'],
-                state: 'skip',
-              },
-            ],
+              } as Test,
+            ].concat(
+              skip
+                ? [
+                    {
+                      name: ['Token', 'has NEP-5 properties and methods'],
+                      state: 'skip' as 'skip',
+                    } as Test,
+                  ]
+                : [],
+            ),
           },
         ],
       });
     };
 
     // Lesson 2: Chapter 1
-    lesson2({ error: "TypeError: Cannot read property 'confirmed' of undefined" });
+    nextButton();
+    cy.get('[data-test=start]').click();
+    lesson2({ error: "TypeError: Cannot read property 'confirmed' of undefined", skip: true, skipNext: true });
 
     // Lesson 2: Chapter 2
-    lesson2({ error: 'Error: expect(received).toBeDefined()' });
+    lesson2({ error: 'Error: expect(received).toBeDefined()', skip: true });
+
+    // Lesson 2: Chapter 3
+    lesson2({ error: 'TypeError: token.amountPerNEO is not a function' });
   });
 });
