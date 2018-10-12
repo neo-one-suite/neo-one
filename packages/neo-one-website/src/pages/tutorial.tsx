@@ -1,6 +1,8 @@
 // tslint:disable-next-line no-import-side-effect
 import '../polyfill';
 
+// @ts-ignore
+import { ViewportProvider } from '@render-props/viewport';
 import * as React from 'react';
 import { RouteData } from 'react-static';
 import { Grid, styled } from 'reakit';
@@ -46,13 +48,15 @@ export default () => (
   // @ts-ignore
   <RouteData Loader={DocsLoading}>
     {({ tutorial, sections }: TutorialInfo) => (
-      <CoreLayout path="tutorial">
-        <Helmet title="Tutorial: Into to NEO•ONE - NEO•ONE" />
-        <StyledGrid>
-          <StyledMarkdown source={tutorial} linkColor="accent" />
-          <StyledSidebar sections={sections} tutorial />
-        </StyledGrid>
-      </CoreLayout>
+      <ViewportProvider>
+        <CoreLayout path="tutorial">
+          <Helmet title="Tutorial: Into to NEO•ONE - NEO•ONE" />
+          <StyledGrid>
+            <StyledMarkdown source={tutorial} linkColor="accent" />
+            <StyledSidebar sections={sections} tutorial />
+          </StyledGrid>
+        </CoreLayout>
+      </ViewportProvider>
     )}
   </RouteData>
 );
