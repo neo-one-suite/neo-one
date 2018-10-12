@@ -252,4 +252,5 @@ describe('Tokenomics', () => {
   lesson2({ chapter: 1, error: "TypeError: Cannot read property 'confirmed' of undefined", skip: true });
   lesson2({ chapter: 2, error: 'Error: expect(received).toBeDefined()', skip: true });
   lesson2({ chapter: 3, error: 'TypeError: token.amountPerNEO is not a function' });
+  lesson2({ chapter: 4, error: 'Error: expect(received).toBeDefined()' });
 });
