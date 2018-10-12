@@ -6,8 +6,11 @@
   "dependencies": {
     "@neo-one/ts-utils": "^1.0.0-preview.0",
     "@neo-one/utils": "^1.0.0-preview.0",
+    "@types/app-root-dir":"^0.1.0",
     "@types/lodash": "^4.14.117",
     "@types/toposort": "^2.0.1",
+    "app-root-dir": "^1.0.2",
+    "fs-extra":"^7.0.0",
     "lodash": "^4.17.11",
     "toposort": "^2.0.2",
     "typescript": "3.1.2"

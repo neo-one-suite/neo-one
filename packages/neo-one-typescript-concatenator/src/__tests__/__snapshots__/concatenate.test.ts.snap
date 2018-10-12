@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Concatenator Testing Suite Mk 1.3b.73 constImportExports concatenation test 1`] = `
+Object {
+  "sourceMap": Object {
+    "file": "index.ts",
+    "mappings": "AAAO,MAAM,GAAG,GAAG,KAAK,CAAC;ACAzB,MAAM,GAAG,GAAG,KAAK,CAAC;AACX,MAAM,IAAI,GAAG,GAAG,CAAC;ACExB,OAAO,EAAE,GAAG,IAAI,GAAG,EAAE,CAAC;AACtB,OAAO,EAAE,IAAI,IAAI,GAAG,EAAE,CAAC",
+    "names": Array [],
+    "sourceRoot": "/Users/danielbyrne/neo-one/packages/neo-one-typescript-concatenator/src/__data__/test-directories/constImportExports/index.ts/",
+    "sources": Array [
+      "foo.ts",
+      "fizz.ts",
+      "index.ts",
+    ],
+    "sourcesContent": Array [
+      "export const foo = 'foo';
+",
+      "const foo = 'bar';
+export const fizz = foo;
+",
+      "import * as fizz from './fizz';
+import * as foo from './foo';
+
+export { foo as bar };
+export { fizz as foo };
+",
+    ],
+    "version": 3,
+  },
+  "text": "const sc1 = 'foo';
+const sc2 = 'bar';
+const fizz = sc2;
+export { foo as bar };
+export { fizz as foo };
+",
+}
+`;

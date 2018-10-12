@@ -1,14 +1,12 @@
+import { tsUtils } from '@neo-one/ts-utils';
 import * as fs from 'fs-extra';
 import path from 'path';
 import ts from 'typescript';
-
-const parseHost: ts.ParseConfigHost = {
-  test: 'boop',
-};
+import { Concatenator } from './Concatenator';
 
 export function concatenate(entry: string) {
   const servicesHost: ts.LanguageServiceHost = {
-    getScriptFileNames: () => [...entry],
+    getScriptFileNames: () => [entry],
     getScriptVersion: () => '0',
     getScriptSnapshot: (fileName) => {
       // tslint:disable-next-line no-non-null-assertion
@@ -27,14 +25,19 @@ export function concatenate(entry: string) {
       }
       const text = fs.readFileSync(configPath, 'utf8');
       const parseResult = ts.parseConfigFileTextToJson(configPath, text);
-      const result = ts.parseJsonConfigFileContent(
+
+      return ts.parseJsonConfigFileContent(
         parseResult.config,
-        xd,
+        {
+          useCaseSensitiveFileNames: true,
+          readDirectory: ts.sys.readDirectory,
+          fileExists: ts.sys.fileExists,
+          readFile: ts.sys.readFile,
+        },
         path.dirname(configPath),
         undefined,
         undefined,
-      );
-      const options = result.options;
+      ).options;
     },
     getDefaultLibFileName: (opts) => ts.getDefaultLibFilePath(opts),
     useCaseSensitiveFileNames: () => ts.sys.useCaseSensitiveFileNames,
@@ -42,6 +45,54 @@ export function concatenate(entry: string) {
     fileExists: ts.sys.fileExists,
     readFile: ts.sys.readFile,
     readDirectory: ts.sys.readDirectory,
-    resolveModuleNames,
   };
+
+  const languageService = ts.createLanguageService(servicesHost);
+  const program = languageService.getProgram();
+  if (program === undefined) {
+    throw new Error('hmmm');
+  }
+  const typeChecker = program.getTypeChecker();
+
+  const getSymbol = (node: ts.Node) => {
+    const symbol = tsUtils.node.getSymbol(typeChecker, node);
+    if (symbol === undefined) {
+      return undefined;
+    }
+
+    const aliased = tsUtils.symbol.getAliasedSymbol(typeChecker, symbol);
+    if (aliased !== undefined) {
+      return aliased;
+    }
+
+    return symbol;
+  };
+
+  const isIgnoreFile = () => false;
+  const isGlobalIdentifier = () => false;
+  const isGlobalFile = () => false;
+  const isGlobalSymbol = () => false;
+
+  const sourceFile = tsUtils.file.getSourceFileOrThrow(program, entry);
+
+  const concatenator = new Concatenator({
+    context: {
+      typeChecker,
+      program,
+      languageService,
+      getSymbol,
+      isIgnoreFile,
+      isGlobalIdentifier,
+      isGlobalFile,
+      isGlobalSymbol,
+    },
+    sourceFile,
+  });
+
+  const sourceFiles = concatenator.sourceFiles;
+  if (sourceFiles.length === 0 || sourceFiles.length === 1) {
+    return undefined;
+  }
+
+  return tsUtils.printBundle(program, sourceFiles, concatenator.substituteNode);
 }

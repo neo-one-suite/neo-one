@@ -179,6 +179,9 @@ export class Concatenator {
     }
 
     if (ts.isExportDeclaration(node)) {
+      // WIP
+      // return node;
+
       return tsUtils.setOriginal(ts.createNotEmittedStatement(node), node);
     }
 
@@ -276,6 +279,7 @@ export class Concatenator {
       identifiers.forEach((identifier) => {
         if (
           !duplicateIdentifiers.has(identifier) &&
+          // !this.entryExportedSymbols.has(identifier)
           (this.context.isGlobalIdentifier(identifier) ||
             fileIdentifiers.some(
               (otherIdentifiers) => identifiers !== otherIdentifiers && otherIdentifiers.has(identifier),
