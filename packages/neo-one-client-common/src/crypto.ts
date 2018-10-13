@@ -14,6 +14,7 @@ import {
   InvalidNumberOfKeysError,
   InvalidPrivateKeyError,
   InvalidSignatureError,
+  InvalidSignaturesError,
   TooManyPublicKeysError,
 } from './errors';
 import { WitnessModel } from './models';
@@ -57,6 +58,7 @@ const sign = ({ message, privateKey }: { readonly message: Buffer; readonly priv
 };
 
 // tslint:disable readonly-array
+/* istanbul ignore next */
 const rmPadding = (buf: number[]): number[] => {
   let i = 0;
   const len = buf.length - 1;
@@ -70,7 +72,7 @@ const rmPadding = (buf: number[]): number[] => {
 
   return buf.slice(i);
 };
-
+/* istanbul ignore next */
 const constructLength = (arr: number[], len: number): void => {
   if (len < 0x80) {
     arr.push(len);
@@ -106,6 +108,7 @@ const verify = ({
 
   // tslint:disable-next-line
   if (r[0] & 0x80) {
+    /* istanbul ignore next */
     r = [0].concat(r);
   }
   // tslint:disable-next-line
@@ -118,6 +121,7 @@ const verify = ({
 
   // tslint:disable-next-line
   while (s.length > 0 && !s[0] && !(s[1] & 0x80)) {
+    /* istanbul ignore next */
     s = s.slice(1);
   }
   let arr = [0x02];
@@ -158,6 +162,7 @@ const privateKeyToPublicKey = (privateKey: PrivateKey): ECPoint => {
     const key = ec().keyFromPrivate(common.privateKeyToBuffer(privateKey));
     key.getPublic(true, 'hex');
     const { result } = key.validate();
+    /* istanbul ignore next */
     if (!result) {
       throw new InvalidPrivateKeyError(privateKey);
     }
@@ -183,12 +188,6 @@ const toScriptHash = hash160;
 
 // Takes various formats and converts to standard ECPoint
 const toECPoint = (publicKey: Buffer): ECPoint => toECPointFromKeyPair(ec().keyFromPublic(publicKey));
-
-const isInfinity = (ecPoint: ECPoint): boolean =>
-  ec()
-    .keyFromPublic(ecPoint)
-    .getPublic()
-    .isInfinity();
 
 const base58Checksum = (buffer: Buffer): Buffer => common.uInt256ToBuffer(hash256(buffer)).slice(0, 4);
 
@@ -284,6 +283,7 @@ const compareKeys = (a: EC.KeyPair, b: EC.KeyPair): number => {
     return result;
   }
 
+  /* istanbul ignore next */
   return aPublic.getY().cmp(bPublic.getY());
 };
 
@@ -336,7 +336,7 @@ const createMultiSignatureWitness = <TWitness extends WitnessModel>(
     .map((publicKey) => publicKeyToSignature[common.ecPointToHex(publicKey)])
     .filter(utils.notNull);
   if (signatures.length !== m) {
-    throw new Error('Invalid signatures');
+    throw new InvalidSignaturesError(m, signatures.length);
   }
 
   const verification = createMultiSignatureVerificationScript(m, publicKeysSorted);
@@ -354,7 +354,8 @@ const wifToPrivateKey = (wif: string, privateKeyVersion: number): PrivateKey => 
   const privateKeyDecoded = base58CheckDecode(wif);
 
   if (privateKeyDecoded.length !== 34 || privateKeyDecoded[0] !== privateKeyVersion || privateKeyDecoded[33] !== 0x01) {
-    throw new InvalidFormatError();
+    /* istanbul ignore next */
+    throw new InvalidFormatError('Private Key was invalid when decoded from WIF.');
   }
 
   return common.bufferToPrivateKey(privateKeyDecoded.slice(1, 33));
@@ -408,6 +409,7 @@ const getNEP2Derived = async ({
       NEP2_KDFPARAMS.p,
       NEP2_KDFPARAMS.dklen,
       (error, _progress, key) => {
+        /* istanbul ignore next */
         if (error != undefined) {
           reject(error);
         } else if (key) {
@@ -495,7 +497,8 @@ const decryptNEP2 = async ({
     decoded.readUInt8(1) !== NEP2_ONE ||
     decoded.readUInt8(2) !== NEP2_TWO
   ) {
-    throw new Error('Invalid NEP2 format.');
+    /* istanbul ignore next */
+    throw new InvalidFormatError('Invalid NEP2 format when decoded from encryptedKey.');
   }
 
   const salt = decoded.slice(3, 7);
@@ -513,6 +516,7 @@ const decryptNEP2 = async ({
 
   const addressSalt = getNEP2Salt({ addressVersion, privateKey });
   if (!salt.equals(addressSalt)) {
+    /* istanbul ignore next */
     throw new Error('Wrong passphrase.');
   }
 
@@ -530,7 +534,6 @@ export const crypto = {
   privateKeyToPublicKey,
   toScriptHash,
   toECPoint,
-  isInfinity,
   createKeyPair,
   scriptHashToAddress,
   addressToScriptHash,

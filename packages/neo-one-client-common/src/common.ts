@@ -2,6 +2,7 @@ import { makeErrorWithCode } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import BN from 'bn.js';
 
+/* istanbul ignore next */
 export const InvalidFormatError = makeErrorWithCode(
   'INVALID_FORMAT',
   (reason?: string) => `Invalid format${reason === undefined ? '.' : `: ${reason}`}`,
@@ -157,7 +158,7 @@ const asPrivateKey = (value: {}): PrivateKey => {
     return value;
   }
 
-  throw new InvalidFormatError('Invalid Private Key');
+  throw new InvalidFormatError(`Invalid Private Key, found: ${value}`);
 };
 
 const bufferToPrivateKey = asPrivateKey;

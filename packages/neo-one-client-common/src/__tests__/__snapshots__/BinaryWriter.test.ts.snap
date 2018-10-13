@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Binary Writer Tests Write FixedString 1`] = `
+Array [
+  "74657374",
+  "0000",
+]
+`;
+
+exports[`Binary Writer Tests Write Object 1`] = `
+Array [
+  "01",
+  "03",
+  "6f6e65",
+  "0100",
+]
+`;

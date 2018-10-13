@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Crypto Function Coverage CreateMultiSignatureVerificationScript - Multiple Keys 1`] = `"5321030d56c2d8dbe1069b910246f7f39d0f4b743557e90603f94fa1d5e8ab8f5fbcf02102ebbc1c117a9ab39a9bcfcb9e776feedee8ab870f5cdcdaee1dff07f1972996e42102f61596eafa6303d6782afee3f221254c028deeac620a28b96112a9d08594fd8853ae"`;
+
+exports[`Crypto Function Coverage CreateMultiSignatureVerificationScript - Single Key 1`] = `"512102f61596eafa6303d6782afee3f221254c028deeac620a28b96112a9d08594fd8851ae"`;
+
+exports[`Crypto Function Coverage CreateMultiSignatureWitness - Multiple Keys 1`] = `
+WitnessModel {
+  "invocation": "000000",
+  "serializeWire": [Function],
+  "verification": "5321030d56c2d8dbe1069b910246f7f39d0f4b743557e90603f94fa1d5e8ab8f5fbcf02102ebbc1c117a9ab39a9bcfcb9e776feedee8ab870f5cdcdaee1dff07f1972996e42102f61596eafa6303d6782afee3f221254c028deeac620a28b96112a9d08594fd8853ae",
+}
+`;
+
+exports[`Crypto Function Coverage CreateMultiSignatureWitness - Single Key 1`] = `
+WitnessModel {
+  "invocation": "00",
+  "serializeWire": [Function],
+  "verification": "512102f61596eafa6303d6782afee3f221254c028deeac620a28b96112a9d08594fd8851ae",
+}
+`;
+
+exports[`Crypto Function Coverage GetConsensusAddress 1`] = `"77386b760f5a1afa5edac7cd3f4fe13a30224edc"`;
+
+exports[`crypto using first key createInvocationScript 1`] = `"405bdd1473894ed6a01ed3f1f47835918050242427f78413f856c8c92acbdf88027f254a883de629586a829e63260a3bd65207e620c2cce563282183d5eb6930ea"`;
+
+exports[`crypto using second key createInvocationScript 1`] = `"402f35cdfc4d76fbae89a8487d6e67df77211a3604207be56b2813a1a523f89615c1733857d9b264bcb0c34ee2650a622867fb29fb670972c736c19c6a790af506"`;
+
+exports[`crypto using third key createInvocationScript 1`] = `"4086603f2711598d64c00818a606c2c834c3b46cb5361a281f79f4f48a2415712d73530da4753ce1d5cb7277f386396f6f8a8c86f402aa8f31c5ec062624c9ee6d"`;

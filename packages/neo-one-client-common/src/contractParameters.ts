@@ -80,10 +80,9 @@ const toBufferBuffer = (contractParameter: ContractParameter): Buffer => {
     case 'Void':
       value = Buffer.alloc(0, 0);
       break;
+    /* istanbul ignore next */
     default:
-      /* istanbul ignore next */
       commonUtils.assertNever(contractParameter);
-      /* istanbul ignore next */
       throw new Error('For TS');
   }
 
@@ -216,6 +215,7 @@ const toObject = (contractParameter: ContractParameter, parameter: ObjectABI): {
   return contractParameter.value.reduce<{ readonly [key: string]: Return }>((acc, [keyParam, val]) => {
     const key = toString(keyParam);
     const value = parameter.properties[key] as ABIReturn | undefined;
+    /* istanbul ignore next */
     if (value === undefined) {
       throw new InvalidContractParameterError(contractParameter, ['Map']);
     }
@@ -249,6 +249,7 @@ function wrapNullable<Result>(
       }
 
       return func(contractParameter);
+      /* istanbul ignore next */
     } catch (error) {
       if (error.code === 'INVALID_CONTRACT_PARAMETER' || error.code === 'INVALID_CONTRACT_PARAMETER_TYPE_JSON') {
         throw error as Error;
@@ -269,6 +270,7 @@ function wrapNullableABI<Result, ABI>(
       }
 
       return func(contractParameter, parameter);
+      /* istanbul ignore next */
     } catch (error) {
       if (error.code === 'INVALID_CONTRACT_PARAMETER' || error.code === 'INVALID_CONTRACT_PARAMETER_TYPE_JSON') {
         throw error as Error;

@@ -21,8 +21,9 @@ const sizeOfFixed8 = 8;
 
 const sizeOfVarUIntLE = (valueIn: number | BN): number => {
   const value = new BN(valueIn);
+  /* istanbul ignore next */
   if (value.lt(utils.ZERO)) {
-    throw new InvalidFormatError();
+    throw new InvalidFormatError(`Expected value >= 0, found: ${value.toString()}`);
   }
 
   if (value.lt(utils.FD)) {
@@ -37,6 +38,7 @@ const sizeOfVarUIntLE = (valueIn: number | BN): number => {
     return sizeOfUInt8 + sizeOfUInt32LE;
   }
 
+  /* istanbul ignore next */
   return sizeOfUInt8 + sizeOfUInt64LE;
 };
 
