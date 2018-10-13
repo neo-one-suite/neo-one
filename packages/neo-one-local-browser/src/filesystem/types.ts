@@ -9,6 +9,7 @@ export interface WriteFileFileSystemChange {
   readonly type: 'writeFile';
   readonly path: string;
   readonly content: string;
+  readonly opts: FileOpts;
 }
 
 export interface MkdirFileSystemChange {
@@ -32,16 +33,24 @@ export interface FileSystem extends SubscribableFileSystem {
   readonly readdirSync: (path: string) => ReadonlyArray<string>;
   readonly statSync: (path: string) => FileStat;
   readonly readFileSync: (path: string) => string;
-  readonly writeFileSync: (path: string, content: string) => void;
+  readonly writeFileSync: (path: string, content: string, opts?: FileOpts) => void;
   readonly mkdirSync: (path: string) => void;
+  readonly readFileOptsSync: (path: string) => FileOpts;
+  readonly writeFileOptsSync: (path: string, opts: FileOpts) => void;
 }
 
 export interface AsyncFileSystem {
   readonly readdir: (path: string) => Promise<ReadonlyArray<string>>;
   readonly stat: (path: string) => Promise<FileStat>;
   readonly readFile: (path: string) => Promise<string>;
-  readonly writeFile: (path: string, content: string) => Promise<void>;
+  readonly writeFile: (path: string, content: string, opts?: FileOpts) => Promise<void>;
   readonly mkdir: (path: string) => Promise<void>;
+  readonly readFileOpts: (path: string) => Promise<FileOpts>;
+  readonly writeFileOpts: (path: string, opts: FileOpts) => Promise<void>;
+}
+
+export interface FileOpts {
+  readonly writable: boolean;
 }
 
 export interface SimpleDir {
@@ -53,6 +62,7 @@ export interface SimpleDir {
 export interface SimpleFile {
   readonly type: 'file';
   readonly content: string;
+  readonly opts: FileOpts;
 }
 
 export type SimplePath = SimpleDir | SimpleFile;

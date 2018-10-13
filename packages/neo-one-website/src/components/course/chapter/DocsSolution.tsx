@@ -63,6 +63,7 @@ export const DocsSolution = ({ selected, ...props }: Props) => (
         <HeaderWrapper>
           {getFiles(selected).map((file, idx) => (
             <FileTab
+              key={file.path}
               data-test={`docs-solution-file-tab-${file.path}`}
               first={idx === 0}
               selected={file.path === selectedFilePath}

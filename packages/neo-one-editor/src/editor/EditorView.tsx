@@ -16,8 +16,8 @@ const Wrapper = styled(Flex)`
 interface Props {
   readonly file?: EditorFile;
   readonly range?: TextRange;
+  readonly openFiles: EditorFiles;
   readonly files: EditorFiles;
-  readonly buildFiles: EditorFiles;
   readonly onSelectFile: (file: EditorFile) => void;
   readonly onChangeProblems?: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
 }
@@ -25,23 +25,16 @@ interface Props {
 export const EditorView = ({
   file,
   range,
-  files,
-  buildFiles,
+  openFiles,
   onChangeProblems,
   onSelectFile,
   ...props
 }: Props & ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
-    <EditorHeader file={file} files={files} onSelectFile={onSelectFile} />
+    <EditorHeader file={file} openFiles={openFiles} onSelectFile={onSelectFile} />
     <EditorContext.Consumer>
       {({ engine }) => (
-        <MonacoEditor
-          file={file}
-          range={range}
-          files={files.concat(buildFiles)}
-          engine={engine}
-          onUpdateDiagnostics={onChangeProblems}
-        />
+        <MonacoEditor file={file} range={range} engine={engine} onUpdateDiagnostics={onChangeProblems} />
       )}
     </EditorContext.Consumer>
   </Wrapper>

@@ -1,6 +1,6 @@
 import { sep } from './constants';
 import { SubscribableSyncFileSystem } from './SubscribableSyncFileSystem';
-import { AsyncFileSystem, FileStat, FileSystem } from './types';
+import { AsyncFileSystem, FileOpts, FileStat, FileSystem, SimpleFile } from './types';
 
 export class MirrorFileSystem extends SubscribableSyncFileSystem implements FileSystem {
   public static async create<T extends MirrorFileSystem>(syncFS: FileSystem, asyncFS: AsyncFileSystem): Promise<T> {
@@ -38,15 +38,26 @@ export class MirrorFileSystem extends SubscribableSyncFileSystem implements File
   public readonly readdirSync = (path: string): ReadonlyArray<string> => this.syncFS.readdirSync(path);
   public readonly statSync = (path: string): FileStat => this.syncFS.statSync(path);
   public readonly readFileSync = (path: string): string => this.syncFS.readFileSync(path);
+  public readonly readFileOptsSync = (path: string): FileOpts => this.syncFS.readFileOptsSync(path);
 
   public async sync(): Promise<void> {
     await Promise.all([...this.promises]);
   }
 
-  protected writeFileSyncInternal(path: string, contents: string): void {
-    this.syncFS.writeFileSync(path, contents);
-    this.handlePromise(this.asyncFS.writeFile(path, contents));
+  protected writeFileSyncInternal(path: string, content: string, opts: FileOpts): void {
+    this.syncFS.writeFileSync(path, content, opts);
+    this.handlePromise(this.asyncFS.writeFile(path, content, opts));
   }
+
+  protected writeFileOptsSyncInternal(path: string, opts: FileOpts): SimpleFile {
+    this.syncFS.writeFileOptsSync(path, opts);
+    this.handlePromise(this.asyncFS.writeFileOpts(path, opts));
+
+    const content = this.syncFS.readFileSync(path);
+
+    return { type: 'file', opts, content };
+  }
+
   protected mkdirSyncInternal(path: string): void {
     this.syncFS.mkdirSync(path);
     this.handlePromise(this.asyncFS.mkdir(path));

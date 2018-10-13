@@ -20,8 +20,8 @@ const Wrapper = styled(Flex)`
 `;
 
 interface ExternalProps {
+  readonly openFiles: EditorFiles;
   readonly files: EditorFiles;
-  readonly buildFiles: EditorFiles;
 }
 
 interface State {
@@ -50,16 +50,16 @@ interface Props extends ExternalProps {
   readonly onChangeProblems: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
 }
 
-const EditorBase = ({ files, buildFiles, onChangeProblems, ...props }: Props & ComponentProps<typeof Wrapper>) => (
+const EditorBase = ({ openFiles, files, onChangeProblems, ...props }: Props & ComponentProps<typeof Wrapper>) => (
   <EditorContext.Consumer>
     {({ engine }) => (
-      <Container initialState={{ ...INITIAL_STATE, file: files[0] }} actions={createActions(engine)}>
+      <Container initialState={{ ...INITIAL_STATE, file: openFiles[0] }} actions={createActions(engine)}>
         {({ range, file, onSelectFile, onSelectRange }) => (
           <Wrapper {...props}>
             <EditorView
               file={file}
+              openFiles={openFiles}
               files={files}
-              buildFiles={buildFiles}
               onSelectFile={onSelectFile}
               onChangeProblems={onChangeProblems}
               range={range}

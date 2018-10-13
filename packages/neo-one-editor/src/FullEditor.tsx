@@ -56,13 +56,13 @@ interface Props extends ExternalProps {
 }
 
 interface State {
+  readonly openFiles: EditorFiles;
   readonly files: EditorFiles;
-  readonly buildFiles: EditorFiles;
   readonly engine?: Engine;
 }
 
 class FullEditorBase extends React.Component<Props, State> {
-  public readonly state: State = { files: [], buildFiles: [] };
+  public readonly state: State = { openFiles: [], files: [] };
   private mutableOpenFilesSubscription: Subscription | undefined;
   private mutableBuildFilesSubscription: Subscription | undefined;
   private mutableOutputSubscription: Subscription | undefined;
@@ -78,7 +78,7 @@ class FullEditorBase extends React.Component<Props, State> {
   }
 
   public render() {
-    const { engine, buildFiles, files } = this.state;
+    const { engine, files, openFiles } = this.state;
     const {
       id: _id,
       initialFiles: _initialFiles,
@@ -96,7 +96,7 @@ class FullEditorBase extends React.Component<Props, State> {
       <EditorContext.Provider value={{ engine }}>
         <>
           <TestsPassContainer onTestsPass={onTestsPass} />
-          <Editor files={files} buildFiles={buildFiles} {...props} />
+          <Editor openFiles={openFiles} files={files} {...props} />
         </>
       </EditorContext.Provider>
     );
@@ -104,20 +104,20 @@ class FullEditorBase extends React.Component<Props, State> {
 
   private initializeEngine({ id, initialFiles, testRunnerCallbacks, appendOutput, clearStore }: Props): void {
     this.dispose();
-    this.setState({ engine: undefined, files: [], buildFiles: [] });
+    this.setState({ engine: undefined, openFiles: [], files: [] });
     clearStore();
     Engine.create({ id, initialFiles, testRunnerCallbacks })
       .then(async (engine) => {
         if (this.props.id === id) {
-          this.setState({ engine, files: engine.openFiles$.getValue() });
+          this.setState({ engine, openFiles: engine.openFiles$.getValue() });
           this.mutableOpenFilesSubscription = engine.openFiles$.subscribe({
-            next: (files) => {
-              this.setState({ files });
+            next: (openFiles) => {
+              this.setState({ openFiles });
             },
           });
-          this.mutableBuildFilesSubscription = engine.buildFiles$.subscribe({
-            next: (buildFiles) => {
-              this.setState({ buildFiles });
+          this.mutableBuildFilesSubscription = engine.files$.subscribe({
+            next: (files) => {
+              this.setState({ files });
             },
           });
           this.mutableOutputSubscription = engine.output$.subscribe({

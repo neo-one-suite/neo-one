@@ -1,4 +1,4 @@
-import { Engine } from './Engine';
+import { EngineBase } from './EngineBase';
 import { evaluate } from './eval';
 import { Exports } from './types';
 
@@ -13,7 +13,7 @@ export abstract class ModuleBase {
   private readonly mutableDependents = new Set<ModuleBase>();
   private mutableExports: Exports = NEEDS_EVAL;
 
-  public constructor(protected readonly engine: Engine, public readonly path: string) {}
+  public constructor(protected readonly engine: EngineBase, public readonly path: string) {}
 
   public evaluate({ force = false, initiator }: EvaluateOptions = {}): Exports {
     if (initiator !== undefined) {

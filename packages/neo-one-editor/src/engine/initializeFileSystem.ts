@@ -105,7 +105,8 @@ const writeFile = (fs: FileSystem, path: string, contents: string) => {
   }
 };
 
-export const METADATA_FILE = '/.neo-one/metadata';
+export const INTERNAL_DIR = '/.neo-one';
+export const ENGINE_STATE_FILE = '/.neo-one/engine';
 export const TRANSPILE_PATH = '/.neo-one/transpile';
 export const EMPTY_MODULE_PATH = '/.neo-one/empty';
 
@@ -118,7 +119,7 @@ export const initializeFileSystem = (fs: FileSystem): void => {
   ensureDir(fs, '/node_modules/@types/react');
   ensureDir(fs, '/node_modules/bignumber.js');
   ensureDir(fs, TRANSPILE_PATH);
-  ensureDir(fs, nodePath.dirname(METADATA_FILE));
+  ensureDir(fs, nodePath.dirname(ENGINE_STATE_FILE));
 
   writeFile(fs, '/node_modules/typescript/lib/lib.d.ts', lib_d_ts);
   writeFile(fs, '/node_modules/typescript/lib/lib.dom.d.ts', lib_dom_d_ts);

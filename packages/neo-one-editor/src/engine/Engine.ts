@@ -8,26 +8,22 @@ import {
   LocalForageFileSystem,
   MemoryFileSystem,
   MirrorFileSystem,
-  normalizePath,
   OutputMessage,
   pathExists,
   traverseDirectory,
 } from '@neo-one/local-browser';
 import { WorkerManager } from '@neo-one/worker';
-import * as bignumber from 'bignumber.js';
+import _ from 'lodash';
 import * as nodePath from 'path';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { EditorFile, EditorFiles } from '../editor';
-import { ModuleNotFoundError } from '../errors';
-import { EngineContentFiles, FileMetadata, FileSystemMetadata, TestRunnerCallbacks } from '../types';
-import { getFileType } from '../utils';
-import { EMPTY_MODULE_PATH, initializeFileSystem, METADATA_FILE, TRANSPILE_PATH } from './initializeFileSystem';
+import { EditorFiles } from '../editor';
+import { EngineContentFiles, EngineState, TestRunnerCallbacks } from '../types';
+import { EngineBase } from './EngineBase';
+import { ENGINE_STATE_FILE, initializeFileSystem, INTERNAL_DIR } from './initializeFileSystem';
 import { ModuleBase } from './ModuleBase';
 import { packages } from './packages';
-import { resolve } from './resolve';
-import { StaticExportsModule } from './StaticExportsModule';
 import { TestRunner } from './test';
-import { TranspiledModule, Transpiler, TranspilerWorker } from './transpile';
+import { transpiler } from './transpile';
 import { Exports } from './types';
 
 export interface EngineCreateOptions {
@@ -44,27 +40,19 @@ interface PathWithExports {
 interface EngineOptions {
   readonly id: string;
   readonly output$: Subject<OutputMessage>;
-  readonly builder: WorkerManager<typeof Builder>;
+  readonly builderManager: WorkerManager<typeof Builder>;
   readonly fs: FileSystem;
-  readonly files: EditorFiles;
   readonly pathWithExports: ReadonlyArray<PathWithExports>;
   readonly testRunnerCallbacks: TestRunnerCallbacks;
 }
 
-interface Modules {
-  // tslint:disable-next-line readonly-keyword
-  [path: string]: ModuleBase;
-}
-
-const BUILTIN_MODULES = new Set(['path', 'bignumber.js']);
-
-export class Engine {
+export class Engine extends EngineBase {
   public static async create({ id, initialFiles, testRunnerCallbacks }: EngineCreateOptions): Promise<Engine> {
     const output$ = new Subject<OutputMessage>();
-    const builder = createBuilderManager(output$, id);
+    const builderManager = createBuilderManager(output$, id, jsonRPCLocalProviderManager);
     const [fs, builderInstance, jsonRPCLocalProvider] = await Promise.all([
       MirrorFileSystem.create(new MemoryFileSystem(), new LocalForageFileSystem(id)),
-      builder.getInstance(),
+      builderManager.getInstance(),
       jsonRPCLocalProviderManager.getInstance(),
     ]);
 
@@ -75,34 +63,18 @@ export class Engine {
       });
     });
 
-    const exists = pathExists(fs, METADATA_FILE);
-    let metadata: FileSystemMetadata;
+    const exists = pathExists(fs, ENGINE_STATE_FILE);
+    let state: EngineState;
     if (exists) {
-      const metadataContents = fs.readFileSync(METADATA_FILE);
-      metadata = JSON.parse(metadataContents);
+      const stateContents = fs.readFileSync(ENGINE_STATE_FILE);
+      state = JSON.parse(stateContents);
     } else {
       initializeFileSystem(fs);
-      metadata = {
-        fileMetadata: initialFiles.reduce<FileSystemMetadata['fileMetadata']>(
-          (acc, file) => ({
-            ...acc,
-            [file.path]: { writable: file.writable },
-          }),
-          {},
-        ),
-        files: initialFiles.filter((file) => file.open).map((file) => file.path),
+      state = {
+        openFiles: initialFiles.filter((file) => file.open).map((file) => file.path),
       };
-      fs.writeFileSync(METADATA_FILE, JSON.stringify(metadata));
+      fs.writeFileSync(ENGINE_STATE_FILE, JSON.stringify(state));
     }
-
-    const files = metadata.files.map((file) => {
-      const fileMetadata = metadata.fileMetadata[file] as FileMetadata | undefined;
-
-      return {
-        path: file,
-        writable: fileMetadata === undefined ? true : fileMetadata.writable,
-      };
-    });
 
     const pathWithExports = packages.reduce<ReadonlyArray<PathWithExports>>(
       (acc, { path, exports }) =>
@@ -113,93 +85,69 @@ export class Engine {
       [],
     );
 
-    const engine = new Engine({ id, output$, builder, fs, files, pathWithExports, testRunnerCallbacks });
+    const engine = new Engine({ id, output$, builderManager, fs, pathWithExports, testRunnerCallbacks });
 
     if (!exists) {
       initialFiles.forEach((file) => {
-        engine.writeFileSync(file.path, file.content);
+        ensureDir(engine.fs, nodePath.dirname(file.path));
+        engine.fs.writeFileSync(file.path, file.content, { writable: file.writable });
       });
 
       // Need to synchronize here so that when we start up the language workers they have an up to date filesystem
+      // Can/should be removed once we reduce the size of the initial file system.
       await fs.sync();
     }
+
+    state.openFiles.forEach((file) => {
+      engine.openFile(file);
+    });
 
     return engine;
   }
 
-  public readonly id: string;
-  public readonly output$: Subject<OutputMessage>;
-  public readonly fs: FileSystem;
   public readonly openFiles$: BehaviorSubject<EditorFiles>;
-  public readonly buildFiles$: BehaviorSubject<EditorFiles>;
-  public readonly transpiler: WorkerManager<typeof Transpiler>;
+  public readonly files$: BehaviorSubject<EditorFiles>;
   private readonly testRunner: TestRunner;
-  private readonly builder: WorkerManager<typeof Builder>;
-  private readonly mutableModules: Modules;
-  // tslint:disable-next-line readonly-keyword
-  private readonly mutableCachedPaths: { [currentPath: string]: { [path: string]: string } } = {};
+  private readonly builderManager: WorkerManager<typeof Builder>;
 
-  private constructor({ id, output$, fs, builder, files, pathWithExports, testRunnerCallbacks }: EngineOptions) {
-    this.id = id;
-    this.output$ = output$;
-    this.fs = fs;
-    this.openFiles$ = new BehaviorSubject(files);
-    this.buildFiles$ = new BehaviorSubject<EditorFiles>([]);
-    this.testRunner = new TestRunner(this, testRunnerCallbacks);
-    this.builder = builder;
-    this.transpiler = new WorkerManager<typeof Transpiler>(TranspilerWorker, new BehaviorSubject<{}>({}));
-    this.mutableModules = pathWithExports.reduce<Modules>(
-      (acc, { path, exports }) => ({
-        ...acc,
-        [path]: new StaticExportsModule(this, path, exports),
-      }),
-      {
-        path: new StaticExportsModule(this, 'path', nodePath),
-        'bignumber.js': new StaticExportsModule(this, 'bignumber.js', bignumber),
-      },
+  private constructor({ id, output$, fs, builderManager, pathWithExports, testRunnerCallbacks }: EngineOptions) {
+    super({ id, output$, fs, transpiler, pathWithExports });
+    this.openFiles$ = new BehaviorSubject<EditorFiles>([]);
+    this.files$ = new BehaviorSubject<EditorFiles>(
+      [...traverseDirectory(fs, '/')]
+        .filter((path) => !path.startsWith(INTERNAL_DIR))
+        .map((path) => this.getFile(path)),
     );
-    this.loadTranspiledModules();
+    this.testRunner = new TestRunner(this, testRunnerCallbacks);
+    this.builderManager = builderManager;
+
+    this.fs.subscribe((event) => {
+      switch (event.type) {
+        case 'writeFile':
+          this.files$.next(
+            _.uniqBy(this.files$.getValue().concat([this.getFile(event.path)]), ({ path: filePath }) => filePath),
+          );
+          break;
+        default:
+        // do nothing
+      }
+    });
   }
 
-  public dispose(): void {
-    // do nothing
-  }
-
-  public get modules(): { readonly [path: string]: ModuleBase } {
-    return this.mutableModules;
-  }
-
-  public writeFileSync(path: string, content: string): void {
-    ensureDir(this.fs, dirname(path));
-    this.fs.writeFileSync(path, content);
-    if (getFileType(path) === 'typescript') {
-      this.transpileModule(path);
-    }
-  }
-
-  public getFile(path: string): EditorFile {
-    const metadata = this.getMetadata();
-    const fileMetadata = metadata.fileMetadata[path] as FileMetadata | undefined;
-    const buildFiles = new Set(this.buildFiles$.getValue().map(({ path: buildPath }) => buildPath));
-
-    return { path, writable: !buildFiles.has(path) && (fileMetadata === undefined || fileMetadata.writable) };
+  public openFile(path: string): void {
+    this.openFiles$.next(
+      _.uniqBy(this.openFiles$.getValue().concat([this.getFile(path)]), ({ path: filePath }) => filePath),
+    );
   }
 
   public async build(): Promise<void> {
-    const instance = await this.builder.getInstance();
-    const result = await instance.build();
+    const builder = await this.builderManager.getInstance();
+    const result = await builder.build();
 
     result.files.forEach((file) => {
       ensureDir(this.fs, dirname(file.path));
-      this.writeFileSync(file.path, file.content);
+      this.fs.writeFileSync(file.path, file.content, { writable: true });
     });
-
-    this.buildFiles$.next(
-      result.files.map((file) => ({
-        ...file,
-        writable: false,
-      })),
-    );
   }
 
   public runTests(): void {
@@ -216,74 +164,10 @@ export class Engine {
     });
   }
 
-  public getTranspiledPath(path: string): string {
-    return nodePath.join(TRANSPILE_PATH, path);
-  }
-
   public getGlobals(mod: ModuleBase) {
     return {
       ...this.testRunner.getTestGlobals(mod),
-      __dirname: dirname(mod.path),
-      __filename: mod.path,
+      ...super.getGlobals(mod),
     };
-  }
-
-  public resolveModule(path: string, currentPath: string): ModuleBase {
-    if (BUILTIN_MODULES.has(path)) {
-      return this.getModule(path, true);
-    }
-
-    const currentDir = dirname(currentPath);
-    if ((this.mutableCachedPaths[currentDir] as { [path: string]: string } | undefined) === undefined) {
-      this.mutableCachedPaths[currentDir] = {};
-    }
-
-    let resolvedPath = this.mutableCachedPaths[currentDir][path] as string | undefined;
-    if (resolvedPath === undefined) {
-      resolvedPath = resolve({ module: path, from: currentPath, emptyModulePath: EMPTY_MODULE_PATH, fs: this.fs });
-      this.mutableCachedPaths[currentDir][path] = resolvedPath;
-    }
-
-    return this.getModule(resolvedPath);
-  }
-
-  private getModule(pathIn: string, normalized = false): ModuleBase {
-    const path = normalized ? pathIn : normalizePath(pathIn);
-    const mod = this.mutableModules[path] as ModuleBase | undefined;
-    if (mod === undefined) {
-      throw new ModuleNotFoundError(path);
-    }
-
-    return mod;
-  }
-
-  private transpileModule(pathIn: string): TranspiledModule {
-    const path = normalizePath(pathIn);
-    const mod = this.mutableModules[path] as ModuleBase | undefined;
-    let transpiledModule = mod !== undefined && mod instanceof TranspiledModule ? mod : undefined;
-    if (transpiledModule === undefined) {
-      transpiledModule = new TranspiledModule(this, path);
-      this.mutableModules[path] = transpiledModule;
-    }
-
-    transpiledModule.transpile();
-
-    return transpiledModule;
-  }
-
-  private loadTranspiledModules(): void {
-    const paths = [...traverseDirectory(this.fs, TRANSPILE_PATH)];
-    paths.forEach((filePath) => {
-      const path = filePath.slice(TRANSPILE_PATH.length);
-      const content = this.fs.readFileSync(filePath);
-      const mod = new TranspiledModule(this, path, content);
-      // Re-transpile in case it has changed.
-      mod.transpile();
-      this.mutableModules[path] = mod;
-    });
-  }
-
-  private getMetadata(): FileSystemMetadata {
-    return JSON.parse(this.fs.readFileSync(METADATA_FILE));
   }
 }

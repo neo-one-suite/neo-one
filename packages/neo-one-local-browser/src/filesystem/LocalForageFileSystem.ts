@@ -1,4 +1,5 @@
 import localforage from 'localforage';
+import { DEFAULT_FILE_OPTS } from './constants';
 import {
   checkMkdir,
   checkWriteFile,
@@ -6,14 +7,16 @@ import {
   normalizePath,
   readdir,
   readFile,
+  readFileOpts,
   stat,
 } from './keyValueFileSystem';
-import { AsyncFileSystem, FileStat, SimplePath } from './types';
+import { AsyncFileSystem, FileOpts, FileStat, SimplePath } from './types';
 
 interface WriteFile {
   readonly type: 'writeFile';
   readonly path: string;
   readonly content: string;
+  readonly opts?: FileOpts;
 }
 
 interface AddChild {
@@ -45,49 +48,67 @@ export class LocalForageFileSystem implements AsyncFileSystem {
     });
   }
 
-  public readonly readdir = async (pathIn: string): Promise<ReadonlyArray<string>> => {
-    await this.initPromise;
-    const path = normalizePath(pathIn);
-    const simplePath = await this.getPath(path);
+  public readonly readdir = async (path: string): Promise<ReadonlyArray<string>> => {
+    const simplePath = await this.getSimplePath(path);
 
     return readdir(path, simplePath);
   };
 
-  public readonly stat = async (pathIn: string): Promise<FileStat> => {
-    await this.initPromise;
-    const path = normalizePath(pathIn);
-    const simplePath = await this.getPath(path);
+  public readonly stat = async (path: string): Promise<FileStat> => {
+    const simplePath = await this.getSimplePath(path);
 
     return stat(path, simplePath);
   };
 
-  public readonly readFile = async (pathIn: string): Promise<string> => {
-    await this.initPromise;
-    const path = normalizePath(pathIn);
-    const simplePath = await this.getPath(path);
+  public readonly readFile = async (path: string): Promise<string> => {
+    const simplePath = await this.getSimplePath(path);
 
     return readFile(path, simplePath);
   };
 
-  public readonly writeFile = async (pathIn: string, content: string): Promise<void> => {
-    await this.initPromise;
-    const path = normalizePath(pathIn);
-    const simplePath = await this.getPath(path);
-    checkWriteFile(path, simplePath);
+  public readonly readFileOpts = async (path: string): Promise<FileOpts> => {
+    const simplePath = await this.getSimplePath(path);
 
-    await this.process({ type: 'writeFile', path, content });
+    return readFileOpts(path, simplePath);
+  };
+
+  public readonly writeFile = async (pathIn: string, content: string, opts?: FileOpts): Promise<void> => {
+    const path = normalizePath(pathIn);
+    await this.process({
+      type: 'writeFile',
+      path,
+      content,
+      opts,
+    });
+    await this.addParent(path);
+  };
+
+  public readonly writeFileOpts = async (pathIn: string, opts: FileOpts): Promise<void> => {
+    const path = normalizePath(pathIn);
+    const simplePath = await this.getSimplePath(path);
+    const simpleFile = checkWriteFile(path, simplePath);
+
+    await this.process({
+      type: 'writeFile',
+      path,
+      content: simpleFile === undefined ? '' : simpleFile.content,
+      opts,
+    });
     await this.addParent(path);
   };
 
   public readonly mkdir = async (pathIn: string): Promise<void> => {
-    await this.initPromise;
     const path = normalizePath(pathIn);
-    const simplePath = await this.getPath(path);
-    checkMkdir(path, simplePath);
-
     await this.process({ type: 'mkdir', path });
     await this.addParent(path);
   };
+
+  private async getSimplePath(pathIn: string) {
+    await this.initPromise;
+    const path = normalizePath(pathIn);
+
+    return this.getPath(path);
+  }
 
   private async addParent(path: string): Promise<void> {
     const result = getParentPaths(path);
@@ -112,12 +133,28 @@ export class LocalForageFileSystem implements AsyncFileSystem {
     while (item !== undefined) {
       switch (item.type) {
         case 'writeFile':
-          await this.store.setItem(item.path, { type: 'file', content: item.content });
+          let { opts } = item;
+          if (opts === undefined) {
+            const simplePath = await this.getSimplePath(item.path);
+            const simpleFile = checkWriteFile(item.path, simplePath);
+
+            opts = simpleFile === undefined ? DEFAULT_FILE_OPTS : simpleFile.opts;
+          }
+
+          await this.store.setItem(item.path, {
+            type: 'file',
+            content: item.content,
+            opts,
+          });
           break;
         case 'addChild':
-          const parentDir = await this.getPath(item.path);
+          const parentDir = await this.getSimplePath(item.path);
           if (parentDir === undefined || parentDir.type !== 'dir') {
-            throw new Error('Something went wrong');
+            throw new Error(
+              `Something went wrong, found parentDir: ${
+                parentDir === undefined ? 'undefined' : parentDir.type
+              }. For path: ${item.path}.`,
+            );
           }
           if (!parentDir.children.includes(item.child)) {
             await this.store.setItem(item.path, {
@@ -128,6 +165,10 @@ export class LocalForageFileSystem implements AsyncFileSystem {
           }
           break;
         case 'mkdir':
+          const path = normalizePath(item.path);
+          const simplePathDir = await this.getSimplePath(path);
+          checkMkdir(path, simplePathDir);
+
           await this.store.setItem(item.path, { type: 'dir', children: [] });
           break;
         default:

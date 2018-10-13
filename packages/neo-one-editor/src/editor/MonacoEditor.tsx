@@ -194,7 +194,7 @@ export class MonacoEditor extends React.Component<Props> {
       const editorModel = this.editor.getModel();
       const editorValue = editorModel.getValue();
 
-      this.props.engine.writeFileSync(editorModel.uri.path, editorValue);
+      this.props.engine.fs.writeFileSync(editorModel.uri.path, editorValue);
 
       const { onValueChange } = this.props;
       if (onValueChange !== undefined) {

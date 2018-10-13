@@ -1,7 +1,7 @@
 import { ensureDir } from '@neo-one/local-browser';
 import _ from 'lodash';
 import * as nodePath from 'path';
-import { Engine } from '../Engine';
+import { EngineBase } from '../EngineBase';
 import { ModuleBase } from '../ModuleBase';
 import { transpile } from './transpile';
 
@@ -30,7 +30,7 @@ export class TranspiledModule extends ModuleBase {
   private mutableTranspiling = false;
   private mutableDirty = false;
 
-  public constructor(engine: Engine, path: string, private mutableCode?: string) {
+  public constructor(engine: EngineBase, path: string, private mutableCode?: string) {
     super(engine, path);
   }
 

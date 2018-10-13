@@ -18,7 +18,11 @@ const createFileSystem = (): [FileSystem, JestMocked<FileSystem>] => {
     readFileSync: jest.fn(() => {
       throw createErrorWithCode('ENOENT');
     }),
+    readFileOptsSync: jest.fn(() => {
+      throw createErrorWithCode('ENOENT');
+    }),
     writeFileSync: jest.fn(),
+    writeFileOptsSync: jest.fn(),
     mkdirSync: jest.fn(),
     subscribe: jest.fn(),
   };

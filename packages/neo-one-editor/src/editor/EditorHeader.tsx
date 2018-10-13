@@ -11,13 +11,13 @@ const Wrapper = styled(Flex)`
 
 interface Props {
   readonly file?: EditorFile;
-  readonly files: EditorFiles;
+  readonly openFiles: EditorFiles;
   readonly onSelectFile: (file: EditorFile) => void;
 }
 
-export const EditorHeader = ({ file, files, onSelectFile, ...props }: Props) => (
+export const EditorHeader = ({ file, openFiles, onSelectFile, ...props }: Props) => (
   <Wrapper {...props}>
-    {files.map((otherFile, idx) => (
+    {openFiles.map((otherFile, idx) => (
       <FileTab
         data-test={`editor-header-file-tab-${otherFile.path}`}
         key={otherFile.path}

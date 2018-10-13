@@ -13,13 +13,8 @@ export interface EngineContentFile {
 
 export type EngineContentFiles = ReadonlyArray<EngineContentFile>;
 
-export interface FileMetadata {
-  readonly writable: boolean;
-}
-
-export interface FileSystemMetadata {
-  readonly fileMetadata: { readonly [path: string]: FileMetadata };
-  readonly files: ReadonlyArray<string>;
+export interface EngineState {
+  readonly openFiles: ReadonlyArray<string>;
 }
 
 export interface EditorContext {

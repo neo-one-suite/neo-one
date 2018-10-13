@@ -1,7 +1,7 @@
-import { Engine } from '../Engine';
+import { EngineBase } from '../EngineBase';
 import { ModuleBase } from '../ModuleBase';
 
-export const createRequire = (engine: Engine, initiator: ModuleBase) => {
+export const createRequire = (engine: EngineBase, initiator: ModuleBase) => {
   function require(path: string) {
     const requiredModule = engine.resolveModule(path, initiator.path);
 

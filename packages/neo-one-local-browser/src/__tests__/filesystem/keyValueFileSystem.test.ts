@@ -14,7 +14,7 @@ describe('keyValueFileSystem', () => {
   });
 
   test('throws ENOTDIR on file in readdir', () => {
-    checkError(() => fs.readdir('/', { type: 'file', content: 'foo' }), 'ENOTDIR');
+    checkError(() => fs.readdir('/', { type: 'file', content: 'foo', opts: { writable: true } }), 'ENOTDIR');
   });
 
   test('throws ENOENT on no directory in stat', () => {
@@ -34,7 +34,7 @@ describe('keyValueFileSystem', () => {
   });
 
   test('throws EEXIST on existing file in checkMkdir', () => {
-    checkError(() => fs.checkMkdir('/', { type: 'file', content: 'foo' }), 'EEXIST');
+    checkError(() => fs.checkMkdir('/', { type: 'file', content: 'foo', opts: { writable: true } }), 'EEXIST');
   });
 
   test('throws EEXIST on existing dir in checkMkdir', () => {

@@ -28,3 +28,9 @@ export const createEEXIST = (path: string) => {
 
   return addErrorCode(error, 'EEXIST');
 };
+
+export const createEACCES = (path: string) => {
+  const error = new Error(`file cannot be written: ${path}`);
+
+  return addErrorCode(error, 'EACCES');
+};
