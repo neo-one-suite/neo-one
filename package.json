@@ -171,7 +171,7 @@
     "mocha-junit-reporter": "1.18.0",
     "mocha-multi-reporters": "1.1.7",
     "nanoid": "1.2.6",
-    "nyc": "13.0.1",
+    "nyc": "13.1.0",
     "prettier": "1.14.3",
     "rxjs": "6.3.3",
     "rxjs-tslint-rules": "4.10.0",
