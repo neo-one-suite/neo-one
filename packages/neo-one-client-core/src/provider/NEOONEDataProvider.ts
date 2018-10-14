@@ -61,11 +61,11 @@ import { MissingTransactionDataError } from '../errors';
 import { convertAction, convertCallReceipt, convertInvocationResult } from './convert';
 import { JSONRPCClient } from './JSONRPCClient';
 import { JSONRPCHTTPProvider } from './JSONRPCHTTPProvider';
-import { JSONRPCProvider } from './JSONRPCProvider';
+import { JSONRPCProvider, JSONRPCProviderManager } from './JSONRPCProvider';
 
 export interface NEOONEDataProviderOptions {
   readonly network: NetworkType;
-  readonly rpcURL: string | JSONRPCProvider;
+  readonly rpcURL: string | JSONRPCProvider | JSONRPCProviderManager;
   readonly iterBlocksFetchTimeoutMS?: number;
   readonly iterBlocksBatchSize?: number;
 }

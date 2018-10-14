@@ -90,6 +90,7 @@ export class WorkerManager<T extends WorkerConstructor> {
   private mutableEndpoint: WorkerEndpoint | undefined;
   private mutableInstance: Promise<WorkerInstance<T>> | undefined;
   private mutableLastUsedTime: number;
+  private mutableInUse: boolean;
   private readonly idleCheckInterval: NodeJS.Timer;
 
   public constructor(
@@ -108,6 +109,7 @@ export class WorkerManager<T extends WorkerConstructor> {
       },
     });
     this.mutableLastUsedTime = 0;
+    this.mutableInUse = false;
     this.idleCheckInterval = setInterval(() => this.checkIfIdle(), 30 * 1000);
   }
 
@@ -117,7 +119,27 @@ export class WorkerManager<T extends WorkerConstructor> {
     this.stopWorker();
   }
 
+  public async withInstance<TResult>(func: (instance: WorkerInstance<T>) => Promise<TResult>): Promise<TResult>;
+  public async withInstance<TResult>(func: (instance: WorkerInstance<T>) => TResult): Promise<TResult> {
+    this.mutableInUse = true;
+
+    return this.getInstance()
+      .then(func)
+      .then((result) => {
+        this.mutableInUse = false;
+
+        return result;
+      })
+      .catch((error) => {
+        this.mutableInUse = false;
+
+        throw error;
+      });
+  }
+
   public async getInstance(): Promise<WorkerInstance<T>> {
+    this.mutableLastUsedTime = Date.now();
+
     if (this.mutableInstance === undefined) {
       this.mutableEndpoint = this.createEndpoint();
       // tslint:disable-next-line no-any
@@ -125,11 +147,11 @@ export class WorkerManager<T extends WorkerConstructor> {
       this.mutableInstance = this.getOptions().then((options) => new WorkerClass(options));
     }
 
-    return this.mutableInstance;
+    return this.mutableInstance.then((value) => comlink.proxyValue(value));
   }
 
   private checkIfIdle(): void {
-    if (this.mutableEndpoint === undefined) {
+    if (this.mutableEndpoint === undefined || this.mutableInUse) {
       return;
     }
 

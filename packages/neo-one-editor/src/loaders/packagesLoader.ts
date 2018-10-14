@@ -43,9 +43,9 @@ const compile = (loader: webpack.loader.LoaderContext): void => {
 };
 
 const getPackagesExports = async (loader: webpack.loader.LoaderContext): Promise<string> => {
-  const packages = await getPackages(loader);
+  const [packages, reakitPackages] = await Promise.all([getPackages(loader), getReakitPackages(loader)]);
 
-  return `module.exports = ${JSON.stringify(packages)};`;
+  return `module.exports = ${JSON.stringify({ ...packages, reakitPackages })};`;
 };
 
 const getPackages = async (loader: webpack.loader.LoaderContext) => {
@@ -54,14 +54,39 @@ const getPackages = async (loader: webpack.loader.LoaderContext) => {
     INCLUDE_PACKAGE_PREFIXES.some((prefix) => dir.startsWith(prefix)),
   );
   const packagePaths = packageDirs.map((dir) => path.resolve(PACKAGES_DIR, dir));
-  const packageFilesList = await Promise.all(packagePaths.map((packagePath) => getPackageFiles(loader, packagePath)));
+  const packageFilesList = await Promise.all(
+    packagePaths.map((packagePath) =>
+      getPackageFiles(
+        loader,
+        packagePath,
+        path.join('@neo-one', packagePath.slice(PACKAGE_DIR_PREFIX.length)),
+        (file) => file.includes('__') || file.includes('node_modules'),
+      ),
+    ),
+  );
 
   return _.fromPairs(_.flatMap(packageFilesList).filter((value) => value[1] !== undefined));
+};
+
+const getReakitPackages = async (loader: webpack.loader.LoaderContext) => {
+  const reakitDir = path.resolve(__dirname, '..', '..', '..', '..', 'node_modules', 'reakit');
+  const packageDir = path.resolve(reakitDir, 'ts');
+  const [packageJSON, packageFiles] = await Promise.all([
+    fs.readFile(path.resolve(reakitDir, 'package.json'), 'utf8'),
+    getPackageFiles(loader, packageDir, 'reakit/ts'),
+  ]);
+
+  return {
+    ..._.fromPairs(packageFiles),
+    ['/node_modules/reakit/package.json']: packageJSON,
+  };
 };
 
 const getPackageFiles = async (
   loader: webpack.loader.LoaderContext,
   packageDir: string,
+  outputPackageDir: string,
+  omitFile = (_file: string) => false,
 ): Promise<ReadonlyArray<[string, string | undefined]>> => {
   loader.addContextDependency(packageDir);
   const filesPromise = new Promise<ReadonlyArray<string>>((resolve, reject) =>
@@ -75,11 +100,9 @@ const getPackageFiles = async (
   );
   const files = await filesPromise;
 
-  const outputPackageDir = path.join('@neo-one', packageDir.slice(PACKAGE_DIR_PREFIX.length));
-
   const result = await Promise.all(
     files.map<Promise<[string, string] | undefined>>(async (file) => {
-      if (file.includes('__') || file.includes('node_modules')) {
+      if (omitFile(file)) {
         return undefined;
       }
 

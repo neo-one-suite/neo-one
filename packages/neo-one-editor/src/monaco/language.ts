@@ -1,9 +1,13 @@
-// tslint:disable promise-function-async no-submodule-imports no-implicit-dependencies
+// tslint:disable promise-function-async no-submodule-imports no-implicit-dependencies no-import-side-effect
+import 'monaco-editor/esm/vs/language/html/monaco.contribution';
+
 import { FileSystem } from '@neo-one/local-browser';
 // @ts-ignore
 import TSWorker from '@neo-one/worker-loader!./ts.worker';
 // @ts-ignore
 import EditorWorker from '@neo-one/worker-loader!monaco-editor/esm/vs/editor/editor.worker';
+// @ts-ignore
+import HTMLWorker from '@neo-one/worker-loader!monaco-editor/esm/vs/language/html/html.worker';
 // @ts-ignore
 import * as javascriptModule from 'monaco-editor/esm/vs/basic-languages/javascript/javascript';
 import ts from 'typescript';
@@ -29,6 +33,8 @@ const JAVASCRIPT_SUFFIX = '-javascript';
     // tslint:disable-next-line:prefer-conditional-expression
     if (label.endsWith(CONTRACT_SUFFIX) || label.endsWith(TYPESCRIPT_SUFFIX) || label.endsWith(JAVASCRIPT_SUFFIX)) {
       MonacoWorker = TSWorker();
+    } else if (label.endsWith('html')) {
+      MonacoWorker = HTMLWorker();
     } else {
       MonacoWorker = EditorWorker();
     }

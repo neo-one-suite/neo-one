@@ -7,6 +7,7 @@ const NEEDS_EVAL = Symbol.for('needsEval');
 export interface EvaluateOptions {
   readonly initiator?: ModuleBase;
   readonly force?: boolean;
+  readonly useEval?: boolean;
 }
 
 export abstract class ModuleBase {
@@ -15,13 +16,13 @@ export abstract class ModuleBase {
 
   public constructor(protected readonly engine: EngineBase, public readonly path: string) {}
 
-  public evaluate({ force = false, initiator }: EvaluateOptions = {}): Exports {
+  public evaluate({ force = false, initiator, useEval }: EvaluateOptions = {}): Exports {
     if (initiator !== undefined) {
       this.mutableDependents.add(initiator);
     }
 
     if (force || this.mutableExports === NEEDS_EVAL) {
-      this.mutableExports = evaluate(this.engine, this);
+      this.mutableExports = evaluate(this.engine, this, useEval);
     }
 
     return this.mutableExports;

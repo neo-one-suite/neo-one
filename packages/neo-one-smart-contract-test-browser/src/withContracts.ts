@@ -26,9 +26,7 @@ export const createWithContracts = (getFS: () => FileSystem) => async <T>(
     async () => {
       const options$ = new BehaviorSubject<{ type: 'memory' }>({ type: 'memory' });
       const manager = new WorkerManager<typeof JSONRPCLocalProvider>(JSONRPCLocalProviderWorker, options$, 30 * 1000);
-      const instance = await manager.getInstance();
-
-      const dataProvider = new NEOONEDataProvider({ network: 'priv', rpcURL: instance });
+      const dataProvider = new NEOONEDataProvider({ network: 'priv', rpcURL: manager });
 
       return {
         dataProvider,

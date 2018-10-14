@@ -1,5 +1,8 @@
+import { utils } from '@neo-one/utils';
+import * as nodePath from 'path';
 import { DEFAULT_FILE_OPTS } from './constants';
 import { Disposable, FileOpts, FileSystemChange, SimpleFile, SubscribableFileSystem, Subscriber } from './types';
+import { ensureDir } from './utils';
 
 export abstract class SubscribableSyncFileSystem implements SubscribableFileSystem {
   private mutableID = 0;
@@ -39,6 +42,23 @@ export abstract class SubscribableSyncFileSystem implements SubscribableFileSyst
         this.mutableSubscribers[id] = undefined;
       },
     };
+  };
+
+  public readonly handleChange = async (change: FileSystemChange) => {
+    switch (change.type) {
+      case 'writeFile':
+        const { path, content, opts } = change;
+        ensureDir(this, nodePath.dirname(path));
+        this.writeFileSync(path, content, opts);
+        break;
+      case 'mkdir':
+        ensureDir(this, nodePath.dirname(change.path));
+        this.mkdirSync(change.path);
+        break;
+      default:
+        utils.assertNever(change);
+        throw new Error('For TS');
+    }
   };
 
   protected abstract writeFileSyncInternal(path: string, content: string, opts: FileOpts): void;

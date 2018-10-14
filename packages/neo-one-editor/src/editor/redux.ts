@@ -24,9 +24,19 @@ export interface EditorState {
     readonly selectedTestSuite?: string;
     readonly testsRunning: boolean;
   };
+  readonly preview: {
+    readonly enabled: boolean;
+    readonly open: boolean;
+  };
 }
 
-const INITIAL_STATE: EditorState = {
+export interface InitialEditorStateOptions {
+  readonly preview: EditorState['preview'];
+}
+
+const createInitialState = (
+  { preview }: InitialEditorStateOptions = { preview: { enabled: true, open: false } },
+): EditorState => ({
   console: {
     open: false,
     output: {},
@@ -37,7 +47,8 @@ const INITIAL_STATE: EditorState = {
     selectedTestSuite: undefined,
     testsRunning: false,
   },
-};
+  preview,
+});
 
 interface SetFileProblems {
   readonly path: string;
@@ -61,9 +72,11 @@ export const updateTest = actionCreator<UpdateTest>('UPDATE_TEST');
 export const setTestsRunning = actionCreator<boolean>('SET_TESTS_RUNNING');
 export const setConsoleOpen = actionCreator<boolean>('SET_CONSOLE_OPEN');
 export const openConsole = actionCreator<ConsoleType>('OPEN_CONSOLE');
-export const clearStore = actionCreator('CLEAR_STORE');
+export const clearStore = actionCreator<InitialEditorStateOptions | undefined>('CLEAR_STORE');
+export const openPreview = actionCreator('OPEN_PREVIEW');
+export const closePreview = actionCreator('CLOSE_PREVIEW');
 
-const reducer = reducerWithInitialState(INITIAL_STATE)
+const reducer = reducerWithInitialState(createInitialState())
   .case(appendConsole, (state, { owner, message }) =>
     produce(state, (draft) => {
       const current = draft.console.output[owner];
@@ -173,7 +186,17 @@ const reducer = reducerWithInitialState(INITIAL_STATE)
       draft.console.type = consoleType;
     }),
   )
-  .case(clearStore, () => INITIAL_STATE);
+  .case(clearStore, (_state, options) => createInitialState(options))
+  .case(openPreview, (state) =>
+    produce(state, (draft) => {
+      draft.preview.open = true;
+    }),
+  )
+  .case(closePreview, (state) =>
+    produce(state, (draft) => {
+      draft.preview.open = false;
+    }),
+  );
 
 export const configureStore = () => createStore(reducer);
 
@@ -200,4 +223,10 @@ export const selectConsoleTestsRunning = (state: EditorState) => ({
 });
 export const selectConsoleOpen = (state: EditorState) => ({
   consoleOpen: state.console.open,
+});
+export const selectPreviewEnabled = (state: EditorState) => ({
+  previewEnabled: state.preview.enabled,
+});
+export const selectPreviewOpen = (state: EditorState) => ({
+  previewOpen: state.preview.open,
 });

@@ -1,13 +1,15 @@
 import { ActionMap } from 'constate';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Container, Flex, styled } from 'reakit';
+import { Container, Flex, Grid, Hidden, styled } from 'reakit';
+import { ifProp } from 'styled-tools';
 import { EditorContext } from '../EditorContext';
 import { Engine } from '../engine';
+import { Preview } from '../preview';
 import { ComponentProps } from '../types';
 import { EditorToolbar } from './EditorToolbar';
 import { EditorView } from './EditorView';
-import { setFileProblems } from './redux';
+import { selectPreviewOpen, setFileProblems } from './redux';
 import { EditorFile, EditorFiles, FileDiagnostic, TextRange } from './types';
 
 const Wrapper = styled(Flex)`
@@ -17,6 +19,16 @@ const Wrapper = styled(Flex)`
   flex-direction: column;
   min-width: 0;
   min-height: 0;
+`;
+
+const EditorWrapper = styled(Grid)<{ readonly previewOpen: boolean }>`
+  grid:
+    'editor preview' auto
+    / 1fr ${ifProp('previewOpen', '1fr', '0')};
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  width: 100%;
 `;
 
 interface ExternalProps {
@@ -47,23 +59,35 @@ const createActions = (engine: Engine): ActionMap<State, Actions> => ({
 });
 
 interface Props extends ExternalProps {
+  readonly previewOpen: boolean;
   readonly onChangeProblems: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
 }
 
-const EditorBase = ({ openFiles, files, onChangeProblems, ...props }: Props & ComponentProps<typeof Wrapper>) => (
+const EditorBase = ({
+  openFiles,
+  files,
+  previewOpen,
+  onChangeProblems,
+  ...props
+}: Props & ComponentProps<typeof Wrapper>) => (
   <EditorContext.Consumer>
     {({ engine }) => (
       <Container initialState={{ ...INITIAL_STATE, file: openFiles[0] }} actions={createActions(engine)}>
         {({ range, file, onSelectFile, onSelectRange }) => (
           <Wrapper {...props}>
-            <EditorView
-              file={file}
-              openFiles={openFiles}
-              files={files}
-              onSelectFile={onSelectFile}
-              onChangeProblems={onChangeProblems}
-              range={range}
-            />
+            <EditorWrapper previewOpen={previewOpen}>
+              <EditorView
+                file={file}
+                openFiles={openFiles}
+                files={files}
+                onSelectFile={onSelectFile}
+                onChangeProblems={onChangeProblems}
+                range={range}
+              />
+              <Hidden visible={previewOpen}>
+                <Preview />
+              </Hidden>
+            </EditorWrapper>
             <EditorToolbar file={file} onSelectRange={onSelectRange} />
           </Wrapper>
         )}
@@ -73,7 +97,7 @@ const EditorBase = ({ openFiles, files, onChangeProblems, ...props }: Props & Co
 );
 
 export const Editor = connect(
-  undefined,
+  selectPreviewOpen,
   (dispatch) => ({
     // tslint:disable-next-line no-unnecessary-type-annotation
     onChangeProblems: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) =>

@@ -11,6 +11,15 @@ export interface JSONRPCRequest {
 // tslint:disable-next-line no-any
 export type JSONRPCResponse = any;
 
+/**
+ * Enables browser clients. See comlink and WorkerManager.
+ */
+export interface JSONRPCProviderManager {
+  // tslint:disable no-method-signature unified-signatures
+  getInstance(): Promise<JSONRPCProvider>;
+  // tslint:enable no-method-signature unified-signatures
+}
+
 export abstract class JSONRPCProvider {
   public abstract request(req: JSONRPCRequest, monitor?: Monitor): Promise<JSONRPCResponse>;
   // tslint:disable-next-line no-any

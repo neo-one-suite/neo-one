@@ -8,6 +8,7 @@ import {
   appendConsole,
   clearStore as clearStoreBase,
   configureStore,
+  InitialEditorStateOptions,
   removeTestSuite,
   selectConsoleTestSuites,
   setTestsRunning,
@@ -45,12 +46,14 @@ const TestsPassContainer = connect(selectConsoleTestSuites)(
 
 interface ExternalProps {
   readonly id: string;
+  readonly createPreviewURL: (id: string) => string;
   readonly initialFiles: EngineContentFiles;
+  readonly initialOptions?: InitialEditorStateOptions;
   readonly onTestsPass?: () => void;
 }
 
 interface Props extends ExternalProps {
-  readonly clearStore: () => void;
+  readonly clearStore: (options?: InitialEditorStateOptions) => void;
   readonly appendOutput: (output: OutputMessage) => void;
   readonly testRunnerCallbacks: TestRunnerCallbacks;
 }
@@ -87,6 +90,8 @@ class FullEditorBase extends React.Component<Props, State> {
       onTestsPass,
       children: _children,
       clearStore: _clearStore,
+      createPreviewURL: _createPreviewURL,
+      initialOptions: _initialOptions,
       ...props
     } = this.props;
 
@@ -102,11 +107,19 @@ class FullEditorBase extends React.Component<Props, State> {
     );
   }
 
-  private initializeEngine({ id, initialFiles, testRunnerCallbacks, appendOutput, clearStore }: Props): void {
+  private initializeEngine({
+    id,
+    createPreviewURL,
+    initialFiles,
+    testRunnerCallbacks,
+    initialOptions,
+    appendOutput,
+    clearStore,
+  }: Props): void {
     this.dispose();
     this.setState({ engine: undefined, openFiles: [], files: [] });
-    clearStore();
-    Engine.create({ id, initialFiles, testRunnerCallbacks })
+    clearStore(initialOptions);
+    Engine.create({ id, createPreviewURL, initialFiles, testRunnerCallbacks })
       .then(async (engine) => {
         if (this.props.id === id) {
           this.setState({ engine, openFiles: engine.openFiles$.getValue() });
@@ -159,7 +172,7 @@ const ConnectedFullEditor = connect(
   undefined,
   (dispatch) => ({
     appendOutput: (output: OutputMessage) => dispatch(appendConsole(output)),
-    clearStore: () => dispatch(clearStoreBase()),
+    clearStore: (options?: InitialEditorStateOptions) => dispatch(clearStoreBase(options)),
     testRunnerCallbacks: {
       onUpdateSuite: (suite: TestSuite) => dispatch(updateTestSuite(suite)),
       onRemoveSuite: (path: string) => dispatch(removeTestSuite(path)),

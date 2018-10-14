@@ -1,10 +1,14 @@
 import { DeveloperClient, NEOONEDataProvider } from '@neo-one/client';
 import { constants } from '@neo-one/local';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
+import { WorkerManager } from '@neo-one/worker';
 import { Builder, BuildResult } from './build';
 
 export class BrowserLocalClient {
-  public constructor(private readonly builder: Builder, private readonly provider: JSONRPCLocalProvider) {}
+  public constructor(
+    private readonly builderManager: WorkerManager<typeof Builder>,
+    private readonly providerManager: WorkerManager<typeof JSONRPCLocalProvider>,
+  ) {}
 
   public async getNEOTrackerURL(): Promise<string | undefined> {
     return undefined;
@@ -12,7 +16,7 @@ export class BrowserLocalClient {
 
   public async reset(): Promise<void> {
     const developerClient = new DeveloperClient(
-      new NEOONEDataProvider({ network: constants.LOCAL_NETWORK_NAME, rpcURL: this.provider }),
+      new NEOONEDataProvider({ network: constants.LOCAL_NETWORK_NAME, rpcURL: this.providerManager }),
     );
     await developerClient.reset();
     await developerClient.updateSettings({ secondsPerBlock: 15 });
@@ -21,6 +25,6 @@ export class BrowserLocalClient {
   }
 
   public async build(): Promise<BuildResult> {
-    return this.builder.build();
+    return this.builderManager.getInstance().then(async (builder) => builder.build());
   }
 }

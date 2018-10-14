@@ -110,6 +110,7 @@
     "e2e-ci-9": "yarn run jest-9 --config jest/e2e-ci.js --ci -w 1",
     "e2e-ci-windows-9": "yarn run jest-windows-9 --config jest/e2e-ci.js --ci -w 1",
     "website:start": "cd packages/neo-one-website && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=../../tsconfig/tsconfig.es2017.cjs.json yarn run react-static start",
+    "website-preview:start": "yarn run ts-node ./packages/neo-one-editor/scripts/start.ts",
     "website:stage": "cd packages/neo-one-website && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=../../tsconfig/tsconfig.es2017.cjs.json yarn run react-static build --staging",
     "website:serve": "cd packages/neo-one-website && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=../../tsconfig/tsconfig.es2017.cjs.json yarn run serve dist -p 3000",
     "website:build": "cd packages/neo-one-website && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=../../tsconfig/tsconfig.es2017.cjs.json yarn run react-static build",

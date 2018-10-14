@@ -22,8 +22,8 @@ export class Builder extends WithWorkerMirroredFileSystem {
   }
 
   public async build(): Promise<BuildResult> {
-    const [fs, provider] = await Promise.all([this.fs, this.provider.getInstance()]);
+    const fs = await this.fs;
 
-    return build({ output$: this.output$, fs, provider });
+    return build({ output$: this.output$, fs, providerManager: this.provider });
   }
 }

@@ -6,26 +6,24 @@ import { ModuleBase } from '../ModuleBase';
 import { transpile } from './transpile';
 
 export class TranspiledModule extends ModuleBase {
-  public readonly transpile = _.debounce(
-    (): void => {
-      if (this.mutableTranspiling) {
-        this.mutableDirty = true;
+  public readonly transpile = _.debounce((): void => {
+    if (this.mutableTranspiling) {
+      this.mutableDirty = true;
 
-        return;
-      }
+      return;
+    }
 
-      this.mutableTranspiling = true;
-      this.doTranspile()
-        .then(() => {
-          this.mutableTranspiling = false;
-        })
-        .catch((error) => {
-          this.mutableTranspiling = false;
-          // tslint:disable-next-line no-console
-          console.error(error);
-        });
-    },
-  );
+    this.mutableTranspiling = true;
+    this.doTranspile()
+      .then(() => {
+        this.mutableTranspiling = false;
+      })
+      .catch((error) => {
+        this.mutableTranspiling = false;
+        // tslint:disable-next-line no-console
+        console.error(error);
+      });
+  }, 500);
 
   private mutableTranspiling = false;
   private mutableDirty = false;
@@ -44,19 +42,20 @@ export class TranspiledModule extends ModuleBase {
   }
 
   private async doTranspile(): Promise<void> {
-    const instance = await this.engine.transpiler.getInstance();
-    const content = this.engine.fs.readFileSync(this.path);
-    const result = await instance.transpile(this.path, content);
+    return this.engine.transpiler.withInstance(async (instance) => {
+      const content = this.engine.fs.readFileSync(this.path);
+      const result = await instance.transpile(this.path, content);
 
-    if (this.mutableDirty) {
-      this.mutableDirty = false;
-      await this.doTranspile();
-    } else {
-      this.mutableCode = result;
-      this.clearExports();
-      const transpiledPath = this.engine.getTranspiledPath(this.path);
-      ensureDir(this.engine.fs, nodePath.dirname(transpiledPath));
-      this.engine.fs.writeFileSync(transpiledPath, result);
-    }
+      if (this.mutableDirty) {
+        this.mutableDirty = false;
+        await this.doTranspile();
+      } else {
+        this.mutableCode = result;
+        this.clearExports();
+        const transpiledPath = this.engine.getTranspiledPath(this.path);
+        ensureDir(this.engine.fs, nodePath.dirname(transpiledPath));
+        this.engine.fs.writeFileSync(transpiledPath, result);
+      }
+    });
   }
 }

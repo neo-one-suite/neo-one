@@ -1,0 +1,18 @@
+{
+  "title": "ICO Info",
+  "files": [
+    {
+      "initial": "src/Info.tsx",
+      "solution": "src/Info.solution.tsx"
+    },
+    {
+      "solution": "src/index.tsx"
+    },
+    {
+      "solution": "public/index.html"
+    },
+    {
+      "solution": "one/contracts/Token.one.ts"
+    }
+  ]
+}

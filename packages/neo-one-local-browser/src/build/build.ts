@@ -1,13 +1,9 @@
-import {
-  JSONRPCProvider,
-  NEOONEDataProvider,
-  scriptHashToAddress,
-  SmartContractNetworksDefinition,
-  SourceMaps,
-} from '@neo-one/client';
+import { NEOONEDataProvider, scriptHashToAddress, SmartContractNetworksDefinition, SourceMaps } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-common';
 import { constants, deployContract, setupWallets } from '@neo-one/local';
+import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { genCommonBrowserFiles, genFiles } from '@neo-one/smart-contract-codegen';
+import { WorkerManager } from '@neo-one/worker';
 import { Subject } from 'rxjs';
 import { FileSystem } from '../filesystem';
 import { OutputMessage } from '../types';
@@ -23,14 +19,14 @@ interface SmartContractNetworksDefinitions {
 export interface BuildOptions {
   readonly output$: Subject<OutputMessage>;
   readonly fs: FileSystem;
-  readonly provider: JSONRPCProvider;
+  readonly providerManager: WorkerManager<typeof JSONRPCLocalProvider>;
 }
 
 export interface BuildResult {
   readonly files: BuildFiles;
 }
 
-export const build = async ({ fs, output$, provider: jsonRPCProvider }: BuildOptions): Promise<BuildResult> => {
+export const build = async ({ fs, output$, providerManager }: BuildOptions): Promise<BuildResult> => {
   output$.next({ owner: 'neo-one', message: 'Scanning for contracts...' });
   const contractPaths = await findContracts(fs);
   if (contractPaths.length === 0) {
@@ -46,7 +42,7 @@ export const build = async ({ fs, output$, provider: jsonRPCProvider }: BuildOpt
 
   const provider = new NEOONEDataProvider({
     network: constants.LOCAL_NETWORK_NAME,
-    rpcURL: jsonRPCProvider,
+    rpcURL: providerManager,
   });
   output$.next({ owner: 'neo-one', message: 'Setting up wallets...' });
   const wallets = await setupWallets(provider, constants.PRIVATE_NET_PRIVATE_KEY);

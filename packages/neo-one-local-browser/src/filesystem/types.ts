@@ -26,6 +26,8 @@ export interface Disposable {
 }
 
 export interface SubscribableFileSystem {
+  readonly writeFileSync: (path: string, content: string, opts?: FileOpts) => void;
+  readonly mkdirSync: (path: string) => void;
   readonly subscribe: (subscriber: Subscriber) => Disposable;
 }
 
@@ -47,6 +49,12 @@ export interface AsyncFileSystem {
   readonly mkdir: (path: string) => Promise<void>;
   readonly readFileOpts: (path: string) => Promise<FileOpts>;
   readonly writeFileOpts: (path: string, opts: FileOpts) => Promise<void>;
+}
+
+export interface RemoteFileSystem {
+  readonly handleChange: (change: FileSystemChange) => Promise<void>;
+  readonly writeFileSync: (path: string, content: string, opts?: FileOpts) => Promise<void>;
+  readonly mkdirSync: (path: string) => Promise<void>;
 }
 
 export interface FileOpts {

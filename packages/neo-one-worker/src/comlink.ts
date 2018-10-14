@@ -10,6 +10,7 @@ type Transferable = MessagePort | ArrayBuffer; // eslint-disable-line no-unused-
 export type Exposable = Function | Object; // eslint-disable-line no-unused-vars
 
 interface InvocationResult {
+  type: 'RETURN';
   id?: string;
   value: WrappedValue;
 }
@@ -163,6 +164,10 @@ export function proxy(endpoint: Endpoint | Window, target?: any): Proxy {
 }
 
 export function proxyValue<T>(obj: T): T {
+  if (obj instanceof MessagePort) {
+    return obj;
+  }
+
   (obj as any)[proxyValueSymbol] = true;
   return obj;
 }
@@ -175,53 +180,47 @@ export function expose(rootObj: Exposable, endpoint: Endpoint | Window): void {
   activateEndpoint(endpoint);
   attachMessageHandler(endpoint, async function(event: MessageEvent) {
     if (!event.data.id || !event.data.callPath) return;
-    const irequest = event.data as InvocationRequest;
-    const that = await irequest.callPath.slice(0, -1).reduce((obj, propName) => obj[propName], rootObj as any);
     let iresult;
-    let args: Array<{}> = [];
+    const irequest = event.data as InvocationRequest;
+    try {
+      const that = await irequest.callPath.slice(0, -1).reduce((obj, propName) => obj[propName], rootObj as any);
+      let args: Array<{}> = [];
 
-    if (irequest.type === 'APPLY' || irequest.type === 'CONSTRUCT') {
-      args = irequest.argumentsList.map(unwrapValue);
-    }
-    if (irequest.type === 'APPLY') {
-      try {
+      if (irequest.type === 'APPLY' || irequest.type === 'CONSTRUCT') {
+        args = irequest.argumentsList.map(unwrapValue);
+      }
+      if (irequest.type === 'APPLY') {
         if (irequest.callPath.length > 0) {
           iresult = await that[irequest.callPath[irequest.callPath.length - 1]](...args);
         } else {
           iresult = await that(...args);
         }
-      } catch (e) {
-        iresult = e;
-        iresult[throwSymbol] = true;
       }
-    }
-    if (irequest.type === 'CONSTRUCT') {
-      try {
+      if (irequest.type === 'CONSTRUCT') {
         if (irequest.callPath.length > 0) {
           iresult = await new that[irequest.callPath[irequest.callPath.length - 1]](...args);
         } else {
           iresult = await new that(...args);
         }
         iresult = proxyValue(iresult);
-      } catch (e) {
-        iresult = e;
-        iresult[throwSymbol] = true;
       }
-    }
-    if (irequest.type === 'SET' || irequest.type === 'GET') {
-      const obj = irequest.callPath.length > 0 ? await that[irequest.callPath[irequest.callPath.length - 1]] : that;
-      if (irequest.type === 'SET') {
-        obj[irequest.property] = irequest.value;
-        // FIXME: ES6 Proxy Handler `set` methods are supposed to return a
-        // boolean. To show good will, we return true asynchronously ¯\_(ツ)_/¯
-        iresult = true;
-      } else {
-        iresult = obj;
+      if (irequest.type === 'SET' || irequest.type === 'GET') {
+        const obj = irequest.callPath.length > 0 ? await that[irequest.callPath[irequest.callPath.length - 1]] : that;
+        if (irequest.type === 'SET') {
+          obj[irequest.property] = irequest.value;
+          // FIXME: ES6 Proxy Handler `set` methods are supposed to return a
+          // boolean. To show good will, we return true asynchronously ¯\_(ツ)_/¯
+          iresult = true;
+        } else {
+          iresult = obj;
+        }
       }
+    } catch (e) {
+      iresult = e;
+      iresult[throwSymbol] = true;
     }
 
-    iresult = makeInvocationResult(iresult);
-    iresult.id = irequest.id;
+    iresult = makeInvocationResult(irequest, iresult);
     return (endpoint as Endpoint).postMessage(iresult, transferableProperties([iresult]));
   });
 }
@@ -346,7 +345,7 @@ function pingPongMessage(endpoint: Endpoint, msg: Object, transferables: Transfe
 
   return new Promise((resolve) => {
     attachMessageHandler(endpoint, function handler(event: MessageEvent) {
-      if (event.data.id !== id) return;
+      if (event.data.id !== id || event.data.type !== 'RETURN') return;
       detachMessageHandler(endpoint, handler);
       resolve(event);
     });
@@ -377,6 +376,10 @@ function cbProxy(cb: CBProxyCallback, callPath: PropertyKey[] = [], target = fun
       });
     },
     get(_target, property, proxy) {
+      if (property === proxyValueSymbol) {
+        return true;
+      }
+
       if (property === 'then' && callPath.length === 0) {
         return { then: () => proxy };
       } else if (property === 'then') {
@@ -390,6 +393,10 @@ function cbProxy(cb: CBProxyCallback, callPath: PropertyKey[] = [], target = fun
       }
     },
     set(_target, property, value, _proxy): boolean {
+      if (property === proxyValueSymbol) {
+        return true;
+      }
+
       return cb({
         type: 'SET',
         callPath,
@@ -429,20 +436,10 @@ function transferableProperties(obj: {}[] | undefined): Transferable[] {
   return r;
 }
 
-function makeInvocationResult(obj: {}): InvocationResult {
-  for (const [type, transferHandler] of transferHandlers) {
-    if (transferHandler.canHandle(obj)) {
-      const value = transferHandler.serialize(obj);
-      return {
-        value: { type, value },
-      };
-    }
-  }
-
+function makeInvocationResult(irequest: InvocationRequest, obj: {}): InvocationResult {
   return {
-    value: {
-      type: 'RAW',
-      value: obj,
-    },
+    type: 'RETURN',
+    id: irequest.id,
+    value: wrapValue(obj),
   };
 }

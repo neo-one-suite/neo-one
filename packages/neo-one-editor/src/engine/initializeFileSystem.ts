@@ -6,9 +6,13 @@ import jest_d_ts from '!raw-loader!../../../../node_modules/@types/jest/index.d.
 // @ts-ignore
 import node_d_ts from '!raw-loader!../../../../node_modules/@types/node/index.d.ts';
 // @ts-ignore
+import reactDOM_d_ts from '!raw-loader!../../../../node_modules/@types/react-dom/index.d.ts';
+// @ts-ignore
 import react_d_ts from '!raw-loader!../../../../node_modules/@types/react/index.d.ts';
 // @ts-ignore
 import bignumber_d_ts from '!raw-loader!../../../../node_modules/bignumber.js/bignumber.d.ts';
+// @ts-ignore
+import styledComponents_d_ts from '!raw-loader!../../../../node_modules/styled-components/typings/styled-components.d.ts';
 // @ts-ignore
 import lib_d_ts from '!raw-loader!../../../../node_modules/typescript/lib/lib.d.ts';
 // @ts-ignore
@@ -94,9 +98,13 @@ import jestPackageJSONContents from '../../../../node_modules/@types/jest/packag
 // @ts-ignore
 import nodePackageJSONContents from '../../../../node_modules/@types/node/package.json';
 // @ts-ignore
+import reactDOMPackageJSONContents from '../../../../node_modules/@types/react-dom/package.json';
+// @ts-ignore
 import reactPackageJSONContents from '../../../../node_modules/@types/react/package.json';
 // @ts-ignore
 import bignumberPackageJSONContents from '../../../../node_modules/bignumber.js/package.json';
+// @ts-ignore
+import styledComponentsPackageJSONContents from '../../../../node_modules/styled-components/package.json';
 
 const writeFile = (fs: FileSystem, path: string, contents: string) => {
   const exists = pathExists(fs, path);
@@ -117,7 +125,9 @@ export const initializeFileSystem = (fs: FileSystem): void => {
   ensureDir(fs, '/node_modules/@types/jest');
   ensureDir(fs, '/node_modules/@types/node');
   ensureDir(fs, '/node_modules/@types/react');
+  ensureDir(fs, '/node_modules/@types/react-dom');
   ensureDir(fs, '/node_modules/bignumber.js');
+  ensureDir(fs, '/node_modules/styled-components/typings');
   ensureDir(fs, TRANSPILE_PATH);
   ensureDir(fs, nodePath.dirname(ENGINE_STATE_FILE));
 
@@ -166,8 +176,12 @@ export const initializeFileSystem = (fs: FileSystem): void => {
   writeFile(fs, '/node_modules/@types/node/package.json', JSON.stringify(nodePackageJSONContents));
   writeFile(fs, '/node_modules/@types/react/index.d.ts', react_d_ts);
   writeFile(fs, '/node_modules/@types/react/package.json', JSON.stringify(reactPackageJSONContents));
+  writeFile(fs, '/node_modules/@types/react-dom/index.d.ts', reactDOM_d_ts);
+  writeFile(fs, '/node_modules/@types/react-dom/package.json', JSON.stringify(reactDOMPackageJSONContents));
   writeFile(fs, '/node_modules/bignumber.js/bignumber.d.ts', bignumber_d_ts);
   writeFile(fs, '/node_modules/bignumber.js/package.json', JSON.stringify(bignumberPackageJSONContents));
+  writeFile(fs, '/node_modules/styled-components/typings/styled-components.d.ts', styledComponents_d_ts);
+  writeFile(fs, '/node_modules/styled-components/package.json', JSON.stringify(styledComponentsPackageJSONContents));
   // tslint:disable-next-line no-any
   Object.entries(files).forEach(([path, contents]: any) => {
     ensureDir(fs, nodePath.dirname(path));

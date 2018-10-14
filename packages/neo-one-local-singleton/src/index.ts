@@ -2,10 +2,11 @@
 /// <reference types="@neo-one/types" />
 import { BrowserLocalClient, FileSystem } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
+import { WorkerManager } from '@neo-one/worker';
 
 // tslint:disable no-let
 let browserLocalClient: BrowserLocalClient | undefined;
-let jsonRPCLocalProvider: JSONRPCLocalProvider | undefined;
+let jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider> | undefined;
 let fs: FileSystem | undefined;
 // tslint:enable no-let
 
@@ -21,16 +22,18 @@ export const setFileSystem = (_fs: FileSystem) => {
   fs = _fs;
 };
 
-export const getJSONRPCLocalProvider = (): JSONRPCLocalProvider => {
-  if (jsonRPCLocalProvider === undefined) {
+export const getJSONRPCLocalProviderManager = (): WorkerManager<typeof JSONRPCLocalProvider> => {
+  if (jsonRPCLocalProviderManager === undefined) {
     throw new Error('JSONRPCLocalProvider has not be set');
   }
 
-  return jsonRPCLocalProvider;
+  return jsonRPCLocalProviderManager;
 };
 
-export const setJSONRPCLocalProvider = (_jsonRPCLocalProvider: JSONRPCLocalProvider) => {
-  jsonRPCLocalProvider = _jsonRPCLocalProvider;
+export const setJSONRPCLocalProviderManager = (
+  _jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>,
+) => {
+  jsonRPCLocalProviderManager = _jsonRPCLocalProviderManager;
 };
 
 export const getBrowserLocalClient = (): BrowserLocalClient => {

@@ -1,63 +1,73 @@
 import {
   Builder,
+  copyToRemote,
   createBuilderManager,
+  createJSONRPCLocalProviderManager,
   dirname,
   ensureDir,
   FileSystem,
-  jsonRPCLocalProviderManager,
   LocalForageFileSystem,
   MemoryFileSystem,
   MirrorFileSystem,
   OutputMessage,
   pathExists,
+  RemoteFileSystem,
   traverseDirectory,
 } from '@neo-one/local-browser';
-import { WorkerManager } from '@neo-one/worker';
+import { JSONRPCLocalProvider } from '@neo-one/node-browser';
+import { comlink, WorkerManager } from '@neo-one/worker';
 import _ from 'lodash';
 import * as nodePath from 'path';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { EditorFiles } from '../editor';
 import { EngineContentFiles, EngineState, TestRunnerCallbacks } from '../types';
-import { EngineBase } from './EngineBase';
+import { EngineBase, PathWithExports } from './EngineBase';
 import { ENGINE_STATE_FILE, initializeFileSystem, INTERNAL_DIR } from './initializeFileSystem';
 import { ModuleBase } from './ModuleBase';
 import { packages } from './packages';
 import { TestRunner } from './test';
 import { transpiler } from './transpile';
-import { Exports } from './types';
+import { RegisterPreviewEngineResult } from './types';
 
 export interface EngineCreateOptions {
   readonly id: string;
+  readonly createPreviewURL: (id: string) => string;
   readonly initialFiles: EngineContentFiles;
   readonly testRunnerCallbacks: TestRunnerCallbacks;
 }
 
-interface PathWithExports {
-  readonly path: string;
-  readonly exports: Exports;
-}
-
 interface EngineOptions {
   readonly id: string;
+  readonly createPreviewURL: (id: string) => string;
   readonly output$: Subject<OutputMessage>;
   readonly builderManager: WorkerManager<typeof Builder>;
+  readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
   readonly fs: FileSystem;
   readonly pathWithExports: ReadonlyArray<PathWithExports>;
   readonly testRunnerCallbacks: TestRunnerCallbacks;
 }
 
+const engines = new Map<string, Engine>();
+
 export class Engine extends EngineBase {
-  public static async create({ id, initialFiles, testRunnerCallbacks }: EngineCreateOptions): Promise<Engine> {
+  public static async create({
+    id,
+    createPreviewURL,
+    initialFiles,
+    testRunnerCallbacks,
+  }: EngineCreateOptions): Promise<Engine> {
+    const existingEngine = engines.get(id);
+    if (existingEngine !== undefined) {
+      return existingEngine;
+    }
+
     const output$ = new Subject<OutputMessage>();
+    const jsonRPCLocalProviderManager = createJSONRPCLocalProviderManager(id);
     const builderManager = createBuilderManager(output$, id, jsonRPCLocalProviderManager);
-    const [fs, builderInstance, jsonRPCLocalProvider] = await Promise.all([
-      MirrorFileSystem.create(new MemoryFileSystem(), new LocalForageFileSystem(id)),
-      builderManager.getInstance(),
-      jsonRPCLocalProviderManager.getInstance(),
-    ]);
+    const fs = await MirrorFileSystem.create(new MemoryFileSystem(), new LocalForageFileSystem(id));
 
     fs.subscribe((change) => {
-      builderInstance.onFileSystemChange(change).catch((error) => {
+      builderManager.withInstance(async (builder) => builder.onFileSystemChange(change)).catch((error) => {
         // tslint:disable-next-line no-console
         console.error(error);
       });
@@ -80,12 +90,22 @@ export class Engine extends EngineBase {
       (acc, { path, exports }) =>
         acc.concat({
           path,
-          exports: exports({ fs, jsonRPCLocalProvider, builder: builderInstance }),
+          exports: exports({ fs, jsonRPCLocalProviderManager, builderManager }),
         }),
       [],
     );
 
-    const engine = new Engine({ id, output$, builderManager, fs, pathWithExports, testRunnerCallbacks });
+    const engine = new Engine({
+      id,
+      createPreviewURL,
+      output$,
+      builderManager,
+      jsonRPCLocalProviderManager,
+      fs,
+      pathWithExports,
+      testRunnerCallbacks,
+    });
+    engines.set(id, engine);
 
     if (!exists) {
       initialFiles.forEach((file) => {
@@ -105,21 +125,36 @@ export class Engine extends EngineBase {
     return engine;
   }
 
+  public readonly output$: Subject<OutputMessage>;
   public readonly openFiles$: BehaviorSubject<EditorFiles>;
   public readonly files$: BehaviorSubject<EditorFiles>;
+  public readonly createPreviewURL: () => string;
   private readonly testRunner: TestRunner;
   private readonly builderManager: WorkerManager<typeof Builder>;
+  private readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
 
-  private constructor({ id, output$, fs, builderManager, pathWithExports, testRunnerCallbacks }: EngineOptions) {
-    super({ id, output$, fs, transpiler, pathWithExports });
+  private constructor({
+    id,
+    createPreviewURL,
+    output$,
+    fs,
+    builderManager,
+    jsonRPCLocalProviderManager,
+    pathWithExports,
+    testRunnerCallbacks,
+  }: EngineOptions) {
+    super({ id, fs, transpiler, pathWithExports });
+    this.output$ = output$;
     this.openFiles$ = new BehaviorSubject<EditorFiles>([]);
     this.files$ = new BehaviorSubject<EditorFiles>(
       [...traverseDirectory(fs, '/')]
         .filter((path) => !path.startsWith(INTERNAL_DIR))
         .map((path) => this.getFile(path)),
     );
+    this.createPreviewURL = () => createPreviewURL(id);
     this.testRunner = new TestRunner(this, testRunnerCallbacks);
     this.builderManager = builderManager;
+    this.jsonRPCLocalProviderManager = jsonRPCLocalProviderManager;
 
     this.fs.subscribe((event) => {
       switch (event.type) {
@@ -141,12 +176,13 @@ export class Engine extends EngineBase {
   }
 
   public async build(): Promise<void> {
-    const builder = await this.builderManager.getInstance();
-    const result = await builder.build();
+    await this.builderManager.withInstance(async (builder) => {
+      const result = await builder.build();
 
-    result.files.forEach((file) => {
-      ensureDir(this.fs, dirname(file.path));
-      this.fs.writeFileSync(file.path, file.content, { writable: true });
+      result.files.forEach((file) => {
+        ensureDir(this.fs, dirname(file.path));
+        this.fs.writeFileSync(file.path, file.content, { writable: true });
+      });
     });
   }
 
@@ -168,6 +204,32 @@ export class Engine extends EngineBase {
     return {
       ...this.testRunner.getTestGlobals(mod),
       ...super.getGlobals(mod),
+    };
+  }
+
+  public async registerPreviewEngine({ fs }: { readonly fs: RemoteFileSystem }): Promise<RegisterPreviewEngineResult> {
+    const copyPromise = copyToRemote(this.fs, fs);
+
+    this.fs.subscribe((change) => {
+      copyPromise
+        .then(async () =>
+          fs.handleChange(change).catch((error) => {
+            // tslint:disable-next-line no-console
+            console.error(error);
+          }),
+        )
+        .catch(() => {
+          // do nothing
+        });
+    });
+
+    await copyPromise;
+
+    return {
+      id: this.id,
+      builderManager: comlink.proxyValue(this.builderManager),
+      jsonRPCLocalProviderManager: comlink.proxyValue(this.jsonRPCLocalProviderManager),
+      transpiler: comlink.proxyValue(transpiler),
     };
   }
 }

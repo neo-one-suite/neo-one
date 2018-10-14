@@ -109,10 +109,19 @@ const getChapterFiles = async (
 const getChapterFile = async (dir: string, initial: string | undefined, solution: string): Promise<ChapterFile> => {
   const readFile = async (filePath: string) => {
     const content = await fs.readFile(path.resolve(dir, filePath), 'utf8');
+    const lines = content.split('\n');
 
-    return content
-      .split('\n')
-      .filter((line) => !line.includes('@ts-ignore') && !line.includes('tslint:disable'))
+    return lines
+      .filter(
+        (line, idx) =>
+          !(
+            line.includes('{/*') &&
+            (lines[idx + 1] as string | undefined) !== undefined &&
+            lines[idx + 1].includes('@ts-ignore')
+          ) &&
+          !line.includes('@ts-ignore') &&
+          !line.includes('tslint:disable'),
+      )
       .join('\n');
   };
 

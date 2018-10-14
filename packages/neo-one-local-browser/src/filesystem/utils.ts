@@ -1,9 +1,9 @@
 // tslint:disable no-array-mutation
 import { join } from '../path';
 import { normalizePath } from './keyValueFileSystem';
-import { FileSystem } from './types';
+import { FileSystem, RemoteFileSystem, SubscribableFileSystem } from './types';
 
-const ensureDirSingle = (fs: FileSystem, dir: string) => {
+const ensureDirSingle = (fs: SubscribableFileSystem | FileSystem, dir: string) => {
   try {
     fs.mkdirSync(dir);
   } catch (error) {
@@ -23,7 +23,7 @@ export const pathExists = (fs: FileSystem, path: string) => {
   }
 };
 
-export const ensureDir = (fs: FileSystem, dirIn: string) => {
+export const ensureDir = (fs: SubscribableFileSystem | FileSystem, dirIn: string) => {
   const dir = normalizePath(dirIn);
   const parts = dir.split('/');
   let current = parts.shift();
@@ -67,3 +67,27 @@ export function* traverseDirectory(fs: FileSystem, dir: string) {
     next = mutableQueue.shift();
   }
 }
+
+export const copyToRemote = async (fs: FileSystem, remote: RemoteFileSystem) => {
+  async function copyWorker(pathIn: string): Promise<void> {
+    if (pathIn !== '/') {
+      await remote.mkdirSync(pathIn);
+    }
+    const paths = fs.readdirSync(pathIn);
+    await Promise.all(
+      paths.map(async (file) => {
+        const path = `${pathIn === '/' ? '' : pathIn}/${file}`;
+        const stat = fs.statSync(path);
+        if (stat.isFile()) {
+          const content = fs.readFileSync(path);
+          const opts = fs.readFileOptsSync(path);
+          await remote.writeFileSync(path, content, opts);
+        } else if (stat.isDirectory()) {
+          await copyWorker(path);
+        }
+      }),
+    );
+  }
+
+  await copyWorker('/');
+};

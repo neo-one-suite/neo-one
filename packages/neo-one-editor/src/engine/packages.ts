@@ -3,13 +3,15 @@ import * as clientFull from '@neo-one/client-full';
 import { BrowserLocalClient, Builder, FileSystem } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import * as react from '@neo-one/react';
+import * as reactCommon from '@neo-one/react-common';
 import { createWithContracts } from '@neo-one/smart-contract-test-browser';
+import { WorkerManager } from '@neo-one/worker';
 import { Exports } from './types';
 
 export interface ExportsOptions {
   readonly fs: FileSystem;
-  readonly jsonRPCLocalProvider: JSONRPCLocalProvider;
-  readonly builder: Builder;
+  readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
+  readonly builderManager: WorkerManager<typeof Builder>;
 }
 
 export interface PackageConfig {
@@ -35,6 +37,11 @@ export const packages: ReadonlyArray<PackageConfig> = [
     exports: () => react,
   },
   {
+    name: '@neo-one/react-common',
+    path: '/node_modules/@neo-one/react-common/src/index.ts',
+    exports: () => reactCommon,
+  },
+  {
     name: '@neo-one/smart-contract-test-browser',
     path: '/node_modules/@neo-one/smart-contract-test-browser/src/index.ts',
     exports: ({ fs }) => ({
@@ -44,12 +51,12 @@ export const packages: ReadonlyArray<PackageConfig> = [
   {
     name: '@neo-one/local-singleton',
     path: '/node_modules/@neo-one/local-singleton/src/index.ts',
-    exports: ({ fs, jsonRPCLocalProvider, builder }) => {
-      const browserLocalClient = new BrowserLocalClient(builder, jsonRPCLocalProvider);
+    exports: ({ fs, jsonRPCLocalProviderManager, builderManager }) => {
+      const browserLocalClient = new BrowserLocalClient(builderManager, jsonRPCLocalProviderManager);
 
       return {
         getFileSystem: () => fs,
-        getJSONRPCLocalProvider: () => jsonRPCLocalProvider,
+        getJSONRPCLocalProviderManager: () => jsonRPCLocalProviderManager,
         getBrowserLocalClient: () => browserLocalClient,
       };
     },

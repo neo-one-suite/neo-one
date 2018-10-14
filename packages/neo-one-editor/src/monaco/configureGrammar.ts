@@ -30,26 +30,23 @@ class TokenizerState implements monacoNsps.languages.IState {
 }
 
 // tslint:disable-next-line no-let
-let wasmLoaded = false;
-// tslint:disable-next-line no-let
-let grammar: IGrammar | undefined;
+let grammar: Promise<IGrammar> | undefined;
 
 export const configureGrammar = async (languageID: string) => {
-  if (!wasmLoaded || grammar === undefined) {
-    await loadWASM(onigasm);
+  if (grammar === undefined) {
+    grammar = loadWASM(onigasm).then(async () => {
+      const registry = new Registry({
+        getGrammarDefinition: async () => ({
+          format: 'plist',
+          content: tsGrammar,
+        }),
+      });
 
-    const registry = new Registry({
-      getGrammarDefinition: async () => ({
-        format: 'plist',
-        content: tsGrammar,
-      }),
+      return registry.loadGrammar('source.tsx');
     });
-
-    grammar = await registry.loadGrammar('source.tsx');
-    wasmLoaded = true;
   }
 
-  const grammarDefined = grammar;
+  const grammarDefined = await grammar;
 
   monaco.languages.setTokensProvider(languageID, {
     getInitialState: () => new TokenizerState(INITIAL),

@@ -9,8 +9,14 @@ export const createBuilderManager = (
   fileSystemID: string,
   provider: WorkerManager<typeof JSONRPCLocalProvider>,
 ) =>
-  new WorkerManager<typeof Builder>(
-    BuilderWorker,
-    new BehaviorSubject({ output$: comlink.proxyValue(output$), fileSystemID, provider: comlink.proxyValue(provider) }),
-    30 * 1000,
+  comlink.proxyValue(
+    new WorkerManager<typeof Builder>(
+      BuilderWorker,
+      new BehaviorSubject({
+        output$: comlink.proxyValue(output$),
+        fileSystemID,
+        provider: comlink.proxyValue(provider),
+      }),
+      30 * 1000,
+    ),
   );
