@@ -30,7 +30,7 @@
     "localforage": "^1.7.2",
     "lodash": "^4.17.11",
     "markdown-it": "^8.4.2",
-    "markdown-it-anchor": "^2.0.3",
+    "markdown-it-anchor": "^5.0.0",
     "markdown-it-table-of-contents": "^0.4.3",
     "prismjs": "1.15.0",
     "react": "^16.5.1",
