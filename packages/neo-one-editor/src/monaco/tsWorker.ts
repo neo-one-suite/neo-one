@@ -39,35 +39,26 @@ export class TypeScriptWorker implements ts.LanguageServiceHost {
 
   private readonly ctx: IWorkerContext;
   // tslint:disable-next-line readonly-keyword
-  private languageService!: ts.LanguageService;
+  private readonly languageService: ts.LanguageService;
   private readonly compilerOptions: ts.CompilerOptions;
   private readonly isSmartContract: boolean;
   // tslint:disable-next-line readonly-keyword
-  private fs!: FileSystem;
+  private readonly fs: FileSystem;
   private readonly initPromise: Promise;
 
   // tslint:disable-next-line no-any
-  public constructor(ctx: IWorkerContext, createData: ICreateData, fsPromise: any) {
+  public constructor(ctx: IWorkerContext, createData: ICreateData, fs: FileSystem) {
     this.ctx = ctx;
     this.compilerOptions = createData.compilerOptions;
     this.isSmartContract = createData.isSmartContract;
-    this.initPromise = Promise.wrap(
-      fsPromise
-        // tslint:disable-next-line no-any
-        .then((fs: any) => {
-          this.fs = fs;
-          const fsHost = createFSHost(this.fs);
-          this.readDirectory = fsHost.readDirectory;
-          this.readFile = fsHost.readFile;
-          this.fileExists = fsHost.fileExists;
-          this.getDirectories = fsHost.getDirectories;
-          this.languageService = ts.createLanguageService(this);
-        })
-        .catch((error: Error) => {
-          // tslint:disable-next-line no-console
-          console.error(error);
-        }),
-    );
+    this.fs = fs;
+    const fsHost = createFSHost(this.fs);
+    this.readDirectory = fsHost.readDirectory;
+    this.readFile = fsHost.readFile;
+    this.fileExists = fsHost.fileExists;
+    this.getDirectories = fsHost.getDirectories;
+    this.languageService = ts.createLanguageService(this);
+    this.initPromise = Promise.wrap(undefined);
   }
 
   public getCompilationSettings(): ts.CompilerOptions {

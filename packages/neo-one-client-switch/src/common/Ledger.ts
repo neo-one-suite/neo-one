@@ -7,7 +7,9 @@ export interface HWLedger {
 export interface Ledger {
   readonly type: string;
   readonly byteLimit: number;
-  readonly open: (path: string) => Promise<HWLedger>;
-  readonly list: () => Promise<ReadonlyArray<string>>;
-  readonly isSupported: () => Promise<boolean>;
+  readonly load: () => Promise<{
+    readonly open: (path: string) => Promise<HWLedger>;
+    readonly list: () => Promise<ReadonlyArray<string>>;
+    readonly isSupported: () => Promise<boolean>;
+  }>;
 }

@@ -24,6 +24,15 @@ if (typeof window !== 'undefined') {
 
 // tslint:disable-next-line strict-type-predicates
 if (typeof document !== 'undefined') {
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch((error) => {
+        // tslint:disable-next-line no-console
+        console.error(error);
+      });
+    });
+  }
+
   // tslint:disable-next-line no-any strict-boolean-expressions
   const renderMethod = (module as any).hot ? ReactDOM.render : ReactDOM.hydrate || ReactDOM.render;
   // tslint:disable-next-line no-any

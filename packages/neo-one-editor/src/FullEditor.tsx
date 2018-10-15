@@ -3,7 +3,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Subscription } from 'rxjs';
 import { ReduxStoreProvider } from './containers';
-import { Editor, EditorFiles } from './editor';
+import { Editor, EditorFile, EditorFiles } from './editor';
 import {
   appendConsole,
   clearStore as clearStoreBase,
@@ -16,7 +16,7 @@ import {
   updateTestSuite,
 } from './editor/redux';
 import { EditorContext } from './EditorContext';
-import { Engine } from './engine';
+import { createEngineContext, Engine } from './engine';
 import { Loading } from './Loading';
 import { EngineContentFiles, Test, TestRunnerCallbacks, TestSuite } from './types';
 
@@ -46,7 +46,7 @@ const TestsPassContainer = connect(selectConsoleTestSuites)(
 
 interface ExternalProps {
   readonly id: string;
-  readonly createPreviewURL: (id: string) => string;
+  readonly createPreviewURL: () => string;
   readonly initialFiles: EngineContentFiles;
   readonly initialOptions?: InitialEditorStateOptions;
   readonly onTestsPass?: () => void;
@@ -59,15 +59,14 @@ interface Props extends ExternalProps {
 }
 
 interface State {
+  readonly file?: EditorFile;
   readonly openFiles: EditorFiles;
-  readonly files: EditorFiles;
   readonly engine?: Engine;
 }
 
 class FullEditorBase extends React.Component<Props, State> {
-  public readonly state: State = { openFiles: [], files: [] };
+  public readonly state: State = { openFiles: [] };
   private mutableOpenFilesSubscription: Subscription | undefined;
-  private mutableBuildFilesSubscription: Subscription | undefined;
   private mutableOutputSubscription: Subscription | undefined;
 
   public componentDidMount(): void {
@@ -81,7 +80,7 @@ class FullEditorBase extends React.Component<Props, State> {
   }
 
   public render() {
-    const { engine, files, openFiles } = this.state;
+    const { engine, file, openFiles } = this.state;
     const {
       id: _id,
       initialFiles: _initialFiles,
@@ -101,7 +100,7 @@ class FullEditorBase extends React.Component<Props, State> {
       <EditorContext.Provider value={{ engine }}>
         <>
           <TestsPassContainer onTestsPass={onTestsPass} />
-          <Editor openFiles={openFiles} files={files} {...props} />
+          <Editor file={file} openFiles={openFiles} onSelectFile={this.onSelectFile} {...props} />
         </>
       </EditorContext.Provider>
     );
@@ -117,34 +116,42 @@ class FullEditorBase extends React.Component<Props, State> {
     clearStore,
   }: Props): void {
     this.dispose();
-    this.setState({ engine: undefined, openFiles: [], files: [] });
+    this.setState({ engine: undefined, openFiles: [] });
     clearStore(initialOptions);
-    Engine.create({ id, createPreviewURL, initialFiles, testRunnerCallbacks })
-      .then(async (engine) => {
-        if (this.props.id === id) {
-          this.setState({ engine, openFiles: engine.openFiles$.getValue() });
-          this.mutableOpenFilesSubscription = engine.openFiles$.subscribe({
-            next: (openFiles) => {
-              this.setState({ openFiles });
-            },
-          });
-          this.mutableBuildFilesSubscription = engine.files$.subscribe({
-            next: (files) => {
-              this.setState({ files });
-            },
-          });
-          this.mutableOutputSubscription = engine.output$.subscribe({
-            next: (output) => {
-              appendOutput(output);
-            },
-          });
-        }
-      })
+    createEngineContext({ id, createPreviewURL })
+      .then(async (context) =>
+        Engine.create({ context, initialFiles, testRunnerCallbacks }).then(async (engine) => {
+          if (this.props.id === id) {
+            const openFiles = engine.context.openFiles$.getValue().map((path) => engine.getFile(path));
+            this.setState({
+              engine,
+              file: openFiles[0],
+              openFiles,
+            });
+            this.mutableOpenFilesSubscription = engine.context.openFiles$.subscribe({
+              next: (nextOpenFiles) => {
+                this.setState({ openFiles: nextOpenFiles.map((path) => engine.getFile(path)) });
+              },
+            });
+            this.mutableOutputSubscription = engine.context.output$.subscribe({
+              next: (output) => {
+                appendOutput(output);
+              },
+            });
+          } else {
+            engine.dispose();
+          }
+        }),
+      )
       .catch((error) => {
         // tslint:disable-next-line no-console
         console.error(error);
       });
   }
+
+  private readonly onSelectFile = (file?: EditorFile) => {
+    this.setState({ file });
+  };
 
   private dispose(): void {
     if (this.state.engine !== undefined) {
@@ -153,9 +160,6 @@ class FullEditorBase extends React.Component<Props, State> {
 
     this.disposeSubscription(this.mutableOpenFilesSubscription);
     this.mutableOpenFilesSubscription = undefined;
-
-    this.disposeSubscription(this.mutableBuildFilesSubscription);
-    this.mutableBuildFilesSubscription = undefined;
 
     this.disposeSubscription(this.mutableOutputSubscription);
     this.mutableOutputSubscription = undefined;

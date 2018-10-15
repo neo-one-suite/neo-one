@@ -280,14 +280,21 @@ export class TestRunner {
   }
 
   public async runTest(path: string) {
-    const test = this.engine.modules[path];
+    const test = this.engine.modules.get(path);
 
-    await runTestsSerially(test, createHandleTestEvent(test, this.callbacks), this.callbacks.setTestsRunning);
+    if (test !== undefined) {
+      await runTestsSerially(test, createHandleTestEvent(test, this.callbacks), this.callbacks.setTestsRunning);
+    }
   }
 
   public findTests(): ReadonlyArray<ModuleBase> {
-    return Object.entries(this.engine.modules)
-      .filter(([path]) => isTest(path))
-      .map((value) => value[1]);
+    const mutableTests: ModuleBase[] = [];
+    this.engine.modules.forEach((mod, path) => {
+      if (isTest(path)) {
+        mutableTests.push(mod);
+      }
+    });
+
+    return mutableTests;
   }
 }

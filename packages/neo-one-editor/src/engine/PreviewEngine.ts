@@ -1,10 +1,9 @@
-import { MemoryFileSystem } from '@neo-one/local-browser';
 import { comlink } from '@neo-one/worker';
 import _ from 'lodash';
+import { createFileSystem, createTranspileCache } from './create';
 import { Engine } from './Engine';
-import { EngineBase, PathWithExports } from './EngineBase';
+import { EngineBase } from './EngineBase';
 import { ModuleBase } from './ModuleBase';
-import { packages } from './packages';
 import { RegisterPreviewEngineResult } from './types';
 
 export interface PreviewEngineCreateOptions {
@@ -19,36 +18,25 @@ export class PreviewEngine extends EngineBase {
     if (mutablePreviewEngine === undefined) {
       // tslint:disable-next-line no-any
       const engine: Engine = comlink.proxy(port) as any;
-      const fs = new MemoryFileSystem();
       const {
         id,
+        endpoint,
         builderManager,
         jsonRPCLocalProviderManager,
-        transpiler,
-      }: RegisterPreviewEngineResult = await engine.registerPreviewEngine({
-        // tslint:disable-next-line no-any
-        fs: comlink.proxyValue(fs) as any,
+      }: RegisterPreviewEngineResult = await engine.registerPreviewEngine();
+      const [fs, transpileCache] = await Promise.all([
+        createFileSystem(id, endpoint),
+        createTranspileCache(id, endpoint),
+      ]);
+      const previewEngine = new PreviewEngine({
+        fs,
+        transpileCache,
+        builderManager,
+        jsonRPCLocalProviderManager,
       });
-
-      const pathWithExports = packages.reduce<ReadonlyArray<PathWithExports>>(
-        (acc, { path, exports }) =>
-          acc.concat({
-            path,
-            exports: exports({ fs, jsonRPCLocalProviderManager, builderManager }),
-          }),
-        [],
-      );
-
-      const previewEngine = new PreviewEngine({ id, fs, pathWithExports, transpiler });
       mutablePreviewEngine = previewEngine;
-      mutablePreviewEngine.fs.subscribe((change) => {
-        switch (change.type) {
-          case 'writeFile':
-            previewEngine.renderJS();
-            break;
-          default:
-          // do nothing
-        }
+      transpileCache.changes.on('change', () => {
+        previewEngine.renderJS();
       });
     }
 
@@ -82,6 +70,11 @@ export class PreviewEngine extends EngineBase {
   }
 
   private findEntryModule(): ModuleBase {
-    return this.modules['/src/index.tsx'];
+    const entry = this.modules.get('/src/index.tsx');
+    if (entry === undefined) {
+      throw new Error('Could not find entry file');
+    }
+
+    return entry;
   }
 }

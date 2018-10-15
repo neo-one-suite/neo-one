@@ -1,4 +1,5 @@
-import { dirname, FileSystem, normalizePath, traverseDirectory } from '@neo-one/local-browser';
+import { Builder, dirname, normalizePath, PouchDBFileSystem, PouchDBFileSystemDoc } from '@neo-one/local-browser';
+import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { WorkerManager } from '@neo-one/worker';
 import * as bignumber from 'bignumber.js';
 import * as nodePath from 'path';
@@ -8,14 +9,12 @@ import * as reakit from 'reakit';
 import * as rxjs from 'rxjs';
 import * as rxjsOperators from 'rxjs/operators';
 import * as styledComponents from 'styled-components';
-import { EditorFile } from '../editor';
 import { ModuleNotFoundError } from '../errors';
-import { getFileType } from '../utils';
-import { EMPTY_MODULE_PATH, TRANSPILE_PATH } from './initializeFileSystem';
 import { ModuleBase } from './ModuleBase';
+import { getPathWithExports } from './packages';
 import { resolve } from './resolve';
 import { StaticExportsModule } from './StaticExportsModule';
-import { TranspiledModule, Transpiler } from './transpile';
+import { TranspiledModule } from './TranspiledModule';
 import { Exports } from './types';
 
 export interface PathWithExports {
@@ -24,75 +23,67 @@ export interface PathWithExports {
 }
 
 interface EngineBaseOptions {
-  readonly id: string;
-  readonly fs: FileSystem;
-  readonly pathWithExports: ReadonlyArray<PathWithExports>;
-  readonly transpiler: WorkerManager<typeof Transpiler>;
+  readonly fs: PouchDBFileSystem;
+  readonly transpileCache: PouchDBFileSystem;
+  readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
+  readonly builderManager: WorkerManager<typeof Builder>;
 }
 
-interface Modules {
-  // tslint:disable-next-line readonly-keyword
-  [path: string]: ModuleBase;
-}
+type Modules = Map<string, ModuleBase>;
 
-const BUILTIN_MODULES = new Set([
-  'path',
-  'bignumber.js',
-  'react',
-  'react-dom',
-  'reakit',
-  'styled-components',
-  'rxjs',
-  'rxjs/operators',
-]);
+const EMPTY_MODULE_PATH = '$empty';
 
 export class EngineBase {
-  public readonly id: string;
-  public readonly fs: FileSystem;
-  public readonly transpiler: WorkerManager<typeof Transpiler>;
-  private readonly mutableModules: Modules;
+  protected readonly mutableModules: Modules;
+  protected readonly fs: PouchDBFileSystem;
+  private readonly transpileCacheChanges: PouchDB.Core.Changes<PouchDBFileSystemDoc>;
   // tslint:disable-next-line readonly-keyword
   private readonly mutableCachedPaths: { [currentPath: string]: { [path: string]: string } } = {};
 
-  public constructor({ id, fs, transpiler, pathWithExports }: EngineBaseOptions) {
-    this.id = id;
+  public constructor({ fs, transpileCache, builderManager, jsonRPCLocalProviderManager }: EngineBaseOptions) {
     this.fs = fs;
-    this.transpiler = transpiler;
-    this.mutableModules = pathWithExports.reduce<Modules>(
-      (acc, { path, exports }) => ({
-        ...acc,
-        [path]: new StaticExportsModule(this, path, exports),
-      }),
-      {
-        path: new StaticExportsModule(this, 'path', nodePath),
-        react: new StaticExportsModule(this, 'react', React),
-        reakit: new StaticExportsModule(this, 'reakit', reakit),
-        rxjs: new StaticExportsModule(this, 'rxjs', rxjs),
-        'rxjs/operators': new StaticExportsModule(this, 'rxjs/operators', rxjsOperators),
-        'styled-components': new StaticExportsModule(this, 'styled-components', styledComponents),
-        'react-dom': new StaticExportsModule(this, 'react-dom', ReactDOM),
-        'bignumber.js': new StaticExportsModule(this, 'bignumber.js', bignumber),
-      },
-    );
-    this.loadTranspiledModules();
+    const pathWithExports = getPathWithExports({ fs, builderManager, jsonRPCLocalProviderManager });
+    this.mutableModules = new Map([
+      [EMPTY_MODULE_PATH, new StaticExportsModule(this, EMPTY_MODULE_PATH, {})],
+      ['path', new StaticExportsModule(this, 'path', nodePath)],
+      ['react', new StaticExportsModule(this, 'react', React)],
+      ['reakit', new StaticExportsModule(this, 'reakit', reakit)],
+      ['rxjs', new StaticExportsModule(this, 'rxjs', rxjs)],
+      ['rxjs/operators', new StaticExportsModule(this, 'rxjs/operators', rxjsOperators)],
+      ['styled-components', new StaticExportsModule(this, 'styled-components', styledComponents)],
+      ['react-dom', new StaticExportsModule(this, 'react-dom', ReactDOM)],
+      ['bignumber.js', new StaticExportsModule(this, 'bignumber.js', bignumber)],
+    ]);
+    // tslint:disable-next-line no-loop-statement
+    for (const { path, exports } of pathWithExports) {
+      this.mutableModules.set(path, new StaticExportsModule(this, path, exports));
+    }
+
+    transpileCache.files.forEach((file, path) => {
+      this.mutableModules.set(path, new TranspiledModule(this, path, file.content));
+    });
+
+    this.transpileCacheChanges = transpileCache.db
+      .changes({ since: 'now', live: true, include_docs: true })
+      .on('change', (change) => {
+        if (change.doc === undefined) {
+          this.mutableModules.delete(change.id);
+        } else {
+          const current = this.mutableModules.get(change.id);
+          if (current !== undefined) {
+            current.clearExports();
+          }
+          this.mutableModules.set(change.id, new TranspiledModule(this, change.id, change.doc.content));
+        }
+      });
   }
 
   public dispose(): void {
-    // do nothing
+    this.transpileCacheChanges.cancel();
   }
 
-  public get modules(): { readonly [path: string]: ModuleBase } {
+  public get modules(): Map<string, ModuleBase> {
     return this.mutableModules;
-  }
-
-  public getFile(path: string): EditorFile {
-    const { writable } = this.fs.readFileOptsSync(path);
-
-    return { path, writable };
-  }
-
-  public getTranspiledPath(path: string): string {
-    return nodePath.join(TRANSPILE_PATH, path);
   }
 
   public getGlobals(mod: ModuleBase) {
@@ -108,7 +99,7 @@ export class EngineBase {
   }
 
   public resolveModule(path: string, currentPath: string): ModuleBase {
-    if (BUILTIN_MODULES.has(path)) {
+    if (!path.startsWith('.') && !path.startsWith('/')) {
       return this.getModule(path, true);
     }
 
@@ -126,55 +117,13 @@ export class EngineBase {
     return this.getModule(resolvedPath);
   }
 
-  private readonly onWriteFile = (pathIn: string): void => {
-    const path = normalizePath(pathIn);
-    if (getFileType(path) === 'typescript' && !path.startsWith(TRANSPILE_PATH) && !path.startsWith('/node_modules')) {
-      this.transpileModule(path);
-    }
-  };
-
   private getModule(pathIn: string, normalized = false): ModuleBase {
     const path = normalized ? pathIn : normalizePath(pathIn);
-    const mod = this.mutableModules[path] as ModuleBase | undefined;
+    const mod = this.mutableModules.get(path);
     if (mod === undefined) {
       throw new ModuleNotFoundError(path);
     }
 
     return mod;
-  }
-
-  private transpileModule(pathIn: string): TranspiledModule {
-    const path = normalizePath(pathIn);
-    const mod = this.mutableModules[path] as ModuleBase | undefined;
-    let transpiledModule = mod !== undefined && mod instanceof TranspiledModule ? mod : undefined;
-    if (transpiledModule === undefined) {
-      transpiledModule = new TranspiledModule(this, path);
-      this.mutableModules[path] = transpiledModule;
-    }
-
-    transpiledModule.transpile();
-
-    return transpiledModule;
-  }
-
-  private loadTranspiledModules(): void {
-    const paths = [...traverseDirectory(this.fs, TRANSPILE_PATH)];
-    paths.forEach((filePath) => {
-      const path = filePath.slice(TRANSPILE_PATH.length);
-      const content = this.fs.readFileSync(filePath);
-      const mod = new TranspiledModule(this, path, content);
-      // Re-transpile in case it has changed.
-      mod.transpile();
-      this.mutableModules[path] = mod;
-    });
-    this.fs.subscribe((event) => {
-      switch (event.type) {
-        case 'writeFile':
-          this.onWriteFile(event.path);
-          break;
-        default:
-        // do nothing
-      }
-    });
   }
 }

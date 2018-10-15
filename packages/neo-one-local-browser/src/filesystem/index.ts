@@ -1,8 +1,5 @@
-export * from './LocalForageFileSystem';
-export * from './MemoryFileSystem';
-export * from './MirrorFileSystem';
-export * from './WithWorkerMirroredFileSystem';
-export * from './WorkerMirrorFileSystem';
+export * from './create';
+export * from './getServiceWorkerEndpoint';
+export * from './PouchDBFileSystem';
 export * from './types';
 export * from './utils';
-export { normalizePath } from './keyValueFileSystem';

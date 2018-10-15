@@ -4,6 +4,7 @@ import * as path from 'path';
 import webpack from 'webpack';
 import WebpackBar from 'webpackbar';
 import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
+import { InjectManifest } from 'workbox-webpack-plugin';
 
 export default () => ({
   webpack: (config, { stage, defaultLoaders }) => {
@@ -117,6 +118,9 @@ export default () => ({
         stage === 'dev'
           ? new HardSourceWebpackPlugin({ cachePrune: { sizeThreshold: 1024 * 1024 * 1024 } })
           : undefined,
+        new InjectManifest({
+          swSrc: path.resolve(__dirname, '..', '..', '..', 'dist', 'website', 'sw.js'),
+        }),
       ].filter((value) => value !== undefined),
     );
 

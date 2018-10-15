@@ -12,7 +12,7 @@ type WorkerConstructor = new (options: any) => any;
 // tslint:disable-next-line no-any no-unused
 type WorkerInstance<T> = T extends new (options: any) => infer TInstance ? TInstance : never;
 // tslint:disable-next-line no-any no-unused
-type WorkerOptions<T> = T extends new (options: infer TOptions) => any ? TOptions : never;
+type WorkerOptions<T> = T extends new (options: infer TOptions) => any ? () => TOptions : never;
 
 function isWindow(endpoint: EndpointLike): endpoint is Window {
   return ['window', 'length', 'location', 'parent', 'opener'].every((prop) => prop in endpoint);
@@ -144,7 +144,7 @@ export class WorkerManager<T extends WorkerConstructor> {
       this.mutableEndpoint = this.createEndpoint();
       // tslint:disable-next-line no-any
       const WorkerClass = comlink.proxy(this.mutableEndpoint) as any;
-      this.mutableInstance = this.getOptions().then((options) => new WorkerClass(options));
+      this.mutableInstance = this.getOptions().then((options) => new WorkerClass(options()));
     }
 
     return this.mutableInstance.then((value) => comlink.proxyValue(value));

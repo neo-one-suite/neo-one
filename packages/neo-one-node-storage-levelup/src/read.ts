@@ -1,6 +1,5 @@
 // tslint:disable no-var-before-return prefer-immediate-return
 import { ReadAllStorage, ReadGetAllStorage, ReadMetadataStorage, ReadStorage } from '@neo-one/node-core';
-// tslint:disable-next-line no-implicit-dependencies
 import { LevelUp } from 'levelup';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -43,7 +42,7 @@ export function createTryGetLatest<Key, Value>({
   return async (): Promise<Value | undefined> => {
     try {
       const result = await db.get(latestKey);
-      const value = await get(deserializeResult(result));
+      const value = await get(deserializeResult(result as Buffer));
 
       return value;
     } catch (error) {
@@ -70,7 +69,7 @@ export function createReadStorage<Key, Value>({
     try {
       const result = await db.get(serializeKey(key));
 
-      return deserializeValue(result);
+      return deserializeValue(result as Buffer);
     } catch (error) {
       if (error.notFound || error.code === 'KEY_NOT_FOUND') {
         throw new KeyNotFoundError(serializeKeyString(key));
@@ -200,7 +199,7 @@ export function createReadMetadataStorage<Value>({
     try {
       const result = await db.get(key);
 
-      return deserializeValue(result);
+      return deserializeValue(result as Buffer);
     } catch (error) {
       if (error.notFound || error.code === 'KEY_NOT_FOUND') {
         throw new KeyNotFoundError(keyString);

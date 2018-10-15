@@ -1,15 +1,15 @@
+// tslint:disable no-null-keyword
 import { ActionMap } from 'constate';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Container, Flex, Grid, Hidden, styled } from 'reakit';
 import { ifProp } from 'styled-tools';
 import { EditorContext } from '../EditorContext';
-import { Engine } from '../engine';
 import { Preview } from '../preview';
 import { ComponentProps } from '../types';
 import { EditorToolbar } from './EditorToolbar';
 import { EditorView } from './EditorView';
-import { selectPreviewOpen, setFileProblems } from './redux';
+import { EditorState, selectPreviewEnabled, selectPreviewOpen, setFileProblems } from './redux';
 import { EditorFile, EditorFiles, FileDiagnostic, TextRange } from './types';
 
 const Wrapper = styled(Flex)`
@@ -32,63 +32,68 @@ const EditorWrapper = styled(Grid)<{ readonly previewOpen: boolean }>`
 `;
 
 interface ExternalProps {
+  readonly file?: EditorFile;
+  readonly onSelectFile: (file?: EditorFile) => void;
   readonly openFiles: EditorFiles;
-  readonly files: EditorFiles;
 }
 
 interface State {
-  readonly file?: EditorFile;
   readonly range?: TextRange;
 }
 
 const INITIAL_STATE: State = {};
 
 interface Actions {
-  readonly onSelectFile: (file: EditorFile) => void;
-  readonly onSelectRange: (path: string, range: TextRange) => void;
+  readonly onSelectRange: (range: TextRange) => void;
 }
 
-const createActions = (engine: Engine): ActionMap<State, Actions> => ({
-  onSelectFile: (file: EditorFile) => () => ({
-    file,
-  }),
-  onSelectRange: (path: string, range: TextRange) => () => ({
-    file: engine.getFile(path),
+const actions: ActionMap<State, Actions> = {
+  onSelectRange: (range: TextRange) => () => ({
     range,
   }),
-});
+};
 
 interface Props extends ExternalProps {
   readonly previewOpen: boolean;
+  readonly previewEnabled: boolean;
   readonly onChangeProblems: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
 }
 
 const EditorBase = ({
+  file,
   openFiles,
-  files,
   previewOpen,
+  previewEnabled,
+  onSelectFile,
   onChangeProblems,
   ...props
 }: Props & ComponentProps<typeof Wrapper>) => (
   <EditorContext.Consumer>
     {({ engine }) => (
-      <Container initialState={{ ...INITIAL_STATE, file: openFiles[0] }} actions={createActions(engine)}>
-        {({ range, file, onSelectFile, onSelectRange }) => (
+      <Container initialState={INITIAL_STATE} actions={actions}>
+        {({ range, onSelectRange }) => (
           <Wrapper {...props}>
             <EditorWrapper previewOpen={previewOpen}>
               <EditorView
                 file={file}
                 openFiles={openFiles}
-                files={files}
                 onSelectFile={onSelectFile}
                 onChangeProblems={onChangeProblems}
                 range={range}
               />
-              <Hidden visible={previewOpen}>
-                <Preview />
-              </Hidden>
+              {previewEnabled ? (
+                <Hidden visible={previewOpen}>
+                  <Preview />
+                </Hidden>
+              ) : null}
             </EditorWrapper>
-            <EditorToolbar file={file} onSelectRange={onSelectRange} />
+            <EditorToolbar
+              file={file}
+              onSelectRange={(path, selectedRange) => {
+                onSelectFile(engine.getFile(path));
+                onSelectRange(selectedRange);
+              }}
+            />
           </Wrapper>
         )}
       </Container>
@@ -97,7 +102,10 @@ const EditorBase = ({
 );
 
 export const Editor = connect(
-  selectPreviewOpen,
+  (state: EditorState) => ({
+    ...selectPreviewOpen(state),
+    ...selectPreviewEnabled(state),
+  }),
   (dispatch) => ({
     // tslint:disable-next-line no-unnecessary-type-annotation
     onChangeProblems: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) =>

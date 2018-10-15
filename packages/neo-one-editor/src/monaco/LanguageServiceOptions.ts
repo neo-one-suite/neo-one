@@ -1,5 +1,5 @@
 /// <reference types="monaco-editor/monaco" />
-import { FileSystem } from '@neo-one/local-browser';
+import { comlink } from '@neo-one/worker';
 import ts from 'typescript';
 
 import Emitter = monaco.Emitter;
@@ -18,21 +18,21 @@ export class LanguageServiceOptions {
   private mutableCompilerOptions!: ts.CompilerOptions;
   private mutableDiagnosticOptions!: DiagnosticsOptions;
   private mutableIsSmartContract: boolean;
-  private mutableFileSystemID: string;
-  private mutableFS: FileSystem;
+  private mutableID: string;
+  private mutableEndpoint: () => comlink.Endpoint;
 
   public constructor(
     compilerOptions: ts.CompilerOptions,
     diagnosticsOptions: DiagnosticsOptions,
-    fileSystemID: string,
-    fs: FileSystem,
+    id: string,
+    endpoint: () => comlink.Endpoint,
     isSmartContract = false,
   ) {
     this.mutableWorkerMaxIdleTime = 2 * 60 * 1000;
     this.setCompilerOptions(compilerOptions);
     this.setDiagnosticsOptions(diagnosticsOptions);
-    this.mutableFileSystemID = fileSystemID;
-    this.mutableFS = fs;
+    this.mutableID = id;
+    this.mutableEndpoint = endpoint;
     this.mutableIsSmartContract = isSmartContract;
   }
 
@@ -85,19 +85,19 @@ export class LanguageServiceOptions {
     return this.mutableIsSmartContract;
   }
 
-  public setFileSystem(fileSystemID: string, fs: FileSystem): void {
-    if (this.mutableFileSystemID !== fileSystemID || this.mutableFS !== fs) {
-      this.mutableFileSystemID = fileSystemID;
-      this.mutableFS = fs;
+  public setEndpointAndID(id: string, endpoint: () => comlink.Endpoint): void {
+    if (this.mutableID !== id) {
+      this.mutableID = id;
+      this.mutableEndpoint = endpoint;
       this.onDidChangeInternal.fire(this);
     }
   }
 
-  public getFileSystemID(): string {
-    return this.mutableFileSystemID;
+  public getID(): string {
+    return this.mutableID;
   }
 
-  public getFileSystem(): FileSystem {
-    return this.mutableFS;
+  public getEndpoint(): comlink.Endpoint {
+    return this.mutableEndpoint();
   }
 }

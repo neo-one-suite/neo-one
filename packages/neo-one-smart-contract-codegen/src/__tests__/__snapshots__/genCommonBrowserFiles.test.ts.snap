@@ -14,7 +14,7 @@ import {
   NEOONEProvider,
   NEOONEDataProvider,
 } from '@neo-one/client';
-import { browserLocalClient, jsonRPCLocalProvider } from '@neo-one/local-singleton';
+import { getBrowserLocalClient, getJSONRPCLocalProviderManager } from '@neo-one/local-singleton';
 
 const getDefaultUserAccountProviders = (provider) => ({
   memory: new LocalUserAccountProvider({
@@ -27,7 +27,7 @@ const isLocalUserAccountProvider = (userAccountProvider) => userAccountProvider 
 
 export const createClient = (getUserAccountProviders = getDefaultUserAccountProviders) => {
   const providers = [];
-  providers.push(new NEOONEDataProvider({ network: 'local', rpcURL: jsonRPCLocalProvider }));
+  providers.push(new NEOONEDataProvider({ network: 'local', rpcURL: getJSONRPCLocalProviderManager() }));
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
   const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
@@ -55,11 +55,11 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
 };
 
 export const createDeveloperClients = () => ({
-  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: jsonRPCLocalProvider })),
+  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: getJSONRPCLocalProviderManager() })),
 });
 
 export const createLocalClients = () => ({
-  local: browserLocalClient,
+  local: getBrowserLocalClient(),
 });
 ",
     "ts": "// tslint:disable
@@ -72,12 +72,12 @@ import {
   LocalUserAccountProvider,
   NEOONEProvider,
   NEOONEDataProvider,
-  LocalClient,
   NEOONEDataProviderOptions,
   UserAccountProvider,
   UserAccountProviders,
 } from '@neo-one/client';
-import { browserLocalClient, jsonRPCLocalProvider } from '@neo-one/local-singleton';
+import { LocalClient } from '@neo-one/react';
+import { getBrowserLocalClient, getJSONRPCLocalProviderManager } from '@neo-one/local-singleton';
 
 export type DefaultUserAccountProviders = {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>;
@@ -100,7 +100,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
   TUserAccountProviders
 > => {
   const providers: Array<NEOONEDataProvider | NEOONEDataProviderOptions> = [];
-  providers.push(new NEOONEDataProvider({ network: 'local', rpcURL: jsonRPCLocalProvider }));
+  providers.push(new NEOONEDataProvider({ network: 'local', rpcURL: getJSONRPCLocalProviderManager() }));
   const provider = new NEOONEProvider(providers);
 
   const userAccountProviders = getUserAccountProviders(provider);
@@ -129,11 +129,11 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
 };
 
 export const createDeveloperClients = (): { [network: string]: DeveloperClient } => ({
-  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: jsonRPCLocalProvider })),
+  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: getJSONRPCLocalProviderManager() })),
 });
 
 export const createLocalClients = (): { [network: string]: LocalClient } => ({
-  local: browserLocalClient,
+  local: getBrowserLocalClient(),
 });
 ",
   },
@@ -303,7 +303,7 @@ import { SourceMaps } from '@neo-one/client';
 
 let sourceMapsIn: Promise<SourceMaps> = Promise.resolve({});
 if (process.env.NODE_ENV !== 'production') {
-  sourceMapsIn = Promise.resolve({});
+  sourceMapsIn = Promise.resolve({} as any);
 }
 
 export const sourceMaps = sourceMapsIn;

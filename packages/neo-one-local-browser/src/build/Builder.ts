@@ -1,29 +1,32 @@
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
-import { WorkerManager } from '@neo-one/worker';
+import { comlink, WorkerManager } from '@neo-one/worker';
 import { Subject } from 'rxjs';
-import { LocalForageFileSystem, MemoryFileSystem, WithWorkerMirroredFileSystem } from '../filesystem';
+import { createPouchDBFileSystem, PouchDBFileSystem } from '../filesystem';
 import { OutputMessage } from '../types';
-import { build, BuildResult } from './build';
+import { build } from './build';
 
 interface BuilderOptions {
+  readonly dbID: string;
+  readonly endpoint: comlink.Endpoint;
   readonly output$: Subject<OutputMessage>;
-  readonly fileSystemID: string;
-  readonly provider: WorkerManager<typeof JSONRPCLocalProvider>;
+  readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
 }
 
-export class Builder extends WithWorkerMirroredFileSystem {
+export class Builder {
+  private readonly fs: Promise<PouchDBFileSystem>;
   private readonly output$: Subject<OutputMessage>;
-  private readonly provider: WorkerManager<typeof JSONRPCLocalProvider>;
+  private readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
 
-  public constructor({ output$, fileSystemID, provider }: BuilderOptions) {
-    super(new MemoryFileSystem(), new LocalForageFileSystem(fileSystemID));
+  public constructor({ dbID, endpoint, output$, jsonRPCLocalProviderManager }: BuilderOptions) {
+    this.fs = createPouchDBFileSystem(dbID, endpoint);
     this.output$ = output$;
-    this.provider = provider;
+    this.jsonRPCLocalProviderManager = jsonRPCLocalProviderManager;
   }
 
-  public async build(): Promise<BuildResult> {
+  public async build(): Promise<void> {
     const fs = await this.fs;
+    const result = await build({ output$: this.output$, fs, providerManager: this.jsonRPCLocalProviderManager });
 
-    return build({ output$: this.output$, fs, providerManager: this.provider });
+    await Promise.all(result.files.map(async (file) => fs.writeFile(file.path, file.content)));
   }
 }

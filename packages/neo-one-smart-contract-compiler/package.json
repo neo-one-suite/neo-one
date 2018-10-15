@@ -6,8 +6,8 @@
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
     "@neo-one/client": "^1.0.0-preview.0",
-    "@neo-one/client-core": "^1.0.0-preview.0",
     "@neo-one/client-common": "^1.0.0-preview.0",
+    "@neo-one/client-core": "^1.0.0-preview.0",
     "@neo-one/client-full": "^1.0.0-preview.0",
     "@neo-one/smart-contract": "^1.0.0-preview.0",
     "@neo-one/ts-utils": "^1.0.0-preview.0",
@@ -22,7 +22,7 @@
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
     "toposort": "^2.0.2",
-    "typescript": "3.1.2"
+    "typescript": "3.1.3"
   },
   "devDependencies": {
     "@neo-one/client-common": "1.0.0-preview.0",
@@ -36,8 +36,8 @@
     "@neo-one/smart-contract-compiler-node": "1.0.0-preview.0",
     "@neo-one/smart-contract-test-common": "1.0.0-preview.0",
     "@neo-one/types": "1.0.0-preview.0",
-    "@types/memdown": "3.0.0",
     "@types/levelup": "3.1.0",
+    "@types/memdown": "3.0.0",
     "app-root-dir": "1.0.2",
     "bignumber.js": "7.2.1",
     "levelup": "3.1.1",

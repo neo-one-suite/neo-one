@@ -5,18 +5,20 @@ import { Builder, BuilderWorker } from './build';
 import { OutputMessage } from './types';
 
 export const createBuilderManager = (
+  dbID: string,
+  endpoint: () => comlink.Endpoint,
   output$: Subject<OutputMessage>,
-  fileSystemID: string,
-  provider: WorkerManager<typeof JSONRPCLocalProvider>,
+  jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>,
 ) =>
   comlink.proxyValue(
     new WorkerManager<typeof Builder>(
       BuilderWorker,
-      new BehaviorSubject({
+      new BehaviorSubject(() => ({
+        dbID,
+        endpoint: endpoint(),
         output$: comlink.proxyValue(output$),
-        fileSystemID,
-        provider: comlink.proxyValue(provider),
-      }),
+        jsonRPCLocalProviderManager: comlink.proxyValue(jsonRPCLocalProviderManager),
+      })),
       30 * 1000,
     ),
   );

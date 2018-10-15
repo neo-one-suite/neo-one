@@ -56,7 +56,8 @@ md.set({
     return `<pre${classAttribute}><code${classAttribute}>${code}</code></pre>`;
   },
 })
-  .use(anchor)
+  // tslint:disable-next-line no-any
+  .use(anchor as any)
   .use(TOC, { includeLevel: [2] });
 
 const headerMargins = css`

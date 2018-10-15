@@ -1,189 +1,129 @@
-import {
-  Builder,
-  copyToRemote,
-  createBuilderManager,
-  createJSONRPCLocalProviderManager,
-  dirname,
-  ensureDir,
-  FileSystem,
-  LocalForageFileSystem,
-  MemoryFileSystem,
-  MirrorFileSystem,
-  OutputMessage,
-  pathExists,
-  RemoteFileSystem,
-  traverseDirectory,
-} from '@neo-one/local-browser';
-import { JSONRPCLocalProvider } from '@neo-one/node-browser';
-import { comlink, WorkerManager } from '@neo-one/worker';
-import _ from 'lodash';
-import * as nodePath from 'path';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { EditorFiles } from '../editor';
-import { EngineContentFiles, EngineState, TestRunnerCallbacks } from '../types';
-import { EngineBase, PathWithExports } from './EngineBase';
-import { ENGINE_STATE_FILE, initializeFileSystem, INTERNAL_DIR } from './initializeFileSystem';
+import { normalizePath, PouchDBFileSystem, PouchDBFileSystemDoc } from '@neo-one/local-browser';
+import { comlink } from '@neo-one/worker';
+import { EditorFile } from '../editor';
+import { EngineContentFile, EngineContentFiles, TestRunnerCallbacks } from '../types';
+import { getFileType } from '../utils';
+import { EngineContext } from './createEngineContext';
+import { EngineBase } from './EngineBase';
 import { ModuleBase } from './ModuleBase';
-import { packages } from './packages';
 import { TestRunner } from './test';
-import { transpiler } from './transpile';
+import { Transpiler, transpilerManager } from './transpile';
 import { RegisterPreviewEngineResult } from './types';
 
 export interface EngineCreateOptions {
-  readonly id: string;
-  readonly createPreviewURL: (id: string) => string;
+  readonly context: EngineContext;
   readonly initialFiles: EngineContentFiles;
   readonly testRunnerCallbacks: TestRunnerCallbacks;
 }
 
 interface EngineOptions {
-  readonly id: string;
-  readonly createPreviewURL: (id: string) => string;
-  readonly output$: Subject<OutputMessage>;
-  readonly builderManager: WorkerManager<typeof Builder>;
-  readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
-  readonly fs: FileSystem;
-  readonly pathWithExports: ReadonlyArray<PathWithExports>;
+  readonly context: EngineContext;
+  readonly initialFiles: Map<string, EngineContentFile>;
+  readonly fsChanges: PouchDB.Core.Changes<PouchDBFileSystemDoc>;
   readonly testRunnerCallbacks: TestRunnerCallbacks;
 }
 
-const engines = new Map<string, Engine>();
+const maybeTranspile = async (
+  transpiler: Transpiler,
+  transpileCache: PouchDBFileSystem,
+  pathIn: string,
+  content: string,
+): Promise<void> => {
+  const path = normalizePath(pathIn);
+  const fileType = getFileType(path);
+  if ((fileType === 'typescript' || fileType === 'javascript') && !path.startsWith('/node_modules')) {
+    const result = await transpiler.transpile(path, content);
+    await transpileCache.writeFile(path, result);
+  }
+};
 
 export class Engine extends EngineBase {
-  public static async create({
-    id,
-    createPreviewURL,
-    initialFiles,
-    testRunnerCallbacks,
-  }: EngineCreateOptions): Promise<Engine> {
-    const existingEngine = engines.get(id);
-    if (existingEngine !== undefined) {
-      return existingEngine;
-    }
-
-    const output$ = new Subject<OutputMessage>();
-    const jsonRPCLocalProviderManager = createJSONRPCLocalProviderManager(id);
-    const builderManager = createBuilderManager(output$, id, jsonRPCLocalProviderManager);
-    const fs = await MirrorFileSystem.create(new MemoryFileSystem(), new LocalForageFileSystem(id));
-
-    fs.subscribe((change) => {
-      builderManager.withInstance(async (builder) => builder.onFileSystemChange(change)).catch((error) => {
-        // tslint:disable-next-line no-console
-        console.error(error);
-      });
-    });
-
-    const exists = pathExists(fs, ENGINE_STATE_FILE);
-    let state: EngineState;
-    if (exists) {
-      const stateContents = fs.readFileSync(ENGINE_STATE_FILE);
-      state = JSON.parse(stateContents);
-    } else {
-      initializeFileSystem(fs);
-      state = {
-        openFiles: initialFiles.filter((file) => file.open).map((file) => file.path),
-      };
-      fs.writeFileSync(ENGINE_STATE_FILE, JSON.stringify(state));
-    }
-
-    const pathWithExports = packages.reduce<ReadonlyArray<PathWithExports>>(
-      (acc, { path, exports }) =>
-        acc.concat({
-          path,
-          exports: exports({ fs, jsonRPCLocalProviderManager, builderManager }),
-        }),
-      [],
+  public static async create({ context, initialFiles, testRunnerCallbacks }: EngineCreateOptions): Promise<Engine> {
+    await Promise.all(
+      initialFiles.map(async (file) => {
+        try {
+          context.fs.readFileSync(file.path);
+        } catch {
+          await context.fs.writeFile(file.path, file.content);
+        }
+      }),
     );
 
-    const engine = new Engine({
-      id,
-      createPreviewURL,
-      output$,
-      builderManager,
-      jsonRPCLocalProviderManager,
-      fs,
-      pathWithExports,
-      testRunnerCallbacks,
-    });
-    engines.set(id, engine);
-
-    if (!exists) {
-      initialFiles.forEach((file) => {
-        ensureDir(engine.fs, nodePath.dirname(file.path));
-        engine.fs.writeFileSync(file.path, file.content, { writable: file.writable });
+    const [fsChanges, transpilePromises] = await transpilerManager.withInstance<
+      [PouchDB.Core.Changes<PouchDBFileSystemDoc>, Array<Promise<void>>]
+    >(async (transpiler) => {
+      const mutableTranspilePromises: Array<Promise<void>> = [];
+      context.fs.files.forEach((file, path) => {
+        mutableTranspilePromises.push(maybeTranspile(transpiler, context.transpileCache, path, file.content));
       });
+      const fsChangesInner = context.fs.db
+        .changes({ since: 'now', live: true, include_docs: true })
+        .on('change', (change) => {
+          if (change.doc === undefined) {
+            context.transpileCache.removeFile(change.id).catch((error) => {
+              // tslint:disable-next-line no-console
+              console.error(error);
+            });
+          } else {
+            const doc = change.doc;
+            transpilerManager
+              .withInstance(async (transpilerInner) => {
+                await maybeTranspile(transpilerInner, context.transpileCache, change.id, doc.content);
+              })
+              .catch((error) => {
+                // tslint:disable-next-line no-console
+                console.error(error);
+              });
+          }
+        });
 
-      // Need to synchronize here so that when we start up the language workers they have an up to date filesystem
-      // Can/should be removed once we reduce the size of the initial file system.
-      await fs.sync();
-    }
-
-    state.openFiles.forEach((file) => {
-      engine.openFile(file);
+      return [fsChangesInner, mutableTranspilePromises];
     });
 
-    return engine;
+    await Promise.all(transpilePromises);
+
+    if (context.openFiles$.getValue().length === 0) {
+      context.openFiles$.next(initialFiles.filter((file) => file.open).map((file) => file.path));
+    }
+    const initialFilesMap = new Map<string, EngineContentFile>();
+    initialFiles.forEach((file) => {
+      initialFilesMap.set(file.path, file);
+    });
+
+    return new Engine({ context, initialFiles: initialFilesMap, testRunnerCallbacks, fsChanges });
   }
 
-  public readonly output$: Subject<OutputMessage>;
-  public readonly openFiles$: BehaviorSubject<EditorFiles>;
-  public readonly files$: BehaviorSubject<EditorFiles>;
-  public readonly createPreviewURL: () => string;
+  public readonly context: EngineContext;
+  private readonly initialFiles: Map<string, EngineContentFile>;
   private readonly testRunner: TestRunner;
-  private readonly builderManager: WorkerManager<typeof Builder>;
-  private readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
+  private readonly fsChanges: PouchDB.Core.Changes<PouchDBFileSystemDoc>;
 
-  private constructor({
-    id,
-    createPreviewURL,
-    output$,
-    fs,
-    builderManager,
-    jsonRPCLocalProviderManager,
-    pathWithExports,
-    testRunnerCallbacks,
-  }: EngineOptions) {
-    super({ id, fs, transpiler, pathWithExports });
-    this.output$ = output$;
-    this.openFiles$ = new BehaviorSubject<EditorFiles>([]);
-    this.files$ = new BehaviorSubject<EditorFiles>(
-      [...traverseDirectory(fs, '/')]
-        .filter((path) => !path.startsWith(INTERNAL_DIR))
-        .map((path) => this.getFile(path)),
-    );
-    this.createPreviewURL = () => createPreviewURL(id);
-    this.testRunner = new TestRunner(this, testRunnerCallbacks);
-    this.builderManager = builderManager;
-    this.jsonRPCLocalProviderManager = jsonRPCLocalProviderManager;
-
-    this.fs.subscribe((event) => {
-      switch (event.type) {
-        case 'writeFile':
-          this.files$.next(
-            _.uniqBy(this.files$.getValue().concat([this.getFile(event.path)]), ({ path: filePath }) => filePath),
-          );
-          break;
-        default:
-        // do nothing
-      }
+  private constructor({ context, initialFiles, testRunnerCallbacks, fsChanges }: EngineOptions) {
+    super({
+      fs: context.fs,
+      transpileCache: context.transpileCache,
+      builderManager: context.builderManager,
+      jsonRPCLocalProviderManager: context.jsonRPCLocalProviderManager,
     });
+    this.context = context;
+    this.initialFiles = initialFiles;
+    this.testRunner = new TestRunner(this, testRunnerCallbacks);
+    this.fsChanges = fsChanges;
   }
 
-  public openFile(path: string): void {
-    this.openFiles$.next(
-      _.uniqBy(this.openFiles$.getValue().concat([this.getFile(path)]), ({ path: filePath }) => filePath),
-    );
+  public dispose(): void {
+    super.dispose();
+    this.fsChanges.cancel();
   }
 
   public async build(): Promise<void> {
-    await this.builderManager.withInstance(async (builder) => {
-      const result = await builder.build();
+    await this.context.builderManager.withInstance(async (builder) => builder.build());
+  }
 
-      result.files.forEach((file) => {
-        ensureDir(this.fs, dirname(file.path));
-        this.fs.writeFileSync(file.path, file.content, { writable: true });
-      });
-    });
+  public getFile(path: string): EditorFile {
+    const initialFile = this.initialFiles.get(path);
+
+    return { path, writable: initialFile === undefined ? true : initialFile.writable };
   }
 
   public runTests(): void {
@@ -207,29 +147,12 @@ export class Engine extends EngineBase {
     };
   }
 
-  public async registerPreviewEngine({ fs }: { readonly fs: RemoteFileSystem }): Promise<RegisterPreviewEngineResult> {
-    const copyPromise = copyToRemote(this.fs, fs);
-
-    this.fs.subscribe((change) => {
-      copyPromise
-        .then(async () =>
-          fs.handleChange(change).catch((error) => {
-            // tslint:disable-next-line no-console
-            console.error(error);
-          }),
-        )
-        .catch(() => {
-          // do nothing
-        });
-    });
-
-    await copyPromise;
-
+  public async registerPreviewEngine(): Promise<RegisterPreviewEngineResult> {
     return {
-      id: this.id,
-      builderManager: comlink.proxyValue(this.builderManager),
-      jsonRPCLocalProviderManager: comlink.proxyValue(this.jsonRPCLocalProviderManager),
-      transpiler: comlink.proxyValue(transpiler),
+      id: this.context.id,
+      endpoint: this.context.serviceWorkerManager.getEndpoint(),
+      builderManager: comlink.proxyValue(this.context.builderManager),
+      jsonRPCLocalProviderManager: comlink.proxyValue(this.context.jsonRPCLocalProviderManager),
     };
   }
 }

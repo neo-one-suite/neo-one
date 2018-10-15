@@ -239,19 +239,24 @@ function wrapValue(arg: {}): WrappedValue {
 
   // If not, traverse the entire object and find handled values.
   let wrappedChildren: WrappedChildValue[] = [];
-  for (const item of iterateAllProperties(arg)) {
+  iterateUnhandledProperties(arg, (value, path) => {
     for (const [key, transferHandler] of transferHandlers) {
-      if (transferHandler.canHandle(item.value)) {
+      if (transferHandler.canHandle(value)) {
         wrappedChildren.push({
-          path: item.path,
+          path,
           wrappedValue: {
             type: key,
-            value: transferHandler.serialize(item.value),
+            value: transferHandler.serialize(value),
           },
         });
+
+        return true;
       }
     }
-  }
+
+    return false;
+  });
+
   for (const wrappedChild of wrappedChildren) {
     const container = wrappedChild.path.slice(0, -1).reduce((obj, key) => obj[key], arg as any);
     container[wrappedChild.path[wrappedChild.path.length - 1]] = null;
@@ -407,8 +412,26 @@ function cbProxy(cb: CBProxyCallback, callPath: PropertyKey[] = [], target = fun
   });
 }
 
-function isTransferable(thing: {}): thing is Transferable {
+export function isTransferable(thing: {}): thing is Transferable {
   return TRANSFERABLE_TYPES.some((type) => thing instanceof type);
+}
+
+function iterateUnhandledProperties(
+  value: {} | undefined,
+  handleProperty: (value: any, path: string[]) => boolean,
+  path: string[] = [],
+  visited: WeakSet<{}> | null = null,
+): void {
+  if (!value) return;
+  if (!visited) visited = new WeakSet<{}>();
+  if (visited.has(value)) return;
+  if (typeof value === 'string') return;
+  if (typeof value === 'object') visited.add(value);
+  if (ArrayBuffer.isView(value)) return;
+  if (handleProperty(value, path)) return;
+
+  const keys = Object.keys(value);
+  for (const key of keys) iterateUnhandledProperties((value as any)[key], handleProperty, [...path, key], visited);
 }
 
 function* iterateAllProperties(

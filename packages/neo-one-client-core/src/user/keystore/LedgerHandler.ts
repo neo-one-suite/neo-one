@@ -59,15 +59,16 @@ export class LedgerHandler {
   public static readonly type = LedgerTransport.type;
 
   public static readonly init = async () => {
-    const isSupported = await LedgerTransport.isSupported();
+    const transport = await LedgerTransport.load();
+    const isSupported = await transport.isSupported();
     if (!isSupported) {
       throw new LedgerNotSupportedError();
     }
-    const paths = await LedgerTransport.list();
+    const paths = await transport.list();
     if (paths.length === 0) {
       throw new LedgerNotDetectedError();
     }
-    const ledger = await LedgerTransport.open(paths[0]);
+    const ledger = await transport.open(paths[0]);
     ledger.setScrambleKey('NEO');
 
     return new LedgerHandler(ledger);

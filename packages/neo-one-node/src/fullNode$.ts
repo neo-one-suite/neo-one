@@ -9,7 +9,6 @@ import { Node, NodeEnvironment, NodeOptions } from '@neo-one/node-protocol';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
 import { vm } from '@neo-one/node-vm';
 import { finalize, neverComplete } from '@neo-one/utils';
-// tslint:disable-next-line no-implicit-dependencies
 import { AbstractLevelDOWN } from 'abstract-leveldown';
 import LevelDOWN, { LevelDownOpenOptions } from 'leveldown';
 import LevelUp from 'levelup';
@@ -109,7 +108,7 @@ FullNodeOptions): Observable<any> => {
       const { levelDownOptions } = environment;
       if (levelDownOptions !== undefined) {
         await new Promise<void>((resolve, reject) => {
-          levelDownToOpen.open(levelDownOptions, (err) => {
+          levelDownToOpen.open(levelDownOptions, (err: Error | undefined) => {
             if (err) {
               reject(err);
             } else {

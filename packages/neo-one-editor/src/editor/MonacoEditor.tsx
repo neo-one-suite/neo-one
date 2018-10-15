@@ -73,7 +73,7 @@ export class MonacoEditor extends React.Component<Props> {
   public componentDidMount(): void {
     const current = this.ref.current;
     if (current !== null) {
-      setupLanguages(this.id, this.fs);
+      setupLanguages(this.id, () => this.props.engine.context.serviceWorkerManager.getEndpoint());
       this.mutableEditor = monac.editor.create(current, {
         language: getLanguageID(this.id, LanguageType.TypeScript),
         theme: 'dark',
@@ -162,11 +162,11 @@ export class MonacoEditor extends React.Component<Props> {
   }
 
   private get fs(): FileSystem {
-    return this.props.engine.fs;
+    return this.props.engine.context.fs;
   }
 
   private get id(): string {
-    return this.props.engine.id;
+    return this.props.engine.context.id;
   }
 
   private openFile(file: EditorFile, range?: monaco.IRange, focus?: boolean): void {
@@ -194,7 +194,10 @@ export class MonacoEditor extends React.Component<Props> {
       const editorModel = this.editor.getModel();
       const editorValue = editorModel.getValue();
 
-      this.props.engine.fs.writeFileSync(editorModel.uri.path, editorValue);
+      this.props.engine.context.fs.writeFile(editorModel.uri.path, editorValue).catch((error) => {
+        // tslint:disable-next-line no-console
+        console.error(error);
+      });
 
       const { onValueChange } = this.props;
       if (onValueChange !== undefined) {

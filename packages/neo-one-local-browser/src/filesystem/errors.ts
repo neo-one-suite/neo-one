@@ -16,21 +16,3 @@ export const createENOTDIR = (path: string) => {
 
   return addErrorCode(error, 'ENOTDIR');
 };
-
-export const createEISDIR = (path: string) => {
-  const error = new Error(`illegal operation on a directory: ${path}`);
-
-  return addErrorCode(error, 'EISDIR');
-};
-
-export const createEEXIST = (path: string) => {
-  const error = new Error(`file already exists: ${path}`);
-
-  return addErrorCode(error, 'EEXIST');
-};
-
-export const createEACCES = (path: string) => {
-  const error = new Error(`file cannot be written: ${path}`);
-
-  return addErrorCode(error, 'EACCES');
-};

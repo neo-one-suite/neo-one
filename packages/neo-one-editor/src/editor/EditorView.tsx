@@ -17,7 +17,6 @@ interface Props {
   readonly file?: EditorFile;
   readonly range?: TextRange;
   readonly openFiles: EditorFiles;
-  readonly files: EditorFiles;
   readonly onSelectFile: (file: EditorFile) => void;
   readonly onChangeProblems?: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
 }

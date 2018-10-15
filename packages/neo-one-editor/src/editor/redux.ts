@@ -31,11 +31,13 @@ export interface EditorState {
 }
 
 export interface InitialEditorStateOptions {
-  readonly preview: EditorState['preview'];
+  readonly preview?: EditorState['preview'];
 }
 
 const createInitialState = (
-  { preview }: InitialEditorStateOptions = { preview: { enabled: true, open: false } },
+  { preview = { enabled: true, open: false } }: InitialEditorStateOptions = {
+    preview: { enabled: true, open: false },
+  },
 ): EditorState => ({
   console: {
     open: false,

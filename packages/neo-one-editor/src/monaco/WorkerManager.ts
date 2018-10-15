@@ -1,5 +1,5 @@
 // tslint:disable promise-function-async
-import { Disposable, WorkerMirrorFileSystem } from '@neo-one/local-browser';
+import { comlink } from '@neo-one/worker';
 import { LanguageServiceOptions } from './LanguageServiceOptions';
 import { TypeScriptWorker } from './tsWorker';
 
@@ -7,7 +7,7 @@ import Promise = monaco.Promise;
 import IDisposable = monaco.IDisposable;
 import Uri = monaco.Uri;
 
-type Clients = [monaco.editor.MonacoWebWorker<TypeScriptWorker>, TypeScriptWorker, Disposable];
+type Clients = [monaco.editor.MonacoWebWorker<TypeScriptWorker>, TypeScriptWorker];
 
 // tslint:disable-next-line export-name
 export class WorkerManager {
@@ -47,7 +47,6 @@ export class WorkerManager {
       // tslint:disable-next-line no-floating-promises
       this.mutableClients.then((value) => {
         value[0].dispose();
-        value[2].dispose();
       });
       this.mutableClients = undefined;
     }
@@ -74,7 +73,7 @@ export class WorkerManager {
         createData: {
           compilerOptions: this.options.getCompilerOptions(),
           isSmartContract: this.options.isSmartContract(),
-          fileSystemID: this.options.getFileSystemID(),
+          id: this.options.getID(),
         },
       });
 
@@ -94,9 +93,13 @@ export class WorkerManager {
       this.mutableClients = p.then<Clients>((client) => {
         // tslint:disable-next-line no-any
         const webWorker = (worker as any)._worker._worker.worker;
-        const disposable = WorkerMirrorFileSystem.subscribe(this.options.getFileSystem(), webWorker);
+        const endpoint = this.options.getEndpoint();
+        (webWorker as Worker).postMessage(
+          { id: this.options.getID(), endpoint },
+          comlink.isTransferable(endpoint) ? [endpoint] : [],
+        );
 
-        return [worker, client, disposable];
+        return [worker, client];
       });
     }
 

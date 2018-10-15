@@ -10,7 +10,7 @@
     "@types/toposort": "^2.0.1",
     "lodash": "^4.17.11",
     "toposort": "^2.0.2",
-    "typescript": "3.1.2"
+    "typescript": "3.1.3"
   },
   "sideEffects": false
 }

@@ -1,7 +1,7 @@
 // tslint:disable promise-function-async no-submodule-imports no-implicit-dependencies no-import-side-effect
 import 'monaco-editor/esm/vs/language/html/monaco.contribution';
 
-import { FileSystem } from '@neo-one/local-browser';
+import { comlink } from '@neo-one/worker';
 // @ts-ignore
 import TSWorker from '@neo-one/worker-loader!./ts.worker';
 // @ts-ignore
@@ -11,6 +11,7 @@ import HTMLWorker from '@neo-one/worker-loader!monaco-editor/esm/vs/language/htm
 // @ts-ignore
 import * as javascriptModule from 'monaco-editor/esm/vs/basic-languages/javascript/javascript';
 import ts from 'typescript';
+import { configureGrammar } from './configureGrammar';
 import * as languageFeatures from './languageFeatures';
 import { LanguageServiceOptions } from './LanguageServiceOptions';
 import { TypeScriptWorker } from './tsWorker';
@@ -19,7 +20,6 @@ import { WorkerManager } from './WorkerManager';
 
 import Promise = monaco.Promise;
 import Uri = monaco.Uri;
-import { configureGrammar } from './configureGrammar';
 
 const CONTRACT_SUFFIX = '-contract';
 const TYPESCRIPT_SUFFIX = '-typescript';
@@ -49,7 +49,7 @@ export enum LanguageType {
   JavaScript,
 }
 
-export function getLanguageID(fileSystemID: string, type: LanguageType) {
+export function getLanguageID(id: string, type: LanguageType) {
   let suffix: string;
   switch (type) {
     case LanguageType.Contract:
@@ -65,10 +65,10 @@ export function getLanguageID(fileSystemID: string, type: LanguageType) {
       throw new Error('For TS');
   }
 
-  return `${fileSystemID}${suffix}`;
+  return `${id}${suffix}`;
 }
 
-function setupTypeScript(fileSystemID: string, fs: FileSystem) {
+function setupTypeScript(id: string, endpoint: () => comlink.Endpoint) {
   const options = new LanguageServiceOptions(
     {
       target: ts.ScriptTarget.ESNext,
@@ -97,15 +97,15 @@ function setupTypeScript(fileSystemID: string, fs: FileSystem) {
       forceConsistentCasingInFileNames: true,
     },
     { noSemanticValidation: false, noSyntaxValidation: false },
-    fileSystemID,
-    fs,
+    id,
+    endpoint,
   );
   options.setEagerModelSync(true);
 
-  setupLanguage(getLanguageID(fileSystemID, LanguageType.TypeScript), options, true);
+  setupLanguage(getLanguageID(id, LanguageType.TypeScript), options, true);
 }
 
-function setupContract(fileSystemID: string, fs: FileSystem) {
+function setupContract(id: string, endpoint: () => comlink.Endpoint) {
   const options = new LanguageServiceOptions(
     {
       target: ts.ScriptTarget.ESNext,
@@ -136,31 +136,31 @@ function setupContract(fileSystemID: string, fs: FileSystem) {
       forceConsistentCasingInFileNames: true,
     },
     { noSemanticValidation: false, noSyntaxValidation: false },
-    fileSystemID,
-    fs,
+    id,
+    endpoint,
     true,
   );
   options.setEagerModelSync(true);
 
-  setupLanguage(getLanguageID(fileSystemID, LanguageType.Contract), options, true);
+  setupLanguage(getLanguageID(id, LanguageType.Contract), options, true);
 }
 
-function setupJavaScript(fileSystemID: string, fs: FileSystem) {
+function setupJavaScript(id: string, endpoint: () => comlink.Endpoint) {
   const options = new LanguageServiceOptions(
     { allowNonTsExtensions: true, allowJs: true, target: ts.ScriptTarget.ESNext },
     { noSemanticValidation: true, noSyntaxValidation: false },
-    fileSystemID,
-    fs,
+    id,
+    endpoint,
   );
   options.setEagerModelSync(true);
 
-  setupLanguage(getLanguageID(fileSystemID, LanguageType.JavaScript), options, false);
+  setupLanguage(getLanguageID(id, LanguageType.JavaScript), options, false);
 }
 
-export function setupLanguages(fileSystemID: string, fs: FileSystem) {
-  setupJavaScript(fileSystemID, fs);
-  setupTypeScript(fileSystemID, fs);
-  setupContract(fileSystemID, fs);
+export function setupLanguages(id: string, endpoint: () => comlink.Endpoint) {
+  setupJavaScript(id, endpoint);
+  setupTypeScript(id, endpoint);
+  setupContract(id, endpoint);
 }
 
 // tslint:disable-next-line readonly-keyword
