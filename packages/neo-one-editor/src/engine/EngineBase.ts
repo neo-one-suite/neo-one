@@ -55,8 +55,8 @@ export class EngineBase {
       ['bignumber.js', new StaticExportsModule(this, 'bignumber.js', bignumber)],
     ]);
     // tslint:disable-next-line no-loop-statement
-    for (const { path, exports } of pathWithExports) {
-      this.mutableModules.set(path, new StaticExportsModule(this, path, exports));
+    for (const { name, exports } of pathWithExports) {
+      this.mutableModules.set(name, new StaticExportsModule(this, name, exports));
     }
 
     transpileCache.files.forEach((file, path) => {

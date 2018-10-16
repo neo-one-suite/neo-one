@@ -64,14 +64,16 @@ const packages: ReadonlyArray<PackageConfig> = [
 ];
 
 export interface PathWithExports {
+  readonly name: string;
   readonly path: string;
   readonly exports: Exports;
 }
 
 export const getPathWithExports = (options: ExportsOptions) =>
   packages.reduce<ReadonlyArray<PathWithExports>>(
-    (acc, { path, exports }) =>
+    (acc, { name, path, exports }) =>
       acc.concat({
+        name,
         path,
         exports: exports(options),
       }),

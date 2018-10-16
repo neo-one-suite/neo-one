@@ -61,8 +61,8 @@ md.set({
   .use(TOC, { includeLevel: [2] });
 
 const headerMargins = css`
-  margin-top: 40px;
-  margin-bottom: 32px;
+  margin-top: 24px;
+  margin-bottom: 24px;
 `;
 
 const Wrapper = styled.div`
@@ -72,7 +72,8 @@ const Wrapper = styled.div`
 
   & h1 {
     ${prop('theme.fontStyles.display2')};
-    ${headerMargins};
+    margin-top: 16px;
+    margin-bottom: 24px;
   }
 
   & h2 {

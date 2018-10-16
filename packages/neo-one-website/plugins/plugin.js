@@ -6,13 +6,20 @@ import WebpackBar from 'webpackbar';
 import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
 import { InjectManifest } from 'workbox-webpack-plugin';
 
+const ROOT = path.resolve(__dirname, '..', '..', '..');
+
 export default () => ({
   webpack: (config, { stage, defaultLoaders }) => {
     config.resolve = {
-      modules: [path.resolve(__dirname, '..', '..', '..', 'node_modules')].concat(config.resolve.modules),
+      ...(config.resolve || {}),
+      modules: config.resolve.modules,
       mainFields: ['browser', 'main'],
       aliasFields: ['browser'],
       extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+      alias: {
+        ...(config.resolve.alias || {}),
+        console$: path.resolve(__dirname, 'console.js'),
+      },
     };
 
     if (stage === 'dev') {
@@ -65,7 +72,7 @@ export default () => ({
         options: {
           happyPackMode: true,
           transpileOnly: stage === 'dev',
-          configFile: path.resolve(__dirname, '..', '..', '..', 'tsconfig', 'tsconfig.es2017.esm.json'),
+          configFile: path.resolve(ROOT, 'tsconfig', 'tsconfig.es2017.esm.json'),
           onlyCompileBundledFiles: true,
           experimentalFileCaching: true,
           experimentalWatchApi: true,
@@ -88,7 +95,7 @@ export default () => ({
           },
           {
             test: /\.jsx?$/,
-            include: path.resolve(__dirname, '..', '..', '..', 'node_modules', '@reactivex', 'ix-esnext-esm'),
+            include: path.resolve(ROOT, 'node_modules', '@reactivex', 'ix-esnext-esm'),
             use: babelLoader,
           },
           defaultLoaders.cssLoader,
@@ -119,15 +126,11 @@ export default () => ({
           ? new HardSourceWebpackPlugin({ cachePrune: { sizeThreshold: 1024 * 1024 * 1024 } })
           : undefined,
         new InjectManifest({
-          swSrc: path.resolve(__dirname, '..', '..', '..', 'dist', 'website', 'sw.js'),
+          swSrc: path.resolve(ROOT, 'dist', 'website', 'sw.js'),
         }),
       ].filter((value) => value !== undefined),
     );
 
-    config.resolve.alias = {
-      ...(config.resolve.alias || {}),
-      console$: path.resolve(__dirname, 'console.js'),
-    };
     config.node = {
       console: 'mock',
       global: true,
@@ -141,6 +144,7 @@ export default () => ({
 
     return config;
   },
+
   beforeRenderToElement: (App, { meta }) => {
     meta.styleComponentsSheet = new ServerStyleSheet();
     return (props) => (
@@ -149,5 +153,6 @@ export default () => ({
       </StyleSheetManager>
     );
   },
+
   Head: ({ meta }) => <>{meta.styleComponentsSheet.getStyleElement()}</>,
 });

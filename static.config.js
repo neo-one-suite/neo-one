@@ -2,14 +2,19 @@ import path from 'path';
 import _ from 'lodash';
 
 require('ts-node/register/transpile-only');
-const { getCourses } = require('./src/loaders/coursesLoader');
-const { getDocs } = require('./src/utils/getDocs');
-const { getTutorial } = require('./src/utils/getTutorial');
+const { getCourses } = require('./packages/neo-one-website/src/loaders/coursesLoader');
+const { getDocs } = require('./packages/neo-one-website/src/utils/getDocs');
+const { getTutorial } = require('./packages/neo-one-website/src/utils/getTutorial');
 
-// Paths Aliases defined through tsconfig.json
+const ROOT = path.resolve(__dirname, 'packages', 'neo-one-website');
+
 export default {
-  entry: path.join(__dirname, 'src', 'index.tsx'),
-  extensions: ['.js', '.jsx', '.ts', '.tsx'],
+  paths: {
+    root: ROOT,
+    node_modules: path.resolve(__dirname, 'node_modules'),
+  },
+  entry: path.join('src', 'index'),
+  extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
   getSiteData: () => ({
     title: 'React Static',
   }),
