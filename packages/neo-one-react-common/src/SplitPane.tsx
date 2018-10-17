@@ -4,26 +4,30 @@ import { DraggableCore, DraggableEventHandler } from 'react-draggable';
 import { styled } from 'reakit';
 import { prop } from 'styled-tools';
 
-const Wrapper = styled.div<{ readonly lr: boolean; readonly size: number }>`
-  display: grid;
-  min-height: 0;
-  ${({ lr, size }) => {
+const Wrapper = styled.div.attrs<{ readonly lr: boolean; readonly size: number }>({
+  style: ({ lr, size }: { readonly lr: boolean; readonly size: number }) => {
+    let grid: string;
     if (lr) {
-      return `
-        grid:
+      grid = `
           'left resizer right' 1fr
-          / calc(${size * 100}% - 1px) 1px calc(${(1 - size) * 100}% - 1px);
+          / calc(${size * 100}% - 1px) 1px calc(${(1 - size) * 100}% - 1px)
       `;
-    }
-
-    return `
-      grid:
+    } else {
+      grid = `
         'top' ${size}fr
         'resizer' 1px
         'bottom' ${1 - size}fr
-        / 1fr;
+        / 1fr
     `;
-  }};
+    }
+
+    return {
+      grid,
+    };
+  },
+})`
+  display: grid;
+  min-height: 0;
 `;
 
 export const SplitPaneResizer = styled.div`
@@ -72,16 +76,20 @@ interface BaseProps {
 
 interface LRProps extends BaseProps {
   readonly type: 'lr';
-  readonly left: React.ReactNode;
-  readonly right: React.ReactNode;
+  readonly left: React.ReactElement<any>;
+  readonly right: React.ReactElement<any>;
+  readonly collapseRight?: boolean;
+  readonly onExpandRight?: () => void;
   readonly top?: undefined;
   readonly bottom?: undefined;
 }
 
 interface TBProps extends BaseProps {
   readonly type: 'tb';
-  readonly top: React.ReactNode;
-  readonly bottom: React.ReactNode;
+  readonly top: React.ReactElement<any>;
+  readonly bottom: React.ReactElement<any>;
+  readonly collapseRight?: undefined;
+  readonly onExpandRight?: undefined;
   readonly left?: undefined;
   readonly right?: undefined;
 }
@@ -96,20 +104,37 @@ export class SplitPane extends React.Component<Props, State> {
   private readonly wrapperRef = React.createRef<HTMLDivElement>();
 
   public render() {
-    const { type, left, right, top, bottom, initialSize: _initialSize, ...props } = this.props;
-    const { size } = this.state;
+    const {
+      type,
+      left,
+      right,
+      top,
+      bottom,
+      initialSize: _initialSize,
+      collapseRight,
+      onExpandRight: _onExpandRight,
+      ...props
+    } = this.props;
+    const { active } = this.state;
+    let { size } = this.state;
 
-    let first: React.ReactNode;
-    let second: React.ReactNode;
+    let first: React.ReactElement<any>;
+    let second: React.ReactElement<any>;
     if (type === 'lr') {
-      first = left;
-      second = right;
+      first = left as React.ReactElement<any>;
+      second = right as React.ReactElement<any>;
+      size = collapseRight ? 1.0 : size;
     } else {
-      first = top;
-      second = bottom;
+      first = top as React.ReactElement<any>;
+      second = bottom as React.ReactElement<any>;
     }
 
     const lr = type === 'lr';
+
+    if (active) {
+      first = React.cloneElement(first, { style: { pointerEvents: 'none' } });
+      second = React.cloneElement(second, { style: { pointerEvents: 'none' } });
+    }
 
     return (
       <Wrapper innerRef={this.wrapperRef} lr={lr} size={size} {...props}>
@@ -123,7 +148,12 @@ export class SplitPane extends React.Component<Props, State> {
   }
 
   private readonly onStartDrag: DraggableEventHandler = () => {
-    this.setState({ active: true });
+    const { onExpandRight, collapseRight } = this.props;
+
+    this.setState({ active: true, size: collapseRight ? 1.0 : this.state.size });
+    if (onExpandRight !== undefined) {
+      onExpandRight();
+    }
   };
 
   private readonly onDrag: DraggableEventHandler = (_event, data) => {
@@ -132,9 +162,8 @@ export class SplitPane extends React.Component<Props, State> {
       const totalSize = this.props.type === 'lr' ? wrapper.clientWidth : wrapper.clientHeight;
       const delta = this.props.type === 'lr' ? data.deltaX : data.deltaY;
 
-      this.setState({
-        size: Math.max(Math.min(this.state.size + delta / totalSize, 1), 0),
-      });
+      const size = Math.max(Math.min(this.state.size + delta / totalSize, 1), 0);
+      this.setState({ size });
     }
   };
 

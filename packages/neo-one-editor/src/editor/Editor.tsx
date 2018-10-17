@@ -1,15 +1,15 @@
 // tslint:disable no-null-keyword
+import { SplitPane } from '@neo-one/react-common';
 import { ActionMap } from 'constate';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Container, Flex, Grid, Hidden, styled } from 'reakit';
-import { ifProp } from 'styled-tools';
+import { Container, Flex, styled } from 'reakit';
 import { EditorContext } from '../EditorContext';
 import { Preview } from '../preview';
 import { ComponentProps } from '../types';
 import { EditorToolbar } from './EditorToolbar';
 import { EditorView } from './EditorView';
-import { EditorState, selectPreviewEnabled, selectPreviewOpen, setFileProblems } from './redux';
+import { EditorState, openPreview, selectPreviewEnabled, selectPreviewOpen, setFileProblems } from './redux';
 import { EditorFile, EditorFiles, FileDiagnostic, TextRange } from './types';
 
 const Wrapper = styled(Flex)`
@@ -21,10 +21,8 @@ const Wrapper = styled(Flex)`
   min-height: 0;
 `;
 
-const EditorWrapper = styled(Grid)<{ readonly previewOpen: boolean }>`
-  grid:
-    'editor preview' auto
-    / 1fr ${ifProp('previewOpen', '1fr', '0')};
+// tslint:disable-next-line no-any
+const StyledSplitPane = styled(SplitPane as any)`
   min-height: 0;
   min-width: 0;
   height: 100%;
@@ -57,6 +55,7 @@ interface Props extends ExternalProps {
   readonly previewOpen: boolean;
   readonly previewEnabled: boolean;
   readonly onChangeProblems: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
+  readonly onOpenPreview: () => void;
 }
 
 const EditorBase = ({
@@ -65,42 +64,56 @@ const EditorBase = ({
   previewOpen,
   previewEnabled,
   onSelectFile,
+  onOpenPreview,
   onChangeProblems,
   ...props
 }: Props & ComponentProps<typeof Wrapper>) => (
   <EditorContext.Consumer>
     {({ engine }) => (
       <Container initialState={INITIAL_STATE} actions={actions}>
-        {({ range, onSelectRange }) => (
-          <Wrapper {...props}>
-            <EditorWrapper previewOpen={previewOpen}>
-              <EditorView
-                file={file}
-                openFiles={openFiles}
-                onSelectFile={onSelectFile}
-                onChangeProblems={onChangeProblems}
-                range={range}
-              />
-              {previewEnabled ? (
-                <Hidden visible={previewOpen}>
-                  <Preview />
-                </Hidden>
-              ) : null}
-            </EditorWrapper>
-            <EditorToolbar
+        {({ range, onSelectRange }) => {
+          const editor = (
+            <EditorView
               file={file}
-              onSelectRange={(path, selectedRange) => {
-                onSelectFile(engine.getFile(path));
-                onSelectRange(selectedRange);
-              }}
+              openFiles={openFiles}
+              onSelectFile={onSelectFile}
+              onChangeProblems={onChangeProblems}
+              range={range}
             />
-          </Wrapper>
-        )}
+          );
+
+          return (
+            <Wrapper {...props}>
+              {previewEnabled ? (
+                <StyledSplitPane
+                  initialSize={0.5}
+                  collapseRight={!previewOpen}
+                  onExpandRight={onOpenPreview}
+                  type="lr"
+                  left={editor}
+                  right={
+                    <Wrapper>
+                      <Preview />
+                    </Wrapper>
+                  }
+                />
+              ) : (
+                editor
+              )}
+              <EditorToolbar
+                file={file}
+                onSelectRange={(path, selectedRange) => {
+                  onSelectFile(engine.getFile(path));
+                  onSelectRange(selectedRange);
+                }}
+              />
+            </Wrapper>
+          );
+        }}
       </Container>
     )}
   </EditorContext.Consumer>
 );
-
 export const Editor = connect(
   (state: EditorState) => ({
     ...selectPreviewOpen(state),
@@ -110,5 +123,6 @@ export const Editor = connect(
     // tslint:disable-next-line no-unnecessary-type-annotation
     onChangeProblems: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) =>
       dispatch(setFileProblems({ path, problems: diagnostics })),
+    onOpenPreview: () => dispatch(openPreview()),
   }),
 )(EditorBase);

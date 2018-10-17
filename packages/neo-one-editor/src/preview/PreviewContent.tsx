@@ -41,6 +41,8 @@ export class PreviewContent extends React.Component<Props> {
   }
 
   public render() {
-    return <StyledIFrame innerRef={this.ref} src={this.props.engine.context.createPreviewURL()} />;
+    const { engine, ...props } = this.props;
+
+    return <StyledIFrame innerRef={this.ref} src={engine.context.createPreviewURL()} {...props} />;
   }
 }

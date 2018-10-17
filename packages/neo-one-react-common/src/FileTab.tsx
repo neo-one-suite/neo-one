@@ -12,6 +12,7 @@ const Wrapper = styled(Button)<{ readonly first: boolean; readonly selected: boo
   cursor: pointer;
   ${ifProp('first', '', withProp('theme.lightBlack', (color) => `border-left: 2px solid ${color}`))};
   outline: none;
+  white-space: nowrap;
 `;
 
 interface Props {

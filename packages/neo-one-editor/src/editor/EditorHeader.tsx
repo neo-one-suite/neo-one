@@ -6,6 +6,7 @@ import { EditorFile, EditorFiles } from './types';
 
 const Wrapper = styled(Grid)`
   grid-auto-flow: column;
+  grid-gap: 8px;
   justify-content: space-between;
 `;
 

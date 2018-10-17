@@ -58,28 +58,33 @@ interface Props {
 
 export const DocsSolution = ({ selected, ...props }: Props) => (
   <Container initialState={{ selectedFilePath: getFiles(selected)[0].path }} actions={actions}>
-    {({ selectedFilePath, onSelectFile }) => (
-      <Wrapper {...props}>
-        <HeaderWrapper>
-          {getFiles(selected).map((file, idx) => (
-            <FileTab
-              key={file.path}
-              data-test={`docs-solution-file-tab-${file.path}`}
-              first={idx === 0}
-              selected={file.path === selectedFilePath}
-              file={{ path: file.path, writable: false }}
-              onClick={() => onSelectFile(file)}
-              omitReadOnly
-            />
-          ))}
-        </HeaderWrapper>
-        <StyledMarkdown
-          data-test="docs-solution-markdown"
-          source={`\`\`\`typescript\n${
-            getFiles(selected).filter((file) => file.path === selectedFilePath)[0].solution
-          }\`\`\``}
-        />
-      </Wrapper>
-    )}
+    {({ selectedFilePath, onSelectFile }) => {
+      const foundFile = getFiles(selected).find((file) => file.path === selectedFilePath);
+      if (foundFile === undefined) {
+        onSelectFile(getFiles(selected)[0]);
+      }
+
+      return (
+        <Wrapper {...props}>
+          <HeaderWrapper>
+            {getFiles(selected).map((file, idx) => (
+              <FileTab
+                key={file.path}
+                data-test={`docs-solution-file-tab-${file.path}`}
+                first={idx === 0}
+                selected={file.path === selectedFilePath}
+                file={{ path: file.path, writable: false }}
+                onClick={() => onSelectFile(file)}
+                omitReadOnly
+              />
+            ))}
+          </HeaderWrapper>
+          <StyledMarkdown
+            data-test="docs-solution-markdown"
+            source={`\`\`\`typescript\n${foundFile === undefined ? '' : foundFile.solution}\`\`\``}
+          />
+        </Wrapper>
+      );
+    }}
   </Container>
 );

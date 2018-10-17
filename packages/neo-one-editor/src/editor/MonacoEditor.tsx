@@ -55,19 +55,14 @@ export class MonacoEditor extends React.Component<Props> {
   // tslint:disable-next-line readonly-keyword
   private readonly mutableAnnotationSubscriptions: { [key: string]: monaco.IDisposable } = {};
   private readonly resizeObserver = new ResizeObserver(
-    _.debounce(
-      () => {
+    _.throttle(() => {
+      this.forceUpdate(() => {
         const editor = this.mutableEditor;
         if (editor !== undefined) {
           editor.layout();
         }
-      },
-      50,
-      {
-        leading: true,
-        trailing: true,
-      },
-    ),
+      });
+    }, 100),
   );
 
   public componentDidMount(): void {
