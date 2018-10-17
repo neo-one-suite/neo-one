@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, styled } from 'reakit';
-import lineLogoPrimary from '../../static/img/lineLogoPrimary.svg';
-import { ComponentProps } from '../types';
+import lineLogoPrimary from '../static/img/lineLogoPrimary.svg';
+import { ComponentProps } from './types';
 
 const StyledImage = styled(Image)`
   height: 24px;

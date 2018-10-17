@@ -29,7 +29,7 @@ export const workers = ({ stage }: { readonly stage: Stage }): webpack.Configura
     chunkFilename: '[name].[chunkHash:8].js',
   },
   module: {
-    rules: rules({ stage }),
+    rules: rules({ stage, bundle: 'workers' }),
   },
   plugins: plugins({ stage, bundle: 'workers' }),
 });

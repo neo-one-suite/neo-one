@@ -1,6 +1,6 @@
+import { Button } from '@neo-one/react-common';
 import * as React from 'react';
 import { Flex, styled } from 'reakit';
-import { Button } from './Button';
 import { WithResetLocalState } from './DeveloperToolsContext';
 
 const Wrapper = styled(Flex)`

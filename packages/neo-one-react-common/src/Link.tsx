@@ -7,7 +7,7 @@ export const Link = styled(LinkBase)<{ readonly linkColor: 'primary' | 'gray' }>
     gray: prop('theme.gray6'),
   })};
   ${prop('theme.fonts.axiformaBold')};
-  font-size: 14px;
+  ${prop('theme.fontStyles.body1')};
   text-decoration: none;
 
   &:hover {

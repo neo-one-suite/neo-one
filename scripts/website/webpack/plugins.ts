@@ -1,15 +1,10 @@
 import ExtractCssChunksPlugin from 'extract-css-chunks-webpack-plugin';
-// @ts-ignore
-import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
-import * as path from 'path';
 import webpack from 'webpack';
 // @ts-ignore
 import WebpackBar from 'webpackbar';
 import { Bundle, Stage } from '../types';
 
-const APP_ROOT_DIR = path.resolve(__dirname, '..', '..', '..');
-
-export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bundle: Bundle }) => [
+export const plugins = ({ stage }: { readonly stage: Stage; readonly bundle: Bundle }) => [
   new webpack.EnvironmentPlugin({
     ...process.env,
     NODE_ENV: JSON.stringify(stage === 'dev' ? 'development' : 'production'),
@@ -20,10 +15,6 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
     resource.request = resource.request.replace(/^@reactivex\/ix-es2015-cjs(.*)$/, '@reactivex/ix-esnext-esm$1');
   }),
   new WebpackBar({ profile: true }),
-  new HardSourceWebpackPlugin({
-    cacheDirectory: path.resolve(APP_ROOT_DIR, 'node_modules', '.cache', bundle),
-    cachePrune: { sizeThreshold: 1024 * 1024 * 1024 },
-  }),
   stage === 'dev'
     ? new ExtractCssChunksPlugin({ hot: true })
     : new ExtractCssChunksPlugin({

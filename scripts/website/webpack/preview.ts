@@ -20,7 +20,7 @@ export const preview = ({ stage }: { readonly stage: Stage }): webpack.Configura
     chunkFilename: stage === 'dev' ? '[name].js' : '[name].[chunkHash:8].js',
   },
   module: {
-    rules: rules({ stage }),
+    rules: rules({ stage, bundle: 'preview' }),
   },
   plugins: [
     new MiniHtmlWebpackPlugin({

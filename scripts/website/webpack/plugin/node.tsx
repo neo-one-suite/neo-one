@@ -31,7 +31,7 @@ export const node = () => ({
     const mod = mutableConfig.module === undefined ? {} : mutableConfig.module;
     mutableConfig.module = {
       ...mod,
-      rules: rules({ stage }),
+      rules: rules({ stage, bundle: 'react-static' }),
       strictExportPresence: false,
     };
 

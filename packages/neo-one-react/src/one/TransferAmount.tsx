@@ -1,10 +1,10 @@
+import { Button } from '@neo-one/react-common';
 import * as React from 'react';
 // tslint:disable-next-line no-submodule-imports
 import Select from 'react-select/lib/Select';
 import { Flex, Input, styled } from 'reakit';
 import { FromStream } from '../FromStream';
 import { ComponentProps } from '../types';
-import { Button } from './Button';
 import { WithTokens } from './DeveloperToolsContext';
 import { Selector } from './Selector';
 import { Asset, ASSETS, getTokenAsset, TransferContainer } from './TransferContainer';

@@ -1,4 +1,5 @@
 // tslint:disable no-any
+import { Monogram } from '@neo-one/react-common';
 import * as React from 'react';
 import { Block, Flex, Hidden, styled } from 'reakit';
 import { prop } from 'styled-tools';
@@ -6,7 +7,6 @@ import { ComponentProps } from '../types';
 import { BalanceSelector } from './BalanceSelector';
 import { BlockIndex } from './BlockIndex';
 import { BlockTime } from './BlockTime';
-import { Monogram } from './Monogram';
 import { NEOTrackerButton } from './NEOTrackerButton';
 import { NetworkSelector } from './NetworkSelector';
 import { ResetButton } from './ResetButton';

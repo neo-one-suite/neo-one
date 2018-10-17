@@ -1,8 +1,7 @@
-import { Monogram } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, Flex, Grid, keyframes, styled } from 'reakit';
+import { Box, Grid, keyframes, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { Footer } from '../Footer';
+import { Monogram } from './Monogram';
 
 const fadeInOut = keyframes`
   0% {
@@ -16,12 +15,6 @@ const fadeInOut = keyframes`
   100% {
     opacity: 1;
   }
-`;
-
-const Wrapper = styled(Flex)`
-  height: 100%;
-  width: 100%;
-  flex-direction: column;
 `;
 
 const LoadingWrapper = styled(Box)`
@@ -47,17 +40,10 @@ const StyledMonogram = styled(Monogram)`
   animation: ${fadeInOut} 1.5s linear infinite;
 `;
 
-const StyledFooter = styled(Footer)`
-  flex: 0 0 auto;
-`;
-
 export const Loading = () => (
-  <Wrapper>
-    <LoadingWrapper>
-      <MonogramWrapper>
-        <StyledMonogram />
-      </MonogramWrapper>
-    </LoadingWrapper>
-    <StyledFooter />
-  </Wrapper>
+  <LoadingWrapper>
+    <MonogramWrapper>
+      <StyledMonogram />
+    </MonogramWrapper>
+  </LoadingWrapper>
 );

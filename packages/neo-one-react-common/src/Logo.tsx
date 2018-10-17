@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Image, styled } from 'reakit';
-import logo from '../../static/img/logo.svg';
-import { ComponentProps } from '../types';
+import logo from '../static/img/logo.svg';
+import { ComponentProps } from './types';
 
 const StyledImage = styled(Image)`
   height: 56px;

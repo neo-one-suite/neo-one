@@ -1,10 +1,9 @@
 // tslint:disable no-any
-import { Link } from '@neo-one/react-common';
+import { Link, Logo } from '@neo-one/react-common';
 import { Link as RouterLink } from '@reach/router';
 import * as React from 'react';
 import { as, Flex, styled, Toolbar } from 'reakit';
 import { prop } from 'styled-tools';
-import { Logo } from '../elements';
 import { ComponentProps } from '../types';
 
 const Wrapper = styled(Flex)`

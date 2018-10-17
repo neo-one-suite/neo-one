@@ -1,12 +1,21 @@
 import autoprefixer from 'autoprefixer';
 import ExtractCssChunksPlugin from 'extract-css-chunks-webpack-plugin';
+import * as path from 'path';
 // @ts-ignore
 import postcssFlexbugsFixes from 'postcss-flexbugs-fixes';
-import { Stage } from '../../types';
+import { Bundle, Stage } from '../../types';
 import { browsers } from '../browsers';
 
-function initCSSLoader(stage: Stage) {
+const APP_ROOT_DIR = path.resolve(__dirname, '..', '..', '..', '..');
+
+function initCSSLoader(stage: Stage, bundle: Bundle) {
   return [
+    {
+      loader: 'cache-loader',
+      options: {
+        cacheDirectory: path.resolve(APP_ROOT_DIR, 'node_modules', '.cache', 'css', bundle),
+      },
+    },
     {
       loader: 'css-loader',
       options: {
@@ -33,8 +42,8 @@ function initCSSLoader(stage: Stage) {
   ];
 }
 
-export const cssLoader = ({ stage }: { readonly stage: Stage }) => {
-  const loaders = initCSSLoader(stage);
+export const cssLoader = ({ stage, bundle }: { readonly stage: Stage; readonly bundle: Bundle }) => {
+  const loaders = initCSSLoader(stage, bundle);
   if (stage === 'node') {
     return {
       test: /\.css$/,

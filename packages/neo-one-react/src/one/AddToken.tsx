@@ -1,11 +1,11 @@
 import { Client, nep5 } from '@neo-one/client';
+import { Button } from '@neo-one/react-common';
 import { EffectMap } from 'constate';
 import * as React from 'react';
 import { Container, Flex, styled } from 'reakit';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { ReactSyntheticEvent } from '../types';
-import { Button } from './Button';
 import { DeveloperToolsContext, Token, WithOnChangeTokens, WithTokens } from './DeveloperToolsContext';
 import { TextInput } from './TextInput';
 import { WithAddError } from './WithAddError';

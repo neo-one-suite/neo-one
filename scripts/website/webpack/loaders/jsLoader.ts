@@ -1,7 +1,7 @@
-import { Stage } from '../../types';
+import { Bundle, Stage } from '../../types';
 import { babelLoader } from './babelLoader';
 
-export const jsLoader = (options: { readonly stage: Stage }) => ({
+export const jsLoader = (options: { readonly stage: Stage; readonly bundle: Bundle }) => ({
   test: /\.jsx?$/,
   include: [
     /react-static-templates\.js/,

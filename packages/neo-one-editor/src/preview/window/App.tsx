@@ -1,5 +1,5 @@
+import { Loading } from '@neo-one/react-common';
 import * as React from 'react';
-import { Loading } from '../../Loading';
 
 interface Props {
   readonly startPromise: Promise<void>;

@@ -1,5 +1,6 @@
 // tslint:disable no-null-keyword
 import { createPrivateKey, LocalKeyStore } from '@neo-one/client';
+import { Button } from '@neo-one/react-common';
 import * as React from 'react';
 import Select from 'react-select';
 import { Grid, styled } from 'reakit';
@@ -7,7 +8,6 @@ import { combineLatest } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { FromStream } from '../FromStream';
 import { ComponentProps } from '../types';
-import { Button } from './Button';
 import { DeveloperToolsContext, WithTokens } from './DeveloperToolsContext';
 import {
   getWalletSelectorOptions$,

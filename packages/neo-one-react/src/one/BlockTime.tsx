@@ -1,3 +1,4 @@
+import { Button } from '@neo-one/react-common';
 import { ActionMap } from 'constate';
 import { formatDistanceStrict } from 'date-fns';
 import * as React from 'react';
@@ -6,7 +7,6 @@ import { Container, Divider, Flex, Overlay, Paragraph, styled } from 'reakit';
 import { concat, of as _of, timer } from 'rxjs';
 import { catchError, distinctUntilChanged, map, skip, take } from 'rxjs/operators';
 import { FromStream } from '../FromStream';
-import { Button } from './Button';
 import { DateTimePicker } from './DateTimePicker';
 import { WithNetworkClient } from './DeveloperToolsContext';
 import { Dialog } from './Dialog';

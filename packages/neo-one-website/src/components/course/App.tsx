@@ -1,3 +1,4 @@
+import { Loading } from '@neo-one/react-common';
 import { Redirect, RouteComponentProps, Router } from '@reach/router';
 import * as React from 'react';
 import { Provider } from 'react-redux';
@@ -6,7 +7,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { ChapterView } from './chapter';
 import { CoursesView } from './courses';
 import { LessonView } from './lesson';
-import { Loading } from './Loading';
 import { configureStore } from './redux';
 
 const { store, persistor } = configureStore();

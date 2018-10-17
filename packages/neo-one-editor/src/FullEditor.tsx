@@ -1,4 +1,5 @@
 import { OutputMessage } from '@neo-one/local-browser';
+import { Loading } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Subscription } from 'rxjs';
@@ -17,7 +18,6 @@ import {
 } from './editor/redux';
 import { EditorContext } from './EditorContext';
 import { createEngineContext, Engine } from './engine';
-import { Loading } from './Loading';
 import { EngineContentFiles, Test, TestRunnerCallbacks, TestSuite } from './types';
 
 interface TestsPassContainerProps {

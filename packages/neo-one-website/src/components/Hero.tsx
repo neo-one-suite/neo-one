@@ -1,7 +1,8 @@
+import { Background } from '@neo-one/react-common';
 import * as React from 'react';
 import { Box, Flex, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { Background, Tagline } from '../elements';
+import { Tagline } from '../elements';
 
 const FlexBackground = Flex.as(Background);
 const StyledBackground = styled(FlexBackground)`

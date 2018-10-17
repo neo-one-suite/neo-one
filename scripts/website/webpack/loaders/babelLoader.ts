@@ -1,7 +1,7 @@
-import { Stage } from '../../types';
+import { Bundle, Stage } from '../../types';
 import { babel } from './babel';
 
-export const babelLoader = (options: { readonly stage: Stage }) => ({
+export const babelLoader = (options: { readonly stage: Stage; readonly bundle: Bundle }) => ({
   loader: 'babel-loader',
-  options: babel(options),
+  options: babel({ ...options, cache: true }),
 });
