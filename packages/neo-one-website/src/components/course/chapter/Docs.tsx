@@ -7,6 +7,7 @@ import { SelectedChapter } from '../types';
 import { DocsFooter } from './DocsFooter';
 
 const Wrapper = styled(Grid)`
+  background-color: ${prop('theme.black')};
   grid-template:
     'docs' 1fr
     'footer' auto
@@ -14,7 +15,6 @@ const Wrapper = styled(Grid)`
   grid-gap: 0;
   min-height: 0;
   min-width: 0;
-  border-right: 1px solid ${prop('theme.gray5')};
 `;
 
 const StyledMarkdown = styled(Markdown)`

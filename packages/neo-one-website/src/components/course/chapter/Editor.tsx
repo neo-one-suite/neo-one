@@ -5,6 +5,7 @@ import { getChapterTo } from '../common';
 import { selectChapter } from '../coursesData';
 import { completeChapter } from '../redux';
 import { SelectedChapter } from '../types';
+import { enablePreview } from './utils';
 
 interface ExternalProps {
   readonly selected: SelectedChapter;
@@ -15,7 +16,7 @@ interface Props extends ExternalProps {
 }
 
 const EditorBase = ({ selected, onTestsPass, ...props }: Props) => {
-  const preview = selectChapter(selected).files.some((file) => file.path === 'public/index.html');
+  const preview = enablePreview(selected);
 
   return (
     <FullEditor

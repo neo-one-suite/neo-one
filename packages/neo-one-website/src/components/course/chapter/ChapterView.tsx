@@ -1,3 +1,4 @@
+import { SplitPane } from '@neo-one/react-common';
 import { Redirect } from '@reach/router';
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -8,6 +9,7 @@ import { SelectedChapter } from '../types';
 import { Docs } from './Docs';
 import { Editor } from './Editor';
 import { ProgressHeader } from './ProgressHeader';
+import { enablePreview } from './utils';
 
 interface ExternalProps {
   readonly selected: SelectedChapter;
@@ -22,9 +24,9 @@ const StyledGrid = styled(Grid)`
   height: calc(100vh - 56px);
   width: 100%;
   grid:
-    'progress progress' 8px
-    'docs editor' 1fr
-    / minmax(400px, 1fr) 2fr;
+    'progress' 8px
+    'pane' 1fr
+    / 100%;
 `;
 
 const ChapterViewBase = ({ selected, progress }: Props) => {
@@ -43,8 +45,12 @@ const ChapterViewBase = ({ selected, progress }: Props) => {
       <Grid.Item area="progress">
         <ProgressHeader selected={selected} />
       </Grid.Item>
-      <Docs selected={selected} />
-      <Editor selected={selected} />
+      <SplitPane
+        initialSize={enablePreview(selected) ? 0.33 : 0.4}
+        type="lr"
+        left={<Docs selected={selected} />}
+        right={<Editor selected={selected} />}
+      />
     </StyledGrid>
   );
 };
