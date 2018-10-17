@@ -26,6 +26,10 @@ const SegmentBase = styled(Box)<{ readonly bg: 'current' | 'complete' | 'incompl
 
 const Segment = as(Link)(SegmentBase);
 
+const StyledTooltip = styled(Tooltip)`
+  white-space: nowrap;
+`;
+
 export const ProgressBar = ({ current, items }: Props) => (
   <Grid column gap={4} height="8px">
     {items.map((item, idx) => (
@@ -40,10 +44,10 @@ export const ProgressBar = ({ current, items }: Props) => (
           <SegmentBase key={idx} bg="incomplete" />
         )}
 
-        <Tooltip placement="bottom">
+        <StyledTooltip placement="bottom">
           <TooltipArrow />
           {item.title}
-        </Tooltip>
+        </StyledTooltip>
       </Block>
     ))}
   </Grid>
