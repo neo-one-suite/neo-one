@@ -1,6 +1,6 @@
+import { Redirect } from '@reach/router';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-static';
 import { Grid, styled } from 'reakit';
 import { getChapterTo } from '../common';
 import { ChaptersProgress, CourseState, selectLessonProgress } from '../redux';

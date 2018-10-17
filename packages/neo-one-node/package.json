@@ -20,7 +20,7 @@
     "@types/abstract-leveldown": "^5.0.1",
     "@types/leveldown": "^4.0.0",
     "@types/levelup": "^3.1.0",
-    "@types/node-cron": "^1.2.0",
+    "@types/node-cron": "^2.0.0",
     "abstract-leveldown": "^5.0.0",
     "leveldown": "^4.0.1",
     "levelup": "^3.1.0",

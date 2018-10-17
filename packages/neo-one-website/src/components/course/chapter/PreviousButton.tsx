@@ -1,7 +1,7 @@
 // tslint:disable no-any
 import { Button } from '@neo-one/react';
+import { Link } from '@reach/router';
 import * as React from 'react';
-import { Link } from 'react-static';
 import { as } from 'reakit';
 import { getChapterTo } from '../common';
 import { selectCourse, selectLesson } from '../coursesData';

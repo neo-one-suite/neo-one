@@ -86,6 +86,7 @@ export const createEngineContext = async ({
   createPreviewURL,
 }: CreateEngineContextOptions): Promise<EngineContext> => {
   const { worker, container } = await getServiceWorkerEndpoint();
+
   const serviceWorkerManager = new ServiceWorkerManager(worker);
   const metaDB = createEndpointPouchDB<EngineMeta>(`${id}-meta`, container);
   const [fs, transpileCache] = await Promise.all([

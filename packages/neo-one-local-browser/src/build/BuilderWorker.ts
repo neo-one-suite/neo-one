@@ -1,5 +1,5 @@
 // tslint:disable match-default-export-name no-submodule-imports no-implicit-dependencies
 // @ts-ignore
-import BuilderWorker from '@neo-one/worker-loader!./builder.worker';
+import builderWorkerURL from 'file-loader!../../../../dist/website/builder.worker.js';
 
-export { BuilderWorker };
+export const BuilderWorker = () => new Worker(builderWorkerURL);

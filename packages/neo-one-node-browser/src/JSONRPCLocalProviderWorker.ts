@@ -1,5 +1,5 @@
 // tslint:disable match-default-export-name no-implicit-dependencies no-submodule-imports
 // @ts-ignore
-import JSONRPCLocalProviderWorker from '@neo-one/worker-loader!./jsonRPCLocalProvider.worker';
+import jsonRPCLocalProviderWorkerURL from 'file-loader!../../../dist/website/jsonRPCLocalProvider.worker.js';
 
-export { JSONRPCLocalProviderWorker };
+export const JSONRPCLocalProviderWorker = () => new Worker(jsonRPCLocalProviderWorkerURL);

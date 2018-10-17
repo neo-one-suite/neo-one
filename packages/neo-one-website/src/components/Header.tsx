@@ -1,7 +1,7 @@
 // tslint:disable no-any
 import { Link } from '@neo-one/react-common';
+import { Link as RouterLink } from '@reach/router';
 import * as React from 'react';
-import { Link as RouterLink } from 'react-static';
 import { as, Flex, styled, Toolbar } from 'reakit';
 import { prop } from 'styled-tools';
 import { Logo } from '../elements';

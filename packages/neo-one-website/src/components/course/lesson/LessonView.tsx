@@ -1,6 +1,6 @@
 import { Button } from '@neo-one/react';
+import { Link } from '@reach/router';
 import * as React from 'react';
-import { Link } from 'react-static';
 import { as, Box, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { Footer } from '../../Footer';

@@ -1,6 +1,6 @@
 import { Tooltip, TooltipArrow } from '@neo-one/react';
+import { Link } from '@reach/router';
 import * as React from 'react';
-import { Link } from 'react-static';
 import { as, Block, Box, Grid, styled } from 'reakit';
 import { prop, switchProp } from 'styled-tools';
 

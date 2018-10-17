@@ -1,5 +1,6 @@
+import { Redirect } from '@reach/router';
 import * as React from 'react';
-import { Redirect, withRouteData } from 'react-static';
+import { withRouteData } from 'react-static';
 import { Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { DocFooter, SectionData, Sidebar } from '../components';

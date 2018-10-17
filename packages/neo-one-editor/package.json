@@ -22,7 +22,7 @@
     "@types/glob": "^7.1.1",
     "@types/lodash": "^4.14.117",
     "@types/pouchdb": "^6.3.2",
-    "@types/react": "^16.4.16",
+    "@types/react": "^16.4.18",
     "@types/react-dom": "^16.0.9",
     "@types/react-redux": "^6.0.9",
     "@types/resolve": "^0.0.8",
@@ -50,7 +50,7 @@
     "react-dom": "^16.5.1",
     "react-icons": "^3.2.0",
     "react-redux": "^5.0.7",
-    "reakit": "^0.15.7",
+    "reakit": "0.15.7",
     "redux": "^4.0.1",
     "resize-observer-polyfill": "^1.5.0",
     "resolve": "^1.8.1",
@@ -63,18 +63,8 @@
     "typescript": "3.1.3",
     "typescript-fsa": "^3.0.0-beta-2",
     "typescript-fsa-reducers": "^1.0.0",
-    "webpack": "4.20.2"
-  },
-  "devDependencies": {
-    "connect-history-api-fallback": "1.5.0",
-    "css-loader": "1.0.0",
-    "hard-source-webpack-plugin": "0.12.0",
-    "koa-connect": "2.0.1",
-    "mini-html-webpack-plugin": "0.2.3",
-    "style-loader": "0.23.1",
-    "webpack-serve": "2.0.2",
-    "webpackbar": "2.6.3",
-    "yargs": "12.0.2"
+    "webpack": "4.20.2",
+    "worker-pouch": "^2.1.0"
   },
   "sideEffects": [
     "src/monaco/language.ts",

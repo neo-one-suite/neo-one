@@ -3,11 +3,11 @@ import 'monaco-editor/esm/vs/language/html/monaco.contribution';
 
 import { comlink } from '@neo-one/worker';
 // @ts-ignore
-import TSWorker from '@neo-one/worker-loader!./ts.worker';
+import editorWorkerURL from 'file-loader!../../../../dist/website/editor.worker.js';
 // @ts-ignore
-import EditorWorker from '@neo-one/worker-loader!monaco-editor/esm/vs/editor/editor.worker';
+import htmlWorkerURL from 'file-loader!../../../../dist/website/html.worker.js';
 // @ts-ignore
-import HTMLWorker from '@neo-one/worker-loader!monaco-editor/esm/vs/language/html/html.worker';
+import tsWorkerURL from 'file-loader!../../../../dist/website/ts.worker.js';
 // @ts-ignore
 import * as javascriptModule from 'monaco-editor/esm/vs/basic-languages/javascript/javascript';
 import ts from 'typescript';
@@ -32,11 +32,11 @@ const JAVASCRIPT_SUFFIX = '-javascript';
 
     // tslint:disable-next-line:prefer-conditional-expression
     if (label.endsWith(CONTRACT_SUFFIX) || label.endsWith(TYPESCRIPT_SUFFIX) || label.endsWith(JAVASCRIPT_SUFFIX)) {
-      MonacoWorker = TSWorker();
+      MonacoWorker = new Worker(tsWorkerURL);
     } else if (label.endsWith('html')) {
-      MonacoWorker = HTMLWorker();
+      MonacoWorker = new Worker(htmlWorkerURL);
     } else {
-      MonacoWorker = EditorWorker();
+      MonacoWorker = new Worker(editorWorkerURL);
     }
 
     return MonacoWorker;

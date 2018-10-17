@@ -1,5 +1,5 @@
+import { Link } from '@reach/router';
 import * as React from 'react';
-import { Link } from 'react-static';
 import { as, Button, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { getLessonTo, LessonProgressBar } from '../common';

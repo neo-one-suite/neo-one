@@ -6,15 +6,14 @@ const { getCourses } = require('./packages/neo-one-website/src/loaders/coursesLo
 const { getDocs } = require('./packages/neo-one-website/src/utils/getDocs');
 const { getTutorial } = require('./packages/neo-one-website/src/utils/getTutorial');
 
-const ROOT = path.resolve(__dirname, 'packages', 'neo-one-website');
+const ROOT_DIR = path.resolve(__dirname);
 
 export default {
   paths: {
-    root: ROOT,
-    node_modules: path.resolve(__dirname, 'node_modules'),
+    root: path.resolve(ROOT_DIR, 'packages', 'neo-one-website'),
+    node_modules: path.resolve(ROOT_DIR, 'node_modules'),
   },
   entry: path.join('src', 'index'),
-  extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
   getSiteData: () => ({
     title: 'React Static',
   }),
@@ -81,6 +80,7 @@ export default {
       },
     ];
   },
-  plugins: ['plugin'],
+  extractCssChunks: true,
+  plugins: [path.resolve(ROOT_DIR, 'scripts', 'website', 'webpack', 'plugin')],
   siteRoot: 'https://neo-one.io',
 };

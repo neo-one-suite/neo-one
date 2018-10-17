@@ -1,8 +1,8 @@
 // tslint:disable no-console
 import execa from 'execa';
-import isRunning from 'is-running';
 import * as path from 'path';
 import yargs from 'yargs';
+import { createKillProcess } from './createKillProcess';
 
 yargs.describe('report', 'Write out test reports.').default('report', false);
 yargs.describe('coverage', 'Write coverage to .nyc_output.').default('coverage', false);
@@ -34,46 +34,6 @@ const runCypress = async ({ report, coverage }: { readonly report: boolean; read
   proc.stderr.pipe(process.stderr);
 
   await proc;
-};
-
-const nowSeconds = () => Math.round(Date.now() / 1000);
-
-const createKillProcess = (proc: execa.ExecaChildProcess) => async () => killProcess(proc);
-
-const killProcess = async (proc: execa.ExecaChildProcess) => {
-  const { pid } = proc;
-  const startTime = nowSeconds();
-  let alive = isRunning(pid);
-  if (!alive) {
-    return;
-  }
-
-  // tslint:disable-next-line no-loop-statement
-  while (nowSeconds() - startTime <= 10) {
-    try {
-      let signal = 'SIGINT';
-      if (nowSeconds() - startTime > 7) {
-        signal = 'SIGKILL';
-      } else if (nowSeconds() - startTime > 5) {
-        signal = 'SIGTERM';
-      }
-      process.kill(pid, signal);
-    } catch (error) {
-      if (error.code === 'ESRCH') {
-        return;
-      }
-
-      throw error;
-    }
-    // eslint-disable-next-line
-    await new Promise<void>((resolve) => setTimeout(resolve, 1000));
-    alive = isRunning(pid);
-    if (!alive) {
-      return;
-    }
-  }
-
-  throw new Error(`Failed to kill process ${pid}`);
 };
 
 // tslint:disable-next-line readonly-array
