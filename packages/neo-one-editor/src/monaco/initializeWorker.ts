@@ -30,7 +30,7 @@ export function initializeWorker(foreignModule: (fs: any) => any) {
           }, editorWorker);
 
           mutableQueue.forEach((e) => {
-            simpleWorker.onmessage(e);
+            simpleWorker.onmessage(e.data);
           });
 
           // tslint:disable-next-line no-object-mutation

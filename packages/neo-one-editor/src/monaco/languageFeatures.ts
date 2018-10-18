@@ -5,6 +5,7 @@ import ts from 'typescript';
 import { LanguageServiceOptions } from './LanguageServiceOptions';
 import { TypeScriptWorker } from './tsWorker';
 import { utils } from '@neo-one/utils';
+import { PouchDBFileSystem } from '@neo-one/local-browser';
 
 import Uri = monaco.Uri;
 import Position = monaco.Position;
@@ -38,15 +39,15 @@ export abstract class Adapter {
 
 // --- diagnostics --- ---
 
-export class DiagnostcsAdapter extends Adapter {
+export class DiagnosticsAdapter extends Adapter {
   private _disposables: IDisposable[] = [];
-  private _listener: { [uri: string]: IDisposable } = Object.create(null);
   private _sources: Set<string> = new Set();
 
   constructor(
     private _defaults: LanguageServiceOptions,
-    private _selector: string,
+    _selector: string,
     worker: (first: Uri, ...more: Uri[]) => Promise<TypeScriptWorker>,
+    fs: PouchDBFileSystem,
   ) {
     super(worker);
 
@@ -55,29 +56,17 @@ export class DiagnostcsAdapter extends Adapter {
         return;
       }
 
-      let handle: NodeJS.Timer;
-      const changeSubscription = model.onDidChangeContent(() => {
-        clearTimeout(handle);
-        handle = setTimeout(() => this._doValidate(model.uri), 500);
-      });
-
-      this._listener[model.uri.toString()] = {
-        dispose() {
-          changeSubscription.dispose();
-          clearTimeout(handle);
-        },
-      };
-
       this._doValidate(model.uri);
     };
 
     const onModelRemoved = (model: monaco.editor.IModel): void => {
-      monaco.editor.setModelMarkers(model, this._selector, []);
-      const key = model.uri.toString();
-      if (this._listener[key]) {
-        this._listener[key].dispose();
-        delete this._listener[key];
+      if (model.getModeId() !== _selector) {
+        return;
       }
+
+      this._sources.forEach((source) => {
+        monaco.editor.setModelMarkers(model, source, []);
+      });
     };
 
     this._disposables.push(monaco.editor.onDidCreateModel(onModelAdd));
@@ -94,6 +83,22 @@ export class DiagnostcsAdapter extends Adapter {
         for (const model of monaco.editor.getModels()) {
           onModelRemoved(model);
         }
+      },
+    });
+
+    const triggerAllDiagnostics = _.debounce(() => {
+      for (const model of monaco.editor.getModels()) {
+        if (model.getModeId() === _selector) {
+          this._doValidate(model.uri);
+        }
+      }
+    }, 500);
+
+    const changes = fs.db.changes({ since: 'now', live: true, include_docs: true }).on('change', triggerAllDiagnostics);
+
+    this._disposables.push({
+      dispose() {
+        changes.cancel();
       },
     });
 

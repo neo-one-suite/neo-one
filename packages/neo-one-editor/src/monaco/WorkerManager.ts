@@ -90,17 +90,15 @@ export class WorkerManager {
         );
       }
 
-      this.mutableClients = p.then<Clients>((client) => {
-        // tslint:disable-next-line no-any
-        const webWorker = (worker as any)._worker._worker.worker;
-        const endpoint = this.options.getEndpoint();
-        (webWorker as Worker).postMessage(
-          { id: this.options.getID(), endpoint },
-          comlink.isTransferable(endpoint) ? [endpoint] : [],
-        );
+      // tslint:disable-next-line no-any
+      const webWorker = (worker as any)._worker._worker.worker;
+      const endpoint = this.options.getEndpoint();
+      (webWorker as Worker).postMessage(
+        { id: this.options.getID(), endpoint },
+        comlink.isTransferable(endpoint) ? [endpoint] : [],
+      );
 
-        return [worker, client];
-      });
+      this.mutableClients = p.then<Clients>((client) => [worker, client]);
     }
 
     return this.mutableClients;

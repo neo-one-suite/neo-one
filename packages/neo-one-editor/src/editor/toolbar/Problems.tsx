@@ -2,8 +2,15 @@ import * as React from 'react';
 import { MdError, MdWarning } from 'react-icons/md';
 import { connect } from 'react-redux';
 import { as, Grid, styled } from 'reakit';
-import { openConsole, selectConsoleProblems } from '../redux';
-import { FileDiagnostic } from '../types';
+import {
+  EditorState,
+  openConsole,
+  selectConsoleOpen,
+  selectConsoleProblems,
+  selectConsoleType,
+  setConsoleOpen,
+} from '../redux';
+import { ConsoleType, FileDiagnostic } from '../types';
 import { Text } from './Text';
 import { Wrapper } from './Wrapper';
 
@@ -14,11 +21,14 @@ const GridWrapper = styled(as(Text)(Grid))`
 
 interface Props {
   readonly consoleProblems: ReadonlyArray<FileDiagnostic>;
-  readonly onClick: () => void;
+  readonly consoleType: ConsoleType;
+  readonly consoleOpen: boolean;
+  readonly onOpen: () => void;
+  readonly onClose: () => void;
 }
 
-const ProblemsBase = ({ consoleProblems, onClick, ...props }: Props) => (
-  <Wrapper data-test="problems" onClick={onClick} {...props}>
+const ProblemsBase = ({ consoleProblems, consoleType, consoleOpen, onOpen, onClose, ...props }: Props) => (
+  <Wrapper data-test="problems" onClick={consoleOpen && consoleType === 'problems' ? onClose : onOpen} {...props}>
     <GridWrapper>
       <MdError />
       <span data-test="problems-problem-count">
@@ -33,8 +43,13 @@ const ProblemsBase = ({ consoleProblems, onClick, ...props }: Props) => (
 );
 
 export const Problems = connect(
-  selectConsoleProblems,
+  (state: EditorState) => ({
+    ...selectConsoleProblems(state),
+    ...selectConsoleOpen(state),
+    ...selectConsoleType(state),
+  }),
   (dispatch) => ({
-    onClick: () => dispatch(openConsole('problems')),
+    onOpen: () => dispatch(openConsole('problems')),
+    onClose: () => dispatch(setConsoleOpen(false)),
   }),
 )(ProblemsBase);

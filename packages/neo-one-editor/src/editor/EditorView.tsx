@@ -33,7 +33,13 @@ export const EditorView = ({
     <EditorHeader file={file} openFiles={openFiles} onSelectFile={onSelectFile} />
     <EditorContext.Consumer>
       {({ engine }: EditorContextType) => (
-        <MonacoEditor file={file} range={range} engine={engine} onUpdateDiagnostics={onChangeProblems} />
+        <MonacoEditor
+          file={file}
+          files={openFiles}
+          range={range}
+          engine={engine}
+          onUpdateDiagnostics={onChangeProblems}
+        />
       )}
     </EditorContext.Consumer>
   </Wrapper>

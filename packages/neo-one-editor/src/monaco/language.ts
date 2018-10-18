@@ -1,6 +1,7 @@
 // tslint:disable promise-function-async no-submodule-imports no-implicit-dependencies no-import-side-effect
 import 'monaco-editor/esm/vs/language/html/monaco.contribution';
 
+import { PouchDBFileSystem } from '@neo-one/local-browser';
 import { comlink } from '@neo-one/worker';
 // @ts-ignore
 import editorWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/website/editor.worker.js';
@@ -68,7 +69,7 @@ export function getLanguageID(id: string, type: LanguageType) {
   return `${id}${suffix}`;
 }
 
-function setupTypeScript(id: string, endpoint: () => comlink.Endpoint) {
+function setupTypeScript(id: string, fs: PouchDBFileSystem, endpoint: () => comlink.Endpoint) {
   const options = new LanguageServiceOptions(
     {
       target: ts.ScriptTarget.ESNext,
@@ -102,10 +103,10 @@ function setupTypeScript(id: string, endpoint: () => comlink.Endpoint) {
   );
   options.setEagerModelSync(true);
 
-  setupLanguage(getLanguageID(id, LanguageType.TypeScript), options, true);
+  setupLanguage(getLanguageID(id, LanguageType.TypeScript), options, fs, true);
 }
 
-function setupContract(id: string, endpoint: () => comlink.Endpoint) {
+function setupContract(id: string, fs: PouchDBFileSystem, endpoint: () => comlink.Endpoint) {
   const options = new LanguageServiceOptions(
     {
       target: ts.ScriptTarget.ESNext,
@@ -142,10 +143,10 @@ function setupContract(id: string, endpoint: () => comlink.Endpoint) {
   );
   options.setEagerModelSync(true);
 
-  setupLanguage(getLanguageID(id, LanguageType.Contract), options, true);
+  setupLanguage(getLanguageID(id, LanguageType.Contract), options, fs, true);
 }
 
-function setupJavaScript(id: string, endpoint: () => comlink.Endpoint) {
+function setupJavaScript(id: string, fs: PouchDBFileSystem, endpoint: () => comlink.Endpoint) {
   const options = new LanguageServiceOptions(
     { allowNonTsExtensions: true, allowJs: true, target: ts.ScriptTarget.ESNext },
     { noSemanticValidation: true, noSyntaxValidation: false },
@@ -154,13 +155,13 @@ function setupJavaScript(id: string, endpoint: () => comlink.Endpoint) {
   );
   options.setEagerModelSync(true);
 
-  setupLanguage(getLanguageID(id, LanguageType.JavaScript), options, false);
+  setupLanguage(getLanguageID(id, LanguageType.JavaScript), options, fs, false);
 }
 
-export function setupLanguages(id: string, endpoint: () => comlink.Endpoint) {
-  setupJavaScript(id, endpoint);
-  setupTypeScript(id, endpoint);
-  setupContract(id, endpoint);
+export function setupLanguages(id: string, fs: PouchDBFileSystem, endpoint: () => comlink.Endpoint) {
+  setupJavaScript(id, fs, endpoint);
+  setupTypeScript(id, fs, endpoint);
+  setupContract(id, fs, endpoint);
 }
 
 // tslint:disable-next-line readonly-keyword
@@ -168,7 +169,12 @@ const mutableManagers: { [languageID: string]: WorkerManager } = {};
 // tslint:disable-next-line readonly-keyword
 const mutableOptions: { [languageID: string]: LanguageServiceOptions } = {};
 
-function setupLanguage(languageID: string, options: LanguageServiceOptions, isTypeScript: boolean) {
+function setupLanguage(
+  languageID: string,
+  options: LanguageServiceOptions,
+  fs: PouchDBFileSystem,
+  isTypeScript: boolean,
+) {
   if ((mutableManagers[languageID] as WorkerManager | undefined) !== undefined) {
     return;
   }
@@ -179,17 +185,26 @@ function setupLanguage(languageID: string, options: LanguageServiceOptions, isTy
   mutableOptions[languageID] = options;
   const worker = (...uris: Uri[]): Promise<TypeScriptWorker> => manager.getScriptWorker(...uris);
 
-  monaco.languages.registerCompletionItemProvider(languageID, new languageFeatures.SuggestAdapter(worker));
+  monaco.languages.registerReferenceProvider(languageID, new languageFeatures.ReferenceAdapter(worker));
+  // registerRenameProvider
   monaco.languages.registerSignatureHelpProvider(languageID, new languageFeatures.SignatureHelpAdapter(worker));
   monaco.languages.registerHoverProvider(languageID, new languageFeatures.QuickInfoAdapter(worker));
+  monaco.languages.registerDocumentSymbolProvider(languageID, new languageFeatures.OutlineAdapter(worker));
   monaco.languages.registerDocumentHighlightProvider(languageID, new languageFeatures.OccurrencesAdapter(worker));
   monaco.languages.registerDefinitionProvider(languageID, new languageFeatures.DefinitionAdapter(worker));
-  monaco.languages.registerReferenceProvider(languageID, new languageFeatures.ReferenceAdapter(worker));
-  monaco.languages.registerDocumentSymbolProvider(languageID, new languageFeatures.OutlineAdapter(worker));
+  // registerImplementationProvider
+  // registerTypeDefinitionProvider
+  // registerCodeLensProvider
+  // registerCodeActionProvider
+  // registerDocumentFormattingEditProvider
   monaco.languages.registerDocumentRangeFormattingEditProvider(languageID, new languageFeatures.FormatAdapter(worker));
   monaco.languages.registerOnTypeFormattingEditProvider(languageID, new languageFeatures.FormatOnTypeAdapter(worker));
+  // registerLinkProvider
+  monaco.languages.registerCompletionItemProvider(languageID, new languageFeatures.SuggestAdapter(worker));
+  // registerColorProvider
+  // registerFoldingRangeProvider
   // tslint:disable-next-line no-unused-expression
-  new languageFeatures.DiagnostcsAdapter(options, languageID, worker);
+  new languageFeatures.DiagnosticsAdapter(options, languageID, worker, fs);
   const mod = isTypeScript ? typescriptModule : javascriptModule;
   monaco.languages.setLanguageConfiguration(languageID, mod.conf);
   configureGrammar(languageID).catch((error) => {

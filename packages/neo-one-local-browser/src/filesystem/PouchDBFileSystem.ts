@@ -116,15 +116,20 @@ export class PouchDBFileSystem implements FileSystem {
     }
     const pathWithTrailing = path === '/' ? path : `${path}/`;
 
-    const mutableOutput: string[] = [];
+    const mutableOutput = new Set<string>();
     // tslint:disable-next-line no-loop-statement
     for (const otherPath of this.files.keys()) {
-      if (otherPath.startsWith(pathWithTrailing) && !otherPath.slice(pathWithTrailing.length).includes('/')) {
-        mutableOutput.push(otherPath.slice(pathWithTrailing.length));
+      if (otherPath.startsWith(pathWithTrailing)) {
+        let filePath = otherPath.slice(pathWithTrailing.length);
+        const index = filePath.indexOf('/');
+        if (index !== -1) {
+          filePath = filePath.slice(0, index);
+        }
+        mutableOutput.add(filePath);
       }
     }
 
-    return mutableOutput;
+    return [...mutableOutput];
   };
 
   public readonly writeFile = async (pathIn: string, content: string): Promise<void> => {

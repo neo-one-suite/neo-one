@@ -1,5 +1,11 @@
 // tslint:disable no-implicit-dependencies no-submodule-imports promise-function-async
-import { createCompilerHost, createFSHost, FileSystem, getSmartContractPath } from '@neo-one/local-browser';
+import {
+  createCompilerHost,
+  createFSHost,
+  getSmartContractPath,
+  normalizePath,
+  PouchDBFileSystem,
+} from '@neo-one/local-browser';
 import { getSemanticDiagnostics } from '@neo-one/smart-contract-compiler';
 // @ts-ignore
 import { TPromise } from 'monaco-editor/esm/vs/base/common/winjs.base';
@@ -43,11 +49,12 @@ export class TypeScriptWorker implements ts.LanguageServiceHost {
   private readonly compilerOptions: ts.CompilerOptions;
   private readonly isSmartContract: boolean;
   // tslint:disable-next-line readonly-keyword
-  private readonly fs: FileSystem;
+  private readonly fs: PouchDBFileSystem;
   private readonly initPromise: Promise;
+  private readonly versions: Map<string, string>;
 
   // tslint:disable-next-line no-any
-  public constructor(ctx: IWorkerContext, createData: ICreateData, fs: FileSystem) {
+  public constructor(ctx: IWorkerContext, createData: ICreateData, fs: PouchDBFileSystem) {
     this.ctx = ctx;
     this.compilerOptions = createData.compilerOptions;
     this.isSmartContract = createData.isSmartContract;
@@ -59,6 +66,11 @@ export class TypeScriptWorker implements ts.LanguageServiceHost {
     this.getDirectories = fsHost.getDirectories;
     this.languageService = ts.createLanguageService(this);
     this.initPromise = Promise.wrap(undefined);
+    this.versions = new Map();
+
+    this.fs.db.changes({ since: 'now', live: true, include_docs: true }).on('change', (change) => {
+      this.versions.set(change.id, `${change.seq}`);
+    });
   }
 
   public getCompilationSettings(): ts.CompilerOptions {
@@ -81,7 +93,9 @@ export class TypeScriptWorker implements ts.LanguageServiceHost {
       return model.version.toString();
     }
 
-    return '-1';
+    const version = this.versions.get(normalizePath(fileName));
+
+    return version === undefined ? '-1' : version;
   }
 
   public getScriptSnapshot(fileName: string): ts.IScriptSnapshot | undefined {

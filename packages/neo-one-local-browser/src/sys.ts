@@ -945,7 +945,7 @@ export const createFSHost = (fs: FileSystem) => {
 
   function getAccessibleFileSystemEntries(path: string): FileSystemEntries {
     try {
-      const entries = fs.readdirSync(path || '.').sort();
+      const entries = fs.readdirSync(path || '/').sort();
       const files: string[] = [];
       const directories: string[] = [];
       for (const entry of entries) {
