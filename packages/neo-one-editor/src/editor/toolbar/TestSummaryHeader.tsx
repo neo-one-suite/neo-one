@@ -1,7 +1,7 @@
 // tslint:disable no-null-keyword
 import * as React from 'react';
 import { EditorContext } from '../../EditorContext';
-import { TestSuite } from '../../types';
+import { EditorContextType, TestSuite } from '../../types';
 import { TestSummaryHeaderCommon } from './TestSummaryHeaderCommon';
 import { TestTextDark } from './TestText';
 
@@ -34,7 +34,7 @@ export const TestSummaryHeader = ({ testSuites, ...props }: Props) => {
 
   return (
     <EditorContext.Consumer>
-      {({ engine }) => (
+      {({ engine }: EditorContextType) => (
         <TestSummaryHeaderCommon
           {...props}
           data-test="test-summary-header"

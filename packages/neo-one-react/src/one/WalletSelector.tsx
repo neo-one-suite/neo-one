@@ -1,46 +1,47 @@
-// tslint:disable no-null-keyword
+// tslint:disable no-null-keyword no-any
 import { createPrivateKey, LocalKeyStore } from '@neo-one/client';
-import { Button } from '@neo-one/react-common';
-import * as React from 'react';
-import Select from 'react-select';
-import { Grid, styled } from 'reakit';
-import { combineLatest } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
-import { FromStream } from '../FromStream';
-import { ComponentProps } from '../types';
-import { DeveloperToolsContext, WithTokens } from './DeveloperToolsContext';
 import {
+  Button,
+  FromStream,
   getWalletSelectorOptions$,
   makeWalletSelectorValueOption,
   WalletSelectorBase,
-  WalletSelectorOptionType,
-} from './WalletSelectorBase';
-import { WithAddError } from './WithAddError';
+  WithAddError,
+} from '@neo-one/react-common';
+import * as React from 'react';
+import { Grid, styled } from 'reakit';
+import { combineLatest } from 'rxjs';
+import { distinctUntilChanged, map } from 'rxjs/operators';
+import { DeveloperToolsContext, DeveloperToolsContextType, WithTokens } from './DeveloperToolsContext';
 
-const Wrapper = styled(Grid)`
-  align-items: center;
-  margin: 16px 0;
+const WalletSelectorWrapper = styled(Grid)`
+  grid:
+    'selector button' auto
+    / minmax(96px, 1fr) auto;
+  gap: 8px;
 `;
 
-export function WalletSelector(props: ComponentProps<Select<WalletSelectorOptionType>>) {
+export function WalletSelector(props: any) {
   return (
     <WithAddError>
       {(addError) => (
         <WithTokens>
           {(tokens$) => (
             <DeveloperToolsContext.Consumer>
-              {({ client }) => (
+              {({ client }: DeveloperToolsContextType) => (
                 <FromStream
-                  props$={combineLatest(
-                    client.currentUserAccount$.pipe(
-                      distinctUntilChanged(),
-                      map(
-                        (value) =>
-                          value === undefined ? value : makeWalletSelectorValueOption({ userAccount: value }),
+                  createStream={() =>
+                    combineLatest(
+                      client.currentUserAccount$.pipe(
+                        distinctUntilChanged(),
+                        map(
+                          (value) =>
+                            value === undefined ? value : makeWalletSelectorValueOption({ userAccount: value }),
+                        ),
                       ),
-                    ),
-                    getWalletSelectorOptions$(addError, client, tokens$),
-                  )}
+                      getWalletSelectorOptions$(addError, client, tokens$),
+                    )
+                  }
                 >
                   {([value, options]) => {
                     let newWalletOnClick: (() => void) | undefined;
@@ -89,28 +90,28 @@ export function WalletSelector(props: ComponentProps<Select<WalletSelectorOption
                       );
 
                     return (
-                      <Wrapper gap={8}>
-                        <Grid gap={16} gridAutoFlow="column">
+                      <>
+                        <WalletSelectorWrapper>
                           <WalletSelectorBase
                             data-test="neo-one-wallet-selector-selector"
                             {...props}
                             value={value}
                             options={options}
-                            onChange={(option) => {
+                            onChange={(option: any) => {
                               if (option != undefined && !Array.isArray(option)) {
                                 client.selectUserAccount(option.id).catch(addError);
                               }
                             }}
                           />
                           {newWalletButton}
-                        </Grid>
+                        </WalletSelectorWrapper>
                         {value === undefined ? null : (
                           <Grid columns="auto 1fr" gap={8}>
                             <Grid.Item>Address:</Grid.Item>
                             <Grid.Item>{value.address}</Grid.Item>
                           </Grid>
                         )}
-                      </Wrapper>
+                      </>
                     );
                   }}
                 </FromStream>

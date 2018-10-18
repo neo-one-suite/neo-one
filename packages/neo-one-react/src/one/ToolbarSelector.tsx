@@ -1,17 +1,9 @@
+// tslint:disable no-any
+import { Select, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import { ActionMap } from 'constate';
 import * as React from 'react';
-import Select from 'react-select';
 import { Container, styled } from 'reakit';
-import { ComponentProps } from '../types';
-import { Selector } from './Selector';
-import { Tooltip, TooltipArrow } from './Tooltip';
 
-interface Props {
-  readonly help: string;
-  readonly 'data-test-selector': string;
-  readonly 'data-test-container': string;
-  readonly 'data-test-tooltip': string;
-}
 interface State {
   readonly menuOpen: boolean;
   readonly hover: boolean;
@@ -32,26 +24,26 @@ const actions: ActionMap<State, Actions> = {
 };
 
 // tslint:disable-next-line no-any
-const StyledSelector: React.ComponentType<{ readonly 'data-test': string } & ComponentProps<Select<any>>> = styled(
-  Selector,
-)`
-  border-right: 0;
-  width: 100px;
-  height: 40px;
+const StyledSelect: any = styled(Select)`
+  &&& {
+    border-right: 0;
+    width: 100px;
+    height: 40px;
+  }
 `;
 
-export function ToolbarSelector<OptionType>({
+export function ToolbarSelector({
   'data-test-container': dataTestContainer,
   'data-test-selector': dataTestSelector,
   'data-test-tooltip': dataTestTooltip,
   help,
   ...rest
-}: Props & ComponentProps<Select<OptionType>>) {
+}: any) {
   return (
     <Container initialState={{ menuOpen: false, hover: false }} actions={actions}>
       {({ menuOpen, onMenuOpen, onMenuClose, hover, onMouseEnter, onMouseLeave }) => (
         <div data-test={dataTestContainer} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-          <StyledSelector
+          <StyledSelect
             data-test={dataTestSelector}
             menuPlacement="top"
             {...rest}

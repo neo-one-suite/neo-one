@@ -70,19 +70,7 @@ export class Client<
   public readonly block$: Observable<{
     readonly block: Block;
     readonly network: NetworkType;
-  }> = this.reset$.pipe(
-    switchMap(() =>
-      this.currentNetwork$.pipe(
-        switchMap((network) =>
-          Observable.create((observer: Observer<Block>) =>
-            toObservable(this.getNetworkProvider(network).iterBlocks(network)).subscribe(observer),
-          ).pipe(map((block) => ({ block, network }))),
-        ),
-      ),
-    ),
-    multicast(() => new ReplaySubject(1)),
-    refCount(),
-  );
+  }>;
 
   public readonly accountState$: Observable<
     | {
@@ -90,23 +78,7 @@ export class Client<
         readonly account: Account;
       }
     | undefined
-  > = combineLatest(this.currentUserAccount$, this.block$).pipe(
-    switchMap(async ([currentAccount]) => {
-      if (currentAccount === undefined) {
-        return undefined;
-      }
-
-      const account = await this.getNetworkProvider(currentAccount.id.network).getAccount(
-        currentAccount.id.network,
-        currentAccount.id.address,
-      );
-
-      return { currentAccount, account };
-    }),
-    distinctUntilChanged((a, b) => _.isEqual(a, b)),
-    multicast(() => new ReplaySubject(1)),
-    refCount(),
-  );
+  >;
 
   public constructor(providersIn: TUserAccountProviders) {
     this.hooks = {
@@ -179,6 +151,37 @@ export class Client<
           // Just ignore errors here.
         });
     }
+
+    this.block$ = this.reset$.pipe(
+      switchMap(() =>
+        this.currentNetwork$.pipe(
+          switchMap((network) =>
+            Observable.create((observer: Observer<Block>) =>
+              toObservable(this.getNetworkProvider(network).iterBlocks(network)).subscribe(observer),
+            ).pipe(map((block) => ({ block, network }))),
+          ),
+        ),
+      ),
+      multicast(() => new ReplaySubject(1)),
+      refCount(),
+    );
+    this.accountState$ = combineLatest(this.currentUserAccount$, this.block$).pipe(
+      switchMap(async ([currentAccount]) => {
+        if (currentAccount === undefined) {
+          return undefined;
+        }
+
+        const account = await this.getNetworkProvider(currentAccount.id.network).getAccount(
+          currentAccount.id.network,
+          currentAccount.id.address,
+        );
+
+        return { currentAccount, account };
+      }),
+      distinctUntilChanged((a, b) => _.isEqual(a, b)),
+      multicast(() => new ReplaySubject(1)),
+      refCount(),
+    );
   }
 
   public get providers(): TUserAccountProviders {

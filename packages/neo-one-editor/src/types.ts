@@ -17,7 +17,7 @@ export interface EngineState {
   readonly openFiles: ReadonlyArray<string>;
 }
 
-export interface EditorContext {
+export interface EditorContextType {
   readonly engine: Engine;
 }
 

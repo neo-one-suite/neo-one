@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { styled, Tooltip as TooltipBase } from 'reakit';
 import { prop } from 'styled-tools';
-import { ComponentProps } from '../types';
+import { ComponentProps } from './types';
 
 export const StyledTooltip = styled(TooltipBase)`
   background-color: ${prop('theme.gray5')};

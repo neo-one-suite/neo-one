@@ -1,9 +1,9 @@
 // tslint:disable no-array-mutation
 import * as React from 'react';
 import { Box, styled } from 'reakit';
-import { FromStream } from '../FromStream';
+import { FromStream } from './FromStream';
 import { Toast } from './Toast';
-import { ToastsContext } from './ToastsContainer';
+import { ToastsContext, ToastsContextType } from './ToastsContainer';
 
 const Wrapper = styled(Box)`
   bottom: 8px;
@@ -15,8 +15,8 @@ const Wrapper = styled(Box)`
 export function Toasts() {
   return (
     <ToastsContext.Consumer>
-      {({ toasts$, removeToast }) => (
-        <FromStream props$={toasts$}>
+      {({ toasts$, removeToast }: ToastsContextType) => (
+        <FromStream createStream={() => toasts$}>
           {(toasts) => (
             <Wrapper>
               {[...toasts].reverse().map((toast) => (

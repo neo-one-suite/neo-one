@@ -1,11 +1,11 @@
+// tslint:disable no-any match-default-export-name
 import * as React from 'react';
-import Select from 'react-select';
+import SelectBase from 'react-select';
 import { styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { ComponentProps } from '../types';
 
 // tslint:disable-next-line:no-any
-const StyledSelect: React.ComponentType<ComponentProps<Select<any>>> = styled(Select)`
+const StyledSelect: any = styled(SelectBase)`
   border: 1px solid rgba(0, 0, 0, 0.3);
   background-color: ${prop('theme.gray0')};
   outline: none;
@@ -55,10 +55,7 @@ const StyledSelect: React.ComponentType<ComponentProps<Select<any>>> = styled(Se
   }
 `;
 
-export function Selector<OptionType>({
-  'data-test': dataTest,
-  ...props
-}: ComponentProps<Select<OptionType>> & { readonly 'data-test': string }) {
+export function Select({ 'data-test': dataTest, ...props }: any) {
   return (
     <div data-test={dataTest}>
       <StyledSelect classNamePrefix="react-select" {...props} />

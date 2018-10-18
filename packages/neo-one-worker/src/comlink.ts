@@ -376,8 +376,8 @@ function cbProxy(cb: CBProxyCallback, callPath: PropertyKey[] = [], target = fun
       if (callPath[callPath.length - 1] === 'bind') return cbProxy(cb, callPath.slice(0, -1));
       return cb({
         type: 'APPLY',
-        callPath,
-        argumentsList,
+        callPath: callPath[callPath.length - 1] === 'apply' ? callPath.slice(0, -1) : callPath,
+        argumentsList: callPath[callPath.length - 1] === 'apply' ? argumentsList[1] : argumentsList,
       });
     },
     get(_target, property, proxy) {

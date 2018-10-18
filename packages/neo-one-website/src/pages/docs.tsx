@@ -1,3 +1,6 @@
+// tslint:disable-next-line no-import-side-effect
+import '../polyfill';
+
 import { Redirect } from '@reach/router';
 import * as React from 'react';
 import { withRouteData } from 'react-static';

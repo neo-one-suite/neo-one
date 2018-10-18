@@ -3,6 +3,7 @@ import { Container, EffectMap } from 'constate';
 import * as React from 'react';
 import { EditorContext } from '../../EditorContext';
 import { Engine } from '../../engine';
+import { EditorContextType } from '../../types';
 import { ActionButtonBase } from './ActionButtonBase';
 
 interface State {
@@ -21,7 +22,7 @@ interface Props {
 
 export const ActionButton = ({ text, makeEffects, icon, ...props }: Props) => (
   <EditorContext.Consumer>
-    {({ engine }) => (
+    {({ engine }: EditorContextType) => (
       <Container initialState={{ loading: false }} effects={makeEffects(engine)}>
         {({ onClick, loading }) => (
           <ActionButtonBase {...props} onClick={onClick} loading={loading} text={text} icon={icon} />

@@ -1,4 +1,4 @@
-import { Button } from '@neo-one/react';
+import { Button } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Box, Flex, Grid, Hidden, styled } from 'reakit';

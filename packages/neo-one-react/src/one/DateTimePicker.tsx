@@ -2,7 +2,7 @@
 import { EffectMap } from 'constate';
 import { format, isBefore, parse } from 'date-fns';
 import * as React from 'react';
-import { Box, Container, Flex, Input, styled } from 'reakit';
+import { Box, Container, Grid, Input, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { ReactSyntheticEvent } from '../types';
 
@@ -35,6 +35,7 @@ export function DateTimePicker({
   initialValue,
   minDate,
   onChange,
+  ...props
 }: Props) {
   let editingTimeout: NodeJS.Timer | undefined;
   const clearEditingTimeout = () => {
@@ -70,7 +71,7 @@ export function DateTimePicker({
   };
 
   return (
-    <Flex column>
+    <Grid {...props}>
       <Container initialState={{ text: format(initialValue, FORMAT), error: undefined }} effects={effects}>
         {({ text, error, onChange: onChangeInput }) => (
           <>
@@ -79,6 +80,6 @@ export function DateTimePicker({
           </>
         )}
       </Container>
-    </Flex>
+    </Grid>
   );
 }

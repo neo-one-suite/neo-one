@@ -1,28 +1,12 @@
 import { Client, DeveloperClient } from '@neo-one/client';
+import { AddError, AddToast, FromStream, Link, WithAddError, WithAddToast } from '@neo-one/react-common';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
-import { Link, styled } from 'reakit';
 import { combineLatest } from 'rxjs';
-import { prop } from 'styled-tools';
-import { FromStream } from '../FromStream';
 import { WithAutoConsensus, WithAutoSystemFee, WithNetworkClient } from './DeveloperToolsContext';
-import { AddToast, WithAddToast } from './ToastsContainer';
-import { AddError, WithAddError } from './WithAddError';
 import { WithNEOTrackerURL } from './WithNEOTrackerURL';
 
 const mutableHookers = new Map<Client, Hooker>();
-
-export const StyledLink = styled(Link)`
-  color: ${prop('theme.accent')};
-  opacity: 0.9;
-  ${prop('theme.fonts.axiformaRegular')};
-  font-size: 14px;
-
-  &:hover {
-    opacity: 1;
-    text-decoration: none;
-  }
-`;
 
 class Hooker {
   public static get(client: Client): Hooker {
@@ -80,13 +64,14 @@ class Hooker {
             ) : (
               <span data-test="neo-one-transaction-toast-message">
                 View on&nbsp;
-                <StyledLink
+                <Link
                   data-test="neo-one-transaction-toast-link"
                   href={`${this.mutableNEOTrackerURL}/tx/${transaction.hash.slice(2)}`}
                   target="_blank"
+                  linkColor="primary"
                 >
                   NEO Tracker
-                </StyledLink>
+                </Link>
               </span>
             ),
           autoHide: 5000,
@@ -134,8 +119,11 @@ export function ClientHook() {
                       {({ autoConsensus$ }) => (
                         <WithAutoSystemFee>
                           {({ autoSystemFee$ }) => (
-                            <FromStream props$={combineLatest(autoConsensus$, autoSystemFee$)}>
-                              {([autoConsensus, autoSystemFee]) => {
+                            <FromStream
+                              props={{ autoConsensus$, autoSystemFee$ }}
+                              createStream={(props) => combineLatest(props.autoConsensus$, props.autoSystemFee$)}
+                            >
+                              {([autoConsensus, autoSystemFee]: [boolean, boolean]) => {
                                 const mutableHooker = Hooker.get(client);
                                 mutableHooker.autoConsensus = autoConsensus;
                                 mutableHooker.autoSystemFee = autoSystemFee;

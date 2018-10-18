@@ -1,5 +1,5 @@
 // tslint:disable match-default-export-name no-submodule-imports no-implicit-dependencies
 // @ts-ignore
-import builderWorkerURL from 'file-loader!../../../../dist/website/builder.worker.js';
+import builderWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/website/builder.worker.js';
 
 export const BuilderWorker = () => new Worker(builderWorkerURL);

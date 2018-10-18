@@ -1,17 +1,21 @@
+import { FromStream } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdAccountBalance } from 'react-icons/md';
-import { Box, Overlay } from 'reakit';
-import { FromStream } from '../FromStream';
-import { DeveloperToolsContext } from './DeveloperToolsContext';
+import { Box, Overlay, styled } from 'reakit';
+import { DeveloperToolsContext, DeveloperToolsContextType } from './DeveloperToolsContext';
 import { ToolbarButton } from './ToolbarButton';
 import { WalletDialog } from './WalletDialog';
+
+const Text = styled(Box)`
+  padding-right: 4px;
+`;
 
 export function WalletButton() {
   return (
     <WalletDialog>
       {(overlay) => (
         <DeveloperToolsContext.Consumer>
-          {({ client }) => (
+          {({ client }: DeveloperToolsContextType) => (
             <Overlay.Show
               data-test-button="neo-one-wallet-button"
               data-test-tooltip="neo-one-wallet-tooltip"
@@ -19,11 +23,11 @@ export function WalletButton() {
               help="Open Wallet..."
               {...overlay}
             >
-              <FromStream props$={client.accountState$}>
+              <FromStream createStream={() => client.accountState$}>
                 {(value) => (
-                  <Box data-test="neo-one-wallet-value">
+                  <Text data-test="neo-one-wallet-value">
                     {value === undefined ? 'Select Wallet' : value.currentAccount.name}
-                  </Box>
+                  </Text>
                 )}
               </FromStream>
               <MdAccountBalance />

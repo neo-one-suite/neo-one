@@ -1,33 +1,26 @@
-import { Button } from '@neo-one/react-common';
+// tslint:disable no-any
+import { Button, FromStream, Select, TextInput } from '@neo-one/react-common';
 import * as React from 'react';
-// tslint:disable-next-line no-submodule-imports
-import Select from 'react-select/lib/Select';
-import { Flex, Input, styled } from 'reakit';
-import { FromStream } from '../FromStream';
+import { Grid, styled } from 'reakit';
 import { ComponentProps } from '../types';
 import { WithTokens } from './DeveloperToolsContext';
-import { Selector } from './Selector';
-import { Asset, ASSETS, getTokenAsset, TransferContainer } from './TransferContainer';
+import { ASSETS, getTokenAsset, TransferContainer } from './TransferContainer';
 
-const StyledFlex = styled(Flex)`
+const Wrapper = styled(Grid)`
+  grid-auto-flow: column;
+  grid-gap: 8px;
   align-items: center;
-  margin: 16px 0;
 `;
 
-const StyledInput = styled(Input)`
-  margin-right: 8px;
-`;
-
-const AssetInput = styled(Selector)`
-  margin-right: 8px;
+const AssetInput = styled(Select)`
   width: 144px;
-` as React.ComponentType<{ readonly 'data-test': string } & ComponentProps<Select<Asset>>>;
+`;
 
-export const TransferAmount = (props: ComponentProps<typeof Flex>) => (
+export const TransferAmount = (props: ComponentProps<typeof Grid>) => (
   <TransferContainer>
     {({ text, asset, amount, to, loading, onChangeAmount, onChangeAsset, send }) => (
-      <StyledFlex {...props}>
-        <StyledInput
+      <Wrapper {...props}>
+        <TextInput
           data-test="neo-one-transfer-amount-input"
           value={text}
           placeholder="Amount"
@@ -35,13 +28,13 @@ export const TransferAmount = (props: ComponentProps<typeof Flex>) => (
         />
         <WithTokens>
           {(tokens$) => (
-            <FromStream props$={tokens$}>
+            <FromStream createStream={() => tokens$}>
               {(tokens) => (
                 <AssetInput
                   data-test="neo-one-transfer-amount-asset-selector"
                   value={asset}
                   options={ASSETS.concat(tokens.map(getTokenAsset))}
-                  onChange={(option) => {
+                  onChange={(option: any) => {
                     if (option != undefined && !Array.isArray(option)) {
                       onChangeAsset(option);
                     }
@@ -58,7 +51,7 @@ export const TransferAmount = (props: ComponentProps<typeof Flex>) => (
         >
           Send
         </Button>
-      </StyledFlex>
+      </Wrapper>
     )}
   </TransferContainer>
 );

@@ -1,17 +1,11 @@
+import { Fit, FromStream, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
-import { Block, Input, Label, styled } from 'reakit';
-import { FromStream } from '../FromStream';
+import { Box, Input, styled } from 'reakit';
 import { WithAutoSystemFee } from './DeveloperToolsContext';
-import { Fit } from './Fit';
-import { Tooltip, TooltipArrow } from './Tooltip';
+import { SettingsLabel } from './SettingsLabel';
 
-const Wrapper = styled(Label)`
-  align-items: center;
-  display: flex;
-  font: inherit;
-  justify-content: space-between;
-  line-height: inherit;
-  cursor: pointer;
+const Wrapper = styled(Box)`
+  position: relative;
 `;
 
 const StyledFit = styled(Fit)`
@@ -22,10 +16,10 @@ export function AutoSystemFeeOption() {
   return (
     <WithAutoSystemFee>
       {({ autoSystemFee$, toggle }) => (
-        <FromStream props$={autoSystemFee$}>
+        <FromStream createStream={() => autoSystemFee$}>
           {(autoSystemFee) => (
-            <Block relative>
-              <Wrapper data-test="neo-one-auto-system-fee-container">
+            <Wrapper>
+              <SettingsLabel data-test="neo-one-auto-system-fee-container">
                 Automatic System Fee
                 <Input
                   data-test="neo-one-auto-system-fee-checkbox"
@@ -35,13 +29,14 @@ export function AutoSystemFeeOption() {
                     // do nothing
                   }}
                 />
-                <Tooltip data-test="neo-one-auto-system-fee-tooltip" placement="right">
+              </SettingsLabel>
+              <StyledFit data-test="neo-one-auto-system-fee-click" onClick={toggle}>
+                <Tooltip data-test="neo-one-auto-system-fee-tooltip" placement="right" delay="1s">
                   <TooltipArrow />
                   Automatically execute all transactions with the required system fee.
                 </Tooltip>
-              </Wrapper>
-              <StyledFit data-test="neo-one-auto-system-fee-click" onClick={toggle} />
-            </Block>
+              </StyledFit>
+            </Wrapper>
           )}
         </FromStream>
       )}

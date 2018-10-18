@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Flex, styled } from 'reakit';
 import { EditorContext } from '../EditorContext';
-import { ComponentProps } from '../types';
+import { ComponentProps, EditorContextType } from '../types';
 import { EditorHeader } from './EditorHeader';
 import { MonacoEditor } from './MonacoEditor';
 import { EditorFile, EditorFiles, FileDiagnostic, TextRange } from './types';
@@ -32,7 +32,7 @@ export const EditorView = ({
   <Wrapper {...props}>
     <EditorHeader file={file} openFiles={openFiles} onSelectFile={onSelectFile} />
     <EditorContext.Consumer>
-      {({ engine }) => (
+      {({ engine }: EditorContextType) => (
         <MonacoEditor file={file} range={range} engine={engine} onUpdateDiagnostics={onChangeProblems} />
       )}
     </EditorContext.Consumer>

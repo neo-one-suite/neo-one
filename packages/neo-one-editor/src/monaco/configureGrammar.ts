@@ -4,7 +4,7 @@ import { loadWASM } from 'onigasm';
 
 // tslint:disable
 // @ts-ignore
-import onigasm from '!file-loader!../../../../node_modules/onigasm/lib/onigasm.wasm';
+import onigasm from '!file-loader?name=[hash].[name].[ext]!../../../../node_modules/onigasm/lib/onigasm.wasm';
 // @ts-ignore
 import tsGrammar from '!raw-loader!./grammars/TypeScriptReact.tmLanguage';
 // tslint:enable

@@ -1,30 +1,39 @@
 import * as React from 'react';
 import { MdClose } from 'react-icons/md';
-import { Box, Button, Flex, Hidden, styled } from 'reakit';
+import { Box, Grid, Hidden, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { BoxWithBorder } from './BoxWithBorder';
+import { IconButton } from './IconButton';
 import { Shadow } from './Shadow';
 import { Toast as ToastType } from './ToastsContainer';
 
 // tslint:disable-next-line no-any
 type HiddenProps = any;
 
-const StyledBox = styled(Box)`
+const Wrapper = styled(Grid)`
+  gap: 8px;
   background-color: ${prop('theme.gray0')};
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 0.25em;
   margin-top: 8px;
   width: 400px;
 `;
 
-const ToastWrapper = styled(BoxWithBorder)`
-  margin: 8px;
+const ToastWrapper = styled(Box)`
+  padding: 8px;
 `;
 
-const ToastHeading = styled(Flex)`
+const ToastHeading = styled(Grid)`
+  grid-auto-flow: column;
   align-items: center;
   justify-content: space-between;
-  margin: 8px;
+  padding: 8px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-  padding-bottom: 8px;
+`;
+
+const StyledIconButton = styled(IconButton)`
+  border-radius: 35;
+  margin-right: -4;
+  margin-top: -4;
 `;
 
 interface Props {
@@ -60,25 +69,16 @@ export function Toast({ toast, removeToast }: Props) {
 
         return (
           <Hidden fade {...hidden}>
-            <StyledBox>
+            <Wrapper>
               <Shadow />
               <ToastHeading data-test="neo-one-toast-heading">
                 {toast.title}
-                <Button
-                  data-test="neo-one-toast-close-button"
-                  fontSize={14}
-                  onClick={hide}
-                  border="none"
-                  backgroundColor="transparent"
-                  borderRadius={35}
-                  marginRight={-4}
-                  marginTop={-4}
-                >
+                <StyledIconButton data-test="neo-one-toast-close-button" onClick={hide}>
                   <MdClose />
-                </Button>
+                </StyledIconButton>
               </ToastHeading>
               <ToastWrapper data-test="neo-one-toast-wrapper">{toast.message}</ToastWrapper>
-            </StyledBox>
+            </Wrapper>
           </Hidden>
         );
       }}

@@ -1,14 +1,17 @@
 import { Client, nep5 } from '@neo-one/client';
-import { Button } from '@neo-one/react-common';
+import { Button, TextInput, Token, WithAddError } from '@neo-one/react-common';
 import { EffectMap } from 'constate';
 import * as React from 'react';
-import { Container, Flex, styled } from 'reakit';
+import { Container, Grid, styled } from 'reakit';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { ReactSyntheticEvent } from '../types';
-import { DeveloperToolsContext, Token, WithOnChangeTokens, WithTokens } from './DeveloperToolsContext';
-import { TextInput } from './TextInput';
-import { WithAddError } from './WithAddError';
+import {
+  DeveloperToolsContext,
+  DeveloperToolsContextType,
+  WithOnChangeTokens,
+  WithTokens,
+} from './DeveloperToolsContext';
 
 interface State {
   readonly disabled: boolean;
@@ -58,18 +61,15 @@ const makeEffects = (
   },
 });
 
-const Wrapper = styled(Flex)`
-  margin: 16px 0;
+const Wrapper = styled(Grid)`
+  grid-auto-flow: column;
+  gap: 8px;
 `;
 
-const StyledButton = styled(Button)`
-  margin-left: 8px;
-`;
-
-export function AddToken() {
+export function AddToken(props: {}) {
   return (
     <DeveloperToolsContext.Consumer>
-      {({ client }) => (
+      {({ client }: DeveloperToolsContextType) => (
         <WithTokens>
           {(tokens$) => (
             <WithOnChangeTokens>
@@ -78,16 +78,16 @@ export function AddToken() {
                   {(addError) => (
                     <Container initialState={INITIAL_STATE} effects={makeEffects(client, tokens$, onChange, addError)}>
                       {({ address, disabled, submit, onChangeAddress }) => (
-                        <Wrapper>
+                        <Wrapper {...props}>
                           <TextInput
                             data-test="neo-one-add-token-input"
                             placeholder="Token Address"
                             value={address}
                             onChange={onChangeAddress}
                           />
-                          <StyledButton data-test="neo-one-add-token-button" onClick={submit} disabled={disabled}>
+                          <Button data-test="neo-one-add-token-button" onClick={submit} disabled={disabled}>
                             Add Token
-                          </StyledButton>
+                          </Button>
                         </Wrapper>
                       )}
                     </Container>

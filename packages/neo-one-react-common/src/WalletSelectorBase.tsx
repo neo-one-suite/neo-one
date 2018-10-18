@@ -3,15 +3,13 @@ import { Account, Client, Hash256, nep5, UserAccount } from '@neo-one/client';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
-import Select from 'react-select';
 // tslint:disable-next-line no-submodule-imports
 import { FormatOptionLabelMeta } from 'react-select/lib/Select';
 import { Grid, styled } from 'reakit';
 import { combineLatest, concat, Observable, of, ReplaySubject } from 'rxjs';
 import { catchError, distinctUntilChanged, map, multicast, refCount, switchMap, take } from 'rxjs/operators';
-import { ComponentProps } from '../types';
-import { Token } from './DeveloperToolsContext';
-import { Selector } from './Selector';
+import { Select } from './Select';
+import { Token } from './types';
 
 export const makeOption = async ({
   client,
@@ -164,6 +162,7 @@ const createFormatOptionLabel = (isMulti?: boolean) => (
       )}
       {((option as any).balances === undefined ? [] : (option as any).balances).map(
         ([name, value]: [string, BigNumber]) => (
+          // @ts-ignore
           <React.Fragment key={name}>
             <Grid.Item>{name}:</Grid.Item>
             <Grid.Item>{value.toFormat()}</Grid.Item>
@@ -177,15 +176,14 @@ const createFormatOptionLabel = (isMulti?: boolean) => (
 const formatOptionLabelMulti = createFormatOptionLabel(true);
 const formatOptionLabel = createFormatOptionLabel(false);
 
-const StyledSelector = styled(Selector)`
-  width: 424px;
-` as React.ComponentType<{ readonly 'data-test': string } & ComponentProps<Select<WalletSelectorOptionType>>>;
+const StyledSelect = styled(Select)`
+  min-width: 96px;
+  max-width: 424px;
+`;
 
-export function WalletSelectorBase(
-  props: { readonly 'data-test': string } & ComponentProps<Select<WalletSelectorOptionType>>,
-) {
+export function WalletSelectorBase(props: any) {
   return (
-    <StyledSelector
+    <StyledSelect
       menuPlacement="bottom"
       {...props}
       formatOptionLabel={props.isMulti ? formatOptionLabelMulti : formatOptionLabel}

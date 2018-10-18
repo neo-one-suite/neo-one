@@ -17,8 +17,20 @@ export const Button = styled(ButtonBase)`
   transition: 0.3s;
   cursor: pointer;
   text-decoration: none;
+  outline: none;
+  white-space: nowrap;
 
   &:hover {
     background-color: ${prop('theme.primaryLight')};
+  }
+
+  &:active {
+    background-color: ${prop('theme.primaryLight')};
+    outline: none;
+  }
+
+  &:focus {
+    background-color: ${prop('theme.primaryLight')};
+    outline: none;
   }
 `;

@@ -2,7 +2,7 @@ import { css } from 'reakit';
 import { prop } from 'styled-tools';
 
 // tslint:disable-next-line no-import-side-effect
-import '../../static/fonts.css';
+import '../static/fonts/fonts.css';
 
 const backup: ReadonlyArray<string> = [
   '-apple-system',
@@ -130,5 +130,6 @@ export const theme = {
   Box: css`
     box-sizing: border-box;
     ${prop('theme.fonts.axiformaRegular')};
+    ${prop('theme.fontStyles.body1')};
   `,
 };

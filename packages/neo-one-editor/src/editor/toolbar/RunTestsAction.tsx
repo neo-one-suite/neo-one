@@ -3,6 +3,7 @@ import * as React from 'react';
 import { MdPlayArrow } from 'react-icons/md';
 import { connect } from 'react-redux';
 import { EditorContext } from '../../EditorContext';
+import { EditorContextType } from '../../types';
 import { openConsole, selectConsoleTestsRunning } from '../redux';
 import { ActionButtonBase } from './ActionButtonBase';
 
@@ -13,7 +14,7 @@ interface Props {
 
 const RunTestsActionBase = ({ consoleTestsRunning, openConsoleTests, ...props }: Props) => (
   <EditorContext.Consumer>
-    {({ engine }) => (
+    {({ engine }: EditorContextType) => (
       <ActionButtonBase
         {...props}
         data-test="test"

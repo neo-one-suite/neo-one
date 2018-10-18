@@ -11,14 +11,15 @@ export interface Toast {
 
 export type AddToast = (toast: Toast) => void;
 
-interface ToastsContextType {
+export interface ToastsContextType {
   readonly toasts$: Observable<ReadonlyArray<Toast>>;
   readonly addToast: AddToast;
   readonly removeToast: (id: string) => void;
 }
 
 const toasts$ = new BehaviorSubject<ReadonlyArray<Toast>>([]);
-export const ToastsContext = React.createContext<ToastsContextType>({
+// tslint:disable-next-line no-any
+export const ToastsContext: any = React.createContext<ToastsContextType>({
   toasts$: toasts$.pipe(distinctUntilChanged()),
   addToast: (toast) => {
     const toasts = toasts$.getValue();
@@ -34,5 +35,5 @@ interface WithAddToastProps {
 }
 
 export function WithAddToast({ children }: WithAddToastProps) {
-  return <ToastsContext.Consumer>{({ addToast }) => children(addToast)}</ToastsContext.Consumer>;
+  return <ToastsContext.Consumer>{({ addToast }: ToastsContextType) => children(addToast)}</ToastsContext.Consumer>;
 }

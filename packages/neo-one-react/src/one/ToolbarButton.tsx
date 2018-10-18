@@ -1,17 +1,26 @@
+import { Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
-import { Button, styled } from 'reakit';
+import { Button, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { Tooltip, TooltipArrow } from './Tooltip';
 
 const StyledButton = styled(Button)`
   background-color: ${prop('theme.gray0')};
+  border: 1px solid rgba(0, 0, 0, 0.3);
   border-right: 0;
-  border-radius: 0;
   color: ${prop('theme.black')};
   font-size: 0.875rem;
   height: 40px;
+  padding: 4px;
   line-height: 1em;
   text-align: center;
+  cursor: pointer;
+  outline: none;
+`;
+
+const Wrapper = styled(Grid)`
+  grid-auto-flow: column;
+  place-items: center;
+  justify-items: center;
 `;
 
 interface Props {
@@ -37,7 +46,7 @@ export function ToolbarButton({
 }: Props) {
   return (
     <StyledButton data-test={dataTestButton} {...props}>
-      {children}
+      <Wrapper>{children}</Wrapper>
       <Tooltip data-test={dataTestTooltip} placement="top" delay={delay}>
         <TooltipArrow />
         {help}

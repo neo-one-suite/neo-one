@@ -1,4 +1,4 @@
-import { Button } from '@neo-one/react';
+import { Button } from '@neo-one/react-common';
 import { Link } from '@reach/router';
 import * as React from 'react';
 import { as, Box, Grid, styled } from 'reakit';

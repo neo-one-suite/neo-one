@@ -1,4 +1,4 @@
-import { Tooltip, TooltipArrow } from '@neo-one/react';
+import { Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdPlayArrow } from 'react-icons/md';
 import { Button, styled } from 'reakit';

@@ -1,5 +1,5 @@
 // tslint:disable no-any strict-type-predicates
-import { theme } from '@neo-one/react';
+import { theme } from '@neo-one/react-common';
 import * as React from 'react';
 import { hot } from 'react-hot-loader';
 // @ts-ignore

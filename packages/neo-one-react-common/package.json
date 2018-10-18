@@ -4,12 +4,22 @@
   "description": "NEO•ONE shared react.",
   "main": "./src/index.ts",
   "dependencies": {
+    "@neo-one/client": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",
+    "@neo-one/utils": "^1.0.0-preview.0",
     "@types/react": "^16.4.18",
+    "@types/react-select": "^2.0.5",
+    "bignumber.js": "^7.2.1",
     "react": "^16.5.1",
+    "react-dom": "^16.5.1",
     "react-draggable": "^3.0.5",
+    "react-icons": "^3.2.0",
+    "react-select": "^2.1.0",
     "reakit": "0.15.7",
+    "rxjs": "^6.3.3",
     "styled-tools": "^1.5.2"
   },
-  "sideEffects": false
+  "sideEffects": [
+    "*.css"
+  ]
 }

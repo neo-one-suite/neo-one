@@ -1,66 +1,65 @@
+// tslint:disable no-any
+import {
+  FromStream,
+  getWalletSelectorOptions$,
+  makeWalletSelectorValueOption,
+  WalletSelectorBase,
+  WithAddError,
+} from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, Label, styled } from 'reakit';
-import { FromStream } from '../FromStream';
+import { Label, styled } from 'reakit';
 import { ComponentProps } from '../types';
-import { DeveloperToolsContext, WithTokens } from './DeveloperToolsContext';
+import { DeveloperToolsContext, DeveloperToolsContextType, WithTokens } from './DeveloperToolsContext';
 import { TransferContainer } from './TransferContainer';
-import { getWalletSelectorOptions$, makeWalletSelectorValueOption, WalletSelectorBase } from './WalletSelectorBase';
-import { WithAddError } from './WithAddError';
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Label)`
   border-top: 1px solid rgba(0, 0, 0, 0.3);
-  margin: 16px 0;
+  margin-top: 8px;
   padding-top: 16px;
-`;
-
-const StyledLabel = styled(Label)`
+  display: grid;
+  grid:
+    'label input' auto
+    / auto 1fr;
+  grid-gap: 8px;
   align-items: center;
-  display: flex;
-  font: inherit;
-  justify-content: space-between;
-  line-height: inherit;
 `;
 
-export function TransferTo(props: ComponentProps<typeof StyledLabel>) {
+export function TransferTo(props: ComponentProps<typeof Wrapper>) {
   return (
     <WithAddError>
       {(addError) => (
         <WithTokens>
           {(tokens$) => (
             <DeveloperToolsContext.Consumer>
-              {({ client }) => {
+              {({ client }: DeveloperToolsContextType) => {
                 const props$ = getWalletSelectorOptions$(addError, client, tokens$);
 
                 return (
-                  <Wrapper>
-                    <StyledLabel {...props}>
-                      <Box data-test="neo-one-transfer-to-text" marginRight={8}>
-                        Transfer To
-                      </Box>
-                      <TransferContainer>
-                        {({ to, onChangeTo }) => (
-                          <FromStream props$={props$}>
-                            {(options) => (
-                              <WalletSelectorBase
-                                data-test="neo-one-transfer-to-selector"
-                                value={to.map((userAccount) => makeWalletSelectorValueOption({ userAccount }))}
-                                options={options}
-                                onChange={(option) => {
-                                  if (option != undefined) {
-                                    if (Array.isArray(option)) {
-                                      onChangeTo(option.map(({ userAccount }) => userAccount));
-                                    } else {
-                                      onChangeTo([option.userAccount]);
-                                    }
+                  <Wrapper {...props}>
+                    Transfer To
+                    <TransferContainer>
+                      {({ to, onChangeTo }) => (
+                        <FromStream createStream={() => props$}>
+                          {(options) => (
+                            <WalletSelectorBase
+                              data-test="neo-one-transfer-to-selector"
+                              value={to.map((userAccount) => makeWalletSelectorValueOption({ userAccount }))}
+                              options={options}
+                              onChange={(option: any) => {
+                                if (option != undefined) {
+                                  if (Array.isArray(option)) {
+                                    onChangeTo(option.map(({ userAccount }) => userAccount));
+                                  } else {
+                                    onChangeTo([option.userAccount]);
                                   }
-                                }}
-                                isMulti
-                              />
-                            )}
-                          </FromStream>
-                        )}
-                      </TransferContainer>
-                    </StyledLabel>
+                                }
+                              }}
+                              isMulti
+                            />
+                          )}
+                        </FromStream>
+                      )}
+                    </TransferContainer>
                   </Wrapper>
                 );
               }}

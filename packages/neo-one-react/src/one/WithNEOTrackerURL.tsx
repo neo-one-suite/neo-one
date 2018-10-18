@@ -1,7 +1,7 @@
 // tslint:disable no-null-keyword
+import { FromStream } from '@neo-one/react-common';
 import * as React from 'react';
 import { concat, defer, of } from 'rxjs';
-import { FromStream } from '../FromStream';
 import { WithNetworkClient } from './DeveloperToolsContext';
 
 interface Props {
@@ -13,16 +13,18 @@ export function WithNEOTrackerURL({ children }: Props) {
     <WithNetworkClient>
       {({ localClient }) => (
         <FromStream
-          props$={concat(
-            of('https://neotracker.io'),
-            defer(async () => {
-              if (localClient === undefined) {
-                return 'https://neotracker.io';
-              }
+          createStream={() =>
+            concat(
+              of('https://neotracker.io'),
+              defer(async () => {
+                if (localClient === undefined) {
+                  return 'https://neotracker.io';
+                }
 
-              return localClient.getNEOTrackerURL();
-            }),
-          )}
+                return localClient.getNEOTrackerURL();
+              }),
+            )
+          }
         >
           {children}
         </FromStream>

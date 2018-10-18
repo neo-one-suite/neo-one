@@ -1,5 +1,4 @@
 /// <reference types="@neo-one/types" />
 export { DeveloperTools } from './DeveloperTools';
-export * from './FromStream';
-export * from './one';
+export { FromStream } from '@neo-one/react-common';
 export { LocalClient } from './types';

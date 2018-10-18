@@ -1,32 +1,30 @@
 // tslint:disable no-any
-import { Monogram } from '@neo-one/react-common';
+import { Monogram, Shadow, Toasts } from '@neo-one/react-common';
 import * as React from 'react';
-import { Block, Flex, Hidden, styled } from 'reakit';
+import { Box, Flex, Hidden, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { ComponentProps } from '../types';
 import { BalanceSelector } from './BalanceSelector';
 import { BlockIndex } from './BlockIndex';
 import { BlockTime } from './BlockTime';
 import { NEOTrackerButton } from './NEOTrackerButton';
-import { NetworkSelector } from './NetworkSelector';
 import { ResetButton } from './ResetButton';
-import { SecondsPerBlockInput } from './SecondsPerBlockInput';
 import { SettingsButton } from './SettingsButton';
-import { Shadow } from './Shadow';
-import { Toasts } from './Toasts';
 import { ToolbarButton } from './ToolbarButton';
 import { WalletButton } from './WalletButton';
 
 const Wrapper = styled(Flex)`
-  background-color: ${prop('theme.gray0')};
+  background-color: ${prop('theme.black')};
   border-right: 1px solid rgba(0, 0, 0, 0.3);
   bottom: 0;
   position: fixed;
-  right: 16px;
+  right: 2px;
 `;
 
 const StyledMonogram = styled(Monogram)`
-  /* stylelint-disable-next-line */
+  &&& {
+    height: 32px;
+  }
 `;
 
 const StyledToolbarButton = styled(ToolbarButton)`
@@ -35,10 +33,10 @@ const StyledToolbarButton = styled(ToolbarButton)`
   left: 8px;
   background-color: ${prop('theme.black')};
   border: 1px solid rgba(0, 0, 0, 0.3);
-  border-radius: 48px;
+  border-radius: 34px;
   color: ${prop('theme.primary')};
-  width: 48px;
-  height: 48px;
+  width: 34px;
+  height: 34px;
   padding: 0;
   transform: translate(0, 0) scale(1);
   transition: transform 0.15s ease-in-out;
@@ -57,6 +55,11 @@ const StyledToolbarButton = styled(ToolbarButton)`
   }
 `;
 
+const ToolbarButtonWrapper = styled(Box)`
+  height: 32px;
+  width: 32px;
+`;
+
 function MonogramButton(visible: boolean) {
   return (props: ComponentProps<typeof ToolbarButton>) => (
     <StyledToolbarButton
@@ -67,9 +70,9 @@ function MonogramButton(visible: boolean) {
       {...props}
     >
       <Shadow />
-      <Block width={32} height={32}>
-        <StyledMonogram width={32} height={32} />
-      </Block>
+      <ToolbarButtonWrapper>
+        <StyledMonogram />
+      </ToolbarButtonWrapper>
     </StyledToolbarButton>
   );
 }
@@ -80,11 +83,9 @@ export function Toolbar() {
       {(hidden) => (
         <>
           <Hidden as={Wrapper as any} slide="top" {...hidden}>
-            <NetworkSelector />
             <BlockIndex />
             <BlockTime />
             <ResetButton />
-            <SecondsPerBlockInput />
             <WalletButton />
             <BalanceSelector />
             <SettingsButton />

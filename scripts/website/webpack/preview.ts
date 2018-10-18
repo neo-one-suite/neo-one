@@ -44,7 +44,7 @@ export const preview = ({ stage }: { readonly stage: Stage }): webpack.Configura
               <style>
                 body {
                   margin: 0;
-                  background-color: #2E2837;
+                  background-color: #F8F5FD;
                   text-rendering: optimizeLegibility;
                 }
               </style>

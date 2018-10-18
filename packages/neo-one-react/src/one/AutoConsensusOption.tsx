@@ -1,17 +1,11 @@
+import { Fit, FromStream, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
-import { Block, Input, Label, styled } from 'reakit';
-import { FromStream } from '../FromStream';
+import { Box, Input, styled } from 'reakit';
 import { WithAutoConsensus } from './DeveloperToolsContext';
-import { Fit } from './Fit';
-import { Tooltip, TooltipArrow } from './Tooltip';
+import { SettingsLabel } from './SettingsLabel';
 
-const Wrapper = styled(Label)`
-  align-items: center;
-  display: flex;
-  font: inherit;
-  justify-content: space-between;
-  line-height: inherit;
-  cursor: pointer;
+const Wrapper = styled(Box)`
+  position: relative;
 `;
 
 const StyledFit = styled(Fit)`
@@ -22,10 +16,10 @@ export function AutoConsensusOption() {
   return (
     <WithAutoConsensus>
       {({ autoConsensus$, toggle }) => (
-        <FromStream props$={autoConsensus$}>
+        <FromStream createStream={() => autoConsensus$}>
           {(autoConsensus) => (
-            <Block relative>
-              <Wrapper data-test="neo-one-auto-consensus-container">
+            <Wrapper>
+              <SettingsLabel data-test="neo-one-auto-consensus-container">
                 Automatic Consensus
                 <Input
                   data-test="neo-one-auto-consensus-checkbox"
@@ -35,13 +29,14 @@ export function AutoConsensusOption() {
                     // do nothing
                   }}
                 />
-                <Tooltip data-test="neo-one-auto-consensus-tooltip" placement="right">
+              </SettingsLabel>
+              <StyledFit data-test="neo-one-auto-consensus-click" onClick={toggle}>
+                <Tooltip data-test="neo-one-auto-consensus-tooltip" placement="right" delay="1s">
                   <TooltipArrow />
                   Automatically run consensus when a transaction is relayed.
                 </Tooltip>
-              </Wrapper>
-              <StyledFit data-test="neo-one-auto-consensus-click" onClick={toggle} />
-            </Block>
+              </StyledFit>
+            </Wrapper>
           )}
         </FromStream>
       )}

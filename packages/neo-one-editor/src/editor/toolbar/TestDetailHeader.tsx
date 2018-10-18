@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Grid, styled } from 'reakit';
 import { EditorContext } from '../../EditorContext';
-import { TestSuite } from '../../types';
+import { EditorContextType, TestSuite } from '../../types';
 import { FileText } from './FileText';
 import { TestSuiteIcon } from './TestSuiteIcon';
 import { TestSummaryHeaderCommon } from './TestSummaryHeaderCommon';
@@ -31,7 +31,7 @@ export const TestDetailHeader = ({ testSuite, ...props }: Props) => {
 
   return (
     <EditorContext.Consumer>
-      {({ engine }) => (
+      {({ engine }: EditorContextType) => (
         <TestSummaryHeaderCommon
           {...props}
           data-test="test-detail-header"

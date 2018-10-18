@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { Box } from 'reakit';
 import { AddToken } from './AddToken';
 import { AutoConsensusOption } from './AutoConsensusOption';
 import { AutoSystemFeeOption } from './AutoSystemFeeOption';
 import { Dialog, OverlayProps } from './Dialog';
+import { NetworkSelector } from './NetworkSelector';
 import { ResetLocalStateButton } from './ResetLocalStateButton';
+import { SecondsPerBlockInput } from './SecondsPerBlockInput';
 
 interface Props {
   readonly children: (props: OverlayProps) => React.ReactNode;
@@ -17,12 +18,14 @@ export function SettingsDialog({ children }: Props) {
       data-test-close-button="neo-one-settings-dialog-close-button"
       title="Settings"
       renderDialog={() => (
-        <Box>
+        <>
           <AddToken />
           <AutoConsensusOption />
           <AutoSystemFeeOption />
+          <SecondsPerBlockInput />
+          <NetworkSelector />
           <ResetLocalStateButton />
-        </Box>
+        </>
       )}
     >
       {children}

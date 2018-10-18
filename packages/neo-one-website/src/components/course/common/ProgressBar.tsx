@@ -1,4 +1,4 @@
-import { Tooltip, TooltipArrow } from '@neo-one/react';
+import { Tooltip, TooltipArrow } from '@neo-one/react-common';
 import { Link } from '@reach/router';
 import * as React from 'react';
 import { as, Block, Box, Grid, styled } from 'reakit';

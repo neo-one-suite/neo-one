@@ -1,5 +1,5 @@
 // tslint:disable no-null-keyword
-import { Tooltip, TooltipArrow } from '@neo-one/react';
+import { Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
 import { Grid, styled } from 'reakit';
 import { TestPlayButton } from './TestPlayButton';

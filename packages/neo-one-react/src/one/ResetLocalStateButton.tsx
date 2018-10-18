@@ -1,11 +1,10 @@
 import { Button } from '@neo-one/react-common';
 import * as React from 'react';
-import { Flex, styled } from 'reakit';
+import { Grid, styled } from 'reakit';
 import { WithResetLocalState } from './DeveloperToolsContext';
 
-const Wrapper = styled(Flex)`
+const Wrapper = styled(Grid)`
   justify-content: flex-end;
-  margin: 16px 0;
 `;
 
 export function ResetLocalStateButton() {

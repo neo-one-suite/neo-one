@@ -1,7 +1,7 @@
 // tslint:disable no-null-keyword
 import * as React from 'react';
 import { MdOpenInNew } from 'react-icons/md';
-import { Box, Link } from 'reakit';
+import { Link } from 'reakit';
 import { ToolbarButton } from './ToolbarButton';
 import { WithNEOTrackerURL } from './WithNEOTrackerURL';
 
@@ -18,9 +18,7 @@ export function NEOTrackerButton() {
             help="Open NEO Tracker..."
             target="_blank"
           >
-            <Box>
-              <MdOpenInNew />
-            </Box>
+            <MdOpenInNew />
           </ToolbarButton>
         )
       }

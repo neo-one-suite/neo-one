@@ -147,7 +147,7 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
     wallets: [
       {
         name: 'master',
-        privateKey: constants.PRIVATE_NET_PUBLIC_KEY,
+        privateKey: constants.PRIVATE_NET_PRIVATE_KEY,
       },
     ].concat(wallets),
     networks: [],

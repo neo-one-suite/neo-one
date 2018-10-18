@@ -60,10 +60,10 @@
     "styled-tools": "^1.5.2",
     "sucrase": "^3.5.0",
     "ts-node": "^7.0.1",
-    "typescript": "3.1.3",
+    "typescript": "3.2.0-dev.20181017",
     "typescript-fsa": "^3.0.0-beta-2",
     "typescript-fsa-reducers": "^1.0.0",
-    "webpack": "4.20.2",
+    "webpack": "4.19.0",
     "worker-pouch": "^2.1.0"
   },
   "sideEffects": [

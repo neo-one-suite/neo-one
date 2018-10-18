@@ -1,3 +1,5 @@
+// tslint:disable-next-line
+import { AddressString } from '@neo-one/client';
 import { FromStream } from '@neo-one/react';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
@@ -8,43 +10,57 @@ import { switchMap } from 'rxjs/operators';
 import { WithContracts } from '../one/generated';
 
 const StyledGrid = styled(Grid)`
-  padding: 8px 0;
-  color: ${({ theme }) => theme.gray0};
+  &&& {
+    padding: 16px;
+    color: ${({ theme }) => theme.gray0};
+  }
 `;
+
+interface Stream {
+  readonly amountPerNEO: BigNumber;
+  readonly totalSupply: BigNumber;
+  readonly remaining: BigNumber;
+  readonly nowMS: number;
+  readonly balance: BigNumber;
+  readonly address: AddressString;
+}
 
 export const Info = (props: {}) => (
   <WithContracts>
     {/*
       // @ts-ignore */}
-    {({ client, token }) => (
+    {({ client: clientIn, token: tokenIn }) => (
       <FromStream
-        props$={concat(
-          of(undefined),
-          combineLatest(client.block$, client.currentUserAccount$, client.currentNetwork$).pipe(
-            // @ts-ignore
-            switchMap(([{ block }, account, network]) =>
-              Promise.resolve().then(async () => {
-                const [amountPerNEO, totalSupply, remaining, balance] = await Promise.all([
-                  token.amountPerNEO(),
-                  token.totalSupply(),
-                  token.remaining(),
-                  account === undefined ? Promise.resolve(new BigNumber(0)) : token.balanceOf(account.id.address),
-                ]);
+        props={{ client: clientIn, token: tokenIn }}
+        createStream={({ client, token }) =>
+          concat(
+            of(undefined),
+            combineLatest(client.block$, client.currentUserAccount$, client.currentNetwork$).pipe(
+              // @ts-ignore
+              switchMap(([{ block }, account, network]) =>
+                Promise.resolve().then(async () => {
+                  const [amountPerNEO, totalSupply, remaining, balance] = await Promise.all([
+                    token.amountPerNEO(),
+                    token.totalSupply(),
+                    token.remaining(),
+                    account === undefined ? Promise.resolve(new BigNumber(0)) : token.balanceOf(account.id.address),
+                  ]);
 
-                return {
-                  amountPerNEO,
-                  totalSupply,
-                  remaining,
-                  nowMS: block.time * 1000,
-                  balance,
-                  address: token.definition.networks[network].address,
-                };
-              }),
+                  return {
+                    amountPerNEO,
+                    totalSupply,
+                    remaining,
+                    nowMS: block.time * 1000,
+                    balance,
+                    address: token.definition.networks[network].address,
+                  };
+                }),
+              ),
             ),
-          ),
-        )}
+          )
+        }
       >
-        {(value) => (
+        {(value: Stream | undefined) => (
           <StyledGrid columns="160px 1fr" autoRows="auto" gap="0" {...props}>
             <Grid.Item data-test="info-neo-contributed">NEO Contributed:</Grid.Item>
             <Grid.Item data-test="info-neo-contributed-value">

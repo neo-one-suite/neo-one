@@ -1,18 +1,39 @@
 // tslint:disable no-any
+import { IconButton, Shadow } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdClose } from 'react-icons/md';
-import { Backdrop, Button, Card, Flex, Heading, Overlay, Portal, styled } from 'reakit';
+import { Backdrop, Card, Grid, Heading, Overlay, Portal, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { Shadow } from './Shadow';
 // tslint:disable-next-line no-any
 export type OverlayProps = any;
 
-const StyledHeader = styled(Flex)`
+const StyledHeader = styled(Grid)`
+  grid-auto-flow: column;
   background-color: ${prop('theme.primary')};
   align-items: center;
   justify-content: space-between;
   margin: 0;
   padding: 16px;
+`;
+
+const StyledHeading = styled(Heading)`
+  ${prop('theme.fonts.axiformaRegular')};
+  ${prop('theme.fontStyles.headline')};
+`;
+
+const StyledBody = styled(Grid)`
+  gap: 8px;
+  background-color: ${prop('theme.gray0')};
+  padding: 16px;
+`;
+
+const StyledIconButton = styled(IconButton)`
+  font-size: 20px;
+  border-radius: 50;
+`;
+
+const StyledCardFit = styled(Card.Fit)`
+  display: grid;
 `;
 
 interface Props {
@@ -38,22 +59,17 @@ export function Dialog({
           <Backdrop as={[Portal, Overlay.Hide]} {...overlay} />
           <Overlay unmount as={[Portal, Card]} slide fade gutter={16} {...overlay}>
             <Shadow />
-            <Card.Fit as={StyledHeader as any}>
-              <Heading data-test={dataTestHeading} as="h3" margin="0">
-                {title}
-              </Heading>
-              <Button
-                data-test={dataTestCloseButton}
-                fontSize={20}
-                onClick={overlay.hide}
-                border="none"
-                backgroundColor="transparent"
-                borderRadius={50}
-              >
-                <MdClose />
-              </Button>
-            </Card.Fit>
-            {renderDialog(overlay)}
+            <StyledCardFit>
+              <StyledHeader>
+                <StyledHeading data-test={dataTestHeading} as="h3" margin="0">
+                  {title}
+                </StyledHeading>
+                <StyledIconButton data-test={dataTestCloseButton} onClick={overlay.hide}>
+                  <MdClose />
+                </StyledIconButton>
+              </StyledHeader>
+              <StyledBody>{renderDialog(overlay)}</StyledBody>
+            </StyledCardFit>
           </Overlay>
         </>
       )}

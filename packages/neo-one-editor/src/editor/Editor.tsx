@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { Container, Flex, styled } from 'reakit';
 import { EditorContext } from '../EditorContext';
 import { Preview } from '../preview';
-import { ComponentProps } from '../types';
+import { ComponentProps, EditorContextType } from '../types';
 import { EditorToolbar } from './EditorToolbar';
 import { EditorView } from './EditorView';
 import { EditorState, openPreview, selectPreviewEnabled, selectPreviewOpen, setFileProblems } from './redux';
@@ -69,7 +69,7 @@ const EditorBase = ({
   ...props
 }: Props & ComponentProps<typeof Wrapper>) => (
   <EditorContext.Consumer>
-    {({ engine }) => (
+    {({ engine }: EditorContextType) => (
       <Container initialState={INITIAL_STATE} actions={actions}>
         {({ range, onSelectRange }) => {
           const editor = (

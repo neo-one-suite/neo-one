@@ -3,11 +3,11 @@ import 'monaco-editor/esm/vs/language/html/monaco.contribution';
 
 import { comlink } from '@neo-one/worker';
 // @ts-ignore
-import editorWorkerURL from 'file-loader!../../../../dist/website/editor.worker.js';
+import editorWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/website/editor.worker.js';
 // @ts-ignore
-import htmlWorkerURL from 'file-loader!../../../../dist/website/html.worker.js';
+import htmlWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/website/html.worker.js';
 // @ts-ignore
-import tsWorkerURL from 'file-loader!../../../../dist/website/ts.worker.js';
+import tsWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/website/ts.worker.js';
 // @ts-ignore
 import * as javascriptModule from 'monaco-editor/esm/vs/basic-languages/javascript/javascript';
 import ts from 'typescript';

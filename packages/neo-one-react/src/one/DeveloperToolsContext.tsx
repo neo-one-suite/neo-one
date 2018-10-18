@@ -1,18 +1,18 @@
-import { AddressString, Client, DeveloperClient } from '@neo-one/client';
+import { Client, DeveloperClient } from '@neo-one/client';
+import { FromStream, Token } from '@neo-one/react-common';
 import localforage from 'localforage';
 import * as React from 'react';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { FromStream } from '../FromStream';
 import { LocalClient, NetworkClients, ReactSyntheticEvent } from '../types';
 
-interface DeveloperToolsContextType {
+export interface DeveloperToolsContextType {
   readonly client: Client;
   readonly developerClients: NetworkClients<DeveloperClient>;
   readonly localClients: NetworkClients<LocalClient>;
 }
 // tslint:disable-next-line no-any
-export const DeveloperToolsContext = React.createContext<DeveloperToolsContextType>(undefined as any);
+export const DeveloperToolsContext: any = React.createContext<DeveloperToolsContextType>(undefined as any);
 
 interface WithNetworkClientProps {
   readonly children: (
@@ -27,16 +27,19 @@ interface WithNetworkClientProps {
 export function WithNetworkClient({ children }: WithNetworkClientProps) {
   return (
     <DeveloperToolsContext.Consumer>
-      {({ client, developerClients, localClients }) => (
+      {({ client, developerClients, localClients }: DeveloperToolsContextType) => (
         <FromStream
-          props$={client.currentNetwork$.pipe(
-            map((network) => {
-              const localClient = localClients[network];
-              const developerClient = developerClients[network];
+          props={{ client, localClients, developerClients }}
+          createStream={(props) =>
+            props.client.currentNetwork$.pipe(
+              map((network) => {
+                const localClient = props.localClients[network];
+                const developerClient = props.developerClients[network];
 
-              return { client, developerClient, localClient };
-            }),
-          )}
+                return { client, developerClient, localClient };
+              }),
+            )
+          }
         >
           {children}
         </FromStream>
@@ -45,12 +48,6 @@ export function WithNetworkClient({ children }: WithNetworkClientProps) {
   );
 }
 
-export interface Token {
-  readonly network: string;
-  readonly address: AddressString;
-  readonly symbol: AddressString;
-  readonly decimals: number;
-}
 export interface LocalState {
   readonly autoConsensus: boolean;
   readonly autoSystemFee: boolean;
@@ -73,7 +70,7 @@ const store = localforage.createInstance({
   description: 'Local developer state persisted across sessions',
 });
 // tslint:disable-next-line no-any
-const LocalStateContext = React.createContext<LocalStateContextType>(undefined as any);
+const LocalStateContext: any = React.createContext<LocalStateContextType>(undefined as any);
 
 export function LocalStateProvider({ children }: { readonly children: React.ReactNode }) {
   const localState$ = new BehaviorSubject<LocalState>(INITIAL_LOCAL_STATE);
@@ -108,7 +105,9 @@ interface WithTokensProps {
 export function WithTokens({ children }: WithTokensProps) {
   return (
     <LocalStateContext.Consumer>
-      {({ localState$ }) => children(localState$.pipe(map((localState) => localState.tokens, distinctUntilChanged())))}
+      {({ localState$ }: LocalStateContextType) =>
+        children(localState$.pipe(map((localState) => localState.tokens, distinctUntilChanged())))
+      }
     </LocalStateContext.Consumer>
   );
 }
@@ -120,7 +119,7 @@ interface WithOnChangeTokensProps {
 export function WithOnChangeTokens({ children }: WithOnChangeTokensProps) {
   return (
     <LocalStateContext.Consumer>
-      {({ onChange }) => children((tokens) => onChange({ tokens }))}
+      {({ onChange }: LocalStateContextType) => children((tokens) => onChange({ tokens }))}
     </LocalStateContext.Consumer>
   );
 }
@@ -132,7 +131,7 @@ interface WithResetLocalStateProps {
 export function WithResetLocalState({ children }: WithResetLocalStateProps) {
   return (
     <LocalStateContext.Consumer>
-      {({ onChange }) => children(() => onChange(INITIAL_LOCAL_STATE))}
+      {({ onChange }: LocalStateContextType) => children(() => onChange(INITIAL_LOCAL_STATE))}
     </LocalStateContext.Consumer>
   );
 }
@@ -146,7 +145,7 @@ interface WithAutoConsensusProps {
 export function WithAutoConsensus({ children }: WithAutoConsensusProps) {
   return (
     <LocalStateContext.Consumer>
-      {({ localState$, onChange }) =>
+      {({ localState$, onChange }: LocalStateContextType) =>
         children({
           autoConsensus$: localState$.pipe(
             map((localState) => localState.autoConsensus),
@@ -171,7 +170,7 @@ interface WithAutoSystemFeeProps {
 export function WithAutoSystemFee({ children }: WithAutoSystemFeeProps) {
   return (
     <LocalStateContext.Consumer>
-      {({ localState$, onChange }) =>
+      {({ localState$, onChange }: LocalStateContextType) =>
         children({
           autoSystemFee$: localState$.pipe(
             map((localState) => localState.autoSystemFee),
