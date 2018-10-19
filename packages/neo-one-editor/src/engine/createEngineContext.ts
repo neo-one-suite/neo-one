@@ -1,13 +1,6 @@
 // tslint:disable no-submodule-imports
-import {
-  Builder,
-  createEndpointPouchDB,
-  getServiceWorkerEndpoint,
-  OutputMessage,
-  PouchDBFileSystem,
-  ServiceWorkerManager,
-} from '@neo-one/local-browser';
-import { createBuilderManager } from '@neo-one/local-browser-worker';
+import { Builder, createEndpointPouchDB, OutputMessage, PouchDBFileSystem } from '@neo-one/local-browser';
+import { createBuilderManager, createFileSystemManager, FileSystemManager } from '@neo-one/local-browser-worker';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { createJSONRPCLocalProviderManager } from '@neo-one/node-browser-worker';
 import { WorkerManager } from '@neo-one/worker';
@@ -74,7 +67,7 @@ export interface EngineContext {
   readonly transpileCache: PouchDBFileSystem;
   readonly output$: Subject<OutputMessage>;
   readonly openFiles$: BehaviorSubject<Files>;
-  readonly serviceWorkerManager: ServiceWorkerManager;
+  readonly fileSystemManager: FileSystemManager;
   readonly builderManager: WorkerManager<typeof Builder>;
   readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
   readonly createPreviewURL: () => string;
@@ -85,13 +78,11 @@ export const createEngineContext = async ({
   id,
   createPreviewURL,
 }: CreateEngineContextOptions): Promise<EngineContext> => {
-  const { worker, container } = await getServiceWorkerEndpoint();
-
-  const serviceWorkerManager = new ServiceWorkerManager(worker);
-  const metaDB = createEndpointPouchDB<EngineMeta>(`${id}-meta`, container);
+  const fileSystemManager = createFileSystemManager();
+  const metaDB = createEndpointPouchDB<EngineMeta>(`${id}-meta`, fileSystemManager.worker);
   const [fs, transpileCache] = await Promise.all([
-    createFileSystem(id, container),
-    createTranspileCache(id, container),
+    createFileSystem(id, fileSystemManager.worker),
+    createTranspileCache(id, fileSystemManager.worker),
   ]);
 
   let meta = await handleMeta(metaDB, fs);
@@ -115,7 +106,7 @@ export const createEngineContext = async ({
   const jsonRPCLocalProviderManager = createJSONRPCLocalProviderManager(id);
   const builderManager = createBuilderManager(
     getFileSystemDBID(id),
-    () => serviceWorkerManager.getEndpoint(),
+    () => fileSystemManager.getEndpoint(),
     output$,
     jsonRPCLocalProviderManager,
   );
@@ -126,7 +117,7 @@ export const createEngineContext = async ({
     transpileCache,
     output$,
     openFiles$,
-    serviceWorkerManager,
+    fileSystemManager,
     builderManager,
     jsonRPCLocalProviderManager,
     createPreviewURL,

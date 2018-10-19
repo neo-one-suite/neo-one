@@ -1,8 +1,3 @@
-// tslint:disable no-submodule-imports match-default-export-name
-import PouchDB from 'pouchdb';
-// @ts-ignore
-import registerWorkerPouch from 'worker-pouch/worker';
-
 // tslint:disable no-any no-submodule-imports
 if (!(self as any).__initialized) {
   // tslint:disable-next-line
@@ -13,5 +8,5 @@ if (!(self as any).__initialized) {
   });
 }
 
-// tslint:disable-next-line
-registerWorkerPouch(self, (value: any) => new PouchDB(value));
+// tslint:disable-next-line export-name
+export const something = undefined;

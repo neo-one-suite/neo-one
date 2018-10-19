@@ -153,7 +153,7 @@ export class Engine extends EngineBase {
   public async registerPreviewEngine(): Promise<RegisterPreviewEngineResult> {
     return {
       id: this.context.id,
-      endpoint: this.context.serviceWorkerManager.getEndpoint(),
+      endpoint: this.context.fileSystemManager.getEndpoint(),
       builderManager: comlink.proxyValue(this.context.builderManager),
       jsonRPCLocalProviderManager: comlink.proxyValue(this.context.jsonRPCLocalProviderManager),
     };

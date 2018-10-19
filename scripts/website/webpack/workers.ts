@@ -17,6 +17,7 @@ export const workers = ({ stage }: { readonly stage: Stage }): webpack.Configura
     stage === 'prod'
       ? {
           'builder.worker': path.resolve(LOCAL_BROWSER_WORKER_PACKAGE, 'src', 'builder.worker.ts'),
+          'fs.worker': path.resolve(LOCAL_BROWSER_WORKER_PACKAGE, 'src', 'fs.worker.ts'),
           'jsonRPCLocalProvider.worker': path.resolve(
             NODE_BROWSER_WORKER_PACKAGE,
             'src',
@@ -31,6 +32,7 @@ export const workers = ({ stage }: { readonly stage: Stage }): webpack.Configura
       : // async chunks seem broken with webpack dev server in workers
         {
           'builder.worker': path.resolve(LOCAL_BROWSER_WORKER_PACKAGE, 'src', 'builder.init.ts'),
+          'fs.worker': path.resolve(LOCAL_BROWSER_WORKER_PACKAGE, 'src', 'fs.init.ts'),
           'jsonRPCLocalProvider.worker': path.resolve(
             NODE_BROWSER_WORKER_PACKAGE,
             'src',

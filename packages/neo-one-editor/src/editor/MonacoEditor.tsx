@@ -69,7 +69,7 @@ export class MonacoEditor extends React.Component<Props> {
     const current = this.ref.current;
     if (current !== null) {
       setupLanguages(this.id, this.props.engine.context.fs, () =>
-        this.props.engine.context.serviceWorkerManager.getEndpoint(),
+        this.props.engine.context.fileSystemManager.getEndpoint(),
       );
       this.mutableEditor = monac.editor.create(current, {
         language: getLanguageID(this.id, LanguageType.TypeScript),

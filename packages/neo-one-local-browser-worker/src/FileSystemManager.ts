@@ -1,7 +1,12 @@
 import { comlink } from '@neo-one/worker';
+import { FileSystemWorker } from './FileSystemWorker';
 
-export class ServiceWorkerManager {
-  public constructor(private readonly endpoint: ServiceWorker) {}
+export class FileSystemManager {
+  public readonly worker: Worker;
+
+  public constructor() {
+    this.worker = FileSystemWorker();
+  }
 
   public getEndpoint(): comlink.Endpoint {
     const { port1, port2 } = new MessageChannel();
@@ -15,10 +20,8 @@ export class ServiceWorkerManager {
       if (event.data && event.data.id) {
         instanceIDs.add(event.data.id);
       }
-      const channel = new MessageChannel();
-      // tslint:disable-next-line no-object-mutation
-      channel.port1.onmessage = workerListener;
-      this.endpoint.postMessage(event.data, [channel.port2]);
+      this.worker.addEventListener('message', workerListener);
+      this.worker.postMessage(event.data);
     });
     port1.start();
 
