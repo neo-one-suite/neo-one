@@ -14,6 +14,7 @@ import { plugins } from '../plugins';
 import { rules } from '../rules';
 
 const APP_ROOT_DIR = path.resolve(__dirname, '..', '..', '..', '..');
+const WEBSITE_DIR = path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-website');
 
 export const node = () => ({
   webpack: (mutableConfig: webpack.Configuration, { stage }: { stage: Stage }) => {
@@ -65,6 +66,12 @@ export const node = () => ({
       .concat([
         new InjectManifest({
           swSrc: path.resolve(APP_ROOT_DIR, 'dist', 'workers', 'sw.js'),
+          ...(stage === 'prod'
+            ? {
+                globDirectory: path.resolve(WEBSITE_DIR, 'dist'),
+                globPatterns: ['**/*.{js,css,html}'],
+              }
+            : {}),
         }),
       ]);
 
@@ -84,6 +91,8 @@ export const node = () => ({
         }),
       ];
     }
+
+    mutableConfig.devtool = stage === 'dev' ? 'cheap-module-source-map' : 'source-map';
 
     return mutableConfig;
   },

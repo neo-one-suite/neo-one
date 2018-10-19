@@ -139,7 +139,10 @@ class FullEditorBase extends React.Component<Props, State> {
               },
             });
           } else {
-            engine.dispose();
+            engine.dispose().catch((error) => {
+              // tslint:disable-next-line no-console
+              console.error(error);
+            });
           }
         }),
       )
@@ -155,7 +158,10 @@ class FullEditorBase extends React.Component<Props, State> {
 
   private dispose(): void {
     if (this.state.engine !== undefined) {
-      this.state.engine.dispose();
+      this.state.engine.dispose().catch((error) => {
+        // tslint:disable-next-line no-console
+        console.error(error);
+      });
     }
 
     this.disposeSubscription(this.mutableOpenFilesSubscription);

@@ -120,7 +120,11 @@ export class ForTypeHelper extends Helper {
         types[0].process(noCastOptions);
       }
     } else {
-      const groupedTypesOrdered = _.sortBy([...groupedTypes.entries()], (value) => value[1].length);
+      const groupedTypesOrdered = _.sortBy(
+        [...groupedTypes.entries()],
+        // tslint:disable-next-line readonly-array
+        [(value: [Process, ForType[]]) => value[1].length],
+      );
       let caseTypes = groupedTypesOrdered;
       if (this.defaultCase === undefined) {
         caseTypes = groupedTypesOrdered.slice(0, -1);

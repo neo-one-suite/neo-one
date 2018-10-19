@@ -1,7 +1,6 @@
 import { common, ECPoint, UInt256 } from '@neo-one/client-common';
-import { BlockSentContext } from './BlockSentContext';
-import { InitialContext } from './InitialContext';
 import { Type } from './types';
+
 export interface ContextAdd {
   readonly type: Type;
   readonly previousHash: UInt256;
@@ -52,24 +51,6 @@ export class Context<TTHis extends Context<TTHis> = Context<any>> {
 
   public get M(): number {
     return Math.floor(this.validators.length - (this.validators.length - 1) / 3);
-  }
-
-  public cloneInitial(_options: {
-    readonly type: Type;
-    readonly previousHash?: UInt256;
-    readonly blockIndex?: number;
-    readonly viewNumber: number;
-    readonly myIndex?: number;
-    readonly primaryIndex: number;
-    readonly expectedView?: ReadonlyArray<number>;
-    readonly validators?: ReadonlyArray<ECPoint>;
-    readonly blockReceivedTimeSeconds?: number;
-  }): InitialContext {
-    throw new Error('Monkey patched');
-  }
-
-  public cloneBlockSent(): BlockSentContext {
-    throw new Error('Monkey patched');
   }
 
   public cloneExpectedView(_options: { readonly expectedView: ReadonlyArray<number> }): TTHis {

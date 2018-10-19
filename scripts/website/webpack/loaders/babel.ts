@@ -35,15 +35,19 @@ export const babel = ({
           displayName: stage === 'dev',
         },
       ],
-      stage === 'dev' ? 'react-hot-loader/babel' : 'babel-plugin-universal-import',
+      stage === 'dev'
+        ? 'react-hot-loader/babel'
+        : bundle === 'react-static' || bundle === 'preview'
+          ? 'babel-plugin-universal-import'
+          : undefined,
       '@babel/plugin-syntax-dynamic-import',
       'babel-plugin-lodash',
       '@babel/plugin-proposal-object-rest-spread',
       '@babel/plugin-proposal-async-generator-functions',
-    ],
+    ].filter((value) => value !== undefined),
   };
 
-  if (!cache || stage !== 'dev') {
+  if (!cache) {
     return config;
   }
 

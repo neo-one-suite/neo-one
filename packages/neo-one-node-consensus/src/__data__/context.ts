@@ -1,6 +1,6 @@
 import { common } from '@neo-one/client-common';
 import _ from 'lodash';
-import { Context } from '../context';
+import { cloneBlockSent, cloneInitial, Context } from '../context';
 import { keys } from './keys';
 
 const validators = keys.map(({ publicKey }) => publicKey);
@@ -41,15 +41,15 @@ const primaryContext = new Context({
 
 const primaryPrivateKey = keys[primaryIndex].privateKey;
 
-const blockSentBackupContext = backupContext.cloneBlockSent();
-const initialBackupContext = backupContext.cloneInitial({
+const blockSentBackupContext = cloneBlockSent(backupContext);
+const initialBackupContext = cloneInitial(backupContext, {
   type: 'backup',
   viewNumber,
   primaryIndex,
 });
 
-const blockSentPrimaryContext = primaryContext.cloneBlockSent();
-const initialPrimaryContext = primaryContext.cloneInitial({
+const blockSentPrimaryContext = cloneBlockSent(primaryContext);
+const initialPrimaryContext = cloneInitial(primaryContext, {
   type: 'primary',
   viewNumber,
   primaryIndex,

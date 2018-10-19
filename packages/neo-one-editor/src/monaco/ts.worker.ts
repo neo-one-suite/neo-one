@@ -1,9 +1,4 @@
-// tslint:disable
-import '@babel/polyfill';
-
-import { TypeScriptWorker } from './tsWorker';
-import { initializeWorker } from './initializeWorker';
-
-initializeWorker((fs: any) => (ctx: any, createData: any) => {
-  return new TypeScriptWorker(ctx, createData, fs);
+import('./ts.init').catch((error) => {
+  // tslint:disable-next-line no-console
+  console.error(error);
 });

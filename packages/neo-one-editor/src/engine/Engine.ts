@@ -111,12 +111,15 @@ export class Engine extends EngineBase {
     this.fsChanges = fsChanges;
   }
 
-  public dispose(): void {
-    super.dispose();
+  public async dispose(): Promise<void> {
+    await super.dispose();
     this.fsChanges.cancel();
+    await this.context.dispose();
   }
 
   public async build(): Promise<void> {
+    this.context.output$.next({ owner: 'neo-one', message: 'Building...' });
+
     await this.context.builderManager.withInstance(async (builder) => builder.build());
   }
 

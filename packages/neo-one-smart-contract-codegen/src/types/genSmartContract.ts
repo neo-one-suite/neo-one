@@ -1,4 +1,4 @@
-import { ABI } from '@neo-one/client-common';
+import { ABI, ABIFunction } from '@neo-one/client-common';
 import { createForwardedValueFuncArgsName, createForwardedValueFuncReturnName } from '@neo-one/client-core';
 import _ from 'lodash';
 import { genConstantFunction } from './genConstantFunction';
@@ -12,8 +12,8 @@ export const genSmartContract = (name: string, abi: ABI): string => `
 export interface ${getSmartContractName(
   name,
 )}<TClient extends Client = Client> extends SmartContract<TClient, ${getEventName(name)}> {
-  ${_.flatMap(
-    _.sortBy(abi.functions, (func) => func.name).map((func) => {
+  ${_.flatten(
+    _.sortBy(abi.functions, [(func: ABIFunction) => func.name]).map((func) => {
       const parameters = func.parameters === undefined ? [] : func.parameters;
       const forwardedParameters = parameters.filter((parameter) => parameter.forwardedValue);
       let decls = [`readonly ${func.name}: ${func.constant ? genConstantFunction(func) : genFunction(name, func)}`];

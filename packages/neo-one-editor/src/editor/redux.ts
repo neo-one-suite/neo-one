@@ -1,5 +1,5 @@
 import { OutputMessage } from '@neo-one/local-browser';
-import { produce } from 'immer';
+import { DraftObject, produce } from 'immer';
 import _ from 'lodash';
 import { createStore } from 'redux';
 import actionCreatorFactory from 'typescript-fsa';
@@ -109,8 +109,10 @@ const reducer = reducerWithInitialState(createInitialState())
     produce(state, (draft) => {
       draft.console.problems = _.sortBy(
         draft.console.problems.filter((problem) => problem.path !== path).concat(problems),
-        (problem) => problem.path,
-        (problem) => problem.startLineNumber,
+        [
+          (problem: DraftObject<FileDiagnostic>) => problem.path,
+          (problem: DraftObject<FileDiagnostic>) => problem.startLineNumber,
+        ],
       );
     }),
   )

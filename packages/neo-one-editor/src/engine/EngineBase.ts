@@ -78,7 +78,7 @@ export class EngineBase {
       });
   }
 
-  public dispose(): void {
+  public async dispose(): Promise<void> {
     this.transpileCacheChanges.cancel();
   }
 

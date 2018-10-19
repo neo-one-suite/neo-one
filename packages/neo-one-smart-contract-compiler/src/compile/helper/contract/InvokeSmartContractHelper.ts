@@ -334,7 +334,7 @@ export class InvokeSmartContractHelper extends Helper {
         sb.emitHelper(node, options, sb.helpers.handleNormal({ propInfo }));
       });
 
-    const allCases = _.flatMap(
+    const allCases = _.flatten(
       this.contractInfo.propInfos
         .filter((propInfo) => propInfo.isPublic && propInfo.type !== 'deploy')
         .map((propInfo) => {

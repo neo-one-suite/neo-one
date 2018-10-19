@@ -10,7 +10,7 @@ export const genCommonTypes = ({
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly commonTypesPath: string;
 }) => {
-  const sortedPaths = _.sortBy(contractsPaths, ({ name }) => name);
+  const sortedPaths = _.sortBy(contractsPaths, [({ name }: ContractPaths) => name]);
 
   return {
     ts: `

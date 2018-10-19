@@ -82,5 +82,5 @@ export default {
   },
   extractCssChunks: true,
   plugins: [path.resolve(ROOT_DIR, 'scripts', 'website', 'webpack', 'plugin')],
-  siteRoot: 'https://neo-one.io',
+  siteRoot: 'https://neo-one.netlify.com',
 };

@@ -357,15 +357,15 @@ export function getBaseTypesFlattened(
 ): ReadonlyArray<ts.Type> {
   function getBaseTypesWorker(type: ts.Type): ReadonlyArray<ts.Type> {
     if (type_.isIntersection(type)) {
-      return _.flatMap(type_.getIntersectionTypesArray(type).map(getBaseTypesWorker));
+      return _.flatten(type_.getIntersectionTypesArray(type).map(getBaseTypesWorker));
     }
 
     const baseTypes = type_.getBaseTypesArray(type);
 
-    return [type].concat(_.flatMap(baseTypes.map(getBaseTypesWorker)));
+    return [type].concat(_.flatten(baseTypes.map(getBaseTypesWorker)));
   }
 
-  return _.flatMap(getBaseTypes(typeChecker, node).map(getBaseTypesWorker));
+  return _.flatten(getBaseTypes(typeChecker, node).map(getBaseTypesWorker));
 }
 
 export function getBaseClasses(

@@ -13,7 +13,7 @@ const hashSourceMap = (hash: Hash, sourceMap: RawSourceMap) =>
     .update(`${sourceMap.version}`);
 
 const hashSourceMaps = (sourceMaps: SourceMaps) =>
-  _.sortBy(Object.entries(sourceMaps), ([key]) => key)
+  _.sortBy(Object.entries(sourceMaps), [([key]: [string, RawSourceMap]) => key])
     .reduce((hash, value) => hashSourceMap(hash, value[1]), createHash('md5').update('v1'))
     .digest('hex');
 

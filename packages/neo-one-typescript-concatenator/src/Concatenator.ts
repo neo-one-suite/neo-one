@@ -214,7 +214,7 @@ export class Concatenator {
 
   private getAllSourceFiles(sourceFile: ts.SourceFile): ReadonlyArray<ts.SourceFile> {
     const sourceFilesMap = this.getAllSourceFilesWorker(sourceFile);
-    const graph = _.flatMap(
+    const graph = _.flatten(
       [...sourceFilesMap.entries()].map(([file, files]) =>
         files.map<[string, string]>((upstreamFile) => [file.fileName, upstreamFile.fileName]),
       ),

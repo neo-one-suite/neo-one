@@ -1201,7 +1201,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       return transaction.clone({
         scripts: _.sortBy<[string, WitnessModel]>(
           [[scriptHash, witness], [otherHash, otherScript]],
-          (value) => value[0],
+          [(value: [string, WitnessModel]) => value[0]],
         ).map((value) => value[1]),
       });
     }

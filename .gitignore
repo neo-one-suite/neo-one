@@ -74,3 +74,6 @@ flow-coverage/
 # Cypress
 cypress/videos
 cypress/screenshots
+
+# netlify
+.netlify

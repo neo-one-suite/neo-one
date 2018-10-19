@@ -22,7 +22,7 @@ export const optimization = ({
   }
 
   const splitChunks: webpack.Options.SplitChunksOptions = {
-    chunks: 'all',
+    chunks: bundle === 'workers' ? 'async' : 'all',
     minSize: 10000,
     minChunks: 1,
     maxAsyncRequests: 10,

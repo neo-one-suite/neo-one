@@ -27,9 +27,5 @@ export const jsLoader = (options: { readonly stage: Stage; readonly bundle: Bund
         ]
       : [],
   ),
-  use: [
-    options.stage === 'dev' ? cacheLoader({ ...options, name: 'js' }) : undefined,
-    'thread-loader',
-    babelLoader(options),
-  ].filter((value) => value !== undefined),
+  use: [cacheLoader({ ...options, name: 'js' }), 'thread-loader', babelLoader(options)],
 });

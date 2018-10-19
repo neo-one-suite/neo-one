@@ -9,7 +9,7 @@ export const tsLoader = ({ stage, bundle }: { readonly stage: Stage; readonly bu
   test: /\.tsx?$/,
   exclude: /node_modules/,
   use: [
-    stage === 'dev' ? cacheLoader({ stage, bundle, name: 'ts' }) : undefined,
+    cacheLoader({ stage, bundle, name: 'ts' }),
     'thread-loader',
     babelLoader({ stage, bundle }),
     {
@@ -23,5 +23,5 @@ export const tsLoader = ({ stage, bundle }: { readonly stage: Stage; readonly bu
         experimentalWatchApi: stage === 'dev',
       },
     },
-  ].filter((loader) => loader !== undefined),
+  ],
 });

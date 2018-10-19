@@ -54,8 +54,11 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
     try {
       contract = await compileContract(contractPath.filePath, contractPath.name, mutableLinked, fs);
     } catch (error) {
-      output$.next({ owner: 'neo-one', message: `Compilation failed:\n ${error.message}` });
-      throw new Error(`${contractPath.name} compilation failed.`);
+      output$.next({
+        owner: 'neo-one',
+        message: `Compilation failed:\n ${error.stack === undefined ? error.message : error.stack}`,
+      });
+      throw error;
     }
 
     const address = scriptHashToAddress(

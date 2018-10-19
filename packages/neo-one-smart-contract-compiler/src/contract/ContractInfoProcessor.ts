@@ -194,17 +194,17 @@ export class ContractInfoProcessor {
         );
       });
 
-    _.flatMap(tsUtils.class_.getMembers(classDecl).map((member) => tsUtils.decoratable.getDecoratorsArray(member)))
+    _.flatten(tsUtils.class_.getMembers(classDecl).map((member) => tsUtils.decoratable.getDecoratorsArray(member)))
       .filter((decorator) => !this.isValidDecorator(decorator))
       .forEach((decorator) => {
         this.context.reportError(decorator, DiagnosticCode.UnsupportedSyntax, DiagnosticMessage.UnsupportedDecorator);
       });
 
-    _.flatMap(
+    _.flatten(
       tsUtils.class_
         .getMethods(classDecl)
         .map((method) =>
-          _.flatMap(
+          _.flatten(
             tsUtils.parametered.getParameters(method).map((param) => tsUtils.decoratable.getDecoratorsArray(param)),
           ),
         ),
@@ -214,11 +214,11 @@ export class ContractInfoProcessor {
         this.context.reportError(decorator, DiagnosticCode.UnsupportedSyntax, DiagnosticMessage.UnsupportedDecorator);
       });
 
-    _.flatMap(
+    _.flatten(
       tsUtils.class_
         .getSetAccessors(classDecl)
         .map((method) =>
-          _.flatMap(
+          _.flatten(
             tsUtils.parametered.getParameters(method).map((param) => tsUtils.decoratable.getDecoratorsArray(param)),
           ),
         ),

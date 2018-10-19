@@ -65,7 +65,7 @@ const getPackages = async (loader: webpack.loader.LoaderContext) => {
     ),
   );
 
-  return _.fromPairs(_.flatMap(packageFilesList).filter((value) => value[1] !== undefined));
+  return _.fromPairs(_.flatten(packageFilesList).filter((value) => value[1] !== undefined));
 };
 
 const getReakitPackages = async (loader: webpack.loader.LoaderContext) => {

@@ -15,6 +15,8 @@ import _ from 'lodash';
 import { ConsensusContext } from './ConsensusContext';
 import {
   BlockSentContext,
+  cloneBlockSent,
+  cloneInitial,
   Context,
   HeaderContext,
   InitialContext,
@@ -186,7 +188,7 @@ export const initializeConsensus = ({
   context =
     type === 'primary' && context instanceof SignatureSentContext
       ? context.clone({ type, primaryIndex, viewNumber })
-      : context.cloneInitial({ type, primaryIndex, viewNumber });
+      : cloneInitial(context, { type, primaryIndex, viewNumber });
 
   return initializeConsensusCommon({ blockchain, context, consensusContext });
 };
@@ -228,7 +230,7 @@ export async function checkSignatures<TContext extends HeaderContext>({
 
     await node.relayBlock(block);
 
-    return { context: context.cloneBlockSent() };
+    return { context: cloneBlockSent(context) };
   }
 
   return { context };
@@ -277,7 +279,7 @@ export const initializeConsensusInitial = ({
 
   return initializeConsensusCommon({
     blockchain,
-    context: context.cloneInitial({ type, primaryIndex, viewNumber }),
+    context: cloneInitial(context, { type, primaryIndex, viewNumber }),
     consensusContext,
   });
 };

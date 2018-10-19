@@ -11,7 +11,7 @@ import { createBuilderManager } from '@neo-one/local-browser-worker';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { createJSONRPCLocalProviderManager } from '@neo-one/node-browser-worker';
 import { WorkerManager } from '@neo-one/worker';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { createFileSystem, createTranspileCache, getFileSystemDBID } from './create';
 import { initializeFileSystem } from './initializeFileSystem';
 
@@ -72,7 +72,7 @@ export interface EngineContext {
   readonly id: string;
   readonly fs: PouchDBFileSystem;
   readonly transpileCache: PouchDBFileSystem;
-  readonly output$: Observable<OutputMessage>;
+  readonly output$: Subject<OutputMessage>;
   readonly openFiles$: BehaviorSubject<Files>;
   readonly serviceWorkerManager: ServiceWorkerManager;
   readonly builderManager: WorkerManager<typeof Builder>;

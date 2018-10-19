@@ -143,8 +143,8 @@ const createForwardValueReturn = (returnType: ABIReturn, forwardEvents: Readonly
     });
     const foundForwardEvents = filterEvents(actions);
     const events = _.uniqBy(
-      _.sortBy(receiptOrValue.events.concat(foundForwardEvents), (event) => event.index),
-      (event) => event.index,
+      _.sortBy(receiptOrValue.events.concat(foundForwardEvents), [(event: Event) => event.index]),
+      (event: Event) => event.index,
     );
     if (receiptOrValue.result.state === 'HALT') {
       const value = convertContractParameter({ type: returnType, parameter: receiptOrValue.result.value });
