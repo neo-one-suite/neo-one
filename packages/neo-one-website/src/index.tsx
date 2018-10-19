@@ -22,7 +22,7 @@ if (typeof window !== 'undefined') {
 
 // tslint:disable-next-line strict-type-predicates
 if (typeof document !== 'undefined') {
-  if ('serviceWorker' in navigator) {
+  if (Modernizr.serviceworker) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js').catch((error) => {
         // tslint:disable-next-line no-console

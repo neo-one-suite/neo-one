@@ -43,7 +43,7 @@ export const babel = ({
     ],
   };
 
-  if (!cache) {
+  if (!cache || stage !== 'dev') {
     return config;
   }
 

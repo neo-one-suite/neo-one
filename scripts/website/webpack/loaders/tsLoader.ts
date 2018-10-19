@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { Bundle, Stage } from '../../types';
-import { babel } from './babel';
+import { babelLoader } from './babelLoader';
+import { cacheLoader } from './cacheLoader';
 
 const APP_ROOT_DIR = path.resolve(__dirname, '..', '..', '..', '..');
 
@@ -8,22 +9,19 @@ export const tsLoader = ({ stage, bundle }: { readonly stage: Stage; readonly bu
   test: /\.tsx?$/,
   exclude: /node_modules/,
   use: [
+    stage === 'dev' ? cacheLoader({ stage, bundle, name: 'ts' }) : undefined,
+    'thread-loader',
+    babelLoader({ stage, bundle }),
     {
-      loader: 'awesome-typescript-loader',
+      loader: 'ts-loader',
       options: {
-        useTranspileModule: stage === 'dev' || stage === 'node',
-        configFileName: path.resolve(APP_ROOT_DIR, 'tsconfig', 'tsconfig.es2017.esm.json'),
         transpileOnly: true,
-        forceIsolatedModules: stage === 'dev' || stage === 'node',
-        babelCore: '@babel/core',
-        useBabel: true,
-        babelOptions: {
-          babelrc: false,
-          ...babel({ stage, bundle }),
-        },
-        useCache: true,
-        cacheDirectory: path.resolve(APP_ROOT_DIR, 'node_modules', '.cache', 'atl', stage, bundle),
+        happyPackMode: true,
+        configFile: path.resolve(APP_ROOT_DIR, 'tsconfig', 'tsconfig.es2017.esm.json'),
+        onlyCompileBundledFiles: true,
+        experimentalFileCaching: true,
+        experimentalWatchApi: stage === 'dev',
       },
     },
-  ],
+  ].filter((loader) => loader !== undefined),
 });

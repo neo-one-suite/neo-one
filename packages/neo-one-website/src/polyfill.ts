@@ -1,8 +1,10 @@
 // tslint:disable no-submodule-imports
-// tslint:disable-next-line no-import-side-effect
+// tslint:disable no-import-side-effect
 import '@babel/polyfill';
 // @ts-ignore
 import regeneratorRuntime from '@babel/runtime/regenerator';
+// @ts-ignore
+import './Modernizr';
 
 // tslint:disable-next-line no-any no-object-mutation
 (global as any).regeneratorRuntime = regeneratorRuntime;

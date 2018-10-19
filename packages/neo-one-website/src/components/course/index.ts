@@ -1,2 +1,2 @@
-export * from './CourseApp';
+export * from './CourseEntry';
 export * from './CourseHeader';

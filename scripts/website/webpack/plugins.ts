@@ -30,13 +30,19 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
       resource.request = resource.request.replace(/^@reactivex\/ix-es2015-cjs(.*)$/, '@reactivex/ix-esnext-esm$1');
     }),
     new WebpackBar({ profile: true }),
-    new HardSourceWebpackPlugin({
-      cacheDirectory: path.resolve(APP_ROOT_DIR, 'node_modules', '.cache', 'hswp', stage, bundle),
-      cachePrune: {
-        sizeThreshold: 1024 * 1024 * 1024,
-      },
-    }),
   ]
+    .concat(
+      stage === 'dev'
+        ? [
+            new HardSourceWebpackPlugin({
+              cacheDirectory: path.resolve(APP_ROOT_DIR, 'node_modules', '.cache', 'hswp', stage, bundle),
+              cachePrune: {
+                sizeThreshold: 1024 * 1024 * 1024,
+              },
+            }),
+          ]
+        : [],
+    )
     .concat(
       stage === 'dev' || stage === 'node'
         ? []

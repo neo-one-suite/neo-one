@@ -1,5 +1,6 @@
 import { Bundle, Stage } from '../../types';
 import { babelLoader } from './babelLoader';
+import { cacheLoader } from './cacheLoader';
 
 export const jsLoader = (options: { readonly stage: Stage; readonly bundle: Bundle }) => ({
   test: /\.jsx?$/,
@@ -19,5 +20,9 @@ export const jsLoader = (options: { readonly stage: Stage; readonly bundle: Bund
         ]
       : [],
   ),
-  use: babelLoader(options),
+  use: [
+    options.stage === 'dev' ? cacheLoader({ ...options, name: 'js' }) : undefined,
+    'thread-loader',
+    babelLoader(options),
+  ].filter((value) => value !== undefined),
 });
