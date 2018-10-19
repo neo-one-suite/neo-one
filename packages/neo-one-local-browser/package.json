@@ -21,7 +21,7 @@
     "rxjs": "^6.3.3",
     "source-map": "^0.7.3",
     "tslib": "^1.9.3",
-    "typescript": "3.2.0-dev.20181017",
+    "typescript": "3.2.0-dev.20181019",
     "worker-pouch": "^2.1.0"
   },
   "sideEffects": false
