@@ -301,43 +301,43 @@ const compileTypescript = ((cache) =>
           ),
         )
         .pipe(gulpSourcemaps.init())
-        .pipe(
-          gulpBabel({
-            presets: [],
-            plugins: [
-              '@babel/plugin-syntax-numeric-separator',
-              ['@babel/plugin-syntax-typescript', { isTSX: true }],
-              '@babel/plugin-syntax-optional-catch-binding',
-              '@babel/plugin-syntax-dynamic-import',
-              ['babel-plugin-lodash', { id: ['lodash'] }],
-              [
-                'babel-plugin-transform-imports',
-                {
-                  rxjs: {
-                    transform: (importName) =>
-                      importName === 'EMPTY'
-                        ? 'rxjs/internal/observable/empty'
-                        : rxjsTypes.has(importName)
-                          ? 'rxjs/internal/types'
-                          : importName[0].toLowerCase() === importName[0]
-                            ? `rxjs/internal/observable/${importName}`
-                            : `rxjs/internal/${importName}`,
-                    skipDefaultConversion: true,
-                  },
-                  'rxjs/operators': {
-                    transform: 'rxjs/internal/operators/${member}',
-                    skipDefaultConversion: true,
-                  },
-                },
-              ],
-            ],
-          }),
-        )
-        .pipe(
-          gulpRename((parsedPath, file) => {
-            parsedPath.extname = path.extname(file.history[0]);
-          }),
-        )
+        // .pipe(
+        //   gulpBabel({
+        //     presets: [],
+        //     plugins: [
+        //       '@babel/plugin-syntax-numeric-separator',
+        //       ['@babel/plugin-syntax-typescript', { isTSX: true }],
+        //       '@babel/plugin-syntax-optional-catch-binding',
+        //       '@babel/plugin-syntax-dynamic-import',
+        //       ['babel-plugin-lodash', { id: ['lodash'] }],
+        //       [
+        //         'babel-plugin-transform-imports',
+        //         {
+        //           rxjs: {
+        //             transform: (importName) =>
+        //               importName === 'EMPTY'
+        //                 ? 'rxjs/internal/observable/empty'
+        //                 : rxjsTypes.has(importName)
+        //                   ? 'rxjs/internal/types'
+        //                   : importName[0].toLowerCase() === importName[0]
+        //                     ? `rxjs/internal/observable/${importName}`
+        //                     : `rxjs/internal/${importName}`,
+        //             skipDefaultConversion: true,
+        //           },
+        //           'rxjs/operators': {
+        //             transform: 'rxjs/internal/operators/${member}',
+        //             skipDefaultConversion: true,
+        //           },
+        //         },
+        //       ],
+        //     ],
+        //   }),
+        // )
+        // .pipe(
+        //   gulpRename((parsedPath, file) => {
+        //     parsedPath.extname = path.extname(file.history[0]);
+        //   }),
+        // )
         .pipe(type === 'fast' ? format.fastProject() : format.project())
         .pipe(gulpSourcemaps.mapSources(mapSources))
         .pipe(gulpSourcemaps.write())
