@@ -18,8 +18,10 @@ export const jsLoader = (options: { readonly stage: Stage; readonly bundle: Bund
           /chalk/,
           /ansi-styles/,
           /markdown-it-anchor/,
+          /markdown-it-table-of-contents/,
           /swimmer/,
           /jest-circus/,
+          /jest-util/,
         ]
       : [],
   ),
