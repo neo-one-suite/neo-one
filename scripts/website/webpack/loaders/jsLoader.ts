@@ -21,9 +21,9 @@ export const jsLoader = (options: { readonly stage: Stage; readonly bundle: Bund
           /markdown-it-anchor/,
           /markdown-it-table-of-contents/,
           /swimmer/,
-          /jest-circus/,
-          /jest-util/,
           /onigasm/,
+          /jest/,
+          /callsites/,
         ]
       : [],
   ),
