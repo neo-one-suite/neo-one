@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/server-grpc",
-  "version": "1.0.0-preview.0",
+  "version": "1.0.0-preview.1",
   "description": "NEO•ONE Server GRPC.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/types": "^1.0.0-preview.0",
+    "@neo-one/types": "^1.0.0-preview.1",
     "google-protobuf": "^3.6.1",
     "tslib": "^1.9.3"
   },

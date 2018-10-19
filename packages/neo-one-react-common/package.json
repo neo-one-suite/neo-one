@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/react-common",
-  "version": "1.0.0-preview.0",
+  "version": "1.0.0-preview.1",
   "description": "NEO•ONE shared react.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client": "^1.0.0-preview.0",
-    "@neo-one/types": "^1.0.0-preview.0",
-    "@neo-one/utils": "^1.0.0-preview.0",
+    "@neo-one/client": "^1.0.0-preview.1",
+    "@neo-one/types": "^1.0.0-preview.1",
+    "@neo-one/utils": "^1.0.0-preview.1",
     "@types/modernizr": "^3.5.2",
     "@types/react": "^16.4.18",
     "@types/react-select": "^2.0.5",

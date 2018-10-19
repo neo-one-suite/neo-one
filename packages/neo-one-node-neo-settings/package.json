@@ -1,14 +1,14 @@
 {
   "name": "@neo-one/node-neo-settings",
-  "version": "1.0.0-preview.0",
+  "version": "1.0.0-preview.1",
   "description": "NEO•ONE standard MainNet and TestNet blockchain settings.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-common": "^1.0.0-preview.0",
-    "@neo-one/client-core": "^1.0.0-preview.0",
-    "@neo-one/node-core": "^1.0.0-preview.0",
-    "@neo-one/types": "^1.0.0-preview.0",
-    "@neo-one/utils": "^1.0.0-preview.0",
+    "@neo-one/client-common": "^1.0.0-preview.1",
+    "@neo-one/client-core": "^1.0.0-preview.1",
+    "@neo-one/node-core": "^1.0.0-preview.1",
+    "@neo-one/types": "^1.0.0-preview.1",
+    "@neo-one/utils": "^1.0.0-preview.1",
     "@types/bn.js": "^4.11.2",
     "bn.js": "^4.11.8",
     "tslib": "^1.9.3"
