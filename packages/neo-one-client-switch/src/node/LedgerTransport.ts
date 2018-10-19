@@ -1,3 +1,4 @@
+// tslint:disable no-implicit-dependencies
 import { Ledger } from '../common';
 
 // tslint:disable-next-line no-let
@@ -14,12 +15,20 @@ export const LedgerTransport: Ledger = {
   type: 'ledger',
   byteLimit: 256,
   load: async () => {
-    const TransportNodeHid = await getTransportNodeHid();
+    try {
+      const TransportNodeHid = await getTransportNodeHid();
 
-    return {
-      open: TransportNodeHid.default.open,
-      list: TransportNodeHid.default.list,
-      isSupported: TransportNodeHid.default.isSupported,
-    };
+      return {
+        open: TransportNodeHid.default.open,
+        list: TransportNodeHid.default.list,
+        isSupported: TransportNodeHid.default.isSupported,
+      };
+    } catch {
+      return {
+        open: async () => Promise.reject(new Error('Not supported')),
+        list: async () => Promise.reject(new Error('Not supported')),
+        isSupported: async () => Promise.resolve(false),
+      };
+    }
   },
 };
