@@ -11,6 +11,7 @@ export const jsLoader = (options: { readonly stage: Stage; readonly bundle: Bund
           /safe-stable-stringify/,
           /sucrase/,
           /monaco-editor/,
+          /monaco-textmate/,
           /tapable/,
           /source-map/,
           /@babel\/highlight/,
@@ -22,6 +23,7 @@ export const jsLoader = (options: { readonly stage: Stage; readonly bundle: Bund
           /swimmer/,
           /jest-circus/,
           /jest-util/,
+          /onigasm/,
         ]
       : [],
   ),
