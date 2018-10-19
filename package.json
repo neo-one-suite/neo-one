@@ -19,11 +19,9 @@
     "dapp"
   ],
   "private": true,
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ]
-  },
+  "workspaces": [
+    "packages/*"
+  ],
   "engines": {
     "node": ">=8.9.0"
   },
@@ -106,13 +104,13 @@
     "e2e-ci-9": "yarn run jest-9 --config jest/e2e-ci.js --ci -w 1",
     "e2e-ci-windows-9": "yarn run jest-windows-9 --config jest/e2e-ci.js --ci -w 1",
     "website:start": "yarn run ts-node ./scripts/website/compile --watch",
-    "website:build-preview": "yarn run ts-node ./scripts/website/compile --bundle workers && yarn run ts-node ./scripts/website/compile --bundle preview",
+    "website:build-preview": "yarn run ts-node ./scripts/website/compile --bundle workers && yarn run ts-node ./scripts/website/compile --bundle preview && cp -r ./dist/workers/* ./dist/preview",
     "website:start-static": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static start",
     "website-sw:start": "yarn run ts-node ./packages/neo-one-editor/scripts/compileSW.ts --watch",
     "website-sw:compile": "yarn run ts-node ./packages/neo-one-editor/scripts/compileSW.ts",
     "website:stage": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build --staging",
     "website:serve": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run serve dist -p 3000",
-    "website:build-static": "yarn run ts-node ./scripts/website/compile --bundle workers && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build",
+    "website:build-static": "yarn run ts-node ./scripts/website/compile --bundle workers && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build && cp -r ./dist/workers/* ./packages/neo-one-website/dist",
     "test:cypress": "yarn run ts-node ./scripts/runCypress.ts"
   },
   "husky": {
