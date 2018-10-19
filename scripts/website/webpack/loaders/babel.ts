@@ -49,7 +49,7 @@ export const babel = ({
 
   return {
     ...config,
-    cacheDirectory: path.resolve(APP_ROOT_DIR, 'node_modules', '.cache', 'babel', bundle),
+    cacheDirectory: path.resolve(APP_ROOT_DIR, 'node_modules', '.cache', 'babel', stage, bundle),
     cacheCompression: false,
   };
 };

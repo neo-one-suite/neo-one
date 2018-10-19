@@ -3,8 +3,6 @@ export * from './BrowserLocalClient';
 export * from './ServiceWorkerManager';
 export * from './build';
 export * from './filesystem';
-export * from './createBuilderManager';
-export * from './createJSONRPCLocalProviderManager';
 export * from './createCompilerHost';
 export * from './sys';
 export * from './types';

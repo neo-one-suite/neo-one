@@ -1,10 +1,9 @@
 // tslint:disable no-import-side-effect
-import '@babel/polyfill';
 import './polyfill';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { PreviewEngine } from '../../engine';
+import { PreviewEngine } from '../../engine/PreviewEngine';
 import { App } from './App';
 
 const createPreviewEngine = async () => {

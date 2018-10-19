@@ -1,14 +1,15 @@
 // tslint:disable promise-function-async no-submodule-imports no-implicit-dependencies no-import-side-effect
-import 'monaco-editor/esm/vs/language/html/monaco.contribution';
+// @ts-ignore
+import * as fake from 'monaco-editor/esm/vs/language/html/monaco.contribution';
 
 import { PouchDBFileSystem } from '@neo-one/local-browser';
 import { comlink } from '@neo-one/worker';
 // @ts-ignore
-import editorWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/website/editor.worker.js';
+import editorWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/workers/editor.worker.js';
 // @ts-ignore
-import htmlWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/website/html.worker.js';
+import htmlWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/workers/html.worker.js';
 // @ts-ignore
-import tsWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/website/ts.worker.js';
+import tsWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/workers/ts.worker.js';
 // @ts-ignore
 import * as javascriptModule from 'monaco-editor/esm/vs/basic-languages/javascript/javascript';
 import ts from 'typescript';
@@ -107,6 +108,7 @@ function setupTypeScript(id: string, fs: PouchDBFileSystem, endpoint: () => coml
 }
 
 function setupContract(id: string, fs: PouchDBFileSystem, endpoint: () => comlink.Endpoint) {
+  // @ts-ignore
   const options = new LanguageServiceOptions(
     {
       target: ts.ScriptTarget.ESNext,
@@ -140,6 +142,8 @@ function setupContract(id: string, fs: PouchDBFileSystem, endpoint: () => comlin
     id,
     endpoint,
     true,
+    // Trick webpack into thinking we're using this import
+    fake,
   );
   options.setEagerModelSync(true);
 

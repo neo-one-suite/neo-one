@@ -1,6 +1,7 @@
-import { FullNodeOptions, JSONRPCLocalProvider, JSONRPCLocalProviderWorker } from '@neo-one/node-browser';
+import { FullNodeOptions, JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { comlink, WorkerManager } from '@neo-one/worker';
 import { BehaviorSubject } from 'rxjs';
+import { JSONRPCLocalProviderWorker } from './JSONRPCLocalProviderWorker';
 
 export const createJSONRPCLocalProviderManager = (id: string) =>
   comlink.proxyValue(

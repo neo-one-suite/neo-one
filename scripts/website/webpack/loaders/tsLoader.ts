@@ -11,10 +11,10 @@ export const tsLoader = ({ stage, bundle }: { readonly stage: Stage; readonly bu
     {
       loader: 'awesome-typescript-loader',
       options: {
-        useTranspileModule: stage === 'dev',
+        useTranspileModule: stage === 'dev' || stage === 'node',
         configFileName: path.resolve(APP_ROOT_DIR, 'tsconfig', 'tsconfig.es2017.esm.json'),
         transpileOnly: true,
-        forceIsolatedModules: stage === 'dev',
+        forceIsolatedModules: stage === 'dev' || stage === 'node',
         babelCore: '@babel/core',
         useBabel: true,
         babelOptions: {
@@ -22,7 +22,7 @@ export const tsLoader = ({ stage, bundle }: { readonly stage: Stage; readonly bu
           ...babel({ stage, bundle }),
         },
         useCache: true,
-        cacheDirectory: path.resolve(APP_ROOT_DIR, 'node_modules', '.cache', 'atl', bundle),
+        cacheDirectory: path.resolve(APP_ROOT_DIR, 'node_modules', '.cache', 'atl', stage, bundle),
       },
     },
   ],

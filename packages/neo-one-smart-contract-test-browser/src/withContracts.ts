@@ -1,7 +1,8 @@
 import { NEOONEDataProvider } from '@neo-one/client';
 import { createCompilerHost, FileSystem } from '@neo-one/local-browser';
 import { getFileSystem } from '@neo-one/local-singleton';
-import { JSONRPCLocalProvider, JSONRPCLocalProviderWorker } from '@neo-one/node-browser';
+import { JSONRPCLocalProvider } from '@neo-one/node-browser';
+import { JSONRPCLocalProviderWorker } from '@neo-one/node-browser-worker';
 import {
   Contract,
   TestOptions,

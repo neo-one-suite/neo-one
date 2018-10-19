@@ -55,7 +55,6 @@
     "webpack": "4.19.0"
   },
   "sideEffects": [
-    "src/index.tsx",
     "src/polyfill.ts",
     "*.css"
   ]

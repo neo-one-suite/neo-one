@@ -1,15 +1,15 @@
 // tslint:disable no-submodule-imports
 import {
   Builder,
-  createBuilderManager,
   createEndpointPouchDB,
-  createJSONRPCLocalProviderManager,
   getServiceWorkerEndpoint,
   OutputMessage,
   PouchDBFileSystem,
   ServiceWorkerManager,
 } from '@neo-one/local-browser';
+import { createBuilderManager } from '@neo-one/local-browser-worker';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
+import { createJSONRPCLocalProviderManager } from '@neo-one/node-browser-worker';
 import { WorkerManager } from '@neo-one/worker';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { createFileSystem, createTranspileCache, getFileSystemDBID } from './create';

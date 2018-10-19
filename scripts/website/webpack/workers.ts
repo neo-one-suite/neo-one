@@ -6,16 +6,16 @@ import { plugins } from './plugins';
 import { rules } from './rules';
 
 const APP_ROOT_DIR = path.resolve(__dirname, '..', '..', '..');
-const DIST_DIR = path.resolve(APP_ROOT_DIR, 'dist', 'website');
+const DIST_DIR = path.resolve(APP_ROOT_DIR, 'dist', 'workers');
 const EDITOR_PACKAGE = path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-editor');
-const LOCAL_BROWSER_PACKAGE = path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-local-browser');
-const NODE_BROWSER_PACKAGE = path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-node-browser');
+const LOCAL_BROWSER_WORKER_PACKAGE = path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-local-browser-worker');
+const NODE_BROWSER_WORKER_PACKAGE = path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-node-browser-worker');
 
 export const workers = ({ stage }: { readonly stage: Stage }): webpack.Configuration => ({
-  ...common({ stage }),
+  ...common({ stage, bundle: 'workers' }),
   entry: {
-    'builder.worker': path.resolve(LOCAL_BROWSER_PACKAGE, 'src', 'build', 'builder.worker.ts'),
-    'jsonRPCLocalProvider.worker': path.resolve(NODE_BROWSER_PACKAGE, 'src', 'jsonRPCLocalProvider.worker.ts'),
+    'builder.worker': path.resolve(LOCAL_BROWSER_WORKER_PACKAGE, 'src', 'builder.worker.ts'),
+    'jsonRPCLocalProvider.worker': path.resolve(NODE_BROWSER_WORKER_PACKAGE, 'src', 'jsonRPCLocalProvider.worker.ts'),
     'ts.worker': path.resolve(EDITOR_PACKAGE, 'src', 'monaco', 'ts.worker.ts'),
     'transpiler.worker': path.resolve(EDITOR_PACKAGE, 'src', 'engine', 'transpile', 'transpiler.worker.ts'),
     'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker',

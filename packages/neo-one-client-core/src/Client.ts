@@ -29,7 +29,7 @@ import {
   UserAccountProviders,
 } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
-import { toObservable } from '@reactivex/ix-es2015-cjs/asynciterable';
+import { toObservable } from '@reactivex/ix-es2015-cjs/asynciterable/toobservable';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { BehaviorSubject, combineLatest, Observable, Observer, ReplaySubject } from 'rxjs';

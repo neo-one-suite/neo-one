@@ -49,6 +49,33 @@ const watchPreview = async () => {
     });
 };
 
+const runCompiler = async ({ compiler }: { readonly compiler: webpack.Compiler }): Promise<webpack.Stats> =>
+  new Promise<webpack.Stats>((resolve, reject) =>
+    compiler.run((error: Error | undefined, stats) => {
+      log(
+        stats.toString({
+          performance: false,
+          hash: false,
+          timings: true,
+          entrypoints: false,
+          chunkOrigins: false,
+          chunkModules: false,
+          colors: true,
+        }),
+      );
+      if (error) {
+        reject(error);
+      } else if (stats.hasErrors()) {
+        reject(new Error('Compilation failed'));
+      } else {
+        resolve(stats);
+      }
+    }),
+  );
+const compileConfig = async (config: webpack.Configuration) => runCompiler({ compiler: webpack(config) });
+const compilePreview = async () => compileConfig(preview({ stage: 'prod' }));
+const compileWorkers = async () => compileConfig(workers({ stage: 'prod' }));
+
 const startReactStatic = () => {
   const proc = execa('react-static', ['start']);
 
@@ -71,6 +98,17 @@ const createWatch = async (bundle: Bundle) => {
   }
 };
 
+const compile = async (bundle: Bundle) => {
+  switch (bundle) {
+    case 'workers':
+      return compileWorkers();
+    case 'preview':
+      return compilePreview();
+    default:
+      throw new Error(`Unknown bundle: ${bundle}`);
+  }
+};
+
 const logError = (error: Error) => {
   // tslint:disable-next-line:no-console
   console.error(error);
@@ -86,10 +124,13 @@ Promise.resolve()
     let dispose: () => Promise<void> = async () => {
       // do nothing
     };
+    let done = Promise.resolve();
     if (yargs.argv.watch) {
       dispose = await createWatch(yargs.argv.bundle);
     } else {
-      throw new Error('Not implemented');
+      done = compile(yargs.argv.bundle).then(() => {
+        // do nothing with stats
+      });
     }
     const exit = async (code: number) => {
       try {
@@ -122,7 +163,10 @@ Promise.resolve()
         // do nothing
       });
     });
+
+    return done;
   })
-  .catch(() => {
+  .catch((error) => {
+    logError(error);
     process.exit(1);
   });

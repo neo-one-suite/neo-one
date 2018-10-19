@@ -1,11 +1,17 @@
 import * as path from 'path';
 import webpack from 'webpack';
-import { Stage } from '../types';
+import { Bundle, Stage } from '../types';
 import { node } from './node';
 import { optimization } from './optimization';
 
-export const common = ({ stage }: { readonly stage: Stage }): webpack.Configuration => ({
-  mode: stage === 'dev' ? 'development' : 'production',
+export const common = ({
+  stage,
+  bundle,
+}: {
+  readonly stage: Stage;
+  readonly bundle: Bundle;
+}): webpack.Configuration => ({
+  mode: stage === 'dev' || stage === 'node' ? 'development' : 'production',
   resolve: {
     mainFields: ['browser', 'main'],
     aliasFields: ['browser'],
@@ -14,7 +20,7 @@ export const common = ({ stage }: { readonly stage: Stage }): webpack.Configurat
       console$: path.resolve(__dirname, 'console.js'),
     },
   },
-  optimization: optimization({ stage }),
+  optimization: optimization({ stage, bundle }),
   node,
-  devtool: stage === 'dev' ? 'cheap-module-source-map' : 'source-map',
+  devtool: stage === 'dev' || stage === 'node' ? 'cheap-module-source-map' : 'source-map',
 });

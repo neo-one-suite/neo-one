@@ -24,7 +24,5 @@
     "styled-tools": "^1.5.2",
     "tslib": "^1.9.3"
   },
-  "sideEffects": [
-    "*.css"
-  ]
+  "sideEffects": false
 }

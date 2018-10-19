@@ -4,9 +4,12 @@ import * as React from 'react';
 import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
 import webpack from 'webpack';
 // @ts-ignore
+import nodeExternals from 'webpack-node-externals';
+// @ts-ignore
 import { InjectManifest } from 'workbox-webpack-plugin';
 import { Stage } from '../../types';
 import { node as nodeSettings } from '../node';
+import { optimization } from '../optimization';
 import { plugins } from '../plugins';
 import { rules } from '../rules';
 
@@ -17,10 +20,9 @@ export const node = () => ({
     const resolve = mutableConfig.resolve === undefined ? {} : mutableConfig.resolve;
     mutableConfig.resolve = {
       ...resolve,
-      modules: resolve.modules,
       mainFields: ['browser', 'module', 'main'],
       aliasFields: ['browser'],
-      extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+      extensions: ['.js', '.jsx', '.json', '.mjs', '.ts', '.tsx'],
       alias: {
         ...(resolve.alias === undefined ? {} : resolve.alias),
         console$: path.resolve(__dirname, '..', 'console.js'),
@@ -47,23 +49,41 @@ export const node = () => ({
       },
     ];
 
-    const opt = mutableConfig.optimization === undefined ? {} : mutableConfig.optimization;
-    mutableConfig.optimization = {
-      ...opt,
-      noEmitOnErrors: false,
-    };
+    if (stage !== 'node') {
+      mutableConfig.optimization = optimization({ stage, bundle: 'react-static' });
+    }
 
     const plugs = mutableConfig.plugins === undefined ? [] : mutableConfig.plugins;
     mutableConfig.plugins = plugs
-      .filter((plugin) => plugin.constructor.name !== 'NoEmitOnErrorsPlugin')
+      .filter(
+        (plugin) =>
+          plugin.constructor.name !== 'NoEmitOnErrorsPlugin' &&
+          plugin.constructor.name !== 'ExtractCssChunksPlugin' &&
+          plugin.constructor.name !== 'EnvironmentPlugin',
+      )
       .concat(plugins({ stage, bundle: 'react-static' }))
       .concat([
         new InjectManifest({
-          swSrc: path.resolve(APP_ROOT_DIR, 'dist', 'website', 'sw.js'),
+          swSrc: path.resolve(APP_ROOT_DIR, 'dist', 'workers', 'sw.js'),
         }),
       ]);
 
     mutableConfig.node = nodeSettings;
+
+    if (stage === 'node') {
+      mutableConfig.externals = [
+        nodeExternals({
+          whitelist: [
+            'react-universal-component',
+            'webpack-flush-chunks',
+            'react-static',
+            'react-static/templates',
+            'react-static/plugins',
+            /.*neo-one.*/,
+          ],
+        }),
+      ];
+    }
 
     return mutableConfig;
   },

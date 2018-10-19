@@ -8,6 +8,7 @@
     "@neo-one/local-browser": "^1.0.0-preview.0",
     "@neo-one/local-singleton": "^1.0.0-preview.0",
     "@neo-one/node-browser": "^1.0.0-preview.0",
+    "@neo-one/node-browser-worker": "^1.0.0-preview.0",
     "@neo-one/smart-contract-test-common": "^1.0.0-preview.0",
     "@neo-one/types": "^1.0.0-preview.0",
     "@neo-one/utils": "^1.0.0-preview.0",
