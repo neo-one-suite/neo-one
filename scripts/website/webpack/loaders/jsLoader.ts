@@ -17,6 +17,9 @@ export const jsLoader = (options: { readonly stage: Stage; readonly bundle: Bund
           /@babel\/code-frame/,
           /chalk/,
           /ansi-styles/,
+          /markdown-it-anchor/,
+          /swimmer/,
+          /jest-circus/,
         ]
       : [],
   ),
