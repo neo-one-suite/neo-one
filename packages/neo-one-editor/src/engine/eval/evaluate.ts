@@ -1,5 +1,5 @@
 import { EngineBase } from '../EngineBase';
-import { ModuleBase } from '../ModuleBase';
+import { TranspiledModule } from '../TranspiledModule';
 import { Exports } from '../types';
 import { createRequire } from './createRequire';
 
@@ -8,16 +8,16 @@ import { createRequire } from './createRequire';
 const _self = this;
 // tslint:enable
 
-export const evaluate = (engine: EngineBase, mod: ModuleBase, useEval = false): Exports => {
+export const evaluate = (engine: EngineBase, mod: TranspiledModule, useEval = false): Exports => {
   const globals = engine.getGlobals(mod);
   const require = createRequire(engine, mod, useEval);
-  const code = mod.getCode();
+  const code = mod.code;
   const module = { exports: {} };
   const params = ['require', 'module', 'exports'].concat(Object.keys(globals));
   const args = [require, module, module.exports, ...Object.values(globals)];
   try {
     if (useEval) {
-      const evalCode = `(function evaluate(${params.join(', ')}) { ${code} })`;
+      const evalCode = `(function evaluate(${params.join(', ')}) { ${code}\n})`;
       // tslint:disable-next-line ban-comma-operator
       (0, eval)(evalCode).apply(_self, args);
     } else {

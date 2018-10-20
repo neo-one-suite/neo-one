@@ -33,7 +33,7 @@ const maybeTranspile = async (
   const fileType = getFileType(path);
   if ((fileType === 'typescript' || fileType === 'javascript') && !path.startsWith('/node_modules')) {
     const result = await transpiler.transpile(path, content);
-    await transpileCache.writeFile(path, result);
+    await transpileCache.writeFile(path, JSON.stringify(result));
   }
 };
 

@@ -8,6 +8,7 @@ import nodeExternals from 'webpack-node-externals';
 // @ts-ignore
 import { InjectManifest } from 'workbox-webpack-plugin';
 import { Stage } from '../../types';
+import { alias } from '../alias';
 import { node as nodeSettings } from '../node';
 import { optimization } from '../optimization';
 import { plugins } from '../plugins';
@@ -26,8 +27,7 @@ export const node = () => ({
       extensions: ['.js', '.jsx', '.json', '.mjs', '.ts', '.tsx'],
       alias: {
         ...(resolve.alias === undefined ? {} : resolve.alias),
-        console$: path.resolve(__dirname, '..', 'console.js'),
-        swimmer$: path.resolve(__dirname, 'swimmer.js'),
+        ...alias,
       },
     };
 

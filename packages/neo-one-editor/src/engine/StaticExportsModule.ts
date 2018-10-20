@@ -10,8 +10,4 @@ export class StaticExportsModule extends ModuleBase {
   public evaluate(): Exports {
     return this.exports;
   }
-
-  public getCode(): string {
-    throw new Error('Something went wrong. Static exports module does not have code to evaluate.');
-  }
 }

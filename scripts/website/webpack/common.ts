@@ -1,6 +1,6 @@
-import * as path from 'path';
 import webpack from 'webpack';
 import { Bundle, Stage } from '../types';
+import { alias } from './alias';
 import { node } from './node';
 import { optimization } from './optimization';
 
@@ -16,9 +16,7 @@ export const common = ({
     mainFields: ['browser', 'main'],
     aliasFields: ['browser'],
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
-    alias: {
-      console$: path.resolve(__dirname, 'console.js'),
-    },
+    alias,
   },
   optimization: optimization({ stage, bundle }),
   node,

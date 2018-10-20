@@ -33,9 +33,9 @@
     "start": "yarn run ts-node ./scripts/start.ts"
   },
   "devDependencies": {
-    "@neo-one/cli": "1.0.0-preview.0",
-    "@neo-one/smart-contract-test": "1.0.0-preview.0",
-    "@neo-one/smart-contract-typescript-plugin": "1.0.0-preview.0",
+    "@neo-one/cli": "1.0.0-preview.1",
+    "@neo-one/smart-contract-test": "1.0.0-preview.1",
+    "@neo-one/smart-contract-typescript-plugin": "1.0.0-preview.1",
     "@types/jest": "23.3.5",
     "@types/react": "16.4.18",
     "@types/react-dom": "16.0.9",
@@ -62,9 +62,9 @@
     "webpack-serve": "2.0.2"
   },
   "dependencies": {
-    "@neo-one/client": "1.0.0-preview.0",
-    "@neo-one/react": "1.0.0-preview.0",
-    "@neo-one/smart-contract": "1.0.0-preview.0",
+    "@neo-one/client": "1.0.0-preview.1",
+    "@neo-one/react": "1.0.0-preview.1",
+    "@neo-one/smart-contract": "1.0.0-preview.1",
     "bignumber.js": "7.2.1",
     "core-js": "2.5.7",
     "react": "16.5.2",

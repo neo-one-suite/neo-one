@@ -60,7 +60,8 @@ export class EngineBase {
     }
 
     transpileCache.files.forEach((file, path) => {
-      this.mutableModules.set(path, new TranspiledModule(this, path, file.content));
+      const { code, sourceMap } = JSON.parse(file.content);
+      this.mutableModules.set(path, new TranspiledModule(this, path, code, sourceMap));
     });
 
     this.transpileCacheChanges = transpileCache.db
@@ -70,10 +71,11 @@ export class EngineBase {
           this.mutableModules.delete(change.id);
         } else {
           const current = this.mutableModules.get(change.id);
-          if (current !== undefined) {
+          if (current !== undefined && current instanceof TranspiledModule) {
             current.clearExports();
           }
-          this.mutableModules.set(change.id, new TranspiledModule(this, change.id, change.doc.content));
+          const { code, sourceMap } = JSON.parse(change.doc.content);
+          this.mutableModules.set(change.id, new TranspiledModule(this, change.id, code, sourceMap));
         }
       });
   }
