@@ -14,6 +14,7 @@
     "@babel/standalone": "^7.1.0",
     "@neo-one/client": "^1.0.0-preview.1",
     "@neo-one/client-full": "^1.0.0-preview.1",
+    "@neo-one/client-switch": "^1.0.0-preview.1",
     "@neo-one/local-browser": "^1.0.0-preview.1",
     "@neo-one/local-browser-worker": "^1.0.0-preview.1",
     "@neo-one/node-browser": "^1.0.0-preview.1",

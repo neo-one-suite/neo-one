@@ -39,7 +39,7 @@ export interface TranspileResult {
 export const transpile = (path: string, value: string): TranspileResult => {
   initialize();
 
-  const { code: codeIn, sourceMap } = Babel.transform(value, {
+  const { code: codeIn, map } = Babel.transform(value, {
     cwd: '/',
     filename: path,
     sourceMaps: 'both',
@@ -56,5 +56,5 @@ export const transpile = (path: string, value: string): TranspileResult => {
   const sourceURL = `//# sourceURL=${location.origin}${path}`;
   const code = `${codeIn}\n${sourceURL}`;
 
-  return { code, sourceMap };
+  return { code, sourceMap: map };
 };

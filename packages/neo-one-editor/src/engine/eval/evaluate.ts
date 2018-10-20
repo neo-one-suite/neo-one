@@ -16,14 +16,10 @@ export const evaluate = (engine: EngineBase, mod: TranspiledModule, useEval = fa
   const params = ['require', 'module', 'exports'].concat(Object.keys(globals));
   const args = [require, module, module.exports, ...Object.values(globals)];
   try {
-    if (useEval) {
-      const evalCode = `(function evaluate(${params.join(', ')}) { ${code}\n})`;
-      // tslint:disable-next-line ban-comma-operator
-      (0, eval)(evalCode).apply(_self, args);
-    } else {
-      const func = new Function(...params.concat([code]));
-      func(...args);
-    }
+    const evalCode = `(function evaluate(${params.join(', ')}) { ${code}\n})`;
+    // tslint:disable-next-line ban-comma-operator
+    (0, eval)(evalCode).apply(_self, args);
+    // ^ makes eval run in global scope
   } catch (e) {
     let error = e;
     if (typeof e === 'string') {

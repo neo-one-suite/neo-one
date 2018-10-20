@@ -16,6 +16,7 @@ import { makeDescribe } from 'jest-circus/build/utils';
 import expect from 'jest-matchers';
 // @ts-ignore
 import jestMock from 'jest-mock';
+import { formatError } from '../../error';
 import { Test, TestRunnerCallbacks } from '../../types';
 import { Engine } from '../Engine';
 import { ModuleBase } from '../ModuleBase';
@@ -114,7 +115,7 @@ interface TestEventHandler {
   readonly handleTestEvent: (event: JestEvent) => void;
 }
 
-const createHandleTestEvent = (test: ModuleBase, callbacks: TestRunnerCallbacks) => {
+const createHandleTestEvent = (engine: Engine, test: ModuleBase, callbacks: TestRunnerCallbacks) => {
   let paths: ReadonlyArray<string> = [];
   let blockIndices: ReadonlyArray<number> = [];
   let tests: ReadonlyArray<Test> = [];
@@ -214,15 +215,19 @@ const createHandleTestEvent = (test: ModuleBase, callbacks: TestRunnerCallbacks)
           });
           break;
         case 'test_fn_failure':
-          callbacks.onUpdateTest(test.path, {
-            name: getTestName(event.test),
-            status: 'fail',
-            duration: Date.now() - now,
-            error:
-              event.test.errors[0][0].stack === undefined
-                ? event.test.errors[0][0].toString()
-                : event.test.errors[0][0].stack,
-          });
+          formatError(engine, event.test.errors[0][0])
+            .then((err) => {
+              callbacks.onUpdateTest(test.path, {
+                name: getTestName(event.test),
+                status: 'fail',
+                duration: Date.now() - now,
+                error: err,
+              });
+            })
+            .catch((err) => {
+              // tslint:disable-next-line no-console
+              console.error(err);
+            });
           break;
         case 'add_hook':
         case 'hook_start':
@@ -283,7 +288,11 @@ export class TestRunner {
     const test = this.engine.modules.get(path);
 
     if (test !== undefined) {
-      await runTestsSerially(test, createHandleTestEvent(test, this.callbacks), this.callbacks.setTestsRunning);
+      await runTestsSerially(
+        test,
+        createHandleTestEvent(this.engine, test, this.callbacks),
+        this.callbacks.setTestsRunning,
+      );
     }
   }
 

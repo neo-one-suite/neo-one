@@ -119,9 +119,14 @@ export class EngineBase {
     return this.getModule(resolvedPath);
   }
 
-  private getModule(pathIn: string, normalized = false): ModuleBase {
+  public tryGetModule(pathIn: string, normalized = false): ModuleBase | undefined {
     const path = normalized ? pathIn : normalizePath(pathIn);
-    const mod = this.mutableModules.get(path);
+
+    return this.mutableModules.get(path);
+  }
+
+  private getModule(path: string, normalized = false): ModuleBase {
+    const mod = this.tryGetModule(path, normalized);
     if (mod === undefined) {
       throw new ModuleNotFoundError(path);
     }
