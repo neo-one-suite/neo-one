@@ -1,6 +1,9 @@
-import { normalizePath, PouchDBFileSystem, PouchDBFileSystemDoc } from '@neo-one/local-browser';
+import { normalizePath, PouchDBFileSystem } from '@neo-one/local-browser';
+import { mergeScanLatest } from '@neo-one/utils';
 import { comlink } from '@neo-one/worker';
-import { EditorFile } from '../editor';
+import { Subject, Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { EditorFile, TextRange } from '../editor';
 import { EngineContentFile, EngineContentFiles, TestRunnerCallbacks } from '../types';
 import { getFileType } from '../utils';
 import { EngineContext } from './createEngineContext';
@@ -10,17 +13,28 @@ import { TestRunner } from './test';
 import { Transpiler, transpilerManager } from './transpile';
 import { RegisterPreviewEngineResult } from './types';
 
+export interface EditorCallbacks {
+  readonly openFile: (file: EditorFile, range?: TextRange) => void;
+}
+
 export interface EngineCreateOptions {
   readonly context: EngineContext;
   readonly initialFiles: EngineContentFiles;
+  readonly editorCallbacks: EditorCallbacks;
   readonly testRunnerCallbacks: TestRunnerCallbacks;
 }
 
 interface EngineOptions {
   readonly context: EngineContext;
   readonly initialFiles: Map<string, EngineContentFile>;
-  readonly fsChanges: PouchDB.Core.Changes<PouchDBFileSystemDoc>;
+  readonly fsSubscription: Subscription;
+  readonly editorCallbacks: EditorCallbacks;
   readonly testRunnerCallbacks: TestRunnerCallbacks;
+  readonly buildErrors$: Subject<string>;
+}
+
+interface RegisterPreviewEngineOptions {
+  readonly onBuildError: (error: string) => Promise<void>;
 }
 
 const maybeTranspile = async (
@@ -38,7 +52,12 @@ const maybeTranspile = async (
 };
 
 export class Engine extends EngineBase {
-  public static async create({ context, initialFiles, testRunnerCallbacks }: EngineCreateOptions): Promise<Engine> {
+  public static async create({
+    context,
+    initialFiles,
+    editorCallbacks,
+    testRunnerCallbacks,
+  }: EngineCreateOptions): Promise<Engine> {
     await Promise.all(
       initialFiles.map(async (file) => {
         try {
@@ -49,38 +68,48 @@ export class Engine extends EngineBase {
       }),
     );
 
-    const [fsChanges, transpilePromises] = await transpilerManager.withInstance<
-      [PouchDB.Core.Changes<PouchDBFileSystemDoc>, Array<Promise<void>>]
+    const buildErrors$ = new Subject<string>();
+    const [fsSubscription, transpilePromises] = await transpilerManager.withInstance<
+      [Subscription, Array<Promise<void>>]
     >(async (transpiler) => {
       const mutableTranspilePromises: Array<Promise<void>> = [];
       context.fs.files.forEach((file, path) => {
         mutableTranspilePromises.push(maybeTranspile(transpiler, context.transpileCache, path, file.content));
       });
-      const fsChangesInner = context.fs.db
-        .changes({ since: 'now', live: true, include_docs: true })
-        .on('change', (change) => {
-          if (change.doc === undefined) {
-            context.transpileCache.removeFile(change.id).catch((error) => {
-              // tslint:disable-next-line no-console
-              console.error(error);
-            });
-          } else {
-            const doc = change.doc;
-            transpilerManager
-              .withInstance(async (transpilerInner) => {
-                await maybeTranspile(transpilerInner, context.transpileCache, change.id, doc.content);
-              })
-              .catch((error) => {
-                // tslint:disable-next-line no-console
-                console.error(error);
+      const fsSubscriptionInner = context.fs
+        .bufferedChanges$(500)
+        .pipe(
+          mergeScanLatest(async (_acc, changes) => {
+            try {
+              await transpilerManager.withInstance(async (transpilerInner) => {
+                await Promise.all(
+                  changes.map(async (change) => {
+                    if (change.doc === undefined) {
+                      context.transpileCache.removeFile(change.id).catch((error) => {
+                        // tslint:disable-next-line no-console
+                        console.error(error);
+                      });
+                    } else {
+                      await maybeTranspile(transpilerInner, context.transpileCache, change.id, change.doc.content);
+                    }
+                  }),
+                );
               });
-          }
-        });
+            } catch (error) {
+              buildErrors$.next(error.message);
+            }
+          }),
+        )
+        .subscribe();
 
-      return [fsChangesInner, mutableTranspilePromises];
+      return [fsSubscriptionInner, mutableTranspilePromises];
     });
 
-    await Promise.all(transpilePromises);
+    try {
+      await Promise.all(transpilePromises);
+    } catch (error) {
+      buildErrors$.next(error.message);
+    }
 
     if (context.openFiles$.getValue().length === 0) {
       context.openFiles$.next(initialFiles.filter((file) => file.open).map((file) => file.path));
@@ -90,15 +119,31 @@ export class Engine extends EngineBase {
       initialFilesMap.set(file.path, file);
     });
 
-    return new Engine({ context, initialFiles: initialFilesMap, testRunnerCallbacks, fsChanges });
+    return new Engine({
+      context,
+      initialFiles: initialFilesMap,
+      editorCallbacks,
+      testRunnerCallbacks,
+      fsSubscription,
+      buildErrors$,
+    });
   }
 
   public readonly context: EngineContext;
   private readonly initialFiles: Map<string, EngineContentFile>;
+  private readonly editorCallbacks: EditorCallbacks;
   private readonly testRunner: TestRunner;
-  private readonly fsChanges: PouchDB.Core.Changes<PouchDBFileSystemDoc>;
+  private readonly fsSubscription: Subscription;
+  private readonly buildErrors$: Subject<string>;
 
-  private constructor({ context, initialFiles, testRunnerCallbacks, fsChanges }: EngineOptions) {
+  private constructor({
+    context,
+    initialFiles,
+    editorCallbacks,
+    testRunnerCallbacks,
+    fsSubscription,
+    buildErrors$,
+  }: EngineOptions) {
     super({
       fs: context.fs,
       transpileCache: context.transpileCache,
@@ -107,13 +152,15 @@ export class Engine extends EngineBase {
     });
     this.context = context;
     this.initialFiles = initialFiles;
+    this.editorCallbacks = editorCallbacks;
     this.testRunner = new TestRunner(this, testRunnerCallbacks);
-    this.fsChanges = fsChanges;
+    this.fsSubscription = fsSubscription;
+    this.buildErrors$ = buildErrors$;
   }
 
   public async dispose(): Promise<void> {
     await super.dispose();
-    this.fsChanges.cancel();
+    this.fsSubscription.unsubscribe();
     await this.context.dispose();
   }
 
@@ -123,7 +170,12 @@ export class Engine extends EngineBase {
     await this.context.builderManager.withInstance(async (builder) => builder.build());
   }
 
-  public getFile(path: string): EditorFile {
+  public readonly openFile = (path: string, range?: TextRange): void => {
+    this.editorCallbacks.openFile(this.getFile(path), range);
+  };
+
+  public getFile(pathIn: string): EditorFile {
+    const path = normalizePath(pathIn);
     const initialFile = this.initialFiles.get(path);
 
     return { path, writable: initialFile === undefined ? true : initialFile.writable };
@@ -150,12 +202,24 @@ export class Engine extends EngineBase {
     };
   }
 
-  public async registerPreviewEngine(): Promise<RegisterPreviewEngineResult> {
+  public async registerPreviewEngine({
+    onBuildError,
+  }: RegisterPreviewEngineOptions): Promise<RegisterPreviewEngineResult> {
+    this.fsSubscription.add(
+      this.buildErrors$.pipe(switchMap(async (error) => onBuildError(error))).subscribe({
+        error: (error) => {
+          // tslint:disable-next-line no-console
+          console.error(error);
+        },
+      }),
+    );
+
     return {
       id: this.context.id,
       endpoint: this.context.fileSystemManager.getEndpoint(),
       builderManager: comlink.proxyValue(this.context.builderManager),
       jsonRPCLocalProviderManager: comlink.proxyValue(this.context.jsonRPCLocalProviderManager),
+      openFile: this.openFile,
     };
   }
 }

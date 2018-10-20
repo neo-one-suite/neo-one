@@ -4,7 +4,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Subscription } from 'rxjs';
 import { ReduxStoreProvider } from './containers';
-import { Editor, EditorFile, EditorFiles } from './editor';
+import { Editor, EditorFile, EditorFiles, TextRange } from './editor';
 import {
   appendConsole,
   clearStore as clearStoreBase,
@@ -60,6 +60,7 @@ interface Props extends ExternalProps {
 
 interface State {
   readonly file?: EditorFile;
+  readonly range?: TextRange;
   readonly openFiles: EditorFiles;
   readonly engine?: Engine;
 }
@@ -80,7 +81,7 @@ class FullEditorBase extends React.Component<Props, State> {
   }
 
   public render() {
-    const { engine, file, openFiles } = this.state;
+    const { engine, file, range, openFiles } = this.state;
     const {
       id: _id,
       initialFiles: _initialFiles,
@@ -100,7 +101,7 @@ class FullEditorBase extends React.Component<Props, State> {
       <EditorContext.Provider value={{ engine }}>
         <>
           <TestsPassContainer onTestsPass={onTestsPass} />
-          <Editor file={file} openFiles={openFiles} onSelectFile={this.onSelectFile} {...props} />
+          <Editor file={file} range={range} openFiles={openFiles} onSelectFile={this.onSelectFile} {...props} />
         </>
       </EditorContext.Provider>
     );
@@ -120,7 +121,14 @@ class FullEditorBase extends React.Component<Props, State> {
     clearStore(initialOptions);
     createEngineContext({ id, createPreviewURL })
       .then(async (context) =>
-        Engine.create({ context, initialFiles, testRunnerCallbacks }).then(async (engine) => {
+        Engine.create({
+          context,
+          initialFiles,
+          editorCallbacks: {
+            openFile: this.onSelectFile,
+          },
+          testRunnerCallbacks,
+        }).then(async (engine) => {
           if (this.props.id === id) {
             const openFiles = engine.context.openFiles$.getValue().map((path) => engine.getFile(path));
             this.setState({
@@ -152,8 +160,8 @@ class FullEditorBase extends React.Component<Props, State> {
       });
   }
 
-  private readonly onSelectFile = (file?: EditorFile) => {
-    this.setState({ file });
+  private readonly onSelectFile = (file?: EditorFile, range?: TextRange) => {
+    this.setState({ file, range });
   };
 
   private dispose(): void {

@@ -1,4 +1,8 @@
+import { retryBackoff } from '@neo-one/utils';
+import { Observable, Subscription } from 'rxjs';
+import { buffer, debounceTime, map, share } from 'rxjs/operators';
 import { DataWriter } from '../DataWriter';
+import { createChanges$ } from './createChanges$';
 import { createENOENT, createENOTDIR } from './errors';
 import { FileStat, FileSystem } from './types';
 import { normalizePath } from './utils';
@@ -31,13 +35,21 @@ type Entry = WriteEntry | RemoveEntry;
 export class PouchDBFileSystem implements FileSystem {
   public static async create(db: Database): Promise<PouchDBFileSystem> {
     const mutableFiles: Files = new Map();
-    const changes = db.changes({ since: 'now', live: true, include_docs: true }).on('change', (change) => {
-      if (change.doc === undefined) {
-        mutableFiles.delete(change.id);
-      } else {
-        mutableFiles.set(change.id, { content: change.doc.content, _rev: change.doc._rev });
-      }
-    });
+    const changes$ = createChanges$(db).pipe(
+      retryBackoff(1000),
+      share(),
+    );
+    const subscription = changes$
+      .pipe(
+        map((change) => {
+          if (change.doc === undefined) {
+            mutableFiles.delete(change.id);
+          } else {
+            mutableFiles.set(change.id, { content: change.doc.content, _rev: change.doc._rev });
+          }
+        }),
+      )
+      .subscribe();
 
     const docs = await db.allDocs({ include_docs: true });
     // tslint:disable-next-line no-loop-statement
@@ -47,14 +59,15 @@ export class PouchDBFileSystem implements FileSystem {
       }
     }
 
-    return new PouchDBFileSystem(db, changes, mutableFiles);
+    return new PouchDBFileSystem(db, changes$, subscription, mutableFiles);
   }
 
   private readonly writer: DataWriter<string, Entry, PouchDB.Core.Response>;
 
   private constructor(
     public readonly db: Database,
-    public readonly changes: PouchDB.Core.Changes<PouchDBFileSystemDoc>,
+    public readonly changes$: Observable<PouchDB.Core.ChangesResponseChange<PouchDBFileSystemDoc>>,
+    public readonly subscription: Subscription,
     public readonly files: Files,
   ) {
     this.writer = new DataWriter(async (batch) => {
@@ -89,8 +102,24 @@ export class PouchDBFileSystem implements FileSystem {
     });
   }
 
+  public readonly bufferedChanges$ = (time = 500) =>
+    this.changes$.pipe(
+      buffer(this.changes$.pipe(debounceTime(time))),
+      map((changes) =>
+        Object.values(
+          changes.reduce<{ [id: string]: PouchDB.Core.ChangesResponseChange<PouchDBFileSystemDoc> }>(
+            (acc, change) => ({
+              ...acc,
+              [change.id]: change,
+            }),
+            {},
+          ),
+        ),
+      ),
+    );
+
   public readonly dispose = async () => {
-    this.changes.cancel();
+    this.subscription.unsubscribe();
     await this.db.close();
   };
 

@@ -1,7 +1,6 @@
 import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import * as comlink from './comlink';
-import { setup } from './setup';
 
 interface WorkerEndpoint extends comlink.Endpoint {
   readonly close: () => void;
@@ -98,7 +97,6 @@ export class WorkerManager<T extends WorkerConstructor> {
     private readonly options$: Observable<WorkerOptions<T>>,
     private readonly idleTimeoutMS?: number,
   ) {
-    setup();
     this.createEndpoint = wrapCreateEndpoint(createEndpoint, () => {
       this.mutableLastUsedTime = Date.now();
     });

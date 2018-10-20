@@ -1,10 +1,18 @@
 // tslint:disable no-submodule-imports
-import { Builder, createEndpointPouchDB, OutputMessage, PouchDBFileSystem } from '@neo-one/local-browser';
+import {
+  Builder,
+  createChanges$,
+  createEndpointPouchDB,
+  OutputMessage,
+  PouchDBFileSystem,
+} from '@neo-one/local-browser';
 import { createBuilderManager, createFileSystemManager, FileSystemManager } from '@neo-one/local-browser-worker';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { createJSONRPCLocalProviderManager } from '@neo-one/node-browser-worker';
+import { retryBackoff } from '@neo-one/utils/src';
 import { WorkerManager } from '@neo-one/worker';
 import { BehaviorSubject, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { createFileSystem, createTranspileCache, getFileSystemDBID } from './create';
 import { initializeFileSystem } from './initializeFileSystem';
 
@@ -86,11 +94,16 @@ export const createEngineContext = async ({
   ]);
 
   let meta = await handleMeta(metaDB, fs);
-  const metaChanges = metaDB.changes({ since: 'now', live: true, include_docs: true }).on('change', (change) => {
-    if (change.id === META_KEY && change.doc !== undefined) {
-      meta = { doc: change.doc, _rev: change.doc._rev };
-    }
-  });
+  const metaSubscription = createChanges$(metaDB)
+    .pipe(
+      retryBackoff(1000),
+      map((change) => {
+        if (change.id === META_KEY && change.doc !== undefined) {
+          meta = { doc: change.doc, _rev: change.doc._rev };
+        }
+      }),
+    )
+    .subscribe();
 
   const openFiles$ = new BehaviorSubject<Files>(meta.doc.openFiles);
   const openFilesSubscription = openFiles$.subscribe({
@@ -122,7 +135,7 @@ export const createEngineContext = async ({
     jsonRPCLocalProviderManager,
     createPreviewURL,
     dispose: async () => {
-      metaChanges.cancel();
+      metaSubscription.unsubscribe();
       openFilesSubscription.unsubscribe();
       await Promise.all([fs.dispose(), transpileCache.dispose()]);
     },

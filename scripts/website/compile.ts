@@ -9,7 +9,7 @@ import serve from 'webpack-serve';
 import yargs from 'yargs';
 import { createKillProcess } from './createKillProcess';
 import { Bundle } from './types';
-import { preview, workers } from './webpack';
+import { overlay, preview, workers } from './webpack';
 
 yargs.describe('watch', 'Run in watch mode.').default('watch', false);
 yargs.describe('bundle', 'Bundle to compile.').default('bundle', 'react-static');
@@ -19,6 +19,7 @@ const createDispose = (watcher: webpack.Compiler.Watching): (() => Promise<void>
 const watchConfig = (config: webpack.Configuration): (() => Promise<void>) =>
   createDispose(webpack(config).watch({}, () => undefined));
 const watchWorkers = () => watchConfig(workers({ stage: 'dev' }));
+const watchOverlay = () => watchConfig(overlay({ stage: 'dev' }));
 const watchPreview = async () => {
   const webpackConfig = preview({ stage: 'dev' });
 
@@ -75,6 +76,7 @@ const runCompiler = async ({ compiler }: { readonly compiler: webpack.Compiler }
 const compileConfig = async (config: webpack.Configuration) => runCompiler({ compiler: webpack(config) });
 const compilePreview = async () => compileConfig(preview({ stage: 'prod' }));
 const compileWorkers = async () => compileConfig(workers({ stage: 'prod' }));
+const compileOverlay = async () => compileConfig(overlay({ stage: 'prod' }));
 
 const startReactStatic = () => {
   const proc = execa('react-static', ['start']);
@@ -93,6 +95,8 @@ const createWatch = async (bundle: Bundle) => {
       return watchWorkers();
     case 'preview':
       return watchPreview();
+    case 'overlay':
+      return watchOverlay();
     default:
       throw new Error(`Unknown bundle: ${bundle}`);
   }
@@ -104,6 +108,8 @@ const compile = async (bundle: Bundle) => {
       return compileWorkers();
     case 'preview':
       return compilePreview();
+    case 'overlay':
+      return compileOverlay();
     default:
       throw new Error(`Unknown bundle: ${bundle}`);
   }

@@ -11,8 +11,8 @@ import { PouchDBFileSystem, PouchDBFileSystemDoc } from './PouchDBFileSystem';
 export const createEndpointPouchDB = <Doc extends {}>(
   dbID: string,
   endpoint: comlink.Endpoint | ServiceWorkerContainer,
-) =>
-  new PouchDB<Doc>(dbID, {
+) => {
+  const db = new PouchDB<Doc>(dbID, {
     adapter: 'worker',
     worker: () => {
       // tslint:disable-next-line no-any
@@ -25,6 +25,10 @@ export const createEndpointPouchDB = <Doc extends {}>(
     },
     // tslint:disable-next-line no-any
   } as any);
+  db.setMaxListeners(20);
+
+  return db;
+};
 
 export const createPouchDBFileSystem = async (
   dbID: string,

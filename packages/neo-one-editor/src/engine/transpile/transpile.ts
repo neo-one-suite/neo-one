@@ -42,6 +42,7 @@ export const transpile = (path: string, value: string): TranspileResult => {
   const { code: codeIn, map } = Babel.transform(value, {
     cwd: '/',
     filename: path,
+    sourceFileName: path,
     sourceMaps: 'both',
     presets: ['@babel/preset-react'],
     plugins: [

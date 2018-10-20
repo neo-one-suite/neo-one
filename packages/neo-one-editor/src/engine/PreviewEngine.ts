@@ -1,5 +1,7 @@
 import { comlink } from '@neo-one/worker';
 import _ from 'lodash';
+import { map } from 'rxjs/operators';
+import * as ReactErrorOverlay from '../error/ReactErrorOverlay';
 import { createFileSystem, createTranspileCache } from './create';
 import { Engine } from './Engine';
 import { EngineBase } from './EngineBase';
@@ -23,7 +25,22 @@ export class PreviewEngine extends EngineBase {
         endpoint,
         builderManager,
         jsonRPCLocalProviderManager,
-      }: RegisterPreviewEngineResult = await engine.registerPreviewEngine();
+        openFile,
+      }: RegisterPreviewEngineResult = await engine.registerPreviewEngine({
+        onBuildError: async (error) => {
+          ReactErrorOverlay.reportBuildError(error);
+        },
+      });
+      ReactErrorOverlay.setEditorHandler(({ fileName, lineNumber, colNumber }) => {
+        const col = colNumber === undefined ? 1 : colNumber;
+
+        openFile(fileName, {
+          startLineNumber: lineNumber,
+          endLineNumber: lineNumber,
+          startColumn: col,
+          endColumn: col,
+        });
+      });
       const [fs, transpileCache] = await Promise.all([
         createFileSystem(id, endpoint),
         createTranspileCache(id, endpoint),
@@ -35,26 +52,35 @@ export class PreviewEngine extends EngineBase {
         jsonRPCLocalProviderManager,
       });
       mutablePreviewEngine = previewEngine;
-      transpileCache.changes.on('change', () => {
-        previewEngine.renderJS();
-      });
+      transpileCache.changes$
+        .pipe(
+          map(() => {
+            previewEngine.renderJS();
+          }),
+        )
+        .subscribe();
     }
 
     return mutablePreviewEngine;
   }
 
   public readonly renderJS = _.debounce((): void => {
+    ReactErrorOverlay.dismissBuildError();
+    ReactErrorOverlay.dismissRuntimeErrors();
     try {
       const entryModule = this.findEntryModule();
       entryModule.evaluate({ force: true, useEval: true });
     } catch (error) {
-      // tslint:disable-next-line no-console
-      console.error(error);
+      // Rethrow with a clean stack to allow React overlay to pick it up.
+      setTimeout(() => {
+        throw error;
+      });
     }
   }, 500);
 
   public start(): void {
     this.renderHTML();
+    ReactErrorOverlay.startReportingRuntimeErrors(this, {});
     this.renderJS();
   }
 

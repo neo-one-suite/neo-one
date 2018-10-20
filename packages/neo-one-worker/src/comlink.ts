@@ -133,9 +133,25 @@ const throwTransferHandler = {
   },
 };
 
+const functionHandler = {
+  canHandle(obj: any): boolean {
+    return obj instanceof Proxy || obj instanceof Function;
+  },
+  serialize(obj: any): any {
+    const { port1, port2 } = new MessageChannel();
+    expose(obj, port1);
+
+    return port2;
+  },
+  deserialize(obj: any): any {
+    return proxy(obj as Endpoint);
+  },
+};
+
 export const transferHandlers: Map<string, TransferHandler> = new Map([
   ['PROXY', proxyTransferHandler],
   ['THROW', throwTransferHandler],
+  ['ANY_FUNCTION', functionHandler],
 ]);
 
 let pingPongMessageCounter: number = 0;

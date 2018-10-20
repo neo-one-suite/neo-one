@@ -2,7 +2,6 @@
 import '@babel/polyfill';
 
 import { Builder } from '@neo-one/local-browser';
-import { comlink, setup } from '@neo-one/worker';
+import { comlink } from '@neo-one/worker';
 
-setup();
 comlink.expose(Builder, self);

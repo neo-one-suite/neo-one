@@ -1,2 +1,2 @@
 export { Editor } from './Editor';
-export { EditorFile, EditorFiles } from './types';
+export { EditorFile, EditorFiles, TextRange } from './types';

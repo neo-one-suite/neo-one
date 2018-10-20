@@ -12,6 +12,7 @@ import { TPromise } from 'monaco-editor/esm/vs/base/common/winjs.base';
 import ts from 'typescript';
 
 import IWorkerContext = monaco.worker.IWorkerContext;
+import { map } from 'rxjs/operators';
 
 // tslint:disable-next-line no-any
 type Promise<T1 = any, T2 = any> = monaco.Promise<T1, T2>;
@@ -68,9 +69,13 @@ export class TypeScriptWorker implements ts.LanguageServiceHost {
     this.initPromise = Promise.wrap(undefined);
     this.versions = new Map();
 
-    this.fs.db.changes({ since: 'now', live: true, include_docs: true }).on('change', (change) => {
-      this.versions.set(change.id, `${change.seq}`);
-    });
+    this.fs.changes$
+      .pipe(
+        map((change) => {
+          this.versions.set(change.id, `${change.seq}`);
+        }),
+      )
+      .subscribe();
   }
 
   public getCompilationSettings(): ts.CompilerOptions {

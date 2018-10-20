@@ -37,7 +37,14 @@ export async function map(
   });
   await Promise.all(
     mutableFiles.map(async (fileName) => {
-      const mod = engine.tryGetModule(fileName.replace(location.origin, ''));
+      const mod = engine.tryGetModule(
+        fileName.startsWith('http')
+          ? fileName
+              .split('/')
+              .slice(3)
+              .join('/')
+          : fileName,
+      );
       if (mod !== undefined && mod instanceof TranspiledModule) {
         const consumer = await new SourceMapConsumer(mod.sourceMap);
         const sourceMap = new SourceMap(consumer);

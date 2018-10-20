@@ -14,6 +14,7 @@ import Thenable = monaco.Thenable;
 import Promise = monaco.Promise;
 import CancellationToken = monaco.CancellationToken;
 import IDisposable = monaco.IDisposable;
+import { debounceTime, map } from 'rxjs/operators';
 
 export abstract class Adapter {
   constructor(protected _worker: (first: Uri, ...more: Uri[]) => Promise<TypeScriptWorker>) {}
@@ -94,11 +95,16 @@ export class DiagnosticsAdapter extends Adapter {
       }
     }, 500);
 
-    const changes = fs.db.changes({ since: 'now', live: true, include_docs: true }).on('change', triggerAllDiagnostics);
+    const subscription = fs.changes$
+      .pipe(
+        debounceTime(500),
+        map(triggerAllDiagnostics),
+      )
+      .subscribe();
 
     this._disposables.push({
       dispose() {
-        changes.cancel();
+        subscription.unsubscribe();
       },
     });
 

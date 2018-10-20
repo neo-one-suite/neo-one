@@ -1,4 +1,4 @@
-import { Builder, dirname, normalizePath, PouchDBFileSystem, PouchDBFileSystemDoc } from '@neo-one/local-browser';
+import { Builder, dirname, normalizePath, PouchDBFileSystem } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { WorkerManager } from '@neo-one/worker';
 import * as bignumber from 'bignumber.js';
@@ -36,7 +36,7 @@ const EMPTY_MODULE_PATH = '$empty';
 export class EngineBase {
   protected readonly mutableModules: Modules;
   protected readonly fs: PouchDBFileSystem;
-  private readonly transpileCacheChanges: PouchDB.Core.Changes<PouchDBFileSystemDoc>;
+  private readonly subscription: rxjs.Subscription;
   // tslint:disable-next-line readonly-keyword
   private readonly mutableCachedPaths: { [currentPath: string]: { [path: string]: string } } = {};
 
@@ -64,24 +64,26 @@ export class EngineBase {
       this.mutableModules.set(path, new TranspiledModule(this, path, code, sourceMap));
     });
 
-    this.transpileCacheChanges = transpileCache.db
-      .changes({ since: 'now', live: true, include_docs: true })
-      .on('change', (change) => {
-        if (change.doc === undefined) {
-          this.mutableModules.delete(change.id);
-        } else {
-          const current = this.mutableModules.get(change.id);
-          if (current !== undefined && current instanceof TranspiledModule) {
-            current.clearExports();
+    this.subscription = transpileCache.changes$
+      .pipe(
+        rxjsOperators.map((change) => {
+          if (change.doc === undefined) {
+            this.mutableModules.delete(change.id);
+          } else {
+            const current = this.mutableModules.get(change.id);
+            if (current !== undefined && current instanceof TranspiledModule) {
+              current.clearExports();
+            }
+            const { code, sourceMap } = JSON.parse(change.doc.content);
+            this.mutableModules.set(change.id, new TranspiledModule(this, change.id, code, sourceMap));
           }
-          const { code, sourceMap } = JSON.parse(change.doc.content);
-          this.mutableModules.set(change.id, new TranspiledModule(this, change.id, code, sourceMap));
-        }
-      });
+        }),
+      )
+      .subscribe();
   }
 
   public async dispose(): Promise<void> {
-    this.transpileCacheChanges.cancel();
+    this.subscription.unsubscribe();
   }
 
   public get modules(): Map<string, ModuleBase> {
