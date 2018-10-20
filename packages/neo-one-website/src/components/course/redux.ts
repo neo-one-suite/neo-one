@@ -1,6 +1,7 @@
 import { produce, setAutoFreeze } from 'immer';
 import localforage from 'localforage';
-import { createStore } from 'redux';
+import LogRocket from 'logrocket';
+import { applyMiddleware, createStore } from 'redux';
 import { persistReducer, persistStore } from 'redux-persist';
 import actionCreatorFactory from 'typescript-fsa';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
@@ -61,7 +62,10 @@ const storage = localforage.createInstance({
 });
 
 export const configureStore = () => {
-  const store = createStore(persistReducer({ key: 'root', storage }, reducer));
+  const store = createStore(
+    persistReducer({ key: 'root', storage }, reducer),
+    applyMiddleware(LogRocket.reduxMiddleware()),
+  );
   const persistor = persistStore(store);
 
   return { store, persistor };

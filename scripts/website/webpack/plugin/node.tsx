@@ -107,5 +107,34 @@ export const node = () => ({
     );
   },
 
-  Head: ({ meta }: any) => <>{meta.styleComponentsSheet.getStyleElement()}</>,
+  Head: ({ meta }: any) => (
+    <>
+      {meta.styleComponentsSheet.getStyleElement()}
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-92599752-3" />
+      <script>
+        {`
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-92599752-3');
+  gtag('config', 'UA-92599752-3', { 'transport_type': 'beacon'});
+
+  // Feature detects Navigation Timing API support.
+  if (window.performance) {
+    // Gets the number of milliseconds since page load
+    // (and rounds the result since the value must be an integer).
+    var timeSincePageLoad = Math.round(performance.now());
+
+    // Sends the timing event to Google Analytics.
+    gtag('event', 'timing_complete', {
+      'name': 'load',
+      'value': timeSincePageLoad,
+      'event_category': 'JS Dependencies'
+    });
+  }
+  `}
+      </script>
+    </>
+  ),
 });
