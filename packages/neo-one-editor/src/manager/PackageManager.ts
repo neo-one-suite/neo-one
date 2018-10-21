@@ -98,8 +98,7 @@ export class PackageManager {
       const pkg = await fetch(this.getNPMUrl({ name, version, file }));
 
       return pkg.text();
-      // tslint:disable-next-line no-unused
-    } catch (error) {
+    } catch {
       throw new Error(`Could not find module ${name}@${version}`);
     }
   }
@@ -118,14 +117,15 @@ export class PackageManager {
     readonly pkgPath: string;
   }) {
     await Promise.all(
-      Object.entries(packages).map(async ([name, pkg]) => {
-        await this.writeModules({
-          packages: pkg.subDependencies,
-          pkgPath: path.resolve(pkgPath, name, 'node_modules'),
-        });
-
-        return this.writeModule({ name, pkg, pkgPath });
-      }),
+      Object.entries(packages).map(async ([name, pkg]) =>
+        Promise.all([
+          this.writeModules({
+            packages: pkg.subDependencies,
+            pkgPath: path.resolve(pkgPath, name, 'node_modules'),
+          }),
+          this.writeModule({ name, pkg, pkgPath }),
+        ]),
+      ),
     );
   }
 
