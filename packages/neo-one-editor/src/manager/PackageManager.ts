@@ -1,27 +1,27 @@
 import { FileSystem } from '@neo-one/local-browser';
 import { mergeScanLatest } from '@neo-one/utils';
 import fetch from 'cross-fetch';
+import _ from 'lodash';
 import * as path from 'path';
 import { Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { Dependencies, DependencyInfo, PackageJSON, ResolvedDependencies, Resolver } from './Resolver';
 
-const PACKAGE_JSON = 'package.json';
-
 interface FetchPackageInfo {
   readonly name: string;
   readonly version: string;
-  readonly file?: string;
+  readonly suffix?: string;
+}
+
+interface FileInfo {
+  readonly path: string;
+  readonly file: string;
 }
 
 interface Module {
   readonly name: string;
-  readonly fileName: string;
   readonly version: string;
-  readonly dependency: string;
-  readonly packageJSON: string;
-  readonly types?: string;
-  readonly typeFile: string;
+  readonly packageFiles: ReadonlyArray<FileInfo>;
   readonly subDependencies: { readonly [name: string]: Module };
 }
 
@@ -55,7 +55,7 @@ export class PackageManager {
     this.subscription.unsubscribe();
   }
 
-  public async resolveDependencies(dependencies: Dependencies): Promise<ResolvedDependencies> {
+  private async resolveDependencies(dependencies: Dependencies): Promise<ResolvedDependencies> {
     const resolver = new Resolver();
 
     return resolver.resolve(dependencies);
@@ -67,35 +67,62 @@ export class PackageManager {
     return packages.reduce<{ readonly [name: string]: Module }>((acc, pkg) => ({ ...acc, [pkg.name]: pkg }), {});
   }
 
-  private async fetchPackage(depInfo: DependencyInfo): Promise<Module> {
-    let file;
-    if (depInfo.main !== undefined && depInfo.main.includes('.')) {
-      file = depInfo.main;
-    }
-    const [pkg, pkgJSON, types, subPkgs] = await Promise.all([
-      this.downloadDependency({ name: depInfo.name, version: depInfo.version, file }),
-      this.downloadDependency({ name: depInfo.name, version: depInfo.version, file: PACKAGE_JSON }),
-      depInfo.types === undefined
-        ? Promise.resolve(undefined)
-        : this.downloadDependency({ name: depInfo.name, version: depInfo.version, file: depInfo.types }),
-      this.fetchPackages(depInfo.dependencies),
+  private async fetchPackage({ name, version, dependencies }: DependencyInfo): Promise<Module> {
+    const [packageFilePaths, subDependencies] = await Promise.all([
+      this.getAllPackageFiles({ name, version }),
+      this.fetchPackages(dependencies),
     ]);
 
+    const packageFiles = await Promise.all(
+      packageFilePaths.map(async (filePath) => ({
+        path: filePath,
+        file: await this.downloadDependency({ name, version, suffix: filePath }),
+      })),
+    );
+
     return {
-      name: depInfo.name,
-      fileName: file === undefined ? 'index.js' : file,
-      version: depInfo.version,
-      dependency: pkg,
-      packageJSON: pkgJSON,
-      types,
-      typeFile: depInfo.types === undefined ? 'index.d.ts' : depInfo.types,
-      subDependencies: subPkgs,
+      name,
+      version,
+      packageFiles,
+      subDependencies,
     };
   }
 
-  private async downloadDependency({ name, version, file }: FetchPackageInfo) {
+  private async getAllPackageFiles({ name, version, suffix }: FetchPackageInfo): Promise<ReadonlyArray<string>> {
+    const rootDirList = await this.getDirectoryList({ name, version, suffix });
+
+    const packageFiles = await Promise.all(
+      rootDirList.map(async (fileOrDir: string) => {
+        if (fileOrDir.includes('.') || fileOrDir === 'LICENSE') {
+          return fileOrDir;
+        }
+
+        return this.getAllPackageFiles({ name, version, suffix: `${fileOrDir}/` });
+      }),
+    );
+
+    return _.flatten(packageFiles);
+  }
+
+  private async getDirectoryList({ name, version, suffix }: FetchPackageInfo): Promise<ReadonlyArray<string>> {
+    const res = await fetch(this.getNPMUrl({ name, version, suffix }));
+    const htmlDir = await res.text();
+
+    return htmlDir
+      .split('\n')
+      .filter((line) => line.includes('</a></td>'))
+      .map((line) => {
+        const match = line.match(/[^>\]]+(?=<)/g);
+
+        return match === null ? '' : match[1];
+      })
+      .filter((line) => line !== '' && line !== '..')
+      .map((line) => (suffix === undefined ? line : `${suffix}${line}`));
+  }
+
+  private async downloadDependency({ name, version, suffix }: FetchPackageInfo) {
     try {
-      const pkg = await fetch(this.getNPMUrl({ name, version, file }));
+      const pkg = await fetch(this.getNPMUrl({ name, version, suffix }));
 
       return pkg.text();
     } catch {
@@ -103,10 +130,10 @@ export class PackageManager {
     }
   }
 
-  private getNPMUrl({ name, version, file }: FetchPackageInfo): string {
-    const urlBase = `https://cdn.jsdelivr.net/npm/${name}@${version}`;
+  private getNPMUrl({ name, version, suffix }: FetchPackageInfo): string {
+    const urlBase = `https://cdn.jsdelivr.net/npm/${name}@${version}/`;
 
-    return file === undefined ? urlBase : `${urlBase}/${file}`;
+    return suffix === undefined ? urlBase : `${urlBase}/${suffix}`;
   }
 
   private async writeModules({
@@ -138,12 +165,8 @@ export class PackageManager {
     readonly pkg: Module;
     readonly pkgPath: string;
   }) {
-    await Promise.all([
-      this.fs.writeFile(path.resolve(pkgPath, name, pkg.fileName), pkg.dependency),
-      this.fs.writeFile(path.resolve(pkgPath, name, 'package.json'), pkg.packageJSON),
-      pkg.types === undefined
-        ? Promise.resolve(undefined)
-        : this.fs.writeFile(path.resolve(pkgPath, name, pkg.typeFile), pkg.types),
-    ]);
+    await Promise.all(
+      pkg.packageFiles.map(async (file) => this.fs.writeFile(path.resolve(pkgPath, name, file.path), file.file)),
+    );
   }
 }

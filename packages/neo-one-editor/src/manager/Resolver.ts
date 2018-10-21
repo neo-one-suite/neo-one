@@ -27,8 +27,6 @@ export interface PackageJSON {
 export interface DependencyInfo {
   readonly name: string;
   readonly version: string;
-  readonly main?: string;
-  readonly types?: string;
   readonly dependencies: ResolvedDependencies;
 }
 
@@ -108,8 +106,6 @@ export class Resolver {
     this.graph.setNode(name, {
       name,
       version,
-      main: versionPackageJson.main,
-      types: versionPackageJson.types === undefined ? versionPackageJson.typings : versionPackageJson.types,
     });
     this.graph.setEdge(ROOT_NODE, name);
 
@@ -128,16 +124,12 @@ export class Resolver {
       this.graph.setNode(fullName, {
         name,
         version,
-        main: versionPackageJson.main,
-        types: versionPackageJson.types === undefined ? versionPackageJson.typings : versionPackageJson.types,
       });
       this.graph.setEdge(task.parentNode, fullName);
     }
     this.graph.setNode(name, {
       name,
       version,
-      main: versionPackageJson.main,
-      types: versionPackageJson.types === undefined ? versionPackageJson.typings : versionPackageJson.types,
     });
     this.graph.setEdge(ROOT_NODE, name);
 

@@ -18,7 +18,7 @@ Object {
   },
   "asap": Object {
     "dependencies": Object {},
-    "main": "./asap.js",
+    "main": "asap.js",
     "name": "asap",
     "types": undefined,
     "version": "2.0.6",
@@ -102,7 +102,7 @@ Object {
   },
   "iconv-lite": Object {
     "dependencies": Object {},
-    "main": "./lib/index.js",
+    "main": "lib/index.js",
     "name": "iconv-lite",
     "types": "./lib/index.d.ts",
     "version": "0.4.24",
@@ -214,7 +214,7 @@ Object {
   },
   "rxjs": Object {
     "dependencies": Object {},
-    "main": "./index.js",
+    "main": "index.js",
     "name": "rxjs",
     "types": "./index.d.ts",
     "version": "6.3.3",
@@ -291,7 +291,7 @@ Object {
   },
   "whatwg-fetch": Object {
     "dependencies": Object {},
-    "main": "./dist/fetch.umd.js",
+    "main": "dist/fetch.umd.js",
     "name": "whatwg-fetch",
     "types": undefined,
     "version": "3.0.0",
