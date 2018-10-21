@@ -32,6 +32,9 @@ const package2 = {
 describe('package manager', () => {
   const fs = {
     writeFile: jest.fn(),
+    statSync: jest.fn(),
+    readFileSync: jest.fn(),
+    readdirSync: jest.fn(),
   };
 
   beforeEach(() => {
@@ -41,14 +44,13 @@ describe('package manager', () => {
   test('files written properly', async () => {
     const packageJSON$ = _of(coursePackages);
 
-    // @ts-ignore
     const pkm = new PackageManager({ fs, packageJSON$ });
     await new Promise<void>((resolve) => setTimeout(resolve, 10000));
 
     // tslint:disable-next-line no-array-mutation
     const paths = fs.writeFile.mock.calls.map((call) => call[0]).sort();
     expect(paths).toMatchSnapshot();
-    pkm.cleanup();
+    pkm.dispose();
   });
 
   test('node_modules updated', async () => {
@@ -57,13 +59,12 @@ describe('package manager', () => {
       map((idx) => (idx === 0 ? coursePackages : package2)),
     );
 
-    // @ts-ignore
     const pkm = new PackageManager({ fs, packageJSON$ });
     await new Promise<void>((resolve) => setTimeout(resolve, 15000));
 
     // tslint:disable-next-line no-array-mutation
     const paths = fs.writeFile.mock.calls.map((call) => call[0]).sort();
     expect(paths).toMatchSnapshot();
-    pkm.cleanup();
+    pkm.dispose();
   });
 });

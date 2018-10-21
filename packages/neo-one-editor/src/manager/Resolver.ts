@@ -5,7 +5,7 @@ import npa from 'npm-package-arg';
 import semver from 'semver';
 
 const NPM_REGISTRY_URL = 'https://registry.npmjs.org';
-const ROOT_NODE = 'root';
+const ROOT_NODE = 'root$';
 
 export interface Dependencies {
   readonly [name: string]: string;
@@ -47,6 +47,7 @@ interface Task {
   readonly parentNode: string;
 }
 
+// Resolves package.json to hoisted top level dependencies. Anything that can't be unambigiously hoisted is kept at the level of the package.json that required it.
 export class Resolver {
   private readonly graph: Graph;
 
@@ -69,9 +70,8 @@ export class Resolver {
 
     try {
       const res = await fetch(`${NPM_REGISTRY_URL}/${escapedName}`);
-      const txt = await res.text();
 
-      return JSON.parse(txt);
+      return res.json();
     } catch (error) {
       throw new Error(`Failed to fetch ${name} from npm registry. ${error}`);
     }
