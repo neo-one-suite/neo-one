@@ -10,9 +10,7 @@ export const jsLoader = (options: { readonly stage: Stage; readonly bundle: Bund
     /@reactivex\/ix-esnext-esm/,
     /react-icons/,
   ],
-  use: [
-    options.stage === 'prod' ? undefined : cacheLoader({ ...options, name: 'js' }),
-    'thread-loader',
-    babelLoader(options),
-  ].filter((value) => value !== undefined),
+  use: [cacheLoader({ ...options, name: 'js' }), 'thread-loader', babelLoader(options)].filter(
+    (value) => value !== undefined,
+  ),
 });

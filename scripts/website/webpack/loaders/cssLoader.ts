@@ -35,16 +35,17 @@ function initCSSLoader(stage: Stage) {
 
 export const cssLoader = ({ stage }: { readonly stage: Stage; readonly bundle: Bundle }) => {
   const loaders = initCSSLoader(stage);
-  if (stage === 'dev') {
-    return {
-      test: /\.css$/,
-      loader: ['style-loader', ...loaders],
-    };
-  }
   if (stage === 'node') {
     return {
       test: /\.css$/,
       loader: loaders,
+    };
+  }
+
+  if (stage === 'dev' || process.env.NEO_ONE_CACHE === 'true') {
+    return {
+      test: /\.css$/,
+      loader: ['style-loader', ...loaders],
     };
   }
 

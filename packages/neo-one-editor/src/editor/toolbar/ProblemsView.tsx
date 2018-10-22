@@ -24,7 +24,7 @@ interface Props {
 }
 
 const ProblemsViewBase = ({ consoleProblems, onSelectRange, ...props }: Props) => {
-  const groupedProblems = _.sortBy(Object.entries(consoleProblems), ([path]) => path).filter(
+  const groupedProblems = _.sortBy(Object.entries(consoleProblems), [([path]) => path]).filter(
     (value) => value[1].length > 0,
   );
 
@@ -36,7 +36,7 @@ const ProblemsViewBase = ({ consoleProblems, onSelectRange, ...props }: Props) =
             <ProblemView
               key={path}
               path={path}
-              problems={_.sortBy(problems, (problem) => problem.startLineNumber)}
+              problems={_.sortBy(problems, [(problem) => problem.startLineNumber])}
               onSelectRange={onSelectRange}
             />
           ))}

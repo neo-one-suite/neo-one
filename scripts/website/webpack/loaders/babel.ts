@@ -47,7 +47,7 @@ export const babel = ({
     ].filter((value) => value !== undefined),
   };
 
-  if (!cache || stage === 'prod') {
+  if (!cache || (stage === 'prod' && process.env.NEO_ONE_CACHE !== 'true')) {
     return config;
   }
 

@@ -44,7 +44,7 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
     new WebpackBar({ profile: true }),
   ]
     .concat(
-      stage === 'dev' || stage === 'node'
+      stage === 'dev' || stage === 'node' || process.env.NEO_ONE_CACHE === 'true'
         ? [
             new HardSourceWebpackPlugin({
               cacheDirectory: path.resolve(APP_ROOT_DIR, 'node_modules', '.cache', 'hswp', stage, bundle),
@@ -54,11 +54,17 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
             }),
           ]
         : [
-            new LodashModuleReplacementPlugin(),
             new ExtractCssChunksPlugin({
               filename: '[name].[chunkHash:8].css',
               chunkFilename: '[id].[chunkHash:8].css',
             }),
+          ],
+    )
+    .concat(
+      stage === 'dev' || stage === 'node'
+        ? []
+        : [
+            new LodashModuleReplacementPlugin(),
             new CompressionPlugin({
               filename: '[path].gz[query]',
               algorithm: 'gzip',
