@@ -23,5 +23,6 @@ export * from './ToastsContainer';
 export * from './Tooltip';
 export * from './WalletSelectorBase';
 export * from './WithAddError';
+export * from './pure';
 export * from './theme';
 export * from './types';

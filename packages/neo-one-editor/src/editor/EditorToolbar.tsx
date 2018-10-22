@@ -45,7 +45,7 @@ interface Props {
 
 const EditorToolbarBase = ({ file, onSelectRange, consoleOpen, ...props }: Props) => (
   <Wrapper {...props}>
-    <Hidden visible={consoleOpen}>
+    <Hidden visible={consoleOpen} unmount>
       <Console onSelectRange={onSelectRange} />
     </Hidden>
     <ToolbarWrapper>

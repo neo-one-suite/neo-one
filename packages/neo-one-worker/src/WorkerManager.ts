@@ -47,8 +47,8 @@ export class WorkerManager<T extends WorkerConstructor> {
     if (this.subscription !== undefined) {
       this.subscription.unsubscribe();
     }
-    this.mutableDisposables.forEach(({ dispose }) => {
-      dispose();
+    this.mutableDisposables.forEach((disposable) => {
+      disposable.dispose();
     });
     this.stopWorker();
   }

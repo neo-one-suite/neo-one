@@ -56,7 +56,7 @@ const DocsFooterBase = ({ selected, complete, ...props }: Props) => (
   <Hidden.Container>
     {(hidden) => (
       <Wrapper>
-        <StyledHidden {...hidden}>
+        <StyledHidden {...hidden} unmount>
           <DocsSolution selected={selected} />
         </StyledHidden>
         <FooterWrapper {...props}>

@@ -97,8 +97,8 @@ export class SingleWorkerManager<T extends WorkerConstructor> {
       this.mutableDisposed = true;
       clearInterval(this.idleCheckInterval);
       this.endpoint.close();
-      this.disposables.forEach(({ dispose }) => {
-        dispose();
+      this.disposables.forEach((disposable) => {
+        disposable.dispose();
       });
       this.onDispose(this);
     }
