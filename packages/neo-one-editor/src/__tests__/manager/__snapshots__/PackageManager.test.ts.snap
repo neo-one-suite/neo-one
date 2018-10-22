@@ -3,6 +3,7 @@
 exports[`package manager files written properly 1`] = `
 Array [
   "/node_modules/bignumber.js/CHANGELOG.md",
+  "/node_modules/bignumber.js/LICENCE",
   "/node_modules/bignumber.js/README.md",
   "/node_modules/bignumber.js/bignumber.d.ts",
   "/node_modules/bignumber.js/bignumber.js",
@@ -26,6 +27,7 @@ Array [
   "/node_modules/loose-envify/package.json",
   "/node_modules/loose-envify/replace.js",
   "/node_modules/object-assign/index.js",
+  "/node_modules/object-assign/license",
   "/node_modules/object-assign/package.json",
   "/node_modules/object-assign/readme.md",
   "/node_modules/prop-types/CHANGELOG.md",
@@ -119,6 +121,8 @@ exports[`package manager node_modules updated 1`] = `
 Array [
   "/node_modules/bignumber.js/CHANGELOG.md",
   "/node_modules/bignumber.js/CHANGELOG.md",
+  "/node_modules/bignumber.js/LICENCE",
+  "/node_modules/bignumber.js/LICENCE",
   "/node_modules/bignumber.js/README.md",
   "/node_modules/bignumber.js/README.md",
   "/node_modules/bignumber.js/bignumber.d.ts",
@@ -155,10 +159,12 @@ Array [
   "/node_modules/lru-cache/index.js",
   "/node_modules/lru-cache/package.json",
   "/node_modules/object-assign/index.js",
+  "/node_modules/object-assign/license",
   "/node_modules/object-assign/package.json",
   "/node_modules/object-assign/readme.md",
   "/node_modules/onigasm/.gitmodules",
-  "/node_modules/onigasm/.vscode",
+  "/node_modules/onigasm/.vscode/launch.json",
+  "/node_modules/onigasm/.vscode/settings.json",
   "/node_modules/onigasm/LICENSE",
   "/node_modules/onigasm/README.md",
   "/node_modules/onigasm/benchmark.js",
