@@ -178,8 +178,6 @@ export class Builtins {
         return false;
       }
 
-      const typeSymbol = this.getAnyTypeSymbol(name);
-
       if (name === 'Fixed') {
         const fixedTagSymbol = this.getAnyInterfaceSymbol('FixedTag');
         if (symbol === fixedTagSymbol) {
@@ -193,6 +191,8 @@ export class Builtins {
           return true;
         }
       }
+
+      const typeSymbol = this.getAnyTypeSymbol(name);
 
       return symbol === typeSymbol;
     });

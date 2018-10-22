@@ -1,6 +1,7 @@
 import { OutputMessage } from '@neo-one/local-browser';
 import { Loading } from '@neo-one/react-common';
 import * as React from 'react';
+import { cold } from 'react-hot-loader';
 import { connect } from 'react-redux';
 import { Subscription } from 'rxjs';
 import { ReduxStoreProvider } from './containers';
@@ -36,7 +37,8 @@ const TestsPassContainer = connect(selectConsoleTestSuites)(
       ) &&
       onTestsPass !== undefined
     ) {
-      onTestsPass();
+      // Call outside of render stack.
+      setTimeout(onTestsPass);
     }
 
     // tslint:disable-next-line no-null-keyword
@@ -200,8 +202,8 @@ const ConnectedFullEditor = connect(
   }),
 )(FullEditorBase);
 
-export const FullEditor = (props: ExternalProps) => (
+export const FullEditor = cold((props: ExternalProps) => (
   <ReduxStoreProvider createStore={configureStore}>
     <ConnectedFullEditor {...props} />
   </ReduxStoreProvider>
-);
+));

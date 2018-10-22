@@ -1,9 +1,9 @@
 import { Link } from '@neo-one/react-common';
-import { Link as RouterLink } from '@reach/router';
 import * as React from 'react';
 import { as, Box, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { AdjacentInfo } from '../../utils';
+import { RouterLink } from '../RouterLink';
 
 export interface Props {
   readonly adjacent: AdjacentInfo;

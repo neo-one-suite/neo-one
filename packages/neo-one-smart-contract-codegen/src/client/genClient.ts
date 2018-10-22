@@ -53,7 +53,7 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
       .map(({ name, rpcURL }) => `{ network: '${name}', rpcURL: '${rpcURL}' },`)
       .join('\n    ')}
   ];
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     providers.push(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, port: ${httpServerPort} }));
   }
   const provider = new NEOONEProvider(providers);
@@ -62,7 +62,7 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
   const localUserAccountProvider = localUserAccountProviders.find(
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
@@ -147,7 +147,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
       .map(({ name, rpcURL }) => `{ network: '${name}', rpcURL: '${rpcURL}' },`)
       .join('\n    ')}
   ];
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     providers.push(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, port: ${httpServerPort} }));
   }
   const provider = new NEOONEProvider(providers);
@@ -158,7 +158,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {

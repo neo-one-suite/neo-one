@@ -7,7 +7,7 @@ export const createConsoleLogMessages = async (
   sourceMaps: Promise<SourceMaps>,
   options: LogOptions,
 ): Promise<ReadonlyArray<string>> => {
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' && process.env.NEO_ONE_DEV !== 'true') {
     return [];
   }
 

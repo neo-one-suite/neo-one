@@ -37,7 +37,7 @@ import { projectID } from '${getRelativeImport(sourceMapsPath, projectIDPath)}';
 
 let sourceMapsIn = Promise.resolve({});
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
   sourceMapsIn = Promise.resolve().then(async () => {
     const client = new OneClient(${httpServerPort});
     const result = await client.request({
@@ -56,7 +56,7 @@ import { OneClient, SourceMaps } from '@neo-one/client';
 import { projectID } from '${getRelativeImport(sourceMapsPath, projectIDPath)}';
 
 let sourceMapsIn: Promise<SourceMaps> = Promise.resolve({});
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
   sourceMapsIn = Promise.resolve().then(async () => {
     const client = new OneClient(${httpServerPort});
     const result = await client.request({

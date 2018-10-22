@@ -9,19 +9,20 @@ export const tsLoader = ({ stage, bundle }: { readonly stage: Stage; readonly bu
   test: /\.tsx?$/,
   exclude: /node_modules/,
   use: [
-    cacheLoader({ stage, bundle, name: 'ts' }),
+    stage === 'prod' ? undefined : cacheLoader({ stage, bundle, name: 'ts' }),
     'thread-loader',
     babelLoader({ stage, bundle }),
     {
       loader: 'ts-loader',
       options: {
-        transpileOnly: true,
+        transpileOnly: stage === 'dev',
         happyPackMode: true,
+        context: APP_ROOT_DIR,
         configFile: path.resolve(APP_ROOT_DIR, 'tsconfig', 'tsconfig.es2017.esm.json'),
         onlyCompileBundledFiles: true,
         experimentalFileCaching: true,
         experimentalWatchApi: stage === 'dev',
       },
     },
-  ],
+  ].filter((value) => value !== undefined),
 });

@@ -10,7 +10,7 @@ import './app.css';
 
 export const App = hot(module)(() => (
   <ThemeProvider theme={theme}>
-    <Root>
+    <Root scrollToHashOffset={-88}>
       <Routes />
     </Root>
   </ThemeProvider>

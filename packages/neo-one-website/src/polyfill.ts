@@ -27,8 +27,26 @@ if (typeof window !== 'undefined') {
     };
     // tslint:disable-next-line
     const trackJs = require('trackjs');
+    trackJs.addMetadata('type', 'main');
     LogRocket.getSessionURL((url) => {
       trackJs.addMetadata('logrocket', url);
+    });
+  }
+
+  window.addEventListener('unhandledrejection', (e) => {
+    if (e.reason && e.reason.name === 'Canceled') {
+      // This is an error from vscode that vscode uses to cancel some actions
+      // We don't want to show this to the user
+      e.preventDefault();
+    }
+  });
+
+  if (Modernizr.serviceworker) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch((error) => {
+        // tslint:disable-next-line no-console
+        console.error(error);
+      });
     });
   }
 }

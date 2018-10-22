@@ -11,7 +11,6 @@ import {
 } from '@neo-one/smart-contract-test-common';
 import { constants } from '@neo-one/utils';
 import { WorkerManager } from '@neo-one/worker';
-import { BehaviorSubject } from 'rxjs';
 
 export { TestOptions, WithContractsOptions, Contract };
 
@@ -25,8 +24,11 @@ export const createWithContracts = (getFS: () => FileSystem) => async <T>(
     test,
     () => createCompilerHost({ fs: getFS() }),
     async () => {
-      const options$ = new BehaviorSubject<() => { type: 'memory' }>(() => ({ type: 'memory' }));
-      const manager = new WorkerManager<typeof JSONRPCLocalProvider>(JSONRPCLocalProviderWorker, options$, 30 * 1000);
+      const manager = new WorkerManager<typeof JSONRPCLocalProvider>(
+        JSONRPCLocalProviderWorker,
+        () => ({ options: { type: 'memory' as 'memory' }, disposables: [] }),
+        30 * 1000,
+      );
       const dataProvider = new NEOONEDataProvider({ network: 'priv', rpcURL: manager });
 
       return {

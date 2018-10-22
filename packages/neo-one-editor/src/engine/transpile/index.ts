@@ -1,5 +1,4 @@
 import { WorkerManager } from '@neo-one/worker';
-import { BehaviorSubject } from 'rxjs';
 import { Transpiler } from './Transpiler';
 import { TranspilerWorker } from './TranspilerWorker';
 
@@ -9,6 +8,6 @@ export * from './Transpiler';
 // tslint:disable-next-line export-name
 export const transpilerManager = new WorkerManager<typeof Transpiler>(
   TranspilerWorker,
-  new BehaviorSubject<() => {}>(() => ({})),
+  () => ({ options: {}, disposables: [] }),
   30 * 1000,
 );

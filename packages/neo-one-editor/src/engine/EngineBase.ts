@@ -11,22 +11,17 @@ import * as rxjsOperators from 'rxjs/operators';
 import * as styledComponents from 'styled-components';
 import { ModuleNotFoundError } from '../errors';
 import { ModuleBase } from './ModuleBase';
-import { getPathWithExports } from './packages';
+import { getPathWithExports, PathWithExports } from './packages';
 import { resolve } from './resolve';
 import { StaticExportsModule } from './StaticExportsModule';
 import { TranspiledModule } from './TranspiledModule';
-import { Exports } from './types';
-
-export interface PathWithExports {
-  readonly path: string;
-  readonly exports: Exports;
-}
 
 interface EngineBaseOptions {
   readonly fs: PouchDBFileSystem;
   readonly transpileCache: PouchDBFileSystem;
   readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
   readonly builderManager: WorkerManager<typeof Builder>;
+  readonly pathWithExports?: ReadonlyArray<PathWithExports>;
 }
 
 type Modules = Map<string, ModuleBase>;
@@ -40,9 +35,17 @@ export class EngineBase {
   // tslint:disable-next-line readonly-keyword
   private readonly mutableCachedPaths: { [currentPath: string]: { [path: string]: string } } = {};
 
-  public constructor({ fs, transpileCache, builderManager, jsonRPCLocalProviderManager }: EngineBaseOptions) {
+  public constructor({
+    fs,
+    transpileCache,
+    builderManager,
+    jsonRPCLocalProviderManager,
+    pathWithExports: pathWithExportsIn = [],
+  }: EngineBaseOptions) {
     this.fs = fs;
-    const pathWithExports = getPathWithExports({ fs, builderManager, jsonRPCLocalProviderManager });
+    const pathWithExports = getPathWithExports({ fs, builderManager, jsonRPCLocalProviderManager }).concat(
+      pathWithExportsIn,
+    );
     this.mutableModules = new Map([
       [EMPTY_MODULE_PATH, new StaticExportsModule(this, EMPTY_MODULE_PATH, {})],
       ['path', new StaticExportsModule(this, 'path', nodePath)],

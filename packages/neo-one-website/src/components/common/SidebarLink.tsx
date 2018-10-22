@@ -1,7 +1,7 @@
 import { Link } from '@neo-one/react-common';
-import { Link as RouterLink } from '@reach/router';
 import * as React from 'react';
 import { as, Box, Hidden, styled } from 'reakit';
+import { RouterLink } from '../RouterLink';
 import { HiddenAPI } from './types';
 
 export interface Props {

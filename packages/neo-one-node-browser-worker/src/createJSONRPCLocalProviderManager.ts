@@ -1,13 +1,16 @@
 import { FullNodeOptions, JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { comlink, WorkerManager } from '@neo-one/worker';
-import { BehaviorSubject } from 'rxjs';
 import { JSONRPCLocalProviderWorker } from './JSONRPCLocalProviderWorker';
 
 export const createJSONRPCLocalProviderManager = (id: string) =>
   comlink.proxyValue(
     new WorkerManager<typeof JSONRPCLocalProvider>(
       JSONRPCLocalProviderWorker,
-      new BehaviorSubject<() => FullNodeOptions>(() => ({ type: 'persistent', id: `neo-one-node-${id}` })),
+      () => ({
+        // tslint:disable-next-line:no-object-literal-type-assertion
+        options: { type: 'persistent', id: `neo-one-node-${id}` } as FullNodeOptions,
+        disposables: [],
+      }),
       30 * 1000,
     ),
   );

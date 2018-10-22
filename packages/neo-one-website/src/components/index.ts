@@ -1,5 +1,7 @@
 export * from './Footer';
 export * from './Header';
+export * from './Helmet';
+export * from './RouterLink';
 export * from './course';
 export * from './docs';
 export * from './home';

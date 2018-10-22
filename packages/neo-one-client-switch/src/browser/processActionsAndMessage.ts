@@ -2,7 +2,7 @@ import { processActionsAndMessage as processActionsAndMessageBase, ProcessAction
 import { initializeSourceMap } from './initializeSourceMap';
 
 export const processActionsAndMessage = async (options: ProcessActionsAndMessageOptions): Promise<string> => {
-  if (process.env.NODE_ENV === 'PRODUCTION') {
+  if (process.env.NODE_ENV === 'production' && process.env.NEO_ONE_DEV !== 'true') {
     return options.message;
   }
 

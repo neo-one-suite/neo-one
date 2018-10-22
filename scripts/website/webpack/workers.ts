@@ -3,7 +3,6 @@ import webpack from 'webpack';
 import { Stage } from '../types';
 import { common } from './common';
 import { plugins } from './plugins';
-import { rules } from './rules';
 
 const APP_ROOT_DIR = path.resolve(__dirname, '..', '..', '..');
 const DIST_DIR = path.resolve(APP_ROOT_DIR, 'dist', 'workers');
@@ -48,10 +47,7 @@ export const workers = ({ stage }: { readonly stage: Stage }): webpack.Configura
   output: {
     path: DIST_DIR,
     filename: '[name].js',
-    chunkFilename: '[name].[chunkHash:8].js',
-  },
-  module: {
-    rules: rules({ stage, bundle: 'workers' }),
+    chunkFilename: 'workers.[name].[chunkHash:8].js',
   },
   plugins: plugins({ stage, bundle: 'workers' }),
 });

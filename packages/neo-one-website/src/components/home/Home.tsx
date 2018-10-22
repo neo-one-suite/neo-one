@@ -1,8 +1,8 @@
 import { Background, Button, LineLogoPrimary, Link } from '@neo-one/react-common';
-import { Link as RouterLink } from '@reach/router';
 import * as React from 'react';
 import { as, Box, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
+import { RouterLink } from '../RouterLink';
 import { Proof } from './Proof';
 
 const StyledBackground = styled(Background)`
@@ -91,7 +91,7 @@ export const Home = (props: {}) => (
   <Wrapper {...props}>
     <StyledBackground>
       <StyledLineLogoPrimary />
-      <Headline>The One for easy, fast, & fun NEO app development.</Headline>
+      <Headline>The One for easy, fast, & fun NEO blockchain development</Headline>
       <ButtonWrapper>
         <StyledLinkButton to="docs/getting-started">Get Started</StyledLinkButton>
         <StyledLink to="course" linkColor="primary">
@@ -119,7 +119,7 @@ export const Home = (props: {}) => (
           <Proof
             title="Approachable"
             lines={[
-              'NEO•ONE courses distill the essentials of dapp development into bite-sized interactive learning chapters. Build, test and write the front-end for smart contracts using the NEO•ONE editor.',
+              'NEO•ONE courses distill the essentials of dapp development into bite-sized interactive learning chapters. Build, test and write the UI for smart contracts with the NEO•ONE editor.',
               "With the most comprehensive documentation available for NEO, you'll always have a resource to reference.",
             ]}
           />

@@ -5,12 +5,13 @@ import { as, Grid, styled } from 'reakit';
 import {
   EditorState,
   openConsole,
+  selectConsoleErrorProblems,
   selectConsoleOpen,
-  selectConsoleProblems,
   selectConsoleType,
+  selectConsoleWarningProblems,
   setConsoleOpen,
 } from '../redux';
-import { ConsoleType, FileDiagnostic } from '../types';
+import { ConsoleType } from '../types';
 import { Text } from './Text';
 import { Wrapper } from './Wrapper';
 
@@ -20,31 +21,37 @@ const GridWrapper = styled(as(Text)(Grid))`
 `;
 
 interface Props {
-  readonly consoleProblems: ReadonlyArray<FileDiagnostic>;
+  readonly consoleErrorProblems: number;
+  readonly consoleWarningProblems: number;
   readonly consoleType: ConsoleType;
   readonly consoleOpen: boolean;
   readonly onOpen: () => void;
   readonly onClose: () => void;
 }
 
-const ProblemsBase = ({ consoleProblems, consoleType, consoleOpen, onOpen, onClose, ...props }: Props) => (
+const ProblemsBase = ({
+  consoleErrorProblems,
+  consoleWarningProblems,
+  consoleType,
+  consoleOpen,
+  onOpen,
+  onClose,
+  ...props
+}: Props) => (
   <Wrapper data-test="problems" onClick={consoleOpen && consoleType === 'problems' ? onClose : onOpen} {...props}>
     <GridWrapper>
       <MdError />
-      <span data-test="problems-problem-count">
-        {consoleProblems.filter((problem) => problem.severity === 'error').length}
-      </span>
+      <span data-test="problems-problem-count">{consoleErrorProblems}</span>
       <MdWarning />
-      <span data-test="problems-warning-count">
-        {consoleProblems.filter((problem) => problem.severity === 'warning').length}
-      </span>
+      <span data-test="problems-warning-count">{consoleWarningProblems}</span>
     </GridWrapper>
   </Wrapper>
 );
 
 export const Problems = connect(
   (state: EditorState) => ({
-    ...selectConsoleProblems(state),
+    ...selectConsoleErrorProblems(state),
+    ...selectConsoleWarningProblems(state),
     ...selectConsoleOpen(state),
     ...selectConsoleType(state),
   }),

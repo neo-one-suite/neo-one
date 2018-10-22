@@ -7,8 +7,11 @@ import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.main';
 import * as React from 'react';
 import { styled } from 'reakit';
 import ResizeObserver from 'resize-observer-polyfill';
+import { Observable, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Engine } from '../engine';
-import { getLanguageID, LanguageType, setupLanguages } from '../monaco/language';
+import { setupStandaloneEditor } from '../monaco/editor';
+import { LanguageID } from '../monaco/language';
 import { defineThemes } from './theme';
 import { EditorFile, EditorFiles, FileDiagnostic, FileDiagnosticSeverity, TextRange } from './types';
 import { getLanguageIDForFile } from './utils';
@@ -51,7 +54,8 @@ export class MonacoEditor extends React.Component<Props> {
   private readonly ref = React.createRef<HTMLDivElement>();
   private readonly resizeRef = React.createRef<HTMLDivElement>();
   private mutableEditor: monaco.editor.IStandaloneCodeEditor | undefined;
-  private mutableValueSubscription: monaco.IDisposable | undefined;
+  private mutableValueSubscription: Subscription | undefined;
+  private readonly mutableCreatedModels: monaco.editor.ITextModel[] = [];
   // tslint:disable-next-line readonly-keyword
   private readonly mutableAnnotationSubscriptions: { [key: string]: monaco.IDisposable } = {};
   private readonly resizeObserver = new ResizeObserver(
@@ -68,14 +72,12 @@ export class MonacoEditor extends React.Component<Props> {
   public componentDidMount(): void {
     const current = this.ref.current;
     if (current !== null) {
-      setupLanguages(this.id, this.props.engine.context.fs, () =>
-        this.props.engine.context.fileSystemManager.getEndpoint(),
-      );
       this.mutableEditor = monac.editor.create(current, {
-        language: getLanguageID(this.id, LanguageType.TypeScript),
+        language: LanguageID.TypeScript,
         theme: 'dark',
         ...this.getEditorOptions(this.props),
       });
+      setupStandaloneEditor({ editor: this.mutableEditor });
 
       const { file, autoFocus, files = [] } = this.props;
       if (file !== undefined) {
@@ -107,7 +109,7 @@ export class MonacoEditor extends React.Component<Props> {
 
       this.openFile(file, range, autoFocus);
     } else if (range !== undefined && !_.isEqual(range, prevProps.range)) {
-      this.editor.setSelection(range);
+      this.setSelection(range);
     }
 
     const prevOptions = this.getEditorOptions(prevProps);
@@ -138,6 +140,9 @@ export class MonacoEditor extends React.Component<Props> {
     if (this.mutableEditor !== undefined) {
       this.mutableEditor.dispose();
     }
+    this.mutableCreatedModels.forEach((model) => {
+      model.dispose();
+    });
 
     this.resizeObserver.disconnect();
   }
@@ -162,50 +167,77 @@ export class MonacoEditor extends React.Component<Props> {
     return this.props.engine.context.fs;
   }
 
-  private get id(): string {
-    return this.props.engine.context.id;
-  }
-
-  private openFile(file: EditorFile, range?: monaco.IRange, focus?: boolean): void {
+  private openFile(file: EditorFile, range?: TextRange, focus?: boolean): void {
     this.initializeFile(file);
 
     const model = monac.editor.getModels().find((mdl) => mdl.uri.path === file.path);
 
     if (model !== undefined) {
       this.editor.setModel(model);
-    }
 
-    const editorState = editorStates.get(file.path);
-    if (range !== undefined) {
-      this.editor.setSelection(range);
-    } else if (editorState !== undefined) {
-      this.editor.restoreViewState(editorState);
-    }
+      this.disposeValueSubscription();
+      this.mutableValueSubscription = new Observable<undefined>((observer) => {
+        const sub = model.onDidChangeContent(() => {
+          observer.next(undefined);
+        });
 
-    if (focus || range !== undefined) {
-      this.editor.focus();
-    }
+        return () => sub.dispose();
+      })
+        .pipe(
+          map(() => {
+            const editorValue = model.getValue();
 
-    this.disposeValueSubscription();
-    this.mutableValueSubscription = this.editor.getModel().onDidChangeContent(() => {
-      const editorModel = this.editor.getModel();
-      const editorValue = editorModel.getValue();
+            this.props.engine.context.fs.writeFile(model.uri.path, editorValue).catch((error) => {
+              // tslint:disable-next-line no-console
+              console.error(error);
+            });
 
-      this.props.engine.context.fs.writeFile(editorModel.uri.path, editorValue).catch((error) => {
-        // tslint:disable-next-line no-console
-        console.error(error);
-      });
+            const { onValueChange } = this.props;
+            if (onValueChange !== undefined) {
+              onValueChange(editorValue);
+            }
+          }),
+        )
+        .subscribe();
 
-      const { onValueChange } = this.props;
-      if (onValueChange !== undefined) {
-        onValueChange(editorValue);
+      const editorState = editorStates.get(file.path);
+      if (range !== undefined) {
+        this.setSelection(range);
+      } else if (editorState !== undefined) {
+        this.editor.restoreViewState(editorState);
       }
-    });
+
+      if (focus || range !== undefined) {
+        this.editor.focus();
+      }
+    }
+  }
+
+  private setSelection(range?: TextRange): void {
+    if (range) {
+      if (range.endLineNumber !== undefined && range.endColumn !== undefined) {
+        const selection = {
+          startLineNumber: range.startLineNumber,
+          startColumn: range.startColumn,
+          endLineNumber: range.endLineNumber,
+          endColumn: range.endColumn,
+        };
+        this.editor.setSelection(selection);
+        this.editor.revealRangeInCenter(selection, 1 /* Immediate */);
+      } else {
+        const pos = {
+          lineNumber: range.startLineNumber,
+          column: range.startColumn,
+        };
+        this.editor.setPosition(pos);
+        this.editor.revealPositionInCenter(pos, 1 /* Immediate */);
+      }
+    }
   }
 
   private disposeValueSubscription(): void {
     if (this.mutableValueSubscription !== undefined) {
-      this.mutableValueSubscription.dispose();
+      this.mutableValueSubscription.unsubscribe();
       this.mutableValueSubscription = undefined;
     }
   }
@@ -222,7 +254,8 @@ export class MonacoEditor extends React.Component<Props> {
     let model = monac.editor.getModels().find((mdl) => mdl.uri.path === file.path);
 
     const content = this.fs.readFileSync(file.path);
-    if (model && !model.isDisposed()) {
+    const modeID = getLanguageIDForFile(file);
+    if (model && !model.isDisposed() && model.getModeId() === modeID) {
       model.pushEditOperations(
         [],
         [
@@ -234,11 +267,12 @@ export class MonacoEditor extends React.Component<Props> {
         () => [],
       );
     } else {
-      model = monac.editor.createModel(
-        content,
-        getLanguageIDForFile(this.id, file),
-        new monac.Uri().with({ path: file.path }),
-      );
+      if (model) {
+        model.dispose();
+      }
+
+      model = monac.editor.createModel(content, modeID, new monac.Uri().with({ path: file.path }));
+      this.mutableCreatedModels.push(model);
       model.updateOptions({
         tabSize: 2,
         insertSpaces: true,

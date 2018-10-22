@@ -1,10 +1,10 @@
 // tslint:disable no-any
 import { Link, Logo } from '@neo-one/react-common';
-import { Link as RouterLink } from '@reach/router';
 import * as React from 'react';
 import { as, Flex, styled, Toolbar } from 'reakit';
 import { prop } from 'styled-tools';
 import { ComponentProps } from '../types';
+import { RouterLink } from './RouterLink';
 
 const Wrapper = styled(Flex)`
   width: 100%;

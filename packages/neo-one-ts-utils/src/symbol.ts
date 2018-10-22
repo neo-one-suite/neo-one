@@ -19,12 +19,17 @@ export function getValueDeclarationOrThrow(node: ts.Symbol): ts.Declaration {
   return utils.throwIfNullOrUndefined(getValueDeclaration(node), 'value declaration');
 }
 
+function hasSymbolFlag(node: ts.Symbol, flag: ts.SymbolFlags): boolean {
+  // tslint:disable-next-line no-bitwise
+  return (node.flags & flag) !== 0;
+}
+
 export function getAliasedSymbol(typeChecker: ts.TypeChecker, node: ts.Symbol): ts.Symbol | undefined {
-  try {
+  if (hasSymbolFlag(node, ts.SymbolFlags.Alias)) {
     return utils.getValueOrUndefined(typeChecker.getAliasedSymbol(node));
-  } catch {
-    return undefined;
   }
+
+  return undefined;
 }
 
 export function getMembers(node: ts.Symbol): ts.SymbolTable | undefined {

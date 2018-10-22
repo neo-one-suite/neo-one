@@ -5,13 +5,17 @@ import BN from 'bn.js';
 import { ExecutionContext } from './constants';
 
 const getLine = (context: ExecutionContext): number => {
-  const bytecode = disassembleByteCode(context.code);
-  // tslint:disable-next-line no-unused
-  const result = [...bytecode.entries()].find(([idx, { pc }]) => context.pc === pc);
+  try {
+    const bytecode = disassembleByteCode(context.code);
+    // tslint:disable-next-line no-unused
+    const result = [...bytecode.entries()].find(([idx, { pc }]) => context.pc === pc);
 
-  // NOTE: We don't do result[0] + 1 because context.pc will be the next pc, not the one that
-  //       the error was thrown on. (Line numbers are 1-indexed)
-  return result === undefined ? 1 : result[0];
+    // NOTE: We don't do result[0] + 1 because context.pc will be the next pc, not the one that
+    //       the error was thrown on. (Line numbers are 1-indexed)
+    return result === undefined ? 1 : result[0];
+  } catch {
+    return 1;
+  }
 };
 
 const getMessage = (context: ExecutionContext, message: string): string => {

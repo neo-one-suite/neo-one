@@ -5,7 +5,7 @@ import * as React from 'react';
 import { withRouteData } from 'react-static';
 import { Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { Sidebar } from '../components';
+import { Helmet, Sidebar } from '../components';
 import { Markdown } from '../elements';
 import { CoreLayout } from '../layout';
 import { TutorialInfo } from '../utils';
@@ -44,6 +44,7 @@ const StyledGrid = styled(Grid)`
 // tslint:disable-next-line export-name no-default-export
 export default withRouteData(({ tutorial, sections }: TutorialInfo) => (
   <CoreLayout>
+    <Helmet title="Tutorial: Into to NEO•ONE - NEO•ONE" />
     <StyledGrid>
       <StyledMarkdown source={tutorial} />
       <StyledSidebar sections={sections} tutorial />

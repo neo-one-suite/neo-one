@@ -20,7 +20,7 @@
 /packages/neo-one-website/tmp
 /packages/neo-one-website/build
 /packages/neo-one-website/dist
-/packages/neo-one-website/public
+/packages/neo-one-website/publicOut
 /packages/neo-one-website/.awcache
 /packages/neo-one-website/.cache-loader
 

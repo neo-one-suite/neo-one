@@ -47,7 +47,7 @@ export const babel = ({
     ].filter((value) => value !== undefined),
   };
 
-  if (!cache) {
+  if (!cache || stage === 'prod') {
     return config;
   }
 

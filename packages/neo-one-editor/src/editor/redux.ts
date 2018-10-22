@@ -1,5 +1,5 @@
 import { OutputMessage } from '@neo-one/local-browser';
-import { DraftObject, produce } from 'immer';
+import { produce } from 'immer';
 import _ from 'lodash';
 import LogRocket from 'logrocket';
 import { applyMiddleware, createStore } from 'redux';
@@ -14,10 +14,16 @@ export interface ConsoleOutput {
   readonly [owner: string]: string | undefined;
 }
 
+export interface FileProblems {
+  readonly [path: string]: ReadonlyArray<FileDiagnostic>;
+}
+
 export interface EditorState {
   readonly console: {
     readonly open: boolean;
-    readonly problems: ReadonlyArray<FileDiagnostic>;
+    readonly problems: FileProblems;
+    readonly errorProblems: number;
+    readonly warningProblems: number;
     readonly output: ConsoleOutput;
     readonly outputOwner: string;
     readonly type: ConsoleType;
@@ -45,7 +51,9 @@ const createInitialState = (
     output: {},
     type: 'problems',
     outputOwner: '',
-    problems: [],
+    problems: {},
+    errorProblems: 0,
+    warningProblems: 0,
     testSuites: [],
     selectedTestSuite: undefined,
     testsRunning: false,
@@ -108,13 +116,13 @@ const reducer = reducerWithInitialState(createInitialState())
   )
   .case(setFileProblems, (state, { path, problems }) =>
     produce(state, (draft) => {
-      draft.console.problems = _.sortBy(
-        draft.console.problems.filter((problem) => problem.path !== path).concat(problems),
-        [
-          (problem: DraftObject<FileDiagnostic>) => problem.path,
-          (problem: DraftObject<FileDiagnostic>) => problem.startLineNumber,
-        ],
-      );
+      const existingProblems = draft.console.problems[path] as ReadonlyArray<FileDiagnostic> | undefined;
+      if (existingProblems === undefined || !_.isEqual(existingProblems, problems)) {
+        draft.console.problems[path] = [...problems];
+        const allProblems = _.flatten(Object.values(draft.console.problems));
+        draft.console.errorProblems = allProblems.filter((problem) => problem.severity === 'error').length;
+        draft.console.warningProblems = allProblems.filter((problem) => problem.severity === 'warning').length;
+      }
     }),
   )
   .case(selectTestSuite, (state, selectedTestSuite) =>
@@ -207,6 +215,12 @@ export const configureStore = () => createStore(reducer, applyMiddleware(LogRock
 
 export const selectConsoleProblems = (state: EditorState) => ({
   consoleProblems: state.console.problems,
+});
+export const selectConsoleErrorProblems = (state: EditorState) => ({
+  consoleErrorProblems: state.console.errorProblems,
+});
+export const selectConsoleWarningProblems = (state: EditorState) => ({
+  consoleWarningProblems: state.console.warningProblems,
 });
 export const selectConsoleOutput = (state: EditorState) => ({
   consoleOutput: state.console.output,

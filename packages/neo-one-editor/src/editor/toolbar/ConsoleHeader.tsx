@@ -6,13 +6,14 @@ import { css, Grid, styled } from 'reakit';
 import {
   clearConsole,
   EditorState,
+  selectConsoleErrorProblems,
   selectConsoleOutputOwner,
-  selectConsoleProblems,
   selectConsoleType,
+  selectConsoleWarningProblems,
   setConsoleOpen,
   setConsoleType,
 } from '../redux';
-import { ConsoleType, FileDiagnostic } from '../types';
+import { ConsoleType } from '../types';
 import { ConsoleButton } from './ConsoleButton';
 import { ConsoleSelector } from './ConsoleSelector';
 import { ConsoleTab } from './ConsoleTab';
@@ -55,7 +56,8 @@ const Close = styled(MdClose)`
 interface Props {
   readonly consoleType: ConsoleType;
   readonly consoleOutputOwner: string;
-  readonly consoleProblems: ReadonlyArray<FileDiagnostic>;
+  readonly consoleErrorProblems: number;
+  readonly consoleWarningProblems: number;
   readonly onClearConsole: (owner: string) => void;
   readonly onClickProblems: () => void;
   readonly onClickTests: () => void;
@@ -63,14 +65,11 @@ interface Props {
   readonly onCloseConsole: () => void;
 }
 
-const getErrorOrWarnCount = (consoleProblems: ReadonlyArray<FileDiagnostic>) =>
-  consoleProblems.filter((problem) => problem.severity === 'error').length +
-  consoleProblems.filter((problem) => problem.severity === 'warning').length;
-
 const ConsoleHeaderBase = ({
   consoleType,
   consoleOutputOwner,
-  consoleProblems,
+  consoleErrorProblems,
+  consoleWarningProblems,
   onClickOutput,
   onClickProblems,
   onClickTests,
@@ -78,7 +77,7 @@ const ConsoleHeaderBase = ({
   onCloseConsole,
   ...props
 }: Props) => {
-  const problemCount = getErrorOrWarnCount(consoleProblems);
+  const problemCount = consoleErrorProblems + consoleWarningProblems;
 
   return (
     <Wrapper {...props}>
@@ -113,7 +112,8 @@ export const ConsoleHeader = connect(
   (state: EditorState) => ({
     ...selectConsoleType(state),
     ...selectConsoleOutputOwner(state),
-    ...selectConsoleProblems(state),
+    ...selectConsoleErrorProblems(state),
+    ...selectConsoleWarningProblems(state),
   }),
   (dispatch) => ({
     onClickProblems: () => dispatch(setConsoleType('problems')),

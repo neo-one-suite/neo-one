@@ -102,7 +102,7 @@ export class PouchDBFileSystem implements FileSystem {
     });
   }
 
-  public readonly bufferedChanges$ = (time = 500) =>
+  public readonly bufferedChanges$ = (time = 1000) =>
     this.changes$.pipe(
       buffer(this.changes$.pipe(debounceTime(time))),
       map((changes) =>

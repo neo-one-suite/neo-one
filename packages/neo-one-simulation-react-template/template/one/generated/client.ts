@@ -35,7 +35,7 @@ export const createClient = <
   getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders as any,
 ): Client<TUserAccountProviders> => {
   const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [];
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 40101 }));
   }
   const provider = new NEOONEProvider(providers);
@@ -46,7 +46,7 @@ export const createClient = <
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {

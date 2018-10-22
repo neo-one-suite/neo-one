@@ -1,9 +1,9 @@
 // tslint:disable no-any
 import { Button } from '@neo-one/react-common';
-import { Link } from '@reach/router';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { as } from 'reakit';
+import { RouterLink } from '../../RouterLink';
 import { getChapterTo, getLessonTo } from '../common';
 import { selectCourse, selectLesson } from '../coursesData';
 import { completeChapter } from '../redux';
@@ -27,7 +27,7 @@ const getNextLesson = (selected: SelectedChapter) => {
   return course.lessons[selected.lesson + 1] as Lesson | undefined;
 };
 
-const ButtonLink = as(Link)(Button);
+const ButtonLink = as(RouterLink)(Button);
 
 const NextButtonBase = ({ selected, onClick, complete, ...props }: Props) => {
   const nextChapter = getNextChapter(selected);

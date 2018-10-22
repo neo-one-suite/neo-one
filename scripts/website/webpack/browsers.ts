@@ -1,1 +1,6 @@
-export const browsers: ReadonlyArray<string> = ['last 2 versions', 'not ie <= 11', 'not dead'];
+export const browsers: ReadonlyArray<string> = [
+  'last 2 chrome versions',
+  'last 2 safari versions',
+  'last 2 edge versions',
+  'last 2 firefox versions',
+];

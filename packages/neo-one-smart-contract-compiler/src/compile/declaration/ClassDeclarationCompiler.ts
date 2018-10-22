@@ -1,5 +1,7 @@
 import { PropertyNamedNode, tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { InternalObjectProperty } from '../constants';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -246,7 +248,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
     tsUtils.class_.getConcreteMembers(decl).forEach((member) => {
       const decorators = tsUtils.decoratable.getDecoratorsArray(member);
       if (decorators.length > 0) {
-        sb.context.reportUnsupported(decorators[0]);
+        sb.context.reportError(decorators[0], DiagnosticCode.UnsupportedSyntax, DiagnosticMessage.UnsupportedDecorator);
       }
     });
 

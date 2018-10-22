@@ -1,3 +1,4 @@
+/// <reference lib="webworker" />
 import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
 // @ts-ignore

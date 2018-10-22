@@ -6,4 +6,13 @@ if (typeof window !== 'undefined') {
   process.stdout = {
     isTTY: undefined,
   };
+
+  // tslint:disable-next-line no-any
+  (window as any)._trackJs = {
+    token: 'ccff2c276a494f0b94462cdbf6bf4518',
+    application: 'neo-one',
+  };
+  // tslint:disable-next-line
+  const trackJs = require('trackjs');
+  trackJs.addMetadata('type', 'preview');
 }

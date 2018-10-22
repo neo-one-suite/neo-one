@@ -3,29 +3,36 @@
 import * as fake from 'monaco-editor/esm/vs/language/html/monaco.contribution';
 
 import { PouchDBFileSystem } from '@neo-one/local-browser';
-import { comlink } from '@neo-one/worker';
+import { FileSystemManager } from '@neo-one/local-browser-worker';
+import { WorkerManager } from '@neo-one/worker';
 // @ts-ignore
 import editorWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/workers/editor.worker.js';
 // @ts-ignore
 import htmlWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/workers/html.worker.js';
 // @ts-ignore
-import tsWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/workers/ts.worker.js';
-// @ts-ignore
 import * as javascriptModule from 'monaco-editor/esm/vs/basic-languages/javascript/javascript';
+import { Observable, Subject } from 'rxjs';
+import { filter, map, take } from 'rxjs/operators';
 import ts from 'typescript';
+import { getFileType } from '../utils';
+import { AsyncLanguageService } from './AsyncLanguageService';
 import { configureGrammar } from './configureGrammar';
-import * as languageFeatures from './languageFeatures';
-import { LanguageServiceOptions } from './LanguageServiceOptions';
-import { TypeScriptWorker } from './tsWorker';
+import {
+  CodeActionAdapter,
+  DefinitionAdapter,
+  FormatAdapter,
+  FormatOnTypeAdapter,
+  OccurrencesAdapter,
+  OutlineAdapter,
+  QuickInfoAdapter,
+  ReferenceAdapter,
+  SignatureHelpAdapter,
+  SuggestAdapter,
+  wireDiagnostics,
+} from './features';
+import { MonacoWorkerManager } from './types';
 import * as typescriptModule from './typescript';
-import { WorkerManager } from './WorkerManager';
-
-import Promise = monaco.Promise;
-import Uri = monaco.Uri;
-
-const CONTRACT_SUFFIX = '-contract';
-const TYPESCRIPT_SUFFIX = '-typescript';
-const JAVASCRIPT_SUFFIX = '-javascript';
+import { TypeScriptWorker } from './TypeScriptWorker';
 
 // tslint:disable-next-line no-object-mutation no-any
 (global as any).MonacoEnvironment = {
@@ -33,9 +40,7 @@ const JAVASCRIPT_SUFFIX = '-javascript';
     let MonacoWorker;
 
     // tslint:disable-next-line:prefer-conditional-expression
-    if (label.endsWith(CONTRACT_SUFFIX) || label.endsWith(TYPESCRIPT_SUFFIX) || label.endsWith(JAVASCRIPT_SUFFIX)) {
-      MonacoWorker = new Worker(tsWorkerURL);
-    } else if (label.endsWith('html')) {
+    if (label.endsWith('html') && fake) {
       MonacoWorker = new Worker(htmlWorkerURL);
     } else {
       MonacoWorker = new Worker(editorWorkerURL);
@@ -45,174 +50,212 @@ const JAVASCRIPT_SUFFIX = '-javascript';
   },
 };
 
-export enum LanguageType {
-  Contract,
-  TypeScript,
-  JavaScript,
+export enum LanguageID {
+  Contract = 'contract-internal',
+  TypeScript = 'typescript-internal',
+  JavaScript = 'javascript-internal',
 }
 
-export function getLanguageID(id: string, type: LanguageType) {
-  let suffix: string;
-  switch (type) {
-    case LanguageType.Contract:
-      suffix = CONTRACT_SUFFIX;
-      break;
-    case LanguageType.TypeScript:
-      suffix = TYPESCRIPT_SUFFIX;
-      break;
-    case LanguageType.JavaScript:
-      suffix = JAVASCRIPT_SUFFIX;
-      break;
-    default:
-      throw new Error('For TS');
-  }
-
-  return `${id}${suffix}`;
-}
-
-function setupTypeScript(id: string, fs: PouchDBFileSystem, endpoint: () => comlink.Endpoint) {
-  const options = new LanguageServiceOptions(
-    {
-      target: ts.ScriptTarget.ESNext,
-      module: ts.ModuleKind.ESNext,
-      moduleResolution: ts.ModuleResolutionKind.NodeJs,
-
-      pretty: true,
-
-      noEmit: true,
-      declaration: false,
-
-      allowSyntheticDefaultImports: true,
-      resolveJsonModule: false,
-      experimentalDecorators: true,
-      jsx: ts.JsxEmit.React,
-
-      alwaysStrict: true,
-      strict: true,
-      skipLibCheck: true,
-      noUnusedLocals: true,
-      noImplicitReturns: true,
-      allowUnusedLabels: false,
-      noUnusedParameters: false,
-      allowUnreachableCode: false,
-      noFallthroughCasesInSwitch: true,
-      forceConsistentCasingInFileNames: true,
-    },
-    { noSemanticValidation: false, noSyntaxValidation: false },
-    id,
-    endpoint,
-  );
-  options.setEagerModelSync(true);
-
-  setupLanguage(getLanguageID(id, LanguageType.TypeScript), options, fs, true);
-}
-
-function setupContract(id: string, fs: PouchDBFileSystem, endpoint: () => comlink.Endpoint) {
-  // @ts-ignore
-  const options = new LanguageServiceOptions(
-    {
-      target: ts.ScriptTarget.ESNext,
-      module: ts.ModuleKind.ESNext,
-      moduleResolution: ts.ModuleResolutionKind.NodeJs,
-
-      noLib: true,
-      typeRoots: [],
-
-      pretty: true,
-
-      noEmit: true,
-      declaration: false,
-
-      allowSyntheticDefaultImports: true,
-      resolveJsonModule: false,
-      experimentalDecorators: true,
-
-      alwaysStrict: true,
-      strict: true,
-      skipLibCheck: false,
-      noUnusedLocals: true,
-      noImplicitReturns: true,
-      allowUnusedLabels: false,
-      noUnusedParameters: false,
-      allowUnreachableCode: false,
-      noFallthroughCasesInSwitch: true,
-      forceConsistentCasingInFileNames: true,
-    },
-    { noSemanticValidation: false, noSyntaxValidation: false },
-    id,
-    endpoint,
-    true,
-    // Trick webpack into thinking we're using this import
-    fake,
-  );
-  options.setEagerModelSync(true);
-
-  setupLanguage(getLanguageID(id, LanguageType.Contract), options, fs, true);
-}
-
-function setupJavaScript(id: string, fs: PouchDBFileSystem, endpoint: () => comlink.Endpoint) {
-  const options = new LanguageServiceOptions(
-    { allowNonTsExtensions: true, allowJs: true, target: ts.ScriptTarget.ESNext },
-    { noSemanticValidation: true, noSyntaxValidation: false },
-    id,
-    endpoint,
-  );
-  options.setEagerModelSync(true);
-
-  setupLanguage(getLanguageID(id, LanguageType.JavaScript), options, fs, false);
-}
-
-export function setupLanguages(id: string, fs: PouchDBFileSystem, endpoint: () => comlink.Endpoint) {
-  setupJavaScript(id, fs, endpoint);
-  setupTypeScript(id, fs, endpoint);
-  setupContract(id, fs, endpoint);
-}
-
-// tslint:disable-next-line readonly-keyword
-const mutableManagers: { [languageID: string]: WorkerManager } = {};
-// tslint:disable-next-line readonly-keyword
-const mutableOptions: { [languageID: string]: LanguageServiceOptions } = {};
-
-function setupLanguage(
-  languageID: string,
-  options: LanguageServiceOptions,
+export async function setupLanguages(
+  fsManager: FileSystemManager,
   fs: PouchDBFileSystem,
-  isTypeScript: boolean,
-) {
-  if ((mutableManagers[languageID] as WorkerManager | undefined) !== undefined) {
-    return;
+  id: string,
+  openFiles$: Observable<ReadonlyArray<string>>,
+): Promise<{ readonly dispose: () => void }> {
+  const createMonacoWorkerManager = async (
+    compilerOptions: ts.CompilerOptions,
+    isSmartContract: boolean,
+    isLanguageFile: (file: string) => boolean,
+  ): Promise<MonacoWorkerManager> => {
+    const filteredFiles$ = openFiles$.pipe(map((files) => files.filter(isLanguageFile)));
+    let fileNames = await filteredFiles$.pipe(take(1)).toPromise();
+    const restart$ = new Subject<void>();
+    // tslint:disable-next-line rxjs-no-ignored-error
+    const subscription = filteredFiles$.subscribe((nextInitialFileNames) => {
+      fileNames = nextInitialFileNames;
+      restart$.next();
+    });
+
+    const manager = new WorkerManager<typeof AsyncLanguageService>(
+      TypeScriptWorker,
+      () => {
+        const disposableEndpoint = fsManager.getEndpoint();
+
+        const options = {
+          compilerOptions,
+          isSmartContract,
+          id,
+          endpoint: disposableEndpoint.endpoint,
+          fileNames,
+        };
+
+        return { options, disposables: [disposableEndpoint] };
+      },
+      30 * 1000,
+      restart$,
+    );
+
+    manager.add({
+      dispose: () => {
+        subscription.unsubscribe();
+      },
+    });
+
+    const fileChanged$ = fs.changes$.pipe(
+      map((change) => change.id),
+      filter(isLanguageFile),
+    );
+
+    return {
+      manager,
+      fs,
+      openFiles$: filteredFiles$,
+      fileChanged$,
+      isLanguageFile,
+    };
+  };
+
+  const [javascriptManager, typescriptManager, contractManager] = await Promise.all([
+    createMonacoWorkerManager(
+      { allowNonTsExtensions: true, allowJs: true, target: ts.ScriptTarget.ESNext },
+      false,
+      (file) => getFileType(file) === 'javascript',
+    ),
+    createMonacoWorkerManager(
+      {
+        target: ts.ScriptTarget.ESNext,
+        module: ts.ModuleKind.ESNext,
+        moduleResolution: ts.ModuleResolutionKind.NodeJs,
+
+        pretty: true,
+
+        noEmit: true,
+        declaration: false,
+
+        allowSyntheticDefaultImports: true,
+        resolveJsonModule: false,
+        experimentalDecorators: true,
+        jsx: ts.JsxEmit.React,
+
+        alwaysStrict: true,
+        strict: true,
+        skipLibCheck: true,
+        noUnusedLocals: true,
+        noImplicitReturns: true,
+        allowUnusedLabels: false,
+        noUnusedParameters: false,
+        allowUnreachableCode: false,
+        noFallthroughCasesInSwitch: true,
+        forceConsistentCasingInFileNames: true,
+      },
+      false,
+      (file) => getFileType(file) === 'typescript',
+    ),
+    createMonacoWorkerManager(
+      {
+        target: ts.ScriptTarget.ESNext,
+        module: ts.ModuleKind.ESNext,
+        moduleResolution: ts.ModuleResolutionKind.NodeJs,
+
+        noLib: true,
+        typeRoots: [],
+
+        pretty: true,
+
+        noEmit: true,
+        declaration: false,
+
+        allowSyntheticDefaultImports: true,
+        resolveJsonModule: false,
+        experimentalDecorators: true,
+
+        alwaysStrict: true,
+        strict: true,
+        skipLibCheck: false,
+        noUnusedLocals: true,
+        noImplicitReturns: true,
+        allowUnusedLabels: false,
+        noUnusedParameters: false,
+        allowUnreachableCode: false,
+        noFallthroughCasesInSwitch: true,
+        forceConsistentCasingInFileNames: true,
+      },
+      true,
+      (file) => getFileType(file) === 'contract',
+    ),
+  ]);
+
+  setupLanguage(LanguageID.JavaScript, javascriptManager, false);
+  setupLanguage(LanguageID.TypeScript, typescriptManager, true);
+  setupLanguage(LanguageID.Contract, contractManager, true);
+
+  return {
+    dispose: () => {
+      javascriptManager.manager.dispose();
+      typescriptManager.manager.dispose();
+      contractManager.manager.dispose();
+    },
+  };
+}
+
+const registeredLanguages = new Set<string>();
+
+function setupLanguage(languageID: string, manager: MonacoWorkerManager, isTypeScript: boolean) {
+  if (!registeredLanguages.has(languageID)) {
+    monaco.languages.register({ id: languageID });
+    const mod = isTypeScript ? typescriptModule : javascriptModule;
+    monaco.languages.setLanguageConfiguration(languageID, mod.conf);
+    configureGrammar(languageID).catch((error) => {
+      // tslint:disable-next-line no-console
+      console.error(error);
+    });
+    registeredLanguages.add(languageID);
   }
-  monaco.languages.register({ id: languageID });
 
-  const manager = new WorkerManager(languageID, options);
-  mutableManagers[languageID] = manager;
-  mutableOptions[languageID] = options;
-  const worker = (...uris: Uri[]): Promise<TypeScriptWorker> => manager.getScriptWorker(...uris);
+  const referenceAdapter = new ReferenceAdapter(manager.manager.instance$, manager.fs, languageID);
+  manager.manager.add(referenceAdapter);
+  manager.manager.add(monaco.languages.registerReferenceProvider(languageID, referenceAdapter));
 
-  monaco.languages.registerReferenceProvider(languageID, new languageFeatures.ReferenceAdapter(worker));
   // registerRenameProvider
-  monaco.languages.registerSignatureHelpProvider(languageID, new languageFeatures.SignatureHelpAdapter(worker));
-  monaco.languages.registerHoverProvider(languageID, new languageFeatures.QuickInfoAdapter(worker));
-  monaco.languages.registerDocumentSymbolProvider(languageID, new languageFeatures.OutlineAdapter(worker));
-  monaco.languages.registerDocumentHighlightProvider(languageID, new languageFeatures.OccurrencesAdapter(worker));
-  monaco.languages.registerDefinitionProvider(languageID, new languageFeatures.DefinitionAdapter(worker));
+  const signatureAdapter = new SignatureHelpAdapter(manager.manager.instance$, manager.fs, languageID);
+  manager.manager.add(signatureAdapter);
+  manager.manager.add(monaco.languages.registerSignatureHelpProvider(languageID, signatureAdapter));
+
+  const quickInfoAdapter = new QuickInfoAdapter(manager.manager.instance$, manager.fs, languageID);
+  manager.manager.add(quickInfoAdapter);
+  manager.manager.add(monaco.languages.registerHoverProvider(languageID, quickInfoAdapter));
+
+  const outlineAdapter = new OutlineAdapter(manager.manager.instance$, manager.fs, languageID);
+  manager.manager.add(outlineAdapter);
+  manager.manager.add(monaco.languages.registerDocumentSymbolProvider(languageID, outlineAdapter));
+
+  const occurrencesAdapter = new OccurrencesAdapter(manager.manager.instance$, manager.fs, languageID);
+  manager.manager.add(occurrencesAdapter);
+  manager.manager.add(monaco.languages.registerDocumentHighlightProvider(languageID, occurrencesAdapter));
+
+  const definitionAdapter = new DefinitionAdapter(manager.manager.instance$, manager.fs, languageID);
+  manager.manager.add(definitionAdapter);
+  manager.manager.add(monaco.languages.registerDefinitionProvider(languageID, definitionAdapter));
   // registerImplementationProvider
   // registerTypeDefinitionProvider
   // registerCodeLensProvider
-  // registerCodeActionProvider
+  const codeActionAdapter = new CodeActionAdapter(manager.manager.instance$, manager.fs, languageID);
+  manager.manager.add(codeActionAdapter);
+  manager.manager.add(monaco.languages.registerCodeActionProvider(languageID, codeActionAdapter));
   // registerDocumentFormattingEditProvider
-  monaco.languages.registerDocumentRangeFormattingEditProvider(languageID, new languageFeatures.FormatAdapter(worker));
-  monaco.languages.registerOnTypeFormattingEditProvider(languageID, new languageFeatures.FormatOnTypeAdapter(worker));
+  const formatAdapter = new FormatAdapter(manager.manager.instance$, manager.fs, languageID);
+  manager.manager.add(formatAdapter);
+  manager.manager.add(monaco.languages.registerDocumentRangeFormattingEditProvider(languageID, formatAdapter));
+
+  const formatOnTypeAdapter = new FormatOnTypeAdapter(manager.manager.instance$, manager.fs, languageID);
+  manager.manager.add(formatOnTypeAdapter);
+  manager.manager.add(monaco.languages.registerOnTypeFormattingEditProvider(languageID, formatOnTypeAdapter));
   // registerLinkProvider
-  monaco.languages.registerCompletionItemProvider(languageID, new languageFeatures.SuggestAdapter(worker));
+  const suggestAdapter = new SuggestAdapter(manager.manager.instance$, manager.fs, languageID);
+  manager.manager.add(suggestAdapter);
+  manager.manager.add(monaco.languages.registerCompletionItemProvider(languageID, suggestAdapter));
   // registerColorProvider
   // registerFoldingRangeProvider
   // tslint:disable-next-line no-unused-expression
-  new languageFeatures.DiagnosticsAdapter(options, languageID, worker, fs);
-  const mod = isTypeScript ? typescriptModule : javascriptModule;
-  monaco.languages.setLanguageConfiguration(languageID, mod.conf);
-  configureGrammar(languageID).catch((error) => {
-    // tslint:disable-next-line no-console
-    console.error(error);
-  });
+  wireDiagnostics(manager, languageID);
 }

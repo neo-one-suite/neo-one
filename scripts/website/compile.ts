@@ -14,14 +14,16 @@ import { overlay, preview, workers } from './webpack';
 yargs.describe('watch', 'Run in watch mode.').default('watch', false);
 yargs.describe('bundle', 'Bundle to compile.').default('bundle', 'react-static');
 
+const devStage = process.env.NEO_ONE_PROD === 'true' ? 'prod' : 'dev';
+
 const createDispose = (watcher: webpack.Compiler.Watching): (() => Promise<void>) => async () =>
   new Promise<void>((resolve) => watcher.close(resolve));
 const watchConfig = (config: webpack.Configuration): (() => Promise<void>) =>
   createDispose(webpack(config).watch({}, () => undefined));
-const watchWorkers = () => watchConfig(workers({ stage: 'dev' }));
-const watchOverlay = () => watchConfig(overlay({ stage: 'dev' }));
+const watchWorkers = () => watchConfig(workers({ stage: devStage }));
+const watchOverlay = () => watchConfig(overlay({ stage: devStage }));
 const watchPreview = async () => {
-  const webpackConfig = preview({ stage: 'dev' });
+  const webpackConfig = preview({ stage: devStage });
 
   const { app } = await serve(
     {},

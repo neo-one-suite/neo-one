@@ -6,8 +6,8 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { styled } from 'reakit';
 import { ifProp } from 'styled-tools';
-import { selectConsoleProblems } from '../redux';
-import { FileDiagnostic, TextRange } from '../types';
+import { FileProblems, selectConsoleProblems } from '../redux';
+import { TextRange } from '../types';
 import { ProblemView } from './ProblemView';
 
 const Wrapper = styled.div<{ readonly shadowed: boolean }>`
@@ -19,19 +19,26 @@ const Wrapper = styled.div<{ readonly shadowed: boolean }>`
 `;
 
 interface Props {
-  readonly consoleProblems: ReadonlyArray<FileDiagnostic>;
+  readonly consoleProblems: FileProblems;
   readonly onSelectRange: (path: string, range: TextRange) => void;
 }
 
-const ProblemsViewBase = ({ consoleProblems: problemsIn, onSelectRange, ...props }: Props) => {
-  const groupedProblems = _.groupBy(problemsIn, (problem) => problem.path);
+const ProblemsViewBase = ({ consoleProblems, onSelectRange, ...props }: Props) => {
+  const groupedProblems = _.sortBy(Object.entries(consoleProblems), ([path]) => path).filter(
+    (value) => value[1].length > 0,
+  );
 
   return (
     <Scrollable>
       {({ scrollRef, scrollY }: any) => (
         <Wrapper innerRef={scrollRef} shadowed={scrollY > 0} {...props}>
-          {Object.entries(groupedProblems).map(([path, problems]) => (
-            <ProblemView key={path} path={path} problems={problems} onSelectRange={onSelectRange} />
+          {groupedProblems.map(([path, problems]) => (
+            <ProblemView
+              key={path}
+              path={path}
+              problems={_.sortBy(problems, (problem) => problem.startLineNumber)}
+              onSelectRange={onSelectRange}
+            />
           ))}
         </Wrapper>
       )}

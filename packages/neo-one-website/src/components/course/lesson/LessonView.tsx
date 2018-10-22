@@ -1,9 +1,10 @@
 import { Button } from '@neo-one/react-common';
-import { Link } from '@reach/router';
 import * as React from 'react';
+import { Helmet } from 'react-helmet';
 import { as, Box, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { Footer } from '../../Footer';
+import { RouterLink } from '../../RouterLink';
 import { Markdown } from '../common';
 import { selectLesson } from '../coursesData';
 import { SelectedLesson } from '../types';
@@ -33,7 +34,7 @@ const InnerWrapper = styled(Grid)`
   box-shadow: 0 6px 4px 4px rgba(0, 0, 0, 0.2);
 `;
 
-const StartButton = styled(as(Link)(Button))`
+const StartButton = styled(as(RouterLink)(Button))`
   text-decoration: none;
   cursor: pointer;
   border-radius: 16px;
@@ -56,6 +57,9 @@ const Text = styled(Box)`
 
 export const LessonView = ({ selected }: Props) => (
   <Wrapper>
+    <Helmet>
+      <title>{`Lesson ${selected.lesson + 1}: ${selectLesson(selected).title} - NEO•ONE`}</title>
+    </Helmet>
     <BoxWrapper>
       <InnerWrapper>
         <Markdown source={selectLesson(selected).documentation} />

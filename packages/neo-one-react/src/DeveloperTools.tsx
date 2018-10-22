@@ -13,4 +13,5 @@ export interface Props {
   readonly localClients: NetworkClients<LocalClient>;
 }
 
-export const DeveloperTools = process.env.NODE_ENV === 'production' ? DeveloperToolsProd : DeveloperToolsDev;
+export const DeveloperTools =
+  process.env.NODE_ENV === 'production' && process.env.NEO_ONE_DEV !== 'true' ? DeveloperToolsProd : DeveloperToolsDev;

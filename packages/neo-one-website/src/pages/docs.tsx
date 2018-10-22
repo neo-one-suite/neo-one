@@ -6,7 +6,7 @@ import * as React from 'react';
 import { withRouteData } from 'react-static';
 import { Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { DocFooter, SectionData, Sidebar } from '../components';
+import { DocFooter, Helmet, SectionData, Sidebar } from '../components';
 import { Markdown } from '../elements';
 import { CoreLayout } from '../layout';
 import { AdjacentInfo } from '../utils';
@@ -50,6 +50,7 @@ const StyledGrid = styled(Grid)`
 
 interface DocData {
   readonly doc: string;
+  readonly title: string;
   readonly sidebar: ReadonlyArray<SectionData>;
   readonly next?: AdjacentInfo;
   readonly previous?: AdjacentInfo;
@@ -60,10 +61,11 @@ export default withRouteData((props?: DocData) => {
   if (props === undefined) {
     return <Redirect to="/docs/getting-started" />;
   }
-  const { doc, next, previous, sidebar } = props;
+  const { doc, title, next, previous, sidebar } = props;
 
   return (
     <CoreLayout>
+      <Helmet title={`${title} - NEO•ONE`} />
       <StyledGrid>
         <StyledMarkdown source={doc} />
         <StyledSidebar sections={sidebar} />

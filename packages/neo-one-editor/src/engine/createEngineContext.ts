@@ -13,6 +13,7 @@ import { retryBackoff } from '@neo-one/utils/src';
 import { WorkerManager } from '@neo-one/worker';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { setupLanguages } from '../monaco/language';
 import { createFileSystem, createTranspileCache, getFileSystemDBID } from './create';
 import { initializeFileSystem } from './initializeFileSystem';
 
@@ -123,6 +124,7 @@ export const createEngineContext = async ({
     output$,
     jsonRPCLocalProviderManager,
   );
+  const languagesDisposable = await setupLanguages(fileSystemManager, fs, id, openFiles$);
 
   return {
     id,
@@ -137,6 +139,7 @@ export const createEngineContext = async ({
     dispose: async () => {
       metaSubscription.unsubscribe();
       openFilesSubscription.unsubscribe();
+      languagesDisposable.dispose();
       await Promise.all([fs.dispose(), transpileCache.dispose()]);
     },
   };

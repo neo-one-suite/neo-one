@@ -1,8 +1,8 @@
 // tslint:disable no-any
 import { Button } from '@neo-one/react-common';
-import { Link } from '@reach/router';
 import * as React from 'react';
 import { as } from 'reakit';
+import { RouterLink } from '../../RouterLink';
 import { getChapterTo } from '../common';
 import { selectCourse, selectLesson } from '../coursesData';
 import { Chapter, Lesson, SelectedChapter } from '../types';
@@ -24,7 +24,7 @@ const getPreviousLesson = (selected: SelectedChapter) => {
   return course.lessons[selected.lesson - 1] as Lesson | undefined;
 };
 
-const ButtonLink = as(Link)(Button);
+const ButtonLink = as(RouterLink)(Button);
 
 export const PreviousButton = ({ selected, onClick, ...props }: Props) => {
   const previousChapter = getPreviousChapter(selected);

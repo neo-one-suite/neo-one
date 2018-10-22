@@ -110,7 +110,9 @@ const uid: number = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 const proxyValueSymbol = Symbol('proxyValue');
 const throwSymbol = Symbol('throw');
 const proxyTransferHandler: TransferHandler = {
-  canHandle: (obj: {}): Boolean => obj && (obj as any)[proxyValueSymbol],
+  canHandle: (obj: {}): Boolean => {
+    return obj && ((obj as any)[proxyValueSymbol] || obj instanceof Function);
+  },
   serialize: (obj: {}): {} => {
     const { port1, port2 } = new MessageChannel();
     expose(obj, port1);
@@ -133,25 +135,9 @@ const throwTransferHandler = {
   },
 };
 
-const functionHandler = {
-  canHandle(obj: any): boolean {
-    return obj instanceof Proxy || obj instanceof Function;
-  },
-  serialize(obj: any): any {
-    const { port1, port2 } = new MessageChannel();
-    expose(obj, port1);
-
-    return port2;
-  },
-  deserialize(obj: any): any {
-    return proxy(obj as Endpoint);
-  },
-};
-
 export const transferHandlers: Map<string, TransferHandler> = new Map([
   ['PROXY', proxyTransferHandler],
   ['THROW', throwTransferHandler],
-  ['ANY_FUNCTION', functionHandler],
 ]);
 
 let pingPongMessageCounter: number = 0;
@@ -321,7 +307,7 @@ function windowEndpoint(w: Window): Endpoint {
   };
 }
 
-function isEndpoint(endpoint: any): endpoint is Endpoint {
+export function isEndpoint(endpoint: any): endpoint is Endpoint {
   return 'addEventListener' in endpoint && 'removeEventListener' in endpoint && 'postMessage' in endpoint;
 }
 

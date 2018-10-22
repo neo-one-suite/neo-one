@@ -4,12 +4,15 @@ import { comlink } from '@neo-one/worker';
 import { Subject, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { EditorFile, TextRange } from '../editor';
+import { setupEditor } from '../monaco/editor';
 import { EngineContentFile, EngineContentFiles, TestRunnerCallbacks } from '../types';
 import { getFileType } from '../utils';
 import { EngineContext } from './createEngineContext';
 import { EngineBase } from './EngineBase';
 import { ModuleBase } from './ModuleBase';
+import { getPathWithExports } from './packages';
 import { TestRunner } from './test';
+import { testPackages } from './testPackages';
 import { Transpiler, transpilerManager } from './transpile';
 import { RegisterPreviewEngineResult } from './types';
 
@@ -77,7 +80,7 @@ export class Engine extends EngineBase {
         mutableTranspilePromises.push(maybeTranspile(transpiler, context.transpileCache, path, file.content));
       });
       const fsSubscriptionInner = context.fs
-        .bufferedChanges$(500)
+        .bufferedChanges$()
         .pipe(
           mergeScanLatest(async (_acc, changes) => {
             try {
@@ -112,14 +115,14 @@ export class Engine extends EngineBase {
     }
 
     if (context.openFiles$.getValue().length === 0) {
-      context.openFiles$.next(initialFiles.filter((file) => file.open).map((file) => file.path));
+      context.openFiles$.next(initialFiles.filter((file) => file.open).map((file) => normalizePath(file.path)));
     }
     const initialFilesMap = new Map<string, EngineContentFile>();
     initialFiles.forEach((file) => {
-      initialFilesMap.set(file.path, file);
+      initialFilesMap.set(normalizePath(file.path), file);
     });
 
-    return new Engine({
+    const engine = new Engine({
       context,
       initialFiles: initialFilesMap,
       editorCallbacks,
@@ -127,6 +130,10 @@ export class Engine extends EngineBase {
       fsSubscription,
       buildErrors$,
     });
+
+    setupEditor({ openFile: (path: string, range?: TextRange) => engine.openFile(path, range) });
+
+    return engine;
   }
 
   public readonly context: EngineContext;
@@ -149,6 +156,14 @@ export class Engine extends EngineBase {
       transpileCache: context.transpileCache,
       builderManager: context.builderManager,
       jsonRPCLocalProviderManager: context.jsonRPCLocalProviderManager,
+      pathWithExports: getPathWithExports(
+        {
+          fs: context.fs,
+          builderManager: context.builderManager,
+          jsonRPCLocalProviderManager: context.jsonRPCLocalProviderManager,
+        },
+        testPackages,
+      ),
     });
     this.context = context;
     this.initialFiles = initialFiles;
@@ -213,10 +228,16 @@ export class Engine extends EngineBase {
         },
       }),
     );
+    const { endpoint, dispose } = this.context.fileSystemManager.getEndpoint();
+    this.fsSubscription.add({
+      unsubscribe() {
+        dispose();
+      },
+    });
 
     return {
       id: this.context.id,
-      endpoint: this.context.fileSystemManager.getEndpoint(),
+      endpoint,
       builderManager: comlink.proxyValue(this.context.builderManager),
       jsonRPCLocalProviderManager: comlink.proxyValue(this.context.jsonRPCLocalProviderManager),
       openFile: this.openFile,

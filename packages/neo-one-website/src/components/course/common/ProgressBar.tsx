@@ -1,8 +1,8 @@
 import { Tooltip, TooltipArrow } from '@neo-one/react-common';
-import { Link } from '@reach/router';
 import * as React from 'react';
 import { as, Block, Box, Grid, styled } from 'reakit';
 import { prop, switchProp } from 'styled-tools';
+import { RouterLink } from '../../RouterLink';
 
 interface Props {
   readonly current?: number;
@@ -24,7 +24,7 @@ const SegmentBase = styled(Box)<{ readonly bg: 'current' | 'complete' | 'incompl
   display: block;
 `;
 
-const Segment = as(Link)(SegmentBase);
+const Segment = as(RouterLink)(SegmentBase);
 
 const StyledTooltip = styled(Tooltip)`
   white-space: nowrap;

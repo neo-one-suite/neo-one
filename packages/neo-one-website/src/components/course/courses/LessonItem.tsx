@@ -1,7 +1,7 @@
-import { Link } from '@reach/router';
 import * as React from 'react';
 import { as, Button, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
+import { RouterLink } from '../../RouterLink';
 import { getLessonTo, LessonProgressBar } from '../common';
 import { Lesson } from '../types';
 
@@ -13,7 +13,7 @@ const Wrapper = styled(Grid)`
     / auto;
 `;
 
-const Title = styled(as(Link)(Button))`
+const Title = styled(as(RouterLink)(Button))`
   width: 100%;
   ${prop('theme.fontStyles.headline')};
   ${prop('theme.fonts.axiformaMedium')};

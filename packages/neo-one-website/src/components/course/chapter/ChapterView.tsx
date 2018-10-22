@@ -1,9 +1,11 @@
 import { SplitPane } from '@neo-one/react-common';
 import { Redirect } from '@reach/router';
 import * as React from 'react';
+import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
 import { Grid, styled } from 'reakit';
 import { getChapterTo } from '../common';
+import { selectChapter } from '../coursesData';
 import { ChaptersProgress, CourseState, selectLessonProgress } from '../redux';
 import { SelectedChapter } from '../types';
 import { Docs } from './Docs';
@@ -42,6 +44,11 @@ const ChapterViewBase = ({ selected, progress }: Props) => {
 
   return (
     <StyledGrid>
+      <Helmet>
+        <title>
+          {`Lesson ${selected.lesson + 1} Chapter ${selected.chapter + 1}: ${selectChapter(selected).title} - NEO•ONE`}
+        </title>
+      </Helmet>
       <Grid.Item area="progress">
         <ProgressHeader selected={selected} />
       </Grid.Item>

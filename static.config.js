@@ -7,11 +7,13 @@ const { getDocs } = require('./packages/neo-one-website/src/utils/getDocs');
 const { getTutorial } = require('./packages/neo-one-website/src/utils/getTutorial');
 
 const ROOT_DIR = path.resolve(__dirname);
+const ROOT = path.resolve(ROOT_DIR, 'packages', 'neo-one-website');
 
 export default {
   paths: {
-    root: path.resolve(ROOT_DIR, 'packages', 'neo-one-website'),
-    node_modules: path.resolve(ROOT_DIR, 'node_modules'),
+    root: ROOT,
+    nodeModules: path.resolve(ROOT_DIR, 'node_modules'),
+    public: 'publicOut',
   },
   entry: path.join('src', 'index'),
   getSiteData: () => ({
@@ -68,6 +70,7 @@ export default {
               })),
             })),
             doc: doc.doc,
+            title: doc.title,
             next: doc.next,
             previous: doc.previous,
           }),
@@ -81,6 +84,7 @@ export default {
     ];
   },
   extractCssChunks: true,
+  disablePreload: true,
   plugins: [path.resolve(ROOT_DIR, 'scripts', 'website', 'webpack', 'plugin')],
   siteRoot: 'https://neo-one.netlify.com',
 };

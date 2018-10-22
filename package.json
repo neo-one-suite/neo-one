@@ -108,10 +108,14 @@
     "website:start-overlay": "yarn run ts-node ./scripts/website/compile --watch --bundle overlay",
     "website:start-preview": "yarn run ts-node ./scripts/website/compile --watch --bundle preview",
     "website:start-static": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static start",
+    "website:start-workers-prod": "NEO_ONE_PROD=true yarn run ts-node ./scripts/website/compile --watch --bundle workers",
+    "website:start-overlay-prod": "NEO_ONE_PROD=true yarn run ts-node ./scripts/website/compile --watch --bundle overlay",
+    "website:start-preview-prod": "NEO_ONE_PROD=true yarn run ts-node ./scripts/website/compile --watch --bundle preview",
+    "website:start-static-prod": "NEO_ONE_PROD=true cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static start",
     "website:stage": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build --staging",
     "website:serve": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run serve packages/neo-one-website/dist -p 3000",
     "website:build-static": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build",
-    "website:deploy-static": "rm -rf ./dist && yarn run ts-node ./scripts/website/compile --bundle workers && rm -rf ./packages/neo-one-website/public && cp -r ./dist/workers ./packages/neo-one-website/public && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build && netlify deploy --dir packages/neo-one-website/dist/ --prod --site 87d53560-9868-4a9b-bcbd-e11ce50a61e3",
+    "website:deploy-static": "rm -rf ./dist && yarn run ts-node ./scripts/website/compile --bundle workers && yarn run ts-node ./scripts/website/compile --bundle overlay && rm -rf ./packages/neo-one-website/publicOut && cp -r ./dist/workers ./packages/neo-one-website/publicOut && cp -r ./packages/neo-one-website/public/* ./packages/neo-one-website/publicOut && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build && netlify deploy --dir packages/neo-one-website/dist/ --prod --site 87d53560-9868-4a9b-bcbd-e11ce50a61e3",
     "website:deploy-preview": "rm -rf ./dist && yarn run ts-node ./scripts/website/compile --bundle workers && yarn run ts-node ./scripts/website/compile --bundle overlay && yarn run ts-node ./scripts/website/compile --bundle preview && cp -r ./dist/workers/* ./dist/preview && cp -r ./dist/overlay/* ./dist/preview && netlify deploy --dir dist/preview --prod --site d76abba9-9ad4-46a4-a2cc-1bf778f04623",
     "test:cypress": "yarn run ts-node ./scripts/runCypress.ts"
   },
@@ -210,6 +214,7 @@
     "stylelint-config-standard": "18.2.0",
     "stylelint-config-styled-components": "0.1.1",
     "stylelint-processor-styled-components": "1.5.0",
+    "terser-webpack-plugin": "1.1.0",
     "thread-loader": "1.2.0",
     "through2": "2.0.3",
     "tmp": "0.0.33",
@@ -223,9 +228,8 @@
     "tslint-immutable": "4.8.0",
     "tslint-microsoft-contrib": "5.2.1",
     "tslint-sonarts": "1.8.0",
-    "typescript": "3.2.0-dev.20181019",
+    "typescript": "3.2.0-dev.20181020",
     "typescript-styled-plugin": "0.11.0",
-    "uglifyjs-webpack-plugin": "2.0.1",
     "url-loader": "1.1.2",
     "webpack": "4.19.0",
     "webpack-bundle-analyzer": "3.0.3",
@@ -240,7 +244,8 @@
     "babel-core": "7.0.0-bridge.0",
     "bn.js": "4.11.8",
     "grpc": "1.15.1",
-    "regenerator-runtime": "0.12.1"
+    "regenerator-runtime": "0.12.1",
+    "webpack": "4.19.0"
   },
   "one": {
     "paths": {

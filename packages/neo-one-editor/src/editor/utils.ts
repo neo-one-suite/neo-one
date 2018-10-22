@@ -1,10 +1,10 @@
 import { utils } from '@neo-one/utils';
-import { getLanguageID, LanguageType } from '../monaco/language';
+import { LanguageID } from '../monaco/language';
 import { getFileType } from '../utils';
 import { EditorFile } from './types';
 
 // tslint:disable-next-line export-name
-export const getLanguageIDForFile = (id: string, file: EditorFile) => {
+export const getLanguageIDForFile = (file: EditorFile) => {
   const type = getFileType(file);
   if (type === undefined) {
     return 'editor';
@@ -12,11 +12,11 @@ export const getLanguageIDForFile = (id: string, file: EditorFile) => {
 
   switch (type) {
     case 'contract':
-      return getLanguageID(id, LanguageType.Contract);
+      return LanguageID.Contract;
     case 'typescript':
-      return getLanguageID(id, LanguageType.TypeScript);
+      return LanguageID.TypeScript;
     case 'javascript':
-      return getLanguageID(id, LanguageType.JavaScript);
+      return LanguageID.JavaScript;
     case 'html':
       return 'html';
     default:

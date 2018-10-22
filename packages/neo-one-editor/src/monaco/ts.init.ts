@@ -1,9 +1,7 @@
-// tslint:disable
+// tslint:disable-next-line
 import '@babel/polyfill';
 
-import { TypeScriptWorker } from './tsWorker';
-import { initializeWorker } from './initializeWorker';
+import { comlink } from '@neo-one/worker';
+import { AsyncLanguageService } from './AsyncLanguageService';
 
-initializeWorker((fs: any) => (ctx: any, createData: any) => {
-  return new TypeScriptWorker(ctx, createData, fs);
-});
+comlink.expose(AsyncLanguageService, self);

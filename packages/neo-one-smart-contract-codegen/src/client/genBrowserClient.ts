@@ -48,7 +48,7 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
   const localUserAccountProvider = localUserAccountProviders.find(
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
@@ -121,7 +121,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {

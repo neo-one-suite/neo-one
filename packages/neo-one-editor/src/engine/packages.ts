@@ -4,7 +4,6 @@ import { BrowserLocalClient, Builder, FileSystem } from '@neo-one/local-browser'
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import * as react from '@neo-one/react';
 import * as reactCommon from '@neo-one/react-common';
-import { createWithContracts } from '@neo-one/smart-contract-test-browser';
 import { WorkerManager } from '@neo-one/worker';
 import { Exports } from './types';
 
@@ -42,13 +41,6 @@ const packages: ReadonlyArray<PackageConfig> = [
     exports: () => reactCommon,
   },
   {
-    name: '@neo-one/smart-contract-test-browser',
-    path: '/node_modules/@neo-one/smart-contract-test-browser/src/index.ts',
-    exports: ({ fs }) => ({
-      withContracts: createWithContracts(() => fs),
-    }),
-  },
-  {
     name: '@neo-one/local-singleton',
     path: '/node_modules/@neo-one/local-singleton/src/index.ts',
     exports: ({ fs, jsonRPCLocalProviderManager, builderManager }) => {
@@ -69,8 +61,8 @@ export interface PathWithExports {
   readonly exports: Exports;
 }
 
-export const getPathWithExports = (options: ExportsOptions) =>
-  packages.reduce<ReadonlyArray<PathWithExports>>(
+export const getPathWithExports = (options: ExportsOptions, packagesIn = packages) =>
+  packagesIn.reduce<ReadonlyArray<PathWithExports>>(
     (acc, { name, path, exports }) =>
       acc.concat({
         name,

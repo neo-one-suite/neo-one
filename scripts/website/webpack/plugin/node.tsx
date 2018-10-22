@@ -1,3 +1,4 @@
+// prettier:disable
 // tslint:disable no-any
 import * as path from 'path';
 import * as React from 'react';
@@ -8,6 +9,7 @@ import nodeExternals from 'webpack-node-externals';
 // @ts-ignore
 import { InjectManifest } from 'workbox-webpack-plugin';
 import { Stage } from '../../types';
+import { addDefaultRules } from '../addDefaultRules';
 import { alias } from '../alias';
 import { node as nodeSettings } from '../node';
 import { optimization } from '../optimization';
@@ -17,14 +19,42 @@ import { rules } from '../rules';
 const APP_ROOT_DIR = path.resolve(__dirname, '..', '..', '..', '..');
 const WEBSITE_DIR = path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-website');
 
+const inlineScript = (body: string, key?: string) => (
+  <script key={key} type="text/javascript" dangerouslySetInnerHTML={{ __html: body }} />
+);
+
+const GTM = `
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', 'UA-92599752-3');
+gtag('config', 'UA-92599752-3', { 'transport_type': 'beacon'});
+
+// Feature detects Navigation Timing API support.
+if (window.performance) {
+  // Gets the number of milliseconds since page load
+  // (and rounds the result since the value must be an integer).
+  var timeSincePageLoad = Math.round(performance.now());
+
+  // Sends the timing event to Google Analytics.
+  gtag('event', 'timing_complete', {
+    'name': 'load',
+    'value': timeSincePageLoad,
+    'event_category': 'JS Dependencies'
+  });
+}
+`;
+
 export const node = () => ({
-  webpack: (mutableConfig: webpack.Configuration, { stage }: { stage: Stage }) => {
+  webpack: (mutableConfig: webpack.Configuration, { stage: stageIn }: { stage: Stage }) => {
+    const stage = process.env.NEO_ONE_PROD === 'true' && stageIn === 'dev' ? 'prod' : stageIn;
     const resolve = mutableConfig.resolve === undefined ? {} : mutableConfig.resolve;
     mutableConfig.resolve = {
       ...resolve,
       mainFields: ['browser', 'module', 'main'],
       aliasFields: ['browser'],
-      extensions: ['.js', '.jsx', '.json', '.mjs', '.ts', '.tsx'],
+      extensions: ['.mjs', '.js', '.jsx', '.json', '.ts', '.tsx'],
       alias: {
         ...(resolve.alias === undefined ? {} : resolve.alias),
         ...alias,
@@ -37,18 +67,7 @@ export const node = () => ({
       rules: rules({ stage, bundle: 'react-static' }),
       strictExportPresence: false,
     };
-
-    // tslint:disable-next-line:no-object-mutation
-    (mutableConfig as any).module.defaultRules = [
-      {
-        type: 'javascript/auto',
-        resolve: {},
-      },
-      {
-        test: /\.json$/i,
-        type: 'json',
-      },
-    ];
+    addDefaultRules(mutableConfig);
 
     if (stage !== 'node') {
       mutableConfig.optimization = optimization({ stage, bundle: 'react-static' });
@@ -63,17 +82,22 @@ export const node = () => ({
           plugin.constructor.name !== 'EnvironmentPlugin',
       )
       .concat(plugins({ stage, bundle: 'react-static' }))
-      .concat([
-        new InjectManifest({
-          swSrc: path.resolve(APP_ROOT_DIR, 'dist', 'workers', 'sw.js'),
-          ...(stage === 'prod'
-            ? {
-                globDirectory: path.resolve(WEBSITE_DIR, 'dist'),
-                globPatterns: ['**/*.{js,css,html}'],
-              }
-            : {}),
-        }),
-      ]);
+      .concat(
+        stage === 'node'
+          ? []
+          : [
+              new InjectManifest({
+                swSrc: path.resolve(APP_ROOT_DIR, 'dist', 'workers', 'sw.js'),
+                ...(stageIn === 'prod'
+                  ? {
+                      globDirectory: path.resolve(WEBSITE_DIR, 'dist'),
+                      globPatterns: ['**/*.{js,css,html}'],
+                      maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
+                    }
+                  : {}),
+              }),
+            ],
+      );
 
     mutableConfig.node = nodeSettings;
 
@@ -106,35 +130,24 @@ export const node = () => ({
       </StyleSheetManager>
     );
   },
-
   Head: ({ meta }: any) => (
     <>
       {meta.styleComponentsSheet.getStyleElement()}
       <script async src="https://www.googletagmanager.com/gtag/js?id=UA-92599752-3" />
-      <script>
-        {`
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-92599752-3');
-  gtag('config', 'UA-92599752-3', { 'transport_type': 'beacon'});
-
-  // Feature detects Navigation Timing API support.
-  if (window.performance) {
-    // Gets the number of milliseconds since page load
-    // (and rounds the result since the value must be an integer).
-    var timeSincePageLoad = Math.round(performance.now());
-
-    // Sends the timing event to Google Analytics.
-    gtag('event', 'timing_complete', {
-      'name': 'load',
-      'value': timeSincePageLoad,
-      'event_category': 'JS Dependencies'
-    });
-  }
-  `}
-      </script>
+      {/* prettier-ignore */}
+      {inlineScript(GTM)}
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+      <link rel="manifest" href="/manifest.json" />
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+      <meta name="theme-color" content="#ffffff" />
+      <meta name="application-name" content="NEO•ONE" />
+      {/*
+      // @ts-ignore */}
+      <meta charset="utf-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
     </>
   ),
 });

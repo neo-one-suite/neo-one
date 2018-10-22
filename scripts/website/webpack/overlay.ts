@@ -3,7 +3,6 @@ import webpack from 'webpack';
 import { Stage } from '../types';
 import { common } from './common';
 import { plugins } from './plugins';
-import { rules } from './rules';
 
 const APP_ROOT_DIR = path.resolve(__dirname, '..', '..', '..');
 const DIST_DIR = path.resolve(APP_ROOT_DIR, 'dist', 'overlay');
@@ -16,9 +15,6 @@ export const overlay = ({ stage }: { readonly stage: Stage }): webpack.Configura
   },
   output: {
     path: DIST_DIR,
-  },
-  module: {
-    rules: rules({ stage, bundle: 'overlay' }),
   },
   plugins: plugins({ stage, bundle: 'overlay' }).concat([
     new webpack.optimize.LimitChunkCountPlugin({

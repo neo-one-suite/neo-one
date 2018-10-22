@@ -58,7 +58,6 @@ export function listenToRuntimeErrors(
   registerStackTraceLimit();
   registerReactStack();
   permanentRegisterConsole('error', (warning, stack) => {
-    console.log('got error');
     const data = massageWarning(warning, stack);
     crashWithFrames(
       {
