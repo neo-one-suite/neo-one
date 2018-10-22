@@ -11,6 +11,7 @@ interface FetchPackageInfo {
   readonly name: string;
   readonly version: string;
   readonly suffix?: string;
+  readonly types?: boolean;
 }
 
 interface FileInfo {
@@ -30,15 +31,19 @@ export class PackageManager {
   public readonly packages$: Observable<{ readonly [name: string]: Module }>;
   private readonly fs: FileSystem;
   private readonly subscription: Subscription;
+  private readonly typesCallback: (name: string, version: string, typesFullName: string) => Promise<void>;
 
   public constructor({
     fs,
     packageJSON$,
+    typesCallback,
   }: {
     readonly packageJSON$: Observable<PackageJSON>;
     readonly fs: FileSystem;
+    readonly typesCallback: (name: string, version: string, typesFullName: string) => Promise<void>;
   }) {
     this.fs = fs;
+    this.typesCallback = typesCallback;
     this.dependencies$ = packageJSON$.pipe(
       distinctUntilChanged(),
       mergeScanLatest(async (_acc, packageJSON) =>
@@ -67,10 +72,11 @@ export class PackageManager {
     return packages.reduce<{ readonly [name: string]: Module }>((acc, pkg) => ({ ...acc, [pkg.name]: pkg }), {});
   }
 
-  private async fetchPackage({ name, version, dependencies }: DependencyInfo): Promise<Module> {
+  private async fetchPackage({ name, version, types, dependencies }: DependencyInfo): Promise<Module> {
     const [packageFilePaths, subDependencies] = await Promise.all([
       this.getAllPackageFiles({ name, version }),
       this.fetchPackages(dependencies),
+      this.checkTypes({ name, version, types }),
     ]);
 
     const packageFiles = await Promise.all(
@@ -120,6 +126,29 @@ export class PackageManager {
       .map((line) => (suffix === undefined ? line : `${suffix}${line}`));
   }
 
+  private async checkTypes({ name, version, types }: FetchPackageInfo) {
+    if (types) {
+      return;
+    }
+    try {
+      const res = await fetch(this.getTypesUrl(name));
+      const htmlDir = await res.text();
+      if (!res.ok) {
+        return;
+      }
+
+      const typesFullName = htmlDir
+        .split('\n')
+        .filter((line) => line.includes('@types') && !line.includes('>'))[0]
+        .replace('\t', '')
+        .trim();
+
+      await this.typesCallback(name, version, typesFullName);
+    } catch {
+      return;
+    }
+  }
+
   private async downloadDependency({ name, version, suffix }: FetchPackageInfo) {
     try {
       const pkg = await fetch(this.getNPMUrl({ name, version, suffix }));
@@ -128,6 +157,12 @@ export class PackageManager {
     } catch {
       throw new Error(`Could not find module ${name}@${version}`);
     }
+  }
+
+  private getTypesUrl(name: string): string {
+    const typesName = name.replace('@', '').replace('/', '__');
+
+    return `https://cdn.jsdelivr.net/npm/@types/${typesName}`;
   }
 
   private getNPMUrl({ name, version, suffix }: FetchPackageInfo): string {

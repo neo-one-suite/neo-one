@@ -36,35 +36,44 @@ describe('package manager', () => {
     readFileSync: jest.fn(),
     readdirSync: jest.fn(),
   };
+  const typesCallback = jest.fn(async () => Promise.resolve());
 
   beforeEach(() => {
     fs.writeFile.mockClear();
+    typesCallback.mockClear();
   });
 
   test('files written properly', async () => {
     const packageJSON$ = _of(coursePackages);
 
-    const pkm = new PackageManager({ fs, packageJSON$ });
+    const pkm = new PackageManager({ fs, packageJSON$, typesCallback });
     await new Promise<void>((resolve) => setTimeout(resolve, 15000));
 
     // tslint:disable-next-line no-array-mutation
     const paths = fs.writeFile.mock.calls.map((call) => call[0]).sort();
     expect(paths).toMatchSnapshot();
+    // tslint:disable-next-line no-array-mutation no-misleading-array-reverse
+    const typesCalls = typesCallback.mock.calls.sort();
+    expect(typesCalls).toMatchSnapshot();
     pkm.dispose();
   });
 
-  test.only('node_modules updated', async () => {
+  test('node_modules updated', async () => {
     const packageJSON$ = interval(10000).pipe(
       take(2),
       map((idx) => (idx === 0 ? coursePackages : package2)),
     );
 
-    const pkm = new PackageManager({ fs, packageJSON$ });
+    const pkm = new PackageManager({ fs, packageJSON$, typesCallback });
     await new Promise<void>((resolve) => setTimeout(resolve, 25000));
 
     // tslint:disable-next-line no-array-mutation
     const paths = fs.writeFile.mock.calls.map((call) => call[0]).sort();
     expect(paths).toMatchSnapshot();
+    // tslint:disable-next-line no-array-mutation no-misleading-array-reverse
+    const typesCalls = typesCallback.mock.calls.sort();
+    expect(typesCalls).toMatchSnapshot();
+
     pkm.dispose();
   });
 });
