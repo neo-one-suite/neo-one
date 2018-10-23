@@ -125,7 +125,7 @@ export class PackageManager {
     );
     const zippedPackageInfo = _.zip(packageFilePaths, packageFilePromises) as ReadonlyArray<[string, Promise<string>]>;
 
-    this.startFetchLoop().catch(() => {
+    this.startFetchQueue().catch(() => {
       // do nothing
     });
 
@@ -171,7 +171,7 @@ export class PackageManager {
           });
         }
 
-        return currentPath === undefined ? entry.name : `${currentPath}/${entry.name}`;
+        return currentPath === undefined ? [entry.name] : [`${currentPath}/${entry.name}`];
       }),
     );
   }
@@ -189,39 +189,24 @@ export class PackageManager {
     const typesVersions = await versionRes.json();
     const latestTypesVersion = typesVersions.versions[0];
 
-    const res = await fetch(this.getNPMDataUrl({ name: typesName, version: latestTypesVersion }));
-    if (!res.ok) {
-      return;
-    }
-    const files = await res.json();
-    let indexFound = false;
-    files.files.forEach((file: FileData | DirectoryData) => {
-      if (file.name === 'index.d.ts') {
-        indexFound = true;
-      }
-    });
-    if (!indexFound) {
-      return;
-    }
-
     this.onAddTypes(name, version, `${typesName}@${latestTypesVersion}`);
   }
 
-  private async startFetchLoop() {
+  private async startFetchQueue() {
     if (this.mutableRunning >= this.fetchConcurrency) {
       return;
     }
 
     const entry = this.mutableQueue.shift();
     // tslint:disable-next-line:no-loop-statement
-    while (entry !== undefined && this.mutableRunning < this.fetchConcurrency) {
+    if (entry !== undefined) {
       this.mutableRunning += 1;
 
       this.downloadDependency({ name: entry.name, version: entry.version, suffix: entry.filePath })
         .then((file) => {
           entry.resolve(file);
           this.mutableRunning -= 1;
-          this.startFetchLoop().catch(() => {
+          this.startFetchQueue().catch(() => {
             // do nothing
           });
         })
@@ -232,7 +217,7 @@ export class PackageManager {
   private async downloadDependency({ name, version, suffix }: FetchPackageInfo) {
     try {
       let minSuffix = suffix;
-      if (suffix !== undefined && suffix.substr(-3, 3) === '.js' && suffix.substr(-7, 4) !== '.min') {
+      if (suffix !== undefined && suffix.endsWith('.js') && !suffix.endsWith('.min.js')) {
         minSuffix = suffix.replace('.js', '.min.js');
       }
 
