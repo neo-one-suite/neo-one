@@ -5,7 +5,7 @@ import anchor from 'markdown-it-anchor';
 import TOC from 'markdown-it-table-of-contents';
 import * as React from 'react';
 import { css, styled } from 'reakit';
-import { prop } from 'styled-tools';
+import { prop, switchProp } from 'styled-tools';
 
 // tslint:disable
 import '../../static/css/prism.css';
@@ -29,6 +29,8 @@ import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 // @ts-ignore
 import 'prismjs/components/prism-markup';
+// @ts-ignore
+import 'prismjs/components/prism-bash';
 
 Prism.languages.typescript = Prism.languages.extend('javascript', {
   // From JavaScript Prism keyword list and TypeScript language spec: https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#221-reserved-words
@@ -62,11 +64,11 @@ md.set({
   .use(TOC, { includeLevel: [2] });
 
 const headerMargins = css`
-  margin-top: 24px;
+  margin-top: 32px;
   margin-bottom: 24px;
 `;
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent' }>`
   ${prop('theme.fontStyles.subheading')};
   ${prop('theme.fonts.axiformaThin')};
   overflow-wrap: break-word;
@@ -108,7 +110,11 @@ const Wrapper = styled.div`
   }
 
   & a {
-    color: ${prop('theme.primary')};
+    color: ${switchProp('linkColor', {
+      primary: prop('theme.primary'),
+      accent: prop('theme.accent'),
+      gray: prop('theme.gray6'),
+    })};
     ${prop('theme.fonts.axiformaBold')};
     ${prop('theme.fontStyles.subheading')};
     text-decoration: none;
@@ -130,10 +136,9 @@ const Wrapper = styled.div`
   }
 
   & hr {
-    border: 'none';
     border-bottom: 1px solid rgba(255, 255, 255, 0.075);
     margin-bottom: 8px;
-    margin-top: 8px;
+    margin-top: 32px;
   }
 
   & strong: {
@@ -161,6 +166,10 @@ const Wrapper = styled.div`
     padding-left: 24px;
   }
 
+  & li {
+    margin-top: 8px;
+  }
+
   & pre {
     margin-bottom: 16px;
     margin-top: 16px;
@@ -175,6 +184,7 @@ const Wrapper = styled.div`
 
 interface Props {
   readonly source: string;
+  readonly linkColor?: 'primary' | 'gray' | 'accent';
 }
 export class Markdown extends React.Component<Props> {
   private readonly ref = React.createRef<HTMLElement>();
@@ -192,8 +202,15 @@ export class Markdown extends React.Component<Props> {
   }
 
   public render() {
-    const { source, ...props } = this.props;
+    const { source, linkColor = 'primary', ...props } = this.props;
 
-    return <Wrapper {...props} innerRef={this.ref} dangerouslySetInnerHTML={{ __html: md.render(source) }} />;
+    return (
+      <Wrapper
+        {...props}
+        linkColor={linkColor}
+        innerRef={this.ref}
+        dangerouslySetInnerHTML={{ __html: md.render(source) }}
+      />
+    );
   }
 }

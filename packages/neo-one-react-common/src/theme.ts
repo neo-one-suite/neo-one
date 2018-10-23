@@ -108,6 +108,12 @@ export const theme = {
       text-align: left;
       margin: 0;
     `,
+    display3: css`
+      font-size: 3.5125rem;
+      line-height: 1.06666em;
+      text-align: left;
+      margin: 0;
+    `,
     headline: css`
       font-size: 1.5rem;
       line-height: 1.35416em;

@@ -8,7 +8,7 @@ import { CoreLayout } from '../layout';
 
 // tslint:disable-next-line export-name no-default-export
 export default () => (
-  <CoreLayout>
+  <CoreLayout path="404">
     <Helmet title="404">
       <link rel="canonical" href={process.env.REACT_STATIC_PUBLIC_PATH} />
       <meta name="robots" content="noindex" />

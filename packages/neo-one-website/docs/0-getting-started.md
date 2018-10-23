@@ -7,47 +7,66 @@ section: Installation
 
 This page is an overview of the NEO•ONE documentation and related resources.
 
-NEO•ONE is a Typescript library designed from the ground up to easily and quickly help you through the full journey of decentralized app development on the NEO blockchain.
+__NEO•ONE__ makes coding, testing and deploying NEO dapps easier, faster, more efficient and much more enjoyable.
+
+---
 
 [[toc]]
-___
 
-## Learn
-This site is filled with resources to help you learn about NEO•ONE and dapp development. Whether you're new to developing for NEO or you have experience with other blockchain development tools, we recommend starting with our hands on [courses](/course), [tutorial](/tutorial), or our [step by step guide]() to main concepts. Our goal is to get you up to speed and building dapps as quickly and easily as possible!
+---
 
-### First Examples
-The [NEO•ONE Homepage](/) contains a few small examples. Even if you don't know anything about building dapps, check it out to see what is possible.
+## Try NEO•ONE
 
-### Typescript Resources
-The NEO•ONE documentation assumes some familiarity with programming in Typescript. If you are familiar with Javascript, or better yet, Javascript with Flow, this should be an easy transition.
+NEO•ONE has been designed as full end-to-end toolkit for building NEO dapps. From developing a smart contract, to testing, to interacting with it from your front-end, the entire dapp lifecycle is covered with NEO•ONE. However, it's not necessary to use NEO•ONE for every part of your dapp, you can pick and choose the parts of NEO•ONE that make sense for your development.
 
-We recommend going through this [Javascript overview](https://developer.mozilla.org/en-US/docs/Web/JavaScript/A_re-introduction_to_JavaScript) to check your knowledge of basic concepts and this [Typescript overview](https://www.typescriptlang.org/docs/home.html) to learn about the differences.
+The links in this section will help you get started.
 
 ### Courses
-The [NEO•ONE courses](/course) are a great place to get started with NEO•ONE. They will walk you through all of the basic concepts of development with NEO•ONE to get your first dapp up and running. Best of all, they run on a completely in the browser, so no environment setup is required. We recommend this as the fastest and easiest way to get started.
+
+If you're interested in playing around with NEO•ONE or you prefer to __learn by doing__, check out [NEO•ONE Courses](/course). Play through the first two lessons and you'll experience the entire development lifecycle of a dapp by deploying a fully functioning ICO, from the smart contract that powers it all to the UI that enables participation. And all directly from your browser - no environment setup required.
 
 ### Tutorial
-If you'd prefer to use your own editor and setup your own environment, the [NEO•ONE tutorial](/tutorial) is also a great place to start.  The tutorials cover the same content as the courses and give you step by step instructions on how to get your environment setup on your local machine.
 
-### Main Concepts
-If you'd prefer to just get an overview of NEO•ONE and learn about some of the core concepts, keep reading this documentation or skip ahead to the [main concepts]() section.
+If you'd prefer to use your own editor, you can work through the [NEO•ONE Tutorial](/tutorial). The tutorial covers roughly the same content as the first two lessons of the Courses and by the end of it you'll be ready to start building your own unique dapp.
 
-### Advanced Concepts
-Once you're comfortable with the [main concepts]() and have built some simple dapps with NEO•ONE, you might be interested in some of the more advanced features NEO•ONE has to offer. The [advanced concepts]() section will introduce you to some of the less commonly used features.
+## Learn NEO•ONE
+
+NEO•ONE covers the entire development lifecycle of a dapp, so it's best to learn it one step at a time.
+
+### First Examples
+
+The [NEO•ONE Homepage](/) contains a few small examples. Even if you don't know anything about building dapps, check them out to see what is possible.
+
+### TypeScript Resources
+
+NEO•ONE is written in TypeScript and the documentation assumes some familiarity with TypeScript. If you've never used TypeScript before, or it's been a while, keep the [TypeScript documentation](https://www.typescriptlang.org/docs/handbook/basic-types.html) handy while working through the NEO•ONE documentation.
+
+Prefer JavaScript or don't want to use TypeScript? No problem! NEO•ONE smart contracts are the only part of the framework that requires coding in TypeScript - otherwise you're free to use either JavaScript or TypeScript.
+
+### Step-by-Step Guide
+
+If you'd prefer to just get an overview of NEO•ONE and learn about the core concepts, check out the [guide to main concepts](). Every chapter builds on the knowledge introduced in previous chapters so you won't miss anything as you go along.
+
+### Advanced Guides
+
+Once you're comfortable with the [main concepts]() and have built some simple dapps with NEO•ONE, you might be interested in some of the more advanced features NEO•ONE has to offer. The [advanced guides]() section will introduce you to some of the less commonly used, though in some cases very powerful, features.
 
 ### API Reference
+
 The [API Reference]() section is useful for learning about specific details of the NEO•ONE API.
 
-___
+---
 
 ## Staying Informed
+
 The [NEO•ONE blog](/blog) is the official source of updates from the NEO•ONE team. Here you will find things like release notes and deprecation notices.
 
-Additionally, you can get the same udpates by following the [@neo-one-suite account](https://twitter.com/neo_one_suite) on twitter.
+Additionally, you can get the same udpates by following [@neo-one-suite](https://twitter.com/neo_one_suite) on Twitter.
 
-Lastly, feel free to reach out to us on the [NEO•ONE discord](https://discordapp.com/invite/S86PqDE) to chat with us directly.
+Finally, feel free to reach out to us on the [NEO•ONE Discord](https://discordapp.com/invite/S86PqDE) to chat with us directly.
 
-___
+---
 
 ## Something Missing?
-If something is missing from the NEO•ONE documentation or you found something confusing, please submit an issue to the [NEO•ONE github](https://github.com/neo-one-suite/neo-one) with your suggestions. You can also tweet at the [@neo-one-suite account](https://twitter.com/neo_one_suite) or let us know directly on the [NEO•ONE discord](https://discordapp.com/invite/S86PqDE).
+
+If something is missing from the NEO•ONE documentation or you found something confusing, please submit an issue to the [NEO•ONE GitHub](https://github.com/neo-one-suite/neo-one) with your suggestions. You can also tweet [@neo-one-suite](https://twitter.com/neo_one_suite) or let us know directly on the [NEO•ONE Discord](https://discordapp.com/invite/S86PqDE). We'd love to hear from you!

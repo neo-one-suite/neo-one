@@ -26,11 +26,12 @@ const Content = styled(Box)`
 `;
 
 interface Props {
+  readonly path: string;
   readonly children: React.ReactNode;
 }
-export const CoreLayout = ({ children, ...props }: Props & ComponentProps<typeof Wrapper>) => (
+export const CoreLayout = ({ children, path, ...props }: Props & ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
-    <ScrollContainer>{({ y }) => <StyledHeader shadowed={y > 0} />}</ScrollContainer>
+    <ScrollContainer>{({ y }) => <StyledHeader path={path} shadowed={y > 0} />}</ScrollContainer>
     <Content>{children}</Content>
     <Footer />
   </Wrapper>

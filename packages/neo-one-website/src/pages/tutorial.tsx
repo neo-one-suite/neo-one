@@ -46,10 +46,10 @@ export default () => (
   // @ts-ignore
   <RouteData Loader={DocsLoading}>
     {({ tutorial, sections }: TutorialInfo) => (
-      <CoreLayout>
+      <CoreLayout path="tutorial">
         <Helmet title="Tutorial: Into to NEO•ONE - NEO•ONE" />
         <StyledGrid>
-          <StyledMarkdown source={tutorial} />
+          <StyledMarkdown source={tutorial} linkColor="accent" />
           <StyledSidebar sections={sections} tutorial />
         </StyledGrid>
       </CoreLayout>

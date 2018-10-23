@@ -12,14 +12,33 @@ import { CoreLayout, DocsLoading } from '../layout';
 import { AdjacentInfo } from '../utils';
 
 const StyledMarkdown = styled(Markdown)`
-  grid-area: markdown;
-  padding-left: 240px;
-  padding-right: 240px;
+  ${prop('theme.fonts.axiformaBook')};
+  color: ${prop('theme.black')};
+  max-width: 42em;
 
-  @media (max-width: ${prop('theme.breakpoints.lg')}) {
-    padding-left: 16px;
-    padding-right: 16px;
+  & h1 {
+    ${prop('theme.fontStyles.display3')};
+    margin-top: 16px;
+    margin-bottom: 24px;
   }
+
+  & > p:nth-child(2) {
+    ${prop('theme.fonts.axiformaThin')};
+    ${prop('theme.fontStyles.headline')};
+    color: ${prop('theme.gray6')};
+    margin-bottom: 40px;
+    margin-top: 40px;
+  }
+`;
+
+const MarkdownWrapper = styled(Grid)`
+  grid-area: markdown;
+  justify-items: center;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 64px;
+  padding-bottom: 64px;
+  width: 90%;
 `;
 
 const StyledSidebar = styled(Sidebar)`
@@ -67,10 +86,12 @@ export default () => (
       const { doc, title, next, previous, sidebar } = props;
 
       return (
-        <CoreLayout>
+        <CoreLayout path="docs">
           <Helmet title={`${title} - NEO•ONE`} />
           <StyledGrid>
-            <StyledMarkdown source={doc} />
+            <MarkdownWrapper>
+              <StyledMarkdown source={doc} linkColor="accent" />
+            </MarkdownWrapper>
             <StyledSidebar sections={sidebar} />
             <StyledDocFooter next={next} previous={previous} />
           </StyledGrid>

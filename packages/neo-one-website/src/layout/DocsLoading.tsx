@@ -3,7 +3,7 @@ import * as React from 'react';
 import { CoreLayout } from './CoreLayout';
 
 export const DocsLoading = () => (
-  <CoreLayout>
+  <CoreLayout path="/">
     <Loading />
   </CoreLayout>
 );

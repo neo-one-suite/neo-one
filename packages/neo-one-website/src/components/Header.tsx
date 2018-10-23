@@ -2,7 +2,7 @@
 import { Link, Logo } from '@neo-one/react-common';
 import * as React from 'react';
 import { as, Flex, styled, Toolbar } from 'reakit';
-import { prop } from 'styled-tools';
+import { ifProp, prop, withProp } from 'styled-tools';
 import { ComponentProps } from '../types';
 import { RouterLink } from './RouterLink';
 
@@ -34,7 +34,7 @@ const StyledToolbar = styled(Toolbar)`
   }
 `;
 
-const FocusableRouterLink = as(RouterLink)(Toolbar.Focusable);
+const FocusableRouterLink = as(Link as any)(as(RouterLink)(Toolbar.Focusable));
 
 const LogoLink = styled(FocusableRouterLink)`
   display: block;
@@ -50,42 +50,49 @@ const LogoLink = styled(FocusableRouterLink)`
   }
 `;
 
-const NavigationLink = styled(FocusableRouterLink)`
+const NavigationLink: any = styled(FocusableRouterLink)<{ readonly active: boolean }>`
   display: flex;
   align-items: center;
-  font-size: 20px;
+  ${prop('theme.fontStyles.headline')};
   height: 100%;
   padding-top: 5px;
-  border-bottom: 5px solid transparent;
-  color: ${prop('theme.black')};
+  ${ifProp('active', withProp('theme.accent', (color) => `color: ${color};`))};
+  border-bottom: 5px solid ${ifProp('active', prop('theme.accent'), 'transparent')};
   text-decoration: none;
 
   &:hover {
-    border-color: ${prop('theme.accent')};
+    color: ${prop('theme.accent')};
+  }
+
+  &:focus {
     color: ${prop('theme.accent')};
   }
 
   &.active {
-    border-color: ${prop('theme.accent')};
+    color: ${prop('theme.accent')};
   }
 `;
 
 const FocusableLink: any = as(Link as any)(Toolbar.Focusable);
 
-export const Header = (props: ComponentProps<typeof Wrapper>) => (
+interface Props {
+  readonly path: string;
+}
+
+export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledToolbar>
       <Toolbar.Content>
         <LogoLink data-test="header-logo" to="/">
           <Logo />
         </LogoLink>
-        <NavigationLink data-test="header-docs" to="/docs/getting-started">
+        <NavigationLink linkColor="gray" active={path === 'docs'} data-test="header-docs" to="/docs/getting-started">
           Docs
         </NavigationLink>
-        <NavigationLink data-test="header-tutorial" to="/tutorial">
+        <NavigationLink linkColor="gray" active={path === 'tutorial'} data-test="header-tutorial" to="/tutorial">
           Tutorial
         </NavigationLink>
-        <NavigationLink data-test="header-tutorial" to="/course">
+        <NavigationLink linkColor="gray" active={path === 'course'} data-test="header-tutorial" to="/course">
           Course
         </NavigationLink>
       </Toolbar.Content>
