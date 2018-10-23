@@ -94,29 +94,35 @@ export const node = () => ({
                   {
                     urlPattern: /^https:\/\/.*.jsdelivr.com/,
                     handler: 'cacheFirst',
-                    expiration: {
-                      maxEntries: 100000,
-                      purgeOnQuotaError: true,
-                    },
-                    cacheableResponse: {
-                      statuses: [0, 200],
-                    },
-                    matchOptions: {
-                      ignoreSearch: true,
+                    options: {
+                      cacheName: 'jsdelivr',
+                      expiration: {
+                        maxEntries: 100000,
+                        purgeOnQuotaError: true,
+                      },
+                      cacheableResponse: {
+                        statuses: [0, 200],
+                      },
+                      matchOptions: {
+                        ignoreSearch: true,
+                      },
                     },
                   },
                   {
                     urlPattern: /^https:\/\/registry.npmjs.org/,
                     handler: 'cacheFirst',
-                    expiration: {
-                      maxEntries: 100000,
-                      purgeOnQuotaError: true,
-                    },
-                    cacheableResponse: {
-                      statuses: [0, 200],
-                    },
-                    matchOptions: {
-                      ignoreSearch: true,
+                    options: {
+                      cacheName: 'npmjs',
+                      expiration: {
+                        maxEntries: 100000,
+                        purgeOnQuotaError: true,
+                      },
+                      cacheableResponse: {
+                        statuses: [0, 200],
+                      },
+                      matchOptions: {
+                        ignoreSearch: true,
+                      },
                     },
                   },
                 ],

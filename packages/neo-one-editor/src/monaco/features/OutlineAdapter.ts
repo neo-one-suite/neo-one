@@ -1,5 +1,7 @@
 /// <reference types="monaco-editor/monaco" />
-// tslint:disable no-object-mutation no-null-keyword strict-boolean-expressions no-array-mutation
+// tslint:disable no-object-mutation no-null-keyword strict-boolean-expressions no-array-mutation no-submodule-imports
+// @ts-ignore
+import * as monaco from 'monaco-editor/esm/vs/editor/edcore.main';
 import { map, switchMap } from 'rxjs/operators';
 import ts from 'typescript';
 import { Adapter } from './Adapter';
