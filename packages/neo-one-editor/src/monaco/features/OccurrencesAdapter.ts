@@ -1,3 +1,4 @@
+/// <reference types="monaco-editor/monaco" />
 import { map, switchMap } from 'rxjs/operators';
 import { Adapter } from './Adapter';
 import { positionToOffset, textSpanToRange } from './utils';
@@ -14,9 +15,14 @@ export class OccurrencesAdapter extends Adapter implements monaco.languages.Docu
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(async (worker) => worker.getOccurrencesAtPosition(resource.path, positionToOffset(model, position))),
+        switchMap(
+          async (worker) =>
+            model.isDisposed()
+              ? undefined
+              : worker.getOccurrencesAtPosition(resource.path, positionToOffset(model, position)),
+        ),
         map((entries) => {
-          if (!entries) {
+          if (!entries || model.isDisposed()) {
             return [];
           }
 

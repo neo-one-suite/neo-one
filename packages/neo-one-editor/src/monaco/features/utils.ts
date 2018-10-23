@@ -1,3 +1,4 @@
+/// <reference types="monaco-editor/monaco" />
 // tslint:disable:prefer-template
 import _ from 'lodash';
 import ts from 'typescript';

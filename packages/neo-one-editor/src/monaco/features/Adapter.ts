@@ -1,7 +1,9 @@
+/// <reference types="monaco-editor/monaco" />
 import { PouchDBFileSystem } from '@neo-one/local-browser';
 import { Observable, Subscription, throwError } from 'rxjs';
 import { catchError, filter, take, takeUntil } from 'rxjs/operators';
 import { AsyncLanguageService } from '../AsyncLanguageService';
+import { disposeModel } from '../utils';
 import { getModel } from './utils';
 
 export class Adapter {
@@ -16,7 +18,7 @@ export class Adapter {
 
   public dispose(): void {
     this.mutableCreatedModels.forEach((model) => {
-      model.dispose();
+      disposeModel(model);
     });
     this.mutableSubscriptions.forEach((subscription) => {
       subscription.unsubscribe();

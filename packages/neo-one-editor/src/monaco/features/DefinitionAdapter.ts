@@ -1,3 +1,4 @@
+/// <reference types="monaco-editor/monaco" />
 // tslint:disable no-array-mutation
 import { map, switchMap } from 'rxjs/operators';
 import { Adapter } from './Adapter';
@@ -14,9 +15,12 @@ export class DefinitionAdapter extends Adapter implements monaco.languages.Defin
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(async (worker) => worker.getDefinitionAtPosition(resource.path, positionToOffset(model, position))),
+        switchMap(
+          async (worker) =>
+            model.isDisposed() ? [] : worker.getDefinitionAtPosition(resource.path, positionToOffset(model, position)),
+        ),
         map((entries) => {
-          if (!entries) {
+          if (!entries || model.isDisposed()) {
             return [];
           }
           const result: monaco.languages.Location[] = [];

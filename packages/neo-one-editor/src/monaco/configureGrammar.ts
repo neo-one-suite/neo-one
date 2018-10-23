@@ -1,4 +1,4 @@
-import * as monacoNsps from 'monaco-editor';
+/// <reference types="monaco-editor/monaco" />
 import { IGrammar, INITIAL, Registry, StackElement } from 'monaco-textmate';
 import { loadWASM } from 'onigasm';
 
@@ -9,7 +9,7 @@ import onigasm from '!file-loader!../../../../node_modules/onigasm/lib/onigasm.w
 import tsGrammar from '!raw-loader!./grammars/TypeScriptReact.tmLanguage';
 // tslint:enable
 
-class TokenizerState implements monacoNsps.languages.IState {
+class TokenizerState implements monaco.languages.IState {
   public constructor(private readonly _ruleStack: StackElement) {}
 
   public get ruleStack(): StackElement {
@@ -20,7 +20,7 @@ class TokenizerState implements monacoNsps.languages.IState {
     return new TokenizerState(this._ruleStack);
   }
 
-  public equals(other: monacoNsps.languages.IState | undefined | null): boolean {
+  public equals(other: monaco.languages.IState | undefined | null): boolean {
     if (!other || !(other instanceof TokenizerState) || other !== this || other._ruleStack !== this._ruleStack) {
       return false;
     }

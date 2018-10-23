@@ -1,3 +1,4 @@
+/// <reference types="monaco-editor/monaco" />
 // tslint:disable:prefer-template
 import { map, switchMap } from 'rxjs/operators';
 import ts from 'typescript';
@@ -59,18 +60,25 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
     // tslint:disable-next-line readonly-array
   ): monaco.Thenable<monaco.languages.CompletionItem[]> {
     const resource = model.uri;
-    const offset = positionToOffset(model, position);
 
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(async (worker) =>
-          worker.getCompletionsAtPosition(resource.path, offset, context.triggerCharacter, {
-            [resource.path]: model.getValue(),
-          }),
+        switchMap(
+          async (worker) =>
+            model.isDisposed()
+              ? undefined
+              : worker.getCompletionsAtPosition(
+                  resource.path,
+                  positionToOffset(model, position),
+                  context.triggerCharacter,
+                  {
+                    [resource.path]: model.getValue(),
+                  },
+                ),
         ),
         map((info) => {
-          if (!info) {
+          if (!info || model.isDisposed()) {
             return [];
           }
 
@@ -102,17 +110,20 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(async (worker) =>
-          worker.getCompletionEntryDetails(
-            resource.path,
-            positionToOffset(model, position),
-            myItem.label,
-            undefined,
-            myItem.source,
-          ),
+        switchMap(
+          async (worker) =>
+            model.isDisposed()
+              ? undefined
+              : worker.getCompletionEntryDetails(
+                  resource.path,
+                  positionToOffset(model, position),
+                  myItem.label,
+                  undefined,
+                  myItem.source,
+                ),
         ),
         map((details) => {
-          if (!details) {
+          if (!details || model.isDisposed()) {
             return myItem;
           }
 

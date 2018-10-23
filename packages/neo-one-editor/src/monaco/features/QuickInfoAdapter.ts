@@ -1,3 +1,4 @@
+/// <reference types="monaco-editor/monaco" />
 // tslint:disable:prefer-template
 import { map, switchMap } from 'rxjs/operators';
 import ts from 'typescript';
@@ -15,9 +16,14 @@ export class QuickInfoAdapter extends Adapter implements monaco.languages.HoverP
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(async (worker) => worker.getQuickInfoAtPosition(resource.path, positionToOffset(model, position))),
+        switchMap(
+          async (worker) =>
+            model.isDisposed()
+              ? undefined
+              : worker.getQuickInfoAtPosition(resource.path, positionToOffset(model, position)),
+        ),
         map((info) => {
-          if (!info) {
+          if (!info || model.isDisposed()) {
             return { contents: [] };
           }
 

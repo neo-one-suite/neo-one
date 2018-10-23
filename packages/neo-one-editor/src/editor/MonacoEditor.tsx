@@ -2,8 +2,6 @@
 /// <reference types="monaco-editor/monaco" />
 import { FileSystem } from '@neo-one/local-browser';
 import _ from 'lodash';
-// @ts-ignore
-import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.main';
 import * as React from 'react';
 import { styled } from 'reakit';
 import ResizeObserver from 'resize-observer-polyfill';
@@ -12,6 +10,7 @@ import { map } from 'rxjs/operators';
 import { Engine } from '../engine';
 import { setupStandaloneEditor } from '../monaco/editor';
 import { LanguageID } from '../monaco/language';
+import { disposeModel } from '../monaco/utils';
 import { defineThemes } from './theme';
 import { EditorFile, EditorFiles, FileDiagnostic, FileDiagnosticSeverity, TextRange } from './types';
 import { getLanguageIDForFile } from './utils';
@@ -32,8 +31,6 @@ const Wrapper = styled.div`
   min-width: 0;
   min-height: 0;
 `;
-
-const monac = monacoEditor as typeof monaco;
 
 defineThemes();
 
@@ -72,7 +69,7 @@ export class MonacoEditor extends React.Component<Props> {
   public componentDidMount(): void {
     const current = this.ref.current;
     if (current !== null) {
-      this.mutableEditor = monac.editor.create(current, {
+      this.mutableEditor = monaco.editor.create(current, {
         language: LanguageID.TypeScript,
         theme: 'dark',
         ...this.getEditorOptions(this.props),
@@ -141,7 +138,7 @@ export class MonacoEditor extends React.Component<Props> {
       this.mutableEditor.dispose();
     }
     this.mutableCreatedModels.forEach((model) => {
-      model.dispose();
+      disposeModel(model);
     });
 
     this.resizeObserver.disconnect();
@@ -170,7 +167,7 @@ export class MonacoEditor extends React.Component<Props> {
   private openFile(file: EditorFile, range?: TextRange, focus?: boolean): void {
     this.initializeFile(file);
 
-    const model = monac.editor.getModels().find((mdl) => mdl.uri.path === file.path);
+    const model = monaco.editor.getModels().find((mdl) => mdl.uri.path === file.path);
 
     if (model !== undefined) {
       this.editor.setModel(model);
@@ -251,7 +248,7 @@ export class MonacoEditor extends React.Component<Props> {
   }
 
   private initializeFile(file: EditorFile): void {
-    let model = monac.editor.getModels().find((mdl) => mdl.uri.path === file.path);
+    let model = monaco.editor.getModels().find((mdl) => mdl.uri.path === file.path);
 
     const content = this.fs.readFileSync(file.path);
     const modeID = getLanguageIDForFile(file);
@@ -268,10 +265,10 @@ export class MonacoEditor extends React.Component<Props> {
       );
     } else {
       if (model) {
-        model.dispose();
+        disposeModel(model);
       }
 
-      model = monac.editor.createModel(content, modeID, new monac.Uri().with({ path: file.path }));
+      model = monaco.editor.createModel(content, modeID, new monaco.Uri().with({ path: file.path }));
       this.mutableCreatedModels.push(model);
       model.updateOptions({
         tabSize: 2,
@@ -284,7 +281,7 @@ export class MonacoEditor extends React.Component<Props> {
         if (onUpdateDiagnostics !== undefined) {
           onUpdateDiagnostics(
             modelConst.uri.path,
-            this.convertDiagnostics(modelConst, monac.editor.getModelMarkers({ resource: modelConst.uri })),
+            this.convertDiagnostics(modelConst, monaco.editor.getModelMarkers({ resource: modelConst.uri })),
           );
         }
       });

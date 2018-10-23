@@ -1,5 +1,7 @@
+/// <reference types="monaco-editor/monaco" />
 // tslint:disable no-object-mutation no-null-keyword strict-boolean-expressions no-array-mutation
 import { map, switchMap } from 'rxjs/operators';
+import ts from 'typescript';
 import { Adapter } from './Adapter';
 import { Kind } from './Kind';
 import { textSpanToRange } from './utils';
@@ -35,8 +37,15 @@ export class OutlineAdapter extends Adapter implements monaco.languages.Document
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(async (worker) => worker.getNavigationBarItems(resource.path)),
+        switchMap(
+          async (worker): Promise<ReadonlyArray<ts.NavigationBarItem>> =>
+            model.isDisposed() ? [] : worker.getNavigationBarItems(resource.path),
+        ),
         map((items) => {
+          if (model.isDisposed()) {
+            return [];
+          }
+
           const convert = (
             bucket: monaco.languages.DocumentSymbol[],
             item: ts.NavigationBarItem,

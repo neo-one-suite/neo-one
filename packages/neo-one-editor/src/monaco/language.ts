@@ -1,4 +1,7 @@
+/// <reference types="monaco-editor/monaco" />
 // tslint:disable promise-function-async no-submodule-imports no-implicit-dependencies no-import-side-effect
+// @ts-ignore
+import * as fake2 from 'monaco-editor/esm/vs/editor/edcore.main';
 // @ts-ignore
 import * as fake from 'monaco-editor/esm/vs/language/html/monaco.contribution';
 
@@ -40,7 +43,7 @@ import { TypeScriptWorker } from './TypeScriptWorker';
     let MonacoWorker;
 
     // tslint:disable-next-line:prefer-conditional-expression
-    if (label.endsWith('html') && fake) {
+    if (label.endsWith('html') && fake && fake2) {
       MonacoWorker = new Worker(htmlWorkerURL);
     } else {
       MonacoWorker = new Worker(editorWorkerURL);

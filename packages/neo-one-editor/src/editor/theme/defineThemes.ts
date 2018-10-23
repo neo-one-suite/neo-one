@@ -1,3 +1,4 @@
+/// <reference types="monaco-editor/monaco" />
 // tslint:disable no-any
 import Color from 'color';
 import dark from './dark.json';

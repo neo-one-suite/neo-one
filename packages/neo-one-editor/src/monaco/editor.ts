@@ -1,4 +1,5 @@
 // tslint:disable no-submodule-imports no-any no-object-mutation
+/// <reference types="monaco-editor/monaco" />
 // @ts-ignore
 import { SimpleEditorModelResolverService } from 'monaco-editor/esm/vs/editor/standalone/browser/simpleServices';
 // @ts-ignore

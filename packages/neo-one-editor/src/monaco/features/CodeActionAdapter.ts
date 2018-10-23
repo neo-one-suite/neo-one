@@ -1,5 +1,7 @@
+/// <reference types="monaco-editor/monaco" />
 import { utils } from '@neo-one/utils';
 import { map, switchMap } from 'rxjs/operators';
+import ts from 'typescript';
 import { Adapter } from './Adapter';
 import { convertCodeFixAction, positionToOffset } from './utils';
 
@@ -13,27 +15,29 @@ export class CodeActionAdapter extends Adapter implements monaco.languages.CodeA
     | Array<monaco.languages.Command | monaco.languages.CodeAction>
     | monaco.Thenable<Array<monaco.languages.Command | monaco.languages.CodeAction>> {
     const resource = model.uri;
-    const errorCodes = context.markers
-      .map((marker) => marker.code)
-      .filter(utils.notNull)
-      .map(Number)
-      .filter((value) => !Number.isNaN(value));
 
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(async (worker) =>
-          worker.getCodeFixesAtPosition(
-            resource.path,
-            positionToOffset(model, range.getStartPosition()),
-            positionToOffset(model, range.getEndPosition()),
-            errorCodes,
-            {
-              [resource.path]: model.getValue(),
-            },
-          ),
+        switchMap(
+          async (worker): Promise<ReadonlyArray<ts.CodeFixAction>> =>
+            model.isDisposed()
+              ? []
+              : worker.getCodeFixesAtPosition(
+                  resource.path,
+                  positionToOffset(model, range.getStartPosition()),
+                  positionToOffset(model, range.getEndPosition()),
+                  context.markers
+                    .map((marker) => marker.code)
+                    .filter(utils.notNull)
+                    .map(Number)
+                    .filter((value) => !Number.isNaN(value)),
+                  {
+                    [resource.path]: model.getValue(),
+                  },
+                ),
         ),
-        map((fixes) => fixes.map((fix) => convertCodeFixAction(model, fix))),
+        map((fixes) => (model.isDisposed() ? [] : fixes.map((fix) => convertCodeFixAction(model, fix)))),
       ),
     );
   }

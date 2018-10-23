@@ -1,3 +1,4 @@
+/// <reference types="monaco-editor/monaco" />
 // tslint:disable no-array-mutation
 import { map, switchMap } from 'rxjs/operators';
 import { Adapter } from './Adapter';
@@ -16,9 +17,14 @@ export class ReferenceAdapter extends Adapter implements monaco.languages.Refere
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(async (worker) => worker.getReferencesAtPosition(resource.path, positionToOffset(model, position))),
+        switchMap(
+          async (worker) =>
+            model.isDisposed()
+              ? undefined
+              : worker.getReferencesAtPosition(resource.path, positionToOffset(model, position)),
+        ),
         map((entries) => {
-          if (!entries) {
+          if (!entries || model.isDisposed()) {
             return [];
           }
 

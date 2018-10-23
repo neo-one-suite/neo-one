@@ -18,7 +18,7 @@ export const tsLoader = ({ stage, bundle }: { readonly stage: Stage; readonly bu
         transpileOnly: stage === 'dev' || process.env.NEO_ONE_CACHE === 'true',
         happyPackMode: stage === 'dev' || process.env.NEO_ONE_CACHE === 'true',
         context: APP_ROOT_DIR,
-        configFile: path.resolve(APP_ROOT_DIR, 'tsconfig', 'tsconfig.es2017.esm.json'),
+        configFile: path.resolve(APP_ROOT_DIR, 'tsconfig.static.json'),
         onlyCompileBundledFiles: true,
         experimentalFileCaching: true,
         experimentalWatchApi: stage === 'dev' || process.env.NEO_ONE_CACHE === 'true',

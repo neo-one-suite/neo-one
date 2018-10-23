@@ -1,3 +1,4 @@
+/// <reference types="monaco-editor/monaco" />
 // tslint:disable no-object-mutation readonly-array no-array-mutation
 import { map, switchMap } from 'rxjs/operators';
 import ts from 'typescript';
@@ -18,13 +19,16 @@ export class SignatureHelpAdapter extends Adapter implements monaco.languages.Si
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(async (worker) =>
-          worker.getSignatureHelpItems(resource.path, positionToOffset(model, position), {
-            [resource.path]: model.getValue(),
-          }),
+        switchMap(
+          async (worker) =>
+            model.isDisposed()
+              ? undefined
+              : worker.getSignatureHelpItems(resource.path, positionToOffset(model, position), {
+                  [resource.path]: model.getValue(),
+                }),
         ),
         map((info) => {
-          if (!info) {
+          if (!info || model.isDisposed()) {
             return undefined;
           }
 

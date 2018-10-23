@@ -1,3 +1,4 @@
+/// <reference types="monaco-editor/monaco" />
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import { merge, Observable } from 'rxjs';
@@ -133,7 +134,7 @@ export const wireDiagnostics = (manager: MonacoWorkerManager, languageID: string
         .then(async () => {
           const file = model.uri.path;
           // monaco creates dummy models on editor creation with invalid paths, just ignore them.
-          if (model.uri.scheme !== 'inmemory' && model.getModeId() === languageID) {
+          if (!model.isDisposed() && model.uri.scheme !== 'inmemory' && model.getModeId() === languageID) {
             const diagnostics = await getDiagnostics([file]);
             handleDiagnostics(diagnostics);
           }

@@ -1,3 +1,4 @@
+/// <reference types="monaco-editor/monaco" />
 import { map, switchMap } from 'rxjs/operators';
 import { Adapter } from './Adapter';
 import { convertFormattingOptions, convertTextChange, positionToOffset } from './utils';
@@ -20,15 +21,18 @@ export class FormatOnTypeAdapter extends Adapter implements monaco.languages.OnT
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(async (worker) =>
-          worker.getFormattingEditsAfterKeystroke(
-            resource.path,
-            positionToOffset(model, position),
-            ch,
-            convertFormattingOptions(options),
-          ),
+        switchMap(
+          async (worker): Promise<ReadonlyArray<ts.TextChange>> =>
+            model.isDisposed()
+              ? []
+              : worker.getFormattingEditsAfterKeystroke(
+                  resource.path,
+                  positionToOffset(model, position),
+                  ch,
+                  convertFormattingOptions(options),
+                ),
         ),
-        map((edits) => edits.map((edit) => convertTextChange(model, edit))),
+        map((edits) => (model.isDisposed() ? [] : edits.map((edit) => convertTextChange(model, edit)))),
       ),
     );
   }
