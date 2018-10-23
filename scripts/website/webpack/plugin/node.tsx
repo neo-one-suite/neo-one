@@ -7,7 +7,7 @@ import webpack from 'webpack';
 // @ts-ignore
 import nodeExternals from 'webpack-node-externals';
 // @ts-ignore
-import { InjectManifest } from 'workbox-webpack-plugin';
+import { GenerateSW } from 'workbox-webpack-plugin';
 import { Stage } from '../../types';
 import { addDefaultRules } from '../addDefaultRules';
 import { alias } from '../alias';
@@ -86,12 +86,46 @@ export const node = () => ({
         stage === 'node'
           ? []
           : [
-              new InjectManifest({
-                swSrc: path.resolve(APP_ROOT_DIR, 'dist', 'workers', 'sw.js'),
+              new GenerateSW({
+                swDest: 'sw.js',
+                include: [/.(js|css|html|woff|woff2|json|png|svg|wasm)$/],
+                clientsClaim: true,
+                runtimeCaching: [
+                  {
+                    urlPattern: /^https:\/\/.*.jsdelivr.com/,
+                    handler: 'cacheFirst',
+                    expiration: {
+                      maxEntries: 100000,
+                      purgeOnQuotaError: true,
+                    },
+                    cacheableResponse: {
+                      statuses: [0, 200],
+                    },
+                    matchOptions: {
+                      ignoreSearch: true,
+                    },
+                  },
+                  {
+                    urlPattern: /^https:\/\/registry.npmjs.org/,
+                    handler: 'cacheFirst',
+                    expiration: {
+                      maxEntries: 100000,
+                      purgeOnQuotaError: true,
+                    },
+                    cacheableResponse: {
+                      statuses: [0, 200],
+                    },
+                    matchOptions: {
+                      ignoreSearch: true,
+                    },
+                  },
+                ],
+                offlineGoogleAnalytics: true,
+                dontCacheBustUrlsMatching: /\.(?:\w{8}|\w{32})\./,
                 ...(stageIn === 'prod'
                   ? {
                       globDirectory: path.resolve(WEBSITE_DIR, 'dist'),
-                      globPatterns: ['**/*.{js,css,html}'],
+                      globPatterns: ['**/*.{js,css,html,woff,woff2,json,png,svg,wasm}'],
                       maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
                     }
                   : {}),

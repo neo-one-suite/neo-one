@@ -3,12 +3,12 @@ import '../polyfill';
 
 import { Redirect } from '@reach/router';
 import * as React from 'react';
-import { withRouteData } from 'react-static';
+import { RouteData } from 'react-static';
 import { Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { DocFooter, Helmet, SectionData, Sidebar } from '../components';
 import { Markdown } from '../elements';
-import { CoreLayout } from '../layout';
+import { CoreLayout, DocsLoading } from '../layout';
 import { AdjacentInfo } from '../utils';
 
 const StyledMarkdown = styled(Markdown)`
@@ -56,21 +56,26 @@ interface DocData {
   readonly previous?: AdjacentInfo;
 }
 
-// tslint:disable-next-line export-name no-default-export
-export default withRouteData((props?: DocData) => {
-  if (props === undefined) {
-    return <Redirect to="/docs/getting-started" />;
-  }
-  const { doc, title, next, previous, sidebar } = props;
+// tslint:disable-next-line:no-default-export export-name
+export default () => (
+  // @ts-ignore
+  <RouteData Loader={DocsLoading}>
+    {(props?: DocData) => {
+      if (props === undefined) {
+        return <Redirect to="/docs/getting-started" />;
+      }
+      const { doc, title, next, previous, sidebar } = props;
 
-  return (
-    <CoreLayout>
-      <Helmet title={`${title} - NEO•ONE`} />
-      <StyledGrid>
-        <StyledMarkdown source={doc} />
-        <StyledSidebar sections={sidebar} />
-        <StyledDocFooter next={next} previous={previous} />
-      </StyledGrid>
-    </CoreLayout>
-  );
-});
+      return (
+        <CoreLayout>
+          <Helmet title={`${title} - NEO•ONE`} />
+          <StyledGrid>
+            <StyledMarkdown source={doc} />
+            <StyledSidebar sections={sidebar} />
+            <StyledDocFooter next={next} previous={previous} />
+          </StyledGrid>
+        </CoreLayout>
+      );
+    }}
+  </RouteData>
+);
