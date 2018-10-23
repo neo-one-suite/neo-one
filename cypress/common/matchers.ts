@@ -256,13 +256,15 @@ interface BuildOptions {
 export const build = ({ success }: BuildOptions) => {
   cy.get('[data-test=build]', { timeout: 60000 }).click();
   const text = success
-    ? 'Scanning for contracts...\nSetting up wallets...\nCompiling contract Token...\nGenerating code...\nDone'
-    : 'Scanning for contracts...\nNo contracts found.';
+    ? 'Building...\nScanning for contracts...\nSetting up wallets...\nCompiling contract Token...\nGenerating code...\nDone'
+    : 'Building...\nScanning for contracts...\nNo contracts found.';
   cy.get('[data-test=console-output]', { timeout: 30000 }).should('have.text', text);
   cy.get('[data-test=console-selector]').should('have.value', 'neo-one');
   cy.get('[data-test=console-header-clear] > [data-test=console-button]').click();
   cy.get('[data-test=console-output]').should('have.text', '');
   cy.get('[data-test=console-close]').click();
+  // Need to wait to allow transpiling to happen
+  cy.wait(2500);
 };
 
 export const nextButton = () => {

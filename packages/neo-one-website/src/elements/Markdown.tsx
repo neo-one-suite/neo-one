@@ -108,7 +108,24 @@ const Wrapper = styled.div`
   }
 
   & a {
-    color: ${prop('theme.accent')};
+    color: ${prop('theme.primary')};
+    ${prop('theme.fonts.axiformaBold')};
+    ${prop('theme.fontStyles.subheading')};
+    text-decoration: none;
+  }
+
+  & a:hover {
+    color: ${prop('theme.primaryDark')};
+    text-decoration: none;
+  }
+
+  & a:focus {
+    color: ${prop('theme.primaryDark')};
+    text-decoration: none;
+  }
+
+  & a:active {
+    color: ${prop('theme.primaryDark')};
     text-decoration: none;
   }
 

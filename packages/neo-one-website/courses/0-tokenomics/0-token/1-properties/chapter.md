@@ -30,6 +30,6 @@ Now that we've added the properties, `Build` the contract and then `Run Tests`. 
 
 ## Wrap Up
 
-In this chapter we learned about the first kind of properties that can be declared in a NEO•ONE smart contract. When you're ready, click `Next Chapter` to learn about storage properties!
+In this chapter we learned about the first kind of properties that can be declared in a NEO•ONE smart contract. When you're ready, click `Next` to learn about storage properties!
 
 Before you go, take a look at the updated `Token.test.ts` file to see the newly generated methods on the `token` variable - one for each of the properties that were added to the contract. Hover over the method calls and you'll notice that the properties have the same types as in the smart contract, except they're wrapped in a `Promise`. They are all wrapped in a `Promise` because we need to make an asynchronous invocation of the smart contract in order to access the values. As we continue through the chapters, be sure to hover over the various pieces of the test code to learn a bit about how the generated NEO•ONE client APIs are structured.

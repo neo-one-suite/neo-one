@@ -58,7 +58,7 @@ const handleEvent = (event: JestEvent) => {
 };
 addEventHandler(handleEvent);
 
-const doRun = async (test: ModuleBase, handler: TestEventHandler) => {
+const doRun = async (engine: Engine, test: ModuleBase, handler: TestEventHandler): Promise<void> => {
   try {
     doHandleEvent = (event) => {
       handler.handleTestEvent(event);
@@ -66,6 +66,7 @@ const doRun = async (test: ModuleBase, handler: TestEventHandler) => {
     resetTestState();
 
     try {
+      await engine.waitTranspile();
       test.evaluate({ force: true });
     } catch (error) {
       handler.onEvaluateError(error);
@@ -88,6 +89,7 @@ const mutableQueue: TestQueueEntry[] = [];
 // tslint:disable-next-line no-let
 let running = false;
 const runTestsSerially = async (
+  engine: Engine,
   test: ModuleBase,
   handler: TestEventHandler,
   setTestsRunning: (running: boolean) => void,
@@ -102,7 +104,7 @@ const runTestsSerially = async (
   let next = mutableQueue.shift();
   // tslint:disable-next-line no-loop-statement
   while (next !== undefined) {
-    await doRun(next.test, next.handler);
+    await doRun(engine, next.test, next.handler);
     next = mutableQueue.shift();
   }
 
@@ -289,6 +291,7 @@ export class TestRunner {
 
     if (test !== undefined) {
       await runTestsSerially(
+        this.engine,
         test,
         createHandleTestEvent(this.engine, test, this.callbacks),
         this.callbacks.setTestsRunning,

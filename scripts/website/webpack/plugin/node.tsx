@@ -83,7 +83,7 @@ export const node = () => ({
       )
       .concat(plugins({ stage, bundle: 'react-static' }))
       .concat(
-        stage === 'node'
+        stage === 'node' || process.env.NEO_ONE_DISABLE_SW === 'true'
           ? []
           : [
               new GenerateSW({

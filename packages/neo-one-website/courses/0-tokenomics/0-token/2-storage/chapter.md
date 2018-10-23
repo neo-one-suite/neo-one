@@ -44,4 +44,4 @@ Once you're done and there are no reported problems, go ahead and click `Build` 
 
 ## Wrap Up
 
-In this chapter we learned about the `Fixed` type, how to declare storage properties, and constant methods. Quite a lot, if you've made it this far you should be proud. Click `Next Chapter` and we'll see you on the other side!
+In this chapter we learned about the `Fixed` type, how to declare storage properties, and constant methods. Quite a lot, if you've made it this far you should be proud. Click `Next` and we'll see you on the other side!

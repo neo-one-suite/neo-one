@@ -22,7 +22,7 @@ import { SmartContract } from '@neo-one/smart-contract';
 export class Example extends SmartContract {}
 ```
 
-Let's break this down. First, we import `SmartContract` from `@neo-one/smart-contract`. This package contains all of the NEO•ONE smart contract types and is where the majority of imports will come from. `SmartContract` is a basic class that when extended marks the class as a NEO•ONE smart contract. We've extended it with a class called `Example` which will be used for all of the generated variable names in the NEO•ONE client APIs.
+Let's break this down. First, we import `SmartContract` from `@neo-one/smart-contract`. This package contains all of the NEO•ONE smart contract types and is where the majority of imports will come from. `SmartContract` is a basic [class](https://www.typescriptlang.org/docs/handbook/classes.html) that when extended marks the class as a NEO•ONE smart contract. We've extended it with a class called `Example` which will be used for all of the generated variable names in the NEO•ONE client APIs.
 
 ## Instructions
 
@@ -38,7 +38,7 @@ This is the shell of a token smart contract. Since we named it `Token`, the vari
 
 ## Test
 
-At this point, we have a basic compilable NEO•ONE smart contract. Go ahead and click the `Build` button in editor toolbar to compile the smart contract. Then click the `Run Tests` button to verify the smart contract. Once the tests pass, you may proceed to the next chapter by clicking `Next Chapter`.
+At this point, we have a basic compilable NEO•ONE smart contract. Go ahead and click the `Build` button in editor toolbar to compile the smart contract. Then click the `Run Tests` button to verify the smart contract. Once the tests pass, you may proceed to the next chapter by clicking `Next`.
 
 ## Wrap Up
 

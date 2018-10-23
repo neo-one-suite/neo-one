@@ -9,7 +9,7 @@ In Lesson 2, we're going to add ICO functionality to our token smart contract. T
 
 We'll also create a fully functioning ICO participation UI that live updates when tokens are minted using the NEO•ONE client APIs. There's quite a bit of ground to cover, so let's get started!
 
-As a quick reminder, the same flow applies as in Lesson 1. Write the code -> `Build` -> `Run Tests` -> `Next Chapter` once the tests are passing. If you get stuck, you can also view the full solution by clicking `Show Solution`.
+As a quick reminder, the same flow applies as in Lesson 1. Write the code -> `Build` -> `Run Tests` -> `Next` once the tests are passing. If you get stuck, you can also view the full solution by clicking `Show Solution`.
 
 ## Learn
 
@@ -40,4 +40,4 @@ The tests for this chapter simply check that we can send both NEO and GAS to the
 
 ## Wrap Up
 
-In this chapter we learned about receiving native assets. On the other side of `Next Chapter`, we'll start to expand our method with additional verification checks.
+In this chapter we learned about receiving native assets. On the other side of `Next`, we'll start to expand our method with additional verification checks.

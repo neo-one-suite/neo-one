@@ -17,5 +17,11 @@ export const Link = styled(LinkBase)<{ readonly linkColor: 'primary' | 'gray' }>
 
   &:focus {
     color: ${prop('theme.primaryDark')};
+    text-decoration: none;
+  }
+
+  &:active {
+    color: ${prop('theme.primaryDark')};
+    text-decoration: none;
   }
 `;

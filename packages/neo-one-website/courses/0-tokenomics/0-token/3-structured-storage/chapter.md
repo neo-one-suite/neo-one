@@ -38,4 +38,4 @@ If you run into issues, make sure there are no reported problems. The NEO•ONE 
 
 ## Wrap Up
 
-Easier than last chapter right? Still, we learned about a powerful concept - structured storage - that most if not all contracts will rely on. We also saw our first specialized `Buffer` type, the `Address`. Once you're done exploring, click `Next Chapter` to proceed.
+Easier than last chapter right? Still, we learned about a powerful concept - structured storage - that most if not all contracts will rely on. We also saw our first specialized `Buffer` type, the `Address`. Once you're done exploring, click `Next` to proceed.

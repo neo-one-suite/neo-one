@@ -15,9 +15,11 @@ import { getPathWithExports, PathWithExports } from './packages';
 import { resolve } from './resolve';
 import { StaticExportsModule } from './StaticExportsModule';
 import { TranspiledModule } from './TranspiledModule';
+import { TranspileSignal } from './TranspileSignal';
 
 interface EngineBaseOptions {
   readonly fs: PouchDBFileSystem;
+  readonly transpileSignal?: TranspileSignal;
   readonly transpileCache: PouchDBFileSystem;
   readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
   readonly builderManager: WorkerManager<typeof Builder>;
@@ -31,18 +33,21 @@ const EMPTY_MODULE_PATH = '$empty';
 export class EngineBase {
   protected readonly mutableModules: Modules;
   protected readonly fs: PouchDBFileSystem;
+  private readonly transpileSignal: TranspileSignal;
   private readonly subscription: rxjs.Subscription;
   // tslint:disable-next-line readonly-keyword
   private readonly mutableCachedPaths: { [currentPath: string]: { [path: string]: string } } = {};
 
   public constructor({
     fs,
+    transpileSignal = new TranspileSignal(),
     transpileCache,
     builderManager,
     jsonRPCLocalProviderManager,
     pathWithExports: pathWithExportsIn = [],
   }: EngineBaseOptions) {
     this.fs = fs;
+    this.transpileSignal = transpileSignal;
     const pathWithExports = getPathWithExports({ fs, builderManager, jsonRPCLocalProviderManager }).concat(
       pathWithExportsIn,
     );
@@ -87,6 +92,10 @@ export class EngineBase {
 
   public async dispose(): Promise<void> {
     this.subscription.unsubscribe();
+  }
+
+  public async waitTranspile(): Promise<void> {
+    return this.transpileSignal.wait();
   }
 
   public get modules(): Map<string, ModuleBase> {

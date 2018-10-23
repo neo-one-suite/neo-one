@@ -14,6 +14,7 @@ import { getPathWithExports } from './packages';
 import { TestRunner } from './test';
 import { testPackages } from './testPackages';
 import { Transpiler, transpilerManager } from './transpile';
+import { TranspileSignal } from './TranspileSignal';
 import { RegisterPreviewEngineResult } from './types';
 
 export interface EditorCallbacks {
@@ -29,6 +30,7 @@ export interface EngineCreateOptions {
 
 interface EngineOptions {
   readonly context: EngineContext;
+  readonly transpileSignal: TranspileSignal;
   readonly initialFiles: Map<string, EngineContentFile>;
   readonly fsSubscription: Subscription;
   readonly editorCallbacks: EditorCallbacks;
@@ -42,6 +44,7 @@ interface RegisterPreviewEngineOptions {
 
 const maybeTranspile = async (
   transpiler: Transpiler,
+  transpileSignal: TranspileSignal,
   transpileCache: PouchDBFileSystem,
   pathIn: string,
   content: string,
@@ -49,8 +52,13 @@ const maybeTranspile = async (
   const path = normalizePath(pathIn);
   const fileType = getFileType(path);
   if ((fileType === 'typescript' || fileType === 'javascript') && !path.startsWith('/node_modules')) {
-    const result = await transpiler.transpile(path, content);
-    await transpileCache.writeFile(path, JSON.stringify(result));
+    transpileSignal.transpiling();
+    try {
+      const result = await transpiler.transpile(path, content);
+      await transpileCache.writeFile(path, JSON.stringify(result));
+    } finally {
+      transpileSignal.done();
+    }
   }
 };
 
@@ -71,13 +79,16 @@ export class Engine extends EngineBase {
       }),
     );
 
+    const transpileSignal = new TranspileSignal();
     const buildErrors$ = new Subject<string>();
     const [fsSubscription, transpilePromises] = await transpilerManager.withInstance<
       [Subscription, Array<Promise<void>>]
     >(async (transpiler) => {
       const mutableTranspilePromises: Array<Promise<void>> = [];
       context.fs.files.forEach((file, path) => {
-        mutableTranspilePromises.push(maybeTranspile(transpiler, context.transpileCache, path, file.content));
+        mutableTranspilePromises.push(
+          maybeTranspile(transpiler, transpileSignal, context.transpileCache, path, file.content),
+        );
       });
       const fsSubscriptionInner = context.fs
         .bufferedChanges$()
@@ -93,7 +104,13 @@ export class Engine extends EngineBase {
                         console.error(error);
                       });
                     } else {
-                      await maybeTranspile(transpilerInner, context.transpileCache, change.id, change.doc.content);
+                      await maybeTranspile(
+                        transpilerInner,
+                        transpileSignal,
+                        context.transpileCache,
+                        change.id,
+                        change.doc.content,
+                      );
                     }
                   }),
                 );
@@ -124,6 +141,7 @@ export class Engine extends EngineBase {
 
     const engine = new Engine({
       context,
+      transpileSignal,
       initialFiles: initialFilesMap,
       editorCallbacks,
       testRunnerCallbacks,
@@ -145,6 +163,7 @@ export class Engine extends EngineBase {
 
   private constructor({
     context,
+    transpileSignal,
     initialFiles,
     editorCallbacks,
     testRunnerCallbacks,
@@ -153,6 +172,7 @@ export class Engine extends EngineBase {
   }: EngineOptions) {
     super({
       fs: context.fs,
+      transpileSignal,
       transpileCache: context.transpileCache,
       builderManager: context.builderManager,
       jsonRPCLocalProviderManager: context.jsonRPCLocalProviderManager,

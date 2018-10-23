@@ -16,6 +16,7 @@ describe('Tokenomics', () => {
         '/course/tokenomics/2/1',
         '/course/tokenomics/2/2',
         '/course/tokenomics/2/3',
+        '/course/tokenomics/2/4',
       ],
     });
   });
@@ -36,14 +37,14 @@ describe('Tokenomics', () => {
           dirname: 'one/tests',
           passing: 0,
           failing: 1,
-          error: "Error: Cannot find module '../generated/test' from '/one/tests'",
+          error: "Cannot find module '../generated/test' from '/one/tests'",
           tests: [],
         },
       ],
     });
     checkProblems([
       {
-        path: 'one/tests/Token.test.ts',
+        path: '/one/tests/Token.test.ts',
         problems: [
           {
             owner: 'ts',
@@ -151,23 +152,23 @@ describe('Tokenomics', () => {
   lesson1({
     chapter: 2,
     testName: 'has name, symbol and decimals properties',
-    error: 'TypeError: token.name is not a function',
+    error: 'token.name is not a function',
   });
   lesson1({
     chapter: 3,
     testName: 'has name, symbol, decimals and totalSupply properties',
-    error: 'TypeError: token.totalSupply is not a function',
+    error: 'token.totalSupply is not a function',
   });
-  lesson1({ chapter: 4, error: 'TypeError: token.balanceOf is not a function' });
-  lesson1({ chapter: 5, error: 'TypeError: token.owner is not a function' });
-  lesson1({ chapter: 6, error: "TypeError: Cannot read property 'confirmed' of undefined" });
-  lesson1({ chapter: 7, error: 'Error: expect(received).toHaveLength(length)' });
-  lesson1({ chapter: 8, error: "TypeError: Cannot read property 'confirmed' of undefined" });
+  lesson1({ chapter: 4, error: 'token.balanceOf is not a function' });
+  lesson1({ chapter: 5, error: 'token.owner is not a function' });
+  lesson1({ chapter: 6, error: "Cannot read property 'confirmed' of undefined" });
+  lesson1({ chapter: 7, error: 'expect(received).toHaveLength(length)' });
+  lesson1({ chapter: 8, error: "Cannot read property 'confirmed' of undefined" });
 
   const lesson2 = ({
     chapter,
     error,
-    testName = 'has NEP-5 properties and methods',
+    testName = 'allows minting tokens',
     skip = false,
   }: {
     chapter: number;
@@ -249,8 +250,8 @@ describe('Tokenomics', () => {
     });
   };
 
-  lesson2({ chapter: 1, error: "TypeError: Cannot read property 'confirmed' of undefined", skip: true });
-  lesson2({ chapter: 2, error: 'Error: expect(received).toBeDefined()', skip: true });
-  lesson2({ chapter: 3, error: 'TypeError: token.amountPerNEO is not a function' });
-  lesson2({ chapter: 4, error: 'Error: expect(received).toBeDefined()' });
+  lesson2({ chapter: 1, error: "Cannot read property 'confirmed' of undefined", skip: true });
+  lesson2({ chapter: 2, error: 'expect(received).toBeDefined()', skip: true });
+  lesson2({ chapter: 3, error: 'token.amountPerNEO is not a function' });
+  lesson2({ chapter: 4, error: 'expect(received).toBeDefined()' });
 });

@@ -18,13 +18,14 @@ module.exports = (on) => {
             exclude: [/node_modules/],
             use: [
               {
-                loader: 'awesome-typescript-loader',
+                loader: 'ts-loader',
                 options: {
-                  useTranspileModule: true,
                   transpileOnly: true,
-                  useBabel: false,
-                  useCache: true,
-                  configFileName: path.resolve(__dirname, '..', 'tsconfig.json'),
+                  happyPackMode: false,
+                  configFile: path.resolve(__dirname, '..', 'tsconfig.json'),
+                  onlyCompileBundledFiles: true,
+                  experimentalFileCaching: true,
+                  experimentalWatchApi: true,
                 },
               },
             ],

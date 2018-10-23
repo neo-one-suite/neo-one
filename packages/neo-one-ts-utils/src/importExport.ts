@@ -23,7 +23,7 @@ export function getModuleSpecifier(node: ts.ImportDeclaration | ts.ExportDeclara
   }
 
   if (!ts.isStringLiteral(moduleSpecifier)) {
-    throw new Error('Unexpected module specifier.');
+    return undefined;
   }
 
   return moduleSpecifier;

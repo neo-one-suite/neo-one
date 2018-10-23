@@ -42,4 +42,4 @@ In our test, we use the shortcut method `confirmed` to do both steps in one call
 
 ## Wrap Up
 
-Now that we know how to make methods, we'll really start picking up the pace in future chapters and get into the meat of the `Token` functionality. Click `Next Chapter` to proceed!
+Now that we know how to make methods, we'll really start picking up the pace in future chapters and get into the meat of the `Token` functionality. Click `Next` to proceed!

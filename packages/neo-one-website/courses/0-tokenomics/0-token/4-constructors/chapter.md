@@ -37,7 +37,7 @@ In future chapters we'll want to verify that the smart contract caller is the ow
 
 ## Test
 
-By now you should know the drill - build and run the tests! If all goes well, go ahead and click the `Next Chapter` button. This chapter's tests are identical to the previous chapter because `withContracts` automatically deploys the contract to a local private network using the default arguments before passing the contract (as `token`) to our test method.
+By now you should know the drill - build and run the tests! If all goes well, go ahead and click the `Next` button. This chapter's tests are identical to the previous chapter because `withContracts` automatically deploys the contract to a local private network using the default arguments before passing the contract (as `token`) to our test method.
 
 ## Wrap Up
 
