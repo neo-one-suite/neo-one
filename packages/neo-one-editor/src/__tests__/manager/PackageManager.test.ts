@@ -1,7 +1,7 @@
 /* @jest-environment jsdom */
 import { interval, of as _of } from 'rxjs';
 import { map, take } from 'rxjs/operators';
-import { PackageManager } from '../../manager';
+import { FetchQueue, PackageManager } from '../../manager';
 
 const coursePackages = {
   name: 'courses',
@@ -37,16 +37,18 @@ describe('package manager', () => {
     readdirSync: jest.fn(),
   };
   const onAddTypes = jest.fn(async () => Promise.resolve());
+  let fetchQueue: FetchQueue<string>;
 
   beforeEach(() => {
     fs.writeFile.mockClear();
     onAddTypes.mockClear();
+    fetchQueue = new FetchQueue<string>();
   });
 
   test('files written properly', async () => {
     const packageJSON$ = _of(coursePackages);
 
-    const pkm = new PackageManager({ fs, packageJSON$, onAddTypes });
+    const pkm = new PackageManager({ fs, packageJSON$, onAddTypes, fetchQueue });
     await new Promise<void>((resolve) => setTimeout(resolve, 15000));
 
     // tslint:disable-next-line no-array-mutation
@@ -64,7 +66,7 @@ describe('package manager', () => {
       map((idx) => (idx === 0 ? coursePackages : package2)),
     );
 
-    const pkm = new PackageManager({ fs, packageJSON$, onAddTypes });
+    const pkm = new PackageManager({ fs, packageJSON$, onAddTypes, fetchQueue });
     await new Promise<void>((resolve) => setTimeout(resolve, 25000));
 
     // tslint:disable-next-line no-array-mutation

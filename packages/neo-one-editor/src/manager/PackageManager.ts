@@ -1,10 +1,10 @@
 import { FileSystem } from '@neo-one/local-browser';
 import { mergeScanLatest } from '@neo-one/utils';
-import fetch from 'cross-fetch';
 import _ from 'lodash';
 import * as path from 'path';
 import { Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
+import { FetchQueue } from './FetchQueue';
 import { Dependencies, DependencyInfo, PackageJSON, ResolvedDependencies, Resolver } from './Resolver';
 
 interface FetchPackageInfo {
@@ -40,40 +40,28 @@ interface FileData {
   readonly size: number;
 }
 
-interface QueueData {
-  readonly name: string;
-  readonly version: string;
-  readonly filePath: string;
-  readonly resolve: (file: string) => void;
-  readonly reject: (error: Error) => void;
-}
-
 export class PackageManager {
   public readonly dependencies$: Observable<ResolvedDependencies>;
   public readonly packages$: Observable<{ readonly [name: string]: Module }>;
   private readonly fs: FileSystem;
   private readonly subscription: Subscription;
   private readonly onAddTypes: (name: string, version: string, typesFullName: string) => void;
-  private readonly fetchConcurrency: number;
-  private readonly mutableQueue: QueueData[];
-  private mutableRunning: number;
+  private readonly fetchQueue: FetchQueue<string>;
 
   public constructor({
     fs,
     packageJSON$,
     onAddTypes,
-    fetchConcurrency = 5,
+    fetchQueue,
   }: {
     readonly packageJSON$: Observable<PackageJSON>;
     readonly fs: FileSystem;
     readonly onAddTypes: (name: string, version: string, typesFullName: string) => void;
-    readonly fetchConcurrency?: number;
+    readonly fetchQueue: FetchQueue<string>;
   }) {
     this.fs = fs;
     this.onAddTypes = onAddTypes;
-    this.mutableQueue = [];
-    this.mutableRunning = 0;
-    this.fetchConcurrency = fetchConcurrency;
+    this.fetchQueue = fetchQueue;
 
     this.dependencies$ = packageJSON$.pipe(
       distinctUntilChanged(),
@@ -92,7 +80,7 @@ export class PackageManager {
   }
 
   private async resolveDependencies(dependencies: Dependencies): Promise<ResolvedDependencies> {
-    const resolver = new Resolver();
+    const resolver = new Resolver({ fetchQueue: this.fetchQueue });
 
     return resolver.resolve(dependencies);
   }
@@ -110,28 +98,9 @@ export class PackageManager {
       this.checkTypes({ name, version, types }),
     ]);
 
-    const packageFilePromises = packageFilePaths.map(
-      async (filePath) =>
-        // tslint:disable-next-line:promise-must-complete
-        new Promise<string>((resolve, reject) => {
-          this.mutableQueue.push({
-            name,
-            version,
-            filePath,
-            resolve,
-            reject,
-          });
-        }),
-    );
-    const zippedPackageInfo = _.zip(packageFilePaths, packageFilePromises) as ReadonlyArray<[string, Promise<string>]>;
-
-    this.startFetchQueue().catch(() => {
-      // do nothing
-    });
-
     const packageFiles = await Promise.all(
-      zippedPackageInfo.map(async ([filePath, filePromise]) => {
-        const file = await filePromise;
+      packageFilePaths.map(async (filePath) => {
+        const file = await this.downloadDependency({ name, version, suffix: filePath });
 
         return {
           file,
@@ -149,8 +118,18 @@ export class PackageManager {
   }
 
   private async getAllPackageFiles({ name, version }: FetchPackageInfo): Promise<ReadonlyArray<string>> {
-    const res = await fetch(this.getNPMDataUrl({ name, version }));
-    const fileTree = await res.json();
+    // tslint:disable-next-line:promise-must-complete
+    const fileTreePromise = new Promise<string>((resolve, reject) => {
+      this.fetchQueue.push({
+        url: this.getNPMDataUrl({ name, version }),
+        handleResponse: async (response: Response) => response.text(),
+        resolve,
+        reject,
+      });
+    });
+    this.fetchQueue.advance();
+    const fileTreeText = await fileTreePromise;
+    const fileTree = JSON.parse(fileTreeText);
 
     return this.getDirectoryList({ dirList: fileTree.files });
   }
@@ -180,38 +159,33 @@ export class PackageManager {
     if (types) {
       return;
     }
-
     const typesName = `@types/${name.replace('@', '').replace('/', '__')}`;
-    const versionRes = await fetch(this.getNPMDataUrl({ name: typesName }));
-    if (!versionRes.ok) {
+
+    // tslint:disable-next-line:promise-must-complete
+    const versionResPromise = new Promise<string>((resolve, reject) => {
+      this.fetchQueue.push({
+        url: this.getNPMDataUrl({ name: typesName }),
+        handleResponse: async (response: Response) => {
+          if (!response.ok) {
+            return 'failed';
+          }
+
+          return response.text();
+        },
+        resolve,
+        reject,
+      });
+    });
+    this.fetchQueue.advance();
+    const versionRes = await versionResPromise;
+
+    if (versionRes === 'failed') {
       return;
     }
-    const typesVersions = await versionRes.json();
-    const latestTypesVersion = typesVersions.versions[0];
+    const typesVersions = JSON.parse(versionRes);
+    const latestTypesVersion = typesVersions.tags.latest;
 
     this.onAddTypes(name, version, `${typesName}@${latestTypesVersion}`);
-  }
-
-  private async startFetchQueue() {
-    if (this.mutableRunning >= this.fetchConcurrency) {
-      return;
-    }
-
-    const entry = this.mutableQueue.shift();
-    // tslint:disable-next-line:no-loop-statement
-    if (entry !== undefined) {
-      this.mutableRunning += 1;
-
-      this.downloadDependency({ name: entry.name, version: entry.version, suffix: entry.filePath })
-        .then((file) => {
-          entry.resolve(file);
-          this.mutableRunning -= 1;
-          this.startFetchQueue().catch(() => {
-            // do nothing
-          });
-        })
-        .catch(entry.reject);
-    }
   }
 
   private async downloadDependency({ name, version, suffix }: FetchPackageInfo) {
@@ -221,9 +195,18 @@ export class PackageManager {
         minSuffix = suffix.replace('.js', '.min.js');
       }
 
-      const pkg = await fetch(this.getNPMUrl({ name, version, suffix: minSuffix }));
+      // tslint:disable-next-line:promise-must-complete
+      const pkgPromise = new Promise<string>((resolve, reject) => {
+        this.fetchQueue.push({
+          url: this.getNPMUrl({ name, version, suffix: minSuffix }),
+          handleResponse: async (response: Response) => response.text(),
+          resolve,
+          reject,
+        });
+      });
+      this.fetchQueue.advance();
 
-      return pkg.text();
+      return pkgPromise;
     } catch {
       throw new Error(`Could not find module ${name}@${version}`);
     }

@@ -1,8 +1,8 @@
-import fetch from 'cross-fetch';
 import { Graph } from 'graphlib';
 import _ from 'lodash';
 import npa from 'npm-package-arg';
 import semver from 'semver';
+import { FetchQueue } from './FetchQueue';
 
 const NPM_REGISTRY_URL = 'https://registry.npmjs.org';
 const ROOT_NODE = 'root$';
@@ -49,9 +49,11 @@ interface Task {
 // Resolves package.json to hoisted top level dependencies. Anything that can't be unambigiously hoisted is kept at the level of the package.json that required it.
 export class Resolver {
   private readonly graph: Graph;
+  private readonly fetchQueue: FetchQueue<string>;
 
-  public constructor() {
+  public constructor({ fetchQueue }: { readonly fetchQueue: FetchQueue<string> }) {
     this.graph = new Graph();
+    this.fetchQueue = fetchQueue;
   }
 
   public async resolve(dependencies: Dependencies): Promise<ResolvedDependencies> {
@@ -68,9 +70,19 @@ export class Resolver {
     const escapedName = name && npa(name).escapedName;
 
     try {
-      const res = await fetch(`${NPM_REGISTRY_URL}/${escapedName}`);
+      // tslint:disable-next-line:promise-must-complete
+      const resPromise = new Promise<string>((resolve, reject) => {
+        this.fetchQueue.push({
+          url: `${NPM_REGISTRY_URL}/${escapedName}`,
+          handleResponse: async (response: Response) => response.text(),
+          resolve,
+          reject,
+        });
+      });
+      this.fetchQueue.advance();
+      const res = await resPromise;
 
-      return res.json();
+      return JSON.parse(res);
     } catch (error) {
       throw new Error(`Failed to fetch ${name} from npm registry. ${error}`);
     }
