@@ -4,7 +4,7 @@ Great job! Now that we have a shell for our contract, let's learn how to add a f
 
 ## Learn
 
-We'll start by adding `readonly` constant properties. Just like regular TypeScript, `readonly` properties cannot be changed. Marking a property as `public` will generate a smart contract method with the same name for accessing the property. Note that even if a property is marked as `private`, all contract code and storage is publicly accessible, so nothing is ever truly private.
+We'll start by adding [readonly](https://www.typescriptlang.org/docs/handbook/classes.html#readonly-modifier) constant properties. Just like regular TypeScript, `readonly` properties cannot be changed. Marking a property as [public](https://www.typescriptlang.org/docs/handbook/classes.html#public-private-and-protected-modifiers) will generate a smart contract method with the same name for accessing the property. Note that even if a property is marked as [private](https://www.typescriptlang.org/docs/handbook/classes.html#public-private-and-protected-modifiers), all contract code and storage is publicly accessible, so nothing is ever truly private.
 
 Let's take a look at an example:
 
@@ -14,7 +14,7 @@ export class Example extends SmartContract {
 }
 ```
 
-In this example contract we created a `string` property called `myStringProperty`. Smart contract callers can read this property by calling the `myStringProperty` method on the smart contract. Using the NEO•ONE client APIs, the property would be accessed as `example.myStringProperty()`.
+In this example contract we created a [string](https://www.typescriptlang.org/docs/handbook/basic-types.html#string) property called `myStringProperty`. Smart contract callers can read this property by calling the `myStringProperty` method on the smart contract. Using the NEO•ONE client APIs, the property would be accessed as `example.myStringProperty()`.
 
 ## Instructions
 

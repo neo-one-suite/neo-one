@@ -4,7 +4,7 @@ Congratulations on making it this far! Now that we've set the stage, it's time t
 
 ## Learn
 
-We saw how to make constant methods using the `@constant` annotation, but now let's look at what happens when we have a non-constant method.
+We saw how to make constant methods using the `@constant` decorator, but now let's look at what happens when we have a non-constant method.
 
 ```typescript
 import { Address, Fixed, MapStorage, SmartContract } from '@neo-one/smart-contract';
@@ -21,7 +21,7 @@ export class Example extends SmartContract {
 }
 ```
 
-Look familiar? This is the same example from Chapter 3: Structured Storage. In terms of the smart contract, there's not much to add, a method that does not have the `@constant` annotation can mutate primitive and structured storage properties. Otherwise, they're free to contain any valid TypeScript just like `@constant` methods.
+Look familiar? This is the same example from Chapter 3: Structured Storage. In terms of the smart contract, there's not much to add, a method that does not have the `@constant` decorator can mutate primitive and structured storage properties. Otherwise, they're free to contain any valid TypeScript just like `@constant` methods.
 
 The main difference for the NEO•ONE client APIs is that methods require relaying a transaction to the blockchain. This makes sense because a non-constant method by definiton mutates storage, and we need to persist those changes to the blockchain.
 

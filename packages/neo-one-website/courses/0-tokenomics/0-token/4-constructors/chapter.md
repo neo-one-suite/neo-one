@@ -24,9 +24,9 @@ export class Example extends SmartContract {
 }
 ```
 
-Here we've defined a constructor that takes two arguments, an `Address` that will be the `owner` of the contract and a `stringValue` which we manipulate and set the `myStringProperty` to. The first thing you might notice is that we provide default values for every constructor argument. This is mandatory in NEO•ONE smart contracts because we use these default values when we automatically deploy your smart contract for automated and local manual testing. Since we also use a generated address to deploy the contract, referred to as the `masterAccountID` in tests and elsewhere, NEO•ONE provides a special value `Deploy.senderAddress` that sets the default value to whichever address deployed the contract.
+Here we've defined a constructor that takes two arguments, an `Address` [parameter property](https://www.typescriptlang.org/docs/handbook/classes.html#parameter-properties) that will be the `owner` of the contract and a `stringValue` which we manipulate and set the `myStringProperty` to. The first thing you might notice is that we provide [default](https://www.typescriptlang.org/docs/handbook/functions.html#optional-and-default-parameters) values for every constructor argument. This is mandatory in NEO•ONE smart contracts because we use these default values when we automatically deploy your smart contract for automated and local manual testing. Since we also use a generated address to deploy the contract, referred to as the `masterAccountID` in tests and elsewhere, NEO•ONE provides a special value `Deploy.senderAddress` that sets the default value to whichever address deployed the contract.
 
-`Address.isCaller` is how you can verify that the smart contract method was invoked directly by the argument `Address`. In this example, we do a sanity check that the `owner` is the one who deployed the smart contract, which eliminates the possibility of accidentally setting the `owner` to an address that the publisher of the smart contract doesn't own.
+`Address.isCaller` allows you to determine if the provided `Address` invoked this contract. In this example, we do a sanity check that the `owner` is the one who deployed the smart contract, which eliminates the possibility of accidentally setting the `owner` to an address that the publisher of the smart contract doesn't own.
 
 ## Instructions
 
