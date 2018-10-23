@@ -1,5 +1,6 @@
 /// <reference types="monaco-editor/monaco" />
 import { map, switchMap } from 'rxjs/operators';
+import ts from 'typescript';
 import { Adapter } from './Adapter';
 import { convertFormattingOptions, convertTextChange, positionToOffset } from './utils';
 
