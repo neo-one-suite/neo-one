@@ -28,10 +28,18 @@ const Content = styled(Box)`
 interface Props {
   readonly path: string;
   readonly children: React.ReactNode;
+  readonly mostRecentBlogPostSlug?: string;
 }
-export const CoreLayout = ({ children, path, ...props }: Props & ComponentProps<typeof Wrapper>) => (
+export const CoreLayout = ({
+  children,
+  path,
+  mostRecentBlogPostSlug,
+  ...props
+}: Props & ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
-    <ScrollContainer>{({ y }) => <StyledHeader path={path} shadowed={y > 0} />}</ScrollContainer>
+    <ScrollContainer>
+      {({ y }) => <StyledHeader path={path} shadowed={y > 0} mostRecentBlogPostSlug={mostRecentBlogPostSlug} />}
+    </ScrollContainer>
     <Content>{children}</Content>
     <Footer />
   </Wrapper>

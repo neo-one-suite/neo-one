@@ -77,9 +77,10 @@ const FocusableLink: any = as(Link as any)(Toolbar.Focusable);
 
 interface Props {
   readonly path: string;
+  readonly mostRecentBlogPostSlug?: string;
 }
 
-export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper>) => (
+export const Header = ({ path, mostRecentBlogPostSlug, ...props }: Props & ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledToolbar>
       <Toolbar.Content>
@@ -92,8 +93,17 @@ export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper
         <NavigationLink linkColor="gray" active={path === 'tutorial'} data-test="header-tutorial" to="/tutorial">
           Tutorial
         </NavigationLink>
-        <NavigationLink linkColor="gray" active={path === 'course'} data-test="header-tutorial" to="/course">
+        <NavigationLink linkColor="gray" active={path === 'course'} data-test="header-course" to="/course">
           Course
+        </NavigationLink>
+        <NavigationLink
+          linkColor="gray"
+          active={path === 'blog'}
+          data-test="header-blog"
+          // Replace undefined case with actual first blog post? Only occurs on "DocLoading" screen.
+          to={mostRecentBlogPostSlug === undefined ? `/blog/welcome` : `/blog/${mostRecentBlogPostSlug}`}
+        >
+          Blog
         </NavigationLink>
       </Toolbar.Content>
       <Toolbar.Content align="end">
