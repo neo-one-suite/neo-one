@@ -237,6 +237,7 @@ describe('LocalUserAccountProvider', () => {
     'PublicKey',
     'String',
     'Array',
+    'Map',
     'InteropInterface',
     'Void',
   ];
@@ -538,6 +539,27 @@ describe('LocalUserAccountProvider', () => {
     expect(sign.mock.calls).toMatchSnapshot();
     expect(testInvoke.mock.calls).toMatchSnapshot();
     expect(relayTransaction.mock.calls).toMatchSnapshot();
+  });
+
+  test('__execute - with transfers', async () => {
+    getUnspentOutputs.mockImplementation(async () => Promise.resolve([gasInputOutput]));
+    getOutput.mockImplementation(async () => Promise.resolve(gasInputOutput));
+    testInvoke.mockImplementation(async () => Promise.resolve(factory.createRawCallReceipt()));
+    sign.mockImplementation(async () => Promise.resolve(factory.createWitness()));
+    const transaction = factory.createRegisterTransaction();
+    relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
+    const receipt = factory.createTransactionReceipt();
+    getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
+    const invocationData = factory.createRawInvocationData();
+    getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
+    const transfer = factory.createTransfer({ amount: new BigNumber(0) });
+
+    const result = await provider.__execute(data.buffers.a, {
+      systemFee: new BigNumber(-1),
+      transfers: [transfer],
+    });
+
+    expect(result.transaction.inputs).toMatchSnapshot();
   });
 
   describe('consolidation + multi-inputs', () => {
