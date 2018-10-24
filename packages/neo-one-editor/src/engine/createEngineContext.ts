@@ -140,7 +140,7 @@ export const createEngineContext = async ({
       metaSubscription.unsubscribe();
       openFilesSubscription.unsubscribe();
       languagesDisposable.dispose();
-      await Promise.all([fs.dispose(), transpileCache.dispose()]);
+      await Promise.all([fs.dispose(), transpileCache.dispose(), metaDB.close()]);
     },
   };
 };

@@ -1,12 +1,11 @@
 // tslint:disable no-submodule-imports match-default-export-name
+import { registerWorkerPouch } from '@neo-one/local-browser';
 import PouchDB from 'pouchdb';
-// @ts-ignore
-import registerWorkerPouch from 'worker-pouch/worker';
 
 // tslint:disable-next-line
-registerWorkerPouch(self, (value: any) => {
+registerWorkerPouch(self, (...args: any[]) => {
   // tslint:disable-next-line no-any
-  const db = new PouchDB<any>(value);
+  const db = new PouchDB<any>(...args);
   db.setMaxListeners(100);
 
   return db;

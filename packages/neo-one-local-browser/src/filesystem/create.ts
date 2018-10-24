@@ -1,12 +1,11 @@
 // tslint:disable no-submodule-imports match-default-export-name
 import { comlink } from '@neo-one/worker';
 import PouchDB from 'pouchdb';
-// @ts-ignore
-import workerPouchClient from 'worker-pouch/client';
 import { PouchDBFileSystem, PouchDBFileSystemDoc } from './PouchDBFileSystem';
+import { workerPouch } from './worker/workerPouch';
 
 // tslint:disable-next-line no-any
-(PouchDB as any).adapter('worker', workerPouchClient);
+(PouchDB as any).adapter('worker', workerPouch);
 
 export const createEndpointPouchDB = <Doc extends {}>(
   dbID: string,
@@ -14,15 +13,7 @@ export const createEndpointPouchDB = <Doc extends {}>(
 ) => {
   const db = new PouchDB<Doc>(dbID, {
     adapter: 'worker',
-    worker: () => {
-      // tslint:disable-next-line no-any
-      if ((endpoint as any).start) {
-        // tslint:disable-next-line no-any
-        (endpoint as any).start();
-      }
-
-      return endpoint;
-    },
+    endpoint: () => endpoint,
     // tslint:disable-next-line no-any
   } as any);
   db.setMaxListeners(20);

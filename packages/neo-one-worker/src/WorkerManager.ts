@@ -1,6 +1,7 @@
 import { Observable, Subscription } from 'rxjs';
+import { EndpointLike } from './endpoint';
 import { SingleWorkerManager } from './SingleWorkerManager';
-import { Disposable, EndpointLike, WorkerConstructor, WorkerInstance, WorkerOptions } from './types';
+import { Disposable, WorkerConstructor, WorkerInstance, WorkerOptions } from './types';
 
 export class WorkerManager<T extends WorkerConstructor> {
   public readonly instance$: Observable<WorkerInstance<T>>;
@@ -18,20 +19,28 @@ export class WorkerManager<T extends WorkerConstructor> {
     forceRestart$?: Observable<void>,
   ) {
     this.instance$ = new Observable<WorkerInstance<T>>((observer) => {
-      let resolver: () => void;
+      let resolver: (() => void) | undefined;
+      let cancelled = false;
       this.withInstance(
         async (instance) =>
           // tslint:disable-next-line:promise-must-complete
           new Promise<void>((resolve) => {
-            resolver = resolve;
-            observer.next(instance);
+            if (cancelled) {
+              resolve();
+            } else {
+              resolver = resolve;
+              observer.next(instance);
+            }
           }),
       ).catch((error) => {
         observer.error(error);
       });
 
       return () => {
-        resolver();
+        cancelled = true;
+        if (resolver !== undefined) {
+          resolver();
+        }
       };
     });
 

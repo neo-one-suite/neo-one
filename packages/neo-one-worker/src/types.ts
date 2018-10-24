@@ -1,6 +1,3 @@
-import * as comlink from './comlink';
-
-export type EndpointLike = comlink.Endpoint | Window | Worker;
 export interface Disposable {
   readonly dispose: () => void;
 }

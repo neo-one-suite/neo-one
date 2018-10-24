@@ -87,8 +87,7 @@
     "typescript": "3.2.0-dev.20181020",
     "typescript-fsa": "^3.0.0-beta-2",
     "typescript-fsa-reducers": "^1.0.0",
-    "webpack": "4.19.0",
-    "worker-pouch": "^2.1.0"
+    "webpack": "4.19.0"
   },
   "sideEffects": [
     "src/preview/window/polyfill.ts"

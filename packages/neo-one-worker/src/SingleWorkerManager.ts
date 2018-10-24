@@ -1,74 +1,22 @@
 import * as comlink from './comlink';
-import { Disposable, EndpointLike, WorkerConstructor, WorkerInstance, WorkerOptions } from './types';
+import * as endpoint from './endpoint';
+import { Disposable, WorkerConstructor, WorkerInstance, WorkerOptions } from './types';
 
-interface WorkerEndpoint extends comlink.Endpoint {
-  readonly close: () => void;
-}
-
-function isWindow(endpoint: EndpointLike): endpoint is Window {
-  return ['window', 'length', 'location', 'parent', 'opener'].every((prop) => prop in endpoint);
-}
-
-function isWorker(endpoint: EndpointLike): endpoint is Worker {
-  return ['onmessage', 'postMessage', 'terminate', 'addEventListener', 'removeEventListener'].every(
-    (prop) => prop in endpoint,
-  );
-}
-
-function windowEndpoint(w: Window): WorkerEndpoint {
-  if (self.constructor.name !== 'Window') {
-    throw Error('self is not a window');
-  }
+function wrapEndpoint(endpointIn: endpoint.EndpointLike, onPostMessage: () => void): endpoint.WorkerEndpoint {
+  const messageEndpoint = endpoint.getEndpoint(endpointIn);
 
   return {
-    addEventListener: self.addEventListener.bind(self),
-    removeEventListener: self.removeEventListener.bind(self),
-    postMessage: (msg, transfer) => w.postMessage(msg, '*', transfer),
-    close: () => {
-      // do nothing
-    },
-  };
-}
-
-function workerEndpoint(worker: Worker): WorkerEndpoint {
-  return {
-    addEventListener: worker.addEventListener.bind(worker),
-    removeEventListener: worker.removeEventListener.bind(worker),
-    postMessage: worker.postMessage.bind(worker),
-    close: worker.terminate.bind(worker),
-  };
-}
-
-function endpointEndpoint(endpoint: comlink.Endpoint): WorkerEndpoint {
-  return {
-    addEventListener: endpoint.addEventListener.bind(endpoint),
-    removeEventListener: endpoint.removeEventListener.bind(endpoint),
-    postMessage: endpoint.postMessage.bind(endpoint),
-    close: () => {
-      // do nothing
-    },
-  };
-}
-
-function getEndpoint(endpointIn: EndpointLike, onPostMessage: () => void): WorkerEndpoint {
-  const endpoint = isWindow(endpointIn)
-    ? windowEndpoint(endpointIn)
-    : isWorker(endpointIn)
-      ? workerEndpoint(endpointIn)
-      : endpointEndpoint(endpointIn);
-
-  return {
-    ...endpoint,
+    ...messageEndpoint,
     postMessage: (msg, transfer) => {
       onPostMessage();
 
-      endpoint.postMessage(msg, transfer);
+      messageEndpoint.postMessage(msg, transfer);
     },
   };
 }
 
 export class SingleWorkerManager<T extends WorkerConstructor> {
-  private readonly endpoint: WorkerEndpoint;
+  private readonly endpoint: endpoint.WorkerEndpoint;
   private readonly instance: Promise<WorkerInstance<T>>;
   private readonly idleCheckInterval: NodeJS.Timer;
   private mutableDisposed = false;
@@ -76,13 +24,13 @@ export class SingleWorkerManager<T extends WorkerConstructor> {
   private mutableInUse = 0;
 
   public constructor(
-    endpoint: EndpointLike,
+    endpointIn: endpoint.EndpointLike,
     options: WorkerOptions<T>,
     private readonly disposables: ReadonlyArray<Disposable>,
     private readonly idleTimeoutMS: number,
     private readonly onDispose: (value: SingleWorkerManager<T>) => void,
   ) {
-    this.endpoint = getEndpoint(endpoint, () => {
+    this.endpoint = wrapEndpoint(endpointIn, () => {
       this.mutableLastUsedTime = Date.now();
     });
     this.mutableLastUsedTime = 0;

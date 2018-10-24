@@ -1,8 +1,8 @@
 // tslint:disable
 export interface Endpoint {
   postMessage(message: any, transfer?: any[]): void;
-  addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: {}): void;
-  removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: {}): void;
+  addEventListener(type: string, listener: (event: MessageEvent) => void, options?: {}): void;
+  removeEventListener(type: string, listener: (event: MessageEvent) => void, options?: {}): void;
 }
 export type Proxy = Function;
 type CBProxyCallback = (bpcd: CBProxyCallbackDescriptor) => {}; // eslint-disable-line no-unused-vars
@@ -301,8 +301,8 @@ function isRawWrappedValue(arg: WrappedValue): arg is RawWrappedValue {
 function windowEndpoint(w: Window): Endpoint {
   if (self.constructor.name !== 'Window') throw Error('self is not a window');
   return {
-    addEventListener: self.addEventListener.bind(self),
-    removeEventListener: self.removeEventListener.bind(self),
+    addEventListener: self.addEventListener.bind(self) as any,
+    removeEventListener: self.removeEventListener.bind(self) as any,
     postMessage: (msg, transfer) => w.postMessage(msg, '*', transfer),
   };
 }
@@ -453,7 +453,7 @@ function* iterateAllProperties(
   for (const key of keys) yield* iterateAllProperties((value as any)[key], [...path, key], visited);
 }
 
-function transferableProperties(obj: {}[] | undefined): Transferable[] {
+export function transferableProperties(obj: {}[] | undefined): Transferable[] {
   const r: Transferable[] = [];
   for (const prop of iterateAllProperties(obj)) {
     if (isTransferable(prop.value)) r.push(prop.value);
