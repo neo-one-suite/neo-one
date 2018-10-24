@@ -13,27 +13,17 @@ describe('fetch queue', () => {
   });
 
   test('queues fetches', async () => {
-    const mutableRunningSpy = jest.spyOn(fetchQueue, 'testSpy');
-    const queuePromises = dummyArray.map(
-      async (idx) =>
-        // tslint:disable-next-line:promise-must-complete
-        new Promise<number>((resolve, reject) => {
-          fetchQueue.push({
-            url,
-            handleResponse: async (_response: Response) => idx,
-            resolve,
-            reject,
-          });
-        }),
+    const mutableRunningArray: number[] = [];
+    const queueResults = await Promise.all(
+      dummyArray.map(async (idx) => {
+        // tslint:disable-next-line:no-any
+        mutableRunningArray.push((fetchQueue as any).mutableRunning);
+
+        return fetchQueue.fetch(url, async (_response: Response) => idx);
+      }),
     );
-    fetchQueue.advance();
-    fetchQueue.advance();
-    fetchQueue.advance();
-    fetchQueue.advance();
 
-    const queueResults = await Promise.all(queuePromises);
-
-    mutableRunningSpy.mock.calls.forEach(([mutableRunning]) => {
+    mutableRunningArray.forEach((mutableRunning) => {
       expect(mutableRunning).toBeLessThanOrEqual(fetchConcurrency);
     });
     expect(queueResults).toEqual(dummyArray);

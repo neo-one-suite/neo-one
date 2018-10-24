@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch';
 
-export interface QueueData<T> {
+interface QueueData<T> {
   readonly url: string;
   readonly handleResponse: (response: Response) => Promise<T>;
   readonly resolve: (result: T) => void;
@@ -22,15 +22,25 @@ export class FetchQueue<T> {
     this.mutableRunning = 0;
   }
 
-  public push(queueData: QueueData<T>) {
-    this.mutableQueue.push(queueData);
+  public async fetch(url: string, handleResponse: (response: Response) => Promise<T>): Promise<T> {
+    // tslint:disable-next-line:promise-must-complete
+    const tPromise = new Promise<T>((resolve, reject) => {
+      this.mutableQueue.push({
+        url,
+        handleResponse,
+        resolve,
+        reject,
+      });
+    });
+    this.advance();
+
+    return tPromise;
   }
 
-  public advance() {
-    if (this.mutableRunning > this.fetchConcurrency) {
+  private advance() {
+    if (this.mutableRunning >= this.fetchConcurrency) {
       return;
     }
-    this.testSpy(this.mutableRunning);
 
     const entry = this.mutableQueue.shift();
     if (entry !== undefined) {
@@ -44,9 +54,5 @@ export class FetchQueue<T> {
         })
         .catch(entry.reject);
     }
-  }
-
-  public testSpy(_testMutableRemaining: number) {
-    // do nothing;
   }
 }

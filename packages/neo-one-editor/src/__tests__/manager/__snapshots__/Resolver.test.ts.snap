@@ -162,19 +162,19 @@ Object {
     "dependencies": Object {},
     "name": "react",
     "types": false,
-    "version": "16.5.2",
+    "version": "16.6.0",
   },
   "react-dom": Object {
     "dependencies": Object {},
     "name": "react-dom",
     "types": false,
-    "version": "16.5.2",
+    "version": "16.6.0",
   },
   "react-is": Object {
     "dependencies": Object {},
     "name": "react-is",
     "types": false,
-    "version": "16.5.2",
+    "version": "16.6.0",
   },
   "reakit": Object {
     "dependencies": Object {},
@@ -194,11 +194,11 @@ Object {
     "types": false,
     "version": "2.1.2",
   },
-  "schedule": Object {
+  "scheduler": Object {
     "dependencies": Object {},
-    "name": "schedule",
+    "name": "scheduler",
     "types": false,
-    "version": "0.5.0",
+    "version": "0.10.0",
   },
   "setimmediate": Object {
     "dependencies": Object {},

@@ -70,17 +70,9 @@ export class Resolver {
     const escapedName = name && npa(name).escapedName;
 
     try {
-      // tslint:disable-next-line:promise-must-complete
-      const resPromise = new Promise<string>((resolve, reject) => {
-        this.fetchQueue.push({
-          url: `${NPM_REGISTRY_URL}/${escapedName}`,
-          handleResponse: async (response: Response) => response.text(),
-          resolve,
-          reject,
-        });
-      });
-      this.fetchQueue.advance();
-      const res = await resPromise;
+      const res = await this.fetchQueue.fetch(`${NPM_REGISTRY_URL}/${escapedName}`, async (response: Response) =>
+        response.text(),
+      );
 
       return JSON.parse(res);
     } catch (error) {

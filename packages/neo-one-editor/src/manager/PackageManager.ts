@@ -119,16 +119,10 @@ export class PackageManager {
 
   private async getAllPackageFiles({ name, version }: FetchPackageInfo): Promise<ReadonlyArray<string>> {
     // tslint:disable-next-line:promise-must-complete
-    const fileTreePromise = new Promise<string>((resolve, reject) => {
-      this.fetchQueue.push({
-        url: this.getNPMDataUrl({ name, version }),
-        handleResponse: async (response: Response) => response.text(),
-        resolve,
-        reject,
-      });
-    });
-    this.fetchQueue.advance();
-    const fileTreeText = await fileTreePromise;
+    const fileTreeText = await this.fetchQueue.fetch(
+      this.getNPMDataUrl({ name, version }),
+      async (response: Response) => response.text(),
+    );
     const fileTree = JSON.parse(fileTreeText);
 
     return this.getDirectoryList({ dirList: fileTree.files });
@@ -161,27 +155,20 @@ export class PackageManager {
     }
     const typesName = `@types/${name.replace('@', '').replace('/', '__')}`;
 
-    // tslint:disable-next-line:promise-must-complete
-    const versionResPromise = new Promise<string>((resolve, reject) => {
-      this.fetchQueue.push({
-        url: this.getNPMDataUrl({ name: typesName }),
-        handleResponse: async (response: Response) => {
-          if (!response.ok) {
-            return 'failed';
-          }
+    const versionRes = await this.fetchQueue.fetch(
+      this.getNPMDataUrl({ name: typesName }),
+      async (response: Response) => {
+        if (!response.ok) {
+          return 'failed';
+        }
 
-          return response.text();
-        },
-        resolve,
-        reject,
-      });
-    });
-    this.fetchQueue.advance();
-    const versionRes = await versionResPromise;
-
+        return response.text();
+      },
+    );
     if (versionRes === 'failed') {
       return;
     }
+
     const typesVersions = JSON.parse(versionRes);
     const latestTypesVersion = typesVersions.tags.latest;
 
@@ -195,18 +182,9 @@ export class PackageManager {
         minSuffix = suffix.replace('.js', '.min.js');
       }
 
-      // tslint:disable-next-line:promise-must-complete
-      const pkgPromise = new Promise<string>((resolve, reject) => {
-        this.fetchQueue.push({
-          url: this.getNPMUrl({ name, version, suffix: minSuffix }),
-          handleResponse: async (response: Response) => response.text(),
-          resolve,
-          reject,
-        });
-      });
-      this.fetchQueue.advance();
-
-      return pkgPromise;
+      return this.fetchQueue.fetch(this.getNPMUrl({ name, version, suffix: minSuffix }), async (response: Response) =>
+        response.text(),
+      );
     } catch {
       throw new Error(`Could not find module ${name}@${version}`);
     }
