@@ -1,5 +1,6 @@
 // tslint:disable no-any
 import ts from 'typescript';
+import * as symbol_ from './symbol';
 import * as utils from './utils';
 
 type NamedNode = ts.Node & { readonly name: ts.Identifier };
@@ -284,3 +285,17 @@ export function isPartOfTypeNode(node: ts.Node): boolean {
   // tslint:disable-next-line no-any
   return (ts as any).isPartOfTypeNode(node);
 }
+
+export const getSymbolOrAlias = (typeChecker: ts.TypeChecker) => (node: ts.Node) => {
+  const symbol = getSymbol(typeChecker, node);
+  if (symbol === undefined) {
+    return undefined;
+  }
+
+  const aliased = symbol_.getAliasedSymbol(typeChecker, symbol);
+  if (aliased !== undefined) {
+    return aliased;
+  }
+
+  return symbol;
+};

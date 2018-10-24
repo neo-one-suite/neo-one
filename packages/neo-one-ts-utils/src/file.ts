@@ -48,3 +48,9 @@ export function createSourceMapRange(node: ts.Node): ts.SourceMapRange {
     source: file === undefined ? undefined : ts.createSourceMapSource(getFilePath(file), getText(node)),
   };
 }
+
+export function getExportedSymbols(typeChecker: ts.TypeChecker, node: ts.SourceFile): ReadonlyArray<ts.Symbol> {
+  const symbol = node_.getSymbol(typeChecker, node);
+
+  return symbol === undefined ? [] : typeChecker.getExportsOfModule(symbol);
+}

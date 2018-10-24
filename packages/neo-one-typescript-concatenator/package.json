@@ -12,5 +12,8 @@
     "toposort": "^2.0.2",
     "typescript": "3.2.0-dev.20181020"
   },
+  "devDependencies": {
+    "app-root-dir": "^1.0.2"
+  },
   "sideEffects": false
 }

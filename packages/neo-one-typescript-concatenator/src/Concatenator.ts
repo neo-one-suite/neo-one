@@ -12,7 +12,8 @@ export interface ConcatenatorContext {
   readonly isIgnoreFile: (node: ts.ClassDeclaration) => boolean;
   readonly isGlobalIdentifier: (value: string) => boolean;
   readonly isGlobalFile: (node: ts.SourceFile) => boolean;
-  readonly isGlobalSymbol: (node: ts.Symbol) => boolean;
+  readonly isGlobalSymbol: (node: ts.Symbol, sourceString?: string) => boolean;
+  readonly skipReferenceCheck?: boolean;
 }
 
 export interface ConcatenatorOptions {
@@ -46,9 +47,7 @@ export class Concatenator {
     }
 
     if (ts.isImportDeclaration(node)) {
-      return this.isConcatenatedImport(node)
-        ? tsUtils.setOriginal(ts.createNotEmittedStatement(node), node)
-        : this.getCombinedImport(node);
+      return this.isConcatenatedImport(node) ? this.replaceImport(node) : this.getCombinedImport(node);
     }
 
     if (ts.isExportAssignment(node)) {
@@ -87,11 +86,13 @@ export class Concatenator {
     }
 
     if (ts.isVariableStatement(node) && tsUtils.modifier.isNamedExport(node)) {
+      const symbol = this.context.getSymbol(node.declarationList.declarations[0].name);
+
       return tsUtils.setOriginal(
         ts.createVariableStatement(
-          node.modifiers === undefined
-            ? undefined
-            : node.modifiers.filter((modifier) => modifier.kind !== ts.SyntaxKind.ExportKeyword),
+          symbol === undefined || !this.context.isGlobalSymbol(symbol, node.getSourceFile().fileName)
+            ? this.filterModifiers(node.modifiers)
+            : node.modifiers,
           node.declarationList,
         ),
         node,
@@ -103,16 +104,15 @@ export class Concatenator {
       ((tsUtils.modifier.isNamedExport(node) && !this.isIgnoreFileInternal(node)) ||
         tsUtils.modifier.isDefaultExport(node))
     ) {
+      const symbol = this.context.getSymbol(node);
+
       return tsUtils.setOriginal(
         ts.updateClassDeclaration(
           node,
           node.decorators,
-          node.modifiers === undefined
-            ? undefined
-            : node.modifiers.filter(
-                (modifier) =>
-                  modifier.kind !== ts.SyntaxKind.ExportKeyword && modifier.kind !== ts.SyntaxKind.DefaultKeyword,
-              ),
+          symbol === undefined || !this.context.isGlobalSymbol(symbol, node.getSourceFile().fileName)
+            ? this.filterModifiers(node.modifiers)
+            : node.modifiers,
           node.name,
           node.typeParameters,
           node.heritageClauses,
@@ -126,10 +126,14 @@ export class Concatenator {
       (ts.isFunctionExpression(node) || ts.isFunctionDeclaration(node)) &&
       (tsUtils.modifier.isNamedExport(node) || tsUtils.modifier.isDefaultExport(node))
     ) {
+      const symbol = this.context.getSymbol(node);
+
       return tsUtils.setOriginal(
         ts.createFunctionDeclaration(
           node.decorators,
-          this.filterModifiers(node.modifiers),
+          symbol === undefined || !this.context.isGlobalSymbol(symbol, node.getSourceFile().fileName)
+            ? this.filterModifiers(node.modifiers)
+            : node.modifiers,
           node.asteriskToken,
           node.name === undefined ? this.getIdentifierForNode(node) : node.name,
           node.typeParameters,
@@ -142,10 +146,14 @@ export class Concatenator {
     }
 
     if (ts.isInterfaceDeclaration(node) && tsUtils.modifier.isNamedExport(node)) {
+      const symbol = this.context.getSymbol(node.name);
+
       return tsUtils.setOriginal(
         ts.createInterfaceDeclaration(
           node.decorators,
-          this.filterModifiers(node.modifiers),
+          symbol === undefined || !this.context.isGlobalSymbol(symbol, node.getSourceFile().fileName)
+            ? this.filterModifiers(node.modifiers)
+            : node.modifiers,
           node.name,
           node.typeParameters,
           node.heritageClauses,
@@ -156,10 +164,14 @@ export class Concatenator {
     }
 
     if (ts.isTypeAliasDeclaration(node) && tsUtils.modifier.isNamedExport(node)) {
+      const symbol = this.context.getSymbol(node);
+
       return tsUtils.setOriginal(
         ts.createTypeAliasDeclaration(
           node.decorators,
-          this.filterModifiers(node.modifiers),
+          symbol === undefined || !this.context.isGlobalSymbol(symbol, node.getSourceFile().fileName)
+            ? this.filterModifiers(node.modifiers)
+            : node.modifiers,
           node.name,
           node.typeParameters,
           node.type,
@@ -172,14 +184,34 @@ export class Concatenator {
       ts.isEnumDeclaration(node) &&
       (tsUtils.modifier.isNamedExport(node) || tsUtils.modifier.isDefaultExport(node))
     ) {
+      const symbol = this.context.getSymbol(node);
+
       return tsUtils.setOriginal(
-        ts.createEnumDeclaration(node.decorators, this.filterModifiers(node.modifiers), node.name, node.members),
+        ts.createEnumDeclaration(
+          node.decorators,
+          symbol === undefined || !this.context.isGlobalSymbol(symbol, node.getSourceFile().fileName)
+            ? this.filterModifiers(node.modifiers)
+            : node.modifiers,
+          node.name,
+          node.members,
+        ),
         node,
       );
     }
 
     if (ts.isExportDeclaration(node)) {
-      return tsUtils.setOriginal(ts.createNotEmittedStatement(node), node);
+      const file = tsUtils.importExport.getModuleSpecifier(node);
+      if (file === undefined) {
+        return tsUtils.setOriginalRecursive(
+          ts.createExportDeclaration(node.decorators, node.modifiers, node.exportClause),
+          node,
+        );
+      }
+      if (tsUtils.literal.getLiteralValue(file).startsWith('.')) {
+        return tsUtils.setOriginal(ts.createNotEmittedStatement(node), node);
+      }
+
+      return node;
     }
 
     if (ts.isPropertyAccessExpression(node)) {
@@ -201,6 +233,7 @@ export class Concatenator {
     if (this.sourceFileImported.has(sourceFile)) {
       return tsUtils.setOriginal(ts.createNotEmittedStatement(node), node);
     }
+
     this.sourceFileImported.add(sourceFile);
 
     const importDecl = this.sourceFileToImports.get(sourceFile);
@@ -233,6 +266,10 @@ export class Concatenator {
       .getStatements(sourceFile)
       .filter(ts.isImportDeclaration)
       .map((decl) => {
+        const file2 = tsUtils.importExport.getModuleSpecifier(decl);
+        if (file2 === undefined || !tsUtils.literal.getLiteralValue(file2).startsWith('.')) {
+          return undefined;
+        }
         const file = tsUtils.importExport.getModuleSpecifierSourceFile(this.context.typeChecker, decl);
         if (this.isConcatenatedImport(decl) && file !== undefined) {
           this.sourceFileImported.add(file);
@@ -247,6 +284,11 @@ export class Concatenator {
       .getStatements(sourceFile)
       .filter(ts.isExportDeclaration)
       .map((decl) => {
+        const file2 = tsUtils.importExport.getModuleSpecifier(decl);
+        if (file2 === undefined || !tsUtils.literal.getLiteralValue(file2).startsWith('.')) {
+          return undefined;
+        }
+
         const file = tsUtils.importExport.getModuleSpecifierSourceFile(this.context.typeChecker, decl);
         if (!this.isBuiltinFile(decl) && file !== undefined) {
           this.sourceFileImported.add(file);
@@ -348,6 +390,7 @@ export class Concatenator {
         ),
       );
     const existingImport = this.sourceFileToImports.get(file);
+    const defaultImport = tsUtils.importDeclaration.getDefaultImport(node);
     const moduleSpecifier = this.context.isGlobalFile(file)
       ? ts.isStringLiteral(node.moduleSpecifier)
         ? tsUtils.setOriginal(ts.createStringLiteral(node.moduleSpecifier.text), node.moduleSpecifier)
@@ -360,7 +403,10 @@ export class Concatenator {
           ts.createImportDeclaration(
             undefined,
             undefined,
-            ts.createImportClause(undefined, ts.createNamedImports(namedImports)),
+            ts.createImportClause(
+              defaultImport === undefined ? undefined : this.getIdentifierForIdentifier(defaultImport),
+              namedImports.length === 0 ? undefined : ts.createNamedImports(namedImports),
+            ),
             moduleSpecifier,
           ),
           node,
@@ -370,6 +416,7 @@ export class Concatenator {
       const existingNamedImports = tsUtils.importDeclaration.getNamedImports(existingImport);
       const existingNames = new Set(existingNamedImports.map((namedImport) => namedImport.name.text));
       const filteredImports = namedImports.filter((namedImport) => !existingNames.has(namedImport.name.text));
+      const concattedImports = existingNamedImports.concat(filteredImports);
 
       this.sourceFileToImports.set(
         file,
@@ -377,7 +424,12 @@ export class Concatenator {
           ts.createImportDeclaration(
             undefined,
             undefined,
-            ts.createImportClause(undefined, ts.createNamedImports(existingNamedImports.concat(filteredImports))),
+            ts.createImportClause(
+              defaultImport === undefined ? undefined : this.getIdentifierForIdentifier(defaultImport),
+              concattedImports.length === 0
+                ? undefined
+                : ts.createNamedImports(existingNamedImports.concat(filteredImports)),
+            ),
             moduleSpecifier,
           ),
           existingImport,
@@ -407,18 +459,19 @@ export class Concatenator {
   }
 
   private getIdentifierForNode(node: ts.Node): ts.Identifier | undefined {
-    const identifier = this.getIdentifierStringForSymbol(this.context.getSymbol(node));
+    const source = node.getSourceFile().fileName;
+    const identifier = this.getIdentifierStringForSymbol(this.context.getSymbol(node), source);
 
     return identifier === undefined ? undefined : tsUtils.setOriginal(ts.createIdentifier(identifier), node);
   }
 
-  private getIdentifierStringForSymbol(symbol: ts.Symbol | undefined): string | undefined {
+  private getIdentifierStringForSymbol(symbol: ts.Symbol | undefined, sourceString?: string): string | undefined {
     if (symbol === undefined) {
       return undefined;
     }
 
     let identifier: string | undefined;
-    if (this.context.isGlobalSymbol(symbol)) {
+    if (this.context.isGlobalSymbol(symbol, sourceString)) {
       identifier = tsUtils.symbol.getName(symbol);
     }
 
@@ -461,6 +514,10 @@ export class Concatenator {
   }
 
   private isConcatenatedImport(node: ts.ImportDeclaration): boolean {
+    if (this.context.skipReferenceCheck) {
+      return !this.isBuiltinFile(node);
+    }
+
     return this.hasValueReference(node) && !this.isBuiltinFile(node);
   }
 
@@ -487,15 +544,10 @@ export class Concatenator {
     }
 
     const namedImports = tsUtils.importDeclaration.getNamedImports(node);
-    if (
-      namedImports.some((namedImport) =>
-        this.hasLocalValueReferences(currentSourceFile, this.getImportNameNode(namedImport)),
-      )
-    ) {
-      return true;
-    }
 
-    return false;
+    return namedImports.some((namedImport) =>
+      this.hasLocalValueReferences(currentSourceFile, this.getImportNameNode(namedImport)),
+    );
   }
 
   private hasLocalValueReferences(currentSourceFile: ts.SourceFile, node: AnyNameableNode): boolean {
@@ -517,5 +569,60 @@ export class Concatenator {
     const alias = tsUtils.node.getPropertyNameNode(node);
 
     return alias === undefined ? node : alias;
+  }
+
+  private createRenamedImport(name: ts.Identifier, symbols: ReadonlyArray<ts.Symbol>) {
+    return ts.createVariableStatement(
+      undefined,
+      ts.createVariableDeclarationList(
+        [
+          ts.createVariableDeclaration(
+            this.getIdentifierForIdentifier(name),
+            undefined,
+            ts.createObjectLiteral(
+              symbols.reduce((acc: ReadonlyArray<ts.ObjectLiteralElementLike>, symbol) => {
+                const expression = this.getIdentifierForSymbol(symbol);
+                if (expression === undefined) {
+                  return acc;
+                }
+
+                return acc.concat(ts.createPropertyAssignment(tsUtils.symbol.getName(symbol), expression));
+              }, []),
+            ),
+          ),
+        ],
+        ts.NodeFlags.Const,
+      ),
+    );
+  }
+
+  private replaceImport(node: ts.ImportDeclaration): ts.Statement {
+    const sourceFile = tsUtils.importExport.getModuleSpecifierSourceFile(this.context.typeChecker, node);
+    const imports = tsUtils.importDeclaration.getNamedImports(node);
+    const namespace = tsUtils.importDeclaration.getNamespaceImportIdentifier(node);
+
+    if (
+      sourceFile === undefined ||
+      imports.length !== 0 ||
+      namespace === undefined ||
+      this.context.skipReferenceCheck === undefined
+    ) {
+      return tsUtils.setOriginal(ts.createNotEmittedStatement(node), node);
+    }
+    const exportSymbols = tsUtils.file.getExportedSymbols(this.context.typeChecker, sourceFile);
+
+    return tsUtils.setOriginalRecursive(this.createRenamedImport(namespace, exportSymbols), node);
+  }
+
+  private getIdentifierForSymbol(symbol: ts.Symbol): ts.Identifier | undefined {
+    const entityName = this.context.typeChecker.symbolToEntityName(symbol, 0);
+    if (entityName === undefined) {
+      return undefined;
+    }
+    if (ts.isQualifiedName(entityName)) {
+      return entityName.right;
+    }
+
+    return entityName;
   }
 }
