@@ -1,8 +1,8 @@
-import fetch from 'cross-fetch';
 import { Graph } from 'graphlib';
 import _ from 'lodash';
 import npa from 'npm-package-arg';
 import semver from 'semver';
+import { FetchQueue } from './FetchQueue';
 
 const NPM_REGISTRY_URL = 'https://registry.npmjs.org';
 const ROOT_NODE = 'root$';
@@ -27,8 +27,7 @@ export interface PackageJSON {
 export interface DependencyInfo {
   readonly name: string;
   readonly version: string;
-  readonly main?: string;
-  readonly types?: string;
+  readonly types: boolean;
   readonly dependencies: ResolvedDependencies;
 }
 
@@ -50,9 +49,11 @@ interface Task {
 // Resolves package.json to hoisted top level dependencies. Anything that can't be unambigiously hoisted is kept at the level of the package.json that required it.
 export class Resolver {
   private readonly graph: Graph;
+  private readonly fetchQueue: FetchQueue<string>;
 
-  public constructor() {
+  public constructor({ fetchQueue }: { readonly fetchQueue: FetchQueue<string> }) {
     this.graph = new Graph();
+    this.fetchQueue = fetchQueue;
   }
 
   public async resolve(dependencies: Dependencies): Promise<ResolvedDependencies> {
@@ -69,9 +70,11 @@ export class Resolver {
     const escapedName = name && npa(name).escapedName;
 
     try {
-      const res = await fetch(`${NPM_REGISTRY_URL}/${escapedName}`);
+      const res = await this.fetchQueue.fetch(`${NPM_REGISTRY_URL}/${escapedName}`, async (response: Response) =>
+        response.text(),
+      );
 
-      return res.json();
+      return JSON.parse(res);
     } catch (error) {
       throw new Error(`Failed to fetch ${name} from npm registry. ${error}`);
     }
@@ -108,8 +111,7 @@ export class Resolver {
     this.graph.setNode(name, {
       name,
       version,
-      main: versionPackageJson.main,
-      types: versionPackageJson.types === undefined ? versionPackageJson.typings : versionPackageJson.types,
+      types: versionPackageJson.types !== undefined || versionPackageJson.typings !== undefined,
     });
     this.graph.setEdge(ROOT_NODE, name);
 
@@ -128,16 +130,14 @@ export class Resolver {
       this.graph.setNode(fullName, {
         name,
         version,
-        main: versionPackageJson.main,
-        types: versionPackageJson.types === undefined ? versionPackageJson.typings : versionPackageJson.types,
+        types: versionPackageJson.types !== undefined || versionPackageJson.typings !== undefined,
       });
       this.graph.setEdge(task.parentNode, fullName);
     }
     this.graph.setNode(name, {
       name,
       version,
-      main: versionPackageJson.main,
-      types: versionPackageJson.types === undefined ? versionPackageJson.typings : versionPackageJson.types,
+      types: versionPackageJson.types !== undefined || versionPackageJson.typings !== undefined,
     });
     this.graph.setEdge(ROOT_NODE, name);
 
