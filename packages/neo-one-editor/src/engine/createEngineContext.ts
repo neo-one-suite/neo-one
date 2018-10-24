@@ -140,6 +140,8 @@ export const createEngineContext = async ({
       metaSubscription.unsubscribe();
       openFilesSubscription.unsubscribe();
       languagesDisposable.dispose();
+      builderManager.dispose();
+      jsonRPCLocalProviderManager.dispose();
       await Promise.all([fs.dispose(), transpileCache.dispose(), metaDB.close()]);
     },
   };

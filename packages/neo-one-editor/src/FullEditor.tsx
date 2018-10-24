@@ -71,6 +71,7 @@ class FullEditorBase extends React.Component<Props, State> {
   public readonly state: State = { openFiles: [] };
   private mutableOpenFilesSubscription: Subscription | undefined;
   private mutableOutputSubscription: Subscription | undefined;
+  private mutableMounted = true;
 
   public componentDidMount(): void {
     this.initializeEngine(this.props);
@@ -80,6 +81,11 @@ class FullEditorBase extends React.Component<Props, State> {
     if (this.props.id !== nextProps.id) {
       this.initializeEngine(nextProps);
     }
+  }
+
+  public componentWillUnmount(): void {
+    this.mutableMounted = false;
+    this.dispose();
   }
 
   public render() {
@@ -130,31 +136,34 @@ class FullEditorBase extends React.Component<Props, State> {
             openFile: this.onSelectFile,
           },
           testRunnerCallbacks,
-        }).then(async (engine) => {
-          if (this.props.id === id) {
-            const openFiles = engine.context.openFiles$.getValue().map((path) => engine.getFile(path));
-            this.setState({
-              engine,
-              file: openFiles[0],
-              openFiles,
-            });
-            this.mutableOpenFilesSubscription = engine.context.openFiles$.subscribe({
-              next: (nextOpenFiles) => {
-                this.setState({ openFiles: nextOpenFiles.map((path) => engine.getFile(path)) });
-              },
-            });
-            this.mutableOutputSubscription = engine.context.output$.subscribe({
-              next: (output) => {
-                appendOutput(output);
-              },
-            });
-          } else {
-            engine.dispose().catch((error) => {
-              // tslint:disable-next-line no-console
-              console.error(error);
-            });
-          }
-        }),
+        })
+          .then(async (engine) => {
+            if (this.props.id === id && this.mutableMounted) {
+              const openFiles = engine.context.openFiles$.getValue().map((path) => engine.getFile(path));
+              this.setState({
+                engine,
+                file: openFiles[0],
+                openFiles,
+              });
+              this.mutableOpenFilesSubscription = engine.context.openFiles$.subscribe({
+                next: (nextOpenFiles) => {
+                  this.setState({ openFiles: nextOpenFiles.map((path) => engine.getFile(path)) });
+                },
+              });
+              this.mutableOutputSubscription = engine.context.output$.subscribe({
+                next: (output) => {
+                  appendOutput(output);
+                },
+              });
+            } else {
+              await engine.dispose();
+            }
+          })
+          .catch(async (error) => {
+            await context.dispose();
+
+            throw error;
+          }),
       )
       .catch((error) => {
         // tslint:disable-next-line no-console

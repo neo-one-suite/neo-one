@@ -8,6 +8,7 @@ export class WorkerManager<T extends WorkerConstructor> {
   private readonly subscription: Subscription | undefined;
   private readonly mutableDisposables: Disposable[] = [];
   private mutableWorkerManager: SingleWorkerManager<T> | undefined;
+  private mutableDisposed = false;
 
   public constructor(
     private readonly createEndpoint: () => EndpointLike,
@@ -53,13 +54,16 @@ export class WorkerManager<T extends WorkerConstructor> {
   }
 
   public dispose(): void {
-    if (this.subscription !== undefined) {
-      this.subscription.unsubscribe();
+    if (!this.mutableDisposed) {
+      this.mutableDisposed = true;
+      if (this.subscription !== undefined) {
+        this.subscription.unsubscribe();
+      }
+      this.mutableDisposables.forEach((disposable) => {
+        disposable.dispose();
+      });
+      this.stopWorker();
     }
-    this.mutableDisposables.forEach((disposable) => {
-      disposable.dispose();
-    });
-    this.stopWorker();
   }
 
   public add(disposable: Disposable): void {
@@ -84,6 +88,10 @@ export class WorkerManager<T extends WorkerConstructor> {
   };
 
   private getSingleWorkerManager(): SingleWorkerManager<T> {
+    if (this.mutableDisposed) {
+      throw new Error('WorkerManager was already disposed');
+    }
+
     if (this.mutableWorkerManager === undefined) {
       const endpoint = this.createEndpoint();
       const { options, disposables } = this.getOptions();
