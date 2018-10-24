@@ -4,8 +4,8 @@ import _ from 'lodash';
 import * as path from 'path';
 import { Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { FetchQueue } from './FetchQueue';
-import { Dependencies, DependencyInfo, PackageJSON, ResolvedDependencies, Resolver } from './Resolver';
+import { FetchError, FetchQueue } from './FetchQueue';
+import { Dependencies, DependencyInfo, PackageJSON, resolve, ResolvedDependencies } from './Resolver';
 
 interface FetchPackageInfo {
   readonly name: string;
@@ -46,7 +46,7 @@ export class PackageManager {
   private readonly fs: FileSystem;
   private readonly subscription: Subscription;
   private readonly onAddTypes: (name: string, version: string, typesFullName: string) => void;
-  private readonly fetchQueue: FetchQueue<string>;
+  private readonly fetchQueue: FetchQueue;
 
   public constructor({
     fs,
@@ -57,7 +57,7 @@ export class PackageManager {
     readonly packageJSON$: Observable<PackageJSON>;
     readonly fs: FileSystem;
     readonly onAddTypes: (name: string, version: string, typesFullName: string) => void;
-    readonly fetchQueue: FetchQueue<string>;
+    readonly fetchQueue: FetchQueue;
   }) {
     this.fs = fs;
     this.onAddTypes = onAddTypes;
@@ -80,9 +80,7 @@ export class PackageManager {
   }
 
   private async resolveDependencies(dependencies: Dependencies): Promise<ResolvedDependencies> {
-    const resolver = new Resolver({ fetchQueue: this.fetchQueue });
-
-    return resolver.resolve(dependencies);
+    return resolve(this.fetchQueue, dependencies);
   }
 
   private async fetchPackages(deps: ResolvedDependencies) {
@@ -118,12 +116,9 @@ export class PackageManager {
   }
 
   private async getAllPackageFiles({ name, version }: FetchPackageInfo): Promise<ReadonlyArray<string>> {
-    // tslint:disable-next-line:promise-must-complete
-    const fileTreeText = await this.fetchQueue.fetch(
-      this.getNPMDataUrl({ name, version }),
-      async (response: Response) => response.text(),
+    const fileTree = await this.fetchQueue.fetch(this.getNPMDataUrl({ name, version }), async (response: Response) =>
+      response.json(),
     );
-    const fileTree = JSON.parse(fileTreeText);
 
     return this.getDirectoryList({ dirList: fileTree.files });
   }
@@ -155,24 +150,22 @@ export class PackageManager {
     }
     const typesName = `@types/${name.replace('@', '').replace('/', '__')}`;
 
-    const versionRes = await this.fetchQueue.fetch(
-      this.getNPMDataUrl({ name: typesName }),
-      async (response: Response) => {
-        if (!response.ok) {
-          return 'failed';
-        }
+    try {
+      const typesVersions = await this.fetchQueue.fetch(
+        this.getNPMDataUrl({ name: typesName }),
+        async (response: Response) => response.json(),
+      );
 
-        return response.text();
-      },
-    );
-    if (versionRes === 'failed') {
-      return;
+      const latestTypesVersion = typesVersions.tags.latest;
+
+      this.onAddTypes(name, version, `${typesName}@${latestTypesVersion}`);
+    } catch (error) {
+      if (error instanceof FetchError) {
+        return;
+      }
+
+      throw error;
     }
-
-    const typesVersions = JSON.parse(versionRes);
-    const latestTypesVersion = typesVersions.tags.latest;
-
-    this.onAddTypes(name, version, `${typesName}@${latestTypesVersion}`);
   }
 
   private async downloadDependency({ name, version, suffix }: FetchPackageInfo) {

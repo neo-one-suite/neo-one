@@ -37,12 +37,12 @@ describe('package manager', () => {
     readdirSync: jest.fn(),
   };
   const onAddTypes = jest.fn(async () => Promise.resolve());
-  let fetchQueue: FetchQueue<string>;
+  let fetchQueue: FetchQueue;
 
   beforeEach(() => {
     fs.writeFile.mockClear();
     onAddTypes.mockClear();
-    fetchQueue = new FetchQueue<string>();
+    fetchQueue = new FetchQueue();
   });
 
   test('files written properly', async () => {

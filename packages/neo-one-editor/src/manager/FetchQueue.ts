@@ -11,9 +11,16 @@ interface FetchQueueOptions {
   readonly fetchConcurrency: number;
 }
 
-export class FetchQueue<T> {
+export class FetchError extends Error {
+  public constructor(public readonly url: string, public readonly status: number, public readonly statusText: string) {
+    super(`Fetch for ${url} failed with status ${status}: ${statusText}`);
+  }
+}
+
+export class FetchQueue {
   private readonly fetchConcurrency: number;
-  private readonly mutableQueue: Array<QueueData<T>>;
+  // tslint:disable-next-line no-any
+  private readonly mutableQueue: Array<QueueData<any>>;
   private mutableRunning: number;
 
   public constructor(options?: FetchQueueOptions) {
@@ -22,7 +29,7 @@ export class FetchQueue<T> {
     this.mutableRunning = 0;
   }
 
-  public async fetch(url: string, handleResponse: (response: Response) => Promise<T>): Promise<T> {
+  public async fetch<T>(url: string, handleResponse: (response: Response) => Promise<T>): Promise<T> {
     // tslint:disable-next-line:promise-must-complete
     const tPromise = new Promise<T>((resolve, reject) => {
       this.mutableQueue.push({
@@ -47,12 +54,20 @@ export class FetchQueue<T> {
       this.mutableRunning += 1;
       fetch(entry.url)
         .then(async (res) => {
+          if (!res.ok) {
+            throw new FetchError(entry.url, res.status, res.statusText);
+          }
+
           const result = await entry.handleResponse(res);
           entry.resolve(result);
           this.mutableRunning -= 1;
           this.advance();
         })
-        .catch(entry.reject);
+        .catch((error) => {
+          entry.reject(error);
+          this.mutableRunning -= 1;
+          this.advance();
+        });
     }
   }
 }

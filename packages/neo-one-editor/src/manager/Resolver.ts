@@ -47,11 +47,11 @@ interface Task {
 }
 
 // Resolves package.json to hoisted top level dependencies. Anything that can't be unambigiously hoisted is kept at the level of the package.json that required it.
-export class Resolver {
+class Resolver {
   private readonly graph: Graph;
-  private readonly fetchQueue: FetchQueue<string>;
+  private readonly fetchQueue: FetchQueue;
 
-  public constructor({ fetchQueue }: { readonly fetchQueue: FetchQueue<string> }) {
+  public constructor({ fetchQueue }: { readonly fetchQueue: FetchQueue }) {
     this.graph = new Graph();
     this.fetchQueue = fetchQueue;
   }
@@ -69,15 +69,7 @@ export class Resolver {
   private async fetchRegistryPackage(name: string): Promise<RegistryPackage> {
     const escapedName = name && npa(name).escapedName;
 
-    try {
-      const res = await this.fetchQueue.fetch(`${NPM_REGISTRY_URL}/${escapedName}`, async (response: Response) =>
-        response.text(),
-      );
-
-      return JSON.parse(res);
-    } catch (error) {
-      throw new Error(`Failed to fetch ${name} from npm registry. ${error}`);
-    }
+    return this.fetchQueue.fetch(`${NPM_REGISTRY_URL}/${escapedName}`, async (response: Response) => response.json());
   }
 
   private resolveVersion({
@@ -186,4 +178,8 @@ export class Resolver {
       parentNode,
     }));
   }
+}
+
+export async function resolve(fetchQueue: FetchQueue, dependencies: Dependencies): Promise<ResolvedDependencies> {
+  return new Resolver({ fetchQueue }).resolve(dependencies);
 }

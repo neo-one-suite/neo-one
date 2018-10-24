@@ -5,11 +5,11 @@ const url = 'https://cdn.jsdelivr.net/npm/bignumber.js@7.2.1';
 const dummyArray = Array.from(Array(100).keys());
 
 describe('fetch queue', () => {
-  let fetchQueue: FetchQueue<number>;
+  let fetchQueue: FetchQueue;
   const fetchConcurrency = 3;
 
   beforeEach(() => {
-    fetchQueue = new FetchQueue<number>({ fetchConcurrency });
+    fetchQueue = new FetchQueue({ fetchConcurrency });
   });
 
   test('queues fetches', async () => {

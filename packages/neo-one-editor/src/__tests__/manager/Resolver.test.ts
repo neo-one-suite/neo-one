@@ -1,5 +1,5 @@
 /* @jest-environment jsdom */
-import { FetchQueue, Resolver } from '../../manager';
+import { FetchQueue, resolve } from '../../manager';
 
 const dependencies = {
   'bignumber.js': '^7.2.1',
@@ -11,16 +11,14 @@ const dependencies = {
 };
 
 describe('resolver', () => {
-  let fetchQueue: FetchQueue<string>;
+  let fetchQueue: FetchQueue;
 
   beforeEach(() => {
-    fetchQueue = new FetchQueue<string>();
+    fetchQueue = new FetchQueue();
   });
 
   test('resolve deps', async () => {
-    const resolver = new Resolver({ fetchQueue });
-
-    const resolvedDependencies = await resolver.resolve(dependencies);
+    const resolvedDependencies = await resolve(fetchQueue, dependencies);
     expect(resolvedDependencies).toMatchSnapshot();
   });
 });
