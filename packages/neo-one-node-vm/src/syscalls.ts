@@ -710,6 +710,7 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
     out: 1,
     invoke: ({ context, args }) => {
       if (args[0].asTransaction().attributes.length > MAX_ARRAY_SIZE) {
+        /* istanbul ignore next */
         throw new ContainerTooLargeError(context);
       }
 
@@ -1579,6 +1580,7 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
         case ScriptContainerType.Consensus:
           result = new ConsensusPayloadStackItem(scriptContainer.value);
           break;
+        /* istanbul ignore next */
         default:
           commonUtils.assertNever(scriptContainer);
           throw new Error('For TS');

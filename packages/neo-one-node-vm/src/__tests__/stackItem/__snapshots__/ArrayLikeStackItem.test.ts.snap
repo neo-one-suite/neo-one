@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Array(Like) Stack Item Array - convertJSON 1`] = `
+Array [
+  "a9b71a27c3f44e611e816b67e2cb75822d92e179993fc43e240a079d220bf59b",
+  "a9b71a27c3f44e611e816b67e2cb75822d92e179993fc43e240a079d220bf59b",
+]
+`;
+
+exports[`Array(Like) Stack Item Array - toStructuralKey 1`] = `"1"`;
+
+exports[`Array(Like) Stack Item Struct - toStructuralKey 1`] = `"[\\"a9b71a27c3f44e611e816b67e2cb75822d92e179993fc43e240a079d220bf59b\\",\\"a9b71a27c3f44e611e816b67e2cb75822d92e179993fc43e240a079d220bf59b\\"]"`;

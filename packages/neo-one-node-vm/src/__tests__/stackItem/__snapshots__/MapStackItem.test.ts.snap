@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Map Stack Item convertJSON 1`] = `
+Object {
+  "\\"00\\"": "00",
+}
+`;
+
+exports[`Map Stack Item toContractParameter 1`] = `
+MapContractParameter {
+  "serializeWire": [Function],
+  "sizeInternal": [Function],
+  "type": 18,
+  "value": Array [
+    Array [
+      Object {
+        "__$type": "IntegerContractParameter",
+        "type": 2,
+        "value": "0",
+      },
+      Object {
+        "__$type": "ByteArrayContractParameter",
+        "type": 5,
+        "value": "00",
+      },
+    ],
+  ],
+}
+`;
+
+exports[`Map Stack Item toStructuralKey 1`] = `"1"`;

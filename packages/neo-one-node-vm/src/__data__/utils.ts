@@ -25,3 +25,6 @@ export const verifyListeners = (listeners: any) => {
 export const expectItemBNEquals = (item: StorageItem, value: string) => {
   expect(utils.fromSignedBuffer(item.value).toString(10)).toEqual(value);
 };
+
+// tslint:disable-next-line:no-any readonly-array
+export const badSeen = (...args: any[]) => new Set(args);

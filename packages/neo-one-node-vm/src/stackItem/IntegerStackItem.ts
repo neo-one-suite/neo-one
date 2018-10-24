@@ -32,6 +32,7 @@ export class IntegerStackItem extends StackItemBase {
   }
 
   // https://github.com/lllwvlvwlll/MegaCity.AntShares/tree/master/src/AntShares
+  /* istanbul ignore next */
   public asStorageContextStackItem({
     currentBlockIndex,
     vm,
