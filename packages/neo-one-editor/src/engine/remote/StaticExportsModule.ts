@@ -1,9 +1,9 @@
-import { EngineBase } from './EngineBase';
 import { ExploreResult, ModuleBase } from './ModuleBase';
+import { RemoteEngine } from './RemoteEngine';
 import { Exports } from './types';
 
 export class StaticExportsModule extends ModuleBase {
-  public constructor(engine: EngineBase, path: string, private readonly exports: Exports) {
+  public constructor(engine: RemoteEngine, path: string, private readonly exports: Exports) {
     super(engine, path);
   }
 

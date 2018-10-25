@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import { RawSourceMap } from 'source-map';
-import { EngineBase } from './EngineBase';
 import { evaluate } from './eval';
 import { EvaluateAsyncOptions, EvaluateOptions, ExploreResult, MissingPath, ModuleBase } from './ModuleBase';
+import { RemoteEngine } from './RemoteEngine';
 import { Exports } from './types';
 
 const NEEDS_EVAL = Symbol.for('needsEval');
@@ -12,7 +12,7 @@ export class TranspiledModule extends ModuleBase {
   private mutableExports: Exports = NEEDS_EVAL;
 
   public constructor(
-    engine: EngineBase,
+    engine: RemoteEngine,
     path: string,
     public readonly code: string,
     public readonly sourceMap?: RawSourceMap,

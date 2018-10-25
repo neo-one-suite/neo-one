@@ -1,4 +1,4 @@
-import { EngineBase } from './EngineBase';
+import { RemoteEngine } from './RemoteEngine';
 import { Exports } from './types';
 
 export interface EvaluateBaseOptions {
@@ -24,7 +24,7 @@ export interface ExploreResult {
 }
 
 export abstract class ModuleBase {
-  public constructor(protected readonly engine: EngineBase, public readonly path: string) {}
+  public constructor(protected readonly engine: RemoteEngine, public readonly path: string) {}
 
   public abstract evaluate(options?: EvaluateOptions): Exports;
   public abstract evaluateExplore(options?: EvaluateOptions): ExploreResult;

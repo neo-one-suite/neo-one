@@ -7,7 +7,7 @@ import { styled } from 'reakit';
 import ResizeObserver from 'resize-observer-polyfill';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Engine } from '../engine';
+import { MainEngine } from '../engine/main';
 import { setupStandaloneEditor } from '../monaco/editor';
 import { LanguageID } from '../monaco/language';
 import { disposeModel } from '../monaco/utils';
@@ -41,7 +41,7 @@ export interface Props {
   readonly file?: EditorFile;
   readonly range?: TextRange;
   readonly files?: EditorFiles;
-  readonly engine: Engine;
+  readonly engine: MainEngine;
   readonly autoFocus?: boolean;
   readonly onValueChange?: (value: string) => void;
   readonly onUpdateDiagnostics?: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
@@ -161,7 +161,7 @@ export class MonacoEditor extends React.Component<Props> {
   }
 
   private get fs(): FileSystem {
-    return this.props.engine.context.fs;
+    return this.props.engine.fs;
   }
 
   private openFile(file: EditorFile, range?: TextRange, focus?: boolean): void {
@@ -184,7 +184,7 @@ export class MonacoEditor extends React.Component<Props> {
           map(() => {
             const editorValue = model.getValue();
 
-            this.props.engine.context.fs.writeFile(model.uri.path, editorValue).catch((error) => {
+            this.fs.writeFile(model.uri.path, editorValue).catch((error) => {
               // tslint:disable-next-line no-console
               console.error(error);
             });

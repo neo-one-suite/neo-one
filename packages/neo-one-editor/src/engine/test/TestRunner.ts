@@ -1,11 +1,8 @@
 // tslint:disable no-submodule-imports no-null-keyword
 // @ts-ignore
-import jestTestHooks from 'jest-circus';
-// @ts-ignore
 import run from 'jest-circus/build/run';
 import {
   addEventHandler,
-  getState,
   ROOT_DESCRIBE_BLOCK_NAME,
   setState,
   // @ts-ignore
@@ -14,12 +11,10 @@ import {
 import { makeDescribe } from 'jest-circus/build/utils';
 // @ts-ignore
 import expect from 'jest-matchers';
-// @ts-ignore
-import jestMock from 'jest-mock';
 import { formatError } from '../../error';
 import { Test, TestRunnerCallbacks } from '../../types';
-import { Engine } from '../Engine';
-import { ModuleBase } from '../ModuleBase';
+import { ModuleBase, RemoteEngine } from '../remote';
+import { createTestEngine, CreateTestEngineOptions } from './createTestEngine';
 import { BlockName, DescribeBlock, JestEvent, TestEntry } from './types';
 
 function resetTestState() {
@@ -58,10 +53,9 @@ const handleEvent = (event: JestEvent) => {
 };
 addEventHandler(handleEvent);
 
-const doRun = async (engine: Engine, test: ModuleBase, handler: TestEventHandler): Promise<void> => {
+const doRun = async (test: ModuleBase, handler: TestEventHandler): Promise<void> => {
   try {
     try {
-      await engine.waitTranspile();
       await test.evaluateAsync({
         force: true,
         beforeEvaluate: () => {
@@ -92,27 +86,26 @@ const mutableQueue: TestQueueEntry[] = [];
 // tslint:disable-next-line no-let
 let running = false;
 const runTestsSerially = async (
-  engine: Engine,
   test: ModuleBase,
   handler: TestEventHandler,
-  setTestsRunning: (running: boolean) => void,
+  setTestsRunning: (running: boolean) => Promise<void>,
 ) => {
   mutableQueue.push({ test, handler });
   if (running) {
     return;
   }
   running = true;
-  setTestsRunning(true);
+  await setTestsRunning(true);
 
   let next = mutableQueue.shift();
   // tslint:disable-next-line no-loop-statement
   while (next !== undefined) {
-    await doRun(engine, next.test, next.handler);
+    await doRun(next.test, next.handler);
     next = mutableQueue.shift();
   }
 
   running = false;
-  setTestsRunning(false);
+  await setTestsRunning(false);
 };
 
 interface TestEventHandler {
@@ -120,7 +113,7 @@ interface TestEventHandler {
   readonly handleTestEvent: (event: JestEvent) => void;
 }
 
-const createHandleTestEvent = (engine: Engine, test: ModuleBase, callbacks: TestRunnerCallbacks) => {
+const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks: TestRunnerCallbacks) => {
   let paths: ReadonlyArray<string> = [];
   let blockIndices: ReadonlyArray<number> = [];
   let tests: ReadonlyArray<Test> = [];
@@ -163,11 +156,16 @@ const createHandleTestEvent = (engine: Engine, test: ModuleBase, callbacks: Test
 
   return {
     onEvaluateError: (error: Error) => {
-      callbacks.onUpdateSuite({
-        path: test.path,
-        tests,
-        error,
-      });
+      callbacks
+        .onUpdateSuite({
+          path: test.path,
+          tests,
+          error,
+        })
+        .catch((err) => {
+          // tslint:disable-next-line no-console
+          console.error(err);
+        });
     },
     handleTestEvent: (event: JestEvent) => {
       switch (event.name) {
@@ -180,10 +178,15 @@ const createHandleTestEvent = (engine: Engine, test: ModuleBase, callbacks: Test
         case 'finish_describe_definition':
           paths = paths.slice(0, -1);
           if (paths.length === 0) {
-            callbacks.onUpdateSuite({
-              path: test.path,
-              tests,
-            });
+            callbacks
+              .onUpdateSuite({
+                path: test.path,
+                tests,
+              })
+              .catch((err) => {
+                // tslint:disable-next-line no-console
+                console.error(err);
+              });
           }
           break;
         case 'add_test':
@@ -207,28 +210,38 @@ const createHandleTestEvent = (engine: Engine, test: ModuleBase, callbacks: Test
           now = Date.now();
           break;
         case 'test_skip':
-          callbacks.onUpdateTest(test.path, {
-            name: getTestName(event.test),
-            status: 'skip',
-          });
+          callbacks
+            .onUpdateTest(test.path, {
+              name: getTestName(event.test),
+              status: 'skip',
+            })
+            .catch((err) => {
+              // tslint:disable-next-line no-console
+              console.error(err);
+            });
           break;
         case 'test_fn_success':
-          callbacks.onUpdateTest(test.path, {
-            name: getTestName(event.test),
-            status: 'pass',
-            duration: Date.now() - now,
-          });
+          callbacks
+            .onUpdateTest(test.path, {
+              name: getTestName(event.test),
+              status: 'pass',
+              duration: Date.now() - now,
+            })
+            .catch((err) => {
+              // tslint:disable-next-line no-console
+              console.error(err);
+            });
           break;
         case 'test_fn_failure':
           formatError(engine, event.test.errors[0][0])
-            .then((err) => {
+            .then(async (err) =>
               callbacks.onUpdateTest(test.path, {
                 name: getTestName(event.test),
                 status: 'fail',
                 duration: Date.now() - now,
                 error: err,
-              });
-            })
+              }),
+            )
             .catch((err) => {
               // tslint:disable-next-line no-console
               console.error(err);
@@ -265,46 +278,38 @@ const isTest = (path: string) => {
   return endsWith.some((ext) => path.endsWith(ext));
 };
 
-export class TestRunner {
-  public constructor(private readonly engine: Engine, private readonly callbacks: TestRunnerCallbacks) {}
+export interface TestRunnerOptions extends CreateTestEngineOptions {
+  readonly callbacks: TestRunnerCallbacks;
+}
 
-  public getTestGlobals(_mod: ModuleBase) {
-    return {
-      ...jestTestHooks,
-      expect,
-      jest: {
-        ...jestMock,
-        setTimeout: (testTimeout: number) =>
-          setState({
-            ...getState(),
-            testTimeout,
-          }),
-      },
-    };
+export class TestRunner {
+  private readonly engine: Promise<RemoteEngine>;
+  private readonly callbacks: TestRunnerCallbacks;
+
+  public constructor({ callbacks, ...options }: TestRunnerOptions) {
+    this.engine = createTestEngine(options);
+    this.callbacks = callbacks;
   }
 
   public async runTests() {
-    const tests = this.findTests();
+    const tests = await this.findTests();
 
     await Promise.all(tests.map(async (test) => this.runTest(test.path)));
   }
 
   public async runTest(path: string) {
-    const test = this.engine.modules.get(path);
+    const engine = await this.engine;
+    const test = engine.modules.get(path);
 
     if (test !== undefined) {
-      await runTestsSerially(
-        this.engine,
-        test,
-        createHandleTestEvent(this.engine, test, this.callbacks),
-        this.callbacks.setTestsRunning,
-      );
+      await runTestsSerially(test, createHandleTestEvent(engine, test, this.callbacks), this.callbacks.setTestsRunning);
     }
   }
 
-  public findTests(): ReadonlyArray<ModuleBase> {
+  private async findTests(): Promise<ReadonlyArray<ModuleBase>> {
     const mutableTests: ModuleBase[] = [];
-    this.engine.modules.forEach((mod, path) => {
+    const engine = await this.engine;
+    engine.modules.forEach((mod, path) => {
       if (isTest(path)) {
         mutableTests.push(mod);
       }

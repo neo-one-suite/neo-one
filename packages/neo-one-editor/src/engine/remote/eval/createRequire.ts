@@ -1,7 +1,7 @@
-import { EngineBase } from '../EngineBase';
 import { MissingPath, ModuleBase } from '../ModuleBase';
+import { RemoteEngine } from '../RemoteEngine';
 
-export const createRequire = (engine: EngineBase, initiator: ModuleBase, explore: boolean) => {
+export const createRequire = (engine: RemoteEngine, initiator: ModuleBase, explore: boolean) => {
   function require(path: string) {
     let requiredModule: ModuleBase;
     try {

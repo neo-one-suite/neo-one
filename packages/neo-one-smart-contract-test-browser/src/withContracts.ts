@@ -27,7 +27,7 @@ export const createWithContracts = (getFS: () => FileSystem) => async <T>(
       const manager = new WorkerManager<typeof JSONRPCLocalProvider>(
         JSONRPCLocalProviderWorker,
         () => ({ options: { type: 'memory' as 'memory' }, disposables: [] }),
-        30 * 1000,
+        300 * 1000,
       );
       const dataProvider = new NEOONEDataProvider({ network: 'priv', rpcURL: manager });
 

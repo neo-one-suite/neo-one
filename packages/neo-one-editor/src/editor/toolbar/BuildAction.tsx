@@ -3,7 +3,7 @@ import { EffectMap } from 'constate';
 import * as React from 'react';
 import { MdBuild } from 'react-icons/md';
 import { connect } from 'react-redux';
-import { Engine } from '../../engine';
+import { MainEngine } from '../../engine/main';
 import { openConsole } from '../redux';
 import { ActionButton } from './ActionButton';
 
@@ -15,7 +15,7 @@ interface Effects {
   readonly onClick: () => void;
 }
 
-const createMakeEffects = (openConsoleOutput: () => void) => (engine: Engine): EffectMap<State, Effects> => ({
+const createMakeEffects = (openConsoleOutput: () => void) => (engine: MainEngine): EffectMap<State, Effects> => ({
   onClick: () => ({ setState }) => {
     openConsoleOutput();
     setState({ loading: true });

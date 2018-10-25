@@ -18,7 +18,7 @@ import {
   updateTestSuite,
 } from './editor/redux';
 import { EditorContext } from './EditorContext';
-import { createEngineContext, Engine } from './engine';
+import { MainEngine } from './engine/main';
 import { EngineContentFiles, Test, TestRunnerCallbacks, TestSuite } from './types';
 
 interface TestsPassContainerProps {
@@ -64,7 +64,7 @@ interface State {
   readonly file?: EditorFile;
   readonly range?: TextRange;
   readonly openFiles: EditorFiles;
-  readonly engine?: Engine;
+  readonly engine?: MainEngine;
 }
 
 class FullEditorBase extends React.Component<Props, State> {
@@ -127,45 +127,38 @@ class FullEditorBase extends React.Component<Props, State> {
     this.dispose();
     this.setState({ engine: undefined, openFiles: [] });
     clearStore(initialOptions);
-    createEngineContext({ id, createPreviewURL })
-      .then(async (context) =>
-        Engine.create({
-          context,
-          initialFiles,
-          editorCallbacks: {
-            openFile: this.onSelectFile,
-          },
-          testRunnerCallbacks,
-        })
-          .then(async (engine) => {
-            if (this.props.id === id && this.mutableMounted) {
-              const openFiles = engine.context.openFiles$.getValue().map((path) => engine.getFile(path));
-              this.setState({
-                engine,
-                file: openFiles[0],
-                openFiles,
-              });
-              this.mutableOpenFilesSubscription = engine.context.openFiles$.subscribe({
-                next: (nextOpenFiles) => {
-                  this.setState({ openFiles: nextOpenFiles.map((path) => engine.getFile(path)) });
-                },
-              });
-              this.mutableOutputSubscription = engine.context.output$.subscribe({
-                next: (output) => {
-                  appendOutput(output);
-                },
-              });
-            } else {
-              await engine.dispose();
-            }
-          })
-          .catch(async (error) => {
-            await context.dispose();
-
-            throw error;
-          }),
-      )
-      .catch((error) => {
+    MainEngine.create({
+      id,
+      createPreviewURL,
+      initialFiles,
+      editorCallbacks: {
+        openFile: this.onSelectFile,
+      },
+      testRunnerCallbacks,
+    })
+      .then(async (engine) => {
+        if (this.props.id === id && this.mutableMounted) {
+          const openFiles = engine.openFiles$.getValue().map((path) => engine.getFile(path));
+          this.setState({
+            engine,
+            file: openFiles[0],
+            openFiles,
+          });
+          this.mutableOpenFilesSubscription = engine.openFiles$.subscribe({
+            next: (nextOpenFiles) => {
+              this.setState({ openFiles: nextOpenFiles.map((path) => engine.getFile(path)) });
+            },
+          });
+          this.mutableOutputSubscription = engine.output$.subscribe({
+            next: (output) => {
+              appendOutput(output);
+            },
+          });
+        } else {
+          await engine.dispose();
+        }
+      })
+      .catch(async (error) => {
         // tslint:disable-next-line no-console
         console.error(error);
       });
@@ -203,10 +196,18 @@ const ConnectedFullEditor = connect(
     appendOutput: (output: OutputMessage) => dispatch(appendConsole(output)),
     clearStore: (options?: InitialEditorStateOptions) => dispatch(clearStoreBase(options)),
     testRunnerCallbacks: {
-      onUpdateSuite: (suite: TestSuite) => dispatch(updateTestSuite(suite)),
-      onRemoveSuite: (path: string) => dispatch(removeTestSuite(path)),
-      onUpdateTest: (path: string, test: Test) => dispatch(updateTest({ path, test })),
-      setTestsRunning: (running: boolean) => dispatch(setTestsRunning(running)),
+      onUpdateSuite: async (suite: TestSuite) => {
+        dispatch(updateTestSuite(suite));
+      },
+      onRemoveSuite: async (path: string) => {
+        dispatch(removeTestSuite(path));
+      },
+      onUpdateTest: async (path: string, test: Test) => {
+        dispatch(updateTest({ path, test }));
+      },
+      setTestsRunning: async (running: boolean) => {
+        dispatch(setTestsRunning(running));
+      },
     },
   }),
 )(FullEditorBase);

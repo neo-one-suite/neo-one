@@ -1,7 +1,7 @@
 import { comlink } from '@neo-one/worker';
 import * as React from 'react';
 import { styled } from 'reakit';
-import { Engine } from '../engine';
+import { MainEngine } from '../engine/main';
 
 const StyledIFrame = styled.iframe`
   margin: unset;
@@ -17,7 +17,7 @@ const StyledIFrame = styled.iframe`
 `;
 
 interface Props {
-  readonly engine: Engine;
+  readonly engine: MainEngine;
 }
 
 export class PreviewContent extends React.Component<Props> {
@@ -43,6 +43,6 @@ export class PreviewContent extends React.Component<Props> {
   public render() {
     const { engine, ...props } = this.props;
 
-    return <StyledIFrame innerRef={this.ref} src={engine.context.createPreviewURL()} {...props} />;
+    return <StyledIFrame innerRef={this.ref} src={engine.createPreviewURL()} {...props} />;
   }
 }

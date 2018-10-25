@@ -6,21 +6,21 @@ import _ from 'lodash';
 import * as nodePath from 'path';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ModuleNotFoundError } from '../errors';
+import { ModuleNotFoundError } from '../../errors';
 import { MissingPath, ModuleBase } from './ModuleBase';
 import { getPathWithExports, PathWithExports } from './packages';
 import { getNodeModulesPaths, resolve } from './resolve';
 import { StaticExportsModule } from './StaticExportsModule';
 import { TranspiledModule } from './TranspiledModule';
-import { TranspileSignal } from './TranspileSignal';
+import { Globals } from './types';
 
-interface EngineBaseOptions {
+interface RemoteEngineOptions {
   readonly fs: PouchDBFileSystem;
-  readonly transpileSignal?: TranspileSignal;
   readonly transpileCache: PouchDBFileSystem;
   readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
   readonly builderManager: WorkerManager<typeof Builder>;
   readonly pathWithExports?: ReadonlyArray<PathWithExports>;
+  readonly globals?: Globals;
 }
 
 interface DirectoryData {
@@ -53,24 +53,23 @@ const EMPTY_MODULE_PATH = '$empty';
 const fileTreeCache = new Map<string, Promise<FileTree>>();
 const fileCache = new Map<string, Promise<string>>();
 
-export class EngineBase {
+export class RemoteEngine {
   protected readonly mutableModules: Modules;
   protected readonly fs: PouchDBFileSystem;
-  private readonly transpileSignal: TranspileSignal;
   private readonly subscription: Subscription;
   // tslint:disable-next-line readonly-keyword
   private readonly mutableCachedPaths: { [currentPath: string]: { [path: string]: string } } = {};
+  private readonly globals: Globals;
 
   public constructor({
     fs,
-    transpileSignal = new TranspileSignal(),
     transpileCache,
     builderManager,
     jsonRPCLocalProviderManager,
     pathWithExports: pathWithExportsIn = [],
-  }: EngineBaseOptions) {
+    globals = {},
+  }: RemoteEngineOptions) {
     this.fs = fs;
-    this.transpileSignal = transpileSignal;
     const pathWithExports = getPathWithExports({ fs, builderManager, jsonRPCLocalProviderManager }).concat(
       pathWithExportsIn,
     );
@@ -104,14 +103,11 @@ export class EngineBase {
         }),
       )
       .subscribe();
+    this.globals = globals;
   }
 
   public async dispose(): Promise<void> {
     this.subscription.unsubscribe();
-  }
-
-  public async waitTranspile(): Promise<void> {
-    return this.transpileSignal.wait();
   }
 
   public get modules(): Map<string, ModuleBase> {
@@ -120,6 +116,7 @@ export class EngineBase {
 
   public getGlobals(mod: ModuleBase) {
     return {
+      ...this.globals,
       __dirname: dirname(mod.path),
       __filename: mod.path,
       process: {

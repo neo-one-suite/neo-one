@@ -3,7 +3,7 @@ import './polyfill';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { PreviewEngine } from '../../engine/PreviewEngine';
+import { PreviewEngine } from '../../engine/preview';
 import { App } from './App';
 
 const createPreviewEngine = async () => {

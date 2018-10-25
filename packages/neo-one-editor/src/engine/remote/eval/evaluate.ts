@@ -1,5 +1,5 @@
-import { EngineBase } from '../EngineBase';
 import { MissingPath } from '../ModuleBase';
+import { RemoteEngine } from '../RemoteEngine';
 import { TranspiledModule } from '../TranspiledModule';
 import { Exports } from '../types';
 import { createRequire } from './createRequire';
@@ -14,7 +14,7 @@ export interface Result {
   readonly missingPaths: ReadonlyArray<MissingPath>;
 }
 
-export const evaluate = (engine: EngineBase, mod: TranspiledModule, explore: boolean): Result => {
+export const evaluate = (engine: RemoteEngine, mod: TranspiledModule, explore: boolean): Result => {
   const globals = engine.getGlobals(mod);
   const require = createRequire(engine, mod, explore);
   const code = mod.code;

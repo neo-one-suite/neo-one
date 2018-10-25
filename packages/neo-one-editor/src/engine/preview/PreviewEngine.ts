@@ -1,12 +1,12 @@
 import { comlink } from '@neo-one/worker';
 import _ from 'lodash';
 import { filter, map } from 'rxjs/operators';
-import * as ReactErrorOverlay from '../error/ReactErrorOverlay';
-import { createFileSystem, createTranspileCache } from './create';
-import { Engine } from './Engine';
-import { EngineBase } from './EngineBase';
-import { ModuleBase } from './ModuleBase';
-import { RegisterPreviewEngineResult } from './types';
+import * as ReactErrorOverlay from '../../error/ReactErrorOverlay';
+import { createFileSystem, createTranspileCache } from '../create';
+import { MainEngine, RegisterPreviewEngineResult } from '../main';
+import { ModuleBase, RemoteEngine } from '../remote';
+import { getPathWithExports } from '../remote/packages';
+import { previewPackages } from './previewPackages';
 
 export interface PreviewEngineCreateOptions {
   readonly port: MessagePort;
@@ -15,11 +15,11 @@ export interface PreviewEngineCreateOptions {
 // tslint:disable-next-line no-let
 let mutablePreviewEngine: PreviewEngine | undefined;
 
-export class PreviewEngine extends EngineBase {
+export class PreviewEngine extends RemoteEngine {
   public static async create({ port }: PreviewEngineCreateOptions): Promise<PreviewEngine> {
     if (mutablePreviewEngine === undefined) {
       // tslint:disable-next-line no-any
-      const engine: Engine = comlink.proxy(port) as any;
+      const engine: MainEngine = comlink.proxy(port) as any;
       const {
         id,
         endpoint,
@@ -50,6 +50,14 @@ export class PreviewEngine extends EngineBase {
         transpileCache,
         builderManager,
         jsonRPCLocalProviderManager,
+        pathWithExports: getPathWithExports(
+          {
+            fs,
+            builderManager,
+            jsonRPCLocalProviderManager,
+          },
+          previewPackages,
+        ),
       });
       mutablePreviewEngine = previewEngine;
       transpileCache.changes$

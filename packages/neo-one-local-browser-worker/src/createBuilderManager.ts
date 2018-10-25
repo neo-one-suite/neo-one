@@ -26,6 +26,6 @@ export const createBuilderManager = (
 
         return { options, disposables: [disposableEndpoint] };
       },
-      30 * 1000,
+      300 * 1000,
     ),
   );

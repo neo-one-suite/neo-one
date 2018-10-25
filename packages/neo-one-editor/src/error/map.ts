@@ -8,8 +8,7 @@
 import { initializeSourceMap } from '@neo-one/client-switch';
 import fetch from 'cross-fetch';
 import { SourceMapConsumer } from 'source-map';
-import { EngineBase } from '../engine/EngineBase';
-import { TranspiledModule } from '../engine/TranspiledModule';
+import { RemoteEngine, TranspiledModule } from '../engine/remote';
 import { getLinesAround } from './getLinesAround';
 import { getSourceMap, SourceMap } from './getSourceMap';
 import { StackFrame } from './StackFrame';
@@ -18,7 +17,7 @@ import { StackFrame } from './StackFrame';
  * Enhances a set of <code>StackFrame</code>s with their original positions and code (when available).
  */
 export async function map(
-  engine: EngineBase,
+  engine: RemoteEngine,
   frames: ReadonlyArray<StackFrame>,
   contextLines = 3,
 ): Promise<ReadonlyArray<StackFrame>> {

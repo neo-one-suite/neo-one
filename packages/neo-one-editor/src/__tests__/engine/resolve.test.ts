@@ -1,5 +1,5 @@
 import { FileSystem } from '@neo-one/local-browser';
-import { resolve } from '../../engine/resolve';
+import { resolve } from '../../engine/remote/resolve';
 
 const createErrorWithCode = (code: string) => {
   const error = new Error(code);

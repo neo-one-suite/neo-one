@@ -17,7 +17,7 @@ import iframeScript from 'raw-loader!../../../../dist/overlay/overlay.js';
 
 import { ErrorRecord } from './listenToRuntimeErrors';
 import { ErrorLocation } from './parseCompileError';
-import { EngineBase } from '../engine/EngineBase';
+import { RemoteEngine } from '../engine/remote';
 
 type RuntimeReportingOptions = {
   onError?: () => void;
@@ -53,7 +53,7 @@ export function dismissBuildError() {
   update();
 }
 
-export function startReportingRuntimeErrors(engine: EngineBase, options: RuntimeReportingOptions) {
+export function startReportingRuntimeErrors(engine: RemoteEngine, options: RuntimeReportingOptions) {
   if (stopListeningToRuntimeErrors !== null) {
     throw new Error('Already listening');
   }

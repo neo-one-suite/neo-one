@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Engine } from './engine';
+import { MainEngine } from './engine/main';
 
 // tslint:disable-next-line no-any
 export type ComponentProps<C extends React.ComponentType<any>> = C extends React.ComponentType<infer P> ? P : never;
@@ -18,7 +18,7 @@ export interface EngineState {
 }
 
 export interface EditorContextType {
-  readonly engine: Engine;
+  readonly engine: MainEngine;
 }
 
 export interface TestBase {
@@ -53,8 +53,8 @@ export interface TestSuite {
 }
 
 export interface TestRunnerCallbacks {
-  readonly onUpdateSuite: (suite: TestSuite) => void;
-  readonly onRemoveSuite: (path: string) => void;
-  readonly onUpdateTest: (path: string, test: Test) => void;
-  readonly setTestsRunning: (running: boolean) => void;
+  readonly onUpdateSuite: (suite: TestSuite) => Promise<void>;
+  readonly onRemoveSuite: (path: string) => Promise<void>;
+  readonly onUpdateTest: (path: string, test: Test) => Promise<void>;
+  readonly setTestsRunning: (running: boolean) => Promise<void>;
 }

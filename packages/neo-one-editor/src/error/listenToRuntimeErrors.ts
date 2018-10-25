@@ -20,7 +20,7 @@ import {
 import { massage as massageWarning } from './warnings';
 import { getStackFrames } from './getStackFrames';
 import { StackFrame } from './StackFrame';
-import { EngineBase } from '../engine/EngineBase';
+import { RemoteEngine } from '../engine/remote';
 
 const CONTEXT_SIZE: number = 3;
 
@@ -32,7 +32,7 @@ export type ErrorRecord = {
 };
 
 export function listenToRuntimeErrors(
-  engine: EngineBase,
+  engine: RemoteEngine,
   crash: (val: ErrorRecord) => void,
   filename: string = '/static/js/bundle.js',
 ) {

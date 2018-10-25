@@ -1,10 +1,7 @@
 import { Builder } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { comlink, WorkerManager } from '@neo-one/worker';
-import { TextRange } from '../editor';
-
-// tslint:disable-next-line no-any
-export type Exports = any;
+import { TextRange } from '../../editor';
 
 export interface RegisterPreviewEngineResult {
   readonly id: string;

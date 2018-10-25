@@ -11,6 +11,6 @@ export const createJSONRPCLocalProviderManager = (id: string) =>
         options: { type: 'persistent', id: `neo-one-node-${id}` } as FullNodeOptions,
         disposables: [],
       }),
-      30 * 1000,
+      300 * 1000,
     ),
   );

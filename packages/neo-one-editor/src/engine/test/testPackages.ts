@@ -1,5 +1,5 @@
 import { createWithContracts } from '@neo-one/smart-contract-test-browser';
-import { PackageConfig } from './packages';
+import { PackageConfig } from '../remote/packages';
 
 export const testPackages: ReadonlyArray<PackageConfig> = [
   {

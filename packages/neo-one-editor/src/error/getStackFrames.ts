@@ -4,13 +4,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { EngineBase } from '../engine/EngineBase';
+import { RemoteEngine } from '../engine/remote';
 import { map } from './map';
 import { parse } from './parse';
 import { StackFrame } from './StackFrame';
 
 export async function getStackFrames(
-  engine: EngineBase,
+  engine: RemoteEngine,
   error: Error,
   contextSize = 3,
 ): Promise<ReadonlyArray<StackFrame> | undefined> {

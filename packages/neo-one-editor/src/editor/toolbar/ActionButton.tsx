@@ -2,7 +2,7 @@
 import { Container, EffectMap } from 'constate';
 import * as React from 'react';
 import { EditorContext } from '../../EditorContext';
-import { Engine } from '../../engine';
+import { MainEngine } from '../../engine/main';
 import { EditorContextType } from '../../types';
 import { ActionButtonBase } from './ActionButtonBase';
 
@@ -17,7 +17,7 @@ interface Effects {
 interface Props {
   readonly text: string;
   readonly icon: React.ReactNode;
-  readonly makeEffects: (engine: Engine) => EffectMap<State, Effects>;
+  readonly makeEffects: (engine: MainEngine) => EffectMap<State, Effects>;
 }
 
 export const ActionButton = ({ text, makeEffects, icon, ...props }: Props) => (
