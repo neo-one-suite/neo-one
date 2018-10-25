@@ -5,6 +5,7 @@ require('ts-node/register/transpile-only');
 const { getCourses } = require('./packages/neo-one-website/src/loaders/coursesLoader');
 const { getDocs } = require('./packages/neo-one-website/src/utils/getDocs');
 const { getTutorial } = require('./packages/neo-one-website/src/utils/getTutorial');
+const { getBlogs } = require('./packages/neo-one-website/src/utils/getBlogs');
 
 const ROOT_DIR = path.resolve(__dirname);
 const ROOT = path.resolve(ROOT_DIR, 'packages', 'neo-one-website');
@@ -20,8 +21,9 @@ export default {
     title: 'React Static',
   }),
   getRoutes: async () => {
-    const [courses, docs, tutorial] = await Promise.all([getCourses(), getDocs(), getTutorial()]);
+    const [courses, docs, tutorial, blog] = await Promise.all([getCourses(), getDocs(), getTutorial(), getBlogs()]);
 
+    const mostRecentBlogPostSlug = blog.allPosts[0].slug;
     const sidebar = Object.entries(
       _.groupBy(
         docs.map((document) => ({
@@ -43,6 +45,7 @@ export default {
       {
         path: '/',
         component: 'src/pages/index',
+        getData: async () => ({ mostRecentBlogPostSlug }),
       },
       {
         path: '/course',
@@ -63,6 +66,7 @@ export default {
       {
         path: '/404',
         component: 'src/pages/404',
+        getData: async () => ({ mostRecentBlogPostSlug }),
       },
       {
         path: '/docs',
@@ -75,13 +79,37 @@ export default {
             title: doc.title,
             next: doc.next,
             previous: doc.previous,
+            mostRecentBlogPostSlug,
           }),
         })),
       },
       {
         path: '/tutorial',
         component: 'src/pages/tutorial',
-        getData: async () => tutorial,
+        getData: async () => ({
+          ...tutorial,
+          mostRecentBlogPostSlug,
+        }),
+      },
+      {
+        path: '/blog',
+        children: blog.posts
+          .map((blogPost) => ({
+            path: `${blogPost.slug}`,
+            component: 'src/pages/blog',
+            getData: async () => ({
+              content: blogPost.content,
+              sidebar: blogPost.sidebar,
+              mostRecentBlogPostSlug,
+            }),
+          }))
+          .concat([
+            {
+              path: 'all',
+              component: 'src/pages/allBlogs',
+              getData: async () => ({ posts: blog.allPosts, mostRecentBlogPostSlug }),
+            },
+          ]),
       },
     ];
   },

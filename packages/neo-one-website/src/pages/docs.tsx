@@ -6,7 +6,7 @@ import * as React from 'react';
 import { RouteData } from 'react-static';
 import { Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { DocFooter, Helmet, SectionData, Sidebar } from '../components';
+import { DocFooter, DocSection, Helmet, SectionData, Sidebar } from '../components';
 import { Markdown } from '../elements';
 import { CoreLayout, DocsLoading } from '../layout';
 import { AdjacentInfo } from '../utils';
@@ -73,6 +73,7 @@ interface DocData {
   readonly sidebar: ReadonlyArray<SectionData>;
   readonly next?: AdjacentInfo;
   readonly previous?: AdjacentInfo;
+  readonly mostRecentBlogPostSlug: string;
 }
 
 // tslint:disable-next-line:no-default-export export-name
@@ -92,7 +93,11 @@ export default () => (
             <MarkdownWrapper>
               <StyledMarkdown source={doc} linkColor="accent" />
             </MarkdownWrapper>
-            <StyledSidebar sections={sidebar} />
+            <StyledSidebar
+              sections={sidebar}
+              renderSection={(sectionProps: SectionData) => <DocSection {...sectionProps} />}
+              initialVisibleMobile
+            />
             <StyledDocFooter next={next} previous={previous} />
           </StyledGrid>
         </CoreLayout>

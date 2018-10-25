@@ -1,6 +1,7 @@
 // tslint:disable no-any
 import { Link, Logo } from '@neo-one/react-common';
 import * as React from 'react';
+import { RouteData } from 'react-static';
 import { as, Flex, styled, Toolbar } from 'reakit';
 import { ifProp, prop, withProp } from 'styled-tools';
 import { ComponentProps } from '../types';
@@ -79,6 +80,22 @@ interface Props {
   readonly path: string;
 }
 
+const BlogLink = ({ path }: Props) => (
+  // @ts-ignore
+  <RouteData>
+    {({ mostRecentBlogPostSlug }: { readonly mostRecentBlogPostSlug: string }) => (
+      <NavigationLink
+        linkColor="gray"
+        active={path === 'blog'}
+        data-test="header-blog"
+        to={`/blog/${mostRecentBlogPostSlug}`}
+      >
+        Blog
+      </NavigationLink>
+    )}
+  </RouteData>
+);
+
 export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledToolbar>
@@ -92,9 +109,10 @@ export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper
         <NavigationLink linkColor="gray" active={path === 'tutorial'} data-test="header-tutorial" to="/tutorial">
           Tutorial
         </NavigationLink>
-        <NavigationLink linkColor="gray" active={path === 'course'} data-test="header-tutorial" to="/course">
+        <NavigationLink linkColor="gray" active={path === 'course'} data-test="header-course" to="/course">
           Course
         </NavigationLink>
+        <BlogLink path={path} />
       </Toolbar.Content>
       <Toolbar.Content align="end">
         <FocusableLink
