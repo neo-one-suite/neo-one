@@ -5,7 +5,7 @@
     "bignumber.js": "7.2.1",
     "react": "16.5.1",
     "react-dom": "16.5.1",
-    "reakit": "0.15.7",
+    "reakit": "0.15.10",
     "rxjs": "6.3.3",
     "styled-components": "4.0.2"
   }

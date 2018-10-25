@@ -67,7 +67,7 @@
     "react-hot-loader": "^4.3.11",
     "react-icons": "^3.2.0",
     "react-redux": "^5.0.7",
-    "reakit": "0.15.7",
+    "reakit": "0.15.10",
     "redux": "^4.0.1",
     "resize-observer-polyfill": "^1.5.0",
     "resolve": "^1.8.1",
