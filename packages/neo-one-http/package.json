@@ -10,7 +10,7 @@
     "@types/koa-better-body": "^3.0.0",
     "@types/koa-convert": "^1.2.1",
     "@types/koa-cors": "^0.0.0",
-    "koa": "^2.5.3",
+    "koa": "^2.6.1",
     "koa-better-body": "^3.0.4",
     "koa-convert": "^1.2.0",
     "koa-cors": "^0.0.16",

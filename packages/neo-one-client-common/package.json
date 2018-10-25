@@ -27,5 +27,6 @@
     "source-map": "^0.7.3",
     "tslib": "^1.9.3",
     "wif": "^2.0.6"
-  }
+  },
+  "sideEffects": false
 }

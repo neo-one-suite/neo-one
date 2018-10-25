@@ -4,7 +4,6 @@
   "description": "NEO•ONE utility for loading serialized blocks (chain.acc) into a node.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-preview.1",
     "@neo-one/node-core": "^1.0.0-preview.1",
     "@neo-one/types": "^1.0.0-preview.1",
     "@neo-one/utils": "^1.0.0-preview.1",

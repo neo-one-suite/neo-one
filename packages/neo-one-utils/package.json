@@ -4,7 +4,6 @@
   "description": "NEO•ONE shared utils.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/monitor": "^1.0.0-preview.1",
     "@types/lodash": "^4.14.117",
     "change-case": "^3.0.2",
     "lodash": "^4.17.11",

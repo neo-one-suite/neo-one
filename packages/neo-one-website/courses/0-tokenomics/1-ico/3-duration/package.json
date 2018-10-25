@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "bignumber.js": "7.2.1"
+  }
+}

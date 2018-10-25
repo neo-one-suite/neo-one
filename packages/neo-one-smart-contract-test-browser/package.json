@@ -13,7 +13,6 @@
     "@neo-one/types": "^1.0.0-preview.1",
     "@neo-one/utils": "^1.0.0-preview.1",
     "@neo-one/worker": "^1.0.0-preview.1",
-    "rxjs": "^6.3.3",
     "tslib": "^1.9.3"
   },
   "sideEffects": false

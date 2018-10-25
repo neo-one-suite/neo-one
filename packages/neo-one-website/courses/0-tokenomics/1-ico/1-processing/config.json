@@ -7,6 +7,9 @@
     },
     {
       "solution": "one/tests/Token.test.ts"
+    },
+    {
+      "solution": "package.json"
     }
   ]
 }

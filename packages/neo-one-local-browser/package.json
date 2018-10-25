@@ -4,7 +4,6 @@
   "description": "NEO•ONE local browser implementation.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@babel/polyfill": "^7.0.0",
     "@neo-one/client": "^1.0.0-preview.1",
     "@neo-one/client-common": "^1.0.0-preview.1",
     "@neo-one/local": "^1.0.0-preview.1",
