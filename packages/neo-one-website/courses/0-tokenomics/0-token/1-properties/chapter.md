@@ -22,7 +22,7 @@ Let's call the token 'Eon', give it the symbol 'EON' and make it have 8 decimals
 
   1. Add a property called `name` - a `string` with the value `'Eon'`.
   2. Add a property called `symbol` - a `string` property with the value `'EON'`.
-  3. Add a property called `decimal` - a `number` property with the value `8`.
+  3. Add a property called `decimals` - a `number` property with the value `8`.
 
 ## Test
 
