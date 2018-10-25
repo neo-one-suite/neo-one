@@ -9479,12 +9479,12 @@ grpc-error@^1.0.0:
   dependencies:
     grpc-create-error "^1.0.0"
 
-grpc-inspect@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/grpc-inspect/-/grpc-inspect-0.5.0.tgz#b8db314b30f7e85307ec4ffb7286e798c9d08b98"
-  integrity sha512-7Zf9+7aiHDD8zmREz9Uf7sSwWi1yH+DW7orYBRItR68MAecnlxH9rJpBGD1h4XGEHLYxaXG8ayl8DBT4t7J/mA==
+grpc-inspect@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/grpc-inspect/-/grpc-inspect-0.6.0.tgz#c10fbf920ece85f315c249ab569e0a1739e711be"
+  integrity sha512-pKW9FvIex0oLI18ms8SkEEvuR0UB1YVEFPecIe457XsxvPMM5gJYjMfuSaCeFVJ1Hv3V6vJYUxTHCy/+HgL0Ww==
   dependencies:
-    lodash "^4.17.2"
+    lodash "^4.17.11"
     traverse "^0.6.6"
 
 grpc@1.15.1, grpc@^1.0.1, grpc@^1.15.1:
@@ -13225,10 +13225,10 @@ mali-onerror@^0.1.1:
     error-inject "^1.0.0"
     mali-call-types "^0.1.0"
 
-mali@^0.9.1:
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/mali/-/mali-0.9.1.tgz#e30453460b36dd095571d5a8de6dbcf6aba5738d"
-  integrity sha512-k06DS0vA2rx/vsqscIZ/sNYhpEApn/LGIIXTICszYAEQevLNc7K8tk7yUzfIEZ8o8ANaSu2/91DYoJ1A+WXd7g==
+mali@^0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/mali/-/mali-0.10.0.tgz#aec9edbe1970bb318f191ac87994b3bcc5ac58a2"
+  integrity sha512-6Bu3SS8WdqQKfPiXmvlSXC8jUE7J3vugTm7pSBhx5qqjel6iXPe9ucKs2+j2WjTV6Apa5WcK+sogcsWzpl/y9w==
   dependencies:
     ascallback "^1.1.1"
     coveralls "^3.0.2"
@@ -13237,9 +13237,9 @@ mali@^0.9.1:
     ee-first "^1.1.1"
     error-inject "^1.0.0"
     grpc-create-metadata "^3.0.0"
-    grpc-inspect "^0.5.0"
+    grpc-inspect "^0.6.0"
     is-stream "^1.1.0"
-    lodash "^4.17.10"
+    lodash "^4.17.11"
     lodash.camelcase "^4.3.0"
     lodash.concat "^4.5.0"
     lodash.find "^4.6.0"
@@ -13252,7 +13252,7 @@ mali@^0.9.1:
     lodash.values "^4.3.0"
     mali-call-types "~0.1.0"
     mali-compose "~1.1.0"
-    p-map "^1.2.0"
+    p-map "^2.0.0"
     pify "^3.0.0"
 
 mamacro@^0.0.3:
@@ -14880,6 +14880,11 @@ p-map@^1.1.1, p-map@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/p-map/-/p-map-1.2.0.tgz#e4e94f311eabbc8633a1e79908165fca26241b6b"
   integrity sha512-r6zKACMNhjPJMTl8KcFH4li//gkrXWfbD6feV8l6doRHlzljFWGJ2AP6iKaCJXyZmAUMOPtvbW7EXkbWO/pLEA==
+
+p-map@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/p-map/-/p-map-2.0.0.tgz#be18c5a5adeb8e156460651421aceca56c213a50"
+  integrity sha512-GO107XdrSUmtHxVoi60qc9tUl/KkNKm+X2CF4P9amalpGxv5YqVPJNfSb0wcA+syCopkZvYYIzW8OVTQW59x/w==
 
 p-pipe@^1.2.0:
   version "1.2.0"

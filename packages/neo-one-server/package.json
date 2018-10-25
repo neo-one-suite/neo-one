@@ -36,7 +36,7 @@
     "koa-compress": "^3.0.0",
     "koa-router": "^7.4.0",
     "lodash": "^4.17.11",
-    "mali": "^0.9.1",
+    "mali": "^0.10.0",
     "mali-compose": "^1.1.0",
     "mali-onerror": "^0.1.1",
     "rxjs": "^6.3.3",
