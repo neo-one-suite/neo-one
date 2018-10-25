@@ -67,8 +67,8 @@
     "@neo-one/smart-contract": "1.0.0-preview.1",
     "bignumber.js": "7.2.1",
     "core-js": "2.5.7",
-    "react": "16.5.2",
-    "react-dom": "16.5.2",
+    "react": "16.6.0",
+    "react-dom": "16.6.0",
     "react-hot-loader": "4.3.11",
     "rxjs": "6.3.3"
   }
