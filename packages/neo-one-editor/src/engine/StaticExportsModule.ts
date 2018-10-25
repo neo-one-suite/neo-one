@@ -1,5 +1,5 @@
 import { EngineBase } from './EngineBase';
-import { ModuleBase } from './ModuleBase';
+import { ExploreResult, ModuleBase } from './ModuleBase';
 import { Exports } from './types';
 
 export class StaticExportsModule extends ModuleBase {
@@ -8,6 +8,14 @@ export class StaticExportsModule extends ModuleBase {
   }
 
   public evaluate(): Exports {
+    return this.exports;
+  }
+
+  public evaluateExplore(): ExploreResult {
+    return { exports: this.exports, missingPaths: [] };
+  }
+
+  public async evaluateAsync(): Promise<Exports> {
     return this.exports;
   }
 }

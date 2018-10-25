@@ -67,7 +67,7 @@ const doRun = async (engine: Engine, test: ModuleBase, handler: TestEventHandler
 
     try {
       await engine.waitTranspile();
-      test.evaluate({ force: true });
+      await test.evaluateAsync({ force: true });
     } catch (error) {
       handler.onEvaluateError(error);
 

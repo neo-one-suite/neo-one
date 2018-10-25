@@ -55,7 +55,7 @@ export class PreviewEngine extends EngineBase {
       transpileCache.changes$
         .pipe(
           map(() => {
-            previewEngine.renderJS();
+            previewEngine.renderJSSafe();
           }),
         )
         .subscribe();
@@ -64,24 +64,38 @@ export class PreviewEngine extends EngineBase {
     return mutablePreviewEngine;
   }
 
-  public readonly renderJS = _.debounce((): void => {
+  public readonly renderJS = _.debounce(async (): Promise<void> => {
+    if (this.mutableRunning) {
+      this.renderJSSafe();
+    }
+    this.mutableRunning = true;
     ReactErrorOverlay.dismissBuildError();
     ReactErrorOverlay.dismissRuntimeErrors();
     try {
       const entryModule = this.findEntryModule();
-      entryModule.evaluate({ force: true, useEval: true });
+      await entryModule.evaluateAsync({ force: true });
     } catch (error) {
       // Rethrow with a clean stack to allow React overlay to pick it up.
       setTimeout(() => {
         throw error;
       });
+    } finally {
+      this.mutableRunning = false;
     }
   }, 500);
+
+  private mutableRunning = false;
+
+  public readonly renderJSSafe = () => {
+    this.renderJS().catch(() => {
+      // do nothing... we catch all errors below
+    });
+  };
 
   public start(): void {
     this.renderHTML();
     ReactErrorOverlay.startReportingRuntimeErrors(this, {});
-    this.renderJS();
+    this.renderJSSafe();
   }
 
   public renderHTML(): void {

@@ -9,13 +9,14 @@ interface Options {
   readonly from: string;
   readonly fs: FileSystem;
   readonly emptyModulePath: string;
+  readonly files?: Set<string>;
 }
 
 interface Shims {
   readonly [key: string]: string;
 }
 
-export const resolve = ({ module: mod, from, emptyModulePath, fs }: Options): string => {
+export const resolve = ({ module: mod, from, emptyModulePath, fs, files = new Set() }: Options): string => {
   const base = path.dirname(from);
   const paths = getNodeModulesPaths(base).map((nodeModulePath) => path.dirname(nodeModulePath));
   const shims = loadShims(paths, emptyModulePath, fs);
@@ -26,7 +27,7 @@ export const resolve = ({ module: mod, from, emptyModulePath, fs }: Options): st
       : (shims[absoluteModule] as string | undefined) !== undefined
         ? shims[absoluteModule]
         : mod;
-  const resolved = resv.sync(transformedID, buildResolveOptions(base, fs));
+  const resolved = resv.sync(transformedID, buildResolveOptions(base, fs, files));
 
   return (shims[resolved] as string | undefined) === undefined ? resolved : shims[resolved];
 };
@@ -89,9 +90,9 @@ const findShimsInPackage = (pkgJSON: string, currentPath: string, emptyModulePat
   }, {});
 };
 
-const buildResolveOptions = (basedir: string, fs: FileSystem) => ({
+const buildResolveOptions = (basedir: string, fs: FileSystem, files: Set<string>) => ({
   basedir,
-  readFileSync: fs.readFileSync,
+  readFileSync: (file: string) => fs.readFileSync(file),
   // tslint:disable-next-line no-any
   packageFilter: (pkg: any) => {
     const replacements = pkg.browser;
@@ -144,6 +145,10 @@ const buildResolveOptions = (basedir: string, fs: FileSystem) => ({
     return mappedPath;
   },
   isFile: (file: string) => {
+    if (files.has(file)) {
+      return true;
+    }
+
     try {
       const stat = fs.statSync(file);
 
@@ -156,11 +161,24 @@ const buildResolveOptions = (basedir: string, fs: FileSystem) => ({
       throw error;
     }
   },
+  isDirectory: (dir: string) => {
+    try {
+      const stat = fs.statSync(dir);
+
+      return stat.isDirectory();
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        return false;
+      }
+
+      throw error;
+    }
+  },
   extensions: ['.js', '.jsx', '.ts', '.tsx'],
 });
 
-const getNodeModulesPaths = (start: string) => {
-  const mutableParts = start.split('/');
+export const getNodeModulesPaths = (start: string) => {
+  const mutableParts = start.startsWith('/') ? start.slice(1).split('/') : start.split('/');
 
   return _.reverse(
     mutableParts.reduce<ReadonlyArray<string>>(

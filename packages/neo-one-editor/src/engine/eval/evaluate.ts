@@ -1,4 +1,5 @@
 import { EngineBase } from '../EngineBase';
+import { MissingPath } from '../ModuleBase';
 import { TranspiledModule } from '../TranspiledModule';
 import { Exports } from '../types';
 import { createRequire } from './createRequire';
@@ -8,9 +9,14 @@ import { createRequire } from './createRequire';
 const _self = this;
 // tslint:enable
 
-export const evaluate = (engine: EngineBase, mod: TranspiledModule, useEval = false): Exports => {
+export interface Result {
+  readonly exports: Exports;
+  readonly missingPaths: ReadonlyArray<MissingPath>;
+}
+
+export const evaluate = (engine: EngineBase, mod: TranspiledModule, explore: boolean): Result => {
   const globals = engine.getGlobals(mod);
-  const require = createRequire(engine, mod, useEval);
+  const require = createRequire(engine, mod, explore);
   const code = mod.code;
   const module = { exports: {} };
   const params = ['require', 'module', 'exports'].concat(Object.keys(globals));
@@ -21,6 +27,10 @@ export const evaluate = (engine: EngineBase, mod: TranspiledModule, useEval = fa
     (0, eval)(evalCode).apply(_self, args);
     // ^ makes eval run in global scope
   } catch (e) {
+    if (explore) {
+      return { exports: module.exports, missingPaths: require.missingPaths };
+    }
+
     let error = e;
     if (typeof e === 'string') {
       error = new Error(e);
@@ -29,5 +39,5 @@ export const evaluate = (engine: EngineBase, mod: TranspiledModule, useEval = fa
     throw error;
   }
 
-  return module.exports;
+  return { exports: module.exports, missingPaths: require.missingPaths };
 };
