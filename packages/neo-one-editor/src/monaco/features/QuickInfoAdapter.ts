@@ -1,9 +1,8 @@
 /// <reference types="monaco-editor/monaco" />
 // tslint:disable:prefer-template
 import { map, switchMap } from 'rxjs/operators';
-import ts from 'typescript';
 import { Adapter } from './Adapter';
-import { convertTags, positionToOffset, textSpanToRange, wrapCode } from './utils';
+import { positionToOffset, textSpanToRange, wrapCode } from './utils';
 
 export class QuickInfoAdapter extends Adapter implements monaco.languages.HoverProvider {
   public provideHover(
@@ -20,22 +19,20 @@ export class QuickInfoAdapter extends Adapter implements monaco.languages.HoverP
           async (worker) =>
             model.isDisposed()
               ? undefined
-              : worker.getQuickInfoAtPosition(resource.path, positionToOffset(model, position)),
+              : worker.parseInfoAtPosition(resource.path, positionToOffset(model, position)),
         ),
         map((info) => {
           if (!info || model.isDisposed()) {
             return { contents: [] };
           }
-
-          const documentation = ts.displayPartsToString(info.documentation);
-          const tags = convertTags(info.tags);
-          const contents = ts.displayPartsToString(info.displayParts);
+          const documentation = info.documentation === undefined ? '' : info.documentation;
+          const tags = info.tags === undefined ? '' : info.tags;
 
           return {
             range: textSpanToRange(model, info.textSpan),
             contents: [
               {
-                value: wrapCode(model.getModeId(), contents) + '\n',
+                value: wrapCode(model.getModeId(), info.contents) + '\n',
               },
               {
                 value: documentation + tags,

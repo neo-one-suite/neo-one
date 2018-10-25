@@ -30,24 +30,6 @@ export const getModel = (resource: monaco.Uri | string): monaco.editor.ITextMode
   return model == undefined || model.isDisposed() ? undefined : model;
 };
 
-export const convertTags = (tags: ReadonlyArray<ts.JSDocTagInfo> | undefined) =>
-  tags
-    ? '\n\n' +
-      tags
-        .map((tag) => {
-          if (tag.name === 'example' && tag.text) {
-            return `*@${tag.name}*\n` + '```typescript-internal\n' + tag.text + '\n```\n';
-          }
-          const label = `*@${tag.name}*`;
-          if (!tag.text) {
-            return label;
-          }
-
-          return label + (tag.text.match(/\r\n|\n/g) ? ' \n' + tag.text : ` - ${tag.text}`);
-        })
-        .join('  \n\n')
-    : '';
-
 export const convertTextChange = (
   model: monaco.editor.ITextModel,
   change: ts.TextChange,
