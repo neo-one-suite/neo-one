@@ -1,8 +1,6 @@
 // tslint:disable no-import-side-effect
 import '@babel/polyfill';
 
-import './trackjs';
-
 import { Builder } from '@neo-one/local-browser';
 import { comlink } from '@neo-one/worker';
 
