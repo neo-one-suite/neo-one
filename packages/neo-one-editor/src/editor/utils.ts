@@ -19,6 +19,8 @@ export const getLanguageIDForFile = (file: EditorFile) => {
       return LanguageID.JavaScript;
     case 'html':
       return 'html';
+    case 'json':
+      return 'json';
     default:
       utils.assertNever(type);
       throw new Error('For TS');

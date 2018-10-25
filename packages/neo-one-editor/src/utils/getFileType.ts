@@ -1,7 +1,7 @@
 import { getSmartContractBasePath, getSmartContractLibBasePath, normalizePath } from '@neo-one/local-browser';
 import { EditorFile } from '../editor';
 
-export type EditorFileType = 'contract' | 'javascript' | 'typescript' | 'html';
+export type EditorFileType = 'contract' | 'javascript' | 'typescript' | 'html' | 'json';
 
 export const getFileType = (fileIn: EditorFile | string): EditorFileType | undefined => {
   const filePath = typeof fileIn === 'object' ? fileIn.path : fileIn;
@@ -25,6 +25,10 @@ export const getFileType = (fileIn: EditorFile | string): EditorFileType | undef
 
   if (file.endsWith('.html')) {
     return 'html';
+  }
+
+  if (file.endsWith('.json')) {
+    return 'json';
   }
 
   return undefined;

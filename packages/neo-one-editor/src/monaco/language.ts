@@ -4,6 +4,8 @@
 import * as fake2 from 'monaco-editor/esm/vs/editor/edcore.main';
 // @ts-ignore
 import * as fake from 'monaco-editor/esm/vs/language/html/monaco.contribution';
+// @ts-ignore
+import * as fake3 from 'monaco-editor/esm/vs/language/json/monaco.contribution';
 
 import { PouchDBFileSystem } from '@neo-one/local-browser';
 import { FileSystemManager } from '@neo-one/local-browser-worker';
@@ -12,6 +14,8 @@ import { WorkerManager } from '@neo-one/worker';
 import editorWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/workers/editor.worker.js';
 // @ts-ignore
 import htmlWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/workers/html.worker.js';
+// @ts-ignore
+import jsonWorkerURL from 'file-loader?name=[hash].[name].[ext]!../../../../dist/workers/json.worker.js';
 // @ts-ignore
 import * as javascriptModule from 'monaco-editor/esm/vs/basic-languages/javascript/javascript';
 import { Observable, Subject } from 'rxjs';
@@ -45,6 +49,8 @@ import { TypeScriptWorker } from './TypeScriptWorker';
     // tslint:disable-next-line:prefer-conditional-expression
     if (label.endsWith('html') && fake && fake2) {
       MonacoWorker = new Worker(htmlWorkerURL);
+    } else if (label.endsWith('json') && fake3) {
+      MonacoWorker = new Worker(jsonWorkerURL);
     } else {
       MonacoWorker = new Worker(editorWorkerURL);
     }
