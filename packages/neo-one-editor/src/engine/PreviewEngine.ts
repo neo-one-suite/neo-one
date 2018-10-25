@@ -1,6 +1,6 @@
 import { comlink } from '@neo-one/worker';
 import _ from 'lodash';
-import { map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import * as ReactErrorOverlay from '../error/ReactErrorOverlay';
 import { createFileSystem, createTranspileCache } from './create';
 import { Engine } from './Engine';
@@ -59,6 +59,14 @@ export class PreviewEngine extends EngineBase {
           }),
         )
         .subscribe();
+      fs.changes$
+        .pipe(
+          filter((change) => change.id.startsWith('/node_modules')),
+          map(() => {
+            previewEngine.renderJSSafe();
+          }),
+        )
+        .subscribe();
     }
 
     return mutablePreviewEngine;
@@ -87,9 +95,8 @@ export class PreviewEngine extends EngineBase {
   private mutableRunning = false;
 
   public readonly renderJSSafe = () => {
-    this.renderJS().catch(() => {
-      // do nothing... we catch all errors below
-    });
+    // tslint:disable-next-line
+    this.renderJS();
   };
 
   public start(): void {

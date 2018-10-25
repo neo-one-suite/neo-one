@@ -76,6 +76,7 @@
     "webpack": "4.19.0"
   },
   "sideEffects": [
+    "src/trackjs.ts",
     "src/preview/window/polyfill.ts"
   ]
 }

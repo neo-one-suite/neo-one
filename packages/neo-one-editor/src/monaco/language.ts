@@ -1,9 +1,9 @@
 /// <reference types="monaco-editor/monaco" />
 // tslint:disable promise-function-async no-submodule-imports no-implicit-dependencies no-import-side-effect
 // @ts-ignore
-import * as fake2 from 'monaco-editor/esm/vs/editor/edcore.main';
+import * as fake1 from 'monaco-editor/esm/vs/editor/edcore.main';
 // @ts-ignore
-import * as fake from 'monaco-editor/esm/vs/language/html/monaco.contribution';
+import * as fake2 from 'monaco-editor/esm/vs/language/html/monaco.contribution';
 // @ts-ignore
 import * as fake3 from 'monaco-editor/esm/vs/language/json/monaco.contribution';
 
@@ -47,11 +47,20 @@ import { TypeScriptWorker } from './TypeScriptWorker';
     let MonacoWorker;
 
     // tslint:disable-next-line:prefer-conditional-expression
-    if (label.endsWith('html') && fake && fake2) {
+    if (label.endsWith('html')) {
+      if (fake2 === undefined) {
+        throw new Error('HTML contribution not loaded');
+      }
       MonacoWorker = new Worker(htmlWorkerURL);
-    } else if (label.endsWith('json') && fake3) {
+    } else if (label.endsWith('json')) {
+      if (fake3 === undefined) {
+        throw new Error('JSON contribution not loaded');
+      }
       MonacoWorker = new Worker(jsonWorkerURL);
     } else {
+      if (fake1 === undefined) {
+        throw new Error('Editor contribution not loaded');
+      }
       MonacoWorker = new Worker(editorWorkerURL);
     }
 

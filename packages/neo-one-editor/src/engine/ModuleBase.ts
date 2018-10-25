@@ -1,11 +1,15 @@
 import { EngineBase } from './EngineBase';
 import { Exports } from './types';
 
-export interface EvaluateAsyncOptions {
+export interface EvaluateBaseOptions {
   readonly force?: boolean;
 }
 
-export interface EvaluateOptions extends EvaluateAsyncOptions {
+export interface EvaluateAsyncOptions extends EvaluateBaseOptions {
+  readonly beforeEvaluate?: () => void;
+}
+
+export interface EvaluateOptions extends EvaluateBaseOptions {
   readonly initiator?: ModuleBase;
 }
 

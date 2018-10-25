@@ -5,7 +5,11 @@ export const getFileTypeName = (file: EditorFile) => {
   const type = getFileType(file);
 
   if (type === 'html') {
-    return 'html';
+    return 'HTML';
+  }
+
+  if (type === 'json') {
+    return 'JSON';
   }
 
   const major = type === 'typescript' || type === 'contract' ? 'TypeScript' : 'JavaScript';

@@ -6,7 +6,10 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "@neo-one/node-browser": "^1.0.0-preview.1",
-    "@neo-one/worker": "^1.0.0-preview.1"
+    "@neo-one/worker": "^1.0.0-preview.1",
+    "trackjs": "^2.13.0"
   },
-  "sideEffects": false
+  "sideEffects": [
+    "src/trackjs.ts"
+  ]
 }

@@ -1,4 +1,8 @@
-// tslint:disable no-submodule-imports match-default-export-name
+// tslint:disable no-submodule-imports match-default-export-name no-import-side-effect
+import '@babel/polyfill';
+
+import './trackjs';
+
 import { registerWorkerPouch } from '@neo-one/local-browser';
 import PouchDB from 'pouchdb';
 

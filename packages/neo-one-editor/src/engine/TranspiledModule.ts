@@ -50,18 +50,33 @@ export class TranspiledModule extends ModuleBase {
     return { exports: this.mutableExports, missingPaths: [] };
   }
 
-  public async evaluateAsync({ force = false }: EvaluateAsyncOptions = {}): Promise<Exports> {
+  public async evaluateAsync({
+    force = false,
+    beforeEvaluate = () => {
+      // do nothing
+    },
+  }: EvaluateAsyncOptions = {}): Promise<Exports> {
     if (force || this.mutableExports === NEEDS_EVAL) {
-      let { missingPaths: missingPathsIn } = this.evaluateExplore({ force });
+      beforeEvaluate();
+      const { exports, missingPaths: missingPathsIn } = this.evaluateExplore({ force });
+      if (missingPathsIn.length === 0) {
+        this.mutableExports = exports;
+
+        return exports;
+      }
+
       let missingPaths = this.uniquePaths(missingPathsIn);
       let prevMissingPaths: ReadonlyArray<MissingPath> = [];
       // tslint:disable-next-line no-loop-statement
       while (!this.samePaths(missingPaths, prevMissingPaths)) {
         await this.engine.fetchDependencies(missingPaths);
         prevMissingPaths = missingPaths;
-        ({ missingPaths: missingPathsIn } = this.evaluateExplore({ force }));
-        missingPaths = this.uniquePaths(missingPathsIn);
+        beforeEvaluate();
+        const { missingPaths: nextMissingPaths } = this.evaluateExplore({ force });
+        missingPaths = this.uniquePaths(nextMissingPaths);
       }
+
+      beforeEvaluate();
 
       return this.evaluate({ force });
     }

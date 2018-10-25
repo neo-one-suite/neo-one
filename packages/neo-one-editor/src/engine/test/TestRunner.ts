@@ -60,14 +60,17 @@ addEventHandler(handleEvent);
 
 const doRun = async (engine: Engine, test: ModuleBase, handler: TestEventHandler): Promise<void> => {
   try {
-    doHandleEvent = (event) => {
-      handler.handleTestEvent(event);
-    };
-    resetTestState();
-
     try {
       await engine.waitTranspile();
-      await test.evaluateAsync({ force: true });
+      await test.evaluateAsync({
+        force: true,
+        beforeEvaluate: () => {
+          doHandleEvent = (event) => {
+            handler.handleTestEvent(event);
+          };
+          resetTestState();
+        },
+      });
     } catch (error) {
       handler.onEvaluateError(error);
 
