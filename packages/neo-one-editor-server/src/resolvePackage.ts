@@ -197,11 +197,16 @@ export const resolvePackageWorker = async (name: string, version: string): Promi
     }
   }
 
-  if (start === undefined) {
+  if (start === undefined || start === '') {
     start = './index.js';
   }
 
   start = nodePath.resolve('/', start);
+
+  if (files[resolveJavaScriptFilePath(files, start)] === undefined && files['/index.d.ts'] !== undefined) {
+    start = '/index.d.ts';
+  }
+
   mapping = _.fromPairs(
     Object.entries(mapping).map(([key, value]) => [
       nodePath.resolve('/', key),

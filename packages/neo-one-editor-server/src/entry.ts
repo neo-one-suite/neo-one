@@ -14,8 +14,23 @@ const monitor = DefaultMonitor.create({
   service: 'editor-server',
   logger: {
     log: (options) => {
-      // tslint:disable-next-line no-console
-      console.log(options);
+      if (
+        process.env.NODE_ENV !== 'production' ||
+        options.level === 'error' ||
+        options.level === 'warn' ||
+        options.level === 'info'
+      ) {
+        if (options.level === 'error') {
+          const { error, ...otherOptions } = options;
+          // tslint:disable-next-line no-console
+          console.error(error);
+          // tslint:disable-next-line no-console
+          console.log(otherOptions);
+        } else {
+          // tslint:disable-next-line no-console
+          console.log(options);
+        }
+      }
     },
     close: () => {
       // do nothing
@@ -125,6 +140,8 @@ router.use(cors).get(
     async (ctx: Context): Promise<void> => {
       const result = await resolvePackage(ctx.params.pkg, ctx.params.version);
 
+      const directives = [`max-age=${365 * 24 * 60 * 60}`, 'immutable', 'public'];
+      ctx.set('Cache-Control', directives.join(', '));
       ctx.body = result;
     },
   ]),

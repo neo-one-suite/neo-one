@@ -145,7 +145,7 @@ const buildResolveOptions = (basedir: string, fs: FileSystem, files: Set<string>
     return mappedPath;
   },
   isFile: (file: string) => {
-    if (files.has(file)) {
+    if (!file.endsWith('.json') && files.has(file)) {
       return true;
     }
 

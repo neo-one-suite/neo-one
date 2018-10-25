@@ -41,7 +41,7 @@ export const workers = ({ stage }: { readonly stage: Stage }): webpack.Configura
           'transpiler.worker': path.resolve(EDITOR_PACKAGE, 'src', 'engine', 'transpile', 'transpiler.init.ts'),
           'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker',
           'html.worker': 'monaco-editor/esm/vs/language/html/html.worker',
-          'json.worker': 'monaco-editor/esm/vs/language/html/json.worker',
+          'json.worker': 'monaco-editor/esm/vs/language/json/json.worker',
         },
   target: 'webworker',
   output: {
