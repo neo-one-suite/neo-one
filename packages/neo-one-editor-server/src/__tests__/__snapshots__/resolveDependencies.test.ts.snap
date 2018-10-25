@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`resolver resolve deps 1`] = `
+exports[`resolveDependencies resolve deps 1`] = `
 Object {
   "@emotion/is-prop-valid": Object {
     "dependencies": Object {},

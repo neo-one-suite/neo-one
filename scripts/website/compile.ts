@@ -3,13 +3,14 @@ import history from 'connect-history-api-fallback';
 import execa from 'execa';
 // @ts-ignore
 import convert from 'koa-connect';
+import * as nodePath from 'path';
 import webpack from 'webpack';
 // @ts-ignore
 import serve from 'webpack-serve';
 import yargs from 'yargs';
 import { createKillProcess } from './createKillProcess';
 import { Bundle } from './types';
-import { overlay, preview, workers } from './webpack';
+import { overlay, preview, server, SERVER_DIST_DIR, workers } from './webpack';
 
 yargs.describe('watch', 'Run in watch mode.').default('watch', false);
 yargs.describe('bundle', 'Bundle to compile.').default('bundle', 'react-static');
@@ -51,6 +52,33 @@ const watchPreview = async () => {
       app.stop(resolve);
     });
 };
+const watchServer = async () => {
+  const stop = watchConfig(server({ stage: devStage }));
+  // tslint:disable-next-line:no-require-imports
+  const nodemon = require('nodemon');
+
+  nodemon({
+    script: nodePath.resolve(SERVER_DIST_DIR, 'index.js'),
+  });
+
+  nodemon
+    .on('start', () => {
+      log('App has started');
+    })
+    .on('quit', () => {
+      log('App has quit');
+    })
+    .on('restart', (files: ReadonlyArray<string>) => {
+      log(`App restarted due to: ${JSON.stringify(files)}`);
+    });
+
+  return async () => {
+    await stop();
+    await new Promise<void>((resolve) => {
+      nodemon.reset(resolve);
+    });
+  };
+};
 
 const runCompiler = async ({ compiler }: { readonly compiler: webpack.Compiler }): Promise<webpack.Stats> =>
   new Promise<webpack.Stats>((resolve, reject) =>
@@ -79,6 +107,7 @@ const compileConfig = async (config: webpack.Configuration) => runCompiler({ com
 const compilePreview = async () => compileConfig(preview({ stage: 'prod' }));
 const compileWorkers = async () => compileConfig(workers({ stage: 'prod' }));
 const compileOverlay = async () => compileConfig(overlay({ stage: 'prod' }));
+const compileServer = async () => compileConfig(server({ stage: 'prod' }));
 
 const startReactStatic = () => {
   const proc = execa('react-static', ['start']);
@@ -99,6 +128,8 @@ const createWatch = async (bundle: Bundle) => {
       return watchPreview();
     case 'overlay':
       return watchOverlay();
+    case 'server':
+      return watchServer();
     default:
       throw new Error(`Unknown bundle: ${bundle}`);
   }
@@ -112,6 +143,8 @@ const compile = async (bundle: Bundle) => {
       return compilePreview();
     case 'overlay':
       return compileOverlay();
+    case 'server':
+      return compileServer();
     default:
       throw new Error(`Unknown bundle: ${bundle}`);
   }

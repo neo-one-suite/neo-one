@@ -6,14 +6,6 @@ import jest_d_ts from '!raw-loader!../../../../node_modules/@types/jest/index.d.
 // @ts-ignore
 import node_d_ts from '!raw-loader!../../../../node_modules/@types/node/index.d.ts';
 // @ts-ignore
-import reactDOM_d_ts from '!raw-loader!../../../../node_modules/@types/react-dom/index.d.ts';
-// @ts-ignore
-import react_d_ts from '!raw-loader!../../../../node_modules/@types/react/index.d.ts';
-// @ts-ignore
-import bignumber_d_ts from '!raw-loader!../../../../node_modules/bignumber.js/bignumber.d.ts';
-// @ts-ignore
-import styledComponents_d_ts from '!raw-loader!../../../../node_modules/styled-components/typings/styled-components.d.ts';
-// @ts-ignore
 import lib_d_ts from '!raw-loader!../../../../node_modules/typescript/lib/lib.d.ts';
 // @ts-ignore
 import lib_dom_d_ts from '!raw-loader!../../../../node_modules/typescript/lib/lib.dom.d.ts';
@@ -96,14 +88,6 @@ import { FileSystem } from '@neo-one/local-browser';
 import jestPackageJSONContents from '../../../../node_modules/@types/jest/package.json';
 // @ts-ignore
 import nodePackageJSONContents from '../../../../node_modules/@types/node/package.json';
-// @ts-ignore
-import reactDOMPackageJSONContents from '../../../../node_modules/@types/react-dom/package.json';
-// @ts-ignore
-import reactPackageJSONContents from '../../../../node_modules/@types/react/package.json';
-// @ts-ignore
-import bignumberPackageJSONContents from '../../../../node_modules/bignumber.js/package.json';
-// @ts-ignore
-import styledComponentsPackageJSONContents from '../../../../node_modules/styled-components/package.json';
 
 const writeFile = async (fs: FileSystem, path: string, content: string) => fs.writeFile(path, content);
 
@@ -153,14 +137,6 @@ export const initializeFileSystem = async (fs: FileSystem): Promise<void> => {
     writeFile(fs, '/node_modules/@types/jest/package.json', JSON.stringify(jestPackageJSONContents)),
     writeFile(fs, '/node_modules/@types/node/index.d.ts', node_d_ts),
     writeFile(fs, '/node_modules/@types/node/package.json', JSON.stringify(nodePackageJSONContents)),
-    writeFile(fs, '/node_modules/@types/react/index.d.ts', react_d_ts),
-    writeFile(fs, '/node_modules/@types/react/package.json', JSON.stringify(reactPackageJSONContents)),
-    writeFile(fs, '/node_modules/@types/react-dom/index.d.ts', reactDOM_d_ts),
-    writeFile(fs, '/node_modules/@types/react-dom/package.json', JSON.stringify(reactDOMPackageJSONContents)),
-    writeFile(fs, '/node_modules/bignumber.js/bignumber.d.ts', bignumber_d_ts),
-    writeFile(fs, '/node_modules/bignumber.js/package.json', JSON.stringify(bignumberPackageJSONContents)),
-    writeFile(fs, '/node_modules/styled-components/typings/styled-components.d.ts', styledComponents_d_ts),
-    writeFile(fs, '/node_modules/styled-components/package.json', JSON.stringify(styledComponentsPackageJSONContents)),
     Promise.all(
       // tslint:disable-next-line no-any
       Object.entries(files).map(async ([path, contents]: any) => {

@@ -1,2 +1,2 @@
 export type Stage = 'node' | 'dev' | 'prod';
-export type Bundle = 'react-static' | 'workers' | 'preview' | 'overlay';
+export type Bundle = 'react-static' | 'workers' | 'preview' | 'overlay' | 'server';

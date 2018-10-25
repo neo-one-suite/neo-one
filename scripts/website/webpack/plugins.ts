@@ -20,8 +20,10 @@ const APP_ROOT_DIR = path.resolve(__dirname, '..', '..', '..');
 export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bundle: Bundle }) =>
   [
     new webpack.DefinePlugin({
+      'global.GENTLY': false,
       'process.env': {
         NEO_ONE_DEV: JSON.stringify('true'),
+        NEO_ONE_API_URL: JSON.stringify('http://localhost:3001/'),
         TSC_NONPOLLING_WATCHER: JSON.stringify('false'),
         TSC_WATCHFILE: JSON.stringify('false'),
         TSC_WATCHDIRECTORY: JSON.stringify('false'),
@@ -44,7 +46,7 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
     new WebpackBar({ profile: true }),
   ]
     .concat(
-      stage === 'dev' || stage === 'node' || process.env.NEO_ONE_CACHE === 'true'
+      stage === 'dev' || stage === 'node' || process.env.NEO_ONE_CACHE === 'true' || bundle === 'server'
         ? [
             new HardSourceWebpackPlugin({
               cacheDirectory: path.resolve(APP_ROOT_DIR, 'node_modules', '.cache', 'hswp', stage, bundle),
@@ -60,11 +62,11 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
             }),
           ],
     )
+    .concat(stage === 'dev' || stage === 'node' ? [] : [new LodashModuleReplacementPlugin()])
     .concat(
-      stage === 'dev' || stage === 'node'
+      stage === 'dev' || stage === 'node' || bundle === 'server'
         ? []
         : [
-            new LodashModuleReplacementPlugin(),
             new CompressionPlugin({
               filename: '[path].gz[query]',
               algorithm: 'gzip',

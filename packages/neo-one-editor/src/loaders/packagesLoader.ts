@@ -43,9 +43,9 @@ const compile = (loader: webpack.loader.LoaderContext): void => {
 };
 
 const getPackagesExports = async (loader: webpack.loader.LoaderContext): Promise<string> => {
-  const [packages, reakitPackages] = await Promise.all([getPackages(loader), getReakitPackages(loader)]);
+  const packages = await getPackages(loader);
 
-  return `module.exports = ${JSON.stringify({ ...packages, reakitPackages })};`;
+  return `module.exports = ${JSON.stringify(packages)};`;
 };
 
 const getPackages = async (loader: webpack.loader.LoaderContext) => {
@@ -66,20 +66,6 @@ const getPackages = async (loader: webpack.loader.LoaderContext) => {
   );
 
   return _.fromPairs(_.flatten(packageFilesList).filter((value) => value[1] !== undefined));
-};
-
-const getReakitPackages = async (loader: webpack.loader.LoaderContext) => {
-  const reakitDir = path.resolve(__dirname, '..', '..', '..', '..', 'node_modules', 'reakit');
-  const packageDir = path.resolve(reakitDir, 'ts');
-  const [packageJSON, packageFiles] = await Promise.all([
-    fs.readFile(path.resolve(reakitDir, 'package.json'), 'utf8'),
-    getPackageFiles(loader, packageDir, 'reakit/ts'),
-  ]);
-
-  return {
-    ..._.fromPairs(packageFiles),
-    ['/node_modules/reakit/package.json']: packageJSON,
-  };
 };
 
 const getPackageFiles = async (

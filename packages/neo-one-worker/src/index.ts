@@ -4,3 +4,4 @@ import * as endpoint from './endpoint';
 
 export { comlink, endpoint };
 export * from './WorkerManager';
+export { Disposable } from './types';

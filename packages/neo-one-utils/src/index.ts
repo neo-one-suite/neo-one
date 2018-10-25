@@ -1,3 +1,4 @@
+export * from './AsyncQueue';
 export * from './constants';
 export * from './finalize';
 export * from './labels';

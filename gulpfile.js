@@ -76,6 +76,7 @@ const getPackageJSON = (pkg) => {
 const SKIP_PACKAGES = new Set([
   'neo-one-playground',
   'neo-one-editor',
+  'neo-one-editor-server',
   'neo-one-local-browser',
   'neo-one-local-browser-worker',
   'neo-one-local-singleton',

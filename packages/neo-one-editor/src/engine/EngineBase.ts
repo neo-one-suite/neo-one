@@ -1,14 +1,9 @@
 import { Builder, dirname, normalizePath, PouchDBFileSystem } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { WorkerManager } from '@neo-one/worker';
-import * as bignumber from 'bignumber.js';
 import * as nodePath from 'path';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as reakit from 'reakit';
-import * as rxjs from 'rxjs';
-import * as rxjsOperators from 'rxjs/operators';
-import * as styledComponents from 'styled-components';
+import { Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ModuleNotFoundError } from '../errors';
 import { ModuleBase } from './ModuleBase';
 import { getPathWithExports, PathWithExports } from './packages';
@@ -34,7 +29,7 @@ export class EngineBase {
   protected readonly mutableModules: Modules;
   protected readonly fs: PouchDBFileSystem;
   private readonly transpileSignal: TranspileSignal;
-  private readonly subscription: rxjs.Subscription;
+  private readonly subscription: Subscription;
   // tslint:disable-next-line readonly-keyword
   private readonly mutableCachedPaths: { [currentPath: string]: { [path: string]: string } } = {};
 
@@ -54,13 +49,6 @@ export class EngineBase {
     this.mutableModules = new Map([
       [EMPTY_MODULE_PATH, new StaticExportsModule(this, EMPTY_MODULE_PATH, {})],
       ['path', new StaticExportsModule(this, 'path', nodePath)],
-      ['react', new StaticExportsModule(this, 'react', React)],
-      ['reakit', new StaticExportsModule(this, 'reakit', reakit)],
-      ['rxjs', new StaticExportsModule(this, 'rxjs', rxjs)],
-      ['rxjs/operators', new StaticExportsModule(this, 'rxjs/operators', rxjsOperators)],
-      ['styled-components', new StaticExportsModule(this, 'styled-components', styledComponents)],
-      ['react-dom', new StaticExportsModule(this, 'react-dom', ReactDOM)],
-      ['bignumber.js', new StaticExportsModule(this, 'bignumber.js', bignumber)],
     ]);
     // tslint:disable-next-line no-loop-statement
     for (const { name, exports } of pathWithExports) {
@@ -74,7 +62,7 @@ export class EngineBase {
 
     this.subscription = transpileCache.changes$
       .pipe(
-        rxjsOperators.map((change) => {
+        map((change) => {
           if (change.doc === undefined) {
             this.mutableModules.delete(change.id);
           } else {
@@ -116,7 +104,10 @@ export class EngineBase {
 
   public resolveModule(path: string, currentPath: string): ModuleBase {
     if (!path.startsWith('.') && !path.startsWith('/')) {
-      return this.getModule(path, true);
+      const mod = this.tryGetModule(path, true);
+      if (mod !== undefined) {
+        return mod;
+      }
     }
 
     const currentDir = dirname(currentPath);
@@ -136,7 +127,18 @@ export class EngineBase {
   public tryGetModule(pathIn: string, normalized = false): ModuleBase | undefined {
     const path = normalized ? pathIn : normalizePath(pathIn);
 
-    return this.mutableModules.get(path);
+    let mod = this.mutableModules.get(path);
+    if (mod === undefined && path.startsWith('/node_modules')) {
+      try {
+        const code = this.fs.readFileSync(path);
+        mod = new TranspiledModule(this, path, code);
+        this.mutableModules.set(path, mod);
+      } catch {
+        // do nothing
+      }
+    }
+
+    return mod;
   }
 
   private getModule(path: string, normalized = false): ModuleBase {

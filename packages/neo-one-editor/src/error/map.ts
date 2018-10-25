@@ -46,10 +46,12 @@ export async function map(
           : fileName,
       );
       if (mod !== undefined && mod instanceof TranspiledModule) {
-        const consumer = await new SourceMapConsumer(mod.sourceMap);
-        const sourceMap = new SourceMap(consumer);
+        if (mod.sourceMap !== undefined) {
+          const consumer = await new SourceMapConsumer(mod.sourceMap);
+          const sourceMap = new SourceMap(consumer);
 
-        mutableCache[fileName] = { fileSource: mod.code, map: sourceMap };
+          mutableCache[fileName] = { fileSource: mod.code, map: sourceMap };
+        }
       } else {
         try {
           const fetchUrl =

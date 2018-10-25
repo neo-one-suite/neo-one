@@ -163,8 +163,11 @@ export class PouchDBFileSystem implements FileSystem {
 
   public readonly writeFile = async (pathIn: string, content: string): Promise<void> => {
     const path = normalizePath(pathIn);
-    const response = await this.writer.write(path, { type: 'write', content });
-    this.files.set(path, { content, _rev: response.rev });
+    const existing = this.files.get(path);
+    if (existing === undefined || existing.content !== content) {
+      const response = await this.writer.write(path, { type: 'write', content });
+      this.files.set(path, { content, _rev: response.rev });
+    }
   };
 
   public readonly removeFile = async (pathIn: string): Promise<void> => {

@@ -13,6 +13,9 @@
     },
     {
       "solution": "one/contracts/Token.one.ts"
+    },
+    {
+      "solution": "package.json"
     }
   ]
 }

@@ -1,8 +1,11 @@
+import fetch from 'cross-fetch';
 import { Graph } from 'graphlib';
 import _ from 'lodash';
-import npa from 'npm-package-arg';
+import LRU from 'lru-cache';
+import stringify from 'safe-stable-stringify';
 import semver from 'semver';
-import { FetchQueue } from './FetchQueue';
+import { FetchError } from './errors';
+import { getEscapedName } from './utils';
 
 const NPM_REGISTRY_URL = 'https://registry.npmjs.org';
 const ROOT_NODE = 'root$';
@@ -46,14 +49,16 @@ interface Task {
   readonly parentNode: string;
 }
 
+const cache = LRU<string, Promise<RegistryPackage>>({
+  max: 1000,
+});
+
 // Resolves package.json to hoisted top level dependencies. Anything that can't be unambigiously hoisted is kept at the level of the package.json that required it.
 class Resolver {
   private readonly graph: Graph;
-  private readonly fetchQueue: FetchQueue;
 
-  public constructor({ fetchQueue }: { readonly fetchQueue: FetchQueue }) {
+  public constructor() {
     this.graph = new Graph();
-    this.fetchQueue = fetchQueue;
   }
 
   public async resolve(dependencies: Dependencies): Promise<ResolvedDependencies> {
@@ -67,9 +72,26 @@ class Resolver {
   }
 
   private async fetchRegistryPackage(name: string): Promise<RegistryPackage> {
-    const escapedName = name && npa(name).escapedName;
+    const escapedName = getEscapedName(name);
 
-    return this.fetchQueue.fetch(`${NPM_REGISTRY_URL}/${escapedName}`, async (response: Response) => response.json());
+    const pkg = cache.get(escapedName);
+    if (pkg !== undefined) {
+      return pkg;
+    }
+
+    const url = `${NPM_REGISTRY_URL}/${escapedName}`;
+
+    const result = fetch(url).then(async (res) => {
+      if (!res.ok) {
+        throw new FetchError(url, res.status, res.statusText);
+      }
+
+      return res.json();
+    });
+
+    cache.set(escapedName, result);
+
+    return result;
   }
 
   private resolveVersion({
@@ -180,6 +202,19 @@ class Resolver {
   }
 }
 
-export async function resolve(fetchQueue: FetchQueue, dependencies: Dependencies): Promise<ResolvedDependencies> {
-  return new Resolver({ fetchQueue }).resolve(dependencies);
+const resolutionCache = LRU<string, Promise<ResolvedDependencies>>({
+  max: 1000,
+});
+
+export async function resolveDependencies(dependencies: Dependencies): Promise<ResolvedDependencies> {
+  const key = stringify(dependencies);
+  const resolved = resolutionCache.get(key);
+  if (resolved !== undefined) {
+    return resolved;
+  }
+
+  const result = new Resolver().resolve(dependencies);
+  resolutionCache.set(key, result);
+
+  return result;
 }

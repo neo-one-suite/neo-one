@@ -14,7 +14,7 @@ export class TranspiledModule extends ModuleBase {
     engine: EngineBase,
     path: string,
     public readonly code: string,
-    public readonly sourceMap: RawSourceMap,
+    public readonly sourceMap?: RawSourceMap,
   ) {
     super(engine, path);
   }
