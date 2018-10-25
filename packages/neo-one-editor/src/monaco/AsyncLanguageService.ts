@@ -37,6 +37,10 @@ interface ParsedDetails extends ParsedBase {
   readonly codeActions?: ts.CodeAction[];
 }
 
+export interface FlattenedDiagnostic extends ts.Diagnostic {
+  readonly message: string;
+}
+
 // tslint:disable-next-line no-let
 let versionNumber = 0;
 const getVersion = () => {
@@ -219,20 +223,23 @@ export class AsyncLanguageService {
   public readonly getSyntacticDiagnostics = (
     fileName: string,
     files: { readonly [key: string]: string },
-  ): Promise<ReadonlyArray<ts.Diagnostic>> =>
+  ): Promise<ReadonlyArray<FlattenedDiagnostic>> =>
     this.languageService.then((languageService) =>
       this.withTmpFS(files, () => {
         const diagnostics = languageService.getSyntacticDiagnostics(fileName);
         clearFiles(diagnostics);
 
-        return diagnostics;
+        return diagnostics.map((diagnostic) => ({
+          ...diagnostic,
+          message: ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'),
+        }));
       }),
     );
 
   public readonly getSemanticDiagnostics = (
     fileName: string,
     files: { readonly [key: string]: string },
-  ): Promise<ReadonlyArray<ts.Diagnostic>> =>
+  ): Promise<ReadonlyArray<FlattenedDiagnostic>> =>
     Promise.all([this.fs, this.languageService]).then(([fs, languageService]) =>
       this.withTmpFS(files, () => {
         const diagnostics = this.isSmartContract
@@ -240,7 +247,10 @@ export class AsyncLanguageService {
           : languageService.getSemanticDiagnostics(fileName);
         clearFiles(diagnostics);
 
-        return diagnostics;
+        return diagnostics.map((diagnostic) => ({
+          ...diagnostic,
+          message: ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'),
+        }));
       }),
     );
 
