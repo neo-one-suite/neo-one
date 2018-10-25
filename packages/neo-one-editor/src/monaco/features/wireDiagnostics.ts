@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { merge, Observable } from 'rxjs';
 import { debounceTime, filter, map, switchMap } from 'rxjs/operators';
 import ts from 'typescript';
-import { AsyncLanguageService } from '../AsyncLanguageService';
+import { AsyncLanguageService, FlattenedDiagnostic } from '../AsyncLanguageService';
 import { MonacoWorkerManager } from '../types';
 import { getModel, offsetToPosition } from './utils';
 
@@ -23,7 +23,7 @@ const convertDiagnosticCategory = (category: ts.DiagnosticCategory) => {
 
 const convertDiagnostics = (
   model: monaco.editor.ITextModel,
-  diag: ts.Diagnostic,
+  diag: FlattenedDiagnostic,
 ): { readonly source: string; readonly data: monaco.editor.IMarkerData } | undefined => {
   const { start, length } = diag;
   if (start === undefined || length === undefined) {
@@ -40,7 +40,7 @@ const convertDiagnostics = (
     startColumn,
     endLineNumber,
     endColumn,
-    message: ts.flattenDiagnosticMessageText(diag.messageText, '\n'),
+    message: diag.message,
   };
 
   return { source: diag.source === undefined ? 'ts' : diag.source, data };
@@ -49,7 +49,9 @@ const convertDiagnostics = (
 export const wireDiagnostics = (manager: MonacoWorkerManager, languageID: string) => {
   const sources = new Set<string>();
 
-  const handleDiagnostics = (diags: ReadonlyArray<{ file: string; diagnostics: ReadonlyArray<ts.Diagnostic> }>) => {
+  const handleDiagnostics = (
+    diags: ReadonlyArray<{ file: string; diagnostics: ReadonlyArray<FlattenedDiagnostic> }>,
+  ) => {
     diags.forEach(({ file, diagnostics }) => {
       const model = getModel(file);
       if (model) {
@@ -71,7 +73,7 @@ export const wireDiagnostics = (manager: MonacoWorkerManager, languageID: string
   };
 
   const mapDiagnostics = (
-    source$: Observable<ReadonlyArray<{ file: string; diagnostics: ReadonlyArray<ts.Diagnostic> }>>,
+    source$: Observable<ReadonlyArray<{ file: string; diagnostics: ReadonlyArray<FlattenedDiagnostic> }>>,
   ) => source$.pipe(map(handleDiagnostics));
 
   const getDiagnosticsForFile = async (
