@@ -127,6 +127,24 @@ const clearFiles = (diagnostics: ReadonlyArray<ts.Diagnostic>) => {
   });
 };
 
+const convertFormattingOptions = (options: monaco.languages.FormattingOptions): ts.FormatCodeOptions => ({
+  ConvertTabsToSpaces: options.insertSpaces,
+  TabSize: options.tabSize,
+  IndentSize: options.tabSize,
+  IndentStyle: ts.IndentStyle.Smart,
+  NewLineCharacter: '\n',
+  InsertSpaceAfterCommaDelimiter: true,
+  InsertSpaceAfterSemicolonInForStatements: true,
+  InsertSpaceBeforeAndAfterBinaryOperators: true,
+  InsertSpaceAfterKeywordsInControlFlowStatements: true,
+  InsertSpaceAfterFunctionKeywordForAnonymousFunctions: true,
+  InsertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis: false,
+  InsertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets: false,
+  InsertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces: false,
+  PlaceOpenBraceOnNewLineForControlBlocks: false,
+  PlaceOpenBraceOnNewLineForFunctions: false,
+});
+
 const preferences = { includeCompletionsForModuleExports: true, includeCompletionsWithInsertText: true };
 const defaultFormatOptions: ts.FormatCodeSettings = {
   convertTabsToSpaces: true,
@@ -284,21 +302,27 @@ export class AsyncLanguageService {
     fileName: string,
     start: number,
     end: number,
-    options: ts.FormatCodeOptions,
-  ): Promise<ReadonlyArray<ts.TextChange>> =>
-    this.languageService.then((languageService) =>
+    optionsIn: monaco.languages.FormattingOptions,
+  ): Promise<ReadonlyArray<ts.TextChange>> => {
+    const options = convertFormattingOptions(optionsIn);
+
+    return this.languageService.then((languageService) =>
       languageService.getFormattingEditsForRange(fileName, start, end, options),
     );
+  };
 
   public readonly getFormattingEditsAfterKeystroke = (
     fileName: string,
     postion: number,
     ch: string,
-    options: ts.FormatCodeOptions,
-  ): Promise<ReadonlyArray<ts.TextChange>> =>
-    this.languageService.then((languageService) =>
+    optionsIn: monaco.languages.FormattingOptions,
+  ): Promise<ReadonlyArray<ts.TextChange>> => {
+    const options = convertFormattingOptions(optionsIn);
+
+    return this.languageService.then((languageService) =>
       languageService.getFormattingEditsAfterKeystroke(fileName, postion, ch, options),
     );
+  };
 
   public readonly getEmitOutput = (fileName: string): Promise<ts.EmitOutput> =>
     this.languageService.then((languageService) => languageService.getEmitOutput(fileName));

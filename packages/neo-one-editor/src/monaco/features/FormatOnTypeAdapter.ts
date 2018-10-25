@@ -2,7 +2,7 @@
 import { map, switchMap } from 'rxjs/operators';
 import ts from 'typescript';
 import { Adapter } from './Adapter';
-import { convertFormattingOptions, convertTextChange, positionToOffset } from './utils';
+import { convertTextChange, positionToOffset } from './utils';
 
 export class FormatOnTypeAdapter extends Adapter implements monaco.languages.OnTypeFormattingEditProvider {
   public get autoFormatTriggerCharacters() {
@@ -26,12 +26,7 @@ export class FormatOnTypeAdapter extends Adapter implements monaco.languages.OnT
           async (worker): Promise<ReadonlyArray<ts.TextChange>> =>
             model.isDisposed()
               ? []
-              : worker.getFormattingEditsAfterKeystroke(
-                  resource.path,
-                  positionToOffset(model, position),
-                  ch,
-                  convertFormattingOptions(options),
-                ),
+              : worker.getFormattingEditsAfterKeystroke(resource.path, positionToOffset(model, position), ch, options),
         ),
         map((edits) => (model.isDisposed() ? [] : edits.map((edit) => convertTextChange(model, edit)))),
       ),
