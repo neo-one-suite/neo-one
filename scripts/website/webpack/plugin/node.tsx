@@ -108,23 +108,6 @@ export const node = () => ({
                       },
                     },
                   },
-                  {
-                    urlPattern: /^https:\/\/registry.npmjs.org/,
-                    handler: 'cacheFirst',
-                    options: {
-                      cacheName: 'npmjs',
-                      expiration: {
-                        maxEntries: 100000,
-                        purgeOnQuotaError: true,
-                      },
-                      cacheableResponse: {
-                        statuses: [0, 200],
-                      },
-                      matchOptions: {
-                        ignoreSearch: true,
-                      },
-                    },
-                  },
                 ],
                 offlineGoogleAnalytics: true,
                 dontCacheBustUrlsMatching: /\.(?:\w{8}|\w{32})\./,

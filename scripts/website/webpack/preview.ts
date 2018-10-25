@@ -2,6 +2,8 @@
 import MiniHtmlWebpackPlugin from 'mini-html-webpack-plugin';
 import * as path from 'path';
 import webpack from 'webpack';
+// @ts-ignore
+import { GenerateSW } from 'workbox-webpack-plugin';
 import { Stage } from '../types';
 import { common } from './common';
 import { plugins } from './plugins';
@@ -45,5 +47,44 @@ export const preview = ({ stage }: { readonly stage: Stage }): webpack.Configura
             </body>
           </html>`,
     }),
-  ].concat(plugins({ stage, bundle: 'preview' })),
+  ]
+    .concat(plugins({ stage, bundle: 'preview' }))
+    .concat(
+      process.env.NEO_ONE_DISABLE_SW === 'true'
+        ? []
+        : [
+            new GenerateSW({
+              swDest: 'sw.js',
+              include: [/.(js|css|html|woff|woff2|json|png|svg|wasm)$/],
+              clientsClaim: true,
+              runtimeCaching: [
+                {
+                  urlPattern: /^https:\/\/.*.jsdelivr.com/,
+                  handler: 'cacheFirst',
+                  options: {
+                    cacheName: 'jsdelivr',
+                    expiration: {
+                      maxEntries: 100000,
+                      purgeOnQuotaError: true,
+                    },
+                    cacheableResponse: {
+                      statuses: [0, 200],
+                    },
+                    matchOptions: {
+                      ignoreSearch: true,
+                    },
+                  },
+                },
+              ],
+              dontCacheBustUrlsMatching: /\.(?:\w{8}|\w{32})\./,
+              ...(stage === 'prod'
+                ? {
+                    globDirectory: DIST_DIR,
+                    globPatterns: ['**/*.{js,css,html,woff,woff2,json,png,svg,wasm}'],
+                    maximumFileSizeToCacheInBytes: 50 * 1024 * 1024,
+                  }
+                : {}),
+            }),
+          ],
+    ),
 });
