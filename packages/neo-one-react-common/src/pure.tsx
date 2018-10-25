@@ -19,7 +19,7 @@ export function pure<P>(BaseComponent: React.ComponentType<P>): React.ComponentC
 
   class Pure extends React.Component<P> {
     public shouldComponentUpdate(nextProps: P) {
-      return shallowEqual(this.props, nextProps);
+      return !shallowEqual(this.props, nextProps);
     }
 
     public render() {
