@@ -986,10 +986,10 @@
     date-fns "^1.27.2"
     figures "^1.7.0"
 
-"@cypress/webpack-preprocessor@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@cypress/webpack-preprocessor/-/webpack-preprocessor-3.0.0.tgz#81db0364eeb4b04707c54cdf7453f7f753a449c9"
-  integrity sha512-6AY5SnYwEgt/Ey7DB8TVo1czWxDLn6jyFEU/WUNAwBLOfRsXAiyWx8BuUT38lnwcpTW25beDnvRO8x6GlHd+dw==
+"@cypress/webpack-preprocessor@3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@cypress/webpack-preprocessor/-/webpack-preprocessor-3.0.1.tgz#f6569ccc2c8c42f62491bce0b859d57177617530"
+  integrity sha512-alqtAWgNiSxmsbKYeCnUz6/dmAZtbD3wYJgw2WFFy/HE6z+/qAOE8jQ2rZeZ2PMef+XP/OjZFN+ThvARJ3hvvg==
   dependencies:
     "@babel/core" "7.0.1"
     "@babel/preset-env" "7.0.0"
