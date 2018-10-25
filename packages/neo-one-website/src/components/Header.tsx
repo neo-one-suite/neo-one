@@ -1,6 +1,7 @@
 // tslint:disable no-any
 import { Link, Logo } from '@neo-one/react-common';
 import * as React from 'react';
+import { RouteData } from 'react-static';
 import { as, Flex, styled, Toolbar } from 'reakit';
 import { ifProp, prop, withProp } from 'styled-tools';
 import { ComponentProps } from '../types';
@@ -77,10 +78,25 @@ const FocusableLink: any = as(Link as any)(Toolbar.Focusable);
 
 interface Props {
   readonly path: string;
-  readonly mostRecentBlogPostSlug?: string;
 }
 
-export const Header = ({ path, mostRecentBlogPostSlug, ...props }: Props & ComponentProps<typeof Wrapper>) => (
+const BlogLink = ({ path }: Props) => (
+  // @ts-ignore
+  <RouteData>
+    {({ mostRecentBlogPostSlug }: { readonly mostRecentBlogPostSlug: string }) => (
+      <NavigationLink
+        linkColor="gray"
+        active={path === 'blog'}
+        data-test="header-blog"
+        to={`/blog/${mostRecentBlogPostSlug}`}
+      >
+        Blog
+      </NavigationLink>
+    )}
+  </RouteData>
+);
+
+export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledToolbar>
       <Toolbar.Content>
@@ -96,15 +112,7 @@ export const Header = ({ path, mostRecentBlogPostSlug, ...props }: Props & Compo
         <NavigationLink linkColor="gray" active={path === 'course'} data-test="header-course" to="/course">
           Course
         </NavigationLink>
-        <NavigationLink
-          linkColor="gray"
-          active={path === 'blog'}
-          data-test="header-blog"
-          // Replace undefined case with actual first blog post? Only occurs on "DocLoading" screen.
-          to={mostRecentBlogPostSlug === undefined ? `/blog/welcome` : `/blog/${mostRecentBlogPostSlug}`}
-        >
-          Blog
-        </NavigationLink>
+        <BlogLink path={path} />
       </Toolbar.Content>
       <Toolbar.Content align="end">
         <FocusableLink

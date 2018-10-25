@@ -84,10 +84,10 @@ export default () => (
       if (props === undefined) {
         return <Redirect to="/docs/getting-started" />;
       }
-      const { doc, title, next, previous, sidebar, mostRecentBlogPostSlug } = props;
+      const { doc, title, next, previous, sidebar } = props;
 
       return (
-        <CoreLayout path="docs" mostRecentBlogPostSlug={mostRecentBlogPostSlug}>
+        <CoreLayout path="docs">
           <Helmet title={`${title} - NEO•ONE`} />
           <StyledGrid>
             <MarkdownWrapper>

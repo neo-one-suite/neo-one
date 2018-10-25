@@ -1,6 +1,7 @@
 // tslint:disable-next-line no-import-side-effect
 import '../polyfill';
 
+import { Redirect } from '@reach/router';
 import * as React from 'react';
 import { RouteData } from 'react-static';
 import { Grid, styled } from 'reakit';
@@ -49,18 +50,25 @@ interface Props extends BlogInfo {
 export default () => (
   // @ts-ignore
   <RouteData Loader={DocsLoading}>
-    {({ content, sidebar, mostRecentBlogPostSlug }: Props) => (
-      <CoreLayout path="blog" mostRecentBlogPostSlug={mostRecentBlogPostSlug}>
-        <Helmet title="Blog" />
-        <StyledGrid>
-          <StyledMarkdown source={content} linkColor="accent" />
-          <StyledSidebar
-            sections={sidebar}
-            renderSidebarHeader={() => <SidebarHeader title="Recent Posts" />}
-            renderSection={(sectionProps: SectionData) => <BlogSection {...sectionProps} numSections={10} />}
-          />
-        </StyledGrid>
-      </CoreLayout>
-    )}
+    {(props?: Props) => {
+      if (props === undefined) {
+        return <Redirect to="/blog/all" />;
+      }
+      const { content, sidebar } = props;
+
+      return (
+        <CoreLayout path="blog">
+          <Helmet title="Blog" />
+          <StyledGrid>
+            <StyledMarkdown source={content} linkColor="accent" />
+            <StyledSidebar
+              sections={sidebar}
+              renderSidebarHeader={() => <SidebarHeader title="Recent Posts" />}
+              renderSection={(sectionProps: SectionData) => <BlogSection {...sectionProps} numSections={10} />}
+            />
+          </StyledGrid>
+        </CoreLayout>
+      );
+    }}
   </RouteData>
 );

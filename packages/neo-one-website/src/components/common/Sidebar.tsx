@@ -1,16 +1,13 @@
-import _ from 'lodash';
 import * as React from 'react';
 import { MdMenu } from 'react-icons/md';
 import { Box, Button, Hidden, List, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { ActiveSectionContainer } from '../../containers';
-import { DocSection } from '../docs';
-import { SidebarHeader, TutorialSection } from '../tutorial';
-import { SectionData } from './types';
+import { HiddenAPI, SectionData } from './types';
 
 interface Props {
   readonly sections: ReadonlyArray<SectionData>;
-  readonly renderSection: (sectionProps: SectionData) => JSX.Element;
+  readonly renderSection?: (sectionProps: SectionData) => JSX.Element;
+  readonly renderSections?: (hidden?: HiddenAPI) => JSX.Element;
   readonly renderSidebarHeader?: () => JSX.Element;
   readonly initialVisibleMobile?: boolean;
 }
@@ -60,12 +57,19 @@ const NavIcon = styled(MdMenu)`
   padding: 8px;
 `;
 
-export const Sidebar = ({ sections, renderSidebarHeader, renderSection, initialVisibleMobile, ...props }: Props) => (
+export const Sidebar = ({
+  sections,
+  renderSidebarHeader,
+  renderSection = (_sectionProps: SectionData) => <></>,
+  renderSections,
+  initialVisibleMobile,
+  ...props
+}: Props) => (
   <Box {...props}>
     <DesktopStyledBox>
       <StyledList>
         {renderSidebarHeader ? renderSidebarHeader() : undefined}
-        {sections.map(renderSection)}
+        {renderSections === undefined ? sections.map(renderSection) : renderSections()}
       </StyledList>
     </DesktopStyledBox>
     <Hidden.Container initialState={{ visible: initialVisibleMobile }} {...props}>
@@ -74,7 +78,9 @@ export const Sidebar = ({ sections, renderSidebarHeader, renderSection, initialV
           <MobileStyledHidden {...hidden}>
             <StyledList>
               {renderSidebarHeader ? renderSidebarHeader() : undefined}
-              {sections.map((sectionProps) => renderSection({ ...sectionProps, upstreamHidden: hidden }))}
+              {renderSections === undefined
+                ? sections.map((sectionProps) => renderSection({ ...sectionProps, upstreamHidden: hidden }))
+                : renderSections(hidden)}
             </StyledList>
           </MobileStyledHidden>
           <Hidden.Toggle as={MobileNavButton} {...hidden}>

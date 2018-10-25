@@ -10,14 +10,12 @@ interface Effects {
   readonly setActiveSection: (section: string) => void;
 }
 
-const makeEffects = (): EffectMap<State, Effects> => ({
+const effects: EffectMap<State, Effects> = {
   setActiveSection: (section: string) => ({ setState }: { setState: (state: Partial<State>) => void }) => {
     setState({ activeSection: section });
   },
-});
-
-export const ActiveSectionContainer = (props: ContainerProps<State, {}, {}, Effects>) => {
-  const effects = makeEffects();
-
-  return <Container {...props} effects={effects} />;
 };
+
+export const ActiveSectionContainer = (props: ContainerProps<State, {}, {}, Effects>) => (
+  <Container {...props} effects={effects} />
+);
