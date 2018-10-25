@@ -2011,7 +2011,16 @@
   dependencies:
     "@babel/runtime" "^7.0.0"
 
-"@render-props/scrollable@^0.1.16":
+"@render-props/rect@^0.1.11":
+  version "0.1.18"
+  resolved "https://registry.yarnpkg.com/@render-props/rect/-/rect-0.1.18.tgz#c7ca2524a4f675ef8ef4e3a0c4d778bc4df3c303"
+  integrity sha512-yX/CzhKuOMTw4zPWC8LM2O36rjgLX6ZN7bK6Q2ZJnHjit38Xk534MUah+TDpGYcMe2GLhZXyhAIndsKmlhImVw==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    "@render-props/events" "^0.1.2"
+    "@render-props/throttle" "^0.1.5"
+
+"@render-props/scrollable@^0.1.11", "@render-props/scrollable@^0.1.16":
   version "0.1.16"
   resolved "https://registry.yarnpkg.com/@render-props/scrollable/-/scrollable-0.1.16.tgz#dd0a4bfb32c5238e53561a663fbf2d9612412d46"
   integrity sha512-A3MS03mRqZxhJY3hASh2pJHTMUpZZm1vR999t2AqJa0ov1LIlKPF5kCSEKpsD5HjNdaLb4i/6c0qGW5Dvz93RQ==
@@ -2036,6 +2045,18 @@
   dependencies:
     "@babel/runtime" "^7.0.0"
     raf "^3.4.0"
+
+"@render-props/viewport@^0.2.13":
+  version "0.2.13"
+  resolved "https://registry.yarnpkg.com/@render-props/viewport/-/viewport-0.2.13.tgz#78a249ca1912faa1176bc831984ed64d25e1f45e"
+  integrity sha512-BfR+AdNZT0BltD3aoqWjZTH+DOgsRYtxNcL+sKp50gO9xGp8ObsBHoiLOs4cP5QSa8vu3cBJGQ6FY/m1bo71jA==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    "@render-props/events" "^0.1.2"
+    "@render-props/rect" "^0.1.11"
+    "@render-props/scrollable" "^0.1.11"
+    "@render-props/throttle" "^0.1.5"
+    "@render-props/utils" "^0.2.1"
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"

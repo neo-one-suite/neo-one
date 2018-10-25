@@ -1,7 +1,9 @@
+import _ from 'lodash';
 import * as React from 'react';
 import { MdMenu } from 'react-icons/md';
 import { Box, Button, Hidden, List, styled } from 'reakit';
 import { prop } from 'styled-tools';
+import { ActiveSectionContainer } from '../../containers';
 import { DocSection } from '../docs';
 import { SidebarHeader, TutorialSection } from '../tutorial';
 import { SectionData } from './types';
@@ -61,14 +63,28 @@ export const Sidebar = ({ sections, tutorial, ...props }: Props) => (
     <DesktopStyledBox>
       <StyledList>
         {tutorial ? <SidebarHeader /> : undefined}
-        {sections.map(
-          ({ section, subsections }) =>
-            tutorial ? (
-              <TutorialSection section={section} subsections={subsections} />
-            ) : (
-              <DocSection section={section} subsections={subsections} />
-            ),
-        )}
+        <ActiveSectionContainer>
+          {({ activeSection, setActiveSection }) =>
+            sections.map(
+              ({ section, subsections }) =>
+                tutorial ? (
+                  <TutorialSection
+                    activeSection={activeSection}
+                    setActiveSection={setActiveSection}
+                    section={section}
+                    subsections={subsections}
+                    sections={_.flatten(
+                      sections.map(({ section: sectionName, subsections: subsectionsInfo }) =>
+                        [sectionName].concat(subsectionsInfo.map(({ title }) => title)),
+                      ),
+                    )}
+                  />
+                ) : (
+                  <DocSection section={section} subsections={subsections} />
+                ),
+            )
+          }
+        </ActiveSectionContainer>
       </StyledList>
     </DesktopStyledBox>
     <Hidden.Container initialState={{ visible: true }} {...props}>
@@ -77,14 +93,29 @@ export const Sidebar = ({ sections, tutorial, ...props }: Props) => (
           <MobileStyledHidden {...hidden}>
             <StyledList>
               {tutorial ? <SidebarHeader /> : undefined}
-              {sections.map(
-                ({ section, subsections }) =>
-                  tutorial ? (
-                    <TutorialSection section={section} subsections={subsections} upstreamHidden={hidden} />
-                  ) : (
-                    <DocSection section={section} subsections={subsections} upstreamHidden={hidden} />
-                  ),
-              )}
+              <ActiveSectionContainer>
+                {({ activeSection, setActiveSection }) =>
+                  sections.map(
+                    ({ section, subsections }) =>
+                      tutorial ? (
+                        <TutorialSection
+                          activeSection={activeSection}
+                          setActiveSection={setActiveSection}
+                          section={section}
+                          subsections={subsections}
+                          sections={_.flatten(
+                            sections.map(({ section: sectionName, subsections: subsectionsInfo }) =>
+                              [sectionName].concat(subsectionsInfo.map(({ title }) => title)),
+                            ),
+                          )}
+                          upstreamHidden={hidden}
+                        />
+                      ) : (
+                        <DocSection section={section} subsections={subsections} upstreamHidden={hidden} />
+                      ),
+                  )
+                }
+              </ActiveSectionContainer>
             </StyledList>
           </MobileStyledHidden>
           <Hidden.Toggle as={MobileNavButton} {...hidden}>
