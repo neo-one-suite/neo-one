@@ -23,7 +23,7 @@ const EditorBase = ({ selected, onTestsPass, ...props }: Props) => {
       {...props}
       id={getChapterTo(selected.course, selected.lesson, selected.chapter)}
       createPreviewURL={() =>
-        process.env.NODE_ENV === 'production' ? 'https://neo-one-course-preview.netlify.com' : `http://localhost:8080`
+        process.env.NEO_ONE_PREVIEW_URL === undefined ? 'http://localhost:8080' : process.env.NEO_ONE_PREVIEW_URL
       }
       initialFiles={selectChapter(selected).files.map((file) => ({
         path: file.path,

@@ -885,7 +885,7 @@ export const createFSHost = (fs: FileSystem) => {
       return [];
     }
 
-    return _.filter<string>(fs.readdirSync(path), (dir) =>
+    return _.filter<string>(fs.readdirSync(path), (dir: string) =>
       fileSystemEntryExists(combinePaths(path, dir), FileSystemEntryKind.Directory),
     );
   }

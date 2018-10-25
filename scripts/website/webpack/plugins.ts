@@ -23,7 +23,10 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
       'global.GENTLY': false,
       'process.env': {
         NEO_ONE_DEV: JSON.stringify('true'),
-        NEO_ONE_API_URL: JSON.stringify('http://localhost:3001/'),
+        NEO_ONE_API_URL: JSON.stringify(stage === 'prod' ? 'https://neo-one-api.now.sh/' : 'http://localhost:3001/'),
+        NEO_ONE_PREVIEW_URL: JSON.stringify(
+          stage === 'prod' ? 'https://neo-one-course-preview.netlify.com' : 'http://localhost:8080',
+        ),
         TSC_NONPOLLING_WATCHER: JSON.stringify('false'),
         TSC_WATCHFILE: JSON.stringify('false'),
         TSC_WATCHDIRECTORY: JSON.stringify('false'),
@@ -46,7 +49,7 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
     new WebpackBar({ profile: true }),
   ]
     .concat(
-      stage === 'dev' || stage === 'node' || process.env.NEO_ONE_CACHE === 'true' || bundle === 'server'
+      stage === 'dev' || stage === 'node' || process.env.NEO_ONE_CACHE === 'true'
         ? [
             new HardSourceWebpackPlugin({
               cacheDirectory: path.resolve(APP_ROOT_DIR, 'node_modules', '.cache', 'hswp', stage, bundle),
@@ -55,12 +58,14 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
               },
             }),
           ]
-        : [
-            new ExtractCssChunksPlugin({
-              filename: '[name].[chunkHash:8].css',
-              chunkFilename: '[id].[chunkHash:8].css',
-            }),
-          ],
+        : bundle === 'server'
+          ? []
+          : [
+              new ExtractCssChunksPlugin({
+                filename: '[name].[chunkHash:8].css',
+                chunkFilename: '[id].[chunkHash:8].css',
+              }),
+            ],
     )
     .concat(stage === 'dev' || stage === 'node' ? [] : [new LodashModuleReplacementPlugin()])
     .concat(
@@ -70,7 +75,7 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
             new CompressionPlugin({
               filename: '[path].gz[query]',
               algorithm: 'gzip',
-              test: /\.(js|css|html|svg|woff|woff2|png)$/,
+              test: /\.(js|css|html|woff|woff2|json|png|svg|wasm)$/,
               threshold: 1024,
               minRatio: 0.8,
               cache: true,
