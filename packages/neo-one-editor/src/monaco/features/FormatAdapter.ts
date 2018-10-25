@@ -2,7 +2,7 @@
 import { map, switchMap } from 'rxjs/operators';
 import ts from 'typescript';
 import { Adapter } from './Adapter';
-import { convertFormattingOptions, convertTextChange, positionToOffset } from './utils';
+import { convertTextChange, positionToOffset } from './utils';
 
 export class FormatAdapter extends Adapter implements monaco.languages.DocumentRangeFormattingEditProvider {
   public provideDocumentRangeFormattingEdits(
@@ -25,7 +25,7 @@ export class FormatAdapter extends Adapter implements monaco.languages.DocumentR
                   resource.path,
                   positionToOffset(model, { lineNumber: range.startLineNumber, column: range.startColumn }),
                   positionToOffset(model, { lineNumber: range.endLineNumber, column: range.endColumn }),
-                  convertFormattingOptions(options),
+                  options,
                 ),
         ),
         map((edits) => (model.isDisposed() ? [] : edits.map((edit) => convertTextChange(model, edit)))),

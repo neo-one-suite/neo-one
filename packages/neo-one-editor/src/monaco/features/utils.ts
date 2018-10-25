@@ -30,24 +30,6 @@ export const getModel = (resource: monaco.Uri | string): monaco.editor.ITextMode
   return model == undefined || model.isDisposed() ? undefined : model;
 };
 
-export const convertFormattingOptions = (options: monaco.languages.FormattingOptions): ts.FormatCodeOptions => ({
-  ConvertTabsToSpaces: options.insertSpaces,
-  TabSize: options.tabSize,
-  IndentSize: options.tabSize,
-  IndentStyle: ts.IndentStyle.Smart,
-  NewLineCharacter: '\n',
-  InsertSpaceAfterCommaDelimiter: true,
-  InsertSpaceAfterSemicolonInForStatements: true,
-  InsertSpaceBeforeAndAfterBinaryOperators: true,
-  InsertSpaceAfterKeywordsInControlFlowStatements: true,
-  InsertSpaceAfterFunctionKeywordForAnonymousFunctions: true,
-  InsertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis: false,
-  InsertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets: false,
-  InsertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces: false,
-  PlaceOpenBraceOnNewLineForControlBlocks: false,
-  PlaceOpenBraceOnNewLineForFunctions: false,
-});
-
 export const convertTags = (tags: ReadonlyArray<ts.JSDocTagInfo> | undefined) =>
   tags
     ? '\n\n' +
