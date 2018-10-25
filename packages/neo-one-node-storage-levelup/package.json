@@ -12,7 +12,7 @@
     "@neo-one/utils": "^1.0.0-preview.1",
     "@types/abstract-leveldown": "^5.0.1",
     "@types/bytewise": "^1.1.0",
-    "abstract-leveldown": "^5.0.0",
+    "abstract-leveldown": "^6.0.0",
     "bytewise": "^1.1.0",
     "levelup": "^3.1.1",
     "rxjs": "^6.3.3",
