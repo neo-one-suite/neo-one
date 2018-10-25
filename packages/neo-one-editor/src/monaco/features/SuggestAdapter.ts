@@ -1,10 +1,9 @@
 /// <reference types="monaco-editor/monaco" />
 // tslint:disable:prefer-template
 import { map, switchMap } from 'rxjs/operators';
-import ts from 'typescript';
 import { Adapter } from './Adapter';
 import { Kind } from './Kind';
-import { convertActions, convertTags, getModel, positionToOffset, wrapCode } from './utils';
+import { convertActions, getModel, positionToOffset, wrapCode } from './utils';
 
 interface CompletionItem extends monaco.languages.CompletionItem {
   readonly uri: monaco.Uri;
@@ -114,7 +113,7 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
           async (worker) =>
             model.isDisposed()
               ? undefined
-              : worker.getCompletionEntryDetails(
+              : worker.parseCompletionEntryDetails(
                   resource.path,
                   positionToOffset(model, position),
                   myItem.label,
@@ -127,10 +126,9 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
             return myItem;
           }
 
-          const contents = ts.displayPartsToString(details.displayParts);
           let rest = '';
           if (details.documentation !== undefined || details.tags !== undefined) {
-            rest = '\n\n---\n\n' + ts.displayPartsToString(details.documentation) + convertTags(details.tags);
+            rest = '\n\n---\n\n' + details.documentation + details.tags;
           }
 
           return {
@@ -139,7 +137,7 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
             label: details.name,
             kind: convertKind(details.kind),
             documentation: {
-              value: wrapCode(model.getModeId(), contents) + rest,
+              value: wrapCode(model.getModeId(), details.contents) + rest,
             },
             additionalTextEdits:
               details.codeActions === undefined ? undefined : convertActions(model, details.codeActions),

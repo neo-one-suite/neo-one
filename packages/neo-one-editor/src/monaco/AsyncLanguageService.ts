@@ -20,6 +20,23 @@ interface Options {
   readonly fileNames: ReadonlyArray<string>;
 }
 
+interface ParsedBase {
+  readonly tags?: string;
+  readonly documentation?: string;
+  readonly contents: string;
+}
+
+interface ParsedInfo extends ParsedBase {
+  readonly textSpan: ts.TextSpan;
+}
+
+interface ParsedDetails extends ParsedBase {
+  readonly name: string;
+  readonly kind: ts.ScriptElementKind;
+  // tslint:disable-next-line:readonly-array
+  readonly codeActions?: ts.CodeAction[];
+}
+
 // tslint:disable-next-line no-let
 let versionNumber = 0;
 const getVersion = () => {
@@ -144,6 +161,24 @@ const convertFormattingOptions = (options: monaco.languages.FormattingOptions): 
   PlaceOpenBraceOnNewLineForControlBlocks: false,
   PlaceOpenBraceOnNewLineForFunctions: false,
 });
+const convertTags = (tags: ReadonlyArray<ts.JSDocTagInfo> | undefined) =>
+  tags
+    ? // tslint:disable-next-line:prefer-template
+      '\n\n' +
+      tags
+        .map((tag) => {
+          if (tag.name === 'example' && tag.text) {
+            return `*@${tag.name}*\n` + '```typescript-internal\n' + tag.text + '\n```\n';
+          }
+          const label = `*@${tag.name}*`;
+          if (!tag.text) {
+            return label;
+          }
+
+          return label + (tag.text.match(/\r\n|\n/g) ? ' \n' + tag.text : ` - ${tag.text}`);
+        })
+        .join('  \n\n')
+    : '';
 
 const preferences = { includeCompletionsForModuleExports: true, includeCompletionsWithInsertText: true };
 const defaultFormatOptions: ts.FormatCodeSettings = {
@@ -245,6 +280,28 @@ export class AsyncLanguageService {
       languageService.getCompletionEntryDetails(fileName, position, entry, formatOptions, source, preferences),
     );
 
+  public readonly parseCompletionEntryDetails = async (
+    fileName: string,
+    position: number,
+    entry: string,
+    formatOptions: ts.FormatCodeOptions | ts.FormatCodeSettings = defaultFormatOptions,
+    source?: string,
+  ): Promise<ParsedDetails | undefined> => {
+    const details = await this.getCompletionEntryDetails(fileName, position, entry, formatOptions, source);
+    if (!details) {
+      return undefined;
+    }
+
+    return {
+      contents: ts.displayPartsToString(details.displayParts),
+      documentation: ts.displayPartsToString(details.documentation),
+      tags: convertTags(details.tags),
+      name: details.name,
+      kind: details.kind,
+      codeActions: details.codeActions,
+    };
+  };
+
   public readonly getCodeFixesAtPosition = (
     fileName: string,
     start: number,
@@ -267,8 +324,79 @@ export class AsyncLanguageService {
       this.withTmpFS(files, () => languageService.getSignatureHelpItems(fileName, position, undefined)),
     );
 
+  public readonly createSignatures = async (
+    fileName: string,
+    position: number,
+    files: { readonly [key: string]: string },
+  ): Promise<
+    | {
+        readonly activeSignature: number;
+        readonly activeParameter: number;
+        readonly signatures: ReadonlyArray<monaco.languages.SignatureInformation>;
+      }
+    | undefined
+  > => {
+    const info = await this.getSignatureHelpItems(fileName, position, files);
+    if (!info) {
+      return undefined;
+    }
+
+    const signatures: monaco.languages.SignatureInformation[] = [];
+
+    info.items.forEach((item) => {
+      const signature: monaco.languages.SignatureInformation = {
+        label: '',
+        documentation: undefined,
+        parameters: [],
+      };
+      // tslint:disable-next-line:no-object-mutation
+      signature.label += ts.displayPartsToString(item.prefixDisplayParts);
+      item.parameters.forEach((p, i, a) => {
+        const label = ts.displayPartsToString(p.displayParts);
+        const parameter: monaco.languages.ParameterInformation = {
+          label,
+          documentation: {
+            value: ts.displayPartsToString(p.documentation),
+          },
+        };
+        // tslint:disable-next-line:no-object-mutation
+        signature.label += label;
+        // tslint:disable-next-line:no-array-mutation
+        signature.parameters.push(parameter);
+        if (i < a.length - 1) {
+          // tslint:disable-next-line:no-object-mutation
+          signature.label += ts.displayPartsToString(item.separatorDisplayParts);
+        }
+      });
+      // tslint:disable-next-line:no-object-mutation
+      signature.label += ts.displayPartsToString(item.suffixDisplayParts);
+      // tslint:disable-next-line:no-array-mutation
+      signatures.push(signature);
+    });
+
+    return {
+      activeSignature: info.selectedItemIndex,
+      activeParameter: info.argumentIndex,
+      signatures,
+    };
+  };
+
   public readonly getQuickInfoAtPosition = (fileName: string, position: number): Promise<ts.QuickInfo | undefined> =>
     this.languageService.then((languageService) => languageService.getQuickInfoAtPosition(fileName, position));
+
+  public readonly parseInfoAtPosition = async (fileName: string, position: number): Promise<ParsedInfo | undefined> => {
+    const info = await this.getQuickInfoAtPosition(fileName, position);
+    if (!info) {
+      return undefined;
+    }
+
+    return {
+      textSpan: info.textSpan,
+      tags: convertTags(info.tags),
+      documentation: ts.displayPartsToString(info.documentation),
+      contents: ts.displayPartsToString(info.displayParts),
+    };
+  };
 
   public readonly getOccurrencesAtPosition = (
     fileName: string,
