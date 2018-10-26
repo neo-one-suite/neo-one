@@ -250,6 +250,7 @@ export class MainEngine {
         builderManager.dispose();
         jsonRPCLocalProviderManager.dispose();
         managePackagesDisposable.dispose();
+        testRunnerManager.dispose();
         await Promise.all([fs.dispose(), transpileCache.dispose(), metaDB.close()]);
       },
       id,

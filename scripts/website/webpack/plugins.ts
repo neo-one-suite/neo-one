@@ -27,6 +27,9 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
         NEO_ONE_PREVIEW_URL: JSON.stringify(
           stage === 'prod' ? 'https://neo-one-course-preview.netlify.com' : 'http://localhost:8080',
         ),
+        NEO_ONE_TEST_RUNNER_URL: JSON.stringify(
+          stage === 'prod' ? 'https://neo-one-test-runner.netlify.com' : 'http://localhost:8081',
+        ),
         TSC_NONPOLLING_WATCHER: JSON.stringify('false'),
         TSC_WATCHFILE: JSON.stringify('false'),
         TSC_WATCHDIRECTORY: JSON.stringify('false'),

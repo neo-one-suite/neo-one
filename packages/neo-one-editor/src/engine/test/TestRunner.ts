@@ -302,7 +302,9 @@ export class TestRunner {
     const test = engine.modules.get(path);
 
     if (test !== undefined) {
-      await runTestsSerially(test, createHandleTestEvent(engine, test, this.callbacks), this.callbacks.setTestsRunning);
+      await runTestsSerially(test, createHandleTestEvent(engine, test, this.callbacks), async (isRunning: boolean) =>
+        this.callbacks.setTestsRunning(isRunning),
+      );
     }
   }
 

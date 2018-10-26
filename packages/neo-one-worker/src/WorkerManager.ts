@@ -7,11 +7,12 @@ export class WorkerManager<T extends WorkerConstructor> {
   public readonly instance$: Observable<WorkerInstance<T>>;
   private readonly subscription: Subscription | undefined;
   private readonly mutableDisposables: Disposable[] = [];
+  private mutableWorkerManagerPromise: Promise<SingleWorkerManager<T>> | undefined;
   private mutableWorkerManager: SingleWorkerManager<T> | undefined;
   private mutableDisposed = false;
 
   public constructor(
-    private readonly createEndpoint: () => EndpointLike,
+    private readonly createEndpoint: () => Promise<EndpointLike> | EndpointLike,
     private readonly getOptions: () => {
       readonly options: WorkerOptions<T>;
       readonly disposables: ReadonlyArray<Disposable>;
@@ -45,10 +46,12 @@ export class WorkerManager<T extends WorkerConstructor> {
       };
     });
 
+    this.eagerStart();
     if (forceRestart$ !== undefined) {
       // tslint:disable-next-line rxjs-no-ignored-error
       this.subscription = forceRestart$.subscribe(() => {
         this.stopWorker();
+        this.eagerStart();
       });
     }
   }
@@ -63,6 +66,17 @@ export class WorkerManager<T extends WorkerConstructor> {
         disposable.dispose();
       });
       this.stopWorker();
+      if (this.mutableWorkerManagerPromise !== undefined) {
+        this.mutableWorkerManagerPromise
+          .then((manager) => {
+            manager.dispose();
+            this.mutableWorkerManagerPromise = undefined;
+          })
+          .catch((error) => {
+            // tslint:disable-next-line no-console
+            console.error(error);
+          });
+      }
     }
   }
 
@@ -72,42 +86,57 @@ export class WorkerManager<T extends WorkerConstructor> {
 
   public async withInstance<TResult>(func: (instance: WorkerInstance<T>) => Promise<TResult>): Promise<TResult>;
   public async withInstance<TResult>(func: (instance: WorkerInstance<T>) => TResult): Promise<TResult> {
+    const manager = await this.getSingleWorkerManager();
+
     // tslint:disable-next-line no-any
-    return this.getSingleWorkerManager().withInstance(func as any);
+    return manager.withInstance(func as any);
   }
 
   public async getInstance(): Promise<WorkerInstance<T>> {
-    return this.getSingleWorkerManager().getInstance();
+    const manager = await this.getSingleWorkerManager();
+
+    return manager.getInstance();
+  }
+
+  private eagerStart(): void {
+    this.getInstance().catch((error) => {
+      // tslint:disable-next-line no-console
+      console.error(error);
+    });
   }
 
   private readonly stopWorker = () => {
     if (this.mutableWorkerManager !== undefined) {
       this.mutableWorkerManager.dispose();
+      this.mutableWorkerManagerPromise = undefined;
       this.mutableWorkerManager = undefined;
     }
   };
 
-  private getSingleWorkerManager(): SingleWorkerManager<T> {
+  private async getSingleWorkerManager(): Promise<SingleWorkerManager<T>> {
     if (this.mutableDisposed) {
       throw new Error('WorkerManager was already disposed');
     }
 
-    if (this.mutableWorkerManager === undefined) {
-      const endpoint = this.createEndpoint();
-      const { options, disposables } = this.getOptions();
-      this.mutableWorkerManager = new SingleWorkerManager(
-        endpoint,
-        options,
-        disposables,
-        this.idleTimeoutMS,
-        (manager) => {
-          if (this.mutableWorkerManager === manager) {
-            this.mutableWorkerManager = undefined;
-          }
-        },
-      );
+    if (this.mutableWorkerManagerPromise === undefined) {
+      this.mutableWorkerManagerPromise = Promise.resolve(this.createEndpoint()).then((endpoint) => {
+        const { options, disposables } = this.getOptions();
+        this.mutableWorkerManager = new SingleWorkerManager(
+          endpoint,
+          options,
+          disposables,
+          this.idleTimeoutMS,
+          (manager) => {
+            if (this.mutableWorkerManager === manager) {
+              this.mutableWorkerManager = undefined;
+            }
+          },
+        );
+
+        return this.mutableWorkerManager;
+      });
     }
 
-    return this.mutableWorkerManager;
+    return this.mutableWorkerManagerPromise;
   }
 }

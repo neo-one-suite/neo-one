@@ -5,8 +5,6 @@ import * as ReactErrorOverlay from '../../error/ReactErrorOverlay';
 import { createFileSystem, createTranspileCache } from '../create';
 import { MainEngine, RegisterPreviewEngineResult } from '../main';
 import { ModuleBase, RemoteEngine } from '../remote';
-import { getPathWithExports } from '../remote/packages';
-import { previewPackages } from './previewPackages';
 
 export interface PreviewEngineCreateOptions {
   readonly port: MessagePort;
@@ -50,14 +48,6 @@ export class PreviewEngine extends RemoteEngine {
         transpileCache,
         builderManager,
         jsonRPCLocalProviderManager,
-        pathWithExports: getPathWithExports(
-          {
-            fs,
-            builderManager,
-            jsonRPCLocalProviderManager,
-          },
-          previewPackages,
-        ),
       });
       mutablePreviewEngine = previewEngine;
       transpileCache.changes$

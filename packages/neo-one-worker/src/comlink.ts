@@ -124,7 +124,7 @@ const proxyTransferHandler: TransferHandler = {
 };
 
 const throwTransferHandler = {
-  canHandle: (obj: {}): Boolean => obj && (obj as any)[throwSymbol],
+  canHandle: (obj: {}): Boolean => (obj && (obj as any)[throwSymbol]) || obj instanceof Error,
   serialize: (obj: any): {} => {
     const message = obj && obj.message;
     const stack = obj && obj.stack;

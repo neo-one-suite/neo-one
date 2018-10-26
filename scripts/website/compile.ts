@@ -10,7 +10,7 @@ import serve from 'webpack-serve';
 import yargs from 'yargs';
 import { createKillProcess } from './createKillProcess';
 import { Bundle } from './types';
-import { overlay, preview, server, SERVER_DIST_DIR, workers } from './webpack';
+import { overlay, preview, server, SERVER_DIST_DIR, testRunner, workers } from './webpack';
 
 yargs.describe('watch', 'Run in watch mode.').default('watch', false);
 yargs.describe('bundle', 'Bundle to compile.').default('bundle', 'react-static');
@@ -23,13 +23,11 @@ const watchConfig = (config: webpack.Configuration): (() => Promise<void>) =>
   createDispose(webpack(config).watch({}, () => undefined));
 const watchWorkers = () => watchConfig(workers({ stage: devStage }));
 const watchOverlay = () => watchConfig(overlay({ stage: devStage }));
-const watchPreview = async () => {
-  const webpackConfig = preview({ stage: devStage });
-
+const watchWindow = async (config: webpack.Configuration, port: number) => {
   const { app } = await serve(
     {},
     {
-      config: webpackConfig,
+      config,
       open: false,
       hotClient: true,
       // tslint:disable-next-line no-any
@@ -44,6 +42,7 @@ const watchPreview = async () => {
           ),
         );
       },
+      port,
     },
   );
 
@@ -52,6 +51,8 @@ const watchPreview = async () => {
       app.stop(resolve);
     });
 };
+const watchPreview = async () => watchWindow(preview({ stage: devStage }), 8080);
+const watchTestRunner = async () => watchWindow(testRunner({ stage: devStage }), 8081);
 const watchServer = async () => {
   const stop = watchConfig(server({ stage: devStage }));
   // tslint:disable-next-line:no-require-imports
@@ -106,6 +107,7 @@ const runCompiler = async ({ compiler }: { readonly compiler: webpack.Compiler }
 const compileConfig = async (config: webpack.Configuration) => runCompiler({ compiler: webpack(config) });
 const compilePreview = async () => compileConfig(preview({ stage: 'prod' }));
 const compileWorkers = async () => compileConfig(workers({ stage: 'prod' }));
+const compileTestRunner = async () => compileConfig(testRunner({ stage: 'prod' }));
 const compileOverlay = async () => compileConfig(overlay({ stage: 'prod' }));
 const compileServer = async () => compileConfig(server({ stage: 'prod' }));
 
@@ -130,6 +132,8 @@ const createWatch = async (bundle: Bundle) => {
       return watchOverlay();
     case 'server':
       return watchServer();
+    case 'testRunner':
+      return watchTestRunner();
     default:
       throw new Error(`Unknown bundle: ${bundle}`);
   }
@@ -145,6 +149,8 @@ const compile = async (bundle: Bundle) => {
       return compileOverlay();
     case 'server':
       return compileServer();
+    case 'testRunner':
+      return compileTestRunner();
     default:
       throw new Error(`Unknown bundle: ${bundle}`);
   }

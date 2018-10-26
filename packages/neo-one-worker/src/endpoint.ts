@@ -1,10 +1,14 @@
 // tslint:disable no-any
 import * as comlink from './comlink';
 
-export type EndpointLike = comlink.Endpoint | Window | Worker;
+export type EndpointLike = comlink.Endpoint | Window | Worker | WorkerEndpoint;
 export interface WorkerEndpoint extends comlink.Endpoint {
   readonly start: () => void;
   readonly close: () => void;
+}
+
+function isWorkerEndpoint(endpoint: EndpointLike): endpoint is WorkerEndpoint {
+  return ['postMessage', 'addEventListener', 'removeEventListener', 'start', 'close'].every((prop) => prop in endpoint);
 }
 
 function isWindow(endpoint: EndpointLike): endpoint is Window {
@@ -64,11 +68,13 @@ function endpointEndpoint(endpoint: comlink.Endpoint): WorkerEndpoint {
 }
 
 export function getEndpoint(endpointIn: EndpointLike): WorkerEndpoint {
-  return isWindow(endpointIn)
-    ? windowEndpoint(endpointIn)
-    : isWorker(endpointIn)
-      ? workerEndpoint(endpointIn)
-      : endpointEndpoint(endpointIn);
+  return isWorkerEndpoint(endpointIn)
+    ? endpointIn
+    : isWindow(endpointIn)
+      ? windowEndpoint(endpointIn)
+      : isWorker(endpointIn)
+        ? workerEndpoint(endpointIn)
+        : endpointEndpoint(endpointIn);
 }
 
 export function activate(endpoint: any): void {

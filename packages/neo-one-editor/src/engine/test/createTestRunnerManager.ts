@@ -23,7 +23,7 @@ export const createTestRunnerManager = (
           endpoint: disposableEndpoint.endpoint,
           builderManager: comlink.proxyValue(builderManager),
           jsonRPCLocalProviderManager: comlink.proxyValue(jsonRPCLocalProviderManager),
-          callbacks,
+          callbacks: { ...callbacks },
         };
 
         return { options, disposables: [disposableEndpoint] };

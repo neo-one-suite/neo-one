@@ -37,7 +37,7 @@ export class SingleWorkerManager<T extends WorkerConstructor> {
     this.idleCheckInterval = setInterval(() => this.checkIfIdle(), 30 * 1000);
     // tslint:disable-next-line no-any
     const WorkerClass = comlink.proxy(this.endpoint) as any;
-    this.instance = Promise.resolve(options).then((opts) => new WorkerClass(opts));
+    this.instance = Promise.resolve(options).then(async (opts) => new WorkerClass(opts));
   }
 
   public dispose(): void {
