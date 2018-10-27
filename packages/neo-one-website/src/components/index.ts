@@ -7,4 +7,4 @@ export * from './course';
 export * from './docs';
 export * from './home';
 export * from './tutorial';
-export * from './common';
+export * from './content';

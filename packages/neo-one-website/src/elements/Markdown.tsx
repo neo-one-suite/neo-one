@@ -1,4 +1,3 @@
-/// <reference lib="webworker" />
 import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
 // @ts-ignore
@@ -12,11 +11,14 @@ import '../../static/css/prism.css';
 import 'clipboard';
 // @ts-ignore
 import Prism from 'prismjs/components/prism-core';
+// @ts-ignore
+const _WorkerGlobalScope = typeof WorkerGlobalScope === 'undefined' ? undefined : WorkerGlobalScope;
 // tslint:disable-next-line no-any
 const _self: any =
   typeof window !== 'undefined'
     ? window // if in browser
-    : typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope
+    : // @ts-ignore
+      _WorkerGlobalScope !== undefined && self instanceof _WorkerGlobalScope
       ? self // if in worker
       : {}; // if in node js
 _self.Prism = Prism;

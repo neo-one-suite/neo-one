@@ -1,6 +1,9 @@
 import * as fs from 'fs-extra';
 import * as matter from 'gray-matter';
+import _ from 'lodash';
 import * as path from 'path';
+import { DocsProps } from '../components';
+import { AdjacentInfo } from '../types';
 
 interface MDDocHeader {
   readonly title: string;
@@ -9,12 +12,7 @@ interface MDDocHeader {
 }
 
 interface DocInfoBase extends MDDocHeader {
-  readonly doc: string;
-}
-
-export interface AdjacentInfo {
-  readonly slug: string;
-  readonly title: string;
+  readonly content: string;
 }
 
 interface DocInfo extends DocInfoBase {
@@ -24,12 +22,36 @@ interface DocInfo extends DocInfoBase {
 
 const DOCS_SOURCE = path.resolve(__dirname, '..', '..', 'docs');
 
-export const getDocs = async (): Promise<ReadonlyArray<DocInfo>> => {
+export const getDocs = async (): Promise<ReadonlyArray<DocsProps>> => {
   const docFiles = await fs.readdir(DOCS_SOURCE);
 
-  const docs = await Promise.all(docFiles.map(async (dir) => getDoc(dir)));
+  const docsBare = await Promise.all(docFiles.map(async (dir) => getDoc(dir)));
+  const docs = addAdjacent(docsBare);
+  const sidebar = Object.entries(
+    _.groupBy(
+      docs.map((document) => ({
+        title: document.title,
+        slug: document.slug,
+        section: document.section,
+      })),
+      (obj) => obj.section,
+    ),
+  ).map(([section, subsections]) => ({
+    title: section,
+    subsections: subsections.map((subsection) => ({
+      title: subsection.title,
+      slug: subsection.slug,
+    })),
+  }));
 
-  return getAdjacent(docs);
+  return docs.map((doc) => ({
+    current: doc.slug,
+    title: doc.title,
+    content: doc.content,
+    sidebar,
+    next: doc.next,
+    previous: doc.previous,
+  }));
 };
 
 const getDoc = async (docFile: string): Promise<DocInfoBase> => {
@@ -37,14 +59,14 @@ const getDoc = async (docFile: string): Promise<DocInfoBase> => {
   const docHeader = doc.data as MDDocHeader;
 
   return {
-    slug: docHeader.slug,
+    slug: `/docs/${docHeader.slug}`,
     title: docHeader.title,
     section: docHeader.section,
-    doc: doc.content,
+    content: doc.content,
   };
 };
 
-const getAdjacent = (docs: ReadonlyArray<DocInfoBase>): ReadonlyArray<DocInfo> =>
+const addAdjacent = (docs: ReadonlyArray<DocInfoBase>): ReadonlyArray<DocInfo> =>
   docs.map((doc, idx) => {
     let previous;
     let next;

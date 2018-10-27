@@ -1,34 +1,30 @@
 import * as fs from 'fs-extra';
 import * as matter from 'gray-matter';
 import * as path from 'path';
-import { SectionData, SubsectionData } from '../components';
+import { BlogAllProps, BlogProps } from '../components';
 
 const BLOG_SOURCE = path.resolve(__dirname, '..', '..', 'blog');
 
-export interface MDBlogHeader extends SubsectionData {
+interface MDBlogHeader {
+  readonly title: string;
+  readonly slug: string;
   readonly date: string;
   readonly author: string;
 }
 
-interface MDBlogData extends MDBlogHeader {
+interface BlogInfo extends MDBlogHeader {
   readonly content: string;
-}
-
-export interface BlogInfo {
-  readonly slug: string;
-  readonly content: string;
-  readonly sidebar: ReadonlyArray<SectionData>;
 }
 
 export const getBlogs = async (): Promise<{
-  readonly posts: ReadonlyArray<BlogInfo>;
-  readonly allPosts: ReadonlyArray<MDBlogHeader>;
+  readonly blogs: ReadonlyArray<BlogProps>;
+  readonly blogAll: BlogAllProps;
 }> => {
   const blogFiles = await fs.readdir(BLOG_SOURCE);
 
   const blogPosts = await Promise.all(blogFiles.map(async (blogFile) => getBlog(blogFile)));
   // tslint:disable-next-line:no-array-mutation
-  const sections = blogPosts
+  const posts = blogPosts
     .map(({ title, slug, date, author }) => ({
       title,
       slug,
@@ -38,29 +34,39 @@ export const getBlogs = async (): Promise<{
     .reverse();
 
   return {
-    posts: blogPosts.map((post) => ({
-      slug: post.slug,
+    blogs: blogPosts.map((post) => ({
+      current: post.slug,
+      title: post.title,
       content: post.content,
       sidebar: [
         {
-          section: 'Recent Posts',
-          subsections: sections.map(({ title, slug }) => ({
-            title,
-            slug,
-          })),
+          title: 'RECENT POSTS',
+          subsections: posts
+            .map(({ title, slug }) => ({
+              title,
+              slug,
+            }))
+            .concat([
+              {
+                title: 'All posts ...',
+                slug: '/blog/all',
+              },
+            ]),
         },
       ],
     })),
-    allPosts: sections,
+    blogAll: {
+      posts,
+    },
   };
 };
 
-const getBlog = async (blogFile: string): Promise<MDBlogData> => {
+const getBlog = async (blogFile: string): Promise<BlogInfo> => {
   const blog = matter.read(path.resolve(BLOG_SOURCE, blogFile));
   const blogHeader = blog.data as MDBlogHeader;
 
   return {
-    slug: blogHeader.slug,
+    slug: `/blog/${blogHeader.slug}`,
     title: blogHeader.title,
     date: blogHeader.date,
     author: blogHeader.author,

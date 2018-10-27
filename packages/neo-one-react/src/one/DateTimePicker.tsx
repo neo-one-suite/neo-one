@@ -37,7 +37,7 @@ export function DateTimePicker({
   onChange,
   ...props
 }: Props) {
-  let editingTimeout: NodeJS.Timer | undefined;
+  let editingTimeout: number | undefined;
   const clearEditingTimeout = () => {
     if (editingTimeout !== undefined) {
       clearTimeout(editingTimeout);
@@ -54,7 +54,8 @@ export function DateTimePicker({
         const onError = (error: string) => {
           editingTimeout = setTimeout(() => {
             setState({ error });
-          }, 2000);
+            // tslint:disable-next-line no-any
+          }, 2000) as any;
         };
 
         setState({ text, error: undefined });

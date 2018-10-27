@@ -1,5 +1,4 @@
 /// <reference lib="esnext" />
-/// <reference lib="dom" />
 /// <reference path="./@neo-one/ec-key/index.d.ts" />
 /// <reference path="./level-js/index.d.ts" />
 /// <reference path="./prettier/index.d.ts" />

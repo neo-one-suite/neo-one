@@ -1,2 +1,2 @@
-export * from './BlogSection';
-export * from './AllPosts';
+export * from './Blog';
+export * from './BlogAll';

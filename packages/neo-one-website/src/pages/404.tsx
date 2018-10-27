@@ -4,11 +4,11 @@ import '../polyfill';
 import { Redirect } from '@reach/router';
 import * as React from 'react';
 import { Helmet } from '../components';
-import { CoreLayout } from '../layout';
+import { MainLayout } from '../layout';
 
 // tslint:disable-next-line export-name no-default-export
 export default () => (
-  <CoreLayout path="404">
+  <MainLayout path="404">
     <Helmet title="404">
       <link rel="canonical" href={process.env.REACT_STATIC_PUBLIC_PATH} />
       <meta name="robots" content="noindex" />
@@ -16,5 +16,5 @@ export default () => (
       <meta httpEquiv="refresh" content={`0; url=${process.env.REACT_STATIC_PUBLIC_PATH}`} />
     </Helmet>
     <Redirect to="/" noThrow={typeof window === 'undefined'} />
-  </CoreLayout>
+  </MainLayout>
 );

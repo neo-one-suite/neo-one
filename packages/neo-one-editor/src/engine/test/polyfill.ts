@@ -1,3 +1,4 @@
+/// <reference types="@neo-one/types" />
 /// <reference types="trackjs" />
 // tslint:disable no-object-mutation strict-type-predicates no-import-side-effect
 import '@babel/polyfill';

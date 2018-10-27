@@ -118,7 +118,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
   private mutablePeerSeeds: Set<Endpoint>;
   private readonly listenTCP: ListenTCP | undefined;
   private mutableTCPServer: net.Server | undefined;
-  private mutableConnectPeersTimeout: NodeJS.Timer | undefined;
+  private mutableConnectPeersTimeout: number | undefined;
   private mutableSubscription: Subscription | undefined;
   private readonly negotiateInternal: (peer: Peer<Message>) => Promise<NegotiateResult<PeerData>>;
   private readonly checkPeerHealthInternal: (
@@ -364,7 +364,8 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
           this.mutableConnectPeersTimeout = setTimeout(() => {
             this.mutableConnectPeersTimeout = undefined;
             resolve();
-          }, this.mutableConnectPeersDelayMS);
+            // tslint:disable-next-line no-any
+          }, this.mutableConnectPeersDelayMS) as any;
         });
       } catch (error) {
         this.monitor.logError({

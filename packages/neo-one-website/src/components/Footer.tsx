@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Box, styled } from 'reakit';
 import { prop } from 'styled-tools';
+import { LayoutWrapper } from './common';
 
 const Wrapper = styled(Box)`
   background-color: ${prop('theme.black')};
@@ -9,4 +10,15 @@ const Wrapper = styled(Box)`
   width: 100%;
 `;
 
-export const Footer = () => <Wrapper />;
+interface Props {
+  readonly content?: boolean;
+}
+
+export const Footer = ({ content = false, ...props }: Props) => {
+  let footer = <Box />;
+  if (content) {
+    footer = <LayoutWrapper>{footer}</LayoutWrapper>;
+  }
+
+  return <Wrapper {...props}>{footer}</Wrapper>;
+};

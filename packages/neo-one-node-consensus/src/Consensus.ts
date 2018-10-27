@@ -31,7 +31,7 @@ const MS_IN_SECOND = 1000;
 
 export class Consensus {
   private mutableQueue: ConsensusQueue;
-  private mutableTimer: NodeJS.Timer | undefined;
+  private mutableTimer: number | undefined;
   private readonly options$: Observable<InternalOptions>;
   private readonly node: Node;
   private mutableConsensusContext: ConsensusContext;
@@ -246,7 +246,8 @@ export class Consensus {
     this.mutableTimer = setTimeout(
       () => this.mutableQueue.write({ type: 'timer' }),
       mutableTimerSeconds * MS_IN_SECOND,
-    );
+      // tslint:disable-next-line no-any
+    ) as any;
   }
 
   private clearTimer(): void {

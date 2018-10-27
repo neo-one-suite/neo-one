@@ -1,3 +1,4 @@
+/// <reference types="monaco-editor/monaco" />
 // tslint:disable no-implicit-dependencies no-submodule-imports promise-function-async
 import {
   createCompilerHost,

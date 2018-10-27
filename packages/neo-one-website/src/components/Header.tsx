@@ -1,7 +1,6 @@
 // tslint:disable no-any
 import { Link, Logo } from '@neo-one/react-common';
 import * as React from 'react';
-import { RouteData } from 'react-static';
 import { as, Flex, styled, Toolbar } from 'reakit';
 import { ifProp, prop, withProp } from 'styled-tools';
 import { ComponentProps } from '../types';
@@ -12,10 +11,10 @@ const Wrapper = styled(Flex)`
   justify-content: center;
   background-color: ${prop('theme.primary')};
   z-index: 9999;
-  padding: 0 36px;
+  padding: 0 8px;
 
-  @media (max-width: 768px) {
-    padding: 0 8px;
+  @media (min-width: ${prop('theme.breakpoints.sm')}) {
+    padding: 0 36px;
   }
 `;
 
@@ -23,15 +22,15 @@ const StyledToolbar = styled(Toolbar)`
   && {
     height: 100%;
     grid-gap: 8px;
-    padding: 0 16px;
+    padding: 0 8px;
   }
 
   ${/* sc-sel */ Toolbar.Focusable as any} {
     outline: none;
   }
 
-  @media (max-width: 768px) {
-    padding: 0 8px;
+  @media (min-width: ${prop('theme.breakpoints.sm')}) {
+    padding: 0 16px;
   }
 `;
 
@@ -39,15 +38,15 @@ const FocusableRouterLink = as(Link as any)(as(RouterLink)(Toolbar.Focusable));
 
 const LogoLink = styled(FocusableRouterLink)`
   display: block;
-  margin-right: 36px;
-  margin-bottom: 12px;
-  margin-top: 12px;
+  margin-right: 0;
+  margin-bottom: 8px;
+  margin-top: 8px;
   height: 56px;
 
-  @media (max-width: 768px) {
-    margin-right: 0;
-    margin-bottom: 8px;
-    margin-top: 8px;
+  @media (min-width: ${prop('theme.breakpoints.sm')}) {
+    margin-right: 36px;
+    margin-bottom: 12px;
+    margin-top: 12px;
   }
 `;
 
@@ -80,22 +79,6 @@ interface Props {
   readonly path: string;
 }
 
-const BlogLink = ({ path }: Props) => (
-  // @ts-ignore
-  <RouteData>
-    {({ mostRecentBlogPostSlug }: { readonly mostRecentBlogPostSlug: string }) => (
-      <NavigationLink
-        linkColor="gray"
-        active={path === 'blog'}
-        data-test="header-blog"
-        to={`/blog/${mostRecentBlogPostSlug}`}
-      >
-        Blog
-      </NavigationLink>
-    )}
-  </RouteData>
-);
-
 export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledToolbar>
@@ -112,7 +95,9 @@ export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper
         <NavigationLink linkColor="gray" active={path === 'course'} data-test="header-course" to="/course">
           Course
         </NavigationLink>
-        <BlogLink path={path} />
+        <NavigationLink linkColor="gray" active={path === 'blog'} data-test="header-blog" to="/blog">
+          Blog
+        </NavigationLink>
       </Toolbar.Content>
       <Toolbar.Content align="end">
         <FocusableLink

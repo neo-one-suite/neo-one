@@ -21,31 +21,17 @@ export default {
     title: 'React Static',
   }),
   getRoutes: async () => {
-    const [courses, docs, tutorial, blog] = await Promise.all([getCourses(), getDocs(), getTutorial(), getBlogs()]);
-
-    const mostRecentBlogPostSlug = blog.allPosts[0].slug;
-    const sidebar = Object.entries(
-      _.groupBy(
-        docs.map((document) => ({
-          title: document.title,
-          slug: document.slug,
-          section: document.section,
-        })),
-        (obj) => obj.section,
-      ),
-    ).map(([section, subsections]) => ({
-      section,
-      subsections: subsections.map((subsection) => ({
-        title: subsection.title,
-        slug: subsection.slug,
-      })),
-    }));
+    const [courses, docs, tutorial, { blogs, blogAll }] = await Promise.all([
+      getCourses(),
+      getDocs(),
+      getTutorial(),
+      getBlogs(),
+    ]);
 
     return [
       {
         path: '/',
         component: 'src/pages/index',
-        getData: async () => ({ mostRecentBlogPostSlug }),
       },
       {
         path: '/course',
@@ -66,48 +52,41 @@ export default {
       {
         path: '/404',
         component: 'src/pages/404',
-        getData: async () => ({ mostRecentBlogPostSlug }),
       },
       {
         path: '/docs',
+        component: 'src/pages/docsRedirect',
+        getData: async () => ({
+          redirect: docs[0].current,
+        }),
         children: docs.map((doc) => ({
-          path: `${doc.slug}`,
+          path: doc.current.slice('/docs/'.length),
           component: 'src/pages/docs',
-          getData: async () => ({
-            sidebar,
-            doc: doc.doc,
-            title: doc.title,
-            next: doc.next,
-            previous: doc.previous,
-            mostRecentBlogPostSlug,
-          }),
+          getData: async () => doc,
         })),
       },
       {
         path: '/tutorial',
         component: 'src/pages/tutorial',
-        getData: async () => ({
-          ...tutorial,
-          mostRecentBlogPostSlug,
-        }),
+        getData: async () => tutorial,
       },
       {
         path: '/blog',
-        children: blog.posts
-          .map((blogPost) => ({
-            path: `${blogPost.slug}`,
+        component: 'src/pages/blogRedirect',
+        getData: async () => ({
+          redirect: blogs[0].current,
+        }),
+        children: blogs
+          .map((blog) => ({
+            path: blog.current.slice('/blog/'.length),
             component: 'src/pages/blog',
-            getData: async () => ({
-              content: blogPost.content,
-              sidebar: blogPost.sidebar,
-              mostRecentBlogPostSlug,
-            }),
+            getData: async () => blog,
           }))
           .concat([
             {
               path: 'all',
-              component: 'src/pages/allBlogs',
-              getData: async () => ({ posts: blog.allPosts, mostRecentBlogPostSlug }),
+              component: 'src/pages/blogAll',
+              getData: async () => blogAll,
             },
           ]),
       },

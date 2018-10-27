@@ -18,7 +18,7 @@ function wrapEndpoint(endpointIn: endpoint.EndpointLike, onPostMessage: () => vo
 export class SingleWorkerManager<T extends WorkerConstructor> {
   private readonly endpoint: endpoint.WorkerEndpoint;
   private readonly instance: Promise<WorkerInstance<T>>;
-  private readonly idleCheckInterval: NodeJS.Timer;
+  private readonly idleCheckInterval: number;
   private mutableDisposed = false;
   private mutableLastUsedTime: number;
   private mutableInUse = 0;
@@ -34,7 +34,8 @@ export class SingleWorkerManager<T extends WorkerConstructor> {
       this.mutableLastUsedTime = Date.now();
     });
     this.mutableLastUsedTime = 0;
-    this.idleCheckInterval = setInterval(() => this.checkIfIdle(), 30 * 1000);
+    // tslint:disable-next-line no-any
+    this.idleCheckInterval = setInterval(() => this.checkIfIdle(), 30 * 1000) as any;
     // tslint:disable-next-line no-any
     const WorkerClass = comlink.proxy(this.endpoint) as any;
     this.instance = Promise.resolve(options).then(async (opts) => new WorkerClass(opts));

@@ -1,30 +1,36 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { SectionData } from '../components';
+import { TutorialProps } from '../components';
+import { SubsectionData } from '../types';
 
 export interface SectionHeaders {
   readonly [key: string]: ReadonlyArray<string>;
 }
 
-export interface TutorialInfo {
-  readonly tutorial: string;
-  readonly sections: ReadonlyArray<SectionData>;
-}
-
 const TUTORIAL_SOURCE = path.resolve(__dirname, '..', '..', 'tutorial', 'tutorial.md');
 
-export const getTutorial = async (): Promise<TutorialInfo> => {
-  const tutorial = await fs.readFile(TUTORIAL_SOURCE, 'utf-8');
+export const getTutorial = async (): Promise<TutorialProps> => {
+  const content = await fs.readFile(TUTORIAL_SOURCE, 'utf-8');
 
   return {
-    tutorial,
-    sections: parseSections(tutorial),
+    title: 'Tutorial: Intro to NEO•ONE',
+    content,
+    sidebar: [
+      {
+        title: 'TUTORIAL',
+        subsections: parseSections(content),
+      },
+    ],
   };
 };
 
-const slugify = (title: string) => title.toLowerCase().replace(' ', '-');
+const slugify = (title: string) => {
+  const id = title.toLowerCase().replace(' ', '-');
 
-const parseSections = (tutorial: string): ReadonlyArray<SectionData> => {
+  return `/tutorial#${id}`;
+};
+
+const parseSections = (tutorial: string): ReadonlyArray<SubsectionData> => {
   const sections = tutorial.split('\n').filter((line) => line.includes('##'));
 
   let prevHeader: string;
@@ -45,8 +51,9 @@ const parseSections = (tutorial: string): ReadonlyArray<SectionData> => {
     return { ...acc, ...tempAcc };
   }, {});
 
-  return Object.entries(sectionHeaders).map<SectionData>(([section, subsections]) => ({
-    section,
+  return Object.entries(sectionHeaders).map<SubsectionData>(([section, subsections]) => ({
+    title: section,
+    slug: slugify(section),
     subsections: subsections.map((subsection) => ({
       title: subsection,
       slug: slugify(subsection),

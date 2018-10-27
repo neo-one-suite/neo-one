@@ -1,2 +1,1 @@
-export * from './DocFooter';
-export * from './DocSection';
+export * from './Docs';

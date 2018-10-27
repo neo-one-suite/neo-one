@@ -82,49 +82,41 @@ export const theme = {
       font-size: 0.8rem;
       line-height: 1.35em;
       text-align: left;
-      margin: 0;
     `,
     body1: css`
       font-size: 0.875rem;
       line-height: 1.46428em;
       text-align: left;
-      margin: 0;
     `,
     body2: css`
       font-size: 0.875rem;
       line-height: 1.71428em;
       text-align: left;
-      margin: 0;
     `,
     display1: css`
       font-size: 2.125rem;
       line-height: 1.20588em;
       text-align: left;
-      margin: 0;
     `,
     display2: css`
       font-size: 2.8125rem;
       line-height: 1.06666em;
       text-align: left;
-      margin: 0;
     `,
     display3: css`
       font-size: 3.5125rem;
       line-height: 1.06666em;
       text-align: left;
-      margin: 0;
     `,
     headline: css`
       font-size: 1.5rem;
       line-height: 1.35416em;
       text-align: left;
-      margin: 0;
     `,
     subheading: css`
       font-size: 1rem;
-      line-height: 1.5em;
+      line-height: 1.7em;
       text-align: left;
-      margin: 0;
     `,
   },
   breakpoints: {
@@ -132,6 +124,12 @@ export const theme = {
     md: '960px',
     lg: '1280px',
     xl: '1920px',
+  },
+  constants: {
+    content: {
+      width: '90%',
+      maxWidth: '42em',
+    },
   },
   Box: css`
     box-sizing: border-box;

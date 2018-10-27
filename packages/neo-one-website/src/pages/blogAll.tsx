@@ -3,8 +3,8 @@ import '../polyfill';
 
 import * as React from 'react';
 import { RouteData } from 'react-static';
-import { Blog, BlogProps, Helmet } from '../components';
-import { BlogLoading, ContentLayout } from '../layout';
+import { BlogAll, BlogAllProps, Helmet } from '../components';
+import { BlogLoading, MainLayout } from '../layout';
 
 // tslint:disable-next-line:no-default-export export-name
 export default () => (
@@ -13,10 +13,10 @@ export default () => (
     {/*
     // @ts-ignore */}
     <RouteData Loader={BlogLoading}>
-      {(props: BlogProps) => (
-        <ContentLayout path="blog">
-          <Blog {...props} />
-        </ContentLayout>
+      {(props: BlogAllProps) => (
+        <MainLayout path="blog">
+          <BlogAll {...props} />
+        </MainLayout>
       )}
     </RouteData>
   </>

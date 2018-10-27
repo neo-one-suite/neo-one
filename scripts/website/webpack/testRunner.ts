@@ -18,7 +18,7 @@ export const testRunner = ({ stage }: { readonly stage: Stage }): webpack.Config
   output: {
     path: DIST_DIR,
     filename: stage === 'dev' ? '[name].js' : '[name].[hash:8].js',
-    chunkFilename: stage === 'dev' ? '[name].js' : 'preview.[name].[chunkHash:8].js',
+    chunkFilename: stage === 'dev' ? '[name].js' : 'testRunner.[name].[chunkHash:8].js',
   },
   plugins: [
     new MiniHtmlWebpackPlugin({

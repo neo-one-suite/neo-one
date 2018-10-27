@@ -90,7 +90,7 @@ export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextIn
       };
     }
 
-    let updateSecondsPerBlockTimer: NodeJS.Timer | undefined;
+    let updateSecondsPerBlockTimer: number | undefined;
     const clearUpdateSecondsPerBlock = () => {
       if (updateSecondsPerBlockTimer !== undefined) {
         clearTimeout(updateSecondsPerBlockTimer);
@@ -98,7 +98,7 @@ export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextIn
       }
     };
 
-    let editSecondsPerBlockTimer: NodeJS.Timer | undefined;
+    let editSecondsPerBlockTimer: number | undefined;
     const clearEditSecondsPerBlock = () => {
       if (editSecondsPerBlockTimer !== undefined) {
         clearTimeout(editSecondsPerBlockTimer);
@@ -120,7 +120,8 @@ export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextIn
               : secondsPerBlockMaybe;
           setState({ editing: true, secondsPerBlockText });
           if (secondsPerBlock === undefined) {
-            editSecondsPerBlockTimer = setTimeout(() => setState({ editing: false }), 10000);
+            // tslint:disable-next-line no-any
+            editSecondsPerBlockTimer = setTimeout(() => setState({ editing: false }), 10000) as any;
           } else {
             updateSecondsPerBlockTimer = setTimeout(() => {
               developerClient
@@ -134,7 +135,8 @@ export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextIn
                   addError(error);
                   setState({ editing: false });
                 });
-            }, 2000);
+              // tslint:disable-next-line no-any
+            }, 2000) as any;
           }
         };
       },

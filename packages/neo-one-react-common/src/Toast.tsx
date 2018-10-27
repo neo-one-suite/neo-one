@@ -42,7 +42,7 @@ interface Props {
 }
 export function Toast({ toast, removeToast }: Props) {
   let once = false;
-  let autoHideTimer: NodeJS.Timer | undefined;
+  let autoHideTimer: number | undefined;
 
   return (
     <Hidden.Container>
@@ -62,7 +62,8 @@ export function Toast({ toast, removeToast }: Props) {
             if (toast.autoHide !== undefined) {
               autoHideTimer = setTimeout(() => {
                 hide();
-              }, toast.autoHide);
+                // tslint:disable-next-line no-any
+              }, toast.autoHide) as any;
             }
           }, 500);
         }

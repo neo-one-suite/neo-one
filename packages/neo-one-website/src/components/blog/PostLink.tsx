@@ -11,26 +11,27 @@ interface Props {
   readonly author: string;
 }
 
-const PostLink = styled(as(RouterLink)(Link))`
+const StyledLink = styled(as(RouterLink)(Link))`
   ${prop('theme.fontStyles.headline')};
 `;
 
 const PostInfo = styled(Box)`
-  color: ${prop('theme.gray3')};
+  color: ${prop('theme.gray5')};
   ${prop('theme.fontStyles.subheading')};
 `;
 
 const Wrapper = styled(List)`
   list-style-type: none;
   max-width: 320px;
-  border-bottom: 1px solid ${prop('theme.accent')};
+  border-bottom: 1px solid ${prop('theme.gray3')};
+  padding-bottom: 16px;
 `;
 
-export const AllPostsLink = ({ title, path, date, author, ...props }: Props) => (
+export const PostLink = ({ title, path, date, author, ...props }: Props) => (
   <Wrapper {...props}>
-    <PostLink to={path} linkColor="gray">
+    <StyledLink to={path} linkColor="gray">
       {title}
-    </PostLink>
+    </StyledLink>
     <PostInfo>{date}</PostInfo>
     <PostInfo>{`by ${author}`}</PostInfo>
   </Wrapper>
