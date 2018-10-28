@@ -8,6 +8,7 @@ import {
   Hash256,
   MapStorage,
   receive,
+  sendUnsafe,
   SmartContract,
 } from '@neo-one/smart-contract';
 
@@ -109,6 +110,11 @@ export class Token extends SmartContract {
     this.issue(sender, amount);
 
     return true;
+  }
+
+  @sendUnsafe
+  public withdraw(): boolean {
+    return Address.isCaller(this.owner);
   }
 
   private issue(addr: Address, amount: Fixed<8>): void {
