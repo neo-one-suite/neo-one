@@ -64,7 +64,7 @@ Once you've implemented the `createTokenInfoStream$` function correctly, try par
 
 The tests verify the stream by checking the emitted values update reactively to contributions.
 
-Before heading to the next chapter, take a look at how the `ICO` component (in `ICO.tsx`) uses the `FromStream` component we mentioned earlier to reactively update the UI in a very succint way.
+Before heading to the next chapter, take a look at how the `ICO` component (in `ICO.tsx`) uses the `FromStream` component we mentioned earlier to reactively update the UI in a very succint way. You'll also see how we're getting the `token` smart contract and `client` values - through the `WithContracts` component. This is a component that automatically wires up a React application to allow easy access to the functionality you need to interact with your dapp. Learn more about the React integration in the [documentation](https://neo-one.io).
 
 ## Wrap Up
 

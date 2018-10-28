@@ -2,7 +2,7 @@
 import { createPrivateKey } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 import { take } from 'rxjs/operators';
-import { createTokenInfoStream$, getTokenInfo, handleMint, TokenInfoResult } from '../utils';
+import { createTokenInfoStream$, getTokenInfo, handleMint, TokenInfoResult, handleTransfer } from '../utils';
 // @ts-ignore
 import { withContracts } from '../../one/generated/test';
 
@@ -39,9 +39,9 @@ describe('utils', () => {
     });
   });
 
-  test('handleMint mints tokens and createTokenInfoStream$ reacts to the mint', async () => {
+  test('handleMint mints tokens, createTokenInfoStream$ reacts to the mint, handleTransfer transfers tokens', async () => {
     // @ts-ignore
-    await withContracts(async ({ client, developerClient, token, masterAccountID }) => {
+    await withContracts(async ({ client, developerClient, token, masterAccountID, networkName }) => {
       let error: Error | undefined;
       try {
         // Note that this transaction doesn't even get relayed to the blockchain and instead immediately fails because
@@ -91,6 +91,31 @@ describe('utils', () => {
 
       info = await stream$.pipe<TokenInfoResult>(take(1)).toPromise();
       expect(info.balance.toNumber()).toEqual(1000000);
+
+      const toWallet = await client.providers.memory.keystore.addAccount({
+        network: networkName,
+        privateKey: createPrivateKey(),
+      });
+      const transferAmount = new BigNumber(100000);
+      const transferReceipt = await handleTransfer(
+        token,
+        masterAccountID.address,
+        toWallet.account.id.address,
+        transferAmount,
+      );
+      if (transferReceipt.result.state === 'FAULT') {
+        throw new Error(transferReceipt.result.message);
+      }
+      expect(transferReceipt.result.state).toEqual('HALT');
+      expect(transferReceipt.result.value).toEqual(true);
+      event = transferReceipt.events[0];
+      expect(event.name).toEqual('transfer');
+      if (event.name !== 'transfer') {
+        throw new Error('For TS');
+      }
+      expect(event.parameters.from).toEqual(masterAccountID.address);
+      expect(event.parameters.to).toEqual(toWallet.account.id.address);
+      expect(event.parameters.amount.toNumber()).toEqual(transferAmount.toNumber());
     });
   });
 });
