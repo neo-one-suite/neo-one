@@ -29,7 +29,7 @@ const watchWindow = async (config: webpack.Configuration, port: number) => {
     {
       config,
       open: false,
-      hotClient: true,
+      hotClient: false,
       // tslint:disable-next-line no-any
       add: (appIn: any) => {
         appIn.use(

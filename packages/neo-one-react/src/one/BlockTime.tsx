@@ -73,14 +73,10 @@ function TimeAgo({ time, ...props }: TimeAgoProps) {
 
   return (
     <FromStream
-      props={{ now, time }}
-      createStream={(streamProps) =>
+      props={[now, time]}
+      createStream={() =>
         concat(_of(0), timer(0, TIMER)).pipe(
-          map((inc) =>
-            shorten(
-              formatDistanceStrict(new Date(streamProps.time), new Date(streamProps.now + Math.floor(inc * TIMER))),
-            ),
-          ),
+          map((inc) => shorten(formatDistanceStrict(new Date(time), new Date(now + Math.floor(inc * TIMER))))),
           distinctUntilChanged<string>(),
         )
       }
@@ -145,7 +141,7 @@ export function BlockTime() {
               data-test-close-button="neo-one-block-time-dialog-close-button"
               title="Fast Forward"
               renderDialog={(overlay) => (
-                <FromStream props={{ client, addError }} createStream={createMinTime$}>
+                <FromStream props={[client, addError]} createStream={() => createMinTime$({ client, addError })}>
                   {(minTime) => (
                     <Container initialState={{ date: new Date(minTime) }} actions={actions}>
                       {({ date, onChangeDate }) => (
@@ -188,7 +184,7 @@ export function BlockTime() {
                   help="Fast Forward..."
                   {...overlay}
                 >
-                  <FromStream props={{ client, addError }} createStream={createTime$}>
+                  <FromStream props={[client, addError]} createStream={() => createTime$({ client, addError })}>
                     {(time) => <TimeAgo time={time} />}
                   </FromStream>
                   <MdFastForward />

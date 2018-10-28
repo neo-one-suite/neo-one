@@ -150,7 +150,10 @@ export function SecondsPerBlockInput(props: Partial<ComponentProps<typeof TextIn
           {({ client, developerClient }) => (
             <Container initialState={INITIAL_STATE} effects={makeEffects(addError, developerClient)}>
               {({ secondsPerBlockText, editing, onChange }) => (
-                <FromStream props={{ client, addError, developerClient, refresh$ }} createStream={createProps$}>
+                <FromStream
+                  props={[client, addError, developerClient, refresh$]}
+                  createStream={() => createProps$({ client, addError, developerClient, refresh$ })}
+                >
                   {({ editable, secondsPerBlock, prevSecondsPerBlock }) => (
                     <SettingsLabel>
                       Seconds Per Block

@@ -50,6 +50,7 @@ interface ExternalProps {
   readonly id: string;
   readonly createPreviewURL: () => string;
   readonly initialFiles: EngineContentFiles;
+  readonly build?: boolean;
   readonly initialOptions?: InitialEditorStateOptions;
   readonly onTestsPass?: () => void;
 }
@@ -100,6 +101,7 @@ class FullEditorBase extends React.Component<Props, State> {
       clearStore: _clearStore,
       createPreviewURL: _createPreviewURL,
       initialOptions: _initialOptions,
+      build: _build,
       ...props
     } = this.props;
 
@@ -123,6 +125,7 @@ class FullEditorBase extends React.Component<Props, State> {
     initialOptions,
     appendOutput,
     clearStore,
+    build,
   }: Props): void {
     this.dispose();
     this.setState({ engine: undefined, openFiles: [] });
@@ -138,6 +141,14 @@ class FullEditorBase extends React.Component<Props, State> {
     })
       .then(async (engine) => {
         if (this.props.id === id && this.mutableMounted) {
+          if (build) {
+            try {
+              await engine.build();
+            } catch (error) {
+              // tslint:disable-next-line no-console
+              console.error(error);
+            }
+          }
           const openFiles = engine.openFiles$.getValue().map((path) => engine.getFile(path));
           this.setState({
             engine,

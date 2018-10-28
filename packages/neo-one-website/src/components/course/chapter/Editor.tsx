@@ -37,6 +37,7 @@ const EditorBase = ({ selected, onTestsPass, ...props }: Props) => {
           open: preview,
         },
       }}
+      build={preview}
       onTestsPass={onTestsPass}
     />
   );

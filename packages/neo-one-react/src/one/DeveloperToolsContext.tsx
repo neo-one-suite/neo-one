@@ -29,12 +29,12 @@ export function WithNetworkClient({ children }: WithNetworkClientProps) {
     <DeveloperToolsContext.Consumer>
       {({ client, developerClients, localClients }: DeveloperToolsContextType) => (
         <FromStream
-          props={{ client, localClients, developerClients }}
-          createStream={(props) =>
-            props.client.currentNetwork$.pipe(
+          props={[client, localClients, developerClients]}
+          createStream={() =>
+            client.currentNetwork$.pipe(
               map((network) => {
-                const localClient = props.localClients[network];
-                const developerClient = props.developerClients[network];
+                const localClient = localClients[network];
+                const developerClient = developerClients[network];
 
                 return { client, developerClient, localClient };
               }),

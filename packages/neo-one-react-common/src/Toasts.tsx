@@ -16,7 +16,7 @@ export function Toasts() {
   return (
     <ToastsContext.Consumer>
       {({ toasts$, removeToast }: ToastsContextType) => (
-        <FromStream createStream={() => toasts$}>
+        <FromStream createStream={() => toasts$} props={[toasts$]}>
           {(toasts) => (
             <Wrapper>
               {[...toasts].reverse().map((toast) => (

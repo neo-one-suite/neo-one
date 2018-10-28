@@ -16,7 +16,7 @@ export function AutoConsensusOption() {
   return (
     <WithAutoConsensus>
       {({ autoConsensus$, toggle }) => (
-        <FromStream createStream={() => autoConsensus$}>
+        <FromStream createStream={() => autoConsensus$} props={[autoConsensus$]}>
           {(autoConsensus) => (
             <Wrapper>
               <SettingsLabel data-test="neo-one-auto-consensus-container">

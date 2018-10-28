@@ -13,6 +13,7 @@ export function WithNEOTrackerURL({ children }: Props) {
     <WithNetworkClient>
       {({ localClient }) => (
         <FromStream
+          props={[localClient]}
           createStream={() =>
             concat(
               of('https://neotracker.io'),

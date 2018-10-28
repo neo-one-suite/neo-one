@@ -7,6 +7,7 @@
     "react-dom": "16.6.0",
     "reakit": "0.15.10",
     "rxjs": "6.3.3",
-    "styled-components": "3.4.10"
+    "styled-components": "3.4.10",
+    "styled-tools": "1.5.2"
   }
 }

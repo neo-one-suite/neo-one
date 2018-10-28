@@ -23,7 +23,7 @@ export function WalletButton() {
               help="Open Wallet..."
               {...overlay}
             >
-              <FromStream createStream={() => client.accountState$}>
+              <FromStream props={[client]} createStream={() => client.accountState$}>
                 {(value) => (
                   <Text data-test="neo-one-wallet-value">
                     {value === undefined ? 'Select Wallet' : value.currentAccount.name}

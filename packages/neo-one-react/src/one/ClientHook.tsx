@@ -120,8 +120,8 @@ export function ClientHook() {
                         <WithAutoSystemFee>
                           {({ autoSystemFee$ }) => (
                             <FromStream
-                              props={{ autoConsensus$, autoSystemFee$ }}
-                              createStream={(props) => combineLatest(props.autoConsensus$, props.autoSystemFee$)}
+                              props={[autoConsensus$, autoSystemFee$]}
+                              createStream={() => combineLatest(autoConsensus$, autoSystemFee$)}
                             >
                               {([autoConsensus, autoSystemFee]: [boolean, boolean]) => {
                                 const mutableHooker = Hooker.get(client);

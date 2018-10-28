@@ -16,7 +16,7 @@ export function AutoSystemFeeOption() {
   return (
     <WithAutoSystemFee>
       {({ autoSystemFee$, toggle }) => (
-        <FromStream createStream={() => autoSystemFee$}>
+        <FromStream createStream={() => autoSystemFee$} props={[autoSystemFee$]}>
           {(autoSystemFee) => (
             <Wrapper>
               <SettingsLabel data-test="neo-one-auto-system-fee-container">

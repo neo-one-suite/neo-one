@@ -30,6 +30,7 @@ export function WalletSelector(props: any) {
             <DeveloperToolsContext.Consumer>
               {({ client }: DeveloperToolsContextType) => (
                 <FromStream
+                  props={[client, addError, tokens$]}
                   createStream={() =>
                     combineLatest(
                       client.currentUserAccount$.pipe(

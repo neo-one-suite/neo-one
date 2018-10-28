@@ -31,38 +31,37 @@ export function TransferTo(props: ComponentProps<typeof Wrapper>) {
         <WithTokens>
           {(tokens$) => (
             <DeveloperToolsContext.Consumer>
-              {({ client }: DeveloperToolsContextType) => {
-                const props$ = getWalletSelectorOptions$(addError, client, tokens$);
-
-                return (
-                  <Wrapper {...props}>
-                    Transfer To
-                    <TransferContainer>
-                      {({ to, onChangeTo }) => (
-                        <FromStream createStream={() => props$}>
-                          {(options) => (
-                            <WalletSelectorBase
-                              data-test="neo-one-transfer-to-selector"
-                              value={to.map((userAccount) => makeWalletSelectorValueOption({ userAccount }))}
-                              options={options}
-                              onChange={(option: any) => {
-                                if (option != undefined) {
-                                  if (Array.isArray(option)) {
-                                    onChangeTo(option.map(({ userAccount }) => userAccount));
-                                  } else {
-                                    onChangeTo([option.userAccount]);
-                                  }
+              {({ client }: DeveloperToolsContextType) => (
+                <Wrapper {...props}>
+                  Transfer To
+                  <TransferContainer>
+                    {({ to, onChangeTo }) => (
+                      <FromStream
+                        props={[addError, client, tokens$]}
+                        createStream={() => getWalletSelectorOptions$(addError, client, tokens$)}
+                      >
+                        {(options) => (
+                          <WalletSelectorBase
+                            data-test="neo-one-transfer-to-selector"
+                            value={to.map((userAccount) => makeWalletSelectorValueOption({ userAccount }))}
+                            options={options}
+                            onChange={(option: any) => {
+                              if (option != undefined) {
+                                if (Array.isArray(option)) {
+                                  onChangeTo(option.map(({ userAccount }) => userAccount));
+                                } else {
+                                  onChangeTo([option.userAccount]);
                                 }
-                              }}
-                              isMulti
-                            />
-                          )}
-                        </FromStream>
-                      )}
-                    </TransferContainer>
-                  </Wrapper>
-                );
-              }}
+                              }
+                            }}
+                            isMulti
+                          />
+                        )}
+                      </FromStream>
+                    )}
+                  </TransferContainer>
+                </Wrapper>
+              )}
             </DeveloperToolsContext.Consumer>
           )}
         </WithTokens>

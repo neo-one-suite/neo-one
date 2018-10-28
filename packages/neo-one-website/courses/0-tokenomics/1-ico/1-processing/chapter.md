@@ -33,8 +33,6 @@ export class Example extends SmartContract {
 
 In this example, we're verifying that every output that is sent to the contract address (`this.address`) is GAS. We're also checking that there's exactly one reference. A reference is the corresponding `output` for the `input`s of the transaction.
 
-In this very simple example, we've defined a method annotated with `@receive`. This enables the method to receive native assets of any kind, including NEO and GAS. Methods marked with `@receive` must return a `boolean` value to indicate whether or not the contract wants to receive the assets. Note, however, that there are cases where the contract may still receive assets, despite returning `false`, due to limitations in how NEO handles native UTXO assets. For these cases, we automatically generate a `refundAssets` method that clients of your smart contract may call to refund assets which were not processed by the smart contract (i.e. the smart contract returned `false` or was not actually called).
-
 ## Instructions
 
   1. Add a check that returns `false` if `references.length === 0` to the `mintTokens` method. We always want a sender for minting tokens, so we expect at least one input.

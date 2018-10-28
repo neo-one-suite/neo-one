@@ -60,6 +60,11 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
                 sizeThreshold: 1024 * 1024 * 1024,
               },
             }),
+            new HardSourceWebpackPlugin.ExcludeModulePlugin([
+              {
+                test: /coursesLoader/,
+              },
+            ]),
           ]
         : bundle === 'server'
           ? []

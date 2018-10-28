@@ -53,7 +53,7 @@ export class PreviewEngine extends RemoteEngine {
       transpileCache.changes$
         .pipe(
           map(() => {
-            previewEngine.renderJSSafe();
+            previewEngine.renderJS();
           }),
         )
         .subscribe();
@@ -61,7 +61,7 @@ export class PreviewEngine extends RemoteEngine {
         .pipe(
           filter((change) => change.id.startsWith('/node_modules')),
           map(() => {
-            previewEngine.renderJSSafe();
+            previewEngine.renderJS();
           }),
         )
         .subscribe();
@@ -70,37 +70,21 @@ export class PreviewEngine extends RemoteEngine {
     return mutablePreviewEngine;
   }
 
-  public readonly renderJS = _.debounce(async (): Promise<void> => {
-    if (this.mutableRunning) {
-      this.renderJSSafe();
-    }
-    this.mutableRunning = true;
-    ReactErrorOverlay.dismissBuildError();
-    ReactErrorOverlay.dismissRuntimeErrors();
-    try {
-      const entryModule = this.findEntryModule();
-      await entryModule.evaluateAsync({ force: true });
-    } catch (error) {
-      // Rethrow with a clean stack to allow React overlay to pick it up.
-      setTimeout(() => {
-        throw error;
-      });
-    } finally {
-      this.mutableRunning = false;
-    }
-  }, 500);
+  public readonly renderJS = _.debounce((): void => {
+    this.renderJSAsync().catch(() => {
+      // do nothing, should never happen
+    });
+  }, 1000);
 
   private mutableRunning = false;
-
-  public readonly renderJSSafe = () => {
-    // tslint:disable-next-line
-    this.renderJS();
-  };
+  private mutableRerun = false;
+  private mutableError: Error | undefined;
+  private mutableErrorTimeout: number | undefined;
 
   public start(): void {
     this.renderHTML();
     ReactErrorOverlay.startReportingRuntimeErrors(this, {});
-    this.renderJSSafe();
+    this.renderJS();
   }
 
   public renderHTML(): void {
@@ -108,6 +92,43 @@ export class PreviewEngine extends RemoteEngine {
     document.open('text/html');
     document.write(indexHTML);
     document.close();
+  }
+
+  private async renderJSAsync(): Promise<void> {
+    if (this.mutableRunning) {
+      this.mutableRerun = true;
+
+      return;
+    }
+    this.mutableRunning = true;
+    this.mutableRerun = false;
+    ReactErrorOverlay.dismissBuildError();
+    ReactErrorOverlay.dismissRuntimeErrors();
+    try {
+      const entryModule = this.findEntryModule();
+      await entryModule.evaluateAsync({ force: true });
+    } catch (error) {
+      this.throwLatestError(error);
+    } finally {
+      this.mutableRunning = false;
+      if (this.mutableRerun) {
+        this.renderJS();
+      }
+    }
+  }
+
+  private throwLatestError(error: Error): void {
+    this.mutableError = error;
+    if (this.mutableErrorTimeout === undefined) {
+      this.mutableErrorTimeout = setTimeout(() => {
+        const err = this.mutableError;
+        this.mutableError = undefined;
+        this.mutableErrorTimeout = undefined;
+        if (!this.mutableRunning && !this.mutableRerun && err !== undefined) {
+          throw err;
+        }
+      });
+    }
   }
 
   private findIndexHTML(): string {

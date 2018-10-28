@@ -128,6 +128,7 @@ export class WorkerManager<T extends WorkerConstructor> {
           this.idleTimeoutMS,
           (manager) => {
             if (this.mutableWorkerManager === manager) {
+              this.mutableWorkerManagerPromise = undefined;
               this.mutableWorkerManager = undefined;
             }
           },

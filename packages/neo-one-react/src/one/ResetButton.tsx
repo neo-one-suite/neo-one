@@ -13,7 +13,7 @@ export function ResetButton() {
       {(addError) => (
         <WithNetworkClient>
           {({ client, localClient }) => (
-            <FromStream createStream={() => disabled$}>
+            <FromStream props={[disabled$]} createStream={() => disabled$}>
               {(disabled) => {
                 if (localClient === undefined) {
                   // tslint:disable-next-line no-null-keyword

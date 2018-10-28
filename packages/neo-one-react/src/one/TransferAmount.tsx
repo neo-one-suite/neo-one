@@ -28,7 +28,7 @@ export const TransferAmount = (props: ComponentProps<typeof Grid>) => (
         />
         <WithTokens>
           {(tokens$) => (
-            <FromStream createStream={() => tokens$}>
+            <FromStream props={[tokens$]} createStream={() => tokens$}>
               {(tokens) => (
                 <AssetInput
                   data-test="neo-one-transfer-amount-asset-selector"

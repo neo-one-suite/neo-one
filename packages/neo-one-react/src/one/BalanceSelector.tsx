@@ -1,5 +1,5 @@
-import { Client, nep5 } from '@neo-one/client';
-import { AddError, FromStream, Token, WithAddError } from '@neo-one/react-common';
+import { nep5 } from '@neo-one/client';
+import { FromStream, Token, WithAddError } from '@neo-one/react-common';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
@@ -74,38 +74,6 @@ const createCurrentAsset$ = (options: CurrentAssetTokenOptions) =>
     distinctUntilChanged(),
   );
 
-interface BalanceOptions extends CurrentAssetTokenOptions {
-  readonly addError: AddError;
-  readonly client: Client;
-}
-
-const createBalance$ = (options: BalanceOptions) =>
-  combineLatest(createCurrentAsset$(options), options.client.accountState$.pipe(filter(utils.notNull))).pipe(
-    switchMap(async ([asset, { currentAccount, account }]) => {
-      if (asset.type === 'token') {
-        const smartContract = nep5.createNEP5SmartContract(
-          options.client,
-          { [asset.token.network]: { address: asset.token.address } },
-          asset.token.decimals,
-        );
-        const tokenBalance = await smartContract.balanceOf(currentAccount.id.address, {
-          network: asset.token.network,
-        });
-
-        return tokenBalance.toFormat();
-      }
-
-      const balance = account.balances[asset.value] as BigNumber | undefined;
-
-      return balance === undefined ? '0' : balance.toFormat();
-    }),
-    catchError((error: Error) => {
-      options.addError(error);
-
-      return of('0');
-    }),
-  );
-
 export function BalanceSelector() {
   const asset$ = new BehaviorSubject(ASSETS[0]);
   const onChangeAsset = (asset: Asset) => {
@@ -121,12 +89,47 @@ export function BalanceSelector() {
               <>
                 <DeveloperToolsContext.Consumer>
                   {({ client }: DeveloperToolsContextType) => (
-                    <FromStream props={{ addError, client, asset$, tokens$ }} createStream={createBalance$}>
+                    <FromStream
+                      props={[addError, client, asset$, tokens$]}
+                      createStream={() =>
+                        combineLatest(
+                          createCurrentAsset$({ asset$, tokens$ }),
+                          client.accountState$.pipe(filter(utils.notNull)),
+                        ).pipe(
+                          switchMap(async ([asset, { currentAccount, account }]) => {
+                            if (asset.type === 'token') {
+                              const smartContract = nep5.createNEP5SmartContract(
+                                client,
+                                { [asset.token.network]: { address: asset.token.address } },
+                                asset.token.decimals,
+                              );
+                              const tokenBalance = await smartContract.balanceOf(currentAccount.id.address, {
+                                network: asset.token.network,
+                              });
+
+                              return tokenBalance.toFormat();
+                            }
+
+                            const balance = account.balances[asset.value] as BigNumber | undefined;
+
+                            return balance === undefined ? '0' : balance.toFormat();
+                          }),
+                          catchError((error: Error) => {
+                            addError(error);
+
+                            return of('0');
+                          }),
+                        )
+                      }
+                    >
                       {(value) => <Wrapper data-test="neo-one-balance-selector-value">{value}</Wrapper>}
                     </FromStream>
                   )}
                 </DeveloperToolsContext.Consumer>
-                <FromStream props={{ asset$, tokens$ }} createStream={createCurrentAssetToken$}>
+                <FromStream
+                  props={[asset$, tokens$]}
+                  createStream={() => createCurrentAssetToken$({ asset$, tokens$ })}
+                >
                   {({ tokens, asset }) => (
                     <AssetInput
                       data-test-selector="neo-one-balance-selector-selector"

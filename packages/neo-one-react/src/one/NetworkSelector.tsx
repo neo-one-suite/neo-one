@@ -19,10 +19,7 @@ export function NetworkSelector() {
       {(addError) => (
         <DeveloperToolsContext.Consumer>
           {({ client }: DeveloperToolsContextType) => (
-            <FromStream
-              props={{ client }}
-              createStream={(props) => combineLatest(props.client.currentNetwork$, props.client.networks$)}
-            >
+            <FromStream props={[client]} createStream={() => combineLatest(client.currentNetwork$, client.networks$)}>
               {([network, networks]: [string, ReadonlyArray<string>]) => (
                 <SettingsLabel>
                   Network

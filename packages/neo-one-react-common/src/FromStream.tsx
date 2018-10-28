@@ -1,4 +1,5 @@
-// tslint:disable no-any
+// tslint:disable no-any readonly-array
+import { utils } from '@neo-one/utils';
 import * as React from 'react';
 import { Observable, Subscription } from 'rxjs';
 import { shallowEqual } from './shallowEqual';
@@ -6,21 +7,14 @@ import { shallowEqual } from './shallowEqual';
 // tslint:disable-next-line no-null-keyword
 const initialValue = Symbol.for('initialValue');
 
-interface Props<TProps, T> {
-  /* Props to pass to createStream */
-  readonly props?: TProps;
+interface Props<T> {
+  /* Props that when changed cause `createStream` to be invoked again  */
+  readonly props?: any[];
   /* Stream of props to render */
-  readonly createStream: (props: TProps) => Observable<T>;
+  readonly createStream: () => Observable<T>;
   /* Render function */
   readonly children: (props: T) => React.ReactNode;
 }
-// interface WithoutProps<T> {
-//   /* Stream of props to render */
-//   readonly createStream: () => Observable<T>;
-//   /* Render function */
-//   readonly children: (props: T) => React.ReactNode;
-// }
-// type Props<TProps, T> = WithProps<TProps, T> | WithoutProps<T>;
 interface State<T> {
   readonly value: T | typeof initialValue;
 }
@@ -45,13 +39,13 @@ interface State<T> {
  *    : <Component data={data} />}
  * </FromStream>
  */
-export class FromStream<TProps, T> extends React.Component<Props<TProps, T>, State<T>> {
+export class FromStream<T> extends React.Component<Props<T>, State<T>> {
   // tslint:disable-next-line readonly-keyword
   public state: State<T>;
   private mutableSubscription: Subscription | undefined;
   private mutableMounted = false;
 
-  public constructor(props: Props<TProps, T>) {
+  public constructor(props: Props<T>) {
     super(props);
 
     this.state = {
@@ -71,7 +65,10 @@ export class FromStream<TProps, T> extends React.Component<Props<TProps, T>, Sta
     if (
       (prevProps.props != undefined && props.props == undefined) ||
       (prevProps.props == undefined && props.props != undefined) ||
-      (prevProps.props != undefined && props.props != undefined && !shallowEqual(prevProps.props, props.props))
+      (prevProps.props != undefined &&
+        props.props != undefined &&
+        (prevProps.props.length !== props.props.length ||
+          utils.zip(prevProps.props, props.props).some(([propA, propB]) => !shallowEqual(propA, propB))))
     ) {
       this.subscribe();
     }
@@ -88,11 +85,9 @@ export class FromStream<TProps, T> extends React.Component<Props<TProps, T>, Sta
   }
 
   private subscribe(): void {
-    const props: any = this.props;
-
     this.unsubscribe();
     let stateSet = false;
-    this.mutableSubscription = props.createStream(props.props).subscribe({
+    this.mutableSubscription = this.props.createStream().subscribe({
       next: (value: any) => {
         stateSet = true;
         this._setValue(value);
