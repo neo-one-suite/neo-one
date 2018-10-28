@@ -21,7 +21,7 @@ const getMinifer = (stage: Stage, bundle: Bundle) => {
       ecma: 8,
       compress: {
         ecma: 8,
-        inline: bundle !== 'react-static' && bundle !== 'testRunner',
+        inline: bundle !== 'react-static' && bundle !== 'testRunner' && bundle !== 'preview',
       },
       output: {
         ecma: 8,

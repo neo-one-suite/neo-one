@@ -14,3 +14,12 @@ export const createJSONRPCLocalProviderManager = (id: string) =>
       300 * 1000,
     ),
   );
+
+export const createMemoryJSONRPCLocalProviderManager = async () =>
+  comlink.proxyValue(
+    new WorkerManager<typeof JSONRPCLocalProvider>(
+      JSONRPCLocalProviderWorker,
+      () => ({ options: { type: 'memory' as 'memory' }, disposables: [] }),
+      300 * 1000,
+    ),
+  );

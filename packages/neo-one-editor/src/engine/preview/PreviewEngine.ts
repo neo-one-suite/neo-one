@@ -23,6 +23,7 @@ export class PreviewEngine extends RemoteEngine {
         endpoint,
         builderManager,
         jsonRPCLocalProviderManager,
+        createJSONRPCLocalProviderManager,
         openFile,
       }: RegisterPreviewEngineResult = await engine.registerPreviewEngine({
         onBuildError: async (error) => {
@@ -48,6 +49,7 @@ export class PreviewEngine extends RemoteEngine {
         transpileCache,
         builderManager,
         jsonRPCLocalProviderManager,
+        createJSONRPCLocalProviderManager,
       });
       mutablePreviewEngine = previewEngine;
       transpileCache.changes$

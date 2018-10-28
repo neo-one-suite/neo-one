@@ -11,6 +11,7 @@ export interface ExportsOptions {
   readonly fs: FileSystem;
   readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
   readonly builderManager: WorkerManager<typeof Builder>;
+  readonly createJSONRPCLocalProviderManager: () => Promise<WorkerManager<typeof JSONRPCLocalProvider>>;
 }
 
 export interface PackageConfig {
@@ -43,13 +44,14 @@ const packages: ReadonlyArray<PackageConfig> = [
   {
     name: '@neo-one/local-singleton',
     path: '/node_modules/@neo-one/local-singleton/src/index.ts',
-    exports: ({ fs, jsonRPCLocalProviderManager, builderManager }) => {
+    exports: ({ fs, jsonRPCLocalProviderManager, builderManager, createJSONRPCLocalProviderManager }) => {
       const browserLocalClient = new BrowserLocalClient(builderManager, jsonRPCLocalProviderManager);
 
       return {
         getFileSystem: () => fs,
         getJSONRPCLocalProviderManager: () => jsonRPCLocalProviderManager,
         getBrowserLocalClient: () => browserLocalClient,
+        createJSONRPCLocalProviderManager,
       };
     },
   },

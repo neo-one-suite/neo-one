@@ -7,6 +7,7 @@ import { WorkerManager } from '@neo-one/worker';
 // tslint:disable no-let
 let browserLocalClient: BrowserLocalClient | undefined;
 let jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider> | undefined;
+let _createMemoryJSONRPCLocalProviderManager: (() => Promise<WorkerManager<typeof JSONRPCLocalProvider>>) | undefined;
 let fs: FileSystem | undefined;
 // tslint:enable no-let
 
@@ -34,6 +35,20 @@ export const setJSONRPCLocalProviderManager = (
   _jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>,
 ) => {
   jsonRPCLocalProviderManager = _jsonRPCLocalProviderManager;
+};
+
+export const createJSONRPCLocalProviderManager = async (): Promise<WorkerManager<typeof JSONRPCLocalProvider>> => {
+  if (_createMemoryJSONRPCLocalProviderManager === undefined) {
+    throw new Error('JSONRPCLocalProvider has not be set');
+  }
+
+  return _createMemoryJSONRPCLocalProviderManager();
+};
+
+export const setCreateJSONRPCLocalProviderManager = (
+  createMemoryJSONRPCLocalProviderManagerInternal: () => Promise<WorkerManager<typeof JSONRPCLocalProvider>>,
+) => {
+  _createMemoryJSONRPCLocalProviderManager = createMemoryJSONRPCLocalProviderManagerInternal;
 };
 
 export const getBrowserLocalClient = (): BrowserLocalClient => {

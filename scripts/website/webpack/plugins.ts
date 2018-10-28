@@ -23,12 +23,20 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
       'global.GENTLY': false,
       'process.env': {
         NEO_ONE_DEV: JSON.stringify('true'),
-        NEO_ONE_API_URL: JSON.stringify(stage === 'prod' ? 'https://neo-one-api.now.sh/' : 'http://localhost:3001/'),
+        NEO_ONE_API_URL: JSON.stringify(
+          stage === 'prod' && process.env.NEO_ONE_STAGING !== 'true'
+            ? 'https://neo-one-api.now.sh/'
+            : 'http://localhost:3001/',
+        ),
         NEO_ONE_PREVIEW_URL: JSON.stringify(
-          stage === 'prod' ? 'https://neo-one-course-preview.netlify.com' : 'http://localhost:8080',
+          stage === 'prod' && process.env.NEO_ONE_STAGING !== 'true'
+            ? 'https://neo-one-course-preview.netlify.com'
+            : 'http://localhost:8080',
         ),
         NEO_ONE_TEST_RUNNER_URL: JSON.stringify(
-          stage === 'prod' ? 'https://neo-one-test-runner.netlify.com' : 'http://localhost:8081',
+          stage === 'prod' && process.env.NEO_ONE_STAGING !== 'true'
+            ? 'https://neo-one-test-runner.netlify.com'
+            : 'http://localhost:8081',
         ),
         TSC_NONPOLLING_WATCHER: JSON.stringify('false'),
         TSC_WATCHFILE: JSON.stringify('false'),

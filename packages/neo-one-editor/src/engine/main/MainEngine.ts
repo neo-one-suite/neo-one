@@ -8,7 +8,10 @@ import {
   PouchDBFileSystem,
 } from '@neo-one/local-browser';
 import { createBuilderManager, createFileSystemManager, FileSystemManager } from '@neo-one/local-browser-worker';
-import { createJSONRPCLocalProviderManager } from '@neo-one/node-browser-worker';
+import {
+  createJSONRPCLocalProviderManager,
+  createMemoryJSONRPCLocalProviderManager,
+} from '@neo-one/node-browser-worker';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser/src';
 import { mergeScanLatest, retryBackoff } from '@neo-one/utils';
 import { comlink, WorkerManager } from '@neo-one/worker';
@@ -235,6 +238,7 @@ export class MainEngine {
       () => fileSystemManager.getEndpoint(),
       builderManager,
       jsonRPCLocalProviderManager,
+      createMemoryJSONRPCLocalProviderManager,
       testRunnerCallbacks,
     );
 
@@ -371,6 +375,7 @@ export class MainEngine {
       endpoint,
       builderManager: comlink.proxyValue(this.builderManager),
       jsonRPCLocalProviderManager: comlink.proxyValue(this.jsonRPCLocalProviderManager),
+      createJSONRPCLocalProviderManager: createMemoryJSONRPCLocalProviderManager,
       openFile: this.openFile,
     };
   }

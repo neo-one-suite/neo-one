@@ -18,6 +18,7 @@ interface RemoteEngineOptions {
   readonly fs: PouchDBFileSystem;
   readonly transpileCache: PouchDBFileSystem;
   readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
+  readonly createJSONRPCLocalProviderManager: () => Promise<WorkerManager<typeof JSONRPCLocalProvider>>;
   readonly builderManager: WorkerManager<typeof Builder>;
   readonly pathWithExports?: ReadonlyArray<PathWithExports>;
   readonly globals?: Globals;
@@ -66,13 +67,17 @@ export class RemoteEngine {
     transpileCache,
     builderManager,
     jsonRPCLocalProviderManager,
+    createJSONRPCLocalProviderManager,
     pathWithExports: pathWithExportsIn = [],
     globals = {},
   }: RemoteEngineOptions) {
     this.fs = fs;
-    const pathWithExports = getPathWithExports({ fs, builderManager, jsonRPCLocalProviderManager }).concat(
-      pathWithExportsIn,
-    );
+    const pathWithExports = getPathWithExports({
+      fs,
+      builderManager,
+      jsonRPCLocalProviderManager,
+      createJSONRPCLocalProviderManager,
+    }).concat(pathWithExportsIn);
     this.mutableModules = new Map([
       [EMPTY_MODULE_PATH, new StaticExportsModule(this, EMPTY_MODULE_PATH, {})],
       ['path', new StaticExportsModule(this, 'path', nodePath)],

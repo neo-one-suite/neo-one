@@ -23,6 +23,7 @@ export interface CreateTestEngineOptions {
   readonly endpoint: comlink.Endpoint;
   readonly builderManager: WorkerManager<typeof Builder>;
   readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
+  readonly createJSONRPCLocalProviderManager: () => Promise<WorkerManager<typeof JSONRPCLocalProvider>>;
 }
 
 export const createTestEngine = async ({
@@ -30,6 +31,7 @@ export const createTestEngine = async ({
   endpoint,
   builderManager,
   jsonRPCLocalProviderManager,
+  createJSONRPCLocalProviderManager,
 }: CreateTestEngineOptions): Promise<RemoteEngine> => {
   const [fs, transpileCache] = await Promise.all([createFileSystem(id, endpoint), createTranspileCache(id, endpoint)]);
 
@@ -38,11 +40,13 @@ export const createTestEngine = async ({
     transpileCache,
     builderManager,
     jsonRPCLocalProviderManager,
+    createJSONRPCLocalProviderManager,
     pathWithExports: getPathWithExports(
       {
         fs,
         builderManager,
         jsonRPCLocalProviderManager,
+        createJSONRPCLocalProviderManager,
       },
       testPackages,
     ),

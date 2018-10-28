@@ -78,6 +78,7 @@
     "webpack": "4.19.0"
   },
   "sideEffects": [
+    "src/engine/test/polyfill.ts",
     "src/preview/window/polyfill.ts"
   ]
 }

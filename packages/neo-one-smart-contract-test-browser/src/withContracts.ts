@@ -1,8 +1,7 @@
 import { NEOONEDataProvider } from '@neo-one/client';
 import { createCompilerHost, FileSystem } from '@neo-one/local-browser';
-import { getFileSystem } from '@neo-one/local-singleton';
+import { createJSONRPCLocalProviderManager, getFileSystem } from '@neo-one/local-singleton';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
-import { JSONRPCLocalProviderWorker } from '@neo-one/node-browser-worker';
 import {
   Contract,
   TestOptions,
@@ -14,7 +13,10 @@ import { WorkerManager } from '@neo-one/worker';
 
 export { TestOptions, WithContractsOptions, Contract };
 
-export const createWithContracts = (getFS: () => FileSystem) => async <T>(
+export const createWithContracts = (
+  getFS: () => FileSystem,
+  createManager: () => Promise<WorkerManager<typeof JSONRPCLocalProvider>>,
+) => async <T>(
   contracts: ReadonlyArray<Contract>,
   test: (contracts: T & TestOptions) => Promise<void>,
   options?: WithContractsOptions,
@@ -24,11 +26,7 @@ export const createWithContracts = (getFS: () => FileSystem) => async <T>(
     test,
     () => createCompilerHost({ fs: getFS() }),
     async () => {
-      const manager = new WorkerManager<typeof JSONRPCLocalProvider>(
-        JSONRPCLocalProviderWorker,
-        () => ({ options: { type: 'memory' as 'memory' }, disposables: [] }),
-        300 * 1000,
-      );
+      const manager = await createManager();
       const dataProvider = new NEOONEDataProvider({ network: 'priv', rpcURL: manager });
 
       return {
@@ -42,4 +40,4 @@ export const createWithContracts = (getFS: () => FileSystem) => async <T>(
     options,
   );
 
-export const withContracts = createWithContracts(getFileSystem);
+export const withContracts = createWithContracts(getFileSystem, createJSONRPCLocalProviderManager);

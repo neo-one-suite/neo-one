@@ -11,6 +11,7 @@ export const createTestRunnerManager = (
   getEndpoint: () => DisposableEndpoint,
   builderManager: WorkerManager<typeof Builder>,
   jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>,
+  createJSONRPCLocalProviderManager: () => Promise<WorkerManager<typeof JSONRPCLocalProvider>>,
   callbacks: TestRunnerCallbacks,
 ) =>
   comlink.proxyValue(
@@ -23,6 +24,7 @@ export const createTestRunnerManager = (
           endpoint: disposableEndpoint.endpoint,
           builderManager: comlink.proxyValue(builderManager),
           jsonRPCLocalProviderManager: comlink.proxyValue(jsonRPCLocalProviderManager),
+          createJSONRPCLocalProviderManager,
           callbacks: { ...callbacks },
         };
 

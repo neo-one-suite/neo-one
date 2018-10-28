@@ -8,5 +8,6 @@ export interface RegisterPreviewEngineResult {
   readonly endpoint: comlink.Endpoint;
   readonly builderManager: WorkerManager<typeof Builder>;
   readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
+  readonly createJSONRPCLocalProviderManager: () => Promise<WorkerManager<typeof JSONRPCLocalProvider>>;
   readonly openFile: (path: string, range?: TextRange) => void;
 }
