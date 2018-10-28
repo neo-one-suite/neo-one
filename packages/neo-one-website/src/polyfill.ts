@@ -8,6 +8,9 @@ import LogRocket from 'logrocket';
 // @ts-ignore
 import './Modernizr';
 
+// tslint:disable-next-line no-import-side-effect
+import './app.css';
+
 // tslint:disable-next-line no-any no-object-mutation
 (global as any).regeneratorRuntime = regeneratorRuntime;
 

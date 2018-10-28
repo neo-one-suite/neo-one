@@ -9,9 +9,6 @@ import { getCurrentRoutePath, Root, Routes } from 'react-static';
 import { ThemeProvider } from 'reakit';
 import { CourseLoading, HomeLoading } from './layout';
 
-// tslint:disable-next-line no-import-side-effect
-import './app.css';
-
 const WebRoutes = (props: any) => (
   <Routes {...props}>
     {({ getComponentForPath }: any) => {
