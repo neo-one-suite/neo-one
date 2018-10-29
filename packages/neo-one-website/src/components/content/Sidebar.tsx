@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { MdClose, MdUnfoldMore } from 'react-icons/md';
-import { Box, Button, Grid, Hidden, styled } from 'reakit';
+import { Box, Button, Grid, Hidden, keyframes, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { SectionData } from '../../types';
 import { SidebarSpacer } from '../common';
@@ -27,6 +27,26 @@ const MobileWrapper = styled(Box)`
   }
 `;
 
+const fadeSlideIn = keyframes`
+  0% {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+`;
+
+const fadeSlideOut = keyframes`
+  0% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+`;
+
 const StyledHidden = styled(Hidden)`
   position: fixed;
   top: 72px;
@@ -36,6 +56,12 @@ const StyledHidden = styled(Hidden)`
   z-index: 2;
   height: calc(100vh - 72px);
   overflow-y: auto;
+  &[aria-hidden='false'] {
+    animation: ${fadeSlideIn} 500ms;
+  }
+  &[aria-hidden='true'] {
+    animation: ${fadeSlideOut} 500ms;
+  }
 
   @media (min-width: ${prop('theme.breakpoints.sm')}) {
     top: 80px;
@@ -107,7 +133,7 @@ export const Sidebar = ({ current, alwaysVisible, sections, ...props }: Props) =
       <Hidden.Container>
         {({ visible, hide, toggle }) => (
           <>
-            <StyledHidden visible={visible}>
+            <StyledHidden visible={visible} animated unmount>
               <MobileSidebarWrapper>
                 <SidebarList current={current} alwaysVisible sections={sections} onClickLink={hide} />
               </MobileSidebarWrapper>
