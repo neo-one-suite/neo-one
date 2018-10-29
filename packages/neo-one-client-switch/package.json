@@ -6,7 +6,7 @@
   "browser": "./src/index.browser.ts",
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
-    "@ledgerhq/hw-transport-u2f": "4.24.0",
+    "@ledgerhq/hw-transport-u2f": "4.28.0",
     "@neo-one/client-common": "^1.0.0-preview.1",
     "@neo-one/node-vm": "^1.0.0-preview.1",
     "@neo-one/types": "^1.0.0-preview.1",
