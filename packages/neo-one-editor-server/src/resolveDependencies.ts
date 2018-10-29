@@ -1,7 +1,10 @@
+import { Monitor } from '@neo-one/monitor';
+import { retryBackoff } from '@neo-one/utils';
 import fetch from 'cross-fetch';
 import { Graph } from 'graphlib';
 import _ from 'lodash';
 import LRU from 'lru-cache';
+import { defer } from 'rxjs';
 import stringify from 'safe-stable-stringify';
 import semver from 'semver';
 import { FetchError } from './errors';
@@ -57,7 +60,7 @@ const cache = LRU<string, Promise<RegistryPackage>>({
 class Resolver {
   private readonly graph: Graph;
 
-  public constructor() {
+  public constructor(private readonly monitor?: Monitor) {
     this.graph = new Graph();
   }
 
@@ -182,7 +185,23 @@ class Resolver {
   }
 
   private async getDependencyData(task: Task) {
-    const registryPackage = await this.fetchRegistryPackage(task.name);
+    const registryPackage = await defer(async () => this.fetchRegistryPackage(task.name))
+      .pipe(
+        retryBackoff({
+          initialInterval: 250,
+          maxRetries: 10,
+          maxInterval: 2500,
+          onError: (error) => {
+            if (this.monitor !== undefined) {
+              this.monitor.logError({
+                name: 'resolve_dependencies_fetch_registry_package_error',
+                error,
+              });
+            }
+          },
+        }),
+      )
+      .toPromise();
     const { version, versionPackageJson } = this.resolveVersion({ requestedVersion: task.version, registryPackage });
 
     return {
@@ -206,14 +225,27 @@ const resolutionCache = LRU<string, Promise<ResolvedDependencies>>({
   max: 1000,
 });
 
-export async function resolveDependencies(dependencies: Dependencies): Promise<ResolvedDependencies> {
+export async function resolveDependencies(
+  dependencies: Dependencies,
+  monitor?: Monitor,
+): Promise<ResolvedDependencies> {
   const key = stringify(dependencies);
   const resolved = resolutionCache.get(key);
   if (resolved !== undefined) {
     return resolved;
   }
 
-  const result = new Resolver().resolve(dependencies);
+  const result = new Resolver(monitor).resolve(dependencies);
+  result.catch((error) => {
+    if (monitor !== undefined) {
+      monitor.logError({
+        name: 'resolve_dependencies_final_error',
+        error,
+      });
+    }
+
+    cache.del(key);
+  });
   resolutionCache.set(key, result);
 
   return result;

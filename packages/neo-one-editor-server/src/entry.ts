@@ -1,4 +1,4 @@
-import { bodyParser, context, cors, createServer$, onError as appOnError } from '@neo-one/http';
+import { bodyParser, context, cors, createServer$, getMonitor, onError as appOnError } from '@neo-one/http';
 import { DefaultMonitor } from '@neo-one/monitor';
 import { finalize } from '@neo-one/utils';
 import * as http from 'http';
@@ -125,8 +125,8 @@ router.use(cors).post(
       }
 
       // tslint:disable-next-line no-any
-      const { fields } = ctx.request as any;
-      const result = await resolveDependencies(fields);
+      const { body } = ctx.request as any;
+      const result = await resolveDependencies(body, getMonitor(ctx));
 
       ctx.body = result;
     },
@@ -138,7 +138,7 @@ router.use(cors).get(
   compose([
     compress(),
     async (ctx: Context): Promise<void> => {
-      const result = await resolvePackage(ctx.params.pkg, ctx.params.version);
+      const result = await resolvePackage(ctx.params.pkg, ctx.params.version, getMonitor(ctx));
 
       const directives = [`max-age=${365 * 24 * 60 * 60}`, 'immutable', 'public'];
       ctx.set('Cache-Control', directives.join(', '));

@@ -20,9 +20,9 @@ export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; rea
         }
 
         // tslint:disable-next-line no-any
-        const { fields } = ctx.request as any;
+        const { body } = ctx.request as any;
         const monitor = getMonitor(ctx);
-        const result = await handler(fields, monitor);
+        const result = await handler(body, monitor);
 
         ctx.body = result;
       },
