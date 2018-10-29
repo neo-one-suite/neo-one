@@ -13,34 +13,44 @@ export interface TutorialProps {
   readonly previous?: AdjacentInfo;
 }
 
+const NULL_OFFSET_RETURN = 10000000;
+
 const slugify = (title: string) => title.toLowerCase().replace(' ', '-');
+
+const getElementPosition = (title: string): number => {
+  const element = document.getElementById(slugify(title));
+  if (element !== null && element.offsetParent !== null) {
+    const parentElement = document.getElementById(element.offsetParent.id);
+
+    return parentElement === null ? element.offsetTop : parentElement.offsetTop + element.offsetTop;
+  }
+
+  return NULL_OFFSET_RETURN;
+};
 
 export const Tutorial = (props: TutorialProps) => (
   <ViewportConsumer>
-    {({ inViewY }: any) => {
+    {({ scrollY }: any) => {
       let current = props.sidebar[0].subsections[0].slug;
+      let minOffset = Math.abs(getElementPosition(props.sidebar[0].subsections[0].title) - scrollY);
       // tslint:disable-next-line strict-type-predicates
       if (typeof document !== 'undefined') {
         // tslint:disable-next-line no-loop-statement
         for (const subsection of props.sidebar[0].subsections) {
-          if (inViewY(document.getElementById(slugify(subsection.title)))) {
+          const subsectionOffset = Math.abs(getElementPosition(subsection.title) - scrollY);
+          if (subsectionOffset < minOffset) {
+            minOffset = subsectionOffset;
             current = subsection.slug;
-            break;
           }
 
           if (subsection.subsections !== undefined) {
-            let shouldBreak = false;
             // tslint:disable-next-line no-loop-statement
             for (const subSubsection of subsection.subsections) {
-              if (inViewY(document.getElementById(slugify(subSubsection.title)))) {
+              const subSubsectionOffset = Math.abs(getElementPosition(subSubsection.title) - scrollY);
+              if (subSubsectionOffset < minOffset) {
+                minOffset = subSubsectionOffset;
                 current = subSubsection.slug;
-                shouldBreak = true;
-                break;
               }
-            }
-
-            if (shouldBreak) {
-              break;
             }
           }
         }
