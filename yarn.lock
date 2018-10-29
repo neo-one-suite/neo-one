@@ -338,7 +338,7 @@
     "@babel/helper-remap-async-to-generator" "^7.1.0"
     "@babel/plugin-syntax-async-generators" "^7.0.0"
 
-"@babel/plugin-proposal-class-properties@^7.0.0":
+"@babel/plugin-proposal-class-properties@^7.0.0", "@babel/plugin-proposal-class-properties@^7.1.0":
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-class-properties/-/plugin-proposal-class-properties-7.1.0.tgz#9af01856b1241db60ec8838d84691aa0bd1e8df4"
   integrity sha512-/PCJWN+CKt5v1xcGn4vnuu13QDoV+P7NcICP44BoonAJoPSGwVkgrXihFIQGiEjjPlUDBIw1cM7wYFLARS2/hw==
@@ -21097,6 +21097,13 @@ yargs-parser@^9.0.2:
   integrity sha1-nM9qQ0YP5O1Aqbto9I1DuKaMwHc=
   dependencies:
     camelcase "^4.1.0"
+
+yargs@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-1.0.1.tgz#95172f9cda36f25ab427c4330b6e249bd5a6b22d"
+  integrity sha1-lRcvnNo28lq0J8QzC24km9Wmsi0=
+  dependencies:
+    minimist "~0.0.1"
 
 yargs@11.1.0, yargs@^11.0.0:
   version "11.1.0"
