@@ -63,7 +63,7 @@ export function registerWorkerPouch(
       const allChanges = new Map<string, PouchDB.Core.Changes<any>>();
       const allChangesUsers = new Map<string, number>();
       const messageIDChangesCleanup = new Map<string, () => void>();
-      const messageIDKey = new Map<string>();
+      const messageIDKey = new Map<string, string>();
 
       const getChangesUserCount = (key: string) => {
         const count = allChangesUsers.get(key);

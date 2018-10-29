@@ -25,7 +25,8 @@ export class SmartContractPlugin {
           fileName,
           info.languageService,
           createCompilerHost({
-            smartContractDir: path.dirname(result.resolvedFileName),
+            // tslint:disable-next-line no-non-null-assertion
+            smartContractDir: path.dirname(result!.resolvedFileName),
           }),
         ),
       ];

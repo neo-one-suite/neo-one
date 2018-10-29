@@ -14,7 +14,7 @@ module.exports = ({ path }) => ({
     './scripts/serializers/bn.js',
     './scripts/serializers/buffer.js',
   ],
-  testPathIgnorePatterns: ['/node_modules/'],
+  testPathIgnorePatterns: ['/node_modules/', '/courses/'],
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },

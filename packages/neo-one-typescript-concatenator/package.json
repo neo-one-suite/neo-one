@@ -10,13 +10,13 @@
     "@types/toposort": "^2.0.1",
     "lodash": "^4.17.11",
     "toposort": "^2.0.2",
-    "typescript": "3.2.0-dev.20181020"
+    "typescript": "3.2.0-dev.20181027"
   },
   "devDependencies": {
     "@neo-one/smart-contract-compiler-node": "1.0.0-preview.1",
     "app-root-dir": "1.0.2",
     "fs-extra": "7.0.0",
-    "yargs": "1.0.2"
+    "yargs": "12.0.2"
   },
   "sideEffects": false
 }
