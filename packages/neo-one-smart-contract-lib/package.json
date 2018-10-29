@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-lib",
-  "version": "1.0.0-preview.1",
+  "version": "1.0.0-preview.2",
   "description": "NEO•ONE TypeScript common smart contracts.",
   "main": "./src/index.ts",
   "smartContract": true,
@@ -8,9 +8,9 @@
     "@neo-one/smart-contract": "^1.0.0-preview.1"
   },
   "devDependencies": {
-    "@neo-one/client-common": "^1.0.0-preview.1",
-    "@neo-one/client-full": "^1.0.0-preview.1",
-    "@neo-one/smart-contract-test": "^1.0.0-preview.1",
+    "@neo-one/client-common": "^1.0.0-preview.2",
+    "@neo-one/client-full": "^1.0.0-preview.2",
+    "@neo-one/smart-contract-test": "^1.0.0-preview.2",
     "@types/app-root-dir": "0.1.0",
     "app-root-dir": "1.0.2",
     "bignumber.js": "7.2.1",
