@@ -78,7 +78,9 @@ export abstract class TransactionBaseModel<
     this.hashInternal = hashIn === undefined ? utils.lazy(() => crypto.hash256(this.message)) : () => hashIn;
 
     if (this.attributes.length > MAX_TRANSACTION_ATTRIBUTES) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(
+        `Expected less than ${MAX_TRANSACTION_ATTRIBUTES} attributes, found: ${attributes.length}`,
+      );
     }
   }
 

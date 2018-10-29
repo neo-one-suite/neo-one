@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { InvalidSysCallError, InvalidVMStateError } from '../errors';
+import { InvalidSysCallError, InvalidVMByteCodeError, InvalidVMStateError } from '../errors';
 
 export enum Op {
   PUSH0 = 0x0,
@@ -213,7 +213,7 @@ export const assertByteCode = (value: number): ByteCode => {
     return value;
   }
 
-  throw new Error('Invalid bytecode');
+  throw new InvalidVMByteCodeError(value);
 };
 
 export enum SysCall {

@@ -45,11 +45,11 @@ export class ClaimTransactionModel<
     this.claims = claims;
 
     if (this.version !== 0) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`expected version 0, found: ${this.version}`);
     }
 
     if (this.claims.length === 0) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError('expected claims, found none.');
     }
   }
 

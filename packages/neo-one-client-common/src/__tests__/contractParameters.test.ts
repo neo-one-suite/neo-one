@@ -1,7 +1,7 @@
 import { data, keys } from '../__data__';
 import { common } from '../common';
 import { contractParameters, smartContractConverters } from '../contractParameters';
-import { BufferContractParameter } from '../types';
+import { BufferContractParameter, ContractParameter } from '../types';
 import { utils } from '../utils';
 
 describe('contractParameters', () => {
@@ -445,5 +445,82 @@ describe('contractParameters', () => {
     const result = contractParameters.Void({ type: 'Void' }, { type: 'Void' });
 
     expect(result).toEqual(undefined);
+  });
+});
+
+describe('Extra Contract Parameter Coverage', () => {
+  const stringMap = [
+    {
+      type: 'String' as 'String',
+      value: 'one',
+    },
+    {
+      type: 'String' as 'String',
+      value: '1',
+    },
+  ] as [ContractParameter, ContractParameter];
+
+  const mapParam = {
+    type: 'Map' as 'Map',
+    value: [stringMap],
+  };
+
+  const mapABI = {
+    type: 'Map' as 'Map',
+    key: {
+      type: 'String' as 'String',
+    },
+    value: {
+      type: 'String' as 'String',
+    },
+  };
+
+  const objABI = {
+    type: 'Object' as 'Object',
+    properties: {
+      one: {
+        type: 'String' as 'String',
+      },
+    },
+  };
+
+  test('toForwardValue', () => {
+    expect(smartContractConverters.toForwardValue(mapParam)).toEqual(mapParam);
+  });
+
+  test('toMap function', () => {
+    const map = smartContractConverters.toMap(mapParam, mapABI);
+    expect(map).toEqual(new Map([['one', '1']]));
+  });
+
+  test('toObject function', () => {
+    const obj = smartContractConverters.toObject(mapParam, objABI);
+    expect(obj).toEqual({
+      one: '1',
+    });
+  });
+
+  test('toMap Throws', () => {
+    const toMapThrows = () =>
+      smartContractConverters.toMap(
+        {
+          type: 'Void' as 'Void',
+        },
+        mapABI,
+      );
+
+    expect(toMapThrows).toThrowError('Expected one of ["Map"] ContractParameterTypes, found Void');
+  });
+
+  test('toObject Throws', () => {
+    const toObjectThrows = () =>
+      smartContractConverters.toObject(
+        {
+          type: 'Void' as 'Void',
+        },
+        objABI,
+      );
+
+    expect(toObjectThrows).toThrowError('Expected one of ["Map"] ContractParameterTypes, found Void');
   });
 });

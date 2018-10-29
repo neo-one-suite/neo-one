@@ -33,6 +33,7 @@ export class ScriptBuilder {
       this.emitUInt32LE(value.length);
       this.emit(value);
     } else {
+      /* istanbul ignore next */
       throw new Error('Invalid buffer length');
     }
 
@@ -155,7 +156,7 @@ export class ScriptBuilder {
     if (typeof param === 'object') {
       return this.emitPushObject(param);
     }
-
+    /* istanbul ignore next */
     throw new InvalidParamError(typeof param);
   }
 

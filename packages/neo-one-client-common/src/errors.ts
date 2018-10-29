@@ -2,6 +2,7 @@ import { makeErrorWithCode } from '@neo-one/utils';
 import { common, PrivateKey } from './common';
 import { ContractParameter } from './types';
 
+/* istanbul ignore next */
 export const UnknownOpError = makeErrorWithCode('UNKNOWN_OP', (byteCode: string) => `Unknown op: ${byteCode}`);
 export const InvalidContractParameterError = makeErrorWithCode(
   'INVALID_CONTRACT_PARAMETER',
@@ -25,6 +26,7 @@ export const InvalidNumberOfKeysError = makeErrorWithCode(
   (m: number, amount: number) =>
     `invalid number of keys. Found: ${m} keys, must be between 1 and ${amount} (number of public keys).`,
 );
+/* istanbul ignore next */
 export const InvalidPrivateKeyError = makeErrorWithCode(
   'INVALID_PRIVATE_KEY',
   (privateKey: PrivateKey) => `Invalid Private Key, found: ${common.privateKeyToString(privateKey)}`,
@@ -41,6 +43,7 @@ export const InvalidVMStateError = makeErrorWithCode(
   'INVALID_VM_STATE',
   (state: number) => `Invalid VM State: ${state}`,
 );
+/* istanbul ignore next */
 export const InvalidParamError = makeErrorWithCode(
   'INVALID_PARAM',
   (paramType?: string) => `Invalid Param${paramType === undefined ? '.' : `: ${paramType}`}`,
@@ -77,4 +80,12 @@ export const InvalidAttributeUsageJSONError = makeErrorWithCode(
 export const InvalidTransactionTypeError = makeErrorWithCode(
   'INVALID_TRANSACTION_TYPE',
   (transactionType: number) => `Expected transaction type, found: ${transactionType.toString(16)}`,
+);
+export const InvalidVMByteCodeError = makeErrorWithCode(
+  'INVALID_VM_OP_CODE',
+  (value: number) => `Expected VM OpCode, received: ${value}}`,
+);
+export const InvalidSignaturesError = makeErrorWithCode(
+  'INVALID_SIGNATURES',
+  (m: number, value: number) => `Expected ${m} unique signatures, found: ${value}.`,
 );

@@ -53,15 +53,15 @@ export class InvocationTransactionModel<
     this.script = script;
 
     if (this.version > 1) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`expected version <= 1, found: ${this.version}`);
     }
 
     if (this.script.length === 0) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError('expected script');
     }
 
     if (this.gas.lt(utils.ZERO)) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`expected valid gas, found: ${this.gas.toString()}`);
     }
   }
 
