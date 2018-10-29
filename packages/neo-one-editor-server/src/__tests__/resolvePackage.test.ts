@@ -1,6 +1,6 @@
 import { resolvePackage } from '../resolvePackage';
 
-describe.only('resolvePackage', () => {
+describe('resolvePackage', () => {
   test('resolves @types/react', async () => {
     const result = await resolvePackage('@types/react', '16.4.18');
 

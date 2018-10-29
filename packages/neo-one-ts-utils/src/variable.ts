@@ -11,3 +11,7 @@ export function getDeclarations(node: ts.VariableDeclarationList): ReadonlyArray
 export function getDeclarationList(node: ts.VariableStatement): ts.VariableDeclarationList {
   return node.declarationList;
 }
+
+export function getDeclarationsFromStatement(node: ts.VariableStatement): ReadonlyArray<ts.VariableDeclaration> {
+  return getDeclarations(getDeclarationList(node));
+}

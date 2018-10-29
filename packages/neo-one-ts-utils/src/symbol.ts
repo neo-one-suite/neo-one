@@ -32,6 +32,12 @@ export function getAliasedSymbol(typeChecker: ts.TypeChecker, node: ts.Symbol): 
   return undefined;
 }
 
+export function getSymbolOrAlias(typeChecker: ts.TypeChecker, symbol: ts.Symbol): ts.Symbol {
+  const alias = getAliasedSymbol(typeChecker, symbol);
+
+  return alias === undefined ? symbol : alias;
+}
+
 export function getMembers(node: ts.Symbol): ts.SymbolTable | undefined {
   const members = utils.getValueOrUndefined(node.members);
 

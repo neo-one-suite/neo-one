@@ -1,0 +1,88 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`concatenate import 1`] = `
+"const fizz = 'fizz', bang = 'bang';
+type Address = string;
+const foo = 'foo';
+abstract class SmartContract {
+    public get foo(): string {
+        return 'foo';
+    }
+}
+// tslint:disable-next-line no-default-export
+class default52 extends SmartContract {
+}
+// tslint:disable-next-line export-name
+class FooType {
+    public readonly bar: string = 'bar';
+}
+const fooType = 'fooType';
+// tslint:disable-next-line no-let
+let valc2 = 0;
+function valuec1() {
+    return valc2;
+}
+function defaultc3() {
+    valc2 += 1;
+}
+const defaultc4 = 'baz';
+// tslint:disable-next-line no-let
+let valc5 = 0;
+const x = 3;
+const value39 = () => valc5;
+const incrementValue = () => {
+    valc5 += 1;
+};
+const bar = { value: value39, incrementValue: incrementValue, x: x };
+if (foo !== 'foo') {
+    throw 'Failure';
+}
+if ((foo as Address) !== 'foo') {
+    throw 'Failure';
+}
+if (bar.value() !== 0) {
+    throw 'Failure';
+}
+bar.incrementValue();
+if (bar.value() !== 1) {
+    throw 'Failure';
+}
+if (valuec1() !== 0) {
+    throw 'Failure';
+}
+defaultc3();
+if (valuec1() !== 1) {
+    throw 'Failure';
+}
+if (bar.x !== 3) {
+    throw 'Failure';
+}
+if (defaultc4 !== 'baz') {
+    throw 'Failure';
+}
+// tslint:disable-next-line export-name
+export class Qux extends SmartContract {
+    public useFooType(fooType: FooType): string {
+        return fooType.bar;
+    }
+}
+const qux = new Qux();
+if (qux.foo !== 'foo') {
+    throw 'Failure';
+}
+const fooSC = new default52();
+if (fooSC.foo !== 'foo') {
+    throw 'Failure';
+}
+export { fooSC as fooSC };
+export { fooSC as barSC };
+export { bar };
+export { bar as bar2 };
+export { defaultc4 as baz };
+export { defaultc4 as baz2 };
+export { FooType as FooType, fooType as fooType };
+export { Address as Address, foo as foo, SmartContract as SmartContract };
+export { SmartContract as SmartContract2Level, default52 as FooSmartContract2Level, foo as foo2level, Address as Address2Level };
+export { fizz as fizz };
+"
+`;

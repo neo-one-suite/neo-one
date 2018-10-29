@@ -15,16 +15,27 @@ export interface TranspileResult {
 }
 
 export const transpile = ({ sourceFile, context }: TranspileOptions): TranspileResult | undefined => {
+  const isExternalFile = (
+    node: ts.SourceFile,
+    _importPath: string,
+    decl: ts.ImportDeclaration | ts.ExportDeclaration,
+  ) => {
+    if (
+      ts.isImportDeclaration(decl) &&
+      !tsUtils.importExport.hasValueReference(context.program, context.languageService, decl)
+    ) {
+      return true;
+    }
+
+    return context.builtins.isBuiltinFile(node);
+  };
   const concatenator = new Concatenator({
     context: {
       typeChecker: context.typeChecker,
       program: context.program,
       languageService: context.languageService,
       getSymbol: context.analysis.getSymbol.bind(context.analysis),
-      isIgnoreFile: context.analysis.isSmartContract.bind(context.analysis),
-      isGlobalIdentifier: context.builtins.isBuiltinIdentifier.bind(context.builtins),
-      isGlobalFile: context.builtins.isBuiltinFile.bind(context.builtins),
-      isGlobalSymbol: context.builtins.isBuiltinSymbol.bind(context.builtins),
+      isExternalFile,
     },
     sourceFile,
   });

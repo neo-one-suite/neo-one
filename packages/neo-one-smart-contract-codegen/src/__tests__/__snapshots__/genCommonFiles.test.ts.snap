@@ -28,7 +28,7 @@ const isLocalUserAccountProvider = (userAccountProvider) => userAccountProvider 
 
 export const createClient = (getUserAccountProviders = getDefaultUserAccountProviders) => {
   const providers = [];
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 40100 }));
   }
   const provider = new NEOONEProvider(providers);
@@ -37,7 +37,7 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
   const localUserAccountProvider = localUserAccountProviders.find(
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
@@ -125,7 +125,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
   TUserAccountProviders
 > => {
   const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [];
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 40100 }));
   }
   const provider = new NEOONEProvider(providers);
@@ -136,7 +136,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
@@ -361,7 +361,7 @@ import { projectID } from './projectID';
 
 let sourceMapsIn = Promise.resolve({});
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
   sourceMapsIn = Promise.resolve().then(async () => {
     const client = new OneClient(40100);
     const result = await client.request({
@@ -382,7 +382,7 @@ import { OneClient, SourceMaps } from '@neo-one/client';
 import { projectID } from './projectID';
 
 let sourceMapsIn: Promise<SourceMaps> = Promise.resolve({});
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
   sourceMapsIn = Promise.resolve().then(async () => {
     const client = new OneClient(40100);
     const result = await client.request({

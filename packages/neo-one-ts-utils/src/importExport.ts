@@ -1,5 +1,7 @@
 import ts from 'typescript';
+import * as importDeclaration from './importDeclaration';
 import * as node_ from './node';
+import * as reference_ from './reference';
 import * as symbol from './symbol';
 import * as utils from './utils';
 
@@ -64,4 +66,56 @@ export function getModuleSpecifierSourceFileOrThrow(
 
 export function isExportEquals(node: ts.ExportAssignment): boolean {
   return !!node.isExportEquals;
+}
+
+export function hasValueReference(
+  program: ts.Program,
+  languageService: ts.LanguageService,
+  node: ts.ImportDeclaration,
+): boolean {
+  const currentSourceFile = node_.getSourceFile(node);
+
+  const namespaceImport = importDeclaration.getNamespaceImport(node);
+  if (
+    namespaceImport !== undefined &&
+    hasLocalValueReferences(program, languageService, currentSourceFile, namespaceImport)
+  ) {
+    return true;
+  }
+
+  const defaultImport = importDeclaration.getDefaultImport(node);
+  if (
+    defaultImport !== undefined &&
+    hasLocalValueReferences(program, languageService, currentSourceFile, defaultImport)
+  ) {
+    return true;
+  }
+
+  return importDeclaration
+    .getNamedImports(node)
+    .some((namedImport) =>
+      hasLocalValueReferences(program, languageService, currentSourceFile, getImportNameNode(namedImport)),
+    );
+}
+
+export function hasLocalValueReferences(
+  program: ts.Program,
+  languageService: ts.LanguageService,
+  currentSourceFile: ts.SourceFile,
+  node: node_.AnyNameableNode,
+): boolean {
+  const references = reference_.findReferencesAsNodes(program, languageService, node);
+
+  return references.some(
+    (reference) =>
+      node_.getSourceFile(reference) === currentSourceFile &&
+      node_.getFirstAncestorByTest(reference, ts.isImportDeclaration) === undefined &&
+      !node_.isPartOfTypeNode(reference),
+  );
+}
+
+export function getImportNameNode(node: ts.ImportSpecifier): ts.ImportSpecifier | ts.Identifier {
+  const alias = node_.getPropertyNameNode(node);
+
+  return alias === undefined ? node : alias;
 }
