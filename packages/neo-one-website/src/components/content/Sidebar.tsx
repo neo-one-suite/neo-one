@@ -30,74 +30,20 @@ const MobileWrapper = styled(Box)`
 const fadeSlideIn = keyframes`
   0% {
     transform: translateY(40px);
-    opacity: 0
-    }
-  10% {
-    opacity: .1
-  }
-  20% {
-    opacity: .2
-  }
-  30% {
-    opacity: .3
-  }
-  40% {
-    opacity: .4
-  }
-  50% {
-    opacity: .5
-  }
-  60% {
-    opacity: .6
-  }
-  70% {
-    opacity: .7
-  }
-  80% {
-    opacity: .8
-  }
-  90% {
-    opacity: .9
+    opacity: 0;
   }
   100% {
-    opacity: 1
+    opacity: 1;
   }
 `;
 
 const fadeSlideOut = keyframes`
   0% {
-    opacity: 1
-    }
-  10% {
-    opacity: .9
-  }
-  20% {
-    opacity: .8
-  }
-  30% {
-    opacity: .7
-  }
-  40% {
-    opacity: .6
-  }
-  50% {
-    opacity: .5
-  }
-  60% {
-    opacity: .4
-  }
-  70% {
-    opacity: .3
-  }
-  80% {
-    opacity: .2
-  }
-  90% {
-    opacity: .1
+    opacity: 1;
   }
   100% {
     transform: translateY(40px);
-    opacity: 0
+    opacity: 0;
   }
 `;
 
@@ -111,10 +57,10 @@ const StyledHidden = styled(Hidden)`
   height: calc(100vh - 72px);
   overflow-y: auto;
   &[aria-hidden='false'] {
-    animation: ${fadeSlideIn} 500ms};
+    animation: ${fadeSlideIn} 500ms;
   }
   &[aria-hidden='true'] {
-    animation: ${fadeSlideOut} 500ms};
+    animation: ${fadeSlideOut} 500ms;
   }
 
   @media (min-width: ${prop('theme.breakpoints.sm')}) {
