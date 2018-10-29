@@ -229,7 +229,7 @@
     "ts-loader": "5.2.2",
     "ts-node": "7.0.1",
     "tslint": "5.11.0",
-    "tslint-clean-code": "0.2.7",
+    "tslint-clean-code": "0.2.8",
     "tslint-config-prettier": "1.15.0",
     "tslint-consistent-codestyle": "1.13.3",
     "tslint-immutable": "4.8.0",
