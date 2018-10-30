@@ -56,7 +56,7 @@ for:
     init:
       - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
     install:
-      - ps: Update-NodeJsInstallation 10.10.0 x64
+      - ps: Update-NodeJsInstallation 10.12.0 x64
       - node --version
       - yarn --version
       - git clone https://github.com/neo-one-suite/neo-one-playground.git packages\neo-one-playground
