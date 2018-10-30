@@ -75,9 +75,8 @@ export const createLocalClients = () => {
 };
   ",
   "ts": "
-import { Client, DeveloperClient, LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider, NEOONEProvider, NEOONEOneDataProvider, OneClient, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client';
+import { Client, DeveloperClient, LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider, NEOONEProvider, NEOONEOneDataProvider, OneClient, LocalClient, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client';
 import { projectID } from './projectID';
-import { LocalClient } from '@neo-one/react';
 
 export type DefaultUserAccountProviders = {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>,
