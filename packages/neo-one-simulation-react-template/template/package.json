@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@neo-one/cli": "1.0.0-preview.1",
-    "@neo-one/smart-contract-test": "1.0.0-preview.1",
+    "@neo-one/smart-contract-test": "1.0.0-preview.2",
     "@neo-one/smart-contract-typescript-plugin": "1.0.0-preview.1",
     "@types/jest": "23.3.7",
     "@types/react": "16.4.18",
