@@ -20,7 +20,7 @@
     "lodash": "^4.17.11",
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
-    "typescript": "3.2.0-dev.20181027"
+    "typescript": "3.2.0-dev.20181030"
   },
   "devDependencies": {
     "@neo-one/client-full-common": "^1.0.0-preview.2",
