@@ -2095,14 +2095,6 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
   integrity sha512-ONhaKPIufzzrlNbqtWFFd+jlnemX6lJAgq9ZeiZtS7I1PIf/la7CW4m83rTXRnVnsMbW2k56pGYu7AUFJD9Pow==
 
-"@tippy.js/react@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@tippy.js/react/-/react-1.0.1.tgz#6ccc53c50a23f8c5846610876ebfa1f929e5c868"
-  integrity sha512-am77vnLtM2tGndvYhGgjPD7QqklfuKGgBCNPGxnOl7hMCsPpO7zBcsZosCstGQfzFdJDlKGU4hqgFM5xyoMxwA==
-  dependencies:
-    prop-types "^15.6.2"
-    tippy.js "^3.0.6"
-
 "@types/abstract-leveldown@*", "@types/abstract-leveldown@^5.0.1":
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@types/abstract-leveldown/-/abstract-leveldown-5.0.1.tgz#3c7750d0186b954c7f2d2f6acc8c3c7ba0c3412e"
@@ -6602,7 +6594,25 @@ css-declaration-sorter@^4.0.1:
     postcss "^7.0.1"
     timsort "^0.3.0"
 
-css-loader@1.0.0, css-loader@^1.0.0:
+css-loader@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-1.0.1.tgz#6885bb5233b35ec47b006057da01cc640b6b79fe"
+  integrity sha512-+ZHAZm/yqvJ2kDtPne3uX0C+Vr3Zn5jFn2N4HywtS5ujwvsVkyg0VArEXpl3BgczDA8anieki1FIzhchX4yrDw==
+  dependencies:
+    babel-code-frame "^6.26.0"
+    css-selector-tokenizer "^0.7.0"
+    icss-utils "^2.1.0"
+    loader-utils "^1.0.2"
+    lodash "^4.17.11"
+    postcss "^6.0.23"
+    postcss-modules-extract-imports "^1.2.0"
+    postcss-modules-local-by-default "^1.2.0"
+    postcss-modules-scope "^1.1.0"
+    postcss-modules-values "^1.3.0"
+    postcss-value-parser "^3.3.0"
+    source-list-map "^2.0.0"
+
+css-loader@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-1.0.0.tgz#9f46aaa5ca41dbe31860e3b62b8e23c42916bf56"
   integrity sha512-tMXlTYf3mIMt3b0dDCOQFJiVvxbocJ5Ho577WiGPYPZcqVEO218L2iU22pDXzkTZCLDE+9AmGSUkWxeh/nZReA==
@@ -6921,10 +6931,10 @@ dataloader@^1.4.0:
   resolved "https://registry.yarnpkg.com/dataloader/-/dataloader-1.4.0.tgz#bca11d867f5d3f1b9ed9f737bd15970c65dff5c8"
   integrity sha512-68s5jYdlvasItOJnCuI2Q9s4q98g0pCyL3HrcKJu8KNugUl8ahgmZYg38ysLTgQjjXX3H8CJLkAvWrclWfcalw==
 
-date-fns@2.0.0-alpha.24, date-fns@^2.0.0-alpha.24:
-  version "2.0.0-alpha.24"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0-alpha.24.tgz#2988c137c72275af29d7d21cc53eb52b3a8c2586"
-  integrity sha512-jpLzKHKSq0nTcZ3K5ZnTelxWmUwPepuoEaXkATwIUnc1tc+/rIooAvDMR+zdAGnwQ35eVWiyn5dikoLHjhEYeA==
+date-fns@2.0.0-alpha.25, date-fns@^2.0.0-alpha.25:
+  version "2.0.0-alpha.25"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0-alpha.25.tgz#651a5d1f59a01af6cf0371e39b2ae29df5d521ee"
+  integrity sha512-iQzJkHF0L4wah9Ae9PkvwemwFz6qmRLuNZcghmvf2t+ptLs1qXzONLiGtjmPQzL6+JpC01JjlTopY2AEy4NFAg==
 
 date-fns@^1.27.2:
   version "1.29.0"
@@ -7861,7 +7871,7 @@ escape-html@^1.0.3, escape-html@~1.0.3:
   resolved "https://registry.yarnpkg.com/escape-html/-/escape-html-1.0.3.tgz#0258eae4d3d0c0974de1c169188ef0051d1d1988"
   integrity sha1-Aljq5NPQwJdN4cFpGI7wBR0dGYg=
 
-escape-string-regexp@1.0.5, escape-string-regexp@^1.0.2, escape-string-regexp@^1.0.3, escape-string-regexp@^1.0.5:
+escape-string-regexp@1.0.5, escape-string-regexp@^1.0.2, escape-string-regexp@^1.0.3, escape-string-regexp@^1.0.4, escape-string-regexp@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
   integrity sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=
@@ -8988,6 +8998,15 @@ functional-red-black-tree@^1.0.1, functional-red-black-tree@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
+
+g-status@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/g-status/-/g-status-2.0.2.tgz#270fd32119e8fc9496f066fe5fe88e0a6bc78b97"
+  integrity sha512-kQoE9qH+T1AHKgSSD0Hkv98bobE90ILQcXAF4wvGgsr7uFqNvwmh8j+Lq3l0RVt3E3HjSbv2B9biEGcEtpHLCA==
+  dependencies:
+    arrify "^1.0.1"
+    matcher "^1.0.0"
+    simple-git "^1.85.0"
 
 gauge@~2.7.3:
   version "2.7.4"
@@ -12604,22 +12623,25 @@ linkify-it@^2.0.0:
   dependencies:
     uc.micro "^1.0.1"
 
-lint-staged@7.3.0:
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/lint-staged/-/lint-staged-7.3.0.tgz#90ff33e5ca61ed3dbac35b6f6502dbefdc0db58d"
-  integrity sha512-AXk40M9DAiPi7f4tdJggwuKIViUplYtVj1os1MVEteW7qOkU50EOehayCfO9TsoGK24o/EsWb41yrEgfJDDjCw==
+lint-staged@8.0.2:
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/lint-staged/-/lint-staged-8.0.2.tgz#b17df8534713071826c2a576c9bdf84b2a535f30"
+  integrity sha512-k8HKT/eIIOpqVLrrNbLDaTn4Vnqan6Y8EZIrxrxtlbArJ76RWcD5hyPqB5f3cLDMb+MjDlOkCWpLpZLHwZw7Fg==
   dependencies:
     chalk "^2.3.1"
     commander "^2.14.1"
     cosmiconfig "^5.0.2"
     debug "^3.1.0"
     dedent "^0.7.0"
-    execa "^0.9.0"
+    del "^3.0.0"
+    execa "^1.0.0"
     find-parent-dir "^0.3.0"
+    g-status "^2.0.2"
     is-glob "^4.0.0"
     is-windows "^1.0.2"
     jest-validate "^23.5.0"
-    listr "^0.14.1"
+    listr "^0.14.2"
+    listr-update-renderer "https://github.com/okonet/listr-update-renderer/tarball/upgrade-log-update"
     lodash "^4.17.5"
     log-symbols "^2.2.0"
     micromatch "^3.1.8"
@@ -12651,10 +12673,9 @@ listr-update-renderer@^0.2.0:
     log-update "^1.0.2"
     strip-ansi "^3.0.1"
 
-listr-update-renderer@^0.4.0:
+listr-update-renderer@^0.4.0, "listr-update-renderer@https://github.com/okonet/listr-update-renderer/tarball/upgrade-log-update":
   version "0.4.0"
-  resolved "https://registry.yarnpkg.com/listr-update-renderer/-/listr-update-renderer-0.4.0.tgz#344d980da2ca2e8b145ba305908f32ae3f4cc8a7"
-  integrity sha1-NE2YDaLKLosUW6MFkI8yrj9MyKc=
+  resolved "https://github.com/okonet/listr-update-renderer/tarball/upgrade-log-update#06073fa93166277607a7814f4e1f83960081414c"
   dependencies:
     chalk "^1.1.3"
     cli-truncate "^0.2.1"
@@ -12662,7 +12683,7 @@ listr-update-renderer@^0.4.0:
     figures "^1.7.0"
     indent-string "^3.0.0"
     log-symbols "^1.0.2"
-    log-update "^1.0.2"
+    log-update "^2.3.0"
     strip-ansi "^3.0.1"
 
 listr-verbose-renderer@^0.4.0:
@@ -12697,7 +12718,7 @@ listr@0.12.0:
     stream-to-observable "^0.1.0"
     strip-ansi "^3.0.1"
 
-listr@^0.14.1:
+listr@^0.14.2:
   version "0.14.2"
   resolved "https://registry.yarnpkg.com/listr/-/listr-0.14.2.tgz#cbe44b021100a15376addfc2d79349ee430bfe14"
   integrity sha512-vmaNJ1KlGuGWShHI35X/F8r9xxS0VTHh9GejVXwSN20fG5xpq3Jh4bJbnumoT6q5EDM/8/YP1z3YMtQbFmhuXw==
@@ -13370,6 +13391,13 @@ matchdep@^2.0.0:
     micromatch "^3.0.4"
     resolve "^1.4.0"
     stack-trace "0.0.10"
+
+matcher@^1.0.0:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/matcher/-/matcher-1.1.1.tgz#51d8301e138f840982b338b116bb0c09af62c1c2"
+  integrity sha512-+BmqxWIubKTRKNWx/ahnCkk3mG8m7OturVlqq6HiojGJTd5hVYbgZm6WzcYPCoB+KBT4Vd6R7WSRG2OADNaCjg==
+  dependencies:
+    escape-string-regexp "^1.0.4"
 
 math-random@^1.0.1:
   version "1.0.1"
@@ -18036,6 +18064,13 @@ simple-get@^2.7.0:
     once "^1.3.1"
     simple-concat "^1.0.0"
 
+simple-git@^1.85.0:
+  version "1.106.0"
+  resolved "https://registry.yarnpkg.com/simple-git/-/simple-git-1.106.0.tgz#81024c7c22fafd0c386a2b338031cc60b3568b9c"
+  integrity sha512-LaxKq4X9Om7bb16Cpinc36hT1YLHMM9KDQMSWJVv4Y1TGDEUuZbs+0lAk2JSKkCEO3xFjcMSx5OjvZo+i4eJvQ==
+  dependencies:
+    debug "^4.0.1"
+
 simple-swizzle@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/simple-swizzle/-/simple-swizzle-0.2.2.tgz#a4da6b635ffcccca33f70d17cb92592de95e557a"
@@ -19306,13 +19341,6 @@ tiny-emitter@^2.0.0:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/tiny-emitter/-/tiny-emitter-2.0.2.tgz#82d27468aca5ade8e5fd1e6d22b57dd43ebdfb7c"
   integrity sha512-2NM0auVBGft5tee/OxP4PI3d8WItkDM+fPnaRAVo6xTDI2knbz9eC5ArWGqtGlYqiH3RU5yMpdyTTO7MguC4ow==
-
-tippy.js@^3.0.6:
-  version "3.0.6"
-  resolved "https://registry.yarnpkg.com/tippy.js/-/tippy.js-3.0.6.tgz#ad29361e96129de582bf4088f00ea8413632ceb4"
-  integrity sha512-/paH+Kf3Caj0J+AlB1Kdg2KFAZ8yJeXZ8hPiwDBfxOLZg3YxDUa2OpMi3ODK8TXSMoPqcGUExCVcc46AmGCxjQ==
-  dependencies:
-    popper.js "^1.14.4"
 
 title-case@^2.1.0:
   version "2.1.1"

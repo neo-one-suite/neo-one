@@ -16,7 +16,7 @@
     "@types/react-dom": "^16.0.9",
     "bignumber.js": "^7.2.1",
     "constate": "^0.9.0",
-    "date-fns": "^2.0.0-alpha.24",
+    "date-fns": "^2.0.0-alpha.25",
     "localforage": "^1.7.3",
     "lodash": "^4.17.11",
     "react": "^16.6.0",
