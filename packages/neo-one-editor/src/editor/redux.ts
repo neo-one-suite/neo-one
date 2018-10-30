@@ -173,7 +173,7 @@ const reducer = reducerWithInitialState(createInitialState())
         if (foundTest !== undefined) {
           const index = testSuite.tests.indexOf(foundTest);
           if (index !== -1) {
-            // tslint:disable-next-line no-object-mutation
+            // tslint:disable-next-line no-object-mutation no-array-mutation
             testSuite.tests[index] = {
               ...test,
               name: [...test.name],
