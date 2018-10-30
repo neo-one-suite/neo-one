@@ -36,7 +36,7 @@
     "@neo-one/cli": "1.0.0-preview.2",
     "@neo-one/smart-contract-test": "1.0.0-preview.2",
     "@neo-one/smart-contract-typescript-plugin": "1.0.0-preview.2",
-    "@types/jest": "23.3.8",
+    "@types/jest": "23.3.9",
     "@types/react": "16.4.18",
     "@types/react-dom": "16.0.9",
     "@types/semver": "5.5.0",
