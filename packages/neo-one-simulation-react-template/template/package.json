@@ -62,7 +62,7 @@
     "webpack-serve": "2.0.2"
   },
   "dependencies": {
-    "@neo-one/client": "1.0.0-preview.1",
+    "@neo-one/client": "1.0.0-preview.2",
     "@neo-one/react": "1.0.0-preview.1",
     "@neo-one/smart-contract": "1.0.0-preview.1",
     "bignumber.js": "7.2.1",
