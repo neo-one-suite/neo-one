@@ -72,6 +72,9 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
               {
                 test: /coursesLoader/,
               },
+              {
+                test: /packagesLoader/,
+              },
             ]),
           ]
         : bundle === 'server'

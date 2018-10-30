@@ -18,6 +18,7 @@
     "@neo-one/client": "^1.0.0-preview.2",
     "@neo-one/client-full": "^1.0.0-preview.2",
     "@neo-one/client-switch": "^1.0.0-preview.2",
+    "@neo-one/developer-tools": "^1.0.0-preview.2",
     "@neo-one/local-browser": "^1.0.0-preview.2",
     "@neo-one/local-browser-worker": "^1.0.0-preview.2",
     "@neo-one/node-browser": "^1.0.0-preview.2",
@@ -72,7 +73,7 @@
     "styled-tools": "^1.5.2",
     "trackjs": "^2.13.0",
     "ts-node": "^7.0.1",
-    "typescript": "3.2.0-dev.20181027",
+    "typescript": "3.2.0-dev.20181030",
     "typescript-fsa": "^3.0.0-beta-2",
     "typescript-fsa-reducers": "^1.0.0",
     "webpack": "4.19.0"

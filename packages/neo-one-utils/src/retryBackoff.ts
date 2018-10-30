@@ -12,6 +12,7 @@ export interface RetryBackoffConfig {
   // Conditional retry.
   readonly shouldRetry?: (error: Error) => boolean;
   readonly backoffDelay?: (iteration: number, initialInterval: number) => number;
+  readonly onError?: (error: Error) => void;
 }
 
 /** Calculates the actual delay which can be limited by maxInterval */
@@ -39,19 +40,24 @@ export function retryBackoff(config: number | RetryBackoffConfig): <T>(source: O
     maxInterval = Infinity,
     shouldRetry = () => true,
     backoffDelay = exponentialBackoffDelay,
+    onError = () => {
+      // do nothing
+    },
   } = typeof config === 'number' ? { initialInterval: config } : config;
 
   return <T>(source: Observable<T>) =>
     source.pipe(
       retryWhen<T>((errors) =>
         errors.pipe(
-          concatMap((error, i) =>
-            iif(
+          concatMap((error, i) => {
+            onError(error);
+
+            return iif(
               () => i < maxRetries && shouldRetry(error),
               timer(getDelay(backoffDelay(i, initialInterval), maxInterval)),
               throwError(error),
-            ),
-          ),
+            );
+          }),
         ),
       ),
     );

@@ -14,7 +14,7 @@ export const genReact = ({
   readonly clientPath: string;
 }) => ({
   js: `
-import { DeveloperTools as DeveloperToolsBase } from '@neo-one/react';
+import { DeveloperTools } from '@neo-one/developer-tools';
 import * as React from 'react';
 import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(reactPath, clientPath)}';
 ${contractsPaths
@@ -35,6 +35,7 @@ export const ContractsProvider = ({
   const client = clientIn === undefined ? createClient() : clientIn;
   const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
   const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+  DeveloperTools.enable({ client, developerClients, localClients });
 
   return (
     <Context.Provider
@@ -57,18 +58,10 @@ export const WithContracts = ({ children }) => (
     {children}
   </Context.Consumer>
 );
-
-export const DeveloperTools = () => (
-  <WithContracts>
-    {({ client, developerClients, localClients }) =>
-      <DeveloperToolsBase client={client} developerClients={developerClients} localClients={localClients} />
-    }
-  </WithContracts>
-);
 `,
   ts: `
-import { DeveloperTools as DeveloperToolsBase, LocalClient } from '@neo-one/react';
-import { Client, DeveloperClient } from '@neo-one/client';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { DeveloperTools } from '@neo-one/developer-tools';
 import * as React from 'react';
 import { Contracts } from '${getRelativeImport(reactPath, commonTypesPath)}';
 import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(reactPath, clientPath)}';
@@ -104,6 +97,7 @@ export const ContractsProvider = <TClient extends Client>({
   const client = clientIn === undefined ? createClient() : clientIn;
   const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
   const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+  DeveloperTools.enable({ client, developerClients, localClients });
 
   return (
     <Context.Provider
@@ -128,14 +122,6 @@ export const WithContracts = <TClient extends Client>({ children }: WithContract
   <Context.Consumer>
     {children}
   </Context.Consumer>
-);
-
-export const DeveloperTools = () => (
-  <WithContracts>
-    {({ client, developerClients, localClients }) =>
-      <DeveloperToolsBase client={client} developerClients={developerClients} localClients={localClients} />
-    }
-  </WithContracts>
 );
   `,
 });

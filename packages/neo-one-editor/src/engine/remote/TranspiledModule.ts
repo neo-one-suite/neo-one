@@ -5,11 +5,14 @@ import { EvaluateAsyncOptions, EvaluateOptions, ExploreResult, MissingPath, Modu
 import { RemoteEngine } from './RemoteEngine';
 import { Exports } from './types';
 
-const NEEDS_EVAL = Symbol.for('needsEval');
+type MutableExports =
+  | { readonly type: 'needsEval' }
+  | { readonly type: 'exploreEval'; readonly exports: Exports; readonly missingPaths: ReadonlyArray<MissingPath> }
+  | { readonly type: 'eval'; readonly exports: Exports };
 
 export class TranspiledModule extends ModuleBase {
   private readonly mutableDependents = new Set<ModuleBase>();
-  private mutableExports: Exports = NEEDS_EVAL;
+  private mutableExports: MutableExports = { type: 'needsEval' };
 
   public constructor(
     engine: RemoteEngine,
@@ -25,12 +28,12 @@ export class TranspiledModule extends ModuleBase {
       this.mutableDependents.add(initiator);
     }
 
-    if (force || this.mutableExports === NEEDS_EVAL) {
+    if (force || this.mutableExports.type === 'needsEval' || this.mutableExports.type === 'exploreEval') {
       const { exports } = evaluate(this.engine, this, false);
-      this.mutableExports = exports;
+      this.mutableExports = { type: 'eval', exports };
     }
 
-    return this.mutableExports;
+    return this.mutableExports.exports;
   }
 
   public evaluateExplore({ force = false, initiator }: EvaluateOptions = {}): ExploreResult {
@@ -38,16 +41,18 @@ export class TranspiledModule extends ModuleBase {
       this.mutableDependents.add(initiator);
     }
 
-    if (force || this.mutableExports === NEEDS_EVAL) {
+    if (force || this.mutableExports.type === 'needsEval') {
       const { exports, missingPaths } = evaluate(this.engine, this, true);
-      if (missingPaths.length === 0) {
-        this.mutableExports = exports;
-      }
+      this.mutableExports = { type: 'exploreEval', exports, missingPaths };
 
-      return { exports, missingPaths };
+      return this.mutableExports;
     }
 
-    return { exports: this.mutableExports, missingPaths: [] };
+    if (this.mutableExports.type === 'exploreEval') {
+      return this.mutableExports;
+    }
+
+    return { exports: this.mutableExports.exports, missingPaths: [] };
   }
 
   public async evaluateAsync({
@@ -56,13 +61,13 @@ export class TranspiledModule extends ModuleBase {
       // do nothing
     },
   }: EvaluateAsyncOptions = {}): Promise<Exports> {
-    if (force || this.mutableExports === NEEDS_EVAL) {
+    if (force || this.mutableExports.type === 'needsEval') {
       beforeEvaluate();
-      const { exports, missingPaths: missingPathsIn } = this.evaluateExplore({ force });
+      const { missingPaths: missingPathsIn } = this.evaluateExplore({ force });
       if (missingPathsIn.length === 0) {
-        this.mutableExports = exports;
+        beforeEvaluate();
 
-        return exports;
+        return this.evaluate({ force });
       }
 
       let missingPaths = this.uniquePaths(missingPathsIn);
@@ -81,11 +86,13 @@ export class TranspiledModule extends ModuleBase {
       return this.evaluate({ force });
     }
 
-    return this.mutableExports;
+    beforeEvaluate();
+
+    return this.evaluate({ force });
   }
 
   public clearExports(): void {
-    this.mutableExports = NEEDS_EVAL;
+    this.mutableExports = { type: 'needsEval' };
     this.mutableDependents.forEach((dep) => {
       if (dep instanceof TranspiledModule) {
         dep.clearExports();

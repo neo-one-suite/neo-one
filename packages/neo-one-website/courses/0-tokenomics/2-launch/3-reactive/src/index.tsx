@@ -4,14 +4,13 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { ThemeProvider } from 'reakit';
 // @ts-ignore
-import { ContractsProvider, DeveloperTools } from '../one/generated';
+import { ContractsProvider } from '../one/generated';
 import { ICO } from './ICO';
 
 const App = (
   <ThemeProvider theme={theme}>
     <ContractsProvider>
       <ICO />
-      <DeveloperTools />
     </ContractsProvider>
   </ThemeProvider>
 );

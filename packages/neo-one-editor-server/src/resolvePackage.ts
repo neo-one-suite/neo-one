@@ -1,10 +1,13 @@
 // tslint:disable no-any
+import { Monitor } from '@neo-one/monitor';
+import { retryBackoff } from '@neo-one/utils';
 import fetch from 'cross-fetch';
 // @ts-ignore
 import detective from 'detective';
 import _ from 'lodash';
 import LRU from 'lru-cache';
 import * as nodePath from 'path';
+import { defer } from 'rxjs';
 import * as tar from 'tar';
 import { EmptyBodyError, FetchError, MissingPackageJSONError } from './errors';
 import { getEscapedName } from './utils';
@@ -136,14 +139,22 @@ const resolveJavaScriptFiles = (files: Files, filePathIn: string, mapping: Mappi
       mutableResult[dtsFilePath] = dtsFile.toString('utf8');
     }
 
-    const requires: ReadonlyArray<string | number> = detective(content);
-    requires
-      .filter((req): req is string => typeof req === 'string')
-      .filter((req) => req.startsWith('.'))
-      .map((req) => nodePath.resolve(nodePath.dirname(resolvedPath), req))
-      .forEach((req) => {
-        resolveJavaScriptFiles(files, req, mapping, mutableResult);
-      });
+    let requires: ReadonlyArray<string | number> | undefined;
+    try {
+      requires = detective(content);
+    } catch {
+      // do nothing
+    }
+
+    if (requires !== undefined) {
+      requires
+        .filter((req): req is string => typeof req === 'string')
+        .filter((req) => req.startsWith('.'))
+        .map((req) => nodePath.resolve(nodePath.dirname(resolvedPath), req))
+        .forEach((req) => {
+          resolveJavaScriptFiles(files, req, mapping, mutableResult);
+        });
+    }
   }
 };
 
@@ -170,16 +181,34 @@ const getAdditionalStarts = (files: Files, start: string, packageJSON: any) => {
     .filter((file) => !otherEntryPaths.has(file));
 };
 
-const getDTS = (files: Files) =>
+const getFilesWithExtensions = (files: Files, extensions: ReadonlyArray<string>) =>
   _.fromPairs(
     Object.entries(files)
-      .filter(([key]) => key.endsWith('.d.ts'))
+      .filter(([key]) => extensions.some((ext) => key.endsWith(ext)))
       .map(([key, val]) => [key, (val as Buffer).toString('utf8')]),
   );
 
-export const resolvePackageWorker = async (name: string, version: string): Promise<Result> => {
+const getDTS = (files: Files) => getFilesWithExtensions(files, ['.d.ts']);
+
+const resolvePackageWorker = async (name: string, version: string, monitor?: Monitor): Promise<Result> => {
   const url = getTarballURL(name, version);
-  const files = await extractPackage(url);
+  const files = await defer(async () => extractPackage(url))
+    .pipe(
+      retryBackoff({
+        initialInterval: 250,
+        maxRetries: 10,
+        maxInterval: 2500,
+        onError: (error) => {
+          if (monitor !== undefined) {
+            monitor.logError({
+              name: 'resolve_package_extract_package_error',
+              error,
+            });
+          }
+        },
+      }),
+    )
+    .toPromise();
   const packageJSONBuffer = files['/package.json'];
   if (packageJSONBuffer === undefined) {
     throw new MissingPackageJSONError(name, version);
@@ -228,7 +257,8 @@ export const resolvePackageWorker = async (name: string, version: string): Promi
     if (types !== undefined) {
       const resolvedTypes = nodePath.resolve('/', types);
       if ((mutableResult[resolvedTypes] as string | undefined) === undefined) {
-        mutableResult = { ...mutableResult, ...getDTS(files) };
+        const extensions = resolvedTypes.endsWith('.d.ts') ? ['.d.ts'] : ['.ts', '.tsx'];
+        mutableResult = { ...mutableResult, ...getFilesWithExtensions(files, extensions) };
       }
     }
   }
@@ -242,14 +272,24 @@ const cache = LRU<string, Promise<Result>>({
   max: 1000,
 });
 
-export const resolvePackage = async (name: string, version: string) => {
+export const resolvePackage = async (name: string, version: string, monitor?: Monitor) => {
   const key = `${name}@${version}`;
   const pkg = cache.get(key);
   if (pkg !== undefined) {
     return pkg;
   }
 
-  const result = resolvePackageWorker(name, version);
+  const result = resolvePackageWorker(name, version, monitor);
+  result.catch((error) => {
+    if (monitor !== undefined) {
+      monitor.logError({
+        name: 'resolve_package_final_error',
+        error,
+      });
+    }
+
+    cache.del(key);
+  });
   cache.set(key, result);
 
   return result;

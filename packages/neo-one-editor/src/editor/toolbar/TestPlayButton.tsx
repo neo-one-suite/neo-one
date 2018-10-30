@@ -5,12 +5,24 @@ import { Button, styled } from 'reakit';
 import { prop } from 'styled-tools';
 
 const PlayButtonWrapper = styled(Button)`
-  width: 24px;
-  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  width: 20px;
+  height: 20px;
+  outline: none;
   color: ${prop('theme.gray3')};
   cursor: pointer;
 
   &:hover {
+    color: ${prop('theme.gray0')};
+  }
+
+  &:active {
+    color: ${prop('theme.gray0')};
+  }
+
+  &:focus {
     color: ${prop('theme.gray0')};
   }
 `;

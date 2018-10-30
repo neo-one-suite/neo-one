@@ -121,9 +121,8 @@ export const createLocalClients = () => {
     ts: `
 import { ${mutableImports.join(
       ', ',
-    )}, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client';
+    )}, LocalClient, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client';
 import { projectID } from '${getRelativeImport(clientPath, projectIDPath)}';
-import { LocalClient } from '@neo-one/react';
 
 export type DefaultUserAccountProviders = {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>,

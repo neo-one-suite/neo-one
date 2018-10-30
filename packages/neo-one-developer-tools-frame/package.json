@@ -1,0 +1,31 @@
+{
+  "name": "@neo-one/developer-tools-frame",
+  "version": "1.0.0-preview.2",
+  "description": "NEO•ONE developer tools.",
+  "main": "./src/index.tsx",
+  "dependencies": {
+    "@babel/polyfill": "^7.0.0",
+    "@neo-one/client": "^1.0.0-preview.2",
+    "@neo-one/react": "^1.0.0-preview.2",
+    "@neo-one/react-common": "^1.0.0-preview.2",
+    "@neo-one/types": "^1.0.0-preview.2",
+    "@neo-one/utils": "^1.0.0-preview.2",
+    "@render-props/size-observer": "^0.1.14",
+    "@types/lodash": "^4.14.117",
+    "@types/react": "^16.4.18",
+    "@types/react-dom": "^16.0.9",
+    "bignumber.js": "^7.2.1",
+    "constate": "^0.9.0",
+    "date-fns": "^2.0.0-alpha.25",
+    "localforage": "^1.7.3",
+    "lodash": "^4.17.11",
+    "react": "^16.6.0",
+    "react-dom": "^16.6.0",
+    "react-icons": "^3.2.2",
+    "reakit": "^0.15.10",
+    "rxjs": "^6.3.3",
+    "styled-tools": "^1.5.2",
+    "tslib": "^1.9.3"
+  },
+  "sideEffects": false
+}

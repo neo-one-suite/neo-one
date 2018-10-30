@@ -1,12 +1,10 @@
 /* @hash 8f1fd62ec35fb06b58cac05a12f84c70 */
 // tslint:disable
 /* eslint-disable */
-import { DeveloperTools as DeveloperToolsBase } from '@neo-one/react';
 import { Client, DeveloperClient, OneClient } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from './types';
 import { createClient, createDeveloperClients, createOneClients } from './client';
-import { projectID } from './projectID';
 import { createContractSmartContract } from './Contract/contract';
 
 export interface WithClients<TClient extends Client> {
@@ -53,17 +51,4 @@ export interface WithContractsProps<TClient extends Client> {
 }
 export const WithContracts = <TClient extends Client>({ children }: WithContractsProps<TClient>) => (
   <Context.Consumer>{children}</Context.Consumer>
-);
-
-export const DeveloperTools = () => (
-  <WithContracts>
-    {({ client, developerClients, oneClients }) => (
-      <DeveloperToolsBase
-        client={client}
-        developerClients={developerClients}
-        oneClients={oneClients}
-        projectID={projectID}
-      />
-    )}
-  </WithContracts>
 );

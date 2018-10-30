@@ -153,9 +153,9 @@ export const rpc = ({ server }: { readonly server: Server }) => {
         }
 
         // tslint:disable-next-line no-any
-        const { fields } = ctx.request as any;
+        const { body } = ctx.request as any;
         const monitor = getMonitor(ctx);
-        const result = await handleRequestSafe(monitor.withLabels({ [monitor.labels.RPC_TYPE]: 'http' }), fields);
+        const result = await handleRequestSafe(monitor.withLabels({ [monitor.labels.RPC_TYPE]: 'http' }), body);
 
         ctx.status = 200;
         ctx.body = result;

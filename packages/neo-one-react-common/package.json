@@ -5,6 +5,7 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/client": "^1.0.0-preview.2",
+    "@neo-one/react": "^1.0.0-preview.2",
     "@neo-one/types": "^1.0.0-preview.2",
     "@neo-one/utils": "^1.0.0-preview.2",
     "@types/react": "^16.4.18",

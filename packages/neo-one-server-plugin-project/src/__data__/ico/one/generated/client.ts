@@ -4,6 +4,7 @@
 import {
   Client,
   DeveloperClient,
+  LocalClient,
   LocalKeyStore,
   LocalMemoryStore,
   LocalUserAccountProvider,
@@ -15,7 +16,6 @@ import {
   UserAccountProviders,
 } from '@neo-one/client';
 import { projectID } from './projectID';
-import { LocalClient } from '@neo-one/react';
 
 export type DefaultUserAccountProviders = {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>;
