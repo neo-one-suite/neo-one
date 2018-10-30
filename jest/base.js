@@ -1,5 +1,14 @@
 const nodePath = require('path');
 
+let testPathIgnorePatterns = ['/node_modules/', '/courses/'];
+
+if (process.platform === 'win32') {
+  testPathIgnorePatterns = testPathIgnorePatterns.concat([
+    '/packages/neo-one-editor/src/__tests__/.*',
+    '/packages/neo-one-editor-server/src/__tests__/.*',
+  ]);
+}
+
 module.exports = ({ path }) => ({
   rootDir: nodePath.resolve(__dirname, '..'),
   globals: {
@@ -14,7 +23,7 @@ module.exports = ({ path }) => ({
     './scripts/serializers/bn.js',
     './scripts/serializers/buffer.js',
   ],
-  testPathIgnorePatterns: ['/node_modules/', '/courses/'],
+  testPathIgnorePatterns,
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
