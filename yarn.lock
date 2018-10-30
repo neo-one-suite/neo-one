@@ -5360,10 +5360,10 @@ cache-content-type@^1.0.0:
     mime-types "^2.1.18"
     ylru "^1.2.0"
 
-cache-loader@1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/cache-loader/-/cache-loader-1.2.2.tgz#6d5c38ded959a09cc5d58190ab5af6f73bd353f5"
-  integrity sha512-rsGh4SIYyB9glU+d0OcHwiXHXBoUgDhHZaQ1KAbiXqfz1CDPxtTboh1gPbJ0q2qdO8a9lfcjgC5CJ2Ms32y5bw==
+cache-loader@1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/cache-loader/-/cache-loader-1.2.3.tgz#5b3ccf4f774fe23b814ff999d47217856407c33e"
+  integrity sha512-g6/cfjwydiORiO8Kcy43D4kKIT4XmtkRuUeioqtdCsmlSX8FNsYCcH8Ov4jzql9iIgzi0woLWcdaL7XaGiOd5w==
   dependencies:
     loader-utils "^1.1.0"
     mkdirp "^0.5.1"
