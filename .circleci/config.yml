@@ -327,7 +327,7 @@ jobs:
     <<: *build-e2e11
 
   lint:
-    <<: *node11
+    <<: *node10
     <<: *lint
 
   deploy-website:
@@ -387,15 +387,5 @@ workflows:
           requires:
             - build-e2e10
           filters: *filter-ignore-gh-pages
-  test11:
-    jobs:
-      - build-e2e11:
-          filters: *filter-ignore-gh-pages
-      - test11:
-          filters: *filter-ignore-gh-pages
       - lint:
-          filters: *filter-ignore-gh-pages
-      - e2e11:
-          requires:
-            - build-e2e11
           filters: *filter-ignore-gh-pages
