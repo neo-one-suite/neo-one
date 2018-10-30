@@ -187,6 +187,7 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent' }
 interface Props {
   readonly source: string;
   readonly linkColor?: 'primary' | 'gray' | 'accent';
+  readonly openAllLinksInNewTab?: boolean;
 }
 export class Markdown extends React.Component<Props> {
   private readonly ref = React.createRef<HTMLElement>();
@@ -194,6 +195,19 @@ export class Markdown extends React.Component<Props> {
   public componentDidMount(): void {
     if (this.ref.current) {
       Prism.highlightAllUnder(this.ref.current);
+
+      const anchors = this.ref.current.getElementsByTagName('a');
+      // tslint:disable-next-line no-loop-statement prefer-for-of
+      for (let i = 0; i < anchors.length; i += 1) {
+        const a = anchors[i];
+        if (this.props.openAllLinksInNewTab) {
+          // tslint:disable-next-line no-object-mutation
+          a.target = '_blank';
+        } else if (a.host !== window.location.host) {
+          // tslint:disable-next-line no-object-mutation
+          a.target = '_blank';
+        }
+      }
     }
   }
 

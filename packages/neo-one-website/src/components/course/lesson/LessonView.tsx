@@ -62,7 +62,7 @@ export const LessonView = ({ selected }: Props) => (
     </Helmet>
     <BoxWrapper>
       <InnerWrapper>
-        <Markdown source={selectLesson(selected).documentation} />
+        <Markdown source={selectLesson(selected).documentation} openAllLinksInNewTab />
         <ButtonWrapper>
           <Text>
             Lesson {selected.lesson + 1}: {selectLesson(selected).title}
