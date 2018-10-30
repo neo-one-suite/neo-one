@@ -22,3 +22,8 @@ export interface SmartContractAny extends SmartContract {
   // tslint:disable-next-line no-any
   readonly [key: string]: any;
 }
+
+export interface LocalClient {
+  readonly getNEOTrackerURL: () => Promise<string | undefined>;
+  readonly reset: () => Promise<void>;
+}

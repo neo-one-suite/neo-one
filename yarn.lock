@@ -2009,7 +2009,7 @@
   dependencies:
     "@babel/runtime" "^7.0.0"
 
-"@render-props/rect@^0.1.11":
+"@render-props/rect@^0.1.11", "@render-props/rect@^0.1.16":
   version "0.1.18"
   resolved "https://registry.yarnpkg.com/@render-props/rect/-/rect-0.1.18.tgz#c7ca2524a4f675ef8ef4e3a0c4d778bc4df3c303"
   integrity sha512-yX/CzhKuOMTw4zPWC8LM2O36rjgLX6ZN7bK6Q2ZJnHjit38Xk534MUah+TDpGYcMe2GLhZXyhAIndsKmlhImVw==
@@ -2026,6 +2026,15 @@
     "@babel/runtime" "^7.0.0"
     "@render-props/events" "^0.1.2"
     "@render-props/throttle" "^0.1.5"
+    "@render-props/utils" "^0.2.1"
+
+"@render-props/size-observer@^0.1.14":
+  version "0.1.14"
+  resolved "https://registry.yarnpkg.com/@render-props/size-observer/-/size-observer-0.1.14.tgz#0f740c4099fdf597be6b1474d9fb50e32e1cdf97"
+  integrity sha512-4Po/wtm8tW4FljACEs65Iy729xMxOLadJ49qOY+ftiz8kLos6R/lV42KoNhGPcS1TWv0T6eqAk0lrs96zmuufw==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    "@render-props/rect" "^0.1.16"
     "@render-props/utils" "^0.2.1"
 
 "@render-props/throttle@^0.1.5":
@@ -2085,6 +2094,14 @@
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
   integrity sha512-ONhaKPIufzzrlNbqtWFFd+jlnemX6lJAgq9ZeiZtS7I1PIf/la7CW4m83rTXRnVnsMbW2k56pGYu7AUFJD9Pow==
+
+"@tippy.js/react@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@tippy.js/react/-/react-1.0.1.tgz#6ccc53c50a23f8c5846610876ebfa1f929e5c868"
+  integrity sha512-am77vnLtM2tGndvYhGgjPD7QqklfuKGgBCNPGxnOl7hMCsPpO7zBcsZosCstGQfzFdJDlKGU4hqgFM5xyoMxwA==
+  dependencies:
+    prop-types "^15.6.2"
+    tippy.js "^3.0.6"
 
 "@types/abstract-leveldown@*", "@types/abstract-leveldown@^5.0.1":
   version "5.0.1"
@@ -16956,7 +16973,7 @@ readline2@^1.0.1:
     is-fullwidth-code-point "^1.0.0"
     mute-stream "0.0.5"
 
-reakit@0.15.10:
+reakit@0.15.10, reakit@^0.15.10:
   version "0.15.10"
   resolved "https://registry.yarnpkg.com/reakit/-/reakit-0.15.10.tgz#81b097ad29267c207ec1f3ebc0623a217a9ee081"
   integrity sha512-e5bp1vJ7wbL30rbPcqzY5dVgCJa4pxbLEKd3RtH+KJzt4R90LwVtWW4/0CgoQWwjFbosBtnjkqhs6pqi8WfMSw==
@@ -19289,6 +19306,13 @@ tiny-emitter@^2.0.0:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/tiny-emitter/-/tiny-emitter-2.0.2.tgz#82d27468aca5ade8e5fd1e6d22b57dd43ebdfb7c"
   integrity sha512-2NM0auVBGft5tee/OxP4PI3d8WItkDM+fPnaRAVo6xTDI2knbz9eC5ArWGqtGlYqiH3RU5yMpdyTTO7MguC4ow==
+
+tippy.js@^3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/tippy.js/-/tippy.js-3.0.6.tgz#ad29361e96129de582bf4088f00ea8413632ceb4"
+  integrity sha512-/paH+Kf3Caj0J+AlB1Kdg2KFAZ8yJeXZ8hPiwDBfxOLZg3YxDUa2OpMi3ODK8TXSMoPqcGUExCVcc46AmGCxjQ==
+  dependencies:
+    popper.js "^1.14.4"
 
 title-case@^2.1.0:
   version "2.1.1"

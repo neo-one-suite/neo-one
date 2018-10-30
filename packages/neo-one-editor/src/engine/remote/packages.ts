@@ -1,5 +1,5 @@
 import * as client from '@neo-one/client';
-import * as clientFull from '@neo-one/client-full';
+import * as developerTools from '@neo-one/developer-tools';
 import { BrowserLocalClient, Builder, FileSystem } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import * as react from '@neo-one/react';
@@ -27,9 +27,9 @@ const packages: ReadonlyArray<PackageConfig> = [
     exports: () => client,
   },
   {
-    name: '@neo-one/client-full',
-    path: '/node_modules/@neo-one/client-full/src/index.ts',
-    exports: () => clientFull,
+    name: '@neo-one/developer-tools',
+    path: '/node_modules/@neo-one/developer-tools/src/index.ts',
+    exports: () => developerTools,
   },
   {
     name: '@neo-one/react',

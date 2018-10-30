@@ -86,8 +86,7 @@ export const createLocalClients = () => ({
     ts: `
 import { ${mutableImports.join(
       ', ',
-    )}, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client';
-import { LocalClient } from '@neo-one/react';
+    )}, LocalClient, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client';
 import { getBrowserLocalClient, getJSONRPCLocalProviderManager } from '@neo-one/local-singleton';
 
 export type DefaultUserAccountProviders = {

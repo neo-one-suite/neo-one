@@ -128,6 +128,7 @@ export {
   JSONRPCProvider,
   JSONRPCRequest,
   JSONRPCResponse,
+  LocalClient,
   LocalKeyStore,
   LocalMemoryStore,
   LocalStringStore,

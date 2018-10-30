@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { hot } from 'react-hot-loader';
-import { ContractsProvider, DeveloperTools, WithContracts } from '../one/generated';
+import { ContractsProvider, WithContracts } from '../one/generated';
 
 export const App = hot(module)(() => (
   <ContractsProvider>
@@ -15,6 +15,5 @@ export const App = hot(module)(() => (
         </button>
       )}
     </WithContracts>
-    <DeveloperTools />
   </ContractsProvider>
 ));

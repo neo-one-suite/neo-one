@@ -104,14 +104,16 @@ export type WalletSelectorOptionType =
 export const getWalletSelectorOptions$ = (
   addError: (error: Error) => void,
   client: Client,
+  userAccounts$: Client['userAccounts$'],
+  block$: Client['block$'],
   tokens$: Observable<ReadonlyArray<Token>>,
 ) =>
   concat(
-    client.userAccounts$.pipe(
+    userAccounts$.pipe(
       take(1),
       map((userAccounts) => userAccounts.map((userAccount) => makeWalletSelectorValueOption({ userAccount }))),
     ),
-    combineLatest(client.userAccounts$.pipe(distinctUntilChanged()), tokens$, client.block$).pipe(
+    combineLatest(userAccounts$.pipe(distinctUntilChanged()), tokens$, block$).pipe(
       switchMap(async ([userAccounts, tokens]) =>
         Promise.all(
           userAccounts.map(async (userAccount) => {

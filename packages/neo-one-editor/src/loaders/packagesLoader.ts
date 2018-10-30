@@ -7,15 +7,33 @@ import _ from 'lodash';
 import * as path from 'path';
 import webpack from 'webpack';
 
-const INCLUDE_PACKAGE_PREFIXES: ReadonlyArray<string> = [
+const INCLUDE_PACKAGES: ReadonlyArray<string> = [
   'neo-one-client',
+  'neo-one-client-common',
+  'neo-one-client-core',
+  'neo-one-client-switch',
+  'neo-one-developer-tools',
   'neo-one-local',
+  'neo-one-local-browser',
+  'neo-one-local-singleton',
   'neo-one-monitor',
-  'neo-one-node',
+  'neo-one-node-blockchain',
+  'neo-one-node-core',
+  'neo-one-node-neo-settings',
+  'neo-one-node-protocol',
+  'neo-one-node-rpc-handler',
+  'neo-one-node-storage-levelup',
+  'neo-one-node-vm',
   'neo-one-react',
+  'neo-one-react-common',
   'neo-one-smart-contract',
+  'neo-one-smart-contract-compiler',
+  'neo-one-smart-contract-lib',
+  'neo-one-smart-contract-test-browser',
+  'neo-one-smart-contract-test-common',
   'neo-one-ts-utils',
   'neo-one-types',
+  'neo-one-typescript-concatenator',
   'neo-one-utils',
   'neo-one-worker',
 ];
@@ -49,10 +67,7 @@ const getPackagesExports = async (loader: webpack.loader.LoaderContext): Promise
 };
 
 const getPackages = async (loader: webpack.loader.LoaderContext) => {
-  const packageDirsUnfiltered = await fs.readdir(PACKAGES_DIR);
-  const packageDirs = packageDirsUnfiltered.filter((dir) =>
-    INCLUDE_PACKAGE_PREFIXES.some((prefix) => dir.startsWith(prefix)),
-  );
+  const packageDirs = INCLUDE_PACKAGES;
   const packagePaths = packageDirs.map((dir) => path.resolve(PACKAGES_DIR, dir));
   const packageFilesList = await Promise.all(
     packagePaths.map((packagePath) =>

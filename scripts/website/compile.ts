@@ -10,7 +10,7 @@ import serve from 'webpack-serve';
 import yargs from 'yargs';
 import { createKillProcess } from './createKillProcess';
 import { Bundle } from './types';
-import { overlay, preview, server, SERVER_DIST_DIR, testRunner, workers } from './webpack';
+import { overlay, preview, server, SERVER_DIST_DIR, testRunner, tools, workers } from './webpack';
 
 yargs.describe('watch', 'Run in watch mode.').default('watch', false);
 yargs.describe('bundle', 'Bundle to compile.').default('bundle', 'react-static');
@@ -23,6 +23,7 @@ const watchConfig = (config: webpack.Configuration): (() => Promise<void>) =>
   createDispose(webpack(config).watch({}, () => undefined));
 const watchWorkers = () => watchConfig(workers({ stage: devStage }));
 const watchOverlay = () => watchConfig(overlay({ stage: devStage }));
+const watchTools = () => watchConfig(tools({ stage: devStage }));
 const watchWindow = async (config: webpack.Configuration, port: number) => {
   const { app } = await serve(
     {},
@@ -106,6 +107,7 @@ const runCompiler = async ({ compiler }: { readonly compiler: webpack.Compiler }
   );
 const compileConfig = async (config: webpack.Configuration) => runCompiler({ compiler: webpack(config) });
 const compilePreview = async () => compileConfig(preview({ stage: 'prod' }));
+const compileTools = async () => compileConfig(tools({ stage: 'prod' }));
 const compileWorkers = async () => compileConfig(workers({ stage: 'prod' }));
 const compileTestRunner = async () => compileConfig(testRunner({ stage: 'prod' }));
 const compileOverlay = async () => compileConfig(overlay({ stage: 'prod' }));
@@ -134,6 +136,8 @@ const createWatch = async (bundle: Bundle) => {
       return watchServer();
     case 'testRunner':
       return watchTestRunner();
+    case 'tools':
+      return watchTools();
     default:
       throw new Error(`Unknown bundle: ${bundle}`);
   }
@@ -151,6 +155,8 @@ const compile = async (bundle: Bundle) => {
       return compileServer();
     case 'testRunner':
       return compileTestRunner();
+    case 'tools':
+      return compileTools();
     default:
       throw new Error(`Unknown bundle: ${bundle}`);
   }
