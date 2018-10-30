@@ -53,8 +53,7 @@ export const createLocalClients = () => ({
 })
   ",
   "ts": "
-import { Client, DeveloperClient, LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider, NEOONEProvider, NEOONEDataProvider, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client';
-import { LocalClient } from '@neo-one/react';
+import { Client, DeveloperClient, LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider, NEOONEProvider, NEOONEDataProvider, LocalClient, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client';
 import { getBrowserLocalClient, getJSONRPCLocalProviderManager } from '@neo-one/local-singleton';
 
 export type DefaultUserAccountProviders = {

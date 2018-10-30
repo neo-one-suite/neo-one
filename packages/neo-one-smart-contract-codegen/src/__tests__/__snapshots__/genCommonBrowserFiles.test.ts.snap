@@ -72,11 +72,11 @@ import {
   LocalUserAccountProvider,
   NEOONEProvider,
   NEOONEDataProvider,
+  LocalClient,
   NEOONEDataProviderOptions,
   UserAccountProvider,
   UserAccountProviders,
 } from '@neo-one/client';
-import { LocalClient } from '@neo-one/react';
 import { getBrowserLocalClient, getJSONRPCLocalProviderManager } from '@neo-one/local-singleton';
 
 export type DefaultUserAccountProviders = {
@@ -176,7 +176,7 @@ export * from './ICO/abi';
   "react": Object {
     "js": "// tslint:disable
 /* eslint-disable */
-import { DeveloperTools as DeveloperToolsBase } from '@neo-one/react';
+import { DeveloperTools } from '@neo-one/developer-tools';
 import * as React from 'react';
 import { createClient, createDeveloperClients, createLocalClients } from './client';
 import { createTokenSmartContract } from './Token/contract';
@@ -193,6 +193,7 @@ export const ContractsProvider = ({
   const client = clientIn === undefined ? createClient() : clientIn;
   const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
   const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+  DeveloperTools.enable({ client, developerClients, localClients });
 
   return (
     <Context.Provider
@@ -210,19 +211,11 @@ export const ContractsProvider = ({
 };
 
 export const WithContracts = ({ children }) => <Context.Consumer>{children}</Context.Consumer>;
-
-export const DeveloperTools = () => (
-  <WithContracts>
-    {({ client, developerClients, localClients }) => (
-      <DeveloperToolsBase client={client} developerClients={developerClients} localClients={localClients} />
-    )}
-  </WithContracts>
-);
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
-import { DeveloperTools as DeveloperToolsBase, LocalClient } from '@neo-one/react';
-import { Client, DeveloperClient } from '@neo-one/client';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { DeveloperTools } from '@neo-one/developer-tools';
 import * as React from 'react';
 import { Contracts } from './types';
 import { createClient, createDeveloperClients, createLocalClients } from './client';
@@ -254,6 +247,7 @@ export const ContractsProvider = <TClient extends Client>({
   const client = clientIn === undefined ? createClient() : clientIn;
   const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
   const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+  DeveloperTools.enable({ client, developerClients, localClients });
 
   return (
     <Context.Provider
@@ -275,14 +269,6 @@ export interface WithContractsProps<TClient extends Client> {
 }
 export const WithContracts = <TClient extends Client>({ children }: WithContractsProps<TClient>) => (
   <Context.Consumer>{children}</Context.Consumer>
-);
-
-export const DeveloperTools = () => (
-  <WithContracts>
-    {({ client, developerClients, localClients }) => (
-      <DeveloperToolsBase client={client} developerClients={developerClients} localClients={localClients} />
-    )}
-  </WithContracts>
 );
 ",
   },
