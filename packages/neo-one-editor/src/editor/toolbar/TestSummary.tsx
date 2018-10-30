@@ -15,6 +15,10 @@ const Wrapper = styled(Grid)`
   min-height: 0;
 `;
 
+const StyledTestSummaryHeader = styled(TestSummaryHeader)`
+  transform: translate(0px, 2px);
+`;
+
 interface Props {
   readonly testSuites: ReadonlyArray<TestSuite>;
   readonly selectedTestSuite?: string;
@@ -22,7 +26,7 @@ interface Props {
 
 export const TestSummary = ({ selectedTestSuite, testSuites, ...props }: Props) => (
   <Wrapper {...props}>
-    <TestSummaryHeader testSuites={testSuites} />
+    <StyledTestSummaryHeader testSuites={testSuites} />
     <TestSummaryList selectedTestSuite={selectedTestSuite} testSuites={testSuites} />
   </Wrapper>
 );
