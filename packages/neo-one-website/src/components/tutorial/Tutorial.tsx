@@ -32,9 +32,9 @@ export const Tutorial = (props: TutorialProps) => (
   <ViewportConsumer>
     {({ scrollY }: any) => {
       let current = props.sidebar[0].subsections[0].slug;
-      let minOffset = Math.abs(getElementPosition(props.sidebar[0].subsections[0].title) - scrollY);
       // tslint:disable-next-line strict-type-predicates
       if (typeof document !== 'undefined') {
+        let minOffset = Math.abs(getElementPosition(props.sidebar[0].subsections[0].title) - scrollY);
         // tslint:disable-next-line no-loop-statement
         for (const subsection of props.sidebar[0].subsections) {
           const subsectionOffset = Math.abs(getElementPosition(subsection.title) - scrollY);
