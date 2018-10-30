@@ -15,12 +15,14 @@ const LightText = styled(Box)`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};
   color: ${prop('theme.gray0')};
+  transform: translate(0px, -2px);
 `;
 
 const DarkText = styled(Box)`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.caption')};
   color: ${prop('theme.gray3')};
+  transform: translate(0px, -2px);
 `;
 
 interface Props {
