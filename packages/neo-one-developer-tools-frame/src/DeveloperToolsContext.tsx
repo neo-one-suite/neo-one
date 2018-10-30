@@ -1,4 +1,4 @@
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client-core';
 import { FromStream, Token } from '@neo-one/react-common';
 import localforage from 'localforage';
 import * as React from 'react';

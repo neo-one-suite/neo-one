@@ -4,7 +4,7 @@
   "description": "NEO•ONE developer tools.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client": "^1.0.0-preview.2",
+    "@neo-one/client-core": "^1.0.0-preview.2",
     "@neo-one/types": "^1.0.0-preview.2",
     "resize-observer-polyfill": "^1.5.0",
     "tslib": "^1.9.3"

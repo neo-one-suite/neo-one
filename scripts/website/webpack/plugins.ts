@@ -42,7 +42,9 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
         TSC_WATCHFILE: JSON.stringify('false'),
         TSC_WATCHDIRECTORY: JSON.stringify('false'),
         NODE_ENV: JSON.stringify(stage === 'dev' ? 'development' : 'production'),
+        NODE_DEBUG: JSON.stringify(''),
         REACT_STATIC_DISABLE_PRELOAD: JSON.stringify('true'),
+        SC_ATTR: JSON.stringify('data-styled-components'),
       },
     }),
     new webpack.EnvironmentPlugin(
@@ -77,7 +79,7 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
               },
             ]),
           ]
-        : bundle === 'server'
+        : bundle === 'server' || bundle === 'tools'
           ? []
           : [
               new ExtractCssChunksPlugin({
@@ -88,7 +90,7 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
     )
     .concat(stage === 'dev' || stage === 'node' ? [] : [new LodashModuleReplacementPlugin()])
     .concat(
-      stage === 'dev' || stage === 'node' || bundle === 'server'
+      stage === 'dev' || stage === 'node' || bundle === 'server' || bundle === 'tools'
         ? []
         : [
             new CompressionPlugin({

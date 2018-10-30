@@ -1,5 +1,6 @@
 // tslint:disable no-null-keyword no-any
-import { createPrivateKey, LocalKeyStore } from '@neo-one/client';
+import { createPrivateKey } from '@neo-one/client-common';
+import { LocalKeyStore } from '@neo-one/client-core';
 import {
   Button,
   FromStream,

@@ -33,7 +33,7 @@ function initCSSLoader(stage: Stage) {
   ];
 }
 
-export const cssLoader = ({ stage }: { readonly stage: Stage; readonly bundle: Bundle }) => {
+export const cssLoader = ({ stage, bundle }: { readonly stage: Stage; readonly bundle: Bundle }) => {
   const loaders = initCSSLoader(stage);
   if (stage === 'node') {
     return {
@@ -42,7 +42,7 @@ export const cssLoader = ({ stage }: { readonly stage: Stage; readonly bundle: B
     };
   }
 
-  if (stage === 'dev' || process.env.NEO_ONE_CACHE === 'true') {
+  if (stage === 'dev' || bundle === 'tools' || process.env.NEO_ONE_CACHE === 'true') {
     return {
       test: /\.css$/,
       loader: ['style-loader', ...loaders],

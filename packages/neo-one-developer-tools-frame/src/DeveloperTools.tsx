@@ -1,4 +1,4 @@
-import { Client, DeveloperClient, Hash256, LocalClient } from '@neo-one/client';
+import { Client, DeveloperClient, Hash256, LocalClient } from '@neo-one/client-core';
 import * as React from 'react';
 import { Provider } from 'reakit';
 import { ClientHook } from './ClientHook';

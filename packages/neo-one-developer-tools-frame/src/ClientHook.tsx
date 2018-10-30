@@ -1,4 +1,4 @@
-import { Client, DeveloperClient } from '@neo-one/client';
+import { Client, DeveloperClient } from '@neo-one/client-core';
 import { FromStream, Link } from '@neo-one/react-common';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';

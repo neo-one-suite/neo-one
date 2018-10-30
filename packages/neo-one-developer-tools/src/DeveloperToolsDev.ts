@@ -1,13 +1,15 @@
 import ResizeObserver from 'resize-observer-polyfill';
 import { applyStyles } from './css';
-import { DeveloperToolsOptions, DeveloperToolsOptionsInternal } from './types';
-
-// Importing iframe-bundle generated in the pre build step as
-// a text using webpack raw-loader.
-// @ts-ignore
-import iframeScript from 'raw-loader!../../../dist/tools/tools.js'; // tslint:disable-line:no-implicit-dependencies no-submodule-imports
 import { getStatics } from './getStatics';
+import { DeveloperToolsOptions, DeveloperToolsOptionsInternal } from './types';
 import { getSize } from './utils';
+
+// Importing iframe-bundle generated in the pre build step as text using webpack raw-loader or
+// an equivalent rollup plugin for distributed version.
+// tslint:disable
+// @ts-ignore
+import iframeScript from '../../../dist/tools/tools.raw.js';
+// tslint:enable
 
 // tslint:disable no-let
 let iframeElement: HTMLIFrameElement | undefined;

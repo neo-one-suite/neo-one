@@ -2,7 +2,7 @@ import { css } from 'reakit';
 import { prop } from 'styled-tools';
 
 // tslint:disable-next-line no-import-side-effect
-import '../static/fonts/fonts.css';
+import '../static/fonts.css';
 
 const backup: ReadonlyArray<string> = [
   '-apple-system',

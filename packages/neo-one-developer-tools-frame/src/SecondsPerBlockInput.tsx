@@ -1,4 +1,5 @@
-import { Client, DeveloperClient, PrivateNetworkSettings } from '@neo-one/client';
+import { PrivateNetworkSettings } from '@neo-one/client-common';
+import { Client, DeveloperClient } from '@neo-one/client-core';
 import { FromStream, TextInput } from '@neo-one/react-common';
 import { mergeScanLatest } from '@neo-one/utils';
 import { EffectMap } from 'constate';

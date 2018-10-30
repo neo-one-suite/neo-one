@@ -1,5 +1,6 @@
 // tslint:disable no-any
-import { Account, Client, Hash256, nep5, UserAccount } from '@neo-one/client';
+import { Account, UserAccount } from '@neo-one/client-common';
+import { Client, Hash256, nep5 } from '@neo-one/client-core';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';

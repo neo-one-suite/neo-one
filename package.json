@@ -125,7 +125,8 @@
     "website:deploy-preview": "rm -rf ./dist && yarn run ts-node ./scripts/website/compile --bundle overlay && yarn run ts-node ./scripts/website/compile --bundle preview && cp -r ./dist/overlay/* ./dist/preview && netlify deploy --dir dist/preview --prod --site d76abba9-9ad4-46a4-a2cc-1bf778f04623",
     "website:deploy-server": "rm -rf ./dist && yarn run ts-node ./scripts/website/compile --bundle server && cp ./scripts/website/package.json.now ./dist/server/package.json && cd dist/server && now --public && now alias",
     "test:cypress": "yarn run ts-node ./scripts/runCypress.ts",
-    "concatenate": "yarn run ts-node ./packages/neo-one-typescript-concatenator/src/entry.ts"
+    "concatenate": "yarn run ts-node ./packages/neo-one-typescript-concatenator/src/entry.ts",
+    "compile:developer-tools-frame": "cross-env NEO_ONE_DIST=true yarn run ts-node ./scripts/website/compile --bundle tools"
   },
   "husky": {
     "hooks": {
@@ -213,6 +214,9 @@
     "react": "16.6.0",
     "react-hot-loader": "4.3.11",
     "react-static": "6.0.0-beta.29",
+    "rollup": "0.66.6",
+    "rollup-plugin-string": "2.0.2",
+    "rollup-plugin-typescript2": "0.17.2",
     "rxjs": "6.3.3",
     "rxjs-tslint-rules": "4.10.0",
     "source-map": "0.7.3",
@@ -258,11 +262,5 @@
     "grpc": "1.15.1",
     "regenerator-runtime": "0.12.1",
     "webpack": "4.19.0"
-  },
-  "one": {
-    "paths": {
-      "contracts": "./packages/neo-one-playground/one/contracts",
-      "generated": "./packages/neo-one-playground/one/generated"
-    }
   }
 }

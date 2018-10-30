@@ -14,7 +14,7 @@ export const genReact = ({
   readonly clientPath: string;
 }) => ({
   js: `
-import { DeveloperTools } from '@neo-one/developer-tools';
+import { DeveloperTools } from '@neo-one/client';
 import * as React from 'react';
 import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(reactPath, clientPath)}';
 ${contractsPaths
@@ -60,8 +60,7 @@ export const WithContracts = ({ children }) => (
 );
 `,
   ts: `
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
-import { DeveloperTools } from '@neo-one/developer-tools';
+import { Client, DeveloperClient, DeveloperTools, LocalClient } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from '${getRelativeImport(reactPath, commonTypesPath)}';
 import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(reactPath, clientPath)}';

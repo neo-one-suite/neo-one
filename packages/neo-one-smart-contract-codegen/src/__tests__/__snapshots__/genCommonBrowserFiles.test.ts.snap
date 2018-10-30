@@ -176,7 +176,7 @@ export * from './ICO/abi';
   "react": Object {
     "js": "// tslint:disable
 /* eslint-disable */
-import { DeveloperTools } from '@neo-one/developer-tools';
+import { DeveloperTools } from '@neo-one/client';
 import * as React from 'react';
 import { createClient, createDeveloperClients, createLocalClients } from './client';
 import { createTokenSmartContract } from './Token/contract';
@@ -214,8 +214,7 @@ export const WithContracts = ({ children }) => <Context.Consumer>{children}</Con
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
-import { DeveloperTools } from '@neo-one/developer-tools';
+import { Client, DeveloperClient, DeveloperTools, LocalClient } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from './types';
 import { createClient, createDeveloperClients, createLocalClients } from './client';

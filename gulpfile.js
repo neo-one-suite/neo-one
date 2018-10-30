@@ -18,6 +18,10 @@ const through2 = require('through2');
 const typescript = require('typescript');
 const pkg = require('./package.json');
 
+const rollup = require('rollup');
+const rollupString = require('rollup-plugin-string');
+const rollupTypescript = require('rollup-plugin-typescript2');
+
 const FORMATS = [
   {
     main: true,
@@ -34,6 +38,7 @@ const FORMATS = [
   dist: main ? 'neo-one' : `neo-one-${target}-${module}`,
   name: main ? '' : `${target}-${module}`,
   tsconfig: `tsconfig/tsconfig.${target}.${module}.json`,
+  tsconfigESM: `tsconfig/tsconfig.${target}.esm.json`,
   fastProject: ts.createProject(`tsconfig/tsconfig.${target}.${module}.json`, { typescript, isolatedModules: true }),
   project: ts.createProject(`tsconfig/tsconfig.${target}.${module}.json`, { typescript }),
 }));
@@ -74,14 +79,15 @@ const getPackageJSON = (pkg) => {
 };
 
 const SKIP_PACKAGES = new Set([
-  'neo-one-playground',
   'neo-one-editor',
   'neo-one-editor-server',
+  'neo-one-developer-tools-frame',
   'neo-one-local-browser',
   'neo-one-local-browser-worker',
   'neo-one-local-singleton',
   'neo-one-node-browser',
   'neo-one-node-browser-worker',
+  'neo-one-react-common',
   'neo-one-smart-contract-test-browser',
   'neo-one-website',
   'neo-one-worker',
@@ -126,6 +132,7 @@ const globs = {
     `!${getDistBase(format)}/packages/*/src/__tests__/**/*`,
     `!${getDistBase(format)}/packages/*/src/__e2e__/**/*`,
     `!${getDistBase(format)}/packages/*/src/bin/**/*`,
+    `!${getDistBase(format)}/packages/neo-one-developer-tools-frame/src/*.ts`,
     `!${getDistBase(format)}/packages/neo-one-smart-contract-lib/src/*.ts`,
     `!${getDistBase(format)}/packages/neo-one-server-plugin-wallet/src/contracts/*.ts`,
   ],
@@ -346,6 +353,43 @@ const compileTypescript = ((cache) =>
       format.module === 'esm' ? "'" : '"',
     ).pipe(gulp.dest(getDest(format)));
   }))({});
+
+gulp.task('compileDeveloperToolsFrame', async () => {
+  await execa('yarn', ['compile:developer-tools-frame'], {
+    stdio: ['ignore', 'inherit', 'inherit'],
+  });
+});
+
+const APP_ROOT_DIR = __dirname;
+
+const compileDeveloperTools = ((cache) =>
+  memoizeTask(cache, async function compileDeveloperTools(format) {
+    const bundle = await rollup.rollup({
+      input: path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-developer-tools', 'src', 'index.ts'),
+      external: ['resize-observer-polyfill'],
+      plugins: [
+        rollupString({
+          include: '**/*.raw.js',
+        }),
+        rollupTypescript({
+          cacheRoot: path.join('node_modules', '.cache', 'rts2', format.target, format.module),
+          tsconfig: format.tsconfigESM,
+          tsconfigOverride: {
+            compilerOptions: {
+              inlineSources: false,
+            },
+          },
+          check: false,
+        }),
+      ],
+    });
+
+    await bundle.write({
+      format: format.module,
+      file: path.join(getDest(format), 'neo-one-developer-tools', 'src', 'index.js'),
+    });
+  }))({});
+
 const buildTypescript = ((cache) =>
   memoizeTask(cache, function buildTypescript(format, done, type) {
     return gulp.series(copyTypescript(format, type), compileTypescript(format, type))(done);
@@ -362,6 +406,7 @@ const buildAll = ((cache) =>
         copyFiles(format),
         copyRootPkg(format),
         copyRootTSConfig(format),
+        compileDeveloperTools(format),
         buildTypescript(format, type),
         format === MAIN_FORMAT ? 'buildBin' : undefined,
         format === MAIN_FORMAT ? 'createBin' : undefined,
@@ -492,8 +537,12 @@ gulp.task('copyMetadata', gulp.parallel(FORMATS.map((format) => copyMetadata(for
 gulp.task('copyFiles', gulp.parallel(FORMATS.map((format) => copyFiles(format))));
 gulp.task('copyRootPkg', gulp.parallel(FORMATS.map((format) => copyRootPkg(format))));
 gulp.task('copyRootTSConfig', gulp.parallel(FORMATS.map((format) => copyRootTSConfig(format))));
+gulp.task('compileDeveloperTools', gulp.parallel(FORMATS.map((format) => compileDeveloperTools(format))));
 gulp.task('buildTypescript', gulp.parallel(FORMATS.map((format) => buildTypescript(format))));
-gulp.task('buildAll', gulp.parallel(FORMATS.map((format) => buildAll(format))));
+gulp.task(
+  'buildAll',
+  gulp.series('compileDeveloperToolsFrame', gulp.parallel(FORMATS.map((format) => buildAll(format)))),
+);
 gulp.task('install', gulp.parallel(FORMATS.map((format) => install(format))));
 gulp.task('publish', gulp.parallel(FORMATS.map((format) => publish(format))));
 

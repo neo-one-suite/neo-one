@@ -144,3 +144,5 @@ export {
   Wallet as LocalWallet,
   nep5,
 } from '@neo-one/client-core';
+
+export { DeveloperTools } from '@neo-one/developer-tools';

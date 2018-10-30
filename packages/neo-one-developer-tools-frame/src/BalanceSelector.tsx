@@ -1,4 +1,4 @@
-import { nep5 } from '@neo-one/client';
+import { nep5 } from '@neo-one/client-core';
 import { FromStream, Token } from '@neo-one/react-common';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';

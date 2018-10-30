@@ -1,5 +1,6 @@
 // tslint:disable no-null-keyword
-import { Client, DeveloperClient, Hash256, nep5, TransactionResult, UserAccount } from '@neo-one/client';
+import { TransactionResult, UserAccount } from '@neo-one/client-common';
+import { Client, DeveloperClient, Hash256, nep5 } from '@neo-one/client-core';
 import { Token } from '@neo-one/react-common';
 import BigNumber from 'bignumber.js';
 import { ActionMap, ComposableContainer, EffectMap } from 'constate';

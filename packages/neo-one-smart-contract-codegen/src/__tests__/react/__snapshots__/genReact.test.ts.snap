@@ -3,7 +3,7 @@
 exports[`genReact Token 1`] = `
 Object {
   "js": "
-import { DeveloperTools } from '@neo-one/developer-tools';
+import { DeveloperTools } from '@neo-one/client';
 import * as React from 'react';
 import { createClient, createDeveloperClients, createLocalClients } from './client';
 import { createTokenSmartContract } from './Token/contract';
@@ -44,8 +44,7 @@ export const WithContracts = ({ children }) => (
 );
 ",
   "ts": "
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
-import { DeveloperTools } from '@neo-one/developer-tools';
+import { Client, DeveloperClient, DeveloperTools, LocalClient } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from './types';
 import { createClient, createDeveloperClients, createLocalClients } from './client';

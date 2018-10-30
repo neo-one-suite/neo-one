@@ -1,4 +1,4 @@
-import { Client, nep5 } from '@neo-one/client';
+import { Client, nep5 } from '@neo-one/client-core';
 import { Button, TextInput, Token } from '@neo-one/react-common';
 import { EffectMap } from 'constate';
 import * as React from 'react';

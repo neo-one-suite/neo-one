@@ -1,4 +1,4 @@
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client-core';
 
 export interface NetworkClients<T> {
   readonly [network: string]: T | undefined;
