@@ -103,7 +103,6 @@
     "e2e-ci-windows-8": "yarn run jest-windows-8 --config jest/e2e-ci.js --ci -w 1",
     "e2e-ci-9": "yarn run jest-9 --config jest/e2e-ci.js --ci -w 1",
     "e2e-ci-windows-9": "yarn run jest-windows-9 --config jest/e2e-ci.js --ci -w 1",
-    "website:start": "yarn run ts-node ./scripts/website/compile --watch",
     "website:start-workers": "yarn run ts-node ./scripts/website/compile --watch --bundle workers",
     "website:start-overlay": "yarn run ts-node ./scripts/website/compile --watch --bundle overlay",
     "website:start-tools": "yarn run ts-node ./scripts/website/compile --watch --bundle tools",

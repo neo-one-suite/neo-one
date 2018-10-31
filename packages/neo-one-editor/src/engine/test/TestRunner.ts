@@ -59,10 +59,12 @@ const doRun = async (test: ModuleBase, handler: TestEventHandler): Promise<void>
       await test.evaluateAsync({
         force: true,
         beforeEvaluate: () => {
+          resetTestState();
+        },
+        beforeFinalEvaluate: () => {
           doHandleEvent = (event) => {
             handler.handleTestEvent(event);
           };
-          resetTestState();
         },
       });
     } catch (error) {

@@ -7,6 +7,7 @@ export interface EvaluateBaseOptions {
 
 export interface EvaluateAsyncOptions extends EvaluateBaseOptions {
   readonly beforeEvaluate?: () => void;
+  readonly beforeFinalEvaluate?: () => void;
 }
 
 export interface EvaluateOptions extends EvaluateBaseOptions {

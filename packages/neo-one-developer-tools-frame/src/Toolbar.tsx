@@ -140,7 +140,7 @@ export function Toolbar({ resizeHandler }: Props) {
               </FromStream>
             )}
           </SizeObserver>
-          <Toasts />
+          <Toasts resizeHandler={resizeHandler} />
         </>
       )}
     </Hidden.Container>

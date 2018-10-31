@@ -15,7 +15,6 @@ const Wrapper = styled(Grid)`
   border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 0.25em;
   margin-top: 8px;
-  height: 240px;
   width: 400px;
 `;
 

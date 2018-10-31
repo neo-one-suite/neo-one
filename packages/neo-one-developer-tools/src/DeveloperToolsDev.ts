@@ -66,7 +66,7 @@ const createOptions = (options: DeveloperToolsOptions): DeveloperToolsOptionsInt
   ...options,
   maxWidth: getSize().width,
   onResize: ({ width, height }) => {
-    if (iframeElement !== undefined && lastWidth !== width && lastHeight !== height) {
+    if (iframeElement !== undefined && (lastWidth !== width || lastHeight !== height)) {
       lastWidth = width;
       lastHeight = height;
       applyStyles(iframeElement, { ...BASE_STYLES, width, height });

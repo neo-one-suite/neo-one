@@ -60,12 +60,16 @@ export class TranspiledModule extends ModuleBase {
     beforeEvaluate = () => {
       // do nothing
     },
+    beforeFinalEvaluate = () => {
+      // do nothing
+    },
   }: EvaluateAsyncOptions = {}): Promise<Exports> {
     if (force || this.mutableExports.type === 'needsEval') {
       beforeEvaluate();
       const { missingPaths: missingPathsIn } = this.evaluateExplore({ force });
       if (missingPathsIn.length === 0) {
         beforeEvaluate();
+        beforeFinalEvaluate();
 
         return this.evaluate({ force });
       }
@@ -82,11 +86,13 @@ export class TranspiledModule extends ModuleBase {
       }
 
       beforeEvaluate();
+      beforeFinalEvaluate();
 
       return this.evaluate({ force });
     }
 
     beforeEvaluate();
+    beforeFinalEvaluate();
 
     return this.evaluate({ force });
   }
