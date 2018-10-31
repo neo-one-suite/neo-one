@@ -49,7 +49,10 @@ export type Test = TestFailure | TestSkip | TestPass | TestRunning;
 export interface TestSuite {
   readonly path: string;
   readonly tests: ReadonlyArray<Test>;
-  readonly error?: Error;
+  readonly error?: {
+    readonly message: string;
+    readonly stack?: string;
+  };
 }
 
 export interface TestRunnerCallbacks {

@@ -1,4 +1,4 @@
-// tslint:disable no-any
+// tslint:disable no-any strict-type-predicates
 import { Select, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import { ActionMap } from 'constate';
 import * as React from 'react';
@@ -49,6 +49,7 @@ export function ToolbarSelector({
             {...rest}
             onMenuOpen={onMenuOpen}
             onMenuClose={onMenuClose}
+            menuPortalTarget={typeof document === 'undefined' ? undefined : document.body}
           />
           <Tooltip data-test={dataTestTooltip} visible={menuOpen ? false : hover} placement="top">
             <TooltipArrow />

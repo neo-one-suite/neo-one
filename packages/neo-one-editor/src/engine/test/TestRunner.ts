@@ -162,7 +162,10 @@ const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks
         .onUpdateSuite({
           path: test.path,
           tests,
-          error,
+          error: {
+            message: error.message,
+            stack: error.stack,
+          },
         })
         .catch((err) => {
           // tslint:disable-next-line no-console

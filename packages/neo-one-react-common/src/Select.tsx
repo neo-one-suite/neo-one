@@ -3,6 +3,7 @@ import * as React from 'react';
 import SelectBase from 'react-select';
 import { styled } from 'reakit';
 import { prop } from 'styled-tools';
+import { axiforma, theme } from './theme';
 
 // tslint:disable-next-line:no-any
 const StyledSelect: any = styled(SelectBase)`
@@ -55,10 +56,27 @@ const StyledSelect: any = styled(SelectBase)`
   }
 `;
 
+const styles = {
+  option: (base: any, state: any) => ({
+    ...base,
+    color: theme.black,
+    cursor: 'pointer',
+    width: 'auto',
+    backgroundColor: state.isSelected || state.isFocused ? '#9B98F6' : '#F8F5FD',
+    opacity: state.isSelected ? 0.8 : state.isFocused ? 1 : undefined,
+    fontSize: '0.875rem',
+    lineHeight: '1.46428em',
+    textAlign: 'left',
+    fontFamily: axiforma('Axiforma-Regular'),
+    fontStyle: 'normal',
+    fontWeight: 400,
+  }),
+};
+
 export function Select({ 'data-test': dataTest, ...props }: any) {
   return (
     <div data-test={dataTest}>
-      <StyledSelect classNamePrefix="react-select" {...props} />
+      <StyledSelect classNamePrefix="react-select" styles={styles} {...props} />
     </div>
   );
 }

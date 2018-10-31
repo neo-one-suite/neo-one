@@ -20,7 +20,7 @@ const backup: ReadonlyArray<string> = [
   'sans-serif',
 ];
 
-const axiforma = (font: string) =>
+export const axiforma = (font: string) =>
   [font, 'Questrial']
     .concat(backup)
     .map((f) => `"${f}"`)

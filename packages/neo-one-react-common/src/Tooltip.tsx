@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { styled, Tooltip as TooltipBase } from 'reakit';
+import { styled, Tooltip as ReakitTooltip } from 'reakit';
 import { prop } from 'styled-tools';
+import { Tooltip as TooltipBase } from './base';
 import { ComponentProps } from './types';
 
 export const StyledTooltip = styled(TooltipBase)`
@@ -14,7 +15,7 @@ export function Tooltip(props: ComponentProps<typeof StyledTooltip>) {
   return <StyledTooltip fade slide {...props} />;
 }
 
-export const TooltipArrow = styled(TooltipBase.Arrow)`
+export const TooltipArrow = styled(ReakitTooltip.Arrow)`
   border-color: ${prop('theme.gray5')};
   color: ${prop('theme.gray5')};
 
