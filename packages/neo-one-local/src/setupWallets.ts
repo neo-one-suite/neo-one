@@ -1,5 +1,5 @@
-import { common, crypto } from '@neo-one/client-common';
-import { Hash256, NEOONEDataProvider, privateKeyToAddress, Transfer, wifToPrivateKey } from '@neo-one/client-full';
+import { common, crypto, privateKeyToAddress, Transfer, wifToPrivateKey } from '@neo-one/client-common';
+import { Hash256, NEOONEDataProvider } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { constants } from './constants';
 import { getClients } from './getClients';

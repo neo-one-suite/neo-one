@@ -1,4 +1,4 @@
-import { SourceMaps } from '@neo-one/client';
+import { SourceMaps } from '@neo-one/client-common';
 import { DescribeTable } from '@neo-one/server-plugin';
 import * as fs from 'fs-extra';
 import * as path from 'path';

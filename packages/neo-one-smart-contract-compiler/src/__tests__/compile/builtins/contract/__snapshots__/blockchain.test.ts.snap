@@ -11,6 +11,17 @@ exports[`Blockchain set currentBlockTime 1`] = `
 "
 `;
 
+exports[`Blockchain set currentCallingContract 1`] = `
+"snippetCode.ts (4,18): Property 'currentCallingContract' does not exist on type 'BlockchainConstructor'.
+
+      2 |       import { Blockchain } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       Blockchain.currentCallingContract = Blockchain.currentCallingContract;
+        |                  ^
+      5 |     
+"
+`;
+
 exports[`Blockchain set currentHeight 1`] = `
 "snippetCode.ts (4,18): Cannot assign to 'currentHeight' because it is a constant or a read-only property.
 

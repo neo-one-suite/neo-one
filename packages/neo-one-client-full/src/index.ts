@@ -42,6 +42,7 @@ export {
   ContractParameterType,
   ContractTransaction,
   DeveloperClient,
+  DeveloperTools,
   EnrollmentTransaction,
   Event,
   ForwardValue,

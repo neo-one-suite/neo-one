@@ -1,4 +1,4 @@
-import { SourceMaps } from '@neo-one/client';
+import { SourceMaps } from '@neo-one/client-common';
 
 export const genBrowserSourceMaps = ({ sourceMaps }: { readonly sourceMaps: SourceMaps }) => ({
   js: `

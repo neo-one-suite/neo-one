@@ -1,4 +1,4 @@
-import { SourceMaps } from '@neo-one/client';
+import { SourceMaps } from '@neo-one/client-common';
 import { genBrowserClient, NetworkDefinition, Wallet } from './client';
 import { genCommonTypes } from './commonTypes';
 import { formatFile } from './formatFile';

@@ -1,4 +1,4 @@
-import { ABIReturn } from '@neo-one/client';
+import { ABIReturn } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DEFAULT_DIAGNOSTIC_OPTIONS, DiagnosticOptions } from '../analysis';

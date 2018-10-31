@@ -101,4 +101,66 @@ describe('Blockchain', () => {
       { type: 'error' },
     );
   });
+
+  test('currentCallerContract', async () => {
+    const node = await helpers.startNode();
+
+    const currentCallerContract = await node.addContract(`
+      import { Address, Blockchain, SmartContract } from '@neo-one/smart-contract';
+
+      export class Contract extends SmartContract {
+        public test(address: Address | undefined): boolean {
+          assertEqual(address, Blockchain.currentCallerContract);
+
+          return true;
+        }
+      }
+    `);
+
+    const testContract = await node.addContract(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Caller {
+        readonly test: (address: Address) => boolean;
+      }
+
+      export class Contract extends SmartContract {
+        public test(): boolean {
+          const contract = SmartContract.for<Caller>(Address.from('${currentCallerContract.address}'));
+          assertEqual(contract.test(this.address), true);
+
+          return true;
+        }
+      }
+    `);
+
+    await node.executeString(
+      `
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Caller {
+        readonly test: () => boolean;
+      }
+      const testContract = SmartContract.for<Caller>(Address.from('${testContract.address}'));
+      assertEqual(testContract.test(), true);
+
+      interface TestCaller {
+        readonly test: (address: Address | undefined) => boolean;
+      }
+      const contract = SmartContract.for<TestCaller>(Address.from('${currentCallerContract.address}'));
+      assertEqual(contract.test(undefined), true);
+    `,
+    );
+  });
+
+  test('set currentCallerContract', async () => {
+    helpers.compileString(
+      `
+      import { Blockchain } from '@neo-one/smart-contract';
+
+      Blockchain.currentCallerContract = Blockchain.currentCallerContract;
+    `,
+      { type: 'error' },
+    );
+  });
 });

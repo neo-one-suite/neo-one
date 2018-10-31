@@ -1,4 +1,5 @@
-import { createPrivateKey, Hash256, privateKeyToAddress } from '@neo-one/client-full';
+import { createPrivateKey, privateKeyToAddress } from '@neo-one/client-common';
+import { Hash256 } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { helpers } from '../../../../__data__';
 

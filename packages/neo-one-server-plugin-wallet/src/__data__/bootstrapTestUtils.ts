@@ -1,13 +1,6 @@
-import { common, crypto } from '@neo-one/client-common';
-import {
-  Client,
-  LocalKeyStore,
-  LocalMemoryStore,
-  LocalUserAccountProvider,
-  NEOONEProvider,
-  privateKeyToAddress,
-  ReadClient,
-} from '@neo-one/client-full';
+import { common, crypto, privateKeyToAddress } from '@neo-one/client-common';
+import { LocalKeyStore, LocalMemoryStore, NEOONEProvider } from '@neo-one/client-core';
+import { Client, LocalUserAccountProvider, ReadClient } from '@neo-one/client-full-core';
 import { Network as ResourceNetwork } from '@neo-one/server-plugin-network';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';

@@ -1,5 +1,5 @@
-import { common, crypto } from '@neo-one/client-common';
-import { AddressString, NEOONEDataProvider, SourceMaps } from '@neo-one/client-full';
+import { AddressString, common, crypto, SourceMaps } from '@neo-one/client-common';
+import { NEOONEDataProvider } from '@neo-one/client-core';
 import { CompileContractResult } from '@neo-one/smart-contract-compiler';
 import BigNumber from 'bignumber.js';
 import { constants } from './constants';

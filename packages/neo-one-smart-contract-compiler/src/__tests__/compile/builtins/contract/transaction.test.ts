@@ -1,5 +1,4 @@
-import { AttributeUsageModel as AttributeUsage, common } from '@neo-one/client-common';
-import { Attribute, Input, Output } from '@neo-one/client-full';
+import { Attribute, AttributeUsageModel as AttributeUsage, common, Input, Output } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import { helpers, keys } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';

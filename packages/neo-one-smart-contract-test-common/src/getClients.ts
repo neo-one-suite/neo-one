@@ -1,11 +1,5 @@
-import {
-  Client,
-  LocalKeyStore,
-  LocalMemoryStore,
-  LocalUserAccountProvider,
-  NEOONEDataProvider,
-  NEOONEProvider,
-} from '@neo-one/client-full';
+import { LocalKeyStore, LocalMemoryStore, NEOONEDataProvider, NEOONEProvider } from '@neo-one/client-core';
+import { Client, LocalUserAccountProvider } from '@neo-one/client-full-core';
 
 interface Options {
   readonly privateKey: string;

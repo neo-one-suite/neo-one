@@ -1,4 +1,4 @@
-import { SourceMaps } from '@neo-one/client';
+import { SourceMaps } from '@neo-one/client-common';
 import { createHash, Hash } from 'crypto';
 import _ from 'lodash';
 import { RawSourceMap } from 'source-map';

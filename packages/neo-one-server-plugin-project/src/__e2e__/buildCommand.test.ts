@@ -1,18 +1,14 @@
-import { common, crypto } from '@neo-one/client-common';
 import {
   ABI,
-  Client,
+  common,
   Contract,
-  DeveloperClient,
-  Hash256,
-  LocalKeyStore,
-  LocalMemoryStore,
-  LocalUserAccountProvider,
-  NEOONEProvider,
+  crypto,
   privateKeyToAddress,
   UserAccountID,
   wifToPrivateKey,
-} from '@neo-one/client-full';
+} from '@neo-one/client-common';
+import { DeveloperClient, Hash256, LocalKeyStore, LocalMemoryStore, NEOONEProvider } from '@neo-one/client-core';
+import { Client, LocalUserAccountProvider } from '@neo-one/client-full-core';
 import { Network } from '@neo-one/server-plugin-network';
 import { Wallet } from '@neo-one/server-plugin-wallet';
 import { TestOptions } from '@neo-one/smart-contract-test';

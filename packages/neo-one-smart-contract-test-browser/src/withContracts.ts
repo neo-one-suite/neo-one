@@ -1,4 +1,4 @@
-import { NEOONEDataProvider } from '@neo-one/client';
+import { NEOONEDataProvider } from '@neo-one/client-core';
 import { createCompilerHost, FileSystem } from '@neo-one/local-browser';
 import { createJSONRPCLocalProviderManager, getFileSystem } from '@neo-one/local-singleton';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';

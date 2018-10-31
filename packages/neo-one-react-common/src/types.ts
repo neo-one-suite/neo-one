@@ -1,4 +1,4 @@
-import { AddressString } from '@neo-one/client';
+import { AddressString } from '@neo-one/client-common';
 import * as React from 'react';
 
 // tslint:disable-next-line no-any

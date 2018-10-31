@@ -1,4 +1,4 @@
-import { ABI, SmartContractNetworksDefinition } from '@neo-one/client';
+import { ABI, SmartContractNetworksDefinition } from '@neo-one/client-common';
 import { genFiles } from '@neo-one/smart-contract-codegen';
 import * as fs from 'fs-extra';
 import * as path from 'path';

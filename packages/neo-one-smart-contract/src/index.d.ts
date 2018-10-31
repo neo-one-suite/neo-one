@@ -984,6 +984,12 @@ export interface BlockchainConstructor {
    * `InvocationTransaction` this smart contract is executed in.
    */
   readonly currentTransaction: InvocationTransaction;
+  /**
+   * The `Address` of the smart contract that directly invoked the contract.
+   *
+   * Will be `undefined` if the smart contract method was not invoked by another smart contract, but instead was invoked by a user directly.
+   */
+  readonly currentCallerContract: Address | undefined;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 /**

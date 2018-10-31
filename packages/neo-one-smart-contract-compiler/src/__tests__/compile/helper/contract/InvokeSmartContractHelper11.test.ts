@@ -1,4 +1,4 @@
-import { Hash256 } from '@neo-one/client-full';
+import { Hash256 } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { helpers, keys } from '../../../../__data__';
 

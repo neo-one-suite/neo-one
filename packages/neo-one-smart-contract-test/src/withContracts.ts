@@ -1,4 +1,4 @@
-import { NEOONEDataProvider } from '@neo-one/client';
+import { NEOONEDataProvider } from '@neo-one/client-core';
 import { createCompilerHost } from '@neo-one/smart-contract-compiler-node';
 import {
   Contract,

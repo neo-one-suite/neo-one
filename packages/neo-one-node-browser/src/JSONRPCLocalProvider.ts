@@ -1,4 +1,4 @@
-import { JSONRPCProvider, JSONRPCRequest, JSONRPCResponse } from '@neo-one/client';
+import { JSONRPCProvider, JSONRPCRequest, JSONRPCResponse } from '@neo-one/client-core';
 import { FullNode, FullNodeOptions } from './FullNode';
 
 // tslint:disable-next-line no-let

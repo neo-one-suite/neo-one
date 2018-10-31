@@ -1,4 +1,5 @@
-import { ABI, ContractRegister } from '@neo-one/client-full';
+import { ABI } from '@neo-one/client-common';
+import { ContractRegister } from '@neo-one/client-full-core';
 import { tsUtils } from '@neo-one/ts-utils';
 import { normalizePath } from '@neo-one/utils';
 import _ from 'lodash';

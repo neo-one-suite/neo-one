@@ -1,4 +1,5 @@
-import { ABI, ContractParameterType, ContractRegister } from '@neo-one/client-full';
+import { ABI, ContractParameterType } from '@neo-one/client-common';
+import { ContractRegister } from '@neo-one/client-full-core';
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';

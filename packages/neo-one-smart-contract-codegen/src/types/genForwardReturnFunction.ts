@@ -1,4 +1,4 @@
-import { ABIFunction } from '@neo-one/client';
+import { ABIFunction } from '@neo-one/client-common';
 import { toTypeScriptType } from '../utils';
 import { getEventName } from './getEventName';
 

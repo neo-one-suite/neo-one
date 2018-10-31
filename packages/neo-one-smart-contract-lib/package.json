@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@neo-one/client-common": "^1.0.0-preview.2",
-    "@neo-one/client-full": "^1.0.0-preview.2",
+    "@neo-one/client-core": "^1.0.0-preview.2",
     "@neo-one/smart-contract-test": "^1.0.0-preview.2",
     "@types/app-root-dir": "0.1.0",
     "app-root-dir": "1.0.2",

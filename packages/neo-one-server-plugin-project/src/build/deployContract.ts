@@ -1,4 +1,5 @@
-import { AddressString, NEOONEDataProvider, SourceMaps } from '@neo-one/client-full';
+import { AddressString, SourceMaps } from '@neo-one/client-common';
+import { NEOONEDataProvider } from '@neo-one/client-core';
 import { deployContract as deployContractBase } from '@neo-one/local';
 import { Network } from '@neo-one/server-plugin-network';
 import { ContractResult } from './compileContract';

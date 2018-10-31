@@ -1,6 +1,7 @@
 import { take } from 'rxjs/operators';
 import { addKeysToCrypto, factory, keys } from '../../../__data__';
-import { LocalKeyStore, Store } from '../../../user';
+import { LocalKeyStore } from '../../../user';
+import { Store } from '../../../user/keystore/LocalKeyStore';
 
 describe('LocalKeyStore', () => {
   addKeysToCrypto();

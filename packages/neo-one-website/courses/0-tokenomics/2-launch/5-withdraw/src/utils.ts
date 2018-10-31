@@ -1,5 +1,6 @@
 // tslint:disable export-name no-empty no-unused no-implicit-dependencies
-import { AddressString, Client, Hash256, InvokeReceipt } from '@neo-one/client';
+import { AddressString, InvokeReceipt } from '@neo-one/client-common';
+import { Client, Hash256 } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { combineLatest, Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';

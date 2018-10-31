@@ -1,4 +1,4 @@
-import { SmartContractNetworksDefinition } from '@neo-one/client';
+import { SmartContractNetworksDefinition } from '@neo-one/client-common';
 import stringify from 'safe-stable-stringify';
 import { getABIName } from '../abi';
 import { getSmartContractName } from '../types';

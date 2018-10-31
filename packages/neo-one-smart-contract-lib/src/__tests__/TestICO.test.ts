@@ -1,5 +1,5 @@
-import { common, crypto } from '@neo-one/client-common';
-import { Hash256, privateKeyToAddress, SmartContractAny } from '@neo-one/client-full';
+import { common, crypto, privateKeyToAddress } from '@neo-one/client-common';
+import { Hash256, SmartContractAny } from '@neo-one/client-core';
 import { withContracts } from '@neo-one/smart-contract-test';
 import BigNumber from 'bignumber.js';
 import * as path from 'path';

@@ -1,17 +1,13 @@
-import { common, crypto } from '@neo-one/client-common';
 import {
-  Client,
-  DeveloperClient,
-  LocalKeyStore,
-  LocalUserAccountProvider,
-  NEOONEDataProvider,
-  NEOONEProvider,
-  PublishReceipt,
+  common,
+  crypto,
   scriptHashToAddress,
   SourceMaps,
   TransactionResult,
   UserAccountID,
-} from '@neo-one/client-full';
+} from '@neo-one/client-common';
+import { DeveloperClient, LocalKeyStore, NEOONEDataProvider, NEOONEProvider } from '@neo-one/client-core';
+import { Client, LocalUserAccountProvider, PublishReceipt } from '@neo-one/client-full-core';
 import { compileContract, CompilerHost } from '@neo-one/smart-contract-compiler';
 import BigNumber from 'bignumber.js';
 import { camel } from 'change-case';

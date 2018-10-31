@@ -1,4 +1,4 @@
-import { DeveloperClient, NEOONEDataProvider } from '@neo-one/client';
+import { DeveloperClient, NEOONEDataProvider } from '@neo-one/client-core';
 import { constants } from '@neo-one/local';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { WorkerManager } from '@neo-one/worker';

@@ -1,12 +1,11 @@
 import {
-  Client,
   DeveloperClient,
   LocalKeyStore,
   LocalMemoryStore,
-  LocalUserAccountProvider,
   NEOONEDataProvider,
   NEOONEProvider,
-} from '@neo-one/client-full';
+} from '@neo-one/client-core';
+import { Client, LocalUserAccountProvider } from '@neo-one/client-full-core';
 
 export const getClients = async (provider: NEOONEDataProvider, masterPrivateKey: string) => {
   const client = new Client({

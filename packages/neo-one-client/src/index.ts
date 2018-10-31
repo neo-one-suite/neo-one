@@ -141,7 +141,7 @@ export {
   SmartContract,
   SmartContractAny,
   UnlockedWallet,
-  Wallet as LocalWallet,
+  LocalWallet,
   nep5,
 } from '@neo-one/client-core';
 

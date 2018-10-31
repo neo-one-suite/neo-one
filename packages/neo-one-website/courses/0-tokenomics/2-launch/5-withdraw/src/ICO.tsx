@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 // tslint:disable-next-line
-import { Client } from '@neo-one/client';
+import { Client } from '@neo-one/client-core';
 // tslint:disable-next-line
 import { FromStream } from '@neo-one/react';
 // tslint:disable-next-line

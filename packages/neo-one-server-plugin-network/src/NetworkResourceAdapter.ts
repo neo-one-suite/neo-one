@@ -1,5 +1,6 @@
 import { common, crypto } from '@neo-one/client-common';
-import { NEOONEDataProvider, ReadClient } from '@neo-one/client-full';
+import { NEOONEDataProvider } from '@neo-one/client-core';
+import { ReadClient } from '@neo-one/client-full-core';
 import { createEndpoint, EndpointConfig } from '@neo-one/node-core';
 import {
   Binary,

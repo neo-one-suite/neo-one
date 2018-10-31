@@ -1,4 +1,4 @@
-import { ABIFunction, ABIParameter } from '@neo-one/client';
+import { ABIFunction, ABIParameter } from '@neo-one/client-common';
 import { genFunctionParameters } from './genFunctionParameters';
 import { getEventName } from './getEventName';
 

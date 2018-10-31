@@ -1,4 +1,4 @@
-import { DeveloperClient, NEOONEDataProvider } from '@neo-one/client';
+import { DeveloperClient, NEOONEDataProvider } from '@neo-one/client-core';
 import { PluginManager, TaskList } from '@neo-one/server-plugin';
 import { getNEOTrackerResourceManager } from '@neo-one/server-plugin-neotracker';
 import { getNetworkResourceManager } from '@neo-one/server-plugin-network';

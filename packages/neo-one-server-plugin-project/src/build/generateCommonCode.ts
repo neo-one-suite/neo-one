@@ -1,4 +1,4 @@
-import { SourceMaps } from '@neo-one/client';
+import { SourceMaps } from '@neo-one/client-common';
 import { genCommonFiles, NetworkDefinition, Wallet } from '@neo-one/smart-contract-codegen';
 import * as fs from 'fs-extra';
 import { ProjectConfig } from '../types';

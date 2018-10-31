@@ -1,5 +1,5 @@
 // tslint:disable no-any no-unused
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client-core';
 import * as React from 'react';
 
 export type ComponentProps<C extends React.ComponentType<any> | React.Component<any>> = C extends React.ComponentType<

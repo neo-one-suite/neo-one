@@ -1,6 +1,6 @@
 // tslint:disable no-implicit-dependencies no-any no-loop-statement prefer-immediate-return no-var-before-return no-console
-import { NEOONEDataProvider, scriptHashToAddress } from '@neo-one/client';
-import { utils } from '@neo-one/client-common';
+import { scriptHashToAddress, utils } from '@neo-one/client-common';
+import { NEOONEDataProvider } from '@neo-one/client-core';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { toArray } from '@reactivex/ix-es2015-cjs/asynciterable/toarray';
 

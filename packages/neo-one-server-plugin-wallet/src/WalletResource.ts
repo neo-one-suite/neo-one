@@ -1,13 +1,12 @@
-import { common } from '@neo-one/client-common';
 import {
+  common,
   createPrivateKey,
-  LocalWallet,
-  NEOONEDataProvider,
   NetworkType as ClientNetworkType,
   privateKeyToAddress,
   privateKeyToWIF,
-  ReadClient,
-} from '@neo-one/client-full';
+} from '@neo-one/client-common';
+import { LocalWallet, NEOONEDataProvider } from '@neo-one/client-core';
+import { ReadClient } from '@neo-one/client-full-core';
 import { compoundName, DescribeTable, PluginManager } from '@neo-one/server-plugin';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
 import { labels } from '@neo-one/utils';

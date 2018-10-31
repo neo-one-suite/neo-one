@@ -1,5 +1,11 @@
-import { NEOONEDataProvider, scriptHashToAddress, SmartContractNetworksDefinition, SourceMaps } from '@neo-one/client';
-import { common, crypto } from '@neo-one/client-common';
+import {
+  common,
+  crypto,
+  scriptHashToAddress,
+  SmartContractNetworksDefinition,
+  SourceMaps,
+} from '@neo-one/client-common';
+import { NEOONEDataProvider } from '@neo-one/client-core';
 import { constants, deployContract, setupWallets } from '@neo-one/local';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { genCommonBrowserFiles, genFiles } from '@neo-one/smart-contract-codegen';

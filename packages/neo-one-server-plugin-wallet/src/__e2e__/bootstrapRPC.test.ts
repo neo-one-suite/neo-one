@@ -1,4 +1,5 @@
-import { Asset, NEOONEProvider, privateKeyToAddress } from '@neo-one/client';
+import { Asset, privateKeyToAddress } from '@neo-one/client-common';
+import { NEOONEProvider } from '@neo-one/client-core';
 import * as bootstrapTestUtils from '../__data__/bootstrapTestUtils';
 import { ASSET_INFO, DEFAULT_PRIVATE_KEYS, TOKEN_INFO } from '../bootstrap';
 

@@ -1,4 +1,4 @@
-import { ABI, ABIEvent, ABIFunction, ABIParameter, ABIReturn, SenderAddressABIDefault } from '@neo-one/client';
+import { ABI, ABIEvent, ABIFunction, ABIParameter, ABIReturn, SenderAddressABIDefault } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';

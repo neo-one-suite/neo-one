@@ -1,4 +1,4 @@
-import { ABI } from '@neo-one/client';
+import { ABI } from '@neo-one/client-common';
 
 const abi = (decimals: number): ABI => ({
   functions: [

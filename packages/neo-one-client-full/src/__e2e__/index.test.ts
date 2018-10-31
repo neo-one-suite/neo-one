@@ -1,7 +1,7 @@
 // tslint:disable-next-line no-implicit-dependencies
 import * as api from '@neo-one/client-full';
 
-describe('@neo-one/client', () => {
+describe('@neo-one/client-full', () => {
   const EXPECTED = [
     'Client',
     'DeveloperClient',

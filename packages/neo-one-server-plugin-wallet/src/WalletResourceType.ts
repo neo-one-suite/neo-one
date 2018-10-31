@@ -1,11 +1,6 @@
-import {
-  Client,
-  LocalKeyStore,
-  LocalStringStore,
-  LocalUserAccountProvider,
-  NEOONEProvider,
-  UserAccountID,
-} from '@neo-one/client-full';
+import { UserAccountID } from '@neo-one/client-common';
+import { LocalKeyStore, LocalStringStore, NEOONEProvider } from '@neo-one/client-core';
+import { Client, LocalUserAccountProvider } from '@neo-one/client-full-core';
 import {
   CRUD,
   DescribeTable,

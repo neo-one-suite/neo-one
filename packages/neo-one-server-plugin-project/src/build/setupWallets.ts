@@ -1,4 +1,4 @@
-import { NEOONEDataProvider } from '@neo-one/client-full';
+import { NEOONEDataProvider } from '@neo-one/client-core';
 import { setupWallets as setupWalletsBase, WALLETS as WALLETS_BASE } from '@neo-one/local';
 import { Network } from '@neo-one/server-plugin-network';
 
