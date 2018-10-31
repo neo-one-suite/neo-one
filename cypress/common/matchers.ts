@@ -22,10 +22,16 @@ export const checkProblems = (problemRoots: ReadonlyArray<ProblemRoot>) => {
   cy.get('[data-test=problems-problem-count]', { timeout: 30000 }).should('have.text', `${problems}`);
   cy.get('[data-test=problems-warning-count]', { timeout: 30000 }).should('have.text', `${warnings}`);
   cy.get('[data-test=problems]').click();
-  cy.get('[data-test=console-header-problem-count]').should('have.text', `${problems + warnings}`);
-  problemRoots.forEach((problemRoot) => {
-    checkProblemRoot(problemRoot);
-  });
+
+  if (problems + warnings === 0) {
+    cy.get('[data-test=console-header-problem-count]').should('not.exist');
+  } else {
+    cy.get('[data-test=console-header-problem-count]').should('have.text', `${problems + warnings}`);
+    problemRoots.forEach((problemRoot) => {
+      checkProblemRoot(problemRoot);
+    });
+  }
+
   cy.get('[data-test=console-close]').click();
 };
 
