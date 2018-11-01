@@ -38,7 +38,7 @@ describe('Tokenomics', () => {
           dirname: 'one/tests',
           passing: 0,
           failing: 1,
-          error: 'Could not find module for ../generated/test',
+          error: 'find module',
           tests: [],
         },
       ],

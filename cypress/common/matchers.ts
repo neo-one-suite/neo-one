@@ -257,9 +257,10 @@ export const enterSolution = ({ path }: { readonly path: string }) => {
 
 interface BuildOptions {
   readonly success: boolean;
+  readonly second?: boolean;
 }
 
-export const build = ({ success }: BuildOptions) => {
+export const build = ({ success, second }: BuildOptions) => {
   cy.get('[data-test=build]', { timeout: 60000 }).click();
   const text = success
     ? 'Building...\nScanning for contracts...\nSetting up wallets...\nCompiling contract Token...\nGenerating code...\nDone'
@@ -271,6 +272,9 @@ export const build = ({ success }: BuildOptions) => {
   cy.get('[data-test=console-close]').click();
   // Need to wait to allow transpiling to happen
   cy.wait(2500);
+  if (!second) {
+    build({ success, second: true });
+  }
 };
 
 export const nextButton = () => {
