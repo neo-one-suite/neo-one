@@ -17,6 +17,13 @@ import { ModuleBase, RemoteEngine } from '../remote';
 import { createTestEngine, CreateTestEngineOptions } from './createTestEngine';
 import { BlockName, DescribeBlock, JestEvent, TestEntry } from './types';
 
+const handleError = (error: Error) => {
+  // tslint:disable-next-line strict-type-predicates
+  if (typeof trackJs !== 'undefined') {
+    trackJs.track(error);
+  }
+};
+
 function resetTestState() {
   // tslint:disable-next-line no-any
   (expect as any).setState({
@@ -167,10 +174,7 @@ const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks
             stack: error.stack,
           },
         })
-        .catch((err) => {
-          // tslint:disable-next-line no-console
-          console.error(err);
-        });
+        .catch(handleError);
     },
     handleTestEvent: (event: JestEvent) => {
       switch (event.name) {
@@ -188,10 +192,7 @@ const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks
                 path: test.path,
                 tests,
               })
-              .catch((err) => {
-                // tslint:disable-next-line no-console
-                console.error(err);
-              });
+              .catch(handleError);
           }
           break;
         case 'add_test':
@@ -220,10 +221,7 @@ const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks
               name: getTestName(event.test),
               status: 'skip',
             })
-            .catch((err) => {
-              // tslint:disable-next-line no-console
-              console.error(err);
-            });
+            .catch(handleError);
           break;
         case 'test_fn_success':
           callbacks
@@ -232,10 +230,7 @@ const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks
               status: 'pass',
               duration: Date.now() - now,
             })
-            .catch((err) => {
-              // tslint:disable-next-line no-console
-              console.error(err);
-            });
+            .catch(handleError);
           break;
         case 'test_fn_failure':
           formatError(engine, event.test.errors[0][0])
@@ -247,10 +242,7 @@ const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks
                 error: err,
               }),
             )
-            .catch((err) => {
-              // tslint:disable-next-line no-console
-              console.error(err);
-            });
+            .catch(handleError);
           break;
         case 'add_hook':
         case 'hook_start':

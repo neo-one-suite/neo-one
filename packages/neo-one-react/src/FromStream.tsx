@@ -100,7 +100,7 @@ export class FromStream<T> extends React.Component<Props<T>, State<T>> {
 
   private _setValue(value: T | typeof initialValue): void {
     if (this.mutableMounted) {
-      this.setState(() => ({ value }));
+      this.setState({ value });
     } else {
       // tslint:disable-next-line no-object-mutation
       this.state = { value };

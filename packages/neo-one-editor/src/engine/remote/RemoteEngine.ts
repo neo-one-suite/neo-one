@@ -1,10 +1,11 @@
 import { Builder, dirname, normalizePath, PouchDBFileSystem } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
+import { retryBackoff } from '@neo-one/utils';
 import { WorkerManager } from '@neo-one/worker';
 import fetch from 'cross-fetch';
 import _ from 'lodash';
 import * as nodePath from 'path';
-import { Subscription } from 'rxjs';
+import { defer, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ModuleNotFoundError } from '../../errors';
 import { MissingPath, ModuleBase } from './ModuleBase';
@@ -179,8 +180,10 @@ export class RemoteEngine {
     try {
       await Promise.all(paths.map(async (path) => this.fetchDependency(path)));
     } catch (error) {
-      // tslint:disable-next-line no-console
-      console.error(error);
+      // tslint:disable-next-line strict-type-predicates
+      if (typeof trackJs !== 'undefined') {
+        trackJs.track(error);
+      }
     }
   }
 
@@ -303,7 +306,15 @@ export class RemoteEngine {
   }
 
   private async fetch(url: string): Promise<Response> {
-    const response = await fetch(url, { mode: 'no-cors' });
+    const response = await defer(async () => fetch(url, { mode: 'no-cors' }))
+      .pipe(
+        retryBackoff({
+          initialInterval: 250,
+          maxRetries: 10,
+          maxInterval: 2500,
+        }),
+      )
+      .toPromise();
     if (!response.ok) {
       throw new Error(`Failed to fetch file at ${url} with status ${response.status}: ${response.statusText}`);
     }

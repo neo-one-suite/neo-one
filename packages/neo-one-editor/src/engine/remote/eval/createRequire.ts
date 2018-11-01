@@ -1,13 +1,13 @@
 import { MissingPath, ModuleBase } from '../ModuleBase';
 import { RemoteEngine } from '../RemoteEngine';
 
-export const createRequire = (engine: RemoteEngine, initiator: ModuleBase, explore: boolean) => {
+export const createRequire = (engine: RemoteEngine, initiator: ModuleBase, exploreID?: string) => {
   function require(path: string) {
     let requiredModule: ModuleBase;
     try {
       requiredModule = engine.resolveModule(path, initiator.path);
     } catch (error) {
-      if (explore) {
+      if (exploreID !== undefined) {
         if (error.code === 'MODULE_NOT_FOUND_ERROR') {
           // tslint:disable-next-line no-array-mutation
           require.missingPaths.push({ request: path, currentPath: initiator.path });
@@ -19,8 +19,8 @@ export const createRequire = (engine: RemoteEngine, initiator: ModuleBase, explo
       throw error;
     }
 
-    if (explore) {
-      const { exports, missingPaths } = requiredModule.evaluateExplore({ initiator });
+    if (exploreID !== undefined) {
+      const { exports, missingPaths } = requiredModule.evaluateExplore({ initiator, id: exploreID });
       // tslint:disable-next-line no-array-mutation
       require.missingPaths.push(...missingPaths);
 

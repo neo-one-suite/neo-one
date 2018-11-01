@@ -43,8 +43,8 @@ const permanentRegister = (type: string, callback: ConsoleProxyCallback) => {
     // tslint:disable-next-line no-any
     const orig = (console as any)[type];
     if (typeof orig === 'function') {
-      // tslint:disable-next-line no-object-mutation no-any
-      (console as any)[type] = function(...args: any[]) {
+      // tslint:disable-next-line no-object-mutation no-any no-unused
+      (console as any)[type] = function __stack_frame_overlay_proxy_console__(...args: any[]) {
         try {
           const message = args[0];
           if (typeof message === 'string' && reactFrameStack.length > 0) {

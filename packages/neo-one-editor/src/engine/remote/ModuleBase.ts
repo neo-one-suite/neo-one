@@ -14,6 +14,10 @@ export interface EvaluateOptions extends EvaluateBaseOptions {
   readonly initiator?: ModuleBase;
 }
 
+export interface EvaluateExploreOptions extends EvaluateOptions {
+  readonly id: string;
+}
+
 export interface MissingPath {
   readonly request: string;
   readonly currentPath: string;
@@ -28,6 +32,6 @@ export abstract class ModuleBase {
   public constructor(protected readonly engine: RemoteEngine, public readonly path: string) {}
 
   public abstract evaluate(options?: EvaluateOptions): Exports;
-  public abstract evaluateExplore(options?: EvaluateOptions): ExploreResult;
+  public abstract evaluateExplore(options: EvaluateExploreOptions): ExploreResult;
   public abstract async evaluateAsync(options?: EvaluateAsyncOptions): Promise<Exports>;
 }

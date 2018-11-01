@@ -106,6 +106,10 @@ export class PreviewEngine extends RemoteEngine {
     this.mutableRerun = false;
     ReactErrorOverlay.dismissBuildError();
     ReactErrorOverlay.dismissRuntimeErrors();
+    if (this.mutableErrorTimeout !== undefined) {
+      clearTimeout(this.mutableErrorTimeout);
+      this.mutableErrorTimeout = undefined;
+    }
     try {
       const entryModule = this.findEntryModule();
       await entryModule.evaluateAsync({ force: true });
@@ -129,7 +133,8 @@ export class PreviewEngine extends RemoteEngine {
         if (!this.mutableRunning && !this.mutableRerun && err !== undefined) {
           throw err;
         }
-      });
+        // tslint:disable-next-line no-any
+      }) as any;
     }
   }
 

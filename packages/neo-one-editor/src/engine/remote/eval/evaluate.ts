@@ -14,9 +14,9 @@ export interface Result {
   readonly missingPaths: ReadonlyArray<MissingPath>;
 }
 
-export const evaluate = (engine: RemoteEngine, mod: TranspiledModule, explore: boolean): Result => {
+export const evaluate = (engine: RemoteEngine, mod: TranspiledModule, exploreID?: string): Result => {
   const globals = engine.getGlobals(mod);
-  const require = createRequire(engine, mod, explore);
+  const require = createRequire(engine, mod, exploreID);
   const code = mod.code;
   const module = { exports: {} };
   const params = ['require', 'module', 'exports'].concat(Object.keys(globals));
@@ -27,7 +27,7 @@ export const evaluate = (engine: RemoteEngine, mod: TranspiledModule, explore: b
     (0, eval)(evalCode).apply(_self, args);
     // ^ makes eval run in global scope
   } catch (e) {
-    if (explore) {
+    if (exploreID !== undefined) {
       return { exports: module.exports, missingPaths: require.missingPaths };
     }
 

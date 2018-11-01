@@ -13,6 +13,19 @@ if (typeof window !== 'undefined') {
     (window as any)._trackJs = {
       token: 'ccff2c276a494f0b94462cdbf6bf4518',
       application: 'neo-one',
+      callback: {
+        enabled: false,
+      },
+      console: {
+        error: false,
+      },
+      network: {
+        error: false,
+      },
+      window: {
+        enabled: false,
+        promise: false,
+      },
     };
     // tslint:disable-next-line
     const trackJs = require('trackjs');
