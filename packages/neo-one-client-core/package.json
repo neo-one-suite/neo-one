@@ -14,7 +14,7 @@
     "@types/bn.js": "^4.11.3",
     "@types/lodash": "^4.14.117",
     "@types/tapable": "^1.0.4",
-    "bignumber.js": "^7.2.1",
+    "bignumber.js": "^8.0.1",
     "bn.js": "^4.11.8",
     "cross-fetch": "^2.2.3",
     "dataloader": "^1.4.0",
