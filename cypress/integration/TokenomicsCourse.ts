@@ -1,5 +1,5 @@
 // tslint:disable no-object-literal-type-assertion
-import { build, checkProblems, enterSolution, nextButton, prepareCourseTest, runTests, Test } from '../common';
+import { build, checkProblems, enterSolution, nextButton, prepareCourseTest, Problem, runTests, Test } from '../common';
 
 describe('Tokenomics', () => {
   beforeEach(() => {
@@ -17,6 +17,7 @@ describe('Tokenomics', () => {
         '/course/tokenomics/2/2',
         '/course/tokenomics/2/3',
         '/course/tokenomics/2/4',
+        '/course/tokenomics/2/5',
       ],
     });
   });
@@ -37,7 +38,7 @@ describe('Tokenomics', () => {
           dirname: 'one/tests',
           passing: 0,
           failing: 1,
-          error: "Cannot find module '../generated/test' from '/one/tests'",
+          error: 'Could not find module for ../generated/test',
           tests: [],
         },
       ],
@@ -63,7 +64,12 @@ describe('Tokenomics', () => {
     ]);
     enterSolution({ path: 'one/contracts/Token.one.ts' });
     build({ success: true });
-    // Check problems cleared
+    checkProblems([
+      {
+        path: '/one/tests/Token.test.ts',
+        problems: [],
+      },
+    ]);
     runTests({
       passing: 1,
       failing: 0,
@@ -87,10 +93,12 @@ describe('Tokenomics', () => {
   const lesson1 = ({
     error,
     chapter,
+    problems,
     testName = 'has NEP-5 properties and methods',
   }: {
     error: string;
     chapter: number;
+    problems: ReadonlyArray<Problem>;
     testName?: string;
   }) => {
     it(`Lesson 1 Chapter ${chapter}`, () => {
@@ -124,10 +132,20 @@ describe('Tokenomics', () => {
           },
         ],
       });
-      // Check for Problems
+      checkProblems([
+        {
+          path: '/one/tests/Token.test.ts',
+          problems,
+        },
+      ]);
       enterSolution({ path: 'one/contracts/Token.one.ts' });
       build({ success: true });
-      // Check problems cleared
+      checkProblems([
+        {
+          path: '/one/tests/Token.test.ts',
+          problems: [],
+        },
+      ]);
       runTests({
         passing: 1,
         failing: 0,
@@ -153,26 +171,159 @@ describe('Tokenomics', () => {
     chapter: 2,
     testName: 'has name, symbol and decimals properties',
     error: 'token.name is not a function',
+    problems: [
+      {
+        owner: 'ts',
+        text: "Property 'name' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 10,
+        endLine: 65,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'symbol' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 10,
+        endLine: 79,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'decimals' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 10,
+        endLine: 95,
+      },
+    ],
   });
   lesson1({
     chapter: 3,
     testName: 'has name, symbol, decimals and totalSupply properties',
     error: 'token.totalSupply is not a function',
+    problems: [
+      {
+        owner: 'ts',
+        text: "Property 'totalSupply' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 14,
+        endLine: 15,
+      },
+    ],
   });
-  lesson1({ chapter: 4, error: 'token.balanceOf is not a function' });
-  lesson1({ chapter: 5, error: 'token.owner is not a function' });
-  lesson1({ chapter: 6, error: "Cannot read property 'confirmed' of undefined" });
-  lesson1({ chapter: 7, error: 'expect(received).toHaveLength(length)' });
-  lesson1({ chapter: 8, error: "Cannot read property 'confirmed' of undefined" });
+  lesson1({
+    chapter: 4,
+    error: 'token.balanceOf is not a function',
+    problems: [
+      {
+        owner: 'ts',
+        text: "Property 'balanceOf' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 21,
+        endLine: 15,
+      },
+    ],
+  });
+  lesson1({
+    chapter: 5,
+    error: 'token.owner is not a function',
+    problems: [
+      {
+        owner: 'ts',
+        text: "Property 'owner' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 22,
+        endLine: 15,
+      },
+    ],
+  });
+  lesson1({
+    chapter: 6,
+    error: "Cannot read property 'confirmed' of undefined",
+    problems: [
+      {
+        owner: 'ts',
+        text: "Property 'issue' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 33,
+        endLine: 40,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'issue' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 47,
+        endLine: 46,
+      },
+    ],
+  });
+  lesson1({
+    chapter: 7,
+    error: 'expect(received).toHaveLength(length)',
+    problems: [
+      {
+        owner: 'ts',
+        text: "Property 'name' does not exist on type 'never'.",
+        startLine: 40,
+        endLine: 20,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'name' does not exist on type 'never'.",
+        startLine: 41,
+        endLine: 17,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'parameters' does not exist on type 'never'.",
+        startLine: 44,
+        endLine: 20,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'parameters' does not exist on type 'never'.",
+        startLine: 45,
+        endLine: 20,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'parameters' does not exist on type 'never'.",
+        startLine: 46,
+        endLine: 20,
+      },
+    ],
+  });
+  lesson1({
+    chapter: 8,
+    error: "Cannot read property 'confirmed' of undefined",
+    problems: [
+      {
+        owner: 'ts',
+        text: "Property 'transfer' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 65,
+        endLine: 15,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'transfer' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 69,
+        endLine: 15,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'transfer' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 71,
+        endLine: 15,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'transfer' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 109,
+        endLine: 21,
+      },
+    ],
+  });
 
   const lesson2 = ({
     chapter,
     error,
+    problems = [],
     testName = 'allows minting tokens',
     skip = false,
   }: {
     chapter: number;
     error: string;
+    problems?: ReadonlyArray<Problem>;
     testName?: string;
     skip?: boolean;
   }) => {
@@ -216,10 +367,20 @@ describe('Tokenomics', () => {
           },
         ],
       });
-      // Check for Problems
+      checkProblems([
+        {
+          path: '/one/tests/Token.test.ts',
+          problems,
+        },
+      ]);
       enterSolution({ path: 'one/contracts/Token.one.ts' });
       build({ success: true });
-      // Check problems cleared
+      checkProblems([
+        {
+          path: '/one/tests/Token.test.ts',
+          problems: [],
+        },
+      ]);
       runTests({
         passing: 1,
         failing: 0,
@@ -250,8 +411,59 @@ describe('Tokenomics', () => {
     });
   };
 
-  lesson2({ chapter: 1, error: "Cannot read property 'confirmed' of undefined", skip: true });
-  lesson2({ chapter: 2, error: 'expect(received).toBeDefined()', skip: true });
-  lesson2({ chapter: 3, error: 'token.amountPerNEO is not a function' });
+  lesson2({
+    chapter: 1,
+    error: "Cannot read property 'confirmed' of undefined",
+    skip: true,
+    problems: [
+      {
+        owner: 'ts',
+        text: "Property 'mintTokens' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 12,
+        endLine: 39,
+      },
+    ],
+  });
+  lesson2({
+    chapter: 2,
+    error: 'expect(received).toBeDefined()',
+    skip: true,
+  });
+  lesson2({
+    chapter: 3,
+    error: 'token.amountPerNEO is not a function',
+    problems: [
+      {
+        owner: 'ts',
+        text: "Property 'amountPerNEO' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 30,
+        endLine: 15,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'remaining' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 33,
+        endLine: 15,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'remaining' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 88,
+        endLine: 15,
+      },
+    ],
+  });
   lesson2({ chapter: 4, error: 'expect(received).toBeDefined()' });
+  lesson2({
+    chapter: 5,
+    error: "Cannot read property 'confirmed' of undefined",
+    problems: [
+      {
+        owner: 'ts',
+        text: "Property 'withdraw' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 189,
+        endLine: 43,
+      },
+    ],
+  });
 });
