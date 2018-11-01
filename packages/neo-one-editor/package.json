@@ -60,7 +60,7 @@
     "raw-loader": "^0.5.1",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
-    "react-hot-loader": "^4.3.11",
+    "react-hot-loader": "^4.3.12",
     "react-icons": "^3.2.2",
     "react-redux": "^5.1.0",
     "reakit": "0.15.10",

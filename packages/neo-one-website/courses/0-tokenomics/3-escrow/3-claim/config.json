@@ -1,0 +1,18 @@
+{
+  "title": "Escrow Claim",
+  "files": [
+    {
+      "initial": "one/contracts/Escrow.one.ts",
+      "solution": "one/contracts/Escrow.solution.one.ts"
+    },
+    {
+      "solution": "one/contracts/Token.one.ts"
+    },
+    {
+      "solution": "one/tests/Escrow.test.ts"
+    },
+    {
+      "solution": "package.json"
+    }
+  ]
+}

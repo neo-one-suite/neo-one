@@ -38,6 +38,7 @@ describe('Escrow', () => {
       if (mintReceipt.result.state === 'FAULT') {
         throw new Error(mintReceipt.result.message);
       }
+      expect(mintReceipt.result.value).toEqual(true);
 
       // Pre-approve the transfer by the Escrow account
       const escrowAmount = new BigNumber(100);
@@ -50,6 +51,7 @@ describe('Escrow', () => {
       if (approveReceipt.result.state === 'FAULT') {
         throw new Error(approveReceipt.result.message);
       }
+      expect(approveReceipt.result.value).toEqual(true);
 
       const escrowReceipt = await escrow.deposit.confirmed(
         masterAccountID.address,
@@ -59,6 +61,7 @@ describe('Escrow', () => {
       if (escrowReceipt.result.state === 'FAULT') {
         throw new Error(escrowReceipt.result.message);
       }
+      expect(escrowReceipt.result.value).toEqual(true);
       let event = escrowReceipt.events[0];
       expect(event.name).toEqual('balanceAvailable');
       if (event.name !== 'balanceAvailable') {

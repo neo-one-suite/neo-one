@@ -2,7 +2,7 @@
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import { merge, Observable } from 'rxjs';
-import { debounceTime, filter, map, switchMap } from 'rxjs/operators';
+import { concatMap, debounceTime, filter, map, switchMap } from 'rxjs/operators';
 import ts from 'typescript';
 import { AsyncLanguageService, FlattenedDiagnostic } from '../AsyncLanguageService';
 import { MonacoWorkerManager } from '../types';
@@ -103,6 +103,16 @@ export const wireDiagnostics = (manager: MonacoWorkerManager, languageID: string
     );
   };
 
+  const newFile$ = new Observable<ReadonlyArray<string>>((observer) => {
+    const disposable = monaco.editor.onDidCreateModel((model) => {
+      if (!model.isDisposed() && model.uri.scheme !== 'inmemory' && model.getModeId() === languageID) {
+        observer.next([model.uri.path]);
+      }
+    });
+
+    return () => disposable.dispose();
+  });
+
   const subscription = manager.openFiles$
     .pipe(
       switchMap((openFiles) => {
@@ -111,15 +121,17 @@ export const wireDiagnostics = (manager: MonacoWorkerManager, languageID: string
         return merge(
           manager.fileChanged$.pipe(
             filter((file) => openFilesSet.has(file)),
-            switchMap(async (file) => getDiagnostics([file])),
-            mapDiagnostics,
+            map((file) => [file]),
           ),
           manager.fileChanged$.pipe(
             filter((file) => !openFilesSet.has(file)),
             debounceTime(750),
-            switchMap(async () => getDiagnostics(openFiles)),
-            mapDiagnostics,
+            map(() => openFiles),
           ),
+          newFile$,
+        ).pipe(
+          concatMap(async (files) => getDiagnostics(files)),
+          mapDiagnostics,
         );
       }),
     )
@@ -130,21 +142,4 @@ export const wireDiagnostics = (manager: MonacoWorkerManager, languageID: string
       subscription.unsubscribe();
     },
   });
-  manager.manager.add(
-    monaco.editor.onDidCreateModel((model) => {
-      Promise.resolve()
-        .then(async () => {
-          const file = model.uri.path;
-          // monaco creates dummy models on editor creation with invalid paths, just ignore them.
-          if (!model.isDisposed() && model.uri.scheme !== 'inmemory' && model.getModeId() === languageID) {
-            const diagnostics = await getDiagnostics([file]);
-            handleDiagnostics(diagnostics);
-          }
-        })
-        .catch((error) => {
-          // tslint:disable-next-line no-console
-          console.error(error);
-        });
-    }),
-  );
 };

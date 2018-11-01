@@ -15,7 +15,7 @@
     "@types/lodash": "^4.14.117",
     "@types/scrypt-js": "^2.0.1",
     "@types/wif": "^2.0.1",
-    "bignumber.js": "^7.2.1",
+    "bignumber.js": "^8.0.1",
     "bn.js": "^4.11.8",
     "bs58": "^4.0.1",
     "buffer-xor": "^2.0.2",

@@ -25,7 +25,7 @@ export class Escrow extends SmartContract {
     this.setBalance(from, to, this.balanceOf(from, to) + amount);
     notifyBalanceAvailable(from, to, amount);
 
-    return false;
+    return true;
   }
 
   private setBalance(from: Address, to: Address, amount: Fixed<8>): void {

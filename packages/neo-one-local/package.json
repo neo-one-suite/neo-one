@@ -10,7 +10,7 @@
     "@neo-one/smart-contract-compiler": "^1.0.0-preview.2",
     "@neo-one/types": "^1.0.0-preview.2",
     "@neo-one/utils": "^1.0.0-preview.2",
-    "bignumber.js": "^7.2.1",
+    "bignumber.js": "^8.0.1",
     "tslib": "^1.9.3"
   },
   "sideEffects": false
