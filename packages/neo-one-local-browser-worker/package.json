@@ -8,7 +8,7 @@
     "@neo-one/local-browser": "^1.0.0-preview.2",
     "@neo-one/worker": "^1.0.0-preview.2",
     "@types/nanoid": "^1.2.0",
-    "nanoid": "^1.3.1",
+    "nanoid": "^1.3.3",
     "pouchdb": "^7.0.0",
     "rxjs": "^6.3.3"
   },
