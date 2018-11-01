@@ -27,7 +27,7 @@ export class Context {
     public readonly typeChecker: ts.TypeChecker,
     public readonly languageService: ts.LanguageService,
     public readonly host: CompilerHost,
-    private readonly mutableDiagnostics: ts.Diagnostic[] = ts.getPreEmitDiagnostics(program),
+    private readonly mutableDiagnostics: ts.Diagnostic[] = [...ts.getPreEmitDiagnostics(program)],
   ) {
     this.analysis = new AnalysisService(this);
     this.builtins = createBuiltins(this);

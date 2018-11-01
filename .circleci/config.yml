@@ -278,7 +278,7 @@ node9: &node9
 
 node10: &node10
   docker:
-    - image: neotracker/neo-one-circleci-node:10.12.0-1
+    - image: neotracker/neo-one-circleci-node:10.13.0-1
 
 node11: &node11
   docker:

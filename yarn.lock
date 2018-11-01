@@ -19856,10 +19856,10 @@ typescript-template-language-service-decorator@^1.7.1:
   resolved "https://registry.yarnpkg.com/typescript-template-language-service-decorator/-/typescript-template-language-service-decorator-1.7.1.tgz#60f825b6b2bab725c9a73eaff65cb598e81a1bc8"
   integrity sha512-Gk0WBNe73T87lpiSj37Xmwzvt5zkKaHT1chY5+v2KP4uhpHktqIcV1hMpxmzAong38EIEhGZWeKtxjxGmTMbqg==
 
-typescript@3.2.0-dev.20181030:
-  version "3.2.0-dev.20181030"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.2.0-dev.20181030.tgz#a80e3377101224aad5e1e3a341f320b5a9b9b1ef"
-  integrity sha512-UqZfZY7xAojS2f9SdLTEJ78Itxs1rlZZSlIHffQwFxdnO/jhMBmcVgaVpT+dsjnbuWnZKcX3Dozkdw06TjB8pg==
+typescript@3.2.0-dev.20181101:
+  version "3.2.0-dev.20181101"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.2.0-dev.20181101.tgz#bd38f9b2977c396e8225ee66ad75c4593e31b763"
+  integrity sha512-7OL68e1Ab4L5EyKsscjgta0i6tiwzzeYCnmd6sLOJyy0GAvvuNKbtHQlICBhF227z8K0P8r/OQoL32If5So2Cw==
 
 typewise-core@^1.2, typewise-core@^1.2.0:
   version "1.2.0"

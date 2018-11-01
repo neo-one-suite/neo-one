@@ -1159,11 +1159,9 @@ interface ForwardedValueTag<T extends SmartContractArg> {}
 export type ForwardedValue<T extends SmartContractArg> = T | (T & ForwardedValueTag<T>);
 
 interface SmartContractValueArray extends Array<SmartContractValue> {}
-interface SmartContractValueReadonlyArray<Value extends SmartContractValue = any> extends ReadonlyArray<Value> {}
-interface SmartContractValueMap<Key extends SmartContractValue = any, Value extends SmartContractValue = any>
-  extends Map<Key, Value> {}
-interface SmartContractValueReadonlyMap<Key extends SmartContractValue = any, Value extends SmartContractValue = any>
-  extends ReadonlyMap<Key, Value> {}
+interface SmartContractValueReadonlyArray extends ReadonlyArray<SmartContractValue> {}
+interface SmartContractValueMap extends Map<SmartContractValue, SmartContractValue> {}
+interface SmartContractValueReadonlyMap extends ReadonlyMap<SmartContractValue, SmartContractValue> {}
 interface SmartContractValueObject {
   readonly [key: string]: SmartContractValue;
 }
