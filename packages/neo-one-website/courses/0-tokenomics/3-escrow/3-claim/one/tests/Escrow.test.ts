@@ -96,6 +96,62 @@ describe('Escrow', () => {
 
       balance = await escrow.balanceOf(masterAccountID.address, toWallet.account.id.address);
       expect(balance.toNumber()).toEqual(escrowAmount.toNumber());
+
+      const claimAmount = escrowAmount.dividedBy(2);
+      const claimReceipt = await escrow.claim.confirmed(
+        masterAccountID.address,
+        toWallet.account.id.address,
+        claimAmount,
+        { from: toWallet.account.id },
+      );
+      if (claimReceipt.result.state === 'FAULT') {
+        throw new Error(claimReceipt.result.message);
+      }
+      expect(claimReceipt.result.value).toEqual(true);
+      event = claimReceipt.events[0];
+      expect(event.name).toEqual('transfer');
+      if (event.name !== 'transfer') {
+        throw new Error('For TS');
+      }
+      expect(event.parameters.from).toEqual(escrowAddress);
+      expect(event.parameters.to).toEqual(toWallet.account.id.address);
+      expect(event.parameters.amount.toNumber()).toEqual(claimAmount.toNumber());
+
+      event = claimReceipt.events[1];
+      expect(event.name).toEqual('balanceClaimed');
+      if (event.name !== 'balanceClaimed') {
+        throw new Error('For TS');
+      }
+      expect(event.parameters.from).toEqual(masterAccountID.address);
+      expect(event.parameters.to).toEqual(toWallet.account.id.address);
+      expect(event.parameters.amount.toNumber()).toEqual(claimAmount.toNumber());
+
+      balance = await escrow.balanceOf(masterAccountID.address, toWallet.account.id.address);
+      expect(balance.toNumber()).toEqual(escrowAmount.minus(claimAmount).toNumber());
+
+      const failedClaimReceipt = await escrow.claim.confirmed(
+        masterAccountID.address,
+        toWallet.account.id.address,
+        claimAmount.plus(1),
+        { from: toWallet.account.id },
+      );
+      if (failedClaimReceipt.result.state === 'FAULT') {
+        throw new Error(failedClaimReceipt.result.message);
+      }
+      expect(failedClaimReceipt.result.value).toEqual(false);
+
+      balance = await escrow.balanceOf(masterAccountID.address, toWallet.account.id.address);
+      expect(balance.toNumber()).toEqual(escrowAmount.minus(claimAmount).toNumber());
+
+      let error: Error | undefined;
+      try {
+        await escrow.claim.confirmed(masterAccountID.address, toWallet.account.id.address, new BigNumber(-1), {
+          from: toWallet.account.id,
+        });
+      } catch (err) {
+        error = err;
+      }
+      expect(error).toBeDefined();
     });
   });
 });

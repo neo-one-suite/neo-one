@@ -15,6 +15,7 @@ const notifyBalanceAvailable = createEventNotifier<Address, Address, Fixed<8>>(
   'to',
   'amount',
 );
+const notifyBalanceClaimed = createEventNotifier<Address, Address, Fixed<8>>('balanceClaimed', 'from', 'to', 'amount');
 
 export class Escrow extends SmartContract {
   private readonly balances = MapStorage.for<[Address, Address], Fixed<8>>();
@@ -35,6 +36,31 @@ export class Escrow extends SmartContract {
     if (token.transfer(from, this.address, amount)) {
       this.setBalance(from, to, this.balanceOf(from, to) + amount);
       notifyBalanceAvailable(from, to, amount);
+
+      return true;
+    }
+
+    return false;
+  }
+
+  public claim(from: Address, to: Address, amount: Fixed<8>): boolean {
+    if (amount < 0) {
+      throw new Error(`Amount must be greater than 0: ${amount}`);
+    }
+
+    if (!Address.isCaller(to)) {
+      return false;
+    }
+
+    const available = this.balanceOf(from, to);
+    if (available < amount) {
+      return false;
+    }
+
+    const token = LinkedSmartContract.for<Token>();
+    if (token.transfer(this.address, to, amount)) {
+      this.setBalance(from, to, available - amount);
+      notifyBalanceClaimed(from, to, amount);
 
       return true;
     }
