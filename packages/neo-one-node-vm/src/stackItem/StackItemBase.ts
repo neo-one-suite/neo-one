@@ -132,6 +132,7 @@ export class StackItemBase implements Equatable {
   public asBigInteger(): BN {
     const value = this.asBuffer();
     if (value.length > MAX_SIZE_BIG_INTEGER) {
+      /* istanbul ignore next */
       throw new IntegerTooLargeError();
     }
 
@@ -139,6 +140,7 @@ export class StackItemBase implements Equatable {
   }
 
   public asBuffer(): Buffer {
+    /* istanbul ignore next */
     throw new Error('Unimplemented.');
   }
 
@@ -257,6 +259,7 @@ export class StackItemBase implements Equatable {
   }
 
   public asStorageContextStackItem(_options: AsStorageContextStackItemOptions): StorageContextStackItem {
+    /* istanbul ignore next */
     throw new InvalidValueStorageContextStackItemError();
   }
 
@@ -269,6 +272,7 @@ export class StackItemBase implements Equatable {
   }
 
   public toContractParameter(): ContractParameter {
+    /* istanbul ignore next */
     throw new Error('Not Implemented');
   }
 

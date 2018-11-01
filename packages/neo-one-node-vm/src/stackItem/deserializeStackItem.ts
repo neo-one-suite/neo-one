@@ -22,6 +22,7 @@ const deserializeStackItemBase = (reader: BinaryReader): StackItem => {
     case StackItemType.Integer: // INTEGER
       return new IntegerStackItem(utils.fromSignedBuffer(reader.readVarBytesLE()));
     case StackItemType.InteropInterface: // INTEROP_INTERFACE
+      /* istanbul ignore next */
       throw new UnsupportedStackItemSerdeError();
     case StackItemType.Array: // ARRAY
     case StackItemType.Struct: {
@@ -46,6 +47,7 @@ const deserializeStackItemBase = (reader: BinaryReader): StackItem => {
 
       return new MapStackItem({ referenceKeys, referenceValues });
     }
+    /* istanbul ignore next */
     default:
       commonUtils.assertNever(type);
       throw new Error('For TS');

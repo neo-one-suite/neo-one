@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Enumerator/Iterator Stack Item Types EnumeratorStackItem - toStructuralKey 1`] = `"1"`;

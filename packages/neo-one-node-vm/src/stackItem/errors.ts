@@ -59,6 +59,7 @@ export const InvalidValueIteratorError = makeErrorWithCode(
 );
 export const InvalidValueStorageContextStackItemError = makeErrorWithCode(
   'INVALID_VALUE_STORAGE_CONTEXT_STACK_ITEM',
+  /* istanbul ignore next */
   () => 'Invalid Value. Expected StorageContextStackItem',
 );
 export const UnsupportedStackItemSerdeError = makeErrorWithCode(
@@ -67,11 +68,11 @@ export const UnsupportedStackItemSerdeError = makeErrorWithCode(
 );
 export const InvalidStorageStackItemEnumeratorError = makeErrorWithCode(
   'INVALID_STORAGE_STACK_ITEM_ENUMERATOR',
-  () => 'Current is not set. The enumerator has been fully consumed or has not ' + 'been initialized',
+  () => 'Current is not set. The enumerator has been fully consumed or has not been initialized',
 );
 export const InvalidStorageStackItemIteratorError = makeErrorWithCode(
   'INVALID_STORAGE_STACK_ITEM_ITERATOR',
-  () => 'Current is not set. The iterator has been fully consumed or has not ' + 'been initialized',
+  () => 'Current is not set. The iterator has been fully consumed or has not been initialized',
 );
 export const MissingStackItemKeyError = makeErrorWithCode('MISSING_STACK_ITEM_KEY', () => 'Map does not contain key.');
 export const InvalidRecursiveSerializeError = makeErrorWithCode(

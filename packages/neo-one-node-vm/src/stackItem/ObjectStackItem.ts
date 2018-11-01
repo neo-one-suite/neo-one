@@ -24,6 +24,7 @@ export class ObjectStackItem<Value> extends StackItemBase {
 
   // tslint:disable-next-line no-any
   protected toJSONInternal(): any {
+    /* istanbul ignore next */
     return JSON.stringify(this.value);
   }
 

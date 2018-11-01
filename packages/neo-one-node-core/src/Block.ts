@@ -154,7 +154,6 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
       version,
       previousHash,
       merkleRoot,
-
       timestamp,
       index,
       consensusData,
