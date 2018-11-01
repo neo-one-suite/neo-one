@@ -69,7 +69,7 @@
     "core-js": "2.5.7",
     "react": "16.6.0",
     "react-dom": "16.6.0",
-    "react-hot-loader": "4.3.11",
+    "react-hot-loader": "4.3.12",
     "rxjs": "6.3.3"
   }
 }
