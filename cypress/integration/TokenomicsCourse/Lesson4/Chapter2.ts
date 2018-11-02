@@ -8,10 +8,12 @@ describe('Tokenomics - Lesson 4 - Chapter 2', () => {
   lesson4({
     chapter: 2,
     error: 'expect(received).toBeDefined()',
+    contracts: ['Token'],
+    secondContracts: ['Escrow', 'Token'],
     problems: [
       {
         owner: 'ts',
-        text: "Type 'Contract & TestOptions' has no property 'escrow' and no string index signature.",
+        text: "Property 'escrow' does not exist on type 'Contracts & TestOptions'.",
         startLine: 9,
         endLine: 41,
       },

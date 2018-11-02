@@ -26,6 +26,9 @@ export const ALL_SLUGS: ReadonlyArray<string> = [
   '/course/tokenomics/4/3',
   '/course/tokenomics/4/4',
   '/course/tokenomics/4/5',
+  '/course/tokenomics/4/6',
+  '/course/tokenomics/4/7',
+  '/course/tokenomics/4/8',
 ];
 
 export const lesson1 = ({
@@ -50,7 +53,7 @@ export const lesson1 = ({
       nextButton();
     }
 
-    build({ success: chapter === 1 ? false : true });
+    build({ success: chapter === 1 ? false : true, contracts: ['Token'] });
     runTests({
       passing: 0,
       failing: 1,
@@ -81,7 +84,7 @@ export const lesson1 = ({
       },
     ]);
     enterSolution({ path: 'one/contracts/Token.one.ts' });
-    build({ success: true });
+    build({ success: true, contracts: ['Token'] });
     checkProblems([
       {
         path: '/one/tests/Token.test.ts',
@@ -133,7 +136,7 @@ export const lesson2 = ({
       nextButton();
     }
 
-    build({ success: true });
+    build({ success: true, contracts: ['Token'] });
     runTests({
       passing: 0,
       failing: 1,
@@ -169,7 +172,7 @@ export const lesson2 = ({
       },
     ]);
     enterSolution({ path: 'one/contracts/Token.one.ts' });
-    build({ success: true });
+    build({ success: true, contracts: ['Token'] });
     checkProblems([
       {
         path: '/one/tests/Token.test.ts',
@@ -230,7 +233,7 @@ export const lesson3 = ({
       nextButton();
     }
 
-    build({ success: true });
+    build({ success: true, contracts: ['Token'] });
     runTests({
       passing: 0,
       failing: 1,
@@ -273,7 +276,7 @@ export const lesson3 = ({
     if (chapter === 6) {
       enterSolution({ path: 'one/contracts/ICO.tsx' });
     }
-    build({ success: true });
+    build({ success: true, contracts: ['Token'] });
     checkProblems([
       {
         path: '/src/utils.ts',
@@ -314,18 +317,21 @@ export const lesson4 = ({
   error,
   chapter,
   problems,
+  contracts,
+  secondContracts,
   testName = 'can deposit funds',
-  skip = false,
   fileName = 'Escrow',
 }: {
   readonly error: string;
   readonly chapter: number;
   readonly problems: ReadonlyArray<Problem>;
+  readonly contracts: ReadonlyArray<string>;
+  readonly secondContracts?: ReadonlyArray<string>;
   readonly testName?: string;
-  readonly skip?: boolean;
   readonly fileName?: string;
 }) => {
   it(`Lesson 4 Chapter ${chapter}`, () => {
+    Cypress.on('uncaught:exception', (_err, _runnable) => false);
     cy.visit('/course');
 
     cy.get('[data-test=tokenomics-lesson-3]').click();
@@ -336,7 +342,7 @@ export const lesson4 = ({
       nextButton();
     }
 
-    build({ success: true });
+    build({ success: true, contracts });
     runTests({
       passing: 0,
       failing: 1,
@@ -351,17 +357,8 @@ export const lesson4 = ({
               name: [fileName, testName],
               state: 'fail',
               error,
-            } as Test,
-          ].concat(
-            skip
-              ? [
-                  {
-                    name: ['Token', 'allows minting tokens'],
-                    state: 'skip',
-                  } as Test,
-                ]
-              : [],
-          ),
+            },
+          ],
         },
       ],
     });
@@ -375,7 +372,7 @@ export const lesson4 = ({
     if (chapter === 3) {
       enterSolution({ path: `one/contracts/Token.one.ts` });
     }
-    build({ success: true });
+    build({ success: true, contracts: secondContracts === undefined ? contracts : secondContracts });
     checkProblems([
       {
         path: `/one/tests/${fileName}.test.ts`,
@@ -395,17 +392,8 @@ export const lesson4 = ({
             {
               name: [fileName, testName],
               state: 'pass',
-            } as Test,
-          ].concat(
-            skip
-              ? [
-                  {
-                    name: ['Token', 'allows minting tokens'],
-                    state: 'skip' as 'skip',
-                  } as Test,
-                ]
-              : [],
-          ),
+            },
+          ],
         },
       ],
     });

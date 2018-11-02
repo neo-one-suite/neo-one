@@ -7,24 +7,12 @@ describe('Tokenomics - Lesson 2 - Chapter 3', () => {
 
   lesson2({
     chapter: 3,
-    error: 'token.amountPerNEO is not a function',
+    error: 'expect(received).toHaveLength(length)',
     problems: [
       {
         owner: 'ts',
-        text: "Property 'amountPerNEO' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
-        startLine: 30,
-        endLine: 15,
-      },
-      {
-        owner: 'ts',
         text: "Property 'remaining' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
-        startLine: 33,
-        endLine: 15,
-      },
-      {
-        owner: 'ts',
-        text: "Property 'remaining' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
-        startLine: 88,
+        startLine: 60,
         endLine: 15,
       },
     ],

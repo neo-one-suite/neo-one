@@ -12,7 +12,7 @@ describe('Tokenomics - Lesson 2 - Chapter 5', () => {
       {
         owner: 'ts',
         text: "Property 'withdraw' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
-        startLine: 189,
+        startLine: 112,
         endLine: 43,
       },
     ],

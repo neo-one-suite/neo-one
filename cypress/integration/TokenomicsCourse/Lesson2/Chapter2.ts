@@ -8,6 +8,5 @@ describe('Tokenomics - Lesson 2 - Chapter 2', () => {
   lesson2({
     chapter: 2,
     error: 'expect(received).toBeDefined()',
-    skip: true,
   });
 });
