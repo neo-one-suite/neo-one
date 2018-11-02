@@ -118,7 +118,7 @@ export const assertBigNumber = (name: string, value?: unknown): BigNumber => {
     throw new InvalidArgumentError('BigNumber', name, value);
   }
 
-  return value as BigNumber;
+  return value;
 };
 
 export const assertNullableBigNumber = (name: string, value?: unknown): BigNumber | undefined => {
