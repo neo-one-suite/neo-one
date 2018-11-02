@@ -1294,23 +1294,29 @@ export interface Crypto {
 }
 export const crypto: Crypto;
 
+export interface Transfer {
+  readonly amount: Fixed<8>;
+  readonly asset: Hash256;
+  readonly to: Address;
+}
+
 /**
  * Marks a `SmartContract` method that verifies `Asset` transfers from the `SmartContract`.
  *
  * Method must return a boolean indicating whether the `SmartContract` wishes to approve sending the transferred `Asset`s.
  *
- * Method can take the receiving address, asset and amount as the final arguments.
+ * Method can take the Transfer as the final argument
  *
  * @example
  *
  * export class Contract extends SmartContract {
  *  @send
- *  public withdraw(arg0: Address, arg1: Fixed<8>, receiver: Address, asset: Hash256, amount: Fixed<8>): boolean {
+ *  public withdraw(arg0: Address, arg1: Fixed<8>, transfer: Transfer): boolean {
  *    // Don't allow sending anything but NEO
- *    if (!asset.equals(Hash256.NEO)) {
+ *    if (!transfer.asset.equals(Hash256.NEO)) {
  *      return false;
  *    }
- *    // Do some additional checks on the receiver and amount being sent and other arguments.
+ *    // Do some additional checks on the transfer.to and transfer.amount being sent and other arguments.
  *    return true;
  *  }
  * }

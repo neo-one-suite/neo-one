@@ -56,7 +56,7 @@ export class ABISmartContractProcessor {
               return [
                 {
                   name: propInfo.name,
-                  sendUnsafe: true,
+                  completeSend: true,
                   parameters: [],
                   returnType: BOOLEAN_RETURN,
                 },
@@ -187,18 +187,7 @@ export class ABISmartContractProcessor {
       parameters = parameters.slice(0, -1);
     }
 
-    if (
-      send &&
-      this.checkLastParamBase(parameters, (decl, type) => this.context.builtins.isType(decl, type, 'Fixed'))
-    ) {
-      parameters = parameters.slice(0, -1);
-    }
-
-    if (send && this.checkLastParam(parameters, 'Hash256')) {
-      parameters = parameters.slice(0, -1);
-    }
-
-    if (send && this.checkLastParam(parameters, 'Address')) {
+    if (send && this.checkLastParam(parameters, 'Transfer')) {
       parameters = parameters.slice(0, -1);
     }
 

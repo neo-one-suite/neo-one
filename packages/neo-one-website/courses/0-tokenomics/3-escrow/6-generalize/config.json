@@ -1,0 +1,21 @@
+{
+  "title": "Contract NEO",
+  "files": [
+    {
+      "initial": "one/contracts/CNEO.one.ts",
+      "solution": "one/contracts/CNEO.solution.one.ts"
+    },
+    {
+      "solution": "one/contracts/Escrow.one.ts"
+    },
+    {
+      "solution": "one/contracts/Token.one.ts"
+    },
+    {
+      "solution": "one/tests/CNEO.test.ts"
+    },
+    {
+      "solution": "package.json"
+    }
+  ]
+}

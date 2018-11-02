@@ -185,38 +185,34 @@ export class HandleSendHelper extends Helper {
           sb.emitPushInt(node, 1);
           // [arg, output]
           sb.emitHelper(node, options, sb.helpers.getArgument);
-          // [arg, output, arg]
-          sb.emitOp(node, 'TUCK');
-          // [output, arg, output, arg]
+          // [output, arg, output]
           sb.emitOp(node, 'OVER');
-          // [arg, output, arg, output, arg]
+          // [arg, output, arg, output]
           sb.emitOp(node, 'OVER');
-          // [arg, arg, output, arg, output, arg]
+          // [arg, arg, output, arg, output]
           sb.emitOp(node, 'DUP');
           sb.emitHelper(
             node,
             options,
             sb.helpers.if({
               condition: () => {
-                // [size, arg, output, arg, output, arg]
+                // [size, arg, output, arg, output]
                 sb.emitOp(node, 'ARRAYSIZE');
-                // [size, size, arg, output, arg, output, arg]
+                // [size, size, arg, output, arg, output]
                 sb.emitOp(node, 'DUP');
-                // [0, size, size, arg, output, arg, output, arg]
+                // [0, size, size, arg, output, arg, output]
                 sb.emitPushInt(node, 0);
-                // [size == 0, size, arg, output, arg, output, arg]
+                // [size == 0, size, arg, output, arg, output]
                 sb.emitOp(node, 'NUMEQUAL');
               },
               whenTrue: () => {
-                // [arg, output, arg, output, arg]
+                // [arg, output, arg, output]
                 sb.emitOp(node, 'DROP');
-                // [output, arg, output, arg]
+                // [output, arg, output]
                 sb.emitOp(node, 'DROP');
-                // [arg, output, arg]
+                // [arg, output]
                 sb.emitOp(node, 'DROP');
-                // [output, arg]
-                sb.emitOp(node, 'DROP');
-                // [arg]
+                // [output]
                 sb.emitOp(node, 'DROP');
                 // []
                 sb.emitOp(node, 'DROP');
@@ -224,32 +220,64 @@ export class HandleSendHelper extends Helper {
                 sb.emitPushBoolean(node, false);
               },
               whenFalse: () => {
-                // [size - 1, arg, output, arg, output, arg]
+                // [size - 1, arg, output, arg, output]
                 sb.emitOp(node, 'DEC');
-                // [address, output, arg, output, arg]
-                sb.emitOp(node, 'PICKITEM');
-                // We don't need to check that it's actually an address because it will be checked
-                // later when we pass the params to the function.
-                // [arg, receiver, output, output, arg]
-                sb.emitOp(node, 'ROT');
-                // [output, arg, receiver, output, arg]
-                sb.emitOp(node, 'ROT');
-                // [buffer, arg, receiver, output, arg]
-                sb.emitSysCall(node, 'Neo.Output.GetAssetId');
-                // [receiver, output, arg]
-                sb.emitOp(node, 'APPEND');
-                // [arg, receiver, output]
-                sb.emitOp(node, 'ROT');
-                // [output, arg, receiver]
-                sb.emitOp(node, 'ROT');
-                // [arg, output, arg, receiver]
+                // [arg, size - 1, arg, output, arg, output]
                 sb.emitOp(node, 'OVER');
-                // [output, arg, arg, receiver]
+                // [size - 1, arg, size - 1, arg, output, arg, output]
+                sb.emitOp(node, 'OVER');
+                // [receiver, size - 1, arg, output, arg, output]
+                sb.emitOp(node, 'PICKITEM');
+                // [arg, receiver, size - 1, output, arg, output]
+                sb.emitOp(node, 'ROT');
+                // [size - 1, arg, receiver, output, arg, output]
+                sb.emitOp(node, 'ROT');
+                // [receiver, output, arg, output]
+                sb.emitOp(node, 'REMOVE');
+                // [transfer, receiver, output, arg, output]
+                sb.emitOp(node, 'NEWMAP');
+                // [transfer, receiver, transfer, output, arg, output]
+                sb.emitOp(node, 'TUCK');
+                // [receiver, transfer, receiver, transfer, output, arg, output]
+                sb.emitOp(node, 'OVER');
+                // ['to', receiver, transfer, receiver, transfer, output, arg, output]
+                sb.emitPushString(node, 'to');
+                // [receiver, 'to', transfer, receiver, transfer, output, arg, output]
                 sb.emitOp(node, 'SWAP');
-                // [value, arg, arg, receiver]
+                // [receiver, transfer, output, arg, output]
+                sb.emitOp(node, 'SETITEM');
+                // [output, receiver, transfer, arg, output]
+                sb.emitOp(node, 'ROT');
+                // [transfer, output, receiver, arg, output]
+                sb.emitOp(node, 'ROT');
+                // [transfer, output, transfer, receiver, arg, output]
+                sb.emitOp(node, 'TUCK');
+                // ['asset', transfer, output, transfer, receiver, arg, output]
+                sb.emitPushString(node, 'asset');
+                // [output, 'asset', transfer, transfer, receiver, arg, output]
+                sb.emitOp(node, 'ROT');
+                // [buffer, 'asset', transfer, transfer, receiver, arg, output]
+                sb.emitSysCall(node, 'Neo.Output.GetAssetId');
+                // [transfer, receiver, arg, output]
+                sb.emitOp(node, 'SETITEM');
+                // [arg, transfer, receiver, output]
+                sb.emitOp(node, 'ROT');
+                // [arg, transfer, arg, receiver, output]
+                sb.emitOp(node, 'TUCK');
+                // [transfer, arg, transfer, arg, receiver, output]
+                sb.emitOp(node, 'OVER');
+                // [transfer, arg, receiver, output]
+                sb.emitOp(node, 'APPEND');
+                // ['amount', transfer, arg, receiver, output]
+                sb.emitPushString(node, 'amount');
+                // [4, 'amount', transfer, arg, receiver, output]
+                sb.emitPushInt(node, 4);
+                // [output, 'amount', transfer, arg, receiver]
+                sb.emitOp(node, 'ROLL');
+                // [value, 'amount', transfer, arg, receiver]
                 sb.emitSysCall(node, 'Neo.Output.GetValue');
                 // [arg, receiver]
-                sb.emitOp(node, 'APPEND');
+                sb.emitOp(node, 'SETITEM');
                 sb.withScope(node, options, (innerOptions) => {
                   // [receiver]
                   sb.emitHelper(

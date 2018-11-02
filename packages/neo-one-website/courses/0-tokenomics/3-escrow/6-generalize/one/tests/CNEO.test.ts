@@ -6,38 +6,36 @@ import { withContracts } from '../generated/test';
 
 jest.setTimeout(60000);
 
-describe('Escrow', () => {
-  test('holds funds claimable by two parties', async () => {
+describe('CNEO', () => {
+  test('can wrap and unwrap NEO and be used as a NEP-5 token', async () => {
     // @ts-ignore
-    await withContracts(async ({ token, escrow, developerClient, masterAccountID, networkName, accountIDs }) => {
-      expect(token).toBeDefined();
+    await withContracts(async ({ cneo, escrow, client, masterAccountID, networkName, accountIDs }) => {
+      expect(cneo).toBeDefined();
       expect(escrow).toBeDefined();
 
       // `accountIDs` contains accounts with NEO and GAS and they are preconfigured in the `client`
       const toAccountID = accountIDs[0];
 
-      // Fast forward to the start of the ICO so that we can mint some tokens.
-      await developerClient.fastForwardOffset(60 * 60);
-      // Mint tokens so we have some available to use in the Escrow
-      const mintNEOAmount = new BigNumber(10);
-      const mintReceipt = await token.mintTokens.confirmed({
+      // Wrap NEO so we have some available to use in the Escrow
+      const neoAmount = new BigNumber(1000);
+      const wrapReceipt = await cneo.wrap.confirmed({
         sendTo: [
           {
-            amount: mintNEOAmount,
+            amount: neoAmount,
             asset: Hash256.NEO,
           },
         ],
       });
-      if (mintReceipt.result.state === 'FAULT') {
-        throw new Error(mintReceipt.result.message);
+      if (wrapReceipt.result.state === 'FAULT') {
+        throw new Error(wrapReceipt.result.message);
       }
-      expect(mintReceipt.result.value).toEqual(true);
+      expect(wrapReceipt.result.value).toEqual(true);
 
       // Pre-approve the transfer by the Escrow account
       const escrowAmount = new BigNumber(100);
       const additionalAmount = new BigNumber(50);
       const escrowAddress = escrow.definition.networks[networkName].address;
-      const approveReceipt = await token.approveSendTransfer.confirmed(
+      const approveReceipt = await cneo.approveSendTransfer.confirmed(
         masterAccountID.address,
         escrowAddress,
         escrowAmount.plus(additionalAmount),
@@ -47,8 +45,14 @@ describe('Escrow', () => {
       }
       expect(approveReceipt.result.value).toEqual(true);
 
-      // Deposit into the Escrow account
-      const escrowReceipt = await escrow.deposit.confirmed(masterAccountID.address, toAccountID.address, escrowAmount);
+      // Depost into the Escrow account
+      const cneoAddress = cneo.definition.networks[networkName].address;
+      const escrowReceipt = await escrow.deposit.confirmed(
+        masterAccountID.address,
+        toAccountID.address,
+        escrowAmount,
+        cneoAddress,
+      );
       if (escrowReceipt.result.state === 'FAULT') {
         throw new Error(escrowReceipt.result.message);
       }
@@ -69,24 +73,10 @@ describe('Escrow', () => {
       expect(event.parameters.from).toEqual(masterAccountID.address);
       expect(event.parameters.to).toEqual(toAccountID.address);
       expect(event.parameters.amount.toNumber()).toEqual(escrowAmount.toNumber());
+      expect(event.parameters.asset).toEqual(cneoAddress);
 
       // Verify the escrow balance matches the above.
-      let balance = await escrow.balanceOf(masterAccountID.address, toAccountID.address);
-      expect(balance.toNumber()).toEqual(escrowAmount.toNumber());
-
-      // Try depositing more than is pre-approved
-      const failedDepositReceipt = await escrow.deposit.confirmed(
-        masterAccountID.address,
-        toAccountID.address,
-        additionalAmount.plus(1),
-      );
-      if (failedDepositReceipt.result.state === 'FAULT') {
-        throw new Error(failedDepositReceipt.result.message);
-      }
-      expect(failedDepositReceipt.result.value).toEqual(false);
-
-      // Verify the balance is still the same since the deposit failed.
-      balance = await escrow.balanceOf(masterAccountID.address, toAccountID.address);
+      let balance = await escrow.balanceOf(masterAccountID.address, toAccountID.address, cneoAddress);
       expect(balance.toNumber()).toEqual(escrowAmount.toNumber());
 
       // Claim half of the escrow balance
@@ -95,6 +85,7 @@ describe('Escrow', () => {
         masterAccountID.address,
         toAccountID.address,
         claimAmount,
+        cneoAddress,
         // Set the from address as the toAccountID since only the `to` address should be able to claim from the Escrow account.
         { from: toAccountID },
       );
@@ -102,7 +93,7 @@ describe('Escrow', () => {
         throw new Error(claimReceipt.result.message);
       }
       expect(claimReceipt.result.value).toEqual(true);
-      // Notice how the receipt has the events for both the Token contract we invoked as well as the Escrow contract.
+      // Notice how the receipt has the events for both the CNEO contract we invoked as well as the Escrow contract.
       event = claimReceipt.events[0];
       expect(event.name).toEqual('transfer');
       if (event.name !== 'transfer') {
@@ -119,37 +110,62 @@ describe('Escrow', () => {
       expect(event.parameters.from).toEqual(masterAccountID.address);
       expect(event.parameters.to).toEqual(toAccountID.address);
       expect(event.parameters.amount.toNumber()).toEqual(claimAmount.toNumber());
+      expect(event.parameters.asset).toEqual(cneoAddress);
 
       // Verify the escrow balance has been deducted
-      balance = await escrow.balanceOf(masterAccountID.address, toAccountID.address);
+      balance = await escrow.balanceOf(masterAccountID.address, toAccountID.address, cneoAddress);
       expect(balance.toNumber()).toEqual(escrowAmount.minus(claimAmount).toNumber());
 
-      // Try claiming the remainder + 1 (i.e. more than the balance of the escrow account)
-      const failedClaimReceipt = await escrow.claim.confirmed(
-        masterAccountID.address,
-        toAccountID.address,
-        claimAmount.plus(1),
+      // Unwrap the claimed CNEO
+      const unwrapReceipt = await cneo.unwrap.confirmed(
+        {
+          amount: claimAmount,
+          asset: Hash256.NEO,
+          to: toAccountID.address,
+        },
         { from: toAccountID },
       );
-      if (failedClaimReceipt.result.state === 'FAULT') {
-        throw new Error(failedClaimReceipt.result.message);
+      if (unwrapReceipt.result.state === 'FAULT') {
+        throw new Error(unwrapReceipt.result.message);
       }
-      expect(failedClaimReceipt.result.value).toEqual(false);
-
-      // Verify the escrow balance is still the same.
-      balance = await escrow.balanceOf(masterAccountID.address, toAccountID.address);
-      expect(balance.toNumber()).toEqual(escrowAmount.minus(claimAmount).toNumber());
-
-      // Verify that claim throws an error in the exceptional case that we pass a negative number
-      let error: Error | undefined;
-      try {
-        await escrow.claim.confirmed(masterAccountID.address, toAccountID.address, new BigNumber(-1), {
-          from: toAccountID,
-        });
-      } catch (err) {
-        error = err;
+      expect(unwrapReceipt.result.value).toEqual(true);
+      const unwrapEvent = unwrapReceipt.events[0];
+      expect(unwrapEvent.name).toEqual('transfer');
+      if (unwrapEvent.name !== 'transfer') {
+        throw new Error('For TS');
       }
-      expect(error).toBeDefined();
+      expect(unwrapEvent.parameters.from).toEqual(toAccountID.address);
+      expect(unwrapEvent.parameters.to).toBeUndefined();
+      expect(unwrapEvent.parameters.amount.toNumber()).toEqual(claimAmount.toNumber());
+
+      // Complete the send
+      const completeReceipt = await cneo.completeSend.confirmed(unwrapReceipt.transaction.hash, {
+        from: toAccountID,
+      });
+      if (completeReceipt.result.state === 'FAULT') {
+        throw new Error(completeReceipt.result.message);
+      }
+      expect(completeReceipt.result.value).toEqual(true);
+
+      // Verify the balance and total supply have been deducted and that the toAccount has the NEO
+      const [masterBalance, toBalance, totalSupply, toAccount, masterAccountBefore] = await Promise.all([
+        cneo.balanceOf(masterAccountID.address),
+        cneo.balanceOf(toAccountID.address),
+        cneo.totalSupply(),
+        client.getAccount(toAccountID),
+        client.getAccount(masterAccountID),
+      ]);
+      expect(masterBalance.toNumber()).toEqual(neoAmount.minus(escrowAmount).toNumber());
+      expect(toBalance.toNumber()).toEqual(0);
+      expect(totalSupply.toNumber()).toEqual(neoAmount.minus(claimAmount).toNumber());
+      expect(toAccount.balances[Hash256.NEO].toNumber()).toEqual(claimAmount.toNumber());
+
+      // Claim the accumulated GAS
+      await cneo.claim.confirmed();
+      const masterAccountAfter = await client.getAccount(masterAccountID);
+      expect(masterAccountBefore.balances[Hash256.GAS].toNumber()).toBeLessThan(
+        masterAccountAfter.balances[Hash256.GAS].toNumber(),
+      );
     });
   });
 });

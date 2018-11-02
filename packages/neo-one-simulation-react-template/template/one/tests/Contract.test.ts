@@ -1,6 +1,6 @@
 import { withContracts } from '../generated/test';
 
-jest.setTimeout(30000);
+jest.setTimeout(60000);
 
 describe('Contract', () => {
   test('myFirstMethod', async () => {

@@ -2,7 +2,7 @@
 // @ts-ignore
 import { withContracts } from '../generated';
 
-jest.setTimeout(30000);
+jest.setTimeout(60000);
 
 describe('Agent', () => {
   test('deploys', async () => {

@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 // @ts-ignore
 import { withContracts } from '../generated/test';
 
-jest.setTimeout(30000);
+jest.setTimeout(60000);
 
 describe('Token', () => {
   test('has NEP-5 properties and methods', async () => {

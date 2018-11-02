@@ -76,6 +76,19 @@ const getParamsAndOptions = ({
   let lastArgIndex = hasRest ? parameters.length - 1 : parameters.length;
 
   let params = args;
+
+  let transfer: Transfer | undefined;
+  let hash: Hash256String | undefined;
+  if (send || completeSend || refundAssets) {
+    const maybeLastArg = params[lastArgIndex];
+    if (send) {
+      transfer = argAssertions.assertTransfer('transfer', maybeLastArg);
+    } else {
+      hash = argAssertions.assertHash256('hash', maybeLastArg);
+    }
+    params = params.slice(0, lastArgIndex).concat(params.slice(lastArgIndex + 1));
+  }
+
   const maybeForwardOptions = params[lastArgIndex];
   // tslint:disable-next-line no-any
   let forwardOptions: any = {};
@@ -93,18 +106,6 @@ const getParamsAndOptions = ({
     // tslint:disable-next-line no-any
     optionsIn = maybeOptionsArg as any;
     lastArgIndex -= 1;
-  }
-
-  let transfer: Transfer | undefined;
-  let hash: Hash256String | undefined;
-  if (send || completeSend || refundAssets) {
-    const maybeLastArg = params[lastArgIndex];
-    if (send) {
-      transfer = argAssertions.assertTransfer('transfer', maybeLastArg);
-    } else {
-      hash = argAssertions.assertHash256('hash', maybeLastArg);
-    }
-    params = params.slice(0, lastArgIndex).concat(params.slice(lastArgIndex + 1));
   }
 
   const currentAccount = client.getCurrentUserAccount();

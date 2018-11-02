@@ -23,7 +23,7 @@ describe('InvokeSmartContractHelper', () => {
         Deploy,
         Hash256,
         SmartContract,
-        Fixed,
+        Transfer,
         sendUnsafe,
         send,
         receive,
@@ -38,8 +38,8 @@ describe('InvokeSmartContractHelper', () => {
         }
 
         @send
-        public send(receiver: Address, asset: Hash256, amount: Fixed<8>): boolean {
-          return receiver.equals(this.owner) && asset.equals(Hash256.NEO) && Address.isCaller(this.owner) && amount > 0;
+        public send(transfer: Transfer): boolean {
+          return transfer.to.equals(this.owner) && transfer.asset.equals(Hash256.NEO) && Address.isCaller(this.owner) && transfer.amount > 0;
         }
 
         @sendUnsafe
