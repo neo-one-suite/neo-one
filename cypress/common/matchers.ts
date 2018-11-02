@@ -235,7 +235,19 @@ export const enterSolution = ({ path }: { readonly path: string }) => {
     values.forEach((value, idx) => {
       const innerValues = value.split('(');
       innerValues.forEach((innerValue, innerIdx) => {
-        cy.get('[data-test=monaco-editor] textarea').type(innerValue, { force: true });
+        const innerInnerValues = innerValue.split('[');
+        innerInnerValues
+          .filter((innerInnerValue) => innerInnerValue !== '')
+          .forEach((innerInnerValue, innerInnerIdx) => {
+            cy.get('[data-test=monaco-editor] textarea').type(innerInnerValue, { force: true });
+
+            if (innerInnerIdx !== innerInnerValues.length - 1) {
+              cy.get('[data-test=monaco-editor] textarea').type('[', { force: true });
+              cy.wait(50);
+              cy.get('[data-test=monaco-editor] textarea').type('{rightarrow}', { force: true });
+              cy.get('[data-test=monaco-editor] textarea').type('{backspace}', { force: true });
+            }
+          });
 
         if (innerIdx !== innerValues.length - 1) {
           cy.get('[data-test=monaco-editor] textarea').type('(', { force: true });
@@ -270,7 +282,7 @@ export const build = ({ success }: BuildOptions) => {
   cy.get('[data-test=console-output]').should('have.text', '');
   cy.get('[data-test=console-close]').click();
   // Need to wait to allow transpiling to happen
-  cy.wait(2500);
+  cy.wait(5000);
 };
 
 export const nextButton = () => {
