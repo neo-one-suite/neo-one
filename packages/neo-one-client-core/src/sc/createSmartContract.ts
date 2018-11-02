@@ -32,12 +32,28 @@ import { filter } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/filter';
 import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import * as argAssertions from '../args';
 import { Client } from '../Client';
-import { CannotSendFromContractError, CannotSendToContractError, NoContractDeployedError } from '../errors';
+import {
+  CannotSendFromContractError,
+  CannotSendToContractError,
+  HashArgumentExpectedError,
+  NoContractDeployedError,
+  TransferArgumentExpectedError,
+} from '../errors';
 import { events as traceEvents } from '../trace';
 import { SmartContractAny } from '../types';
 import * as common from './common';
 
-const getParamsAndOptions = ({
+interface ParamAndOptionsResults {
+  // tslint:disable-next-line:no-any
+  readonly requiredArgs: ReadonlyArray<any>;
+  // tslint:disable-next-line:no-any
+  readonly options: any;
+  readonly forwardOptions: ForwardOptions | undefined;
+  readonly transfer: Transfer | undefined;
+  readonly hash: Hash256String | undefined;
+}
+
+export const getParamsAndOptions = ({
   definition: { networks },
   parameters,
   args,
@@ -69,53 +85,81 @@ const getParamsAndOptions = ({
   readonly hash?: Hash256String;
 } => {
   const hasRest = parameters.length > 0 && parameters[parameters.length - 1].rest;
-  const hasForwardOptions =
-    parameters.length > 0 &&
-    parameters[parameters.length - 1].rest &&
-    parameters[parameters.length - 1].type === 'ForwardValue';
-  let lastArgIndex = hasRest ? parameters.length - 1 : parameters.length;
+  const hasForwardValueOptions = hasRest && parameters[parameters.length - 1].type === 'ForwardValue';
 
-  let params = args;
+  const { requiredArgs, forwardOptions, options: optionsIn, transfer, hash } = args.reduceRight<ParamAndOptionsResults>(
+    (acc, right) => {
+      if (hasForwardValueOptions && acc.forwardOptions === undefined && common.isForwardValueOptions(right)) {
+        return {
+          ...acc,
+          forwardOptions: right,
+        };
+      }
 
-  let transfer: Transfer | undefined;
-  let hash: Hash256String | undefined;
-  if (send || completeSend || refundAssets) {
-    const maybeLastArg = params[lastArgIndex];
-    if (send) {
-      transfer = argAssertions.assertTransfer('transfer', maybeLastArg);
-    } else {
-      hash = argAssertions.assertHash256('hash', maybeLastArg);
-    }
-    params = params.slice(0, lastArgIndex).concat(params.slice(lastArgIndex + 1));
+      if (common.isTransactionOptions(right) && acc.options === undefined) {
+        return {
+          ...acc,
+          options: right,
+        };
+      }
+
+      if (acc.transfer === undefined && send) {
+        try {
+          const maybeTransfer = argAssertions.assertTransfer('transfer', right);
+
+          return {
+            ...acc,
+            transfer: maybeTransfer,
+          };
+        } catch {
+          //
+        }
+      }
+
+      if (acc.hash === undefined && (completeSend || refundAssets)) {
+        try {
+          const maybeHash = argAssertions.assertHash256('hash', right);
+
+          return {
+            ...acc,
+            hash: maybeHash,
+          };
+        } catch {
+          //
+        }
+      }
+
+      return {
+        ...acc,
+        requiredArgs: [right].concat(acc.requiredArgs),
+      };
+    },
+    {
+      requiredArgs: [],
+      options: undefined,
+      forwardOptions: undefined,
+      transfer: undefined,
+      hash: undefined,
+    },
+  );
+
+  if (transfer === undefined && send) {
+    throw new TransferArgumentExpectedError();
   }
-
-  const maybeForwardOptions = params[lastArgIndex];
-  // tslint:disable-next-line no-any
-  let forwardOptions: any = {};
-  if (common.isOptionsArg(maybeForwardOptions) && hasForwardOptions) {
-    params = params.slice(0, lastArgIndex).concat(params.slice(lastArgIndex + 1));
-    forwardOptions = maybeForwardOptions;
-    lastArgIndex -= 1;
-  }
-
-  const maybeOptionsArg = params[lastArgIndex] as {} | undefined;
-  // tslint:disable-next-line no-any
-  let optionsIn: any = {};
-  if (common.isOptionsArg(maybeOptionsArg)) {
-    params = params.slice(0, lastArgIndex).concat(params.slice(lastArgIndex + 1));
-    // tslint:disable-next-line no-any
-    optionsIn = maybeOptionsArg as any;
-    lastArgIndex -= 1;
+  if (hash === undefined && (completeSend || refundAssets)) {
+    throw new HashArgumentExpectedError();
   }
 
   const currentAccount = client.getCurrentUserAccount();
   const options =
-    optionsIn.from === undefined && currentAccount !== undefined
+    (optionsIn === undefined || optionsIn.from === undefined) && currentAccount !== undefined
       ? {
           ...optionsIn,
           from: currentAccount.id,
         }
-      : optionsIn;
+      : {
+          ...optionsIn,
+        };
   const network =
     options.network === undefined
       ? options.from === undefined
@@ -135,7 +179,7 @@ const getParamsAndOptions = ({
   }
 
   const { converted, zipped } = common.convertParams({
-    params,
+    params: requiredArgs,
     parameters,
     senderAddress: currentAccount === undefined ? undefined : currentAccount.id.address,
   });
@@ -144,7 +188,7 @@ const getParamsAndOptions = ({
     params: converted,
     paramsZipped: zipped,
     options,
-    forwardOptions,
+    forwardOptions: forwardOptions === undefined ? {} : forwardOptions,
     network,
     address: contractNetwork.address,
     transfer,
@@ -308,7 +352,7 @@ const createInvoke = ({
     // tslint:disable-next-line no-any
     const finalArg = args[args.length - 1];
     let options: GetOptions | undefined;
-    if (common.isOptionsArg(finalArg)) {
+    if (common.isOptionsBase(finalArg)) {
       options = finalArg;
     }
     const result = await invoke(...args);

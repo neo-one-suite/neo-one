@@ -13,7 +13,7 @@ public readonly properties = {
 `;
 
 describe('InvokeSmartContractHelper', () => {
-  test('class that used processedTransactions, send, receive and claim', async () => {
+  test.only('class that used processedTransactions, send, receive and claim', async () => {
     const node = await helpers.startNode();
     const accountID = node.masterWallet.account.id;
     const contract = await node.addContract(`

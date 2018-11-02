@@ -109,12 +109,20 @@ export const LedgerParseError = makeErrorWithCode(
   () => 'Ledger transaction parsing error. [CODE: 6d07]',
 );
 export const DeleteUserAccountUnsupportedError = makeErrorWithCode(
-  `DELETE_USER_ACCOUNT_UNSUPPORTED`,
+  'DELETE_USER_ACCOUNT_UNSUPPORTED',
   (id: UserAccountID) =>
     `Deleting the user account with network ${id.network} and address ${id.address} is not supported`,
 );
 export const UpdateUserAccountUnsupportedError = makeErrorWithCode(
-  `UPDATE_USER_ACCOUNT_NAME_UNSUPPORTED`,
+  'UPDATE_USER_ACCOUNT_NAME_UNSUPPORTED',
   (id: UserAccountID) =>
     `Updating the name of user account with network ${id.network} and address ${id.address} is not supported`,
+);
+export const TransferArgumentExpectedError = makeErrorWithCode(
+  'TRANFER_ARGUMENT_EXPECTED',
+  () => 'Expected to find a transfer argument',
+);
+export const HashArgumentExpectedError = makeErrorWithCode(
+  'HASH_ARGUMENT_EXPECTED',
+  () => 'Expected to find a hash argument',
 );
