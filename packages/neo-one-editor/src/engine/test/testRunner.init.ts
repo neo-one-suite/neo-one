@@ -8,7 +8,6 @@ const init = (win: Window, parent: Window, opener: Window | null) => {
   const parentOrOpener = parent === win ? opener : parent;
   if (parentOrOpener !== null) {
     comlink.expose(TestRunner, parentOrOpener);
-    parentOrOpener.postMessage({ type: 'initialize' }, '*');
   }
 };
 

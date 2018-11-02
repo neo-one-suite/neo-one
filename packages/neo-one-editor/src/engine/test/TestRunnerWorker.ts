@@ -10,15 +10,10 @@ export const TestRunnerWorker = async (): Promise<endpoint.EndpointLike> =>
     // @ts-ignore
     iframe.style = 'width: 0; height: 0; position: absolute; top: 0; left: 0; border: 0;';
 
-    const handler = (event: MessageEvent) => {
-      if (
-        event.data != undefined &&
-        typeof event.data === 'object' &&
-        event.data.type === 'initialize' &&
-        iframe.contentWindow !== null
-      ) {
-        window.removeEventListener('message', handler);
-        const contentWindow = iframe.contentWindow;
+    const handler = () => {
+      iframe.removeEventListener('load', handler);
+      const contentWindow = iframe.contentWindow;
+      if (contentWindow !== null) {
         resolve({
           // tslint:disable-next-line no-any
           addEventListener: window.addEventListener.bind(window) as any,
@@ -34,7 +29,7 @@ export const TestRunnerWorker = async (): Promise<endpoint.EndpointLike> =>
         });
       }
     };
-    window.addEventListener('message', handler);
+    iframe.addEventListener('load', handler);
 
     document.body.append(iframe);
   });

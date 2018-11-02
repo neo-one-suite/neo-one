@@ -22,6 +22,7 @@ interface Props {
 
 export class PreviewContent extends React.Component<Props> {
   private readonly ref = React.createRef<HTMLIFrameElement>();
+  private mutableCleanup: (() => void) | undefined;
 
   public componentDidMount(): void {
     const instance = this.ref.current;
@@ -30,13 +31,27 @@ export class PreviewContent extends React.Component<Props> {
       const { port1, port2 } = new MessageChannel();
       comlink.expose(this.props.engine, port1);
 
+      let cleaned = false;
       const handler = (event: MessageEvent) => {
         if (event.data != undefined && typeof event.data === 'object' && event.data.type === 'initialize') {
           contentWindow.postMessage({ port: port2 }, '*', [port2]);
+          cleaned = true;
           window.removeEventListener('message', handler);
         }
       };
       window.addEventListener('message', handler);
+      this.mutableCleanup = () => {
+        if (!cleaned) {
+          cleaned = true;
+          window.removeEventListener('message', handler);
+        }
+      };
+    }
+  }
+
+  public componentWillUnmount(): void {
+    if (this.mutableCleanup !== undefined) {
+      this.mutableCleanup();
     }
   }
 
