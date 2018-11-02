@@ -1,4 +1,4 @@
-# Chapter 3: Escrow Claim
+# Chapter 4: Escrow Claim
 
 In this chapter we'll add a method for the destination address to claim EON from the account. We don't need to learn anything new to implement this method, so let's jump right into it.
 

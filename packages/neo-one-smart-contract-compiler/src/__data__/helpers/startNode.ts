@@ -14,7 +14,6 @@ import {
 import { DeveloperClient, LocalKeyStore, LocalWallet, NEOONEDataProvider, SmartContract } from '@neo-one/client-core';
 import { Client, InvokeExecuteTransactionOptions, ReadClient } from '@neo-one/client-full-core';
 import { createCompilerHost, pathResolve } from '@neo-one/smart-contract-compiler-node';
-import { getClients } from '@neo-one/smart-contract-test-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import * as appRootDir from 'app-root-dir';
 import BigNumber from 'bignumber.js';
@@ -26,6 +25,7 @@ import { Context } from '../../Context';
 import { createContextForPath, createContextForSnippet } from '../../createContext';
 import { throwOnDiagnosticErrorOrWarning } from '../../utils';
 import { checkRawResult } from './extractors';
+import { getClients } from './getClients';
 
 export interface Result {
   readonly networkName: string;

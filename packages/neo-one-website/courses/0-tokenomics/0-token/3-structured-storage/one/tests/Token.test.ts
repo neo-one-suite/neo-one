@@ -1,5 +1,4 @@
 // tslint:disable
-import { createPrivateKey } from '@neo-one/client';
 // @ts-ignore
 import { withContracts } from '../generated/test';
 
@@ -8,20 +7,18 @@ jest.setTimeout(30000);
 describe('Token', () => {
   test('has NEP-5 properties and methods', async () => {
     // @ts-ignore
-    await withContracts(async ({ client, token, networkName }) => {
+    await withContracts(async ({ token, accountIDs }) => {
       expect(token).toBeDefined();
 
-      const toWallet = await client.providers.memory.keystore.addAccount({
-        network: networkName,
-        privateKey: createPrivateKey(),
-      });
+      // `accountIDs` contains accounts with NEO and GAS and they are preconfigured in the `client`
+      const toAccountID = accountIDs[0];
 
       const [name, symbol, decimals, totalSupply, initialBalance] = await Promise.all([
         token.name(),
         token.symbol(),
         token.decimals(),
         token.totalSupply(),
-        token.balanceOf(toWallet.account.id.address),
+        token.balanceOf(toAccountID.address),
       ]);
       expect(name).toEqual('Eon');
       expect(symbol).toEqual('EON');

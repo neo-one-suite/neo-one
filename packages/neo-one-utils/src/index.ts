@@ -1,5 +1,6 @@
 export * from './AsyncQueue';
 export * from './constants';
+export * from './enqueuePostPromiseJob';
 export * from './finalize';
 export * from './labels';
 export * from './mergeScanLatest';

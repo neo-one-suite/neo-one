@@ -6,18 +6,18 @@ import * as ReactDOM from 'react-dom';
 import { PreviewEngine } from '../../engine/preview';
 import { App } from './App';
 
-const createPreviewEngine = async () => {
+const createPreviewEngine = async (win: Window, parent: Window, opener: Window | null) => {
   const { port } = await new Promise<{ port: MessagePort }>((resolve) => {
     const handler = (event: MessageEvent) => {
       if (event.data.port !== undefined) {
         resolve(event.data);
-        window.removeEventListener('message', handler);
+        win.removeEventListener('message', handler);
       }
     };
-    window.addEventListener('message', handler);
+    win.addEventListener('message', handler);
 
-    const parentOrOpener = window.parent === window ? (window.opener as Window | undefined) : window.parent;
-    if (parentOrOpener !== undefined) {
+    const parentOrOpener = parent === win ? opener : parent;
+    if (parentOrOpener !== null) {
       parentOrOpener.postMessage({ type: 'initialize' }, '*');
     }
   });
@@ -30,7 +30,7 @@ const createPreviewEngine = async () => {
 let startPromise: Promise<void> = Promise.resolve();
 // tslint:disable-next-line strict-type-predicates
 if (typeof window !== 'undefined') {
-  startPromise = createPreviewEngine().catch((error) => {
+  startPromise = createPreviewEngine(window, window.parent, window.opener).catch((error) => {
     // tslint:disable-next-line no-console
     console.error(error);
   });

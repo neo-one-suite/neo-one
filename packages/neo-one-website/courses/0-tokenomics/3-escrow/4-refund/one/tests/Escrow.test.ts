@@ -47,7 +47,7 @@ describe('Escrow', () => {
       }
       expect(approveReceipt.result.value).toEqual(true);
 
-      // Deposit into the Escrow account
+      // Depost into the Escrow account
       const escrowReceipt = await escrow.deposit.confirmed(masterAccountID.address, toAccountID.address, escrowAmount);
       if (escrowReceipt.result.state === 'FAULT') {
         throw new Error(escrowReceipt.result.message);
@@ -140,12 +140,60 @@ describe('Escrow', () => {
       balance = await escrow.balanceOf(masterAccountID.address, toAccountID.address);
       expect(balance.toNumber()).toEqual(escrowAmount.minus(claimAmount).toNumber());
 
+      // Refund the remainder of the escrow account
+      const refundAmount = escrowAmount.minus(claimAmount);
+      const refundReceipt = await escrow.refund.confirmed(masterAccountID.address, toAccountID.address, refundAmount);
+      if (refundReceipt.result.state === 'FAULT') {
+        throw new Error(refundReceipt.result.message);
+      }
+      expect(refundReceipt.result.value).toEqual(true);
+      event = refundReceipt.events[0];
+      expect(event.name).toEqual('transfer');
+      if (event.name !== 'transfer') {
+        throw new Error('For TS');
+      }
+      expect(event.parameters.from).toEqual(escrowAddress);
+      expect(event.parameters.to).toEqual(masterAccountID.address);
+      expect(event.parameters.amount.toNumber()).toEqual(refundAmount.toNumber());
+      event = refundReceipt.events[1];
+      expect(event.name).toEqual('balanceRefunded');
+      if (event.name !== 'balanceRefunded') {
+        throw new Error('For TS');
+      }
+      expect(event.parameters.from).toEqual(masterAccountID.address);
+      expect(event.parameters.to).toEqual(toAccountID.address);
+      expect(event.parameters.amount.toNumber()).toEqual(refundAmount.toNumber());
+
+      // Verify the escrow balance is now 0
+      balance = await escrow.balanceOf(masterAccountID.address, toAccountID.address);
+      expect(balance.toNumber()).toEqual(0);
+
+      // Try to refund more (and fail)
+      const failedRefundReceipt = await escrow.refund.confirmed(
+        masterAccountID.address,
+        toAccountID.address,
+        new BigNumber(1),
+      );
+      if (failedRefundReceipt.result.state === 'FAULT') {
+        throw new Error(failedRefundReceipt.result.message);
+      }
+      expect(failedRefundReceipt.result.value).toEqual(false);
+
       // Verify that claim throws an error in the exceptional case that we pass a negative number
       let error: Error | undefined;
       try {
         await escrow.claim.confirmed(masterAccountID.address, toAccountID.address, new BigNumber(-1), {
           from: toAccountID,
         });
+      } catch (err) {
+        error = err;
+      }
+      expect(error).toBeDefined();
+
+      // Verify that refund throws an error in the exceptional case that we pass a negative number
+      error = undefined;
+      try {
+        await escrow.refund.confirmed(masterAccountID.address, toAccountID.address, new BigNumber(-1));
       } catch (err) {
         error = err;
       }

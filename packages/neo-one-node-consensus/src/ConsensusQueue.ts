@@ -42,11 +42,16 @@ export class ConsensusQueue implements AsyncIterator<Event> {
   }
 
   public write(value: Event): void {
+    let pushTimer = false;
     if (value.type === 'handlePersistBlock') {
+      pushTimer = this.mutableItems.some((item) => item.type === 'value' && item.value.type === 'timer');
       this.clear();
     }
 
     this.push({ type: 'value', value });
+    if (pushTimer) {
+      this.push({ type: 'value', value: { type: 'timer' } });
+    }
   }
 
   public error(error: Error): void {

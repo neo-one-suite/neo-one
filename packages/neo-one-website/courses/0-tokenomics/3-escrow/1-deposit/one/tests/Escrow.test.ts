@@ -1,5 +1,5 @@
 // tslint:disable
-import { createPrivateKey, Hash256 } from '@neo-one/client';
+import { Hash256 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
 // @ts-ignore
 import { withContracts } from '../generated/test';
@@ -9,22 +9,15 @@ jest.setTimeout(30000);
 describe('Escrow', () => {
   test('can deposit funds', async () => {
     // @ts-ignore
-    await withContracts(async ({ token, escrow, developerClient, masterAccountID, networkName, client }) => {
+    await withContracts(async ({ token, escrow, developerClient, masterAccountID, networkName, accountIDs }) => {
       expect(token).toBeDefined();
       expect(escrow).toBeDefined();
 
+      // `accountIDs` contains accounts with NEO and GAS and they are preconfigured in the `client`
+      const toAccountID = accountIDs[0];
+
+      // Fast forward to the start of the ICO so that we can mint some tokens.
       await developerClient.fastForwardOffset(60 * 60);
-
-      const [toWallet] = await Promise.all([
-        // Add a wallet to the client
-        client.providers.memory.keystore.addAccount({
-          network: networkName,
-          privateKey: createPrivateKey(),
-        }),
-        // Fast forward to the start of the ICO
-        developerClient.fastForwardOffset(60 * 60),
-      ]);
-
       // Mint tokens so we have some available to use in the Escrow
       const mintNEOAmount = new BigNumber(10);
       const mintReceipt = await token.mintTokens.confirmed({
@@ -53,11 +46,8 @@ describe('Escrow', () => {
       }
       expect(approveReceipt.result.value).toEqual(true);
 
-      const escrowReceipt = await escrow.deposit.confirmed(
-        masterAccountID.address,
-        toWallet.account.id.address,
-        escrowAmount,
-      );
+      // Depost into the Escrow account
+      const escrowReceipt = await escrow.deposit.confirmed(masterAccountID.address, toAccountID.address, escrowAmount);
       if (escrowReceipt.result.state === 'FAULT') {
         throw new Error(escrowReceipt.result.message);
       }
@@ -68,10 +58,11 @@ describe('Escrow', () => {
         throw new Error('For TS');
       }
       expect(event.parameters.from).toEqual(masterAccountID.address);
-      expect(event.parameters.to).toEqual(toWallet.account.id.address);
+      expect(event.parameters.to).toEqual(toAccountID.address);
       expect(event.parameters.amount.toNumber()).toEqual(escrowAmount.toNumber());
 
-      const escrowBalance = await escrow.balanceOf(masterAccountID.address, toWallet.account.id.address);
+      // Verify the escrow balance matches the above.
+      const escrowBalance = await escrow.balanceOf(masterAccountID.address, toAccountID.address);
       expect(escrowBalance.toNumber()).toEqual(escrowAmount.toNumber());
     });
   });

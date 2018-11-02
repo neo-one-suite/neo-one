@@ -1,18 +1,10 @@
+import { enqueuePostPromiseJob } from '@neo-one/utils';
+
 interface Resolver<K, R> {
   readonly key: K;
   readonly resolve: (value?: R) => void;
   readonly reject: (error: Error) => void;
 }
-
-const resolvedPromise = Promise.resolve();
-// tslint:disable
-const enqueuePostPromiseJob =
-  typeof process === 'object' && typeof process.nextTick === 'function'
-    ? (fn: () => void) => {
-        resolvedPromise.then(() => process.nextTick(fn));
-      }
-    : setImmediate || setTimeout;
-// tslint:enable
 
 export class DataWriter<K, V, R> {
   private mutableResolvers: Array<Resolver<K, R>> = [];

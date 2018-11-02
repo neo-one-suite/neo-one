@@ -1,4 +1,11 @@
-import { common, crypto, privateKeyToAddress, Transfer, wifToPrivateKey } from '@neo-one/client-common';
+import {
+  common,
+  crypto,
+  privateKeyToAddress,
+  publicKeyToAddress,
+  Transfer,
+  wifToPrivateKey,
+} from '@neo-one/client-common';
 import { Hash256, NEOONEDataProvider } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { constants } from './constants';
@@ -98,12 +105,23 @@ export const setupWallets = async (
   WALLETS.forEach(({ privateKey, publicKey }) => {
     crypto.addPublicKey(common.stringToPrivateKey(wifToPrivateKey(privateKey)), common.stringToECPoint(publicKey));
   });
-  const { client, developerClient } = await getClients(provider, masterPrivateKey);
+  const { client, developerClient, masterWallet } = await getClients(provider, masterPrivateKey);
 
-  const account = await client.getAccount({
-    network: provider.network,
-    address: privateKeyToAddress(wifToPrivateKey(WALLETS[1].privateKey)),
-  });
+  const [account] = await Promise.all([
+    client.getAccount({
+      network: provider.network,
+      address: privateKeyToAddress(wifToPrivateKey(WALLETS[1].privateKey)),
+    }),
+    Promise.all(
+      WALLETS.map(async ({ privateKey }) =>
+        client.providers.memory.keystore.addAccount({
+          network: provider.network,
+          privateKey,
+        }),
+      ),
+    ),
+  ]);
+
   if (
     (account.balances[Hash256.NEO] as BigNumber | undefined) === undefined ||
     account.balances[Hash256.NEO].isEqualTo(0)
@@ -114,5 +132,14 @@ export const setupWallets = async (
     await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
   }
 
-  return WALLETS;
+  return {
+    client,
+    developerClient,
+    masterWallet,
+    wallets: WALLETS,
+    accountIDs: WALLETS.map(({ publicKey }) => ({
+      network: provider.network,
+      address: publicKeyToAddress(publicKey),
+    })),
+  };
 };

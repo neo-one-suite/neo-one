@@ -8,10 +8,10 @@ import {
 } from '@neo-one/client-common';
 import { DeveloperClient, LocalKeyStore, NEOONEDataProvider, NEOONEProvider } from '@neo-one/client-core';
 import { Client, LocalUserAccountProvider, PublishReceipt } from '@neo-one/client-full-core';
+import { setupWallets } from '@neo-one/local';
 import { compileContract, CompilerHost } from '@neo-one/smart-contract-compiler';
 import BigNumber from 'bignumber.js';
 import { camel } from 'change-case';
-import { getClients } from './getClients';
 
 export interface Contract {
   readonly filePath: string;
@@ -32,6 +32,7 @@ export interface TestOptions {
   readonly developerClient: DeveloperClient;
   readonly masterAccountID: UserAccountID;
   readonly masterPrivateKey: string;
+  readonly accountIDs: ReadonlyArray<UserAccountID>;
 }
 
 export interface DataProviderOptions {
@@ -48,9 +49,9 @@ export const withContracts = async <T>(
   { ignoreWarnings = false, deploy = true, autoConsensus = true, autoSystemFee = true }: WithContractsOptions = {},
 ): Promise<void> => {
   const { dataProvider, cleanup, privateKey } = await getDataProvider();
-  const { client, masterWallet, networkName } = await getClients({ dataProvider, privateKey });
+  const { client, developerClient, masterWallet, accountIDs } = await setupWallets(dataProvider, privateKey);
+  const networkName = dataProvider.network;
   try {
-    const developerClient = new DeveloperClient(dataProvider);
     if (autoSystemFee) {
       client.hooks.beforeRelay.tapPromise('AutoSystemFee', async (options) => {
         // tslint:disable-next-line no-object-mutation
@@ -116,6 +117,7 @@ export const withContracts = async <T>(
       masterAccountID: masterWallet.account.id,
       masterPrivateKey: privateKey,
       networkName,
+      accountIDs,
     });
 
     await test(contractOptions);

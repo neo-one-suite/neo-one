@@ -51,7 +51,7 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
     rpcURL: providerManager,
   });
   output$.next({ owner: 'neo-one', message: 'Setting up wallets...' });
-  const wallets = await setupWallets(provider, constants.PRIVATE_NET_PRIVATE_KEY);
+  const { wallets } = await setupWallets(provider, constants.PRIVATE_NET_PRIVATE_KEY);
 
   // tslint:disable-next-line no-loop-statement
   for (const contractPath of contractPaths) {
