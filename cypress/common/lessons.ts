@@ -21,6 +21,11 @@ export const ALL_SLUGS: ReadonlyArray<string> = [
   '/course/tokenomics/3/4',
   '/course/tokenomics/3/5',
   '/course/tokenomics/3/6',
+  '/course/tokenomics/4/1',
+  '/course/tokenomics/4/2',
+  '/course/tokenomics/4/3',
+  '/course/tokenomics/4/4',
+  '/course/tokenomics/4/5',
 ];
 
 export const lesson1 = ({
@@ -298,6 +303,108 @@ export const lesson3 = ({
                     state: 'pass',
                   } as Test,
                 ],
+          ),
+        },
+      ],
+    });
+  });
+};
+
+export const lesson4 = ({
+  error,
+  chapter,
+  problems,
+  testName = 'can deposit funds',
+  skip = false,
+  fileName = 'Escrow',
+}: {
+  readonly error: string;
+  readonly chapter: number;
+  readonly problems: ReadonlyArray<Problem>;
+  readonly testName?: string;
+  readonly skip?: boolean;
+  readonly fileName?: string;
+}) => {
+  it(`Lesson 4 Chapter ${chapter}`, () => {
+    cy.visit('/course');
+
+    cy.get('[data-test=tokenomics-lesson-3]').click();
+    cy.get('[data-test=start]').click();
+
+    // tslint:disable-next-line no-loop-statement
+    for (let i = 0; i < chapter - 1; i += 1) {
+      nextButton();
+    }
+
+    build({ success: true });
+    runTests({
+      passing: 0,
+      failing: 1,
+      suites: [
+        {
+          basename: `${fileName}.test.ts`,
+          dirname: 'one/tests',
+          passing: 0,
+          failing: 1,
+          tests: [
+            {
+              name: [fileName, testName],
+              state: 'fail',
+              error,
+            } as Test,
+          ].concat(
+            skip
+              ? [
+                  {
+                    name: ['Token', 'allows minting tokens'],
+                    state: 'skip',
+                  } as Test,
+                ]
+              : [],
+          ),
+        },
+      ],
+    });
+    checkProblems([
+      {
+        path: `/one/tests/${fileName}.test.ts`,
+        problems,
+      },
+    ]);
+    enterSolution({ path: `one/contracts/${fileName}.one.ts` });
+    if (chapter === 3) {
+      enterSolution({ path: `one/contracts/Token.one.ts` });
+    }
+    build({ success: true });
+    checkProblems([
+      {
+        path: `/one/tests/${fileName}.test.ts`,
+        problems: [],
+      },
+    ]);
+    runTests({
+      passing: 1,
+      failing: 0,
+      suites: [
+        {
+          basename: `${fileName}.test.ts`,
+          dirname: 'one/tests',
+          passing: 1,
+          failing: 0,
+          tests: [
+            {
+              name: [fileName, testName],
+              state: 'pass',
+            } as Test,
+          ].concat(
+            skip
+              ? [
+                  {
+                    name: ['Token', 'allows minting tokens'],
+                    state: 'skip' as 'skip',
+                  } as Test,
+                ]
+              : [],
           ),
         },
       ],
