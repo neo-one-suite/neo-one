@@ -16728,10 +16728,10 @@ react-side-effect@^1.1.0:
     exenv "^1.2.1"
     shallowequal "^1.0.1"
 
-react-static@6.0.0-beta.29:
-  version "6.0.0-beta.29"
-  resolved "https://registry.yarnpkg.com/react-static/-/react-static-6.0.0-beta.29.tgz#e5076f656b27e69637569839c6816604576c813f"
-  integrity sha512-wFB5VWapq5sCtGKtYu2oHersNismi4AZk8bfRjbQjIPx2yzJ7TSialHvjBz0dLevtbp8WKlrcPB/UJ5C06hGPg==
+react-static@6.0.0-beta.30:
+  version "6.0.0-beta.30"
+  resolved "https://registry.yarnpkg.com/react-static/-/react-static-6.0.0-beta.30.tgz#01c494ad8743251d95cc1ed73d4d860e7f452fd0"
+  integrity sha512-yrHg/ypPBvtzSeF8Ce6YBRtw/s8q/l6zD9bTNCh/e5VBKRrRDvQ9+ZMMDzLZAmZ9FIUX2K7yUObosN/t80QR+w==
   dependencies:
     "@babel/cli" "^7.0.0"
     "@babel/core" "^7.0.0"

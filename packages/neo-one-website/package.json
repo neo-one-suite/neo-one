@@ -41,7 +41,7 @@
     "react-hot-loader": "^4.3.12",
     "react-icons": "^3.2.2",
     "react-redux": "^5.1.0",
-    "react-static": "6.0.0-beta.29",
+    "react-static": "6.0.0-beta.30",
     "react-transition-group": "^2.5.0",
     "react-universal-component": "^3.0.3",
     "reakit": "0.15.10",
