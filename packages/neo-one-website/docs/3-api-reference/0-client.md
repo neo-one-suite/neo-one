@@ -1,8 +1,9 @@
 ---
-slug: client-types
-title: Client Types
-section: API Reference
+slug: client
+title: \@neo-one/client
 ---
+# @neo-one/client
+
 This is the API documentation for the NEO•ONE Client Types.
 
 ## Types

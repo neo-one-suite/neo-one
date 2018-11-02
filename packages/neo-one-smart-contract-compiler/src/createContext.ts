@@ -54,7 +54,7 @@ const DEFAULT_MAKE_CONTEXT_OPTIONS = {
   modifyHost: defaultModifyHost,
 };
 
-const COMPILER_OPTIONS: ts.CompilerOptions = {
+export const COMPILER_OPTIONS: ts.CompilerOptions = {
   target: ts.ScriptTarget.ESNext,
   module: ts.ModuleKind.ESNext,
   moduleResolution: ts.ModuleResolutionKind.NodeJs,

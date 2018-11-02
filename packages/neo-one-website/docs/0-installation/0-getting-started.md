@@ -1,7 +1,6 @@
 ---
 slug: getting-started
 title: Getting Started
-section: Installation
 ---
 # Getting Started
 
@@ -29,13 +28,17 @@ If you're interested in playing around with NEO•ONE or you prefer to __learn b
 
 If you'd prefer to use your own editor, you can work through the [NEO•ONE Tutorial](/tutorial). The tutorial covers roughly the same content as the first two lessons of the Courses and by the end of it you'll be ready to start building your own unique dapp.
 
+### Playground
+
+Setup the [NEO•ONE Playground](/docs/playground) repository to get a feel for NEO•ONE in action in a real-world setting. Try modifying the smart contracts, adding to the tests or fiddle with the UI.
+
 ## Learn NEO•ONE
 
 NEO•ONE covers the entire development lifecycle of a dapp, so it's best to learn it one step at a time.
 
 ### First Examples
 
-The [NEO•ONE Homepage](/) contains a few small examples. Even if you don't know anything about building dapps, check them out to see what is possible.
+The [NEO•ONE Homepage](/) contains a few full fledged editors with small examples. Even if you don't know anything about building dapps, check them out to see what is possible.
 
 ### TypeScript Resources
 
@@ -45,15 +48,15 @@ Prefer JavaScript or don't want to use TypeScript? No problem! NEO•ONE smart c
 
 ### Step-by-Step Guide
 
-If you'd prefer to just get an overview of NEO•ONE and learn about the core concepts, check out the [guide to main concepts](). Every chapter builds on the knowledge introduced in previous chapters so you won't miss anything as you go along.
+If you'd prefer to just get an overview of NEO•ONE and learn about the core concepts, check out the [guide to main concepts](/docs/hello-world). Every chapter builds on the knowledge introduced in previous chapters so you won't miss a thing as you go along.
 
 ### Advanced Guides
 
-Once you're comfortable with the [main concepts]() and have built some simple dapps with NEO•ONE, you might be interested in some of the more advanced features NEO•ONE has to offer. The [advanced guides]() section will introduce you to some of the less commonly used, though in some cases very powerful, features.
+Once you're comfortable with the main concepts and have built some simple dapps with NEO•ONE, you might be interested in some of the more advanced features NEO•ONE has to offer. The advanced guides section will introduce you to some of the less commonly used, though in some cases very powerful, features.
 
 ### API Reference
 
-The [API Reference]() section is useful for learning about specific details of the NEO•ONE API.
+This documentation section is useful for learning about specific details of the NEO•ONE API. For example, the [@neo-one/smart-contract API reference](/docs/smart-contract) can provide details on the various APIs available for smart contracts.
 
 ---
 

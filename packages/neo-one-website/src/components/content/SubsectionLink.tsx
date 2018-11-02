@@ -36,15 +36,16 @@ interface Props {
   readonly active: boolean;
   readonly title: string;
   readonly slug: string;
+  readonly index?: number;
   readonly onClick?: () => void;
   readonly children?: React.ReactNode;
 }
 
-export const SubsectionLink = ({ active, title, slug, children, onClick, ...props }: Props) => (
+export const SubsectionLink = ({ active, title, index, slug, children, onClick, ...props }: Props) => (
   <Wrapper {...props}>
     <Link active={active} linkColor="gray" to={slug} onClick={onClick}>
       {active ? <ActiveBorder /> : null}
-      {title}
+      {index === undefined ? title : `${index}. ${title}`}
     </Link>
     {children}
   </Wrapper>

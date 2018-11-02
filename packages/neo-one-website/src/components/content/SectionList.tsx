@@ -8,14 +8,16 @@ import { SubsectionLink } from './SubsectionLink';
 interface SubsectionProps {
   readonly current: string;
   readonly subsection: SubsectionData;
+  readonly index?: number;
   readonly onClickLink?: () => void;
 }
 
-const Subsection = ({ current, subsection, onClickLink, ...props }: SubsectionProps) => (
+const Subsection = ({ current, index, subsection, onClickLink, ...props }: SubsectionProps) => (
   <SubsectionLink
     active={current === subsection.slug}
     title={subsection.title}
     slug={subsection.slug}
+    index={index}
     onClick={onClickLink}
     {...props}
   >
@@ -30,6 +32,7 @@ interface Props {
   readonly subsections: ReadonlyArray<SubsectionData>;
   readonly onClickLink?: () => void;
   readonly indent?: boolean;
+  readonly numbered?: boolean;
 }
 
 const Wrapper = styled(List)<{ readonly indent: boolean }>`
@@ -37,10 +40,16 @@ const Wrapper = styled(List)<{ readonly indent: boolean }>`
   ${ifProp('indent', 'margin-left: 16px', '')};
 `;
 
-export const SectionList = ({ current, subsections, indent = false, onClickLink, ...props }: Props) => (
+export const SectionList = ({ numbered, current, subsections, indent = false, onClickLink, ...props }: Props) => (
   <Wrapper indent={indent} {...props}>
-    {subsections.map((subsection) => (
-      <Subsection key={subsection.slug} current={current} subsection={subsection} onClickLink={onClickLink} />
+    {subsections.map((subsection, idx) => (
+      <Subsection
+        key={subsection.slug}
+        index={numbered ? idx : undefined}
+        current={current}
+        subsection={subsection}
+        onClickLink={onClickLink}
+      />
     ))}
   </Wrapper>
 );

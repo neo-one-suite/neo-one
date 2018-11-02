@@ -7,6 +7,7 @@ import { filter, take } from 'rxjs/operators';
 import { build } from './build';
 import { buildCommand } from './buildCommand';
 import { constants } from './constants';
+import { initCommand } from './initCommand';
 import { ProjectResourceType } from './ProjectResourceType';
 import { reset } from './reset';
 import { ExecuteTaskListOptions, RequestOptions } from './types';
@@ -42,7 +43,7 @@ export class ProjectPlugin extends Plugin {
   }
 
   public get interactive(): ReadonlyArray<InteractiveCommand> {
-    return [buildCommand];
+    return [buildCommand, initCommand];
   }
 
   public executeTaskList(pluginManager: PluginManager, optionsIn: string): TaskList {

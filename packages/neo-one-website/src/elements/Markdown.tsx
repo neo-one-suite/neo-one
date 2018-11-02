@@ -4,7 +4,7 @@ import anchor from 'markdown-it-anchor';
 import TOC from 'markdown-it-table-of-contents';
 import * as React from 'react';
 import { css, styled } from 'reakit';
-import { prop, switchProp } from 'styled-tools';
+import { ifProp, prop, switchProp } from 'styled-tools';
 
 // tslint:disable
 import '../../static/css/prism.css';
@@ -70,7 +70,14 @@ const headerMargins = css`
   margin-bottom: 24px;
 `;
 
-const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent' }>`
+const lightCode = css`
+  background-color: ${prop('theme.gray1')};
+  color: ${prop('theme.black')};
+  padding: 4px;
+  border-radius: 4px;
+`;
+
+const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent'; readonly light: boolean }>`
   ${prop('theme.fontStyles.subheading')};
   ${prop('theme.fonts.axiformaThin')};
   overflow-wrap: break-word;
@@ -179,7 +186,7 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent' }
   }
 
   & code {
-    ${prop('theme.fontStyles.subheading')};
+    ${ifProp('light', lightCode, '')} ${prop('theme.fontStyles.subheading')};
     font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
   }
 `;
@@ -188,6 +195,7 @@ interface Props {
   readonly source: string;
   readonly linkColor?: 'primary' | 'gray' | 'accent';
   readonly openAllLinksInNewTab?: boolean;
+  readonly light?: boolean;
 }
 export class Markdown extends React.Component<Props> {
   private readonly ref = React.createRef<HTMLElement>();
@@ -218,12 +226,13 @@ export class Markdown extends React.Component<Props> {
   }
 
   public render() {
-    const { source, linkColor = 'primary', ...props } = this.props;
+    const { source, linkColor = 'primary', light = false, ...props } = this.props;
 
     return (
       <Wrapper
         {...props}
         linkColor={linkColor}
+        light={light}
         innerRef={this.ref}
         dangerouslySetInnerHTML={{ __html: md.render(source) }}
       />

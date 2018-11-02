@@ -17,7 +17,8 @@ pre[class*="language-"] {
 	-webkit-hyphens: none;
 	-moz-hyphens: none;
 	-ms-hyphens: none;
-	hyphens: none;
+  hyphens: none;
+  padding: 0;
 }
 
 /* Code blocks */

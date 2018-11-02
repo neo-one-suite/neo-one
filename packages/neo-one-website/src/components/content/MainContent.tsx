@@ -88,6 +88,6 @@ interface Props {
 
 export const MainContent = ({ content, ...props }: Props) => (
   <Wrapper {...props}>
-    <StyledMarkdown source={content} linkColor="accent" />
+    <StyledMarkdown source={content} linkColor="accent" light />
   </Wrapper>
 );

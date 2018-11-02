@@ -11,6 +11,7 @@ export interface SubsectionData {
 
 export interface SectionData {
   readonly title: string;
+  readonly numbered?: boolean;
   readonly subsections: ReadonlyArray<SubsectionData>;
 }
 
