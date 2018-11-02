@@ -15,6 +15,12 @@ export const ALL_SLUGS: ReadonlyArray<string> = [
   '/course/tokenomics/2/3',
   '/course/tokenomics/2/4',
   '/course/tokenomics/2/5',
+  '/course/tokenomics/3/1',
+  '/course/tokenomics/3/2',
+  '/course/tokenomics/3/3',
+  '/course/tokenomics/3/4',
+  '/course/tokenomics/3/5',
+  '/course/tokenomics/3/6',
 ];
 
 export const lesson1 = ({
@@ -188,6 +194,110 @@ export const lesson2 = ({
                   } as Test,
                 ]
               : [],
+          ),
+        },
+      ],
+    });
+  });
+};
+
+export const lesson3 = ({
+  chapter,
+  problems = [],
+  error,
+  testName,
+}: {
+  readonly chapter: number;
+  readonly problems?: ReadonlyArray<Problem>;
+  readonly error: string;
+  readonly testName?: string;
+}) => {
+  it(`Lesson 3 Chapter ${chapter}`, () => {
+    const baseTestName = 'getTokenInfo returns token info';
+
+    cy.visit('/course');
+
+    cy.get('[data-test=tokenomics-lesson-2]').click();
+    cy.get('[data-test=start]').click();
+
+    // tslint:disable-next-line no-loop-statement
+    for (let i = 0; i < chapter - 1; i += 1) {
+      nextButton();
+    }
+
+    build({ success: true });
+    runTests({
+      passing: 0,
+      failing: 1,
+      suites: [
+        {
+          basename: 'utils.test.ts',
+          dirname: 'src/__tests__',
+          passing: testName === undefined ? 0 : 1,
+          failing: 1,
+          tests:
+            testName === undefined
+              ? [
+                  {
+                    name: ['utils', baseTestName],
+                    state: 'fail',
+                    error,
+                  },
+                ]
+              : [
+                  {
+                    name: ['utils', baseTestName],
+                    state: 'pass',
+                  },
+                  {
+                    name: ['utils', testName],
+                    state: 'fail',
+                    error,
+                  },
+                ],
+        },
+      ],
+    });
+    checkProblems([
+      {
+        path: '/src/utils.ts',
+        problems,
+      },
+    ]);
+    enterSolution({ path: 'src/utils.ts' });
+    if (chapter === 6) {
+      enterSolution({ path: 'one/contracts/ICO.tsx' });
+    }
+    build({ success: true });
+    checkProblems([
+      {
+        path: '/src/utils.ts',
+        problems: [],
+      },
+    ]);
+    runTests({
+      passing: 1,
+      failing: 0,
+      suites: [
+        {
+          basename: 'utils.test.ts',
+          dirname: 'src/__tests__',
+          passing: 1,
+          failing: 0,
+          tests: [
+            {
+              name: ['utils', baseTestName],
+              state: 'pass',
+            } as Test,
+          ].concat(
+            testName === undefined
+              ? []
+              : [
+                  {
+                    name: ['utils', testName],
+                    state: 'pass',
+                  } as Test,
+                ],
           ),
         },
       ],
