@@ -19594,10 +19594,10 @@ tr46@^1.0.1:
   dependencies:
     punycode "^2.1.0"
 
-trackjs@^2.13.0:
-  version "2.13.0"
-  resolved "https://registry.yarnpkg.com/trackjs/-/trackjs-2.13.0.tgz#323efb31a31c2dbc0a90132a79b96b523c83c12b"
-  integrity sha512-O3x/Krn0iQhCacfazqiNrWakQbM6Nj1SDd9BvZeVGNFbkq8YkhblNnSp+VC7u+wXBh05dX3TDtDSl+WgAxwdlg==
+trackjs@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/trackjs/-/trackjs-3.0.0.tgz#fee7ba4d568507663061041f3139eabef0331ef8"
+  integrity sha512-slyLiFRGg7mXEk5n1ubbxBYdAwDOFKqsHXY3bOKrgt5mHkq/7+aSplBMMm3mLIxZcL3EbdrQ66npvS6yEbqjGg==
 
 traverse@^0.6.6:
   version "0.6.6"

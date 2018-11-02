@@ -70,7 +70,7 @@
     "rxjs": "^6.3.3",
     "source-map": "^0.7.3",
     "styled-tools": "^1.5.2",
-    "trackjs": "^2.13.0",
+    "trackjs": "^3.0.0",
     "ts-node": "^7.0.1",
     "typescript": "3.2.0-dev.20181102",
     "typescript-fsa": "^3.0.0-beta-2",
