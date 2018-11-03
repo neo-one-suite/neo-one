@@ -592,7 +592,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           outputs: this.convertOutputs(
             outputs.concat([
               {
-                address: from.address,
+                address: contract,
                 asset: common.GAS_ASSET_HASH,
                 value: amount,
               },
