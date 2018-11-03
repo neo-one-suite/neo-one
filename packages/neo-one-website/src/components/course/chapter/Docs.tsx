@@ -29,7 +29,7 @@ interface Props {
 
 export const Docs = ({ selected, ...props }: Props) => (
   <Wrapper {...props}>
-    <StyledMarkdown source={selectChapter(selected).documentation} />
+    <StyledMarkdown source={selectChapter(selected).documentation} openAllLinksInNewTab />
     <DocsFooter selected={selected} />
   </Wrapper>
 );

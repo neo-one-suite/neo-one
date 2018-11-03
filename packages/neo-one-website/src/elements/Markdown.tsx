@@ -47,53 +47,63 @@ Prism.languages.typescript = Prism.languages.extend('javascript', {
 Prism.languages.ts = Prism.languages.typescript;
 // tslint:enable
 
-const md = MarkdownIt();
-
 const langPrefix = 'language-';
-md.set({
-  html: false,
-  xhtmlOut: false,
-  breaks: false,
-  langPrefix,
-  linkify: true,
-  typographer: true,
-  quotes: `""''`,
-  highlight: (text, lang) => {
-    const code = md.utils.escapeHtml(text);
-    const classAttribute = lang ? ` class="${langPrefix}${lang}"` : '';
 
-    return `<pre${classAttribute}><code${classAttribute}>${code}</code></pre>`;
-  },
-})
-  // tslint:disable-next-line no-any
-  .use(anchor as any, {
-    permalink: true,
-    slugify,
-    level: [2, 3, 4],
-  })
-  .use(markdownTOC, {
-    slugify,
-    includeLevel: [2],
-    name: 'toc',
-  })
-  .use(markdownTOC, {
-    slugify,
-    markerPattern: /^\[\[toc-reference\]\]/im,
-    format: (content: string) => md.render(content).slice(3, -5),
-    includeLevel: [4],
-    name: 'toc_reference',
-  })
-  .use(container, 'warning', {
-    // tslint:disable-next-line:no-any
-    render: (tokens: any, idx: any) => {
-      if (tokens[idx].type === 'container_warning_open') {
-        return '<blockquote class="warning">';
-      }
+const createMD = ({ withAnchors }: { readonly withAnchors: boolean }) => {
+  const md = MarkdownIt();
+  md.set({
+    html: false,
+    xhtmlOut: false,
+    breaks: false,
+    langPrefix,
+    linkify: true,
+    typographer: true,
+    quotes: `""''`,
+    highlight: (text, lang) => {
+      const code = md.utils.escapeHtml(text);
+      const classAttribute = lang ? ` class="${langPrefix}${lang}"` : '';
 
-      return '</blockquote>\n';
+      return `<pre${classAttribute}><code${classAttribute}>${code}</code></pre>`;
     },
   })
-  .use(table);
+    .use(markdownTOC, {
+      slugify,
+      includeLevel: [2],
+      name: 'toc',
+    })
+    .use(markdownTOC, {
+      slugify,
+      markerPattern: /^\[\[toc-reference\]\]/im,
+      format: (content: string) => md.render(content).slice(3, -5),
+      includeLevel: [4],
+      name: 'toc_reference',
+    })
+    .use(container, 'warning', {
+      // tslint:disable-next-line:no-any
+      render: (tokens: any, idx: any) => {
+        if (tokens[idx].type === 'container_warning_open') {
+          return '<blockquote class="warning">';
+        }
+
+        return '</blockquote>\n';
+      },
+    })
+    .use(table);
+
+  if (withAnchors) {
+    // tslint:disable-next-line no-any
+    md.use(anchor as any, {
+      permalink: true,
+      slugify,
+      level: [2, 3, 4],
+    });
+  }
+
+  return md;
+};
+
+const mdWithoutAnchors = createMD({ withAnchors: false });
+const mdWithAnchors = createMD({ withAnchors: true });
 
 const headerMargins = css`
   margin-top: 32px;
@@ -277,6 +287,7 @@ interface Props {
   readonly linkColor?: 'primary' | 'gray' | 'accent';
   readonly openAllLinksInNewTab?: boolean;
   readonly light?: boolean;
+  readonly anchors?: boolean;
 }
 export class Markdown extends React.Component<Props> {
   private readonly ref = React.createRef<HTMLElement>();
@@ -307,7 +318,7 @@ export class Markdown extends React.Component<Props> {
   }
 
   public render() {
-    const { source, linkColor = 'primary', light = false, ...props } = this.props;
+    const { source, linkColor = 'primary', light = false, anchors = false, ...props } = this.props;
 
     return (
       <Wrapper
@@ -315,7 +326,7 @@ export class Markdown extends React.Component<Props> {
         linkColor={linkColor}
         light={light}
         innerRef={this.ref}
-        dangerouslySetInnerHTML={{ __html: md.render(source) }}
+        dangerouslySetInnerHTML={{ __html: anchors ? mdWithAnchors.render(source) : mdWithoutAnchors.render(source) }}
       />
     );
   }
