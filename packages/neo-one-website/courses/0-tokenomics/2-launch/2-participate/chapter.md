@@ -4,11 +4,11 @@ Now we get to the fun part, invoking a non-constant method on our smart contract
 
 ## Learn
 
-Smart contract methods that are not constant require relaying a transaction on the network. Typically you'll also want to wait for it to be confirmed in order to update the UI as well as to respond to any errors during the process. The generated NEO•ONE client APIs enable this through a two step process.
+Smart contract methods that are not constant require relaying a transaction on the network. Typically you'll want to wait for the transaction to be confirmed in order to update the UI as well as to respond to any errors during the process. The generated NEO•ONE client APIs enable this through a two step process.
 
 First, invoke the smart contract method which will return a `Promise<TransactionResult>`. The `TransactionResult` object contains two properties, `transaction` which is the full transaction object that was relayed to the network, and `confirmed` which is a function we can call to wait for the transaction to be confirmed.
 
-Thus, the second step of the process is to call `confirmed` which returns a `Promise<InvokeReceipt>`. This `InvokeReceipt` contains many useful properties, like the `event`s that were emitted during execution as well as the final `result` of the smart contract. To learn more, take a look at the detailed [documentation](https://neo-one.io) on invoking smart contract methods.
+Thus, the second step of the process is to call `confirmed` which returns a `Promise<InvokeReceipt>`. This `InvokeReceipt` contains many useful properties, like the `event`s that were emitted during execution as well as the final `result` of the smart contract. To learn more, take a look at the detailed [documentation](/docs/smart-contract-apis#methods) on invoking smart contract methods.
 
 Methods marked with `@receive` also take an additional argument for the native assets to send with the invocation. Let's take a look at an example:
 

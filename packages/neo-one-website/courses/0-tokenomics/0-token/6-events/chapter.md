@@ -29,7 +29,7 @@ Now, what does that actually do? Well, events (also called notifications) are a 
 
 ## Test
 
-Recall last chapter we glossed over the `TokenEvent` type in the receipt. Well now that we actually have an event, `transfer`, we can access the events from our issue receipt. Notice in `Token.test.ts` that we added lines 41-49 which verify that the event was emitted as expected.
+Recall last chapter we glossed over the `TokenEvent` type in the receipt. Now that we actually have an event, `transfer`, we can access the events from our issue receipt. Notice in `Token.test.ts` that we added lines 41-49 which verify that the event was emitted as expected.
 
 ## Wrap Up
 

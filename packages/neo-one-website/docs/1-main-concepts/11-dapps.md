@@ -86,7 +86,7 @@ class Client {
 }
 ```
 
-## DeveloperTools
+## Developer Tools
 
 NEO•ONE Developer Tools simplify the process of developing and manually testing your dapp. They contain all of the functionality necessary to control your private network:
 

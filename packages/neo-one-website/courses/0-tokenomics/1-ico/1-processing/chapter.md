@@ -4,7 +4,7 @@ In this chapter we'll start processing the native UTXO assets in the transaction
 
 ## Learn
 
-The current transaction in NEO•ONE smart contracts can be accessed using `Blockchain.currentTransaction`. The transaction itself has many useful properties, but the ones that we're only interested in a few of them. Let's look at an example.
+The current transaction in NEO•ONE smart contracts can be accessed using `Blockchain.currentTransaction`. The transaction itself has many useful properties, but for now we are only interested in a few of them. Let's look at an example.
 
 ```typescript
 import { Blockchain, Hash256, receive, SmartContract } from '@neo-one/smart-contract';
@@ -44,4 +44,4 @@ In this chapter the tests verify that we can only send NEO to the contract. If y
 
 ## Wrap Up
 
-In this chapter we started to learn about processing the assets that we received in the transaction. We saw how to access the current transaction, how to fetch the corresponding `output`s for the transaction's `input`s and how to check for outputs that were sent to the contract.
+In this chapter we started to learn about processing native UTXO assets received in a transaction. We saw how to access the current transaction, how to fetch the corresponding `output`s for the transaction's `input`s and how to check for outputs that were sent to the contract.

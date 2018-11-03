@@ -10,7 +10,7 @@ The smart contract APIs are created at runtime based on the generated ABI in `on
 
 [[toc]]
 
-## Smart Contract Properties
+## Properties
 
 Each public property is translated to either a single method or two methods:
 
@@ -43,7 +43,7 @@ Notice how the smart contract client APIs correspond directly with the propertie
 `setMyValue` works the same as a normal instance method, which we'll cover in the next section.
 
 
-## Smart Contract Methods
+## Methods
 
 Recall that the smart contract methods we've seen thus far in this guide come in two forms, normal instance methods and constant instance methods - designated by the `@constant` decorator.
 
@@ -206,7 +206,7 @@ if (receipt.result.state === 'FAULT') {
 }
 ```
 
-## Confirmed Transaction Shortcut
+### Confirmed Transaction Shortcut
 
 Every normal instance method also contains a `confirmed` property which is a shortcut for the above process. The `Promise` it returns instead resolves once the transaction is both relayed and confirmed:
 
@@ -227,7 +227,7 @@ if (receipt.result.state === 'FAULT') {
 
 The only difference is the `Promise` resolves with an additional property, `transaction`, on the receipt object that contains the `Transaction` that was relayed and confirmed.
 
-## Common Smart Contract Properties
+## Common Properties
 
 In addition to the generated methods mentioned above, the smart contract object contains all contain a few common properties:
 
@@ -336,18 +336,33 @@ Read more about asynchronous iteration [here](http://2ality.com/2016/10/asynchro
 
 ## Type Conversion Table
 
-Smart Contract Type | Client API Type | Example | Notes
---------------------|-----------------|---------|--------
-boolean             | boolean         | true    |
-string              | string          | 'hello world' |
-number              | BigNumber       | new BigNumber(10) |
-Fixed<N>            | BigNumber       | new BigNumber(10) | Value is automatically converted to a BigNumber with N decimal places.
-Buffer              | BufferString    | '02028a' | Hex encoded byte array
-Address             | AddressString   | 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR' | Base58 encoded NEO address
-Hash256             | Hash256String   | '0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c' | Hex encoded string prefixed by '0x'
-PublicKey           | PublicKeyString | '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef' | Hex encoded string
-Array<T>            | Array<T>        | [0, 1, 2] |
-Map<K, V>           | Map<K, V>       | new Map().set('hello', 'world'); |
-Object              | Object          | { key: 'value' } | Object values are follow the same conversions as above
+Smart Contract Type | Client API Type | Notes
+--------------------|-----------------|--------
+boolean             | boolean         |
+string              | string          |
+number              | BigNumber       |
+Fixed<N>            | BigNumber       | Value is automatically converted to a BigNumber with N decimal places.
+Buffer              | BufferString    | Hex encoded byte array
+Address             | AddressString   | Base58 encoded NEO address
+Hash256             | Hash256String   | Hex encoded string prefixed by '0x'
+PublicKey           | PublicKeyString | Hex encoded string
+Array<T>            | Array<T>        |
+Map<K, V>           | Map<K, V>       |
+Object              | Object          | Object values are follow the same conversions as above
 
 
+Here are some examples of each of the types in the front-end:
+
+ Client API Type | Example
+-----------------|---------
+ boolean         | `true`
+ string          | `'hello world'`
+ BigNumber       | `new BigNumber(10)`
+ BigNumber       | `new BigNumber(10)`
+ BufferString    | `'02028a'`
+ AddressString   | `'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR'`
+ Hash256String   | `'0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c'`
+ PublicKeyString | `'02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef'`
+ Array<T>        | `[0, 1, 2]`
+ Map<K, V>       | `new Map().set('hello', 'world');`
+ Object          | `{ key: 'value' }`

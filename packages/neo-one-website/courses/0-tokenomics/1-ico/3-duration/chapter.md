@@ -13,7 +13,7 @@ Last chapter we saw that we can access the current transaction with `Blockchain.
 
   1. Add a `public` `readonly` constructor parameter property called `icoStartTimeSeconds` whose default value is equal to `Blockchain.currentBlockTime + 60 * 60`.
   2. Add a `public` `readonly` constructor parameter property called `icoDurationSeconds` whose default value is equal to `24 * 60 * 60`.
-  3. If the `Blockchain.currentBlockTime` is not within `this.icoStartTimeSeconds` and `this.icoStartTimeSeconds + this.icoDuration`, return `false` from `mintTokens`.
+  3. If the `Blockchain.currentBlockTime` is not within `this.icoStartTimeSeconds` and `this.icoStartTimeSeconds + this.icoDurationSeconds`, return `false` from `mintTokens`.
 
   Recall that all constructor parameters must have a default value for local and automated testing. Here we're setting the start time to 1 hour from the current time and the duration to 24 hours.
 

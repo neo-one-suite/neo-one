@@ -4,7 +4,7 @@ In this chapter we'll learn about NEO•ONE smart contract constructors which en
 
 ## Learn
 
-So far we've been using an implicit constructor by defining class properties with values. But we can also declare a constructor to run arbitrary logic when the smart contract is deployed. Recall that the constructor is called exactly once when the smart contract is deployed.
+So far we've been using an implicit constructor by defining class properties with values. We can also declare a constructor to run arbitrary logic when the smart contract is deployed. Recall that the constructor is called exactly once when the smart contract is deployed.
 
 Let's take a look at an example:
 
@@ -32,7 +32,7 @@ Here we've defined a constructor that takes two arguments, an `Address` [paramet
 
 In future chapters we'll want to verify that the smart contract caller is the owner of the contract:
 
-  1. Add a constructor with a single parameter property `owner` just like in the example above.
+  1. Add a constructor with a single parameter property, `owner`, just like in the example above.
   2. Add the `Address.isCaller` sanity check.
 
 ## Test
@@ -41,4 +41,4 @@ By now you should know the drill - build and run the tests! If all goes well, go
 
 ## Wrap Up
 
-In this chapter we covered constructors, which allow arbitrary initialization logic, as well as how to verify the invoker of the smart contract. As usual, don't forget to check the tests to see the new check for the `owner` property. Notice how we use the `masterAccountID` since that is the one that automatically publishes and deploys the smart contract behind the scenes.
+In this chapter we covered constructors, which allow arbitrary initialization logic, as well as how to verify the invoker of the smart contract. As usual, don't forget to check the tests to see the new check for the `owner` property. Notice the usage of `masterAccountID`. This is the account that automatically publishes and deploys the smart contract behind the scenes.

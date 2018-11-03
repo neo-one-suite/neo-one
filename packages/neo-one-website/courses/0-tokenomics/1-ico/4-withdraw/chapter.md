@@ -23,9 +23,11 @@ export class Example extends SmartContract {
 }
 ```
 
-In this example, we simply check that the caller of the method is the owner of the smart contract - if that's the case, then the native asset transfer is allowed to proceed.
+In this example, we simply check that the caller of the method is the owner of the smart contract - if that's the case, then the native asset transfer is allowed to proceed. We could do additional verification on the inputs and outputs of the transaction, similar to what we did with `@receive`, however in this example, we're trusting that the owner is not acting maliciously.
 
 What if we want to safely send assets? NEO•ONE supports that too, we'll talk about the safe counterpart to the `@sendUnsafe` decorator, `@send`, in a later lesson.
+
+Note that any transaction which attempts to send native assets from the smart contract without invoking a method marked with `@sendUnsafe` or `@send` will be automatically denied.
 
 ## Instructions
 

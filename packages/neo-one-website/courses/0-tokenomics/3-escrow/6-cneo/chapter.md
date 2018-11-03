@@ -11,7 +11,7 @@ Recall from Lesson 2 that we used the `@sendUnsafe` decorator in order to withdr
   1. The user "marks" the assets they wish to withdraw from the contract by constructing a transaction that sends those assets back to the smart contract.
   2. The user then constructs a transaction that withdraws the previously "mark"ed assets to the desired address.
 
-With NEO•ONE, this process is implemented transparently both in terms of the implementation in the smart contract as well as actually invoking the methods in the NEO•ONE client APIs. Simply decorate a method with the `@send` decorator as before and return `true` if the transaction should proceed, and `false` otherwise. The method may optionally accept 1 additional argument, in addition to any user defined arguments, the `Transfer` object with a `to` `Address` property that the assets will be sent to, an `asset` `Hash256` property corresponding to the asset to be sent, and an `amount` `Fixed<8>` property that will be sent. Typically your method will want to accept the `Transfer` argument in order to validate the transaction. Let's take a look at an example.
+With NEO•ONE, this process is implemented transparently both in terms of the implementation in the smart contract as well as actually invoking the methods in the NEO•ONE client APIs. Simply decorate a method with the `@send` decorator as before and return `true` if the transaction should proceed, and `false` otherwise. The method may optionally accept one argument in addition to any user defined arguments; a `Transfer` object. The `Transfere` object contains a `to` `Address` property that the assets will be sent to, an `asset` `Hash256` property corresponding to the asset to be sent, and an `amount` `Fixed<8>` property that will be sent. Typically your method will want to accept the `Transfer` argument in order to validate the transaction. Let's take a look at an example.
 
 ```typescript
 import { send, SmartContract, Transfer } from '@neo-one/smart-contract';
@@ -87,8 +87,8 @@ Then at least the owner of `CNEO` can claim and distribute `GAS`.
 
 ## Test
 
-The tests for this chapter verify `unwrap`ping `CNEO` as well as `claim`ing it. They're worth checking out to see invoking the smart contract methods in action. They also test the NEP-5 functionality by using `CNEO` with the `Escrow` contract.
+The tests for this chapter verify that `CNEO` can be unwrapped and GAS can be claimed. They're worth checking out to see how the smart contract methods are invoked in action. They also test the NEP-5 functionality by using `CNEO` with the `Escrow` contract.
 
 ## Wrap Up
 
-This chapter introduced the `@send` and `@claim` decorators and we used them to implement `CNEO`, a NEP-5 compatible wrapper around `NEO`. At this point, we have 3 fully functioning smart contracts, but you may have noticed that the interaction between them is a bit cumbersome. Currently we require two transaction, a pre-approval transaction followed by the actual action. In the next chapter we'll look at how we can modify the NEP-5 contract to support both the transfer and the action in a single safe transaction.
+This chapter introduced the `@send` and `@claim` decorators and used them to implement `CNEO`, a NEP-5 compatible wrapper around `NEO`. At this point, we have 3 fully functioning smart contracts, but you may have noticed that the interaction between them is a bit cumbersome. Currently we require two transactions, a pre-approval transaction followed by the actual action. In the next chapter we'll look at how we can modify the NEP-5 contract to support both the transfer (without pre-approval) and the action in a single safe transaction.

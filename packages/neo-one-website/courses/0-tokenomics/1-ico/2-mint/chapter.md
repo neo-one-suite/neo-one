@@ -42,7 +42,7 @@ There's quite a bit that needs to be done this chapter, so don't hesitate to tak
 
 ## Test
 
-Take a look at the `Token.test.ts` file and you'll see that we're now fully testing the functionality of `mintTokens` - verifying everything from a transfer event is emitted to the remaining amount being decremented. We also consolidated the other unit test into our `mintTokens` test since we no longer have a public `issue` method.
+Take a look at the `Token.test.ts` file and you'll see that we're now fully testing the functionality of `mintTokens` - verifying everything from the emission of transfer events to the remaining amount being decremented.
 
 ## Wrap Up
 

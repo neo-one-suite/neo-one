@@ -66,10 +66,16 @@ The [NEO•ONE blog](/blog) is the official source of updates from the NEO•ONE
 
 Additionally, you can get the same udpates by following [@neo-one-suite](https://twitter.com/neo_one_suite) on Twitter.
 
-Finally, feel free to reach out to us on the [NEO•ONE Discord](https://discordapp.com/invite/S86PqDE) to chat with us directly.
+Finally, feel free to reach out to us on the [NEO•ONE Discord](https://discord.gg/S86PqDE) to chat with us directly.
+
+---
+
+## Help
+
+Need help? NEO•ONE is developed by community members just like you. Contributors are often around and available for questions. First, see if you can find what you're looking for in the docs. If you can't find the answer, come chat with us in the [#support](https://discord.gg/S86PqDE) channel on the NEO•ONE Discord community. Many members of the community also use Stack Overflow. Read through [existing questions](https://stackoverflow.com/questions/tagged/neo-one) tagged with **neo-one** or [ask your own](https://stackoverflow.com/questions/ask)!
 
 ---
 
 ## Something Missing?
 
-If something is missing from the NEO•ONE documentation or you found something confusing, please submit an issue to the [NEO•ONE GitHub](https://github.com/neo-one-suite/neo-one) with your suggestions. You can also tweet [@neo-one-suite](https://twitter.com/neo_one_suite) or let us know directly on the [NEO•ONE Discord](https://discordapp.com/invite/S86PqDE). We'd love to hear from you!
+If something is missing from the NEO•ONE documentation or you found something confusing, please submit an issue to the [NEO•ONE GitHub](https://github.com/neo-one-suite/neo-one) with your suggestions. You can also tweet [@neo-one-suite](https://twitter.com/neo_one_suite) or let us know directly on the [NEO•ONE Discord](https://discord.gg/S86PqDE). We'd love to hear from you!
