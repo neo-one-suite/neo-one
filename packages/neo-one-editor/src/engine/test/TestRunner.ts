@@ -11,6 +11,7 @@ import {
 import { makeDescribe } from 'jest-circus/build/utils';
 // @ts-ignore
 import expect from 'jest-matchers';
+import { TrackJS } from 'trackjs';
 import { formatError } from '../../error';
 import { Test, TestRunnerCallbacks } from '../../types';
 import { ModuleBase, RemoteEngine } from '../remote';
@@ -18,10 +19,7 @@ import { createTestEngine, CreateTestEngineOptions } from './createTestEngine';
 import { BlockName, DescribeBlock, JestEvent, TestEntry } from './types';
 
 const handleError = (error: Error) => {
-  // tslint:disable-next-line strict-type-predicates
-  if (typeof trackJs !== 'undefined') {
-    trackJs.track(error);
-  }
+  TrackJS.track(error);
 };
 
 function resetTestState() {

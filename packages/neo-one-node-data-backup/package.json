@@ -4,7 +4,7 @@
   "description": "NEO•ONE node data path backup and restore.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@google-cloud/storage": "^2.2.0",
+    "@google-cloud/storage": "^2.3.0",
     "@neo-one/monitor": "^1.0.0-preview.2",
     "@neo-one/types": "^1.0.0-preview.2",
     "@types/fs-extra": "^5.0.4",

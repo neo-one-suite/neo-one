@@ -60,7 +60,6 @@ describe('InvokeSmartContractHelper', () => {
 
         @claim
         public claim(transaction: ClaimTransaction): boolean {
-          console.log(transaction.inputs.length);
           return transaction.inputs.length === 0 && Address.isCaller(this.owner);
         }
       }
@@ -225,7 +224,7 @@ describe('InvokeSmartContractHelper', () => {
     await expect(smartContract.refundAssets(sendUnsafeReceiveResult.transaction.hash)).rejects.toBeDefined();
 
     account = await node.client.read(accountID.network).getAccount(contract.address);
-    expect(account.balances[Hash256.GAS].toString()).toEqual('20');
+    expect(account.balances[Hash256.GAS].toString()).toEqual('20.0000008');
     expect(account.balances[Hash256.NEO].toString()).toEqual('20');
 
     const sendResult = await smartContract.send({
@@ -256,7 +255,7 @@ describe('InvokeSmartContractHelper', () => {
     expect(sendReceipt.result.gasCost).toMatchSnapshot();
 
     account = await node.client.read(accountID.network).getAccount(contract.address);
-    expect(account.balances[Hash256.GAS].toString()).toEqual('20');
+    expect(account.balances[Hash256.GAS].toString()).toEqual('20.0000008');
     expect(account.balances[Hash256.NEO].toString()).toEqual('20');
 
     const completeSendReceipt = await smartContract.completeSend.confirmed(sendResult.transaction.hash);
@@ -264,7 +263,7 @@ describe('InvokeSmartContractHelper', () => {
     expect(completeSendReceipt.result.gasCost).toMatchSnapshot();
 
     account = await node.client.read(accountID.network).getAccount(contract.address);
-    expect(account.balances[Hash256.GAS].toString()).toEqual('20');
+    expect(account.balances[Hash256.GAS].toString()).toEqual('20.0000008');
     expect(account.balances[Hash256.NEO].toString()).toEqual('10');
 
     const sendResult0 = await smartContract.send({
@@ -277,7 +276,7 @@ describe('InvokeSmartContractHelper', () => {
     expect(sendReceipt0.result.gasCost).toMatchSnapshot();
 
     account = await node.client.read(accountID.network).getAccount(contract.address);
-    expect(account.balances[Hash256.GAS].toString()).toEqual('20');
+    expect(account.balances[Hash256.GAS].toString()).toEqual('20.0000008');
     expect(account.balances[Hash256.NEO].toString()).toEqual('10');
 
     const completeSendReceipt0 = await smartContract.completeSend.confirmed(sendResult0.transaction.hash);
@@ -285,7 +284,7 @@ describe('InvokeSmartContractHelper', () => {
     expect(completeSendReceipt0.result.gasCost).toMatchSnapshot();
 
     account = await node.client.read(accountID.network).getAccount(contract.address);
-    expect(account.balances[Hash256.GAS].toString()).toEqual('20');
+    expect(account.balances[Hash256.GAS].toString()).toEqual('20.0000008');
     expect(account.balances[Hash256.NEO]).toBeUndefined();
   });
 

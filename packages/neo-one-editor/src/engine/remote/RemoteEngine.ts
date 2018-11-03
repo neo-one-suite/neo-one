@@ -7,6 +7,7 @@ import _ from 'lodash';
 import * as nodePath from 'path';
 import { defer, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { TrackJS } from 'trackjs';
 import { ModuleNotFoundError } from '../../errors';
 import { MissingPath, ModuleBase } from './ModuleBase';
 import { getPathWithExports, PathWithExports } from './packages';
@@ -180,10 +181,7 @@ export class RemoteEngine {
     try {
       await Promise.all(paths.map(async (path) => this.fetchDependency(path)));
     } catch (error) {
-      // tslint:disable-next-line strict-type-predicates
-      if (typeof trackJs !== 'undefined') {
-        trackJs.track(error);
-      }
+      TrackJS.track(error);
     }
   }
 

@@ -78,7 +78,7 @@ describe('ForwardValue', () => {
     `);
   });
 
-  test('can be as<type>', async () => {
+  test.skip('can be as<type>', async () => {
     const node = await helpers.startNode();
     const contract = await node.addContract(`
       import { Address, ForwardValue, Hash256, PublicKey, SmartContract } from '@neo-one/smart-contract';

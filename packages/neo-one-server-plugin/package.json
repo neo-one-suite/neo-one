@@ -16,7 +16,7 @@
     "@types/is-running": "^2.1.0",
     "@types/log-symbols": "^2.0.0",
     "@types/log-update": "^2.0.0",
-    "@types/seamless-immutable": "^7.1.3",
+    "@types/seamless-immutable": "^7.1.4",
     "@types/vorpal": "^1.11.0",
     "ajv": "^6.5.4",
     "chalk": "^2.4.1",

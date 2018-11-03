@@ -1,3 +1,4 @@
+import { common } from '@neo-one/client-common';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -11,14 +12,14 @@ export class DidReceiveNonClaimAssetsHelper extends Helper {
 
     // [transaction]
     sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
-    // [claims]
-    sb.emitSysCall(node, 'Neo.ClaimTransaction.GetClaimReferences');
-    // [map];
+    // [outputs]
+    sb.emitSysCall(node, 'Neo.Transaction.GetOutputs');
+    // [map]
     sb.emitHelper(node, options, sb.helpers.getOutputAssetValueMap);
     // [transaction, map]
     sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
-    // [map, map]
-    sb.emitSysCall(node, 'Neo.Transaction.GetOutputs');
+    // [outputs, map]
+    sb.emitSysCall(node, 'Neo.Transaction.GetReferences');
     // [map]
     sb.emitHelper(node, options, sb.helpers.mergeAssetValueMaps({ add: false }));
     // [boolean]
@@ -27,12 +28,20 @@ export class DidReceiveNonClaimAssetsHelper extends Helper {
       optionsIn,
       sb.helpers.mapSome({
         each: () => {
-          // [value]
-          sb.emitOp(node, 'DROP');
-          // [0, value]
+          // [buffer, key, value]
+          sb.emitPushBuffer(node, common.stringToUInt256(common.GAS_ASSET_HASH));
+          // [isGAS, value]
+          sb.emitOp(node, 'EQUAL');
+          // [!isGAS, value]
+          sb.emitOp(node, 'NOT');
+          // [value, !isGAS]
+          sb.emitOp(node, 'SWAP');
+          // [0, value, !isGAS]
           sb.emitPushInt(node, 0);
-          // [value < 0]
-          sb.emitOp(node, 'LT');
+          // [value > 0, !isGAS]
+          sb.emitOp(node, 'GT');
+          // [value > 0 && !isGAS]
+          sb.emitOp(node, 'BOOLAND');
         },
       }),
     );
