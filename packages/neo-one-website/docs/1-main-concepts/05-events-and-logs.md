@@ -6,6 +6,8 @@ title: Events and Logs
 
 Smart contracts may emit events to allow listeners to *react* to changes in smart contract state.
 
+[[toc]]
+
 ## Events
 
 Decentralized apps commonly need to know the current state of a smart contract, sometimes by employing a centralized storage solution such as a relational database to store the current state in a more efficiently queryable way. Rather than poll the smart contract for the entire state every block, we can react to events emitted by the contract which represent the important state changes.

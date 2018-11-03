@@ -6,6 +6,8 @@ title: Properties and Storage
 
 NEO•ONE stores persistent data in the class properties of the smart contract.
 
+[[toc]]
+
 ## Properties and Accessors
 
 Using that mental model of a single instance of our smart contract, it becomes clear that any properties of the smart contract are automatically persisted between invocations of the smart contract, just like a normal class instance. In TypeScript we can declare several types of instance properties of a class - [private, protected, public and readonly](https://www.typescriptlang.org/docs/handbook/classes.html#public-private-and-protected-modifiers). The following example explores each of these:

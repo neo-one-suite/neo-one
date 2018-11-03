@@ -6,6 +6,8 @@ title: Smart Contract Basics
 
 NEO•ONE enables writing NEO smart contracts in TypeScript. This chapter will cover the basics of smart contract authoring.
 
+[[toc]]
+
 ## Why TypeScript?
 
 The first question you might ask is "why should I write my smart contract in TypeScript?" Aside from the many benefits of first-class incorporation in the NEO•ONE toolchain, there are many standalone advantages to NEO•ONE TypeScript smart contracts.

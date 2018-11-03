@@ -6,6 +6,8 @@ title: Forward Values
 
 Forward values allow advanced interactivity between smart contracts, enabling use-cases that would not normally be possible.
 
+[[toc]]
+
 ## Forward Value
 
 Before we dive into the specifics, let's look at an example of how forward values are used:

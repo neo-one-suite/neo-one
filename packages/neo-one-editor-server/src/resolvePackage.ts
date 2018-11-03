@@ -12,7 +12,7 @@ import * as tar from 'tar';
 import { EmptyBodyError, FetchError, MissingPackageJSONError } from './errors';
 import { getEscapedName } from './utils';
 
-const REGISTRY = 'https://registry.npmjs.org/';
+const REGISTRY = 'https://registry.yarnpkg.com/';
 
 const getTarballURL = (name: string, version: string) => {
   const escapedName = getEscapedName(name);

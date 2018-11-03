@@ -12,6 +12,8 @@ export class HelloWorld extends SmartContract {}
 
 This smart contract doesn't do a whole lot, in fact, it does nothing, but this is the smallest compilable smart contract.
 
+[[toc]]
+
 ## How to Read This Guide
 
 In this guide, we will work through creating a dapp with NEO•ONE starting from writing the smart contract, to building and deploying the smart contract, to testing the smart contract, and all the way on up to interacting with the smart contract from a dapp UI. Once you master the basics through this guide, you'll be able to create complex dapps using NEO•ONE.

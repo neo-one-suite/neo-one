@@ -1,4 +1,4 @@
-// tslint:disable member-ordering
+// tslint:disable member-ordering readonly-array no-any
 import {
   Account,
   AddressString,
@@ -67,14 +67,24 @@ export class Client<
   private readonly currentNetworkInternal$: BehaviorSubject<NetworkType>;
   private readonly reset$ = new BehaviorSubject<void>(undefined);
 
+  /**
+   * Emits a value whenever a block is persisted to the blockchain.
+   *
+   * Immediately emits the latest block/network when subscribed to.
+   */
   public readonly block$: Observable<{
     readonly block: Block;
     readonly network: NetworkType;
   }>;
 
+  /**
+   * Emits a value whenever a new user account is selected and whenever a block is persisted to the blockchain.
+   *
+   * Immediately emits the latest value when subscribed to.
+   */
   public readonly accountState$: Observable<
     | {
-        readonly currentAccount: UserAccount;
+        readonly currentUserAccount: UserAccount;
         readonly account: Account;
       }
     | undefined
@@ -166,17 +176,17 @@ export class Client<
       refCount(),
     );
     this.accountState$ = combineLatest(this.currentUserAccount$, this.block$).pipe(
-      switchMap(async ([currentAccount]) => {
-        if (currentAccount === undefined) {
+      switchMap(async ([currentUserAccount]) => {
+        if (currentUserAccount === undefined) {
           return undefined;
         }
 
-        const account = await this.getNetworkProvider(currentAccount.id.network).getAccount(
-          currentAccount.id.network,
-          currentAccount.id.address,
+        const account = await this.getNetworkProvider(currentUserAccount.id.network).getAccount(
+          currentUserAccount.id.network,
+          currentUserAccount.id.address,
         );
 
-        return { currentAccount, account };
+        return { currentUserAccount, account };
       }),
       distinctUntilChanged((a, b) => _.isEqual(a, b)),
       multicast(() => new ReplaySubject(1)),
@@ -263,6 +273,15 @@ export class Client<
     }) as any;
   }
 
+  /**
+   * Transfer native assets in the specified amount(s) to the specified Address(es).
+   *
+   * Accepts either a single transfer or an array of transfer objects.
+   *
+   * Note that we use an `InvocationTransaction` for transfers in order to reduce the overall bundle size since they can be used equivalently to `ContractTransaction`s.
+   *
+   * @returns `Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>`.
+   */
   public async transfer(
     amount: BigNumber,
     asset: Hash256String,
@@ -270,7 +289,6 @@ export class Client<
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>;
   public async transfer(transfers: ReadonlyArray<Transfer>, options?: TransactionOptions): Promise<TransactionResult>;
-  // tslint:disable-next-line readonly-array no-any
   public async transfer(...argsIn: any[]): Promise<TransactionResult> {
     const { transfers, options } = this.getTransfersOptions(argsIn);
     await this.applyBeforeRelayHook(options);

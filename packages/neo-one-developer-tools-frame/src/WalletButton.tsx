@@ -26,7 +26,7 @@ export function WalletButton() {
               <FromStream props={[accountState$]} createStream={() => accountState$}>
                 {(value) => (
                   <Text data-test="neo-one-wallet-value">
-                    {value === undefined ? 'Select Wallet' : value.currentAccount.name}
+                    {value === undefined ? 'Select Wallet' : value.currentUserAccount.name}
                   </Text>
                 )}
               </FromStream>

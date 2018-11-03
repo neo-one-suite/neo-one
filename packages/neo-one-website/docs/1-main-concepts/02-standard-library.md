@@ -6,7 +6,11 @@ title: Standard Library
 
 NEO•ONE includes a library of standard smart contract values, functions, interfaces and classes.
 
-This chapter will go into detail on some of the more common values and types that we will use throughout the guide. For more details, check out the [Smart Contract](/docs/smart-contract) reference.
+This chapter will go into detail on some of the more common values and types that we will use throughout the guide. While working through the rest of the chapters you may want to keep this page handy.
+
+For more details, check out the [Smart Contract](/docs/smart-contract) reference.
+
+[[toc]]
 
 ## Value Types
 

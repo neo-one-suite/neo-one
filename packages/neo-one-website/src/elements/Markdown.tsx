@@ -2,6 +2,8 @@ import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
 // @ts-ignore
 import container from 'markdown-it-container';
+// @ts-ignore
+import table from 'markdown-it-multimd-table';
 import * as React from 'react';
 import { css, styled } from 'reakit';
 // @ts-ignore
@@ -90,7 +92,8 @@ md.set({
 
       return '</blockquote>\n';
     },
-  });
+  })
+  .use(table);
 
 const headerMargins = css`
   margin-top: 32px;

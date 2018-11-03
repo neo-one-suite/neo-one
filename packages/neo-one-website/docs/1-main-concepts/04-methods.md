@@ -6,6 +6,8 @@ title: Methods
 
 Methods are the core component of smart contract logic.
 
+[[toc]]
+
 ## Constructor
 
 The constructor of the smart contract is invoked exactly once on deployment of the smart contract. The constructor can have parameters so that you can deploy with different values on the MainNet vs TestNet vs a local private network, but they must always have a [default](https://www.typescriptlang.org/docs/handbook/functions.html#optional-and-default-parameters) value. The default value is used during automatic deployment to your local private network during manual testing, as well as to the private network used during automated unit tests, so it's typically best to choose defaults that tailor to those two deployments. For example, you might set a time dependent property to a parameter with a default that is computed based on the current time, or you might set an `Address` property, such as the owner, to the current sender address:

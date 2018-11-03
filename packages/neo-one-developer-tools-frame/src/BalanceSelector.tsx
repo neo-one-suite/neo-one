@@ -97,14 +97,14 @@ export function BalanceSelector() {
                           createCurrentAsset$({ asset$, tokens$ }),
                           accountState$.pipe(filter(utils.notNull)),
                         ).pipe(
-                          switchMap(async ([asset, { currentAccount, account }]) => {
+                          switchMap(async ([asset, { currentUserAccount, account }]) => {
                             if (asset.type === 'token') {
                               const smartContract = nep5.createNEP5SmartContract(
                                 client,
                                 { [asset.token.network]: { address: asset.token.address } },
                                 asset.token.decimals,
                               );
-                              const tokenBalance = await smartContract.balanceOf(currentAccount.id.address, {
+                              const tokenBalance = await smartContract.balanceOf(currentUserAccount.id.address, {
                                 network: asset.token.network,
                               });
 

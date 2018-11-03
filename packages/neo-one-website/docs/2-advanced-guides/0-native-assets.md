@@ -10,6 +10,8 @@ NEO employs the [UTXO](https://en.wikipedia.org/wiki/Unspent_transaction_output)
 
 One commonality between every native asset method is that they must return a `boolean` indicating whether or not the transaction should proceed.
 
+[[toc]]
+
 ## Receive Native Assets
 
 Decorate a method with `@receive` to allow the method to be invoked when receiving native assets:
