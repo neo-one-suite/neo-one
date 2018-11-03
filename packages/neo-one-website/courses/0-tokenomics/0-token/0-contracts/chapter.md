@@ -14,7 +14,7 @@ Before getting started, let's familiarize ourselves with the editor. The editor 
 
 ## Learn
 
-Every NEO•ONE smart contract starts with a typescript source file that exports a single class extending `SmartContract`. The simplest smart contract looks like
+Every NEO•ONE smart contract starts with a TypeScript source file that exports a single class extending `SmartContract`. The simplest smart contract looks like
 
 ```typescript
 import { SmartContract } from '@neo-one/smart-contract';

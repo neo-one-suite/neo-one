@@ -68,6 +68,14 @@ const StyledMarkdown = styled(Markdown)`
     max-width: ${prop('theme.constants.content.maxWidth')};
   }
 
+  & > ol {
+    max-width: ${prop('theme.constants.content.maxWidth')};
+  }
+
+  & > ul {
+    max-width: ${prop('theme.constants.content.maxWidth')};
+  }
+
   &&& > p:nth-child(2) {
     ${prop('theme.fonts.axiformaThin')};
     ${prop('theme.fontStyles.subheading')};

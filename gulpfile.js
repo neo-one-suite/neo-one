@@ -481,34 +481,38 @@ gulp.task('compileBin', () =>
     .pipe(gulp.dest(getDest(MAIN_FORMAT))),
 );
 const bin = (name) => `#!/usr/bin/env node
-const execa = require('execa');
-const path = require('path');
-const semver = require('semver');
+const importLocal = require('import-local');
 
-let args = [];
-if (semver.satisfies(process.version, '8.x')) {
-  args = ['--harmony-async-iteration'];
-} else if (semver.satisfies(process.version, '9.x')) {
-  args = ['--harmony'];
-}
+if (!importLocal(__filename)) {
+  const execa = require('execa');
+  const path = require('path');
+  const semver = require('semver');
 
-const proc = execa('node', args.concat([path.resolve(__dirname, '${name}')]).concat(process.argv.slice(2)), {
-  stdio: 'inherit',
-  env: {
-    NODE_NO_WARNINGS: '1',
-  },
-});
-process.on('SIGTERM', () => proc.kill('SIGTERM'));
-process.on('SIGINT', () => proc.kill('SIGINT'));
-process.on('SIGBREAK', () => proc.kill('SIGBREAK'));
-process.on('SIGHUP', () => proc.kill('SIGHUP'));
-proc.on('exit', (code, signal) => {
-  let exitCode = code;
-  if (exitCode === null) {
-    exitCode = signal === 'SIGINT' ? 0 : 1;
+  let args = [];
+  if (semver.satisfies(process.version, '8.x')) {
+    args = ['--harmony-async-iteration'];
+  } else if (semver.satisfies(process.version, '9.x')) {
+    args = ['--harmony'];
   }
-  process.exit(exitCode);
-});
+
+  const proc = execa('node', args.concat([path.resolve(__dirname, '${name}')]).concat(process.argv.slice(2)), {
+    stdio: 'inherit',
+    env: {
+      NODE_NO_WARNINGS: '1',
+    },
+  });
+  process.on('SIGTERM', () => proc.kill('SIGTERM'));
+  process.on('SIGINT', () => proc.kill('SIGINT'));
+  process.on('SIGBREAK', () => proc.kill('SIGBREAK'));
+  process.on('SIGHUP', () => proc.kill('SIGHUP'));
+  proc.on('exit', (code, signal) => {
+    let exitCode = code;
+    if (exitCode === null) {
+      exitCode = signal === 'SIGINT' ? 0 : 1;
+    }
+    process.exit(exitCode);
+  });
+}
 `;
 gulp.task('createBin', () =>
   gulp

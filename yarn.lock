@@ -13379,6 +13379,11 @@ markdown-it-anchor@^5.0.2:
   resolved "https://registry.yarnpkg.com/markdown-it-anchor/-/markdown-it-anchor-5.0.2.tgz#cdd917a05b7bf92fb736a6dae3385c6d0d0fa552"
   integrity sha512-AFM/woBI8QDJMS/9+MmsBMT5/AR+ImfOsunQZTZhzcTmna3rIzAzbOh5E0l6mlFM/i9666BpUtkqQ9bS7WApCg==
 
+markdown-it-container@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/markdown-it-container/-/markdown-it-container-2.0.0.tgz#0019b43fd02eefece2f1960a2895fba81a404695"
+  integrity sha1-ABm0P9Au7+zi8ZYKKJX7qBpARpU=
+
 markdown-it-table-of-contents@^0.4.3:
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/markdown-it-table-of-contents/-/markdown-it-table-of-contents-0.4.3.tgz#6453925a76e49b9b3d9569a0d89f1c2168b46982"
@@ -18196,6 +18201,11 @@ slide@^1.1.5, slide@^1.1.6:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/slide/-/slide-1.1.6.tgz#56eb027d65b4d2dce6cb2e2d32c4d4afc9e1d707"
   integrity sha1-VusCfWW00tzmyy4tMsTUr8nh1wc=
+
+slugify@^1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/slugify/-/slugify-1.3.2.tgz#b9aac7a964b94319871cf3f6e2cd06d47ee218aa"
+  integrity sha512-RB7T2QO4+F8zc5UA+yujQb8V5GDmyiGzCW7e/x5CyKUEx0xzI9Hz5ptOS85GDBHlDx6LDooyHxw5FwKkximL5Q==
 
 smart-buffer@^4.0.1:
   version "4.0.1"

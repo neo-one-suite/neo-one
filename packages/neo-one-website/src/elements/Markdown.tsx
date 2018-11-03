@@ -1,9 +1,13 @@
 import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
 // @ts-ignore
+import container from 'markdown-it-container';
+// @ts-ignore
 import TOC from 'markdown-it-table-of-contents';
 import * as React from 'react';
 import { css, styled } from 'reakit';
+// @ts-ignore
+import slugify from 'slugify';
 import { ifProp, prop, switchProp } from 'styled-tools';
 
 // tslint:disable
@@ -31,8 +35,7 @@ import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 // @ts-ignore
 import 'prismjs/components/prism-markup';
-// @ts-ignore
-import 'prismjs/components/prism-bash';
+import './prismBash';
 
 Prism.languages.typescript = Prism.languages.extend('javascript', {
   // From JavaScript Prism keyword list and TypeScript language spec: https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#221-reserved-words
@@ -62,8 +65,31 @@ md.set({
   },
 })
   // tslint:disable-next-line no-any
-  .use(anchor as any)
-  .use(TOC, { includeLevel: [2] });
+  .use(anchor as any, {
+    permalink: true,
+    slugify,
+    level: [2, 3, 4],
+  })
+  .use(TOC, {
+    slugify,
+    includeLevel: [2],
+  })
+  .use(TOC, {
+    slugify,
+    markerPattern: /^\[\[toc-reference\]\]/im,
+    format: (content: string) => md.render(content).slice(3, -5),
+    includeLevel: [4],
+  })
+  .use(container, 'warning', {
+    // tslint:disable-next-line:no-any
+    render: (tokens: any, idx: any) => {
+      if (tokens[idx].type === 'container_warning_open') {
+        return '<blockquote class="warning">';
+      }
+
+      return '</blockquote>\n';
+    },
+  });
 
 const headerMargins = css`
   margin-top: 32px;
@@ -75,6 +101,11 @@ const lightCode = css`
   color: ${prop('theme.black')};
   padding: 4px;
   border-radius: 4px;
+`;
+
+const stretchCSS = css`
+  margin-left: -24px;
+  margin-right: -24px;
 `;
 
 const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent'; readonly light: boolean }>`
@@ -129,9 +160,21 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent'; 
     text-decoration: none;
   }
 
+  & a code {
+    color: ${switchProp('linkColor', {
+      primary: prop('theme.primary'),
+      accent: prop('theme.accent'),
+      gray: prop('theme.gray6'),
+    })};
+  }
+
   & a:hover {
     color: ${prop('theme.primaryDark')};
     text-decoration: none;
+  }
+
+  & a:hover code {
+    color: ${prop('theme.primaryDark')};
   }
 
   & a:focus {
@@ -139,9 +182,17 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent'; 
     text-decoration: none;
   }
 
+  & a:focus code {
+    color: ${prop('theme.primaryDark')};
+  }
+
   & a:active {
     color: ${prop('theme.primaryDark')};
     text-decoration: none;
+  }
+
+  & a:active code {
+    color: ${prop('theme.primaryDark')};
   }
 
   & hr {
@@ -186,8 +237,34 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent'; 
   }
 
   & code {
-    ${ifProp('light', lightCode, '')} ${prop('theme.fontStyles.subheading')};
+    ${ifProp('light', lightCode, '')};
+    ${prop('theme.fontStyles.subheading')};
     font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    white-space: nowrap;
+  }
+
+  & .header-anchor {
+    vertical-align: top;
+  }
+
+  & blockquote.warning {
+    background-color: rgba(255, 229, 100, 0.3);
+    border-left-color: #ffe564;
+    border-left-width: 8px;
+    border-left-style: solid;
+    padding: 16px 40px 16px 24px;
+    margin-bottom: 24px;
+    margin-top: 16px;
+    ${stretchCSS};
+  }
+
+  & blockquote.warning p {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  & blockquote.warning p:first-of-type {
+    ${prop('theme.fonts.axiformaBold')};
   }
 `;
 
