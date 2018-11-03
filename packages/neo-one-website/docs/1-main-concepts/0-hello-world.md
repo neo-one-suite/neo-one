@@ -20,7 +20,7 @@ In this guide, we will work through creating a dapp with NEO•ONE starting from
 
 Tip
 
-This guide is designed for people who prefer **learning concepts step by step**. If instead you'd like to learn by doing, check out [NEO•ONE Courses](/course) or the [tutorial](/tutorial). This guide can also serve as a complementary resource to the courses or tutorial.
+This guide is designed for people who prefer **learning concepts step by step**. If instead you'd like to learn by doing, check out [NEO•ONE Courses](/course) or the [tutorial](/tutorial). This guide can also serve as a complementary resource to the courses and tutorial.
 
 :::
 
