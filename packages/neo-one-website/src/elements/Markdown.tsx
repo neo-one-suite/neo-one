@@ -2,13 +2,12 @@ import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
 // @ts-ignore
 import container from 'markdown-it-container';
-// @ts-ignore
-import TOC from 'markdown-it-table-of-contents';
 import * as React from 'react';
 import { css, styled } from 'reakit';
 // @ts-ignore
 import slugify from 'slugify';
 import { ifProp, prop, switchProp } from 'styled-tools';
+import { markdownTOC } from './markdownTOC';
 
 // tslint:disable
 import '../../static/css/prism.css';
@@ -70,15 +69,17 @@ md.set({
     slugify,
     level: [2, 3, 4],
   })
-  .use(TOC, {
+  .use(markdownTOC, {
     slugify,
     includeLevel: [2],
+    name: 'toc',
   })
-  .use(TOC, {
+  .use(markdownTOC, {
     slugify,
     markerPattern: /^\[\[toc-reference\]\]/im,
     format: (content: string) => md.render(content).slice(3, -5),
     includeLevel: [4],
+    name: 'toc_reference',
   })
   .use(container, 'warning', {
     // tslint:disable-next-line:no-any

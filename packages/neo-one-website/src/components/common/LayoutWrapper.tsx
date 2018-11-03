@@ -12,6 +12,11 @@ const Wrapper = styled(Grid)`
   padding-right: 16px;
   width: 100%;
 
+  @media (min-width: ${prop('theme.breakpoints.sm')}) {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
   @media (min-width: ${prop('theme.breakpoints.md')}) {
     width: 90%;
   }

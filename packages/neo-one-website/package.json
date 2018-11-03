@@ -34,7 +34,6 @@
     "markdown-it": "^8.4.2",
     "markdown-it-anchor": "^5.0.2",
     "markdown-it-container": "^2.0.0",
-    "markdown-it-table-of-contents": "^0.4.3",
     "prismjs": "1.15.0",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",

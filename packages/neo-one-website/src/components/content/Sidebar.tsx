@@ -8,7 +8,8 @@ import { SidebarList } from './SidebarList';
 
 const Wrapper = styled(Box)``;
 
-const DesktopSidebarList = styled(SidebarList)`
+const DesktopSidebarWrapper = styled(Box)`
+  background-color: ${prop('theme.gray1')};
   position: fixed;
   z-index: 2;
   height: calc(100vh - 72px);
@@ -127,7 +128,9 @@ interface Props {
 export const Sidebar = ({ current, alwaysVisible, sections, ...props }: Props) => (
   <Wrapper {...props}>
     <SidebarSpacer>
-      <DesktopSidebarList current={current} alwaysVisible={alwaysVisible} sections={sections} />
+      <DesktopSidebarWrapper>
+        <SidebarList current={current} alwaysVisible={alwaysVisible} sections={sections} />
+      </DesktopSidebarWrapper>
     </SidebarSpacer>
     <MobileWrapper>
       <Hidden.Container>

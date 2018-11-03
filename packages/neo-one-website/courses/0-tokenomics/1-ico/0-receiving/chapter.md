@@ -26,11 +26,11 @@ export class Example extends SmartContract {
 }
 ```
 
-In this very simple example, we've defined a method annotated with `@receive`. This enables the method to receive native assets of any kind, including NEO and GAS. Methods marked with `@receive` must return a `boolean` value to indicate whether or not the contract wants to receive the assets. Note, however, that there are cases where the contract may still receive assets, despite returning `false`, due to limitations in how NEO handles native UTXO assets. For these cases, we automatically generate a `refundAssets` method that clients of your smart contract may call to refund assets which were not processed by the smart contract (i.e. the smart contract returned `false` or was not actually called).
+In this very simple example, we've defined a method decorated with `@receive`. This enables the method to receive native assets of any kind, including NEO and GAS. Methods marked with `@receive` must return a `boolean` value to indicate whether or not the contract wants to receive the assets. Note, however, that there are cases where the contract may still receive assets, despite returning `false`, due to limitations in how NEO handles native UTXO assets. For these cases, we automatically generate a `refundAssets` method that clients of your smart contract may call to refund assets which were not processed by the smart contract (i.e. the smart contract returned `false` or was not actually called).
 
 ## Instructions
 
-  1. Add a method called `mintTokens` that's annotated with `@receive` and returns `true`.
+  1. Add a method called `mintTokens` that's decorated with `@receive` and returns `true`.
 
 In the following chapters we'll start expanding the method with more logic like converting NEO to tokens, but for now, we'll just accept all assets.
 
