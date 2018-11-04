@@ -4,7 +4,7 @@ import { Client } from '@neo-one/client';
 // tslint:disable-next-line
 import { FromStream } from '@neo-one/react';
 // tslint:disable-next-line
-import { Button, TextInput } from '@neo-one/react-common';
+import { Button, TextInput } from '@neo-one/react-core';
 import * as React from 'react';
 import { Box, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';

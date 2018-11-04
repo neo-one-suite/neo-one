@@ -87,7 +87,6 @@ const SKIP_PACKAGES = new Set([
   'neo-one-local-singleton',
   'neo-one-node-browser',
   'neo-one-node-browser-worker',
-  'neo-one-react-common',
   'neo-one-smart-contract-test-browser',
   'neo-one-website',
   'neo-one-worker',

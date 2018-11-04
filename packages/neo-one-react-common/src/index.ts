@@ -1,6 +1,5 @@
 /// <reference types="@neo-one/types" />
 export * from './Background';
-export * from './Button';
 export * from './FileDisplay';
 export * from './FileIcon';
 export * from './FileTab';
@@ -15,8 +14,7 @@ export * from './Monogram';
 export * from './Selector';
 export * from './Shadow';
 export * from './SplitPane';
-export * from './TextInput';
 export * from './Tooltip';
 export * from './pure';
-export * from './theme';
 export * from './types';
+export * from '@neo-one/react-core';

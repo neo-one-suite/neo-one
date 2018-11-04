@@ -4,6 +4,7 @@
   "description": "NEO•ONE shared react.",
   "main": "./src/index.ts",
   "dependencies": {
+    "@neo-one/react-core": "1.0.0-preview.3",
     "@neo-one/types": "^1.0.0-preview.3",
     "@types/react": "^16.4.18",
     "react": "^16.6.0",
