@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/server-plugin-project",
-  "version": "1.0.0-preview.3",
+  "version": "1.0.0-preview.4",
   "description": "NEO•ONE server plugin for project functionality.",
   "main": "./src/index.ts",
   "dependencies": {

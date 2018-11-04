@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/developer-tools-frame",
-  "version": "1.0.0-preview.3",
+  "version": "1.0.0-preview.4",
   "description": "NEO•ONE developer tools.",
   "main": "./src/index.tsx",
   "dependencies": {
@@ -8,7 +8,7 @@
     "@neo-one/client-common": "^1.0.0-preview.3",
     "@neo-one/client-core": "^1.0.0-preview.3",
     "@neo-one/react": "^1.0.0-preview.3",
-    "@neo-one/react-common": "^1.0.0-preview.3",
+    "@neo-one/react-common": "^1.0.0-preview.4",
     "@neo-one/types": "^1.0.0-preview.3",
     "@neo-one/utils": "^1.0.0-preview.3",
     "@render-props/size-observer": "^0.1.14",
