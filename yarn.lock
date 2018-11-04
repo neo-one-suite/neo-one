@@ -19700,10 +19700,10 @@ tslint-consistent-codestyle@1.14.0:
     tslib "^1.7.1"
     tsutils "^2.27.2"
 
-tslint-immutable@4.9.0:
-  version "4.9.0"
-  resolved "https://registry.yarnpkg.com/tslint-immutable/-/tslint-immutable-4.9.0.tgz#dcb3b7ea9173ddcc524d35f3c0adfa21516c75cf"
-  integrity sha512-dOnyEVfiNK2fz+iet9FhzxJ4T4aOjK670fS/dnV1F1dtQSm4y3mdrGNocK8lDNJfAggJi6CY9kmb2w7XdooYWQ==
+tslint-immutable@4.9.1:
+  version "4.9.1"
+  resolved "https://registry.yarnpkg.com/tslint-immutable/-/tslint-immutable-4.9.1.tgz#ca4555d04c3995c92c912b9e57502d423151002c"
+  integrity sha512-iIFCq08H4YyNIX0bV5N6fGQtAmjc4OQZKQCgBP5WHgQaITyGAHPVmAw+Yf7qe0zbRCvCDZdrdEC/191fLGFiww==
 
 tslint-microsoft-contrib@5.2.1:
   version "5.2.1"
