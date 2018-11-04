@@ -63,7 +63,7 @@
   },
   "dependencies": {
     "@neo-one/client": "1.0.0-preview.2",
-    "@neo-one/react": "1.0.0-preview.2",
+    "@neo-one/react": "1.0.0-preview.3",
     "@neo-one/smart-contract": "1.0.0-preview.1",
     "bignumber.js": "8.0.1",
     "core-js": "2.5.7",
