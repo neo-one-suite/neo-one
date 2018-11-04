@@ -1,5 +1,5 @@
 import { nep5 } from '@neo-one/client-core';
-import { FromStream, Token } from '@neo-one/react-common';
+import { FromStream } from '@neo-one/react';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
@@ -11,6 +11,7 @@ import { DeveloperToolsContext, DeveloperToolsContextType, WithTokens } from './
 import { Pure } from './Pure';
 import { ToolbarSelector } from './ToolbarSelector';
 import { Asset, ASSETS, getTokenAsset } from './TransferContainer';
+import { Token } from './types';
 import { WithAddError } from './WithAddError';
 
 // tslint:disable-next-line no-any

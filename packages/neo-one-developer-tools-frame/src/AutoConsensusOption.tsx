@@ -1,4 +1,5 @@
-import { Fit, FromStream, Tooltip, TooltipArrow } from '@neo-one/react-common';
+import { FromStream } from '@neo-one/react';
+import { Fit, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
 import { Box, Input, styled } from 'reakit';
 import { WithAutoConsensus } from './DeveloperToolsContext';

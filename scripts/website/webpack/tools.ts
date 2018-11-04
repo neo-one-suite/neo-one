@@ -11,7 +11,7 @@ const TOOLS_PACKAGE = path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-developer-
 export const tools = ({ stage }: { readonly stage: Stage }): webpack.Configuration => ({
   ...common({ stage, bundle: 'tools' }),
   entry: {
-    'tools.raw': path.resolve(TOOLS_PACKAGE, 'src', 'index.tsx'),
+    'tools.raw': path.resolve(TOOLS_PACKAGE, 'src', 'entry.tsx'),
   },
   output: {
     path: DIST_DIR,

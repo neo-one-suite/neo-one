@@ -1,14 +1,13 @@
 // tslint:disable no-null-keyword
 import { TransactionResult, UserAccount } from '@neo-one/client-common';
 import { Client, DeveloperClient, Hash256, nep5 } from '@neo-one/client-core';
-import { Token } from '@neo-one/react-common';
 import BigNumber from 'bignumber.js';
 import { ActionMap, ComposableContainer, EffectMap } from 'constate';
 import _ from 'lodash';
 import * as React from 'react';
 import { Container } from 'reakit';
 import { WithNetworkClient } from './DeveloperToolsContext';
-import { ReactSyntheticEvent } from './types';
+import { ReactSyntheticEvent, Token } from './types';
 import { WithAddError } from './WithAddError';
 
 interface State {

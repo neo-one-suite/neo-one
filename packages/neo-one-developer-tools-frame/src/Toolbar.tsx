@@ -1,5 +1,6 @@
 // tslint:disable no-any
-import { FromStream, Monogram } from '@neo-one/react-common';
+import { FromStream } from '@neo-one/react';
+import { Monogram } from '@neo-one/react-common';
 // @ts-ignore
 import SizeObserver from '@render-props/size-observer';
 import * as React from 'react';

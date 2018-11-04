@@ -1,9 +1,9 @@
 // tslint:disable no-any match-default-export-name
+import { axiforma, theme } from '@neo-one/react-common';
 import * as React from 'react';
 import SelectBase from 'react-select';
 import { styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { axiforma, theme } from './theme';
 
 // tslint:disable-next-line:no-any
 const StyledSelect: any = styled(SelectBase)`

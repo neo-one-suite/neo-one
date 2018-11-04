@@ -1,10 +1,10 @@
 import { Client, DeveloperClient, LocalClient } from '@neo-one/client-core';
-import { FromStream, Token } from '@neo-one/react-common';
+import { FromStream } from '@neo-one/react';
 import localforage from 'localforage';
 import * as React from 'react';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { NetworkClients, ReactSyntheticEvent } from './types';
+import { NetworkClients, ReactSyntheticEvent, Token } from './types';
 
 export interface DeveloperToolsContextTypeBase {
   readonly client: Client;

@@ -1,4 +1,4 @@
-import { FromStream } from '@neo-one/react-common';
+import { FromStream } from '@neo-one/react';
 import * as React from 'react';
 import { MdAccountBalance } from 'react-icons/md';
 import { Box, Overlay, styled } from 'reakit';

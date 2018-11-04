@@ -1,8 +1,10 @@
 // tslint:disable no-any
-import { Button, FromStream, Select, TextInput } from '@neo-one/react-common';
+import { FromStream } from '@neo-one/react';
+import { Button, TextInput } from '@neo-one/react-common';
 import * as React from 'react';
 import { Grid, styled } from 'reakit';
 import { WithTokens } from './DeveloperToolsContext';
+import { Select } from './Select';
 import { ASSETS, getTokenAsset, TransferContainer } from './TransferContainer';
 import { ComponentProps } from './types';
 

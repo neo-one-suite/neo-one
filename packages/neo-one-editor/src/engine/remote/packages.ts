@@ -1,8 +1,6 @@
 import * as client from '@neo-one/client';
 import { BrowserLocalClient, Builder, FileSystem } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
-import * as react from '@neo-one/react';
-import * as reactCommon from '@neo-one/react-common';
 import { WorkerManager } from '@neo-one/worker';
 import { Exports } from './types';
 
@@ -24,16 +22,6 @@ const packages: ReadonlyArray<PackageConfig> = [
     name: '@neo-one/client',
     path: '/node_modules/@neo-one/client/src/index.ts',
     exports: () => client,
-  },
-  {
-    name: '@neo-one/react',
-    path: '/node_modules/@neo-one/react/src/index.ts',
-    exports: () => react,
-  },
-  {
-    name: '@neo-one/react-common',
-    path: '/node_modules/@neo-one/react-common/src/index.ts',
-    exports: () => reactCommon,
   },
   {
     name: '@neo-one/local-singleton',

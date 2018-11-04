@@ -1,18 +1,14 @@
 // tslint:disable no-null-keyword no-any
 import { createPrivateKey } from '@neo-one/client-common';
 import { LocalKeyStore } from '@neo-one/client-core';
-import {
-  Button,
-  FromStream,
-  getWalletSelectorOptions$,
-  makeWalletSelectorValueOption,
-  WalletSelectorBase,
-} from '@neo-one/react-common';
+import { FromStream } from '@neo-one/react';
+import { Button } from '@neo-one/react-common';
 import * as React from 'react';
 import { Grid, styled } from 'reakit';
 import { combineLatest } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { DeveloperToolsContext, DeveloperToolsContextType, WithTokens } from './DeveloperToolsContext';
+import { getWalletSelectorOptions$, makeWalletSelectorValueOption, WalletSelectorBase } from './WalletSelectorBase';
 import { WithAddError } from './WithAddError';
 
 const WalletSelectorWrapper = styled(Grid)`

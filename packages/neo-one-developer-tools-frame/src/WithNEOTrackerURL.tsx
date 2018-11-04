@@ -1,5 +1,5 @@
 // tslint:disable no-null-keyword
-import { FromStream } from '@neo-one/react-common';
+import { FromStream } from '@neo-one/react';
 import * as React from 'react';
 import { concat, defer, of } from 'rxjs';
 import { WithNetworkClient } from './DeveloperToolsContext';
