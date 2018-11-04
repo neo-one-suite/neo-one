@@ -8,7 +8,6 @@ import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { catchError, distinctUntilChanged, filter, map, scan, switchMap } from 'rxjs/operators';
 import { prop } from 'styled-tools';
 import { DeveloperToolsContext, DeveloperToolsContextType, WithTokens } from './DeveloperToolsContext';
-import { Pure } from './Pure';
 import { ToolbarSelector } from './ToolbarSelector';
 import { Asset, ASSETS, getTokenAsset } from './TransferContainer';
 import { Token } from './types';
@@ -85,73 +84,68 @@ export function BalanceSelector() {
   return (
     <WithAddError>
       {(addError) => (
-        <Pure>
-          <WithTokens>
-            {(tokens$) => (
-              <>
-                <DeveloperToolsContext.Consumer>
-                  {({ client, accountState$ }: DeveloperToolsContextType) => (
-                    <FromStream
-                      props={[addError, accountState$, asset$, tokens$]}
-                      createStream={() =>
-                        combineLatest(
-                          createCurrentAsset$({ asset$, tokens$ }),
-                          accountState$.pipe(filter(utils.notNull)),
-                        ).pipe(
-                          switchMap(async ([asset, { currentUserAccount, account }]) => {
-                            if (asset.type === 'token') {
-                              const smartContract = nep5.createNEP5SmartContract(
-                                client,
-                                { [asset.token.network]: { address: asset.token.address } },
-                                asset.token.decimals,
-                              );
-                              const tokenBalance = await smartContract.balanceOf(currentUserAccount.id.address, {
-                                network: asset.token.network,
-                              });
+        <WithTokens>
+          {(tokens$) => (
+            <>
+              <DeveloperToolsContext.Consumer>
+                {({ client, accountState$ }: DeveloperToolsContextType) => (
+                  <FromStream
+                    props={[addError, accountState$, asset$, tokens$]}
+                    createStream={() =>
+                      combineLatest(
+                        createCurrentAsset$({ asset$, tokens$ }),
+                        accountState$.pipe(filter(utils.notNull)),
+                      ).pipe(
+                        switchMap(async ([asset, { currentUserAccount, account }]) => {
+                          if (asset.type === 'token') {
+                            const smartContract = nep5.createNEP5SmartContract(
+                              client,
+                              { [asset.token.network]: { address: asset.token.address } },
+                              asset.token.decimals,
+                            );
+                            const tokenBalance = await smartContract.balanceOf(currentUserAccount.id.address, {
+                              network: asset.token.network,
+                            });
 
-                              return tokenBalance.toFormat();
-                            }
+                            return tokenBalance.toFormat();
+                          }
 
-                            const balance = account.balances[asset.value] as BigNumber | undefined;
+                          const balance = account.balances[asset.value] as BigNumber | undefined;
 
-                            return balance === undefined ? '0' : balance.toFormat();
-                          }),
-                          catchError((error: Error) => {
-                            addError(error);
+                          return balance === undefined ? '0' : balance.toFormat();
+                        }),
+                        catchError((error: Error) => {
+                          addError(error);
 
-                            return of('0');
-                          }),
-                        )
+                          return of('0');
+                        }),
+                      )
+                    }
+                  >
+                    {(value) => <Wrapper data-test="neo-one-balance-selector-value">{value}</Wrapper>}
+                  </FromStream>
+                )}
+              </DeveloperToolsContext.Consumer>
+              <FromStream props={[asset$, tokens$]} createStream={() => createCurrentAssetToken$({ asset$, tokens$ })}>
+                {({ tokens, asset }) => (
+                  <AssetInput
+                    data-test-selector="neo-one-balance-selector-selector"
+                    data-test-container="neo-one-balance-selector-container"
+                    data-test-tooltip="neo-one-balance-selector-tooltip"
+                    help="Select Coin"
+                    value={asset}
+                    options={ASSETS.concat(tokens.map(getTokenAsset))}
+                    onChange={(option: Asset | Asset[] | undefined | null) => {
+                      if (option != undefined && !Array.isArray(option)) {
+                        onChangeAsset(option);
                       }
-                    >
-                      {(value) => <Wrapper data-test="neo-one-balance-selector-value">{value}</Wrapper>}
-                    </FromStream>
-                  )}
-                </DeveloperToolsContext.Consumer>
-                <FromStream
-                  props={[asset$, tokens$]}
-                  createStream={() => createCurrentAssetToken$({ asset$, tokens$ })}
-                >
-                  {({ tokens, asset }) => (
-                    <AssetInput
-                      data-test-selector="neo-one-balance-selector-selector"
-                      data-test-container="neo-one-balance-selector-container"
-                      data-test-tooltip="neo-one-balance-selector-tooltip"
-                      help="Select Coin"
-                      value={asset}
-                      options={ASSETS.concat(tokens.map(getTokenAsset))}
-                      onChange={(option: Asset | Asset[] | undefined | null) => {
-                        if (option != undefined && !Array.isArray(option)) {
-                          onChangeAsset(option);
-                        }
-                      }}
-                    />
-                  )}
-                </FromStream>
-              </>
-            )}
-          </WithTokens>
-        </Pure>
+                    }}
+                  />
+                )}
+              </FromStream>
+            </>
+          )}
+        </WithTokens>
       )}
     </WithAddError>
   );

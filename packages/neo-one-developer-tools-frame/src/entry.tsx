@@ -4,7 +4,8 @@ import '../static/fonts.css';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { DeveloperTools } from './DeveloperTools';
+import { BehaviorSubject } from 'rxjs';
+import { Clients, DeveloperTools } from './DeveloperTools';
 import { ResizeHandler } from './ResizeHandler';
 import { DeveloperToolsOptions } from './types';
 
@@ -30,16 +31,29 @@ applyStyles(root, {
 });
 document.body.appendChild(root);
 
-// tslint:disable-next-line no-let
+// tslint:disable no-let
 let resizeHandler: ResizeHandler | undefined;
+let clients$: BehaviorSubject<Clients> | undefined;
+let rendered = false;
+// tslint:enable no-let
 
 const render = ({ onResize, maxWidth, ...props }: DeveloperToolsOptions) => {
   if (resizeHandler === undefined) {
     resizeHandler = new ResizeHandler(onResize, maxWidth);
-    ReactDOM.render(<DeveloperTools {...props} resizeHandler={resizeHandler} />, root);
   } else {
     resizeHandler.updateOnResize(onResize);
     resizeHandler.updateMaxWidth(maxWidth);
+  }
+
+  if (clients$ === undefined) {
+    clients$ = new BehaviorSubject(props);
+  } else {
+    clients$.next(props);
+  }
+
+  if (!rendered) {
+    rendered = true;
+    ReactDOM.render(<DeveloperTools clients$={clients$} resizeHandler={resizeHandler} />, root);
   }
 };
 

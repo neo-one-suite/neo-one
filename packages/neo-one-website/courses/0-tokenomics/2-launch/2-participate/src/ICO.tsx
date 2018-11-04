@@ -74,8 +74,17 @@ export class ICO extends React.Component<Props, State> {
       <WithContracts>
         {/*
           // @ts-ignore */}
-        {({ token }) => (
-          <FromStream props={[token]} createStream={() => defer<TokenInfoResult>(async () => getTokenInfo(token))}>
+        {({ token, client }) => (
+          <FromStream
+            props={[client, token]}
+            createStream={() =>
+              defer<TokenInfoResult>(async () => {
+                const userAccount = client.getCurrentUserAccount();
+
+                return getTokenInfo(token, userAccount === undefined ? undefined : userAccount.id.address);
+              })
+            }
+          >
             {(value) => (
               <Wrapper>
                 <InnerWrapper>

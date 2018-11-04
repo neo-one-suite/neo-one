@@ -10,7 +10,7 @@ import { ToastsContext, ToastsContextType } from './ToastsContainer';
 
 const Wrapper = styled.div`
   bottom: 48px;
-  left: 80px;
+  left: 24px;
   position: fixed;
   z-index: 1050;
 `;
