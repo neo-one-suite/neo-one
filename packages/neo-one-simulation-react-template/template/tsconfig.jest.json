@@ -1,3 +1,0 @@
-{
-  "extends": "./tsconfig/tsconfig.es2018.cjs.json"
-}

@@ -11,7 +11,6 @@
     "@neo-one/server-plugin-neotracker": "^1.0.0-preview.3",
     "@neo-one/server-plugin-network": "^1.0.0-preview.3",
     "@neo-one/server-plugin-project": "^1.0.0-preview.3",
-    "@neo-one/server-plugin-simulation": "^1.0.0-preview.3",
     "@neo-one/server-plugin-wallet": "^1.0.0-preview.3",
     "@neo-one/types": "^1.0.0-preview.3",
     "@neo-one/utils": "^1.0.0-preview.3",
