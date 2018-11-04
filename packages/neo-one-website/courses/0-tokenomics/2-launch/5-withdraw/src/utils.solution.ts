@@ -89,7 +89,7 @@ export const handleWithdraw = async (
           {
             asset: Hash256.NEO,
             amount: balance,
-            address: currentAccount.id.address,
+            to: currentAccount.id.address,
           },
         ],
       });

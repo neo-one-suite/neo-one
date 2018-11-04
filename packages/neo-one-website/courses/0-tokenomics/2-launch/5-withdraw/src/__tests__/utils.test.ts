@@ -129,7 +129,7 @@ describe('utils', () => {
         network: networkName,
         address: token.definition.networks[networkName].address,
       });
-      expect(account.balance[Hash256.NEO]).toBeUndefined();
+      expect(account.balances[Hash256.NEO]).toBeUndefined();
     });
   });
 });

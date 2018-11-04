@@ -21,6 +21,7 @@ const Wrapper = styled(Grid)`
 const ToastWrapper = styled(Box)`
   padding: 8px;
   border-top: 1px solid rgba(0, 0, 0, 0.3);
+  min-width: 0;
 `;
 
 const ToastHeading = styled(Grid)`
