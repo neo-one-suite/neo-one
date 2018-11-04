@@ -12,7 +12,7 @@ The NEO•ONE client APIs are organized into two packages, `@neo-one/client` whi
 
 ## Client
 
-The `@neo-one/client` APIs center around the instances of the `Client` class. The `Client` class abstracts away user accounts and even how those accounts are provided to your dapp, for example, they might come from an extension like NEX, dapp browser like nOS or through some other integration.
+The `@neo-one/client` APIs center around instances of the `Client` class. The `Client` class abstracts away user accounts and even how those accounts are provided to your dapp, for example, they might come from an extension like NEX, dapp browser like nOS or through some other integration.
 
 :: warning
 
@@ -24,7 +24,7 @@ Do not roll your own wallet when creating a dapp. This fractures the ecosystem a
 
 The `Client` class also contains a few methods that may be useful in the course of developing a dapp:
 
-  - `getCurrentUserAccount(): UserAccount | undefined` - Returns the currently selected `UserAccount`, if one exists.
+  - `getCurrentUserAccount(): UserAccount | undefined` - Returns the currently selected `UserAccount`. Returns `undefined` is there are no `UserAccount`s.
   - `getCurrentNetwork(): NetworkType` - Returns the currently selected network, a string that will be `'main'` for the MainNet, `'test'` for the TestNet, and typically `'local'` for a local private network.
   - `getAccount(id: UserAccountID): Promise<Account>` - Returns an object containing the native asset balances for a given `UserAccountID`.
 
@@ -89,9 +89,20 @@ You'll notice that all methods in the client APIs take a `Monitor` object. This 
 
 :::
 
+Putting this all together, if we wanted to transfer funds to another account, but only if the account is empty, we would do:
+
+```typescript
+const account = await client.getAccount(otherAccountID);
+if (account.balances[Hash256.NEO] === undefined) {
+  await client.transfer.confirmed(new BigNumber(10), Hash256.NEO, otherAccountID.address);
+}
+```
+
+We'll learn more about the `confirmed` property in the next chapter. Also take note of the `Hash256.NEO` property, which works just like the `Hash256.NEO` property in smart contracts and can be imported directly from `@neo-one/client`.
+
 ## Toolchain Code Generation
 
-This guide will focus on the `@neo-one/client` APIs, and in particular, on the APIs automatically generated after building your smart contracts by running `neo-one build`. Running `neo-one build` will emit TypeScript files, let's briefly cover what each one contains.
+The NEO•ONE toolchain generates many files that contain helpers and APIs that are essential for dapp development. Running `neo-one build` will emit TypeScript files, let's briefly cover what each one contains.
 
 ::: warning
 
@@ -103,7 +114,7 @@ The output directory for generated files is configurable. You can also change th
 
 For each contract, the toolchain will emit 3 files:
 
-  - `one/generated/<ContractName>/abi.ts` - Contains the ABI that generate the client smart contract APIs at runtime that we'll discuss in this chapter.
+  - `one/generated/<ContractName>/abi.ts` - Contains the ABI that generates the client smart contract APIs at runtime that we'll discuss in the next chapter.
   - `one/generated/<ContractName>/contract.ts` - Contains the smart contract definition, which contains the ABI, the source maps for the contract and a mapping from network name to deployed address for the smart contract. Initially the network mapping will only contain the `local` network which represents your local development network. Once you deploy your smart contract to the TestNet or MainNet, it will also contain deployed contract addresses for those networks. The client APIs automatically choose which address to work with based on the network of the user account that is initiating the request. This file also contains a helper function for creating the smart contract APIs given a `Client`.
   - `one/generated/<ContractName>/types.ts` - Contains the TypeScript type definitions for the smart contract client APIs.
 
@@ -113,7 +124,7 @@ For each contract, the toolchain will emit 3 files:
   - `one/generated/projectID.ts` - This contains a unique identifier for your project. The NEO•ONE toolchain stores some of the information it needs locally on your machine referenced by this project identifier. This information should not be checked in, however we need to be able to associate it with a given project, hence we have the `projectID`.
   - `one/generated/react.tsx` - Contains two react components, that when used together allow you to easily access all of the tools you need to write a dapp with React throughout your component tree. Read more in the [React](/docs/react) advanced guide.
   - `one/generated/sourceMaps.ts` - Contains all of the smart contract source maps. These source maps are not included in the production build in order to reduce the bundle size.
-  - `one/generated/test.ts` - Contains the `withContracts` test helper. We'll learn more about this helper in the next chapter.
+  - `one/generated/test.ts` - Contains the `withContracts` test helper. We'll learn more about this helper in the following chapters.
   - `one/generated/types.ts` - Contains the `Contracts` type whose properties are the smart contract APIs for your dapp.
 
 ## Integration

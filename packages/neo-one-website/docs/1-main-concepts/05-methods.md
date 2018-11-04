@@ -33,9 +33,9 @@ Public instance methods come in several flavors but they effectively break down 
 
   1. Normal instance methods. These have no restrictions and work identically to instance methods in normal TypeScript.
   2. Constant instance methods. Designated with the `@constant` decorator, these methods may not modify smart contract properties.
-  3. Native asset instance methods. Designated with the `@receive`, `@sendUnsafe`, `@send` and `@claim` decorators. Read more about these in the advanced guide, [Native Assets](/docs/native-assets)
+  3. Native asset instance methods. Designated with the `@receive`, `@sendUnsafe`, `@send` and `@claim` decorators. Read more about these in the [Native Assets](/docs/native-assets) advanced guide.
 
-Public instance methods define the API of the smart contract. In the following example we have two methods. One is a constant method since it's decorated with `@constant`. The other is a normal instance method modifies the smart contract propery `mutableClosing`.
+Public instance methods define the API of the smart contract. In the following example we have two methods. One is a constant method since it's decorated with `@constant`. The other is a normal instance method which modifies the smart contract propery `mutableClosing`.
 
 ```typescript
 export class HelloWorld extends SmartContract {
@@ -52,5 +52,4 @@ export class HelloWorld extends SmartContract {
 }
 ```
 
-
-Private and protected instance methods are just helper methods, same as normal TypeScript, but be aware that any private or protected methods invoked from a public method must respect the restrictions of the public method. That is, for example, you can't call a private or protected method which modifies a smart contract property from a `@constant` public method.
+Private and protected instance methods are just helper methods, same as normal TypeScript, but be aware that any private or protected methods invoked from a public method must respect the restrictions of the public method. For example, you can't call a private or protected method which modifies a smart contract property from a `@constant` public method.

@@ -6,7 +6,7 @@ title: Smart Contract APIs
 
 The generated smart contract client APIs correspond directly with the properties and methods of your smart contract.
 
-The smart contract APIs are created at runtime based on the generated ABI in `one/generated/<ContractName>/abi.ts`. The exact structure of the ABI is not too important, we just need to understand what's happening at a high level - for every public property and method of your smart contract, a corresponding method is created on the smart contract object.
+The smart contract APIs are created at runtime based on the generated ABI in `one/generated/<ContractName>/abi.ts`. The exact structure of the ABI is not too important, we just need to understand what's happening at a high level; for every public property and method of your smart contract, a corresponding method is created on the smart contract object.
 
 [[toc]]
 
@@ -15,7 +15,7 @@ The smart contract APIs are created at runtime based on the generated ABI in `on
 Each public property is translated to either a single method or two methods:
 
   - If the property is readonly, then it's translated to a method with the same name.
-  - If the property is mutable, then it's translated to two methods. One that serves to fetch the current value of that property and is named the same as the method. The other serves to set the value of the property and is named `set<PropertyName>`.
+  - If the property is mutable, then it's translated to two methods. One that's named the same as the property and serves to fetch the current value. The other is named `set<PropertyName>` and serves to set the value of the property.
 
 Let's take a look at an example:
 
@@ -36,12 +36,11 @@ would result in an object with three properties:
 
   - `owner(): Promise<AddressString>` - a method that returns a `Promise<AddressString>` which resolves to the current value of the `owner` property of the smart contract.
   - `myValue(): Promise<string>` - a method that returns a `Promise<string>` which resolves to the current value of the `myValue` property of the smart contract.
-  - `setMyValue(value: string): Promise<TransactionResult<InvokeReceipt<void, ContractEvent>, InvocationTransaction>>` a method which takes a `string` parameter to set as the current value of `myProperty` and that returns a `Promise` that resolves to a `TransactionResult` object. We'll talk more about this somewhat complex looking `TransactionResult` type in the next section.
+  - `setMyValue(value: string): Promise<TransactionResult>` a method which takes a `string` parameter to set as the current value of `myProperty` and that returns a `Promise` that resolves to a `TransactionResult` object. We'll talk more about the `TransactionResult` type in the next section.
 
-Notice how the smart contract client APIs correspond directly with the properties defined in the smart contract. The main difference is that reading properties requires an asynchronous action - we need to make a request to a node to determine the current value. Thus, the methods return a `Promise` which will resolve to a value with the type of the property.
+Notice how the smart contract client APIs correspond directly with the properties defined in the smart contract. The main difference is that reading properties requires an asynchronous action - we need to make a request to a node to determine the current value. Thus, the methods return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which will resolve to a value with the type of the property.
 
 `setMyValue` works the same as a normal instance method, which we'll cover in the next section.
-
 
 ## Methods
 
@@ -60,7 +59,7 @@ export class Contract extends SmartContract {
 }
 ```
 
-Then calling the generated helper method `createContractSmartContract` would result in an object with one property:
+The generated helper method `createContractSmartContract` will return an object with one property:
 
   - `balanceOf(value: AddressString): Promise<BigNumber>` - a method that returns a `Promise<BigNumber>` which resolves to the result of calling `balanceOf` on the smart contract with the provided `address`.
 
@@ -83,9 +82,11 @@ export class Contract extends SmartContract {
 }
 ```
 
-The smart contract object returned by `createContractSmartContract` would contain one property:
+The smart contract object returned by `createContractSmartContract` will contain one property:
 
-  - `transfer(from: AddressString, to: AddressString, amount: Fixed<8>): Promise<TransactionResult<InvokeReceipt<boolean, ContractEvent>, InvocationTransaction>>`.
+```typescript
+transfer(from: AddressString, to: AddressString, amount: Fixed<8>): Promise<TransactionResult<InvokeReceipt<boolean, ContractEvent>, InvocationTransaction>>
+```
 
 Calling this method corresponds to the first step in the process. The `Promise` will resolve once the transaction has been relayed to the blockchain. The `TransactionResult` object contains two properties:
 
@@ -101,9 +102,9 @@ interface TransactionResult<
 }
 ```
 
-The `transaction` property contains the relayed transaction object. In the above case it will be an `InvocationTransaction` since all normal instance smart contract methods correspond to relaying an `InvocationTransaction` which invokes the method.
+The `transaction` property contains the relayed transaction object. In the above case it will be an `InvocationTransaction` since all normal smart contract methods correspond to relaying an `InvocationTransaction` which invokes the method.
 
-The `confirmed` method corresponds to the second step of the process. Calling `confirmed` returns a `Promise` which resolves once the transaction has been confirmed on, and permanently persisted to, the blockchain. The `Promise` resolves to a "receipt" of this confirmation. Every transaction receipt contains at least three properties:
+The `confirmed` method corresponds to the second step of the process. Calling `confirmed` returns a `Promise` which resolves once the transaction has been confirmed on and permanently persisted to the blockchain. The `Promise` resolves to a "receipt" of this confirmation. Every transaction receipt contains at least three properties:
 
 ```typescript
 interface TransactionReceipt {
@@ -128,8 +129,7 @@ Normal instance method invocations return a special receipt called an `InvokeRec
 interface InvokeReceipt<
   TReturn extends Return,
   TEvent extends Event<string, any>
->
-  extends TransactionReceipt {
+> extends TransactionReceipt {
   /**
    * The result of the invocation.
    */
@@ -149,7 +149,7 @@ interface InvokeReceipt<
 }
 ```
 
-The `result` property indicates success or failure based on the `state` property of the object - either `'HALT'` for success, or `'FAULT'` for failure. On success, the result object contains the property `value` which is the return value of the invocation. On failure, the result object contains the property `message` which will contain a descriptive message of the reason why the transaction failed.
+The `result` property indicates success or failure based on the `state` property of the object - either `'HALT'` for success, or `'FAULT'` for failure. On success, the return value of the invocation is stored in the `value` property of the object. On failure, a descriptive message of the reason why the transaction failed is stored in the `message` property.
 
 ```typescript
 interface InvocationResultBase {
@@ -186,15 +186,19 @@ interface InvocationResultError extends InvocationResultBase {
 }
 ```
 
-Both success and failure contain properties which contain the total GAS consumed
+Both success and failure contain properties which contain the total GAS consumed and cost.
+
 Putting this all together, a common pattern for invoking smart contract methods is the following:
 
 ```typescript
 // Indicate in the UI that the transaction is being relayed.
+
 const result = await contract.transfer(from, to, amount);
-// Indicate in the UI that we're waiting for confirmation.
-// Process the transaction that was relayed
+
+// Indicate in the UI that we're waiting for confirmation
+// and process the transaction that was relayed
 const transaction = result.transaction
+
 const receipt = await result.confirmed();
 if (receipt.result.state === 'FAULT') {
   // Handle the failure, possibly processing the error message for display in the UI
@@ -212,9 +216,12 @@ Every normal instance method also contains a `confirmed` property which is a sho
 
 ```typescript
 // Indicate in the UI that the transaction is being processed (both relayed and confirmed).
+
 const result = await contract.transfer.confirmed(from, to, amount);
-// Process the transaction that was relayed
+
+// Process the transaction that was relayed AND confirmed
 const transaction = receipt.transaction
+
 if (receipt.result.state === 'FAULT') {
   // Handle the failure, possibly processing the error message for display in the UI
 } else {
@@ -229,7 +236,7 @@ The only difference is the `Promise` resolves with an additional property, `tran
 
 ## Common Properties
 
-In addition to the generated methods mentioned above, the smart contract object contains all contain a few common properties:
+In addition to the generated methods mentioned above, the smart contract object contains a few common properties:
 
 ```typescript
 interface SmartContract<
@@ -273,7 +280,12 @@ interface SmartContract<
 
 Let's go through each in more detail.
 
-`definition` is simply the `SmartContractDefinition` that generated the smart contract API object. This is the object created by the automatically generated helper method in `one/contracts/<ContractName>/contract.ts`.
+`definition` is simply the `SmartContractDefinition` that generated the smart contract API object. This is the object created by the automatically generated helper method in `one/contracts/<ContractName>/contract.ts`. This is most commonly used to get the current `Address` of the smart contract we're interacting with:
+
+```typescript
+const network = client.getCurrentNetwork();
+const tokenAddress = token.definition.networks[network].address;
+```
 
 `client` is the `Client` that was used to create the smart contract API object, and is the underlying client used for all smart contract operations.
 
@@ -287,7 +299,7 @@ for await (const event of contract.iterEvents()) {
 
 `iterLogs` is the same as `iterEvents` but for log notifications, i.e. unstructured strings. Note that NEO•ONE smart contracts intentionally do not support nor emit log events because any time you might want to emit a log event, we believe it's more future-proof to emit a structured event. However, when integrating with external contracts, you may want to iterate over the logs that it emits.
 
-`iterActions` is simply an `AsyncIterable` over both the events and logs of the smart contract, in the order that they were seen.
+`iterActions` is simply an `AsyncIterable` over both the events and logs of the smart contract in the order that they were seen.
 
 All of the `iter` methods accept a `SmartContractIterOptions` object:
 

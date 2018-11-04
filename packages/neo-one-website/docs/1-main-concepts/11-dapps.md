@@ -10,7 +10,7 @@ In addition to the client APIs we've already walked through, there's a few prope
 
 ## Reactive
 
-NEO•ONE uses [Observables](http://reactivex.io/) using [RxJS](http://reactivex.io/rxjs) to enable reactivity in dapps. The `Client` class has several `Observable` properties that can be subscribed to in order to update application state and the application UI. The most commonly used is the `block$` property:
+NEO•ONE uses [Observables](http://reactivex.io/) with [RxJS](http://reactivex.io/rxjs) to enable reactivity in dapps. The `Client` class has several `Observable` properties that can be subscribed to in order to update application state and the application UI. The most commonly used is the `block$` property:
 
 ```typescript
 class Client {
@@ -26,9 +26,9 @@ class Client {
 }
 ```
 
-The `Observable` emits a value whenever a new block is persisted to the blockchain for the given network. The network corresponds to the currently selected user account's network. The `Observable` automatically updates to start emitting new blocks form another network whenever the underlying network changes, due to selecting an account on a different network.
+The `Observable` emits a value whenever a new block is persisted to the blockchain for the given network. The `network` property corresponds to the currently selected user account's network. The `Observable` automatically updates to start emitting new blocks from another network whenever the underlying network changes due to a change in the selected user account.
 
-We can update application state that depends on new blocks by subscribing to the `Observable`:
+We can update application state that depends on new blocks by subscribing to the `block$` `Observable`:
 
 ```typescript
 client.block$.subscribe(({ block, network }) => {
@@ -40,7 +40,7 @@ client.block$.subscribe(({ block, network }) => {
 
 Tip
 
-If you're using React, check out the `FromStream` component in the [React](/docs/react) advanced guide for an easy way to integrate `Observable`s in your application.
+If you're using React, check out the `FromStream` component in the [React](/docs/react) advanced guide for a streamlined way to integrate `Observable`s in your application.
 
 :::
 
@@ -62,6 +62,7 @@ client.block$.pipe(
   if (result === undefined) {
     // Update the UI when a user account is not selected
   } else {
+    const { neo, gas } = result;
     // Update the UI with the new neo and gas values.
   }
 });
@@ -85,6 +86,22 @@ class Client {
   >;
 }
 ```
+
+Thus, we can simplify the above example to just:
+
+```typescript
+client.accountState$.subscribe((result) => {
+  if (result === undefined) {
+    // Update the UI when a user account is not selected
+  } else {
+    const neo = result.account.balances[Hash256.NEO];
+    const gas = result.account.balances[Hash256.GAS];
+    // Update the UI with the new neo and gas values.
+  }
+})
+```
+
+Take a look at the [@neo-one/client](/docs/client) reference for details on all available `Observable`s.
 
 ## Developer Tools
 

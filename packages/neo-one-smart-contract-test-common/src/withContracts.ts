@@ -56,6 +56,8 @@ export interface TestOptions {
   readonly networkName: string;
   /**
    * `Client` that has been pre-configured with the master account for the local network as well as each of the accounts in `accountIDs`.
+   *
+   * This user account is also the currently selected user account in the `Client` and the one that deployed the contracts.
    */
   readonly client: Client<{
     readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>;

@@ -55,7 +55,7 @@ export class Bar extends SmartContract {
 
 Notice that we also have to define the interface of the smart contract explicitly. The instance returned by `SmartContract.for` will match the interface we've defined and then we can access any of its public properties and methods.
 
-We also have to declare the events we expect to be emitted by the underlying contract explicitly using `declareEvent`. The `declareEvent` method works the same as `createEventNotifier` except it does not return a function that can be called to emit an event - instead it just informs the NEO•ONE toolchain that there are additional events that it needs to register with the NEO•ONE client APIs.
+We also have to declare the events we expect to be emitted by the underlying contract explicitly using `declareEvent`. The `declareEvent` method works the same as `createEventNotifier` except it does not return a function that can be called to emit an event. Instead, it just informs the NEO•ONE toolchain that there are additional events that it needs to register with the NEO•ONE client APIs.
 
 ::: warning
 

@@ -22,7 +22,7 @@ The standard library includes several specialized value types which are defined 
 
 Each of the value types can be created from a string literal using the `from` [static method](https://www.typescriptlang.org/docs/handbook/classes.html#static-properties), for example, `Address.from('APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR')`. `Hash256` also contains static properties for the `NEO` and `GAS` `Hash256` values.
 
-The `Address` type has a commonly used static method, `isCaller`, which is used to check that the argument `Address` directly called and approved the current method invocation.
+The `Address` type has a commonly used static method, `isCaller`, which is used to check that the passed `Address` directly called and approved the current method invocation.
 
 ```typescript
 Address.isCaller(address);
@@ -44,7 +44,7 @@ This makes it easy to do things like display the result of a smart contract meth
 
 The `Blockchain` value contains several properties pertaining to the current state of the blockchain, the current transaction and the current invocation:
 
-  - `currentBlockTime` - the timestamp of the `Block` that this `Transaction` will be included in.
-  - `currentHeight` - index of the last `Block` persisted to the blockchain.
-  - `currentTransaction` - the current `InvocationTransaction`
-  - `currentCallerContract` - the `Address` of the smart contract that directly invoked this contract. May be `undefined` if the current invocation was not from another smart contract.
+  - `Blockchain.currentBlockTime` - the timestamp of the `Block` that this `Transaction` will be included in.
+  - `Blockchain.currentHeight` - index of the last `Block` persisted to the blockchain.
+  - `Blockchain.currentTransaction` - the current `InvocationTransaction`
+  - `Blockchain.currentCallerContract` - the `Address` of the smart contract that directly invoked this contract. May be `undefined` if the current invocation was not from another smart contract.
