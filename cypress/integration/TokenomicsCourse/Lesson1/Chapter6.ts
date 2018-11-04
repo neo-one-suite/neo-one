@@ -12,13 +12,13 @@ describe('Tokenomics - Lesson 1 - Chapter 6', () => {
       {
         owner: 'ts',
         text: "Property 'issue' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
-        startLine: 33,
+        startLine: 34,
         endLine: 40,
       },
       {
         owner: 'ts',
         text: "Property 'issue' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
-        startLine: 47,
+        startLine: 51,
         endLine: 46,
       },
     ],

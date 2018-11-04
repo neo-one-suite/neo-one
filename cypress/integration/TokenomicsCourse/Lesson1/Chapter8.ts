@@ -12,25 +12,25 @@ describe('Tokenomics - Lesson 1 - Chapter 8', () => {
       {
         owner: 'ts',
         text: "Property 'transfer' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
-        startLine: 65,
-        endLine: 15,
-      },
-      {
-        owner: 'ts',
-        text: "Property 'transfer' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
-        startLine: 69,
-        endLine: 15,
-      },
-      {
-        owner: 'ts',
-        text: "Property 'transfer' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
         startLine: 71,
         endLine: 15,
       },
       {
         owner: 'ts',
         text: "Property 'transfer' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
-        startLine: 109,
+        startLine: 75,
+        endLine: 15,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'transfer' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 77,
+        endLine: 15,
+      },
+      {
+        owner: 'ts',
+        text: "Property 'transfer' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
+        startLine: 119,
         endLine: 21,
       },
     ],

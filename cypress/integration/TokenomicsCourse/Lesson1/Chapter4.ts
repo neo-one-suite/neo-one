@@ -12,7 +12,7 @@ describe('Tokenomics - Lesson 1 - Chapter 4', () => {
       {
         owner: 'ts',
         text: "Property 'balanceOf' does not exist on type 'TokenSmartContract<Client<any, any>>'.",
-        startLine: 21,
+        startLine: 18,
         endLine: 15,
       },
     ],

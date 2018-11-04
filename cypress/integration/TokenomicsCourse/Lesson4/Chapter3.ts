@@ -8,12 +8,13 @@ describe('Tokenomics - Lesson 4 - Chapter 3', () => {
   lesson4({
     chapter: 3,
     error: 'expect(received).toEqual(expected)',
+    contracts: ['Escrow', 'Token'],
     problems: [
       {
         owner: 'ts',
         text:
           "This condition will always return 'true' since the types '\"balanceAvailable\"' and '\"transfer\"' have no overlap.",
-        startLine: 65,
+        startLine: 55,
         endLine: 11,
       },
     ],

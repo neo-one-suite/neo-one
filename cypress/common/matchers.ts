@@ -226,6 +226,8 @@ const checkTest = ({ name, state, error }: Test) => {
 export const enterSolution = ({ path }: { readonly path: string }) => {
   cy.get('[data-test=docs-footer-solution-button]').click();
   cy.get(`[data-test="docs-solution-file-tab-${path}"]`).click();
+  cy.get(`[data-test="editor-header-file-tab-/${path}"]`).click();
+
   cy.get('[data-test=monaco-editor] textarea')
     .type('{cmd}a', { force: true })
     .type('{backspace}', { force: true });
@@ -236,18 +238,17 @@ export const enterSolution = ({ path }: { readonly path: string }) => {
       const innerValues = value.split('(');
       innerValues.forEach((innerValue, innerIdx) => {
         const innerInnerValues = innerValue.split('[');
-        innerInnerValues
-          .filter((innerInnerValue) => innerInnerValue !== '')
-          .forEach((innerInnerValue, innerInnerIdx) => {
+        innerInnerValues.forEach((innerInnerValue, innerInnerIdx) => {
+          if (innerInnerValue !== '') {
             cy.get('[data-test=monaco-editor] textarea').type(innerInnerValue, { force: true });
-
-            if (innerInnerIdx !== innerInnerValues.length - 1) {
-              cy.get('[data-test=monaco-editor] textarea').type('[', { force: true });
-              cy.wait(50);
-              cy.get('[data-test=monaco-editor] textarea').type('{rightarrow}', { force: true });
-              cy.get('[data-test=monaco-editor] textarea').type('{backspace}', { force: true });
-            }
-          });
+          }
+          if (innerInnerIdx !== innerInnerValues.length - 1) {
+            cy.get('[data-test=monaco-editor] textarea').type('[', { force: true });
+            cy.wait(50);
+            cy.get('[data-test=monaco-editor] textarea').type('{rightarrow}', { force: true });
+            cy.get('[data-test=monaco-editor] textarea').type('{backspace}', { force: true });
+          }
+        });
 
         if (innerIdx !== innerValues.length - 1) {
           cy.get('[data-test=monaco-editor] textarea').type('(', { force: true });
@@ -265,18 +266,31 @@ export const enterSolution = ({ path }: { readonly path: string }) => {
       }
     });
   });
+
+  cy.get('[data-test=docs-footer-solution-button]').click();
 };
 
 interface BuildOptions {
   readonly success: boolean;
+  readonly contracts: ReadonlyArray<string>;
 }
 
-export const build = ({ success }: BuildOptions) => {
+export const build = ({ success, contracts }: BuildOptions) => {
   cy.get('[data-test=build]', { timeout: 60000 }).click();
-  const text = success
-    ? 'Building...\nScanning for contracts...\nSetting up wallets...\nCompiling contract Token...\nGenerating code...\nDone'
-    : 'Building...\nScanning for contracts...\nNo contracts found.';
-  cy.get('[data-test=console-output]', { timeout: 30000 }).should('have.text', text);
+  const textPre = `Building...\nScanning for contracts...\nSetting up wallets...\n`;
+  const textPost = `Generating code...\nDone`;
+  const contractTexts = contracts.map((contract) => `Compiling contract ${contract}...\n`);
+  const textFail = 'Building...\nScanning for contracts...\nNo contracts found.';
+
+  if (success) {
+    cy.get('[data-test=console-output]', { timeout: 30000 }).contains(textPre);
+    contractTexts.forEach((contractText) =>
+      cy.get('[data-test=console-output]', { timeout: 30000 }).contains(contractText),
+    );
+    cy.get('[data-test=console-output]', { timeout: 30000 }).contains(textPost);
+  } else {
+    cy.get('[data-test=console-output]', { timeout: 30000 }).should('have.text', textFail);
+  }
   cy.get('[data-test=console-selector]').should('have.value', 'neo-one');
   cy.get('[data-test=console-header-clear] > [data-test=console-button]').click();
   cy.get('[data-test=console-output]').should('have.text', '');
