@@ -33,7 +33,7 @@
     "start": "yarn run ts-node ./scripts/start.ts"
   },
   "devDependencies": {
-    "@neo-one/cli": "1.0.0-preview.2",
+    "@neo-one/cli": "1.0.0-preview.3",
     "@neo-one/smart-contract-test": "1.0.0-preview.2",
     "@neo-one/smart-contract-typescript-plugin": "1.0.0-preview.2",
     "@types/jest": "23.3.9",
