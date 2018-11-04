@@ -1,6 +1,6 @@
 # Chapter 3: Escrow Transfer
 
-Now that we have the shell of the Escrow contract we can learn how to interact with other smart contracts, namely the EON Token contract, from our Escrow contract. In this chapter we'll cover how to do that as well as a few other things to keep in mind when invoking other contracts.
+Now that we have the shell of the Escrow contract we can learn how to interact with other smart contracts. In this chapter we'll cover how to use the EON `Token` contract from our `Escrow` contract as well as cover a few other things to keep in mind when invoking other contracts.
 
 ## Learn
 

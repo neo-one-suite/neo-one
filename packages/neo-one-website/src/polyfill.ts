@@ -1,15 +1,14 @@
-/// <reference types="trackjs" />
-// tslint:disable no-submodule-imports
-// tslint:disable no-import-side-effect
+// tslint:disable no-submodule-imports no-import-side-effect
 import '@babel/polyfill';
 // @ts-ignore
 import regeneratorRuntime from '@babel/runtime/regenerator';
+import { TrackJS } from '@neo-one/react-common';
 import LogRocket from 'logrocket';
 // @ts-ignore
 import './Modernizr';
 
-// tslint:disable-next-line no-import-side-effect
-import './app.css';
+import '../static/css/app.css';
+import '../static/css/fonts.css';
 
 // tslint:disable-next-line no-any no-object-mutation
 (global as any).regeneratorRuntime = regeneratorRuntime;
@@ -21,18 +20,17 @@ if (typeof window !== 'undefined') {
     isTTY: undefined,
   };
 
+  TrackJS.install({
+    token: 'ccff2c276a494f0b94462cdbf6bf4518',
+    application: 'neo-one',
+    enabled: process.env.NODE_ENV === 'production',
+  });
+  TrackJS.addMetadata('type', 'main');
+
   if (process.env.NODE_ENV === 'production') {
     LogRocket.init('p5ugma/neo-one');
-    // tslint:disable-next-line no-any
-    (window as any)._trackJs = {
-      token: 'ccff2c276a494f0b94462cdbf6bf4518',
-      application: 'neo-one',
-    };
-    // tslint:disable-next-line
-    const trackJs = require('trackjs');
-    trackJs.addMetadata('type', 'main');
     LogRocket.getSessionURL((url) => {
-      trackJs.addMetadata('logrocket', url);
+      TrackJS.addMetadata('logrocket', url);
     });
   }
 

@@ -1,6 +1,6 @@
 # Chapter 1: Contracts
 
-In Lesson 1, we're going to build a token smart contract from scratch. The token will
+In Lesson 1, we're going to build a token smart contract for the NEO blockchain from scratch. The token will
 
  - Expose constants like the token name, symbol and decimals.
  - Maintain a mapping from token holder to amount held.
@@ -10,11 +10,17 @@ In Lesson 1, we're going to build a token smart contract from scratch. The token
 
 In later lessons we'll add more functionality like pre-approving transfers and forwarding arguments to other contracts.
 
-Before getting started, let's familiarize ourselves with the editor. The editor works similar to VSCode - errors show up inline, and you can hover over code to get inline help. The editor toolbar at the bottom has two buttons that will be used frequently throughout the course. `Build` builds the smart contract code - files that end with `.one.ts` in the editor. `Run Tests` runs the Jest tests - files that end with `.test.ts`. Each chapter will have a set of tests which must pass before proceeding to the next chapter. If you ever get stuck, you can always click `Show Solution` and copy the code into the editor.
+Before getting started, let's familiarize ourselves with the editor. The editor works similar to VSCode - errors show up inline, and you can hover over code to get inline help. The editor toolbar at the bottom has two buttons that will be used frequently throughout the course. `Build` builds the smart contract code - files that end with `.one.ts` in the editor. When you click `Build`, the smart contract is compiled and deployed on a private NEO blockchain running in your browser. `Run Tests` runs the Jest tests - files that end with `.test.ts`. The tests interact with the contract running on the blockchain and verify the contract works the way we expect. Each chapter will have a set of tests which must pass before proceeding to the next chapter. If you ever get stuck, you can always click `Show Solution` and copy the code into the editor.
+
+## Expected Knowledge
+
+Throughout the course we'll be using TypeScript. It's not necessary to have prior experience with TypeScript, but you may want to keep the TypeScript [documentation](http://www.typescriptlang.org/docs/home.html) handy. We'll also include links to the TypeScript handbook throughout the documentation.
+
+The course assumes some knowledge of blockchain and NEO concepts, though you don't need to be an expert. Reading through the [Blockchain Basics](/docs/blockchain-basics) chapter of the main guide will sufficiently prepare you for the course.
 
 ## Learn
 
-Every NEO•ONE smart contract starts with a typescript source file that exports a single class extending `SmartContract`. The simplest smart contract looks like
+Every NEO•ONE smart contract starts with a TypeScript source file that exports a single class extending `SmartContract`. The simplest smart contract looks like
 
 ```typescript
 import { SmartContract } from '@neo-one/smart-contract';
@@ -44,4 +50,4 @@ At this point, we have a basic compilable NEO•ONE smart contract. Go ahead and
 
 `Token.test.ts` is very basic right now, it just checks that the `Token` smart contract exists and was compiled correctly. In later chapters we'll explore the NEO•ONE client APIs which are used to interact with smart contracts both in the front-end and in tests.
 
-If you ever get stuck, click the `Help` link in the editor toolbar for information on where to get help, including a link to the NEO•ONE Discord where you can get live help. See the solution for a particular chapter by clicking `Show Solution` at the bottom of the course material.
+If you ever get stuck, click the `Help` link in the editor toolbar for information on where to get help, including a link to the NEO•ONE [Discord](https://discord.gg/S86PqDE) where you can get live help. See the solution for a particular chapter by clicking `Show Solution` at the bottom of the course material.

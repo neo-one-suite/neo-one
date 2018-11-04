@@ -1,5 +1,5 @@
 import { Client, nep5 } from '@neo-one/client-core';
-import { Button, TextInput, Token } from '@neo-one/react-common';
+import { Button, TextInput } from '@neo-one/react-common';
 import { EffectMap } from 'constate';
 import * as React from 'react';
 import { Container, Grid, styled } from 'reakit';
@@ -11,7 +11,7 @@ import {
   WithOnChangeTokens,
   WithTokens,
 } from './DeveloperToolsContext';
-import { ReactSyntheticEvent } from './types';
+import { ReactSyntheticEvent, Token } from './types';
 import { WithAddError } from './WithAddError';
 
 interface State {

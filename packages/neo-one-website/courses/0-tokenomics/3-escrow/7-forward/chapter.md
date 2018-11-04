@@ -6,13 +6,13 @@ This chapter will be quite dense as we dive into a rather advanced, but powerful
 
 ## Learn
 
-We'll structure the inversion of control through convention, that is, whenever we take an action `foo` who's target is a smart contract, we'll invoke `approveReceiveFoo` on that contract. This enables a key interaction between smart contracts - the target contract not only react to the action, but they can disallow it entirely. Let's take a look at an example.
+We'll structure the inversion of control through convention, that is, whenever we take an action `foo` who's target is a smart contract, we'll invoke `approveReceiveFoo` on that contract. This enables a key interaction between smart contracts - the target contracts not only react to the action, but they can disallow it entirely. Let's take a look at an example.
 
 ```typescript
 import { Address, ForwardValue, SmartContract } from '@neo-one/smart-contract';
 
 interface ActionContract {
-  readonly approveReceiveTransfer: (
+  readonly approveReceiveTakeAction: (
     value: string,
     ...args: ForwardValue[]
   ) => boolean;
@@ -33,9 +33,9 @@ export class Example extends SmartContract {
 }
 ```
 
-Let's break this down piece by piece. We have a method called `takeAction` which expects two arguments, a `string` called `value` and the target of the action, an `Address` call `on`. We also have a [rest parameter](https://www.typescriptlang.org/docs/handbook/functions.html#rest-parameters) with a new type `ForwardValue`. A `ForwardValue` is an opaque type that could be anything and is intended not to be used by the current method, but instead "forwarded" to another smart contract method. In a moment we'll show how that works in the client APIs which will make it a bit more clear how these forwarded arguments are used and why they're useful.
+Let's break this down piece by piece. We have a method called `takeAction` which expects two arguments, a `string` called `value` and the target of the action, an `Address` call `on`. We also have a [rest parameter](https://www.typescriptlang.org/docs/handbook/functions.html#rest-parameters) with a new type, `ForwardValue`. A `ForwardValue` is an opaque type that could be anything and is intended not to be used by the current method, but instead "forwarded" to another smart contract method. In a moment we'll show how that works in the client APIs which will make it a bit more clear how these forwarded arguments are used and why they're useful.
 
-Inside of the `takeAction` method we check to see if the `on` `Address` is a contract address by attempting to create the contract for `on`, i.e. `Contract.for(on)`. If it exists, then the result will be defined. Then we instantiate the `SmartContract` for `on` and invoke it's `approveReceiveTakeAction` method, forwarding any additional arguments we received in our invocation. Notice that we also check that the `on` `Address` is not the current caller, since there would be no point in invoking the contract that called us to see if the current call is approved - by virtue of being called by that contract we can safely assume the call is approved.
+Inside of the `takeAction` method we check to see if the `on` `Address` is a contract address by attempting to create the contract for `on`, i.e. `Contract.for(on)`. If it exists, then the result will be defined. Then we instantiate the `SmartContract` for `on` and invoke its `approveReceiveTakeAction` method, forwarding any additional arguments we received in our invocation. Notice that we also check that the `on` `Address` is not the current caller, since there would be no point in invoking the contract that called us to see if the current call is approved - by virtue of being called by that contract we can safely assume the call is approved.
 
 Let's look at another example contract that implements the `approveReceiveTakeAction` method.
 
@@ -89,7 +89,7 @@ In the `Escrow` contract:
 
 ## Test
 
-The tests for this chapter verify the same end result as previous chapters' `Escrow` contract tests, however notice that the pre-approve and deposit process has been replaced with a single call to the `Token` contract `transfer` method with forwarded arguments. We've copied the relevant code below:
+The tests for this chapter verify the same end result as previous chapters' `Escrow` contract tests. However, notice that the pre-approve and deposit process has been replaced with a single call to the `Token` contract `transfer` method with forwarded arguments. We've copied the relevant code below:
 
 ```typescript
 const escrowAmount = new BigNumber(100);

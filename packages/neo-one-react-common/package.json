@@ -1,25 +1,18 @@
 {
   "name": "@neo-one/react-common",
-  "version": "1.0.0-preview.2",
+  "version": "1.0.0-preview.4",
   "description": "NEO•ONE shared react.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-common": "^1.0.0-preview.2",
-    "@neo-one/client-core": "^1.0.0-preview.2",
-    "@neo-one/react": "^1.0.0-preview.2",
-    "@neo-one/types": "^1.0.0-preview.2",
-    "@neo-one/utils": "^1.0.0-preview.2",
+    "@neo-one/react-core": "^1.0.0-preview.4",
+    "@neo-one/types": "^1.0.0-preview.3",
     "@types/react": "^16.4.18",
-    "@types/react-select": "^2.0.6",
-    "bignumber.js": "^8.0.1",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
     "react-draggable": "^3.0.5",
-    "react-icons": "^3.2.2",
-    "react-select": "^2.1.1",
     "reakit": "0.15.10",
-    "rxjs": "^6.3.3",
-    "styled-tools": "^1.5.2"
+    "styled-tools": "^1.5.2",
+    "trackjs": "^3.0.0"
   },
   "sideEffects": [
     "*.css"

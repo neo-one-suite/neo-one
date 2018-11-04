@@ -9,11 +9,14 @@ const Wrapper = styled(Box)`
   padding-top: 16px;
   padding-bottom: 16px;
   padding-left: 16px;
+  padding-right: 16px;
+  height: 100%;
 
   @media (min-width: ${prop('theme.breakpoints.md')}) {
     padding-top: 64px;
     padding-bottom: 64px;
     padding-left: 40px;
+    padding-right: 40px;
   }
 `;
 

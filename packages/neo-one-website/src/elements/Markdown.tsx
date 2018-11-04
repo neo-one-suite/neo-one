@@ -1,10 +1,15 @@
 import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
 // @ts-ignore
-import TOC from 'markdown-it-table-of-contents';
+import container from 'markdown-it-container';
+// @ts-ignore
+import table from 'markdown-it-multimd-table';
 import * as React from 'react';
 import { css, styled } from 'reakit';
-import { prop, switchProp } from 'styled-tools';
+// @ts-ignore
+import slugify from 'slugify';
+import { ifProp, prop, switchProp } from 'styled-tools';
+import { markdownTOC } from './markdownTOC';
 
 // tslint:disable
 import '../../static/css/prism.css';
@@ -31,8 +36,7 @@ import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 // @ts-ignore
 import 'prismjs/components/prism-markup';
-// @ts-ignore
-import 'prismjs/components/prism-bash';
+import './prismBash';
 
 Prism.languages.typescript = Prism.languages.extend('javascript', {
   // From JavaScript Prism keyword list and TypeScript language spec: https://github.com/Microsoft/TypeScript/blob/master/doc/spec.md#221-reserved-words
@@ -43,34 +47,82 @@ Prism.languages.typescript = Prism.languages.extend('javascript', {
 Prism.languages.ts = Prism.languages.typescript;
 // tslint:enable
 
-const md = MarkdownIt();
-
 const langPrefix = 'language-';
-md.set({
-  html: false,
-  xhtmlOut: false,
-  breaks: false,
-  langPrefix,
-  linkify: true,
-  typographer: true,
-  quotes: `""''`,
-  highlight: (text, lang) => {
-    const code = md.utils.escapeHtml(text);
-    const classAttribute = lang ? ` class="${langPrefix}${lang}"` : '';
 
-    return `<pre${classAttribute}><code${classAttribute}>${code}</code></pre>`;
-  },
-})
-  // tslint:disable-next-line no-any
-  .use(anchor as any)
-  .use(TOC, { includeLevel: [2] });
+const createMD = ({ withAnchors }: { readonly withAnchors: boolean }) => {
+  const md = MarkdownIt();
+  md.set({
+    html: false,
+    xhtmlOut: false,
+    breaks: false,
+    langPrefix,
+    linkify: true,
+    typographer: true,
+    quotes: `""''`,
+    highlight: (text, lang) => {
+      const code = md.utils.escapeHtml(text);
+      const classAttribute = lang ? ` class="${langPrefix}${lang}"` : '';
+
+      return `<pre${classAttribute}><code${classAttribute}>${code}</code></pre>`;
+    },
+  })
+    .use(markdownTOC, {
+      slugify,
+      includeLevel: [2],
+      name: 'toc',
+    })
+    .use(markdownTOC, {
+      slugify,
+      markerPattern: /^\[\[toc-reference\]\]/im,
+      format: (content: string) => md.render(content).slice(3, -5),
+      includeLevel: [4],
+      name: 'toc_reference',
+    })
+    .use(container, 'warning', {
+      // tslint:disable-next-line:no-any
+      render: (tokens: any, idx: any) => {
+        if (tokens[idx].type === 'container_warning_open') {
+          return '<blockquote class="warning">';
+        }
+
+        return '</blockquote>\n';
+      },
+    })
+    .use(table);
+
+  if (withAnchors) {
+    // tslint:disable-next-line no-any
+    md.use(anchor as any, {
+      permalink: true,
+      slugify,
+      level: [2, 3, 4],
+    });
+  }
+
+  return md;
+};
+
+const mdWithoutAnchors = createMD({ withAnchors: false });
+const mdWithAnchors = createMD({ withAnchors: true });
 
 const headerMargins = css`
   margin-top: 32px;
   margin-bottom: 24px;
 `;
 
-const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent' }>`
+const lightCode = css`
+  background-color: ${prop('theme.gray1')};
+  color: ${prop('theme.black')};
+  padding: 4px;
+  border-radius: 4px;
+`;
+
+const stretchCSS = css`
+  margin-left: -24px;
+  margin-right: -24px;
+`;
+
+const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent'; readonly light: boolean }>`
   ${prop('theme.fontStyles.subheading')};
   ${prop('theme.fonts.axiformaThin')};
   overflow-wrap: break-word;
@@ -122,9 +174,21 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent' }
     text-decoration: none;
   }
 
+  & a code {
+    color: ${switchProp('linkColor', {
+      primary: prop('theme.primary'),
+      accent: prop('theme.accent'),
+      gray: prop('theme.gray6'),
+    })};
+  }
+
   & a:hover {
     color: ${prop('theme.primaryDark')};
     text-decoration: none;
+  }
+
+  & a:hover code {
+    color: ${prop('theme.primaryDark')};
   }
 
   & a:focus {
@@ -132,9 +196,17 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent' }
     text-decoration: none;
   }
 
+  & a:focus code {
+    color: ${prop('theme.primaryDark')};
+  }
+
   & a:active {
     color: ${prop('theme.primaryDark')};
     text-decoration: none;
+  }
+
+  & a:active code {
+    color: ${prop('theme.primaryDark')};
   }
 
   & hr {
@@ -179,8 +251,34 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent' }
   }
 
   & code {
+    ${ifProp('light', lightCode, '')};
     ${prop('theme.fontStyles.subheading')};
     font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    white-space: nowrap;
+  }
+
+  & .header-anchor {
+    vertical-align: top;
+  }
+
+  & blockquote.warning {
+    background-color: rgba(255, 229, 100, 0.3);
+    border-left-color: #ffe564;
+    border-left-width: 8px;
+    border-left-style: solid;
+    padding: 16px 40px 16px 24px;
+    margin-bottom: 24px;
+    margin-top: 16px;
+    ${stretchCSS};
+  }
+
+  & blockquote.warning p {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  & blockquote.warning p:first-of-type {
+    ${prop('theme.fonts.axiformaBold')};
   }
 `;
 
@@ -188,6 +286,8 @@ interface Props {
   readonly source: string;
   readonly linkColor?: 'primary' | 'gray' | 'accent';
   readonly openAllLinksInNewTab?: boolean;
+  readonly light?: boolean;
+  readonly anchors?: boolean;
 }
 export class Markdown extends React.Component<Props> {
   private readonly ref = React.createRef<HTMLElement>();
@@ -218,14 +318,15 @@ export class Markdown extends React.Component<Props> {
   }
 
   public render() {
-    const { source, linkColor = 'primary', ...props } = this.props;
+    const { source, linkColor = 'primary', light = false, anchors = false, ...props } = this.props;
 
     return (
       <Wrapper
         {...props}
         linkColor={linkColor}
+        light={light}
         innerRef={this.ref}
-        dangerouslySetInnerHTML={{ __html: md.render(source) }}
+        dangerouslySetInnerHTML={{ __html: anchors ? mdWithAnchors.render(source) : mdWithoutAnchors.render(source) }}
       />
     );
   }

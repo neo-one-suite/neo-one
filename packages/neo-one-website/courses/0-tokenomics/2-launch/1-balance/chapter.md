@@ -30,11 +30,11 @@ Similar to the previous chapter, the only difference with the generated client A
 
   1. Add a call to the `getTokenInfo` method which returns the balance of the argument address and add it to the result.
 
-Note that you'll have to deal with the case where `address` is undefined - just return `new BigNumber(0)` as the balance.
+Note that you'll have to deal with the case where `address` is undefined - just return `new BigNumber(0)` as the balance. Also note the new type `AddressString`. Recall that in our smart contract, we declared a single parameter of type `Address` for the `balanceOf` method. `AddressString` is the 1:1 mapping in the generated client APIs which let us pass the NEO address in string form which will then be automatically converted into the proper form for the smart contract. Read more about the 1:1 type mappings in the [documentation](/docs/smart-contract-apis#type-conversion-table).
 
 ## Test
 
-We added a row for the balance of the current user, which right now will always show 0 since the current user (nor any other user) has participated in the ICO yet. Similarly, the tests add a check that the returned balance for the passed address is 0. Run the tests to verify you've implemented `getTokenInfo` correctly and then proceed to the next chapter.
+Notice we added a row for the balance of the current user in the dapp preview. Right now it will always show 0 since the current user (nor any other user) has participated in the ICO. Similarly, the tests add a check that the returned balance for the passed address is 0. Run the tests to verify you've implemented `getTokenInfo` correctly and then proceed to the next chapter.
 
 ## Wrap Up
 

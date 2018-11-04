@@ -7,10 +7,10 @@ import { RawSourceMap } from 'source-map';
 import { ECPoint, UInt160, UInt256 } from './common';
 
 /**
- * Base64 encoded string that represents a NEO address.
+ * Base58 encoded string that represents a NEO address.
  *
  * Also accepts Hash160 strings (hex encoded string prefixed by '0x') when used as a parameter to a NEO•ONE function.
- * Always a base64 encoded string when returned from a NEO•ONE function.
+ * Always the base58 encoded string form when returned from a NEO•ONE function.
  *
  * @example 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR'
  * @example '0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9'
@@ -425,7 +425,7 @@ export interface TransactionReceipt {
    */
   readonly blockHash: Hash256String;
   /**
-   * Transaction indedx of the `Transaction` within the `Block` for this receipt.
+   * Transaction index of the `Transaction` within the `Block` for this receipt.
    */
   readonly transactionIndex: number;
 }
@@ -438,17 +438,36 @@ export interface TransactionResult<
   readonly confirmed: (options?: GetOptions) => Promise<TTransactionReceipt>;
 }
 
-export interface InvocationResultSuccess<TValue> {
-  readonly state: 'HALT';
+export interface InvocationResultBase {
+  /**
+   * GAS consumed by the operation. This is the total GAS consumed after the free GAS is subtracted.
+   */
   readonly gasConsumed: BigNumber;
+  /**
+   * The total GAS cost before subtracting the free GAS.
+   */
   readonly gasCost: BigNumber;
+}
+
+export interface InvocationResultSuccess<TValue> extends InvocationResultBase {
+  /**
+   * Indicates a successful invocation
+   */
+  readonly state: 'HALT';
+  /**
+   * The return value of the invocation.
+   */
   readonly value: TValue;
 }
 
-export interface InvocationResultError {
+export interface InvocationResultError extends InvocationResultBase {
+  /**
+   * Indicates a failed invocation
+   */
   readonly state: 'FAULT';
-  readonly gasConsumed: BigNumber;
-  readonly gasCost: BigNumber;
+  /**
+   * Failure reason.
+   */
   readonly message: string;
 }
 
@@ -457,9 +476,21 @@ export type InvocationResult<TValue> = InvocationResultSuccess<TValue> | Invocat
 // tslint:disable-next-line no-any
 export interface InvokeReceipt<TReturn extends Return = Return, TEvent extends Event<string, any> = Event>
   extends TransactionReceipt {
+  /**
+   * The result of the invocation.
+   */
   readonly result: InvocationResult<TReturn>;
+  /**
+   * The events emitted by the smart contract during the invocation.
+   */
   readonly events: ReadonlyArray<TEvent>;
+  /**
+   * The logs emitted by the smart contract during the invocation.
+   */
   readonly logs: ReadonlyArray<Log>;
+  /**
+   * The original, unprocessed, raw invoke receipt. The `RawInvokeReceipt` is transformed into this object (the `InvokeReceipt`) using the ABI to parse out the events and transaction result.
+   */
   readonly raw: RawInvokeReceipt;
 }
 
@@ -614,17 +645,31 @@ export interface SmartContractDefinition {
 }
 
 export interface SmartContractReadOptions {
+  /**
+   * The network to read the smart contract data for. By default this is the network of the currently selected user account.
+   */
   readonly network?: string;
 }
 
 export interface SmartContractIterOptions extends SmartContractReadOptions {
+  /**
+   * Filters the iterated events and/or logs to those that match the provided `BlockFilter` object.
+   */
   readonly filter?: BlockFilter;
 }
 
-// Indices are inclusive start, exclusive end.
 export interface BlockFilter {
+  /**
+   * The inclusive start index for the first block to include. Leaving `undefined` means start from the beginning of the blockchain, i.e. index 0.
+   */
   readonly indexStart?: number;
+  /**
+   * The exclsuive end index for the block to start at. Leaving `undefined` means continue indefinitely, waiting for new blocks to come in.
+   */
   readonly indexStop?: number;
+  /**
+   * The `Monitor` to use for tracking all asynchronous calls made in the process of pulling data.
+   */
   readonly monitor?: Monitor;
 }
 
@@ -635,10 +680,33 @@ export interface GetOptions {
 
 export interface TransactionOptions {
   // tslint:disable readonly-keyword
+  /**
+   * The `UserAccount` that the transaction is "from", i.e. the one that will be used for native asset transfers, claims, and signing the transaction.
+   *
+   * If unspecified, the currently selected `UserAccount` is used as the `from` address.
+   *
+   * DApp developers will typically want to leave this unspecified.
+   */
   from?: UserAccountID;
+  /**
+   * Additional attributes to include with the transaction.
+   */
   attributes?: ReadonlyArray<Attribute>;
+  /**
+   * An optional network fee to include with the transaction.
+   */
   networkFee?: BigNumber;
+  /**
+   * A maximum system fee to include with the transaction. Note that this is a maximum, the client APIs will automatically calculate and add a system fee to the transaction up to the value specified here.
+   *
+   * Leaving `systemFee` `undefined` is equivalent to `new BigNumber(0)`, i.e. no system fee.
+   *
+   * A `systemFee` of `-1`, i.e. `new BigNumber(-1)` indicates no limit on the fee. This is typically used only during development.
+   */
   systemFee?: BigNumber;
+  /**
+   * The `Monitor` to use for tracking and logging all asynchronous calls made during the transaction.
+   */
   monitor?: Monitor;
   // tslint:enable readonly-keyword
 }

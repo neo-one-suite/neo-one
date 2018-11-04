@@ -85,11 +85,11 @@ export const handleWithdraw = async (
     const balance = contractAccount.balances[Hash256.NEO] as BigNumber | undefined;
     if (balance !== undefined) {
       await token.withdraw.confirmed({
-        sendTo: [
+        sendFrom: [
           {
             asset: Hash256.NEO,
             amount: balance,
-            address: currentAccount.id.address,
+            to: currentAccount.id.address,
           },
         ],
       });

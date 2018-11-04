@@ -1,5 +1,5 @@
 // tslint:disable-next-line
-import { theme } from '@neo-one/react-common';
+import { theme } from '@neo-one/react-core';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { ThemeProvider } from 'reakit';

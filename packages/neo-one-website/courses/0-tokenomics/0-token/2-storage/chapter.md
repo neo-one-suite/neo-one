@@ -8,7 +8,7 @@ Contract properties that are not `readonly` are automatically stored inside of c
 
 Every NEO•ONE smart contract has an automatically generated method called `deploy` which is based on the `constructor` of your smart contract. It's created whether or not you have an explicit constructor and must be invoked when the contract is published to the blockchain to initialize it. Using the NEO•ONE client APIs, the `deploy` method is called automatically and atomically when the contract is published, so you never have to worry about it.
 
-Now, back to contract storage properties. The way to think about how the smart contract we're building works is that when it's published to the blockchain we construct it, i.e. we call the equivalent of `new Token()`. Then for every invocation we use that one instance, so any changes to storage properties are persisted between invocations.
+Now, back to contract storage properties. The way to think about how the smart contract we're building works is that when it's published to the blockchain we construct it, i.e. we call the equivalent of `new Token()`. Then for every invocation we use that one instance, so any changes to storage properties are persisted between invocations. In short, our smart contract follows the [singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern).
 
 Let's take a look at an example:
 

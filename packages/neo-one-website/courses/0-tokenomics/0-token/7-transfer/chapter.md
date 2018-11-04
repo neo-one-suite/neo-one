@@ -28,7 +28,7 @@ export class Example extends SmartContract {
 }
 ```
 
-In this example, we attempt the transfer and if it succeeds, we want to run one set of logic, otherwise if it fails a different set of logic. Normally we might us a `try`/`catch` here, but errors don't propagate across smart contract boundaries, instead the entire transaction immediately fails, so instead we expect that the `transfer` method on the `Token` contract we're calling will return `false`.
+In this example, first we attempt a transfer. If it succeeds and returns true, we run one set of logic. If it fails and returns false, we run a different set of logic. Normally we might use a `try`/`catch` here, but errors don't propagate across smart contract boundaries. If an error is thrown, the entire transaction immediately fails. Instead we expect that the `transfer` method on the `Token` contract we're calling will return `false`.
 
 ## Instructions
 
@@ -37,7 +37,7 @@ Alrighty, let's finish up the `Token` contract! Implement a `transfer` method th
  1. Takes a `from` `Address`, `to` `Address` and `amount` `Fixed<8>` to transfer.
  2. Throws an `Error` when `amount < 0`.
  3. Returns `false` when the `from` address is not the caller (using `Address.isCaller`).
- 4. Returns `false` when `amount` is less than the `from` `Address`es current balance.
+ 4. Returns `false` when `amount` is greater than the `from` `Address`es current balance.
  5. Otherwise, reduces the `from` `Address` balance by `amount` and increases the `to` `Address` balance by `amount`.
  6. Emits a `transfer` event.
  7. And finally, returns `true`.

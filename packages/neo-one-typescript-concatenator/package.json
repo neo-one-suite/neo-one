@@ -1,19 +1,19 @@
 {
   "name": "@neo-one/typescript-concatenator",
-  "version": "1.0.0-preview.2",
+  "version": "1.0.0-preview.3",
   "description": "NEO•ONE TypeScript Concatenator",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/ts-utils": "^1.0.0-preview.2",
-    "@neo-one/utils": "^1.0.0-preview.2",
+    "@neo-one/ts-utils": "^1.0.0-preview.3",
+    "@neo-one/utils": "^1.0.0-preview.3",
     "@types/lodash": "^4.14.117",
     "@types/toposort": "^2.0.1",
     "lodash": "^4.17.11",
     "toposort": "^2.0.2",
-    "typescript": "3.2.0-dev.20181102"
+    "typescript": "3.2.0-dev.20181103"
   },
   "devDependencies": {
-    "@neo-one/smart-contract-compiler-node": "^1.0.0-preview.2",
+    "@neo-one/smart-contract-compiler-node": "^1.0.0-preview.3",
     "app-root-dir": "1.0.2",
     "fs-extra": "7.0.0",
     "yargs": "12.0.2"

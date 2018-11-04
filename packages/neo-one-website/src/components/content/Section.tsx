@@ -16,7 +16,12 @@ export const Section = ({ current, section, visible, toggle, onClickLink, ...pro
   <Box {...props}>
     <SectionHeader title={section.title} visible={visible} toggle={toggle} />
     <Hidden visible={visible}>
-      <SectionList current={current} subsections={section.subsections} onClickLink={onClickLink} />
+      <SectionList
+        numbered={section.numbered}
+        current={current}
+        subsections={section.subsections}
+        onClickLink={onClickLink}
+      />
     </Hidden>
   </Box>
 );

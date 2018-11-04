@@ -8,11 +8,12 @@ export const SidebarSpacer = styled(Box)`
     display: block;
     position: relative;
     height: 100%;
-    margin-left: 80px;
-    width: 204px;
+    margin-left: 40px;
+    width: 196px;
   }
 
   @media (min-width: ${prop('theme.breakpoints.lg')}) {
+    margin-left: 80px;
     width: 300px;
   }
 `;

@@ -58,7 +58,7 @@ aliases:
 
   - &yarn
     |
-      yarn install --non-interactive --cache-folder ~/.cache/yarn
+      yarn install --non-interactive --cache-folder ~/.cache/yarn --ignore-engines
 
   - &lint
     working_directory: ~/neo-one

@@ -1,5 +1,5 @@
 import { Bundle, Stage } from '../types';
-import { cssLoader, exportsLoader, fileLoader, jsLoader, rawLoader, tsLoader, wasmFileLoader } from './loaders';
+import { cssLoader, fileLoader, jsLoader, rawLoader, tsLoader, wasmFileLoader } from './loaders';
 
 export const rules = (options: { readonly stage: Stage; readonly bundle: Bundle }) => [
   {
@@ -11,7 +11,6 @@ export const rules = (options: { readonly stage: Stage; readonly bundle: Bundle 
       tsLoader(options) as any,
       cssLoader(options),
       fileLoader(),
-      exportsLoader,
       wasmFileLoader,
     ],
   },

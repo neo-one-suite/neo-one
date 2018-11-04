@@ -1,6 +1,6 @@
 # Chapter 2: Deposit Funds
 
-Last chapter was a lot of reinforcing previously learned concepts, and this one will be much the same as we develop the shell of our Escrow contract. The Escrow contract should allow one person to deposit funds into effectively a shared account with another address, where either party may withdraw funds from the account at any time. One might use this, for example, to give Eon to friends to try out and if they don't end up claiming it, then they can get it back - i.e. it's not just lost forever.
+Last chapter was a lot of reinforcing previously learned concepts, and this one will be much the same as we develop the shell of our Escrow contract. The Escrow contract should allow one person to deposit funds into a shared account with another address, where either party may withdraw funds from the account at any time. One might use this, for example, to give Eon to friends to try out and if they don't end up claiming it, then they can get it back - i.e. it's not just lost forever.
 
 ## Learn
 
@@ -16,7 +16,6 @@ Starting from scratch, we're going to implement the shell of the Escrow contract
   4. Add an event notifier to `deposit` called `balanceAvailable` that takes the `from`, `to`, and `amount` as parameters. Invoke the event notifier in the `deposit` method.
 
 Note that we haven't actually transferred any tokens yet, and functionally our smart contract doesn't actually do much since all we're doing is incrementing a balance. In the next chapter we'll make this a bit more functional once the shell is complete.
-
 
 ## Test
 

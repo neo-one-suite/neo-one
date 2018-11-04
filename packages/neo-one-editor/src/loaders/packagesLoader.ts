@@ -24,8 +24,6 @@ const INCLUDE_PACKAGES: ReadonlyArray<string> = [
   'neo-one-node-rpc-handler',
   'neo-one-node-storage-levelup',
   'neo-one-node-vm',
-  'neo-one-react',
-  'neo-one-react-common',
   'neo-one-smart-contract',
   'neo-one-smart-contract-compiler',
   'neo-one-smart-contract-lib',

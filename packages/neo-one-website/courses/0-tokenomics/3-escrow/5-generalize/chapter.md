@@ -25,7 +25,7 @@ export class Example extends SmartContract {
 
 In this example we're forwarding the transfer call to the contract at the given `tokenAddress`. Compared to before, we replaced the `LinkedSmartContract.for<Token>()` call that referenced our own `Token` contract with a `SmartContract.for<ExampleToken>(tokenAddress)` call that references a contract that has the interface `ExampleToken` at `tokenAddress`. Besides that, the return value is identical - we can call any contract method defined by the `ExampleToken` interface, which in this case just contains the `transfer` method.
 
-We can also declare the events that we expect our smart contract to emit due to calling other smart contract. Before when we used `LinkedSmartContract.for<Token>()`, the `Token` contract's events were automatically pulled in as possible events for the `Escrow` contract to emit. We can use `declareEvent` with the same type parameters and parameter names as we did for the `'transfer'` in order to have the same effect when using `SmartContract.for<ExampleToken>(tokenAddress)` - that is, now the generated NEO•ONE client APIs will include the `'transfer'` event in transaction receipts.
+We can also declare the events that we expect our smart contract to emit due to calling other smart contracts. Before when we used `LinkedSmartContract.for<Token>()`, the `Token` contract's events were automatically pulled in as possible events for the `Escrow` contract to emit. We can use `declareEvent` with the same type parameters and parameter names as we did for the `'transfer'` in order to have the same effect when using `SmartContract.for<ExampleToken>(tokenAddress)` - that is, now the generated NEO•ONE client APIs will include the `'transfer'` event in transaction receipts.
 
 ## Instructions
 

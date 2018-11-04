@@ -1,6 +1,6 @@
 # Chapter 6: Withdraw NEO
 
-We've seen how to invoke normal smart contract methods, methods annotated with `@receive` and now we'll learn how to invoke a method annotated with `@sendUnsafe`. Since this turns out to be very similar to methods marked with `@receive`, we'll also cover a few `Client` methods that will be used in the implementation for this chapter.
+We've seen how to invoke normal smart contract methods, methods decorated with `@receive` and now we'll learn how to invoke a method decorated with `@sendUnsafe`. Since this turns out to be very similar to methods marked with `@receive`, we'll also cover a few `Client` methods that will be used in the implementation for this chapter.
 
 ## Learn
 
@@ -37,7 +37,7 @@ if (receipt.result.state === 'FAULT') {
 }
 ```
 
-In this example, we're invoking the method `mySendUnsafe` with the argument `'foo'` and also specifying that we want to send `10` NEO from the contract to the given address. Notice how the invocation is very similar to how we invoked methods annotated with `@receive`.
+In this example, we're invoking the method `mySendUnsafe` with the argument `'foo'` and also specifying that we want to send `10` NEO from the contract to the given address. Notice how the invocation is very similar to how we invoked methods decorated with `@receive`.
 
 Before we move on to the instructions for this chapter, let's take a quick look at how we can fetch the balances for a given account so that when we use the `withdraw` function of the EON contract, we know how much is available to withdraw.
 
@@ -76,7 +76,7 @@ Once you've implemented `handleWithdraw` you can test it out by participating in
 
 ## Wrap Up
 
-In this chapter we saw how to invoke a smart contract method annotated with `@sendUnsafe` using the NEO•ONE client APIs. We also saw how we can use the `Client` to get the currently selected `UserAccount` as well as fetch the balance of an arbitrary `Account`. Finally, we were able to pull the address of our Eon contract with the `definition` property.
+In this chapter we saw how to invoke a smart contract method decorated with `@sendUnsafe` using the NEO•ONE client APIs. We also saw how we can use the `Client` to get the currently selected `UserAccount` as well as fetch the balance of an arbitrary `Account`. Finally, we were able to pull the address of our Eon contract with the `definition` property.
 
 And with that, we've implemented a UI for the entire Eon token smart contract. Not bad for 6 chapters. In case you want to play around with the UI implementation itself, we've made the `ICO.tsx` file writable. The original `ICO.tsx` content can be found in the `Show Solution` menu in case you want to revert back.
 

@@ -1,6 +1,6 @@
 # Chapter 1: Pre-Approved Transfers
 
-Before we get started on the Escrow contract, we need to enable other contracts to interact with the EON Token contract on behalf of a user. There's two primary ways to do this, we'll learn about one in this chapter and the other in the next lesson.
+Before we get started on the Escrow contract, we need to enable other contracts to interact with the EON `Token` contract on behalf of a user. There's two primary ways to do this, we'll learn about one in this chapter and the other in the next lesson.
 
 As a quick reminder, remember that you can build the contracts by clicking `Build` at the bottom of the editor and you can run the tests by clicking `Run Tests`. Once the tests pass, you may proceed to the next chapter by clicking `Next`. If you ever get stuck, click `Show Solution` to view the solution code for the chapter.
 

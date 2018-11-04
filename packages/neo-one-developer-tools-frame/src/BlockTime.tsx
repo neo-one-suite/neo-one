@@ -1,5 +1,6 @@
 import { Client } from '@neo-one/client-core';
-import { Button, FromStream } from '@neo-one/react-common';
+import { FromStream } from '@neo-one/react';
+import { Button } from '@neo-one/react-common';
 import { ActionMap } from 'constate';
 import { formatDistanceStrict } from 'date-fns';
 import * as React from 'react';

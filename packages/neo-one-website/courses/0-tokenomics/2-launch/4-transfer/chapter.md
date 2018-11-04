@@ -1,10 +1,10 @@
 # Chapter 5: Transfer EON
 
-Earlier this lesson we saw how to invoke a method marked with `@receive`, now we'll take a look at how to invoke the `transfer` method which does not have any annotations.
+Earlier this lesson we saw how to invoke a method marked with `@receive`. Now we'll take a look at how to invoke the `transfer` method which does not have any decorators.
 
 ## Learn
 
-Turns out, there's not much to learn here. Invoking a method without an annotation follows the same two step process that we mentioned in the earlier chapter, the only difference is we can't send native assets along with the invocation. So instead of covering the same material, we'll look at how we can shortcut that two step process if we don't care about knowing when the transaction has been successfully relayed. We can do this by invoking the `confirmed` that is available on every smart contract method. Let's take a look at an example.
+Turns out, there's not much to learn here. Invoking a method without an decorator follows the same two step process that we mentioned in the earlier chapter, the only difference is we can't send native assets along with the invocation. So instead of covering the same material, we'll look at how we can shortcut that two step process if we don't care about knowing when the transaction has been successfully relayed. We can do this by invoking the `confirmed` that is available on every smart contract method. Let's take a look at an example.
 
 ```typescript
 import { SmartContract } from '@neo-one/smart-contract';
@@ -34,7 +34,7 @@ const result = await example.myMethod('foo');
 const receipt = await result.confirmed();
 ```
 
-Every smart contract method has this property, so if, for example, you're not updating the state of a UI in response to a successful relay of the transaction, you can just use the shortcut method.
+Every smart contract method has this property and it can be handy for cases where you don't require a side effect after relaying of a transaction only it's confirmation. For example, if you want your dapp to display a notification when a transaction has been relayed, you should use the two step confirmation process. If you only care about updating the final balance once the result has been confirmed, the one step confirmation process can be a handy shortcut.
 
 ## Instructions
 
@@ -50,4 +50,4 @@ Similar to before, the unit tests simply verify that we can call `handleTransfer
 
 ## Wrap Up
 
-In this chapter we saw how invoking a smart contract method without annotations is virtually the same as what we saw for `mintTokens`. In the next chapter we'll hook up the `withdraw` method and find that, again, invoking a method with `@sendUnsafe` is very similar.
+In this chapter we saw how invoking a smart contract method without decorators is virtually the same as what we saw for `mintTokens`. In the next chapter we'll hook up the `withdraw` method and find that, again, invoking a method with `@sendUnsafe` is very similar.

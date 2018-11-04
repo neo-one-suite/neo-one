@@ -148,12 +148,12 @@ describe('CNEO', () => {
       expect(completeReceipt.result.value).toEqual(true);
 
       // Verify the balance and total supply have been deducted and that the toAccount has the NEO
-      const [masterBalance, toBalance, totalSupply, toAccount, masterAccountBefore] = await Promise.all([
+      const [masterBalance, toBalance, totalSupply, toAccount, cneoAccountBefore] = await Promise.all([
         cneo.balanceOf(masterAccountID.address),
         cneo.balanceOf(toAccountID.address),
         cneo.totalSupply(),
         client.getAccount(toAccountID),
-        client.getAccount(masterAccountID),
+        client.getAccount(cneoAddress),
       ]);
       expect(masterBalance.toNumber()).toEqual(neoAmount.minus(escrowAmount).toNumber());
       expect(toBalance.toNumber()).toEqual(0);
@@ -162,10 +162,10 @@ describe('CNEO', () => {
 
       // Claim the accumulated GAS
       await cneo.claim.confirmed();
-      const masterAccountAfter = await client.getAccount(masterAccountID);
-      expect(masterAccountBefore.balances[Hash256.GAS].toNumber()).toBeLessThan(
-        masterAccountAfter.balances[Hash256.GAS].toNumber(),
-      );
+      const cneoAccountAfter = await client.getAccount(cneoAddress);
+      expect(cneoAccountBefore.balances[Hash256.GAS]).toBeUndefined();
+      expect(cneoAccountAfter.balances[Hash256.GAS]).toBeDefined();
+      expect(cneoAccountAfter.balances[Hash256.GAS]).toBeGreaterThan(0);
     });
   });
 });

@@ -1,4 +1,5 @@
 // tslint:disable no-submodule-imports no-null-keyword
+import { TrackJS } from '@neo-one/react-common';
 // @ts-ignore
 import run from 'jest-circus/build/run';
 import {
@@ -18,10 +19,7 @@ import { createTestEngine, CreateTestEngineOptions } from './createTestEngine';
 import { BlockName, DescribeBlock, JestEvent, TestEntry } from './types';
 
 const handleError = (error: Error) => {
-  // tslint:disable-next-line strict-type-predicates
-  if (typeof trackJs !== 'undefined') {
-    trackJs.track(error);
-  }
+  TrackJS.track(error);
 };
 
 function resetTestState() {

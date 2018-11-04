@@ -1,4 +1,4 @@
-import { FromStream } from '@neo-one/react-common';
+import { FromStream } from '@neo-one/react';
 import * as React from 'react';
 import { MdRefresh } from 'react-icons/md';
 import { BehaviorSubject } from 'rxjs';

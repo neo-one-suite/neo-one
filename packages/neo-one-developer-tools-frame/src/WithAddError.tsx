@@ -1,7 +1,8 @@
+import { enqueuePostPromiseJob } from '@neo-one/utils';
 import * as React from 'react';
 import { Box, styled } from 'reakit';
 import { prop } from 'styled-tools';
-import { WithAddToast } from './ToastsContainer';
+import { AddToast, WithAddToast } from './ToastsContainer';
 
 export type AddError = (error: Error) => void;
 
@@ -21,11 +22,16 @@ const StyledPre = styled.pre`
   overflow-x: auto;
 `;
 
-export function WithAddError({ children }: WithAddErrorProps) {
-  return (
-    <WithAddToast>
-      {(addToast) =>
-        children((error) => {
+const createAddError = (addToast: AddToast) => {
+  let queued = false;
+  const errors = new Set<Error>();
+
+  return (err: Error) => {
+    errors.add(err);
+    if (!queued) {
+      queued = true;
+      enqueuePostPromiseJob(() => {
+        errors.forEach((error) => {
           // tslint:disable-next-line no-console
           console.error(error.stack === undefined ? error : error.stack);
           addToast({
@@ -39,8 +45,14 @@ export function WithAddError({ children }: WithAddErrorProps) {
             message: <StyledPre data-test="neo-one-error-toast-message">{error.message}</StyledPre>,
           });
           mutableID += 1;
-        })
-      }
-    </WithAddToast>
-  );
+        });
+        errors.clear();
+        queued = false;
+      });
+    }
+  };
+};
+
+export function WithAddError({ children }: WithAddErrorProps) {
+  return <WithAddToast>{(addToast) => children(createAddError(addToast))}</WithAddToast>;
 }

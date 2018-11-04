@@ -21,7 +21,7 @@ export class Example extends SmartContract {
 }
 ```
 
-We create `MapStorage` using the [static](https://www.typescriptlang.org/docs/handbook/classes.html#static-properties) `for` property, which makes it read as "`MapStorage` `for` `Address` to `Fixed<8>`". (Note: we're using generic types here, take a look at the TypeScript [documentation](https://www.typescriptlang.org/docs/handbook/generics.html) for more info.) We're also introducing the `Address` [interface](https://www.typescriptlang.org/docs/handbook/interfaces.html) which is a special kind of `Buffer` that represents a NEO address. You'll see a few types like this in NEO•ONE smart contracts, they're designed such that it makes it difficult to use certain constructs incorrectly. As a concrete example, you can't pass an arbitrary `Buffer` where an `Address` is expected which helps eliminate bugs.
+We create `MapStorage` using the [static](https://www.typescriptlang.org/docs/handbook/classes.html#static-properties) `for` property, which makes it read as "`MapStorage` `for` `Address` to `Fixed<8>`". (Note: we're using generic types here, take a look at the TypeScript [documentation](https://www.typescriptlang.org/docs/handbook/generics.html) for more info.) We're also introducing the `Address` [interface](https://www.typescriptlang.org/docs/handbook/interfaces.html) which is a special kind of `Buffer` that represents a NEO address. You'll see a few types like this in NEO•ONE smart contracts, they're designed such that it makes it difficult to use certain values incorrectly. As a concrete example, you can't pass an arbitrary `Buffer` where an `Address` is expected which helps eliminate bugs.
 
 Notice also that this method is not marked with `@constant` because it modifies the `MapStorage` by calling `set` on it. We won't create a non-constant method in this chapter though, it's only used for illustration.
 
@@ -38,4 +38,4 @@ If you run into issues, make sure there are no reported problems. The NEO•ONE 
 
 ## Wrap Up
 
-Easier than last chapter right? Still, we learned about a powerful concept - structured storage - that most if not all contracts will rely on. We also saw our first specialized `Buffer` type, the `Address`. Once you're done exploring, click `Next` to proceed.
+Easier than last chapter right? Still, we learned about the powerful concept of structured storage which nearly every contract will rely on. We also saw our first specialized `Buffer` type, the `Address`. Once you're done exploring, click `Next` to proceed.

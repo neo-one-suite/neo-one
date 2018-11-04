@@ -1,15 +1,11 @@
 // tslint:disable no-any
-import {
-  FromStream,
-  getWalletSelectorOptions$,
-  makeWalletSelectorValueOption,
-  WalletSelectorBase,
-} from '@neo-one/react-common';
+import { FromStream } from '@neo-one/react';
 import * as React from 'react';
 import { Label, styled } from 'reakit';
 import { DeveloperToolsContext, DeveloperToolsContextType, WithTokens } from './DeveloperToolsContext';
 import { TransferContainer } from './TransferContainer';
 import { ComponentProps } from './types';
+import { getWalletSelectorOptions$, makeWalletSelectorValueOption, WalletSelectorBase } from './WalletSelectorBase';
 import { WithAddError } from './WithAddError';
 
 const Wrapper = styled(Label)`

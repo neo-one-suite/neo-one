@@ -7,7 +7,7 @@ In Lesson 2, we're going to add ICO functionality to our token smart contract. T
  - Limit the number of tokens minted.
  - Enable withdrawing the contributed NEO.
 
-We'll also create a fully functioning ICO participation UI that live updates when tokens are minted using the NEO•ONE client APIs. There's quite a bit of ground to cover, so let's get started!
+There's quite a bit of ground to cover, so let's get started!
 
 As a quick reminder, the same flow applies as in Lesson 1. Write the code -> `Build` -> `Run Tests` -> `Next` once the tests are passing. If you get stuck, you can also view the full solution by clicking `Show Solution`.
 
@@ -26,11 +26,11 @@ export class Example extends SmartContract {
 }
 ```
 
-In this very simple example, we've defined a method annotated with `@receive`. This enables the method to receive native assets of any kind, including NEO and GAS. Methods marked with `@receive` must return a `boolean` value to indicate whether or not the contract wants to receive the assets. Note, however, that there are cases where the contract may still receive assets, despite returning `false`, due to limitations in how NEO handles native UTXO assets. For these cases, we automatically generate a `refundAssets` method that clients of your smart contract may call to refund assets which were not processed by the smart contract (i.e. the smart contract returned `false` or was not actually called).
+In this very simple example, we've defined a method decorated with `@receive`. This enables the method to receive native assets of any kind, including NEO and GAS. Methods marked with `@receive` must return a `boolean` value to indicate whether or not the contract wants to receive the assets. Note, however, that there are cases where the contract may still receive assets, despite returning `false`, due to limitations in how NEO handles native UTXO assets. For these cases, we automatically generate a `refundAssets` method that clients of your smart contract may call to refund assets which were not processed by the smart contract (i.e. the smart contract returned `false` or was not actually called). Note that this method cannot refund assets if the smart contract invocation succeeded.
 
 ## Instructions
 
-  1. Add a method called `mintTokens` that's annotated with `@receive` and returns `true`.
+  1. Add a method called `mintTokens` that's decorated with `@receive` and returns `true`.
 
 In the following chapters we'll start expanding the method with more logic like converting NEO to tokens, but for now, we'll just accept all assets.
 

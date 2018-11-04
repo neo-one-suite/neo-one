@@ -17,14 +17,16 @@ pre[class*="language-"] {
 	-webkit-hyphens: none;
 	-moz-hyphens: none;
 	-ms-hyphens: none;
-	hyphens: none;
+  hyphens: none;
+  padding: 0;
 }
 
 /* Code blocks */
 pre[class*="language-"] {
-	padding: 1em;
-	margin: .5em 0;
-	overflow: auto;
+  padding: 1em 24px;
+	margin: .5em -24px;
+  overflow: auto;
+  border-radius: 10px;
 }
 
 :not(pre) > code[class*="language-"],

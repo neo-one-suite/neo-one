@@ -66,7 +66,7 @@ exports[`ObjectBindingHelper variable builtin value rest property 1`] = `
 `;
 
 exports[`ObjectBindingHelper variable builtin value unknown property 1`] = `
-"snippetCode.ts (3,17): Type 'BlockchainConstructor' has no property '0' and no string index signature.
+"snippetCode.ts (3,17): Property '0' does not exist on type 'BlockchainConstructor'.
 
       1 | 
       2 |         import { Blockchain } from '@neo-one/smart-contract';

@@ -1,5 +1,6 @@
 // tslint:disable no-any
-import { FromStream, Monogram } from '@neo-one/react-common';
+import { FromStream } from '@neo-one/react';
+import { Monogram } from '@neo-one/react-common';
 // @ts-ignore
 import SizeObserver from '@render-props/size-observer';
 import * as React from 'react';
@@ -95,48 +96,46 @@ export function Toolbar({ resizeHandler }: Props) {
           <SizeObserver>
             {({ sizeRef, width }: any) => (
               <FromStream props={[resizeHandler]} createStream={() => resizeHandler.maxWidth$}>
-                {(maxWidth) => (
-                  <Wrapper
-                    innerRef={sizeRef}
-                    maxWidth={maxWidth}
-                    style={{ transform: hidden.visible ? 'translate(0, 0)' : `translate(-${width - 40}px, 0)` }}
-                    onMouseEnter={() => {
-                      resizeHandler.maximize({
-                        type: 'max',
-                        id: 'toolbarOnEnter',
-                      });
-                    }}
-                    onMouseLeave={() => {
-                      resizeHandler.minimize('toolbarOnEnter');
-                    }}
-                  >
-                    <InnerWrapper>
-                      <BlockIndex />
-                      <BlockTime />
-                      <ResetButton />
-                      <WalletButton />
-                      <BalanceSelector />
-                      <NEOTrackerButton />
-                      <SettingsButton />
-                    </InnerWrapper>
-                    <MonogramButton
-                      visible={hidden.visible}
-                      onClick={() => {
-                        if (hidden.visible) {
-                          resizeHandler.minimizeToolbar();
-                        } else {
-                          resizeHandler.maximizeToolbar({
-                            type: 'px',
-                            id: 'toolbar',
-                            width: Math.min(width, maxWidth),
-                            height: 40,
-                          });
-                        }
-                        hidden.toggle();
+                {(maxWidth) => {
+                  if (hidden.visible) {
+                    resizeHandler.maximizeToolbar({
+                      type: 'px',
+                      id: 'toolbar',
+                      width: Math.min(width, maxWidth),
+                      height: 40,
+                    });
+                  } else {
+                    resizeHandler.minimizeToolbar();
+                  }
+
+                  return (
+                    <Wrapper
+                      innerRef={sizeRef}
+                      maxWidth={maxWidth}
+                      style={{ transform: hidden.visible ? 'translate(0, 0)' : `translate(-${width - 40}px, 0)` }}
+                      onMouseEnter={() => {
+                        resizeHandler.maximize({
+                          type: 'max',
+                          id: 'toolbarOnEnter',
+                        });
                       }}
-                    />
-                  </Wrapper>
-                )}
+                      onMouseLeave={() => {
+                        resizeHandler.minimize('toolbarOnEnter');
+                      }}
+                    >
+                      <InnerWrapper>
+                        <BlockIndex />
+                        <BlockTime />
+                        <ResetButton />
+                        <WalletButton />
+                        <BalanceSelector />
+                        <NEOTrackerButton />
+                        <SettingsButton />
+                      </InnerWrapper>
+                      <MonogramButton visible={hidden.visible} onClick={hidden.toggle} />
+                    </Wrapper>
+                  );
+                }}
               </FromStream>
             )}
           </SizeObserver>

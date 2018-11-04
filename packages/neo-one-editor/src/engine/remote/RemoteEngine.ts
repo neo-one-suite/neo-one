@@ -1,5 +1,6 @@
 import { Builder, dirname, normalizePath, PouchDBFileSystem } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
+import { TrackJS } from '@neo-one/react-common';
 import { retryBackoff } from '@neo-one/utils';
 import { WorkerManager } from '@neo-one/worker';
 import fetch from 'cross-fetch';
@@ -180,10 +181,7 @@ export class RemoteEngine {
     try {
       await Promise.all(paths.map(async (path) => this.fetchDependency(path)));
     } catch (error) {
-      // tslint:disable-next-line strict-type-predicates
-      if (typeof trackJs !== 'undefined') {
-        trackJs.track(error);
-      }
+      TrackJS.track(error);
     }
   }
 

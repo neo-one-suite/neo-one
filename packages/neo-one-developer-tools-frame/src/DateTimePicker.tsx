@@ -1,8 +1,9 @@
 // tslint:disable no-null-keyword
+import { TextInput } from '@neo-one/react-common';
 import { EffectMap } from 'constate';
 import { format, isBefore, parse } from 'date-fns';
 import * as React from 'react';
-import { Box, Container, Grid, Input, styled } from 'reakit';
+import { Box, Container, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { ReactSyntheticEvent } from './types';
 
@@ -76,7 +77,7 @@ export function DateTimePicker({
       <Container initialState={{ text: format(initialValue, FORMAT), error: undefined }} effects={effects}>
         {({ text, error, onChange: onChangeInput }) => (
           <>
-            <Input data-test={dataTestInput} value={text} onChange={onChangeInput} />
+            <TextInput data-test={dataTestInput} value={text} onChange={onChangeInput} />
             {error === undefined ? null : <ErrorText data-test={dataTestError}>{error}</ErrorText>}
           </>
         )}

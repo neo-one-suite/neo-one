@@ -10,7 +10,7 @@ import semver from 'semver';
 import { FetchError } from './errors';
 import { getEscapedName } from './utils';
 
-const NPM_REGISTRY_URL = 'https://registry.npmjs.org';
+const NPM_REGISTRY_URL = 'https://registry.yarnpkg.com';
 const ROOT_NODE = 'root$';
 
 export interface Dependencies {
