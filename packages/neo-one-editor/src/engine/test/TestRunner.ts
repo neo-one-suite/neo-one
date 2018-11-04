@@ -1,4 +1,5 @@
 // tslint:disable no-submodule-imports no-null-keyword
+import { TrackJS } from '@neo-one/react-common';
 // @ts-ignore
 import run from 'jest-circus/build/run';
 import {
@@ -11,7 +12,6 @@ import {
 import { makeDescribe } from 'jest-circus/build/utils';
 // @ts-ignore
 import expect from 'jest-matchers';
-import { TrackJS } from 'trackjs';
 import { formatError } from '../../error';
 import { Test, TestRunnerCallbacks } from '../../types';
 import { ModuleBase, RemoteEngine } from '../remote';

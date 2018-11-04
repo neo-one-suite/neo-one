@@ -1,5 +1,6 @@
 import { Builder, dirname, normalizePath, PouchDBFileSystem } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
+import { TrackJS } from '@neo-one/react-common';
 import { retryBackoff } from '@neo-one/utils';
 import { WorkerManager } from '@neo-one/worker';
 import fetch from 'cross-fetch';
@@ -7,7 +8,6 @@ import _ from 'lodash';
 import * as nodePath from 'path';
 import { defer, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { TrackJS } from 'trackjs';
 import { ModuleNotFoundError } from '../../errors';
 import { MissingPath, ModuleBase } from './ModuleBase';
 import { getPathWithExports, PathWithExports } from './packages';

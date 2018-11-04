@@ -417,7 +417,7 @@ const buildAll = ((cache) =>
 
 const install = ((cache) =>
   memoizeTask(cache, async function install(format) {
-    await execa.shell('yarn install --non-interactive --no-progress', {
+    await execa.shell('yarn install --non-interactive --no-progress --ignore-engines', {
       cwd: getDistBaseCWD(format),
       stdio: ['ignore', 'inherit', 'inherit'],
     });

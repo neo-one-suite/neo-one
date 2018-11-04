@@ -2,8 +2,8 @@
 import '@babel/polyfill';
 // @ts-ignore
 import regeneratorRuntime from '@babel/runtime/regenerator';
+import { TrackJS } from '@neo-one/react-common';
 import LogRocket from 'logrocket';
-import { TrackJS } from 'trackjs';
 // @ts-ignore
 import './Modernizr';
 

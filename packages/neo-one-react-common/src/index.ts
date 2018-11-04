@@ -15,6 +15,7 @@ export * from './Selector';
 export * from './Shadow';
 export * from './SplitPane';
 export * from './Tooltip';
+export * from './TrackJS';
 export * from './pure';
 export * from './types';
 export * from '@neo-one/react-core';
