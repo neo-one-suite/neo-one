@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/editor-server",
-  "version": "1.0.0-preview.2",
+  "version": "1.0.0-preview.3",
   "description": "NEO•ONE editor server.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/http": "^1.0.0-preview.2",
-    "@neo-one/monitor": "^1.0.0-preview.2",
-    "@neo-one/utils": "^1.0.0-preview.2",
+    "@neo-one/http": "^1.0.0-preview.3",
+    "@neo-one/monitor": "^1.0.0-preview.3",
+    "@neo-one/utils": "^1.0.0-preview.3",
     "@types/graphlib": "^2.1.4",
     "@types/koa": "^2.0.46",
     "@types/koa-compose": "^3.2.2",
