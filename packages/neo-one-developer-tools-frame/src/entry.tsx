@@ -1,5 +1,6 @@
 // tslint:disable no-import-side-effect no-object-mutation
 import '@babel/polyfill';
+import '../static/fonts.css';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
