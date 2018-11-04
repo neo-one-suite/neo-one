@@ -2,7 +2,7 @@
 import * as api from '@neo-one/smart-contract-compiler';
 
 describe('@neo-one/smart-contract-compiler', () => {
-  const EXPECTED = ['compileContract', 'scan', 'getSemanticDiagnostics'];
+  const EXPECTED = ['compileContract', 'scan', 'getSemanticDiagnostics', 'COMPILER_OPTIONS'];
 
   test('has expected exports', () => {
     // tslint:disable-next-line no-array-mutation no-misleading-array-reverse

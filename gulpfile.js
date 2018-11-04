@@ -132,6 +132,7 @@ const globs = {
     `!${getDistBase(format)}/packages/*/src/__tests__/**/*`,
     `!${getDistBase(format)}/packages/*/src/__e2e__/**/*`,
     `!${getDistBase(format)}/packages/*/src/bin/**/*`,
+    `!${getDistBase(format)}/packages/neo-one-developer-tools/src/*.ts`,
     `!${getDistBase(format)}/packages/neo-one-developer-tools-frame/src/*.ts`,
     `!${getDistBase(format)}/packages/neo-one-smart-contract-lib/src/*.ts`,
     `!${getDistBase(format)}/packages/neo-one-server-plugin-wallet/src/contracts/*.ts`,
@@ -552,7 +553,8 @@ gulp.task('publish', gulp.parallel(FORMATS.map((format) => publish(format))));
 
 gulp.task('build', gulp.series('clean', 'buildAll', 'install'));
 
-const buildE2ESeries = (type) => gulp.series(buildAll(MAIN_FORMAT, type), install(MAIN_FORMAT));
+const buildE2ESeries = (type) =>
+  gulp.series('compileDeveloperToolsFrame', buildAll(MAIN_FORMAT, type), install(MAIN_FORMAT));
 gulp.task('buildE2E', gulp.series('clean', buildE2ESeries()));
 
 gulp.task(

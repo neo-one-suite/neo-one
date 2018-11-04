@@ -1,7 +1,7 @@
-/* @hash 33b5c6f29fd5f7804cf483145b3012b2 */
+/* @hash be86571217462e15a43c1714a5c8c9a6 */
 // tslint:disable
 /* eslint-disable */
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { Client, DeveloperClient, DeveloperTools, LocalClient } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from './types';
 import { createClient, createDeveloperClients, createLocalClients } from './client';
@@ -34,6 +34,7 @@ export const ContractsProvider = <TClient extends Client>({
   const client = clientIn === undefined ? createClient() : clientIn;
   const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
   const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+  DeveloperTools.enable({ client, developerClients, localClients });
 
   return (
     <Context.Provider

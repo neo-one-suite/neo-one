@@ -33,6 +33,8 @@ describe('@neo-one/client-full', () => {
     'publicKeyToScriptHash',
     'scriptHashToAddress',
     'wifToPrivateKey',
+    // DeveloperTools
+    'DeveloperTools',
   ];
 
   test('has expected exports', () => {
