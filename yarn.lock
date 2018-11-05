@@ -7741,10 +7741,10 @@ entities@^1.1.1, entities@~1.1.1:
   resolved "https://registry.yarnpkg.com/entities/-/entities-1.1.2.tgz#bdfa735299664dfafd34529ed4f8522a275fea56"
   integrity sha512-f2LZMYl1Fzu7YSBKg+RoROelpOaNrcGmE9AZubeDfrCEia483oW4MI4VyFd5VNHIgQ/7qm1I0wUHK1eJnn2y2w==
 
-env-paths@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/env-paths/-/env-paths-1.0.0.tgz#4168133b42bb05c38a35b1ae4397c8298ab369e0"
-  integrity sha1-QWgTO0K7BcOKNbGuQ5fIKYqzaeA=
+env-paths@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/env-paths/-/env-paths-2.0.0.tgz#5a71723f3df7ca98113541f6fa972184f2c9611d"
+  integrity sha512-13VpSqOO91W3MskXxWJ8x+Y33RKaPT53/HviPp8QcMmEbAJaPFEm8BmMpxCHroJ5rGADqr34Zl6zosBt3F+xAA==
 
 env-variable@0.0.x:
   version "0.0.5"
