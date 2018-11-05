@@ -80,6 +80,7 @@ const createMD = ({ withAnchors }: { readonly withAnchors: boolean }) => {
       format: (content: string) => md.render(content).slice(3, -5),
       includeLevel: [4, 5],
       name: 'toc_reference',
+      subTOC: true,
     })
     .use(container, 'warning', {
       // tslint:disable-next-line:no-any

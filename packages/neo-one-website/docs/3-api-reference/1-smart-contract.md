@@ -11,6 +11,12 @@ This reference uses dot syntax to indicate static properties and `#` to indicate
   - `Foo.bar` is the static property `bar` on the value `Foo`.
   - `Foo#bar` is the property `bar` on an instance of `Foo`.
 
+---
+
+[[toc]]
+
+---
+
 ## Smart Contract Reference
 
 [[toc-reference]]
@@ -457,7 +463,9 @@ Marks a [`SmartContract`](/docs/smart-contract#SmartContract) method as not modi
 
 ---
 
-## Blockchain Data-Types Reference
+## Blockchain Data Types Reference
+
+[[toc-reference]]
 
 #### `AttributeUsage`
 

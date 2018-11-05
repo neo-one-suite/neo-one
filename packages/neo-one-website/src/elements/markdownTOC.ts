@@ -15,6 +15,7 @@ const defaults = {
   listType: 'ul',
   format: undefined,
   forceFullToc: false,
+  subTOC: false,
   containerHeaderHtml: undefined,
   containerFooterHtml: undefined,
   name: 'toc',
@@ -25,6 +26,7 @@ export const markdownTOC = (md: any, o: any) => {
   const name = options.name;
   const tocRegexp = options.markerPattern;
   let gstate: any;
+  let seen = 0;
 
   const open = `${name}_open`;
   const body = `${name}_body`;
@@ -53,6 +55,9 @@ export const markdownTOC = (md: any, o: any) => {
     if (match.length < 1) {
       return false;
     }
+
+    gstate = undefined;
+    seen = 0;
 
     // Build content
     token = state.push(open, 'toc', 1);
@@ -120,7 +125,9 @@ export const markdownTOC = (md: any, o: any) => {
 
       return tocBody;
     } else {
-      return renderChildsTokens(0, gstate.tokens)[1];
+      const result = renderChildsTokens(seen, gstate.tokens);
+      seen = result[0] + 1;
+      return result[1];
     }
   };
 
@@ -135,6 +142,14 @@ export const markdownTOC = (md: any, o: any) => {
       var token = tokens[i];
       var heading = tokens[i - 1];
       var level = token.tag && parseInt(token.tag.substr(1, 1));
+      if (
+        token.type === 'heading_close' &&
+        options.includeLevel.indexOf(level) == -1 &&
+        currentLevel !== undefined &&
+        options.subTOC
+      ) {
+        break;
+      }
       if (token.type !== 'heading_close' || options.includeLevel.indexOf(level) == -1 || heading.type !== 'inline') {
         i++;
         continue; // Skip if not matching criteria
@@ -172,7 +187,9 @@ export const markdownTOC = (md: any, o: any) => {
 
   // Catch all the tokens for iteration later
   md.core.ruler.push('grab_state', function(state: any) {
-    gstate = state;
+    if (gstate === undefined) {
+      gstate = state;
+    }
   });
 
   // Insert TOC
