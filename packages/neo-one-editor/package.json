@@ -54,7 +54,7 @@
     "logrocket": "^0.6.17",
     "monaco-editor": "^0.14.3",
     "monaco-textmate": "^3.0.0",
-    "nanoid": "^1.3.4",
+    "nanoid": "^2.0.0",
     "onigasm": "^2.2.1",
     "prop-types": "^15.6.2",
     "raw-loader": "^0.5.1",

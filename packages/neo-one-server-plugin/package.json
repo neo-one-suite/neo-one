@@ -23,7 +23,7 @@
     "chokidar": "^2.0.4",
     "cli-truncate": "^1.1.0",
     "elegant-spinner": "^1.0.1",
-    "env-paths": "^1.0.0",
+    "env-paths": "^2.0.0",
     "figures": "^2.0.0",
     "fs-extra": "^7.0.0",
     "is-running": "^2.1.0",

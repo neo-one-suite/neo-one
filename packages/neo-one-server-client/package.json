@@ -14,7 +14,7 @@
     "@types/execa": "^0.9.0",
     "@types/fs-extra": "^5.0.4",
     "@types/is-running": "^2.1.0",
-    "env-paths": "^1.0.0",
+    "env-paths": "^2.0.0",
     "execa": "^1.0.0",
     "fs-extra": "^7.0.0",
     "grpc": "^1.15.1",
