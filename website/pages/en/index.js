@@ -1,5 +1,6 @@
 const React = require('react');
 const siteConfig = require(process.cwd() + '/siteConfig.js');
+const translate = require('../../server/translate.js').translate;
 
 class HorizontalTitleContainer extends React.Component {
   render() {
