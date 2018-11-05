@@ -235,7 +235,7 @@
     "tslint": "5.11.0",
     "tslint-clean-code": "0.2.9",
     "tslint-config-prettier": "1.15.0",
-    "tslint-consistent-codestyle": "1.14.0",
+    "tslint-consistent-codestyle": "1.14.1",
     "tslint-immutable": "4.9.0",
     "tslint-microsoft-contrib": "5.2.1",
     "tslint-sonarts": "1.8.0",
