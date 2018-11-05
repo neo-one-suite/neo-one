@@ -35,6 +35,8 @@ import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 // @ts-ignore
 import 'prismjs/components/prism-markup';
+// @ts-ignore
+import 'prismjs/components/prism-jsx';
 import './prismBash';
 
 Prism.languages.typescript = Prism.languages.extend('javascript', {
@@ -44,6 +46,8 @@ Prism.languages.typescript = Prism.languages.extend('javascript', {
   builtin: /\b(?:string|Function|any|number|boolean|Array|symbol|console|void|null)\b/,
 });
 Prism.languages.ts = Prism.languages.typescript;
+const typescript = Prism.util.clone(Prism.languages.typescript);
+Prism.languages.tsx = Prism.languages.extend('jsx', typescript);
 // tslint:enable
 
 const langPrefix = 'language-';
