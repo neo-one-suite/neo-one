@@ -37,11 +37,7 @@ const siteConfig = {
   organizationName: 'neo-one-suite',
   projectName: 'neo-one',
   headerLinks: [
-    { doc: 'getting-started', label: 'Docs' },
-    { page: 'help', label: 'Help' },
-    { blog: true, label: 'Blog' },
     { href: repoUrl, label: 'GitHub' },
-    { languages: true },
     // { search: true },
   ],
   users,
