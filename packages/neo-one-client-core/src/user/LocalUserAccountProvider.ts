@@ -10,6 +10,7 @@ import {
   ClaimTransaction,
   ClaimTransactionModel,
   common,
+  crypto,
   ForwardValue,
   GetOptions,
   Hash256String,
@@ -65,26 +66,55 @@ import {
   NothingToRefundError,
   NothingToSendError,
   NothingToTransferError,
+  UnknownAccountError,
 } from '../errors';
 import { converters } from './converters';
 
 export interface KeyStore {
-  readonly type: string;
+  /**
+   * An optional limit on the total byte size the `KeyStore` is capable of signing.
+   */
   readonly byteLimit?: number;
+  /**
+   * An `Observable` which emits the currently selected `UserAccount`.
+   */
   readonly currentUserAccount$: Observable<UserAccount | undefined>;
+  /**
+   * @returns the currently selected `UserAccount`
+   */
   readonly getCurrentUserAccount: () => UserAccount | undefined;
+  /**
+   * An `Observable` of all available `UserAccount`s
+   */
   readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
+  /**
+   * @returns the available `UserAccount`s
+   */
   readonly getUserAccounts: () => ReadonlyArray<UserAccount>;
+  /**
+   * Select a specific `UserAccount` as the currently selected user account.
+   *
+   * If the `KeyStore` implements selecting `UserAccount`s in a way that does not allow arbitrary `UserAccount`s to be programatically selected, then the `KeyStore` should only ever return one available `UserAccount` from the `userAccount$` and `getUserAccounts` properties.
+   */
   readonly selectUserAccount: (id?: UserAccountID, monitor?: Monitor) => Promise<void>;
-  readonly deleteUserAccount: (id: UserAccountID, monitor?: Monitor) => Promise<void>;
-  readonly updateUserAccountName: (options: UpdateAccountNameOptions) => Promise<void>;
+  /**
+   * The `KeyStore` may optionally support deleting `UserAccount`s.
+   */
+  readonly deleteUserAccount?: (id: UserAccountID, monitor?: Monitor) => Promise<void>;
+  /**
+   * The `KeyStore` may optionally support updating the `UserAccount` name.
+   */
+  readonly updateUserAccountName?: (options: UpdateAccountNameOptions) => Promise<void>;
+  /**
+   * Sign an arbitrary message with the specified user account, returning a hex encoded string of the signature.
+   */
   readonly sign: (
     options: {
       readonly account: UserAccountID;
       readonly message: string;
       readonly monitor?: Monitor;
     },
-  ) => Promise<Witness>;
+  ) => Promise<string>;
 }
 
 export interface Provider {
@@ -128,7 +158,7 @@ export interface Provider {
   readonly getOutput: (network: NetworkType, input: Input, monitor?: Monitor) => Promise<Output>;
   readonly iterBlocks: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<Block>;
   readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
-  readonly iterActionsRaw: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<RawAction>;
+  readonly iterActionsRaw?: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<RawAction>;
 }
 
 interface TransactionOptionsFull {
@@ -176,17 +206,18 @@ interface FullTransfer extends Transfer {
 
 export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider extends Provider>
   implements UserAccountProvider {
-  public readonly type: string;
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;
   public readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
   public readonly networks$: Observable<ReadonlyArray<NetworkType>>;
   public readonly keystore: TKeyStore;
   public readonly provider: TProvider;
+  public readonly deleteUserAccount?: (id: UserAccountID) => Promise<void>;
+  public readonly updateUserAccountName?: (options: UpdateAccountNameOptions) => Promise<void>;
+  public readonly iterActionsRaw?: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<RawAction>;
   protected readonly mutableUsedOutputs: Set<string>;
   protected mutableBlockCount: number;
 
   public constructor({ keystore, provider }: { readonly keystore: TKeyStore; readonly provider: TProvider }) {
-    this.type = keystore.type;
     this.keystore = keystore;
     this.provider = provider;
 
@@ -196,6 +227,27 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
 
     this.mutableBlockCount = 0;
     this.mutableUsedOutputs = new Set<string>();
+
+    const deleteUserAccountIn = this.keystore.deleteUserAccount;
+    if (deleteUserAccountIn !== undefined) {
+      const deleteUserAccount = deleteUserAccountIn.bind(this.keystore);
+      this.deleteUserAccount = async (id: UserAccountID, monitor?: Monitor): Promise<void> => {
+        await deleteUserAccount(id, monitor);
+      };
+    }
+
+    const updateUserAccountNameIn = this.keystore.updateUserAccountName;
+    if (updateUserAccountNameIn !== undefined) {
+      const updateUserAccountName = updateUserAccountNameIn.bind(this.keystore);
+      this.updateUserAccountName = async (options: UpdateAccountNameOptions): Promise<void> => {
+        await updateUserAccountName(options);
+      };
+    }
+
+    const iterActionsRaw = this.provider.iterActionsRaw;
+    if (iterActionsRaw !== undefined) {
+      this.iterActionsRaw = iterActionsRaw.bind(this.keystore);
+    }
   }
 
   public getCurrentUserAccount(): UserAccount | undefined {
@@ -220,10 +272,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
 
   public async getAccount(network: NetworkType, address: AddressString, monitor?: Monitor): Promise<Account> {
     return this.provider.getAccount(network, address, monitor);
-  }
-
-  public iterActionsRaw(network: NetworkType, filter?: BlockFilter): AsyncIterable<RawAction> {
-    return this.provider.iterActionsRaw(network, filter);
   }
 
   public async transfer(
@@ -641,14 +689,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     await this.keystore.selectUserAccount(id, monitor);
   }
 
-  public async deleteUserAccount(id: UserAccountID, monitor?: Monitor): Promise<void> {
-    await this.keystore.deleteUserAccount(id, monitor);
-  }
-
-  public async updateUserAccountName(options: UpdateAccountNameOptions): Promise<void> {
-    await this.keystore.updateUserAccountName(options);
-  }
-
   protected getTransactionOptions(options: TransactionOptions = {}): TransactionOptionsFull {
     const { attributes = [], networkFee = utils.ZERO_BIG_NUMBER, systemFee = utils.ZERO_BIG_NUMBER } = options;
 
@@ -914,7 +954,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           });
         }
 
-        const [witness, inputOutputs, claimOutputs] = await Promise.all([
+        const [signature, inputOutputs, claimOutputs] = await Promise.all([
           this.keystore.sign({
             account: from,
             message: transactionUnsigned.serializeUnsigned().toString('hex'),
@@ -937,13 +977,20 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             : Promise.resolve([]),
         ]);
 
+        const userAccount = this.getUserAccount(from);
+        const witness = crypto.createWitnessForSignature(
+          Buffer.from(signature, 'hex'),
+          common.stringToECPoint(userAccount.publicKey),
+          WitnessModel,
+        );
+
         const result = await this.provider.relayTransaction(
           from.network,
           this.addWitness({
             transaction: transactionUnsigned,
             inputOutputs: inputOutputs.concat(claimOutputs),
             address,
-            witness: this.convertWitness(witness),
+            witness,
           })
             .serializeWire()
             .toString('hex'),
@@ -1512,5 +1559,16 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         level: { log: 'verbose', span: 'info' },
         trace: true,
       });
+  }
+
+  private getUserAccount(id: UserAccountID): UserAccount {
+    const userAccount = this.keystore
+      .getUserAccounts()
+      .find((account) => account.id.network === id.network && account.id.address === id.address);
+    if (userAccount === undefined) {
+      throw new UnknownAccountError(id.address);
+    }
+
+    return userAccount;
   }
 }

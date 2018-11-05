@@ -25,10 +25,9 @@ describe('LocalStringStore', () => {
     };
   };
 
-  const type = 'memory';
   let store: LocalStringStore;
   beforeEach(() => {
-    store = new LocalStringStore({ type, storage: createStorage() });
+    store = new LocalStringStore(createStorage());
   });
 
   test('getWallets', async () => {

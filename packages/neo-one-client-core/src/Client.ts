@@ -29,6 +29,8 @@ import {
   UserAccountProviders,
 } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
+import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
+import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
 import { toObservable } from '@reactivex/ix-es2015-cjs/asynciterable/toobservable';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -36,7 +38,12 @@ import { BehaviorSubject, combineLatest, Observable, Observer, ReplaySubject } f
 import { distinctUntilChanged, filter, map, multicast, refCount, switchMap, take } from 'rxjs/operators';
 import { AsyncParallelHook } from 'tapable';
 import * as args from './args';
-import { UnknownAccountError, UnknownNetworkError } from './errors';
+import {
+  DeleteUserAccountUnsupportedError,
+  UnknownAccountError,
+  UnknownNetworkError,
+  UpdateUserAccountUnsupportedError,
+} from './errors';
 import { createSmartContract } from './sc';
 import { SmartContract, SmartContractAny } from './types';
 
@@ -49,6 +56,11 @@ export interface ClientHooks {
   readonly afterConfirmed: AsyncParallelHook<Transaction, TransactionReceipt>;
   readonly afterCall: AsyncParallelHook<RawCallReceipt>;
   readonly callError: AsyncParallelHook<Error>;
+}
+
+export interface Features {
+  readonly delete: boolean;
+  readonly updateName: boolean;
 }
 
 export class Client<
@@ -107,10 +119,6 @@ export class Client<
       (providersArray[0] as TUserAccountProvider | undefined);
     if (providerIn === undefined) {
       throw new Error('At least one provider is required');
-    }
-
-    if (Object.entries(providersIn).some(([type, provider]) => type !== provider.type)) {
-      throw new Error('Provider keys must be named the same as their type');
     }
 
     this.providers$ = new BehaviorSubject(providersIn);
@@ -233,14 +241,34 @@ export class Client<
     this.selectedProvider$.next(provider);
   }
 
+  public async getSupportedFeatures(idIn: UserAccountID): Promise<Features> {
+    const id = args.assertUserAccountID('id', idIn);
+    const provider = this.getProvider({ from: id });
+
+    return {
+      delete: provider.deleteUserAccount !== undefined,
+      updateName: provider.updateUserAccountName !== undefined,
+    };
+  }
+
   public async deleteUserAccount(idIn: UserAccountID): Promise<void> {
     const id = args.assertUserAccountID('id', idIn);
-    await this.getProvider({ from: id }).deleteUserAccount(id);
+    const provider = this.getProvider({ from: id });
+    if (provider.deleteUserAccount === undefined) {
+      throw new DeleteUserAccountUnsupportedError(id);
+    }
+
+    await provider.deleteUserAccount(id);
   }
 
   public async updateUserAccountName(options: UpdateAccountNameOptions): Promise<void> {
     const { id, name } = args.assertUpdateAccountNameOptions('options', options);
-    await this.getProvider({ from: id }).updateUserAccountName({ id, name });
+    const provider = this.getProvider({ from: id });
+    if (provider.updateUserAccountName === undefined) {
+      throw new UpdateUserAccountUnsupportedError(id);
+    }
+
+    await provider.updateUserAccountName({ id, name });
   }
 
   public getCurrentUserAccount(): UserAccount | undefined {
@@ -309,7 +337,26 @@ export class Client<
 
   // internal
   public __iterActionsRaw(network: NetworkType, blockFilter?: BlockFilter): AsyncIterable<RawAction> {
-    return this.getNetworkProvider(network).iterActionsRaw(network, blockFilter);
+    const provider = this.getNetworkProvider(network);
+    if (provider.iterActionsRaw !== undefined) {
+      return provider.iterActionsRaw(network, blockFilter);
+    }
+
+    return AsyncIterableX.from(provider.iterBlocks(network, blockFilter)).pipe(
+      flatMap(async (block) => {
+        const actions = _.flatten(
+          block.transactions.map((transaction) => {
+            if (transaction.type === 'InvocationTransaction') {
+              return [...transaction.invocationData.actions];
+            }
+
+            return [];
+          }),
+        );
+
+        return AsyncIterableX.of(...actions);
+      }),
+    );
   }
 
   public async __invoke(

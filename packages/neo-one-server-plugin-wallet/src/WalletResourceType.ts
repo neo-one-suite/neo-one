@@ -81,10 +81,7 @@ export class WalletResourceType extends ResourceType<Wallet, WalletResourceOptio
     const client = new Client({
       file: new LocalUserAccountProvider({
         keystore: new LocalKeyStore({
-          store: new LocalStringStore({
-            type: 'file',
-            storage: new AsyncNodeStorage(walletsPath),
-          }),
+          store: new LocalStringStore(new AsyncNodeStorage(walletsPath)),
         }),
 
         provider: new NEOONEProvider([{ network: 'main', rpcURL: constants.MAIN_URL }]),

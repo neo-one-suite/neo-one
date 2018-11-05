@@ -75,11 +75,11 @@ const StyledMarkdown = styled(Markdown)`
   }
 
   & h5 {
-    ${prop('theme.fontStyles.body1')};
+    ${prop('theme.fontStyles.body2')};
     ${smallHeaderMargins}
 
     @media (min-width: ${prop('theme.breakpoints.md')}) {
-      ${prop('theme.fontStyles.body2')};
+      ${prop('theme.fontStyles.subheading')};
       ${headerMargins}
     }
   }

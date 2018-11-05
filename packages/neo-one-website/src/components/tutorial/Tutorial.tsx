@@ -2,6 +2,7 @@
 // @ts-ignore
 import { ViewportConsumer } from '@render-props/viewport';
 import * as React from 'react';
+import slugify from 'slugify';
 import { AdjacentInfo, SectionData } from '../../types';
 import { Content } from '../content';
 
@@ -14,8 +15,6 @@ export interface TutorialProps {
 }
 
 const NULL_OFFSET_RETURN = 10000000;
-
-const slugify = (title: string) => title.toLowerCase().replace(' ', '-');
 
 const getElementPosition = (title: string): number => {
   const element = document.getElementById(slugify(title));

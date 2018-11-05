@@ -810,12 +810,9 @@ const createUserAccountID = (options: Partial<UserAccountID> = {}): UserAccountI
 });
 
 const createUserAccount = (options: Partial<UserAccount> = {}): UserAccount => ({
-  type: 'mock',
   id: createUserAccountID(),
   name: 'Mock',
   publicKey: keys[1].publicKeyString,
-  configurableName: true,
-  deletable: true,
   ...options,
 });
 

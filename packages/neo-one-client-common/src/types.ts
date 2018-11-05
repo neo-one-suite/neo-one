@@ -500,42 +500,115 @@ export interface Transfer {
   readonly to: AddressString;
 }
 
+/**
+ * Uniquely identifies a `UserAccount` by its address and the network its used on.
+ */
 export interface UserAccountID {
+  /**
+   * Network that this address is used on.
+   */
   readonly network: NetworkType;
+  /**
+   * The NEO address.
+   */
   readonly address: AddressString;
 }
 
+/**
+ * `UserAccount` is the base abstraction on which all of the @neo-one/client APIs work with.
+ */
 export interface UserAccount {
-  readonly type: string;
+  /**
+   * Uniquely identifies a `UserAccount` by its address and the network its used on.
+   */
   readonly id: UserAccountID;
+  /**
+   * The name to use when displaying this account in a user-facing UI. Can be a user configured name or just the address.
+   */
   readonly name: string;
+  /**
+   * The public key for the address.
+   */
   readonly publicKey: PublicKeyString;
-  readonly configurableName: boolean;
-  readonly deletable: boolean;
 }
 
 export interface UserAccountProvider {
-  readonly type: string;
+  /**
+   * An `Observable` that emits the currently selected `UserAccount`
+   */
   readonly currentUserAccount$: Observable<UserAccount | undefined>;
+  /**
+   * An `Observable` that emits the available `UserAccount`s
+   */
   readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
+  /**
+   * An `Observable` that emits the available networks this `UserAccountProvider` knows how to function with.
+   */
   readonly networks$: Observable<ReadonlyArray<NetworkType>>;
-
+  /**
+   * @returns the currently selected `UserAccount` or `undefined` if one is not selected.
+   */
   readonly getCurrentUserAccount: () => UserAccount | undefined;
+  /**
+   * @returns the available `UserAccount`s
+   */
   readonly getUserAccounts: () => ReadonlyArray<UserAccount>;
+  /**
+   * @returns the available networks this `UserAccountProvider` knows how to function with.
+   */
   readonly getNetworks: () => ReadonlyArray<NetworkType>;
-  readonly iterBlocks: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<Block>;
+  /**
+   * Set the given `UserAccountID` as the selected `UserAccount`.
+   *
+   * If the `UserAccountProvider` does not support programatically selecting a `UserAccountID`, it should only ever expose one available `UserAccount` and manage selecting other `UserAccount`s outside of the application.
+   */
+  readonly selectUserAccount: (id?: UserAccountID) => Promise<void>;
+  /**
+   * Optional support for deleting a `UserAccount`
+   */
+  readonly deleteUserAccount?: (id: UserAccountID) => Promise<void>;
+  /**
+   * Optional support for updating the name of a `UserAccount`
+   */
+  readonly updateUserAccountName?: (options: UpdateAccountNameOptions) => Promise<void>;
+  /**
+   * @returns the current `Block` height.
+   */
   readonly getBlockCount: (network: NetworkType, monitor?: Monitor) => Promise<number>;
+  /**
+   * @returns `Account` for the specified network and address. Note that the provided network and address may not correspond to one of the available `UserAccount`s.
+   */
   readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
-  readonly iterActionsRaw: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<RawAction>;
+  /**
+   * @returns `AsyncIterable` of `Block`s on the argument `network`.
+   */
+  readonly iterBlocks: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<Block>;
+  /**
+   * While this method could be implemented simply as a function of `iterBlocks`, `iterActionsRaw` is provided in case the `UserAccountProvider` has a more efficient way of iterating over actions.
+   *
+   * @returns `AsyncIterable` over all actions emitted by the given `network`, filtered by the given `filter`.
+   */
+  readonly iterActionsRaw?: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<RawAction>;
+  /**
+   * Transfers native assets.
+   */
   readonly transfer: (
     transfers: ReadonlyArray<Transfer>,
     options?: TransactionOptions,
   ) => Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>;
+  /**
+   * Claim all claimable GAS.
+   */
   readonly claim: (options?: TransactionOptions) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
-
-  readonly selectUserAccount: (id?: UserAccountID) => Promise<void>;
-  readonly deleteUserAccount: (id: UserAccountID) => Promise<void>;
-  readonly updateUserAccountName: (options: UpdateAccountNameOptions) => Promise<void>;
+  /**
+   * Invoke the specified `method` with the given `params` on `contract`.
+   *
+   * `paramsZipped` contains the original parameters before processing with the ABI and are typically suitable for displaying to a user.
+   *
+   * `verify` will be true if the transaction should trigger verification for the `contract`
+   *
+   * `options` may specify additional native asset transfers to include with the transaction (either to or from the contract address).
+   */
   readonly invoke: (
     contract: AddressString,
     method: string,
@@ -545,6 +618,11 @@ export interface UserAccountProvider {
     options?: InvokeSendUnsafeReceiveTransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  /**
+   * Relays a transaction that is the first step of a two-step send process. The `Transfer`'s `to` property represents the ultimate destination of the funds, but this transaction will be constructed such that those funds are marked for transfer, not actually transferred.
+   *
+   * Otherwise, parameters are the same as `invoke`.
+   */
   readonly invokeSend: (
     contract: AddressString,
     method: string,
@@ -554,6 +632,11 @@ export interface UserAccountProvider {
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  /**
+   * Relays a transaction that is the second step of a two-step send process. The `hash` is the transaction hash of the first step in the process and is used to determine the amount to transfer to the `from` address.
+   *
+   * Otherwise, parameters are the same as `invoke`.
+   */
   readonly invokeCompleteSend: (
     contract: AddressString,
     method: string,
@@ -563,6 +646,11 @@ export interface UserAccountProvider {
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  /**
+   * Refunds native assets that were not processed by the contract. The `hash` is the transaction hash that should be refunded and is used to construct the transfers for this transaction.
+   *
+   * Otherwise, parameters are the same as `invoke`.
+   */
   readonly invokeRefundAssets: (
     contract: AddressString,
     method: string,
@@ -572,6 +660,11 @@ export interface UserAccountProvider {
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  /**
+   * Claims GAS. Currently only supports claiming all unclaimed GAS to the contract address.
+   *
+   * Otherwise, parameters are the same as `invoke`.
+   */
   readonly invokeClaim: (
     contract: AddressString,
     method: string,
@@ -580,6 +673,9 @@ export interface UserAccountProvider {
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+  /**
+   * Invokes the constant `method` on `contract` with `params` on `network`.
+   */
   readonly call: (
     network: NetworkType,
     contract: AddressString,

@@ -1,15 +1,11 @@
 import {
   Account,
   AddressString,
-  common,
-  crypto,
   NetworkType,
   PublicKeyString,
   publicKeyToAddress,
   UserAccount,
   UserAccountID,
-  Witness,
-  WitnessModel,
 } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
 import { mergeScanLatest, utils } from '@neo-one/utils';
@@ -34,7 +30,6 @@ export interface LedgerProvider {
 
 export interface Handler {
   readonly byteLimit: number;
-  readonly type: string;
   readonly init: () => Promise<ConnectedHandler>;
 }
 
@@ -77,7 +72,6 @@ export class LedgerKeyStore {
   public get currentAccount(): UserAccount | undefined {
     return this.currentAccountInternal$.getValue();
   }
-  public readonly type: string;
   public readonly byteLimit: number;
   public readonly currentAccount$: Observable<UserAccount | undefined>;
   public readonly accounts$: Observable<ReadonlyArray<UserAccount>>;
@@ -93,7 +87,6 @@ export class LedgerKeyStore {
 
   public constructor(provider: LedgerProvider, handlerIn?: Handler) {
     this.ledgerHandler = handlerIn === undefined ? LedgerHandler : handlerIn;
-    this.type = this.ledgerHandler.type;
     this.byteLimit = this.ledgerHandler.byteLimit;
     this.provider = provider;
 
@@ -194,7 +187,7 @@ export class LedgerKeyStore {
     readonly account: UserAccountID;
     readonly message: string;
     readonly monitor?: Monitor;
-  }): Promise<Witness> {
+  }): Promise<string> {
     const handler = await this.initPromise;
 
     return this.capture(
@@ -205,16 +198,7 @@ export class LedgerKeyStore {
           account: ledger.accountKey,
         });
 
-        const witness = crypto.createWitnessForSignature(
-          response,
-          common.stringToECPoint(ledger.account.publicKey),
-          WitnessModel,
-        );
-
-        return {
-          verification: witness.verification.toString('hex'),
-          invocation: witness.invocation.toString('hex'),
-        };
+        return response.toString('hex');
       },
       'neo_ledger_sign',
       monitor,
@@ -311,15 +295,12 @@ export class LedgerKeyStore {
     return {
       accountKey: accountVal,
       account: {
-        type: `ledger`,
         id: {
           network,
           address: publicKeyToAddress(publicKey),
         },
         name: accountVal.toString(),
         publicKey,
-        configurableName: false,
-        deletable: false,
       },
     };
   }

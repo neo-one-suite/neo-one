@@ -47,27 +47,21 @@ describe('LedgerKeyStore', () => {
   };
 
   const indexAccount = {
-    type: 'ledger',
     id: {
       network: 'test',
       address: 'ARL4VYQWxSwigpRsCsucLxovujKDmwYeTd',
     },
     name: '0',
     publicKey: '03d81d462f80d55ff234b1b221e46d52e4da3f93c465edbbaeebd742bc1947fe6d',
-    configurableName: false,
-    deletable: false,
   };
 
   const secondaryAccount = {
-    type: 'ledger',
     id: {
       network: 'test',
       address: 'AJGCVgoLp3bU57zd4k6mcpedWr45Em8dFD',
     },
     name: '1',
     publicKey: '031546889cf12577237536380e86b2587d55743f9d4dac8879f332b79ce1a84cd6',
-    configurableName: false,
-    deletable: false,
   };
 
   const indexLedger: Ledger = {
@@ -108,7 +102,6 @@ describe('LedgerKeyStore', () => {
 
   const mockHandler: Handler = {
     byteLimit: 2048,
-    type: 'ledger',
     init: async () => Promise.resolve(mockConnectedHandler),
   };
 
@@ -141,12 +134,6 @@ describe('LedgerKeyStore', () => {
     ]);
     expect(currentAccount).toEqual(indexAccount);
     expect(accounts).toEqual([indexAccount, secondaryAccount]);
-  });
-
-  test('type', () => {
-    const result = keystore.type;
-
-    expect(result).toEqual('ledger');
   });
 
   test('byteLimit', () => {

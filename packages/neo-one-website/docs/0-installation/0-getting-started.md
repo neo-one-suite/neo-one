@@ -46,6 +46,10 @@ NEO•ONE is written in TypeScript and the documentation assumes some familiarit
 
 Prefer JavaScript or don't want to use TypeScript? No problem! NEO•ONE smart contracts are the only part of the framework that requires coding in TypeScript - otherwise you're free to use either JavaScript or TypeScript.
 
+### Blockchain Resources
+
+The majority of the documentation assumes general familiarity with blockchain and the NEO blockchain in particular. Check out the [Blockchain Basics](/docs/blockchain-basics) chapter of the main guide if you are unfamiliar with the general concepts blockchain or need a refresher.
+
 ### Step-by-Step Guide
 
 If you'd prefer to just get an overview of NEO•ONE and learn about the core concepts, check out the [guide to main concepts](/docs/hello-world). Every chapter builds on the knowledge introduced in previous chapters so you won't miss a thing as you go along.

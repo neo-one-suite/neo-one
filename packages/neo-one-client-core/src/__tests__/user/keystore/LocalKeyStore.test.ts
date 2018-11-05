@@ -7,13 +7,11 @@ describe('LocalKeyStore', () => {
   addKeysToCrypto();
 
   const network = 'local';
-  const type = 'mock';
   const getWallets = jest.fn();
   const getWalletsSync = jest.fn();
   const saveWallet = jest.fn();
   const deleteWallet = jest.fn();
   const store: Store = {
-    type,
     getWallets,
     getWalletsSync,
     saveWallet,
@@ -32,12 +30,6 @@ describe('LocalKeyStore', () => {
     getWalletsSync.mockImplementation(() => [lockedWallet, unlockedWallet]);
     getWallets.mockImplementation(() => [lockedWallet, unlockedWallet]);
     keystore = new LocalKeyStore({ store });
-  });
-
-  test('type', () => {
-    const result = keystore.type;
-
-    expect(result).toEqual(type);
   });
 
   test('currentUserAccount$', async () => {
@@ -163,15 +155,12 @@ describe('LocalKeyStore', () => {
   const createExpectedPrivateKeyWallet = ({ name = keys[2].address, nep2 }: { name?: string; nep2?: string }) => ({
     type: 'unlocked',
     account: {
-      type,
       id: {
         network,
         address: keys[2].address,
       },
       name,
       publicKey: keys[2].publicKeyString,
-      configurableName: true,
-      deletable: true,
     },
     nep2,
     privateKey: keys[2].privateKeyString,

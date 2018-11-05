@@ -41,8 +41,6 @@ Array [
 
 exports[`Client constructor does not automatically select an account if one exists at the time of selection 1`] = `Array []`;
 
-exports[`Client constructor throws on invalid provider key 1`] = `"Provider keys must be named the same as their type"`;
-
 exports[`Client constructor throws on no provider 1`] = `"At least one provider is required"`;
 
 exports[`Client deleteUserAccount 1`] = `
@@ -433,15 +431,12 @@ Object {
             "_isScalar": true,
             "_subscribe": [Function],
             "value": Object {
-              "configurableName": true,
-              "deletable": true,
               "id": Object {
                 "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                 "network": "main",
               },
               "name": "Mock",
               "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-              "type": "mock",
             },
           },
           "deleteUserAccount": [MockFunction] {
@@ -471,29 +466,23 @@ Object {
               Object {
                 "isThrow": false,
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
               Object {
                 "isThrow": false,
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
             ],
@@ -645,7 +634,6 @@ Object {
           },
           "selectUserAccount": [MockFunction],
           "transfer": [MockFunction],
-          "type": "memory",
           "updateUserAccountName": [MockFunction] {
             "calls": Array [
               Array [
@@ -670,15 +658,12 @@ Object {
             "_subscribe": [Function],
             "value": Array [
               Object {
-                "configurableName": true,
-                "deletable": true,
                 "id": Object {
                   "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                   "network": "main",
                 },
                 "name": "Mock",
                 "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                "type": "mock",
               },
             ],
           },
@@ -857,15 +842,12 @@ Object {
                 "toRespond": 0,
                 "values": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                   Object {
                     "call": [MockFunction],
@@ -886,15 +868,12 @@ Object {
                       "_isScalar": true,
                       "_subscribe": [Function],
                       "value": Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     },
                     "deleteUserAccount": [MockFunction] {
@@ -924,29 +903,23 @@ Object {
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                       ],
@@ -1098,7 +1071,6 @@ Object {
                     },
                     "selectUserAccount": [MockFunction],
                     "transfer": [MockFunction],
-                    "type": "memory",
                     "updateUserAccountName": [MockFunction] {
                       "calls": Array [
                         Array [
@@ -1123,15 +1095,12 @@ Object {
                       "_subscribe": [Function],
                       "value": Array [
                         Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       ],
                     },
@@ -1322,15 +1291,12 @@ Object {
                 "toRespond": 0,
                 "values": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                   Object {
                     "call": [MockFunction],
@@ -1351,15 +1317,12 @@ Object {
                       "_isScalar": true,
                       "_subscribe": [Function],
                       "value": Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     },
                     "deleteUserAccount": [MockFunction] {
@@ -1389,29 +1352,23 @@ Object {
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                       ],
@@ -1563,7 +1520,6 @@ Object {
                     },
                     "selectUserAccount": [MockFunction],
                     "transfer": [MockFunction],
-                    "type": "memory",
                     "updateUserAccountName": [MockFunction] {
                       "calls": Array [
                         Array [
@@ -1588,15 +1544,12 @@ Object {
                       "_subscribe": [Function],
                       "value": Array [
                         Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       ],
                     },
@@ -1789,15 +1742,12 @@ Object {
                 "toRespond": 0,
                 "values": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                   Object {
                     "call": [MockFunction],
@@ -1818,15 +1768,12 @@ Object {
                       "_isScalar": true,
                       "_subscribe": [Function],
                       "value": Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     },
                     "deleteUserAccount": [MockFunction] {
@@ -1856,29 +1803,23 @@ Object {
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                       ],
@@ -2030,7 +1971,6 @@ Object {
                     },
                     "selectUserAccount": [MockFunction],
                     "transfer": [MockFunction],
-                    "type": "memory",
                     "updateUserAccountName": [MockFunction] {
                       "calls": Array [
                         Array [
@@ -2055,15 +1995,12 @@ Object {
                       "_subscribe": [Function],
                       "value": Array [
                         Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       ],
                     },
@@ -2254,15 +2191,12 @@ Object {
                 "toRespond": 0,
                 "values": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                   Object {
                     "call": [MockFunction],
@@ -2283,15 +2217,12 @@ Object {
                       "_isScalar": true,
                       "_subscribe": [Function],
                       "value": Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     },
                     "deleteUserAccount": [MockFunction] {
@@ -2321,29 +2252,23 @@ Object {
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                       ],
@@ -2495,7 +2420,6 @@ Object {
                     },
                     "selectUserAccount": [MockFunction],
                     "transfer": [MockFunction],
-                    "type": "memory",
                     "updateUserAccountName": [MockFunction] {
                       "calls": Array [
                         Array [
@@ -2520,15 +2444,12 @@ Object {
                       "_subscribe": [Function],
                       "value": Array [
                         Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       ],
                     },
@@ -2732,15 +2653,12 @@ Object {
               "toRespond": 0,
               "values": Array [
                 Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
                 Object {
                   "call": [MockFunction],
@@ -2761,15 +2679,12 @@ Object {
                     "_isScalar": true,
                     "_subscribe": [Function],
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   "deleteUserAccount": [MockFunction] {
@@ -2799,29 +2714,23 @@ Object {
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                     ],
@@ -2973,7 +2882,6 @@ Object {
                   },
                   "selectUserAccount": [MockFunction],
                   "transfer": [MockFunction],
-                  "type": "memory",
                   "updateUserAccountName": [MockFunction] {
                     "calls": Array [
                       Array [
@@ -2998,15 +2906,12 @@ Object {
                     "_subscribe": [Function],
                     "value": Array [
                       Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     ],
                   },
@@ -3220,15 +3125,12 @@ Object {
               "toRespond": 0,
               "values": Array [
                 Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
                 Object {
                   "call": [MockFunction],
@@ -3249,15 +3151,12 @@ Object {
                     "_isScalar": true,
                     "_subscribe": [Function],
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   "deleteUserAccount": [MockFunction] {
@@ -3287,29 +3186,23 @@ Object {
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                     ],
@@ -3461,7 +3354,6 @@ Object {
                   },
                   "selectUserAccount": [MockFunction],
                   "transfer": [MockFunction],
-                  "type": "memory",
                   "updateUserAccountName": [MockFunction] {
                     "calls": Array [
                       Array [
@@ -3486,15 +3378,12 @@ Object {
                     "_subscribe": [Function],
                     "value": Array [
                       Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     ],
                   },
@@ -3535,15 +3424,12 @@ Object {
             "_isScalar": true,
             "_subscribe": [Function],
             "value": Object {
-              "configurableName": true,
-              "deletable": true,
               "id": Object {
                 "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                 "network": "main",
               },
               "name": "Mock",
               "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-              "type": "mock",
             },
           },
           "deleteUserAccount": [MockFunction] {
@@ -3573,29 +3459,23 @@ Object {
               Object {
                 "isThrow": false,
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
               Object {
                 "isThrow": false,
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
             ],
@@ -3747,7 +3627,6 @@ Object {
           },
           "selectUserAccount": [MockFunction],
           "transfer": [MockFunction],
-          "type": "memory",
           "updateUserAccountName": [MockFunction] {
             "calls": Array [
               Array [
@@ -3772,15 +3651,12 @@ Object {
             "_subscribe": [Function],
             "value": Array [
               Object {
-                "configurableName": true,
-                "deletable": true,
                 "id": Object {
                   "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                   "network": "main",
                 },
                 "name": "Mock",
                 "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                "type": "mock",
               },
             ],
           },
@@ -3959,15 +3835,12 @@ Object {
                 "toRespond": 0,
                 "values": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                   Object {
                     "call": [MockFunction],
@@ -3988,15 +3861,12 @@ Object {
                       "_isScalar": true,
                       "_subscribe": [Function],
                       "value": Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     },
                     "deleteUserAccount": [MockFunction] {
@@ -4026,29 +3896,23 @@ Object {
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                       ],
@@ -4200,7 +4064,6 @@ Object {
                     },
                     "selectUserAccount": [MockFunction],
                     "transfer": [MockFunction],
-                    "type": "memory",
                     "updateUserAccountName": [MockFunction] {
                       "calls": Array [
                         Array [
@@ -4225,15 +4088,12 @@ Object {
                       "_subscribe": [Function],
                       "value": Array [
                         Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       ],
                     },
@@ -4424,15 +4284,12 @@ Object {
                 "toRespond": 0,
                 "values": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                   Object {
                     "call": [MockFunction],
@@ -4453,15 +4310,12 @@ Object {
                       "_isScalar": true,
                       "_subscribe": [Function],
                       "value": Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     },
                     "deleteUserAccount": [MockFunction] {
@@ -4491,29 +4345,23 @@ Object {
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                       ],
@@ -4665,7 +4513,6 @@ Object {
                     },
                     "selectUserAccount": [MockFunction],
                     "transfer": [MockFunction],
-                    "type": "memory",
                     "updateUserAccountName": [MockFunction] {
                       "calls": Array [
                         Array [
@@ -4690,15 +4537,12 @@ Object {
                       "_subscribe": [Function],
                       "value": Array [
                         Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       ],
                     },
@@ -4891,15 +4735,12 @@ Object {
                 "toRespond": 0,
                 "values": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                   Object {
                     "call": [MockFunction],
@@ -4920,15 +4761,12 @@ Object {
                       "_isScalar": true,
                       "_subscribe": [Function],
                       "value": Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     },
                     "deleteUserAccount": [MockFunction] {
@@ -4958,29 +4796,23 @@ Object {
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                       ],
@@ -5132,7 +4964,6 @@ Object {
                     },
                     "selectUserAccount": [MockFunction],
                     "transfer": [MockFunction],
-                    "type": "memory",
                     "updateUserAccountName": [MockFunction] {
                       "calls": Array [
                         Array [
@@ -5157,15 +4988,12 @@ Object {
                       "_subscribe": [Function],
                       "value": Array [
                         Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       ],
                     },
@@ -5356,15 +5184,12 @@ Object {
                 "toRespond": 0,
                 "values": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                   Object {
                     "call": [MockFunction],
@@ -5385,15 +5210,12 @@ Object {
                       "_isScalar": true,
                       "_subscribe": [Function],
                       "value": Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     },
                     "deleteUserAccount": [MockFunction] {
@@ -5423,29 +5245,23 @@ Object {
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                         Object {
                           "isThrow": false,
                           "value": Object {
-                            "configurableName": true,
-                            "deletable": true,
                             "id": Object {
                               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                               "network": "main",
                             },
                             "name": "Mock",
                             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                            "type": "mock",
                           },
                         },
                       ],
@@ -5597,7 +5413,6 @@ Object {
                     },
                     "selectUserAccount": [MockFunction],
                     "transfer": [MockFunction],
-                    "type": "memory",
                     "updateUserAccountName": [MockFunction] {
                       "calls": Array [
                         Array [
@@ -5622,15 +5437,12 @@ Object {
                       "_subscribe": [Function],
                       "value": Array [
                         Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       ],
                     },
@@ -5834,15 +5646,12 @@ Object {
               "toRespond": 0,
               "values": Array [
                 Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
                 Object {
                   "call": [MockFunction],
@@ -5863,15 +5672,12 @@ Object {
                     "_isScalar": true,
                     "_subscribe": [Function],
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   "deleteUserAccount": [MockFunction] {
@@ -5901,29 +5707,23 @@ Object {
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                     ],
@@ -6075,7 +5875,6 @@ Object {
                   },
                   "selectUserAccount": [MockFunction],
                   "transfer": [MockFunction],
-                  "type": "memory",
                   "updateUserAccountName": [MockFunction] {
                     "calls": Array [
                       Array [
@@ -6100,15 +5899,12 @@ Object {
                     "_subscribe": [Function],
                     "value": Array [
                       Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     ],
                   },
@@ -6322,15 +6118,12 @@ Object {
               "toRespond": 0,
               "values": Array [
                 Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
                 Object {
                   "call": [MockFunction],
@@ -6351,15 +6144,12 @@ Object {
                     "_isScalar": true,
                     "_subscribe": [Function],
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   "deleteUserAccount": [MockFunction] {
@@ -6389,29 +6179,23 @@ Object {
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                     ],
@@ -6563,7 +6347,6 @@ Object {
                   },
                   "selectUserAccount": [MockFunction],
                   "transfer": [MockFunction],
-                  "type": "memory",
                   "updateUserAccountName": [MockFunction] {
                     "calls": Array [
                       Array [
@@ -6588,15 +6371,12 @@ Object {
                     "_subscribe": [Function],
                     "value": Array [
                       Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     ],
                   },
@@ -6720,15 +6500,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction],
@@ -6758,22 +6535,18 @@ Object {
               "registerAsset": [MockFunction],
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "local",
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                    "type": "mock",
                   },
                 ],
               },
@@ -6797,15 +6570,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction] {
@@ -6835,29 +6605,23 @@ Object {
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                 ],
@@ -7009,7 +6773,6 @@ Object {
               },
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "memory",
               "updateUserAccountName": [MockFunction] {
                 "calls": Array [
                   Array [
@@ -7034,15 +6797,12 @@ Object {
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                 ],
               },
@@ -7070,15 +6830,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction],
@@ -7108,22 +6865,18 @@ Object {
               "registerAsset": [MockFunction],
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "local",
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                    "type": "mock",
                   },
                 ],
               },
@@ -7147,15 +6900,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction] {
@@ -7185,29 +6935,23 @@ Object {
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                 ],
@@ -7359,7 +7103,6 @@ Object {
               },
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "memory",
               "updateUserAccountName": [MockFunction] {
                 "calls": Array [
                   Array [
@@ -7384,15 +7127,12 @@ Object {
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                 ],
               },
@@ -7426,15 +7166,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction],
@@ -7464,22 +7201,18 @@ Object {
               "registerAsset": [MockFunction],
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "local",
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                    "type": "mock",
                   },
                 ],
               },
@@ -7503,15 +7236,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction] {
@@ -7541,29 +7271,23 @@ Object {
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                 ],
@@ -7715,7 +7439,6 @@ Object {
               },
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "memory",
               "updateUserAccountName": [MockFunction] {
                 "calls": Array [
                   Array [
@@ -7740,15 +7463,12 @@ Object {
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                 ],
               },
@@ -7776,15 +7496,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction],
@@ -7814,22 +7531,18 @@ Object {
               "registerAsset": [MockFunction],
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "local",
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                    "type": "mock",
                   },
                 ],
               },
@@ -7853,15 +7566,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction] {
@@ -7891,29 +7601,23 @@ Object {
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                 ],
@@ -8065,7 +7769,6 @@ Object {
               },
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "memory",
               "updateUserAccountName": [MockFunction] {
                 "calls": Array [
                   Array [
@@ -8090,15 +7793,12 @@ Object {
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                 ],
               },
@@ -8124,15 +7824,12 @@ Object {
             "_isScalar": true,
             "_subscribe": [Function],
             "value": Object {
-              "configurableName": true,
-              "deletable": true,
               "id": Object {
                 "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                 "network": "main",
               },
               "name": "Mock",
               "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-              "type": "mock",
             },
           },
           "deleteUserAccount": [MockFunction],
@@ -8162,22 +7859,18 @@ Object {
           "registerAsset": [MockFunction],
           "selectUserAccount": [MockFunction],
           "transfer": [MockFunction],
-          "type": "local",
           "updateUserAccountName": [MockFunction],
           "userAccounts$": Observable {
             "_isScalar": true,
             "_subscribe": [Function],
             "value": Array [
               Object {
-                "configurableName": true,
-                "deletable": true,
                 "id": Object {
                   "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                   "network": "main",
                 },
                 "name": "Mock",
                 "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                "type": "mock",
               },
             ],
           },
@@ -8201,15 +7894,12 @@ Object {
             "_isScalar": true,
             "_subscribe": [Function],
             "value": Object {
-              "configurableName": true,
-              "deletable": true,
               "id": Object {
                 "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                 "network": "main",
               },
               "name": "Mock",
               "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-              "type": "mock",
             },
           },
           "deleteUserAccount": [MockFunction] {
@@ -8239,29 +7929,23 @@ Object {
               Object {
                 "isThrow": false,
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
               Object {
                 "isThrow": false,
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
             ],
@@ -8413,7 +8097,6 @@ Object {
           },
           "selectUserAccount": [MockFunction],
           "transfer": [MockFunction],
-          "type": "memory",
           "updateUserAccountName": [MockFunction] {
             "calls": Array [
               Array [
@@ -8438,15 +8121,12 @@ Object {
             "_subscribe": [Function],
             "value": Array [
               Object {
-                "configurableName": true,
-                "deletable": true,
                 "id": Object {
                   "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                   "network": "main",
                 },
                 "name": "Mock",
                 "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                "type": "mock",
               },
             ],
           },
@@ -8488,15 +8168,12 @@ Object {
           "_isScalar": true,
           "_subscribe": [Function],
           "value": Object {
-            "configurableName": true,
-            "deletable": true,
             "id": Object {
               "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
               "network": "main",
             },
             "name": "Mock",
             "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-            "type": "mock",
           },
         },
         "deleteUserAccount": [MockFunction] {
@@ -8526,29 +8203,23 @@ Object {
             Object {
               "isThrow": false,
               "value": Object {
-                "configurableName": true,
-                "deletable": true,
                 "id": Object {
                   "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                   "network": "main",
                 },
                 "name": "Mock",
                 "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                "type": "mock",
               },
             },
             Object {
               "isThrow": false,
               "value": Object {
-                "configurableName": true,
-                "deletable": true,
                 "id": Object {
                   "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                   "network": "main",
                 },
                 "name": "Mock",
                 "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                "type": "mock",
               },
             },
           ],
@@ -8700,7 +8371,6 @@ Object {
         },
         "selectUserAccount": [MockFunction],
         "transfer": [MockFunction],
-        "type": "memory",
         "updateUserAccountName": [MockFunction] {
           "calls": Array [
             Array [
@@ -8725,15 +8395,12 @@ Object {
           "_subscribe": [Function],
           "value": Array [
             Object {
-              "configurableName": true,
-              "deletable": true,
               "id": Object {
                 "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                 "network": "main",
               },
               "name": "Mock",
               "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-              "type": "mock",
             },
           ],
         },
@@ -8924,15 +8591,12 @@ Object {
               "toRespond": 0,
               "values": Array [
                 Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
                 Object {
                   "call": [MockFunction],
@@ -8953,15 +8617,12 @@ Object {
                     "_isScalar": true,
                     "_subscribe": [Function],
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   "deleteUserAccount": [MockFunction] {
@@ -8991,29 +8652,23 @@ Object {
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                     ],
@@ -9165,7 +8820,6 @@ Object {
                   },
                   "selectUserAccount": [MockFunction],
                   "transfer": [MockFunction],
-                  "type": "memory",
                   "updateUserAccountName": [MockFunction] {
                     "calls": Array [
                       Array [
@@ -9190,15 +8844,12 @@ Object {
                     "_subscribe": [Function],
                     "value": Array [
                       Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     ],
                   },
@@ -9413,15 +9064,12 @@ Object {
               "toRespond": 0,
               "values": Array [
                 Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
                 Object {
                   "call": [MockFunction],
@@ -9442,15 +9090,12 @@ Object {
                     "_isScalar": true,
                     "_subscribe": [Function],
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   "deleteUserAccount": [MockFunction] {
@@ -9480,29 +9125,23 @@ Object {
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                     ],
@@ -9654,7 +9293,6 @@ Object {
                   },
                   "selectUserAccount": [MockFunction],
                   "transfer": [MockFunction],
-                  "type": "memory",
                   "updateUserAccountName": [MockFunction] {
                     "calls": Array [
                       Array [
@@ -9679,15 +9317,12 @@ Object {
                     "_subscribe": [Function],
                     "value": Array [
                       Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     ],
                   },
@@ -9892,15 +9527,12 @@ Object {
               "toRespond": 0,
               "values": Array [
                 Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
                 Object {
                   "call": [MockFunction],
@@ -9921,15 +9553,12 @@ Object {
                     "_isScalar": true,
                     "_subscribe": [Function],
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   "deleteUserAccount": [MockFunction] {
@@ -9959,29 +9588,23 @@ Object {
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                     ],
@@ -10133,7 +9756,6 @@ Object {
                   },
                   "selectUserAccount": [MockFunction],
                   "transfer": [MockFunction],
-                  "type": "memory",
                   "updateUserAccountName": [MockFunction] {
                     "calls": Array [
                       Array [
@@ -10158,15 +9780,12 @@ Object {
                     "_subscribe": [Function],
                     "value": Array [
                       Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     ],
                   },
@@ -10381,15 +10000,12 @@ Object {
               "toRespond": 0,
               "values": Array [
                 Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
                 Object {
                   "call": [MockFunction],
@@ -10410,15 +10026,12 @@ Object {
                     "_isScalar": true,
                     "_subscribe": [Function],
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   "deleteUserAccount": [MockFunction] {
@@ -10448,29 +10061,23 @@ Object {
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                       Object {
                         "isThrow": false,
                         "value": Object {
-                          "configurableName": true,
-                          "deletable": true,
                           "id": Object {
                             "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                             "network": "main",
                           },
                           "name": "Mock",
                           "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                          "type": "mock",
                         },
                       },
                     ],
@@ -10622,7 +10229,6 @@ Object {
                   },
                   "selectUserAccount": [MockFunction],
                   "transfer": [MockFunction],
-                  "type": "memory",
                   "updateUserAccountName": [MockFunction] {
                     "calls": Array [
                       Array [
@@ -10647,15 +10253,12 @@ Object {
                     "_subscribe": [Function],
                     "value": Array [
                       Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     ],
                   },
@@ -10883,15 +10486,12 @@ Object {
             "toRespond": 0,
             "values": Array [
               Object {
-                "configurableName": true,
-                "deletable": true,
                 "id": Object {
                   "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                   "network": "main",
                 },
                 "name": "Mock",
                 "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                "type": "mock",
               },
               Object {
                 "call": [MockFunction],
@@ -10912,15 +10512,12 @@ Object {
                   "_isScalar": true,
                   "_subscribe": [Function],
                   "value": Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                 },
                 "deleteUserAccount": [MockFunction] {
@@ -10950,29 +10547,23 @@ Object {
                     Object {
                       "isThrow": false,
                       "value": Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     },
                     Object {
                       "isThrow": false,
                       "value": Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     },
                   ],
@@ -11124,7 +10715,6 @@ Object {
                 },
                 "selectUserAccount": [MockFunction],
                 "transfer": [MockFunction],
-                "type": "memory",
                 "updateUserAccountName": [MockFunction] {
                   "calls": Array [
                     Array [
@@ -11149,15 +10739,12 @@ Object {
                   "_subscribe": [Function],
                   "value": Array [
                     Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   ],
                 },
@@ -11395,15 +10982,12 @@ Object {
             "toRespond": 0,
             "values": Array [
               Object {
-                "configurableName": true,
-                "deletable": true,
                 "id": Object {
                   "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                   "network": "main",
                 },
                 "name": "Mock",
                 "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                "type": "mock",
               },
               Object {
                 "call": [MockFunction],
@@ -11424,15 +11008,12 @@ Object {
                   "_isScalar": true,
                   "_subscribe": [Function],
                   "value": Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                 },
                 "deleteUserAccount": [MockFunction] {
@@ -11462,29 +11043,23 @@ Object {
                     Object {
                       "isThrow": false,
                       "value": Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     },
                     Object {
                       "isThrow": false,
                       "value": Object {
-                        "configurableName": true,
-                        "deletable": true,
                         "id": Object {
                           "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                           "network": "main",
                         },
                         "name": "Mock",
                         "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        "type": "mock",
                       },
                     },
                   ],
@@ -11636,7 +11211,6 @@ Object {
                 },
                 "selectUserAccount": [MockFunction],
                 "transfer": [MockFunction],
-                "type": "memory",
                 "updateUserAccountName": [MockFunction] {
                   "calls": Array [
                     Array [
@@ -11661,15 +11235,12 @@ Object {
                   "_subscribe": [Function],
                   "value": Array [
                     Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   ],
                 },
@@ -11699,15 +11270,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction],
@@ -11737,22 +11305,18 @@ Object {
               "registerAsset": [MockFunction],
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "local",
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                    "type": "mock",
                   },
                 ],
               },
@@ -11776,15 +11340,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction] {
@@ -11814,29 +11375,23 @@ Object {
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                 ],
@@ -11988,7 +11543,6 @@ Object {
               },
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "memory",
               "updateUserAccountName": [MockFunction] {
                 "calls": Array [
                   Array [
@@ -12013,15 +11567,12 @@ Object {
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                 ],
               },
@@ -12049,15 +11600,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction],
@@ -12087,22 +11635,18 @@ Object {
               "registerAsset": [MockFunction],
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "local",
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                    "type": "mock",
                   },
                 ],
               },
@@ -12126,15 +11670,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction] {
@@ -12164,29 +11705,23 @@ Object {
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                 ],
@@ -12338,7 +11873,6 @@ Object {
               },
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "memory",
               "updateUserAccountName": [MockFunction] {
                 "calls": Array [
                   Array [
@@ -12363,15 +11897,12 @@ Object {
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                 ],
               },
@@ -12405,15 +11936,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction],
@@ -12443,22 +11971,18 @@ Object {
               "registerAsset": [MockFunction],
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "local",
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                    "type": "mock",
                   },
                 ],
               },
@@ -12482,15 +12006,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction] {
@@ -12520,29 +12041,23 @@ Object {
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                 ],
@@ -12694,7 +12209,6 @@ Object {
               },
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "memory",
               "updateUserAccountName": [MockFunction] {
                 "calls": Array [
                   Array [
@@ -12719,15 +12233,12 @@ Object {
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                 ],
               },
@@ -12755,15 +12266,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction],
@@ -12793,22 +12301,18 @@ Object {
               "registerAsset": [MockFunction],
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "local",
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                    "type": "mock",
                   },
                 ],
               },
@@ -12832,15 +12336,12 @@ Object {
                 "_isScalar": true,
                 "_subscribe": [Function],
                 "value": Object {
-                  "configurableName": true,
-                  "deletable": true,
                   "id": Object {
                     "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                     "network": "main",
                   },
                   "name": "Mock",
                   "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  "type": "mock",
                 },
               },
               "deleteUserAccount": [MockFunction] {
@@ -12870,29 +12371,23 @@ Object {
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                   Object {
                     "isThrow": false,
                     "value": Object {
-                      "configurableName": true,
-                      "deletable": true,
                       "id": Object {
                         "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                         "network": "main",
                       },
                       "name": "Mock",
                       "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      "type": "mock",
                     },
                   },
                 ],
@@ -13044,7 +12539,6 @@ Object {
               },
               "selectUserAccount": [MockFunction],
               "transfer": [MockFunction],
-              "type": "memory",
               "updateUserAccountName": [MockFunction] {
                 "calls": Array [
                   Array [
@@ -13069,15 +12563,12 @@ Object {
                 "_subscribe": [Function],
                 "value": Array [
                   Object {
-                    "configurableName": true,
-                    "deletable": true,
                     "id": Object {
                       "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
                       "network": "main",
                     },
                     "name": "Mock",
                     "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    "type": "mock",
                   },
                 ],
               },

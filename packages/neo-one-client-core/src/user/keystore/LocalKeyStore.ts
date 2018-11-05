@@ -10,8 +10,6 @@ import {
   UpdateAccountNameOptions,
   UserAccount,
   UserAccountID,
-  Witness,
-  WitnessModel,
 } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
 import { utils } from '@neo-one/utils';
@@ -38,7 +36,6 @@ export type Wallet = LockedWallet | UnlockedWallet;
 export type Wallets = { readonly [Network in string]?: { readonly [Address in string]?: Wallet } };
 
 export interface Store {
-  readonly type: string;
   readonly getWallets: () => Promise<ReadonlyArray<Wallet>>;
   readonly getWalletsSync?: () => ReadonlyArray<Wallet>;
   readonly saveWallet: (wallet: Wallet, monitor?: Monitor) => Promise<void>;
@@ -53,7 +50,6 @@ const flattenWallets = (wallets: Wallets) =>
   ).filter(utils.notNull);
 
 export class LocalKeyStore {
-  public readonly type: string;
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;
   public readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
   public readonly wallets$: Observable<ReadonlyArray<Wallet>>;
@@ -64,7 +60,6 @@ export class LocalKeyStore {
   private readonly initPromise: Promise<void>;
 
   public constructor({ store }: { readonly store: Store }) {
-    this.type = store.type;
     this.walletsInternal$ = new BehaviorSubject<Wallets>({});
     this.wallets$ = this.walletsInternal$.pipe(
       distinctUntilChanged((a, b) => _.isEqual(a, b)),
@@ -106,22 +101,16 @@ export class LocalKeyStore {
     readonly account: UserAccountID;
     readonly message: string;
     readonly monitor?: Monitor;
-  }): Promise<Witness> {
+  }): Promise<string> {
     await this.initPromise;
 
     return this.capture(
       async () => {
         const privateKey = this.getPrivateKey(account);
-        const witness = crypto.createWitness(
-          Buffer.from(message, 'hex'),
-          common.stringToPrivateKey(privateKey),
-          WitnessModel,
-        );
 
-        return {
-          verification: witness.verification.toString('hex'),
-          invocation: witness.invocation.toString('hex'),
-        };
+        return crypto
+          .sign({ message: Buffer.from(message, 'hex'), privateKey: common.stringToPrivateKey(privateKey) })
+          .toString('hex');
       },
       'neo_sign',
       monitor,
@@ -146,12 +135,9 @@ export class LocalKeyStore {
         const wallet = this.getWallet(id);
         let newWallet: Wallet;
         const account = {
-          type: wallet.account.type,
           id: wallet.account.id,
           name,
           publicKey: wallet.account.publicKey,
-          deletable: true,
-          configurableName: true,
         };
 
         if (wallet.type === 'locked') {
@@ -241,15 +227,12 @@ export class LocalKeyStore {
         }
 
         const account = {
-          type: this.store.type,
           id: {
             network,
             address,
           },
           name: name === undefined ? address : name,
           publicKey,
-          configurableName: true,
-          deletable: true,
         };
 
         const unlockedWallet: UnlockedWallet = {

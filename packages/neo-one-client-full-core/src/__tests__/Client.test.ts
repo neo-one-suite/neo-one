@@ -50,7 +50,6 @@ describe('Client', () => {
     issue1 = jest.fn(async () => factory.createTransactionResult());
 
     provider = {
-      type,
       currentUserAccount$: _of(unlockedWallet.account),
       userAccounts$: _of([unlockedWallet.account]),
       networks$: _of([unlockedWallet.account.id.network]),
@@ -79,7 +78,6 @@ describe('Client', () => {
       iterActionsRaw,
     };
     provider1 = {
-      type: type1,
       currentUserAccount$: _of(unlockedWallet1.account),
       userAccounts$: _of([unlockedWallet1.account]),
       networks$: _of([unlockedWallet1.account.id.network]),
@@ -112,12 +110,6 @@ describe('Client', () => {
 
   test('constructor throws on no provider', () => {
     const result = () => new Client<{}>({});
-
-    expect(result).toThrowErrorMatchingSnapshot();
-  });
-
-  test('constructor throws on invalid provider key', () => {
-    const result = () => new Client({ ['some-other-type']: provider });
 
     expect(result).toThrowErrorMatchingSnapshot();
   });

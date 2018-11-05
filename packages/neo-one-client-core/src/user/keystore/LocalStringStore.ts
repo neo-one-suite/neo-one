@@ -9,13 +9,7 @@ export interface Storage {
 }
 
 export class LocalStringStore {
-  public readonly type: string;
-  public readonly storage: Storage;
-
-  public constructor({ type, storage }: { readonly type: string; readonly storage: Storage }) {
-    this.type = type;
-    this.storage = storage;
-  }
+  public constructor(public readonly storage: Storage) {}
 
   public async getWallets(): Promise<ReadonlyArray<LocalWallet>> {
     const keys = await this.storage.getAllKeys();

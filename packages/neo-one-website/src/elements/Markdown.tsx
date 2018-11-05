@@ -6,7 +6,6 @@ import container from 'markdown-it-container';
 import table from 'markdown-it-multimd-table';
 import * as React from 'react';
 import { css, styled } from 'reakit';
-// @ts-ignore
 import slugify from 'slugify';
 import { ifProp, prop, switchProp } from 'styled-tools';
 import { markdownTOC } from './markdownTOC';
@@ -75,7 +74,7 @@ const createMD = ({ withAnchors }: { readonly withAnchors: boolean }) => {
       slugify,
       markerPattern: /^\[\[toc-reference\]\]/im,
       format: (content: string) => md.render(content).slice(3, -5),
-      includeLevel: [4],
+      includeLevel: [4, 5],
       name: 'toc_reference',
     })
     .use(container, 'warning', {
@@ -95,7 +94,7 @@ const createMD = ({ withAnchors }: { readonly withAnchors: boolean }) => {
     md.use(anchor as any, {
       permalink: true,
       slugify,
-      level: [2, 3, 4],
+      level: [2, 3, 4, 5],
     });
   }
 
@@ -149,12 +148,12 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent'; 
   }
 
   & h5 {
-    ${prop('theme.fontStyles.body2')};
+    ${prop('theme.fontStyles.subheading')};
     ${headerMargins};
   }
 
   & h6 {
-    ${prop('theme.fontStyles.body1')};
+    ${prop('theme.fontStyles.body2')};
     ${headerMargins};
   }
 

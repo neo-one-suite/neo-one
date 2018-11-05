@@ -35,11 +35,11 @@ export const SidebarList = ({ sections, current, alwaysVisible, onClickLink, ...
           <Section key={section.title} current={current} section={section} visible onClickLink={onClickLink} />
         ) : (
           <Hidden.Container
+            key={section.title}
             initialState={{ visible: section.subsections.some((subsection) => current === subsection.slug) }}
           >
             {({ toggle, visible }) => (
               <Section
-                key={section.title}
                 current={current}
                 section={section}
                 visible={visible}

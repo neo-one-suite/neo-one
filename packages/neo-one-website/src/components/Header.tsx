@@ -89,11 +89,11 @@ export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper
         <NavigationLink linkColor="gray" active={path === 'docs'} data-test="header-docs" to="/docs/getting-started">
           Docs
         </NavigationLink>
-        <NavigationLink linkColor="gray" active={path === 'tutorial'} data-test="header-tutorial" to="/tutorial">
-          Tutorial
-        </NavigationLink>
         <NavigationLink linkColor="gray" active={path === 'course'} data-test="header-course" to="/course">
           Course
+        </NavigationLink>
+        <NavigationLink linkColor="gray" active={path === 'tutorial'} data-test="header-tutorial" to="/tutorial">
+          Tutorial
         </NavigationLink>
         <NavigationLink linkColor="gray" active={path === 'blog'} data-test="header-blog" to="/blog">
           Blog

@@ -15,9 +15,9 @@ NEO•ONE uses [cosmiconfig](https://github.com/davidtheclark/cosmiconfig) to lo
 
 Options use dot syntax to indicate an object property. For example, `paths.contracts` means the `contracts` property of the object at the `paths` property of the root configuration object.
 
-[[toc-reference]]
-
 ## Reference
+
+[[toc-reference]]
 
 #### `paths.contracts` [string]
 

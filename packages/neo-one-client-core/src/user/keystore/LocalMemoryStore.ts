@@ -1,12 +1,6 @@
 import { Wallet } from './LocalKeyStore';
 
 export class LocalMemoryStore {
-  public readonly type: string;
-
-  public constructor(type?: string) {
-    this.type = type === undefined ? 'memory' : type;
-  }
-
   public async getWallets(): Promise<ReadonlyArray<Wallet>> {
     return Promise.resolve([]);
   }

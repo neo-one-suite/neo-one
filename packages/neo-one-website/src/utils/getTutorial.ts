@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import slugify from 'slugify';
 import { TutorialProps } from '../components';
 import { SubsectionData } from '../types';
 
@@ -24,11 +25,7 @@ export const getTutorial = async (): Promise<TutorialProps> => {
   };
 };
 
-const slugify = (title: string) => {
-  const id = title.toLowerCase().replace(' ', '-');
-
-  return `/tutorial#${id}`;
-};
+const slugifyTitle = (title: string) => `/tutorial#${slugify(title)}`;
 
 const parseSections = (tutorial: string): ReadonlyArray<SubsectionData> => {
   const sections = tutorial.split('\n').filter((line) => line.includes('##'));
@@ -53,10 +50,10 @@ const parseSections = (tutorial: string): ReadonlyArray<SubsectionData> => {
 
   return Object.entries(sectionHeaders).map<SubsectionData>(([section, subsections]) => ({
     title: section,
-    slug: slugify(section),
+    slug: slugifyTitle(section),
     subsections: subsections.map((subsection) => ({
       title: subsection,
-      slug: slugify(subsection),
+      slug: slugifyTitle(subsection),
     })),
   }));
 };

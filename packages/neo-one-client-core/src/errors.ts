@@ -109,3 +109,13 @@ export const LedgerParseError = makeErrorWithCode(
   'LEDGER_PARSE_ERROR',
   () => 'Ledger transaction parsing error. [CODE: 6d07]',
 );
+export const DeleteUserAccountUnsupportedError = makeErrorWithCode(
+  `DELETE_USER_ACCOUNT_UNSUPPORTED`,
+  (id: UserAccountID) =>
+    `Deleting the user account with network ${id.network} and address ${id.address} is not supported`,
+);
+export const UpdateUserAccountUnsupportedError = makeErrorWithCode(
+  `UPDATE_USER_ACCOUNT_NAME_UNSUPPORTED`,
+  (id: UserAccountID) =>
+    `Updating the name of user account with network ${id.network} and address ${id.address} is not supported`,
+);

@@ -48,3 +48,9 @@ The `Blockchain` value contains several properties pertaining to the current sta
   - `Blockchain.currentHeight` - index of the last `Block` persisted to the blockchain.
   - `Blockchain.currentTransaction` - the current `InvocationTransaction`
   - `Blockchain.currentCallerContract` - the `Address` of the smart contract that directly invoked this contract. May be `undefined` if the current invocation was not from another smart contract.
+
+## Opaque Tag Symbol
+
+If you look at the definition file for the standard library, you might notice a property `OpaqueTagSymbol0` or `OpaqueTagSymbol1` that is present on all types, including global types like `Array` or `Map`. In order to emit the most efficient NEO VM bytecode possible, we have specialized implementations of all of the standard library types. One limitation of this approach, however, is that you must explicitly use the types. For example, you can't pass an `Array` where an `Array`-like but not `Array` interface is expected. Adding the `OpaqueTagSymbol0` or `OpaqueTagSymbol1` properties helps enforce this as a static type error, but it does catch all cases (though we're working on improving this).
+
+As a rule of thumb, don't rely on ["Duck Typing"](https://en.wikipedia.org/wiki/Duck_typing) - always be explicit about the types you're using.
