@@ -17,9 +17,11 @@ This reference uses dot syntax to indicate static properties and `#` to indicate
 
 ---
 
-## Smart Contract Reference
+## Smart Contract
 
 [[toc-reference]]
+
+---
 
 #### `Address`
 
@@ -463,9 +465,11 @@ Marks a [`SmartContract`](/docs/smart-contract#SmartContract) method as not modi
 
 ---
 
-## Blockchain Data Types Reference
+## Blockchain Data Types
 
 [[toc-reference]]
+
+---
 
 #### `AttributeUsage`
 
@@ -580,6 +584,9 @@ Corresponding [`Output`](/docs/smart-contract#Output)s for the [`Input`](/docs/s
 [`Output`](/docs/smart-contract#Output)s which have not been spent.
 
 #### `MinerTransaction`
+
+*extends*
+  - [`TransactionBase`](/docs/smart-contract#TransactionBase)
 
 First [`Transaction`](/docs/smart-contract#Transaction) in each [`Block`](/docs/smart-contract#Block) which contains the [`Block`](/docs/smart-contract#Block) rewards for the consensus node that produced the [`Block`](/docs/smart-contract#Block).
 

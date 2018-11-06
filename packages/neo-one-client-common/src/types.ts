@@ -1,4 +1,4 @@
-// tslint:disable deprecation
+// tslint:disable deprecation no-any
 import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import BN from 'bn.js';
@@ -438,6 +438,9 @@ export interface TransactionResult<
   readonly confirmed: (options?: GetOptions) => Promise<TTransactionReceipt>;
 }
 
+/**
+ * Common `InvocationResult` properties.
+ */
 export interface InvocationResultBase {
   /**
    * GAS consumed by the operation. This is the total GAS consumed after the free GAS is subtracted.
@@ -449,9 +452,12 @@ export interface InvocationResultBase {
   readonly gasCost: BigNumber;
 }
 
+/**
+ * Result of a successful invocation.
+ */
 export interface InvocationResultSuccess<TValue> extends InvocationResultBase {
   /**
-   * Indicates a successful invocation
+   * Indicates a successful invocation.
    */
   readonly state: 'HALT';
   /**
@@ -460,9 +466,12 @@ export interface InvocationResultSuccess<TValue> extends InvocationResultBase {
   readonly value: TValue;
 }
 
+/**
+ * Result of a failed invocation.
+ */
 export interface InvocationResultError extends InvocationResultBase {
   /**
-   * Indicates a failed invocation
+   * Indicates a failed invocation.
    */
   readonly state: 'FAULT';
   /**
@@ -473,7 +482,9 @@ export interface InvocationResultError extends InvocationResultBase {
 
 export type InvocationResult<TValue> = InvocationResultSuccess<TValue> | InvocationResultError;
 
-// tslint:disable-next-line no-any
+/**
+ * The receipt for a smart contract method invocation.
+ */
 export interface InvokeReceipt<TReturn extends Return = Return, TEvent extends Event<string, any> = Event>
   extends TransactionReceipt {
   /**
@@ -489,7 +500,7 @@ export interface InvokeReceipt<TReturn extends Return = Return, TEvent extends E
    */
   readonly logs: ReadonlyArray<Log>;
   /**
-   * The original, unprocessed, raw invoke receipt. The `RawInvokeReceipt` is transformed into this object (the `InvokeReceipt`) using the ABI to parse out the events and transaction result.
+   * The original, unprocessed, raw invoke receipt. The `RawInvokeReceipt` is transformed into this object (the `InvokeReceipt`) using the `ABI` to parse out the `Event`s and `InvocationResult`.
    */
   readonly raw: RawInvokeReceipt;
 }
@@ -726,17 +737,41 @@ export interface Log extends RawActionBase {
 
 export type Action = Event | Log;
 
+/**
+ * Network specific smart contract configuration
+ */
 export interface SmartContractNetworkDefinition {
+  /**
+   * `AddressString` of the smart contract on the network.
+   */
   readonly address: AddressString;
 }
 
+/**
+ * Configuration for the smart contract by network.
+ */
 export interface SmartContractNetworksDefinition {
-  readonly [type: string]: SmartContractNetworkDefinition;
+  /**
+   * Network specific smart contract configuration
+   */
+  readonly [networkType: string]: SmartContractNetworkDefinition;
 }
 
+/**
+ * Used to generate the smart contract APIs.
+ */
 export interface SmartContractDefinition {
+  /**
+   * Configuration for the smart contract by network.
+   */
   readonly networks: SmartContractNetworksDefinition;
+  /**
+   * `ABI` of the smart contract
+   */
   readonly abi: ABI;
+  /**
+   * `SourceMaps` associated with the smart contract.
+   */
   readonly sourceMaps?: Promise<SourceMaps>;
 }
 
@@ -837,27 +872,16 @@ export interface UpdateAccountNameOptions {
  * @see ABIReturn
  */
 export interface ABIReturnBase {
+  /**
+   * `true` if the value can be `undefined`
+   */
   readonly optional?: boolean;
+  /**
+   * `true` if the smart contract expects this value to be forwarded by another smart contract.
+   */
   readonly forwardedValue?: boolean;
 }
 
-/**
- * `Signature` return type.
- *
- * @see ABIReturn
- * @see SignatureString
- */
-export interface SignatureABIReturn extends ABIReturnBase {
-  readonly type: 'Signature';
-}
-/**
- * `boolean` return type.
- *
- * @see ABIReturn
- */
-export interface BooleanABIReturn extends ABIReturnBase {
-  readonly type: 'Boolean';
-}
 /**
  * `Address` return type.
  *
@@ -868,13 +892,22 @@ export interface AddressABIReturn extends ABIReturnBase {
   readonly type: 'Address';
 }
 /**
- * `Hash256` return type.
+ * `Array` return type.
+ */
+export interface ArrayABIReturn extends ABIReturnBase {
+  readonly type: 'Array';
+  /**
+   * Value type of the `Array`.
+   */
+  readonly value: ABIReturn;
+}
+/**
+ * `boolean` return type.
  *
  * @see ABIReturn
- * @see Hash256String
  */
-export interface Hash256ABIReturn extends ABIReturnBase {
-  readonly type: 'Hash256';
+export interface BooleanABIReturn extends ABIReturnBase {
+  readonly type: 'Boolean';
 }
 /**
  * `Buffer` return type.
@@ -886,27 +919,19 @@ export interface BufferABIReturn extends ABIReturnBase {
   readonly type: 'Buffer';
 }
 /**
- * `PublicKey` return type.
- *
- * @see ABIReturn
- * @see PublicKeyString
+ * `ForwardValue` return type.
  */
-export interface PublicKeyABIReturn extends ABIReturnBase {
-  readonly type: 'PublicKey';
+export interface ForwardValueABIReturn extends ABIReturnBase {
+  readonly type: 'ForwardValue';
 }
 /**
- * `string` return type.
+ * `Hash256` return type.
  *
  * @see ABIReturn
+ * @see Hash256String
  */
-export interface StringABIReturn extends ABIReturnBase {
-  readonly type: 'String';
-}
-/**
- * `void` return type.
- */
-export interface VoidABIReturn extends ABIReturnBase {
-  readonly type: 'Void';
+export interface Hash256ABIReturn extends ABIReturnBase {
+  readonly type: 'Hash256';
 }
 /**
  * `Fixed<decimals>` return type. `decimals` indicates to the client APIs how many decimals the integer represents.
@@ -919,16 +944,6 @@ export interface IntegerABIReturn extends ABIReturnBase {
    * Number of decimals values of this type represent.
    */
   readonly decimals: number;
-}
-/**
- * `Array` return type.
- */
-export interface ArrayABIReturn extends ABIReturnBase {
-  readonly type: 'Array';
-  /**
-   * Value type of the `Array`.
-   */
-  readonly value: ABIReturn;
 }
 /**
  * `Map` return type.
@@ -955,10 +970,36 @@ export interface ObjectABIReturn extends ABIReturnBase {
   readonly properties: { readonly [key: string]: ABIReturn };
 }
 /**
- * `ForwardValue` return type.
+ * `PublicKey` return type.
+ *
+ * @see ABIReturn
+ * @see PublicKeyString
  */
-export interface ForwardValueABIReturn extends ABIReturnBase {
-  readonly type: 'ForwardValue';
+export interface PublicKeyABIReturn extends ABIReturnBase {
+  readonly type: 'PublicKey';
+}
+/**
+ * `Signature` return type.
+ *
+ * @see ABIReturn
+ * @see SignatureString
+ */
+export interface SignatureABIReturn extends ABIReturnBase {
+  readonly type: 'Signature';
+}
+/**
+ * `string` return type.
+ *
+ * @see ABIReturn
+ */
+export interface StringABIReturn extends ABIReturnBase {
+  readonly type: 'String';
+}
+/**
+ * `void` return type.
+ */
+export interface VoidABIReturn extends ABIReturnBase {
+  readonly type: 'Void';
 }
 
 /**
@@ -968,11 +1009,14 @@ export interface SenderAddressABIDefault {
   readonly type: 'sender';
 }
 
+/**
+ * Default value for the constructor/deploy parameter.
+ */
 export type ABIDefault = SenderAddressABIDefault;
 export type ABIDefaultType = ABIDefault['type'];
 
 /**
- * `ABIParameter`s are the same as `ABIReturn`s with an additional `name` property for the parameter name.
+ * Base interface for all `ABIParameter`s
  */
 export interface ABIParameterBase {
   /**
@@ -984,26 +1028,11 @@ export interface ABIParameterBase {
    */
   readonly default?: ABIDefault;
   /**
-   * Represents a rest parameter
+   * Represents a rest parameter.
    */
   readonly rest?: boolean;
 }
 
-/**
- * `Signature` parameter type.
- *
- * @see ABIParameter
- * @see SignatureABIReturn
- * @see SignatureString
- */
-export interface SignatureABIParameter extends ABIParameterBase, SignatureABIReturn {}
-/**
- * `boolean` parameter type.
- *
- * @see ABIParameter
- * @see BooleanABIReturn
- */
-export interface BooleanABIParameter extends ABIParameterBase, BooleanABIReturn {}
 /**
  * `Address` parameter type.
  *
@@ -1013,13 +1042,19 @@ export interface BooleanABIParameter extends ABIParameterBase, BooleanABIReturn 
  */
 export interface AddressABIParameter extends ABIParameterBase, AddressABIReturn {}
 /**
- * `Hash256` parameter type.
+ * `Array` parameter type.
  *
  * @see ABIParameter
- * @see Hash256ABIReturn
- * @see Hash256String
+ * @see ArrayABIReturn
  */
-export interface Hash256ABIParameter extends ABIParameterBase, Hash256ABIReturn {}
+export interface ArrayABIParameter extends ABIParameterBase, ArrayABIReturn {}
+/**
+ * `boolean` parameter type.
+ *
+ * @see ABIParameter
+ * @see BooleanABIReturn
+ */
+export interface BooleanABIParameter extends ABIParameterBase, BooleanABIReturn {}
 /**
  * `Buffer` parameter type.
  *
@@ -1029,27 +1064,13 @@ export interface Hash256ABIParameter extends ABIParameterBase, Hash256ABIReturn 
  */
 export interface BufferABIParameter extends ABIParameterBase, BufferABIReturn {}
 /**
- * `PublicKey` parameter type.
+ * `Hash256` parameter type.
  *
  * @see ABIParameter
- * @see PublicKeyABIReturn
- * @see PublicKeyString
+ * @see Hash256ABIReturn
+ * @see Hash256String
  */
-export interface PublicKeyABIParameter extends ABIParameterBase, PublicKeyABIReturn {}
-/**
- * `string` parameter type.
- *
- * @see ABIParameter
- * @see StringABIReturn
- */
-export interface StringABIParameter extends ABIParameterBase, StringABIReturn {}
-/**
- * `void` parameter type.
- *
- * @see ABIParameter
- * @see VoidABIReturn
- */
-export interface VoidABIParameter extends ABIParameterBase, VoidABIReturn {}
+export interface Hash256ABIParameter extends ABIParameterBase, Hash256ABIReturn {}
 /**
  * `Fixed<decimals>` parameter type. `decimals` indicates to the client APIs how many decimals the integer represents.
  *
@@ -1059,12 +1080,12 @@ export interface VoidABIParameter extends ABIParameterBase, VoidABIReturn {}
  */
 export interface IntegerABIParameter extends ABIParameterBase, IntegerABIReturn {}
 /**
- * `Array` parameter type.
+ * `ForwardValue` parameter type.
  *
  * @see ABIParameter
- * @see ArrayABIReturn
+ * @see ForwardValueABIReturn
  */
-export interface ArrayABIParameter extends ABIParameterBase, ArrayABIReturn {}
+export interface ForwardValueABIParameter extends ABIParameterBase, ForwardValueABIReturn {}
 /**
  * `Map` parameter type.
  *
@@ -1080,12 +1101,35 @@ export interface MapABIParameter extends ABIParameterBase, MapABIReturn {}
  */
 export interface ObjectABIParameter extends ABIParameterBase, ObjectABIReturn {}
 /**
- * `ForwardValue` parameter type.
+ * `PublicKey` parameter type.
  *
  * @see ABIParameter
- * @see ForwardValueABIReturn
+ * @see PublicKeyABIReturn
+ * @see PublicKeyString
  */
-export interface ForwardValueABIParameter extends ABIParameterBase, ForwardValueABIReturn {}
+export interface PublicKeyABIParameter extends ABIParameterBase, PublicKeyABIReturn {}
+/**
+ * `Signature` parameter type.
+ *
+ * @see ABIParameter
+ * @see SignatureABIReturn
+ * @see SignatureString
+ */
+export interface SignatureABIParameter extends ABIParameterBase, SignatureABIReturn {}
+/**
+ * `string` parameter type.
+ *
+ * @see ABIParameter
+ * @see StringABIReturn
+ */
+export interface StringABIParameter extends ABIParameterBase, StringABIReturn {}
+/**
+ * `void` parameter type.
+ *
+ * @see ABIParameter
+ * @see VoidABIReturn
+ */
+export interface VoidABIParameter extends ABIParameterBase, VoidABIReturn {}
 
 /**
  * Return type specification of a function in the `ABI` of a smart contract.
@@ -1153,31 +1197,31 @@ export interface ABIFunction {
    */
   readonly returnType: ABIReturn;
   /**
-   * True if the function is constant or read-only.
+   * `true` if the function is constant or read-only.
    */
   readonly constant?: boolean;
   /**
-   * True if the function is used for sending native assets with a two-phase send.
+   * `true` if the function is used for sending native assets with a two-phase send.
    */
   readonly send?: boolean;
   /**
-   * True if the function is used for sending native assets.
+   * `true` if the function is used for sending native assets.
    */
   readonly sendUnsafe?: boolean;
   /**
-   * True if the function is used for receiving native assets.
+   * `true` if the function is used for receiving native assets.
    */
   readonly receive?: boolean;
   /**
-   * True if the function is used for claiming GAS.
+   * `true` if the function is used for claiming GAS.
    */
   readonly claim?: boolean;
   /**
-   * True if the function is used for refunding native assets.
+   * `true` if the function is used for refunding native assets.
    */
   readonly refundAssets?: boolean;
   /**
-   * True if the function is used for the second phase of a send.
+   * `true` if the function is used for the second phase of a send.
    */
   readonly completeSend?: boolean;
 }
@@ -1198,9 +1242,17 @@ export interface ABIEvent {
 
 /**
  * Full specification of the functions and events of a smart contract. Used by the client APIs to generate the smart contract interface.
+ *
+ * See the [Smart Contract APIs](https://neo-one.io/docs/smart-contract-apis) chapter of the main guide for more information.
  */
 export interface ABI {
+  /**
+   * Specification of the smart contract functions.
+   */
   readonly functions: ReadonlyArray<ABIFunction>;
+  /**
+   * Specification of the smart contract events.
+   */
   readonly events?: ReadonlyArray<ABIEvent>;
 }
 
@@ -1236,7 +1288,7 @@ export interface ParamObject {
   readonly [key: string]: Param;
 }
 /**
- * Valid parameter types for a smart contract function.
+ * Valid parameter types for a smart contract method.
  */
 export type Param =
   | undefined
@@ -1255,6 +1307,9 @@ export interface ReturnMap extends ReadonlyMap<Return, Return> {}
 export interface ReturnObject {
   readonly [key: string]: Return;
 }
+/**
+ * Possible return types for a smart contract method.
+ */
 export type Return =
   | undefined
   | BigNumber
@@ -1360,15 +1415,15 @@ export interface Contract {
    */
   readonly description: string;
   /**
-   * True if this `Contract` can use storage.
+   * `true` if this `Contract` can use storage.
    */
   readonly storage: boolean;
   /**
-   * True if this `Contract` can make dynamic invocations.
+   * `true` if this `Contract` can make dynamic invocations.
    */
   readonly dynamicInvoke: boolean;
   /**
-   * True if this `Contract` accepts first-class `Asset`s and/or tokens.
+   * `true` if this `Contract` accepts first-class `Asset`s and/or tokens.
    */
   readonly payable: boolean;
 }
@@ -1619,7 +1674,13 @@ export interface RawInvokeReceipt extends TransactionReceipt {
   readonly actions: ReadonlyArray<RawAction>;
 }
 
+/**
+ * Smart contract source maps.
+ */
 export interface SourceMaps {
+  /**
+   * `RawSourceMap` for the contract at `address`
+   */
   readonly [address: string]: RawSourceMap;
 }
 
