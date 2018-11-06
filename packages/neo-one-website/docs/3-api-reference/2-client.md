@@ -26,19 +26,393 @@ This reference uses dot syntax to indicate static properties and `#` to indicate
 #### `Client`
 #### `UpdateAccountNameOptions`
 #### `UserAccountProvider`
+
+##### `UserAccountProvider#currentUserAccount$`
+
+An `Observable` that emits the currently selected `UserAccount`.
+
+##### `UserAccountProvider#userAccounts$`
+
+An `Observable` that emits the available `UserAccount`s.
+
+##### `UserAccountProvider#networks$`
+
+An `Observable` that emits the available networks this `UserAccountProvider` knows how to function with.
+
+##### `UserAccountProvider#getCurrentUserAccount`
+
+```typescript
+interface UserAccountProvider {
+  readonly getCurrentUserAccount: () => UserAccount | undefined;
+}
+```
+
+Returns the currently selected `UserAccount` or `undefined` if one is not selected.
+
+##### `UserAccountProvider#getUserAccounts`
+
+```typescript
+interface UserAccountProvider {
+  readonly getUserAccounts: () => ReadonlyArray<UserAccount>;
+}
+```
+
+Returns the available `UserAccount`s.
+
+##### `UserAccountProvider#getNetworks`
+
+```typescript
+interface UserAccountProvider {
+  readonly getNetworks: () => ReadonlyArray<NetworkType>;
+}
+```
+
+Returns the available networks this `UserAccountProvider` knows how to function with.
+
+##### `UserAccountProvider#selectUserAccount`
+
+```typescript
+interface UserAccountProvider {
+  readonly selectUserAccount: (id?: UserAccountID) => Promise<void>;
+}
+```
+
+Set the given `UserAccountID` as the selected `UserAccount`. If the `UserAccountProvider` does not support programatically selecting a `UserAccountID`, it should only ever expose one available `UserAccount` and manage selecting other `UserAccount`s outside of the application.
+
+##### `UserAccountProvider#deleteUserAccount`
+
+```typescript
+interface UserAccountProvider {
+  readonly deleteUserAccount?: (id: UserAccountID) => Promise<void>;
+}
+```
+
+Optional support for deleting a `UserAccount`.
+
+##### `UserAccountProvider#updateUserAccountName`
+
+```typescript
+interface UserAccountProvider {
+  readonly updateUserAccountName?: (options: UpdateAccountNameOptions) => Promise<void>;
+}
+```
+
+Optional support for updating the name of a `UserAccount`.
+
+##### `UserAccountProvider#getBlockCount`
+
+```typescript
+interface UserAccountProvider {
+  readonly getBlockCount: (network: NetworkType, monitor?: Monitor) => Promise<number>;
+}
+```
+
+Returns the current `Block` height.
+
+##### `UserAccountProvider#getAccount`
+
+```typescript
+interface UserAccountProvider {
+  readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
+}
+```
+
+Returns `Account` for the specified network and address. Note that the provided network and address may not correspond to one of the available `UserAccount`s.
+
+##### `UserAccountProvider#iterBlocks`
+
+```typescript
+interface UserAccountProvider {
+  readonly iterBlocks: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<Block>;
+}
+```
+
+Returns `AsyncIterable` of `Block`s on the argument `network`.
+
+##### `UserAccountProvider#iterActionsRaw`
+
+```typescript
+interface UserAccountProvider {
+  readonly iterActionsRaw?: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<RawAction>;
+}
+```
+
+While this method could be implemented simply as a function of `iterBlocks`, `iterActionsRaw` is provided in case the `UserAccountProvider` has a more efficient way of iterating over actions. Returns `AsyncIterable` over all actions emitted by the given `network`, filtered by the given `filter`.
+
+##### `UserAccountProvider#transfer`
+
+```typescript
+interface UserAccountProvider {
+  readonly transfer: (
+    transfers: ReadonlyArray<Transfer>,
+    options?: TransactionOptions,
+  ) => Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>;
+}
+```
+
+Transfers native assets.
+
+##### `UserAccountProvider.claim`
+
+```typescript
+interface UserAccountProvider {
+  readonly claim: (options?: TransactionOptions) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+}
+```
+
+Claim all claimable GAS.
+
+##### `UserAccountProvider#invoke`
+
+```typescript
+interface UserAccountProvider {
+  readonly invoke: (
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    verify: boolean,
+    options?: InvokeSendUnsafeReceiveTransactionOptions,
+    sourceMaps?: Promise<SourceMaps>,
+  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+}
+```
+
+Invoke the specified `method` with the given `params` on `contract`. `paramsZipped` contains the original parameters before processing with the ABI and are typically suitable for displaying to a user. `verify` will be true if the transaction should trigger verification for the `contract`. `options` may specify additional native asset transfers to include with the transaction (either to or from the contract address).
+
+##### `UserAccountProvider#invokeSend`
+
+```typescript
+interface UserAccountProvider {
+  readonly invokeSend: (
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    transfer: Transfer,
+    options?: TransactionOptions,
+    sourceMaps?: Promise<SourceMaps>,
+  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+}
+```
+
+Relays a transaction that is the first step of a two-step send process. The `Transfer`'s `to` property represents the ultimate destination of the funds, but this transaction will be constructed such that those funds are marked for transfer, not actually transferred. Otherwise, parameters are the same as `invoke`.
+
+##### `UserAccountProvider#invokeCompleteSend`
+
+```typescript
+interface UserAccountProvider {
+  readonly invokeCompleteSend: (
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    hash: Hash256String,
+    options?: TransactionOptions,
+    sourceMaps?: Promise<SourceMaps>,
+  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+}
+```
+
+Relays a transaction that is the second step of a two-step send process. The `hash` is the transaction hash of the first step in the process and is used to determine the amount to transfer to the `from` address. Otherwise, parameters are the same as `invoke`.
+
+##### `UserAccountProvider#invokeRefundAssets`
+
+```typescript
+interface UserAccountProvider {
+  readonly invokeRefundAssets: (
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    hash: Hash256String,
+    options?: TransactionOptions,
+    sourceMaps?: Promise<SourceMaps>,
+  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+}
+```
+
+Refunds native assets that were not processed by the contract. The `hash` is the transaction hash that should be refunded and is used to construct the transfers for this transaction. Otherwise, parameters are the same as `invoke`.
+
+##### `UserAccountProvider#invokeClaim`
+
+```typescript
+interface UserAccountProvider {
+  readonly invokeClaim: (
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    options?: TransactionOptions,
+    sourceMaps?: Promise<SourceMaps>,
+  ) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+}
+```
+
+Claims GAS. Currently only supports claiming all unclaimed GAS to the contract address. Otherwise, parameters are the same as `invoke`.
+
+##### `UserAccountProvider#call`
+
+```typescript
+interface UserAccountProvider {
+  readonly call: (
+    network: NetworkType,
+    contract: AddressString,
+    method: string,
+    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    monitor?: Monitor,
+  ) => Promise<RawCallReceipt>;
+}
+```
+
+Invokes the constant `method` on `contract` with `params` on `network`.
+
 #### `UserAccountProviders`
+
 #### `AddressString`
+
+Base58 encoded string that represents a NEO address. Also accepts Hash160 strings (hex encoded string prefixed by '0x') when used as a parameter to a NEO•ONE function. Always the base58 encoded string form when returned from a NEO•ONE function.
+
+ **Example:**
+
+```typescript
+// base58 encoded string
+'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR'
+// hash160 string
+'0xecc6b20d3ccac1ee9ef109af5a7cdb85706b1df9'
+```
+
 #### `Hash256String`
+
+Hex encoded string prefixed by '0x' that represents a NEO 256 bit hash. Examples of `Hash256String` include `Block` hashes and `Transaction` hashes.
+
+ **Example:**
+
+```typescript
+'0x7f48028c38117ac9e42c8e1f6f06ae027cdbb904eaf1a0bdc30c9d81694e045c'
+```
+
 #### `PublicKeyString`
+
+Hex encoded string that represents a public key.
+
+ **Example:**
+
+```typescript
+'02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef'
+```
+
+#### `PrivateKeyString`
+
+WIF strings that represents a private key. Also accepts hex encoded strings when used as a parameter to a NEO•ONE function. Always a WIF string when returned from a NEO•ONE function.
+
+ **Example:**
+
+```typescript
+// wif string
+'L1QqQJnpBwbsPGAuutuzPTac8piqvbR1HRjrY5qHup48TBCBFe4g'
+// hex encoded string
+'9ab7e154840daca3a2efadaf0df93cd3a5b51768c632f5433f86909d9b994a69'
+```
+#### `SignatureString`
+
+Hex encoded string that represents a signature for a message.
+
+ **Example:**
+
+```typescript
+'ccaab040cc25021c91567b75db4778853441869157b8f6aad960cdcf1069812480027a528ca9b98e2205027de20696f848cf81824eeb7af1d5110870870ceb67'
+```
+
 #### `BufferString`
+
+Hex encoded string that represents a buffer.
+
+ **Example:**
+
+```typescript
+'908d323aa7f92656a77ec26e8861699ef'
+```
+
 #### `UserAccount`
+
+`UserAccount` is the base abstraction on which all of the @neo-one/client APIs work with.
+
+##### `UserAccount#id`
+
+Uniquely identifies a `UserAccount` by its address and the network its used on.
+
+##### `UserAccount#name`
+
+The name to use when displaying this account in a user-facing UI. Can be a user configured name or just the address.
+
+##### `UserAccount#publicKey`
+
+The public key for the address.
+
 #### `UserAccountID`
+
+Uniquely identifies a `UserAccount` by its address and the network its used on.
+
+##### `UserAccountID#network`
+
+Network that this address is used on.
+
+##### `UserAccountID#address`
+
+The NEO address.
+
 #### `NetworkType`
+
+```typescript
+type NetworkType =
+  | 'main'
+  | 'test'
+  | string
+```
+
 #### `Transfer`
 #### `GetOptions`
 #### `BlockFilter`
+
 #### `TransactionOptions`
+
+##### `TransactionOptions#from`
+
+The `UserAccount` that the transaction is "from", i.e. the one that will be used for native asset transfers, claims, and signing the transaction. If unspecified, the currently selected `UserAccount` is used as the `from` address. DApp developers will typically want to leave this unspecified.
+
+##### `TransactionOptions#attributes`
+
+Additional attributes to include with the transaction.
+
+##### `TransactionOptions#networkFee`
+
+An optional network fee to include with the transaction.
+
+##### `TransactionOptions#systemFee`
+
+A maximum system fee to include with the transaction. Note that this is a maximum, the client APIs will automatically calculate and add a system fee to the transaction up to the value specified here. Leaving `systemFee` `undefined` is equivalent to `new BigNumber(0)`, i.e. no system fee. A `systemFee` of `-1`, i.e. `new BigNumber(-1)` indicates no limit on the fee. This is typically used only during development.
+
+##### `TransactionOptions#monitor`
+
+The `Monitor` to use for tracking and logging all asynchronous calls made during the transaction.
+
 #### `TransactionReceipt`
+
+Receipt of a confirmed `Transaction` which contains data about the confirmation such as the `Block` index and the index of the `Transaction` within the block.
+
+##### `TransactionReceipt#blockIndex`
+
+`Block` index of the `Transaction` for this receipt.
+
+##### `TransactionReceipt#blockHash`
+
+`Block` hash of the `Transaction` for this receipt.
+
+##### `TransactionReceipt#transactionIndex`
+
+Transaction index of the `Transaction` within the `Block` for this receipt.
+
 #### `TransactionResult`
 #### `NetworkSettings`
 
