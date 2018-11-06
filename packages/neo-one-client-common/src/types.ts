@@ -714,27 +714,70 @@ export interface DeveloperProvider {
   readonly reset: (monitor?: Monitor) => Promise<void>;
 }
 
+/**
+ * An `Account` represents the balances of NEO, GAS an other native assets at a given `Address`.
+ */
 export interface Account {
+  /**
+   * The address of this `Account`.
+   */
   readonly address: AddressString;
+  /**
+   * A mapping from a `Hash256String` of a native `Asset` to the value of the held by the `address` for this `Account`.
+   *
+   * May be `undefined` if the `address` has 0 balance.
+   */
   readonly balances: {
     readonly [asset: string]: BigNumber;
   };
 }
 
+/**
+ * The base type of the `Event` parameters. This type is specialized automatically with the generated NEO•ONE smart contract APIs.
+ */
 export interface EventParameters {
   readonly [name: string]: Param | undefined;
 }
+/**
+ * Structured data emitted by a smart contract during a method invocation. Typically emitted in response to state changes within the contract and to notify contract listeners of an action happening within the contract.
+ */
 export interface Event<TName extends string = string, TEventParameters = EventParameters> extends RawActionBase {
+  /**
+   * `type` differentiates the `Event` object from other `Action` objects, i.e. `Log`.
+   */
   readonly type: 'Event';
+  /**
+   * An implementation defined string identifying this `Event`. In the automatically generated NEO•ONE smart contract APIs this identifier distinguishes the type of `Event` and the exact type of the `parameters` of the `Event`.
+   *
+   * @example 'transfer'
+   * @example 'mint'
+   */
   readonly name: TName;
+  /**
+   * Structured data attached to the event.
+   *
+   * @example { from: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR', to: 'ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s', amount: new BigNumber(10) }
+   */
   readonly parameters: TEventParameters;
 }
 
+/**
+ * Unstructured string emitted by a smart contract during a method invocation.
+ */
 export interface Log extends RawActionBase {
+  /**
+   * `type` differentiates the `Log` object from other `Action` objects, i.e. `Event`.
+   */
   readonly type: 'Log';
+  /**
+   * An implementation defined string representing a log message.
+   */
   readonly message: string;
 }
 
+/**
+ * An `Action` is either an `Event` or `Log` emitted by the smart contract during a method invocation.
+ */
 export type Action = Event | Log;
 
 /**
@@ -1579,15 +1622,18 @@ export type ContractParameter =
 
 export type ContractParameterType = ContractParameter['type'];
 
+export interface RawInvocationResultBase {
+  readonly gasConsumed: BigNumber;
+  readonly gasCost: BigNumber;
+}
+
 /**
  * Raw result of a successful invocation.
  *
  * Low-level API for advanced usage only.
  */
-export interface RawInvocationResultSuccess {
+export interface RawInvocationResultSuccess extends RawInvocationResultBase {
   readonly state: 'HALT';
-  readonly gasConsumed: BigNumber;
-  readonly gasCost: BigNumber;
   readonly stack: ReadonlyArray<ContractParameter>;
 }
 
@@ -1598,8 +1644,6 @@ export interface RawInvocationResultSuccess {
  */
 export interface RawInvocationResultError {
   readonly state: 'FAULT';
-  readonly gasConsumed: BigNumber;
-  readonly gasCost: BigNumber;
   readonly stack: ReadonlyArray<ContractParameter>;
   readonly message: string;
 }
@@ -1612,28 +1656,56 @@ export interface RawInvocationResultError {
 export type RawInvocationResult = RawInvocationResultSuccess | RawInvocationResultError;
 
 /**
- * Raw action emitted during an invocation.
- *
- * Low-level API for advanced usage only.
+ * Base properties of `Event`s and `Log`s as well as their raw counterparts, `RawNotification` and `RawLog`, respectively.
  */
 export interface RawActionBase {
+  /**
+   * NEO network version number.
+   */
   readonly version: number;
+  /**
+   * Index of the block this action was emitted in.
+   */
   readonly blockIndex: number;
+  /**
+   * Hash of the block this action was emitted in.
+   */
   readonly blockHash: Hash256String;
+  /**
+   * Index of the transaction within the block this action was emitted in.
+   */
   readonly transactionIndex: number;
+  /**
+   * Hash of the transaction within the block this action was emitted in.
+   */
   readonly transactionHash: Hash256String;
+  /**
+   * Ordered index of the action of when it occurred within the transaction.
+   */
   readonly index: number;
+  /**
+   * Ordered globally unique index of the action.
+   */
   readonly globalIndex: BigNumber;
+  /**
+   * Address of the smart contract that this action occurred in.
+   */
   readonly address: AddressString;
 }
 
 /**
- * Raw notification emitted during an invocation.
+ * Raw notification emitted during an invocation. This is the unprocessed counterpart to an `Event`.
  *
  * Low-level API for advanced usage only.
  */
 export interface RawNotification extends RawActionBase {
+  /**
+   * `type` differentiates the `RawNotification` object from other `RawAction` objects, i.e. `RawLog`.
+   */
   readonly type: 'Notification';
+  /**
+   * The raw arguments of the notifications. These are processed into the `parameters` parameter of the `Event` object using the `ABI`.
+   */
   readonly args: ReadonlyArray<ContractParameter>;
 }
 
@@ -1643,7 +1715,13 @@ export interface RawNotification extends RawActionBase {
  * Low-level API for advanced usage only.
  */
 export interface RawLog extends RawActionBase {
+  /**
+   * `type` differentiates the `RawLog` object from other `RawAction` objects, i.e. `RawNotification`.
+   */
   readonly type: 'Log';
+  /**
+   * The raw message. This is unprocessed in the `message` of the
+   */
   readonly message: string;
 }
 
