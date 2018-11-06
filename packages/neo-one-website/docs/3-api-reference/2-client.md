@@ -368,7 +368,7 @@ The NEO address.
 type NetworkType =
   | 'main'
   | 'test'
-  | string
+  | string;
 ```
 
 #### `Transfer`
@@ -1089,7 +1089,69 @@ Smart contract source maps.
 ---
 
 #### `DeveloperTools`
+
 #### `DeveloperClient`
+
+##### `DeveloperClient#runConsensusNow`
+
+```typescript
+interface DeveloperClient {
+  readonly runConsensusNow: () => Promise<void>;
+ }
+```
+
+Trigger consensus to run immediately.
+
+##### `DeveloperClient#updateSettings`
+
+```typescript
+interface DeveloperClient {
+  readonly updateSettings: (options: Partial<PrivateNetworkSettings>) => Promise<void>;
+ }
+```
+
+Update settings for the private network.
+
+##### `DeveloperClient#getSettings`
+
+```typescript
+interface DeveloperClient {
+  readonly getSettings: () => Promise<PrivateNetworkSettings>;
+ }
+```
+
+Get the current settings of the private network.
+
+##### `DeveloperClient#fastForwardOffset`
+
+```typescript
+interface DeveloperClient {
+  readonly fastForwardOffset: (seconds: number) => Promise<void>;
+ }
+```
+
+Fast forward the local network by `seconds` into the future.
+
+##### `DeveloperClient#fastForwardToTime`
+
+```typescript
+interface DeveloperClient {
+  readonly fastForwardToTime: (seconds: number) => Promise<void>;
+ }
+```
+
+Fast forward to a particular unix timestamp in the future.
+
+##### `DeveloperClient#reset`
+
+```typescript
+interface DeveloperClient {
+  readonly reset: () => Promise<void>;
+ }
+```
+
+Reset the local network to it's initial state starting at the genesis block.
+
 #### `DeveloperProvider`
 #### `PrivateNetworkSettings`
 #### `LocalClient`
@@ -1128,9 +1190,91 @@ Smart contract source maps.
 ---
 
 #### `Account`
+
+An `Account` represents the balances of NEO, GAS an other native assets at a given `Address`.
+
+##### `Account#address`
+
+The address of this `Account`.
+
+##### `Account#balances`
+
+A mapping from a `Hash256String` of a native `Asset` to the value of the held by the `address` for this `Account`. May be `undefined` if the `address` has 0 balance.
+
 #### `Asset`
+
+Attributes of a first class asset. Users will typically only interact with the NEO and GAS `Asset`s.
+
+```typescript
+const asset = readClient.getAsset(Hash256.NEO);
+const neoAmount = asset.amount;
+```
+
+##### `Asset#hash`
+
+`Hash256String` of this `Asset`.
+
+##### `Asset#type`
+
+Type of the `Asset`. See `AssetType`.
+
+#### `Asset#name`
+
+Name of the `Asset`.
+
+#### `Asset#amount`
+
+Total possible supply of the `Asset`.
+
+#### `Asset#available`
+
+Amount currently available of the `Asset`.
+
+#### `Asset#precision`
+
+Precision (number of decimal places) of the `Asset`.
+
+#### `Asset#owner`
+
+Owner of the `Asset`.
+
+#### `Asset#admin`
+
+Admin of the `Asset`.
+
+#### `Asset#issuer`
+
+Issuer of the `Asset`.
+
+#### `Asset#expiration`
+#### `Asset#frozen`
+
 #### `AssetType`
+
+```typescript
+type AssetType =
+  | 'Credit'
+  | 'Duty'
+  | 'Governing'
+  | 'Utility'
+  | 'Currency'
+  | 'Share'
+  | 'Invoice'
+  | 'Token';
+```
+
 #### `Attribute`
+
+`Attribute`s are used to store additional data on `Transaction`s. Most `Attribute`s are used to store arbitrary data, whereas some, like `AddressAttribute`, have specific uses in the NEO protocol.
+
+```typescript
+type Attribute =
+  | BufferAttribute
+  | PublicKeyAttribute
+  | Hash256Attribute
+  | AddressAttribute;
+```
+
 #### `AttributeBase`
 #### `AttributeUsage`
 #### `AddressAttribute`
@@ -1140,35 +1284,425 @@ Smart contract source maps.
 #### `Hash256Attribute`
 #### `Hash256AttributeUsage`
 #### `PublicKeyAttribute`
+
+#### `AddressAttributeUsage`
+
+```typescript
+type AddressAttributeUsage = 'Script';
+```
+
+`Attribute` usage flag indicating the data is a `Hash256`.
+
+#### `BufferAttributeUsage`
+
+`Attribute` usage flag indicating the data is an arbitrary `Buffer`.
+
+```typescript
+type BufferAttributeUsage =
+  | 'DescriptionUrl'
+  | 'Description'
+  | 'Remark'
+  | 'Remark1'
+  | 'Remark2'
+  | 'Remark3'
+  | 'Remark4'
+  | 'Remark5'
+  | 'Remark6'
+  | 'Remark7'
+  | 'Remark8'
+  | 'Remark9'
+  | 'Remark10'
+  | 'Remark11'
+  | 'Remark12'
+  | 'Remark13'
+  | 'Remark14'
+  | 'Remark15';
+```
+
+#### `Hash256AttributeUsage`
+
+`Attribute` usage flag indicating the data is a `Hash256`.
+
+```typescript
+type Hash256AttributeUsage =
+  | 'ContractHash'
+  | 'Vote'
+  | 'Hash1'
+  | 'Hash2'
+  | 'Hash3'
+  | 'Hash4'
+  | 'Hash5'
+  | 'Hash6'
+  | 'Hash7'
+  | 'Hash8'
+  | 'Hash9'
+  | 'Hash10'
+  | 'Hash11'
+  | 'Hash12'
+  | 'Hash13'
+  | 'Hash14'
+  | 'Hash15';
+```
+
 #### `PublicKeyAttributeUsage`
+
+`Attribute` usage flag indicating the data is a `PublicKey`.
+
+```typescript
+type PublicKeyAttributeUsage = 'ECDH02' | 'ECDH03';
+```
+
 #### `Block`
+
+##### `Block#transactions`
+
+`Transaction`s contained in the `Block`.
+
 #### `Contract`
+
+##### `Contract#version`
+
+##### `Contract#address`
+
+`AddressString` of this `Contract`.
+
+##### `Contract#script`
+
+`Contract` code.
+
+##### `Contract#parameters`
+
+Expected parameters of this `Contract`.
+
+##### `Contract#returnType`
+
+Return type of this `Contract`.
+
+##### `Contract#name`
+
+Name of this `Contract`. For informational purposes only.
+
+##### `Contract#codeVersion`
+
+Version of this `Contract`. For informational purposes only.
+
+##### `Contract#author`
+
+Author of this `Contract`. For informational purposes only.
+
+##### `Contract#email`
+
+Email of this `Contract`. For informational purposes only.
+
+##### `Contract#description`
+
+Description of this `Contract`. For informational purposes only.
+
+##### `Contract#storage`
+
+`true` if this `Contract` can use storage.
+
+##### `Contract#dynamicInvoke`
+
+`true` if this `Contract` can make dynamic invocations.
+
+##### `Contract#payable`
+
+`true` if this `Contract` accepts first-class `Asset`s and/or tokens.
+
 #### `Header`
+
+#### `Header#version`
+
+NEO blockchain version.
+
+#### `Header#hash`
+
+`Block` hash.
+
+#### `Header#previousBlockHash`
+#### `Header#merkleRoot`
+
+#### `Header#time`
+
+`Block` time persisted.
+
+#### `Header#index`
+
+`Block` index.
+
+#### `Header#nonce`
+
+#### `Header#nextConsensus`
+
+Next consensus address.
+
+#### `Header#script`
+#### `Header#size`
+
 #### `Input`
+
+`Input`s are a reference to an `Output` of a `Transaction` that has been persisted to the blockchain. The sum of the `value`s of the referenced `Output`s is the total amount transferred in the `Transaction`.
+
+##### `Input#hash`
+
+Hash of the `Transaction` this input references.
+
+##### `Input#index`
+
+`Output` index within the `Transaction` this input references.
+
 #### `Output`
+
+`Output`s represent the destination `Address` and amount transferred of a given `Asset`. The sum of the unspent `Output`s of an `Address` represent the total balance of the `Address`.
+
+##### `Output#asset`
+
+Hash of the `Asset` that was transferred.
+
+##### `Output#value`
+
+Amount transferred.
+
+##### `Output#address`
+
+Destination `Address`.
+
 #### `Witness`
+
 #### `Transaction`
+
+`Transaction`s are relayed to the blockchain and contain information that is to be permanently stored on the blockchain. They may contain `Input`s and `Output`s corresponding to transfers of native `Asset`s. Each `Transaction` type serves a particular purpose, see the documentation for each for more information.
+
+```typescript
+type Transaction =
+  | MinerTransaction
+  | IssueTransaction
+  | ClaimTransaction
+  | EnrollmentTransaction
+  | RegisterTransaction
+  | ContractTransaction
+  | PublishTransaction
+  | StateTransaction
+  | InvocationTransaction;
+```
+
 #### `TransactionBase`
+
+Base interface for all `Transaction`s.
+
+##### `TransactionBase#version`
+
+##### `TransactionBase#hash`
+
+`Hash256` of this `Transaction`.
+
+##### `TransactionBase#size`
+
+Byte size of this `Transaction`.
+
+##### `TransactionBase#attributes`
+
+`Attribute`s attached to the `Transaction`.
+
+##### `TransactionBase#inputs`
+
+`Input`s of the `Transaction`.
+
+##### `TransactionBase#outputs`
+
+`Output`s of the `Transaction`.
+
+##### `TransactionBase#scripts`
+##### `TransactionBase#systemFee`
+##### `TransactionBase#networkFee`
+
+
 #### `ClaimTransaction`
+
+*extends:*
+- `TransactionBase`
+
+Claims GAS for a set of spent `Output`s.
+
+##### `ClaimTransaction#type`
+
+`type` distinguishes `ClaimTransaction` from other `Transaction` object types.
+
+##### `ClaimTransaction#claims`
+
+The spent outputs that this `ClaimTransaction` is claiming `GAS` for.
+
 #### `ContractTransaction`
+
+*extends:*
+- `TransactionBase`
+
+Transfers first class `Asset`s.
+
+##### `ContractTransaction#type`
+
+`type` distinguishes `ContractTransaction` from other `Transaction` object types.
+
 #### `EnrollmentTransaction`
+
+*extends:*
+- `TransactionBase`
+
+Enrolls a new validator for a given `PublicKey`.
+
+##### `EnrollmentTransaction#type`
+
+`type` distinguishes `Enrollmentransaction` from other `Transaction` object types.
+
+##### `EnrollmentTransaction#publicKey`
+
+The public key that is being enrolled as a validator.
+
 #### `InvocationTransaction`
+
+*extends:*
+- `TransactionBase`
+
+Runs a script in the NEO VM.
+
+##### `InvocationTransaction#type`
+
+`type` distinguishes `InvocationTransaction` from other `Transaction` object types.
+
+##### `InvocationTransaction#script`
+
+Script to execute in the NEO VM.
+
+##### `InvocationTransaction#gas`
+
+GAS that has been attached to be used for the `systemFee` of the `Transaction`. All attached GAS will be consumed by this operation, regardless of if execution fails or provides too much GAS.
+
 #### `IssueTransaction`
+
+*extends:*
+- `TransactionBase`
+
+Issues new currency of a first-class `Asset`.
+
+##### `IssueTransaction#type`
+
+`type` distinguishes `IssueTransaction` from other `Transaction` object types.
+
 #### `MinerTransaction`
+
+*extends:*
+- `TransactionBase`
+
+First `Transaction` in each block which contains the `Block` rewards for the consensus node that produced the `Block`.
+
+##### `MinerTransaction#type`
+
+`type` distinguishes `MinerTransaction` from other `Transaction` object types.
+
+##### `MinerTransaction#nonce`
+
+Unique number in order to ensure the hash for this transaction is unique.
+
 #### `PublishTransaction`
+
+*extends:*
+- `TransactionBase`
+
+Registers a new `Contract`.
+
+##### `PublishTransaction#type`
+
+`type` distinguishes `PublishTransaction` from other `Transaction` object types.
+
+##### `PublishTransaction#contract`
+
+`Contract` to publish.
+
 #### `RegisterTransaction`
+
+*extends:*
+- `TransactionBase`
+
+Registers a new first class `Asset`.
+
+##### `RegisterTransaction#type`
+
+`type` distinguishes `RegisterTransaction` from other `Transaction` object types.
+
+##### `RegisterTransaction#asset`
+
+`Asset` information to register.
+
 #### `StateTransaction`
+
+*extends:*
+- `TransactionBase`
+
+##### `StateTransaction#type`
+
+`type` distinguishes `StateTransaction` from other `Transaction` object types.
+
 #### `ConfirmedTransaction`
+
+`Transaction` that has been confirmed on the blockchain. Includes all of the same properties as a `Transaction` as well as the `TransactionReceipt` of the confirmation.
+
+```typescript
+type ConfirmedTransaction =
+  | ConfirmedMinerTransaction
+  | ConfirmedIssueTransaction
+  | ConfirmedClaimTransaction
+  | ConfirmedEnrollmentTransaction
+  | ConfirmedRegisterTransaction
+  | ConfirmedContractTransaction
+  | ConfirmedPublishTransaction
+  | ConfirmedStateTransaction
+  | ConfirmedInvocationTransaction;
+```
+
 #### `ConfirmedTransactionBase`
+
+Common propreties for all `ConfirmedTransaction`s.
+
+##### `ConfirmedTransactionBase#receipt`
+
+"Receipt" of the confirmed transaction on the blockchain. This contains properties like the block the `Transaction` was included in.
+
 #### `ConfirmedClaimTransaction`
+
+Confirmed variant of `ClaimTransaction`
+
 #### `ConfirmedContractTransaction`
+
+Confirmed variant of `ContractTransaction`
+
 #### `ConfirmedEnrollmentTransaction`
+
+Confirmed variant of `EnrollmentTransaction`.
+
 #### `ConfirmedInvocationTransaction`
+
+Confirmed variant of `InvocationTransaction`.
+
 #### `ConfirmedIssueTransaction`
+
+Confirmed variant of `IssueTransaction`.
+
 #### `ConfirmedMinerTransaction`
+
+Confirmed variant of `MinerTransaction`.
+
 #### `ConfirmedPublishTransaction`
+
+Confirmed variant of `PublishTransaction`.
+
 #### `ConfirmedRegisterTransaction`
+
+Confirmed variant of `RegisterTransaction`.
+
 #### `ConfirmedStateTransaction`
+
+Confirmed variant of `StateTransaction`.
 
 ---
 
