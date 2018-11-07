@@ -1,14 +1,28 @@
+// tslint:disable no-any
 import { Monitor } from '@neo-one/monitor';
 import { JSONRPCError, UnknownBlockError } from '../errors';
 
+/**
+ * jsonrpc request object.
+ */
 export interface JSONRPCRequest {
+  /**
+   * Method to be invoked.
+   */
   readonly method: string;
-  // tslint:disable-next-line no-any
+  /**
+   * Invocation params.
+   */
   readonly params?: any;
+  /**
+   * How long to leave the request open (i.e. long-polling) to wait for a result for given `method` and `params`.
+   */
   readonly watchTimeoutMS?: number;
 }
 
-// tslint:disable-next-line no-any
+/**
+ * jsonrpc response object.
+ */
 export type JSONRPCResponse = any;
 
 /**
@@ -20,9 +34,12 @@ export interface JSONRPCProviderManager {
   // tslint:enable no-method-signature unified-signatures
 }
 
+/**
+ * Base interface for handling `JSONRPCRequest`s and returning `JSONRPCResponse`s.
+ */
 export abstract class JSONRPCProvider {
   public abstract request(req: JSONRPCRequest, monitor?: Monitor): Promise<JSONRPCResponse>;
-  // tslint:disable-next-line no-any
+
   protected readonly handleResponse = (responseJSON: any): any => {
     if (responseJSON.error !== undefined) {
       if (responseJSON.error.code === -100 && responseJSON.error.message === 'Unknown block') {

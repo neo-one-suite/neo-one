@@ -34,7 +34,7 @@ const getUserAccountProviders = (provider: NEOONEProvider) => {
   }
 
   const memory = new LocalUserAccountProvider({
-    keystore: new LocalKeyStore({ store: new LocalMemoryStore() }),
+    keystore: new LocalKeyStore(new LocalMemoryStore()),
     provider,
   });
 
@@ -64,12 +64,12 @@ In the example above, we've configured it to use a `LocalKeyStore` which is back
 import localforage from 'localforage';
 
 const localStorage = new LocalUserAccountProvider({
-  keystore: new LocalKeyStore({
-    store: new LocalStringStore({
+  keystore: new LocalKeyStore(
+    new LocalStringStore({
       type: 'localStorage',
       storage: localforage,
     }),
-  }),
+  ),
   provider,
 });
 ```

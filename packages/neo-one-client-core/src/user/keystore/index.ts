@@ -1,3 +1,4 @@
-export { LocalKeyStore, Wallet as LocalWallet, LockedWallet, UnlockedWallet } from './LocalKeyStore';
+export { LocalKeyStore, LocalWallet, LockedWallet, UnlockedWallet, LocalStore } from './LocalKeyStore';
 export * from './LocalMemoryStore';
 export * from './LocalStringStore';
+export * from './LedgerKeyStore';

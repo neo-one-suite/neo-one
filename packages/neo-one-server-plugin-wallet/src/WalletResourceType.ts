@@ -80,10 +80,7 @@ export class WalletResourceType extends ResourceType<Wallet, WalletResourceOptio
     fs.mkdirpSync(walletsPath);
     const client = new Client({
       file: new LocalUserAccountProvider({
-        keystore: new LocalKeyStore({
-          store: new LocalStringStore(new AsyncNodeStorage(walletsPath)),
-        }),
-
+        keystore: new LocalKeyStore(new LocalStringStore(new AsyncNodeStorage(walletsPath))),
         provider: new NEOONEProvider([{ network: 'main', rpcURL: constants.MAIN_URL }]),
       }),
     });

@@ -39,4 +39,4 @@ NEO•ONE itself is written in [TypeScript](http://www.typescriptlang.org/) and 
 
 ## Let's Get Started!
 
-At the bottom of each page in the guide, including this one, you'll find the link to the [next chapter of the guide](/docs/smart-contract-basics) right before the website footer.
+At the bottom of each page in the guide, including this one, you'll find the link to the [next chapter of the guide](/docs/blockchain-basics) right before the website footer.

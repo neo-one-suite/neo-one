@@ -70,6 +70,9 @@ export interface NEOONEDataProviderOptions {
   readonly iterBlocksBatchSize?: number;
 }
 
+/**
+ * Implements the methods required by the `NEOONEProvider` as well as the `DeveloperProvider` interface using a NEO•ONE node.
+ */
 export class NEOONEDataProvider implements DeveloperProvider {
   public readonly network: NetworkType;
   private mutableClient: JSONRPCClient;
@@ -156,7 +159,9 @@ export class NEOONEDataProvider implements DeveloperProvider {
   }
 
   public async getTransactionReceipt(hash: Hash256String, options?: GetOptions): Promise<TransactionReceipt> {
-    return this.mutableClient.getTransactionReceipt(hash, options);
+    const result = await this.mutableClient.getTransactionReceipt(hash, options);
+
+    return { ...result, globalIndex: new BigNumber(result.globalIndex) };
   }
 
   public async getInvocationData(hash: Hash256String, monitor?: Monitor): Promise<RawInvocationData> {
@@ -174,7 +179,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
       transaction.data.blockHash,
       transaction.data.blockIndex,
       hash,
-      transaction.data.index,
+      transaction.data.transactionIndex,
     );
   }
 
@@ -371,7 +376,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     const data = {
       blockHash: transaction.data.blockHash,
       blockIndex: transaction.data.blockIndex,
-      index: transaction.data.index,
+      transactionIndex: transaction.data.transactionIndex,
       globalIndex: JSONHelper.readUInt64(transaction.data.globalIndex),
     };
 
@@ -387,7 +392,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
           transaction.data.blockHash,
           transaction.data.blockIndex,
           transaction.txid,
-          transaction.data.index,
+          transaction.data.transactionIndex,
         );
 
         return {

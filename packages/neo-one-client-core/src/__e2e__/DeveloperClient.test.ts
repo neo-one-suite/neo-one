@@ -76,10 +76,7 @@ async function addWallet({
 
 async function setupClients(networkName: string): Promise<SetupClientsReturn> {
   const masterWallet = 'master';
-  const keystore = new LocalKeyStore({
-    store: new LocalMemoryStore(),
-  });
-
+  const keystore = new LocalKeyStore(new LocalMemoryStore());
   const rpcURL = await setupNetwork(networkName);
   const master = await addWallet({
     walletName: masterWallet,

@@ -204,6 +204,11 @@ interface FullTransfer extends Transfer {
   readonly from: UserAccountID;
 }
 
+/**
+ * Implements `UserAccountProvider` using a `KeyStore` instance and a `Provider` instance.
+ *
+ * See the [LocalUserAccountProvider](https://neo-one.io/docs/user-accounts#LocalUserAccountProvider) section of the advanced guide for more details.
+ */
 export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider extends Provider>
   implements UserAccountProvider {
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;
@@ -421,6 +426,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         blockIndex: receipt.blockIndex,
         blockHash: receipt.blockHash,
         transactionIndex: receipt.transactionIndex,
+        globalIndex: receipt.globalIndex,
         result: data.result,
         actions: data.actions,
       }),
@@ -470,6 +476,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         blockIndex: receipt.blockIndex,
         blockHash: receipt.blockHash,
         transactionIndex: receipt.transactionIndex,
+        globalIndex: receipt.globalIndex,
         result: data.result,
         actions: data.actions,
       }),
@@ -537,6 +544,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         blockIndex: receipt.blockIndex,
         blockHash: receipt.blockHash,
         transactionIndex: receipt.transactionIndex,
+        globalIndex: receipt.globalIndex,
         result: data.result,
         actions: data.actions,
       }),
@@ -594,6 +602,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         blockIndex: receipt.blockIndex,
         blockHash: receipt.blockHash,
         transactionIndex: receipt.transactionIndex,
+        globalIndex: receipt.globalIndex,
         result: data.result,
         actions: data.actions,
       }),

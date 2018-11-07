@@ -179,6 +179,9 @@ const watchSingle = async ({
   return response.json();
 };
 
+/**
+ * Implements the `JSONRPCProvider` interface using http requests.
+ */
 export class JSONRPCHTTPProvider extends JSONRPCProvider {
   public readonly endpoint: string;
   // tslint:disable-next-line no-any

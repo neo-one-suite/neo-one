@@ -37,7 +37,7 @@ In addition to the above, if you're developing TypeScript smart contracts using 
 In order to have inline compiler diagnostics from your IDE, you'll need to configure the IDE to use your local TypeScript installation as well as configure the `@neo-one/smart-contract-typescript-plugin`. These instructions are for [VSCode](https://code.visualstudio.com/), but they should be similar for any editor that supports TypeScript Intellisense.
 
   1. Ensure `@neo-one/cli` and `@neo-one/smart-contract-typescript-plugin` are installed.
-  2. Run `yarn neo-one init`. This will create a `tsconfig.json` file in the configured smart contract directory (by default, `/one/contracts`).
+  2. Run `yarn neo-one init`. This will create a `tsconfig.json` file in the configured smart contract directory (by default, `./one/contracts`).
   3. Click the TypeScript version number in the lower right hand side of your editor and choose "Use Workspace Version"
 
 That's it! Enjoy inline smart contract compiler diagnostics.

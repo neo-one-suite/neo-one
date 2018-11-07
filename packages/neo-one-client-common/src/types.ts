@@ -52,6 +52,9 @@ export type PrivateKeyString = string;
  * @example 'ccaab040cc25021c91567b75db4778853441869157b8f6aad960cdcf1069812480027a528ca9b98e2205027de20696f848cf81824eeb7af1d5110870870ceb67'
  */
 export type SignatureString = string;
+/**
+ * Implementation defined string for selecting the network to use. `'main'` refers to the NEO MainNet and `'test'` refers to the NEO TestNet. `'local'` is typically used to indicate a local development network.
+ */
 export type NetworkType = 'main' | 'test' | string;
 
 /**
@@ -134,34 +137,61 @@ export type AttributeUsage =
  * @see Attribute
  */
 export interface AttributeBase {
+  /**
+   * `usage` distinguishes the various `Attribute` types.
+   */
   readonly usage: AttributeUsage;
 }
 /**
  * `Attribute` whose data is an arbitrary `BufferString`.
  */
 export interface BufferAttribute extends AttributeBase {
+  /**
+   * `usage` distinguishes `BufferAttribute` from other `Attribute` object types.
+   */
   readonly usage: BufferAttributeUsage;
+  /**
+   * Hex encoded data of the `Attribute`.
+   */
   readonly data: BufferString;
 }
 /**
  * `Attribute` whose data is a `PublicKeyString`.
  */
 export interface PublicKeyAttribute extends AttributeBase {
+  /**
+   * `usage` distinguishes `PublicKeyAttribute` from other `Attribute` object types.
+   */
   readonly usage: PublicKeyAttributeUsage;
+  /**
+   * Public key as a string of the `Attribute`.
+   */
   readonly data: PublicKeyString;
 }
 /**
  * `Attribute` whose data is a `Hash256`.
  */
 export interface Hash256Attribute extends AttributeBase {
+  /**
+   * `usage` distinguishes `Hash256Attribute` from other `Attribute` object types.
+   */
   readonly usage: Hash256AttributeUsage;
+  /**
+   * NEO `Hash256` as a string of the `Attribute`.
+   */
   readonly data: Hash256String;
 }
 /**
  * `Attribute` whose data is an `AddressString`.
  */
 export interface AddressAttribute extends AttributeBase {
+  /**
+   * `usage` distinguishes `AddressAttribute` from other `Attribute` object types.
+   */
   readonly usage: AddressAttributeUsage;
+  /**
+   * NEO `Address` as a string of the `Attribute`.
+   */
   readonly data: AddressString;
 }
 /**
@@ -184,6 +214,9 @@ export interface Input {
   readonly index: number;
 }
 
+/**
+ * Both the `Output` and it's reference as an `Input`.
+ */
 export interface InputOutput extends Input, Output {}
 
 /**
@@ -206,8 +239,17 @@ export interface Output {
   readonly address: AddressString;
 }
 
+/**
+ * `Witness` is just that, a "witness" to the transaction, meaning they have approved the transaction. Can vary from a simple signature of the transaction for a given `Address`' private key or a "witness" being a smart contract and the way it's verified is by executing the smart contract code.
+ */
 export interface Witness {
+  /**
+   * Sets up the stack for the `verification` script.
+   */
   readonly invocation: BufferString;
+  /**
+   * A script that should leave either a `true` value on the stack if the `Witness` is valid, or `false` otherwise.
+   */
   readonly verification: BufferString;
 }
 
@@ -215,6 +257,9 @@ export interface Witness {
  * Base interface for all `Transaction`s
  */
 export interface TransactionBase {
+  /**
+   * NEO protocol version.
+   */
   readonly version: number;
   /**
    * `Hash256` of this `Transaction`.
@@ -226,53 +271,72 @@ export interface TransactionBase {
   readonly size: number;
   /**
    * `Attribute`s attached to the `Transaction`.
-   *
-   * @see Attribute
    */
   readonly attributes: ReadonlyArray<Attribute>;
   /**
    * `Input`s of the `Transaction`.
-   *
-   * @see Input
    */
   readonly inputs: ReadonlyArray<Input>;
   /**
    * `Output`s of the `Transaction`.
-   *
-   * @see Output
    */
   readonly outputs: ReadonlyArray<Output>;
+  /**
+   * `Witness`es to the `Transaction`, i.e. the `Address`es that have signed the `Transasction`.
+   */
   readonly scripts: ReadonlyArray<Witness>;
+  /**
+   * GAS execution fee for the transaction.
+   */
   readonly systemFee: BigNumber;
+  /**
+   * GAS network priority fee for the transaction.
+   */
   readonly networkFee: BigNumber;
 }
 
+/**
+ * Common propreties for all `ConfirmedTransaction`s.
+ */
 export interface ConfirmedTransactionBase {
-  readonly receipt: {
-    readonly blockHash: Hash256String;
-    readonly blockIndex: number;
-    readonly index: number;
-    readonly globalIndex: BigNumber;
-  };
+  /**
+   * "Receipt" of the confirmed transaction on the blockchain. This contains properties like the block the `Transaction` was included in.
+   */
+  readonly receipt: TransactionReceipt;
 }
 
 /**
  * Claims GAS for a set of spent `Output`s.
  */
 export interface ClaimTransaction extends TransactionBase {
+  /**
+   * `type` distinguishes `ClaimTransaction` from other `Transaction` object types.
+   */
   readonly type: 'ClaimTransaction';
+  /**
+   * The spent outputs that this `ClaimTransaction` is claiming `GAS` for.
+   */
   readonly claims: ReadonlyArray<Input>;
 }
 
+/**
+ * Confirmed variant of `ClaimTransaction`
+ */
 export interface ConfirmedClaimTransaction extends ClaimTransaction, ConfirmedTransactionBase {}
 
 /**
  * Transfers first class `Asset`s
  */
 export interface ContractTransaction extends TransactionBase {
+  /**
+   * `type` distinguishes `ContractTransaction` from other `Transaction` object types.
+   */
   readonly type: 'ContractTransaction';
 }
 
+/**
+ * Confirmed variant of `ContractTransaction`
+ */
 export interface ConfirmedContractTransaction extends ContractTransaction, ConfirmedTransactionBase {}
 
 /**
@@ -281,31 +345,61 @@ export interface ConfirmedContractTransaction extends ContractTransaction, Confi
  * @deprecated
  */
 export interface EnrollmentTransaction extends TransactionBase {
+  /**
+   * `type` distinguishes `Enrollmentransaction` from other `Transaction` object types.
+   */
   readonly type: 'EnrollmentTransaction';
+  /**
+   * The public key that is being enrolled as a validator.
+   */
   readonly publicKey: PublicKeyString;
 }
 
+/**
+ * Confirmed variant of `EnrollmentTransaction`
+ */
 export interface ConfirmedEnrollmentTransaction extends EnrollmentTransaction, ConfirmedTransactionBase {}
 
 /**
  * Issues new currency of a first-class `Asset`.
  */
 export interface IssueTransaction extends TransactionBase {
+  /**
+   * `type` distinguishes `IssueTransaction` from other `Transaction` object types.
+   */
   readonly type: 'IssueTransaction';
 }
 
+/**
+ * Confirmed variant of `IssueTransaction`
+ */
 export interface ConfirmedIssueTransaction extends IssueTransaction, ConfirmedTransactionBase {}
 
 /**
  * Runs a script in the NEO VM.
  */
 export interface InvocationTransaction extends TransactionBase {
+  /**
+   * `type` distinguishes `InvocationTransaction` from other `Transaction` object types.
+   */
   readonly type: 'InvocationTransaction';
+  /**
+   * Script to execute in the NEO VM.
+   */
   readonly script: BufferString;
+  /**
+   * GAS that has been attached to be used for the `systemFee` of the `Transaction`. All attached GAS will be consumed by this operation, regardless of if execution fails or provides too much GAS.
+   */
   readonly gas: BigNumber;
 }
 
+/**
+ * Confirmed variant of `InvocationTransaction`
+ */
 export interface ConfirmedInvocationTransaction extends InvocationTransaction, ConfirmedTransactionBase {
+  /**
+   * Additional raw data that is typically processed by an `ABI` for the client APIs.
+   */
   readonly invocationData: RawInvocationData;
 }
 
@@ -313,10 +407,19 @@ export interface ConfirmedInvocationTransaction extends InvocationTransaction, C
  * First `Transaction` in each block which contains the `Block` rewards for the consensus node that produced the `Block`.
  */
 export interface MinerTransaction extends TransactionBase {
+  /**
+   * `type` distinguishes `MinerTransaction` from other `Transaction` object types.
+   */
   readonly type: 'MinerTransaction';
+  /**
+   * Unique number in order to ensure the hash for this transaction is unique.
+   */
   readonly nonce: number;
 }
 
+/**
+ * Confirmed variant of `MinerTransaction`
+ */
 export interface ConfirmedMinerTransaction extends MinerTransaction, ConfirmedTransactionBase {}
 
 /**
@@ -325,10 +428,19 @@ export interface ConfirmedMinerTransaction extends MinerTransaction, ConfirmedTr
  * @deprecated Replaced by `Client#publish`
  */
 export interface PublishTransaction extends TransactionBase {
+  /**
+   * `type` distinguishes `PublishTransaction` from other `Transaction` object types.
+   */
   readonly type: 'PublishTransaction';
+  /**
+   * `Contract` to publish.
+   */
   readonly contract: Contract;
 }
 
+/**
+ * Confirmed variant of `PublishTransaction`
+ */
 export interface ConfirmedPublishTransaction extends PublishTransaction, ConfirmedTransactionBase {}
 
 /**
@@ -337,25 +449,39 @@ export interface ConfirmedPublishTransaction extends PublishTransaction, Confirm
  * @deprecated Replaced by `Client#registerAsset`
  */
 export interface RegisterTransaction extends TransactionBase {
+  /**
+   * `type` distinguishes `RegisterTransaction` from other `Transaction` object types.
+   */
   readonly type: 'RegisterTransaction';
-  readonly asset: {
-    readonly type: AssetType;
-    readonly name: string;
-    readonly amount: BigNumber;
-    readonly precision: number;
-    readonly owner: PublicKeyString;
-    readonly admin: AddressString;
-  };
+  /**
+   * `Asset` information to register.
+   */
+  readonly asset: Pick<Asset, 'type' | 'name' | 'amount' | 'precision' | 'owner' | 'admin'>;
 }
 
+/**
+ * Confirmed variant of `RegisterTransaction`
+ */
 export interface ConfirmedRegisterTransaction extends RegisterTransaction, ConfirmedTransactionBase {}
 
+/**
+ * Used for voting. Full support coming soon.
+ */
 export interface StateTransaction extends TransactionBase {
+  /**
+   * `type` distinguishes `StateTransaction` from other `Transaction` object types.
+   */
   readonly type: 'StateTransaction';
 }
 
+/**
+ * Confirmed variant of `StateTransaction`
+ */
 export interface ConfirmedStateTransaction extends StateTransaction, ConfirmedTransactionBase {}
 
+/**
+ * `Transaction`s are relayed to the blockchain and contain information that is to be permanently stored on the blockchain. They may contain `Input`s and `Output`s corresponding to transfers of native `Asset`s. Each `Transaction` type serves a particular purpose, see the documentation for each for more information.
+ */
 export type Transaction =
   | MinerTransaction
   | IssueTransaction
@@ -366,6 +492,9 @@ export type Transaction =
   | PublishTransaction
   | StateTransaction
   | InvocationTransaction;
+/**
+ * `Transaction` that has been confirmed on the blockchain. Includes all of the same properties as a `Transaction` as well as the `TransactionReceipt` of the confirmation.
+ */
 export type ConfirmedTransaction =
   | ConfirmedMinerTransaction
   | ConfirmedIssueTransaction
@@ -377,6 +506,9 @@ export type ConfirmedTransaction =
   | ConfirmedStateTransaction
   | ConfirmedInvocationTransaction;
 
+/**
+ * All of the properties of a `Block` except the `Transaction`s themselves.
+ */
 export interface Header {
   /**
    * NEO blockchain version
@@ -386,7 +518,13 @@ export interface Header {
    * `Block` hash
    */
   readonly hash: Hash256String;
+  /**
+   * Previous `Block` hash.
+   */
   readonly previousBlockHash: Hash256String;
+  /**
+   * Merkle Root of the `Transaction`s of this `Block`.
+   */
   readonly merkleRoot: Hash256String;
   /**
    * `Block` time persisted
@@ -396,12 +534,21 @@ export interface Header {
    * `Block` index
    */
   readonly index: number;
+  /**
+   * Unique number to ensure the block hash is always unique.
+   */
   readonly nonce: string;
   /**
    * Next consensus address.
    */
   readonly nextConsensus: AddressString;
+  /**
+   * "Witness" to the `Block`'s validity.
+   */
   readonly script: Witness;
+  /**
+   * Size in bytes of the `Block`.
+   */
   readonly size: number;
 }
 
@@ -428,20 +575,36 @@ export interface TransactionReceipt {
    * Transaction index of the `Transaction` within the `Block` for this receipt.
    */
   readonly transactionIndex: number;
+  /**
+   * Ordered globally unique index of the transaction.
+   */
+  readonly globalIndex: BigNumber;
 }
 
+/**
+ * The result of a successful relay of a `Transaction`.
+ */
 export interface TransactionResult<
   TTransactionReceipt extends TransactionReceipt = TransactionReceipt,
   TTransaction extends Transaction = Transaction
 > {
+  /**
+   * `Transaction` that was relayed.
+   */
   readonly transaction: TTransaction;
+  /**
+   * Waits for the `Transaction` to be confirmed on the blockchain.
+   *
+   * @param options Optional object that controls, in particular, the time to wait for the `Transaction` to confirm before timing out.
+   * @returns `Promise` that resolves when the `Transaction` has been confirmed, resolving to the confirmation receipt.
+   */
   readonly confirmed: (options?: GetOptions) => Promise<TTransactionReceipt>;
 }
 
 /**
- * Common `InvocationResult` properties.
+ * Common `InvocationResult` and `RawInvocationResult` properties.
  */
-export interface InvocationResultBase {
+export interface RawInvocationResultBase {
   /**
    * GAS consumed by the operation. This is the total GAS consumed after the free GAS is subtracted.
    */
@@ -455,7 +618,7 @@ export interface InvocationResultBase {
 /**
  * Result of a successful invocation.
  */
-export interface InvocationResultSuccess<TValue> extends InvocationResultBase {
+export interface InvocationResultSuccess<TValue> extends RawInvocationResultBase {
   /**
    * Indicates a successful invocation.
    */
@@ -469,7 +632,7 @@ export interface InvocationResultSuccess<TValue> extends InvocationResultBase {
 /**
  * Result of a failed invocation.
  */
-export interface InvocationResultError extends InvocationResultBase {
+export interface InvocationResultError extends RawInvocationResultBase {
   /**
    * Indicates a failed invocation.
    */
@@ -480,6 +643,9 @@ export interface InvocationResultError extends InvocationResultBase {
   readonly message: string;
 }
 
+/**
+ * Either a successful or error result, `InvocationResultSuccess` and `InvocationResultError`, respectively.
+ */
 export type InvocationResult<TValue> = InvocationResultSuccess<TValue> | InvocationResultError;
 
 /**
@@ -505,9 +671,21 @@ export interface InvokeReceipt<TReturn extends Return = Return, TEvent extends E
   readonly raw: RawInvokeReceipt;
 }
 
+/**
+ * Represents a transfer of native assets.
+ */
 export interface Transfer {
+  /**
+   * Amount to be transferred
+   */
   readonly amount: BigNumber;
+  /**
+   * `Hash256` in string format of the native `Asset` to transfer.
+   */
   readonly asset: Hash256String;
+  /**
+   * Destination address.
+   */
   readonly to: AddressString;
 }
 
@@ -543,6 +721,9 @@ export interface UserAccount {
   readonly publicKey: PublicKeyString;
 }
 
+/**
+ * `UserAccountProvider`s power `Client` instances. Multiple `UserAccountProvider`s may be provided, and the `Client` abstracts over them to provide a common layer of functionality independent of the underlying `UserAccountProvider`s.
+ */
 export interface UserAccountProvider {
   /**
    * An `Observable` that emits the currently selected `UserAccount`
@@ -696,21 +877,57 @@ export interface UserAccountProvider {
   ) => Promise<RawCallReceipt>;
 }
 
+/**
+ * An object of `UserAccountProvider`s.
+ */
 export interface UserAccountProviders<TUserAccountProvider extends UserAccountProvider> {
+  /**
+   * Key index may be arbitrary and is primarily intended to allow for a more specific `Client` TypeScript type to enable direct access to the underlying providers, if needed.
+   */
   readonly [type: string]: TUserAccountProvider;
 }
 
+/**
+ * Settings that may be modified on a local NEO•ONE private network.
+ */
 export interface PrivateNetworkSettings {
+  /**
+   * Time until the next block starts to be produced.
+   */
   readonly secondsPerBlock: number;
 }
 
+/**
+ * Provides the core functionality required by the `DeveloperClient`.
+ */
 export interface DeveloperProvider {
+  /**
+   * Network the `DeveloperProvider` is acting on.
+   */
   readonly network: NetworkType;
+  /**
+   * Trigger consensus to run immediately.
+   */
   readonly runConsensusNow: (monitor?: Monitor) => Promise<void>;
+  /**
+   * Update the network's settings.
+   */
   readonly updateSettings: (options: Partial<PrivateNetworkSettings>, monitor?: Monitor) => Promise<void>;
+  /**
+   * @returns the current network settings.
+   */
   readonly getSettings: (monitor?: Monitor) => Promise<PrivateNetworkSettings>;
+  /**
+   * @param seconds fast forward by `seconds` number of seconds.
+   */
   readonly fastForwardOffset: (seconds: number, monitor?: Monitor) => Promise<void>;
+  /**
+   * @param seconds fast forward to the unix timestamp defined by `seconds`
+   */
   readonly fastForwardToTime: (seconds: number, monitor?: Monitor) => Promise<void>;
+  /**
+   * Reset the network to it's initial state, restarting from the genesis `Block`.
+   */
   readonly reset: (monitor?: Monitor) => Promise<void>;
 }
 
@@ -724,10 +941,11 @@ export interface Account {
   readonly address: AddressString;
   /**
    * A mapping from a `Hash256String` of a native `Asset` to the value of the held by the `address` for this `Account`.
-   *
-   * May be `undefined` if the `address` has 0 balance.
    */
   readonly balances: {
+    /**
+     * May be `undefined` if the `address` has 0 balance.
+     */
     readonly [asset: string]: BigNumber;
   };
 }
@@ -736,7 +954,10 @@ export interface Account {
  * The base type of the `Event` parameters. This type is specialized automatically with the generated NEO•ONE smart contract APIs.
  */
 export interface EventParameters {
-  readonly [name: string]: Param | undefined;
+  /**
+   * Note that arbitrary string indices are not supported - the exact indices are implementation defined for a particular `Event` name.
+   */
+  readonly [name: string]: Param;
 }
 /**
  * Structured data emitted by a smart contract during a method invocation. Typically emitted in response to state changes within the contract and to notify contract listeners of an action happening within the contract.
@@ -818,13 +1039,19 @@ export interface SmartContractDefinition {
   readonly sourceMaps?: Promise<SourceMaps>;
 }
 
+/**
+ * Additional optional options for methods that read data from a smart contract.
+ */
 export interface SmartContractReadOptions {
   /**
    * The network to read the smart contract data for. By default this is the network of the currently selected user account.
    */
-  readonly network?: string;
+  readonly network?: NetworkType;
 }
 
+/**
+ * Additional optional options for methods that iterate over data from a smart contract.
+ */
 export interface SmartContractIterOptions extends SmartContractReadOptions {
   /**
    * Filters the iterated events and/or logs to those that match the provided `BlockFilter` object.
@@ -832,6 +1059,9 @@ export interface SmartContractIterOptions extends SmartContractReadOptions {
   readonly filter?: BlockFilter;
 }
 
+/**
+ * Filter that specifies (optionally) a block index to start at and (optionally) a block index to end at.
+ */
 export interface BlockFilter {
   /**
    * The inclusive start index for the first block to include. Leaving `undefined` means start from the beginning of the blockchain, i.e. index 0.
@@ -847,11 +1077,23 @@ export interface BlockFilter {
   readonly monitor?: Monitor;
 }
 
+/**
+ * Common options for operations that fetch data from the blockchain.
+ */
 export interface GetOptions {
+  /**
+   * Time in milliseconds before timing out the operation.
+   */
   readonly timeoutMS?: number;
+  /**
+   * `Monitor` to use for all logging of the operation.
+   */
   readonly monitor?: Monitor;
 }
 
+/**
+ * Common options for all methods in the client APIs that create transactions.
+ */
 export interface TransactionOptions {
   // tslint:disable readonly-keyword
   /**
@@ -885,27 +1127,59 @@ export interface TransactionOptions {
   // tslint:enable readonly-keyword
 }
 
-// tslint:disable-next-line no-any
+/**
+ * Additional options that are automatically provided by the `forward<method>Args` method. In particular, this object provides the event specification when forwarding values.
+ */
 export interface ForwardOptions<TEvent extends Event<string, any> = Event> {
+  /**
+   * Additional events that may be emitted due to forwarding arguments to another smart contract method.
+   */
   readonly events?: ReadonlyArray<ABIEvent>;
   readonly __tag?: TEvent;
 }
 
+/**
+ * Additional parameters available to methods that support unsafely sending native `Asset`s from the smart contract, i.e. they have been annotated with `@sendUnsafe`.
+ */
 export interface InvokeSendUnsafeTransactionOptions extends TransactionOptions {
+  /**
+   * `Transfer`s that specify native assets to send from the contract.
+   */
   readonly sendFrom?: ReadonlyArray<Transfer>;
 }
 
+/**
+ * Additional parameters available to methods that support receiving native `Asset`s to the smart contract, i.e. they have been annotated with `@receive`.
+ */
 export interface InvokeReceiveTransactionOptions extends TransactionOptions {
+  /**
+   * `Transfer`s that specify native assets to send to the contract.
+   */
   readonly sendTo?: ReadonlyArray<Omit<Transfer, 'to'>>;
 }
 
+/**
+ * Additional parameters available to methods that support unsafely sending native `Asset`s from the smart contract and receiving native `Asset`s to the smart contract, i.e. they have been annotated with both `@sendUnsafe` and `@receive`.
+ */
 export interface InvokeSendUnsafeReceiveTransactionOptions
   extends InvokeSendUnsafeTransactionOptions,
     InvokeReceiveTransactionOptions {}
 
+/**
+ * Options for the `UserAccountProvider#updateAccountName` method.
+ */
 export interface UpdateAccountNameOptions {
+  /**
+   * `UserAccountID` of the `UserAccount` to update.
+   */
   readonly id: UserAccountID;
+  /**
+   * New name of the `UserAccount`.
+   */
   readonly name: string;
+  /**
+   * Optional `Monitor` for any logging that occurs during the update process.
+   */
   readonly monitor?: Monitor;
 }
 
@@ -932,12 +1206,18 @@ export interface ABIReturnBase {
  * @see AddressString
  */
 export interface AddressABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `AddressABIReturn` object from other `ABIReturn` objects.
+   */
   readonly type: 'Address';
 }
 /**
  * `Array` return type.
  */
 export interface ArrayABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `ArrayABIReturn` object from other `ABIReturn` objects.
+   */
   readonly type: 'Array';
   /**
    * Value type of the `Array`.
@@ -950,6 +1230,9 @@ export interface ArrayABIReturn extends ABIReturnBase {
  * @see ABIReturn
  */
 export interface BooleanABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `BooleanABIReturn` object from other `ABIReturn` objects.
+   */
   readonly type: 'Boolean';
 }
 /**
@@ -959,12 +1242,18 @@ export interface BooleanABIReturn extends ABIReturnBase {
  * @see BufferString
  */
 export interface BufferABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `BufferABIReturn` object from other `ABIReturn` objects.
+   */
   readonly type: 'Buffer';
 }
 /**
  * `ForwardValue` return type.
  */
 export interface ForwardValueABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `ForwardValueABIReturn` object from other `ABIReturn` objects.
+   */
   readonly type: 'ForwardValue';
 }
 /**
@@ -974,6 +1263,9 @@ export interface ForwardValueABIReturn extends ABIReturnBase {
  * @see Hash256String
  */
 export interface Hash256ABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `Hash256ABIReturn` object from other `ABIReturn` objects.
+   */
   readonly type: 'Hash256';
 }
 /**
@@ -982,6 +1274,9 @@ export interface Hash256ABIReturn extends ABIReturnBase {
  * @see Fixed<Decimals>
  */
 export interface IntegerABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `IntegerABIReturn` object from other `ABIReturn` objects.
+   */
   readonly type: 'Integer';
   /**
    * Number of decimals values of this type represent.
@@ -992,6 +1287,9 @@ export interface IntegerABIReturn extends ABIReturnBase {
  * `Map` return type.
  */
 export interface MapABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `MapABIReturn` object from other `ABIReturn` objects.
+   */
   readonly type: 'Map';
   /**
    * Key type of the `Map`.
@@ -1006,6 +1304,9 @@ export interface MapABIReturn extends ABIReturnBase {
  * `Object` return type.
  */
 export interface ObjectABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `ObjectABIReturn` object from other `ABIReturn` objects.
+   */
   readonly type: 'Object';
   /**
    * Properties of the `Object`.
@@ -1019,6 +1320,9 @@ export interface ObjectABIReturn extends ABIReturnBase {
  * @see PublicKeyString
  */
 export interface PublicKeyABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `PublicKeyABIReturn` object from other `ABIReturn` objects.
+   */
   readonly type: 'PublicKey';
 }
 /**
@@ -1028,6 +1332,9 @@ export interface PublicKeyABIReturn extends ABIReturnBase {
  * @see SignatureString
  */
 export interface SignatureABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `SignatureABIReturn` object from other `ABIReturn` objects.
+   */
   readonly type: 'Signature';
 }
 /**
@@ -1036,12 +1343,18 @@ export interface SignatureABIReturn extends ABIReturnBase {
  * @see ABIReturn
  */
 export interface StringABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `StringABIReturn` object from other `ABIReturn` objects.
+   */
   readonly type: 'String';
 }
 /**
  * `void` return type.
  */
 export interface VoidABIReturn extends ABIReturnBase {
+  /**
+   * `type` differentiates the `VoidABIReturn` object from other `ABIReturn` objects.
+   */
   readonly type: 'Void';
 }
 
@@ -1049,6 +1362,9 @@ export interface VoidABIReturn extends ABIReturnBase {
  * Default value is the `Transaction` sender `Address`
  */
 export interface SenderAddressABIDefault {
+  /**
+   * `type` differentiates the `SenderAddressABIDefault` object from other `ABIDefault` objects.
+   */
   readonly type: 'sender';
 }
 
@@ -1056,6 +1372,9 @@ export interface SenderAddressABIDefault {
  * Default value for the constructor/deploy parameter.
  */
 export type ABIDefault = SenderAddressABIDefault;
+/**
+ * All possible `ABIDefault#type` fields.
+ */
 export type ABIDefaultType = ABIDefault['type'];
 
 /**
@@ -1300,6 +1619,11 @@ export interface ABI {
 }
 
 declare const OpaqueTagSymbol: unique symbol;
+/**
+ * `ForwardValue` represents a value that's intended to be forwarded to another smart contract method. This object is not meant to be directly constructued, instead one should produce them via the automatically generated `forward<method>Args` methods.
+ *
+ * See the [Forward Values](https://neo-one.io/docs/forward-values) chapter of the advanced guide for more information.
+ */
 export interface ForwardValue {
   readonly name: string;
   readonly converted: ScriptBuilderParam | undefined;
@@ -1312,6 +1636,9 @@ export interface ScriptBuilderParamMap extends Map<ScriptBuilderParam | undefine
 export interface ScriptBuilderParamObject {
   readonly [key: string]: ScriptBuilderParam;
 }
+/**
+ * `Param` is converted internally via the `ABI` definition into a `ScriptBuilderParam` which is used to actually invoke the method on the smart contract.
+ */
 export type ScriptBuilderParam =
   | BN
   | number
@@ -1366,6 +1693,11 @@ export type Return =
   | ReturnObject
   | ContractParameter;
 
+/**
+ * Constants that describe the type of `Asset`.
+ *
+ * The two most important ones are `'Governing'` and `'Utility'` which are reserved for NEO and GAS respectively.
+ */
 export type AssetType = 'Credit' | 'Duty' | 'Governing' | 'Utility' | 'Currency' | 'Share' | 'Invoice' | 'Token';
 
 /**
@@ -1390,6 +1722,9 @@ export interface Asset {
    * @see AssetType
    */
   readonly type: AssetType;
+  /**
+   * User configurable name of the `Asset`
+   */
   readonly name: string;
   /**
    * Total possible supply of the `Asset`
@@ -1415,11 +1750,23 @@ export interface Asset {
    * Issuer of the `Asset`.
    */
   readonly issuer: AddressString;
+  /**
+   * Unix timestamp of when the `Asset` must be renewed by or it expires.
+   */
   readonly expiration: number;
+  /**
+   * `true` if no transfers are allowed with the `Asset`.
+   */
   readonly frozen: boolean;
 }
 
+/**
+ * Attributes of a deployed smart contract.
+ */
 export interface Contract {
+  /**
+   * NEO protocol version.
+   */
   readonly version: number;
   /**
    * `AddressString` of this `Contract`.
@@ -1480,7 +1827,13 @@ export interface Contract {
  * @see SignatureString
  */
 export interface SignatureContractParameter {
+  /**
+   * `type` distinguishes `SignatureContractParameter` from other `ContractParameter` object types.
+   */
   readonly type: 'Signature';
+  /**
+   * Raw signature string.
+   */
   readonly value: SignatureString;
 }
 
@@ -1490,7 +1843,13 @@ export interface SignatureContractParameter {
  * @see ContractParameter
  */
 export interface BooleanContractParameter {
+  /**
+   * `type` distinguishes `BooleanContractParameter` from other `ContractParameter` object types.
+   */
   readonly type: 'Boolean';
+  /**
+   * Raw boolean value.
+   */
   readonly value: boolean;
 }
 
@@ -1503,7 +1862,13 @@ export interface BooleanContractParameter {
  * @see ContractParameter
  */
 export interface IntegerContractParameter {
+  /**
+   * `type` distinguishes `IntegerContractParameter` from other `ContractParameter` object types.
+   */
   readonly type: 'Integer';
+  /**
+   * Always an integer. This value is processed using the ABI's `decimals` specification into a corresponding `BigNumber`.
+   */
   readonly value: BN;
 }
 
@@ -1514,7 +1879,13 @@ export interface IntegerContractParameter {
  * @see AddressString
  */
 export interface AddressContractParameter {
+  /**
+   * `type` distinguishes `AddressContractParameter` from other `ContractParameter` object types.
+   */
   readonly type: 'Address';
+  /**
+   * NEO address in base58 encoded string format.
+   */
   readonly value: AddressString;
 }
 
@@ -1525,7 +1896,13 @@ export interface AddressContractParameter {
  * @see Hash256String
  */
 export interface Hash256ContractParameter {
+  /**
+   * `type` distinguishes `Hash256ContractParameter` from other `ContractParameter` object types.
+   */
   readonly type: 'Hash256';
+  /**
+   * NEO `Hash256` encoded as a string.
+   */
   readonly value: Hash256String;
 }
 
@@ -1536,7 +1913,13 @@ export interface Hash256ContractParameter {
  * @see BufferString
  */
 export interface BufferContractParameter {
+  /**
+   * `type` distinguishes `BufferContractParameter` from other `ContractParameter` object types.
+   */
   readonly type: 'Buffer';
+  /**
+   * Hex encoded `Buffer` string.
+   */
   readonly value: BufferString;
 }
 
@@ -1547,7 +1930,13 @@ export interface BufferContractParameter {
  * @see PublicKeyString
  */
 export interface PublicKeyContractParameter {
+  /**
+   * `type` distinguishes `PublicKeyContractParameter` from other `ContractParameter` object types.
+   */
   readonly type: 'PublicKey';
+  /**
+   * String format of a public key.
+   */
   readonly value: PublicKeyString;
 }
 
@@ -1557,7 +1946,13 @@ export interface PublicKeyContractParameter {
  * @see ContractParameter
  */
 export interface StringContractParameter {
+  /**
+   * `type` distinguishes `StringContractParameter` from other `ContractParameter` object types.
+   */
   readonly type: 'String';
+  /**
+   * Raw string value.
+   */
   readonly value: string;
 }
 
@@ -1567,7 +1962,13 @@ export interface StringContractParameter {
  * @see ContractParameter
  */
 export interface ArrayContractParameter {
+  /**
+   * `type` distinguishes `ArrayContractParameter` from other `ContractParameter` object types.
+   */
   readonly type: 'Array';
+  /**
+   * An array of `ContractParameter`s.
+   */
   readonly value: ReadonlyArray<ContractParameter>;
 }
 
@@ -1577,7 +1978,13 @@ export interface ArrayContractParameter {
  * @see ContractParameter
  */
 export interface MapContractParameter {
+  /**
+   * `type` distinguishes `MapContractParameter` from other `ContractParameter` object types.
+   */
   readonly type: 'Map';
+  /**
+   * A map of `ContractParameter` to `ContractParameter`. Represented as an array of pairs because JavaScript `Map` keys do not have the same semantics as the NEO VM.
+   */
   readonly value: ReadonlyArray<[ContractParameter, ContractParameter]>;
 }
 
@@ -1589,6 +1996,9 @@ export interface MapContractParameter {
  * @see ContractParameter
  */
 export interface InteropInterfaceContractParameter {
+  /**
+   * `type` distinguishes `InteropInterfaceContractParameter` from other `ContractParameter` object types.
+   */
   readonly type: 'InteropInterface';
 }
 
@@ -1598,6 +2008,9 @@ export interface InteropInterfaceContractParameter {
  * @see ContractParameter
  */
 export interface VoidContractParameter {
+  /**
+   * `type` distinguishes `VoidContractParameter` from other `ContractParameter` object types.
+   */
   readonly type: 'Void';
 }
 
@@ -1620,12 +2033,10 @@ export type ContractParameter =
   | InteropInterfaceContractParameter
   | VoidContractParameter;
 
+/**
+ * All of the possible `type`s that a `ContractParameter` may have.
+ */
 export type ContractParameterType = ContractParameter['type'];
-
-export interface RawInvocationResultBase {
-  readonly gasConsumed: BigNumber;
-  readonly gasCost: BigNumber;
-}
 
 /**
  * Raw result of a successful invocation.
@@ -1633,7 +2044,13 @@ export interface RawInvocationResultBase {
  * Low-level API for advanced usage only.
  */
 export interface RawInvocationResultSuccess extends RawInvocationResultBase {
+  /**
+   * Indicates a successful invocation.
+   */
   readonly state: 'HALT';
+  /**
+   * The state of the NEO VM after execution. Typically has one `ContractParameter` which is the return value of the method invoked.
+   */
   readonly stack: ReadonlyArray<ContractParameter>;
 }
 
@@ -1642,9 +2059,18 @@ export interface RawInvocationResultSuccess extends RawInvocationResultBase {
  *
  * Low-level API for advanced usage only.
  */
-export interface RawInvocationResultError {
+export interface RawInvocationResultError extends RawInvocationResultBase {
+  /**
+   * Indicates a failed invocation.
+   */
   readonly state: 'FAULT';
+  /**
+   * The state of the NEO VM after execution. Typically has one `ContractParameter` which is the return value of the method invoked.
+   */
   readonly stack: ReadonlyArray<ContractParameter>;
+  /**
+   * A descriptive message indicating why the invocation failed.
+   */
   readonly message: string;
 }
 
@@ -1762,39 +2188,104 @@ export interface SourceMaps {
   readonly [address: string]: RawSourceMap;
 }
 
+/**
+ * Encodes an error returned by the JSONRPC server.
+ */
 export interface JSONRPCErrorResponse {
+  /**
+   * Error code.
+   */
   readonly code: number;
+  /**
+   * Error message.
+   */
   readonly message: string;
-  // tslint:disable-next-line no-any
+  /**
+   * Additional data, typically `undefined`.
+   */
   readonly data?: any;
 }
 
+/**
+ * An individual verification and the associated data.
+ */
 export interface VerifyScriptResult {
+  /**
+   * `undefined` if the verification passed, otherwise a message that describes the failure.
+   */
   readonly failureMessage?: string;
+  /**
+   * The smart contract this result is associated with.
+   */
   readonly address: AddressString;
+  /**
+   * The specific `Witness` that was checked.
+   */
   readonly witness: Witness;
+  /**
+   * The actions emitted during the verification.
+   */
   readonly actions: ReadonlyArray<RawAction>;
 }
 
+/**
+ * Interface which describes the result of verification invocation.
+ */
 export interface VerifyTransactionResult {
+  /**
+   * All verifications that happened during the relay of the `Transaction`.
+   */
   readonly verifications: ReadonlyArray<VerifyScriptResult>;
 }
 
+/**
+ * Raw result of relaying a `Transaction`. Further consumed and processed by `LocalUserAccountProvider` and `ABI`.
+ */
 export interface RelayTransactionResult {
+  /**
+   * Relayed `Transaction`
+   */
   readonly transaction: Transaction;
+  /**
+   * Verification result.
+   */
   readonly verifyResult?: VerifyTransactionResult;
 }
 
+/**
+ * Additional raw data that is typically processed by an `ABI` for the client APIs.
+ */
 export interface RawInvocationData {
+  /**
+   * `Asset` created by the invocation.
+   */
   readonly asset?: Asset;
+  /**
+   * `Contract`s created by the invocation.
+   */
   readonly contracts: ReadonlyArray<Contract>;
+  /**
+   * `Contract`s deleted by the invocation.
+   */
   readonly deletedContractAddresses: ReadonlyArray<AddressString>;
+  /**
+   * `Contract`s migrated (upgraded) by the invocation.
+   */
   readonly migratedContractAddresses: ReadonlyArray<[AddressString, AddressString]>;
+  /**
+   * Raw result of an invocation.
+   */
   readonly result: RawInvocationResult;
+  /**
+   * Raw actions emitted by the invocation.
+   */
   readonly actions: ReadonlyArray<RawAction>;
 }
 
-export interface ParamJSONArray extends ReadonlyArray<Param> {}
+export interface ParamJSONArray extends ReadonlyArray<ParamJSON> {}
+/**
+ * JSON format of `Param`s that are added as an `Attribute` tag.
+ */
 export type ParamJSON =
   | undefined
   | string
@@ -1805,10 +2296,16 @@ export type ParamJSON =
   | boolean
   | ParamJSONArray;
 
+/**
+ * Constant settings used to initialize the client APIs.
+ */
 export interface NetworkSettings {
   readonly issueGASFee: BigNumber;
 }
 
+/**
+ * Peers connected to the node.
+ */
 export interface Peer {
   readonly address: string;
   readonly port: number;

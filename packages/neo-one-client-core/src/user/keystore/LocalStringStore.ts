@@ -1,15 +1,33 @@
 import { PasswordRequiredError } from '../../errors';
-import { Wallet as LocalWallet } from './LocalKeyStore';
+import { LocalStore, LocalWallet } from './LocalKeyStore';
 
-export interface Storage {
+/**
+ * Interfae that `LocalStringStore` requires to function.
+ */
+export interface LocalStringStoreStorage {
+  /**
+   * Set `key` to `value`.
+   */
   readonly setItem: (key: string, value: string) => Promise<void>;
+  /**
+   * Return the value of `key`
+   */
   readonly getItem: (key: string) => Promise<string>;
+  /**
+   * Remove `key`.
+   */
   readonly removeItem: (key: string) => Promise<void>;
+  /**
+   * Return all keys.
+   */
   readonly getAllKeys: () => Promise<ReadonlyArray<string>>;
 }
 
-export class LocalStringStore {
-  public constructor(public readonly storage: Storage) {}
+/**
+ * Implements the `LocalStore` interface expected by `LocalKeyStore`.
+ */
+export class LocalStringStore implements LocalStore {
+  public constructor(public readonly storage: LocalStringStoreStorage) {}
 
   public async getWallets(): Promise<ReadonlyArray<LocalWallet>> {
     const keys = await this.storage.getAllKeys();

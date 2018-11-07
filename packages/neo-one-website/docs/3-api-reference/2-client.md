@@ -24,6 +24,7 @@ This reference uses dot syntax to indicate static properties and `#` to indicate
 ---
 
 #### `Client`
+#### `UpdateAccountNameOptions`
 #### `UserAccountProvider`
 #### `UserAccountProviders`
 #### `AddressString`
@@ -35,9 +36,11 @@ This reference uses dot syntax to indicate static properties and `#` to indicate
 #### `NetworkType`
 #### `Transfer`
 #### `GetOptions`
+#### `BlockFilter`
 #### `TransactionOptions`
 #### `TransactionReceipt`
 #### `TransactionResult`
+#### `NetworkSettings`
 
 ---
 
@@ -61,6 +64,9 @@ This reference uses dot syntax to indicate static properties and `#` to indicate
 #### `JSONRPCProvider`
 #### `JSONRPCRequest`
 #### `JSONRPCResponse`
+#### `RelayTransactionResult`
+#### `VerifyTransactionResult`
+#### `VerifyScriptResult`
 
 ---
 
@@ -97,6 +103,25 @@ Iterate over the events and logs emitted by the smart contract.
 ##### `SmartContract#convertAction(action: RawAction): Action | undefined`
 
 Converts a `RawAction`, typically from the raw results found in a `Block` to a processed `Action` or `undefined` if the action is not recognized by the ABI.
+
+#### `SmartContractReadOptions`
+
+Additional optional options for methods that read data from a smart contract.
+
+##### `SmartContractReadOptions#network`
+
+The network to read the smart contract data for. By default this is the network of the currently selected user account.
+
+#### `SmartContractIterOptions`
+
+*extends:*
+  - `SmartContractReadOptions`
+
+Additional optional options for methods that iterate over data from a smart contract.
+
+##### `SmartContractIterOptions#filter`
+
+Filters the iterated events and/or logs to those that match the provided `BlockFilter` object.
 
 #### `SmartContractDefinition`
 
@@ -243,7 +268,7 @@ The original, unprocessed, `RawInvokeReceipt`. The `RawInvokeReceipt` is transfo
 *extends:*
   - `TransactionOptions`
 
-
+Additional parameters available to methods that support receiving native `Asset`s to the smart contract, i.e. they have been annotated with `@receive`.
 
 #### `InvokeSendUnsafeReceiveTransactionOptions`
 #### `InvokeSendUnsafeTransactionOptions`
@@ -251,6 +276,7 @@ The original, unprocessed, `RawInvokeReceipt`. The `RawInvokeReceipt` is transfo
 #### `ForwardValue`
 #### `Action`
 #### `Event`
+#### `EventParameters`
 #### `Log`
 #### `ABI`
 
@@ -690,6 +716,7 @@ Smart contract source maps.
 
 #### `DeveloperTools`
 #### `DeveloperClient`
+#### `DeveloperProvider`
 #### `PrivateNetworkSettings`
 #### `LocalClient`
 #### `OneClient`
@@ -730,13 +757,21 @@ Smart contract source maps.
 #### `Asset`
 #### `AssetType`
 #### `Attribute`
+#### `AttributeBase`
+#### `AttributeUsage`
+#### `AddressAttribute`
 #### `AddressAttributeUsage`
+#### `BufferAttribute`
 #### `BufferAttributeUsage`
+#### `Hash256Attribute`
 #### `Hash256AttributeUsage`
+#### `PublicKeyAttribute`
 #### `PublicKeyAttributeUsage`
 #### `Block`
 #### `Contract`
 #### `Header`
+#### `Input`
+#### `Output`
 #### `Witness`
 #### `Transaction`
 #### `TransactionBase`
@@ -749,8 +784,6 @@ Smart contract source maps.
 #### `PublishTransaction`
 #### `RegisterTransaction`
 #### `StateTransaction`
-#### `Input`
-#### `Output`
 #### `ConfirmedTransaction`
 #### `ConfirmedTransactionBase`
 #### `ConfirmedClaimTransaction`
@@ -788,6 +821,7 @@ Smart contract source maps.
 #### `Hash256ContractParameter`
 #### `IntegerContractParameter`
 #### `InteropInterfaceContractParameter`
+#### `MapContractParameter`
 #### `PublicKeyContractParameter`
 #### `SignatureContractParameter`
 #### `StringContractParameter`

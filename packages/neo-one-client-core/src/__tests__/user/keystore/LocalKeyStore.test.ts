@@ -1,7 +1,7 @@
 import { take } from 'rxjs/operators';
 import { addKeysToCrypto, factory, keys } from '../../../__data__';
 import { LocalKeyStore } from '../../../user';
-import { Store } from '../../../user/keystore/LocalKeyStore';
+import { LocalStore } from '../../../user/keystore/LocalKeyStore';
 
 describe('LocalKeyStore', () => {
   addKeysToCrypto();
@@ -11,7 +11,7 @@ describe('LocalKeyStore', () => {
   const getWalletsSync = jest.fn();
   const saveWallet = jest.fn();
   const deleteWallet = jest.fn();
-  const store: Store = {
+  const store: LocalStore = {
     getWallets,
     getWalletsSync,
     saveWallet,
@@ -29,7 +29,7 @@ describe('LocalKeyStore', () => {
     deleteWallet.mockReset();
     getWalletsSync.mockImplementation(() => [lockedWallet, unlockedWallet]);
     getWallets.mockImplementation(() => [lockedWallet, unlockedWallet]);
-    keystore = new LocalKeyStore({ store });
+    keystore = new LocalKeyStore(store);
   });
 
   test('currentUserAccount$', async () => {

@@ -293,6 +293,7 @@ const createInvoke = ({
         return {
           blockIndex: receipt.blockIndex,
           blockHash: receipt.blockHash,
+          globalIndex: receipt.globalIndex,
           transactionIndex: receipt.transactionIndex,
           result: invocationResult,
           events: common.filterEvents(actions),

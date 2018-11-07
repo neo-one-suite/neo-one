@@ -42,7 +42,7 @@ const getClients = async (
 ): Promise<{
   readonly client: Client;
 }> => {
-  const keystore = new LocalKeyStore({ store: new LocalMemoryStore() });
+  const keystore = new LocalKeyStore(new LocalMemoryStore());
 
   if (wallet.wif === undefined) {
     throw new Error(`Something went wrong, wif is null for ${wallet.name}`);

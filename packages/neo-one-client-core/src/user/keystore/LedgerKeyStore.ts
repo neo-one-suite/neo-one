@@ -64,6 +64,9 @@ const getNewNetworks = (networks: Set<NetworkType> | undefined, networksIn: Read
   return networksIn.filter((network) => !networks.has(network));
 };
 
+/**
+ * Implements the `KeyStore` interface expected by `LocalUserAccountProvider` using a ledger.
+ */
 export class LedgerKeyStore {
   public get ledgers(): Ledgers {
     return this.ledgersInternal$.getValue();

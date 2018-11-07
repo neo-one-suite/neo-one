@@ -26,7 +26,7 @@ yarn install
 yarn neo-one build
 ```
 
-This will start up a local network, compile the smart contracts located in the `/one/contracts` directory and publish them to your local network. Add `--watch` command to listen for changes to the smart contracts and trigger automatic recompilation and deployment.
+This will start up a local network, compile the smart contracts located in the `./one/contracts` directory and publish them to your local network. Add `--watch` command to listen for changes to the smart contracts and trigger automatic recompilation and deployment.
 
 ## Start the Playground
 

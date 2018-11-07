@@ -211,6 +211,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           blockIndex: receipt.blockIndex,
           blockHash: receipt.blockHash,
           transactionIndex: receipt.transactionIndex,
+          globalIndex: receipt.globalIndex,
           result,
         };
       },
@@ -283,6 +284,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         blockIndex: receipt.blockIndex,
         blockHash: receipt.blockHash,
         transactionIndex: receipt.transactionIndex,
+        globalIndex: receipt.globalIndex,
         result: data.result,
         actions: data.actions,
       }),
@@ -353,6 +355,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           blockIndex: receipt.blockIndex,
           blockHash: receipt.blockHash,
           transactionIndex: receipt.transactionIndex,
+          globalIndex: receipt.globalIndex,
           result,
         };
       },

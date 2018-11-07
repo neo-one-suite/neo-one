@@ -14,7 +14,7 @@ The NEO•ONE client APIs are organized into two packages, `@neo-one/client` whi
 
 The `@neo-one/client` APIs center around instances of the `Client` class. The `Client` class abstracts away user accounts and even how those accounts are provided to your dapp, for example, they might come from an extension like NEX, dapp browser like nOS or through some other integration.
 
-:: warning
+::: warning
 
 Tip
 
@@ -24,7 +24,7 @@ Do not roll your own wallet when creating a dapp. This fractures the ecosystem a
 
 The `Client` class also contains a few methods that may be useful in the course of developing a dapp:
 
-  - `getCurrentUserAccount(): UserAccount | undefined` - Returns the currently selected `UserAccount`. Returns `undefined` is there are no `UserAccount`s.
+  - `getCurrentUserAccount(): UserAccount | undefined` - Returns the currently selected `UserAccount`. Returns `undefined` if there are no `UserAccount`s.
   - `getCurrentNetwork(): NetworkType` - Returns the currently selected network, a string that will be `'main'` for the MainNet, `'test'` for the TestNet, and typically `'local'` for a local private network.
   - `getAccount(id: UserAccountID): Promise<Account>` - Returns an object containing the native asset balances for a given `UserAccountID`.
 
@@ -138,7 +138,7 @@ const client = createClient();
 const token = createTokenSmartContract(client);
 ```
 
-Now we can use both the base blockchain APIs offered by the `Client` class and the generated smart contract APIs that correspond to the `Token` contract. We'll focus on the generated APIs in this chapter, but feel free to take a look at the [@neo-one/client](/docs/client) reference for more details on the available `Client` APIs.
+Now we can use both the base blockchain APIs offered by the `Client` class and the generated smart contract APIs that correspond to the `Token` contract.
 
 ::: warning
 

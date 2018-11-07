@@ -985,9 +985,7 @@ export const bootstrap = (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs)
         spinner.succeed();
 
         spinner.start(`Bootstrapping network ${bootstrapData.network.name}`);
-        const keystore = new LocalKeyStore({
-          store: new LocalMemoryStore(),
-        });
+        const keystore = new LocalKeyStore(new LocalMemoryStore());
 
         await addWalletsToKeystore({
           keystore,

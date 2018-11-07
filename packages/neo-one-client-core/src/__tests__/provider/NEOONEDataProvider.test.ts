@@ -250,7 +250,7 @@ describe('NEOONEDataProvider', () => {
 
     expect(transaction.receipt.blockHash).toEqual(transactionJSON.data.blockHash);
     expect(transaction.receipt.blockIndex).toEqual(transactionJSON.data.blockIndex);
-    expect(transaction.receipt.index).toEqual(transactionJSON.data.index);
+    expect(transaction.receipt.transactionIndex).toEqual(transactionJSON.data.transactionIndex);
     expect(transaction.receipt.globalIndex.toString(10)).toEqual(transactionJSON.data.globalIndex);
   };
 
@@ -343,7 +343,7 @@ describe('NEOONEDataProvider', () => {
       invocationData.actions,
       transactionData.blockIndex,
       transactionData.blockHash,
-      transactionData.index,
+      transactionData.transactionIndex,
       transactionJSON.txid,
     );
 
@@ -620,7 +620,7 @@ describe('NEOONEDataProvider', () => {
       transactionJSON.invocationData.actions,
       transactionJSON.data.blockIndex,
       transactionJSON.data.blockHash,
-      transactionJSON.data.index,
+      transactionJSON.data.transactionIndex,
       transactionJSON.txid,
     );
   });

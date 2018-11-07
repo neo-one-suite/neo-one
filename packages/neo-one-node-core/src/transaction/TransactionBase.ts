@@ -268,7 +268,7 @@ export function TransactionBase<
             : {
                 blockHash: common.uInt256ToString(transactionData.blockHash),
                 blockIndex: transactionData.startHeight,
-                index: transactionData.index,
+                transactionIndex: transactionData.index,
                 globalIndex: JSONHelper.writeUInt64(transactionData.globalIndex),
               },
       };

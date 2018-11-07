@@ -38,6 +38,9 @@ export interface NEOONEOneDataProviderOptions {
   readonly iterBlocksBatchSize?: number;
 }
 
+/**
+ * Implements the methods required by the `NEOONEProvider` as well as the `DeveloperProvider` interface using a NEO•ONE node that is looked up through the local NEO•ONE `projectID`.
+ */
 export class NEOONEOneDataProvider implements DeveloperProvider {
   public readonly network: NetworkType;
   private mutableProvider: NEOONEDataProvider | undefined;

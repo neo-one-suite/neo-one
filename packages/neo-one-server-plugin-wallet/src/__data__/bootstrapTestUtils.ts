@@ -369,7 +369,7 @@ export async function testBootstrap(
 
   const provider = new NEOONEProvider([{ network, rpcURL }]);
   const client = new Client({
-    memory: new LocalUserAccountProvider({ provider, keystore: new LocalKeyStore({ store: new LocalMemoryStore() }) }),
+    memory: new LocalUserAccountProvider({ provider, keystore: new LocalKeyStore(new LocalMemoryStore()) }),
   });
   const readClient = new ReadClient(provider.read(network));
 

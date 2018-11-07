@@ -47,32 +47,97 @@ import {
 import { createSmartContract } from './sc';
 import { SmartContract, SmartContractAny } from './types';
 
+/**
+ * Object which contains the points that can be hooked into on the `Client`.
+ */
 export interface ClientHooks {
+  /**
+   * Called before the `Transaction` is relayed.
+   */
   readonly beforeRelay: AsyncParallelHook<TransactionOptions>;
+  /**
+   * Called when there is an `Error` thrown during relaying a `Transaction`.
+   */
   readonly relayError: AsyncParallelHook<Error>;
+  /**
+   * Called after successfully relaying a `Transaction`.
+   */
   readonly afterRelay: AsyncParallelHook<Transaction>;
+  /**
+   * Called when the `confirmed` method of a `TransactionResult` is invoked.
+   */
   readonly beforeConfirmed: AsyncParallelHook<Transaction>;
+  /**
+   * Called when there is an `Error` thrown during the `confirmed` method of a `TransactionResult`.
+   */
   readonly confirmedError: AsyncParallelHook<Transaction, Error>;
+  /**
+   * Called after the `confirmed` method of a `TransactionResult` resolves.
+   */
   readonly afterConfirmed: AsyncParallelHook<Transaction, TransactionReceipt>;
+  /**
+   * Called after a constant method is invoked.
+   */
   readonly afterCall: AsyncParallelHook<RawCallReceipt>;
+  /**
+   * Called when an `Error` is thrown from a constant method invocation.
+   */
   readonly callError: AsyncParallelHook<Error>;
 }
 
-export interface Features {
+/**
+ * Properties represent features that a given `UserAccountID` supports.
+ */
+export interface UserAccountFeatures {
+  /**
+   * `true` if the `UserAccountID` can be deleted.
+   */
   readonly delete: boolean;
+  /**
+   * `true` if the `name` of the `UserAccount` associated with the `UserAccountID` can be updated.
+   */
   readonly updateName: boolean;
 }
 
+/**
+ * Main entrypoint to the `@neo-one/client` APIs. The `Client` class abstracts away user accounts and even how those accounts are provided to your dapp, for example, they might come from an extension like NEX, dapp browser like nOS or through some other integration.
+ *
+ * See the [Client APIs](https://neo-one.io/docs/client-apis) chapter of the main guide for more information.
+ */
 export class Client<
   // tslint:disable-next-line no-any
   TUserAccountProvider extends UserAccountProvider = any,
   // tslint:disable-next-line no-any
   TUserAccountProviders extends UserAccountProviders<TUserAccountProvider> = any
 > {
+  /**
+   * Hook into the lifecycle of various requests. Can be used to automatically add logging, or parameter transformations across the application, for example.
+   */
   public readonly hooks: ClientHooks;
+  /**
+   * Emits a value whenever a new user account is selected.
+   *
+   * Immediately emits the latest value when subscribed to.
+   */
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;
+  /**
+   * Emits a value whenever a new list of user accounts is available.
+   *
+   * Immediately emits the latest value when subscribed to.
+   */
   public readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
+  /**
+   * Emits a value whenever a new network is selected.
+   *
+   * Immediately emits the latest value when subscribed to.
+   */
+
   public readonly currentNetwork$: Observable<NetworkType>;
+  /**
+   * Emits a value whenever a new list of networks user account is available.
+   *
+   * Immediately emits the latest value when subscribed to.
+   */
   public readonly networks$: Observable<ReadonlyArray<NetworkType>>;
   protected readonly providers$: BehaviorSubject<TUserAccountProviders>;
   protected readonly selectedProvider$: BehaviorSubject<TUserAccountProvider>;
@@ -202,10 +267,19 @@ export class Client<
     );
   }
 
+  /**
+   * The configured `UserAccountProvider`s for this `Client` instance.
+   */
   public get providers(): TUserAccountProviders {
     return this.providers$.getValue();
   }
 
+  /**
+   * Get the details of the `UserAccount` for a given `UserAccountID`.
+   *
+   * @param idIn `UserAccountID` to find the `UserAccount` for
+   * @returns `UserAccount` or throws an `UnknownAccountError` if one could not be found.
+   */
   public getUserAccount(idIn: UserAccountID): UserAccount {
     const id = args.assertUserAccountID('id', idIn);
     const provider = this.getProvider({ from: id });
@@ -221,6 +295,11 @@ export class Client<
     return account;
   }
 
+  /**
+   * Sets a `UserAccountID` as the currently selected `UserAccountID`.
+   *
+   * @param idIn `UserAccountID` to select, or `undefined` to deselect the current `UserAccountID`.
+   */
   public async selectUserAccount(idIn?: UserAccountID): Promise<void> {
     const id = args.assertNullableUserAccountID('id', idIn);
     const provider = this.getProvider({ from: id });
@@ -228,6 +307,11 @@ export class Client<
     this.selectedProvider$.next(provider);
   }
 
+  /**
+   * Sets a `NetworkType` as the currently selected `NetworkType`.
+   *
+   * @param networkIn `NetworkType` to select.
+   */
   public async selectNetwork(networkIn: NetworkType): Promise<void> {
     const network = args.assertString('network', networkIn);
     const provider = this.getNetworkProvider(network);
@@ -241,7 +325,10 @@ export class Client<
     this.selectedProvider$.next(provider);
   }
 
-  public async getSupportedFeatures(idIn: UserAccountID): Promise<Features> {
+  /**
+   * @returns `Promise` which resolves to the `UserAccountFeatures` supported by the given `UserAccountID`.
+   */
+  public async getSupportedFeatures(idIn: UserAccountID): Promise<UserAccountFeatures> {
     const id = args.assertUserAccountID('id', idIn);
     const provider = this.getProvider({ from: id });
 
@@ -251,6 +338,11 @@ export class Client<
     };
   }
 
+  /**
+   * Deletes the `UserAccountID` from its underlying provider. Throws an `DeleteUserAccountUnsupportedError` if the operation is unsupported.
+   *
+   * Users should check `getSupportedFeatures` before calling this method.
+   */
   public async deleteUserAccount(idIn: UserAccountID): Promise<void> {
     const id = args.assertUserAccountID('id', idIn);
     const provider = this.getProvider({ from: id });
@@ -261,6 +353,11 @@ export class Client<
     await provider.deleteUserAccount(id);
   }
 
+  /**
+   * Updates the name of the `UserAccountID` in the underlying provider. Throws an `UpdateUserAccountUnsupportedError` if the operation is unsupported.
+   *
+   * Users should check `getSupportedFeatures` before calling this method.
+   */
   public async updateUserAccountName(options: UpdateAccountNameOptions): Promise<void> {
     const { id, name } = args.assertUpdateAccountNameOptions('options', options);
     const provider = this.getProvider({ from: id });
@@ -271,14 +368,23 @@ export class Client<
     await provider.updateUserAccountName({ id, name });
   }
 
+  /**
+   * @returns the currently selected `UserAccount` or `undefined` if there are no `UserAccount`s.
+   */
   public getCurrentUserAccount(): UserAccount | undefined {
     return this.selectedProvider$.getValue().getCurrentUserAccount();
   }
 
+  /**
+   * @returns the currently selected `NetworkType`
+   */
   public getCurrentNetwork(): NetworkType {
     return this.currentNetworkInternal$.getValue();
   }
 
+  /**
+   * @returns a list of all available `UserAccount`s
+   */
   public getUserAccounts(): ReadonlyArray<UserAccount> {
     return Object.values(this.providers).reduce(
       (acc: UserAccount[], provider) => acc.concat(provider.getUserAccounts()),
@@ -286,13 +392,18 @@ export class Client<
     );
   }
 
+  /**
+   * @returns a list of all available `NetworkType`s
+   */
   public getNetworks(): ReadonlyArray<NetworkType> {
     const providers = Object.values(this.providers);
 
     return [...new Set(providers.reduce((acc: NetworkType[], provider) => acc.concat(provider.getNetworks()), []))];
   }
 
-  // tslint:disable-next-line no-any
+  /**
+   * Constructs a `SmartContract` instance for the provided `definition` backed by this `Client` instance.
+   */
   public smartContract<T extends SmartContract<any, any> = SmartContractAny>(definition: SmartContractDefinition): T {
     return createSmartContract({
       definition: args.assertSmartContractDefinition('definition', definition),
@@ -324,18 +435,26 @@ export class Client<
     return this.addTransactionHooks(this.getProvider(options).transfer(transfers, options));
   }
 
-  public async claim(optionsIn?: TransactionOptions): Promise<TransactionResult> {
+  /**
+   * Claim all available unclaimed `GAS` for the currently selected account (or the specified `from` `UserAccountID`).
+   */
+  public async claim(optionsIn?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
     const options = args.assertTransactionOptions('options', optionsIn);
     await this.applyBeforeRelayHook(options);
 
     return this.addTransactionHooks(this.getProvider(options).claim(options));
   }
 
+  /**
+   * @returns `Promise` which resolves to an `Account` object for the provided `UserAccountID`.
+   */
   public async getAccount(id: UserAccountID): Promise<Account> {
     return this.getNetworkProvider(id.network).getAccount(id.network, id.address);
   }
 
-  // internal
+  /**
+   * @internal
+   */
   public __iterActionsRaw(network: NetworkType, blockFilter?: BlockFilter): AsyncIterable<RawAction> {
     const provider = this.getNetworkProvider(network);
     if (provider.iterActionsRaw !== undefined) {
@@ -359,6 +478,9 @@ export class Client<
     );
   }
 
+  /**
+   * @internal
+   */
   public async __invoke(
     contract: AddressString,
     method: string,
@@ -376,6 +498,9 @@ export class Client<
     );
   }
 
+  /**
+   * @internal
+   */
   public async __invokeSend(
     contract: AddressString,
     method: string,
@@ -393,6 +518,9 @@ export class Client<
     );
   }
 
+  /**
+   * @internal
+   */
   public async __invokeCompleteSend(
     contract: AddressString,
     method: string,
@@ -410,6 +538,9 @@ export class Client<
     );
   }
 
+  /**
+   * @internal
+   */
   public async __invokeRefundAssets(
     contract: AddressString,
     method: string,
@@ -427,6 +558,9 @@ export class Client<
     );
   }
 
+  /**
+   * @internal
+   */
   public async __invokeClaim(
     contract: AddressString,
     method: string,
@@ -443,6 +577,9 @@ export class Client<
     );
   }
 
+  /**
+   * @internal
+   */
   public async __call(
     network: NetworkType,
     contract: AddressString,
@@ -462,6 +599,9 @@ export class Client<
     }
   }
 
+  /**
+   * @internal
+   */
   public reset(): void {
     this.reset$.next(undefined);
   }
@@ -556,7 +696,6 @@ export class Client<
   }
 
   protected getTransfersOptions(
-    // tslint:disable-next-line no-any
     argsIn: ReadonlyArray<any>,
   ): {
     readonly transfers: ReadonlyArray<Transfer>;

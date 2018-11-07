@@ -22,7 +22,7 @@ export type DefaultUserAccountProviders = {
 };
 const getDefaultUserAccountProviders = (provider: NEOONEProvider): DefaultUserAccountProviders => ({
   memory: new LocalUserAccountProvider({
-    keystore: new LocalKeyStore({ store: new LocalMemoryStore() }),
+    keystore: new LocalKeyStore(new LocalMemoryStore()),
     provider,
   }),
 });

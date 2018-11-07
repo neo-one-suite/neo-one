@@ -12,6 +12,9 @@ interface RPCResult {
   readonly [key: string]: any;
 }
 
+/**
+ * Client which makes http requests to the local NEO•ONE toolchain.
+ */
 export class Client {
   private readonly port: number;
 

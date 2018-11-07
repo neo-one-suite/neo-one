@@ -5,6 +5,7 @@ import {
   decryptNEP2,
   encryptNEP2,
   NetworkType,
+  PrivateKeyString,
   privateKeyToPublicKey,
   publicKeyToAddress,
   UpdateAccountNameOptions,
@@ -19,27 +20,80 @@ import { distinctUntilChanged, map } from 'rxjs/operators';
 import * as args from '../../args';
 import { LockedAccountError, UnknownAccountError } from '../../errors';
 
+/**
+ * Wallet in the "locked" state.
+ */
 export interface LockedWallet {
+  /**
+   * `type` differentiates a `LockedWallet` from other `LocalWallet`s, i.e. an `UnlockedWallet`
+   */
   readonly type: 'locked';
+  /**
+   * `UserAccount` this `LockedWallet` refers to.
+   */
   readonly account: UserAccount;
+  /**
+   * NEP-2 encrypted key of this `LockedWallet`.
+   */
   readonly nep2: string;
 }
 
+/**
+ * Wallet in the "unlocked" state.
+ */
 export interface UnlockedWallet {
+  /**
+   * `type` differentiates an `UnlockedWallet` from other `LocalWallet`s, i.e. an `LockedWallet`
+   */
+
   readonly type: 'unlocked';
+  /**
+   * `UserAccount` this `UnlockedWallet` refers to.
+   */
   readonly account: UserAccount;
-  readonly privateKey: BufferString;
+  /**
+   * Private key for this `UnlockedWallet`.
+   */
+  readonly privateKey: PrivateKeyString;
+  /**
+   * NEP-2 encrypted key of this `UnlockedWallet`. `undefined` if the `privateKey` has never been encrypted.
+   */
   readonly nep2?: string | undefined;
 }
 
-export type Wallet = LockedWallet | UnlockedWallet;
-export type Wallets = { readonly [Network in string]?: { readonly [Address in string]?: Wallet } };
+/**
+ * Locally stored wallet that is either in a `'locked'` or `'unlocked'` state (`type`).
+ */
+export type LocalWallet = LockedWallet | UnlockedWallet;
+/**
+ * Mapping from `NetworkType` -> `AddressString` -> `LocalWallet`
+ */
+export type Wallets = { readonly [Network in string]?: { readonly [Address in string]?: LocalWallet } };
 
-export interface Store {
-  readonly getWallets: () => Promise<ReadonlyArray<Wallet>>;
-  readonly getWalletsSync?: () => ReadonlyArray<Wallet>;
-  readonly saveWallet: (wallet: Wallet, monitor?: Monitor) => Promise<void>;
-  readonly deleteWallet: (account: Wallet, monitor?: Monitor) => Promise<void>;
+/**
+ * Base interface that must be implemented to use the `LocalKeyStore`.
+ */
+export interface LocalStore {
+  /**
+   * @returns `Promise` that resolves to all available `LocalWallet`s.
+   */
+  readonly getWallets: () => Promise<ReadonlyArray<LocalWallet>>;
+  /**
+   * Optional method that returns the available wallets synchronously.
+   *
+   * @returns All available `LocalWallet`s
+   */
+
+  readonly getWalletsSync?: () => ReadonlyArray<LocalWallet>;
+  /**
+   * Save a wallet to the store.
+   */
+  readonly saveWallet: (wallet: LocalWallet, monitor?: Monitor) => Promise<void>;
+  /**
+   * Delete a wallet from the store.
+   */
+
+  readonly deleteWallet: (account: LocalWallet, monitor?: Monitor) => Promise<void>;
 }
 
 const flattenWallets = (wallets: Wallets) =>
@@ -49,17 +103,20 @@ const flattenWallets = (wallets: Wallets) =>
       .map((networkWallets) => Object.values(networkWallets)),
   ).filter(utils.notNull);
 
+/**
+ * `LocalKeyStore` implements the `KeyStore` interface expected by `LocalUserAccountProvider` via an underlying `Store` implementation.
+ */
 export class LocalKeyStore {
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;
   public readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
-  public readonly wallets$: Observable<ReadonlyArray<Wallet>>;
+  public readonly wallets$: Observable<ReadonlyArray<LocalWallet>>;
   private readonly currentAccountInternal$: BehaviorSubject<UserAccount | undefined>;
   private readonly accountsInternal$: BehaviorSubject<ReadonlyArray<UserAccount>>;
   private readonly walletsInternal$: BehaviorSubject<Wallets>;
-  private readonly store: Store;
+  private readonly store: LocalStore;
   private readonly initPromise: Promise<void>;
 
-  public constructor({ store }: { readonly store: Store }) {
+  public constructor(store: LocalStore) {
     this.walletsInternal$ = new BehaviorSubject<Wallets>({});
     this.wallets$ = this.walletsInternal$.pipe(
       distinctUntilChanged((a, b) => _.isEqual(a, b)),
@@ -89,7 +146,7 @@ export class LocalKeyStore {
     return this.accountsInternal$.getValue();
   }
 
-  public get wallets(): ReadonlyArray<Wallet> {
+  public get wallets(): ReadonlyArray<LocalWallet> {
     return flattenWallets(this.walletsObj);
   }
 
@@ -133,7 +190,7 @@ export class LocalKeyStore {
         await this.initPromise;
 
         const wallet = this.getWallet(id);
-        let newWallet: Wallet;
+        let newWallet: LocalWallet;
         const account = {
           id: wallet.account.id,
           name,
@@ -163,7 +220,7 @@ export class LocalKeyStore {
     );
   }
 
-  public getWallet({ address, network }: UserAccountID): Wallet {
+  public getWallet({ address, network }: UserAccountID): LocalWallet {
     const wallets = this.walletsObj[network];
     if (wallets === undefined) {
       throw new UnknownAccountError(address);
@@ -177,7 +234,7 @@ export class LocalKeyStore {
     return wallet;
   }
 
-  public getWallet$({ address, network }: UserAccountID): Observable<Wallet | undefined> {
+  public getWallet$({ address, network }: UserAccountID): Observable<LocalWallet | undefined> {
     return this.walletsInternal$.pipe(
       map((wallets) => {
         const networkWallets = wallets[network];
@@ -204,7 +261,7 @@ export class LocalKeyStore {
     readonly password?: string;
     readonly nep2?: string;
     readonly monitor?: Monitor;
-  }): Promise<Wallet> {
+  }): Promise<LocalWallet> {
     await this.initPromise;
 
     return this.capture(
@@ -242,7 +299,7 @@ export class LocalKeyStore {
           privateKey,
         };
 
-        let wallet: Wallet = unlockedWallet;
+        let wallet: LocalWallet = unlockedWallet;
         if (nep2 !== undefined) {
           wallet = { type: 'locked', account, nep2 };
         }
@@ -353,7 +410,7 @@ export class LocalKeyStore {
     this.initWithWallets(walletsList);
   }
 
-  private initWithWallets(walletsList: ReadonlyArray<Wallet>): void {
+  private initWithWallets(walletsList: ReadonlyArray<LocalWallet>): void {
     const wallets = walletsList.reduce<Wallets>(
       (acc, wallet) => ({
         ...acc,
@@ -381,7 +438,7 @@ export class LocalKeyStore {
     return wallet.privateKey;
   }
 
-  private updateWallet(wallet: Wallet): void {
+  private updateWallet(wallet: LocalWallet): void {
     const { walletsObj: wallets } = this;
     this.walletsInternal$.next({
       ...wallets,

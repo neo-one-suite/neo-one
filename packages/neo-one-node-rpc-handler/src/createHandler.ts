@@ -228,6 +228,7 @@ const getTransactionReceipt = (value: TransactionData) => ({
   blockIndex: value.startHeight,
   blockHash: JSONHelper.writeUInt256(value.blockHash),
   transactionIndex: value.index,
+  globalIndex: JSONHelper.writeUInt64(value.globalIndex),
 });
 
 // tslint:disable-next-line no-any

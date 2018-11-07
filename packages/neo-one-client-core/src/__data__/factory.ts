@@ -248,7 +248,7 @@ const createTransactionBaseJSON = (options: Partial<TransactionBaseJSON> = {}): 
   data: {
     blockHash: data.hash256s.b,
     blockIndex: 5,
-    index: 10,
+    transactionIndex: 10,
     globalIndex: '25',
   },
   ...options,
@@ -354,6 +354,7 @@ const createTransactionReceipt = (options: Partial<TransactionReceipt> = {}): Tr
   blockHash: data.hash256s.a,
   blockIndex: 0,
   transactionIndex: 3,
+  globalIndex: new BigNumber(4),
   ...options,
 });
 
@@ -618,7 +619,7 @@ const createConfirmedTransactionBase = (options: Partial<ConfirmedTransactionBas
   receipt: {
     blockHash: data.hash256s.a,
     blockIndex: 10,
-    index: 1,
+    transactionIndex: 1,
     globalIndex: new BigNumber('11'),
   },
   ...options,
@@ -768,6 +769,7 @@ const createRawInvokeReceipt = (options: Partial<RawInvokeReceipt> = {}): RawInv
   blockIndex: 10,
   blockHash: data.hash256s.a,
   transactionIndex: 1,
+  globalIndex: new BigNumber(11),
   result: createRawInvocationResultSuccess(),
   actions: [createRawNotification(), createRawLog()],
   ...options,

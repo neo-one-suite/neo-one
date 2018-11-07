@@ -178,7 +178,7 @@ export interface TransactionBaseJSON {
     | {
         readonly blockHash: string;
         readonly blockIndex: number;
-        readonly index: number;
+        readonly transactionIndex: number;
         readonly globalIndex: string;
       }
     | undefined;
@@ -260,6 +260,7 @@ export interface TransactionReceiptJSON {
   readonly blockIndex: number;
   readonly blockHash: string;
   readonly transactionIndex: number;
+  readonly globalIndex: string;
 }
 
 export type AssetNameJSON = string | ReadonlyArray<{ readonly lang: string; readonly name: string }>;

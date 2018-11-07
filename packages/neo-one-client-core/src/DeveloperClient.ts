@@ -1,6 +1,9 @@
 import { DeveloperProvider, PrivateNetworkSettings } from '@neo-one/client-common';
 import { enqueuePostPromiseJob } from '@neo-one/utils';
 
+/**
+ * Client which controls a development network.
+ */
 export class DeveloperClient {
   private readonly developerProvider: DeveloperProvider;
   private mutableRunConsensusNow: Promise<void> | undefined;
