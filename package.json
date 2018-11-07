@@ -227,7 +227,7 @@
     "stylelint-processor-styled-components": "1.5.0",
     "terser-webpack-plugin": "1.1.0",
     "thread-loader": "1.2.0",
-    "through2": "2.0.3",
+    "through2": "2.0.5",
     "tmp": "0.0.33",
     "ts-jest": "23.10.4",
     "ts-loader": "5.3.0",
