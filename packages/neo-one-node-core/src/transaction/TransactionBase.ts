@@ -227,11 +227,10 @@ export function TransactionBase<
         ]);
 
         const attributeHashes = this.attributes
-          .map(
-            (attribute) =>
-              attribute instanceof UInt160Attribute && attribute.usage === AttributeUsage.Script
-                ? common.uInt160ToHex(attribute.value)
-                : undefined,
+          .map((attribute) =>
+            attribute instanceof UInt160Attribute && attribute.usage === AttributeUsage.Script
+              ? common.uInt160ToHex(attribute.value)
+              : undefined,
           )
           .filter(commonUtils.notNull);
 

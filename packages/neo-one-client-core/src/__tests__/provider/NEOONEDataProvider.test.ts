@@ -293,8 +293,8 @@ describe('NEOONEDataProvider', () => {
     const accountJSON = factory.createAccountJSON();
     const outputJSON = factory.createOutputJSON();
     client.getAccount = jest.fn(async () => Promise.resolve(accountJSON));
-    client.getUnspentOutput = jest.fn(
-      async (input) => (input.vout === accountJSON.unspent[0].vout ? outputJSON : undefined),
+    client.getUnspentOutput = jest.fn(async (input) =>
+      input.vout === accountJSON.unspent[0].vout ? outputJSON : undefined,
     );
 
     const result = await provider.getUnspentOutputs(keys[0].address);

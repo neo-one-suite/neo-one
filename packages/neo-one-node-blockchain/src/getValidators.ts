@@ -338,11 +338,10 @@ export const getValidators = async (
             (validator.registered && validator.votes.gt(utils.ZERO)) ||
             standbyValidatorsSet.has(common.ecPointToHex(validator.publicKey)),
         )
-        .sort(
-          (aValidator, bValidator) =>
-            aValidator.votes.eq(bValidator.votes)
-              ? common.ecPointCompare(aValidator.publicKey, bValidator.publicKey)
-              : -aValidator.votes.cmp(bValidator.votes),
+        .sort((aValidator, bValidator) =>
+          aValidator.votes.eq(bValidator.votes)
+            ? common.ecPointCompare(aValidator.publicKey, bValidator.publicKey)
+            : -aValidator.votes.cmp(bValidator.votes),
         )
         .map((validator) => common.ecPointToHex(validator.publicKey)),
       numValidators,

@@ -71,10 +71,10 @@ export function getEndpoint(endpointIn: EndpointLike): WorkerEndpoint {
   return isWorkerEndpoint(endpointIn)
     ? endpointIn
     : isWindow(endpointIn)
-      ? windowEndpoint(endpointIn)
-      : isWorker(endpointIn)
-        ? workerEndpoint(endpointIn)
-        : endpointEndpoint(endpointIn);
+    ? windowEndpoint(endpointIn)
+    : isWorker(endpointIn)
+    ? workerEndpoint(endpointIn)
+    : endpointEndpoint(endpointIn);
 }
 
 export function activate(endpoint: any): void {

@@ -1195,8 +1195,8 @@ export class Node implements INode {
     if (!getBlocks.hashStop.equals(common.ZERO_UINT256)) {
       hashStopIndexPromise = this.blockchain.header
         .tryGet({ hashOrIndex: getBlocks.hashStop })
-        .then(
-          (hashStopHeader) => (hashStopHeader === undefined ? maxHeight : Math.min(hashStopHeader.index, maxHeight)),
+        .then((hashStopHeader) =>
+          hashStopHeader === undefined ? maxHeight : Math.min(hashStopHeader.index, maxHeight),
         );
     }
     const [hashStartHeaders, hashEnd] = await Promise.all([

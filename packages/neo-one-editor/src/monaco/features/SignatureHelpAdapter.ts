@@ -18,13 +18,12 @@ export class SignatureHelpAdapter extends Adapter implements monaco.languages.Si
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(
-          async (worker) =>
-            model.isDisposed()
-              ? undefined
-              : worker.createSignatures(resource.path, positionToOffset(model, position), {
-                  [resource.path]: model.getValue(),
-                }),
+        switchMap(async (worker) =>
+          model.isDisposed()
+            ? undefined
+            : worker.createSignatures(resource.path, positionToOffset(model, position), {
+                [resource.path]: model.getValue(),
+              }),
         ),
       ),
     );

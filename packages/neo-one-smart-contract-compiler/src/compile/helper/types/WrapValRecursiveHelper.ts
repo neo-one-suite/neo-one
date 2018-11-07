@@ -138,8 +138,8 @@ export class WrapValRecursiveHelper extends Helper {
                   const expectedSize = isAddress(sb.context, node, type)
                     ? common.UINT160_BUFFER_BYTES
                     : isHash256(sb.context, node, type)
-                      ? common.UINT256_BUFFER_BYTES
-                      : common.ECPOINT_BUFFER_BYTES;
+                    ? common.UINT256_BUFFER_BYTES
+                    : common.ECPOINT_BUFFER_BYTES;
                   // [number, number, buffer]
                   sb.emitPushInt(node, expectedSize);
                   // [boolean, buffer]

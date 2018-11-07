@@ -25,8 +25,8 @@ export const resolve = ({ module: mod, from, emptyModulePath, fs, files = new Se
     (shims[mod] as string | undefined) !== undefined
       ? shims[mod]
       : (shims[absoluteModule] as string | undefined) !== undefined
-        ? shims[absoluteModule]
-        : mod;
+      ? shims[absoluteModule]
+      : mod;
   const resolved = resv.sync(transformedID, buildResolveOptions(base, fs, files));
 
   return (shims[resolved] as string | undefined) === undefined ? resolved : shims[resolved];

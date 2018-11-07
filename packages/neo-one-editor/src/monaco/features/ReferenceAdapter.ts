@@ -17,11 +17,10 @@ export class ReferenceAdapter extends Adapter implements monaco.languages.Refere
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(
-          async (worker) =>
-            model.isDisposed()
-              ? undefined
-              : worker.getReferencesAtPosition(resource.path, positionToOffset(model, position)),
+        switchMap(async (worker) =>
+          model.isDisposed()
+            ? undefined
+            : worker.getReferencesAtPosition(resource.path, positionToOffset(model, position)),
         ),
         map((entries) => {
           if (!entries || model.isDisposed()) {

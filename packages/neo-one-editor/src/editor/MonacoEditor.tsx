@@ -304,10 +304,10 @@ export class MonacoEditor extends React.Component<Props> {
       severity: (marker.severity === 1
         ? 'hint'
         : marker.severity === 2
-          ? 'info'
-          : marker.severity === 4
-            ? 'warning'
-            : 'error') as FileDiagnosticSeverity,
+        ? 'info'
+        : marker.severity === 4
+        ? 'warning'
+        : 'error') as FileDiagnosticSeverity,
     }));
   }
 

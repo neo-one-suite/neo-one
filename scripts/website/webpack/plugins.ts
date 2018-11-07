@@ -80,13 +80,13 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
             ]),
           ]
         : bundle === 'server' || bundle === 'tools'
-          ? []
-          : [
-              new ExtractCssChunksPlugin({
-                filename: '[name].[chunkHash:8].css',
-                chunkFilename: '[id].[chunkHash:8].css',
-              }),
-            ],
+        ? []
+        : [
+            new ExtractCssChunksPlugin({
+              filename: '[name].[chunkHash:8].css',
+              chunkFilename: '[id].[chunkHash:8].css',
+            }),
+          ],
     )
     .concat(stage === 'dev' || stage === 'node' ? [] : [new LodashModuleReplacementPlugin()])
     .concat(

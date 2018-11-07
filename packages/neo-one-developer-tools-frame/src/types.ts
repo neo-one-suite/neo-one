@@ -7,7 +7,9 @@ export type ComponentProps<C extends React.ComponentType<any> | React.Component<
   infer P
 >
   ? P
-  : C extends React.Component<infer P1> ? P1 : never;
+  : C extends React.Component<infer P1>
+  ? P1
+  : never;
 
 export interface PopoverProps {
   readonly visible: boolean;

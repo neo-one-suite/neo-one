@@ -22,9 +22,9 @@ const _self: any =
   typeof window !== 'undefined'
     ? window // if in browser
     : // @ts-ignore
-      _WorkerGlobalScope !== undefined && self instanceof _WorkerGlobalScope
-      ? self // if in worker
-      : {}; // if in node js
+    _WorkerGlobalScope !== undefined && self instanceof _WorkerGlobalScope
+    ? self // if in worker
+    : {}; // if in node js
 _self.Prism = Prism;
 import 'prismjs/plugins/toolbar/prism-toolbar.css';
 import 'prismjs/plugins/toolbar/prism-toolbar';

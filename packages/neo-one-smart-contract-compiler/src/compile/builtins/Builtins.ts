@@ -304,14 +304,17 @@ export class Builtins {
   private getAllMembers(symbol: ts.Symbol): Map<ts.Symbol, Builtin> {
     return this.memoized('get-all-members', symbolKey(symbol), () => {
       const interfaceMembers = this.builtinMembers.get(symbol);
-      const memberEntries = [...this.getInheritedSymbols(symbol)].reduce((acc, parentInterfaceSymbol) => {
-        const parentInterfaceMembers = this.builtinMembers.get(parentInterfaceSymbol);
-        if (parentInterfaceMembers === undefined) {
-          return acc;
-        }
+      const memberEntries = [...this.getInheritedSymbols(symbol)].reduce(
+        (acc, parentInterfaceSymbol) => {
+          const parentInterfaceMembers = this.builtinMembers.get(parentInterfaceSymbol);
+          if (parentInterfaceMembers === undefined) {
+            return acc;
+          }
 
-        return [...parentInterfaceMembers.entries()].concat(acc);
-      }, interfaceMembers === undefined ? [] : [...interfaceMembers.entries()]);
+          return [...parentInterfaceMembers.entries()].concat(acc);
+        },
+        interfaceMembers === undefined ? [] : [...interfaceMembers.entries()],
+      );
 
       return new Map(memberEntries);
     });

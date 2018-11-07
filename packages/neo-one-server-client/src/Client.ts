@@ -104,9 +104,8 @@ export class Client {
       name,
       options: JSON.stringify(options),
     }).pipe(
-      map(
-        (response) =>
-          response.resource === '' || response.resource === undefined ? undefined : JSON.parse(response.resource),
+      map((response) =>
+        response.resource === '' || response.resource === undefined ? undefined : JSON.parse(response.resource),
       ),
     );
   }

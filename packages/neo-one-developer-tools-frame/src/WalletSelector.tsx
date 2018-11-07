@@ -32,9 +32,8 @@ export function WalletSelector(props: any) {
                     combineLatest(
                       currentUserAccount$.pipe(
                         distinctUntilChanged(),
-                        map(
-                          (value) =>
-                            value === undefined ? value : makeWalletSelectorValueOption({ userAccount: value }),
+                        map((value) =>
+                          value === undefined ? value : makeWalletSelectorValueOption({ userAccount: value }),
                         ),
                       ),
                       getWalletSelectorOptions$(addError, client, userAccounts$, block$, tokens$),

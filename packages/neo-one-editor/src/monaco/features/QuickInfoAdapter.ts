@@ -15,11 +15,8 @@ export class QuickInfoAdapter extends Adapter implements monaco.languages.HoverP
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(
-          async (worker) =>
-            model.isDisposed()
-              ? undefined
-              : worker.parseInfoAtPosition(resource.path, positionToOffset(model, position)),
+        switchMap(async (worker) =>
+          model.isDisposed() ? undefined : worker.parseInfoAtPosition(resource.path, positionToOffset(model, position)),
         ),
         map((info) => {
           if (!info || model.isDisposed()) {

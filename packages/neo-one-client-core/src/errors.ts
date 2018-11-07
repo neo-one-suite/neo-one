@@ -40,9 +40,8 @@ export const InvalidRPCResponseError = makeErrorWithCode(
   'INVALID_RPC_RESPONSE',
   () => 'Did not receive valid rpc response',
 );
-export const HTTPError = makeErrorWithCode(
-  'HTTP',
-  (status: number, text?: string) => (text === undefined ? `HTTP Error ${status}` : `HTTP Error ${status}: ${text}`),
+export const HTTPError = makeErrorWithCode('HTTP', (status: number, text?: string) =>
+  text === undefined ? `HTTP Error ${status}` : `HTTP Error ${status}: ${text}`,
 );
 export const UnknownBlockError = makeErrorWithCode('UNKNOWN_BLOCK', () => 'Unknown block');
 export const NothingToSendError = makeErrorWithCode('NOTHING_TO_SEND', () => 'Nothing to send.');

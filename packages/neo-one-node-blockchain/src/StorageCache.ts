@@ -258,8 +258,8 @@ class ReadGetAllStorageCache<Key, PartialKey, Value> extends ReadStorageCache<Ke
         defer(() =>
           _of(
             ...Object.values(this.mutableValues)
-              .map(
-                (value) => (value.type === 'add' && this.matchesPartialKey(value.value, key) ? value.value : undefined),
+              .map((value) =>
+                value.type === 'add' && this.matchesPartialKey(value.value, key) ? value.value : undefined,
               )
               .filter(commonUtils.notNull),
           ),

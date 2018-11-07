@@ -38,8 +38,8 @@ export const babel = ({
       stage === 'dev'
         ? 'react-hot-loader/babel'
         : bundle === 'react-static' || bundle === 'preview'
-          ? 'babel-plugin-universal-import'
-          : undefined,
+        ? 'babel-plugin-universal-import'
+        : undefined,
       '@babel/plugin-syntax-dynamic-import',
       'babel-plugin-lodash',
       '@babel/plugin-proposal-object-rest-spread',

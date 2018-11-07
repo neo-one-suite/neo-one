@@ -669,12 +669,12 @@ function compareComparableValues(a: string | number | undefined, b: string | num
   return a === b
     ? Comparison.EqualTo
     : a === undefined
-      ? Comparison.LessThan
-      : b === undefined
-        ? Comparison.GreaterThan
-        : a < b
-          ? Comparison.LessThan
-          : Comparison.GreaterThan;
+    ? Comparison.LessThan
+    : b === undefined
+    ? Comparison.GreaterThan
+    : a < b
+    ? Comparison.LessThan
+    : Comparison.GreaterThan;
 }
 
 function getStringComparer(ignoreCase?: boolean) {

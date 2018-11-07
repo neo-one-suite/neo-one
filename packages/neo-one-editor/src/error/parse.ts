@@ -35,42 +35,44 @@ const regexValidFrameChrome = /^\s*(at|in)\s.+(:\d+)/;
 const regexValidFrameFireFox = /(^|@)\S+:\d+|.+line\s+\d+\s+>\s+(eval|Function).+/;
 
 function parseStack(stack: ReadonlyArray<string>): ReadonlyArray<StackFrame> {
-  return stack.filter((e) => regexValidFrameChrome.test(e) || regexValidFrameFireFox.test(e)).map((eIn) => {
-    let e = eIn;
+  return stack
+    .filter((e) => regexValidFrameChrome.test(e) || regexValidFrameFireFox.test(e))
+    .map((eIn) => {
+      let e = eIn;
 
-    if (regexValidFrameFireFox.test(e)) {
-      // Strip eval, we don't care about it
-      let isEval = false;
-      if (/ > (eval|Function)/.test(e)) {
-        e = e.replace(/ line (\d+)(?: > eval line \d+)* > (eval|Function):\d+:\d+/g, ':$1');
-        isEval = true;
+      if (regexValidFrameFireFox.test(e)) {
+        // Strip eval, we don't care about it
+        let isEval = false;
+        if (/ > (eval|Function)/.test(e)) {
+          e = e.replace(/ line (\d+)(?: > eval line \d+)* > (eval|Function):\d+:\d+/g, ':$1');
+          isEval = true;
+        }
+        const data = e.split(/[@]/g);
+        // tslint:disable-next-line no-array-mutation
+        const last = data.pop();
+
+        return new StackFrame(
+          data.length === 0 ? (isEval ? 'eval' : undefined) : data.join('@'),
+          ...extractLocation(last),
+        );
       }
-      const data = e.split(/[@]/g);
+
+      // Strip eval, we don't care about it
+      if (e.indexOf('(eval ') !== -1) {
+        e = e.replace(/(\(eval at [^()]*)|(\),.*$)/g, '');
+      }
+      if (e.indexOf('(at ') !== -1) {
+        e = e.replace(/\(at /, '(');
+      }
+      const dataOuter = e
+        .trim()
+        .split(/\s+/g)
+        .slice(1);
       // tslint:disable-next-line no-array-mutation
-      const last = data.pop();
+      const lastOuter = dataOuter.pop();
 
-      return new StackFrame(
-        data.length === 0 ? (isEval ? 'eval' : undefined) : data.join('@'),
-        ...extractLocation(last),
-      );
-    }
-
-    // Strip eval, we don't care about it
-    if (e.indexOf('(eval ') !== -1) {
-      e = e.replace(/(\(eval at [^()]*)|(\),.*$)/g, '');
-    }
-    if (e.indexOf('(at ') !== -1) {
-      e = e.replace(/\(at /, '(');
-    }
-    const dataOuter = e
-      .trim()
-      .split(/\s+/g)
-      .slice(1);
-    // tslint:disable-next-line no-array-mutation
-    const lastOuter = dataOuter.pop();
-
-    return new StackFrame(dataOuter.length === 0 ? undefined : dataOuter.join(' '), ...extractLocation(lastOuter));
-  });
+      return new StackFrame(dataOuter.length === 0 ? undefined : dataOuter.join(' '), ...extractLocation(lastOuter));
+    });
 }
 
 /**
