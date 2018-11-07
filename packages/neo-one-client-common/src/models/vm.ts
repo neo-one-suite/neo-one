@@ -264,6 +264,7 @@ export enum SysCall {
   'Neo.Account.GetScriptHash' = 'Neo.Account.GetScriptHash',
   'Neo.Account.GetVotes' = 'Neo.Account.GetVotes',
   'Neo.Account.GetBalance' = 'Neo.Account.GetBalance',
+  'Neo.Account.IsStandard' = 'Neo.Account.IsStandard',
   'Neo.Asset.GetAssetId' = 'Neo.Asset.GetAssetId',
   'Neo.Asset.GetAssetType' = 'Neo.Asset.GetAssetType',
   'Neo.Asset.GetAmount' = 'Neo.Asset.GetAmount',

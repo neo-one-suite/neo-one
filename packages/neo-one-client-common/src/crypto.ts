@@ -17,7 +17,7 @@ import {
   InvalidSignaturesError,
   TooManyPublicKeysError,
 } from './errors';
-import { WitnessModel } from './models';
+import { Op, WitnessModel } from './models';
 import { p256 } from './precomputed';
 import { ScriptBuilder } from './ScriptBuilder';
 
@@ -523,6 +523,57 @@ const decryptNEP2 = async ({
   return common.bufferToPrivateKey(privateKey);
 };
 
+// tslint:disable
+const isMultiSigContract = (script: Buffer) => {
+  let m = 0;
+  let n = 0;
+  let i = 0;
+  if (script.length < 37) return false;
+  if (script[i] > Op.PUSH16) return false;
+  if (script[i] < Op.PUSH1 && script[i] !== 1 && script[i] !== 2) return false;
+  switch (script[i]) {
+    case 1:
+      m = script[++i];
+      ++i;
+      break;
+    case 2:
+      m = script.readUInt16LE(++i);
+      i += 2;
+      break;
+    default:
+      m = script[i++] - 80;
+      break;
+  }
+  if (m < 1 || m > 1024) return false;
+  while (script[i] == 33) {
+    i += 34;
+    if (script.length <= i) return false;
+    ++n;
+  }
+  if (n < m || n > 1024) return false;
+  switch (script[i]) {
+    case 1:
+      if (n != script[++i]) return false;
+      ++i;
+      break;
+    case 2:
+      if (script.length < i + 3 || n != script.readUInt16LE(++i)) return false;
+      i += 2;
+      break;
+    default:
+      if (n != script[i++] - 80) return false;
+      break;
+  }
+  if (script[i++] != Op.CHECKMULTISIG) return false;
+  if (script.length != i) return false;
+  return true;
+};
+// tslint:enable
+
+const isSignatureContract = (script: Buffer) => script.length === 35 && script[0] === 33 && script[34] === Op.CHECKSIG;
+
+const isStandardContract = (script: Buffer) => isSignatureContract(script) || isMultiSigContract(script);
+
 export const crypto = {
   addPublicKey,
   sha1,
@@ -555,4 +606,7 @@ export const crypto = {
   encryptNEP2,
   decryptNEP2,
   createPrivateKey,
+  isMultiSigContract,
+  isSignatureContract,
+  isStandardContract,
 };

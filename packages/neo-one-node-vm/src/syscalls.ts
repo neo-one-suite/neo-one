@@ -1354,6 +1354,22 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
     },
   }),
 
+  'Neo.Account.IsStandard': createSysCall({
+    name: 'Neo.Account.IsStandard',
+    in: 1,
+    out: 1,
+    fee: FEES.ONE_HUNDRED,
+    invoke: async ({ context, args }) => {
+      const hash = args[0].asUInt160();
+      const contract = await context.blockchain.contract.tryGet({ hash });
+
+      return {
+        context,
+        results: [new BooleanStackItem(contract === undefined || crypto.isStandardContract(contract.script))],
+      };
+    },
+  }),
+
   'Neo.Validator.Register': createSysCall({
     name: 'Neo.Validator.Register',
     in: 1,
