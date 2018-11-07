@@ -6,6 +6,7 @@
   "dependencies": {
     "@neo-one/types": "^1.0.0-preview.3",
     "@neo-one/utils": "^1.0.0-preview.3",
+    "@types/app-root-dir": "^0.1.0",
     "@types/glob": "^7.1.1",
     "app-root-dir": "^1.0.2",
     "glob": "^7.1.3",

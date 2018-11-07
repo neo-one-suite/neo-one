@@ -2245,7 +2245,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/app-root-dir@0.1.0":
+"@types/app-root-dir@0.1.0", "@types/app-root-dir@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@types/app-root-dir/-/app-root-dir-0.1.0.tgz#ad0c090ea036b10f5cb4823d8e151495f23b271f"
   integrity sha512-hL5zdUZ6OZE2DQ38CTxvcTIPYT8YXQE5wq3cs4EWf6NTL+HbyD+9yKeta6qNTuYS68JfqSVgTpwPwoBEhNZLIA==
