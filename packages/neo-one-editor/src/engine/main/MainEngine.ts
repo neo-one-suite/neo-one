@@ -339,17 +339,21 @@ export class MainEngine {
   }
 
   public runTests(): void {
-    this.testRunnerManager.withInstance(async (testRunner) => testRunner.runTests()).catch((error) => {
-      // tslint:disable-next-line no-console
-      console.error(error);
-    });
+    this.testRunnerManager
+      .withInstance(async (testRunner) => testRunner.runTests())
+      .catch((error) => {
+        // tslint:disable-next-line no-console
+        console.error(error);
+      });
   }
 
   public runTest(path: string): void {
-    this.testRunnerManager.withInstance(async (testRunner) => testRunner.runTest(path)).catch((error) => {
-      // tslint:disable-next-line no-console
-      console.error(error);
-    });
+    this.testRunnerManager
+      .withInstance(async (testRunner) => testRunner.runTest(path))
+      .catch((error) => {
+        // tslint:disable-next-line no-console
+        console.error(error);
+      });
   }
 
   public async registerPreviewEngine({

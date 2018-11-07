@@ -126,18 +126,20 @@ export class Concatenator {
             }
           }
         } else {
-          elements = clause.elements.filter((element) => this.isExportedNode(element)).map((element) => {
-            const propertyNameNode = tsUtils.node.getPropertyNameNode(element);
-            const nameNode = tsUtils.node.getNameNode(element);
-            const identifier = this.getIdentifierForIdentifier(
-              propertyNameNode === undefined ? nameNode : propertyNameNode,
-            );
-            if (nameNode !== identifier) {
-              return ts.createExportSpecifier(identifier, nameNode);
-            }
+          elements = clause.elements
+            .filter((element) => this.isExportedNode(element))
+            .map((element) => {
+              const propertyNameNode = tsUtils.node.getPropertyNameNode(element);
+              const nameNode = tsUtils.node.getNameNode(element);
+              const identifier = this.getIdentifierForIdentifier(
+                propertyNameNode === undefined ? nameNode : propertyNameNode,
+              );
+              if (nameNode !== identifier) {
+                return ts.createExportSpecifier(identifier, nameNode);
+              }
 
-            return element;
-          });
+              return element;
+            });
         }
 
         if (elements.length > 0) {

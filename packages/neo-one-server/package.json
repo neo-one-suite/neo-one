@@ -26,7 +26,7 @@
     "@types/mali-compose": "1.1.0",
     "@types/mali-onerror": "0.1.0",
     "@types/toposort": "^2.0.1",
-    "fs-extra": "^7.0.0",
+    "fs-extra": "^7.0.1",
     "grpc": "^1.16.0",
     "grpc-error": "^1.0.0",
     "koa": "^2.6.1",

@@ -15,9 +15,8 @@ export class DefinitionAdapter extends Adapter implements monaco.languages.Defin
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(
-          async (worker) =>
-            model.isDisposed() ? [] : worker.getDefinitionAtPosition(resource.path, positionToOffset(model, position)),
+        switchMap(async (worker) =>
+          model.isDisposed() ? [] : worker.getDefinitionAtPosition(resource.path, positionToOffset(model, position)),
         ),
         map((entries) => {
           if (!entries || model.isDisposed()) {

@@ -99,8 +99,8 @@ export class HeaderContext<T extends HeaderContext<T> = HeaderContext<any>> exte
       ...super.toJSON(),
       transactionHashes: this.transactionHashes.map((hash) => common.uInt256ToString(hash)),
 
-      signatures: this.signatures.map(
-        (signature) => (signature === undefined ? 'undefined' : signature.toString('hex')),
+      signatures: this.signatures.map((signature) =>
+        signature === undefined ? 'undefined' : signature.toString('hex'),
       ),
     };
   }

@@ -63,18 +63,17 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(
-          async (worker) =>
-            model.isDisposed()
-              ? undefined
-              : worker.getCompletionsAtPosition(
-                  resource.path,
-                  positionToOffset(model, position),
-                  context.triggerCharacter,
-                  {
-                    [resource.path]: model.getValue(),
-                  },
-                ),
+        switchMap(async (worker) =>
+          model.isDisposed()
+            ? undefined
+            : worker.getCompletionsAtPosition(
+                resource.path,
+                positionToOffset(model, position),
+                context.triggerCharacter,
+                {
+                  [resource.path]: model.getValue(),
+                },
+              ),
         ),
         map((info) => {
           if (!info || model.isDisposed()) {
@@ -109,17 +108,16 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
     return this.toPromise(
       token,
       this.worker$.pipe(
-        switchMap(
-          async (worker) =>
-            model.isDisposed()
-              ? undefined
-              : worker.parseCompletionEntryDetails(
-                  resource.path,
-                  positionToOffset(model, position),
-                  myItem.label,
-                  undefined,
-                  myItem.source,
-                ),
+        switchMap(async (worker) =>
+          model.isDisposed()
+            ? undefined
+            : worker.parseCompletionEntryDetails(
+                resource.path,
+                positionToOffset(model, position),
+                myItem.label,
+                undefined,
+                myItem.source,
+              ),
         ),
         map((details) => {
           if (!details || model.isDisposed()) {

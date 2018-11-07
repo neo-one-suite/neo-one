@@ -29,26 +29,19 @@ interface Props {
 
 export const SidebarList = ({ sections, current, alwaysVisible, onClickLink, ...props }: Props) => (
   <Wrapper {...props}>
-    {sections.map(
-      (section) =>
-        alwaysVisible ? (
-          <Section key={section.title} current={current} section={section} visible onClickLink={onClickLink} />
-        ) : (
-          <Hidden.Container
-            key={section.title}
-            initialState={{ visible: section.subsections.some((subsection) => current === subsection.slug) }}
-          >
-            {({ toggle, visible }) => (
-              <Section
-                current={current}
-                section={section}
-                visible={visible}
-                toggle={toggle}
-                onClickLink={onClickLink}
-              />
-            )}
-          </Hidden.Container>
-        ),
+    {sections.map((section) =>
+      alwaysVisible ? (
+        <Section key={section.title} current={current} section={section} visible onClickLink={onClickLink} />
+      ) : (
+        <Hidden.Container
+          key={section.title}
+          initialState={{ visible: section.subsections.some((subsection) => current === subsection.slug) }}
+        >
+          {({ toggle, visible }) => (
+            <Section current={current} section={section} visible={visible} toggle={toggle} onClickLink={onClickLink} />
+          )}
+        </Hidden.Container>
+      ),
     )}
   </Wrapper>
 );

@@ -132,14 +132,16 @@ export class IssueTransaction extends TransactionBase<
         }
 
         const issued = asset.available.add(
-          memPool.filter((transaction) => transaction !== this).reduce(
-            (acc, transaction) =>
-              transaction.outputs
-                .filter((output) => common.uInt256Equal(hash, output.asset))
-                .reduce((innerAcc, output) => innerAcc.add(output.value), acc),
+          memPool
+            .filter((transaction) => transaction !== this)
+            .reduce(
+              (acc, transaction) =>
+                transaction.outputs
+                  .filter((output) => common.uInt256Equal(hash, output.asset))
+                  .reduce((innerAcc, output) => innerAcc.add(output.value), acc),
 
-            utils.ZERO,
-          ),
+              utils.ZERO,
+            ),
         );
 
         if (asset.amount.sub(issued).lt(value.neg())) {

@@ -52,6 +52,9 @@ const executeSimple = async ({
     skipWitnessVerify: skipWitnessVerify === undefined ? true : skipWitnessVerify,
     persistingBlock,
     listeners,
+    vmFeatures: {
+      structClone: false,
+    },
   });
 
 const neoBN = (value: string) => new BN(value, 10).mul(utils.ONE_HUNDRED_MILLION);
@@ -167,7 +170,7 @@ describe('execute', () => {
 
   testKYC('should not fail kyc transaction with sufficient gas', common.ONE_HUNDRED_MILLION_FIXED8, VMState.Halt);
 
-  test.skip('should refund on mintTokens with insufficient presale', async () => {
+  test('should refund on mintTokens with insufficient presale', async () => {
     blockchain.contract.get = jest.fn(async () => Promise.resolve(transactions.kycContract));
 
     blockchain.storageItem.tryGet = jest.fn(async (item) => {
@@ -979,7 +982,7 @@ describe('execute', () => {
         testUtils.verifyListeners(listeners);
       });
 
-      test.skip('should allow withdrawing filled orders', async () => {
+      test('should allow withdrawing filled orders', async () => {
         await deploy();
 
         await whitelistConcierge();

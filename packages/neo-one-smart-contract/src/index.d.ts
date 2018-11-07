@@ -927,7 +927,11 @@ export interface MapStorage<K extends SerializableKey, V extends SerializableVal
    */
   readonly at: K extends [SK, SK]
     ? SKMapAtTwo<K, V>
-    : K extends [SK, SK, SK] ? SKMapAtThree<K, V> : K extends [SK, SK, SK, SK] ? SKMapAtFour<K, V> : never;
+    : K extends [SK, SK, SK]
+    ? SKMapAtThree<K, V>
+    : K extends [SK, SK, SK, SK]
+    ? SKMapAtFour<K, V>
+    : never;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface MapStorageConstructor {
@@ -1001,7 +1005,11 @@ export interface SetStorage<V extends SerializableKey> extends Iterable<V> {
    */
   readonly at: V extends [SK, SK]
     ? SKSetAtTwo<V>
-    : V extends [SK, SK, SK] ? SKSetAtThree<V> : V extends [SK, SK, SK, SK] ? SKSetAtFour<V> : never;
+    : V extends [SK, SK, SK]
+    ? SKSetAtThree<V>
+    : V extends [SK, SK, SK, SK]
+    ? SKSetAtFour<V>
+    : never;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface SetStorageConstructor {
@@ -1235,8 +1243,12 @@ type SmartContractValue =
 type SmartContractArg = SmartContractValue | ForwardValue;
 type IsValidSmartContract<T> = {
   [K in keyof T]: T[K] extends Function
-    ? Parameters<T[K]> extends SmartContractArg[] ? (ReturnType<T[K]> extends SmartContractArg ? T[K] : never) : never
-    : T[K] extends SmartContractValue ? T[K] : never
+    ? Parameters<T[K]> extends SmartContractArg[]
+      ? (ReturnType<T[K]> extends SmartContractArg ? T[K] : never)
+      : never
+    : T[K] extends SmartContractValue
+    ? T[K]
+    : never
 };
 
 /**

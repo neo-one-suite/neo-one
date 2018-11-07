@@ -87,10 +87,10 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
             propertyName === undefined
               ? tsUtils.node.getNameOrThrow(element)
               : ts.isIdentifier(propertyName)
-                ? tsUtils.node.getText(propertyName)
-                : ts.isStringLiteral(propertyName)
-                  ? tsUtils.literal.getLiteralValue(propertyName)
-                  : `${tsUtils.literal.getLiteralValue(propertyName)}`;
+              ? tsUtils.node.getText(propertyName)
+              : ts.isStringLiteral(propertyName)
+              ? tsUtils.literal.getLiteralValue(propertyName)
+              : `${tsUtils.literal.getLiteralValue(propertyName)}`;
           const member = sb.context.builtins.getOnlyMember(builtinName, memberName);
 
           if (member === undefined) {
