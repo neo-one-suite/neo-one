@@ -2055,10 +2055,10 @@
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.3.tgz#2b5a3ab3f918cca48a8c754c08168e3f03eba61b"
   integrity sha512-shAmDyaQC4H92APFoIaVDHCx5bStIocgvbwQyxPRrbUY20V1EYTbSDchWbuwlMG3V17cprZhA6+78JfB+3DTPw==
 
-"@phenomnomnominal/tsquery@^2.0.0":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@phenomnomnominal/tsquery/-/tsquery-2.1.1.tgz#eb5e7bf0fe95c40c38b17d5f5beb2809a89871dd"
-  integrity sha512-awpB28hmZ8HcW+bEIvjPoSSc7vcCt0Hvh3x6HpBV6P/GB9YIrDukjQUsEZDK5s0BbPPhvJYdWKkubeQbVAwEtA==
+"@phenomnomnominal/tsquery@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@phenomnomnominal/tsquery/-/tsquery-3.0.0.tgz#6f2f4dbf6304ff52b12cc7a5b979f20c3794a22a"
+  integrity sha512-SW8lKitBHWJ9fAYkJ9kJivuctwNYCh3BUxLdH0+XiR1GPBiu+7qiZzh8p8jqlj1LgVC1TbvfNFroaEsmYlL8Iw==
   dependencies:
     esquery "^1.0.1"
 
@@ -17925,12 +17925,12 @@ rx-lite@^3.1.2:
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
   integrity sha1-Gc5QLKVyZl87ZHsQk5+X/RYV8QI=
 
-rxjs-tslint-rules@4.10.0:
-  version "4.10.0"
-  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.10.0.tgz#8b5d0b4e6bcb5f4c313d2b104043778e8b8fdaf0"
-  integrity sha512-5mjt+gKdnYLMplZfvhwrgXdpGMyzhlyzUWN3KNdu6IOiPzSfPeDXvsThg37l70Lt/JcBP7PBVhHrbuEJjwcpcA==
+rxjs-tslint-rules@4.10.1:
+  version "4.10.1"
+  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.10.1.tgz#3b050404ceaa25fac340b3af4c42cef019cff6d2"
+  integrity sha512-GED5I+Aakgh8lgf4wbfMktDfi8EXwIbbceUBu/iY+cBTgiO9skZY524tAb6JvnFPZnAbYvyi19t0iAMnSlZCCw==
   dependencies:
-    "@phenomnomnominal/tsquery" "^2.0.0"
+    "@phenomnomnominal/tsquery" "^3.0.0"
     decamelize "^2.0.0"
     resolve "^1.4.0"
     tslib "^1.8.0"
