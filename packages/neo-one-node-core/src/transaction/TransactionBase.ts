@@ -19,6 +19,7 @@ import _ from 'lodash';
 import { Account, AccountKey } from '../Account';
 import { Asset, AssetKey } from '../Asset';
 import { AssetType } from '../AssetType';
+import { MAX_TRANSACTION_SIZE } from '../constants';
 import { Equals, EquatableKey } from '../Equatable';
 import { VerifyError } from '../errors';
 import { ScriptContainerType } from '../ScriptContainer';
@@ -302,6 +303,10 @@ export function TransactionBase<
     }
 
     public async verify(options: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
+      if (this.size > MAX_TRANSACTION_SIZE) {
+        throw new VerifyError('Transaction too large.');
+      }
+
       const { memPool = [] } = options;
       if (hasDuplicateInputs(this.inputs)) {
         throw new VerifyError('Duplicate inputs');
