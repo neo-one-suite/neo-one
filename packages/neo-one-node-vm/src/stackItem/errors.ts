@@ -23,6 +23,10 @@ export const InvalidValueTransactionError = makeErrorWithCode(
   'INVALID_VALUE_TRANSACTION',
   () => 'Invalid Value. Expected Transaction',
 );
+export const InvalidValueWitnessError = makeErrorWithCode(
+  'INVALID_VALUE_WITNESS',
+  () => 'Invalid Value. Expected Witness',
+);
 export const InvalidValueAttributeError = makeErrorWithCode(
   'INVALID_VALUE_ATTRIBUTE',
   () => 'Invalid Value. Expected Attribute',

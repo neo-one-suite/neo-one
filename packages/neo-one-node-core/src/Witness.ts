@@ -1,5 +1,5 @@
 import { IOHelper, JSONHelper, WitnessJSON, WitnessModel } from '@neo-one/client-common';
-import { Equals, Equatable } from './Equatable';
+import { Equals, EquatableKey } from './Equatable';
 import {
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
@@ -13,7 +13,7 @@ export interface WitnessAdd {
   readonly invocation: Buffer;
 }
 
-export class Witness extends WitnessModel implements SerializableJSON<WitnessJSON>, Equatable {
+export class Witness extends WitnessModel implements SerializableJSON<WitnessJSON>, EquatableKey {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): Witness {
     const invocation = reader.readVarBytesLE(utils.USHORT_MAX_NUMBER_PLUS_ONE);
     const verification = reader.readVarBytesLE(utils.USHORT_MAX_NUMBER_PLUS_ONE);
@@ -36,6 +36,10 @@ export class Witness extends WitnessModel implements SerializableJSON<WitnessJSO
     Witness,
     this,
     (other) => this.invocation.equals(other.invocation) && this.verification.equals(other.verification),
+  );
+  public readonly toKeyString = utils.toKeyString(
+    Witness,
+    () => `${this.invocation.toString('hex')}:${this.verification.toString('hex')}`,
   );
   private readonly sizeInternal = utils.lazy(
     () => IOHelper.sizeOfVarBytesLE(this.invocation) + IOHelper.sizeOfVarBytesLE(this.verification),

@@ -14,6 +14,7 @@ import {
   utils,
   Validator,
   VMSettings,
+  Witness,
 } from '@neo-one/node-core';
 import BN from 'bn.js';
 import { MAX_SIZE_BIG_INTEGER } from '../constants';
@@ -38,6 +39,7 @@ import {
   InvalidValueStorageContextStackItemError,
   InvalidValueTransactionError,
   InvalidValueValidatorError,
+  InvalidValueWitnessError,
 } from './errors';
 import { MapStackItem } from './MapStackItem';
 import { StackItem } from './StackItem';
@@ -212,6 +214,10 @@ export class StackItemBase implements Equatable {
 
   public asTransaction(): Transaction {
     throw new InvalidValueTransactionError();
+  }
+
+  public asWitness(): Witness {
+    throw new InvalidValueWitnessError();
   }
 
   public asAttribute(): Attribute {

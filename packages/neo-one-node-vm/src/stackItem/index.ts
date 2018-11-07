@@ -23,6 +23,7 @@ export { ECPointStackItem } from './ECPointStackItem';
 export { StructStackItem } from './StructStackItem';
 export { StackItemEnumerator } from './StackItemEnumerator';
 export { StackItemIterator } from './StackItemIterator';
+export { WitnessStackItem } from './WitnessStackItem';
 
 export { deserializeStackItem } from './deserializeStackItem';
 export { StackItem } from './StackItem';

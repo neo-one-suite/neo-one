@@ -22,6 +22,7 @@ import {
   TransactionType,
   utils,
   Validator,
+  Witness,
 } from '@neo-one/node-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
@@ -83,6 +84,7 @@ import {
   UInt160StackItem,
   UInt256StackItem,
   ValidatorStackItem,
+  WitnessStackItem,
 } from './stackItem';
 import { vmUtils } from './vmUtils';
 export interface CreateSysCallArgs {
@@ -814,6 +816,60 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
       return {
         context,
         results: [new ArrayStackItem(outputs)],
+      };
+    },
+  }),
+
+  'Neo.Transaction.GetWitnesses': createSysCall({
+    name: 'Neo.Transaction.GetWitnesses',
+    in: 1,
+    out: 1,
+    fee: FEES.TWO_HUNDRED,
+    invoke: async ({ context, args }) => {
+      const transaction = args[0].asTransaction();
+
+      if (transaction.scripts.length > MAX_ARRAY_SIZE) {
+        throw new ContainerTooLargeError(context);
+      }
+
+      const hashesSet = await transaction.getScriptHashesForVerifying({
+        getOutput: context.blockchain.output.get,
+        getAsset: context.blockchain.asset.get,
+      });
+      const hashes = [...hashesSet];
+      const witnesses = await Promise.all(
+        transaction.scripts.map(async (witness, idx) => {
+          if (witness.verification.length === 0) {
+            const contract = await context.blockchain.contract.get({ hash: common.stringToUInt160(hashes[idx]) });
+
+            return new Witness({
+              invocation: witness.invocation,
+              verification: contract.script,
+            });
+          }
+
+          return witness;
+        }),
+      );
+
+      return {
+        context,
+        results: [new ArrayStackItem(witnesses.map((witness) => new WitnessStackItem(witness)))],
+      };
+    },
+  }),
+
+  'Neo.Witness.GetVerificationScript': createSysCall({
+    name: 'Neo.Witness.GetVerificationScript',
+    in: 1,
+    out: 1,
+    fee: FEES.ONE_HUNDRED,
+    invoke: async ({ context, args }) => {
+      const witness = args[0].asWitness();
+
+      return {
+        context,
+        results: [new BufferStackItem(witness.verification)],
       };
     },
   }),
