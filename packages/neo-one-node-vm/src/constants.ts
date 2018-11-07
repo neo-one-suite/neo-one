@@ -1,6 +1,14 @@
 import { common, OpCode, SysCallName, UInt160, VMState } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
-import { Block, ExecutionAction, ScriptContainer, TriggerType, VMListeners, WriteBlockchain } from '@neo-one/node-core';
+import {
+  Block,
+  ExecutionAction,
+  ScriptContainer,
+  TriggerType,
+  VMFeatureSwitches,
+  VMListeners,
+  WriteBlockchain,
+} from '@neo-one/node-core';
 import BN from 'bn.js';
 import { StackItem } from './stackItem';
 
@@ -34,6 +42,7 @@ export interface ExecutionInit {
   readonly listeners: VMListeners;
   readonly skipWitnessVerify: boolean;
   readonly persistingBlock?: Block;
+  readonly vmFeatures: VMFeatureSwitches;
 }
 
 interface CreatedContracts {

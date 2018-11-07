@@ -513,6 +513,9 @@ export class Blockchain {
         action: NULL_ACTION,
         gas: transaction.gas,
         skipWitnessVerify: true,
+        vmFeatures: {
+          structClone: this.settings.features.structClone <= this.currentBlockIndex,
+        },
       }),
     );
 
@@ -713,6 +716,9 @@ export class Blockchain {
 
           globalActionIndex = globalActionIndex.add(utils.ONE);
         },
+      },
+      vmFeatures: {
+        structClone: this.settings.features.structClone <= this.currentBlockIndex,
       },
     });
     const result = { actions: mutableActions, hash, witness };

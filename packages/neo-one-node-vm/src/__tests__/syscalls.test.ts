@@ -3385,20 +3385,23 @@ describe('syscalls', () => {
               value: factory.createBlock({ timestamp: 15 }),
             }
           : flags.has('consensusContainer')
-            ? {
-                type: ScriptContainerType.Consensus,
-                value: factory.createConsensusPayload({ timestamp: 15 }),
-              }
-            : {
-                type: ScriptContainerType.Transaction,
-                value: flags.has('useBadTransaction') ? transactions.badTransaction : transaction,
-              },
+          ? {
+              type: ScriptContainerType.Consensus,
+              value: factory.createConsensusPayload({ timestamp: 15 }),
+            }
+          : {
+              type: ScriptContainerType.Transaction,
+              value: flags.has('useBadTransaction') ? transactions.badTransaction : transaction,
+            },
 
         triggerType,
         action: NULL_ACTION,
         listeners,
         skipWitnessVerify: false,
         persistingBlock: flags.has('noPersistingBlock') ? undefined : (block as Block),
+        vmFeatures: {
+          structClone: true,
+        },
       };
 
       const gasLeft = common.ONE_HUNDRED_MILLION_FIXED8;
