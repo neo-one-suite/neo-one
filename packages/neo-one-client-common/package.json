@@ -12,7 +12,7 @@
     "@types/bs58": "^3.0.30",
     "@types/buffer-xor": "^2.0.0",
     "@types/elliptic": "^6.4.0",
-    "@types/lodash": "^4.14.117",
+    "@types/lodash": "^4.14.118",
     "@types/scrypt-js": "^2.0.1",
     "@types/wif": "^2.0.1",
     "bignumber.js": "^8.0.1",

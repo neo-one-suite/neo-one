@@ -1,3 +1,4 @@
+// tslint:disable no-any no-object-mutation
 import {
   areTasksDone,
   CRUDRequest,
@@ -19,20 +20,20 @@ import { Server } from '../Server';
 function makeObservable$<TData>(ctx: Context): Observable<TData> {
   return Observable.create((observer: Observer<TData>) => {
     let completed = false;
-    ctx.req.on('data', (value: TData) => {
+    (ctx as any).req.on('data', (value: TData) => {
       observer.next(value);
     });
-    ctx.req.on('error', (error: Error) => {
+    (ctx as any).req.on('error', (error: Error) => {
       observer.error(error);
     });
-    ctx.req.on('end', () => {
+    (ctx as any).req.on('end', () => {
       completed = true;
       observer.complete();
     });
 
     return () => {
       if (!completed) {
-        ctx.req.destroy();
+        (ctx as any).req.destroy();
       }
     };
   });
@@ -69,10 +70,10 @@ export const services = ({ server }: { readonly server: Server }) => {
         }),
         map((tasks: ReadonlyArray<TaskStatus>) => {
           if (!done) {
-            ctx.res.write({ tasks: JSON.stringify(tasks) });
+            (ctx as any).res.write({ tasks: JSON.stringify(tasks) });
             if (areTasksDone(tasks)) {
               done = true;
-              ctx.res.end();
+              (ctx as any).res.end();
             }
           }
         }),
@@ -131,10 +132,10 @@ export const services = ({ server }: { readonly server: Server }) => {
         ),
         map((response: ReadResponse) => {
           if (!done) {
-            ctx.res.write(response);
+            (ctx as any).res.write(response);
             if (response.type === 'aborted' || response.type === 'error') {
               done = true;
-              ctx.res.end();
+              (ctx as any).res.end();
             }
           }
         }),
@@ -145,19 +146,19 @@ export const services = ({ server }: { readonly server: Server }) => {
   return {
     reset: async (ctx: Context) => {
       await server.reset();
-      ctx.res = {};
+      (ctx as any).res = {};
     },
     getVersion: async (ctx: Context) => {
-      ctx.res = { version: VERSION };
+      (ctx as any).res = { version: VERSION };
     },
     verify: async (ctx: Context) => {
-      ctx.res = { ready: true };
+      (ctx as any).res = { ready: true };
     },
     getDebug: async (ctx: Context) => {
-      ctx.res = { debug: JSON.stringify(server.getDebug()) };
+      (ctx as any).res = { debug: JSON.stringify(server.getDebug()) };
     },
     getAllPlugins: async (ctx: Context) => {
-      ctx.res = { plugins: server.pluginManager.plugins };
+      (ctx as any).res = { plugins: server.pluginManager.plugins };
     },
     getPlugins: async (ctx: Context) => {
       await handleRead(ctx, () => server.pluginManager.plugins$.pipe(map((plugin) => ({ plugin }))));

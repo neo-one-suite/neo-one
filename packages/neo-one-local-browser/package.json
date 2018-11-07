@@ -13,7 +13,7 @@
     "@neo-one/types": "^1.0.0-preview.3",
     "@neo-one/utils": "^1.0.0-preview.3",
     "@neo-one/worker": "^1.0.0-preview.3",
-    "@types/lodash": "^4.14.117",
+    "@types/lodash": "^4.14.118",
     "@types/nanoid": "^1.2.0",
     "@types/pouchdb": "^6.3.2",
     "lodash": "^4.17.11",
@@ -24,7 +24,7 @@
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
     "tslib": "^1.9.3",
-    "typescript": "3.2.0-dev.20181103"
+    "typescript": "3.2.0-dev.20181107"
   },
   "sideEffects": false
 }

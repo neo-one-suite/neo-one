@@ -11,8 +11,8 @@
     "@types/koa": "^2.0.46",
     "@types/koa-compose": "^3.2.2",
     "@types/koa-compress": "^2.0.8",
-    "@types/koa-router": "^7.0.32",
-    "@types/lodash": "^4.14.117",
+    "@types/koa-router": "^7.0.33",
+    "@types/lodash": "^4.14.118",
     "@types/lru-cache": "^4.1.1",
     "@types/npm-package-arg": "^6.1.0",
     "@types/semver": "^5.5.0",
@@ -30,7 +30,7 @@
     "rxjs": "^6.3.3",
     "safe-stable-stringify": "^1.1.0",
     "semver": "^5.6.0",
-    "tar": "^4.4.6"
+    "tar": "^4.4.7"
   },
   "sideEffects": false
 }

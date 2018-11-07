@@ -19,7 +19,7 @@
     "@neo-one/utils": "^1.0.0-preview.3",
     "@types/convict": "^4.2.0",
     "@types/cosmiconfig": "^5.0.3",
-    "@types/lodash": "^4.14.117",
+    "@types/lodash": "^4.14.118",
     "@types/nanoid": "^1.2.0",
     "chokidar": "^2.0.4",
     "convict": "^4.4.0",
@@ -29,7 +29,7 @@
     "nanoid": "^2.0.0",
     "rxjs": "^6.3.3",
     "source-map": "^0.7.3",
-    "typescript": "3.2.0-dev.20181103"
+    "typescript": "3.2.0-dev.20181107"
   },
   "devDependencies": {
     "@neo-one/server-plugin-wallet": "^1.0.0-preview.3",
@@ -37,7 +37,7 @@
     "@neo-one/smart-contract-test": "1.0.0-alpha.44",
     "@types/react": "16.4.18",
     "bignumber.js": "8.0.1",
-    "react": "16.6.0"
+    "react": "16.6.1"
   },
   "sideEffects": false
 }

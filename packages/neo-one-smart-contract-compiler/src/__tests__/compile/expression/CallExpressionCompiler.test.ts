@@ -257,7 +257,7 @@ describe('CallExpressionCompiler', () => {
     `);
   });
 
-  test.skip('array[Symbol.iterator]()', async () => {
+  test('array[Symbol.iterator]()', async () => {
     await helpers.executeString(`
       const x = [1, 2, 3];
 

@@ -15,7 +15,7 @@
     "fs-extra": "^7.0.0",
     "megajs": "^0.15.5",
     "stream-throttle": "^0.1.3",
-    "tar": "^4.4.6",
+    "tar": "^4.4.7",
     "tslib": "^1.9.3"
   },
   "sideEffects": false

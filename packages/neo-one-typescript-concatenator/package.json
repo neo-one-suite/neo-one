@@ -6,11 +6,11 @@
   "dependencies": {
     "@neo-one/ts-utils": "^1.0.0-preview.3",
     "@neo-one/utils": "^1.0.0-preview.3",
-    "@types/lodash": "^4.14.117",
+    "@types/lodash": "^4.14.118",
     "@types/toposort": "^2.0.1",
     "lodash": "^4.17.11",
     "toposort": "^2.0.2",
-    "typescript": "3.2.0-dev.20181103"
+    "typescript": "3.2.0-dev.20181107"
   },
   "devDependencies": {
     "@neo-one/smart-contract-compiler-node": "^1.0.0-preview.3",

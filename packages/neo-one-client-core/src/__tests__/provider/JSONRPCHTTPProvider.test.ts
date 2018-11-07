@@ -22,7 +22,7 @@ describe('JSONRPCHTTPProvider', () => {
     provider = new JSONRPCHTTPProvider(endpoint);
   });
 
-  test.skip('retries failed requests once', async () => {
+  test('retries failed requests once', async () => {
     const error = new Error('hello world');
     fetchMock.mockImplementation(async () => Promise.reject(error));
 
@@ -32,7 +32,7 @@ describe('JSONRPCHTTPProvider', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  test.skip('retries parse error requests three additional times (total 5)', async () => {
+  test('retries parse error requests three additional times (total 5)', async () => {
     fetchMock.mockImplementation(async () =>
       Promise.resolve({
         ok: true,
@@ -58,7 +58,7 @@ describe('JSONRPCHTTPProvider', () => {
     expect(fetchMock).toHaveBeenCalledTimes(5);
   });
 
-  test.skip('does not retry other failures additional times', async () => {
+  test('does not retry other failures additional times', async () => {
     fetchMock.mockImplementation(async () =>
       Promise.resolve({
         ok: true,
@@ -72,7 +72,7 @@ describe('JSONRPCHTTPProvider', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  test.skip('retries http errors and throws error with text', async () => {
+  test('retries http errors and throws error with text', async () => {
     const status = 400;
     const expected = 'error message';
     fetchMock.mockImplementation(async () =>
@@ -89,7 +89,7 @@ describe('JSONRPCHTTPProvider', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  test.skip('retries http errors and catches text errors', async () => {
+  test('retries http errors and catches text errors', async () => {
     const status = 400;
     const expected = undefined;
     fetchMock.mockImplementation(async () =>
@@ -106,7 +106,7 @@ describe('JSONRPCHTTPProvider', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  test.skip('throws UnknownBlockError', async () => {
+  test('throws UnknownBlockError', async () => {
     fetchMock.mockImplementation(async () =>
       Promise.resolve({
         ok: true,
@@ -128,7 +128,7 @@ describe('JSONRPCHTTPProvider', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  test.skip('throws JSONRPCError', async () => {
+  test('throws JSONRPCError', async () => {
     const expected = {
       code: -500,
       message: 'Some error',
@@ -152,7 +152,7 @@ describe('JSONRPCHTTPProvider', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  test.skip('watchSingle throws http error and catches text errors', async () => {
+  test('watchSingle throws http error and catches text errors', async () => {
     const reqTimeout = { method: 'getblockcount', watchTimeoutMS: 1000 };
     const status = 400;
     const expected = undefined;
@@ -170,7 +170,7 @@ describe('JSONRPCHTTPProvider', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  test.skip('watchSingle successful result', async () => {
+  test('watchSingle successful result', async () => {
     const reqTimeout = { method: 'getblockcount', watchTimeoutMS: 1000 };
     const expectedReqTimeout = {
       jsonrpc: '2.0',
@@ -202,7 +202,7 @@ describe('JSONRPCHTTPProvider', () => {
     });
   });
 
-  test.skip('returns successful result', async () => {
+  test('returns successful result', async () => {
     const expected = {};
     fetchMock.mockImplementation(async () =>
       Promise.resolve({
