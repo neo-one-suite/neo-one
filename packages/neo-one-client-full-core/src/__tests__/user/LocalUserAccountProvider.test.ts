@@ -196,8 +196,6 @@ describe('LocalUserAccountProvider', () => {
     expect(confirmResult.blockHash).toEqual(receipt.blockHash);
     expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
     expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
-    expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
-    expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
     expect(confirmResult.result.state).toEqual('FAULT');
     if (confirmResult.result.state !== 'FAULT') {
       throw new Error('For TS');
@@ -250,7 +248,10 @@ describe('LocalUserAccountProvider', () => {
       relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
-      const invocationData = factory.createRawInvocationData();
+      const testResult = factory.createRawInvocationResultSuccess();
+      const invocationData = factory.createRawInvocationData({
+        result: testResult,
+      });
       getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
       const result = await provider.publish(contract, { systemFee: new BigNumber(-1) });
@@ -260,8 +261,8 @@ describe('LocalUserAccountProvider', () => {
       expect(confirmResult.blockHash).toEqual(receipt.blockHash);
       expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
       expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
-      expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
-      expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
+      expect(confirmResult.result.gasConsumed).toEqual(testResult.gasConsumed);
+      expect(confirmResult.result.gasCost).toEqual(testResult.gasCost);
       expect(confirmResult.result.state).toEqual('HALT');
       if (confirmResult.result.state !== 'HALT') {
         throw new Error('For TS');
@@ -301,7 +302,10 @@ describe('LocalUserAccountProvider', () => {
       relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
-      const invocationData = factory.createRawInvocationData();
+      const testResult = factory.createRawInvocationResultSuccess();
+      const invocationData = factory.createRawInvocationData({
+        result: testResult,
+      });
       getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
       const result = await provider.publishAndDeploy(
@@ -316,8 +320,8 @@ describe('LocalUserAccountProvider', () => {
       expect(confirmResult.blockHash).toEqual(receipt.blockHash);
       expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
       expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
-      expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
-      expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
+      expect(confirmResult.result.gasConsumed).toEqual(testResult.gasConsumed);
+      expect(confirmResult.result.gasCost).toEqual(testResult.gasCost);
       expect(confirmResult.result.state).toEqual('HALT');
       if (confirmResult.result.state !== 'HALT') {
         throw new Error('For TS');
@@ -351,7 +355,10 @@ describe('LocalUserAccountProvider', () => {
       relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
-      const invocationData = factory.createRawInvocationData();
+      const testResult = factory.createRawInvocationResultSuccess();
+      const invocationData = factory.createRawInvocationData({
+        result: testResult,
+      });
       getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
       const result = await provider.registerAsset(asset, { systemFee: new BigNumber(-1) });
@@ -361,8 +368,8 @@ describe('LocalUserAccountProvider', () => {
       expect(confirmResult.blockHash).toEqual(receipt.blockHash);
       expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
       expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
-      expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
-      expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
+      expect(confirmResult.result.gasConsumed).toEqual(testResult.gasConsumed);
+      expect(confirmResult.result.gasCost).toEqual(testResult.gasCost);
       expect(confirmResult.result.state).toEqual('HALT');
       if (confirmResult.result.state !== 'HALT') {
         throw new Error('For TS');
@@ -394,8 +401,6 @@ describe('LocalUserAccountProvider', () => {
     expect(confirmResult.blockHash).toEqual(receipt.blockHash);
     expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
     expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
-    expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
-    expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
     expect(confirmResult.result.state).toEqual('FAULT');
     if (confirmResult.result.state !== 'FAULT') {
       throw new Error('For TS');
@@ -446,7 +451,10 @@ describe('LocalUserAccountProvider', () => {
       relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
       const receipt = factory.createTransactionReceipt();
       getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
-      const invocationData = factory.createRawInvocationData();
+      const testResult = factory.createRawInvocationResultSuccess();
+      const invocationData = factory.createRawInvocationData({
+        result: testResult,
+      });
       getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
       const result = await provider.invoke(keys[1].address, 'foo', [true], [['firstArg', true]], verify, {
@@ -458,13 +466,13 @@ describe('LocalUserAccountProvider', () => {
       expect(confirmResult.blockHash).toEqual(receipt.blockHash);
       expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
       expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
-      expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
-      expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
       expect(confirmResult.result.state).toEqual('HALT');
       if (confirmResult.result.state !== 'HALT') {
         throw new Error('For TS');
       }
       expect(confirmResult.result).toEqual(invocationData.result);
+      expect(confirmResult.result.gasConsumed).toEqual(testResult.gasConsumed);
+      expect(confirmResult.result.gasCost).toEqual(testResult.gasCost);
 
       expect(sign.mock.calls).toMatchSnapshot();
       expect(testInvoke.mock.calls).toMatchSnapshot();
@@ -524,7 +532,10 @@ describe('LocalUserAccountProvider', () => {
     relayTransaction.mockImplementation(async () => Promise.resolve({ transaction }));
     const receipt = factory.createTransactionReceipt();
     getTransactionReceipt.mockImplementation(async () => Promise.resolve(receipt));
-    const invocationData = factory.createRawInvocationData();
+    const testResult = factory.createRawInvocationResultSuccess();
+    const invocationData = factory.createRawInvocationData({
+      result: testResult,
+    });
     getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
     const result = await provider.__execute(data.buffers.a, { systemFee: new BigNumber(-1) });
@@ -534,12 +545,13 @@ describe('LocalUserAccountProvider', () => {
     expect(confirmResult.blockHash).toEqual(receipt.blockHash);
     expect(confirmResult.blockIndex).toEqual(receipt.blockIndex);
     expect(confirmResult.transactionIndex).toEqual(receipt.transactionIndex);
-    expect(confirmResult.result.gasConsumed).toEqual(invocationData.result.gasConsumed);
-    expect(confirmResult.result.gasCost).toEqual(invocationData.result.gasCost);
     expect(confirmResult.result.state).toEqual('HALT');
     if (confirmResult.result.state !== 'HALT') {
       throw new Error('For TS');
     }
+
+    expect(confirmResult.result.gasConsumed).toEqual(testResult.gasConsumed);
+    expect(confirmResult.result.gasCost).toEqual(testResult.gasCost);
     expect(confirmResult.result).toEqual(invocationData.result);
 
     expect(sign.mock.calls).toMatchSnapshot();

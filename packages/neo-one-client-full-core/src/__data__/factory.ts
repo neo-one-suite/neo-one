@@ -594,8 +594,6 @@ const createBooleanContractParameter = (options: Partial<BooleanContractParamete
 
 const createRawInvocationResultError = (options: Partial<RawInvocationResultError> = {}): RawInvocationResultError => ({
   state: 'FAULT',
-  gasConsumed: new BigNumber('10'),
-  gasCost: new BigNumber('20'),
   stack: [createIntegerContractParameter()],
   message: 'Failure!',
   ...options,
