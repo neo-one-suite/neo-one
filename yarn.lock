@@ -2117,10 +2117,10 @@
   resolved "https://registry.yarnpkg.com/@types/async/-/async-2.0.50.tgz#117540e026d64e1846093abbd5adc7e27fda7bcb"
   integrity sha512-VMhZMMQgV1zsR+lX/0IBfAk+8Eb7dPVMWiQGFAt3qjo5x7Ml6b77jUo0e1C3ToD+XRDXqtrfw+6AB0uUsPEr3Q==
 
-"@types/autoprefixer@9.1.0":
-  version "9.1.0"
-  resolved "https://registry.yarnpkg.com/@types/autoprefixer/-/autoprefixer-9.1.0.tgz#46344a843d2f4a5873d256a5cf7cb1c211739cc1"
-  integrity sha512-0kIUa9+V10ewz0ywAamVIdJGkhQ63/3TzWAETrVN5HzRqLxGlE6JzpZq5AeAAm64qQ+0+did0fkgbc0euY13hQ==
+"@types/autoprefixer@9.1.1":
+  version "9.1.1"
+  resolved "https://registry.yarnpkg.com/@types/autoprefixer/-/autoprefixer-9.1.1.tgz#b2bc6670cdf7c090ef1c57ac4e2bd01d2664fd88"
+  integrity sha512-mseeUmIM9k44Ml5yRG2zAfdVjf1cuOVUmWODuPqbZ97/1vUOCc7DzTp/I/NyXAUL5VCkHIR5nvqUobx42eYHgQ==
   dependencies:
     postcss "7.x.x"
 
