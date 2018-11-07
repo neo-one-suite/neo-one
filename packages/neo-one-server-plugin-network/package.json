@@ -22,7 +22,7 @@
     "@types/vorpal": "^1.11.0",
     "cross-fetch": "^2.2.3",
     "execa": "^1.0.0",
-    "fs-extra": "^7.0.0",
+    "fs-extra": "^7.0.1",
     "lodash": "^4.17.11",
     "rxjs": "^6.3.3",
     "tslib": "^1.9.3",
