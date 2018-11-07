@@ -217,6 +217,7 @@ export const assertByteCode = (value: number): ByteCode => {
 };
 
 export enum SysCall {
+  'System.Runtime.Platform' = 'System.Runtime.Platform',
   'Neo.Runtime.GetTrigger' = 'Neo.Runtime.GetTrigger',
   'Neo.Runtime.CheckWitness' = 'Neo.Runtime.CheckWitness',
   'Neo.Runtime.Notify' = 'Neo.Runtime.Notify',

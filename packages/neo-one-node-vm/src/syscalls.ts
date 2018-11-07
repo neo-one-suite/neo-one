@@ -305,6 +305,14 @@ const destroyContract = async ({ context }: OpInvokeArgs) => {
 };
 
 export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
+  'System.Runtime.Platform': createSysCall({
+    name: 'System.Runtime.Platform',
+    out: 1,
+    invoke: ({ context }) => ({
+      context,
+      results: [new BufferStackItem(Buffer.from('NEO', 'ascii'))],
+    }),
+  }),
   'Neo.Runtime.GetTrigger': createSysCall({
     name: 'Neo.Runtime.GetTrigger',
     out: 1,
