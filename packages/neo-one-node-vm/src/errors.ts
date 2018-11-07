@@ -191,3 +191,6 @@ export const InvalidTailCallReturnValueError = makeErrorWithCode(
     getMessage(context, `Invalid tail call return value count. Found ${found}, expected ${expected}`),
 );
 export const TemplateVMError = makeErrorWithCode('VM_ERROR', getMessage);
+export const ConstantStorageError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, key: Buffer) =>
+  getMessage(context, `Storage at ${key.toString('hex')} is read only`),
+);

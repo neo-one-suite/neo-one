@@ -409,6 +409,7 @@ const createStorageItemJSON = (options: Partial<StorageItemJSON> = {}): StorageI
   hash: keys[0].scriptHashString,
   key: data.buffers.a,
   value: data.buffers.b,
+  flags: 'None',
   ...options,
 });
 

@@ -12,6 +12,7 @@ import {
   InvocationTransaction,
   NULL_ACTION,
   ScriptContainerType,
+  StorageFlags,
   StorageItem,
   TriggerType,
   UInt160Attribute,
@@ -137,6 +138,7 @@ const nextItem = new StorageItem({
   hash: scriptAttributeHash,
   key: Buffer.from('key', 'utf-8'),
   value: Buffer.from('val', 'utf-8'),
+  flags: StorageFlags.None,
 });
 
 interface SysCall {

@@ -1,8 +1,10 @@
 import {
   assertContractParameterType,
+  assertStorageFlags,
   common,
   crypto,
   ECPoint,
+  hasStorageFlag,
   SysCallName,
   UInt160,
   UInt256,
@@ -18,6 +20,7 @@ import {
   Contract,
   InvocationTransaction,
   ScriptContainerType,
+  StorageFlags,
   StorageItem,
   TransactionType,
   utils,
@@ -43,6 +46,7 @@ import {
 import {
   AccountFrozenError,
   BadWitnessCheckError,
+  ConstantStorageError,
   ContainerTooLargeError,
   ContractNoStorageError,
   InvalidAssetTypeError,
@@ -304,6 +308,54 @@ const destroyContract = async ({ context }: OpInvokeArgs) => {
         : Promise.resolve(),
     ]);
   }
+};
+
+const createPut = ({ name }: { readonly name: 'Neo.Storage.Put' | 'Neo.Storage.PutEx' }) => ({
+  context: contextIn,
+}: CreateSysCallArgs) => {
+  const keyIn = contextIn.stack[1] as StackItem | undefined;
+  const valueIn = contextIn.stack[2] as StackItem | undefined;
+  const expectedIn = name === 'Neo.Storage.Put' ? 3 : 4;
+  if (keyIn === undefined || valueIn === undefined) {
+    throw new StackUnderflowError(contextIn, 'SYSCALL', contextIn.stack.length, expectedIn);
+  }
+  const ratio = new BN(keyIn.asBuffer().length)
+    .add(new BN(valueIn.asBuffer().length))
+    .sub(utils.ONE)
+    .div(utils.ONE_THOUSAND_TWENTY_FOUR)
+    .add(utils.ONE);
+
+  return createSysCall({
+    name,
+    in: expectedIn,
+    fee: FEES.ONE_THOUSAND.mul(ratio),
+    invoke: async ({ context, args }) => {
+      const hash = vmUtils.toStorageContext({
+        context,
+        value: args[0],
+        write: true,
+      }).value;
+      await checkStorage({ context, hash });
+      const key = args[1].asBuffer();
+      if (key.length > 1024) {
+        throw new ItemTooLargeError(context);
+      }
+
+      const value = args[2].asBuffer();
+      const flags =
+        name === 'Neo.Storage.Put' ? StorageFlags.None : assertStorageFlags(args[3].asBigInteger().toNumber());
+      const item = await context.blockchain.storageItem.tryGet({ hash, key });
+      if (item === undefined) {
+        await context.blockchain.storageItem.add(new StorageItem({ hash, key, value, flags }));
+      } else if (hasStorageFlag(item.flags, StorageFlags.Constant)) {
+        throw new ConstantStorageError(context, key);
+      } else {
+        await context.blockchain.storageItem.update(item, { value, flags });
+      }
+
+      return { context };
+    },
+  })({ context: contextIn });
 };
 
 export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
@@ -1531,6 +1583,7 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
                       hash: contract.hash,
                       key: item.key,
                       value: item.value,
+                      flags: StorageFlags.None,
                     }),
                   ),
                 ),
@@ -1590,42 +1643,10 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
     },
   }),
 
-  'Neo.Storage.Put': ({ context: contextIn }) => {
-    const keyIn = contextIn.stack[1] as StackItem | undefined;
-    const valueIn = contextIn.stack[2] as StackItem | undefined;
-    if (keyIn === undefined || valueIn === undefined) {
-      throw new StackUnderflowError(contextIn, 'SYSCALL', contextIn.stack.length, 3);
-    }
-    const ratio = new BN(keyIn.asBuffer().length)
-      .add(new BN(valueIn.asBuffer().length))
-      .sub(utils.ONE)
-      .div(utils.ONE_THOUSAND_TWENTY_FOUR)
-      .add(utils.ONE);
+  'Neo.Storage.Put': createPut({ name: 'Neo.Storage.Put' }),
 
-    return createSysCall({
-      name: 'Neo.Storage.Put',
-      in: 3,
-      fee: FEES.ONE_THOUSAND.mul(ratio),
-      invoke: async ({ context, args }) => {
-        const hash = vmUtils.toStorageContext({
-          context,
-          value: args[0],
-          write: true,
-        }).value;
-        await checkStorage({ context, hash });
-        const key = args[1].asBuffer();
-        const value = args[2].asBuffer();
-        const item = await context.blockchain.storageItem.tryGet({ hash, key });
-        if (item === undefined) {
-          await context.blockchain.storageItem.add(new StorageItem({ hash, key, value }));
-        } else {
-          await context.blockchain.storageItem.update(item, { value });
-        }
+  'Neo.Storage.PutEx': createPut({ name: 'Neo.Storage.PutEx' }),
 
-        return { context };
-      },
-    })({ context: contextIn });
-  },
   'Neo.Storage.Delete': createSysCall({
     name: 'Neo.Storage.Delete',
     in: 2,
@@ -1638,6 +1659,11 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
       }).value;
       await checkStorage({ context, hash });
       const key = args[1].asBuffer();
+      const existing = await context.blockchain.storageItem.tryGet({ hash, key });
+      if (existing !== undefined && hasStorageFlag(existing.flags, StorageFlags.Constant)) {
+        throw new ConstantStorageError(context, key);
+      }
+
       await context.blockchain.storageItem.delete({ hash, key });
 
       return { context };

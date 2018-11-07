@@ -298,6 +298,7 @@ export enum SysCall {
   'Neo.Contract.GetStorageContext' = 'Neo.Contract.GetStorageContext',
   'Neo.Contract.Destroy' = 'Neo.Contract.Destroy',
   'Neo.Storage.Put' = 'Neo.Storage.Put',
+  'Neo.Storage.PutEx' = 'Neo.Storage.PutEx',
   'Neo.Storage.Delete' = 'Neo.Storage.Delete',
   'Neo.ClaimTransaction.GetClaimReferences' = 'Neo.ClaimTransaction.GetClaimReferences',
   'Neo.Witness.GetVerificationScript' = 'Neo.Witness.GetVerificationScript',

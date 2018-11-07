@@ -1,6 +1,7 @@
 import { AssetTypeModel } from './AssetTypeModel';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
 import { StateDescriptorTypeModel } from './StateDescriptorTypeModel';
+import { StorageFlagsModel } from './StorageFlagsModel';
 import { AttributeUsageModel } from './transaction';
 import { VMState } from './vm';
 
@@ -128,7 +129,10 @@ export interface StorageItemJSON {
   readonly hash: string;
   readonly key: string;
   readonly value: string;
+  readonly flags: StorageFlagsJSON;
 }
+
+export type StorageFlagsJSON = keyof typeof StorageFlagsModel;
 
 export interface WitnessJSON {
   readonly invocation: string;

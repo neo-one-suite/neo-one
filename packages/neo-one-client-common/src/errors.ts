@@ -56,6 +56,14 @@ export const InvalidAssetTypeError = makeErrorWithCode(
   'INVALID_ASSET_TYPE',
   (assetType: number) => `Expected asset type, found: ${assetType.toString(16)}`,
 );
+export const InvalidStorageFlagsJSONError = makeErrorWithCode(
+  'INVALID_STORAGE_FLAGS_JSON',
+  (type: string) => `Invalid StorageFlags: ${type}`,
+);
+export const InvalidStorageFlagsError = makeErrorWithCode(
+  'INVALID_STORAGE_FLAGS',
+  (storageFlags: number) => `Expected StorageFlags, found: ${storageFlags.toString(16)}`,
+);
 export const InvalidStateDescriptorTypeError = makeErrorWithCode(
   'INVALID_STATE_DESCRIPTOR_TYPE',
   (stateDescriptorType: number) => `Expected StateDescriptorType, found: ${stateDescriptorType.toString(16)}`,

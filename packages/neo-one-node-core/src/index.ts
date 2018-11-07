@@ -20,6 +20,7 @@ export * from './ScriptContainer';
 export * from './Serializable';
 export * from './Settings';
 export * from './Storage';
+export * from './StorageFlags';
 export * from './StorageItem';
 export * from './TransactionData';
 export * from './Validator';
