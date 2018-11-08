@@ -1,12 +1,12 @@
 import { resolveDependencies } from '../resolveDependencies';
 
 const dependencies = {
-  'bignumber.js': '^7.2.1',
-  react: '^16.5.1',
+  'bignumber.js': '7.2.1',
+  react: '16.5.1',
   reakit: '0.15.7',
-  rxjs: '^6.3.3',
-  'react-dom': '^16.5.1',
-  'styled-components': '^3.4.10',
+  rxjs: '6.3.3',
+  'react-dom': '16.5.1',
+  'styled-components': '3.4.10',
 };
 
 describe('resolveDependencies', () => {

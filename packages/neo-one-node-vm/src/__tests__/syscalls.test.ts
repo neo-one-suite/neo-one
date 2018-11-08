@@ -3112,6 +3112,7 @@ const SYSCALLS = [
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
     gas: FEES.ONE_THOUSAND.mul(new BN(2)),
+    error: 'Item too large',
   },
 
   {
@@ -3214,7 +3215,7 @@ const SYSCALLS = [
 
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
-
+      blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve({ flags: StorageFlags.None }));
       blockchain.storageItem.delete = jest.fn(async () => Promise.resolve());
     },
     gas: FEES.ONE_HUNDRED,

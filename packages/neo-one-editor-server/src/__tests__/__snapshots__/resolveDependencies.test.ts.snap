@@ -138,7 +138,7 @@ Object {
     "dependencies": Object {},
     "name": "popper.js",
     "types": true,
-    "version": "1.14.4",
+    "version": "1.14.5",
   },
   "postcss-value-parser": Object {
     "dependencies": Object {},
@@ -162,13 +162,13 @@ Object {
     "dependencies": Object {},
     "name": "react",
     "types": false,
-    "version": "16.6.1",
+    "version": "16.5.1",
   },
   "react-dom": Object {
     "dependencies": Object {},
     "name": "react-dom",
     "types": false,
-    "version": "16.6.1",
+    "version": "16.5.1",
   },
   "react-is": Object {
     "dependencies": Object {},
@@ -194,11 +194,11 @@ Object {
     "types": false,
     "version": "2.1.2",
   },
-  "scheduler": Object {
+  "schedule": Object {
     "dependencies": Object {},
-    "name": "scheduler",
+    "name": "schedule",
     "types": false,
-    "version": "0.11.0",
+    "version": "0.4.0",
   },
   "setimmediate": Object {
     "dependencies": Object {},
