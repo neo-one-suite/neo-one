@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/worker",
-  "version": "1.0.0-preview.3",
+  "version": "1.0.0-preview.4",
   "description": "NEO•ONE web workers.",
   "main": "./src/index.ts",
   "dependencies": {

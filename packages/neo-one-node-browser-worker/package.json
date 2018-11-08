@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/node-browser-worker",
-  "version": "1.0.0-preview.3",
+  "version": "1.0.0-preview.4",
   "description": "NEO•ONE node browser workers.",
   "main": "./src/index.ts",
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
-    "@neo-one/node-browser": "^1.0.0-preview.3",
-    "@neo-one/worker": "^1.0.0-preview.3"
+    "@neo-one/node-browser": "^1.0.0-preview.4",
+    "@neo-one/worker": "^1.0.0-preview.4"
   },
   "sideEffects": false
 }

@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/local-singleton",
-  "version": "1.0.0-preview.4",
+  "version": "1.0.0-preview.5",
   "description": "NEO•ONE local singleton stubs.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/local-browser": "^1.0.0-preview.4",
-    "@neo-one/node-browser": "^1.0.0-preview.3",
+    "@neo-one/local-browser": "^1.0.0-preview.5",
+    "@neo-one/node-browser": "^1.0.0-preview.4",
     "@neo-one/types": "^1.0.0-preview.3",
-    "@neo-one/worker": "^1.0.0-preview.3",
+    "@neo-one/worker": "^1.0.0-preview.4",
     "tslib": "^1.9.3"
   },
   "sideEffects": false
