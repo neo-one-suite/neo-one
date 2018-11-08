@@ -74,7 +74,7 @@
     "typescript": "3.2.0-dev.20181107",
     "typescript-fsa": "^3.0.0-beta-2",
     "typescript-fsa-reducers": "^1.0.0",
-    "webpack": "4.19.0"
+    "webpack": "4.25.1"
   },
   "sideEffects": [
     "src/engine/test/polyfill.ts",
