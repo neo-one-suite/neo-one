@@ -5,7 +5,7 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/types": "^1.0.0-preview.3",
-    "reakit": "0.15.10",
+    "reakit": "0.15.11",
     "styled-tools": "^1.6.0"
   },
   "sideEffects": false

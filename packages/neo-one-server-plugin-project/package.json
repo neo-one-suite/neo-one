@@ -23,7 +23,7 @@
     "@types/nanoid": "^1.2.0",
     "chokidar": "^2.0.4",
     "convict": "^4.4.0",
-    "cosmiconfig": "^5.0.6",
+    "cosmiconfig": "^5.0.7",
     "fs-extra": "^7.0.1",
     "lodash": "^4.17.11",
     "nanoid": "^2.0.0",

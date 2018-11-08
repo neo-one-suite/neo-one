@@ -10,7 +10,7 @@
     "react": "^16.6.1",
     "react-dom": "^16.6.1",
     "react-draggable": "^3.0.5",
-    "reakit": "0.15.10",
+    "reakit": "0.15.11",
     "styled-tools": "^1.6.0",
     "trackjs": "^3.0.0"
   },
