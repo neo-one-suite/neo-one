@@ -6,6 +6,7 @@ if (process.platform === 'win32') {
   testPathIgnorePatterns = testPathIgnorePatterns.concat([
     '/packages/neo-one-editor/src/__tests__/.*',
     '/packages/neo-one-editor-server/src/__tests__/.*',
+    'packages/neo-one-smart-contract-compiler/src/__tests__/getSemanticDiagnostics.test.ts',
   ]);
 }
 
