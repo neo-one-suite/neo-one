@@ -144,7 +144,7 @@ exports[`ContractInfoProcessor invalid @sendUnsafe method with ForwardedValue 1`
 `;
 
 exports[`ContractInfoProcessor invalid property function not readonly 1`] = `
-"snippetCode.ts (13,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+"snippetCode.ts (13,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
 
       11 | };
       12 | 
@@ -157,7 +157,7 @@ exports[`ContractInfoProcessor invalid property function not readonly 1`] = `
 `;
 
 exports[`ContractInfoProcessor invalid property function set in constructor 1`] = `
-"snippetCode.ts (13,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+"snippetCode.ts (13,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
 
       11 | };
       12 | 
@@ -170,7 +170,7 @@ exports[`ContractInfoProcessor invalid property function set in constructor 1`] 
 `;
 
 exports[`ContractInfoProcessor invalid storage structured array type 1`] = `
-"snippetCode.ts (15,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+"snippetCode.ts (15,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
 
       13 | };
       14 | 
@@ -182,7 +182,7 @@ exports[`ContractInfoProcessor invalid storage structured array type 1`] = `
 `;
 
 exports[`ContractInfoProcessor invalid storage structured map type 1`] = `
-"snippetCode.ts (15,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+"snippetCode.ts (15,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
 
       13 | };
       14 | 
@@ -194,7 +194,7 @@ exports[`ContractInfoProcessor invalid storage structured map type 1`] = `
 `;
 
 exports[`ContractInfoProcessor invalid storage structured set type 1`] = `
-"snippetCode.ts (15,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+"snippetCode.ts (15,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
 
       13 | };
       14 | 
@@ -206,7 +206,7 @@ exports[`ContractInfoProcessor invalid storage structured set type 1`] = `
 `;
 
 exports[`ContractInfoProcessor invalid storage type 1`] = `
-"snippetCode.ts (15,9): Invalid SmartContract storage type. See <insert_url> for valid storage types.
+"snippetCode.ts (15,9): Invalid SmartContract storage type. See https://neo-one.io/docs/properties-and-storage#Storage-Types for valid storage types.
 
       13 | };
       14 | 
