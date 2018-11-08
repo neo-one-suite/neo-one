@@ -19979,20 +19979,20 @@ typescript-fsa@^3.0.0-beta-2:
   resolved "https://registry.yarnpkg.com/typescript-fsa/-/typescript-fsa-3.0.0-beta-2.tgz#1cc1d0c014c025fd51cba097776033ac4b6b753c"
   integrity sha512-qXkHih2XAtpxqd3AEVgFtCDwvBlAMl2miVy1TmS+wXgiRlVw7orf2qIh3C8faANhD34n75Ui8x5ydQ40uzuskA==
 
-typescript-styled-plugin@0.11.0:
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/typescript-styled-plugin/-/typescript-styled-plugin-0.11.0.tgz#5d6045fb0c86ac8b6085341497eabe0321110da8"
-  integrity sha512-niTuUKY5JJd1JS1YCFFd7ahWXW8kymJHBjlkFu9iIU1M43ClIaidAHPEy7rihLTjxM9q1bIG6hr0USt1r8wAEg==
+typescript-styled-plugin@0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/typescript-styled-plugin/-/typescript-styled-plugin-0.12.0.tgz#ea441d773c1648727dbdb1e961a6a59d8f53c1a3"
+  integrity sha512-dqetvWmgwkfeUNyWlGlolnAw/A65bj+9I33MFQcy7a6JslZ71Zhvp0HMLmLYgF24qk5J8/UIGcYYUh7lJZIpLQ==
   dependencies:
-    typescript-template-language-service-decorator "^1.7.1"
-    vscode-css-languageservice "^3.0.10"
+    typescript-template-language-service-decorator "^2.0.0"
+    vscode-css-languageservice "^3.0.11"
     vscode-emmet-helper "1.2.11"
     vscode-languageserver-types "^3.13.0"
 
-typescript-template-language-service-decorator@^1.7.1:
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/typescript-template-language-service-decorator/-/typescript-template-language-service-decorator-1.7.1.tgz#60f825b6b2bab725c9a73eaff65cb598e81a1bc8"
-  integrity sha512-Gk0WBNe73T87lpiSj37Xmwzvt5zkKaHT1chY5+v2KP4uhpHktqIcV1hMpxmzAong38EIEhGZWeKtxjxGmTMbqg==
+typescript-template-language-service-decorator@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/typescript-template-language-service-decorator/-/typescript-template-language-service-decorator-2.0.0.tgz#7433fdc464f07034d951dea9a5e76fab6e558f57"
+  integrity sha512-wbrje6G8t+h/xBRP+gyAXYpR0+U7the2YnfsF59SKz//gdLnpL+cSFhIuW61I07XXDyU68yMBFqUzm0Hg1Xpcg==
 
 typescript@3.2.0-dev.20181107:
   version "3.2.0-dev.20181107"
@@ -20633,7 +20633,7 @@ vorpal@^1.12.0:
     strip-ansi "^3.0.0"
     wrap-ansi "^2.0.0"
 
-vscode-css-languageservice@^3.0.10:
+vscode-css-languageservice@^3.0.11:
   version "3.0.12"
   resolved "https://registry.yarnpkg.com/vscode-css-languageservice/-/vscode-css-languageservice-3.0.12.tgz#fb4aac5ae3c5b761b1db1d7224b78ff824284dc3"
   integrity sha512-+FLQ9LcukIhnxaGTjDOqb3Nb1hesz9BLXf5yeoZxUsuK7joADPLPdxLwlZugFcMAvgmtnaFIGnzkQhGOVqf5yw==
