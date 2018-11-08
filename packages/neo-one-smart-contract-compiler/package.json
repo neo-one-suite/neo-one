@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-compiler",
-  "version": "1.0.0-preview.4",
+  "version": "1.0.0-preview.5",
   "description": "NEO•ONE TypeScript smart contract compiler.",
   "main": "./src/index.ts",
   "dependencies": {
@@ -9,7 +9,7 @@
     "@neo-one/client-core": "^1.0.0-preview.4",
     "@neo-one/client-full-common": "^1.0.0-preview.4",
     "@neo-one/client-full-core": "^1.0.0-preview.4",
-    "@neo-one/smart-contract": "^1.0.0-preview.3",
+    "@neo-one/smart-contract": "^1.0.0-preview.4",
     "@neo-one/ts-utils": "^1.0.0-preview.4",
     "@neo-one/typescript-concatenator": "^1.0.0-preview.4",
     "@neo-one/utils": "^1.0.0-preview.4",
@@ -25,12 +25,12 @@
   "devDependencies": {
     "@neo-one/client-switch": "^1.0.0-preview.4",
     "@neo-one/monitor": "^1.0.0-preview.4",
-    "@neo-one/node-blockchain": "^1.0.0-preview.4",
+    "@neo-one/node-blockchain": "^1.0.0-preview.5",
     "@neo-one/node-neo-settings": "^1.0.0-preview.4",
     "@neo-one/node-storage-levelup": "^1.0.0-preview.4",
     "@neo-one/node-vm": "^1.0.0-preview.4",
     "@neo-one/smart-contract-compiler-node": "^1.0.0-preview.4",
-    "@neo-one/smart-contract-test-common": "^1.0.0-preview.4",
+    "@neo-one/smart-contract-test-common": "^1.0.0-preview.5",
     "@neo-one/types": "^1.0.0-preview.3",
     "@types/levelup": "3.1.0",
     "@types/memdown": "3.0.0",

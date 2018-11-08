@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/client-full",
-  "version": "1.0.0-preview.5",
+  "version": "1.0.0-preview.6",
   "description": "NEO•ONE client extended API.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client": "^1.0.0-preview.5",
+    "@neo-one/client": "^1.0.0-preview.6",
     "@neo-one/client-full-core": "^1.0.0-preview.4",
     "@neo-one/types": "^1.0.0-preview.3",
     "tslib": "^1.9.3"
