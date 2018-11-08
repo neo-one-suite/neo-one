@@ -38,8 +38,7 @@ for:
       - ps: Update-NodeJsInstallation 9.11.2 x64
       - node --version
       - yarn --version
-      - git clone https://github.com/neo-one-suite/neo-one-playground.git packages\neo-one-playground
-      - yarn install --non-interactive
+      - yarn install --non-interactive --ignore-engines
       - yarn run build:e2e
     test_script:
       - yarn run test-ci-windows-9
@@ -59,8 +58,7 @@ for:
       - ps: Update-NodeJsInstallation 10.13.0 x64
       - node --version
       - yarn --version
-      - git clone https://github.com/neo-one-suite/neo-one-playground.git packages\neo-one-playground
-      - yarn install --non-interactive
+      - yarn install --non-interactive --ignore-engines
       - yarn run build:e2e
     test_script:
       - yarn run test-ci
