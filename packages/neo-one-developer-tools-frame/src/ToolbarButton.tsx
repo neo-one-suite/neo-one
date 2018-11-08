@@ -18,6 +18,7 @@ const StyledButton = styled(Button)`
 `;
 
 const Wrapper = styled(Grid)`
+  height: 100%;
   grid-auto-flow: column;
   place-items: center;
   justify-items: center;
