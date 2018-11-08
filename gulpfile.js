@@ -81,7 +81,6 @@ const getPackageJSON = (pkg) => {
 const SKIP_PACKAGES = new Set([
   'neo-one-editor',
   'neo-one-editor-server',
-  'neo-one-developer-tools-frame',
   'neo-one-local-browser',
   'neo-one-local-browser-worker',
   'neo-one-local-singleton',
@@ -213,7 +212,9 @@ const transformBasePackageJSON = (format, orig, file) => {
       orig.dependencies === undefined
         ? undefined
         : _.fromPairs(
-            Object.entries(orig.dependencies).map(([depName, version]) => [mapDep(format, depName), version]),
+            Object.entries(orig.dependencies)
+              .filter((depName) => depName !== '@neo-one/developer-tools-frame')
+              .map(([depName, version]) => [mapDep(format, depName), version]),
           ),
     publishConfig: {
       access: 'public',
@@ -458,6 +459,11 @@ const copyRootTSConfig = ((cache) =>
     await fs.writeFile(filePath, JSON.stringify(tsconfig, null, 2));
   }))({});
 
+const removeFrame = ((cache) =>
+  memoizeTask(cache, async function removeFrame(format) {
+    await fs.remove(path.resolve(getDistBase(format), 'packages', 'neo-one-developer-tools-frame'));
+  }))({});
+
 const gulpBin = () =>
   gulpReplaceModule(MAIN_FORMAT, gulp.src(globs.bin)).pipe(
     gulpRename((parsedPath) => {
@@ -548,7 +554,8 @@ gulp.task(
   gulp.series('compileDeveloperToolsFrame', gulp.parallel(FORMATS.map((format) => buildAll(format)))),
 );
 gulp.task('install', gulp.parallel(FORMATS.map((format) => install(format))));
-gulp.task('publish', gulp.parallel(FORMATS.map((format) => publish(format))));
+gulp.task('publish', gulp.parallel(FORMATS.map((format) => gulp.series(removeFrame(format), publish(format)))));
+gulp.task('removeFrame', gulp.parallel(FORMATS.map((format) => removeFrame(format))));
 
 gulp.task('build', gulp.series('clean', 'buildAll', 'install'));
 
