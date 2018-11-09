@@ -97,7 +97,7 @@ export const serializeContractWireBase = ({
   writer.writeVarBytesLE(contract.script);
   writer.writeVarBytesLE(Buffer.from(contract.parameterList as ContractParameterTypeModel[]));
   writer.writeUInt8(contract.returnType);
-  if (publishVersion === undefined || publishVersion >= 1) {
+  if (publishVersion === undefined || /*istanbul ignore next */ publishVersion >= 1) {
     writer.writeUInt8(contract.contractProperties);
   }
   writer.writeVarString(contract.name);
