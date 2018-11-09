@@ -35,6 +35,7 @@ import {
   ContractTransactionJSON,
   EnrollmentTransaction,
   EnrollmentTransactionJSON,
+  ForwardValue,
   Hash256Attribute,
   Header,
   HeaderJSON,
@@ -814,6 +815,19 @@ const createUnlockedWallet = (options: Partial<UnlockedWallet> = {}): UnlockedWa
   ...options,
 });
 
+const createOtherWallet = (options: Partial<UnlockedWallet> = {}): UnlockedWallet => ({
+  type: 'unlocked',
+  account: createUserAccount({
+    id: createUserAccountID({
+      address: keys[1].address,
+    }),
+    publicKey: keys[1].publicKeyString,
+  }),
+  privateKey: keys[1].privateKeyString,
+  nep2: keys[1].encryptedWIF,
+  ...options,
+});
+
 const createTransfer = (options: Partial<Transfer> = {}): Transfer => ({
   to: keys[0].address,
   amount: data.bigNumbers.a,
@@ -868,6 +882,28 @@ const createStringABIParameter = (options: Partial<StringABIParameter> = {}): St
 
 const createABI = (options: Partial<ABI> = {}): ABI => ({
   ...nep5.abi(8),
+  ...options,
+});
+
+const createForwardValue = (options: Partial<ForwardValue> = {}): ForwardValue =>
+  // tslint:disable-next-line:no-object-literal-type-assertion
+  ({
+    name: 'foo',
+    converted: true,
+    param: true,
+    ...options,
+  } as ForwardValue);
+
+const createABIFunction = (options: Partial<ABIFunction> = {}): ABIFunction => ({
+  name: 'foo',
+  parameters: [],
+  returnType: { type: 'Boolean' },
+  send: false,
+  receive: false,
+  sendUnsafe: false,
+  refundAssets: false,
+  completeSend: false,
+  claim: false,
   ...options,
 });
 
@@ -959,6 +995,7 @@ export const factory = {
   createWitness,
   createLockedWallet,
   createUnlockedWallet,
+  createOtherWallet,
   createTransfer,
   createContractTransaction,
   createClaimTransaction,
@@ -972,6 +1009,8 @@ export const factory = {
   createRawLog,
   createRawNotification,
   createABIEvent,
+  createABIFunction,
+  createForwardValue,
   createAddressContractParameter,
   createIntegerContractParameter,
   createStringContractParameter,

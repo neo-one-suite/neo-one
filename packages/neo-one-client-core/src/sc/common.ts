@@ -40,15 +40,40 @@ export const convertContractParameter = ({
   // tslint:disable-next-line no-any
 }): Return | undefined => (contractParameters[type.type] as any)(parameter, type);
 
+// tslint:disable-next-line:no-any
+const isMaybeUserAccountID = (arg: any) =>
+  arg.network !== undefined && arg.address !== undefined && typeof arg.address === 'string';
+
 // tslint:disable-next-line no-any
-export const isOptionsArg = (finalArg: any) =>
-  finalArg !== undefined &&
-  typeof finalArg === 'object' &&
-  !Array.isArray(finalArg) &&
-  !BigNumber.isBigNumber(finalArg) &&
-  // tslint:disable-next-line no-any
-  finalArg.name === undefined &&
-  finalArg.amount === undefined;
+export const isOptionsBase = (arg: any) =>
+  arg !== undefined &&
+  typeof arg === 'object' &&
+  !Array.isArray(arg) &&
+  !BigNumber.isBigNumber(arg) &&
+  arg.name === undefined &&
+  arg.amount === undefined;
+
+// tslint:disable-next-line:no-any
+export const isTransactionOptions = (arg: any) =>
+  isOptionsBase(arg) &&
+  ((arg.from !== undefined && isMaybeUserAccountID(arg.from)) ||
+    (arg.attributes !== undefined && Array.isArray(arg.attributes)) ||
+    (arg.networkFee !== undefined && BigNumber.isBigNumber(arg.networkFee)) ||
+    (arg.systemFee !== undefined && BigNumber.isBigNumber(arg.systemFee)) ||
+    (arg.sendFrom !== undefined && Array.isArray(arg.sendFrom)) ||
+    (arg.sendTo !== undefined && Array.isArray(arg.sendTo)) ||
+    (arg.timeoutMS !== undefined && (typeof arg.timeoutMS === 'number')) ||
+    arg.monitor !== undefined);
+
+// tslint:disable-next-line:no-any
+export const isForwardValueOptions = (arg: any): boolean =>
+  isOptionsBase(arg) &&
+  arg.from === undefined &&
+  arg.attributes === undefined &&
+  arg.sytemFees === undefined &&
+  arg.networkFees === undefined &&
+  arg.monitor === undefined &&
+  ((arg.events !== undefined && Array.isArray(arg.events)) || (arg.__tag !== undefined && arg.__tag.type === 'Event'));
 
 export const getForwardValues = ({
   parameters,
