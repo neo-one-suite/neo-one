@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/smart-contract-codegen",
-  "version": "1.0.0-preview.4",
+  "version": "1.0.0-preview.5",
   "description": "NEO•ONE TypeScript smart contract codegen.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-common": "^1.0.0-preview.4",
-    "@neo-one/client-core": "^1.0.0-preview.4",
+    "@neo-one/client-common": "^1.0.0-preview.5",
+    "@neo-one/client-core": "^1.0.0-preview.5",
     "@neo-one/types": "^1.0.0-preview.3",
     "@neo-one/utils": "^1.0.0-preview.4",
     "@types/lodash": "^4.14.118",

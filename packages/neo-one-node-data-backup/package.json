@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-data-backup",
-  "version": "1.0.0-preview.4",
+  "version": "1.0.0-preview.5",
   "description": "NEO•ONE node data path backup and restore.",
   "main": "./src/index.ts",
   "dependencies": {

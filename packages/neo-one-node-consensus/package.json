@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/node-consensus",
-  "version": "1.0.0-preview.4",
+  "version": "1.0.0-preview.5",
   "description": "NEO•ONE NEO consensus protocol.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-common": "^1.0.0-preview.4",
+    "@neo-one/client-common": "^1.0.0-preview.5",
     "@neo-one/monitor": "^1.0.0-preview.4",
-    "@neo-one/node-core": "^1.0.0-preview.4",
+    "@neo-one/node-core": "^1.0.0-preview.5",
     "@neo-one/types": "^1.0.0-preview.3",
     "@neo-one/utils": "^1.0.0-preview.4",
     "@reactivex/ix-es2015-cjs": "^2.3.5",

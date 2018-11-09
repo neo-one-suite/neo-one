@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/client-core",
-  "version": "1.0.0-preview.4",
+  "version": "1.0.0-preview.5",
   "description": "NEO•ONE client core types implementation.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-common": "^1.0.0-preview.4",
-    "@neo-one/client-switch": "^1.0.0-preview.4",
+    "@neo-one/client-common": "^1.0.0-preview.5",
+    "@neo-one/client-switch": "^1.0.0-preview.5",
     "@neo-one/monitor": "^1.0.0-preview.4",
     "@neo-one/server-http-client": "^1.0.0-preview.4",
     "@neo-one/types": "^1.0.0-preview.3",

@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/node-storage-common",
-  "version": "1.0.0-preview.4",
+  "version": "1.0.0-preview.5",
   "description": "NEO•ONE node storage common.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-common": "^1.0.0-preview.4",
-    "@neo-one/node-core": "^1.0.0-preview.4",
+    "@neo-one/client-common": "^1.0.0-preview.5",
+    "@neo-one/node-core": "^1.0.0-preview.5",
     "@neo-one/types": "^1.0.0-preview.3",
     "@types/bn.js": "^4.11.3",
     "@types/bytewise": "^1.1.0",

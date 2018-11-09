@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/node-network",
-  "version": "1.0.0-preview.4",
+  "version": "1.0.0-preview.5",
   "description": "NEO•ONE NEO network protocol.",
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/monitor": "^1.0.0-preview.4",
-    "@neo-one/node-core": "^1.0.0-preview.4",
+    "@neo-one/node-core": "^1.0.0-preview.5",
     "@neo-one/types": "^1.0.0-preview.3",
     "@neo-one/utils": "^1.0.0-preview.4",
     "@types/lodash": "^4.14.118",

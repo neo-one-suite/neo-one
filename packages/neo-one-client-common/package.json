@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-common",
-  "version": "1.0.0-preview.4",
+  "version": "1.0.0-preview.5",
   "description": "NEO•ONE client common code.",
   "main": "./src/index.ts",
   "dependencies": {
