@@ -1,4 +1,4 @@
-import { Block, BlockFilter, GetOptions } from '@neo-one/client-common';
+import { Block, GetOptions, IterOptions } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
 import _ from 'lodash';
 
@@ -15,7 +15,7 @@ interface Client {
 
 interface AsyncBlockIteratorOptions {
   readonly client: Client;
-  readonly filter: BlockFilter;
+  readonly options: IterOptions;
   readonly fetchTimeoutMS?: number;
   readonly batchSize?: number;
 }
@@ -39,7 +39,7 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
 
   public constructor({
     client,
-    filter: { indexStart, indexStop, monitor },
+    options: { indexStart, indexStop, monitor },
     fetchTimeoutMS = FETCH_TIMEOUT_MS,
     batchSize = BATCH_SIZE,
   }: AsyncBlockIteratorOptions) {

@@ -5,7 +5,6 @@ import {
   Asset,
   AssetType,
   Block,
-  BlockFilter,
   BufferString,
   Contract,
   ContractParameterType,
@@ -15,6 +14,7 @@ import {
   InvocationResult,
   InvocationTransaction,
   IssueTransaction,
+  IterOptions,
   NetworkType,
   Output,
   Param,
@@ -95,7 +95,7 @@ export interface DataProvider {
   readonly getAccount: (address: AddressString, monitor?: Monitor) => Promise<Account>;
   readonly getAsset: (hash: Hash256String, monitor?: Monitor) => Promise<Asset>;
   readonly getBlock: (hashOrIndex: number | Hash256String, options?: GetOptions) => Promise<Block>;
-  readonly iterBlocks: (filter?: BlockFilter) => AsyncIterable<Block>;
+  readonly iterBlocks: (options?: IterOptions) => AsyncIterable<Block>;
   readonly getBestBlockHash: (monitor?: Monitor) => Promise<Hash256String>;
   readonly getBlockCount: (monitor?: Monitor) => Promise<number>;
   readonly getContract: (address: AddressString, monitor?: Monitor) => Promise<Contract>;

@@ -6,10 +6,6 @@ exports[`arg assertions assertAssetRegister - non object 1`] = `"Expected AssetR
 
 exports[`arg assertions assertAssetRegister - undefined 1`] = `"Expected AssetRegister for value, found undefined"`;
 
-exports[`arg assertions assertBlockFilter - invalid 1`] = `"Expected BlockFilter for value, found {\\"indexStart\\":5,\\"indexStop\\":0}. Index start was greater than index stop."`;
-
-exports[`arg assertions assertBlockFilter - non object 1`] = `"Expected BlockFilter for value, found true"`;
-
 exports[`arg assertions assertContractRegister - invalid 1`] = `"Expected ContractParameterType for ContractRegister.returnType, found ByteArray"`;
 
 exports[`arg assertions assertContractRegister - non object 1`] = `"Expected ContractRegister for value, found true"`;
@@ -17,6 +13,10 @@ exports[`arg assertions assertContractRegister - non object 1`] = `"Expected Con
 exports[`arg assertions assertContractRegister - undefined 1`] = `"Expected ContractRegister for value, found undefined"`;
 
 exports[`arg assertions assertGetOptions - non object 1`] = `"Expected GetOptions for value, found true"`;
+
+exports[`arg assertions assertIterOptions - invalid 1`] = `"Expected IterOptions for value, found {\\"indexStart\\":5,\\"indexStop\\":0}. Index start was greater than index stop."`;
+
+exports[`arg assertions assertIterOptions - non object 1`] = `"Expected IterOptions for value, found true"`;
 
 exports[`arg assertions assertNullableBigNumber - non BigNumber 1`] = `"Expected BigNumber for value, found 0"`;
 

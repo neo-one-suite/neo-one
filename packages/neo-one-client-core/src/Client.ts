@@ -3,12 +3,12 @@ import {
   Account,
   AddressString,
   Block,
-  BlockFilter,
   ClaimTransaction,
   GetOptions,
   Hash256String,
   InvocationTransaction,
   InvokeSendUnsafeReceiveTransactionOptions,
+  IterOptions,
   NetworkType,
   Param,
   RawAction,
@@ -448,20 +448,20 @@ export class Client<
   /**
    * @returns `Promise` which resolves to an `Account` object for the provided `UserAccountID`.
    */
-  public async getAccount(id: UserAccountID): Promise<Account> {
-    return this.getNetworkProvider(id.network).getAccount(id.network, id.address);
+  public async getAccount(id: UserAccountID, monitor?: Monitor): Promise<Account> {
+    return this.getNetworkProvider(id.network).getAccount(id.network, id.address, monitor);
   }
 
   /**
    * @internal
    */
-  public __iterActionsRaw(network: NetworkType, blockFilter?: BlockFilter): AsyncIterable<RawAction> {
+  public __iterActionsRaw(network: NetworkType, options?: IterOptions): AsyncIterable<RawAction> {
     const provider = this.getNetworkProvider(network);
     if (provider.iterActionsRaw !== undefined) {
-      return provider.iterActionsRaw(network, blockFilter);
+      return provider.iterActionsRaw(network, options);
     }
 
-    return AsyncIterableX.from(provider.iterBlocks(network, blockFilter)).pipe(
+    return AsyncIterableX.from(provider.iterBlocks(network, options)).pipe(
       flatMap(async (block) => {
         const actions = _.flatten(
           block.transactions.map((transaction) => {

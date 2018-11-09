@@ -7,7 +7,7 @@ import { UnknownBlockError } from '../errors';
 
 const blockCount = 10;
 const blocks = _.range(blockCount).map(() => ({}));
-const filter = {
+const options = {
   indexStart: 0,
   indexStop: blockCount,
 };
@@ -38,7 +38,7 @@ describe('AsyncBlockIterator', () => {
     blockIterator = new AsyncBlockIterator({
       // tslint:disable-next-line no-any
       client: client as any,
-      filter,
+      options,
       fetchTimeoutMS: FETCH_TIMEOUT_MS,
     });
   });
