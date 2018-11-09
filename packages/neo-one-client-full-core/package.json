@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/client-full-core",
-  "version": "1.0.0-preview.5",
+  "version": "1.0.0-preview.6",
   "description": "NEO•ONE client-full core types implementation.",
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/client-common": "^1.0.0-preview.5",
-    "@neo-one/client-core": "^1.0.0-preview.5",
+    "@neo-one/client-core": "^1.0.0-preview.6",
     "@neo-one/client-full-common": "^1.0.0-preview.5",
     "@neo-one/client-switch": "^1.0.0-preview.5",
     "@neo-one/monitor": "^1.0.0-preview.4",
