@@ -3,11 +3,11 @@ import {
   AddressString,
   Asset,
   Block,
-  BlockFilter,
   Contract,
   GetOptions,
   Hash256String,
   Input,
+  IterOptions,
   Output,
   Peer,
   Transaction,
@@ -41,8 +41,8 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
     return this.dataProvider.getBlock(clientArgs.assertHash256('hash', hash), options);
   }
 
-  public iterBlocks(filter?: BlockFilter): AsyncIterable<Block> {
-    return this.dataProvider.iterBlocks(args.assertBlockFilter('filter', filter));
+  public iterBlocks(options?: IterOptions): AsyncIterable<Block> {
+    return this.dataProvider.iterBlocks(args.assertIterOptions('options', options));
   }
 
   public async getBestBlockHash(monitor?: Monitor): Promise<Hash256String> {

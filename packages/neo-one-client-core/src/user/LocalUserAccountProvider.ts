@@ -6,7 +6,6 @@ import {
   AttributeModel,
   AttributeUsageModel,
   Block,
-  BlockFilter,
   ClaimTransaction,
   ClaimTransactionModel,
   common,
@@ -20,6 +19,7 @@ import {
   InvocationTransaction,
   InvocationTransactionModel,
   InvokeSendUnsafeReceiveTransactionOptions,
+  IterOptions,
   NetworkType,
   Output,
   OutputModel,
@@ -156,9 +156,9 @@ export interface Provider {
   readonly getBlockCount: (network: NetworkType, monitor?: Monitor) => Promise<number>;
   readonly getTransaction: (network: NetworkType, hash: Hash256String, monitor?: Monitor) => Promise<Transaction>;
   readonly getOutput: (network: NetworkType, input: Input, monitor?: Monitor) => Promise<Output>;
-  readonly iterBlocks: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<Block>;
+  readonly iterBlocks: (network: NetworkType, options?: IterOptions) => AsyncIterable<Block>;
   readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
-  readonly iterActionsRaw?: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<RawAction>;
+  readonly iterActionsRaw?: (network: NetworkType, options?: IterOptions) => AsyncIterable<RawAction>;
 }
 
 interface TransactionOptionsFull {
@@ -218,7 +218,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   public readonly provider: TProvider;
   public readonly deleteUserAccount?: (id: UserAccountID) => Promise<void>;
   public readonly updateUserAccountName?: (options: UpdateAccountNameOptions) => Promise<void>;
-  public readonly iterActionsRaw?: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<RawAction>;
+  public readonly iterActionsRaw?: (network: NetworkType, options?: IterOptions) => AsyncIterable<RawAction>;
   protected readonly mutableUsedOutputs: Set<string>;
   protected mutableBlockCount: number;
 
@@ -267,8 +267,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     return this.provider.getNetworks();
   }
 
-  public iterBlocks(network: NetworkType, filter?: BlockFilter): AsyncIterable<Block> {
-    return this.provider.iterBlocks(network, filter);
+  public iterBlocks(network: NetworkType, options?: IterOptions): AsyncIterable<Block> {
+    return this.provider.iterBlocks(network, options);
   }
 
   public async getBlockCount(network: NetworkType, monitor?: Monitor): Promise<number> {

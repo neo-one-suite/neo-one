@@ -774,13 +774,13 @@ export interface UserAccountProvider {
   /**
    * @returns `AsyncIterable` of `Block`s on the argument `network`.
    */
-  readonly iterBlocks: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<Block>;
+  readonly iterBlocks: (network: NetworkType, options?: IterOptions) => AsyncIterable<Block>;
   /**
    * While this method could be implemented simply as a function of `iterBlocks`, `iterActionsRaw` is provided in case the `UserAccountProvider` has a more efficient way of iterating over actions.
    *
-   * @returns `AsyncIterable` over all actions emitted by the given `network`, filtered by the given `filter`.
+   * @returns `AsyncIterable` over all actions emitted by the given `network`, filtered by the given `options`.
    */
-  readonly iterActionsRaw?: (network: NetworkType, filter?: BlockFilter) => AsyncIterable<RawAction>;
+  readonly iterActionsRaw?: (network: NetworkType, options?: IterOptions) => AsyncIterable<RawAction>;
   /**
    * Transfers native assets.
    */
@@ -1047,17 +1047,16 @@ export interface SmartContractReadOptions {
    * The network to read the smart contract data for. By default this is the network of the currently selected user account.
    */
   readonly network?: NetworkType;
+  /**
+   * The `Monitor` to use for tracking all asynchronous calls made in the process of pulling data.
+   */
+  readonly monitor?: Monitor;
 }
 
 /**
  * Additional optional options for methods that iterate over data from a smart contract.
  */
-export interface SmartContractIterOptions extends SmartContractReadOptions {
-  /**
-   * Filters the iterated events and/or logs to those that match the provided `BlockFilter` object.
-   */
-  readonly filter?: BlockFilter;
-}
+export interface SmartContractIterOptions extends SmartContractReadOptions, BlockFilter {}
 
 /**
  * Filter that specifies (optionally) a block index to start at and (optionally) a block index to end at.
@@ -1071,6 +1070,12 @@ export interface BlockFilter {
    * The exclusive end index for the block to start at. Leaving `undefined` means continue indefinitely, waiting for new blocks to come in.
    */
   readonly indexStop?: number;
+}
+
+/**
+ * Additional optional options for methods that iterate over data by block index.
+ */
+export interface IterOptions extends BlockFilter {
   /**
    * The `Monitor` to use for tracking all asynchronous calls made in the process of pulling data.
    */

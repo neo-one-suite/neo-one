@@ -39,46 +39,46 @@ describe('arg assertions', () => {
     expect(() => args.assertNullableNumber('value', value)).toThrowErrorMatchingSnapshot();
   });
 
-  test('assertBlockFilter - valid', () => {
+  test('assertIterOptions - valid', () => {
     const value = data.blockFilters.valid;
 
-    expect(args.assertBlockFilter('value', value)).toEqual(value);
+    expect(args.assertIterOptions('value', value)).toEqual(value);
   });
 
-  test('assertBlockFilter - onlyStart', () => {
+  test('assertIterOptions - onlyStart', () => {
     const value = data.blockFilters.onlyStart;
 
-    expect(args.assertBlockFilter('value', value)).toEqual(value);
+    expect(args.assertIterOptions('value', value)).toEqual(value);
   });
 
-  test('assertBlockFilter - onlyStop', () => {
+  test('assertIterOptions - onlyStop', () => {
     const value = data.blockFilters.onlyStop;
 
-    expect(args.assertBlockFilter('value', value)).toEqual(value);
+    expect(args.assertIterOptions('value', value)).toEqual(value);
   });
 
-  test('assertBlockFilter - empty', () => {
+  test('assertIterOptions - empty', () => {
     const value = data.blockFilters.empty;
 
-    expect(args.assertBlockFilter('value', value)).toEqual(value);
+    expect(args.assertIterOptions('value', value)).toEqual(value);
   });
 
-  test('assertBlockFilter - undefined', () => {
+  test('assertIterOptions - undefined', () => {
     const value = undefined;
 
-    expect(args.assertBlockFilter('value', value)).toEqual(value);
+    expect(args.assertIterOptions('value', value)).toEqual(value);
   });
 
-  test('assertBlockFilter - non object', () => {
+  test('assertIterOptions - non object', () => {
     const value = true;
 
-    expect(() => args.assertBlockFilter('value', value)).toThrowErrorMatchingSnapshot();
+    expect(() => args.assertIterOptions('value', value)).toThrowErrorMatchingSnapshot();
   });
 
-  test('assertBlockFilter - invalid', () => {
+  test('assertIterOptions - invalid', () => {
     const value = data.blockFilters.invalid;
 
-    expect(() => args.assertBlockFilter('value', value)).toThrowErrorMatchingSnapshot();
+    expect(() => args.assertIterOptions('value', value)).toThrowErrorMatchingSnapshot();
   });
 
   test('assertGetOptions - valid', () => {

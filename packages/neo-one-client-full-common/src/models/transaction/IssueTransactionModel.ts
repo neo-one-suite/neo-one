@@ -1,13 +1,13 @@
 import {
   AttributeModel,
   InputModel,
-  InvalidFormatError,
   OutputModel,
   TransactionBaseModel,
   TransactionBaseModelAdd,
   TransactionTypeModel,
   WitnessModel,
 } from '@neo-one/client-common';
+import { InvalidVersionError } from '../../errors';
 
 export type IssueTransactionModelAdd<
   TAttribute extends AttributeModel = AttributeModel,
@@ -41,7 +41,7 @@ export class IssueTransactionModel<
     });
 
     if (this.version !== 0) {
-      throw new InvalidFormatError();
+      throw new InvalidVersionError(0, this.version);
     }
   }
 

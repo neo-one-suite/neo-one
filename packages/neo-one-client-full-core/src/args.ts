@@ -1,5 +1,5 @@
 // tslint:disable strict-type-predicates
-import { AssetType, BlockFilter, ContractParameterType, GetOptions } from '@neo-one/client-common';
+import { AssetType, ContractParameterType, GetOptions, IterOptions } from '@neo-one/client-common';
 import { args, InvalidArgumentError } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -21,29 +21,31 @@ export const assertNullableBigNumber = (name: string, value?: unknown): BigNumbe
   return args.assertBigNumber(name, value);
 };
 
-export const assertBlockFilter = (name: string, filter?: unknown): BlockFilter | undefined => {
-  if (filter == undefined) {
+export const assertIterOptions = (name: string, options?: unknown): IterOptions | undefined => {
+  if (options == undefined) {
     return undefined;
   }
 
-  if (!args.isObject(filter)) {
-    throw new InvalidArgumentError('BlockFilter', name, filter);
+  if (!args.isObject(options)) {
+    throw new InvalidArgumentError('IterOptions', name, options);
   }
 
-  if (_.isEmpty(filter)) {
+  if (_.isEmpty(options)) {
     return {};
   }
 
   const output = {
-    indexStart: args.assertProperty(filter, 'BlockFilter', 'indexStart', assertNullableNumber),
-    indexStop: args.assertProperty(filter, 'BlockFilter', 'indexStop', assertNullableNumber),
+    indexStart: args.assertProperty(options, 'IterOptions', 'indexStart', assertNullableNumber),
+    indexStop: args.assertProperty(options, 'IterOptions', 'indexStop', assertNullableNumber),
+    // tslint:disable-next-line no-any
+    monitor: (options as any).monitor,
   };
 
   if (output.indexStart !== undefined && output.indexStop !== undefined && output.indexStart > output.indexStop) {
     throw new InvalidArgumentError(
-      'BlockFilter',
+      'IterOptions',
       name,
-      JSON.stringify(filter),
+      JSON.stringify(options),
       'Index start was greater than index stop.',
     );
   }

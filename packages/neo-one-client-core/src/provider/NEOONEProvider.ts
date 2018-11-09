@@ -2,11 +2,11 @@ import {
   Account,
   AddressString,
   Block,
-  BlockFilter,
   GetOptions,
   Hash256String,
   Input,
   InputOutput,
+  IterOptions,
   NetworkSettings,
   NetworkType,
   Output,
@@ -146,12 +146,12 @@ export class NEOONEProvider implements Provider {
     return this.getProvider(network).getAccount(address, monitor);
   }
 
-  public iterActionsRaw(network: NetworkType, filter?: BlockFilter): AsyncIterable<RawAction> {
-    return this.getProvider(network).iterActionsRaw(filter);
+  public iterActionsRaw(network: NetworkType, options?: IterOptions): AsyncIterable<RawAction> {
+    return this.getProvider(network).iterActionsRaw(options);
   }
 
-  public iterBlocks(network: NetworkType, filter: BlockFilter = {}): AsyncIterable<Block> {
-    return this.getProvider(network).iterBlocks(filter);
+  public iterBlocks(network: NetworkType, options: IterOptions = {}): AsyncIterable<Block> {
+    return this.getProvider(network).iterBlocks(options);
   }
 
   private getProvider(network: NetworkType): NEOONEDataProvider | NEOONEOneDataProvider {
