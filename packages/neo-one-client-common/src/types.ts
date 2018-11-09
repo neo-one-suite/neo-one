@@ -1068,7 +1068,7 @@ export interface BlockFilter {
    */
   readonly indexStart?: number;
   /**
-   * The exclsuive end index for the block to start at. Leaving `undefined` means continue indefinitely, waiting for new blocks to come in.
+   * The exclusive end index for the block to start at. Leaving `undefined` means continue indefinitely, waiting for new blocks to come in.
    */
   readonly indexStop?: number;
   /**
@@ -2146,7 +2146,7 @@ export interface RawLog extends RawActionBase {
    */
   readonly type: 'Log';
   /**
-   * The raw message. This is unprocessed in the `message` of the
+   * The raw message. This is unprocessed in the `message`.
    */
   readonly message: string;
 }

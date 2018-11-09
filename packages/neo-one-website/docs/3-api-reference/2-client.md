@@ -24,8 +24,206 @@ This reference uses dot syntax to indicate static properties and `#` to indicate
 ---
 
 #### `Client`
+
+Main entrypoint to the `@neo-one/client` APIs. The `Client` class abstracts away user accounts and even how those accounts are provided to your dapp, for example, they might come from an extension like NEX, dapp browser like nOS or through some other integration. See the [Client APIs](https://neo-one.io/docs/client-apis) chapter of the main guide for more information.
+
+##### `Client#hooks`
+
+Hook into the lifecycle of various requests. Can be used to automatically add logging, or parameter transformations across the application, for example.
+
+##### `Client#currentUserAccount$`
+
+Emits a value whenever a new list of user accounts is available. Immediately emits the latest value when subscribed to.
+
+##### `Client#userAccounts$`
+
+Emits a value whenever a new network is selected. Immediately emits the latest value when subscribed to.
+
+##### `Client#currentNetwork$`
+
+Emits a value whenever a new network is selected. Immediately emits the latest value when subscribed to.
+
+##### `Client#networks$`
+
+Emits a value whenever a new list of networks user account is available. Immediately emits the latest value when subscribed to.
+
+##### `Client#blocks$`
+
+Emits a value whenever a block is persisted to the blockchain. Immediately emits the latest block/network when subscribed to.
+
+##### `Client#accountState$`
+
+Emits a value whenever a new user account is selected and whenever a block is persisted to the blockchain. Immediately emits the latest value when subscribed to.
+
+##### `Client#providers`
+
+The configured `UserAccountProvider`s for this `Client` instance.
+
+##### `Client#getUserAccount`
+
+```typescript
+interface Client {
+  readonly getUserAccount: (idIn: UserAccountID) => UserAccount;
+}
+```
+
+Get the details of the `UserAccount` for a given `UserAccountID`. @returns `UserAccount` or throws an `UnknownAccountError` if one could not be found.
+
+##### `Client#selectUserAccount`
+
+```typescript
+interface Client {
+  readonly selectUserAccount: (idIn?: UserAccountID) => Promise<void>;
+}
+```
+
+Sets a `UserAccountID` as the currently selected `UserAccountID`.
+
+##### `Client#selectNetwork`
+
+```typescript
+interface Client {
+  readonly selectNetwork: (networkIn: NetworkType) => Promise<void>;
+}
+```
+
+Sets a `NetworkType` as the currently selected `NetworkType`.
+
+##### `Client#getSupportFeatures`
+
+```typescript
+interface Client {
+  readonly getSupportedFeatures: (idIn: UserAccountID) => Promise<UserAccountFeatures>;
+}
+```
+
+@returns `Promise` which resolves to the `UserAccountFeatures` supported by the given `UserAccountID`.
+
+##### `Client#deleteUserAccount`
+
+```typescript
+interface Client {
+  readonly deleteUserAccount: (idIn: UserAccountID) => Promise<void>;
+}
+```
+
+Deletes the `UserAccountID` from its underlying provider. Throws an `DeleteUserAccountUnsupportedError` if the operation is unsupported. Users should check `getSupportedFeatures` before calling this method.
+
+##### `Client#updateUserAccountName`
+
+```typescript
+interface Client {
+  readonly updateUserAccountName: (options: UpdateAccountNameOptions) => Promise<void>;
+}
+```
+
+Updates the name of the `UserAccountID` in the underlying provider. Throws an `UpdateUserAccountUnsupportedError` if the operation is unsupported. Users should check `getSupportedFeatures` before calling this method.
+
+##### `Client#getCurrentUserAccount`
+
+```typescript
+interface Client {
+  readonly getCurrentUserAccount: () => UserAccount | undefined;
+}
+```
+
+@returns the currently selected `UserAccount` or `undefined` if there are no `UserAccount`s.
+
+##### `Client#getCurrentNetwork`
+
+```typescript
+interface Client {
+  readonly getCurrentNetwork: () => NetworkType;
+}
+```
+
+@returns the currently selected `NetworkType`.
+
+##### `Client#getUserAccounts`
+
+```typescript
+interface Client {
+  readonly getUserAccounts: () => ReadonlyArray<UserAccount>;
+}
+```
+
+@returns a list of all available `UserAccount`s.
+
+##### `Client#getNetworks`
+
+```typescript
+interface Client {
+  readonly getNetworks: () => ReadonlyArray<NetworkType>;
+}
+```
+
+@returns a list of all available `NetworkType`s.
+
+##### `Client#smartContract`
+
+```typescript
+interface Client {
+  readonly smartContract<T extends SmartContract<any, any> = SmartContractAny>: (definition: SmartContractDefinition) => T;
+}
+```
+
+Constructs a `SmartContract` instance for the provided `definition` backed by this `Client` instance.
+
+##### `Client#transfer`
+
+```typescript
+interface Client {
+  readonly transfer: (
+    amount: BigNumber,
+    asset: Hash256String,
+    to: AddressString,
+    options?: TransactionOptions,
+    ) => Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>;
+}
+```
+
+Transfer native assets in the specified amount(s) to the specified Address(es). Accepts either a single transfer or an array of transfer objects. Note that we use an `InvocationTransaction` for transfers in order to reduce the overall bundle size since they can be used equivalently to `ContractTransaction`s. @returns `Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>`.
+
+##### `Client#claim`
+
+```typescript
+interface Client {
+  readonly claim: (optionsIn?: TransactionOptions) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+}
+```
+
+Claim all available unclaimed `GAS` for the currently selected account (or the specified `from` `UserAccountID`).
+
+##### `Client#getAccount`
+
+```typescript
+interface Client {
+  readonly getAccount: (id: UserAccountID) => Promise<Account>;
+}
+```
+
+@returns `Promise` which resolves to an `Account` object for the provided `UserAccountID`.
+
+
 #### `UpdateAccountNameOptions`
+
+Options for the `UserAccountProvider#updateAccountName` method.
+
+##### `UpdateAccountNameOptions#id`
+
+`UserAccountID` of the `UserAccount` to update.
+
+##### `UpdateAccountNameOptions#name`
+
+New name of the `UserAccount`.
+
+##### `UpdateAccountNameOptions#monitor`
+
+Optional `Monitor` for any logging that occurs during the update process.
+
 #### `UserAccountProvider`
+
+`UserAccountProvider`s power `Client` instances. Multiple `UserAccountProvider`s may be provided, and the `Client` abstracts over them to provide a common layer of functionality independent of the underlying `UserAccountProvider`s.
 
 ##### `UserAccountProvider#currentUserAccount$`
 
@@ -269,6 +467,12 @@ Invokes the constant `method` on `contract` with `params` on `network`.
 
 #### `UserAccountProviders`
 
+An object of `UserAccountProvider`s.
+
+#### `UserAccountProviders#[type: string]`
+
+Key index may be arbitrary and is primarily intended to allow for a more specific `Client` TypeScript type to enable direct access to the underlying providers, if needed.
+
 #### `AddressString`
 
 Base58 encoded string that represents a NEO address. Also accepts Hash160 strings (hex encoded string prefixed by '0x') when used as a parameter to a NEO•ONE function. Always the base58 encoded string form when returned from a NEO•ONE function.
@@ -364,6 +568,8 @@ The NEO address.
 
 #### `NetworkType`
 
+Implementation defined string for selecting the network to use. `'main'` refers to the NEO MainNet and `'test'` refers to the NEO TestNet. `'local'` is typically used to indicate a local development network.
+
 ```typescript
 type NetworkType =
   | 'main'
@@ -372,10 +578,52 @@ type NetworkType =
 ```
 
 #### `Transfer`
+
+Represents a transfer of native assets.
+
+##### `Transfer#amount`
+
+Amount to be transferred.
+
+##### `Transfer#asset`
+
+`Hash256` in string format of the native `Asset` to transfer.
+
+##### `Transfer#to`
+
+Destination address.
+
 #### `GetOptions`
+
+Common options for operations that fetch data from the blockchain.
+
+##### `GetOptions#timeoutMS`
+
+Time in milliseconds before timing out the operation.
+
+##### `GetOptions#monitor`
+
+`Monitor` to use for all logging of the operation.
+
 #### `BlockFilter`
 
+Filter that specifies (optionally) a block index to start at and (optionally) a block index to end at.
+
+##### `BlockFilter#indexStart`
+
+The inclusive start index for the first block to include. Leaving `undefined` means start from the beginning of the blockchain, i.e. index 0.
+
+##### `BlockFilter#indexStop`
+
+The exclusive end index for the block to start at. Leaving `undefined` means continue indefinitely, waiting for new blocks to come in.
+
+##### `BlockFilter#monitor`
+
+The `Monitor` to use for tracking all asynchronous calls made in the process of pulling data.
+
 #### `TransactionOptions`
+
+Common options for all methods in the client APIs that create transactions.
 
 ##### `TransactionOptions#from`
 
@@ -414,7 +662,28 @@ Receipt of a confirmed `Transaction` which contains data about the confirmation 
 Transaction index of the `Transaction` within the `Block` for this receipt.
 
 #### `TransactionResult`
+
+The result of a successful relay of a `Transaction`.
+
+##### `TransactionResult#transaction`
+
+`Transaction` that was relayed.
+
+##### `TransactionResult#confirmed`
+
+```typescript
+interface TransactionResult {
+  readonly confirmed: (options?: GetOptions) => Promise<TTransactionReceipt>;
+}
+```
+
+Waits for the `Transaction` to be confirmed on the blockchain. @returns `Promise` that resolves when the `Transaction` has been confirmed, resolving to the confirmation receipt.
+
 #### `NetworkSettings`
+
+Constant settings used to initialize the client APIs.
+
+##### `NetworkSettings#issueGASFee`
 
 ---
 
@@ -425,22 +694,142 @@ Transaction index of the `Transaction` within the `Block` for this receipt.
 ---
 
 #### `LocalUserAccountProvider`
+
+Implements `UserAccountProvider` using a `KeyStore` instance and a `Provider` instance. See the [LocalUserAccountProvider](https://neo-one.io/docs/user-accounts#LocalUserAccountProvider) section of the advanced guide for more details.
+
 #### `LocalKeyStore`
+
+`LocalKeyStore` implements the `KeyStore` interface expected by `LocalUserAccountProvider` via an underlying `Store` implementation.
+
 #### `LocalMemoryStore`
+
+Dummy implementation of the `LocalStore` interface which causes the `LocalKeyStore` to be entirely in-memory.
+
 #### `LocalStringStore`
+
+Implements the `LocalStore` interface expected by `LocalKeyStore`.
+
 #### `UnlockedWallet`
+
+Wallet in the "unlocked" state.
+
+##### `UnlockedWallet#type`
+
+`type` differentiates an `UnlockedWallet` from other `LocalWallet`s, i.e. an `LockedWallet`
+
+##### `UnlockedWallet#account`
+
+`UserAccount` this `UnlockedWallet` refers to.
+
+##### `UnlockedWallet#privateKey`
+
+Private key for this `UnlockedWallet`.
+
+##### `UnlockedWallet#nep2`
+
+NEP-2 encrypted key of this `UnlockedWallet`. `undefined` if the `privateKey` has never been encrypted.
+
+#### `LockedWallet`
+
+Wallet in the "locked" state.
+
+##### `LockedWallet#type`
+
+`type` differentiates a `LockedWallet` from other `LocalWallet`s, i.e. an `UnlockedWallet`.
+
+##### `LockedWallet#account`
+
+`UserAccount` this `LockedWallet` refers to.
+
+##### `LockedWallet#nep2`
+
+NEP-2 encrypted key of this `LockedWallet`.
+
 #### `LocalWallet`
+
+Locally stored wallet that is either in a `'locked'` or `'unlocked'` state (`type`).
+
 #### `NEOONEDataProvider`
+
+Implements the methods required by the `NEOONEProvider` as well as the `DeveloperProvider` interface using a NEO•ONE node.
+
 #### `NEOONEDataProviderOptions`
+
 #### `NEOONEOneDataProvider`
+
+Implements the methods required by the `NEOONEProvider` as well as the `DeveloperProvider` interface using a NEO•ONE node that is looked up through the local NEO•ONE `projectID`.
+
 #### `NEOONEProvider`
+
+Implements the `Provider` interface expected by a `LocalUserAccountProvider` using a NEO•ONE node.
+
 #### `Peer`
+
+Peers connected to the node.
+
 #### `JSONRPCProvider`
+
+Base interface for handling `JSONRPCRequest`s and returning `JSONRPCResponse`s.
+
 #### `JSONRPCRequest`
+
+jsonrpc request object.
+
+##### `JSONRPCRequest#method`
+
+Method to be invoked.
+
+##### `JSONRPCRequest#params`
+
+Invocation params.
+
+##### `JSONRPCRequest#watchTimeoutMS`
+
+How long to leave the request open (i.e. long-polling) to wait for a result for given `method` and `params`.
+
 #### `JSONRPCResponse`
+
+jsonrpc response object.
+
 #### `RelayTransactionResult`
+
+Raw result of relaying a `Transaction`. Further consumed and processed by `LocalUserAccountProvider` and `ABI`.
+
+##### `RelayTransactionResult#transaction`
+
+Relayed `Transaction`.
+
+##### `RelayTransactionResult#verifyResult`
+
+Verification result.
+
 #### `VerifyTransactionResult`
+
+Interface which describes the result of verification invocation.
+
+##### `VerifyTransactionResult#verifications`
+
+All verifications that happened during the relay of the `Transaction`.
+
 #### `VerifyScriptResult`
+
+An individual verification and the associated data.
+
+##### `VerifyScriptResult#failureMessage`
+
+`undefined` if the verification passed, otherwise a message that describes the failure.
+
+##### `VerifyScriptResult#address`
+
+The smart contract this result is associated with.
+
+##### `VerifyScriptResult#witness`
+
+The specific `Witness` that was checked.
+
+##### `VerifyScriptResult#actions`
+
+The actions emitted during the verification.
 
 ---
 
@@ -645,13 +1034,89 @@ The original, unprocessed, `RawInvokeReceipt`. The `RawInvokeReceipt` is transfo
 Additional parameters available to methods that support receiving native `Asset`s to the smart contract, i.e. they have been annotated with `@receive`.
 
 #### `InvokeSendUnsafeReceiveTransactionOptions`
+
+*extends:*
+  - `InvokeSendUnsafeTransactionOptions`
+  - `InvokeReceiveTransactionOptions`
+
+Additional parameters available to methods that support unsafely sending native `Asset`s from the smart contract and receiving native `Asset`s to the smart contract, i.e. they have been annotated with both `@sendUnsafe` and `@receive`.
+
 #### `InvokeSendUnsafeTransactionOptions`
+
+*extends:*
+  - `TransactionOptions`
+
+Additional parameters available to methods that support unsafely sending native `Asset`s from the smart contract, i.e. they have been annotated with `@sendUnsafe`.
+
+##### `InvokeSendUnsafeTransactionOptions#sendFrom`
+
+`Transfer`s that specify native assets to send from the contract.
+
 #### `ForwardOptions`
+
+Additional options that are automatically provided by the `forward<method>Args` method. In particular, this object provides the event specification when forwarding values.
+
+##### `ForwardOptions#events`
+
+Additional events that may be emitted due to forwarding arguments to another smart contract method.
+
 #### `ForwardValue`
+
+`ForwardValue` represents a value that's intended to be forwarded to another smart contract method. This object is not meant to be directly constructued, instead one should produce them via the automatically generated `forward<method>Args` methods. See the [Forward Values](https://neo-one.io/docs/forward-values) chapter of the advanced guide for more information.
+
 #### `Action`
+
+An `Action` is either an `Event` or `Log` emitted by the smart contract during a method invocation.
+
 #### `Event`
+
+Structured data emitted by a smart contract during a method invocation. Typically emitted in response to state changes within the contract and to notify contract listeners of an action happening within the contract.
+
+##### `Event#type`
+
+`type` differentiates the `Event` object from other `Action` objects, i.e. `Log`.
+
+##### `Event#name`
+
+An implementation defined string identifying this `Event`. In the automatically generated NEO•ONE smart contract APIs this identifier distinguishes the type of `Event` and the exact type of the `parameters` of the `Event`.
+
+ **Example:**
+
+```typescript
+'transfer'
+'mint'
+```
+
+##### `Event#parameters`
+
+Structured data attached to the event.
+
+ **Example:**
+
+```typescript
+{ from: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR', to: 'ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s', amount: new BigNumber(10) }
+```
+
 #### `EventParameters`
+
+The base type of the `Event` parameters. This type is specialized automatically with the generated NEO•ONE smart contract APIs.
+
+##### `EventParameters#[name: string]`
+
+Note that arbitrary string indices are not supported - the exact indices are implementation defined for a particular `Event` name.
+
 #### `Log`
+
+Unstructured string emitted by a smart contract during a method invocation.
+
+##### `Log#type`
+
+`type` differentiates the `Log` object from other `Action` objects, i.e. `Event`.
+
+##### `Log#message`
+
+An implementation defined string representing a log message.
+
 #### `ABI`
 
 Full specification of the functions and events of a smart contract. Used by the client APIs to generate the smart contract interface. See the [Smart Contract APIs](/docs/smart-contract-apis) chapter of the main guide for more information.
@@ -1092,6 +1557,8 @@ Smart contract source maps.
 
 #### `DeveloperClient`
 
+Client which controls a development network.
+
 ##### `DeveloperClient#runConsensusNow`
 
 ```typescript
@@ -1153,8 +1620,29 @@ interface DeveloperClient {
 Reset the local network to it's initial state starting at the genesis block.
 
 #### `DeveloperProvider`
+
+Provides the core functionality required by the `DeveloperClient`.
+
 #### `PrivateNetworkSettings`
+
+Settings that may be modified on a local NEO•ONE private network.
+
+##### `PrivateNetworkSettings#secondsPerBlock`
+
+Time until the next block starts to be produced.
+
 #### `LocalClient`
+
+Client which controls a local NEO•ONE toolchain.
+
+##### `LocalClient#getNEOTrackerURL`
+
+Returns the local toolchain's NEO Tracker url.
+
+##### `LocalClient#reset`
+
+Resets the local toolchain to its initial state by resetting the local developer network and redeploying contracts.
+
 #### `OneClient`
 
 ---
@@ -1166,20 +1654,134 @@ Reset the local network to it's initial state starting at the genesis block.
 ---
 
 #### `Hash256`
+
+Common `Hash256String`s.
+
+##### `Hash256.NEO`
+
+`Hash256String` of the NEO `Asset`.
+
+##### `Hash256.GAS`
+
+`Hash256String` of the GAS `Asset`.
+
 #### `nep5`
+
 #### `createPrivateKey`
+
+```typescript
+const createPrivateKey = (): PrivateKeyString
+```
+
+Creates a new cryptographically secure private key. @returns hex-encoded private key.
+
 #### `decryptNEP2`
+
+```typescript
+const decryptNEP2 = async ({
+  password,
+  encryptedKey,
+}: {
+  readonly password: string;
+  readonly encryptedKey: string;
+}): Promise<PrivateKeyString>
+```
+
+Decrypts a private key encrypted using the NEP-2 standard with the given password. @returns hex-encoded private key.
+
 #### `encryptNEP2`
+
+```typescript
+type encryptNEP2 = async ({
+  password,
+  privateKey,
+}: {
+  readonly password: string;
+  readonly privateKey: PrivateKeyString;
+}): Promise<string>
+```
+
+Encrypts a private key with a password using the NEP-2 standard. @returns NEP-2 format encrypted key.
+
 #### `isNEP2`
+
+```typescript
+const isNEP2 = (encryptedKey: string): boolean
+```
+
+Validates if a given string is a NEP-2 encrypted private key. @returns `true` if it's a valid NEP-2 key, `false` otherwise.
+
 #### `addressToScriptHash`
+
+```typescript
+const addressToScriptHash = (address: AddressString): string
+```
+
+Converts a base58 encoded NEO `Address` into a `Hash160` script hash. @returns `Hash160` string, a hex encoded string prefixed by '0x'.
+
 #### `privateKeyToAddress`
+
+```typescript
+const privateKeyToAddress = (privateKey: PrivateKeyString): AddressString
+```
+
+Converts a hex-encoded private key to a base58 encoded NEO `Address`. @returns base58 encoded string that represents a NEO address.
+
 #### `privateKeyToPublicKey`
+
+```typescript
+const privateKeyToPublicKey = (privateKey: PrivateKeyString): PublicKeyString
+```
+
+Converts a hex-encoded private key to a hex-encoded public key. @returns hex-encoded public key.
+
 #### `privateKeyToScriptHash`
+
+```typescript
+const privateKeyToScriptHash = (privateKey: PrivateKeyString): string
+```
+
+Converts a hex-encoded private key to a `Hash160` script hash. @returns `Hash160` string, a hex encoded string prefixed by '0x'.
+
 #### `privateKeyToWIF`
+
+```typescript
+const privateKeyToWIF = (privateKey: PrivateKeyString): string
+```
+
+Converts a hex-encoded private key to a wallet-import-format (WIF) private key. @returns wallet-import-format (WIF) private key.
+
 #### `publicKeyToAddress`
+
+```typescript
+const publicKeyToAddress = (publicKey: PublicKeyString): AddressString
+```
+
+Converts a hex-encoded public key into a base58 encoded NEO `Address`. @returns base58 encoded string that represents a NEO address.
+
 #### `publicKeyToScriptHash`
+
+```typescript
+const publicKeyToScriptHash = (publicKey: PublicKeyString): string
+```
+
+Converts a hex-encoded public key into a `Hash160` script hash. @returns `Hash160` string, a hex encoded string prefixed by '0x'.
+
 #### `scriptHashToAddress`
+
+```typescript
+const scriptHashToAddress = (scriptHash: string): AddressString
+```
+
+Converts a `Hash160` script hash into a base58 encoded NEO `Address`. @returns base58 encoded string that represents a NEO address.
+
 #### `wifToPrivateKey`
+
+```typescript
+const wifToPrivateKey = (wif: string): PrivateKeyString
+```
+
+Converts a wallet-import-format (WIF) private key to a hex-encoded private key. @returns hex-encoded private key.
 
 ---
 
@@ -1247,9 +1849,16 @@ Admin of the `Asset`.
 Issuer of the `Asset`.
 
 #### `Asset#expiration`
+
+Unix timestamp of when the `Asset` must be renewed by or it expires.
+
 #### `Asset#frozen`
 
+`true` if no transfers are allowed with the `Asset`.
+
 #### `AssetType`
+
+Constants that describe the type of `Asset`. The two most important ones are `'Governing'` and `'Utility'` which are reserved for NEO and GAS respectively.
 
 ```typescript
 type AssetType =
@@ -1276,14 +1885,39 @@ type Attribute =
 ```
 
 #### `AttributeBase`
+
+Base interface for `Attribute`s.
+
+##### `AttributeBase#usage`
+
+`usage` distinguishes the various `Attribute` types.
+
 #### `AttributeUsage`
+
+`Attribute` usage flag indicates the type of the data.
+
+```typescript
+type AttributeUsage =
+  | BufferAttributeUsage
+  | PublicKeyAttributeUsage
+  | Hash256AttributeUsage
+  | AddressAttributeUsage;
+```
+
 #### `AddressAttribute`
-#### `AddressAttributeUsage`
-#### `BufferAttribute`
-#### `BufferAttributeUsage`
-#### `Hash256Attribute`
-#### `Hash256AttributeUsage`
-#### `PublicKeyAttribute`
+
+*extends:*
+  -`AttributeBase`
+
+`Attribute` whose data is an `AddressString`.
+
+##### `AddressAttribute#usage`
+
+`usage` distinguishes `AddressAttribute` from other `Attribute` object types.
+
+##### `AddressAttribute#data`
+
+NEO `Address` as a string of the `Attribute`.
 
 #### `AddressAttributeUsage`
 
@@ -1292,6 +1926,22 @@ type AddressAttributeUsage = 'Script';
 ```
 
 `Attribute` usage flag indicating the data is a `Hash256`.
+
+
+#### `BufferAttribute`
+
+*extends:*
+  -`AttributeBase`
+
+`Attribute` whose data is an arbitrary `BufferString`.
+
+##### `BufferAttribute#usage`
+
+`usage` distinguishes `BufferAttribute` from other `Attribute` object types.
+
+##### `BufferAttribute#data`
+
+Hex encoded data of the `Attribute`.
 
 #### `BufferAttributeUsage`
 
@@ -1319,6 +1969,21 @@ type BufferAttributeUsage =
   | 'Remark15';
 ```
 
+#### `Hash256Attribute`
+
+*extends:*
+  -`AttributeBase`
+
+`Attribute` whose data is a `Hash256`.
+
+#### `Hash256Attribute#usage`
+
+`usage` distinguishes `Hash256Attribute` from other `Attribute` object types.
+
+#### `Hash256Attribute#data`
+
+NEO `Hash256` as a string of the `Attribute`.
+
 #### `Hash256AttributeUsage`
 
 `Attribute` usage flag indicating the data is a `Hash256`.
@@ -1344,6 +2009,21 @@ type Hash256AttributeUsage =
   | 'Hash15';
 ```
 
+#### `PublicKeyAttribute`
+
+*extends:*
+  -`AttributeBase`
+
+`Attribute` whose data is a `PublicKeyString`.
+
+##### `PublicKeyAttribute#usage`
+
+`usage` distinguishes `PublicKeyAttribute` from other `Attribute` object types.
+
+#### `PublicKeyAttribute#data`
+
+Public key as a string of the `Attribute`.
+
 #### `PublicKeyAttributeUsage`
 
 `Attribute` usage flag indicating the data is a `PublicKey`.
@@ -1354,13 +2034,20 @@ type PublicKeyAttributeUsage = 'ECDH02' | 'ECDH03';
 
 #### `Block`
 
+*extends:*
+  - `Header`
+
 ##### `Block#transactions`
 
 `Transaction`s contained in the `Block`.
 
 #### `Contract`
 
+Attributes of a deployed smart contract.
+
 ##### `Contract#version`
+
+NEO protocol version.
 
 ##### `Contract#address`
 
@@ -1412,6 +2099,8 @@ Description of this `Contract`. For informational purposes only.
 
 #### `Header`
 
+All of the properties of a `Block` except the `Transaction`s themselves.
+
 #### `Header#version`
 
 NEO blockchain version.
@@ -1421,7 +2110,12 @@ NEO blockchain version.
 `Block` hash.
 
 #### `Header#previousBlockHash`
+
+Previous `Block` hash.
+
 #### `Header#merkleRoot`
+
+Merkle Root of the `Transaction`s of this `Block`.
 
 #### `Header#time`
 
@@ -1433,12 +2127,19 @@ NEO blockchain version.
 
 #### `Header#nonce`
 
+Unique number to ensure the block hash is always unique.
+
 #### `Header#nextConsensus`
 
 Next consensus address.
 
 #### `Header#script`
+
+"Witness" to the `Block`'s validity.
+
 #### `Header#size`
+
+ Size in bytes of the `Block`.
 
 #### `Input`
 
@@ -1470,6 +2171,16 @@ Destination `Address`.
 
 #### `Witness`
 
+`Witness` is just that, a "witness" to the transaction, meaning they have approved the transaction. Can vary from a simple signature of the transaction for a given `Address`' private key or a "witness" being a smart contract and the way it's verified is by executing the smart contract code.
+
+##### `Witness#invocation`
+
+Sets up the stack for the `verification` script.
+
+##### `Witness#verification`
+
+A script that should leave either a `true` value on the stack if the `Witness` is valid, or `false` otherwise.
+
 #### `Transaction`
 
 `Transaction`s are relayed to the blockchain and contain information that is to be permanently stored on the blockchain. They may contain `Input`s and `Output`s corresponding to transfers of native `Asset`s. Each `Transaction` type serves a particular purpose, see the documentation for each for more information.
@@ -1493,6 +2204,8 @@ Base interface for all `Transaction`s.
 
 ##### `TransactionBase#version`
 
+NEO protocol version.
+
 ##### `TransactionBase#hash`
 
 `Hash256` of this `Transaction`.
@@ -1514,8 +2227,16 @@ Byte size of this `Transaction`.
 `Output`s of the `Transaction`.
 
 ##### `TransactionBase#scripts`
+
+`Witness`es to the `Transaction`, i.e. the `Address`es that have signed the `Transasction`.
+
 ##### `TransactionBase#systemFee`
+
+GAS execution fee for the transaction.
+
 ##### `TransactionBase#networkFee`
+
+GAS network priority fee for the transaction.
 
 
 #### `ClaimTransaction`
@@ -1637,7 +2358,7 @@ Registers a new first class `Asset`.
 #### `StateTransaction`
 
 *extends:*
-- `TransactionBase`
+  - `TransactionBase`
 
 ##### `StateTransaction#type`
 
@@ -1670,37 +2391,73 @@ Common propreties for all `ConfirmedTransaction`s.
 
 #### `ConfirmedClaimTransaction`
 
+*extends:*
+  - `ConfirmedTransactionBase`
+  - `ClaimTransaction`
+
 Confirmed variant of `ClaimTransaction`
 
 #### `ConfirmedContractTransaction`
+
+*extends:*
+  - `ConfirmedTransactionBase`
+  - `ContractTransaction`
 
 Confirmed variant of `ContractTransaction`
 
 #### `ConfirmedEnrollmentTransaction`
 
+*extends:*
+  - `ConfirmedTransactionBase`
+  - `EnrollmentTransaction`
+
 Confirmed variant of `EnrollmentTransaction`.
 
 #### `ConfirmedInvocationTransaction`
+
+*extends:*
+  - `ConfirmedTransactionBase`
+  - `InvocationTransaction`
 
 Confirmed variant of `InvocationTransaction`.
 
 #### `ConfirmedIssueTransaction`
 
+*extends:*
+  - `ConfirmedTransactionBase`
+  - `IssueTransaction`
+
 Confirmed variant of `IssueTransaction`.
 
 #### `ConfirmedMinerTransaction`
+
+*extends:*
+  - `ConfirmedTransactionBase`
+  - `MinerTransaction`
 
 Confirmed variant of `MinerTransaction`.
 
 #### `ConfirmedPublishTransaction`
 
+*extends:*
+  - `ConfirmedTransactionBase`
+  - `PublishTransaction`
+
 Confirmed variant of `PublishTransaction`.
 
 #### `ConfirmedRegisterTransaction`
 
+*extends:*
+  - `ConfirmedTransactionBase`
+  - `RegisterTransaction`
+
 Confirmed variant of `RegisterTransaction`.
 
 #### `ConfirmedStateTransaction`
+
+*extends:*
+  - `ConfirmedTransactionBase`
+  - `StateTransaction`
 
 Confirmed variant of `StateTransaction`.
 
@@ -1713,24 +2470,310 @@ Confirmed variant of `StateTransaction`.
 ---
 
 #### `RawAction`
+
+Raw action emitted during an invocation. Low-level API for advanced usage only.
+
 #### `RawActionBase`
+
+Base properties of `Event`s and `Log`s as well as their raw counterparts, `RawNotification` and `RawLog`, respectively.
+
+##### `RawActionBase#version`
+
+NEO network version number.
+
+##### `RawActionBase#blockIndex`
+
+Index of the block this action was emitted in.
+
+##### `RawActionBase#blockHash`
+
+Hash of the block this action was emitted in.
+
+##### `RawActionBase#transactionIndex`
+
+Index of the transaction within the block this action was emitted in.
+
+##### `RawActionBase#transactionHash`
+
+Hash of the transaction within the block this action was emitted in.
+
+##### `RawActionBase#index`
+
+Ordered index of the action of when it occurred within the transaction.
+
+##### `RawActionBase#globalIndex`
+
+Ordered globally unique index of the action.
+
+##### `RawActionBase#address`
+
+Address of the smart contract that this action occurred in.
+
 #### `RawInvocationData`
+
+Additional raw data that is typically processed by an `ABI` for the client APIs.
+
+##### `RawInvocationData#asset`
+
+`Asset` created by the invocation.
+
+##### `RawInvocationData#contracts`
+
+`Contract`s created by the invocation.
+
+##### `RawInvocationData#deletedContractAddresses`
+
+`Contract`s deleted by the invocation.
+
+##### `RawInvocationData#migratedContractAddresses`
+
+`Contract`s migrated (upgraded) by the invocation.
+
+##### `RawInvocationData#result`
+
+Raw result of an invocation.
+
+##### `RawInvocationData#actions`
+
+Raw actions emitted by the invocation.
+
 #### `RawInvocationResult`
+
+Raw result of an invocation. Low-level API for advanced usage only.
+
+```typescript
+type RawInvocationResult = RawInvocationResultError | RawInvocationResultSuccess;
+```
+
+#### `RawInvocationResultBase`
+
+Common `InvocationResult` and `RawInvocationResult` properties.
+
+##### `RawInvocationResultBase#gasConsumed`
+
+GAS consumed by the operation. This is the total GAS consumed after the free GAS is subtracted.
+
+##### `RawInvocationResultBase#gasCost`
+
+The total GAS cost before subtracting the free GAS.
+
 #### `RawInvocationResultError`
+
+*extends:*
+  - `RawInvocationResultBase`
+
+Raw result of a failed invocation. Low-level API for advanced usage only.
+
+##### `RawInvocationResultError#state`
+
+Indicates a failed invocation.
+
+##### `RawInvocationResultError#stack`
+
+The state of the NEO VM after execution. Typically has one `ContractParameter` which is the return value of the method invoked.
+
+##### `RawInvocationResultError#message`
+
+A descriptive message indicating why the invocation failed.
+
 #### `RawInvocationResultSuccess`
+
+*extends:*
+  - `RawInvocationResultBase`
+
+Raw result of a successful invocation. Low-level API for advanced usage only.
+
+##### `RawInvocationResultSuccess#state`
+
+Indicates a successful invocation.
+
+##### `RawInvocationResultSuccess#stack`
+
+The state of the NEO VM after execution. Typically has one `ContractParameter` which is the return value of the method invoked.
+
 #### `RawLog`
+
+Raw log emitted during an invocation.
+
+#### `RawLog#type`
+
+`type` differentiates the `RawLog` object from other `RawAction` objects, i.e. `RawNotification`.
+
+#### `RawLog#message`
+
+The raw message. This is unprocessed in the `message`.
+
 #### `RawNotification`
+
+*extends:*
+  - `RawActionBase`
+
+Raw notification emitted during an invocation. This is the unprocessed counterpart to an `Event`. Low-level API for advanced usage only.
+
+##### `RawNotification#type`
+
+`type` differentiates the `RawNotification` object from other `RawAction` objects, i.e. `RawLog`.
+
+##### `RawNotification#args`
+
+The raw arguments of the notifications. These are processed into the `parameters` parameter of the `Event` object using the `ABI`.
+
 #### `ContractParameter`
+
+`ContractParameter`s are the serialized stack items of an invocation. These are typically the raw results of an invocation, but they may appear in other raw contexts. Low-level API for advanced usage only.
+
+```typescript
+type ContractParameter =
+  | SignatureContractParameter
+  | BooleanContractParameter
+  | IntegerContractParameter
+  | AddressContractParameter
+  | Hash256ContractParameter
+  | BufferContractParameter
+  | PublicKeyContractParameter
+  | StringContractParameter
+  | ArrayContractParameter
+  | MapContractParameter
+  | InteropInterfaceContractParameter
+  | VoidContractParameter;
+```
+
 #### `ContractParameterType`
+
+All of the possible `type`s that a `ContractParameter` may have.
+
 #### `AddressContractParameter`
+
+Invocation stack item for an `Address`.
+
+##### `AddressContractParameter#type`
+
+`type` distinguishes `AddressContractParameter` from other `ContractParameter` object types.
+
+##### `AddressContractParameter#value`
+
+NEO address in base58 encoded string format.
+
 #### `ArrayContractParameter`
+
+Invocation stack item for an `Array`.
+
+##### `ArrayContractParameter#type`
+
+`type` distinguishes `ArrayContractParameter` from other `ContractParameter` object types.
+
+##### `ArrayContractParameter#value`
+
+An array of `ContractParameter`s.
+
 #### `BooleanContractParameter`
+
+Invocation stack item for a `boolean`.
+
+##### `BooleanContractParameter#type`
+
+`type` distinguishes `BooleanContractParameter` from other `ContractParameter` object types.
+
+##### `BooleanContractParameter#value`
+
+Raw boolean value.
+
 #### `BufferContractParameter`
+
+Invocation stack item for a `Buffer`.
+
+##### `BufferContractParameter#type`
+
+`type` distinguishes `BufferContractParameter` from other `ContractParameter` object types.
+
+##### `BufferContractParameter#value`
+
+Hex encoded `Buffer` string.
+
 #### `Hash256ContractParameter`
+
+Invocation stack item for a `Hash256`.
+
+##### `Hash256ContractParameter#type`
+
+`type` distinguishes `Hash256ContractParameter` from other `ContractParameter` object types.
+
+##### `Hash256ContractParameter#value`
+
+ NEO `Hash256` encoded as a string.
+
 #### `IntegerContractParameter`
+
+Invocation stack item for a `BN`.
+
+##### `IntegerContractParameter#type`
+
+Note that unlike most of the client APIs, we use a `BN` instead of a `BigNumber` here to indicate that this is an integer value.
+
+##### `IntegerContractParameter#value`
+
+For example, an `IntegerContractParameter` that represents a NEO value of 10 would be a `new BN(10_00000000)`.
+
 #### `InteropInterfaceContractParameter`
+
+Invocation stack item for anything other than the other valid contract parameters. Examples include the `Block` builtin. If these builtins remain on the stack after invocation, for example, as a return value, then they will be serialized as this empty interface.
+
+##### `InteropInterfaceContractParameter#type`
+
+`type` distinguishes `InteropInterfaceContractParameter` from other `ContractParameter` object types.
+
 #### `MapContractParameter`
+
+Invocation stack item for a `Map`.
+
+##### `MapContractParameter#type`
+
+`type` distinguishes `MapContractParameter` from other `ContractParameter` object types.
+
+##### `MapContractParameter#value`
+
+A map of `ContractParameter` to `ContractParameter`. Represented as an array of pairs because JavaScript `Map` keys do not have the same semantics as the NEO VM.
+
 #### `PublicKeyContractParameter`
+
+Invocation stack item for a `PublicKey`.
+
+##### `PublicKeyContractParameter#type`
+
+`type` distinguishes `PublicKeyContractParameter` from other `ContractParameter` object types.
+
+##### `PublicKeyContractParameter#value`
+
+String format of a public key.
+
 #### `SignatureContractParameter`
+
+Invocation stack item for a `Signature`.
+
+##### `SignatureContractParameter#type`
+
+`type` distinguishes `SignatureContractParameter` from other `ContractParameter` object types.
+
+##### `SignatureContractParameter#value`
+
+Raw signature string.
+
 #### `StringContractParameter`
+
+Invocation stack item for a `string`.
+
+##### `StringContractParameter#type`
+
+`type` distinguishes `StringContractParameter` from other `ContractParameter` object types.
+
+##### `StringContractParameter#value`
+
+Raw string value.
+
 #### `VoidContractParameter`
+
+Invocation stack item for `void`.
+
+##### `VoidContractParameter#type`
+
+`type` distinguishes `VoidContractParameter` from other `ContractParameter` object types.
