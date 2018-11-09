@@ -25,7 +25,7 @@ This reference uses dot syntax to indicate static properties and `#` to indicate
 
 #### `Client`
 
-Main entrypoint to the `@neo-one/client` APIs. The `Client` class abstracts away user accounts and even how those accounts are provided to your dapp, for example, they might come from an extension like NEX, dapp browser like nOS or through some other integration. See the [Client APIs](https://neo-one.io/docs/client-apis) chapter of the main guide for more information.
+Main entrypoint to the `@neo-one/client` APIs. The [`Client`](/docs/client#Client) class abstracts away user accounts and even how those accounts are provided to your dapp, for example, they might come from an extension like NEX, dapp browser like nOS or through some other integration. See the [Client APIs](/docs/client-apis) chapter of the main guide for more information.
 
 ##### `Client#hooks`
 
@@ -57,7 +57,7 @@ Emits a value whenever a new user account is selected and whenever a block is pe
 
 ##### `Client#providers`
 
-The configured `UserAccountProvider`s for this `Client` instance.
+The configured [`UserAccountProvider`](/docs/client#UserAccountProvider)s for this [`Client`](/docs/client#Client) instance.
 
 ##### `Client#getUserAccount`
 
@@ -67,7 +67,7 @@ interface Client {
 }
 ```
 
-Get the details of the `UserAccount` for a given `UserAccountID`. @returns `UserAccount` or throws an `UnknownAccountError` if one could not be found.
+Get the details of the [`UserAccount`](/docs/client#UserAccount) for a given [`UserAccountID`](/docs/client#UserAccountID). Returns [`UserAccount`](/docs/client#UserAccount) or throws an `UnknownAccountError` if one could not be found.
 
 ##### `Client#selectUserAccount`
 
@@ -77,7 +77,7 @@ interface Client {
 }
 ```
 
-Sets a `UserAccountID` as the currently selected `UserAccountID`.
+Sets a [`UserAccountID`](/docs/client#UserAccountID) as the currently selected [`UserAccountID`](/docs/client#UserAccountID).
 
 ##### `Client#selectNetwork`
 
@@ -87,7 +87,7 @@ interface Client {
 }
 ```
 
-Sets a `NetworkType` as the currently selected `NetworkType`.
+Sets a [`NetworkType`](/docs/client#NetworkType) as the currently selected [`NetworkType`](/docs/client#NetworkType).
 
 ##### `Client#getSupportFeatures`
 
@@ -97,7 +97,7 @@ interface Client {
 }
 ```
 
-@returns `Promise` which resolves to the `UserAccountFeatures` supported by the given `UserAccountID`.
+Returns `Promise` which resolves to the `UserAccountFeatures` supported by the given [`UserAccountID`](/docs/client#UserAccountID).
 
 ##### `Client#deleteUserAccount`
 
@@ -107,7 +107,7 @@ interface Client {
 }
 ```
 
-Deletes the `UserAccountID` from its underlying provider. Throws an `DeleteUserAccountUnsupportedError` if the operation is unsupported. Users should check `getSupportedFeatures` before calling this method.
+Deletes the [`UserAccountID`](/docs/client#UserAccountID) from its underlying provider. Throws an `DeleteUserAccountUnsupportedError` if the operation is unsupported. Users should check `getSupportedFeatures` before calling this method.
 
 ##### `Client#updateUserAccountName`
 
@@ -117,7 +117,7 @@ interface Client {
 }
 ```
 
-Updates the name of the `UserAccountID` in the underlying provider. Throws an `UpdateUserAccountUnsupportedError` if the operation is unsupported. Users should check `getSupportedFeatures` before calling this method.
+Updates the name of the [`UserAccountID`](/docs/client#UserAccountID) in the underlying provider. Throws an `UpdateUserAccountUnsupportedError` if the operation is unsupported. Users should check `getSupportedFeatures` before calling this method.
 
 ##### `Client#getCurrentUserAccount`
 
@@ -127,7 +127,7 @@ interface Client {
 }
 ```
 
-@returns the currently selected `UserAccount` or `undefined` if there are no `UserAccount`s.
+Returns the currently selected [`UserAccount`](/docs/client#UserAccount) or `undefined` if there are no [`UserAccount`](/docs/client#UserAccount)s.
 
 ##### `Client#getCurrentNetwork`
 
@@ -137,7 +137,7 @@ interface Client {
 }
 ```
 
-@returns the currently selected `NetworkType`.
+Returns the currently selected [`NetworkType`](/docs/client#NetworkType).
 
 ##### `Client#getUserAccounts`
 
@@ -147,7 +147,7 @@ interface Client {
 }
 ```
 
-@returns a list of all available `UserAccount`s.
+Returns a list of all available [`UserAccount`](/docs/client#UserAccount)s.
 
 ##### `Client#getNetworks`
 
@@ -157,7 +157,7 @@ interface Client {
 }
 ```
 
-@returns a list of all available `NetworkType`s.
+Returns a list of all available [`NetworkType`](/docs/client#NetworkType)s.
 
 ##### `Client#smartContract`
 
@@ -167,7 +167,7 @@ interface Client {
 }
 ```
 
-Constructs a `SmartContract` instance for the provided `definition` backed by this `Client` instance.
+Constructs a [`SmartContract`](/docs/client#SmartContract) instance for the provided `definition` backed by this [`Client`](/docs/client#Client) instance.
 
 ##### `Client#transfer`
 
@@ -182,7 +182,7 @@ interface Client {
 }
 ```
 
-Transfer native assets in the specified amount(s) to the specified Address(es). Accepts either a single transfer or an array of transfer objects. Note that we use an `InvocationTransaction` for transfers in order to reduce the overall bundle size since they can be used equivalently to `ContractTransaction`s. @returns `Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>`.
+Transfer native assets in the specified amount(s) to the specified Address(es). Accepts either a single transfer or an array of transfer objects. Note that we use an [`InvocationTransaction`](/docs/client#InvocationTransaction) for transfers in order to reduce the overall bundle size since they can be used equivalently to [`ContractTransaction`](/docs/client#ContractTransaction)s. Returns `Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>`.
 
 ##### `Client#claim`
 
@@ -192,7 +192,7 @@ interface Client {
 }
 ```
 
-Claim all available unclaimed `GAS` for the currently selected account (or the specified `from` `UserAccountID`).
+Claim all available unclaimed `GAS` for the currently selected account (or the specified `from` [`UserAccountID`](/docs/client#UserAccountID)).
 
 ##### `Client#getAccount`
 
@@ -202,20 +202,20 @@ interface Client {
 }
 ```
 
-@returns `Promise` which resolves to an `Account` object for the provided `UserAccountID`.
+Returns `Promise` which resolves to an [`Account`](/docs/client#Account) object for the provided [`UserAccountID`](/docs/client#UserAccountID).
 
 
 #### `UpdateAccountNameOptions`
 
-Options for the `UserAccountProvider#updateAccountName` method.
+Options for the [`UserAccountProvider#updateAccountName`](/docs/client#UserAccountProvider#updateAccountName) method.
 
 ##### `UpdateAccountNameOptions#id`
 
-`UserAccountID` of the `UserAccount` to update.
+[`UserAccountID`](/docs/client#UserAccountID) of the [`UserAccount`](/docs/client#UserAccount) to update.
 
 ##### `UpdateAccountNameOptions#name`
 
-New name of the `UserAccount`.
+New name of the [`UserAccount`](/docs/client#UserAccount).
 
 ##### `UpdateAccountNameOptions#monitor`
 
@@ -223,19 +223,19 @@ Optional `Monitor` for any logging that occurs during the update process.
 
 #### `UserAccountProvider`
 
-`UserAccountProvider`s power `Client` instances. Multiple `UserAccountProvider`s may be provided, and the `Client` abstracts over them to provide a common layer of functionality independent of the underlying `UserAccountProvider`s.
+[`UserAccountProvider`](/docs/client#UserAccountProvider)s power [`Client`](/docs/client#Client) instances. Multiple [`UserAccountProvider`](/docs/client#UserAccountProvider)s may be provided, and the [`Client`](/docs/client#Client) abstracts over them to provide a common layer of functionality independent of the underlying [`UserAccountProvider`](/docs/client#UserAccountProvider)s.
 
 ##### `UserAccountProvider#currentUserAccount$`
 
-An `Observable` that emits the currently selected `UserAccount`.
+An `Observable` that emits the currently selected [`UserAccount`](/docs/client#UserAccount).
 
 ##### `UserAccountProvider#userAccounts$`
 
-An `Observable` that emits the available `UserAccount`s.
+An `Observable` that emits the available [`UserAccount`](/docs/client#UserAccount)s.
 
 ##### `UserAccountProvider#networks$`
 
-An `Observable` that emits the available networks this `UserAccountProvider` knows how to function with.
+An `Observable` that emits the available networks this [`UserAccountProvider`](/docs/client#UserAccountProvider) knows how to function with.
 
 ##### `UserAccountProvider#getCurrentUserAccount`
 
@@ -245,7 +245,7 @@ interface UserAccountProvider {
 }
 ```
 
-Returns the currently selected `UserAccount` or `undefined` if one is not selected.
+Returns the currently selected [`UserAccount`](/docs/client#UserAccount) or `undefined` if one is not selected.
 
 ##### `UserAccountProvider#getUserAccounts`
 
@@ -255,7 +255,7 @@ interface UserAccountProvider {
 }
 ```
 
-Returns the available `UserAccount`s.
+Returns the available [`UserAccount`](/docs/client#UserAccount)s.
 
 ##### `UserAccountProvider#getNetworks`
 
@@ -265,7 +265,7 @@ interface UserAccountProvider {
 }
 ```
 
-Returns the available networks this `UserAccountProvider` knows how to function with.
+Returns the available networks this [`UserAccountProvider`](/docs/client#UserAccountProvider) knows how to function with.
 
 ##### `UserAccountProvider#selectUserAccount`
 
@@ -275,7 +275,7 @@ interface UserAccountProvider {
 }
 ```
 
-Set the given `UserAccountID` as the selected `UserAccount`. If the `UserAccountProvider` does not support programatically selecting a `UserAccountID`, it should only ever expose one available `UserAccount` and manage selecting other `UserAccount`s outside of the application.
+Set the given [`UserAccountID`](/docs/client#UserAccountID) as the selected [`UserAccount`](/docs/client#UserAccount). If the [`UserAccountProvider`](/docs/client#UserAccountProvider) does not support programatically selecting a [`UserAccountID`](/docs/client#UserAccountID), it should only ever expose one available [`UserAccount`](/docs/client#UserAccount) and manage selecting other [`UserAccount`](/docs/client#UserAccount)s outside of the application.
 
 ##### `UserAccountProvider#deleteUserAccount`
 
@@ -285,7 +285,7 @@ interface UserAccountProvider {
 }
 ```
 
-Optional support for deleting a `UserAccount`.
+Optional support for deleting a [`UserAccount`](/docs/client#UserAccount).
 
 ##### `UserAccountProvider#updateUserAccountName`
 
@@ -295,7 +295,7 @@ interface UserAccountProvider {
 }
 ```
 
-Optional support for updating the name of a `UserAccount`.
+Optional support for updating the name of a [`UserAccount`](/docs/client#UserAccount).
 
 ##### `UserAccountProvider#getBlockCount`
 
@@ -305,7 +305,7 @@ interface UserAccountProvider {
 }
 ```
 
-Returns the current `Block` height.
+Returns the current [`Block`](/docs/client#Block) height.
 
 ##### `UserAccountProvider#getAccount`
 
@@ -315,7 +315,7 @@ interface UserAccountProvider {
 }
 ```
 
-Returns `Account` for the specified network and address. Note that the provided network and address may not correspond to one of the available `UserAccount`s.
+Returns [`Account`](/docs/client#Account) for the specified network and address. Note that the provided network and address may not correspond to one of the available [`UserAccount`](/docs/client#UserAccount)s.
 
 ##### `UserAccountProvider#iterBlocks`
 
@@ -325,7 +325,7 @@ interface UserAccountProvider {
 }
 ```
 
-Returns `AsyncIterable` of `Block`s on the argument `network`.
+Returns `AsyncIterable` of [`Block`](/docs/client#Block)s on the argument `network`.
 
 ##### `UserAccountProvider#iterActionsRaw`
 
@@ -335,7 +335,7 @@ interface UserAccountProvider {
 }
 ```
 
-While this method could be implemented simply as a function of `iterBlocks`, `iterActionsRaw` is provided in case the `UserAccountProvider` has a more efficient way of iterating over actions. Returns `AsyncIterable` over all actions emitted by the given `network`, filtered by the given `filter`.
+While this method could be implemented simply as a function of `iterBlocks`, `iterActionsRaw` is provided in case the [`UserAccountProvider`](/docs/client#UserAccountProvider) has a more efficient way of iterating over actions. Returns `AsyncIterable` over all actions emitted by the given `network`, filtered by the given `filter`.
 
 ##### `UserAccountProvider#transfer`
 
@@ -376,7 +376,7 @@ interface UserAccountProvider {
 }
 ```
 
-Invoke the specified `method` with the given `params` on `contract`. `paramsZipped` contains the original parameters before processing with the ABI and are typically suitable for displaying to a user. `verify` will be true if the transaction should trigger verification for the `contract`. `options` may specify additional native asset transfers to include with the transaction (either to or from the contract address).
+Invoke the specified `method` with the given `params` on [`Contract`](/docs/client#Contract). `paramsZipped` contains the original parameters before processing with the ABI and are typically suitable for displaying to a user. `verify` will be true if the transaction should trigger verification for the [`Contract`](/docs/client#Contract). `options` may specify additional native asset transfers to include with the transaction (either to or from the contract address).
 
 ##### `UserAccountProvider#invokeSend`
 
@@ -394,7 +394,7 @@ interface UserAccountProvider {
 }
 ```
 
-Relays a transaction that is the first step of a two-step send process. The `Transfer`'s `to` property represents the ultimate destination of the funds, but this transaction will be constructed such that those funds are marked for transfer, not actually transferred. Otherwise, parameters are the same as `invoke`.
+Relays a transaction that is the first step of a two-step send process. The [`Transfer`](/docs/client#Transfer)'s `to` property represents the ultimate destination of the funds, but this transaction will be constructed such that those funds are marked for transfer, not actually transferred. Otherwise, parameters are the same as [`invoke`](/docs/client#UserAccountProvider#invoke).
 
 ##### `UserAccountProvider#invokeCompleteSend`
 
@@ -412,7 +412,7 @@ interface UserAccountProvider {
 }
 ```
 
-Relays a transaction that is the second step of a two-step send process. The `hash` is the transaction hash of the first step in the process and is used to determine the amount to transfer to the `from` address. Otherwise, parameters are the same as `invoke`.
+Relays a transaction that is the second step of a two-step send process. The `hash` is the transaction hash of the first step in the process and is used to determine the amount to transfer to the `from` address. Otherwise, parameters are the same as [`invoke`](/docs/client#UserAccountProvider#invoke).
 
 ##### `UserAccountProvider#invokeRefundAssets`
 
@@ -430,7 +430,7 @@ interface UserAccountProvider {
 }
 ```
 
-Refunds native assets that were not processed by the contract. The `hash` is the transaction hash that should be refunded and is used to construct the transfers for this transaction. Otherwise, parameters are the same as `invoke`.
+Refunds native assets that were not processed by the contract. The `hash` is the transaction hash that should be refunded and is used to construct the transfers for this transaction. Otherwise, parameters are the same as [`invoke`](/docs/client#UserAccountProvider#invoke).
 
 ##### `UserAccountProvider#invokeClaim`
 
@@ -447,7 +447,7 @@ interface UserAccountProvider {
 }
 ```
 
-Claims GAS. Currently only supports claiming all unclaimed GAS to the contract address. Otherwise, parameters are the same as `invoke`.
+Claims GAS. Currently only supports claiming all unclaimed GAS to the contract address. Otherwise, parameters are the same as [`invoke`](/docs/client#UserAccountProvider#invoke).
 
 ##### `UserAccountProvider#call`
 
@@ -463,15 +463,15 @@ interface UserAccountProvider {
 }
 ```
 
-Invokes the constant `method` on `contract` with `params` on `network`.
+Invokes the constant `method` on [`Contract`](/docs/client#Contract) with `params` on `network`.
 
 #### `UserAccountProviders`
 
-An object of `UserAccountProvider`s.
+An object of [`UserAccountProvider`](/docs/client#UserAccountProvider)s.
 
 #### `UserAccountProviders#[type: string]`
 
-Key index may be arbitrary and is primarily intended to allow for a more specific `Client` TypeScript type to enable direct access to the underlying providers, if needed.
+Key index may be arbitrary and is primarily intended to allow for a more specific [`Client`](/docs/client#Client) TypeScript type to enable direct access to the underlying providers, if needed.
 
 #### `AddressString`
 
@@ -488,7 +488,7 @@ Base58 encoded string that represents a NEO address. Also accepts Hash160 string
 
 #### `Hash256String`
 
-Hex encoded string prefixed by '0x' that represents a NEO 256 bit hash. Examples of `Hash256String` include `Block` hashes and `Transaction` hashes.
+Hex encoded string prefixed by '0x' that represents a NEO 256 bit hash. Examples of [`Hash256String`](/docs/client#Hash256String) include [`Block`](/docs/client#Block) hashes and [`Transaction`](/docs/client#Transaction) hashes.
 
  **Example:**
 
@@ -540,11 +540,11 @@ Hex encoded string that represents a buffer.
 
 #### `UserAccount`
 
-`UserAccount` is the base abstraction on which all of the @neo-one/client APIs work with.
+[`UserAccount`](/docs/client#UserAccount) is the base abstraction on which all of the @neo-one/client APIs work with.
 
 ##### `UserAccount#id`
 
-Uniquely identifies a `UserAccount` by its address and the network its used on.
+Uniquely identifies a [`UserAccount`](/docs/client#UserAccount) by its address and the network its used on.
 
 ##### `UserAccount#name`
 
@@ -556,7 +556,7 @@ The public key for the address.
 
 #### `UserAccountID`
 
-Uniquely identifies a `UserAccount` by its address and the network its used on.
+Uniquely identifies a [`UserAccount`](/docs/client#UserAccount) by its address and the network its used on.
 
 ##### `UserAccountID#network`
 
@@ -587,7 +587,7 @@ Amount to be transferred.
 
 ##### `Transfer#asset`
 
-`Hash256` in string format of the native `Asset` to transfer.
+[`Hash256`](/docs/client#Hash256) in string format of the native [`Asset`](/docs/client#Asset) to transfer.
 
 ##### `Transfer#to`
 
@@ -627,7 +627,7 @@ Common options for all methods in the client APIs that create transactions.
 
 ##### `TransactionOptions#from`
 
-The `UserAccount` that the transaction is "from", i.e. the one that will be used for native asset transfers, claims, and signing the transaction. If unspecified, the currently selected `UserAccount` is used as the `from` address. DApp developers will typically want to leave this unspecified.
+The [`UserAccount`](/docs/client#UserAccount) that the transaction is "from", i.e. the one that will be used for native asset transfers, claims, and signing the transaction. If unspecified, the currently selected [`UserAccount`](/docs/client#UserAccount) is used as the `from` address. DApp developers will typically want to leave this unspecified.
 
 ##### `TransactionOptions#attributes`
 
@@ -647,27 +647,27 @@ The `Monitor` to use for tracking and logging all asynchronous calls made during
 
 #### `TransactionReceipt`
 
-Receipt of a confirmed `Transaction` which contains data about the confirmation such as the `Block` index and the index of the `Transaction` within the block.
+Receipt of a confirmed [`Transaction`](/docs/client#Transaction) which contains data about the confirmation such as the [`Block`](/docs/client#Block) index and the index of the [`Transaction`](/docs/client#Transaction) within the block.
 
 ##### `TransactionReceipt#blockIndex`
 
-`Block` index of the `Transaction` for this receipt.
+[`Block`](/docs/client#Block) index of the [`Transaction`](/docs/client#Transaction) for this receipt.
 
 ##### `TransactionReceipt#blockHash`
 
-`Block` hash of the `Transaction` for this receipt.
+[`Block`](/docs/client#Block) hash of the [`Transaction`](/docs/client#Transaction) for this receipt.
 
 ##### `TransactionReceipt#transactionIndex`
 
-Transaction index of the `Transaction` within the `Block` for this receipt.
+Transaction index of the [`Transaction`](/docs/client#Transaction) within the [`Block`](/docs/client#Block) for this receipt.
 
 #### `TransactionResult`
 
-The result of a successful relay of a `Transaction`.
+The result of a successful relay of a [`Transaction`](/docs/client#Transaction).
 
 ##### `TransactionResult#transaction`
 
-`Transaction` that was relayed.
+[`Transaction`](/docs/client#Transaction) that was relayed.
 
 ##### `TransactionResult#confirmed`
 
@@ -677,7 +677,7 @@ interface TransactionResult {
 }
 ```
 
-Waits for the `Transaction` to be confirmed on the blockchain. @returns `Promise` that resolves when the `Transaction` has been confirmed, resolving to the confirmation receipt.
+Waits for the [`Transaction`](/docs/client#Transaction) to be confirmed on the blockchain. Returns `Promise` that resolves when the [`Transaction`](/docs/client#Transaction) has been confirmed, resolving to the confirmation receipt.
 
 #### `NetworkSettings`
 
@@ -695,19 +695,19 @@ Constant settings used to initialize the client APIs.
 
 #### `LocalUserAccountProvider`
 
-Implements `UserAccountProvider` using a `KeyStore` instance and a `Provider` instance. See the [LocalUserAccountProvider](https://neo-one.io/docs/user-accounts#LocalUserAccountProvider) section of the advanced guide for more details.
+Implements [`UserAccountProvider`](/docs/client#UserAccountProvider) using a `KeyStore` instance and a `Provider` instance. See the [LocalUserAccountProvider](/docs/user-accounts#LocalUserAccountProvider) section of the advanced guide for more details.
 
 #### `LocalKeyStore`
 
-`LocalKeyStore` implements the `KeyStore` interface expected by `LocalUserAccountProvider` via an underlying `Store` implementation.
+[`LocalKeyStore`](/docs/client#LocalKeyStore) implements the `KeyStore` interface expected by [`LocalUserAccountProvider`](/docs/client#LocalUserAccountProvider) via an underlying `Store` implementation.
 
 #### `LocalMemoryStore`
 
-Dummy implementation of the `LocalStore` interface which causes the `LocalKeyStore` to be entirely in-memory.
+Dummy implementation of the `LocalStore` interface which causes the [`LocalKeyStore`](/docs/client#LocalKeyStore) to be entirely in-memory.
 
 #### `LocalStringStore`
 
-Implements the `LocalStore` interface expected by `LocalKeyStore`.
+Implements the `LocalStore` interface expected by [`LocalKeyStore`](/docs/client#LocalKeyStore).
 
 #### `UnlockedWallet`
 
@@ -715,19 +715,19 @@ Wallet in the "unlocked" state.
 
 ##### `UnlockedWallet#type`
 
-`type` differentiates an `UnlockedWallet` from other `LocalWallet`s, i.e. an `LockedWallet`
+`type` differentiates an [`UnlockedWallet`](/docs/client#UnlockedWallet) from other [`LocalWallet`](/docs/client#LocalWallet)s, i.e. an [`LockedWallet`](/docs/client#LockedWallet)
 
 ##### `UnlockedWallet#account`
 
-`UserAccount` this `UnlockedWallet` refers to.
+[`UserAccount`](/docs/client#UserAccount) this [`UnlockedWallet`](/docs/client#UnlockedWallet) refers to.
 
 ##### `UnlockedWallet#privateKey`
 
-Private key for this `UnlockedWallet`.
+Private key for this [`UnlockedWallet`](/docs/client#UnlockedWallet).
 
 ##### `UnlockedWallet#nep2`
 
-NEP-2 encrypted key of this `UnlockedWallet`. `undefined` if the `privateKey` has never been encrypted.
+NEP-2 encrypted key of this [`UnlockedWallet`](/docs/client#UnlockedWallet). `undefined` if the `privateKey` has never been encrypted.
 
 #### `LockedWallet`
 
@@ -735,15 +735,15 @@ Wallet in the "locked" state.
 
 ##### `LockedWallet#type`
 
-`type` differentiates a `LockedWallet` from other `LocalWallet`s, i.e. an `UnlockedWallet`.
+`type` differentiates a [`LockedWallet`](/docs/client#LockedWallet) from other [`LocalWallet`](/docs/client#LocalWallet)s, i.e. an [`UnlockedWallet`](/docs/client#UnlockedWallet).
 
 ##### `LockedWallet#account`
 
-`UserAccount` this `LockedWallet` refers to.
+[`UserAccount`](/docs/client#UserAccount) this [`LockedWallet`](/docs/client#LockedWallet) refers to.
 
 ##### `LockedWallet#nep2`
 
-NEP-2 encrypted key of this `LockedWallet`.
+NEP-2 encrypted key of this [`LockedWallet`](/docs/client#LockedWallet).
 
 #### `LocalWallet`
 
@@ -751,17 +751,17 @@ Locally stored wallet that is either in a `'locked'` or `'unlocked'` state (`typ
 
 #### `NEOONEDataProvider`
 
-Implements the methods required by the `NEOONEProvider` as well as the `DeveloperProvider` interface using a NEO•ONE node.
+Implements the methods required by the [`NEOONEProvider`](/docs/client#NEOONEProvider) as well as the [`DeveloperProvider`](/docs/client#DeveloperProvider) interface using a NEO•ONE node.
 
 #### `NEOONEDataProviderOptions`
 
 #### `NEOONEOneDataProvider`
 
-Implements the methods required by the `NEOONEProvider` as well as the `DeveloperProvider` interface using a NEO•ONE node that is looked up through the local NEO•ONE `projectID`.
+Implements the methods required by the [`NEOONEProvider`](/docs/client#NEOONEProvider) as well as the [`DeveloperProvider`](/docs/client#DeveloperProvider) interface using a NEO•ONE node that is looked up through the local NEO•ONE `projectID`.
 
 #### `NEOONEProvider`
 
-Implements the `Provider` interface expected by a `LocalUserAccountProvider` using a NEO•ONE node.
+Implements the `Provider` interface expected by a [`LocalUserAccountProvider`](/docs/client#LocalUserAccountProvider) using a NEO•ONE node.
 
 #### `Peer`
 
@@ -769,7 +769,7 @@ Peers connected to the node.
 
 #### `JSONRPCProvider`
 
-Base interface for handling `JSONRPCRequest`s and returning `JSONRPCResponse`s.
+Base interface for handling [`JSONRPCRequest`](/docs/client#JSONRPCRequest)s and returning [`JSONRPCResponse`](/docs/client#JSONRPCResponse)s.
 
 #### `JSONRPCRequest`
 
@@ -793,11 +793,11 @@ jsonrpc response object.
 
 #### `RelayTransactionResult`
 
-Raw result of relaying a `Transaction`. Further consumed and processed by `LocalUserAccountProvider` and `ABI`.
+Raw result of relaying a [`Transaction`](/docs/client#Transaction). Further consumed and processed by [`LocalUserAccountProvider`](/docs/client#LocalUserAccountProvider) and [`ABI`](/docs/client#ABI).
 
 ##### `RelayTransactionResult#transaction`
 
-Relayed `Transaction`.
+Relayed [`Transaction`](/docs/client#Transaction).
 
 ##### `RelayTransactionResult#verifyResult`
 
@@ -809,7 +809,7 @@ Interface which describes the result of verification invocation.
 
 ##### `VerifyTransactionResult#verifications`
 
-All verifications that happened during the relay of the `Transaction`.
+All verifications that happened during the relay of the [`Transaction`](/docs/client#Transaction).
 
 #### `VerifyScriptResult`
 
@@ -825,7 +825,7 @@ The smart contract this result is associated with.
 
 ##### `VerifyScriptResult#witness`
 
-The specific `Witness` that was checked.
+The specific [`Witness`](/docs/client#Witness) that was checked.
 
 ##### `VerifyScriptResult#actions`
 
@@ -841,15 +841,15 @@ The actions emitted during the verification.
 
 #### `SmartContract<TClient extends Client, TEvent extends Event>`
 
-An object representing a smart contract defined by the `definition` property, in particular, the `ABI` of the definition.
+An object representing a smart contract defined by the `definition` property, in particular, the [`ABI`](/docs/client#ABI) of the definition.
 
 ##### `SmartContract#definition`
 
-The `SmartContractDefinition` that generated this `SmartContract` object.
+The [`SmartContractDefinition`](/docs/client#SmartContractDefinition) that generated this [`SmartContract`](/docs/client#SmartContract) object.
 
 ##### `SmartContract#client`
 
-The underlying `Client` used by this `SmartContract`.
+The underlying [`Client`](/docs/client#Client) used by this [`SmartContract`](/docs/client#SmartContract).
 
 ##### `SmartContract#iterEvent(options?: SmartContractIterOptions): AsyncIterable<TEvent>`
 
@@ -865,7 +865,7 @@ Iterate over the events and logs emitted by the smart contract.
 
 ##### `SmartContract#convertAction(action: RawAction): Action | undefined`
 
-Converts a `RawAction`, typically from the raw results found in a `Block` to a processed `Action` or `undefined` if the action is not recognized by the ABI.
+Converts a [`RawAction`](/docs/client#RawAction), typically from the raw results found in a [`Block`](/docs/client#Block) to a processed [`Action`](/docs/client#Action) or `undefined` if the action is not recognized by the ABI.
 
 #### `SmartContractReadOptions`
 
@@ -878,13 +878,13 @@ The network to read the smart contract data for. By default this is the network 
 #### `SmartContractIterOptions`
 
 *extends:*
-  - `SmartContractReadOptions`
+  - [`SmartContractReadOptions`](/docs/client#SmartContractReadOptions)
 
 Additional optional options for methods that iterate over data from a smart contract.
 
 ##### `SmartContractIterOptions#filter`
 
-Filters the iterated events and/or logs to those that match the provided `BlockFilter` object.
+Filters the iterated events and/or logs to those that match the provided [`BlockFilter`](/docs/client#BlockFilter) object.
 
 #### `SmartContractDefinition`
 
@@ -896,11 +896,11 @@ Configuration for the smart contract by network.
 
 ##### `SmartContractDefinition#abi`
 
-`ABI` of the smart contract
+[`ABI`](/docs/client#ABI) of the smart contract
 
 ##### `SmartContractDefinition#sourceMaps`
 
-`SourceMaps` associated with the smart contract.
+[`SourceMaps`](/docs/client#SourceMaps) associated with the smart contract.
 
 #### `SmartContractNetworkDefinition`
 
@@ -916,7 +916,7 @@ Network specific smart contract configuration
 
 ##### `SmartContractNetworkDefinition#address`
 
-`AddressString` of the smart contract on the network.
+[`AddressString`](/docs/client#AddressString) of the smart contract on the network.
 
 #### `Param`
 
@@ -966,7 +966,7 @@ The result of a smart contract method invocation.
 
 #### `InvocationResultBase`
 
-Common `InvocationResult` properties.
+Common [`InvocationResult`](/docs/client#InvocationResult) properties.
 
 ##### `InvocationResultBase#gasConsumed`
 
@@ -979,7 +979,7 @@ The total GAS cost before subtracting the free GAS.
 #### `InvocationResultSuccess<TValue>`
 
 *extends:*
-  - `InvocationResultBase`
+  - [`InvocationResultBase`](/docs/client#InvocationResultBase)
 
 Result of a successful invocation.
 
@@ -1003,10 +1003,10 @@ Indicates a failed invocation. Always equals `'FAULT'`
 
 Failure reason.
 
-#### `InvokeReceipt<TReturn extends Return, TEvent extends Event>`
+#### `InvokeReceipt`
 
 *extends:*
-  - `TransactionReceipt`
+  - [`TransactionReceipt`](/docs/client#TransactionReceipt)
 
 The receipt for a smart contract method invocation.
 
@@ -1024,33 +1024,33 @@ The logs emitted by the smart contract during the invocation.
 
 #### `InvokeReceipt#raw`
 
-The original, unprocessed, `RawInvokeReceipt`. The `RawInvokeReceipt` is transformed into this object (the `InvokeReceipt`) using the `ABI` to parse out the `Event`s and `InvocationResult`.
+The original, unprocessed, `RawInvokeReceipt`. The `RawInvokeReceipt` is transformed into this object (the [`InvokeReceipt`](/docs/client#InvokeReceipt)) using the [`ABI`](/docs/client#ABI) to parse out the [`Event`](/docs/client#Event)s and [`InvocationResult`](/docs/client#InvocationResult).
 
 #### `InvokeReceiveTransactionOptions`
 
 *extends:*
-  - `TransactionOptions`
+  - [`TransactionOptions`](/docs/client#TransactionOptions)
 
-Additional parameters available to methods that support receiving native `Asset`s to the smart contract, i.e. they have been annotated with `@receive`.
+Additional parameters available to methods that support receiving native [`Asset`](/docs/client#Asset)s to the smart contract, i.e. they have been annotated with `@receive`.
 
 #### `InvokeSendUnsafeReceiveTransactionOptions`
 
 *extends:*
-  - `InvokeSendUnsafeTransactionOptions`
-  - `InvokeReceiveTransactionOptions`
+  - [`InvokeSendUnsafeTransactionOptions`](/docs/client#InvokeSendUnsafeTransactionOptions)
+  - [`InvokeReceiveTransactionOptions`](/docs/client#InvokeReceiveTransactionOptions)
 
-Additional parameters available to methods that support unsafely sending native `Asset`s from the smart contract and receiving native `Asset`s to the smart contract, i.e. they have been annotated with both `@sendUnsafe` and `@receive`.
+Additional parameters available to methods that support unsafely sending native [`Asset`](/docs/client#Asset)s from the smart contract and receiving native [`Asset`](/docs/client#Asset)s to the smart contract, i.e. they have been annotated with both `@sendUnsafe` and `@receive`.
 
 #### `InvokeSendUnsafeTransactionOptions`
 
 *extends:*
-  - `TransactionOptions`
+  - [`TransactionOptions`](/docs/client#TransactionOptions)
 
-Additional parameters available to methods that support unsafely sending native `Asset`s from the smart contract, i.e. they have been annotated with `@sendUnsafe`.
+Additional parameters available to methods that support unsafely sending native [`Asset`](/docs/client#Asset)s from the smart contract, i.e. they have been annotated with `@sendUnsafe`.
 
 ##### `InvokeSendUnsafeTransactionOptions#sendFrom`
 
-`Transfer`s that specify native assets to send from the contract.
+[`Transfer`](/docs/client#Transfer)s that specify native assets to send from the contract.
 
 #### `ForwardOptions`
 
@@ -1062,11 +1062,11 @@ Additional events that may be emitted due to forwarding arguments to another sma
 
 #### `ForwardValue`
 
-`ForwardValue` represents a value that's intended to be forwarded to another smart contract method. This object is not meant to be directly constructued, instead one should produce them via the automatically generated `forward<method>Args` methods. See the [Forward Values](https://neo-one.io/docs/forward-values) chapter of the advanced guide for more information.
+[`ForwardValue`](/docs/client#ForwardValue) represents a value that's intended to be forwarded to another smart contract method. This object is not meant to be directly constructued, instead one should produce them via the automatically generated `forward<method>Args` methods. See the [Forward Values](https://neo-one.io/docs/forward-values) chapter of the advanced guide for more information.
 
 #### `Action`
 
-An `Action` is either an `Event` or `Log` emitted by the smart contract during a method invocation.
+An [`Action`](/docs/client#Action) is either an [`Event`](/docs/client#Event) or [`Log`](/docs/client#Log) emitted by the smart contract during a method invocation.
 
 #### `Event`
 
@@ -1074,11 +1074,11 @@ Structured data emitted by a smart contract during a method invocation. Typicall
 
 ##### `Event#type`
 
-`type` differentiates the `Event` object from other `Action` objects, i.e. `Log`.
+`type` differentiates the [`Event`](/docs/client#Event) object from other [`Action`](/docs/client#Action) objects, i.e. [`Log`](/docs/client#Log).
 
 ##### `Event#name`
 
-An implementation defined string identifying this `Event`. In the automatically generated NEO•ONE smart contract APIs this identifier distinguishes the type of `Event` and the exact type of the `parameters` of the `Event`.
+An implementation defined string identifying this [`Event`](/docs/client#Event). In the automatically generated NEO•ONE smart contract APIs this identifier distinguishes the type of [`Event`](/docs/client#Event) and the exact type of the `parameters` of the [`Event`](/docs/client#Event).
 
  **Example:**
 
@@ -1099,11 +1099,11 @@ Structured data attached to the event.
 
 #### `EventParameters`
 
-The base type of the `Event` parameters. This type is specialized automatically with the generated NEO•ONE smart contract APIs.
+The base type of the [`Event`](/docs/client#Event) parameters. This type is specialized automatically with the generated NEO•ONE smart contract APIs.
 
 ##### `EventParameters#[name: string]`
 
-Note that arbitrary string indices are not supported - the exact indices are implementation defined for a particular `Event` name.
+Note that arbitrary string indices are not supported - the exact indices are implementation defined for a particular [`Event`](/docs/client#Event) name.
 
 #### `Log`
 
@@ -1111,7 +1111,7 @@ Unstructured string emitted by a smart contract during a method invocation.
 
 ##### `Log#type`
 
-`type` differentiates the `Log` object from other `Action` objects, i.e. `Event`.
+`type` differentiates the [`Log`](/docs/client#Log) object from other [`Action`](/docs/client#Action) objects, i.e. [`Event`](/docs/client#Event).
 
 ##### `Log#message`
 
@@ -1131,7 +1131,7 @@ Specification of the smart contract events.
 
 #### `ABIFunction`
 
-Function specification in the `ABI` of a smart contract.
+Function specification in the [`ABI`](/docs/client#ABI) of a smart contract.
 
 ##### `ABIFunction#name`
 
@@ -1175,7 +1175,7 @@ Return type of the function.
 
 #### `ABIEvent`
 
-Event specification in the `ABI` of a smart contract.
+Event specification in the [`ABI`](/docs/client#ABI) of a smart contract.
 
 ##### `ABIEvent#name`
 
@@ -1204,11 +1204,11 @@ type ABIParameter =
   | ForwardValueABIParameter;
 ```
 
-Parameter specification of a function or event in the `ABI` of a smart contract.
+Parameter specification of a function or event in the [`ABI`](/docs/client#ABI) of a smart contract.
 
 #### `ABIParameterBase`
 
-Base interface for all `ABIParameter`s
+Base interface for all [`ABIParameter`](/docs/client#ABIParameter)s
 
 ##### `ABIParameterBase#name`
 
@@ -1225,104 +1225,104 @@ Represents a rest parameter.
 #### `AddressABIParameter`
 
 *extends:*
-  - `ABIParameterBase`
-  - `AddressABIReturn`
+  - [`ABIParameterBase`](/docs/client#ABIParameterBase)
+  - [`AddressABIReturn`](/docs/client#AddressABIReturn)
 
 `Address` parameter type.
 
 #### `ArrayABIParameter`
 
 *extends:*
-  - `ABIParameterBase`
-  - `ArrayABIReturn`
+  - [`ABIParameterBase`](/docs/client#ABIParameterBase)
+  - [`ArrayABIReturn`](/docs/client#ArrayABIReturn)
 
 `Array` parameter type.
 
 #### `BooleanABIParameter`
 
 *extends:*
-  - `ABIParameterBase`
-  - `BooleanABIReturn`
+  - [`ABIParameterBase`](/docs/client#ABIParameterBase)
+  - [`BooleanABIReturn`](/docs/client#BooleanABIReturn)
 
 `boolean` parameter type.
 
 #### `BufferABIParameter`
 
 *extends:*
-  - `ABIParameterBase`
-  - `BufferABIReturn`
+  - [`ABIParameterBase`](/docs/client#ABIParameterBase)
+  - [`BufferABIReturn`](/docs/client#BufferABIReturn)
 
 `Buffer` parameter type.
 
 #### `ForwardValueABIParameter`
 
 *extends:*
-  - `ABIParameterBase`
-  - `ForwardValueABIReturn`
+  - [`ABIParameterBase`](/docs/client#ABIParameterBase)
+  - [`ForwardValueABIReturn`](/docs/client#ForwardValueABIReturn)
 
-`ForwardValue` parameter type.
+[`ForwardValue`](/docs/client#ForwardValue) parameter type.
 
 #### `Hash256ABIParameter`
 
 *extends:*
-  - `ABIParameterBase`
-  - `Hash256ABIReturn`
+  - [`ABIParameterBase`](/docs/client#ABIParameterBase)
+  - [`Hash256ABIReturn`](/docs/client#Hash256ABIReturn)
 
-`Hash256` parameter type.
+[`Hash256`](/docs/client#Hash256) parameter type.
 
 #### `IntegerABIParameter`
 
 *extends:*
-  - `ABIParameterBase`
-  - `IntegerABIReturn`
+  - [`ABIParameterBase`](/docs/client#ABIParameterBase)
+  - [`IntegerABIReturn`](/docs/client#IntegerABIReturn)
 
 `Fixed<decimals>` parameter type. `decimals` indicates to the client APIs how many decimals the integer represents.
 
 #### `MapABIParameter`
 
 *extends:*
-  - `ABIParameterBase`
-  - `MapABIReturn`
+  - [`ABIParameterBase`](/docs/client#ABIParameterBase)
+  - [`MapABIReturn`](/docs/client#MapABIReturn)
 
 `Map` parameter type.
 
 #### `ObjectABIParameter`
 
 *extends:*
-  - `ABIParameterBase`
-  - `ObjectABIReturn`
+  - [`ABIParameterBase`](/docs/client#ABIParameterBase)
+  - [`ObjectABIReturn`](/docs/client#ObjectABIReturn)
 
 `Object` parameter type.
 
 #### `PublicKeyABIParameter`
 
 *extends:*
-  - `ABIParameterBase`
-  - `PublicKeyABIReturn`
+  - [`ABIParameterBase`](/docs/client#ABIParameterBase)
+  - [`PublicKeyABIReturn`](/docs/client#PublicKeyABIReturn)
 
 `PublicKey` parameter type.
 
 #### `SignatureABIParameter`
 
 *extends:*
-  - `ABIParameterBase`
-  - `SignatureABIReturn`
+  - [`ABIParameterBase`](/docs/client#ABIParameterBase)
+  - [`SignatureABIReturn`](/docs/client#SignatureABIReturn)
 
 `Signature` parameter type.
 
 #### `StringABIParameter`
 
 *extends:*
-  - `ABIParameterBase`
-  - `StringABIReturn`
+  - [`ABIParameterBase`](/docs/client#ABIParameterBase)
+  - [`StringABIReturn`](/docs/client#StringABIReturn)
 
 `string` parameter type.
 
 #### `VoidABIParameter`
 
 *extends:*
-  - `ABIParameterBase`
-  - `VoidABIReturn`
+  - [`ABIParameterBase`](/docs/client#ABIParameterBase)
+  - [`VoidABIReturn`](/docs/client#VoidABIReturn)
 
 `void` parameter type.
 
@@ -1345,11 +1345,11 @@ type ABIReturn =
   | ForwardValueABIReturn;
 ```
 
-Return type specification of a function in the `ABI` of a smart contract.
+Return type specification of a function in the [`ABI`](/docs/client#ABI) of a smart contract.
 
 #### `ABIReturnBase`
 
-Common properties of all `ABIReturn` specifications.
+Common properties of all [`ABIReturn`](/docs/client#ABIReturn) specifications.
 
 ##### `ABIReturnBase#optional`
 
@@ -1363,7 +1363,7 @@ Common properties of all `ABIReturn` specifications.
 #### `AddressABIReturn`
 
 *extends:*
- - `ABIReturnBase`
+ - [`ABIReturnBase`](/docs/client#ABIReturnBase)
 
 `Address` return type.
 
@@ -1374,7 +1374,7 @@ Common properties of all `ABIReturn` specifications.
 #### `ArrayABIReturn`
 
 *extends:*
- - `ABIReturnBase`
+ - [`ABIReturnBase`](/docs/client#ABIReturnBase)
 
 `Array` return type.
 
@@ -1389,7 +1389,7 @@ Value type of the `Array`.
 #### `BooleanABIReturn`
 
 *extends:*
- - `ABIReturnBase`
+ - [`ABIReturnBase`](/docs/client#ABIReturnBase)
 
 `boolean` return type.
 
@@ -1400,7 +1400,7 @@ Value type of the `Array`.
 #### `BufferABIReturn`
 
 *extends:*
- - `ABIReturnBase`
+ - [`ABIReturnBase`](/docs/client#ABIReturnBase)
 
 ##### `BufferABIReturn#type`
 
@@ -1409,9 +1409,9 @@ Value type of the `Array`.
 #### `ForwardValueABIReturn`
 
 *extends:*
- - `ABIReturnBase`
+ - [`ABIReturnBase`](/docs/client#ABIReturnBase)
 
-`ForwardValue` return type.
+[`ForwardValue`](/docs/client#ForwardValue) return type.
 
 ##### `ForwardValueABIReturn#type`
 
@@ -1420,9 +1420,9 @@ Value type of the `Array`.
 #### `Hash256ABIReturn`
 
 *extends:*
- - `ABIReturnBase`
+ - [`ABIReturnBase`](/docs/client#ABIReturnBase)
 
-`Hash256` return type.
+[`Hash256`](/docs/client#Hash256) return type.
 
 ##### `Hash256ABIReturn#type`
 
@@ -1431,7 +1431,7 @@ Value type of the `Array`.
 #### `IntegerABIReturn`
 
 *extends:*
- - `ABIReturnBase`
+ - [`ABIReturnBase`](/docs/client#ABIReturnBase)
 
 `Fixed<decimals>` return type. `decimals` indicates to the client APIs how many decimals the integer represents.
 
@@ -1446,7 +1446,7 @@ Number of decimals values of this type represent.
 #### `MapABIReturn`
 
 *extends:*
- - `ABIReturnBase`
+ - [`ABIReturnBase`](/docs/client#ABIReturnBase)
 
 `Map` return type.
 
@@ -1465,7 +1465,7 @@ Value type of the `Map`.
 #### `ObjectABIReturn`
 
 *extends:*
- - `ABIReturnBase`
+ - [`ABIReturnBase`](/docs/client#ABIReturnBase)
 
 `Object` return type.
 
@@ -1480,7 +1480,7 @@ Properties of the `Object`.
 #### `PublicKeyABIReturn`
 
 *extends:*
- - `ABIReturnBase`
+ - [`ABIReturnBase`](/docs/client#ABIReturnBase)
 
 `PublicKey` return type.
 
@@ -1491,7 +1491,7 @@ Properties of the `Object`.
 #### `SignatureABIReturn`
 
 *extends:*
- - `ABIReturnBase`
+ - [`ABIReturnBase`](/docs/client#ABIReturnBase)
 
 `Signature` return type.
 
@@ -1502,7 +1502,7 @@ Properties of the `Object`.
 #### `StringABIReturn`
 
 *extends:*
- - `ABIReturnBase`
+ - [`ABIReturnBase`](/docs/client#ABIReturnBase)
 
 `string` return type.
 
@@ -1513,7 +1513,7 @@ Properties of the `Object`.
 #### `VoidABIReturn`
 
 *extends:*
- - `ABIReturnBase`
+ - [`ABIReturnBase`](/docs/client#ABIReturnBase)
 
 `void` return type.
 
@@ -1531,7 +1531,7 @@ Default value for the constructor/deploy parameter.
 
 #### `SenderAddressABIDefault`
 
-Default value is the `Transaction` sender `Address`
+Default value is the [`Transaction`](/docs/client#Transaction) sender `Address`
 
 ##### `SenderAddressABIDefault#type`
 
@@ -1621,7 +1621,7 @@ Reset the local network to it's initial state starting at the genesis block.
 
 #### `DeveloperProvider`
 
-Provides the core functionality required by the `DeveloperClient`.
+Provides the core functionality required by the [`DeveloperClient`](/docs/client#DeveloperClient).
 
 #### `PrivateNetworkSettings`
 
@@ -1655,15 +1655,15 @@ Resets the local toolchain to its initial state by resetting the local developer
 
 #### `Hash256`
 
-Common `Hash256String`s.
+Common [`Hash256String`](/docs/client#Hash256String)s.
 
 ##### `Hash256.NEO`
 
-`Hash256String` of the NEO `Asset`.
+[`Hash256String`](/docs/client#Hash256String) of the NEO [`Asset`](/docs/client#Asset).
 
 ##### `Hash256.GAS`
 
-`Hash256String` of the GAS `Asset`.
+[`Hash256String`](/docs/client#Hash256String) of the GAS [`Asset`](/docs/client#Asset).
 
 #### `nep5`
 
@@ -1673,7 +1673,7 @@ Common `Hash256String`s.
 const createPrivateKey = (): PrivateKeyString
 ```
 
-Creates a new cryptographically secure private key. @returns hex-encoded private key.
+Creates a new cryptographically secure private key. Returns hex-encoded private key.
 
 #### `decryptNEP2`
 
@@ -1687,7 +1687,7 @@ const decryptNEP2 = async ({
 }): Promise<PrivateKeyString>
 ```
 
-Decrypts a private key encrypted using the NEP-2 standard with the given password. @returns hex-encoded private key.
+Decrypts a private key encrypted using the NEP-2 standard with the given password. Returns hex-encoded private key.
 
 #### `encryptNEP2`
 
@@ -1701,7 +1701,7 @@ type encryptNEP2 = async ({
 }): Promise<string>
 ```
 
-Encrypts a private key with a password using the NEP-2 standard. @returns NEP-2 format encrypted key.
+Encrypts a private key with a password using the NEP-2 standard. Returns NEP-2 format encrypted key.
 
 #### `isNEP2`
 
@@ -1709,7 +1709,7 @@ Encrypts a private key with a password using the NEP-2 standard. @returns NEP-2 
 const isNEP2 = (encryptedKey: string): boolean
 ```
 
-Validates if a given string is a NEP-2 encrypted private key. @returns `true` if it's a valid NEP-2 key, `false` otherwise.
+Validates if a given string is a NEP-2 encrypted private key. Returns `true` if it's a valid NEP-2 key, `false` otherwise.
 
 #### `addressToScriptHash`
 
@@ -1717,7 +1717,7 @@ Validates if a given string is a NEP-2 encrypted private key. @returns `true` if
 const addressToScriptHash = (address: AddressString): string
 ```
 
-Converts a base58 encoded NEO `Address` into a `Hash160` script hash. @returns `Hash160` string, a hex encoded string prefixed by '0x'.
+Converts a base58 encoded NEO `Address` into a `Hash160` script hash. Returns `Hash160` string, a hex encoded string prefixed by '0x'.
 
 #### `privateKeyToAddress`
 
@@ -1725,7 +1725,7 @@ Converts a base58 encoded NEO `Address` into a `Hash160` script hash. @returns `
 const privateKeyToAddress = (privateKey: PrivateKeyString): AddressString
 ```
 
-Converts a hex-encoded private key to a base58 encoded NEO `Address`. @returns base58 encoded string that represents a NEO address.
+Converts a hex-encoded private key to a base58 encoded NEO `Address`. Returns base58 encoded string that represents a NEO address.
 
 #### `privateKeyToPublicKey`
 
@@ -1733,7 +1733,7 @@ Converts a hex-encoded private key to a base58 encoded NEO `Address`. @returns b
 const privateKeyToPublicKey = (privateKey: PrivateKeyString): PublicKeyString
 ```
 
-Converts a hex-encoded private key to a hex-encoded public key. @returns hex-encoded public key.
+Converts a hex-encoded private key to a hex-encoded public key. Returns hex-encoded public key.
 
 #### `privateKeyToScriptHash`
 
@@ -1741,7 +1741,7 @@ Converts a hex-encoded private key to a hex-encoded public key. @returns hex-enc
 const privateKeyToScriptHash = (privateKey: PrivateKeyString): string
 ```
 
-Converts a hex-encoded private key to a `Hash160` script hash. @returns `Hash160` string, a hex encoded string prefixed by '0x'.
+Converts a hex-encoded private key to a `Hash160` script hash. Returns `Hash160` string, a hex encoded string prefixed by '0x'.
 
 #### `privateKeyToWIF`
 
@@ -1749,7 +1749,7 @@ Converts a hex-encoded private key to a `Hash160` script hash. @returns `Hash160
 const privateKeyToWIF = (privateKey: PrivateKeyString): string
 ```
 
-Converts a hex-encoded private key to a wallet-import-format (WIF) private key. @returns wallet-import-format (WIF) private key.
+Converts a hex-encoded private key to a wallet-import-format (WIF) private key. Returns wallet-import-format (WIF) private key.
 
 #### `publicKeyToAddress`
 
@@ -1757,7 +1757,7 @@ Converts a hex-encoded private key to a wallet-import-format (WIF) private key. 
 const publicKeyToAddress = (publicKey: PublicKeyString): AddressString
 ```
 
-Converts a hex-encoded public key into a base58 encoded NEO `Address`. @returns base58 encoded string that represents a NEO address.
+Converts a hex-encoded public key into a base58 encoded NEO `Address`. Returns base58 encoded string that represents a NEO address.
 
 #### `publicKeyToScriptHash`
 
@@ -1765,7 +1765,7 @@ Converts a hex-encoded public key into a base58 encoded NEO `Address`. @returns 
 const publicKeyToScriptHash = (publicKey: PublicKeyString): string
 ```
 
-Converts a hex-encoded public key into a `Hash160` script hash. @returns `Hash160` string, a hex encoded string prefixed by '0x'.
+Converts a hex-encoded public key into a `Hash160` script hash. Returns `Hash160` string, a hex encoded string prefixed by '0x'.
 
 #### `scriptHashToAddress`
 
@@ -1773,7 +1773,7 @@ Converts a hex-encoded public key into a `Hash160` script hash. @returns `Hash16
 const scriptHashToAddress = (scriptHash: string): AddressString
 ```
 
-Converts a `Hash160` script hash into a base58 encoded NEO `Address`. @returns base58 encoded string that represents a NEO address.
+Converts a `Hash160` script hash into a base58 encoded NEO `Address`. Returns base58 encoded string that represents a NEO address.
 
 #### `wifToPrivateKey`
 
@@ -1781,7 +1781,7 @@ Converts a `Hash160` script hash into a base58 encoded NEO `Address`. @returns b
 const wifToPrivateKey = (wif: string): PrivateKeyString
 ```
 
-Converts a wallet-import-format (WIF) private key to a hex-encoded private key. @returns hex-encoded private key.
+Converts a wallet-import-format (WIF) private key to a hex-encoded private key. Returns hex-encoded private key.
 
 ---
 
@@ -1793,19 +1793,19 @@ Converts a wallet-import-format (WIF) private key to a hex-encoded private key. 
 
 #### `Account`
 
-An `Account` represents the balances of NEO, GAS an other native assets at a given `Address`.
+An [`Account`](/docs/client#Account) represents the balances of NEO, GAS an other native assets at a given `Address`.
 
 ##### `Account#address`
 
-The address of this `Account`.
+The address of this [`Account`](/docs/client#Account).
 
 ##### `Account#balances`
 
-A mapping from a `Hash256String` of a native `Asset` to the value of the held by the `address` for this `Account`. May be `undefined` if the `address` has 0 balance.
+A mapping from a [`Hash256String`](/docs/client#Hash256String) of a native [`Asset`](/docs/client#Asset) to the value of the held by the `address` for this [`Account`](/docs/client#Account). May be `undefined` if the `address` has 0 balance.
 
 #### `Asset`
 
-Attributes of a first class asset. Users will typically only interact with the NEO and GAS `Asset`s.
+Attributes of a first class asset. Users will typically only interact with the NEO and GAS [`Asset`](/docs/client#Asset)s.
 
 ```typescript
 const asset = readClient.getAsset(Hash256.NEO);
@@ -1814,51 +1814,51 @@ const neoAmount = asset.amount;
 
 ##### `Asset#hash`
 
-`Hash256String` of this `Asset`.
+[`Hash256String`](/docs/client#Hash256String) of this [`Asset`](/docs/client#Asset).
 
 ##### `Asset#type`
 
-Type of the `Asset`. See `AssetType`.
+Type of the [`Asset`](/docs/client#Asset). See [`AssetType`](/docs/client#AssetType).
 
 #### `Asset#name`
 
-Name of the `Asset`.
+Name of the [`Asset`](/docs/client#Asset).
 
 #### `Asset#amount`
 
-Total possible supply of the `Asset`.
+Total possible supply of the [`Asset`](/docs/client#Asset).
 
 #### `Asset#available`
 
-Amount currently available of the `Asset`.
+Amount currently available of the [`Asset`](/docs/client#Asset).
 
 #### `Asset#precision`
 
-Precision (number of decimal places) of the `Asset`.
+Precision (number of decimal places) of the [`Asset`](/docs/client#Asset).
 
 #### `Asset#owner`
 
-Owner of the `Asset`.
+Owner of the [`Asset`](/docs/client#Asset).
 
 #### `Asset#admin`
 
-Admin of the `Asset`.
+Admin of the [`Asset`](/docs/client#Asset).
 
 #### `Asset#issuer`
 
-Issuer of the `Asset`.
+Issuer of the [`Asset`](/docs/client#Asset).
 
 #### `Asset#expiration`
 
-Unix timestamp of when the `Asset` must be renewed by or it expires.
+Unix timestamp of when the [`Asset`](/docs/client#Asset) must be renewed by or it expires.
 
 #### `Asset#frozen`
 
-`true` if no transfers are allowed with the `Asset`.
+`true` if no transfers are allowed with the [`Asset`](/docs/client#Asset).
 
 #### `AssetType`
 
-Constants that describe the type of `Asset`. The two most important ones are `'Governing'` and `'Utility'` which are reserved for NEO and GAS respectively.
+Constants that describe the type of [`Asset`](/docs/client#Asset). The two most important ones are `'Governing'` and `'Utility'` which are reserved for NEO and GAS respectively.
 
 ```typescript
 type AssetType =
@@ -1874,7 +1874,7 @@ type AssetType =
 
 #### `Attribute`
 
-`Attribute`s are used to store additional data on `Transaction`s. Most `Attribute`s are used to store arbitrary data, whereas some, like `AddressAttribute`, have specific uses in the NEO protocol.
+[`Attribute`](/docs/client#Attribute)s are used to store additional data on [`Transaction`](/docs/client#Transaction)s. Most [`Attribute`](/docs/client#Attribute)s are used to store arbitrary data, whereas some, like [`AddressAttribute`](/docs/client#AddressAttribute), have specific uses in the NEO protocol.
 
 ```typescript
 type Attribute =
@@ -1886,15 +1886,15 @@ type Attribute =
 
 #### `AttributeBase`
 
-Base interface for `Attribute`s.
+Base interface for [`Attribute`](/docs/client#Attribute)s.
 
 ##### `AttributeBase#usage`
 
-`usage` distinguishes the various `Attribute` types.
+`usage` distinguishes the various [`Attribute`](/docs/client#Attribute) types.
 
 #### `AttributeUsage`
 
-`Attribute` usage flag indicates the type of the data.
+[`Attribute`](/docs/client#Attribute) usage flag indicates the type of the data.
 
 ```typescript
 type AttributeUsage =
@@ -1907,17 +1907,17 @@ type AttributeUsage =
 #### `AddressAttribute`
 
 *extends:*
-  -`AttributeBase`
+  -[`AttributeBase`](/docs/client#AttributeBase)
 
-`Attribute` whose data is an `AddressString`.
+[`Attribute`](/docs/client#Attribute) whose data is an [`AddressString`](/docs/client#AddressString).
 
 ##### `AddressAttribute#usage`
 
-`usage` distinguishes `AddressAttribute` from other `Attribute` object types.
+`usage` distinguishes [`AddressAttribute`](/docs/client#AddressAttribute) from other [`Attribute`](/docs/client#Attribute) object types.
 
 ##### `AddressAttribute#data`
 
-NEO `Address` as a string of the `Attribute`.
+NEO `Address` as a string of the [`Attribute`](/docs/client#Attribute).
 
 #### `AddressAttributeUsage`
 
@@ -1925,27 +1925,27 @@ NEO `Address` as a string of the `Attribute`.
 type AddressAttributeUsage = 'Script';
 ```
 
-`Attribute` usage flag indicating the data is a `Hash256`.
+[`Attribute`](/docs/client#Attribute) usage flag indicating the data is a [`Hash256`](/docs/client#Hash256).
 
 
 #### `BufferAttribute`
 
 *extends:*
-  -`AttributeBase`
+  -[`AttributeBase`](/docs/client#AttributeBase)
 
-`Attribute` whose data is an arbitrary `BufferString`.
+[`Attribute`](/docs/client#Attribute) whose data is an arbitrary [`BufferString`](/docs/client#BufferString).
 
 ##### `BufferAttribute#usage`
 
-`usage` distinguishes `BufferAttribute` from other `Attribute` object types.
+`usage` distinguishes [`BufferAttribute`](/docs/client#BufferAttribute) from other [`Attribute`](/docs/client#Attribute) object types.
 
 ##### `BufferAttribute#data`
 
-Hex encoded data of the `Attribute`.
+Hex encoded data of the [`Attribute`](/docs/client#Attribute).
 
 #### `BufferAttributeUsage`
 
-`Attribute` usage flag indicating the data is an arbitrary `Buffer`.
+[`Attribute`](/docs/client#Attribute) usage flag indicating the data is an arbitrary `Buffer`.
 
 ```typescript
 type BufferAttributeUsage =
@@ -1972,21 +1972,21 @@ type BufferAttributeUsage =
 #### `Hash256Attribute`
 
 *extends:*
-  -`AttributeBase`
+  -[`AttributeBase`](/docs/client#AttributeBase)
 
-`Attribute` whose data is a `Hash256`.
+[`Attribute`](/docs/client#Attribute) whose data is a [`Hash256`](/docs/client#Hash256).
 
 #### `Hash256Attribute#usage`
 
-`usage` distinguishes `Hash256Attribute` from other `Attribute` object types.
+`usage` distinguishes `Hash256Attribute` from other [`Attribute`](/docs/client#Attribute) object types.
 
 #### `Hash256Attribute#data`
 
-NEO `Hash256` as a string of the `Attribute`.
+NEO [`Hash256`](/docs/client#Hash256) as a string of the [`Attribute`](/docs/client#Attribute).
 
 #### `Hash256AttributeUsage`
 
-`Attribute` usage flag indicating the data is a `Hash256`.
+[`Attribute`](/docs/client#Attribute) usage flag indicating the data is a [`Hash256`](/docs/client#Hash256).
 
 ```typescript
 type Hash256AttributeUsage =
@@ -2012,21 +2012,21 @@ type Hash256AttributeUsage =
 #### `PublicKeyAttribute`
 
 *extends:*
-  -`AttributeBase`
+  -[`AttributeBase`](/docs/client#AttributeBase)
 
-`Attribute` whose data is a `PublicKeyString`.
+[`Attribute`](/docs/client#Attribute) whose data is a `PublicKeyString`.
 
 ##### `PublicKeyAttribute#usage`
 
-`usage` distinguishes `PublicKeyAttribute` from other `Attribute` object types.
+`usage` distinguishes [`PublicKeyAttribute`](/docs/client#PublicKeyAttribute) from other [`Attribute`](/docs/client#Attribute) object types.
 
 #### `PublicKeyAttribute#data`
 
-Public key as a string of the `Attribute`.
+Public key as a string of the [`Attribute`](/docs/client#Attribute).
 
 #### `PublicKeyAttributeUsage`
 
-`Attribute` usage flag indicating the data is a `PublicKey`.
+[`Attribute`](/docs/client#Attribute) usage flag indicating the data is a `PublicKey`.
 
 ```typescript
 type PublicKeyAttributeUsage = 'ECDH02' | 'ECDH03';
@@ -2035,11 +2035,11 @@ type PublicKeyAttributeUsage = 'ECDH02' | 'ECDH03';
 #### `Block`
 
 *extends:*
-  - `Header`
+  - [`Header`](/docs/client#Header)
 
 ##### `Block#transactions`
 
-`Transaction`s contained in the `Block`.
+[`Transaction`](/docs/client#Transaction)s contained in the [`Block`](/docs/client#Block).
 
 #### `Contract`
 
@@ -2051,55 +2051,55 @@ NEO protocol version.
 
 ##### `Contract#address`
 
-`AddressString` of this `Contract`.
+[`AddressString`](/docs/client#AddressString) of this [`Contract`](/docs/client#Contract).
 
 ##### `Contract#script`
 
-`Contract` code.
+[`Contract`](/docs/client#Contract) code.
 
 ##### `Contract#parameters`
 
-Expected parameters of this `Contract`.
+Expected parameters of this [`Contract`](/docs/client#Contract).
 
 ##### `Contract#returnType`
 
-Return type of this `Contract`.
+Return type of this [`Contract`](/docs/client#Contract).
 
 ##### `Contract#name`
 
-Name of this `Contract`. For informational purposes only.
+Name of this [`Contract`](/docs/client#Contract). For informational purposes only.
 
 ##### `Contract#codeVersion`
 
-Version of this `Contract`. For informational purposes only.
+Version of this [`Contract`](/docs/client#Contract). For informational purposes only.
 
 ##### `Contract#author`
 
-Author of this `Contract`. For informational purposes only.
+Author of this [`Contract`](/docs/client#Contract). For informational purposes only.
 
 ##### `Contract#email`
 
-Email of this `Contract`. For informational purposes only.
+Email of this [`Contract`](/docs/client#Contract). For informational purposes only.
 
 ##### `Contract#description`
 
-Description of this `Contract`. For informational purposes only.
+Description of this [`Contract`](/docs/client#Contract). For informational purposes only.
 
 ##### `Contract#storage`
 
-`true` if this `Contract` can use storage.
+`true` if this [`Contract`](/docs/client#Contract) can use storage.
 
 ##### `Contract#dynamicInvoke`
 
-`true` if this `Contract` can make dynamic invocations.
+`true` if this [`Contract`](/docs/client#Contract) can make dynamic invocations.
 
 ##### `Contract#payable`
 
-`true` if this `Contract` accepts first-class `Asset`s and/or tokens.
+`true` if this [`Contract`](/docs/client#Contract) accepts first-class [`Asset`](/docs/client#Asset)s and/or tokens.
 
 #### `Header`
 
-All of the properties of a `Block` except the `Transaction`s themselves.
+All of the properties of a [`Block`](/docs/client#Block) except the [`Transaction`](/docs/client#Transaction)s themselves.
 
 #### `Header#version`
 
@@ -2107,23 +2107,23 @@ NEO blockchain version.
 
 #### `Header#hash`
 
-`Block` hash.
+[`Block`](/docs/client#Block) hash.
 
 #### `Header#previousBlockHash`
 
-Previous `Block` hash.
+Previous [`Block`](/docs/client#Block) hash.
 
 #### `Header#merkleRoot`
 
-Merkle Root of the `Transaction`s of this `Block`.
+Merkle Root of the [`Transaction`](/docs/client#Transaction)s of this [`Block`](/docs/client#Block).
 
 #### `Header#time`
 
-`Block` time persisted.
+[`Block`](/docs/client#Block) time persisted.
 
 #### `Header#index`
 
-`Block` index.
+[`Block`](/docs/client#Block) index.
 
 #### `Header#nonce`
 
@@ -2135,31 +2135,31 @@ Next consensus address.
 
 #### `Header#script`
 
-"Witness" to the `Block`'s validity.
+"Witness" to the [`Block`](/docs/client#Block)'s validity.
 
 #### `Header#size`
 
- Size in bytes of the `Block`.
+ Size in bytes of the [`Block`](/docs/client#Block).
 
 #### `Input`
 
-`Input`s are a reference to an `Output` of a `Transaction` that has been persisted to the blockchain. The sum of the `value`s of the referenced `Output`s is the total amount transferred in the `Transaction`.
+[`Input`](/docs/client#Input)s are a reference to an [`Output`](/docs/client#Output) of a [`Transaction`](/docs/client#Transaction) that has been persisted to the blockchain. The sum of the `value`s of the referenced [`Output`](/docs/client#Output)s is the total amount transferred in the [`Transaction`](/docs/client#Transaction).
 
 ##### `Input#hash`
 
-Hash of the `Transaction` this input references.
+Hash of the [`Transaction`](/docs/client#Transaction) this input references.
 
 ##### `Input#index`
 
-`Output` index within the `Transaction` this input references.
+[`Output`](/docs/client#Output) index within the [`Transaction`](/docs/client#Transaction) this input references.
 
 #### `Output`
 
-`Output`s represent the destination `Address` and amount transferred of a given `Asset`. The sum of the unspent `Output`s of an `Address` represent the total balance of the `Address`.
+[`Output`](/docs/client#Output)s represent the destination `Address` and amount transferred of a given [`Asset`](/docs/client#Asset). The sum of the unspent [`Output`](/docs/client#Output)s of an `Address` represent the total balance of the `Address`.
 
 ##### `Output#asset`
 
-Hash of the `Asset` that was transferred.
+Hash of the [`Asset`](/docs/client#Asset) that was transferred.
 
 ##### `Output#value`
 
@@ -2171,7 +2171,7 @@ Destination `Address`.
 
 #### `Witness`
 
-`Witness` is just that, a "witness" to the transaction, meaning they have approved the transaction. Can vary from a simple signature of the transaction for a given `Address`' private key or a "witness" being a smart contract and the way it's verified is by executing the smart contract code.
+[`Witness`](/docs/client#Witness) is just that, a "witness" to the transaction, meaning they have approved the transaction. Can vary from a simple signature of the transaction for a given `Address`' private key or a "witness" being a smart contract and the way it's verified is by executing the smart contract code.
 
 ##### `Witness#invocation`
 
@@ -2179,11 +2179,11 @@ Sets up the stack for the `verification` script.
 
 ##### `Witness#verification`
 
-A script that should leave either a `true` value on the stack if the `Witness` is valid, or `false` otherwise.
+A script that should leave either a `true` value on the stack if the [`Witness`](/docs/client#Witness) is valid, or `false` otherwise.
 
 #### `Transaction`
 
-`Transaction`s are relayed to the blockchain and contain information that is to be permanently stored on the blockchain. They may contain `Input`s and `Output`s corresponding to transfers of native `Asset`s. Each `Transaction` type serves a particular purpose, see the documentation for each for more information.
+[`Transaction`](/docs/client#Transaction)s are relayed to the blockchain and contain information that is to be permanently stored on the blockchain. They may contain [`Input`](/docs/client#Input)s and [`Output`](/docs/client#Output)s corresponding to transfers of native [`Asset`](/docs/client#Asset)s. Each [`Transaction`](/docs/client#Transaction) type serves a particular purpose, see the documentation for each for more information.
 
 ```typescript
 type Transaction =
@@ -2200,7 +2200,7 @@ type Transaction =
 
 #### `TransactionBase`
 
-Base interface for all `Transaction`s.
+Base interface for all [`Transaction`](/docs/client#Transaction)s.
 
 ##### `TransactionBase#version`
 
@@ -2208,27 +2208,27 @@ NEO protocol version.
 
 ##### `TransactionBase#hash`
 
-`Hash256` of this `Transaction`.
+[`Hash256`](/docs/client#Hash256) of this [`Transaction`](/docs/client#Transaction).
 
 ##### `TransactionBase#size`
 
-Byte size of this `Transaction`.
+Byte size of this [`Transaction`](/docs/client#Transaction).
 
 ##### `TransactionBase#attributes`
 
-`Attribute`s attached to the `Transaction`.
+[`Attribute`](/docs/client#Attribute)s attached to the [`Transaction`](/docs/client#Transaction).
 
 ##### `TransactionBase#inputs`
 
-`Input`s of the `Transaction`.
+[`Input`](/docs/client#Input)s of the [`Transaction`](/docs/client#Transaction).
 
 ##### `TransactionBase#outputs`
 
-`Output`s of the `Transaction`.
+[`Output`](/docs/client#Output)s of the [`Transaction`](/docs/client#Transaction).
 
 ##### `TransactionBase#scripts`
 
-`Witness`es to the `Transaction`, i.e. the `Address`es that have signed the `Transasction`.
+[`Witness`](/docs/client#Witness)es to the [`Transaction`](/docs/client#Transaction), i.e. the `Address`es that have signed the [`Transaction`](/docs/client#Transaction).
 
 ##### `TransactionBase#systemFee`
 
@@ -2242,39 +2242,39 @@ GAS network priority fee for the transaction.
 #### `ClaimTransaction`
 
 *extends:*
-- `TransactionBase`
+- [`TransactionBase`](/docs/client#TransactionBase)
 
-Claims GAS for a set of spent `Output`s.
+Claims GAS for a set of spent [`Output`](/docs/client#Output)s.
 
 ##### `ClaimTransaction#type`
 
-`type` distinguishes `ClaimTransaction` from other `Transaction` object types.
+`type` distinguishes [`ClaimTransaction`](/docs/client#ClaimTransaction) from other [`Transaction`](/docs/client#Transaction) object types.
 
 ##### `ClaimTransaction#claims`
 
-The spent outputs that this `ClaimTransaction` is claiming `GAS` for.
+The spent outputs that this [`ClaimTransaction`](/docs/client#ClaimTransaction) is claiming `GAS` for.
 
 #### `ContractTransaction`
 
 *extends:*
-- `TransactionBase`
+- [`TransactionBase`](/docs/client#TransactionBase)
 
-Transfers first class `Asset`s.
+Transfers first class [`Asset`](/docs/client#Asset)s.
 
 ##### `ContractTransaction#type`
 
-`type` distinguishes `ContractTransaction` from other `Transaction` object types.
+`type` distinguishes [`ContractTransaction`](/docs/client#ContractTransaction) from other [`Transaction`](/docs/client#Transaction) object types.
 
 #### `EnrollmentTransaction`
 
 *extends:*
-- `TransactionBase`
+- [`TransactionBase`](/docs/client#TransactionBase)
 
 Enrolls a new validator for a given `PublicKey`.
 
 ##### `EnrollmentTransaction#type`
 
-`type` distinguishes `Enrollmentransaction` from other `Transaction` object types.
+`type` distinguishes [`EnrollmentTransaction`](/docs/client#EnrollmentTransaction) from other [`Transaction`](/docs/client#Transaction) object types.
 
 ##### `EnrollmentTransaction#publicKey`
 
@@ -2283,13 +2283,13 @@ The public key that is being enrolled as a validator.
 #### `InvocationTransaction`
 
 *extends:*
-- `TransactionBase`
+- [`TransactionBase`](/docs/client#TransactionBase)
 
 Runs a script in the NEO VM.
 
 ##### `InvocationTransaction#type`
 
-`type` distinguishes `InvocationTransaction` from other `Transaction` object types.
+`type` distinguishes [`InvocationTransaction`](/docs/client#InvocationTransaction) from other [`Transaction`](/docs/client#Transaction) object types.
 
 ##### `InvocationTransaction#script`
 
@@ -2297,29 +2297,29 @@ Script to execute in the NEO VM.
 
 ##### `InvocationTransaction#gas`
 
-GAS that has been attached to be used for the `systemFee` of the `Transaction`. All attached GAS will be consumed by this operation, regardless of if execution fails or provides too much GAS.
+GAS that has been attached to be used for the `systemFee` of the [`Transaction`](/docs/client#Transaction). All attached GAS will be consumed by this operation, regardless of if execution fails or provides too much GAS.
 
 #### `IssueTransaction`
 
 *extends:*
-- `TransactionBase`
+- [`TransactionBase`](/docs/client#TransactionBase)
 
-Issues new currency of a first-class `Asset`.
+Issues new currency of a first-class [`Asset`](/docs/client#Asset).
 
 ##### `IssueTransaction#type`
 
-`type` distinguishes `IssueTransaction` from other `Transaction` object types.
+`type` distinguishes [`IssueTransaction`](/docs/client#IssueTransaction) from other [`Transaction`](/docs/client#Transaction) object types.
 
 #### `MinerTransaction`
 
 *extends:*
-- `TransactionBase`
+- [`TransactionBase`](/docs/client#TransactionBase)
 
-First `Transaction` in each block which contains the `Block` rewards for the consensus node that produced the `Block`.
+First [`Transaction`](/docs/client#Transaction) in each block which contains the [`Block`](/docs/client#Block) rewards for the consensus node that produced the [`Block`](/docs/client#Block).
 
 ##### `MinerTransaction#type`
 
-`type` distinguishes `MinerTransaction` from other `Transaction` object types.
+`type` distinguishes [`MinerTransaction`](/docs/client#MinerTransaction) from other [`Transaction`](/docs/client#Transaction) object types.
 
 ##### `MinerTransaction#nonce`
 
@@ -2328,45 +2328,45 @@ Unique number in order to ensure the hash for this transaction is unique.
 #### `PublishTransaction`
 
 *extends:*
-- `TransactionBase`
+- [`TransactionBase`](/docs/client#TransactionBase)
 
-Registers a new `Contract`.
+Registers a new [`Contract`](/docs/client#Contract).
 
 ##### `PublishTransaction#type`
 
-`type` distinguishes `PublishTransaction` from other `Transaction` object types.
+`type` distinguishes [`PublishTransaction`](/docs/client#PublishTransaction) from other [`Transaction`](/docs/client#Transaction) object types.
 
 ##### `PublishTransaction#contract`
 
-`Contract` to publish.
+[`Contract`](/docs/client#Contract) to publish.
 
 #### `RegisterTransaction`
 
 *extends:*
-- `TransactionBase`
+- [`TransactionBase`](/docs/client#TransactionBase)
 
-Registers a new first class `Asset`.
+Registers a new first class [`Asset`](/docs/client#Asset).
 
 ##### `RegisterTransaction#type`
 
-`type` distinguishes `RegisterTransaction` from other `Transaction` object types.
+`type` distinguishes `RegisterTransaction` from other [`Transaction`](/docs/client#Transaction) object types.
 
 ##### `RegisterTransaction#asset`
 
-`Asset` information to register.
+[`Asset`](/docs/client#Asset) information to register.
 
 #### `StateTransaction`
 
 *extends:*
-  - `TransactionBase`
+  - [`TransactionBase`](/docs/client#TransactionBase)
 
 ##### `StateTransaction#type`
 
-`type` distinguishes `StateTransaction` from other `Transaction` object types.
+`type` distinguishes [`StateTransaction`](/docs/client#StateTransaction) from other [`Transaction`](/docs/client#Transaction) object types.
 
 #### `ConfirmedTransaction`
 
-`Transaction` that has been confirmed on the blockchain. Includes all of the same properties as a `Transaction` as well as the `TransactionReceipt` of the confirmation.
+[`Transaction`](/docs/client#Transaction) that has been confirmed on the blockchain. Includes all of the same properties as a [`Transaction`](/docs/client#Transaction) as well as the [`TransactionReceipt`](/docs/client#TransactionReceipt) of the confirmation.
 
 ```typescript
 type ConfirmedTransaction =
@@ -2383,72 +2383,72 @@ type ConfirmedTransaction =
 
 #### `ConfirmedTransactionBase`
 
-Common propreties for all `ConfirmedTransaction`s.
+Common properties for all [`ConfirmedTransaction`](/docs/client#ConfirmedTransaction)s.
 
 ##### `ConfirmedTransactionBase#receipt`
 
-"Receipt" of the confirmed transaction on the blockchain. This contains properties like the block the `Transaction` was included in.
+"Receipt" of the confirmed transaction on the blockchain. This contains properties like the block the [`Transaction`](/docs/client#Transaction) was included in.
 
 #### `ConfirmedClaimTransaction`
 
 *extends:*
-  - `ConfirmedTransactionBase`
-  - `ClaimTransaction`
+  - [`ConfirmedTransactionBase`](/docs/client#ConfirmedTransactionBase)
+  - [`ClaimTransaction`](/docs/client#ClaimTransaction)
 
-Confirmed variant of `ClaimTransaction`
+Confirmed variant of [`ClaimTransaction`](/docs/client#ClaimTransaction)
 
 #### `ConfirmedContractTransaction`
 
 *extends:*
-  - `ConfirmedTransactionBase`
-  - `ContractTransaction`
+  - [`ConfirmedTransactionBase`](/docs/client#ConfirmedTransactionBase)
+  - [`ContractTransaction`](/docs/client#ContractTransaction)
 
-Confirmed variant of `ContractTransaction`
+Confirmed variant of [`ContractTransaction`](/docs/client#ContractTransaction)
 
 #### `ConfirmedEnrollmentTransaction`
 
 *extends:*
-  - `ConfirmedTransactionBase`
-  - `EnrollmentTransaction`
+  - [`ConfirmedTransactionBase`](/docs/client#ConfirmedTransactionBase)
+  - [`EnrollmentTransaction`](/docs/client#EnrollmentTransaction)
 
-Confirmed variant of `EnrollmentTransaction`.
+Confirmed variant of [`EnrollmentTransaction`](/docs/client#EnrollmentTransaction).
 
 #### `ConfirmedInvocationTransaction`
 
 *extends:*
-  - `ConfirmedTransactionBase`
-  - `InvocationTransaction`
+  - [`ConfirmedTransactionBase`](/docs/client#ConfirmedTransactionBase)
+  - [`InvocationTransaction`](/docs/client#InvocationTransaction)
 
-Confirmed variant of `InvocationTransaction`.
+Confirmed variant of [`InvocationTransaction`](/docs/client#InvocationTransaction).
 
 #### `ConfirmedIssueTransaction`
 
 *extends:*
-  - `ConfirmedTransactionBase`
-  - `IssueTransaction`
+  - [`ConfirmedTransactionBase`](/docs/client#ConfirmedTransactionBase)
+  - [`IssueTransaction`](/docs/client#IssueTransaction)
 
-Confirmed variant of `IssueTransaction`.
+Confirmed variant of [`IssueTransaction`](/docs/client#IssueTransaction).
 
 #### `ConfirmedMinerTransaction`
 
 *extends:*
-  - `ConfirmedTransactionBase`
-  - `MinerTransaction`
+  - [`ConfirmedTransactionBase`](/docs/client#ConfirmedTransactionBase)
+  - [`MinerTransaction`](/docs/client#MinerTransaction)
 
-Confirmed variant of `MinerTransaction`.
+Confirmed variant of [`MinerTransaction`](/docs/client#MinerTransaction).
 
 #### `ConfirmedPublishTransaction`
 
 *extends:*
-  - `ConfirmedTransactionBase`
-  - `PublishTransaction`
+  - [`ConfirmedTransactionBase`](/docs/client#ConfirmedTransactionBase)
+  - [`PublishTransaction`](/docs/client#PublishTransaction)
 
-Confirmed variant of `PublishTransaction`.
+Confirmed variant of [`PublishTransaction`](/docs/client#PublishTransaction).
 
 #### `ConfirmedRegisterTransaction`
 
 *extends:*
-  - `ConfirmedTransactionBase`
+  - [`ConfirmedTransactionBase`](/docs/client#ConfirmedTransactionBase)
   - `RegisterTransaction`
 
 Confirmed variant of `RegisterTransaction`.
@@ -2456,10 +2456,10 @@ Confirmed variant of `RegisterTransaction`.
 #### `ConfirmedStateTransaction`
 
 *extends:*
-  - `ConfirmedTransactionBase`
-  - `StateTransaction`
+  - [`ConfirmedTransactionBase`](/docs/client#ConfirmedTransactionBase)
+  - [`StateTransaction`](/docs/client#StateTransaction)
 
-Confirmed variant of `StateTransaction`.
+Confirmed variant of [`StateTransaction`](/docs/client#StateTransaction).
 
 ---
 
@@ -2475,7 +2475,7 @@ Raw action emitted during an invocation. Low-level API for advanced usage only.
 
 #### `RawActionBase`
 
-Base properties of `Event`s and `Log`s as well as their raw counterparts, `RawNotification` and `RawLog`, respectively.
+Base properties of [`Event`](/docs/client#Event)s and [`Log`](/docs/client#Log)s as well as their raw counterparts, [`RawNotification`](/docs/client#RawNotification) and [`RawLog`](/docs/client#RawLog), respectively.
 
 ##### `RawActionBase#version`
 
@@ -2511,23 +2511,23 @@ Address of the smart contract that this action occurred in.
 
 #### `RawInvocationData`
 
-Additional raw data that is typically processed by an `ABI` for the client APIs.
+Additional raw data that is typically processed by an [`ABI`](/docs/client#ABI) for the client APIs.
 
 ##### `RawInvocationData#asset`
 
-`Asset` created by the invocation.
+[`Asset`](/docs/client#Asset) created by the invocation.
 
 ##### `RawInvocationData#contracts`
 
-`Contract`s created by the invocation.
+[`Contract`](/docs/client#Contract)s created by the invocation.
 
 ##### `RawInvocationData#deletedContractAddresses`
 
-`Contract`s deleted by the invocation.
+[`Contract`](/docs/client#Contract)s deleted by the invocation.
 
 ##### `RawInvocationData#migratedContractAddresses`
 
-`Contract`s migrated (upgraded) by the invocation.
+[`Contract`](/docs/client#Contract)s migrated (upgraded) by the invocation.
 
 ##### `RawInvocationData#result`
 
@@ -2547,7 +2547,7 @@ type RawInvocationResult = RawInvocationResultError | RawInvocationResultSuccess
 
 #### `RawInvocationResultBase`
 
-Common `InvocationResult` and `RawInvocationResult` properties.
+Common [`InvocationResult`](/docs/client#InvocationResult) and [`RawInvocationResult`](/docs/client#RawInvocationResult) properties.
 
 ##### `RawInvocationResultBase#gasConsumed`
 
@@ -2560,7 +2560,7 @@ The total GAS cost before subtracting the free GAS.
 #### `RawInvocationResultError`
 
 *extends:*
-  - `RawInvocationResultBase`
+  - [`RawInvocationResultBase`](/docs/client#RawInvocationResultBase)
 
 Raw result of a failed invocation. Low-level API for advanced usage only.
 
@@ -2570,7 +2570,7 @@ Indicates a failed invocation.
 
 ##### `RawInvocationResultError#stack`
 
-The state of the NEO VM after execution. Typically has one `ContractParameter` which is the return value of the method invoked.
+The state of the NEO VM after execution. Typically has one [`ContractParameter`](/docs/client#ContractParameter) which is the return value of the method invoked.
 
 ##### `RawInvocationResultError#message`
 
@@ -2579,7 +2579,7 @@ A descriptive message indicating why the invocation failed.
 #### `RawInvocationResultSuccess`
 
 *extends:*
-  - `RawInvocationResultBase`
+  - [`RawInvocationResultBase`](/docs/client#RawInvocationResultBase)
 
 Raw result of a successful invocation. Low-level API for advanced usage only.
 
@@ -2589,7 +2589,7 @@ Indicates a successful invocation.
 
 ##### `RawInvocationResultSuccess#stack`
 
-The state of the NEO VM after execution. Typically has one `ContractParameter` which is the return value of the method invoked.
+The state of the NEO VM after execution. Typically has one [`ContractParameter`](/docs/client#ContractParameter) which is the return value of the method invoked.
 
 #### `RawLog`
 
@@ -2597,7 +2597,7 @@ Raw log emitted during an invocation.
 
 #### `RawLog#type`
 
-`type` differentiates the `RawLog` object from other `RawAction` objects, i.e. `RawNotification`.
+`type` differentiates the [`RawLog`](/docs/client#RawLog) object from other [`RawAction`](/docs/client#RawAction) objects, i.e. [`RawNotification`](/docs/client#RawNotification).
 
 #### `RawLog#message`
 
@@ -2606,21 +2606,21 @@ The raw message. This is unprocessed in the `message`.
 #### `RawNotification`
 
 *extends:*
-  - `RawActionBase`
+  - [`RawActionBase`](/docs/client#RawActionBase)
 
-Raw notification emitted during an invocation. This is the unprocessed counterpart to an `Event`. Low-level API for advanced usage only.
+Raw notification emitted during an invocation. This is the unprocessed counterpart to an [`Event`](/docs/client#Event). Low-level API for advanced usage only.
 
 ##### `RawNotification#type`
 
-`type` differentiates the `RawNotification` object from other `RawAction` objects, i.e. `RawLog`.
+`type` differentiates the [`RawNotification`](/docs/client#RawNotification) object from other [`RawAction`](/docs/client#RawAction) objects, i.e. [`RawLog`](/docs/client#RawLog).
 
 ##### `RawNotification#args`
 
-The raw arguments of the notifications. These are processed into the `parameters` parameter of the `Event` object using the `ABI`.
+The raw arguments of the notifications. These are processed into the `parameters` parameter of the [`Event`](/docs/client#Event) object using the [`ABI`](/docs/client#ABI).
 
 #### `ContractParameter`
 
-`ContractParameter`s are the serialized stack items of an invocation. These are typically the raw results of an invocation, but they may appear in other raw contexts. Low-level API for advanced usage only.
+[`ContractParameter`](/docs/client#ContractParameter)s are the serialized stack items of an invocation. These are typically the raw results of an invocation, but they may appear in other raw contexts. Low-level API for advanced usage only.
 
 ```typescript
 type ContractParameter =
@@ -2640,7 +2640,7 @@ type ContractParameter =
 
 #### `ContractParameterType`
 
-All of the possible `type`s that a `ContractParameter` may have.
+All of the possible `type`s that a [`ContractParameter`](/docs/client#ContractParameter) may have.
 
 #### `AddressContractParameter`
 
@@ -2648,7 +2648,7 @@ Invocation stack item for an `Address`.
 
 ##### `AddressContractParameter#type`
 
-`type` distinguishes `AddressContractParameter` from other `ContractParameter` object types.
+`type` distinguishes [`AddressContractParameter`](/docs/client#AddressContractParameter) from other [`ContractParameter`](/docs/client#ContractParameter) object types.
 
 ##### `AddressContractParameter#value`
 
@@ -2660,11 +2660,11 @@ Invocation stack item for an `Array`.
 
 ##### `ArrayContractParameter#type`
 
-`type` distinguishes `ArrayContractParameter` from other `ContractParameter` object types.
+`type` distinguishes [`ArrayContractParameter`](/docs/client#ArrayContractParameter) from other [`ContractParameter`](/docs/client#ContractParameter) object types.
 
 ##### `ArrayContractParameter#value`
 
-An array of `ContractParameter`s.
+An array of [`ContractParameter`](/docs/client#ContractParameter)s.
 
 #### `BooleanContractParameter`
 
@@ -2672,7 +2672,7 @@ Invocation stack item for a `boolean`.
 
 ##### `BooleanContractParameter#type`
 
-`type` distinguishes `BooleanContractParameter` from other `ContractParameter` object types.
+`type` distinguishes [`BooleanContractParameter`](/docs/client#BooleanContractParameter) from other [`ContractParameter`](/docs/client#ContractParameter) object types.
 
 ##### `BooleanContractParameter#value`
 
@@ -2684,7 +2684,7 @@ Invocation stack item for a `Buffer`.
 
 ##### `BufferContractParameter#type`
 
-`type` distinguishes `BufferContractParameter` from other `ContractParameter` object types.
+`type` distinguishes [`BufferContractParameter`](/docs/client#BufferContractParameter) from other [`ContractParameter`](/docs/client#ContractParameter) object types.
 
 ##### `BufferContractParameter#value`
 
@@ -2692,15 +2692,15 @@ Hex encoded `Buffer` string.
 
 #### `Hash256ContractParameter`
 
-Invocation stack item for a `Hash256`.
+Invocation stack item for a [`Hash256`](/docs/client#Hash256).
 
 ##### `Hash256ContractParameter#type`
 
-`type` distinguishes `Hash256ContractParameter` from other `ContractParameter` object types.
+`type` distinguishes [`Hash256ContractParameter`](/docs/client#Hash256ContractParameter) from other [`ContractParameter`](/docs/client#ContractParameter) object types.
 
 ##### `Hash256ContractParameter#value`
 
- NEO `Hash256` encoded as a string.
+ NEO [`Hash256`](/docs/client#Hash256) encoded as a string.
 
 #### `IntegerContractParameter`
 
@@ -2712,15 +2712,15 @@ Note that unlike most of the client APIs, we use a `BN` instead of a `BigNumber`
 
 ##### `IntegerContractParameter#value`
 
-For example, an `IntegerContractParameter` that represents a NEO value of 10 would be a `new BN(10_00000000)`.
+For example, an [`IntegerContractParameter`](/docs/client#IntegerContractParameter) that represents a NEO value of 10 would be a `new BN(10_00000000)`.
 
 #### `InteropInterfaceContractParameter`
 
-Invocation stack item for anything other than the other valid contract parameters. Examples include the `Block` builtin. If these builtins remain on the stack after invocation, for example, as a return value, then they will be serialized as this empty interface.
+Invocation stack item for anything other than the other valid contract parameters. Examples include the [`Block`](/docs/client#Block) builtin. If these builtins remain on the stack after invocation, for example, as a return value, then they will be serialized as this empty interface.
 
 ##### `InteropInterfaceContractParameter#type`
 
-`type` distinguishes `InteropInterfaceContractParameter` from other `ContractParameter` object types.
+`type` distinguishes [`InteropInterfaceContractParameter`](/docs/client#InteropInterfaceContractParameter) from other [`ContractParameter`](/docs/client#ContractParameter) object types.
 
 #### `MapContractParameter`
 
@@ -2728,11 +2728,11 @@ Invocation stack item for a `Map`.
 
 ##### `MapContractParameter#type`
 
-`type` distinguishes `MapContractParameter` from other `ContractParameter` object types.
+`type` distinguishes [`MapContractParameter`](/docs/client#MapContractParameter) from other [`ContractParameter`](/docs/client#ContractParameter) object types.
 
 ##### `MapContractParameter#value`
 
-A map of `ContractParameter` to `ContractParameter`. Represented as an array of pairs because JavaScript `Map` keys do not have the same semantics as the NEO VM.
+A map of [`ContractParameter`](/docs/client#ContractParameter) to [`ContractParameter`](/docs/client#ContractParameter). Represented as an array of pairs because JavaScript `Map` keys do not have the same semantics as the NEO VM.
 
 #### `PublicKeyContractParameter`
 
@@ -2740,7 +2740,7 @@ Invocation stack item for a `PublicKey`.
 
 ##### `PublicKeyContractParameter#type`
 
-`type` distinguishes `PublicKeyContractParameter` from other `ContractParameter` object types.
+`type` distinguishes [`PublicKeyContractParameter`](/docs/client#PublicKeyContractParameter) from other [`ContractParameter`](/docs/client#ContractParameter) object types.
 
 ##### `PublicKeyContractParameter#value`
 
@@ -2752,7 +2752,7 @@ Invocation stack item for a `Signature`.
 
 ##### `SignatureContractParameter#type`
 
-`type` distinguishes `SignatureContractParameter` from other `ContractParameter` object types.
+`type` distinguishes [`SignatureContractParameter`](/docs/client#SignatureContractParameter) from other [`ContractParameter`](/docs/client#ContractParameter) object types.
 
 ##### `SignatureContractParameter#value`
 
@@ -2764,7 +2764,7 @@ Invocation stack item for a `string`.
 
 ##### `StringContractParameter#type`
 
-`type` distinguishes `StringContractParameter` from other `ContractParameter` object types.
+`type` distinguishes [`StringContractParameter`](/docs/client#StringContractParameter) from other [`ContractParameter`](/docs/client#ContractParameter) object types.
 
 ##### `StringContractParameter#value`
 
@@ -2776,4 +2776,4 @@ Invocation stack item for `void`.
 
 ##### `VoidContractParameter#type`
 
-`type` distinguishes `VoidContractParameter` from other `ContractParameter` object types.
+`type` distinguishes [`VoidContractParameter`](/docs/client#VoidContractParameter) from other [`ContractParameter`](/docs/client#ContractParameter) object types.
