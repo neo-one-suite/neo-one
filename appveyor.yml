@@ -5,7 +5,7 @@ configuration:
 
 cache:
   - node_modules -> yarn.lock
-  - '%LocalAppData%\Yarn\cache -> yarn.lock'
+  - "%LOCALAPPDATA%\\Yarn" -> yarn.lock
 
 for:
   -
@@ -21,7 +21,7 @@ for:
       - ps: Update-NodeJsInstallation 8.9.0 x64
       - node --version
       - yarn --version
-      - yarn install --non-interactive --cache-folder ~/.cache/yarn --ignore-engines
+      - yarn install --non-interactive --ignore-engines
       - yarn run build:e2e
     test_script:
       - yarn run test-ci-windows-8
@@ -41,7 +41,7 @@ for:
       - ps: Update-NodeJsInstallation 9.11.2 x64
       - node --version
       - yarn --version
-      - yarn install --non-interactive --cache-folder ~/.cache/yarn --ignore-engines
+      - yarn install --non-interactive --ignore-engines
       - yarn run build:e2e
     test_script:
       - yarn run test-ci-windows-9
@@ -61,7 +61,7 @@ for:
       - ps: Update-NodeJsInstallation 10.13.0 x64
       - node --version
       - yarn --version
-      - yarn install --non-interactive --cache-folder ~/.cache/yarn --ignore-engines
+      - yarn install --non-interactive --ignore-engines
       - yarn run build:e2e
     test_script:
       - yarn run test-ci
