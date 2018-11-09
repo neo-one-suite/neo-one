@@ -12621,21 +12621,7 @@ listr-update-renderer@^0.2.0:
     log-update "^1.0.2"
     strip-ansi "^3.0.1"
 
-listr-update-renderer@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/listr-update-renderer/-/listr-update-renderer-0.4.0.tgz#344d980da2ca2e8b145ba305908f32ae3f4cc8a7"
-  integrity sha1-NE2YDaLKLosUW6MFkI8yrj9MyKc=
-  dependencies:
-    chalk "^1.1.3"
-    cli-truncate "^0.2.1"
-    elegant-spinner "^1.0.1"
-    figures "^1.7.0"
-    indent-string "^3.0.0"
-    log-symbols "^1.0.2"
-    log-update "^1.0.2"
-    strip-ansi "^3.0.1"
-
-"listr-update-renderer@https://github.com/okonet/listr-update-renderer/tarball/upgrade-log-update":
+listr-update-renderer@^0.4.0, "listr-update-renderer@https://github.com/okonet/listr-update-renderer/tarball/upgrade-log-update":
   version "0.4.0"
   resolved "https://github.com/okonet/listr-update-renderer/tarball/upgrade-log-update#06073fa93166277607a7814f4e1f83960081414c"
   dependencies:
@@ -20703,10 +20689,10 @@ webpack@4.19.0, webpack@^4.18.0:
     watchpack "^1.5.0"
     webpack-sources "^1.2.0"
 
-webpackbar@3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/webpackbar/-/webpackbar-3.0.3.tgz#fad6032308c0dc871c707e45172646a6f56e499b"
-  integrity sha512-glcT90q25QnA0uSgQbU+l6AxcTiCPNr9+Ao3Dz8MHqluE3h6X8JfY8czlMDzTjkRLY7RtD2j37lEw0hNJvhjVA==
+webpackbar@3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/webpackbar/-/webpackbar-3.1.2.tgz#eee47195b1309604c363e0dc52d13d7846da5078"
+  integrity sha512-Wk7VwbUl6RwWAnPL5d0/rKlrBNSwiE+Xr+3aC2Paq3rQxIleNDFshnVyM2YFL/9J0VRfmIg6C6DOqDzYN5CU9w==
   dependencies:
     ansi-escapes "^3.1.0"
     chalk "^2.4.1"
