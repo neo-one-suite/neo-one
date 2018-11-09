@@ -384,9 +384,9 @@ export const createSmartContract = ({
 
   const iterActionsRaw = ({
     network = client.getCurrentNetwork(),
-    filter: blockFilter = {},
+    ...iterOptions
   }: SmartContractIterOptions = {}): AsyncIterable<RawAction> =>
-    AsyncIterableX.from(client.__iterActionsRaw(network, blockFilter)).pipe(
+    AsyncIterableX.from(client.__iterActionsRaw(network, iterOptions)).pipe(
       filter((action) => action.address === definition.networks[network].address),
     );
 

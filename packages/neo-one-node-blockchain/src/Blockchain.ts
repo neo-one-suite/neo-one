@@ -736,7 +736,7 @@ export class Blockchain {
         ...result,
         failureMessage:
           `Verification did not return one result. This may be a bug in the ` +
-          `smart contract compiler or the smart contract itself. If you are using the NEO•ONE compiler please see <insert_url>. Found ${
+          `smart contract compiler or the smart contract itself. If you are using the NEO•ONE compiler please file an issue. Found ${
             stack.length
           } results.`,
       };

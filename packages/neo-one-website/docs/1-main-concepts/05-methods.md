@@ -53,3 +53,7 @@ export class HelloWorld extends SmartContract {
 ```
 
 Private and protected instance methods are just helper methods, same as normal TypeScript, but be aware that any private or protected methods invoked from a public method must respect the restrictions of the public method. For example, you can't call a private or protected method which modifies a smart contract property from a `@constant` public method.
+
+## Parameter and Return Types
+
+Similar to storage properties, parameter and return types for public instance methods may not be classes or functions.

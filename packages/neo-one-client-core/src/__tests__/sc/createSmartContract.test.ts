@@ -160,7 +160,7 @@ describe('createSmartContract', () => {
   test('iterActions', async () => {
     __iterActionsRaw.mockImplementationOnce(() => AsyncIterableX.from(allActions));
 
-    const result = await toArray(contract.iterActions({ filter: { indexStart: 3, indexStop: 5 } }));
+    const result = await toArray(contract.iterActions({ indexStart: 3, indexStop: 5 }));
 
     expect(result).toHaveLength(2);
     verifyEvent(result[0]);
@@ -171,7 +171,7 @@ describe('createSmartContract', () => {
   test('iterEvents', async () => {
     __iterActionsRaw.mockImplementationOnce(() => AsyncIterableX.from(allActions));
 
-    const result = await toArray(contract.iterEvents({ filter: { indexStart: 3, indexStop: 5 } }));
+    const result = await toArray(contract.iterEvents({ indexStart: 3, indexStop: 5 }));
 
     expect(result).toHaveLength(1);
     verifyEvent(result[0]);
@@ -181,7 +181,7 @@ describe('createSmartContract', () => {
   test('iterLogs', async () => {
     __iterActionsRaw.mockImplementationOnce(() => AsyncIterableX.from(allActions));
 
-    const result = await toArray(contract.iterLogs({ filter: { indexStart: 3, indexStop: 5 } }));
+    const result = await toArray(contract.iterLogs({ indexStart: 3, indexStop: 5 }));
 
     expect(result).toHaveLength(1);
     verifyLog(result[0]);

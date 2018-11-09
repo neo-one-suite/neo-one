@@ -55,4 +55,20 @@ Notice that we construct the structured storage classes using the [static](https
 
 Aside from the limitations mentioned above, each of the structured storage classes work identically to their `Array`, `Set` and `Map` counterparts.
 
+## Storage Types
+
+The only limitation on storage types is that you cannot use an instance of a class or a functon. This is because we cannot reliably serialize and deserialize arbitrary instances when we store the values in the underlying smart contract storage. For similar reasons, we cannot store arbitrary functions. However, you may declare a `readonly` property that is a function. This can be useful for declaring event notifiers as properties of the class:
+
+```typescript
+export class Contract extends SmartContract {
+  private readonly notifyTransfer = createEventNotifier<Address | undefined, Address | undefined, Fixed<8>>(
+    'transfer',
+    'from',
+    'to',
+    'amount',
+  );
+}
+```
+
+We'll learn more about event notifiers in a later chaper of the guide.
 

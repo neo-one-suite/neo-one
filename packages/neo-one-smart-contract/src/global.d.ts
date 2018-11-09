@@ -4,7 +4,7 @@
  *
  * Makes it an error to pass values that would otherwise match the shape of the interface.
  *
- * See <fill_me_in> for more info.
+ * See the [Standard Library](https://neo-one.io/docs/smart-contract-basics#Opaque-Tag-Symbol) chapter of the main guide for more information.
  */
 declare const one0: unique symbol;
 /**
@@ -12,7 +12,7 @@ declare const one0: unique symbol;
  *
  * Makes it an error to pass values that would otherwise match the shape of the interface.
  *
- * See <fill_me_in> for more info.
+ * See the [Standard Library](https://neo-one.io/docs/smart-contract-basics#Opaque-Tag-Symbol) chapter of the main guide for more information.
  */
 declare const one1: unique symbol;
 

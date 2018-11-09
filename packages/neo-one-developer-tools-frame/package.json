@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/developer-tools-frame",
-  "version": "1.0.0-preview.5",
+  "version": "1.0.0-preview.6",
   "description": "NEO•ONE developer tools.",
   "main": "./src/index.tsx",
   "dependencies": {

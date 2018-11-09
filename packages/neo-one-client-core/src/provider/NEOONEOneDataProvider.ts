@@ -3,13 +3,13 @@ import {
   AddressString,
   Asset,
   Block,
-  BlockFilter,
   Contract,
   DeveloperProvider,
   GetOptions,
   Hash256String,
   Input,
   InputOutput,
+  IterOptions,
   NetworkSettings,
   NetworkType,
   Output,
@@ -130,8 +130,8 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
     return provider.getBlock(hashOrIndex, options);
   }
 
-  public iterBlocks(filter: BlockFilter = {}): AsyncIterable<Block> {
-    return AsyncIterableX.from(this.getProvider()).pipe(flatMap((provider) => provider.iterBlocks(filter)));
+  public iterBlocks(options: IterOptions = {}): AsyncIterable<Block> {
+    return AsyncIterableX.from(this.getProvider()).pipe(flatMap((provider) => provider.iterBlocks(options)));
   }
 
   public async getBestBlockHash(monitor?: Monitor): Promise<Hash256String> {
@@ -182,8 +182,8 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
     return provider.getNetworkSettings(monitor);
   }
 
-  public iterActionsRaw(filter: BlockFilter = {}): AsyncIterable<RawAction> {
-    return AsyncIterableX.from(this.getProvider()).pipe(flatMap((provider) => provider.iterActionsRaw(filter)));
+  public iterActionsRaw(options: IterOptions = {}): AsyncIterable<RawAction> {
+    return AsyncIterableX.from(this.getProvider()).pipe(flatMap((provider) => provider.iterActionsRaw(options)));
   }
 
   public async call(

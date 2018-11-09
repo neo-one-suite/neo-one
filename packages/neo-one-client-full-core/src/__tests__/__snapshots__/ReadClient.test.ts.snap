@@ -104,6 +104,7 @@ Array [
     Object {
       "indexStart": 3,
       "indexStop": 4,
+      "monitor": undefined,
     },
   ],
 ]

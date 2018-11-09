@@ -9,7 +9,6 @@ import {
   Attribute,
   AttributeJSON,
   Block,
-  BlockFilter,
   BlockJSON,
   common,
   ConfirmedTransaction,
@@ -26,6 +25,7 @@ import {
   InvocationDataJSON,
   InvocationTransactionJSON,
   InvocationTransactionModel,
+  IterOptions,
   JSONHelper,
   NetworkSettings,
   NetworkSettingsJSON,
@@ -216,11 +216,11 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return this.convertBlock(block);
   }
 
-  public iterBlocks(filter: BlockFilter = {}): AsyncIterable<Block> {
+  public iterBlocks(options: IterOptions = {}): AsyncIterable<Block> {
     return AsyncIterableX.from(
       new AsyncBlockIterator({
         client: this,
-        filter,
+        options,
         fetchTimeoutMS: this.iterBlocksFetchTimeoutMS,
         batchSize: this.iterBlocksBatchSize,
       }),
@@ -273,14 +273,8 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return this.convertNetworkSettings(settings);
   }
 
-  public iterActionsRaw(filter: BlockFilter = {}): AsyncIterable<RawAction> {
-    return AsyncIterableX.from(
-      this.iterBlocks({
-        indexStart: filter.indexStart,
-        indexStop: filter.indexStop,
-        monitor: filter.monitor,
-      }),
-    ).pipe(
+  public iterActionsRaw(options: IterOptions = {}): AsyncIterable<RawAction> {
+    return AsyncIterableX.from(this.iterBlocks(options)).pipe(
       flatMap(async (block) => {
         const actions = _.flatten(
           block.transactions.map((transaction) => {

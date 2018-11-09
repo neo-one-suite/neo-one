@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-blockchain",
-  "version": "1.0.0-preview.4",
+  "version": "1.0.0-preview.5",
   "description": "NEO•ONE NEO blockchain implementation.",
   "main": "./src/index.ts",
   "dependencies": {

@@ -75,12 +75,12 @@ const createCurrentAsset$ = (options: CurrentAssetTokenOptions) =>
     distinctUntilChanged(),
   );
 
-export function BalanceSelector() {
-  const asset$ = new BehaviorSubject(ASSETS[0]);
-  const onChangeAsset = (asset: Asset) => {
-    asset$.next(asset);
-  };
+const assetGlobal$ = new BehaviorSubject(ASSETS[0]);
+const onChangeAsset = (asset: Asset) => {
+  assetGlobal$.next(asset);
+};
 
+export function BalanceSelector() {
   return (
     <WithAddError>
       {(addError) => (
@@ -90,10 +90,10 @@ export function BalanceSelector() {
               <DeveloperToolsContext.Consumer>
                 {({ client, accountState$ }: DeveloperToolsContextType) => (
                   <FromStream
-                    props={[addError, accountState$, asset$, tokens$]}
+                    props={[addError, accountState$, assetGlobal$, tokens$]}
                     createStream={() =>
                       combineLatest(
-                        createCurrentAsset$({ asset$, tokens$ }),
+                        createCurrentAsset$({ asset$: assetGlobal$, tokens$ }),
                         accountState$.pipe(filter(utils.notNull)),
                       ).pipe(
                         switchMap(async ([asset, { currentUserAccount, account }]) => {
@@ -126,7 +126,10 @@ export function BalanceSelector() {
                   </FromStream>
                 )}
               </DeveloperToolsContext.Consumer>
-              <FromStream props={[asset$, tokens$]} createStream={() => createCurrentAssetToken$({ asset$, tokens$ })}>
+              <FromStream
+                props={[assetGlobal$, tokens$]}
+                createStream={() => createCurrentAssetToken$({ asset$: assetGlobal$, tokens$ })}
+              >
                 {({ tokens, asset }) => (
                   <AssetInput
                     data-test-selector="neo-one-balance-selector-selector"
