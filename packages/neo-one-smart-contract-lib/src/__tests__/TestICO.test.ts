@@ -37,7 +37,7 @@ describe('TestICO', () => {
           smartContract.name(),
           smartContract.decimals(),
           smartContract.symbol(),
-          client.providers.memory.keystore.addAccount({
+          client.providers.memory.keystore.addUserAccount({
             network: networkName,
             name: 'minter',
             privateKey: MINTER.PRIVATE_KEY,
@@ -73,7 +73,7 @@ describe('TestICO', () => {
 
         const firstMint = new BigNumber('10');
         const mintResult = await smartContract.mintTokens({
-          from: minter.account.id,
+          from: minter.userAccount.id,
           sendTo: [
             {
               amount: firstMint,
@@ -90,7 +90,7 @@ describe('TestICO', () => {
         const event = mintReceipt.events[0];
         expect(event.name).toEqual('transfer');
         expect(event.parameters.from).toBeUndefined();
-        expect(event.parameters.to).toEqual(minter.account.id.address);
+        expect(event.parameters.to).toEqual(minter.userAccount.id.address);
         if (event.parameters.amount === undefined) {
           expect(event.parameters.amount).toBeTruthy();
           throw new Error('For TS');
@@ -99,7 +99,7 @@ describe('TestICO', () => {
         expect(event.parameters.amount.toString()).toEqual(firstBalance);
 
         const [minterBalance, mintTotalSupply] = await Promise.all([
-          smartContract.balanceOf(minter.account.id.address),
+          smartContract.balanceOf(minter.userAccount.id.address),
           smartContract.totalSupply(),
         ]);
 

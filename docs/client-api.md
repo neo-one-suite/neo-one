@@ -70,7 +70,7 @@ This is the API documentation for the NEO•ONE Client.
   ```ts
   const keystore = client.providers.memory.keystore;
 
-  await keystore.addAccount({
+  await keystore.addUserAccount({
     network: 'private',
     privateKey: createPrivateKey(),
   })

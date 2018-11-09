@@ -13,11 +13,12 @@ import _ from 'lodash';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { UnknownAccountError } from '../../errors';
+import { KeyStore } from '../LocalUserAccountProvider';
 import { LedgerHandler } from './LedgerHandler';
 
-export type Ledgers = { readonly [Network in string]?: { readonly [Address in string]?: Ledger } };
+type Ledgers = { readonly [Network in string]?: { readonly [Address in string]?: Ledger } };
 
-export interface Ledger {
+interface Ledger {
   readonly accountKey: number;
   readonly account: UserAccount;
 }
@@ -28,12 +29,12 @@ export interface LedgerProvider {
   readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
 }
 
-export interface Handler {
+interface Handler {
   readonly byteLimit: number;
   readonly init: () => Promise<ConnectedHandler>;
 }
 
-export interface ConnectedHandler {
+interface ConnectedHandler {
   readonly getPublicKey: (account?: number) => Promise<PublicKeyString>;
   readonly sign: (
     options: {
@@ -67,18 +68,10 @@ const getNewNetworks = (networks: Set<NetworkType> | undefined, networksIn: Read
 /**
  * Implements the `KeyStore` interface expected by `LocalUserAccountProvider` using a ledger.
  */
-export class LedgerKeyStore {
-  public get ledgers(): Ledgers {
-    return this.ledgersInternal$.getValue();
-  }
-
-  public get currentAccount(): UserAccount | undefined {
-    return this.currentAccountInternal$.getValue();
-  }
+export class LedgerKeyStore implements KeyStore {
   public readonly byteLimit: number;
-  public readonly currentAccount$: Observable<UserAccount | undefined>;
-  public readonly accounts$: Observable<ReadonlyArray<UserAccount>>;
-
+  public readonly currentUserAccount$: Observable<UserAccount | undefined>;
+  public readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
   private readonly ledgerHandler: Handler;
   private readonly initPromise: Promise<ConnectedHandler>;
   private readonly provider: LedgerProvider;
@@ -136,7 +129,7 @@ export class LedgerKeyStore {
 
     this.accountsInternal$ = new BehaviorSubject<ReadonlyArray<UserAccount>>([]);
     this.ledgers$.pipe(map((ledgers) => ledgers.map(({ account }) => account))).subscribe(this.accountsInternal$);
-    this.accounts$ = this.accountsInternal$;
+    this.userAccounts$ = this.accountsInternal$;
 
     this.currentAccountInternal$ = new BehaviorSubject<UserAccount | undefined>(undefined);
     this.ledgers$
@@ -150,14 +143,14 @@ export class LedgerKeyStore {
         }),
       )
       .subscribe(this.currentAccountInternal$);
-    this.currentAccount$ = this.currentAccountInternal$.pipe(distinctUntilChanged());
+    this.currentUserAccount$ = this.currentAccountInternal$.pipe(distinctUntilChanged());
   }
 
-  public getCurrentAccount(): UserAccount | undefined {
+  public getCurrentUserAccount(): UserAccount | undefined {
     return this.currentAccountInternal$.getValue();
   }
 
-  public getAccounts(): ReadonlyArray<UserAccount> {
+  public getUserAccounts(): ReadonlyArray<UserAccount> {
     return this.accountsInternal$.getValue();
   }
 
@@ -165,15 +158,7 @@ export class LedgerKeyStore {
     return this.provider.getNetworks();
   }
 
-  public async deleteAccount(): Promise<void> {
-    throw new Error('not implemented on ledger.');
-  }
-
-  public async updateAccountName(): Promise<void> {
-    throw new Error('not implemented on ledger.');
-  }
-
-  public async selectAccount(id?: UserAccountID, _monitor?: Monitor): Promise<void> {
+  public async selectUserAccount(id?: UserAccountID, _monitor?: Monitor): Promise<void> {
     if (id === undefined) {
       this.currentAccountInternal$.next(undefined);
     } else {
@@ -208,7 +193,13 @@ export class LedgerKeyStore {
     );
   }
 
-  public getLedger({ address, network }: UserAccountID): Ledger {
+  public async close(): Promise<void> {
+    const handler = await this.initPromise;
+    this.ledgersSubscription.unsubscribe();
+    await handler.close();
+  }
+
+  private getLedger({ address, network }: UserAccountID): Ledger {
     const ledgers = this.ledgers[network];
     if (ledgers === undefined) {
       throw new UnknownAccountError(address);
@@ -222,14 +213,8 @@ export class LedgerKeyStore {
     return ledger;
   }
 
-  public async init(): Promise<ConnectedHandler> {
+  private async init(): Promise<ConnectedHandler> {
     return this.ledgerHandler.init();
-  }
-
-  public async close(): Promise<void> {
-    const handler = await this.initPromise;
-    this.ledgersSubscription.unsubscribe();
-    await handler.close();
   }
 
   private async scanLedgerAccounts(
@@ -318,5 +303,9 @@ export class LedgerKeyStore {
       level: { log: 'verbose', span: 'info' },
       trace: true,
     });
+  }
+
+  private get ledgers(): Ledgers {
+    return this.ledgersInternal$.getValue();
   }
 }

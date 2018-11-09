@@ -6,8 +6,8 @@ import { Client } from '../../Client';
 import { getParamsAndOptions } from '../../sc';
 
 const wallet = factory.createUnlockedWallet();
-const getCurrentNetwork = jest.fn(() => wallet.account.id.network);
-const getCurrentUserAccount = jest.fn(() => wallet.account);
+const getCurrentNetwork = jest.fn(() => wallet.userAccount.id.network);
+const getCurrentUserAccount = jest.fn(() => wallet.userAccount);
 const client: Client = {
   getCurrentNetwork,
   getCurrentUserAccount,
@@ -97,13 +97,19 @@ describe('Transfer - No Function Options', async () => {
 
   const testArgsNoForward = [true, true, new BigNumber(1)];
   const testArgs = [true, true, new BigNumber(1), factory.createForwardValue(), factory.createForwardValue()];
-  const testArgsWithOptions = [true, true, new BigNumber(1), { from: wallet.account.id }, factory.createForwardValue()];
+  const testArgsWithOptions = [
+    true,
+    true,
+    new BigNumber(1),
+    { from: wallet.userAccount.id },
+    factory.createForwardValue(),
+  ];
   const testArgsForwardOptions = [true, true, new BigNumber(1), { events }, factory.createForwardValue()];
   const testArgsAllOptions = [
     true,
     true,
     new BigNumber(1),
-    { from: wallet.account.id },
+    { from: wallet.userAccount.id },
     { events },
     factory.createForwardValue(),
   ];
@@ -164,7 +170,7 @@ describe('Transfer - Complete Send - Optional ForwardValues', () => {
     true,
     new BigNumber(1),
     data.hash256s.a,
-    { from: wallet.account.id },
+    { from: wallet.userAccount.id },
     factory.createForwardValue(),
   ];
   const testArgsAllOptions = [
@@ -172,7 +178,7 @@ describe('Transfer - Complete Send - Optional ForwardValues', () => {
     true,
     new BigNumber(1),
     data.hash256s.a,
-    { from: wallet.account.id },
+    { from: wallet.userAccount.id },
     { events },
     factory.createForwardValue(),
   ];
@@ -235,12 +241,12 @@ describe('Transfer - Send - Optional ForwardValue', async () => {
     new BigNumber(1),
     transfer,
     { events },
-    { from: wallet.account.id },
+    { from: wallet.userAccount.id },
     factory.createForwardValue(),
     factory.createForwardValue(),
   ];
   const testArgsNoForward = [true, true, new BigNumber(1), transfer];
-  const testArgsNFWithOptions = [true, true, new BigNumber(1), transfer, { from: wallet.account.id }];
+  const testArgsNFWithOptions = [true, true, new BigNumber(1), transfer, { from: wallet.userAccount.id }];
 
   const testFunc = getABIFuncTest(func);
 
@@ -282,12 +288,12 @@ describe('Transfer - SendUnsafe&Receive', () => {
   ];
 
   const unsafeOptions = {
-    from: wallet.account.id,
+    from: wallet.userAccount.id,
     sendFrom: [factory.createTransfer()],
     sendTo: [
       {
         amount: new BigNumber(5),
-        to: wallet.account.id.address,
+        to: wallet.userAccount.id.address,
       },
     ],
   };
@@ -360,7 +366,7 @@ describe('Transfer - No Forward Values', async () => {
   const testFunc = getABIFuncTest(func);
 
   const testArgs = [true, true, new BigNumber(1)];
-  const testArgsWithOptions = [true, true, new BigNumber(1), { from: wallet.account.id }];
+  const testArgsWithOptions = [true, true, new BigNumber(1), { from: wallet.userAccount.id }];
 
   testFunc(testArgs, 'base');
   testFunc(testArgsWithOptions, 'base-transOptions');
@@ -415,7 +421,7 @@ describe('Transfer - Other Rest Param', () => {
 
   const testArgs = [true, true, new BigNumber(1), true, false];
   const testArgsNoOptional = [true, true, new BigNumber(1)];
-  const testArgsWithOptions = [true, true, new BigNumber(1), { from: wallet.account.id }, true, false];
+  const testArgsWithOptions = [true, true, new BigNumber(1), { from: wallet.userAccount.id }, true, false];
 
   testFunc(testArgsNoOptional, 'base');
   testFunc(testArgs, 'all');
@@ -471,8 +477,8 @@ describe('Transfer - No Rest, No ForwardValue', () => {
 
   const testArgsNoOptional = [true, true, new BigNumber(1)];
   const testArgs = [true, true, new BigNumber(1), false];
-  const testArgsWithOptions = [true, true, new BigNumber(1), { from: wallet.account.id }];
-  const testArgsAll = [true, true, new BigNumber(1), { from: wallet.account.id }, false];
+  const testArgsWithOptions = [true, true, new BigNumber(1), { from: wallet.userAccount.id }];
+  const testArgsAll = [true, true, new BigNumber(1), { from: wallet.userAccount.id }, false];
 
   testFunc(testArgsNoOptional, 'base');
   testFunc(testArgs, 'all');

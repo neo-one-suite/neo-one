@@ -65,7 +65,7 @@ async function addWallet({
     await one.execute(`create wallet ${walletName} --network ${networkName}`);
   }
   const wallet = await getWalletInfo({ walletName, networkName });
-  await keystore.addAccount({
+  await keystore.addUserAccount({
     network: networkName,
     name: walletName,
     privateKey: wifToPrivateKey(wallet.privateKey),

@@ -221,7 +221,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
       ] = await sourceMap;
       const result = await userAccountProviders.memory.__execute(
         outputScript,
-        { from: masterWallet.account.id, systemFee: new BigNumber(-1), ...options },
+        { from: masterWallet.userAccount.id, systemFee: new BigNumber(-1), ...options },
         Promise.resolve(mutableSourceMaps),
       );
 

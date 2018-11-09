@@ -11,8 +11,8 @@ describe('createSmartContract', () => {
   const __iterActionsRaw = jest.fn();
   const __invoke = jest.fn();
   const __call = jest.fn();
-  const getCurrentNetwork = jest.fn(() => wallet.account.id.network);
-  const getCurrentUserAccount = jest.fn(() => wallet.account);
+  const getCurrentNetwork = jest.fn(() => wallet.userAccount.id.network);
+  const getCurrentUserAccount = jest.fn(() => wallet.userAccount);
   const client: Client = {
     read,
     __iterActionsRaw,

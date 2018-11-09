@@ -44,7 +44,7 @@ describe('LocalStringStore', () => {
     const result = await store.getWallets();
     expect(result).toHaveLength(1);
     expect(result[0].type).toEqual('locked');
-    expect(result[0].account).toEqual(wallet.account);
+    expect(result[0].userAccount).toEqual(wallet.userAccount);
     expect(result[0].nep2).toEqual(wallet.nep2);
   });
 
@@ -56,7 +56,7 @@ describe('LocalStringStore', () => {
     const result = await store.getWallets();
     expect(result).toHaveLength(1);
     expect(result[0].type).toEqual('locked');
-    expect(result[0].account).toEqual(wallet.account);
+    expect(result[0].userAccount).toEqual(wallet.userAccount);
     expect(result[0].nep2).toEqual(wallet.nep2);
   });
 

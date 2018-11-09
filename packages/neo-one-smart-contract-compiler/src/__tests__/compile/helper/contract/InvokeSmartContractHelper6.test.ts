@@ -15,7 +15,7 @@ public readonly properties = {
 describe('InvokeSmartContractHelper', () => {
   test('class that used processedTransactions, send, receive and claim', async () => {
     const node = await helpers.startNode();
-    const accountID = node.masterWallet.account.id;
+    const accountID = node.masterWallet.userAccount.id;
     const contract = await node.addContract(`
       import {
         Address,
@@ -442,7 +442,7 @@ describe('InvokeSmartContractHelper', () => {
       assertEqual(escrow.deploy(), true);
     `);
 
-    const accountID = node.masterWallet.account.id;
+    const accountID = node.masterWallet.userAccount.id;
     const tokenContract = node.client.smartContract({
       networks: {
         [accountID.network]: {

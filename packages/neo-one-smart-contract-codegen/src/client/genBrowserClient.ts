@@ -56,7 +56,7 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
           ${wallets
             .map(
               ({ name, privateKey }) =>
-                `localKeyStore.addAccount({ network: '${localDevNetworkName}', name: '${name}', privateKey: '${privateKey}' }),`,
+                `localKeyStore.addUserAccount({ network: '${localDevNetworkName}', name: '${name}', privateKey: '${privateKey}' }),`,
             )
             .join('\n          ')}
         ]).catch(() => {
@@ -128,7 +128,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
           ${wallets
             .map(
               ({ name, privateKey }) =>
-                `localKeyStore.addAccount({ network: '${localDevNetworkName}', name: '${name}', privateKey: '${privateKey}' }),`,
+                `localKeyStore.addUserAccount({ network: '${localDevNetworkName}', name: '${name}', privateKey: '${privateKey}' }),`,
             )
             .join('\n          ')}
         ]).catch(() => {

@@ -272,7 +272,7 @@ export class WalletResource {
       throw new Error('Something went wrong.');
     }
     const { privateKey, password } = this.mutableInitial;
-    await this.client.providers.file.keystore.addAccount({
+    await this.client.providers.file.keystore.addUserAccount({
       network: this.clientNetworkType,
       name: this.baseName,
       privateKey,
@@ -358,7 +358,7 @@ export class WalletResource {
       gasBalance: this.mutableGasBalance === undefined ? 'Unknown' : this.mutableGasBalance,
       wif: this.wif,
       nep2: this.wallet.nep2,
-      publicKey: this.wallet.account.publicKey,
+      publicKey: this.wallet.userAccount.publicKey,
       balance: this.mutableBalance,
     };
   }

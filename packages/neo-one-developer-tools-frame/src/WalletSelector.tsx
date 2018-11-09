@@ -57,11 +57,11 @@ export function WalletSelector(props: any) {
                       if (keystore instanceof LocalKeyStore) {
                         newWalletOnClick = () => {
                           keystore
-                            .addAccount({
+                            .addUserAccount({
                               network: client.getCurrentNetwork(),
                               privateKey: createPrivateKey(),
                             })
-                            .then(async (wallet) => client.selectUserAccount(wallet.account.id))
+                            .then(async (wallet) => client.selectUserAccount(wallet.userAccount.id))
                             .catch(addError);
                         };
                       }
@@ -75,11 +75,11 @@ export function WalletSelector(props: any) {
                       if (keystore instanceof LocalKeyStore) {
                         newWalletOnClick = () => {
                           keystore
-                            .addAccount({
+                            .addUserAccount({
                               network: client.getCurrentNetwork(),
                               privateKey: createPrivateKey(),
                             })
-                            .then(async (wallet) => client.selectUserAccount(wallet.account.id))
+                            .then(async (wallet) => client.selectUserAccount(wallet.userAccount.id))
                             .catch(addError);
                         };
                       }

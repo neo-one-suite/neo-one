@@ -39,7 +39,7 @@ describe('Address.isCaller', () => {
 
         public runNotCallerAddressSigned(): void {
           const contract = SmartContract.for<IsCaller>(Address.from('${isCallerContract.address}'));
-          assertEqual(contract.isCaller(Address.from('${node.masterWallet.account.id.address}')), false);
+          assertEqual(contract.isCaller(Address.from('${node.masterWallet.userAccount.id.address}')), false);
         }
 
         public runNotCallerAddressUnigned(): void {
@@ -81,9 +81,9 @@ describe('Address.isCaller', () => {
       contract.runCaller();
 
       const isCallerContract = SmartContract.for<IsCaller>(Address.from('${isCallerContract.address}'));
-      assertEqual(isCallerContract.isCaller(Address.from('${node.masterWallet.account.id.address}')), true);
+      assertEqual(isCallerContract.isCaller(Address.from('${node.masterWallet.userAccount.id.address}')), true);
     `,
-      { from: node.masterWallet.account.id },
+      { from: node.masterWallet.userAccount.id },
     );
   });
 });

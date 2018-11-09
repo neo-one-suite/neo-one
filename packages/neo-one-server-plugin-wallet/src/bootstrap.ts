@@ -756,7 +756,7 @@ async function addWalletsToKeystore({
       .concat(assetWallets)
       .concat(tokenWallets)
       .map(async (wallet) =>
-        keystore.addAccount({
+        keystore.addUserAccount({
           network: networkName,
           name: wallet.name,
           privateKey: wallet.privateKey,

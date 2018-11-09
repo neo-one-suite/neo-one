@@ -12,7 +12,7 @@ describe('utils', () => {
     await withContracts(async ({ token, networkName }) => {
       expect(token).toBeDefined();
 
-      const toWallet = await token.client.providers.memory.keystore.addAccount({
+      const toWallet = await token.client.providers.memory.keystore.addUserAccount({
         network: networkName,
         privateKey: createPrivateKey(),
       });
@@ -26,7 +26,7 @@ describe('utils', () => {
         icoStartTimeSeconds,
         icoDurationSeconds,
         balance,
-      } = await getTokenInfo(token, toWallet.account.id.address);
+      } = await getTokenInfo(token, toWallet.userAccount.id.address);
 
       expect(name).toEqual('Eon');
       expect(symbol).toEqual('EON');

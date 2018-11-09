@@ -11,7 +11,7 @@ describe('Client', () => {
   const type1 = 'local';
   const unlockedWallet = factory.createUnlockedWallet();
   const unlockedWallet1 = factory.createUnlockedWallet({
-    account: factory.createUserAccount({ id: factory.createUserAccountID({ address: keys[2].address }) }),
+    userAccount: factory.createUserAccount({ id: factory.createUserAccountID({ address: keys[2].address }) }),
   });
   const lockedWallet = factory.createLockedWallet();
   const selectUserAccount = jest.fn();
@@ -50,12 +50,12 @@ describe('Client', () => {
     issue1 = jest.fn(async () => factory.createTransactionResult());
 
     provider = {
-      currentUserAccount$: _of(unlockedWallet.account),
-      userAccounts$: _of([unlockedWallet.account]),
-      networks$: _of([unlockedWallet.account.id.network]),
-      getCurrentUserAccount: jest.fn(() => unlockedWallet.account),
-      getUserAccounts: jest.fn(() => [unlockedWallet.account]),
-      getNetworks: jest.fn(() => [unlockedWallet.account.id.network]),
+      currentUserAccount$: _of(unlockedWallet.userAccount),
+      userAccounts$: _of([unlockedWallet.userAccount]),
+      networks$: _of([unlockedWallet.userAccount.id.network]),
+      getCurrentUserAccount: jest.fn(() => unlockedWallet.userAccount),
+      getUserAccounts: jest.fn(() => [unlockedWallet.userAccount]),
+      getNetworks: jest.fn(() => [unlockedWallet.userAccount.id.network]),
       selectUserAccount,
       deleteUserAccount,
       updateUserAccountName,
@@ -78,12 +78,12 @@ describe('Client', () => {
       iterActionsRaw,
     };
     provider1 = {
-      currentUserAccount$: _of(unlockedWallet1.account),
-      userAccounts$: _of([unlockedWallet1.account]),
-      networks$: _of([unlockedWallet1.account.id.network]),
-      getCurrentUserAccount: jest.fn(() => unlockedWallet1.account),
-      getUserAccounts: jest.fn(() => [unlockedWallet1.account]),
-      getNetworks: jest.fn(() => [unlockedWallet1.account.id.network]),
+      currentUserAccount$: _of(unlockedWallet1.userAccount),
+      userAccounts$: _of([unlockedWallet1.userAccount]),
+      networks$: _of([unlockedWallet1.userAccount.id.network]),
+      getCurrentUserAccount: jest.fn(() => unlockedWallet1.userAccount),
+      getUserAccounts: jest.fn(() => [unlockedWallet1.userAccount]),
+      getNetworks: jest.fn(() => [unlockedWallet1.userAccount.id.network]),
       selectUserAccount: jest.fn(),
       deleteUserAccount: jest.fn(),
       updateUserAccountName: jest.fn(),
@@ -136,7 +136,7 @@ describe('Client', () => {
       .fn()
       .mockImplementationOnce(() => undefined)
       .mockImplementationOnce(() => undefined)
-      .mockImplementationOnce(() => unlockedWallet.account);
+      .mockImplementationOnce(() => unlockedWallet.userAccount);
     const localSelectAccount = jest.fn();
 
     client = new Client({
@@ -151,48 +151,48 @@ describe('Client', () => {
   test('currentUserAccount$', async () => {
     const result = await client.currentUserAccount$.pipe(take(1)).toPromise();
 
-    expect(result).toEqual(unlockedWallet.account);
+    expect(result).toEqual(unlockedWallet.userAccount);
   });
 
   test('userAccounts$', async () => {
     const result = await client.userAccounts$.pipe(take(1)).toPromise();
 
-    expect(result).toEqual([unlockedWallet.account, unlockedWallet1.account]);
+    expect(result).toEqual([unlockedWallet.userAccount, unlockedWallet1.userAccount]);
   });
 
   test('networks$', async () => {
     const result = await client.networks$.pipe(take(1)).toPromise();
 
-    expect(result).toEqual([unlockedWallet.account.id.network]);
+    expect(result).toEqual([unlockedWallet.userAccount.id.network]);
   });
 
   test('getUserAccount', () => {
-    const result = client.getUserAccount(unlockedWallet.account.id);
+    const result = client.getUserAccount(unlockedWallet.userAccount.id);
 
-    expect(result).toEqual(unlockedWallet.account);
+    expect(result).toEqual(unlockedWallet.userAccount);
   });
 
   test('getUserAccount - throws on unknown account', () => {
-    const result = () => client.getUserAccount(lockedWallet.account.id);
+    const result = () => client.getUserAccount(lockedWallet.userAccount.id);
 
     expect(result).toThrowErrorMatchingSnapshot();
   });
 
   test('selectUserAccount', async () => {
-    await client.selectUserAccount(unlockedWallet1.account.id);
+    await client.selectUserAccount(unlockedWallet1.userAccount.id);
 
     expect(selectUserAccount.mock.calls).toMatchSnapshot();
-    expect(client.getCurrentUserAccount()).toEqual(unlockedWallet1.account);
+    expect(client.getCurrentUserAccount()).toEqual(unlockedWallet1.userAccount);
   });
 
   test('deleteUserAccount', async () => {
-    await client.deleteUserAccount(unlockedWallet.account.id);
+    await client.deleteUserAccount(unlockedWallet.userAccount.id);
 
     expect(deleteUserAccount.mock.calls).toMatchSnapshot();
   });
 
   test('updateUserAccountName', async () => {
-    await client.updateUserAccountName({ id: unlockedWallet.account.id, name: 'newName' });
+    await client.updateUserAccountName({ id: unlockedWallet.userAccount.id, name: 'newName' });
 
     expect(updateUserAccountName.mock.calls).toMatchSnapshot();
   });
@@ -200,13 +200,13 @@ describe('Client', () => {
   test('getUserAccounts', () => {
     const result = client.getUserAccounts();
 
-    expect(result).toEqual([unlockedWallet.account, unlockedWallet1.account]);
+    expect(result).toEqual([unlockedWallet.userAccount, unlockedWallet1.userAccount]);
   });
 
   test('getNetworks', () => {
     const result = client.getNetworks();
 
-    expect(result).toEqual([unlockedWallet.account.id.network]);
+    expect(result).toEqual([unlockedWallet.userAccount.id.network]);
   });
 
   test('transfer - simple', async () => {
@@ -224,7 +224,7 @@ describe('Client', () => {
     transfer1.mockImplementation(async () => transactionResult);
 
     const result = await client.transfer([{ amount: data.bigNumbers.a, asset: Hash256.NEO, to: keys[0].address }], {
-      from: unlockedWallet1.account.id,
+      from: unlockedWallet1.userAccount.id,
     });
 
     expect(transfer1.mock.calls).toMatchSnapshot();
@@ -277,7 +277,7 @@ describe('Client', () => {
     issue1.mockImplementation(async () => transactionResult);
 
     const result = await client.issue([{ amount: data.bigNumbers.a, asset: Hash256.NEO, to: keys[0].address }], {
-      from: unlockedWallet1.account.id,
+      from: unlockedWallet1.userAccount.id,
     });
 
     expect(issue1.mock.calls).toMatchSnapshot();
@@ -285,7 +285,7 @@ describe('Client', () => {
   });
 
   test('read', () => {
-    const result = client.read(lockedWallet.account.id.network);
+    const result = client.read(lockedWallet.userAccount.id.network);
 
     expect(read.mock.calls).toMatchSnapshot();
     expect(result).toMatchSnapshot();
@@ -311,7 +311,7 @@ describe('Client', () => {
   });
 
   test('__call', async () => {
-    const result = await client.__call(unlockedWallet.account.id.network, keys[0].address, 'deploy', []);
+    const result = await client.__call(unlockedWallet.userAccount.id.network, keys[0].address, 'deploy', []);
 
     expect(call.mock.calls).toMatchSnapshot();
     expect(result).toEqual(commonRawCallReceipt);

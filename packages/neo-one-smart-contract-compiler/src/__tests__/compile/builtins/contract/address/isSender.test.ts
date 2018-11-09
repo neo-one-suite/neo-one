@@ -6,8 +6,8 @@ describe('Address.isSender', () => {
     await node.executeString(`
       import { Address } from '@neo-one/smart-contract';
 
-      Address.isSender(Address.from('${node.masterWallet.account.id.address}'));
-      assertEqual(Address.isSender(Address.from('${node.masterWallet.account.id.address}')), true);
+      Address.isSender(Address.from('${node.masterWallet.userAccount.id.address}'));
+      assertEqual(Address.isSender(Address.from('${node.masterWallet.userAccount.id.address}')), true);
     `);
   });
 

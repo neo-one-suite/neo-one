@@ -12,7 +12,7 @@ describe('utils', () => {
     await withContracts(async ({ token, networkName }) => {
       expect(token).toBeDefined();
 
-      const toWallet = await token.client.providers.memory.keystore.addAccount({
+      const toWallet = await token.client.providers.memory.keystore.addUserAccount({
         network: networkName,
         privateKey: createPrivateKey(),
       });
@@ -26,7 +26,7 @@ describe('utils', () => {
         icoStartTimeSeconds,
         icoDurationSeconds,
         balance,
-      } = await getTokenInfo(token, toWallet.account.id.address);
+      } = await getTokenInfo(token, toWallet.userAccount.id.address);
 
       expect(name).toEqual('Eon');
       expect(symbol).toEqual('EON');
@@ -92,7 +92,7 @@ describe('utils', () => {
       info = await stream$.pipe<TokenInfoResult>(take(1)).toPromise();
       expect(info.balance.toNumber()).toEqual(1000000);
 
-      const toWallet = await client.providers.memory.keystore.addAccount({
+      const toWallet = await client.providers.memory.keystore.addUserAccount({
         network: networkName,
         privateKey: createPrivateKey(),
       });
@@ -100,7 +100,7 @@ describe('utils', () => {
       const transferReceipt = await handleTransfer(
         token,
         masterAccountID.address,
-        toWallet.account.id.address,
+        toWallet.userAccount.id.address,
         transferAmount,
       );
       if (transferReceipt.result.state === 'FAULT') {
@@ -114,7 +114,7 @@ describe('utils', () => {
         throw new Error('For TS');
       }
       expect(event.parameters.from).toEqual(masterAccountID.address);
-      expect(event.parameters.to).toEqual(toWallet.account.id.address);
+      expect(event.parameters.to).toEqual(toWallet.userAccount.id.address);
       expect(event.parameters.amount.toNumber()).toEqual(transferAmount.toNumber());
     });
   });

@@ -114,7 +114,7 @@ export const setupWallets = async (
     }),
     Promise.all(
       WALLETS.map(async ({ privateKey }) =>
-        client.providers.memory.keystore.addAccount({
+        client.providers.memory.keystore.addUserAccount({
           network: provider.network,
           privateKey,
         }),

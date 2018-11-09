@@ -11,7 +11,7 @@ export const getClients = async ({ privateKey, dataProvider }: Options) => {
   const masterWalletName = 'master';
 
   const keystore = new LocalKeyStore(new LocalMemoryStore());
-  const masterWallet = await keystore.addAccount({
+  const masterWallet = await keystore.addUserAccount({
     network: networkName,
     name: masterWalletName,
     privateKey,

@@ -173,7 +173,7 @@ export const withContracts = async <T>(
     const contractOptions = Object.assign({}, deployedContracts, {
       client,
       developerClient,
-      masterAccountID: masterWallet.account.id,
+      masterAccountID: masterWallet.userAccount.id,
       masterPrivateKey: privateKey,
       networkName,
       accountIDs,

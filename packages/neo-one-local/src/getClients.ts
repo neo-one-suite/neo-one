@@ -15,7 +15,7 @@ export const getClients = async (provider: NEOONEDataProvider, masterPrivateKey:
     }),
   });
   const developerClient = new DeveloperClient(provider);
-  const masterWallet = await client.providers.memory.keystore.addAccount({
+  const masterWallet = await client.providers.memory.keystore.addUserAccount({
     network: provider.network,
     privateKey: masterPrivateKey,
   });

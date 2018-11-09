@@ -38,13 +38,13 @@ export class LocalStringStore implements LocalStore {
 
   public async saveWallet(wallet: LocalWallet): Promise<void> {
     let safeWallet = wallet;
-    if (wallet.account.id.network === 'main') {
+    if (wallet.userAccount.id.network === 'main') {
       if (wallet.nep2 === undefined) {
         throw new PasswordRequiredError();
       }
       safeWallet = {
         type: 'locked',
-        account: wallet.account,
+        userAccount: wallet.userAccount,
         nep2: wallet.nep2,
       };
     }
@@ -57,7 +57,7 @@ export class LocalStringStore implements LocalStore {
   }
 
   private getKey({
-    account: {
+    userAccount: {
       id: { network, address },
     },
   }: LocalWallet): string {

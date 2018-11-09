@@ -47,7 +47,7 @@ const getClients = async (
   if (wallet.wif === undefined) {
     throw new Error(`Something went wrong, wif is null for ${wallet.name}`);
   }
-  await keystore.addAccount({
+  await keystore.addUserAccount({
     network: LOCAL,
     name: wallet.name,
     privateKey: wifToPrivateKey(wallet.wif),
@@ -316,7 +316,7 @@ const verifySmartContractsTest = async (nowSeconds: number) => {
   const test = require('../__data__/ico/one/generated/test');
   const withContracts: WithContracts = test.withContracts;
   await withContracts(async ({ ico, token, escrow, masterAccountID, networkName, client }) => {
-    await client.providers.memory.keystore.addAccount({
+    await client.providers.memory.keystore.addUserAccount({
       network: networkName,
       privateKey: TO_PRIVATE_KEY,
     });
@@ -356,7 +356,7 @@ const verifySmartContractsManual = async (accountID: UserAccountID, toAccountID:
   const token = createTokenSmartContract(client);
   const escrow = createEscrowSmartContract(client);
 
-  await client.providers.memory.keystore.addAccount({
+  await client.providers.memory.keystore.addUserAccount({
     network: accountID.network,
     privateKey: TO_PRIVATE_KEY,
   });

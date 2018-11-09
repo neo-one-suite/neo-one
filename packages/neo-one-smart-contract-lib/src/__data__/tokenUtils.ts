@@ -100,7 +100,7 @@ export const testToken = async ({
         smartContract.name(),
         smartContract.decimals(),
         smartContract.symbol(),
-        client.providers.memory.keystore.addAccount({
+        client.providers.memory.keystore.addUserAccount({
           network: networkName,
           name: 'wallet0',
           privateKey: TO.PRIVATE_KEY,
@@ -110,7 +110,7 @@ export const testToken = async ({
       expect(decimalsResult.toString()).toEqual(`${decimals}`);
       expect(symbolResult).toEqual(symbol);
 
-      const account0 = wallet0.account.id;
+      const account0 = wallet0.userAccount.id;
 
       const [issueBalance, issueTotalSupply, transferResult] = await Promise.all([
         smartContract.balanceOf(masterAccountID.address),

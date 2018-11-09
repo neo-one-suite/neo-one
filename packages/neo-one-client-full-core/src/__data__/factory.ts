@@ -821,14 +821,14 @@ const createUserAccount = (options: Partial<UserAccount> = {}): UserAccount => (
 
 const createLockedWallet = (options: Partial<LockedWallet> = {}): LockedWallet => ({
   type: 'locked',
-  account: createUserAccount(),
+  userAccount: createUserAccount(),
   nep2: keys[1].encryptedWIF,
   ...options,
 });
 
 const createUnlockedWallet = (options: Partial<UnlockedWallet> = {}): UnlockedWallet => ({
   type: 'unlocked',
-  account: createUserAccount({
+  userAccount: createUserAccount({
     id: createUserAccountID({
       address: keys[0].address,
     }),

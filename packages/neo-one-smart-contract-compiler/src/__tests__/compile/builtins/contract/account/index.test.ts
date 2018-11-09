@@ -4,7 +4,7 @@ import { helpers } from '../../../../../__data__';
 describe('Account', () => {
   test('Account properties', async () => {
     const node = await helpers.startNode();
-    const account = await node.readClient.getAccount(node.masterWallet.account.id.address);
+    const account = await node.readClient.getAccount(node.masterWallet.userAccount.id.address);
     await node.executeString(`
       import { Account, Address, Hash256 } from '@neo-one/smart-contract';
 

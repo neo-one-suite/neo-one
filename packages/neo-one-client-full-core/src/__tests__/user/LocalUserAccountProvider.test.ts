@@ -20,15 +20,15 @@ import { LocalUserAccountProvider, Provider } from '../../user';
 describe('LocalUserAccountProvider', () => {
   utils.randomUInt = () => 10;
   const unlockedWallet = factory.createUnlockedWallet();
-  const accounts = [unlockedWallet.account];
-  const getCurrentUserAccount = jest.fn(() => unlockedWallet.account);
+  const accounts = [unlockedWallet.userAccount];
+  const getCurrentUserAccount = jest.fn(() => unlockedWallet.userAccount);
   const getUserAccounts = jest.fn(() => accounts);
   const selectUserAccount = jest.fn();
   const deleteUserAccount = jest.fn();
   const updateUserAccountName = jest.fn();
   const sign = jest.fn();
   const keystore: Modifiable<KeyStore> = {
-    currentUserAccount$: _of(unlockedWallet.account),
+    currentUserAccount$: _of(unlockedWallet.userAccount),
     getCurrentUserAccount,
     userAccounts$: _of(accounts),
     getUserAccounts,
@@ -38,7 +38,7 @@ describe('LocalUserAccountProvider', () => {
     sign,
   };
 
-  const network = unlockedWallet.account.id.network;
+  const network = unlockedWallet.userAccount.id.network;
   const networks = [network];
   const getNetworks = jest.fn(() => networks);
   const getUnclaimed = jest.fn();
@@ -85,13 +85,13 @@ describe('LocalUserAccountProvider', () => {
   beforeEach(() => {
     provider = new LocalUserAccountProvider({ keystore, provider: dataProvider });
 
-    getCurrentUserAccount.mockImplementation(() => unlockedWallet.account);
+    getCurrentUserAccount.mockImplementation(() => unlockedWallet.userAccount);
   });
 
   test('getCurrentUserAccount', () => {
     const result = provider.getCurrentUserAccount();
 
-    expect(result).toEqual(unlockedWallet.account);
+    expect(result).toEqual(unlockedWallet.userAccount);
   });
 
   test('getUserAccounts', () => {
@@ -494,7 +494,7 @@ describe('LocalUserAccountProvider', () => {
       throw new Error('Was undefined');
     }
 
-    await provider.deleteUserAccount(unlockedWallet.account.id);
+    await provider.deleteUserAccount(unlockedWallet.userAccount.id);
 
     expect(deleteUserAccount.mock.calls).toMatchSnapshot();
   });
@@ -504,7 +504,7 @@ describe('LocalUserAccountProvider', () => {
       throw new Error('Was undefined');
     }
 
-    await provider.updateUserAccountName({ id: unlockedWallet.account.id, name: 'foo' });
+    await provider.updateUserAccountName({ id: unlockedWallet.userAccount.id, name: 'foo' });
 
     expect(updateUserAccountName.mock.calls).toMatchSnapshot();
   });

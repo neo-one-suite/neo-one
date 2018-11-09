@@ -75,13 +75,13 @@ describe('MyContract', () => {
     await withContracts(async ({ client, developerClient, myContract, masterAccountID, networkName }) => {
 
       // use the client to create a new wallet
-      const newWallet = await client.providers.memory.keystore.addAccount({
+      const newWallet = await client.providers.memory.keystore.addUserAccount({
         network: networkName,
         privateKey: createPrivateKey(),
       });
 
       // use the smart contract api to call checkBalance for the new wallet's address
-      const balance = await myContract.checkBalance(newWallet.account.id.address);
+      const balance = await myContract.checkBalance(newWallet.userAccount.id.address);
 
       // use matchers to confirm you expect the new wallet's balance to be 0
       expect(balance.toString()).toEqual('0');

@@ -1,27 +1,11 @@
 import { common, crypto } from '@neo-one/client-common';
-import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import _ from 'lodash';
 import { of } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
-import {
-  ConnectedHandler,
-  Handler,
-  Ledger,
-  LedgerKeyStore,
-  LedgerProvider,
-  Ledgers,
-} from '../../../user/keystore/LedgerKeyStore';
+import { LedgerKeyStore, LedgerProvider } from '../../../user/keystore/LedgerKeyStore';
 
 const testMessage =
   '8000000185e7e907cc5c5683e7fc926ba4be613d1810aebe14686b3675ee27d2476e5201000002e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60a08601000000000013354f4f5d3f989a221c794271e0bb2471c2735ee72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c60e23f01000000000013354f4f5d3f989a221c794271e0bb2471c2735e';
-
-const flattenLedgers = (ledgers: Ledgers) =>
-  _.flatten(
-    Object.values(ledgers)
-      .filter(utils.notNull)
-      .map((networkLedgers) => Object.values(networkLedgers)),
-  ).filter(utils.notNull);
 
 describe('LedgerKeyStore', () => {
   const emptyAccount = {
@@ -64,17 +48,12 @@ describe('LedgerKeyStore', () => {
     publicKey: '031546889cf12577237536380e86b2587d55743f9d4dac8879f332b79ce1a84cd6',
   };
 
-  const indexLedger: Ledger = {
+  const indexLedger = {
     accountKey: 0,
     account: indexAccount,
   };
 
-  const secondaryLedger: Ledger = {
-    accountKey: 1,
-    account: secondaryAccount,
-  };
-
-  const mockConnectedHandler: ConnectedHandler = {
+  const mockConnectedHandler = {
     getPublicKey: async (account?: number) => {
       switch (account === undefined || account > 1 ? 2 : account) {
         case 0: {
@@ -100,7 +79,7 @@ describe('LedgerKeyStore', () => {
     close: async () => Promise.resolve(),
   };
 
-  const mockHandler: Handler = {
+  const mockHandler = {
     byteLimit: 2048,
     init: async () => Promise.resolve(mockConnectedHandler),
   };
@@ -119,13 +98,13 @@ describe('LedgerKeyStore', () => {
 
   test('accounts$', async () => {
     const [currentAccount, accounts] = await Promise.all([
-      keystore.currentAccount$
+      keystore.currentUserAccount$
         .pipe(
           filter((value) => value !== undefined),
           take(1),
         )
         .toPromise(),
-      keystore.accounts$
+      keystore.userAccounts$
         .pipe(
           filter((value) => value.length > 0),
           take(1),
@@ -143,15 +122,9 @@ describe('LedgerKeyStore', () => {
   });
 
   test('getAccounts', async () => {
-    const result = keystore.getAccounts();
+    const result = keystore.getUserAccounts();
 
     expect(result).toEqual([indexAccount, secondaryAccount]);
-  });
-
-  test('ledgers', async () => {
-    const result = keystore.ledgers;
-
-    expect(flattenLedgers(result)).toEqual([indexLedger, secondaryLedger]);
   });
 
   test('mixed scan', async () => {
@@ -171,22 +144,22 @@ describe('LedgerKeyStore', () => {
     });
 
     keystore = new LedgerKeyStore(ledgerProvider, mockHandler);
-    await keystore.currentAccount$
+    await keystore.currentUserAccount$
       .pipe(
         filter((value) => value !== undefined),
         take(1),
       )
       .toPromise();
 
-    const accounts = keystore.getAccounts();
-    const account = keystore.getCurrentAccount();
+    const accounts = keystore.getUserAccounts();
+    const account = keystore.getCurrentUserAccount();
 
     expect(accounts.length).toEqual(21);
     expect(account).toBeDefined();
   });
 
   test('sign', async () => {
-    await keystore.accounts$
+    await keystore.userAccounts$
       .pipe(
         filter((value) => value.length !== 0),
         take(1),
