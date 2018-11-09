@@ -12621,21 +12621,7 @@ listr-update-renderer@^0.2.0:
     log-update "^1.0.2"
     strip-ansi "^3.0.1"
 
-listr-update-renderer@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/listr-update-renderer/-/listr-update-renderer-0.4.0.tgz#344d980da2ca2e8b145ba305908f32ae3f4cc8a7"
-  integrity sha1-NE2YDaLKLosUW6MFkI8yrj9MyKc=
-  dependencies:
-    chalk "^1.1.3"
-    cli-truncate "^0.2.1"
-    elegant-spinner "^1.0.1"
-    figures "^1.7.0"
-    indent-string "^3.0.0"
-    log-symbols "^1.0.2"
-    log-update "^1.0.2"
-    strip-ansi "^3.0.1"
-
-"listr-update-renderer@https://github.com/okonet/listr-update-renderer/tarball/upgrade-log-update":
+listr-update-renderer@^0.4.0, "listr-update-renderer@https://github.com/okonet/listr-update-renderer/tarball/upgrade-log-update":
   version "0.4.0"
   resolved "https://github.com/okonet/listr-update-renderer/tarball/upgrade-log-update#06073fa93166277607a7814f4e1f83960081414c"
   dependencies:
@@ -19774,13 +19760,13 @@ typescript-fsa@^3.0.0-beta-2:
   resolved "https://registry.yarnpkg.com/typescript-fsa/-/typescript-fsa-3.0.0-beta-2.tgz#1cc1d0c014c025fd51cba097776033ac4b6b753c"
   integrity sha512-qXkHih2XAtpxqd3AEVgFtCDwvBlAMl2miVy1TmS+wXgiRlVw7orf2qIh3C8faANhD34n75Ui8x5ydQ40uzuskA==
 
-typescript-styled-plugin@0.12.0:
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/typescript-styled-plugin/-/typescript-styled-plugin-0.12.0.tgz#ea441d773c1648727dbdb1e961a6a59d8f53c1a3"
-  integrity sha512-dqetvWmgwkfeUNyWlGlolnAw/A65bj+9I33MFQcy7a6JslZ71Zhvp0HMLmLYgF24qk5J8/UIGcYYUh7lJZIpLQ==
+typescript-styled-plugin@0.13.0:
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/typescript-styled-plugin/-/typescript-styled-plugin-0.13.0.tgz#e5d3d1293b9b85cffd473f01a7f4917ad6035ee5"
+  integrity sha512-GGMzv/JAd4S8mvWgHZslvW2G1HHrdurrp93oSR4h85SM8e5at7+KCqHsZICiTaL+iN25YGkJqoaZe4XklA76rg==
   dependencies:
     typescript-template-language-service-decorator "^2.0.0"
-    vscode-css-languageservice "^3.0.11"
+    vscode-css-languageservice "^3.0.12"
     vscode-emmet-helper "1.2.11"
     vscode-languageserver-types "^3.13.0"
 
@@ -20428,7 +20414,7 @@ vorpal@^1.12.0:
     strip-ansi "^3.0.0"
     wrap-ansi "^2.0.0"
 
-vscode-css-languageservice@^3.0.11:
+vscode-css-languageservice@^3.0.12:
   version "3.0.12"
   resolved "https://registry.yarnpkg.com/vscode-css-languageservice/-/vscode-css-languageservice-3.0.12.tgz#fb4aac5ae3c5b761b1db1d7224b78ff824284dc3"
   integrity sha512-+FLQ9LcukIhnxaGTjDOqb3Nb1hesz9BLXf5yeoZxUsuK7joADPLPdxLwlZugFcMAvgmtnaFIGnzkQhGOVqf5yw==
