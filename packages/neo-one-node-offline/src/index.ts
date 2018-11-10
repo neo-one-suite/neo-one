@@ -55,7 +55,6 @@ class BlockTransform extends Transform {
       );
       this.mutableBuffers = [remainingBuffer];
       this.mutableLength = remainingBuffer.length;
-      mutableBlocks.reverse();
       mutableBlocks.forEach((block) => this.push(block));
       callback(undefined);
     } catch (error) {
@@ -69,27 +68,28 @@ class BlockTransform extends Transform {
     readonly remainingBuffer: Buffer;
     readonly mutableBlocks: Block[];
   } {
-    if (reader.remaining < SIZE_OF_INT32) {
-      return { remainingBuffer: reader.remainingBuffer, mutableBlocks: [] };
+    const mutableBlocks: Block[] = [];
+
+    // tslint:disable-next-line no-loop-statement
+    while (true) {
+      if (reader.remaining < SIZE_OF_INT32) {
+        return { remainingBuffer: reader.remainingBuffer, mutableBlocks };
+      }
+
+      const length = reader.clone().readInt32LE();
+
+      // Not sure why this doesn't work properly with just length...
+      if (reader.remaining < length + SIZE_OF_INT32) {
+        return { remainingBuffer: reader.remainingBuffer, mutableBlocks };
+      }
+
+      reader.readInt32LE();
+      const block = Block.deserializeWireBase({
+        context: this.context,
+        reader,
+      });
+      mutableBlocks.push(block);
     }
-
-    const length = reader.clone().readInt32LE();
-
-    // Not sure why this doesn't work properly with just length...
-    if (reader.remaining < length + SIZE_OF_INT32) {
-      return { remainingBuffer: reader.remainingBuffer, mutableBlocks: [] };
-    }
-
-    reader.readInt32LE();
-    const block = Block.deserializeWireBase({
-      context: this.context,
-      reader,
-    });
-
-    const { remainingBuffer, mutableBlocks } = this.processBuffer(reader);
-    mutableBlocks.push(block);
-
-    return { remainingBuffer, mutableBlocks };
   }
 }
 export interface Chain {

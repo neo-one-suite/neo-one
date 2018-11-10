@@ -4,8 +4,10 @@
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
-
-    "lib": ["esnext", "dom"],
+    "lib": [
+      "esnext",
+      "dom"
+    ],
     "paths": {
       "@neo-one/types": [
         "./neo-one-types/"
@@ -14,17 +16,13 @@
         "./neo-one-*/src"
       ]
     },
-
     "pretty": true,
-
     "noEmit": true,
     "declaration": false,
-
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": false,
     "experimentalDecorators": true,
     "jsx": "react",
-
     "alwaysStrict": true,
     "strict": true,
     "skipLibCheck": true,

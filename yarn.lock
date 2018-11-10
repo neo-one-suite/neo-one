@@ -3951,6 +3951,11 @@ asap@^2.0.0, asap@~2.0.3, asap@~2.0.6:
   resolved "https://registry.yarnpkg.com/asap/-/asap-2.0.6.tgz#e50347611d7e690943208bbdafebcbc2fb866d46"
   integrity sha1-5QNHYR1+aQlDIIu9r+vLwvuGbUY=
 
+asap@~1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/asap/-/asap-1.0.0.tgz#b2a45da5fdfa20b0496fc3768cc27c12fa916a7d"
+  integrity sha1-sqRdpf36ILBJb8N2jMJ8EvqRan0=
+
 ascallback@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ascallback/-/ascallback-1.1.1.tgz#246086fb5d3ac4e9b78ae79d2d5979efe563da35"
@@ -10667,7 +10672,7 @@ is-builtin-module@^1.0.0:
   dependencies:
     builtin-modules "^1.0.0"
 
-is-callable@^1.1.3, is-callable@^1.1.4:
+is-callable@^1.1.0, is-callable@^1.1.3, is-callable@^1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/is-callable/-/is-callable-1.1.4.tgz#1e1adf219e1eeb684d691f9d6a05ff0d30a24d75"
   integrity sha512-r5p9sxJjYnArLjObpjA4xu5EKI3CuKHkJXMhT7kwbpUyIFD1n5PMAsoPvWnvtZiNz7LjkYDRZhd7FlI0eMijEA==
@@ -11810,6 +11815,17 @@ jsesc@~0.5.0:
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
   integrity sha1-597mbjXW/Bb3EP6R1c9p9w8IkR0=
 
+json-file-plus@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/json-file-plus/-/json-file-plus-3.3.1.tgz#f4363806b82819ff8803d83d539d6a9edd2a5258"
+  integrity sha512-wo0q1UuiV5NsDPQDup1Km8IwEeqe+olr8tkWxeJq9Bjtcp7DZ0l+yrg28fSC3DEtrE311mhTZ54QGS6oiqnZEA==
+  dependencies:
+    is "^3.2.1"
+    node.extend "^2.0.0"
+    object.assign "^4.1.0"
+    promiseback "^2.0.2"
+    safer-buffer "^2.0.2"
+
 json-parse-better-errors@^1.0.0, json-parse-better-errors@^1.0.1, json-parse-better-errors@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/json-parse-better-errors/-/json-parse-better-errors-1.0.2.tgz#bb867cfb3450e69107c131d1c514bab3dc8bcaa9"
@@ -12621,21 +12637,7 @@ listr-update-renderer@^0.2.0:
     log-update "^1.0.2"
     strip-ansi "^3.0.1"
 
-listr-update-renderer@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/listr-update-renderer/-/listr-update-renderer-0.4.0.tgz#344d980da2ca2e8b145ba305908f32ae3f4cc8a7"
-  integrity sha1-NE2YDaLKLosUW6MFkI8yrj9MyKc=
-  dependencies:
-    chalk "^1.1.3"
-    cli-truncate "^0.2.1"
-    elegant-spinner "^1.0.1"
-    figures "^1.7.0"
-    indent-string "^3.0.0"
-    log-symbols "^1.0.2"
-    log-update "^1.0.2"
-    strip-ansi "^3.0.1"
-
-"listr-update-renderer@https://github.com/okonet/listr-update-renderer/tarball/upgrade-log-update":
+listr-update-renderer@^0.4.0, "listr-update-renderer@https://github.com/okonet/listr-update-renderer/tarball/upgrade-log-update":
   version "0.4.0"
   resolved "https://github.com/okonet/listr-update-renderer/tarball/upgrade-log-update#06073fa93166277607a7814f4e1f83960081414c"
   dependencies:
@@ -14254,6 +14256,14 @@ node-version@^1.1.3:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/node-version/-/node-version-1.2.0.tgz#34fde3ffa8e1149bd323983479dda620e1b5060d"
   integrity sha512-ma6oU4Sk0qOoKEAymVoTvk8EdXEobdS7m/mAGhDJ8Rouugho48crHBORAmy5BoOcv8wraPM6xumapQp5hl4iIQ==
+
+node.extend@^2.0.0:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/node.extend/-/node.extend-2.0.1.tgz#8d52296197b5408fe82b0a3c7c78513d9f98aeca"
+  integrity sha512-42zXr2Cy16E58KEHm8vz2LE3IJWW0xUrQw0L+R2sII7NIiqKMa9JlwX02YFHg5+IKDg+Es1ZE8nD7ucUWR16UA==
+  dependencies:
+    has "^1.0.3"
+    is "^3.2.1"
 
 nodemon@1.18.6:
   version "1.18.6"
@@ -16152,6 +16162,13 @@ prometheus-gc-stats@^0.6.0:
   optionalDependencies:
     gc-stats "^1.2.0"
 
+promise-deferred@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/promise-deferred/-/promise-deferred-2.0.1.tgz#b05398f1a43f6d87be0c97c52040046e83eb5454"
+  integrity sha1-sFOY8aQ/bYe+DJfFIEAEboPrVFQ=
+  dependencies:
+    promise "~6.1.0"
+
 promise-inflight@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/promise-inflight/-/promise-inflight-1.0.1.tgz#98472870bf228132fcbdd868129bad12c3c029e3"
@@ -16178,6 +16195,21 @@ promise@^8.0.1:
   integrity sha512-EIyzM39FpVOMbqgzEHhxdrEhtOSDOtjMZQ0M6iVfCE+kWNgCkAyOdnuCWqfmflylftfadU6FkiMgHZA2kUzwRw==
   dependencies:
     asap "~2.0.6"
+
+promise@~6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/promise/-/promise-6.1.0.tgz#2ce729f6b94b45c26891ad0602c5c90e04c6eef6"
+  integrity sha1-LOcp9rlLRcJoka0GAsXJDgTG7vY=
+  dependencies:
+    asap "~1.0.0"
+
+promiseback@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/promiseback/-/promiseback-2.0.2.tgz#424af89a43de0c6a8997bf3cb2d8139447fb3b97"
+  integrity sha1-Qkr4mkPeDGqJl788stgTlEf7O5c=
+  dependencies:
+    is-callable "^1.1.0"
+    promise-deferred "^2.0.1"
 
 prompts@^0.1.9:
   version "0.1.14"
