@@ -36,7 +36,6 @@ NEO•ONE is a JavaScript library so we'll assume you have a basic understanding
 
 NEO•ONE itself is written in [TypeScript](http://www.typescriptlang.org/) and throughout the guide we will use TypeScript, however the guide assumes no prior knowledge. We will introduce TypeScript specific concepts as they're used, with links to documentation to learn more.
 
-
 ## Let's Get Started!
 
 At the bottom of each page in the guide, including this one, you'll find the link to the [next chapter of the guide](/docs/blockchain-basics) right before the website footer.
