@@ -15,12 +15,14 @@ const SIZE_OF_INT32 = 4;
 
 class BlockTransform extends Transform {
   public readonly context: DeserializeWireContext;
-  public mutableBuffer: Buffer;
+  private mutableBuffers: Buffer[];
+  private mutableLength: number;
 
   public constructor(context: DeserializeWireContext) {
     super({ readableObjectMode: true });
     this.context = context;
-    this.mutableBuffer = Buffer.from([]);
+    this.mutableBuffers = [];
+    this.mutableLength = 0;
   }
 
   public _transform(
@@ -39,11 +41,20 @@ class BlockTransform extends Transform {
       );
     }
 
-    this.mutableBuffer = Buffer.concat([this.mutableBuffer, chunk]);
-    try {
-      const { remainingBuffer, mutableBlocks } = this.processBuffer(new BinaryReader(this.mutableBuffer));
+    this.mutableBuffers.push(chunk);
+    this.mutableLength += chunk.length;
+    if (this.mutableLength < 100000) {
+      callback(undefined);
 
-      this.mutableBuffer = remainingBuffer;
+      return;
+    }
+
+    try {
+      const { remainingBuffer, mutableBlocks } = this.processBuffer(
+        new BinaryReader(Buffer.concat(this.mutableBuffers)),
+      );
+      this.mutableBuffers = [remainingBuffer];
+      this.mutableLength = remainingBuffer.length;
       mutableBlocks.reverse();
       mutableBlocks.forEach((block) => this.push(block));
       callback(undefined);
@@ -65,7 +76,7 @@ class BlockTransform extends Transform {
     const length = reader.clone().readInt32LE();
 
     // Not sure why this doesn't work properly with just length...
-    if (reader.remaining + SIZE_OF_INT32 < length * 2) {
+    if (reader.remaining < length + SIZE_OF_INT32) {
       return { remainingBuffer: reader.remainingBuffer, mutableBlocks: [] };
     }
 
@@ -212,6 +223,7 @@ const writeOut = async (blockchain: Blockchain, out: Writable, height: number): 
     for (const block of blocks) {
       const buffer = block.serializeWire();
       const length = Buffer.alloc(4, 0);
+      length.writeInt32LE(buffer.length, 0);
       // tslint:disable-next-line no-unnecessary-callback-wrapper
       await new Promise<void>((resolve) => out.write(length, () => resolve()));
       // tslint:disable-next-line no-unnecessary-callback-wrapper

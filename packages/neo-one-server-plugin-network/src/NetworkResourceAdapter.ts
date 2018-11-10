@@ -50,10 +50,11 @@ export interface NetworkResourceAdapterOptions extends NetworkResourceAdapterSta
 }
 
 const DEFAULT_MAIN_SEEDS: ReadonlyArray<EndpointConfig> = [
-  { type: 'tcp', host: 'seed1.travala.com', port: 10333 },
-  { type: 'tcp', host: 'seed2.travala.com', port: 10333 },
-  { type: 'tcp', host: 'seed3.travala.com', port: 10333 },
-  { type: 'tcp', host: 'seed4.travala.com', port: 10333 },
+  { type: 'tcp', host: 'node1.nyc3.bridgeprotocol.io', port: 10333 },
+  { type: 'tcp', host: 'node2.nyc3.bridgeprotocol.io', port: 10333 },
+  { type: 'tcp', host: 'seed1.switcheo.com', port: 10333 },
+  { type: 'tcp', host: 'seed2.switcheo.com', port: 10333 },
+  { type: 'tcp', host: 'seed3.switcheo.com', port: 10333 },
   { type: 'tcp', host: 'seed1.aphelion-neo.com', port: 10333 },
   { type: 'tcp', host: 'seed2.aphelion-neo.com', port: 10333 },
   { type: 'tcp', host: 'seed3.aphelion-neo.com', port: 10333 },
@@ -251,12 +252,11 @@ export class NetworkResourceAdapter {
       },
       seeds: DEFAULT_MAIN_SEEDS.map(createEndpoint),
       rpcEndpoints: [
-        'https://pyrpc1.narrative.org:443',
-        'https://pyrpc2.narrative.org:443',
-        'https://pyrpc3.narrative.org:443',
-        'https://pyrpc4.narrative.org:443',
-        'http://seed1.travala.com:10332',
-        'http://seed2.travala.com:10332',
+        'http://node1.nyc3.bridgeprotocol.io:10332',
+        'http://node2.nyc3.bridgeprotocol.io:10332',
+        'https://seed1.switcheo.network:10331',
+        'https://seed2.switcheo.network:10331',
+        'https://seed3.switcheo.network:10331',
         'http://seed1.aphelion-neo.com:10332',
         'http://seed2.aphelion-neo.com:10332',
         'http://seed3.aphelion-neo.com:10332',
