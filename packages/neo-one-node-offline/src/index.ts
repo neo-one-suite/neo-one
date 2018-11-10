@@ -164,6 +164,10 @@ export const loadChain = async ({
     let paused = false;
     const trackIndex = blockchain.currentBlockIndex;
     transform.on('data', (block: Block) => {
+      if (block.index < trackIndex) {
+        return;
+      }
+
       pending += 1;
       blockchain
         .persistBlock({ block, unsafe: true })
