@@ -20,16 +20,16 @@ In this example contract we created a [string](https://www.typescriptlang.org/do
 
 Let's call the token 'Eon', give it the symbol 'EON' and make it have 8 decimals. We can represent this by adding a few properties to the smart contract:
 
-  1. Add a property called `name` - a `string` with the value `'Eon'`.
-  2. Add a property called `symbol` - a `string` property with the value `'EON'`.
-  3. Add a property called `decimals` - a `number` property with the value `8`.
+  1. Add a property called `name`, a `string` with the value `'Eon'`.
+  2. Add a property called `symbol`, a `string` property with the value `'EON'`.
+  3. Add a property called `decimals`, a `number` property with the value `8`.
 
 ## Test
 
 Now that we've added the properties, `Build` the contract and then `Run Tests`. Remember, if you ever get stuck feel free to take a look at the solution code by clicking `Show Solution` at the bottom of the page.
 
+Take a look at the updated `Token.test.ts` file to see the newly generated methods on the `token` variable - one for each of the properties that were added to the contract. Hover over the method calls and you'll notice that the properties have the same types as in the smart contract, except they're wrapped in a `Promise`. They are all wrapped in a `Promise` because they require an asynchronous action - we need to make a request to a node to determine the current value. As we continue through the chapters, be sure to hover over the various pieces of the test code to learn a bit about how the generated NEO•ONE client APIs are structured.
+
 ## Wrap Up
 
 In this chapter we learned how to declare constant properties in a NEO•ONE smart contract. When you're ready, click `Next` to learn about storage properties!
-
-Before you go, take a look at the updated `Token.test.ts` file to see the newly generated methods on the `token` variable - one for each of the properties that were added to the contract. Hover over the method calls and you'll notice that the properties have the same types as in the smart contract, except they're wrapped in a `Promise`. They are all wrapped in a `Promise` because they requires an asynchronous action - we need to make a request to a node to determine the current value. As we continue through the chapters, be sure to hover over the various pieces of the test code to learn a bit about how the generated NEO•ONE client APIs are structured.

@@ -31,7 +31,7 @@ export class Example extends SmartContract {
 }
 ```
 
-In this example, we're verifying that every output that is sent to the contract address (`this.address`) is GAS. We're also checking that there's exactly one reference. A reference is the corresponding `output` for the `input`s of the transaction.
+In this example, we're verifying that every output that is sent to the contract address (`this.address`) is GAS. We're also checking that there's exactly one reference. A reference is the corresponding `output` for the `input`s of the transaction. Learn more about `input`s and `output`s in the [Blockchain Basics](/docs/blockchain-basics) chapter of the main guide.
 
 ## Instructions
 

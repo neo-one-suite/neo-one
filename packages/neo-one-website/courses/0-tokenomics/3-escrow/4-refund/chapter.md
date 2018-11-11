@@ -10,7 +10,7 @@ In this chapter we'll add a method for the source address to reclaim EON from th
   4. Verify that the escrow account has enough funds to claim.
   5. Create an instance of `Token` using `LinkedSmartContract.for`.
   6. Invoke `transfer` with `this.address` as the `from` parameter, the `from` argument to `claim` as the `to` parameter of `transfer`, and the `amount` argument to `claim` as the `amount` parameter of `transfer`.
-  7. If successful, i.e. `transfer` returns `true`, reduce the escrow balance and emit a `'balanceRefunded'` event with the `from`, `to` and `amount` arguments.
+  7. If successful (`transfer` returns `true`), reduce the escrow balance and emit a `'balanceRefunded'` event with the `from`, `to` and `amount` arguments.
 
 ## Test
 
@@ -18,4 +18,4 @@ Similar to last chapter, the tests verify that the `refund` method properly tran
 
 ## Wrap Up
 
-This chapter was a bit of a rehash of last chapter, but now we have a fully functioning Escrow contract! On the other side of `Next` we'll see how to generalize the Escrow contract to work for any NEP-5 token.
+Now we have a fully functioning Escrow contract! On the other side of `Next` we'll see how to generalize the Escrow contract to work for any NEP-5 token.

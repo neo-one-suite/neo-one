@@ -51,17 +51,17 @@ export class Example extends SmartContract {
 }
 ```
 
-In this example, we have a method `action` that represents taking an action on the parameter `for` `Address`. Like before, we check if `for` is the caller of the method. We've also added a check to see if the current calling contract, which can be accessed with the `Blockchain.currentCallerContract` property, has been preapproved to take the action. Notice that `Blockchain.currentCallerContract` will be `undefined` if the call was initiated directly by a user, and not through another smart contract.
+In this example, we have a method `action` that represents taking an action on the parameter `for` `Address`. Like before, we check if `for` is the caller of the method. We've also added a check to see if the current calling contract, which can be accessed with the `Blockchain.currentCallerContract` property, has been pre-approved to take the action. Notice that `Blockchain.currentCallerContract` will be `undefined` if the call was initiated directly by a user, and not through another smart contract.
 
 If the exact mechanics here seems a bit confusing, don't worry, it will become more clear in the following chapter when we make use of the pre-approval with our Escrow contract.
 
-A user can preapprove a contract by invoking the `approveAction` method, which first checks to see that the user is the caller and if so, adds the `by` parameter `Address` to the `preapprovedActions` `SetStorage`. We're using `SetStorage` for the first time here - like `MapStorage`, `SetStorage` works identically to a `Set` with the one exception that you can't get the `size` of it.
+A user can pre-approve a contract by invoking the `approveAction` method, which first checks to see that the user is the caller and if so, adds the `by` parameter `Address` to the `preapprovedActions` `SetStorage`. We're using `SetStorage` for the first time here - like `MapStorage`, `SetStorage` works identically to a `Set` with the one exception that you can't get the `size` of it.
 
 Additionally, a user can revoke their previous approval by invoking the `revokeAction` method. With these 2 methods and the additional check on `Blockchain.currentCallerContract`, the contract can now safely allow other smart contracts to invoke `action` on behalf of the user.
 
 ## Instructions
 
-We're going to implement quite a bit this chapter, but most of it will just be reinforcing what we've learned in previous chapters. Remember, if you feel like you're not sure how to proceed, you can always check the solution by clicking `Show Solution`. Alternatively, you can take a look at the tests to see if you're on the right track.
+We're going to implement quite a bit in this chapter, but most of it will be reinforcing what we've learned in previous chapters. Remember, if you feel like you're not sure how to proceed, you can always check the solution by clicking `Show Solution`. Alternatively, you can take a look at the tests to see if you're on the right track.
 
 Before diving into the detailed instructions, at a high level we want to enable users to approve smart contracts to make transfers for a given maximum amount on their behalf. We'll enable this by implementing a few methods, `approveSendTransfer` which will add to our approvals, `revokeSendTransfer` which will revoke an approval and `approvedTransfer` which will return the current amount approved for transferring. We'll hold off on modifying the `transfer` method to make use of approvals (and `Blockchain.currentCallerContract`) until one of the following chapters where we can properly test it. Let's get started!
 
@@ -75,7 +75,7 @@ Before diving into the detailed instructions, at a high level we want to enable 
 
 ## Test
 
-Phew, that was quite a bit. You should feel quite proud of yourself for implementing all of that! We've added a new test case (and skipped the old tests) which verifies the `approveSendTransfer` and `revokeSendTransfer` methods, once the tests pass you may proceed to the next chapter.
+Phew, that was quite a bit. You should feel proud of yourself for implementing all of that! We've added a new test case (and skipped the old tests) which verifies the `approveSendTransfer` and `revokeSendTransfer` methods, once the tests pass you may proceed to the next chapter.
 
 ## Wrap Up
 

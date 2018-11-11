@@ -59,8 +59,8 @@ The tests for this chapter verify both the `Token` contract and the `Escrow` con
   2. Pre-approve a transfer of tokens to another address.
   3. Call deposit for the tokens pre-approved in 2/
 
-We also verify that it returns `false` is the transfer is not pre-approved.
+We also verify that it returns `false` if the transfer is not pre-approved.
 
 ## Wrap Up
 
-In this chapter we got to use the `Blockchain.currentCallerContract` property we learned about earlier, as well as learned how to call one smart contract from another. In the next chapter we'll flesh out the remainder of the Escrow contract.
+In this chapter we used the `Blockchain.currentCallerContract` property we learned about earlier, as well as, learned how to call one smart contract from another. In the next chapter we'll flesh out the remainder of the Escrow contract.

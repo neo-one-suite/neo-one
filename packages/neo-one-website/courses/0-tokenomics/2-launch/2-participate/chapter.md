@@ -1,6 +1,6 @@
 # Chapter 3: Participate in the ICO
 
-Now we get to the fun part, invoking a non-constant method on our smart contract. We'll cover how to do that for normal methods and ones marked with `@receive` and then you'll put that knowledge to use to implement a callback handler that participates in the ICO. We'll also have an opportunity to play with the NEO•ONE developer tools.
+Now we get to the fun part, invoking a non-constant method on our smart contract. We'll cover how to do that for normal methods and ones marked with `@receive` and then you'll put that knowledge to use implementing a callback handler that participates in the ICO. We'll also have an opportunity to play with the NEO•ONE developer tools.
 
 ## Learn
 

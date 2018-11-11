@@ -1,6 +1,6 @@
 # Chapter 2: Fetch User Balance
 
-In this chapter we'll take a quick look at how we can invoke constant methods using the NEO•ONE client APIs. This chapter will be rather short, since like properties, constant methods correspond one-to-one with methods on the generated client smart contract APIs.
+In this chapter we'll take a quick look at how we can invoke constant methods using the NEO•ONE client APIs. This chapter will be rather short because, like properties, constant methods correspond one-to-one with methods on the generated client smart contract APIs.
 
 ## Learn
 

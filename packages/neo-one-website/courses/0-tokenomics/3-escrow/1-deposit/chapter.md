@@ -15,7 +15,7 @@ Starting from scratch, we're going to implement the shell of the Escrow contract
   3. Add a method named `deposit` which accepts a `from` and `to` which specify the shared account, and `amount` for the amount in that account. Increase the balance of the shared account by `amount`.
   4. Add an event notifier to `deposit` called `balanceAvailable` that takes the `from`, `to`, and `amount` as parameters. Invoke the event notifier in the `deposit` method.
 
-Note that we haven't actually transferred any tokens yet, and functionally our smart contract doesn't actually do much since all we're doing is incrementing a balance. In the next chapter we'll make this a bit more functional once the shell is complete.
+Note that we haven't transferred any tokens yet, and functionally our smart contract doesn't do much since all we're doing is incrementing a balance. In the next chapter we'll make this a bit more functional once the shell is complete.
 
 ## Test
 

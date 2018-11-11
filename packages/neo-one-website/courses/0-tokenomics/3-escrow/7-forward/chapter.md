@@ -106,6 +106,8 @@ const transferReceipt = await token.transfer.confirmed(
 
 This chapter introduced the concept of reactive contracts with forwarded values. By making it this far, you've started from scratch, potentially with zero knowledge of smart contracts, implemented not one, but two full smart contracts, built the UI for an ICO and learned the fundamentals of developing dapps on NEO. Congratulations!
 
-We've reached the end of the course, but your journey into dapp development is just beginning. From here you can start on another course (coming soon!) or get started with setting up your local development environment with NEO•ONE to build your own unique dapp. If you enjoyed the course or if you have any feedback at all, let us know! Click the smiley face in the lower right hand side of the editor to Tweet us feedback, we'd love to hear from you. Alternatively, click the `Help` button to find other channels like Discord where you can come tell us what you think.
+We've reached the end of the course, but your journey into dapp development is just beginning. From here you can start on another course (coming soon!) or get started with [setting up a local development environment](/docs/environment-setup) with NEO•ONE to build your own unique dapp. We've covered the majority of the topics in the [Main Guide](/docs/hello-world) as well as a few from the [Advanced Guide](/docs/native-assets), but you may still find them useful.
+
+If you enjoyed the course or if you have any feedback at all, let us know! Click the smiley face in the lower right hand side of the editor to Tweet us feedback. We'd love to hear from you! Alternatively, click the `Help` button to find other channels like Discord where you can come tell us what you think.
 
 Thanks for taking part in the course, we hope you enjoyed it!

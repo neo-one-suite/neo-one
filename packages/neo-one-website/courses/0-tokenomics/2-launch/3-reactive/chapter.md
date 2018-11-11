@@ -42,7 +42,7 @@ const value$ = combineLatest(client.currentUserAccount$, client.block$).pipe(
 
 Here we have a simple smart contract that returns a `Fixed<8>` value for a given `Address`, similar to the `balanceOf` function of the Eon smart contract. We combine the latest values of the `currentUserAccount$` and `block$` `Observable`s which results in another `Observable` that contains a pair of the latest `UserAccount` and `Block`. We then `pipe` that stream of values into the [`switchMap`](https://rxjs-dev.firebaseapp.com/api/operators/switchMap) operator which transforms the stream of values with an async function, returning the latest value from the `myConstantFunction` of the smart contract. Finally, we would subscribe to the stream of values in order to do something with each one, for example update a UI. Abstractly, this allows us to automatically call `myConstantFunction` with the current `UserAccount`'s address every time the current `UserAccount` changes or a new `Block` is added.
 
-Because using `Observable`s to reactively update a UI is a very common pattern in developing dapps, NEO•ONE offers a React component, `FromStream` which helps simplify integrating with React (other framework integrations coming soon!). Using the above stream, for example, we could reactively update a UI with the following:
+Because using `Observable`s to reactively update a UI is a very common pattern in developing dapps, NEO•ONE offers a React component, `FromStream`, which helps simplify integrating with React. Using the above stream for example, we could reactively update a UI with the following:
 
 ```tsx
 <FromStream createStream={() => value$}>
@@ -56,7 +56,7 @@ Now whenever the `value$` `Observable` from the above example emits a new `value
 
   1. Implement the `createTokenInfoStream$` method. This method should return an `Observable` that calls the `getTokenInfo` function similar to the above examples, i.e. whenever the current user account changes or a new block comes in.
 
-Remember, if you get stuck, you can click `Show Solution` to see the solution. If this is your first time working with `Observable`s, they may seem a bit mysterious, but over time you'll add common patterns for using them to your toolbelt.
+Remember, if you get stuck, you can click `Show Solution` to see the solution. If this is your first time working with `Observable`s they may seem a bit mysterious, but over time you'll add common patterns for using them to your toolbelt.
 
 ## Test
 
@@ -68,4 +68,4 @@ Before heading to the next chapter, take a look at how the `ICO` component (in `
 
 ## Wrap Up
 
-In this chapter we took a whirlwind tour through `Observable`s and how they can be used to reactively update your dapp's UI. At this point, we have a fully reactive UI for participating in an ICO. We're not quite ready to move on to the next lesson, however, before that we'll take a look at how we can invoke the `transfer` and `withdraw` methods in the next two chapters.
+In this chapter we took a whirlwind tour through `Observable`s and how they can be used to reactively update your dapp's UI. At this point, we have a fully reactive UI for participating in an ICO. We'll take a look at how we can invoke the `transfer` and `withdraw` methods in the next two chapters.

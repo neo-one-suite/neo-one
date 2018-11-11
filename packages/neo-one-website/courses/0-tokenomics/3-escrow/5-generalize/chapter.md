@@ -29,7 +29,7 @@ We can also declare the events that we expect our smart contract to emit due to 
 
 ## Instructions
 
-Rather than go step by step through every change, we'll make this a bit more challenging than previous chapters and give a more high level description of what needs to be done.
+Rather than go step by step through every change, we'll make this a bit more challenging than previous chapters and give a high level description of what needs to be done.
 
   1. Remove the `Token` import and construct an interface called `Token` with a `transfer` method just like the example above. Use `declareEvent` to declare the `'transfer'` event that we expect the tokens we invoke to emit.
   2. Make the `balances` have keys that are a triplet of `Address` corresponding to `[from, to, asset]`.

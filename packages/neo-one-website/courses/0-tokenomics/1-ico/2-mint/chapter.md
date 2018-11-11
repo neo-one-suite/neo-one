@@ -34,7 +34,7 @@ There's quite a bit that needs to be done this chapter, so don't hesitate to tak
   1. Add a `public` `readonly` property for the `amountPerNEO` that we'll be minting. Give it a value of `100_000`, i.e. for each NEO contributed, we'll mint 100k of the token.
   2. Add a `private` `Fixed<8>` property for the `mutableRemaining` and give it an initial value of `10_000_000_000_00000000`, i.e. at the start of the ICO there are 10 billion tokens available.
   3. Add a `public` `@constant` getter called `remaining` that returns `mutableRemaining` so that clients can easily check how much is remaining in the ICO.
-  4. In the `for` loop that checks for only `NEO` assets, sum up the `amount` to issue by multiplying `output.value` by `this.amountPerNEO`.
+  4. In the `for` loop that checks for only `NEO` assets, sum the `amount` to issue by multiplying `output.value` by `this.amountPerNEO`.
   5. Add a check that if `amount` is greater than `this.remaining` returns false so that we don't issue more than the expected number of tokens.
   6. Subtract `amount` from `this.mutableRemaining`.
   7. Call `this.issue` with the first reference's address as the address to issue tokens to.

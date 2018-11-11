@@ -35,7 +35,7 @@ Since we'll be fetching multiple properties, you'll want to `await` a [`Promise.
 
 ## Test
 
-Once you've correctly implemented `getTokenInfo`, you should see the properties displayed in a simple table. The tests for this chapter are located in `utils.test.ts`, go ahead and click `Run Tests` once you're done implementing `getTokenInfo` to check your answer. Once they pass, click `Next` to proceed to the next chapter! Remember, if you ever get stuck, click `Show Solution` to view the complete solution for this chapter.
+Once you've correctly implemented `getTokenInfo`, you should see the properties displayed in a simple table. The tests for this chapter are located in `utils.test.ts`, once you're done implementing `getTokenInfo` go ahead and click `Run Tests` to check your answer. Once they pass, click `Next` to proceed to the next chapter! Remember, if you ever get stuck, click `Show Solution` to view the complete solution for this chapter.
 
 ## Wrap Up
 

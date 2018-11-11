@@ -22,7 +22,9 @@ This page describes how to setup NEO•ONE using `yarn` or `npm`.
   - [Angular CLI](https://cli.angular.io/)
   - [Vue CLI](https://cli.vuejs.org/)
 
-**Once you have a project setup**, add NEO•ONE to it. NEO•ONE is organized into multiple individual packages. Use as much or as little as you like. Each package may be installed using either [yarn](https://yarnpkg.com/) (`yarn add <package name>`) or [npm](https://www.npmjs.com/) `npm install <package name>`. Not sure what exactly you want to use from NEO•ONE? Go ahead and install everything mentioned on this page, and then follow the [main guide](/docs/hello-world) or the [tutorial](/tutorial). By the end of it you'll know which features of NEO•ONE you end up using, and thus which packages to keep.
+**Once you have a project setup**, add NEO•ONE to it. NEO•ONE is organized into multiple individual packages. Use as much or as little as you like. Each package may be installed using either [yarn](https://yarnpkg.com/) (`yarn add <package name>`) or [npm](https://www.npmjs.com/) `npm install <package name>`.
+
+Not sure what exactly you want to use from NEO•ONE? Go ahead and install everything mentioned on this page, and then follow the [main guide](/docs/hello-world) or the [tutorial](/tutorial). By the end of it you'll know which features of NEO•ONE you end up using and which packages to keep.
 
 For interacting with smart contracts, you should install
 

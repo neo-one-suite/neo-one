@@ -10,7 +10,7 @@ In this chapter we'll add a method for the destination address to claim EON from
   4. Verify that the escrow account has enough funds to claim.
   5. Create an instance of `Token` using `LinkedSmartContract.for`.
   6. Invoke `transfer` with `this.address` as the `from` parameter, the `to` argument to `claim` as the `to` parameter of `transfer`, and the `amount` argument to `claim` as the `amount` parameter of `transfer`.
-  7. If successful, i.e. `transfer` returns `true`, reduce the escrow balance and emit a `'balanceClaimed'` event with the `from`, `to` and `amount` arguments.
+  7. If successful (`transfer` returns `true`), reduce the escrow balance and emit a `'balanceClaimed'` event with the `from`, `to` and `amount` arguments.
 
 ## Test
 
@@ -18,4 +18,4 @@ Similar to last chapter, the tests verify that the `claim` method properly trans
 
 ## Wrap Up
 
-In this chapter we flexed the knowledge we've gained in this course to implement the `claim` method. Next chapter we'll enable refunds, which works very similarly to the `claim` method.
+In this chapter we used the knowledge we've gained to implement the `claim` method. Next chapter we'll enable refunds, which works very similarly to the `claim` method.
