@@ -10,7 +10,7 @@ export default () => (
   <CourseLayout>
     <Helmet
       title="NEO•ONE Courses"
-      description="NEO•ONE courses distill the essentials of dapp development into bite-sized interactive learning chapters. Build, test and write the UI for smart contracts with the NEO•ONE editor."
+      description="NEO•ONE Courses distill the essentials of dapp development into bite-sized interactive learning chapters. Build, test and write the UI for smart contracts with the NEO•ONE editor."
     />
     <CourseEntry />
   </CourseLayout>

@@ -5,6 +5,7 @@ import { prop } from 'styled-tools';
 import { Tagline } from '../../../elements';
 import { Footer } from '../../Footer';
 import { courses } from '../coursesData';
+import { CourseExplainer } from './CourseExplainer';
 import { CourseSection } from './CourseSection';
 
 const FlexBackground = Flex.as(Background);
@@ -51,6 +52,7 @@ export const CoursesView = (props: {}) => (
       </HeaderWrapper>
     </StyledBackground>
     <ContentWrapper>
+      <CourseExplainer />
       {Object.entries(courses).map(([slug, course], idx) => (
         <CourseSection key={slug} index={idx} slug={slug} course={course} />
       ))}

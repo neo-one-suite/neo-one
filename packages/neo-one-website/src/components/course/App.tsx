@@ -2,8 +2,10 @@ import { Loading } from '@neo-one/react-common';
 import { Redirect, RouteComponentProps, Router } from '@reach/router';
 import * as React from 'react';
 import { Provider } from 'react-redux';
+import { Box, Grid, styled } from 'reakit';
 // tslint:disable-next-line no-submodule-imports
 import { PersistGate } from 'redux-persist/integration/react';
+import { prop } from 'styled-tools';
 import { ChapterView } from './chapter';
 import { CoursesView } from './courses';
 import { LessonView } from './lesson';
@@ -52,15 +54,57 @@ const ChapterRoute = ({ course, lesson, chapter }: RouteComponentProps<ChapterPa
   );
 };
 
+const DesktopWrapper = styled(Box)`
+  @media (max-width: ${prop('theme.breakpoints.sm')}) {
+    display: none;
+  }
+`;
+
+const MobileWrapper = styled(Grid)`
+  display: none;
+
+  @media (max-width: ${prop('theme.breakpoints.sm')}) {
+    display: unset;
+    grid-gap: 32px;
+    padding: 16px;
+  }
+`;
+
+const Header = styled.h1`
+  ${prop('theme.fonts.axiformaBold')}
+  ${prop('theme.fontStyles.headline')}
+  color: ${prop('theme.gray0')};
+  margin: 0;
+`;
+
+const Text = styled(Box)`
+  ${prop('theme.fonts.axiformaRegular')}
+  ${prop('theme.fontStyles.subheading')}
+  color: ${prop('theme.gray0')};
+  margin: 0;
+`;
+
 export const App = () => (
-  <Provider store={store}>
-    <PersistGate loading={<Loading />} persistor={persistor}>
-      <Router>
-        <CoursesRoute path="course" />
-        <LessonRoute path="course/:course/:lesson" />
-        <ChapterRoute path="course/:course/:lesson/:chapter" />
-        <RedirectRoute default />
-      </Router>
-    </PersistGate>
-  </Provider>
+  <>
+    <DesktopWrapper>
+      <Provider store={store}>
+        <PersistGate loading={<Loading />} persistor={persistor}>
+          <Router>
+            <CoursesRoute path="course" />
+            <LessonRoute path="course/:course/:lesson" />
+            <ChapterRoute path="course/:course/:lesson/:chapter" />
+            <RedirectRoute default />
+          </Router>
+        </PersistGate>
+      </Provider>
+    </DesktopWrapper>
+    <MobileWrapper>
+      <Header>Uh oh!</Header>
+      <Text>
+        Looks like you're trying to start the NEO•ONE Courses from a mobile device. NEO•ONE Courses are an interactive
+        learning experience designed for desktops and laptops. Come back with your laptop or desktop to experience
+        NEO•ONE development.
+      </Text>
+    </MobileWrapper>
+  </>
 );
