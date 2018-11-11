@@ -1,13 +1,81 @@
+import { Link } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, styled } from 'reakit';
+import { as, Box, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { LayoutWrapper } from './common';
+import { RouterLink } from './RouterLink';
 
-const Wrapper = styled(Box)`
+const LinkSectionTitle = styled(Box)`
+  ${prop('theme.fonts.axiformaBold')};
+  ${prop('theme.fontStyles.body1')};
+  color: ${prop('theme.gray2')};
+`;
+
+const NavLink = as(RouterLink)(Link);
+
+const ExternalLink = Link;
+
+const LinkSectionWrapper = styled(Grid)`
+  grid-gap: 8px;
+  align-content: start;
+`;
+
+const LinkSection = ({
+  title,
+  links,
+}: {
+  readonly title: string;
+  readonly links: { readonly [name: string]: string };
+}) => (
+  <LinkSectionWrapper>
+    <LinkSectionTitle>{title}</LinkSectionTitle>
+    {Object.entries(links).map(([name, to]) =>
+      to.startsWith('/') ? (
+        <NavLink linkColor="light" to={to}>
+          {name}
+        </NavLink>
+      ) : (
+        <ExternalLink linkColor="light" href={to}>
+          {name}
+        </ExternalLink>
+      ),
+    )}
+  </LinkSectionWrapper>
+);
+
+const FooterWrapper = styled(Grid)`
+  justify-content: center;
+  grid-gap: 64px;
+  padding: 64px;
+
+  @media (max-width: ${prop('theme.breakpoints.md')}) {
+    grid-gap: 32px;
+    padding: 32px;
+  }
+`;
+
+const Copyright = styled(Box)`
+  ${prop('theme.fonts.axiformaRegular')};
+  ${prop('theme.fontStyles.caption')};
+  color: ${prop('theme.gray3')};
+  text-align: center;
+`;
+
+const LinksGrid = styled(Grid)`
+  grid-auto-flow: column;
+  grid-gap: 64px;
+
+  @media (max-width: ${prop('theme.breakpoints.md')}) {
+    grid-gap: 32px;
+  }
+`;
+
+const Wrapper = styled(Grid)`
   background-color: ${prop('theme.black')};
   box-shadow: inset 0 10px 10px -5px rgba(0, 0, 0, 0.2);
   height: 240px;
   width: 100%;
+  justify-items: center;
 `;
 
 interface Props {
@@ -15,7 +83,42 @@ interface Props {
 }
 
 export const Footer = ({ content = false, ...props }: Props) => {
-  let footer = <Box />;
+  const currentYear = new Date().getFullYear();
+
+  let footer = (
+    <FooterWrapper>
+      <LinksGrid>
+        <LinkSection
+          title="DOCS"
+          links={{
+            Installation: '/docs/getting-started',
+            'Main Concepts': '/docs/hello-world',
+            'Advanced Guides': '/docs/native-assets',
+            'API Reference': '/docs/configuration',
+            Contributing: '/docs/contributing',
+          }}
+        />
+        <LinkSection
+          title="CHANNELS"
+          links={{
+            GitHub: 'https://github.com/neo-one-suite/neo-one',
+            'Stack Overflow': 'https://stackoverflow.com/questions/tagged/neo-one',
+            'Discord Chat': 'https://discord.gg/S86PqDE',
+            Twitter: 'https://twitter.com/neo_one_suite',
+          }}
+        />
+        <LinkSection
+          title="MORE"
+          links={{
+            Courses: '/course',
+            Tutorial: '/tutorial',
+            Blog: '/blog',
+          }}
+        />
+      </LinksGrid>
+      <Copyright>COPYRIGHT &copy; {currentYear} NEO•ONE</Copyright>
+    </FooterWrapper>
+  );
   if (content) {
     footer = <LayoutWrapper>{footer}</LayoutWrapper>;
   }

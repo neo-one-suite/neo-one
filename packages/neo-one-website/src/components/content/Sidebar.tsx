@@ -11,14 +11,15 @@ const Wrapper = styled(Box)``;
 const DesktopSidebarWrapper = styled(Box)`
   background-color: ${prop('theme.gray1')};
   position: fixed;
-  z-index: 2;
-  height: calc(100vh - 72px);
+  height: 100vh;
   overflow-y: auto;
   margin-right: -1000px;
   padding-right: 1000px;
+  padding-top: 72px;
+  top: 0;
 
   @media (min-width: ${prop('theme.breakpoints.sm')}) {
-    height: calc(100vh - 80px);
+    padding-top: 80px;
   }
 `;
 
@@ -50,23 +51,18 @@ const fadeSlideOut = keyframes`
 
 const StyledHidden = styled(Hidden)`
   position: fixed;
-  top: 72px;
+  top: 0;
   bottom: 0px;
   left: 0px;
   right: 0px;
   z-index: 2;
-  height: calc(100vh - 72px);
+  height: 100vh;
   overflow-y: auto;
   &[aria-hidden='false'] {
     animation: ${fadeSlideIn} 500ms;
   }
   &[aria-hidden='true'] {
     animation: ${fadeSlideOut} 500ms;
-  }
-
-  @media (min-width: ${prop('theme.breakpoints.sm')}) {
-    top: 80px;
-    height: calc(100vh - 80px);
   }
 `;
 
