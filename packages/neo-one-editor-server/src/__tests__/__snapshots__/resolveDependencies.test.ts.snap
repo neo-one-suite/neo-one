@@ -222,7 +222,7 @@ Object {
     "dependencies": Object {},
     "name": "stylis",
     "types": true,
-    "version": "3.5.3",
+    "version": "3.5.4",
   },
   "stylis-rule-sheet": Object {
     "dependencies": Object {},

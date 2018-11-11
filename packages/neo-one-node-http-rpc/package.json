@@ -16,7 +16,7 @@
     "@types/koa-router": "^7.0.33",
     "@types/lodash": "^4.14.118",
     "cross-fetch": "^2.2.3",
-    "koa": "^2.6.1",
+    "koa": "^2.6.2",
     "koa-compose": "^4.1.0",
     "koa-compress": "^3.0.0",
     "koa-router": "^7.4.0",

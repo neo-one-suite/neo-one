@@ -30,13 +30,13 @@
     "nanoid": "^2.0.0",
     "rxjs": "^6.3.3",
     "source-map": "^0.7.3",
-    "typescript": "3.2.0-dev.20181107"
+    "typescript": "3.2.0-dev.20181110"
   },
   "devDependencies": {
     "@neo-one/server-plugin-wallet": "^1.0.0-preview.7",
     "@neo-one/smart-contract": "^1.0.0-preview.4",
     "@neo-one/smart-contract-test": "1.0.0-alpha.44",
-    "@types/react": "16.4.18",
+    "@types/react": "16.7.3",
     "bignumber.js": "8.0.1",
     "react": "16.6.1"
   },
