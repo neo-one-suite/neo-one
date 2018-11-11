@@ -3,7 +3,12 @@ import * as React from 'react';
 import { as, Box, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { RouterLink } from '../RouterLink';
+import { Authoring } from './Authoring';
+import { ContentWrapperBase } from './ContentWrapperBase';
+import { DeveloperTools } from './DeveloperTools';
+import { EditorContent } from './EditorContent';
 import { Proof } from './Proof';
+import { Testing } from './Testing';
 
 const StyledBackground = styled(Background)`
   display: grid;
@@ -49,28 +54,20 @@ const StyledLink = styled(as(RouterLink)(Link))`
   }
 `;
 
-const ContentWrapper = styled(Grid)`
-  background-color: ${prop('theme.gray0')};
-  max-width: 1260px;
+const CenterContentWrapper = styled(ContentWrapperBase)`
+  flex: 1 1 auto;
   justify-content: center;
-  padding-left: 24px;
-  padding-right: 24px;
-
-  @media (max-width: ${prop('theme.breakpoints.md')}) {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
 `;
 
 const ProofsWrapper = styled(Grid)`
   grid-auto-flow: column;
   padding-top: 64px;
   padding-bottom: 64px;
-  border-bottom: 1px solid ${prop('theme.gray3')};
 
   @media (max-width: ${prop('theme.breakpoints.md')}) {
     padding-top: 32px;
     padding-bottom: 32px;
+    border-bottom: 1px solid ${prop('theme.gray3')};
   }
 `;
 
@@ -80,6 +77,18 @@ const ProofsInnerWrapper = styled(Grid)`
   @media (max-width: ${prop('theme.breakpoints.md')}) {
     mask-image: linear-gradient(to right, transparent, white 10px, white 90%, transparent);
     overflow-x: scroll;
+  }
+`;
+
+const FeaturesWrapper = styled(Grid)`
+  padding-top: 64px;
+  padding-bottom: 64px;
+  grid-gap: 64px;
+
+  @media (max-width: ${prop('theme.breakpoints.md')}) {
+    padding-top: 32px;
+    padding-bottom: 32px;
+    grid-gap: 32px;
   }
 `;
 
@@ -99,7 +108,7 @@ export const Home = (props: {}) => (
         </StyledLink>
       </ButtonWrapper>
     </StyledBackground>
-    <ContentWrapper>
+    <CenterContentWrapper>
       <ProofsWrapper>
         <ProofsInnerWrapper>
           <Proof
@@ -125,6 +134,12 @@ export const Home = (props: {}) => (
           />
         </ProofsInnerWrapper>
       </ProofsWrapper>
-    </ContentWrapper>
+    </CenterContentWrapper>
+    <EditorContent />
+    <FeaturesWrapper>
+      <Authoring />
+      <Testing />
+      <DeveloperTools />
+    </FeaturesWrapper>
   </Wrapper>
 );

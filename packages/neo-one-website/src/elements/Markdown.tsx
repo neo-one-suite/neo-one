@@ -219,7 +219,7 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent'; 
     margin-top: 32px;
   }
 
-  & strong: {
+  & strong {
     font-weight: ${prop('theme.fontStyles.axiformaMedium')};
   }
 

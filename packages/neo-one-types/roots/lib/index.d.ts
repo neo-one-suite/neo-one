@@ -30,4 +30,8 @@ declare module '*.json' {
   export default {};
 }
 
+declare module '*.mp4' {
+  export default {};
+}
+
 type JestMocked<T> = { [K in keyof T]: jest.Mock<T[K]> };

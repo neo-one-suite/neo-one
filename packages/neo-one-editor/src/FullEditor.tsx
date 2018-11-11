@@ -53,6 +53,7 @@ interface ExternalProps {
   readonly build?: boolean;
   readonly initialOptions?: InitialEditorStateOptions;
   readonly onTestsPass?: () => void;
+  readonly clearFS?: boolean;
 }
 
 interface Props extends ExternalProps {
@@ -102,6 +103,7 @@ class FullEditorBase extends React.Component<Props, State> {
       createPreviewURL: _createPreviewURL,
       initialOptions: _initialOptions,
       build: _build,
+      clearFS: _clearFS,
       ...props
     } = this.props;
 
@@ -126,6 +128,7 @@ class FullEditorBase extends React.Component<Props, State> {
     appendOutput,
     clearStore,
     build,
+    clearFS,
   }: Props): void {
     this.dispose();
     this.setState({ engine: undefined, openFiles: [] });
@@ -138,6 +141,7 @@ class FullEditorBase extends React.Component<Props, State> {
         openFile: this.onSelectFile,
       },
       testRunnerCallbacks,
+      clearFS,
     })
       .then(async (engine) => {
         if (this.props.id === id && this.mutableMounted) {

@@ -103,6 +103,7 @@ interface CreateMainEngineOptions {
   readonly initialFiles: EngineContentFiles;
   readonly editorCallbacks: EditorCallbacks;
   readonly testRunnerCallbacks: TestRunnerCallbacks;
+  readonly clearFS?: boolean;
 }
 
 export type Files = ReadonlyArray<string>;
@@ -131,6 +132,7 @@ export class MainEngine {
     initialFiles,
     editorCallbacks,
     testRunnerCallbacks,
+    clearFS,
   }: CreateMainEngineOptions): Promise<MainEngine> {
     const fileSystemManager = createFileSystemManager();
     const metaDB = createEndpointPouchDB<EngineMeta>(`${id}-meta`, fileSystemManager.worker);
@@ -174,10 +176,14 @@ export class MainEngine {
 
     await Promise.all(
       initialFiles.map(async (file) => {
-        try {
-          fs.readFileSync(file.path);
-        } catch {
+        if (clearFS) {
           await fs.writeFile(file.path, file.content);
+        } else {
+          try {
+            fs.readFileSync(file.path);
+          } catch {
+            await fs.writeFile(file.path, file.content);
+          }
         }
       }),
     );

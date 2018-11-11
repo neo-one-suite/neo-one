@@ -39,6 +39,7 @@
     "prop-types": "^15.6.2",
     "react": "^16.6.1",
     "react-dom": "^16.6.1",
+    "react-headroom": "^2.2.4",
     "react-helmet": "^5.2.0",
     "react-hot-loader": "^4.3.12",
     "react-icons": "^3.2.2",

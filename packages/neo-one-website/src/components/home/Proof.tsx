@@ -19,12 +19,14 @@ const Title = styled.h2`
   ${prop('theme.fonts.axiformaThin')};
   ${prop('theme.fontStyles.headline')};
   color: ${prop('theme.gray5')};
+  margin: 0;
 `;
 
 const Line = styled.p`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.subheading')};
   color: ${prop('theme.black')};
+  margin: 0;
 `;
 
 interface Props {
