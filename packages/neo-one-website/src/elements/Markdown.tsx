@@ -292,6 +292,7 @@ interface Props {
   readonly openAllLinksInNewTab?: boolean;
   readonly light?: boolean;
   readonly anchors?: boolean;
+  readonly resetScroll?: boolean;
 }
 export class Markdown extends React.Component<Props> {
   private readonly ref = React.createRef<HTMLElement>();
@@ -315,9 +316,17 @@ export class Markdown extends React.Component<Props> {
     }
   }
 
-  public componentDidUpdate(): void {
-    if (this.ref.current) {
-      Prism.highlightAllUnder(this.ref.current);
+  public componentDidUpdate(prevProps: Props): void {
+    const current = this.ref.current;
+    if (current) {
+      Prism.highlightAllUnder(current);
+
+      if (this.props.resetScroll && this.props.source !== prevProps.source) {
+        // tslint:disable-next-line no-object-mutation
+        current.scrollTop = 0;
+        // tslint:disable-next-line no-object-mutation
+        current.scrollLeft = 0;
+      }
     }
   }
 
