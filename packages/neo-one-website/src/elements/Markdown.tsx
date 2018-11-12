@@ -302,6 +302,35 @@ export class Markdown extends React.Component<Props> {
   private readonly ref = React.createRef<HTMLElement>();
 
   public componentDidMount(): void {
+    this.handleUpdate();
+  }
+
+  public componentDidUpdate(prevProps: Props): void {
+    this.handleUpdate();
+    const current = this.ref.current;
+    if (current && this.props.resetScroll && this.props.source !== prevProps.source) {
+      // tslint:disable-next-line no-object-mutation
+      current.scrollTop = 0;
+      // tslint:disable-next-line no-object-mutation
+      current.scrollLeft = 0;
+    }
+  }
+
+  public render() {
+    const { source, linkColor = 'primary', light = false, anchors = false, ...props } = this.props;
+
+    return (
+      <Wrapper
+        {...props}
+        linkColor={linkColor}
+        light={light}
+        innerRef={this.ref}
+        dangerouslySetInnerHTML={{ __html: anchors ? mdWithAnchors.render(source) : mdWithoutAnchors.render(source) }}
+      />
+    );
+  }
+
+  private handleUpdate(): void {
     if (this.ref.current) {
       Prism.highlightAllUnder(this.ref.current);
 
@@ -318,33 +347,5 @@ export class Markdown extends React.Component<Props> {
         }
       }
     }
-  }
-
-  public componentDidUpdate(prevProps: Props): void {
-    const current = this.ref.current;
-    if (current) {
-      Prism.highlightAllUnder(current);
-
-      if (this.props.resetScroll && this.props.source !== prevProps.source) {
-        // tslint:disable-next-line no-object-mutation
-        current.scrollTop = 0;
-        // tslint:disable-next-line no-object-mutation
-        current.scrollLeft = 0;
-      }
-    }
-  }
-
-  public render() {
-    const { source, linkColor = 'primary', light = false, anchors = false, ...props } = this.props;
-
-    return (
-      <Wrapper
-        {...props}
-        linkColor={linkColor}
-        light={light}
-        innerRef={this.ref}
-        dangerouslySetInnerHTML={{ __html: anchors ? mdWithAnchors.render(source) : mdWithoutAnchors.render(source) }}
-      />
-    );
   }
 }
