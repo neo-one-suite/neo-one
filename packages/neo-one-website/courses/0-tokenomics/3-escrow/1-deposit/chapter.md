@@ -4,7 +4,7 @@ Last chapter was a lot of reinforcing previously learned concepts, and this one 
 
 ## Learn
 
-This chapter actually doesn't have anything new to learn - rather than try to throw in new concepts at the same time as revisiting old ones, we felt it best to just let you focus on building out the contract from scratch on your own.
+This chapter doesn't have anything new to learn - rather than try to throw in new concepts at the same time as revisiting old ones, we felt it best to just let you focus on building out the contract from scratch on your own.
 
 ## Instructions
 

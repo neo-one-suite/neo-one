@@ -2,13 +2,15 @@
 slug: client-apis
 title: Client APIs
 ---
-# Client APIs
+Now it's time to take a look at the client APIs and learn how to interact with smart contracts from a dapp.
 
-Now it's finally time to take a look at the client APIs and learn how to interact with smart contracts from a dapp.
+The NEO•ONE client APIs are organized into two packages, `@neo-one/client` which contains the most commonly used functionality, and `@neo-one/client-full` which contains extended but rarely used functionality. In general a dapp developer only needs to concern themselves with the APIs offered by `@neo-one/client`. Learn more about the `@neo-one/client-full` APIs in the [Extended Client APIs](/docs/extended-client-apis) advanced guide.
 
-The NEO•ONE client APIs are organized into two packages, `@neo-one/client` which contains the most commonly used functionality, and `@neo-one/client-full` which contains extended, but rarely used, functionality. In general a dapp developer only needs to concern themselves with the APIs offered by `@neo-one/client`. Learn more about the `@neo-one/client-full` APIs in the [Extended Client APIs](/docs/extended-client-apis) advanced guide.
+---
 
 [[toc]]
+
+---
 
 ## Client
 
@@ -100,9 +102,11 @@ if (account.balances[Hash256.NEO] === undefined) {
 
 We'll learn more about the `confirmed` property in the next chapter. Also take note of the `Hash256.NEO` property, which works just like the `Hash256.NEO` property in smart contracts and can be imported directly from `@neo-one/client`.
 
+---
+
 ## Toolchain Code Generation
 
-The NEO•ONE toolchain generates many files that contain helpers and APIs that are essential for dapp development. Running `neo-one build` will emit TypeScript files, let's briefly cover what each one contains.
+The NEO•ONE toolchain generates many files that contain helpers and APIs that are essential for dapp development. Running `neo-one build` will emit TypeScript files. Let's briefly cover what each one contains.
 
 ::: warning
 
@@ -127,6 +131,8 @@ For each contract, the toolchain will emit 3 files:
   - `one/generated/test.ts` - Contains the `withContracts` test helper. We'll learn more about this helper in the following chapters.
   - `one/generated/types.ts` - Contains the `Contracts` type whose properties are the smart contract APIs for your dapp.
 
+---
+
 ## Integration
 
 Integrating the NEO•ONE client APIs in a vanilla JavaScript or TypeScript application is very simple - assuming we have a contract called `Token` and we're in the `src/index.ts` file using the default NEO•ONE toolchain paths:
@@ -147,6 +153,8 @@ Note
 As you prepare your dapp for production, you'll likely want to configure additional `UserAccountProvider`s in the `Client`. Learn more about `UserAccount`s and `UserAccountProvider`s in the [User Accounts](/docs/user-accounts) advanced guide.
 
 :::
+
+---
 
 ## Utilities
 

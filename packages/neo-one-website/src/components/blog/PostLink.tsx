@@ -2,13 +2,14 @@ import { Link } from '@neo-one/react-common';
 import * as React from 'react';
 import { as, Box, List, styled } from 'reakit';
 import { prop } from 'styled-tools';
+import { Author } from '../content';
 import { RouterLink } from '../RouterLink';
 
 interface Props {
   readonly title: string;
   readonly path: string;
   readonly date: string;
-  readonly author: string;
+  readonly author: Author;
 }
 
 const StyledLink = styled(as(RouterLink)(Link))`
@@ -33,6 +34,6 @@ export const PostLink = ({ title, path, date, author, ...props }: Props) => (
       {title}
     </StyledLink>
     <PostInfo>{date}</PostInfo>
-    <PostInfo>{`by ${author}`}</PostInfo>
+    <PostInfo>{`by ${author.name}`}</PostInfo>
   </Wrapper>
 );

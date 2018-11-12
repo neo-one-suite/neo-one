@@ -2,15 +2,17 @@
 slug: events-and-logs
 title: Events and Logs
 ---
-# Events and Logs
-
 Smart contracts may emit events to allow listeners to *react* to changes in smart contract state.
+
+---
 
 [[toc]]
 
+---
+
 ## Events
 
-Decentralized apps commonly need to know the current state of a smart contract, sometimes by employing a centralized storage solution, Forexample, they may employ a relational database to store the current state in a more efficiently queryable way. Rather than poll the smart contract for the entire state every block, we can react to events emitted by the contract which represent the important state changes.
+Decentralized apps commonly need to know the current state of a smart contract, sometimes by employing a centralized storage solution, For example, they may employ a relational database to store the current state in a more efficiently queryable way. Rather than poll the smart contract for the entire state every block, we can react to events emitted by the contract which represent the important state changes.
 
 Create an event notifier using `createEventNotifier` and then call it to emit an event:
 
@@ -36,6 +38,8 @@ The `createEventNotifier` function requires an event name as the first argument,
   2. `value` which is a `Fixed<8>`
 
 Events must be unique throughout a smart contract.
+
+---
 
 ## Debugging with Logs
 

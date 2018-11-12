@@ -39,4 +39,4 @@ We've updated `Token.test.ts` to verify that we can invoke the `withdraw` method
 
 ## Wrap Up
 
-Congratulations, you've built a fully functioning ICO smart contract! Now we just need a way for people to actually participate in the ICO through a UI, otherwise we'll likely not see many participants since not everyone is technical enough to construct the smart contract invocations themselves. We'll do that and more in the next lesson, see you on the other side!
+Congratulations, you've built a fully functioning ICO smart contract! Now we just need a way for people to participate in the ICO through a UI, otherwise we'll likely not see many participants since not everyone is technical enough to construct the smart contract invocations themselves. We'll do that and more in the next lesson, see you on the other side!

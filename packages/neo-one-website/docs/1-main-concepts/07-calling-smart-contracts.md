@@ -2,11 +2,13 @@
 slug: calling-smart-contracts
 title: Calling Smart Contracts
 ---
-# Calling Smart Contracts
-
 Smart contracts are not very useful in isolation, they typically interact with other smart contracts that make up the building blocks of a larger piece of infrastructure.
 
+---
+
 [[toc]]
+
+---
 
 ## Calling One of Your Smart Contracts
 
@@ -35,9 +37,11 @@ export class Bar extends SmartContract {
 
 Once we have an instance of the contract we can access any of its public properties and methods. Events from the original contract are also propagated automatically and are made available in the NEO•ONE client APIs.
 
+---
+
 ## Calling an Arbitrary Smart Contract
 
-Continuing from the examples above, let's say we want to invoke the `takeAction` method of a smart contract at a given `Address`, i.e. not one of our own smart contracts, but an arbitrary one. Similar to `LinkedSmartContract.for`, we can get the instance of the smart contract using `SmartContract.for<Foo>(address)` where `address` is the `Address` of the smart contract:
+Continuing from the examples above, let's say we want to invoke the `takeAction` method of a smart contract at a given arbitrary `Address`. Similar to `LinkedSmartContract.for`, we can get the instance of the smart contract using `SmartContract.for<Foo>(address)` where `address` is the `Address` of the smart contract:
 
 ```typescript
 interface Foo {

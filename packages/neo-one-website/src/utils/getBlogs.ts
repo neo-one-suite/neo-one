@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
-import * as matter from 'gray-matter';
+import matter from 'gray-matter';
 import * as path from 'path';
-import { BlogAllProps, BlogProps } from '../components';
+import { Author, BlogAllProps, BlogProps } from '../components';
 
 const BLOG_SOURCE = path.resolve(__dirname, '..', '..', 'blog');
 
@@ -10,10 +10,15 @@ interface MDBlogHeader {
   readonly slug: string;
   readonly date: string;
   readonly author: string;
+  readonly twitter: string;
 }
 
-interface BlogInfo extends MDBlogHeader {
+interface BlogInfo {
+  readonly title: string;
+  readonly slug: string;
+  readonly date: string;
   readonly content: string;
+  readonly author: Author;
 }
 
 export const getBlogs = async (): Promise<{
@@ -33,27 +38,31 @@ export const getBlogs = async (): Promise<{
     }))
     .reverse();
 
+  const sidebar = [
+    {
+      title: 'RECENT POSTS',
+      subsections: posts
+        .map(({ title, slug }) => ({
+          title,
+          slug,
+        }))
+        .concat([
+          {
+            title: 'All posts ...',
+            slug: '/blog/all',
+          },
+        ]),
+    },
+  ];
+
   return {
     blogs: blogPosts.map((post) => ({
       current: post.slug,
       title: post.title,
       content: post.content,
-      sidebar: [
-        {
-          title: 'RECENT POSTS',
-          subsections: posts
-            .map(({ title, slug }) => ({
-              title,
-              slug,
-            }))
-            .concat([
-              {
-                title: 'All posts ...',
-                slug: '/blog/all',
-              },
-            ]),
-        },
-      ],
+      date: post.date,
+      author: post.author,
+      sidebar,
     })),
     blogAll: {
       posts,
@@ -62,14 +71,19 @@ export const getBlogs = async (): Promise<{
 };
 
 const getBlog = async (blogFile: string): Promise<BlogInfo> => {
-  const blog = matter.read(path.resolve(BLOG_SOURCE, blogFile));
+  const date = blogFile.slice(0, 10);
+  const contents = await fs.readFile(path.resolve(BLOG_SOURCE, blogFile), 'utf8');
+  const blog = matter(contents);
   const blogHeader = blog.data as MDBlogHeader;
 
   return {
     slug: `/blog/${blogHeader.slug}`,
     title: blogHeader.title,
-    date: blogHeader.date,
-    author: blogHeader.author,
+    date,
+    author: {
+      name: blogHeader.author,
+      twitter: blogHeader.twitter,
+    },
     content: blog.content,
   };
 };

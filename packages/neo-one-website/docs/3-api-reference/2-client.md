@@ -2,8 +2,6 @@
 slug: client
 title: \@neo-one/client
 ---
-# @neo-one/client
-
 `@neo-one/client` contains the NEO•ONE client APIs.
 
 This reference uses dot syntax to indicate static properties and `#` to indicate instance properties. For example:

@@ -2,13 +2,15 @@
 slug: smart-contract-apis
 title: Smart Contract APIs
 ---
-# Smart Contract APIs
-
 The generated smart contract client APIs correspond directly with the properties and methods of your smart contract.
 
-The smart contract APIs are created at runtime based on the generated ABI in `one/generated/<ContractName>/abi.ts`. The exact structure of the ABI is not too important, we just need to understand what's happening at a high level; for every public property and method of your smart contract, a corresponding method is created on the smart contract object.
+The smart contract APIs are created at runtime based on the generated ABI in `one/generated/<ContractName>/abi.ts`. The exact structure of the ABI is not too important, we just need to understand what's happening at a high level. For every public property and method of your smart contract, a corresponding method is created on the smart contract object.
+
+---
 
 [[toc]]
+
+---
 
 ## Properties
 
@@ -41,6 +43,8 @@ would result in an object with three properties:
 Notice how the smart contract client APIs correspond directly with the properties defined in the smart contract. The main difference is that reading properties requires an asynchronous action - we need to make a request to a node to determine the current value. Thus, the methods return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which will resolve to a value with the type of the property.
 
 `setMyValue` works the same as a normal instance method, which we'll cover in the next section.
+
+---
 
 ## Methods
 
@@ -234,6 +238,8 @@ if (receipt.result.state === 'FAULT') {
 
 The only difference is the `Promise` resolves with an additional property, `transaction`, on the receipt object that contains the `Transaction` that was relayed and confirmed.
 
+---
+
 ## Common Properties
 
 In addition to the generated methods mentioned above, the smart contract object contains a few common properties:
@@ -304,37 +310,41 @@ for await (const event of contract.iterEvents()) {
 All of the `iter` methods accept a `SmartContractIterOptions` object:
 
 ```typescript
-interface SmartContractReadOptions {
+/**
+ * Additional optional options for methods that read data from a smart contract.
+ */
+export interface SmartContractReadOptions {
   /**
    * The network to read the smart contract data for. By default this is the network of the currently selected user account.
    */
-  readonly network?: string;
-}
-
-interface SmartContractIterOptions extends SmartContractReadOptions {
-  /**
-   * Filters the iterated events and/or logs to those that match the provided `BlockFilter` object.
-   */
-  readonly filter?: BlockFilter;
-}
-
-interface BlockFilter {
-  /**
-   * The inclusive start index for the first block to include. Leaving `undefined` means start from the beginning of the blockchain, i.e. index 0.
-   */
-  readonly indexStart?: number;
-  /**
-   * The exclsuive end index for the block to start at. Leaving `undefined` means continue indefinitely, waiting for new blocks to come in.
-   */
-  readonly indexStop?: number;
+  readonly network?: NetworkType;
   /**
    * The `Monitor` to use for tracking all asynchronous calls made in the process of pulling data.
    */
   readonly monitor?: Monitor;
 }
+
+/**
+ * Filter that specifies (optionally) a block index to start at and (optionally) a block index to end at.
+ */
+export interface BlockFilter {
+  /**
+   * The inclusive start index for the first block to include. Leaving `undefined` means start from the beginning of the blockchain, i.e. index 0.
+   */
+  readonly indexStart?: number;
+  /**
+   * The exclusive end index for the block to start at. Leaving `undefined` means continue indefinitely, waiting for new blocks to come in.
+   */
+  readonly indexStop?: number;
+}
+
+/**
+ * Additional optional options for methods that iterate over data from a smart contract.
+ */
+export interface SmartContractIterOptions extends SmartContractReadOptions, BlockFilter {}
 ```
 
-The `SmartContractIterOptions` object allows specifying two properties, one for the `network` to iterate over and one that specifies the iteration parameters - that is, which block to start from and which block to end at.
+The `SmartContractIterOptions` object allows specifying the `network` to iterate over and the iteration parameters, which block to start from and which block to end at.
 
 `convertAction` takes a `RawAction` and converts it using the ABI of the smart contract. This conversion includes parsing out the relevant events and automatically converting the raw parameters. See the [Raw Client APIs](/docs/raw-client-apis) documentation for more details.
 
@@ -345,6 +355,8 @@ Tip
 Read more about asynchronous iteration [here](http://2ality.com/2016/10/asynchronous-iteration.html)
 
 :::
+
+---
 
 ## Type Conversion Table
 

@@ -2,8 +2,6 @@
 slug: node-deployment
 title: Node Deployment
 ---
-# Node Deployment
-
 NEO•ONE nodes are designed to be easy to deploy with a variety of deployment methods.
 
 Coming soon! We are currently working on:

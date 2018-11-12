@@ -2,8 +2,6 @@
 slug: smart-contract
 title: \@neo-one/smart-contract
 ---
-# @neo-one/smart-contract
-
 `@neo-one/smart-contract` contains the standard library for NEO•ONE smart contracts.
 
 This reference uses dot syntax to indicate static properties and `#` to indicate instance properties. For example:

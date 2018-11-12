@@ -1,11 +1,9 @@
 ---
-slug: welcome
-title: Lorem Ipsum Dolor Sit Amet
-date: October 23rd, 2016
-author: Bergstrom BermingHam
+slug: 2018/11/13/announcing-neo-one
+title: Announcing NEO•ONE
+author: Alex DiCarlo
+twitter: https://twitter.com/AlexDiCarlo10
 ---
-
-# Welcome
 
 ## Section 1
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent euismod congue arcu, ut ultricies velit. Sed sed turpis convallis, consectetur justo id, dictum orci. Fusce efficitur euismod augue non accumsan. Fusce aliquam, urna dapibus gravida tempor, massa odio tincidunt felis, ut blandit ipsum mauris ac enim. Etiam rutrum quam non iaculis ornare. Phasellus ut felis pretium lectus egestas blandit. Cras consectetur metus sed consectetur euismod. Aliquam quis ultricies odio. Nam sagittis libero nibh, eget tincidunt dolor placerat vitae. Aliquam sollicitudin urna eu lorem molestie consequat.

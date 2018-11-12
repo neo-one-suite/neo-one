@@ -2,11 +2,15 @@
 slug: dapps
 title: Decentralized Apps
 ---
-# Decentralized Apps
-
 Building a decentralized app doesn't have to be hard, use these tools from NEO•ONE to make it quick and easy.
 
-In addition to the client APIs we've already walked through, there's a few properties on the `Client` that help make your app reactive. We'll also cover using the Developer Tools to help speed up manual testing of your dapp.
+In addition to the client APIs we've already walked through, there's a few properties on the `Client` that help make your app reactive. We'll also cover using the NEO•ONE Developer Tools to help speed up manual testing of your dapp.
+
+---
+
+[[toc]]
+
+---
 
 ## Reactive
 
@@ -102,6 +106,8 @@ client.accountState$.subscribe((result) => {
 ```
 
 Take a look at the [@neo-one/client](/docs/client) reference for details on all available `Observable`s.
+
+---
 
 ## Developer Tools
 

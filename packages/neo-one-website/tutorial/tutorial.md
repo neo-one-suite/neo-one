@@ -1,10 +1,14 @@
-# Tutorial: Intro to NEO•ONE
-
 This tutorial serves as an introduction to NEO•ONE and does not assume any prior knowledge.
+
+---
+
+[[toc]]
+
+---
 
 ## Before We Get Started
 
-This tutorial roughly follows the same material as the first lesson of the first course in the NEO•ONE Courses: Tokens, ICOs and DApps, oh my! We'll just focus on creating a token in this . Even if you have no plans to build a token, give this tutorial (or the course) a chance. The techniques you’ll learn in the tutorial are fundamental to building decentralized apps with NEO•ONE, and mastering it will give you a deep understanding of NEO•ONE.
+This tutorial roughly follows the same material as the first course of the NEO•ONE Courses: Tokens, ICOs and DApps, oh my! We'll focus on creating a token, but even if you have no plans to build a token, give this tutorial (or the course) a chance. The techniques you’ll learn in the tutorial are fundamental to building decentralized apps with NEO•ONE, and mastering it will give you a deep understanding of NEO•ONE.
 
 ::: warning
 
@@ -24,15 +28,17 @@ While each section follows from the previous, you don't have to complete the ent
 
 While all snippets in the tutorial can be copy-pasted, we recommend typing the solutions directly into your editor in order to reinforce the learnings.
 
+---
+
 ## Setup
 
 ### Prerequisites
 
 NEO•ONE is a JavaScript library so we'll assume you have a basic understanding of the JavaScript language. **If you're not sure, we recommend taking a [JavaScript tutorial](https://developer.mozilla.org/en-US/docs/Web/JavaScript/A_re-introduction_to_JavaScript) to check your knowledge level**. It might take some time to complete, but then you won't be trying to learn both NEO•ONE and JavaScript at the same time.
 
-NEO•ONE itself is written in [TypeScript](http://www.typescriptlang.org/) and throughout the tutorial we will use TypeScript, however the guide assumes no prior knowledge. We will introduce TypeScript specific concepts as they're used, with links to documentation to learn more.
+NEO•ONE itself is written in [TypeScript](http://www.typescriptlang.org/) and throughout the tutorial we will use TypeScript, however the tutorial assumes no prior knowledge. We will introduce TypeScript specific concepts as they're used, with links to documentation to learn more.
 
-The tutorial assumes general familiarity with blockchain and the NEO blockchain in particular. Check out the [Blockchain Basics](/docs/blockchain-basics) chapter of the main guide if you are unfamiliar with the general concepts blockchain or need a refresher.
+The tutorial assumes general familiarity with blockchain and the NEO blockchain in particular. Check out the [Blockchain Basics](/docs/blockchain-basics) chapter of the main guide if you are unfamiliar with the general concepts of blockchain or need a refresher.
 
 The tutorial will leverage [React](https://reactjs.org). If you'd prefer to use another front-end framework, or no framework at all, that's okay too! We'll only briefly cover how to use React with NEO•ONE and otherwise it will primarily be used to show how one might integrate NEO•ONE with a front-end framework, so in-depth knowledge of React is not required.
 
@@ -44,23 +50,26 @@ This tutorial assumes you'll be working with a local development environment. **
 
 Here's how to setup your local development environment:
 
-  1. Install [Node](https://nodejs.org) >= 8.9.0 (We recommend the latest version)
-    - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
-    - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
-  2. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
-    - Be sure to invoke Create React App with the `--typescript` flag in order to enable TypeScript support: `npx create-react-app token --typescript`
-  3. Install NEO•ONE using either [yarn](https://yarnpkg.com/) (`yarn add <package name>`) or [npm](https://www.npmjs.com/) `npm install <package name>`.
+1. Install [Node](https://nodejs.org) >= 8.9.0 (We recommend the latest version)
+  - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
+  - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
+2. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
+  - Be sure to invoke Create React App with the `--typescript` flag in order to enable TypeScript support: `npx create-react-app token --typescript`
+3. Install NEO•ONE using either [yarn](https://yarnpkg.com/) (`yarn add <package name>`) or [npm](https://www.npmjs.com/) `npm install <package name>`.
 
 ```bash
 yarn add @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-typescript-plugin
 ```
-  4. Run `yarn neo-one init`.
+
+4. Run `yarn neo-one init`.
 
 We recommend taking a moment to [setup your editor](/docs/environment-setup#Editor-Setup) to take advantage of inline NEO•ONE compiler diagnostics.
 
 ### Help, I'm Stuck!
 
 If you get stuck, check out the [Help](/docs/getting-started#Help) section. In particular, come chat with us on [Discord](https://discord.gg/S86PqDE), we're more than happy to assist in any way we can.
+
+---
 
 ## Create a Token
 
@@ -84,7 +93,7 @@ For brevity, from here on we will not include the `import` statement for smart c
 
 :::
 
-This smart contract doesn't do a whole lot, in fact, it does nothing, but this is the smallest compilable smart contract. Let's go ahead and build it to familiarize ourself with the NEO•ONE toolchain by running `yarn neo-one build`. This command will:
+This smart contract doesn't do a whole lot, in fact it does nothing, but this is the smallest compilable smart contract. Let's go ahead and build it to familiarize ourself with the NEO•ONE toolchain by running `yarn neo-one build`. This command will:
 
   1. Start up a local private NEO network (if one has not already been started).
   2. Setup wallets for testing with various amounts of NEO and GAS.
@@ -173,11 +182,11 @@ export class Token extends SmartContract {
 }
 ```
 
-Before diving into these properties, let's take a look at the mental model for TypeScript smart contracts. The way to think about how the smart contract we're building works is that when it's published to the blockchain we construct it, i.e. we call the equivalent of `new Token()`. Then for every invocation we use that one instance, so any changes to storage properties are persisted between invocations. In short, our smart contract follows the [singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern).
+Before diving into these properties, let's describe the mental model for TypeScript smart contracts. The way to think about how the smart contract we're building works is that when it's published to the blockchain we construct it, i.e. we call the equivalent of `new Token()`. Then for every invocation we use that one instance, so any changes to storage properties are persisted between invocations. In short, our smart contract follows the [singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern).
 
-So, we can see that `mutableSupply` acts as persistent storage of the current supply in our smart contract. But what about `balances`? We initialize this property with the `MapStorage` [static](https://www.typescriptlang.org/docs/handbook/classes.html#static-properties) `for` property, which makes it read as "`MapStorage` `for` `Address` to `Fixed<8>`". (Note: we're using generic types here, take a look at the TypeScript [documentation](https://www.typescriptlang.org/docs/handbook/generics.html) for more info.) We're also introducing the `Address` [interface](https://www.typescriptlang.org/docs/handbook/interfaces.html) which is a special kind of `Buffer` that represents a NEO address. You'll see a few types like this in NEO•ONE smart contracts, they're designed such that it makes it difficult to use certain values incorrectly. As a concrete example, you can't pass an arbitrary `Buffer` where an `Address` is expected which helps eliminate bugs.
+So, we can see that `mutableSupply` acts as persistent storage of the current supply in our smart contract. But what about `balances`? We initialize this property with the `MapStorage` [static](https://www.typescriptlang.org/docs/handbook/classes.html#static-properties) `for` property, which makes it read as "`MapStorage` `for` `Address` to `Fixed<8>`". (Note: we're using generic types here, take a look at the TypeScript [documentation](https://www.typescriptlang.org/docs/handbook/generics.html) for more info.) `MapStorage` and its related classes `SetStorage` and `ArrayStorage` work identically to their `Map`, `Set` and `Array` counterparts, however they're optimized for persistent smart contract storage. In particular, the main difference is if we declared a `Map` property, the entire `Map` would be stored in one storage key of the smart contract, bounding the total possible size of the `Map`, whereas `MapStorage` stores each value in a separate key.
 
-We initialize this property using `MapStorage.for<Address, Fixed<8>>()` which can be read as "MapStorage for Address to Fixed<8>". `MapStorage` and its related classes `SetStorage` and `ArrayStorage` work identically to their `Map`, `Set` and `Array` counterparts, however they're optimized for persistent smart contract storage. In particular, the main difference is if we declared a `Map` property, the entire `Map` would be stored in one storage key of the smart contract, bounding the total possible size of the `Map`, whereas `MapStorage` stores each value in a separate key.
+We're also introducing the `Address` [interface](https://www.typescriptlang.org/docs/handbook/interfaces.html) which is a special kind of `Buffer` that represents a NEO address. You'll see a few types like this in NEO•ONE smart contracts, they're declared in a way that makes them difficult to use incorrectly. As a concrete example, you can't pass an arbitrary `Buffer` where an `Address` is expected which helps eliminate bugs.
 
 Finally, you may be wondering what the `Fixed<8>` type is. The `Fixed` [type](https://www.typescriptlang.org/docs/handbook/advanced-types.html#type-aliases) has no impact on how the smart contract executes, but it does change how the automatically generated NEO•ONE client APIs function. All numbers in a NEO smart contract must be integers (up to 256 bits, to be precise), so typically we use an integer multiplied by a power of 10 to represent decimals. In this case, `Fixed<8>` is telling the compiler that this number actually represents a fixed point number with 8 decimal places. We use this information to automatically convert the integer value to the corresponding decimal value in the `BigNumber`s that are used in the client APIs.
 
@@ -287,7 +296,7 @@ The main difference for the NEO•ONE client APIs is that methods require relayi
 
 The NEO blockchain supports native assets, the two most important ones being NEO and GAS. Native assets are UTXO based and are understood natively by the blockchain. Contrast this with tokens like the one we've built so far which live entirely in custom smart contracts. As a result, they require special handling within smart contracts. Luckily, NEO•ONE smart contracts abstract most of this away and let you focus on the logic of your smart contract.
 
-In order to receive native assets, we can decorate a method with `@receive`. Methods marked with `@receive` must return a `boolean` value to indicate whether or not the contract wants to receive the assets. Note, however, that there are cases where the contract may still receive assets, despite returning `false`, due to limitations in how NEO handles native UTXO assets. For these cases, we automatically generate a `refundAssets` method that clients of your smart contract may call to refund assets which were not processed by the smart contract (i.e. the smart contract returned `false` or was not actually called). Note that this method cannot refund assets if the smart contract invocation succeeded.
+In order to receive native assets, we can decorate a method with `@receive`. Methods marked with `@receive` must return a `boolean` value to indicate whether or not the contract wants to receive the assets. Note, however, that there are cases where the contract may still receive assets, despite returning `false`, due to limitations in how NEO handles native UTXO assets. For these cases, we automatically generate a `refundAssets` method that clients of your smart contract may call to refund assets which were not processed by the smart contract (i.e. the smart contract returned `false` or was not called). Note that this method cannot refund assets if the smart contract invocation succeeded.
 
 Let's add the `mintTokens` method to our `Token` smart contract to enable minting new tokens.
 
@@ -340,7 +349,7 @@ await withContracts(async ({ token, accountIDs }) => {
   const accountID = accountIDs[0];
   const amount = new BigNumber(10);
 
-  // Mint the tokens and verify the succeeds
+  // Mint the tokens and verify the transaction succeeds
   const mintTokensResult = await token.mintTokens({
     sendTo: [{
       amount,
@@ -392,13 +401,15 @@ Phew, quite a bit, but we're testing a lot of functionality here. Recall that we
 
 First, invoke the smart contract method which will return a `Promise<TransactionResult>`. The `TransactionResult` object contains two properties, `transaction` which is the full transaction object that was relayed to the network, and `confirmed` which is a function we can call to wait for the transaction to be confirmed.
 
-Thus, the second step of the process is to call `confirmed` which returns a `Promise<InvokeReceipt>`. This `InvokeReceipt` contains many useful properties, like the `event`s that were emitted during execution as well as the final `result` of the smart contract. To learn more, take a look at the detailed [documentation](/docs/smart-contract-apis#methods) on invoking smart contract methods. Methods marked with `@receive` also take an additional argument for the native assets to send with the invocation.
+Second, call `confirmed` which returns a `Promise<InvokeReceipt>`. This `InvokeReceipt` contains many useful properties, like the `event`s that were emitted during execution as well as the final `result` of the smart contract. To learn more, take a look at the detailed [documentation](/docs/smart-contract-apis#methods) on invoking smart contract methods. Methods marked with `@receive` also take an additional argument for the native assets to send with the invocation.
 
 Putting it all together, we see both forms of invoking smart contract methods in the above snippet. When we mint tokens, we use the 2-step form, and when we transfer we use the 1-step or shortcut form.
 
 ### Wrapping Up
 
 At this point, we have a fully functioning, although simplistic token contract. If you'd like to go into more details on some aspects or work on some of the parts we skipped, like event notifications or advanced topics like invoking other smart contracts, check out [NEO•ONE Courses](/course). Otherwise, head to the next section to learn about integrating a dapp with the NEO•ONE client and smart contract APIs. Once you have it integrated, try it out with the React boilerplate that was generated with create-react-app!
+
+---
 
 ## DApps
 

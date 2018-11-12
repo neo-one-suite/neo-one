@@ -2,15 +2,17 @@
 slug: native-assets
 title: Native Assets
 ---
-# Native Assets
-
 Native assets like NEO and GAS require special handling in smart contracts. This guide will show you how.
 
 NEO employs the [UTXO](https://en.wikipedia.org/wiki/Unspent_transaction_output) (unspent transaction output) system for native assets. Unfortunately, the UTXO system does not play well with smart contracts. Fortunately, NEO•ONE smart contracts abstract away most of the difficulty in handling native assets using the `@receive`, `@send`, `@sendUnsafe` and `@claim` [decorators](https://www.typescriptlang.org/docs/handbook/decorators.html).
 
 One commonality between every native asset method is that they must return a `boolean` indicating whether or not the transaction should proceed.
 
+---
+
 [[toc]]
+
+---
 
 ## Receive Native Assets
 
@@ -41,12 +43,14 @@ const receipt = await contract.mintTokens({
 })
 ```
 
-There are cases where a smart contract may receive native assets without a corresponding `@receive` method invocation, or sometimes even when the `@receive` method returns `false`. Unfortunately this is unavoidable, however to solve these cases every smart contract has an automatically generated method called `refundAssets`. Users may call this method when they have sent assets to the contract that were not properly processed. Using the NEO•ONE client APIs:
+There are cases where a smart contract may receive native assets without a corresponding `@receive` method invocation, or sometimes even when the `@receive` method returns `false`. Unfortunately this is unavoidable, and to solve these cases every smart contract has an automatically generated method called `refundAssets`. Users may call this method when they have sent assets to the contract that were not properly processed. Using the NEO•ONE client APIs:
 
 ```typescript
 const transactionHash = ... // Hash of the transaction that needs to be refunded
 const receipt = await contract.refundAssets.confirmed(transactionHash);
 ```
+
+---
 
 ## Send Native Assets
 
@@ -66,7 +70,7 @@ export class Contract extends SmartContract {
 }
 ```
 
-`@sendUnsafe` is unsafe because it potentially allows the equivalent of double spends - that is, a user can construct a series of parallel transactions that enable them to withdraw more than they should be allowed to.
+`@sendUnsafe` is unsafe because it potentially allows the equivalent of double spends. It's possible for a user to construct a series of parallel transactions that enable them to withdraw more than they should be allowed to.
 
 ::: warning
 
@@ -83,17 +87,17 @@ const receipt = await contract.withdraw.confirmed({
   sendFrom: [{
     asset: Hash256.NEO,
     amount: new BigNumber(10),
-    address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+    to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
   }],
 });
 ```
 
 ### Safe
 
-Decorate a method with `@send` to enable assets to be sent from the contract safely. `@send` requires two transactions to send assets safely from the contract. At a high level the steps are:
+Decorate a method with `@send` to enable assets to be sent from the contract safely. `@send` requires two transactions to send assets from the contract. At a high level the steps are:
 
   1. The user "marks" the assets they wish to withdraw from the contract by constructing a transaction that sends those assets back to the smart contract.
-  2. The user then constructs a transaction that withdraws the previously "mark"ed assets to the desired address.
+  2. The user constructs a transaction that withdraws the previously "mark"ed assets to the desired address.
 
 NEO•ONE abstract this process such that you only need to define a method decorated with `@send` that returns `true` or `false`. NEO•ONE handles the rest. This method may also accept a final argument, a `Transfer` object, that contains the details of the pending transfer:
 
@@ -118,7 +122,7 @@ export class Contract extends SmartContract {
 }
 ```
 
-Calling a method marked with `@send` is identical to `@sendUnsafe`, however, the transfer will not actually occur until the `completeSend` method is invoked with the transaction hash of the first transaction:
+Calling a method marked with `@send` is identical to `@sendUnsafe`, however, the transfer will not occur until the `completeSend` method is invoked with the transaction hash of the first transaction:
 
 ```typescript
 // This transaction only sends assets from the contract to itself,
@@ -127,12 +131,14 @@ const receipt = await contract.withdraw.confirmed('value', {
   sendFrom: [{
     asset: Hash256.NEO,
     amount: new BigNumber(10),
-    address: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+    to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
   }],
 });
 // Complete the withdrawal process using the transaction hash
 const finalReceipt = await contract.completeSend.confirmed(receipt.transaction.hash);
 ```
+
+---
 
 ## Claim GAS
 

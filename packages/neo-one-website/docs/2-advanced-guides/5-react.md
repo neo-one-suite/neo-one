@@ -2,13 +2,15 @@
 slug: react
 title: React
 ---
-# React
-
 NEO•ONE has first-class integration with React applications.
 
 Integrating NEO•ONE with React is a breeze using the generated NEO•ONE client APIs. We also offer a `FromStream` component that make using `Observable`s in the client APIs within your React components much simpler.
 
+---
+
 [[toc]]
+
+---
 
 ## Generated Code
 
@@ -49,7 +51,7 @@ ReactDOM.render(app, document.getElementById('app'));
 
 ### WithContracts
 
-Once you've included `ContractsProvider` in your application, you may use the `WithContracts` component anywhere in your application to access the NEO•ONE client APIs. `WithContracts` is is a [render props](https://reactjs.org/docs/render-props.html) component that passes the `client` and your smart contract APIs to it's child function:
+Once you've included `ContractsProvider` in your application, you may use the `WithContracts` component anywhere in your application to access the NEO•ONE client APIs. `WithContracts` is is a [render props](https://reactjs.org/docs/render-props.html) component that passes the `client` and your smart contract APIs to its child function:
 
 ```tsx
 <WithContracts>
@@ -59,9 +61,11 @@ Once you've included `ContractsProvider` in your application, you may use the `W
 </WithContracts>
 ```
 
+---
+
 ## FromStream
 
-`@neo-one/react` currently contains one export, the `FromStream` component. `FromStream` is a [render props](https://reactjs.org/docs/render-props.html) component that subscribes to the `Observable` returned from invoking the `createStream` prop. It then passes the most recently emitted value to its children function:
+`@neo-one/react` contains one export, the `FromStream` component. `FromStream` is a [render props](https://reactjs.org/docs/render-props.html) component that subscribes to the `Observable` returned from invoking the `createStream` prop. It then passes the most recently emitted value to its children function:
 
 ```tsx
 <WithContracts>

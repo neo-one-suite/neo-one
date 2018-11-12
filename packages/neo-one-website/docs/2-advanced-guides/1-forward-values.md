@@ -2,11 +2,13 @@
 slug: forward-values
 title: Forward Values
 ---
-# Forward Values
-
 Forward values allow advanced interactivity between smart contracts, enabling use-cases that would not normally be possible.
 
+---
+
 [[toc]]
+
+---
 
 ## Forward Value
 
@@ -51,9 +53,11 @@ We're using a [rest](https://www.typescriptlang.org/docs/handbook/functions.html
 
 :::
 
-`ForwardValue`s represent any type - they're opaque to the contract that declared them. Instead of using them directly, the contract forwards them to another contract. In the example above we check to see if the target, or `to` `Address` is a smart contract. If it is, we get an instance of it and invoke the `approveReceiveTransfer` method, forwarding any additional arguments that we received in the call to `transfer`.
+`ForwardValue`s represent any type. They're opaque to the contract that declared them. Instead of using them directly, the contract forwards them to another contract. In the example above we check to see if the target or `to` `Address` is a smart contract. If it is, we get an instance of it and invoke the `approveReceiveTransfer` method, forwarding any additional arguments that we received in the call to `transfer`.
 
 This pattern allows the target contract a chance to react to the transfer, as well as allows the user to provide any additional arguments the contract may require to react to the transfer.
+
+---
 
 ## Forwarded Value
 
@@ -100,6 +104,8 @@ const receipt = await token.transfer.confirmed(
 ```
 
 In this case, the `receipt` would contain the events for the `transfer` call, the `approveReceiveTransfer` call and the `bar` call.
+
+---
 
 ## Reactive Smart Contracts
 

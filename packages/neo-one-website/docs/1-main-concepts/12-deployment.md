@@ -2,11 +2,15 @@
 slug: deployment
 title: Deployment
 ---
-# Deployment
-
 You've built your smart contract, tested it and built a dapp around it. Now it's time to deploy.
 
 Productionizing your smart contract for deployment to a network other than your local network requires keeping a few things in mind which we will cover in this chapter.
+
+---
+
+[[toc]]
+
+---
 
 ## Deployment Specifics
 
@@ -29,7 +33,7 @@ These properties have no impact on the execution of the contract, they're simply
 
 ### Upgrade
 
-Every NEO•ONE smart contract automatically contains a public `upgrade` method. This method replaces the smart contract code as well as the static metadata associated with the contract while preserving the smart contract's storage. Thus, this method can be used to change the logic of your smart contract without losing the data.
+Every NEO•ONE smart contract automatically contains a public `upgrade` method. This method replaces the smart contract code as well as the static metadata associated with the contract while preserving the smart contract's storage. In other words, this method can be used to change the logic of your smart contract without losing the data.
 
 In order to make it possible to upgrade your contract, you *must* specify the `approveUpgrade` `protected` method. This method should return a `boolean` indicating if the `upgrade` is approved:
 
@@ -55,7 +59,7 @@ If you do not specify the `approveUpgrade` method, it is impossible for you or a
 
 ### Destroy
 
-All smart contracts have a `protected` method called `destroy` which any method may use to permanently delete the smart contract. Once `destroy` is called it can no longer be invoked and the storage is no longer immediately accessible. You're not required to have a method that calls `destroy`, but if you do, it should probably look something like:
+All smart contracts have a `protected` method called `destroy` which any method may use to permanently delete the smart contract. Once `destroy` is called the smart contract can no longer be invoked and the storage is no longer accessible. You're not required to have a method that calls `destroy`, but if you do, it should probably look something like:
 
 ```typescript
 export class Contract extends SmartContract {
@@ -77,9 +81,11 @@ export class Contract extends SmartContract {
 
 Note
 
-While the contract can no longer be invoked and the storage is not immediately accessible, all of the past invocations still exist on the blockchain. The storage can still be accessed by replaying the blockchain from the beginning up until the point it was destroyed.
+While the contract can no longer be invoked and the storage is not accessible, all of the past invocations still exist on the blockchain. The storage can still be accessed by replaying the blockchain from the beginning up until the point it was destroyed.
 
 :::
+
+---
 
 ## Deploying to a Public Network
 

@@ -34,7 +34,7 @@ The main difference for the NEO•ONE client APIs is that methods require relayi
 
 ## Test
 
-Take a look at the tests for this chapter in `Token.test.ts`. Notice how unlike the `@constant` methods and `readonly` properties, we check that the invocation actually succeeded. We also have a test that makes sure the invocation failed when the `from` address is not the `owner`.
+Take a look at the tests for this chapter in `Token.test.ts`. Notice how unlike the `@constant` methods and `readonly` properties, we check that the invocation succeeded. We also have a test that makes sure the invocation failed when the `from` address is not the `owner`.
 
 Hover over the return values and you'll see that they return a `InvokeReceipt<void, TokenEvent>`, which is the "receipt" for the confirmed transaction on the blockchain. When a transaction, like a smart contract invocation, is relayed to the blockchain, we wait for it to be confirmed in a block.  Once it has been confirmed, we receive a “receipt” of that confirmation which lets us know whether the transaction succeeded and gives us access to any return values. Since the `issue` method doesn't return anything, we receive a `void` value in the receipt. We'll talk more about `TokenEvent` in the next chapter, so for now you can ignore that.
 

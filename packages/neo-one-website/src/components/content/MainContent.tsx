@@ -1,7 +1,10 @@
+// tslint:disable no-null-keyword
 import * as React from 'react';
 import { Box, css, styled } from 'reakit';
 import { prop } from 'styled-tools';
 import { Markdown } from '../../elements';
+import { DateAndAuthor } from './DateAndAuthor';
+import { Author } from './types';
 
 const Wrapper = styled(Box)`
   padding-top: 16px;
@@ -96,7 +99,7 @@ const StyledMarkdown = styled(Markdown)`
     max-width: ${prop('theme.constants.content.maxWidth')};
   }
 
-  &&& > p:nth-child(2) {
+  &&& > p:nth-child(1) {
     ${prop('theme.fonts.axiformaThin')};
     ${prop('theme.fontStyles.subheading')};
     color: ${prop('theme.gray6')};
@@ -112,12 +115,32 @@ const StyledMarkdown = styled(Markdown)`
   }
 `;
 
+const Title = styled.h1`
+  margin-top: 16px;
+  margin-bottom: 24px;
+  margin-left: 0;
+  margin-right: 0;
+  ${prop('theme.fontStyles.display2')};
+  color: ${prop('theme.black')};
+  ${prop('theme.fonts.axiformaBook')};
+  font-weight: 700;
+
+  @media (min-width: ${prop('theme.breakpoints.md')}) {
+    ${prop('theme.fontStyles.display3')};
+  }
+`;
+
 interface Props {
+  readonly title: string;
   readonly content: string;
+  readonly date?: string;
+  readonly author?: Author;
 }
 
-export const MainContent = ({ content, ...props }: Props) => (
+export const MainContent = ({ content, title, date, author, ...props }: Props) => (
   <Wrapper {...props}>
+    <Title>{title}</Title>
+    {date === undefined || author === undefined ? null : <DateAndAuthor date={date} author={author} />}
     <StyledMarkdown source={content} linkColor="accent" light anchors />
   </Wrapper>
 );

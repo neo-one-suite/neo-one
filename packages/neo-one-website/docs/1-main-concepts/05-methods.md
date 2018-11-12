@@ -2,11 +2,13 @@
 slug: methods
 title: Methods
 ---
-# Methods
-
 Methods are the core component of smart contract logic.
 
+---
+
 [[toc]]
+
+---
 
 ## Constructor
 
@@ -26,6 +28,8 @@ export class HelloWorld extends SmartContract {
 ```
 
 Note in this example we've used [parameter properties](https://www.typescriptlang.org/docs/handbook/classes.html#parameter-properties) which are a shortcut for declaring a constructor parameter and instance property with a single declaration.
+
+---
 
 ## Instance Methods
 
@@ -53,6 +57,8 @@ export class HelloWorld extends SmartContract {
 ```
 
 Private and protected instance methods are just helper methods, same as normal TypeScript, but be aware that any private or protected methods invoked from a public method must respect the restrictions of the public method. For example, you can't call a private or protected method which modifies a smart contract property from a `@constant` public method.
+
+---
 
 ## Parameter and Return Types
 

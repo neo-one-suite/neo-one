@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { Box, Grid, styled } from 'reakit';
 import { prop } from 'styled-tools';
+import { Author } from '../content';
 import { PostLink } from './PostLink';
 
 interface BlogPost {
   readonly slug: string;
   readonly title: string;
   readonly date: string;
-  readonly author: string;
+  readonly author: Author;
 }
 
 export interface BlogAllProps {
@@ -83,11 +84,9 @@ export const BlogAll = ({ posts, ...props }: BlogAllProps) => (
         <Title>All Posts</Title>
 
         <PostsGrid>
-          {posts.map((post) => {
-            const path = `/blog/${post.slug}`;
-
-            return <PostLink path={path} title={post.title} author={post.author} date={post.date} />;
-          })}
+          {posts.map((post) => (
+            <PostLink path={post.slug} title={post.title} author={post.author} date={post.date} />
+          ))}
         </PostsGrid>
       </Box>
     </InnerWrapper>

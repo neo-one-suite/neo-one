@@ -2,8 +2,6 @@
 slug: configuration
 title: Configuration
 ---
-# Configuration
-
 NEO•ONE requires no configuration to get started, but you can customize certain aspects of the toolchain.
 
 NEO•ONE uses [cosmiconfig](https://github.com/davidtheclark/cosmiconfig) to load configuration with the name `one`. This means that you can configure the toolchain using

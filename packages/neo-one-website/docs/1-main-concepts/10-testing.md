@@ -2,9 +2,13 @@
 slug: testing
 title: Testing
 ---
-# Testing
-
 Use your favorite unit test framework to test smart contracts using the NEO•ONE client APIs.
+
+---
+
+[[toc]]
+
+---
 
 ## withContracts
 
@@ -137,6 +141,8 @@ describe('Token', () => {
   });
 });
 ```
+
+---
 
 ## DeveloperClient
 

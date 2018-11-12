@@ -7,6 +7,7 @@ import { LayoutWrapper } from '../common';
 import { DocFooter } from './DocFooter';
 import { MainContent } from './MainContent';
 import { Sidebar } from './Sidebar';
+import { Author } from './types';
 
 const StyledGrid = styled(Grid)`
   grid-gap: 0;
@@ -19,6 +20,8 @@ interface Props {
   readonly title: string;
   readonly content: string;
   readonly sidebar: ReadonlyArray<SectionData>;
+  readonly date?: string;
+  readonly author?: Author;
   readonly next?: AdjacentInfo;
   readonly previous?: AdjacentInfo;
 }
@@ -31,6 +34,8 @@ export const Content = ({
   next,
   previous,
   sidebar,
+  date,
+  author,
   ...props
 }: Props) => (
   <StyledGrid {...props}>
@@ -38,7 +43,7 @@ export const Content = ({
       <title>{`${title} - NEO•ONE`}</title>
     </Helmet>
     <LayoutWrapper omitSpacer>
-      <MainContent content={content} />
+      <MainContent content={content} title={title} date={date} author={author} />
       <Sidebar current={current} sections={sidebar} alwaysVisible={sidebarAlwaysVisible} />
     </LayoutWrapper>
     <DocFooter next={next} previous={previous} />
