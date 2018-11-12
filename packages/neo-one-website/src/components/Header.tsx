@@ -23,6 +23,7 @@ const StyledToolbar = styled(Toolbar)`
     height: 100%;
     grid-gap: 8px;
     padding: 0 8px;
+    overflow-x: scroll;
   }
 
   ${/* sc-sel */ Toolbar.Focusable as any} {
@@ -75,6 +76,18 @@ const NavigationLink: any = styled(FocusableRouterLink)<{ readonly active: boole
 
 const FocusableLink: any = as(Link as any)(Toolbar.Focusable);
 
+const GitHubLink = styled(FocusableLink)`
+  @media (max-width: ${prop('theme.breakpoints.sm')}) {
+    display: none;
+  }
+`;
+
+const CourseLink = styled(NavigationLink)`
+  @media (max-width: ${prop('theme.breakpoints.sm')}) {
+    display: none;
+  }
+`;
+
 interface Props {
   readonly path: string;
 }
@@ -89,9 +102,9 @@ export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper
         <NavigationLink linkColor="gray" active={path === 'docs'} data-test="header-docs" to="/docs/getting-started">
           Docs
         </NavigationLink>
-        <NavigationLink linkColor="gray" active={path === 'course'} data-test="header-course" to="/course">
+        <CourseLink linkColor="gray" active={path === 'course'} data-test="header-course" to="/course">
           Course
-        </NavigationLink>
+        </CourseLink>
         <NavigationLink linkColor="gray" active={path === 'tutorial'} data-test="header-tutorial" to="/tutorial">
           Tutorial
         </NavigationLink>
@@ -100,14 +113,14 @@ export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper
         </NavigationLink>
       </Toolbar.Content>
       <Toolbar.Content align="end">
-        <FocusableLink
+        <GitHubLink
           linkColor="gray"
           data-test="header-github"
           href="https://github.com/neo-one-suite/neo-one"
           target="_blank"
         >
           GitHub
-        </FocusableLink>
+        </GitHubLink>
       </Toolbar.Content>
     </StyledToolbar>
   </Wrapper>

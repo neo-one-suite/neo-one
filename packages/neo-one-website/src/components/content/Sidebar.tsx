@@ -67,7 +67,6 @@ const StyledHidden = styled(Hidden)`
 `;
 
 const MobileSidebarWrapper = styled(Box)`
-  height: 100%;
   width: 100%;
   background-color: ${prop('theme.gray1')};
 `;
