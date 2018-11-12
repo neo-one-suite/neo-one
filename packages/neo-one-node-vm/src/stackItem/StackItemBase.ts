@@ -183,9 +183,7 @@ export class StackItemBase implements Equatable {
   }
 
   public asECPoint(): ECPoint {
-    const buffer = this.asBuffer();
-
-    return buffer.length === 0 ? common.ECPOINT_INFINITY : common.bufferToECPoint(buffer);
+    return common.bufferToECPoint(this.asBuffer());
   }
 
   public asECPointMaybe(): ECPoint | undefined {
