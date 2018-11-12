@@ -13,8 +13,39 @@ const WATCH_TIMEOUT_MS = 5000;
 const PARSE_ERROR_CODE = -32700;
 const PARSE_ERROR_MESSAGE = 'Parse error';
 
+const browserFetch = async (input: RequestInfo, init: RequestInit, timeoutMS: number): Promise<Response> => {
+  const controller = new AbortController();
+
+  const responsePromise = _fetch(input, {
+    ...init,
+    signal: controller.signal,
+  });
+
+  const timeout = setTimeout(() => controller.abort(), timeoutMS);
+
+  try {
+    // tslint:disable-next-line prefer-immediate-return
+    const response = await responsePromise;
+
+    // tslint:disable-next-line:no-var-before-return
+    return response;
+  } finally {
+    clearTimeout(timeout);
+  }
+};
+
+const nodeFetch = async (input: RequestInfo, init: RequestInit, timeoutMS: number): Promise<Response> =>
+  _fetch(input, {
+    ...init,
+    timeout: timeoutMS,
+    // tslint:disable-next-line no-any
+  } as any);
+
+// tslint:disable-next-line strict-type-predicates
+const fetch = typeof window === 'undefined' ? nodeFetch : browserFetch;
+
 const instrumentFetch = async <T extends { readonly status: number }>(
-  doFetch: (headers: object) => Promise<T>,
+  doFetch: (headers: Record<string, string>) => Promise<T>,
   endpoint: string,
   type: 'fetch' | 'watch',
   monitor?: Monitor,
@@ -81,13 +112,15 @@ const doRequest = async ({
     try {
       const response = await instrumentFetch(
         async (headers) =>
-          _fetch(endpoint, {
-            method: 'POST',
-            headers,
-            body,
-            timeout: timeoutMS,
-            // tslint:disable-next-line no-any
-          } as any),
+          fetch(
+            endpoint,
+            {
+              method: 'POST',
+              headers,
+              body,
+            },
+            timeoutMS,
+          ),
         endpoint,
         'fetch',
         monitor,
@@ -154,13 +187,15 @@ const watchSingle = async ({
 }) => {
   const response = await instrumentFetch(
     async (headers) =>
-      _fetch(endpoint, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(req),
-        timeout: timeoutMS + WATCH_TIMEOUT_MS,
-        // tslint:disable-next-line no-any
-      } as any),
+      fetch(
+        endpoint,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(req),
+        },
+        timeoutMS + WATCH_TIMEOUT_MS,
+      ),
     endpoint,
     'watch',
     monitor,

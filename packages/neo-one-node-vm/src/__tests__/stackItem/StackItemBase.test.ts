@@ -1,18 +1,15 @@
-import { common } from '@neo-one/client-common';
 import { factory, testUtils } from '../../__data__';
-import { BufferStackItem, HeaderStackItem, InputStackItem, UInt160StackItem, UInt256StackItem } from '../../stackItem';
+import { HeaderStackItem, InputStackItem, UInt160StackItem, UInt256StackItem } from '../../stackItem';
 
 describe('Stack Item Base', () => {
   const uInt160 = factory.createUInt160();
   const uInt256 = factory.createUInt256();
   const header = factory.createHeader();
   const input = factory.createInput();
-  const buff = Buffer.from([]);
   const uInt160StackItem = new UInt160StackItem(uInt160);
   const uInt256StackItem = new UInt256StackItem(uInt256);
   const headerStackItem = new HeaderStackItem(header);
   const inputStackItem = new InputStackItem(input);
-  const bufferStackItem = new BufferStackItem(buff);
 
   test('equals - undefined', () => {
     expect(uInt160StackItem.equals(undefined)).toBeFalsy();
@@ -53,14 +50,6 @@ describe('Stack Item Base', () => {
 
   test('asUInt256Maybe - uInt160 (bad)', () => {
     expect(uInt160StackItem.asUInt256Maybe()).toEqual(undefined);
-  });
-
-  test('asECPoint - infinity', () => {
-    expect(bufferStackItem.asECPoint()).toEqual(common.ECPOINT_INFINITY);
-  });
-
-  test('asECPointMaybe - Good', () => {
-    expect(bufferStackItem.asECPointMaybe()).toEqual(common.ECPOINT_INFINITY);
   });
 
   test('asECPointMaybe - bad', () => {
