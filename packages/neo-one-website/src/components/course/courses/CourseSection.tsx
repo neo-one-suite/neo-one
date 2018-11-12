@@ -90,7 +90,7 @@ const TextWrapper = styled(Box)`
 `;
 
 const template = `
-  "text button" 120px
+  "text button" auto
   "progress empty" auto
   "list empty" auto
   / 1fr 160px
