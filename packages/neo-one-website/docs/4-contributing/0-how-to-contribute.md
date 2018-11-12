@@ -10,6 +10,12 @@ Following these guidelines helps to communicate that you respect the time of the
 
 This project and everyone participating in it is governed by the [Code of Conduct](/docs/code-of-conduct). By participating, you are expected to uphold this code. Please report unacceptable behavior to [contact@neo-one.io](mailto:contact@neo-one.io).
 
+---
+
+[[toc]]
+
+---
+
 ## How Can I Contribute?
 
 NEO•ONE is an open source project and we love to receive contributions from our community — you! There are many ways to contribute, from writing tutorials or blog posts, improving the documentation, submitting bug reports and feature requests or writing code which can be incorporated into NEO•ONE itself.
@@ -35,12 +41,16 @@ Unsure where to begin contributing to NEO•ONE? Here are some great ways to get
 
 Once you've had your first pull request approved and merged, find existing issues marked with [help wanted](https://github.com/neo-one-suite/neo-one/issues?utf8=%E2%9C%93&q=is%3Aopen+label%3Ahelp%20wanted) labels to continue contributing or suggest an enhancement. Respond on the issue thread expressing interest in working on it. This helps other people know that the issue is active, and hopefully prevents duplicated efforts.
 
+---
+
 ## Pull Requests
 
 - Follow the process outlined in [GitHub Standard Fork & Pull Request Workflow](https://gist.github.com/Chaser324/ce0505fbed06b947d962) when submitting a pull request.
 - Fill in the pull request template.
 - Pre-commit hooks will run basic checks automatically.
 - Pull requests should typically be accompanied with tests. Your reviewers will request tests when appropriate if they are missing.
+
+---
 
 ## License
 

@@ -95,7 +95,7 @@ export const Footer = ({ content = false, ...props }: Props) => {
             'Main Concepts': '/docs/hello-world',
             'Advanced Guides': '/docs/native-assets',
             'API Reference': '/docs/configuration',
-            Contributing: '/docs/contributing',
+            Contributing: '/docs/how-to-contribute',
           }}
         />
         <LinkSection

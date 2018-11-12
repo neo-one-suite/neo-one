@@ -12,7 +12,9 @@ import { markdownTOC } from './markdownTOC';
 
 // tslint:disable
 import '../../static/css/prism.css';
-import 'clipboard';
+if (typeof window !== 'undefined') {
+  require('clipboard');
+}
 // @ts-ignore
 import Prism from 'prismjs/components/prism-core';
 // @ts-ignore
@@ -28,7 +30,9 @@ const _self: any =
 _self.Prism = Prism;
 import 'prismjs/plugins/toolbar/prism-toolbar.css';
 import 'prismjs/plugins/toolbar/prism-toolbar';
-import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard';
+if (typeof window !== 'undefined') {
+  require('prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard');
+}
 // @ts-ignore
 import 'prismjs/components/prism-clike';
 // @ts-ignore
