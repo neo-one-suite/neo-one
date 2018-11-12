@@ -2,25 +2,13 @@
 import { Input } from './Input';
 
 export const hasDuplicateInputs = (inputs: ReadonlyArray<Input>): boolean => {
-  for (let i = 1; i < inputs.length; i += 1) {
-    for (let j = 0; j < i; j += 1) {
-      if (inputs[i].equals(inputs[j])) {
-        return true;
-      }
-    }
-  }
+  const inputKeys = new Set(inputs.map((input) => input.toKeyString()));
 
-  return false;
+  return inputs.length !== inputKeys.size;
 };
 
 export const hasIntersectingInputs = (a: ReadonlyArray<Input>, b: ReadonlyArray<Input>): boolean => {
-  for (const inputA of a) {
-    for (const inputB of b) {
-      if (inputA.equals(inputB)) {
-        return true;
-      }
-    }
-  }
+  const inputsA = new Set(a.map((input) => input.toKeyString()));
 
-  return false;
+  return b.some((input) => inputsA.has(input.toKeyString()));
 };

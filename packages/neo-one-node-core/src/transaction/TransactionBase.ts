@@ -34,7 +34,7 @@ import { Validator } from '../Validator';
 import { VerifyScript, VerifyScriptResult } from '../vm';
 import { Witness } from '../Witness';
 import { Attribute, AttributeUsage, deserializeAttributeWireBase, UInt160Attribute } from './attribute';
-import { hasDuplicateInputs } from './common';
+import { hasDuplicateInputs, hasIntersectingInputs } from './common';
 import { Input } from './Input';
 import { Output, OutputKey } from './Output';
 import { RegisterTransaction } from './RegisterTransaction';
@@ -312,12 +312,7 @@ export function TransactionBase<
         throw new VerifyError('Duplicate inputs');
       }
 
-      if (
-        memPool.some(
-          (tx) =>
-            !tx.equals(this) && tx.inputs.some((input) => this.inputs.some((thisInput) => input.equals(thisInput))),
-        )
-      ) {
+      if (memPool.some((tx) => !tx.equals(this) && hasIntersectingInputs(tx.inputs, this.inputs))) {
         throw new VerifyError('Input already exists in mempool');
       }
 
