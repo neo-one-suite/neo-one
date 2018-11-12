@@ -20,5 +20,6 @@ module.exports = {
     '<rootDir>/packages/neo-one-smart-contract-compiler/src/scripts/generateTypes.ts',
     '<rootDir>/packages/neo-one-smart-contract-lib/src/.*',
     '<rootDir>/packages/neo-one-smart-contract/src/.*',
+    '<rootDir>/packages/.*/src/__ledger_tests__/.*',
   ],
 };

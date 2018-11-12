@@ -9,13 +9,16 @@ import {
   AddressABIParameter,
   AddressAttribute,
   AddressContractParameter,
+  ArrayContractParameterJSON,
   Asset,
   AssetJSON,
   AttributeJSON,
   Block,
   BlockJSON,
   BooleanContractParameter,
+  BooleanContractParameterJSON,
   BufferAttribute,
+  ByteArrayContractParameterJSON,
   CallReceiptJSON,
   ClaimTransaction,
   ClaimTransactionJSON,
@@ -36,7 +39,9 @@ import {
   EnrollmentTransaction,
   EnrollmentTransactionJSON,
   ForwardValue,
+  Hash160ContractParameterJSON,
   Hash256Attribute,
+  Hash256ContractParameterJSON,
   Header,
   HeaderJSON,
   Input,
@@ -46,8 +51,10 @@ import {
   IntegerABIReturn,
   IntegerContractParameter,
   IntegerContractParameterJSON,
+  InteropInterfaceContractParameterJSON,
   InvocationDataJSON,
   InvocationResultError,
+  InvocationResultErrorJSON,
   InvocationResultSuccess,
   InvocationResultSuccessJSON,
   InvocationTransaction,
@@ -55,6 +62,7 @@ import {
   IssueTransaction,
   IssueTransactionJSON,
   LogActionJSON,
+  MapContractParameterJSON,
   MinerTransaction,
   MinerTransactionJSON,
   NetworkSettings,
@@ -64,6 +72,7 @@ import {
   OutputJSON,
   Peer,
   PublicKeyAttribute,
+  PublicKeyContractParameterJSON,
   PublishTransaction,
   PublishTransactionJSON,
   RawActionBase,
@@ -76,6 +85,7 @@ import {
   RawNotification,
   RegisterTransaction,
   RegisterTransactionJSON,
+  SignatureContractParameterJSON,
   SmartContractDefinition,
   StateTransaction,
   StateTransactionJSON,
@@ -83,6 +93,7 @@ import {
   StringABIParameter,
   StringABIReturn,
   StringContractParameter,
+  StringContractParameterJSON,
   TransactionBase,
   TransactionBaseJSON,
   TransactionReceipt,
@@ -90,7 +101,10 @@ import {
   Transfer,
   UserAccount,
   UserAccountID,
+  VerifyScriptResultJSON,
+  VerifyTransactionResultJSON,
   VMState,
+  VoidContractParameterJSON,
   Witness,
   WitnessJSON,
 } from '@neo-one/client-common';
@@ -273,6 +287,17 @@ const createInvocationResultSuccessJSON = (
   ...options,
 });
 
+const createInvocationResultErrorJSON = (
+  options: Partial<InvocationResultErrorJSON> = {},
+): InvocationResultErrorJSON => ({
+  state: VMState.Fault,
+  gas_consumed: '20',
+  gas_cost: '10',
+  stack: [createIntegerContractParameterJSON()],
+  message: 'failure',
+  ...options,
+});
+
 const createInvocationDataJSON = (options: Partial<InvocationDataJSON> = {}): InvocationDataJSON => ({
   result: createInvocationResultSuccessJSON(),
   asset: createAssetJSON(),
@@ -365,6 +390,20 @@ const createCallReceiptJSON = (options: Partial<CallReceiptJSON> = {}): CallRece
   ...options,
 });
 
+const createVerifyScriptResultJSON = (options: Partial<VerifyScriptResultJSON> = {}): VerifyScriptResultJSON => ({
+  hash: keys[0].scriptHashString,
+  witness: factory.createWitness(),
+  actions: [createLogActionJSON()],
+  ...options,
+});
+
+const createVerifyTransactionResultJSON = (
+  options: Partial<VerifyTransactionResultJSON> = {},
+): VerifyTransactionResultJSON => ({
+  verifications: [createVerifyScriptResultJSON()],
+  ...options,
+});
+
 const createHeaderJSON = (options: Partial<HeaderJSON> = {}): HeaderJSON => ({
   version: 0,
   hash: data.hash256s.a,
@@ -412,6 +451,88 @@ const createStorageItemJSON = (options: Partial<StorageItemJSON> = {}): StorageI
   key: data.buffers.a,
   value: data.buffers.b,
   flags: 'None',
+  ...options,
+});
+
+const createArrayContractParameterJSON = (
+  options: Partial<ArrayContractParameterJSON> = {},
+): ArrayContractParameterJSON => ({
+  type: 'Array',
+  value: [createBooleanContractParameterJSON()],
+  ...options,
+});
+
+const createBooleanContractParameterJSON = (
+  options: Partial<BooleanContractParameterJSON> = {},
+): BooleanContractParameterJSON => ({
+  type: 'Boolean',
+  value: true,
+  ...options,
+});
+
+const createByteArrayContractParameterJSON = (
+  options: Partial<ByteArrayContractParameterJSON> = {},
+): ByteArrayContractParameterJSON => ({
+  type: 'ByteArray',
+  value: Buffer.alloc(1, 0xff).toString(),
+  ...options,
+});
+
+const createHash160ContractParameterJSON = (
+  options: Partial<Hash160ContractParameterJSON> = {},
+): Hash160ContractParameterJSON => ({
+  type: 'Hash160',
+  value: keys[0].scriptHashString,
+  ...options,
+});
+
+const createHash256ContractParameterJSON = (
+  options: Partial<Hash256ContractParameterJSON> = {},
+): Hash256ContractParameterJSON => ({
+  type: 'Hash256',
+  value: data.hash256s.a,
+  ...options,
+});
+
+const createInteropInterfaceContractParameterJSON = (options: Partial<InteropInterfaceContractParameterJSON> = {}) => ({
+  type: 'InteropInterface' as 'InteropInterface',
+  ...options,
+});
+
+const createMapContractParameterJSON = (options: Partial<MapContractParameterJSON> = {}): MapContractParameterJSON => ({
+  type: 'Map',
+  value: [[createIntegerContractParameterJSON(), createBooleanContractParameterJSON()]],
+  ...options,
+});
+
+const createPublicKeyContractParameterJSON = (
+  options: Partial<PublicKeyContractParameterJSON> = {},
+): PublicKeyContractParameterJSON => ({
+  type: 'PublicKey',
+  value: keys[0].publicKeyString,
+  ...options,
+});
+
+const createSignatureContractParameterJSON = (
+  options: Partial<SignatureContractParameterJSON> = {},
+): SignatureContractParameterJSON => ({
+  type: 'Signature',
+  value: data.signatures.a,
+  ...options,
+});
+
+const createStringContractParameterJSON = (
+  options: Partial<StringContractParameterJSON> = {},
+): StringContractParameterJSON => ({
+  type: 'String',
+  value: 'test',
+  ...options,
+});
+
+const createVoidContractParameterJSON = (
+  options: Partial<VoidContractParameterJSON> = {},
+): VoidContractParameterJSON => ({
+  type: 'Void',
   ...options,
 });
 
@@ -968,11 +1089,27 @@ export const factory = {
   createContractJSON,
   createInputJSON,
   createOutputJSON,
+  createIntegerContractParameterJSON,
+  createArrayContractParameterJSON,
+  createBooleanContractParameterJSON,
+  createByteArrayContractParameterJSON,
+  createHash160ContractParameterJSON,
+  createHash256ContractParameterJSON,
+  createInteropInterfaceContractParameterJSON,
+  createMapContractParameterJSON,
+  createPublicKeyContractParameterJSON,
+  createSignatureContractParameterJSON,
+  createStringContractParameterJSON,
+  createVoidContractParameterJSON,
   createInvocationDataJSON,
   createInvocationResultSuccessJSON,
+  createInvocationResultErrorJSON,
   createInvocationTransactionJSON,
   createTransactionReceipt,
   createCallReceiptJSON,
+  createLogActionJSON,
+  createVerifyScriptResultJSON,
+  createVerifyTransactionResultJSON,
   createBlockJSON,
   createPeerJSON,
   createNetworkSettingsJSON,
@@ -983,8 +1120,11 @@ export const factory = {
   createOutput,
   createRawInvocationData,
   createInvocationTransaction,
+  createConfirmedInvocationTransaction,
   createInvocationResultSuccess,
+  createInvocationResultError,
   createMinerTransaction,
+  createConfirmedMinerTransaction,
   createInputOutput,
   createRawCallReceipt,
   createNetworkSettings,
@@ -1004,7 +1144,6 @@ export const factory = {
   createPublishTransaction,
   createRawInvocationResultError,
   createRawInvocationResultSuccess,
-  createInvocationResultError,
   createIssueTransaction,
   createRawLog,
   createRawNotification,

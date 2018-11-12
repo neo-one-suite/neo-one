@@ -381,12 +381,14 @@ export class NEOONEDataProvider implements DeveloperProvider {
         script: invocation.script,
         gas: new BigNumber(invocation.gas),
       }),
+      /* istanbul ignore next */
       (converted) => converted,
     );
   }
 
   private convertConfirmedTransaction(transaction: TransactionJSON): ConfirmedTransaction {
     if (transaction.data === undefined) {
+      /* istanbul ignore next */
       throw new Error('Unexpected undefined data');
     }
     const data = {
@@ -399,6 +401,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return this.convertTransactionBase(
       transaction,
       (invocation, transactionBase) => {
+        /* istanbul ignore next */
         if (invocation.invocationData === undefined || transaction.data === undefined) {
           throw new Error('Unexpected undefined data');
         }
@@ -492,7 +495,9 @@ export class NEOONEDataProvider implements DeveloperProvider {
           type: 'RegisterTransaction',
           asset: {
             type: this.convertAssetType(transaction.asset.type),
-            name: Array.isArray(transaction.asset.name) ? transaction.asset.name[0].name : transaction.asset.name,
+            name: Array.isArray(transaction.asset.name)
+              ? /* istanbul ignore next */ transaction.asset.name[0].name
+              : transaction.asset.name,
             amount: new BigNumber(transaction.asset.amount),
             precision: transaction.asset.precision,
             owner: transaction.asset.owner,
@@ -506,10 +511,9 @@ export class NEOONEDataProvider implements DeveloperProvider {
           type: 'StateTransaction',
         };
         break;
+      /* istanbul ignore next */
       default:
-        /* istanbul ignore next */
         commonUtils.assertNever(transaction);
-        /* istanbul ignore next */
         throw new Error('For TS');
     }
 
@@ -591,10 +595,9 @@ export class NEOONEDataProvider implements DeveloperProvider {
         return 'InteropInterface';
       case 'Void':
         return 'Void';
+      /* istanbul ignore next */
       default:
-        /* istanbul ignore next */
         commonUtils.assertNever(param);
-        /* istanbul ignore next */
         throw new Error('For TS');
     }
   }
@@ -690,6 +693,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return { transaction, verifyResult };
   }
 
+  /* istanbul ignore next */
   private convertVerifyResult(transactionHash: string, result: VerifyTransactionResultJSON): VerifyTransactionResult {
     return {
       verifications: result.verifications.map((verification) => ({
@@ -715,6 +719,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
       return func();
     }
 
+    /* istanbul ignore next */
     return monitor.at('neo_one_data_provider').captureSpanLog(func, {
       name,
       level: { log: 'verbose', span: 'info' },

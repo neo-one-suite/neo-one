@@ -37,6 +37,16 @@ describe('JSONRPCClient', () => {
     expect(mockRequest.mock.calls).toMatchSnapshot();
   });
 
+  test('getSettings', async () => {
+    const settings = { secondsPerBlock: 15 };
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(settings));
+
+    const result = await client.getSettings();
+
+    expect(result).toEqual(settings);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
   test('getBlock - hash', async () => {
     const value = factory.createBlockJSON();
     mockRequest.mockImplementationOnce(async () => Promise.resolve(value));

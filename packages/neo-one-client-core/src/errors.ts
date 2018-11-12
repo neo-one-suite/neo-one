@@ -119,10 +119,14 @@ export const UpdateUserAccountUnsupportedError = makeErrorWithCode(
     `Updating the name of user account with network ${id.network} and address ${id.address} is not supported`,
 );
 export const TransferArgumentExpectedError = makeErrorWithCode(
-  'TRANFER_ARGUMENT_EXPECTED',
+  'TRANSFER_ARGUMENT_EXPECTED',
   () => 'Expected to find a transfer argument',
 );
 export const HashArgumentExpectedError = makeErrorWithCode(
   'HASH_ARGUMENT_EXPECTED',
   () => 'Expected to find a hash argument',
+);
+export const NEOONEOneDataProviderSetRPCURLError = makeErrorWithCode(
+  'INVALID_SET_RPC_URL_CALL',
+  () => 'Cannot set rpcURL for NEOONEOneDataProvider',
 );

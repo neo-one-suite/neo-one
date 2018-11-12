@@ -12,7 +12,7 @@ import { mergeScanLatest, utils } from '@neo-one/utils';
 import _ from 'lodash';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { UnknownAccountError } from '../../errors';
+import { UnknownAccountError, UnknownNetworkError } from '../../errors';
 import { KeyStore } from '../LocalUserAccountProvider';
 import { LedgerHandler } from './LedgerHandler';
 
@@ -202,7 +202,7 @@ export class LedgerKeyStore implements KeyStore {
   private getLedger({ address, network }: UserAccountID): Ledger {
     const ledgers = this.ledgers[network];
     if (ledgers === undefined) {
-      throw new UnknownAccountError(address);
+      throw new UnknownNetworkError(network);
     }
 
     const ledger = ledgers[address];

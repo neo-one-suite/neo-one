@@ -137,6 +137,7 @@ export function convertContractParameter(parameter: ContractParameterJSON): Cont
       return parameter;
     case 'Void':
       return parameter;
+    /* istanbul ignore next */
     default:
       utils.assertNever(parameter);
       throw new Error('For TS');

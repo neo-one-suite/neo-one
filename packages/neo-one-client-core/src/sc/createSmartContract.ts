@@ -271,12 +271,14 @@ const createInvoke = ({
 
     let result: TransactionResult<RawInvokeReceipt, InvocationTransaction>;
     if (send) {
+      /* istanbul ignore next */
       if (transfer === undefined) {
         throw new Error('Something went wrong.');
       }
 
       result = await client.__invokeSend(address, name, params, paramsZipped, transfer, options, definition.sourceMaps);
     } else if (refundAssets) {
+      /* istanbul ignore next */
       if (hash === undefined) {
         throw new Error('Something went wrong.');
       }
@@ -291,6 +293,7 @@ const createInvoke = ({
         definition.sourceMaps,
       );
     } else if (completeSend) {
+      /* istanbul ignore next */
       if (hash === undefined) {
         throw new Error('Something went wrong.');
       }
