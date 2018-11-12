@@ -20,11 +20,16 @@ interface Props {
   readonly date: string;
 }
 
-export const DateAndAuthor = ({ author, date, ...props }: Props) => (
-  <Text {...props}>
-    {new Date(date).toLocaleDateString()} by{' '}
-    <StyledLink linkColor="accent" href={author.twitter} target="_blank">
-      {author.name}
-    </StyledLink>
-  </Text>
-);
+export const DateAndAuthor = ({ author, date, ...props }: Props) => {
+  const [year, month, day] = date.split('-');
+  const dateValue = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
+
+  return (
+    <Text {...props}>
+      {dateValue.toLocaleDateString()} by{' '}
+      <StyledLink linkColor="accent" href={author.twitter} target="_blank">
+        {author.name}
+      </StyledLink>
+    </Text>
+  );
+};
