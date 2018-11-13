@@ -404,7 +404,6 @@ const buildAll = ((cache) =>
         copyPkg(format),
         copyPkgFiles(format),
         copyTypes(format),
-        copyMetadata(format),
         copyFiles(format),
         copyRootPkg(format),
         copyRootTSConfig(format),
@@ -568,21 +567,9 @@ gulp.task(
 );
 
 gulp.task('prepareRelease', async () => {
-  await execa(
-    'yarn',
-    [
-      'lerna',
-      'version',
-      '--conventional-commits',
-      '--npm-tag=latest',
-      '--yes',
-      '--messsage',
-      'chore(release): publish',
-    ],
-    {
-      stdio: ['ignore', 'inherit', 'inherit'],
-    },
-  );
+  await execa('yarn', ['lerna', 'version', '--conventional-commits', '--npm-tag=latest', '--yes', '--messsage',], {
+    stdio: ['ignore', 'inherit', 'inherit'],
+  });
 });
 
 gulp.task('test', async () => {
@@ -595,4 +582,4 @@ gulp.task('e2e', async () => {
 
 gulp.task('release', gulp.series('test', 'build', 'e2e', 'prepareRelease', 'copyPkg', 'publish'));
 
-gulp.task('fastRelease', gulp.series('build', 'prepareRelease', 'copyPkg', 'publish'));
+gulp.task('fastRelease', gulp.series('build', 'prepareRelease', 'copyPkg', 'copyMetadata', 'publish'));
