@@ -1,14 +1,14 @@
-import { AddressString, common, crypto, SourceMaps } from '@neo-one/client-common';
+import { ABI, AddressString, common, crypto, SourceMaps } from '@neo-one/client-common';
 import { NEOONEDataProvider } from '@neo-one/client-core';
-import { CompileContractResult } from '@neo-one/smart-contract-compiler';
+import { ContractRegister } from '@neo-one/client-full-core';
 import BigNumber from 'bignumber.js';
 import { constants } from './constants';
 import { getClients } from './getClients';
 
 export const deployContract = async (
   provider: NEOONEDataProvider,
-  contract: CompileContractResult['contract'],
-  abi: CompileContractResult['abi'],
+  contract: ContractRegister,
+  abi: ABI,
   sourceMaps: Promise<SourceMaps>,
   masterPrivateKey: string = constants.PRIVATE_NET_PRIVATE_KEY,
 ): Promise<AddressString> => {
