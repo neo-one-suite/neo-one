@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/react-common",
-  "version": "1.0.0-preview.5",
+  "version": "1.0.0",
   "description": "NEO•ONE shared react.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/react-core": "^1.0.0-preview.5",
-    "@neo-one/types": "^1.0.0-preview.3",
+    "@neo-one/react-core": "^1.0.0",
+    "@neo-one/types": "^1.0.0",
     "@types/react": "^16.7.3",
     "react": "^16.6.1",
     "react-dom": "^16.6.1",

@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/developer-tools",
-  "version": "1.0.0-preview.8",
+  "version": "1.0.0",
   "description": "NEO•ONE developer tools.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.0-preview.6",
-    "@neo-one/developer-tools-frame": "^1.0.0-preview.8",
-    "@neo-one/types": "^1.0.0-preview.3",
+    "@neo-one/client-core": "^1.0.0",
+    "@neo-one/developer-tools-frame": "^1.0.0",
+    "@neo-one/types": "^1.0.0",
     "resize-observer-polyfill": "^1.5.0",
     "tslib": "^1.9.3"
   },

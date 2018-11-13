@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/client-full-common",
-  "version": "1.0.0-preview.5",
+  "version": "1.0.0",
   "description": "NEO•ONE full client common code.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-common": "^1.0.0-preview.5",
-    "@neo-one/types": "^1.0.0-preview.3",
-    "@neo-one/utils": "^1.0.0-preview.4",
+    "@neo-one/client-common": "^1.0.0",
+    "@neo-one/types": "^1.0.0",
+    "@neo-one/utils": "^1.0.0",
     "tslib": "^1.9.3"
   },
   "sideEffects": false

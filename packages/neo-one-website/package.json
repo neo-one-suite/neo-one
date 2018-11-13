@@ -1,14 +1,14 @@
 {
   "name": "@neo-one/website",
-  "version": "1.0.0-preview.9",
+  "version": "1.0.0",
   "description": "NEO•ONE website.",
   "main": "./src/index.ts",
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "@babel/runtime": "^7.1.5",
-    "@neo-one/editor": "^1.0.0-preview.9",
-    "@neo-one/react": "^1.0.0-preview.3",
-    "@neo-one/react-common": "^1.0.0-preview.5",
+    "@neo-one/editor": "^1.0.0",
+    "@neo-one/react": "^1.0.0",
+    "@neo-one/react-common": "^1.0.0",
     "@reach/router": "^1.2.1",
     "@render-props/viewport": "^0.2.13",
     "@types/clipboard": "^2.0.1",
