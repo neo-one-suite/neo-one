@@ -5,6 +5,7 @@ import _fetch from 'cross-fetch';
 import DataLoader from 'dataloader';
 import stringify from 'safe-stable-stringify';
 import { HTTPError, InvalidRPCResponseError, JSONRPCError } from '../errors';
+import { AbortController } from './AbortController.ponyfill';
 import { JSONRPCProvider, JSONRPCRequest } from './JSONRPCProvider';
 
 const TIMEOUT_MS = 20000;
@@ -18,7 +19,8 @@ const browserFetch = async (input: RequestInfo, init: RequestInit, timeoutMS: nu
 
   const responsePromise = _fetch(input, {
     ...init,
-    signal: controller.signal,
+    // tslint:disable-next-line no-any
+    signal: controller.signal as any,
   });
 
   const timeout = setTimeout(() => controller.abort(), timeoutMS);
