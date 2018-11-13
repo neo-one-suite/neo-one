@@ -139,9 +139,9 @@ const globs = {
   types: ['packages/neo-one-types/**/*', '!packages/neo-one-types/package.json'],
   bin: ['packages/*/src/bin/*.ts'].concat(skipGlobs),
   pkg: ['packages/*/package.json'].concat(skipGlobs),
-  pkgFiles: ['packages/*/tsconfig.json', 'packages/*/static/**/*'].concat(skipGlobs),
+  pkgFiles: ['packages/*/CHANGELOG.md', 'packages/*/tsconfig.json', 'packages/*/static/**/*'].concat(skipGlobs),
   files: ['lerna.json', 'yarn.lock', 'tsconfig.json'],
-  metadata: ['LICENSE', 'README.md', 'CHANGELOG.md'],
+  metadata: ['LICENSE', 'README.md'],
 };
 
 const getName = (format, name) => (format.name === '' ? name : `${name}-${format.name}`);
@@ -586,4 +586,4 @@ gulp.task('e2e', async () => {
 
 gulp.task('release', gulp.series('test', 'build', 'e2e', 'prepareRelease', 'copyPkg', 'publish'));
 
-gulp.task('fastRelease', gulp.series('build', 'prepareRelease', 'copyPkg', 'copyMetadata', 'publish'));
+gulp.task('fastRelease', gulp.series('build', 'prepareRelease', 'copyPkg', 'copyMetadata', 'copyPkgFiles', 'publish'));
