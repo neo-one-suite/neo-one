@@ -2470,6 +2470,13 @@
   dependencies:
     "@types/koa" "*"
 
+"@types/koa-ratelimit-lru@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/koa-ratelimit-lru/-/koa-ratelimit-lru-1.0.0.tgz#16e873817c3eb6a0e7543dccc9f6250559c5b52d"
+  integrity sha512-ll/OFp6JGn9Pn0lL/htRfJQQorjC0guSqtS2h5pk9o5s896nxlDS+82tu8QgVZr1R0oE2LW3n0+Hmlr59R7YgA==
+  dependencies:
+    "@types/koa" "*"
+
 "@types/koa-router@^7.0.35":
   version "7.0.35"
   resolved "https://registry.yarnpkg.com/@types/koa-router/-/koa-router-7.0.35.tgz#07442ac95e65ec1b042af4f72abea44dc96b909f"
@@ -3074,6 +3081,11 @@
   integrity sha512-9a7C5VHh+1BKblaYiq+7Tfc+EOmjMdZaD1MYtkQjSoxgB69tBjW98ry6SKsi4zEIWztLOMRuL87A3bdT/Fc/4w==
   dependencies:
     "@types/node" "*"
+
+"@types/toobusy-js@^0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@types/toobusy-js/-/toobusy-js-0.5.1.tgz#37f46604c582c4f0c0bb7653a0f200a1a5d66d04"
+  integrity sha512-P0BGYQkqFT2mWDbHFrdr5nwS2Kmlu6oOrSfb3aFpVrG0+jAEXpL2GE+mlmvNLh5C+csTGJVrlyJQKEFYgfpbvA==
 
 "@types/toposort@^2.0.1":
   version "2.0.1"
