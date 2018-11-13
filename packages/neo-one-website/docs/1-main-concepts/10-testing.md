@@ -45,7 +45,7 @@ In all of our examples we'll use [Jest](https://jestjs.io/) for the testing fram
 
 :::
 
-The `withContracts` function starts up a fresh network for each test case, compiles all of your smart contracts, deploys them to the local network, pre-configures a `Client` as well as a `DeveloperClient` and creates the smart contract APIs. It then passes everything it's setup to an async callback function that you specify where your testing logic should reside. The properties available to your function are:
+The `withContracts` function starts up a fresh network for each test case, compiles all of your smart contracts, deploys them to the local network, pre-configures a `Client` as well as a `DeveloperClient` and creates the smart contract APIs. It then passes these tools as properties of an object to an async callback function where your testing logic should reside. The properties available to your function are:
 
 ```typescript
 interface TestOptions {
@@ -96,7 +96,7 @@ In addition to the properties listed above, the object will contain a smart cont
 
 Within the callback to the `withContracts` function, we can test our smart contracts using the same NEO•ONE client APIs that we use to interact with the contract in production (and that we've discussed over the previous 2 chapters).
 
-The network and clients are setup to run consensus immediately with every transaction, so tests do not have to wait for blocks to be produced every 15 seconds. If you'd like to turn off this behavior, or configure other aspects of `withContracts`, you may pass in an options object as the second parameter:
+To run tests quickly, the network and clients are setup to run consensus immediately with every transaction. This way, tests do not have to wait for blocks to be produced every 15 seconds. If you'd like to turn off this behavior, or configure other aspects of `withContracts`, you may pass in an options object as the second parameter:
 
 ```typescript
 interface WithContractsOptions {
@@ -148,7 +148,7 @@ describe('Token', () => {
 
 `DeveloperClient` is a class that is configured to point at a local development network. This class provides methods that are useful during testing:
 
-  - `runConsensusNow(): Promise<void>` - trigger consensus to run immediately
+  - `runConsensusNow(): Promise<void>` - trigger consensus to run immediately.
   - `fastForwardOffset(seconds: number): Promise<void>` - fast forward the local network by `seconds` into the future. Use this method to test time-dependent smart contracts.
   - `fastForwardToTime(seconds: number): Promise<void>` - fast forward to a particular unix timestamp in the future.
   - `reset(): Promise<void>` - reset the local network to it's initial state starting at the genesis block.

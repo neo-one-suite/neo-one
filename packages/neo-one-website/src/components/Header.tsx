@@ -88,6 +88,14 @@ const CourseLink = styled(NavigationLink)`
   }
 `;
 
+const LeftHeader = styled(Toolbar.Content)`
+  grid-gap: 32px;
+
+  @media (max-width: ${prop('theme.breakpoints.md')}) {
+    grid-gap: 16px;
+  }
+`;
+
 interface Props {
   readonly path: string;
 }
@@ -95,7 +103,7 @@ interface Props {
 export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledToolbar>
-      <Toolbar.Content>
+      <LeftHeader>
         <LogoLink data-test="header-logo" to="/">
           <Logo />
         </LogoLink>
@@ -111,7 +119,7 @@ export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper
         <NavigationLink linkColor="gray" active={path === 'blog'} data-test="header-blog" to="/blog">
           Blog
         </NavigationLink>
-      </Toolbar.Content>
+      </LeftHeader>
       <Toolbar.Content align="end">
         <GitHubLink
           linkColor="gray"

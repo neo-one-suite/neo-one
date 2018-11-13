@@ -2,8 +2,6 @@ import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
 // @ts-ignore
 import container from 'markdown-it-container';
-// @ts-ignore
-import table from 'markdown-it-multimd-table';
 import * as React from 'react';
 import { css, styled } from 'reakit';
 import slugify from 'slugify';
@@ -95,8 +93,7 @@ const createMD = ({ withAnchors }: { readonly withAnchors: boolean }) => {
 
         return '</blockquote>\n';
       },
-    })
-    .use(table);
+    });
 
   if (withAnchors) {
     // tslint:disable-next-line no-any

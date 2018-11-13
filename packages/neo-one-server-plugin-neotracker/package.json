@@ -4,7 +4,11 @@
   "description": "NEO•ONE server plugin for NEO Tracker functionality.",
   "main": "./src/index.ts",
   "dependencies": {
+    "@neo-one/client": "^1.0.0-preview.8",
+    "@neo-one/client-full": "^1.0.0-preview.8",
     "@neo-one/monitor": "^1.0.0-preview.4",
+    "@neo-one/node-core": "^1.0.0-preview.5",
+    "@neo-one/node-neo-settings": "^1.0.0-preview.5",
     "@neo-one/server-plugin": "^1.0.0-preview.4",
     "@neo-one/server-plugin-network": "^1.0.0-preview.7",
     "@neo-one/utils": "^1.0.0-preview.4",

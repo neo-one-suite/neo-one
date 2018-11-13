@@ -23,6 +23,7 @@ This guide will walk you through getting started with the [NEO•ONE Playground]
 
 ```bash
 git clone https://github.com/neo-one-suite/neo-one-playground.git
+cd neo-one-playground
 yarn install
 ```
 

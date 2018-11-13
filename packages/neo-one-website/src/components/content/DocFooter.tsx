@@ -17,6 +17,11 @@ const Wrapper = styled(Grid)`
 const LinkWrapper = styled(Grid)`
   grid-auto-flow: column;
   justify-content: space-between;
+  grid-gap: 32px;
+
+  @media (max-width: ${prop('theme.breakpoints.md')}) {
+    grid-gap: 16px;
+  }
 `;
 
 interface Props {

@@ -99,6 +99,21 @@ const StyledMarkdown = styled(Markdown)`
     max-width: ${prop('theme.constants.content.maxWidth')};
   }
 
+  & table {
+    border: none;
+    border-spacing: 0;
+    overflow-x: auto;
+    display: block;
+  }
+
+  & tr:nth-child(even) {
+    background-color: ${prop('theme.gray2')};
+  }
+
+  & tr:nth-child(odd) {
+    background-color: ${prop('theme.grayHalf')};
+  }
+
   &&& > p:nth-child(1) {
     ${prop('theme.fonts.axiformaThin')};
     ${prop('theme.fontStyles.subheading')};

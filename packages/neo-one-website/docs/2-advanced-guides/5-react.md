@@ -81,4 +81,4 @@ Once you've included `ContractsProvider` in your application, you may use the `W
 </WithContracts>
 ```
 
-`FromStream` additionally accepts one additional prop, `props` which is a list of values that are used within the `createStream` function. Without `props`, `createStream` is called on every render of `FromStream` and the result is subscribed to. With `props`, a new stream is subscribed to only when the value of one of the elements of `props` does not match the previous render. In general, you should go ahead and include any values you use in your `createStream` function within the `props` prop.
+`FromStream` accepts one additional prop, `props`, which is a list of values that are used within the `createStream` function. Without `props`, `createStream` is called on every render of `FromStream` and the result is subscribed to. With `props`, a new stream is subscribed to only when the value of one of the elements of `props` does not match the previous render. In general, you should go ahead and include any values you use in your `createStream` function within the `props` prop.

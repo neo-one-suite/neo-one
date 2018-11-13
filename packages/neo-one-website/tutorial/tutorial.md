@@ -42,7 +42,7 @@ The tutorial assumes general familiarity with blockchain and the NEO blockchain 
 
 The tutorial will leverage [React](https://reactjs.org). If you'd prefer to use another front-end framework, or no framework at all, that's okay too! We'll only briefly cover how to use React with NEO•ONE and otherwise it will primarily be used to show how one might integrate NEO•ONE with a front-end framework, so in-depth knowledge of React is not required.
 
-Finally, we'll use [Jest](https://jestjs.io/) for testing our smart contracts, however note that NEO•ONE may be used with any testing framework.
+Finally, we'll use [Jest](https://jestjs.io/) for testing our smart contracts, however, note that NEO•ONE may be used with any testing framework.
 
 ### Setup for the Tutorial
 
@@ -294,7 +294,7 @@ The main difference for the NEO•ONE client APIs is that methods require relayi
 
 ### Native Asset Methods
 
-The NEO blockchain supports native assets, the two most important ones being NEO and GAS. Native assets are UTXO based and are understood natively by the blockchain. Contrast this with tokens like the one we've built so far which live entirely in custom smart contracts. As a result, they require special handling within smart contracts. Luckily, NEO•ONE smart contracts abstract most of this away and let you focus on the logic of your smart contract.
+The NEO blockchain supports native assets, the two most important ones being NEO and GAS. Native assets are Unspent Transaction Output (UTXO) based and are understood natively by the blockchain. Contrast this with tokens like the one we've built so far which live entirely in custom smart contracts. As a result, they require special handling within smart contracts. Luckily, NEO•ONE smart contracts abstract most of this away and let you focus on the logic of your smart contract.
 
 In order to receive native assets, we can decorate a method with `@receive`. Methods marked with `@receive` must return a `boolean` value to indicate whether or not the contract wants to receive the assets. Note, however, that there are cases where the contract may still receive assets, despite returning `false`, due to limitations in how NEO handles native UTXO assets. For these cases, we automatically generate a `refundAssets` method that clients of your smart contract may call to refund assets which were not processed by the smart contract (i.e. the smart contract returned `false` or was not called). Note that this method cannot refund assets if the smart contract invocation succeeded.
 
@@ -407,7 +407,7 @@ Putting it all together, we see both forms of invoking smart contract methods in
 
 ### Wrapping Up
 
-At this point, we have a fully functioning, although simplistic token contract. If you'd like to go into more details on some aspects or work on some of the parts we skipped, like event notifications or advanced topics like invoking other smart contracts, check out [NEO•ONE Courses](/course). Otherwise, head to the next section to learn about integrating a dapp with the NEO•ONE client and smart contract APIs. Once you have it integrated, try it out with the React boilerplate that was generated with create-react-app!
+At this point we have a fully functioning, although simplistic, token contract. If you'd like to go into more details on some aspects or work on some of the parts we skipped, like event notifications or advanced topics like invoking other smart contracts, check out [NEO•ONE Courses](/course). Otherwise, head to the next section to learn about integrating a dapp with the NEO•ONE client and smart contract APIs. Once you have it integrated, try it out with the React boilerplate that was generated with create-react-app!
 
 ---
 

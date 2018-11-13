@@ -39,7 +39,7 @@ This command compiles your smart contracts, sets up a local private network, dep
 
 ## First Steps
 
-Every NEO•ONE smart contract starts with a TypeScript source file that exports a single [class](https://www.typescriptlang.org/docs/handbook/classes.html) extending `SmartContract`. The simplest smart contract looks like
+Every NEO•ONE smart contract starts with a TypeScript source file that exports a single [class](https://www.typescriptlang.org/docs/handbook/classes.html) extending `SmartContract`. The simplest smart contract looks like:
 
 ```typescript
 export class HelloWorld extends SmartContract {}

@@ -17,6 +17,7 @@ const DesktopSidebarWrapper = styled(Box)`
   padding-right: 1000px;
   padding-top: 72px;
   top: 0;
+  z-index: 2;
 
   @media (min-width: ${prop('theme.breakpoints.sm')}) {
     padding-top: 80px;

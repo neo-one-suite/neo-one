@@ -4,7 +4,6 @@ import { Server } from 'net';
 
 import mount from 'koa-mount';
 import * as prom from 'prom-client';
-import gcStats from 'prometheus-gc-stats';
 
 import { MonitorBase, Tracer } from './MonitorBase';
 import { Logger, LogLevel, Monitor } from './types';
@@ -28,7 +27,6 @@ const DEFAULT_LOGGER: Logger = {
 export class NodeMonitor extends MonitorBase {
   public static create({ service, logger = DEFAULT_LOGGER, tracer, spanLogLevel }: NodeMonitorCreate): NodeMonitor {
     prom.collectDefaultMetrics({ timeout: 4000 });
-    gcStats(prom.register)();
 
     return new NodeMonitor({
       service,

@@ -109,6 +109,6 @@ In this case, the `receipt` would contain the events for the `transfer` call, th
 
 ## Reactive Smart Contracts
 
-Reactive smart contracts are so powerful and enable many use-cases that would otherwise not be possible that we recommend the following pattern when implementing your smart contracts.
+Reactive smart contracts are powerful and enable many use-cases that would otherwise not be possible. We recommend the following pattern when implementing your smart contracts.
 
-Whenever your smart contract has a method that takes an `action` on an `Address`, always check to see if the target `Address` is a smart contract. If it is, invoke the `approveReceive<action>` method of that smart contract with the same arguments `action` was called with, except the argument that is the smart contract `Address` itself. Additionally, pass a rest parameter of `ForwardValue`s to the method.
+Whenever your smart contract has a method that takes an `action` on an `Address`, always check to see if the target `Address` is a smart contract. If it is, invoke the `approveReceive<action>` method of that smart contract with the same arguments `action` was called with, except the argument that is the smart contract `Address` itself. Additionally, pass a rest parameter of `ForwardValue`s to the method. Take a look at the `Token` example above to see this pattern in action.

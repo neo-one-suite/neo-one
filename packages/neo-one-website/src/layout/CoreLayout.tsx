@@ -14,6 +14,7 @@ const Wrapper = styled(Flex)`
 
 const StyledHeadroom = styled(Headroom)`
   width: 100%;
+  z-index: 9999;
 `;
 
 const Content = styled(Box)`

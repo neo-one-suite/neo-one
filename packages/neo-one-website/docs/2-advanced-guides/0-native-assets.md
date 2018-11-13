@@ -4,7 +4,7 @@ title: Native Assets
 ---
 Native assets like NEO and GAS require special handling in smart contracts. This guide will show you how.
 
-NEO employs the [UTXO](https://en.wikipedia.org/wiki/Unspent_transaction_output) (unspent transaction output) system for native assets. Unfortunately, the UTXO system does not play well with smart contracts. Fortunately, NEO•ONE smart contracts abstract away most of the difficulty in handling native assets using the `@receive`, `@send`, `@sendUnsafe` and `@claim` [decorators](https://www.typescriptlang.org/docs/handbook/decorators.html).
+NEO employs the [Unspent Transaction Output](https://en.wikipedia.org/wiki/Unspent_transaction_output) (UTXO) system for native assets. Unfortunately, the UTXO system does not play well with smart contracts. Fortunately, NEO•ONE smart contracts abstract away most of the difficulty in handling native assets using the `@receive`, `@send`, `@sendUnsafe` and `@claim` [decorators](https://www.typescriptlang.org/docs/handbook/decorators.html).
 
 One commonality between every native asset method is that they must return a `boolean` indicating whether or not the transaction should proceed.
 
@@ -109,7 +109,7 @@ interface Transfer {
 }
 ```
 
-For example, if you wanted to have a method that required a single argument `value` of type `string`, you could define your method like so:
+For example, if you wanted to have a method that required a single argument, `value`, of type `string`, you could define your method like so:
 
 ```typescript
 export class Contract extends SmartContract {

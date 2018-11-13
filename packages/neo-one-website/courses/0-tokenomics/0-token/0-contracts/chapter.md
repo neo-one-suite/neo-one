@@ -10,7 +10,7 @@ In Lesson 1, we're going to build a token smart contract for the NEO blockchain 
 
 In later lessons we'll add more functionality like pre-approving transfers and forwarding arguments to other contracts.
 
-Before getting started, let's familiarize ourselves with the editor. The editor works similar to VSCode - errors show up inline, and you can hover over code to get inline help. The editor toolbar at the bottom has two buttons that will be used frequently throughout the course. `Build` builds the smart contract code - files that end with `.one.ts` in the editor. When you click `Build`, the smart contract is compiled and deployed on a private NEO blockchain running in your browser. `Run Tests` runs the Jest tests - files that end with `.test.ts`. The tests interact with the contract running on the blockchain and verify the contract works the way we expect. Each chapter will have a set of tests which must pass before proceeding to the next chapter. If you ever get stuck, you can always click `Show Solution` and copy the code into the editor.
+Before getting started, let's familiarize ourselves with the editor. The editor works similar to VSCode - errors show up inline, and you can hover over code to get inline help. The editor toolbar at the bottom has two buttons that will be used frequently throughout the course. `Build` compiles the smart contract code - files that end with `.one.ts` in the editor. When you click `Build`, the smart contract is compiled and deployed on a private NEO blockchain running in your browser. `Run Tests` runs the Jest tests - files that end with `.test.ts`. The tests interact with the contract running on the blockchain and verify the contract works the way we expect. Each chapter will have a set of tests which must pass before proceeding to the next chapter. If you ever get stuck, you can always click `Show Solution` and copy the code into the editor.
 
 ## Expected Knowledge
 
@@ -44,7 +44,7 @@ This is the shell of a token smart contract. Since we named it `Token`, the vari
 
 ## Test
 
-At this point, we have a basic compilable NEO•ONE smart contract. Go ahead and click the `Build` button in editor toolbar to compile the smart contract. Then click the `Run Tests` button to verify the smart contract. Once the tests pass, you may proceed to the next chapter by clicking `Next`.
+At this point, we have a basic compilable NEO•ONE smart contract. Go ahead and click the `Build` button in editor toolbar at the bottom right-hand side to compile the smart contract. Then click the `Run Tests` button to verify the smart contract. Once the tests pass, you may proceed to the next chapter by clicking `Next`.
 
 ## Wrap Up
 

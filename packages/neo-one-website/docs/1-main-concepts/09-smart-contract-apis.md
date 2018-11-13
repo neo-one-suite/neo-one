@@ -16,7 +16,7 @@ The smart contract APIs are created at runtime based on the generated ABI in `on
 
 Each public property is translated to either a single method or two methods:
 
-  - If the property is readonly, then it's translated to a method with the same name.
+  - If the property is `readonly`, then it's translated to a method with the same name.
   - If the property is mutable, then it's translated to two methods. One that's named the same as the property and serves to fetch the current value. The other is named `set<PropertyName>` and serves to set the value of the property.
 
 Let's take a look at an example:
@@ -38,7 +38,7 @@ would result in an object with three properties:
 
   - `owner(): Promise<AddressString>` - a method that returns a `Promise<AddressString>` which resolves to the current value of the `owner` property of the smart contract.
   - `myValue(): Promise<string>` - a method that returns a `Promise<string>` which resolves to the current value of the `myValue` property of the smart contract.
-  - `setMyValue(value: string): Promise<TransactionResult>` a method which takes a `string` parameter to set as the current value of `myProperty` and that returns a `Promise` that resolves to a `TransactionResult` object. We'll talk more about the `TransactionResult` type in the next section.
+  - `setMyValue(value: string): Promise<TransactionResult>` - a method which takes a `string` parameter to set as the current value of `myProperty` and that returns a `Promise` that resolves to a `TransactionResult` object. We'll talk more about the `TransactionResult` type in the next section.
 
 Notice how the smart contract client APIs correspond directly with the properties defined in the smart contract. The main difference is that reading properties requires an asynchronous action - we need to make a request to a node to determine the current value. Thus, the methods return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) which will resolve to a value with the type of the property.
 
@@ -190,7 +190,7 @@ interface InvocationResultError extends InvocationResultBase {
 }
 ```
 
-Both success and failure contain properties which contain the total GAS consumed and cost.
+Both successful and failed invocation results contain properties for the total GAS consumed and cost.
 
 Putting this all together, a common pattern for invoking smart contract methods is the following:
 
@@ -362,17 +362,17 @@ Read more about asynchronous iteration [here](http://2ality.com/2016/10/asynchro
 
 Smart Contract Type | Client API Type | Notes
 --------------------|-----------------|--------
-boolean             | boolean         |
-string              | string          |
-number              | BigNumber       |
-Fixed<N>            | BigNumber       | Value is automatically converted to a BigNumber with N decimal places.
-Buffer              | BufferString    | Hex encoded byte array
-Address             | AddressString   | Base58 encoded NEO address
-Hash256             | Hash256String   | Hex encoded string prefixed by '0x'
-PublicKey           | PublicKeyString | Hex encoded string
-Array<T>            | Array<T>        |
-Map<K, V>           | Map<K, V>       |
-Object              | Object          | Object values are follow the same conversions as above
+boolean             | boolean         |  |
+string              | string          |  |
+number              | BigNumber       |  |
+Fixed<N>            | BigNumber       | Value is automatically converted to a BigNumber with N decimal places. |
+Buffer              | BufferString    | Hex encoded byte array |
+Address             | AddressString   | Base58 encoded NEO address |
+Hash256             | Hash256String   | Hex encoded string prefixed by '0x' |
+PublicKey           | PublicKeyString | Hex encoded string |
+Array<T>            | Array<T>        |  |
+Map<K, V>           | Map<K, V>       |  |
+Object              | Object          | Object properties are follow the same conversions as above |
 
 
 Here are some examples of each of the types in the front-end:

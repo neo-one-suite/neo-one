@@ -4,7 +4,7 @@ title: Getting Started
 ---
 This page is an overview of the NEO•ONE documentation and related resources.
 
-__NEO•ONE__ makes coding, testing and deploying NEO dapps easier, faster, more efficient and much more enjoyable.
+__NEO•ONE__ makes coding, testing and deploying NEO dapps easy, fast, efficient and enjoyable.
 
 ---
 
@@ -14,13 +14,13 @@ __NEO•ONE__ makes coding, testing and deploying NEO dapps easier, faster, more
 
 ## Try NEO•ONE
 
-NEO•ONE has been designed as full end-to-end toolkit for building NEO dapps. From developing a smart contract, to testing, to interacting with it from your front-end, the entire dapp lifecycle is covered with NEO•ONE. However, it's not necessary to use NEO•ONE for every part of your dapp, you can pick and choose the parts of NEO•ONE that make sense for your development.
+NEO•ONE has been designed as a full end-to-end toolkit for building NEO dapps. From developing a smart contract, to testing, to interacting with it from your front-end, the entire dapp lifecycle is covered with NEO•ONE. However, it's not necessary to use NEO•ONE for every part of your dapp, you can pick and choose the parts of NEO•ONE that make sense for your development.
 
 The links in this section will help you get started.
 
 ### Courses
 
-If you're interested in playing around with NEO•ONE or you prefer to __learn by doing__, check out [NEO•ONE Courses](/course). Play through the first two lessons and you'll experience the entire development lifecycle of a dapp by deploying a fully functioning ICO, from the smart contract that powers it all to the UI that enables participation. All directly from your browser - no environment setup required.
+If you're interested in playing around with NEO•ONE or you prefer to __learn by doing__, check out [NEO•ONE Courses](/course). As you work through the first two lessons you'll experience the entire development lifecycle of a dapp by deploying a fully functioning ICO, from the smart contract that powers it all to the UI that enables participation. All directly from your browser - no environment setup required.
 
 ### Tutorial
 
@@ -28,7 +28,7 @@ If you'd prefer to use your own editor, you can work through the [NEO•ONE Tuto
 
 ### Playground
 
-Setup the [NEO•ONE Playground](/docs/playground) repository to get a feel for NEO•ONE in a real-world setting. Try modifying the smart contracts, adding to the tests or play with the UI.
+Setup the [NEO•ONE Playground](/docs/playground) repository to get a feel for NEO•ONE in a real-world setting. Try modifying the smart contracts, adding to the tests or playing with the UI. Once you're comfortable, you can even try adding your own dapp!
 
 ---
 
@@ -38,7 +38,7 @@ NEO•ONE covers the entire development lifecycle of a dapp, so it's best to lea
 
 ### First Examples
 
-The [NEO•ONE Homepage](/) contains a fledged editor with a simplified token smart contract example and tests. Even if you don't know anything about building dapps, check it out to see what's possible.
+The [NEO•ONE Homepage](/) contains a full editor with a simplified token smart contract example and tests. Even if you don't know anything about building dapps, check it out to see what's possible.
 
 ### TypeScript Resources
 
