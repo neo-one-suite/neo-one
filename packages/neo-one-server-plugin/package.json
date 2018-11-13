@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/server-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "NEO•ONE Server plugin API.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/monitor": "^1.0.0",
-    "@neo-one/types": "^1.0.0",
-    "@neo-one/utils": "^1.0.0",
+    "@neo-one/monitor": "^1.0.1",
+    "@neo-one/types": "^1.0.1",
+    "@neo-one/utils": "^1.0.1",
     "@types/chokidar": "^1.7.5",
     "@types/cli-truncate": "^1.1.0",
     "@types/elegant-spinner": "^1.0.0",

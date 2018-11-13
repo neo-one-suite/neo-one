@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/server-http-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "NEO•ONE Server http client api.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/types": "^1.0.0",
+    "@neo-one/types": "^1.0.1",
     "cross-fetch": "^2.2.3",
     "tslib": "^1.9.3"
   },

@@ -1,18 +1,18 @@
 {
   "name": "@neo-one/smart-contract-test-browser",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "NEO•ONE TypeScript smart contract test harness for browsers.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-core": "^1.0.1",
-    "@neo-one/local-browser": "^1.0.1",
-    "@neo-one/local-singleton": "^1.0.1",
-    "@neo-one/node-browser": "^1.0.1",
-    "@neo-one/node-browser-worker": "^1.0.1",
-    "@neo-one/smart-contract-test-common": "^1.0.1",
-    "@neo-one/types": "^1.0.0",
-    "@neo-one/utils": "^1.0.0",
-    "@neo-one/worker": "^1.0.0",
+    "@neo-one/client-core": "^1.0.2",
+    "@neo-one/local-browser": "^1.0.2",
+    "@neo-one/local-singleton": "^1.0.2",
+    "@neo-one/node-browser": "^1.0.2",
+    "@neo-one/node-browser-worker": "^1.0.2",
+    "@neo-one/smart-contract-test-common": "^1.0.2",
+    "@neo-one/types": "^1.0.1",
+    "@neo-one/utils": "^1.0.1",
+    "@neo-one/worker": "^1.0.1",
     "tslib": "^1.9.3"
   },
   "sideEffects": false
