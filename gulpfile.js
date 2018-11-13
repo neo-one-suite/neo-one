@@ -251,10 +251,10 @@ const transformPackageJSON = (format, orig, file) =>
   orig.name === '@neo-one/types'
     ? transformTypesPackageJSON(format, orig, file)
     : smartContractPkgNames.some((p) => orig.name === p)
-      ? transformSmartContractPackageJSON(format, orig, file)
-      : browserPkgNames.some((p) => orig.name === p)
-        ? transformBrowserPackageJSON(format, orig, file)
-        : transformSrcPackageJSON(format, orig, file);
+    ? transformSmartContractPackageJSON(format, orig, file)
+    : browserPkgNames.some((p) => orig.name === p)
+    ? transformBrowserPackageJSON(format, orig, file)
+    : transformSrcPackageJSON(format, orig, file);
 
 const copyPkg = ((cache) =>
   memoizeTask(cache, function copyPkg(format) {
@@ -568,13 +568,9 @@ gulp.task(
 );
 
 gulp.task('prepareRelease', async () => {
-  await execa(
-    'yarn',
-    ['lerna', 'publish', '--skip-npm', '--cd-version=prerelease', '--preid=preview', '--npm-tag=latest', '--yes'],
-    {
-      stdio: ['ignore', 'inherit', 'inherit'],
-    },
-  );
+  await execa('yarn', ['lerna', 'version', '--conventional-commits', '--npm-tag=latest', '--yes'], {
+    stdio: ['ignore', 'inherit', 'inherit'],
+  });
 });
 
 gulp.task('test', async () => {
