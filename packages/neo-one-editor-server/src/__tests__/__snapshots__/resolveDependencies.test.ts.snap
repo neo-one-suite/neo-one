@@ -174,7 +174,7 @@ Object {
     "dependencies": Object {},
     "name": "react-is",
     "types": false,
-    "version": "16.6.1",
+    "version": "16.6.2",
   },
   "reakit": Object {
     "dependencies": Object {},
