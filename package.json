@@ -70,6 +70,7 @@
     "e2e": "yarn run jest --config jest/e2e.js",
     "e2e-ci": "yarn run jest --config jest/e2e-ci.js --ci -w 1",
     "tsc": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" tsc && tsc -p packages/neo-one-smart-contract && tsc -p packages/neo-one-smart-contract-lib && tsc -p packages/neo-one-smart-contract-lib/src/__data__/contracts && tsc -p packages/neo-one-smart-contract-compiler/src/__data__/contracts && tsc -p packages/neo-one-server-plugin-project/src/__data__/ico/one/contracts",
+    "tsc-fast": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" tsc",
     "ts-node": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json node -r ts-node/register/transpile-only",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.{ts,tsx}\"",
     "nit:scripts:ts": "prettier --config .prettierrc --list-different \"scripts/**/*.{ts,tsx}\"",
@@ -130,7 +131,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged && echo \"Executing tsc...\" && yarn run tsc",
+      "pre-commit": "lint-staged && echo \"Executing tsc...\" && yarn run tsc-fast",
       "post-checkout": "cross-env-shell \"yarn run ts-node ./scripts/hooks/post-checkout.ts $HUSKY_GIT_PARAMS\"",
       "post-merge": "yarn run ts-node ./scripts/hooks/post-merge.ts",
       "post-rewrite": "yarn run ts-node ./scripts/hooks/post-rewrite.ts"

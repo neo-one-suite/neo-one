@@ -567,9 +567,13 @@ gulp.task(
 );
 
 gulp.task('prepareRelease', async () => {
-  await execa('yarn', ['lerna', 'version', '--conventional-commits', '--npm-tag=latest', '--yes', '--messsage',], {
-    stdio: ['ignore', 'inherit', 'inherit'],
-  });
+  await execa(
+    'yarn',
+    ['lerna', 'version', '--conventional-commits', '--npm-tag=latest', '--yes', '--message', 'chore(release): publish'],
+    {
+      stdio: ['ignore', 'inherit', 'inherit'],
+    },
+  );
 });
 
 gulp.task('test', async () => {
