@@ -166,7 +166,7 @@ describe('CNEO', () => {
       const cneoAccountAfter = await client.getAccount(cneoAccountID);
       expect(cneoAccountBefore.balances[Hash256.GAS]).toBeUndefined();
       expect(cneoAccountAfter.balances[Hash256.GAS]).toBeDefined();
-      expect(cneoAccountAfter.balances[Hash256.GAS]).toBeGreaterThan(0);
+      expect(cneoAccountAfter.balances[Hash256.GAS].toNumber()).toBeGreaterThan(0);
     });
   });
 });
