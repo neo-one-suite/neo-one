@@ -1,4 +1,4 @@
-import { BlockBase, Header } from '@neo-one/client-core';
+import { BlockBase, Header } from '@neo-one/node-core';
 import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 
 export class HeaderStackItem extends EquatableKeyStackItem<Header> {

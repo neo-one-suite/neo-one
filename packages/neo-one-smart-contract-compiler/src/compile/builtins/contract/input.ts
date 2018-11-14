@@ -10,7 +10,7 @@ class InputConstructorInterface extends BuiltinInterface {}
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
   builtins.addContractInterface('Input', new InputInterface());
-  builtins.addContractValue('Input', new ValueInstanceOf((sb) => sb.helpers.isInput));
+  builtins.addContractValue('Input', new ValueInstanceOf('InputConstructor', (sb) => sb.helpers.isInput));
   builtins.addContractInterface('InputConstructor', new InputConstructorInterface());
   builtins.addContractMember(
     'Input',

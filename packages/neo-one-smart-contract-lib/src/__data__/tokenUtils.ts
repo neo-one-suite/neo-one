@@ -1,13 +1,14 @@
 // tslint:disable no-unsafe-any
 import {
+  common,
+  crypto,
   Event,
   InvokeReceipt,
   privateKeyToAddress,
-  SmartContractAny,
   TransactionResult,
   UserAccountID,
-} from '@neo-one/client';
-import { common, crypto } from '@neo-one/client-core';
+} from '@neo-one/client-common';
+import { SmartContractAny } from '@neo-one/client-core';
 import { withContracts } from '@neo-one/smart-contract-test';
 import BigNumber from 'bignumber.js';
 
@@ -66,31 +67,14 @@ export const testToken = async ({
       const { client, networkName, masterAccountID, masterPrivateKey } = options;
       // tslint:disable-next-line no-any
       const smartContract: SmartContractAny = (options as any)[smartContractName];
-      const [nameResult, decimalsResult, symbolResult, wallet0, deployResult] = await Promise.all([
-        smartContract.name(),
-        smartContract.decimals(),
-        smartContract.symbol(),
-        client.providers.memory.keystore.addAccount({
-          network: networkName,
-          name: 'wallet0',
-          privateKey: TO.PRIVATE_KEY,
-        }),
-        deploy === undefined
-          ? Promise.resolve(undefined)
-          : deploy({
-              masterPrivateKey,
-              masterAccountID,
-              smartContract,
-            }),
-      ]);
-      expect(nameResult).toEqual(name);
-      expect(decimalsResult.toString()).toEqual(`${decimals}`);
-      expect(symbolResult).toEqual(symbol);
-
-      const account0 = wallet0.account.id;
-
       let event: Event;
-      if (deployResult !== undefined) {
+      if (deploy !== undefined) {
+        const deployResult = await deploy({
+          masterPrivateKey,
+          masterAccountID,
+          smartContract,
+        });
+
         const deployReceipt = await deployResult.confirmed({ timeoutMS: 2500 });
 
         if (deployReceipt.result.state !== 'HALT') {
@@ -111,6 +95,22 @@ export const testToken = async ({
         }
         expect(event.parameters.amount.toString()).toEqual(issueValue.toString());
       }
+
+      const [nameResult, decimalsResult, symbolResult, wallet0] = await Promise.all([
+        smartContract.name(),
+        smartContract.decimals(),
+        smartContract.symbol(),
+        client.providers.memory.keystore.addUserAccount({
+          network: networkName,
+          name: 'wallet0',
+          privateKey: TO.PRIVATE_KEY,
+        }),
+      ]);
+      expect(nameResult).toEqual(name);
+      expect(decimalsResult.toString()).toEqual(`${decimals}`);
+      expect(symbolResult).toEqual(symbol);
+
+      const account0 = wallet0.userAccount.id;
 
       const [issueBalance, issueTotalSupply, transferResult] = await Promise.all([
         smartContract.balanceOf(masterAccountID.address),
@@ -166,7 +166,7 @@ export const testToken = async ({
       expect(contract.parameters).toEqual(['String', 'Array']);
       expect(contract.returnType).toEqual('Buffer');
       expect(contract.storage).toBeTruthy();
-      expect(contract.dynamicInvoke).toBeFalsy();
+      expect(contract.dynamicInvoke).toBeTruthy();
       expect(contract.payable).toEqual(payable);
     },
     { deploy: deploy === undefined },

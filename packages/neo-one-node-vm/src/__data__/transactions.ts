@@ -1,7 +1,8 @@
+import { common } from '@neo-one/client-common';
 import {
   Attribute,
   BufferAttribute,
-  common,
+  ClaimTransaction,
   Contract,
   ContractParameterType,
   ContractPropertyState,
@@ -10,8 +11,9 @@ import {
   Output,
   utils,
   Witness,
-} from '@neo-one/client-core';
-import { BN } from 'bn.js';
+} from '@neo-one/node-core';
+import BN from 'bn.js';
+import { randomBytes } from 'crypto';
 import { keys } from './keys';
 
 export const createInvocation = ({
@@ -36,6 +38,27 @@ export const createInvocation = ({
     inputs,
     outputs,
     scripts,
+  });
+
+export const createClaim = ({
+  attributes,
+  inputs,
+  outputs,
+  scripts,
+  claims,
+}: {
+  readonly attributes?: ReadonlyArray<Attribute>;
+  readonly inputs?: ReadonlyArray<Input>;
+  readonly outputs?: ReadonlyArray<Output>;
+  readonly scripts?: ReadonlyArray<Witness>;
+  readonly claims: ReadonlyArray<Input>;
+}) =>
+  new ClaimTransaction({
+    attributes,
+    inputs,
+    outputs,
+    scripts,
+    claims,
   });
 
 const kycContractScript = Buffer.from(
@@ -89,6 +112,50 @@ export const mintTransaction = new InvocationTransaction({
       address: keys[0].scriptHash,
     }),
   ],
+
+  attributes: [
+    new BufferAttribute({
+      usage: 0x81,
+      value: Buffer.alloc(32, 0),
+    }),
+  ],
+});
+
+export const claimOutput = new Output({
+  value: new BN(54).mul(utils.ONE_HUNDRED_MILLION),
+  asset: common.stringToUInt256(common.NEO_ASSET_HASH),
+  address: kycContract.hash,
+});
+
+export const claimTransaction = createClaim({
+  claims: [
+    new Input({
+      hash: common.bufferToUInt256(Buffer.alloc(32, 0)),
+      index: 0,
+    }),
+  ],
+});
+
+export const badTransaction = new InvocationTransaction({
+  script: Buffer.from('00c10a6d696e74546f6b656e7367dc6cc7701762e83d2d3795d27b1aac14469e5735', 'hex'),
+
+  gas: utils.ZERO,
+  inputs: [...Array(1025)].map(
+    (value) =>
+      new Input({
+        hash: common.bufferToUInt256(randomBytes(32)),
+        index: value,
+      }),
+  ),
+
+  outputs: [...Array(1025)].map(
+    () =>
+      new Output({
+        value: new BN(54).mul(utils.ONE_HUNDRED_MILLION),
+        asset: common.stringToUInt256(common.NEO_ASSET_HASH),
+        address: kycContract.hash,
+      }),
+  ),
 
   attributes: [
     new BufferAttribute({

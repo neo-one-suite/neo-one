@@ -1,7 +1,5 @@
-import { AnyNameableNode, tsUtils } from '@neo-one/ts-utils';
+import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { DiagnosticCode } from '../../DiagnosticCode';
-import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -13,14 +11,7 @@ export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration
     const options = sb.pushValueOptions(optionsIn);
     const sourceFile = tsUtils.importExport.getModuleSpecifierSourceFile(sb.context.typeChecker, node);
     if (sourceFile === undefined) {
-      const specifier = tsUtils.importExport.getModuleSpecifier(node);
-      sb.context.reportError(
-        node,
-        DiagnosticCode.UnknownModule,
-        DiagnosticMessage.UnknownModule,
-        specifier === undefined ? 'unknown' : tsUtils.literal.getLiteralValue(specifier),
-      );
-
+      /* istanbul ignore next */
       return;
     }
 
@@ -28,14 +19,14 @@ export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration
       return;
     }
 
-    if (!this.hasValueReference(sb, node)) {
+    if (!tsUtils.importExport.hasValueReference(sb.context.program, sb.context.languageService, node)) {
       return;
     }
 
     // [exports]
     sb.loadModule(sourceFile);
 
-    const namespaceImport = tsUtils.importDeclaration.getNamespaceImport(node);
+    const namespaceImport = tsUtils.importDeclaration.getNamespaceImportIdentifier(node);
     if (namespaceImport !== undefined) {
       const name = namespaceImport.getText();
       sb.scope.add(name);
@@ -88,42 +79,6 @@ export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration
     }
   }
 
-  private hasValueReference(sb: ScriptBuilder, node: ts.ImportDeclaration): boolean {
-    const currentSourceFile = tsUtils.node.getSourceFile(node);
-
-    const namespaceImport = tsUtils.importDeclaration.getNamespaceImport(node);
-    if (namespaceImport !== undefined && this.hasLocalValueReferences(sb, currentSourceFile, namespaceImport)) {
-      return true;
-    }
-
-    const defaultImport = tsUtils.importDeclaration.getDefaultImport(node);
-    if (defaultImport !== undefined && this.hasLocalValueReferences(sb, currentSourceFile, defaultImport)) {
-      return true;
-    }
-
-    const namedImports = tsUtils.importDeclaration.getNamedImports(node);
-    if (
-      namedImports.some((namedImport) =>
-        this.hasLocalValueReferences(sb, currentSourceFile, this.getImportNameNode(namedImport)),
-      )
-    ) {
-      return true;
-    }
-
-    return false;
-  }
-
-  private hasLocalValueReferences(sb: ScriptBuilder, currentSourceFile: ts.SourceFile, node: AnyNameableNode): boolean {
-    const references = tsUtils.reference.findReferencesAsNodes(sb.context.program, sb.context.languageService, node);
-
-    return references.some(
-      (reference) =>
-        tsUtils.node.getSourceFile(reference) === currentSourceFile &&
-        tsUtils.node.getFirstAncestorByTest(reference, ts.isImportDeclaration) === undefined &&
-        !tsUtils.node.isPartOfTypeNode(reference),
-    );
-  }
-
   private getExportedNamedImports(
     sb: ScriptBuilder,
     node: ts.ImportDeclaration,
@@ -138,11 +93,5 @@ export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration
     const alias = tsUtils.node.getPropertyNameNode(node);
 
     return alias === undefined ? tsUtils.node.getName(node) : tsUtils.node.getText(alias);
-  }
-
-  private getImportNameNode(node: ts.ImportSpecifier): ts.ImportSpecifier | ts.Identifier {
-    const alias = tsUtils.node.getPropertyNameNode(node);
-
-    return alias === undefined ? node : alias;
   }
 }

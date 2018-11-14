@@ -1,4 +1,5 @@
 import { helpers } from '../../../../__data__';
+import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Header', () => {
   test('properties', async () => {
@@ -33,6 +34,39 @@ describe('Header', () => {
       }
     `,
       { type: 'error' },
+    );
+  });
+
+  test('invalid reference', () => {
+    helpers.compileString(
+      `
+      import { Header } from '@neo-one/smart-contract';
+
+      const for = Header.for;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid "reference"', () => {
+    helpers.compileString(
+      `
+      import { Header } from '@neo-one/smart-contract';
+
+      const for = Header['for'];
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid reference - object', () => {
+    helpers.compileString(
+      `
+      import { Header } from '@neo-one/smart-contract';
+
+      const { for } = Header;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
 });

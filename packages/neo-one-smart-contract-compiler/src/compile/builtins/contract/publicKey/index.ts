@@ -1,10 +1,12 @@
-import { BuiltinBase } from '../../BuiltinBase';
 import { BuiltinInterface } from '../../BuiltinInterface';
 import { Builtins } from '../../Builtins';
+import { BuiltinValueObject } from '../../BuiltinValueObject';
 import { PublicKeyFrom } from './from';
 
 class PublicKeyInterface extends BuiltinInterface {}
-class PublicKeyValue extends BuiltinBase {}
+class PublicKeyValue extends BuiltinValueObject {
+  public readonly type = 'PublicKeyConstructor';
+}
 class PublicKeyConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name

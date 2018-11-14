@@ -7,8 +7,8 @@ import {
   Hash256,
   Integer,
   MapStorage,
+  receive,
   SmartContract,
-  verify,
 } from '@neo-one/smart-contract';
 
 const notifyTransfer = createEventNotifier<Address | undefined, Address | undefined, Fixed<8>>(
@@ -18,16 +18,17 @@ const notifyTransfer = createEventNotifier<Address | undefined, Address | undefi
   'amount',
 );
 
+const notifyTransfer2 = createEventNotifier<Address, Address, Fixed<8>>('transfer', 'from', 'to', 'amount');
+
 const notifyRefund = createEventNotifier('refund');
 
 // tslint:disable-next-line export-name
-export class ICO implements SmartContract {
+export class ICO extends SmartContract {
   public readonly properties = {
     codeVersion: '1.0',
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'NEO•ONE ICO',
-    payable: true,
   };
   public readonly name = 'One';
   public readonly symbol = 'ONE';
@@ -42,7 +43,8 @@ export class ICO implements SmartContract {
     public readonly startTimeSeconds: Integer = 1000000,
     public readonly icoDurationSeconds: Integer = 100000,
   ) {
-    if (!Address.isSender(owner)) {
+    super();
+    if (!Address.isCaller(owner)) {
       throw new Error('Sender was not the owner.');
     }
   }
@@ -62,7 +64,7 @@ export class ICO implements SmartContract {
       throw new Error(`Amount must be greater than 0: ${amount}`);
     }
 
-    if (!Address.isSender(from)) {
+    if (!Address.isCaller(from)) {
       return false;
     }
 
@@ -79,7 +81,7 @@ export class ICO implements SmartContract {
     const toBalance = this.balanceOf(to);
     this.balances.set(from, fromBalance - amount);
     this.balances.set(to, toBalance + amount);
-    notifyTransfer(from, to, amount);
+    notifyTransfer2(from, to, amount);
 
     return true;
   }
@@ -88,7 +90,7 @@ export class ICO implements SmartContract {
     return this.mutableRemaining;
   }
 
-  @verify
+  @receive
   public mintTokens(): boolean {
     if (!this.hasStarted() || this.hasEnded()) {
       notifyRefund();

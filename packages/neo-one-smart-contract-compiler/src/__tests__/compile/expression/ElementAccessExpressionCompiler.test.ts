@@ -36,6 +36,36 @@ describe('ElementAccessExpressionCompiler', () => {
     );
   });
 
+  const buffer = Buffer.from([0, 1, 2]);
+
+  test('Buffer.from([0, 1, 2])[idx]', async () => {
+    await helpers.executeString(`
+      const x = ${helpers.getBuffer(buffer)};
+
+      x[2];
+      x['length'];
+      const length: 'length' | 'equals' = 'length' as 'length' | 'equals';
+      assertEqual(x[length], 3);
+      assertEqual(x.length, 3);
+      assertEqual(x[0], 0);
+      assertEqual(x[1] as number | undefined, 1);
+      assertEqual(x[2], 2);
+      assertEqual(x[3] as number | undefined, undefined);
+    `);
+  });
+
+  test('Buffer.from([0, 1, 2])["idx"]', async () => {
+    helpers.compileString(
+      `
+      const x = ${helpers.getBuffer(buffer)};
+      x['0'];
+      const length: string = 'length' as string;
+      x[length];
+    `,
+      { type: 'error' },
+    );
+  });
+
   test('{ a: 0, b: 1 }[element]', async () => {
     await helpers.executeString(`
       const x = { a: 0, b: 1 };
@@ -96,16 +126,6 @@ describe('ElementAccessExpressionCompiler', () => {
       const length: 'length' | 'equals' = 'length' as 'length' | 'equals';
       assertEqual(z[length], 2);
     `);
-  });
-
-  test('buffer["idx"]', async () => {
-    helpers.compileString(
-      `
-      const x = Buffer.from('3030', 'hex');
-      x[1];
-    `,
-      { type: 'error' },
-    );
   });
 
   test('Symbol["iterator"]', async () => {

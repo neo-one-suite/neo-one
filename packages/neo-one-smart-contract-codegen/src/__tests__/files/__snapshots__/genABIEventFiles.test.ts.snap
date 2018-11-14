@@ -1,0 +1,1433 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ABIEvent Tests Array 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Array",
+        "parameters": Array [
+          Object {
+            "name": "arg",
+            "type": "Array",
+            "value": Object {
+              "type": "Boolean",
+            },
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface ArrayArrayEventParameters {
+  readonly arg: Array<boolean>;
+}
+export interface ArrayArrayEvent extends Event<'Array', ArrayArrayEventParameters> {}
+export type ArrayEvent = ArrayArrayEvent
+
+export interface ArraySmartContract<TClient extends Client = Client> extends SmartContract<TClient, ArrayEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ArrayEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, ArrayEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Array_default 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Array_default",
+        "parameters": Array [
+          Object {
+            "default": Object {
+              "type": "sender",
+            },
+            "name": "arg",
+            "type": "Array",
+            "value": Object {
+              "type": "Boolean",
+            },
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface Array_defaultArrayDefaultEventParameters {
+  readonly arg: Array<boolean>;
+}
+export interface Array_defaultArrayDefaultEvent extends Event<'Array_default', Array_defaultArrayDefaultEventParameters> {}
+export type Array_defaultEvent = Array_defaultArrayDefaultEvent
+
+export interface Array_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_defaultEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Array_defaultEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Array_defaultEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Array_default_rest 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Array_default_rest",
+        "parameters": Array [
+          Object {
+            "default": Object {
+              "type": "sender",
+            },
+            "name": "arg",
+            "rest": true,
+            "type": "Array",
+            "value": Object {
+              "type": "Boolean",
+            },
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface Array_default_restArrayDefaultRestEventParameters {
+  readonly arg: Array<boolean>;
+}
+export interface Array_default_restArrayDefaultRestEvent extends Event<'Array_default_rest', Array_default_restArrayDefaultRestEventParameters> {}
+export type Array_default_restEvent = Array_default_restArrayDefaultRestEvent
+
+export interface Array_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_default_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Array_default_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Array_default_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Array_rest 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Array_rest",
+        "parameters": Array [
+          Object {
+            "name": "arg",
+            "rest": true,
+            "type": "Array",
+            "value": Object {
+              "type": "Boolean",
+            },
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface Array_restArrayRestEventParameters {
+  readonly arg: Array<boolean>;
+}
+export interface Array_restArrayRestEvent extends Event<'Array_rest', Array_restArrayRestEventParameters> {}
+export type Array_restEvent = Array_restArrayRestEvent
+
+export interface Array_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Array_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Array_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Boolean 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Boolean",
+        "parameters": Array [
+          Object {
+            "name": "arg",
+            "optional": true,
+            "type": "Boolean",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface BooleanBooleanEventParameters {
+  readonly arg: boolean | undefined;
+}
+export interface BooleanBooleanEvent extends Event<'Boolean', BooleanBooleanEventParameters> {}
+export type BooleanEvent = BooleanBooleanEvent
+
+export interface BooleanSmartContract<TClient extends Client = Client> extends SmartContract<TClient, BooleanEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, BooleanEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Boolean 2`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Boolean",
+        "parameters": Array [
+          Object {
+            "forwardedValue": true,
+            "name": "arg",
+            "type": "Boolean",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface BooleanBooleanEventParameters {
+  readonly arg: boolean;
+}
+export interface BooleanBooleanEvent extends Event<'Boolean', BooleanBooleanEventParameters> {}
+export type BooleanEvent = BooleanBooleanEvent
+
+export interface BooleanSmartContract<TClient extends Client = Client> extends SmartContract<TClient, BooleanEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, BooleanEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Boolean_default 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Boolean_default",
+        "parameters": Array [
+          Object {
+            "default": Object {
+              "type": "sender",
+            },
+            "name": "arg",
+            "optional": true,
+            "type": "Boolean",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface Boolean_defaultBooleanDefaultEventParameters {
+  readonly arg: boolean | undefined;
+}
+export interface Boolean_defaultBooleanDefaultEvent extends Event<'Boolean_default', Boolean_defaultBooleanDefaultEventParameters> {}
+export type Boolean_defaultEvent = Boolean_defaultBooleanDefaultEvent
+
+export interface Boolean_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_defaultEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_defaultEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Boolean_defaultEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Boolean_default 2`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Boolean_default",
+        "parameters": Array [
+          Object {
+            "default": Object {
+              "type": "sender",
+            },
+            "forwardedValue": true,
+            "name": "arg",
+            "type": "Boolean",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface Boolean_defaultBooleanDefaultEventParameters {
+  readonly arg: boolean;
+}
+export interface Boolean_defaultBooleanDefaultEvent extends Event<'Boolean_default', Boolean_defaultBooleanDefaultEventParameters> {}
+export type Boolean_defaultEvent = Boolean_defaultBooleanDefaultEvent
+
+export interface Boolean_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_defaultEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_defaultEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Boolean_defaultEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Boolean_default_rest 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Boolean_default_rest",
+        "parameters": Array [
+          Object {
+            "default": Object {
+              "type": "sender",
+            },
+            "name": "arg",
+            "optional": true,
+            "rest": true,
+            "type": "Boolean",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface Boolean_default_restBooleanDefaultRestEventParameters {
+  readonly arg: boolean | undefined;
+}
+export interface Boolean_default_restBooleanDefaultRestEvent extends Event<'Boolean_default_rest', Boolean_default_restBooleanDefaultRestEventParameters> {}
+export type Boolean_default_restEvent = Boolean_default_restBooleanDefaultRestEvent
+
+export interface Boolean_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_default_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_default_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Boolean_default_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Boolean_default_rest 2`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Boolean_default_rest",
+        "parameters": Array [
+          Object {
+            "default": Object {
+              "type": "sender",
+            },
+            "forwardedValue": true,
+            "name": "arg",
+            "rest": true,
+            "type": "Boolean",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface Boolean_default_restBooleanDefaultRestEventParameters {
+  readonly arg: boolean;
+}
+export interface Boolean_default_restBooleanDefaultRestEvent extends Event<'Boolean_default_rest', Boolean_default_restBooleanDefaultRestEventParameters> {}
+export type Boolean_default_restEvent = Boolean_default_restBooleanDefaultRestEvent
+
+export interface Boolean_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_default_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_default_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Boolean_default_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Boolean_rest 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Boolean_rest",
+        "parameters": Array [
+          Object {
+            "name": "arg",
+            "optional": true,
+            "rest": true,
+            "type": "Boolean",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface Boolean_restBooleanRestEventParameters {
+  readonly arg: boolean | undefined;
+}
+export interface Boolean_restBooleanRestEvent extends Event<'Boolean_rest', Boolean_restBooleanRestEventParameters> {}
+export type Boolean_restEvent = Boolean_restBooleanRestEvent
+
+export interface Boolean_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Boolean_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Boolean_rest 2`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Boolean_rest",
+        "parameters": Array [
+          Object {
+            "forwardedValue": true,
+            "name": "arg",
+            "rest": true,
+            "type": "Boolean",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface Boolean_restBooleanRestEventParameters {
+  readonly arg: boolean;
+}
+export interface Boolean_restBooleanRestEvent extends Event<'Boolean_rest', Boolean_restBooleanRestEventParameters> {}
+export type Boolean_restEvent = Boolean_restBooleanRestEvent
+
+export interface Boolean_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Boolean_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests ForwardValue 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "ForwardValue",
+        "parameters": Array [
+          Object {
+            "name": "arg",
+            "type": "ForwardValue",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, ForwardValue, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface ForwardValueForwardValueEventParameters {
+  readonly arg: ForwardValue;
+}
+export interface ForwardValueForwardValueEvent extends Event<'ForwardValue', ForwardValueForwardValueEventParameters> {}
+export type ForwardValueEvent = ForwardValueForwardValueEvent
+
+export interface ForwardValueSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValueEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ForwardValueEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, ForwardValueEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests ForwardValue_default 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "ForwardValue_default",
+        "parameters": Array [
+          Object {
+            "default": Object {
+              "type": "sender",
+            },
+            "name": "arg",
+            "type": "ForwardValue",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, ForwardValue, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface ForwardValue_defaultForwardValueDefaultEventParameters {
+  readonly arg: ForwardValue;
+}
+export interface ForwardValue_defaultForwardValueDefaultEvent extends Event<'ForwardValue_default', ForwardValue_defaultForwardValueDefaultEventParameters> {}
+export type ForwardValue_defaultEvent = ForwardValue_defaultForwardValueDefaultEvent
+
+export interface ForwardValue_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_defaultEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ForwardValue_defaultEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, ForwardValue_defaultEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests ForwardValue_default_rest 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "ForwardValue_default_rest",
+        "parameters": Array [
+          Object {
+            "default": Object {
+              "type": "sender",
+            },
+            "name": "arg",
+            "rest": true,
+            "type": "ForwardValue",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, ForwardValue, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface ForwardValue_default_restForwardValueDefaultRestEventParameters {
+  readonly arg: ForwardValue;
+}
+export interface ForwardValue_default_restForwardValueDefaultRestEvent extends Event<'ForwardValue_default_rest', ForwardValue_default_restForwardValueDefaultRestEventParameters> {}
+export type ForwardValue_default_restEvent = ForwardValue_default_restForwardValueDefaultRestEvent
+
+export interface ForwardValue_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_default_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ForwardValue_default_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, ForwardValue_default_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests ForwardValue_rest 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "ForwardValue_rest",
+        "parameters": Array [
+          Object {
+            "name": "arg",
+            "rest": true,
+            "type": "ForwardValue",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, ForwardValue, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface ForwardValue_restForwardValueRestEventParameters {
+  readonly arg: ForwardValue;
+}
+export interface ForwardValue_restForwardValueRestEvent extends Event<'ForwardValue_rest', ForwardValue_restForwardValueRestEventParameters> {}
+export type ForwardValue_restEvent = ForwardValue_restForwardValueRestEvent
+
+export interface ForwardValue_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ForwardValue_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, ForwardValue_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Integer 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Integer",
+        "parameters": Array [
+          Object {
+            "decimals": 4,
+            "name": "arg",
+            "type": "Integer",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
+
+
+export interface IntegerIntegerEventParameters {
+  readonly arg: BigNumber;
+}
+export interface IntegerIntegerEvent extends Event<'Integer', IntegerIntegerEventParameters> {}
+export type IntegerEvent = IntegerIntegerEvent
+
+export interface IntegerSmartContract<TClient extends Client = Client> extends SmartContract<TClient, IntegerEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, IntegerEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, IntegerEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Integer_default 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Integer_default",
+        "parameters": Array [
+          Object {
+            "decimals": 4,
+            "default": Object {
+              "type": "sender",
+            },
+            "name": "arg",
+            "type": "Integer",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
+
+
+export interface Integer_defaultIntegerDefaultEventParameters {
+  readonly arg: BigNumber;
+}
+export interface Integer_defaultIntegerDefaultEvent extends Event<'Integer_default', Integer_defaultIntegerDefaultEventParameters> {}
+export type Integer_defaultEvent = Integer_defaultIntegerDefaultEvent
+
+export interface Integer_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_defaultEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Integer_defaultEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Integer_defaultEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Integer_default_rest 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Integer_default_rest",
+        "parameters": Array [
+          Object {
+            "decimals": 4,
+            "default": Object {
+              "type": "sender",
+            },
+            "name": "arg",
+            "rest": true,
+            "type": "Integer",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
+
+
+export interface Integer_default_restIntegerDefaultRestEventParameters {
+  readonly arg: BigNumber;
+}
+export interface Integer_default_restIntegerDefaultRestEvent extends Event<'Integer_default_rest', Integer_default_restIntegerDefaultRestEventParameters> {}
+export type Integer_default_restEvent = Integer_default_restIntegerDefaultRestEvent
+
+export interface Integer_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_default_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Integer_default_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Integer_default_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Integer_rest 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Integer_rest",
+        "parameters": Array [
+          Object {
+            "decimals": 4,
+            "name": "arg",
+            "rest": true,
+            "type": "Integer",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
+
+
+export interface Integer_restIntegerRestEventParameters {
+  readonly arg: BigNumber;
+}
+export interface Integer_restIntegerRestEvent extends Event<'Integer_rest', Integer_restIntegerRestEventParameters> {}
+export type Integer_restEvent = Integer_restIntegerRestEvent
+
+export interface Integer_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Integer_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Integer_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Map 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Map",
+        "parameters": Array [
+          Object {
+            "key": Object {
+              "decimals": 0,
+              "type": "Integer",
+            },
+            "name": "arg",
+            "type": "Map",
+            "value": Object {
+              "type": "Boolean",
+            },
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
+
+
+export interface MapMapEventParameters {
+  readonly arg: Map<BigNumber, boolean>;
+}
+export interface MapMapEvent extends Event<'Map', MapMapEventParameters> {}
+export type MapEvent = MapMapEvent
+
+export interface MapSmartContract<TClient extends Client = Client> extends SmartContract<TClient, MapEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, MapEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, MapEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Map_default 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Map_default",
+        "parameters": Array [
+          Object {
+            "default": Object {
+              "type": "sender",
+            },
+            "key": Object {
+              "decimals": 0,
+              "type": "Integer",
+            },
+            "name": "arg",
+            "type": "Map",
+            "value": Object {
+              "type": "Boolean",
+            },
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
+
+
+export interface Map_defaultMapDefaultEventParameters {
+  readonly arg: Map<BigNumber, boolean>;
+}
+export interface Map_defaultMapDefaultEvent extends Event<'Map_default', Map_defaultMapDefaultEventParameters> {}
+export type Map_defaultEvent = Map_defaultMapDefaultEvent
+
+export interface Map_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_defaultEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Map_defaultEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Map_defaultEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Map_default_rest 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Map_default_rest",
+        "parameters": Array [
+          Object {
+            "default": Object {
+              "type": "sender",
+            },
+            "key": Object {
+              "decimals": 0,
+              "type": "Integer",
+            },
+            "name": "arg",
+            "rest": true,
+            "type": "Map",
+            "value": Object {
+              "type": "Boolean",
+            },
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
+
+
+export interface Map_default_restMapDefaultRestEventParameters {
+  readonly arg: Map<BigNumber, boolean>;
+}
+export interface Map_default_restMapDefaultRestEvent extends Event<'Map_default_rest', Map_default_restMapDefaultRestEventParameters> {}
+export type Map_default_restEvent = Map_default_restMapDefaultRestEvent
+
+export interface Map_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_default_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Map_default_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Map_default_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Map_rest 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Map_rest",
+        "parameters": Array [
+          Object {
+            "key": Object {
+              "decimals": 0,
+              "type": "Integer",
+            },
+            "name": "arg",
+            "rest": true,
+            "type": "Map",
+            "value": Object {
+              "type": "Boolean",
+            },
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
+
+
+export interface Map_restMapRestEventParameters {
+  readonly arg: Map<BigNumber, boolean>;
+}
+export interface Map_restMapRestEvent extends Event<'Map_rest', Map_restMapRestEventParameters> {}
+export type Map_restEvent = Map_restMapRestEvent
+
+export interface Map_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Map_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Map_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Object 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Object",
+        "parameters": Array [
+          Object {
+            "name": "arg",
+            "properties": Object {
+              "property": Object {
+                "type": "Boolean",
+              },
+            },
+            "type": "Object",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface ObjectObjectEventParameters {
+  readonly arg: {
+      readonly 'property': boolean
+    };
+}
+export interface ObjectObjectEvent extends Event<'Object', ObjectObjectEventParameters> {}
+export type ObjectEvent = ObjectObjectEvent
+
+export interface ObjectSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ObjectEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ObjectEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, ObjectEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Object_default 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Object_default",
+        "parameters": Array [
+          Object {
+            "default": Object {
+              "type": "sender",
+            },
+            "name": "arg",
+            "properties": Object {
+              "property": Object {
+                "type": "Boolean",
+              },
+            },
+            "type": "Object",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface Object_defaultObjectDefaultEventParameters {
+  readonly arg: {
+      readonly 'property': boolean
+    };
+}
+export interface Object_defaultObjectDefaultEvent extends Event<'Object_default', Object_defaultObjectDefaultEventParameters> {}
+export type Object_defaultEvent = Object_defaultObjectDefaultEvent
+
+export interface Object_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_defaultEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Object_defaultEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Object_defaultEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Object_default_rest 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Object_default_rest",
+        "parameters": Array [
+          Object {
+            "default": Object {
+              "type": "sender",
+            },
+            "name": "arg",
+            "properties": Object {
+              "property": Object {
+                "type": "Boolean",
+              },
+            },
+            "rest": true,
+            "type": "Object",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface Object_default_restObjectDefaultRestEventParameters {
+  readonly arg: {
+      readonly 'property': boolean
+    };
+}
+export interface Object_default_restObjectDefaultRestEvent extends Event<'Object_default_rest', Object_default_restObjectDefaultRestEventParameters> {}
+export type Object_default_restEvent = Object_default_restObjectDefaultRestEvent
+
+export interface Object_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_default_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Object_default_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Object_default_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;
+
+exports[`ABIEvent Tests Object_rest 1`] = `
+Object {
+  "inputABI": Object {
+    "events": Array [
+      Object {
+        "name": "Object_rest",
+        "parameters": Array [
+          Object {
+            "name": "arg",
+            "properties": Object {
+              "property": Object {
+                "type": "Boolean",
+              },
+            },
+            "rest": true,
+            "type": "Object",
+          },
+        ],
+      },
+    ],
+    "functions": Array [
+      Object {
+        "name": "foo",
+        "returnType": Object {
+          "type": "Boolean",
+        },
+      },
+    ],
+  },
+  "types": Object {
+    "ts": "import { Client, Event, GetOptions, InvocationTransaction, InvokeReceipt, SmartContract, TransactionOptions, TransactionResult } from '@neo-one/client';
+
+
+export interface Object_restObjectRestEventParameters {
+  readonly arg: {
+      readonly 'property': boolean
+    };
+}
+export interface Object_restObjectRestEvent extends Event<'Object_rest', Object_restObjectRestEventParameters> {}
+export type Object_restEvent = Object_restObjectRestEvent
+
+export interface Object_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_restEvent> {
+  readonly foo: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Object_restEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Object_restEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+",
+  },
+}
+`;

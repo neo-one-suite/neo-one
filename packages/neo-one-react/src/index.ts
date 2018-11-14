@@ -1,4 +1,3 @@
 /// <reference types="@neo-one/types" />
-export { DeveloperTools } from './DeveloperTools';
-export * from './FromStream';
-export { Button, theme } from './one';
+// tslint:disable-next-line export-name
+export { FromStream } from './FromStream';

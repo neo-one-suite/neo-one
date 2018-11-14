@@ -6,18 +6,19 @@ export function getImportClause(node: ts.ImportDeclaration): ts.ImportClause | u
   return utils.getValueOrUndefined(node.importClause);
 }
 
-export function getNamespaceImport(node: ts.ImportDeclaration): ts.Identifier | undefined {
+export function getNamespaceImport(node: ts.ImportDeclaration): ts.NamespaceImport | undefined {
   const clause = getImportClause(node);
   if (clause === undefined) {
     return undefined;
   }
 
-  const namespaceImport = node_.getFirstDescendantByKind(node, ts.SyntaxKind.NamespaceImport);
-  if (namespaceImport === undefined) {
-    return undefined;
-  }
+  return node_.getFirstDescendantByKind(node, ts.SyntaxKind.NamespaceImport);
+}
 
-  return node_.getFirstDescendantByKind(node, ts.SyntaxKind.Identifier);
+export function getNamespaceImportIdentifier(node: ts.ImportDeclaration): ts.Identifier | undefined {
+  return getNamespaceImport(node) === undefined
+    ? undefined
+    : node_.getFirstDescendantByKind(node, ts.SyntaxKind.Identifier);
 }
 
 export function getDefaultImport(node: ts.ImportDeclaration): ts.Identifier | undefined {
@@ -41,7 +42,8 @@ export function getNamedImports(node: ts.ImportDeclaration): ReadonlyArray<ts.Im
     return [];
   }
 
-  const namedImports = node_.getFirstChildByKind<ts.NamedImports>(clause, ts.SyntaxKind.NamedImports);
+  const namedImports =
+    clause.namedBindings === undefined || !ts.isNamedImports(clause.namedBindings) ? undefined : clause.namedBindings;
   if (namedImports === undefined) {
     return [];
   }

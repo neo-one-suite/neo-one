@@ -106,6 +106,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
           set: throwInnerTypeError,
           setStorage: throwInnerTypeError,
           error: throwInnerTypeError,
+          forwardValue: throwInnerTypeError,
           iteratorResult: throwInnerTypeError,
           iterable: throwInnerTypeError,
           iterableIterator: throwInnerTypeError,
@@ -294,6 +295,56 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
       return createHandleProp(handleString, handleNumber, handleSymbol);
     };
 
+    const createProcessBuffer = () => {
+      const handleNumberBase = (innerInnerOptions: VisitOptions) => {
+        if (optionsIn.pushValue) {
+          // [val]
+          sb.emitHelper(expr, innerInnerOptions, sb.helpers.getBufferIndex);
+        } else {
+          // [objectVal]
+          sb.emitOp(expr, 'DROP');
+          // []
+          sb.emitOp(expr, 'DROP');
+        }
+      };
+
+      const handleString = (innerInnerOptions: VisitOptions) => {
+        // [string, objectVal]
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapString);
+        sb.emitHelper(
+          expr,
+          innerInnerOptions,
+          sb.helpers.case(getValueCases('Buffer', false), () => {
+            // [stringVal, objectVal]
+            sb.emitHelper(prop, innerInnerOptions, sb.helpers.wrapString);
+            // [number, objectVal]
+            sb.emitHelper(prop, innerInnerOptions, sb.helpers.toNumber({ type: propType, knownType: Types.String }));
+            handleNumberBase(innerInnerOptions);
+          }),
+        );
+      };
+
+      const handleNumber = (innerInnerOptions: VisitOptions) => {
+        // [number, objectVal]
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapNumber);
+        handleNumberBase(innerInnerOptions);
+      };
+
+      const handleSymbol = (innerInnerOptions: VisitOptions) => {
+        // [string, objectVal]
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapSymbol);
+        sb.emitHelper(
+          expr,
+          innerInnerOptions,
+          sb.helpers.case(getValueCases('Buffer', true), () => {
+            throwInnerTypeError(innerInnerOptions);
+          }),
+        );
+      };
+
+      return createHandleProp(handleString, handleNumber, handleSymbol);
+    };
+
     const processObject = (innerOptions: VisitOptions) => {
       const handleStringBase = (innerInnerOptions: VisitOptions) => {
         if (optionsIn.pushValue && optionsIn.setValue) {
@@ -389,6 +440,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
           set: throwInnerTypeError,
           setStorage: throwInnerTypeError,
           error: throwInnerTypeError,
+          forwardValue: throwInnerTypeError,
           iteratorResult: throwInnerTypeError,
           iterable: throwInnerTypeError,
           iterableIterator: throwInnerTypeError,
@@ -416,7 +468,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
         array: createProcessArray(),
         arrayStorage: createProcessArrayStorage(),
         boolean: createProcessBuiltin('Boolean'),
-        buffer: createProcessBuiltin('Buffer'),
+        buffer: createProcessBuffer(),
         null: throwTypeError,
         number: createProcessBuiltin('Number'),
         object: processObject,
@@ -428,6 +480,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
         set: createProcessBuiltin('Set'),
         setStorage: createProcessBuiltin('SetStorage'),
         error: createProcessBuiltin('Error'),
+        forwardValue: createProcessBuiltin('ForwardValue'),
         iteratorResult: createProcessBuiltin('IteratorResult'),
         iterable: createProcessBuiltin('Iterable'),
         iterableIterator: createProcessBuiltin('IterableIterator'),

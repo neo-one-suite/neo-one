@@ -72,6 +72,14 @@ export function getAliasSymbol(type: ts.Type): ts.Symbol | undefined {
   return utils.getValueOrUndefined(type.aliasSymbol);
 }
 
+export function getAliasTypeArguments(type: ts.Type): ReadonlyArray<ts.Type> | undefined {
+  return utils.getValueOrUndefined(type.aliasTypeArguments);
+}
+
+export function getAliasTypeArgumentsArray(type: ts.Type): ReadonlyArray<ts.Type> {
+  return utils.getArray(getAliasTypeArguments(type));
+}
+
 export function getSymbolOrThrow(type: ts.Type): ts.Symbol {
   return utils.throwIfNullOrUndefined(getSymbol(type), 'symbol');
 }
@@ -92,6 +100,10 @@ function getDefaultTypeFormatFlags(node?: ts.Node): ts.TypeFormatFlags {
 
 export function getProperties(type: ts.Type): ReadonlyArray<ts.Symbol> {
   return type.getProperties();
+}
+
+export function getConstructSignatures(type: ts.Type): ReadonlyArray<ts.Signature> {
+  return type.getConstructSignatures();
 }
 
 export function getProperty(type: ts.Type, name: string): ts.Symbol | undefined {
@@ -189,6 +201,10 @@ export function getTupleElements(type: ts.Type): ReadonlyArray<ts.Type> | undefi
 
 export function getTypeArguments(type: ts.Type): ReadonlyArray<ts.Type> | undefined {
   return isTypeReference(type) ? utils.getValueOrUndefined(type.typeArguments) : undefined;
+}
+
+export function getTypeArgumentsArray(type: ts.Type): ReadonlyArray<ts.Type> {
+  return utils.getArray(getTypeArguments(type));
 }
 
 export function getTypeArgumentsOrThrow(type: ts.Type): ReadonlyArray<ts.Type> {

@@ -1,7 +1,11 @@
+import { UInt256 } from '@neo-one/client-common';
 import {
   Account,
+  AccountUnclaimed,
+  AccountUnspent,
   Asset,
   Block,
+  BlockData,
   BlockKey,
   Contract,
   deserializeActionWire,
@@ -11,16 +15,13 @@ import {
   HeaderKey,
   InvocationData,
   Output,
+  Storage,
   StorageItem,
   TransactionData,
-  UInt256,
   Validator,
-} from '@neo-one/client-core';
-import { AccountUnclaimed, AccountUnspent, BlockData, Storage, ValidatorsCount } from '@neo-one/node-core';
+  ValidatorsCount,
+} from '@neo-one/node-core';
 import { keys } from '@neo-one/node-storage-common';
-// tslint:disable-next-line no-implicit-dependencies
-import { AbstractBatch } from 'abstract-leveldown';
-// tslint:disable-next-line no-implicit-dependencies
 import { LevelUp } from 'levelup';
 import * as common from './common';
 import { convertChange } from './convertChange';
@@ -39,7 +40,7 @@ export const levelUpStorage = ({
     if (typeof hash === 'number') {
       try {
         const result = await db.get(keys.serializeHeaderIndexHashKey(hash));
-        hash = common.deserializeHeaderHash(result);
+        hash = common.deserializeHeaderHash(result as Buffer);
       } catch (error) {
         if (error.notFound) {
           throw new KeyNotFoundError(`${hash}`);
@@ -281,7 +282,8 @@ export const levelUpStorage = ({
     },
     async commit(changeSet): Promise<void> {
       const changesList = changeSet.map(convertChange);
-      const changes = changesList.reduce<AbstractBatch[]>((acc, converted) => {
+      // tslint:disable-next-line readonly-array no-any
+      const changes = changesList.reduce<any[]>((acc, converted) => {
         // tslint:disable-next-line no-array-mutation
         acc.push(...converted);
 
@@ -290,8 +292,8 @@ export const levelUpStorage = ({
       await db.batch(changes);
     },
     async reset(): Promise<void> {
-      // tslint:disable-next-line readonly-array
-      const batch: AbstractBatch[] = [];
+      // tslint:disable-next-line readonly-array no-any
+      const batch: any[] = [];
       await new Promise<void>((resolve, reject) => {
         db.createKeyStream()
           .on('data', (key: Buffer) => {

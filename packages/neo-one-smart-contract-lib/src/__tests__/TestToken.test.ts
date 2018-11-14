@@ -1,4 +1,4 @@
-import { InvokeReceipt, TransactionResult } from '@neo-one/client';
+import { InvokeReceipt, TransactionResult } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import * as path from 'path';
 import { testToken } from '../__data__';
@@ -10,7 +10,7 @@ describe('TestToken', () => {
       filePath: path.resolve(__dirname, '..', '__data__', 'contracts', 'TestToken.ts'),
       smartContractName: 'testToken',
       symbol: 'TT',
-      decimals: 4,
+      decimals: 8,
       deploy: async ({ masterAccountID, smartContract }) =>
         smartContract.deploy(masterAccountID.address, {
           from: masterAccountID,
@@ -18,7 +18,7 @@ describe('TestToken', () => {
       issueValue: new BigNumber('100'),
       transferValue: new BigNumber('10'),
       description: 'The TestToken',
-      payable: true,
+      payable: false,
     });
   });
 });

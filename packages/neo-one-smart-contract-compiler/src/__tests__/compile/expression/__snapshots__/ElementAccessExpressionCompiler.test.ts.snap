@@ -13,6 +13,19 @@ exports[`ElementAccessExpressionCompiler [0, 1, 2]["idx"] 1`] = `
 "
 `;
 
+exports[`ElementAccessExpressionCompiler Buffer.from([0, 1, 2])["idx"] 1`] = `
+"snippetCode.ts (3,9): Element implicitly has an 'any' type because index expression is not of type 'number'.
+
+      1 | 
+      2 |       const x = Buffer.from('000102', 'hex');
+    > 3 |       x['0'];
+        |         ^
+      4 |       const length: string = 'length' as string;
+      5 |       x[length];
+      6 |     
+"
+`;
+
 exports[`ElementAccessExpressionCompiler Object["keys"] 1`] = `
 "snippetCode.ts (4,7): Cannot find name 'assertEqual'.
 
@@ -21,16 +34,5 @@ exports[`ElementAccessExpressionCompiler Object["keys"] 1`] = `
     > 4 |       assertEqual(x !== undefined, true);
         |       ^
       5 |     
-"
-`;
-
-exports[`ElementAccessExpressionCompiler buffer["idx"] 1`] = `
-"snippetCode.ts (3,7): Element implicitly has an 'any' type because type 'Buffer' has no index signature.
-
-      1 | 
-      2 |       const x = Buffer.from('3030', 'hex');
-    > 3 |       x[1];
-        |       ^
-      4 |     
 "
 `;

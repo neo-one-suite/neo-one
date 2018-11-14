@@ -1,15 +1,14 @@
 {
   "name": "@neo-one/ts-utils",
-  "version": "1.0.0-alpha.44",
+  "version": "1.0.1",
   "description": "NEO•ONE TypeScript utils.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/types": "^1.0.0-alpha.43",
-    "@types/commondir": "^1.0.0",
-    "@types/lodash": "^4.14.116",
-    "commondir": "^1.0.1",
-    "lodash": "^4.17.10",
+    "@neo-one/types": "^1.0.1",
+    "@types/lodash": "^4.14.118",
+    "lodash": "^4.17.11",
     "source-map": "^0.7.3",
-    "typescript": "^3.0.3"
-  }
+    "typescript": "3.2.0-dev.20181110"
+  },
+  "sideEffects": false
 }

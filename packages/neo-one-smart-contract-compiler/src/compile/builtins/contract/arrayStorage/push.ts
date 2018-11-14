@@ -8,7 +8,7 @@ import { CallMemberLikeExpression } from '../../types';
 
 // tslint:disable-next-line export-name
 export class ArrayStoragePush extends BuiltinInstanceMemberCall {
-  public canCall(_sb: ScriptBuilder, _func: CallMemberLikeExpression, _node: ts.CallExpression): boolean {
+  public canCall(): boolean {
     return true;
   }
 

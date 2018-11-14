@@ -76,20 +76,22 @@ export class ArrReduceFuncHelper extends Helper {
           // [idx, size, arr, callable, accum]
           sb.emitOp(node, 'INC');
         },
+        cleanup: () => {
+          // [size, arr, callable, accum]
+          sb.emitOp(node, 'DROP');
+          // [arr, callable, accum]
+          sb.emitOp(node, 'DROP');
+          // [callable, accum]
+          sb.emitOp(node, 'DROP');
+          // [accum]
+          sb.emitOp(node, 'DROP');
+
+          if (!optionsIn.pushValue) {
+            // []
+            sb.emitOp(node, 'DROP');
+          }
+        },
       }),
     );
-    // [size, arr, callable, accum]
-    sb.emitOp(node, 'DROP');
-    // [arr, callable, accum]
-    sb.emitOp(node, 'DROP');
-    // [callable, accum]
-    sb.emitOp(node, 'DROP');
-    // [accum]
-    sb.emitOp(node, 'DROP');
-
-    if (!optionsIn.pushValue) {
-      // []
-      sb.emitOp(node, 'DROP');
-    }
   }
 }

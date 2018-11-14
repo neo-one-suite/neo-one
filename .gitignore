@@ -4,6 +4,7 @@
 # Build output folders
 /dist/
 /build/
+/tmp
 /packages/*/lib
 /packages/*/dist
 /packages/*/dist-ts
@@ -11,9 +12,17 @@
 /reports
 .nyc_output
 .awcache
+.cache-loader
 
 # Playground
 /packages/neo-one-playground
+
+/packages/neo-one-website/tmp
+/packages/neo-one-website/build
+/packages/neo-one-website/dist
+/packages/neo-one-website/publicOut
+/packages/neo-one-website/.awcache
+/packages/neo-one-website/.cache-loader
 
 # Logs
 logs
@@ -65,3 +74,6 @@ flow-coverage/
 # Cypress
 cypress/videos
 cypress/screenshots
+
+# netlify
+.netlify

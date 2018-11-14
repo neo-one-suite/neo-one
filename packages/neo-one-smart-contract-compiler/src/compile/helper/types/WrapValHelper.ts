@@ -38,6 +38,9 @@ export class WrapValHelper extends Helper {
       case Types.Error:
         sb.emitHelper(node, options, sb.helpers.wrapError);
         break;
+      case Types.ForwardValue:
+        sb.emitHelper(node, options, sb.helpers.wrapForwardValue);
+        break;
       case Types.Input:
         sb.emitHelper(node, options, sb.helpers.wrapInput);
         break;

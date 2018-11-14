@@ -122,6 +122,7 @@ export class PropertyAccessExpressionCompiler extends NodeCompiler<ts.PropertyAc
         set: createProcessBuiltin('Set'),
         setStorage: createProcessBuiltin('SetStorage'),
         error: createProcessBuiltin('Error'),
+        forwardValue: createProcessBuiltin('ForwardValue'),
         iteratorResult: createProcessBuiltin('IteratorResult'),
         iterable: createProcessBuiltin('Iterable'),
         iterableIterator: createProcessBuiltin('IterableIterator'),

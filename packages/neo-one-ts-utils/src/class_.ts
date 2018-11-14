@@ -121,6 +121,16 @@ export function getInstanceMethods(
   return getInstanceMembers(node).filter(ts.isMethodDeclaration);
 }
 
+export function getMethods(node: ts.ClassDeclaration | ts.ClassExpression): ReadonlyArray<ts.MethodDeclaration> {
+  return getMembers(node).filter(ts.isMethodDeclaration);
+}
+
+export function getSetAccessors(
+  node: ts.ClassDeclaration | ts.ClassExpression,
+): ReadonlyArray<ts.SetAccessorDeclaration> {
+  return getMembers(node).filter(ts.isSetAccessor);
+}
+
 export function getInstanceMethod(
   node: ts.ClassDeclaration | ts.ClassExpression,
   name: string,
@@ -293,22 +303,90 @@ export function getImplementors(
   return getImplementorsWorker(program, languageService, node);
 }
 
-export function getBaseTypes(typeChecker: ts.TypeChecker, node: ts.ClassDeclaration): ReadonlyArray<ts.Type> {
+function getExtendorsWorker(
+  program: ts.Program,
+  languageService: ts.LanguageService,
+  node: ts.ClassDeclaration,
+  seen = new Set<ts.ClassDeclaration>(),
+): ReadonlyArray<ts.ClassDeclaration> {
+  if (seen.has(node)) {
+    return [];
+  }
+
+  return reference
+    .findReferencesAsNodes(program, languageService, node)
+    .reduce<ReadonlyArray<ts.ClassDeclaration>>((acc, ref) => {
+      const parent = node_.getParent(ref) as ts.Node | undefined;
+      if (parent === undefined) {
+        return acc;
+      }
+
+      const clause = node_.getParent(parent) as ts.Node | undefined;
+      if (clause === undefined || !ts.isHeritageClause(clause) || !heritage.isExtends(clause)) {
+        return acc;
+      }
+
+      const derived: ts.ClassDeclaration | undefined = node_.getFirstAncestorByTestOrThrow(
+        clause,
+        ts.isClassDeclaration,
+      );
+
+      return acc.concat(getImplementorsWorker(program, languageService, derived, seen));
+    }, [])
+    .concat(ts.isClassDeclaration(node) ? [node] : []);
+}
+
+export function getExtendors(
+  program: ts.Program,
+  languageService: ts.LanguageService,
+  node: ts.ClassDeclaration,
+): ReadonlyArray<ts.ClassDeclaration> {
+  return getExtendorsWorker(program, languageService, node);
+}
+
+export function getBaseTypes(
+  typeChecker: ts.TypeChecker,
+  node: ts.ClassDeclaration | ts.ClassExpression | ts.InterfaceDeclaration,
+): ReadonlyArray<ts.Type> {
   return type_.getBaseTypesArray(type_.getType(typeChecker, node));
 }
 
-export function getBaseClass(typeChecker: ts.TypeChecker, node: ts.ClassDeclaration): ts.ClassDeclaration | undefined {
-  const baseTypes = _.flatMap(
-    getBaseTypes(typeChecker, node).map(
-      (type) => (type_.isIntersection(type) ? type_.getIntersectionTypesArray(type) : [type]),
-    ),
-  );
-  const declarations = baseTypes
+export function getBaseTypesFlattened(
+  typeChecker: ts.TypeChecker,
+  node: ts.ClassDeclaration | ts.ClassExpression | ts.InterfaceDeclaration,
+): ReadonlyArray<ts.Type> {
+  function getBaseTypesWorker(type: ts.Type): ReadonlyArray<ts.Type> {
+    if (type_.isIntersection(type)) {
+      return _.flatten(type_.getIntersectionTypesArray(type).map(getBaseTypesWorker));
+    }
+
+    const baseTypes = type_.getBaseTypesArray(type);
+
+    return [type].concat(_.flatten(baseTypes.map(getBaseTypesWorker)));
+  }
+
+  return _.flatten(getBaseTypes(typeChecker, node).map(getBaseTypesWorker));
+}
+
+export function getBaseClasses(
+  typeChecker: ts.TypeChecker,
+  node: ts.ClassDeclaration | ts.ClassExpression,
+): ReadonlyArray<ts.ClassDeclaration> {
+  const baseTypes = getBaseTypesFlattened(typeChecker, node);
+
+  return baseTypes
     .map((type) => type_.getSymbol(type))
     .filter(utils.notNull)
     .map((symbol) => symbol_.getDeclarations(symbol))
     .reduce<ReadonlyArray<ts.Declaration>>((a, b) => a.concat(b), [])
     .filter(ts.isClassDeclaration);
+}
+
+export function getBaseClass(
+  typeChecker: ts.TypeChecker,
+  node: ts.ClassDeclaration | ts.ClassExpression,
+): ts.ClassDeclaration | undefined {
+  const declarations = getBaseClasses(typeChecker, node);
 
   return declarations.length === 1 ? declarations[0] : undefined;
 }

@@ -1,0 +1,28 @@
+{
+  "title": "Reactive Updates",
+  "files": [
+    {
+      "initial": "src/utils.ts",
+      "solution": "src/utils.solution.ts"
+    },
+    {
+      "solution": "src/__tests__/utils.test.ts"
+    },
+    {
+      "initial": "src/ICO.tsx",
+      "solution": "src/ICO.tsx"
+    },
+    {
+      "solution": "src/index.tsx"
+    },
+    {
+      "solution": "one/contracts/Token.one.ts"
+    },
+    {
+      "solution": "public/index.html"
+    },
+    {
+      "solution": "package.json"
+    }
+  ]
+}

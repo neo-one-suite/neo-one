@@ -1,18 +1,7 @@
 const base = require('./base');
 
 module.exports = {
-  ...base({
-    babel: {
-      plugins: [
-        'babel-plugin-dynamic-import-node',
-        '@babel/plugin-syntax-dynamic-import',
-        '@babel/plugin-syntax-optional-catch-binding',
-        '@babel/plugin-syntax-numeric-separator',
-        'babel-plugin-jest-hoist',
-      ],
-    },
-    path: 'test',
-  }),
+  ...base({ path: 'test' }),
   displayName: 'unit',
   testRegex: '^.*/__tests__/.*\\.test\\.tsx?$',
   modulePathIgnorePatterns: ['<rootDir>/dist/.*'],

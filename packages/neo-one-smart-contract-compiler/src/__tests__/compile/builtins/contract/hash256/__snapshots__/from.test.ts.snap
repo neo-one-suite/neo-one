@@ -22,6 +22,17 @@ exports[`Hash256.from cannot be element referenced 1`] = `
 "
 `;
 
+exports[`Hash256.from cannot be referenced - object literal 1`] = `
+"snippetCode.ts (3,15): Builtin properties cannot be referenced
+
+      1 | 
+      2 |       import { Hash256 } from '@neo-one/smart-contract';
+    > 3 |       const { from } = Hash256;
+        |               ^
+      4 |     
+"
+`;
+
 exports[`Hash256.from cannot be referenced 1`] = `
 "snippetCode.ts (3,28): Builtin properties cannot be referenced
 

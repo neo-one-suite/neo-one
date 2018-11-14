@@ -13,7 +13,9 @@
   ],
   "linterOptions": {
     "exclude": [
-      "./packages/*/package.json"
+      "./packages/*/package.json",
+      "./packages/*/template/**/*.ts",
+      "./packages/*/template/**/*.tsx"
     ]
   },
   "rules": {
@@ -132,17 +134,17 @@
     "promise-must-complete": true,
     "use-named-parameter": true,
     "no-unused-expression": [true, "allow-fast-null-checks"],
-    "readonly-keyword": [true, "ignore-local", {"ignore-prefix": ["mutable", "this.mutable"] }],
-    "readonly-array": [true, "ignore-local", {"ignore-prefix": ["mutable", "this.mutable"] }],
+    "readonly-keyword": [true, "ignore-local", {"ignore-prefix": ["mutable", "this.mutable", "draft"] }],
+    "readonly-array": [true, "ignore-local", {"ignore-prefix": ["mutable", "this.mutable", "draft"] }],
     "no-let": [true, "ignore-local"],
-    "no-array-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "ctx.mutable"] }],
-    "no-object-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "app.proxy", "app.silent", "ctx."] }],
+    "no-array-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "ctx.mutable", "draft"] }],
+    "no-object-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "app.proxy", "app.silent", "ctx.", "draft", "$el"] }],
     "no-method-signature": true,
     "no-loop-statement": true,
     "no-accessor-recursion": true,
     "no-collapsible-if": true,
     "no-unnecessary-else": true,
-    "no-unnecessary-type-annotation": true,
+    "no-unnecessary-type-annotation": false,
     "no-unused": [true, "unused-function-expression-name", "unused-class-expression-name", "unused-catch-binding"],
     "no-var-before-return": true,
     "prefer-while": true,
@@ -166,6 +168,6 @@
     "use-primitive-type": true,
     "no-map-without-usage": true,
     "rxjs-finnish": true,
-    "rxjs-no-ignored-error": true
+    "rxjs-no-ignored-error": false
   }
 }

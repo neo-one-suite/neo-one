@@ -1,0 +1,1541 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Transfer - Complete Send - Optional ForwardValues all 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - Complete Send - Optional ForwardValues all-allOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {
+    "events": Array [
+      Object {
+        "name": "event",
+        "parameters": Array [],
+      },
+    ],
+  },
+  "hash": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+    Object {
+      "from": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+      },
+    },
+    Object {
+      "events": Array [
+        Object {
+          "name": "event",
+          "parameters": Array [],
+        },
+      ],
+    },
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - Complete Send - Optional ForwardValues all-transOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+    Object {
+      "from": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+      },
+    },
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - Complete Send - Optional ForwardValues base 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - No Forward Values base 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - No Forward Values base-transOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "from": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+      },
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - No Function Options all 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+    true,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - No Function Options all-allOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {
+    "events": Array [
+      Object {
+        "name": "event",
+        "parameters": Array [],
+      },
+    ],
+  },
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "from": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+      },
+    },
+    Object {
+      "events": Array [
+        Object {
+          "name": "event",
+          "parameters": Array [],
+        },
+      ],
+    },
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - No Function Options all-forwardOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {
+    "events": Array [
+      Object {
+        "name": "event",
+        "parameters": Array [],
+      },
+    ],
+  },
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "events": Array [
+        Object {
+          "name": "event",
+          "parameters": Array [],
+        },
+      ],
+    },
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - No Function Options all-transOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "from": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+      },
+    },
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - No Function Options base 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - No Rest, No ForwardValue all 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    false,
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    false,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      false,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - No Rest, No ForwardValue all-transOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "from": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+      },
+    },
+    false,
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    false,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      false,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - No Rest, No ForwardValue base 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    undefined,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      undefined,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - No Rest, No ForwardValue base-transOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "from": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+      },
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    undefined,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      undefined,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - Other Rest Param all 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    true,
+    false,
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+    false,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+    Array [
+      "approveArgs",
+      false,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - Other Rest Param all-transOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "from": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+      },
+    },
+    true,
+    false,
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+    false,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+    Array [
+      "approveArgs",
+      false,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - Other Rest Param base 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - Send - Optional ForwardValue base 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "amount": "10",
+      "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    },
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+    true,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+  ],
+  "transfer": Object {
+    "amount": "10",
+    "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+    "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  },
+}
+`;
+
+exports[`Transfer - Send - Optional ForwardValue base-noForwardValues 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "amount": "10",
+      "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+  ],
+  "transfer": Object {
+    "amount": "10",
+    "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+    "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  },
+}
+`;
+
+exports[`Transfer - Send - Optional ForwardValue base-noForwardValues-transOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "amount": "10",
+      "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    },
+    Object {
+      "from": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+      },
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+  ],
+  "transfer": Object {
+    "amount": "10",
+    "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+    "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  },
+}
+`;
+
+exports[`Transfer - Send - Optional ForwardValue base-transOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {
+    "events": Array [
+      Object {
+        "name": "event",
+        "parameters": Array [],
+      },
+    ],
+  },
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "amount": "10",
+      "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    },
+    Object {
+      "events": Array [
+        Object {
+          "name": "event",
+          "parameters": Array [],
+        },
+      ],
+    },
+    Object {
+      "from": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+      },
+    },
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+    true,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+  ],
+  "transfer": Object {
+    "amount": "10",
+    "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+    "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  },
+}
+`;
+
+exports[`Transfer - SendUnsafe&Receive all 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - SendUnsafe&Receive all-FVOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {
+    "events": Array [
+      Object {
+        "name": "event",
+        "parameters": Array [],
+      },
+    ],
+  },
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "events": Array [
+        Object {
+          "name": "event",
+          "parameters": Array [],
+        },
+      ],
+    },
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - SendUnsafe&Receive all-WithOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "from": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+      },
+      "sendFrom": Array [
+        Object {
+          "amount": "10",
+          "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+          "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        },
+      ],
+      "sendTo": Array [
+        Object {
+          "amount": "5",
+          "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        },
+      ],
+    },
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+    "sendFrom": Array [
+      Object {
+        "amount": "10",
+        "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+        "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      },
+    ],
+    "sendTo": Array [
+      Object {
+        "amount": "5",
+        "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      },
+    ],
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - SendUnsafe&Receive all-allOptions 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {
+    "events": Array [
+      Object {
+        "name": "event",
+        "parameters": Array [],
+      },
+    ],
+  },
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+    Object {
+      "from": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+      },
+      "sendFrom": Array [
+        Object {
+          "amount": "10",
+          "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+          "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        },
+      ],
+      "sendTo": Array [
+        Object {
+          "amount": "5",
+          "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        },
+      ],
+    },
+    Object {
+      "events": Array [
+        Object {
+          "name": "event",
+          "parameters": Array [],
+        },
+      ],
+    },
+    Object {
+      "converted": true,
+      "name": "foo",
+      "param": true,
+    },
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+    "sendFrom": Array [
+      Object {
+        "amount": "10",
+        "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+        "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      },
+    ],
+    "sendTo": Array [
+      Object {
+        "amount": "5",
+        "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      },
+    ],
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+    true,
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+    Array [
+      "approveArgs",
+      true,
+    ],
+  ],
+  "transfer": undefined,
+}
+`;
+
+exports[`Transfer - SendUnsafe&Receive base 1`] = `
+Object {
+  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+  "forwardOptions": Object {},
+  "hash": undefined,
+  "inputArgs": Array [
+    true,
+    true,
+    "1",
+  ],
+  "network": "main",
+  "options": Object {
+    "from": Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  },
+  "params": Array [
+    true,
+    true,
+    "1",
+  ],
+  "paramsZipped": Array [
+    Array [
+      "from",
+      true,
+    ],
+    Array [
+      "to",
+      true,
+    ],
+    Array [
+      "amount",
+      "1",
+    ],
+  ],
+  "transfer": undefined,
+}
+`;

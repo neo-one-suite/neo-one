@@ -85,13 +85,15 @@ export class ArrMapFuncHelper extends Helper {
           // [size, idx, callable, ...arr]
           sb.emitOp(node, 'ROT');
         },
+        cleanup: () => {
+          // [size, callable, ...arr]
+          sb.emitOp(node, 'NIP');
+          // [size, ...arr]
+          sb.emitOp(node, 'NIP');
+          // [arr]
+          sb.emitOp(node, 'PACK');
+        },
       }),
     );
-    // [size, callable, ...arr]
-    sb.emitOp(node, 'NIP');
-    // [size, ...arr]
-    sb.emitOp(node, 'NIP');
-    // [arr]
-    sb.emitOp(node, 'PACK');
   }
 }

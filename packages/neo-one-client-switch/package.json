@@ -1,19 +1,27 @@
 {
   "name": "@neo-one/client-switch",
-  "version": "1.0.0-alpha.88",
+  "version": "1.0.1",
   "description": "NEO•ONE client library for browser/node differences.",
   "main": "./src/index.ts",
   "browser": "./src/index.browser.ts",
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
-    "@neo-one/client-core": "^1.0.0-alpha.74",
-    "@neo-one/node-vm": "^1.0.0-alpha.76",
-    "@neo-one/types": "^1.0.0-alpha.43",
-    "@neo-one/utils": "^1.0.0-alpha.63",
+    "@ledgerhq/hw-transport-u2f": "4.28.0",
+    "@neo-one/client-common": "^1.0.1",
+    "@neo-one/node-vm": "^1.0.1",
+    "@neo-one/types": "^1.0.1",
+    "@neo-one/utils": "^1.0.1",
     "@types/babel__code-frame": "^7.0.0",
-    "@types/lodash": "^4.14.116",
-    "lodash": "^4.17.10",
+    "@types/ledgerhq__hw-transport": "^4.21.0",
+    "@types/ledgerhq__hw-transport-node-hid": "^4.22.0",
+    "@types/ledgerhq__hw-transport-u2f": "^4.21.0",
+    "@types/lodash": "^4.14.118",
+    "lodash": "^4.17.11",
     "source-map": "^0.7.3",
     "tslib": "^1.9.3"
-  }
+  },
+  "optionalDependencies": {
+    "@ledgerhq/hw-transport-node-hid": "4.24.0"
+  },
+  "sideEffects": false
 }

@@ -1,4 +1,5 @@
-import { Asset, AssetType, common, crypto, ScriptBuilder } from '@neo-one/client-core';
+import { common, crypto, ScriptBuilder } from '@neo-one/client-common';
+import { Asset, AssetType } from '@neo-one/node-core';
 
 const ONE_HUNDRED_MILLION = common.fixed8FromDecimal(100000000);
 

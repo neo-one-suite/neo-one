@@ -18,6 +18,7 @@ export abstract class BuiltinInstanceMemberValue implements BuiltinInstanceMembe
   public emitValue(sb: ScriptBuilder, node: MemberLikeExpression, options: VisitOptions, visited = false): void {
     if (!this.canSet && options.setValue) {
       if (!this.isReadonly) {
+        /* istanbul ignore next */
         sb.context.reportError(node, DiagnosticCode.InvalidBuiltinModify, DiagnosticMessage.CannotModifyBuiltin);
       }
 
@@ -30,7 +31,6 @@ export abstract class BuiltinInstanceMemberValue implements BuiltinInstanceMembe
     }
 
     if (!this.canSet && !options.pushValue) {
-      /* istanbul ignore next */
       sb.emitOp(node, 'DROP');
 
       return;

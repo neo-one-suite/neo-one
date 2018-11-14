@@ -1,10 +1,11 @@
 import { AddChange, Change, DeleteChange } from '@neo-one/node-core';
 import { keys } from '@neo-one/node-storage-common';
 import { utils } from '@neo-one/utils';
-// tslint:disable-next-line no-implicit-dependencies
-import { AbstractBatch } from 'abstract-leveldown';
 import * as common from './common';
 import { UnknownChangeTypeError, UnknownTypeError } from './errors';
+
+// tslint:disable-next-line no-any
+type AbstractBatch = any;
 
 const convertAddChange = (changeIn: AddChange): ReadonlyArray<AbstractBatch> => {
   const change = changeIn;

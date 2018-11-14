@@ -1,4 +1,4 @@
-import { ContractParameter, InteropInterfaceContractParameter } from '@neo-one/client-core';
+import { ContractParameter, InteropInterfaceContractParameter } from '@neo-one/node-core';
 import { InvalidValueBufferError, UnsupportedStackItemSerdeError } from './errors';
 import { StackItemBase } from './StackItemBase';
 
@@ -24,6 +24,7 @@ export class ObjectStackItem<Value> extends StackItemBase {
 
   // tslint:disable-next-line no-any
   protected toJSONInternal(): any {
+    /* istanbul ignore next */
     return JSON.stringify(this.value);
   }
 

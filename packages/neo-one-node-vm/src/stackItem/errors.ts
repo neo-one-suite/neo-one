@@ -23,6 +23,10 @@ export const InvalidValueTransactionError = makeErrorWithCode(
   'INVALID_VALUE_TRANSACTION',
   () => 'Invalid Value. Expected Transaction',
 );
+export const InvalidValueWitnessError = makeErrorWithCode(
+  'INVALID_VALUE_WITNESS',
+  () => 'Invalid Value. Expected Witness',
+);
 export const InvalidValueAttributeError = makeErrorWithCode(
   'INVALID_VALUE_ATTRIBUTE',
   () => 'Invalid Value. Expected Attribute',
@@ -59,6 +63,7 @@ export const InvalidValueIteratorError = makeErrorWithCode(
 );
 export const InvalidValueStorageContextStackItemError = makeErrorWithCode(
   'INVALID_VALUE_STORAGE_CONTEXT_STACK_ITEM',
+  /* istanbul ignore next */
   () => 'Invalid Value. Expected StorageContextStackItem',
 );
 export const UnsupportedStackItemSerdeError = makeErrorWithCode(
@@ -67,14 +72,18 @@ export const UnsupportedStackItemSerdeError = makeErrorWithCode(
 );
 export const InvalidStorageStackItemEnumeratorError = makeErrorWithCode(
   'INVALID_STORAGE_STACK_ITEM_ENUMERATOR',
-  () => 'Current is not set. The enumerator has been fully consumed or has not ' + 'been initialized',
+  () => 'Current is not set. The enumerator has been fully consumed or has not been initialized',
 );
 export const InvalidStorageStackItemIteratorError = makeErrorWithCode(
   'INVALID_STORAGE_STACK_ITEM_ITERATOR',
-  () => 'Current is not set. The iterator has been fully consumed or has not ' + 'been initialized',
+  () => 'Current is not set. The iterator has been fully consumed or has not been initialized',
 );
 export const MissingStackItemKeyError = makeErrorWithCode('MISSING_STACK_ITEM_KEY', () => 'Map does not contain key.');
 export const InvalidRecursiveSerializeError = makeErrorWithCode(
   'INVALID_RECURSIVE_SERIALIZE',
   () => 'Attempted to serialize a recursive structure.',
+);
+export const IntegerTooLargeError = makeErrorWithCode(
+  'INTEGER_TOO_LARGE',
+  () => 'Integer too large. Max size is 256 bits.',
 );

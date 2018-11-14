@@ -1,4 +1,4 @@
-import { AttributeUsage } from '@neo-one/client-core';
+import { AttributeUsageModel as AttributeUsage } from '@neo-one/client-common';
 import { BuiltinBase } from '../BuiltinBase';
 import { BuiltinConstantNumberMemberValue } from '../BuiltinConstantNumberMemberValue';
 import { Builtins } from '../Builtins';

@@ -21,6 +21,7 @@ import { TransactionStackItem } from './TransactionStackItem';
 import { UInt160StackItem } from './UInt160StackItem';
 import { UInt256StackItem } from './UInt256StackItem';
 import { ValidatorStackItem } from './ValidatorStackItem';
+import { WitnessStackItem } from './WitnessStackItem';
 
 export type StackItem =
   | ArrayStackItem
@@ -45,4 +46,5 @@ export type StackItem =
   | ValidatorStackItem
   | StorageContextStackItem
   | ECPointStackItem
-  | StructStackItem;
+  | StructStackItem
+  | WitnessStackItem;

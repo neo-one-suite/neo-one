@@ -1,14 +1,12 @@
 import {
-  BinaryReader,
   BinaryWriter,
   common,
   createSerializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
   SerializableWire,
   SerializeWire,
   UInt256,
-} from '@neo-one/client-core';
+} from '@neo-one/client-common';
+import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions } from '@neo-one/node-core';
 export interface GetBlocksPayloadAdd {
   readonly hashStart: ReadonlyArray<UInt256>;
   readonly hashStop?: UInt256;

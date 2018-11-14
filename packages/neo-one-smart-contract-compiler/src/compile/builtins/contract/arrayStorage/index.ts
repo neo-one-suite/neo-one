@@ -13,6 +13,8 @@ import { ArrayStoragePush } from './push';
 
 class ArrayStorageInterface extends BuiltinInterface {}
 class ArrayStorageValue extends BuiltinInstanceOf {
+  public readonly type = 'ArrayStorageConstructor';
+
   public emitInstanceOf(sb: ScriptBuilder, node: ts.Expression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [val]

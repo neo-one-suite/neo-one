@@ -11,7 +11,7 @@ class HeaderConstructorInterface extends BuiltinInterface {}
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
   builtins.addContractInterface('Header', new HeaderInterface());
-  builtins.addContractValue('Header', new ValueInstanceOf((sb) => sb.helpers.isHeader));
+  builtins.addContractValue('Header', new ValueInstanceOf('HeaderConstructor', (sb) => sb.helpers.isHeader));
   builtins.addContractMember(
     'Header',
     'hash',

@@ -1,35 +1,35 @@
+import { common, crypto, ECPoint, ScriptBuilder, UInt160, VMState } from '@neo-one/client-common';
+import { metrics, Monitor } from '@neo-one/monitor';
 import {
   Action,
   Block,
+  Blockchain as BlockchainType,
   CallReceipt,
-  common,
   ConsensusPayload,
-  crypto,
-  ECPoint,
   Header,
   Input,
   InvocationTransaction,
   LogAction,
   NotificationAction,
+  NULL_ACTION,
   Output,
   OutputKey,
-  ScriptBuilder,
   ScriptContainerType,
   SerializableInvocationData,
   Settings,
+  Storage,
   Transaction,
-  TransactionBase,
   TransactionData,
-  UInt160,
+  TriggerType,
   utils,
   Validator,
   VerifyScriptOptions,
-  VMState,
-} from '@neo-one/client-core';
-import { metrics, Monitor } from '@neo-one/monitor';
-import { Blockchain as BlockchainType, NULL_ACTION, Storage, TriggerType, VM } from '@neo-one/node-core';
+  VerifyScriptResult,
+  VerifyTransactionResult,
+  VM,
+} from '@neo-one/node-core';
 import { labels, utils as commonUtils } from '@neo-one/utils';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import PriorityQueue from 'js-priority-queue';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { toArray } from 'rxjs/operators';
@@ -38,7 +38,6 @@ import {
   CoinUnspentError,
   GenesisBlockNotRegisteredError,
   InvalidClaimError,
-  ScriptVerifyError,
   UnknownVerifyError,
   WitnessVerifyError,
 } from './errors';
@@ -426,9 +425,9 @@ export class Blockchain {
     readonly monitor?: Monitor;
     readonly transaction: Transaction;
     readonly memPool?: ReadonlyArray<Transaction>;
-  }): Promise<void> {
+  }): Promise<VerifyTransactionResult> {
     try {
-      await this.getMonitor(monitor)
+      const verifications = await this.getMonitor(monitor)
         .withData({ [labels.NEO_TRANSACTION_HASH]: transaction.hashHex })
         .captureSpan(
           async (span) =>
@@ -451,6 +450,8 @@ export class Blockchain {
 
           { name: 'neo_blockchain_verify_transaction' },
         );
+
+      return { verifications };
     } catch (error) {
       if (error.code === undefined || typeof error.code !== 'string' || !error.code.includes('VERIFY')) {
         throw new UnknownVerifyError(error.message);
@@ -512,6 +513,9 @@ export class Blockchain {
         action: NULL_ACTION,
         gas: transaction.gas,
         skipWitnessVerify: true,
+        vmFeatures: {
+          structClone: this.settings.features.structClone <= this.currentBlockIndex,
+        },
       }),
     );
 
@@ -668,7 +672,7 @@ export class Blockchain {
   private readonly verifyScript = async (
     { scriptContainer, hash, witness }: VerifyScriptOptions,
     monitor: Monitor,
-  ): Promise<void> => {
+  ): Promise<VerifyScriptResult> => {
     let { verification } = witness;
     if (verification.length === 0) {
       const builder = new ScriptBuilder();
@@ -679,7 +683,9 @@ export class Blockchain {
     }
 
     const blockchain = this.createWriteBlockchain();
-    const result = await this.vm.executeScripts({
+    const mutableActions: Action[] = [];
+    let globalActionIndex = new BN(0);
+    const executeResult = await this.vm.executeScripts({
       monitor: this.getMonitor(monitor),
       scripts: [{ code: witness.invocation }, { code: verification }],
       blockchain,
@@ -687,26 +693,61 @@ export class Blockchain {
       triggerType: TriggerType.Verification,
       action: NULL_ACTION,
       gas: utils.ONE_HUNDRED_MILLION,
-    });
+      listeners: {
+        onLog: ({ message, scriptHash }) => {
+          mutableActions.push(
+            new LogAction({
+              index: globalActionIndex,
+              scriptHash,
+              message,
+            }),
+          );
 
-    const { stack, state, errorMessage } = result;
+          globalActionIndex = globalActionIndex.add(utils.ONE);
+        },
+        onNotify: ({ args, scriptHash }) => {
+          mutableActions.push(
+            new NotificationAction({
+              index: globalActionIndex,
+              scriptHash,
+              args,
+            }),
+          );
+
+          globalActionIndex = globalActionIndex.add(utils.ONE);
+        },
+      },
+      vmFeatures: {
+        structClone: this.settings.features.structClone <= this.currentBlockIndex,
+      },
+    });
+    const result = { actions: mutableActions, hash, witness };
+
+    const { stack, state, errorMessage } = executeResult;
     if (state === VMState.Fault) {
-      throw new ScriptVerifyError(
-        errorMessage === undefined ? 'Script execution ended in a FAULT state' : errorMessage,
-      );
+      return {
+        ...result,
+        failureMessage: errorMessage === undefined ? 'Script execution ended in a FAULT state' : errorMessage,
+      };
     }
 
     if (stack.length !== 1) {
-      throw new ScriptVerifyError(
-        `Verification did not return one result. This may be a bug in the ` +
-          `smart contract. Found ${stack.length} results.`,
-      );
+      return {
+        ...result,
+        failureMessage:
+          `Verification did not return one result. This may be a bug in the ` +
+          `smart contract compiler or the smart contract itself. If you are using the NEO•ONE compiler please file an issue. Found ${
+            stack.length
+          } results.`,
+      };
     }
 
     const top = stack[0];
     if (!top.asBoolean()) {
-      throw new ScriptVerifyError('Verification did not succeed.');
+      return { ...result, failureMessage: 'Verification did not succeed.' };
     }
+
+    return result;
   };
 
   private readonly tryGetInvocationData = async (
@@ -744,7 +785,7 @@ export class Blockchain {
       actions,
     };
   };
-  private readonly tryGetTransactionData = async (transaction: TransactionBase): Promise<TransactionData | undefined> =>
+  private readonly tryGetTransactionData = async (transaction: Transaction): Promise<TransactionData | undefined> =>
     this.transactionData.tryGet({ hash: transaction.hash });
   private readonly getUnclaimed = async (hash: UInt160): Promise<ReadonlyArray<Input>> =>
     this.accountUnclaimed

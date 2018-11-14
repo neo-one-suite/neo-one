@@ -1,7 +1,7 @@
 import { Types } from '../../constants';
-import { BuiltinBase } from '../BuiltinBase';
 import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
+import { BuiltinValueObject } from '../BuiltinValueObject';
 import { SysCallInstanceMemberArray } from './SysCallInstanceMemberArray';
 import { SysCallInstanceMemberPrimitive } from './SysCallInstanceMemberPrimitive';
 import { ValueFor } from './ValueFor';
@@ -9,7 +9,9 @@ import { ValueInstanceOf } from './ValueInstanceOf';
 
 class TransactionBaseInterface extends BuiltinInterface {}
 class TransactionBaseConstructorInterface extends BuiltinInterface {}
-class TransactionValue extends BuiltinBase {}
+class TransactionValue extends BuiltinValueObject {
+  public readonly type = 'TransactionConstructor';
+}
 class TransactionConstructorInterface extends BuiltinInterface {}
 class MinerTransactionInterface extends BuiltinInterface {}
 class IssueTransactionInterface extends BuiltinInterface {}
@@ -24,7 +26,10 @@ class InvocationTransactionInterface extends BuiltinInterface {}
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
   builtins.addContractInterface('TransactionBase', new TransactionBaseInterface());
-  builtins.addContractValue('TransactionBase', new ValueInstanceOf((sb) => sb.helpers.isTransaction));
+  builtins.addContractValue(
+    'TransactionBase',
+    new ValueInstanceOf('TransactionBaseConstructor', (sb) => sb.helpers.isTransaction),
+  );
   builtins.addContractInterface('TransactionBaseConstructor', new TransactionBaseConstructorInterface());
   builtins.addContractMember(
     'TransactionBase',

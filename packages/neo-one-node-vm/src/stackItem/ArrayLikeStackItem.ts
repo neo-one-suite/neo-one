@@ -1,5 +1,6 @@
 // tslint:disable readonly-array
-import { ArrayContractParameter, BinaryWriter, ContractParameter } from '@neo-one/client-core';
+import { BinaryWriter } from '@neo-one/client-common';
+import { ArrayContractParameter, ContractParameter } from '@neo-one/node-core';
 import { CircularReferenceError, InvalidValueBufferError } from './errors';
 import { StackItem } from './StackItem';
 import { StackItemBase } from './StackItemBase';
@@ -42,6 +43,14 @@ export class ArrayLikeStackItem extends StackItemBase {
 
   public get size(): number {
     return this.value.length;
+  }
+
+  protected incrementInternal(seen: Set<StackItemBase>): number {
+    return this.incrementInternalArray(this.value, seen);
+  }
+
+  protected decrementInternal(seen: Set<StackItemBase>): number {
+    return this.decrementInternalArray(this.value, seen);
   }
 
   // tslint:disable-next-line no-any

@@ -1,4 +1,4 @@
-import { Validator } from '@neo-one/client-core';
+import { Validator } from '@neo-one/node-core';
 import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 
 export class ValidatorStackItem extends EquatableKeyStackItem<Validator> {

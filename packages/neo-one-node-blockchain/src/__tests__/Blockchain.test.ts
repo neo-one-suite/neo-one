@@ -1,14 +1,13 @@
 // tslint:disable no-any no-object-mutation
+import { common, utils } from '@neo-one/client-common';
+import { DefaultMonitor } from '@neo-one/monitor';
 import {
   AttributeUsage,
   BooleanContractParameter,
-  common,
   InvocationTransaction,
   UInt160Attribute,
-  utils,
   Witness,
-} from '@neo-one/client-core';
-import { DefaultMonitor } from '@neo-one/monitor';
+} from '@neo-one/node-core';
 import { of as _of } from 'rxjs';
 import { settings } from '../__data__';
 import { Blockchain } from '../Blockchain';
@@ -127,35 +126,29 @@ describe('Blockchain', () => {
         stack: [new BooleanContractParameter(false)],
       }));
 
-      let error;
-      try {
-        await blockchain.verifyTransaction({
-          transaction: new InvocationTransaction({
-            script: Buffer.alloc(1, 0),
-            gas: utils.ZERO,
-            attributes: [
-              new UInt160Attribute({
-                usage: AttributeUsage.Script,
-                value: common.ZERO_UINT160,
-              }),
-            ],
+      const result = await blockchain.verifyTransaction({
+        transaction: new InvocationTransaction({
+          script: Buffer.alloc(1, 0),
+          gas: utils.ZERO,
+          attributes: [
+            new UInt160Attribute({
+              usage: AttributeUsage.Script,
+              value: common.ZERO_UINT160,
+            }),
+          ],
 
-            scripts: [
-              new Witness({
-                invocation: Buffer.alloc(0, 0),
-                verification: Buffer.alloc(0, 0),
-              }),
-            ],
-          }),
-        });
-      } catch (err) {
-        error = err;
-      }
-
-      expect(error).toBeDefined();
-      if (error != undefined) {
-        expect(error.code).toEqual('SCRIPT_VERIFY');
-        expect(error.message).toEqual('Verification did not succeed.');
+          scripts: [
+            new Witness({
+              invocation: Buffer.alloc(0, 0),
+              verification: Buffer.alloc(0, 0),
+            }),
+          ],
+        }),
+      });
+      const verifyResult = result.verifications.find(({ failureMessage }) => failureMessage !== undefined);
+      expect(verifyResult).toBeDefined();
+      if (verifyResult !== undefined) {
+        expect(verifyResult.failureMessage).toEqual('Verification did not succeed.');
       }
     });
   });

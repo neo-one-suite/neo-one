@@ -67,11 +67,13 @@ export class IterableIteratorForEachHelper extends Helper {
           // [argsarr, callable]
           this.each(sb.noPushValueOptions(innerOptions));
         },
+        cleanup: () => {
+          // [callable]
+          sb.emitOp(node, 'DROP');
+          // []
+          sb.emitOp(node, 'DROP');
+        },
       }),
     );
-    // [callable]
-    sb.emitOp(node, 'DROP');
-    // []
-    sb.emitOp(node, 'DROP');
   }
 }

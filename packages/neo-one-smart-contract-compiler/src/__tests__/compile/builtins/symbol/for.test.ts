@@ -29,4 +29,13 @@ describe('Symbol.for', () => {
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
+
+  test('cannot be referenced - object literal', async () => {
+    helpers.compileString(
+      `
+      const { for } = Symbol;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
 });

@@ -1,10 +1,13 @@
-import { format } from 'prettier';
+// tslint:disable no-submodule-imports
+import parser from 'prettier/parser-typescript';
+import prettier from 'prettier/standalone';
 import { FileResult } from './type';
 
 const formatSingleFile = (value: string) =>
-  `// tslint:disable\n/* eslint-disable */\n${format(value, {
+  `// tslint:disable\n/* eslint-disable */\n${prettier.format(value, {
     arrowParens: 'always',
     parser: 'typescript',
+    plugins: [parser],
     printWidth: 120,
     singleQuote: true,
     trailingComma: 'all',

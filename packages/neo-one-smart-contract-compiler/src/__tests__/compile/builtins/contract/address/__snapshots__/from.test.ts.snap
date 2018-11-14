@@ -22,6 +22,17 @@ exports[`Address.from cannot be element referenced 1`] = `
 "
 `;
 
+exports[`Address.from cannot be referenced - object literal 1`] = `
+"snippetCode.ts (3,15): Builtin properties cannot be referenced
+
+      1 | 
+      2 |       import { Address } from '@neo-one/smart-contract';
+    > 3 |       const { from } = Address;
+        |               ^
+      4 |     
+"
+`;
+
 exports[`Address.from cannot be referenced 1`] = `
 "snippetCode.ts (3,28): Builtin properties cannot be referenced
 

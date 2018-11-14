@@ -9,7 +9,6 @@ export class BlueToken extends SimpleToken {
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'The BlueToken',
-    payable: true,
   };
 
   public constructor(owner: Address, amount: Fixed<8>) {

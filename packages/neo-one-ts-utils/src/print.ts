@@ -1,4 +1,3 @@
-import commondir from 'commondir';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import * as file_ from './file';
@@ -7,7 +6,11 @@ interface Result {
   readonly text: string;
   readonly sourceMap: RawSourceMap;
 }
-export const print = (programIn: ts.Program, original: ts.SourceFile, file: ts.SourceFile): Result => {
+export const printBundle = (
+  programIn: ts.Program,
+  files: ReadonlyArray<ts.SourceFile>,
+  substituteNode: (hint: ts.EmitHint, node: ts.Node) => ts.Node,
+): Result => {
   // tslint:disable-next-line no-any
   const program: any = programIn;
   // tslint:disable-next-line no-any
@@ -29,31 +32,34 @@ export const print = (programIn: ts.Program, original: ts.SourceFile, file: ts.S
     fileExists: ts.sys.fileExists,
     directoryExists: ts.sys.directoryExists,
   };
-  const writer = compiler.createTextWriter('\n');
-  const sourceMap = compiler.createSourceMapWriter(host, writer, {
-    ...program.getCompilerOptions(),
-    sourceRoot: commondir([...programIn.getRootFileNames()]),
-    sourceMap: true,
-  });
-  sourceMap.initialize(file.fileName, `${file.fileName}.map`);
-
+  const writer = compiler.createTextWriter(ts.sys.newLine);
+  const sourceMapGenerator = compiler.createSourceMapGenerator(
+    host,
+    'foo.ts',
+    program.getCurrentDirectory(),
+    program.getCurrentDirectory(),
+    {},
+  );
   const printer = compiler.createPrinter(
-    { ...program.getCompilerOptions() },
+    { ...program.getCompilerOptions(), outFile: 'foo.ts' },
     {
-      onEmitSourceMapOfNode: sourceMap.emitNodeWithSourceMap,
-      onEmitSourceMapOfToken: sourceMap.emitTokenWithSourceMap,
-      onEmitSourceMapOfPosition: sourceMap.emitPos,
-      onSetSourceFile: sourceMap.setSourceFile,
+      substituteNode,
     },
   );
 
-  printer.writeFile(file, writer);
+  printer.writeBundle(ts.createBundle(files), undefined, writer, sourceMapGenerator);
+
+  const resolvedSourceMap: RawSourceMap = sourceMapGenerator.toJSON();
 
   return {
     text: writer.getText(),
     sourceMap: {
-      ...JSON.parse(sourceMap.getText()),
-      sourcesContent: [original.getFullText()],
+      ...resolvedSourceMap,
+      sourcesContent: resolvedSourceMap.sources.map((filePath) => {
+        const foundFile = files.find((file) => file_.getFilePath(file).endsWith(filePath));
+
+        return foundFile === undefined ? '' : file_.getText(foundFile);
+      }),
     },
   };
 };
@@ -68,9 +74,9 @@ export const markOriginal = <T extends ts.Node>(node: T): T => {
 export const setOriginal = <T extends ts.Node>(node: T, original: ts.Node): T => {
   // tslint:disable-next-line no-any
   if (!(node as any).__originalSet) {
-    const transformedNode = ts.setSourceMapRange(
-      ts.setOriginalNode(node, original),
-      file_.createSourceMapRange(original),
+    const transformedNode = ts.moveSyntheticComments(
+      ts.setSourceMapRange(ts.setOriginalNode(node, original), file_.createSourceMapRange(original)),
+      original,
     );
 
     // tslint:disable-next-line no-any no-object-mutation
@@ -81,6 +87,9 @@ export const setOriginal = <T extends ts.Node>(node: T, original: ts.Node): T =>
 
   return node;
 };
+
+// tslint:disable-next-line no-any
+export const isOriginal = (node: ts.Node): boolean => !(node as any).__originalSet;
 
 const context: ts.TransformationContext = {
   // tslint:disable-next-line no-any

@@ -1,19 +1,15 @@
+import { common as clientCommon, crypto, Op, ScriptBuilder, UInt160 } from '@neo-one/client-common';
 import {
   AssetType,
   Block,
-  common as clientCommon,
-  crypto,
   IssueTransaction,
   MinerTransaction,
-  Op,
   Output,
   RegisterTransaction,
-  ScriptBuilder,
-  UInt160,
   Witness,
-} from '@neo-one/client-core';
+} from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 
 export const GENERATION_AMOUNT: ReadonlyArray<number> = [
   8,

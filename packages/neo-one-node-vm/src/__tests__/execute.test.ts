@@ -1,22 +1,19 @@
 // tslint:disable no-any no-let no-object-mutation no-empty
-// wallaby.skip
+import { common, crypto, ScriptBuilder, UInt160, utils, VMState } from '@neo-one/client-common';
+import { DefaultMonitor } from '@neo-one/monitor';
 import {
-  common,
-  crypto,
+  ExecuteScriptsResult,
   Input,
   InvocationTransaction,
+  NULL_ACTION,
   Output,
-  ScriptBuilder,
   ScriptContainerType,
-  UInt160,
+  TriggerType,
   UInt160Attribute,
   UInt256Attribute,
-  utils,
-  VMState,
-} from '@neo-one/client-core';
-import { DefaultMonitor } from '@neo-one/monitor';
-import { ExecuteScriptsResult, NULL_ACTION, TriggerType, VMListeners } from '@neo-one/node-core';
-import { BN } from 'bn.js';
+  VMListeners,
+} from '@neo-one/node-core';
+import BN from 'bn.js';
 import _ from 'lodash';
 import { assets, createBlockchain, testUtils, transactions } from '../__data__';
 import { execute } from '../execute';
@@ -55,6 +52,9 @@ const executeSimple = async ({
     skipWitnessVerify: skipWitnessVerify === undefined ? true : skipWitnessVerify,
     persistingBlock,
     listeners,
+    vmFeatures: {
+      structClone: false,
+    },
   });
 
 const neoBN = (value: string) => new BN(value, 10).mul(utils.ONE_HUNDRED_MILLION);
@@ -133,7 +133,7 @@ describe('execute', () => {
   });
 
   const testKYC = (name: string, gas: BN, state: number) => {
-    it(name, async () => {
+    test(name, async () => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve(transactions.kycContract));
 
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
@@ -170,7 +170,7 @@ describe('execute', () => {
 
   testKYC('should not fail kyc transaction with sufficient gas', common.ONE_HUNDRED_MILLION_FIXED8, VMState.Halt);
 
-  it.skip('should refund on mintTokens with insufficient presale', async () => {
+  test('should refund on mintTokens with insufficient presale', async () => {
     blockchain.contract.get = jest.fn(async () => Promise.resolve(transactions.kycContract));
 
     blockchain.storageItem.tryGet = jest.fn(async (item) => {
@@ -301,7 +301,7 @@ describe('execute', () => {
     const addToWhitelist = async (address: UInt160) =>
       executeSetupScript(new ScriptBuilder().emitAppCall(conciergeContract.hash, 'addToWhitelist', address).build());
 
-    it('should add to storage in deploy', async () => {
+    test('should add to storage in deploy', async () => {
       const ret = await conciergeDeploy();
 
       testUtils.verifyBlockchainSnapshot(blockchain);
@@ -319,7 +319,7 @@ describe('execute', () => {
       testUtils.verifyListeners(listeners);
     });
 
-    it('should fail on multiple deploy', async () => {
+    test('should fail on multiple deploy', async () => {
       let ret = await conciergeDeploy();
       expect(ret.asBoolean()).toBeTruthy();
 
@@ -335,7 +335,7 @@ describe('execute', () => {
         mockBlockchain();
       });
 
-      it('should fail without a sender', async () => {
+      test('should fail without a sender', async () => {
         await conciergeDeploy();
 
         const result = await executeSimple({
@@ -354,7 +354,7 @@ describe('execute', () => {
           mockBlockchain();
         });
 
-        it('when whitelist sale period and not whitelisted', async () => {
+        test('when whitelist sale period and not whitelisted', async () => {
           await conciergeDeploy();
 
           const result = await executeSimple({
@@ -369,7 +369,7 @@ describe('execute', () => {
           testUtils.verifyListeners(listeners);
         });
 
-        it('when whitelist sale period and not whitelisted real world', async () => {
+        test('when whitelist sale period and not whitelisted real world', async () => {
           blockchain.output.get = jest.fn(async () =>
             Promise.resolve(
               new Output({
@@ -413,7 +413,7 @@ describe('execute', () => {
           testUtils.verifyListeners(listeners);
         });
 
-        it('when whitelist sale period and rate not set', async () => {
+        test('when whitelist sale period and rate not set', async () => {
           await conciergeDeploy();
           await addToWhitelist(conciergeSenderAddress);
 
@@ -429,7 +429,7 @@ describe('execute', () => {
           testUtils.verifyListeners(listeners);
         });
 
-        it('when pre sale sale period and rate not set', async () => {
+        test('when pre sale sale period and rate not set', async () => {
           await conciergeDeploy();
 
           const result = await executeSimple({
@@ -445,7 +445,7 @@ describe('execute', () => {
         });
       });
 
-      it('should mint tokens during whitelist based on exchange rate', async () => {
+      test('should mint tokens during whitelist based on exchange rate', async () => {
         await conciergeDeploy();
         await addToWhitelist(conciergeSenderAddress);
         await setConciergeParam('setWhitelistSaleRate', '22');
@@ -464,7 +464,7 @@ describe('execute', () => {
         testUtils.verifyListeners(listeners);
       });
 
-      it('should mint tokens during pre sale based on exchange rate with max tokens', async () => {
+      test('should mint tokens during pre sale based on exchange rate with max tokens', async () => {
         await conciergeDeploy();
         await setConciergeParam('setPresaleWeek1Rate', '10');
         await setConciergeParam('setMaxPurchase', '5');
@@ -482,7 +482,7 @@ describe('execute', () => {
         testUtils.verifyListeners(listeners);
       });
 
-      it('should mint tokens during main sale based on exchange rate with total supply cap', async () => {
+      test('should mint tokens during main sale based on exchange rate with total supply cap', async () => {
         await conciergeDeploy();
         await setConciergeParam('setMainsaleWeek2Rate', '10');
         await setConciergeParam('setMaxPurchase', '10');
@@ -532,7 +532,7 @@ describe('execute', () => {
       };
 
       const testTransfer = ({ count, success, gas }: { count: number; success: boolean; gas?: string }) => {
-        it(`should ${success ? '' : 'not '}handle ${count} transfers${
+        test(`should ${success ? '' : 'not '}handle ${count} transfers${
           gas === undefined ? '' : ` with ${gas} gas`
         }`, async () => {
           await mintTokens();
@@ -954,7 +954,7 @@ describe('execute', () => {
     };
 
     describe('withdraw', () => {
-      it('should allow NEP5 Concierge withdrawals', async () => {
+      test('should allow NEP5 Concierge withdrawals', async () => {
         await deploy();
         await mintConciergeTokens();
         await whitelistConcierge();
@@ -968,7 +968,7 @@ describe('execute', () => {
         testUtils.verifyListeners(listeners);
       });
 
-      it('should allow NEP5 Switcheo withdrawals', async () => {
+      test('should allow NEP5 Switcheo withdrawals', async () => {
         await deploy();
         await mintSwitcheoTokens();
         await whitelistSwitcheo();
@@ -982,7 +982,7 @@ describe('execute', () => {
         testUtils.verifyListeners(listeners);
       });
 
-      it.skip('should allow withdrawing filled orders', async () => {
+      test('should allow withdrawing filled orders', async () => {
         await deploy();
 
         await whitelistConcierge();

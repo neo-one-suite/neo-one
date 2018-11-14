@@ -1,7 +1,5 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
-import { DiagnosticCode } from '../../../DiagnosticCode';
-import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import { InternalObjectProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
@@ -22,8 +20,6 @@ class CreateEventNotifier extends BuiltinCall {
 
     const arg = args[0];
     if (!ts.isStringLiteral(arg)) {
-      sb.context.reportError(node, DiagnosticCode.InvalidLiteral, DiagnosticMessage.EventNotifierArguments);
-
       return;
     }
 
@@ -44,23 +40,31 @@ class CreateEventNotifier extends BuiltinCall {
         body: (innerOptionsIn) => {
           const innerOptions = sb.pushValueOptions(innerOptionsIn);
 
-          // [...params]
+          // [params]
           sb.emitHelper(
             node,
             innerOptions,
             sb.helpers.parameters({
               params: paramDecls,
-              onStack: true,
-              map: (param, innerInnerOptions) => {
+              asArgsArr: true,
+              map: (param, innerInnerOptions, isRestElement) => {
+                let tpe = paramTypes.get(param);
+                if (type !== undefined && isRestElement) {
+                  tpe = tsUtils.type_.getArrayType(type);
+                }
                 // [value]
-                sb.emitHelper(node, innerInnerOptions, sb.helpers.unwrapValRecursive({ type: paramTypes.get(param) }));
+                sb.emitHelper(node, innerInnerOptions, sb.helpers.unwrapValRecursive({ type: tpe }));
               },
             }),
           );
-          // [eventName, ...params]
+          // [length, ...params]
+          sb.emitOp(node, 'UNPACK');
+          // [eventName, length, ...params]
           sb.emitPushString(node, eventName);
-          // [number, eventName, ...params]
-          sb.emitPushInt(node, paramDecls.length + 1);
+          // [length, eventName, ...params]
+          sb.emitOp(node, 'SWAP');
+          // [length, eventName, ...params]
+          sb.emitOp(node, 'INC');
           // [arr]
           sb.emitOp(node, 'PACK');
           // []

@@ -1,6 +1,7 @@
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
 import { Context } from '../../Context';
+import { ContractInfo } from '../../contract';
 import { Helper, Helpers } from '../helper';
 import { ResolvedScope } from '../scope';
 import { LinkedContracts } from '../types';
@@ -14,13 +15,22 @@ export interface EmittingScriptBuilderOptions {
   readonly helpers: Helpers;
   readonly linked: LinkedContracts;
   readonly allHelpers: ReadonlyArray<Helper>;
+  readonly contractInfo?: ContractInfo;
 }
 
 export class EmittingScriptBuilder extends BaseScriptBuilder<ResolvedScope> implements ScriptBuilder {
   private readonly scopes: Map<ts.Node, Map<number, ResolvedScope>>;
 
-  public constructor({ context, scopes, helpers, sourceFile, linked, allHelpers }: EmittingScriptBuilderOptions) {
-    super(context, helpers, sourceFile, linked, allHelpers);
+  public constructor({
+    context,
+    scopes,
+    helpers,
+    sourceFile,
+    linked,
+    contractInfo,
+    allHelpers,
+  }: EmittingScriptBuilderOptions) {
+    super(context, helpers, sourceFile, contractInfo, linked, allHelpers);
     this.scopes = scopes;
   }
 

@@ -1,5 +1,7 @@
 import { PropertyNamedNode, tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import { DiagnosticCode } from '../../DiagnosticCode';
+import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { InternalObjectProperty } from '../constants';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
@@ -9,6 +11,10 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
   public readonly kind = ts.SyntaxKind.ClassDeclaration;
 
   public visitNode(sb: ScriptBuilder, decl: ts.ClassDeclaration, optionsIn: VisitOptions): void {
+    if (sb.context.analysis.isSmartContract(decl)) {
+      return;
+    }
+
     let options = sb.pushValueOptions(sb.noSuperClassOptions(optionsIn));
     const name = sb.scope.add(tsUtils.node.getNameOrThrow(decl));
     const extendsExpr = tsUtils.class_.getExtends(decl);
@@ -78,6 +84,7 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
             set: throwTypeError,
             setStorage: throwTypeError,
             error: throwTypeError,
+            forwardValue: throwTypeError,
             iteratorResult: throwTypeError,
             iterable: throwTypeError,
             iterableIterator: throwTypeError,
@@ -238,19 +245,10 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
       addMethod(method);
     });
 
-    const verifySymbol = sb.context.builtins.getValueSymbol('verify');
-    const constantSymbol = sb.context.builtins.getValueSymbol('constant');
     tsUtils.class_.getConcreteMembers(decl).forEach((member) => {
-      const decorators =
-        ts.isMethodDeclaration(member) || ts.isGetAccessorDeclaration(member) || ts.isSetAccessorDeclaration(member)
-          ? tsUtils.decoratable.getDecoratorsArray(member).filter((decorator) => {
-              const decoratorSymbol = sb.context.analysis.getSymbol(tsUtils.expression.getExpression(decorator));
-
-              return decoratorSymbol !== verifySymbol && decoratorSymbol !== constantSymbol;
-            })
-          : tsUtils.decoratable.getDecoratorsArray(member);
+      const decorators = tsUtils.decoratable.getDecoratorsArray(member);
       if (decorators.length > 0) {
-        sb.context.reportUnsupported(decorators[0]);
+        sb.context.reportError(decorators[0], DiagnosticCode.UnsupportedSyntax, DiagnosticMessage.UnsupportedDecorator);
       }
     });
 

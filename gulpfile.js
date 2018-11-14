@@ -18,6 +18,10 @@ const through2 = require('through2');
 const typescript = require('typescript');
 const pkg = require('./package.json');
 
+const rollup = require('rollup');
+const rollupString = require('rollup-plugin-string');
+const rollupTypescript = require('rollup-plugin-typescript2');
+
 const FORMATS = [
   {
     main: true,
@@ -34,6 +38,7 @@ const FORMATS = [
   dist: main ? 'neo-one' : `neo-one-${target}-${module}`,
   name: main ? '' : `${target}-${module}`,
   tsconfig: `tsconfig/tsconfig.${target}.${module}.json`,
+  tsconfigESM: `tsconfig/tsconfig.${target}.esm.json`,
   fastProject: ts.createProject(`tsconfig/tsconfig.${target}.${module}.json`, { typescript, isolatedModules: true }),
   project: ts.createProject(`tsconfig/tsconfig.${target}.${module}.json`, { typescript }),
 }));
@@ -73,10 +78,25 @@ const getPackageJSON = (pkg) => {
   }
 };
 
+const SKIP_PACKAGES = new Set([
+  'neo-one-developer-tools-frame',
+  'neo-one-editor',
+  'neo-one-editor-server',
+  'neo-one-local-browser',
+  'neo-one-local-browser-worker',
+  'neo-one-local-singleton',
+  'neo-one-node-browser',
+  'neo-one-node-browser-worker',
+  'neo-one-smart-contract-test-browser',
+  'neo-one-website',
+  'neo-one-worker',
+]);
+const SKIP_PACKAGES_LIST = [...SKIP_PACKAGES];
+
 const pkgs = fs
   .readdirSync('packages')
   .filter((file) => !file.startsWith('.'))
-  .filter((file) => file !== 'neo-one-playground')
+  .filter((file) => !SKIP_PACKAGES.has(file))
   .filter((pkg) => fs.pathExistsSync(path.resolve('packages', pkg, 'package.json')));
 const pkgJSONs = pkgs.map((pkg) => [pkg, getPackageJSON(pkg)]);
 const smartContractPkgs = pkgJSONs.filter(([_p, pkgJSON]) => pkgJSON.smartContract).map(([p]) => p);
@@ -91,32 +111,37 @@ const indexPkgs = pkgs.filter((p) => !smartContractPkgs.includes(p));
 const pkgNames = pkgJSONs.map(([_p, pkgJSON]) => pkgJSON.name);
 const pkgNamesSet = new Set(pkgNames);
 
+const skipGlobs = SKIP_PACKAGES_LIST.map((pkg) => `!packages/${pkg}/**/*`);
+
 const globs = {
   originalSrc: [
-    'packages/*/src/**/*.{ts,tsx}',
+    'packages/*/src/**/*.{ts,tsx,js}',
+    'packages/*/template/**/*',
     'packages/*/proto/**/*.proto',
-    '!packages/neo-one-playground/**/*',
     '!packages/*/src/**/*.test.{ts,tsx}',
     '!packages/*/src/__data__/**/*',
     '!packages/*/src/__tests__/**/*',
     '!packages/*/src/__e2e__/**/*',
     '!packages/*/src/bin/**/*',
-  ],
+  ].concat(skipGlobs),
   src: (format) => [
     `${getDistBase(format)}/packages/*/src/**/*.{ts,tsx}`,
-    `${getDistBase(format)}/packages/*/proto/**/*.proto`,
     `!${getDistBase(format)}/packages/*/src/**/*.test.{ts,tsx}`,
     `!${getDistBase(format)}/packages/*/src/__data__/**/*`,
     `!${getDistBase(format)}/packages/*/src/__tests__/**/*`,
     `!${getDistBase(format)}/packages/*/src/__e2e__/**/*`,
     `!${getDistBase(format)}/packages/*/src/bin/**/*`,
+    `!${getDistBase(format)}/packages/neo-one-developer-tools/src/*.ts`,
+    `!${getDistBase(format)}/packages/neo-one-developer-tools-frame/src/*.ts`,
+    `!${getDistBase(format)}/packages/neo-one-smart-contract-lib/src/*.ts`,
+    `!${getDistBase(format)}/packages/neo-one-server-plugin-wallet/src/contracts/*.ts`,
   ],
   types: ['packages/neo-one-types/**/*', '!packages/neo-one-types/package.json'],
-  bin: ['packages/*/src/bin/*.ts', '!packages/neo-one-playground/**/*'],
-  pkg: ['packages/*/package.json', '!packages/neo-one-playground/**/*'],
-  pkgFiles: ['packages/*/tsconfig.json', 'packages/*/static/**/*', '!packages/neo-one-playground/**/*'],
+  bin: ['packages/*/src/bin/*.ts'].concat(skipGlobs),
+  pkg: ['packages/*/package.json'].concat(skipGlobs),
+  pkgFiles: ['packages/*/CHANGELOG.md', 'packages/*/tsconfig.json', 'packages/*/static/**/*'].concat(skipGlobs),
   files: ['lerna.json', 'yarn.lock', 'tsconfig.json'],
-  metadata: ['LICENSE', 'README.md', 'CHANGELOG.md'],
+  metadata: ['LICENSE', 'README.md'],
 };
 
 const getName = (format, name) => (format.name === '' ? name : `${name}-${format.name}`);
@@ -188,7 +213,9 @@ const transformBasePackageJSON = (format, orig, file) => {
       orig.dependencies === undefined
         ? undefined
         : _.fromPairs(
-            Object.entries(orig.dependencies).map(([depName, version]) => [mapDep(format, depName), version]),
+            Object.entries(orig.dependencies)
+              .filter(([depName]) => depName !== '@neo-one/developer-tools-frame')
+              .map(([depName, version]) => [mapDep(format, depName), version]),
           ),
     publishConfig: {
       access: 'public',
@@ -224,10 +251,10 @@ const transformPackageJSON = (format, orig, file) =>
   orig.name === '@neo-one/types'
     ? transformTypesPackageJSON(format, orig, file)
     : smartContractPkgNames.some((p) => orig.name === p)
-      ? transformSmartContractPackageJSON(format, orig, file)
-      : browserPkgNames.some((p) => orig.name === p)
-        ? transformBrowserPackageJSON(format, orig, file)
-        : transformSrcPackageJSON(format, orig, file);
+    ? transformSmartContractPackageJSON(format, orig, file)
+    : browserPkgNames.some((p) => orig.name === p)
+    ? transformBrowserPackageJSON(format, orig, file)
+    : transformSrcPackageJSON(format, orig, file);
 
 const copyPkg = ((cache) =>
   memoizeTask(cache, function copyPkg(format) {
@@ -284,43 +311,43 @@ const compileTypescript = ((cache) =>
           ),
         )
         .pipe(gulpSourcemaps.init())
-        .pipe(
-          gulpBabel({
-            presets: [],
-            plugins: [
-              '@babel/plugin-syntax-numeric-separator',
-              ['@babel/plugin-syntax-typescript', { isTSX: true }],
-              '@babel/plugin-syntax-optional-catch-binding',
-              '@babel/plugin-syntax-dynamic-import',
-              ['babel-plugin-lodash', { id: ['lodash'] }],
-              [
-                'babel-plugin-transform-imports',
-                {
-                  rxjs: {
-                    transform: (importName) =>
-                      importName === 'EMPTY'
-                        ? 'rxjs/internal/observable/empty'
-                        : rxjsTypes.has(importName)
-                          ? 'rxjs/internal/types'
-                          : importName[0].toLowerCase() === importName[0]
-                            ? `rxjs/internal/observable/${importName}`
-                            : `rxjs/internal/${importName}`,
-                    skipDefaultConversion: true,
-                  },
-                  'rxjs/operators': {
-                    transform: 'rxjs/internal/operators/${member}',
-                    skipDefaultConversion: true,
-                  },
-                },
-              ],
-            ],
-          }),
-        )
-        .pipe(
-          gulpRename((parsedPath, file) => {
-            parsedPath.extname = path.extname(file.history[0]);
-          }),
-        )
+        // .pipe(
+        //   gulpBabel({
+        //     presets: [],
+        //     plugins: [
+        //       '@babel/plugin-syntax-numeric-separator',
+        //       ['@babel/plugin-syntax-typescript', { isTSX: true }],
+        //       '@babel/plugin-syntax-optional-catch-binding',
+        //       '@babel/plugin-syntax-dynamic-import',
+        //       ['babel-plugin-lodash', { id: ['lodash'] }],
+        //       [
+        //         'babel-plugin-transform-imports',
+        //         {
+        //           rxjs: {
+        //             transform: (importName) =>
+        //               importName === 'EMPTY'
+        //                 ? 'rxjs/internal/observable/empty'
+        //                 : rxjsTypes.has(importName)
+        //                   ? 'rxjs/internal/types'
+        //                   : importName[0].toLowerCase() === importName[0]
+        //                     ? `rxjs/internal/observable/${importName}`
+        //                     : `rxjs/internal/${importName}`,
+        //             skipDefaultConversion: true,
+        //           },
+        //           'rxjs/operators': {
+        //             transform: 'rxjs/internal/operators/${member}',
+        //             skipDefaultConversion: true,
+        //           },
+        //         },
+        //       ],
+        //     ],
+        //   }),
+        // )
+        // .pipe(
+        //   gulpRename((parsedPath, file) => {
+        //     parsedPath.extname = path.extname(file.history[0]);
+        //   }),
+        // )
         .pipe(type === 'fast' ? format.fastProject() : format.project())
         .pipe(gulpSourcemaps.mapSources(mapSources))
         .pipe(gulpSourcemaps.write())
@@ -328,6 +355,43 @@ const compileTypescript = ((cache) =>
       format.module === 'esm' ? "'" : '"',
     ).pipe(gulp.dest(getDest(format)));
   }))({});
+
+gulp.task('compileDeveloperToolsFrame', async () => {
+  await execa('yarn', ['compile:developer-tools-frame'], {
+    stdio: ['ignore', 'inherit', 'inherit'],
+  });
+});
+
+const APP_ROOT_DIR = __dirname;
+
+const compileDeveloperTools = ((cache) =>
+  memoizeTask(cache, async function compileDeveloperTools(format) {
+    const bundle = await rollup.rollup({
+      input: path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-developer-tools', 'src', 'index.ts'),
+      external: ['resize-observer-polyfill'],
+      plugins: [
+        rollupString({
+          include: '**/*.raw.js',
+        }),
+        rollupTypescript({
+          cacheRoot: path.join('node_modules', '.cache', 'rts2', format.target, format.module),
+          tsconfig: format.tsconfigESM,
+          tsconfigOverride: {
+            compilerOptions: {
+              inlineSources: false,
+            },
+          },
+          check: false,
+        }),
+      ],
+    });
+
+    await bundle.write({
+      format: format.module,
+      file: path.join(getDest(format), 'neo-one-developer-tools', 'src', 'index.js'),
+    });
+  }))({});
+
 const buildTypescript = ((cache) =>
   memoizeTask(cache, function buildTypescript(format, done, type) {
     return gulp.series(copyTypescript(format, type), compileTypescript(format, type))(done);
@@ -340,10 +404,10 @@ const buildAll = ((cache) =>
         copyPkg(format),
         copyPkgFiles(format),
         copyTypes(format),
-        copyMetadata(format),
         copyFiles(format),
         copyRootPkg(format),
         copyRootTSConfig(format),
+        compileDeveloperTools(format),
         buildTypescript(format, type),
         format === MAIN_FORMAT ? 'buildBin' : undefined,
         format === MAIN_FORMAT ? 'createBin' : undefined,
@@ -354,7 +418,7 @@ const buildAll = ((cache) =>
 
 const install = ((cache) =>
   memoizeTask(cache, async function install(format) {
-    await execa.shell('yarn install --non-interactive --no-progress', {
+    await execa.shell('yarn install --non-interactive --no-progress --ignore-engines', {
       cwd: getDistBaseCWD(format),
       stdio: ['ignore', 'inherit', 'inherit'],
     });
@@ -418,34 +482,38 @@ gulp.task('compileBin', () =>
     .pipe(gulp.dest(getDest(MAIN_FORMAT))),
 );
 const bin = (name) => `#!/usr/bin/env node
-const execa = require('execa');
-const path = require('path');
-const semver = require('semver');
+const importLocal = require('import-local');
 
-let args = [];
-if (semver.satisfies(process.version, '8.x')) {
-  args = ['--harmony-async-iteration'];
-} else if (semver.satisfies(process.version, '9.x')) {
-  args = ['--harmony'];
-}
+if (!importLocal(__filename)) {
+  const execa = require('execa');
+  const path = require('path');
+  const semver = require('semver');
 
-const proc = execa('node', args.concat([path.resolve(__dirname, '${name}')]).concat(process.argv.slice(2)), {
-  stdio: 'inherit',
-  env: {
-    NODE_NO_WARNINGS: '1',
-  },
-});
-process.on('SIGTERM', () => proc.kill('SIGTERM'));
-process.on('SIGINT', () => proc.kill('SIGINT'));
-process.on('SIGBREAK', () => proc.kill('SIGBREAK'));
-process.on('SIGHUP', () => proc.kill('SIGHUP'));
-proc.on('exit', (code, signal) => {
-  let exitCode = code;
-  if (exitCode === null) {
-    exitCode = signal === 'SIGINT' ? 0 : 1;
+  let args = [];
+  if (semver.satisfies(process.version, '8.x')) {
+    args = ['--harmony-async-iteration'];
+  } else if (semver.satisfies(process.version, '9.x')) {
+    args = ['--harmony'];
   }
-  process.exit(exitCode);
-});
+
+  const proc = execa('node', args.concat([path.resolve(__dirname, '${name}')]).concat(process.argv.slice(2)), {
+    stdio: 'inherit',
+    env: {
+      NODE_NO_WARNINGS: '1',
+    },
+  });
+  process.on('SIGTERM', () => proc.kill('SIGTERM'));
+  process.on('SIGINT', () => proc.kill('SIGINT'));
+  process.on('SIGBREAK', () => proc.kill('SIGBREAK'));
+  process.on('SIGHUP', () => proc.kill('SIGHUP'));
+  proc.on('exit', (code, signal) => {
+    let exitCode = code;
+    if (exitCode === null) {
+      exitCode = signal === 'SIGINT' ? 0 : 1;
+    }
+    process.exit(exitCode);
+  });
+}
 `;
 gulp.task('createBin', () =>
   gulp
@@ -474,14 +542,19 @@ gulp.task('copyMetadata', gulp.parallel(FORMATS.map((format) => copyMetadata(for
 gulp.task('copyFiles', gulp.parallel(FORMATS.map((format) => copyFiles(format))));
 gulp.task('copyRootPkg', gulp.parallel(FORMATS.map((format) => copyRootPkg(format))));
 gulp.task('copyRootTSConfig', gulp.parallel(FORMATS.map((format) => copyRootTSConfig(format))));
+gulp.task('compileDeveloperTools', gulp.parallel(FORMATS.map((format) => compileDeveloperTools(format))));
 gulp.task('buildTypescript', gulp.parallel(FORMATS.map((format) => buildTypescript(format))));
-gulp.task('buildAll', gulp.parallel(FORMATS.map((format) => buildAll(format))));
+gulp.task(
+  'buildAll',
+  gulp.series('compileDeveloperToolsFrame', gulp.parallel(FORMATS.map((format) => buildAll(format)))),
+);
 gulp.task('install', gulp.parallel(FORMATS.map((format) => install(format))));
 gulp.task('publish', gulp.parallel(FORMATS.map((format) => publish(format))));
 
 gulp.task('build', gulp.series('clean', 'buildAll', 'install'));
 
-const buildE2ESeries = (type) => gulp.series(buildAll(MAIN_FORMAT, type), install(MAIN_FORMAT));
+const buildE2ESeries = (type) =>
+  gulp.series('compileDeveloperToolsFrame', buildAll(MAIN_FORMAT, type), install(MAIN_FORMAT));
 gulp.task('buildE2E', gulp.series('clean', buildE2ESeries()));
 
 gulp.task(
@@ -496,7 +569,7 @@ gulp.task(
 gulp.task('prepareRelease', async () => {
   await execa(
     'yarn',
-    ['lerna', 'publish', '--skip-npm', '--cd-version=prerelease', '--preid=alpha', '--npm-tag=latest', '--yes'],
+    ['lerna', 'version', '--conventional-commits', '--npm-tag=latest', '--yes', '--message', 'chore(release): publish'],
     {
       stdio: ['ignore', 'inherit', 'inherit'],
     },
@@ -513,4 +586,4 @@ gulp.task('e2e', async () => {
 
 gulp.task('release', gulp.series('test', 'build', 'e2e', 'prepareRelease', 'copyPkg', 'publish'));
 
-gulp.task('fastRelease', gulp.series('build', 'prepareRelease', 'copyPkg', 'publish'));
+gulp.task('fastRelease', gulp.series('build', 'prepareRelease', 'copyPkg', 'copyMetadata', 'copyPkgFiles', 'publish'));

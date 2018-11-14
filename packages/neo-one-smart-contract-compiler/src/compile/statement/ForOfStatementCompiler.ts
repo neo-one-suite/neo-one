@@ -48,6 +48,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
     };
 
     const handleOther = (innerOptions: VisitOptions) => {
+      sb.emitOp(node, 'DROP');
       sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
     };
 
@@ -221,6 +222,7 @@ export class ForOfStatementCompiler extends NodeCompiler<ts.ForOfStatement> {
         set: handleSet,
         setStorage: handleSetStorage,
         error: handleOther,
+        forwardValue: handleOther,
         iteratorResult: handleOther,
         iterable: handleIterable,
         iterableIterator: handleIterableIterator,

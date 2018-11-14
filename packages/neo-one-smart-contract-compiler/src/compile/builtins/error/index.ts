@@ -10,6 +10,8 @@ import { BuiltinSlotInstanceMemberValue } from '../BuiltinSlotInstanceMemberValu
 
 class ErrorInterface extends BuiltinInterface {}
 class ErrorValue extends BuiltinNew {
+  public readonly type = 'ErrorConstructor';
+
   public emitInstanceOf(sb: ScriptBuilder, node: ts.Expression, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
     // [val]
@@ -58,6 +60,6 @@ class ErrorConstructorInterface extends BuiltinInterface {}
 export const add = (builtins: Builtins): void => {
   builtins.addInterface('Error', new ErrorInterface());
   builtins.addValue('Error', new ErrorValue());
-  builtins.addMember('Error', 'message', new BuiltinSlotInstanceMemberValue(Types.Error, ErrorSlots.message));
+  builtins.addGlobalMember('Error', 'message', new BuiltinSlotInstanceMemberValue(Types.Error, ErrorSlots.message));
   builtins.addInterface('ErrorConstructor', new ErrorConstructorInterface());
 };

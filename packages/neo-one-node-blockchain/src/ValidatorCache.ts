@@ -1,6 +1,6 @@
-import { Account, common, ECPoint, UInt160, UInt256, utils, Validator, ValidatorUpdate } from '@neo-one/client-core';
-import { ValidatorsCount, ValidatorsCountUpdate } from '@neo-one/node-core';
-import { BN } from 'bn.js';
+import { common, ECPoint, UInt160, UInt256, utils } from '@neo-one/client-common';
+import { Account, Validator, ValidatorsCount, ValidatorsCountUpdate, ValidatorUpdate } from '@neo-one/node-core';
+import BN from 'bn.js';
 import _ from 'lodash';
 import { toArray } from 'rxjs/operators';
 import { Blockchain } from './Blockchain';

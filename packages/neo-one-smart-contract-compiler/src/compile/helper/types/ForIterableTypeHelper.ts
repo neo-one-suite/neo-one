@@ -15,6 +15,7 @@ import { hasSetStorage } from './setStorage';
 type ProcessType = (options: VisitOptions) => void;
 
 export interface ForIterableTypeHelperOptions {
+  readonly type?: ts.Type;
   readonly knownType?: IterableTypes;
   readonly array: ProcessType;
   readonly map: ProcessType;
@@ -29,6 +30,7 @@ export interface ForIterableTypeHelperOptions {
 // Input: [val]
 // Output: []
 export class ForIterableTypeHelper extends Helper {
+  private readonly type?: ts.Type;
   private readonly knownType?: IterableTypes;
   private readonly array: ProcessType;
   private readonly map: ProcessType;
@@ -40,6 +42,7 @@ export class ForIterableTypeHelper extends Helper {
   private readonly defaultCase?: ProcessType;
 
   public constructor({
+    type,
     knownType,
     array,
     map,
@@ -51,6 +54,7 @@ export class ForIterableTypeHelper extends Helper {
     defaultCase,
   }: ForIterableTypeHelperOptions) {
     super();
+    this.type = type;
     this.knownType = knownType;
     this.array = array;
     this.map = map;
@@ -73,7 +77,7 @@ export class ForIterableTypeHelper extends Helper {
       node,
       options,
       sb.helpers.forType({
-        type: undefined,
+        type: this.type,
         defaultCase: this.defaultCase,
         types: [
           {

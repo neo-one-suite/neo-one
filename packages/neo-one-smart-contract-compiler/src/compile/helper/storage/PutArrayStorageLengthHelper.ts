@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import { StructuredStorageSlots } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -12,8 +13,10 @@ export class PutArrayStorageLengthHelper extends Helper {
     sb.emitOp(node, 'SWAP');
     // [prefix, idx]
     sb.emitHelper(node, options, sb.helpers.unwrapArrayStorage);
-    // [buffer, idx]
-    sb.emitSysCall(node, 'Neo.Runtime.Serialize');
+    // [number, map]
+    sb.emitPushInt(node, StructuredStorageSlots.prefix);
+    // [prefix]
+    sb.emitOp(node, 'PICKITEM');
     // [idx]
     sb.emitHelper(node, options, sb.helpers.putCommonStorage);
   }

@@ -1,14 +1,12 @@
 import {
-  BinaryReader,
   BinaryWriter,
   createSerializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
   InvalidFormatError,
   SerializableWire,
   SerializeWire,
-} from '@neo-one/client-core';
-import { BN } from 'bn.js';
+} from '@neo-one/client-common';
+import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions } from '@neo-one/node-core';
+import BN from 'bn.js';
 import { Address6 } from 'ip-address';
 
 export interface NetworkAddressAdd {
@@ -24,10 +22,10 @@ export class NetworkAddress implements SerializableWire<NetworkAddress> {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): NetworkAddress {
     const timestamp = reader.readUInt32LE();
     const services = reader.readUInt64LE();
-    const address = Address6.fromByteArray([...reader.readBytes(16)]);
+    const address = Address6.fromByteArray([...reader.readBytes(16)]) as Address6 | undefined | null;
     const port = reader.readUInt16BE();
 
-    const canonical = address == undefined ? '' : address.canonicalForm();
+    const canonical = address == undefined ? '' : (address.canonicalForm() as string | undefined | null);
 
     return new this({
       timestamp,

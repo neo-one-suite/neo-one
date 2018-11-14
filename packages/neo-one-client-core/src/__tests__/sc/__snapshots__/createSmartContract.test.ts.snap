@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createSmartContract createInvoke - no network 1`] = `[Error [NO_CONTRACT_DEPLOYED]: Contract has not been deployed to network local]`;
+
+exports[`createSmartContract iterActions 1`] = `
+Array [
+  Array [
+    "main",
+    Object {
+      "indexStart": 3,
+      "indexStop": 5,
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract iterEvents 1`] = `
+Array [
+  Array [
+    "main",
+    Object {
+      "indexStart": 3,
+      "indexStop": 5,
+    },
+  ],
+  Array [
+    "main",
+    Object {
+      "indexStart": 3,
+      "indexStop": 5,
+    },
+  ],
+]
+`;
+
+exports[`createSmartContract iterLogs 1`] = `
+Array [
+  Array [
+    "main",
+    Object {
+      "indexStart": 3,
+      "indexStop": 5,
+    },
+  ],
+  Array [
+    "main",
+    Object {
+      "indexStart": 3,
+      "indexStop": 5,
+    },
+  ],
+  Array [
+    "main",
+    Object {
+      "indexStart": 3,
+      "indexStop": 5,
+    },
+  ],
+]
+`;

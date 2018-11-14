@@ -1,4 +1,4 @@
-import { converters, RawAction } from '@neo-one/client-core';
+import { RawAction, smartContractConverters as converters } from '@neo-one/client-common';
 import { deserializeStackItem, StackItem } from '@neo-one/node-vm';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
@@ -15,6 +15,44 @@ interface ConsoleLog {
   readonly line: number;
   readonly message: string;
 }
+
+// tslint:disable-next-line no-any
+const inspect = (value: any, wrapString = false): any => {
+  if (value === null) {
+    return wrapString ? JSON.stringify(value) : value;
+  }
+
+  if (Array.isArray(value)) {
+    return wrapString ? JSON.stringify(value) : value;
+  }
+
+  if (value instanceof Map) {
+    return `Map { ${[...value.entries()]
+      .map(([key, val]) => `${inspect(key, true)} => ${inspect(val, true)}`)
+      .join(', ')} }`;
+  }
+
+  if (value instanceof Set) {
+    return `Set { ${[...value].map((val) => inspect(val, true)).join(', ')} }`;
+  }
+
+  if (typeof value === 'string') {
+    return wrapString ? `'${value}'` : value;
+  }
+
+  if (typeof value === 'function') {
+    return '[Function]';
+  }
+
+  if (typeof value === 'object') {
+    // tslint:disable-next-line no-any
+    const result = _.fromPairs(Object.entries(value).map(([key, val]) => [key, inspect(val)]));
+
+    return wrapString ? JSON.stringify(result) : result;
+  }
+
+  return wrapString ? JSON.stringify(value) : value;
+};
 
 // tslint:disable-next-line no-any
 const extractValueFromStackItem = (stackItem: StackItem): any => {
@@ -65,6 +103,22 @@ const extractValueFromStackItem = (stackItem: StackItem): any => {
         .asArray()[1]
         .asBuffer()
         .toString('hex');
+    case 9:
+      // tslint:disable-next-line no-any
+      return new Map<any, any>(
+        stackItem
+          .asArray()[1]
+          .asArray()
+          // tslint:disable-next-line no-any
+          .map<any>((value) => value.asArray().map(extractValueFromStackItem)),
+      );
+    case 10:
+      return new Set(
+        stackItem
+          .asArray()[1]
+          .asArray()
+          .map(extractValueFromStackItem),
+      );
     default:
       return `<unknown type ${type}>`;
   }
@@ -73,7 +127,7 @@ const extractValueFromStackItem = (stackItem: StackItem): any => {
 const extractMessageFromStackItem = (stackItem: StackItem): string => {
   const value = extractValueFromStackItem(stackItem);
 
-  return typeof value === 'string' ? value : JSON.stringify(value);
+  return typeof value === 'string' ? value : JSON.stringify(inspect(value));
 };
 
 const extractMessage = (value: Buffer): string => {

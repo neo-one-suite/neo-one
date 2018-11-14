@@ -44,7 +44,7 @@ describe('ObjectBindingHelper', () => {
 
         assertEqual(currentTransaction !== undefined, true);
       `,
-        { type: 'error', code: DiagnosticCode.GenericUnsupportedSyntax },
+        { type: 'error', code: DiagnosticCode.UnsupportedSyntax },
       );
     });
 
@@ -56,7 +56,7 @@ describe('ObjectBindingHelper', () => {
 
         assertEqual(currentTransaction !== undefined, true);
       `,
-        { type: 'error', code: DiagnosticCode.GenericUnsupportedSyntax },
+        { type: 'error', code: DiagnosticCode.UnsupportedSyntax },
       );
     });
 
@@ -111,7 +111,7 @@ describe('ObjectBindingHelper', () => {
 
         assertEqual(references !== undefined, true);
       `,
-        { type: 'error', code: DiagnosticCode.GenericUnsupportedSyntax },
+        { type: 'error', code: DiagnosticCode.UnsupportedSyntax },
       );
     });
 

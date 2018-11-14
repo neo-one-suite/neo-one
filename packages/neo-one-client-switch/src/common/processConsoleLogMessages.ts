@@ -1,4 +1,4 @@
-import { RawAction } from '@neo-one/client-core';
+import { RawAction } from '@neo-one/client-common';
 import { SourceMaps } from '../common';
 import { createConsoleLogMessages } from './createConsoleLogMessages';
 

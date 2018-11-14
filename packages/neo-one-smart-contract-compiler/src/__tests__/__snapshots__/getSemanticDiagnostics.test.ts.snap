@@ -4,14 +4,25 @@ exports[`getSemanticDiagnostics reports errors for a complex single file 1`] = `
 Array [
   Object {
     "category": 1,
-    "code": 110012,
+    "code": 110008,
+    "column": 72,
+    "file": "complex.ts",
+    "length": 10,
+    "line": 20,
+    "messageText": "Duplicate event. Only one event is allowed per name.",
+    "source": "neo-one",
+    "start": 393,
+  },
+  Object {
+    "category": 1,
+    "code": 110017,
     "column": 37,
     "file": "complex.ts",
     "length": 19,
-    "line": 40,
+    "line": 41,
     "messageText": "Argument to Address.from must be a string literal address.",
     "source": "neo-one",
-    "start": 1000,
+    "start": 1089,
   },
 ]
 `;
@@ -20,7 +31,7 @@ exports[`getSemanticDiagnostics reports errors for a simple single file 1`] = `
 Array [
   Object {
     "category": 1,
-    "code": 110012,
+    "code": 110017,
     "column": 0,
     "file": "simple.ts",
     "length": 19,
@@ -31,3 +42,5 @@ Array [
   },
 ]
 `;
+
+exports[`getSemanticDiagnostics reports no errors for a complex valid single file 1`] = `Array []`;

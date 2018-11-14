@@ -1,4 +1,4 @@
-import { ABI } from '@neo-one/client-core';
+import { ABI } from '@neo-one/client-common';
 import stringify from 'safe-stable-stringify';
 import { getABIName } from './getABIName';
 

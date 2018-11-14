@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-core';
+import { common } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
 import ts from 'typescript';
@@ -6,10 +6,12 @@ import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 import { isAddress, isHash256, isPublicKey } from './buffer';
+import { isOnlyMap } from './map';
 
 export interface WrapValRecursiveHelperOptions {
   readonly checkValue?: boolean;
   readonly type: ts.Type | undefined;
+  readonly optional?: boolean;
 }
 
 // Input: [val]
@@ -17,10 +19,13 @@ export interface WrapValRecursiveHelperOptions {
 export class WrapValRecursiveHelper extends Helper {
   private readonly checkValue: boolean;
   private readonly type: ts.Type | undefined;
+  private readonly optional?: boolean;
+
   public constructor(options: WrapValRecursiveHelperOptions) {
     super();
     this.checkValue = options.checkValue === undefined ? false : options.checkValue;
     this.type = options.type;
+    this.optional = options.optional;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -47,6 +52,8 @@ export class WrapValRecursiveHelper extends Helper {
       sb.emitHelper(node, innerOptions, sb.helpers.wrapUndefined);
     });
 
+    const type = tsUtils.type_.getNonNullableType(this.type);
+
     sb.emitHelper(
       node,
       options,
@@ -54,8 +61,9 @@ export class WrapValRecursiveHelper extends Helper {
         type: this.type,
         single: true,
         singleUndefined: handleUndefined,
+        optional: this.optional,
         array: createHandleValue(true, (innerOptions) => {
-          const elements = this.type === undefined ? undefined : tsUtils.type_.getTupleElements(this.type);
+          const elements = tsUtils.type_.getTupleElements(type);
           if (elements === undefined) {
             sb.emitHelper(
               node,
@@ -67,10 +75,7 @@ export class WrapValRecursiveHelper extends Helper {
                     innerInnerOptions,
                     sb.helpers.wrapValRecursive({
                       checkValue: this.checkValue,
-                      type:
-                        this.type === undefined
-                          ? undefined
-                          : sb.context.analysis.getNotAnyType(node, tsUtils.type_.getArrayType(this.type)),
+                      type: sb.context.analysis.getNotAnyType(node, tsUtils.type_.getArrayType(type)),
                     }),
                   );
                 },
@@ -114,10 +119,8 @@ export class WrapValRecursiveHelper extends Helper {
           sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
         }),
         buffer: createHandleValue(true, (innerOptions) => {
-          const type = this.type;
           if (
             this.checkValue &&
-            type !== undefined &&
             (isAddress(sb.context, node, type) ||
               isHash256(sb.context, node, type) ||
               isPublicKey(sb.context, node, type))
@@ -135,8 +138,8 @@ export class WrapValRecursiveHelper extends Helper {
                   const expectedSize = isAddress(sb.context, node, type)
                     ? common.UINT160_BUFFER_BYTES
                     : isHash256(sb.context, node, type)
-                      ? common.UINT256_BUFFER_BYTES
-                      : common.ECPOINT_BUFFER_BYTES;
+                    ? common.UINT256_BUFFER_BYTES
+                    : common.ECPOINT_BUFFER_BYTES;
                   // [number, number, buffer]
                   sb.emitPushInt(node, expectedSize);
                   // [boolean, buffer]
@@ -159,7 +162,55 @@ export class WrapValRecursiveHelper extends Helper {
           sb.emitHelper(node, innerOptions, sb.helpers.wrapNumber);
         }),
         object: createHandleValue(true, (innerOptions) => {
-          sb.emitHelper(node, innerOptions, sb.helpers.wrapObject);
+          // [objectVal, map]
+          sb.emitHelper(node, options, sb.helpers.createObject);
+          tsUtils.type_.getProperties(type).forEach((prop) => {
+            const propType = sb.context.analysis.getTypeOfSymbol(prop, node);
+            // [objectVal, map, objectVal]
+            sb.emitOp(node, 'TUCK');
+            // [map, objectVal, map, objectVal]
+            sb.emitOp(node, 'OVER');
+            // [string, map, objectVal, map, objectVal]
+            sb.emitPushString(node, tsUtils.symbol.getName(prop));
+            // [map, string, map, objectVal, map, objectVal]
+            sb.emitOp(node, 'OVER');
+            // [string, map, string, map, objectVal, map, objectVal]
+            sb.emitOp(node, 'OVER');
+            sb.emitHelper(
+              node,
+              innerOptions,
+              sb.helpers.if({
+                condition: () => {
+                  // [boolean, string, map, objectVal, map, objectVal]
+                  sb.emitOp(node, 'HASKEY');
+                },
+                whenTrue: () => {
+                  // [value, objectVal, map, objectVal]
+                  sb.emitOp(node, 'PICKITEM');
+                  // [val, objectVal, map, objectVal]
+                  sb.emitHelper(node, innerOptions, sb.helpers.wrapValRecursive({ type: propType }));
+                },
+                whenFalse: () => {
+                  // [map, objectVal, map, objectVal]
+                  sb.emitOp(node, 'DROP');
+                  // [objectVal, map, objectVal]
+                  sb.emitOp(node, 'DROP');
+                  // [val, objectVal, map, objectVal]
+                  sb.emitHelper(node, innerOptions, sb.helpers.wrapUndefined);
+                },
+              }),
+            );
+            // [string, val, objectVal, map, objectVal]
+            sb.emitPushString(node, tsUtils.symbol.getName(prop));
+            // [val, string, objectVal, map, objectVal]
+            sb.emitOp(node, 'SWAP');
+            // [map, objectVal]
+            sb.emitHelper(node, innerOptions, sb.helpers.setDataPropertyObjectProperty);
+            // [objectVal, map]
+            sb.emitOp(node, 'SWAP');
+          });
+          // [objectVal]
+          sb.emitOp(node, 'NIP');
         }),
         string: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.wrapString);
@@ -169,7 +220,44 @@ export class WrapValRecursiveHelper extends Helper {
         }),
         undefined: handleUndefined,
         map: createHandleValue(true, (innerOptions) => {
-          sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+          sb.emitHelper(
+            node,
+            innerOptions,
+            sb.helpers.mapMap({
+              map: (innerInnerOptions) => {
+                let keyType: ts.Type | undefined;
+                let valueType: ts.Type | undefined;
+                if (isOnlyMap(sb.context, node, type)) {
+                  const localKeyType = tsUtils.type_.getTypeArgumentsArray(type)[0] as ts.Type | undefined;
+                  keyType =
+                    localKeyType === undefined ? undefined : sb.context.analysis.getNotAnyType(node, localKeyType);
+                  const localValueType = tsUtils.type_.getTypeArgumentsArray(type)[1] as ts.Type | undefined;
+                  valueType =
+                    localValueType === undefined ? undefined : sb.context.analysis.getNotAnyType(node, localValueType);
+                }
+
+                sb.emitHelper(
+                  node,
+                  innerInnerOptions,
+                  sb.helpers.wrapValRecursive({
+                    checkValue: this.checkValue,
+                    type: keyType,
+                  }),
+                );
+                sb.emitOp(node, 'SWAP');
+                sb.emitHelper(
+                  node,
+                  innerInnerOptions,
+                  sb.helpers.wrapValRecursive({
+                    checkValue: this.checkValue,
+                    type: valueType,
+                  }),
+                );
+                sb.emitOp(node, 'SWAP');
+              },
+            }),
+          );
+          sb.emitHelper(node, innerOptions, sb.helpers.wrapMap);
         }),
         mapStorage: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
@@ -182,6 +270,9 @@ export class WrapValRecursiveHelper extends Helper {
         }),
         error: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
+        }),
+        forwardValue: createHandleValue(true, (innerOptions) => {
+          sb.emitHelper(node, innerOptions, sb.helpers.wrapForwardValue);
         }),
         iteratorResult: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);

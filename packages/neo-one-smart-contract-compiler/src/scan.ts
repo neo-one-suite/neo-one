@@ -4,6 +4,7 @@ import ts from 'typescript';
 import { Context } from './Context';
 import { createContextForDir } from './createContext';
 import { CircularLinkedDependencyError, MultipleContractsInFileError } from './errors';
+import { CompilerHost } from './types';
 
 export interface ContractDependency {
   readonly filePath: string;
@@ -24,16 +25,19 @@ interface FilePathToDependencies {
 }
 
 export const scanContext = (context: Context): Contracts => {
-  const smartContract = tsUtils.symbol.getDeclarations(context.builtins.getInterfaceSymbol('SmartContract'))[0];
-  if (!ts.isInterfaceDeclaration(smartContract)) {
+  const smartContract = tsUtils.symbol.getDeclarations(context.builtins.getValueSymbol('SmartContract'))[0];
+  if (!ts.isClassDeclaration(smartContract)) {
     throw new Error('Something went wrong!');
   }
 
   const { contracts, dependencies } = tsUtils.class_
-    .getImplementors(context.program, context.languageService, smartContract)
+    .getExtendors(context.program, context.languageService, smartContract)
     .reduce<{ contracts: FilePathToContract; dependencies: FilePathToDependencies }>(
       (acc, derived) => {
-        if (!tsUtils.modifier.isAbstract(derived)) {
+        if (
+          !tsUtils.modifier.isAbstract(derived) &&
+          !tsUtils.file.isDeclarationFile(tsUtils.node.getSourceFile(derived))
+        ) {
           const filePath = tsUtils.file.getFilePath(tsUtils.node.getSourceFile(derived));
           const name = tsUtils.node.getNameOrThrow(derived);
           const existing = acc.contracts[filePath] as Contract | undefined;
@@ -136,8 +140,8 @@ const topographicalSort = (contracts: Contracts): Contracts => {
   return mutableOut;
 };
 
-export const scan = async (dir: string): Promise<Contracts> => {
-  const context = await createContextForDir(dir);
+export const scan = async (dir: string, host: CompilerHost): Promise<Contracts> => {
+  const context = await createContextForDir(dir, host);
 
   return scanContext(context);
 };

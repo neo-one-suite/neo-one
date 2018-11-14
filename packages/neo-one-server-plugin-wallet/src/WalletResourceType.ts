@@ -1,11 +1,6 @@
-import {
-  Client,
-  LocalKeyStore,
-  LocalStringStore,
-  LocalUserAccountProvider,
-  NEOONEProvider,
-  UserAccountID,
-} from '@neo-one/client';
+import { UserAccountID } from '@neo-one/client-common';
+import { LocalKeyStore, LocalStringStore, NEOONEProvider } from '@neo-one/client-core';
+import { Client, LocalUserAccountProvider } from '@neo-one/client-full-core';
 import {
   CRUD,
   DescribeTable,
@@ -85,13 +80,7 @@ export class WalletResourceType extends ResourceType<Wallet, WalletResourceOptio
     fs.mkdirpSync(walletsPath);
     const client = new Client({
       file: new LocalUserAccountProvider({
-        keystore: new LocalKeyStore({
-          store: new LocalStringStore({
-            type: 'file',
-            storage: new AsyncNodeStorage(walletsPath),
-          }),
-        }),
-
+        keystore: new LocalKeyStore(new LocalStringStore(new AsyncNodeStorage(walletsPath))),
         provider: new NEOONEProvider([{ network: 'main', rpcURL: constants.MAIN_URL }]),
       }),
     });

@@ -1,4 +1,4 @@
-import { Settings } from '@neo-one/client-core';
+import { Settings } from '@neo-one/node-core';
 import { createTest } from './createTest';
 
 // tslint:disable-next-line no-let

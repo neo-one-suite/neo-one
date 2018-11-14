@@ -1,12 +1,15 @@
-import { ABI } from '@neo-one/client-core';
+import { ABI } from '@neo-one/client-common';
 import { genEvent } from './genEvent';
-import { genReadSmartContract } from './genReadSmartContract';
 import { genSmartContract } from './genSmartContract';
 import { getEventName } from './getEventName';
 import { getSingleEventName } from './getSingleEventName';
 
 const getImportClauses = (text: string) => {
   const mutableClauses: string[] = [];
+
+  if (text.includes('Client')) {
+    mutableClauses.push('Client');
+  }
 
   if (text.includes('BufferString')) {
     mutableClauses.push('BufferString');
@@ -40,8 +43,56 @@ const getImportClauses = (text: string) => {
     mutableClauses.push('Event');
   }
 
-  if (text.includes('InvokeTransactionOptions')) {
-    mutableClauses.push('InvokeTransactionOptions');
+  if (text.includes('InvokeSendUnsafeTransactionOptions')) {
+    mutableClauses.push('InvokeSendUnsafeTransactionOptions');
+  }
+
+  if (text.includes('InvokeReceiveTransactionOptions')) {
+    mutableClauses.push('InvokeReceiveTransactionOptions');
+  }
+
+  if (text.includes('InvokeSendUnsafeReceiveTransactionOptions')) {
+    mutableClauses.push('InvokeSendUnsafeReceiveTransactionOptions');
+  }
+
+  if (text.includes('TransactionReceipt')) {
+    mutableClauses.push('TransactionReceipt');
+  }
+
+  if (text.includes('ClaimTransaction')) {
+    mutableClauses.push('ClaimTransaction');
+  }
+
+  if (text.includes('InvocationTransaction')) {
+    mutableClauses.push('InvocationTransaction');
+  }
+
+  if (text.includes('TransactionOptions')) {
+    mutableClauses.push('TransactionOptions');
+  }
+
+  if (text.includes('GetOptions')) {
+    mutableClauses.push('GetOptions');
+  }
+
+  if (text.includes('ContractParameter')) {
+    mutableClauses.push('ContractParameter');
+  }
+
+  if (text.includes('ForwardValue')) {
+    mutableClauses.push('ForwardValue');
+  }
+
+  if (text.includes('SmartContract')) {
+    mutableClauses.push('SmartContract');
+  }
+
+  if (text.includes('Transfer,')) {
+    mutableClauses.push('Transfer');
+  }
+
+  if (text.includes('ForwardOptions')) {
+    mutableClauses.push('ForwardOptions');
   }
 
   return mutableClauses;
@@ -49,25 +100,24 @@ const getImportClauses = (text: string) => {
 
 export const genSmartContractTypes = (name: string, abi: ABI) => {
   const events = abi.events === undefined ? [] : abi.events;
+  const eventType = `export type ${getEventName(name)} = ${
+    events.length === 0 ? 'never' : events.map((event) => getSingleEventName(name, event.name)).join(' | ')
+  }`;
   const text = `
 ${events.map((event) => genEvent(name, event)).join('\n')}
-${genSmartContract(name, abi)}${genReadSmartContract(name, abi)}`;
+${eventType}
+${genSmartContract(name, abi)}`;
 
-  const importClauses = getImportClauses(text).concat(['SmartContract', 'ReadSmartContract']);
+  const importClauses = getImportClauses(text);
   // tslint:disable-next-line no-array-mutation
   importClauses.sort();
 
   const bigNumberImport = text.includes('BigNumber') ? "\nimport BigNumber from 'bignumber.js';" : '';
-
   const importDecl = `import { ${importClauses.join(', ')} } from '@neo-one/client';${bigNumberImport}`;
-  const eventType = `export type ${getEventName(name)} = ${
-    events.length === 0 ? 'never' : events.map((event) => getSingleEventName(name, event.name)).join(' | ')
-  }`;
 
   return {
     ts: `${importDecl}
 
-${eventType}
 ${text}`,
   };
 };

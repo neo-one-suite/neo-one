@@ -1,15 +1,12 @@
+import { BinaryWriter, IOHelper, SerializableWire, UInt256 } from '@neo-one/client-common';
 import {
   BinaryReader,
-  BinaryWriter,
   BlockBase,
   BlockBaseAdd,
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
-  IOHelper,
-  SerializableWire,
-  UInt256,
   utils,
-} from '@neo-one/client-core';
+} from '@neo-one/node-core';
 export interface MerkleBlockPayloadAdd extends BlockBaseAdd {
   readonly transactionCount: number;
   readonly hashes: ReadonlyArray<UInt256>;

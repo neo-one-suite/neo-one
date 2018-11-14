@@ -2,26 +2,22 @@ import {
   Address,
   Blockchain,
   constant,
-  createEventNotifier,
   Deploy,
   Fixed,
   Hash256,
   Integer,
   LinkedSmartContract,
+  receive,
   SmartContract,
-  verify,
 } from '@neo-one/smart-contract';
 import { Token } from './Token';
 
-const notifyRefund = createEventNotifier('refund');
-
-export class ICO implements SmartContract {
+export class ICO extends SmartContract {
   public readonly properties = {
     codeVersion: '1.0',
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'NEO•ONE ICO',
-    payable: true,
   };
   public readonly amountPerNEO = 10;
   private mutableRemaining: Fixed<8> = 10_000_000_000_00000000;
@@ -31,7 +27,8 @@ export class ICO implements SmartContract {
     public readonly startTimeSeconds: Integer = Blockchain.currentBlockTime,
     public readonly icoDurationSeconds: Integer = 157700000,
   ) {
-    if (!Address.isSender(owner)) {
+    super();
+    if (!Address.isCaller(owner)) {
       throw new Error('Sender was not the owner.');
     }
   }
@@ -41,11 +38,9 @@ export class ICO implements SmartContract {
     return this.mutableRemaining;
   }
 
-  @verify
+  @receive
   public mintTokens(): boolean {
     if (!this.hasStarted() || this.hasEnded()) {
-      notifyRefund();
-
       return false;
     }
 
@@ -58,10 +53,8 @@ export class ICO implements SmartContract {
     let amount = 0;
     // tslint:disable-next-line no-loop-statement
     for (const output of Blockchain.currentTransaction.outputs) {
-      if (output.address.equals(Blockchain.contractAddress)) {
+      if (output.address.equals(this.address)) {
         if (!output.asset.equals(Hash256.NEO)) {
-          notifyRefund();
-
           return false;
         }
 
@@ -70,8 +63,6 @@ export class ICO implements SmartContract {
     }
 
     if (amount > this.remaining) {
-      notifyRefund();
-
       return false;
     }
 
@@ -85,8 +76,6 @@ export class ICO implements SmartContract {
 
       return true;
     }
-
-    notifyRefund();
 
     return false;
   }

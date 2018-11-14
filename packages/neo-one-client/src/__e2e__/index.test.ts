@@ -4,18 +4,18 @@ import * as api from '@neo-one/client';
 describe('@neo-one/client', () => {
   const EXPECTED = [
     'Client',
-    'ReadClient',
     'DeveloperClient',
     'Hash256',
     'OneClient',
     'nep5',
-    'typeGuards',
     // ./user
+    'LedgerKeyStore',
     'LocalUserAccountProvider',
     'LocalKeyStore',
     'LocalMemoryStore',
     'LocalStringStore',
     // ./provider
+    'JSONRPCProvider',
     'NEOONEDataProvider',
     'NEOONEOneDataProvider',
     'NEOONEProvider',
@@ -33,9 +33,8 @@ describe('@neo-one/client', () => {
     'publicKeyToScriptHash',
     'scriptHashToAddress',
     'wifToPrivateKey',
-    // ./preconfigured
-    'createClient',
-    'createReadClient',
+    // DeveloperTools
+    'DeveloperTools',
   ];
 
   test('has expected exports', () => {

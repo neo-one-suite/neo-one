@@ -1,4 +1,4 @@
-import { nep5 } from '@neo-one/client';
+import { nep5 } from '../__data__';
 import { genFiles } from '../genFiles';
 
 describe('genFiles', () => {

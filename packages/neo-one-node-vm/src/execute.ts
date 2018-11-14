@@ -1,30 +1,30 @@
-import { Block, crypto, ScriptContainer, UInt160, utils, VMState } from '@neo-one/client-core';
+import { crypto, UInt160, utils, VMState } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
 import {
+  Block,
+  ByteArrayContractParameter,
   ExecuteScriptsResult,
   ExecutionAction,
   Script,
+  ScriptContainer,
   TriggerType,
+  VMFeatureSwitches,
   VMListeners,
   WriteBlockchain,
 } from '@neo-one/node-core';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import _ from 'lodash';
 import {
   ExecutionContext,
   ExecutionInit,
   FREE_GAS,
-  MAX_ARRAY_SIZE,
   MAX_INVOCATION_STACK_SIZE,
-  MAX_ITEM_SIZE,
   MAX_STACK_SIZE,
   Options,
 } from './constants';
 import {
   AltStackUnderflowError,
-  ArrayOverflowError,
   InvocationStackOverflowError,
-  ItemOverflowError,
   OutOfGASError,
   StackOverflowError,
   StackUnderflowError,
@@ -32,6 +32,7 @@ import {
   UnknownError,
 } from './errors';
 import { lookupOp } from './opcodes';
+import { StackItem } from './stackItem';
 
 const getErrorMessage = (error: Error) => `${error.message}\n${error.stack}`;
 
@@ -65,31 +66,8 @@ const executeNext = async ({
     throw new AltStackUnderflowError(context);
   }
 
-  const stackSize =
-    context.stack.length +
-    context.stackAlt.length +
-    op.out +
-    op.outAlt +
-    op.modify +
-    op.modifyAlt -
-    op.in -
-    op.inAlt +
-    context.callerStackCount +
-    context.callerStackAltCount;
-  if (stackSize > MAX_STACK_SIZE) {
-    throw new StackOverflowError(context);
-  }
-
   if (context.depth + op.invocation > MAX_INVOCATION_STACK_SIZE) {
     throw new InvocationStackOverflowError(context);
-  }
-
-  if (op.array > MAX_ARRAY_SIZE) {
-    throw new ArrayOverflowError(context);
-  }
-
-  if (op.item > MAX_ITEM_SIZE) {
-    throw new ItemOverflowError(context);
   }
 
   const args = context.stack.slice(0, op.in);
@@ -99,6 +77,10 @@ const executeNext = async ({
     ...context,
     stack: context.stack.slice(op.in),
     stackAlt: context.stackAlt.slice(op.inAlt),
+    stackCount:
+      context.stackCount +
+      args.reduce((acc, val) => acc + val.decrement(), 0) +
+      argsAlt.reduce((acc, val) => acc + val.decrement(), 0),
     gasLeft: context.gasLeft.sub(op.fee),
   };
 
@@ -129,6 +111,7 @@ const executeNext = async ({
     context = {
       ...context,
       stack: _.reverse(results).concat(context.stack),
+      stackCount: context.stackCount + results.reduce((acc, value) => acc + value.increment(), 0),
     };
   } else if (results !== undefined) {
     throw new UnknownError(context);
@@ -142,9 +125,14 @@ const executeNext = async ({
     context = {
       ...context,
       stackAlt: _.reverse(resultsAlt).concat(context.stackAlt),
+      stackCount: context.stackCount + resultsAlt.reduce((acc, value) => acc + value.increment(), 0),
     };
   } else if (resultsAlt !== undefined) {
     throw new UnknownError(context);
+  }
+
+  if (context.stackCount > MAX_STACK_SIZE) {
+    throw new StackOverflowError(context);
   }
 
   return context;
@@ -181,8 +169,7 @@ const run = async ({
         gasLeft: context.gasLeft,
         createdContracts: context.createdContracts,
         returnValueCount: context.returnValueCount,
-        callerStackCount: context.callerStackCount,
-        callerStackAltCount: context.callerStackAltCount,
+        stackCount: context.stackCount,
       };
     }
   }
@@ -207,8 +194,7 @@ export const executeScript = async ({
     stackAlt = [],
     createdContracts = {},
     returnValueCount = -1,
-    callerStackCount = 0,
-    callerStackAltCount = 0,
+    stackCount = 0,
     pc = 0,
   } = {},
 }: {
@@ -240,8 +226,7 @@ export const executeScript = async ({
     gasLeft,
     createdContracts,
     returnValueCount,
-    callerStackCount,
-    callerStackAltCount,
+    stackCount,
   };
 
   return monitor.captureSpanLog(async (span) => run({ monitor: span, context }), {
@@ -249,6 +234,18 @@ export const executeScript = async ({
     level: { log: 'debug', span: 'debug' },
     error: { level: 'debug' },
   });
+};
+
+const safeToContractParameter = (item: StackItem, safe: boolean) => {
+  if (safe) {
+    try {
+      return item.toContractParameter();
+    } catch {
+      return new ByteArrayContractParameter(Buffer.alloc(0, 0));
+    }
+  }
+
+  return item.toContractParameter();
 };
 
 export const execute = async ({
@@ -263,6 +260,7 @@ export const execute = async ({
   listeners = {},
   skipWitnessVerify = false,
   persistingBlock,
+  vmFeatures,
 }: {
   readonly monitor: Monitor;
   readonly scripts: ReadonlyArray<Script>;
@@ -275,6 +273,7 @@ export const execute = async ({
   readonly listeners?: VMListeners;
   readonly skipWitnessVerify?: boolean;
   readonly persistingBlock?: Block;
+  readonly vmFeatures: VMFeatureSwitches;
 }): Promise<ExecuteScriptsResult> => {
   const monitor = monitorIn.at('vm');
   const init = {
@@ -284,6 +283,7 @@ export const execute = async ({
     listeners,
     skipWitnessVerify,
     persistingBlock,
+    vmFeatures,
   };
 
   let context;
@@ -297,7 +297,7 @@ export const execute = async ({
 
   let err;
   try {
-    const entryScriptHash = crypto.hash160(scripts[scripts.length - 1].code);
+    const entryScriptHash = crypto.hash160(scripts[0].code);
     // tslint:disable-next-line no-loop-statement
     for (let idx = 0; idx < scripts.length && (context === undefined || context.state === VMState.Halt); idx += 1) {
       const script = scripts[idx];
@@ -305,7 +305,7 @@ export const execute = async ({
       //       to callingScriptHash within executeScript. executeScript
       //       automatically hashes the input code to determine the current
       //       scriptHash.
-      const scriptHash = idx + 1 < scripts.length ? crypto.hash160(scripts[idx + 1].code) : undefined;
+      const scriptHash = idx - 1 > 0 ? crypto.hash160(scripts[idx - 1].code) : undefined;
       let options: Options = {
         depth: scripts.length - idx,
         stack: [],
@@ -314,8 +314,7 @@ export const execute = async ({
         scriptHash,
         entryScriptHash,
         returnValueCount,
-        callerStackCount: 0,
-        callerStackAltCount: 0,
+        stackCount: 0,
       };
 
       if (context !== undefined) {
@@ -327,8 +326,7 @@ export const execute = async ({
           scriptHash,
           entryScriptHash,
           returnValueCount,
-          callerStackCount: context.callerStackCount,
-          callerStackAltCount: context.callerStackAltCount,
+          stackCount: context.stackCount,
         };
       }
 
@@ -368,10 +366,13 @@ export const execute = async ({
     gasConsumed = utils.ZERO;
   }
 
+  const state = errorMessage === undefined ? finalContext.state : VMState.Fault;
+  const toContractParameter = (item: StackItem) => safeToContractParameter(item, state === VMState.Fault);
+
   return {
     state: errorMessage === undefined ? finalContext.state : VMState.Fault,
-    stack: finalContext.stack.map((item) => item.toContractParameter()),
-    stackAlt: finalContext.stackAlt.map((item) => item.toContractParameter()),
+    stack: finalContext.stack.map(toContractParameter),
+    stackAlt: finalContext.stackAlt.map(toContractParameter),
     gasConsumed,
     gasCost,
     errorMessage: errorMessage === undefined ? finalContext.errorMessage : errorMessage,

@@ -1,3 +1,5 @@
+import { constants as localConstants } from '@neo-one/local';
+
 export const constants = {
   PLUGIN: '@neo-one/server-plugin-network',
   NETWORK_RESOURCE_TYPE: 'network',
@@ -10,6 +12,6 @@ export const constants = {
     TEST: 'https://testnet.neotracker.io/rpc',
   },
   DELIMITER_KEY: 'network',
-  PRIVATE_NET_PRIVATE_KEY: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
-  PRIVATE_NET_PUBLIC_KEY: '0248be3c070df745a60f3b8b494efcc6caf90244d803a9a72fe95d9bae2120ec70',
+  PRIVATE_NET_PRIVATE_KEY: localConstants.PRIVATE_NET_PRIVATE_KEY,
+  PRIVATE_NET_PUBLIC_KEY: localConstants.PRIVATE_NET_PUBLIC_KEY,
 };

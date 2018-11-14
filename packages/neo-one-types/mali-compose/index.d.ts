@@ -1,5 +1,15 @@
-declare module 'mali-compose' {
-  import { Middleware } from 'mali';
+// Type definitions for mali 1.1
+// Project: https://github.com/malijs/mali-compose
+// Definitions by: Daniel Byrne <https://github.com/danwbyrne>
+// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
+// TypeScript Version: 2.1
 
-  export default function compose(middlewares: ReadonlyArray<Middleware>): Middleware;
+declare module 'mali-compose' {
+  import { Context } from 'mali';
+
+  declare function compose(
+    middleware: ReadonlyArray<(ctx: Context, next: () => Promise<void>) => Promise<void>>,
+  ): (context: Context, next: () => Promise<void>) => Promise<void>;
+
+  export = compose;
 }

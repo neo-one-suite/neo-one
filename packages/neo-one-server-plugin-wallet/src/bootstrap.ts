@@ -1,26 +1,28 @@
 import {
   AssetType,
-  Client,
+  common,
   createPrivateKey,
-  DeveloperClient,
+  crypto,
   Hash256String,
-  LocalKeyStore,
-  LocalMemoryStore,
-  LocalUserAccountProvider,
-  NEOONEProvider,
   privateKeyToAddress,
   privateKeyToPublicKey,
-  PublishReceipt,
-  SmartContractAny,
   TransactionResult,
   Transfer,
   UserAccountID,
   wifToPrivateKey,
-} from '@neo-one/client';
-import { common, crypto } from '@neo-one/client-core';
+} from '@neo-one/client-common';
+import {
+  DeveloperClient,
+  LocalKeyStore,
+  LocalMemoryStore,
+  NEOONEProvider,
+  SmartContractAny,
+} from '@neo-one/client-core';
+import { Client, LocalUserAccountProvider, PublishReceipt } from '@neo-one/client-full-core';
 import { GetCLIResourceOptions, InteractiveCLI, InteractiveCLIArgs } from '@neo-one/server-plugin';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
 import { compileContract, CompileContractResult } from '@neo-one/smart-contract-compiler';
+import { createCompilerHost } from '@neo-one/smart-contract-compiler-node';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as fs from 'fs-extra';
@@ -754,7 +756,7 @@ async function addWalletsToKeystore({
       .concat(assetWallets)
       .concat(tokenWallets)
       .map(async (wallet) =>
-        keystore.addAccount({
+        keystore.addUserAccount({
           network: networkName,
           name: wallet.name,
           privateKey: wallet.privateKey,
@@ -779,7 +781,7 @@ type ContractResult = Omit<CompileContractResult, 'sourceMap'> & {
 export const compileSmartContract = async (contractName: string): Promise<ContractResult> => {
   const dir = await findContracts(require.resolve('@neo-one/server-plugin-wallet'));
 
-  const result = compileContract(path.resolve(dir, `${contractName}.ts`), contractName);
+  const result = compileContract(path.resolve(dir, `${contractName}.ts`), contractName, createCompilerHost());
 
   const sourceMap = await result.sourceMap;
 
@@ -983,9 +985,7 @@ export const bootstrap = (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs)
         spinner.succeed();
 
         spinner.start(`Bootstrapping network ${bootstrapData.network.name}`);
-        const keystore = new LocalKeyStore({
-          store: new LocalMemoryStore(),
-        });
+        const keystore = new LocalKeyStore(new LocalMemoryStore());
 
         await addWalletsToKeystore({
           keystore,
@@ -1005,8 +1005,11 @@ export const bootstrap = (plugin: WalletPlugin) => ({ cli }: InteractiveCLIArgs)
           memory: localUserAccountProvider,
         };
         const client = new Client(providers);
+        client.hooks.beforeRelay.tapPromise('bootstrap', async (mutableOptions) => {
+          mutableOptions.systemFee = new BigNumber(-1);
+        });
 
-        await client.selectAccount(master.accountID);
+        await client.selectUserAccount(master.accountID);
 
         const developerClient = new DeveloperClient(provider.read(network.name));
 

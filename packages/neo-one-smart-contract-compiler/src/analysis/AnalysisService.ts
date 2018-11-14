@@ -1,12 +1,23 @@
-import { addressToScriptHash } from '@neo-one/client';
-import { common, ECPoint, UInt160, UInt256 } from '@neo-one/client-core';
-import { tsUtils } from '@neo-one/ts-utils';
+import { addressToScriptHash, common, ECPoint, UInt160, UInt256 } from '@neo-one/client-common';
+import { AnyNameableNode, symbolKey, tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import ts from 'typescript';
+import {
+  isOnlyArray,
+  isOnlyBoolean,
+  isOnlyBuffer,
+  isOnlyMap,
+  isOnlyNull,
+  isOnlyNumber,
+  isOnlySet,
+  isOnlyString,
+  isOnlySymbol,
+  isOnlyUndefined,
+} from '../compile/helper/types';
 import { Context } from '../Context';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
-import { createMemoized, nodeKey, symbolKey, typeKey } from '../utils';
+import { createMemoized, nodeKey, typeKey } from '../utils';
 
 export interface ErrorDiagnosticOptions {
   readonly error?: boolean;
@@ -17,8 +28,8 @@ export interface DiagnosticOptions extends ErrorDiagnosticOptions {
 }
 
 export const DEFAULT_DIAGNOSTIC_OPTIONS = {
-  error: false,
-  warning: true,
+  error: true,
+  warning: false,
 };
 
 export interface SignatureTypes {
@@ -41,12 +52,19 @@ export class AnalysisService {
 
     const typeNode = tsUtils.type_.getTypeNode(node) as ts.TypeNode | undefined;
     if (typeNode !== undefined) {
-      return tsUtils.type_.getTypeFromTypeNode(this.context.typeChecker, typeNode);
+      return this.getNotAnyType(typeNode, tsUtils.type_.getTypeFromTypeNode(this.context.typeChecker, typeNode));
     }
 
     const signatureTypes = this.extractSignature(node, options);
 
     return signatureTypes === undefined ? undefined : signatureTypes.returnType;
+  }
+
+  public extractAllSignatures(
+    node: ts.Node,
+    options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
+  ): ReadonlyArray<SignatureTypes> {
+    return this.extractAllSignaturesForType(node, this.getType(node), options);
   }
 
   public extractSignature(
@@ -70,27 +88,36 @@ export class AnalysisService {
     return tsUtils.type_.getCallSignatures(type);
   }
 
+  public extractAllSignaturesForType(
+    node: ts.Node,
+    type: ts.Type | undefined,
+    options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
+  ): ReadonlyArray<SignatureTypes> {
+    const signatures = type === undefined ? undefined : tsUtils.type_.getCallSignatures(type);
+    if (signatures === undefined) {
+      return [];
+    }
+
+    return signatures.map((signature) => this.extractSignatureTypes(node, signature, options)).filter(utils.notNull);
+  }
+
   public extractSignatureForType(
     node: ts.Node,
     type: ts.Type | undefined,
     options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): SignatureTypes | undefined {
-    const signatures = type === undefined ? undefined : tsUtils.type_.getCallSignatures(type);
-    if (signatures === undefined) {
+    const signatureTypes = this.extractAllSignaturesForType(node, type, options);
+    if (signatureTypes.length === 0) {
       return undefined;
     }
 
-    if (signatures.length === 0) {
-      return undefined;
-    }
-
-    if (signatures.length !== 1) {
+    if (signatureTypes.length !== 1) {
       this.report(options, node, DiagnosticCode.MultipleSignatures, DiagnosticMessage.MultipleSignatures);
 
       return undefined;
     }
 
-    return this.extractSignatureTypes(node, signatures[0], options);
+    return signatureTypes[0];
   }
 
   public extractSignaturesForCall(
@@ -111,7 +138,7 @@ export class AnalysisService {
     options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
   ): SignatureTypes | undefined {
     const params = tsUtils.signature.getParameters(signature);
-    const paramTypes = params.map((param) => this.context.analysis.getTypeOfSymbol(param, node));
+    const paramTypes = params.map((param) => this.getTypeOfSymbol(param, node));
     const paramDeclsNullable = params.map((param) => tsUtils.symbol.getValueDeclaration(param));
     const nullParamIndex = paramDeclsNullable.indexOf(undefined);
     if (nullParamIndex !== -1) {
@@ -216,9 +243,9 @@ export class AnalysisService {
     }
 
     return this.memoized('get-symbol-for-type', typeKey(type), () => {
-      let symbol = tsUtils.type_.getSymbol(type);
+      let symbol = tsUtils.type_.getAliasSymbol(type);
       if (symbol === undefined) {
-        symbol = tsUtils.type_.getAliasSymbol(type);
+        symbol = tsUtils.type_.getSymbol(type);
       }
 
       if (symbol === undefined) {
@@ -275,13 +302,18 @@ export class AnalysisService {
 
   public isSmartContract(node: ts.ClassDeclaration): boolean {
     return this.memoized('is-smart-contract', nodeKey(node), () => {
-      const isSmartContract = tsUtils.class_.getImplementsArray(node).some((implType) => {
-        const testType = this.getType(tsUtils.expression.getExpression(implType));
+      const extendsExpr = tsUtils.class_.getExtends(node);
 
-        return testType !== undefined && this.context.builtins.isInterface(node, testType, 'SmartContract');
-      });
+      const isSmartContract =
+        extendsExpr !== undefined &&
+        this.context.builtins.isValue(tsUtils.expression.getExpression(extendsExpr), 'SmartContract');
 
       if (isSmartContract) {
+        return true;
+      }
+
+      const baseClasses = tsUtils.class_.getBaseClasses(this.context.typeChecker, node);
+      if (baseClasses.some((value) => this.context.builtins.isValue(value, 'SmartContract'))) {
         return true;
       }
 
@@ -289,6 +321,137 @@ export class AnalysisService {
 
       return baseClass !== undefined && this.isSmartContract(baseClass);
     });
+  }
+
+  public isSmartContractNode(node: ts.Node): boolean {
+    return this.memoized('is-smart-contract-node', nodeKey(node), () => {
+      const symbol = this.getSymbol(node);
+      if (symbol === undefined) {
+        return false;
+      }
+
+      const decls = tsUtils.symbol.getDeclarations(symbol);
+      if (decls.length === 0) {
+        return false;
+      }
+
+      const decl = decls[0];
+
+      return ts.isClassDeclaration(decl) && this.isSmartContract(decl);
+    });
+  }
+
+  public getSymbolAndAllInheritedSymbols(node: ts.Node): ReadonlyArray<ts.Symbol> {
+    return this.memoized('get-symbol-and-all-inherited-symbols', nodeKey(node), () => {
+      const symbol = this.getSymbol(node);
+      const symbols = [symbol].filter(utils.notNull);
+      if (ts.isClassDeclaration(node) || ts.isClassExpression(node) || ts.isInterfaceDeclaration(node)) {
+        const baseTypes = tsUtils.class_.getBaseTypesFlattened(this.context.typeChecker, node);
+
+        return symbols.concat(baseTypes.map((baseType) => this.getSymbolForType(node, baseType)).filter(utils.notNull));
+      }
+
+      return symbols;
+    });
+  }
+
+  public isValidStorageType(node: ts.Node, type: ts.Type): boolean {
+    return !tsUtils.type_.hasType(
+      type,
+      (tpe) =>
+        !tsUtils.type_.isOnlyType(
+          tpe,
+          (tp) =>
+            isOnlyUndefined(this.context, node, tp) ||
+            isOnlyNull(this.context, node, tp) ||
+            isOnlyBoolean(this.context, node, tp) ||
+            isOnlyNumber(this.context, node, tp) ||
+            isOnlyString(this.context, node, tp) ||
+            isOnlySymbol(this.context, node, tp) ||
+            isOnlyBuffer(this.context, node, tp) ||
+            this.isValidStorageArray(node, tp) ||
+            this.isValidStorageMap(node, tp) ||
+            this.isValidStorageSet(node, tp),
+        ),
+    );
+  }
+
+  public findReferencesAsNodes(node: AnyNameableNode | ts.Identifier): ReadonlyArray<ts.Node> {
+    return this.memoized('find-references-as-nodes', nodeKey(node), () =>
+      tsUtils.reference
+        .findReferencesAsNodes(this.context.program, this.context.languageService, node)
+        .filter((found) => this.context.sourceFiles.has(tsUtils.node.getSourceFile(found))),
+    );
+  }
+
+  public isSmartContractMixinFunction(node: ts.FunctionDeclaration | ts.FunctionExpression): boolean {
+    const parameters = tsUtils.parametered.getParameters(node);
+    if (parameters.length !== 1) {
+      return false;
+    }
+
+    const signatureTypess = this.extractAllSignatures(node);
+    if (signatureTypess.length !== 1) {
+      return false;
+    }
+
+    const signatureTypes = signatureTypess[0];
+    const firstParam = signatureTypes.paramDecls[0];
+    const firstParamType = signatureTypes.paramTypes.get(firstParam);
+    if (firstParamType === undefined || tsUtils.type_.getConstructSignatures(firstParamType).length !== 1) {
+      return false;
+    }
+
+    const constructSignatureTypes = this.extractSignatureTypes(
+      firstParam,
+      tsUtils.type_.getConstructSignatures(firstParamType)[0],
+    );
+    if (constructSignatureTypes === undefined) {
+      return false;
+    }
+
+    const returnTypeSymbol = this.getSymbolForType(firstParam, constructSignatureTypes.returnType);
+
+    return returnTypeSymbol !== undefined && returnTypeSymbol === this.context.builtins.getValueSymbol('SmartContract');
+  }
+
+  private isValidStorageArray(node: ts.Node, type: ts.Type): boolean {
+    if (!isOnlyArray(this.context, node, type)) {
+      return false;
+    }
+
+    const typeArguments = tsUtils.type_.getTypeArgumentsArray(type);
+    if (typeArguments.length !== 1) {
+      return true;
+    }
+
+    return this.isValidStorageType(node, typeArguments[0]);
+  }
+
+  private isValidStorageMap(node: ts.Node, type: ts.Type): boolean {
+    if (!isOnlyMap(this.context, node, type)) {
+      return false;
+    }
+
+    const typeArguments = tsUtils.type_.getTypeArgumentsArray(type);
+    if (typeArguments.length !== 2) {
+      return true;
+    }
+
+    return this.isValidStorageType(node, typeArguments[0]) && this.isValidStorageType(node, typeArguments[1]);
+  }
+
+  private isValidStorageSet(node: ts.Node, type: ts.Type): boolean {
+    if (!isOnlySet(this.context, node, type)) {
+      return false;
+    }
+
+    const typeArguments = tsUtils.type_.getTypeArgumentsArray(type);
+    if (typeArguments.length !== 1) {
+      return true;
+    }
+
+    return this.isValidStorageType(node, typeArguments[0]);
   }
 
   private extractLiteral<T>(

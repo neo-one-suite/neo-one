@@ -21,6 +21,9 @@ export class WhileStatementCompiler extends NodeCompiler<ts.WhileStatement> {
         each: (innerOptions) => {
           sb.visit(tsUtils.statement.getStatement(node), innerOptions);
         },
+        cleanup: () => {
+          // do nothing
+        },
       }),
     );
   }

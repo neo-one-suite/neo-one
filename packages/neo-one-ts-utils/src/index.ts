@@ -15,7 +15,7 @@ import * as literal from './literal';
 import * as node from './node';
 import * as object_ from './object_';
 import * as parameter from './parameter';
-import { markOriginal, print, setOriginal, setOriginalRecursive } from './print';
+import { isOriginal, markOriginal, printBundle, setOriginal, setOriginalRecursive } from './print';
 import * as reference from './reference';
 import * as signature from './signature';
 import * as statement from './statement';
@@ -29,6 +29,7 @@ export { ArgumentedNode, BodiedNode, BodyableNode, ParameteredNode } from './bas
 export { AnyNameableNode, PropertyNamedNode } from './node';
 export { StatementedNode } from './statement';
 export { ClassInstanceMemberType } from './class_';
+export { symbolKey } from './symbolKey';
 
 // tslint:disable-next-line export-name
 export const tsUtils = {
@@ -49,8 +50,9 @@ export const tsUtils = {
   node,
   object_,
   parameter,
-  print,
+  printBundle,
   reference,
+  isOriginal,
   setOriginal,
   setOriginalRecursive,
   signature,

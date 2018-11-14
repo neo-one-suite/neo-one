@@ -1,0 +1,9 @@
+{
+  "name": "neo-one-api",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "now": {
+    "alias": "api.neo-one.io"
+  }
+}

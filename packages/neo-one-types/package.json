@@ -1,7 +1,8 @@
 {
   "name": "@neo-one/types",
-  "version": "1.0.0-alpha.43",
+  "version": "1.0.1",
   "description": "NEO•ONE TypeScript types.",
   "main": "index.d.ts",
-  "types": "index.d.ts"
+  "types": "index.d.ts",
+  "sideEffects": false
 }

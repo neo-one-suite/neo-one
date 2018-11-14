@@ -1,51 +1,35 @@
+import { ECPoint } from '@neo-one/client-common';
+import { Monitor } from '@neo-one/monitor';
+import BN from 'bn.js';
+import { Observable } from 'rxjs';
+import { Account, AccountKey, AccountUpdate } from './Account';
+import { AccountUnclaimed, AccountUnclaimedKey, AccountUnclaimedsKey } from './AccountUnclaimed';
+import { AccountUnspent, AccountUnspentKey, AccountUnspentsKey } from './AccountUnspent';
+import { Action, ActionKey, ActionsKey } from './action';
+import { Asset, AssetKey, AssetUpdate } from './Asset';
+import { Block, BlockKey } from './Block';
+import { BlockData, BlockDataKey } from './BlockData';
+import { CallReceipt } from './CallReceipt';
+import { Contract, ContractKey } from './Contract';
+import { Header, HeaderKey } from './Header';
+import { InvocationData, InvocationDataKey } from './InvocationData';
+import { ConsensusPayload } from './payload';
+import { DeserializeWireContext, SerializeJSONContext } from './Serializable';
+import { Settings } from './Settings';
+import { StorageItem, StorageItemKey, StorageItemsKey, StorageItemUpdate } from './StorageItem';
 import {
-  Account,
-  AccountKey,
-  AccountUpdate,
-  Action,
-  ActionKey,
-  ActionsKey,
-  Asset,
-  AssetKey,
-  AssetUpdate,
-  Block,
-  BlockKey,
-  CallReceipt,
-  ConsensusPayload,
-  Contract,
-  ContractKey,
-  DeserializeWireContext,
-  ECPoint,
   FeeContext,
-  Header,
-  HeaderKey,
   Input,
-  InvocationData,
-  InvocationDataKey,
   InvocationTransaction,
   Output,
   OutputKey,
-  SerializeJSONContext,
-  Settings,
-  StorageItem,
-  StorageItemKey,
-  StorageItemsKey,
-  StorageItemUpdate,
   Transaction,
-  TransactionData,
-  TransactionDataKey,
-  TransactionDataUpdate,
   TransactionKey,
-  Validator,
-  ValidatorKey,
-} from '@neo-one/client-core';
-import { Monitor } from '@neo-one/monitor';
-import { BN } from 'bn.js';
-import { Observable } from 'rxjs';
-import { AccountUnclaimed, AccountUnclaimedKey, AccountUnclaimedsKey } from './AccountUnclaimed';
-import { AccountUnspent, AccountUnspentKey, AccountUnspentsKey } from './AccountUnspent';
-import { BlockData, BlockDataKey } from './BlockData';
+} from './transaction';
+import { TransactionData, TransactionDataKey, TransactionDataUpdate } from './TransactionData';
+import { Validator, ValidatorKey } from './Validator';
 import { ValidatorsCount, ValidatorsCountUpdate } from './ValidatorsCount';
+import { VerifyScriptResult } from './vm';
 
 export interface ReadMetadataStorage<Value> {
   readonly get: () => Promise<Value>;
@@ -137,6 +121,10 @@ export interface BlockchainStorage {
   readonly validatorsCount: ReadMetadataStorage<ValidatorsCount>;
 }
 
+export interface VerifyTransactionResult {
+  readonly verifications: ReadonlyArray<VerifyScriptResult>;
+}
+
 export interface Blockchain extends BlockchainStorage {
   readonly settings: Settings;
   readonly deserializeWireContext: DeserializeWireContext;
@@ -166,7 +154,7 @@ export interface Blockchain extends BlockchainStorage {
       readonly transaction: Transaction;
       readonly memPool?: ReadonlyArray<Transaction>;
     },
-  ) => Promise<void>;
+  ) => Promise<VerifyTransactionResult>;
   readonly verifyConsensusPayload: (payload: ConsensusPayload, monitor?: Monitor) => Promise<void>;
 
   readonly getValidators: (

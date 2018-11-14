@@ -1,4 +1,5 @@
-import { common, ContractParameter, ECPoint, PublicKeyContractParameter } from '@neo-one/client-core';
+import { common, ECPoint } from '@neo-one/client-common';
+import { ContractParameter, PublicKeyContractParameter } from '@neo-one/node-core';
 import { StackItemBase } from './StackItemBase';
 
 export class ECPointStackItem extends StackItemBase {

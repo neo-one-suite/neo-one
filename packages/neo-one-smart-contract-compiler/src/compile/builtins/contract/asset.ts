@@ -11,7 +11,7 @@ class AssetConstructorInterface extends BuiltinInterface {}
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
   builtins.addContractInterface('Asset', new AssetInterface());
-  builtins.addContractValue('Asset', new ValueInstanceOf((sb) => sb.helpers.isAsset));
+  builtins.addContractValue('Asset', new ValueInstanceOf('AssetConstructor', (sb) => sb.helpers.isAsset));
   builtins.addContractMember(
     'Asset',
     'hash',

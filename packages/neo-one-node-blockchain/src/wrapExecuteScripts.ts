@@ -1,5 +1,10 @@
-import { InvocationResult, InvocationResultError, InvocationResultSuccess, utils, VMState } from '@neo-one/client-core';
-import { ExecuteScriptsResult } from '@neo-one/node-core';
+import { utils, VMState } from '@neo-one/client-common';
+import {
+  ExecuteScriptsResult,
+  InvocationResult,
+  InvocationResultError,
+  InvocationResultSuccess,
+} from '@neo-one/node-core';
 
 export const wrapExecuteScripts = async (execute: (() => Promise<ExecuteScriptsResult>)): Promise<InvocationResult> => {
   try {

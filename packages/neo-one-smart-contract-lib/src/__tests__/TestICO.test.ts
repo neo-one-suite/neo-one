@@ -1,5 +1,5 @@
-import { Hash256, privateKeyToAddress, SmartContractAny } from '@neo-one/client';
-import { common, crypto } from '@neo-one/client-core';
+import { common, crypto, privateKeyToAddress } from '@neo-one/client-common';
+import { Hash256, SmartContractAny } from '@neo-one/client-core';
 import { withContracts } from '@neo-one/smart-contract-test';
 import BigNumber from 'bignumber.js';
 import * as path from 'path';
@@ -20,21 +20,10 @@ describe('TestICO', () => {
       ],
       async ({ client, networkName, testIco: smartContract, masterAccountID }) => {
         crypto.addPublicKey(common.stringToPrivateKey(MINTER.PRIVATE_KEY), common.stringToECPoint(MINTER.PUBLIC_KEY));
-        const [nameResult, decimalsResult, symbolResult, minter, deployResult] = await Promise.all([
-          smartContract.name(),
-          smartContract.decimals(),
-          smartContract.symbol(),
-          client.providers.memory.keystore.addAccount({
-            network: networkName,
-            name: 'minter',
-            privateKey: MINTER.PRIVATE_KEY,
-          }),
-          smartContract.deploy(masterAccountID.address, new BigNumber(Math.round(Date.now() / 1000))),
-        ]);
-        expect(nameResult).toEqual('TestToken');
-        expect(decimalsResult.toString()).toEqual('8');
-        expect(symbolResult).toEqual('TT');
-
+        const deployResult = await smartContract.deploy(
+          masterAccountID.address,
+          new BigNumber(Math.round(Date.now() / 1000)),
+        );
         const deployReceipt = await deployResult.confirmed({ timeoutMS: 2500 });
         if (deployReceipt.result.state !== 'HALT') {
           throw new Error(deployReceipt.result.message);
@@ -43,6 +32,20 @@ describe('TestICO', () => {
         expect(deployReceipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
         expect(deployReceipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
         expect(deployReceipt.result.value).toBeTruthy();
+
+        const [nameResult, decimalsResult, symbolResult, minter] = await Promise.all([
+          smartContract.name(),
+          smartContract.decimals(),
+          smartContract.symbol(),
+          client.providers.memory.keystore.addUserAccount({
+            network: networkName,
+            name: 'minter',
+            privateKey: MINTER.PRIVATE_KEY,
+          }),
+        ]);
+        expect(nameResult).toEqual('TestToken');
+        expect(decimalsResult.toString()).toEqual('8');
+        expect(symbolResult).toEqual('TT');
 
         const [initialTotalSupply, transferResult] = await Promise.all([
           smartContract.totalSupply(),
@@ -70,12 +73,11 @@ describe('TestICO', () => {
 
         const firstMint = new BigNumber('10');
         const mintResult = await smartContract.mintTokens({
-          from: minter.account.id,
-          transfers: [
+          from: minter.userAccount.id,
+          sendTo: [
             {
               amount: firstMint,
               asset: Hash256.NEO,
-              to: smartContract.definition.networks[client.providers.memory.getNetworks()[0]].address,
             },
           ],
         });
@@ -88,7 +90,7 @@ describe('TestICO', () => {
         const event = mintReceipt.events[0];
         expect(event.name).toEqual('transfer');
         expect(event.parameters.from).toBeUndefined();
-        expect(event.parameters.to).toEqual(minter.account.id.address);
+        expect(event.parameters.to).toEqual(minter.userAccount.id.address);
         if (event.parameters.amount === undefined) {
           expect(event.parameters.amount).toBeTruthy();
           throw new Error('For TS');
@@ -97,7 +99,7 @@ describe('TestICO', () => {
         expect(event.parameters.amount.toString()).toEqual(firstBalance);
 
         const [minterBalance, mintTotalSupply] = await Promise.all([
-          smartContract.balanceOf(minter.account.id.address),
+          smartContract.balanceOf(minter.userAccount.id.address),
           smartContract.totalSupply(),
         ]);
 

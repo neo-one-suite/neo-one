@@ -18,3 +18,7 @@ export type MaybeTypeArgumentedNode = ts.Node & { readonly typeArguments?: ts.No
 export function getTypeArguments(node: MaybeTypeArgumentedNode): ReadonlyArray<ts.TypeNode> | undefined {
   return utils.getValueOrUndefined(node.typeArguments);
 }
+
+export function getTypeArgumentsArray(node: MaybeTypeArgumentedNode): ReadonlyArray<ts.TypeNode> {
+  return utils.getArray(getTypeArguments(node));
+}

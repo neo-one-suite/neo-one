@@ -1,6 +1,8 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
 import ts from 'typescript';
+import { DiagnosticCode } from '../../../DiagnosticCode';
+import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import {
   Builtin,
   BuiltinInstanceMemberTemplate,
@@ -35,13 +37,17 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       // Otherwise, already reported as an error by typescript checker
       if (ts.isCallExpression(expression) && isBuiltinCall(valueBuiltin)) {
         valueBuiltin.emitCall(sb, expression, optionsIn);
+
+        return;
       }
 
       if (ts.isTaggedTemplateExpression(expression) && isBuiltinTemplate(valueBuiltin)) {
         valueBuiltin.emitCall(sb, expression, optionsIn);
+
+        return;
       }
 
-      return;
+      sb.context.reportError(expr, DiagnosticCode.InvalidBuiltinCall, DiagnosticMessage.InvalidBuiltinCall);
     }
 
     const throwTypeError = (innerOptions: VisitOptions) => {
@@ -127,6 +133,18 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       }
     };
 
+    const isValidBuiltinCall = (builtinProp: Builtin) => {
+      if (ts.isCallExpression(expression)) {
+        return isBuiltinMemberCall(builtinProp) || isBuiltinInstanceMemberCall(builtinProp);
+      }
+
+      if (ts.isTaggedTemplateExpression(expression)) {
+        return isBuiltinMemberTemplate(builtinProp) || isBuiltinInstanceMemberTemplate(builtinProp);
+      }
+
+      return false;
+    };
+
     const handleBuiltinMemberCall = (builtinProp: Builtin, memberLike: CallMemberLikeExpression, visited: boolean) => {
       if (ts.isCallExpression(expression)) {
         if (isBuiltinMemberCall(builtinProp)) {
@@ -155,10 +173,17 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       }
     };
 
+    const superExpression = ts.isCallExpression(expression) ? tsUtils.expression.getExpression(expression) : undefined;
     if (
       ts.isCallExpression(expression) &&
-      tsUtils.guards.isSuperExpression(tsUtils.expression.getExpression(expression))
+      superExpression !== undefined &&
+      tsUtils.guards.isSuperExpression(superExpression)
     ) {
+      if (optionsIn.handleSuperConstruct !== undefined) {
+        optionsIn.handleSuperConstruct(expression, superExpression, optionsIn);
+
+        return;
+      }
       const superClass = optionsIn.superClass;
       if (superClass === undefined) {
         /* istanbul ignore next */
@@ -180,7 +205,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       const nameValue = tsUtils.node.getName(expr);
 
       const builtinProp = sb.context.builtins.getMember(value, name);
-      if (builtinProp !== undefined) {
+      if (builtinProp !== undefined && isValidBuiltinCall(builtinProp)) {
         handleBuiltinMemberCall(builtinProp, expr, false);
 
         return;
@@ -237,6 +262,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           set: createProcessBuiltin('Set'),
           setStorage: createProcessBuiltin('SetStorage'),
           error: createProcessBuiltin('Error'),
+          forwardValue: createProcessBuiltin('ForwardValue'),
           iteratorResult: createProcessBuiltin('IteratorResult'),
           iterable: createProcessBuiltin('Iterable'),
           iterableIterator: createProcessBuiltin('IterableIterator'),
@@ -258,7 +284,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       const propType = sb.context.analysis.getType(prop);
 
       const builtinProp = sb.context.builtins.getMember(value, prop);
-      if (builtinProp !== undefined) {
+      if (builtinProp !== undefined && isValidBuiltinCall(builtinProp)) {
         handleBuiltinMemberCall(builtinProp, expr, false);
 
         return;
@@ -333,6 +359,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
             set: throwInnerTypeError,
             setStorage: throwInnerTypeError,
             error: throwInnerTypeError,
+            forwardValue: throwInnerTypeError,
             iteratorResult: throwInnerTypeError,
             iterable: throwInnerTypeError,
             iterableIterator: throwInnerTypeError,
@@ -498,6 +525,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
             set: throwInnerTypeError,
             setStorage: throwInnerTypeError,
             error: throwInnerTypeError,
+            forwardValue: throwInnerTypeError,
             iteratorResult: throwInnerTypeError,
             iterable: throwInnerTypeError,
             iterableIterator: throwInnerTypeError,
@@ -537,6 +565,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           set: createProcessBuiltin('Set'),
           setStorage: createProcessBuiltin('SetStorage'),
           error: createProcessBuiltin('Error'),
+          forwardValue: createProcessBuiltin('ForwardValue'),
           iteratorResult: createProcessBuiltin('IteratorResult'),
           iterable: createProcessBuiltin('Iterable'),
           iterableIterator: createProcessBuiltin('IterableIterator'),

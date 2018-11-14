@@ -8,6 +8,8 @@ describe('Map.prototype.get/set/has/delete', () => {
       x.set('foo', 'bar');
       const result = x.set('foo', 'baz');
 
+      x.get('foo');
+      x.has('foo');
       assertEqual(result, x);
       assertEqual(x.get('foo'), 'baz');
       assertEqual(x.has('foo'), true);
@@ -82,7 +84,7 @@ describe('Map.prototype.get/set/has/delete', () => {
         readonly has: (key: K) => boolean;
         readonly size: number;
         readonly delete: (key: K) => boolean;
-        readonly set: (key: K, value: V) => this;
+        readonly set: (key: K, value: V) => Mp<K, V>;
       }
       const x: Mp<Buffer, string> | Map<Buffer, string> = new Map<Buffer, string>() as Mp<Buffer, string> | Map<Buffer, string>;
       const y = Buffer.from('ab', 'hex');

@@ -31,9 +31,11 @@ export class ArrConcatHelper extends Helper {
           // [enumerator, result]
           sb.emitOp(node, 'APPEND');
         },
+        cleanup: () => {
+          // [result]
+          sb.emitOp(node, 'NIP');
+        },
       }),
     );
-    // [result]
-    sb.emitOp(node, 'NIP');
   }
 }

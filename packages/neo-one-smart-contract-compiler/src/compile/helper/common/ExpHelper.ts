@@ -148,6 +148,9 @@ export class ExpHelper extends Helper {
                   }),
                 );
               },
+              cleanup: () => {
+                // do nothing
+              },
             }),
           );
 

@@ -21,6 +21,7 @@ export { name } from './name';
 export { paths } from './paths';
 export { pluginResourceTypeUtil } from './pluginResourceTypeUtil';
 export { theme } from './theme';
+export * from './version';
 
 export { AbortController, AbortSignal } from './AbortController';
 export { getTasksError, areTasksDone, skipAllTasks } from './tasks';

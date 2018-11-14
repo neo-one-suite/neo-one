@@ -1,26 +1,22 @@
 import {
   ABI,
-  Client,
+  common,
   Contract,
-  DeveloperClient,
-  Hash256,
-  LocalKeyStore,
-  LocalMemoryStore,
-  LocalUserAccountProvider,
-  NEOONEProvider,
+  crypto,
   privateKeyToAddress,
-  ReadClient,
   UserAccountID,
   wifToPrivateKey,
-} from '@neo-one/client';
-import { common, crypto } from '@neo-one/client-core';
+} from '@neo-one/client-common';
+import { DeveloperClient, Hash256, LocalKeyStore, LocalMemoryStore, NEOONEProvider } from '@neo-one/client-core';
+import { Client, LocalUserAccountProvider } from '@neo-one/client-full-core';
 import { Network } from '@neo-one/server-plugin-network';
 import { Wallet } from '@neo-one/server-plugin-wallet';
 import { TestOptions } from '@neo-one/smart-contract-test';
 import BigNumber from 'bignumber.js';
 import * as path from 'path';
-import { ICOReadSmartContract, ICOSmartContract } from '../__data__/ico/one/generated/ICO/types';
-import { TokenReadSmartContract, TokenSmartContract } from '../__data__/ico/one/generated/Token/types';
+import { EscrowSmartContract } from '../__data__/ico/one/generated';
+import { ICOSmartContract } from '../__data__/ico/one/generated/ICO/types';
+import { TokenSmartContract } from '../__data__/ico/one/generated/Token/types';
 import { Contracts } from '../__data__/ico/one/generated/types';
 
 const TO_PRIVATE_KEY = '7d128a6d096f0c14c3a25a2b0c41cf79661bfcb4a8cc95aaaea28bde4d732344';
@@ -46,12 +42,12 @@ const getClients = async (
 ): Promise<{
   readonly client: Client;
 }> => {
-  const keystore = new LocalKeyStore({ store: new LocalMemoryStore() });
+  const keystore = new LocalKeyStore(new LocalMemoryStore());
 
   if (wallet.wif === undefined) {
     throw new Error(`Something went wrong, wif is null for ${wallet.name}`);
   }
-  await keystore.addAccount({
+  await keystore.addUserAccount({
     network: LOCAL,
     name: wallet.name,
     privateKey: wifToPrivateKey(wallet.wif),
@@ -75,7 +71,7 @@ const getContracts = async (client: Client, networkName: string): Promise<Readon
       if (transaction.type === 'InvocationTransaction' && transaction.invocationData.contracts.length > 0) {
         mutableContracts.push(transaction.invocationData.contracts[0]);
 
-        if (mutableContracts.length === 2) {
+        if (mutableContracts.length === 3) {
           return mutableContracts;
         }
       }
@@ -89,7 +85,6 @@ const getGeneratedICOCode = (): {
   readonly abi: ABI;
   readonly contract: {
     readonly createSmartContract: (client: Client) => ICOSmartContract;
-    readonly createReadSmartContract: (readClient: ReadClient) => ICOReadSmartContract;
   };
 } => {
   // tslint:disable-next-line no-require-imports
@@ -97,16 +92,14 @@ const getGeneratedICOCode = (): {
   // tslint:disable-next-line no-require-imports
   const contract = require('../__data__/ico/one/generated/ICO/contract');
   const createSmartContract = contract.createICOSmartContract;
-  const createReadSmartContract = contract.createICOReadSmartContract;
 
-  return { abi, contract: { createSmartContract, createReadSmartContract } };
+  return { abi, contract: { createSmartContract } };
 };
 
 const getGeneratedTokenCode = (): {
   readonly abi: ABI;
   readonly contract: {
     readonly createSmartContract: (client: Client) => TokenSmartContract;
-    readonly createReadSmartContract: (readClient: ReadClient) => TokenReadSmartContract;
   };
 } => {
   // tslint:disable-next-line no-require-imports
@@ -114,9 +107,23 @@ const getGeneratedTokenCode = (): {
   // tslint:disable-next-line no-require-imports
   const contract = require('../__data__/ico/one/generated/Token/contract');
   const createSmartContract = contract.createTokenSmartContract;
-  const createReadSmartContract = contract.createTokenReadSmartContract;
 
-  return { abi, contract: { createSmartContract, createReadSmartContract } };
+  return { abi, contract: { createSmartContract } };
+};
+
+const getGeneratedEscrowCode = (): {
+  readonly abi: ABI;
+  readonly contract: {
+    readonly createSmartContract: (client: Client) => EscrowSmartContract;
+  };
+} => {
+  // tslint:disable-next-line no-require-imports
+  const abi = require('../__data__/ico/one/generated/Escrow/abi').escrowABI;
+  // tslint:disable-next-line no-require-imports
+  const contract = require('../__data__/ico/one/generated/Escrow/contract');
+  const createSmartContract = contract.createEscrowSmartContract;
+
+  return { abi, contract: { createSmartContract } };
 };
 
 const getGeneratedCommonCode = (): {
@@ -128,6 +135,7 @@ const getGeneratedCommonCode = (): {
 const verifySmartContractAfterMint = async (
   ico: ICOSmartContract,
   token: TokenSmartContract,
+  escrow: EscrowSmartContract,
   accountID: UserAccountID,
   toAccountID: UserAccountID,
   developerClient?: DeveloperClient,
@@ -160,13 +168,77 @@ const verifySmartContractAfterMint = async (
   expect(totalSupplyAfter.toString()).toEqual('100');
   expect(balanceAfter.toString()).toEqual('75');
   expect(toBalanceAfter.toString()).toEqual('25');
+
+  const escrowAddress = escrow.definition.networks[accountID.network].address;
+  const [escrowTransferReceipt] = await Promise.all([
+    token.transfer.confirmed(
+      accountID.address,
+      escrowAddress,
+      new BigNumber('25'),
+      ...escrow.forwardApproveReceiveTransferArgs(toAccountID.address),
+    ),
+    developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+  ]);
+  if (escrowTransferReceipt.result.state === 'FAULT') {
+    throw new Error(escrowTransferReceipt.result.message);
+  }
+  expect(escrowTransferReceipt.events).toHaveLength(2);
+  const transferEvent = escrowTransferReceipt.events[1];
+  if (transferEvent.name !== 'transfer') {
+    throw new Error('Expected transfer event');
+  }
+  expect(transferEvent.parameters.amount.toString()).toEqual('25');
+  const balanceAvailableEvent = escrowTransferReceipt.events[0];
+  if (balanceAvailableEvent.name !== 'balanceAvailable') {
+    throw new Error('Expected balanceAvailable event');
+  }
+  expect(balanceAvailableEvent.parameters.amount.toString()).toEqual('25');
+
+  const tokenAddress = token.definition.networks[accountID.network].address;
+  const [escrowBalanceAfterEscrow, balanceAfterEscrow, toBalanceAfterEscrow, escrowPairBalance] = await Promise.all([
+    token.balanceOf(escrowAddress),
+    token.balanceOf(accountID.address),
+    token.balanceOf(toAccountID.address),
+    escrow.balanceOf(accountID.address, toAccountID.address, tokenAddress),
+  ]);
+  expect(escrowBalanceAfterEscrow.toString()).toEqual('25');
+  expect(balanceAfterEscrow.toString()).toEqual('50');
+  expect(toBalanceAfterEscrow.toString()).toEqual('25');
+  expect(escrowPairBalance.toString()).toEqual('25');
+
+  const [escrowClaimReceipt] = await Promise.all([
+    escrow.claim.confirmed(accountID.address, toAccountID.address, tokenAddress, new BigNumber('10'), {
+      from: toAccountID,
+    }),
+    developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+  ]);
+  if (escrowClaimReceipt.result.state === 'FAULT') {
+    throw new Error(escrowClaimReceipt.result.message);
+  }
+  expect(escrowClaimReceipt.result.value).toEqual(true);
+  expect(escrowClaimReceipt.events).toHaveLength(2);
+
+  const [
+    escrowBalanceAfterClaim,
+    balanceAfterClaim,
+    toBalanceAfterClaim,
+    escrowPairBalanceAfterClaim,
+  ] = await Promise.all([
+    token.balanceOf(escrowAddress),
+    token.balanceOf(accountID.address),
+    token.balanceOf(toAccountID.address),
+    escrow.balanceOf(accountID.address, toAccountID.address, tokenAddress),
+  ]);
+  expect(escrowBalanceAfterClaim.toString()).toEqual('15');
+  expect(balanceAfterClaim.toString()).toEqual('50');
+  expect(toBalanceAfterClaim.toString()).toEqual('35');
+  expect(escrowPairBalanceAfterClaim.toString()).toEqual('15');
 };
 
 const verifySmartContracts = async (
   ico: ICOSmartContract,
   token: TokenSmartContract,
-  icoRead: ICOReadSmartContract,
-  tokenRead: TokenReadSmartContract,
+  escrow: EscrowSmartContract,
   accountID: UserAccountID,
   toAccountID: UserAccountID,
   nowSeconds: number,
@@ -178,29 +250,26 @@ const verifySmartContracts = async (
     decimals,
     amountPerNEO,
     icoOwner,
-    owner,
     startTimeSeconds,
     icoDurationSeconds,
     initialTotalSupply,
     [initialRemaining, initialBalance],
   ] = await Promise.all([
-    tokenRead.name(),
-    tokenRead.symbol(),
-    tokenRead.decimals(),
-    icoRead.amountPerNEO(),
-    icoRead.owner(),
-    tokenRead.owner(),
-    icoRead.startTimeSeconds(),
-    icoRead.icoDurationSeconds(),
-    tokenRead.totalSupply(),
-    Promise.all([icoRead.remaining(), tokenRead.balanceOf(accountID.address)]),
+    token.name(),
+    token.symbol(),
+    token.decimals(),
+    ico.amountPerNEO(),
+    ico.owner(),
+    ico.startTimeSeconds(),
+    ico.icoDurationSeconds(),
+    token.totalSupply(),
+    Promise.all([ico.remaining(), token.balanceOf(accountID.address)]),
   ]);
   expect(name).toEqual('One');
   expect(symbol).toEqual('ONE');
   expect(decimals.toString()).toEqual('8');
   expect(amountPerNEO.toString()).toEqual('10');
   expect(icoOwner).toEqual(accountID.address);
-  expect(owner).toEqual(accountID.address);
   expect(startTimeSeconds.gte(new BigNumber(nowSeconds))).toBeTruthy();
   expect(icoDurationSeconds.toString()).toEqual('157700000');
   expect(initialTotalSupply.toString()).toEqual('0');
@@ -208,9 +277,8 @@ const verifySmartContracts = async (
   expect(initialBalance.toString()).toEqual('0');
 
   const mintResult = await ico.mintTokens({
-    transfers: [
+    sendTo: [
       {
-        to: ico.definition.networks[accountID.network].address,
         amount: new BigNumber(10),
         asset: Hash256.NEO,
       },
@@ -239,7 +307,7 @@ const verifySmartContracts = async (
   expect(event.parameters.to).toEqual(accountID.address);
   expect(event.parameters.amount.toString()).toEqual('100');
 
-  await verifySmartContractAfterMint(ico, token, accountID, toAccountID, developerClient);
+  await verifySmartContractAfterMint(ico, token, escrow, accountID, toAccountID, developerClient);
 };
 
 type WithContracts = (test: (contracts: Contracts & TestOptions) => Promise<void>) => Promise<void>;
@@ -247,12 +315,15 @@ const verifySmartContractsTest = async (nowSeconds: number) => {
   // tslint:disable-next-line no-require-imports
   const test = require('../__data__/ico/one/generated/test');
   const withContracts: WithContracts = test.withContracts;
-  await withContracts(async ({ ico, token, masterAccountID, networkName }) => {
+  await withContracts(async ({ ico, token, escrow, masterAccountID, networkName, client }) => {
+    await client.providers.memory.keystore.addUserAccount({
+      network: networkName,
+      privateKey: TO_PRIVATE_KEY,
+    });
     await verifySmartContracts(
       ico,
       token,
-      ico.read(networkName),
-      token.read(networkName),
+      escrow,
       masterAccountID,
       { network: networkName, address: privateKeyToAddress(TO_PRIVATE_KEY) },
       nowSeconds,
@@ -263,24 +334,34 @@ const verifySmartContractsTest = async (nowSeconds: number) => {
 const verifySmartContractsManual = async (accountID: UserAccountID, toAccountID: UserAccountID, nowSeconds: number) => {
   const {
     abi: icoABI,
-    contract: { createSmartContract: createICOSmartContract, createReadSmartContract: createICOReadSmartContract },
+    contract: { createSmartContract: createICOSmartContract },
   } = getGeneratedICOCode();
   expect(icoABI).toBeDefined();
   const {
     abi: tokenABI,
-    contract: { createSmartContract: createTokenSmartContract, createReadSmartContract: createTokenReadSmartContract },
+    contract: { createSmartContract: createTokenSmartContract },
   } = getGeneratedTokenCode();
+  expect(tokenABI).toBeDefined();
+  const {
+    abi: escrowABI,
+    contract: { createSmartContract: createEscrowSmartContract },
+  } = getGeneratedEscrowCode();
+  expect(escrowABI).toBeDefined();
+
   const { createClient, createDeveloperClients } = getGeneratedCommonCode();
   const client = createClient();
   const developerClient = createDeveloperClients().local;
-  expect(tokenABI).toBeDefined();
 
   const ico = createICOSmartContract(client);
-  const icoRead = createICOReadSmartContract(client.read(accountID.network));
   const token = createTokenSmartContract(client);
-  const tokenRead = createTokenReadSmartContract(client.read(accountID.network));
+  const escrow = createEscrowSmartContract(client);
 
-  await verifySmartContracts(ico, token, icoRead, tokenRead, accountID, toAccountID, nowSeconds, developerClient);
+  await client.providers.memory.keystore.addUserAccount({
+    network: accountID.network,
+    privateKey: TO_PRIVATE_KEY,
+  });
+
+  await verifySmartContracts(ico, token, escrow, accountID, toAccountID, nowSeconds, developerClient);
 };
 
 const verifyICOContract = (contract?: Contract): void => {
@@ -312,7 +393,23 @@ const verifyTokenContract = (contract?: Contract): void => {
   expect(contract.returnType).toEqual('Buffer');
   expect(contract.payable).toBeFalsy();
   expect(contract.storage).toBeTruthy();
-  expect(contract.dynamicInvoke).toBeFalsy();
+  expect(contract.dynamicInvoke).toBeTruthy();
+};
+
+const verifyEscrowContract = (contract?: Contract): void => {
+  expect(contract).toBeDefined();
+  if (contract === undefined) {
+    throw new Error('For TS');
+  }
+  expect(contract.codeVersion).toEqual('1.0');
+  expect(contract.author).toEqual('dicarlo2');
+  expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
+  expect(contract.description).toEqual('Escrow');
+  expect(contract.parameters).toEqual(['String', 'Array']);
+  expect(contract.returnType).toEqual('Buffer');
+  expect(contract.payable).toBeFalsy();
+  expect(contract.storage).toBeTruthy();
+  expect(contract.dynamicInvoke).toBeTruthy();
 };
 
 describe('buildCommand', () => {
@@ -346,6 +443,7 @@ describe('buildCommand', () => {
     const contracts = await getContracts(client, LOCAL);
     verifyICOContract(contracts.find((contract) => contract.name === 'ICO'));
     verifyTokenContract(contracts.find((contract) => contract.name === 'Token'));
+    verifyEscrowContract(contracts.find((contract) => contract.name === 'Escrow'));
 
     await Promise.all([
       verifySmartContractsTest(nowSeconds),

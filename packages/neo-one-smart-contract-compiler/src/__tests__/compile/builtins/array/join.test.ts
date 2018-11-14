@@ -26,7 +26,7 @@ describe('Array.prototype.join', () => {
       }
       const x: ReadonlyArray<number> | Arr<number> = [1, 2, 3] as ReadonlyArray<number> | Arr<number>;
 
-      assertEqual('1|2|3', x.join('|'));
+      assertEqual('1|2|3', x['join']('|'));
     `);
   });
 

@@ -122,6 +122,9 @@ export class ToStringHelper extends TypedHelper {
                   // []
                   sb.scope.set(sb, node, options, accum);
                 },
+                cleanup: () => {
+                  // do nothing
+                },
               }),
             );
             // [string]
@@ -189,6 +192,7 @@ export class ToStringHelper extends TypedHelper {
           set: convertEmptyString,
           setStorage: convertEmptyString,
           error: convertEmptyString,
+          forwardValue: convertEmptyString,
           iteratorResult: convertEmptyString,
           iterable: convertEmptyString,
           iterableIterator: convertEmptyString,

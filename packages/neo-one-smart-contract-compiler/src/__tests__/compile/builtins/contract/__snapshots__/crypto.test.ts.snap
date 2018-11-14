@@ -1,0 +1,89 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`crypto hash160 cannot be referenced - object literal 1`] = `
+"snippetCode.ts (4,15): Builtin properties cannot be referenced
+
+      2 |       import { crypto } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const { hash160 } = crypto;
+        |               ^
+      5 |     
+"
+`;
+
+exports[`crypto hash160 cannot be referenced 1`] = `
+"snippetCode.ts (4,30): Builtin properties cannot be referenced
+
+      2 |       import { crypto } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const hash160 = crypto.hash160;
+        |                              ^
+      5 |     
+"
+`;
+
+exports[`crypto hash256 cannot be referenced - object literal 1`] = `
+"snippetCode.ts (4,15): Builtin properties cannot be referenced
+
+      2 |       import { crypto } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const { hash256 } = crypto;
+        |               ^
+      5 |     
+"
+`;
+
+exports[`crypto hash256 cannot be referenced 1`] = `
+"snippetCode.ts (4,30): Builtin properties cannot be referenced
+
+      2 |       import { crypto } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const hash256 = crypto.hash256;
+        |                              ^
+      5 |     
+"
+`;
+
+exports[`crypto sha1 cannot be referenced - object literal 1`] = `
+"snippetCode.ts (4,15): Builtin properties cannot be referenced
+
+      2 |       import { crypto } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const { sha1 } = crypto;
+        |               ^
+      5 |     
+"
+`;
+
+exports[`crypto sha1 cannot be referenced 1`] = `
+"snippetCode.ts (4,27): Builtin properties cannot be referenced
+
+      2 |       import { crypto } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const sha1 = crypto.sha1;
+        |                           ^
+      5 |     
+"
+`;
+
+exports[`crypto sha256 cannot be referenced - object literal 1`] = `
+"snippetCode.ts (4,15): Builtin properties cannot be referenced
+
+      2 |       import { crypto } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const { sha256 } = crypto;
+        |               ^
+      5 |     
+"
+`;
+
+exports[`crypto sha256 cannot be referenced 1`] = `
+"snippetCode.ts (4,29): Builtin properties cannot be referenced
+
+      2 |       import { crypto } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const sha256 = crypto.sha256;
+        |                             ^
+      5 |     
+"
+`;

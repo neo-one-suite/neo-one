@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-core';
+import { common } from '@neo-one/client-common';
 import { helpers } from '../../../../../__data__';
 import { DiagnosticCode } from '../../../../../DiagnosticCode';
 
@@ -28,6 +28,16 @@ describe('Hash256.from', () => {
       `
       import { Hash256 } from '@neo-one/smart-contract';
       const keys = Hash256.from;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('cannot be referenced - object literal', async () => {
+    helpers.compileString(
+      `
+      import { Hash256 } from '@neo-one/smart-contract';
+      const { from } = Hash256;
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );

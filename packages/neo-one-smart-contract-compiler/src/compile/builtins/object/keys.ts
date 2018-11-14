@@ -96,6 +96,7 @@ export class ObjectKeys extends BuiltinMemberCall {
         set: emptyArray,
         setStorage: emptyArray,
         error: emptyArray,
+        forwardValue: emptyArray,
         iteratorResult: emptyArray,
         iterable: emptyArray,
         iterableIterator: emptyArray,

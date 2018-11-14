@@ -1,12 +1,12 @@
 // tslint:disable ban-types
-import { OpCode, SysCallName, UInt160 } from '@neo-one/client-core';
-import { BN } from 'bn.js';
+import { OpCode, SysCallName, UInt160 } from '@neo-one/client-common';
+import BN from 'bn.js';
 import ts from 'typescript';
 import { Context } from '../../Context';
 import { Helper, Helpers } from '../helper';
 import { Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
-import { VisitOptions } from '../types';
+import { HandleSuperConstruct, VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 
 export type SingleBytecodeValue = Buffer | Jump | Line;
@@ -40,6 +40,7 @@ export interface ScriptBuilder {
   readonly emitCall: (node: ts.Node) => void;
   readonly emitSysCall: (node: ts.Node, name: SysCallName) => void;
   readonly emitLine: (node: ts.Node) => void;
+  readonly isCurrentSmartContract: (node: ts.Node) => boolean;
   readonly getLinkedScriptHash: (node: ts.Node, filePath: string, smartContractClass: string) => UInt160 | undefined;
   readonly loadModule: (node: ts.SourceFile) => void;
   readonly capture: (func: () => void) => CaptureResult;
@@ -53,6 +54,10 @@ export interface ScriptBuilder {
   readonly catchPCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
   readonly noCatchPCOptions: (options: VisitOptions) => VisitOptions;
   readonly finallyPCOptions: (options: VisitOptions, pc: ProgramCounter) => VisitOptions;
+  readonly handleSuperConstructOptions: (
+    options: VisitOptions,
+    handleSuperConstruct: HandleSuperConstruct,
+  ) => VisitOptions;
   readonly castOptions: (options: VisitOptions, type?: ts.Type) => VisitOptions;
   readonly noCastOptions: (options: VisitOptions) => VisitOptions;
   readonly superClassOptions: (options: VisitOptions, superClass: Name) => VisitOptions;

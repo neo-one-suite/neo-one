@@ -1,0 +1,370 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`JSONRPCClient fastForwardOffset 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "fastforwardoffset",
+      "params": Array [
+        10,
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient fastForwardToTime 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "fastforwardtotime",
+      "params": Array [
+        10,
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getAccount 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getaccountstate",
+      "params": Array [
+        "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getAsset 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getassetstate",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getBestBlockHash 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getbestblockhash",
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getBlock - hash 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getblock",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+        1,
+      ],
+      "watchTimeoutMS": undefined,
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getBlock - index 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getblock",
+      "params": Array [
+        10,
+        1,
+      ],
+      "watchTimeoutMS": 1000,
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getBlockCount 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getblockcount",
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getClaimAmount 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getclaimamount",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+        2,
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getConnectedPeers 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getpeers",
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getContract 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getcontractstate",
+      "params": Array [
+        "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getInvocationData 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getinvocationdata",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getMemPool 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getrawmempool",
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getNetworkSettings 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getnetworksettings",
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getOutput 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getoutput",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+        2,
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getTransaction 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getrawtransaction",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+        1,
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getTransactionReceipt 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "gettransactionreceipt",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+      ],
+      "watchTimeoutMS": 1000,
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getUnspentOutput - defined 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "gettxout",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+        2,
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient getUnspentOutput - undefined 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "gettxout",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+        2,
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient relayTransaction - other error 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "relaytransaction",
+      "params": Array [
+        "b500",
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient relayTransaction - relay error 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "relaytransaction",
+      "params": Array [
+        "b500",
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient relayTransaction 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "relaytransaction",
+      "params": Array [
+        "b500",
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient reset 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "reset",
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient runConsensusNow 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "runconsensusnow",
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient testInvocation 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "testinvocation",
+      "params": Array [
+        "b500",
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient testInvokeRaw 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "invokescript",
+      "params": Array [
+        "b500",
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`JSONRPCClient updateSettings 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "updatesettings",
+      "params": Array [
+        Object {
+          "secondsPerBlock": 10,
+        },
+      ],
+    },
+    undefined,
+  ],
+]
+`;

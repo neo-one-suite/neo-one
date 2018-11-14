@@ -1,6 +1,5 @@
-import { VERSION } from '@neo-one/server';
 import { ServerManager } from '@neo-one/server-client';
-import { CLIArgs, name } from '@neo-one/server-plugin';
+import { CLIArgs, name, VERSION } from '@neo-one/server-plugin';
 import { combineLatest } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { setupServer } from './common';

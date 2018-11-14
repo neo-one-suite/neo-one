@@ -8,14 +8,6 @@ export class ForStatementCompiler extends NodeCompiler<ts.ForStatement> {
   public readonly kind = ts.SyntaxKind.ForStatement;
 
   public visitNode(sb: ScriptBuilder, node: ts.ForStatement, options: VisitOptions): void {
-    let initializer;
-    const exprInitializer = tsUtils.statement.getInitializer(node);
-    if (exprInitializer !== undefined) {
-      initializer = () => {
-        sb.visit(exprInitializer, sb.noPushValueOptions(options));
-      };
-    }
-
     let condition;
     const exprCondition = tsUtils.statement.getCondition(node);
     if (exprCondition !== undefined) {
@@ -39,15 +31,22 @@ export class ForStatementCompiler extends NodeCompiler<ts.ForStatement> {
       };
     }
 
+    const exprInitializer = tsUtils.statement.getInitializer(node);
+    if (exprInitializer !== undefined) {
+      sb.visit(exprInitializer, sb.noPushValueOptions(options));
+    }
+
     sb.emitHelper(
       node,
       options,
       sb.helpers.forLoop({
-        initializer,
         condition,
         incrementor,
         each: (innerOptions) => {
           sb.visit(tsUtils.statement.getStatement(node), sb.noPushValueOptions(innerOptions));
+        },
+        cleanup: () => {
+          // do nothing
         },
       }),
     );

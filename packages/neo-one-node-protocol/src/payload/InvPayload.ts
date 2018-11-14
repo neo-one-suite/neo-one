@@ -1,13 +1,5 @@
-import {
-  BinaryReader,
-  BinaryWriter,
-  createSerializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableWire,
-  SerializeWire,
-  UInt256,
-} from '@neo-one/client-core';
+import { BinaryWriter, createSerializeWire, SerializableWire, SerializeWire, UInt256 } from '@neo-one/client-common';
+import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions } from '@neo-one/node-core';
 import { assertInventoryType, InventoryType } from './InventoryType';
 export interface InvPayloadAdd {
   readonly type: InventoryType;

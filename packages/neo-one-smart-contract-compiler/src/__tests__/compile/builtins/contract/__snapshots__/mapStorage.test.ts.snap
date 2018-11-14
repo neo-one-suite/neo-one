@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MapStorage invalid "reference" 1`] = `
+"snippetCode.ts (4,30): Builtin properties cannot be referenced
+
+      2 |       import { MapStorage } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const for = MapStorage['for'];
+        |                              ^
+      5 |     
+"
+`;
+
+exports[`MapStorage invalid create 1`] = `
+"snippetCode.ts (4,13): Persistent storage classes may only be used as SmartContract private or protected readonly properties with a property initializer.
+
+      2 |       import { MapStorage } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const storage = MapStorage.for<string, number>();
+        |             ^
+      5 |     
+"
+`;
+
+exports[`MapStorage invalid object value - method 1`] = `
+"snippetCode.ts (5,59): Type '{ bar(): boolean; }' does not satisfy the constraint 'SerializableValue'.
+  Type '{ bar(): boolean; }' is not assignable to type 'SerializableValueObject'.
+    Property 'bar' is incompatible with index signature.
+      Type '() => boolean' is not assignable to type 'SerializableValue'.
+        Type '() => boolean' is not assignable to type 'SerializableValueObject'.
+          Index signature is missing in type '() => boolean'.
+
+      3 | 
+      4 |       export class Contract extends SmartContract {
+    > 5 |         private readonly storage = MapStorage.for<string, {
+        |                                                           ^
+      6 |           bar(): boolean;
+      7 |         }>();
+      8 | 
+"
+`;
+
+exports[`MapStorage invalid reference - object 1`] = `
+"snippetCode.ts (4,15): Builtin properties cannot be referenced
+
+      2 |       import { MapStorage } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const { for } = MapStorage;
+        |               ^
+      5 |     
+"
+`;
+
+exports[`MapStorage invalid reference 1`] = `
+"snippetCode.ts (4,30): Builtin properties cannot be referenced
+
+      2 |       import { MapStorage } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const for = MapStorage.for;
+        |                              ^
+      5 |     
+"
+`;

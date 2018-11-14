@@ -1,0 +1,27 @@
+{
+  "title": "Participate in the ICO",
+  "files": [
+    {
+      "initial": "src/utils.ts",
+      "solution": "src/utils.solution.ts"
+    },
+    {
+      "solution": "src/__tests__/utils.test.ts"
+    },
+    {
+      "solution": "src/ICO.tsx"
+    },
+    {
+      "solution": "src/index.tsx"
+    },
+    {
+      "solution": "one/contracts/Token.one.ts"
+    },
+    {
+      "solution": "public/index.html"
+    },
+    {
+      "solution": "package.json"
+    }
+  ]
+}

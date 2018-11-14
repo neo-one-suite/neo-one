@@ -40,6 +40,7 @@ export class TypeOfExpressionCompiler extends NodeCompiler<ts.TypeOfExpression> 
         set: pushObject,
         setStorage: pushObject,
         error: pushObject,
+        forwardValue: pushObject,
         iteratorResult: pushObject,
         iterable: pushObject,
         iterableIterator: pushObject,

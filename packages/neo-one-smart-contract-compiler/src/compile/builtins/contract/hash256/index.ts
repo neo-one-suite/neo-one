@@ -1,12 +1,14 @@
-import { common } from '@neo-one/client-core';
-import { BuiltinBase } from '../../BuiltinBase';
+import { common } from '@neo-one/client-common';
 import { BuiltinConstantBufferMemberValue } from '../../BuiltinConstantBufferMemberValue';
 import { BuiltinInterface } from '../../BuiltinInterface';
 import { Builtins } from '../../Builtins';
+import { BuiltinValueObject } from '../../BuiltinValueObject';
 import { Hash256From } from './from';
 
 class Hash256Interface extends BuiltinInterface {}
-class Hash256Value extends BuiltinBase {}
+class Hash256Value extends BuiltinValueObject {
+  public readonly type = 'Hash256Constructor';
+}
 class Hash256ConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name

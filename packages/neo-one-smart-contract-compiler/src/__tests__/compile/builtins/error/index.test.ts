@@ -66,4 +66,13 @@ describe('Error', () => {
       assertEqual(x instanceof Error, true);
     `);
   });
+
+  test('can be constructed without string', async () => {
+    await helpers.executeString(`
+      new Error();
+      const x = new Error();
+      assertEqual(x.message, '');
+      assertEqual(x instanceof Error, true);
+    `);
+  });
 });

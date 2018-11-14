@@ -1,4 +1,4 @@
-import { TransactionType } from '@neo-one/client-core';
+import { TransactionTypeModel as TransactionType } from '@neo-one/client-common';
 import { BuiltinBase } from '../BuiltinBase';
 import { BuiltinConstantNumberMemberValue } from '../BuiltinConstantNumberMemberValue';
 import { Builtins } from '../Builtins';

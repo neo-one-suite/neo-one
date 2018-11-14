@@ -1,27 +1,26 @@
+import { BinaryWriter, common, ECPoint, UInt160, UInt256 } from '@neo-one/client-common';
 import {
   Account,
   Asset,
   Attribute,
-  BinaryWriter,
   Block,
   BlockBase,
-  common,
   Contract,
   ContractParameter,
-  ECPoint,
   Equatable,
   Input,
   Output,
   Transaction,
-  UInt160,
-  UInt256,
   utils,
   Validator,
   VMSettings,
-} from '@neo-one/client-core';
-import { BN } from 'bn.js';
+  Witness,
+} from '@neo-one/node-core';
+import BN from 'bn.js';
+import { MAX_SIZE_BIG_INTEGER } from '../constants';
 import { AttributeStackItem } from './AttributeStackItem';
 import {
+  IntegerTooLargeError,
   InvalidRecursiveSerializeError,
   InvalidValueAccountError,
   InvalidValueArrayError,
@@ -40,6 +39,7 @@ import {
   InvalidValueStorageContextStackItemError,
   InvalidValueTransactionError,
   InvalidValueValidatorError,
+  InvalidValueWitnessError,
 } from './errors';
 import { MapStackItem } from './MapStackItem';
 import { StackItem } from './StackItem';
@@ -57,6 +57,40 @@ export interface AsStorageContextStackItemOptions {
 }
 
 export class StackItemBase implements Equatable {
+  private mutableCount = 0;
+
+  public get referenceCount(): number {
+    return this.mutableCount;
+  }
+
+  public increment(seen = new Set<StackItemBase>()): number {
+    if (seen.has(this)) {
+      return 1;
+    }
+    seen.add(this);
+    this.mutableCount += 1;
+
+    if (this.mutableCount > 1) {
+      return 1;
+    }
+
+    return this.incrementInternal(seen) + 1;
+  }
+
+  public decrement(seen = new Set<StackItemBase>()): number {
+    if (seen.has(this)) {
+      return -1;
+    }
+    seen.add(this);
+    this.mutableCount -= 1;
+
+    if (this.mutableCount >= 1) {
+      return -1;
+    }
+
+    return this.decrementInternal(seen) - 1;
+  }
+
   public toStructuralKey(): string {
     return this.asBuffer().toString('hex');
   }
@@ -86,9 +120,10 @@ export class StackItemBase implements Equatable {
     if (seen.has(this)) {
       throw new InvalidRecursiveSerializeError();
     }
-    seen.add(this);
+    const nextSeen = new Set(seen);
+    nextSeen.add(this);
 
-    return this.serializeInternal(seen);
+    return this.serializeInternal(nextSeen);
   }
 
   // tslint:disable-next-line readonly-array
@@ -97,10 +132,17 @@ export class StackItemBase implements Equatable {
   }
 
   public asBigInteger(): BN {
-    return utils.fromSignedBuffer(this.asBuffer());
+    const value = this.asBuffer();
+    if (value.length > MAX_SIZE_BIG_INTEGER) {
+      /* istanbul ignore next */
+      throw new IntegerTooLargeError();
+    }
+
+    return utils.fromSignedBuffer(value);
   }
 
   public asBuffer(): Buffer {
+    /* istanbul ignore next */
     throw new Error('Unimplemented.');
   }
 
@@ -141,9 +183,7 @@ export class StackItemBase implements Equatable {
   }
 
   public asECPoint(): ECPoint {
-    const buffer = this.asBuffer();
-
-    return buffer.length === 0 ? common.ECPOINT_INFINITY : common.bufferToECPoint(buffer);
+    return common.bufferToECPoint(this.asBuffer());
   }
 
   public asECPointMaybe(): ECPoint | undefined {
@@ -172,6 +212,10 @@ export class StackItemBase implements Equatable {
 
   public asTransaction(): Transaction {
     throw new InvalidValueTransactionError();
+  }
+
+  public asWitness(): Witness {
+    throw new InvalidValueWitnessError();
   }
 
   public asAttribute(): Attribute {
@@ -219,6 +263,7 @@ export class StackItemBase implements Equatable {
   }
 
   public asStorageContextStackItem(_options: AsStorageContextStackItemOptions): StorageContextStackItem {
+    /* istanbul ignore next */
     throw new InvalidValueStorageContextStackItemError();
   }
 
@@ -226,7 +271,12 @@ export class StackItemBase implements Equatable {
     return false;
   }
 
+  public isMap(): boolean {
+    return false;
+  }
+
   public toContractParameter(): ContractParameter {
+    /* istanbul ignore next */
     throw new Error('Not Implemented');
   }
 
@@ -243,9 +293,26 @@ export class StackItemBase implements Equatable {
     if (seen.has(this)) {
       return '<circular>';
     }
-    seen.add(this);
+    const nextSeen = new Set(seen);
+    nextSeen.add(this);
 
-    return this.convertJSONInternal(seen);
+    return this.convertJSONInternal(nextSeen);
+  }
+
+  protected incrementInternal(_seen: Set<StackItemBase>): number {
+    return 0;
+  }
+
+  protected decrementInternal(_seen: Set<StackItemBase>): number {
+    return 0;
+  }
+
+  protected incrementInternalArray(stackItems: ReadonlyArray<StackItem>, seen: Set<StackItemBase>): number {
+    return stackItems.reduce((acc, val) => acc + val.increment(seen), 0);
+  }
+
+  protected decrementInternalArray(stackItems: ReadonlyArray<StackItem>, seen: Set<StackItemBase>): number {
+    return stackItems.reduce((acc, val) => acc + val.decrement(seen), 0);
   }
 
   protected serializeInternal(_seen: Set<StackItemBase>): Buffer {

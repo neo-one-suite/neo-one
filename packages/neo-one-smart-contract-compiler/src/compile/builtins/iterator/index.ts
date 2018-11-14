@@ -1,9 +1,7 @@
 import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
 
-class IteratorInterface extends BuiltinInterface {
-  public readonly canImplement = false;
-}
+class IteratorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {

@@ -1,4 +1,5 @@
 import { helpers } from '../../../../__data__';
+import { ArrayConcat } from '../../../../compile/builtins/array/concat';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Array.prototype.concat', () => {
@@ -76,5 +77,9 @@ describe('Array.prototype.concat', () => {
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
+  });
+
+  test('canCall', () => {
+    expect(new ArrayConcat().canCall()).toBeTruthy();
   });
 });

@@ -1,4 +1,4 @@
-import { converters, RawAction } from '@neo-one/client-core';
+import { RawAction, smartContractConverters as converters } from '@neo-one/client-common';
 import _ from 'lodash';
 import { ProcessErrorError, ProcessErrorTrace } from './processError';
 

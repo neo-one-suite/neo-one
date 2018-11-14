@@ -8,8 +8,17 @@
     ]
   },
   "docs": {
-    "Getting Started": [
-      "installation"
+    "Documentation": [
+      "getting-started",
+      "playground-tutorial",
+      "writing-a-smart-contract",
+      "testing",
+      "front-end",
+      "smart-contract-api",
+      "client-api",
+      "client-types",
+      "read-client-api",
+      "developer-client-api"
     ]
   }
 }

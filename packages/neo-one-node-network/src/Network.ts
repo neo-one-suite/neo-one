@@ -1,24 +1,26 @@
 import { metrics, Monitor } from '@neo-one/monitor';
-import { createEndpoint, Endpoint, getEndpointConfig } from '@neo-one/node-core';
+import {
+  ConnectedPeer,
+  createEndpoint,
+  Endpoint,
+  getEndpointConfig,
+  NegotiateResult,
+  NetworkCreateOptions,
+  OnNetworkEvent,
+  Peer,
+  PeerHealthBase,
+} from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import * as net from 'net';
 import { Observable, Subscription } from 'rxjs';
 import { Duplex } from 'stream';
-import { ConnectedPeer } from './ConnectedPeer';
 import { UnsupportedEndpointType } from './errors';
-import { OnEvent } from './event';
-import { Peer } from './Peer';
 import { TCPPeer } from './TCPPeer';
 
 export interface ListenTCP {
   readonly port: number;
   readonly host?: string;
-}
-
-export interface NegotiateResult<PeerData> {
-  readonly data: PeerData;
-  readonly relay: boolean;
 }
 
 export interface NetworkEnvironment {
@@ -35,23 +37,11 @@ export interface NetworkOptions {
   readonly connectErrorCodes?: ReadonlyArray<string>;
 }
 
-export interface PeerHealthBase {
-  readonly healthy: boolean;
-}
-
-interface NetworkConstructOptions<Message, PeerData, PeerHealth extends PeerHealthBase> {
+interface NetworkConstructOptions<Message, PeerData, PeerHealth extends PeerHealthBase>
+  extends NetworkCreateOptions<Message, PeerData, PeerHealth> {
   readonly monitor: Monitor;
   readonly environment?: NetworkEnvironment;
   readonly options$: Observable<NetworkOptions>;
-  readonly negotiate: (peer: Peer<Message>) => Promise<NegotiateResult<PeerData>>;
-  readonly checkPeerHealth: (
-    connectedPeer: ConnectedPeer<Message, PeerData>,
-    previousHealth?: PeerHealth,
-  ) => PeerHealth;
-  readonly createMessageTransform: () => Duplex;
-  readonly onMessageReceived: (peer: ConnectedPeer<Message, PeerData>, message: Message) => void;
-  readonly onRequestEndpoints: () => void;
-  readonly onEvent?: OnEvent<Message, PeerData>;
 }
 
 const emptyFunction = () => {
@@ -128,7 +118,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
   private mutablePeerSeeds: Set<Endpoint>;
   private readonly listenTCP: ListenTCP | undefined;
   private mutableTCPServer: net.Server | undefined;
-  private mutableConnectPeersTimeout: NodeJS.Timer | undefined;
+  private mutableConnectPeersTimeout: number | undefined;
   private mutableSubscription: Subscription | undefined;
   private readonly negotiateInternal: (peer: Peer<Message>) => Promise<NegotiateResult<PeerData>>;
   private readonly checkPeerHealthInternal: (
@@ -138,7 +128,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
   private readonly createMessageTransformInternal: () => Duplex;
   private readonly onMessageReceivedInternal: (peer: ConnectedPeer<Message, PeerData>, message: Message) => void;
   private readonly onRequestEndpointsInternal: () => void;
-  private readonly onEventInternal: OnEvent<Message, PeerData>;
+  private readonly onEventInternal: OnNetworkEvent<Message, PeerData>;
 
   public constructor(options: NetworkConstructOptions<Message, PeerData, PeerHealth>) {
     const { environment = {}, options$ } = options;
@@ -374,7 +364,8 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
           this.mutableConnectPeersTimeout = setTimeout(() => {
             this.mutableConnectPeersTimeout = undefined;
             resolve();
-          }, this.mutableConnectPeersDelayMS);
+            // tslint:disable-next-line no-any
+          }, this.mutableConnectPeersDelayMS) as any;
         });
       } catch (error) {
         this.monitor.logError({

@@ -1,4 +1,5 @@
-import { common as clientCommon, crypto, Settings, TransactionType, UInt160 } from '@neo-one/client-core';
+import { common as clientCommon, crypto, UInt160 } from '@neo-one/client-common';
+import { Settings, TransactionType } from '@neo-one/node-core';
 import { common } from './common';
 
 const DEFAULT_VALIDATORS: ReadonlyArray<string> = [
@@ -73,6 +74,9 @@ export const createMain = ({
           index: 0,
         },
       },
+    },
+    features: {
+      structClone: privateNet ? -1 : Number.MAX_SAFE_INTEGER,
     },
   };
 };

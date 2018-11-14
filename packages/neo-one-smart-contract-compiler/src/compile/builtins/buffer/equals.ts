@@ -4,11 +4,11 @@ import { isBuffer } from '../../helper/types';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { BuiltinInstanceMemberCall } from '../BuiltinInstanceMemberCall';
-import { MemberLikeExpression } from '../types';
+import { CallMemberLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
 export class BufferEquals extends BuiltinInstanceMemberCall {
-  public canCall(sb: ScriptBuilder, _func: MemberLikeExpression, node: ts.CallExpression): boolean {
+  public canCall(sb: ScriptBuilder, _func: CallMemberLikeExpression, node: ts.CallExpression): boolean {
     const arg = tsUtils.argumented.getArguments(node)[0] as ts.Expression | undefined;
     if (arg === undefined) {
       /* istanbul ignore next */
@@ -22,13 +22,13 @@ export class BufferEquals extends BuiltinInstanceMemberCall {
 
   public emitCall(
     sb: ScriptBuilder,
-    func: MemberLikeExpression,
+    func: CallMemberLikeExpression,
     node: ts.CallExpression,
     optionsIn: VisitOptions,
     visited: boolean,
   ): void {
     const options = sb.pushValueOptions(optionsIn);
-    if (!visited && (ts.isPropertyAccessExpression(func) || ts.isElementAccessExpression(func))) {
+    if (!visited) {
       // [arrayVal]
       sb.visit(tsUtils.expression.getExpression(func), options);
     }
@@ -38,12 +38,8 @@ export class BufferEquals extends BuiltinInstanceMemberCall {
       return;
     }
 
-    // [buffer]
-    sb.emitHelper(node, options, sb.helpers.unwrapBuffer);
-    // [bufferVal, buffer]
+    // [bufferVal, bufferVal]
     sb.visit(tsUtils.argumented.getArguments(node)[0], options);
-    // [buffer, buffer]
-    sb.emitHelper(tsUtils.argumented.getArguments(node)[0], options, sb.helpers.unwrapBuffer);
     // [boolean]
     sb.emitOp(node, 'EQUAL');
     if (optionsIn.pushValue) {

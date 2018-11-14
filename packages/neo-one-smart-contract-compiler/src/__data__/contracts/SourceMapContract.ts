@@ -1,18 +1,16 @@
-import { Address, SmartContract } from '@neo-one/smart-contract';
+import { SmartContract } from '@neo-one/smart-contract';
 
-export class SourceMapContract implements SmartContract {
-  public readonly owner: Address;
+export class SourceMapContract extends SmartContract {
   public readonly properties = {
     codeVersion: '1.0',
     author: 'dicarlo2',
     email: 'alex.dicarlo@neotracker.io',
     description: 'SourceMapContract',
-    payable: false,
   };
   private readonly constructorValue: number;
 
-  public constructor(owner: Address, constructorValue: number) {
-    this.owner = owner;
+  public constructor(constructorValue: number) {
+    super();
     this.constructorValue = constructorValue;
   }
 

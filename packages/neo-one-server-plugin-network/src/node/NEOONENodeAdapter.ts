@@ -31,12 +31,11 @@ export interface NodeConfig {
 }
 
 const DEFAULT_RPC_URLS: ReadonlyArray<string> = [
-  'https://pyrpc1.narrative.org:443',
-  'https://pyrpc2.narrative.org:443',
-  'https://pyrpc3.narrative.org:443',
-  'https://pyrpc4.narrative.org:443',
-  'http://seed1.travala.com:10332',
-  'http://seed2.travala.com:10332',
+  'http://node1.nyc3.bridgeprotocol.io:10332',
+  'http://node2.nyc3.bridgeprotocol.io:10332',
+  'https://seed1.switcheo.network:10331',
+  'https://seed2.switcheo.network:10331',
+  'https://seed3.switcheo.network:10331',
   'http://seed1.aphelion-neo.com:10332',
   'http://seed2.aphelion-neo.com:10332',
   'http://seed3.aphelion-neo.com:10332',
@@ -44,10 +43,11 @@ const DEFAULT_RPC_URLS: ReadonlyArray<string> = [
 ];
 
 const DEFAULT_SEEDS: ReadonlyArray<EndpointConfig> = [
-  { type: 'tcp', host: 'seed1.travala.com', port: 10333 },
-  { type: 'tcp', host: 'seed2.travala.com', port: 10333 },
-  { type: 'tcp', host: 'seed3.travala.com', port: 10333 },
-  { type: 'tcp', host: 'seed4.travala.com', port: 10333 },
+  { type: 'tcp', host: 'node1.nyc3.bridgeprotocol.io', port: 10333 },
+  { type: 'tcp', host: 'node2.nyc3.bridgeprotocol.io', port: 10333 },
+  { type: 'tcp', host: 'seed1.switcheo.com', port: 10333 },
+  { type: 'tcp', host: 'seed2.switcheo.com', port: 10333 },
+  { type: 'tcp', host: 'seed3.switcheo.com', port: 10333 },
   { type: 'tcp', host: 'seed1.aphelion-neo.com', port: 10333 },
   { type: 'tcp', host: 'seed2.aphelion-neo.com', port: 10333 },
   { type: 'tcp', host: 'seed3.aphelion-neo.com', port: 10333 },
@@ -66,7 +66,8 @@ const makeDefaultConfig = (dataPath: string): NodeConfig => ({
   environment: {
     dataPath: path.resolve(dataPath, 'node'),
     rpc: {},
-    node: { network: {} },
+    node: {},
+    network: {},
   },
   options: {
     node: {
@@ -74,10 +75,10 @@ const makeDefaultConfig = (dataPath: string): NodeConfig => ({
         enabled: false,
         options: { privateKey: 'default', privateNet: false },
       },
-      network: {
-        seeds: DEFAULT_SEEDS.map(createEndpoint),
-      },
       rpcURLs: [...DEFAULT_RPC_URLS],
+    },
+    network: {
+      seeds: DEFAULT_SEEDS.map(createEndpoint),
     },
     rpc: {
       server: {
@@ -132,7 +133,7 @@ export const createNodeConfig = ({
         },
         environment: {
           type: 'object',
-          required: ['dataPath', 'rpc', 'node'],
+          required: ['dataPath', 'rpc', 'node', 'network'],
           properties: {
             dataPath: { type: 'string' },
             rpc: {
@@ -160,44 +161,44 @@ export const createNodeConfig = ({
                 },
               },
             },
-
             node: {
               type: 'object',
-              required: ['network'],
+              required: [],
               properties: {
-                network: {
+                externalPort: { type: 'number' },
+              },
+            },
+            network: {
+              type: 'object',
+              required: [],
+              properties: {
+                listenTCP: {
                   type: 'object',
-                  required: [],
+                  required: ['port'],
                   properties: {
-                    listenTCP: {
-                      type: 'object',
-                      required: ['port'],
-                      properties: {
-                        host: { type: 'string' },
-                        port: { type: 'number' },
-                      },
-                    },
-
-                    externalEndpoints: {
-                      type: 'array',
-                      items: { type: 'string' },
-                    },
-
-                    connectPeersDelayMS: { type: 'number' },
-                    socketTimeoutMS: { type: 'number' },
+                    host: { type: 'string' },
+                    port: { type: 'number' },
                   },
                 },
+
+                externalEndpoints: {
+                  type: 'array',
+                  items: { type: 'string' },
+                },
+
+                connectPeersDelayMS: { type: 'number' },
+                socketTimeoutMS: { type: 'number' },
               },
             },
           },
         },
         options: {
           type: 'object',
-          required: ['node', 'rpc'],
+          required: ['node', 'network', 'rpc'],
           properties: {
             node: {
               type: 'object',
-              required: ['consensus', 'rpcURLs', 'network'],
+              required: ['consensus', 'rpcURLs'],
               properties: {
                 consensus: {
                   type: 'object',
@@ -214,15 +215,15 @@ export const createNodeConfig = ({
                     },
                   },
                 },
-                network: {
-                  type: 'object',
-                  required: ['seeds'],
-                  properties: {
-                    seeds: { type: 'array', items: { type: 'string' } },
-                    maxConnectedPeers: { type: 'number' },
-                  },
-                },
                 rpcURLs: { type: 'array', items: { type: 'string' } },
+              },
+            },
+            network: {
+              type: 'object',
+              required: ['seeds'],
+              properties: {
+                seeds: { type: 'array', items: { type: 'string' } },
+                maxConnectedPeers: { type: 'number' },
               },
             },
             rpc: {
@@ -432,11 +433,12 @@ export class NEOONENodeAdapter extends NodeAdapter {
           },
         },
         node: {
-          network: {
-            listenTCP: {
-              port: settings.listenTCPPort,
-              host: '0.0.0.0',
-            },
+          externalPort: settings.listenTCPPort,
+        },
+        network: {
+          listenTCP: {
+            port: settings.listenTCPPort,
+            host: '0.0.0.0',
           },
         },
         telemetry: {
@@ -446,10 +448,10 @@ export class NEOONENodeAdapter extends NodeAdapter {
       options: {
         node: {
           consensus: settings.consensus,
-          network: {
-            seeds: settings.seeds,
-          },
           rpcURLs: settings.rpcEndpoints,
+        },
+        network: {
+          seeds: settings.seeds,
         },
         rpc: {
           server: {

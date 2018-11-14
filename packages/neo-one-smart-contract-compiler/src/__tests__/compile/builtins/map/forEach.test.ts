@@ -49,6 +49,16 @@ describe('Map.prototype.forEach', () => {
     );
   });
 
+  test('cannot be referenced - object literal', async () => {
+    helpers.compileString(
+      `
+      const x = new Map<string, number>();
+      const { forEach } = x;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
   test('cannot be "referenced"', async () => {
     helpers.compileString(
       `

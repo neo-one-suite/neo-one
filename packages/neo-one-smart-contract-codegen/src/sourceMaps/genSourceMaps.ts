@@ -1,4 +1,4 @@
-import { SourceMaps } from '@neo-one/client';
+import { SourceMaps } from '@neo-one/client-common';
 import { createHash, Hash } from 'crypto';
 import _ from 'lodash';
 import { RawSourceMap } from 'source-map';
@@ -13,7 +13,7 @@ const hashSourceMap = (hash: Hash, sourceMap: RawSourceMap) =>
     .update(`${sourceMap.version}`);
 
 const hashSourceMaps = (sourceMaps: SourceMaps) =>
-  _.sortBy(Object.entries(sourceMaps), ([key]) => key)
+  _.sortBy(Object.entries(sourceMaps), [([key]: [string, RawSourceMap]) => key])
     .reduce((hash, value) => hashSourceMap(hash, value[1]), createHash('md5').update('v1'))
     .digest('hex');
 
@@ -37,7 +37,7 @@ import { projectID } from '${getRelativeImport(sourceMapsPath, projectIDPath)}';
 
 let sourceMapsIn = Promise.resolve({});
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
   sourceMapsIn = Promise.resolve().then(async () => {
     const client = new OneClient(${httpServerPort});
     const result = await client.request({
@@ -56,7 +56,7 @@ import { OneClient, SourceMaps } from '@neo-one/client';
 import { projectID } from '${getRelativeImport(sourceMapsPath, projectIDPath)}';
 
 let sourceMapsIn: Promise<SourceMaps> = Promise.resolve({});
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
   sourceMapsIn = Promise.resolve().then(async () => {
     const client = new OneClient(${httpServerPort});
     const result = await client.request({

@@ -1,5 +1,6 @@
 // tslint:disable no-any no-object-mutation readonly-keyword
-import { common, Contract, crypto, StorageItem } from '@neo-one/client-core';
+import { common, crypto } from '@neo-one/client-common';
+import { Contract, StorageItem } from '@neo-one/node-core';
 
 interface Storages {
   [key: string]: StorageItem;

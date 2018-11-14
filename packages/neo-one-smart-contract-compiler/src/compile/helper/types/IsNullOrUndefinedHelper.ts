@@ -44,6 +44,7 @@ export class IsNullOrUndefinedHelper extends TypedHelper {
         set: pushFalse,
         setStorage: pushFalse,
         error: pushFalse,
+        forwardValue: pushFalse,
         iteratorResult: pushFalse,
         iterable: pushFalse,
         iterableIterator: pushFalse,

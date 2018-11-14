@@ -7,19 +7,16 @@ export const genReact = ({
   reactPath,
   commonTypesPath,
   clientPath,
-  projectIDPath,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly reactPath: string;
   readonly commonTypesPath: string;
   readonly clientPath: string;
-  readonly projectIDPath: string;
 }) => ({
   js: `
-import { DeveloperTools as DeveloperToolsBase } from '@neo-one/react';
+import { DeveloperTools } from '@neo-one/client';
 import * as React from 'react';
-import { createClient, createDeveloperClients, createOneClients } from '${getRelativeImport(reactPath, clientPath)}';
-import { projectID } from '${getRelativeImport(reactPath, projectIDPath)}';
+import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(reactPath, clientPath)}';
 ${contractsPaths
     .map(
       ({ name, createContractPath }) =>
@@ -32,19 +29,20 @@ const Context = React.createContext(undefined);
 export const ContractsProvider = ({
   client: clientIn,
   developerClients: developerClientsIn,
-  oneClients: oneClientsIn,
+  localClients: localClientsIn,
   children,
 }) => {
   const client = clientIn === undefined ? createClient() : clientIn;
   const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
-  const oneClients = oneClientsIn === undefined ? createOneClients() : oneClientsIn;
+  const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+  DeveloperTools.enable({ client, developerClients, localClients });
 
   return (
     <Context.Provider
       value={{
         client,
         developerClients,
-        oneClients,
+        localClients,
         ${contractsPaths
           .map(({ name }) => `${lowerCaseFirst(name)}: ${getCreateSmartContractName(name)}(client),`)
           .join('\n      ')}
@@ -60,22 +58,13 @@ export const WithContracts = ({ children }) => (
     {children}
   </Context.Consumer>
 );
-
-export const DeveloperTools = () => (
-  <WithContracts>
-    {({ client, developerClients, oneClients }) =>
-      <DeveloperToolsBase client={client} developerClients={developerClients} oneClients={oneClients} projectID={projectID} />
-    }
-  </WithContracts>
-);
 `,
   ts: `
-import { DeveloperTools as DeveloperToolsBase } from '@neo-one/react';
-import { Client, DeveloperClient, OneClient } from '@neo-one/client';
+import { Client, DeveloperClient, DeveloperTools, LocalClient } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from '${getRelativeImport(reactPath, commonTypesPath)}';
-import { createClient, createDeveloperClients, createOneClients } from '${getRelativeImport(reactPath, clientPath)}';
-import { projectID } from '${getRelativeImport(reactPath, projectIDPath)}';
+import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(reactPath, clientPath)}';
+
 ${contractsPaths
     .map(
       ({ name, createContractPath }) =>
@@ -88,8 +77,8 @@ export interface WithClients<TClient extends Client> {
   readonly developerClients: {
     readonly [network: string]: DeveloperClient;
   },
-  readonly oneClients: {
-    readonly [network: string]: OneClient;
+  readonly localClients: {
+    readonly [network: string]: LocalClient;
   },
 }
 export type ContractsWithClients<TClient extends Client> = Contracts & WithClients<TClient>;
@@ -101,19 +90,20 @@ export type ContractsProviderProps<TClient extends Client> = Partial<WithClients
 export const ContractsProvider = <TClient extends Client>({
   client: clientIn,
   developerClients: developerClientsIn,
-  oneClients: oneClientsIn,
+  localClients: localClientsIn,
   children,
 }: ContractsProviderProps<TClient>) => {
   const client = clientIn === undefined ? createClient() : clientIn;
   const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
-  const oneClients = oneClientsIn === undefined ? createOneClients() : oneClientsIn;
+  const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+  DeveloperTools.enable({ client, developerClients, localClients });
 
   return (
     <Context.Provider
       value={{
         client,
         developerClients,
-        oneClients,
+        localClients,
         ${contractsPaths
           .map(({ name }) => `${lowerCaseFirst(name)}: ${getCreateSmartContractName(name)}(client),`)
           .join('\n      ')}
@@ -131,14 +121,6 @@ export const WithContracts = <TClient extends Client>({ children }: WithContract
   <Context.Consumer>
     {children}
   </Context.Consumer>
-);
-
-export const DeveloperTools = () => (
-  <WithContracts>
-    {({ client, developerClients, oneClients }) =>
-      <DeveloperToolsBase client={client} developerClients={developerClients} oneClients={oneClients} projectID={projectID} />
-    }
-  </WithContracts>
 );
   `,
 });

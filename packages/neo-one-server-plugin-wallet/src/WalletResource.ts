@@ -1,13 +1,12 @@
 import {
+  common,
   createPrivateKey,
-  LocalWallet,
-  NEOONEDataProvider,
   NetworkType as ClientNetworkType,
   privateKeyToAddress,
   privateKeyToWIF,
-  ReadClient,
-} from '@neo-one/client';
-import { common } from '@neo-one/client-core';
+} from '@neo-one/client-common';
+import { LocalWallet, NEOONEDataProvider } from '@neo-one/client-core';
+import { ReadClient } from '@neo-one/client-full-core';
 import { compoundName, DescribeTable, PluginManager } from '@neo-one/server-plugin';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
 import { labels } from '@neo-one/utils';
@@ -273,7 +272,7 @@ export class WalletResource {
       throw new Error('Something went wrong.');
     }
     const { privateKey, password } = this.mutableInitial;
-    await this.client.providers.file.keystore.addAccount({
+    await this.client.providers.file.keystore.addUserAccount({
       network: this.clientNetworkType,
       name: this.baseName,
       privateKey,
@@ -286,7 +285,7 @@ export class WalletResource {
   }
 
   public async delete(): Promise<void> {
-    await this.client.providers.file.keystore.deleteAccount(this.walletID);
+    await this.client.providers.file.keystore.deleteUserAccount(this.walletID);
     await fs.remove(this.dataPath);
   }
 
@@ -359,7 +358,7 @@ export class WalletResource {
       gasBalance: this.mutableGasBalance === undefined ? 'Unknown' : this.mutableGasBalance,
       wif: this.wif,
       nep2: this.wallet.nep2,
-      publicKey: this.wallet.account.publicKey,
+      publicKey: this.wallet.userAccount.publicKey,
       balance: this.mutableBalance,
     };
   }

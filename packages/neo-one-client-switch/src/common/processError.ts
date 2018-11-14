@@ -1,5 +1,5 @@
 import { codeFrameColumns } from '@babel/code-frame';
-import { scriptHashToAddress } from '@neo-one/client-core';
+import { scriptHashToAddress } from '@neo-one/client-common';
 import _ from 'lodash';
 import { RawSourceMap, SourceMapConsumer } from 'source-map';
 import { SourceMaps } from './processActionsAndMessage';

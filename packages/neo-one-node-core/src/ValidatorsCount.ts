@@ -1,16 +1,16 @@
 import {
-  BaseState,
-  BinaryReader,
   BinaryWriter,
   createSerializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
   IOHelper,
   SerializableWire,
   SerializeWire,
   utils,
-} from '@neo-one/client-core';
-import { BN } from 'bn.js';
+} from '@neo-one/client-common';
+import { BaseState } from '@neo-one/client-full-common';
+import BN from 'bn.js';
+import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
+import { BinaryReader } from './utils';
+
 type Votes = ReadonlyArray<BN | undefined>;
 export interface ValidatorsCountUpdate {
   readonly votes?: Votes;

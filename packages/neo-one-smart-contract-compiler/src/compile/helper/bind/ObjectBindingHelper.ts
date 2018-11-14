@@ -87,10 +87,10 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
             propertyName === undefined
               ? tsUtils.node.getNameOrThrow(element)
               : ts.isIdentifier(propertyName)
-                ? tsUtils.node.getText(propertyName)
-                : ts.isStringLiteral(propertyName)
-                  ? tsUtils.literal.getLiteralValue(propertyName)
-                  : `${tsUtils.literal.getLiteralValue(propertyName)}`;
+              ? tsUtils.node.getText(propertyName)
+              : ts.isStringLiteral(propertyName)
+              ? tsUtils.literal.getLiteralValue(propertyName)
+              : `${tsUtils.literal.getLiteralValue(propertyName)}`;
           const member = sb.context.builtins.getOnlyMember(builtinName, memberName);
 
           if (member === undefined) {
@@ -255,6 +255,7 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
               set: throwInnerTypeError,
               setStorage: throwInnerTypeError,
               error: throwInnerTypeError,
+              forwardValue: throwInnerTypeError,
               iteratorResult: throwInnerTypeError,
               iterable: throwInnerTypeError,
               iterableIterator: throwInnerTypeError,
@@ -383,6 +384,7 @@ export class ObjectBindingHelper extends TypedHelper<ts.ObjectBindingPattern> {
         set: createProcessBuiltin('Set'),
         setStorage: createProcessBuiltin('SetStorage'),
         error: createProcessBuiltin('Error'),
+        forwardValue: createProcessBuiltin('ForwardValue'),
         iteratorResult: createProcessBuiltin('IteratorResult'),
         iterable: createProcessBuiltin('Iterable'),
         iterableIterator: createProcessBuiltin('IterableIterator'),

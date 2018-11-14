@@ -1,12 +1,21 @@
 const nodePath = require('path');
 
-module.exports = ({ babel, path }) => ({
+let testPathIgnorePatterns = ['/node_modules/', '/courses/'];
+
+if (process.platform === 'win32') {
+  testPathIgnorePatterns = testPathIgnorePatterns.concat([
+    '/packages/neo-one-editor/src/__tests__/.*',
+    '/packages/neo-one-editor-server/src/__tests__/.*',
+    '/packages/neo-one-smart-contract-compiler/src/__tests__/getSemanticDiagnostics.test.ts',
+  ]);
+}
+
+module.exports = ({ path }) => ({
   rootDir: nodePath.resolve(__dirname, '..'),
   globals: {
     'ts-jest': {
-      skipBabel: babel === undefined,
-      babelConfig: babel,
-      tsConfigFile: 'tsconfig.jest.json',
+      tsConfig: '<rootDir>/tsconfig/tsconfig.es2017.cjs.json',
+      isolatedModules: true,
     },
   },
   moduleFileExtensions: ['js', 'jsx', 'json', 'node', 'ts', 'tsx'],
@@ -15,7 +24,7 @@ module.exports = ({ babel, path }) => ({
     './scripts/serializers/bn.js',
     './scripts/serializers/buffer.js',
   ],
-  testPathIgnorePatterns: ['/node_modules/'],
+  testPathIgnorePatterns,
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },

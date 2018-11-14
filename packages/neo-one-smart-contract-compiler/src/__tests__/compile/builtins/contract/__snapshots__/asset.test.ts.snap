@@ -12,3 +12,36 @@ exports[`Asset cannot be implemented 1`] = `
       6 |     
 "
 `;
+
+exports[`Asset invalid "reference" 1`] = `
+"snippetCode.ts (4,25): Builtin properties cannot be referenced
+
+      2 |       import { Asset } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const for = Asset['for'];
+        |                         ^
+      5 |     
+"
+`;
+
+exports[`Asset invalid reference - object 1`] = `
+"snippetCode.ts (4,15): Builtin properties cannot be referenced
+
+      2 |       import { Asset } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const { for } = Asset;
+        |               ^
+      5 |     
+"
+`;
+
+exports[`Asset invalid reference 1`] = `
+"snippetCode.ts (4,25): Builtin properties cannot be referenced
+
+      2 |       import { Asset } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       const for = Asset.for;
+        |                         ^
+      5 |     
+"
+`;

@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-core';
+import { common } from '@neo-one/client-common';
 import { helpers, keys } from '../../../../../__data__';
 import { DiagnosticCode } from '../../../../../DiagnosticCode';
 
@@ -28,6 +28,16 @@ describe('PublicKey.from', () => {
       `
       import { PublicKey } from '@neo-one/smart-contract';
       const keys = PublicKey.from;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('cannot be referenced - object', async () => {
+    helpers.compileString(
+      `
+      import { PublicKey } from '@neo-one/smart-contract';
+      const { from } = PublicKey;
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );

@@ -33,7 +33,7 @@ export class ArrEveryFuncHelper extends Helper {
           // [boolean, result, enumerator, result, idx, callable]
           sb.emitSysCall(node, 'Neo.Enumerator.Next');
           // [boolean, enumerator, result, idx, callable]
-          sb.emitOp(node, 'AND');
+          sb.emitOp(node, 'BOOLAND');
         },
         each: (innerOptions) => {
           // [enumerator, idx, callable]
@@ -71,13 +71,15 @@ export class ArrEveryFuncHelper extends Helper {
           // [enumerator, result, idx, callable]
           sb.emitOp(node, 'ROT');
         },
+        cleanup: () => {
+          // [result, idx, callable]
+          sb.emitOp(node, 'DROP');
+          // [result, callable]
+          sb.emitOp(node, 'NIP');
+          // [result]
+          sb.emitOp(node, 'NIP');
+        },
       }),
     );
-    // [result, idx, callable]
-    sb.emitOp(node, 'DROP');
-    // [result, callable]
-    sb.emitOp(node, 'NIP');
-    // [result]
-    sb.emitOp(node, 'NIP');
   }
 }

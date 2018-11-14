@@ -1,4 +1,5 @@
-import Storage, { File } from '@google-cloud/storage';
+// tslint:disable-next-line:no-submodule-imports
+import { File } from '@google-cloud/storage/build/src/file';
 import { Monitor } from '@neo-one/monitor';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -136,13 +137,17 @@ export class GCloudProvider extends Provider {
         storage
           .bucket(bucket)
           .file([prefix, `${time}`, METADATA_NAME].join('/'))
-          .save(''),
+          .save('', undefined),
       { name: 'neo_backup_push' },
     );
 
-    const [fileNames] = await monitor.captureSpanLog(async () => storage.bucket(bucket).getFiles({ prefix }), {
-      name: 'neo_backup_list_files',
-    });
+    const [fileNames] = await monitor.captureSpanLog(
+      // tslint:disable-next-line no-any no-void-expression no-use-of-empty-return-value
+      async () => (storage.bucket(bucket).getFiles({ prefix }) as any) as Promise<[File[]]>,
+      {
+        name: 'neo_backup_list_files',
+      },
+    );
     const times = [...new Set(fileNames.map((file) => extractTime(prefix, file)))];
     // tslint:disable-next-line no-array-mutation
     times.sort();
@@ -166,7 +171,8 @@ export class GCloudProvider extends Provider {
     const { bucket, prefix } = this.options;
 
     const storage = await this.getStorage();
-    const [files] = await storage.bucket(bucket).getFiles({ prefix });
+    // tslint:disable-next-line no-any no-void-expression no-use-of-empty-return-value
+    const [files] = (await (storage.bucket(bucket).getFiles({ prefix }) as any)) as [File[]];
 
     const metadataTimes = files
       .filter((file) => path.basename(file.name) === METADATA_NAME)
@@ -183,6 +189,6 @@ export class GCloudProvider extends Provider {
     const storage = await import('@google-cloud/storage');
 
     // tslint:disable-next-line no-any
-    return (storage as any).default({ projectId: this.options.projectID }) as Storage;
+    return new storage.Storage({ projectId: this.options.projectID });
   }
 }

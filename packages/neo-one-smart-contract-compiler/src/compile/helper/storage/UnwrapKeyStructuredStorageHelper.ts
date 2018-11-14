@@ -43,6 +43,7 @@ export class UnwrapKeyStructuredStorageHelper extends TypedHelper {
         mapStorage: wrapArray,
         setStorage: wrapArray,
         error: wrapArray,
+        forwardValue: wrapArray,
         iteratorResult: wrapArray,
         iterable: wrapArray,
         iterableIterator: wrapArray,

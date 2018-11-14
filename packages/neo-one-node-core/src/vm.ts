@@ -1,16 +1,27 @@
-import {
-  Block,
-  common,
-  ContractParameter,
-  ECPoint,
-  ScriptContainer,
-  UInt160,
-  UInt256,
-  VMState,
-} from '@neo-one/client-core';
+import { common, ECPoint, UInt160, UInt256, VMState } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
+import { Action } from './action';
+import { Block } from './Block';
 import { WriteBlockchain } from './Blockchain';
+import { ContractParameter } from './contractParameter';
+import { ScriptContainer } from './ScriptContainer';
+import { Witness } from './Witness';
+
+export interface VerifyScriptOptions {
+  readonly scriptContainer: ScriptContainer;
+  readonly hash: UInt160;
+  readonly witness: Witness;
+}
+
+export interface VerifyScriptResult {
+  readonly failureMessage?: string;
+  readonly hash: UInt160;
+  readonly witness: Witness;
+  readonly actions: ReadonlyArray<Action>;
+}
+
+export type VerifyScript = (options: VerifyScriptOptions) => Promise<VerifyScriptResult>;
 
 export enum TriggerType {
   Verification = 0x00,
@@ -59,6 +70,10 @@ export interface VMListeners {
   readonly onSetVotes?: (options: { readonly address: UInt160; readonly votes: ReadonlyArray<ECPoint> }) => void;
 }
 
+export interface VMFeatureSwitches {
+  readonly structClone: boolean;
+}
+
 export type ExecuteScripts = (
   input: {
     readonly monitor: Monitor;
@@ -71,6 +86,7 @@ export type ExecuteScripts = (
     readonly listeners?: VMListeners;
     readonly skipWitnessVerify?: boolean;
     readonly persistingBlock?: Block;
+    readonly vmFeatures: VMFeatureSwitches;
   },
 ) => Promise<ExecuteScriptsResult>;
 

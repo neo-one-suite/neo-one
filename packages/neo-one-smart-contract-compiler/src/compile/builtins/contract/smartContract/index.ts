@@ -1,18 +1,40 @@
+import { ContractPropertyName } from '../../../../constants';
+import { StructuredStorageType } from '../../../constants';
 import { BuiltinBase } from '../../BuiltinBase';
-import { BuiltinInterface } from '../../BuiltinInterface';
+import { BuiltinInstanceMemberStorageProperty } from '../../BuiltinInstanceMemberStorageProperty';
+import { BuiltinInstanceMemberStructuredStorageProperty } from '../../BuiltinInstanceMemberStructuredStorageProperty';
 import { Builtins } from '../../Builtins';
+import { SmartContractAddress } from './address';
+import { SmartContractDestroy } from './destroy';
 import { SmartContractFor } from './for';
 
-class SmartContractInterface extends BuiltinInterface {
-  public readonly canImplement = true;
-}
 class SmartContractValue extends BuiltinBase {}
-class SmartContractConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
-  builtins.addContractInterface('SmartContract', new SmartContractInterface());
   builtins.addContractValue('SmartContract', new SmartContractValue());
-  builtins.addContractInterface('SmartContractConstructor', new SmartContractConstructorInterface());
-  builtins.addContractMember('SmartContractConstructor', 'for', new SmartContractFor());
+  builtins.addContractMember('SmartContract', 'for', new SmartContractFor());
+  builtins.addContractMember('SmartContract', ContractPropertyName.address, new SmartContractAddress());
+  builtins.addContractMember(
+    'SmartContract',
+    ContractPropertyName.deployed,
+    new BuiltinInstanceMemberStorageProperty(ContractPropertyName.deployed),
+  );
+  builtins.addContractMember(
+    'SmartContract',
+    ContractPropertyName.processedTransactions,
+    new BuiltinInstanceMemberStructuredStorageProperty(
+      StructuredStorageType.SetStorage,
+      ContractPropertyName.processedTransactions,
+    ),
+  );
+  builtins.addContractMember(
+    'SmartContract',
+    ContractPropertyName.claimedTransactions,
+    new BuiltinInstanceMemberStructuredStorageProperty(
+      StructuredStorageType.MapStorage,
+      ContractPropertyName.claimedTransactions,
+    ),
+  );
+  builtins.addContractMember('SmartContract', ContractPropertyName.destroy, new SmartContractDestroy());
 };

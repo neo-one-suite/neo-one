@@ -20,49 +20,33 @@ export class ArrForEachHelper extends Helper {
     this.withIndex = options.withIndex || false;
   }
 
-  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
-    const options = sb.pushValueOptions(optionsIn);
-
-    // [size, ...array]
-    sb.emitOp(node, 'UNPACK');
-    // [idx, size, ...array]
-    sb.emitPushInt(node, 0);
-    sb.emitHelper(
-      node,
-      options,
-      sb.helpers.forLoop({
-        condition: () => {
-          // [size, idx, ...array]
-          sb.emitOp(node, 'SWAP');
-          // [size, idx, size, ...array]
-          sb.emitOp(node, 'TUCK');
-          // [idx, size, idx, size, ...array]
-          sb.emitOp(node, 'OVER');
-          // size > idx
-          // [size > idx, idx, size, ...array]
-          sb.emitOp(node, 'GT');
-        },
-        each: (innerOptions) => {
-          // [value, idx, size, ...array]
-          sb.emitOp(node, 'ROT');
-          if (this.withIndex) {
-            // [idx, value, idx, size, ...array]
-            sb.emitOp(node, 'OVER');
-            // [value, idx, idx, size, ...array]
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
+    if (this.withIndex) {
+      // [iterator]
+      sb.emitSysCall(node, 'Neo.Iterator.Create');
+      // []
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.rawIteratorForEach({
+          each: (innerOptions) => {
+            // [val, idx]
             sb.emitOp(node, 'SWAP');
-          }
-          // [idx, size, ...array]
-          this.each(sb.noPushValueOptions(innerOptions));
-        },
-        incrementor: () => {
-          // [idx, size, ...array]
-          sb.emitOp(node, 'INC');
-        },
-      }),
-    );
-    // [size]
-    sb.emitOp(node, 'DROP');
-    // []
-    sb.emitOp(node, 'DROP');
+            // []
+            this.each(innerOptions);
+          },
+        }),
+      );
+    } else {
+      // [enumerator]
+      sb.emitSysCall(node, 'Neo.Enumerator.Create');
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.rawEnumeratorForEach({
+          each: this.each,
+        }),
+      );
+    }
   }
 }

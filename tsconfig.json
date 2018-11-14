@@ -4,8 +4,10 @@
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
-
-    "lib": ["dom", "esnext"],
+    "lib": [
+      "esnext",
+      "dom"
+    ],
     "paths": {
       "@neo-one/types": [
         "./neo-one-types/"
@@ -14,17 +16,13 @@
         "./neo-one-*/src"
       ]
     },
-
     "pretty": true,
-
     "noEmit": true,
     "declaration": false,
-
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": false,
     "experimentalDecorators": true,
     "jsx": "react",
-
     "alwaysStrict": true,
     "strict": true,
     "skipLibCheck": true,
@@ -39,11 +37,15 @@
   "exclude": [
     "dist",
     "packages/neo-one-server-plugin-wallet/src/contracts/*.ts",
+    "packages/neo-one-smart-contract-lib/src/*.ts",
     "packages/neo-one-smart-contract/src/*.d.ts",
     "packages/neo-one-smart-contract-compiler/src/__data__/snippets/**/*.ts",
-    "packages/neo-one-smart-contract-lib/src/*.ts",
     "packages/*/src/__data__/contracts/*.ts",
+    "packages/*/template/**/*.ts",
+    "packages/*/template/**/*.tsx",
     "packages/neo-one-server-plugin-project/src/__data__/ico/one/contracts/*.ts",
-    "packages/neo-one-playground"
+    "packages/neo-one-playground",
+    "packages/neo-one-website/courses/**/contracts/*.ts",
+    "cypress"
   ]
 }

@@ -1,28 +1,14 @@
 {
   "name": "@neo-one/react",
-  "version": "1.0.0-alpha.14",
+  "version": "1.0.1",
   "description": "NEO•ONE React utilities.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client": "^1.0.0-alpha.98",
-    "@neo-one/server-http-client": "^1.0.0-alpha.74",
-    "@neo-one/types": "^1.0.0-alpha.43",
-    "@neo-one/utils": "^1.0.0-alpha.63",
-    "@types/lodash": "^4.14.116",
-    "@types/react": "^16.4.12",
-    "@types/react-select": "^2.0.2",
-    "bignumber.js": "^7.2.1",
-    "constate": "^0.8.0",
-    "date-fns": "^2.0.0-alpha.16",
-    "localforage": "^1.7.2",
-    "lodash": "^4.17.10",
-    "react": "^16.4.2",
-    "react-dom": "^16.4.2",
-    "react-icons": "^3.0.5",
-    "react-select": "^2.0.0",
-    "reakit": "^0.14.5",
-    "rxjs": "^6.2.2",
-    "styled-tools": "^1.4.1",
     "tslib": "^1.9.3"
-  }
+  },
+  "peerDependencies": {
+    "react": "^16.0.0",
+    "rxjs": "^6.0.0"
+  },
+  "sideEffects": false
 }

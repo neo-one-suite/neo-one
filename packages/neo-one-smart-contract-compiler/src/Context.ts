@@ -1,4 +1,5 @@
 // tslint:disable ban-types
+import { tsUtils } from '@neo-one/ts-utils';
 import _ from 'lodash';
 import ts, { DiagnosticCategory } from 'typescript';
 import { format } from 'util';
@@ -7,6 +8,7 @@ import { Builtins, createBuiltins } from './compile/builtins';
 import { CompilerDiagnostic } from './CompilerDiagnostic';
 import { DiagnosticCode } from './DiagnosticCode';
 import { DiagnosticMessage } from './DiagnosticMessage';
+import { CompilerHost } from './types';
 
 const getErrorKey = (diagnostic: ts.Diagnostic) =>
   `${diagnostic.file}:${diagnostic.start}:${diagnostic.length}:${diagnostic.code}`;
@@ -20,14 +22,15 @@ export class Context {
   public readonly analysis: AnalysisService;
 
   public constructor(
+    public readonly sourceFiles: Set<ts.SourceFile>,
     public readonly program: ts.Program,
     public readonly typeChecker: ts.TypeChecker,
     public readonly languageService: ts.LanguageService,
-    public readonly smartContractDir: string,
-    private readonly mutableDiagnostics: ts.Diagnostic[] = ts.getPreEmitDiagnostics(program),
+    public readonly host: CompilerHost,
+    private readonly mutableDiagnostics: ts.Diagnostic[] = [...ts.getPreEmitDiagnostics(program)],
   ) {
-    this.builtins = createBuiltins(this);
     this.analysis = new AnalysisService(this);
+    this.builtins = createBuiltins(this);
   }
 
   public get diagnostics(): ReadonlyArray<ts.Diagnostic> {
@@ -48,12 +51,12 @@ export class Context {
   }
 
   public update(
+    sourceFiles: Set<ts.SourceFile>,
     program: ts.Program,
     typeChecker: ts.TypeChecker,
     languageService: ts.LanguageService,
-    smartContractDir: string,
   ): Context {
-    return new Context(program, typeChecker, languageService, smartContractDir, [...this.mutableDiagnostics]);
+    return new Context(sourceFiles, program, typeChecker, languageService, this.host, [...this.mutableDiagnostics]);
   }
 
   public reportError(
@@ -63,24 +66,28 @@ export class Context {
     // tslint:disable-next-line no-any readonly-array
     ...args: any[]
   ): void {
-    this.mutableDiagnostics.push(
-      new CompilerDiagnostic(node, this.getDiagnosticMessage(message, ...args), code, ts.DiagnosticCategory.Error),
-    );
+    if (!this.isDeclarationFile(node)) {
+      this.mutableDiagnostics.push(
+        new CompilerDiagnostic(node, this.getDiagnosticMessage(message, ...args), code, ts.DiagnosticCategory.Error),
+      );
+    }
   }
 
   // tslint:disable-next-line no-any readonly-array
   public reportWarning(node: ts.Node, code: DiagnosticCode, message: DiagnosticMessage, ...args: any[]): void {
-    this.mutableDiagnostics.push(
-      new CompilerDiagnostic(node, this.getDiagnosticMessage(message, ...args), code, ts.DiagnosticCategory.Warning),
-    );
+    if (!this.isDeclarationFile(node)) {
+      this.mutableDiagnostics.push(
+        new CompilerDiagnostic(node, this.getDiagnosticMessage(message, ...args), code, ts.DiagnosticCategory.Warning),
+      );
+    }
   }
 
   public reportUnsupported(node: ts.Node): void {
-    this.reportError(node, DiagnosticCode.GenericUnsupportedSyntax, DiagnosticMessage.GenericUnsupportedSyntax);
+    this.reportError(node, DiagnosticCode.UnsupportedSyntax, DiagnosticMessage.UnsupportedSyntax);
   }
 
   public reportUnsupportedEfficiency(node: ts.Node): void {
-    this.reportError(node, DiagnosticCode.GenericUnsupportedSyntax, DiagnosticMessage.EfficiencyUnsupportedSyntax);
+    this.reportError(node, DiagnosticCode.UnsupportedSyntax, DiagnosticMessage.EfficiencyUnsupportedSyntax);
   }
 
   public reportTypeError(node: ts.Node): void {
@@ -104,5 +111,9 @@ export class Context {
     }
 
     return format(message, ...args);
+  }
+
+  private isDeclarationFile(node: ts.Node): boolean {
+    return tsUtils.file.isDeclarationFile(tsUtils.node.getSourceFile(node));
   }
 }

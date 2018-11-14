@@ -1,23 +1,21 @@
 // tslint:disable no-object-mutation no-array-mutation no-loop-statement
+import { common, ECPoint, UInt160, UInt256Hex } from '@neo-one/client-common';
 import {
   Account,
   BinaryReader,
-  common,
-  ECPoint,
   Output,
   StateDescriptor,
   StateTransaction,
   Transaction,
   TransactionType,
-  UInt160,
-  UInt256Hex,
   utils,
   Validator,
   ValidatorKey,
+  ValidatorsCount,
+  ValidatorsCountUpdate,
   ValidatorUpdate,
-} from '@neo-one/client-core';
-import { ValidatorsCount, ValidatorsCountUpdate } from '@neo-one/node-core';
-import { BN } from 'bn.js';
+} from '@neo-one/node-core';
+import BN from 'bn.js';
 import _ from 'lodash';
 import { Blockchain } from './Blockchain';
 import { ValidatorCache } from './ValidatorCache';
@@ -340,11 +338,10 @@ export const getValidators = async (
             (validator.registered && validator.votes.gt(utils.ZERO)) ||
             standbyValidatorsSet.has(common.ecPointToHex(validator.publicKey)),
         )
-        .sort(
-          (aValidator, bValidator) =>
-            aValidator.votes.eq(bValidator.votes)
-              ? common.ecPointCompare(aValidator.publicKey, bValidator.publicKey)
-              : -aValidator.votes.cmp(bValidator.votes),
+        .sort((aValidator, bValidator) =>
+          aValidator.votes.eq(bValidator.votes)
+            ? common.ecPointCompare(aValidator.publicKey, bValidator.publicKey)
+            : -aValidator.votes.cmp(bValidator.votes),
         )
         .map((validator) => common.ecPointToHex(validator.publicKey)),
       numValidators,

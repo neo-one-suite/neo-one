@@ -7,7 +7,7 @@ import { CallMemberLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
 export class ArrayConcat extends BuiltinInstanceMemberCall {
-  public canCall(_sb: ScriptBuilder, _func: CallMemberLikeExpression, _node: ts.CallExpression): boolean {
+  public canCall(): boolean {
     return true;
   }
 
@@ -70,6 +70,7 @@ export class ArrayConcat extends BuiltinInstanceMemberCall {
           set: handleOther,
           setStorage: handleOther,
           error: handleOther,
+          forwardValue: handleOther,
           iteratorResult: handleOther,
           iterable: handleOther,
           iterableIterator: handleOther,

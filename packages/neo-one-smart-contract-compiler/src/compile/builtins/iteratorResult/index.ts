@@ -8,12 +8,12 @@ class IteratorResultInterface extends BuiltinInterface {}
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
   builtins.addInterface('IteratorResult', new IteratorResultInterface());
-  builtins.addMember(
+  builtins.addGlobalMember(
     'IteratorResult',
     'done',
     new BuiltinSlotInstanceMemberValue(Types.IteratorResult, IteratorResultSlots.done),
   );
-  builtins.addMember(
+  builtins.addGlobalMember(
     'IteratorResult',
     'value',
     new BuiltinSlotInstanceMemberValue(Types.IteratorResult, IteratorResultSlots.value),

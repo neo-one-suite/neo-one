@@ -1,18 +1,20 @@
-/* @hash 032fcef50c558d2df1b56d2e38c55e5c */
+/* @hash 40111576dd4b75816183640324b0c850 */
 // tslint:disable
 /* eslint-disable */
 import {
   AddressString,
+  Client,
   Event,
+  GetOptions,
+  InvocationTransaction,
   InvokeReceipt,
-  InvokeTransactionOptions,
-  ReadSmartContract,
+  InvokeReceiveTransactionOptions,
+  InvokeSendUnsafeTransactionOptions,
   SmartContract,
+  TransactionOptions,
   TransactionResult,
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
-
-export type ICOEvent = ICOTransferEvent | ICORefundEvent;
 
 export interface ICOTransferEventParameters {
   readonly from: AddressString | undefined;
@@ -20,30 +22,61 @@ export interface ICOTransferEventParameters {
   readonly amount: BigNumber;
 }
 export interface ICOTransferEvent extends Event<'transfer', ICOTransferEventParameters> {}
-export interface ICORefundEventParameters {}
-export interface ICORefundEvent extends Event<'refund', ICORefundEventParameters> {}
-
-export interface ICOSmartContract extends SmartContract<ICOReadSmartContract> {
-  readonly amountPerNEO: () => Promise<BigNumber>;
-  readonly deploy: (
-    owner?: AddressString,
-    startTimeSeconds?: BigNumber,
-    icoDurationSeconds?: BigNumber,
-    options?: InvokeTransactionOptions,
-  ) => Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>>>;
-  readonly icoDurationSeconds: () => Promise<BigNumber>;
-  readonly mintTokens: (
-    options?: InvokeTransactionOptions,
-  ) => Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>>>;
-  readonly owner: () => Promise<AddressString>;
-  readonly remaining: () => Promise<BigNumber>;
-  readonly startTimeSeconds: () => Promise<BigNumber>;
+export interface ICOApproveSendTransferEventParameters {
+  readonly from: AddressString;
+  readonly to: AddressString;
+  readonly amount: BigNumber;
 }
+export interface ICOApproveSendTransferEvent
+  extends Event<'approveSendTransfer', ICOApproveSendTransferEventParameters> {}
+export interface ICORevokeSendTransferEventParameters {
+  readonly from: AddressString;
+  readonly to: AddressString;
+  readonly amount: BigNumber;
+}
+export interface ICORevokeSendTransferEvent extends Event<'revokeSendTransfer', ICORevokeSendTransferEventParameters> {}
+export type ICOEvent = ICOTransferEvent | ICOApproveSendTransferEvent | ICORevokeSendTransferEvent;
 
-export interface ICOReadSmartContract extends ReadSmartContract<ICOEvent> {
+export interface ICOSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ICOEvent> {
   readonly amountPerNEO: () => Promise<BigNumber>;
+  readonly deploy: {
+    (
+      owner?: AddressString,
+      startTimeSeconds?: BigNumber,
+      icoDurationSeconds?: BigNumber,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        owner?: AddressString,
+        startTimeSeconds?: BigNumber,
+        icoDurationSeconds?: BigNumber,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }>;
+    };
+  };
   readonly icoDurationSeconds: () => Promise<BigNumber>;
+  readonly mintTokens: {
+    (options?: InvokeReceiveTransactionOptions): Promise<
+      TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>
+    >;
+    readonly confirmed: {
+      (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<
+        InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }
+      >;
+    };
+  };
   readonly owner: () => Promise<AddressString>;
+  readonly refundAssets: {
+    (options?: InvokeSendUnsafeTransactionOptions): Promise<
+      TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>
+    >;
+    readonly confirmed: {
+      (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<
+        InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }
+      >;
+    };
+  };
   readonly remaining: () => Promise<BigNumber>;
   readonly startTimeSeconds: () => Promise<BigNumber>;
 }

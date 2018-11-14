@@ -20,7 +20,7 @@ export abstract class SetObjectPropertyHelperBase extends Helper {
     sb.emitOp(node, 'SWAP');
     sb.emitHelper(
       node,
-      options,
+      sb.pushValueOptions(options),
       sb.helpers.findObjectProperty({
         accessor: () => {
           // [1, propVal, objectVal, stringProp, val]
@@ -42,7 +42,7 @@ export abstract class SetObjectPropertyHelperBase extends Helper {
           // [setObjectVal, objectVal, argsarr]
           sb.emitOp(node, 'ROT');
           // [val]
-          sb.emitHelper(node, options, sb.helpers.invokeCall({ bindThis: true, noArgs: false }));
+          sb.emitHelper(node, sb.noPushValueOptions(options), sb.helpers.invokeCall({ bindThis: true, noArgs: false }));
         },
         dataExists: () => {
           // [propVal, stringProp, val]
@@ -62,7 +62,7 @@ export abstract class SetObjectPropertyHelperBase extends Helper {
           // [val, stringProp, objectVal]
           sb.emitOp(node, 'ROT');
           // []
-          sb.emitHelper(node, options, this.setDataProperty(sb));
+          sb.emitHelper(node, sb.noPushValueOptions(options), this.setDataProperty(sb));
         },
         getObject: this.getObject.bind(this),
       }),

@@ -5,7 +5,7 @@ import { VisitOptions } from '../../types';
 import { BuiltinInstanceOf } from '../BuiltinInstanceOf';
 
 export class ValueInstanceOf extends BuiltinInstanceOf {
-  public constructor(private readonly isHelper: (sb: ScriptBuilder) => Helper) {
+  public constructor(public readonly type: string, private readonly isHelper: (sb: ScriptBuilder) => Helper) {
     super();
   }
 
@@ -20,7 +20,7 @@ export class ValueInstanceOf extends BuiltinInstanceOf {
       sb.emitHelper(node, options, sb.helpers.wrapBoolean);
     } else {
       // []
-      /* instanbul ignore next */
+      /* istanbul ignore next */
       sb.emitOp(node, 'DROP');
     }
   }

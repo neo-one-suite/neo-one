@@ -1,9 +1,10 @@
 // tslint:disable readonly-array
-import { BinaryWriter, ContractParameter, InteropInterfaceContractParameter } from '@neo-one/client-core';
+import { BinaryWriter } from '@neo-one/client-common';
+import { ContractParameter, MapContractParameter } from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import { ArrayStackItem } from './ArrayStackItem';
-import { InvalidValueBufferError, MissingStackItemKeyError } from './errors';
+import { CircularReferenceError, InvalidValueBufferError, MissingStackItemKeyError } from './errors';
 import { getNextID } from './referenceCounter';
 import { StackItem } from './StackItem';
 import { StackItemBase } from './StackItemBase';
@@ -35,6 +36,10 @@ export class MapStackItem extends StackItemBase {
     return this === other;
   }
 
+  public isMap(): boolean {
+    return false;
+  }
+
   public asBoolean(): boolean {
     return true;
   }
@@ -43,8 +48,19 @@ export class MapStackItem extends StackItemBase {
     throw new InvalidValueBufferError();
   }
 
-  public toContractParameter(_seen: Set<StackItemBase> = new Set()): ContractParameter {
-    return new InteropInterfaceContractParameter();
+  public toContractParameter(seen: Set<StackItemBase> = new Set()): ContractParameter {
+    if (seen.has(this)) {
+      throw new CircularReferenceError();
+    }
+    const newSeen = new Set([...seen]);
+    newSeen.add(this);
+
+    return new MapContractParameter(
+      this.keysArray().map<[ContractParameter, ContractParameter]>((key) => [
+        key.toContractParameter(newSeen),
+        this.get(key).toContractParameter(newSeen),
+      ]),
+    );
   }
 
   public get size(): number {
@@ -98,6 +114,14 @@ export class MapStackItem extends StackItemBase {
 
   public asMapStackItem(): MapStackItem {
     return this;
+  }
+
+  protected incrementInternal(seen: Set<StackItemBase>): number {
+    return this.incrementInternalArray(this.keysArray(), seen) + this.incrementInternalArray(this.valuesArray(), seen);
+  }
+
+  protected decrementInternal(seen: Set<StackItemBase>): number {
+    return this.decrementInternalArray(this.keysArray(), seen) + this.decrementInternalArray(this.valuesArray(), seen);
   }
 
   // tslint:disable-next-line no-any

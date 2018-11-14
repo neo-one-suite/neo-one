@@ -1,12 +1,17 @@
-import { tsUtils } from '@neo-one/ts-utils';
+import { symbolKey, tsUtils } from '@neo-one/ts-utils';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { Context } from '../../Context';
-import { createMemoized, nodeKey, pathResolve, symbolKey, typeKey } from '../../utils';
+import { createMemoized, nodeKey, typeKey } from '../../utils';
 import { Builtin, isBuiltinValueObject } from './types';
 
 const getMember = (sym: ts.Symbol, name: string) => tsUtils.symbol.getMemberOrThrow(sym, name);
+const getExportOrMember = (sym: ts.Symbol, name: string) => {
+  const member = tsUtils.symbol.getMember(sym, name);
+
+  return member === undefined ? tsUtils.symbol.getExportOrThrow(sym, name) : member;
+};
 
 const findNonNull = <T>(value: ReadonlyArray<T | undefined>): T | undefined => value.find((val) => val !== undefined);
 
@@ -21,47 +26,53 @@ const throwIfNull = <T>(value: T | undefined | null): T => {
 
 export class Builtins {
   private readonly builtinMembers: Map<ts.Symbol, Map<ts.Symbol, Builtin>> = new Map();
+  private readonly allBuiltinMembers: Map<ts.Symbol, Builtin> = new Map();
   private readonly builtinInterfaces: Map<ts.Symbol, Builtin> = new Map();
   private readonly builtinValues: Map<ts.Symbol, Builtin> = new Map();
+  private readonly builtinOverrides: Map<ts.Symbol, ts.Symbol> = new Map();
   private readonly memoized = createMemoized();
 
   public constructor(private readonly context: Context) {}
 
+  public isBuiltinSymbol(symbol: ts.Symbol | undefined): boolean {
+    return symbol !== undefined && (this.builtinValues.has(symbol) || this.builtinInterfaces.has(symbol));
+  }
+
+  public isBuiltinIdentifier(value: string): boolean {
+    return (
+      this.getAnyInterfaceSymbolMaybe(value) !== undefined ||
+      this.getAnyTypeSymbolMaybe(value) !== undefined ||
+      this.getAnyValueSymbolMaybe(value) !== undefined
+    );
+  }
+
+  public isBuiltinFile(file: ts.SourceFile): boolean {
+    return this.getContract() === file;
+  }
+
   public getMember(value: ts.Node, prop: ts.Node): Builtin | undefined {
     return this.memoized('get-member', `${nodeKey(value)}:${nodeKey(prop)}`, () => {
       const propSymbol = this.context.analysis.getSymbol(prop);
-
       if (propSymbol === undefined) {
         return undefined;
       }
 
       const valueSymbol = this.context.analysis.getTypeSymbol(value);
       if (valueSymbol === undefined) {
-        return undefined;
+        return this.allBuiltinMembers.get(propSymbol);
       }
 
-      const members = this.builtinMembers.get(valueSymbol);
-      const member = members === undefined ? undefined : members.get(propSymbol);
-
-      if (member === undefined) {
-        // tslint:disable-next-line no-loop-statement
-        for (const decl of tsUtils.symbol.getDeclarations(valueSymbol)) {
-          if (ts.isInterfaceDeclaration(decl)) {
-            // tslint:disable-next-line no-loop-statement
-            for (const clause of tsUtils.heritage.getHeritageClauses(decl)) {
-              // tslint:disable-next-line no-loop-statement
-              for (const type of tsUtils.heritage.getTypeNodes(clause)) {
-                const foundMember = this.getMember(tsUtils.expression.getExpression(type), prop);
-                if (foundMember !== undefined) {
-                  return foundMember;
-                }
-              }
-            }
-          }
+      // Super hacky - only works for the special way smart contracts are compiled.
+      if (!tsUtils.guards.isSuperExpression(value)) {
+        const overridenMember = this.walkOverridesForMember(valueSymbol, propSymbol);
+        if (overridenMember !== undefined) {
+          return overridenMember;
         }
       }
 
-      return member;
+      const members = this.getAllMembers(valueSymbol);
+
+      return members.get(propSymbol);
     });
   }
 
@@ -79,23 +90,31 @@ export class Builtins {
     isEligible: (builtin: T) => boolean,
     symbolMembers = false,
   ): ReadonlyArray<[string, T]> {
-    let testKey = (key: string) => !key.startsWith('__@');
+    const filterPseudoSymbol = (symbol: ts.Symbol, key: string) => {
+      const symbolSymbol = this.getInterfaceSymbolBase('SymbolConstructor', this.getGlobals());
+
+      return tsUtils.symbol.getMember(symbolSymbol, key) !== symbol;
+    };
+    const isSymbolKey = (key: string) => key.startsWith('__@');
+
+    let testKey = (key: string) => !isSymbolKey(key);
     let modifyKey = (key: string) => key;
     if (symbolMembers) {
-      testKey = (key) => key.startsWith('__@');
+      testKey = isSymbolKey;
       modifyKey = (key) => key.slice(3);
     }
 
-    const interfaceSymbol = this.getAnyInterfaceSymbol(name);
-    const members = this.builtinMembers.get(interfaceSymbol);
-    if (members === undefined) {
-      return [];
-    }
+    const members = this.getAllMembers(this.getAnyInterfaceSymbol(name));
 
     const mutableMembers: Array<[string, T]> = [];
     members.forEach((builtin, memberSymbol) => {
       const memberName = tsUtils.symbol.getName(memberSymbol);
-      if (isMember(builtin) && testKey(memberName) && isEligible(builtin)) {
+      if (
+        isMember(builtin) &&
+        filterPseudoSymbol(memberSymbol, memberName) &&
+        testKey(memberName) &&
+        isEligible(builtin)
+      ) {
         mutableMembers.push([modifyKey(memberName), builtin]);
       }
     });
@@ -139,10 +158,6 @@ export class Builtins {
     return this.getAnyTypeSymbol(name);
   }
 
-  public hasInterface(node: ts.Node, type: ts.Type, name: string): boolean {
-    return tsUtils.type_.hasType(type, (testType) => this.isInterface(node, testType, name));
-  }
-
   public isInterface(node: ts.Node, testType: ts.Type, name: string): boolean {
     return this.memoized('is-interface', `${typeKey(testType)}:${name}`, () => {
       const symbol = this.context.analysis.getSymbolForType(node, testType);
@@ -161,6 +176,20 @@ export class Builtins {
       const symbol = this.context.analysis.getSymbolForType(node, testType);
       if (symbol === undefined) {
         return false;
+      }
+
+      if (name === 'Fixed') {
+        const fixedTagSymbol = this.getAnyInterfaceSymbol('FixedTag');
+        if (symbol === fixedTagSymbol) {
+          return true;
+        }
+      }
+
+      if (name === 'ForwardedValue') {
+        const forwardedValueTagSymbol = this.getAnyInterfaceSymbol('ForwardedValueTag');
+        if (symbol === forwardedValueTagSymbol) {
+          return true;
+        }
       }
 
       const typeSymbol = this.getAnyTypeSymbol(name);
@@ -182,7 +211,29 @@ export class Builtins {
     });
   }
 
-  public addMember(value: string, member: string, builtin: Builtin): void {
+  public addMember(valueSymbol: ts.Symbol, memberSymbol: ts.Symbol, builtin: Builtin): void {
+    let members = this.builtinMembers.get(valueSymbol);
+    if (members === undefined) {
+      members = new Map();
+      this.builtinMembers.set(valueSymbol, members);
+    }
+
+    members.set(memberSymbol, builtin);
+    this.allBuiltinMembers.set(memberSymbol, builtin);
+    const memberSymbolName = tsUtils.symbol.getName(memberSymbol);
+    if (memberSymbolName.startsWith('__@')) {
+      const symbolSymbol = this.getInterfaceSymbolBase('SymbolConstructor', this.getGlobals());
+      const memberSymbolSymbol = getMember(symbolSymbol, memberSymbolName.slice(3));
+      members.set(memberSymbolSymbol, builtin);
+      this.allBuiltinMembers.set(memberSymbolSymbol, builtin);
+    }
+  }
+
+  public addOverride(superSymbol: ts.Symbol, overrideSymbol: ts.Symbol): void {
+    this.builtinOverrides.set(superSymbol, overrideSymbol);
+  }
+
+  public addGlobalMember(value: string, member: string, builtin: Builtin): void {
     this.addMemberBase(value, member, builtin, this.getGlobals());
   }
 
@@ -215,8 +266,25 @@ export class Builtins {
     this.addValueBase(value, builtin, this.getContract());
   }
 
-  public addInternalValue(value: string, builtin: Builtin): void {
-    this.addValueBase(value, builtin, this.getInternal());
+  private walkOverridesForMember(valueSymbol: ts.Symbol, propSymbol: ts.Symbol): Builtin | undefined {
+    const overrideValueSymbol = this.builtinOverrides.get(valueSymbol);
+    if (overrideValueSymbol === undefined) {
+      return undefined;
+    }
+
+    let overridePropSymbol = this.builtinOverrides.get(propSymbol);
+    if (overridePropSymbol === undefined) {
+      overridePropSymbol = propSymbol;
+    }
+
+    const member = this.walkOverridesForMember(overrideValueSymbol, overridePropSymbol);
+    if (member !== undefined) {
+      return member;
+    }
+
+    const overridenMembers = this.getAllMembers(overrideValueSymbol);
+
+    return overridenMembers.get(overridePropSymbol);
   }
 
   private getOnlyMemberBase<T>(
@@ -225,54 +293,50 @@ export class Builtins {
     getValue: (value: [ts.Symbol, Builtin]) => T,
   ): T | undefined {
     return this.memoized('only-member-base', `${value}$${name}`, () => {
-      const interfaceSymbol = this.getAnyInterfaceSymbol(value);
-      const members = this.builtinMembers.get(interfaceSymbol);
-      if (members === undefined) {
-        return undefined;
-      }
-
-      const result = [...members.entries()].find(([symbol]) => tsUtils.symbol.getName(symbol) === name);
-
-      if (result === undefined) {
-        // tslint:disable-next-line no-loop-statement
-        for (const decl of tsUtils.symbol.getDeclarations(interfaceSymbol)) {
-          if (ts.isInterfaceDeclaration(decl)) {
-            // tslint:disable-next-line no-loop-statement
-            for (const clause of tsUtils.heritage.getHeritageClauses(decl)) {
-              // tslint:disable-next-line no-loop-statement
-              for (const type of tsUtils.heritage.getTypeNodes(clause)) {
-                const expr = tsUtils.expression.getExpression(type);
-                if (ts.isIdentifier(expr)) {
-                  const member = this.getOnlyMemberBase(tsUtils.node.getText(expr), name, getValue);
-                  if (member !== undefined) {
-                    return member;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      const symbol = this.getAnyInterfaceOrValueSymbol(value);
+      const members = this.getAllMembers(symbol);
+      const result = [...members.entries()].find(([memberSymbol]) => tsUtils.symbol.getName(memberSymbol) === name);
 
       return result === undefined ? undefined : getValue(result);
     });
   }
 
+  private getAllMembers(symbol: ts.Symbol): Map<ts.Symbol, Builtin> {
+    return this.memoized('get-all-members', symbolKey(symbol), () => {
+      const interfaceMembers = this.builtinMembers.get(symbol);
+      const memberEntries = [...this.getInheritedSymbols(symbol)].reduce(
+        (acc, parentInterfaceSymbol) => {
+          const parentInterfaceMembers = this.builtinMembers.get(parentInterfaceSymbol);
+          if (parentInterfaceMembers === undefined) {
+            return acc;
+          }
+
+          return [...parentInterfaceMembers.entries()].concat(acc);
+        },
+        interfaceMembers === undefined ? [] : [...interfaceMembers.entries()],
+      );
+
+      return new Map(memberEntries);
+    });
+  }
+
   private addMemberBase(value: string, member: string, builtin: Builtin, file: ts.SourceFile): void {
-    const valueSymbol = this.getInterfaceSymbolBase(value, file);
-    let members = this.builtinMembers.get(valueSymbol);
-    if (members === undefined) {
-      members = new Map();
-      this.builtinMembers.set(valueSymbol, members);
+    let valueSymbol = this.getInterfaceSymbolMaybe(value, file);
+    let memberSymbol: ts.Symbol;
+    if (valueSymbol === undefined) {
+      valueSymbol = this.getValueSymbolBase(value, file);
+      memberSymbol = getExportOrMember(valueSymbol, member);
+    } else {
+      memberSymbol = getMember(valueSymbol, member);
     }
 
-    const memberSymbol = getMember(valueSymbol, member);
-    members.set(memberSymbol, builtin);
-    const memberSymbolName = tsUtils.symbol.getName(memberSymbol);
-    if (memberSymbolName.startsWith('__@')) {
-      const symbolSymbol = this.getInterfaceSymbolBase('SymbolConstructor', this.getGlobals());
-      members.set(getMember(symbolSymbol, memberSymbolName.slice(3)), builtin);
-    }
+    this.addMember(valueSymbol, memberSymbol, builtin);
+  }
+
+  private getAnyInterfaceOrValueSymbol(value: string): ts.Symbol {
+    const valueSymbol = this.getAnyInterfaceSymbolMaybe(value);
+
+    return valueSymbol === undefined ? this.getAnyValueSymbol(value) : valueSymbol;
   }
 
   private addInterfaceBase(value: string, builtin: Builtin, file: ts.SourceFile): void {
@@ -288,7 +352,9 @@ export class Builtins {
   }
 
   private getAnyValueSymbolMaybe(name: string): ts.Symbol | undefined {
-    return findNonNull(this.getFiles().map((file) => this.getValueSymbolMaybe(name, file)));
+    return this.memoized('get-any-value-symbol-maybe', name, () =>
+      findNonNull(this.getFiles().map((file) => this.getValueSymbolMaybe(name, file))),
+    );
   }
 
   private getValueSymbolBase(name: string, file: ts.SourceFile): ts.Symbol {
@@ -306,6 +372,10 @@ export class Builtins {
     }
 
     if (decl === undefined) {
+      decl = tsUtils.statement.getClass(file, name);
+    }
+
+    if (decl === undefined) {
       return undefined;
     }
 
@@ -317,7 +387,9 @@ export class Builtins {
   }
 
   private getAnyInterfaceSymbolMaybe(name: string): ts.Symbol | undefined {
-    return findNonNull(this.getFiles().map((file) => this.getInterfaceSymbolMaybe(name, file)));
+    return this.memoized('get-any-interface-symbol-maybe', name, () =>
+      findNonNull(this.getFiles().map((file) => this.getInterfaceSymbolMaybe(name, file))),
+    );
   }
 
   private getInterfaceSymbolBase(name: string, file: ts.SourceFile): ts.Symbol {
@@ -345,23 +417,27 @@ export class Builtins {
     });
   }
 
-  private getInheritedInterfaceSymbols(symbol: ts.Symbol): Set<ts.Symbol> {
-    return this.memoized('inherited-interface-symbols', symbolKey(symbol), () => {
+  private getInheritedSymbols(symbol: ts.Symbol, baseTypes: ReadonlyArray<ts.Type> = []): Set<ts.Symbol> {
+    return this.memoized('get-inherited-symbols', symbolKey(symbol), () => {
       const symbols = new Set();
       // tslint:disable-next-line no-loop-statement
       for (const decl of tsUtils.symbol.getDeclarations(symbol)) {
-        if (ts.isInterfaceDeclaration(decl)) {
-          // tslint:disable-next-line no-loop-statement
-          for (const clause of tsUtils.heritage.getHeritageClauses(decl)) {
-            // tslint:disable-next-line no-loop-statement
-            for (const type of tsUtils.heritage.getTypeNodes(clause)) {
-              const expr = tsUtils.expression.getExpression(type);
-              if (ts.isIdentifier(expr)) {
-                const interfaceSymbol = this.getAnyInterfaceSymbol(tsUtils.node.getText(expr));
-                this.getInheritedInterfaceSymbols(interfaceSymbol).forEach((inheritedSymbol) => {
-                  symbols.add(inheritedSymbol);
-                });
-              }
+        if (ts.isInterfaceDeclaration(decl) || ts.isClassDeclaration(decl) || ts.isClassExpression(decl)) {
+          let baseType = baseTypes[0] as ts.Type | undefined;
+          let nextBaseTypes = baseTypes.slice(1);
+          if (baseTypes.length === 0) {
+            const currentBaseTypes = tsUtils.class_.getBaseTypesFlattened(this.context.typeChecker, decl);
+            baseType = currentBaseTypes[0];
+            nextBaseTypes = currentBaseTypes.slice(1);
+          }
+
+          if (baseType !== undefined) {
+            const baseSymbol = this.context.analysis.getSymbolForType(decl, baseType);
+            if (baseSymbol !== undefined) {
+              symbols.add(baseSymbol);
+              this.getInheritedSymbols(baseSymbol, nextBaseTypes).forEach((inheritedSymbol) => {
+                symbols.add(inheritedSymbol);
+              });
             }
           }
         }
@@ -372,11 +448,13 @@ export class Builtins {
   }
 
   private getAnyTypeSymbol(name: string): ts.Symbol {
-    return this.memoized('any-type-symbol', name, () => throwIfNull(this.getAnyTypeSymbolMaybe(name)));
+    return this.memoized('get-any-type-symbol', name, () => throwIfNull(this.getAnyTypeSymbolMaybe(name)));
   }
 
   private getAnyTypeSymbolMaybe(name: string): ts.Symbol | undefined {
-    return findNonNull(this.getFiles().map((file) => this.getTypeSymbolMaybe(name, file)));
+    return this.memoized('get-any-type-symbol-maybe', name, () =>
+      findNonNull(this.getFiles().map((file) => this.getTypeSymbolMaybe(name, file))),
+    );
   }
 
   private getTypeSymbolMaybe(name: string, file: ts.SourceFile): ts.Symbol | undefined {
@@ -407,31 +485,19 @@ export class Builtins {
 
   private getGlobals(): ts.SourceFile {
     return this.memoized('file-cache', 'globals', () =>
-      tsUtils.file.getSourceFileOrThrow(
-        this.context.program,
-        pathResolve(this.context.smartContractDir, 'global.d.ts'),
-      ),
+      tsUtils.file.getSourceFileOrThrow(this.context.program, this.context.host.getSmartContractPath('global.d.ts')),
     );
   }
 
   private getContract(): ts.SourceFile {
     return this.memoized('file-cache', 'contract', () =>
-      tsUtils.file.getSourceFileOrThrow(this.context.program, pathResolve(this.context.smartContractDir, 'index.d.ts')),
-    );
-  }
-
-  private getInternal(): ts.SourceFile {
-    return this.memoized('file-cache', 'internal', () =>
-      tsUtils.file.getSourceFileOrThrow(
-        this.context.program,
-        pathResolve(this.context.smartContractDir, 'internal.d.ts'),
-      ),
+      tsUtils.file.getSourceFileOrThrow(this.context.program, this.context.host.getSmartContractPath('index.d.ts')),
     );
   }
 
   private getTestGlobals(): ts.SourceFile | undefined {
     return this.memoized('file-cache', 'test', () =>
-      tsUtils.file.getSourceFile(this.context.program, pathResolve(this.context.smartContractDir, 'harness.d.ts')),
+      tsUtils.file.getSourceFile(this.context.program, this.context.host.getSmartContractPath('harness.d.ts')),
     );
   }
 }

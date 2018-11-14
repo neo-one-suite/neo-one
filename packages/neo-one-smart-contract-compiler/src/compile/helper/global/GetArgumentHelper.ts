@@ -2,11 +2,11 @@ import ts from 'typescript';
 import { GlobalProperty } from '../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
-import { TypedHelper } from '../types';
+import { Helper } from '../Helper';
 
-// Input: [numberVal]
+// Input: [number]
 // Output: [value]
-export class GetArgumentHelper extends TypedHelper {
+export class GetArgumentHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (!options.pushValue) {
       sb.emitOp(node, 'DROP');
@@ -15,10 +15,8 @@ export class GetArgumentHelper extends TypedHelper {
     }
     // [argv]
     sb.emitHelper(node, options, sb.helpers.getGlobalProperty({ property: GlobalProperty.Arguments }));
-    // [numberVal, argv]
-    sb.emitOp(node, 'SWAP');
     // [number, argv]
-    sb.emitHelper(node, options, sb.helpers.toNumber({ type: this.type }));
+    sb.emitOp(node, 'SWAP');
     // [value]
     sb.emitOp(node, 'PICKITEM');
   }

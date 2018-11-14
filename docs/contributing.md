@@ -29,7 +29,7 @@ Feature requests are welcome. But take a moment to find out whether your idea fi
 
 Unsure where to begin contributing to NEO•ONE? Here are some great ways to get started:
 
-- Chat with us on [Discord](https://discordapp.com/channels/391302767781740545/391302768234594314) about ways to contribute!
+- Chat with us on [Discord](https://discord.gg/S86PqDE) about ways to contribute!
 - Documentation (like the text you are reading now) can always use improvement! All pages on this website include an edit button which you can click to modify the documentation.
 - Adding test coverage is a great way to get familiar with the codebase.
 - Find an existing issue with the [help wanted and good first issue](https://github.com/neo-one-suite/neo-one/issues?utf8=%E2%9C%93&q=is%3Aopen+label%3Ahelp%20wanted+label%3Agood%20first%20issue) labels.

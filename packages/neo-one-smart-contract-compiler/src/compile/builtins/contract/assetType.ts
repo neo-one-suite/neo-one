@@ -1,4 +1,4 @@
-import { AssetType } from '@neo-one/client-core';
+import { AssetTypeModel as AssetType } from '@neo-one/client-common';
 import { BuiltinBase } from '../BuiltinBase';
 import { BuiltinConstantNumberMemberValue } from '../BuiltinConstantNumberMemberValue';
 import { Builtins } from '../Builtins';

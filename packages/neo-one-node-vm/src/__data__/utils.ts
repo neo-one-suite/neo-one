@@ -1,4 +1,5 @@
-import { StorageItem, utils } from '@neo-one/client-core';
+import { utils } from '@neo-one/client-common';
+import { StorageItem } from '@neo-one/node-core';
 
 // tslint:disable-next-line no-any
 export const verifyBlockchainSnapshot = (blockchain: any) => {
@@ -24,3 +25,6 @@ export const verifyListeners = (listeners: any) => {
 export const expectItemBNEquals = (item: StorageItem, value: string) => {
   expect(utils.fromSignedBuffer(item.value).toString(10)).toEqual(value);
 };
+
+// tslint:disable-next-line:no-any readonly-array
+export const badSeen = (...args: any[]) => new Set(args);

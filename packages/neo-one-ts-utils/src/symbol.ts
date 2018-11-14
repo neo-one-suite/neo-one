@@ -19,12 +19,23 @@ export function getValueDeclarationOrThrow(node: ts.Symbol): ts.Declaration {
   return utils.throwIfNullOrUndefined(getValueDeclaration(node), 'value declaration');
 }
 
+function hasSymbolFlag(node: ts.Symbol, flag: ts.SymbolFlags): boolean {
+  // tslint:disable-next-line no-bitwise
+  return (node.flags & flag) !== 0;
+}
+
 export function getAliasedSymbol(typeChecker: ts.TypeChecker, node: ts.Symbol): ts.Symbol | undefined {
-  try {
+  if (hasSymbolFlag(node, ts.SymbolFlags.Alias)) {
     return utils.getValueOrUndefined(typeChecker.getAliasedSymbol(node));
-  } catch {
-    return undefined;
   }
+
+  return undefined;
+}
+
+export function getSymbolOrAlias(typeChecker: ts.TypeChecker, symbol: ts.Symbol): ts.Symbol {
+  const alias = getAliasedSymbol(typeChecker, symbol);
+
+  return alias === undefined ? symbol : alias;
 }
 
 export function getMembers(node: ts.Symbol): ts.SymbolTable | undefined {
@@ -47,6 +58,38 @@ export function getMemberOrThrow(node: ts.Symbol, name: string): ts.Symbol {
   return utils.throwIfNullOrUndefined(getMember(node, name), 'symbol member');
 }
 
+export function getExports(node: ts.Symbol): ts.SymbolTable | undefined {
+  return utils.getValueOrUndefined(node.exports);
+}
+
+export function getExportsOrThrow(node: ts.Symbol): ts.SymbolTable {
+  return utils.throwIfNullOrUndefined(getExports(node), 'exports');
+}
+
+export function getExport(node: ts.Symbol, name: string): ts.Symbol | undefined {
+  const exports = getExports(node);
+
+  return exports === undefined ? undefined : exports.get(name as ts.__String);
+}
+
+export function getExportOrThrow(node: ts.Symbol, name: string): ts.Symbol {
+  return utils.throwIfNullOrUndefined(getExport(node, name), 'symbol export');
+}
+
 export function isArgumentsSymbol(typeChecker: ts.TypeChecker, node: ts.Symbol): boolean {
   return typeChecker.isArgumentsSymbol(node);
+}
+
+export function getTarget(symbol: ts.Symbol): ts.Symbol {
+  // tslint:disable-next-line no-any
+  const symbolAny: any = symbol;
+
+  return symbolAny.target == undefined ? symbol : symbolAny.target;
+}
+
+export function getParent(symbol: ts.Symbol): ts.Symbol | undefined {
+  // tslint:disable-next-line no-any
+  const symbolAny: any = symbol;
+
+  return symbolAny.parent == undefined ? undefined : symbolAny.parent;
 }

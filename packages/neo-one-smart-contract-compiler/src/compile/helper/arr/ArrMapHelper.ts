@@ -21,74 +21,62 @@ export class ArrMapHelper extends Helper {
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    if (!options.pushValue) {
-      sb.emitOp(node, 'DROP');
-
-      return;
-    }
-
-    // [size, ...array]
-    sb.emitOp(node, 'UNPACK');
-    // [idx, size, ...array]
-    sb.emitPushInt(node, 0);
-    sb.emitHelper(
-      node,
-      options,
-      sb.helpers.forLoop({
-        condition: () => {
-          // [size, idx, ...array]
-          sb.emitOp(node, 'SWAP');
-          // [size, idx, size, ...array]
-          sb.emitOp(node, 'TUCK');
-          // [idx, size, idx, size, ...array]
-          sb.emitOp(node, 'OVER');
-          // size > idx
-          // [size > idx, idx, size, ...array]
-          sb.emitOp(node, 'GT');
-        },
-        each: (innerOptions) => {
-          // [idx, idx, size, ...array]
-          sb.emitOp(node, 'DUP');
-          // [3, idx, idx, size, ...array]
-          sb.emitPushInt(node, 3);
-          // [idx + 3, idx, size, ...array]
-          sb.emitOp(node, 'ADD');
-          if (this.withIndex) {
-            // [idx, idx + 3, idx, size, ...array]
+    if (this.withIndex) {
+      // [iterator]
+      sb.emitSysCall(node, 'Neo.Iterator.Create');
+      // [0, iterator]
+      sb.emitPushInt(node, 0);
+      // [accum, iterator]
+      sb.emitOp(node, 'NEWARRAY');
+      // [accum]
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.rawIteratorReduce({
+          each: (innerOptions) => {
+            // [val, accum, idx]
+            sb.emitOp(node, 'ROT');
+            // [idx, val, accum]
+            sb.emitOp(node, 'ROT');
+            // [val, idx, accum]
+            sb.emitOp(node, 'SWAP');
+            // [val, accum]
+            // tslint:disable-next-line no-map-without-usage
+            this.map(innerOptions);
+            // [accum, val, accum]
             sb.emitOp(node, 'OVER');
-            // [idx, idx, idx + 3, idx, size, ...array]
-            sb.emitOp(node, 'DUP');
-            // [4, idx, idx, idx + 3, idx, size, ...array]
-            sb.emitPushInt(node, 4);
-            // [idx + 4, idx, idx + 3, idx, size, ...array]
-            sb.emitOp(node, 'ADD');
-            // [value, idx, idx + 3, idx, size, ...array]
-            sb.emitOp(node, 'ROLL');
-          } else {
-            // [idx + 3, idx + 3, idx, size, ...array]
-            sb.emitOp(node, 'DUP');
-            // [value, idx + 3, idx, size, ...array]
-            sb.emitOp(node, 'ROLL');
-          }
-          // [value, idx + 3, idx, size, ...array]
-          // tslint:disable-next-line no-map-without-usage
-          this.map(innerOptions);
-          // [idx + 3, value, idx, size, ...array]
-          sb.emitOp(node, 'SWAP');
-          // [value, idx, size, ...array]
-          sb.emitOp(node, 'XTUCK');
-          // [idx, size, ...array]
-          sb.emitOp(node, 'DROP');
-        },
-        incrementor: () => {
-          // [idx, size, ...array]
-          sb.emitOp(node, 'INC');
-        },
-      }),
-    );
-    // [size, ...array]
-    sb.emitOp(node, 'DROP');
-    // [array]
-    sb.emitOp(node, 'PACK');
+            // [val, accum, accum]
+            sb.emitOp(node, 'SWAP');
+            // [accum]
+            sb.emitOp(node, 'APPEND');
+          },
+        }),
+      );
+    } else {
+      // [enumerator]
+      sb.emitSysCall(node, 'Neo.Enumerator.Create');
+      // [0, enumerator]
+      sb.emitPushInt(node, 0);
+      // [accum, enumerator]
+      sb.emitOp(node, 'NEWARRAY');
+      // [accum]
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.rawEnumeratorReduce({
+          each: (innerOptions) => {
+            // [accum, val, accum]
+            sb.emitOp(node, 'TUCK');
+            // [val, accum, accum]
+            sb.emitOp(node, 'SWAP');
+            // [val, accum, accum]
+            // tslint:disable-next-line no-map-without-usage
+            this.map(innerOptions);
+            // [accum]
+            sb.emitOp(node, 'APPEND');
+          },
+        }),
+      );
+    }
   }
 }

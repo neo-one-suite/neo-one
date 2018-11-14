@@ -1,13 +1,12 @@
 // tslint:disable
 /// <reference path="./global.d.ts" />
-/// <reference path="./internal.d.ts" />
 
 /**
  * Marks an interface or class as not implementable or extendable.
  *
  * Makes it an error to pass values that would otherwise match the shape of the interface.
  *
- * See <fill_me_in> for more info.
+ * See the [Standard Library](https://neo-one.io/docs/smart-contract-basics#Opaque-Tag-Symbol) chapter of the main guide for more information.
  */
 declare const OpaqueTagSymbol0: unique symbol;
 
@@ -15,6 +14,8 @@ declare const OpaqueTagSymbol0: unique symbol;
  * `Buffer` that represents a NEO address.
  *
  * Stored as a script hash (Hash160) internally.
+ *
+ * See the [Standard Library](https://neo-one.io/docs/smart-contract-basics#Value-Types) chapter of the main guide for more information.
  */
 export interface Address extends Buffer {
   readonly [OpaqueTagSymbol0]: unique symbol;
@@ -25,20 +26,34 @@ export interface AddressConstructor {
    *
    * @example
    *
-   * const accountAddress = Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW');
+   * const address = Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW');
    *
    * @example
    *
-   * const contractAddress = Address.from('​​​​​0xcef0c0fdcfe7838eff6ff104f9cdec2922297537​​​​​');
+   * const address = Address.from('0xcef0c0fdcfe7838eff6ff104f9cdec2922297537');
    *
    * @param value Literal string for an `Address`.
    * @returns `Address` for the specified `value`
    */
   readonly from: (value: string) => Address;
   /**
+   * Verifies that the invocation was directly called AND approved by `Address`.
+   *
+   * Smart contracts should invoke this function before taking transferring items for `Address`es, like transferring tokens, that require the permission of the `Address`.
+   *
+   * @example
+   *
+   * if (!Address.isCaller(address)) {
+   *   return false;
+   * }
+   *
+   * @returns true if `Address` approves this invocation.
+   */
+  readonly isCaller: (address: Address) => boolean;
+  /**
    * Verifies that the `Transaction` was signed by the `address`.
    *
-   * Smart contracts should invoke this function before taking actions on `Address`es, like transferring tokens, that require the permission of the `Address`.
+   * In most cases, smart contracts should instead use `Address.isCaller`.
    *
    * @example
    *
@@ -46,7 +61,7 @@ export interface AddressConstructor {
    *   return false;
    * }
    *
-   * @returns true if `Address` approved this `Transaction`
+   * @returns true if `Address` signed this `Transaction`
    */
   readonly isSender: (address: Address) => boolean;
   readonly [OpaqueTagSymbol0]: unique symbol;
@@ -57,6 +72,8 @@ export const Address: AddressConstructor;
  * `Buffer` that represents a NEO 256 bit hash.
  *
  * Examples of `Hash256` include `Block` hashes and `Transaction` hashes.
+ *
+ * See the [Standard Library](https://neo-one.io/docs/smart-contract-basics#Value-Types) chapter of the main guide for more information.
  */
 export interface Hash256 extends Buffer {
   readonly [OpaqueTagSymbol0]: unique symbol;
@@ -67,7 +84,7 @@ export interface Hash256Constructor {
    *
    * @example
    *
-   * const transactionHash = Hash256.from('0xd6572a459b95d9136b7a713c5485ca709f9efa4f08f1c25dd792672d2bd75bfb');
+   * const hash = Hash256.from('0xd6572a459b95d9136b7a713c5485ca709f9efa4f08f1c25dd792672d2bd75bfb');
    *
    * @param value Literal string for a `Hash256`.
    * @returns `Hash256` for the specified `value`
@@ -87,6 +104,8 @@ export const Hash256: Hash256Constructor;
 
 /**
  * `Buffer` that represents a public key.
+ *
+ * See the [Standard Library](https://neo-one.io/docs/smart-contract-basics#Value-Types) chapter of the main guide for more information.
  */
 export interface PublicKey extends Buffer {
   readonly [OpaqueTagSymbol0]: unique symbol;
@@ -112,71 +131,22 @@ interface FixedTag<T extends number> {
 }
 /**
  * Integer which represents a number with the specified decimals.
+ *
+ * See the [Standard Library](https://neo-one.io/docs/smart-contract-basics#Tagged-Types) chapter of the main guide for more information.
  */
 export type Fixed<Decimals extends number> = number | (number & FixedTag<Decimals>);
 /**
  * Integer that represents a number with 0 decimals.
+ *
+ * See the [Standard Library](https://neo-one.io/docs/smart-contract-basics#Tagged-Types) chapter of the main guide for more information.
  */
 export type Integer = Fixed<0>;
 /**
  * Integer that represents a number with 8 decimals.
+ *
+ * See the [Standard Library](https://neo-one.io/docs/smart-contract-basics#Tagged-Types) chapter of the main guide for more information.
  */
 export type Fixed8 = Fixed<8>;
-
-export enum TransactionType {
-  /**
-   * First `Transaction` in each block which contains the `Block` rewards for the consensus node that produced the `Block`.
-   *
-   * @see MinerTransaction
-   */
-  Miner = 0x00,
-  /**
-   * Issues new currency of a first-class `Asset`.
-   *
-   * @see IssueTransaction
-   */
-  Issue = 0x01,
-  /**
-   * Claims GAS for a set of spent `Output`s.
-   *
-   * @see ClaimTransaction
-   */
-  Claim = 0x02,
-  /**
-   * Enrolls a new validator for a given `PublicKey`.
-   *
-   * @see EnrollmentTransaction
-   * @deprecated
-   */
-  Enrollment = 0x20,
-  /**
-   * Registers a new first class `Asset`
-   *
-   * @see RegisterTransaction
-   * @deprecated Replaced by `Client#registerAsset`
-   */
-  Register = 0x40,
-  /**
-   * Transfers first class `Asset`s
-   *
-   * @see ContractTransaction
-   */
-  Contract = 0x80,
-  State = 0x90,
-  /**
-   * Registers a new `Contract`
-   *
-   * @see PublishTransaction
-   * @deprecated Replaced by `Client#publish`
-   */
-  Publish = 0xd0,
-  /**
-   * Runs a script in the NEO VM.
-   *
-   * @see InvocationTransaction
-   */
-  Invocation = 0xd1,
-}
 
 /**
  * `Attribute` usage flag indicates the type of the data.
@@ -348,7 +318,7 @@ export interface Output {
    */
   readonly address: Address;
   /**
-   * Hash of the `Asset` that was transferred.
+   * `Hash256` of the `Asset` that was transferred.
    */
   readonly asset: Hash256;
   /**
@@ -367,7 +337,7 @@ export const Output: OutputConstructor;
  */
 export interface Input {
   /**
-   * Hash of the `Transaction` this input references.
+   * `Hash256` of the `Transaction` this input references.
    */
   readonly hash: Hash256;
   /**
@@ -382,7 +352,65 @@ export interface InputConstructor {
 export const Input: InputConstructor;
 
 /**
- * Base interface for all `Transaction`s
+ * Constants that specify the type of a `Transaction`.
+ */
+export enum TransactionType {
+  /**
+   * First `Transaction` in each block which contains the `Block` rewards for the consensus node that produced the `Block`.
+   *
+   * @see MinerTransaction
+   */
+  Miner = 0x00,
+  /**
+   * Issues new currency of a first-class `Asset`.
+   *
+   * @see IssueTransaction
+   */
+  Issue = 0x01,
+  /**
+   * Claims GAS for a set of spent `Output`s.
+   *
+   * @see ClaimTransaction
+   */
+  Claim = 0x02,
+  /**
+   * Enrolls a new validator for a given `PublicKey`.
+   *
+   * @see EnrollmentTransaction
+   * @deprecated
+   */
+  Enrollment = 0x20,
+  /**
+   * Registers a new first class `Asset`
+   *
+   * @see RegisterTransaction
+   * @deprecated Replaced by `Client#registerAsset`
+   */
+  Register = 0x40,
+  /**
+   * Transfers first class `Asset`s
+   *
+   * @see ContractTransaction
+   */
+  Contract = 0x80,
+  State = 0x90,
+  /**
+   * Registers a new `Contract`
+   *
+   * @see PublishTransaction
+   * @deprecated Replaced by `Client#publish`
+   */
+  Publish = 0xd0,
+  /**
+   * Runs a script in the NEO VM.
+   *
+   * @see InvocationTransaction
+   */
+  Invocation = 0xd1,
+}
+
+/**
+ * Base interface for all `Transaction`s.
  */
 export interface TransactionBase {
   /**
@@ -390,7 +418,8 @@ export interface TransactionBase {
    */
   readonly hash: Hash256;
   /**
-   * Type of the `Transaction`
+   * Type of the `Transaction`.
+   *
    * @see TransactionType
    */
   readonly type: TransactionType;
@@ -413,7 +442,7 @@ export interface TransactionBase {
    */
   readonly inputs: Input[];
   /**
-   * Corresponding `Output`s for the Inputs of the `Transaction`.
+   * Corresponding `Output`s for the `Input`s of the `Transaction`.
    *
    * @see Output
    */
@@ -429,7 +458,7 @@ export interface TransactionBase {
 export interface TransactionBaseConstructor {}
 export const TransactionBase: TransactionBaseConstructor;
 /**
- * First `Transaction` in each block which contains the Block rewards for the consensus node that produced the block.
+ * First `Transaction` in each `Block` which contains the `Block` rewards for the consensus node that produced the `Block`.
  */
 export interface MinerTransaction extends TransactionBase {
   readonly type: TransactionType.Miner;
@@ -455,7 +484,7 @@ export interface EnrollmentTransaction extends TransactionBase {
   readonly type: TransactionType.Enrollment;
 }
 /**
- * Registers a new first class `Asset`
+ * Registers a new first class `Asset`.
  *
  * @deprecated Replaced by `Client#registerAsset`
  */
@@ -463,11 +492,14 @@ export interface RegisterTransaction extends TransactionBase {
   readonly type: TransactionType.Register;
 }
 /**
- * `Transaction` that transfers first class `Asset`s
+ * `Transaction` that transfers first class `Asset`s.
  */
 export interface ContractTransaction extends TransactionBase {
   readonly type: TransactionType.Contract;
 }
+/**
+ * Contains the state of votes.
+ */
 export interface StateTransaction extends TransactionBase {
   readonly type: TransactionType.State;
 }
@@ -490,7 +522,7 @@ export interface InvocationTransaction extends TransactionBase {
   readonly script: Buffer;
 }
 /**
- * `Transaction`s are persisted to the blockchain and represent various functionality like transferring first class assets or executing smart contracts.
+ * `Transaction`s are persisted to the blockchain and represent various functionality like transferring first class `Asset`s or executing smart contracts.
  *
  * Smart contracts are executed within an `InvocationTransaction`.
  *
@@ -536,7 +568,7 @@ export interface Account {
    */
   readonly address: Address;
   /**
-   * Retrieve the balance for a first class `Asset`.
+   * Retrieve the balance for a first class `Asset` based on its `Hash256`.
    */
   readonly getBalance: (asset: Hash256) => Fixed8;
   readonly [OpaqueTagSymbol0]: unique symbol;
@@ -550,6 +582,9 @@ export interface AccountConstructor {
 }
 export const Account: AccountConstructor;
 
+/**
+ * Constants that specify the type of the `Asset`.
+ */
 export enum AssetType {
   Credit = 0x40,
   Duty = 0x80,
@@ -584,7 +619,8 @@ export interface Asset {
    */
   readonly hash: Hash256;
   /**
-   * Type of the `Asset`
+   * `AssetType` of the `Asset`
+   *
    * @see AssetType
    */
   readonly type: AssetType;
@@ -628,7 +664,7 @@ export const Asset: AssetConstructor;
  *
  * @example
  *
- * const contractAddress = Address.from('​​​​​0xcef0c0fdcfe7838eff6ff104f9cdec2922297537​​​​​');
+ * const contractAddress = Address.from('0xcef0c0fdcfe7838eff6ff104f9cdec2922297537');
  * const contract = Contract.for(contractAddress);
  * const contractScript = contract.script;
  *
@@ -639,16 +675,16 @@ export interface Contract {
    */
   readonly script: Buffer;
   /**
-   * Flag that indicates if the `Contract` supports receiving `Asset`s and NEP-5 tokens.
+   * Flag that indicates if the `Contract` supports receiving `Asset`s.
    */
   readonly payable: boolean;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface ContractConstructor {
   /**
-   * Returns undefined if a `Contract` does not exist at `address`.
+   * Returns `undefined` if a `Contract` does not exist at `address`.
    *
-   * @returns `Contract` for the specified `address.
+   * @returns `Contract` for the specified `address`.
    */
   readonly for: (address: Address) => Contract | undefined;
   readonly [OpaqueTagSymbol0]: unique symbol;
@@ -656,7 +692,7 @@ export interface ContractConstructor {
 export const Contract: ContractConstructor;
 
 /**
- * Attributes of a `Block` persisted to the blockchain. `Header` includes all information except the `Transaction`s.
+ * Attributes of a `Block` persisted to the blockchain. `Header` includes all information except the list of `Transaction`s.
  *
  * @example
  *
@@ -666,11 +702,11 @@ export const Contract: ContractConstructor;
  */
 export interface Header {
   /**
-   * `Block` hash
+   * `Block` hash.
    */
   readonly hash: Hash256;
   /**
-   * NEO blockchain version
+   * NEO blockchain version.
    */
   readonly version: Integer;
   /**
@@ -678,12 +714,15 @@ export interface Header {
    */
   readonly previousHash: Hash256;
   /**
-   * `Block` index
+   * `Block` index.
    */
   readonly index: Integer;
+  /**
+   * Root of the `Transaction` hash Merkle Tree.
+   */
   readonly merkleRoot: Hash256;
   /**
-   * `Block` time persisted
+   * `Block` time persisted.
    */
   readonly time: Integer;
   /**
@@ -718,37 +757,54 @@ export interface Block extends Header {
 }
 export interface BlockConstructor {
   /**
-   * Accepts either the `Hash256` or the index of the `Block`;
+   * Accepts either the `Hash256` or the index of the `Block`.
    *
-   * @returns `Header` for the specified `hashOrIndex`.
+   * @returns `Block` for the specified `hashOrIndex`.
    */
   readonly for: (hashOrIndex: Hash256 | Integer) => Block;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const Block: BlockConstructor;
 
+/**
+ * Value that can be used as a key in `MapStorage` and a value for `SetStorage`.
+ *
+ * See the [Properties and Storage](https://neo-one.io/docs/properties-and-storage) chapter of the main guide for more information.
+ */
 export type SerializableKeySingle = number | string | boolean | Buffer;
 type SK = SerializableKeySingle;
 export type SerializableKey = SK | [SK, SK] | [SK, SK, SK] | [SK, SK, SK, SK];
-interface SerializableValueArray extends ReadonlyArray<SerializableValue> {}
-interface SerializableValueMap extends ReadonlyMap<SerializableKeySingle, SerializableValue> {}
-interface SerializableValueSet extends ReadonlySet<SerializableValue> {}
+export interface SerializableValueArray extends ReadonlyArray<SerializableValue> {}
+export interface SerializableValueMap extends ReadonlyMap<SerializableKeySingle, SerializableValue> {}
+export interface SerializableValueSet extends ReadonlySet<SerializableValue> {}
+export interface SerializableValueObject {
+  readonly [key: string]: SerializableValue;
+}
+/**
+ * Value that can be serialized for storage.
+ *
+ * See the [Properties and Storage](https://neo-one.io/docs/properties-and-storage) chapter of the main guide for more information.
+ */
 export type SerializableValue =
   | undefined
+  | null
   | number
   | string
   | boolean
   | Buffer
   | SerializableValueArray
   | SerializableValueMap
-  | SerializableValueSet;
+  | SerializableValueSet
+  | SerializableValueObject;
 
 /**
- * Persistent smart contract set storage. Only usable as a `SmartContract` property.
+ * Persistent smart contract array storage. Only usable as a `SmartContract` property.
+ *
+ * See the [Properties and Storage](https://neo-one.io/docs/properties-and-storage#Structured-Storage) chapter of the main guide for more information.
  *
  * @example
  *
- * class MySmartContract implements SmartContract {
+ * class MySmartContract extends SmartContract {
  *  private readonly pendingAddresses =
  *    ArrayStorage.for<Address>();
  *
@@ -779,6 +835,9 @@ export interface ArrayStorage<T extends SerializableValue> extends Iterable<T> {
    * Removes the last element from an array and returns it.
    */
   readonly pop: () => T | undefined;
+  /**
+   * Access the value at index `n`.
+   */
   [n: number]: T;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
@@ -807,9 +866,11 @@ type SKMapAtFour<K extends [SK, SK, SK, SK], V extends SerializableValue> = {
 /**
  * Persistent smart contract storage. Only usable as a `SmartContract` property.
  *
+ * See the [Properties and Storage](https://neo-one.io/docs/properties-and-storage#Structured-Storage) chapter of the main guide for more information.
+ *
  * @example
  *
- * class Token implements SmartContract {
+ * class Token extends SmartContract {
  *  private readonly balances =
  *    MapStorage.for<Address, Fixed<8>>();
  *
@@ -866,7 +927,11 @@ export interface MapStorage<K extends SerializableKey, V extends SerializableVal
    */
   readonly at: K extends [SK, SK]
     ? SKMapAtTwo<K, V>
-    : K extends [SK, SK, SK] ? SKMapAtThree<K, V> : K extends [SK, SK, SK, SK] ? SKMapAtFour<K, V> : never;
+    : K extends [SK, SK, SK]
+    ? SKMapAtThree<K, V>
+    : K extends [SK, SK, SK, SK]
+    ? SKMapAtFour<K, V>
+    : never;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface MapStorageConstructor {
@@ -894,9 +959,11 @@ type SKSetAtFour<V extends [SK, SK, SK, SK]> = {
 /**
  * Persistent smart contract set storage. Only usable as a `SmartContract` property.
  *
+ * See the [Properties and Storage](https://neo-one.io/docs/properties-and-storage#Structured-Storage) chapter of the main guide for more information.
+ *
  * @example
  *
- * class ICO implements SmartContract {
+ * class ICO extends SmartContract {
  *  private readonly whitelistedAddresses =
  *    SetStorage.for<Address>();
  *
@@ -938,7 +1005,11 @@ export interface SetStorage<V extends SerializableKey> extends Iterable<V> {
    */
   readonly at: V extends [SK, SK]
     ? SKSetAtTwo<V>
-    : V extends [SK, SK, SK] ? SKSetAtThree<V> : V extends [SK, SK, SK, SK] ? SKSetAtFour<V> : never;
+    : V extends [SK, SK, SK]
+    ? SKSetAtThree<V>
+    : V extends [SK, SK, SK, SK]
+    ? SKSetAtFour<V>
+    : never;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface SetStorageConstructor {
@@ -950,6 +1021,11 @@ export interface SetStorageConstructor {
 }
 export const SetStorage: SetStorageConstructor;
 
+/**
+ * Holds properties about the current state of the blockchain, the current `Transaction` and the current caller `Contract`.
+ *
+ * See the [Standard Library](https://neo-one.io/docs/standard-library#Blockchain-and-Transaction-Information) chapter of the main guide for more information.
+ */
 export interface BlockchainConstructor {
   /**
    * Time of the current `Block`.
@@ -967,9 +1043,11 @@ export interface BlockchainConstructor {
    */
   readonly currentTransaction: InvocationTransaction;
   /**
-   * `Address` of the smart contract.
+   * The `Address` of the smart contract that directly invoked the contract.
+   *
+   * Will be `undefined` if the smart contract method was not invoked by another smart contract, but instead was invoked by a user directly.
    */
-  readonly contractAddress: Address;
+  readonly currentCallerContract: Address | undefined;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 /**
@@ -977,6 +1055,9 @@ export interface BlockchainConstructor {
  */
 export const Blockchain: BlockchainConstructor;
 
+/**
+ * Injects values at deployment time. Can only be used for default constructor parameters.
+ */
 export interface DeployConstructor {
   /**
    * Use the sender `Address` for the constructor parameter.
@@ -984,8 +1065,10 @@ export interface DeployConstructor {
    * @example
    * import { Address, Deploy, SmartContract } from '@neo-one/smart-contract';
    *
-   * class Token implements SmartContract {
-   *  public constructor(public readonly owner: Address = Deploy.senderAddress) {}
+   * class Token extends SmartContract {
+   *  public constructor(public readonly owner: Address = Deploy.senderAddress) {
+   *    super();
+   *  }
    * }
    */
   readonly senderAddress: Address;
@@ -995,29 +1078,6 @@ export interface DeployConstructor {
  * Injects values at deployment time. Can only be used for default constructor parameters.
  */
 export const Deploy: DeployConstructor;
-
-export interface SmartContractValueArray extends Array<SmartContractValue> {}
-type SmartContractValue =
-  | void
-  | undefined
-  | number
-  | Fixed<any>
-  | string
-  | boolean
-  | Buffer
-  | Address
-  | Hash256
-  | PublicKey
-  | SmartContractValueArray;
-type Parameters<T extends Function> = T extends (...args: infer U) => any ? U : never;
-type ReturnType<T extends Function> = T extends (...args: any[]) => infer R ? R : never;
-type IsValidSmartContract<T> = {
-  [K in keyof T]: T[K] extends Function
-    ? Parameters<T[K]> extends SmartContractValue[]
-      ? ReturnType<T[K]> extends SmartContractValue ? T[K] : never
-      : never
-    : T[K]
-};
 
 export function createEventNotifier(name: string): () => void;
 export function createEventNotifier<A0>(name: string, arg0Name: string): (arg0: A0) => void;
@@ -1052,6 +1112,8 @@ export function createEventNotifier<A0, A1, A2, A3, A4>(
  *
  * Must be explicitly typed and contain string literals for the event name and argument names.
  *
+ * See the [Events and Logs](https://neo-one.io/docs/events-and-logs) chapter of the main guide for more information.
+ *
  * @example
  *
  * const notifyTransfer = createEventNotifier<Address, Address, Fixed<8>>('transfer', 'from', 'to', 'amount');
@@ -1073,73 +1135,254 @@ export function createEventNotifier<A0, A1, A2, A3, A4, A5>(
   arg5Name: string,
 ): (arg0: A0, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => void;
 
+export function declareEvent(name: string): void;
+export function declareEvent<A0>(name: string, arg0Name: string): void;
+export function declareEvent<A0, A1>(name: string, arg0Name: string, arg1Name: string): void;
+export function declareEvent<A0, A1, A2>(name: string, arg0Name: string, arg1Name: string, arg2Name: string): void;
+export function declareEvent<A0, A1, A2, A3>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+  arg2Name: string,
+  arg3Name: string,
+): void;
+export function declareEvent<A0, A1, A2, A3, A4>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+  arg2Name: string,
+  arg3Name: string,
+  arg4Name: string,
+): void;
+/**
+ * Declares an event for `SmartContract` notifications.
+ *
+ * Must be explicitly typed and contain string literals for the event name and argument names.
+ *
+ * See the [Events and Logs](https://neo-one.io/docs/events-and-logs) chapter of the main guide for more information.
+ *
+ * @example
+ *
+ * declareEvent<Address, Address, Fixed<8>>('transfer', 'from', 'to', 'amount');
+ *
+ * @param name Event name
+ * @param argName Event argument name
+ */
+export function declareEvent<A0, A1, A2, A3, A4, A5>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+  arg2Name: string,
+  arg3Name: string,
+  arg4Name: string,
+  arg5Name: string,
+): void;
+
+/**
+ * An opaque type that represents a method parameter which is typically forwarded as an argument to another smart contract.
+ *
+ * See the [Forward Values](https://neo-one.io/docs/forward-values) chapter of the advanced guide for more information.
+ */
+export interface ForwardValue {
+  readonly asString: () => string;
+  readonly asStringNullable: () => string | undefined;
+  readonly asNumber: () => number;
+  readonly asNumberNullable: () => number | undefined;
+  readonly asBoolean: () => boolean;
+  readonly asBuffer: () => Buffer;
+  readonly asBufferNullable: () => Buffer | undefined;
+  readonly asAddress: () => Address;
+  readonly asAddressNullable: () => Address | undefined;
+  readonly asHash256: () => Hash256;
+  readonly asHash256Nullable: () => Hash256 | undefined;
+  readonly asPublicKey: () => PublicKey;
+  readonly asPublicKeyNullable: () => PublicKey | undefined;
+  readonly asArray: () => Array<ForwardValue>;
+  readonly asArrayNullable: () => Array<ForwardValue> | undefined;
+  readonly asMap: () => Map<ForwardValue, ForwardValue>;
+  readonly asMapNullable: () => Map<ForwardValue, ForwardValue> | undefined;
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+export interface ForwardValueConstructor {
+  readonly [OpaqueTagSymbol0]: unique symbol;
+}
+export const ForwardValue: ForwardValueConstructor;
+
+interface ForwardedValueTag<T extends SmartContractArg> {}
+/**
+ * Marks a parameter or return type of a public `SmartContract` method as expecting a forwarded value.
+ *
+ * See the [Forward Values](https://neo-one.io/docs/forward-values) chapter of the advanced guide for more information.
+ */
+export type ForwardedValue<T extends SmartContractArg> = T | (T & ForwardedValueTag<T>);
+
+interface SmartContractValueArray extends Array<SmartContractValue> {}
+interface SmartContractValueReadonlyArray extends ReadonlyArray<SmartContractValue> {}
+interface SmartContractValueMap extends Map<SmartContractValue, SmartContractValue> {}
+interface SmartContractValueReadonlyMap extends ReadonlyMap<SmartContractValue, SmartContractValue> {}
+interface SmartContractValueObject {
+  readonly [key: string]: SmartContractValue;
+}
+type SmartContractValue =
+  | void
+  | null
+  | undefined
+  | number
+  | Fixed<any>
+  | string
+  | boolean
+  | Buffer
+  | Address
+  | Hash256
+  | PublicKey
+  | SmartContractValueArray
+  | SmartContractValueReadonlyArray
+  | SmartContractValueMap
+  | SmartContractValueReadonlyMap
+  | SmartContractValueObject;
+type SmartContractArg = SmartContractValue | ForwardValue;
+type IsValidSmartContract<T> = {
+  [K in keyof T]: T[K] extends Function
+    ? Parameters<T[K]> extends SmartContractArg[]
+      ? (ReturnType<T[K]> extends SmartContractArg ? T[K] : never)
+      : never
+    : T[K] extends SmartContractValue
+    ? T[K]
+    : never
+};
+
 /**
  * Object with string literals for the contract properties to be used in deployment.
+ *
+ * See the [Deployment](https://neo-one.io/docs/deployment#Properties) chapter of the main guide for more information.
  */
 export interface ContractProperties {
   readonly codeVersion: string;
   readonly author: string;
   readonly email: string;
   readonly description: string;
-  readonly payable: boolean;
 }
+
 /**
  * Marks a class as a `SmartContract`.
  */
-export interface SmartContract {
-  /**
-   * Owner of the `SmartContract`
-   */
-  owner: Address;
+export class SmartContract {
   /**
    * Properties used for deployment of the `SmartContract`
-   */
-  readonly properties: ContractProperties;
-}
-export interface SmartContractConstructor {
-  /**
-   * Returns an object representing a contract at `address` with the given type `T`.
    *
-   * `T` is checked for validity and `getSmartContract` will report an error during compilation if the interface is invalid.
+   * See the [Deployment](https://neo-one.io/docs/deployment#Properties) chapter of the main guide for more information.
+   */
+  public readonly properties: ContractProperties;
+  /**
+   * `Address` of the `SmartContract`.
+   */
+  public readonly address: Address;
+  /**
+   * Stores `Transaction` hashes that have been processed by a method marked with `@receive`, `@send`, or `@sendUnsafe`.
+   *
+   * Used to enforce that a `Transaction` with native `Asset`s is only ever processed once by an appropriate `@receive`, `@send`, or `@sendUnsafe` method.
+   *
+   * Unprocessed transactions that sent assets to the smart contract can be refunded by using `refundAssets`.
+   *
+   * See the [Native Assets](https://neo-one.io/docs/native-assets) chapter of the advanced guide for more information.
+   */
+  protected readonly processedTransactions: SetStorage<Hash256>;
+  /**
+   * Stores `Transaction` hashes that have been claimed by an address with a method marked with `@send`.
+   *
+   * The first contract output of a claimed transaction may be sent to the receiver by using `completeSend`.
+   *
+   * See the [Native Assets](https://neo-one.io/docs/native-assets) chapter of the advanced guide for more information.
+   */
+  protected readonly claimedTransactions: MapStorage<Hash256, Address>;
+  /**
+   * Property primarily used internally to validate that the smart contract is deployed only once.
+   */
+  protected readonly deployed: true;
+  /**
+   * Override to validate a contract upgrade invocation. Returns `false` by default. Return `true` to indicate the upgrade may proceed.
+   *
+   * See the [Deployment](https://neo-one.io/docs/deployment#Upgrade) chapter of the main guide for more information.
    *
    * @example
    *
-   * interface TransferContract {
-   *   transfer(from: Address, to: Address, value: Fixed<8>): boolean;
-   * }
-   * const contractAddress = Address.from('0xcef0c0fdcfe7838eff6ff104f9cdec2922297537');
-   * const contract = SmartContract.for<TransferContract>(contractAddress);
-   * const from = Address.from('ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s');
-   * const to = Address.from('AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx');
-   * contract.transfer(from, to, 10);
+   * export class Contract extends SmartContract {
+   *  public constructor(private readonly owner = Deploy.senderAddress) {
+   *    super();
+   *  }
    *
-   * @param hash `Address` of the smart contract
-   * @returns an object representing the underlying smart contract
+   *  protected approveUpgrade(): boolean {
+   *    return Address.isCaller(this.owner);
+   *  }
+   * }
    */
-  readonly for: <T>(hash: T extends IsValidSmartContract<T> ? Address : never) => T;
-  readonly [OpaqueTagSymbol0]: unique symbol;
-}
-export const SmartContract: SmartContractConstructor;
-
-/**
- * Additonal properties available for linked smart contracts.
- */
-export interface LinkedSmartContract {
+  protected approveUpgrade(): boolean;
   /**
-   * `Address` of the `LinkedSmartContract`.
+   * Permanently deletes the contract.
+   *
+   * See the [Deployment](https://neo-one.io/docs/deployment#Destroy) chapter of the main guide for more information.
    */
-  readonly address: Address;
-  readonly [OpaqueTagSymbol0]: unique symbol;
+  protected readonly destroy: () => void;
+  /**
+   * Method automatically added for refunding native `Asset`s.
+   *
+   * See the [Native Assets](https://neo-one.io/docs/native-assets) chapter of the advanced guide for more information.
+   */
+  public readonly refundAssets: () => boolean;
+  /**
+   * Method automatically added for sending native `Asset`s that have been claimed by a `@send` method.
+   *
+   * See the [Native Assets](https://neo-one.io/docs/native-assets) chapter of the advanced guide for more information.
+   */
+  public readonly completeSend: () => boolean;
+  /**
+   * Used internally by client APIs to upgrade the contract. Control whether an invocation is allowed to upgrade the contract by overriding `approveUpgrade`.
+   *
+   * See the [Deployment](https://neo-one.io/docs/deployment#Upgrade) chapter of the main guide for more information.
+   */
+  public readonly upgrade: (
+    script: Buffer,
+    parameterList: Buffer,
+    returnType: number,
+    properties: number,
+    contractName: string,
+    codeVersion: string,
+    author: string,
+    email: string,
+    description: string,
+  ) => boolean;
+  /**
+   * Returns the singleton instance of the `SmartContract` defined by the interface `T` at `address`.
+   *
+   * `T` is checked for validity and `SmartContract.for` will report an error during compilation if the interface is invalid.
+   *
+   * See the [Calling Smart Contracts](https://neo-one.io/docs/calling-smart-contracts) chapter of the main guide for more information.
+   *
+   * @example
+   *
+   * interface Token {
+   *  readonly transfer: (from: Address, to: Address, amount: Fixed<8>) => boolean;
+   * }
+   *
+   * const address = Address.from('ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s');
+   * const contract = SmartContract.for<Token>(address);
+   *
+   */
+  public static readonly for: <T>(address: T extends IsValidSmartContract<T> ? Address : never) => T;
 }
+
 export interface LinkedSmartContractConstructor {
   /**
-   * Returns an object representing a statically linked contract `T`.
+   * Returns the singleton instance of the statically linked contract `T`.
    *
-   * `T` is checked for validity and `getLinkedSmartContract` will report an error during compilation if the interface is invalid.
+   * `T` is checked for validity and `LinkedSmartContract.for` will report an error during compilation if the interface is invalid.
+   *
+   * See the [Calling Smart Contracts](https://neo-one.io/docs/calling-smart-contracts) chapter of the main guide for more information.
    *
    * @example
    *
    * import { Token } from './Token';
+   *
    * const contract = LinkedSmartContract.for<Token>();
    * const from = Address.from('ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s');
    * const to = Address.from('AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx');
@@ -1147,16 +1390,121 @@ export interface LinkedSmartContractConstructor {
    *
    * @returns an object representing the underlying smart contract
    */
-  readonly for: <T extends SmartContract>() => T extends IsValidSmartContract<T> ? T & LinkedSmartContract : never;
+  readonly for: <T extends SmartContract>() => T extends IsValidSmartContract<T> ? T : never;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export const LinkedSmartContract: LinkedSmartContractConstructor;
 
 /**
- * Marks a `SmartContract` method to be verified before execution.
+ * Types that can be hashed the various `crypto` functions.
+ *
+ * @see crypto
  */
-export function verify(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
+export type Hashable = number | string | boolean | Buffer;
 /**
- * Marks a `SmartContract` method as constant.
+ * Contains various cryptography functions.
+ */
+export interface Crypto {
+  /**
+   * Returns a `Buffer` of the SHA1 hash of the input
+   */
+  readonly sha1: (value: Hashable) => Buffer;
+  /**
+   * Returns a `Buffer` of the SHA256 hash of the input
+   */
+  readonly sha256: (value: Hashable) => Buffer;
+  /**
+   * Returns a `Buffer` of the RMD160 hash of the SHA256 hash of the input.
+   */
+  readonly hash160: (value: Hashable) => Buffer;
+  /**
+   * Returns a `Buffer` of the SHA256 hash of the SHA256 hash of the input.
+   */
+  readonly hash256: (value: Hashable) => Buffer;
+}
+/**
+ * Contains various cryptography functions.
+ */
+export const crypto: Crypto;
+
+/**
+ * Represents a native `Asset` transfer.
+ */
+export interface Transfer {
+  /**
+   * The amount transferred.
+   */
+  readonly amount: Fixed<8>;
+  /**
+   * The `Hash256` of the `Asset` transferred.
+   */
+  readonly asset: Hash256;
+  /**
+   * The desination `Address` of the transfer.
+   */
+  readonly to: Address;
+}
+
+/**
+ * Marks a `SmartContract` method that verifies `Asset` transfers from the `SmartContract`.
+ *
+ * Method must return a boolean indicating whether the `SmartContract` wishes to approve sending the transferred `Asset`s.
+ *
+ * Method can take the `Transfer` as the final argument.
+ *
+ * See the [Native Assets](https://neo-one.io/docs/native-assets) chapter of the advanced guide for more information.
+ *
+ * @example
+ *
+ * export class Contract extends SmartContract {
+ *  @send
+ *  public withdraw(arg0: Address, arg1: Fixed<8>, transfer: Transfer): boolean {
+ *    // Don't allow sending anything but NEO
+ *    if (!transfer.asset.equals(Hash256.NEO)) {
+ *      return false;
+ *    }
+ *    // Do some additional checks on the transfer.to and transfer.amount being sent and other arguments.
+ *    return true;
+ *  }
+ * }
+ *
+ */
+export function send(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
+/**
+ * Marks a `SmartContract` method that verifies `Asset` transfers from the `SmartContract`.
+ *
+ * Method must return a boolean indicating whether the `SmartContract` wishes to approve sending the transferred `Asset`s.
+ *
+ * Note that unlike `@send`, `@sendUnsafe` does not use a two-phase send. Smart contract authors must implement their own logic for safely sending assets from the contract.
+ *
+ * May be used in combination with `@receive`.
+ *
+ * See the [Native Assets](https://neo-one.io/docs/native-assets) chapter of the advanced guide for more information.
+ */
+export function sendUnsafe(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
+/**
+ * Marks a `SmartContract` method that verifies receiving `Asset`s to the `SmartContract`.
+ *
+ * Method must return a boolean indicating whether the `SmartContract` wishes to receive the transferred `Asset`s.
+ *
+ * May be used in combination with `@sendUnsafe`.
+ *
+ * See the [Native Assets](https://neo-one.io/docs/native-assets) chapter of the advanced guide for more information.
+ */
+export function receive(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
+/**
+ * Marks a `SmartContract` method that verifies GAS claims from the `SmartContract`.
+ *
+ * Method must return a boolean indicating whether the `SmartContract` wishes to allow GAS to be claimed.
+ *
+ * May optionally take the `ClaimTransaction` this `SmartContract` is executed in as the last argument. Accessing `Blockchain.currentTransaction` will result in an error.
+ *
+ * See the [Native Assets](https://neo-one.io/docs/native-assets) chapter of the advanced guide for more information.
+ */
+export function claim(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;
+/**
+ * Marks a `SmartContract` method as not modifying storage.
+ *
+ * See the [Methods](https://neo-one.io/docs/methods) chapter of the main guide for more information.
  */
 export function constant(target: any, propertyKey: string, descriptor: PropertyDescriptor): void;

@@ -1,0 +1,30 @@
+{
+  "name": "@neo-one/local-browser",
+  "version": "1.0.2",
+  "description": "NEO•ONE local browser implementation.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@neo-one/client-common": "^1.0.1",
+    "@neo-one/client-core": "^1.0.2",
+    "@neo-one/local": "^1.0.2",
+    "@neo-one/node-browser": "^1.0.2",
+    "@neo-one/smart-contract-codegen": "^1.0.2",
+    "@neo-one/smart-contract-compiler": "^1.0.2",
+    "@neo-one/types": "^1.0.1",
+    "@neo-one/utils": "^1.0.1",
+    "@neo-one/worker": "^1.0.1",
+    "@types/lodash": "^4.14.118",
+    "@types/nanoid": "^1.2.0",
+    "@types/pouchdb": "^6.3.2",
+    "lodash": "^4.17.11",
+    "nanoid": "^2.0.0",
+    "pouchdb": "^7.0.0",
+    "pouchdb-utils": "^7.0.0",
+    "rxjs": "^6.3.3",
+    "safe-stable-stringify": "^1.1.0",
+    "source-map": "^0.7.3",
+    "tslib": "^1.9.3",
+    "typescript": "3.2.0-dev.20181110"
+  },
+  "sideEffects": false
+}

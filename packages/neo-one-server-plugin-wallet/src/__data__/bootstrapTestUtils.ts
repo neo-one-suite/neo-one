@@ -1,5 +1,6 @@
-import { NEOONEProvider, privateKeyToAddress, ReadClient } from '@neo-one/client';
-import { common, crypto } from '@neo-one/client-core';
+import { common, crypto, privateKeyToAddress } from '@neo-one/client-common';
+import { LocalKeyStore, LocalMemoryStore, NEOONEProvider } from '@neo-one/client-core';
+import { Client, LocalUserAccountProvider, ReadClient } from '@neo-one/client-full-core';
 import { Network as ResourceNetwork } from '@neo-one/server-plugin-network';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
@@ -55,7 +56,6 @@ DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS.forEach(([privateKey, publicKey]) => {
   crypto.addPublicKey(common.stringToPrivateKey(privateKey), common.stringToECPoint(publicKey));
 });
 const ASSET_WALLET_ADDRESSES = new Set(ASSET_INFO.map(({ privateKey }) => privateKeyToAddress(privateKey)));
-
 const TOKEN_WALLET_ADDRESSES = new Set(TOKEN_INFO.map(({ privateKey }) => privateKeyToAddress(privateKey)));
 
 function expectNotNull<T>(value: T | null | undefined): T {
@@ -75,23 +75,37 @@ const getAssetNameCoin = (wallet: Wallet, name: string) => getCoin(wallet, (coin
 const getSmartContract = async ({
   token,
   client,
+  network,
   tokens,
 }: {
   readonly token: TokenInfo;
-  readonly client: ReadClient;
+  readonly client: Client;
+  readonly network: string;
   readonly tokens: Tokens;
 }) => {
   const { abi, sourceMap } = await compileSmartContract(token.name);
 
   const address = tokens[token.name];
 
-  return client.smartContract({ address, abi, sourceMaps: Promise.resolve({ [address]: sourceMap }) });
+  return client.smartContract({
+    networks: { [network]: { address } },
+    abi,
+    sourceMaps: Promise.resolve({ [address]: sourceMap }),
+  });
 };
 
-const getSmartContracts = async ({ client, tokens }: { readonly client: ReadClient; readonly tokens: Tokens }) =>
+const getSmartContracts = async ({
+  client,
+  network,
+  tokens,
+}: {
+  readonly client: Client;
+  readonly network: string;
+  readonly tokens: Tokens;
+}) =>
   Promise.all(
     TOKEN_INFO.map(async (token) => {
-      const smartContract = await getSmartContract({ token, client, tokens });
+      const smartContract = await getSmartContract({ token, client, network, tokens });
 
       return { token, smartContract };
     }),
@@ -188,12 +202,14 @@ const testTokens = async ({
   wallets,
   transferWallets,
   client,
+  network,
   tokenGas,
   tokens,
 }: {
   readonly wallets: ReadonlyArray<Wallet>;
   readonly transferWallets: ReadonlyArray<Wallet>;
-  readonly client: ReadClient;
+  readonly client: Client;
+  readonly network: string;
   readonly tokenGas: string;
   readonly tokens: Tokens;
 }) => {
@@ -204,7 +220,7 @@ const testTokens = async ({
   );
   expect(tokenWallets.length).toEqual(TOKEN_INFO.length);
 
-  const tokenAndSmartContracts = await getSmartContracts({ client, tokens });
+  const tokenAndSmartContracts = await getSmartContracts({ client, network, tokens });
 
   await Promise.all(
     utils.zip(tokenAndSmartContracts, tokenWallets).map(async ([{ token, smartContract }, wallet], idx) => {
@@ -248,15 +264,15 @@ const testTokens = async ({
 };
 
 const testContract = async ({
-  client,
+  readClient,
   name,
   hash,
 }: {
-  readonly client: ReadClient;
+  readonly readClient: ReadClient;
   readonly name: string;
   readonly hash: string;
 }) => {
-  const contract = await client.getContract(hash);
+  const contract = await readClient.getContract(hash);
   expect(contract.name).toEqual(name);
   expect(contract.codeVersion).toEqual('1.0');
   expect(contract.parameters).toEqual(['String', 'Array']);
@@ -264,13 +280,13 @@ const testContract = async ({
   expect(contract.author).toEqual('dicarlo2');
   expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
   expect(contract.description).toEqual(`The ${name}`);
-  expect(contract.dynamicInvoke).toBeFalsy();
-  expect(contract.payable).toBeTruthy();
+  expect(contract.dynamicInvoke).toBeTruthy();
+  expect(contract.payable).toBeFalsy();
   expect(contract.storage).toBeTruthy();
 };
 
-const testContracts = async ({ client, tokens }: { readonly client: ReadClient; readonly tokens: Tokens }) => {
-  await Promise.all(Object.entries(tokens).map(async ([name, hash]) => testContract({ client, name, hash })));
+const testContracts = async ({ readClient, tokens }: { readonly readClient: ReadClient; readonly tokens: Tokens }) => {
+  await Promise.all(Object.entries(tokens).map(async ([name, hash]) => testContract({ readClient, name, hash })));
 };
 
 export interface Info {
@@ -351,13 +367,16 @@ export async function testBootstrap(
 
   expect(transferWallets.length).toEqual(numWallets);
 
-  const provider = new NEOONEProvider([{ network, rpcURL }]).read(network);
-  const client = new ReadClient(provider);
+  const provider = new NEOONEProvider([{ network, rpcURL }]);
+  const client = new Client({
+    memory: new LocalUserAccountProvider({ provider, keystore: new LocalKeyStore(new LocalMemoryStore()) }),
+  });
+  const readClient = new ReadClient(provider.read(network));
 
   testTransfersAndClaims({ transferWallets });
   testAssets({ wallets, transferWallets });
   await Promise.all([
-    testTokens({ wallets, transferWallets, client, tokenGas, tokens }),
-    testContracts({ client, tokens }),
+    testTokens({ wallets, transferWallets, client, network, tokenGas, tokens }),
+    testContracts({ readClient, tokens }),
   ]);
 }

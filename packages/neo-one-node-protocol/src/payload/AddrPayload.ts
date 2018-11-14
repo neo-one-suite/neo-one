@@ -1,12 +1,5 @@
-import {
-  BinaryReader,
-  BinaryWriter,
-  createSerializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableWire,
-  SerializeWire,
-} from '@neo-one/client-core';
+import { BinaryWriter, createSerializeWire, SerializableWire, SerializeWire } from '@neo-one/client-common';
+import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions } from '@neo-one/node-core';
 import { NetworkAddress } from './NetworkAddress';
 export interface AddrPayloadAdd {
   readonly addresses: ReadonlyArray<NetworkAddress>;

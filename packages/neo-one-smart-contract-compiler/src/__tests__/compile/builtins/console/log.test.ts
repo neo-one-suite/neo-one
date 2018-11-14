@@ -1,5 +1,5 @@
-import { SourceMaps } from '@neo-one/client';
-import { CallReceiptJSON, convertCallReceipt } from '@neo-one/client-core';
+import { CallReceiptJSON, SourceMaps } from '@neo-one/client-common';
+import { convertCallReceipt } from '@neo-one/client-core';
 import { createConsoleLogMessages } from '@neo-one/client-switch';
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
@@ -75,6 +75,31 @@ describe('console.log', () => {
   test('should log arrays', async () => {
     const { receipt, sourceMaps } = await helpers.executeString(`
       console.log([[1, 2, 3], ['a'], [[Symbol.for('b')]]]);
+    `);
+
+    const messages = await getMessages(receipt, sourceMaps);
+
+    expect(messages).toMatchSnapshot();
+  });
+
+  test('should log maps', async () => {
+    const { receipt, sourceMaps } = await helpers.executeString(`
+      const map = new Map();
+      map.set('a', 1);
+      map.set('b', 2);
+      map.set('c', 3);
+      console.log(map);
+    `);
+
+    const messages = await getMessages(receipt, sourceMaps);
+
+    expect(messages).toMatchSnapshot();
+  });
+
+  test('should log sets', async () => {
+    const { receipt, sourceMaps } = await helpers.executeString(`
+      const set = new Set([1, 2, 3]);
+      console.log(set);
     `);
 
     const messages = await getMessages(receipt, sourceMaps);
@@ -192,6 +217,15 @@ describe('console.log', () => {
     helpers.compileString(
       `
       const log = console.log;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('cannot be referenced - object literal', async () => {
+    helpers.compileString(
+      `
+      const { log } = console;
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );

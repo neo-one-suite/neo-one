@@ -44,7 +44,7 @@ NEO•ONE implements a full node for the NEO blockchain across the following pac
 - [@neo-one/node-protocol](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-protocol) implements the high-level Node protocol for passing messages on the mesh Network. It also contains the Consensus logic.
 - [@neo-one/node-core](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-core) is similar to `neo-one-client-core` and contains the NEO blockchain types and interfaces shared between Node packages. In particular, it contains common abstractions like the Storage and VM interfaces used between packages.
 -  [@neo-one/node-offline](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-offline) is a simple package that implements bootstrapping a new Blockchain using a serialized Block file, typically called chain.acc. Mostly useful when we need to change the underlying Storage interfaces in a backwards incompatible way and need to generate a new backup, otherwise just restoring from `neo-one-node-data-backup` is preferrable.
-- [@neo-one/node-rpc](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-rpc) contains the RPC server implementation
+- [@neo-one/node-http-rpc](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-rpc) contains the RPC server implementation
 - [@neo-one/node-vm](https://github.com/neo-one-suite/neo-one/tree/master/packages/neo-one-node-vm) contains the NEO VM implementation
 
 ### Client

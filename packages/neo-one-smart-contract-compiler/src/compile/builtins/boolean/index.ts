@@ -1,9 +1,11 @@
-import { BuiltinBase } from '../BuiltinBase';
 import { BuiltinInterface } from '../BuiltinInterface';
 import { Builtins } from '../Builtins';
+import { BuiltinValueObject } from '../BuiltinValueObject';
 
 class BooleanInterface extends BuiltinInterface {}
-class BooleanValue extends BuiltinBase {}
+class BooleanValue extends BuiltinValueObject {
+  public readonly type = 'BooleanConstructor';
+}
 class BooleanConstructorInterface extends BuiltinInterface {}
 
 // tslint:disable-next-line export-name

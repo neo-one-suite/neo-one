@@ -46,6 +46,9 @@ export class ExtendArrHelper extends Helper {
           // [currentLength, length, arr]
           sb.emitOp(node, 'SWAP');
         },
+        cleanup: () => {
+          // do nothing
+        },
       }),
     );
     // [length, arr]

@@ -11,13 +11,14 @@ import {
   UInt160,
   UnknownOpError,
   utils,
-} from '@neo-one/client-core';
+} from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import { utils as commonUtils } from '@neo-one/utils';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../../Context';
+import { ContractInfo } from '../../contract';
 import { DiagnosticCode } from '../../DiagnosticCode';
 import { DiagnosticMessage } from '../../DiagnosticMessage';
 import { declarations } from '../declaration';
@@ -28,7 +29,7 @@ import { NodeCompiler } from '../NodeCompiler';
 import { Call, DeferredProgramCounter, Jmp, Jump, Line, ProgramCounter, ProgramCounterHelper } from '../pc';
 import { Name, Scope } from '../scope';
 import { statements } from '../statement';
-import { Features, LinkedContracts, ScriptBuilderResult, VisitOptions } from '../types';
+import { Features, HandleSuperConstruct, LinkedContracts, ScriptBuilderResult, VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 import { resolveJumps } from './resolveJumps';
 import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode, SingleBytecodeValue, Tags } from './ScriptBuilder';
@@ -60,6 +61,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     public readonly context: Context,
     public readonly helpers: Helpers,
     private readonly sourceFile: ts.SourceFile,
+    private readonly contractInfo?: ContractInfo,
     private readonly linked: LinkedContracts = {},
     private readonly allHelpers: ReadonlyArray<Helper> = [],
   ) {
@@ -126,6 +128,16 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         // []
         this.emitOp(sourceFile, 'DROP');
         this.visit(sourceFile, innerOptions);
+        const contractInfo = this.contractInfo;
+        if (contractInfo !== undefined) {
+          this.emitHelper(
+            contractInfo.smartContract,
+            innerOptions,
+            this.helpers.invokeSmartContract({
+              contractInfo,
+            }),
+          );
+        }
         // [globalObject]
         this.scope.getGlobal(this, sourceFile, options);
         this.allHelpers.forEach((helper) => {
@@ -163,14 +175,24 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     const buffers = bytecode.map(([node, tags, value], idx) => {
       let finalValue: Buffer;
       if (value instanceof Jump) {
+        let jumpPCBuffer = Buffer.alloc(2, 0);
         const offsetPC = new BN(value.pc.getPC()).sub(new BN(pc));
         const jumpPC = offsetPC.toTwos(16);
-        if (jumpPC.fromTwos(16).toNumber() !== value.pc.getPC() - pc) {
-          /* istanbul ignore next */
-          throw new Error(
-            `Something went wrong, expected 2's complement of ${value.pc.getPC() - pc}, found: ${jumpPC
-              .fromTwos(16)
-              .toNumber()}`,
+        try {
+          if (jumpPC.fromTwos(16).toNumber() !== value.pc.getPC() - pc) {
+            /* istanbul ignore next */
+            throw new Error(
+              `Something went wrong, expected 2's complement of ${value.pc.getPC() - pc}, found: ${jumpPC
+                .fromTwos(16)
+                .toNumber()}`,
+            );
+          }
+          jumpPCBuffer = jumpPC.toArrayLike(Buffer, 'le', 2);
+        } catch {
+          this.context.reportError(
+            node,
+            DiagnosticCode.SomethingWentWrong,
+            DiagnosticMessage.CompilationFailedPleaseReport,
           );
         }
         const byteCodeBuffer = ByteBuffer[Op[value.op]] as Buffer | undefined;
@@ -178,7 +200,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
           /* istanbul ignore next */
           throw new Error('Something went wrong, could not find bytecode buffer');
         }
-        finalValue = Buffer.concat([byteCodeBuffer, jumpPC.toArrayLike(Buffer, 'le', 2)]);
+        finalValue = Buffer.concat([byteCodeBuffer, jumpPCBuffer]);
       } else if (value instanceof Line) {
         const currentLine = new BN(idx + 1);
         const byteCodeBuffer = ByteBuffer[Op.PUSHBYTES4];
@@ -262,7 +284,10 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public emitOp(node: ts.Node, code: OpCode, buffer?: Buffer | undefined): void {
-    if ((code === 'APPCALL' || code === 'TAILCALL') && buffer !== undefined && buffer.equals(Buffer.alloc(20, 0))) {
+    if (
+      ((code === 'APPCALL' || code === 'TAILCALL') && buffer !== undefined && buffer.equals(Buffer.alloc(20, 0))) ||
+      code === 'CALL_ED'
+    ) {
       this.mutableFeatures = { ...this.mutableFeatures, dynamicInvoke: true };
     }
 
@@ -345,6 +370,27 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
   public emitLine(node: ts.Node): void {
     this.emitLineRaw(node, new Line());
+  }
+
+  public isCurrentSmartContract(node: ts.Node): boolean {
+    if (this.contractInfo === undefined) {
+      return false;
+    }
+
+    const symbol = this.context.analysis.getSymbol(node);
+    if (symbol === undefined) {
+      return false;
+    }
+
+    const symbols = this.context.analysis.getSymbolAndAllInheritedSymbols(this.contractInfo.smartContract);
+
+    if (symbols.some((smartContractSymbol) => smartContractSymbol === symbol)) {
+      return true;
+    }
+
+    const typeSymbol = this.context.analysis.getTypeSymbol(node);
+
+    return typeSymbol !== undefined && symbols.some((smartContractSymbol) => smartContractSymbol === typeSymbol);
   }
 
   public loadModule(sourceFile: ts.SourceFile): void {
@@ -467,6 +513,10 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
   public finallyPCOptions(options: VisitOptions, pc: ProgramCounter): VisitOptions {
     return { ...options, finallyPC: pc };
+  }
+
+  public handleSuperConstructOptions(options: VisitOptions, handleSuperConstruct: HandleSuperConstruct): VisitOptions {
+    return { ...options, handleSuperConstruct };
   }
 
   public castOptions(options: VisitOptions, cast?: ts.Type | undefined): VisitOptions {

@@ -1,9 +1,12 @@
-import { Block, common, Output, OutputKey, UInt256 } from '@neo-one/client-core';
+import { common, UInt256 } from '@neo-one/client-common';
 import {
   AddChange,
+  Block,
   Change,
   ChangeSet,
   DeleteChange,
+  Output,
+  OutputKey,
   ReadAllStorage,
   ReadGetAllStorage,
   ReadMetadataStorage,
@@ -255,8 +258,8 @@ class ReadGetAllStorageCache<Key, PartialKey, Value> extends ReadStorageCache<Ke
         defer(() =>
           _of(
             ...Object.values(this.mutableValues)
-              .map(
-                (value) => (value.type === 'add' && this.matchesPartialKey(value.value, key) ? value.value : undefined),
+              .map((value) =>
+                value.type === 'add' && this.matchesPartialKey(value.value, key) ? value.value : undefined,
               )
               .filter(commonUtils.notNull),
           ),

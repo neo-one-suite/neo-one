@@ -1,13 +1,5 @@
-import {
-  Attribute,
-  ContractParameter,
-  ECPoint,
-  ECPointAttribute,
-  UInt160,
-  UInt160Attribute,
-  UInt256,
-  UInt256Attribute,
-} from '@neo-one/client-core';
+import { ECPoint, UInt160, UInt256 } from '@neo-one/client-common';
+import { Attribute, ContractParameter, ECPointAttribute, UInt160Attribute, UInt256Attribute } from '@neo-one/node-core';
 import { BufferStackItem } from './BufferStackItem';
 import { ECPointStackItem } from './ECPointStackItem';
 import { EquatableKeyStackItem } from './EquatableKeyStackItem';

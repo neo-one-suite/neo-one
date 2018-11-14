@@ -39,6 +39,74 @@ export class GenericLogSerializeHelper extends Helper {
       sb.emitHelper(node, innerOptions, sb.helpers.wrapArray);
     };
 
+    const handleMap = (innerOptions: VisitOptions) => {
+      // [map]
+      sb.emitHelper(node, innerOptions, sb.helpers.unwrapMap);
+      // [0, map]
+      sb.emitPushInt(node, 0);
+      // [arr, map]
+      sb.emitOp(node, 'NEWARRAY');
+      sb.emitHelper(
+        node,
+        innerOptions,
+        sb.helpers.mapReduce({
+          each: (innerInnerOptions) => {
+            // [val, arr, key]
+            sb.emitOp(node, 'ROT');
+            // [val, arr, key]
+            invokeLogSerialize(sb, node, innerInnerOptions);
+            // [key, val, arr]
+            sb.emitOp(node, 'ROT');
+            // [key, val, arr]
+            invokeLogSerialize(sb, node, innerInnerOptions);
+            // [2, key, val, arr]
+            sb.emitPushInt(node, 2);
+            // [entryArr, arr]
+            sb.emitOp(node, 'PACK');
+            // [arr, entryArr, arr]
+            sb.emitOp(node, 'OVER');
+            // [entryArr, arr, arr]
+            sb.emitOp(node, 'SWAP');
+            // [arr]
+            sb.emitOp(node, 'APPEND');
+          },
+        }),
+      );
+      // [val]
+      sb.emitHelper(node, innerOptions, sb.helpers.wrapMap);
+    };
+
+    const handleSet = (innerOptions: VisitOptions) => {
+      // [map]
+      sb.emitHelper(node, innerOptions, sb.helpers.unwrapSet);
+      // [0, map]
+      sb.emitPushInt(node, 0);
+      // [arr, map]
+      sb.emitOp(node, 'NEWARRAY');
+      sb.emitHelper(
+        node,
+        innerOptions,
+        sb.helpers.mapReduce({
+          each: (innerInnerOptions) => {
+            // [val, arr, key]
+            sb.emitOp(node, 'ROT');
+            // [arr, key]
+            sb.emitOp(node, 'DROP');
+            // [arr, key, arr]
+            sb.emitOp(node, 'TUCK');
+            // [key, arr, arr]
+            sb.emitOp(node, 'SWAP');
+            // [key, arr, arr]
+            invokeLogSerialize(sb, node, innerInnerOptions);
+            // [arr]
+            sb.emitOp(node, 'APPEND');
+          },
+        }),
+      );
+      // [val]
+      sb.emitHelper(node, innerOptions, sb.helpers.wrapSet);
+    };
+
     const handleObject = (innerOptions: VisitOptions) => {
       // [val, val]
       sb.emitOp(node, 'DUP');
@@ -107,11 +175,12 @@ export class GenericLogSerializeHelper extends Helper {
               string: doNothing,
               symbol: doNothing,
               undefined: doNothing,
-              map: throwTypeError,
+              map: handleMap,
               mapStorage: throwTypeError,
-              set: throwTypeError,
+              set: handleSet,
               setStorage: throwTypeError,
               error: throwTypeError,
+              forwardValue: throwTypeError,
               iteratorResult: throwTypeError,
               iterable: throwTypeError,
               iterableIterator: throwTypeError,

@@ -1,9 +1,10 @@
-import { UInt160 } from '@neo-one/client-core';
+import { UInt160 } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 import { DiagnosticMessage } from '../../../../DiagnosticMessage';
 import { ScriptBuilder } from '../../../sb';
+import { Name } from '../../../scope';
 import { VisitOptions } from '../../../types';
 import { MemberLikeExpression } from '../../types';
 import { SmartContractForBase } from '../SmartContractForBase';
@@ -36,38 +37,11 @@ export class LinkedSmartContractFor extends SmartContractForBase {
     _func: MemberLikeExpression,
     node: ts.CallExpression,
     prop: ts.Declaration,
+    _addressName: Name,
     callBuffer: Buffer,
     _options: VisitOptions,
   ): void {
-    const type = sb.context.analysis.getType(node);
-    if (type === undefined) {
-      /* istanbul ignore next */
-      return;
-    }
-
-    const smartContractType = tsUtils.type_.getIntersectionTypesArray(type)[0];
-    const symbol = sb.context.analysis.getSymbolForType(prop, smartContractType);
-    if (symbol === undefined) {
-      /* istanbul ignore next */
-      return;
-    }
-
-    const decl = tsUtils.symbol.getValueDeclaration(symbol);
-    if (decl === undefined) {
-      /* istanbul ignore next */
-      sb.context.reportError(
-        node,
-        DiagnosticCode.InvalidLinkedSmartContract,
-        DiagnosticMessage.InvalidLinkedSmartContractDeclaration,
-      );
-
-      /* istanbul ignore next */
-      return;
-    }
-
-    const filePath = tsUtils.file.getFilePath(tsUtils.node.getSourceFile(decl));
-    const name = tsUtils.symbol.getName(symbol);
-    const scriptHash = sb.getLinkedScriptHash(node, filePath, name);
+    const scriptHash = this.getScriptHash(sb, node);
     if (scriptHash !== undefined) {
       // [result]
       sb.emitOp(prop, 'CALL_E', Buffer.concat([callBuffer, scriptHash]));
@@ -81,8 +55,7 @@ export class LinkedSmartContractFor extends SmartContractForBase {
       return undefined;
     }
 
-    const smartContractType = tsUtils.type_.getIntersectionTypesArray(type)[0];
-    const symbol = sb.context.analysis.getSymbolForType(node, smartContractType);
+    const symbol = sb.context.analysis.getSymbolForType(node, type);
     if (symbol === undefined) {
       /* istanbul ignore next */
       return undefined;

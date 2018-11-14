@@ -1,3 +1,4 @@
+import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 import { DiagnosticMessage } from '../../../../DiagnosticMessage';
@@ -21,11 +22,19 @@ export class StorageFor extends BuiltinMemberCall {
   ): void {
     const prefix = sb.context.analysis.extractStorageKey(node);
     if (prefix === undefined) {
-      sb.context.reportError(
-        node,
-        DiagnosticCode.InvalidStructuredStorageFor,
-        DiagnosticMessage.InvalidStructuredStorageForProperty,
-      );
+      const parent = tsUtils.node.getParent(node);
+      const parentClass = tsUtils.node.getFirstAncestorByTest(parent, ts.isClassDeclaration);
+      if (
+        !ts.isPropertyDeclaration(parent) ||
+        parentClass === undefined ||
+        !sb.context.analysis.isSmartContract(parentClass)
+      ) {
+        sb.context.reportError(
+          parent,
+          DiagnosticCode.InvalidStructuredStorageFor,
+          DiagnosticMessage.InvalidStructuredStorageForProperty,
+        );
+      }
 
       return;
     }

@@ -1,20 +1,17 @@
 import {
-  BinaryReader,
   BinaryWriter,
   common,
   createSerializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  Equals,
-  Equatable,
-  Input,
   IOHelper,
   SerializableWire,
   SerializeWire,
   UInt160,
   UInt160Hex,
-  utils,
-} from '@neo-one/client-core';
+} from '@neo-one/client-common';
+import { Equals, Equatable } from './Equatable';
+import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
+import { Input } from './transaction';
+import { BinaryReader, utils } from './utils';
 
 export interface AccountInputKey {
   readonly hash: UInt160;

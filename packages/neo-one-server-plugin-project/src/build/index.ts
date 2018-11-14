@@ -1,5 +1,11 @@
-import { scriptHashToAddress, SmartContractNetworksDefinition, SourceMaps, wifToPrivateKey } from '@neo-one/client';
-import { common, crypto } from '@neo-one/client-core';
+import {
+  common,
+  crypto,
+  scriptHashToAddress,
+  SmartContractNetworksDefinition,
+  SourceMaps,
+  wifToPrivateKey,
+} from '@neo-one/client-common';
 import { PluginManager, Task, TaskList } from '@neo-one/server-plugin';
 import { getNEOTrackerResourceManager } from '@neo-one/server-plugin-neotracker';
 import { getNetworkResourceManager, Network } from '@neo-one/server-plugin-network';
@@ -7,9 +13,9 @@ import { constants as walletConstants, getWalletResourceManager, Wallet } from '
 import { NetworkDefinition } from '@neo-one/smart-contract-codegen';
 import { Contracts as ContractPaths } from '@neo-one/smart-contract-compiler';
 import { utils } from '@neo-one/utils';
+import nanoid from 'nanoid';
 import { filter, take } from 'rxjs/operators';
 import { DiagnosticCategory } from 'typescript';
-import v4 from 'uuid/v4';
 import { constants } from '../constants';
 import { BuildTaskListOptions, ProjectConfig } from '../types';
 import {
@@ -65,7 +71,7 @@ export const build = (
           const projectConfig = await loadProjectConfig(options.rootDir);
           let projectID = await loadProjectID(pluginManager, projectConfig, options);
           if (projectID === undefined) {
-            projectID = v4();
+            projectID = nanoid();
           }
 
           ctx.projectConfig = projectConfig;
@@ -242,7 +248,8 @@ export const build = (
                         mutableSourceMaps[address] = contract.sourceMap;
                         const [prodNetworksDefinition] = await Promise.all<SmartContractNetworksDefinition, string>([
                           Promise.resolve({}),
-                          deployContract(network, contract, mutableSourceMaps),
+                          // tslint:disable-next-line no-non-null-assertion
+                          deployContract(network, contract, mutableSourceMaps, getWallet(ctx).wif!),
                         ]);
 
                         mutableLinked[contractPath.filePath] = { [contractPath.name]: address };

@@ -22,43 +22,16 @@ export class ArrSomeHelper extends Helper {
         : options.map;
   }
 
-  public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
-    const options = sb.pushValueOptions(optionsIn);
-
+  public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     // [enumerator]
     sb.emitSysCall(node, 'Neo.Enumerator.Create');
-    // [result, enumerator]
-    sb.emitPushBoolean(node, false);
+    // [val]
     sb.emitHelper(
       node,
       options,
-      sb.helpers.forLoop({
-        condition: () => {
-          // [result, enumerator, result]
-          sb.emitOp(node, 'TUCK');
-          // [!result, enumerator, result]
-          sb.emitOp(node, 'NOT');
-          // [enumerator, !result, enumerator, result]
-          sb.emitOp(node, 'OVER');
-          // [boolean, !result, enumerator, result]
-          sb.emitSysCall(node, 'Neo.Enumerator.Next');
-          // [boolean, enumerator, result]
-          sb.emitOp(node, 'AND');
-        },
-        each: (innerOptions) => {
-          // [enumerator]
-          sb.emitOp(node, 'NIP');
-          // [enumerator, enumerator]
-          sb.emitOp(node, 'DUP');
-          // [value, enumerator]
-          sb.emitSysCall(node, 'Neo.Enumerator.Value');
-          // [result, enumerator]
-          // tslint:disable-next-line no-map-without-usage
-          this.map(innerOptions);
-        },
+      sb.helpers.rawEnumeratorSome({
+        each: this.map,
       }),
     );
-    // [result]
-    sb.emitOp(node, 'DROP');
   }
 }

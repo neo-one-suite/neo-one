@@ -1,11 +1,5 @@
-import {
-  Client,
-  LocalKeyStore,
-  LocalUserAccountProvider,
-  NEOONEDataProvider,
-  NEOONEProvider,
-  ReadClient,
-} from '@neo-one/client';
+import { LocalKeyStore, NEOONEDataProvider, NEOONEProvider } from '@neo-one/client-core';
+import { Client, LocalUserAccountProvider, ReadClient } from '@neo-one/client-full-core';
 
 export type WalletClient = Client<{
   readonly file: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>;

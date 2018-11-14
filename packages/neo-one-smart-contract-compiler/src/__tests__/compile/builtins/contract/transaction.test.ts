@@ -1,13 +1,13 @@
-import { Attribute, Input, Output } from '@neo-one/client';
-import { AttributeUsage, common } from '@neo-one/client-core';
+import { Attribute, AttributeUsageModel as AttributeUsage, common, Input, Output } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import { helpers, keys } from '../../../../__data__';
+import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('Transaction', () => {
   test('properties', async () => {
     const node = await helpers.startNode();
     const block = await node.readClient.getBlock(0);
-    const { transaction } = await node.executeString(
+    const { transaction: invocationTransaction } = await node.executeString(
       `
       import { Hash256, TransactionType, Transaction, } from '@neo-one/smart-contract';
 
@@ -15,14 +15,16 @@ describe('Transaction', () => {
 
       assertEqual(transaction.type, TransactionType.Miner);
     `,
+    );
+    const { transaction, confirmed } = await node.client.transfer(
+      [
+        {
+          to: keys[0].address,
+          amount: new BigNumber(10),
+          asset: common.NEO_ASSET_HASH,
+        },
+      ],
       {
-        transfers: [
-          {
-            to: keys[0].address,
-            amount: new BigNumber(10),
-            asset: common.NEO_ASSET_HASH,
-          },
-        ],
         attributes: [
           {
             usage: 'Description',
@@ -31,6 +33,7 @@ describe('Transaction', () => {
         ],
       },
     );
+    await confirmed();
 
     const getUsage = (attribute: Attribute) => AttributeUsage[attribute.usage];
 
@@ -64,10 +67,14 @@ describe('Transaction', () => {
     await node.executeString(`
       import { TransactionBase, TransactionType, Transaction, Address, Hash256, Attribute, Output, Input, InvocationTransaction, AttributeBase } from '@neo-one/smart-contract';
 
+      const invocationTransaction = Transaction.for(Hash256.from('${
+        invocationTransaction.hash
+      }')) as InvocationTransaction;
+      assertEqual(invocationTransaction.script.equals(${helpers.getBufferHash(invocationTransaction.script)}), true);
+
       const transaction = Transaction.for(Hash256.from('${transaction.hash}')) as InvocationTransaction;
 
       assertEqual(transaction.type, TransactionType.Invocation);
-      assertEqual(transaction.script.equals(${helpers.getBufferHash(transaction.script)}), true);
 
       const attributes = transaction.attributes;
       assertEqual(attributes.length, ${transaction.attributes.length});
@@ -110,6 +117,39 @@ describe('Transaction', () => {
       }
     `,
       { type: 'error' },
+    );
+  });
+
+  test('invalid reference', () => {
+    helpers.compileString(
+      `
+      import { Transaction } from '@neo-one/smart-contract';
+
+      const for = Transaction.for;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid "reference"', () => {
+    helpers.compileString(
+      `
+      import { Transaction } from '@neo-one/smart-contract';
+
+      const for = Transaction['for'];
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('invalid reference - object', () => {
+    helpers.compileString(
+      `
+      import { Transaction } from '@neo-one/smart-contract';
+
+      const { for } = Transaction;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );
   });
 });

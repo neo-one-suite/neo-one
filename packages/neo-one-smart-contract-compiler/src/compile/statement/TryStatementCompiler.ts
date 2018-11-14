@@ -92,7 +92,7 @@ export class TryStatementCompiler extends NodeCompiler<ts.TryStatement> {
               whenTrue: () => {
                 sb.emitOp(finallyBlock, 'DROP');
                 sb.scope.get(sb, finallyBlock, options, val);
-                sb.emitHelper(finallyBlock, options, sb.helpers.throwCompletion);
+                sb.emitHelper(finallyBlock, options, sb.helpers.throwCompletionBase);
               },
             },
             {

@@ -1,0 +1,28 @@
+{
+  "name": "@neo-one/node-http-rpc",
+  "version": "1.0.1",
+  "description": "NEO•ONE RPC server.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@neo-one/http": "^1.0.1",
+    "@neo-one/monitor": "^1.0.1",
+    "@neo-one/node-core": "^1.0.1",
+    "@neo-one/node-rpc-handler": "^1.0.1",
+    "@neo-one/types": "^1.0.1",
+    "@neo-one/utils": "^1.0.1",
+    "@types/koa": "^2.0.46",
+    "@types/koa-compose": "^3.2.2",
+    "@types/koa-compress": "^2.0.8",
+    "@types/koa-router": "^7.0.33",
+    "@types/lodash": "^4.14.118",
+    "cross-fetch": "^2.2.3",
+    "koa": "^2.6.2",
+    "koa-compose": "^4.1.0",
+    "koa-compress": "^3.0.0",
+    "koa-router": "^7.4.0",
+    "lodash": "^4.17.11",
+    "rxjs": "^6.3.3",
+    "tslib": "^1.9.3"
+  },
+  "sideEffects": false
+}

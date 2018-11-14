@@ -1,4 +1,4 @@
-import { SysCallName } from '@neo-one/client-core';
+import { SysCallName } from '@neo-one/client-common';
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
@@ -21,7 +21,7 @@ export class ValueFor extends BuiltinMemberCall {
     optionsIn: VisitOptions,
   ): void {
     if (tsUtils.argumented.getArguments(node).length < 1) {
-      /* instanbul ignore next */
+      /* istanbul ignore next */
       return;
     }
 

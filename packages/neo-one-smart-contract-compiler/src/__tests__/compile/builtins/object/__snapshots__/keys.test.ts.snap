@@ -10,6 +10,16 @@ exports[`Object.keys cannot be element referenced 1`] = `
 "
 `;
 
+exports[`Object.keys cannot be property referenced - object literal 1`] = `
+"snippetCode.ts (2,15): Builtin properties cannot be referenced
+
+      1 | 
+    > 2 |       const { keys } = Object;
+        |               ^
+      3 |     
+"
+`;
+
 exports[`Object.keys cannot be property referenced 1`] = `
 "snippetCode.ts (2,27): Builtin properties cannot be referenced
 

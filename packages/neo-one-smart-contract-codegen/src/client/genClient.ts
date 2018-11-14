@@ -1,15 +1,5 @@
 import { getRelativeImport } from '../utils';
-
-export interface NetworkDefinition {
-  readonly name: string;
-  readonly rpcURL: string;
-  readonly dev: boolean;
-}
-
-export interface Wallet {
-  readonly name: string;
-  readonly privateKey: string;
-}
+import { NetworkDefinition, Wallet } from './types';
 
 export const genClient = ({
   localDevNetworkName,
@@ -48,7 +38,7 @@ import { projectID } from '${getRelativeImport(clientPath, projectIDPath)}';
 
 const getDefaultUserAccountProviders = (provider) => ({
   memory: new LocalUserAccountProvider({
-    keystore: new LocalKeyStore({ store: new LocalMemoryStore() }),
+    keystore: new LocalKeyStore(new LocalMemoryStore()),
     provider,
   }),
 });
@@ -63,7 +53,7 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
       .map(({ name, rpcURL }) => `{ network: '${name}', rpcURL: '${rpcURL}' },`)
       .join('\n    ')}
   ];
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     providers.push(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, port: ${httpServerPort} }));
   }
   const provider = new NEOONEProvider(providers);
@@ -72,7 +62,7 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
   const localUserAccountProvider = localUserAccountProviders.find(
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
@@ -80,7 +70,7 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
           ${wallets
             .map(
               ({ name, privateKey }) =>
-                `localKeyStore.addAccount({ network: '${localDevNetworkName}', name: '${name}', privateKey: '${privateKey}' }),`,
+                `localKeyStore.addUserAccount({ network: '${localDevNetworkName}', name: '${name}', privateKey: '${privateKey}' }),`,
             )
             .join('\n          ')}
         ]).catch(() => {
@@ -103,12 +93,35 @@ export const createDeveloperClients = () => ({${networks
   '${localDevNetworkName}': new DeveloperClient(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, port: ${httpServerPort} })),
 });
 
-export const createOneClients = () => ({
-  '${localDevNetworkName}': new OneClient(${httpServerPort}),
-})
+export const createLocalClients = () => {
+  const client = new OneClient(${httpServerPort});
+  return {
+    '${localDevNetworkName}': {
+      getNEOTrackerURL: async () => {
+        const result = await client.request({
+          plugin: '@neo-one/server-plugin-project',
+          options: { type: 'neotracker', projectID },
+        });
+
+        return result.response;
+      },
+      reset: async () => {
+        await client.executeTaskList({
+          plugin: '@neo-one/server-plugin-project',
+          options: {
+            command: 'reset',
+            projectID,
+          },
+        });
+      },
+    },
+  };
+};
   `,
     ts: `
-import { ${mutableImports.join(', ')}, NEOONEDataProviderOptions, UserAccountProvider } from '@neo-one/client';
+import { ${mutableImports.join(
+      ', ',
+    )}, LocalClient, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client';
 import { projectID } from '${getRelativeImport(clientPath, projectIDPath)}';
 
 export type DefaultUserAccountProviders = {
@@ -116,7 +129,7 @@ export type DefaultUserAccountProviders = {
 }
 const getDefaultUserAccountProviders = (provider: NEOONEProvider): DefaultUserAccountProviders => ({
   memory: new LocalUserAccountProvider({
-    keystore: new LocalKeyStore({ store: new LocalMemoryStore() }),
+    keystore: new LocalKeyStore(new LocalMemoryStore()),
     provider,
   }),
 });
@@ -124,16 +137,16 @@ const getDefaultUserAccountProviders = (provider: NEOONEProvider): DefaultUserAc
 const isLocalUserAccountProvider = (userAccountProvider: UserAccountProvider): userAccountProvider is LocalUserAccountProvider<any, any> =>
   userAccountProvider instanceof LocalUserAccountProvider;
 
-export const createClient = <TUserAccountProviders extends { readonly [K: string]: UserAccountProvider } = DefaultUserAccountProviders>(
+export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
   getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders as any,
-): Client<TUserAccountProviders> => {
+): Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never, TUserAccountProviders> => {
   const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [
     ${networks
       .filter(({ name }) => name !== localDevNetworkName)
       .map(({ name, rpcURL }) => `{ network: '${name}', rpcURL: '${rpcURL}' },`)
       .join('\n    ')}
   ];
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     providers.push(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, port: ${httpServerPort} }));
   }
   const provider = new NEOONEProvider(providers);
@@ -144,7 +157,7 @@ export const createClient = <TUserAccountProviders extends { readonly [K: string
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
@@ -152,7 +165,7 @@ export const createClient = <TUserAccountProviders extends { readonly [K: string
           ${wallets
             .map(
               ({ name, privateKey }) =>
-                `localKeyStore.addAccount({ network: '${localDevNetworkName}', name: '${name}', privateKey: '${privateKey}' }),`,
+                `localKeyStore.addUserAccount({ network: '${localDevNetworkName}', name: '${name}', privateKey: '${privateKey}' }),`,
             )
             .join('\n          ')}
         ]).catch(() => {
@@ -174,9 +187,30 @@ export const createDeveloperClients = (): { [network: string]: DeveloperClient }
   '${localDevNetworkName}': new DeveloperClient(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, port: ${httpServerPort} })),
 });
 
-export const createOneClients = (): { [network: string]: OneClient } => ({
-  '${localDevNetworkName}': new OneClient(${httpServerPort}),
-})
+export const createLocalClients = (): { [network: string]: LocalClient } => {
+  const client = new OneClient(${httpServerPort});
+  return {
+    '${localDevNetworkName}': {
+      getNEOTrackerURL: async () => {
+        const result = await client.request({
+          plugin: '@neo-one/server-plugin-project',
+          options: { type: 'neotracker', projectID },
+        });
+
+        return result.response;
+      },
+      reset: async () => {
+        await client.executeTaskList({
+          plugin: '@neo-one/server-plugin-project',
+          options: {
+            command: 'reset',
+            projectID,
+          },
+        });
+      },
+    },
+  };
+};
 `,
   };
 };

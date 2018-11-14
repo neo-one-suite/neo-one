@@ -59,7 +59,7 @@ export const tokenABI = {
       name: 'totalSupply',
       parameters: [],
       returnType: {
-        decimals: 4,
+        decimals: 8,
         type: 'Integer',
       },
     },
@@ -75,9 +75,14 @@ export const tokenABI = {
           type: 'Address',
         },
         {
-          decimals: 4,
+          decimals: 8,
           name: 'value',
           type: 'Integer',
+        },
+        {
+          name: 'args',
+          rest: true,
+          type: 'ForwardValue',
         },
       ],
       returnType: {
@@ -96,6 +101,147 @@ export const tokenABI = {
       returnType: {
         decimals: 4,
         type: 'Integer',
+      },
+    },
+    {
+      name: 'forward',
+      parameters: [
+        {
+          name: 'address',
+          type: 'Address',
+        },
+        {
+          name: 'args',
+          rest: true,
+          type: 'ForwardValue',
+        },
+      ],
+      returnType: {
+        type: 'ForwardValue',
+      },
+    },
+    {
+      constant: true,
+      name: 'forwardConstant',
+      parameters: [
+        {
+          name: 'address',
+          type: 'Address',
+        },
+        {
+          name: 'args',
+          rest: true,
+          type: 'ForwardValue',
+        },
+      ],
+      returnType: {
+        type: 'ForwardValue',
+      },
+    },
+    {
+      name: 'forwardForward',
+      parameters: [
+        {
+          name: 'address',
+          type: 'Address',
+        },
+        {
+          forwardedValue: true,
+          name: 'args',
+          rest: true,
+          type: 'ForwardValue',
+        },
+      ],
+      returnType: {
+        forwardedValue: true,
+        type: 'ForwardValue',
+      },
+    },
+    {
+      constant: true,
+      name: 'forwardForwardConstant',
+      parameters: [
+        {
+          name: 'address',
+          type: 'Address',
+        },
+        {
+          forwardedValue: true,
+          name: 'args',
+          rest: true,
+          type: 'ForwardValue',
+        },
+      ],
+      returnType: {
+        forwardedValue: true,
+        type: 'ForwardValue',
+      },
+    },
+    {
+      name: 'forwardTo',
+      parameters: [
+        {
+          decimals: 8,
+          forwardedValue: true,
+          name: 'first',
+          type: 'Integer',
+        },
+        {
+          decimals: 0,
+          forwardedValue: true,
+          name: 'second',
+          type: 'Integer',
+        },
+      ],
+      returnType: {
+        decimals: 8,
+        forwardedValue: true,
+        type: 'Integer',
+      },
+    },
+    {
+      constant: true,
+      name: 'forwardToConstant',
+      parameters: [
+        {
+          decimals: 8,
+          forwardedValue: true,
+          name: 'first',
+          type: 'Integer',
+        },
+        {
+          decimals: 0,
+          forwardedValue: true,
+          name: 'second',
+          type: 'Integer',
+        },
+      ],
+      returnType: {
+        decimals: 8,
+        forwardedValue: true,
+        type: 'Integer',
+      },
+    },
+    {
+      name: 'obj',
+      parameters: [
+        {
+          name: 'bar',
+          properties: {
+            baz: {
+              properties: {
+                qux: {
+                  type: 'String',
+                },
+              },
+              type: 'Object',
+            },
+          },
+          type: 'Object',
+        },
+      ],
+      returnType: {
+        type: 'Void',
       },
     },
   ],
@@ -159,7 +305,7 @@ export const tokenABI: ABI = {
       name: 'totalSupply',
       parameters: [],
       returnType: {
-        decimals: 4,
+        decimals: 8,
         type: 'Integer',
       },
     },
@@ -175,9 +321,14 @@ export const tokenABI: ABI = {
           type: 'Address',
         },
         {
-          decimals: 4,
+          decimals: 8,
           name: 'value',
           type: 'Integer',
+        },
+        {
+          name: 'args',
+          rest: true,
+          type: 'ForwardValue',
         },
       ],
       returnType: {
@@ -196,6 +347,147 @@ export const tokenABI: ABI = {
       returnType: {
         decimals: 4,
         type: 'Integer',
+      },
+    },
+    {
+      name: 'forward',
+      parameters: [
+        {
+          name: 'address',
+          type: 'Address',
+        },
+        {
+          name: 'args',
+          rest: true,
+          type: 'ForwardValue',
+        },
+      ],
+      returnType: {
+        type: 'ForwardValue',
+      },
+    },
+    {
+      constant: true,
+      name: 'forwardConstant',
+      parameters: [
+        {
+          name: 'address',
+          type: 'Address',
+        },
+        {
+          name: 'args',
+          rest: true,
+          type: 'ForwardValue',
+        },
+      ],
+      returnType: {
+        type: 'ForwardValue',
+      },
+    },
+    {
+      name: 'forwardForward',
+      parameters: [
+        {
+          name: 'address',
+          type: 'Address',
+        },
+        {
+          forwardedValue: true,
+          name: 'args',
+          rest: true,
+          type: 'ForwardValue',
+        },
+      ],
+      returnType: {
+        forwardedValue: true,
+        type: 'ForwardValue',
+      },
+    },
+    {
+      constant: true,
+      name: 'forwardForwardConstant',
+      parameters: [
+        {
+          name: 'address',
+          type: 'Address',
+        },
+        {
+          forwardedValue: true,
+          name: 'args',
+          rest: true,
+          type: 'ForwardValue',
+        },
+      ],
+      returnType: {
+        forwardedValue: true,
+        type: 'ForwardValue',
+      },
+    },
+    {
+      name: 'forwardTo',
+      parameters: [
+        {
+          decimals: 8,
+          forwardedValue: true,
+          name: 'first',
+          type: 'Integer',
+        },
+        {
+          decimals: 0,
+          forwardedValue: true,
+          name: 'second',
+          type: 'Integer',
+        },
+      ],
+      returnType: {
+        decimals: 8,
+        forwardedValue: true,
+        type: 'Integer',
+      },
+    },
+    {
+      constant: true,
+      name: 'forwardToConstant',
+      parameters: [
+        {
+          decimals: 8,
+          forwardedValue: true,
+          name: 'first',
+          type: 'Integer',
+        },
+        {
+          decimals: 0,
+          forwardedValue: true,
+          name: 'second',
+          type: 'Integer',
+        },
+      ],
+      returnType: {
+        decimals: 8,
+        forwardedValue: true,
+        type: 'Integer',
+      },
+    },
+    {
+      name: 'obj',
+      parameters: [
+        {
+          name: 'bar',
+          properties: {
+            baz: {
+              properties: {
+                qux: {
+                  type: 'String',
+                },
+              },
+              type: 'Object',
+            },
+          },
+          type: 'Object',
+        },
+      ],
+      returnType: {
+        type: 'Void',
       },
     },
   ],
@@ -219,20 +511,13 @@ const definition = {
 };
 
 export const createTokenSmartContract = (client) => client.smartContract(definition);
-
-export const createTokenReadSmartContract = (client) =>
-  client.smartContract({
-    address: definition.networks[client.dataProvider.network].address,
-    abi: definition.abi,
-    sourceMaps: definition.sourceMaps,
-  });
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
-import { Client, ReadClient, SmartContractDefinition } from '@neo-one/client';
+import { Client, SmartContractDefinition } from '@neo-one/client';
 import { sourceMaps } from '../sourceMaps';
 import { tokenABI } from './abi';
-import { TokenReadSmartContract, TokenSmartContract } from './types';
+import { TokenSmartContract } from './types';
 
 const definition: SmartContractDefinition = {
   networks: {
@@ -244,15 +529,8 @@ const definition: SmartContractDefinition = {
   sourceMaps,
 };
 
-export const createTokenSmartContract = (client: Client): TokenSmartContract =>
-  client.smartContract<TokenSmartContract>(definition);
-
-export const createTokenReadSmartContract = (client: ReadClient): TokenReadSmartContract =>
-  client.smartContract<TokenReadSmartContract>({
-    address: definition.networks[client.dataProvider.network].address,
-    abi: definition.abi,
-    sourceMaps: definition.sourceMaps,
-  });
+export const createTokenSmartContract = <TClient extends Client>(client: TClient): TokenSmartContract<TClient> =>
+  client.smartContract<TokenSmartContract<TClient>>(definition);
 ",
   },
   "types": Object {
@@ -261,16 +539,19 @@ export const createTokenReadSmartContract = (client: ReadClient): TokenReadSmart
 /* eslint-disable */
 import {
   AddressString,
+  Client,
+  ContractParameter,
   Event,
+  ForwardOptions,
+  ForwardValue,
+  GetOptions,
+  InvocationTransaction,
   InvokeReceipt,
-  InvokeTransactionOptions,
-  ReadSmartContract,
   SmartContract,
+  TransactionOptions,
   TransactionResult,
 } from '@neo-one/client';
 import BigNumber from 'bignumber.js';
-
-export type TokenEvent = TokenTransferEvent;
 
 export interface TokenTransferEventParameters {
   readonly from: AddressString | undefined;
@@ -278,27 +559,239 @@ export interface TokenTransferEventParameters {
   readonly amount: BigNumber;
 }
 export interface TokenTransferEvent extends Event<'transfer', TokenTransferEventParameters> {}
+export type TokenEvent = TokenTransferEvent;
 
-export interface TokenSmartContract extends SmartContract<TokenReadSmartContract> {
+export interface TokenSmartContract<TClient extends Client = Client> extends SmartContract<TClient, TokenEvent> {
   readonly balanceOf: (account: AddressString) => Promise<BigNumber>;
   readonly decimals: () => Promise<BigNumber>;
+  readonly forward: {
+    <TForwardOptions extends ForwardOptions<any>>(
+      address: AddressString,
+      forwardOptions?: TForwardOptions,
+      ...args: ForwardValue[]
+    ): Promise<
+      TransactionResult<
+        InvokeReceipt<ContractParameter, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent>,
+        InvocationTransaction
+      >
+    >;
+    <TForwardOptions extends ForwardOptions<any>>(
+      address: AddressString,
+      options?: TransactionOptions,
+      forwardOptions?: TForwardOptions,
+      ...args: ForwardValue[]
+    ): Promise<
+      TransactionResult<
+        InvokeReceipt<ContractParameter, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent>,
+        InvocationTransaction
+      >
+    >;
+    readonly confirmed: {
+      <TForwardOptions extends ForwardOptions<any>>(
+        address: AddressString,
+        forwardOptions?: TForwardOptions,
+        ...args: ForwardValue[]
+      ): Promise<
+        InvokeReceipt<
+          ContractParameter,
+          TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent
+        > & { readonly transaction: InvocationTransaction }
+      >;
+      <TForwardOptions extends ForwardOptions<any>>(
+        address: AddressString,
+        options?: TransactionOptions & GetOptions,
+        forwardOptions?: TForwardOptions,
+        ...args: ForwardValue[]
+      ): Promise<
+        InvokeReceipt<
+          ContractParameter,
+          TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent
+        > & { readonly transaction: InvocationTransaction }
+      >;
+    };
+  };
+  readonly forwardConstant: (
+    address: AddressString,
+    forwardOptions?: ForwardOptions,
+    ...args: ForwardValue[]
+  ) => Promise<ContractParameter>;
+  readonly forwardForward: {
+    <TForwardOptions extends ForwardOptions<any>>(
+      address: AddressString,
+      forwardOptions?: TForwardOptions,
+      ...args: ForwardValue[]
+    ): Promise<
+      TransactionResult<
+        InvokeReceipt<ContractParameter, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent>,
+        InvocationTransaction
+      >
+    >;
+    <TForwardOptions extends ForwardOptions<any>>(
+      address: AddressString,
+      options?: TransactionOptions,
+      forwardOptions?: TForwardOptions,
+      ...args: ForwardValue[]
+    ): Promise<
+      TransactionResult<
+        InvokeReceipt<ContractParameter, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent>,
+        InvocationTransaction
+      >
+    >;
+    readonly confirmed: {
+      <TForwardOptions extends ForwardOptions<any>>(
+        address: AddressString,
+        forwardOptions?: TForwardOptions,
+        ...args: ForwardValue[]
+      ): Promise<
+        InvokeReceipt<
+          ContractParameter,
+          TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent
+        > & { readonly transaction: InvocationTransaction }
+      >;
+      <TForwardOptions extends ForwardOptions<any>>(
+        address: AddressString,
+        options?: TransactionOptions & GetOptions,
+        forwardOptions?: TForwardOptions,
+        ...args: ForwardValue[]
+      ): Promise<
+        InvokeReceipt<
+          ContractParameter,
+          TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent
+        > & { readonly transaction: InvocationTransaction }
+      >;
+    };
+  };
+  readonly forwardForwardForwardArgs: (
+    forwardOptions?: ForwardOptions,
+    ...args: ForwardValue[]
+  ) => [ForwardOptions<TokenEvent>, ForwardValue];
+  readonly forwardForwardForwardReturn: {
+    <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E>
+      ? InvokeReceipt<ContractParameter, E | TokenEvent>
+      : never;
+    (result: ContractParameter): ContractParameter;
+  };
+  readonly forwardForwardConstant: (
+    address: AddressString,
+    forwardOptions?: ForwardOptions,
+    ...args: ForwardValue[]
+  ) => Promise<ContractParameter>;
+  readonly forwardForwardForwardConstantArgs: (
+    forwardOptions?: ForwardOptions,
+    ...args: ForwardValue[]
+  ) => [ForwardOptions<TokenEvent>, ForwardValue];
+  readonly forwardForwardForwardConstantReturn: {
+    <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E>
+      ? InvokeReceipt<ContractParameter, E | TokenEvent>
+      : never;
+    (result: ContractParameter): ContractParameter;
+  };
+  readonly forwardTo: {
+    (first: BigNumber, second: BigNumber, options?: TransactionOptions): Promise<
+      TransactionResult<InvokeReceipt<BigNumber, TokenEvent>, InvocationTransaction>
+    >;
+    readonly confirmed: {
+      (first: BigNumber, second: BigNumber, options?: TransactionOptions & GetOptions): Promise<
+        InvokeReceipt<BigNumber, TokenEvent> & { readonly transaction: InvocationTransaction }
+      >;
+    };
+  };
+  readonly forwardForwardToArgs: (
+    first: BigNumber,
+    second: BigNumber,
+  ) => [ForwardOptions<TokenEvent>, ForwardValue, ForwardValue];
+  readonly forwardForwardToReturn: {
+    <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E>
+      ? InvokeReceipt<BigNumber, E | TokenEvent>
+      : never;
+    (result: ContractParameter): BigNumber;
+  };
+  readonly forwardToConstant: (first: BigNumber, second: BigNumber) => Promise<BigNumber>;
+  readonly forwardForwardToConstantArgs: (
+    first: BigNumber,
+    second: BigNumber,
+  ) => [ForwardOptions<TokenEvent>, ForwardValue, ForwardValue];
+  readonly forwardForwardToConstantReturn: {
+    <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E>
+      ? InvokeReceipt<BigNumber, E | TokenEvent>
+      : never;
+    (result: ContractParameter): BigNumber;
+  };
   readonly name: () => Promise<string>;
+  readonly obj: {
+    (
+      bar: {
+        readonly baz: {
+          readonly qux: string;
+        };
+      },
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<undefined, TokenEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        bar: {
+          readonly baz: {
+            readonly qux: string;
+          };
+        },
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<undefined, TokenEvent> & { readonly transaction: InvocationTransaction }>;
+    };
+  };
   readonly symbol: () => Promise<string>;
   readonly totalSupply: () => Promise<BigNumber>;
-  readonly transfer: (
-    from: AddressString,
-    to: AddressString,
-    value: BigNumber,
-    options?: InvokeTransactionOptions,
-  ) => Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>>>;
-}
-
-export interface TokenReadSmartContract extends ReadSmartContract<TokenEvent> {
-  readonly balanceOf: (account: AddressString) => Promise<BigNumber>;
-  readonly decimals: () => Promise<BigNumber>;
-  readonly name: () => Promise<string>;
-  readonly symbol: () => Promise<string>;
-  readonly totalSupply: () => Promise<BigNumber>;
+  readonly transfer: {
+    <TForwardOptions extends ForwardOptions<any>>(
+      from: AddressString,
+      to: AddressString,
+      value: BigNumber,
+      forwardOptions?: TForwardOptions,
+      ...args: ForwardValue[]
+    ): Promise<
+      TransactionResult<
+        InvokeReceipt<boolean, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent>,
+        InvocationTransaction
+      >
+    >;
+    <TForwardOptions extends ForwardOptions<any>>(
+      from: AddressString,
+      to: AddressString,
+      value: BigNumber,
+      options?: TransactionOptions,
+      forwardOptions?: TForwardOptions,
+      ...args: ForwardValue[]
+    ): Promise<
+      TransactionResult<
+        InvokeReceipt<boolean, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent>,
+        InvocationTransaction
+      >
+    >;
+    readonly confirmed: {
+      <TForwardOptions extends ForwardOptions<any>>(
+        from: AddressString,
+        to: AddressString,
+        value: BigNumber,
+        forwardOptions?: TForwardOptions,
+        ...args: ForwardValue[]
+      ): Promise<
+        InvokeReceipt<boolean, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent> & {
+          readonly transaction: InvocationTransaction;
+        }
+      >;
+      <TForwardOptions extends ForwardOptions<any>>(
+        from: AddressString,
+        to: AddressString,
+        value: BigNumber,
+        options?: TransactionOptions & GetOptions,
+        forwardOptions?: TForwardOptions,
+        ...args: ForwardValue[]
+      ): Promise<
+        InvokeReceipt<boolean, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent> & {
+          readonly transaction: InvocationTransaction;
+        }
+      >;
+    };
+  };
 }
 ",
   },

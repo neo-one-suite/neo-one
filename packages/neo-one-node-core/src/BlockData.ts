@@ -1,20 +1,17 @@
 import {
-  BinaryReader,
   BinaryWriter,
   common,
   createSerializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  Equals,
-  Equatable,
   IOHelper,
   SerializableWire,
   SerializeWire,
   UInt256,
   UInt256Hex,
-  utils,
-} from '@neo-one/client-core';
-import { BN } from 'bn.js';
+} from '@neo-one/client-common';
+import BN from 'bn.js';
+import { Equals, Equatable } from './Equatable';
+import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
+import { BinaryReader, utils } from './utils';
 
 export interface BlockDataKey {
   readonly hash: UInt256;

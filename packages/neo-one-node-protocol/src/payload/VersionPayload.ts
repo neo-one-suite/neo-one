@@ -1,13 +1,6 @@
-import {
-  BinaryReader,
-  BinaryWriter,
-  createSerializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableWire,
-  SerializeWire,
-} from '@neo-one/client-core';
-import { BN } from 'bn.js';
+import { BinaryWriter, createSerializeWire, SerializableWire, SerializeWire } from '@neo-one/client-common';
+import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions } from '@neo-one/node-core';
+import BN from 'bn.js';
 
 export const SERVICES = {
   NODE_NETWORK: new BN(1),

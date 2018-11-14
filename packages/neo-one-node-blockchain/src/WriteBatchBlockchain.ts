@@ -1,7 +1,15 @@
 // tslint:disable no-array-mutation no-object-mutation
+import { common, ECPoint, UInt160, UInt256, utils } from '@neo-one/client-common';
+import { Monitor } from '@neo-one/monitor';
 import {
   Account,
   AccountKey,
+  AccountUnclaimed,
+  AccountUnclaimedKey,
+  AccountUnclaimedsKey,
+  AccountUnspent,
+  AccountUnspentKey,
+  AccountUnspentsKey,
   AccountUpdate,
   Action,
   ActionKey,
@@ -10,12 +18,14 @@ import {
   AssetKey,
   AssetUpdate,
   Block,
+  BlockchainStorage,
+  BlockData,
+  BlockDataKey,
+  ChangeSet,
   ClaimTransaction,
-  common,
   Contract,
   ContractKey,
   ContractTransaction,
-  ECPoint,
   EnrollmentTransaction,
   Header,
   Input,
@@ -42,33 +52,17 @@ import {
   TransactionDataUpdate,
   TransactionKey,
   TransactionType,
-  UInt160,
-  UInt256,
-  utils,
+  TriggerType,
   Validator,
   ValidatorKey,
-  ValidatorUpdate,
-} from '@neo-one/client-core';
-import { Monitor } from '@neo-one/monitor';
-import {
-  AccountUnclaimed,
-  AccountUnclaimedKey,
-  AccountUnclaimedsKey,
-  AccountUnspent,
-  AccountUnspentKey,
-  AccountUnspentsKey,
-  BlockchainStorage,
-  BlockData,
-  BlockDataKey,
-  ChangeSet,
-  TriggerType,
   ValidatorsCount,
   ValidatorsCountUpdate,
+  ValidatorUpdate,
   VM,
   WriteBlockchain,
 } from '@neo-one/node-core';
 import { labels, utils as commonUtils } from '@neo-one/utils';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import _ from 'lodash';
 import { GenesisBlockNotRegisteredError } from './errors';
 import { AccountChanges, getDescriptorChanges, ValidatorChanges, ValidatorsCountChanges } from './getValidators';
@@ -721,6 +715,9 @@ export class WriteBatchBlockchain {
                 },
 
                 persistingBlock: block,
+                vmFeatures: {
+                  structClone: this.settings.features.structClone <= block.index,
+                },
               }),
             );
 
@@ -729,24 +726,21 @@ export class WriteBatchBlockchain {
             if (result instanceof InvocationResultSuccess) {
               const assetChangeSet = temporaryBlockchain.asset.getChangeSet();
               const assetHash = assetChangeSet
-                .map(
-                  (change) =>
-                    change.type === 'add' && change.change.type === 'asset' ? change.change.value.hash : undefined,
+                .map((change) =>
+                  change.type === 'add' && change.change.type === 'asset' ? change.change.value.hash : undefined,
                 )
                 .find((value) => value !== undefined);
 
               const contractsChangeSet = temporaryBlockchain.contract.getChangeSet();
               const contractHashes = contractsChangeSet
-                .map(
-                  (change) =>
-                    change.type === 'add' && change.change.type === 'contract' ? change.change.value.hash : undefined,
+                .map((change) =>
+                  change.type === 'add' && change.change.type === 'contract' ? change.change.value.hash : undefined,
                 )
                 .filter(commonUtils.notNull);
 
               const deletedContractHashes = contractsChangeSet
-                .map(
-                  (change) =>
-                    change.type === 'delete' && change.change.type === 'contract' ? change.change.key.hash : undefined,
+                .map((change) =>
+                  change.type === 'delete' && change.change.type === 'contract' ? change.change.key.hash : undefined,
                 )
                 .filter(commonUtils.notNull);
 
@@ -964,15 +958,18 @@ export class WriteBatchBlockchain {
   ): Promise<void> {
     const account = await this.account.tryGet({ hash: address });
 
-    const balances = values.reduce<{ [asset: string]: BN }>((acc, [asset, value]) => {
-      const key = common.uInt256ToHex(asset);
-      if ((acc[key] as BN | undefined) === undefined) {
-        acc[key] = utils.ZERO;
-      }
-      acc[key] = acc[key].add(value);
+    const balances = values.reduce<{ [asset: string]: BN }>(
+      (acc, [asset, value]) => {
+        const key = common.uInt256ToHex(asset);
+        if ((acc[key] as BN | undefined) === undefined) {
+          acc[key] = utils.ZERO;
+        }
+        acc[key] = acc[key].add(value);
 
-      return acc;
-    }, account === undefined ? {} : { ...account.balances });
+        return acc;
+      },
+      account === undefined ? {} : { ...account.balances },
+    );
 
     const promises = [];
     promises.push(

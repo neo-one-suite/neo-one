@@ -1,75 +1,71 @@
-// tslint:disable readonly-keyword readonly-array no-object-mutation strict-boolean-expressions
-import { Blockchain, constant, createEventNotifier, Fixed, Hash256, Integer, verify } from '@neo-one/smart-contract';
+import {
+  Address,
+  Blockchain,
+  constant,
+  Fixed,
+  Hash256,
+  Integer,
+  receive,
+  SmartContract,
+} from '@neo-one/smart-contract';
 
-import { Token } from './Token';
+export function ICO<TBase extends Constructor<SmartContract>>(Base: TBase) {
+  abstract class ICOClass extends Base {
+    public abstract readonly icoStartTimeSeconds: Integer;
+    public abstract readonly icoDurationSeconds: Integer;
+    public abstract readonly amountPerNEO: Fixed<8>;
+    private mutableRemaining: Fixed<8> = this.getICOAmount();
 
-const notifyRefund = createEventNotifier('refund');
-
-export abstract class ICO<Decimals extends number> extends Token<Decimals> {
-  private mutableRemaining: Fixed<Decimals>;
-
-  public constructor(
-    public readonly startTimeSeconds: Integer,
-    public readonly icoDurationSeconds: Integer,
-    public readonly icoAmount: Fixed<Decimals>,
-    public readonly amountPerNEO: Fixed<Decimals>,
-  ) {
-    super();
-    this.mutableRemaining = icoAmount;
-  }
-
-  @constant
-  public get remaining(): number {
-    return this.mutableRemaining;
-  }
-
-  @verify
-  public mintTokens(): boolean {
-    if (!this.hasStarted() || this.hasEnded()) {
-      notifyRefund();
-
-      return false;
+    @constant
+    public get remaining(): number {
+      return this.mutableRemaining;
     }
 
-    const { references } = Blockchain.currentTransaction;
-    if (references.length === 0) {
-      return false;
-    }
-    const sender = references[0].address;
-
-    let amount = 0;
-    // tslint:disable-next-line no-loop-statement
-    for (const output of Blockchain.currentTransaction.outputs) {
-      if (output.address.equals(Blockchain.contractAddress)) {
-        if (!output.asset.equals(Hash256.NEO)) {
-          notifyRefund();
-
-          return false;
-        }
-
-        amount += output.value * this.amountPerNEO;
+    @receive
+    public mintTokens(): boolean {
+      if (!this.hasStarted() || this.hasEnded()) {
+        return false;
       }
+
+      const { references } = Blockchain.currentTransaction;
+      if (references.length === 0) {
+        return false;
+      }
+      const sender = references[0].address;
+
+      let amount = 0;
+      // tslint:disable-next-line no-loop-statement
+      for (const output of Blockchain.currentTransaction.outputs) {
+        if (output.address.equals(this.address)) {
+          if (!output.asset.equals(Hash256.NEO)) {
+            return false;
+          }
+
+          amount += output.value * this.amountPerNEO;
+        }
+      }
+
+      if (amount > this.remaining) {
+        return false;
+      }
+
+      this.mutableRemaining -= amount;
+      this.issue(sender, amount);
+
+      return true;
     }
 
-    if (amount > this.remaining) {
-      notifyRefund();
+    public abstract getICOAmount(): Fixed<8>;
+    protected abstract issue(addr: Address, amount: Fixed<8>): void;
 
-      return false;
+    private hasStarted(): boolean {
+      return Blockchain.currentBlockTime >= this.icoStartTimeSeconds;
     }
 
-    this.balances.set(sender, this.balanceOf(sender) + amount);
-    this.mutableRemaining -= amount;
-    this.mutableSupply += amount;
-    this.notifyTransfer(undefined, sender, amount);
-
-    return true;
+    private hasEnded(): boolean {
+      return Blockchain.currentBlockTime > this.icoStartTimeSeconds + this.icoDurationSeconds;
+    }
   }
 
-  private hasStarted(): boolean {
-    return Blockchain.currentBlockTime >= this.startTimeSeconds;
-  }
-
-  private hasEnded(): boolean {
-    return Blockchain.currentBlockTime > this.startTimeSeconds + this.icoDurationSeconds;
-  }
+  return ICOClass;
 }

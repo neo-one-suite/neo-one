@@ -13,6 +13,9 @@ export class FunctionLikeHelper extends Helper<ts.FunctionDeclaration | ts.Funct
     if (!tsUtils.overload.isImplementation(node)) {
       return;
     }
+    if (sb.context.analysis.isSmartContractMixinFunction(node)) {
+      return;
+    }
     // tslint:disable-next-line no-any
     const func: BodiedNode & ParameteredNode = node as any;
 

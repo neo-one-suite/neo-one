@@ -1,5 +1,5 @@
 import ts from 'typescript';
-
+import * as constants from '../../../constants';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
@@ -7,43 +7,29 @@ import { Helper } from '../Helper';
 export type ForLoopHelperFunction = (() => void) | undefined;
 export interface ForLoopHelperOptions {
   readonly each: (options: VisitOptions) => void;
-  readonly initializer?: ForLoopHelperFunction;
   readonly condition: ForLoopHelperFunction;
   readonly incrementor?: ForLoopHelperFunction;
-  readonly withScope?: boolean;
+  readonly handleReturn?: ForLoopHelperFunction;
+  readonly cleanup: () => void;
 }
 
 export class ForLoopHelper extends Helper {
   private readonly each: (options: VisitOptions) => void;
-  private readonly initializer: ForLoopHelperFunction;
   private readonly condition: ForLoopHelperFunction;
   private readonly incrementor: ForLoopHelperFunction;
-  private readonly withScope: boolean;
+  private readonly handleReturn: () => void;
+  private readonly cleanup: () => void;
 
-  public constructor({ each, initializer, condition, incrementor, withScope = true }: ForLoopHelperOptions) {
+  public constructor({ each, cleanup, condition, incrementor, handleReturn }: ForLoopHelperOptions) {
     super();
     this.each = each;
-    this.initializer = initializer;
     this.condition = condition;
     this.incrementor = incrementor;
-    this.withScope = withScope;
+    this.handleReturn = handleReturn === undefined ? cleanup : handleReturn;
+    this.cleanup = cleanup;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    if (this.withScope) {
-      sb.withScope(node, options, (innerOptions) => {
-        this.emitLoop(sb, node, innerOptions);
-      });
-    } else {
-      this.emitLoop(sb, node, options);
-    }
-  }
-
-  private emitLoop(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
-    if (this.initializer !== undefined) {
-      this.initializer();
-    }
-
     sb.withProgramCounter((loopPC) => {
       if (this.condition !== undefined) {
         this.condition();
@@ -53,16 +39,16 @@ export class ForLoopHelper extends Helper {
         sb.emitJmp(node, 'JMPIFNOT', loopPC.getLast());
       }
 
-      sb.withProgramCounter((breakPC) => {
-        sb.withProgramCounter((innerPC) => {
-          sb.withProgramCounter((continuePC) => {
-            this.each(sb.breakPCOptions(sb.continuePCOptions(options, continuePC.getLast()), breakPC.getLast()));
-            sb.emitJmp(node, 'JMP', innerPC.getLast());
-          });
-
-          // Drop continue completion
-          sb.emitOp(node, 'DROP');
-        });
+      sb.withProgramCounter((finallyPC) => {
+        this.each(
+          sb.finallyPCOptions(
+            sb.breakPCOptions(
+              sb.continuePCOptions(sb.noCatchPCOptions(options), finallyPC.getLast()),
+              finallyPC.getLast(),
+            ),
+            finallyPC.getLast(),
+          ),
+        );
 
         if (this.incrementor !== undefined) {
           this.incrementor();
@@ -71,8 +57,74 @@ export class ForLoopHelper extends Helper {
         sb.emitJmp(node, 'JMP', loopPC.getFirst());
       });
 
-      // Drop break completion
+      // Drop finally completion
+      // [completion, val]
       sb.emitOp(node, 'DROP');
+      const condition = (value: number) => () => {
+        sb.emitOp(node, 'DUP');
+        sb.emitPushInt(node, value);
+        sb.emitOp(node, 'NUMEQUAL');
+      };
+      const val = sb.scope.addUnique();
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.case(
+          [
+            {
+              condition: condition(constants.THROW_COMPLETION),
+              whenTrue: () => {
+                // [val]
+                sb.emitOp(node, 'DROP');
+                // []
+                sb.scope.set(sb, node, options, val);
+                // []
+                this.handleReturn();
+                // [val]
+                sb.scope.get(sb, node, options, val);
+                // []
+                sb.emitHelper(node, options, sb.helpers.throwCompletionBase);
+              },
+            },
+            {
+              condition: condition(constants.NORMAL_COMPLETION),
+              whenTrue: () => {
+                // [val]
+                sb.emitOp(node, 'DROP');
+                // []
+                sb.scope.set(sb, node, options, val);
+                // []
+                this.handleReturn();
+                // [val]
+                sb.scope.get(sb, node, options, val);
+                // []
+                sb.emitHelper(node, options, sb.helpers.return);
+              },
+            },
+            {
+              condition: condition(constants.BREAK_COMPLETION),
+              whenTrue: () => {
+                // [val]
+                sb.emitOp(node, 'DROP');
+                // []
+                sb.emitOp(node, 'DROP');
+              },
+            },
+          ],
+          () => {
+            // [val]
+            sb.emitOp(node, 'DROP');
+            // []
+            sb.emitOp(node, 'DROP');
+            if (this.incrementor !== undefined) {
+              this.incrementor();
+            }
+            sb.emitJmp(node, 'JMP', loopPC.getFirst());
+          },
+        ),
+      );
     });
+    // []
+    this.cleanup();
   }
 }

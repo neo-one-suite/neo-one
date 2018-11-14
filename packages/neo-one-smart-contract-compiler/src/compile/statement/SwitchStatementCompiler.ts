@@ -1,5 +1,6 @@
 import { tsUtils } from '@neo-one/ts-utils';
 import ts from 'typescript';
+import * as constants from '../../constants';
 import { NodeCompiler } from '../NodeCompiler';
 import { ScriptBuilder } from '../sb';
 import { VisitOptions } from '../types';
@@ -101,6 +102,11 @@ export class SwitchStatementCompiler extends NodeCompiler<ts.SwitchStatement> {
           sb.visit(statement, breakOptions);
         });
       }
+
+      sb.emitPushInt(node, constants.BREAK_COMPLETION);
     });
+
+    // []
+    sb.emitOp(node, 'DROP');
   }
 }

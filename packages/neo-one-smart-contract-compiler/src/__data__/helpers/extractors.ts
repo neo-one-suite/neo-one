@@ -1,5 +1,5 @@
-import { SourceMaps } from '@neo-one/client';
-import { CallReceiptJSON, convertCallReceipt, RawCallReceipt } from '@neo-one/client-core';
+import { CallReceiptJSON, RawCallReceipt, SourceMaps } from '@neo-one/client-common';
+import { convertCallReceipt } from '@neo-one/client-core';
 import {
   disableConsoleLogForTest,
   enableConsoleLogForTest,
@@ -7,13 +7,13 @@ import {
   processConsoleLogMessages,
 } from '@neo-one/client-switch';
 
-export const checkResult = async (receiptIn: CallReceiptJSON, sourceMaps: SourceMaps) => {
+export const checkResult = async (receiptIn: CallReceiptJSON, sourceMaps: SourceMaps, checkStack = false) => {
   const receipt = convertCallReceipt(receiptIn);
 
-  return checkRawResult(receipt, sourceMaps);
+  return checkRawResult(receipt, sourceMaps, checkStack);
 };
 
-export const checkRawResult = async (receipt: RawCallReceipt, sourceMaps: SourceMaps) => {
+export const checkRawResult = async (receipt: RawCallReceipt, sourceMaps: SourceMaps, checkStack = false) => {
   if (receipt.result.state === 'FAULT') {
     enableConsoleLogForTest();
     try {
@@ -33,4 +33,8 @@ export const checkRawResult = async (receipt: RawCallReceipt, sourceMaps: Source
     actions: receipt.actions,
     sourceMaps: Promise.resolve(sourceMaps),
   });
+
+  if (checkStack && receipt.result.stack.length !== 0) {
+    throw new Error(`Found leftover stack items, length: ${receipt.result.stack.length}`);
+  }
 };

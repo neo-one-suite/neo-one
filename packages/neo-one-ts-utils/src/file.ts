@@ -12,7 +12,7 @@ export function getSourceFile(program: ts.Program, fileName: string): ts.SourceF
 }
 
 export function getSourceFileOrThrow(program: ts.Program, fileName: string): ts.SourceFile {
-  return utils.throwIfNullOrUndefined(getSourceFile(program, fileName), 'source file');
+  return utils.throwIfNullOrUndefined(getSourceFile(program, fileName), `source file: ${fileName}`);
 }
 
 export function isDeclarationFile(node: ts.SourceFile): boolean {
@@ -47,4 +47,10 @@ export function createSourceMapRange(node: ts.Node): ts.SourceMapRange {
     end: node.end,
     source: file === undefined ? undefined : ts.createSourceMapSource(getFilePath(file), getText(node)),
   };
+}
+
+export function getExportedSymbols(typeChecker: ts.TypeChecker, node: ts.SourceFile): ReadonlyArray<ts.Symbol> {
+  const symbol = node_.getSymbol(typeChecker, node);
+
+  return symbol === undefined ? [] : typeChecker.getExportsOfModule(symbol);
 }

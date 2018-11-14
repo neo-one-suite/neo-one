@@ -105,7 +105,7 @@ export class MergeScanOperator<T, R> implements Operator<T, R> {
   }
 }
 
-export function mergeScanLatest<T, R>(
+export function mergeScanLatest<T, R = undefined | void>(
   accumulator: (acc: R | undefined, value: T) => ObservableInput<R>,
   seed?: R,
 ): OperatorFunction<T, R> {

@@ -5,4 +5,5 @@ export enum GlobalProperty {
   GenericLogSerialize = 3,
   CommonStorage = 4,
   CommonStorageSerialized = 5,
+  Cache = 6,
 }

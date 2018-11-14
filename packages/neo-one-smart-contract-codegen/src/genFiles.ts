@@ -1,4 +1,4 @@
-import { ABI, SmartContractNetworksDefinition } from '@neo-one/client';
+import { ABI, SmartContractNetworksDefinition } from '@neo-one/client-common';
 import { genABI } from './abi';
 import { genContract } from './contract';
 import { formatFile } from './formatFile';

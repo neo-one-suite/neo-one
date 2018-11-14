@@ -1,6 +1,7 @@
-import { BinaryReader, utils } from '@neo-one/client-core';
+import { BinaryReader, utils } from '@neo-one/node-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import _ from 'lodash';
+import { MAX_ARRAY_SIZE_BN } from '../constants';
 import { ArrayStackItem } from './ArrayStackItem';
 import { BooleanStackItem } from './BooleanStackItem';
 import { BufferStackItem } from './BufferStackItem';
@@ -21,18 +22,19 @@ const deserializeStackItemBase = (reader: BinaryReader): StackItem => {
     case StackItemType.Integer: // INTEGER
       return new IntegerStackItem(utils.fromSignedBuffer(reader.readVarBytesLE()));
     case StackItemType.InteropInterface: // INTEROP_INTERFACE
+      /* istanbul ignore next */
       throw new UnsupportedStackItemSerdeError();
     case StackItemType.Array: // ARRAY
     case StackItemType.Struct: {
       // STRUCT
-      const count = reader.readVarUIntLE().toNumber();
+      const count = reader.readVarUIntLE(MAX_ARRAY_SIZE_BN).toNumber();
       const value = _.range(count).map(() => deserializeStackItemBase(reader));
 
       return type === 0x80 ? new ArrayStackItem(value) : new StructStackItem(value);
     }
     case StackItemType.Map: {
       // MAP
-      const count = reader.readVarUIntLE().toNumber();
+      const count = reader.readVarUIntLE(MAX_ARRAY_SIZE_BN).toNumber();
       const referenceKeys = new Map<string, StackItem>();
       const referenceValues = new Map<string, StackItem>();
       _.range(count).forEach(() => {
@@ -45,6 +47,7 @@ const deserializeStackItemBase = (reader: BinaryReader): StackItem => {
 
       return new MapStackItem({ referenceKeys, referenceValues });
     }
+    /* istanbul ignore next */
     default:
       commonUtils.assertNever(type);
       throw new Error('For TS');

@@ -1,31 +1,33 @@
+import { common, crypto, UInt256Hex, utils } from '@neo-one/client-common';
+import { metrics, Monitor } from '@neo-one/monitor';
+import { Consensus, ConsensusOptions } from '@neo-one/node-consensus';
 import {
   Block,
-  common,
+  Blockchain,
+  ConnectedPeer,
   ConsensusPayload,
-  crypto,
+  createEndpoint,
+  CreateNetwork,
+  Endpoint,
+  getEndpointConfig,
   Header,
   MerkleTree,
-  RegisterTransaction,
-  Transaction,
-  TransactionType,
-  UInt256Hex,
-  utils,
-} from '@neo-one/client-core';
-import { metrics, Monitor } from '@neo-one/monitor';
-import { Blockchain, createEndpoint, Endpoint, getEndpointConfig, Node as INode } from '@neo-one/node-core';
-import {
-  ConnectedPeer,
-  EventMessage as NetworkEventMessage,
   NegotiateResult,
   Network,
-  NetworkEnvironment,
-  NetworkOptions,
+  NetworkEventMessage,
+  Node as INode,
   Peer,
-} from '@neo-one/node-network';
+  RegisterTransaction,
+  RelayTransactionResult,
+  Transaction,
+  TransactionType,
+  VerifyTransactionResult,
+} from '@neo-one/node-core';
 import { finalize, labels, neverComplete, utils as commonUtils } from '@neo-one/utils';
 import { ScalingBloem } from 'bloem';
+// tslint:disable-next-line:match-default-export-name
 import BloomFilter from 'bloom-filter';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import fetch from 'cross-fetch';
 import { Address6 } from 'ip-address';
 import _ from 'lodash';
@@ -33,7 +35,6 @@ import LRU from 'lru-cache';
 import { combineLatest, defer, Observable, of as _of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
 import { Command } from './Command';
-import { Consensus, ConsensusOptions } from './consensus';
 import { AlreadyConnectedError, NegotiationError } from './errors';
 import { Message, MessageTransform, MessageValue } from './Message';
 import {
@@ -77,14 +78,13 @@ export interface TransactionAndFee {
 }
 
 export interface Environment {
-  readonly network?: NetworkEnvironment;
+  readonly externalPort?: number;
 }
 export interface Options {
   readonly consensus?: {
     readonly enabled: boolean;
     readonly options: ConsensusOptions;
   };
-  readonly network?: NetworkOptions;
   readonly rpcURLs?: ReadonlyArray<string>;
   readonly unhealthyPeerSeconds?: number;
 }
@@ -157,7 +157,7 @@ export class Node implements INode {
   // tslint:disable-next-line readonly-keyword
   private mutableMemPool: { [hash: string]: Transaction };
   private readonly monitor: Monitor;
-  private readonly network: Network<Message, PeerData, PeerHealth>;
+  private readonly network: Network<Message, PeerData>;
   private readonly options$: Observable<Options>;
   private readonly externalPort: number;
   private readonly nonce: number;
@@ -255,24 +255,19 @@ export class Node implements INode {
   public constructor({
     monitor,
     blockchain,
+    createNetwork,
     environment = {},
     options$,
   }: {
     readonly monitor: Monitor;
     readonly blockchain: Blockchain;
+    readonly createNetwork: CreateNetwork;
     readonly environment?: Environment;
     readonly options$: Observable<Options>;
   }) {
     this.blockchain = blockchain;
     this.monitor = monitor.at('node_protocol');
-    this.network = new Network({
-      monitor,
-      environment: environment.network,
-      options$: options$.pipe(
-        map(({ network = {} }) => network),
-        distinctUntilChanged(),
-      ),
-
+    this.network = createNetwork({
       negotiate: this.negotiate,
       checkPeerHealth: this.checkPeerHealth,
       createMessageTransform: () => new MessageTransform(this.blockchain.deserializeWireContext),
@@ -285,10 +280,10 @@ export class Node implements INode {
 
     this.options$ = options$;
 
-    const { network: { listenTCP: { port = 0 } = {} } = {} } = environment;
-    this.externalPort = port;
+    const { externalPort = 0 } = environment;
+    this.externalPort = externalPort;
     this.nonce = Math.floor(Math.random() * utils.UINT_MAX_NUMBER);
-    this.userAgent = `NEO:neo-one-js:1.0.0-alpha`;
+    this.userAgent = `NEO:neo-one-js:1.0.0-preview`;
 
     this.mutableMemPool = {};
     this.mutableKnownBlockHashes = createScalingBloomFilter();
@@ -361,7 +356,7 @@ export class Node implements INode {
           return mutableConsensus.start$();
         }
 
-        return _of(0);
+        return _of(undefined);
       }),
     );
 
@@ -383,13 +378,15 @@ export class Node implements INode {
       throwVerifyError: false,
       forceAdd: false,
     },
-  ): Promise<void> {
+  ): Promise<RelayTransactionResult> {
+    const result = {};
+
     if (
       transaction.type === TransactionType.Miner ||
       (this.mutableMemPool[transaction.hashHex] as Transaction | undefined) !== undefined ||
       this.tempKnownTransactionHashes.has(transaction.hashHex)
     ) {
-      return;
+      return result;
     }
 
     if (!this.mutableKnownTransactionHashes.has(transaction.hash)) {
@@ -400,45 +397,57 @@ export class Node implements INode {
         if (memPool.length > MEM_POOL_SIZE / 2 && !forceAdd) {
           this.mutableKnownTransactionHashes.add(transaction.hash);
 
-          return;
+          return result;
         }
 
-        await this.monitor.withData({ [labels.NEO_TRANSACTION_HASH]: transaction.hashHex }).captureSpanLog(
-          async (span) => {
-            let foundTransaction;
-            try {
-              foundTransaction = await this.blockchain.transaction.tryGet({
-                hash: transaction.hash,
-              });
-            } finally {
-              span.setLabels({
-                [labels.NEO_TRANSACTION_FOUND]: foundTransaction !== undefined,
-              });
-            }
-            if (foundTransaction === undefined) {
-              await this.blockchain.verifyTransaction({
-                monitor: span,
-                transaction,
-                memPool: Object.values(this.mutableMemPool),
-              });
-
-              this.mutableMemPool[transaction.hashHex] = transaction;
-              NEO_PROTOCOL_MEMPOOL_SIZE.inc();
-              if (this.mutableConsensus !== undefined) {
-                this.mutableConsensus.onTransactionReceived(transaction);
+        // tslint:disable-next-line prefer-immediate-return
+        const finalResult = await this.monitor
+          .withData({ [labels.NEO_TRANSACTION_HASH]: transaction.hashHex })
+          .captureSpanLog(
+            async (span) => {
+              let foundTransaction;
+              try {
+                foundTransaction = await this.blockchain.transaction.tryGet({
+                  hash: transaction.hash,
+                });
+              } finally {
+                span.setLabels({
+                  [labels.NEO_TRANSACTION_FOUND]: foundTransaction !== undefined,
+                });
               }
-              this.relayTransactionInternal(transaction);
-              await this.trimMemPool(span);
-            }
+              let verifyResult: VerifyTransactionResult | undefined;
+              if (foundTransaction === undefined) {
+                verifyResult = await this.blockchain.verifyTransaction({
+                  monitor: span,
+                  transaction,
+                  memPool: Object.values(this.mutableMemPool),
+                });
+                const verified = verifyResult.verifications.every(({ failureMessage }) => failureMessage === undefined);
 
-            this.mutableKnownTransactionHashes.add(transaction.hash);
-          },
-          {
-            name: 'neo_relay_transaction',
-            level: { log: 'verbose', span: 'info' },
-            trace: true,
-          },
-        );
+                if (verified) {
+                  this.mutableMemPool[transaction.hashHex] = transaction;
+                  NEO_PROTOCOL_MEMPOOL_SIZE.inc();
+                  if (this.mutableConsensus !== undefined) {
+                    this.mutableConsensus.onTransactionReceived(transaction);
+                  }
+                  this.relayTransactionInternal(transaction);
+                  await this.trimMemPool(span);
+                }
+              }
+
+              this.mutableKnownTransactionHashes.add(transaction.hash);
+
+              return { verifyResult };
+            },
+            {
+              name: 'neo_relay_transaction',
+              level: { log: 'verbose', span: 'info' },
+              trace: true,
+            },
+          );
+
+        // tslint:disable-next-line no-var-before-return
+        return finalResult;
       } catch (error) {
         if (
           error.code === undefined ||
@@ -452,6 +461,8 @@ export class Node implements INode {
         this.tempKnownTransactionHashes.delete(transaction.hashHex);
       }
     }
+
+    return result;
   }
 
   public async relayBlock(block: Block, monitor?: Monitor): Promise<void> {
@@ -707,7 +718,7 @@ export class Node implements INode {
         .map((peer) => {
           const { address, port } = peer;
           const host = new Address6(address);
-          const canonicalForm = host.canonicalForm();
+          const canonicalForm = host.canonicalForm() as string | undefined | null;
 
           return { host: canonicalForm == undefined ? '' : canonicalForm, port };
         })
@@ -1184,8 +1195,8 @@ export class Node implements INode {
     if (!getBlocks.hashStop.equals(common.ZERO_UINT256)) {
       hashStopIndexPromise = this.blockchain.header
         .tryGet({ hashOrIndex: getBlocks.hashStop })
-        .then(
-          (hashStopHeader) => (hashStopHeader === undefined ? maxHeight : Math.min(hashStopHeader.index, maxHeight)),
+        .then((hashStopHeader) =>
+          hashStopHeader === undefined ? maxHeight : Math.min(hashStopHeader.index, maxHeight),
         );
     }
     const [hashStartHeaders, hashEnd] = await Promise.all([

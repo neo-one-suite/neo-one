@@ -1,0 +1,92 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ABISmartContractProcessor invalid getter + setter 1`] = `
+"snippetCode.ts (5,9): Invalid SmartContract type. See https://neo-one.io/docs/methods#Parameter-and-Return-Types for valid parameter and return types.
+
+      3 | 
+      4 |       class Foo {
+    > 5 |         doSomething() {
+        |         ^
+      6 |           // do nothing
+      7 |         }
+      8 |       }
+"
+`;
+
+exports[`ABISmartContractProcessor invalid getter 1`] = `
+"snippetCode.ts (4,19): Invalid SmartContract type. See https://neo-one.io/docs/methods#Parameter-and-Return-Types for valid parameter and return types.
+
+      2 |       import { SmartContract } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       class Foo { bar(): string { return ''; } }
+        |                   ^
+      5 | 
+      6 |       export class TestSmartContract extends SmartContract {
+      7 |         
+"
+`;
+
+exports[`ABISmartContractProcessor invalid method parameter 1`] = `
+"snippetCode.ts (4,19): Invalid SmartContract type. See https://neo-one.io/docs/methods#Parameter-and-Return-Types for valid parameter and return types.
+
+      2 |       import { SmartContract } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       class Foo { bar(): string { return ''; } }
+        |                   ^
+      5 | 
+      6 |       export class TestSmartContract extends SmartContract {
+      7 |         
+"
+`;
+
+exports[`ABISmartContractProcessor invalid method return - union 1`] = `
+"snippetCode.ts (15,9): Invalid SmartContract type. See https://neo-one.io/docs/methods#Parameter-and-Return-Types for valid parameter and return types.
+
+      13 |         private foo: boolean = true;
+      14 | 
+    > 15 |         public test() {
+         |         ^
+      16 |           if (this.foo) {
+      17 |             return '';
+      18 |           }
+"
+`;
+
+exports[`ABISmartContractProcessor invalid method return 1`] = `
+"snippetCode.ts (4,19): Invalid SmartContract type. See https://neo-one.io/docs/methods#Parameter-and-Return-Types for valid parameter and return types.
+
+      2 |       import { SmartContract } from '@neo-one/smart-contract';
+      3 | 
+    > 4 |       class Foo { bar(): string { return ''; } }
+        |                   ^
+      5 | 
+      6 |       export class TestSmartContract extends SmartContract {
+      7 |         
+"
+`;
+
+exports[`ABISmartContractProcessor invalid setter 1`] = `
+"snippetCode.ts (5,9): Invalid SmartContract type. See https://neo-one.io/docs/methods#Parameter-and-Return-Types for valid parameter and return types.
+
+      3 | 
+      4 |       class Foo {
+    > 5 |         doSomething() {
+        |         ^
+      6 |           // do nothing
+      7 |         }
+      8 |       }
+"
+`;
+
+exports[`ABISmartContractProcessor no duplicate events 1`] = `
+"snippetCode.ts (5,50): Duplicate event. Only one event is allowed per name.
+
+      3 | 
+      4 |       const first = createEventNotifier('foo');
+    > 5 |       const second = createEventNotifier<number>('foo', 'arg');
+        |                                                  ^
+      6 | 
+      7 |       first();
+      8 |       second(1);
+"
+`;

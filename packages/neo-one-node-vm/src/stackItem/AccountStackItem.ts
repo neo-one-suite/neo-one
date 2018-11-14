@@ -1,4 +1,4 @@
-import { Account } from '@neo-one/client-core';
+import { Account } from '@neo-one/node-core';
 import { EquatableKeyStackItem } from './EquatableKeyStackItem';
 
 export class AccountStackItem extends EquatableKeyStackItem<Account> {

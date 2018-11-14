@@ -76,6 +76,8 @@ export class ToNumberHelper extends TypedHelper {
             sb.emitOp(node, 'EQUAL');
           },
           whenTrue: () => {
+            // []
+            sb.emitOp(node, 'DROP');
             // We don't support NaN
             // []
             sb.emitHelper(node, options, sb.helpers.throwTypeError);
@@ -190,6 +192,9 @@ export class ToNumberHelper extends TypedHelper {
                   // []
                   sb.scope.set(sb, node, innerOptions, accum);
                 },
+                cleanup: () => {
+                  // do nothing
+                },
               }),
             );
             // [number]
@@ -232,6 +237,7 @@ export class ToNumberHelper extends TypedHelper {
           set: throwTypeError,
           setStorage: throwTypeError,
           error: throwTypeError,
+          forwardValue: throwTypeError,
           iteratorResult: throwTypeError,
           iterable: throwTypeError,
           iterableIterator: throwTypeError,

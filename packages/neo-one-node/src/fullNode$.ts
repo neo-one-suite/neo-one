@@ -1,14 +1,14 @@
-import { Settings } from '@neo-one/client-core';
 import { Monitor } from '@neo-one/monitor';
 import { Blockchain } from '@neo-one/node-blockchain';
+import { Settings } from '@neo-one/node-core';
 import { backup, BackupRestoreOptions, restore } from '@neo-one/node-data-backup';
+import { rpcServer$, RPCServerEnvironment, RPCServerOptions } from '@neo-one/node-http-rpc';
+import { Network, NetworkEnvironment, NetworkOptions } from '@neo-one/node-network';
 import { dumpChain, loadChain } from '@neo-one/node-offline';
 import { Node, NodeEnvironment, NodeOptions } from '@neo-one/node-protocol';
-import { rpcServer$, RPCServerEnvironment, RPCServerOptions } from '@neo-one/node-rpc';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
 import { vm } from '@neo-one/node-vm';
 import { finalize, neverComplete } from '@neo-one/utils';
-// tslint:disable-next-line no-implicit-dependencies
 import { AbstractLevelDOWN } from 'abstract-leveldown';
 import LevelDOWN, { LevelDownOpenOptions } from 'leveldown';
 import LevelUp from 'levelup';
@@ -39,13 +39,14 @@ export interface Environment {
   readonly dataPath: string;
   readonly rpc: RPCServerEnvironment;
   readonly levelDownOptions?: LevelDownOpenOptions;
-
   readonly node?: NodeEnvironment;
+  readonly network?: NetworkEnvironment;
   readonly backup?: BackupEnvironment;
   readonly telemetry?: TelemetryEnvironment;
 }
 export interface Options {
   readonly node?: NodeOptions;
+  readonly network?: NetworkOptions;
   readonly rpc?: RPCServerOptions;
   readonly backup?: BackupOptions;
 }
@@ -101,9 +102,26 @@ FullNodeOptions): Observable<any> => {
       monitor.serveMetrics(environment.telemetry.port);
     }
 
-    const storage = levelupStorage({
-      db: LevelUp(customLeveldown === undefined ? LevelDOWN(dataPath, environment.levelDownOptions) : customLeveldown),
+    let levelDown = customLeveldown;
+    if (levelDown === undefined) {
+      const levelDownToOpen = LevelDOWN(dataPath);
+      const { levelDownOptions } = environment;
+      if (levelDownOptions !== undefined) {
+        await new Promise<void>((resolve, reject) => {
+          levelDownToOpen.open(levelDownOptions, (err: Error | undefined) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        });
+      }
+      levelDown = levelDownToOpen;
+    }
 
+    const storage = levelupStorage({
+      db: LevelUp(levelDown),
       context: { messageMagic: settings.messageMagic },
     });
 
@@ -147,6 +165,16 @@ FullNodeOptions): Observable<any> => {
           map(({ node: nodeOptions = {} }) => nodeOptions),
           distinctUntilChanged(),
         ),
+        createNetwork: (options) =>
+          new Network({
+            monitor,
+            environment: environment.network,
+            options$: options$.pipe(
+              map(({ network: networkOptions = {} }) => networkOptions),
+              distinctUntilChanged(),
+            ),
+            ...options,
+          }),
       });
 
       return node.start$().pipe(map(() => ({ blockchain, node })));

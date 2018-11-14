@@ -1,0 +1,15 @@
+{
+  "title": "Transfer",
+  "files": [
+    {
+      "initial": "one/contracts/Token.one.ts",
+      "solution": "one/contracts/Token.solution.one.ts"
+    },
+    {
+      "solution": "one/tests/Token.test.ts"
+    },
+    {
+      "solution": "package.json"
+    }
+  ]
+}

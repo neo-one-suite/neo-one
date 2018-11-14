@@ -1,4 +1,5 @@
-import { common, ContractParameter, Hash256ContractParameter, UInt256 } from '@neo-one/client-core';
+import { common, UInt256 } from '@neo-one/client-common';
+import { ContractParameter, Hash256ContractParameter } from '@neo-one/node-core';
 import { StackItemBase } from './StackItemBase';
 
 export class UInt256StackItem extends StackItemBase {

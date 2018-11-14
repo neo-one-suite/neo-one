@@ -1,16 +1,21 @@
-import { common, disassembleByteCode, OpCode } from '@neo-one/client-core';
+import { common, OpCode } from '@neo-one/client-common';
+import { disassembleByteCode } from '@neo-one/node-core';
 import { makeErrorWithCode } from '@neo-one/utils';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { ExecutionContext } from './constants';
 
 const getLine = (context: ExecutionContext): number => {
-  const bytecode = disassembleByteCode(context.code);
-  // tslint:disable-next-line no-unused
-  const result = [...bytecode.entries()].find(([idx, { pc }]) => context.pc === pc);
+  try {
+    const bytecode = disassembleByteCode(context.code);
+    // tslint:disable-next-line no-unused
+    const result = [...bytecode.entries()].find(([idx, { pc }]) => context.pc === pc);
 
-  // NOTE: We don't do result[0] + 1 because context.pc will be the next pc, not the one that
-  //       the error was thrown on. (Line numbers are 1-indexed)
-  return result === undefined ? 1 : result[0];
+    // NOTE: We don't do result[0] + 1 because context.pc will be the next pc, not the one that
+    //       the error was thrown on. (Line numbers are 1-indexed)
+    return result === undefined ? 1 : result[0];
+  } catch {
+    return 1;
+  }
 };
 
 const getMessage = (context: ExecutionContext, message: string): string => {
@@ -24,6 +29,15 @@ const getMessage = (context: ExecutionContext, message: string): string => {
 
 export const ThrowError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'Script execution threw an Error'),
+);
+export const ShiftTooLargeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Shift value too large'),
+);
+export const ContainerTooLargeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Container too large'),
+);
+export const ItemTooLargeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Item too large'),
 );
 export const UnknownOpError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, byteCode: string) =>
   getMessage(context, `Unknown op: ${byteCode}`),
@@ -44,12 +58,6 @@ export const StackOverflowError = makeErrorWithCode('VM_ERROR', (context: Execut
 );
 export const InvocationStackOverflowError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'Invocation Stack Overflow'),
-);
-export const ArrayOverflowError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
-  getMessage(context, 'Array Overflow'),
-);
-export const ItemOverflowError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
-  getMessage(context, 'Item Overflow'),
 );
 export const OutOfGASError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'Out of GAS'),
@@ -74,6 +82,9 @@ export const XSwapNegativeError = makeErrorWithCode('VM_ERROR', (context: Execut
 );
 export const XDropNegativeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'XDROP Negative Index'),
+);
+export const XDropUnderflowError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'XDROP Underflow'),
 );
 export const PickNegativeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'PICK Negative Index'),
@@ -136,6 +147,9 @@ export const InvalidIndexError = makeErrorWithCode('VM_ERROR', (context: Executi
 export const InvalidInvocationTransactionError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'Expected InvocationTransaction.'),
 );
+export const InvalidClaimTransactionError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, 'Expected ClaimTransaction.'),
+);
 export const ContractNoStorageError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, hash: string) =>
   getMessage(context, `Contract Does Not Have Storage: ${hash}`),
 );
@@ -176,5 +190,7 @@ export const InvalidTailCallReturnValueError = makeErrorWithCode(
   (context: ExecutionContext, found: number, expected: number) =>
     getMessage(context, `Invalid tail call return value count. Found ${found}, expected ${expected}`),
 );
-
 export const TemplateVMError = makeErrorWithCode('VM_ERROR', getMessage);
+export const ConstantStorageError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, key: Buffer) =>
+  getMessage(context, `Storage at ${key.toString('hex')} is read only`),
+);

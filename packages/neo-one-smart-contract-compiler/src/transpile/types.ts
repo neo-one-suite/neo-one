@@ -1,4 +1,4 @@
-import { ABI, ContractParameterType } from '@neo-one/client';
+import { ABI, ContractParameterType } from '@neo-one/client-common';
 import { RawSourceMap } from 'source-map';
 
 export interface Contract {

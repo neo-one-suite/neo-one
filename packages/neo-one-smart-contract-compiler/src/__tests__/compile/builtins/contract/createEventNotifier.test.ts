@@ -1,5 +1,4 @@
 import { helpers } from '../../../../__data__';
-import { DiagnosticCode } from '../../../../DiagnosticCode';
 
 describe('createEventNotifier', () => {
   test('simple event', async () => {
@@ -35,13 +34,45 @@ describe('createEventNotifier', () => {
   test('invalid event name', async () => {
     helpers.compileString(
       `
-      import { createEventNotifier } from '@neo-one/smart-contract';
+      import { createEventNotifier, SmartContract } from '@neo-one/smart-contract';
 
       const foo = 'event';
       const onTransfer = createEventNotifier(foo);
       onTransfer();
+
+      export class Contract extends SmartContract {}
     `,
-      { type: 'error', code: DiagnosticCode.InvalidLiteral },
+      { type: 'error' },
+    );
+  });
+
+  test('invalid event parameter type', async () => {
+    helpers.compileString(
+      `
+      import { createEventNotifier, SmartContract } from '@neo-one/smart-contract';
+
+      class Foo {}
+      const onTransfer = createEventNotifier<Foo>('foo');
+      const foo = new Foo();
+      onTransfer(foo);
+
+      export class Contract extends SmartContract {}
+    `,
+      { type: 'error' },
+    );
+  });
+
+  test('invalid event parameter type - forward value', async () => {
+    helpers.compileString(
+      `
+      import { createEventNotifier, SmartContract } from '@neo-one/smart-contract';
+
+      const onTransfer = createEventNotifier<ForwardValue<string>>('foo');
+      onTransfer('foo');
+
+      export class Contract extends SmartContract {}
+    `,
+      { type: 'error' },
     );
   });
 });

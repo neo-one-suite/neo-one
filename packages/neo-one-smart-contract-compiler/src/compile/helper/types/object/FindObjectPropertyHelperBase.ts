@@ -72,7 +72,7 @@ export class FindObjectPropertyHelperBase extends Helper {
           // [hasPrototypeKey, notHasKey, obj, pobj, prop]
           sb.emitOp(node, 'HASKEY');
           // [condition, obj, pobj, prop]
-          sb.emitOp(node, 'AND');
+          sb.emitOp(node, 'BOOLAND');
         },
         each: () => {
           // [pobj, prop]
@@ -88,7 +88,9 @@ export class FindObjectPropertyHelperBase extends Helper {
           // [prop, obj, obj, pobj, pobj, prop]
           prepareLoop();
         },
-        withScope: false,
+        cleanup: () => {
+          // do nothing
+        },
       }),
     );
     // [obj, prop]

@@ -1,26 +1,21 @@
 import ts from 'typescript';
 
 export class CompilerDiagnostic implements ts.Diagnostic {
+  public readonly start: number;
+  public readonly length: number;
+  // tslint:disable-next-line readonly-keyword
+  public file: ts.SourceFile;
+  public readonly source: string;
+
   public constructor(
-    public readonly node: ts.Node,
+    node: ts.Node,
     public readonly messageText: string,
     public readonly code: number,
     public readonly category: ts.DiagnosticCategory,
-  ) {}
-
-  public get file(): ts.SourceFile {
-    return this.node.getSourceFile();
-  }
-
-  public get start(): number {
-    return this.node.getStart();
-  }
-
-  public get length(): number {
-    return this.node.getWidth();
-  }
-
-  public get source(): string {
-    return 'neo-one';
+  ) {
+    this.file = node.getSourceFile();
+    this.start = node.getStart();
+    this.length = node.getWidth();
+    this.source = 'neo-one';
   }
 }

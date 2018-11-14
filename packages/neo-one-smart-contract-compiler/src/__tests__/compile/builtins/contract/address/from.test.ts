@@ -1,4 +1,4 @@
-import { common } from '@neo-one/client-core';
+import { common } from '@neo-one/client-common';
 import { helpers, keys } from '../../../../../__data__';
 import { DiagnosticCode } from '../../../../../DiagnosticCode';
 
@@ -29,6 +29,16 @@ describe('Address.from', () => {
       `
       import { Address } from '@neo-one/smart-contract';
       const keys = Address.from;
+    `,
+      { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
+    );
+  });
+
+  test('cannot be referenced - object literal', async () => {
+    helpers.compileString(
+      `
+      import { Address } from '@neo-one/smart-contract';
+      const { from } = Address;
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },
     );

@@ -3,23 +3,23 @@ import ts from 'typescript';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { BuiltinInstanceMemberCall } from '../BuiltinInstanceMemberCall';
-import { MemberLikeExpression } from '../types';
+import { CallMemberLikeExpression } from '../types';
 
 // tslint:disable-next-line export-name
 export class ArrayMap extends BuiltinInstanceMemberCall {
-  public canCall(_sb: ScriptBuilder, _func: MemberLikeExpression, node: ts.CallExpression): boolean {
+  public canCall(_sb: ScriptBuilder, _func: CallMemberLikeExpression, node: ts.CallExpression): boolean {
     return ts.isCallExpression(node) && tsUtils.argumented.getArguments(node).length === 1;
   }
 
   public emitCall(
     sb: ScriptBuilder,
-    func: MemberLikeExpression,
+    func: CallMemberLikeExpression,
     node: ts.CallExpression,
     optionsIn: VisitOptions,
     visited: boolean,
   ): void {
     const options = sb.pushValueOptions(optionsIn);
-    if (!visited && (ts.isPropertyAccessExpression(func) || ts.isElementAccessExpression(func))) {
+    if (!visited) {
       // [arrayVal]
       sb.visit(tsUtils.expression.getExpression(func), options);
     }

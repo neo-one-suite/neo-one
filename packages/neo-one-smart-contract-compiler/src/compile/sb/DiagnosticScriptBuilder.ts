@@ -1,4 +1,4 @@
-import { UInt160 } from '@neo-one/client-core';
+import { UInt160 } from '@neo-one/client-common';
 import ts from 'typescript';
 import { Helper } from '../helper';
 import { DiagnosticScope } from '../scope';

@@ -1,4 +1,4 @@
-import { decryptNEP2, isNEP2, wifToPrivateKey } from '@neo-one/client';
+import { decryptNEP2, isNEP2, wifToPrivateKey } from '@neo-one/client-common';
 import {
   CreateCRUD,
   ExecCLIOptions,

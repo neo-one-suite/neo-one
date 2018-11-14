@@ -1,0 +1,32 @@
+{
+  "name": "@neo-one/client-common",
+  "version": "1.0.1",
+  "description": "NEO•ONE client common code.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@neo-one/ec-key": "^0.0.3",
+    "@neo-one/monitor": "^1.0.1",
+    "@neo-one/types": "^1.0.1",
+    "@neo-one/utils": "^1.0.1",
+    "@types/bn.js": "^4.11.3",
+    "@types/bs58": "^3.0.30",
+    "@types/buffer-xor": "^2.0.0",
+    "@types/elliptic": "^6.4.0",
+    "@types/lodash": "^4.14.118",
+    "@types/scrypt-js": "^2.0.1",
+    "@types/wif": "^2.0.1",
+    "bignumber.js": "^8.0.1",
+    "bn.js": "^4.11.8",
+    "bs58": "^4.0.1",
+    "buffer-xor": "^2.0.2",
+    "elliptic": "^6.4.1",
+    "hash.js": "^1.1.5",
+    "lodash": "^4.17.11",
+    "rxjs": "^6.3.3",
+    "scrypt-js": "^2.0.4",
+    "source-map": "^0.7.3",
+    "tslib": "^1.9.3",
+    "wif": "^2.0.6"
+  },
+  "sideEffects": false
+}

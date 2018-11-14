@@ -1,3 +1,4 @@
+// tslint:disable-next-line:match-default-export-name
 import BloomFilter from 'bloom-filter';
 import { NetworkAddress } from './payload';
 
