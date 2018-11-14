@@ -47,6 +47,7 @@ describe('CNEO', () => {
 
       // Depost into the Escrow account
       const cneoAddress = cneo.definition.networks[networkName].address;
+      const cneoAccountID = { network: networkName, address: cneoAddress };
       const escrowReceipt = await escrow.deposit.confirmed(
         masterAccountID.address,
         toAccountID.address,
@@ -153,7 +154,7 @@ describe('CNEO', () => {
         cneo.balanceOf(toAccountID.address),
         cneo.totalSupply(),
         client.getAccount(toAccountID),
-        client.getAccount(cneoAddress),
+        client.getAccount(cneoAccountID),
       ]);
       expect(masterBalance.toNumber()).toEqual(neoAmount.minus(escrowAmount).toNumber());
       expect(toBalance.toNumber()).toEqual(0);
@@ -162,7 +163,7 @@ describe('CNEO', () => {
 
       // Claim the accumulated GAS
       await cneo.claim.confirmed();
-      const cneoAccountAfter = await client.getAccount(cneoAddress);
+      const cneoAccountAfter = await client.getAccount(cneoAccountID);
       expect(cneoAccountBefore.balances[Hash256.GAS]).toBeUndefined();
       expect(cneoAccountAfter.balances[Hash256.GAS]).toBeDefined();
       expect(cneoAccountAfter.balances[Hash256.GAS]).toBeGreaterThan(0);
