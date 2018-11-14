@@ -1,10 +1,10 @@
 ---
-slug: 2018/11/14/announcing-neo-one
-title: Announcing NEO•ONE
+slug: 2018/11/14/introducing-neo-one
+title: Introducing NEO•ONE
 author: Alex DiCarlo
 twitter: https://twitter.com/AlexDiCarlo10
 ---
-After almost a year of development, we are proud to announce the official release of NEO•ONE.
+After a year of development, we are proud to announce the official release of NEO•ONE.
 
 ## What is NEO•ONE?
 
