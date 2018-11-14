@@ -128,6 +128,14 @@ const StyledMarkdown = styled(Markdown)`
       margin-top: 40px;
     }
   }
+
+  &&&& p img {
+    max-width: 100%;
+  }
+
+  &&&& img {
+    max-width: 100%;
+  }
 `;
 
 const Title = styled.h1`

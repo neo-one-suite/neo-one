@@ -285,6 +285,14 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent'; 
   & blockquote.warning p:first-of-type {
     ${prop('theme.fonts.axiformaBold')};
   }
+
+  &&&& p img {
+    max-width: 100%;
+  }
+
+  &&&& img {
+    max-width: 100%;
+  }
 `;
 
 interface Props {

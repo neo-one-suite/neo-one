@@ -114,7 +114,7 @@ export const Home = (props: {}) => (
           <Proof
             title="Powerful"
             lines={[
-              'NEO•ONE makes coding, testing and deploying NEO dapps easier, faster, more efficient and much more enjoyable.',
+              'NEO•ONE makes coding, testing and deploying NEO dapps easy, fast, efficient and enjoyable.',
               'The complete end-to-end framework offers effortless startup and empowers you with tooling every step of the way.',
             ]}
           />
