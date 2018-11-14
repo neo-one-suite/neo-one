@@ -1,4 +1,3 @@
-rm -f ./packages/neo-one-website/dist/static.*
 rm -f ./packages/neo-one-website/dist/builder.worker.js
 rm -f ./packages/neo-one-website/dist/builder.worker.js.gz
 rm -f ./packages/neo-one-website/dist/builder.worker.js.map
