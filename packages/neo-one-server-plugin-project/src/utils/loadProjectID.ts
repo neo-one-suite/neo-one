@@ -2,7 +2,7 @@ import { PluginManager } from '@neo-one/server-plugin';
 import fs from 'fs-extra';
 import { take } from 'rxjs/operators';
 import { ProjectResourceOptions } from '../ProjectResourceType';
-import { ProjectConfig } from '../types';
+import { CodegenLanguage, ProjectConfig } from '../types';
 import { getProjectResourceManager } from './getProjectResourceManager';
 import { getCommonPaths, getTSPath } from './paths';
 
@@ -11,7 +11,8 @@ const projectIDRegex = /@projectID ([0-9a-z-]+)/;
 const loadProjectIDFromFile = async (projectConfig: ProjectConfig): Promise<string | undefined> => {
   const { projectIDPath: projectIDPathIn } = getCommonPaths(projectConfig);
 
-  const projectIDPath = projectConfig.codegen.javascript ? projectIDPathIn : getTSPath(projectIDPathIn);
+  const projectIDPath =
+    projectConfig.codegen.language === CodegenLanguage.JavaScript ? projectIDPathIn : getTSPath(projectIDPathIn);
 
   const exists = await fs.pathExists(projectIDPath);
   if (exists) {

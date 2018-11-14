@@ -1,7 +1,7 @@
 import { SourceMaps } from '@neo-one/client-common';
 import { genCommonFiles, NetworkDefinition, Wallet } from '@neo-one/smart-contract-codegen';
 import * as fs from 'fs-extra';
-import { CodegenLanguage, ProjectConfig, CodegenFrameworks } from '../types';
+import { CodegenLanguage, ProjectConfig } from '../types';
 import { getCommonPaths, getContractPaths, getTSPath } from '../utils';
 import { ContractResult } from './compileContract';
 import { writeFile } from './writeFile';

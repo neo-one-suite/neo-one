@@ -17,6 +17,7 @@ module.exports = ({ path }) => ({
       tsConfig: '<rootDir>/tsconfig/tsconfig.es2017.cjs.json',
       isolatedModules: true,
     },
+    'babel-jest': {},
   },
   moduleFileExtensions: ['js', 'jsx', 'json', 'node', 'ts', 'tsx'],
   snapshotSerializers: [
@@ -27,6 +28,7 @@ module.exports = ({ path }) => ({
   testPathIgnorePatterns,
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.jsx?$': 'babel-jest',
   },
   testEnvironment: `./scripts/${path}/NodeEnvironment.js`,
   setupTestFrameworkScriptFile: `./scripts/${path}/jestSetup.js`,
