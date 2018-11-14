@@ -30,13 +30,26 @@ export interface NEOTrackerRequestOptions {
 
 export type RequestOptions = NetworkRequestOptions | SourceMapsRequestOptions | NEOTrackerRequestOptions;
 
+export enum CodegenLanguage {
+  JavaScript,
+  TypeScript,
+}
+
+export enum CodegenFrameworks {
+  none,
+  react,
+  angular,
+  vue,
+}
+
 export interface ProjectConfig {
   readonly paths: {
     readonly contracts: string;
     readonly generated: string;
   };
   readonly codegen: {
-    readonly javascript: boolean;
+    readonly language: CodegenLanguage;
+    readonly uiframework: CodegenFrameworks;
   };
 }
 
@@ -52,9 +65,13 @@ export const projectConfigSchema = {
     },
   },
   codegen: {
-    javascript: {
-      format: Boolean,
-      default: false,
+    language: {
+      format: CodegenLanguage,
+      default: 0,
+    },
+    framework: {
+      format: CodegenFrameworks,
+      default: 0,
     },
   },
 };
