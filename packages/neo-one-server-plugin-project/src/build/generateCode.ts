@@ -3,7 +3,7 @@ import { genFiles } from '@neo-one/smart-contract-codegen';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { RawSourceMap } from 'source-map';
-import { ProjectConfig } from '../types';
+import { CodegenLanguage, ProjectConfig } from '../types';
 import { getCommonPaths, getContractPaths, getTSPath } from '../utils';
 import { writeFile } from './writeFile';
 
@@ -32,13 +32,13 @@ export const generateCode = async (
   });
 
   await fs.ensureDir(base);
-  if (project.codegen.javascript) {
-    await Promise.all([writeFile(abiPath, abi.js), writeFile(createContractPath, contract.js)]);
-  } else {
+  if (project.codegen.language == CodegenLanguage.TypeScript) {
     await Promise.all([
       writeFile(getTSPath(abiPath), abi.ts),
       writeFile(getTSPath(createContractPath), contract.ts),
       writeFile(getTSPath(typesPath), types.ts),
     ]);
+  } else {
+    await Promise.all([writeFile(abiPath, abi.js), writeFile(createContractPath, contract.js)]);
   }
 };
