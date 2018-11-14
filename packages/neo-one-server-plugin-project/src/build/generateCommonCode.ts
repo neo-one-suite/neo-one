@@ -1,7 +1,7 @@
 import { SourceMaps } from '@neo-one/client';
 import { genCommonFiles, NetworkDefinition, Wallet } from '@neo-one/smart-contract-codegen';
 import * as fs from 'fs-extra';
-import { ProjectConfig } from '../types';
+import { CodegenLanguage, ProjectConfig, CodegenFrameworks } from '../types';
 import { getCommonPaths, getContractPaths, getTSPath } from '../utils';
 import { ContractResult } from './compileContract';
 import { writeFile } from './writeFile';
@@ -54,16 +54,7 @@ export const generateCommonCode = async (
   });
 
   await fs.ensureDir(project.paths.generated);
-  if (project.codegen.javascript) {
-    await Promise.all([
-      writeFile(sourceMapsPath, sourceMaps.js),
-      writeFile(testPath, test.js),
-      writeFile(reactPath, react.js),
-      writeFile(clientPath, client.js),
-      writeFile(generatedPath, generated.js),
-      writeFile(projectIDPath, projectIDFile.js),
-    ]);
-  } else {
+  if (project.codegen.language == CodegenLanguage.TypeScript) {
     await Promise.all([
       writeFile(getTSPath(sourceMapsPath), sourceMaps.ts),
       writeFile(getTSPath(testPath), test.ts),
@@ -72,6 +63,15 @@ export const generateCommonCode = async (
       writeFile(getTSPath(generatedPath), generated.ts),
       writeFile(getTSPath(projectIDPath), projectIDFile.ts),
       writeFile(getTSPath(commonTypesPath), commonTypes.ts),
+    ]);
+  } else {
+    await Promise.all([
+      writeFile(sourceMapsPath, sourceMaps.js),
+      writeFile(testPath, test.js),
+      writeFile(reactPath, react.js),
+      writeFile(clientPath, client.js),
+      writeFile(generatedPath, generated.js),
+      writeFile(projectIDPath, projectIDFile.js),
     ]);
   }
 };
