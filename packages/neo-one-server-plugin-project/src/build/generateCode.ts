@@ -32,7 +32,7 @@ export const generateCode = async (
   });
 
   await fs.ensureDir(base);
-  if (project.codegen.language == CodegenLanguage.TypeScript) {
+  if (project.codegen.language === CodegenLanguage.TypeScript) {
     await Promise.all([
       writeFile(getTSPath(abiPath), abi.ts),
       writeFile(getTSPath(createContractPath), contract.ts),

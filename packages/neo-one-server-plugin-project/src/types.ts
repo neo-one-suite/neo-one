@@ -66,12 +66,13 @@ export const projectConfigSchema = {
   },
   codegen: {
     language: {
-      format: CodegenLanguage,
+      format: typeof CodegenLanguage,
       default: 0,
     },
-    framework: {
-      format: CodegenFrameworks,
+    uiframework: {
+      format: typeof CodegenFrameworks,
       default: 0,
     },
+    default: { language: { format: CodegenLanguage.JavaScript }, uiframework: { format: CodegenFrameworks.none } },
   },
 };
