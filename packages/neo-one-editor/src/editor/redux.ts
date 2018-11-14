@@ -1,8 +1,7 @@
 import { OutputMessage } from '@neo-one/local-browser';
 import { produce } from 'immer';
 import _ from 'lodash';
-import LogRocket from 'logrocket';
-import { applyMiddleware, createStore } from 'redux';
+import { createStore } from 'redux';
 import actionCreatorFactory from 'typescript-fsa';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 import { Test, TestSuite } from '../types';
@@ -211,7 +210,7 @@ const reducer = reducerWithInitialState(createInitialState())
     }),
   );
 
-export const configureStore = () => createStore(reducer, applyMiddleware(LogRocket.reduxMiddleware()));
+export const configureStore = () => createStore(reducer);
 
 export const selectConsoleProblems = (state: EditorState) => ({
   consoleProblems: state.console.problems,

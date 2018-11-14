@@ -30,7 +30,6 @@
     "immer": "^1.7.4",
     "localforage": "^1.7.3",
     "lodash": "^4.17.11",
-    "logrocket": "^0.6.17",
     "markdown-it": "^8.4.2",
     "markdown-it-anchor": "^5.0.2",
     "markdown-it-container": "^2.0.0",

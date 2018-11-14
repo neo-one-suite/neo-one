@@ -3,7 +3,6 @@ import '@babel/polyfill';
 // @ts-ignore
 import regeneratorRuntime from '@babel/runtime/regenerator';
 import { TrackJS } from '@neo-one/react-common';
-import LogRocket from 'logrocket';
 // @ts-ignore
 import './Modernizr';
 
@@ -26,13 +25,6 @@ if (typeof window !== 'undefined') {
     enabled: process.env.NODE_ENV === 'production',
   });
   TrackJS.addMetadata('type', 'main');
-
-  if (process.env.NODE_ENV === 'production') {
-    LogRocket.init('p5ugma/neo-one');
-    LogRocket.getSessionURL((url) => {
-      TrackJS.addMetadata('logrocket', url);
-    });
-  }
 
   window.addEventListener('unhandledrejection', (e) => {
     if (e.reason && e.reason.name === 'Canceled') {
