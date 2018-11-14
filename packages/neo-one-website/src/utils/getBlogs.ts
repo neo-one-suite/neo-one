@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import matter from 'gray-matter';
 import * as path from 'path';
-import { Author, BlogAllProps, BlogProps } from '../components';
+import { Author, BlogAllProps, BlogProps, MarkdownContent } from '../components';
 
 const BLOG_SOURCE = path.resolve(__dirname, '..', '..', 'blog');
 
@@ -17,7 +17,7 @@ interface BlogInfo {
   readonly title: string;
   readonly slug: string;
   readonly date: string;
-  readonly content: string;
+  readonly content: MarkdownContent;
   readonly author: Author;
 }
 
@@ -84,6 +84,6 @@ const getBlog = async (blogFile: string): Promise<BlogInfo> => {
       name: blogHeader.author,
       twitter: blogHeader.twitter,
     },
-    content: blog.content,
+    content: { type: 'markdown', value: blog.content },
   };
 };

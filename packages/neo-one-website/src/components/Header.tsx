@@ -119,6 +119,9 @@ export const Header = ({ path, ...props }: Props & React.ComponentProps<typeof W
         <NavigationLink linkColor="gray" active={path === 'blog'} data-test="header-blog" to="/blog">
           Blog
         </NavigationLink>
+        <NavigationLink linkColor="gray" active={path === 'reference'} data-test="header-reference" to="/reference">
+          Reference
+        </NavigationLink>
       </LeftHeader>
       <ToolbarContent align="end">
         <GitHubLink

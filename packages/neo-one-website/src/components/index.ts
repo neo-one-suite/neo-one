@@ -8,3 +8,4 @@ export * from './docs';
 export * from './home';
 export * from './tutorial';
 export * from './content';
+export * from './reference';

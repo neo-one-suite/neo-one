@@ -10,6 +10,76 @@ const { getBlogs } = require('./packages/neo-one-website/src/utils/getBlogs');
 const ROOT_DIR = path.resolve(__dirname);
 const ROOT = path.resolve(ROOT_DIR, 'packages', 'neo-one-website');
 
+const links = ['Hamlet', 'Ham', 'Forever', 'Buffalo', 'BLARG_DARG', 'One', 'Boofus'];
+
+const tokenizeExample = (example) =>
+  example
+    .split(' ')
+    .map((word) =>
+      links.includes(word)
+        ? { slug: `/reference/${word.toLowerCase()}`, value: word }
+        : { slug: undefined, value: word },
+    );
+
+const functionRefItem = {
+  name: 'ThingOne',
+  slug: '/reference/thingone',
+  type: 'Function',
+  description: tokenizeExample('Returns the first One from the thing.'),
+  definition: tokenizeExample('thingOne(thing: string, otherThing: Hamlet | number ): One'),
+  parameters: [
+    {
+      name: 'thing',
+      type: tokenizeExample('string'),
+      description: tokenizeExample('The thing from which to extract a Boofus .  Does the following:'),
+    },
+    {
+      name: 'otherThing',
+      type: tokenizeExample('Hamlet | number'),
+      description: tokenizeExample(
+        'The Hamlet fro which your thing originated.  Needed for Such and such and such. For example, you might pick a Hamlet from Oaxaca.  Or maybe a Hamlet from the lexical menagerie.',
+      ),
+    },
+  ],
+};
+
+const constRefItem = {
+  name: 'BlargDarg',
+  slug: '/reference/blargdarg',
+  type: 'Const',
+  description: tokenizeExample('Specifies Blargdarg.'),
+  definition: tokenizeExample(`const BLARG_DARG = 'blarg-darg'`),
+};
+
+const classDefinition = `interface Hamlet extends Ham {
+  readonly meatLoaf: string ;
+  readonly boosuf: Buffalo ;
+  readonly methodBoop: (yardstick: string) => Promise< Forever > ;
+}`;
+
+const classRefItem = {
+  name: 'Hamlet',
+  slug: '/reference/hamlet',
+  type: 'Class',
+  description: tokenizeExample(
+    'Class for managing all your little hamlets. Does a lot of things and I want this sentece to be just a bit longer so that I can make sure long descriptions work well',
+  ),
+  definition: tokenizeExample(classDefinition),
+};
+
+const refChildren = [functionRefItem, constRefItem, classRefItem];
+
+const refSidebar = [
+  {
+    title: 'Packages',
+    subsections: [
+      { slug: '@neo-one/client', title: '@neo-one/client' },
+      { slug: '@neo-one/client-full', title: '@neo-one/client-full' },
+      { slug: '@neo-one/smart-contract', title: '@neo-one/smart-contract' },
+    ],
+  },
+];
+
 export default {
   paths: {
     root: ROOT,
@@ -89,6 +159,42 @@ export default {
               getData: async () => blogAll,
             },
           ]),
+      },
+      {
+        path: '/reference',
+        component: 'src/pages/reference',
+        getData: async () => ({
+          title: '@neo-one/client',
+          type: 'All',
+          content: {
+            type: 'referenceItems',
+            value: [
+              functionRefItem,
+              constRefItem,
+              classRefItem,
+              functionRefItem,
+              classRefItem,
+              functionRefItem,
+              constRefItem,
+              classRefItem,
+              functionRefItem,
+              constRefItem,
+              classRefItem,
+            ],
+          },
+          current: '@neo-one/client',
+          sidebar: refSidebar,
+        }),
+        children: refChildren.map((ref) => ({
+          path: ref.slug.slice('/reference/'.length),
+          component: 'src/pages/reference',
+          getData: async () => ({
+            title: ref.name,
+            content: { type: 'referenceItem', value: ref },
+            current: `@neo-one/client`,
+            sidebar: refSidebar,
+          }),
+        })),
       },
     ];
   },
