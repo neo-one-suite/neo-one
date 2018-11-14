@@ -25,17 +25,17 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
         NEO_ONE_DEV: JSON.stringify('true'),
         NEO_ONE_API_URL: JSON.stringify(
           stage === 'prod' && process.env.NEO_ONE_STAGING !== 'true'
-            ? 'https://neo-one-api.now.sh/'
+            ? 'https://api.neo-one.io/'
             : 'http://localhost:3001/',
         ),
         NEO_ONE_PREVIEW_URL: JSON.stringify(
           stage === 'prod' && process.env.NEO_ONE_STAGING !== 'true'
-            ? 'https://neo-one-course-preview.netlify.com'
+            ? 'https://course-preview.neo-one.io'
             : 'http://localhost:8080',
         ),
         NEO_ONE_TEST_RUNNER_URL: JSON.stringify(
           stage === 'prod' && process.env.NEO_ONE_STAGING !== 'true'
-            ? 'https://neo-one-test-runner.netlify.com'
+            ? 'https://test-runner.neo-one.io'
             : 'http://localhost:8081',
         ),
         TSC_NONPOLLING_WATCHER: JSON.stringify('false'),
