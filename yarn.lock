@@ -20812,10 +20812,10 @@ webpack@4.19.0, webpack@^4.18.0:
     watchpack "^1.5.0"
     webpack-sources "^1.2.0"
 
-webpackbar@3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/webpackbar/-/webpackbar-3.1.2.tgz#eee47195b1309604c363e0dc52d13d7846da5078"
-  integrity sha512-Wk7VwbUl6RwWAnPL5d0/rKlrBNSwiE+Xr+3aC2Paq3rQxIleNDFshnVyM2YFL/9J0VRfmIg6C6DOqDzYN5CU9w==
+webpackbar@3.1.3:
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/webpackbar/-/webpackbar-3.1.3.tgz#3ea7b7e3d09fd3ac62ba476a45a1c0c2830e6dcb"
+  integrity sha512-OvCUjHxd+FRSlocJTqi0wjBZIIetW04WkDiKpkfL7ZvvEeQnTVL+6yBzjJVpdaY7CZ/tfQKM8IBXIcHlPqyX+g==
   dependencies:
     ansi-escapes "^3.1.0"
     chalk "^2.4.1"
