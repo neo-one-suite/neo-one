@@ -51,7 +51,7 @@
     "jest-matchers": "^20.0.3",
     "jest-mock": "^23.2.0",
     "lodash": "^4.17.11",
-    "monaco-editor": "^0.14.3",
+    "monaco-editor": "^0.15.0",
     "monaco-textmate": "^3.0.0",
     "nanoid": "^2.0.0",
     "onigasm": "^2.2.1",
