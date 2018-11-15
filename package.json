@@ -152,7 +152,7 @@
     "@types/autoprefixer": "9.1.1",
     "@types/jest": "23.3.9",
     "@types/react": "16.7.3",
-    "@types/webpack": "4.4.18",
+    "@types/webpack": "4.4.19",
     "@types/webpack-bundle-analyzer": "2.13.0",
     "@types/yargs": "12.0.1",
     "all-contributors-cli": "5.4.1",
@@ -246,7 +246,7 @@
     "typescript": "3.2.0-dev.20181110",
     "typescript-styled-plugin": "0.13.0",
     "url-loader": "1.1.2",
-    "webpack": "4.19.0",
+    "webpack": "4.25.1",
     "webpack-bundle-analyzer": "3.0.3",
     "webpack-node-externals": "1.7.2",
     "webpack-serve": "2.0.2",
@@ -261,7 +261,7 @@
     "grpc": "1.16.0",
     "regenerator-runtime": "0.12.1",
     "styled-components": "3.4.10",
-    "webpack": "4.19.0"
+    "webpack": "4.25.1"
   },
   "config": {
     "commitizen": {
