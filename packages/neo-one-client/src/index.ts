@@ -143,6 +143,7 @@ export {
   SmartContractReadOptions,
   SourceMaps,
   StateTransaction,
+  StorageItem,
   StringABI,
   StringABIParameter,
   StringABIReturn,
