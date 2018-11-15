@@ -224,7 +224,7 @@
     "source-map": "0.7.3",
     "stats-webpack-plugin": "0.7.0",
     "style-loader": "0.23.1",
-    "styled-components": "3.4.10",
+    "styled-components": "4.1.1",
     "stylelint": "9.8.0",
     "stylelint-config-standard": "18.2.0",
     "stylelint-config-styled-components": "0.1.1",
@@ -260,7 +260,7 @@
     "bn.js": "4.11.8",
     "grpc": "1.16.0",
     "regenerator-runtime": "0.12.1",
-    "styled-components": "3.4.10",
+    "styled-components": "4.1.1",
     "webpack": "4.19.0"
   },
   "config": {
