@@ -2316,4 +2316,13 @@ export interface Peer {
   readonly port: number;
 }
 
+/**
+ * Raw storage value
+ */
+export interface StorageItem {
+  readonly address: string;
+  readonly key: string;
+  readonly value: string;
+}
+
 /* END LOW-LEVEL API */

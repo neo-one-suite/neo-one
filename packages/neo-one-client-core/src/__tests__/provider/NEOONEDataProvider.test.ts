@@ -21,6 +21,8 @@ import {
   RawCallReceipt,
   RawInvocationResult,
   scriptHashToAddress,
+  StorageItem,
+  StorageItemJSON,
   Transaction,
   TransactionJSON,
   VMState,
@@ -596,6 +598,22 @@ describe('NEOONEDataProvider', () => {
     const result = await provider.getNetworkSettings();
 
     expect(result.issueGASFee.toString(10)).toEqual(networkSettingsJSON.issueGASFee);
+  });
+
+  const verifyStorage = (item: StorageItem, itemJSON: StorageItemJSON) => {
+    expect(item.address).toEqual(keys[0].address);
+    expect(item.key).toEqual(data.buffers.a);
+    expect(item.value).toEqual(itemJSON.value);
+  };
+
+  test('iterStorage', async () => {
+    const storageItemJSON = factory.createStorageItemJSON();
+    client.getAllStorage = jest.fn(async () => Promise.resolve([storageItemJSON]));
+
+    const result = await toArray(provider.iterStorage(keys[0].address));
+
+    expect(result).toHaveLength(1);
+    verifyStorage(result[0], storageItemJSON);
   });
 
   test('iterActionsRaw', async () => {
