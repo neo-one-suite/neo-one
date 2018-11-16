@@ -1,10 +1,10 @@
 // tslint:disable no-any
 import { FromStream } from '@neo-one/react';
+import { Select } from '@neo-one/react-common';
 import * as React from 'react';
 import { styled } from 'reakit';
 import { combineLatest } from 'rxjs';
 import { DeveloperToolsContext, DeveloperToolsContextType } from './DeveloperToolsContext';
-import { Select } from './Select';
 import { SettingsLabel } from './SettingsLabel';
 import { WithAddError } from './WithAddError';
 
