@@ -42,6 +42,20 @@ Array [
 ]
 `;
 
+exports[`JSONRPCClient getAllStorage 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getallstorage",
+      "params": Array [
+        "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+      ],
+    },
+    undefined,
+  ],
+]
+`;
+
 exports[`JSONRPCClient getAsset 1`] = `
 Array [
   Array [

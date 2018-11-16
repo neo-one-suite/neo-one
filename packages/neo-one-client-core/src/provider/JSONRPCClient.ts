@@ -17,6 +17,7 @@ import {
   Peer,
   PrivateNetworkSettings,
   RelayTransactionResultJSON,
+  StorageItemJSON,
   TransactionJSON,
   TransactionReceiptJSON,
 } from '@neo-one/client-common';
@@ -176,6 +177,18 @@ export class JSONRPCClient {
           monitor,
         )
         .then((res) => new BigNumber(res)),
+    );
+  }
+
+  public async getAllStorage(address: AddressString, monitor?: Monitor): Promise<ReadonlyArray<StorageItemJSON>> {
+    return this.withInstance(async (provider) =>
+      provider.request(
+        {
+          method: 'getallstorage',
+          params: [addressToScriptHash(address)],
+        },
+        monitor,
+      ),
     );
   }
 

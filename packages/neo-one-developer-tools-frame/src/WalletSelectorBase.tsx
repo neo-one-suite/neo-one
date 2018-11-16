@@ -1,6 +1,7 @@
 // tslint:disable no-any
 import { Account, UserAccount } from '@neo-one/client-common';
 import { Client, Hash256, nep5 } from '@neo-one/client-core';
+import { Select } from '@neo-one/react-common';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
@@ -9,7 +10,6 @@ import { FormatOptionLabelMeta } from 'react-select/lib/Select';
 import { Grid, styled } from 'reakit';
 import { combineLatest, concat, Observable, of, ReplaySubject } from 'rxjs';
 import { catchError, distinctUntilChanged, map, multicast, refCount, switchMap, take } from 'rxjs/operators';
-import { Select } from './Select';
 import { Token } from './types';
 
 export const makeOption = async ({

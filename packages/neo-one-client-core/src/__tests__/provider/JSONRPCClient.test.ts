@@ -188,6 +188,16 @@ describe('JSONRPCClient', () => {
     expect(mockRequest.mock.calls).toMatchSnapshot();
   });
 
+  test('getAllStorage', async () => {
+    const value = [factory.createStorageItemJSON()];
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getAllStorage(keys[0].address);
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
   test('testInvocation', async () => {
     const value = factory.createCallReceiptJSON();
     mockRequest.mockImplementationOnce(async () => Promise.resolve(value));

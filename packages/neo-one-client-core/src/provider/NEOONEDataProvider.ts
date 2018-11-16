@@ -41,6 +41,8 @@ import {
   RelayTransactionResultJSON,
   ScriptBuilderParam,
   scriptHashToAddress,
+  StorageItem,
+  StorageItemJSON,
   Transaction,
   TransactionBase,
   TransactionJSON,
@@ -53,6 +55,8 @@ import { Monitor } from '@neo-one/monitor';
 import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
+import { flatten } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatten';
+import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { AsyncBlockIterator } from '../AsyncBlockIterator';
@@ -332,6 +336,24 @@ export class NEOONEDataProvider implements DeveloperProvider {
 
   public async reset(monitor?: Monitor): Promise<void> {
     return this.mutableClient.reset(monitor);
+  }
+
+  public iterStorage(address: AddressString, monitor?: Monitor): AsyncIterable<StorageItem> {
+    return AsyncIterableX.from(
+      this.mutableClient.getAllStorage(address, monitor).then((res) => AsyncIterableX.from(res)),
+    ).pipe(
+      // tslint:disable-next-line no-any
+      flatten<StorageItem>() as any,
+      map<StorageItemJSON, StorageItem>((storageItem) => this.convertStorageItem(storageItem)),
+    );
+  }
+
+  private convertStorageItem(storageItem: StorageItemJSON): StorageItem {
+    return {
+      address: scriptHashToAddress(storageItem.hash),
+      key: storageItem.key,
+      value: storageItem.value,
+    };
   }
 
   private convertBlock(block: BlockJSON): Block {
