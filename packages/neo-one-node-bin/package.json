@@ -1,0 +1,18 @@
+{
+  "name": "@neo-one/node-bin",
+  "version": "1.0.1",
+  "description": "NEO•ONE NEO executable full node.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@neo-one/monitor": "^1.0.1",
+    "@neo-one/node": "^1.0.1",
+    "@neo-one/node-neo-settings": "^1.0.1",
+    "@neo-one/types": "^1.0.1",
+    "@neo-one/utils":"^1.0.1",
+    "env-paths":"^2.0.0",
+    "winston":"^3.1.0",
+    "rxjs": "^6.3.3",
+    "tslib": "^1.9.3"
+  },
+  "sideEffects": false
+}
