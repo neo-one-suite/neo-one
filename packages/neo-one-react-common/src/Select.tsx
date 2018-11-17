@@ -1,5 +1,5 @@
 // tslint:disable no-any match-default-export-name
-import { axiforma, theme } from '@neo-one/react-common';
+import { axiforma, theme } from '@neo-one/react-core';
 import * as React from 'react';
 import SelectBase from 'react-select';
 import { styled } from 'reakit';

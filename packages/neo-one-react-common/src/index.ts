@@ -11,6 +11,7 @@ export * from './Loading';
 export * from './LoadingDots';
 export * from './Logo';
 export * from './Monogram';
+export * from './Select';
 export * from './Selector';
 export * from './Shadow';
 export * from './SplitPane';

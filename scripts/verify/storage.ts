@@ -144,7 +144,6 @@ const getStorage = async (provider: any, item: any): Promise<any> => {
 };
 
 const verifyStorage = async (hash: string): Promise<void> => {
-  // @ts-ignore
   const storageItems = await toArray(AsyncIterableX.from(oneProvider.iterStorage(hash)));
 
   let totalEqual = 0;

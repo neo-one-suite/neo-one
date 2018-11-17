@@ -1,9 +1,8 @@
 // tslint:disable no-any strict-type-predicates
-import { Tooltip, TooltipArrow } from '@neo-one/react-common';
+import { Select, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import { ActionMap } from 'constate';
 import * as React from 'react';
 import { Container, styled } from 'reakit';
-import { Select } from './Select';
 
 interface State {
   readonly menuOpen: boolean;

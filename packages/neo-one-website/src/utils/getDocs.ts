@@ -35,28 +35,27 @@ export const getDocs = async (): Promise<ReadonlyArray<DocsProps>> => {
   ]);
   const docsBare = _.flatten(docFileLists);
   const docs = addAdjacent(docsBare);
-  const sidebar = Object.entries(
-    _.groupBy(
-      docs.map((document) => ({
-        title: document.title,
-        slug: document.slug,
-        section: document.section,
-      })),
-      (obj) => obj.section,
-    ),
-  ).map(([section, subsections]) => ({
-    ...docSectionConfigs[section],
-    subsections: subsections.map((subsection) => ({
-      title: subsection.title,
-      slug: subsection.slug,
-    })),
-  }));
 
   return docs.map((doc) => ({
     current: doc.slug,
     title: doc.title,
     content: doc.content,
-    sidebar,
+    sidebar: Object.entries(
+      _.groupBy(
+        docs.map((document) => ({
+          title: document.title,
+          slug: document.slug,
+          section: document.section,
+        })),
+        (obj) => obj.section,
+      ),
+    ).map(([section, subsections]) => ({
+      ...docSectionConfigs[section],
+      subsections: subsections.map((subsection) => ({
+        title: subsection.title,
+        slug: subsection.slug,
+      })),
+    })),
     next: doc.next,
     previous: doc.previous,
   }));

@@ -9,10 +9,18 @@ const dependencies = {
   'styled-components': '3.4.10',
 };
 
+const dependencyNames = Object.keys(dependencies);
+
 describe('resolveDependencies', () => {
   test('resolve deps', async () => {
     const resolvedDependencies = await resolveDependencies(dependencies);
-
-    expect(resolvedDependencies).toMatchSnapshot();
+    // tslint:disable-next-line no-array-mutation
+    Object.values(resolvedDependencies)
+      .sort((a, b) => (a.name >= b.name ? -1 : 1))
+      .forEach((dependency) => {
+        if (dependencyNames.includes(dependency.name)) {
+          expect(dependency).toMatchSnapshot();
+        }
+      });
   });
 });

@@ -54,7 +54,7 @@ export const generateCommonCode = async (
   });
 
   await fs.ensureDir(project.paths.generated);
-  if (project.codegen.language == CodegenLanguage.TypeScript) {
+  if (project.codegen.language === CodegenLanguage.TypeScript) {
     await Promise.all([
       writeFile(getTSPath(sourceMapsPath), sourceMaps.ts),
       writeFile(getTSPath(testPath), test.ts),
