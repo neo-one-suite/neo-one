@@ -13398,23 +13398,23 @@ mali-call-types@^0.1.0, mali-call-types@~0.1.0:
   resolved "https://registry.yarnpkg.com/mali-call-types/-/mali-call-types-0.1.0.tgz#d4ea0a599485909083d98f1db003c46d39a4beca"
   integrity sha1-1OoKWZSFkJCD2Y8dsAPEbTmkvso=
 
-mali-compose@^1.1.0, mali-compose@~1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/mali-compose/-/mali-compose-1.1.0.tgz#e198d3dd0fecb17bf58b3bc2d0c5da28bcb67ce6"
-  integrity sha512-yhMuokiUF2Sea0mSze7y68XuylyC0/ZQtdzcaeK4B+SqMW1crUePOyP+kQ22HroP6Og3cWr68wPwvbCpA+hlZg==
+mali-compose@^1.2.0, mali-compose@~1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/mali-compose/-/mali-compose-1.2.0.tgz#ceb20d1d89f22e6d59b1da965ee5f94b1a029110"
+  integrity sha512-3KpMsVNfqqAjnIsLVLAlSRlbxpCEI6+YG1mAKkd7An9a/VSp2f9vQ5QakP+3S48OpHVtaTvDHSjVbIPr2Fm0Fw==
 
-mali-onerror@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/mali-onerror/-/mali-onerror-0.1.1.tgz#1740e155793723990de752cdc87a92f4f161863c"
-  integrity sha1-F0DhVXk3I5kN51LNyHqS9PFhhjw=
+mali-onerror@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/mali-onerror/-/mali-onerror-0.2.0.tgz#25e5dde981ad5ce355a2d0506b55b91d9a6e7b1d"
+  integrity sha512-zmBpSaoVlgcXlcFpW5zpV9gMy7aefPg5KX9tadui4Ewh+2j9BXm1qCHb/XkJiZ3LgoPgW0ptUMuqwinCmiKGag==
   dependencies:
     error-inject "^1.0.0"
     mali-call-types "^0.1.0"
 
-mali@^0.10.1:
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/mali/-/mali-0.10.1.tgz#9d79694feee6b019fa06e8bda4a8aa5b5bad5449"
-  integrity sha512-YKAZr0hK9sRvUadYGcpQeMyuIy2W33X6luASLr3NqE//3mZWQI6OcEfIvdBRzoMwb0ik9pwUnqq+ZrUrBtdKFw==
+mali@^0.10.2:
+  version "0.10.2"
+  resolved "https://registry.yarnpkg.com/mali/-/mali-0.10.2.tgz#671c7e34cf67d8d208b770a2ec644f9e58974e1b"
+  integrity sha512-CNssmbHxNPNK8mdEHuGNOmKHz3Go+2k4r04dQh+269Q5KdXEIVlr15HYTxyQ/HDqwO2TG1Z2220t0XcTceg1Gw==
   dependencies:
     ascallback "^1.1.1"
     coveralls "^3.0.2"
@@ -13437,7 +13437,7 @@ mali@^0.10.1:
     lodash.upperfirst "^4.3.1"
     lodash.values "^4.3.0"
     mali-call-types "~0.1.0"
-    mali-compose "~1.1.0"
+    mali-compose "~1.2.0"
     p-map "^2.0.0"
     pify "^3.0.0"
 

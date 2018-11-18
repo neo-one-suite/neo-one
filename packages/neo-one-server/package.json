@@ -32,9 +32,9 @@
     "koa-compress": "^3.0.0",
     "koa-router": "^7.4.0",
     "lodash": "^4.17.11",
-    "mali": "^0.10.1",
-    "mali-compose": "^1.1.0",
-    "mali-onerror": "^0.1.1",
+    "mali": "^0.10.2",
+    "mali-compose": "^1.2.0",
+    "mali-onerror": "^0.2.0",
     "rxjs": "^6.3.3",
     "toposort": "^2.0.2",
     "tslib": "^1.9.3"

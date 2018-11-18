@@ -1,11 +1,12 @@
 import { Monitor } from '@neo-one/monitor';
+import { Context } from 'mali';
 import compose from 'mali-compose';
 import onError from 'mali-onerror';
 import { getMonitor } from './common';
 
 export const context = ({ monitor }: { readonly monitor: Monitor }) =>
   compose([
-    async (ctx, next) => {
+    async (ctx: Context, next) => {
       // tslint:disable-next-line:no-any no-object-mutation
       (ctx as any).state = {};
       await monitor
