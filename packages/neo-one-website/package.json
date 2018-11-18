@@ -22,7 +22,7 @@
     "@types/react": "^16.7.3",
     "@types/react-dom": "^16.0.9",
     "@types/react-redux": "^6.0.9",
-    "@types/webpack": "^4.4.18",
+    "@types/webpack": "^4.4.19",
     "clipboard": "^2.0.3",
     "constate": "^0.9.0",
     "fs-extra": "^7.0.1",
