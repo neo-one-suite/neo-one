@@ -47,14 +47,12 @@ aliases:
       - ~/.cache/yarn
     key: v2-yarn-11-{{ .Branch }}-{{ checksum "yarn.lock" }}
 
-  - &filter-only-master
+  - &filter-ignore-bors-tmp
     branches:
-      only:
-        - master
+      ignore:
+        - staging.tmp
+        - trying.tmp
 
-  - &filter-ignore-gh-pages
-    branches:
-      ignore: gh-pages
 
   - &yarn
     |
@@ -330,62 +328,37 @@ jobs:
     <<: *node10
     <<: *lint
 
-  deploy-website:
-    <<: *node10
-    working_directory: ~/neo-one/website
-    steps:
-      - checkout:
-          path: ~/neo-one
-      - restore-cache: *restore-yarn-cache-10
-      - run: *yarn
-      - save-cache: *save-yarn-cache-10
-      - run:
-          name: Install Dependencies
-          command: sudo apt install rsync
-      - run:
-          name: Deploy Website
-          command: |
-            git config --global user.email "dicarlo2@users.noreply.github.com"
-            git config --global user.name "Alex DiCarlo"
-            echo "machine github.com login dicarlo2 password $GITHUB_TOKEN" > ~/.netrc
-            echo "Deploying website..."
-            GIT_USER=dicarlo2 yarn run publish-gh-pages
-
 workflows:
   version: 2
-  website:
-    jobs:
-      - deploy-website:
-          filters: *filter-only-master
   test8:
     jobs:
       - build-e2e8:
-          filters: *filter-ignore-gh-pages
+          filters: *filter-ignore-bors-tmp
       - test8:
-          filters: *filter-ignore-gh-pages
+          filters: *filter-ignore-bors-tmp
       - e2e8:
           requires:
             - build-e2e8
-          filters: *filter-ignore-gh-pages
+          filters: *filter-ignore-bors-tmp
   test9:
     jobs:
       - build-e2e9:
-          filters: *filter-ignore-gh-pages
+          filters: *filter-ignore-bors-tmp
       - test9:
-          filters: *filter-ignore-gh-pages
+          filters: *filter-ignore-bors-tmp
       - e2e9:
           requires:
             - build-e2e9
-          filters: *filter-ignore-gh-pages
+          filters: *filter-ignore-bors-tmp
   test10:
     jobs:
       - build-e2e10:
-          filters: *filter-ignore-gh-pages
+          filters: *filter-ignore-bors-tmp
       - test10:
-          filters: *filter-ignore-gh-pages
+          filters: *filter-ignore-bors-tmp
       - e2e10:
           requires:
             - build-e2e10
-          filters: *filter-ignore-gh-pages
+          filters: *filter-ignore-bors-tmp
       - lint:
-          filters: *filter-ignore-gh-pages
+          filters: *filter-ignore-bors-tmp
