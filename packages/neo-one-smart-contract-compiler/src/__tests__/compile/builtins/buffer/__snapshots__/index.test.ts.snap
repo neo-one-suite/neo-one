@@ -13,7 +13,7 @@ exports[`Buffer cannot be extended 1`] = `
 
 exports[`Buffer cannot be implemented 1`] = `
 "snippetCode.ts (2,13): Class 'MyBuffer' incorrectly implements interface 'Buffer'.
-  Property 'length' is missing in type 'MyBuffer'.
+  Type 'MyBuffer' is missing the following properties from type 'Buffer': length, equals, toString, toInteger, and 2 more.
 
       1 | 
     > 2 |       class MyBuffer implements Buffer {

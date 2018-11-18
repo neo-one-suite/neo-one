@@ -13,7 +13,7 @@ exports[`Symbol cannot be extended 1`] = `
 
 exports[`Symbol cannot be implemented 1`] = `
 "snippetCode.ts (2,13): Class 'MySymbol' incorrectly implements interface 'Symbol'.
-  Property '[one0]' is missing in type 'MySymbol'.
+  Property '[one0]' is missing in type 'MySymbol' but required in type 'Symbol'.
 
       1 | 
     > 2 |       class MySymbol implements Symbol {

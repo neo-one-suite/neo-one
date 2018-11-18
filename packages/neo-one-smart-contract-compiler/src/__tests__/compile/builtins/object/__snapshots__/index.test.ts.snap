@@ -13,7 +13,7 @@ exports[`Object cannot be extended 1`] = `
 
 exports[`Object cannot match shape and pass to function 1`] = `
 "snippetCode.ts (10,9): Argument of type '{ keys: (o: {}) => string[]; }' is not assignable to parameter of type 'ObjectConstructor'.
-  Property '[one0]' is missing in type '{ keys: (o: {}) => string[]; }'.
+  Property '[one0]' is missing in type '{ keys: (o: {}) => string[]; }' but required in type 'ObjectConstructor'.
 
        8 |       }
        9 | 

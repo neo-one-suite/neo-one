@@ -2,7 +2,7 @@
 
 exports[`Transaction cannot be implemented 1`] = `
 "snippetCode.ts (4,13): Class 'MyTransaction' incorrectly implements interface 'TransactionBase'.
-  Property 'hash' is missing in type 'MyTransaction'.
+  Type 'MyTransaction' is missing the following properties from type 'TransactionBase': hash, type, attributes, outputs, and 4 more.
 
       2 |       import { TransactionBase } from '@neo-one/smart-contract';
       3 | 

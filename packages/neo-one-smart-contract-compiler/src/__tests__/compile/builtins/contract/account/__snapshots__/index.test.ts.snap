@@ -2,7 +2,7 @@
 
 exports[`Account cannot be implemented 1`] = `
 "snippetCode.ts (4,13): Class 'MyAccount' incorrectly implements interface 'Account'.
-  Property 'address' is missing in type 'MyAccount'.
+  Type 'MyAccount' is missing the following properties from type 'Account': address, getBalance, [OpaqueTagSymbol0]
 
       2 |       import { Account } from '@neo-one/smart-contract';
       3 | 

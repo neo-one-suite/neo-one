@@ -2,7 +2,7 @@
 
 exports[`IArguments cannot be implemented 1`] = `
 "snippetCode.ts (2,13): Class 'MyArray' incorrectly implements interface 'IArguments'.
-  Property '[one0]' is missing in type 'MyArray'.
+  Property '[one0]' is missing in type 'MyArray' but required in type 'IArguments'.
 
       1 | 
     > 2 |       class MyArray implements IArguments {

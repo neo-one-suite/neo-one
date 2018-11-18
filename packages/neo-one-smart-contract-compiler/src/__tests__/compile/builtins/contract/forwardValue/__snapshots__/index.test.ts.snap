@@ -14,7 +14,7 @@ exports[`ForwardValue cannot be extended 1`] = `
 
 exports[`ForwardValue cannot be implemented 1`] = `
 "snippetCode.ts (4,13): Class 'MyForwardValue' incorrectly implements interface 'ForwardValue'.
-  Property 'asString' is missing in type 'MyForwardValue'.
+  Type 'MyForwardValue' is missing the following properties from type 'ForwardValue': asString, asStringNullable, asNumber, asNumberNullable, and 14 more.
 
       2 |       import { ForwardValue } from '@neo-one/smart-contract';
       3 | 

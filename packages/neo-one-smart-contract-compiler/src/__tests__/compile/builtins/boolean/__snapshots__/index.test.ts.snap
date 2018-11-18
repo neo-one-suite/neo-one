@@ -13,7 +13,7 @@ exports[`Boolean cannot be extended 1`] = `
 
 exports[`Boolean cannot be implemented 1`] = `
 "snippetCode.ts (2,13): Class 'MyBoolean' incorrectly implements interface 'Boolean'.
-  Property '[one0]' is missing in type 'MyBoolean'.
+  Property '[one0]' is missing in type 'MyBoolean' but required in type 'Boolean'.
 
       1 | 
     > 2 |       class MyBoolean implements Boolean {

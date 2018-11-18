@@ -13,7 +13,7 @@ exports[`RegExp cannot be extended 1`] = `
 
 exports[`RegExp cannot be implemented 1`] = `
 "snippetCode.ts (2,13): Class 'MyRegExp' incorrectly implements interface 'RegExp'.
-  Property '[one0]' is missing in type 'MyRegExp'.
+  Property '[one0]' is missing in type 'MyRegExp' but required in type 'RegExp'.
 
       1 | 
     > 2 |       class MyRegExp implements RegExp {

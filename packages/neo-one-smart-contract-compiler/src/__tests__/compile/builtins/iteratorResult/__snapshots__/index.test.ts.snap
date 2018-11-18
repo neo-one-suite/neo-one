@@ -2,7 +2,7 @@
 
 exports[`IteratorResult cannot be implemented 1`] = `
 "snippetCode.ts (2,13): Class 'MyIteratorResult' incorrectly implements interface 'IteratorResult<number>'.
-  Property '[one0]' is missing in type 'MyIteratorResult'.
+  Property '[one0]' is missing in type 'MyIteratorResult' but required in type 'IteratorResult<number>'.
 
       1 | 
     > 2 |       class MyIteratorResult implements IteratorResult<number> {

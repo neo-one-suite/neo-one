@@ -13,7 +13,7 @@ exports[`Number cannot be extended 1`] = `
 
 exports[`Number cannot be implemented 1`] = `
 "snippetCode.ts (2,13): Class 'MyNumber' incorrectly implements interface 'Number'.
-  Property '[one0]' is missing in type 'MyNumber'.
+  Property '[one0]' is missing in type 'MyNumber' but required in type 'Number'.
 
       1 | 
     > 2 |       class MyNumber implements Number {

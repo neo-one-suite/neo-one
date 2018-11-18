@@ -2,7 +2,7 @@
 
 exports[`Address cannot be implemented 1`] = `
 "snippetCode.ts (3,13): Class 'MyAddress' incorrectly implements interface 'Address'.
-  Property '[OpaqueTagSymbol0]' is missing in type 'MyAddress'.
+  Type 'MyAddress' is missing the following properties from type 'Address': [OpaqueTagSymbol0], length, equals, toString, and 3 more.
 
       1 | 
       2 |       import { Address } from '@neo-one/smart-contract';

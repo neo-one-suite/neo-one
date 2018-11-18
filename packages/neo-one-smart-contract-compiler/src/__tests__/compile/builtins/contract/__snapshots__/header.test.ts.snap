@@ -2,7 +2,7 @@
 
 exports[`Header cannot be implemented 1`] = `
 "snippetCode.ts (4,13): Class 'MyHeader' incorrectly implements interface 'Header'.
-  Property 'hash' is missing in type 'MyHeader'.
+  Type 'MyHeader' is missing the following properties from type 'Header': hash, version, previousHash, index, and 4 more.
 
       2 |       import { Header } from '@neo-one/smart-contract';
       3 | 

@@ -13,7 +13,7 @@ exports[`console cannot be extended 1`] = `
 
 exports[`console cannot be implemented 1`] = `
 "snippetCode.ts (2,13): Class 'MyConsole' incorrectly implements interface 'Console'.
-  Property 'log' is missing in type 'MyConsole'.
+  Type 'MyConsole' is missing the following properties from type 'Console': log, [one0]
 
       1 | 
     > 2 |       class MyConsole implements Console {

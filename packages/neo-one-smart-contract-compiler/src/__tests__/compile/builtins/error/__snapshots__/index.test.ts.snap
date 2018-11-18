@@ -14,7 +14,7 @@ exports[`Error cannot be extended 1`] = `
 
 exports[`Error cannot be implemented 1`] = `
 "snippetCode.ts (2,13): Class 'MyError' incorrectly implements interface 'Error'.
-  Property '[one0]' is missing in type 'MyError'.
+  Property '[one0]' is missing in type 'MyError' but required in type 'Error'.
 
       1 | 
     > 2 |       class MyError implements Error {

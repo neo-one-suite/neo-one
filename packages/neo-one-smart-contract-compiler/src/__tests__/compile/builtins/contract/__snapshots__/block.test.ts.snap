@@ -2,7 +2,7 @@
 
 exports[`Block cannot be implemented 1`] = `
 "snippetCode.ts (4,13): Class 'MyBlock' incorrectly implements interface 'Block'.
-  Property 'transactions' is missing in type 'MyBlock'.
+  Type 'MyBlock' is missing the following properties from type 'Block': transactions, hash, version, previousHash, and 5 more.
 
       2 |       import { Block } from '@neo-one/smart-contract';
       3 | 

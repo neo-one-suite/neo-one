@@ -2,7 +2,7 @@
 
 exports[`Deploy cannot be implemented 1`] = `
 "snippetCode.ts (4,13): Class 'MyDeploy' incorrectly implements interface 'DeployConstructor'.
-  Property 'senderAddress' is missing in type 'MyDeploy'.
+  Type 'MyDeploy' is missing the following properties from type 'DeployConstructor': senderAddress, [OpaqueTagSymbol0]
 
       2 |       import { DeployConstructor } from '@neo-one/smart-contract';
       3 | 

@@ -2,7 +2,7 @@
 
 exports[`TemplateStringsArray cannot be implemented 1`] = `
 "snippetCode.ts (2,13): Class 'MyTemplateStringsArray' incorrectly implements interface 'TemplateStringsArray'.
-  Property '[Symbol.iterator]' is missing in type 'MyTemplateStringsArray'.
+  Type 'MyTemplateStringsArray' is missing the following properties from type 'TemplateStringsArray': [Symbol.iterator], length, entries, toString, and 13 more.
 
       1 | 
     > 2 |       class MyTemplateStringsArray implements TemplateStringsArray {

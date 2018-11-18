@@ -2,7 +2,7 @@
 
 exports[`Iterable cannot be implemented 1`] = `
 "snippetCode.ts (2,13): Class 'MyIterable' incorrectly implements interface 'Iterable<number>'.
-  Property '[one0]' is missing in type 'MyIterable'.
+  Property '[one0]' is missing in type 'MyIterable' but required in type 'Iterable<number>'.
 
       1 | 
     > 2 |       class MyIterable implements Iterable<number> {

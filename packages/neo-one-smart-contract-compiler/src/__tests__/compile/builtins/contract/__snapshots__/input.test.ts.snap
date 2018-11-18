@@ -2,7 +2,7 @@
 
 exports[`Input cannot be implemented 1`] = `
 "snippetCode.ts (4,13): Class 'MyInput' incorrectly implements interface 'Input'.
-  Property 'hash' is missing in type 'MyInput'.
+  Type 'MyInput' is missing the following properties from type 'Input': hash, index, [OpaqueTagSymbol0]
 
       2 |       import { Input } from '@neo-one/smart-contract';
       3 | 

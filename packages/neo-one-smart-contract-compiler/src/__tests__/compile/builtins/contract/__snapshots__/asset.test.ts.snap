@@ -2,7 +2,7 @@
 
 exports[`Asset cannot be implemented 1`] = `
 "snippetCode.ts (4,13): Class 'MyAsset' incorrectly implements interface 'Asset'.
-  Property 'hash' is missing in type 'MyAsset'.
+  Type 'MyAsset' is missing the following properties from type 'Asset': hash, type, amount, available, and 5 more.
 
       2 |       import { Asset } from '@neo-one/smart-contract';
       3 | 

@@ -2,7 +2,7 @@
 
 exports[`Output cannot be implemented 1`] = `
 "snippetCode.ts (4,13): Class 'MyOutput' incorrectly implements interface 'Output'.
-  Property 'address' is missing in type 'MyOutput'.
+  Type 'MyOutput' is missing the following properties from type 'Output': address, asset, value, [OpaqueTagSymbol0]
 
       2 |       import { Output } from '@neo-one/smart-contract';
       3 | 
