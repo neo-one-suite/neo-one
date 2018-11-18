@@ -1,12 +1,5 @@
 // tslint:disable no-any
-import {
-  Action,
-  Event,
-  Log,
-  RawAction,
-  SmartContractDefinition,
-  SmartContractIterOptions,
-} from '@neo-one/client-common';
+import { Event, Log, RawAction, SmartContractDefinition, SmartContractIterOptions } from '@neo-one/client-common';
 import { Client } from './Client';
 
 /**
@@ -38,13 +31,13 @@ export interface SmartContract<TClient extends Client = Client, TEvent extends E
    *
    * @returns an `AsyncIterable` over the events and logs emitted by the smart contract.
    */
-  readonly iterActions: (options?: SmartContractIterOptions) => AsyncIterable<Action>;
+  readonly iterActions: (options?: SmartContractIterOptions) => AsyncIterable<TEvent | Log>;
   /**
    * Converts a `RawAction`, typically from the raw results found in a `Block` to a processed `Action` or `undefined` if the action is not recognized by the ABI.
    *
    * @returns `Action` if the `action` parameter is recognized by the `ABI` of the smart contract, `undefined` otherwise.
    */
-  readonly convertAction: (action: RawAction) => Action | undefined;
+  readonly convertAction: (action: RawAction) => TEvent | Log | undefined;
 }
 
 export interface SmartContractAny extends SmartContract {
