@@ -2577,10 +2577,10 @@
   dependencies:
     "@types/koa" "*"
 
-"@types/koa-router@^7.0.33":
-  version "7.0.33"
-  resolved "https://registry.yarnpkg.com/@types/koa-router/-/koa-router-7.0.33.tgz#68d6ab67b71cc88cd5147a1fa23cde765f5bfad1"
-  integrity sha512-X/h7/zM7nyBlsa9L74u0fZQ53bmDrWzaZQlAEJQJq7F60RuTAyIVahe7id2mYCbIkXAiYxaIQeTOQlCql15WNA==
+"@types/koa-router@^7.0.35":
+  version "7.0.35"
+  resolved "https://registry.yarnpkg.com/@types/koa-router/-/koa-router-7.0.35.tgz#07442ac95e65ec1b042af4f72abea44dc96b909f"
+  integrity sha512-WSdZ0FkUSCDiGQBtsEAmTjsM3l5o4eq2WDSCR9UXm/buLY73b5MSkfSt4f8+LAhoZYa9uNNcEyiE43J0xISF5A==
   dependencies:
     "@types/koa" "*"
 
