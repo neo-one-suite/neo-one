@@ -1176,10 +1176,10 @@
   resolved "https://registry.yarnpkg.com/@google-cloud/promisify/-/promisify-0.3.1.tgz#f641e6d944a8e0a05ee0cb1091dfa60089becdba"
   integrity sha512-QzB0/IMvB0eFxFK7Eqh+bfC8NLv3E9ScjWQrPOk6GgfNroxcVITdTlT8NRsRrcp5+QQJVPLkRqKG0PUdaWXmHw==
 
-"@google-cloud/storage@^2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@google-cloud/storage/-/storage-2.3.0.tgz#22b41bfa5c37f137c863f3a1722cc36459f749d4"
-  integrity sha512-5IT6lkTJPNpWZDtHSL7AzDOIDMhkdl1ruxrLryVXsuaP61F8IukMgtoxG0KxH199FoRxCw2fFUvkB5guPTf8fQ==
+"@google-cloud/storage@^2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@google-cloud/storage/-/storage-2.3.1.tgz#89db0e051a3d30cd2f0c627d0f13633f646ee392"
+  integrity sha512-AXfze/I1J6NNk9yuyuKgYL2E1qxS7nvDGFvwitUyAb0FgDEA5UpXiKbDWouu4mwqVMYWl7HXlQiLUSkYNXMB1w==
   dependencies:
     "@google-cloud/common" "^0.26.0"
     "@google-cloud/paginator" "^0.1.0"
@@ -1199,7 +1199,7 @@
     snakeize "^0.1.0"
     stream-events "^1.0.1"
     teeny-request "^3.11.0"
-    through2 "^2.0.0"
+    through2 "^3.0.0"
     xdg-basedir "^3.0.0"
 
 "@grpc/proto-loader@^0.3.0":
@@ -13602,10 +13602,10 @@ media-typer@0.3.0:
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
   integrity sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=
 
-megajs@^0.15.5:
-  version "0.15.5"
-  resolved "https://registry.yarnpkg.com/megajs/-/megajs-0.15.5.tgz#16c9d8774b58eb1503188c7ef1ae97e789f4eecc"
-  integrity sha512-63GM5Z9fQV0Hf6W/mgFuzcYZwRFfvC22CXvvm4BJJehISDwt3A4inTNUekUNmnGxtTpM1bMP7cFB30auHcdAIA==
+megajs@^0.15.7:
+  version "0.15.7"
+  resolved "https://registry.yarnpkg.com/megajs/-/megajs-0.15.7.tgz#05948635456233de6234f2d561d3ac112df621ac"
+  integrity sha512-MpVxaKYMLpYEJlyDoXmlxgP9MYFHtKeFqwMebnUWarDgd5/kXhpIW4pLN4U/u1KEwHkqPJLVOIweYbokGUDIdw==
   dependencies:
     combined-stream "^1.0.5"
     request "^2.88.0"
@@ -19539,7 +19539,7 @@ through2@2.X, through2@^2.0.0, through2@^2.0.2, through2@^2.0.3, through2@~2.0.0
     readable-stream "~2.3.6"
     xtend "~4.0.1"
 
-through2@3.0.0:
+through2@3.0.0, through2@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/through2/-/through2-3.0.0.tgz#468b461df9cd9fcc170f22ebf6852e467e578ff2"
   integrity sha512-8B+sevlqP4OiCjonI1Zw03Sf8PuV1eRsYQgLad5eonILOdyeRsY27A/2Ze8IlvlMvq31OH+3fz/styI7Ya62yQ==
