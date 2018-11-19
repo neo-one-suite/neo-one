@@ -26,7 +26,8 @@ class FetchError extends Error {
 const API_URL = process.env.NEO_ONE_API_URL;
 const RESOLVE_URL = `${API_URL}resolve`;
 
-const getPackageUrl = (name: string, version: string) => `${API_URL}pkg/${encodeURIComponent(name)}/${version}`;
+const getPackageUrl = (name: string, version: string) =>
+  `${API_URL}pkg?name=${encodeURIComponent(name)}&version=${version}`;
 
 const headers = {
   'Content-Type': 'application/json',

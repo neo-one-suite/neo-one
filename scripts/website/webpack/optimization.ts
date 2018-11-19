@@ -71,6 +71,6 @@ export const optimization = ({
     concatenateModules: true,
     minimize: true,
     minimizer: [getMinifer(stage, bundle), new OptimizeCSSAssetsPlugin({})],
-    splitChunks,
+    splitChunks: bundle === 'server' ? false : splitChunks,
   };
 };

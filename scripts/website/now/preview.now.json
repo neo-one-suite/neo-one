@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "alias": ["preview.neo-one.io"],
+  "builds": [
+    { "src": "**/*", "use": "@now/static" }
+  ]
+}

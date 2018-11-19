@@ -18,14 +18,28 @@ export const server = ({ stage }: { readonly stage: Stage }): webpack.Configurat
       extensions: ['.mjs', '.js', '.jsx', '.json', '.ts', '.tsx'],
     },
     node: undefined,
-    entry: {
-      index: path.resolve(EDITOR_SERVER_PACKAGE, 'src', 'entry.ts'),
-    },
+    entry:
+      stage === 'prod'
+        ? {
+            resolve: path.resolve(EDITOR_SERVER_PACKAGE, 'src', 'resolve.ts'),
+            pkg: path.resolve(EDITOR_SERVER_PACKAGE, 'src', 'pkg.ts'),
+          }
+        : {
+            index: path.resolve(EDITOR_SERVER_PACKAGE, 'src', 'entry.ts'),
+          },
     target: 'node',
-    output: {
-      path: SERVER_DIST_DIR,
-      filename: '[name].js',
-    },
+    output:
+      stage === 'prod'
+        ? {
+            path: SERVER_DIST_DIR,
+            filename: '[name].js',
+            libraryExport: 'default',
+            libraryTarget: 'umd',
+          }
+        : {
+            path: SERVER_DIST_DIR,
+            filename: '[name].js',
+          },
     plugins: plugins({ stage, bundle: 'server' }).concat([
       new webpack.optimize.LimitChunkCountPlugin({
         maxChunks: 1,

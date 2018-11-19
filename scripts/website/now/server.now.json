@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "alias": ["api.neo-one.io"],
+  "builds": [
+    { "src": "resolve.js", "use": "@now/node" },
+    { "src": "pkg.js", "use": "@now/node" }
+  ],
+  "routes": [
+    { "src": "^/resolve", "dest": "/resolve.js" },
+    { "src": "^/pkg", "dest": "/pkg.js" },
+    { "src": "^/.*", "status": 404 }
+  ]
+}
