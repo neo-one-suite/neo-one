@@ -157,7 +157,7 @@
     "no-useless-increment": true,
     "no-useless-intersection": true,
     "no-array-delete": true,
-    "no-dead-store": true,
+    "no-dead-store": false,
     "no-gratuitous-expressions": true,
     "no-inconsistent-return": true,
     "no-redundant-boolean": true,

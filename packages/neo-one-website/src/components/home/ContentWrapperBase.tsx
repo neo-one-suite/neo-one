@@ -1,7 +1,9 @@
-import { Grid, styled } from 'reakit';
+import { Box } from '@neo-one/react-common';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
-export const ContentWrapperBase = styled(Grid)`
+export const ContentWrapperBase = styled(Box)`
+  display: grid;
   max-width: 1260px;
   padding-left: 24px;
   padding-right: 24px;

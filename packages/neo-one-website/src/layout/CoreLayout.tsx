@@ -1,11 +1,13 @@
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 // @ts-ignore
 import Headroom from 'react-headroom';
-import { Box, Flex, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Footer, Header } from '../components';
 
-const Wrapper = styled(Flex)`
+const Wrapper = styled(Box)`
+  display: flex;
   flex-direction: column;
   align-items: center;
   min-height: 100vh;

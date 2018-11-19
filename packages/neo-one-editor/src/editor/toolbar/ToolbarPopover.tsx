@@ -1,10 +1,12 @@
+import { Box, ButtonBase, Popover, useHidden } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdClose } from 'react-icons/md';
-import { as, Box, Button, Grid, Popover, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Wrapper } from './Wrapper';
 
-const HeaderWrapper = styled(Grid)`
+const HeaderWrapper = styled(Box)`
+  display: grid;
   color: ${prop('theme.gray0')};
   grid-auto-flow: column;
   grid-auto-columns: auto;
@@ -25,7 +27,7 @@ const TitleText = styled(Box)`
   ${prop('theme.fontStyles.headline')};
 `;
 
-const ToggleWrapper = styled(as(Popover.Toggle)(Wrapper))`
+const ToggleWrapper = styled(Wrapper)`
   display: grid;
   color: ${prop('theme.gray0')};
   ${prop('theme.fonts.axiformaBook')};
@@ -42,14 +44,21 @@ const PopoverWrapper = styled(Box)`
   width: 480px;
 `;
 
-const StyledButton = styled(Button)`
+const StyledButton = styled(ButtonBase)`
+  font-size: 20;
   outline: none;
   cursor: pointer;
 `;
 
-const ButtonWrapper = styled(Grid)`
+const ButtonWrapper = styled(Box)`
+  display: grid;
   place-items: center;
   place-content: center;
+`;
+
+const OuterWrapper = styled(Box)`
+  display: grid;
+  position: relative;
 `;
 
 interface Props {
@@ -58,27 +67,28 @@ interface Props {
   readonly content: React.ReactNode;
 }
 
-export const ToolbarPopover = ({ title, button, content, ...props }: Props) => (
-  <Popover.Container>
-    {(popover) => (
-      <Grid relative>
-        <ToggleWrapper {...popover} {...props}>
-          {button}
-        </ToggleWrapper>
-        <Popover fade slide placement="top" {...popover}>
-          <PopoverWrapper>
-            <HeaderWrapper>
-              <TitleText>{title}</TitleText>
-              <StyledButton fontSize={20} onClick={popover.hide}>
-                <ButtonWrapper>
-                  <MdClose />
-                </ButtonWrapper>
-              </StyledButton>
-            </HeaderWrapper>
-            <BodyWrapper>{content}</BodyWrapper>
-          </PopoverWrapper>
-        </Popover>
-      </Grid>
-    )}
-  </Popover.Container>
-);
+export const ToolbarPopover = ({ title, button, content, ...props }: Props) => {
+  // tslint:disable-next-line:no-unused
+  const [visible, show, hide, toggle] = useHidden(false);
+
+  return (
+    <OuterWrapper>
+      <ToggleWrapper onClick={toggle} {...props}>
+        {button}
+      </ToggleWrapper>
+      <Popover fade slide placement="top" visible={visible}>
+        <PopoverWrapper>
+          <HeaderWrapper>
+            <TitleText>{title}</TitleText>
+            <StyledButton onClick={hide}>
+              <ButtonWrapper>
+                <MdClose />
+              </ButtonWrapper>
+            </StyledButton>
+          </HeaderWrapper>
+          <BodyWrapper>{content}</BodyWrapper>
+        </PopoverWrapper>
+      </Popover>
+    </OuterWrapper>
+  );
+};

@@ -3,11 +3,14 @@ import '@babel/polyfill';
 // @ts-ignore
 import regeneratorRuntime from '@babel/runtime/regenerator';
 import { TrackJS } from '@neo-one/react-common';
+import { setConfig } from 'react-hot-loader';
 // @ts-ignore
 import './Modernizr';
 
 import '../static/css/app.css';
-import '../static/css/fonts.css';
+
+// tslint:disable-next-line no-any
+setConfig({ pureSFC: true } as any);
 
 // tslint:disable-next-line no-any no-object-mutation
 (global as any).regeneratorRuntime = regeneratorRuntime;

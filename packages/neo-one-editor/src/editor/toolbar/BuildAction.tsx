@@ -1,51 +1,50 @@
 // tslint:disable no-null-keyword
-import { EffectMap } from 'constate';
 import * as React from 'react';
 import { MdBuild } from 'react-icons/md';
 import { connect } from 'react-redux';
-import { MainEngine } from '../../engine/main';
+import { EditorContext } from '../../EditorContext';
 import { openConsole } from '../redux';
-import { ActionButton } from './ActionButton';
+import { ActionButtonBase } from './ActionButtonBase';
 
-interface State {
-  readonly loading: boolean;
-}
-
-interface Effects {
-  readonly onClick: () => void;
-}
-
-const createMakeEffects = (openConsoleOutput: () => void) => (engine: MainEngine): EffectMap<State, Effects> => ({
-  onClick: () => ({ setState }) => {
-    openConsoleOutput();
-    setState({ loading: true });
-
-    engine
-      .build()
-      .then(() => {
-        setState({ loading: false });
-      })
-      .catch((error) => {
-        setState({ loading: false });
-        // tslint:disable-next-line no-console
-        console.error(error);
-      });
-  },
-});
+const { useContext, useCallback, useState } = React;
 
 interface Props {
   readonly openConsoleOutput: () => void;
 }
 
-const BuildActionBase = ({ openConsoleOutput, ...props }: Props) => (
-  <ActionButton
-    {...props}
-    data-test="build"
-    icon={<MdBuild />}
-    text="Build"
-    makeEffects={createMakeEffects(openConsoleOutput)}
-  />
-);
+const BuildActionBase = ({ openConsoleOutput, ...props }: Props) => {
+  const { engine } = useContext(EditorContext);
+  const [loading, setLoading] = useState(false);
+  const onClick = useCallback(
+    () => {
+      openConsoleOutput();
+      setLoading(true);
+
+      engine
+        .build()
+        .then(() => {
+          setLoading(false);
+        })
+        .catch((error) => {
+          setLoading(false);
+          // tslint:disable-next-line no-console
+          console.error(error);
+        });
+    },
+    [setLoading, openConsoleOutput, engine],
+  );
+
+  return (
+    <ActionButtonBase
+      {...props}
+      loading={loading}
+      onClick={onClick}
+      data-test="build"
+      icon={<MdBuild />}
+      text="Build"
+    />
+  );
+};
 
 export const BuildAction = connect(
   undefined,

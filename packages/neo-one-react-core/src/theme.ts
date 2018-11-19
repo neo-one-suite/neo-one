@@ -1,4 +1,4 @@
-import { css } from 'reakit';
+import { css } from 'styled-components';
 import { prop } from 'styled-tools';
 
 const backup: ReadonlyArray<string> = [

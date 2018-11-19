@@ -1,11 +1,13 @@
+import { Box, ButtonBase } from '@neo-one/react-common';
 import * as React from 'react';
-import { as, Button, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { RouterLink } from '../../RouterLink';
 import { getLessonTo, LessonProgressBar } from '../common';
 import { Lesson } from '../types';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   grid-gap: 8px;
   grid:
     'title' auto
@@ -13,7 +15,7 @@ const Wrapper = styled(Grid)`
     / auto;
 `;
 
-const Title = styled(as(RouterLink)(Button))`
+const Title = styled(ButtonBase.withComponent(RouterLink))`
   width: 100%;
   ${prop('theme.fontStyles.headline')};
   ${prop('theme.fonts.axiformaMedium')};

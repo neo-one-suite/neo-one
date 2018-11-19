@@ -1,7 +1,7 @@
-import { FileIcon } from '@neo-one/react-common';
+import { Box, FileIcon } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdArrowDropDown } from 'react-icons/md';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { FileText } from './FileText';
 import { ProblemCount } from './ProblemCount';
@@ -19,7 +19,8 @@ const Expanded = styled(BaseArrow)`
   transform: translate(6px, 2px) scale(1.5) rotate(-45deg);
 `;
 
-const GridWrapper = styled(Grid)`
+const GridWrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   gap: 4px;
   align-items: start;

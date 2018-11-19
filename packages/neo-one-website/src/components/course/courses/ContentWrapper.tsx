@@ -1,7 +1,9 @@
-import { Grid, styled } from 'reakit';
+import { Box } from '@neo-one/react-common';
+import styled from 'styled-components';
 import { prop, switchProp } from 'styled-tools';
 
-export const ContentWrapper = styled(Grid)<{ readonly bg: string }>`
+export const ContentWrapper = styled(Box)<{ readonly bg: string }>`
+  display: grid;
   /* stylelint-disable-next-line */
   background-color: ${switchProp('bg', {
     light: prop('theme.gray0'),

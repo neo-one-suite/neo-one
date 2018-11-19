@@ -1,22 +1,25 @@
-import { FileTab } from '@neo-one/react-common';
+import { Box, FileTab } from '@neo-one/react-common';
 import * as React from 'react';
-import { Flex, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { PreviewButton } from './PreviewButton';
 import { EditorFile, EditorFiles } from './types';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   grid-gap: 8px;
   justify-content: space-between;
 `;
 
-const FileTabWrapper = styled(Flex)`
+const FileTabWrapper = styled(Box)`
+  display: flex;
   flex: 0 0 auto;
   flex-wrap: nowrap;
   overflow-x: scroll;
 `;
 
-const ActionWrapper = styled(Grid)`
+const ActionWrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   align-items: center;
   padding-right: 8px;

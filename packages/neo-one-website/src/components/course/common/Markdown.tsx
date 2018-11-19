@@ -1,4 +1,4 @@
-import { styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Markdown as MarkdownBase } from '../../../elements';
 

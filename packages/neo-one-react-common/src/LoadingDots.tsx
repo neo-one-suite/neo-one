@@ -1,5 +1,6 @@
+import { Box } from '@neo-one/react-core';
 import * as React from 'react';
-import { Box, keyframes, styled } from 'reakit';
+import styled, { keyframes } from 'styled-components';
 import { prop } from 'styled-tools';
 
 const animation = keyframes`

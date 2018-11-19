@@ -1,6 +1,7 @@
+import { Box, ButtonBase, Hidden, useHidden } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdClose, MdUnfoldMore } from 'react-icons/md';
-import { Box, Button, Grid, Hidden, keyframes, styled } from 'reakit';
+import styled, { keyframes } from 'styled-components';
 import { prop } from 'styled-tools';
 import { SectionData } from '../../types';
 import { SidebarSpacer } from '../common';
@@ -72,7 +73,7 @@ const MobileSidebarWrapper = styled(Box)`
   background-color: ${prop('theme.gray1')};
 `;
 
-const MobileButton = styled(Button)`
+const MobileButton = styled(ButtonBase)`
   position: fixed;
   bottom: 48px;
   right: 24px;
@@ -103,7 +104,8 @@ const MobileButton = styled(Button)`
   }
 `;
 
-const IconWrapper = styled(Grid)`
+const IconWrapper = styled(Box)`
+  display: grid;
   width: 100%;
   height: 100%;
   justify-items: center;
@@ -121,28 +123,27 @@ interface Props {
   readonly sections: ReadonlyArray<SectionData>;
 }
 
-export const Sidebar = ({ current, alwaysVisible, sections, ...props }: Props) => (
-  <Wrapper {...props}>
-    <SidebarSpacer>
-      <DesktopSidebarWrapper>
-        <SidebarList current={current} alwaysVisible={alwaysVisible} sections={sections} />
-      </DesktopSidebarWrapper>
-    </SidebarSpacer>
-    <MobileWrapper>
-      <Hidden.Container>
-        {({ visible, hide, toggle }) => (
-          <>
-            <StyledHidden visible={visible} animated unmount>
-              <MobileSidebarWrapper>
-                <SidebarList current={current} alwaysVisible sections={sections} onClickLink={hide} />
-              </MobileSidebarWrapper>
-            </StyledHidden>
-            <MobileButton onClick={toggle}>
-              <IconWrapper>{visible ? <MdClose /> : <MdUnfoldMore />}</IconWrapper>
-            </MobileButton>
-          </>
-        )}
-      </Hidden.Container>
-    </MobileWrapper>
-  </Wrapper>
-);
+export const Sidebar = ({ current, alwaysVisible, sections, ...props }: Props) => {
+  // tslint:disable-next-line:no-unused
+  const [visible, show, hide, toggle] = useHidden();
+
+  return (
+    <Wrapper {...props}>
+      <SidebarSpacer>
+        <DesktopSidebarWrapper>
+          <SidebarList current={current} alwaysVisible={alwaysVisible} sections={sections} />
+        </DesktopSidebarWrapper>
+      </SidebarSpacer>
+      <MobileWrapper>
+        <StyledHidden visible={visible} animated unmount>
+          <MobileSidebarWrapper>
+            <SidebarList current={current} alwaysVisible sections={sections} onClickLink={hide} />
+          </MobileSidebarWrapper>
+        </StyledHidden>
+        <MobileButton onClick={toggle}>
+          <IconWrapper>{visible ? <MdClose /> : <MdUnfoldMore />}</IconWrapper>
+        </MobileButton>
+      </MobileWrapper>
+    </Wrapper>
+  );
+};

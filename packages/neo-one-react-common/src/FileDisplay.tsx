@@ -1,10 +1,12 @@
+import { Box } from '@neo-one/react-core';
 import * as nodePath from 'path';
 import * as React from 'react';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { FileIcon } from './FileIcon';
 import { File } from './types';
 
-const GridWrapper = styled(Grid)`
+const GridWrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   gap: 4px;
   align-items: start;

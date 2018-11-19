@@ -1,6 +1,6 @@
-import { Link } from '@neo-one/react-common';
+import { Box, Link } from '@neo-one/react-common';
 import * as React from 'react';
-import { as, Box, styled } from 'reakit';
+import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 import { AdjacentInfo } from '../../types';
 import { RouterLink } from '../RouterLink';
@@ -18,7 +18,7 @@ const ArticleText = styled(Box)<{ readonly next: boolean }>`
   padding-bottom: 8px;
 `;
 
-const StyledLink = styled(as(RouterLink)(Link))`
+const StyledLink = styled(Link.withComponent(RouterLink))`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.display1')};
 

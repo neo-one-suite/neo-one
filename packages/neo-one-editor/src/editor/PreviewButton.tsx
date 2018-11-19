@@ -1,16 +1,18 @@
 // tslint:disable no-null-keyword
+import { Box, ButtonBase } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdOpenInBrowser } from 'react-icons/md';
 import { connect } from 'react-redux';
-import { Button, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 import { closePreview, EditorState, openPreview, selectPreviewEnabled, selectPreviewOpen } from './redux';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   place-items: center;
 `;
 
-const StyledButton = styled(Button)<{ readonly open: boolean }>`
+const StyledButton = styled(ButtonBase)<{ readonly open: boolean }>`
   color: ${ifProp('open', prop('theme.gray0'), prop('theme.gray3'))};
   cursor: pointer;
   outline: none;

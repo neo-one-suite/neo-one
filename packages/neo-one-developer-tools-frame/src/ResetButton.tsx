@@ -1,56 +1,48 @@
-import { FromStream } from '@neo-one/react';
 import * as React from 'react';
 import { MdRefresh } from 'react-icons/md';
-import { BehaviorSubject } from 'rxjs';
-import { WithNetworkClient } from './DeveloperToolsContext';
+import { useNetworkClients } from './DeveloperToolsContext';
+import { useAddError } from './ToastsContext';
 import { ToolbarButton } from './ToolbarButton';
-import { WithAddError } from './WithAddError';
+
+const { useState, useCallback } = React;
 
 export function ResetButton() {
-  const disabled$ = new BehaviorSubject(false);
+  const [disabled, setDisabled] = useState(false);
+  const addError = useAddError();
+  const { client, localClient } = useNetworkClients();
+  const onClick = useCallback(
+    () => {
+      if (localClient !== undefined) {
+        setDisabled(true);
+        localClient
+          .reset()
+          .then(() => {
+            client.reset();
+            setDisabled(false);
+          })
+          .catch((error) => {
+            addError(error);
+            setDisabled(false);
+          });
+      }
+    },
+    [client, localClient, setDisabled],
+  );
+
+  if (localClient === undefined) {
+    // tslint:disable-next-line:no-null-keyword
+    return null;
+  }
 
   return (
-    <WithAddError>
-      {(addError) => (
-        <WithNetworkClient>
-          {({ client, localClient }) => (
-            <FromStream props={[disabled$]} createStream={() => disabled$}>
-              {(disabled) => {
-                if (localClient === undefined) {
-                  // tslint:disable-next-line no-null-keyword
-                  return null;
-                }
-
-                const onClick = () => {
-                  disabled$.next(true);
-                  localClient
-                    .reset()
-                    .then(() => {
-                      client.reset();
-                      disabled$.next(false);
-                    })
-                    .catch((error) => {
-                      addError(error);
-                      disabled$.next(false);
-                    });
-                };
-
-                return (
-                  <ToolbarButton
-                    data-test-button="neo-one-reset-button"
-                    data-test-tooltip="neo-one-reset-tooltip"
-                    help="Reset Network"
-                    onClick={onClick}
-                    disabled={disabled}
-                  >
-                    <MdRefresh />
-                  </ToolbarButton>
-                );
-              }}
-            </FromStream>
-          )}
-        </WithNetworkClient>
-      )}
-    </WithAddError>
+    <ToolbarButton
+      data-test-button="neo-one-reset-button"
+      data-test-tooltip="neo-one-reset-tooltip"
+      help="Reset Network"
+      onClick={onClick}
+      disabled={disabled}
+    >
+      <MdRefresh />
+    </ToolbarButton>
   );
 }

@@ -1,12 +1,12 @@
 // tslint:disable no-any
-import { Link, Logo } from '@neo-one/react-common';
+import { Box, Link, LinkBase, Logo, Toolbar, ToolbarContent, ToolbarFocusable, use } from '@neo-one/react-common';
 import * as React from 'react';
-import { as, Flex, styled, Toolbar } from 'reakit';
+import styled from 'styled-components';
 import { ifProp, prop, withProp } from 'styled-tools';
-import { ComponentProps } from '../types';
 import { RouterLink } from './RouterLink';
 
-const Wrapper = styled(Flex)`
+const Wrapper = styled(Box)`
+  display: flex;
   width: 100%;
   justify-content: center;
   background-color: ${prop('theme.primary')};
@@ -26,7 +26,7 @@ const StyledToolbar = styled(Toolbar)`
     overflow-x: scroll;
   }
 
-  ${/* sc-sel */ Toolbar.Focusable as any} {
+  ${/* sc-sel */ ToolbarFocusable} {
     outline: none;
   }
 
@@ -35,7 +35,7 @@ const StyledToolbar = styled(Toolbar)`
   }
 `;
 
-const FocusableRouterLink = as(Link as any)(as(RouterLink)(Toolbar.Focusable));
+const FocusableRouterLink = use(ToolbarFocusable, RouterLink, LinkBase);
 
 const LogoLink = styled(FocusableRouterLink)`
   display: block;
@@ -74,7 +74,7 @@ const NavigationLink: any = styled(FocusableRouterLink)<{ readonly active: boole
   }
 `;
 
-const FocusableLink: any = as(Link as any)(Toolbar.Focusable);
+const FocusableLink: any = ToolbarFocusable.withComponent(Link);
 
 const GitHubLink = styled(FocusableLink)`
   @media (max-width: ${prop('theme.breakpoints.sm')}) {
@@ -88,7 +88,7 @@ const CourseLink = styled(NavigationLink)`
   }
 `;
 
-const LeftHeader = styled(Toolbar.Content)`
+const LeftHeader = styled(ToolbarContent)`
   grid-gap: 32px;
 
   @media (max-width: ${prop('theme.breakpoints.md')}) {
@@ -100,11 +100,11 @@ interface Props {
   readonly path: string;
 }
 
-export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper>) => (
+export const Header = ({ path, ...props }: Props & React.ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledToolbar>
       <LeftHeader>
-        <LogoLink data-test="header-logo" to="/">
+        <LogoLink linkColor="gray" data-test="header-logo" to="/">
           <Logo />
         </LogoLink>
         <NavigationLink linkColor="gray" active={path === 'docs'} data-test="header-docs" to="/docs/getting-started">
@@ -120,7 +120,7 @@ export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper
           Blog
         </NavigationLink>
       </LeftHeader>
-      <Toolbar.Content align="end">
+      <ToolbarContent align="end">
         <GitHubLink
           linkColor="gray"
           data-test="header-github"
@@ -129,7 +129,7 @@ export const Header = ({ path, ...props }: Props & ComponentProps<typeof Wrapper
         >
           GitHub
         </GitHubLink>
-      </Toolbar.Content>
+      </ToolbarContent>
     </StyledToolbar>
   </Wrapper>
 );

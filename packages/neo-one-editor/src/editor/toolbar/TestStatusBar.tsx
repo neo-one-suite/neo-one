@@ -1,8 +1,10 @@
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
-const Wrapper = styled(Grid)<Props>`
+const Wrapper = styled(Box)<Props>`
+  display: grid;
   grid-gap: 4px;
   grid:
     'fail pass skip' auto

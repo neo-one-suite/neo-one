@@ -1,5 +1,6 @@
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, styled } from 'reakit';
+import styled from 'styled-components';
 import { Lesson } from '../types';
 import { LessonItem } from './LessonItem';
 

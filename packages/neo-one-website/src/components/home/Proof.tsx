@@ -1,8 +1,10 @@
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   margin-left: 8px;
   margin-right: 24px;
   grid-gap: 16px;

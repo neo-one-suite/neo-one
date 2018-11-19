@@ -1,6 +1,7 @@
+import { ButtonBase } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdExpandLess, MdExpandMore } from 'react-icons/md';
-import { Button, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
 interface Props {
@@ -9,7 +10,7 @@ interface Props {
   readonly toggle?: () => void;
 }
 
-const SectionButton = styled(Button)`
+const SectionButton = styled(ButtonBase)`
   ${prop('theme.fonts.axiformaBold')};
   ${prop('theme.fontStyles.subheading')};
   line-height: 3;

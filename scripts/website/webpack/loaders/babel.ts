@@ -15,6 +15,7 @@ export const babel = ({
 }) => {
   const config = {
     configFile: false,
+    babelrc: false,
     presets: [
       '@babel/preset-react',
       [
@@ -36,7 +37,7 @@ export const babel = ({
         },
       ],
       stage === 'dev'
-        ? 'react-hot-loader/babel'
+        ? undefined
         : bundle === 'react-static' || bundle === 'preview'
         ? 'babel-plugin-universal-import'
         : undefined,

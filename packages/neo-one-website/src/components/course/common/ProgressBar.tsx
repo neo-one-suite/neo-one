@@ -1,6 +1,6 @@
-import { pure, Tooltip, TooltipArrow } from '@neo-one/react-common';
+import { Box, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
-import { as, Block, Box, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop, switchProp } from 'styled-tools';
 import { RouterLink } from '../../RouterLink';
 
@@ -26,10 +26,22 @@ const SegmentBase = styled(Box)<{ readonly bg: 'current' | 'complete' | 'incompl
   display: block;
 `;
 
-const Segment = as(RouterLink)(SegmentBase);
+const Segment = SegmentBase.withComponent(RouterLink);
+
+const RelativeBlock = styled(Box)`
+  display: block;
+  position: relative;
+`;
 
 const StyledTooltip = styled(Tooltip)`
   white-space: nowrap;
+`;
+
+const Wrapper = styled(Box)`
+  display: grid;
+  grid-auto-flow: column;
+  gap: 4px;
+  height: 8px;
 `;
 
 interface ProgressItemProps {
@@ -39,28 +51,28 @@ interface ProgressItemProps {
   readonly item: Item;
 }
 
-const ProgressItemTooltip = pure(({ title }: { readonly title: string }) => (
+const ProgressItemTooltip = React.memo(({ title }: { readonly title: string }) => (
   <StyledTooltip placement="bottom">
     <TooltipArrow />
     {title}
   </StyledTooltip>
 ));
 
-const ProgressItem = pure(({ idx, items, item, isCurrent }: ProgressItemProps) => (
-  <Block relative>
+const ProgressItem = React.memo(({ idx, items, item, isCurrent }: ProgressItemProps) => (
+  <RelativeBlock>
     {isCurrent || item.complete || idx === 0 || items[idx - 1].complete ? (
       <Segment to={item.to} key={idx} bg={isCurrent ? 'current' : item.complete ? 'complete' : 'incomplete'} />
     ) : (
       <SegmentBase key={idx} bg="incomplete" />
     )}
     <ProgressItemTooltip title={item.title} />
-  </Block>
+  </RelativeBlock>
 ));
 
 export const ProgressBar = ({ current, items }: Props) => (
-  <Grid column gap={4} height="8px">
+  <Wrapper>
     {items.map((item, idx) => (
       <ProgressItem key={idx} idx={idx} item={item} isCurrent={idx === current} items={items} />
     ))}
-  </Grid>
+  </Wrapper>
 );

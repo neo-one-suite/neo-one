@@ -1,6 +1,6 @@
-import { Link } from '@neo-one/react-common';
+import { Box, Link, List } from '@neo-one/react-common';
 import * as React from 'react';
-import { as, Box, List, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Author } from '../content';
 import { RouterLink } from '../RouterLink';
@@ -12,7 +12,7 @@ interface Props {
   readonly author: Author;
 }
 
-const StyledLink = styled(as(RouterLink)(Link))`
+const StyledLink = styled(Link.withComponent(RouterLink))`
   ${prop('theme.fontStyles.headline')};
 `;
 

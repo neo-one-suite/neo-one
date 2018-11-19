@@ -1,6 +1,7 @@
 // tslint:disable no-any
+import { Input } from '@neo-one/react-core';
 import * as React from 'react';
-import { Input, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
 const StyledInput = styled(Input)`
@@ -18,7 +19,7 @@ interface Props {
 }
 
 export const Selector = ({ options, selected, onChange, ...props }: Props) => (
-  <StyledInput {...props} as="select" value={selected} onChange={(event) => onChange((event.target as any).value)}>
+  <StyledInput {...props} as="select" value={selected} onChange={(event) => onChange(event.target.value)}>
     {options.map((option) => (
       <option key={option}>{option}</option>
     ))}

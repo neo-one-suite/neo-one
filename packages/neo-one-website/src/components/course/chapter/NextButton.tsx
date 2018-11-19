@@ -2,7 +2,6 @@
 import { Button } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { as } from 'reakit';
 import { RouterLink } from '../../RouterLink';
 import { getChapterTo, getLessonTo } from '../common';
 import { selectCourse, selectLesson } from '../coursesData';
@@ -27,7 +26,7 @@ const getNextLesson = (selected: SelectedChapter) => {
   return course.lessons[selected.lesson + 1] as Lesson | undefined;
 };
 
-const ButtonLink = as(RouterLink)(Button);
+const ButtonLink = Button.withComponent(RouterLink);
 
 const NextButtonBase = ({ selected, onClick, complete, ...props }: Props) => {
   const nextChapter = getNextChapter(selected);

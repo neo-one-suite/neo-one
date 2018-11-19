@@ -1,12 +1,13 @@
 // tslint:disable no-any
-import { FromStream } from '@neo-one/react';
+import { UserAccount } from '@neo-one/client-common';
+import { Label, useStream } from '@neo-one/react-common';
 import * as React from 'react';
-import { Label, styled } from 'reakit';
-import { DeveloperToolsContext, DeveloperToolsContextType, WithTokens } from './DeveloperToolsContext';
-import { TransferContainer } from './TransferContainer';
-import { ComponentProps } from './types';
+import styled from 'styled-components';
+import { DeveloperToolsContext, useTokens } from './DeveloperToolsContext';
+import { useAddError } from './ToastsContext';
 import { getWalletSelectorOptions$, makeWalletSelectorValueOption, WalletSelectorBase } from './WalletSelectorBase';
-import { WithAddError } from './WithAddError';
+
+const { useContext } = React;
 
 const Wrapper = styled(Label)`
   border-top: 1px solid rgba(0, 0, 0, 0.3);
@@ -20,48 +21,41 @@ const Wrapper = styled(Label)`
   align-items: center;
 `;
 
-export function TransferTo(props: ComponentProps<typeof Wrapper>) {
+interface Props {
+  readonly to: ReadonlyArray<UserAccount>;
+  readonly onChangeTo: (value: ReadonlyArray<UserAccount>) => void;
+}
+
+export function TransferTo({ to, onChangeTo, ...props }: Props & React.ComponentProps<typeof Wrapper>) {
+  const addError = useAddError();
+  const [tokens] = useTokens();
+  const { client, userAccounts$, block$ } = useContext(DeveloperToolsContext);
+  const options = useStream(() => getWalletSelectorOptions$(addError, client, userAccounts$, block$, tokens), [
+    addError,
+    client,
+    userAccounts$,
+    block$,
+    tokens,
+  ]);
+
   return (
-    <WithAddError>
-      {(addError) => (
-        <WithTokens>
-          {(tokens$) => (
-            <DeveloperToolsContext.Consumer>
-              {({ client, userAccounts$, block$ }: DeveloperToolsContextType) => (
-                <Wrapper {...props}>
-                  Transfer To
-                  <TransferContainer>
-                    {({ to, onChangeTo }) => (
-                      <FromStream
-                        props={[addError, client, tokens$]}
-                        createStream={() => getWalletSelectorOptions$(addError, client, userAccounts$, block$, tokens$)}
-                      >
-                        {(options) => (
-                          <WalletSelectorBase
-                            data-test="neo-one-transfer-to-selector"
-                            value={to.map((userAccount) => makeWalletSelectorValueOption({ userAccount }))}
-                            options={options}
-                            onChange={(option: any) => {
-                              if (option != undefined) {
-                                if (Array.isArray(option)) {
-                                  onChangeTo(option.map(({ userAccount }) => userAccount));
-                                } else {
-                                  onChangeTo([option.userAccount]);
-                                }
-                              }
-                            }}
-                            isMulti
-                          />
-                        )}
-                      </FromStream>
-                    )}
-                  </TransferContainer>
-                </Wrapper>
-              )}
-            </DeveloperToolsContext.Consumer>
-          )}
-        </WithTokens>
-      )}
-    </WithAddError>
+    <Wrapper {...props}>
+      Transfer To
+      <WalletSelectorBase
+        data-test="neo-one-transfer-to-selector"
+        value={to.map((userAccount) => makeWalletSelectorValueOption({ userAccount }))}
+        options={options}
+        onChange={(option: any) => {
+          if (option != undefined) {
+            if (Array.isArray(option)) {
+              onChangeTo(option.map(({ userAccount }) => userAccount));
+            } else {
+              onChangeTo([option.userAccount]);
+            }
+          }
+        }}
+        isMulti
+      />
+    </Wrapper>
   );
 }

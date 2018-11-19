@@ -1,19 +1,20 @@
 // tslint:disable no-any
-import { Link } from '@neo-one/react-common';
-import { ActionMap, Container } from 'constate';
+import { Box, ButtonBase as ButtonBaseBase, Input, Link, LinkBase } from '@neo-one/react-common';
 import * as React from 'react';
 import { FaTwitter } from 'react-icons/fa';
 import { IoMdHappy, IoMdSad } from 'react-icons/io';
-import { as, Box, Button, Grid, Input, Link as LinkBase, styled } from 'reakit';
+import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 import { ToolbarPopover } from './ToolbarPopover';
+
+const { useState, useCallback } = React;
 
 const HappyToolbarButton = styled(IoMdHappy)`
   width: 16px;
   height: 16px;
 `;
 
-const ButtonBase = styled(Button)<{ readonly selected: boolean }>`
+const ButtonBase = styled(ButtonBaseBase)<{ readonly selected: boolean }>`
   border: 1px solid ${ifProp('selected', prop('theme.accent'), 'transparent')};
   color: ${prop('theme.gray0')};
   width: 32px;
@@ -22,8 +23,8 @@ const ButtonBase = styled(Button)<{ readonly selected: boolean }>`
   outline: none;
 `;
 
-const HappyButton = as(IoMdHappy)(ButtonBase);
-const SadButton = as(IoMdSad)(ButtonBase);
+const HappyButton = ButtonBase.withComponent(IoMdHappy);
+const SadButton = ButtonBase.withComponent(IoMdSad);
 
 const Text = styled(Box)`
   color: ${prop('theme.gray0')};
@@ -31,12 +32,14 @@ const Text = styled(Box)`
   ${prop('theme.fontStyles.subheading')};
 `;
 
-const ButtonWrapper = styled(Grid)`
+const ButtonWrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   justify-content: start;
 `;
 
-const RowWrapper = styled(Grid)`
+const RowWrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: row;
   grid-auto-rows: auto;
 `;
@@ -70,7 +73,8 @@ const InputBox = styled(Input)`
   resize: none;
 `;
 
-const ColumnWrapper = styled(Grid)`
+const ColumnWrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   grid-auto-columns: auto;
 `;
@@ -79,7 +83,8 @@ const TweetWrapper = styled(ColumnWrapper)`
   justify-content: end;
 `;
 
-const TweetButtonWrapper = styled(as(LinkBase)(Grid))`
+const TweetButtonWrapper = styled(LinkBase)`
+  display: grid;
   padding: 8px;
   grid-auto-flow: column;
   grid-auto-columns: auto;
@@ -97,68 +102,57 @@ const Twitter = styled(FaTwitter)`
   height: 16px;
 `;
 
-interface State {
-  readonly text: string;
-  readonly happy: boolean;
-}
+export const Feedback = (props: {}) => {
+  const [happy, setHappy] = useState(true);
+  const [text, setText] = useState('');
+  const onClickHappy = useCallback(() => setHappy(true), [setHappy]);
+  const onClickSad = useCallback(() => setHappy(false), [setHappy]);
+  const onChangeText = useCallback((event: React.ChangeEvent<HTMLInputElement>) => setText(event.currentTarget.value), [
+    setText,
+  ]);
 
-interface Actions {
-  readonly onClickHappy: () => void;
-  readonly onClickSad: () => void;
-  readonly onChangeText: (text: string) => void;
-}
-
-const actions: ActionMap<State, Actions> = {
-  onClickHappy: () => () => ({ happy: true }),
-  onClickSad: () => () => ({ happy: false }),
-  onChangeText: (text: string) => () => ({ text }),
+  return (
+    <ToolbarPopover
+      {...props}
+      title="Tweet us your feedback."
+      button={<HappyToolbarButton />}
+      content={
+        <Wrapper>
+          <ColumnWrapper>
+            <ExperienceWrapper>
+              <Text>How was your experience?</Text>
+              <ButtonWrapper>
+                <HappyButton onClick={onClickHappy} selected={happy} />
+                <SadButton onClick={onClickSad} selected={!happy} />
+              </ButtonWrapper>
+            </ExperienceWrapper>
+            <ContactWrapper>
+              <Text>Other ways to contact us</Text>
+              <Link linkColor="primary" href="https://github.com/neo-one-suite/neo-one/issues/new" target="_blank">
+                Submit a bug
+              </Link>
+              <Link linkColor="primary" href="https://github.com/neo-one-suite/neo-one/issues" target="_blank">
+                Request a missing feature
+              </Link>
+            </ContactWrapper>
+          </ColumnWrapper>
+          <BottomWrapper>
+            <Text>Tell us why? ({257 - text.length} characters left)</Text>
+            <InputBox as="textarea" value={text} onChange={onChangeText} />
+            <TweetWrapper>
+              <TweetButtonWrapper
+                href={`https://twitter.com/intent/tweet?hashtags=NEO&ref_src=twsrc%5Etfw&related=twitterapi%2Ctwitter&text=${encodeURIComponent(
+                  text,
+                )}&tw_p=tweetbutton&via=neo_one_suite`}
+                target="_blank"
+              >
+                <Twitter />
+                Tweet
+              </TweetButtonWrapper>
+            </TweetWrapper>
+          </BottomWrapper>
+        </Wrapper>
+      }
+    />
+  );
 };
-
-export const Feedback = (props: {}) => (
-  <ToolbarPopover
-    {...props}
-    title="Tweet us your feedback."
-    button={<HappyToolbarButton />}
-    content={
-      <Container initialState={{ happy: true, text: '' }} actions={actions}>
-        {({ happy, text, onClickHappy, onClickSad, onChangeText }) => (
-          <Wrapper>
-            <ColumnWrapper>
-              <ExperienceWrapper>
-                <Text>How was your experience?</Text>
-                <ButtonWrapper>
-                  <HappyButton onClick={onClickHappy} selected={happy} />
-                  <SadButton onClick={onClickSad} selected={!happy} />
-                </ButtonWrapper>
-              </ExperienceWrapper>
-              <ContactWrapper>
-                <Text>Other ways to contact us</Text>
-                <Link linkColor="primary" href="https://github.com/neo-one-suite/neo-one/issues/new" target="_blank">
-                  Submit a bug
-                </Link>
-                <Link linkColor="primary" href="https://github.com/neo-one-suite/neo-one/issues" target="_blank">
-                  Request a missing feature
-                </Link>
-              </ContactWrapper>
-            </ColumnWrapper>
-            <BottomWrapper>
-              <Text>Tell us why? ({257 - text.length} characters left)</Text>
-              <InputBox as="textarea" value={text} onChange={(element: any) => onChangeText(element.target.value)} />
-              <TweetWrapper>
-                <TweetButtonWrapper
-                  href={`https://twitter.com/intent/tweet?hashtags=NEO&ref_src=twsrc%5Etfw&related=twitterapi%2Ctwitter&text=${encodeURIComponent(
-                    text,
-                  )}&tw_p=tweetbutton&via=neo_one_suite`}
-                  target="_blank"
-                >
-                  <Twitter />
-                  Tweet
-                </TweetButtonWrapper>
-              </TweetWrapper>
-            </BottomWrapper>
-          </Wrapper>
-        )}
-      </Container>
-    }
-  />
-);

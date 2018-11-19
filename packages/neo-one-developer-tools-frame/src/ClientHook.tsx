@@ -1,13 +1,10 @@
 import { Client, DeveloperClient } from '@neo-one/client-core';
-import { FromStream } from '@neo-one/react';
 import { Link } from '@neo-one/react-common';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
-import { combineLatest } from 'rxjs';
-import { WithAutoConsensus, WithAutoSystemFee, WithNetworkClient } from './DeveloperToolsContext';
-import { AddToast, WithAddToast } from './ToastsContainer';
-import { AddError, WithAddError } from './WithAddError';
-import { WithNEOTrackerURL } from './WithNEOTrackerURL';
+import { useAutoConsensus, useAutoSystemFee, useNetworkClients } from './DeveloperToolsContext';
+import { AddError, AddToast, useAddError, useToasts } from './ToastsContext';
+import { useNEOTrackerURL } from './useNEOTrackerURL';
 
 const mutableHookers = new Map<Client, Hooker>();
 
@@ -109,47 +106,22 @@ class Hooker {
 }
 
 export function ClientHook() {
-  return (
-    <WithAddToast>
-      {(addToast) => (
-        <WithAddError>
-          {(addError) => (
-            <WithNetworkClient>
-              {({ client, developerClient }) => (
-                <WithNEOTrackerURL>
-                  {(neotrackerURL) => (
-                    <WithAutoConsensus>
-                      {({ autoConsensus$ }) => (
-                        <WithAutoSystemFee>
-                          {({ autoSystemFee$ }) => (
-                            <FromStream
-                              props={[autoConsensus$, autoSystemFee$]}
-                              createStream={() => combineLatest(autoConsensus$, autoSystemFee$)}
-                            >
-                              {([autoConsensus, autoSystemFee]: [boolean, boolean]) => {
-                                const mutableHooker = Hooker.get(client);
-                                mutableHooker.autoConsensus = autoConsensus;
-                                mutableHooker.autoSystemFee = autoSystemFee;
-                                mutableHooker.developerClient = developerClient;
-                                mutableHooker.addToast = addToast;
-                                mutableHooker.neotrackerURL = neotrackerURL;
-                                mutableHooker.addError = addError;
+  // tslint:disable-next-line:no-unused
+  const [toasts, addToast] = useToasts();
+  const addError = useAddError();
+  const { client, developerClient } = useNetworkClients();
+  const neotrackerURL = useNEOTrackerURL();
+  const [autoConsensus] = useAutoConsensus();
+  const [autoSystemFee] = useAutoSystemFee();
 
-                                // tslint:disable-next-line no-null-keyword
-                                return null;
-                              }}
-                            </FromStream>
-                          )}
-                        </WithAutoSystemFee>
-                      )}
-                    </WithAutoConsensus>
-                  )}
-                </WithNEOTrackerURL>
-              )}
-            </WithNetworkClient>
-          )}
-        </WithAddError>
-      )}
-    </WithAddToast>
-  );
+  const mutableHooker = Hooker.get(client);
+  mutableHooker.autoConsensus = autoConsensus;
+  mutableHooker.autoSystemFee = autoSystemFee;
+  mutableHooker.developerClient = developerClient;
+  mutableHooker.addToast = addToast;
+  mutableHooker.neotrackerURL = neotrackerURL;
+  mutableHooker.addError = addError;
+
+  // tslint:disable-next-line no-null-keyword
+  return null;
 }

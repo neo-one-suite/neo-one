@@ -1,6 +1,6 @@
-import { Link } from '@neo-one/react-common';
+import { Box, Link } from '@neo-one/react-common';
 import * as React from 'react';
-import { as, Box, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { LayoutWrapper } from './common';
 import { RouterLink } from './RouterLink';
@@ -11,11 +11,12 @@ const LinkSectionTitle = styled(Box)`
   color: ${prop('theme.gray2')};
 `;
 
-const NavLink = as(RouterLink)(Link);
+const NavLink = Link.withComponent(RouterLink);
 
 const ExternalLink = Link;
 
-const LinkSectionWrapper = styled(Grid)`
+const LinkSectionWrapper = styled(Box)`
+  display: grid;
   grid-gap: 8px;
   align-content: start;
 `;
@@ -31,11 +32,11 @@ const LinkSection = ({
     <LinkSectionTitle>{title}</LinkSectionTitle>
     {Object.entries(links).map(([name, to]) =>
       to.startsWith('/') ? (
-        <NavLink linkColor="light" to={to}>
+        <NavLink key={to} linkColor="light" to={to}>
           {name}
         </NavLink>
       ) : (
-        <ExternalLink linkColor="light" href={to}>
+        <ExternalLink key={to} linkColor="light" href={to}>
           {name}
         </ExternalLink>
       ),
@@ -43,7 +44,8 @@ const LinkSection = ({
   </LinkSectionWrapper>
 );
 
-const FooterWrapper = styled(Grid)`
+const FooterWrapper = styled(Box)`
+  display: grid;
   justify-content: center;
   grid-gap: 64px;
   padding: 64px;
@@ -61,7 +63,8 @@ const Copyright = styled(Box)`
   text-align: center;
 `;
 
-const LinksGrid = styled(Grid)`
+const LinksGrid = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   grid-gap: 64px;
 
@@ -70,7 +73,8 @@ const LinksGrid = styled(Grid)`
   }
 `;
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   background-color: ${prop('theme.black')};
   box-shadow: inset 0 10px 10px -5px rgba(0, 0, 0, 0.2);
   height: 240px;

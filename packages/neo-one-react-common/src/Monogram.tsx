@@ -1,12 +1,12 @@
+import { Image } from '@neo-one/react-core';
 import React from 'react';
-import { Image, styled } from 'reakit';
+import styled from 'styled-components';
 import monogram from '../static/img/monogram.svg';
-import { ComponentProps } from './types';
 
 const StyledImage = styled(Image)`
   height: 56px;
 `;
 
-export const Monogram = (props: ComponentProps<typeof Image>) => (
+export const Monogram = (props: React.ComponentPropsWithoutRef<typeof Image>) => (
   <StyledImage src={monogram} alt="NEO•ONE" {...props} />
 );

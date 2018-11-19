@@ -1,32 +1,37 @@
 // tslint:disable no-null-keyword
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Test } from '../../types';
 import { TestDetailError } from './TestDetailError';
 import { TestIcon } from './TestIcon';
 import { TestText } from './TestText';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   grid-gap: 0;
   grid-auto-flow: row;
   background-color: ${prop('theme.gray5')};
 `;
 
-const NameWrapper = styled(Grid)`
+const NameWrapper = styled(Box)`
+  display: grid;
   grid-gap: 8px;
   grid-auto-flow: column;
   grid-auto-columns: auto;
   justify-content: start;
 `;
 
-const HeaderWrapper = styled(Grid)`
+const HeaderWrapper = styled(Box)`
+  display: grid;
   padding: 8px;
   grid-auto-flow: column;
   justify-items: space-between;
 `;
 
-const DurationWrapper = styled(Grid)`
+const DurationWrapper = styled(Box)`
+  display: grid;
   grid-gap: 8px;
   grid-auto-flow: column;
   grid-auto-columns: auto;

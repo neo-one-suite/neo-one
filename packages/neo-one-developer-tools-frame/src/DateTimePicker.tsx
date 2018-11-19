@@ -1,14 +1,18 @@
 // tslint:disable no-null-keyword
-import { TextInput } from '@neo-one/react-common';
-import { EffectMap } from 'constate';
+import { Box, TextInput } from '@neo-one/react-common';
 import { format, isBefore, parse } from 'date-fns';
 import * as React from 'react';
-import { Box, Container, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
-import { ReactSyntheticEvent } from './types';
+
+const { useState, useCallback } = React;
 
 const ErrorText = styled(Box)`
   color: ${prop('theme.error')};
+`;
+
+const Wrapper = styled(Box)`
+  display: grid;
 `;
 
 interface Props {
@@ -17,15 +21,6 @@ interface Props {
   readonly onChange: (date: Date) => void;
   readonly 'data-test-input': string;
   readonly 'data-test-error': string;
-}
-
-interface State {
-  readonly text: string;
-  readonly error: string | undefined;
-}
-
-interface Effects {
-  readonly onChange: (event: ReactSyntheticEvent) => void;
 }
 
 const FORMAT = 'yyyy/MM/dd hh:mm:ss a';
@@ -38,6 +33,9 @@ export function DateTimePicker({
   onChange,
   ...props
 }: Props) {
+  const [text, setText] = useState(format(initialValue, FORMAT));
+  const [error, setError] = useState<string | undefined>(undefined);
+
   let editingTimeout: number | undefined;
   const clearEditingTimeout = () => {
     if (editingTimeout !== undefined) {
@@ -45,43 +43,35 @@ export function DateTimePicker({
       editingTimeout = undefined;
     }
   };
-
-  const effects: EffectMap<State, Effects> = {
-    onChange: (event) => {
-      const text = event.currentTarget.value;
+  const onChangeInput = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const nextText = event.currentTarget.value;
       clearEditingTimeout();
-
-      return ({ setState }) => {
-        const onError = (error: string) => {
-          editingTimeout = setTimeout(() => {
-            setState({ error });
-            // tslint:disable-next-line no-any
-          }, 2000) as any;
-        };
-
-        setState({ text, error: undefined });
-        const parsedDate = parse(text, FORMAT, new Date());
-        if (Number.isNaN(parsedDate.valueOf())) {
-          onError(`Invalid date. Expected format ${FORMAT}`);
-        } else if (isBefore(parsedDate, minDate)) {
-          onError('Date must be a future point in time after the current block time.');
-        } else {
-          onChange(parsedDate);
-        }
+      const onError = (nextError: string) => {
+        editingTimeout = setTimeout(() => {
+          setError(nextError);
+          // tslint:disable-next-line no-any
+        }, 2000) as any;
       };
+
+      setText(nextText);
+      setError(undefined);
+      const parsedDate = parse(text, FORMAT, new Date());
+      if (Number.isNaN(parsedDate.valueOf())) {
+        onError(`Invalid date. Expected format ${FORMAT}`);
+      } else if (isBefore(parsedDate, minDate)) {
+        onError('Date must be a future point in time after the current block time.');
+      } else {
+        onChange(parsedDate);
+      }
     },
-  };
+    [setText, setError, onChange],
+  );
 
   return (
-    <Grid {...props}>
-      <Container initialState={{ text: format(initialValue, FORMAT), error: undefined }} effects={effects}>
-        {({ text, error, onChange: onChangeInput }) => (
-          <>
-            <TextInput data-test={dataTestInput} value={text} onChange={onChangeInput} />
-            {error === undefined ? null : <ErrorText data-test={dataTestError}>{error}</ErrorText>}
-          </>
-        )}
-      </Container>
-    </Grid>
+    <Wrapper {...props}>
+      <TextInput data-test={dataTestInput} value={text} onChange={onChangeInput} />
+      {error === undefined ? null : <ErrorText data-test={dataTestError}>{error}</ErrorText>}
+    </Wrapper>
   );
 }

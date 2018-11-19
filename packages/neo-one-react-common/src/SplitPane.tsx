@@ -1,30 +1,31 @@
 // tslint:disable no-any
 import * as React from 'react';
 import { DraggableCore, DraggableEventHandler } from 'react-draggable';
-import { styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
-const Wrapper = styled.div.attrs<{ readonly lr: boolean; readonly size: number }>({
-  style: ({ lr, size }: { readonly lr: boolean; readonly size: number }) => {
-    let grid: string;
-    if (lr) {
-      grid = `
+// tslint:disable-next-line no-any
+const Wrapper: any = styled.div.attrs(({ lr, size }: { readonly lr: boolean; readonly size: number }) => {
+  let grid: string;
+  if (lr) {
+    grid = `
           'left resizer right' 1fr
           / calc(${size * 100}% - 1px) 1px calc(${(1 - size) * 100}% - 1px)
       `;
-    } else {
-      grid = `
+  } else {
+    grid = `
         'top' ${size}fr
         'resizer' 1px
         'bottom' ${1 - size}fr
         / 1fr
     `;
-    }
+  }
 
-    return {
+  return {
+    style: {
       grid,
-    };
-  },
+    },
+  };
 })`
   display: grid;
   min-height: 0;
@@ -137,7 +138,7 @@ export class SplitPane extends React.Component<Props, State> {
     }
 
     return (
-      <Wrapper innerRef={this.wrapperRef} lr={lr} size={size} {...props}>
+      <Wrapper ref={this.wrapperRef} lr={lr} size={size} {...props}>
         {first}
         <DraggableCore onStart={this.onStartDrag} onDrag={this.onDrag} onStop={this.onStopDrag}>
           {lr ? <SplitPaneResizerLR /> : <SplitPaneResizerTB />}

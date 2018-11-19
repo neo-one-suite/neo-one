@@ -1,12 +1,13 @@
 // tslint:disable no-null-keyword
-import { Tooltip, TooltipArrow } from '@neo-one/react-common';
+import { Box, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { TestPlayButton } from './TestPlayButton';
 import { TestStatusBar } from './TestStatusBar';
 import { TestFailing, TestPassing, TestTextDark } from './TestText';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   grid-gap: 0;
   align-content: center;
   justify-items: space-between;
@@ -18,7 +19,8 @@ const Wrapper = styled(Grid)`
     / auto auto;
 `;
 
-const StyledGrid = styled(Grid)`
+const StyledGrid = styled(Box)`
+  display: grid;
   grid-gap: 8px;
   grid-auto-flow: column;
   grid-auto-columns: auto;

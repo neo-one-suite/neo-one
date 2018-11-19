@@ -1,10 +1,12 @@
 // tslint:disable no-null-keyword
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { SidebarSpacer } from './SidebarSpacer';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   grid:
     'content' 'sidebar' auto
     / 1fr auto;

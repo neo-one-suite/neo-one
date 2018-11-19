@@ -1,6 +1,6 @@
 import { comlink } from '@neo-one/worker';
 import * as React from 'react';
-import { styled } from 'reakit';
+import styled from 'styled-components';
 import { MainEngine } from '../engine/main';
 
 const StyledIFrame = styled.iframe`
@@ -58,6 +58,6 @@ export class PreviewContent extends React.Component<Props> {
   public render() {
     const { engine, ...props } = this.props;
 
-    return <StyledIFrame innerRef={this.ref} src={engine.createPreviewURL()} {...props} />;
+    return <StyledIFrame ref={this.ref} src={engine.createPreviewURL()} {...props} />;
   }
 }

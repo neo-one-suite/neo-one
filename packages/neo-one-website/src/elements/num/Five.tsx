@@ -1,6 +1,5 @@
+import { Image } from '@neo-one/react-common';
 import * as React from 'react';
-import { Image } from 'reakit';
 import five from '../../../static/img/number5.svg';
-import { ComponentProps } from '../../types';
 
-export const Five = (props: ComponentProps<typeof Image>) => <Image src={five} alt="05" {...props} />;
+export const Five = (props: React.ComponentProps<typeof Image>) => <Image src={five} alt="05" {...props} />;

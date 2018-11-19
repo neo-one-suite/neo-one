@@ -1,8 +1,9 @@
 // tslint:disable no-null-keyword
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdClose, MdDeleteSweep } from 'react-icons/md';
 import { connect } from 'react-redux';
-import { css, Grid, styled } from 'reakit';
+import styled, { css } from 'styled-components';
 import {
   clearConsole,
   EditorState,
@@ -19,7 +20,8 @@ import { ConsoleSelector } from './ConsoleSelector';
 import { ConsoleTab } from './ConsoleTab';
 import { ProblemCount } from './ProblemCount';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   justify-content: space-between;
   gap: 8px;
   grid:
@@ -27,14 +29,16 @@ const Wrapper = styled(Grid)`
     / auto auto;
 `;
 
-const TabsWrapper = styled(Grid)`
+const TabsWrapper = styled(Box)`
+  display: grid;
   padding-left: 8px;
   gap: 0;
   grid-auto-flow: column;
   align-items: center;
 `;
 
-const ButtonsWrapper = styled(Grid)`
+const ButtonsWrapper = styled(Box)`
+  display: grid;
   gap: 0;
   grid-auto-flow: column;
   align-items: center;

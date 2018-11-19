@@ -1,12 +1,14 @@
-import { FileTab } from '@neo-one/react-common';
-import { ActionMap, Container } from 'constate';
+import { Box, FileTab } from '@neo-one/react-common';
 import * as React from 'react';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { Markdown } from '../common';
 import { selectChapter } from '../coursesData';
-import { ChapterFile, SelectedChapter } from '../types';
+import { SelectedChapter } from '../types';
 
-const Wrapper = styled(Grid)`
+const { useState } = React;
+
+const Wrapper = styled(Box)`
+  display: grid;
   grid:
     'header' auto
     'solution' 1fr
@@ -17,7 +19,8 @@ const Wrapper = styled(Grid)`
   width: 100%;
 `;
 
-const HeaderWrapper = styled(Grid)`
+const HeaderWrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   grid-auto-columns: auto;
   grid-gap: 0;
@@ -38,53 +41,36 @@ const StyledMarkdown = styled(Markdown)`
 const getFiles = (selected: SelectedChapter) =>
   selectChapter(selected).files.filter((file) => file.initial !== undefined);
 
-interface State {
-  readonly selectedFilePath: string;
-}
-
-interface Actions {
-  readonly onSelectFile: (file: ChapterFile) => void;
-}
-
-const actions: ActionMap<State, Actions> = {
-  onSelectFile: (file: ChapterFile) => () => ({
-    selectedFilePath: file.path,
-  }),
-};
-
 interface Props {
   readonly selected: SelectedChapter;
 }
 
-export const DocsSolution = ({ selected, ...props }: Props) => (
-  <Container initialState={{ selectedFilePath: getFiles(selected)[0].path }} actions={actions}>
-    {({ selectedFilePath, onSelectFile }) => {
-      const foundFile = getFiles(selected).find((file) => file.path === selectedFilePath);
-      if (foundFile === undefined) {
-        onSelectFile(getFiles(selected)[0]);
-      }
+export const DocsSolution = ({ selected, ...props }: Props) => {
+  const [selectedFilePath, setSelectedFilePath] = useState(getFiles(selected)[0].path);
+  const foundFile = getFiles(selected).find((file) => file.path === selectedFilePath);
+  if (foundFile === undefined) {
+    setSelectedFilePath(getFiles(selected)[0].path);
+  }
 
-      return (
-        <Wrapper {...props}>
-          <HeaderWrapper>
-            {getFiles(selected).map((file, idx) => (
-              <FileTab
-                key={file.path}
-                data-test={`docs-solution-file-tab-${file.path}`}
-                first={idx === 0}
-                selected={file.path === selectedFilePath}
-                file={{ path: file.path, writable: false }}
-                onClick={() => onSelectFile(file)}
-                omitReadOnly
-              />
-            ))}
-          </HeaderWrapper>
-          <StyledMarkdown
-            data-test="docs-solution-markdown"
-            source={`\`\`\`typescript\n${foundFile === undefined ? '' : foundFile.solution}\`\`\``}
+  return (
+    <Wrapper {...props}>
+      <HeaderWrapper>
+        {getFiles(selected).map((file, idx) => (
+          <FileTab
+            key={file.path}
+            data-test={`docs-solution-file-tab-${file.path}`}
+            first={idx === 0}
+            selected={file.path === selectedFilePath}
+            file={{ path: file.path, writable: false }}
+            onClick={() => setSelectedFilePath(file.path)}
+            omitReadOnly
           />
-        </Wrapper>
-      );
-    }}
-  </Container>
-);
+        ))}
+      </HeaderWrapper>
+      <StyledMarkdown
+        data-test="docs-solution-markdown"
+        source={`\`\`\`typescript\n${foundFile === undefined ? '' : foundFile.solution}\`\`\``}
+      />
+    </Wrapper>
+  );
+};

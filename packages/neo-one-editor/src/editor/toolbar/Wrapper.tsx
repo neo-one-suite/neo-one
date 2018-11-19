@@ -1,6 +1,7 @@
-import { Button, styled } from 'reakit';
+import { ButtonBase } from '@neo-one/react-common';
+import styled from 'styled-components';
 
-export const Wrapper = styled(Button)`
+export const Wrapper = styled(ButtonBase)`
   outline: none;
   cursor: pointer;
   padding: 2px 2px;

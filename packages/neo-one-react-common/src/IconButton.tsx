@@ -1,7 +1,8 @@
-import { Button, styled } from 'reakit';
+import { ButtonBase } from '@neo-one/react-core';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
-export const IconButton = styled(Button)`
+export const IconButton = styled(ButtonBase)`
   color: ${prop('theme.black')};
   outline: none;
   cursor: pointer;

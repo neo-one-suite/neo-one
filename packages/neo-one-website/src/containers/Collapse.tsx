@@ -1,7 +1,7 @@
 // tslint:disable no-any no-object-mutation readonly-keyword no-null-keyword no-submodule-imports no-unnecessary-type-annotation strict-boolean-expressions
 import React from 'react';
 import Transition from 'react-transition-group/Transition';
-import { styled } from 'reakit';
+import styled from 'styled-components';
 import { ifProp } from 'styled-tools';
 
 interface Props {
@@ -57,7 +57,7 @@ export class Collapse extends React.Component<Props> {
         {(state: any, childProps: any) => (
           <Wrapper entered={state === 'entered'} {...childProps}>
             <WrapperOuter
-              innerRef={(ref: any) => {
+              ref={(ref: any) => {
                 this.wrapperRef = ref;
               }}
             >

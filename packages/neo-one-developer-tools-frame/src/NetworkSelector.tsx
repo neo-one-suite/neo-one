@@ -1,12 +1,13 @@
 // tslint:disable no-any
-import { FromStream } from '@neo-one/react';
-import { Select } from '@neo-one/react-common';
+import { Select, useStream } from '@neo-one/react-common';
 import * as React from 'react';
-import { styled } from 'reakit';
 import { combineLatest } from 'rxjs';
-import { DeveloperToolsContext, DeveloperToolsContextType } from './DeveloperToolsContext';
+import styled from 'styled-components';
+import { DeveloperToolsContext } from './DeveloperToolsContext';
 import { SettingsLabel } from './SettingsLabel';
-import { WithAddError } from './WithAddError';
+import { useAddError } from './ToastsContext';
+
+const { useContext } = React;
 
 const StyledSelect: any = styled(Select)`
   &&& {
@@ -16,34 +17,23 @@ const StyledSelect: any = styled(Select)`
 `;
 
 export function NetworkSelector() {
+  const addError = useAddError();
+  const { client, currentNetwork$, networks$ } = useContext(DeveloperToolsContext);
+  const [network, networks] = useStream(() => combineLatest(currentNetwork$, networks$), [currentNetwork$, networks$]);
+
   return (
-    <WithAddError>
-      {(addError) => (
-        <DeveloperToolsContext.Consumer>
-          {({ client, currentNetwork$, networks$ }: DeveloperToolsContextType) => (
-            <FromStream
-              props={[currentNetwork$, networks$]}
-              createStream={() => combineLatest(currentNetwork$, networks$)}
-            >
-              {([network, networks]: [string, ReadonlyArray<string>]) => (
-                <SettingsLabel>
-                  Network
-                  <StyledSelect
-                    data-test="neo-one-network-selector"
-                    value={{ label: network, value: network }}
-                    options={networks.map((net) => ({ label: net, value: net }))}
-                    onChange={(option: any) => {
-                      if (option != undefined && !Array.isArray(option)) {
-                        client.selectNetwork(option.value).catch(addError);
-                      }
-                    }}
-                  />
-                </SettingsLabel>
-              )}
-            </FromStream>
-          )}
-        </DeveloperToolsContext.Consumer>
-      )}
-    </WithAddError>
+    <SettingsLabel>
+      Network
+      <StyledSelect
+        data-test="neo-one-network-selector"
+        value={{ label: network, value: network }}
+        options={networks.map((net) => ({ label: net, value: net }))}
+        onChange={(option: any) => {
+          if (option != undefined && !Array.isArray(option)) {
+            client.selectNetwork(option.value).catch(addError);
+          }
+        }}
+      />
+    </SettingsLabel>
   );
 }

@@ -1,10 +1,11 @@
+import { ButtonBase } from '@neo-one/react-core';
 import * as React from 'react';
-import { Button, styled } from 'reakit';
+import styled from 'styled-components';
 import { ifProp, prop, withProp } from 'styled-tools';
 import { FileDisplay } from './FileDisplay';
 import { File } from './types';
 
-const Wrapper = styled(Button)<{ readonly first: boolean; readonly selected: boolean }>`
+const Wrapper = styled(ButtonBase)<{ readonly first: boolean; readonly selected: boolean }>`
   color: ${ifProp('selected', prop('theme.gray0'), prop('theme.gray2'))};
   background-color: ${ifProp('selected', prop('theme.lightBlack'), prop('theme.gray5'))};
   ${prop('theme.fontStyles.body1')};

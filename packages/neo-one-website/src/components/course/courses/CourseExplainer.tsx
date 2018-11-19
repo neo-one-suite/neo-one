@@ -1,6 +1,6 @@
-import { Link } from '@neo-one/react-common';
+import { Box, H2, Link } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { maxWidth } from './constants';
 import { ContentWrapper } from './ContentWrapper';
@@ -15,14 +15,15 @@ const Text = styled(Box)`
   color: ${prop('theme.black')};
 `;
 
-const Header = styled.h2`
+const Header = styled(H2)`
   ${prop('theme.fonts.axiformaRegular')}
   ${prop('theme.fontStyles.headline')}
   color: ${prop('theme.black')};
   margin: 0;
 `;
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   grid-gap: 16px;
   padding: 32px;
   max-width: ${maxWidth};

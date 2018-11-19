@@ -1,7 +1,7 @@
-import { Button } from '@neo-one/react-common';
+import { Box, Button } from '@neo-one/react-common';
 import * as React from 'react';
 import { Helmet } from 'react-helmet';
-import { as, Box, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Footer } from '../../Footer';
 import { RouterLink } from '../../RouterLink';
@@ -18,7 +18,8 @@ const Wrapper = styled(Box)`
   width: 100%;
 `;
 
-const BoxWrapper = styled(Grid)`
+const BoxWrapper = styled(Box)`
+  display: grid;
   background-color: ${prop('theme.gray6')};
   padding-top: 64px;
   padding-bottom: 128px;
@@ -27,20 +28,22 @@ const BoxWrapper = styled(Grid)`
   place-content: center;
 `;
 
-const InnerWrapper = styled(Grid)`
+const InnerWrapper = styled(Box)`
+  display: grid;
   background-color: ${prop('theme.black')};
   max-width: 720px;
   margin: 16px;
   box-shadow: 0 6px 4px 4px rgba(0, 0, 0, 0.2);
 `;
 
-const StartButton = styled(as(RouterLink)(Button))`
+const StartButton = styled(Button.withComponent(RouterLink))`
   text-decoration: none;
   cursor: pointer;
   border-radius: 16px;
 `;
 
-const ButtonWrapper = styled(Grid)`
+const ButtonWrapper = styled(Box)`
+  display: grid;
   color: ${prop('theme.gray0')};
   background-color: ${prop('theme.gray4')};
   grid-auto-flow: column;

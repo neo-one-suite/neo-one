@@ -1,6 +1,6 @@
 // tslint:disable no-null-keyword
+import { Box, Hidden, useHidden } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, Hidden } from 'reakit';
 import { FileDiagnostic, TextRange } from '../types';
 import { ProblemList } from './ProblemList';
 import { ProblemRoot } from './ProblemRoot';
@@ -11,15 +11,16 @@ interface Props {
   readonly onSelectRange: (path: string, range: TextRange) => void;
 }
 
-export const ProblemView = ({ problems, path, onSelectRange, ...props }: Props) => (
-  <Hidden.Container>
-    {(hidden) => (
-      <Box {...props}>
-        <ProblemRoot path={path} problemCount={problems.length} expanded={hidden.visible} toggle={hidden.toggle} />
-        <Hidden {...hidden}>
-          <ProblemList path={path} problems={problems} onSelectRange={onSelectRange} />
-        </Hidden>
-      </Box>
-    )}
-  </Hidden.Container>
-);
+export const ProblemView = ({ problems, path, onSelectRange, ...props }: Props) => {
+  // tslint:disable-next-line:no-unused
+  const [visible, show, hide, toggle] = useHidden(true);
+
+  return (
+    <Box {...props}>
+      <ProblemRoot path={path} problemCount={problems.length} expanded={visible} toggle={toggle} />
+      <Hidden visible={visible}>
+        <ProblemList path={path} problems={problems} onSelectRange={onSelectRange} />
+      </Hidden>
+    </Box>
+  );
+};

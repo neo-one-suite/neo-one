@@ -1,7 +1,8 @@
 // tslint:disable-next-line no-import-side-effect
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import { Helmet } from 'react-helmet';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { AdjacentInfo, SectionData } from '../../types';
 import { LayoutWrapper } from '../common';
 import { DocFooter } from './DocFooter';
@@ -9,7 +10,8 @@ import { MainContent } from './MainContent';
 import { Sidebar } from './Sidebar';
 import { Author } from './types';
 
-const StyledGrid = styled(Grid)`
+const StyledGrid = styled(Box)`
+  display: grid;
   grid-gap: 0;
   justify-items: center;
 `;

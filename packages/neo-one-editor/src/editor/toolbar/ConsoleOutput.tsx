@@ -1,9 +1,10 @@
 // tslint:disable no-any
+import { Box } from '@neo-one/react-common';
 // @ts-ignore
 import Scrollable from '@render-props/scrollable';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { styled } from 'reakit';
+import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 import {
   ConsoleOutput as ConsoleOutputType,
@@ -12,7 +13,7 @@ import {
   selectConsoleOutputOwner,
 } from '../redux';
 
-const Wrapper = styled.div<{ readonly shadowed: boolean }>`
+const Wrapper = styled(Box)<{ readonly shadowed: boolean }>`
   color: ${prop('theme.gray0')};
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};
@@ -42,7 +43,7 @@ const ConsoleOutputBase = ({ consoleOutput, consoleOutputOwner }: Props) => (
       }
 
       return (
-        <Wrapper data-test="console-output" innerRef={scrollRef} shadowed={scrollY > 0}>
+        <Wrapper data-test="console-output" ref={scrollRef} shadowed={scrollY > 0}>
           {output}
         </Wrapper>
       );

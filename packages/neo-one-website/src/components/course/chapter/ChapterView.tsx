@@ -1,9 +1,9 @@
-import { SplitPane } from '@neo-one/react-common';
+import { Box, SplitPane } from '@neo-one/react-common';
 import { Redirect } from '@reach/router';
 import * as React from 'react';
 import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { getChapterTo } from '../common';
 import { selectChapter } from '../coursesData';
 import { ChaptersProgress, CourseState, selectLessonProgress } from '../redux';
@@ -21,7 +21,8 @@ interface Props extends ExternalProps {
   readonly progress: ChaptersProgress;
 }
 
-const StyledGrid = styled(Grid)`
+const StyledGrid = styled(Box)`
+  display: grid;
   overflow: hidden;
   height: calc(100vh - 56px);
   width: 100%;
@@ -29,6 +30,10 @@ const StyledGrid = styled(Grid)`
     'progress' 8px
     'pane' 1fr
     / 100%;
+`;
+
+const ProgressItem = styled(Box)`
+  grid-area: progress;
 `;
 
 const ChapterViewBase = ({ selected, progress }: Props) => {
@@ -49,9 +54,9 @@ const ChapterViewBase = ({ selected, progress }: Props) => {
           {`Lesson ${selected.lesson + 1} Chapter ${selected.chapter + 1}: ${selectChapter(selected).title} - NEO•ONE`}
         </title>
       </Helmet>
-      <Grid.Item area="progress">
+      <ProgressItem>
         <ProgressHeader selected={selected} />
-      </Grid.Item>
+      </ProgressItem>
       <SplitPane
         initialSize={enablePreview(selected) ? 0.33 : 0.4}
         type="lr"

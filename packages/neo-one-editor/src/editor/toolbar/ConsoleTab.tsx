@@ -1,20 +1,22 @@
+import { Box, ButtonBase } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, Button, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { ifProp, prop, withProp } from 'styled-tools';
 
-const ButtonWrapper = styled(Button)`
+const ButtonWrapper = styled(ButtonBase)`
   padding: 8px;
   cursor: pointer;
   outline: none;
 `;
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   align-items: start;
   gap: 4px;
   grid-auto-flow: column;
 `;
 
-const TextWrapper = styled(Box)`
+const TextWrapper = styled(Box)<{ readonly selected: boolean }>`
   color: ${ifProp('selected', prop('theme.gray0'), prop('theme.gray2'))};
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};

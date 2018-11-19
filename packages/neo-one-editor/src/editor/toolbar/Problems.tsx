@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { MdError, MdWarning } from 'react-icons/md';
 import { connect } from 'react-redux';
-import { as, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import {
   EditorState,
   openConsole,
@@ -15,7 +15,8 @@ import { ConsoleType } from '../types';
 import { Text } from './Text';
 import { Wrapper } from './Wrapper';
 
-const GridWrapper = styled(as(Text)(Grid))`
+const GridWrapper = styled(Text)`
+  display: grid;
   gap: 2px;
   grid-auto-flow: column;
 `;

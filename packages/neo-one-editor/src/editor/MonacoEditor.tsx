@@ -3,10 +3,10 @@
 import { FileSystem } from '@neo-one/local-browser';
 import _ from 'lodash';
 import * as React from 'react';
-import { styled } from 'reakit';
 import ResizeObserver from 'resize-observer-polyfill';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import styled from 'styled-components';
 import { MainEngine } from '../engine/main';
 import { setupStandaloneEditor } from '../monaco/editor';
 import { LanguageID } from '../monaco/language';
@@ -101,7 +101,10 @@ export class MonacoEditor extends React.Component<Props> {
       this.editor.setModel(null);
     } else if (prevProps.file === undefined || file.path !== prevProps.file.path) {
       if (prevProps.file !== undefined) {
-        editorStates.set(prevProps.file.path, this.editor.saveViewState());
+        const viewState = this.editor.saveViewState();
+        if (viewState !== null) {
+          editorStates.set(prevProps.file.path, viewState);
+        }
       }
 
       this.openFile(file, range, autoFocus);
@@ -146,8 +149,8 @@ export class MonacoEditor extends React.Component<Props> {
 
   public render() {
     return (
-      <Wrapper innerRef={this.resizeRef}>
-        <Container data-test="monaco-editor" innerRef={this.ref} />
+      <Wrapper ref={this.resizeRef}>
+        <Container data-test="monaco-editor" ref={this.ref} />
       </Wrapper>
     );
   }

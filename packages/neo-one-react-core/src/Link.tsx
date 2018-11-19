@@ -1,5 +1,6 @@
-import { Link as LinkBase, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop, switchProp } from 'styled-tools';
+import { LinkBase } from './LinkBase';
 
 export const Link = styled(LinkBase)<{ readonly linkColor: 'primary' | 'gray' | 'accent' | 'light' }>`
   color: ${switchProp('linkColor', {

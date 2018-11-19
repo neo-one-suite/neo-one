@@ -1,6 +1,7 @@
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdError, MdWarning } from 'react-icons/md';
-import { Box, css, styled } from 'reakit';
+import styled, { css } from 'styled-components';
 import { prop } from 'styled-tools';
 import { FileDiagnostic, TextRange } from '../types';
 import { ProblemWrapper } from './ProblemWrapper';

@@ -1,6 +1,6 @@
-import { Background, Button, LineLogoPrimary, Link } from '@neo-one/react-common';
+import { Background, Box, Button, LineLogoPrimary, Link } from '@neo-one/react-common';
 import * as React from 'react';
-import { as, Box, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { RouterLink } from '../RouterLink';
 import { Authoring } from './Authoring';
@@ -34,18 +34,19 @@ const Headline = styled(Box)`
   text-align: center;
 `;
 
-const ButtonWrapper = styled(Grid)`
+const ButtonWrapper = styled(Box)`
+  display: grid;
   align-items: center;
   grid-auto-flow: column;
   grid-gap: 24px;
 `;
 
-const LinkButton = as(RouterLink)(Button);
+const LinkButton = Button.withComponent(RouterLink);
 const StyledLinkButton = styled(LinkButton)`
   ${prop('theme.fontStyles.subheading')};
 `;
 
-const StyledLink = styled(as(RouterLink)(Link))`
+const StyledLink = styled(Link.withComponent(RouterLink))`
   ${prop('theme.fontStyles.subheading')};
   color: ${prop('theme.accent')};
 
@@ -59,7 +60,8 @@ const CenterContentWrapper = styled(ContentWrapperBase)`
   justify-content: center;
 `;
 
-const ProofsWrapper = styled(Grid)`
+const ProofsWrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   padding-top: 64px;
   padding-bottom: 64px;
@@ -71,7 +73,8 @@ const ProofsWrapper = styled(Grid)`
   }
 `;
 
-const ProofsInnerWrapper = styled(Grid)`
+const ProofsInnerWrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
 
   @media (max-width: ${prop('theme.breakpoints.md')}) {
@@ -80,7 +83,8 @@ const ProofsInnerWrapper = styled(Grid)`
   }
 `;
 
-const FeaturesWrapper = styled(Grid)`
+const FeaturesWrapper = styled(Box)`
+  display: grid;
   padding-top: 64px;
   padding-bottom: 64px;
   grid-gap: 64px;
@@ -92,7 +96,8 @@ const FeaturesWrapper = styled(Grid)`
   }
 `;
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   justify-items: center;
 `;
 

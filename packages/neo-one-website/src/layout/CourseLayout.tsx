@@ -1,11 +1,12 @@
+import { Box } from '@neo-one/react-common';
 import React from 'react';
-import { Flex, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { CourseHeader } from '../components';
-import { ComponentProps } from '../types';
 
-const Wrapper = styled(Flex)`
+const Wrapper = styled(Box)`
   &&& {
+    display: flex;
     flex-direction: column;
     background-color: ${prop('theme.black')};
     color: ${prop('theme.black')};
@@ -21,7 +22,7 @@ const StyledHeader = styled(CourseHeader)`
 interface Props {
   readonly children: React.ReactNode;
 }
-export const CourseLayout = ({ children, ...props }: Props & ComponentProps<typeof Wrapper>) => (
+export const CourseLayout = ({ children, ...props }: Props & React.ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledHeader />
     {children}

@@ -1,12 +1,14 @@
 // tslint:disable no-null-keyword
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { AdjacentInfo } from '../../types';
 import { LayoutWrapper } from '../common';
 import { AdjacentLink } from './AdjacentLink';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   justify-items: center;
   padding-top: 64px;
   padding-bottom: 64px;
@@ -14,7 +16,8 @@ const Wrapper = styled(Grid)`
   width: 100%;
 `;
 
-const LinkWrapper = styled(Grid)`
+const LinkWrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   justify-content: space-between;
   grid-gap: 32px;

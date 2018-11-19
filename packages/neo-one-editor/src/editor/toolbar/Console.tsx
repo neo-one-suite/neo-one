@@ -1,11 +1,13 @@
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { TextRange } from '../types';
 import { ConsoleContent } from './ConsoleContent';
 import { ConsoleHeader } from './ConsoleHeader';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   width: 100%;
   grid:
     'header' auto

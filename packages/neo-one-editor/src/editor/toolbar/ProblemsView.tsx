@@ -1,16 +1,17 @@
 // tslint:disable no-any
+import { Box } from '@neo-one/react-common';
 // @ts-ignore
 import Scrollable from '@render-props/scrollable';
 import _ from 'lodash';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { styled } from 'reakit';
+import styled from 'styled-components';
 import { ifProp } from 'styled-tools';
 import { FileProblems, selectConsoleProblems } from '../redux';
 import { TextRange } from '../types';
 import { ProblemView } from './ProblemView';
 
-const Wrapper = styled.div<{ readonly shadowed: boolean }>`
+const Wrapper = styled(Box)<{ readonly shadowed: boolean }>`
   display: grid;
   align-content: start;
   width: 100%;
@@ -31,7 +32,7 @@ const ProblemsViewBase = ({ consoleProblems, onSelectRange, ...props }: Props) =
   return (
     <Scrollable>
       {({ scrollRef, scrollY }: any) => (
-        <Wrapper innerRef={scrollRef} shadowed={scrollY > 0} {...props}>
+        <Wrapper ref={scrollRef} shadowed={scrollY > 0} {...props}>
           {groupedProblems.map(([path, problems]) => (
             <ProblemView
               key={path}

@@ -1,10 +1,12 @@
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { TestSuite } from '../../types';
 import { TestSummaryHeader } from './TestSummaryHeader';
 import { TestSummaryList } from './TestSummaryList';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   grid-gap: 8px;
   grid-auto-flow: row;
   grid-auto-rows: auto;

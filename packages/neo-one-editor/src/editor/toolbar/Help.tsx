@@ -1,10 +1,11 @@
-import { Link } from '@neo-one/react-common';
+import { Box, Link } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { ToolbarPopover } from './ToolbarPopover';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: row;
   grid-auto-rows: auto;
 `;

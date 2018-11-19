@@ -1,5 +1,6 @@
-import { Button as ButtonBase, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
+import { ButtonBase } from './ButtonBase';
 
 export const Button = styled(ButtonBase)`
   background-color: ${prop('theme.accent')};
@@ -34,3 +35,9 @@ export const Button = styled(ButtonBase)`
     outline: none;
   }
 `;
+
+// tslint:disable-next-line:no-object-mutation
+Button.defaultProps = {
+  opaque: true,
+  palette: 'primary',
+};

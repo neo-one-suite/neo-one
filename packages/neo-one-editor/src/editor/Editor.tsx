@@ -1,17 +1,18 @@
 // tslint:disable no-null-keyword
-import { SplitPane } from '@neo-one/react-common';
+import { Box, SplitPane } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Flex, styled } from 'reakit';
+import styled from 'styled-components';
 import { EditorContext } from '../EditorContext';
 import { Preview } from '../preview';
-import { ComponentProps, EditorContextType } from '../types';
+import { EditorContextType } from '../types';
 import { EditorToolbar } from './EditorToolbar';
 import { EditorView } from './EditorView';
 import { EditorState, openPreview, selectPreviewEnabled, selectPreviewOpen, setFileProblems } from './redux';
 import { EditorFile, EditorFiles, FileDiagnostic, TextRange } from './types';
 
-const Wrapper = styled(Flex)`
+const Wrapper = styled(Box)`
+  display: flex;
   align-self: stretch;
   justify-self: stretch;
   flex: 1;
@@ -52,7 +53,7 @@ const EditorBase = ({
   onOpenPreview,
   onChangeProblems,
   ...props
-}: Props & ComponentProps<typeof Wrapper>) => (
+}: Props & React.ComponentProps<typeof Wrapper>) => (
   <EditorContext.Consumer>
     {({ engine }: EditorContextType) => {
       const editor = (

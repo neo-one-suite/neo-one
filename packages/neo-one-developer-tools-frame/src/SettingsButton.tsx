@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { MdSettings } from 'react-icons/md';
-import { Overlay, styled } from 'reakit';
+import styled from 'styled-components';
 import { SettingsDialog } from './SettingsDialog';
 import { ToolbarButton } from './ToolbarButton';
 
@@ -14,15 +14,14 @@ export function SettingsButton() {
   return (
     <SettingsDialog>
       {(overlay) => (
-        <Overlay.Show
+        <StyledToolbarButton
           data-test-button="neo-one-settings-button"
           data-test-tooltip="neo-one-settings-tooltip"
-          as={StyledToolbarButton}
           help="Open Settings..."
-          {...overlay}
+          onClick={overlay.show}
         >
           <MdSettings />
-        </Overlay.Show>
+        </StyledToolbarButton>
       )}
     </SettingsDialog>
   );

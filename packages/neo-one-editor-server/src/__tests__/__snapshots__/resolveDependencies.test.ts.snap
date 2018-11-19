@@ -21,22 +21,13 @@ Object {
 exports[`resolveDependencies resolve deps 3`] = `
 Object {
   "dependencies": Object {},
-  "name": "reakit",
-  "types": true,
-  "version": "0.15.7",
-}
-`;
-
-exports[`resolveDependencies resolve deps 4`] = `
-Object {
-  "dependencies": Object {},
   "name": "react-dom",
   "types": false,
   "version": "16.5.1",
 }
 `;
 
-exports[`resolveDependencies resolve deps 5`] = `
+exports[`resolveDependencies resolve deps 4`] = `
 Object {
   "dependencies": Object {},
   "name": "react",
@@ -45,7 +36,7 @@ Object {
 }
 `;
 
-exports[`resolveDependencies resolve deps 6`] = `
+exports[`resolveDependencies resolve deps 5`] = `
 Object {
   "dependencies": Object {},
   "name": "bignumber.js",

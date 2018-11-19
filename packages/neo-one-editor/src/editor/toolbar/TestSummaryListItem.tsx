@@ -1,17 +1,19 @@
+import { Box, ButtonBase } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Button, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 import { TestSuite } from '../../types';
 import { selectTestSuite } from '../redux';
 import { FileText } from './FileText';
 import { TestSuiteIcon } from './TestSuiteIcon';
 
-const Wrapper = styled(Button)`
+const Wrapper = styled(ButtonBase)`
   cursor: pointer;
 `;
 
-const GridWrapper = styled(Grid)<{ readonly selected: boolean }>`
+const GridWrapper = styled(Box)<{ readonly selected: boolean }>`
+  display: grid;
   grid-gap: 8px;
   grid-auto-flow: column;
   grid-auto-columns: auto;

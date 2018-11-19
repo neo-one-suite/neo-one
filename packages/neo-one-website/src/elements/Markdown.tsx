@@ -3,8 +3,8 @@ import anchor from 'markdown-it-anchor';
 // @ts-ignore
 import container from 'markdown-it-container';
 import * as React from 'react';
-import { css, styled } from 'reakit';
 import slugify from 'slugify';
+import styled, { css } from 'styled-components';
 import { ifProp, prop, switchProp } from 'styled-tools';
 import { markdownTOC } from './markdownTOC';
 
@@ -304,7 +304,7 @@ interface Props {
   readonly resetScroll?: boolean;
 }
 export class Markdown extends React.Component<Props> {
-  private readonly ref = React.createRef<HTMLElement>();
+  private readonly ref = React.createRef<HTMLDivElement>();
 
   public componentDidMount(): void {
     this.handleUpdate();
@@ -329,7 +329,7 @@ export class Markdown extends React.Component<Props> {
         {...props}
         linkColor={linkColor}
         light={light}
-        innerRef={this.ref}
+        ref={this.ref}
         dangerouslySetInnerHTML={{ __html: anchors ? mdWithAnchors.render(source) : mdWithoutAnchors.render(source) }}
       />
     );

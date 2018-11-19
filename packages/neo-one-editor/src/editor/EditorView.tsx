@@ -1,12 +1,14 @@
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Flex, styled } from 'reakit';
+import styled from 'styled-components';
 import { EditorContext } from '../EditorContext';
-import { ComponentProps, EditorContextType } from '../types';
+import { EditorContextType } from '../types';
 import { EditorHeader } from './EditorHeader';
 import { MonacoEditor } from './MonacoEditor';
 import { EditorFile, EditorFiles, FileDiagnostic, TextRange } from './types';
 
-const Wrapper = styled(Flex)`
+const Wrapper = styled(Box)`
+  display: flex;
   flex: 1;
   flex-direction: column;
   min-width: 0;
@@ -28,7 +30,7 @@ export const EditorView = ({
   onChangeProblems,
   onSelectFile,
   ...props
-}: Props & ComponentProps<typeof Wrapper>) => (
+}: Props & React.ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <EditorHeader file={file} openFiles={openFiles} onSelectFile={onSelectFile} />
     <EditorContext.Consumer>

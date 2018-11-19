@@ -1,7 +1,7 @@
 // tslint:disable no-null-keyword
 import * as React from 'react';
 import { MdLoop } from 'react-icons/md';
-import { as, Grid, keyframes, styled } from 'reakit';
+import styled, { keyframes } from 'styled-components';
 import { Text } from './Text';
 import { Wrapper } from './Wrapper';
 
@@ -23,7 +23,8 @@ const Loop = styled(MdLoop)`
   animation: ${rotate} 1.5s linear infinite;
 `;
 
-const GridWrapper = styled(as(Text)(Grid))`
+const GridWrapper = styled(Text)`
+  display: grid;
   gap: 2px;
   grid-auto-flow: column;
 `;

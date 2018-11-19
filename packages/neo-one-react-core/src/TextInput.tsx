@@ -1,5 +1,6 @@
-import { Input, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
+import { Input } from './Input';
 
 export const TextInput = styled(Input)`
   padding: 0 4px;

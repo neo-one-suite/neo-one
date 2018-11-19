@@ -1,6 +1,5 @@
+import { Image } from '@neo-one/react-common';
 import * as React from 'react';
-import { Image } from 'reakit';
-import { ComponentProps } from '../../types';
 import { Five } from './Five';
 import { Four } from './Four';
 import { One } from './One';
@@ -14,7 +13,7 @@ interface Props {
   readonly num: number;
 }
 
-export const Num = ({ num, ...rest }: Props & ComponentProps<typeof Image>) => {
+export const Num = ({ num, ...rest }: Props & React.ComponentProps<typeof Image>) => {
   const Component = numbers[num];
 
   return <Component {...rest} />;

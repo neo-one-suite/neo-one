@@ -1,15 +1,15 @@
 // tslint:disable no-any
 import { Account, UserAccount } from '@neo-one/client-common';
 import { Client, Hash256, nep5 } from '@neo-one/client-core';
-import { Select } from '@neo-one/react-common';
+import { Box, Select } from '@neo-one/react-common';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
 // tslint:disable-next-line no-submodule-imports
 import { FormatOptionLabelMeta } from 'react-select/lib/Select';
-import { Grid, styled } from 'reakit';
-import { combineLatest, concat, Observable, of, ReplaySubject } from 'rxjs';
+import { combineLatest, concat, of, ReplaySubject } from 'rxjs';
 import { catchError, distinctUntilChanged, map, multicast, refCount, switchMap, take } from 'rxjs/operators';
+import styled from 'styled-components';
 import { Token } from './types';
 
 export const makeOption = async ({
@@ -107,15 +107,15 @@ export const getWalletSelectorOptions$ = (
   client: Client,
   userAccounts$: Client['userAccounts$'],
   block$: Client['block$'],
-  tokens$: Observable<ReadonlyArray<Token>>,
+  tokens: ReadonlyArray<Token>,
 ) =>
   concat(
     userAccounts$.pipe(
       take(1),
       map((userAccounts) => userAccounts.map((userAccount) => makeWalletSelectorValueOption({ userAccount }))),
     ),
-    combineLatest(userAccounts$.pipe(distinctUntilChanged()), tokens$, block$).pipe(
-      switchMap(async ([userAccounts, tokens]) =>
+    combineLatest(userAccounts$.pipe(distinctUntilChanged()), block$).pipe(
+      switchMap(async ([userAccounts]) =>
         Promise.all(
           userAccounts.map(async (userAccount) => {
             const account = await client.getAccount(userAccount.id);
@@ -139,8 +139,12 @@ export const getWalletSelectorOptions$ = (
     ),
   );
 
-const AddressGrid = styled(Grid)`
+const AddressGrid = styled(Box)`
+  display: grid;
   padding: 8px 0;
+  grid-template-columns: '80px 1fr';
+  grid-template-rows: auto;
+  gap: 0;
 `;
 
 const createFormatOptionLabel = (isMulti?: boolean) => (
@@ -152,23 +156,23 @@ const createFormatOptionLabel = (isMulti?: boolean) => (
   }
 
   return (
-    <AddressGrid columns="80px 1fr" autoRows="auto" gap="0">
-      <Grid.Item>Name:</Grid.Item>
-      <Grid.Item>{option.label}</Grid.Item>
+    <AddressGrid>
+      <Box>Name:</Box>
+      <Box>{option.label}</Box>
       {option.label === option.address ? (
         <></>
       ) : (
         <>
-          <Grid.Item>Address:</Grid.Item>
-          <Grid.Item>{option.address}</Grid.Item>
+          <Box>Address:</Box>
+          <Box>{option.address}</Box>
         </>
       )}
       {((option as any).balances === undefined ? [] : (option as any).balances).map(
         ([name, value]: [string, BigNumber]) => (
           // @ts-ignore
           <React.Fragment key={name}>
-            <Grid.Item>{name}:</Grid.Item>
-            <Grid.Item>{value.toFormat()}</Grid.Item>
+            <Box>{name}:</Box>
+            <Box>{value.toFormat()}</Box>
           </React.Fragment>
         ),
       )}

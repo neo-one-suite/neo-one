@@ -1,10 +1,10 @@
-import { Loading } from '@neo-one/react-common';
+import { Box, Loading } from '@neo-one/react-common';
 import { Redirect, RouteComponentProps, Router } from '@reach/router';
 import * as React from 'react';
 import { Provider } from 'react-redux';
-import { Box, Grid, styled } from 'reakit';
 // tslint:disable-next-line no-submodule-imports
 import { PersistGate } from 'redux-persist/integration/react';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { ChapterView } from './chapter';
 import { CoursesView } from './courses';
@@ -60,11 +60,11 @@ const DesktopWrapper = styled(Box)`
   }
 `;
 
-const MobileWrapper = styled(Grid)`
+const MobileWrapper = styled(Box)`
   display: none;
 
   @media (max-width: ${prop('theme.breakpoints.sm')}) {
-    display: unset;
+    display: grid;
     grid-gap: 32px;
     padding: 16px;
   }

@@ -1,3 +1,6 @@
+import { createGlobalStyle } from 'styled-components';
+
+export const GlobalFonts = createGlobalStyle`
 @font-face {
   font-family: 'Axiforma-Bold';
   src: url('https://neo-one.io/static/fonts/Axiforma-Bold.woff2') format('woff2'), url('https://neo-one.io/static/fonts/Axiforma-Bold.woff') format('woff');
@@ -39,3 +42,4 @@
   font-weight: 400;
   font-style: normal;
 }
+`;

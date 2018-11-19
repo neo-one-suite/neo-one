@@ -1,5 +1,5 @@
+import { Box, Hidden } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, Hidden } from 'reakit';
 import { SectionData } from '../../types';
 import { SectionHeader } from './SectionHeader';
 import { SectionList } from './SectionList';

@@ -1,5 +1,6 @@
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Footer } from '../Footer';
 
@@ -12,7 +13,8 @@ const Wrapper = styled(Box)`
   width: 100%;
 `;
 
-const BoxWrapper = styled(Grid)`
+const BoxWrapper = styled(Box)`
+  display: grid;
   background-color: ${prop('theme.gray6')};
   padding-top: 64px;
   padding-bottom: 128px;
@@ -21,7 +23,8 @@ const BoxWrapper = styled(Grid)`
   place-content: center;
 `;
 
-const InnerWrapper = styled(Grid)`
+const InnerWrapper = styled(Box)`
+  display: grid;
   background-color: ${prop('theme.black')};
   max-width: 480px;
   margin: 16px;

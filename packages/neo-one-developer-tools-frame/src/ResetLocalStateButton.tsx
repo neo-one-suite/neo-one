@@ -1,22 +1,21 @@
-import { Button } from '@neo-one/react-common';
+import { Box, Button } from '@neo-one/react-common';
 import * as React from 'react';
-import { Grid, styled } from 'reakit';
-import { WithResetLocalState } from './DeveloperToolsContext';
+import styled from 'styled-components';
+import { useResetLocalState } from './DeveloperToolsContext';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   justify-content: flex-end;
 `;
 
 export function ResetLocalStateButton() {
+  const resetLocalState = useResetLocalState();
+
   return (
-    <WithResetLocalState>
-      {(resetLocalState) => (
-        <Wrapper>
-          <Button data-test="neo-one-reset-local-state-button" onClick={resetLocalState}>
-            Reset Local Storage
-          </Button>
-        </Wrapper>
-      )}
-    </WithResetLocalState>
+    <Wrapper>
+      <Button data-test="neo-one-reset-local-state-button" onClick={resetLocalState}>
+        Reset Local Storage
+      </Button>
+    </Wrapper>
   );
 }

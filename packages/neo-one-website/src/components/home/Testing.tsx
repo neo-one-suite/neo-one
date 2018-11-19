@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled } from 'reakit';
+import styled from 'styled-components';
 import { Markdown } from '../../elements';
 import { AssetSectionGrid } from './AssetSectionGrid';
 

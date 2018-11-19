@@ -1,8 +1,9 @@
+import { Box, ButtonBase } from '@neo-one/react-common';
 import * as React from 'react';
-import { Button, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
-const Wrapper = styled(Button)`
+const Wrapper = styled(ButtonBase)`
   cursor: pointer;
   outline: none;
   width: 100%;
@@ -12,7 +13,8 @@ const Wrapper = styled(Button)`
   }
 `;
 
-const GridWrapper = styled(Grid)`
+const GridWrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   grid-gap: 8px;
   align-items: start;

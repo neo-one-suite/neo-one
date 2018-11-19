@@ -1,5 +1,6 @@
+import { Box } from '@neo-one/react-core';
 import * as React from 'react';
-import { Box, Grid, keyframes, styled } from 'reakit';
+import styled, { keyframes } from 'styled-components';
 import { prop } from 'styled-tools';
 import { Monogram } from './Monogram';
 
@@ -24,7 +25,8 @@ const LoadingWrapper = styled(Box)`
   background-color: ${prop('theme.gray6')};
 `;
 
-const MonogramWrapper = styled(Grid)`
+const MonogramWrapper = styled(Box)`
+  display: grid;
   width: 100%;
   flex-direction: column;
   place-items: center;

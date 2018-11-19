@@ -1,5 +1,5 @@
+import { Image } from '@neo-one/react-core';
 import * as React from 'react';
-import { Image } from 'reakit';
 import html from '../static/img/icons/html.svg';
 import json from '../static/img/icons/json.svg';
 import reactts from '../static/img/icons/reactts.svg';

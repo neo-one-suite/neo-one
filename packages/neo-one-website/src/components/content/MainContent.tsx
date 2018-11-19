@@ -1,6 +1,7 @@
 // tslint:disable no-null-keyword
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, css, styled } from 'reakit';
+import styled, { css } from 'styled-components';
 import { prop } from 'styled-tools';
 import { Markdown } from '../../elements';
 import { DateAndAuthor } from './DateAndAuthor';

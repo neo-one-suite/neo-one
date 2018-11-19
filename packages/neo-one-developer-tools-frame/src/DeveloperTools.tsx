@@ -1,7 +1,6 @@
-import { Client, DeveloperClient, Hash256, LocalClient } from '@neo-one/client-core';
-import { FromStream } from '@neo-one/react';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client-core';
+import { GlobalFonts, useStream } from '@neo-one/react-common';
 import * as React from 'react';
-import { Provider } from 'reakit';
 import { Observable } from 'rxjs';
 import { ClientHook } from './ClientHook';
 import { createContext, DeveloperToolsContext, LocalStateProvider } from './DeveloperToolsContext';
@@ -23,34 +22,23 @@ interface Props {
 }
 
 export function DeveloperTools({ resizeHandler, clients$ }: Props) {
+  const props = useStream(() => clients$, [clients$]);
+
   return (
-    <FromStream props={[clients$]} createStream={() => clients$}>
-      {(props) => (
-        <DeveloperToolsContext.Provider value={createContext(props)}>
-          <ResizeHandlerContext.Provider value={resizeHandler}>
-            <LocalStateProvider>
-              <ThemeProvider>
-                <Provider
-                  initialState={{
-                    transfer: {
-                      text: '',
-                      asset: { type: 'asset', value: Hash256.NEO, label: 'NEO' },
-                      loading: false,
-                      to: [],
-                    },
-                    toasts: {
-                      toasts: [],
-                    },
-                  }}
-                >
-                  <Toolbar resizeHandler={resizeHandler} />
-                  <ClientHook />
-                </Provider>
-              </ThemeProvider>
-            </LocalStateProvider>
-          </ResizeHandlerContext.Provider>
-        </DeveloperToolsContext.Provider>
-      )}
-    </FromStream>
+    <>
+      <DeveloperToolsContext.Provider value={createContext(props)}>
+        <ResizeHandlerContext.Provider value={resizeHandler}>
+          <LocalStateProvider>
+            <ThemeProvider>
+              <>
+                <Toolbar resizeHandler={resizeHandler} />
+                <ClientHook />
+              </>
+            </ThemeProvider>
+          </LocalStateProvider>
+        </ResizeHandlerContext.Provider>
+      </DeveloperToolsContext.Provider>
+      <GlobalFonts />
+    </>
   );
 }

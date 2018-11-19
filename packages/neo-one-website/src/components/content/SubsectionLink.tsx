@@ -1,11 +1,11 @@
 // tslint:disable no-null-keyword
 import { Link as ReactLink } from '@neo-one/react-common';
 import * as React from 'react';
-import { as, styled } from 'reakit';
+import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 import { RouterLink } from '../RouterLink';
 
-const Link = styled(as(RouterLink)(ReactLink))<{ readonly active: boolean }>`
+const Link = styled(ReactLink.withComponent(RouterLink))<{ readonly active: boolean }>`
   ${ifProp('active', prop('theme.fonts.axiformaBold'), prop('theme.fonts.axiformaRegular'))};
   ${prop('theme.fontStyles.subheading')};
 

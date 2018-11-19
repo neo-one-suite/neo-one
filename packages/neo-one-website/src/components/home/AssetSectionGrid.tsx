@@ -1,5 +1,6 @@
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { ContentWrapperBase } from './ContentWrapperBase';
 
@@ -17,22 +18,32 @@ const StyledHeading = styled.h2`
   margin: 0;
 `;
 
-const Content = styled(Grid)`
+const Content = styled(Box)`
+  display: grid;
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.subheading')};
   color: ${prop('theme.black')};
   display: grid;
   margin: 0;
+  gap: 16;
 `;
 
-const AssetItem = styled(Grid.Item)`
+const AssetItem = styled(Box)`
+  grid-area: asset;
   display: grid;
   grid-area: asset;
   min-width: 0;
   min-height: 0;
 `;
 
-const Wrapper = styled(Grid)`
+const ContentItem = styled(Box)`
+  grid-area: content;
+  display: grid;
+  gap: 16;
+`;
+
+const Wrapper = styled(Box)`
+  display: grid;
   grid-template:
     'content asset' auto
     / 4fr 3fr;
@@ -51,13 +62,11 @@ const Wrapper = styled(Grid)`
 export const AssetSectionGrid = ({ title, children, asset, ...props }: Props) => (
   <ContentWrapperBase {...props}>
     <Wrapper>
-      <AssetItem area="asset">{asset}</AssetItem>
-      <Grid.Item area="content">
-        <Grid gap={16}>
-          <StyledHeading>{title}</StyledHeading>
-          <Content gap={16}>{children}</Content>
-        </Grid>
-      </Grid.Item>
+      <AssetItem>{asset}</AssetItem>
+      <ContentItem>
+        <StyledHeading>{title}</StyledHeading>
+        <Content>{children}</Content>
+      </ContentItem>
     </Wrapper>
   </ContentWrapperBase>
 );

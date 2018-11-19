@@ -1,15 +1,25 @@
 // tslint:disable no-any
-import { IconButton, Shadow } from '@neo-one/react-common';
+import {
+  Backdrop,
+  Box,
+  H3,
+  IconButton,
+  Overlay,
+  Portal,
+  Shadow,
+  useHidden,
+  UseHiddenProps,
+} from '@neo-one/react-common';
 import * as React from 'react';
 import { MdClose } from 'react-icons/md';
-import { Backdrop, Card, Grid, Heading, Overlay, Portal, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
-import { ResizeHandler } from './ResizeHandler';
 import { ResizeHandlerContext } from './ResizeHandlerContext';
-// tslint:disable-next-line no-any
-export type OverlayProps = any;
 
-const StyledHeader = styled(Grid)`
+const { useContext, useCallback } = React;
+
+const StyledHeader = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   background-color: ${prop('theme.primary')};
   align-items: center;
@@ -18,12 +28,14 @@ const StyledHeader = styled(Grid)`
   padding: 16px;
 `;
 
-const StyledHeading = styled(Heading)`
+const StyledHeading = styled(H3)`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.headline')};
+  margin: 0;
 `;
 
-const StyledBody = styled(Grid)`
+const StyledBody = styled(Box)`
+  display: grid;
   gap: 8px;
   background-color: ${prop('theme.gray0')};
   padding: 16px;
@@ -34,14 +46,14 @@ const StyledIconButton = styled(IconButton)`
   border-radius: 50;
 `;
 
-const StyledCardFit = styled(Card.Fit)`
+const StyledCardFit = styled(Box)`
   display: grid;
 `;
 
 interface Props {
   readonly title: string;
-  readonly renderDialog: (overlay: OverlayProps) => React.ReactNode;
-  readonly children: (overlay: OverlayProps) => React.ReactNode;
+  readonly renderDialog: (overlay: UseHiddenProps) => React.ReactNode;
+  readonly children: (overlay: UseHiddenProps) => React.ReactNode;
   readonly 'data-test-heading': string;
   readonly 'data-test-close-button': string;
 }
@@ -53,54 +65,54 @@ export function Dialog({
   renderDialog,
   title,
 }: Props) {
-  return (
-    <ResizeHandlerContext.Consumer>
-      {(resizeHandler: ResizeHandler) => (
-        <Overlay.Container>
-          {(overlayIn: OverlayProps) => {
-            const overlay = {
-              ...overlayIn,
-              show: () => {
-                resizeHandler.maximize({ type: 'max', id: 'dialog' });
-                overlayIn.show();
-              },
-              hide: () => {
-                resizeHandler.minimize('dialog');
-                overlayIn.hide();
-              },
-              toggle: () => {
-                if (overlayIn.visible) {
-                  resizeHandler.minimize('dialog');
-                } else {
-                  resizeHandler.maximize({ type: 'max', id: 'dialog' });
-                }
-                overlayIn.toggle();
-              },
-            };
+  const resizeHandler = useContext(ResizeHandlerContext);
+  const [visible, showIn, hideIn, toggleIn] = useHidden(false);
+  const show = useCallback(
+    () => {
+      resizeHandler.maximize({ type: 'max', id: 'dialog' });
+      showIn();
+    },
+    [showIn],
+  );
+  const hide = useCallback(
+    () => {
+      resizeHandler.minimize('dialog');
+      hideIn();
+    },
+    [hideIn],
+  );
+  const toggle = useCallback(
+    () => {
+      if (visible) {
+        resizeHandler.minimize('dialog');
+      } else {
+        resizeHandler.maximize({ type: 'max', id: 'dialog' });
+      }
+      toggleIn();
+    },
+    [visible, toggleIn],
+  );
 
-            return (
-              <>
-                {children(overlay)}
-                <Backdrop as={[Portal, Overlay.Hide]} {...overlay} />
-                <Overlay unmount as={[Portal, Card]} slide fade gutter={16} {...overlay}>
-                  <Shadow />
-                  <StyledCardFit>
-                    <StyledHeader>
-                      <StyledHeading data-test={dataTestHeading} as="h3" margin="0">
-                        {title}
-                      </StyledHeading>
-                      <StyledIconButton data-test={dataTestCloseButton} onClick={overlay.hide}>
-                        <MdClose />
-                      </StyledIconButton>
-                    </StyledHeader>
-                    <StyledBody>{renderDialog(overlay)}</StyledBody>
-                  </StyledCardFit>
-                </Overlay>
-              </>
-            );
-          }}
-        </Overlay.Container>
-      )}
-    </ResizeHandlerContext.Consumer>
+  const overlay = { visible, show, hide, toggle };
+
+  return (
+    <>
+      {children(overlay)}
+      <Portal>
+        <Backdrop onClick={hide} />
+        <Overlay unmount slide fade visible={visible}>
+          <Shadow />
+          <StyledCardFit>
+            <StyledHeader>
+              <StyledHeading data-test={dataTestHeading}>{title}</StyledHeading>
+              <StyledIconButton data-test={dataTestCloseButton} onClick={overlay.hide}>
+                <MdClose />
+              </StyledIconButton>
+            </StyledHeader>
+            <StyledBody>{renderDialog(overlay)}</StyledBody>
+          </StyledCardFit>
+        </Overlay>
+      </Portal>
+    </>
   );
 }

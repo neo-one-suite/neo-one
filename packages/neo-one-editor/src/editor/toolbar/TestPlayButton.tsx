@@ -1,10 +1,10 @@
-import { Tooltip, TooltipArrow } from '@neo-one/react-common';
+import { ButtonBase, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdPlayArrow } from 'react-icons/md';
-import { Button, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
-const PlayButtonWrapper = styled(Button)`
+const PlayButtonWrapper = styled(ButtonBase)`
   display: flex;
   justify-content: center;
   align-content: center;

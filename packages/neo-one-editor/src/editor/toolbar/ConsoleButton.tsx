@@ -1,13 +1,14 @@
-import { Tooltip, TooltipArrow } from '@neo-one/react-common';
+import { Box, ButtonBase, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
-import { Button, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   place-items: center;
 `;
 
-const IconWrapper = styled(Button)`
+const IconWrapper = styled(ButtonBase)`
   color: ${prop('theme.gray0')};
   cursor: pointer;
   outline: none;

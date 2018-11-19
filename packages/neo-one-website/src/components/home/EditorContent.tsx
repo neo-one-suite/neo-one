@@ -1,6 +1,6 @@
-import { Link } from '@neo-one/react-common';
+import { Box, H2, Link } from '@neo-one/react-common';
 import * as React from 'react';
-import { as, Box, Grid, Heading, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { RouterLink } from '../RouterLink';
 import { ContentWrapperBase } from './ContentWrapperBase';
@@ -25,12 +25,13 @@ const TextWrapper = styled(ContentWrapperBase)`
   margin-bottom: 32px;
 `;
 
-const InnerTextWrapper = styled(Grid)`
+const InnerTextWrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   grid-gap: 24px;
 `;
 
-const StyledHeading = styled(Heading)`
+const StyledHeading = styled(H2)`
   ${prop('theme.fontStyles.headline')};
   ${prop('theme.fonts.axiformaBold')};
   color: ${prop('theme.gray1')};
@@ -42,7 +43,8 @@ const Text = styled(Box)`
   color: ${prop('theme.gray1')};
 `;
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   padding-top: 64px;
   background-color: ${prop('theme.black')};
   width: 100%;
@@ -54,7 +56,7 @@ const Wrapper = styled(Grid)`
   }
 `;
 
-const StyledLink = as(RouterLink)(Link);
+const StyledLink = Link.withComponent(RouterLink);
 
 export const EditorContent = () => (
   <Wrapper>

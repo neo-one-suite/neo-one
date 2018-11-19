@@ -1,13 +1,15 @@
 // tslint:disable no-any
+import { Box, Hidden } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Grid, Hidden, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { selectConsoleOpen } from './redux';
 import { BuildAction, Console, Feedback, FileType, Help, Problems, RunTestsAction } from './toolbar';
 import { EditorFile, TextRange } from './types';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   flex: 0 0 auto;
   width: 100%;
   grid:
@@ -16,7 +18,8 @@ const Wrapper = styled(Grid)`
     / auto;
 `;
 
-const ToolbarWrapper = styled(Grid)`
+const ToolbarWrapper = styled(Box)`
+  display: grid;
   width: 100%;
   background-color: ${prop('theme.accent')};
   padding: 0 4px;
@@ -25,13 +28,15 @@ const ToolbarWrapper = styled(Grid)`
   justify-content: space-between;
 `;
 
-const ToolbarLeftWrapper = styled(Grid)`
+const ToolbarLeftWrapper = styled(Box)`
+  display: grid;
   gap: 8px;
   grid-auto-flow: column;
   justify-content: start;
 `;
 
-const ToolbarRightWrapper = styled(Grid)`
+const ToolbarRightWrapper = styled(Box)`
+  display: grid;
   gap: 8px;
   grid-auto-flow: column;
   justify-content: end;

@@ -1,6 +1,5 @@
+import { Image } from '@neo-one/react-common';
 import * as React from 'react';
-import { Image } from 'reakit';
 import contract from '../../../static/img/contract.svg';
-import { ComponentProps } from '../../types';
 
-export const Contract = (props: ComponentProps<typeof Image>) => <Image src={contract} alt="05" {...props} />;
+export const Contract = (props: React.ComponentProps<typeof Image>) => <Image src={contract} alt="05" {...props} />;

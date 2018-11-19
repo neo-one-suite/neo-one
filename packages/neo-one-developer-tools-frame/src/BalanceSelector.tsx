@@ -1,17 +1,20 @@
+// tslint:disable no-object-mutation
 import { nep5 } from '@neo-one/client-core';
-import { FromStream } from '@neo-one/react';
+import { Box, usePrevious, useStream } from '@neo-one/react-common';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
-import { Grid, styled } from 'reakit';
-import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
-import { catchError, distinctUntilChanged, filter, map, scan, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, of } from 'rxjs';
+import { catchError, filter, switchMap } from 'rxjs/operators';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
-import { DeveloperToolsContext, DeveloperToolsContextType, WithTokens } from './DeveloperToolsContext';
+import { DeveloperToolsContext, useTokens } from './DeveloperToolsContext';
+import { useAddError } from './ToastsContext';
 import { ToolbarSelector } from './ToolbarSelector';
-import { Asset, ASSETS, getTokenAsset } from './TransferContainer';
+import { Asset, ASSETS, getTokenAsset } from './transferCommon';
 import { Token } from './types';
-import { WithAddError } from './WithAddError';
+
+const { useContext } = React;
 
 // tslint:disable-next-line no-any
 const AssetInput: any = styled(ToolbarSelector)`
@@ -21,7 +24,8 @@ const AssetInput: any = styled(ToolbarSelector)`
   }
 `;
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   align-items: center;
   background-color: ${prop('theme.gray0')};
@@ -31,125 +35,84 @@ const Wrapper = styled(Grid)`
   padding: 0 8px;
 `;
 
-interface CurrentAssetTokenOptions {
-  readonly asset$: Observable<Asset>;
-  readonly tokens$: Observable<ReadonlyArray<Token>>;
-}
-
-const createCurrentAssetToken$ = ({ asset$, tokens$ }: CurrentAssetTokenOptions) =>
-  combineLatest(tokens$, asset$).pipe(
-    scan<[ReadonlyArray<Token>, Asset], { tokens: ReadonlyArray<Token>; asset: Asset } | undefined>(
-      (prev, [tokens, asset]) => {
-        const simple = { tokens, asset };
-        if (prev === undefined || prev.tokens === tokens) {
-          return simple;
-        }
-
-        if (prev.tokens === tokens) {
-          return simple;
-        }
-
-        if (prev.tokens.length > tokens.length) {
-          if (asset.type === 'token' && !tokens.some((token) => token.address === asset.token.address)) {
-            return { tokens, asset: tokens.length === 0 ? ASSETS[0] : getTokenAsset(tokens[0]) };
-          }
-
-          return simple;
-        }
-
-        if (prev.tokens.length < tokens.length) {
-          return { tokens, asset: getTokenAsset(tokens[tokens.length - 1]) };
-        }
-
-        return simple;
-      },
-      undefined,
-    ),
-    filter(utils.notNull),
-  );
-
-const createCurrentAsset$ = (options: CurrentAssetTokenOptions) =>
-  createCurrentAssetToken$(options).pipe(
-    filter(utils.notNull),
-    map(({ asset }) => asset),
-    distinctUntilChanged(),
-  );
-
 const assetGlobal$ = new BehaviorSubject(ASSETS[0]);
 const onChangeAsset = (asset: Asset) => {
   assetGlobal$.next(asset);
 };
 
+const getAsset = (tokens: ReadonlyArray<Token>, prevTokens: ReadonlyArray<Token> | undefined, asset: Asset) => {
+  if (prevTokens === undefined || prevTokens === tokens) {
+    return asset;
+  }
+
+  if (prevTokens.length > tokens.length) {
+    if (asset.type === 'token' && !tokens.some((token) => token.address === asset.token.address)) {
+      return tokens.length === 0 ? ASSETS[0] : getTokenAsset(tokens[0]);
+    }
+
+    return asset;
+  }
+
+  if (prevTokens.length < tokens.length) {
+    return getTokenAsset(tokens[tokens.length - 1]);
+  }
+
+  return asset;
+};
+
 export function BalanceSelector() {
+  const addError = useAddError();
+  const [tokens] = useTokens();
+  const prevTokens = usePrevious(tokens);
+  const asset = getAsset(tokens, prevTokens, useStream(() => assetGlobal$, [assetGlobal$], assetGlobal$.getValue()));
+
+  const { client, accountState$ } = useContext(DeveloperToolsContext);
+  const value = useStream(
+    () =>
+      accountState$.pipe(filter(utils.notNull)).pipe(
+        switchMap(async ({ currentUserAccount, account }) => {
+          if (asset.type === 'token') {
+            const smartContract = nep5.createNEP5SmartContract(
+              client,
+              { [asset.token.network]: { address: asset.token.address } },
+              asset.token.decimals,
+            );
+            const tokenBalance = await smartContract.balanceOf(currentUserAccount.id.address, {
+              network: asset.token.network,
+            });
+
+            return tokenBalance.toFormat();
+          }
+
+          const balance = account.balances[asset.value] as BigNumber | undefined;
+
+          return balance === undefined ? '0' : balance.toFormat();
+        }),
+        catchError((error: Error) => {
+          addError(error);
+
+          return of('0');
+        }),
+      ),
+    [addError, accountState$, asset, tokens],
+  );
+
   return (
-    <WithAddError>
-      {(addError) => (
-        <WithTokens>
-          {(tokens$) => (
-            <>
-              <DeveloperToolsContext.Consumer>
-                {({ client, accountState$ }: DeveloperToolsContextType) => (
-                  <FromStream
-                    props={[addError, accountState$, assetGlobal$, tokens$]}
-                    createStream={() =>
-                      combineLatest(
-                        createCurrentAsset$({ asset$: assetGlobal$, tokens$ }),
-                        accountState$.pipe(filter(utils.notNull)),
-                      ).pipe(
-                        switchMap(async ([asset, { currentUserAccount, account }]) => {
-                          if (asset.type === 'token') {
-                            const smartContract = nep5.createNEP5SmartContract(
-                              client,
-                              { [asset.token.network]: { address: asset.token.address } },
-                              asset.token.decimals,
-                            );
-                            const tokenBalance = await smartContract.balanceOf(currentUserAccount.id.address, {
-                              network: asset.token.network,
-                            });
-
-                            return tokenBalance.toFormat();
-                          }
-
-                          const balance = account.balances[asset.value] as BigNumber | undefined;
-
-                          return balance === undefined ? '0' : balance.toFormat();
-                        }),
-                        catchError((error: Error) => {
-                          addError(error);
-
-                          return of('0');
-                        }),
-                      )
-                    }
-                  >
-                    {(value) => <Wrapper data-test="neo-one-balance-selector-value">{value}</Wrapper>}
-                  </FromStream>
-                )}
-              </DeveloperToolsContext.Consumer>
-              <FromStream
-                props={[assetGlobal$, tokens$]}
-                createStream={() => createCurrentAssetToken$({ asset$: assetGlobal$, tokens$ })}
-              >
-                {({ tokens, asset }) => (
-                  <AssetInput
-                    data-test-selector="neo-one-balance-selector-selector"
-                    data-test-container="neo-one-balance-selector-container"
-                    data-test-tooltip="neo-one-balance-selector-tooltip"
-                    help="Select Coin"
-                    value={asset}
-                    options={ASSETS.concat(tokens.map(getTokenAsset))}
-                    onChange={(option: Asset | Asset[] | undefined | null) => {
-                      if (option != undefined && !Array.isArray(option)) {
-                        onChangeAsset(option);
-                      }
-                    }}
-                  />
-                )}
-              </FromStream>
-            </>
-          )}
-        </WithTokens>
-      )}
-    </WithAddError>
+    <>
+      <Wrapper data-test="neo-one-balance-selector-value">{value}</Wrapper>
+      <AssetInput
+        data-test-selector="neo-one-balance-selector-selector"
+        data-test-container="neo-one-balance-selector-container"
+        data-test-tooltip="neo-one-balance-selector-tooltip"
+        help="Select Coin"
+        value={asset}
+        options={ASSETS.concat(tokens.map(getTokenAsset))}
+        onChange={(option: Asset | Asset[] | undefined | null) => {
+          if (option != undefined && !Array.isArray(option)) {
+            onChangeAsset(option);
+          }
+        }}
+      />
+    </>
   );
 }

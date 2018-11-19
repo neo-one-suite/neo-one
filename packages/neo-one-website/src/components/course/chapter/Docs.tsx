@@ -1,12 +1,14 @@
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Markdown } from '../common';
 import { selectChapter } from '../coursesData';
 import { SelectedChapter } from '../types';
 import { DocsFooter } from './DocsFooter';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   background-color: ${prop('theme.black')};
   grid-template:
     'docs' 1fr

@@ -1,12 +1,9 @@
 // @ts-ignore
 import CompressionPlugin from 'compression-webpack-plugin';
 import ExtractCssChunksPlugin from 'extract-css-chunks-webpack-plugin';
-// @ts-ignore
-import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
 import _ from 'lodash';
 // @ts-ignore
 import LodashModuleReplacementPlugin from 'lodash-webpack-plugin';
-import * as path from 'path';
 // @ts-ignore
 import StatsPlugin from 'stats-webpack-plugin';
 import webpack from 'webpack';
@@ -14,8 +11,6 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 // @ts-ignore
 import WebpackBar from 'webpackbar';
 import { Bundle, Stage } from '../types';
-
-const APP_ROOT_DIR = path.resolve(__dirname, '..', '..', '..');
 
 export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bundle: Bundle }) =>
   [
@@ -63,22 +58,7 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
   ]
     .concat(
       stage === 'dev' || stage === 'node' || process.env.NEO_ONE_CACHE === 'true'
-        ? [
-            new HardSourceWebpackPlugin({
-              cacheDirectory: path.resolve(APP_ROOT_DIR, 'node_modules', '.cache', 'hswp', stage, bundle),
-              cachePrune: {
-                sizeThreshold: 1024 * 1024 * 1024,
-              },
-            }),
-            new HardSourceWebpackPlugin.ExcludeModulePlugin([
-              {
-                test: /coursesLoader/,
-              },
-              {
-                test: /packagesLoader/,
-              },
-            ]),
-          ]
+        ? []
         : bundle === 'server' || bundle === 'tools'
         ? []
         : [

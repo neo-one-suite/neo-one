@@ -1,12 +1,12 @@
 // tslint:disable no-any
-import { LineLogoPrimary, Link } from '@neo-one/react-common';
+import { Box, LineLogoPrimary, Link, Toolbar, ToolbarContent, ToolbarFocusable } from '@neo-one/react-common';
 import * as React from 'react';
-import { as, Flex, styled, Toolbar } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
-import { ComponentProps } from '../../types';
 import { RouterLink } from '../RouterLink';
 
-const Wrapper = styled(Flex)`
+const Wrapper = styled(Box)`
+  display: flex;
   width: 100%;
   justify-content: center;
   background-color: ${prop('theme.black')};
@@ -24,12 +24,12 @@ const StyledToolbar = styled(Toolbar)`
     padding: 0 8px;
   }
 
-  ${/* sc-sel */ Toolbar.Focusable as any} {
+  ${/* sc-sel */ ToolbarFocusable as any} {
     outline: none;
   }
 `;
 
-const FocusableRouterLink = as(RouterLink)(Toolbar.Focusable);
+const FocusableRouterLink = ToolbarFocusable.withComponent(RouterLink);
 
 const LogoLink = styled(FocusableRouterLink)`
   display: block;
@@ -43,21 +43,21 @@ const LogoLink = styled(FocusableRouterLink)`
   }
 `;
 
-const FocusableLink: any = as(Link as any)(Toolbar.Focusable);
+const FocusableLink: any = ToolbarFocusable.withComponent(Link);
 
-export const CourseHeader = (props: ComponentProps<typeof Wrapper>) => (
+export const CourseHeader = (props: React.ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledToolbar>
-      <Toolbar.Content>
+      <ToolbarContent>
         <LogoLink to="/course">
           <LineLogoPrimary />
         </LogoLink>
-      </Toolbar.Content>
-      <Toolbar.Content align="end">
+      </ToolbarContent>
+      <ToolbarContent align="end">
         <FocusableLink linkColor="primary" href="/" target="_blank">
           Docs
         </FocusableLink>
-      </Toolbar.Content>
+      </ToolbarContent>
     </StyledToolbar>
   </Wrapper>
 );

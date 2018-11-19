@@ -1,9 +1,11 @@
-import { ActionMap, Container } from 'constate';
+import { Box, useHidden, usePrevious } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, Hidden, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { SectionData } from '../../types';
 import { Section } from './Section';
+
+const { useEffect } = React;
 
 const Wrapper = styled(Box)`
   background-color: ${prop('theme.gray1')};
@@ -21,18 +23,41 @@ const Wrapper = styled(Box)`
   }
 `;
 
-interface State {
-  readonly lastCurrent: string;
+interface SidebarListItemProps {
+  readonly current: string;
+  readonly section: SectionData;
+  readonly onClickLink?: () => void;
 }
 
-interface Actions {
-  readonly updateCurrent: (current: string) => void;
-}
+const SidebarListItem = ({ current, section, onClickLink, ...props }: SidebarListItemProps) => {
+  // tslint:disable-next-line:no-unused
+  const [visible, show, hide, toggle] = useHidden(
+    section.subsections.some((subsection) => current === subsection.slug),
+  );
+  const prevCurrent = usePrevious(current);
+  useEffect(
+    () => {
+      if (
+        current !== prevCurrent &&
+        !visible &&
+        section.subsections.some((subsection) => current === subsection.slug)
+      ) {
+        show();
+      }
+    },
+    [current, visible, prevCurrent, show, section],
+  );
 
-const actions: ActionMap<State, Actions> = {
-  updateCurrent: (current) => () => ({
-    lastCurrent: current,
-  }),
+  return (
+    <Section
+      {...props}
+      current={current}
+      section={section}
+      visible={visible}
+      toggle={toggle}
+      onClickLink={onClickLink}
+    />
+  );
 };
 
 interface Props {
@@ -48,36 +73,7 @@ export const SidebarList = ({ sections, current, alwaysVisible, onClickLink, ...
       alwaysVisible ? (
         <Section key={section.title} current={current} section={section} visible onClickLink={onClickLink} />
       ) : (
-        <Container initialState={{ lastCurrent: current }} actions={actions}>
-          {({ updateCurrent, lastCurrent }) => {
-            const expectedVisible = section.subsections.some((subsection) => current === subsection.slug);
-
-            return (
-              <Hidden.Container key={section.title} initialState={{ visible: expectedVisible }}>
-                {({ toggle, visible }) => {
-                  if (current !== lastCurrent) {
-                    setImmediate(() => {
-                      updateCurrent(current);
-                      if (!visible && expectedVisible) {
-                        toggle();
-                      }
-                    });
-                  }
-
-                  return (
-                    <Section
-                      current={current}
-                      section={section}
-                      visible={visible}
-                      toggle={toggle}
-                      onClickLink={onClickLink}
-                    />
-                  );
-                }}
-              </Hidden.Container>
-            );
-          }}
-        </Container>
+        <SidebarListItem key={section.title} current={current} section={section} onClickLink={onClickLink} />
       ),
     )}
   </Wrapper>

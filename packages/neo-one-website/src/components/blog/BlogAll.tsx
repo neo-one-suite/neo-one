@@ -1,5 +1,6 @@
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Box, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Author } from '../content';
 import { PostLink } from './PostLink';
@@ -15,7 +16,8 @@ export interface BlogAllProps {
   readonly posts: ReadonlyArray<BlogPost>;
 }
 
-const PostsGrid = styled(Grid)`
+const PostsGrid = styled(Box)`
+  display: grid;
   border-top: 1px solid ${prop('theme.gray3')};
   grid-template-columns: 1fr;
   margin-left: -8px;
@@ -73,7 +75,8 @@ const Wrapper = styled(Box)`
   }
 `;
 
-const InnerWrapper = styled(Grid)`
+const InnerWrapper = styled(Box)`
+  display: grid;
   justify-items: center;
 `;
 

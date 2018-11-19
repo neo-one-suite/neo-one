@@ -1,3 +1,14 @@
+const r = require.resolve;
+
 module.exports = {
-  extends: 'react-static/.babelrc',
+  presets: [
+    [
+      r('@babel/preset-env'),
+      {
+        modules: 'commonjs',
+        useBuiltIns: 'entry',
+        targets: { node: true },
+      },
+    ],
+  ],
 };

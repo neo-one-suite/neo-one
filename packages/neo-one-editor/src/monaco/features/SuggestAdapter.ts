@@ -52,12 +52,11 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
   }
 
   public provideCompletionItems(
-    model: monaco.editor.IReadOnlyModel,
+    model: monaco.editor.ITextModel,
     position: monaco.Position,
-    token: monaco.CancellationToken,
     context: monaco.languages.CompletionContext,
-    // tslint:disable-next-line readonly-array
-  ): monaco.Thenable<monaco.languages.CompletionItem[]> {
+    token: monaco.CancellationToken,
+  ): monaco.languages.ProviderResult<monaco.languages.CompletionList> {
     const resource = model.uri;
 
     return this.toPromise(
@@ -77,23 +76,28 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
         ),
         map((info) => {
           if (!info || model.isDisposed()) {
-            return [];
+            return { suggestions: [] };
           }
 
-          return info.entries.map((entry) => ({
-            uri: resource,
-            source: entry.source,
-            position,
-            label: entry.name,
-            sortText: entry.sortText,
-            kind: convertKind(entry.kind),
-          }));
+          return {
+            suggestions: info.entries.map((entry) => ({
+              uri: resource,
+              source: entry.source,
+              position,
+              label: entry.name,
+              insertText: entry.name,
+              sortText: entry.sortText,
+              kind: convertKind(entry.kind),
+            })),
+          };
         }),
       ),
     );
   }
 
   public resolveCompletionItem(
+    _model: monaco.editor.IReadOnlyModel,
+    _position: monaco.Position,
     item: monaco.languages.CompletionItem,
     token: monaco.CancellationToken,
   ): monaco.Thenable<monaco.languages.CompletionItem> {
@@ -134,6 +138,7 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
             position,
             label: details.name,
             kind: convertKind(details.kind),
+            insertText: myItem.insertText,
             documentation: {
               value: wrapCode(model.getModeId(), details.contents) + rest,
             },

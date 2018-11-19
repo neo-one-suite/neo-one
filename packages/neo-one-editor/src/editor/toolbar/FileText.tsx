@@ -1,9 +1,11 @@
+import { Box } from '@neo-one/react-common';
 import * as nodePath from 'path';
 import * as React from 'react';
-import { Box, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   grid-auto-flow: column;
   grid-auto-columns: auto;
   justify-content: start;

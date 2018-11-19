@@ -4,24 +4,29 @@ import { Client } from '@neo-one/client';
 // tslint:disable-next-line
 import { FromStream } from '@neo-one/react';
 // tslint:disable-next-line
-import { Button, TextInput } from '@neo-one/react-core';
+import { Box, Button, TextInput } from '@neo-one/react-core';
 import * as React from 'react';
-import { Box, Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 // @ts-ignore
 import { TokenSmartContract, WithContracts } from '../one/generated';
 import { createTokenInfoStream$, handleMint, handleTransfer, handleWithdraw } from './utils';
 
-const InfoGrid = styled(Grid)`
+const InfoGrid = styled(Box)`
+  display: grid;
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};
   background-color: ${prop('theme.gray0')};
   padding: 8px;
   margin: 8px;
   color: ${prop('theme.black')};
+  grid-template-columns: '160px 1fr';
+  grid-auto-rows: auto;
+  gap: 0;
 `;
 
-const ContributeGrid = styled(Grid)`
+const ContributeGrid = styled(Box)`
+  display: grid;
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};
   background-color: ${prop('theme.gray0')};
@@ -34,7 +39,8 @@ const ContributeGrid = styled(Grid)`
   margin: 8px;
 `;
 
-const TransferGrid = styled(Grid)`
+const TransferGrid = styled(Box)`
+  display: grid;
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};
   background-color: ${prop('theme.gray0')};
@@ -47,7 +53,8 @@ const TransferGrid = styled(Grid)`
   margin: 8px;
 `;
 
-const WithdrawGrid = styled(Grid)`
+const WithdrawGrid = styled(Box)`
+  display: grid;
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};
   background-color: ${prop('theme.gray0')};
@@ -68,13 +75,15 @@ const AddressInput = styled(TextInput)`
   grid-area: address;
 `;
 
-const SendWrapper = styled(Grid)`
+const SendWrapper = styled(Box)`
+  display: grid;
   grid-area: send;
   grid-auto-flow: column;
   justify-items: end;
 `;
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   justify-items: center;
 `;
 
@@ -111,25 +120,25 @@ export class ICO extends React.Component<Props, State> {
             {(value) => (
               <Wrapper>
                 <InnerWrapper>
-                  <InfoGrid columns="160px 1fr" autoRows="auto" gap="0">
-                    <Grid.Item>Name:</Grid.Item>
-                    <Grid.Item>{value.name}</Grid.Item>
-                    <Grid.Item>Symbol:</Grid.Item>
-                    <Grid.Item>{value.symbol}</Grid.Item>
-                    <Grid.Item>Total Supply:</Grid.Item>
-                    <Grid.Item>{value.totalSupply.toFormat()}</Grid.Item>
-                    <Grid.Item>Amount Per NEO:</Grid.Item>
-                    <Grid.Item>{value.amountPerNEO.toFormat()}</Grid.Item>
-                    <Grid.Item>NEO Contributed:</Grid.Item>
-                    <Grid.Item>{value.totalSupply.div(value.amountPerNEO).toFormat()}</Grid.Item>
-                    <Grid.Item>Remaining:</Grid.Item>
-                    <Grid.Item>{value.remaining.toFormat()}</Grid.Item>
-                    <Grid.Item>Start Time:</Grid.Item>
-                    <Grid.Item>{new Date(value.icoStartTimeSeconds.toNumber() * 1000).toLocaleString()}</Grid.Item>
-                    <Grid.Item>Duration:</Grid.Item>
-                    <Grid.Item>{value.icoDurationSeconds.toNumber() / (60 * 60)} hours</Grid.Item>
-                    <Grid.Item>Your Balance:</Grid.Item>
-                    <Grid.Item>{value.balance.toFormat()}</Grid.Item>
+                  <InfoGrid>
+                    <Box>Name:</Box>
+                    <Box>{value.name}</Box>
+                    <Box>Symbol:</Box>
+                    <Box>{value.symbol}</Box>
+                    <Box>Total Supply:</Box>
+                    <Box>{value.totalSupply.toFormat()}</Box>
+                    <Box>Amount Per NEO:</Box>
+                    <Box>{value.amountPerNEO.toFormat()}</Box>
+                    <Box>NEO Contributed:</Box>
+                    <Box>{value.totalSupply.div(value.amountPerNEO).toFormat()}</Box>
+                    <Box>Remaining:</Box>
+                    <Box>{value.remaining.toFormat()}</Box>
+                    <Box>Start Time:</Box>
+                    <Box>{new Date(value.icoStartTimeSeconds.toNumber() * 1000).toLocaleString()}</Box>
+                    <Box>Duration:</Box>
+                    <Box>{value.icoDurationSeconds.toNumber() / (60 * 60)} hours</Box>
+                    <Box>Your Balance:</Box>
+                    <Box>{value.balance.toFormat()}</Box>
                   </InfoGrid>
                   <ContributeGrid>
                     <AmountInput value={this.state.text} placeholder="Send NEO" onChange={this.onChangeAmount} />

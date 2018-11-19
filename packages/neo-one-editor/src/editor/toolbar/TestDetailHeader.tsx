@@ -1,13 +1,15 @@
 // tslint:disable no-null-keyword
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Grid, styled } from 'reakit';
+import styled from 'styled-components';
 import { EditorContext } from '../../EditorContext';
 import { EditorContextType, TestSuite } from '../../types';
 import { FileText } from './FileText';
 import { TestSuiteIcon } from './TestSuiteIcon';
 import { TestSummaryHeaderCommon } from './TestSummaryHeaderCommon';
 
-const TitleElementWrapper = styled(Grid)`
+const TitleElementWrapper = styled(Box)`
+  display: grid;
   grid-gap: 4px;
   grid-auto-flow: column;
   justify-content: start;

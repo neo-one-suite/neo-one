@@ -1,8 +1,8 @@
 // tslint:disable no-null-keyword
-import { Button } from '@neo-one/react-common';
+import { Box, Button, Hidden, useHidden } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Grid, Hidden, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { CourseState, selectChapterProgress } from '../redux';
 import { SelectedChapter } from '../types';
@@ -10,7 +10,8 @@ import { DocsSolution } from './DocsSolution';
 import { NextButton } from './NextButton';
 import { PreviousButton } from './PreviousButton';
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
   grid:
     'solution' auto
     'footer' auto
@@ -20,7 +21,8 @@ const Wrapper = styled(Grid)`
   border-top: 1px solid ${prop('theme.gray5')};
 `;
 
-const FooterWrapperBase = styled(Grid)`
+const FooterWrapperBase = styled(Box)`
+  display: grid;
   grid-gap: 8px;
   padding: 8px;
   grid-auto-flow: column;
@@ -52,28 +54,29 @@ interface Props extends ExternalProps {
   readonly complete: boolean;
 }
 
-const DocsFooterBase = ({ selected, complete, ...props }: Props) => (
-  <Hidden.Container>
-    {(hidden) => (
-      <Wrapper>
-        <StyledHidden {...hidden} unmount>
-          <DocsSolution selected={selected} />
-        </StyledHidden>
-        <FooterWrapper {...props}>
-          <FooterLeftWrapper>
-            <PreviousButton selected={selected} onClick={hidden.hide} />
-          </FooterLeftWrapper>
-          <FooterRightWrapper>
-            <Hidden.Toggle data-test="docs-footer-solution-button" as={Button} {...hidden}>
-              {hidden.visible ? 'Hide' : 'Show'} Solution
-            </Hidden.Toggle>
-            <NextButton selected={selected} onClick={hidden.hide} complete={complete} />
-          </FooterRightWrapper>
-        </FooterWrapper>
-      </Wrapper>
-    )}
-  </Hidden.Container>
-);
+const DocsFooterBase = ({ selected, complete, ...props }: Props) => {
+  // tslint:disable-next-line:no-unused
+  const [visible, show, hide, toggle] = useHidden();
+
+  return (
+    <Wrapper>
+      <StyledHidden visible={visible} unmount>
+        <DocsSolution selected={selected} />
+      </StyledHidden>
+      <FooterWrapper {...props}>
+        <FooterLeftWrapper>
+          <PreviousButton selected={selected} onClick={hide} />
+        </FooterLeftWrapper>
+        <FooterRightWrapper>
+          <Button data-test="docs-footer-solution-button" onClick={toggle}>
+            {visible ? 'Hide' : 'Show'} Solution
+          </Button>
+          <NextButton selected={selected} onClick={hide} complete={complete} />
+        </FooterRightWrapper>
+      </FooterWrapper>
+    </Wrapper>
+  );
+};
 
 export const DocsFooter = connect((state: CourseState, { selected }: ExternalProps) => ({
   complete: selectChapterProgress(state, selected),

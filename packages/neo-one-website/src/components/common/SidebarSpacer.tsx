@@ -1,4 +1,5 @@
-import { Box, styled } from 'reakit';
+import { Box } from '@neo-one/react-common';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
 export const SidebarSpacer = styled(Box)`

@@ -1,12 +1,12 @@
 // tslint:disable no-any strict-type-predicates
-import { theme } from '@neo-one/react-common';
+import { GlobalFonts, theme } from '@neo-one/react-common';
 // @ts-ignore
 import { ViewportProvider } from '@render-props/viewport';
 import * as React from 'react';
 import { hot } from 'react-hot-loader';
 // @ts-ignore
 import { getCurrentRoutePath, Root, Routes } from 'react-static';
-import { ThemeProvider } from 'reakit';
+import { ThemeProvider } from 'styled-components';
 import { CourseLoading, HomeLoading } from './layout';
 
 const WebRoutes = (props: any) => (
@@ -26,11 +26,14 @@ const WebRoutes = (props: any) => (
 const ReactRoutes: any = typeof window === 'undefined' ? Routes : WebRoutes;
 
 export const App = hot(module)(() => (
-  <ThemeProvider theme={theme}>
-    <ViewportProvider>
-      <Root scrollToHashOffset={-88}>
-        <ReactRoutes Loader={HomeLoading} />
-      </Root>
-    </ViewportProvider>
-  </ThemeProvider>
+  <>
+    <GlobalFonts />
+    <ThemeProvider theme={theme}>
+      <ViewportProvider>
+        <Root scrollToHashOffset={-88}>
+          <ReactRoutes Loader={HomeLoading} />
+        </Root>
+      </ViewportProvider>
+    </ThemeProvider>
+  </>
 ));

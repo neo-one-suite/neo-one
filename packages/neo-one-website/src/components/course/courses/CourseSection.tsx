@@ -1,7 +1,7 @@
-import { Button } from '@neo-one/react-common';
+import { Box, Button, useHidden } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Box, Flex, Grid, Hidden, styled } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Collapse } from '../../../containers';
 import { Client, Contract, Debugging, Num } from '../../../elements';
@@ -33,7 +33,9 @@ const images = {
   client: StyledClient,
 };
 
-const Wrapper = styled(Grid)`
+const Wrapper = styled(Box)`
+  display: grid;
+  gap: 16;
   width: 100%;
   max-width: ${maxWidth};
   grid:
@@ -41,7 +43,8 @@ const Wrapper = styled(Grid)`
     / auto minmax(480px, 1fr);
 `;
 
-const ImageWrapper = styled(Flex)`
+const ImageWrapper = styled(Box)`
+  display: flex;
   height: 136px;
   width: 100%;
   align-items: center;
@@ -89,6 +92,24 @@ const TextWrapper = styled(Box)`
   grid-gap: 8px;
 `;
 
+const InnerWrapper = styled(Box)<{ readonly template: string }>`
+  display: grid;
+  grid: ${prop('template')};
+  gap: 8;
+`;
+
+const TextItem = styled(Box)`
+  grid-area: text;
+`;
+
+const ProgressItem = styled(Box)`
+  grid-area: progress;
+`;
+
+const ListItem = styled(Box)`
+  grid-area: list;
+`;
+
 const template = `
   "text button" auto
   "progress empty" auto
@@ -118,21 +139,24 @@ const CourseSectionBase = ({ slug, course, index, progress }: Props) => {
   const Image = images[course.image];
   const bg = background[index % background.length];
 
+  // tslint:disable-next-line:no-unused
+  const [visible, _show, _hide, toggle] = useHidden(index === 0);
+
   return (
     <ContentWrapper bg={bg}>
-      <Wrapper gap={16}>
+      <Wrapper>
         <ImageWrapper>
           <StyledNumber num={index} />
           <Image />
         </ImageWrapper>
-        <Grid template={template} gap={8}>
-          <Grid.Item area="text">
+        <InnerWrapper template={template}>
+          <TextItem>
             <TextWrapper>
               <Title>{course.title}</Title>
               <Text>{course.description}</Text>
             </TextWrapper>
-          </Grid.Item>
-          <Grid.Item area="progress">
+          </TextItem>
+          <ProgressItem>
             <ProgressBar
               items={course.lessons.map((lesson, idx) => ({
                 complete: isLessonComplete(lesson, idx, progress),
@@ -140,20 +164,14 @@ const CourseSectionBase = ({ slug, course, index, progress }: Props) => {
                 to: getLessonTo(slug, idx),
               }))}
             />
-          </Grid.Item>
-          <Hidden.Container initialState={{ visible: index === 0 }}>
-            {({ visible, toggle }) => (
-              <>
-                <StartButton onClick={toggle}>{visible ? 'Hide' : 'Show'} Lessons</StartButton>
-                <Grid.Item area="list">
-                  <Collapse visible={visible}>
-                    <StyledLessonList slug={slug} lessons={course.lessons} />
-                  </Collapse>
-                </Grid.Item>
-              </>
-            )}
-          </Hidden.Container>
-        </Grid>
+          </ProgressItem>
+          <StartButton onClick={toggle}>{visible ? 'Hide' : 'Show'} Lessons</StartButton>
+          <ListItem>
+            <Collapse visible={visible}>
+              <StyledLessonList slug={slug} lessons={course.lessons} />
+            </Collapse>
+          </ListItem>
+        </InnerWrapper>
       </Wrapper>
     </ContentWrapper>
   );

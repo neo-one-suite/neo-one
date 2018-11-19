@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { styled, Tooltip as ReakitTooltip } from 'reakit';
+import styled from 'styled-components';
 import { prop } from 'styled-tools';
-import { Tooltip as TooltipBase } from './base';
-import { ComponentProps } from './types';
+import { PopoverArrow } from './PopoverArrow';
+import { TooltipBase } from './TooltipBase';
 
 export const StyledTooltip = styled(TooltipBase)`
   background-color: ${prop('theme.gray5')};
@@ -11,15 +11,8 @@ export const StyledTooltip = styled(TooltipBase)`
   padding: 8px;
 `;
 
-export function Tooltip(props: ComponentProps<typeof StyledTooltip>) {
+export function Tooltip(props: React.ComponentPropsWithoutRef<typeof StyledTooltip>) {
   return <StyledTooltip fade slide {...props} />;
 }
 
-export const TooltipArrow = styled(ReakitTooltip.Arrow)`
-  border-color: ${prop('theme.gray5')};
-  color: ${prop('theme.gray5')};
-
-  &&& > svg > path {
-    fill: currentColor;
-  }
-`;
+export const TooltipArrow = PopoverArrow;

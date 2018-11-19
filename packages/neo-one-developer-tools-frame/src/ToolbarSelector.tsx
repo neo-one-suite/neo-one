@@ -1,27 +1,9 @@
 // tslint:disable no-any strict-type-predicates
-import { Select, Tooltip, TooltipArrow } from '@neo-one/react-common';
-import { ActionMap } from 'constate';
+import { Box, Select, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
-import { Container, styled } from 'reakit';
+import styled from 'styled-components';
 
-interface State {
-  readonly menuOpen: boolean;
-  readonly hover: boolean;
-}
-
-interface Actions {
-  readonly onMenuOpen: () => void;
-  readonly onMenuClose: () => void;
-  readonly onMouseEnter: () => void;
-  readonly onMouseLeave: () => void;
-}
-
-const actions: ActionMap<State, Actions> = {
-  onMenuOpen: () => () => ({ menuOpen: true, hover: false }),
-  onMenuClose: () => () => ({ menuOpen: false, hover: false }),
-  onMouseEnter: () => () => ({ hover: true }),
-  onMouseLeave: () => () => ({ hover: false }),
-};
+const { useCallback, useState } = React;
 
 // tslint:disable-next-line no-any
 const StyledSelect: any = styled(Select)`
@@ -39,24 +21,39 @@ export function ToolbarSelector({
   help,
   ...rest
 }: any) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [hover, setHover] = useState(false);
+  const onMenuOpen = useCallback(
+    () => {
+      setMenuOpen(true);
+      setHover(false);
+    },
+    [setMenuOpen, setHover],
+  );
+  const onMenuClose = useCallback(
+    () => {
+      setMenuOpen(false);
+      setHover(false);
+    },
+    [setMenuOpen, setHover],
+  );
+  const onMouseEnter = useCallback(() => setHover(true), [setHover]);
+  const onMouseLeave = useCallback(() => setHover(false), [setHover]);
+
   return (
-    <Container initialState={{ menuOpen: false, hover: false }} actions={actions}>
-      {({ menuOpen, onMenuOpen, onMenuClose, hover, onMouseEnter, onMouseLeave }) => (
-        <div data-test={dataTestContainer} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-          <StyledSelect
-            data-test={dataTestSelector}
-            menuPlacement="top"
-            {...rest}
-            onMenuOpen={onMenuOpen}
-            onMenuClose={onMenuClose}
-            menuPortalTarget={typeof document === 'undefined' ? undefined : document.body}
-          />
-          <Tooltip data-test={dataTestTooltip} visible={menuOpen ? false : hover} placement="top">
-            <TooltipArrow />
-            {help}
-          </Tooltip>
-        </div>
-      )}
-    </Container>
+    <Box data-test={dataTestContainer} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      <StyledSelect
+        data-test={dataTestSelector}
+        menuPlacement="top"
+        {...rest}
+        onMenuOpen={onMenuOpen}
+        onMenuClose={onMenuClose}
+        menuPortalTarget={typeof document === 'undefined' ? undefined : document.body}
+      />
+      <Tooltip data-test={dataTestTooltip} visible={menuOpen ? false : hover} placement="top">
+        <TooltipArrow />
+        {help}
+      </Tooltip>
+    </Box>
   );
 }
