@@ -4,10 +4,19 @@ import { Blockchain, Node } from '@neo-one/node-core';
 import * as http from 'http';
 import * as https from 'https';
 import Application from 'koa';
+import rateLimit from 'koa-ratelimit-lru';
 import Router from 'koa-router';
 import { combineLatest, Observable, of as _of } from 'rxjs';
 import { distinctUntilChanged, map, publishReplay, refCount } from 'rxjs/operators';
-import { liveHealthCheck, LiveHealthCheckOptions, readyHealthCheck, ReadyHealthCheckOptions, rpc } from './middleware';
+import {
+  liveHealthCheck,
+  LiveHealthCheckOptions,
+  readyHealthCheck,
+  ReadyHealthCheckOptions,
+  rpc,
+  tooBusyCheck,
+  TooBusyCheckOptions,
+} from './middleware';
 
 export interface ServerOptions {
   readonly keepAliveTimeout?: number;
@@ -29,6 +38,8 @@ export interface Options {
   readonly server?: ServerOptions;
   readonly liveHealthCheck?: LiveHealthCheckOptions;
   readonly readyHealthCheck?: ReadyHealthCheckOptions;
+  readonly tooBusyCheck?: TooBusyCheckOptions & { readonly enabled?: boolean };
+  readonly rateLimit?: rateLimit.Options & { readonly enabled?: boolean };
 }
 
 export const rpcServer$ = ({
@@ -51,16 +62,22 @@ export const rpcServer$ = ({
       map((options) => options.liveHealthCheck),
       distinctUntilChanged(),
     ),
-
     options$.pipe(
       map((options) => options.readyHealthCheck),
       distinctUntilChanged(),
     ),
+    options$.pipe(
+      map((options) => options.tooBusyCheck),
+      distinctUntilChanged(),
+    ),
+    options$.pipe(
+      map((options) => options.rateLimit),
+      distinctUntilChanged(),
+    ),
   ).pipe(
-    map(([liveHealthCheckOptions, readyHealthCheckOptions]) => {
+    map(([liveHealthCheckOptions, readyHealthCheckOptions, tooBusyCheckOptions, rateLimitOptions]) => {
       const app = new Application();
       app.proxy = true;
-      // $FlowFixMe
       app.silent = true;
 
       app.on('error', appOnError({ monitor }));
@@ -86,6 +103,14 @@ export const rpcServer$ = ({
         });
 
         router.get(readyMiddleware.name, readyMiddleware.path, readyMiddleware.middleware);
+      }
+
+      if (rateLimitOptions !== undefined && rateLimitOptions.enabled) {
+        router.use(rateLimit(rateLimitOptions));
+      }
+
+      if (tooBusyCheckOptions !== undefined && tooBusyCheckOptions.enabled) {
+        router.use(tooBusyCheck(tooBusyCheckOptions));
       }
 
       router.use(cors).post(rpcMiddleware.name, rpcMiddleware.path, rpcMiddleware.middleware);
