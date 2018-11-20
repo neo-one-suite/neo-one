@@ -12737,6 +12737,7 @@ listr-update-renderer@^0.2.0:
 listr-update-renderer@^0.4.0:
   version "0.4.0"
   resolved "https://github.com/okonet/listr-update-renderer/tarball/upgrade-log-update#06073fa93166277607a7814f4e1f83960081414c"
+  integrity sha1-NE2YDaLKLosUW6MFkI8yrj9MyKc=
   dependencies:
     chalk "^1.1.3"
     cli-truncate "^0.2.1"
@@ -21296,10 +21297,10 @@ yargs-parser@10.1.0, yargs-parser@10.x, yargs-parser@^10.0.0, yargs-parser@^10.1
   dependencies:
     camelcase "^4.1.0"
 
-yargs-parser@^11.1.0:
-  version "11.1.0"
-  resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-11.1.0.tgz#0b8104116367bf663089b24e5801438ab50396a3"
-  integrity sha512-lGA5HsbjkpCfekDBHAhgE5OE8xEoqiUDylowr+BvhRCwG1xVYTsd8hx2CYC0NY4k9RIgJeybFTG2EZW4P2aN1w==
+yargs-parser@^11.1.1:
+  version "11.1.1"
+  resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-11.1.1.tgz#879a0865973bca9f6bab5cbdf3b1c67ec7d3bcf4"
+  integrity sha512-C6kB/WJDiaxONLJQnF8ccx9SEeoTTLek8RVbaOIsrAUS8VrBEXfmeSnCZxygc+XC2sNMBIwOOnfcxiynjHsVSQ==
   dependencies:
     camelcase "^5.0.0"
     decamelize "^1.2.0"
@@ -21368,10 +21369,10 @@ yargs@12.0.2, yargs@^12.0.1, yargs@^12.0.2:
     y18n "^3.2.1 || ^4.0.0"
     yargs-parser "^10.1.0"
 
-yargs@12.0.4:
-  version "12.0.4"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-12.0.4.tgz#5ea307c6f11f11881c3bc375f9c939194e8cf4bc"
-  integrity sha512-f5esswlPO351AnejaO2A1ZZr0zesz19RehQKwiRDqWtrraWrJy16tsUIKgDXFMVytvNOHPVmTiaTh3wO67I0fQ==
+yargs@12.0.5:
+  version "12.0.5"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-12.0.5.tgz#05f5997b609647b64f66b81e3b4b10a368e7ad13"
+  integrity sha512-Lhz8TLaYnxq/2ObqHDql8dX8CJi97oHxrjUcYtzKbbykPtVW9WB+poxI+NM2UIzsMgNCZTIf0AQwsjK5yMAqZw==
   dependencies:
     cliui "^4.0.0"
     decamelize "^1.2.0"
@@ -21384,7 +21385,7 @@ yargs@12.0.4:
     string-width "^2.0.0"
     which-module "^2.0.0"
     y18n "^3.2.1 || ^4.0.0"
-    yargs-parser "^11.1.0"
+    yargs-parser "^11.1.1"
 
 yargs@^10.0.3:
   version "10.1.2"
