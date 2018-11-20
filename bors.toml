@@ -1,4 +1,13 @@
 status = [
-  "ci/circleci%"
+  "ci/circleci: lint",
+  "ci/circleci: test8",
+  "ci/circleci: test9",
+  "ci/circleci: test10",
+  "ci/circleci: e2e8",
+  "ci/circleci: e2e9",
+  "ci/circleci: e2e10",
+  "ci/circleci: build-e2e8",
+  "ci/circleci: build-e2e9",
+  "ci/circleci: build-e2e10"
 ]
 timeout_sec = 18000
