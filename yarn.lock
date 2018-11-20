@@ -2894,6 +2894,11 @@
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.2.tgz#fa8e1ad1d474688a757140c91de6dace6f4abc8d"
 
+"@types/rc@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@types/rc/-/rc-0.0.1.tgz#1f5b8a1b3b1ac6d1fee137c53fac5fa0f28ae0d7"
+  integrity sha1-H1uKGzsaxtH+4TfFP6xfoPKK4Nc=
+
 "@types/reach__router@^1.2.2":
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@types/reach__router/-/reach__router-1.2.2.tgz#1bd96626c2866a61937758ef6be2f06309124805"
@@ -14913,7 +14918,7 @@ raw-loader@^0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/raw-loader/-/raw-loader-0.5.1.tgz#0c3d0beaed8a01c966d9787bf778281252a979aa"
 
-rc@^1.0.1, rc@^1.1.6, rc@^1.2.7:
+rc@^1.0.1, rc@^1.1.6, rc@^1.2.7, rc@^1.2.8:
   version "1.2.8"
   resolved "https://registry.yarnpkg.com/rc/-/rc-1.2.8.tgz#cd924bf5200a075b83c188cd6b9e211b7fc0d3ed"
   dependencies:
