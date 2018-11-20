@@ -39,7 +39,7 @@ export const optimization = ({
 }): webpack.Options.Optimization => {
   if (stage === 'dev') {
     return {
-      concatenateModules: true,
+      concatenateModules: false,
     };
   }
 

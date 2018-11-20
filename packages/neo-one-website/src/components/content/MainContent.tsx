@@ -4,6 +4,8 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { prop } from 'styled-tools';
 import { Markdown } from '../../elements';
+import { ReferenceContent } from '../reference';
+import { ContentType } from './Content';
 import { DateAndAuthor } from './DateAndAuthor';
 import { Author } from './types';
 
@@ -156,7 +158,7 @@ const Title = styled.h1`
 
 interface Props {
   readonly title: string;
-  readonly content: string;
+  readonly content: ContentType;
   readonly date?: string;
   readonly author?: Author;
 }
@@ -165,6 +167,10 @@ export const MainContent = ({ content, title, date, author, ...props }: Props) =
   <Wrapper {...props}>
     <Title>{title}</Title>
     {date === undefined || author === undefined ? null : <DateAndAuthor date={date} author={author} />}
-    <StyledMarkdown source={content} linkColor="accent" light anchors />
+    {content.type === 'markdown' ? (
+      <StyledMarkdown source={content.value} linkColor="accent" light anchors />
+    ) : (
+      <ReferenceContent content={content} />
+    )}
   </Wrapper>
 );

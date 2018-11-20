@@ -4,11 +4,11 @@ import { ViewportConsumer } from '@render-props/viewport';
 import * as React from 'react';
 import slugify from 'slugify';
 import { AdjacentInfo, SectionData } from '../../types';
-import { Content } from '../content';
+import { Content, MarkdownContent } from '../content';
 
 export interface TutorialProps {
   readonly title: string;
-  readonly content: string;
+  readonly content: MarkdownContent;
   readonly sidebar: ReadonlyArray<SectionData>;
   readonly next?: AdjacentInfo;
   readonly previous?: AdjacentInfo;

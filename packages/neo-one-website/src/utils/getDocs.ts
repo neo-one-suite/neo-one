@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import matter from 'gray-matter';
 import _ from 'lodash';
 import * as path from 'path';
-import { DocsProps } from '../components';
+import { DocsProps, MarkdownContent } from '../components';
 import { AdjacentInfo } from '../types';
 
 interface MDDocHeader {
@@ -12,7 +12,7 @@ interface MDDocHeader {
 }
 
 interface DocInfoBase extends MDDocHeader {
-  readonly content: string;
+  readonly content: MarkdownContent;
 }
 
 interface DocInfo extends DocInfoBase {
@@ -79,7 +79,7 @@ const getDoc = async (section: string, docFile: string): Promise<DocInfoBase> =>
     slug: `/docs/${docHeader.slug}`,
     title: docHeader.title.replace(/\\@/g, '@'),
     section,
-    content: doc.content,
+    content: { type: 'markdown', value: doc.content },
   };
 };
 

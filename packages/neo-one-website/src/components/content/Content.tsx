@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
 import { AdjacentInfo, SectionData } from '../../types';
 import { LayoutWrapper } from '../common';
+import { ReferenceItem } from '../reference';
 import { DocFooter } from './DocFooter';
 import { MainContent } from './MainContent';
 import { Sidebar } from './Sidebar';
@@ -16,11 +17,28 @@ const StyledGrid = styled(Box)`
   justify-items: center;
 `;
 
+export interface MarkdownContent {
+  readonly type: 'markdown';
+  readonly value: string;
+}
+
+export interface ReferenceItemContent {
+  readonly type: 'referenceItem';
+  readonly value: ReferenceItem;
+}
+
+export interface ReferenceItemsContent {
+  readonly type: 'referenceItems';
+  readonly value: ReadonlyArray<ReferenceItem>;
+}
+
+export type ContentType = MarkdownContent | ReferenceItemContent | ReferenceItemsContent;
+
 interface Props {
   readonly current: string;
   readonly sidebarAlwaysVisible: boolean;
   readonly title: string;
-  readonly content: string;
+  readonly content: ContentType;
   readonly sidebar: ReadonlyArray<SectionData>;
   readonly date?: string;
   readonly author?: Author;

@@ -15,7 +15,7 @@ export const getTutorial = async (): Promise<TutorialProps> => {
 
   return {
     title: 'Tutorial: Intro to NEO•ONE',
-    content,
+    content: { type: 'markdown', value: content },
     sidebar: [
       {
         title: 'TUTORIAL',
