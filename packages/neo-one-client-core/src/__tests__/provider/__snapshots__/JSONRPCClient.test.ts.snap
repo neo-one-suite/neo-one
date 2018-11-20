@@ -215,6 +215,17 @@ Array [
 ]
 `;
 
+exports[`JSONRPCClient getSettings 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getsettings",
+    },
+    undefined,
+  ],
+]
+`;
+
 exports[`JSONRPCClient getTransaction 1`] = `
 Array [
   Array [

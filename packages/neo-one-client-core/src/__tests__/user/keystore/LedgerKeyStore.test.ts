@@ -1,7 +1,9 @@
 import { common, crypto } from '@neo-one/client-common';
+import { DefaultMonitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import { of } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
+import { UnknownAccountError, UnknownNetworkError } from '../../../errors';
 import { LedgerKeyStore, LedgerProvider } from '../../../user/keystore/LedgerKeyStore';
 
 const testMessage =
@@ -20,7 +22,7 @@ describe('LedgerKeyStore', () => {
     },
   };
 
-  const networks = ['test'];
+  const networks = ['test', 'main', 'test'];
   const networks$ = of(networks);
   const getAccount = jest.fn();
 
@@ -30,28 +32,23 @@ describe('LedgerKeyStore', () => {
     getNetworks: () => networks,
   };
 
-  const indexAccount = {
+  const indexAccount = (network: string) => ({
     id: {
-      network: 'test',
+      network,
       address: 'ARL4VYQWxSwigpRsCsucLxovujKDmwYeTd',
     },
     name: '0',
     publicKey: '03d81d462f80d55ff234b1b221e46d52e4da3f93c465edbbaeebd742bc1947fe6d',
-  };
+  });
 
-  const secondaryAccount = {
+  const secondaryAccount = (network: string) => ({
     id: {
-      network: 'test',
+      network,
       address: 'AJGCVgoLp3bU57zd4k6mcpedWr45Em8dFD',
     },
     name: '1',
     publicKey: '031546889cf12577237536380e86b2587d55743f9d4dac8879f332b79ce1a84cd6',
-  };
-
-  const indexLedger = {
-    accountKey: 0,
-    account: indexAccount,
-  };
+  });
 
   const mockConnectedHandler = {
     getPublicKey: async (account?: number) => {
@@ -97,7 +94,7 @@ describe('LedgerKeyStore', () => {
   });
 
   test('accounts$', async () => {
-    const [currentAccount, accounts] = await Promise.all([
+    const [currentUserAccount, accounts] = await Promise.all([
       keystore.currentUserAccount$
         .pipe(
           filter((value) => value !== undefined),
@@ -111,8 +108,13 @@ describe('LedgerKeyStore', () => {
         )
         .toPromise(),
     ]);
-    expect(currentAccount).toEqual(indexAccount);
-    expect(accounts).toEqual([indexAccount, secondaryAccount]);
+    expect(currentUserAccount).toEqual(indexAccount('main'));
+    expect(accounts).toEqual([
+      indexAccount('test'),
+      secondaryAccount('test'),
+      indexAccount('main'),
+      secondaryAccount('main'),
+    ]);
   });
 
   test('byteLimit', () => {
@@ -121,10 +123,56 @@ describe('LedgerKeyStore', () => {
     expect(result).toEqual(2048);
   });
 
-  test('getAccounts', async () => {
+  test('selectUserAccount - currentUserAccount', async () => {
+    await keystore.currentUserAccount$
+      .pipe(
+        filter((value) => value !== undefined),
+        take(1),
+      )
+      .toPromise();
+
+    expect(keystore.getCurrentUserAccount()).toEqual(indexAccount('main'));
+    await keystore.selectUserAccount();
+    expect(keystore.getCurrentUserAccount()).toEqual(undefined);
+    await keystore.selectUserAccount(indexAccount('main').id);
+    expect(keystore.getCurrentUserAccount()).toEqual(indexAccount('main'));
+  });
+
+  test('selectUserAccount - throws on bad network', async () => {
+    const badNetwork = 'badNetwork';
+    const getLedgersThrow = keystore.selectUserAccount({
+      address: indexAccount('test').id.address,
+      network: badNetwork,
+    });
+
+    await expect(getLedgersThrow).rejects.toEqual(new UnknownNetworkError(badNetwork));
+  });
+
+  test('selectUserAccount - throws on bad address', async () => {
+    const badAddress = 'badAddress';
+    const getLedgersThrow = keystore.selectUserAccount({
+      address: badAddress,
+      network: indexAccount('test').id.network,
+    });
+
+    await expect(getLedgersThrow).rejects.toEqual(new UnknownAccountError(badAddress));
+  });
+
+  test('getUserAccounts', () => {
     const result = keystore.getUserAccounts();
 
-    expect(result).toEqual([indexAccount, secondaryAccount]);
+    expect(result).toEqual([
+      indexAccount('test'),
+      secondaryAccount('test'),
+      indexAccount('main'),
+      secondaryAccount('main'),
+    ]);
+  });
+
+  test('getNetworks', () => {
+    const result = keystore.getNetworks();
+
+    expect(result).toEqual(networks);
   });
 
   test('mixed scan', async () => {
@@ -154,7 +202,7 @@ describe('LedgerKeyStore', () => {
     const accounts = keystore.getUserAccounts();
     const account = keystore.getCurrentUserAccount();
 
-    expect(accounts.length).toEqual(21);
+    expect(accounts.length).toEqual(23);
     expect(account).toBeDefined();
   });
 
@@ -166,7 +214,21 @@ describe('LedgerKeyStore', () => {
       )
       .toPromise();
 
-    const result = await keystore.sign({ account: indexLedger.account.id, message: testMessage });
+    const result = await keystore.sign({ account: indexAccount('test').id, message: testMessage });
+
+    expect(result).toMatchSnapshot();
+  });
+
+  test('sign - with monitor', async () => {
+    const monitor = DefaultMonitor.create({ service: 'test' });
+    await keystore.userAccounts$
+      .pipe(
+        filter((value) => value.length !== 0),
+        take(1),
+      )
+      .toPromise();
+
+    const result = await keystore.sign({ account: indexAccount('test').id, message: testMessage, monitor });
 
     expect(result).toMatchSnapshot();
   });

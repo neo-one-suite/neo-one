@@ -30,6 +30,14 @@ describe('DeveloperClient', () => {
     expect(provider.updateSettings).toHaveBeenCalledTimes(1);
   });
 
+  test('getSettings', async () => {
+    const options = { secondsPerBlock: 10 };
+    provider.getSettings = jest.fn(async () => Promise.resolve(options));
+    const result = await developerClient.getSettings();
+
+    expect(result).toEqual(options);
+  });
+
   test('fastForwardOffset', async () => {
     const offset = 10;
     provider.fastForwardOffset = jest.fn();

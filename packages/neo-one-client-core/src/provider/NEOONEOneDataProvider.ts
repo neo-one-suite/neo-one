@@ -28,6 +28,7 @@ import { Client as OneClient } from '@neo-one/server-http-client';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
 import BigNumber from 'bignumber.js';
+import { NEOONEOneDataProviderSetRPCURLError } from '../errors';
 import { NEOONEDataProvider } from './NEOONEDataProvider';
 
 export interface NEOONEOneDataProviderOptions {
@@ -64,7 +65,7 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
   }
 
   public setRPCURL(_rpcURL: string): void {
-    throw new Error('Cannot set rpcURL for NEOONEOneDataProvider');
+    throw new NEOONEOneDataProviderSetRPCURLError();
   }
 
   public async getUnclaimed(
@@ -234,6 +235,7 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
   }
 
   private async getProvider(): Promise<NEOONEDataProvider> {
+    /* istanbul ignore next */
     if (this.mutableProvider === undefined) {
       const client = new OneClient(this.port);
       const result = await client.request({

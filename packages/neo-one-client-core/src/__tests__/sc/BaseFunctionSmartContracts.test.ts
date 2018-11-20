@@ -1,7 +1,7 @@
 // tslint:disable variable-name
 import { ABIFunction } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
-import { data, factory } from '../../__data__';
+import { data, factory, keys } from '../../__data__';
 import { Client } from '../../Client';
 import { getParamsAndOptions } from '../../sc';
 
@@ -15,28 +15,33 @@ const client: Client = {
 } as any;
 
 // tslint:disable-next-line:no-any
-const getABIFuncTest = (func: ABIFunction) => (args: ReadonlyArray<any>, argsName: string) => {
+const getABIFuncTest = (func: ABIFunction) => (args: ReadonlyArray<any>, argsName: string, error?: string) => {
   test(`${argsName}`, () => {
     const abi = {
       functions: [func],
     };
 
     const definition = factory.createSmartContractDefinition({ abi });
-    const paramsAndOptions = getParamsAndOptions({
-      definition,
-      client,
-      args,
-      parameters: func.parameters === undefined ? [] : func.parameters,
-      sendUnsafe: func.sendUnsafe === undefined ? false : func.sendUnsafe,
-      receive: func.receive === undefined ? false : func.receive,
-      send: func.send === undefined ? false : func.send,
-      completeSend: func.completeSend === undefined ? false : func.completeSend,
-      refundAssets: func.refundAssets === undefined ? false : func.refundAssets,
-    });
-    expect({
-      inputArgs: args,
-      ...paramsAndOptions,
-    }).toMatchSnapshot();
+    const paramsAndOptions = () =>
+      getParamsAndOptions({
+        definition,
+        client,
+        args,
+        parameters: func.parameters === undefined ? [] : func.parameters,
+        sendUnsafe: func.sendUnsafe === undefined ? false : func.sendUnsafe,
+        receive: func.receive === undefined ? false : func.receive,
+        send: func.send === undefined ? false : func.send,
+        completeSend: func.completeSend === undefined ? false : func.completeSend,
+        refundAssets: func.refundAssets === undefined ? false : func.refundAssets,
+      });
+    if (error !== undefined) {
+      expect(paramsAndOptions).toThrowError(error);
+    } else {
+      expect({
+        inputArgs: args,
+        ...paramsAndOptions(),
+      }).toMatchSnapshot();
+    }
   });
 };
 
@@ -182,6 +187,7 @@ describe('Transfer - Complete Send - Optional ForwardValues', () => {
     { events },
     factory.createForwardValue(),
   ];
+  const testArgsThrow = [true, true, new BigNumber(1), { from: wallet.userAccount.id }];
 
   const testFunc = getABIFuncTest(func);
 
@@ -189,6 +195,7 @@ describe('Transfer - Complete Send - Optional ForwardValues', () => {
   testFunc(testArgs, 'all');
   testFunc(testArgsWithOptions, 'all-transOptions');
   testFunc(testArgsAllOptions, 'all-allOptions');
+  testFunc(testArgsThrow, 'throws-noHash', 'Expected to find a hash argument');
 });
 
 describe('Transfer - Send - Optional ForwardValue', async () => {
@@ -247,6 +254,7 @@ describe('Transfer - Send - Optional ForwardValue', async () => {
   ];
   const testArgsNoForward = [true, true, new BigNumber(1), transfer];
   const testArgsNFWithOptions = [true, true, new BigNumber(1), transfer, { from: wallet.userAccount.id }];
+  const testArgsThrow = [true, true, new BigNumber(1), { from: wallet.userAccount.id }];
 
   const testFunc = getABIFuncTest(func);
 
@@ -254,6 +262,7 @@ describe('Transfer - Send - Optional ForwardValue', async () => {
   testFunc(testArgsWithOptions, 'base-transOptions');
   testFunc(testArgsNoForward, 'base-noForwardValues');
   testFunc(testArgsNFWithOptions, 'base-noForwardValues-transOptions');
+  testFunc(testArgsThrow, 'throw-noTransfer', 'Expected to find a transfer argument');
 });
 
 describe('Transfer - SendUnsafe&Receive', () => {
@@ -367,9 +376,27 @@ describe('Transfer - No Forward Values', async () => {
 
   const testArgs = [true, true, new BigNumber(1)];
   const testArgsWithOptions = [true, true, new BigNumber(1), { from: wallet.userAccount.id }];
+  const testArgsThrowsSendFrom = [
+    true,
+    true,
+    new BigNumber(1),
+    { from: wallet.userAccount.id, sendFrom: [factory.createTransfer()] },
+  ];
+  const testArgsThrowsSendTo = [
+    true,
+    true,
+    new BigNumber(1),
+    { from: wallet.userAccount.id, sendTo: [factory.createTransfer()] },
+  ];
 
   testFunc(testArgs, 'base');
   testFunc(testArgsWithOptions, 'base-transOptions');
+  testFunc(
+    testArgsThrowsSendFrom,
+    'throws-sendFrom',
+    `Contract ${keys[0].address} does not allow sending native assets`,
+  );
+  testFunc(testArgsThrowsSendTo, 'throws-sendTo', `Contract ${keys[0].address} does not accept native assets`);
 });
 
 describe('Transfer - Other Rest Param', () => {

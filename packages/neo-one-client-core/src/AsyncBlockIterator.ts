@@ -94,6 +94,7 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
 
   private push(item: Item): void {
     if (this.mutableDone) {
+      /* istanbul ignore next */
       throw new Error('AsyncBlockIterator already ended');
     }
 

@@ -1,4 +1,6 @@
 // tslint:disable no-object-mutation
+import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable';
+import BigNumber from 'bignumber.js';
 import { take } from 'rxjs/operators';
 import { data, factory, keys } from '../../__data__';
 import { NEOONEDataProvider, NEOONEProvider } from '../../provider';
@@ -115,6 +117,15 @@ describe('NEOONEProvider', () => {
     expect(result).toBe(expected);
   });
 
+  test('getClaimAmount', async () => {
+    const expected = new BigNumber('1');
+    dataProvider.getClaimAmount = jest.fn(async () => Promise.resolve(expected));
+
+    const result = await provider.getClaimAmount(network, factory.createInput());
+
+    expect(result).toBe(expected);
+  });
+
   test('getNetworkSettings', async () => {
     const expected = factory.createNetworkSettings();
     dataProvider.getNetworkSettings = jest.fn(async () => Promise.resolve(expected));
@@ -124,11 +135,38 @@ describe('NEOONEProvider', () => {
     expect(result).toBe(expected);
   });
 
+  test('getAccount', async () => {
+    const expected = factory.createAccount();
+    dataProvider.getAccount = jest.fn(async () => Promise.resolve(expected));
+
+    const result = await provider.getAccount(network, expected.address);
+
+    expect(result).toBe(expected);
+  });
+
   test('getBlockCount', async () => {
     const expected = 10;
     dataProvider.getBlockCount = jest.fn(async () => Promise.resolve(expected));
 
     const result = await provider.getBlockCount(network);
+
+    expect(result).toBe(expected);
+  });
+
+  test('iterActionsRaw', async () => {
+    const expected = AsyncIterableX.from([factory.createRawLog()]);
+    dataProvider.iterActionsRaw = jest.fn(() => expected);
+
+    const result = provider.iterActionsRaw(network);
+
+    expect(result).toBe(expected);
+  });
+
+  test('iterBlocks', async () => {
+    const expected = AsyncIterableX.from([factory.createBlock()]);
+    dataProvider.iterBlocks = jest.fn(() => expected);
+
+    const result = provider.iterBlocks(network);
 
     expect(result).toBe(expected);
   });

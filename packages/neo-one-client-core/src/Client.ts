@@ -230,6 +230,7 @@ export class Client<
             await this.selectUserAccount(account.id);
           }
         })
+        /* istanbul ignore next */
         .catch(() => {
           // Just ignore errors here.
         });
