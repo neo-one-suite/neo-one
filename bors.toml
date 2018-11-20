@@ -1,3 +1,4 @@
 status = [
-  "ci/circleci"
+  "ci/circleci%"
 ]
+timeout_sec = 18000
