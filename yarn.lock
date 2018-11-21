@@ -20720,10 +20720,10 @@ webpack-node-externals@1.7.2, webpack-node-externals@^1.7.2:
   resolved "https://registry.yarnpkg.com/webpack-node-externals/-/webpack-node-externals-1.7.2.tgz#6e1ee79ac67c070402ba700ef033a9b8d52ac4e3"
   integrity sha512-ajerHZ+BJKeCLviLUUmnyd5B4RavLF76uv3cs6KNuO8W+HuQaEs0y0L7o40NQxdPy5w0pcv8Ew7yPUAQG0UdCg==
 
-webpack-serve@2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/webpack-serve/-/webpack-serve-2.0.2.tgz#6263b7c2888e169f84105da2119079098512b404"
-  integrity sha512-KQra2vayPKE2gooZRr2jF0Cs9AcQrS60Dmc6gMlFn4DmPkk/EmCuCODiAw008XedjwMBt8kUapDXJVu4gDH9Mg==
+webpack-serve@2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/webpack-serve/-/webpack-serve-2.0.3.tgz#61d24481d8560bcc45c7be005d326c9ba5ed7e0c"
+  integrity sha512-hJiikqjNm+opxaEY9JO/W+IHhWg3VC+meMOqHeOYyCjFyRVh2BzUlhvTh9ZKtuxcHCrez2VlghYrpII98ZpRqQ==
   dependencies:
     "@shellscape/koa-static" "^4.0.4"
     "@webpack-contrib/cli-utils" "^1.0.2"
