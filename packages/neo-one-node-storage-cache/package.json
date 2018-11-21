@@ -10,7 +10,7 @@
     "@neo-one/types": "^1.0.1",
     "@neo-one/utils": "^1.0.1",
     "@types/lru-cache": "^4.1.1",
-    "lru-cache": "^4.1.3",
+    "lru-cache": "^5.0.0",
     "tslib": "^1.9.3"
   },
   "sideEffects": false

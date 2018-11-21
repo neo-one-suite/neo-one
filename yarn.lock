@@ -13209,6 +13209,13 @@ lru-cache@^4.0.1, lru-cache@^4.1.1, lru-cache@^4.1.2, lru-cache@^4.1.3:
     pseudomap "^1.0.2"
     yallist "^2.1.2"
 
+lru-cache@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-5.0.0.tgz#de3d12fb64e4225b8d3eeda3c738f7d6ed007473"
+  integrity sha512-InxIcrhmeOXzY3n557oYAKV9HNTClbNAnjqizOci/fJiTrMa45iFd1OavQCIEyiHZNxM11fly2c39EH5st7ABw==
+  dependencies:
+    yallist "^3.0.2"
+
 lru-queue@0.1:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/lru-queue/-/lru-queue-0.1.0.tgz#2738bd9f0d3cf4f84490c5736c48699ac632cda3"
