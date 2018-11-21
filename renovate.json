@@ -13,5 +13,6 @@
   },
   "automergeComment": "bors: r+",
   "automergeType": "pr-comment",
-  "rebaseStalePrs": false
+  "rebaseStalePrs": false,
+  "requiredStatusChecks": null
 }
