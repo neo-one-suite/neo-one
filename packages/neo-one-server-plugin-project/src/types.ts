@@ -1,3 +1,4 @@
+import convict from 'convict';
 import * as path from 'path';
 
 export interface BuildTaskListOptions {
@@ -30,17 +31,20 @@ export interface NEOTrackerRequestOptions {
 
 export type RequestOptions = NetworkRequestOptions | SourceMapsRequestOptions | NEOTrackerRequestOptions;
 
+export type CodegenLanguage = 'typescript' | 'javascript';
+export type CodegenFramework = 'none' | 'react';
 export interface ProjectConfig {
   readonly paths: {
     readonly contracts: string;
     readonly generated: string;
   };
   readonly codegen: {
-    readonly javascript: boolean;
+    readonly language: CodegenLanguage;
+    readonly framework: CodegenFramework;
   };
 }
 
-export const projectConfigSchema = {
+export const projectConfigSchema: convict.Schema<ProjectConfig> = {
   paths: {
     contracts: {
       format: String,
@@ -52,9 +56,13 @@ export const projectConfigSchema = {
     },
   },
   codegen: {
-    javascript: {
-      format: Boolean,
-      default: false,
+    language: {
+      format: ['typescript', 'javascript'],
+      default: 'typescript',
+    },
+    framework: {
+      format: ['none', 'react'],
+      default: 'none',
     },
   },
 };

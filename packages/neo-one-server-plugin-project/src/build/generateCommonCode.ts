@@ -54,24 +54,44 @@ export const generateCommonCode = async (
   });
 
   await fs.ensureDir(project.paths.generated);
-  if (project.codegen.javascript) {
-    await Promise.all([
-      writeFile(sourceMapsPath, sourceMaps.js),
-      writeFile(testPath, test.js),
-      writeFile(reactPath, react.js),
-      writeFile(clientPath, client.js),
-      writeFile(generatedPath, generated.js),
-      writeFile(projectIDPath, projectIDFile.js),
-    ]);
-  } else {
-    await Promise.all([
-      writeFile(getTSPath(sourceMapsPath), sourceMaps.ts),
-      writeFile(getTSPath(testPath), test.ts),
-      writeFile(getTSPath(reactPath), react.ts),
-      writeFile(getTSPath(clientPath), client.ts),
-      writeFile(getTSPath(generatedPath), generated.ts),
-      writeFile(getTSPath(projectIDPath), projectIDFile.ts),
-      writeFile(getTSPath(commonTypesPath), commonTypes.ts),
-    ]);
-  }
+  await Promise.all(
+    [
+      {
+        path: sourceMapsPath,
+        data: sourceMaps,
+      },
+      {
+        path: testPath,
+        data: test,
+      },
+      {
+        path: reactPath,
+        data: project.codegen.framework === 'react' ? react : undefined,
+      },
+      {
+        path: clientPath,
+        data: client,
+      },
+      {
+        path: generatedPath,
+        data: generated,
+      },
+      {
+        path: projectIDPath,
+        data: projectIDFile,
+      },
+      {
+        path: commonTypesPath,
+        data: project.codegen.language === 'typescript' ? commonTypes : undefined,
+      },
+    ].map(async ({ path, data }) => {
+      if (data !== undefined) {
+        if (project.codegen.language === 'javascript') {
+          await writeFile(path, data.js);
+        } else {
+          await writeFile(getTSPath(path), data.ts);
+        }
+      }
+    }),
+  );
 };
