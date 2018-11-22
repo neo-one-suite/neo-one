@@ -32,7 +32,7 @@ export const generateCode = async (
   });
 
   await fs.ensureDir(base);
-  if (project.codegen.javascript) {
+  if (project.codegen.language === 'javascript') {
     await Promise.all([writeFile(abiPath, abi.js), writeFile(createContractPath, contract.js)]);
   } else {
     await Promise.all([

@@ -11,7 +11,7 @@ const projectIDRegex = /@projectID ([0-9a-z-]+)/;
 const loadProjectIDFromFile = async (projectConfig: ProjectConfig): Promise<string | undefined> => {
   const { projectIDPath: projectIDPathIn } = getCommonPaths(projectConfig);
 
-  const projectIDPath = projectConfig.codegen.javascript ? projectIDPathIn : getTSPath(projectIDPathIn);
+  const projectIDPath = projectConfig.codegen.language === 'javascript' ? projectIDPathIn : getTSPath(projectIDPathIn);
 
   const exists = await fs.pathExists(projectIDPath);
   if (exists) {
