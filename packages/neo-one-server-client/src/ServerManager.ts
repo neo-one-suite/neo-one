@@ -5,32 +5,15 @@ import execa from 'execa';
 import * as fs from 'fs-extra';
 import isRunning from 'is-running';
 import * as path from 'path';
+import semver from 'semver';
 import { Client } from './Client';
+import { npmCheck } from './npmCheck';
 
 const SERVER_PID = 'server.pid';
-
-const isSameVersion = async ({
-  port,
-  expectedVersion,
-}: {
-  readonly port: number;
-  readonly expectedVersion: string;
-}): Promise<boolean> => {
-  const client = new Client({ port });
-  const startTime = utils.nowSeconds();
-  // tslint:disable-next-line no-loop-statement
-  while (utils.nowSeconds() - startTime <= 5) {
-    try {
-      const version = await client.getVersion();
-
-      return version === expectedVersion;
-    } catch {
-      // ignore errors
-    }
-  }
-
-  return false;
-};
+const SERVER_VER = 'lastserver.ver';
+const SERVER_CHK = 'lastcheck.dat';
+const CHECK_DELAY_SEC = 600;
+const CHECK_TIMEOUT_MS = 5000;
 
 const waitRunning = async ({ pid }: { readonly pid: number }) => {
   const startTime = utils.nowSeconds();
@@ -91,6 +74,58 @@ export class ServerManager {
     }
   }
 
+  public async getServerVersion(): Promise<string | undefined> {
+    let versionContents: string | undefined;
+    try {
+      versionContents = await fs.readFile(this.versionPath, 'utf8');
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        return undefined;
+      }
+      throw error;
+    }
+
+    return versionContents;
+  }
+
+  public async getCurrentVersion({ port }: { readonly port: number }): Promise<string | undefined> {
+    const client = new Client({ port });
+    const startTime = utils.nowSeconds();
+    // tslint:disable-next-line no-loop-statement
+    while (utils.nowSeconds() - startTime <= 5) {
+      try {
+        /*tslint:disable-next-line:prefer-immediate-return */
+        const version = await client.getVersion();
+
+        /* tslint:disable-next-line:no-var-before-return */
+        return version;
+      } catch {
+        // ignore errors...
+      }
+    }
+
+    return this.getServerVersion();
+  }
+
+  public compareVersions(verA: string, verB: string) {
+    return verA === verB ? 0 : semver.lt(verA, verB) ? -1 : 1;
+  }
+
+  public async getRelativeServerVersion({
+    port,
+    expectedVersion,
+  }: {
+    readonly port: number;
+    readonly expectedVersion: string;
+  }): Promise<number | undefined> {
+    const version = await this.getCurrentVersion({ port });
+    if (version !== undefined) {
+      return this.compareVersions(version, expectedVersion);
+    }
+
+    return version;
+  }
+
   public async checkAlive(port: number): Promise<number | undefined> {
     const pid = await this.getServerPID();
 
@@ -100,15 +135,22 @@ export class ServerManager {
 
     if (pid !== undefined) {
       if (isRunning(pid)) {
-        const sameVersion = await isSameVersion({
+        const serverVersion = await this.getRelativeServerVersion({
           port,
           expectedVersion: this.serverVersion,
         });
-
-        if (sameVersion) {
+        const clientVersion = 0;
+        if (serverVersion === clientVersion) {
           return pid;
         }
-
+        if (serverVersion === undefined) {
+          return undefined;
+        }
+        if (serverVersion > clientVersion) {
+          throw new Error(
+            '[NEO•ONE] version conflict: server is newer than client. Please upgrade NEO•ONE and try again.',
+          );
+        }
         await this.kill({ pid });
       }
 
@@ -140,10 +182,17 @@ export class ServerManager {
     readonly httpPort: number;
     readonly binary: Binary;
     readonly onStart?: () => void;
-  }): Promise<{ readonly pid: number; readonly started: boolean }> {
-    const pid = await this.checkAlive(port);
+  }): Promise<{ readonly pid: number; readonly started: boolean; readonly newerVersion: string | undefined }> {
+    const [version, pid] = await Promise.all([
+      npmCheck('@neo-one/cli', this.checkPath, CHECK_TIMEOUT_MS, CHECK_DELAY_SEC),
+      this.checkAlive(port),
+    ]);
+
+    const newerVersion =
+      version !== undefined && this.compareVersions(this.serverVersion, version) ? version : undefined;
+
     if (pid !== undefined) {
-      return { pid, started: false };
+      return { pid, started: false, newerVersion };
     }
 
     if (onStart !== undefined) {
@@ -163,15 +212,32 @@ export class ServerManager {
     await waitRunning({ pid: child.pid });
     await waitReachable({ port: httpPort });
 
-    return { pid: child.pid, started: true };
+    return { pid: child.pid, started: true, newerVersion };
   }
 
-  public async writePID(pid: number): Promise<void> {
+  public async writeVersionPID(pid: number, version: string): Promise<void> {
+    await Promise.all([this.writePID(pid), this.writeVersion(version)]);
+  }
+
+  public async writeVersion(version: string): Promise<void> {
+    await fs.ensureDir(path.dirname(this.versionPath));
+    await fs.writeFile(this.versionPath, `${version}`);
+  }
+
+  public async writePID(pid: number) {
     await fs.ensureDir(path.dirname(this.pidPath));
     await fs.writeFile(this.pidPath, `${pid}`);
   }
 
+  public get checkPath(): string {
+    return path.resolve(this.dataPath, SERVER_CHK);
+  }
+
   public get pidPath(): string {
     return path.resolve(this.dataPath, SERVER_PID);
+  }
+
+  public get versionPath(): string {
+    return path.resolve(this.dataPath, SERVER_VER);
   }
 }
