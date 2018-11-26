@@ -22,8 +22,42 @@ export type WordTokens = ReadonlyArray<WordToken>;
 
 export interface Parameter {
   readonly name: string;
-  readonly type: WordTokens;
+  readonly type?: WordTokens;
   readonly description: WordTokens;
+}
+
+export interface FunctionData {
+  readonly parameters?: ReadonlyArray<Parameter>;
+  readonly returns?: WordTokens;
+}
+
+export interface Method {
+  readonly functionData: FunctionData;
+  readonly title: string;
+  readonly description?: WordTokens;
+  readonly definition: WordTokens;
+}
+
+export interface Property extends Parameter {}
+
+export interface InterfaceData {
+  readonly constructorDefinition?: Method;
+  readonly properties?: ReadonlyArray<Property>;
+  readonly methods?: ReadonlyArray<Method>;
+}
+
+export interface ClassData extends InterfaceData {}
+
+export interface EnumMember extends Parameter {}
+
+export interface EnumData {
+  readonly members: ReadonlyArray<EnumMember>;
+}
+
+export interface ExtraData {
+  readonly title?: string;
+  readonly code?: boolean;
+  readonly data: WordTokens;
 }
 
 export interface ReferenceItem {
@@ -32,5 +66,9 @@ export interface ReferenceItem {
   readonly type: ReferenceType;
   readonly description: WordTokens;
   readonly definition: WordTokens;
-  readonly parameters?: ReadonlyArray<Parameter>;
+  readonly functionData?: FunctionData;
+  readonly classData?: ClassData;
+  readonly enumData?: EnumData;
+  readonly interfaceData?: InterfaceData;
+  readonly extra?: ReadonlyArray<ExtraData>;
 }

@@ -4,9 +4,9 @@ import { Parser } from 'html-to-react';
 import * as React from 'react';
 import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
-import { Prism } from '../../common';
-import { RouterLink } from '../RouterLink';
-import { WordTokens } from './types';
+import { Prism } from '../../../common';
+import { RouterLink } from '../../RouterLink';
+import { WordTokens } from '../types';
 
 const ReferenceLink = styled(Link.withComponent(RouterLink))<{ readonly code?: boolean }>`
   font-family: ${ifProp('code', "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace")};

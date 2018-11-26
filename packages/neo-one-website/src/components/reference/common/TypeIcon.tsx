@@ -3,7 +3,7 @@ import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
 import { ifProp, prop, switchProp } from 'styled-tools';
-import { TypeFilterOptions } from './types';
+import { TypeFilterOptions } from '../types';
 
 interface Props {
   readonly type: TypeFilterOptions;

@@ -2,7 +2,7 @@ import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
 import { prop } from 'styled-tools';
-import { WordTokens } from './types';
+import { WordTokens } from '../types';
 import { buildExample } from './utils';
 
 interface Props {
