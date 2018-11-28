@@ -8,7 +8,7 @@
     "@neo-one/monitor": "^1.0.1",
     "@neo-one/utils": "^1.0.1",
     "@types/graphlib": "^2.1.4",
-    "@types/koa": "^2.0.46",
+    "@types/koa": "^2.0.47",
     "@types/koa-compose": "^3.2.2",
     "@types/koa-compress": "^2.0.8",
     "@types/koa-router": "^7.0.35",
