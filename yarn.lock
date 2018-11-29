@@ -1148,10 +1148,10 @@
     node-hid "^0.7.2"
     usb "^1.3.3"
 
-"@ledgerhq/hw-transport-u2f@4.28.0":
-  version "4.28.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.28.0.tgz#5cee76c39c2972e22864992585a52b6a1fb8bc52"
-  integrity sha512-jI33imJGh+QOFbxhEIYdzkBC7HTUQ2wdkkgEZvt7ECPsGBl/75OSJGu+yebl2yz/XYVhPbZBnpSJYfXJGFBe9g==
+"@ledgerhq/hw-transport-u2f@4.31.0":
+  version "4.31.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.31.0.tgz#b3c97e7f8e42a3b43372853f33a713cb5c49efdc"
+  integrity sha512-YW+d34XL2U2P/EVsRt6m9KymVB5LpdFQdMjiG+O5n2OGdfLC6pXucoFqOtTsnAhdgNYEefB8kPA93ISwo1ZYNw==
   dependencies:
     "@ledgerhq/hw-transport" "^4.24.0"
     u2f-api "0.2.7"
