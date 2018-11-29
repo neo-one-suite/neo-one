@@ -60,6 +60,7 @@
     "gulp": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" gulp",
     "build": "yarn run gulp build",
     "build:e2e": "yarn run gulp buildE2E",
+    "build:node": "yarn run gulp buildNode",
     "watch": "yarn run gulp watch",
     "release": "yarn run gulp release",
     "neo-one": "node ./dist/neo-one/packages/neo-one-cli/bin/neo-one",
