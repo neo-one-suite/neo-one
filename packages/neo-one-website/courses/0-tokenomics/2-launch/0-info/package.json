@@ -3,7 +3,7 @@
     "@neo-one/react": "1.0.0-preview.3",
     "@neo-one/react-core": "1.0.0-preview.5",
     "@types/react": "16.7.8",
-    "@types/react-dom": "16.0.10",
+    "@types/react-dom": "16.0.11",
     "@types/styled-components": "4.1.0",
     "bignumber.js": "8.0.1",
     "react": "16.7.0-alpha.2",
