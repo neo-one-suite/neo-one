@@ -1,18 +1,6 @@
 {
   "extends": [
     "config:base",
-    "schedule:nonOfficeHours",
     ":semanticCommits"
-  ],
-  "automerge": true,
-  "major": {
-    "automerge": false
-  },
-  "devDependencies": {
-    "automerge": true
-  },
-  "automergeComment": "bors: r+",
-  "automergeType": "pr-comment",
-  "rebaseStalePrs": false,
-  "requiredStatusChecks": null
+  ]
 }
