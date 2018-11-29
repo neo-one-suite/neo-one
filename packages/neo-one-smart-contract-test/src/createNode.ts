@@ -48,11 +48,10 @@ export const createNode = async (omitCleanup = false) => {
       }),
       leveldown: MemDown(),
     },
+    /* istanbul ignore next */
     (error) => {
       // tslint:disable
-      /* istanbul ignore next */
       console.error(error);
-      /* istanbul ignore next */
       node.stop();
       // tslint:enable
     },

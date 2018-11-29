@@ -1,27 +1,10 @@
 // tslint:disable no-object-mutation no-any
-import { FullNode, FullNodeEnvironment } from '@neo-one/node';
-import { createTest } from '@neo-one/node-neo-settings';
+import { FullNode } from '@neo-one/node';
 import { finalize } from '@neo-one/utils';
-import { of as _of } from 'rxjs';
-import { createMonitor } from './createMonitor';
-
-const createRPCEnvironment = () => ({
-  http: {
-    port: 8080,
-    host: 'localhost',
-  },
-});
-
-const createDataPath = () => './neo-one-node';
-
-const createEnvironment = (options: Partial<FullNodeEnvironment> = {}): FullNodeEnvironment => ({
-  dataPath: createDataPath(),
-  rpc: createRPCEnvironment(),
-  ...options,
-});
+import { getConfiguration } from './utils';
 
 export const startNode = async (): Promise<void> => {
-  const monitor = createMonitor();
+  const { monitor, environment, settings, options$ } = getConfiguration();
   let mutableShutdownFuncs: ReadonlyArray<() => Promise<void>> = [];
 
   const initiateShutdown = async () => {
@@ -96,9 +79,9 @@ export const startNode = async (): Promise<void> => {
 
   const fullNode = new FullNode({
     monitor,
-    environment: createEnvironment(),
-    settings: createTest(),
-    options$: _of({}),
+    environment,
+    settings,
+    options$,
   });
 
   mutableShutdownFuncs = mutableShutdownFuncs.concat(fullNode.stop);

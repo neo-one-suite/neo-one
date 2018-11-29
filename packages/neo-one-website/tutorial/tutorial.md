@@ -55,13 +55,16 @@ Here's how to setup your local development environment:
   - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
 2. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
   - Be sure to invoke Create React App with the `--typescript` flag in order to enable TypeScript support: `npx create-react-app token --typescript`
-3. Install NEO•ONE using either [yarn](https://yarnpkg.com/) (`yarn add <package name>`) or [npm](https://www.npmjs.com/) `npm install <package name>`.
+3. Install NEO•ONE using either [yarn](https://yarnpkg.com/) (`yarn add <package name>`) or [npm](https://www.npmjs.com/) (`npm install <package name>`).
 
 ```bash
 yarn add @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-typescript-plugin
 ```
+```bash
+npm install @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-typescript-plugin
+```
 
-4. Run `yarn neo-one init`.
+4. Run `yarn neo-one init` or `npm run neo-one init`
 
 We recommend taking a moment to [setup your editor](/docs/environment-setup#Editor-Setup) to take advantage of inline NEO•ONE compiler diagnostics.
 
@@ -101,11 +104,11 @@ This smart contract doesn't do a whole lot, in fact it does nothing, but this is
   4. Deploy the smart contracts to the private NEO network.
   5. Generate code for use in your decentralized app.
 
-Additionally, you may run `yarn build` with the `--reset` flag to reset the network. Running with `--watch` will execute the above process whenever you make a change to your smart contracts.
+Additionally, you may run `yarn neo-one build` OR `npm run neo-one build` with the `--reset` flag to reset the network. Running with `--watch` will execute the above process whenever you make a change to your smart contracts.
 
 ### Testing
 
-Throughout the tutorial we'll write tests for each piece of smart contract functionality. Run the tests using `yarn test`. It's convention to put smart contract tests under `one/tests`, e.g. `one/tests/Token.test.ts`, however for this tutorial we'll put the tests under `src/__tests__/contracts` so that Jest will automatically pick them up without additional configuration. Create a new file `src/__tests__/contracts/Token.test.ts` and add the following:
+Throughout the tutorial we'll write tests for each piece of smart contract functionality. Run the tests using `yarn test` OR `npm test`. It's convention to put smart contract tests under `one/tests`, e.g. `one/tests/Token.test.ts`, however for this tutorial we'll put the tests under `src/__tests__/contracts` so that Jest will automatically pick them up without additional configuration. Create a new file `src/__tests__/contracts/Token.test.ts` and add the following:
 
 ```typescript
 /**

@@ -240,7 +240,7 @@ export interface Output {
 }
 
 /**
- * `Witness` is just that, a "witness" to the transaction, meaning they have approved the transaction. Can vary from a simple signature of the transaction for a given `Address`' private key or a "witness" being a smart contract and the way it's verified is by executing the smart contract code.
+ * `Witness` is just that, a 'witness' to the transaction, meaning they have approved the transaction. Can vary from a simple signature of the transaction for a given `Address`' private key or a 'witness' being a smart contract and the way it's verified is by executing the smart contract code.
  */
 export interface Witness {
   /**
@@ -300,7 +300,7 @@ export interface TransactionBase {
  */
 export interface ConfirmedTransactionBase {
   /**
-   * "Receipt" of the confirmed transaction on the blockchain. This contains properties like the block the `Transaction` was included in.
+   * 'Receipt' of the confirmed transaction on the blockchain. This contains properties like the block the `Transaction` was included in.
    */
   readonly receipt: TransactionReceipt;
 }
@@ -543,7 +543,7 @@ export interface Header {
    */
   readonly nextConsensus: AddressString;
   /**
-   * "Witness" to the `Block`'s validity.
+   * 'Witness' to the `Block`'s validity.
    */
   readonly script: Witness;
   /**
@@ -1102,7 +1102,7 @@ export interface GetOptions {
 export interface TransactionOptions {
   // tslint:disable readonly-keyword
   /**
-   * The `UserAccount` that the transaction is "from", i.e. the one that will be used for native asset transfers, claims, and signing the transaction.
+   * The `UserAccount` that the transaction is 'from', i.e. the one that will be used for native asset transfers, claims, and signing the transaction.
    *
    * If unspecified, the currently selected `UserAccount` is used as the `from` address.
    *

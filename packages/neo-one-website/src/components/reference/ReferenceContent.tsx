@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ReferenceItemContent, ReferenceItemsContent } from '../content';
+import { ReferencePage } from './components';
 import { ReferenceGrid } from './ReferenceGrid';
-import { ReferencePage } from './ReferencePage';
 
 interface Props {
   readonly content: ReferenceItemsContent | ReferenceItemContent;

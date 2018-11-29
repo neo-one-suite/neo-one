@@ -15,7 +15,7 @@ This guide will walk you through getting started with the [NEO•ONE Playground]
 ## Requirements
 
   - [Node](https://nodejs.org) >= 8.9.0 (We recommend the latest version)
-  - [yarn](https://yarnpkg.com/)
+  - a package manager: [yarn](https://yarnpkg.com/)   **OR**   npm (distributed with Node)
 
 ---
 
@@ -24,6 +24,7 @@ This guide will walk you through getting started with the [NEO•ONE Playground]
 ```bash
 git clone https://github.com/neo-one-suite/neo-one-playground.git
 cd neo-one-playground
+# npm install
 yarn install
 ```
 
@@ -32,6 +33,7 @@ yarn install
 ## Compile
 
 ```bash
+# npm run neo-one build
 yarn neo-one build
 ```
 
@@ -42,6 +44,7 @@ This will start up a local network, compile the smart contracts located in the `
 ## Start the Playground
 
 ```bash
+# npm run start
 yarn start
 ```
 
@@ -52,6 +55,7 @@ This will open a browser window with the playground. Modify the files in the `sr
 ## Run the tests
 
 ```bash
+# npm test
 yarn test
 ```
 

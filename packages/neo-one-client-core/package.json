@@ -16,7 +16,7 @@
     "@types/tapable": "^1.0.4",
     "bignumber.js": "^8.0.1",
     "bn.js": "^4.11.8",
-    "cross-fetch": "^2.2.3",
+    "cross-fetch": "^3.0.0",
     "dataloader": "^1.4.0",
     "lodash": "^4.17.11",
     "rxjs": "^6.3.3",

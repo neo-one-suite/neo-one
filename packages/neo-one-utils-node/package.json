@@ -1,0 +1,11 @@
+{
+  "name": "@neo-one/utils-node",
+  "version": "1.0.1",
+  "description": "NEO•ONE shared Nodejs utils.",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@types/npm-package-arg": "^6.1.0",
+    "npm-package-arg": "^6.1.0"
+  },
+  "sideEffects": false
+}

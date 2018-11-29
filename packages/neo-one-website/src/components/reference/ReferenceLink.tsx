@@ -3,7 +3,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { RouterLink } from '../RouterLink';
-import { TypeIcon } from './TypeIcon';
+import { TypeIcon } from './common';
 import { ReferenceType } from './types';
 
 interface Props {

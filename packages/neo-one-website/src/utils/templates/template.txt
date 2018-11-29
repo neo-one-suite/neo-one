@@ -1,0 +1,56 @@
+{
+  "description": [{% for line in doc.description %} "{{line}}", {% endfor %} ""], {% if doc.constructorDoc %}
+  "constructorDoc": {
+    "name": "{{doc.constructorDoc.name}}",
+    "text": [{% for line in doc.constructorDoc.text %} "{{line}}", {% endfor %} ""],
+    "parameters": [{% for param in doc.constructorDoc.parameterDocs %}
+          {
+            "name": "{{ param.name }}",
+            "type": [{% for line in param.type %} "{{line}}", {% endfor %} ""],
+            "description": [{% for line in param.content %} "{{line}}", {% endfor %} ""]
+          }, {% endfor %}
+          {}
+       ]
+  }, {% endif %}
+  "text": [{% for line in doc.text %} "{{line}}", {% endfor %} ""], {% if doc.parameterDocs %}
+  "parameters": [ {% for param in doc.parameterDocs %}
+    {
+      "name": "{{ param.name }}",
+      "type": [{% for line in param.type %} "{{line}}", {% endfor %} ""],
+      "description": [{% for line in param.description %} "{{line}}", {% endfor %} ""]
+    }, {% endfor %}
+    {}
+  ], {% endif %} {% if doc.docType in ['interface', 'class', 'enum'] %}
+  "properties": [{% for member in doc.members %} {% if member.parameterDocs === undefined %}
+    {
+      "name": "{{member.name}}",
+      "type": [{% for line in member.type %} "{{line}}", {% endfor %} ""],
+      "description": [{% for line in member.description %} "{{line}}", {% endfor %} ""]
+    }, {% endif %} {% endfor %}
+    {}
+  ], {% endif %} {% if doc.docType in ['interface', 'class'] %}
+  "methods": [{% for member in doc.members %} {% if member.parameterDocs %}
+     {
+       "text": [{% for line in member.text %} "{{line}}", {% endfor %} ""],
+       "description": [{% for line in member.description %} "{{line}}", {% endfor %} ""], {% if member.returns %}
+       "returns": [{% for line in member.returns.description %} "{{line}}", {% endfor %} ""], {% endif %}
+       "parameters": [{% for param in member.parameterDocs %}
+          {
+            "name": "{{ param.name }}",
+            "type": [{% for line in param.type %} "{{line}}", {% endfor %} ""],
+            "description": [{% for line in param.content %} "{{line}}", {% endfor %} ""]
+          }, {% endfor %}
+          {}
+       ], {% if member.internal !== undefined %}
+       "internal": true, {% endif %}
+       "name": "{{member.name}}",
+       "type": [{% for line in member.type %} "{{line}}", {% endfor %} ""]
+      },{% endif %} {% endfor %}
+      {}
+    ],
+  {% endif %} {% if doc.returns %}
+  "returns": [{% for line in doc.returns.description %} "{{line}}", {% endfor %} ""], {% endif %} {% if doc.example %}
+  "examples": [{% for example in doc.example %} [{% for line in example %} "{{line}}", {% endfor %} ""], {% endfor %} []], {% endif %}
+  "name": "{{ doc.name }}",
+  "docType": "{{ doc.docType }}"
+}
