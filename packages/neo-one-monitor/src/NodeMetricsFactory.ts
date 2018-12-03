@@ -12,6 +12,7 @@ import {
   PercentiledMetricOptions,
   Summary,
 } from './types';
+import { convertMetricLabels } from './utils';
 
 class NodeMetricsFactory extends MetricsFactoryProxy {
   protected createCounterInternal(options: MetricOptions): Counter {
@@ -64,8 +65,7 @@ class NodeMetricsFactory extends MetricsFactoryProxy {
     init: (metric: T, labels: Labels) => void,
   ): T {
     labels.forEach((labelSet) => {
-      // tslint:disable-next-line no-any
-      init(metric, labelSet);
+      init(metric, convertMetricLabels(labelSet));
     });
 
     return metric;
