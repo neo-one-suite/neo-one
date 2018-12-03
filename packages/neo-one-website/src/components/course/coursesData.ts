@@ -10,4 +10,5 @@ export const selectLesson = (selected: SelectedLesson) => courses[selected.cours
 export const selectChapter = (selected: SelectedChapter) =>
   courses[selected.course].lessons[selected.lesson].chapters[selected.chapter];
 
+// tslint:disable-next-line export-name
 export { courses };
