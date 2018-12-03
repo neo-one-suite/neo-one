@@ -52,7 +52,7 @@ interface Task {
   readonly parentNode: string;
 }
 
-const cache = LRU<string, Promise<RegistryPackage>>({
+const cache = new LRU<string, Promise<RegistryPackage>>({
   max: 1000,
 });
 

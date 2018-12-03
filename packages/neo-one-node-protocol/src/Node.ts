@@ -293,7 +293,7 @@ export class Node implements INode {
     this.mutableKnownHeaderHashes = createScalingBloomFilter();
     this.tempKnownHeaderHashes = new Set();
     this.mutableGetBlocksRequestsCount = 1;
-    this.consensusCache = LRU(10000);
+    this.consensusCache = new LRU(10000);
     this.mutableBlockIndex = {};
   }
 

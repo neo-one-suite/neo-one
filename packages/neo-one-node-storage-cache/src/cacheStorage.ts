@@ -17,7 +17,7 @@ export const cacheStorage = ({
   readonly storage: Storage;
 }): Storage => {
   // tslint:disable-next-line no-any
-  const cache = LRU<string, any>({
+  const cache = new LRU<string, any>({
     max: environment.maxSizeBytes,
     // length: (value, key) => value.size + Buffer.byteLength(key, 'utf8'),
   });

@@ -268,7 +268,7 @@ const resolvePackageWorker = async (name: string, version: string, monitor?: Mon
   return mutableResult;
 };
 
-const cache = LRU<string, Promise<Result>>({
+const cache = new LRU<string, Promise<Result>>({
   max: 1000,
 });
 
