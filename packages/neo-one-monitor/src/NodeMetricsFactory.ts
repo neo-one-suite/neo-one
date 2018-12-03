@@ -6,6 +6,7 @@ import {
   Counter,
   Gauge,
   Histogram,
+  Labels,
   MetricOptions,
   MetricsFactory,
   PercentiledMetricOptions,
@@ -15,8 +16,10 @@ import {
 class NodeMetricsFactory extends MetricsFactoryProxy {
   protected createCounterInternal(options: MetricOptions): Counter {
     return new CounterProxy(
-      this.initializeMetric(new prom.Counter(this.getMetricConstruct(options)), options, (metric: prom.Counter) =>
-        metric.inc(0),
+      this.initializeMetric(
+        new prom.Counter(this.getMetricConstruct(options)),
+        options,
+        (metric: prom.Counter, labels: Labels) => metric.inc(labels as prom.labelValues, 0),
       ),
       options.labelNames,
     );
@@ -24,8 +27,10 @@ class NodeMetricsFactory extends MetricsFactoryProxy {
 
   protected createGaugeInternal(options: MetricOptions): Gauge {
     return new GaugeProxy(
-      this.initializeMetric(new prom.Gauge(this.getMetricConstruct(options)), options, (metric: prom.Gauge) =>
-        metric.set(0),
+      this.initializeMetric(
+        new prom.Gauge(this.getMetricConstruct(options)),
+        options,
+        (metric: prom.Gauge, labels: Labels) => metric.set(labels as prom.labelValues, 0),
       ),
       options.labelNames,
     );
@@ -33,8 +38,10 @@ class NodeMetricsFactory extends MetricsFactoryProxy {
 
   protected createHistogramInternal(options: BucketedMetricOptions): Histogram {
     return new HistogramProxy(
-      this.initializeMetric(new prom.Histogram(this.getMetricConstruct(options)), options, (metric: prom.Histogram) =>
-        metric.observe(0),
+      this.initializeMetric(
+        new prom.Histogram(this.getMetricConstruct(options)),
+        options,
+        (metric: prom.Histogram, labels: Labels) => metric.observe(labels as prom.labelValues, 0),
       ),
       options.labelNames,
     );
@@ -42,8 +49,10 @@ class NodeMetricsFactory extends MetricsFactoryProxy {
 
   protected createSummaryInternal(options: PercentiledMetricOptions): Summary {
     return new SummaryProxy(
-      this.initializeMetric(new prom.Summary(this.getMetricConstruct(options)), options, (metric: prom.Summary) =>
-        metric.observe(0),
+      this.initializeMetric(
+        new prom.Summary(this.getMetricConstruct(options)),
+        options,
+        (metric: prom.Summary, labels: Labels) => metric.observe(labels as prom.labelValues, 0),
       ),
       options.labelNames,
     );
@@ -52,11 +61,11 @@ class NodeMetricsFactory extends MetricsFactoryProxy {
   protected initializeMetric<T>(
     metric: T,
     { labels = [] }: MetricOptions | BucketedMetricOptions | PercentiledMetricOptions,
-    init: (metric: T) => void,
+    init: (metric: T, labels: Labels) => void,
   ): T {
     labels.forEach((labelSet) => {
       // tslint:disable-next-line no-any
-      init((metric as any).labels(labelSet as any));
+      init(metric, labelSet);
     });
 
     return metric;
