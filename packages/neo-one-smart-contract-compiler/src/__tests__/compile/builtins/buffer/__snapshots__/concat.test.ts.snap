@@ -21,7 +21,7 @@ exports[`Buffer.concat cannot be referenced 1`] = `
 `;
 
 exports[`Buffer.concat cannot be set 1`] = `
-"snippetCode.ts (2,14): Cannot assign to 'concat' because it is a constant or a read-only property.
+"snippetCode.ts (2,14): Cannot assign to 'concat' because it is a read-only property.
 
       1 | 
     > 2 |       Buffer.concat = (list: Buffer[]) => Buffer.from('', 'hex');

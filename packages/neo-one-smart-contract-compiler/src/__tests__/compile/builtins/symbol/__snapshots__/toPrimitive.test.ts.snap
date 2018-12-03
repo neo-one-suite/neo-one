@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Symbol.toPrimitive cannot be set 1`] = `
-"snippetCode.ts (2,14): Cannot assign to 'toPrimitive' because it is a constant or a read-only property.
+"snippetCode.ts (2,14): Cannot assign to 'toPrimitive' because it is a read-only property.
 
       1 | 
     > 2 |       Symbol.toPrimitive = Symbol.for('foo');

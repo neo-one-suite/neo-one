@@ -10,7 +10,7 @@
     "@types/toposort": "^2.0.1",
     "lodash": "^4.17.11",
     "toposort": "^2.0.2",
-    "typescript": "3.2.0-rc"
+    "typescript": "3.2.1"
   },
   "devDependencies": {
     "@neo-one/smart-contract-compiler-node": "^1.0.1",
