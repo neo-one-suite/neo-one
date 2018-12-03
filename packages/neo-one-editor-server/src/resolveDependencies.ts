@@ -221,7 +221,7 @@ class Resolver {
   }
 }
 
-const resolutionCache = LRU<string, Promise<ResolvedDependencies>>({
+const resolutionCache = new LRU<string, Promise<ResolvedDependencies>>({
   max: 1000,
 });
 
