@@ -188,7 +188,7 @@
     "gulp-rename": "1.4.0",
     "gulp-replace": "1.0.0",
     "gulp-sourcemaps": "2.6.4",
-    "gulp-typescript": "5.0.0-alpha.3",
+    "gulp-typescript": "5.0.0",
     "husky": "1.2.0",
     "is-running": "2.1.0",
     "istanbul-lib-coverage": "2.0.1",
