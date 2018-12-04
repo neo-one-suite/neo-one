@@ -1,5 +1,5 @@
 import { Monitor } from '@neo-one/monitor';
-import { retryBackoff } from '@neo-one/utils';
+import { getEscapedNPMName, retryBackoff } from '@neo-one/utils';
 import fetch from 'cross-fetch';
 import { Graph } from 'graphlib';
 import _ from 'lodash';
@@ -8,7 +8,6 @@ import { defer } from 'rxjs';
 import stringify from 'safe-stable-stringify';
 import semver from 'semver';
 import { FetchError } from './errors';
-import { getEscapedName } from './utils';
 
 const NPM_REGISTRY_URL = 'https://registry.yarnpkg.com';
 const ROOT_NODE = 'root$';
@@ -75,7 +74,7 @@ class Resolver {
   }
 
   private async fetchRegistryPackage(name: string): Promise<RegistryPackage> {
-    const escapedName = getEscapedName(name);
+    const escapedName = getEscapedNPMName(name);
 
     const pkg = cache.get(escapedName);
     if (pkg !== undefined) {

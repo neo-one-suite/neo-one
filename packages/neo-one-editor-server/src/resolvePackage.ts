@@ -1,6 +1,6 @@
 // tslint:disable no-any
 import { Monitor } from '@neo-one/monitor';
-import { retryBackoff } from '@neo-one/utils';
+import { getEscapedNPMName, retryBackoff } from '@neo-one/utils';
 import fetch from 'cross-fetch';
 // @ts-ignore
 import detective from 'detective';
@@ -10,12 +10,11 @@ import * as nodePath from 'path';
 import { defer } from 'rxjs';
 import * as tar from 'tar';
 import { EmptyBodyError, FetchError, MissingPackageJSONError } from './errors';
-import { getEscapedName } from './utils';
 
 const REGISTRY = 'https://registry.yarnpkg.com/';
 
 const getTarballURL = (name: string, version: string) => {
-  const escapedName = getEscapedName(name);
+  const escapedName = getEscapedNPMName(name);
 
   return `${REGISTRY}${escapedName}/-/${escapedName}-${version}.tgz`;
 };

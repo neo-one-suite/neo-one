@@ -5,8 +5,10 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@types/lodash": "^4.14.118",
+    "@types/npm-package-arg": "^6.1.0",
     "change-case": "^3.0.2",
     "lodash": "^4.17.11",
+    "npm-package-arg": "^6.1.0",
     "rxjs": "^6.3.3",
     "tslib": "^1.9.3"
   },
