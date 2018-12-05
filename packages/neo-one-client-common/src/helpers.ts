@@ -8,8 +8,9 @@ import { AddressString, PrivateKeyString, PublicKeyString } from './types';
  * @param publicKey hex-encoded public key
  * @returns `Hash160` string, a hex encoded string prefixed by '0x'.
  */
-export const publicKeyToScriptHash = (publicKey: PublicKeyString): string =>
-  common.uInt160ToString(crypto.publicKeyToScriptHash(common.stringToECPoint(publicKey)));
+export function publicKeyToScriptHash(publicKey: PublicKeyString): string {
+  return common.uInt160ToString(crypto.publicKeyToScriptHash(common.stringToECPoint(publicKey)));
+}
 
 /**
  * Converts a hex-encoded public key into a base58 encoded NEO `Address`.
@@ -17,11 +18,12 @@ export const publicKeyToScriptHash = (publicKey: PublicKeyString): string =>
  * @param publicKey hex-encoded public key
  * @returns base58 encoded string that represents a NEO address.
  */
-export const publicKeyToAddress = (publicKey: PublicKeyString): AddressString =>
-  crypto.scriptHashToAddress({
+export function publicKeyToAddress(publicKey: PublicKeyString): AddressString {
+  return crypto.scriptHashToAddress({
     addressVersion: common.NEO_ADDRESS_VERSION,
     scriptHash: crypto.publicKeyToScriptHash(common.stringToECPoint(publicKey)),
   });
+}
 
 /**
  * Converts a `Hash160` script hash into a base58 encoded NEO `Address`.
@@ -29,11 +31,12 @@ export const publicKeyToAddress = (publicKey: PublicKeyString): AddressString =>
  * @param scriptHash `Hash160` string, a hex encoded string prefixed by '0x'.
  * @returns base58 encoded string that represents a NEO address.
  */
-export const scriptHashToAddress = (scriptHash: string): AddressString =>
-  crypto.scriptHashToAddress({
+export function scriptHashToAddress(scriptHash: string): AddressString {
+  return crypto.scriptHashToAddress({
     addressVersion: common.NEO_ADDRESS_VERSION,
     scriptHash: common.stringToUInt160(scriptHash),
   });
+}
 
 /**
  * Converts a base58 encoded NEO `Address` into a `Hash160` script hash.
@@ -41,13 +44,14 @@ export const scriptHashToAddress = (scriptHash: string): AddressString =>
  * @param address base58 encoded string that represents a NEO address.
  * @returns `Hash160` string, a hex encoded string prefixed by '0x'.
  */
-export const addressToScriptHash = (address: AddressString): string =>
-  common.uInt160ToString(
+export function addressToScriptHash(address: AddressString): string {
+  return common.uInt160ToString(
     crypto.addressToScriptHash({
       addressVersion: common.NEO_ADDRESS_VERSION,
       address,
     }),
   );
+}
 
 /**
  * Converts a wallet-import-format (WIF) private key to a hex-encoded private key.
@@ -55,8 +59,9 @@ export const addressToScriptHash = (address: AddressString): string =>
  * @param wif wallet-import-format (WIF) private key.
  * @returns hex-encoded private key.
  */
-export const wifToPrivateKey = (wif: string): PrivateKeyString =>
-  common.privateKeyToString(crypto.wifToPrivateKey(wif, common.NEO_PRIVATE_KEY_VERSION));
+export function wifToPrivateKey(wif: string): PrivateKeyString {
+  return common.privateKeyToString(crypto.wifToPrivateKey(wif, common.NEO_PRIVATE_KEY_VERSION));
+}
 
 /**
  * Converts a hex-encoded private key to a wallet-import-format (WIF) private key.
@@ -64,8 +69,9 @@ export const wifToPrivateKey = (wif: string): PrivateKeyString =>
  * @param privateKey hex-encoded private key.
  * @returns wallet-import-format (WIF) private key.
  */
-export const privateKeyToWIF = (privateKey: PrivateKeyString): string =>
-  crypto.privateKeyToWIF(common.stringToPrivateKey(privateKey), common.NEO_PRIVATE_KEY_VERSION);
+export function privateKeyToWIF(privateKey: PrivateKeyString): string {
+  return crypto.privateKeyToWIF(common.stringToPrivateKey(privateKey), common.NEO_PRIVATE_KEY_VERSION);
+}
 
 /**
  * Converts a hex-encoded private key to a `Hash160` script hash.
@@ -73,8 +79,9 @@ export const privateKeyToWIF = (privateKey: PrivateKeyString): string =>
  * @param privateKey hex-encoded private key.
  * @returns `Hash160` string, a hex encoded string prefixed by '0x'.
  */
-export const privateKeyToScriptHash = (privateKey: PrivateKeyString): string =>
-  common.uInt160ToString(crypto.privateKeyToScriptHash(common.stringToPrivateKey(privateKey)));
+export function privateKeyToScriptHash(privateKey: PrivateKeyString): string {
+  return common.uInt160ToString(crypto.privateKeyToScriptHash(common.stringToPrivateKey(privateKey)));
+}
 
 /**
  * Converts a hex-encoded private key to a base58 encoded NEO `Address`.
@@ -82,11 +89,12 @@ export const privateKeyToScriptHash = (privateKey: PrivateKeyString): string =>
  * @param privateKey hex-encoded private key.
  * @returns base58 encoded string that represents a NEO address.
  */
-export const privateKeyToAddress = (privateKey: PrivateKeyString): AddressString =>
-  crypto.privateKeyToAddress({
+export function privateKeyToAddress(privateKey: PrivateKeyString): AddressString {
+  return crypto.privateKeyToAddress({
     addressVersion: common.NEO_ADDRESS_VERSION,
     privateKey: common.stringToPrivateKey(privateKey),
   });
+}
 
 /**
  * Converts a hex-encoded private key to a hex-encoded public key.
@@ -94,8 +102,9 @@ export const privateKeyToAddress = (privateKey: PrivateKeyString): AddressString
  * @param privateKey hex-encoded private key.
  * @returns hex-encoded public key
  */
-export const privateKeyToPublicKey = (privateKey: PrivateKeyString): PublicKeyString =>
-  common.ecPointToString(crypto.privateKeyToPublicKey(common.stringToPrivateKey(privateKey)));
+export function privateKeyToPublicKey(privateKey: PrivateKeyString): PublicKeyString {
+  return common.ecPointToString(crypto.privateKeyToPublicKey(common.stringToPrivateKey(privateKey)));
+}
 
 /**
  * Validates if a given string is a NEP-2 encrypted private key.
@@ -103,7 +112,9 @@ export const privateKeyToPublicKey = (privateKey: PrivateKeyString): PublicKeySt
  * @param encryptedKey hex-encoded encrypted key
  * @returns `true` if it's a valid NEP-2 key, `false` otherwise
  */
-export const isNEP2 = (encryptedKey: string): boolean => crypto.isNEP2(encryptedKey);
+export function isNEP2(encryptedKey: string): boolean {
+  return crypto.isNEP2(encryptedKey);
+}
 
 /**
  * Encrypts a private key with a password using the NEP-2 standard.
@@ -112,18 +123,19 @@ export const isNEP2 = (encryptedKey: string): boolean => crypto.isNEP2(encrypted
  * @param privateKey hex-encoded private key
  * @returns NEP-2 format encrypted key
  */
-export const encryptNEP2 = async ({
+export async function encryptNEP2({
   password,
   privateKey,
 }: {
   readonly password: string;
   readonly privateKey: PrivateKeyString;
-}): Promise<string> =>
-  crypto.encryptNEP2({
+}): Promise<string> {
+  return crypto.encryptNEP2({
     addressVersion: common.NEO_ADDRESS_VERSION,
     privateKey: common.stringToPrivateKey(privateKey),
     password,
   });
+}
 
 /**
  * Decrypts a private key encrypted using the NEP-2 standard with the given password.
@@ -132,13 +144,13 @@ export const encryptNEP2 = async ({
  * @param encryptedKey NEP-2 format encrypted key
  * @returns hex-encoded private key
  */
-export const decryptNEP2 = async ({
+export async function decryptNEP2({
   password,
   encryptedKey,
 }: {
   readonly password: string;
   readonly encryptedKey: string;
-}): Promise<PrivateKeyString> => {
+}): Promise<PrivateKeyString> {
   const privateKey = await crypto.decryptNEP2({
     addressVersion: common.NEO_ADDRESS_VERSION,
     encryptedKey,
@@ -146,11 +158,13 @@ export const decryptNEP2 = async ({
   });
 
   return common.privateKeyToString(privateKey);
-};
+}
 
 /**
  * Creates a new cryptographically secure private key.
  *
  * @returns hex-encoded private key
  */
-export const createPrivateKey = (): PrivateKeyString => common.privateKeyToString(crypto.createPrivateKey());
+export function createPrivateKey(): PrivateKeyString {
+  return common.privateKeyToString(crypto.createPrivateKey());
+}

@@ -2,7 +2,7 @@ import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
 import { prop } from 'styled-tools';
-import { TypeIcon } from './TypeIcon';
+import { TypeIcon } from './common';
 import { TypeFilterOptions } from './types';
 
 interface Props {

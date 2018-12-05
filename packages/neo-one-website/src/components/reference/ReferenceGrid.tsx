@@ -11,7 +11,8 @@ const { useState } = React;
 const ReferenceLayout = styled(Box)`
   display: grid;
   min-width: 0;
-  grid-template-columns: repeat(auto-fill, 160px);
+  grid-template-columns: repeat(auto-fill, 240px);
+  grid-gap: 8px;
 `;
 
 const Wrapper = styled(Box)`
