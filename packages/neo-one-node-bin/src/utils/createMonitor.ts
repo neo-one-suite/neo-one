@@ -1,13 +1,18 @@
-import { DefaultMonitor, Monitor } from '@neo-one/monitor';
+import { DefaultMonitor, LogLevel, Monitor } from '@neo-one/monitor';
 import { createLogger, format, transports } from 'winston';
 
-export const createMonitor = (): Monitor => {
-  const formats = format.combine(format.timestamp(), format.json());
+export interface MonitorEnvironment {
+  readonly level: LogLevel;
+}
+
+const DEFAULT_FORMATS = format.combine(format.timestamp(), format.json());
+
+export const createMonitor = ({ level }: MonitorEnvironment): Monitor => {
   const logger = createLogger({
     transports: [
       new transports.Console({
-        level: 'verbose',
-        format: formats,
+        level,
+        format: DEFAULT_FORMATS,
       }),
     ],
   });
