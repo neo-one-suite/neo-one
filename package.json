@@ -243,7 +243,7 @@
     "tslint-immutable": "4.9.1",
     "tslint-microsoft-contrib": "6.0.0",
     "tslint-sonarts": "1.8.0",
-    "typescript": "3.2.1",
+    "typescript": "3.2.2",
     "typescript-styled-plugin": "0.13.0",
     "url-loader": "1.1.2",
     "webpack": "4.27.1",
