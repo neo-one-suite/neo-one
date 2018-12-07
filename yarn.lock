@@ -14025,10 +14025,10 @@ media-typer@0.3.0:
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
   integrity sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=
 
-megajs@^0.15.7:
-  version "0.15.7"
-  resolved "https://registry.yarnpkg.com/megajs/-/megajs-0.15.7.tgz#05948635456233de6234f2d561d3ac112df621ac"
-  integrity sha512-MpVxaKYMLpYEJlyDoXmlxgP9MYFHtKeFqwMebnUWarDgd5/kXhpIW4pLN4U/u1KEwHkqPJLVOIweYbokGUDIdw==
+megajs@^0.16.0:
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/megajs/-/megajs-0.16.0.tgz#c4e6f4d90cfad7ad796a9efef5a306e010326b0b"
+  integrity sha512-8zvnDurwJkOGgKJ8IlWu05IhM/BqpIwKgvLzZaRcMv/rGcEzgYD20LY3DdGFQ7/XiMtksoM8WGIvcJuRmZyAXg==
   dependencies:
     combined-stream "^1.0.5"
     request "^2.88.0"
