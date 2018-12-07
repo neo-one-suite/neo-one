@@ -1,3 +1,4 @@
+// tslint:disable no-null-keyword
 import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
@@ -21,7 +22,7 @@ interface Props {
 
 export const Extra = ({ data, ...props }: Props) => (
   <Wrapper {...props}>
-    {data.title === undefined ? undefined : <Title>{data.title}</Title>}
+    {data.title === undefined ? null : <Title>{data.title}</Title>}
     {data.code ? <Example example={data.data} /> : <Text text={data.data} />}
   </Wrapper>
 );

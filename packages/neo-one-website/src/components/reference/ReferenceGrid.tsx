@@ -11,7 +11,7 @@ const { useState } = React;
 const ReferenceLayout = styled(Box)`
   display: grid;
   min-width: 0;
-  grid-template-columns: repeat(auto-fill, 240px);
+  grid-template-columns: repeat(auto-fill, 400px);
   grid-gap: 8px;
 `;
 

@@ -1,9 +1,11 @@
+// tslint:disable no-null-keyword
 import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Example, Text, Title } from '../common';
 import { Method } from '../types';
+import { Extra } from './Extra';
 import { ParameterReturns } from './ParameterReturns';
 
 export interface Props {
@@ -43,9 +45,10 @@ export const MethodItem = ({ method, ...props }: Props) => (
   <Layout {...props}>
     <StyledTitle subheading>{method.title}</StyledTitle>
     <Wrapper>
-      {method.description === undefined ? undefined : <Text text={method.description} />}
+      {method.description === undefined ? null : <Text text={method.description} />}
       <Example example={method.definition} />
       <ParameterReturns functionData={method.functionData} subheading />
+      {method.extra === undefined ? null : method.extra.map((extra) => <Extra data={extra} key={extra.title} />)}
     </Wrapper>
   </Layout>
 );

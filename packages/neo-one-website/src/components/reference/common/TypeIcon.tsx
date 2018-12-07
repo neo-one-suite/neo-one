@@ -14,12 +14,12 @@ const IconBox = styled(Box)<{ readonly bg: TypeFilterOptions; readonly fullIcon:
   background-color: ${switchProp('bg', {
     All: 'transparent',
     Class: prop('theme.primary'),
-    Const: prop('theme.secondary'),
-    Function: prop('theme.accent'),
-    Interface: prop('theme.error'),
-    Enum: prop('theme.warning'),
-    Decorator: prop('theme.gray3'),
-    'Type Alias': prop('theme.gray6'),
+    Const: prop('theme.gray6'),
+    Function: prop('theme.warning'),
+    Interface: prop('theme.accent'),
+    Enum: prop('theme.gray3'),
+    Decorator: prop('theme.error'),
+    'Type Alias': prop('theme.secondary'),
   })};
   color: ${switchProp(
     'bg',

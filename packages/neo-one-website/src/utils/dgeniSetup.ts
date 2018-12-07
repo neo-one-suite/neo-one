@@ -58,12 +58,10 @@ const docFiles: ReadonlyArray<string> = [
       },
     });
 
-    // Configure output path for overloaded functions. Each overload needs a unique output file to avoid conflict.
     computePathsProcessor.pathTemplates.push({
-      docTypes: ['function-overload'],
+      docTypes: ['const', 'interface', 'class', 'type-alias', 'decorator', 'function', 'enum'],
       outputPathTemplate: 'partials/modules/${path}/index.html',
-      // Template to generate unique path for each overload of a function.
-      pathTemplate: '${moduleDoc.path}/${name}${parameterDocs.length}',
+      pathTemplate: '${moduleDoc.path}/${docType}/${name}',
     });
   });
 
