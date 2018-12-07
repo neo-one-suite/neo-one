@@ -47,7 +47,7 @@
     "react-icons": "^3.2.2",
     "react-redux": "^5.1.1",
     "react-select": "^2.1.1",
-    "react-static": "6.0.0-beta.30",
+    "react-static": "6.0.0-beta.32",
     "react-transition-group": "^2.5.0",
     "react-universal-component": "^3.0.3",
     "redux": "^4.0.1",
