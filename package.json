@@ -152,7 +152,7 @@
     "@types/jest": "23.3.10",
     "@types/react": "16.7.13",
     "@types/styled-components": "4.1.0",
-    "@types/webpack": "4.4.20",
+    "@types/webpack": "4.4.21",
     "@types/webpack-bundle-analyzer": "2.13.0",
     "@types/yargs": "12.0.1",
     "all-contributors-cli": "5.4.1",
