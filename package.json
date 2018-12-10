@@ -206,7 +206,7 @@
     "mocha-junit-reporter": "1.18.0",
     "mocha-multi-reporters": "1.1.7",
     "nanoid": "2.0.0",
-    "nodemon": "1.18.7",
+    "nodemon": "1.18.8",
     "nyc": "13.1.0",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "postcss-flexbugs-fixes": "4.1.0",
