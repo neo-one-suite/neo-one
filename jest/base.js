@@ -27,6 +27,7 @@ module.exports = ({ path }) => ({
   testPathIgnorePatterns,
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.jsx?$': 'babel-jest',
   },
   testEnvironment: `./scripts/${path}/NodeEnvironment.js`,
   setupTestFrameworkScriptFile: `./scripts/${path}/jestSetup.js`,

@@ -15,7 +15,7 @@ import {
   verifyTokenContract,
 } from '../__data__/buildCommand.bootstrap';
 
-const TEST_DATA_ROOT = path.resolve(__dirname, '../__data__/ico');
+const TEST_DATA_ROOT = path.resolve(__dirname, '../__data__/icojs');
 
 describe('buildCommand', () => {
   test('build', async () => {
@@ -29,7 +29,7 @@ describe('buildCommand', () => {
     expect(networks.length).toEqual(1);
 
     const network = networks[0];
-    expect(network.name.includes('ico-local')).toBeTruthy();
+    expect(network.name.includes('icojs-local')).toBeTruthy();
     expect(network.type).toEqual('private');
     expect(network.nodes.length).toEqual(1);
     expect(network.nodes[0].live).toBeTruthy();

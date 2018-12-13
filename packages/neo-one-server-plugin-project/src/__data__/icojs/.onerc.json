@@ -1,0 +1,10 @@
+{
+  "paths": {
+    "contracts": "one/contracts",
+    "generated": "one/generated"
+  },
+  "codegen": {
+    "language": "javascript",
+    "framework": "none"
+  }
+}
