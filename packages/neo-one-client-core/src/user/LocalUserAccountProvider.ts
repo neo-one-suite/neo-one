@@ -222,7 +222,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   protected readonly mutableUsedOutputs: Set<string>;
   protected mutableBlockCount: number;
 
-  public constructor({ keystore, provider }: { readonly keystore: TKeyStore; readonly provider: TProvider }) {
+  public constructor(constructorOptions: { readonly keystore: TKeyStore; readonly provider: TProvider }) {
+    const { keystore, provider } = constructorOptions;
     this.keystore = keystore;
     this.provider = provider;
 
