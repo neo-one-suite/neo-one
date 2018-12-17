@@ -17,6 +17,7 @@ declare const OpaqueTagSymbol0: unique symbol;
  *
  * See the [Standard Library](https://neo-one.io/docs/smart-contract-basics#Value-Types) chapter of the main guide for more information.
  */
+export const Address: AddressConstructor;
 export interface Address extends Buffer {
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
@@ -66,7 +67,6 @@ export interface AddressConstructor {
   readonly isSender: (address: Address) => boolean;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const Address: AddressConstructor;
 
 /**
  * `Buffer` that represents a NEO 256 bit hash.
@@ -75,6 +75,7 @@ export const Address: AddressConstructor;
  *
  * See the [Standard Library](https://neo-one.io/docs/smart-contract-basics#Value-Types) chapter of the main guide for more information.
  */
+export const Hash256: Hash256Constructor;
 export interface Hash256 extends Buffer {
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
@@ -100,13 +101,13 @@ export interface Hash256Constructor {
   readonly GAS: Hash256;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const Hash256: Hash256Constructor;
 
 /**
  * `Buffer` that represents a public key.
  *
  * See the [Standard Library](https://neo-one.io/docs/smart-contract-basics#Value-Types) chapter of the main guide for more information.
  */
+export const PublicKey: PublicKeyConstructor;
 export interface PublicKey extends Buffer {
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
@@ -124,7 +125,6 @@ export interface PublicKeyConstructor {
   readonly from: (value: string) => PublicKey;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const PublicKey: PublicKeyConstructor;
 
 interface FixedTag<T extends number> {
   readonly __decimals: T;
@@ -262,6 +262,7 @@ export type Hash256AttributeUsage =
  *
  * @see Attribute
  */
+export const AttributeBase: AttributeBaseConstructor;
 export interface AttributeBase {
   readonly usage: AttributeUsage;
   readonly data: Buffer;
@@ -270,7 +271,6 @@ export interface AttributeBase {
 export interface AttributeBaseConstructor {
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const AttributeBase: AttributeBaseConstructor;
 
 /**
  * `Attribute` whose data is an arbitrary `Buffer`.
@@ -312,6 +312,7 @@ export type Attribute = BufferAttribute | PublicKeyAttribute | AddressAttribute 
  *
  * The sum of the unspent `Output`s of an `Address` represent the total balance of the `Address`.
  */
+export const Output: OutputConstructor;
 export interface Output {
   /**
    * Destination `Address`.
@@ -330,11 +331,11 @@ export interface Output {
 export interface OutputConstructor {
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const Output: OutputConstructor;
 
 /**
  * `Input`s are a reference to an `Output` of a `Transaction` that has been persisted to the blockchain. The sum of the `value`s of the referenced `Output`s is the total amount transferred in the `Transaction`.
  */
+export const Input: InputConstructor;
 export interface Input {
   /**
    * `Hash256` of the `Transaction` this input references.
@@ -349,7 +350,6 @@ export interface Input {
 export interface InputConstructor {
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const Input: InputConstructor;
 
 /**
  * Constants that specify the type of a `Transaction`.
@@ -412,6 +412,7 @@ export enum TransactionType {
 /**
  * Base interface for all `Transaction`s.
  */
+export const TransactionBase: TransactionBaseConstructor;
 export interface TransactionBase {
   /**
    * `Hash256` of this `Transaction`.
@@ -456,7 +457,7 @@ export interface TransactionBase {
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
 export interface TransactionBaseConstructor {}
-export const TransactionBase: TransactionBaseConstructor;
+
 /**
  * First `Transaction` in each `Block` which contains the `Block` rewards for the consensus node that produced the `Block`.
  */
@@ -533,6 +534,7 @@ export interface InvocationTransaction extends TransactionBase {
  * const transactionOutputs = transaction.outputs;
  *
  */
+export const Transaction: TransactionConstructor;
 export type Transaction =
   | MinerTransaction
   | IssueTransaction
@@ -550,7 +552,6 @@ export interface TransactionConstructor {
   readonly for: (hash: Hash256) => Transaction;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const Transaction: TransactionConstructor;
 
 /**
  * Balance and vote information for an `Address`.
@@ -562,6 +563,7 @@ export const Transaction: TransactionConstructor;
  * const neoBalance = account.getBalance(Hash256.NEO);
  *
  */
+export const Account: AccountConstructor;
 export interface Account {
   /**
    * `Address` of this `Account`.
@@ -580,7 +582,6 @@ export interface AccountConstructor {
   readonly for: (address: Address) => Account;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const Account: AccountConstructor;
 
 /**
  * Constants that specify the type of the `Asset`.
@@ -613,6 +614,7 @@ export enum AssetType {
  * const neoAmount = asset.amount;
  *
  */
+export const Asset: AssetConstructor;
 export interface Asset {
   /**
    * `Hash256` of this `Asset`.
@@ -657,7 +659,6 @@ export interface AssetConstructor {
   readonly for: (hash: Hash256) => Asset;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const Asset: AssetConstructor;
 
 /**
  * Attributes of a smart contract deployed to the blockchain.
@@ -669,6 +670,7 @@ export const Asset: AssetConstructor;
  * const contractScript = contract.script;
  *
  */
+export const Contract: ContractConstructor;
 export interface Contract {
   /**
    * `Contract` code.
@@ -689,7 +691,6 @@ export interface ContractConstructor {
   readonly for: (address: Address) => Contract | undefined;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const Contract: ContractConstructor;
 
 /**
  * Attributes of a `Block` persisted to the blockchain. `Header` includes all information except the list of `Transaction`s.
@@ -700,6 +701,7 @@ export const Contract: ContractConstructor;
  * const header = Header.for(blockHash);
  *
  */
+export const Header: HeaderConstructor;
 export interface Header {
   /**
    * `Block` hash.
@@ -740,7 +742,7 @@ export interface HeaderConstructor {
   readonly for: (hashOrIndex: Hash256 | Integer) => Header;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const Header: HeaderConstructor;
+
 /**
  * Attributes of a `Block` persisted to the blockchain.
  *
@@ -749,6 +751,7 @@ export const Header: HeaderConstructor;
  * const genesisBlock = Block.for(0);
  *
  */
+export const Block: BlockConstructor;
 export interface Block extends Header {
   /**
    * `Transaction`s contained in the `Block`.
@@ -764,7 +767,6 @@ export interface BlockConstructor {
   readonly for: (hashOrIndex: Hash256 | Integer) => Block;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const Block: BlockConstructor;
 
 /**
  * Value that can be used as a key in `MapStorage` and a value for `SetStorage`.
@@ -814,6 +816,7 @@ export type SerializableValue =
  * }
  *
  */
+export const ArrayStorage: ArrayStorageConstructor;
 export interface ArrayStorage<T extends SerializableValue> extends Iterable<T> {
   readonly [Symbol.iterator]: () => IterableIterator<T>;
   /**
@@ -848,7 +851,6 @@ export interface ArrayStorageConstructor {
   for<T extends SerializableValue>(): ArrayStorage<T>;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const ArrayStorage: ArrayStorageConstructor;
 
 type SKMapAtTwo<K extends [SK, SK], V extends SerializableValue> = {
   (prefix: K[0]): MapStorage<K[1], V>;
@@ -888,6 +890,7 @@ type SKMapAtFour<K extends [SK, SK, SK, SK], V extends SerializableValue> = {
  * }
  *
  */
+export const MapStorage: MapStorageConstructor;
 export interface MapStorage<K extends SerializableKey, V extends SerializableValue> extends Iterable<[K, V]> {
   readonly [Symbol.iterator]: () => IterableIterator<[K, V]>;
   /**
@@ -941,7 +944,6 @@ export interface MapStorageConstructor {
   for<K extends SerializableKey, V extends SerializableValue>(): MapStorage<K, V>;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const MapStorage: MapStorageConstructor;
 
 type SKSetAtTwo<V extends [SK, SK]> = {
   (prefix: V[0]): SetStorage<V[1]>;
@@ -973,6 +975,7 @@ type SKSetAtFour<V extends [SK, SK, SK, SK]> = {
  * }
  *
  */
+export const SetStorage: SetStorageConstructor;
 export interface SetStorage<V extends SerializableKey> extends Iterable<V> {
   readonly [Symbol.iterator]: () => IterableIterator<V>;
   /**
@@ -1019,7 +1022,6 @@ export interface SetStorageConstructor {
   for<K extends SerializableKey>(): SetStorage<K>;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const SetStorage: SetStorageConstructor;
 
 /**
  * Holds properties about the current state of the blockchain, the current `Transaction` and the current caller `Contract`.
@@ -1058,6 +1060,7 @@ export const Blockchain: BlockchainConstructor;
 /**
  * Injects values at deployment time. Can only be used for default constructor parameters.
  */
+export const Deploy: DeployConstructor;
 export interface DeployConstructor {
   /**
    * Use the sender `Address` for the constructor parameter.
@@ -1074,11 +1077,34 @@ export interface DeployConstructor {
   readonly senderAddress: Address;
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-/**
- * Injects values at deployment time. Can only be used for default constructor parameters.
- */
-export const Deploy: DeployConstructor;
 
+/**
+ * Creates an event notifier for `SmartContract` notifications.
+ *
+ * Must be explicitly typed and contain string literals for the event name and argument names.
+ *
+ * See the [Events and Logs](https://neo-one.io/docs/events-and-logs) chapter of the main guide for more information.
+ *
+ * @example
+ *
+ * const notifyTransfer = createEventNotifier<Address, Address, Fixed<8>>('transfer', 'from', 'to', 'amount');
+ *
+ * const from = Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW');
+ * const to = Address.from('AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx');
+ * notifyTransfer(from, to, 200);
+ *
+ * @param name Event name
+ * @param argName Event argument name
+ */
+export function createEventNotifier<A0, A1, A2, A3, A4, A5>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+  arg2Name: string,
+  arg3Name: string,
+  arg4Name: string,
+  arg5Name: string,
+): (arg0: A0, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => void;
 export function createEventNotifier(name: string): () => void;
 export function createEventNotifier<A0>(name: string, arg0Name: string): (arg0: A0) => void;
 export function createEventNotifier<A0, A1>(
@@ -1107,53 +1133,7 @@ export function createEventNotifier<A0, A1, A2, A3, A4>(
   arg3Name: string,
   arg4Name: string,
 ): (arg0: A0, arg1: A1, arg2: A2, arg3: A3, arg4: A4) => void;
-/**
- * Creates an event notifier for `SmartContract` notifications.
- *
- * Must be explicitly typed and contain string literals for the event name and argument names.
- *
- * See the [Events and Logs](https://neo-one.io/docs/events-and-logs) chapter of the main guide for more information.
- *
- * @example
- *
- * const notifyTransfer = createEventNotifier<Address, Address, Fixed<8>>('transfer', 'from', 'to', 'amount');
- *
- * const from = Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW');
- * const to = Address.from('AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx');
- * notifyTransfer(from, to, 200);
- *
- * @param name Event name
- * @param argName Event argument name
- */
-export function createEventNotifier<A0, A1, A2, A3, A4, A5>(
-  name: string,
-  arg0Name: string,
-  arg1Name: string,
-  arg2Name: string,
-  arg3Name: string,
-  arg4Name: string,
-  arg5Name: string,
-): (arg0: A0, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5) => void;
 
-export function declareEvent(name: string): void;
-export function declareEvent<A0>(name: string, arg0Name: string): void;
-export function declareEvent<A0, A1>(name: string, arg0Name: string, arg1Name: string): void;
-export function declareEvent<A0, A1, A2>(name: string, arg0Name: string, arg1Name: string, arg2Name: string): void;
-export function declareEvent<A0, A1, A2, A3>(
-  name: string,
-  arg0Name: string,
-  arg1Name: string,
-  arg2Name: string,
-  arg3Name: string,
-): void;
-export function declareEvent<A0, A1, A2, A3, A4>(
-  name: string,
-  arg0Name: string,
-  arg1Name: string,
-  arg2Name: string,
-  arg3Name: string,
-  arg4Name: string,
-): void;
 /**
  * Declares an event for `SmartContract` notifications.
  *
@@ -1177,12 +1157,32 @@ export function declareEvent<A0, A1, A2, A3, A4, A5>(
   arg4Name: string,
   arg5Name: string,
 ): void;
+export function declareEvent(name: string): void;
+export function declareEvent<A0>(name: string, arg0Name: string): void;
+export function declareEvent<A0, A1>(name: string, arg0Name: string, arg1Name: string): void;
+export function declareEvent<A0, A1, A2>(name: string, arg0Name: string, arg1Name: string, arg2Name: string): void;
+export function declareEvent<A0, A1, A2, A3>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+  arg2Name: string,
+  arg3Name: string,
+): void;
+export function declareEvent<A0, A1, A2, A3, A4>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+  arg2Name: string,
+  arg3Name: string,
+  arg4Name: string,
+): void;
 
 /**
  * An opaque type that represents a method parameter which is typically forwarded as an argument to another smart contract.
  *
  * See the [Forward Values](https://neo-one.io/docs/forward-values) chapter of the advanced guide for more information.
  */
+export const ForwardValue: ForwardValueConstructor;
 export interface ForwardValue {
   readonly asString: () => string;
   readonly asStringNullable: () => string | undefined;
@@ -1206,7 +1206,6 @@ export interface ForwardValue {
 export interface ForwardValueConstructor {
   readonly [OpaqueTagSymbol0]: unique symbol;
 }
-export const ForwardValue: ForwardValueConstructor;
 
 interface ForwardedValueTag<T extends SmartContractArg> {}
 /**
@@ -1404,7 +1403,7 @@ export type Hashable = number | string | boolean | Buffer;
 /**
  * Contains various cryptography functions.
  */
-export interface Crypto {
+export interface CryptoConstructor {
   /**
    * Returns a `Buffer` of the SHA1 hash of the input
    */
@@ -1425,7 +1424,7 @@ export interface Crypto {
 /**
  * Contains various cryptography functions.
  */
-export const crypto: Crypto;
+export const crypto: CryptoConstructor;
 
 /**
  * Represents a native `Asset` transfer.
@@ -1457,7 +1456,7 @@ export interface Transfer {
  * @example
  *
  * export class Contract extends SmartContract {
- *  @send
+ *  `@send`
  *  public withdraw(arg0: Address, arg1: Fixed<8>, transfer: Transfer): boolean {
  *    // Don't allow sending anything but NEO
  *    if (!transfer.asset.equals(Hash256.NEO)) {
