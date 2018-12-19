@@ -12,7 +12,7 @@
     "@types/chokidar": "^1.7.5",
     "@types/env-paths": "^1.0.2",
     "@types/fs-extra": "^5.0.4",
-    "@types/rc": "^0.0.1",
+    "@types/rc": "^0.0.2",
     "@types/seamless-immutable": "^7.1.4",
     "chokidar": "^2.0.4",
     "env-paths": "^2.0.0",
