@@ -247,7 +247,7 @@
     "typescript": "3.2.2",
     "typescript-styled-plugin": "0.13.0",
     "url-loader": "1.1.2",
-    "webpack": "4.27.1",
+    "webpack": "4.28.0",
     "webpack-bundle-analyzer": "3.0.3",
     "webpack-node-externals": "1.7.2",
     "webpack-serve": "2.0.3",
@@ -263,7 +263,7 @@
     "grpc": "1.16.1",
     "regenerator-runtime": "0.13.1",
     "styled-components": "4.1.1",
-    "webpack": "4.27.1"
+    "webpack": "4.28.0"
   },
   "config": {
     "commitizen": {
