@@ -168,6 +168,8 @@
     "use-primitive-type": true,
     "no-map-without-usage": true,
     "rxjs-finnish": true,
-    "rxjs-no-ignored-error": false
+    "rxjs-no-ignored-error": false,
+    "ban-ts-ignore": false,
+    "no-default-import": false
   }
 }
