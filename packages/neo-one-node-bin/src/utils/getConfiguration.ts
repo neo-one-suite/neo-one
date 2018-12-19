@@ -14,6 +14,8 @@ export interface NodeBinEnvironment {
   readonly settingsEnvironment: SettingsEnvironment;
   readonly monitorEnvironment: MonitorEnvironment;
   readonly options: ConfigOptions;
+  readonly dumpChainFile: string | undefined;
+  readonly chainFile: string | undefined;
   // tslint:disable-next-line:readonly-array
   readonly configs: string[] | undefined;
 }
@@ -67,6 +69,8 @@ const getFreshConfig = (): NodeBinEnvironment => {
     settingsEnvironment: config.settings,
     monitorEnvironment: config.monitor,
     options: config.options === undefined ? {} : config.options,
+    dumpChainFile: config.dumpChainFile,
+    chainFile: config.chainFile,
     configs: config.configs,
   };
 };
@@ -77,6 +81,8 @@ export const getConfiguration = () => {
     settingsEnvironment,
     monitorEnvironment,
     options: initialOptions,
+    dumpChainFile,
+    chainFile,
     configs,
   } = getFreshConfig();
 
@@ -113,5 +119,5 @@ export const getConfiguration = () => {
     );
   }
 
-  return { monitor, environment, settings, options$ };
+  return { monitor, environment, settings, options$, dumpChainFile, chainFile };
 };

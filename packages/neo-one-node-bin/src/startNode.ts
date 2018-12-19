@@ -4,7 +4,7 @@ import { finalize } from '@neo-one/utils';
 import { getConfiguration } from './utils';
 
 export const startNode = async (): Promise<void> => {
-  const { monitor, environment, settings, options$ } = getConfiguration();
+  const { monitor, environment, settings, options$, chainFile, dumpChainFile } = getConfiguration();
   let mutableShutdownFuncs: ReadonlyArray<() => Promise<void>> = [];
 
   const initiateShutdown = async () => {
@@ -82,6 +82,8 @@ export const startNode = async (): Promise<void> => {
     environment,
     settings,
     options$,
+    chainFile,
+    dumpChainFile,
   });
 
   mutableShutdownFuncs = mutableShutdownFuncs.concat(fullNode.stop);
