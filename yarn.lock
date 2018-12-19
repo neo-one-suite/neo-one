@@ -5920,7 +5920,12 @@ caniuse-lite@^1.0.30000921:
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000921.tgz#7a607c1623444b22351d834e093aedda3c42fbe8"
   integrity sha512-Bu09ciy0lMWLgpYC77I0YGuI8eFRBPPzaSOYJK1jTI64txCphYCqnWbxJYjHABYVt/TYX/p3jNjLBR87u1Bfpw==
 
-canonical-path@0.0.2, canonical-path@~0.0.2:
+canonical-path@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/canonical-path/-/canonical-path-1.0.0.tgz#fcb470c23958def85081856be7a86e904f180d1d"
+  integrity sha512-feylzsbDxi1gPZ1IjystzIQZagYYLvfKrSuygUCgf7z6x790VEzze5QEkdSV1U58RA7Hi0+v6fv4K54atOzATg==
+
+canonical-path@~0.0.2:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/canonical-path/-/canonical-path-0.0.2.tgz#e31eb937a8c93ee2a01df1839794721902874574"
   integrity sha1-4x65N6jJPuKgHfGDl5RyGQKHRXQ=
@@ -7859,12 +7864,12 @@ dezalgo@^1.0.0:
     asap "^2.0.0"
     wrappy "1"
 
-dgeni-packages@^0.26.12:
-  version "0.26.12"
-  resolved "https://registry.yarnpkg.com/dgeni-packages/-/dgeni-packages-0.26.12.tgz#6b8329b59a17213d30137b53a689d579cd6a9fb1"
-  integrity sha512-dYuRYnw+sURD82F6JJ+2erOKOlaReBymR9g2bjpws3GSIpBbX1p1kE9VYwmAaBoZRE2h+woK8RyDktZvkzETfg==
+dgeni-packages@^0.27.0:
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/dgeni-packages/-/dgeni-packages-0.27.0.tgz#99ddf4c97f75bb1f8deb5658ed7d60f6894e9b9d"
+  integrity sha512-BFWJGZTpLb1xAc/iHq7SOcbkyEoxD57NqVG84azfNu63wAVLxoez/9n8VISWNJkrOIT1ITQS7nacgcGxfl0MIw==
   dependencies:
-    canonical-path "0.0.2"
+    canonical-path "^1.0.0"
     catharsis "^0.8.1"
     change-case "3.0.0"
     dgeni "^0.4.9"
@@ -7878,13 +7883,13 @@ dgeni-packages@^0.26.12:
     mkdirp "^0.5.1"
     mkdirp-promise "^5.0.0"
     node-html-encoder "0.0.2"
-    nunjucks "^3.0.1"
+    nunjucks "^3.1.6"
     semver "^5.2.0"
     shelljs "^0.7.0"
     source-map-support "^0.4.15"
     spdx-license-list "^2.1.0"
     stringmap "^0.2.2"
-    typescript "~2.7.1"
+    typescript "^3.2.2"
     urlencode "^1.1.0"
 
 dgeni@^0.4.10, dgeni@^0.4.9:
@@ -15313,10 +15318,10 @@ number-is-nan@^1.0.0:
   resolved "https://registry.yarnpkg.com/number-is-nan/-/number-is-nan-1.0.1.tgz#097b602b53422a522c1afb8790318336941a011d"
   integrity sha1-CXtgK1NCKlIsGvuHkDGDNpQaAR0=
 
-nunjucks@^3.0.1:
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/nunjucks/-/nunjucks-3.1.4.tgz#d15d7b6c4215d2525f991b948335e16502fa1bfa"
-  integrity sha512-OIbdsl7jAZpw5V6GIa6wJc2AKCC/JSwuVdNKuVpFZ+eB3kYugoGF6OVN/jKNFe52782Uj89n0pT0DiSS1KPbxA==
+nunjucks@^3.1.6:
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/nunjucks/-/nunjucks-3.1.6.tgz#6e3a3420c77ceae937ae323e9e2995383d6410fb"
+  integrity sha512-aHCt5arZUqHnRNjfDBCq+fI/O3J2sxx+xZdz6mCNvwAgJVCtHM/VAv2++figjGeFyrZ1dVcJ1dCJwMxY8iYoqQ==
   dependencies:
     a-sync-waterfall "^1.0.0"
     asap "^2.0.3"
@@ -20737,15 +20742,10 @@ typescript-template-language-service-decorator@^2.0.0:
   resolved "https://registry.yarnpkg.com/typescript-template-language-service-decorator/-/typescript-template-language-service-decorator-2.2.0.tgz#4ee6d580f307fb9239978e69626f2775b8a59b2a"
   integrity sha512-xiolqt1i7e22rpqMaprPgSFVgU64u3b9n6EJlAaUYE61jumipKAdI1+O5khPlWslpTUj80YzjUKjJ2jxT0D74w==
 
-typescript@3.2.2:
+typescript@3.2.2, typescript@^3.2.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.2.2.tgz#fe8101c46aa123f8353523ebdcf5730c2ae493e5"
   integrity sha512-VCj5UiSyHBjwfYacmDuc/NOk4QQixbE+Wn7MFJuS0nRuPQbof132Pw4u53dm264O8LPc2MVsc7RJNml5szurkg==
-
-typescript@~2.7.1:
-  version "2.7.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.7.2.tgz#2d615a1ef4aee4f574425cdff7026edf81919836"
-  integrity sha512-p5TCYZDAO0m4G344hD+wx/LATebLWZNkkh2asWUFqSsD2OrDNhbAHuSjobrmsUmdzjJjEeZVU9g1h3O6vpstnw==
 
 typewise-core@^1.2, typewise-core@^1.2.0:
   version "1.2.0"
