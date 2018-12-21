@@ -178,7 +178,7 @@ function weightedFilter<T>(
 
 function equals<T>(
   // tslint:disable-next-line no-any readonly-array
-  clazz: { new (...args: any[]): T },
+  clazz: new (...args: any[]) => T,
   thiz: T,
   equalsFunc: (other: T) => boolean,
   // tslint:disable-next-line no-any
