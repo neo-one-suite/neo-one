@@ -215,7 +215,7 @@
     "prettier": "1.15.3",
     "react": "16.7.0",
     "react-dom": "16.7.0",
-    "react-hot-loader": "4.6.0",
+    "react-hot-loader": "4.6.3",
     "react-static": "6.0.11",
     "rollup": "0.68.0",
     "rollup-plugin-string": "2.0.2",
