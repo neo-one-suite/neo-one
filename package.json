@@ -230,7 +230,7 @@
     "stylelint-config-standard": "18.2.0",
     "stylelint-config-styled-components": "0.1.1",
     "stylelint-processor-styled-components": "1.5.1",
-    "terser-webpack-plugin": "1.1.0",
+    "terser-webpack-plugin": "1.2.1",
     "thread-loader": "2.1.1",
     "through2": "3.0.0",
     "tmp": "0.0.33",
