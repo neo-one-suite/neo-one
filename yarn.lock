@@ -3611,9 +3611,9 @@ ajv@6.5.3, ajv@6.5.5, ajv@^5.1.0, ajv@^5.2.3, ajv@^5.3.0, ajv@^6.1.0, ajv@^6.1.1
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-all-contributors-cli@5.4.1:
-  version "5.4.1"
-  resolved "https://registry.yarnpkg.com/all-contributors-cli/-/all-contributors-cli-5.4.1.tgz#c385cd7241f33ff381048c3ed81607eddecd2f4b"
+all-contributors-cli@5.5.0:
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/all-contributors-cli/-/all-contributors-cli-5.5.0.tgz#e96219a7dab53f2e7303ad0d6f0743113c4b9171"
   dependencies:
     async "^2.0.0-rc.1"
     chalk "^2.3.0"
