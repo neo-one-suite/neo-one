@@ -172,7 +172,7 @@
     "connect-history-api-fallback": "1.5.0",
     "cross-env": "5.2.0",
     "css-loader": "2.0.2",
-    "cypress": "3.1.3",
+    "cypress": "3.1.4",
     "cz-conventional-changelog": "2.1.0",
     "date-fns": "2.0.0-alpha.26",
     "execa": "1.0.0",
