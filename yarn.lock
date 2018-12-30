@@ -3515,6 +3515,13 @@ abstract-leveldown@~5.0.0:
   dependencies:
     xtend "~4.0.0"
 
+abstract-leveldown@~6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-6.0.1.tgz#2d5dd4c26799a38b7ca52026b3b7e8e5283bd165"
+  dependencies:
+    level-concat-iterator "~2.0.0"
+    xtend "~4.0.0"
+
 accepts@^1.3.5, accepts@~1.3.4, accepts@~1.3.5:
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/accepts/-/accepts-1.3.5.tgz#eb777df6011723a3b14e8a72c0805c8e86746bd2"
@@ -11679,11 +11686,11 @@ level-iterator-stream@~3.0.0:
     readable-stream "^2.3.6"
     xtend "^4.0.0"
 
-level-js@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/level-js/-/level-js-3.0.0.tgz#e6c066fb529b23eec230849c0751e4f6d548c865"
+level-js@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/level-js/-/level-js-4.0.0.tgz#1dc3e27ea29de99d549ac62a492862aa0c8186db"
   dependencies:
-    abstract-leveldown "~5.0.0"
+    abstract-leveldown "~6.0.1"
     immediate "~3.2.3"
     inherits "^2.0.3"
     ltgt "^2.1.2"
