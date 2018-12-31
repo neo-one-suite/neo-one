@@ -2631,9 +2631,9 @@
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/@types/is-running/-/is-running-2.1.0.tgz#883e7bb60ac9cbf256b43727790bfb0110ccb86a"
 
-"@types/jest@23.3.10":
-  version "23.3.10"
-  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-23.3.10.tgz#4897974cc317bf99d4fe6af1efa15957fa9c94de"
+"@types/jest@23.3.11":
+  version "23.3.11"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-23.3.11.tgz#d3a936ae753d9e484965f5cbd19027c2b8af2551"
 
 "@types/jquery@*":
   version "3.3.22"
