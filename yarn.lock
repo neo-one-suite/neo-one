@@ -2412,9 +2412,9 @@
     "@types/connect" "*"
     "@types/node" "*"
 
-"@types/bs58@^3.0.30":
-  version "3.0.30"
-  resolved "https://registry.yarnpkg.com/@types/bs58/-/bs58-3.0.30.tgz#916ba10992465e56f81afc735e7935fd749893e1"
+"@types/bs58@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@types/bs58/-/bs58-4.0.0.tgz#baec75cb007b419ede3ec6b3410d2c8f14c92fc5"
   dependencies:
     "@types/base-x" "*"
 
@@ -2631,9 +2631,9 @@
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/@types/is-running/-/is-running-2.1.0.tgz#883e7bb60ac9cbf256b43727790bfb0110ccb86a"
 
-"@types/jest@23.3.10":
-  version "23.3.10"
-  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-23.3.10.tgz#4897974cc317bf99d4fe6af1efa15957fa9c94de"
+"@types/jest@23.3.11":
+  version "23.3.11"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-23.3.11.tgz#d3a936ae753d9e484965f5cbd19027c2b8af2551"
 
 "@types/jquery@*":
   version "3.3.22"
@@ -3513,6 +3513,13 @@ abstract-leveldown@~5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-5.0.0.tgz#f7128e1f86ccabf7d2893077ce5d06d798e386c6"
   dependencies:
+    xtend "~4.0.0"
+
+abstract-leveldown@~6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-6.0.1.tgz#2d5dd4c26799a38b7ca52026b3b7e8e5283bd165"
+  dependencies:
+    level-concat-iterator "~2.0.0"
     xtend "~4.0.0"
 
 accepts@^1.3.5, accepts@~1.3.4, accepts@~1.3.5:
@@ -4771,6 +4778,10 @@ bfj@^6.1.1:
 big.js@^3.1.3:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-3.2.0.tgz#a5fc298b81b9e0dca2e458824784b65c52ba588e"
+
+big.js@^5.2.2:
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/big.js/-/big.js-5.2.2.tgz#65f0af382f578bcdc742bd9c281e9cb2d7768328"
 
 bignumber.js@8.0.1, bignumber.js@^8.0.1:
   version "8.0.1"
@@ -6396,12 +6407,12 @@ css-declaration-sorter@^4.0.1:
     postcss "^7.0.1"
     timsort "^0.3.0"
 
-css-loader@2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-2.0.2.tgz#5b02031745ba6d6721bcecad39daaea9804e30d3"
+css-loader@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-2.1.0.tgz#42952ac22bca5d076978638e9813abce49b8f0cc"
   dependencies:
     icss-utils "^4.0.0"
-    loader-utils "^1.0.2"
+    loader-utils "^1.2.1"
     lodash "^4.17.11"
     postcss "^7.0.6"
     postcss-modules-extract-imports "^2.0.0"
@@ -8083,9 +8094,9 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-css-chunks-webpack-plugin@3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/extract-css-chunks-webpack-plugin/-/extract-css-chunks-webpack-plugin-3.3.0.tgz#1809d576a21a7fe01b176c94b7345df8a25195b5"
+extract-css-chunks-webpack-plugin@3.3.2:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/extract-css-chunks-webpack-plugin/-/extract-css-chunks-webpack-plugin-3.3.2.tgz#c99ba78be7c670e1bbd1dcffe3e272ab5e88026d"
   dependencies:
     loader-utils "^1.1.0"
     lodash "^4.17.11"
@@ -11197,9 +11208,9 @@ json3@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/json3/-/json3-3.3.2.tgz#3c0434743df93e2f5c42aee7b19bcb483575f4e1"
 
-json5@1.0.1:
+json5@1.0.1, json5@^1.0.1:
   version "1.0.1"
-  resolved "https://registry.yarnpkg.com/json5/-/json5-1.0.1.tgz#779fb0018604fa854eacbf6252180d83543e3dbe"
+  resolved "http://registry.npmjs.org/json5/-/json5-1.0.1.tgz#779fb0018604fa854eacbf6252180d83543e3dbe"
   dependencies:
     minimist "^1.2.0"
 
@@ -11679,11 +11690,11 @@ level-iterator-stream@~3.0.0:
     readable-stream "^2.3.6"
     xtend "^4.0.0"
 
-level-js@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/level-js/-/level-js-3.0.0.tgz#e6c066fb529b23eec230849c0751e4f6d548c865"
+level-js@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/level-js/-/level-js-4.0.0.tgz#1dc3e27ea29de99d549ac62a492862aa0c8186db"
   dependencies:
-    abstract-leveldown "~5.0.0"
+    abstract-leveldown "~6.0.1"
     immediate "~3.2.3"
     inherits "^2.0.3"
     ltgt "^2.1.2"
@@ -12059,6 +12070,14 @@ loader-utils@^0.2.16:
     emojis-list "^2.0.0"
     json5 "^0.5.0"
     object-assign "^4.0.1"
+
+loader-utils@^1.2.1:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-1.2.3.tgz#1ff5dc6911c9f0a062531a4c04b609406108c2c7"
+  dependencies:
+    big.js "^5.2.2"
+    emojis-list "^2.0.0"
+    json5 "^1.0.1"
 
 locale2@^2.3.1:
   version "2.3.1"
