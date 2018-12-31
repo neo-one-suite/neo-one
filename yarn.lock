@@ -3001,9 +3001,9 @@
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.2.tgz#fa8e1ad1d474688a757140c91de6dace6f4abc8d"
 
-"@types/rc@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@types/rc/-/rc-0.0.2.tgz#cb639295e98fb2f7c4d008d7647e9b1aa304e4e3"
+"@types/rc@^1.0.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@types/rc/-/rc-1.1.0.tgz#59cf49ae07e2a34ab744231287b85d9e15a580a2"
 
 "@types/reach__router@^1.2.2":
   version "1.2.2"
