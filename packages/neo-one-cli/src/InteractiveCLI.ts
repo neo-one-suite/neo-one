@@ -263,8 +263,15 @@ export class InteractiveCLI {
 
             // tslint:disable-next-line no-any
             let spinner: any | undefined;
+            // tslint:disable-next-line no-any
+            let verSpinner: any | undefined;
+
+            if (first) {
+              verSpinner = ora(`Checking for @neo-one/cli updates...`).start();
+            }
+
             try {
-              const { pid } = await manager.start({
+              const { pid, newerVersion } = await manager.start({
                 port,
                 httpPort,
                 binary: createBinary(argv, this.serverConfig),
@@ -274,6 +281,16 @@ export class InteractiveCLI {
                   }
                 },
               });
+
+              if (verSpinner !== undefined) {
+                if (newerVersion === undefined) {
+                  verSpinner.succeed(`@neo-one/cli is current`);
+                } else {
+                  verSpinner.warn(
+                    `A newer version (${newerVersion}) of @neo-one/cli is available for download see https://neo-one.io/docs/environment-setup/#Updating for how to update.`,
+                  );
+                }
+              }
 
               if (spinner !== undefined) {
                 spinner.succeed(`Started ${name.title} server (pid=${pid})`);

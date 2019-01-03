@@ -58,6 +58,13 @@ In addition to the above, if you're developing TypeScript smart contracts using 
  - `@neo-one/smart-contract-test` - TypeScript smart contract testing utilitiees.
  - `@neo-one/smart-contract-typescript-plugin` - TypeScript language server plugin for inline compiler diagnostics in your favorite IDE.
 
+### Update
+
+```bash
+#npm update @neo-one/cli
+yarn upgrade @neo-one/cli
+```
+
 ### Editor Setup
 
 Configure your IDE to use your local TypeScript installation and the `@neo-one/smart-contract-typescript-plugin` in order to take advantage of inline compiler diagnostics. These instructions are for [VSCode](https://code.visualstudio.com/), but they should be similar for any editor that supports TypeScript IntelliSense.

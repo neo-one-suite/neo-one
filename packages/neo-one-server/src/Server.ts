@@ -145,7 +145,7 @@ export class Server {
               if (pid === undefined) {
                 this.mutableServerDebug.pid = process.pid;
 
-                await manager.writePID(process.pid);
+                await manager.writeVersionPID(process.pid, VERSION);
               } else if (pid !== process.pid) {
                 throw new ServerRunningError(pid);
               }
