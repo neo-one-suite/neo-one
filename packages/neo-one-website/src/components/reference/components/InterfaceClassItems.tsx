@@ -1,4 +1,6 @@
+// tslint:disable no-null-keyword
 import { Box } from '@neo-one/react-common';
+import _ from 'lodash';
 import * as React from 'react';
 import styled from 'styled-components';
 import { prop } from 'styled-tools';
@@ -24,15 +26,18 @@ const Wrapper = styled(Box)`
 
 export const InterfaceClassItems = ({ data, ...props }: Props) => (
   <Wrapper {...props}>
-    {data.constructorDefinition === undefined ? (
-      undefined
-    ) : (
+    {data.constructorDefinition === undefined ? null : (
       <Wrapper>
         <Title>Constructor</Title>
         <MethodItem method={data.constructorDefinition} />
       </Wrapper>
     )}
-    {data.properties === undefined ? undefined : <ParameterPropertyList values={data.properties} title="Properties" />}
-    {data.methods === undefined ? undefined : <MethodList methods={data.methods} />}
+    {data.properties === undefined || _.isEmpty(data.properties) ? null : (
+      <ParameterPropertyList values={data.properties} title="Properties" />
+    )}
+    {data.staticMethods === undefined || _.isEmpty(data.staticMethods) ? null : (
+      <MethodList methods={data.staticMethods} staticMethods />
+    )}
+    {data.methods === undefined || _.isEmpty(data.methods) ? null : <MethodList methods={data.methods} />}
   </Wrapper>
 );

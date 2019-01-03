@@ -1,4 +1,6 @@
+// tslint:disable no-null-keyword
 import { Box } from '@neo-one/react-common';
+import _ from 'lodash';
 import * as React from 'react';
 import styled from 'styled-components';
 import { prop } from 'styled-tools';
@@ -23,14 +25,10 @@ const Wrapper = styled(Box)`
 
 export const ParameterReturns = ({ functionData, subheading, ...props }: Props) => (
   <Wrapper {...props}>
-    {functionData.parameters === undefined ? (
-      undefined
-    ) : (
+    {functionData.parameters === undefined || _.isEmpty(functionData.parameters) ? null : (
       <ParameterPropertyList values={functionData.parameters} title="Parameters" subheading={subheading} />
     )}
-    {functionData.returns === undefined ? (
-      undefined
-    ) : (
+    {functionData.returns === undefined || _.isEmpty(functionData.returns) ? null : (
       <TextSection title="Returns" text={functionData.returns} subheading={subheading} />
     )}
   </Wrapper>

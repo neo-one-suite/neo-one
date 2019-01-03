@@ -1,3 +1,4 @@
+// tslint:disable no-null-keyword
 import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
@@ -27,7 +28,7 @@ interface Props {
 export const ParameterPropertyItem = ({ value, ...props }: Props) => (
   <ParameterLayout {...props}>
     <Name>{value.name}</Name>
-    {value.type === undefined ? undefined : <Text text={value.type} />}
+    {value.type === undefined ? null : <Text text={value.type} />}
     <Text text={value.description} />
   </ParameterLayout>
 );

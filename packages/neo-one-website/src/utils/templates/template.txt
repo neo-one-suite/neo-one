@@ -33,7 +33,8 @@
      {
        "text": [{% for line in member.text %} "{{line}}", {% endfor %} ""],
        "description": [{% for line in member.description %} "{{line}}", {% endfor %} ""], {% if member.returns %}
-       "returns": [{% for line in member.returns.description %} "{{line}}", {% endfor %} ""], {% endif %}
+       "returns": [{% for line in member.returns.description %} "{{line}}", {% endfor %} ""], {% endif %} {% if member.example %}
+       "examples": [{% for example in member.example %} [{% for line in example %} "{{line}}", {% endfor %} ""], {% endfor %} []], {% endif %}
        "parameters": [{% for param in member.parameterDocs %}
           {
             "name": "{{ param.name }}",

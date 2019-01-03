@@ -1,3 +1,4 @@
+// tslint:disable no-null-keyword
 import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
@@ -25,14 +26,13 @@ const PageLayout = styled(Box)`
 export const ReferencePage = ({ content, ...props }: Props) => (
   <PageLayout {...props}>
     <ReferenceHeader type={content.type} description={content.description} definition={content.definition} />
-    {content.functionData === undefined ? undefined : <ParameterReturns functionData={content.functionData} />}
-    {content.classData === undefined ? undefined : <InterfaceClassItems data={content.classData} />}
-    {content.enumData === undefined ? (
-      undefined
-    ) : (
+    {content.functionData === undefined ? null : <ParameterReturns functionData={content.functionData} />}
+    {content.classData === undefined ? null : <InterfaceClassItems data={content.classData} />}
+    {content.enumData === undefined ? null : (
       <ParameterPropertyList values={content.enumData.members} title="Members" />
     )}
-    {content.interfaceData === undefined ? undefined : <InterfaceClassItems data={content.interfaceData} />}
-    {content.extra === undefined ? undefined : content.extra.map((extra) => <Extra data={extra} key={extra.title} />)}
+    {content.constData === undefined ? null : <InterfaceClassItems data={content.constData} />}
+    {content.interfaceData === undefined ? null : <InterfaceClassItems data={content.interfaceData} />}
+    {content.extra === undefined ? null : content.extra.map((extra) => <Extra data={extra} key={extra.title} />)}
   </PageLayout>
 );

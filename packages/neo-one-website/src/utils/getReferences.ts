@@ -2,6 +2,7 @@ import { Dgeni } from 'dgeni';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
 import * as path from 'path';
+import { ReferenceItem } from '../components';
 import { dgeniSetup } from './dgeniSetup';
 import { ModuleLinks, ModuleLinksPaths, tokenizeDocText } from './tokenizeDocText';
 
@@ -9,6 +10,7 @@ interface Parameter {
   readonly name: string;
   readonly type: ReadonlyArray<string>;
   readonly description: ReadonlyArray<string>;
+  readonly examples?: ReadonlyArray<ReadonlyArray<string>>;
 }
 
 interface Property extends Parameter {}
@@ -23,6 +25,7 @@ interface Method extends MethodBase {
   readonly description: ReadonlyArray<string>;
   readonly returns?: ReadonlyArray<string>;
   readonly internal?: boolean;
+  readonly examples?: ReadonlyArray<ReadonlyArray<string>>;
 }
 
 const BASE_PATH = path.resolve(__dirname, 'build', 'partials', 'modules');
@@ -99,78 +102,281 @@ const getLinks = async (): Promise<{ readonly [moduleName: string]: ModuleLinksP
   }, Promise.resolve({}));
 };
 
-const extractParametersProperties = (values: ReadonlyArray<Parameter | Property>, links: ModuleLinks) =>
+const extractParametersProperties = (
+  values: ReadonlyArray<Parameter | Property>,
+  links: ModuleLinks,
+  moduleName: string,
+) =>
   values
-    .filter((param) => !_.isEmpty(param))
-    .map((param) => ({
-      name: param.name,
-      type: tokenizeDocText(param.type, links),
-      description: tokenizeDocText(param.description, links),
+    // Remove last element which is always empty to ensure the template follows the JSON comma pattern.
+    .slice(0, -1)
+    .filter((value) => !_.isEmpty(value))
+    .filter((value) => !isMethod(value))
+    .map((value) => ({
+      name: value.name,
+      type: tokenizeDocText(value.type, links, moduleName),
+      description: tokenizeDocText(value.description, links, moduleName),
     }));
 
-const extractConstructor = (constructorDoc: MethodBase, links: ModuleLinks) => ({
-  name: constructorDoc.name,
-  text: tokenizeDocText(constructorDoc.text, links),
-  parameters: extractParametersProperties(constructorDoc.parameters, links),
+const isMethod = (value: Property) => value.type[0].charAt(0) === '(';
+
+const extractConstructor = (constructorDoc: MethodBase, links: ModuleLinks, moduleName: string) => ({
+  title: constructorDoc.name,
+  definition: tokenizeDocText(constructorDoc.text, links, moduleName),
+  functionData: {
+    parameters: extractParametersProperties(constructorDoc.parameters, links, moduleName),
+  },
 });
 
-const extractMethods = (methods: ReadonlyArray<Method>, links: ModuleLinks) =>
-  methods
+const extractMethodBase = ({
+  title,
+  definition,
+  description,
+  links,
+  moduleName,
+  functionData,
+  examples,
+}: {
+  readonly title: string;
+  readonly definition: ReadonlyArray<string>;
+  readonly description: ReadonlyArray<string>;
+  readonly links: ModuleLinks;
+  readonly moduleName: string;
+  readonly functionData?: {
+    readonly parameters: ReadonlyArray<Parameter>;
+    readonly returns?: ReadonlyArray<string>;
+  };
+  readonly examples?: ReadonlyArray<ReadonlyArray<string>>;
+}) => ({
+  title,
+  definition: tokenizeDocText(definition, links, moduleName),
+  description: tokenizeDocText(description, links, moduleName),
+  functionData:
+    functionData === undefined
+      ? {}
+      : {
+          parameters: extractParametersProperties(functionData.parameters, links, moduleName),
+          returns:
+            functionData.returns === undefined ? undefined : tokenizeDocText(functionData.returns, links, moduleName),
+        },
+  extra:
+    examples === undefined
+      ? undefined
+      : // Remove last element which is always empty to ensure the template follows the JSON comma pattern.
+        examples.slice(0, -1).map((example) => ({
+          title: 'Example',
+          code: true,
+          data: tokenizeDocText(example, links, moduleName),
+        })),
+});
+
+const extractMethods = (
+  methods: ReadonlyArray<Method>,
+  properties: ReadonlyArray<Property>,
+  links: ModuleLinks,
+  moduleName: string,
+) => {
+  const parsedMethods = methods
+    // Remove last element which is always empty to ensure the template follows the JSON comma pattern.
+    .slice(0, -1)
     .filter((method) => !_.isEmpty(method))
     .filter((method) => !method.internal)
-    .map((method) => ({
-      name: method.name,
-      text: tokenizeDocText(method.text, links),
-      parameters: extractParametersProperties(method.parameters, links),
-      description: tokenizeDocText(method.description, links),
-      returns: method.returns === undefined ? undefined : tokenizeDocText(method.returns, links),
-    }));
+    .filter((method) => method.text[0].substr(0, 9) !== 'protected')
+    .filter((method) => method.name !== '__index')
+    .map((method) =>
+      extractMethodBase({
+        title: method.name,
+        definition: method.text,
+        description: method.description,
+        functionData: {
+          parameters: method.parameters,
+          returns: method.returns,
+        },
+        examples: method.examples,
+        links,
+        moduleName,
+      }),
+    );
 
-const getReference = async (refPath: string, links: ModuleLinks) => {
-  const contents = await fs.readJSON(refPath);
+  const propertyMethods = properties
+    // Remove last element which is always empty to ensure the template follows the JSON comma pattern.
+    .slice(0, -1)
+    .filter((property) => !_.isEmpty(property))
+    .filter(isMethod)
+    .map((method) =>
+      extractMethodBase({
+        title: method.name,
+        definition: method.type,
+        description: method.description,
+        examples: method.examples,
+        links,
+        moduleName,
+      }),
+    );
+
+  return propertyMethods.concat(parsedMethods);
+};
+
+const convertDocType = (type: string) =>
+  type === 'type-alias' ? 'Type Alias' : `${type.charAt(0).toUpperCase()}${type.substr(1)}`;
+
+const getStaticPath = (name: string, links: ModuleLinks, moduleName: string) => {
+  const staticPath = links[moduleName].paths.find((pathString) => pathString.includes(`${name}Constructor`));
+
+  return staticPath === undefined
+    ? links[moduleName].paths.find((pathString) =>
+        pathString.includes(`${name.charAt(0).toUpperCase()}${name.substr(1)}Constructor`),
+      )
+    : staticPath;
+};
+
+const getReference = async (refPath: string, links: ModuleLinks, moduleName: string) => {
+  let contents = await fs.readJSON(refPath);
+
+  const staticPath = getStaticPath(contents.name, links, moduleName);
+  let staticContents;
+  if (staticPath !== undefined) {
+    staticContents = await fs.readJSON(staticPath);
+    if (contents.docType === 'const') {
+      contents = {
+        ...staticContents,
+        name: contents.name,
+        text: [staticContents.text[0].replace(staticContents.name, contents.name)].concat(staticContents.text.slice(1)),
+        docType: contents.docType,
+      };
+    }
+  }
 
   return {
     name: contents.name,
-    docType: contents.docType,
-    text: tokenizeDocText(contents.text, links),
-    description: tokenizeDocText(contents.description, links),
-    parameters: contents.parameters === undefined ? undefined : extractParametersProperties(contents.parameters, links),
-    constructorDoc:
-      contents.constructorDoc === undefined ? undefined : extractConstructor(contents.constructorDoc, links),
-    properties: contents.properties === undefined ? undefined : extractParametersProperties(contents.properties, links),
-    methods: contents.methods === undefined ? undefined : extractMethods(contents.methods, links),
-    returns: contents.returns === undefined ? undefined : tokenizeDocText(contents.returns, links),
-    examples:
+    type: convertDocType(contents.docType),
+    slug: `/reference/${moduleName}/${contents.name.toLowerCase()}`,
+    definition: tokenizeDocText(contents.text, links, moduleName),
+    description: tokenizeDocText(contents.description, links, moduleName),
+    functionData:
+      contents.docType === 'function'
+        ? {
+            parameters:
+              contents.parameters === undefined
+                ? undefined
+                : extractParametersProperties(contents.parameters, links, moduleName),
+            returns: contents.returns === undefined ? undefined : tokenizeDocText(contents.returns, links, moduleName),
+          }
+        : undefined,
+    classData:
+      contents.docType === 'class'
+        ? {
+            constructorDefinition:
+              contents.constructorDoc === undefined
+                ? undefined
+                : extractConstructor(contents.constructorDoc, links, moduleName),
+            properties:
+              contents.properties === undefined
+                ? undefined
+                : extractParametersProperties(contents.properties, links, moduleName),
+            methods:
+              contents.methods === undefined
+                ? undefined
+                : extractMethods(contents.methods, contents.properties, links, moduleName),
+          }
+        : undefined,
+    interfaceData:
+      contents.docType === 'interface'
+        ? {
+            properties:
+              contents.properties === undefined
+                ? undefined
+                : extractParametersProperties(contents.properties, links, moduleName),
+            methods:
+              contents.methods === undefined
+                ? undefined
+                : extractMethods(contents.methods, contents.properties, links, moduleName),
+            staticMethods:
+              staticContents === undefined
+                ? undefined
+                : extractMethods(staticContents.methods, staticContents.properties, links, moduleName),
+          }
+        : undefined,
+    enumData:
+      contents.docType === 'enum'
+        ? {
+            properties:
+              contents.properties === undefined
+                ? undefined
+                : extractParametersProperties(contents.properties, links, moduleName),
+          }
+        : undefined,
+    constData:
+      contents.docType === 'const'
+        ? {
+            properties:
+              contents.properties === undefined
+                ? undefined
+                : extractParametersProperties(contents.properties, links, moduleName),
+            staticMethods:
+              contents.methods === undefined
+                ? undefined
+                : extractMethods(contents.methods, contents.properties, links, moduleName),
+          }
+        : undefined,
+    extra:
       contents.examples === undefined
         ? undefined
-        : contents.examples.map((example: ReadonlyArray<string>) => tokenizeDocText(example, links)),
+        : // Remove last element which is always empty to ensure the template follows the JSON comma pattern.
+          contents.examples.slice(0, -1).map((example: ReadonlyArray<string>) => ({
+            title: 'Example',
+            code: true,
+            data: tokenizeDocText(example, links, moduleName),
+          })),
   };
 };
 
-const getSidebar = (links: ModuleLinks) => ({
-  title: 'Packages',
-  subsections: Object.keys(links).map((subsection) => ({
-    slug: subsection,
-    title: subsection,
-  })),
-});
+const getSidebar = (links: ModuleLinks) => [
+  {
+    title: 'Packages',
+    subsections: Object.keys(links).map((subsection) => ({
+      slug: `/reference/${subsection}`,
+      title: subsection,
+    })),
+  },
+];
 
 export const getReferences = async () => {
   await dgenerate();
   const links = await getLinks();
 
-  return Object.entries(links).map(async ([moduleName, moduleLinksPaths]) => {
-    const refItems = await Promise.all(moduleLinksPaths.paths.map(async (refPath) => getReference(refPath, links)));
+  const references = await Promise.all(
+    Object.entries(links).map(async ([moduleName, moduleLinksPaths]) => {
+      const refItems = await Promise.all(
+        moduleLinksPaths.paths.map(async (refPath) =>
+          refPath.includes('Constructor') ? undefined : getReference(refPath, links, moduleName),
+        ),
+      );
+      const slug = `/reference/${moduleName}`;
 
-    return {
-      title: moduleName,
-      type: 'All',
-      content: {
-        type: 'referenceItems',
-        value: refItems,
-      },
-      current: '@neo-one/client',
-      sidebar: getSidebar(links),
-    };
-  });
+      return {
+        title: moduleName,
+        slug,
+        type: 'All',
+        content: {
+          type: 'referenceItems',
+          value: _.sortBy(refItems.filter((item) => item !== undefined), [(item) => (item as ReferenceItem).name]).map(
+            (item) => ({
+              title: (item as ReferenceItem).name,
+              slug: (item as ReferenceItem).slug,
+              content: { type: 'referenceItem', value: item },
+              current: slug,
+              sidebar: getSidebar(links),
+            }),
+          ),
+        },
+        current: slug,
+        sidebar: getSidebar(links),
+      };
+    }),
+  );
+
+  await fs.remove(path.resolve(__dirname, 'build'));
+
+  return references;
 };

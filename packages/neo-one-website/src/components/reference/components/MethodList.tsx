@@ -18,11 +18,12 @@ const ParameterLayout = styled(Box)`
 
 interface Props {
   readonly methods: ReadonlyArray<Method>;
+  readonly staticMethods?: boolean;
 }
 
-export const MethodList = ({ methods, ...props }: Props) => (
+export const MethodList = ({ methods, staticMethods, ...props }: Props) => (
   <ParameterLayout {...props}>
-    <Title>Methods</Title>
+    <Title>{staticMethods ? 'Static Methods' : 'Methods'}</Title>
     {methods.map((method) => (
       <MethodItem key={method.title} method={method} />
     ))}
