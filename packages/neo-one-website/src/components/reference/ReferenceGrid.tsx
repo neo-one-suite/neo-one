@@ -1,4 +1,3 @@
-// tslint:disable no-any
 import { Box, TextInput } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
@@ -45,7 +44,7 @@ export const ReferenceGrid = ({ content, ...props }: Props) => {
     <Wrapper {...props}>
       <FilterWrapper>
         <TypeFilter selected={typeFilter} onChange={setTypeFilter} />
-        <StyledInput placeholder="Filter" onChange={(event) => setTextFilter((event.target as any).value)} />
+        <StyledInput placeholder="Filter" onChange={(event) => setTextFilter(event.target.value)} />
       </FilterWrapper>
       <ReferenceLayout>
         {content
