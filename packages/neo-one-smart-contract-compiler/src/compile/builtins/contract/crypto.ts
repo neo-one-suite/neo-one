@@ -11,7 +11,7 @@ import { MemberLikeExpression } from '../types';
 
 class CryptoInterface extends BuiltinInterface {}
 class CryptoValue extends BuiltinValueObject {
-  public readonly type = 'Crypto';
+  public readonly type = 'CryptoConstructor';
 }
 
 class HashOp extends BuiltinMemberCall {
@@ -88,10 +88,10 @@ class HashOp extends BuiltinMemberCall {
 
 // tslint:disable-next-line export-name
 export const add = (builtins: Builtins): void => {
-  builtins.addContractInterface('Crypto', new CryptoInterface());
-  builtins.addContractMember('Crypto', 'sha1', new HashOp('SHA1'));
-  builtins.addContractMember('Crypto', 'sha256', new HashOp('SHA256'));
-  builtins.addContractMember('Crypto', 'hash160', new HashOp('HASH160'));
-  builtins.addContractMember('Crypto', 'hash256', new HashOp('HASH256'));
+  builtins.addContractInterface('CryptoConstructor', new CryptoInterface());
+  builtins.addContractMember('CryptoConstructor', 'sha1', new HashOp('SHA1'));
+  builtins.addContractMember('CryptoConstructor', 'sha256', new HashOp('SHA256'));
+  builtins.addContractMember('CryptoConstructor', 'hash160', new HashOp('HASH160'));
+  builtins.addContractMember('CryptoConstructor', 'hash256', new HashOp('HASH256'));
   builtins.addContractValue('crypto', new CryptoValue());
 };
