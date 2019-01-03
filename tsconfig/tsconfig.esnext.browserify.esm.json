@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.esm.json",
+  "compilerOptions": {
+    "target": "esnext",
+    "paths": {
+      "@neo-one/*-esnext-browserify-esm": [
+        "./neo-one-*/src"
+      ],
+      "*": [
+        "../@types/*"
+      ]
+    }
+  }
+}

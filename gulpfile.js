@@ -22,6 +22,227 @@ const rollup = require('rollup');
 const rollupString = require('rollup-plugin-string');
 const rollupTypescript = require('rollup-plugin-typescript2');
 
+const rxjsTypes = new Set(['Observer']);
+
+// Reference: https://github.com/browserify/browserify#compatibility
+const browserifyModules = {
+  assert: {
+    name: 'assert',
+    version: '1.4.1',
+  },
+  buffer: {
+    name: 'buffer',
+    version: '5.2.1',
+  },
+  console: {
+    name: 'console-browserify',
+    version: '1.1.0',
+  },
+  constants: {
+    name: 'constants-browserify',
+    version: '1.0.0',
+  },
+  crypto: {
+    name: 'crypto-browserify',
+    version: '3.12.0',
+  },
+  domain: {
+    name: 'domain-browser',
+    version: '1.2.0',
+  },
+  events: {
+    name: 'events',
+    version: '3.0.0',
+  },
+  os: {
+    name: 'os-browserify',
+    version: '0.3.0',
+  },
+  path: {
+    name: 'path-browserify',
+    version: '1.0.0',
+  },
+  punycode: {
+    name: 'punycode',
+    version: '2.1.1',
+  },
+  querystring: {
+    name: 'querystring-es3',
+    version: '0.2.1',
+  },
+  stream: {
+    name: 'stream-browserify',
+    version: '2.0.2',
+  },
+  string_decoder: {
+    name: 'string_decoder',
+    version: '1.2.0',
+  },
+  timers: {
+    name: 'timers-browserify',
+    version: '2.0.10',
+  },
+  tty: {
+    name: 'tty-browserify',
+    version: '0.0.1',
+  },
+  url: {
+    name: 'url',
+    version: '0.11.0',
+  },
+  util: {
+    name: 'util',
+    version: '0.11.1',
+  },
+  vm: {
+    name: 'vm-browserify',
+    version: '1.1.0',
+  },
+  zlib: {
+    name: 'browserify-zlib',
+    version: '0.2.0',
+  },
+};
+
+const modulesToBrowserify = new Set(Object.keys(browserifyModules));
+
+const transformRxjsImportText = (importName) =>
+  importName === 'EMPTY'
+    ? 'rxjs/internal/observable/empty'
+    : rxjsTypes.has(importName)
+    ? 'rxjs/internal/types'
+    : importName[0].toLowerCase() === importName[0]
+    ? `rxjs/internal/observable/${importName}`
+    : `rxjs/internal/${importName}`;
+
+const transformRxjsOperatorsImportText = (importName) => `rxjs/internal/operators/${importName}`;
+
+const updateRxjsImportStatements = (callback, statement) =>
+  statement.importClause.namedBindings.elements.map((elem) =>
+    typescript.createImportDeclaration(
+      statement.decorators,
+      statement.modifiers,
+      typescript.createImportClause(
+        undefined,
+        typescript.createNamedImports([typescript.createImportSpecifier(elem.propertyName, elem.name)]),
+      ),
+      typescript.createStringLiteral(
+        callback(elem.propertyName === undefined ? elem.name.getText() : elem.propertyName.getText()),
+      ),
+    ),
+  );
+
+const updateBrowserifyImportStatements = (statement, moduleName) => {
+  const filePathParts = statement.getSourceFile().fileName.split('/');
+  const packageName = filePathParts[filePathParts.indexOf('packages') + 1];
+  updatePackageBrowserifyMap(packageName, moduleName);
+
+  return typescript.updateImportDeclaration(
+    statement,
+    statement.decorators,
+    statement.modifiers,
+    statement.importClause,
+    typescript.createStringLiteral(browserifyModules[moduleName].name),
+  );
+};
+
+const RXJS_IMPORT = 'rxjs';
+const RXJS_OPERATORS_IMPORT = 'rxjs/operators';
+
+const transformImports = (statements, browserify = false) =>
+  _.flattenDeep(
+    statements.map((statement) => {
+      if (typescript.isImportDeclaration(statement)) {
+        const moduleName = statement.moduleSpecifier.text;
+
+        if (moduleName === RXJS_IMPORT && !browserify) {
+          return updateRxjsImportStatements(transformRxjsImportText, statement);
+        }
+        if (moduleName === RXJS_OPERATORS_IMPORT && !browserify) {
+          return updateRxjsImportStatements(transformRxjsOperatorsImportText, statement);
+        }
+        if (modulesToBrowserify.has(moduleName) && browserify) {
+          return updateBrowserifyImportStatements(statement, moduleName);
+        }
+      }
+
+      return statement;
+    }),
+  );
+
+const createCustomTransform = (context) => {
+  return (node) => {
+    const visitor = (node) => {
+      if (typescript.isSourceFile(node)) {
+        const statements = transformImports(node.statements);
+
+        return typescript.updateSourceFileNode(
+          node,
+          statements,
+          node.isDeclarationFile,
+          node.referencedFiles,
+          node.typeReferences,
+          node.hasNoDefaultLib,
+          node.libReferences,
+        );
+      }
+      return node;
+    };
+
+    return typescript.visitNode(node, visitor);
+  };
+};
+
+let packageBrowserifyMap = {};
+
+const updatePackageBrowserifyMap = (packageName, moduleName) => {
+  const pkgJsonPackageName = `@neo-one/${packageName.split('neo-one-')[1]}`;
+
+  if (Object.keys(packageBrowserifyMap).includes(pkgJsonPackageName)) {
+    packageBrowserifyMap[pkgJsonPackageName].add(moduleName);
+  } else {
+    packageBrowserifyMap[pkgJsonPackageName] = new Set([moduleName]);
+  }
+};
+
+const createCustomBrowserifyTransform = (context) => {
+  return (node) => {
+    const visitor = (node) => {
+      if (typescript.isSourceFile(node)) {
+        const statements = transformImports(node.statements, true);
+
+        return typescript.updateSourceFileNode(
+          node,
+          statements,
+          node.isDeclarationFile,
+          node.referencedFiles,
+          node.typeReferences,
+          node.hasNoDefaultLib,
+          node.libReferences,
+        );
+      }
+
+      return node;
+    };
+
+    return typescript.visitNode(node, visitor);
+  };
+};
+
+const createFormatDistName = ({ target, module, browserify }) => {
+  if (browserify) {
+    return `neo-one-${target}-browserify-${module}`;
+  }
+  return `neo-one-${target}-${module}`;
+};
+
+const createFormatName = ({ target, module, browserify }) => {
+  if (browserify) {
+    return `${target}-browserify-${module}`;
+  }
+  return `${target}-${module}`;
+};
+
 const FORMATS = [
   {
     main: true,
@@ -32,21 +253,61 @@ const FORMATS = [
     target: 'esnext',
     module: 'esm',
   },
-].map(({ target, module, main }) => ({
+  {
+    target: 'es2017',
+    browserify: true,
+    module: 'cjs',
+  },
+  {
+    target: 'esnext',
+    browserify: true,
+    module: 'esm',
+  },
+].map(({ target, module, main, browserify }) => ({
   target,
   module,
-  dist: main ? 'neo-one' : `neo-one-${target}-${module}`,
-  name: main ? '' : `${target}-${module}`,
-  tsconfig: `tsconfig/tsconfig.${target}.${module}.json`,
-  tsconfigESM: `tsconfig/tsconfig.${target}.esm.json`,
-  fastProject: ts.createProject(`tsconfig/tsconfig.${target}.${module}.json`, { typescript, isolatedModules: true }),
-  project: ts.createProject(`tsconfig/tsconfig.${target}.${module}.json`, { typescript }),
+  browserify,
+  dist: main ? 'neo-one' : createFormatDistName({ target, module, browserify }),
+  name: main ? '' : createFormatName({ target, module, browserify }),
+  tsconfig: browserify
+    ? `tsconfig/tsconfig.${target}.browserify.${module}.json`
+    : `tsconfig/tsconfig.${target}.${module}.json`,
+  tsconfigESM: browserify ? `tsconfig/tsconfig.${target}.browserify.esm.json` : `tsconfig/tsconfig.${target}.esm.json`,
+  fastProject: ts.createProject(
+    browserify ? `tsconfig/tsconfig.${target}.browserify.${module}.json` : `tsconfig/tsconfig.${target}.${module}.json`,
+    {
+      typescript,
+      isolatedModules: true,
+      getCustomTransformers: () => ({
+        before: browserify ? [createCustomBrowserifyTransform] : [],
+      }),
+      // TODO: Get rxjs import transform working properly
+      // getCustomTransformers: () => ({
+      //   before: browserify ? [createCustomTransform, createCustomBrowserifyTransform] : [createCustomTransform],
+      // }),
+    },
+  ),
+  project: ts.createProject(
+    browserify ? `tsconfig/tsconfig.${target}.browserify.${module}.json` : `tsconfig/tsconfig.${target}.${module}.json`,
+    {
+      typescript,
+      getCustomTransformers: () => ({
+        before: browserify ? [createCustomBrowserifyTransform] : [],
+      }),
+      // TODO: Get rxjs import transform working properly
+      // getCustomTransformers: () => ({
+      //   before: browserify ? [createCustomTransform, createCustomBrowserifyTransform] : [createCustomTransform],
+      // }),
+    },
+  ),
 }));
 const MAIN_FORMAT = FORMATS[0];
 const MAIN_BIN_FORMAT = FORMATS[0];
 
 function getTaskHash(format, ...args) {
-  return [format.target, format.module].concat(args.filter((x) => x !== void 0 && x !== '')).join(`:`);
+  return [format.target, format.browserify === undefined ? '' : 'browserify', format.module]
+    .concat(args.filter((x) => x !== void 0 && x !== ''))
+    .join(`:`);
 }
 
 let noCache = false;
@@ -203,6 +464,17 @@ const mapDep = (format, depName) => {
   return depName;
 };
 
+const addBrowserifyModules = (name) => {
+  if (Object.keys(packageBrowserifyMap).includes(name)) {
+    return [...packageBrowserifyMap[name]].map((moduleName) => [
+      browserifyModules[moduleName].name,
+      browserifyModules[moduleName].version,
+    ]);
+  }
+
+  return [];
+};
+
 const transformBasePackageJSON = (format, orig, file) => {
   const bin = getBin(format, file);
 
@@ -222,6 +494,7 @@ const transformBasePackageJSON = (format, orig, file) => {
         ? undefined
         : _.fromPairs(
             Object.entries(orig.dependencies)
+              .concat(format.browserify ? addBrowserifyModules(orig.name) : [])
               .filter(([depName]) => depName !== '@neo-one/developer-tools-frame')
               .map(([depName, version]) => [mapDep(format, depName), version]),
           ),
@@ -324,7 +597,6 @@ const gulpReplaceModule = (format, stream, quote = "'") =>
     .concat(format === MAIN_FORMAT ? [] : pkgNames.map((p) => [quoted(p, quote), quoted(mapDep(format, p), quote)]))
     .reduce((streamIn, [moduleName, replaceName]) => streamIn.pipe(gulpReplace(moduleName, replaceName)), stream);
 const mapSources = (sourcePath) => path.basename(sourcePath);
-const rxjsTypes = new Set(['Observer']);
 const compileTypescript = ((cache) =>
   memoizeTask(cache, function compileTypescript(format, _done, type) {
     return gulpReplaceModule(
@@ -332,43 +604,6 @@ const compileTypescript = ((cache) =>
       addFast(format, gulp.src(globs.src), type === 'fast')
         .pipe(gulpFilter(['**', '!**/*.proto'].concat(smartContractPkgs.map((p) => `!packages/${p}/**/*`))))
         .pipe(gulpSourcemaps.init())
-        // .pipe(
-        //   gulpBabel({
-        //     presets: [],
-        //     plugins: [
-        //       '@babel/plugin-syntax-numeric-separator',
-        //       ['@babel/plugin-syntax-typescript', { isTSX: true }],
-        //       '@babel/plugin-syntax-optional-catch-binding',
-        //       '@babel/plugin-syntax-dynamic-import',
-        //       ['babel-plugin-lodash', { id: ['lodash'] }],
-        //       [
-        //         'babel-plugin-transform-imports',
-        //         {
-        //           rxjs: {
-        //             transform: (importName) =>
-        //               importName === 'EMPTY'
-        //                 ? 'rxjs/internal/observable/empty'
-        //                 : rxjsTypes.has(importName)
-        //                   ? 'rxjs/internal/types'
-        //                   : importName[0].toLowerCase() === importName[0]
-        //                     ? `rxjs/internal/observable/${importName}`
-        //                     : `rxjs/internal/${importName}`,
-        //             skipDefaultConversion: true,
-        //           },
-        //           'rxjs/operators': {
-        //             transform: 'rxjs/internal/operators/${member}',
-        //             skipDefaultConversion: true,
-        //           },
-        //         },
-        //       ],
-        //     ],
-        //   }),
-        // )
-        // .pipe(
-        //   gulpRename((parsedPath, file) => {
-        //     parsedPath.extname = path.extname(file.history[0]);
-        //   }),
-        // )
         .pipe(type === 'fast' ? format.fastProject() : format.project())
         .pipe(gulpSourcemaps.mapSources(mapSources))
         .pipe(gulpSourcemaps.write())
@@ -403,7 +638,14 @@ const compileDeveloperTools = ((cache) =>
           include: '**/*.raw.js',
         }),
         rollupTypescript({
-          cacheRoot: path.join('node_modules', '.cache', 'rts2', format.target, format.module),
+          cacheRoot: path.join(
+            'node_modules',
+            '.cache',
+            'rts2',
+            format.target,
+            format.browserify === undefined ? '' : 'browserify',
+            format.module,
+          ),
           tsconfig: format.tsconfigESM,
           tsconfigOverride: {
             compilerOptions: {
@@ -424,20 +666,22 @@ const compileDeveloperTools = ((cache) =>
 
 const buildAllNoDeveloperTools = ((cache) =>
   memoizeTask(cache, function buildAllNoDeveloperTools(format, done, type) {
-    return gulp.parallel(
-      ...[
-        copyPkg(format),
-        copyPkgFiles(format),
-        copyTypes(format),
-        copyTypescript(format),
-        copyFiles(format),
-        copyRootPkg(format),
-        copyRootTSConfig(format),
-        compileTypescript(format, type),
-        format === MAIN_FORMAT ? 'buildBin' : undefined,
-        format === MAIN_FORMAT ? 'createBin' : undefined,
-        format === MAIN_FORMAT ? 'copyBin' : undefined,
-      ].filter((task) => task !== undefined),
+    return gulp.series(
+      gulp.parallel(
+        ...[
+          copyPkgFiles(format),
+          copyTypes(format),
+          copyTypescript(format),
+          copyFiles(format),
+          copyRootPkg(format),
+          copyRootTSConfig(format),
+          compileTypescript(format, type),
+          format === MAIN_FORMAT ? 'buildBin' : undefined,
+          format === MAIN_FORMAT ? 'createBin' : undefined,
+          format === MAIN_FORMAT ? 'copyBin' : undefined,
+        ].filter((task) => task !== undefined),
+      ),
+      copyPkg(format),
     )(done);
   }))({});
 
