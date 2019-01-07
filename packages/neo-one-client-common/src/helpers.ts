@@ -123,13 +123,12 @@ export function isNEP2(encryptedKey: string): boolean {
  * @param privateKey hex-encoded private key
  * @returns NEP-2 format encrypted key
  */
-export async function encryptNEP2({
-  password,
-  privateKey,
-}: {
+export async function encryptNEP2(options: {
   readonly password: string;
   readonly privateKey: PrivateKeyString;
 }): Promise<string> {
+  const { password, privateKey } = options;
+
   return crypto.encryptNEP2({
     addressVersion: common.NEO_ADDRESS_VERSION,
     privateKey: common.stringToPrivateKey(privateKey),
@@ -144,13 +143,11 @@ export async function encryptNEP2({
  * @param encryptedKey NEP-2 format encrypted key
  * @returns hex-encoded private key
  */
-export async function decryptNEP2({
-  password,
-  encryptedKey,
-}: {
+export async function decryptNEP2(options: {
   readonly password: string;
   readonly encryptedKey: string;
 }): Promise<PrivateKeyString> {
+  const { password, encryptedKey } = options;
   const privateKey = await crypto.decryptNEP2({
     addressVersion: common.NEO_ADDRESS_VERSION,
     encryptedKey,

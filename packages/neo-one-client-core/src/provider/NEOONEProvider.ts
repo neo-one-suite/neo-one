@@ -58,7 +58,8 @@ export class NEOONEProvider implements Provider {
     return this.networksInternal$.getValue();
   }
 
-  public addNetwork({ network, rpcURL }: { readonly network: NetworkType; readonly rpcURL: string }): void {
+  public addNetwork(options: { readonly network: NetworkType; readonly rpcURL: string }): void {
+    const { network, rpcURL } = options;
     this.mutableProviders[network] = new NEOONEDataProvider({ network, rpcURL });
     const networks = this.networksInternal$.value.filter((net) => network !== net).concat([network]);
     this.networksInternal$.next(networks);

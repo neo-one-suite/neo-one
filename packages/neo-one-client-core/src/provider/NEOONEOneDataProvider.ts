@@ -50,13 +50,8 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
   private readonly iterBlocksFetchTimeoutMS: number | undefined;
   private readonly iterBlocksBatchSize: number | undefined;
 
-  public constructor({
-    network,
-    projectID,
-    port,
-    iterBlocksFetchTimeoutMS,
-    iterBlocksBatchSize,
-  }: NEOONEOneDataProviderOptions) {
+  public constructor(options: NEOONEOneDataProviderOptions) {
+    const { network, projectID, port, iterBlocksFetchTimeoutMS, iterBlocksBatchSize } = options;
     this.network = network;
     this.projectID = projectID;
     this.port = port;
