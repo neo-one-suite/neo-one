@@ -19,7 +19,12 @@ interface Props {
 }
 
 export const Selector = ({ options, selected, onChange, ...props }: Props) => (
-  <StyledInput {...props} as="select" value={selected} onChange={(event) => onChange(event.target.value)}>
+  <StyledInput
+    {...props}
+    as="select"
+    value={selected}
+    onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.value)}
+  >
     {options.map((option) => (
       <option key={option}>{option}</option>
     ))}
