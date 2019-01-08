@@ -2248,7 +2248,16 @@
     react-lifecycles-compat "^3.0.4"
     warning "^3.0.0"
 
-"@reactivex/ix-es2015-cjs@2.3.5", "@reactivex/ix-es2015-cjs@^2.3.5":
+"@reactivex/ix-es2015-cjs@2.4.3":
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/@reactivex/ix-es2015-cjs/-/ix-es2015-cjs-2.4.3.tgz#9745fa341d9ee61e68fbea797cf72ab2cfba0013"
+  dependencies:
+    "@types/node" "^10.12.18"
+    is-stream "1.1.0"
+    rxjs "5.5.11"
+    tslib "^1.9.3"
+
+"@reactivex/ix-es2015-cjs@^2.3.5":
   version "2.3.5"
   resolved "https://registry.yarnpkg.com/@reactivex/ix-es2015-cjs/-/ix-es2015-cjs-2.3.5.tgz#f50adc537e0c1fa91d68f5870bbc7e3d1ec9d327"
   dependencies:
