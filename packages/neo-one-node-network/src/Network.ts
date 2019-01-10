@@ -489,12 +489,12 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
           {
             name: 'neo_network_peer_connect',
             message: `Connecting to peer at ${endpoint}`,
-            level: 'verbose',
+            level: 'debug',
             metric: NEO_NETWORK_PEER_CONNECT_TOTAL,
             error: {
               message: `Failed to connect to peer at ${endpoint}.`,
               metric: NEO_NETWORK_PEER_CONNECT_FAILURES_TOTAL,
-              level: 'verbose',
+              level: 'debug',
             },
           },
         );
@@ -571,8 +571,9 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       .withData({
         [this.monitor.labels.PEER_ADDRESS]: peer.endpoint,
       })
-      .logError({
+      .log({
         name: 'neo_network_peer_error',
+        level: 'debug',
         message: `Encountered error with peer at ${peer.endpoint}.`,
         error,
       });

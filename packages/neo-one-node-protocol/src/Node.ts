@@ -899,7 +899,7 @@ export class Node implements INode {
             },
             {
               name: 'neo_relay_block',
-              level: { log: 'verbose', span: 'info' },
+              level: { log: 'info', span: 'info' },
               trace: true,
             },
           );
