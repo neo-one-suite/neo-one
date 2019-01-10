@@ -717,8 +717,12 @@ export class Node implements INode {
       connected
         .map((peer) => {
           const { address, port } = peer;
-          const host = new Address6(address);
-          const canonicalForm = host.canonicalForm() as string | undefined | null;
+
+          let canonicalForm = new Address6(address).canonicalForm() as string | undefined | null;
+
+          if (canonicalForm == undefined) {
+            canonicalForm = Address6.fromAddress4(address).canonicalForm() as string | undefined | null;
+          }
 
           return { host: canonicalForm == undefined ? '' : canonicalForm, port };
         })
