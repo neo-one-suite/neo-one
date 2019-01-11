@@ -198,7 +198,7 @@
     "jest-junit": "6.0.0",
     "json": "9.0.6",
     "koa-connect": "2.0.1",
-    "lerna": "3.8.5",
+    "lerna": "3.10.5",
     "lint-staged": "8.1.0",
     "lodash": "4.17.11",
     "lodash-webpack-plugin": "0.11.5",
