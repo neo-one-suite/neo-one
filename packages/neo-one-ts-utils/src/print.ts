@@ -2,7 +2,7 @@ import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import * as file_ from './file';
 
-interface Result {
+export interface Result {
   readonly text: string;
   readonly sourceMap: RawSourceMap;
 }

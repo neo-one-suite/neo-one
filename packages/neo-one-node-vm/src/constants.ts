@@ -45,7 +45,7 @@ export interface ExecutionInit {
   readonly vmFeatures: VMFeatureSwitches;
 }
 
-interface CreatedContracts {
+export interface CreatedContracts {
   readonly [hash: string]: UInt160;
 }
 export interface Options {

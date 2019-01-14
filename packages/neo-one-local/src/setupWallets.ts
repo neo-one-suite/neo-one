@@ -11,7 +11,7 @@ import BigNumber from 'bignumber.js';
 import { constants } from './constants';
 import { getClients } from './getClients';
 
-interface BootstrapWallet {
+export interface BootstrapWallet {
   readonly name: string;
   readonly privateKey: string;
   readonly publicKey: string;
