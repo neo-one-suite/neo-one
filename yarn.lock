@@ -2201,13 +2201,12 @@
     react-lifecycles-compat "^3.0.4"
     warning "^3.0.0"
 
-"@reactivex/ix-es2015-cjs@2.4.3":
-  version "2.4.3"
-  resolved "https://registry.yarnpkg.com/@reactivex/ix-es2015-cjs/-/ix-es2015-cjs-2.4.3.tgz#9745fa341d9ee61e68fbea797cf72ab2cfba0013"
+"@reactivex/ix-es2015-cjs@2.5.1":
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@reactivex/ix-es2015-cjs/-/ix-es2015-cjs-2.5.1.tgz#4a34f0aeddbee8bc97debe63169693028b1bcc4f"
   dependencies:
     "@types/node" "^10.12.18"
     is-stream "1.1.0"
-    rxjs "5.5.11"
     tslib "^1.9.3"
 
 "@reactivex/ix-es2015-cjs@^2.3.5":
@@ -16501,12 +16500,6 @@ rxjs-tslint-rules@4.14.3:
     resolve "^1.4.0"
     tslib "^1.8.0"
     tsutils "^3.0.0"
-
-rxjs@5.5.11:
-  version "5.5.11"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.5.11.tgz#f733027ca43e3bec6b994473be4ab98ad43ced87"
-  dependencies:
-    symbol-observable "1.0.1"
 
 rxjs@6.3.3, rxjs@^6.1.0, rxjs@^6.3.3:
   version "6.3.3"
