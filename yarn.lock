@@ -2992,9 +2992,9 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-redux@^6.0.9":
-  version "6.0.9"
-  resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-6.0.9.tgz#96aa7f5b0716bcc3bfb36ceaa1223118d509f79a"
+"@types/react-redux@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@types/react-redux/-/react-redux-7.0.0.tgz#8aaba50fb43739462c40e65e85f96eb8a550d494"
   dependencies:
     "@types/react" "*"
     redux "^4.0.0"
