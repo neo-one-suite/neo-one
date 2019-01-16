@@ -15335,15 +15335,6 @@ react-dom@16.7.0-alpha.0:
     prop-types "^15.6.2"
     scheduler "^0.11.0-alpha.0"
 
-react-dom@^16.6.3:
-  version "16.6.3"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.6.3.tgz#8fa7ba6883c85211b8da2d0efeffc9d3825cccc0"
-  dependencies:
-    loose-envify "^1.1.0"
-    object-assign "^4.1.1"
-    prop-types "^15.6.2"
-    scheduler "^0.11.2"
-
 react-dom@^16.7.0-alpha.2:
   version "16.7.0-alpha.2"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.7.0-alpha.2.tgz#16632880ed43676315991d8b412cce6975a30282"
@@ -15547,9 +15538,9 @@ react-side-effect@^1.1.0:
     exenv "^1.2.1"
     shallowequal "^1.0.1"
 
-react-static@6.2.0:
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/react-static/-/react-static-6.2.0.tgz#3e1a66354f89c5307a9863c8d0a2708d584e187b"
+react-static@6.3.0:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/react-static/-/react-static-6.3.0.tgz#ac94c247f795a4251e91220a3c91994bbde91851"
   dependencies:
     "@babel/cli" "^7.1.5"
     "@babel/core" "^7.2.2"
@@ -15605,7 +15596,7 @@ react-static@6.2.0:
     raw-loader "^1.0.0"
     react "^16.7.0-alpha.2"
     react-dev-utils "^6.1.1"
-    react-dom "^16.6.3"
+    react-dom "^16.7.0-alpha.2"
     react-helmet "^5.2.0"
     react-hot-loader "^4.6.1"
     react-universal-component "^3.0.2"
@@ -16497,12 +16488,6 @@ rxjs-tslint-rules@4.14.4:
     tslib "^1.8.0"
     tsutils "^3.0.0"
 
-rxjs@5.5.11:
-  version "5.5.11"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.5.11.tgz#f733027ca43e3bec6b994473be4ab98ad43ced87"
-  dependencies:
-    symbol-observable "1.0.1"
-
 rxjs@6.3.3, rxjs@^6.1.0, rxjs@^6.3.3:
   version "6.3.3"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.3.3.tgz#3c6a7fa420e844a81390fb1158a9ec614f4bad55"
@@ -16552,7 +16537,7 @@ sax@^1.2.4, sax@~1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
 
-scheduler@^0.11.0-alpha.0, scheduler@^0.11.2:
+scheduler@^0.11.0-alpha.0:
   version "0.11.2"
   resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.11.2.tgz#a8db5399d06eba5abac51b705b7151d2319d33d3"
   dependencies:
