@@ -3233,9 +3233,9 @@
     "@types/uglify-js" "*"
     source-map "^0.6.0"
 
-"@types/webpack@4.4.22":
-  version "4.4.22"
-  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.4.22.tgz#c4a5ea8b74a31b579537515bcfe86d2b2a34382c"
+"@types/webpack@4.4.23":
+  version "4.4.23"
+  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.4.23.tgz#059d6f4598cfd65ddee0e2db38317ef989696712"
   dependencies:
     "@types/anymatch" "*"
     "@types/node" "*"
@@ -16496,12 +16496,6 @@ rxjs-tslint-rules@4.14.4:
     resolve "^1.4.0"
     tslib "^1.8.0"
     tsutils "^3.0.0"
-
-rxjs@5.5.11:
-  version "5.5.11"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.5.11.tgz#f733027ca43e3bec6b994473be4ab98ad43ced87"
-  dependencies:
-    symbol-observable "1.0.1"
 
 rxjs@6.3.3, rxjs@^6.1.0, rxjs@^6.3.3:
   version "6.3.3"
