@@ -11,7 +11,7 @@
     "@neo-one/types": "^1.0.1",
     "@neo-one/utils": "^1.0.1",
     "@reactivex/ix-es2015-cjs": "^2.3.5",
-    "@types/bn.js": "^4.11.3",
+    "@types/bn.js": "^4.11.4",
     "@types/lodash": "^4.14.118",
     "@types/tapable": "^1.0.4",
     "bignumber.js": "^8.0.2",
