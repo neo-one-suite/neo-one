@@ -1,0 +1,62 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`genAngular Token 1`] = `
+Object {
+  "js": "
+import { Injectable } from '@angular/core';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { createClient, createDeveloperClients, createLocalClients } from './client';
+
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ContractsService {
+  constructor() {
+    this.client = createClient();
+    this.developerClients = createDeveloperClients();
+    this.localClients = createLocalClients();
+    this.token = createTokenSmartContract(this.client);
+    this.ico = createICOSmartContract(this.client);
+  }
+}
+    ",
+  "ts": "
+import { Injectable } from '@angular/core';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { createClient, createDeveloperClients, createLocalClients } from './client';
+import { Contracts } from './types';
+
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
+
+export interface DeveloperClients {
+  readonly [network: string]: DeveloperClient;
+};
+export interface LocalClients {
+  readonly [network: string]: LocalClient;
+};
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ContractsService {
+  public readonly client: Client;
+  public readonly developerClients: DeveloperClients;
+  public readonly localClients: LocalClients;
+  public readonly token: Contracts['token'];
+  public readonly ico: Contracts['ico'];
+
+  public constructor() {
+    this.client = createClient();
+    this.developerClients = createDeveloperClients();
+    this.localClients = createLocalClients();
+    this.token = createTokenSmartContract(this.client);
+    this.ico = createICOSmartContract(this.client);
+  }
+}
+  ",
+}
+`;

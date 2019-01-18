@@ -2,6 +2,66 @@
 
 exports[`genCommonBrowserFiles Token 1`] = `
 Object {
+  "angular": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+import { Injectable } from '@angular/core';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { createClient, createDeveloperClients, createLocalClients } from './client';
+
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ContractsService {
+  constructor() {
+    this.client = createClient();
+    this.developerClients = createDeveloperClients();
+    this.localClients = createLocalClients();
+    this.token = createTokenSmartContract(this.client);
+    this.ico = createICOSmartContract(this.client);
+  }
+}
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
+import { Injectable } from '@angular/core';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { createClient, createDeveloperClients, createLocalClients } from './client';
+import { Contracts } from './types';
+
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
+
+export interface DeveloperClients {
+  readonly [network: string]: DeveloperClient;
+}
+export interface LocalClients {
+  readonly [network: string]: LocalClient;
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ContractsService {
+  public readonly client: Client;
+  public readonly developerClients: DeveloperClients;
+  public readonly localClients: LocalClients;
+  public readonly token: Contracts['token'];
+  public readonly ico: Contracts['ico'];
+
+  public constructor() {
+    this.client = createClient();
+    this.developerClients = createDeveloperClients();
+    this.localClients = createLocalClients();
+    this.token = createTokenSmartContract(this.client);
+    this.ico = createICOSmartContract(this.client);
+  }
+}
+",
+  },
   "client": Object {
     "js": "// tslint:disable
 /* eslint-disable */
@@ -30,7 +90,9 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
   providers.push(new NEOONEDataProvider({ network: 'local', rpcURL: getJSONRPCLocalProviderManager() }));
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
-  const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
+  const localUserAccountProviders = Object.keys(userAccountProviders)
+    .map((key) => userAccountProviders[key])
+    .filter(isLocalUserAccountProvider);
   const localUserAccountProvider = localUserAccountProviders.find(
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );
@@ -154,6 +216,8 @@ export interface Contracts {
     "js": "// tslint:disable
 /* eslint-disable */
 export * from './react';
+export * from './angular.service';
+export * from './vue';
 export * from './client';
 export * from './Token/contract';
 export * from './Token/abi';
@@ -164,6 +228,8 @@ export * from './ICO/abi';
 /* eslint-disable */
 export * from './types';
 export * from './react';
+export * from './angular.service';
+export * from './vue';
 export * from './client';
 export * from './Token/contract';
 export * from './Token/types';
@@ -332,6 +398,62 @@ export const withContracts = async (
     test,
     options,
   );
+",
+  },
+  "vue": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { createClient, createDeveloperClients, createLocalClients } from './client';
+
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
+
+class ContractsService {
+  constructor() {
+    this.client = createClient();
+    this.developerClients = createDeveloperClients();
+    this.localClients = createLocalClients();
+    this.token = createTokenSmartContract(this.client);
+    this.ico = createICOSmartContract(this.client);
+  }
+}
+
+export const contractsService = new ContractsService();
+",
+    "ts": "// tslint:disable
+/* eslint-disable */
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { createClient, createDeveloperClients, createLocalClients } from './client';
+import { Contracts } from './types';
+
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
+
+export interface DeveloperClients {
+  readonly [network: string]: DeveloperClient;
+}
+export interface LocalClients {
+  readonly [network: string]: LocalClient;
+}
+
+class ContractsService {
+  public readonly client: Client;
+  public readonly developerClients: DeveloperClients;
+  public readonly localClients: LocalClients;
+  public readonly token: Contracts['token'];
+  public readonly ico: Contracts['ico'];
+
+  public constructor() {
+    this.client = createClient();
+    this.developerClients = createDeveloperClients();
+    this.localClients = createLocalClients();
+    this.token = createTokenSmartContract(this.client);
+    this.ico = createICOSmartContract(this.client);
+  }
+}
+
+export const contractsService = new ContractsService();
 ",
   },
 }

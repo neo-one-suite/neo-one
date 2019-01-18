@@ -44,7 +44,7 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
   providers.push(new NEOONEDataProvider({ network: '${localDevNetworkName}', rpcURL: getJSONRPCLocalProviderManager() }));
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
-  const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
+  const localUserAccountProviders = Object.keys(userAccountProviders).map((key) => userAccountProviders[key]).filter(isLocalUserAccountProvider);
   const localUserAccountProvider = localUserAccountProviders.find(
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );

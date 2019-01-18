@@ -152,7 +152,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
   const provider = new NEOONEProvider(providers);
 
   const userAccountProviders = getUserAccountProviders(provider);
-  const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
+  const localUserAccountProviders = Object.keys(userAccountProviders).map((key) => userAccountProviders[key]).filter(isLocalUserAccountProvider);
   const localUserAccountProvider = localUserAccountProviders.find(
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );

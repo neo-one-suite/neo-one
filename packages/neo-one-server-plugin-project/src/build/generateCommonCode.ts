@@ -32,15 +32,29 @@ export const generateCommonCode = async (
     testPath,
     commonTypesPath,
     reactPath,
+    angularPath,
+    vuePath,
     clientPath,
     generatedPath,
     projectIDPath,
   } = getCommonPaths(project);
-  const { sourceMaps, test, commonTypes, react, client, generated, projectID: projectIDFile } = genCommonFiles({
+  const {
+    sourceMaps,
+    test,
+    commonTypes,
+    react,
+    angular,
+    vue,
+    client,
+    generated,
+    projectID: projectIDFile,
+  } = genCommonFiles({
     contractsPaths,
     testPath,
     commonTypesPath,
     reactPath,
+    angularPath,
+    vuePath,
     clientPath,
     generatedPath,
     localDevNetworkName,
@@ -67,6 +81,14 @@ export const generateCommonCode = async (
       {
         path: reactPath,
         data: project.codegen.framework === 'react' ? react : undefined,
+      },
+      {
+        path: angularPath,
+        data: project.codegen.framework === 'angular' ? angular : undefined,
+      },
+      {
+        path: vuePath,
+        data: project.codegen.framework === 'vue' ? vue : undefined,
       },
       {
         path: clientPath,

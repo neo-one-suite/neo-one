@@ -6,6 +6,8 @@ export const getCommonPaths = (project: ProjectConfig) => ({
   testPath: path.resolve(project.paths.generated, 'test.js'),
   commonTypesPath: path.resolve(project.paths.generated, 'types.js'),
   reactPath: path.resolve(project.paths.generated, 'react.jsx'),
+  angularPath: path.resolve(project.paths.generated, 'angular.service.js'),
+  vuePath: path.resolve(project.paths.generated, 'vue.js'),
   clientPath: path.resolve(project.paths.generated, 'client.js'),
   projectIDPath: path.resolve(project.paths.generated, 'projectID.js'),
   generatedPath: path.resolve(project.paths.generated, 'index.js'),

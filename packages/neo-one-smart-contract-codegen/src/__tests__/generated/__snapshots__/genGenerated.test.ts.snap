@@ -4,6 +4,8 @@ exports[`genGenerated Token 1`] = `
 Object {
   "js": "
 export * from './react';
+export * from './angular.service';
+export * from './vue';
 export * from './client';
 export * from './Token/contract';
 export * from './Token/abi';
@@ -13,6 +15,8 @@ export * from './ICO/abi';
   "ts": "
 export * from './types';
 export * from './react';
+export * from './angular.service';
+export * from './vue';
 export * from './client';
 export * from './Token/contract';
 export * from './Token/types';
