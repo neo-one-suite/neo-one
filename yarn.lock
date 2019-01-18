@@ -16554,9 +16554,9 @@ rollup-plugin-string@2.0.2:
   dependencies:
     rollup-pluginutils "^1.5.0"
 
-rollup-plugin-typescript2@0.19.0:
-  version "0.19.0"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-typescript2/-/rollup-plugin-typescript2-0.19.0.tgz#4b360f96d6932b0cf13f8e25fe1351387c530122"
+rollup-plugin-typescript2@0.19.2:
+  version "0.19.2"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-typescript2/-/rollup-plugin-typescript2-0.19.2.tgz#87d9c799cd6e02efbedbba25af12753a1e92b6c2"
   dependencies:
     fs-extra "7.0.1"
     resolve "1.8.1"
@@ -16625,9 +16625,9 @@ rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
 
-rxjs-tslint-rules@4.14.4:
-  version "4.14.4"
-  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.14.4.tgz#1d7ba88a68963a494488a8114ac66507bf2b0df3"
+rxjs-tslint-rules@4.15.0:
+  version "4.15.0"
+  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.15.0.tgz#418015e0ec106b91f5af1c065857f532b036292f"
   dependencies:
     "@phenomnomnominal/tsquery" "^3.0.0"
     decamelize "^2.0.0"
