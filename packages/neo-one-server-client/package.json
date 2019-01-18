@@ -4,7 +4,7 @@
   "description": "NEO•ONE Server client api.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@grpc/proto-loader": "^0.3.0",
+    "@grpc/proto-loader": "^0.4.0",
     "@neo-one/server-grpc": "^1.0.1",
     "@neo-one/server-http-client": "^1.0.1",
     "@neo-one/server-plugin": "^1.0.1",
