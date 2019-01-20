@@ -2051,6 +2051,14 @@
     libnpm "^2.0.1"
     write-file-atomic "^2.3.0"
 
+"@malijs/call-types@~0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@malijs/call-types/-/call-types-0.3.0.tgz#bc9c385f241c60d633c141e3ee5a376d1bfa86ff"
+
+"@malijs/compose@^1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@malijs/compose/-/compose-1.3.2.tgz#f3f50674f8718d8702f243e180ba30e1fe82d7b7"
+
 "@material-ui/core@^3.4.0":
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/@material-ui/core/-/core-3.5.1.tgz#365d1c392d3df3b37295db0548f4cca501034e69"
@@ -6308,17 +6316,6 @@ cosmiconfig@^5.0.0, cosmiconfig@^5.0.2, cosmiconfig@^5.0.5, cosmiconfig@^5.0.7:
     js-yaml "^3.9.0"
     parse-json "^4.0.0"
 
-coveralls@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/coveralls/-/coveralls-3.0.2.tgz#f5a0bcd90ca4e64e088b710fa8dda640aea4884f"
-  dependencies:
-    growl "~> 1.10.0"
-    js-yaml "^3.11.0"
-    lcov-parse "^0.0.10"
-    log-driver "^1.2.7"
-    minimist "^1.2.0"
-    request "^2.85.0"
-
 create-ecdh@^4.0.0:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/create-ecdh/-/create-ecdh-4.0.3.tgz#c9111b6f33045c4697f144787f9254cdc77c45ff"
@@ -9148,7 +9145,7 @@ gray-matter@^4.0.1:
     section-matter "^1.0.0"
     strip-bom-string "^1.0.0"
 
-growl@1.10.5, "growl@~> 1.10.0":
+growl@1.10.5:
   version "1.10.5"
   resolved "https://registry.yarnpkg.com/growl/-/growl-1.10.5.tgz#f2735dc2283674fa67478b10181059355c369e5e"
 
@@ -11703,10 +11700,6 @@ lcid@^2.0.0:
   dependencies:
     invert-kv "^2.0.0"
 
-lcov-parse@^0.0.10:
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/lcov-parse/-/lcov-parse-0.0.10.tgz#1b0b8ff9ac9c7889250582b70b71315d9da6d9a3"
-
 lead@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/lead/-/lead-1.0.0.tgz#6f14f99a37be3a9dd784f5495690e5903466ee42"
@@ -12413,10 +12406,6 @@ lodash@^3.10.1, lodash@^3.3.1:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
 
-log-driver@^1.2.7:
-  version "1.2.7"
-  resolved "https://registry.yarnpkg.com/log-driver/-/log-driver-1.2.7.tgz#63b95021f0702fedfa2c9bb0a24e7797d71871d8"
-
 log-symbols@2.2.0, log-symbols@^2.0.0, log-symbols@^2.1.0, log-symbols@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/log-symbols/-/log-symbols-2.2.0.tgz#5740e1c5d6f0dfda4ad9323b5332107ef6b4c40a"
@@ -12569,11 +12558,11 @@ makeerror@1.0.x:
   dependencies:
     tmpl "1.0.x"
 
-mali-call-types@^0.1.0, mali-call-types@~0.1.0:
+mali-call-types@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/mali-call-types/-/mali-call-types-0.1.0.tgz#d4ea0a599485909083d98f1db003c46d39a4beca"
 
-mali-compose@^1.2.0, mali-compose@~1.2.0:
+mali-compose@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/mali-compose/-/mali-compose-1.2.0.tgz#ceb20d1d89f22e6d59b1da965ee5f94b1a029110"
 
@@ -12584,12 +12573,13 @@ mali-onerror@^0.2.0:
     error-inject "^1.0.0"
     mali-call-types "^0.1.0"
 
-mali@^0.10.2:
-  version "0.10.2"
-  resolved "https://registry.yarnpkg.com/mali/-/mali-0.10.2.tgz#671c7e34cf67d8d208b770a2ec644f9e58974e1b"
+mali@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/mali/-/mali-0.11.0.tgz#2a2212e9186b537bf7e9add7681985583c0099a9"
   dependencies:
+    "@malijs/call-types" "~0.3.0"
+    "@malijs/compose" "^1.3.2"
     ascallback "^1.1.1"
-    coveralls "^3.0.2"
     delegates "^1.0.0"
     destroy "^1.0.4"
     ee-first "^1.1.1"
@@ -12608,10 +12598,7 @@ mali@^0.10.2:
     lodash.pull "^4.1.0"
     lodash.upperfirst "^4.3.1"
     lodash.values "^4.3.0"
-    mali-call-types "~0.1.0"
-    mali-compose "~1.2.0"
     p-map "^2.0.0"
-    pify "^3.0.0"
 
 map-age-cleaner@^0.1.1:
   version "0.1.3"
@@ -16364,7 +16351,7 @@ request@2.87.0:
     tunnel-agent "^0.6.0"
     uuid "^3.1.0"
 
-request@^2.72.0, request@^2.85.0, request@^2.87.0, request@^2.88.0:
+request@^2.72.0, request@^2.87.0, request@^2.88.0:
   version "2.88.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.0.tgz#9c2fca4f7d35b592efe57c7f0a55e81052124fef"
   dependencies:
