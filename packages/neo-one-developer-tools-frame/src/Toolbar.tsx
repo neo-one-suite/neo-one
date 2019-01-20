@@ -94,21 +94,18 @@ export function Toolbar({ resizeHandler }: Props) {
   // tslint:disable-next-line:no-unused
   const [visible, show, hide, toggle] = useHidden(false);
   const maxWidth = useStream(() => resizeHandler.maxWidth$, [resizeHandler]);
-  const onChangeSize = useCallback(
-    ({ width }: { width: number }) => {
-      if (visible) {
-        resizeHandler.maximizeToolbar({
-          type: 'px',
-          id: 'toolbar',
-          width: Math.min(width, maxWidth),
-          height: 40,
-        });
-      } else {
-        resizeHandler.minimizeToolbar();
-      }
-    },
-    [visible, resizeHandler, maxWidth],
-  );
+  const onChangeSize = useCallback(({ width }: { width: number }) => {
+    if (visible) {
+      resizeHandler.maximizeToolbar({
+        type: 'px',
+        id: 'toolbar',
+        width: Math.min(width, maxWidth),
+        height: 40,
+      });
+    } else {
+      resizeHandler.minimizeToolbar();
+    }
+  }, [visible, resizeHandler, maxWidth]);
 
   return (
     <>

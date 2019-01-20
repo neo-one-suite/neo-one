@@ -18,15 +18,15 @@ import { concatMap } from 'rxjs/operators';
 type TrackedChange<Key, AddValue, Value> =
   | { readonly type: 'add'; readonly addValue: AddValue; readonly value: Value }
   | { readonly type: 'delete'; readonly key: Key };
-type GetFunc<Key, Value> = ((key: Key) => Promise<Value>);
-type TryGetFunc<Key, Value> = ((key: Key) => Promise<Value | undefined>);
+type GetFunc<Key, Value> = (key: Key) => Promise<Value>;
+type TryGetFunc<Key, Value> = (key: Key) => Promise<Value | undefined>;
 
 function createGet<Key, Value>({
   tryGetTracked,
   readStorage,
 }: {
   // tslint:disable-next-line no-any
-  readonly tryGetTracked: ((key: Key) => TrackedChange<Key, any, Value> | undefined);
+  readonly tryGetTracked: (key: Key) => TrackedChange<Key, any, Value> | undefined;
   readonly readStorage: () => ReadStorage<Key, Value>;
 }): GetFunc<Key, Value> {
   return async (key: Key): Promise<Value> => {
@@ -48,7 +48,7 @@ function createTryGet<Key, Value>({
   readStorage,
 }: {
   // tslint:disable-next-line no-any
-  readonly tryGetTracked: ((key: Key) => TrackedChange<Key, any, Value> | undefined);
+  readonly tryGetTracked: (key: Key) => TrackedChange<Key, any, Value> | undefined;
   readonly readStorage: () => ReadStorage<Key, Value>;
 }): TryGetFunc<Key, Value> {
   return async (key: Key): Promise<Value | undefined> => {
@@ -68,9 +68,9 @@ function createTryGet<Key, Value>({
 interface BaseReadStorageCacheOptions<Key, AddValue, Value> {
   readonly readStorage: () => ReadStorage<Key, Value>;
   readonly name: string;
-  readonly createAddChange: ((value: AddValue) => AddChange);
-  readonly createDeleteChange?: ((key: Key) => DeleteChange);
-  readonly onAdd?: ((value: AddValue) => Promise<void>);
+  readonly createAddChange: (value: AddValue) => AddChange;
+  readonly createDeleteChange?: (key: Key) => DeleteChange;
+  readonly onAdd?: (value: AddValue) => Promise<void>;
 }
 
 export class BaseReadStorageCache<Key, AddValue, Value> {
@@ -81,7 +81,7 @@ export class BaseReadStorageCache<Key, AddValue, Value> {
   // tslint:disable-next-line readonly-keyword
   public readonly mutableValues: { [key: string]: TrackedChange<Key, AddValue, Value> };
   protected readonly readStorage: () => ReadStorage<Key, Value>;
-  protected readonly createAddChange: ((value: AddValue) => AddChange);
+  protected readonly createAddChange: (value: AddValue) => AddChange;
   protected readonly createDeleteChange: ((key: Key) => DeleteChange) | undefined;
 
   public constructor(options: BaseReadStorageCacheOptions<Key, AddValue, Value>) {
@@ -125,11 +125,11 @@ export class BaseReadStorageCache<Key, AddValue, Value> {
 }
 
 interface ReadStorageCacheOptions<Key, AddValue, Value> extends BaseReadStorageCacheOptions<Key, AddValue, Value> {
-  readonly getKeyString: ((key: Key) => string);
+  readonly getKeyString: (key: Key) => string;
 }
 
 class ReadStorageCache<Key, AddValue, Value> extends BaseReadStorageCache<Key, AddValue, Value> {
-  public readonly getKeyString: ((key: Key) => string);
+  public readonly getKeyString: (key: Key) => string;
 
   public constructor(options: ReadStorageCacheOptions<Key, AddValue, Value>) {
     super({
@@ -151,17 +151,17 @@ class ReadStorageCache<Key, AddValue, Value> extends BaseReadStorageCache<Key, A
 interface ReadAllStorageCacheOptions<Key, Value> {
   readonly readAllStorage: () => ReadAllStorage<Key, Value>;
   readonly name: string;
-  readonly createAddChange: ((value: Value) => AddChange);
-  readonly createDeleteChange?: ((key: Key) => DeleteChange);
-  readonly onAdd?: ((value: Value) => Promise<void>);
-  readonly getKeyString: ((key: Key) => string);
-  readonly getKeyFromValue: ((value: Value) => Key);
+  readonly createAddChange: (value: Value) => AddChange;
+  readonly createDeleteChange?: (key: Key) => DeleteChange;
+  readonly onAdd?: (value: Value) => Promise<void>;
+  readonly getKeyString: (key: Key) => string;
+  readonly getKeyFromValue: (value: Value) => Key;
 }
 
 class ReadAllStorageCache<Key, Value> extends ReadStorageCache<Key, Value, Value> {
   public readonly all$: Observable<Value>;
   protected readonly readAllStorage: () => ReadAllStorage<Key, Value>;
-  protected readonly getKeyFromValue: ((value: Value) => Key);
+  protected readonly getKeyFromValue: (value: Value) => Key;
 
   public constructor(options: ReadAllStorageCacheOptions<Key, Value>) {
     super({
@@ -207,19 +207,19 @@ class ReadAllStorageCache<Key, Value> extends ReadStorageCache<Key, Value, Value
 interface ReadGetAllStorageCacheOptions<Key, PartialKey, Value> {
   readonly readGetAllStorage: () => ReadGetAllStorage<Key, PartialKey, Value>;
   readonly name: string;
-  readonly createAddChange: ((value: Value) => AddChange);
-  readonly createDeleteChange?: ((key: Key) => DeleteChange);
-  readonly onAdd?: ((value: Value) => Promise<void>);
-  readonly getKeyString: ((key: Key) => string);
-  readonly getKeyFromValue: ((value: Value) => Key);
-  readonly matchesPartialKey: ((value: Value, key: PartialKey) => boolean);
+  readonly createAddChange: (value: Value) => AddChange;
+  readonly createDeleteChange?: (key: Key) => DeleteChange;
+  readonly onAdd?: (value: Value) => Promise<void>;
+  readonly getKeyString: (key: Key) => string;
+  readonly getKeyFromValue: (value: Value) => Key;
+  readonly matchesPartialKey: (value: Value, key: PartialKey) => boolean;
 }
 
 class ReadGetAllStorageCache<Key, PartialKey, Value> extends ReadStorageCache<Key, Value, Value> {
-  public readonly getAll$: ((key: PartialKey) => Observable<Value>);
+  public readonly getAll$: (key: PartialKey) => Observable<Value>;
   protected readonly readGetAllStorage: () => ReadGetAllStorage<Key, PartialKey, Value>;
-  protected readonly getKeyFromValue: ((value: Value) => Key);
-  protected readonly matchesPartialKey: ((value: Value, key: PartialKey) => boolean);
+  protected readonly getKeyFromValue: (value: Value) => Key;
+  protected readonly matchesPartialKey: (value: Value, key: PartialKey) => boolean;
 
   public constructor(options: ReadGetAllStorageCacheOptions<Key, PartialKey, Value>) {
     super({
@@ -267,7 +267,7 @@ class ReadGetAllStorageCache<Key, PartialKey, Value> extends ReadStorageCache<Ke
       );
   }
 }
-type AddFunc<Value> = ((value: Value, force?: boolean) => Promise<void>);
+type AddFunc<Value> = (value: Value, force?: boolean) => Promise<void>;
 
 function createAdd<Key, Value>({
   cache,
@@ -275,8 +275,8 @@ function createAdd<Key, Value>({
   getKeyString,
 }: {
   readonly cache: ReadStorageCache<Key, Value, Value>;
-  readonly getKeyFromValue: ((value: Value) => Key);
-  readonly getKeyString: ((key: Key) => string);
+  readonly getKeyFromValue: (value: Value) => Key;
+  readonly getKeyString: (key: Key) => string;
 }): AddFunc<Value> {
   return async (value: Value, force?): Promise<void> => {
     const key = getKeyFromValue(value);
@@ -300,7 +300,7 @@ function createAdd<Key, Value>({
     };
   };
 }
-type UpdateFunc<Value, Update> = ((value: Value, update: Update) => Promise<Value>);
+type UpdateFunc<Value, Update> = (value: Value, update: Update) => Promise<Value>;
 
 function createUpdate<Key, Value, Update>({
   cache,
@@ -308,8 +308,8 @@ function createUpdate<Key, Value, Update>({
   getKeyFromValue,
 }: {
   readonly cache: ReadStorageCache<Key, Value, Value>;
-  readonly update: ((value: Value, update: Update) => Value);
-  readonly getKeyFromValue: ((value: Value) => Key);
+  readonly update: (value: Value, update: Update) => Value;
+  readonly getKeyFromValue: (value: Value) => Key;
 }): UpdateFunc<Value, Update> {
   return async (value: Value, update: Update): Promise<Value> => {
     const key = getKeyFromValue(value);
@@ -325,7 +325,7 @@ function createUpdate<Key, Value, Update>({
     return updatedValue;
   };
 }
-type DeleteFunc<Key> = ((key: Key) => Promise<void>);
+type DeleteFunc<Key> = (key: Key) => Promise<void>;
 
 // tslint:disable-next-line no-any
 function createDelete<Key>({ cache }: { readonly cache: ReadStorageCache<Key, any, any> }): DeleteFunc<Key> {
@@ -337,8 +337,8 @@ function createDelete<Key>({ cache }: { readonly cache: ReadStorageCache<Key, an
 
 interface ReadAddUpdateDeleteStorageCacheOptions<Key, Value, Update>
   extends ReadStorageCacheOptions<Key, Value, Value> {
-  readonly update: ((value: Value, update: Update) => Value);
-  readonly getKeyFromValue: ((value: Value) => Key);
+  readonly update: (value: Value, update: Update) => Value;
+  readonly getKeyFromValue: (value: Value) => Key;
 }
 
 export class ReadAddUpdateDeleteStorageCache<Key, Value, Update> extends ReadStorageCache<Key, Value, Value> {
@@ -373,8 +373,8 @@ export class ReadAddUpdateDeleteStorageCache<Key, Value, Update> extends ReadSto
 }
 
 interface ReadAddUpdateStorageCacheOptions<Key, Value, Update> extends ReadStorageCacheOptions<Key, Value, Value> {
-  readonly update: ((value: Value, update: Update) => Value);
-  readonly getKeyFromValue: ((value: Value) => Key);
+  readonly update: (value: Value, update: Update) => Value;
+  readonly getKeyFromValue: (value: Value) => Key;
 }
 
 export class ReadAddUpdateStorageCache<Key, Value, Update> extends ReadStorageCache<Key, Value, Value> {
@@ -406,7 +406,7 @@ export class ReadAddUpdateStorageCache<Key, Value, Update> extends ReadStorageCa
 }
 
 interface ReadAddDeleteStorageCacheOptions<Key, Value> extends ReadStorageCacheOptions<Key, Value, Value> {
-  readonly getKeyFromValue: ((value: Value) => Key);
+  readonly getKeyFromValue: (value: Value) => Key;
 }
 
 export class ReadAddDeleteStorageCache<Key, Value> extends ReadStorageCache<Key, Value, Value> {
@@ -434,7 +434,7 @@ export class ReadAddDeleteStorageCache<Key, Value> extends ReadStorageCache<Key,
 }
 
 interface ReadAddStorageCacheOptions<Key, Value> extends ReadStorageCacheOptions<Key, Value, Value> {
-  readonly getKeyFromValue: ((value: Value) => Key);
+  readonly getKeyFromValue: (value: Value) => Key;
 }
 
 export class ReadAddStorageCache<Key, Value> extends ReadStorageCache<Key, Value, Value> {
@@ -460,7 +460,7 @@ export class ReadAddStorageCache<Key, Value> extends ReadStorageCache<Key, Value
 
 interface ReadGetAllAddDeleteStorageCacheOptions<Key, PartialKey, Value>
   extends ReadGetAllStorageCacheOptions<Key, PartialKey, Value> {
-  readonly getKeyFromValue: ((value: Value) => Key);
+  readonly getKeyFromValue: (value: Value) => Key;
 }
 
 export class ReadGetAllAddDeleteStorageCache<Key, PartialKey, Value> extends ReadGetAllStorageCache<
@@ -495,8 +495,8 @@ export class ReadGetAllAddDeleteStorageCache<Key, PartialKey, Value> extends Rea
 
 interface ReadGetAllAddUpdateDeleteStorageCacheOptions<Key, PartialKey, Value, Update>
   extends ReadGetAllStorageCacheOptions<Key, PartialKey, Value> {
-  readonly update: ((value: Value, update: Update) => Value);
-  readonly getKeyFromValue: ((value: Value) => Key);
+  readonly update: (value: Value, update: Update) => Value;
+  readonly getKeyFromValue: (value: Value) => Key;
 }
 
 export class ReadGetAllAddUpdateDeleteStorageCache<Key, PartialKey, Value, Update> extends ReadGetAllStorageCache<
@@ -538,7 +538,7 @@ export class ReadGetAllAddUpdateDeleteStorageCache<Key, PartialKey, Value, Updat
 
 interface ReadGetAllAddStorageCacheOptions<Key, PartialKey, Value>
   extends ReadGetAllStorageCacheOptions<Key, PartialKey, Value> {
-  readonly getKeyFromValue: ((value: Value) => Key);
+  readonly getKeyFromValue: (value: Value) => Key;
 }
 
 export class ReadGetAllAddStorageCache<Key, PartialKey, Value> extends ReadGetAllStorageCache<Key, PartialKey, Value> {
@@ -565,8 +565,8 @@ export class ReadGetAllAddStorageCache<Key, PartialKey, Value> extends ReadGetAl
 }
 
 interface ReadAllAddUpdateDeleteStorageCacheOptions<Key, Value, Update> extends ReadAllStorageCacheOptions<Key, Value> {
-  readonly update: ((value: Value, update: Update) => Value);
-  readonly getKeyFromValue: ((value: Value) => Key);
+  readonly update: (value: Value, update: Update) => Value;
+  readonly getKeyFromValue: (value: Value) => Key;
 }
 
 export class ReadAllAddUpdateDeleteStorageCache<Key, Value, Update> extends ReadAllStorageCache<Key, Value> {
@@ -602,7 +602,7 @@ export class ReadAllAddUpdateDeleteStorageCache<Key, Value, Update> extends Read
 }
 
 interface ReadAllAddStorageCacheOptions<Key, Value> extends ReadAllStorageCacheOptions<Key, Value> {
-  readonly getKeyFromValue: ((value: Value) => Key);
+  readonly getKeyFromValue: (value: Value) => Key;
 }
 
 export class ReadAllAddStorageCache<Key, Value> extends ReadAllStorageCache<Key, Value> {
@@ -717,15 +717,15 @@ export class OutputStorageCache extends ReadStorageCache<OutputKey, OutputValue,
 type TrackedMetadataChange<AddValue, Value> =
   | { readonly type: 'add'; readonly addValue: AddValue; readonly value: Value }
   | { readonly type: 'delete' };
-type GetMetadataFunc<Value> = ((key?: undefined) => Promise<Value>);
-type TryGetMetadataFunc<Value> = ((key?: undefined) => Promise<Value | undefined>);
+type GetMetadataFunc<Value> = (key?: undefined) => Promise<Value>;
+type TryGetMetadataFunc<Value> = (key?: undefined) => Promise<Value | undefined>;
 
 function createGetMetadata<Key, Value>({
   tryGetTracked,
   readStorage,
 }: {
   // tslint:disable-next-line no-any
-  readonly tryGetTracked: (() => TrackedMetadataChange<any, Value> | undefined);
+  readonly tryGetTracked: () => TrackedMetadataChange<any, Value> | undefined;
   readonly readStorage: () => ReadMetadataStorage<Value>;
 }): GetFunc<Key, Value> {
   return async (): Promise<Value> => {
@@ -747,7 +747,7 @@ function createTryGetMetadata<Value>({
   readStorage,
 }: {
   // tslint:disable-next-line no-any
-  readonly tryGetTracked: (() => TrackedMetadataChange<any, Value> | undefined);
+  readonly tryGetTracked: () => TrackedMetadataChange<any, Value> | undefined;
   readonly readStorage: () => ReadMetadataStorage<Value>;
 }): TryGetMetadataFunc<Value> {
   return async (): Promise<Value | undefined> => {
@@ -767,9 +767,9 @@ function createTryGetMetadata<Value>({
 interface BaseReadMetadataStorageCacheOptions<AddValue, Value> {
   readonly readStorage: () => ReadMetadataStorage<Value>;
   readonly name: string;
-  readonly createAddChange: ((value: AddValue) => AddChange);
-  readonly createDeleteChange?: (() => DeleteChange);
-  readonly onAdd?: ((value: AddValue) => Promise<void>);
+  readonly createAddChange: (value: AddValue) => AddChange;
+  readonly createDeleteChange?: () => DeleteChange;
+  readonly onAdd?: (value: AddValue) => Promise<void>;
 }
 
 export class BaseReadMetadataStorageCache<AddValue, Value> {
@@ -779,7 +779,7 @@ export class BaseReadMetadataStorageCache<AddValue, Value> {
   public readonly onAdd: ((value: AddValue) => Promise<void>) | undefined;
   protected readonly readStorage: () => ReadMetadataStorage<Value>;
   protected readonly name: string;
-  protected readonly createAddChange: ((value: AddValue) => AddChange);
+  protected readonly createAddChange: (value: AddValue) => AddChange;
   protected readonly createDeleteChange: (() => DeleteChange) | undefined;
 
   public constructor(options: BaseReadMetadataStorageCacheOptions<AddValue, Value>) {
@@ -849,7 +849,7 @@ function createUpdateMetadata<Value, Update>({
   update: updateFunc,
 }: {
   readonly cache: ReadMetadataStorageCache<Value, Value>;
-  readonly update: ((value: Value, update: Update) => Value);
+  readonly update: (value: Value, update: Update) => Value;
 }): UpdateFunc<Value, Update> {
   return async (value: Value, update: Update): Promise<Value> => {
     const updatedValue = updateFunc(value, update);
@@ -866,7 +866,7 @@ function createUpdateMetadata<Value, Update>({
 
 interface ReadAddUpdateMetadataStorageCacheOptions<Value, Update>
   extends BaseReadMetadataStorageCacheOptions<Value, Value> {
-  readonly update: ((value: Value, update: Update) => Value);
+  readonly update: (value: Value, update: Update) => Value;
 }
 
 export class ReadAddUpdateMetadataStorageCache<Value, Update> extends ReadMetadataStorageCache<Value, Value> {

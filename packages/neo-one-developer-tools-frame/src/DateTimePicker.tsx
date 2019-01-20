@@ -43,30 +43,27 @@ export function DateTimePicker({
       editingTimeout = undefined;
     }
   };
-  const onChangeInput = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const nextText = event.currentTarget.value;
-      clearEditingTimeout();
-      const onError = (nextError: string) => {
-        editingTimeout = setTimeout(() => {
-          setError(nextError);
-          // tslint:disable-next-line no-any
-        }, 2000) as any;
-      };
+  const onChangeInput = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const nextText = event.currentTarget.value;
+    clearEditingTimeout();
+    const onError = (nextError: string) => {
+      editingTimeout = setTimeout(() => {
+        setError(nextError);
+        // tslint:disable-next-line no-any
+      }, 2000) as any;
+    };
 
-      setText(nextText);
-      setError(undefined);
-      const parsedDate = parse(text, FORMAT, new Date());
-      if (Number.isNaN(parsedDate.valueOf())) {
-        onError(`Invalid date. Expected format ${FORMAT}`);
-      } else if (isBefore(parsedDate, minDate)) {
-        onError('Date must be a future point in time after the current block time.');
-      } else {
-        onChange(parsedDate);
-      }
-    },
-    [setText, setError, onChange],
-  );
+    setText(nextText);
+    setError(undefined);
+    const parsedDate = parse(text, FORMAT, new Date());
+    if (Number.isNaN(parsedDate.valueOf())) {
+      onError(`Invalid date. Expected format ${FORMAT}`);
+    } else if (isBefore(parsedDate, minDate)) {
+      onError('Date must be a future point in time after the current block time.');
+    } else {
+      onChange(parsedDate);
+    }
+  }, [setText, setError, onChange]);
 
   return (
     <Wrapper {...props}>

@@ -412,15 +412,15 @@ export class InteractiveCLI {
     }
   }
 
-  public printDescribe(describeTable: DescribeTable, print?: ((value: string) => void)) {
+  public printDescribe(describeTable: DescribeTable, print?: (value: string) => void) {
     this.getPrint(print)(this.getDescribe(describeTable));
   }
 
-  public printList(listTable: ListTable, print?: ((value: string) => void)) {
+  public printList(listTable: ListTable, print?: (value: string) => void) {
     this.getPrint(print)(this.getList(listTable));
   }
 
-  public print(value: string, print?: ((value: string) => void)): void {
+  public print(value: string, print?: (value: string) => void): void {
     this.getPrint(print)(value);
   }
 
@@ -514,7 +514,7 @@ export class InteractiveCLI {
     return mutableTable.toString();
   }
 
-  private getPrint(printIn?: ((value: string) => void)): ((value: string) => void) {
+  private getPrint(printIn?: (value: string) => void): (value: string) => void {
     let print = printIn;
     if (print === undefined) {
       print =

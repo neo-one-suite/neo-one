@@ -44,13 +44,10 @@ interface Props {
 }
 export function Toast({ toast, removeToast }: Props) {
   const [visible, show, hideIn] = useHidden(false);
-  const hide = useCallback(
-    () => {
-      hideIn();
-      setTimeout(() => removeToast(toast.id), 250);
-    },
-    [hideIn],
-  );
+  const hide = useCallback(() => {
+    hideIn();
+    setTimeout(() => removeToast(toast.id), 250);
+  }, [hideIn]);
   useEffect(() => {
     let autoHideTimer: number | undefined;
     const showTimer = setTimeout(() => {

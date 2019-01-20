@@ -18,11 +18,11 @@ import { DeveloperTools } from '@neo-one/client';
 import * as React from 'react';
 import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(reactPath, clientPath)}';
 ${contractsPaths
-    .map(
-      ({ name, createContractPath }) =>
-        `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(reactPath, createContractPath)}';`,
-    )
-    .join('\n')}
+  .map(
+    ({ name, createContractPath }) =>
+      `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(reactPath, createContractPath)}';`,
+  )
+  .join('\n')}
 
 const Context = React.createContext(undefined);
 
@@ -66,11 +66,11 @@ import { Contracts } from '${getRelativeImport(reactPath, commonTypesPath)}';
 import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(reactPath, clientPath)}';
 
 ${contractsPaths
-    .map(
-      ({ name, createContractPath }) =>
-        `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(reactPath, createContractPath)}';`,
-    )
-    .join('\n')}
+  .map(
+    ({ name, createContractPath }) =>
+      `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(reactPath, createContractPath)}';`,
+  )
+  .join('\n')}
 
 export interface WithClients<TClient extends Client> {
   readonly client: TClient;

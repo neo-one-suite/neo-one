@@ -29,57 +29,45 @@ export const ToolbarFocusableComponent = forwardRef<HTMLDivElement, Props>(
 
     const [tabIndex, setTabIndex] = useState(propTabIndex);
 
-    const getToolbar = useCallback(
-      () => {
-        if (toolbarRef.current === null && ref.current !== null) {
-          // tslint:disable-next-line:no-object-mutation
-          toolbarRef.current = ref.current.closest(getSelector(Toolbar));
+    const getToolbar = useCallback(() => {
+      if (toolbarRef.current === null && ref.current !== null) {
+        // tslint:disable-next-line:no-object-mutation
+        toolbarRef.current = ref.current.closest(getSelector(Toolbar));
+      }
+
+      return toolbarRef.current;
+    }, [ref, toolbarRef]);
+
+    const getFocusables = useCallback((): NodeListOf<Focusable> | undefined => {
+      const toolbar = getToolbar();
+
+      if (toolbar === null) {
+        return undefined;
+      }
+
+      return toolbar.querySelectorAll(getSelector(ToolbarFocusable)) as NodeListOf<Focusable>;
+    }, [getToolbar]);
+
+    const getCurrentIndex = useCallback((focusables: NodeListOf<Focusable> | undefined) => {
+      if (focusables === undefined) {
+        return -1;
+      }
+
+      let currentIndex = -1;
+      focusables.forEach((item: Element | Text | null, i: number) => {
+        if (item === ref.current) {
+          currentIndex = i;
         }
+      });
 
-        return toolbarRef.current;
-      },
-      [ref, toolbarRef],
-    );
+      return currentIndex;
+    }, [ref]);
 
-    const getFocusables = useCallback(
-      (): NodeListOf<Focusable> | undefined => {
-        const toolbar = getToolbar();
+    const toolbarIsVertical = useCallback(() => {
+      const toolbar = getToolbar();
 
-        if (toolbar === null) {
-          return undefined;
-        }
-
-        return toolbar.querySelectorAll(getSelector(ToolbarFocusable)) as NodeListOf<Focusable>;
-      },
-      [getToolbar],
-    );
-
-    const getCurrentIndex = useCallback(
-      (focusables: NodeListOf<Focusable> | undefined) => {
-        if (focusables === undefined) {
-          return -1;
-        }
-
-        let currentIndex = -1;
-        focusables.forEach((item: Element | Text | null, i: number) => {
-          if (item === ref.current) {
-            currentIndex = i;
-          }
-        });
-
-        return currentIndex;
-      },
-      [ref],
-    );
-
-    const toolbarIsVertical = useCallback(
-      () => {
-        const toolbar = getToolbar();
-
-        return toolbar !== null && toolbar.getAttribute('aria-orientation') === 'vertical';
-      },
-      [toolbar],
-    );
+      return toolbar !== null && toolbar.getAttribute('aria-orientation') === 'vertical';
+    }, [toolbar]);
 
     const getPreviousFocusable = useCallback((focusables: NodeListOf<Focusable>, currentIndex: number) => {
       const index = currentIndex ? currentIndex - 1 : focusables.length - 1;
@@ -94,54 +82,48 @@ export const ToolbarFocusableComponent = forwardRef<HTMLDivElement, Props>(
       return focusables.item(index) || focusables.item(0);
     }, []);
 
-    const handleKeyDown = useCallback(
-      (e: KeyboardEvent) => {
-        const isVertical = toolbarIsVertical();
-        const nextKey = isVertical ? 'ArrowDown' : 'ArrowRight';
-        const previousKey = isVertical ? 'ArrowUp' : 'ArrowLeft';
-        const willPerformEvent = [nextKey, previousKey].indexOf(e.key) >= 0;
+    const handleKeyDown = useCallback((e: KeyboardEvent) => {
+      const isVertical = toolbarIsVertical();
+      const nextKey = isVertical ? 'ArrowDown' : 'ArrowRight';
+      const previousKey = isVertical ? 'ArrowUp' : 'ArrowLeft';
+      const willPerformEvent = [nextKey, previousKey].indexOf(e.key) >= 0;
 
-        if (willPerformEvent) {
-          const focusables = getFocusables();
-          if (focusables !== undefined) {
-            const currentIndex = getCurrentIndex(focusables);
+      if (willPerformEvent) {
+        const focusables = getFocusables();
+        if (focusables !== undefined) {
+          const currentIndex = getCurrentIndex(focusables);
 
-            e.preventDefault();
-            setTabIndex(propTabIndex);
+          e.preventDefault();
+          setTabIndex(propTabIndex);
 
-            if (e.key === nextKey) {
-              getNextFocusable(focusables, currentIndex).focus();
-            } else {
-              getPreviousFocusable(focusables, currentIndex).focus();
-            }
+          if (e.key === nextKey) {
+            getNextFocusable(focusables, currentIndex).focus();
+          } else {
+            getPreviousFocusable(focusables, currentIndex).focus();
           }
         }
-      },
-      [toolbarIsVertical, getFocusables, getCurrentIndex, propTabIndex, getNextFocusable, getPreviousFocusable],
-    );
+      }
+    }, [toolbarIsVertical, getFocusables, getCurrentIndex, propTabIndex, getNextFocusable, getPreviousFocusable]);
 
     const handleFocus = useCallback(() => setTabIndex(0), [setTabIndex]);
 
-    useLayoutEffect(
-      () => {
-        if (firstRender.current && tabIndex === -1) {
-          // tslint:disable-next-line:no-object-mutation
-          firstRender.current = false;
-          setTabIndex(getCurrentIndex(getFocusables()));
-        }
+    useLayoutEffect(() => {
+      if (firstRender.current && tabIndex === -1) {
+        // tslint:disable-next-line:no-object-mutation
+        firstRender.current = false;
+        setTabIndex(getCurrentIndex(getFocusables()));
+      }
 
-        if (!disabled && ref.current !== null) {
-          ref.current.addEventListener('keydown', handleKeyDown);
-        }
+      if (!disabled && ref.current !== null) {
+        ref.current.addEventListener('keydown', handleKeyDown);
+      }
 
-        return () => {
-          if (ref.current !== null) {
-            ref.current.removeEventListener('keydown', handleKeyDown);
-          }
-        };
-      },
-      [tabIndex, disabled, setTabIndex, getCurrentIndex, getFocusables, ref],
-    );
+      return () => {
+        if (ref.current !== null) {
+          ref.current.removeEventListener('keydown', handleKeyDown);
+        }
+      };
+    }, [tabIndex, disabled, setTabIndex, getCurrentIndex, getFocusables, ref]);
 
     return <Box {...props} ref={ref} onFocus={callAll(handleFocus, onFocus)} tabIndex={tabIndex} />;
   },

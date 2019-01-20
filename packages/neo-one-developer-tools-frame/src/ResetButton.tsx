@@ -10,24 +10,21 @@ export function ResetButton() {
   const [disabled, setDisabled] = useState(false);
   const addError = useAddError();
   const { client, localClient } = useNetworkClients();
-  const onClick = useCallback(
-    () => {
-      if (localClient !== undefined) {
-        setDisabled(true);
-        localClient
-          .reset()
-          .then(() => {
-            client.reset();
-            setDisabled(false);
-          })
-          .catch((error) => {
-            addError(error);
-            setDisabled(false);
-          });
-      }
-    },
-    [client, localClient, setDisabled],
-  );
+  const onClick = useCallback(() => {
+    if (localClient !== undefined) {
+      setDisabled(true);
+      localClient
+        .reset()
+        .then(() => {
+          client.reset();
+          setDisabled(false);
+        })
+        .catch((error) => {
+          addError(error);
+          setDisabled(false);
+        });
+    }
+  }, [client, localClient, setDisabled]);
 
   if (localClient === undefined) {
     // tslint:disable-next-line:no-null-keyword

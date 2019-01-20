@@ -20,83 +20,77 @@ export function WalletTransfer() {
   const { client, developerClient } = useNetworkClients();
   const addError = useAddError();
 
-  const onChangeAmount = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const nextText = event.currentTarget.value;
+  const onChangeAmount = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const nextText = event.currentTarget.value;
 
-      let nextAmount: BigNumber | undefined;
-      try {
-        nextAmount = new BigNumber(nextText);
-        if (nextAmount.toString() !== nextText) {
-          nextAmount = undefined;
-        }
-      } catch {
-        // do nothing
+    let nextAmount: BigNumber | undefined;
+    try {
+      nextAmount = new BigNumber(nextText);
+      if (nextAmount.toString() !== nextText) {
+        nextAmount = undefined;
       }
+    } catch {
+      // do nothing
+    }
 
-      setText(nextText);
-      setAmount(nextAmount);
-    },
-    [setText, setAmount],
-  );
+    setText(nextText);
+    setAmount(nextAmount);
+  }, [setText, setAmount]);
   const onChangeAsset = setAsset;
   const onChangeTo = setTo;
-  const send = useCallback(
-    () => {
-      const from = client.getCurrentUserAccount();
-      if (amount === undefined || to.length === 0 || from === undefined) {
-        return;
-      }
+  const send = useCallback(() => {
+    const from = client.getCurrentUserAccount();
+    if (amount === undefined || to.length === 0 || from === undefined) {
+      return;
+    }
 
-      setLoading(true);
+    setLoading(true);
 
-      const onComplete = () => {
-        setLoading(false);
-      };
+    const onComplete = () => {
+      setLoading(false);
+    };
 
-      const onError = (error: Error) => {
-        addError(error);
+    const onError = (error: Error) => {
+      addError(error);
+      onComplete();
+    };
+
+    const toConfirm = async (result: TransactionResult) => {
+      try {
+        await result.confirmed();
         onComplete();
-      };
-
-      const toConfirm = async (result: TransactionResult) => {
-        try {
-          await result.confirmed();
-          onComplete();
-        } catch (error) {
-          onError(error);
-        }
-      };
-
-      // tslint:disable-next-line possible-timing-attack
-      if (asset.type === 'token') {
-        const smartContract = nep5.createNEP5SmartContract(
-          client,
-          { [asset.token.network]: { address: asset.token.address } },
-          asset.token.decimals,
-        );
-        Promise.all(to.map((account) => smartContract.transfer(from.id.address, account.id.address, amount)))
-          .then(async (results) => {
-            await Promise.all([
-              Promise.all(results.map(toConfirm)),
-              developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
-            ]);
-          })
-          .catch(onError);
-      } else {
-        client
-          .transfer(to.map((account) => ({ asset: asset.value, amount, to: account.id.address })))
-          .then(async (result) =>
-            Promise.all([
-              toConfirm(result),
-              developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
-            ]),
-          )
-          .catch(onError);
+      } catch (error) {
+        onError(error);
       }
-    },
-    [client, setLoading, addError, asset, amount, to, developerClient],
-  );
+    };
+
+    // tslint:disable-next-line possible-timing-attack
+    if (asset.type === 'token') {
+      const smartContract = nep5.createNEP5SmartContract(
+        client,
+        { [asset.token.network]: { address: asset.token.address } },
+        asset.token.decimals,
+      );
+      Promise.all(to.map((account) => smartContract.transfer(from.id.address, account.id.address, amount)))
+        .then(async (results) => {
+          await Promise.all([
+            Promise.all(results.map(toConfirm)),
+            developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+          ]);
+        })
+        .catch(onError);
+    } else {
+      client
+        .transfer(to.map((account) => ({ asset: asset.value, amount, to: account.id.address })))
+        .then(async (result) =>
+          Promise.all([
+            toConfirm(result),
+            developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+          ]),
+        )
+        .catch(onError);
+    }
+  }, [client, setLoading, addError, asset, amount, to, developerClient]);
 
   return (
     <>

@@ -181,15 +181,12 @@ export const getNodeModulesPaths = (start: string) => {
   const mutableParts = start.startsWith('/') ? start.slice(1).split('/') : start.split('/');
 
   return _.reverse(
-    mutableParts.reduce<ReadonlyArray<string>>(
-      (acc, part, i) => {
-        if (part === 'node_modules') {
-          return acc;
-        }
+    mutableParts.reduce<ReadonlyArray<string>>((acc, part, i) => {
+      if (part === 'node_modules') {
+        return acc;
+      }
 
-        return acc.concat(`/${path.join(...mutableParts.slice(0, i + 1).concat(['node_modules']))}`);
-      },
-      ['/node_modules'],
-    ),
+      return acc.concat(`/${path.join(...mutableParts.slice(0, i + 1).concat(['node_modules']))}`);
+    }, ['/node_modules']),
   );
 };

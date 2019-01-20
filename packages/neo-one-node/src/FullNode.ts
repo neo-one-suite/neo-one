@@ -10,7 +10,7 @@ export class FullNode {
   private readonly onError: ((error: Error) => void) | undefined;
   private mutableSubscription: Subscription | undefined;
 
-  public constructor(options: FullNodeOptions, onError?: ((error: Error) => void)) {
+  public constructor(options: FullNodeOptions, onError?: (error: Error) => void) {
     this.options = options;
     this.onError = onError;
   }
