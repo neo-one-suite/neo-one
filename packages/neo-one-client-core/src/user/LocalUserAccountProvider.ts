@@ -108,13 +108,11 @@ export interface KeyStore {
   /**
    * Sign an arbitrary message with the specified user account, returning a hex encoded string of the signature.
    */
-  readonly sign: (
-    options: {
-      readonly account: UserAccountID;
-      readonly message: string;
-      readonly monitor?: Monitor;
-    },
-  ) => Promise<string>;
+  readonly sign: (options: {
+    readonly account: UserAccountID;
+    readonly message: string;
+    readonly monitor?: Monitor;
+  }) => Promise<string>;
 }
 
 export interface Provider {
@@ -787,13 +785,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly script: Buffer;
     readonly transfers?: ReadonlyArray<FullTransfer>;
     readonly options?: TransactionOptions;
-    readonly onConfirm: (
-      options: {
-        readonly transaction: Transaction;
-        readonly data: RawInvocationData;
-        readonly receipt: TransactionReceipt;
-      },
-    ) => Promise<T> | T;
+    readonly onConfirm: (options: {
+      readonly transaction: Transaction;
+      readonly data: RawInvocationData;
+      readonly receipt: TransactionReceipt;
+    }) => Promise<T> | T;
     readonly method: string;
     readonly scripts?: ReadonlyArray<WitnessModel>;
     readonly labels?: Labels;
@@ -922,12 +918,10 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly inputs: ReadonlyArray<InputOutput>;
     readonly transaction: TransactionBaseModel;
     readonly from: UserAccountID;
-    readonly onConfirm: (
-      options: {
-        readonly transaction: Transaction;
-        readonly receipt: TransactionReceipt;
-      },
-    ) => Promise<T>;
+    readonly onConfirm: (options: {
+      readonly transaction: Transaction;
+      readonly receipt: TransactionReceipt;
+    }) => Promise<T>;
     readonly sourceMaps?: Promise<SourceMaps>;
     readonly monitor?: Monitor;
   }): Promise<TransactionResult<T, TTransaction>> {

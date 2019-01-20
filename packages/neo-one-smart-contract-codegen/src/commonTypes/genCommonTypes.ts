@@ -15,11 +15,11 @@ export const genCommonTypes = ({
   return {
     ts: `
 ${sortedPaths
-      .map(
-        ({ name, typesPath }) =>
-          `import { ${getSmartContractName(name)} } from '${getRelativeImport(commonTypesPath, typesPath)}'`,
-      )
-      .join('\n')}
+  .map(
+    ({ name, typesPath }) =>
+      `import { ${getSmartContractName(name)} } from '${getRelativeImport(commonTypesPath, typesPath)}'`,
+  )
+  .join('\n')}
 
 export interface Contracts {
   ${sortedPaths.map(({ name }) => `readonly ${lowerCaseFirst(name)}: ${getSmartContractName(name)};`).join('\n  ')}

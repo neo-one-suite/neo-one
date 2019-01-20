@@ -10,30 +10,27 @@ const TooltipBaseComponent = forwardRef<HTMLDivElement, React.ComponentPropsWith
   const myRef = useRef<HTMLDivElement>(null);
   const ref = refIn === null ? myRef : (refIn as React.RefObject<HTMLDivElement>);
   const [visible, setVisible] = useState(false);
-  useEffect(
-    () => {
-      const show = () => setVisible(true);
-      const hide = () => setVisible(false);
-      const node = ref.current;
-      const parentNode = node === null ? undefined : node.parentNode === null ? undefined : node.parentNode;
-      if (parentNode !== undefined && props.visible === undefined) {
-        parentNode.addEventListener('mouseenter', show);
-        parentNode.addEventListener('focus', show);
-        parentNode.addEventListener('mouseleave', hide);
-        parentNode.addEventListener('blur', hide);
-      }
+  useEffect(() => {
+    const show = () => setVisible(true);
+    const hide = () => setVisible(false);
+    const node = ref.current;
+    const parentNode = node === null ? undefined : node.parentNode === null ? undefined : node.parentNode;
+    if (parentNode !== undefined && props.visible === undefined) {
+      parentNode.addEventListener('mouseenter', show);
+      parentNode.addEventListener('focus', show);
+      parentNode.addEventListener('mouseleave', hide);
+      parentNode.addEventListener('blur', hide);
+    }
 
-      return () => {
-        if (parentNode !== undefined && props.visible === undefined) {
-          parentNode.removeEventListener('mouseenter', show);
-          parentNode.removeEventListener('focus', show);
-          parentNode.removeEventListener('mouseleave', hide);
-          parentNode.removeEventListener('blur', hide);
-        }
-      };
-    },
-    [ref, setVisible, props.visible],
-  );
+    return () => {
+      if (parentNode !== undefined && props.visible === undefined) {
+        parentNode.removeEventListener('mouseenter', show);
+        parentNode.removeEventListener('focus', show);
+        parentNode.removeEventListener('mouseleave', hide);
+        parentNode.removeEventListener('blur', hide);
+      }
+    };
+  }, [ref, setVisible, props.visible]);
 
   return <Popover {...props} ref={ref} visible={props.visible === undefined ? visible : props.visible} />;
 });

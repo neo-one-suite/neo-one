@@ -16,7 +16,7 @@ const REQUEST_ERRORS_COUNTER = metrics.createCounter({
 
 export const context = ({ monitor }: { readonly monitor: Monitor }) => async (
   ctx: Context,
-  next: (() => Promise<void>),
+  next: () => Promise<void>,
 ) => {
   await monitor.forContext(ctx).captureSpanLog(
     async (span) => {

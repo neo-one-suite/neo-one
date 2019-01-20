@@ -6,14 +6,14 @@ import { map } from 'rxjs/operators';
 import { KeyNotFoundError } from './errors';
 import { streamToObservable } from './streamToObservable';
 
-type SerializeKey<Key> = ((key: Key) => Buffer);
-type SerializeKeyString<Key> = ((key: Key) => string);
+type SerializeKey<Key> = (key: Key) => Buffer;
+type SerializeKeyString<Key> = (key: Key) => string;
 
 export function createTryGet<Key, Value>({
   get,
 }: {
-  readonly get: ((key: Key) => Promise<Value>);
-}): ((key: Key) => Promise<Value | undefined>) {
+  readonly get: (key: Key) => Promise<Value>;
+}): (key: Key) => Promise<Value | undefined> {
   return async (key: Key): Promise<Value | undefined> => {
     try {
       const result = await get(key);
@@ -36,9 +36,9 @@ export function createTryGetLatest<Key, Value>({
 }: {
   readonly db: LevelUp;
   readonly latestKey: Buffer;
-  readonly deserializeResult: ((latestResult: Buffer) => Key);
-  readonly get: ((key: Key) => Promise<Value>);
-}): (() => Promise<Value | undefined>) {
+  readonly deserializeResult: (latestResult: Buffer) => Key;
+  readonly get: (key: Key) => Promise<Value>;
+}): () => Promise<Value | undefined> {
   return async (): Promise<Value | undefined> => {
     try {
       const result = await db.get(latestKey);
@@ -63,7 +63,7 @@ export function createReadStorage<Key, Value>({
   readonly db: LevelUp;
   readonly serializeKey: SerializeKey<Key>;
   readonly serializeKeyString: SerializeKeyString<Key>;
-  readonly deserializeValue: ((value: Buffer) => Value);
+  readonly deserializeValue: (value: Buffer) => Value;
 }): ReadStorage<Key, Value> {
   const get = async (key: Key): Promise<Value> => {
     try {
@@ -91,7 +91,7 @@ export function createAll$<Value>({
   readonly db: LevelUp;
   readonly minKey: Buffer;
   readonly maxKey: Buffer;
-  readonly deserializeValue: ((value: Buffer) => Value);
+  readonly deserializeValue: (value: Buffer) => Value;
 }): Observable<Value> {
   return streamToObservable(() =>
     db.createValueStream({
@@ -114,7 +114,7 @@ export function createReadAllStorage<Key, Value>({
   readonly serializeKeyString: SerializeKeyString<Key>;
   readonly minKey: Buffer;
   readonly maxKey: Buffer;
-  readonly deserializeValue: ((value: Buffer) => Value);
+  readonly deserializeValue: (value: Buffer) => Value;
 }): ReadAllStorage<Key, Value> {
   const readStorage = createReadStorage({
     db,
@@ -141,9 +141,9 @@ export function createReadGetAllStorage<Key, Keys, Value>({
   readonly db: LevelUp;
   readonly serializeKey: SerializeKey<Key>;
   readonly serializeKeyString: SerializeKeyString<Key>;
-  readonly getMinKey: ((keys: Keys) => Buffer);
-  readonly getMaxKey: ((keys: Keys) => Buffer);
-  readonly deserializeValue: ((value: Buffer) => Value);
+  readonly getMinKey: (keys: Keys) => Buffer;
+  readonly getMaxKey: (keys: Keys) => Buffer;
+  readonly deserializeValue: (value: Buffer) => Value;
 }): ReadGetAllStorage<Key, Keys, Value> {
   const readStorage = createReadStorage({
     db,
@@ -168,8 +168,8 @@ export function createReadGetAllStorage<Key, Keys, Value>({
 export function createTryGetMetadata<Value>({
   get,
 }: {
-  readonly get: (() => Promise<Value>);
-}): (() => Promise<Value | undefined>) {
+  readonly get: () => Promise<Value>;
+}): () => Promise<Value | undefined> {
   return async (): Promise<Value | undefined> => {
     try {
       const result = await get();
@@ -193,7 +193,7 @@ export function createReadMetadataStorage<Value>({
   readonly db: LevelUp;
   readonly key: Buffer;
   readonly keyString: string;
-  readonly deserializeValue: ((value: Buffer) => Value);
+  readonly deserializeValue: (value: Buffer) => Value;
 }): ReadMetadataStorage<Value> {
   const get = async (): Promise<Value> => {
     try {

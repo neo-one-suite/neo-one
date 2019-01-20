@@ -35,18 +35,11 @@ const SidebarListItem = ({ current, section, onClickLink, ...props }: SidebarLis
     section.subsections.some((subsection) => current === subsection.slug),
   );
   const prevCurrent = usePrevious(current);
-  useEffect(
-    () => {
-      if (
-        current !== prevCurrent &&
-        !visible &&
-        section.subsections.some((subsection) => current === subsection.slug)
-      ) {
-        show();
-      }
-    },
-    [current, visible, prevCurrent, show, section],
-  );
+  useEffect(() => {
+    if (current !== prevCurrent && !visible && section.subsections.some((subsection) => current === subsection.slug)) {
+      show();
+    }
+  }, [current, visible, prevCurrent, show, section]);
 
   return (
     <Section

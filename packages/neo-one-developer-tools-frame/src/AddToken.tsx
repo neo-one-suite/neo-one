@@ -19,27 +19,24 @@ export function AddToken(props: {}) {
   const addError = useAddError();
   const [disabled, setDisabled] = useState(false);
   const [address, setAddress] = useState('');
-  const submit = useCallback(
-    () => {
-      setDisabled(true);
-      Promise.resolve()
-        .then(async () => {
-          const network = client.getCurrentNetwork();
-          const decimals = await nep5.getDecimals(client, { [network]: { address } }, network);
-          const smartContract = nep5.createNEP5SmartContract(client, { [network]: { address } }, decimals);
-          const symbol = await smartContract.symbol({ network });
+  const submit = useCallback(() => {
+    setDisabled(true);
+    Promise.resolve()
+      .then(async () => {
+        const network = client.getCurrentNetwork();
+        const decimals = await nep5.getDecimals(client, { [network]: { address } }, network);
+        const smartContract = nep5.createNEP5SmartContract(client, { [network]: { address } }, decimals);
+        const symbol = await smartContract.symbol({ network });
 
-          onChangeTokens(tokens.concat({ network, address, decimals, symbol }));
-          setDisabled(false);
-          setAddress('');
-        })
-        .catch((error) => {
-          addError(error);
-          setDisabled(false);
-        });
-    },
-    [setDisabled, client, address, tokens, onChangeTokens, addError],
-  );
+        onChangeTokens(tokens.concat({ network, address, decimals, symbol }));
+        setDisabled(false);
+        setAddress('');
+      })
+      .catch((error) => {
+        addError(error);
+        setDisabled(false);
+      });
+  }, [setDisabled, client, address, tokens, onChangeTokens, addError]);
   const onChangeAddress = useCallback(
     (event) => {
       setAddress(event.currentTarget.value);

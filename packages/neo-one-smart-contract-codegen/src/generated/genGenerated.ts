@@ -23,14 +23,14 @@ ${createExport(generatedPath, commonTypesPath)}
 ${createExport(generatedPath, reactPath)}
 ${createExport(generatedPath, clientPath)}
 ${_.flatMap(contractsPaths, ({ createContractPath, typesPath, abiPath }) => [createContractPath, typesPath, abiPath])
-    .map((importPath) => createExport(generatedPath, importPath))
-    .join('\n')}
+  .map((importPath) => createExport(generatedPath, importPath))
+  .join('\n')}
 `,
   js: `
 ${createExport(generatedPath, reactPath)}
 ${createExport(generatedPath, clientPath)}
 ${_.flatMap(contractsPaths, ({ createContractPath, abiPath }) => [createContractPath, abiPath])
-    .map((importPath) => createExport(generatedPath, importPath))
-    .join('\n')}
+  .map((importPath) => createExport(generatedPath, importPath))
+  .join('\n')}
 `,
 });

@@ -65,19 +65,18 @@ export interface ExecutionContext {
   readonly blockchain: WriteBlockchain;
   readonly init: ExecutionInit;
   readonly engine: {
-    readonly run: (
-      input: { readonly monitor: Monitor; readonly context: ExecutionContext },
-    ) => Promise<ExecutionContext>;
-    readonly executeScript: (
-      input: {
-        readonly monitor: Monitor;
-        readonly code: Buffer;
-        readonly blockchain: WriteBlockchain;
-        readonly init: ExecutionInit;
-        readonly gasLeft: BN;
-        readonly options?: Options;
-      },
-    ) => Promise<ExecutionContext>;
+    readonly run: (input: {
+      readonly monitor: Monitor;
+      readonly context: ExecutionContext;
+    }) => Promise<ExecutionContext>;
+    readonly executeScript: (input: {
+      readonly monitor: Monitor;
+      readonly code: Buffer;
+      readonly blockchain: WriteBlockchain;
+      readonly init: ExecutionInit;
+      readonly gasLeft: BN;
+      readonly options?: Options;
+    }) => Promise<ExecutionContext>;
   };
   readonly code: Buffer;
   readonly scriptHash: UInt160;

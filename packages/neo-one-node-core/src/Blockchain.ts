@@ -138,23 +138,19 @@ export interface Blockchain extends BlockchainStorage {
   readonly block$: Observable<Block>;
   readonly isPersistingBlock: boolean;
 
-  readonly persistBlock: (
-    options: {
-      readonly monitor?: Monitor;
-      readonly block: Block;
-      readonly unsafe?: boolean;
-    },
-  ) => Promise<void>;
+  readonly persistBlock: (options: {
+    readonly monitor?: Monitor;
+    readonly block: Block;
+    readonly unsafe?: boolean;
+  }) => Promise<void>;
   readonly persistHeaders: (headers: ReadonlyArray<Header>, monitor?: Monitor) => Promise<void>;
 
   readonly verifyBlock: (block: Block, monitor?: Monitor) => Promise<void>;
-  readonly verifyTransaction: (
-    param0: {
-      readonly monitor?: Monitor;
-      readonly transaction: Transaction;
-      readonly memPool?: ReadonlyArray<Transaction>;
-    },
-  ) => Promise<VerifyTransactionResult>;
+  readonly verifyTransaction: (param0: {
+    readonly monitor?: Monitor;
+    readonly transaction: Transaction;
+    readonly memPool?: ReadonlyArray<Transaction>;
+  }) => Promise<VerifyTransactionResult>;
   readonly verifyConsensusPayload: (payload: ConsensusPayload, monitor?: Monitor) => Promise<void>;
 
   readonly getValidators: (

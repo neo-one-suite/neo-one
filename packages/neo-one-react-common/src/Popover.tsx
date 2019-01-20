@@ -64,46 +64,43 @@ const PopoverComponent = forwardRef<HTMLDivElement, PopoverProps & React.Compone
       [setOriginX, setOriginY, setTranslateX, setTranslateY, setPlacement],
     );
 
-    useEffect(
-      () => {
-        const popper = popperRef.current;
-        const popover = ref.current;
-        if (popper === null && popover !== null && popover.parentNode !== null) {
-          const arrow = popover.querySelector(getSelector(PopoverArrow));
+    useEffect(() => {
+      const popper = popperRef.current;
+      const popover = ref.current;
+      if (popper === null && popover !== null && popover.parentNode !== null) {
+        const arrow = popover.querySelector(getSelector(PopoverArrow));
 
-          popperRef.current = new Popper(popover.parentNode as Element, popover, {
-            placement: propPlacement,
-            modifiers: {
-              hide: { enabled: false },
-              applyStyle: { enabled: false },
-              // tslint:disable-next-line strict-boolean-expressions
-              arrow: arrow ? { enabled: !!arrow, element: arrow } : undefined,
-              flip: { enabled: flip, padding: 16 },
-              preventOverflow: {
-                enabled: true,
-                boundariesElement: 'window',
-              },
-              shift: { enabled: shift },
-              offset: { offset: `0, ${gutter}` },
-              setState: {
-                order: 900,
-                enabled: true,
-                fn: modifier,
-              },
+        popperRef.current = new Popper(popover.parentNode as Element, popover, {
+          placement: propPlacement,
+          modifiers: {
+            hide: { enabled: false },
+            applyStyle: { enabled: false },
+            // tslint:disable-next-line strict-boolean-expressions
+            arrow: arrow ? { enabled: !!arrow, element: arrow } : undefined,
+            flip: { enabled: flip, padding: 16 },
+            preventOverflow: {
+              enabled: true,
+              boundariesElement: 'window',
             },
-          });
-        }
+            shift: { enabled: shift },
+            offset: { offset: `0, ${gutter}` },
+            setState: {
+              order: 900,
+              enabled: true,
+              fn: modifier,
+            },
+          },
+        });
+      }
 
-        return () => {
-          const innerPopper = popperRef.current;
-          if (innerPopper !== null) {
-            innerPopper.destroy();
-            popperRef.current = null;
-          }
-        };
-      },
-      [props.visible, propPlacement, flip, shift, gutter, props.children, modifier, ref],
-    );
+      return () => {
+        const innerPopper = popperRef.current;
+        if (innerPopper !== null) {
+          innerPopper.destroy();
+          popperRef.current = null;
+        }
+      };
+    }, [props.visible, propPlacement, flip, shift, gutter, props.children, modifier, ref]);
 
     // tslint:disable-next-line no-any strict-type-predicates
     const defaultPlacement = placement === undefined ? undefined : (placement.replace(/-.+$/, '') as any);

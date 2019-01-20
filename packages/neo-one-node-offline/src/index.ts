@@ -28,7 +28,7 @@ class BlockTransform extends Transform {
   public _transform(
     chunk: Buffer | string,
     encoding: string,
-    callback: ((error: Error | undefined, data?: Buffer | string) => void),
+    callback: (error: Error | undefined, data?: Buffer | string) => void,
   ): void {
     if (typeof chunk === 'string') {
       throw new InvalidBlockTransformEncodingError(

@@ -1,7 +1,7 @@
 import { ReadAllStorage, ReadGetAllStorage, ReadStorage } from '@neo-one/node-core';
 import LRU from 'lru-cache';
 
-type SerializeKeyString<Key> = ((key: Key) => string);
+type SerializeKeyString<Key> = (key: Key) => string;
 
 export function createReadStorage<Key, Value>({
   cache,

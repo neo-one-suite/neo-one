@@ -14,7 +14,7 @@ export const createMonitor = ({
 }): {
   readonly config$: Subject<LogConfig>;
   readonly monitor: Monitor;
-  readonly cleanup: (() => void);
+  readonly cleanup: () => void;
 } => {
   const formats = format.combine(format.timestamp(), format.json());
   const logger = createLogger({

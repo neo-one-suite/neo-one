@@ -95,81 +95,63 @@ export interface Client {
   readonly getAllPlugins: () => Promise<ReadonlyArray<string>>;
   readonly getPlugins$: () => Observable<string>;
   readonly getAllResources$: () => Observable<AllResources>;
-  readonly getResources$: (
-    options: {
-      readonly plugin: string;
-      readonly resourceType: string;
-      readonly options: BaseResourceOptions;
-    },
-  ) => Observable<ReadonlyArray<BaseResource>>;
-  readonly getResource$: (
-    options: {
-      readonly plugin: string;
-      readonly resourceType: string;
-      readonly name: string;
-      readonly options: BaseResourceOptions;
-    },
-  ) => Observable<BaseResource | undefined>;
-  readonly getResource: (
-    options: {
-      readonly plugin: string;
-      readonly resourceType: string;
-      readonly name: string;
-      readonly options: BaseResourceOptions;
-    },
-  ) => Promise<BaseResource | undefined>;
-  readonly createResource$: (
-    options: {
-      readonly plugin: string;
-      readonly resourceType: string;
-      readonly name: string;
-      readonly options: BaseResourceOptions;
-      readonly cancel$: Observable<void>;
-    },
-  ) => Observable<ExecuteTaskListResponse>;
-  readonly createResource: (
-    options: {
-      readonly plugin: string;
-      readonly resourceType: string;
-      readonly name: string;
-      readonly options: BaseResourceOptions;
-      readonly cancel$: Observable<void>;
-    },
-  ) => Promise<BaseResource>;
-  readonly deleteResource$: (
-    options: {
-      readonly plugin: string;
-      readonly resourceType: string;
-      readonly name: string;
-      readonly options: BaseResourceOptions;
-      readonly cancel$: Observable<void>;
-    },
-  ) => Observable<ExecuteTaskListResponse>;
-  readonly startResource$: (
-    options: {
-      readonly plugin: string;
-      readonly resourceType: string;
-      readonly name: string;
-      readonly options: BaseResourceOptions;
-      readonly cancel$: Observable<void>;
-    },
-  ) => Observable<ExecuteTaskListResponse>;
-  readonly stopResource$: (
-    options: {
-      readonly plugin: string;
-      readonly resourceType: string;
-      readonly name: string;
-      readonly options: BaseResourceOptions;
-      readonly cancel$: Observable<void>;
-    },
-  ) => Observable<ExecuteTaskListResponse>;
-  readonly executeTaskList$: (
-    options: {
-      readonly plugin: string;
-      readonly options: object;
-      readonly cancel$: Observable<void>;
-    },
-  ) => Observable<ExecuteTaskListResponse>;
+  readonly getResources$: (options: {
+    readonly plugin: string;
+    readonly resourceType: string;
+    readonly options: BaseResourceOptions;
+  }) => Observable<ReadonlyArray<BaseResource>>;
+  readonly getResource$: (options: {
+    readonly plugin: string;
+    readonly resourceType: string;
+    readonly name: string;
+    readonly options: BaseResourceOptions;
+  }) => Observable<BaseResource | undefined>;
+  readonly getResource: (options: {
+    readonly plugin: string;
+    readonly resourceType: string;
+    readonly name: string;
+    readonly options: BaseResourceOptions;
+  }) => Promise<BaseResource | undefined>;
+  readonly createResource$: (options: {
+    readonly plugin: string;
+    readonly resourceType: string;
+    readonly name: string;
+    readonly options: BaseResourceOptions;
+    readonly cancel$: Observable<void>;
+  }) => Observable<ExecuteTaskListResponse>;
+  readonly createResource: (options: {
+    readonly plugin: string;
+    readonly resourceType: string;
+    readonly name: string;
+    readonly options: BaseResourceOptions;
+    readonly cancel$: Observable<void>;
+  }) => Promise<BaseResource>;
+  readonly deleteResource$: (options: {
+    readonly plugin: string;
+    readonly resourceType: string;
+    readonly name: string;
+    readonly options: BaseResourceOptions;
+    readonly cancel$: Observable<void>;
+  }) => Observable<ExecuteTaskListResponse>;
+  readonly startResource$: (options: {
+    readonly plugin: string;
+    readonly resourceType: string;
+    readonly name: string;
+    readonly options: BaseResourceOptions;
+    readonly cancel$: Observable<void>;
+  }) => Observable<ExecuteTaskListResponse>;
+  readonly stopResource$: (options: {
+    readonly plugin: string;
+    readonly resourceType: string;
+    readonly name: string;
+    readonly options: BaseResourceOptions;
+    readonly cancel$: Observable<void>;
+  }) => Observable<ExecuteTaskListResponse>;
+  readonly executeTaskList$: (options: {
+    readonly plugin: string;
+    readonly options: object;
+    readonly cancel$: Observable<void>;
+  }) => Observable<ExecuteTaskListResponse>;
 }
 
 export interface Binary {
@@ -187,12 +169,7 @@ export interface LogConfig {
 
 export interface CLIArgs {
   readonly monitor: Monitor;
-  readonly shutdown: (
-    options: {
-      readonly exitCode: number;
-      readonly error?: Error;
-    },
-  ) => void;
+  readonly shutdown: (options: { readonly exitCode: number; readonly error?: Error }) => void;
   mutableShutdownFuncs: Array<() => void>;
   readonly logConfig$: Subject<LogConfig>;
   readonly vorpal: Vorpal;
@@ -226,12 +203,7 @@ export interface InteractiveCLI {
   readonly printDescribe: (describeTable: DescribeTable, log?: (value: string) => void) => void;
   readonly printList: (listTable: ListTable, log?: (value: string) => void) => void;
   readonly print: (value: string) => void;
-  readonly getResourceType: (
-    options: {
-      readonly plugin: string;
-      readonly resourceType: string;
-    },
-  ) => ResourceType;
+  readonly getResourceType: (options: { readonly plugin: string; readonly resourceType: string }) => ResourceType;
 }
 
 export interface InteractiveCLIArgs {
@@ -240,30 +212,21 @@ export interface InteractiveCLIArgs {
 
 export type InteractiveCommand = (cliArgs: InteractiveCLIArgs) => Command;
 
-export type CLIHook = (
-  options: {
-    readonly cli: InteractiveCLI;
-    readonly args: Args;
-  },
-) => Promise<void>;
+export type CLIHook = (options: { readonly cli: InteractiveCLI; readonly args: Args }) => Promise<void>;
 
 export interface PortAllocator {
-  readonly allocatePort: (
-    options: {
-      readonly plugin: string;
-      readonly resourceType: string;
-      readonly resource: string;
-      readonly name: string;
-    },
-  ) => number;
-  readonly releasePort: (
-    options: {
-      readonly plugin: string;
-      readonly resourceType: string;
-      readonly resource: string;
-      readonly name?: string;
-    },
-  ) => void;
+  readonly allocatePort: (options: {
+    readonly plugin: string;
+    readonly resourceType: string;
+    readonly resource: string;
+    readonly name: string;
+  }) => number;
+  readonly releasePort: (options: {
+    readonly plugin: string;
+    readonly resourceType: string;
+    readonly resource: string;
+    readonly name?: string;
+  }) => void;
 }
 
 export interface ResourcesManager<
@@ -272,9 +235,10 @@ export interface ResourcesManager<
 > {
   readonly getResource: (options: { readonly name: string; readonly options: ResourceOptions }) => Promise<Resource>;
   readonly getResources$: (options: ResourceOptions) => Observable<ReadonlyArray<Resource>>;
-  readonly getResource$: (
-    options: { readonly name: string; readonly options: ResourceOptions },
-  ) => Observable<Resource | undefined>;
+  readonly getResource$: (options: {
+    readonly name: string;
+    readonly options: ResourceOptions;
+  }) => Observable<Resource | undefined>;
   readonly getResourceAdapter: (name: string) => ResourceAdapter<Resource, ResourceOptions>;
   // tslint:disable-next-line no-any
   readonly masterResourceAdapter: any;
@@ -286,15 +250,14 @@ export interface ResourcesManager<
 
 export interface PluginManager {
   readonly httpServerPort: number;
-  readonly getResourcesManager: (
-    options: { readonly plugin: string; readonly resourceType: string },
-  ) => ResourcesManager;
+  readonly getResourcesManager: (options: {
+    readonly plugin: string;
+    readonly resourceType: string;
+  }) => ResourcesManager;
 }
 
-export type CreateHook = (
-  options: {
-    readonly name: string;
-    readonly options: BaseResourceOptions;
-    readonly pluginManager: PluginManager;
-  },
-) => Task;
+export type CreateHook = (options: {
+  readonly name: string;
+  readonly options: BaseResourceOptions;
+  readonly pluginManager: PluginManager;
+}) => Task;

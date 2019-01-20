@@ -67,31 +67,22 @@ export function Dialog({
 }: Props) {
   const resizeHandler = useContext(ResizeHandlerContext);
   const [visible, showIn, hideIn, toggleIn] = useHidden(false);
-  const show = useCallback(
-    () => {
-      resizeHandler.maximize({ type: 'max', id: 'dialog' });
-      showIn();
-    },
-    [showIn],
-  );
-  const hide = useCallback(
-    () => {
+  const show = useCallback(() => {
+    resizeHandler.maximize({ type: 'max', id: 'dialog' });
+    showIn();
+  }, [showIn]);
+  const hide = useCallback(() => {
+    resizeHandler.minimize('dialog');
+    hideIn();
+  }, [hideIn]);
+  const toggle = useCallback(() => {
+    if (visible) {
       resizeHandler.minimize('dialog');
-      hideIn();
-    },
-    [hideIn],
-  );
-  const toggle = useCallback(
-    () => {
-      if (visible) {
-        resizeHandler.minimize('dialog');
-      } else {
-        resizeHandler.maximize({ type: 'max', id: 'dialog' });
-      }
-      toggleIn();
-    },
-    [visible, toggleIn],
-  );
+    } else {
+      resizeHandler.maximize({ type: 'max', id: 'dialog' });
+    }
+    toggleIn();
+  }, [visible, toggleIn]);
 
   const overlay = { visible, show, hide, toggle };
 

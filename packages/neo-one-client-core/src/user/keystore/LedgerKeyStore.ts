@@ -36,12 +36,7 @@ interface Handler {
 
 interface ConnectedHandler {
   readonly getPublicKey: (account?: number) => Promise<PublicKeyString>;
-  readonly sign: (
-    options: {
-      readonly message: Buffer;
-      readonly account: number;
-    },
-  ) => Promise<Buffer>;
+  readonly sign: (options: { readonly message: Buffer; readonly account: number }) => Promise<Buffer>;
   readonly close: () => Promise<void>;
 }
 
