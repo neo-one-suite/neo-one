@@ -18342,9 +18342,9 @@ tslint-microsoft-contrib@5.2.1:
   dependencies:
     tsutils "^2.27.2 <2.29.0"
 
-tslint-sonarts@1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/tslint-sonarts/-/tslint-sonarts-1.8.0.tgz#80f2e8addd418c3b8807fc0155dec33b5a81e8d1"
+tslint-sonarts@1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/tslint-sonarts/-/tslint-sonarts-1.9.0.tgz#feb593e92db328c0328b430b838adbe65d504de9"
   dependencies:
     immutable "^3.8.2"
 
