@@ -236,7 +236,7 @@
     "tmp": "0.0.33",
     "ts-jest": "23.10.5",
     "ts-loader": "5.3.3",
-    "ts-node": "7.0.1",
+    "ts-node": "8.0.1",
     "tslint": "5.12.1",
     "tslint-clean-code": "0.2.9",
     "tslint-config-prettier": "1.17.0",
