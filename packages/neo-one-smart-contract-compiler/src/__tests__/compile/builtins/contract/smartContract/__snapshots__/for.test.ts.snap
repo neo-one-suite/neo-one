@@ -14,12 +14,12 @@ exports[`SmartContract.for reports error on any parameter 1`] = `
 `;
 
 exports[`SmartContract.for reports error on any properties 1`] = `
-"snippetCode.ts (8,43): Argument of type 'Address' is not assignable to parameter of type 'never'.
+"snippetCode.ts (8,20): Could not infer type. Please add an explicit type annotation.
 
        6 |         }
        7 | 
     >  8 |         const sc = SmartContract.for<Foo>(Address.from('ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW'));
-         |                                           ^
+         |                    ^
        9 |         sc.bar(0);
       10 |       
 "
