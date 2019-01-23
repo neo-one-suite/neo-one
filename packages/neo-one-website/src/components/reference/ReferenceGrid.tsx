@@ -44,7 +44,10 @@ export const ReferenceGrid = ({ content, ...props }: Props) => {
     <Wrapper {...props}>
       <FilterWrapper>
         <TypeFilter selected={typeFilter} onChange={setTypeFilter} />
-        <StyledInput placeholder="Filter" onChange={(event) => setTextFilter(event.target.value)} />
+        <StyledInput
+          placeholder="Filter"
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setTextFilter(event.target.value)}
+        />
       </FilterWrapper>
       <ReferenceLayout>
         {content
