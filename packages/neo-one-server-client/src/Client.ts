@@ -16,7 +16,7 @@ import { ReadError } from './errors';
 
 const packageDefinition = protoLoader.loadSync(proto, {});
 // tslint:disable-next-line no-any
-const { Server } = grpc.loadPackageDefinition(packageDefinition) as any;
+const { Server } = grpc.loadPackageDefinition(packageDefinition);
 
 type GRPCClient = grpc.Client & { readonly [key: string]: any };
 // tslint:disable-next-line readonly-keyword
