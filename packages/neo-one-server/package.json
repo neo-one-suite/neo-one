@@ -4,7 +4,7 @@
   "description": "NEO•ONE Server that NEO•ONE CLI and other clients connect to.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@grpc/proto-loader": "^0.3.0",
+    "@grpc/proto-loader": "^0.4.0",
     "@neo-one/http": "^1.0.1",
     "@neo-one/monitor": "^1.0.1",
     "@neo-one/server-client": "^1.0.1",
@@ -25,7 +25,7 @@
     "@types/lodash": "^4.14.118",
     "@types/toposort": "^2.0.1",
     "fs-extra": "^7.0.1",
-    "grpc": "^1.16.1",
+    "grpc": "^1.18.0",
     "grpc-error": "^1.0.0",
     "koa": "^2.6.2",
     "koa-compose": "^4.1.0",

@@ -413,7 +413,7 @@ const getNEP2Derived = async ({
         if (error != undefined) {
           reject(error);
         } else if (key) {
-          resolve(Buffer.from(key));
+          resolve(Buffer.from([...key]));
         }
       },
     ),
