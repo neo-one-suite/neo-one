@@ -105,12 +105,12 @@ export const rpcServer$ = ({
         router.get(readyMiddleware.name, readyMiddleware.path, readyMiddleware.middleware);
       }
 
-      if (rateLimitOptions !== undefined && rateLimitOptions.enabled) {
-        router.use(rateLimit(rateLimitOptions));
+      if (rateLimitOptions === undefined || rateLimitOptions.enabled) {
+        router.use(rateLimit({ rate: 6000 }));
       }
 
-      if (tooBusyCheckOptions !== undefined && tooBusyCheckOptions.enabled) {
-        router.use(tooBusyCheck(tooBusyCheckOptions));
+      if (tooBusyCheckOptions === undefined || tooBusyCheckOptions.enabled) {
+        router.use(tooBusyCheck());
       }
 
       router.use(cors).post(rpcMiddleware.name, rpcMiddleware.path, rpcMiddleware.middleware);
