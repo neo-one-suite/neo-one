@@ -9,7 +9,7 @@
     "@neo-one/node-core": "^1.0.1",
     "@neo-one/types": "^1.0.1",
     "@neo-one/utils": "^1.0.1",
-    "@types/bn.js": "^4.11.3",
+    "@types/bn.js": "^4.11.4",
     "@types/js-priority-queue": "^0.0.5",
     "@types/lodash": "^4.14.118",
     "bn.js": "^4.11.8",
