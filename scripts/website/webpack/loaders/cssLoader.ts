@@ -1,4 +1,5 @@
 import autoprefixer from 'autoprefixer';
+import cssnano from 'cssnano';
 import ExtractCssChunksPlugin from 'extract-css-chunks-webpack-plugin';
 // @ts-ignore
 import postcssFlexbugsFixes from 'postcss-flexbugs-fixes';
@@ -6,12 +7,13 @@ import { Bundle, Stage } from '../../types';
 import { browsers } from '../browsers';
 
 function initCSSLoader(stage: Stage) {
+  const plugins = stage === 'prod' ? [cssnano] : [];
+
   return [
     {
       loader: 'css-loader',
       options: {
         importLoaders: 1,
-        minimize: stage === 'prod',
         sourceMap: false,
       },
     },
@@ -20,14 +22,15 @@ function initCSSLoader(stage: Stage) {
       options: {
         sourceMap: true,
         ident: 'postcss',
-        plugins: () => [
-          postcssFlexbugsFixes,
-          autoprefixer({
-            browsers,
-            flexbox: 'no-2009', // I'd opt in for this - safari 9 & IE 10.
-            // tslint:disable-next-line no-any
-          } as any),
-        ],
+        plugins: () =>
+          plugins.concat([
+            postcssFlexbugsFixes,
+            autoprefixer({
+              browsers,
+              flexbox: 'no-2009', // I'd opt in for this - safari 9 & IE 10.
+              // tslint:disable-next-line no-any
+            } as any),
+          ]),
       },
     },
   ];
