@@ -16601,9 +16601,9 @@ rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
 
-rxjs-tslint-rules@4.15.1:
-  version "4.15.1"
-  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.15.1.tgz#3522a6e1d25ac823999f50b9942855d1e984e2ee"
+rxjs-tslint-rules@4.16.0:
+  version "4.16.0"
+  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.16.0.tgz#8f148656afc26c97bea43d2fa74bd063c99a51be"
   dependencies:
     "@phenomnomnominal/tsquery" "^3.0.0"
     decamelize "^2.0.0"
