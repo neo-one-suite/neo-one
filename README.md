@@ -1,7 +1,6 @@
 # NEO•ONE
 [![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=shield)](#contributors)
 [![CircleCI](https://circleci.com/gh/neo-one-suite/neo-one.svg?style=shield)](https://circleci.com/gh/neo-one-suite/neo-one)
-[![AppVeyor](https://ci.appveyor.com/api/projects/status/a2k7nqrxp33bxu95/branch/master?svg=true)](https://ci.appveyor.com/project/dicarlo2/neo-one)
 [![codecov](https://codecov.io/gh/neo-one-suite/neo-one/branch/master/graph/badge.svg)](https://codecov.io/gh/neo-one-suite/neo-one)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://neo-one.io/docs/how-to-contribute)
 [![DeepScan grade](https://deepscan.io/api/projects/1846/branches/8291/badge/grade.svg)](https://deepscan.io/dashboard#view=project&pid=1846&bid=8291)
