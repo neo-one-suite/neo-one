@@ -2,7 +2,7 @@
   "dependencies": {
     "@neo-one/react": "1.0.0-preview.3",
     "@neo-one/react-core": "1.0.0-preview.5",
-    "@types/react": "16.7.22",
+    "@types/react": "16.8.0",
     "@types/react-dom": "16.0.11",
     "@types/styled-components": "4.1.6",
     "bignumber.js": "8.0.2",
