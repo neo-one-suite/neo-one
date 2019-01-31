@@ -30,5 +30,5 @@ module.exports = ({ path }) => ({
     '^.+\\.jsx?$': 'babel-jest',
   },
   testEnvironment: `./scripts/${path}/NodeEnvironment.js`,
-  setupTestFrameworkScriptFile: `./scripts/${path}/jestSetup.js`,
+  setupFilesAfterEnv: [`./scripts/${path}/jestSetup.js`],
 });
