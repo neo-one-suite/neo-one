@@ -32,7 +32,7 @@ export interface NEOTrackerRequestOptions {
 export type RequestOptions = NetworkRequestOptions | SourceMapsRequestOptions | NEOTrackerRequestOptions;
 
 export type CodegenLanguage = 'typescript' | 'javascript';
-export type CodegenFramework = 'none' | 'react';
+export type CodegenFramework = 'none' | 'react' | 'angular' | 'vue';
 export interface ProjectConfig {
   readonly paths: {
     readonly contracts: string;
@@ -61,7 +61,7 @@ export const projectConfigSchema: convict.Schema<ProjectConfig> = {
       default: 'typescript',
     },
     framework: {
-      format: ['none', 'react'],
+      format: ['none', 'react', 'angular', 'vue'],
       default: 'none',
     },
   },

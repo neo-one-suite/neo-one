@@ -96,6 +96,8 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
   const testPath = `${generated}/test.ts`;
   const commonTypesPath = `${generated}/types.ts`;
   const reactPath = `${generated}/react.tsx`;
+  const angularPath = `${generated}/angular.service.ts`;
+  const vuePath = `${generated}/vue.js`;
   const clientPath = `${generated}/client.ts`;
   const generatedPath = `${generated}/index.ts`;
 
@@ -150,6 +152,8 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
     testPath,
     commonTypesPath,
     reactPath,
+    angularPath,
+    vuePath,
     clientPath,
     generatedPath,
     localDevNetworkName: constants.LOCAL_NETWORK_NAME,

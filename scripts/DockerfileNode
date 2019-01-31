@@ -60,4 +60,4 @@ RUN yarn build:node
 FROM node:10-stretch-slim
 COPY --from=builder tmp/neo-one/dist/ /tmp/
 WORKDIR /tmp/neo-one
-CMD ["node", "packages/neo-one-node-bin/bin/neo-one-node"]
+ENTRYPOINT ["node", "packages/neo-one-node-bin/bin/neo-one-node"]

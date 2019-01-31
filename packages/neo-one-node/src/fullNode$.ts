@@ -38,12 +38,14 @@ interface TelemetryEnvironment {
 export interface Environment {
   readonly dataPath: string;
   readonly rpc: RPCServerEnvironment;
+  readonly haltAndBackup?: boolean;
   readonly levelDownOptions?: LevelDownOpenOptions;
   readonly node?: NodeEnvironment;
   readonly network?: NetworkEnvironment;
   readonly backup?: BackupEnvironment;
   readonly telemetry?: TelemetryEnvironment;
 }
+
 export interface Options {
   readonly node?: NodeOptions;
   readonly network?: NetworkOptions;

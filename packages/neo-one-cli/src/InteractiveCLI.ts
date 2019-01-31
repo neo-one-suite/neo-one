@@ -29,6 +29,7 @@ import { distinctUntilChanged, map, mergeScan, publishReplay, refCount, switchMa
 import Vorpal, { Args, CommandInstance } from 'vorpal';
 import { commands, createPlugin } from './interactive';
 import { ClientConfig, createBinary, createClientConfig, setupCLI } from './utils';
+import { reportError } from './utils/reportError';
 
 // tslint:disable-next-line readonly-array
 const getTable = (head?: string[]) =>
@@ -64,6 +65,12 @@ interface Sessions {
   // tslint:disable-next-line readonly-keyword
   [plugin: string]: Session;
 }
+
+const shutdownReport = (logFile: string, shutdownCB: () => void) => {
+  reportError(logFile)
+    .then(shutdownCB)
+    .catch(shutdownCB);
+};
 
 export class InteractiveCLI {
   public readonly vorpal: Vorpal;
@@ -323,7 +330,9 @@ export class InteractiveCLI {
 
         this.vorpal.log(`Something went wrong: ${error.message}. Shutting down.`);
 
-        shutdown({ exitCode: 1, error });
+        shutdownReport(paths.log, () => {
+          shutdown({ exitCode: 1, error });
+        });
       },
       complete: () => {
         const message = 'Something went wrong: CLI unexpectedly exited. Shutting down.';
@@ -334,7 +343,9 @@ export class InteractiveCLI {
         });
 
         this.vorpal.log(message);
-        shutdown({ exitCode: 1 });
+        shutdownReport(paths.log, () => {
+          shutdown({ exitCode: 1 });
+        });
       },
     });
 

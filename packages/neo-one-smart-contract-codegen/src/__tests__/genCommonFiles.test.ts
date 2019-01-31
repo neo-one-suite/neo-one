@@ -10,6 +10,8 @@ describe('genCommonFiles', () => {
         commonTypesPath: '/foo/bar/one/generated/types.js',
         testPath: '/foo/bar/one/generated/test.js',
         reactPath: '/foo/bar/one/generated/react.jsx',
+        angularPath: '/foo/bar/one/generated/angular.service.js',
+        vuePath: '/foo/bar/one/generated/vue.js',
         clientPath: '/foo/bar/one/generated/client.js',
         generatedPath: '/foo/bar/one/generated/index.js',
         projectIDPath: '/foo/bar/one/generated/projectID.js',
