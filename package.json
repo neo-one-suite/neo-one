@@ -153,7 +153,7 @@
     "@types/cssnano": "4.0.0",
     "@types/jest": "23.3.13",
     "@types/react": "16.7.22",
-    "@types/styled-components": "4.1.6",
+    "@types/styled-components": "4.1.7",
     "@types/webpack": "4.4.24",
     "@types/webpack-bundle-analyzer": "2.13.0",
     "@types/yargs": "12.0.2",

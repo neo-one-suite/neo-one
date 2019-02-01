@@ -1456,12 +1456,6 @@
     "@ledgerhq/hw-transport" "^4.35.0"
     u2f-api "0.2.7"
 
-"@ledgerhq/hw-transport@^4.32.0":
-  version "4.32.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-4.32.0.tgz#592b9dc51459cb1cd31ce9444cf943f627bc4beb"
-  dependencies:
-    events "^3.0.0"
-
 "@ledgerhq/hw-transport@^4.35.0":
   version "4.35.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-4.35.0.tgz#aa7b851111ed759cd7489fa07a7b34c1773e8314"
@@ -2217,15 +2211,7 @@
     react-lifecycles-compat "^3.0.4"
     warning "^3.0.0"
 
-"@reactivex/ix-es2015-cjs@2.5.1":
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/@reactivex/ix-es2015-cjs/-/ix-es2015-cjs-2.5.1.tgz#4a34f0aeddbee8bc97debe63169693028b1bcc4f"
-  dependencies:
-    "@types/node" "^10.12.18"
-    is-stream "1.1.0"
-    tslib "^1.9.3"
-
-"@reactivex/ix-es2015-cjs@^2.3.5":
+"@reactivex/ix-es2015-cjs@2.3.5":
   version "2.3.5"
   resolved "https://registry.yarnpkg.com/@reactivex/ix-es2015-cjs/-/ix-es2015-cjs-2.3.5.tgz#f50adc537e0c1fa91d68f5870bbc7e3d1ec9d327"
   dependencies:
@@ -2837,10 +2823,6 @@
   version "10.12.9"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.9.tgz#a07bfa74331471e1dc22a47eb72026843f7b95c8"
 
-"@types/node@^10.12.18":
-  version "10.12.18"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.18.tgz#1d3ca764718915584fcd9f6344621b7672665c67"
-
 "@types/npm-package-arg@^6.1.0":
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/@types/npm-package-arg/-/npm-package-arg-6.1.0.tgz#88bdfce72f6a3d5fa1053c8d44d655e7850642e4"
@@ -3191,9 +3173,9 @@
   dependencies:
     "@types/node" "*"
 
-"@types/styled-components@4.1.6":
-  version "4.1.6"
-  resolved "https://registry.yarnpkg.com/@types/styled-components/-/styled-components-4.1.6.tgz#9aa1d47dbc6bae540083869bcc6c639c6e9af0fe"
+"@types/styled-components@4.1.7":
+  version "4.1.7"
+  resolved "https://registry.yarnpkg.com/@types/styled-components/-/styled-components-4.1.7.tgz#fdb59c66616e847106395f4023e452ca78b13033"
   dependencies:
     "@types/node" "*"
     "@types/react" "*"
@@ -10576,7 +10558,7 @@ is-stream-ended@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/is-stream-ended/-/is-stream-ended-0.1.4.tgz#f50224e95e06bce0e356d440a4827cd35b267eda"
 
-is-stream@1.1.0, is-stream@^1.0.0, is-stream@^1.0.1, is-stream@^1.1.0:
+is-stream@^1.0.0, is-stream@^1.0.1, is-stream@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/is-stream/-/is-stream-1.1.0.tgz#12d4a3dd4e68e0b79ceb8dbc84173ae80d91ca44"
 
@@ -16696,7 +16678,6 @@ rx-lite@^3.1.2:
 rxjs-tslint-rules@4.16.2:
   version "4.16.2"
   resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.16.2.tgz#ee5337999f7a42f4b1c7bbe48fcea11be7ac677f"
-  integrity sha512-yX/rG/aqjIZNTv6Ugq9ST43IV+g2a3JY3YwWTA8Q7VY+jGRhoILLWJbvJlL5gwmeT4HZXybpVGEBsZU4NPx15g==
   dependencies:
     "@phenomnomnominal/tsquery" "^3.0.0"
     decamelize "^2.0.0"
@@ -18437,7 +18418,6 @@ ts-loader@5.3.3:
 ts-node@8.0.2:
   version "8.0.2"
   resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-8.0.2.tgz#9ecdf8d782a0ca4c80d1d641cbb236af4ac1b756"
-  integrity sha512-MosTrinKmaAcWgO8tqMjMJB22h+sp3Rd1i4fdoWY4mhBDekOwIAKI/bzmRi7IcbCmjquccYg2gcF6NBkLgr0Tw==
   dependencies:
     arg "^4.1.0"
     diff "^3.1.0"
@@ -19996,7 +19976,6 @@ yn@^2.0.0:
 yn@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.0.0.tgz#0073c6b56e92aed652fbdfd62431f2d6b9a7a091"
-  integrity sha512-+Wo/p5VRfxUgBUGy2j/6KX2mj9AYJWOHuhMjMcbBFc3y54o9/4buK1ksBvuiK01C3kby8DH9lSmJdSxw+4G/2Q==
 
 yup@^0.26.10:
   version "0.26.10"
