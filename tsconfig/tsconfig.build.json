@@ -6,6 +6,8 @@
     "noEmit": false,
     "sourceMap": false,
     "inlineSources": true,
-    "inlineSourceMap": true
+    "inlineSourceMap": true,
+    "declaration": true,
+    "stripInternal": true
   }
 }

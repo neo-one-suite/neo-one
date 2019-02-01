@@ -103,7 +103,6 @@ process.on('uncaughtException', (error) => {
 
 const app = new Application();
 app.proxy = true;
-// $FlowFixMe
 app.silent = true;
 
 app.on('error', appOnError({ monitor }));

@@ -74,7 +74,7 @@ export class NodeMonitor extends MonitorBase {
     app.silent = true;
 
     const monitor = this.at('telemetry');
-    app.on('error', (error) => {
+    app.on('error', (error: Error) => {
       monitor.logError({
         name: 'http_server_request_uncaught_error',
         message: 'Unexpected uncaught request error.',

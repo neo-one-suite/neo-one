@@ -768,7 +768,7 @@ async function addWalletsToKeystore({
 const findContracts = async (current: string): Promise<string> => {
   const exists = await fs.pathExists(path.resolve(current, 'package.json'));
   if (exists) {
-    return path.resolve(current, 'src', 'contracts');
+    return path.resolve(current, current.split(path.sep).some((dir) => dir === 'dist') ? '' : 'src', 'contracts');
   }
 
   return findContracts(path.dirname(current));

@@ -94,6 +94,7 @@ export interface TransactionVerifyOptions {
   readonly memPool?: ReadonlyArray<Transaction>;
 }
 
+/** @internal */
 export function TransactionBase<
   Type extends TransactionType,
   TransactionJSON,

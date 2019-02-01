@@ -35,7 +35,6 @@ export const lambda = (name: string, middleware: Middleware, type: 'get' | 'post
 
   const app = new Application();
   app.proxy = true;
-  // $FlowFixMe
   app.silent = true;
 
   app.on('error', appOnError({ monitor }));

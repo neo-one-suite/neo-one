@@ -9,7 +9,7 @@ import { PopoverArrow } from './PopoverArrow';
 
 const { forwardRef, useCallback, useEffect, useRef, useState } = React;
 
-interface PopoverProps extends HiddenProps {
+export interface PopoverProps extends HiddenProps {
   readonly role?: string;
   readonly hideOnEsc?: boolean;
   readonly placement?: Popper.Placement;
