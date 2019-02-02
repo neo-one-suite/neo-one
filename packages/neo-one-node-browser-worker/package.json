@@ -4,7 +4,7 @@
   "description": "NEO•ONE node browser workers.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@babel/polyfill": "^7.0.0",
+    "@babel/polyfill": "^7.2.5",
     "@neo-one/node-browser": "^1.0.2",
     "@neo-one/worker": "^1.0.1"
   },
