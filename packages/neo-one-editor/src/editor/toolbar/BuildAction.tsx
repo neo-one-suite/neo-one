@@ -15,24 +15,21 @@ interface Props {
 const BuildActionBase = ({ openConsoleOutput, ...props }: Props) => {
   const { engine } = useContext(EditorContext);
   const [loading, setLoading] = useState(false);
-  const onClick = useCallback(
-    () => {
-      openConsoleOutput();
-      setLoading(true);
+  const onClick = useCallback(() => {
+    openConsoleOutput();
+    setLoading(true);
 
-      engine
-        .build()
-        .then(() => {
-          setLoading(false);
-        })
-        .catch((error) => {
-          setLoading(false);
-          // tslint:disable-next-line no-console
-          console.error(error);
-        });
-    },
-    [setLoading, openConsoleOutput, engine],
-  );
+    engine
+      .build()
+      .then(() => {
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        // tslint:disable-next-line no-console
+        console.error(error);
+      });
+  }, [setLoading, openConsoleOutput, engine]);
 
   return (
     <ActionButtonBase

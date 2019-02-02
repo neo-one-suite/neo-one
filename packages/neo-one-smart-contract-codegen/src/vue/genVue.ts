@@ -18,11 +18,11 @@ import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
 import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(vuePath, clientPath)}';
 
 ${contractsPaths
-    .map(
-      ({ name, createContractPath }) =>
-        `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(vuePath, createContractPath)}';`,
-    )
-    .join('\n')}
+  .map(
+    ({ name, createContractPath }) =>
+      `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(vuePath, createContractPath)}';`,
+  )
+  .join('\n')}
 
 class ContractsService {
   constructor() {
@@ -43,11 +43,11 @@ import { createClient, createDeveloperClients, createLocalClients } from '${getR
 import { Contracts } from '${getRelativeImport(vuePath, commonTypesPath)}';
 
 ${contractsPaths
-    .map(
-      ({ name, createContractPath }) =>
-        `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(vuePath, createContractPath)}';`,
-    )
-    .join('\n')}
+  .map(
+    ({ name, createContractPath }) =>
+      `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(vuePath, createContractPath)}';`,
+  )
+  .join('\n')}
 
 export interface DeveloperClients {
   readonly [network: string]: DeveloperClient;

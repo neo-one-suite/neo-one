@@ -23,20 +23,14 @@ export function ToolbarSelector({
 }: any) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [hover, setHover] = useState(false);
-  const onMenuOpen = useCallback(
-    () => {
-      setMenuOpen(true);
-      setHover(false);
-    },
-    [setMenuOpen, setHover],
-  );
-  const onMenuClose = useCallback(
-    () => {
-      setMenuOpen(false);
-      setHover(false);
-    },
-    [setMenuOpen, setHover],
-  );
+  const onMenuOpen = useCallback(() => {
+    setMenuOpen(true);
+    setHover(false);
+  }, [setMenuOpen, setHover]);
+  const onMenuClose = useCallback(() => {
+    setMenuOpen(false);
+    setHover(false);
+  }, [setMenuOpen, setHover]);
   const onMouseEnter = useCallback(() => setHover(true), [setHover]);
   const onMouseLeave = useCallback(() => setHover(false), [setHover]);
 

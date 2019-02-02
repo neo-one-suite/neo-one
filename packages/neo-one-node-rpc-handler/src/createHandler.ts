@@ -25,7 +25,7 @@ export type HandlerResult =
   | undefined
   | void;
 // tslint:disable-next-line no-any
-export type Handler = ((args: ReadonlyArray<any>, monitor: Monitor) => Promise<HandlerResult>);
+export type Handler = (args: ReadonlyArray<any>, monitor: Monitor) => Promise<HandlerResult>;
 
 interface Handlers {
   readonly [method: string]: Handler;

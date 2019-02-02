@@ -29,30 +29,24 @@ export const ToolbarFocusableComponent = forwardRef<HTMLDivElement, Props>(
 
     const [tabIndex, setTabIndex] = useState(propTabIndex);
 
-    const getToolbar = useCallback(
-      () => {
-        if (toolbarRef.current === null && ref.current !== null) {
-          // tslint:disable-next-line:no-object-mutation
-          toolbarRef.current = ref.current.closest(getSelector(Toolbar));
-        }
+    const getToolbar = useCallback(() => {
+      if (toolbarRef.current === null && ref.current !== null) {
+        // tslint:disable-next-line:no-object-mutation
+        toolbarRef.current = ref.current.closest(getSelector(Toolbar));
+      }
 
-        return toolbarRef.current;
-      },
-      [ref, toolbarRef],
-    );
+      return toolbarRef.current;
+    }, [ref, toolbarRef]);
 
-    const getFocusables = useCallback(
-      (): NodeListOf<Focusable> | undefined => {
-        const toolbar = getToolbar();
+    const getFocusables = useCallback((): NodeListOf<Focusable> | undefined => {
+      const toolbar = getToolbar();
 
-        if (toolbar === null) {
-          return undefined;
-        }
+      if (toolbar === null) {
+        return undefined;
+      }
 
-        return toolbar.querySelectorAll(getSelector(ToolbarFocusable)) as NodeListOf<Focusable>;
-      },
-      [getToolbar],
-    );
+      return toolbar.querySelectorAll(getSelector(ToolbarFocusable)) as NodeListOf<Focusable>;
+    }, [getToolbar]);
 
     const getCurrentIndex = useCallback(
       (focusables: NodeListOf<Focusable> | undefined) => {
@@ -72,14 +66,11 @@ export const ToolbarFocusableComponent = forwardRef<HTMLDivElement, Props>(
       [ref],
     );
 
-    const toolbarIsVertical = useCallback(
-      () => {
-        const toolbar = getToolbar();
+    const toolbarIsVertical = useCallback(() => {
+      const toolbar = getToolbar();
 
-        return toolbar !== null && toolbar.getAttribute('aria-orientation') === 'vertical';
-      },
-      [toolbar],
-    );
+      return toolbar !== null && toolbar.getAttribute('aria-orientation') === 'vertical';
+    }, [toolbar]);
 
     const getPreviousFocusable = useCallback((focusables: NodeListOf<Focusable>, currentIndex: number) => {
       const index = currentIndex ? currentIndex - 1 : focusables.length - 1;
@@ -122,26 +113,23 @@ export const ToolbarFocusableComponent = forwardRef<HTMLDivElement, Props>(
 
     const handleFocus = useCallback(() => setTabIndex(0), [setTabIndex]);
 
-    useLayoutEffect(
-      () => {
-        if (firstRender.current && tabIndex === -1) {
-          // tslint:disable-next-line:no-object-mutation
-          firstRender.current = false;
-          setTabIndex(getCurrentIndex(getFocusables()));
-        }
+    useLayoutEffect(() => {
+      if (firstRender.current && tabIndex === -1) {
+        // tslint:disable-next-line:no-object-mutation
+        firstRender.current = false;
+        setTabIndex(getCurrentIndex(getFocusables()));
+      }
 
-        if (!disabled && ref.current !== null) {
-          ref.current.addEventListener('keydown', handleKeyDown);
-        }
+      if (!disabled && ref.current !== null) {
+        ref.current.addEventListener('keydown', handleKeyDown);
+      }
 
-        return () => {
-          if (ref.current !== null) {
-            ref.current.removeEventListener('keydown', handleKeyDown);
-          }
-        };
-      },
-      [tabIndex, disabled, setTabIndex, getCurrentIndex, getFocusables, ref],
-    );
+      return () => {
+        if (ref.current !== null) {
+          ref.current.removeEventListener('keydown', handleKeyDown);
+        }
+      };
+    }, [tabIndex, disabled, setTabIndex, getCurrentIndex, getFocusables, ref]);
 
     return <Box {...props} ref={ref} onFocus={callAll(handleFocus, onFocus)} tabIndex={tabIndex} />;
   },

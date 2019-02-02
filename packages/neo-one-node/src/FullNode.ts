@@ -13,7 +13,7 @@ export class FullNode {
   private mutableSubscription: Subscription | undefined;
   private mutableWatcher: Subscription | undefined;
 
-  public constructor(options: FullNodeOptions, onError?: ((error: Error) => void)) {
+  public constructor(options: FullNodeOptions, onError?: (error: Error) => void) {
     this.options = options;
     this.onError = onError;
   }

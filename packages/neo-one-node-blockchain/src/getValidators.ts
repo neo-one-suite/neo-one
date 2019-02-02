@@ -116,7 +116,7 @@ export const getDescriptorChanges = async ({
   governingTokenHash,
 }: {
   readonly transactions: ReadonlyArray<StateTransaction>;
-  readonly getAccount: ((hash: UInt160) => Promise<Account>);
+  readonly getAccount: (hash: UInt160) => Promise<Account>;
   readonly governingTokenHash: UInt256Hex;
 }): Promise<{
   readonly accountChanges: AccountChanges;
@@ -226,14 +226,14 @@ export const processStateTransaction = async ({
 }: {
   readonly validatorChanges: ValidatorChanges;
   readonly validatorsCountChanges: ValidatorsCountChanges;
-  readonly tryGetValidatorsCount: (() => Promise<ValidatorsCount | undefined>);
-  readonly addValidatorsCount: ((validatorsCount: ValidatorsCount) => Promise<void>);
-  readonly updateValidatorsCount: ((validatorsCount: ValidatorsCount, update: ValidatorsCountUpdate) => Promise<void>);
+  readonly tryGetValidatorsCount: () => Promise<ValidatorsCount | undefined>;
+  readonly addValidatorsCount: (validatorsCount: ValidatorsCount) => Promise<void>;
+  readonly updateValidatorsCount: (validatorsCount: ValidatorsCount, update: ValidatorsCountUpdate) => Promise<void>;
 
-  readonly tryGetValidator: ((key: ValidatorKey) => Promise<Validator | undefined>);
-  readonly addValidator: ((validator: Validator) => Promise<void>);
-  readonly deleteValidator: ((key: ValidatorKey) => Promise<void>);
-  readonly updateValidator: ((validator: Validator, update: ValidatorUpdate) => Promise<Validator>);
+  readonly tryGetValidator: (key: ValidatorKey) => Promise<Validator | undefined>;
+  readonly addValidator: (validator: Validator) => Promise<void>;
+  readonly deleteValidator: (key: ValidatorKey) => Promise<void>;
+  readonly updateValidator: (validator: Validator, update: ValidatorUpdate) => Promise<Validator>;
 }): Promise<void> => {
   const validatorsCount = await tryGetValidatorsCount();
   const mutableValidatorsCountVotes = validatorsCount === undefined ? [] : [...validatorsCount.votes];

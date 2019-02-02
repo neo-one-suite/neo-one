@@ -65,71 +65,62 @@ const HiddenComponent = forwardRef<HTMLDivElement, HiddenProps & React.Component
     const refVisible = useRef(visible);
     refVisible.current = visible;
 
-    const handleTransitionEnd = useCallback(
-      () => {
-        if (unmount && !propVisible) {
-          setTransitioning(false);
+    const handleTransitionEnd = useCallback(() => {
+      if (unmount && !propVisible) {
+        setTransitioning(false);
+      }
+    }, [unmount, propVisible]);
+
+    useEffect(() => {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape' && propVisible && hide) {
+          hide();
         }
-      },
-      [unmount, propVisible],
-    );
+      };
 
-    useEffect(
-      () => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-          if (e.key === 'Escape' && propVisible && hide) {
-            hide();
-          }
-        };
+      const handleClickOutside = (e: MouseEvent) => {
+        const node = ref.current;
 
-        const handleClickOutside = (e: MouseEvent) => {
-          const node = ref.current;
-
-          // tslint:disable-next-line no-any
-          if (node !== null && !node.contains(e.target as any) && propVisible && hide !== undefined) {
-            setTimeout(() => {
-              if (refVisible.current) {
-                hide();
-              }
-            });
-          }
-        };
-
-        if (hideOnEsc) {
-          document.body.addEventListener('keydown', handleKeyDown);
+        // tslint:disable-next-line no-any
+        if (node !== null && !node.contains(e.target as any) && propVisible && hide !== undefined) {
+          setTimeout(() => {
+            if (refVisible.current) {
+              hide();
+            }
+          });
         }
+      };
 
-        if (hideOnClickOutside) {
-          document.body.addEventListener('click', handleClickOutside);
-        }
+      if (hideOnEsc) {
+        document.body.addEventListener('keydown', handleKeyDown);
+      }
 
-        return () => {
-          document.body.removeEventListener('keydown', handleKeyDown);
-          document.body.removeEventListener('click', handleClickOutside);
-        };
-      },
-      [propVisible, hide, ref, refVisible, hideOnEsc, hideOnClickOutside],
-    );
-    useEffect(
-      () => {
-        // tslint:disable-next-line strict-type-predicates
-        if (typeof window !== 'undefined' && unmount && hasTransition(props)) {
-          if (propVisible) {
-            setTransitioning(true);
-            requestAnimationFrame(() => {
-              setTransitioning(false);
-              setVisible(true);
-            });
-          } else {
-            setTransitioning(true);
-            setVisible(false);
-          }
+      if (hideOnClickOutside) {
+        document.body.addEventListener('click', handleClickOutside);
+      }
+
+      return () => {
+        document.body.removeEventListener('keydown', handleKeyDown);
+        document.body.removeEventListener('click', handleClickOutside);
+      };
+    }, [propVisible, hide, ref, refVisible, hideOnEsc, hideOnClickOutside]);
+    useEffect(() => {
+      // tslint:disable-next-line strict-type-predicates
+      if (typeof window !== 'undefined' && unmount && hasTransition(props)) {
+        if (propVisible) {
+          setTransitioning(true);
+          requestAnimationFrame(() => {
+            setTransitioning(false);
+            setVisible(true);
+          });
         } else {
-          setVisible(propVisible);
+          setTransitioning(true);
+          setVisible(false);
         }
-      },
-      [propVisible, setTransitioning, setVisible, ...getTransitionArray(props)],
-    );
+      } else {
+        setVisible(propVisible);
+      }
+    }, [propVisible, setTransitioning, setVisible, ...getTransitionArray(props)]);
 
     if (unmount && !visible && !transitioning) {
       return null;

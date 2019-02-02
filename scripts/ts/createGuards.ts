@@ -155,10 +155,10 @@ export function is${name}(node: ts.Node): node is ts.${getName(name)} {
 import ts from 'typescript';
 
 ${interfacesToSyntaxKinds
-    // tslint:disable-next-line no-unused
-    .filter(([_name, syntaxKinds]) => syntaxKinds.length > 0)
-    .map(([name, syntaxKinds]) => createFunction(name, syntaxKinds))
-    .join('')}
+  // tslint:disable-next-line no-unused
+  .filter(([_name, syntaxKinds]) => syntaxKinds.length > 0)
+  .map(([name, syntaxKinds]) => createFunction(name, syntaxKinds))
+  .join('')}
 `;
 
   const outputFile = path.resolve(appRootDir.get(), 'packages', 'neo-one-ts-utils', 'src', 'guards.ts');

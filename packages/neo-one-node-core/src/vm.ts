@@ -58,12 +58,10 @@ export interface ExecuteScriptsResult {
 }
 
 export interface VMListeners {
-  readonly onNotify?: (
-    options: {
-      readonly args: ReadonlyArray<ContractParameter>;
-      readonly scriptHash: UInt160;
-    },
-  ) => void;
+  readonly onNotify?: (options: {
+    readonly args: ReadonlyArray<ContractParameter>;
+    readonly scriptHash: UInt160;
+  }) => void;
 
   readonly onLog?: (options: { readonly message: string; readonly scriptHash: UInt160 }) => void;
   readonly onMigrateContract?: (options: { readonly from: UInt160; readonly to: UInt160 }) => void;
@@ -74,21 +72,19 @@ export interface VMFeatureSwitches {
   readonly structClone: boolean;
 }
 
-export type ExecuteScripts = (
-  input: {
-    readonly monitor: Monitor;
-    readonly scripts: ReadonlyArray<Script>;
-    readonly blockchain: WriteBlockchain;
-    readonly scriptContainer: ScriptContainer;
-    readonly triggerType: TriggerType;
-    readonly action: ExecutionAction;
-    readonly gas: BN;
-    readonly listeners?: VMListeners;
-    readonly skipWitnessVerify?: boolean;
-    readonly persistingBlock?: Block;
-    readonly vmFeatures: VMFeatureSwitches;
-  },
-) => Promise<ExecuteScriptsResult>;
+export type ExecuteScripts = (input: {
+  readonly monitor: Monitor;
+  readonly scripts: ReadonlyArray<Script>;
+  readonly blockchain: WriteBlockchain;
+  readonly scriptContainer: ScriptContainer;
+  readonly triggerType: TriggerType;
+  readonly action: ExecutionAction;
+  readonly gas: BN;
+  readonly listeners?: VMListeners;
+  readonly skipWitnessVerify?: boolean;
+  readonly persistingBlock?: Block;
+  readonly vmFeatures: VMFeatureSwitches;
+}) => Promise<ExecuteScriptsResult>;
 
 export interface VM {
   readonly executeScripts: ExecuteScripts;

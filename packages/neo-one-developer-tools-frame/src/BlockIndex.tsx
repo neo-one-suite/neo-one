@@ -17,14 +17,11 @@ const IndexWrapper = styled(Box)`
 export function BlockIndex() {
   const addError = useAddError();
   const { block$, developerClient } = useNetworkClients();
-  const onClick = useCallback(
-    () => {
-      if (developerClient !== undefined) {
-        developerClient.runConsensusNow().catch(addError);
-      }
-    },
-    [developerClient, addError],
-  );
+  const onClick = useCallback(() => {
+    if (developerClient !== undefined) {
+      developerClient.runConsensusNow().catch(addError);
+    }
+  }, [developerClient, addError]);
   const index = useStream(
     () =>
       block$.pipe(

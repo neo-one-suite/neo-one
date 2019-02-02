@@ -17,7 +17,7 @@ type ListenOptions =
       readonly host: string;
     };
 
-type Listener = ((request: http.IncomingMessage, response: http.ServerResponse) => void);
+type Listener = (request: http.IncomingMessage, response: http.ServerResponse) => void;
 
 interface HandleServerResult<T extends http.Server | https.Server> {
   readonly server: T | undefined;
@@ -38,7 +38,7 @@ async function handleServer<T extends http.Server | https.Server, TOptions exten
   },
 }: {
   readonly monitor: Monitor;
-  readonly createServer: ((options: TOptions) => T);
+  readonly createServer: (options: TOptions) => T;
   readonly keepAliveTimeout: number;
   readonly options: TOptions;
   readonly app: Application;
@@ -95,7 +95,7 @@ export function createServer$<T extends http.Server | https.Server, TOptions ext
   app$: Observable<Application>,
   keepAliveTimeout$: Observable<number | undefined>,
   options: TOptions,
-  createServer: ((options: TOptions) => T),
+  createServer: (options: TOptions) => T,
 ) {
   return combineLatest(app$, keepAliveTimeout$).pipe(
     mergeScanLatest<[Application, number | undefined], HandleServerResult<T> | undefined>(

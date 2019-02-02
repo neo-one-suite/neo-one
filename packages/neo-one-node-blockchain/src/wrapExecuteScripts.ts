@@ -6,7 +6,7 @@ import {
   InvocationResultSuccess,
 } from '@neo-one/node-core';
 
-export const wrapExecuteScripts = async (execute: (() => Promise<ExecuteScriptsResult>)): Promise<InvocationResult> => {
+export const wrapExecuteScripts = async (execute: () => Promise<ExecuteScriptsResult>): Promise<InvocationResult> => {
   try {
     const result = await execute();
     if (result.state === VMState.Halt) {

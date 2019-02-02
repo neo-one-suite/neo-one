@@ -167,16 +167,16 @@ interface TestCase {
   readonly name: SysCallName;
   readonly result:
     | ReadonlyArray<StackItem>
-    | ((
-        options: { readonly transaction: InvocationTransaction },
-      ) => // tslint:disable-next-line no-any
+    | ((options: {
+        readonly transaction: InvocationTransaction;
+      }) => // tslint:disable-next-line no-any
       ReadonlyArray<StackItem> | ((result: any) => void));
 
   readonly gas: BN;
   readonly args?: ReadonlyArray<Arg>;
   readonly options?: Options;
   // tslint:disable-next-line no-any
-  readonly mock?: ((options: { readonly blockchain: any }) => void);
+  readonly mock?: (options: { readonly blockchain: any }) => void;
   readonly error?: string;
   readonly flags?: Set<flag>;
 }

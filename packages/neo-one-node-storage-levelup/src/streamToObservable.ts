@@ -1,6 +1,6 @@
 import { Observable, Observer } from 'rxjs';
 
-export const streamToObservable = (getStream: (() => NodeJS.ReadableStream)): Observable<Buffer> =>
+export const streamToObservable = (getStream: () => NodeJS.ReadableStream): Observable<Buffer> =>
   Observable.create((observer: Observer<Buffer>) => {
     const stream = getStream();
     let done = false;

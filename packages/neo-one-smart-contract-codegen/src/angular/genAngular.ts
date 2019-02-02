@@ -22,11 +22,11 @@ import { createClient, createDeveloperClients, createLocalClients } from '${getR
   )}';
 
 ${contractsPaths
-    .map(
-      ({ name, createContractPath }) =>
-        `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(angularPath, createContractPath)}';`,
-    )
-    .join('\n')}
+  .map(
+    ({ name, createContractPath }) =>
+      `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(angularPath, createContractPath)}';`,
+  )
+  .join('\n')}
 
 @Injectable({
   providedIn: 'root'
@@ -52,11 +52,11 @@ import { createClient, createDeveloperClients, createLocalClients } from '${getR
 import { Contracts } from '${getRelativeImport(angularPath, commonTypesPath)}';
 
 ${contractsPaths
-    .map(
-      ({ name, createContractPath }) =>
-        `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(angularPath, createContractPath)}';`,
-    )
-    .join('\n')}
+  .map(
+    ({ name, createContractPath }) =>
+      `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(angularPath, createContractPath)}';`,
+  )
+  .join('\n')}
 
 export interface DeveloperClients {
   readonly [network: string]: DeveloperClient;
