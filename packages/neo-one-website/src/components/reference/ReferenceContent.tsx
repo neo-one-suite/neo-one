@@ -9,7 +9,7 @@ interface Props {
 
 export const ReferenceContent = ({ content, ...props }: Props) =>
   content.type === 'referenceItems' ? (
-    <ReferenceGrid content={content.value} {...props} />
+    <ReferenceGrid content={content.value.map((reference) => reference.content.value)} {...props} />
   ) : (
     <ReferencePage content={content.value} />
   );

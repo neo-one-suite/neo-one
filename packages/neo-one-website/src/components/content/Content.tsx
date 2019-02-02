@@ -27,9 +27,17 @@ export interface ReferenceItemContent {
   readonly value: ReferenceItem;
 }
 
+export interface ReferenceItemPageData {
+  readonly title: string;
+  readonly slug: string;
+  readonly content: ReferenceItemContent;
+  readonly current: string;
+  readonly sidebar: ReadonlyArray<SectionData>;
+}
+
 export interface ReferenceItemsContent {
   readonly type: 'referenceItems';
-  readonly value: ReadonlyArray<ReferenceItem>;
+  readonly value: ReadonlyArray<ReferenceItemPageData>;
 }
 
 export type ContentType = MarkdownContent | ReferenceItemContent | ReferenceItemsContent;
