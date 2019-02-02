@@ -21,20 +21,7 @@ class One {
   }
 
   async teardown() {
-    if (this.server === undefined) {
-      return;
-    }
-
-    try {
-      await this._exec('reset --static-neo-one');
-    } catch (error) {
-      this.server.kill('SIGINT');
-      await new Promise((resolve) => setTimeout(() => resolve(), 2500));
-      this.server.kill('SIGTERM');
-    }
-
-    await fs.remove(this.dir.name);
-
+    await this.cleanupServer();
     await this.cleanupTest();
   }
 
@@ -48,6 +35,10 @@ class One {
       return;
     }
 
+    await this.startServer();
+  }
+
+  async startServer(retries = 2) {
     this.dir = tmp.dirSync();
     this.dirName = this.dir.name;
     this.serverPort = _.random(10000, 50000);
@@ -74,7 +65,7 @@ class One {
     };
     this.server.on('exit', exitListener);
 
-    let tries = 60;
+    let tries = 40;
     let ready = false;
     while (!ready && !exited && tries >= 0) {
       await new Promise((resolve) => setTimeout(() => resolve(), 1000));
@@ -93,9 +84,31 @@ class One {
     this.server.removeListener('exit', exitListener);
 
     if (!ready) {
-      await this.teardown();
-      throw new Error(`Failed to start NEO-ONE server.\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}`);
+      if (retries === 0) {
+        await this.teardown();
+        throw new Error(`Failed to start NEO-ONE server.\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}`);
+      } else {
+        await this.cleanupServer();
+        await this.startServer(retries - 1);
+      }
     }
+  }
+
+  async cleanupServer() {
+    if (this.server === undefined) {
+      return;
+    }
+
+    try {
+      await this._exec('reset --static-neo-one');
+    } catch (error) {
+      this.server.kill('SIGINT');
+      await new Promise((resolve) => setTimeout(() => resolve(), 2500));
+      this.server.kill('SIGTERM');
+    }
+    this.server = undefined;
+
+    await fs.remove(this.dir.name);
   }
 
   parseJSON(value) {
