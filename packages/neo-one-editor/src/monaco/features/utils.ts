@@ -22,7 +22,7 @@ export const textSpanToRange = (model: monaco.editor.ITextModel, span: ts.TextSp
 export const getModel = (resource: monaco.Uri | string): monaco.editor.ITextModel | undefined => {
   let uri = resource;
   if (typeof uri === 'string') {
-    uri = new monaco.Uri().with({ path: uri });
+    uri = monaco.Uri.from({ scheme: 'file', path: uri });
   }
 
   const model = monaco.editor.getModel(uri) as monaco.editor.ITextModel | undefined | null;

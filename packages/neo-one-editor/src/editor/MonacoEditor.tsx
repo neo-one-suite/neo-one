@@ -271,7 +271,7 @@ export class MonacoEditor extends React.Component<Props> {
         disposeModel(model);
       }
 
-      model = monaco.editor.createModel(content, modeID, new monaco.Uri().with({ path: file.path }));
+      model = monaco.editor.createModel(content, modeID, monaco.Uri.from({ scheme: 'file', path: file.path }));
       this.mutableCreatedModels.push(model);
       model.updateOptions({
         tabSize: 2,

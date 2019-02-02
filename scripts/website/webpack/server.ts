@@ -13,9 +13,9 @@ export const server = ({ stage }: { readonly stage: Stage }): webpack.Configurat
   addDefaultRules({
     ...common({ stage, bundle: 'server' }),
     resolve: {
-      mainFields: ['module', 'main'],
+      mainFields: ['main'],
       aliasFields: [],
-      extensions: ['.mjs', '.js', '.jsx', '.json', '.ts', '.tsx'],
+      extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
     },
     node: undefined,
     entry:

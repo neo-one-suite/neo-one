@@ -59,7 +59,7 @@ export class Adapter {
         model = monaco.editor.createModel(
           content,
           this.languageID,
-          typeof resource === 'string' ? new monaco.Uri().with({ path: resource }) : resource,
+          typeof resource === 'string' ? monaco.Uri.from({ scheme: 'file', path: resource }) : resource,
         );
         this.mutableCreatedModels.add(model);
 
