@@ -27,7 +27,7 @@
     "@neo-one/types": "^1.0.1",
     "@neo-one/utils": "^1.0.1",
     "@neo-one/worker": "^1.0.1",
-    "@render-props/scrollable": "^0.1.16",
+    "@render-props/scrollable": "^0.1.19",
     "@types/color": "^3.0.0",
     "@types/fs-extra": "^5.0.4",
     "@types/glob": "^7.1.1",
