@@ -2331,7 +2331,7 @@
     react-lifecycles-compat "^3.0.4"
     warning "^3.0.0"
 
-"@reactivex/ix-es2015-cjs@2.3.5":
+"@reactivex/ix-es2015-cjs@2.3.5", "@reactivex/ix-es2015-cjs@2.5.1":
   version "2.3.5"
   resolved "https://registry.yarnpkg.com/@reactivex/ix-es2015-cjs/-/ix-es2015-cjs-2.3.5.tgz#f50adc537e0c1fa91d68f5870bbc7e3d1ec9d327"
   integrity sha512-eZRfTc+xlp5Y1saw2/UxP/pVfmx4v6IS4nn/z6IbCFCukMzhkkFYUVhEuPOAy2QRkxUmbWDWequvD8e3RA7mFA==
