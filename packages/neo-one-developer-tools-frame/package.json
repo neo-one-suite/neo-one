@@ -26,7 +26,7 @@
     "react-dom": "^16.8.0-alpha.1",
     "react-icons": "^3.2.2",
     "react-select": "^2.1.1",
-    "rxjs": "^6.3.3",
+    "rxjs": "^6.4.0",
     "styled-components": "^4.1.1",
     "styled-tools": "^1.6.0",
     "tslib": "^1.9.3"

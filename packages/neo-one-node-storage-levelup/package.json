@@ -10,7 +10,7 @@
     "@neo-one/types": "^1.0.1",
     "@neo-one/utils": "^1.0.1",
     "levelup": "^4.0.0",
-    "rxjs": "^6.3.3",
+    "rxjs": "^6.4.0",
     "tslib": "^1.9.3"
   },
   "sideEffects": false

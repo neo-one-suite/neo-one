@@ -13,7 +13,7 @@
     "koa-bodyparser": "^4.2.1",
     "koa-convert": "^1.2.0",
     "koa-cors": "^0.0.16",
-    "rxjs": "^6.3.3",
+    "rxjs": "^6.4.0",
     "tslib": "^1.9.3"
   },
   "sideEffects": false

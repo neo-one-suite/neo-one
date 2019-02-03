@@ -10,7 +10,7 @@
     "@types/nanoid": "^1.2.0",
     "nanoid": "^2.0.0",
     "pouchdb": "^7.0.0",
-    "rxjs": "^6.3.3"
+    "rxjs": "^6.4.0"
   },
   "sideEffects": false
 }

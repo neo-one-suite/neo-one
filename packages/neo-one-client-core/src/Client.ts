@@ -100,6 +100,34 @@ export interface UserAccountFeatures {
 }
 
 /**
+ * `Client#block$` `Observable` item.
+ */
+export interface BlockEntry {
+  /**
+   * Emitted block.
+   */
+  readonly block: Block;
+  /**
+   * Network of the block.
+   */
+  readonly network: NetworkType;
+}
+
+/**
+ * `Client#accountState$` `Observable` item.
+ */
+export interface AccountStateEntry {
+  /**
+   * Currently selected `UserAccount`
+   */
+  readonly currentUserAccount: UserAccount;
+  /**
+   * Blockchain account info for `currentUserAccount`
+   */
+  readonly account: Account;
+}
+
+/**
  * Main entrypoint to the `@neo-one/client` APIs. The `Client` class abstracts away user accounts and even how those accounts are provided to your dapp, for example, they might come from an extension like NEX, dapp browser like nOS or through some other integration.
  *
  * See the [Client APIs](https://neo-one.io/docs/client-apis) chapter of the main guide for more information.
@@ -149,23 +177,14 @@ export class Client<
    *
    * Immediately emits the latest block/network when subscribed to.
    */
-  public readonly block$: Observable<{
-    readonly block: Block;
-    readonly network: NetworkType;
-  }>;
+  public readonly block$: Observable<BlockEntry>;
 
   /**
    * Emits a value whenever a new user account is selected and whenever a block is persisted to the blockchain.
    *
    * Immediately emits the latest value when subscribed to.
    */
-  public readonly accountState$: Observable<
-    | {
-        readonly currentUserAccount: UserAccount;
-        readonly account: Account;
-      }
-    | undefined
-  >;
+  public readonly accountState$: Observable<AccountStateEntry | undefined>;
 
   public constructor(providersIn: TUserAccountProviders) {
     this.hooks = {
@@ -240,13 +259,13 @@ export class Client<
       switchMap(() =>
         this.currentNetwork$.pipe(
           switchMap((network) =>
-            Observable.create((observer: Observer<Block>) =>
+            new Observable((observer: Observer<Block>) =>
               toObservable(this.getNetworkProvider(network).iterBlocks(network)).subscribe(observer),
             ).pipe(map((block) => ({ block, network }))),
           ),
         ),
       ),
-      multicast(() => new ReplaySubject(1)),
+      multicast(() => new ReplaySubject<BlockEntry>(1)),
       refCount(),
     );
     this.accountState$ = combineLatest(this.currentUserAccount$, this.block$).pipe(
@@ -263,7 +282,7 @@ export class Client<
         return { currentUserAccount, account };
       }),
       distinctUntilChanged((a, b) => _.isEqual(a, b)),
-      multicast(() => new ReplaySubject(1)),
+      multicast(() => new ReplaySubject<AccountStateEntry | undefined>(1)),
       refCount(),
     );
   }

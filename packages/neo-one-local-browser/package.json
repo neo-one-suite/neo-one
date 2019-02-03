@@ -20,7 +20,7 @@
     "nanoid": "^2.0.0",
     "pouchdb": "^7.0.0",
     "pouchdb-utils": "^7.0.0",
-    "rxjs": "^6.3.3",
+    "rxjs": "^6.4.0",
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
     "tslib": "^1.9.3",

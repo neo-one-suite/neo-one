@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { prop } from 'styled-tools';
 // @ts-ignore
 import { WithContracts } from '../one/generated';
-import { getTokenInfo, TokenInfoResult } from './utils';
+import { getTokenInfo } from './utils';
 
 const StyledGrid = styled(Box)`
   display: grid;
@@ -36,7 +36,7 @@ export const ICO = (props: {}) => (
     {/*
       // @ts-ignore */}
     {({ token }) => (
-      <FromStream props={[token]} createStream={() => defer<TokenInfoResult>(async () => getTokenInfo(token))}>
+      <FromStream props={[token]} createStream={() => defer(async () => getTokenInfo(token))}>
         {(value) => (
           <Wrapper>
             <InnerWrapper>

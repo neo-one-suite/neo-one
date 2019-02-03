@@ -22,7 +22,7 @@
     "ip-address": "^5.8.9",
     "lodash": "^4.17.11",
     "lru-cache": "^5.0.0",
-    "rxjs": "^6.3.3",
+    "rxjs": "^6.4.0",
     "tslib": "^1.9.3"
   },
   "sideEffects": false

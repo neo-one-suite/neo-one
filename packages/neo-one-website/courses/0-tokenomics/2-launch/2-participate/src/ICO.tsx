@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import { prop } from 'styled-tools';
 // @ts-ignore
 import { TokenSmartContract, WithContracts } from '../one/generated';
-import { getTokenInfo, handleMint, TokenInfoResult } from './utils';
+import { getTokenInfo, handleMint } from './utils';
 
 const InfoGrid = styled(Box)`
   display: grid;
@@ -85,7 +85,7 @@ export class ICO extends React.Component<Props, State> {
           <FromStream
             props={[client, token]}
             createStream={() =>
-              defer<TokenInfoResult>(async () => {
+              defer(async () => {
                 const userAccount = client.getCurrentUserAccount();
 
                 return getTokenInfo(token, userAccount === undefined ? undefined : userAccount.id.address);

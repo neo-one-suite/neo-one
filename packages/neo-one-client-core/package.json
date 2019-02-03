@@ -18,7 +18,7 @@
     "cross-fetch": "^3.0.1",
     "dataloader": "^1.4.0",
     "lodash": "^4.17.11",
-    "rxjs": "^6.3.3",
+    "rxjs": "^6.4.0",
     "safe-stable-stringify": "^1.1.0",
     "tapable": "^1.1.0",
     "tslib": "^1.9.3"

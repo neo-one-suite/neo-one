@@ -35,7 +35,7 @@
     "mali": "^0.11.0",
     "mali-compose": "^1.2.0",
     "mali-onerror": "^0.2.0",
-    "rxjs": "^6.3.3",
+    "rxjs": "^6.4.0",
     "toposort": "^2.0.2",
     "tslib": "^1.9.3"
   },
