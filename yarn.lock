@@ -2597,9 +2597,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/convict@^4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@types/convict/-/convict-4.2.0.tgz#87ec9c10bfae801f79bf9dfa0f603c064e2fa5fa"
+"@types/convict@^4.2.1":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@types/convict/-/convict-4.2.1.tgz#a827b6447c0afe89950f84be47628fae198dd748"
+  integrity sha512-2cd51m3i0yeY1i3dKxcqJKeS5Q4jZnjP37OseoNeIX1OM0AhmGPuuYmwJ9OqtsU35YrREQxdb2VeX5sM3cwGMQ==
 
 "@types/cookies@*":
   version "0.7.1"
