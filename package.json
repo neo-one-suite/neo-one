@@ -214,7 +214,7 @@
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "postcss-flexbugs-fixes": "4.1.0",
     "postcss-loader": "3.0.0",
-    "prettier": "1.16.3",
+    "prettier": "1.16.4",
     "react": "16.8.0-alpha.1",
     "react-dom": "16.8.0-alpha.1",
     "react-hot-loader": "4.6.5",
