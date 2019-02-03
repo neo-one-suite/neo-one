@@ -7,7 +7,7 @@
   "dependencies": {
     "@neo-one/types": "^1.0.1",
     "@neo-one/utils": "^1.0.1",
-    "@types/koa": "^2.0.47",
+    "@types/koa": "^2.0.48",
     "@types/koa-mount": "^3.0.1",
     "@types/lodash": "^4.14.120",
     "koa": "^2.6.2",
