@@ -44,7 +44,7 @@ client.block$.subscribe(({ block, network }) => {
 
 Tip
 
-If you're using React, check out the `FromStream` component in the [React](/docs/react) advanced guide for a streamlined way to integrate `Observable`s in your application.
+If you're using React, check out the `FromStream` component in the [React](/docs/react) advanced guide for a streamlined way to integrate `Observable`s in your application. If you're using Angular or Vue, check out the [Angular](/docs/angular) or [Vue](/docs/vue) advanced guides for examples with those frameworks.
 
 :::
 
