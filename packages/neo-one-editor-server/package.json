@@ -13,7 +13,7 @@
     "@types/koa-compose": "^3.2.2",
     "@types/koa-compress": "^2.0.8",
     "@types/koa-router": "^7.0.35",
-    "@types/lodash": "^4.14.118",
+    "@types/lodash": "^4.14.120",
     "@types/lru-cache": "^4.1.1",
     "@types/semver": "^5.5.0",
     "@types/tar": "^4.0.0",

@@ -13,7 +13,7 @@
     "@types/bloem": "^0.2.0",
     "@types/bloom-filter": "^0.2.0",
     "@types/ip-address": "^5.8.2",
-    "@types/lodash": "^4.14.118",
+    "@types/lodash": "^4.14.120",
     "@types/lru-cache": "^4.1.1",
     "bloem": "^0.2.4",
     "bloom-filter": "^0.2.0",

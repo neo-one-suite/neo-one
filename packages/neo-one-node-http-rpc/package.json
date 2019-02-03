@@ -15,7 +15,7 @@
     "@types/koa-compress": "^2.0.8",
     "@types/koa-ratelimit-lru": "^1.0.0",
     "@types/koa-router": "^7.0.35",
-    "@types/lodash": "^4.14.118",
+    "@types/lodash": "^4.14.120",
     "@types/toobusy-js": "^0.5.1",
     "cross-fetch": "^3.0.1",
     "koa": "^2.6.2",

@@ -15,7 +15,7 @@
     "@types/ledgerhq__hw-transport": "^4.21.0",
     "@types/ledgerhq__hw-transport-node-hid": "^4.22.0",
     "@types/ledgerhq__hw-transport-u2f": "^4.21.0",
-    "@types/lodash": "^4.14.118",
+    "@types/lodash": "^4.14.120",
     "lodash": "^4.17.11",
     "source-map": "^0.7.3",
     "tslib": "^1.9.3"
