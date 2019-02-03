@@ -2638,9 +2638,10 @@
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@types/elegant-spinner/-/elegant-spinner-1.0.0.tgz#e963397f174929b9194d1ae193a548c7108c5afb"
 
-"@types/elliptic@^6.4.0":
-  version "6.4.0"
-  resolved "https://registry.yarnpkg.com/@types/elliptic/-/elliptic-6.4.0.tgz#eed3bd9dc83184f0f08987c05eb82e58ea7fb5de"
+"@types/elliptic@^6.4.2":
+  version "6.4.2"
+  resolved "https://registry.yarnpkg.com/@types/elliptic/-/elliptic-6.4.2.tgz#29c8ca2f85c798b17ec6883ec449151920e45b3e"
+  integrity sha512-aIhX07nKFHKTw8z5mZcsgbXjTD9pOXVbqtcNUbdhd3YhH5pC94+plnSglrPFhbHgeL2dCTobnb4kn6gtf7UC3A==
   dependencies:
     "@types/bn.js" "*"
 
