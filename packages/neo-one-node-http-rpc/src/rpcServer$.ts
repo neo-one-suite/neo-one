@@ -76,13 +76,15 @@ export const rpcServer$ = ({
     ),
   ).pipe(
     map(([liveHealthCheckOptions, readyHealthCheckOptions, tooBusyCheckOptions, rateLimitOptions]) => {
-      const app = new Application();
+      // tslint:disable-next-line:no-any
+      const app = new Application<any, {}>();
       app.proxy = true;
       app.silent = true;
 
       app.on('error', appOnError({ monitor }));
 
-      const router = new Router();
+      // tslint:disable-next-line:no-any
+      const router = new Router<any, {}>();
 
       const rpcMiddleware = rpc({ blockchain, node });
       router.use(context({ monitor }));

@@ -59,7 +59,8 @@ export class NodeMonitor extends MonitorBase {
   }
 
   public forMessage(message: IncomingMessage): Monitor {
-    const app = new Application();
+    // tslint:disable-next-line:no-any
+    const app = new Application<any, {}>();
     app.proxy = true;
     app.silent = true;
     // tslint:disable-next-line no-any
@@ -69,7 +70,8 @@ export class NodeMonitor extends MonitorBase {
   }
 
   public serveMetrics(port: number): void {
-    const app = new Application();
+    // tslint:disable-next-line:no-any
+    const app = new Application<any, {}>();
     app.proxy = true;
     app.silent = true;
 

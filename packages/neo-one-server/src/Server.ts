@@ -197,12 +197,14 @@ export class Server {
 
     const app$ = new BehaviorSubject(
       (() => {
-        const app = new Application();
+        // tslint:disable-next-line:no-any
+        const app = new Application<any, {}>();
         app.silent = true;
 
         app.on('error', appOnError({ monitor: this.monitor }));
 
-        const router = new Router();
+        // tslint:disable-next-line:no-any
+        const router = new Router<any, {}>();
 
         const rpcMiddleware = rpc({ server: this });
         router.use(httpContext({ monitor: this.monitor }));

@@ -33,12 +33,14 @@ export const lambda = (name: string, middleware: Middleware, type: 'get' | 'post
     },
   });
 
-  const app = new Application();
+  // tslint:disable-next-line:no-any
+  const app = new Application<any, {}>();
   app.proxy = true;
   app.silent = true;
 
   app.on('error', appOnError({ monitor }));
-  const router = new Router();
+  // tslint:disable-next-line:no-any
+  const router = new Router<any, {}>();
 
   router.use(context({ monitor }));
   if (type === 'post') {

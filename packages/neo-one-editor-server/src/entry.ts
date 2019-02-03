@@ -101,13 +101,15 @@ process.on('uncaughtException', (error) => {
   shutdown({ exitCode: 1, error });
 });
 
-const app = new Application();
+// tslint:disable-next-line:no-any
+const app = new Application<any, {}>();
 app.proxy = true;
 app.silent = true;
 
 app.on('error', appOnError({ monitor }));
 
-const router = new Router();
+// tslint:disable-next-line:no-any
+const router = new Router<any, {}>();
 
 router.use(context({ monitor }));
 router.use(cors).post('resolveDependencies', '/resolve', compose([compress(), bodyParser(), resolveMiddleware]));
