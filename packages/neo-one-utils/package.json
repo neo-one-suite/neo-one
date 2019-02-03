@@ -5,7 +5,7 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@types/lodash": "^4.14.120",
-    "change-case": "^3.0.2",
+    "change-case": "^3.1.0",
     "lodash": "^4.17.11",
     "rxjs": "^6.4.0",
     "tslib": "^1.9.3"

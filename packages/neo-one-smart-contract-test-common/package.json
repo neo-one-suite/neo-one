@@ -11,7 +11,7 @@
     "@neo-one/smart-contract-compiler": "^1.0.2",
     "@neo-one/types": "^1.0.1",
     "bignumber.js": "^8.0.2",
-    "change-case": "^3.0.2",
+    "change-case": "^3.1.0",
     "tslib": "^1.9.3"
   },
   "sideEffects": false
