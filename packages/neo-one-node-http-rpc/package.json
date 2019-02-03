@@ -18,7 +18,7 @@
     "@types/lodash": "^4.14.120",
     "@types/toobusy-js": "^0.5.1",
     "cross-fetch": "^3.0.1",
-    "koa": "^2.6.2",
+    "koa": "^2.7.0",
     "koa-compose": "^4.1.0",
     "koa-compress": "^3.0.0",
     "koa-ratelimit-lru": "^1.0.2",
