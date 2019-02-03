@@ -207,7 +207,7 @@ FullNodeOptions): Observable<any> => {
 
       const { cronSchedule } = backupOptions.backup;
 
-      return Observable.create((observer: Observer<{ type: 'start' } | { type: 'backup' }>) => {
+      return new Observable((observer: Observer<{ type: 'start' } | { type: 'backup' }>) => {
         observer.next({ type: 'start' });
         const task = cron.schedule(cronSchedule, () => observer.next({ type: 'backup' }));
 

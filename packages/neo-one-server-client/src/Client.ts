@@ -371,7 +371,7 @@ export class Client {
   }
 
   private makeObservable$(call: any, start?: () => () => void): Observable<any> {
-    return Observable.create((observer: Observer<any>) => {
+    return new Observable((observer: Observer<any>) => {
       call.on('data', (value: any) => {
         observer.next(value);
       });

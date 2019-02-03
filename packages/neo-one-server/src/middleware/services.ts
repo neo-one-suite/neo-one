@@ -18,7 +18,7 @@ import { ResourcesManager } from '../ResourcesManager';
 import { Server } from '../Server';
 
 function makeObservable$<TData>(ctx: Context): Observable<TData> {
-  return Observable.create((observer: Observer<TData>) => {
+  return new Observable((observer: Observer<TData>) => {
     let completed = false;
     (ctx as any).req.on('data', (value: TData) => {
       observer.next(value);

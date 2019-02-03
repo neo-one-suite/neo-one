@@ -14,7 +14,7 @@ export function finalize<T>(
   func: (value: T | undefined) => Promise<void> | void,
 ): (source$: Observable<T>) => Observable<T> {
   return (source$) =>
-    Observable.create((observer: Observer<T>) => {
+    new Observable((observer: Observer<T>) => {
       let lastValue: T | undefined;
       const subscription = source$.subscribe({
         next: (value) => {
@@ -40,7 +40,7 @@ export function finalize<T>(
       });
 
       return subscription;
-    }) as Observable<T>;
+    });
 }
 
 export namespace finalize {

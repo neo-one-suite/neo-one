@@ -7,7 +7,7 @@ import SeamlessImmutable from 'seamless-immutable';
 type Event = 'change';
 
 const watchConfig$ = (file: string): Observable<Event> =>
-  Observable.create((observer: Observer<string>) => {
+  new Observable((observer: Observer<Event>) => {
     // import('chokidar').FSWatcher
     // tslint:disable-next-line no-any
     let watcher: any | undefined;

@@ -2,7 +2,7 @@ import { Observable, Observer } from 'rxjs';
 
 export function onComplete<T>(func: () => void): (source$: Observable<T>) => Observable<T> {
   return (source$) =>
-    Observable.create((observer: Observer<T>) =>
+    new Observable((observer: Observer<T>) =>
       source$.subscribe({
         next: (value) => observer.next(value),
         error: (error) => observer.error(error),
@@ -13,5 +13,5 @@ export function onComplete<T>(func: () => void): (source$: Observable<T>) => Obs
           observer.complete();
         },
       }),
-    ) as Observable<T>;
+    );
 }

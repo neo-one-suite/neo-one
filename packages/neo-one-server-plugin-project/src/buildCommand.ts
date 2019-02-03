@@ -24,8 +24,10 @@ const build = async (
   await handleCLITaskList({ cli, response$, progress, cancel$ });
 };
 
+type Event = 'change';
+
 const watchFiles$ = (dir: string): Observable<Event> =>
-  Observable.create((observer: Observer<string>) => {
+  new Observable((observer: Observer<Event>) => {
     // import('chokidar').FSWatcher
     // tslint:disable-next-line no-any
     let watcher: any | undefined;

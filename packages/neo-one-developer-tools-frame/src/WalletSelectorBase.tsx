@@ -129,7 +129,7 @@ export const getWalletSelectorOptions$ = (
           }),
         ),
       ),
-      multicast(() => new ReplaySubject(1)),
+      multicast(() => new ReplaySubject<ReadonlyArray<WalletSelectorOptionType>>(1)),
       refCount(),
       catchError((error: Error) => {
         addError(error);
