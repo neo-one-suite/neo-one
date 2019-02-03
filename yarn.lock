@@ -2387,11 +2387,13 @@
     "@render-props/throttle" "^0.1.5"
     "@render-props/utils" "^0.2.1"
 
-"@render-props/size-observer@^0.1.14":
-  version "0.1.14"
-  resolved "https://registry.yarnpkg.com/@render-props/size-observer/-/size-observer-0.1.14.tgz#0f740c4099fdf597be6b1474d9fb50e32e1cdf97"
+"@render-props/size-observer@^0.1.17":
+  version "0.1.17"
+  resolved "https://registry.yarnpkg.com/@render-props/size-observer/-/size-observer-0.1.17.tgz#c1a61c1ebc50ad7e3ca257673d42e6a692d192cd"
+  integrity sha512-JKG/0KFEPAT3ev0bF+jDF6SbjDwFVO46t/sKAnSjaIrFyac5MrAZL0MdtUNdP7KEXEtf1ftzupEVnHPHEdhEyw==
   dependencies:
-    "@babel/runtime" "^7.0.0"
+    "@babel/runtime" "^7.3.1"
+    "@babel/runtime-corejs2" "^7.3.1"
     "@render-props/rect" "^0.1.16"
     "@render-props/utils" "^0.2.1"
 
