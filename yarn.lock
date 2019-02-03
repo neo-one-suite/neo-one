@@ -2411,11 +2411,13 @@
     "@babel/runtime" "^7.0.0"
     raf "^3.4.0"
 
-"@render-props/viewport@^0.2.13":
-  version "0.2.13"
-  resolved "https://registry.yarnpkg.com/@render-props/viewport/-/viewport-0.2.13.tgz#78a249ca1912faa1176bc831984ed64d25e1f45e"
+"@render-props/viewport@^0.2.16":
+  version "0.2.16"
+  resolved "https://registry.yarnpkg.com/@render-props/viewport/-/viewport-0.2.16.tgz#a0b258fd6fb583fb5f2ca50ba76f3fc393ae345f"
+  integrity sha512-f4dVL9yBK22y6EGtfHGdxZs+B5q+ZGKMhqjOy//1uHQRNpMGJFSvP+x7bOpexVjllPxpE4mGBbQ3HzlQtJmyQQ==
   dependencies:
-    "@babel/runtime" "^7.0.0"
+    "@babel/runtime" "^7.3.1"
+    "@babel/runtime-corejs2" "^7.3.1"
     "@render-props/events" "^0.1.2"
     "@render-props/rect" "^0.1.11"
     "@render-props/scrollable" "^0.1.11"
