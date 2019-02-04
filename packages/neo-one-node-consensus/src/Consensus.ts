@@ -1,3 +1,4 @@
+/// <reference types="@reactivex/ix-es2015-cjs" />
 import { common, crypto, ECPoint, PrivateKey, UInt160 } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
 import { ConsensusPayload, Node, Transaction } from '@neo-one/node-core';

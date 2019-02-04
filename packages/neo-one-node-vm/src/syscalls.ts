@@ -1,3 +1,4 @@
+/// <reference types="@reactivex/ix-es2015-cjs" />
 import {
   assertContractParameterType,
   assertStorageFlags,
@@ -1225,9 +1226,10 @@ export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
       await checkStorage({ context, hash });
 
       const prefix = args[1].asBuffer();
-      const iterable = AsyncIterableX.from<StorageItem, StorageItem>(
-        context.blockchain.storageItem.getAll$({ hash, prefix }),
-      ).pipe(
+      const iterable = AsyncIterableX.from<StorageItem>(context.blockchain.storageItem.getAll$({ hash, prefix })).pipe<{
+        key: BufferStackItem;
+        value: BufferStackItem;
+      }>(
         asyncMap(({ key, value }) => ({
           key: new BufferStackItem(key),
           value: new BufferStackItem(value),

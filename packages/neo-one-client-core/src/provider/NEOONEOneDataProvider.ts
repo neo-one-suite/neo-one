@@ -1,3 +1,4 @@
+/// <reference types="@reactivex/ix-es2015-cjs" />
 import {
   Account,
   AddressString,
@@ -127,7 +128,7 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
   }
 
   public iterBlocks(options: IterOptions = {}): AsyncIterable<Block> {
-    return AsyncIterableX.from(this.getProvider()).pipe(flatMap((provider) => provider.iterBlocks(options)));
+    return AsyncIterableX.from(this.getProvider()).pipe<Block>(flatMap((provider) => provider.iterBlocks(options)));
   }
 
   public async getBestBlockHash(monitor?: Monitor): Promise<Hash256String> {
@@ -179,7 +180,9 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
   }
 
   public iterActionsRaw(options: IterOptions = {}): AsyncIterable<RawAction> {
-    return AsyncIterableX.from(this.getProvider()).pipe(flatMap((provider) => provider.iterActionsRaw(options)));
+    return AsyncIterableX.from(this.getProvider()).pipe<RawAction>(
+      flatMap((provider) => provider.iterActionsRaw(options)),
+    );
   }
 
   public async call(

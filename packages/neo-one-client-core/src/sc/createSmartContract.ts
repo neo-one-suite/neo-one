@@ -1,3 +1,4 @@
+/// <reference types="@reactivex/ix-es2015-cjs" />
 import {
   ABIEvent,
   ABIFunction,
@@ -389,7 +390,7 @@ export const createSmartContract = ({
     network = client.getCurrentNetwork(),
     ...iterOptions
   }: SmartContractIterOptions = {}): AsyncIterable<RawAction> =>
-    AsyncIterableX.from(client.__iterActionsRaw(network, iterOptions)).pipe(
+    AsyncIterableX.from(client.__iterActionsRaw(network, iterOptions)).pipe<RawAction>(
       filter((action) => action.address === definition.networks[network].address),
     );
 

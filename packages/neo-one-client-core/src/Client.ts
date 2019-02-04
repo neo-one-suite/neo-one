@@ -1,3 +1,4 @@
+/// <reference types="@reactivex/ix-es2015-cjs" />
 // tslint:disable member-ordering readonly-array no-any
 import {
   Account,
@@ -481,7 +482,7 @@ export class Client<
       return provider.iterActionsRaw(network, options);
     }
 
-    return AsyncIterableX.from(provider.iterBlocks(network, options)).pipe(
+    return AsyncIterableX.from(provider.iterBlocks(network, options)).pipe<RawAction>(
       flatMap(async (block) => {
         const actions = _.flatten(
           block.transactions.map((transaction) => {

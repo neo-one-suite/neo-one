@@ -1,3 +1,4 @@
+/// <reference types="@reactivex/ix-es2015-cjs" />
 import {
   Account,
   AccountJSON,
@@ -278,7 +279,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   }
 
   public iterActionsRaw(options: IterOptions = {}): AsyncIterable<RawAction> {
-    return AsyncIterableX.from(this.iterBlocks(options)).pipe(
+    return AsyncIterableX.from(this.iterBlocks(options)).pipe<RawAction>(
       flatMap(async (block) => {
         const actions = _.flatten(
           block.transactions.map((transaction) => {
