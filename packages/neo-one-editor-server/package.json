@@ -19,7 +19,7 @@
     "@types/tar": "^4.0.0",
     "cross-fetch": "^3.0.1",
     "detective": "^5.2.0",
-    "graphlib": "^2.1.5",
+    "graphlib": "^2.1.7",
     "koa": "^2.7.0",
     "koa-compose": "^4.1.0",
     "koa-compress": "^3.0.0",
