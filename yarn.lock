@@ -16431,15 +16431,6 @@ postcss-value-parser@^3.0.0, postcss-value-parser@^3.3.0, postcss-value-parser@^
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postcss@^6.0.14:
-  version "6.0.23"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-6.0.23.tgz#61c82cc328ac60e677645f979054eb98bc0e3324"
-  integrity sha512-soOk1h6J3VMTZtVeVpv15/Hpdl2cBLX3CAw4TAbkpTJiNPk9YP/zWcD1ND+xEtvyuuvKzbxliTOIyvkSeSJ6ag==
-  dependencies:
-    chalk "^2.4.1"
-    source-map "^0.6.1"
-    supports-color "^5.4.0"
-
 postgres-array@~2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/postgres-array/-/postgres-array-2.0.0.tgz#48f8fce054fbc69671999329b8834b772652d82e"
@@ -19540,14 +19531,14 @@ stylelint-config-styled-components@0.1.1:
   resolved "https://registry.yarnpkg.com/stylelint-config-styled-components/-/stylelint-config-styled-components-0.1.1.tgz#b408388d7c687833ab4be4c4e6522d97d2827ede"
   integrity sha512-z5Xz/9GmvxO6e/DLzBMwkB85zHxEEjN6K7Cj80Bi+o/9vR9eS3GX3E9VuMnX9WLFYulqbqLtTapGGY28JBiy9Q==
 
-stylelint-processor-styled-components@1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/stylelint-processor-styled-components/-/stylelint-processor-styled-components-1.5.1.tgz#c3ab94eb0ea234750003ab648f2d3a17f79e1c61"
-  integrity sha512-gDsr2PCwc82lN2RkK2fq108lEIGFqnX0ZB+KVhHn4i+Lisb9W0f9gHChQK8peMo9/DVksb6QYNTLOwCb9OwcKg==
+stylelint-processor-styled-components@1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/stylelint-processor-styled-components/-/stylelint-processor-styled-components-1.5.2.tgz#875e21baa2dd0a0c0d5de082430e47c45c7d14ce"
+  integrity sha512-sjOU/GtTQMR1McdntJWo6Za1wbdl5YuxQwWm5l2Nz6ELYoVI9WJTZbU9DQcvkOGjW3+HEk4ZKBytqFrMJPIx9Q==
   dependencies:
     "@babel/parser" "^7.0.0"
     "@babel/traverse" "^7.0.0"
-    postcss "^6.0.14"
+    postcss "^7.0.0"
 
 stylelint@9.10.1:
   version "9.10.1"
