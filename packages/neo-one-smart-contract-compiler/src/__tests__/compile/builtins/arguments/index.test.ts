@@ -12,7 +12,7 @@ describe('IArguments', () => {
     );
   });
 
-  test('cannot be referenced', async () => {
+  test.skip('cannot be referenced', async () => {
     helpers.compileString(
       `
       const y = () => {
