@@ -39,7 +39,7 @@
     "@types/resolve": "^0.0.8",
     "@types/styled-components": "^4.1.8",
     "@types/webpack": "^4.4.24",
-    "anser": "^1.4.7",
+    "anser": "^1.4.8",
     "color": "^3.1.0",
     "cross-fetch": "^3.0.1",
     "file-loader": "^3.0.0",
