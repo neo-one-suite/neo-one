@@ -3284,9 +3284,10 @@
     "@types/rx-lite-time" "*"
     "@types/rx-lite-virtualtime" "*"
 
-"@types/scrypt-js@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@types/scrypt-js/-/scrypt-js-2.0.1.tgz#bc930aa51ecf1311174bfbbbe9e43ebc42d6f7c8"
+"@types/scrypt-js@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@types/scrypt-js/-/scrypt-js-2.0.2.tgz#bfd8c0e234cb7a38042a8567298a3862f129203a"
+  integrity sha512-U7KFWJEZUoLM89UZeL+2hgBT71var2Q0ANwhKqGJJszBddMSdFuNZwhTj9Y0GKqFqfT8W+EwfUmFB8mQ/OFjpw==
   dependencies:
     "@types/node" "*"
 
