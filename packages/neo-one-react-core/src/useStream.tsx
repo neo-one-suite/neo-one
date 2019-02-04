@@ -1,8 +1,8 @@
 // tslint:disable no-object-mutation
-import { InputIdentityList, useEffect, useMemo, useRef, useState } from 'react';
+import { DependencyList, useEffect, useMemo, useRef, useState } from 'react';
 import { Observable, Subscription } from 'rxjs';
 
-export function useStream<T>(createStream$: () => Observable<T>, props: InputIdentityList, initialValue?: T): T {
+export function useStream<T>(createStream$: () => Observable<T>, props: DependencyList, initialValue?: T): T {
   const subscriptionRef = useRef<Subscription | undefined>(undefined);
   const setValueRef = useRef<((value: T) => void) | undefined>(undefined);
   // Subscribe during the first render in case there is a synchronous result.
