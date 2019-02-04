@@ -6950,17 +6950,13 @@ dataloader@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/dataloader/-/dataloader-1.4.0.tgz#bca11d867f5d3f1b9ed9f737bd15970c65dff5c8"
 
-date-fns@2.0.0-alpha.27:
+date-fns@2.0.0-alpha.27, date-fns@^2.0.0-alpha.27:
   version "2.0.0-alpha.27"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0-alpha.27.tgz#5ecd4204ef0e7064264039570f6e8afbc014481c"
 
 date-fns@^1.27.2:
   version "1.29.0"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-1.29.0.tgz#12e609cdcb935127311d04d33334e2960a2a54e6"
-
-date-fns@^2.0.0-alpha.25:
-  version "2.0.0-alpha.25"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0-alpha.25.tgz#651a5d1f59a01af6cf0371e39b2ae29df5d521ee"
 
 date-now@^0.1.4:
   version "0.1.4"
