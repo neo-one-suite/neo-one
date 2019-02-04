@@ -27,7 +27,7 @@
     "@types/styled-components": "^4.1.8",
     "@types/webpack": "^4.4.24",
     "clipboard": "^2.0.3",
-    "dgeni": "^0.4.10",
+    "dgeni": "^0.4.11",
     "dgeni-packages": "^0.27.0",
     "fs-extra": "^7.0.1",
     "gray-matter": "^4.0.1",
