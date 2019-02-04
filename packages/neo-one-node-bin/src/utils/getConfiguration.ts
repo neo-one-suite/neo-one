@@ -61,6 +61,41 @@ const getSettings = (settings: SettingsEnvironment) => {
   }
 };
 
+const fixArrayVariable = (data?: string | ReadonlyArray<string>) => (typeof data === 'string' ? data.split(',') : data);
+
+// tslint:disable-next-line no-any
+const fixEnvironmentOptions = (options: { [k in string]?: any }) => ({
+  ...options,
+  node: {
+    ...options.node,
+    rpcURLs: options.node !== undefined ? fixArrayVariable(options.node.rpcURLs) : undefined,
+  },
+  network: {
+    ...options.network,
+    seeds: options.network !== undefined ? fixArrayVariable(options.network.seeds) : undefined,
+    peerSeeds: options.network !== undefined ? fixArrayVariable(options.network.peerSeeds) : undefined,
+    externalEndpoints: options.network !== undefined ? fixArrayVariable(options.network.externalEndpoints) : undefined,
+    connectErrorCodes: options.network !== undefined ? fixArrayVariable(options.network.connectErrorCodes) : undefined,
+  },
+  rpc: {
+    ...options.rpc,
+    liveHealthCheck:
+      options.rpc !== undefined && options.rpc.liveHealthCheck !== undefined
+        ? {
+            ...options.rpc.liveHealthCheck,
+            rpcURLs: fixArrayVariable(options.rpc.liveHealthCheck.rpcURLs),
+          }
+        : undefined,
+    readyHealthCheck:
+      options.rpc !== undefined && options.rpc.readyHealthCheck !== undefined
+        ? {
+            ...options.rpc.readyHealthCheck,
+            rpcURLs: fixArrayVariable(options.rpc.readyHealthCheck.rpcURLs),
+          }
+        : undefined,
+  },
+});
+
 const getFreshConfig = (): NodeBinEnvironment => {
   const config = rc('neo_one_node', DEFAULT_CONFIG);
 
@@ -68,7 +103,7 @@ const getFreshConfig = (): NodeBinEnvironment => {
     fullNodeEnvironment: config.environment,
     settingsEnvironment: config.settings,
     monitorEnvironment: config.monitor,
-    options: config.options === undefined ? {} : config.options,
+    options: config.options === undefined ? {} : fixEnvironmentOptions(config.options),
     dumpChainFile: config.dumpChainFile,
     chainFile: config.chainFile,
     configs: config.configs,
