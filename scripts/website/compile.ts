@@ -9,11 +9,15 @@ import webpack from 'webpack';
 import serve from 'webpack-serve';
 import yargs from 'yargs';
 import { createKillProcess } from './createKillProcess';
-import { Bundle } from './types';
 import { overlay, preview, server, SERVER_DIST_DIR, testRunner, tools, workers } from './webpack';
 
-yargs.describe('watch', 'Run in watch mode.').default('watch', false);
-yargs.describe('bundle', 'Bundle to compile.').default('bundle', 'react-static');
+const argv = yargs
+  .boolean('watch')
+  .describe('watch', 'Run in watch mode.')
+  .default('watch', false)
+  .string('bundle')
+  .describe('bundle', 'Bundle to compile.')
+  .default('bundle', 'react-static').argv;
 
 const devStage = process.env.NEO_ONE_PROD === 'true' ? 'prod' : 'dev';
 
@@ -122,7 +126,7 @@ const startReactStatic = () => {
   return createKillProcess(proc);
 };
 
-const createWatch = async (bundle: Bundle) => {
+const createWatch = async (bundle: string) => {
   switch (bundle) {
     case 'react-static':
       return startReactStatic();
@@ -143,7 +147,7 @@ const createWatch = async (bundle: Bundle) => {
   }
 };
 
-const compile = async (bundle: Bundle) => {
+const compile = async (bundle: string) => {
   switch (bundle) {
     case 'workers':
       return compileWorkers();
@@ -178,10 +182,10 @@ Promise.resolve()
       // do nothing
     };
     let done = Promise.resolve();
-    if (yargs.argv.watch) {
-      dispose = await createWatch(yargs.argv.bundle);
+    if (argv.watch) {
+      dispose = await createWatch(argv.bundle);
     } else {
-      done = compile(yargs.argv.bundle).then(() => {
+      done = compile(argv.bundle).then(() => {
         // do nothing with stats
       });
     }

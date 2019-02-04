@@ -4,8 +4,13 @@ import * as path from 'path';
 import yargs from 'yargs';
 import { createKillProcess } from './createKillProcess';
 
-yargs.describe('report', 'Write out test reports.').default('report', false);
-yargs.describe('coverage', 'Write coverage to .nyc_output.').default('coverage', false);
+const argv = yargs
+  .boolean('report')
+  .describe('report', 'Write out test reports.')
+  .default('report', false)
+  .boolean('coverage')
+  .describe('coverage', 'Write coverage to .nyc_output.')
+  .default('coverage', false).argv;
 
 const runCypress = async ({ report, coverage }: { readonly report: boolean; readonly coverage: boolean }) => {
   // tslint:disable-next-line no-unused
@@ -83,7 +88,7 @@ const run = async ({ report, coverage }: { readonly report: boolean; readonly co
   await runCypress({ report, coverage });
 };
 
-run({ report: yargs.argv.report, coverage: yargs.argv.coverage })
+run({ report: argv.report, coverage: argv.coverage })
   .then(() => shutdown(0))
   .catch((error) => {
     console.error(error);
