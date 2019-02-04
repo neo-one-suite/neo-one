@@ -13,7 +13,7 @@
     "@types/env-paths": "^1.0.2",
     "@types/fs-extra": "^5.0.4",
     "@types/rc": "^1.0.0",
-    "@types/seamless-immutable": "^7.1.4",
+    "@types/seamless-immutable": "^7.1.6",
     "chokidar": "^2.0.4",
     "env-paths": "^2.0.0",
     "execa": "^1.0.0",

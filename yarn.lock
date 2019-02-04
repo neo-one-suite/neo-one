@@ -3291,9 +3291,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/seamless-immutable@^7.1.4":
-  version "7.1.4"
-  resolved "https://registry.yarnpkg.com/@types/seamless-immutable/-/seamless-immutable-7.1.4.tgz#1f1ee3e4dd330ca7b00e6c931417a2882212cb69"
+"@types/seamless-immutable@^7.1.6":
+  version "7.1.6"
+  resolved "https://registry.yarnpkg.com/@types/seamless-immutable/-/seamless-immutable-7.1.6.tgz#f578c2b8365f413c84a057263577d6f47f1341d9"
+  integrity sha512-sglWmIH/RIN14Lquz8/vlOyG8hUk4xVUeSnuwFq1bSIygglDUs2WQogjyBjIocjpU+QTfooyxrJZyAvyrfk1XA==
 
 "@types/semver@^5.5.0":
   version "5.5.0"
