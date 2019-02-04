@@ -27,7 +27,7 @@
     "execa": "^1.0.0",
     "fs-extra": "^7.0.1",
     "import-local": "^2.0.0",
-    "inquirer": "^6.2.0",
+    "inquirer": "^6.2.2",
     "log-update": "^2.3.0",
     "ora": "^3.0.0",
     "rxjs": "^6.4.0",
