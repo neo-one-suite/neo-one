@@ -3638,9 +3638,9 @@ abstract-leveldown@^4.0.0, abstract-leveldown@~4.0.0:
   dependencies:
     xtend "~4.0.0"
 
-abstract-leveldown@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-6.0.0.tgz#b57e2398ecf9e393d9077f91967333d4c566813a"
+abstract-leveldown@^6.0.1, abstract-leveldown@~6.0.0, abstract-leveldown@~6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-6.0.1.tgz#2d5dd4c26799a38b7ca52026b3b7e8e5283bd165"
   dependencies:
     level-concat-iterator "~2.0.0"
     xtend "~4.0.0"
@@ -3649,13 +3649,6 @@ abstract-leveldown@~5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-5.0.0.tgz#f7128e1f86ccabf7d2893077ce5d06d798e386c6"
   dependencies:
-    xtend "~4.0.0"
-
-abstract-leveldown@~6.0.0, abstract-leveldown@~6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-6.0.1.tgz#2d5dd4c26799a38b7ca52026b3b7e8e5283bd165"
-  dependencies:
-    level-concat-iterator "~2.0.0"
     xtend "~4.0.0"
 
 accepts@^1.3.5, accepts@~1.3.4, accepts@~1.3.5:
