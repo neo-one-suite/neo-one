@@ -2026,12 +2026,14 @@
   dependencies:
     tslib "^1.8.0"
 
-"@reactivex/ix-esnext-esm@2.3.5":
-  version "2.3.5"
-  resolved "https://registry.yarnpkg.com/@reactivex/ix-esnext-esm/-/ix-esnext-esm-2.3.5.tgz#c62389c6212385ecff152ae2bb0b86dfb47e1988"
-  integrity sha512-fhrkmPeUWFIx/foZvFuSh1b4Vsm9+MxM3xYrjD+q9cpoNd11NMz4RWORqjQ5ZitDkcr7lZ5Y2UJKEP/G00pqJQ==
+"@reactivex/ix-esnext-esm@2.5.1":
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@reactivex/ix-esnext-esm/-/ix-esnext-esm-2.5.1.tgz#8c2b467c3a96856236bceb43a2d9fb7a88519aca"
+  integrity sha512-GH2ai2Td65e7HRcD4LfZz0cmL6a6V/deGJeYAjh3wM9ytzpfz4TQeSnhDDOVu/nHneMImHsdjH0D1CH+7Lc1Hg==
   dependencies:
-    tslib "^1.8.0"
+    "@types/node" "^10.12.18"
+    is-stream "1.1.0"
+    tslib "^1.9.3"
 
 "@render-props/events@^0.1.2":
   version "0.1.12"
