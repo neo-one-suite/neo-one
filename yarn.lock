@@ -3151,9 +3151,10 @@
     "@types/react" "*"
     redux "^4.0.0"
 
-"@types/react-select@^2.0.6", "@types/react-select@^2.0.7":
-  version "2.0.7"
-  resolved "https://registry.yarnpkg.com/@types/react-select/-/react-select-2.0.7.tgz#627e27a40a909aa7c10dc95a44557004ea1121f8"
+"@types/react-select@^2.0.11":
+  version "2.0.11"
+  resolved "https://registry.yarnpkg.com/@types/react-select/-/react-select-2.0.11.tgz#9b2b1fdb12b67a5a617c5f572e15617636cc65af"
+  integrity sha512-kITn4R50eUJCi2YT3JFZS4z5M2SJJqqYiVUX1HyLSFWbHbF6J25ZPKCCXANQrsnQzSrac2XiNpR5oYBif6l93g==
   dependencies:
     "@types/react" "*"
     "@types/react-dom" "*"
