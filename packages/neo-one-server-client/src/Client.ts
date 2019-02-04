@@ -403,7 +403,7 @@ export class Client {
     callback?: (response: any) => T,
   ): Promise<T> {
     return new Promise<T>((resolve, reject) =>
-      (func.bind(this.client) as typeof func)(req, (err, response) => {
+      func.bind(this.client)(req, (err, response) => {
         if (err) {
           reject(err);
         } else {
