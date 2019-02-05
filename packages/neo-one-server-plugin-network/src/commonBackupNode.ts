@@ -60,7 +60,6 @@ export const processArgs = async (
       projectID,
       bucket,
       prefix,
-      writeBytesPerSecond: 50000000,
     };
   } else {
     vorpal.activeCommand.log(`Unknown provider: ${provider}. Valid choices: "mega", "gcloud"`);

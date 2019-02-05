@@ -10,7 +10,6 @@ export interface Options {
   readonly download?: {
     readonly id: string;
     readonly key: string;
-    readonly writeBytesPerSecond: number;
   };
 
   readonly upload?: {
@@ -58,7 +57,7 @@ export class MegaProvider extends Provider {
       return;
     }
 
-    const { id, key, writeBytesPerSecond } = download;
+    const { id, key } = download;
     const { dataPath, tmpPath } = this.environment;
     const downloadPath = path.resolve(tmpPath, 'storage.db.tar.gz');
 
@@ -109,7 +108,6 @@ export class MegaProvider extends Provider {
         extract({
           downloadPath,
           dataPath,
-          writeBytesPerSecond,
         }),
       {
         name: 'neo_restore_extract',
