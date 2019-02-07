@@ -70,7 +70,7 @@
     "styled-components": "^4.1.1",
     "styled-tools": "^1.6.0",
     "ts-node": "^8.0.2",
-    "typescript": "3.3.1",
+    "typescript": "3.3.3",
     "typescript-fsa": "^3.0.0-beta-2",
     "typescript-fsa-reducers": "^1.0.0",
     "webpack": "4.29.3"
