@@ -1,2 +1,2 @@
 // tslint:disable-next-line export-name
-export { Token } from './Token';
+export { NEP5Token } from './NEP5Token';

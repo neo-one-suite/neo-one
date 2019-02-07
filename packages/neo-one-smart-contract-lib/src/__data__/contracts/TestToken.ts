@@ -1,8 +1,8 @@
 import { Address, SmartContract } from '@neo-one/smart-contract';
 // tslint:disable-next-line no-implicit-dependencies
-import { Token } from '@neo-one/smart-contract-lib';
+import { NEP5Token } from '@neo-one/smart-contract-lib';
 
-export class TestToken extends Token(SmartContract) {
+export class TestToken extends NEP5Token(SmartContract) {
   public readonly owner: Address;
   public readonly name: string = 'TestToken';
   public readonly decimals: 8 = 8;
