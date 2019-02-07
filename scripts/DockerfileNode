@@ -57,7 +57,7 @@ COPY packages/neo-one-node/package.json packages/neo-one-node/
 RUN sudo yarn install --non-interactive
 RUN yarn build:node
 
-FROM node:10-stretch-slim
-COPY --from=builder tmp/neo-one/dist/ /tmp/
-WORKDIR /tmp/neo-one
-ENTRYPOINT ["node", "packages/neo-one-node-bin/bin/neo-one-node"]
+FROM node:10-stretch-slim AS production
+RUN mkdir -p neo-one
+COPY --from=builder tmp/neo-one/dist/neo-one/ neo-one/
+ENTRYPOINT ["node", "neo-one/packages/neo-one-node-bin/bin/neo-one-node"]

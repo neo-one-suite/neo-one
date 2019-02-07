@@ -6,7 +6,6 @@ export const extract = async ({
 }: {
   readonly downloadPath: string;
   readonly dataPath: string;
-  readonly writeBytesPerSecond: number;
 }) => {
   await tar.extract({
     file: downloadPath,

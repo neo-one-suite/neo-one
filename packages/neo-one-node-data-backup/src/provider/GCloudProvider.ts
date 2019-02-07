@@ -12,7 +12,6 @@ export interface Options {
   readonly projectID: string;
   readonly bucket: string;
   readonly prefix: string;
-  readonly writeBytesPerSecond: number;
   readonly keepBackupCount?: number;
   readonly maxSizeBytes?: number;
 }
@@ -41,7 +40,7 @@ export class GCloudProvider extends Provider {
 
   public async restore(monitorIn: Monitor): Promise<void> {
     const monitor = monitorIn.at('gcloud_provider');
-    const { prefix, writeBytesPerSecond } = this.options;
+    const { prefix } = this.options;
     const { dataPath, tmpPath } = this.environment;
 
     const { time, files } = await this.getLatestTime();
@@ -65,7 +64,6 @@ export class GCloudProvider extends Provider {
           name: 'neo_restore_download',
         });
     }
-
     await Promise.all(
       fileAndPaths.map(async ({ filePath }) =>
         monitor.withData({ filePath }).captureSpanLog(
@@ -73,7 +71,6 @@ export class GCloudProvider extends Provider {
             extract({
               downloadPath: filePath,
               dataPath,
-              writeBytesPerSecond,
             }),
           { name: 'neo_restore_extract' },
         ),
