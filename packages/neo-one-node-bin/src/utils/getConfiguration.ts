@@ -33,7 +33,7 @@ const DEFAULT_CONFIG = {
     dataPath: envPaths('neo_one_node', { suffix: false }).data,
     rpc: {
       http: {
-        port: 8080,
+        port: process.env.PORT !== undefined ? process.env.PORT : 8080,
         host: 'localhost',
       },
     },
