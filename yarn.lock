@@ -18383,10 +18383,10 @@ rx-lite@^3.1.2:
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
   integrity sha1-Gc5QLKVyZl87ZHsQk5+X/RYV8QI=
 
-rxjs-tslint-rules@4.16.2:
-  version "4.16.2"
-  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.16.2.tgz#ee5337999f7a42f4b1c7bbe48fcea11be7ac677f"
-  integrity sha512-yX/rG/aqjIZNTv6Ugq9ST43IV+g2a3JY3YwWTA8Q7VY+jGRhoILLWJbvJlL5gwmeT4HZXybpVGEBsZU4NPx15g==
+rxjs-tslint-rules@4.17.0:
+  version "4.17.0"
+  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.17.0.tgz#f7db17ec41d0d83b47402e0dafc71f5a406233ae"
+  integrity sha512-LDiLOSxB3+tFhXM4iXaB87izkmOPImByDjR08PsIp5NQfngx0hWW52l63+rJDBs4BFd0Ojwa+RLk09lFLz2JRA==
   dependencies:
     "@phenomnomnominal/tsquery" "^3.0.0"
     decamelize "^2.0.0"
