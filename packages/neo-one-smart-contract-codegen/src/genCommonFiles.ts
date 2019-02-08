@@ -8,7 +8,7 @@ import { genProjectID } from './projectID';
 import { genReact } from './react';
 import { genSourceMaps } from './sourceMaps';
 import { genTest } from './test';
-import { ContractPaths, FileResult } from './type';
+import { CodegenFramework, ContractPaths, FileResult } from './type';
 import { genVue } from './vue';
 
 export interface CommonFilesResult {
@@ -40,6 +40,8 @@ export const genCommonFiles = ({
   httpServerPort,
   sourceMapsPath,
   sourceMaps,
+  framework,
+  browser,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly projectID: string;
@@ -57,15 +59,19 @@ export const genCommonFiles = ({
   readonly httpServerPort: number;
   readonly sourceMapsPath: string;
   readonly sourceMaps: SourceMaps;
+  readonly framework: CodegenFramework;
+  readonly browser: boolean;
 }): CommonFilesResult => {
   const testFile = formatFile(genTest({ contractsPaths, testPath, commonTypesPath }));
   const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }));
-  const sourceMapsFile = formatFile(genSourceMaps({ httpServerPort, sourceMapsPath, projectIDPath, sourceMaps }));
-  const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath }));
-  const angularFile = formatFile(genAngular({ contractsPaths, angularPath, commonTypesPath, clientPath }));
-  const vueFile = formatFile(genVue({ contractsPaths, vuePath, commonTypesPath, clientPath }));
+  const sourceMapsFile = formatFile(
+    genSourceMaps({ httpServerPort, sourceMapsPath, projectIDPath, sourceMaps, browser }),
+  );
+  const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath, browser }));
+  const angularFile = formatFile(genAngular({ contractsPaths, angularPath, commonTypesPath, clientPath, browser }));
+  const vueFile = formatFile(genVue({ contractsPaths, vuePath, commonTypesPath, clientPath, browser }));
   const clientFile = formatFile(
-    genClient({ localDevNetworkName, wallets, networks, clientPath, projectIDPath, httpServerPort }),
+    genClient({ localDevNetworkName, wallets, networks, clientPath, projectIDPath, httpServerPort, browser }),
   );
   const generatedFile = formatFile(
     genGenerated({
@@ -76,6 +82,7 @@ export const genCommonFiles = ({
       vuePath,
       clientPath,
       generatedPath,
+      framework,
     }),
   );
   const projectIDFile = formatFile(genProjectID({ projectID }));

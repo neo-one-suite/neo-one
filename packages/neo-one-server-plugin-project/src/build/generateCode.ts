@@ -16,6 +16,7 @@ export const generateCode = async (
     readonly sourceMap: RawSourceMap;
   },
   networksDefinition: SmartContractNetworksDefinition,
+  browser: boolean,
 ) => {
   const base = path.resolve(project.paths.generated, contractResult.name);
   const sourceMapsPath = getCommonPaths(project).sourceMapsPath;
@@ -29,6 +30,7 @@ export const generateCode = async (
     createContractPath,
     abi: contractResult.abi,
     sourceMapsPath,
+    browser,
   });
 
   await fs.ensureDir(base);

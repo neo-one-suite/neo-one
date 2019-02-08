@@ -17,9 +17,11 @@ interface RPCResult {
  */
 export class Client {
   private readonly port: number;
+  private readonly host: string;
 
-  public constructor(port: number) {
+  public constructor(port: number, host = 'localhost') {
     this.port = port;
+    this.host = host;
   }
 
   public async ready(): Promise<RPCResult> {
@@ -52,7 +54,7 @@ export class Client {
     const headers = {
       'Content-Type': 'application/json',
     };
-    const response = await fetch(`http://localhost:${this.port}/rpc`, {
+    const response = await fetch(`http://${this.host}:${this.port}/rpc`, {
       method: 'POST',
       headers,
       body: JSON.stringify(req),

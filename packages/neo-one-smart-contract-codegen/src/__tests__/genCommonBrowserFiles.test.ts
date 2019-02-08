@@ -27,6 +27,7 @@ describe('genCommonBrowserFiles', () => {
             dev: true,
           },
         ],
+        framework: 'react',
         sourceMaps: {},
       }),
     ).toMatchSnapshot();

@@ -7,7 +7,7 @@ import { genGenerated } from './generated';
 import { genReact } from './react';
 import { genBrowserSourceMaps } from './sourceMaps';
 import { genTest } from './test';
-import { ContractPaths, FileResult } from './type';
+import { CodegenFramework, ContractPaths, FileResult } from './type';
 import { genVue } from './vue';
 
 export interface CommonBrowserFilesResult {
@@ -34,6 +34,7 @@ export const genCommonBrowserFiles = ({
   wallets,
   networks,
   sourceMaps,
+  framework,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly testPath: string;
@@ -47,15 +48,18 @@ export const genCommonBrowserFiles = ({
   readonly wallets: ReadonlyArray<Wallet>;
   readonly networks: ReadonlyArray<NetworkDefinition>;
   readonly sourceMaps: SourceMaps;
+  readonly framework: CodegenFramework;
 }): CommonBrowserFilesResult => {
   const testFile = formatFile(
     genTest({ contractsPaths, testPath, commonTypesPath, mod: '@neo-one/smart-contract-test-browser' }),
   );
   const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }));
   const sourceMapsFile = formatFile(genBrowserSourceMaps({ sourceMaps }));
-  const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath }));
-  const angularFile = formatFile(genAngular({ contractsPaths, angularPath, commonTypesPath, clientPath }));
-  const vueFile = formatFile(genVue({ contractsPaths, vuePath, commonTypesPath, clientPath }));
+  const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath, browser: false }));
+  const angularFile = formatFile(
+    genAngular({ contractsPaths, angularPath, commonTypesPath, clientPath, browser: false }),
+  );
+  const vueFile = formatFile(genVue({ contractsPaths, vuePath, commonTypesPath, clientPath, browser: false }));
   const clientFile = formatFile(genBrowserClient({ localDevNetworkName, wallets, networks }));
   const generatedFile = formatFile(
     genGenerated({
@@ -66,6 +70,7 @@ export const genCommonBrowserFiles = ({
       vuePath,
       clientPath,
       generatedPath,
+      framework,
     }),
   );
 

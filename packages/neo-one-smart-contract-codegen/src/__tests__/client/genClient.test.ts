@@ -21,6 +21,7 @@ describe('genClient', () => {
         projectIDPath: '/foo/bar/one/generated/projectID.js',
         clientPath: '/foo/bar/one/generated/client.js',
         httpServerPort: 40100,
+        browser: false,
       }),
     ).toMatchSnapshot();
   });

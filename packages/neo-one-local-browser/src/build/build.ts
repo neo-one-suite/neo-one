@@ -125,6 +125,7 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
       createContractPath,
       abi: contractResult.abi,
       sourceMapsPath,
+      browser: false,
     });
 
     mutableFiles.push({ path: typesPath, content: typesContents.ts });
@@ -165,6 +166,7 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
     ].concat(wallets),
     networks: [],
     sourceMaps: mutableSourceMaps,
+    framework: 'react',
   });
 
   mutableFiles.push({ path: sourceMapsPath, content: sourceMapsContents.ts });

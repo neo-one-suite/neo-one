@@ -14,3 +14,5 @@ export interface FileResult {
   readonly ts: string;
   readonly js?: string;
 }
+
+export type CodegenFramework = 'none' | 'react' | 'angular' | 'vue';

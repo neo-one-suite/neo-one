@@ -12,6 +12,7 @@ describe('genGenerated', () => {
         vuePath: '/foo/bar/one/generated/vue.js',
         clientPath: '/foo/bar/one/generated/client.js',
         generatedPath: '/foo/bar/one/generated/index.js',
+        framework: 'angular',
       }),
     ).toMatchSnapshot();
   });

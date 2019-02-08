@@ -1,3 +1,4 @@
+import { CodegenFramework } from '@neo-one/smart-contract-codegen';
 import convict from 'convict';
 import * as path from 'path';
 
@@ -32,7 +33,6 @@ export interface NEOTrackerRequestOptions {
 export type RequestOptions = NetworkRequestOptions | SourceMapsRequestOptions | NEOTrackerRequestOptions;
 
 export type CodegenLanguage = 'typescript' | 'javascript';
-export type CodegenFramework = 'none' | 'react' | 'angular' | 'vue';
 export interface ProjectConfig {
   readonly paths: {
     readonly contracts: string;
@@ -41,6 +41,7 @@ export interface ProjectConfig {
   readonly codegen: {
     readonly language: CodegenLanguage;
     readonly framework: CodegenFramework;
+    readonly browser: boolean;
   };
 }
 
@@ -63,6 +64,10 @@ export const projectConfigSchema: convict.Schema<ProjectConfig> = {
     framework: {
       format: ['none', 'react', 'angular', 'vue'],
       default: 'none',
+    },
+    browser: {
+      format: Boolean,
+      default: false,
     },
   },
 };

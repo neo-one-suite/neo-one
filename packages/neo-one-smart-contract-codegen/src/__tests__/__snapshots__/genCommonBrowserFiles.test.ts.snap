@@ -23,6 +23,12 @@ export class ContractsService {
     this.token = createTokenSmartContract(this.client);
     this.ico = createICOSmartContract(this.client);
   }
+
+  setHost(host) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
+  }
 }
 ",
     "ts": "// tslint:disable
@@ -58,6 +64,12 @@ export class ContractsService {
     this.localClients = createLocalClients();
     this.token = createTokenSmartContract(this.client);
     this.ico = createICOSmartContract(this.client);
+  }
+
+  public setHost(host) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
   }
 }
 ",
@@ -216,8 +228,6 @@ export interface Contracts {
     "js": "// tslint:disable
 /* eslint-disable */
 export * from './react';
-export * from './angular.service';
-export * from './vue';
 export * from './client';
 export * from './Token/contract';
 export * from './Token/abi';
@@ -228,8 +238,6 @@ export * from './ICO/abi';
 /* eslint-disable */
 export * from './types';
 export * from './react';
-export * from './angular.service';
-export * from './vue';
 export * from './client';
 export * from './Token/contract';
 export * from './Token/types';
@@ -254,11 +262,12 @@ export const ContractsProvider = ({
   client: clientIn,
   developerClients: developerClientsIn,
   localClients: localClientsIn,
+  host,
   children,
 }) => {
-  const client = clientIn === undefined ? createClient() : clientIn;
-  const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
-  const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+  const client = clientIn === undefined ? createClient(host) : clientIn;
+  const developerClients = developerClientsIn === undefined ? createDeveloperClients(host) : developerClientsIn;
+  const localClients = localClientsIn === undefined ? createLocalClients(host) : localClientsIn;
   DeveloperTools.enable({ client, developerClients, localClients });
 
   return (
@@ -296,6 +305,7 @@ export interface WithClients<TClient extends Client> {
   readonly localClients: {
     readonly [network: string]: LocalClient;
   };
+  readonly host?: string;
 }
 export type ContractsWithClients<TClient extends Client> = Contracts & WithClients<TClient>;
 const Context: any = React.createContext<ContractsWithClients<Client>>(undefined as any);
@@ -307,11 +317,12 @@ export const ContractsProvider = <TClient extends Client>({
   client: clientIn,
   developerClients: developerClientsIn,
   localClients: localClientsIn,
+  host,
   children,
 }: ContractsProviderProps<TClient>) => {
-  const client = clientIn === undefined ? createClient() : clientIn;
-  const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
-  const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+  const client = clientIn === undefined ? createClient(host) : clientIn;
+  const developerClients = developerClientsIn === undefined ? createDeveloperClients(host) : developerClientsIn;
+  const localClients = localClientsIn === undefined ? createLocalClients(host) : localClientsIn;
   DeveloperTools.enable({ client, developerClients, localClients });
 
   return (
@@ -417,6 +428,12 @@ class ContractsService {
     this.token = createTokenSmartContract(this.client);
     this.ico = createICOSmartContract(this.client);
   }
+
+  setHost(host) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
+  }
 }
 
 export const contractsService = new ContractsService();
@@ -450,6 +467,12 @@ class ContractsService {
     this.localClients = createLocalClients();
     this.token = createTokenSmartContract(this.client);
     this.ico = createICOSmartContract(this.client);
+  }
+
+  public setHost(host: string) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
   }
 }
 

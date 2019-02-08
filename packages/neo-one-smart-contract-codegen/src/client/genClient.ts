@@ -8,6 +8,7 @@ export const genClient = ({
   clientPath,
   projectIDPath,
   httpServerPort,
+  browser,
 }: {
   readonly localDevNetworkName: string;
   readonly wallets: ReadonlyArray<Wallet>;
@@ -15,6 +16,7 @@ export const genClient = ({
   readonly clientPath: string;
   readonly projectIDPath: string;
   readonly httpServerPort: number;
+  readonly browser: boolean;
 }) => {
   const mutableImports = [
     'Client',
@@ -33,7 +35,7 @@ export const genClient = ({
 
   return {
     js: `
-import { ${mutableImports.join(', ')} } from '@neo-one/client';
+import { ${mutableImports.join(', ')} } from '@neo-one/client${browser ? '-browserify' : ''}';
 import { projectID } from '${getRelativeImport(clientPath, projectIDPath)}';
 
 const getDefaultUserAccountProviders = (provider) => ({
@@ -46,7 +48,14 @@ const getDefaultUserAccountProviders = (provider) => ({
 const isLocalUserAccountProvider = (userAccountProvider) =>
   userAccountProvider instanceof LocalUserAccountProvider;
 
-export const createClient = (getUserAccountProviders = getDefaultUserAccountProviders) => {
+export const createClient = (getUserAccountProvidersOrHost) => {
+  let getUserAccountProviders = getDefaultUserAccountProviders;
+  let host = 'localhost'
+  if (typeof getUserAccountProvidersOrHost === 'string') {
+    host = getUserAccountProvidersOrHost;
+  } else if (getUserAccountProvidersOrHost !== undefined) {
+    getUserAccountProviders = getUserAccountProvidersOrHost;
+  }
   const providers = [
     ${networks
       .filter(({ name }) => name !== localDevNetworkName)
@@ -54,7 +63,7 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
       .join('\n    ')}
   ];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, port: ${httpServerPort} }));
+    providers.push(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, host, port: ${httpServerPort} }));
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
@@ -83,18 +92,18 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
   return new Client(userAccountProviders);
 };
 
-export const createDeveloperClients = () => ({${networks
+export const createDeveloperClients = (host = 'localhost') => ({${networks
       .filter(({ name, dev }) => dev && name !== localDevNetworkName)
       .map(
         ({ name, rpcURL }) =>
           `\n  '${name}': new DeveloperClient(new NEOONEDataProvider({ network: '${name}', rpcURL: '${rpcURL}' })),`,
       )
       .join('')}
-  '${localDevNetworkName}': new DeveloperClient(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, port: ${httpServerPort} })),
+  '${localDevNetworkName}': new DeveloperClient(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, host, port: ${httpServerPort} })),
 });
 
-export const createLocalClients = () => {
-  const client = new OneClient(${httpServerPort});
+export const createLocalClients = (host = 'localhost') => {
+  const client = new OneClient(${httpServerPort}, host);
   return {
     '${localDevNetworkName}': {
       getNEOTrackerURL: async () => {
@@ -121,7 +130,9 @@ export const createLocalClients = () => {
     ts: `
 import { ${mutableImports.join(
       ', ',
-    )}, LocalClient, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client';
+    )}, LocalClient, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client${
+      browser ? '-browserify' : ''
+    }';
 import { projectID } from '${getRelativeImport(clientPath, projectIDPath)}';
 
 export type DefaultUserAccountProviders = {
@@ -138,8 +149,15 @@ const isLocalUserAccountProvider = (userAccountProvider: UserAccountProvider): u
   userAccountProvider instanceof LocalUserAccountProvider;
 
 export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
-  getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders as any,
+  getUserAccountProvidersOrHost?: string | ((provider: NEOONEProvider) => TUserAccountProviders),
 ): Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never, TUserAccountProviders> => {
+  let getUserAccountProviders = getDefaultUserAccountProviders as any;
+  let host = 'localhost'
+  if (typeof getUserAccountProvidersOrHost === 'string') {
+    host = getUserAccountProvidersOrHost;
+  } else if (getUserAccountProvidersOrHost !== undefined) {
+    getUserAccountProviders = getUserAccountProvidersOrHost;
+  }
   const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [
     ${networks
       .filter(({ name }) => name !== localDevNetworkName)
@@ -147,7 +165,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
       .join('\n    ')}
   ];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, port: ${httpServerPort} }));
+    providers.push(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, host, port: ${httpServerPort} }));
   }
   const provider = new NEOONEProvider(providers);
 
@@ -177,18 +195,18 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
   return new Client(userAccountProviders);
 }
 
-export const createDeveloperClients = (): { [network: string]: DeveloperClient } => ({${networks
+export const createDeveloperClients = (host = 'localhost'): { [network: string]: DeveloperClient } => ({${networks
       .filter(({ name, dev }) => dev && name !== localDevNetworkName)
       .map(
         ({ name, rpcURL }) =>
           `\n  '${name}': new DeveloperClient(new NEOONEDataProvider({ network: '${name}', rpcURL: '${rpcURL}' })),`,
       )
       .join('')}
-  '${localDevNetworkName}': new DeveloperClient(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, port: ${httpServerPort} })),
+  '${localDevNetworkName}': new DeveloperClient(new NEOONEOneDataProvider({ network: '${localDevNetworkName}', projectID, host, port: ${httpServerPort} })),
 });
 
-export const createLocalClients = (): { [network: string]: LocalClient } => {
-  const client = new OneClient(${httpServerPort});
+export const createLocalClients = (host = 'localhost'): { [network: string]: LocalClient } => {
+  const client = new OneClient(${httpServerPort}, host);
   return {
     '${localDevNetworkName}': {
       getNEOTrackerURL: async () => {

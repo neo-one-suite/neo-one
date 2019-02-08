@@ -317,13 +317,14 @@ export const build = (
                           const project = getProjectConfig(ctx);
                           const networksDefinition = getSmartContractNetworksDefinitions(ctx)[contract.name];
 
-                          await generateCode(project, contract, networksDefinition);
+                          await generateCode(project, contract, networksDefinition, project.codegen.browser);
                         },
                       }))
                       .concat([
                         {
                           title: 'Generate common code',
                           task: async () => {
+                            const project = getProjectConfig(ctx);
                             await generateCommonCode(
                               getProjectConfig(ctx),
                               getProjectID(ctx),
@@ -339,6 +340,7 @@ export const build = (
                               getNetworkDefinitions(ctx),
                               pluginManager.httpServerPort,
                               getSourceMaps(ctx),
+                              project.codegen.browser,
                             );
                           },
                         },
