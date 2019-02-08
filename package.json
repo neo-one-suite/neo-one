@@ -218,7 +218,7 @@
     "react": "16.8.1",
     "react-dom": "16.8.1",
     "react-hot-loader": "4.6.5",
-    "react-static": "6.3.4",
+    "react-static": "6.3.5",
     "rollup": "1.1.2",
     "rollup-plugin-string": "2.0.2",
     "rollup-plugin-typescript2": "0.19.2",
