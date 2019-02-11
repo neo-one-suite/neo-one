@@ -4,7 +4,7 @@
   "description": "NEO•ONE client common code.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/ec-key": "^0.0.3",
+    "@neo-one/ec-key": "^0.0.4",
     "@neo-one/monitor": "^1.0.1",
     "@neo-one/types": "^1.0.1",
     "@neo-one/utils": "^1.0.1",

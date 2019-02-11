@@ -1856,10 +1856,10 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@neo-one/ec-key@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@neo-one/ec-key/-/ec-key-0.0.3.tgz#d309941a5f7deafe0a41af8b76227708152fd4de"
-  integrity sha1-0wmUGl996v4KQa+LdiJ3CBUv1N4=
+"@neo-one/ec-key@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@neo-one/ec-key/-/ec-key-0.0.4.tgz#9ad27fda1ff3ad8194f62710f988c22ca7266839"
+  integrity sha512-AltyRFSrJ8NyKVSy9VA3xUlN3+marQc4OxKXqrFjQpCvErNaAso3Km4SXUCmvbyvZ4sMK1Ctmcb9+iByqXQTPw==
   dependencies:
     asn1.js "^1.0.4"
 
