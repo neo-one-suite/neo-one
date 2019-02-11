@@ -5,7 +5,6 @@ export interface Driver {
   readonly getHeight: () => Promise<number>;
   readonly syncTo: (height: number) => Promise<void>;
   readonly getStorageItems: () => Promise<ReadonlyArray<StorageItem>>;
-  readonly restore: (height: number) => Promise<void>;
   readonly backup: () => Promise<void>;
 }
 
@@ -66,7 +65,6 @@ const binarySearch = async (test: Driver, golden: Driver, min: number, max: numb
   let lastDiff: Diff = { additional: [], different: [], missing: [] };
   // tslint:disable-next-line:no-loop-statement
   while (left < right) {
-    await Promise.all([test.restore(min), golden.restore(min)]);
     const nextHeight = Math.floor((left + right) / 2);
     const currentDiff = await runOnce(test, golden, nextHeight);
     if (hasDiff(currentDiff)) {
