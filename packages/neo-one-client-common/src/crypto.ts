@@ -17,7 +17,7 @@ import {
   InvalidSignaturesError,
   TooManyPublicKeysError,
 } from './errors';
-import { Op, WitnessModel } from './models';
+import { Op, sha256 as sha256In, WitnessModel } from './models';
 import { p256 } from './precomputed';
 import { ScriptBuilder } from './ScriptBuilder';
 
@@ -37,10 +37,7 @@ const sha1 = (value: Buffer): Buffer =>
     .update(value)
     .digest();
 
-const sha256 = (value: Buffer): Buffer =>
-  createHash('sha256')
-    .update(value)
-    .digest();
+const sha256 = sha256In;
 
 const rmd160 = (value: Buffer): Buffer =>
   createHash('rmd160')
