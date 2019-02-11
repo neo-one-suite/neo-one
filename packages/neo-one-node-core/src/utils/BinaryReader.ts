@@ -32,6 +32,7 @@ export class BinaryReader {
   }
 
   public readBytes(numBytes: number): Buffer {
+    this.checkRead(numBytes);
     const result = this.buffer.slice(this.mutableIndex, this.mutableIndex + numBytes);
     this.mutableIndex += numBytes;
 
@@ -39,6 +40,7 @@ export class BinaryReader {
   }
 
   public readInt8(): number {
+    this.checkRead(1);
     const result = this.buffer.readInt8(this.mutableIndex);
     this.mutableIndex += 1;
 
@@ -46,6 +48,7 @@ export class BinaryReader {
   }
 
   public readUInt8(): number {
+    this.checkRead(1);
     const result = this.buffer.readUInt8(this.mutableIndex);
     this.mutableIndex += 1;
 
@@ -57,6 +60,7 @@ export class BinaryReader {
   }
 
   public readInt16LE(): number {
+    this.checkRead(2);
     const result = this.buffer.readInt16LE(this.mutableIndex);
     this.mutableIndex += 2;
 
@@ -64,6 +68,7 @@ export class BinaryReader {
   }
 
   public readUInt16LE(): number {
+    this.checkRead(2);
     const result = this.buffer.readUInt16LE(this.mutableIndex);
     this.mutableIndex += 2;
 
@@ -71,6 +76,7 @@ export class BinaryReader {
   }
 
   public readUInt16BE(): number {
+    this.checkRead(2);
     const result = this.buffer.readUInt16BE(this.mutableIndex);
     this.mutableIndex += 2;
 
@@ -78,6 +84,7 @@ export class BinaryReader {
   }
 
   public readInt32LE(): number {
+    this.checkRead(4);
     const result = this.buffer.readInt32LE(this.mutableIndex);
     this.mutableIndex += 4;
 
@@ -85,6 +92,7 @@ export class BinaryReader {
   }
 
   public readUInt32LE(): number {
+    this.checkRead(4);
     const result = this.buffer.readUInt32LE(this.mutableIndex);
     this.mutableIndex += 4;
 
@@ -186,5 +194,11 @@ export class BinaryReader {
     }
 
     return common.bufferToECPoint(Buffer.concat([firstByte, this.readBytes(common.ECPOINT_BUFFER_BYTES - 1)]));
+  }
+
+  private checkRead(numBytes: number): void {
+    if (this.remaining < numBytes) {
+      throw new InvalidFormatError(`Insufficient bytes remaining (${this.remaining}): ${numBytes}`);
+    }
   }
 }
