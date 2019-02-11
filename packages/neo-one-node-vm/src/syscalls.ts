@@ -2,11 +2,15 @@
 import {
   assertContractParameterType,
   assertStorageFlags,
+  assertSysCall,
   common,
   crypto,
   ECPoint,
   hasStorageFlag,
+  SysCall as SysCallEnum,
+  SysCallHash,
   SysCallName,
+  toSysCallHash,
   UInt160,
   UInt256,
 } from '@neo-one/client-common';
@@ -32,6 +36,7 @@ import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { map as asyncMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import BN from 'bn.js';
+import _ from 'lodash';
 import { defer } from 'rxjs';
 import { concatMap, map, toArray } from 'rxjs/operators';
 import {
@@ -359,7 +364,7 @@ const createPut = ({ name }: { readonly name: 'Neo.Storage.Put' | 'Neo.Storage.P
   })({ context: contextIn });
 };
 
-export const SYSCALLS: { readonly [key: string]: CreateSysCall | undefined } = {
+export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
   'System.Runtime.Platform': createSysCall({
     name: 'System.Runtime.Platform',
     out: 1,
@@ -1824,17 +1829,30 @@ export const SYSCALL_ALIASES: { readonly [key: string]: string | undefined } = {
 
 const SYS_CALL_STRING_LENGTH = 252;
 
+const SYSCALLS_BY_HASH = _.fromPairs(
+  Object.entries(SYSCALLS).map(([key, value]) => [toSysCallHash(key as SysCallEnum), value]),
+);
+
 export const lookupSysCall = ({ context }: { readonly context: ExecutionContext }) => {
   const { code, pc } = context;
   const reader = new BinaryReader(code, pc);
 
   const sysCallBytes = reader.readVarBytesLE(SYS_CALL_STRING_LENGTH);
-  const sysCallName = utils.toASCII(sysCallBytes);
-  const aliasName = SYSCALL_ALIASES[sysCallName];
-  const canonicalName = aliasName === undefined ? sysCallName : aliasName;
-  const createCall = SYSCALLS[canonicalName];
+  let key: SysCallHash;
+  let debugName: string;
+  if (sysCallBytes.length === 4) {
+    key = sysCallBytes.readUInt32LE(0) as SysCallHash;
+    debugName = sysCallBytes.toString('hex');
+  } else {
+    const sysCallName = utils.toASCII(sysCallBytes);
+    const aliasName = SYSCALL_ALIASES[sysCallName];
+    const canonicalName = aliasName === undefined ? sysCallName : aliasName;
+    key = toSysCallHash(assertSysCall(canonicalName));
+    debugName = canonicalName;
+  }
+  const createCall = SYSCALLS_BY_HASH[key];
   if (createCall === undefined) {
-    throw new UnknownSysCallError(context, sysCallName);
+    throw new UnknownSysCallError(context, debugName);
   }
 
   const nextContext = {

@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { crypto } from '../crypto';
 import { InvalidSysCallError, InvalidVMByteCodeError, InvalidVMStateError } from '../errors';
 
 export enum Op {
@@ -337,4 +338,18 @@ export const assertVMState = (state: number): VMState => {
     return state;
   }
   throw new InvalidVMStateError(state);
+};
+
+export type SysCallHash = number & { readonly __uint256: undefined };
+
+// @ts-ignore
+const mutableCache: { [K in SysCall]: SysCallHash } = {};
+
+export const toSysCallHash = (value: SysCall): SysCallHash => {
+  let hash = mutableCache[value];
+  if ((hash as SysCallHash | undefined) === undefined) {
+    mutableCache[value] = hash = crypto.sha256(Buffer.from(value, 'ascii')).readUInt32LE(0) as SysCallHash;
+  }
+
+  return hash;
 };
