@@ -151,6 +151,14 @@ export function TransactionBase<
       (other: TransactionBaseClass) => common.uInt256Equal(this.hash, other.hash),
     );
     public readonly toKeyString = utils.toKeyString(TransactionBase, () => this.hashHex);
+    public readonly getSortedScriptHashesForVerifying = utils.lazyAsync(
+      async (options: TransactionGetScriptHashesForVerifyingOptions) => {
+        const hashes = await this.getScriptHashesForVerifying(options);
+
+        // tslint:disable-next-line no-array-mutation
+        return [...hashes].sort();
+      },
+    );
     private readonly sizeInternal = utils.lazy(
       () =>
         IOHelper.sizeOfUInt8 +
@@ -436,17 +444,18 @@ export function TransactionBase<
       getOutput,
       verifyScript,
     }: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
-      const hashesSet = await this.getScriptHashesForVerifying({
+      const hashesArr = await this.getSortedScriptHashesForVerifying({
         getAsset,
         getOutput,
       });
 
-      if (hashesSet.size !== this.scripts.length) {
-        throw new VerifyError(`Invalid witnesses. Found ${hashesSet.size} hashes and ${this.scripts.length} scripts.`);
+      if (hashesArr.length !== this.scripts.length) {
+        throw new VerifyError(
+          `Invalid witnesses. Found ${hashesArr.length} hashes and ${this.scripts.length} scripts.`,
+        );
       }
 
-      // tslint:disable-next-line no-array-mutation
-      const hashes = [...hashesSet].sort().map((value) => common.hexToUInt160(value));
+      const hashes = hashesArr.map((value) => common.hexToUInt160(value));
 
       return Promise.all(
         _.zip(hashes, this.scripts).map(async ([hash, witness]) =>

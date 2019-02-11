@@ -890,11 +890,10 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
         throw new ContainerTooLargeError(context);
       }
 
-      const hashesSet = await transaction.getScriptHashesForVerifying({
+      const hashes = await transaction.getSortedScriptHashesForVerifying({
         getOutput: context.blockchain.output.get,
         getAsset: context.blockchain.asset.get,
       });
-      const hashes = [...hashesSet];
       const witnesses = await Promise.all(
         transaction.scripts.map(async (witness, idx) => {
           if (witness.verification.length === 0) {
