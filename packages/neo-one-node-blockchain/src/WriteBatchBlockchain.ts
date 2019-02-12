@@ -42,6 +42,9 @@ import {
   RegisterTransaction,
   ScriptContainerType,
   StateTransaction,
+  StorageChangeAdd,
+  StorageChangeDelete,
+  StorageChangeModify,
   StorageItem,
   StorageItemKey,
   StorageItemsKey,
@@ -744,6 +747,35 @@ export class WriteBatchBlockchain {
                 )
                 .filter(commonUtils.notNull);
 
+              const storageChanges = temporaryBlockchain.storageItem
+                .getChangeSet()
+                .map((change) => {
+                  const addChange =
+                    change.type === 'add' && change.change.type === 'storageItem'
+                      ? { value: change.change.value, subType: change.subType }
+                      : undefined;
+                  if (addChange !== undefined) {
+                    const options = {
+                      hash: addChange.value.hash,
+                      key: addChange.value.key,
+                      value: addChange.value.value,
+                    };
+
+                    return addChange.subType === 'add'
+                      ? new StorageChangeAdd(options)
+                      : new StorageChangeModify(options);
+                  }
+
+                  const deleteChange =
+                    change.type === 'delete' && change.change.type === 'storageItem' ? change.change.key : undefined;
+                  if (deleteChange !== undefined) {
+                    return new StorageChangeDelete(deleteChange);
+                  }
+
+                  return undefined;
+                })
+                .filter(commonUtils.notNull);
+
               await Promise.all([
                 Promise.all(
                   temporaryBlockchain.getChangeSet().map(async (change) => {
@@ -769,6 +801,7 @@ export class WriteBatchBlockchain {
                     actionIndexStart: globalActionIndexIn,
                     actionIndexStop: globalActionIndex,
                     result,
+                    storageChanges,
                   }),
                 ),
                 addActionsPromise,
@@ -788,6 +821,7 @@ export class WriteBatchBlockchain {
                     actionIndexStart: globalActionIndexIn,
                     actionIndexStop: globalActionIndex,
                     result,
+                    storageChanges: [],
                   }),
                 ),
                 addActionsPromise,

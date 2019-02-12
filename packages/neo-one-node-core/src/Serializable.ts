@@ -3,6 +3,7 @@ import { Action } from './action';
 import { Asset } from './Asset';
 import { Contract } from './Contract';
 import { InvocationResult } from './invocationResult';
+import { StorageChange } from './storageChange';
 import { FeeContext, Input, InvocationTransaction, Transaction } from './transaction';
 import { TransactionData } from './TransactionData';
 import { BinaryReader } from './utils';
@@ -42,6 +43,7 @@ export interface SerializableInvocationData {
   readonly voteUpdates: ReadonlyArray<[UInt160, ReadonlyArray<ECPoint>]>;
   readonly result: InvocationResult;
   readonly actions: ReadonlyArray<Action>;
+  readonly storageChanges: ReadonlyArray<StorageChange>;
 }
 
 export interface SerializeJSONContext {

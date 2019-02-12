@@ -106,6 +106,28 @@ export interface InvocationResultSuccessJSON {
 
 export type InvocationResultJSON = InvocationResultSuccessJSON | InvocationResultErrorJSON;
 
+export interface StorageChangeAddJSON {
+  readonly type: 'Add';
+  readonly hash: string;
+  readonly key: string;
+  readonly value: string;
+}
+
+export interface StorageChangeModifyJSON {
+  readonly type: 'Modify';
+  readonly hash: string;
+  readonly key: string;
+  readonly value: string;
+}
+
+export interface StorageChangeDeleteJSON {
+  readonly type: 'Delete';
+  readonly hash: string;
+  readonly key: string;
+}
+
+export type StorageChangeJSON = StorageChangeAddJSON | StorageChangeModifyJSON | StorageChangeDeleteJSON;
+
 export interface ActionBaseJSON {
   readonly version: number;
   readonly index: string;
@@ -166,6 +188,7 @@ export interface InvocationDataJSON {
   readonly migratedContractHashes: ReadonlyArray<[string, string]>;
   readonly voteUpdates: ReadonlyArray<[string, ReadonlyArray<string>]>;
   readonly actions: ReadonlyArray<ActionJSON>;
+  readonly storageChanges: ReadonlyArray<StorageChangeJSON>;
 }
 
 export interface TransactionBaseJSON {

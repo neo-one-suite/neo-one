@@ -2164,6 +2164,73 @@ export interface RawLog extends RawActionBase {
 export type RawAction = RawNotification | RawLog;
 
 /**
+ * Base properties of `RawStorageChange`s.
+ */
+export interface RawStorageChangeBase {
+  /**
+   * Address of the smart contract whose storage changed.
+   */
+  readonly address: AddressString;
+  /**
+   * Key of the storage change.
+   */
+  readonly key: BufferString;
+}
+
+/**
+ * Common properties of `RawStorageChangeAdd` and `RawStorageChangeModify`.
+ */
+export interface RawStorageChangeAddModifyBase extends RawStorageChangeBase {
+  /**
+   * Value of the storage change.
+   */
+  readonly value: BufferString;
+}
+
+/**
+ * Raw storage addition during an invocation.
+ *
+ * Low-level API for advanced usage only.
+ */
+export interface RawStorageChangeAdd extends RawStorageChangeAddModifyBase {
+  /**
+   * `type` differentiates the `RawStorageChangeAdd` object from other `RawStorageChange` objects.
+   */
+  readonly type: 'Add';
+}
+
+/**
+ * Raw storage modification during an invocation.
+ *
+ * Low-level API for advanced usage only.
+ */
+export interface RawStorageChangeModify extends RawStorageChangeAddModifyBase {
+  /**
+   * `type` differentiates the `RawStorageChangeModify` object from other `RawStorageChange` objects.
+   */
+  readonly type: 'Modify';
+}
+
+/**
+ * Raw storage deletion during an invocation.
+ *
+ * Low-level API for advanced usage only.
+ */
+export interface RawStorageChangeDelete extends RawStorageChangeBase {
+  /**
+   * `type` differentiates the `RawStorageChangeDelete` object from other `RawStorageChange` objects.
+   */
+  readonly type: 'Delete';
+}
+
+/**
+ * Raw storage change which occurred an invocation.
+ *
+ * Low-level API for advanced usage only.
+ */
+export type RawStorageChange = RawStorageChangeAdd | RawStorageChangeModify | RawStorageChangeDelete;
+
+/**
  * Raw receipt of an invocation.
  *
  * Low-level API for advanced usage only.
@@ -2285,6 +2352,10 @@ export interface RawInvocationData {
    * Raw actions emitted by the invocation.
    */
   readonly actions: ReadonlyArray<RawAction>;
+  /**
+   * Storage changes that occurred during this invocation
+   */
+  readonly storageChanges: ReadonlyArray<RawStorageChange>;
 }
 
 export interface ParamJSONArray extends ReadonlyArray<ParamJSON> {}

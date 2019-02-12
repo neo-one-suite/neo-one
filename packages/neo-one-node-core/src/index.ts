@@ -33,6 +33,7 @@ export * from './disassembleByteCode';
 export * from './invocationResult';
 export * from './net';
 export * from './payload';
+export * from './storageChange';
 export * from './transaction';
 export * from './utils';
 export * from './vm';

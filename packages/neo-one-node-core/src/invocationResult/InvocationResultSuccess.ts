@@ -1,4 +1,4 @@
-import { ContractParameterJSON, InvalidFormatError, JSONHelper, VMState } from '@neo-one/client-common';
+import { InvalidFormatError, InvocationResultSuccessJSON, JSONHelper, VMState } from '@neo-one/client-common';
 import BN from 'bn.js';
 import { ContractParameter } from '../contractParameter';
 import { DeserializeWireBaseOptions, SerializableJSON, SerializeJSONContext } from '../Serializable';
@@ -8,13 +8,6 @@ export interface InvocationResultSuccessAdd {
   readonly gasConsumed: BN;
   readonly gasCost: BN;
   readonly stack: ReadonlyArray<ContractParameter>;
-}
-
-export interface InvocationResultSuccessJSON {
-  readonly state: VMState.Halt;
-  readonly gas_consumed: string;
-  readonly gas_cost: string;
-  readonly stack: ReadonlyArray<ContractParameterJSON>;
 }
 
 export class InvocationResultSuccess extends InvocationResultBase<VMState.Halt>

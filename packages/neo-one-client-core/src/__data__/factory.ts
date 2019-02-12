@@ -306,6 +306,7 @@ const createInvocationDataJSON = (options: Partial<InvocationDataJSON> = {}): In
   migratedContractHashes: [[keys[0].scriptHashString, keys[1].scriptHashString]],
   voteUpdates: [],
   actions: [createNotificationActionJSON(), createLogActionJSON()],
+  storageChanges: [],
   ...options,
 });
 
@@ -735,6 +736,7 @@ const createRawInvocationData = (options: Partial<RawInvocationData> = {}): RawI
   deletedContractAddresses: [keys[2].address],
   migratedContractAddresses: [[keys[0].address, keys[1].address]],
   actions: [createRawNotification(), createRawLog()],
+  storageChanges: [],
   ...options,
 });
 

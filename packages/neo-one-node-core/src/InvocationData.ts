@@ -8,6 +8,7 @@ import {
   SerializableWire,
   SerializeWire,
 } from './Serializable';
+import { deserializeStorageChangeWireBase, StorageChange } from './storageChange';
 import { BinaryReader, utils } from './utils';
 
 export interface InvocationDataAdd {
@@ -22,6 +23,7 @@ export interface InvocationDataAdd {
   readonly actionIndexStart: BN;
   readonly actionIndexStop: BN;
   readonly result: InvocationResult;
+  readonly storageChanges: ReadonlyArray<StorageChange>;
 }
 
 export interface InvocationDataKey {
@@ -52,6 +54,7 @@ export class InvocationData implements SerializableWire<InvocationData> {
     const actionIndexStart = reader.readUInt64LE();
     const actionIndexStop = reader.readUInt64LE();
     const result = deserializeInvocationResultWireBase(options);
+    const storageChanges = reader.readArray(() => deserializeStorageChangeWireBase(options));
 
     return new this({
       hash,
@@ -65,6 +68,7 @@ export class InvocationData implements SerializableWire<InvocationData> {
       actionIndexStart,
       actionIndexStop,
       result,
+      storageChanges,
     });
   }
 
@@ -86,6 +90,7 @@ export class InvocationData implements SerializableWire<InvocationData> {
   public readonly actionIndexStart: BN;
   public readonly actionIndexStop: BN;
   public readonly result: InvocationResult;
+  public readonly storageChanges: ReadonlyArray<StorageChange>;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 
@@ -101,6 +106,7 @@ export class InvocationData implements SerializableWire<InvocationData> {
     actionIndexStart,
     actionIndexStop,
     result,
+    storageChanges,
   }: InvocationDataAdd) {
     this.hash = hash;
     this.assetHash = assetHash;
@@ -113,6 +119,7 @@ export class InvocationData implements SerializableWire<InvocationData> {
     this.actionIndexStart = actionIndexStart;
     this.actionIndexStop = actionIndexStop;
     this.result = result;
+    this.storageChanges = storageChanges;
     this.sizeInternal = utils.lazy(
       () =>
         IOHelper.sizeOfUInt256 +
@@ -160,5 +167,8 @@ export class InvocationData implements SerializableWire<InvocationData> {
     writer.writeUInt64LE(this.actionIndexStart);
     writer.writeUInt64LE(this.actionIndexStop);
     this.result.serializeWireBase(writer);
+    writer.writeArray(this.storageChanges, (storageChange) => {
+      storageChange.serializeWireBase(writer);
+    });
   }
 }

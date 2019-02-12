@@ -783,6 +783,7 @@ export class Blockchain {
       voteUpdates: data.voteUpdates,
       result: data.result,
       actions,
+      storageChanges: data.storageChanges,
     };
   };
   private readonly tryGetTransactionData = async (transaction: Transaction): Promise<TransactionData | undefined> =>

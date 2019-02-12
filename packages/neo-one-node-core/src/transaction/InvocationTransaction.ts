@@ -72,7 +72,16 @@ export class InvocationTransaction extends TransactionBase<
     const data = await context.tryGetInvocationData(this);
     let invocationDataJSON: InvocationDataJSON | undefined;
     if (data !== undefined) {
-      const { asset, contracts, deletedContractHashes, migratedContractHashes, voteUpdates, actions, result } = data;
+      const {
+        asset,
+        contracts,
+        deletedContractHashes,
+        migratedContractHashes,
+        voteUpdates,
+        actions,
+        result,
+        storageChanges,
+      } = data;
       invocationDataJSON = {
         result: result.serializeJSON(context),
         asset: asset === undefined ? undefined : asset.serializeJSON(context),
@@ -90,6 +99,7 @@ export class InvocationTransaction extends TransactionBase<
           votes.map((vote) => common.ecPointToString(vote)),
         ]),
         actions: actions.map((action) => action.serializeJSON(context)),
+        storageChanges: storageChanges.map((storageChange) => storageChange.serializeJSON(context)),
       };
     }
 

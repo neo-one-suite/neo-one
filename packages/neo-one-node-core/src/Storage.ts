@@ -47,7 +47,7 @@ export type DeleteChange =
   | { readonly type: 'storageItem'; readonly key: StorageItemKey }
   | { readonly type: 'validator'; readonly key: ValidatorKey };
 export type Change =
-  | { readonly type: 'add'; readonly change: AddChange }
+  | { readonly type: 'add'; readonly change: AddChange; readonly subType: 'add' | 'update' }
   | { readonly type: 'delete'; readonly change: DeleteChange };
 export type ChangeSet = ReadonlyArray<Change>;
 

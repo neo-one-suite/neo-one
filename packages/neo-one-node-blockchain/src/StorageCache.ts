@@ -16,7 +16,7 @@ import { utils as commonUtils } from '@neo-one/utils';
 import { concat, defer, EMPTY, Observable, of as _of } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
 type TrackedChange<Key, AddValue, Value> =
-  | { readonly type: 'add'; readonly addValue: AddValue; readonly value: Value }
+  | { readonly type: 'add'; readonly addValue: AddValue; readonly value: Value; readonly subType: 'add' | 'update' }
   | { readonly type: 'delete'; readonly key: Key };
 type GetFunc<Key, Value> = (key: Key) => Promise<Value>;
 type TryGetFunc<Key, Value> = (key: Key) => Promise<Value | undefined>;
@@ -115,7 +115,7 @@ export class BaseReadStorageCache<Key, AddValue, Value> {
         return { type: 'delete', change: createDeleteChange(value.key) };
       }
 
-      return { type: 'add', change: this.createAddChange(value.addValue) };
+      return { type: 'add', change: this.createAddChange(value.addValue), subType: value.subType };
     });
   }
 
@@ -297,6 +297,7 @@ function createAdd<Key, Value>({
       type: 'add',
       addValue: value,
       value,
+      subType: 'add',
     };
   };
 }
@@ -320,6 +321,7 @@ function createUpdate<Key, Value, Update>({
       type: 'add',
       addValue: updatedValue,
       value: updatedValue,
+      subType: 'update',
     };
 
     return updatedValue;
@@ -661,7 +663,7 @@ export class BlockLikeStorageCache<Value extends BlockLike> extends BaseReadStor
       }
     }
 
-    const addValue: TrackedChange<BlockLikeKey, Value, Value> = { type: 'add', addValue: value, value };
+    const addValue: TrackedChange<BlockLikeKey, Value, Value> = { type: 'add', addValue: value, value, subType: 'add' };
     this.mutableValues[common.uInt256ToString(value.hash)] = addValue;
     this.mutableIndexValues[`${value.index}`] = addValue;
   }
@@ -710,12 +712,13 @@ export class OutputStorageCache extends ReadStorageCache<OutputKey, OutputValue,
         type: 'add',
         addValue: value,
         value: value.output,
+        subType: 'add',
       };
     };
   }
 }
 type TrackedMetadataChange<AddValue, Value> =
-  | { readonly type: 'add'; readonly addValue: AddValue; readonly value: Value }
+  | { readonly type: 'add'; readonly addValue: AddValue; readonly value: Value; readonly subType: 'add' | 'update' }
   | { readonly type: 'delete' };
 type GetMetadataFunc<Value> = (key?: undefined) => Promise<Value>;
 type TryGetMetadataFunc<Value> = (key?: undefined) => Promise<Value | undefined>;
@@ -815,7 +818,7 @@ export class BaseReadMetadataStorageCache<AddValue, Value> {
       return [{ type: 'delete', change: createDeleteChange() }];
     }
 
-    return [{ type: 'add', change: this.createAddChange(value.addValue) }];
+    return [{ type: 'add', change: this.createAddChange(value.addValue), subType: value.subType }];
   }
 
   protected tryGetTracked(): TrackedMetadataChange<AddValue, Value> | undefined {
@@ -840,6 +843,7 @@ function createAddMetadata<Value>({
       type: 'add',
       addValue: value,
       value,
+      subType: 'add',
     };
   };
 }
@@ -858,6 +862,7 @@ function createUpdateMetadata<Value, Update>({
       type: 'add',
       addValue: updatedValue,
       value: updatedValue,
+      subType: 'update',
     };
 
     return updatedValue;

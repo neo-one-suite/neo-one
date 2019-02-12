@@ -38,10 +38,12 @@ import {
   RawAction,
   RawCallReceipt,
   RawInvocationData,
+  RawStorageChange,
   RelayTransactionResult,
   RelayTransactionResultJSON,
   ScriptBuilderParam,
   scriptHashToAddress,
+  StorageChangeJSON,
   StorageItem,
   StorageItemJSON,
   Transaction,
@@ -622,6 +624,33 @@ export class NEOONEDataProvider implements DeveloperProvider {
       actions: data.actions.map((action, idx) =>
         convertAction(blockHash, blockIndex, transactionHash, transactionIndex, idx, action),
       ),
+      storageChanges: data.storageChanges.map((storageChange) => this.convertStorageChange(storageChange)),
+    };
+  }
+
+  private convertStorageChange(storageChange: StorageChangeJSON): RawStorageChange {
+    if (storageChange.type === 'Add') {
+      return {
+        type: 'Add',
+        address: scriptHashToAddress(storageChange.hash),
+        key: storageChange.key,
+        value: storageChange.value,
+      };
+    }
+
+    if (storageChange.type === 'Modify') {
+      return {
+        type: 'Modify',
+        address: scriptHashToAddress(storageChange.hash),
+        key: storageChange.key,
+        value: storageChange.value,
+      };
+    }
+
+    return {
+      type: 'Delete',
+      address: scriptHashToAddress(storageChange.hash),
+      key: storageChange.key,
     };
   }
 

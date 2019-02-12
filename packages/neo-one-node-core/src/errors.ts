@@ -25,3 +25,7 @@ export const UnsignedBlockError = makeErrorWithCode(
   'UNSIGNED_BLOCK',
   (stringHash: string) => `Block script does not exist because it has not been signed. @ block with hash ${stringHash}`,
 );
+export const InvalidStorageChangeTypeError = makeErrorWithCode(
+  'INVALID_STORAGE_CHANGE_TYPE',
+  (storageChangeType: number) => `Invalid Storage Change Type: ${storageChangeType}`,
+);
