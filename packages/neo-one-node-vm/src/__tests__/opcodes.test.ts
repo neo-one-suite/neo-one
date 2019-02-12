@@ -1,5 +1,5 @@
 // tslint:disable no-object-mutation no-any no-loop-statement
-import { crypto, OpCode, ScriptBuilder, ScriptBuilderParam } from '@neo-one/client-common';
+import { BinaryWriter, crypto, OpCode, ScriptBuilder, ScriptBuilderParam } from '@neo-one/client-common';
 import { DefaultMonitor } from '@neo-one/monitor';
 import {
   AttributeUsage,
@@ -562,8 +562,7 @@ const OPCODES = ([
 
       {
         op: 'SYSCALL',
-        // Hacky way to get syscall to work with the extra space.
-        buffer: Buffer.from(' Neo.Blockchain.GetHeight', 'utf8'),
+        buffer: new BinaryWriter().writeVarBytesLE(Buffer.from('Neo.Blockchain.GetHeight', 'ascii')).toBuffer(),
         result: [new IntegerStackItem(new BN(10))],
         mockBlockchain: ({ blockchain }) => {
           blockchain.currentBlock.index = 10;
