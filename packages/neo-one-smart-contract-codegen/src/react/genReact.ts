@@ -7,14 +7,16 @@ export const genReact = ({
   reactPath,
   commonTypesPath,
   clientPath,
+  browser,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly reactPath: string;
   readonly commonTypesPath: string;
   readonly clientPath: string;
+  readonly browser: boolean;
 }) => ({
   js: `
-import { DeveloperTools } from '@neo-one/client';
+import { DeveloperTools } from '@neo-one/client${browser ? '-browserify' : ''}';
 import * as React from 'react';
 import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(reactPath, clientPath)}';
 ${contractsPaths
@@ -30,11 +32,12 @@ export const ContractsProvider = ({
   client: clientIn,
   developerClients: developerClientsIn,
   localClients: localClientsIn,
+  host,
   children,
 }) => {
-  const client = clientIn === undefined ? createClient() : clientIn;
-  const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
-  const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+  const client = clientIn === undefined ? createClient(host) : clientIn;
+  const developerClients = developerClientsIn === undefined ? createDeveloperClients(host) : developerClientsIn;
+  const localClients = localClientsIn === undefined ? createLocalClients(host) : localClientsIn;
   DeveloperTools.enable({ client, developerClients, localClients });
 
   return (
@@ -60,7 +63,7 @@ export const WithContracts = ({ children }) => (
 );
 `,
   ts: `
-import { Client, DeveloperClient, DeveloperTools, LocalClient } from '@neo-one/client';
+import { Client, DeveloperClient, DeveloperTools, LocalClient } from '@neo-one/client${browser ? '-browserify' : ''}';
 import * as React from 'react';
 import { Contracts } from '${getRelativeImport(reactPath, commonTypesPath)}';
 import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(reactPath, clientPath)}';
@@ -76,10 +79,11 @@ export interface WithClients<TClient extends Client> {
   readonly client: TClient;
   readonly developerClients: {
     readonly [network: string]: DeveloperClient;
-  },
+  };
   readonly localClients: {
     readonly [network: string]: LocalClient;
-  },
+  };
+  readonly host?: string;
 }
 export type ContractsWithClients<TClient extends Client> = Contracts & WithClients<TClient>;
 const Context: any = React.createContext<ContractsWithClients<Client>>(undefined as any);
@@ -91,11 +95,12 @@ export const ContractsProvider = <TClient extends Client>({
   client: clientIn,
   developerClients: developerClientsIn,
   localClients: localClientsIn,
+  host,
   children,
 }: ContractsProviderProps<TClient>) => {
-  const client = clientIn === undefined ? createClient() : clientIn;
-  const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
-  const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+  const client = clientIn === undefined ? createClient(host) : clientIn;
+  const developerClients = developerClientsIn === undefined ? createDeveloperClients(host) : developerClientsIn;
+  const localClients = localClientsIn === undefined ? createLocalClients(host) : localClientsIn;
   DeveloperTools.enable({ client, developerClients, localClients });
 
   return (

@@ -9,6 +9,7 @@ describe('genVue', () => {
         commonTypesPath: '/foo/bar/one/generated/types.js',
         vuePath: '/foo/bar/one/generated/vue.js',
         clientPath: '/foo/bar/one/generated/client.js',
+        browser: false,
       }),
     ).toMatchSnapshot();
   });

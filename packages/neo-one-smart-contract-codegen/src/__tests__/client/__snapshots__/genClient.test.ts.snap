@@ -16,12 +16,19 @@ const getDefaultUserAccountProviders = (provider) => ({
 const isLocalUserAccountProvider = (userAccountProvider) =>
   userAccountProvider instanceof LocalUserAccountProvider;
 
-export const createClient = (getUserAccountProviders = getDefaultUserAccountProviders) => {
+export const createClient = (getUserAccountProvidersOrHost) => {
+  let getUserAccountProviders = getDefaultUserAccountProviders;
+  let host = 'localhost'
+  if (typeof getUserAccountProvidersOrHost === 'string') {
+    host = getUserAccountProvidersOrHost;
+  } else if (getUserAccountProvidersOrHost !== undefined) {
+    getUserAccountProviders = getUserAccountProvidersOrHost;
+  }
   const providers = [
     
   ];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 40100 }));
+    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 40100 }));
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
@@ -45,12 +52,12 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
   return new Client(userAccountProviders);
 };
 
-export const createDeveloperClients = () => ({
-  'local': new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, port: 40100 })),
+export const createDeveloperClients = (host = 'localhost') => ({
+  'local': new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 40100 })),
 });
 
-export const createLocalClients = () => {
-  const client = new OneClient(40100);
+export const createLocalClients = (host = 'localhost') => {
+  const client = new OneClient(40100, host);
   return {
     'local': {
       getNEOTrackerURL: async () => {
@@ -92,13 +99,20 @@ const isLocalUserAccountProvider = (userAccountProvider: UserAccountProvider): u
   userAccountProvider instanceof LocalUserAccountProvider;
 
 export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
-  getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders as any,
+  getUserAccountProvidersOrHost?: string | ((provider: NEOONEProvider) => TUserAccountProviders),
 ): Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never, TUserAccountProviders> => {
+  let getUserAccountProviders = getDefaultUserAccountProviders as any;
+  let host = 'localhost'
+  if (typeof getUserAccountProvidersOrHost === 'string') {
+    host = getUserAccountProvidersOrHost;
+  } else if (getUserAccountProvidersOrHost !== undefined) {
+    getUserAccountProviders = getUserAccountProvidersOrHost;
+  }
   const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [
     
   ];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 40100 }));
+    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 40100 }));
   }
   const provider = new NEOONEProvider(providers);
 
@@ -123,12 +137,12 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
   return new Client(userAccountProviders);
 }
 
-export const createDeveloperClients = (): { [network: string]: DeveloperClient } => ({
-  'local': new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, port: 40100 })),
+export const createDeveloperClients = (host = 'localhost'): { [network: string]: DeveloperClient } => ({
+  'local': new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 40100 })),
 });
 
-export const createLocalClients = (): { [network: string]: LocalClient } => {
-  const client = new OneClient(40100);
+export const createLocalClients = (host = 'localhost'): { [network: string]: LocalClient } => {
+  const client = new OneClient(40100, host);
   return {
     'local': {
       getNEOTrackerURL: async () => {

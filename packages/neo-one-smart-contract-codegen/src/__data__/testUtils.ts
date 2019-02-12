@@ -5,7 +5,7 @@ const testABI = (abi: ABI, name: string) => {
   test(name, () => {
     expect({
       inputABI: abi,
-      types: genSmartContractTypes(name, abi),
+      types: genSmartContractTypes(name, abi, false),
     }).toMatchSnapshot();
   });
 };

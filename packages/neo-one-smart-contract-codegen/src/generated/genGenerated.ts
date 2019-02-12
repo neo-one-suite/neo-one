@@ -1,9 +1,12 @@
 import _ from 'lodash';
-import { ContractPaths } from '../type';
+import { CodegenFramework, ContractPaths } from '../type';
 import { getRelativeImport } from '../utils';
 
 const createExport = (generatedPath: string, importPath: string) =>
   `export * from '${getRelativeImport(generatedPath, importPath)}';`;
+
+const createNewLineExport = (generatedPath: string, importPath: string) =>
+  `\n${createExport(generatedPath, importPath)}`;
 
 export const genGenerated = ({
   contractsPaths,
@@ -13,6 +16,7 @@ export const genGenerated = ({
   vuePath,
   clientPath,
   generatedPath,
+  framework,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly commonTypesPath: string;
@@ -21,21 +25,23 @@ export const genGenerated = ({
   readonly vuePath: string;
   readonly clientPath: string;
   readonly generatedPath: string;
+  readonly framework: CodegenFramework;
 }) => ({
   ts: `
-${createExport(generatedPath, commonTypesPath)}
-${createExport(generatedPath, reactPath)}
-${createExport(generatedPath, angularPath)}
-${createExport(generatedPath, vuePath)}
+${createExport(generatedPath, commonTypesPath)}${
+    framework === 'react' ? createNewLineExport(generatedPath, reactPath) : ''
+  }${framework === 'angular' ? createNewLineExport(generatedPath, angularPath) : ''}${
+    framework === 'vue' ? createNewLineExport(generatedPath, vuePath) : ''
+  }
 ${createExport(generatedPath, clientPath)}
 ${_.flatMap(contractsPaths, ({ createContractPath, typesPath, abiPath }) => [createContractPath, typesPath, abiPath])
   .map((importPath) => createExport(generatedPath, importPath))
   .join('\n')}
 `,
   js: `
-${createExport(generatedPath, reactPath)}
-${createExport(generatedPath, angularPath)}
-${createExport(generatedPath, vuePath)}
+${framework === 'react' ? createNewLineExport(generatedPath, reactPath) : ''}${
+    framework === 'angular' ? createNewLineExport(generatedPath, angularPath) : ''
+  }${framework === 'vue' ? createNewLineExport(generatedPath, vuePath) : ''}
 ${createExport(generatedPath, clientPath)}
 ${_.flatMap(contractsPaths, ({ createContractPath, abiPath }) => [createContractPath, abiPath])
   .map((importPath) => createExport(generatedPath, importPath))

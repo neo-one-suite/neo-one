@@ -19,6 +19,7 @@ export const generateCommonCode = async (
   networks: ReadonlyArray<NetworkDefinition>,
   httpServerPort: number,
   sourceMapsIn: SourceMaps,
+  browser: boolean,
 ) => {
   const contractsPaths = contracts.map(({ name, filePath, sourceMap, addresses }) => ({
     ...getContractPaths(project, { name, filePath }),
@@ -65,6 +66,8 @@ export const generateCommonCode = async (
     projectIDPath,
     sourceMapsPath,
     sourceMaps: sourceMapsIn,
+    framework: project.codegen.framework,
+    browser,
   });
 
   await fs.ensureDir(project.paths.generated);

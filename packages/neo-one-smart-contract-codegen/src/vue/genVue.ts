@@ -7,14 +7,16 @@ export const genVue = ({
   vuePath,
   commonTypesPath,
   clientPath,
+  browser,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly vuePath: string;
   readonly commonTypesPath: string;
   readonly clientPath: string;
+  readonly browser: boolean;
 }) => ({
   js: `
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client${browser ? '-browserify' : ''}';
 import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(vuePath, clientPath)}';
 
 ${contractsPaths
@@ -33,12 +35,18 @@ class ContractsService {
       .map(({ name }) => `this.${lowerCaseFirst(name)} = ${getCreateSmartContractName(name)}(this.client);`)
       .join('\n    ')}
   }
+
+  setHost(host) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
+  }
 }
 
 export const contractsService = new ContractsService();
     `,
   ts: `
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client${browser ? '-browserify' : ''}';
 import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(vuePath, clientPath)}';
 import { Contracts } from '${getRelativeImport(vuePath, commonTypesPath)}';
 
@@ -71,6 +79,12 @@ class ContractsService {
     ${contractsPaths
       .map(({ name }) => `this.${lowerCaseFirst(name)} = ${getCreateSmartContractName(name)}(this.client);`)
       .join('\n    ')}
+  }
+
+  public setHost(host: string) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
   }
 }
 

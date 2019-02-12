@@ -7,15 +7,17 @@ export const genAngular = ({
   angularPath,
   commonTypesPath,
   clientPath,
+  browser,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly angularPath: string;
   readonly commonTypesPath: string;
   readonly clientPath: string;
+  readonly browser: boolean;
 }) => ({
   js: `
 import { Injectable } from '@angular/core';
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client${browser ? '-browserify' : ''}';
 import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(
     angularPath,
     clientPath,
@@ -40,11 +42,17 @@ export class ContractsService {
       .map(({ name }) => `this.${lowerCaseFirst(name)} = ${getCreateSmartContractName(name)}(this.client);`)
       .join('\n    ')}
   }
+
+  setHost(host) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
+  }
 }
     `,
   ts: `
 import { Injectable } from '@angular/core';
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
+import { Client, DeveloperClient, LocalClient } from '@neo-one/client${browser ? '-browserify' : ''}';
 import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(
     angularPath,
     clientPath,
@@ -83,6 +91,12 @@ export class ContractsService {
     ${contractsPaths
       .map(({ name }) => `this.${lowerCaseFirst(name)} = ${getCreateSmartContractName(name)}(this.client);`)
       .join('\n    ')}
+  }
+
+  public setHost(host) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
   }
 }
   `,

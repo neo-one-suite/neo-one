@@ -21,6 +21,12 @@ export class ContractsService {
     this.token = createTokenSmartContract(this.client);
     this.ico = createICOSmartContract(this.client);
   }
+
+  setHost(host) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
+  }
 }
     ",
   "ts": "
@@ -55,6 +61,12 @@ export class ContractsService {
     this.localClients = createLocalClients();
     this.token = createTokenSmartContract(this.client);
     this.ico = createICOSmartContract(this.client);
+  }
+
+  public setHost(host) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
   }
 }
   ",

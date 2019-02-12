@@ -8,6 +8,7 @@ describe('genSourceMaps', () => {
         projectIDPath: '/foo/bar/one/generated/projectID.js',
         sourceMapsPath: '/foo/bar/one/generated/sourceMaps.js',
         sourceMaps: {},
+        browser: false,
       }),
     ).toMatchSnapshot();
   });

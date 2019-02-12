@@ -36,6 +36,7 @@ export interface NEOONEOneDataProviderOptions {
   readonly network: NetworkType;
   readonly projectID: string;
   readonly port: number;
+  readonly host?: string;
   readonly iterBlocksFetchTimeoutMS?: number;
   readonly iterBlocksBatchSize?: number;
 }
@@ -48,14 +49,16 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
   private mutableProvider: NEOONEDataProvider | undefined;
   private readonly projectID: string;
   private readonly port: number;
+  private readonly host: string;
   private readonly iterBlocksFetchTimeoutMS: number | undefined;
   private readonly iterBlocksBatchSize: number | undefined;
 
   public constructor(options: NEOONEOneDataProviderOptions) {
-    const { network, projectID, port, iterBlocksFetchTimeoutMS, iterBlocksBatchSize } = options;
+    const { network, projectID, port, host = 'localhost', iterBlocksFetchTimeoutMS, iterBlocksBatchSize } = options;
     this.network = network;
     this.projectID = projectID;
     this.port = port;
+    this.host = host;
     this.iterBlocksFetchTimeoutMS = iterBlocksFetchTimeoutMS;
     this.iterBlocksBatchSize = iterBlocksBatchSize;
   }
@@ -235,14 +238,14 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
   private async getProvider(): Promise<NEOONEDataProvider> {
     /* istanbul ignore next */
     if (this.mutableProvider === undefined) {
-      const client = new OneClient(this.port);
+      const client = new OneClient(this.port, this.host);
       const result = await client.request({
         plugin: '@neo-one/server-plugin-project',
         options: { type: 'network', projectID: this.projectID },
       });
       this.mutableProvider = new NEOONEDataProvider({
         network: this.network,
-        rpcURL: result.response.nodes[0].rpcAddress,
+        rpcURL: result.response.nodes[0].rpcAddress.replace('localhost', this.host),
         iterBlocksFetchTimeoutMS: this.iterBlocksFetchTimeoutMS,
         iterBlocksBatchSize: this.iterBlocksBatchSize,
       });

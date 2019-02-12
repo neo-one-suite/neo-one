@@ -22,17 +22,19 @@ export const genSourceMaps = ({
   sourceMapsPath,
   projectIDPath,
   sourceMaps,
+  browser,
 }: {
   readonly httpServerPort: number;
   readonly sourceMapsPath: string;
   readonly projectIDPath: string;
   readonly sourceMaps: SourceMaps;
+  readonly browser: boolean;
 }) => {
   const hash = hashSourceMaps(sourceMaps);
 
   return {
     js: `/* @source-map-hash ${hash} */
-import { OneClient } from '@neo-one/client';
+import { OneClient } from '@neo-one/client${browser ? '-browserify' : ''}';
 import { projectID } from '${getRelativeImport(sourceMapsPath, projectIDPath)}';
 
 let sourceMapsIn = Promise.resolve({});
@@ -52,7 +54,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
 export const sourceMaps = sourceMapsIn;
 `,
     ts: `/* @source-map-hash ${hash} */
-import { OneClient, SourceMaps } from '@neo-one/client';
+import { OneClient, SourceMaps } from '@neo-one/client${browser ? '-browserify' : ''}';
 import { projectID } from '${getRelativeImport(sourceMapsPath, projectIDPath)}';
 
 let sourceMapsIn: Promise<SourceMaps> = Promise.resolve({});

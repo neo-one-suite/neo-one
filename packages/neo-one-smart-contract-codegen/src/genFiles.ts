@@ -19,6 +19,7 @@ export const genFiles = ({
   typesPath,
   abiPath,
   abi,
+  browser,
 }: {
   readonly name: string;
   readonly networksDefinition: SmartContractNetworksDefinition;
@@ -28,8 +29,9 @@ export const genFiles = ({
   readonly abiPath: string;
   readonly contractPath: string;
   readonly abi: ABI;
+  readonly browser: boolean;
 }) => {
-  const abiFile = formatFile(genABI(name, abi));
+  const abiFile = formatFile(genABI(name, abi, browser));
   const contractFile = formatFile(
     genContract({
       name,
@@ -38,9 +40,10 @@ export const genFiles = ({
       typesPath,
       abiPath,
       networksDefinition,
+      browser,
     }),
   );
-  const typesFile = formatFile(genSmartContractTypes(name, abi));
+  const typesFile = formatFile(genSmartContractTypes(name, abi, browser));
 
   return {
     abi: abiFile,

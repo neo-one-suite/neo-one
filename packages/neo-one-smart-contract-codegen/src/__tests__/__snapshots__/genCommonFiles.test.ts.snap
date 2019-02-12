@@ -23,6 +23,12 @@ export class ContractsService {
     this.token = createTokenSmartContract(this.client);
     this.ico = createICOSmartContract(this.client);
   }
+
+  setHost(host) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
+  }
 }
 ",
     "ts": "// tslint:disable
@@ -59,6 +65,12 @@ export class ContractsService {
     this.token = createTokenSmartContract(this.client);
     this.ico = createICOSmartContract(this.client);
   }
+
+  public setHost(host) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
+  }
 }
 ",
   },
@@ -86,10 +98,17 @@ const getDefaultUserAccountProviders = (provider) => ({
 
 const isLocalUserAccountProvider = (userAccountProvider) => userAccountProvider instanceof LocalUserAccountProvider;
 
-export const createClient = (getUserAccountProviders = getDefaultUserAccountProviders) => {
+export const createClient = (getUserAccountProvidersOrHost) => {
+  let getUserAccountProviders = getDefaultUserAccountProviders;
+  let host = 'localhost';
+  if (typeof getUserAccountProvidersOrHost === 'string') {
+    host = getUserAccountProvidersOrHost;
+  } else if (getUserAccountProvidersOrHost !== undefined) {
+    getUserAccountProviders = getUserAccountProvidersOrHost;
+  }
   const providers = [];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 40100 }));
+    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 40100 }));
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
@@ -117,12 +136,12 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
   return new Client(userAccountProviders);
 };
 
-export const createDeveloperClients = () => ({
-  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, port: 40100 })),
+export const createDeveloperClients = (host = 'localhost') => ({
+  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 40100 })),
 });
 
-export const createLocalClients = () => {
-  const client = new OneClient(40100);
+export const createLocalClients = (host = 'localhost') => {
+  const client = new OneClient(40100, host);
   return {
     local: {
       getNEOTrackerURL: async () => {
@@ -179,14 +198,21 @@ const isLocalUserAccountProvider = (
 ): userAccountProvider is LocalUserAccountProvider<any, any> => userAccountProvider instanceof LocalUserAccountProvider;
 
 export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
-  getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders as any,
+  getUserAccountProvidersOrHost?: string | ((provider: NEOONEProvider) => TUserAccountProviders),
 ): Client<
   TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never,
   TUserAccountProviders
 > => {
+  let getUserAccountProviders = getDefaultUserAccountProviders as any;
+  let host = 'localhost';
+  if (typeof getUserAccountProvidersOrHost === 'string') {
+    host = getUserAccountProvidersOrHost;
+  } else if (getUserAccountProvidersOrHost !== undefined) {
+    getUserAccountProviders = getUserAccountProvidersOrHost;
+  }
   const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, port: 40100 }));
+    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 40100 }));
   }
   const provider = new NEOONEProvider(providers);
 
@@ -217,12 +243,12 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
   return new Client(userAccountProviders);
 };
 
-export const createDeveloperClients = (): { [network: string]: DeveloperClient } => ({
-  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, port: 40100 })),
+export const createDeveloperClients = (host = 'localhost'): { [network: string]: DeveloperClient } => ({
+  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 40100 })),
 });
 
-export const createLocalClients = (): { [network: string]: LocalClient } => {
-  const client = new OneClient(40100);
+export const createLocalClients = (host = 'localhost'): { [network: string]: LocalClient } => {
+  const client = new OneClient(40100, host);
   return {
     local: {
       getNEOTrackerURL: async () => {
@@ -263,8 +289,6 @@ export interface Contracts {
   "generated": Object {
     "js": "// tslint:disable
 /* eslint-disable */
-export * from './react';
-export * from './angular.service';
 export * from './vue';
 export * from './client';
 export * from './Token/contract';
@@ -275,8 +299,6 @@ export * from './ICO/abi';
     "ts": "// tslint:disable
 /* eslint-disable */
 export * from './types';
-export * from './react';
-export * from './angular.service';
 export * from './vue';
 export * from './client';
 export * from './Token/contract';
@@ -320,11 +342,12 @@ export const ContractsProvider = ({
   client: clientIn,
   developerClients: developerClientsIn,
   localClients: localClientsIn,
+  host,
   children,
 }) => {
-  const client = clientIn === undefined ? createClient() : clientIn;
-  const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
-  const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+  const client = clientIn === undefined ? createClient(host) : clientIn;
+  const developerClients = developerClientsIn === undefined ? createDeveloperClients(host) : developerClientsIn;
+  const localClients = localClientsIn === undefined ? createLocalClients(host) : localClientsIn;
   DeveloperTools.enable({ client, developerClients, localClients });
 
   return (
@@ -362,6 +385,7 @@ export interface WithClients<TClient extends Client> {
   readonly localClients: {
     readonly [network: string]: LocalClient;
   };
+  readonly host?: string;
 }
 export type ContractsWithClients<TClient extends Client> = Contracts & WithClients<TClient>;
 const Context: any = React.createContext<ContractsWithClients<Client>>(undefined as any);
@@ -373,11 +397,12 @@ export const ContractsProvider = <TClient extends Client>({
   client: clientIn,
   developerClients: developerClientsIn,
   localClients: localClientsIn,
+  host,
   children,
 }: ContractsProviderProps<TClient>) => {
-  const client = clientIn === undefined ? createClient() : clientIn;
-  const developerClients = developerClientsIn === undefined ? createDeveloperClients() : developerClientsIn;
-  const localClients = localClientsIn === undefined ? createLocalClients() : localClientsIn;
+  const client = clientIn === undefined ? createClient(host) : clientIn;
+  const developerClients = developerClientsIn === undefined ? createDeveloperClients(host) : developerClientsIn;
+  const localClients = localClientsIn === undefined ? createLocalClients(host) : localClientsIn;
   DeveloperTools.enable({ client, developerClients, localClients });
 
   return (
@@ -501,6 +526,12 @@ class ContractsService {
     this.token = createTokenSmartContract(this.client);
     this.ico = createICOSmartContract(this.client);
   }
+
+  setHost(host) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
+  }
 }
 
 export const contractsService = new ContractsService();
@@ -534,6 +565,12 @@ class ContractsService {
     this.localClients = createLocalClients();
     this.token = createTokenSmartContract(this.client);
     this.ico = createICOSmartContract(this.client);
+  }
+
+  public setHost(host: string) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.localClients = createLocalClients(host);
   }
 }
 
