@@ -1168,6 +1168,18 @@
     log-update "^2.3.0"
     strip-ansi "^3.0.1"
 
+"@ledgerhq/devices@^4.38.0":
+  version "4.38.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/devices/-/devices-4.38.0.tgz#06e4ac7f1e49827b9cd32c34c2f20c28c3b42fdc"
+  integrity sha512-6XfuSoJIXmW6xloWNdXDNsL8JZrUb4Xh9pKwh7NzxqQx50rqQ0JI1wxrZQJB0ZRevnk0SCMbIbT6aQOxmF8CIg==
+  dependencies:
+    "@ledgerhq/errors" "^4.38.0"
+
+"@ledgerhq/errors@^4.38.0":
+  version "4.38.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-4.38.0.tgz#5260118b2cb1069f706d9316bf6f2ee1f6935f43"
+  integrity sha512-ZVpwiQV4y6OqMcOhZ7xQR37xpZdYGXnZftlYtT9muzXrak/HPHc19oPpwiuqKmHAbgfio6qEVk9Lp3yWLY9bPQ==
+
 "@ledgerhq/hw-transport-node-hid@4.35.0":
   version "4.35.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid/-/hw-transport-node-hid-4.35.0.tgz#0eba08e5edd14a8c779ebaf73ec21976ee5f112e"
@@ -1178,12 +1190,13 @@
     node-hid "^0.7.2"
     usb "^1.3.3"
 
-"@ledgerhq/hw-transport-u2f@4.35.0":
-  version "4.35.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.35.0.tgz#750805d92cd194c2d68e27723e77b7c16878d3e4"
-  integrity sha512-cVPH0SNRrIKVZz9zHvulHGPSdDQiV1hCK634KZa2M2+fMVhQxUi4YRBQz7QpI88CwRyEy+sBfTfSahPWjQUN2Q==
+"@ledgerhq/hw-transport-u2f@4.38.0":
+  version "4.38.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.38.0.tgz#3cb5a83951bbbc28e748367ea354b2e6eff7a080"
+  integrity sha512-U4uC2gxd1zhEjw7VUGawj3IELPjRwleYSqsKFocRVMiDMrLoKAUutP3KCA404B1HdWZNpsB0kmVyuvM8y2tfOA==
   dependencies:
-    "@ledgerhq/hw-transport" "^4.35.0"
+    "@ledgerhq/errors" "^4.38.0"
+    "@ledgerhq/hw-transport" "^4.38.0"
     u2f-api "0.2.7"
 
 "@ledgerhq/hw-transport@^4.35.0":
@@ -1191,6 +1204,15 @@
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-4.35.0.tgz#aa7b851111ed759cd7489fa07a7b34c1773e8314"
   integrity sha512-o8ekdoCkHMvOByIKDmAMNDjm8Q5cu+sbqmebPtGrHAPbgIZBUbNA5UupY/Om+xypdxXYnuBw+MF8FyIVOjnIsg==
   dependencies:
+    events "^3.0.0"
+
+"@ledgerhq/hw-transport@^4.38.0":
+  version "4.38.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-4.38.0.tgz#cd7c20d87a99d1e68d77b9b858a9cf70a3c96044"
+  integrity sha512-0On4hCLPZ9sgv4sJspX/nfg6cfdmSV4uMd+rjzAdCFqi3/7siRSnZioLazdRTIOtNOaWqqTu9rLIJ4wKNLqQyA==
+  dependencies:
+    "@ledgerhq/devices" "^4.38.0"
+    "@ledgerhq/errors" "^4.38.0"
     events "^3.0.0"
 
 "@lerna/add@3.11.0":
