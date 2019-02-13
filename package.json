@@ -243,7 +243,7 @@
     "tslint-clean-code": "0.2.9",
     "tslint-config-prettier": "1.18.0",
     "tslint-consistent-codestyle": "1.15.0",
-    "tslint-immutable": "5.1.2",
+    "tslint-immutable": "5.2.0",
     "tslint-microsoft-contrib": "5.2.1",
     "tslint-sonarts": "1.9.0",
     "typescript": "3.3.3",
