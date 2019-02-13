@@ -14,8 +14,8 @@ interface TokenPayableContract {
   readonly onRevokeSendTransfer: (from: Address, amount: Fixed<0>, asset: Address) => void;
 }
 
-export function Token<TBase extends Constructor<SmartContract>>(Base: TBase) {
-  abstract class TokenClass extends Base {
+export function NEP5Token<TBase extends Constructor<SmartContract>>(Base: TBase) {
+  abstract class NEP5TokenClass extends Base {
     public abstract readonly name: string;
     public abstract readonly decimals: 8;
     public abstract readonly symbol: string;
@@ -167,5 +167,5 @@ export function Token<TBase extends Constructor<SmartContract>>(Base: TBase) {
     }
   }
 
-  return TokenClass;
+  return NEP5TokenClass;
 }

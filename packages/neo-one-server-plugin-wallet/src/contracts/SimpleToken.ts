@@ -1,7 +1,7 @@
 import { Address, Fixed, SmartContract } from '@neo-one/smart-contract';
-import { Token } from '@neo-one/smart-contract-lib';
+import { NEP5Token } from '@neo-one/smart-contract-lib';
 
-export abstract class SimpleToken extends Token(SmartContract) {
+export abstract class SimpleToken extends NEP5Token(SmartContract) {
   public readonly owner: Address;
   public readonly decimals: 8 = 8;
 
