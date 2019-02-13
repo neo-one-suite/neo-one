@@ -1190,13 +1190,13 @@
     node-hid "^0.7.2"
     usb "^1.3.3"
 
-"@ledgerhq/hw-transport-u2f@4.38.0":
-  version "4.38.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.38.0.tgz#3cb5a83951bbbc28e748367ea354b2e6eff7a080"
-  integrity sha512-U4uC2gxd1zhEjw7VUGawj3IELPjRwleYSqsKFocRVMiDMrLoKAUutP3KCA404B1HdWZNpsB0kmVyuvM8y2tfOA==
+"@ledgerhq/hw-transport-u2f@4.38.6":
+  version "4.38.6"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.38.6.tgz#c25113b5aeb83ce8580893710c7534f8ba473b43"
+  integrity sha512-Gzu0TBYE9Bf53xJhv39nbuxiDeW9MT6wde1yrIr9Psstdqm8aAWD3NCPjdYlMRQ2IQI8AkS2Wx57aogROYuApw==
   dependencies:
     "@ledgerhq/errors" "^4.38.0"
-    "@ledgerhq/hw-transport" "^4.38.0"
+    "@ledgerhq/hw-transport" "^4.38.6"
     u2f-api "0.2.7"
 
 "@ledgerhq/hw-transport@^4.35.0":
@@ -1206,10 +1206,10 @@
   dependencies:
     events "^3.0.0"
 
-"@ledgerhq/hw-transport@^4.38.0":
-  version "4.38.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-4.38.0.tgz#cd7c20d87a99d1e68d77b9b858a9cf70a3c96044"
-  integrity sha512-0On4hCLPZ9sgv4sJspX/nfg6cfdmSV4uMd+rjzAdCFqi3/7siRSnZioLazdRTIOtNOaWqqTu9rLIJ4wKNLqQyA==
+"@ledgerhq/hw-transport@^4.38.6":
+  version "4.38.6"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-4.38.6.tgz#a7a2d24d87f16f507c1e00dbdfb246dae9adc7a8"
+  integrity sha512-zRKarFc6bp3zcLNiku+ObAeawHevsvMEqkJo7hdSarKFBb8TjBBiS8CDIXy3xs9651HtZNOv6WHGTQFHdBbcwA==
   dependencies:
     "@ledgerhq/devices" "^4.38.0"
     "@ledgerhq/errors" "^4.38.0"
