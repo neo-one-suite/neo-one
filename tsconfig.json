@@ -41,6 +41,8 @@
     "packages/neo-one-smart-contract-lib/src/access/**/*.ts",
     "packages/neo-one-smart-contract-lib/src/*.ts",
     "packages/neo-one-smart-contract/src/*.d.ts",
+    "packages/neo-one-smart-contract-lib/src/access/*.ts",
+    "packages/neo-one-smart-contract-lib/src/access/roles/*.ts",
     "packages/neo-one-smart-contract-compiler/src/__data__/snippets/**/*.ts",
     "packages/*/src/__data__/contracts/*.ts",
     "packages/*/template/**/*.ts",
