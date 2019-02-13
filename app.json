@@ -1,0 +1,14 @@
+{
+  "name": "NEO•ONE Node",
+  "description": "NEO•ONE Node Deployment",
+  "website": "https://neo-one.io/",
+  "repository": "https://github.com/neo-one-suite/neo-one.git",
+  "logo": "https://neo-one.io/social.png",
+  "keywords": [
+    "NEO•ONE",
+    "NEO",
+    "ONE",
+    "node"
+  ],
+  "stack": "container"
+}
