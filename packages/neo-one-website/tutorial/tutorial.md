@@ -443,6 +443,14 @@ As you prepare your dapp for production, you'll likely want to configure additio
 
 If you're using React to power your dapp, the NEO•ONE toolchain offers two components that aid in integration: `ContractsProvider` and `WithContracts`. Check out the [React](/docs/react) advanced guide for more details.
 
+### Angular
+
+If you're using Angular to power your dapp, the NEO•ONE toolchain offers an Angular Service to aid in integration: `ContractsService`. Check out the [Angular](/docs/angular) advanced guide for more details.
+
+### Vue
+
+If you're using Angular to power your dapp, the NEO•ONE toolchain offers a tool to aid in integration: `contractsService`. Check out the [Vue](/docs/vue) advanced guide for more details.
+
 ### Developer Tools
 
 Regardless of the front-end framework you're using, the NEO•ONE Developer Tools contain all of the functionality necessary to control your private network and are simple to integrate:
