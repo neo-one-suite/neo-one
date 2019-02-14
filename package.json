@@ -155,7 +155,7 @@
     "@types/react": "16.8.2",
     "@types/styled-components": "4.1.8",
     "@types/webpack": "4.4.24",
-    "@types/webpack-bundle-analyzer": "2.13.0",
+    "@types/webpack-bundle-analyzer": "2.13.1",
     "@types/yargs": "12.0.8",
     "all-contributors-cli": "6.1.1",
     "app-root-dir": "1.0.2",
