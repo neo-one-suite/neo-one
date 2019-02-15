@@ -210,7 +210,7 @@
     "mocha-multi-reporters": "1.1.7",
     "nanoid": "2.0.1",
     "nodemon": "1.18.10",
-    "nyc": "13.2.0",
+    "nyc": "13.3.0",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "postcss-flexbugs-fixes": "4.1.0",
     "postcss-loader": "3.0.0",
