@@ -5,7 +5,7 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/types": "^1.0.2-alpha.0",
-    "@types/styled-components": "4.1.8",
+    "@types/styled-components": "4.1.10",
     "react": "16.8.2",
     "rxjs": "6.4.0",
     "styled-components": "4.1.3",
