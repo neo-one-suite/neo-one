@@ -11,20 +11,20 @@ export interface Role {
   readonly remove: (address: Address) => boolean;
 }
 
-export class AccessRole {
-  private mutableMembers: MapStorage<Address, boolean>;
+export class AccessRole implements Role {
+  private readonly members: MapStorage<Address, boolean>;
 
   public constructor() {
-    this.mutableMembers = MapStorage.for<Address, boolean>();
+    this.members = MapStorage.for<Address, boolean>();
   }
 
   @constant
   public hasMember(address: Address): boolean {
-    if (!this.mutableMembers.has(address)) {
+    if (!this.members.has(address)) {
       return false;
     }
 
-    return this.mutableMembers.get(address) ? true : false;
+    return !!this.members.get(address);
   }
 
   public add(address: Address): boolean {
@@ -32,7 +32,7 @@ export class AccessRole {
       return false;
     }
 
-    this.mutableMembers.set(address, true);
+    this.members.set(address, true);
 
     return true;
   }
@@ -42,7 +42,7 @@ export class AccessRole {
       return false;
     }
 
-    this.mutableMembers.set(address, true);
+    this.members.set(address, true);
 
     return true;
   }
