@@ -1168,24 +1168,12 @@
     log-update "^2.3.0"
     strip-ansi "^3.0.1"
 
-"@ledgerhq/devices@^4.38.0":
-  version "4.38.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/devices/-/devices-4.38.0.tgz#06e4ac7f1e49827b9cd32c34c2f20c28c3b42fdc"
-  integrity sha512-6XfuSoJIXmW6xloWNdXDNsL8JZrUb4Xh9pKwh7NzxqQx50rqQ0JI1wxrZQJB0ZRevnk0SCMbIbT6aQOxmF8CIg==
-  dependencies:
-    "@ledgerhq/errors" "^4.38.0"
-
 "@ledgerhq/devices@^4.39.0":
   version "4.39.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/devices/-/devices-4.39.0.tgz#47d23a1a58004da162e007e0c456ab2119038c7d"
   integrity sha512-2Jd7CVvMJDZxxaSpQpfOMeGWf7M0f6nZqZQWfjsUDQHw45Kunck101pXr6U/5UejJiLl/fhyLqvaXz0X0cs+1A==
   dependencies:
     "@ledgerhq/errors" "^4.39.0"
-
-"@ledgerhq/errors@^4.38.0":
-  version "4.38.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-4.38.0.tgz#5260118b2cb1069f706d9316bf6f2ee1f6935f43"
-  integrity sha512-ZVpwiQV4y6OqMcOhZ7xQR37xpZdYGXnZftlYtT9muzXrak/HPHc19oPpwiuqKmHAbgfio6qEVk9Lp3yWLY9bPQ==
 
 "@ledgerhq/errors@^4.39.0":
   version "4.39.0"
@@ -1204,23 +1192,14 @@
     node-hid "^0.7.6"
     usb "^1.5.0"
 
-"@ledgerhq/hw-transport-u2f@4.38.6":
-  version "4.38.6"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.38.6.tgz#c25113b5aeb83ce8580893710c7534f8ba473b43"
-  integrity sha512-Gzu0TBYE9Bf53xJhv39nbuxiDeW9MT6wde1yrIr9Psstdqm8aAWD3NCPjdYlMRQ2IQI8AkS2Wx57aogROYuApw==
+"@ledgerhq/hw-transport-u2f@4.39.0":
+  version "4.39.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.39.0.tgz#f91da2d8791d343db455991ceae55218182c00b6"
+  integrity sha512-nGvf409m2W5xIuUZklCnyf7ZrFGNCKhHgXwBAZAEk37qCvM7NueC25TgQKcphe88S/dbU/arC8Z3mpVoArLTGg==
   dependencies:
-    "@ledgerhq/errors" "^4.38.0"
-    "@ledgerhq/hw-transport" "^4.38.6"
+    "@ledgerhq/errors" "^4.39.0"
+    "@ledgerhq/hw-transport" "^4.39.0"
     u2f-api "0.2.7"
-
-"@ledgerhq/hw-transport@^4.38.6":
-  version "4.38.6"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-4.38.6.tgz#a7a2d24d87f16f507c1e00dbdfb246dae9adc7a8"
-  integrity sha512-zRKarFc6bp3zcLNiku+ObAeawHevsvMEqkJo7hdSarKFBb8TjBBiS8CDIXy3xs9651HtZNOv6WHGTQFHdBbcwA==
-  dependencies:
-    "@ledgerhq/devices" "^4.38.0"
-    "@ledgerhq/errors" "^4.38.0"
-    events "^3.0.0"
 
 "@ledgerhq/hw-transport@^4.39.0":
   version "4.39.0"
