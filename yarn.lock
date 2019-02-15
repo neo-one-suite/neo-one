@@ -1180,10 +1180,10 @@
   resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-4.39.0.tgz#10b9889f78df94ce36a4b34d9a3a45aac77be0e9"
   integrity sha512-kBr2rnoYDACRCxTLtEufE4oCvYj6vx2oFWVVjwskBxYsF5LC9R8Mbg5C4GgvDweiWW4Io8HA9p9jCsOfdCDygg==
 
-"@ledgerhq/hw-transport-node-hid@4.39.0":
-  version "4.39.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid/-/hw-transport-node-hid-4.39.0.tgz#566d485fef31dabaabf2e8a276cc07f33cf02cb5"
-  integrity sha512-QoNx8GUcgTlEkZ4Grr+cHFraj9sYmAl4Do0deqRSK5t6Ogjz/3iZvf7/l3MVvg4hKeIg8ajPjAzm+WUvnoUxgA==
+"@ledgerhq/hw-transport-node-hid@4.40.0":
+  version "4.40.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid/-/hw-transport-node-hid-4.40.0.tgz#7f35194f94e20374e1bd6a04e5299032c5e81b6c"
+  integrity sha512-Nxp2Ys5lxgWTUG/A+W7O3nemkIBigW0LSJI6QrCDdLDg7deU+Zp6QA/CDS95BLijqi5m0AqKE2U4IyQh4OFnhQ==
   dependencies:
     "@ledgerhq/devices" "^4.39.0"
     "@ledgerhq/errors" "^4.39.0"
