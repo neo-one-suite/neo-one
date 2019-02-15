@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.3-alpha.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client@1.0.2...@neo-one/client@1.0.3-alpha.0) (2019-02-15)
+
+
+### Features
+
+* **@neo-one/client:** Add iterStorage to NEOONEDataProvider ([0797f74](https://github.com/neo-one-suite/neo-one/commit/0797f74))
+
+
+
+
+
 ## [1.0.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client@1.0.1...@neo-one/client@1.0.2) (2018-11-13)
 
 **Note:** Version bump only for package @neo-one/client

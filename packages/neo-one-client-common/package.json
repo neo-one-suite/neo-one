@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/client-common",
-  "version": "1.0.1",
+  "version": "1.0.2-alpha.0",
   "description": "NEO•ONE client common code.",
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/ec-key": "^0.0.4",
-    "@neo-one/monitor": "^1.0.1",
-    "@neo-one/types": "^1.0.1",
-    "@neo-one/utils": "^1.0.1",
+    "@neo-one/monitor": "^1.0.2-alpha.0",
+    "@neo-one/types": "^1.0.2-alpha.0",
+    "@neo-one/utils": "^1.0.2-alpha.0",
     "@types/bs58": "^4.0.0",
     "@types/buffer-xor": "^2.0.0",
     "@types/elliptic": "^6.4.2",

@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/editor-server",
-  "version": "1.0.1",
+  "version": "1.0.2-alpha.0",
   "description": "NEO•ONE editor server.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/http": "^1.0.1",
-    "@neo-one/monitor": "^1.0.1",
-    "@neo-one/utils": "^1.0.1",
-    "@neo-one/utils-node": "^1.0.1",
+    "@neo-one/http": "^1.0.2-alpha.0",
+    "@neo-one/monitor": "^1.0.2-alpha.0",
+    "@neo-one/utils": "^1.0.2-alpha.0",
+    "@neo-one/utils-node": "^1.0.2-alpha.0",
     "@types/graphlib": "^2.1.4",
     "@types/koa": "^2.0.48",
     "@types/koa-compose": "^3.2.2",
