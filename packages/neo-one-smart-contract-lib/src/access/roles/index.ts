@@ -1,2 +1,6 @@
-// tslint:disable-next-line export-name
-export { CapperRole } from './CapperRole';
+export * from './CapperRole';
+export * from './MinterRole';
+export * from './PauserRole';
+export * from './SignerRole';
+export * from './WhitelistRole';
+export * from './WhitelistAdminRole';
