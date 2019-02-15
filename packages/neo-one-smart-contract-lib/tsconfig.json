@@ -28,8 +28,9 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
+    "src/access/**/*.ts",
     "src/ICO.ts",
     "src/index.ts",
-    "src/Token.ts"
+    "src/Token.ts",
   ]
 }

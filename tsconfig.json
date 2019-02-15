@@ -37,6 +37,8 @@
   "exclude": [
     "dist",
     "packages/neo-one-server-plugin-wallet/src/contracts/*.ts",
+    "packages/neo-one-smart-contract-lib/src/__data__/**/*.ts",
+    "packages/neo-one-smart-contract-lib/src/access/**/*.ts",
     "packages/neo-one-smart-contract-lib/src/*.ts",
     "packages/neo-one-smart-contract/src/*.d.ts",
     "packages/neo-one-smart-contract-compiler/src/__data__/snippets/**/*.ts",

@@ -1,5 +1,6 @@
 import { Address, Fixed, SmartContract } from '@neo-one/smart-contract';
-import { NEP5Token } from '@neo-one/smart-contract-lib';
+// tslint:disable-next-line:no-submodule-imports
+import { NEP5Token } from '@neo-one/smart-contract-lib/src/NEP5Token';
 
 export abstract class SimpleToken extends NEP5Token(SmartContract) {
   public readonly owner: Address;
