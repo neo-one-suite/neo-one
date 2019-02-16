@@ -49,6 +49,7 @@ interface Props {
   readonly content: ContentType;
   readonly sidebar: ReadonlyArray<SectionData>;
   readonly date?: string;
+  readonly link: string;
   readonly author?: Author;
   readonly next?: AdjacentInfo;
   readonly previous?: AdjacentInfo;
@@ -63,6 +64,7 @@ export const Content = ({
   previous,
   sidebar,
   date,
+  link,
   author,
   ...props
 }: Props) => (
@@ -71,7 +73,7 @@ export const Content = ({
       <title>{`${title} - NEO•ONE`}</title>
     </Helmet>
     <LayoutWrapper omitSpacer>
-      <MainContent content={content} title={title} date={date} author={author} />
+      <MainContent content={content} title={title} date={date} link={link} author={author} />
       <Sidebar current={current} sections={sidebar} alwaysVisible={sidebarAlwaysVisible} />
     </LayoutWrapper>
     <DocFooter next={next} previous={previous} />

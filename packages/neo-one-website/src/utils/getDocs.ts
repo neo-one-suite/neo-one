@@ -13,6 +13,7 @@ interface MDDocHeader {
 
 interface DocInfoBase extends MDDocHeader {
   readonly content: MarkdownContent;
+  readonly link: string;
 }
 
 interface DocInfo extends DocInfoBase {
@@ -40,6 +41,7 @@ export const getDocs = async (): Promise<ReadonlyArray<DocsProps>> => {
     current: doc.slug,
     title: doc.title,
     content: doc.content,
+    link: doc.link,
     sidebar: Object.entries(
       _.groupBy(
         docs.map((document) => ({
@@ -74,12 +76,15 @@ const getDoc = async (section: string, docFile: string): Promise<DocInfoBase> =>
   const contents = await fs.readFile(docFile, 'utf8');
   const doc = matter(contents);
   const docHeader = doc.data as MDDocHeader;
+  const docSource = path.resolve(__dirname, '..', '..', 'docs', docFile);
+  const link = docSource.replace(path.resolve(__dirname, '..', '..', '..', '..'), '');
 
   return {
     slug: `/docs/${docHeader.slug}`,
     title: docHeader.title.replace(/\\@/g, '@'),
     section,
     content: { type: 'markdown', value: doc.content },
+    link,
   };
 };
 

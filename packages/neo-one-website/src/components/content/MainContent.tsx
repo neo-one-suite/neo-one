@@ -7,6 +7,7 @@ import { Markdown } from '../../elements';
 import { ReferenceContent } from '../reference';
 import { ContentType } from './Content';
 import { DateAndAuthor } from './DateAndAuthor';
+import { EditPageLink } from './EditPageLink';
 import { Author } from './types';
 
 const Wrapper = styled(Box)`
@@ -160,15 +161,19 @@ interface Props {
   readonly title: string;
   readonly content: ContentType;
   readonly date?: string;
+  readonly link: string;
   readonly author?: Author;
 }
 
-export const MainContent = ({ content, title, date, author, ...props }: Props) => (
+export const MainContent = ({ content, title, date, link, author, ...props }: Props) => (
   <Wrapper {...props}>
     <Title>{title}</Title>
     {date === undefined || author === undefined ? null : <DateAndAuthor date={date} author={author} />}
     {content.type === 'markdown' ? (
-      <StyledMarkdown source={content.value} linkColor="accent" light anchors />
+      <>
+        <StyledMarkdown source={content.value} linkColor="accent" light anchors />
+        <EditPageLink link={link} />
+      </>
     ) : (
       <ReferenceContent content={content} />
     )}

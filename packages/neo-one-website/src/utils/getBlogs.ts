@@ -17,6 +17,7 @@ interface BlogInfo {
   readonly title: string;
   readonly slug: string;
   readonly date: string;
+  readonly link: string;
   readonly content: MarkdownContent;
   readonly author: Author;
 }
@@ -61,6 +62,7 @@ export const getBlogs = async (): Promise<{
       title: post.title,
       content: post.content,
       date: post.date,
+      link: post.link,
       author: post.author,
       sidebar,
     })),
@@ -75,11 +77,14 @@ const getBlog = async (blogFile: string): Promise<BlogInfo> => {
   const contents = await fs.readFile(path.resolve(BLOG_SOURCE, blogFile), 'utf8');
   const blog = matter(contents);
   const blogHeader = blog.data as MDBlogHeader;
+  const blogSourceLessDirname = BLOG_SOURCE.replace(path.resolve(__dirname, '..', '..', '..', '..'), '');
+  const link = path.join(blogSourceLessDirname, blogFile);
 
   return {
     slug: `/blog/${blogHeader.slug}`,
     title: blogHeader.title,
     date,
+    link,
     author: {
       name: blogHeader.author,
       twitter: blogHeader.twitter,

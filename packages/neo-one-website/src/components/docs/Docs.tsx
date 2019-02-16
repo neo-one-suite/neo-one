@@ -6,6 +6,7 @@ import { Content, MarkdownContent } from '../content';
 export interface DocsProps {
   readonly current: string;
   readonly title: string;
+  readonly link: string;
   readonly content: MarkdownContent;
   readonly sidebar: ReadonlyArray<SectionData>;
   readonly next?: AdjacentInfo;
