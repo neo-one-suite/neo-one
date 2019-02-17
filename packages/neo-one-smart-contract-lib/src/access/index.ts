@@ -1,2 +1,2 @@
 export * from './AccessRoles';
-export * from './roles/';
+export * from './roles';

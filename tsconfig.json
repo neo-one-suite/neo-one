@@ -39,18 +39,21 @@
     "packages/neo-one-server-plugin-wallet/src/contracts/*.ts",
     "packages/neo-one-smart-contract-lib/src/access/roles/*.ts",
     "packages/neo-one-smart-contract-lib/src/access/*.ts",
+    "packages/neo-one-smart-contract-lib/src/lifecycle/*.ts",
     "packages/neo-one-smart-contract-lib/src/*.ts",
     "packages/neo-one-smart-contract/src/*.d.ts",
     "packages/neo-one-smart-contract-lib/src/access/*.ts",
     "packages/neo-one-smart-contract-lib/src/access/roles/*.ts",
     "packages/neo-one-smart-contract-compiler/src/__data__/snippets/**/*.ts",
     "packages/*/src/__data__/contracts/*.ts",
+    "packages/*/src/__data__/contracts/**/*.ts",
     "packages/*/template/**/*.ts",
     "packages/*/template/**/*.tsx",
     "packages/neo-one-server-plugin-project/src/__data__/ico/one/contracts/*.ts",
     "packages/neo-one-server-plugin-project/src/__data__/icojs/one/contracts/*.ts",
     "packages/neo-one-playground",
     "packages/neo-one-website/courses/**/contracts/*.ts",
+    "packages/neo-one-website/courses/**/contracts/**/*.ts",
     "cypress"
   ]
 }
