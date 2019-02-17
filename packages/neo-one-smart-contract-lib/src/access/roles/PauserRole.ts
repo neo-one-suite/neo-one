@@ -38,6 +38,7 @@ export function PauserRole<TBase extends Constructor<SmartContract>>(Base: TBase
     public removePauser(address: Address, requstedBy: Address): boolean {
       if (
         this.onlyPausers(requstedBy) &&
+        !Address.isCaller(address) &&
         AccessRoleHandler.isMember(this.mutablePauserList, address) &&
         AccessRoleHandler.remove(this.mutablePauserList, address)
       ) {

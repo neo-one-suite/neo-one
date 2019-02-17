@@ -10,19 +10,18 @@ const ALTERNATE = {
 
 describe('Test Pausability', () => {
   test('deploy + pause + unpause', async () => {
-    await withContracts<{ testPausableContract: SmartContractAny }>(
+    await withContracts<{ testPausable: SmartContractAny }>(
       [
         {
           filePath: path.resolve(__dirname, '..', '..', '__data__', 'contracts', 'lifecycle', 'TestPausable.ts'),
           name: 'TestPausable',
         },
       ],
-      async ({ client, networkName, testPausableContract: smartContract, masterAccountID }) => {
+      async ({ client, networkName, testPausable: smartContract, masterAccountID }) => {
         crypto.addPublicKey(
           common.stringToPrivateKey(ALTERNATE.PRIVATE_KEY),
           common.stringToECPoint(ALTERNATE.PUBLIC_KEY),
         );
-
         const deployResult = await smartContract.deploy(masterAccountID.address, { from: masterAccountID });
 
         const deployReceipt = await deployResult.confirmed({ timeoutMS: 2500 });
@@ -34,73 +33,114 @@ describe('Test Pausability', () => {
         expect(deployReceipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
         expect(deployReceipt.result.value).toBeTruthy();
 
+        // setup alternate account
+
         const alternate = await client.providers.memory.keystore.addUserAccount({
           network: networkName,
           name: 'alternate',
           privateKey: ALTERNATE.PRIVATE_KEY,
         });
 
-        const [initialPauseState, ownerIsPauser, alternateIsPauser] = await Promise.all([
+        // Check state
+        // test functions
+
+        const [
+          initialPauseState,
+          ownerIsPauser,
+          alternateIsPauser,
+          resultPauseOnlyActivity,
+          resultUnpausedOnlyActivity,
+        ] = await Promise.all([
           smartContract.isPaused(),
           smartContract.isPauser(masterAccountID.address),
-          smartContract.isPauser(alternate.userAccount.id.address)
+          smartContract.isPauser(alternate.userAccount.id.address),
+          smartContract.doPauseOnlyActivity(),
+          smartContract.doUnpausedOnlyActivity(),
         ]);
-
         expect(initialPauseState).toBeFalsy();
         expect(ownerIsPauser).toBeTruthy();
         expect(alternateIsPauser).toBeFalsy();
+        expect(resultPauseOnlyActivity).toBeFalsy();
+        expect(resultUnpausedOnlyActivity).toBeTruthy();
 
-        const firstRequestResult = await smartContract.pause(
-          alternate.userAccount.id.address
-          { from: masterAccountID },
-        );
+        const [badRequestResult, badAddPauserResult] = await Promise.all([
+          smartContract.pause(alternate.userAccount.id.address, {
+            from: alternate.userAccount.id,
+          }),
+          smartContract.addPauser(alternate.userAccount.id.address, alternate.userAccount.id.address, {
+            from: alternate.userAccount.id,
+          }),
+        ]);
 
-        const firstRequestReceipt = await firstRequestResult.confirmed({ timeoutMS: 2500 });
-        if (firstRequestReceipt.result.state !== 'HALT') {
-          throw new Error(firstRequestReceipt.result.message);
+        const badRequestReceipt = await badRequestResult.confirmed({ timeoutMS: 2500 });
+        if (badRequestReceipt.result.state !== 'HALT') {
+          throw new Error(badRequestReceipt.result.message);
         }
-        expect(firstRequestReceipt.events).toHaveLength(1);
-        const initEvent = firstRequestReceipt.events[0];
-        expect(initEvent.name).toEqual('contract ownership transfer initiated');
-        const initOwnerResult = await smartContract.owner();
-        expect(initOwnerResult.toString()).toEqual(masterAccountID.address);
 
-        const canceledOwnerResult = await smartContract.transferContract(
+        const badAddPauserReceipt = await badAddPauserResult.confirmed({ timeoutMS: 2500 });
+        if (badAddPauserReceipt.result.state !== 'HALT') {
+          throw new Error(badAddPauserReceipt.result.message);
+        }
+
+        expect(badRequestReceipt.result.value).toBeFalsy();
+
+        expect(badAddPauserReceipt.result.value).toBeFalsy();
+
+        const [pauseResult, addPauserResult, removeSelfResult] = await Promise.all([
+          smartContract.pause(masterAccountID.address, { from: masterAccountID }),
+          smartContract.addPauser(alternate.userAccount.id.address, masterAccountID.address, { from: masterAccountID }),
+          smartContract.removePauser(masterAccountID.address, masterAccountID.address, { from: masterAccountID }),
+        ]);
+        const pauseReceipt = await pauseResult.confirmed({ timeoutMS: 2500 });
+        if (pauseReceipt.result.state !== 'HALT') {
+          throw new Error(pauseReceipt.result.message);
+        }
+        const removeSelfReceipt = await removeSelfResult.confirmed({ timeoutMS: 2500 });
+        if (removeSelfReceipt.result.state !== 'HALT') {
+          throw new Error(removeSelfReceipt.result.message);
+        }
+        expect(removeSelfReceipt.result.value).toBeFalsy();
+        expect(pauseReceipt.result.value).toBeTruthy();
+
+        expect(pauseReceipt.events).toHaveLength(1);
+        expect(pauseReceipt.events[0].name).toEqual('paused');
+
+        const addPauserReceipt = await addPauserResult.confirmed({ timeoutMS: 2500 });
+        if (addPauserReceipt.result.state !== 'HALT') {
+          throw new Error(addPauserReceipt.result.message);
+        }
+        expect(addPauserReceipt.result.value).toBeTruthy();
+        expect(addPauserReceipt.events).toHaveLength(1);
+        expect(addPauserReceipt.events[0].name).toEqual('add pauser');
+
+        const pauserRemovesAnotherPauserResult = await smartContract.removePauser(
           masterAccountID.address,
-
-          { from: masterAccountID },
+          alternate.userAccount.id.address,
+          { from: alternate.userAccount.id },
         );
-        const canceledOwnerReceipt = await canceledOwnerResult.confirmed({ timeoutMS: 2500 });
-        expect(canceledOwnerReceipt.events).toHaveLength(1);
-        const cancelEvent = canceledOwnerReceipt.events[0];
-        expect(cancelEvent.name).toEqual('contract ownership transfer canceled');
-        const cancelOwnerResult = await smartContract.owner();
-        expect(cancelOwnerResult.toString()).toEqual(masterAccountID.address);
+        const pauserRemovesAnotherPauserReciept = await pauserRemovesAnotherPauserResult.confirmed({ timeoutMS: 2500 });
+        if (pauserRemovesAnotherPauserReciept.result.state !== 'HALT') {
+          throw new Error(pauserRemovesAnotherPauserReciept.result.message);
+        }
 
-        const bogusClaimResult = await smartContract.transferContract(alternate.userAccount.id.address, {
-          from: alternate.userAccount.id,
-        });
-        const bogusClaimReceipt = await bogusClaimResult.confirmed({ timeoutMS: 2500 });
-        expect(bogusClaimReceipt.value).toBeFalsy();
-
-        const init2TransferResult = await smartContract.transferContract(alternate.userAccount.id.address, {
-          from: masterAccountID,
-        });
-        const init2TransferReceipt = await init2TransferResult.confirmed({ timeoutMS: 2500 });
-        expect(init2TransferReceipt.events).toHaveLength(1);
-        const init2Event = init2TransferReceipt.events[0];
-        expect(init2Event.name).toEqual('contract ownership transfer initiated');
-
-        const finalizeTransferResult = await smartContract.transferContract(alternate.userAccount.id.address, {
-          from: alternate.userAccount.id,
-        });
-        const finalizeTransferReceipt = await finalizeTransferResult.confirmed({ timeoutMS: 2500 });
-        expect(finalizeTransferReceipt.events).toHaveLength(1);
-        const finalEvent = finalizeTransferReceipt.events[0];
-        expect(finalEvent.name).toEqual('contract ownership transfer');
-
-        const finalOwnerResult = await smartContract.owner();
-        expect(finalOwnerResult.toString()).toEqual(alternate.userAccount.id.address);
+        const [
+          midPauseState,
+          ownerIsPauserB,
+          alternateIsPauserB,
+          resultPauseOnlyActivityB,
+          resultUnpausedOnlyActivityB,
+        ] = await Promise.all([
+          smartContract.isPaused(),
+          smartContract.isPauser(masterAccountID.address),
+          smartContract.isPauser(alternate.userAccount.id.address),
+          smartContract.doPauseOnlyActivity(),
+          smartContract.doUnpausedOnlyActivity(),
+        ]);
+        expect(midPauseState).toBeTruthy();
+        expect(ownerIsPauserB).toBeFalsy();
+        expect(alternateIsPauserB).toBeTruthy();
+        expect(resultUnpausedOnlyActivityB).toBeFalsy();
+        expect(resultPauseOnlyActivityB).toBeTruthy();
       },
       { deploy: false },
     );

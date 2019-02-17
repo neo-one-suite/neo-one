@@ -31,6 +31,7 @@
     "src/access/**/*.ts",
     "src/ICO.ts",
     "src/index.ts",
+    "src/lifecycle/*.ts",
     "src/Token.ts",
   ]
 }

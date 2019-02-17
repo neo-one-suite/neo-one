@@ -1,6 +1,6 @@
 import { Address, SmartContract } from '@neo-one/smart-contract';
-// tslint:disable-next-line:no-submodule-imports no-implicit-dependencies
-import { SignerRole } from '@neo-one/smart-contract-lib/src/access/roles/SignerRole';
+// tslint:disable-next-line:no-implicit-dependencies
+import { SignerRole } from '@neo-one/smart-contract-lib';
 
 export class TestSigner extends SignerRole(SmartContract) {
   public constructor(owner: Address) {

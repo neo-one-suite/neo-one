@@ -1,6 +1,6 @@
 import { Address, SmartContract } from '@neo-one/smart-contract';
-// tslint:disable-next-line:no-submodule-imports no-implicit-dependencies
-import { CapperRole } from '@neo-one/smart-contract-lib/src/access/roles/CapperRole';
+// tslint:disable-next-line:no-implicit-dependencies
+import { CapperRole } from '@neo-one/smart-contract-lib';
 
 export class TestCapper extends CapperRole(SmartContract) {
   public constructor(owner: Address) {
