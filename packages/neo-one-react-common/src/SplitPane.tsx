@@ -77,8 +77,8 @@ interface BaseProps {
 
 interface LRProps extends BaseProps {
   readonly type: 'lr';
-  readonly left: React.ReactElement<any>;
-  readonly right: React.ReactElement<any>;
+  readonly left: React.ReactElement;
+  readonly right: React.ReactElement;
   readonly collapseRight?: boolean;
   readonly onExpandRight?: () => void;
   readonly top?: undefined;
@@ -87,8 +87,8 @@ interface LRProps extends BaseProps {
 
 interface TBProps extends BaseProps {
   readonly type: 'tb';
-  readonly top: React.ReactElement<any>;
-  readonly bottom: React.ReactElement<any>;
+  readonly top: React.ReactElement;
+  readonly bottom: React.ReactElement;
   readonly collapseRight?: undefined;
   readonly onExpandRight?: undefined;
   readonly left?: undefined;
@@ -119,15 +119,15 @@ export class SplitPane extends React.Component<Props, State> {
     const { active } = this.state;
     let { size } = this.state;
 
-    let first: React.ReactElement<any>;
-    let second: React.ReactElement<any>;
+    let first: React.ReactElement;
+    let second: React.ReactElement;
     if (type === 'lr') {
-      first = left as React.ReactElement<any>;
-      second = right as React.ReactElement<any>;
+      first = left as React.ReactElement;
+      second = right as React.ReactElement;
       size = collapseRight ? 1.0 : size;
     } else {
-      first = top as React.ReactElement<any>;
-      second = bottom as React.ReactElement<any>;
+      first = top as React.ReactElement;
+      second = bottom as React.ReactElement;
     }
 
     const lr = type === 'lr';
