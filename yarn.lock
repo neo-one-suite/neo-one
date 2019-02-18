@@ -19510,9 +19510,10 @@ yargs@12.0.2:
     y18n "^3.2.1 || ^4.0.0"
     yargs-parser "^10.1.0"
 
-yargs@13.2.0:
-  version "13.2.0"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-13.2.0.tgz#8b749168defffe473ec1e7980634aa360518d7e7"
+yargs@13.2.1:
+  version "13.2.1"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-13.2.1.tgz#c8888bcf24424bd4e5a834348366f6fcc37bb8d9"
+  integrity sha512-HgY0xHGmPPakg6kEDufqxZuXVtvPZcipORC8O7S44iEnwsUmP+qnhReHc6d1dyeIZkrPmYFblh45Z2oeDn++fQ==
   dependencies:
     cliui "^4.0.0"
     find-up "^3.0.0"
