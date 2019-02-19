@@ -298,7 +298,7 @@ describe('BrowserMonitor', () => {
       });
       const nodeCounter = {
         inc: jest.fn(),
-      };
+      } as any;
       const createCounterSpy = jest.spyOn(metrics, 'createCounter');
       createCounterSpy.mockImplementationOnce(() => nodeCounter);
       nodeMonitor.report(JSON.parse(testReport));
@@ -323,7 +323,7 @@ describe('BrowserMonitor', () => {
       });
       const nodeHistogram = {
         observe: jest.fn(),
-      };
+      } as any;
       const createHistogramSpy = jest.spyOn(metrics, 'createHistogram');
       createHistogramSpy.mockImplementationOnce(() => nodeHistogram);
       nodeMonitor.report(JSON.parse(testReport));

@@ -1,4 +1,3 @@
-import { TransactionResult } from '@neo-one/client-common';
 import { Hash256 } from '@neo-one/client-core';
 import { of as _of } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -7,6 +6,7 @@ import { Client } from '../Client';
 import { UserAccountProvider } from '../types';
 
 describe('Client', () => {
+  // tslint:disable:no-any
   const type = 'memory';
   const type1 = 'local';
   const unlockedWallet = factory.createUnlockedWallet();
@@ -18,27 +18,28 @@ describe('Client', () => {
   const deleteUserAccount = jest.fn();
   const updateUserAccountName = jest.fn();
   const commonTransactionResult = factory.createTransactionResult();
-  const claim = jest.fn(async () => commonTransactionResult);
-  const publish = jest.fn(async () => commonTransactionResult);
-  const publishAndDeploy = jest.fn(async () => commonTransactionResult);
-  const registerAsset = jest.fn(async () => commonTransactionResult);
+  const claim = jest.fn(async () => commonTransactionResult) as any;
+  const publish = jest.fn(async () => commonTransactionResult) as any;
+  const publishAndDeploy = jest.fn(async () => commonTransactionResult) as any;
+  const registerAsset = jest.fn(async () => commonTransactionResult) as any;
   const readClient = {};
-  const read = jest.fn(() => readClient);
-  const invoke = jest.fn(async () => commonTransactionResult);
-  const invokeSend = jest.fn(async () => commonTransactionResult);
-  const invokeRefundAssets = jest.fn(async () => commonTransactionResult);
-  const invokeCompleteSend = jest.fn(async () => commonTransactionResult);
-  const invokeClaim = jest.fn(async () => commonTransactionResult);
+  const read = jest.fn(() => readClient) as any;
+  const invoke = jest.fn(async () => commonTransactionResult) as any;
+  const invokeSend = jest.fn(async () => commonTransactionResult) as any;
+  const invokeRefundAssets = jest.fn(async () => commonTransactionResult) as any;
+  const invokeCompleteSend = jest.fn(async () => commonTransactionResult) as any;
+  const invokeClaim = jest.fn(async () => commonTransactionResult) as any;
   const commonRawCallReceipt = factory.createRawCallReceipt();
   const call = jest.fn(async () => commonRawCallReceipt);
   const iterBlocks = jest.fn();
   const getBlockCount = jest.fn();
   const getAccount = jest.fn();
   const iterActionsRaw = jest.fn();
-  let transfer: jest.Mock<Promise<TransactionResult>>;
-  let transfer1: jest.Mock<Promise<TransactionResult>>;
-  let issue: jest.Mock<Promise<TransactionResult>>;
-  let issue1: jest.Mock<Promise<TransactionResult>>;
+  let transfer: jest.Mock;
+  let transfer1: jest.Mock;
+  let issue: jest.Mock;
+  let issue1: jest.Mock;
+  // tslint:enable:no-any
 
   let provider: UserAccountProvider;
   let provider1: UserAccountProvider;
@@ -88,17 +89,19 @@ describe('Client', () => {
       deleteUserAccount: jest.fn(),
       updateUserAccountName: jest.fn(),
       transfer: transfer1,
-      claim: jest.fn(async () => Promise.resolve()),
-      publish: jest.fn(async () => Promise.resolve()),
-      publishAndDeploy: jest.fn(async () => Promise.resolve()),
-      registerAsset: jest.fn(async () => Promise.resolve()),
+      // tslint:disable:no-any
+      claim: jest.fn(async () => Promise.resolve()) as any,
+      publish: jest.fn(async () => Promise.resolve()) as any,
+      publishAndDeploy: jest.fn(async () => Promise.resolve()) as any,
+      registerAsset: jest.fn(async () => Promise.resolve()) as any,
       issue: issue1,
       read: jest.fn(),
-      invoke: jest.fn(async () => Promise.resolve()),
-      invokeSend: jest.fn(async () => Promise.resolve()),
-      invokeRefundAssets: jest.fn(async () => Promise.resolve()),
-      invokeCompleteSend: jest.fn(async () => Promise.resolve()),
-      invokeClaim: jest.fn(async () => Promise.resolve()),
+      invoke: jest.fn(async () => Promise.resolve()) as any,
+      invokeSend: jest.fn(async () => Promise.resolve()) as any,
+      invokeRefundAssets: jest.fn(async () => Promise.resolve()) as any,
+      invokeCompleteSend: jest.fn(async () => Promise.resolve()) as any,
+      invokeClaim: jest.fn(async () => Promise.resolve()) as any,
+      // tslint:enable:no-any
       call: jest.fn(),
       iterBlocks,
       getBlockCount,

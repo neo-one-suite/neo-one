@@ -16,8 +16,8 @@ const FETCH_TIMEOUT_MS = 100;
 
 describe('AsyncBlockIterator', () => {
   let client: {
-    getBlockCount: ReturnType<typeof jest.fn>;
-    getBlock: ReturnType<typeof jest.fn>;
+    getBlockCount: jest.Mock;
+    getBlock: jest.Mock;
   };
   let blockIterator: AsyncBlockIterator;
 

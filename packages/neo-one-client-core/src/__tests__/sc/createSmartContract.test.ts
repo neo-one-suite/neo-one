@@ -127,7 +127,8 @@ describe('createSmartContract', () => {
   });
 
   test('createInvoke - no network', async () => {
-    getCurrentUserAccount.mockImplementationOnce(() => ({ id: { network: 'local', address: keys[0].address } }));
+    // tslint:disable-next-line:no-any
+    getCurrentUserAccount.mockImplementationOnce(() => ({ id: { network: 'local', address: keys[0].address } } as any));
 
     const result = contract.transfer(keys[0].address, keys[1].address, data.bigNumbers.a);
 

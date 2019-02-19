@@ -17,7 +17,7 @@ describe('JSONRPCHTTPProvider', () => {
 
   let provider = new JSONRPCHTTPProvider(endpoint);
   // tslint:disable-next-line no-any
-  const fetchMock: jest.Mock<typeof fetch> = fetch as any;
+  const fetchMock: jest.Mock = fetch as any;
   beforeEach(() => {
     fetchMock.mockClear();
     provider = new JSONRPCHTTPProvider(endpoint);
@@ -25,6 +25,7 @@ describe('JSONRPCHTTPProvider', () => {
 
   test('retries failed requests once', async () => {
     const error = new Error('hello world');
+    // tslint:disable-next-line:no-any
     fetchMock.mockImplementation(async () => Promise.reject(error));
 
     const result = provider.request(req);
