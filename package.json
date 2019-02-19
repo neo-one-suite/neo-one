@@ -249,7 +249,7 @@
     "typescript": "3.3.3",
     "typescript-styled-plugin": "0.13.0",
     "url-loader": "1.1.2",
-    "webpack": "4.29.3",
+    "webpack": "4.29.5",
     "webpack-bundle-analyzer": "3.0.4",
     "webpack-node-externals": "1.7.2",
     "webpack-serve": "2.0.3",
@@ -264,7 +264,7 @@
     "bn.js": "4.11.8",
     "regenerator-runtime": "0.13.1",
     "terser": "3.14.1",
-    "webpack": "4.29.3"
+    "webpack": "4.29.5"
   },
   "config": {
     "commitizen": {
