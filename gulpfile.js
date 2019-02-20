@@ -623,17 +623,14 @@ const copyBrowserifyTypesFiles = (inputPath, outputPath) => {
     const newOutputPath = path.resolve(outputPath, dirOrFile);
 
     if (fs.lstatSync(newInputPath).isDirectory()) {
-      copyBrowserifyTypesFiles(
-        newInputPath,
-        newInputPath.includes('@neo-one/ec-key') ? `${newOutputPath}-browserify` : newOutputPath,
-      );
+      copyBrowserifyTypesFiles(newInputPath, newOutputPath);
     } else if (dirOrFile.endsWith('.d.ts')) {
       const typesFile = fs.readFileSync(newInputPath, 'utf-8');
       fs.outputFileSync(
         newOutputPath,
-        newOutputPath.includes('neo-one-types-browserify/index.d.ts')
-          ? typesFile.replace('ec-key', 'ec-key-browserify')
-          : typesFile.replace(/(?<='@neo-one\/)(.*)(?=')/gm, (match) => `${match}-browserify`),
+        typesFile.replace(/(?<='@neo-one\/)(.*)(?=')/gm, (match) =>
+          match.includes('ec-key') ? match : `${match}-browserify`,
+        ),
       );
     } else if (dirOrFile === 'package.json') {
       const pkgJSON = fs.readJSONSync(newInputPath);
@@ -646,9 +643,10 @@ const copyBrowserifyTypesFiles = (inputPath, outputPath) => {
             pkgJSON.dependencies === undefined
               ? undefined
               : Object.entries(pkgJSON.dependencies).reduce((acc, dependency) => {
-                  const dependencyName = dependency[0].includes('@neo-one/')
-                    ? `${dependency[0]}-browserify`
-                    : dependency[0];
+                  const dependencyName =
+                    dependency[0].includes('@neo-one/') && !dependency[0].includes('ec-key')
+                      ? `${dependency[0]}-browserify`
+                      : dependency[0];
                   const dependencyVersion = dependency[1];
                   return {
                     ...acc,
@@ -668,38 +666,59 @@ const bundleBrowserify = ((cache) =>
   memoizeTask(cache, async function bundleBrowserify(format) {
     if (format.dist === 'neo-one') {
       const pkgJSONMap = createPkgJSONMap();
+      const baseInputPath = path.resolve(__dirname, getDistBase(format));
+      const baseOutputPath = path.resolve(__dirname, DIST, 'neo-one-browserify');
+      const inputPkgPath = path.resolve(baseInputPath, 'packages');
+      const outputPkgPath = path.resolve(baseOutputPath, 'packages');
+      fs.removeSync(baseOutputPath);
 
-      Object.entries(CLIENT_BROWSERIFY).forEach(([pkgName, neoOneDependencies]) => {
-        const externals = getClientPkgDependencies(pkgJSONMap, neoOneDependencies);
-        const basePath = path.resolve(__dirname, getDest(format));
-        const inputPath = path.resolve(basePath, pkgName);
-        const outputPath = path.resolve(basePath, `${pkgName}-browserify`);
+      await Promise.all(
+        Object.entries(CLIENT_BROWSERIFY).map(async ([pkgName, neoOneDependencies]) => {
+          const externals = getClientPkgDependencies(pkgJSONMap, neoOneDependencies);
 
-        webpack(webpackBrowserifyConfig(externals, inputPath, outputPath), (err, stats) => {
-          if (err) {
-            throw err;
-          } else if (stats.hasErrors()) {
-            console.log(
-              stats.toString({
-                performance: false,
-                hash: false,
-                timings: true,
-                entrypoints: false,
-                chunkOrigins: false,
-                chunkModules: false,
-                colors: true,
-              }),
-            );
-            throw new Error('Webpack bundling failed.');
-          }
+          webpack(
+            webpackBrowserifyConfig(
+              externals,
+              path.resolve(inputPkgPath, pkgName),
+              path.resolve(outputPkgPath, pkgName),
+            ),
+            (err, stats) => {
+              if (err) {
+                throw err;
+              } else if (stats.hasErrors()) {
+                console.log(
+                  stats.toString({
+                    performance: false,
+                    hash: false,
+                    timings: true,
+                    entrypoints: false,
+                    chunkOrigins: false,
+                    chunkModules: false,
+                    colors: true,
+                  }),
+                );
+                throw new Error('Webpack bundling failed.');
+              }
 
-          neoOneDependencies.forEach((dependency) => {
-            const dirName = getDirName(dependency);
-            const browserifyPath = path.resolve(basePath, `${dirName}-browserify`);
-            copyBrowserifyTypesFiles(path.resolve(basePath, dirName), browserifyPath);
-          });
-        });
-      });
+              if (pkgName.includes('client-full')) {
+                fs.copySync(baseInputPath, baseOutputPath, {
+                  filter: (src) => src.endsWith('neo-one') || src.endsWith('.json'),
+                });
+                neoOneDependencies.forEach((dependency) => {
+                  const dirName = getDirName(dependency);
+                  const browserifyPath = path.resolve(outputPkgPath, dirName);
+                  copyBrowserifyTypesFiles(path.resolve(inputPkgPath, dirName), browserifyPath);
+                });
+
+                execa.shell('yarn install --non-interactive --no-progress --ignore-engines', {
+                  cwd: baseOutputPath,
+                  stdio: ['ignore', 'inherit', 'inherit'],
+                });
+              }
+            },
+          );
+        }),
+      );
     }
   }))({});
 
