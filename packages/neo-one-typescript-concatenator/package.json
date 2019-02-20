@@ -16,7 +16,7 @@
     "@neo-one/smart-contract-compiler-node": "^1.0.2-alpha.0",
     "app-root-dir": "1.0.2",
     "fs-extra": "7.0.1",
-    "yargs": "13.2.0"
+    "yargs": "13.2.1"
   },
   "sideEffects": false
 }
