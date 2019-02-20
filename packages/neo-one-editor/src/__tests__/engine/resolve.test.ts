@@ -10,7 +10,7 @@ const createErrorWithCode = (code: string) => {
 };
 
 const createFileSystem = (): [FileSystem, JestMocked<FileSystem>] => {
-  const fileSystem: JestMocked<FileSystem> = {
+  const fileSystem = {
     readdirSync: jest.fn(),
     statSync: jest.fn(() => {
       throw createErrorWithCode('ENOENT');
@@ -19,7 +19,8 @@ const createFileSystem = (): [FileSystem, JestMocked<FileSystem>] => {
       throw createErrorWithCode('ENOENT');
     }),
     writeFile: jest.fn(),
-  };
+    // tslint:disable-next-line:no-any
+  } as any;
 
   return [fileSystem, fileSystem];
 };
@@ -32,23 +33,25 @@ describe('resolve', () => {
   });
 
   const mockFiles = (files: { [path: string]: string }) => {
-    fsMock.readFileSync.mockImplementation((filePath) => {
+    fsMock.readFileSync.mockImplementation(((filePath: string) => {
       const file = files[filePath] as string | undefined;
       if (file !== undefined) {
         return file;
       }
 
       throw createErrorWithCode('ENOENT');
-    });
+      // tslint:disable-next-line:no-any
+    }) as any);
 
-    fsMock.statSync.mockImplementation((filePath) => {
+    fsMock.statSync.mockImplementation(((filePath: string) => {
       const file = files[filePath] as string | undefined;
       if (file !== undefined) {
         return { isFile: () => true, isDirectory: () => false };
       }
 
       throw createErrorWithCode('ENOENT');
-    });
+      // tslint:disable-next-line:no-any
+    }) as any);
   };
 
   test('simple relative', () => {

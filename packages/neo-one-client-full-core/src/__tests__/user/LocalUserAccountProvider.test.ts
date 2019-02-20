@@ -133,7 +133,8 @@ describe('LocalUserAccountProvider', () => {
   });
 
   test('transfer - no account', async () => {
-    getCurrentUserAccount.mockImplementation(() => undefined);
+    // tslint:disable-next-line:no-any
+    getCurrentUserAccount.mockImplementation((() => undefined) as any);
     const result = provider.transfer([]);
 
     await expect(result).rejects.toMatchSnapshot();

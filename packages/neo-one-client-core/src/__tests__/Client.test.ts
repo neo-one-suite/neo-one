@@ -75,8 +75,10 @@ describe('Client Tests', () => {
   let providerTwo: Modifiable<UserAccountProvider>;
   let client: Client;
   beforeEach(() => {
-    providerOne = getMockProvider(walletOne);
-    providerTwo = getMockProvider(walletTwo);
+    // tslint:disable:no-any
+    providerOne = getMockProvider(walletOne) as any;
+    providerTwo = getMockProvider(walletTwo) as any;
+    // tslint:enable:no-any
 
     client = new Client({
       main: providerOne,

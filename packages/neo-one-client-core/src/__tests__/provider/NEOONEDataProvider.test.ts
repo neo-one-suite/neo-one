@@ -362,7 +362,8 @@ describe('NEOONEDataProvider', () => {
 
   test('getTransactionReceipt', async () => {
     const transactionReceipt = factory.createTransactionReceipt();
-    client.getTransactionReceipt = jest.fn(async () => Promise.resolve(transactionReceipt));
+    // tslint:disable-next-line:no-any
+    client.getTransactionReceipt = jest.fn(async () => Promise.resolve(transactionReceipt) as any);
 
     const result = await provider.getTransactionReceipt(data.hash256s.a);
 
@@ -377,7 +378,7 @@ describe('NEOONEDataProvider', () => {
       throw new Error('Something went wrong');
     }
 
-    client.getInvocationData = jest.fn(async () => Promise.resolve(transactionJSON.invocationData));
+    client.getInvocationData = jest.fn(async () => Promise.resolve(invocationData));
     client.getTransaction = jest.fn(async () => Promise.resolve(transactionJSON));
 
     const result = await provider.getInvocationData(data.hash256s.a);
@@ -436,8 +437,11 @@ describe('NEOONEDataProvider', () => {
 
   test('getInvocationData - missing transaction data', async () => {
     const { data: _data, ...transactionJSON } = factory.createInvocationTransactionJSON();
-    client.getInvocationData = jest.fn(async () => Promise.resolve(transactionJSON.invocationData));
-    client.getTransaction = jest.fn(async () => Promise.resolve(transactionJSON));
+
+    // tslint:disable:no-any
+    client.getInvocationData = jest.fn(async () => Promise.resolve(transactionJSON.invocationData) as any);
+    client.getTransaction = jest.fn((async () => Promise.resolve(transactionJSON)) as any);
+    // tslint:enable:no-any
 
     await expect(provider.getInvocationData(data.hash256s.a)).rejects.toMatchSnapshot();
   });

@@ -83,7 +83,8 @@ describe('NEOONEProvider', () => {
 
   test('relayTransaction', async () => {
     const expected = factory.createMinerTransaction();
-    dataProvider.relayTransaction = jest.fn(async () => Promise.resolve(expected));
+    // tslint:disable-next-line:no-any
+    dataProvider.relayTransaction = jest.fn((async () => Promise.resolve(expected)) as any);
 
     const result = await provider.relayTransaction(network, data.buffers.a);
 
