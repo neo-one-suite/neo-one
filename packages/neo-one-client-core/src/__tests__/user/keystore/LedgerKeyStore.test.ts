@@ -83,13 +83,13 @@ describe('LedgerKeyStore', () => {
 
   let keystore: LedgerKeyStore;
 
-  beforeAll(() => {
+  beforeEach(() => {
     getAccount.mockReset();
     getAccount.mockImplementation(() => emptyAccount);
     keystore = new LedgerKeyStore(ledgerProvider, mockHandler);
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await keystore.close();
   });
 

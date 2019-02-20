@@ -208,3 +208,55 @@ describe('Crypto Errors', () => {
     expect(badSigsThrows).toThrowError(`Expected ${2} unique signatures, found: ${0}.`);
   });
 });
+
+describe.only('BIP32 HD Node Functions', () => {
+  const testVectors = [
+    '000102030405060708090a0b0c0d0e0f',
+    'fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542',
+    '4b381541583be4423346c643850da4b320e46a87ae3d2a4e6da11eba819cd4acba45d239319ac14f863b8d5ab5a0d0c64d2e8a1e7d1457df2e5a3c51c73235be',
+  ];
+
+  testVectors.forEach((seed, index) => {
+    test(`parseMasterSeed - seed ${index}`, () => {
+      const node = crypto.parseMasterSeed(seed);
+
+      expect(node).toMatchSnapshot();
+    });
+
+    test(`serializeHDNode - private - seed ${index}`, () => {
+      const node = crypto.parseMasterSeed(seed);
+      const serialized = crypto.serializeHDNode(node, true);
+
+      expect(serialized).toMatchSnapshot();
+    });
+
+    test(`serializeHDNode - public - seed ${index}`, () => {
+      const node = crypto.parseMasterSeed(seed);
+      const serialized = crypto.serializeHDNode(node, false);
+
+      expect(serialized).toMatchSnapshot();
+    });
+
+    test(`serializing an extendedKey should be equivalent - seed ${index}`, () => {
+      const node = crypto.parseMasterSeed(seed);
+      const privateExtended = crypto.serializeHDNode(node, true);
+      const privateNode = crypto.parseExtendedKey(privateExtended);
+
+      expect(privateNode).toEqual(node);
+    });
+
+    test(`derived public chain matches private chain - seed ${index}`, () => {
+      const node = crypto.parseMasterSeed(seed);
+      const privateExtended = crypto.serializeHDNode(node, true);
+      const publicExtended = crypto.serializeHDNode(node, false);
+
+      const privateNode = crypto.parseExtendedKey(privateExtended);
+      const publicNode = crypto.parseExtendedKey(publicExtended);
+
+      const privateChild = crypto.deriveChildKey(privateNode, 0, false);
+      const publicChild = crypto.deriveChildKey(publicNode, 0, false);
+
+      expect(privateChild.publicKey).toEqual(publicChild.publicKey);
+    });
+  });
+});

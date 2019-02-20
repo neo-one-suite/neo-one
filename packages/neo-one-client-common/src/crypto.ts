@@ -1,9 +1,10 @@
 // tslint:disable no-any no-array-mutation
 import ECKey from '@neo-one/ec-key';
 import { utils } from '@neo-one/utils';
+import BN from 'bn.js';
 import base58 from 'bs58';
 import xor from 'buffer-xor';
-import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto';
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from 'crypto';
 import { ec as EC } from 'elliptic';
 import scrypt from 'scrypt-js';
 import WIF from 'wif';
@@ -11,6 +12,11 @@ import { common, ECPoint, InvalidFormatError, PrivateKey, UInt160, UInt256 } fro
 import {
   Base58CheckError,
   InvalidAddressError,
+  InvalidBIP32ChildIndexError,
+  InvalidBIP32ExtendedKeyError,
+  InvalidBIP32HardenedError,
+  InvalidBIP32SerializePrivateNodeError,
+  InvalidBIP32VersionError,
   InvalidNumberOfKeysError,
   InvalidPrivateKeyError,
   InvalidSignatureError,
@@ -46,6 +52,11 @@ const rmd160 = (value: Buffer): Buffer =>
 const hash160 = (value: Buffer): UInt160 => common.bufferToUInt160(rmd160(sha256(value)));
 
 const hash256 = (value: Buffer): UInt256 => common.bufferToUInt256(sha256(sha256(value)));
+
+const hmacSha512 = (key: Buffer | string, data: Buffer) =>
+  createHmac('sha512', key)
+    .update(data)
+    .digest();
 
 const sign = ({ message, privateKey }: { readonly message: Buffer; readonly privateKey: PrivateKey }): Buffer => {
   const sig = ec().sign(sha256(message), common.privateKeyToBuffer(privateKey));
@@ -575,6 +586,192 @@ const isSignatureContract = (script: Buffer) => script.length === 35 && script[0
 
 const isStandardContract = (script: Buffer) => isSignatureContract(script) || isMultiSigContract(script);
 
+const HARDENED_KEY_OFFSET = 0x80000000;
+const EXTENDED_KEY_BYTES = 78;
+
+// Need eyes, according to https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki#node-serialization this isn't special.
+const BIP32_VERSION = {
+  public: 0x0488b21e,
+  private: 0x0488ade4,
+};
+
+export interface HDNode {
+  readonly privateKey?: PrivateKey;
+  readonly publicKey: Buffer;
+  readonly version: number;
+  readonly depth: number;
+  readonly parentFingerprint?: Buffer;
+  readonly index: number;
+  readonly chainCode: Buffer;
+}
+
+const getFingerprint = (value: Buffer) => hash160(value).slice(0, 4);
+
+const parseMasterSeed = (seedIn: Buffer | string): HDNode => {
+  const seed = seedIn instanceof Buffer ? seedIn : Buffer.from(seedIn, 'hex');
+  const hmac = hmacSha512('NEO Seed', seed);
+
+  const privateKey = hmac.slice(0, 32);
+  const publicKey = privateKeyToPublicKey(common.asPrivateKey(privateKey));
+  const chainCode = hmac.slice(32);
+
+  return {
+    privateKey: common.asPrivateKey(privateKey),
+    publicKey,
+    version: BIP32_VERSION.private,
+    depth: 0,
+    index: 0,
+    chainCode,
+  };
+};
+
+const parseExtendedKey = (key: string): HDNode => {
+  const data = base58CheckDecode(key);
+
+  if (data.length !== EXTENDED_KEY_BYTES) {
+    throw new InvalidBIP32ExtendedKeyError(key);
+  }
+
+  const version = data.readUInt32BE(0);
+  const depth = data.readUInt8(4);
+  const parentFingerprintIn = data.slice(5, 9);
+  const parentFingerprint = parentFingerprintIn.readUInt32BE(0) === 0 ? undefined : parentFingerprintIn;
+  const index = data.readUInt32BE(9);
+  const chainCode = data.slice(13, 45);
+  const keyData = data.slice(45);
+  const privateKeyIn = keyData[0] === 0 ? keyData.slice(1) : undefined;
+  const publicKey = keyData[0] !== 0 ? keyData : undefined;
+
+  if (privateKeyIn !== undefined) {
+    if (version !== BIP32_VERSION.private) {
+      throw new InvalidBIP32VersionError(version, BIP32_VERSION.private);
+    }
+
+    const privateKey = common.asPrivateKey(privateKeyIn);
+
+    return {
+      privateKey,
+      publicKey: privateKeyToPublicKey(privateKey),
+      version,
+      depth,
+      parentFingerprint,
+      index,
+      chainCode,
+    };
+  }
+
+  if (publicKey !== undefined) {
+    if (version !== BIP32_VERSION.public) {
+      throw new InvalidBIP32VersionError(version, BIP32_VERSION.public);
+    }
+
+    return {
+      publicKey,
+      version,
+      depth,
+      parentFingerprint,
+      index,
+      chainCode,
+    };
+  }
+
+  throw new InvalidBIP32ExtendedKeyError(key);
+};
+
+const deriveChildKey = (node: HDNode, index: number, hardened: boolean): HDNode => {
+  if (index >= HARDENED_KEY_OFFSET) {
+    throw new InvalidBIP32ChildIndexError(index);
+  }
+
+  const data: Buffer = Buffer.alloc(37);
+  if (hardened) {
+    if (!node.privateKey) {
+      throw new InvalidBIP32HardenedError();
+    }
+    node.privateKey.copy(data, 1);
+  } else {
+    node.publicKey.copy(data, 0);
+  }
+  data.writeUInt32BE(index, 33);
+
+  const sha = hmacSha512(node.chainCode, data);
+  const shaLeft = new BN(sha.slice(0, 32));
+  const shaRight = sha.slice(32);
+
+  if (shaLeft.cmp(ec().n) >= 0) {
+    return deriveChildKey(node, index + 1, hardened);
+  }
+
+  if (node.privateKey) {
+    const childKeyPrivate = shaLeft.add(new BN(node.privateKey)).mod(ec().n);
+
+    if (childKeyPrivate.cmp(new BN(0)) === 0) {
+      return deriveChildKey(node, index + 1, hardened);
+    }
+
+    const privateKey = common.asPrivateKey(childKeyPrivate.toArrayLike(Buffer, 'be', 32));
+    const publicKey = privateKeyToPublicKey(privateKey);
+
+    return {
+      depth: node.depth + 1,
+      privateKey,
+      publicKey,
+      chainCode: shaRight,
+      parentFingerprint: getFingerprint(node.publicKey),
+      index: hardened ? index + HARDENED_KEY_OFFSET : index,
+      version: BIP32_VERSION.private,
+    };
+  }
+  const parentKey = ec()
+    .keyFromPublic(node.publicKey)
+    .getPublic();
+
+  const childKey = ec()
+    .g.mul(shaLeft)
+    .add(parentKey);
+
+  if (childKey.isInfinity()) {
+    return deriveChildKey(node, index + 1, false);
+  }
+
+  const compressedChildKey = Buffer.from(childKey.encode(undefined, true));
+
+  return {
+    depth: node.depth + 1,
+    publicKey: compressedChildKey,
+    chainCode: shaRight,
+    parentFingerprint: getFingerprint(node.publicKey),
+    index,
+    version: BIP32_VERSION.public,
+  };
+};
+
+// privateNode lets you serialize the just the public key even on a private HDNode.
+const serializeHDNode = (node: HDNode, privateNode = true): string => {
+  if (privateNode && node.privateKey === undefined) {
+    throw new InvalidBIP32SerializePrivateNodeError();
+  }
+
+  const data = Buffer.alloc(EXTENDED_KEY_BYTES);
+
+  data.writeUInt32BE(privateNode ? BIP32_VERSION.private : BIP32_VERSION.public, 0);
+  data.writeUInt8(node.depth, 4);
+
+  if (node.parentFingerprint !== undefined) {
+    node.parentFingerprint.copy(data, 5);
+  }
+
+  data.writeUInt32BE(node.index, 9);
+  node.chainCode.copy(data, 13);
+
+  const key = privateNode && node.privateKey !== undefined ? node.privateKey : node.publicKey;
+  key.copy(data, EXTENDED_KEY_BYTES - key.length);
+
+  const checksum = hash256(data).slice(0, 4);
+
+  return base58.encode(Buffer.concat([data, checksum]));
+};
+
 export const crypto = {
   addPublicKey,
   sha1,
@@ -610,4 +807,8 @@ export const crypto = {
   isMultiSigContract,
   isSignatureContract,
   isStandardContract,
+  parseExtendedKey,
+  parseMasterSeed,
+  deriveChildKey,
+  serializeHDNode,
 };
