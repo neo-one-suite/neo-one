@@ -1,14 +1,14 @@
 {
   "name": "@neo-one/node-storage-cache",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "NEO•ONE node storage cache.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-common": "^1.0.2",
-    "@neo-one/node-core": "^1.0.2",
-    "@neo-one/node-storage-common": "^1.0.2",
-    "@neo-one/types": "^1.0.2",
-    "@neo-one/utils": "^1.0.2",
+    "@neo-one/client-common": "^1.1.0",
+    "@neo-one/node-core": "^1.1.0",
+    "@neo-one/node-storage-common": "^1.1.0",
+    "@neo-one/types": "^1.1.0",
+    "@neo-one/utils": "^1.1.0",
     "@types/lru-cache": "^4.1.1",
     "lru-cache": "^5.0.0",
     "tslib": "^1.9.3"

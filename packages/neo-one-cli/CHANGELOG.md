@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/cli@1.0.3...@neo-one/cli@1.1.0) (2019-02-21)
+
+**Note:** Version bump only for package @neo-one/cli
+
+
+
+
+
 ## [1.0.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/cli@1.0.3-alpha.0...@neo-one/cli@1.0.3) (2019-02-21)
 
 **Note:** Version bump only for package @neo-one/cli
