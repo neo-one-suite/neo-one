@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@1.0.3-alpha.0...@neo-one/website@1.0.3) (2019-02-21)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @types/react-dom to v16.8.2 ([81fed08](https://github.com/neo-one-suite/neo-one/commit/81fed08))
+* **deps:** update dependency @types/styled-components to v4.1.10 ([c9a5f1d](https://github.com/neo-one-suite/neo-one/commit/c9a5f1d))
+* **deps:** update dependency webpack to v4.29.5 ([fbfb3d0](https://github.com/neo-one-suite/neo-one/commit/fbfb3d0))
+* **website:** fix website courses and dependencies ([e106822](https://github.com/neo-one-suite/neo-one/commit/e106822))
+
+
+
+
+
 ## [1.0.3-alpha.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@1.0.2...@neo-one/website@1.0.3-alpha.0) (2019-02-15)
 
 

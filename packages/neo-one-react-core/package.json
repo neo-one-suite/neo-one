@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/react-core",
-  "version": "1.0.2-alpha.0",
+  "version": "1.0.2",
   "description": "NEO•ONE shared react.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/types": "^1.0.2-alpha.0",
+    "@neo-one/types": "^1.0.2",
     "@types/styled-components": "4.1.10",
     "react": "16.8.2",
     "rxjs": "6.4.0",

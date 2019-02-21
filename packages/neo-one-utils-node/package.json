@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/utils-node",
-  "version": "1.0.2-alpha.0",
+  "version": "1.0.2",
   "description": "NEO•ONE shared Nodejs utils.",
   "main": "./src/index.ts",
   "dependencies": {
