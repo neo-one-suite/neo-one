@@ -1,0 +1,872 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RemoteUserAccountProvider call 1`] = `
+Array [
+  Array [
+    "main",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    "deploy",
+    Array [
+      "100000000",
+      20,
+      "0707070707070707070707070707070707070707",
+      "0808080808080808080808080808080808080808080808080808080808080808",
+      "090909090909090909090909090909090909090909090909090909090909090909",
+      "stringData",
+      "abc123",
+      true,
+      Array [
+        "1000000000",
+        8,
+      ],
+      Array [
+        Array [
+          "100000000",
+          8,
+        ],
+      ],
+      Object {
+        "key": false,
+      },
+      undefined,
+    ],
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider claim 1`] = `
+Array [
+  Array [
+    Object {
+      "attributes": Array [
+        Object {
+          "data": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+          "usage": "Script",
+        },
+        Object {
+          "data": "b500",
+          "usage": "Description",
+        },
+        Object {
+          "data": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+          "usage": "ECDH02",
+        },
+        Object {
+          "data": "0x0621113df436c180a47b833a2814008dc4f332915b22253651593a40a342e0fb",
+          "usage": "Hash1",
+        },
+      ],
+      "from": Object {
+        "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
+        "network": "main",
+      },
+      "networkFee": "10",
+      "systemFee": "100",
+    },
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider claim 2`] = `
+Array [
+  Array [
+    Object {
+      "timeoutMS": 1257,
+    },
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider deleteUserAccount 1`] = `
+Array [
+  Array [
+    Object {
+      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      "network": "main",
+    },
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider invoke 1`] = `
+Array [
+  Array [
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    "deploy",
+    Array [
+      "100000000",
+      20,
+      "0707070707070707070707070707070707070707",
+      "0808080808080808080808080808080808080808080808080808080808080808",
+      "090909090909090909090909090909090909090909090909090909090909090909",
+      "stringData",
+      "abc123",
+      true,
+      Array [
+        "1000000000",
+        8,
+      ],
+      Array [
+        Array [
+          "100000000",
+          8,
+        ],
+      ],
+      Object {
+        "key": false,
+      },
+      undefined,
+    ],
+    Array [
+      Array [
+        "undefined",
+        undefined,
+      ],
+      Array [
+        "bignumber",
+        "10",
+      ],
+      Array [
+        "buffer",
+        "b500",
+      ],
+      Array [
+        "address",
+        "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      ],
+      Array [
+        "hash256",
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+      ],
+      Array [
+        "publicKey",
+        "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+      ],
+      Array [
+        "boolean",
+        true,
+      ],
+      Array [
+        "array",
+        Array [
+          Array [
+            "undefined",
+            undefined,
+          ],
+          Array [
+            "bignumber",
+            "10",
+          ],
+        ],
+      ],
+      Array [
+        "map",
+        Array [
+          Array [
+            "100000000",
+            8,
+          ],
+        ],
+      ],
+      Array [
+        "object",
+        Object {
+          "key": false,
+        },
+      ],
+      Array [
+        "forward",
+        Object {
+          "converted": "0707070707070707070707070707070707070707",
+          "name": "forwardValue",
+          "param": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        },
+      ],
+    ],
+    true,
+    Object {
+      "sendFrom": Array [
+        Object {
+          "amount": "10",
+          "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+          "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        },
+      ],
+      "sendTo": Array [
+        Object {
+          "amount": "10",
+          "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+        },
+      ],
+    },
+    Promise {},
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider invoke 2`] = `
+Array [
+  Array [
+    Object {
+      "timeoutMS": 1257,
+    },
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider invokeClaim 1`] = `
+Array [
+  Array [
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    "deploy",
+    Array [
+      "100000000",
+      20,
+      "0707070707070707070707070707070707070707",
+      "0808080808080808080808080808080808080808080808080808080808080808",
+      "090909090909090909090909090909090909090909090909090909090909090909",
+      "stringData",
+      "abc123",
+      true,
+      Array [
+        "1000000000",
+        8,
+      ],
+      Array [
+        Array [
+          "100000000",
+          8,
+        ],
+      ],
+      Object {
+        "key": false,
+      },
+      undefined,
+    ],
+    Array [
+      Array [
+        "undefined",
+        undefined,
+      ],
+      Array [
+        "bignumber",
+        "10",
+      ],
+      Array [
+        "buffer",
+        "b500",
+      ],
+      Array [
+        "address",
+        "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      ],
+      Array [
+        "hash256",
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+      ],
+      Array [
+        "publicKey",
+        "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+      ],
+      Array [
+        "boolean",
+        true,
+      ],
+      Array [
+        "array",
+        Array [
+          Array [
+            "undefined",
+            undefined,
+          ],
+          Array [
+            "bignumber",
+            "10",
+          ],
+        ],
+      ],
+      Array [
+        "map",
+        Array [
+          Array [
+            "100000000",
+            8,
+          ],
+        ],
+      ],
+      Array [
+        "object",
+        Object {
+          "key": false,
+        },
+      ],
+      Array [
+        "forward",
+        Object {
+          "converted": "0707070707070707070707070707070707070707",
+          "name": "forwardValue",
+          "param": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        },
+      ],
+    ],
+    Object {
+      "attributes": Array [
+        Object {
+          "data": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+          "usage": "Script",
+        },
+        Object {
+          "data": "b500",
+          "usage": "Description",
+        },
+        Object {
+          "data": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+          "usage": "ECDH02",
+        },
+        Object {
+          "data": "0x0621113df436c180a47b833a2814008dc4f332915b22253651593a40a342e0fb",
+          "usage": "Hash1",
+        },
+      ],
+      "from": Object {
+        "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
+        "network": "main",
+      },
+      "networkFee": "10",
+      "systemFee": "100",
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider invokeClaim 2`] = `
+Array [
+  Array [
+    Object {
+      "timeoutMS": 1257,
+    },
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider invokeCompleteSend 1`] = `
+Array [
+  Array [
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    "deploy",
+    Array [
+      "100000000",
+      20,
+      "0707070707070707070707070707070707070707",
+      "0808080808080808080808080808080808080808080808080808080808080808",
+      "090909090909090909090909090909090909090909090909090909090909090909",
+      "stringData",
+      "abc123",
+      true,
+      Array [
+        "1000000000",
+        8,
+      ],
+      Array [
+        Array [
+          "100000000",
+          8,
+        ],
+      ],
+      Object {
+        "key": false,
+      },
+      undefined,
+    ],
+    Array [
+      Array [
+        "undefined",
+        undefined,
+      ],
+      Array [
+        "bignumber",
+        "10",
+      ],
+      Array [
+        "buffer",
+        "b500",
+      ],
+      Array [
+        "address",
+        "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      ],
+      Array [
+        "hash256",
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+      ],
+      Array [
+        "publicKey",
+        "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+      ],
+      Array [
+        "boolean",
+        true,
+      ],
+      Array [
+        "array",
+        Array [
+          Array [
+            "undefined",
+            undefined,
+          ],
+          Array [
+            "bignumber",
+            "10",
+          ],
+        ],
+      ],
+      Array [
+        "map",
+        Array [
+          Array [
+            "100000000",
+            8,
+          ],
+        ],
+      ],
+      Array [
+        "object",
+        Object {
+          "key": false,
+        },
+      ],
+      Array [
+        "forward",
+        Object {
+          "converted": "0707070707070707070707070707070707070707",
+          "name": "forwardValue",
+          "param": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        },
+      ],
+    ],
+    "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+    Object {
+      "attributes": Array [
+        Object {
+          "data": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+          "usage": "Script",
+        },
+        Object {
+          "data": "b500",
+          "usage": "Description",
+        },
+        Object {
+          "data": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+          "usage": "ECDH02",
+        },
+        Object {
+          "data": "0x0621113df436c180a47b833a2814008dc4f332915b22253651593a40a342e0fb",
+          "usage": "Hash1",
+        },
+      ],
+      "from": Object {
+        "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
+        "network": "main",
+      },
+      "networkFee": "10",
+      "systemFee": "100",
+    },
+    undefined,
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider invokeCompleteSend 2`] = `
+Array [
+  Array [
+    Object {
+      "timeoutMS": 1257,
+    },
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider invokeRefundAssets 1`] = `
+Array [
+  Array [
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    "deploy",
+    Array [
+      "100000000",
+      20,
+      "0707070707070707070707070707070707070707",
+      "0808080808080808080808080808080808080808080808080808080808080808",
+      "090909090909090909090909090909090909090909090909090909090909090909",
+      "stringData",
+      "abc123",
+      true,
+      Array [
+        "1000000000",
+        8,
+      ],
+      Array [
+        Array [
+          "100000000",
+          8,
+        ],
+      ],
+      Object {
+        "key": false,
+      },
+      undefined,
+    ],
+    Array [
+      Array [
+        "undefined",
+        undefined,
+      ],
+      Array [
+        "bignumber",
+        "10",
+      ],
+      Array [
+        "buffer",
+        "b500",
+      ],
+      Array [
+        "address",
+        "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      ],
+      Array [
+        "hash256",
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+      ],
+      Array [
+        "publicKey",
+        "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+      ],
+      Array [
+        "boolean",
+        true,
+      ],
+      Array [
+        "array",
+        Array [
+          Array [
+            "undefined",
+            undefined,
+          ],
+          Array [
+            "bignumber",
+            "10",
+          ],
+        ],
+      ],
+      Array [
+        "map",
+        Array [
+          Array [
+            "100000000",
+            8,
+          ],
+        ],
+      ],
+      Array [
+        "object",
+        Object {
+          "key": false,
+        },
+      ],
+      Array [
+        "forward",
+        Object {
+          "converted": "0707070707070707070707070707070707070707",
+          "name": "forwardValue",
+          "param": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        },
+      ],
+    ],
+    "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+    Object {
+      "attributes": Array [
+        Object {
+          "data": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+          "usage": "Script",
+        },
+        Object {
+          "data": "b500",
+          "usage": "Description",
+        },
+        Object {
+          "data": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+          "usage": "ECDH02",
+        },
+        Object {
+          "data": "0x0621113df436c180a47b833a2814008dc4f332915b22253651593a40a342e0fb",
+          "usage": "Hash1",
+        },
+      ],
+      "from": Object {
+        "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
+        "network": "main",
+      },
+      "networkFee": "10",
+      "systemFee": "100",
+    },
+    Promise {},
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider invokeRefundAssets 2`] = `
+Array [
+  Array [
+    Object {
+      "timeoutMS": 1257,
+    },
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider invokeSend 1`] = `
+Array [
+  Array [
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    "deploy",
+    Array [
+      "100000000",
+      20,
+      "0707070707070707070707070707070707070707",
+      "0808080808080808080808080808080808080808080808080808080808080808",
+      "090909090909090909090909090909090909090909090909090909090909090909",
+      "stringData",
+      "abc123",
+      true,
+      Array [
+        "1000000000",
+        8,
+      ],
+      Array [
+        Array [
+          "100000000",
+          8,
+        ],
+      ],
+      Object {
+        "key": false,
+      },
+      undefined,
+    ],
+    Array [
+      Array [
+        "undefined",
+        undefined,
+      ],
+      Array [
+        "bignumber",
+        "10",
+      ],
+      Array [
+        "buffer",
+        "b500",
+      ],
+      Array [
+        "address",
+        "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      ],
+      Array [
+        "hash256",
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+      ],
+      Array [
+        "publicKey",
+        "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+      ],
+      Array [
+        "boolean",
+        true,
+      ],
+      Array [
+        "array",
+        Array [
+          Array [
+            "undefined",
+            undefined,
+          ],
+          Array [
+            "bignumber",
+            "10",
+          ],
+        ],
+      ],
+      Array [
+        "map",
+        Array [
+          Array [
+            "100000000",
+            8,
+          ],
+        ],
+      ],
+      Array [
+        "object",
+        Object {
+          "key": false,
+        },
+      ],
+      Array [
+        "forward",
+        Object {
+          "converted": "0707070707070707070707070707070707070707",
+          "name": "forwardValue",
+          "param": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        },
+      ],
+    ],
+    Object {
+      "amount": "10",
+      "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+      "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    },
+    Object {
+      "attributes": Array [
+        Object {
+          "data": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+          "usage": "Script",
+        },
+        Object {
+          "data": "b500",
+          "usage": "Description",
+        },
+        Object {
+          "data": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+          "usage": "ECDH02",
+        },
+        Object {
+          "data": "0x0621113df436c180a47b833a2814008dc4f332915b22253651593a40a342e0fb",
+          "usage": "Hash1",
+        },
+      ],
+      "from": Object {
+        "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
+        "network": "main",
+      },
+      "networkFee": "10",
+      "systemFee": "100",
+    },
+    Promise {},
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider invokeSend 2`] = `
+Array [
+  Array [
+    Object {
+      "timeoutMS": 1257,
+    },
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider selectUserAccount 1`] = `
+Array [
+  Array [
+    Object {
+      "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
+      "network": "main",
+    },
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider stress test 1`] = `
+Array [
+  Array [
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    "deploy",
+    Array [],
+    Array [],
+    undefined,
+    undefined,
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider stress test 2`] = `
+Array [
+  Array [
+    "main",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    "deploy",
+    Array [
+      "100000000",
+      20,
+      "0707070707070707070707070707070707070707",
+      "0808080808080808080808080808080808080808080808080808080808080808",
+      "090909090909090909090909090909090909090909090909090909090909090909",
+      "stringData",
+      "abc123",
+      true,
+      Array [
+        "1000000000",
+        8,
+      ],
+      Array [
+        Array [
+          "100000000",
+          8,
+        ],
+      ],
+      Object {
+        "key": false,
+      },
+      undefined,
+    ],
+  ],
+  Array [
+    "main",
+    "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+    "deploy",
+    Array [],
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider transfer 1`] = `
+Array [
+  Array [
+    Array [
+      Object {
+        "amount": "10",
+        "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+        "to": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      },
+    ],
+    Object {
+      "from": Object {
+        "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
+        "network": "main",
+      },
+    },
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider transfer 2`] = `
+Array [
+  Array [
+    undefined,
+  ],
+]
+`;
+
+exports[`RemoteUserAccountProvider updateUserAccountName 1`] = `
+Array [
+  Array [
+    Object {
+      "id": Object {
+        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+      },
+      "name": "newName",
+    },
+  ],
+]
+`;
