@@ -16398,15 +16398,17 @@ rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
 
-rxjs-tslint-rules@4.17.0:
-  version "4.17.0"
-  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.17.0.tgz#f7db17ec41d0d83b47402e0dafc71f5a406233ae"
+rxjs-tslint-rules@4.17.2:
+  version "4.17.2"
+  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.17.2.tgz#96cf1ceb2dbf4e9c36c900fdde7d3a1e54259b18"
+  integrity sha512-ui5zNm9Fn5Sz+E8+ZCMEc47Fjfmd+KnQrdhANii5KoMzwdrbBZT+aeDk3w5a52Bd+Dbhry4+cPxshR1zNu5WBQ==
   dependencies:
     "@phenomnomnominal/tsquery" "^3.0.0"
     decamelize "^2.0.0"
     resolve "^1.4.0"
     tslib "^1.8.0"
     tsutils "^3.0.0"
+    tsutils-etc "^1.0.0"
 
 rxjs@6.4.0, rxjs@^6.1.0, rxjs@^6.3.3, rxjs@^6.4.0:
   version "6.4.0"
@@ -18201,6 +18203,11 @@ tslint@5.12.1:
     semver "^5.3.0"
     tslib "^1.8.0"
     tsutils "^2.27.2"
+
+tsutils-etc@^1.0.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/tsutils-etc/-/tsutils-etc-1.0.1.tgz#2114f1b41a1d7ad5498690f011a18fa989ebffad"
+  integrity sha512-Yp6RQzPfxuZNjw/tHYdr+QRHtoPX2Al+9UmydyMidGqKt3Y13lJhryLUNPxYce5Y8KQ0Q6qn2MLJIxwL48GBWg==
 
 tsutils@2.7.1:
   version "2.7.1"
