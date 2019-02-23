@@ -20,7 +20,7 @@ const skipped = chalk.yellow(figures.arrowDown);
 const getSymbol = (task: TaskStatus, mutableSpinners: Spinners) => {
   if (mutableSpinners[task.id] == undefined) {
     const spinner = ora();
-
+    spinner.color = 'yellow';
     mutableSpinners[task.id] = spinner;
   }
 
