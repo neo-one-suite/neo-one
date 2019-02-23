@@ -1,5 +1,5 @@
 import { ReadAllStorage, ReadGetAllStorage, ReadStorage } from '@neo-one/node-core';
-import LRU from 'lru-cache';
+import LRUCache from 'lru-cache';
 
 type SerializeKeyString<Key> = (key: Key) => string;
 
@@ -8,7 +8,7 @@ export function createReadStorage<Key, Value>({
   storage,
   serializeKeyString,
 }: {
-  readonly cache: LRU.Cache<string, Value>;
+  readonly cache: LRUCache<string, Value>;
   readonly storage: ReadStorage<Key, Value>;
   readonly serializeKeyString: SerializeKeyString<Key>;
 }): ReadStorage<Key, Value> {
@@ -50,7 +50,7 @@ export function createReadAllStorage<Key, Value>({
   storage,
   serializeKeyString,
 }: {
-  readonly cache: LRU.Cache<string, Value>;
+  readonly cache: LRUCache<string, Value>;
   readonly storage: ReadAllStorage<Key, Value>;
   readonly serializeKeyString: SerializeKeyString<Key>;
 }): ReadAllStorage<Key, Value> {
@@ -72,7 +72,7 @@ export function createReadGetAllStorage<Key, Keys, Value>({
   storage,
   serializeKeyString,
 }: {
-  readonly cache: LRU.Cache<string, Value>;
+  readonly cache: LRUCache<string, Value>;
   readonly storage: ReadGetAllStorage<Key, Keys, Value>;
   readonly serializeKeyString: SerializeKeyString<Key>;
 }): ReadGetAllStorage<Key, Keys, Value> {

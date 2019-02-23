@@ -9,7 +9,7 @@
     "@neo-one/node-storage-common": "^1.1.0",
     "@neo-one/types": "^1.1.0",
     "@neo-one/utils": "^1.1.0",
-    "@types/lru-cache": "^4.1.1",
+    "@types/lru-cache": "^5.0.0",
     "lru-cache": "^5.0.0",
     "tslib": "^1.9.3"
   },
