@@ -480,7 +480,7 @@ const compileDeveloperTools = ((cache) =>
       input: path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-developer-tools', 'src', 'index.ts'),
       external: ['resize-observer-polyfill'],
       plugins: [
-        rollupString({
+        rollupString.string({
           include: '**/*.raw.js',
         }),
         rollupTypescript({
