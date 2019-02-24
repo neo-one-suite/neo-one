@@ -13,7 +13,7 @@
     "@neo-one/smart-contract-test": "^1.1.0",
     "@types/app-root-dir": "0.1.0",
     "app-root-dir": "1.0.2",
-    "bignumber.js": "8.0.2",
+    "bignumber.js": "8.1.1",
     "tslib": "1.9.3"
   },
   "sideEffects": false
