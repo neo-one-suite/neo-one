@@ -1964,14 +1964,14 @@
     is-stream "1.1.0"
     tslib "^1.9.3"
 
-"@render-props/events@^0.1.2":
+"@render-props/events@^0.1.12", "@render-props/events@^0.1.2":
   version "0.1.12"
   resolved "https://registry.yarnpkg.com/@render-props/events/-/events-0.1.12.tgz#fc0a6babf2da6825fb4f7a17023d6a24ad25d607"
   dependencies:
     "@babel/runtime" "^7.3.1"
     "@babel/runtime-corejs2" "^7.3.1"
 
-"@render-props/rect@^0.1.11", "@render-props/rect@^0.1.16":
+"@render-props/rect@^0.1.16", "@render-props/rect@^0.1.21":
   version "0.1.21"
   resolved "https://registry.yarnpkg.com/@render-props/rect/-/rect-0.1.21.tgz#735ba162369e4bbcdf0f4e08d44dafdaf88e1378"
   dependencies:
@@ -1980,7 +1980,7 @@
     "@render-props/events" "^0.1.2"
     "@render-props/throttle" "^0.1.5"
 
-"@render-props/scrollable@^0.1.11", "@render-props/scrollable@^0.1.19":
+"@render-props/scrollable@^0.1.19":
   version "0.1.19"
   resolved "https://registry.yarnpkg.com/@render-props/scrollable/-/scrollable-0.1.19.tgz#e99f214300dd1dcdf06287d217f8e5943d8d53a7"
   dependencies:
@@ -1999,7 +1999,7 @@
     "@render-props/rect" "^0.1.16"
     "@render-props/utils" "^0.2.1"
 
-"@render-props/throttle@^0.1.5":
+"@render-props/throttle@^0.1.15", "@render-props/throttle@^0.1.5":
   version "0.1.15"
   resolved "https://registry.yarnpkg.com/@render-props/throttle/-/throttle-0.1.15.tgz#d1caf5d6913501d6659d0a96339caa26a95f403a"
   dependencies:
@@ -2007,7 +2007,7 @@
     "@babel/runtime-corejs2" "^7.3.1"
     "@render-props/utils" "^0.2.0"
 
-"@render-props/utils@^0.2.0", "@render-props/utils@^0.2.1":
+"@render-props/utils@^0.2.0", "@render-props/utils@^0.2.1", "@render-props/utils@^0.2.11":
   version "0.2.11"
   resolved "https://registry.yarnpkg.com/@render-props/utils/-/utils-0.2.11.tgz#7dff4611d326bae77d3f1f63c668adf3ce721ad7"
   dependencies:
@@ -2015,17 +2015,18 @@
     "@babel/runtime-corejs2" "^7.3.1"
     raf "^3.4.0"
 
-"@render-props/viewport@^0.2.16":
-  version "0.2.16"
-  resolved "https://registry.yarnpkg.com/@render-props/viewport/-/viewport-0.2.16.tgz#a0b258fd6fb583fb5f2ca50ba76f3fc393ae345f"
+"@render-props/viewport@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@render-props/viewport/-/viewport-0.3.0.tgz#2cebb0b971e7b1980fa9717753fbc52b75f7542b"
+  integrity sha512-uZ3OBRXJxM2Sj5kFYv7bn5jebqnJ3mOBseH3n/wLr5i0dXPI4THKVCvfDnJmB+EO1Fgxyrh4Lq+s1chIANeyAw==
   dependencies:
     "@babel/runtime" "^7.3.1"
     "@babel/runtime-corejs2" "^7.3.1"
-    "@render-props/events" "^0.1.2"
-    "@render-props/rect" "^0.1.11"
-    "@render-props/scrollable" "^0.1.11"
-    "@render-props/throttle" "^0.1.5"
-    "@render-props/utils" "^0.2.1"
+    "@render-props/events" "^0.1.12"
+    "@render-props/rect" "^0.1.21"
+    "@render-props/scrollable" "^0.1.19"
+    "@render-props/throttle" "^0.1.15"
+    "@render-props/utils" "^0.2.11"
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
