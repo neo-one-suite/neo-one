@@ -3359,9 +3359,10 @@ ajv@6.5.3, ajv@6.8.1, ajv@^5.1.0, ajv@^5.2.3, ajv@^5.3.0, ajv@^6.1.0, ajv@^6.1.1
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-all-contributors-cli@6.1.1:
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/all-contributors-cli/-/all-contributors-cli-6.1.1.tgz#6c0cc6318d6f5d19c2c4cca35d2306ff25f993d3"
+all-contributors-cli@6.1.2:
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/all-contributors-cli/-/all-contributors-cli-6.1.2.tgz#ec45c0629900111f6911fd320de4e669e57c8013"
+  integrity sha512-IfX9BEbcSrn3/tZCpajxc8343Wnz29s9MaiFjN8KREHsDiLv/PLxuCVPSsdZSdS8ajhSM5b+u8kli8Dx6dK6pw==
   dependencies:
     "@babel/runtime" "^7.2.0"
     async "^2.0.0-rc.1"
@@ -3370,7 +3371,7 @@ all-contributors-cli@6.1.1:
     lodash "^4.11.2"
     pify "^4.0.1"
     request "^2.72.0"
-    yargs "^12.0.5"
+    yargs "^13.1.0"
 
 alphanum-sort@^1.0.0:
   version "1.0.2"
@@ -15327,7 +15328,7 @@ react-helmet@^5.2.0:
     prop-types "^15.5.4"
     react-side-effect "^1.1.0"
 
-react-hot-loader@4.7.1:
+react-hot-loader@4.7.1, react-hot-loader@^4.3.6:
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.7.1.tgz#1260b939297859cff35aff61412887a92c9b4275"
   dependencies:
@@ -15570,12 +15571,21 @@ react-transition-group@^2.2.1, react-transition-group@^2.5.0:
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
 
-react-universal-component@^3.0.2, react-universal-component@^3.0.3:
+react-universal-component@^3.0.2:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/react-universal-component/-/react-universal-component-3.0.3.tgz#88a7263584a9cd5497715cf1488eb4d3cfa17175"
   dependencies:
     hoist-non-react-statics "^2.2.1"
     prop-types "^15.5.10"
+
+react-universal-component@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/react-universal-component/-/react-universal-component-4.0.0.tgz#51e74198b98092dff6faf25315091070547ed129"
+  integrity sha512-FOL+1ZDS7Fp6AvUbkTDjttTOGxSRJZaU5M9MX+mm/Uj4/Azq7r2TpFACaUvMxFUYHjDRg2NpKwZDsHvywXMvMg==
+  dependencies:
+    hoist-non-react-statics "^2.2.1"
+    prop-types "^15.5.10"
+    react-hot-loader "^4.3.6"
 
 react@16.7.0-alpha.0:
   version "16.7.0-alpha.0"
@@ -16416,15 +16426,17 @@ rx-lite@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
 
-rxjs-tslint-rules@4.17.0:
-  version "4.17.0"
-  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.17.0.tgz#f7db17ec41d0d83b47402e0dafc71f5a406233ae"
+rxjs-tslint-rules@4.17.2:
+  version "4.17.2"
+  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.17.2.tgz#96cf1ceb2dbf4e9c36c900fdde7d3a1e54259b18"
+  integrity sha512-ui5zNm9Fn5Sz+E8+ZCMEc47Fjfmd+KnQrdhANii5KoMzwdrbBZT+aeDk3w5a52Bd+Dbhry4+cPxshR1zNu5WBQ==
   dependencies:
     "@phenomnomnominal/tsquery" "^3.0.0"
     decamelize "^2.0.0"
     resolve "^1.4.0"
     tslib "^1.8.0"
     tsutils "^3.0.0"
+    tsutils-etc "^1.0.0"
 
 rxjs@6.4.0, rxjs@^6.1.0, rxjs@^6.3.3, rxjs@^6.4.0:
   version "6.4.0"
@@ -18220,6 +18232,11 @@ tslint@5.12.1:
     tslib "^1.8.0"
     tsutils "^2.27.2"
 
+tsutils-etc@^1.0.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/tsutils-etc/-/tsutils-etc-1.0.1.tgz#2114f1b41a1d7ad5498690f011a18fa989ebffad"
+  integrity sha512-Yp6RQzPfxuZNjw/tHYdr+QRHtoPX2Al+9UmydyMidGqKt3Y13lJhryLUNPxYce5Y8KQ0Q6qn2MLJIxwL48GBWg==
+
 tsutils@2.7.1:
   version "2.7.1"
   resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-2.7.1.tgz#411a0e9466525a2b2869260a55620d7292155e24"
@@ -19629,7 +19646,7 @@ yargs@12.0.5, yargs@^12.0.1, yargs@^12.0.2, yargs@^12.0.5:
     y18n "^3.2.1 || ^4.0.0"
     yargs-parser "^11.1.1"
 
-yargs@13.2.1:
+yargs@13.2.1, yargs@^13.1.0:
   version "13.2.1"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-13.2.1.tgz#c8888bcf24424bd4e5a834348366f6fcc37bb8d9"
   dependencies:
