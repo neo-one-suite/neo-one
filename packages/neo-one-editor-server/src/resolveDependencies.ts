@@ -4,7 +4,7 @@ import { getEscapedNPMName } from '@neo-one/utils-node';
 import fetch from 'cross-fetch';
 import { Graph } from 'graphlib';
 import _ from 'lodash';
-import LRU from 'lru-cache';
+import LRUCache from 'lru-cache';
 import { defer } from 'rxjs';
 import stringify from 'safe-stable-stringify';
 import semver from 'semver';
@@ -52,7 +52,7 @@ interface Task {
   readonly parentNode: string;
 }
 
-const cache = new LRU<string, Promise<RegistryPackage>>({
+const cache = new LRUCache<string, Promise<RegistryPackage>>({
   max: 1000,
 });
 
@@ -221,7 +221,7 @@ class Resolver {
   }
 }
 
-const resolutionCache = new LRU<string, Promise<ResolvedDependencies>>({
+const resolutionCache = new LRUCache<string, Promise<ResolvedDependencies>>({
   max: 1000,
 });
 

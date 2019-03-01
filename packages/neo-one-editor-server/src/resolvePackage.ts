@@ -7,7 +7,7 @@ import fetch from 'cross-fetch';
 // @ts-ignore
 import detective from 'detective';
 import _ from 'lodash';
-import LRU from 'lru-cache';
+import LRUCache from 'lru-cache';
 import * as nodePath from 'path';
 import { defer } from 'rxjs';
 import * as tar from 'tar';
@@ -269,7 +269,7 @@ const resolvePackageWorker = async (name: string, version: string, monitor?: Mon
   return mutableResult;
 };
 
-const cache = new LRU<string, Promise<Result>>({
+const cache = new LRUCache<string, Promise<Result>>({
   max: 1000,
 });
 

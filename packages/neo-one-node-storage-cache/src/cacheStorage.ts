@@ -2,7 +2,7 @@ import { UInt256 } from '@neo-one/client-common';
 import { Storage } from '@neo-one/node-core';
 import { keys } from '@neo-one/node-storage-common';
 import { utils } from '@neo-one/utils';
-import LRU from 'lru-cache';
+import LRUCache from 'lru-cache';
 import { convertChange } from './convertChange';
 import * as read from './read';
 export interface Environment {
@@ -17,7 +17,7 @@ export const cacheStorage = ({
   readonly storage: Storage;
 }): Storage => {
   // tslint:disable-next-line no-any
-  const cache = new LRU<string, any>({
+  const cache = new LRUCache<string, any>({
     max: environment.maxSizeBytes,
     // length: (value, key) => value.size + Buffer.byteLength(key, 'utf8'),
   });
