@@ -2204,9 +2204,10 @@
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@types/app-root-dir/-/app-root-dir-0.1.0.tgz#ad0c090ea036b10f5cb4823d8e151495f23b271f"
 
-"@types/autoprefixer@9.1.1":
-  version "9.1.1"
-  resolved "https://registry.yarnpkg.com/@types/autoprefixer/-/autoprefixer-9.1.1.tgz#b2bc6670cdf7c090ef1c57ac4e2bd01d2664fd88"
+"@types/autoprefixer@9.4.0":
+  version "9.4.0"
+  resolved "https://registry.yarnpkg.com/@types/autoprefixer/-/autoprefixer-9.4.0.tgz#b72589130765cf8f7f403b9cec8ea81e507e759b"
+  integrity sha512-dN3gnhzPnDNmL0JckzmwPoEvqNTmIuvb/bRv73ku/TDqFBciBr4KtijA42Zbghkgxp5YomANvPphHOPeBQg+xw==
   dependencies:
     postcss "7.x.x"
 
