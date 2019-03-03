@@ -12235,6 +12235,15 @@ log-update@^2.3.0:
     cli-cursor "^2.0.0"
     wrap-ansi "^3.0.1"
 
+log-update@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/log-update/-/log-update-3.0.0.tgz#a79767dbbd2f1f46e2e763d8459a20c8179525b0"
+  integrity sha512-xhQH4g9biBnuNMYm/NjWgL2VDWPj60byIHvy8Zd9oy2+r2xO71NDmwSd7nEoznhcVuFsDyKoyEgORJWaotqoPg==
+  dependencies:
+    ansi-escapes "^3.2.0"
+    cli-cursor "^2.1.0"
+    wrap-ansi "^5.0.0"
+
 logform@^2.1.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/logform/-/logform-2.1.2.tgz#957155ebeb67a13164069825ce67ddb5bb2dd360"
@@ -19650,6 +19659,15 @@ wrap-ansi@^4.0.0:
     ansi-styles "^3.2.0"
     string-width "^2.1.1"
     strip-ansi "^4.0.0"
+
+wrap-ansi@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-5.0.0.tgz#c3838a85fbac6a647558ca97024d41d7631721dc"
+  integrity sha512-3ThemJUfTTju0SKG2gjGExzGRHxT5l/KEM5sff3TQReaVWe/bFTiF1GEr8DKr/j0LxGt8qPzx0yhd2RLyqgy2Q==
+  dependencies:
+    ansi-styles "^3.2.0"
+    string-width "^3.0.0"
+    strip-ansi "^5.0.0"
 
 wrappy@1:
   version "1.0.2"
