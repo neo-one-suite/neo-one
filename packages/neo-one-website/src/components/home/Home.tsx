@@ -79,7 +79,7 @@ const ProofsInnerWrapper = styled(Box)`
 
   @media (max-width: ${prop('theme.breakpoints.md')}) {
     mask-image: linear-gradient(to right, transparent, white 10px, white 90%, transparent);
-    overflow-x: scroll;
+    overflow-x: auto;
   }
 `;
 

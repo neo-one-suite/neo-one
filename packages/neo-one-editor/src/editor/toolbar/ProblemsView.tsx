@@ -15,7 +15,7 @@ const Wrapper = styled(Box)<{ readonly shadowed: boolean }>`
   display: grid;
   align-content: start;
   width: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   ${ifProp('shadowed', 'box-shadow: inset 0 10px 10px -5px rgba(0, 0, 0, 0.25)')};
 `;
 

@@ -24,13 +24,13 @@ const HeaderWrapper = styled(Box)`
   grid-auto-flow: column;
   grid-auto-columns: auto;
   grid-gap: 0;
-  overflow-x: scroll;
+  overflow-x: auto;
   justify-content: start;
 `;
 
 const StyledMarkdown = styled(Markdown)`
   min-height: 0;
-  overflow-y: scroll;
+  overflow-y: auto;
   padding: 0;
 
   &&& pre {
