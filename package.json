@@ -219,7 +219,7 @@
     "react-dom": "16.8.3",
     "react-hot-loader": "4.7.1",
     "react-static": "6.3.6",
-    "rollup": "1.4.0",
+    "rollup": "1.4.1",
     "rollup-plugin-string": "2.0.2",
     "rollup-plugin-typescript2": "0.19.3",
     "rxjs": "6.4.0",
