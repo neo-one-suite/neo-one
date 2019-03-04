@@ -54,10 +54,13 @@ const getPartsFromKey = (storageKey: string) => {
   const keyRaw = storageKey.slice(40);
   const padding = parseInt(keyRaw.substring(keyRaw.length - 2), 16);
   const key = keyRaw.substring(0, keyRaw.length - (padding + 1) * 2);
+  const keyFixed = _.chunk([...key], 34)
+    .map((chunk) => chunk.slice(0, 32))
+    .reduce((acc, chunk) => acc + chunk.join(''), '');
 
   return {
     address: scriptHashToAddress(scriptHash),
-    key,
+    key: keyFixed,
   };
 };
 
@@ -74,27 +77,39 @@ const getType = (state: string): RawStorageChange['type'] =>
 const getNEOStorageChangesForChange = (change: StorageAuditChange): RawStorageChange => {
   const { address, key } = getPartsFromKey(change.key);
   const type = getType(change.state);
-  if (type === 'Add') {
-    return { type, address, key, value: getValue(change.value) };
-  }
-
-  if (type === 'Modify') {
-    return { type, address, key, value: getValue(change.value) };
+  if (type === 'Add' || type === 'Modify') {
+    return { type: 'Add', address, key, value: getValue(change.value) };
   }
 
   return { type, address, key };
 };
 
-const getNEOStorageChanges = (block: StorageAuditBlock) => block.storage.map(getNEOStorageChangesForChange);
+const sortChanges = (changes: ReadonlyArray<RawStorageChange>) =>
+  _.sortBy(changes, (change) => `${change.address}:${change.key}`);
 
-const getOneStorageChanges = (block: Block) => {
+const getNEOStorageChanges = (block: StorageAuditBlock) =>
+  sortChanges(block.storage.map(getNEOStorageChangesForChange));
+
+const getOneStorageChanges = (block: Block): ReadonlyArray<RawStorageChange> => {
   const storageChanges = block.transactions
     .filter(
       (transaction): transaction is ConfirmedInvocationTransaction => transaction.type === 'InvocationTransaction',
     )
     .map((invocation) => invocation.invocationData.storageChanges);
 
-  return _.flatten(storageChanges);
+  const storageChangesByKey = _.flatten(storageChanges).reduce<{ [key: string]: RawStorageChange }>(
+    (acc, storageChange) => {
+      // tslint:disable-next-line:no-object-mutation
+      acc[`${storageChange.address}:${storageChange.key}`] = storageChange;
+
+      return acc;
+    },
+    {},
+  );
+
+  return sortChanges(Object.values(storageChangesByKey)).map((value) =>
+    value.type === 'Add' || value.type === 'Modify' ? { ...value, type: 'Add' as 'Add' } : value,
+  );
 };
 
 const compareStorageChangeForBlock = async (auditBlock: StorageAuditBlock): Promise<StorageMismatch | undefined> => {
