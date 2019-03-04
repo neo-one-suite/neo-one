@@ -22,7 +22,7 @@ const Wrapper = styled(Box)`
 const StyledMarkdown = styled(Markdown)`
   background-color: ${prop('theme.black')};
   min-height: 0;
-  overflow-y: scroll;
+  overflow-y: auto;
 `;
 
 interface Props {

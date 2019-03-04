@@ -17,7 +17,7 @@ const Wrapper = styled(Box)<{ readonly shadowed: boolean }>`
   color: ${prop('theme.gray0')};
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-wrap: break-word;
   padding-left: 16px;
   padding-right: 16px;
