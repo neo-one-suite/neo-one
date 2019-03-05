@@ -13,7 +13,7 @@ export class CodeActionAdapter extends Adapter implements monaco.languages.CodeA
     token: monaco.CancellationToken, // tslint:disable readonly-array
   ):
     | Array<monaco.languages.Command | monaco.languages.CodeAction>
-    | monaco.Thenable<Array<monaco.languages.Command | monaco.languages.CodeAction>> {
+    | Promise<Array<monaco.languages.Command | monaco.languages.CodeAction>> {
     const resource = model.uri;
 
     return this.toPromise(
