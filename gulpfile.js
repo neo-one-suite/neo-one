@@ -246,7 +246,7 @@ const globs = {
     `!packages/*/src/__tests__/**/*`,
     `!packages/*/src/__e2e__/**/*`,
     `!packages/*/src/bin/**/*`,
-    `!packages/neo-one-developer-tools/src/*.ts`,
+    `!packages/neo-one-developer-tools/src/*.{ts,tsx}`,
     `!packages/neo-one-developer-tools-frame/src/*.ts`,
     `!packages/neo-one-smart-contract-lib/src/*.ts`,
     `!packages/neo-one-server-plugin-wallet/src/contracts/*.ts`,
@@ -472,10 +472,29 @@ gulp.task('compileDeveloperToolsFrame', async () => {
   });
 });
 
+const compileDeveloperToolDeclarations = ((cache) =>
+  memoizeTask(cache, function compileTypescript(format, _done, type) {
+    return gulpReplaceModule(
+      format,
+      addFast(format, gulp.src(globs.typescript), type === 'fast')
+        .pipe(gulpFilter(['packages/neo-one-developer-tools/src/*.{ts,tsx}']))
+        .pipe(type === 'fast' ? format.fastProject() : format.project())
+        .dts.pipe(
+          gulpRename((name) => {
+            name.dirname = name.dirname
+              .split(path.sep)
+              .filter((dir) => dir !== 'src')
+              .join(path.sep);
+          }),
+        ),
+      format.module === 'esm' ? "'" : '"',
+    ).pipe(gulp.dest(path.join(getDest(format))));
+  }))({});
+
 const APP_ROOT_DIR = __dirname;
 
-const compileDeveloperTools = ((cache) =>
-  memoizeTask(cache, async function compileDeveloperTools(format) {
+const compileDeveloperToolsBundle = ((cache) =>
+  memoizeTask(cache, async function compileDeveloperToolsBundle(format) {
     const bundle = await rollup.rollup({
       input: path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-developer-tools', 'src', 'index.ts'),
       external: ['resize-observer-polyfill'],
@@ -521,6 +540,11 @@ const buildAllNoDeveloperTools = ((cache) =>
         format === MAIN_FORMAT ? 'copyBin' : undefined,
       ].filter((task) => task !== undefined),
     )(done);
+  }))({});
+
+const compileDeveloperTools = ((cache) =>
+  memoizeTask(cache, function compileDeveloperTools(format, done, type) {
+    return gulp.parallel(compileDeveloperToolDeclarations(format, type), compileDeveloperToolsBundle(format))(done);
   }))({});
 
 const buildAll = ((cache) =>
