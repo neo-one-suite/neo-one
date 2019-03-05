@@ -2080,7 +2080,7 @@
     react-lifecycles-compat "^3.0.4"
     warning "^3.0.0"
 
-"@reactivex/ix-es2015-cjs@2.5.1":
+"@reactivex/ix-es2015-cjs@2.5.1", "@reactivex/ix-es2015-cjs@2.5.2":
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/@reactivex/ix-es2015-cjs/-/ix-es2015-cjs-2.5.1.tgz#4a34f0aeddbee8bc97debe63169693028b1bcc4f"
   dependencies:
