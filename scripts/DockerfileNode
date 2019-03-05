@@ -2,7 +2,7 @@ FROM neotracker/neo-one-circleci-node:10.13.0-1 as builder
 RUN mkdir -p /tmp/neo-one
 WORKDIR tmp/neo-one
 
-COPY package.json tsconfig.json lerna.json gulpfile.js yarn.lock ./
+COPY package.json tsconfig.json lerna.json gulpfile.js yarn.lock LICENSE README.md ./
 COPY tsconfig/ tsconfig
 COPY packages/neo-one-utils/src/ packages/neo-one-utils/src
 COPY packages/neo-one-utils/package.json packages/neo-one-utils/
@@ -23,6 +23,10 @@ COPY packages/neo-one-client-full/src/ packages/neo-one-client-full/src
 COPY packages/neo-one-client-full/package.json packages/neo-one-client-full/
 COPY packages/neo-one-client-switch/src/ packages/neo-one-client-switch/src
 COPY packages/neo-one-client-switch/package.json packages/neo-one-client-switch/
+COPY packages/neo-one-developer-tools/src/ packages/neo-one-developer-tools/src
+COPY packages/neo-one-developer-tools/package.json packages/neo-one-developer-tools/
+COPY packages/neo-one-developer-tools-frame/src/ packages/neo-one-developer-tools-frame/src
+COPY packages/neo-one-developer-tools-frame/package.json packages/neo-one-developer-tools-frame/
 COPY packages/neo-one-node-bin/src/ packages/neo-one-node-bin/src
 COPY packages/neo-one-node-bin/package.json packages/neo-one-node-bin/
 COPY packages/neo-one-node-blockchain/src/ packages/neo-one-node-blockchain/src
