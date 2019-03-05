@@ -1,33 +1,33 @@
 import { Address, constant, createEventNotifier, MapStorage, SmartContract } from '@neo-one/smart-contract';
 import { AccessRoleHandler } from '../AccessRoles';
 
+/* tslint:disable-next-line:variable-name */
+const add_whitelist = createEventNotifier<Address, Address>('add whitelist', 'address', 'by');
+/* tslint:disable-next-line:variable-name */
+const remove_whitelist = createEventNotifier<Address, Address>('remove whitelist', 'address', 'by');
+
 export function WhitelistRole<TBase extends Constructor<SmartContract>>(Base: TBase) {
   abstract class WhitelistRoleClass extends Base {
     private readonly mutableWhitelistList = MapStorage.for<Address, boolean>();
     private mutableInitialized = false;
 
-    /* tslint:disable-next-line:variable-name */
-    private readonly add_whitelist = createEventNotifier<Address, Address>('add whitelist', 'address', 'by');
-    /* tslint:disable-next-line:variable-name */
-    private readonly remove_whitelist = createEventNotifier<Address, Address>('remove whitelist', 'address', 'by');
-
     @constant
-    public isWhitelist(address: Address): boolean {
+    public isWhitelisted(address: Address): boolean {
       return AccessRoleHandler.isMember(this.mutableWhitelistList, address);
     }
 
     @constant
-    public onlyWhitelists(address: Address): boolean {
-      return Address.isCaller(address) && this.isWhitelist(address);
+    public onlyWhitelisted(address: Address): boolean {
+      return Address.isCaller(address) && this.isWhitelisted(address);
     }
 
     public addWhitelist(address: Address, requstedBy: Address): boolean {
       if (
-        this.onlyWhitelists(requstedBy) &&
+        this.onlyWhitelisted(requstedBy) &&
         !AccessRoleHandler.isMember(this.mutableWhitelistList, address) &&
         AccessRoleHandler.add(this.mutableWhitelistList, address)
       ) {
-        this.add_whitelist(address, requstedBy);
+        add_whitelist(address, requstedBy);
 
         return true;
       }
@@ -37,11 +37,11 @@ export function WhitelistRole<TBase extends Constructor<SmartContract>>(Base: TB
 
     public removeWhitelist(address: Address, requstedBy: Address): boolean {
       if (
-        this.onlyWhitelists(requstedBy) &&
+        this.onlyWhitelisted(requstedBy) &&
         AccessRoleHandler.isMember(this.mutableWhitelistList, address) &&
         AccessRoleHandler.remove(this.mutableWhitelistList, address)
       ) {
-        this.remove_whitelist(address, requstedBy);
+        remove_whitelist(address, requstedBy);
 
         return true;
       }

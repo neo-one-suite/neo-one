@@ -1,23 +1,15 @@
 import { Address, constant, createEventNotifier, MapStorage, SmartContract } from '@neo-one/smart-contract';
 import { AccessRoleHandler } from '../AccessRoles';
 
+/* tslint:disable-next-line:variable-name */
+const add_whitelist_admin = createEventNotifier<Address, Address>('add whitelist admin', 'address', 'by');
+/* tslint:disable-next-line:variable-name */
+const remove_whitelist_admin = createEventNotifier<Address, Address>('remove whitelist admin', 'address', 'by');
+
 export function WhitelistAdminRole<TBase extends Constructor<SmartContract>>(Base: TBase) {
   abstract class WhitelistAdminRoleClass extends Base {
     private readonly mutableWhitelistAdminList = MapStorage.for<Address, boolean>();
     private mutableInitialized = false;
-
-    /* tslint:disable-next-line:variable-name */
-    private readonly add_whitelist_admin = createEventNotifier<Address, Address>(
-      'add whitelist admin',
-      'address',
-      'by',
-    );
-    /* tslint:disable-next-line:variable-name */
-    private readonly remove_whitelist_admin = createEventNotifier<Address, Address>(
-      'remove whitelist admin',
-      'address',
-      'by',
-    );
 
     @constant
     public isWhitelistAdmin(address: Address): boolean {
@@ -35,7 +27,7 @@ export function WhitelistAdminRole<TBase extends Constructor<SmartContract>>(Bas
         !AccessRoleHandler.isMember(this.mutableWhitelistAdminList, address) &&
         AccessRoleHandler.add(this.mutableWhitelistAdminList, address)
       ) {
-        this.add_whitelist_admin(address, requstedBy);
+        add_whitelist_admin(address, requstedBy);
 
         return true;
       }
@@ -49,7 +41,7 @@ export function WhitelistAdminRole<TBase extends Constructor<SmartContract>>(Bas
         AccessRoleHandler.isMember(this.mutableWhitelistAdminList, address) &&
         AccessRoleHandler.remove(this.mutableWhitelistAdminList, address)
       ) {
-        this.remove_whitelist_admin(address, requstedBy);
+        remove_whitelist_admin(address, requstedBy);
 
         return true;
       }

@@ -1,11 +1,13 @@
 import { Address, constant, createEventNotifier, SmartContract } from '@neo-one/smart-contract';
 import { PauserRole } from '../access/';
 
-export function Pausable<TBase extends Constructor<SmartContract>>(Base: TBase) {
-  abstract class PausableClass extends PauserRole<Constructor<SmartContract>>(Base) {
-    private readonly notify_pause = createEventNotifier<Address>('paused', 'by');
-    private readonly notify_unpaused = createEventNotifier<Address>('unpaused', 'by');
+/* tslint:disable-next-line:variable-name */
+const notify_pause = createEventNotifier<Address>('paused', 'by');
+/* tslint:disable-next-line:variable-name */
+const notify_unpaused = createEventNotifier<Address>('unpaused', 'by');
 
+export function Pausable<TBase extends Constructor<SmartContract>>(Base: TBase) {
+  class PausableClass extends PauserRole<Constructor<SmartContract>>(Base) {
     private mutablePaused = false;
 
     @constant
@@ -26,7 +28,7 @@ export function Pausable<TBase extends Constructor<SmartContract>>(Base: TBase) 
     public unpause(address: Address): boolean {
       if (this.onlyPausers(address) && this.mutablePaused) {
         this.mutablePaused = false;
-        this.notify_unpaused(address);
+        notify_unpaused(address);
 
         return true;
       }
@@ -37,7 +39,7 @@ export function Pausable<TBase extends Constructor<SmartContract>>(Base: TBase) 
     public pause(requestedBy: Address): boolean {
       if (this.onlyPausers(requestedBy) && !this.mutablePaused) {
         this.mutablePaused = true;
-        this.notify_pause(requestedBy);
+        notify_pause(requestedBy);
 
         return true;
       }

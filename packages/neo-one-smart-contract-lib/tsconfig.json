@@ -32,6 +32,8 @@
     "src/access/*.ts",
     "src/access/**/*.ts",
     "src/lifecycle/*.ts",
+    "src/crowdsale/*.ts",
+    "src/crowdsale/**/*.ts",
     "src/index.ts",
     "src/Token.ts"
   ]
