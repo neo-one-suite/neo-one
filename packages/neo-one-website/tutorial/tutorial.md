@@ -68,6 +68,17 @@ npm install @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-
 
 We recommend taking a moment to [setup your editor](/docs/environment-setup#Editor-Setup) to take advantage of inline NEO•ONE compiler diagnostics.
 
+5. Review the available [configuration options](/docs/config-options) and update your `.onerc` file as needed.
+* To follow along with the tutorial you configuration should look something like:
+```json
+{
+  "codegen": {
+    "language": "typescript",
+    "framework": "react",
+  }
+}
+```
+
 ### Help, I'm Stuck!
 
 If you get stuck, check out the [Help](/docs/getting-started#Help) section. In particular, come chat with us on [Discord](https://discord.gg/S86PqDE), we're more than happy to assist in any way we can.
