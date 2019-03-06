@@ -18407,10 +18407,10 @@ tslint-consistent-codestyle@1.15.1:
     tslib "^1.7.1"
     tsutils "^2.29.0"
 
-tslint-immutable@5.3.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/tslint-immutable/-/tslint-immutable-5.3.0.tgz#adb1e506edc2780f45e8d137212c2219644c0e59"
-  integrity sha512-BvQqkrnSAw6hu29TzX6+nrI01gSqZFpvOEQD7HPma7Wc2srYE4eWsfTTRnIlL0oUTzMiNDD0FqaANnI0ju3RLA==
+tslint-immutable@5.3.1:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/tslint-immutable/-/tslint-immutable-5.3.1.tgz#73e02133233df7f8d29f1ddd4535344ef94b8c45"
+  integrity sha512-APqxRz2fZ5slCmo69eTDjtyeooI8x23bBiXeHVkoBqQOrWZybW7HP5eB8MW8fleN+5BX4+yQYhhpgBNLf0HvjQ==
   dependencies:
     tsutils "^2.28.0 || ^3.0.0"
 
