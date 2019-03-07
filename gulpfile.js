@@ -95,9 +95,27 @@ const createCustomTransform = (context) => {
   };
 };
 
-const createFormatDistName = ({ target, module }) => `neo-one-${target}-${module}`;
+const createFormatDistName = ({ main, target, module, browser }) => {
+  if (main) {
+    return 'neo-one';
+  }
+  if (browser) {
+    return 'neo-one-browserify';
+  }
 
-const createFormatName = ({ target, module }) => `${target}-${module}`;
+  return `neo-one-${target}-${module}`;
+};
+
+const createFormatName = ({ main, target, module, browser }) => {
+  if (main) {
+    return '';
+  }
+  if (browser) {
+    return 'browserify';
+  }
+
+  return `${target}-${module}`;
+};
 
 const FORMATS = [
   {
@@ -109,18 +127,24 @@ const FORMATS = [
     target: 'esnext',
     module: 'esm',
   },
-].map(({ target, module, main }) => ({
+  {
+    target: 'es2017',
+    module: 'cjs',
+    browser: true,
+  },
+].map(({ target, module, main, browser }) => ({
   target,
   module,
-  dist: main ? 'neo-one' : createFormatDistName({ target, module }),
-  name: main ? '' : createFormatName({ target, module }),
-  tsconfig: `tsconfig/tsconfig.${target}.${module}.json`,
+  browser: browser === true,
+  dist: createFormatDistName({ main, target, module, browser }),
+  name: createFormatName({ main, target, module, browser }),
+  tsconfig: `tsconfig/tsconfig.${target}.${browser ? 'browserify.' : ''}${module}.json`,
   tsconfigESM: `tsconfig/tsconfig.${target}.esm.json`,
-  fastProject: ts.createProject(`tsconfig/tsconfig.${target}.${module}.json`, {
+  fastProject: ts.createProject(`tsconfig/tsconfig.${target}.${browser ? 'browserify.' : ''}${module}.json`, {
     typescript,
     isolatedModules: true,
   }),
-  project: ts.createProject(`tsconfig/tsconfig.${target}.${module}.json`, {
+  project: ts.createProject(`tsconfig/tsconfig.${target}.${browser ? 'browserify.' : ''}${module}.json`, {
     typescript,
   }),
 }));
@@ -128,7 +152,9 @@ const MAIN_FORMAT = FORMATS[0];
 const MAIN_BIN_FORMAT = FORMATS[0];
 
 function getTaskHash(format, ...args) {
-  return [format.target, format.module].concat(args.filter((x) => x !== void 0 && x !== '')).join(`:`);
+  return (format.browser ? [format.target, format.module, 'browserify'] : [format.target, format.module])
+    .concat(args.filter((x) => x !== void 0 && x !== ''))
+    .join(`:`);
 }
 
 let noCache = false;
@@ -287,6 +313,10 @@ const mapDep = (format, depName) => {
 
   if (DEP_MAPPING[format.target][format.module][depName] !== undefined) {
     return DEP_MAPPING[format.target][format.module][depName];
+  }
+
+  if (format.browser && depName.includes('@neo-one/') && !depName.includes('ec-key')) {
+    return `${depName}-browserify`;
   }
 
   return depName;
@@ -485,7 +515,7 @@ const buildAllNoDeveloperTools = ((cache) =>
         copyMetadata(format),
         copyRootPkg(format),
         copyRootTSConfig(format),
-        compileTypescript(format, type),
+        format.browser ? undefined : compileTypescript(format, type),
         format === MAIN_FORMAT ? 'buildBin' : undefined,
         format === MAIN_FORMAT ? 'createBin' : undefined,
         format === MAIN_FORMAT ? 'copyBin' : undefined,
@@ -495,7 +525,7 @@ const buildAllNoDeveloperTools = ((cache) =>
 
 const buildAll = ((cache) =>
   memoizeTask(cache, function buildAll(format, done, type) {
-    return gulp.parallel(buildAllNoDeveloperTools(format, type), compileDeveloperTools(format))(done);
+    return gulp.series(buildAllNoDeveloperTools(format, type), compileDeveloperTools(format))(done);
   }))({});
 
 const install = ((cache) =>
@@ -541,7 +571,7 @@ const copyRootTSConfig = ((cache) =>
     await fs.writeFile(filePath, JSON.stringify(tsconfig, null, 2));
   }))({});
 
-const CLIENT_PACKAGES = [
+const CLIENT_PACKAGES = new Set([
   '@neo-one/client',
   '@neo-one/client-common',
   '@neo-one/client-core',
@@ -554,9 +584,11 @@ const CLIENT_PACKAGES = [
   '@neo-one/client-full-common',
   '@neo-one/node-core',
   '@neo-one/types',
-];
+]);
 
-const CLIENT_FULL_PACKAGES = CLIENT_PACKAGES.concat(['@neo-one/client-full', '@neo-one/client-full-core']);
+const CLIENT_FULL_PACKAGES = new Set(
+  [...CLIENT_PACKAGES].concat(['@neo-one/client-full', '@neo-one/client-full-core']),
+);
 
 const CLIENT_BROWSERIFY = {
   'neo-one-client': CLIENT_PACKAGES,
@@ -614,7 +646,11 @@ const getClientPkgDependencies = (pkgJSONMap, pkgs) => {
   return [...externals];
 };
 
-const getDirName = (pkgName) => pkgName.replace('@', '').replace('/', '-');
+const getPkgName = (pkgName) =>
+  `@neo-one/${pkgName
+    .split('-')
+    .slice(2)
+    .join('-')}`;
 
 const copyBrowserifyTypesFiles = (inputPath, outputPath) => {
   const dirList = fs.readdirSync(inputPath);
@@ -632,97 +668,81 @@ const copyBrowserifyTypesFiles = (inputPath, outputPath) => {
           match.includes('ec-key') ? match : `${match}-browserify`,
         ),
       );
-    } else if (dirOrFile === 'package.json') {
-      const pkgJSON = fs.readJSONSync(newInputPath);
-      fs.outputJSONSync(
-        newOutputPath,
-        {
-          ...pkgJSON,
-          name: `${pkgJSON.name}-browserify`,
-          dependencies:
-            pkgJSON.dependencies === undefined
-              ? undefined
-              : Object.entries(pkgJSON.dependencies).reduce((acc, dependency) => {
-                  const dependencyName =
-                    dependency[0].includes('@neo-one/') && !dependency[0].includes('ec-key')
-                      ? `${dependency[0]}-browserify`
-                      : dependency[0];
-                  const dependencyVersion = dependency[1];
-                  return {
-                    ...acc,
-                    [dependencyName]: dependencyVersion,
-                  };
-                }, {}),
-        },
-        { spaces: 2 },
-      );
-    } else if (dirOrFile.endsWith('.md') || dirOrFile === 'LICENSE') {
-      fs.copySync(newInputPath, newOutputPath);
     }
   });
 };
 
+const copyBrowserifyTypes = ((cache) =>
+  memoizeTask(cache, async function copyBrowserifyTypes(format) {
+    if (format.browser) {
+      const inputPath = path.resolve(DIST, 'neo-one', 'packages');
+      const outputPath = getDest(format);
+
+      const allPackages = await fs.readdir(inputPath);
+      await Promise.all(
+        allPackages.map(async (pkgName) => {
+          if (CLIENT_FULL_PACKAGES.has(getPkgName(pkgName))) {
+            copyBrowserifyTypesFiles(path.resolve(inputPath, pkgName), path.resolve(outputPath, pkgName));
+          } else {
+            await fs.remove(path.resolve(outputPath, pkgName));
+          }
+        }),
+      );
+    }
+  }))({});
+
 const bundleBrowserify = ((cache) =>
   memoizeTask(cache, async function bundleBrowserify(format) {
-    if (format.dist === 'neo-one') {
+    if (format.browser) {
       const pkgJSONMap = createPkgJSONMap();
-      const baseInputPath = path.resolve(__dirname, getDistBase(format));
-      const baseOutputPath = path.resolve(__dirname, DIST, 'neo-one-browserify');
-      const inputPkgPath = path.resolve(baseInputPath, 'packages');
-      const outputPkgPath = path.resolve(baseOutputPath, 'packages');
-      fs.removeSync(baseOutputPath);
+      const inputPkgPath = path.resolve(DIST, 'neo-one', 'packages');
+      const outputPkgPath = getDest(format);
 
       await Promise.all(
         Object.entries(CLIENT_BROWSERIFY).map(async ([pkgName, neoOneDependencies]) => {
           const externals = getClientPkgDependencies(pkgJSONMap, neoOneDependencies);
 
-          webpack(
-            webpackBrowserifyConfig(
-              externals,
-              path.resolve(inputPkgPath, pkgName),
-              path.resolve(outputPkgPath, pkgName),
+          await new Promise((resolve, reject) =>
+            webpack(
+              webpackBrowserifyConfig(
+                externals,
+                path.resolve(inputPkgPath, pkgName),
+                path.resolve(outputPkgPath, pkgName),
+              ),
+              (err, stats) => {
+                if (err) {
+                  reject(err);
+                } else if (stats.hasErrors()) {
+                  console.log(
+                    stats.toString({
+                      performance: false,
+                      hash: false,
+                      timings: true,
+                      entrypoints: false,
+                      chunkOrigins: false,
+                      chunkModules: false,
+                      colors: true,
+                    }),
+                  );
+                  reject(new Error('Webpack bundling failed.'));
+                } else {
+                  resolve(stats);
+                }
+              },
             ),
-            (err, stats) => {
-              if (err) {
-                throw err;
-              } else if (stats.hasErrors()) {
-                console.log(
-                  stats.toString({
-                    performance: false,
-                    hash: false,
-                    timings: true,
-                    entrypoints: false,
-                    chunkOrigins: false,
-                    chunkModules: false,
-                    colors: true,
-                  }),
-                );
-                throw new Error('Webpack bundling failed.');
-              }
-
-              if (pkgName.includes('client-full')) {
-                fs.copySync(baseInputPath, baseOutputPath, {
-                  filter: (src) => src.endsWith('neo-one') || src.endsWith('.json'),
-                });
-                neoOneDependencies.forEach((dependency) => {
-                  const dirName = getDirName(dependency);
-                  const browserifyPath = path.resolve(outputPkgPath, dirName);
-                  copyBrowserifyTypesFiles(path.resolve(inputPkgPath, dirName), browserifyPath);
-                });
-
-                execa.shell('yarn install --non-interactive --no-progress --ignore-engines', {
-                  cwd: baseOutputPath,
-                  stdio: ['ignore', 'inherit', 'inherit'],
-                });
-              }
-            },
           );
         }),
       );
     }
   }))({});
 
-gulp.task('browserify', gulp.parallel(FORMATS.map((format) => bundleBrowserify(format))));
+gulp.task(
+  'browserify',
+  gulp.parallel(
+    FORMATS.filter((format) => format.browser).map((format) => copyBrowserifyTypes(format)),
+    FORMATS.filter((format) => format.browser).map((format) => bundleBrowserify(format)),
+  ),
+);
 
 const gulpBin = () =>
   gulpReplaceModule(MAIN_FORMAT, gulp.src(globs.bin)).pipe(
@@ -817,7 +837,7 @@ gulp.task(
 gulp.task('install', gulp.parallel(FORMATS.map((format) => install(format))));
 gulp.task('publish', gulp.parallel(FORMATS.map((format) => publish(format))));
 
-gulp.task('build', gulp.series('clean', 'buildAll', 'install'));
+gulp.task('build', gulp.series('clean', 'buildAll', 'install', 'browserify'));
 
 const buildE2ESeries = (type) =>
   gulp.series('compileDeveloperToolsFrame', buildAll(MAIN_FORMAT, type), install(MAIN_FORMAT));
