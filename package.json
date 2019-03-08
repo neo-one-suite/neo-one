@@ -244,7 +244,7 @@
     "tslint-config-prettier": "1.18.0",
     "tslint-consistent-codestyle": "1.15.1",
     "tslint-immutable": "5.3.2",
-    "tslint-microsoft-contrib": "5.2.1",
+    "tslint-microsoft-contrib": "6.1.0",
     "tslint-sonarts": "1.9.0",
     "typescript": "3.3.3333",
     "typescript-styled-plugin": "0.14.0",
