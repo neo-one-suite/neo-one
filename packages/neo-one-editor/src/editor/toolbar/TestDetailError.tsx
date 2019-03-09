@@ -8,5 +8,5 @@ export const TestDetailError = styled(Box)`
   background-color: ${prop('theme.gray4')};
   white-space: pre;
   min-height: 0;
-  overflow: scroll;
+  overflow: auto;
 `;

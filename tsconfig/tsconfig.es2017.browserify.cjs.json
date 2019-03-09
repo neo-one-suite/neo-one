@@ -3,7 +3,7 @@
   "compilerOptions": {
     "target": "es2017",
     "paths": {
-      "@neo-one/*-es2017-browserify-cjs": [
+      "@neo-one/*-browserify": [
         "./neo-one-*/src"
       ],
       "*": [

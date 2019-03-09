@@ -23,7 +23,7 @@ const StyledToolbar = styled(Toolbar)`
     height: 100%;
     grid-gap: 8px;
     padding: 0 8px;
-    overflow-x: scroll;
+    overflow-x: auto;
   }
 
   ${/* sc-sel */ ToolbarFocusable} {

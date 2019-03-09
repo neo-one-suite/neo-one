@@ -9,7 +9,7 @@ const Wrapper = styled(Box)`
   grid-gap: 8px;
   grid-auto-flow: row;
   min-height: 0;
-  overflow: scroll;
+  overflow: auto;
 `;
 
 interface Props {

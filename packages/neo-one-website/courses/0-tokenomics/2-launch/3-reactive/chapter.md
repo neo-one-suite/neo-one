@@ -17,7 +17,7 @@ The two most commonly used properties of the `Client` are the `block$` `Observab
 Let's take a look at an example.
 
 ```typescript
-import { Address, contstant, Fixed, SmartContract } from '@neo-one/smart-contract';
+import { Address, constant, Fixed, SmartContract } from '@neo-one/smart-contract';
 
 export class Example extends SmartContract {
   @constant
