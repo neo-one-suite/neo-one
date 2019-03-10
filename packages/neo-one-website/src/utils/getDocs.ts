@@ -77,7 +77,7 @@ const getDoc = async (section: string, docFile: string): Promise<DocInfoBase> =>
   const doc = matter(contents);
   const docHeader = doc.data as MDDocHeader;
   const docSource = path.resolve(__dirname, '..', '..', 'docs', docFile);
-  const link = docSource.replace(path.resolve(__dirname, '..', '..', '..', '..'), '');
+  const link = path.relative(path.resolve(__dirname, '..', '..', '..', '..'), docSource);
 
   return {
     slug: `/docs/${docHeader.slug}`,

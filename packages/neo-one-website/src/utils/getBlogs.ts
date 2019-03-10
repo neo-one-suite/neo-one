@@ -77,7 +77,7 @@ const getBlog = async (blogFile: string): Promise<BlogInfo> => {
   const contents = await fs.readFile(path.resolve(BLOG_SOURCE, blogFile), 'utf8');
   const blog = matter(contents);
   const blogHeader = blog.data as MDBlogHeader;
-  const blogSourceLessDirname = BLOG_SOURCE.replace(path.resolve(__dirname, '..', '..', '..', '..'), '');
+  const blogSourceLessDirname = path.relative(path.resolve(__dirname, '..', '..', '..', '..'), BLOG_SOURCE);
   const link = path.join(blogSourceLessDirname, blogFile);
 
   return {

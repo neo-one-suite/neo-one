@@ -12,7 +12,7 @@ const TUTORIAL_SOURCE = path.resolve(__dirname, '..', '..', 'tutorial', 'tutoria
 
 export const getTutorial = async (): Promise<TutorialProps> => {
   const content = await fs.readFile(TUTORIAL_SOURCE, 'utf-8');
-  const link = TUTORIAL_SOURCE.replace(path.resolve(__dirname, '..', '..', '..', '..'), '');
+  const link = path.relative(path.resolve(__dirname, '..', '..', '..', '..'), TUTORIAL_SOURCE);
 
   return {
     title: 'Tutorial: Intro to NEO•ONE',
