@@ -15,7 +15,7 @@ const FileTabWrapper = styled(Box)`
   display: flex;
   flex: 0 0 auto;
   flex-wrap: nowrap;
-  overflow-x: scroll;
+  overflow-x: auto;
 `;
 
 const ActionWrapper = styled(Box)`

@@ -69,7 +69,7 @@ const TIMER = 100;
 function TimeAgo({ time, ...props }: TimeAgoProps) {
   let now = Date.now();
   // tslint:disable-next-line no-any
-  let lastTime: React.ReactElement<any> | undefined;
+  let lastTime: React.ReactElement | undefined;
   if (time > now + 5000) {
     now = time;
     const innerValue = new Date(time).toLocaleString();

@@ -34,7 +34,7 @@ const collapsibleExpandedStyle: any = {
 };
 
 interface Props {
-  readonly children: ReadonlyArray<React.ReactElement<any>>;
+  readonly children: ReadonlyArray<React.ReactElement>;
 }
 
 interface State {

@@ -31,7 +31,7 @@ import BN from 'bn.js';
 import fetch from 'cross-fetch';
 import { Address6 } from 'ip-address';
 import _ from 'lodash';
-import LRU from 'lru-cache';
+import LRUCache from 'lru-cache';
 import { combineLatest, defer, Observable, of as _of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
 import { Command } from './Command';
@@ -173,7 +173,7 @@ export class Node implements INode {
   private mutableGetBlocksRequestsCount: number;
   private mutableBestPeer: ConnectedPeer<Message, PeerData> | undefined;
   private mutableUnhealthyPeerSeconds = UNHEALTHY_PEER_SECONDS;
-  private readonly consensusCache: LRU.Cache<string, ConsensusPayload>;
+  private readonly consensusCache: LRUCache<string, ConsensusPayload>;
   // tslint:disable-next-line readonly-keyword
   private mutableBlockIndex: { [endpoint: string]: number };
   private mutableConsensus: Consensus | undefined;
@@ -293,7 +293,7 @@ export class Node implements INode {
     this.mutableKnownHeaderHashes = createScalingBloomFilter();
     this.tempKnownHeaderHashes = new Set();
     this.mutableGetBlocksRequestsCount = 1;
-    this.consensusCache = new LRU(10000);
+    this.consensusCache = new LRUCache(10000);
     this.mutableBlockIndex = {};
   }
 
