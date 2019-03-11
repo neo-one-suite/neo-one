@@ -35,8 +35,12 @@ const runCypress = async ({ report, coverage }: { readonly report: boolean; read
     cwd: path.resolve(__dirname, '..'),
   });
 
-  proc.stdout.pipe(process.stdout);
-  proc.stderr.pipe(process.stderr);
+  if (proc.stdout !== null) {
+    proc.stdout.pipe(process.stdout);
+  }
+  if (proc.stderr !== null) {
+    proc.stderr.pipe(process.stderr);
+  }
 
   await proc;
 };

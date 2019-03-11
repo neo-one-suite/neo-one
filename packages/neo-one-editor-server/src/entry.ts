@@ -81,7 +81,8 @@ const shutdown = ({
   }
 };
 
-process.on('unhandledRejection', (error) => {
+process.on('unhandledRejection', (errorIn) => {
+  const error = errorIn as Error;
   monitor.logError({
     name: 'unhandled_rejection',
     message: 'Unhandled rejection. Shutting down.',

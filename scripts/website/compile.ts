@@ -120,8 +120,12 @@ const compileServer = async () => compileConfig(server({ stage: 'prod' }));
 const startReactStatic = () => {
   const proc = execa('react-static', ['start']);
 
-  proc.stdout.pipe(process.stdout);
-  proc.stderr.pipe(process.stderr);
+  if (proc.stdout !== null) {
+    proc.stdout.pipe(process.stdout);
+  }
+  if (proc.stderr !== null) {
+    proc.stderr.pipe(process.stderr);
+  }
 
   return createKillProcess(proc);
 };
@@ -204,7 +208,7 @@ Promise.resolve()
     });
 
     process.on('unhandledRejection', (error) => {
-      logError(error);
+      logError(error as Error);
     });
 
     process.on('SIGINT', () => {

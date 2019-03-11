@@ -14,8 +14,13 @@ const doCheck = async (files: string) => {
     const childProc = execa('yarn', ['install', '--non-interactive', '--frozen-lockfile'], {
       cwd: appRootDir.get(),
     });
-    childProc.stdout.pipe(process.stdout);
-    childProc.stderr.pipe(process.stderr);
+
+    if (childProc.stdout !== null) {
+      childProc.stdout.pipe(process.stdout);
+    }
+    if (childProc.stderr !== null) {
+      childProc.stderr.pipe(process.stderr);
+    }
     await childProc;
   }
 };

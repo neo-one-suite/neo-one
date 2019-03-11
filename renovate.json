@@ -3,5 +3,5 @@
     "config:base",
     ":semanticCommits"
   ],
-  "postUpdateOptions": ["yarnDedupeFewer"]
+  "postUpdateOptions": ["yarnDedupeHighest"]
 }
