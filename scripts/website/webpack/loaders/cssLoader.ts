@@ -1,5 +1,6 @@
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
+// @ts-ignore
 import ExtractCssChunksPlugin from 'extract-css-chunks-webpack-plugin';
 // @ts-ignore
 import postcssFlexbugsFixes from 'postcss-flexbugs-fixes';

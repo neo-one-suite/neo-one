@@ -1,5 +1,6 @@
 // @ts-ignore
 import CompressionPlugin from 'compression-webpack-plugin';
+// @ts-ignore
 import ExtractCssChunksPlugin from 'extract-css-chunks-webpack-plugin';
 import _ from 'lodash';
 // @ts-ignore
