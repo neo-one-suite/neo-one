@@ -27,7 +27,7 @@ function isEmotion(comp: any) {
 }
 
 // tslint:disable-next-line:no-any
-function isReuse(comp: any): comp is { readonly uses: ReadonlyArray<React.ReactType> } {
+function isReuse(comp: any): comp is { readonly uses: ReadonlyArray<React.ElementType> } {
   return Boolean(comp && Array.isArray(comp.uses));
 }
 
