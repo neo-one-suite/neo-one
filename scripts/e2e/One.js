@@ -4,7 +4,7 @@ const execa = require('execa');
 const fs = require('fs-extra');
 const path = require('path');
 const tmp = require('tmp');
-
+const checkPort = require('../checkPort');
 class One {
   constructor() {
     this.mutableCleanup = [];
@@ -43,6 +43,22 @@ class One {
     return this._exec(command, options);
   }
 
+  async getAvailableMinPortForRange(range, start = 10000) {
+    const portRange = _.range(start, start + range);
+
+    const results = await Promise.all(
+      portRange.map(async (port) => {
+        return checkPort(port);
+      }),
+    );
+
+    if (results.some((taken) => taken)) {
+      return this.getAvailableMinPortForRange(range, start + range);
+    }
+
+    return start;
+  }
+
   async setupCLI() {
     if (this.server !== undefined) {
       return;
@@ -50,7 +66,7 @@ class One {
 
     this.dir = tmp.dirSync();
     this.dirName = this.dir.name;
-    this.serverPort = _.random(10000, 50000);
+    this.serverPort = await this.getAvailableMinPortForRange(15);
     this.httpServerPort = this.serverPort + 1;
     this.minPort = this.serverPort + 2;
     const [cmd, args] = this._createCommand('start server --static-neo-one');
