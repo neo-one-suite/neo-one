@@ -1,51 +1,51 @@
 aliases:
   - &restore-yarn-cache-8
     keys:
-      - v2-yarn-8-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - v3-yarn-8-{{ .Branch }}-{{ checksum "yarn.lock" }}
       # Fallback in case checksum fails
-      - v2-yarn-8-{{ .Branch }}-
+      - v3-yarn-8-{{ .Branch }}-
 
   - &save-yarn-cache-8
     paths:
       - node_modules
       - ~/.cache/yarn
-    key: v2-yarn-8-{{ .Branch }}-{{ checksum "yarn.lock" }}
+    key: v3-yarn-8-{{ .Branch }}-{{ checksum "yarn.lock" }}
 
   - &restore-yarn-cache-9
     keys:
-      - v2-yarn-9-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - v3-yarn-9-{{ .Branch }}-{{ checksum "yarn.lock" }}
       # Fallback in case checksum fails
-      - v2-yarn-9-{{ .Branch }}-
+      - v3-yarn-9-{{ .Branch }}-
 
   - &save-yarn-cache-9
     paths:
       - node_modules
       - ~/.cache/yarn
-    key: v2-yarn-9-{{ .Branch }}-{{ checksum "yarn.lock" }}
+    key: v3-yarn-9-{{ .Branch }}-{{ checksum "yarn.lock" }}
 
   - &restore-yarn-cache-10
     keys:
-      - v2-yarn-10-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - v3-yarn-10-{{ .Branch }}-{{ checksum "yarn.lock" }}
       # Fallback in case checksum fails
-      - v2-yarn-10-{{ .Branch }}-
+      - v3-yarn-10-{{ .Branch }}-
 
   - &save-yarn-cache-10
     paths:
       - node_modules
       - ~/.cache/yarn
-    key: v2-yarn-10-{{ .Branch }}-{{ checksum "yarn.lock" }}
+    key: v3-yarn-10-{{ .Branch }}-{{ checksum "yarn.lock" }}
 
   - &restore-yarn-cache-11
     keys:
-      - v2-yarn-11-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - v3-yarn-11-{{ .Branch }}-{{ checksum "yarn.lock" }}
       # Fallback in case checksum fails
-      - v2-yarn-11-{{ .Branch }}-
+      - v3-yarn-11-{{ .Branch }}-
 
   - &save-yarn-cache-11
     paths:
       - node_modules
       - ~/.cache/yarn
-    key: v2-yarn-11-{{ .Branch }}-{{ checksum "yarn.lock" }}
+    key: v3-yarn-11-{{ .Branch }}-{{ checksum "yarn.lock" }}
 
   - &filter-ignore-bors-tmp
     branches:
