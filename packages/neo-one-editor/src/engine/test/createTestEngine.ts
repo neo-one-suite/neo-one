@@ -11,8 +11,7 @@ import {
 } from 'jest-circus/build/state';
 // @ts-ignore
 import expect from 'jest-matchers';
-// @ts-ignore
-import jestMock from 'jest-mock';
+import JestMock from 'jest-mock';
 import { createFileSystem, createTranspileCache } from '../create';
 import { RemoteEngine } from '../remote';
 import { getPathWithExports } from '../remote/packages';
@@ -54,7 +53,7 @@ export const createTestEngine = async ({
       ...jestTestHooks,
       expect,
       jest: {
-        ...jestMock,
+        ...JestMock,
         setTimeout: (testTimeout: number) =>
           setState({
             ...getState(),
