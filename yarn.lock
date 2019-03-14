@@ -12818,9 +12818,10 @@ moment@2.22.2:
   version "2.22.2"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
 
-monaco-editor@^0.15.6:
-  version "0.15.6"
-  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.15.6.tgz#d63b3b06f86f803464f003b252627c3eb4a09483"
+monaco-editor@^0.16.0:
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.16.0.tgz#83538173c2427f62e0ea3e19a4864742ea457cd9"
+  integrity sha512-a0ZksW1C5gTXOOJR/guKwzYrLJkJtMqzPb/W81YFSFHwbZ/ecVWdNguUkuyUuchzeKJRwqcizgVx++G9wmfofQ==
 
 monaco-textmate@^3.0.0:
   version "3.0.0"

@@ -80,15 +80,26 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
           }
 
           return {
-            suggestions: info.entries.map((entry) => ({
-              uri: resource,
-              source: entry.source,
-              position,
-              label: entry.name,
-              insertText: entry.name,
-              sortText: entry.sortText,
-              kind: convertKind(entry.kind),
-            })),
+            suggestions: info.entries.map((entry) => {
+              const word = model.getWordUntilPosition(position);
+              const range = new monaco.Range(
+                position.lineNumber,
+                word.startColumn,
+                position.lineNumber,
+                word.endColumn,
+              );
+
+              return {
+                uri: resource,
+                source: entry.source,
+                position,
+                label: entry.name,
+                insertText: entry.name,
+                sortText: entry.sortText,
+                kind: convertKind(entry.kind),
+                range,
+              };
+            }),
           };
         }),
       ),
@@ -104,6 +115,7 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
     const myItem = item as CompletionItem;
     const resource = myItem.uri;
     const position = myItem.position;
+    const range = myItem.range;
     const model = getModel(resource);
     if (!model) {
       return Promise.resolve(myItem);
@@ -136,6 +148,7 @@ export class SuggestAdapter extends Adapter implements monaco.languages.Completi
           return {
             uri: resource,
             position,
+            range,
             label: details.name,
             kind: convertKind(details.kind),
             insertText: myItem.insertText,
