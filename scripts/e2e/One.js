@@ -66,7 +66,7 @@ class One {
 
     this.dir = tmp.dirSync();
     this.dirName = this.dir.name;
-    this.serverPort = await this.getAvailableMinPortForRange(15);
+    this.serverPort = await this.getAvailableMinPortForRange(30);
     this.httpServerPort = this.serverPort + 1;
     this.minPort = this.serverPort + 2;
     const [cmd, args] = this._createCommand('start server --static-neo-one');

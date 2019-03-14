@@ -22,11 +22,10 @@ import { p256 } from './precomputed';
 import { ScriptBuilder } from './ScriptBuilder';
 
 // tslint:disable-next-line no-let
-let ecCache: any;
+let ecCache: EC | undefined;
 const ec = () => {
   if (ecCache === undefined) {
-    // tslint:disable-next-line no-any
-    ecCache = new EC(p256) as any;
+    ecCache = new EC(p256);
   }
 
   return ecCache;
@@ -172,6 +171,11 @@ const privateKeyToPublicKey = (privateKey: PrivateKey): ECPoint => {
 
 const createKeyPair = (): { readonly privateKey: PrivateKey; readonly publicKey: ECPoint } => {
   const key = ec().genKeyPair();
+  const validation = key.validate();
+
+  if (!validation.result) {
+    return createKeyPair();
+  }
 
   return {
     privateKey: common.bufferToPrivateKey(key.getPrivate().toArrayLike(Buffer, 'be')),
