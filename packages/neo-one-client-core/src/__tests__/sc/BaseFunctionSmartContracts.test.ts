@@ -53,7 +53,7 @@ const events: ReadonlyArray<any> = [
   },
 ];
 
-describe('Transfer - No Function Options', async () => {
+describe('Transfer - No Function Options', () => {
   // tslint:disable-next-line:no-any
   const parameters: ReadonlyArray<any> = [
     {
@@ -198,7 +198,7 @@ describe('Transfer - Complete Send - Optional ForwardValues', () => {
   testFunc(testArgsThrow, 'throws-noHash', 'Expected to find a hash argument');
 });
 
-describe('Transfer - Send - Optional ForwardValue', async () => {
+describe('Transfer - Send - Optional ForwardValue', () => {
   // tslint:disable-next-line:no-any
   const parameters: ReadonlyArray<any> = [
     {
@@ -334,7 +334,7 @@ describe('Transfer - SendUnsafe&Receive', () => {
   testFunc(testArgsAllOptions, 'all-allOptions');
 });
 
-describe('Transfer - No Forward Values', async () => {
+describe('Transfer - No Forward Values', () => {
   // tslint:disable-next-line:no-any
   const parameters: ReadonlyArray<any> = [
     {
