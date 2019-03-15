@@ -14,8 +14,8 @@ describe('create network', () => {
       expect(description.nodes[0].name).toEqual('main');
       expect(description.nodes[0].live).toBeTruthy();
       expect(description.nodes[0].ready).toBeFalsy();
-      expect(description.height).toBeGreaterThan(5);
-      expect(description.peers).toBeGreaterThan(5);
+      expect(description.height).toBeGreaterThan(3);
+      expect(description.peers).toBeGreaterThan(3);
 
       const endpoint = description.nodes[0].telemetryAddress;
       const response = await fetch(endpoint);
