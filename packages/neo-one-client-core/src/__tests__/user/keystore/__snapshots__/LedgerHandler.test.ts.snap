@@ -1,0 +1,110 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LedgerHandler Ledger Discovery - Account at index 5 1`] = `
+Array [
+  Object {
+    "identifier": 0,
+    "userAccount": Object {
+      "id": Object {
+        "address": "ARL4VYQWxSwigpRsCsucLxovujKDmwYeTd",
+        "network": "test",
+      },
+      "name": "0",
+      "publicKey": "03d81d462f80d55ff234b1b221e46d52e4da3f93c465edbbaeebd742bc1947fe6d",
+    },
+  },
+  Object {
+    "identifier": 1,
+    "userAccount": Object {
+      "id": Object {
+        "address": "AJGCVgoLp3bU57zd4k6mcpedWr45Em8dFD",
+        "network": "test",
+      },
+      "name": "1",
+      "publicKey": "031546889cf12577237536380e86b2587d55743f9d4dac8879f332b79ce1a84cd6",
+    },
+  },
+  Object {
+    "identifier": 2,
+    "userAccount": Object {
+      "id": Object {
+        "address": "AaUtR8xiXsz3hcv7u3YDqo4NGgAXDECFZ7",
+        "network": "test",
+      },
+      "name": "2",
+      "publicKey": "037b45897e50eb34e2722e4e0728e7c8649c7250a2aec8347522ec92279f85e651",
+    },
+  },
+  Object {
+    "identifier": 3,
+    "userAccount": Object {
+      "id": Object {
+        "address": "AUh8CkAbNjPRKmFEVJCb6VHPzvNEarxWhg",
+        "network": "test",
+      },
+      "name": "3",
+      "publicKey": "03af568d2062edf9f3d532b02e6bbaa94cc795d1490022ae7d093c7d623782b88d",
+    },
+  },
+  Object {
+    "identifier": 4,
+    "userAccount": Object {
+      "id": Object {
+        "address": "ALC3neq4X6cTRBFX13KMroLq8PgrjWz4mQ",
+        "network": "test",
+      },
+      "name": "4",
+      "publicKey": "03e1e41b7d97116b2c15a0f243768cd0f56dc73f7f82a7cdf02850c915e8958f96",
+    },
+  },
+  Object {
+    "identifier": 5,
+    "userAccount": Object {
+      "id": Object {
+        "address": "AQUMwmPu6UJVroCcgdVaj1d8Lz1WtYgrP7",
+        "network": "test",
+      },
+      "name": "5",
+      "publicKey": "02c24b1fee519aea053ef3bfa3ad563d6d28ef4d05db49cc5fbfb69a02b66d9e1f",
+    },
+  },
+  Object {
+    "identifier": 6,
+    "userAccount": Object {
+      "id": Object {
+        "address": "AXaxXhFRLXJUWkmaTF367td2RQMf7oJoaV",
+        "network": "test",
+      },
+      "name": "6",
+      "publicKey": "02ba34a5aaab9b0359016edd49c22c358cf614b5b6af66e11fbb9f8908d0f75e7e",
+    },
+  },
+]
+`;
+
+exports[`LedgerHandler Ledger Discovery - Empty 1`] = `
+Array [
+  Object {
+    "identifier": 0,
+    "userAccount": Object {
+      "id": Object {
+        "address": "ARL4VYQWxSwigpRsCsucLxovujKDmwYeTd",
+        "network": "test",
+      },
+      "name": "0",
+      "publicKey": "03d81d462f80d55ff234b1b221e46d52e4da3f93c465edbbaeebd742bc1947fe6d",
+    },
+  },
+  Object {
+    "identifier": 1,
+    "userAccount": Object {
+      "id": Object {
+        "address": "AJGCVgoLp3bU57zd4k6mcpedWr45Em8dFD",
+        "network": "test",
+      },
+      "name": "1",
+      "publicKey": "031546889cf12577237536380e86b2587d55743f9d4dac8879f332b79ce1a84cd6",
+    },
+  },
+]
+`;

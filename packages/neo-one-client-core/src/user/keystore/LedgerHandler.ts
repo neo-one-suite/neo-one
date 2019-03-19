@@ -2,21 +2,32 @@ import { Account, AddressString, NetworkType, publicKeyToAddress } from '@neo-on
 import { Monitor } from '@neo-one/monitor';
 import _ from 'lodash';
 import { HDAccount, HDHandler } from './HDKeyStore';
-import { LedgerStore } from './LedgerStore';
+import { HDStore } from './types';
 
 export type Ledger = HDAccount<number>;
+export type ConnectedLedgerStore = HDStore<number>;
+
+export interface LedgerStore {
+  readonly byteLimit: number;
+  readonly type: string;
+  readonly init: () => Promise<ConnectedLedgerStore>;
+}
 
 export class LedgerHandler implements HDHandler<number> {
-  public static readonly byteLimit = LedgerStore.byteLimit;
+  public readonly byteLimit: number;
+  public readonly type: string;
 
-  private readonly storePromise: Promise<LedgerStore>;
+  private readonly storePromise: Promise<ConnectedLedgerStore>;
   private readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
 
-  public constructor(
-    getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>,
-  ) {
-    this.getAccount = getAccount;
-    this.storePromise = LedgerStore.init();
+  public constructor(options: {
+    readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
+    readonly store: LedgerStore;
+  }) {
+    this.getAccount = options.getAccount;
+    this.byteLimit = options.store.byteLimit;
+    this.type = options.store.type;
+    this.storePromise = options.store.init();
   }
 
   public async sign(options: { readonly message: Buffer; readonly account: number }): Promise<Buffer> {
@@ -29,7 +40,7 @@ export class LedgerHandler implements HDHandler<number> {
     const store = await this.storePromise;
     const scanAccountsInternal = async (start: number, currentOffset = 0): Promise<ReadonlyArray<Ledger>> => {
       const ledgerAccounts = await Promise.all(
-        _.range(start, start + maxOffset).map(async (num) => {
+        _.range(start, start + maxOffset - currentOffset).map(async (num) => {
           const key = await store.getPublicKey(num);
 
           return this.publicKeyToLedgerAccount(num, key, network);
@@ -38,7 +49,7 @@ export class LedgerHandler implements HDHandler<number> {
 
       const unscannedAccounts = await Promise.all(
         ledgerAccounts.map(async (ledger) => {
-          const { balances } = await this.getAccount(network, ledger.userAccount.publicKey);
+          const { balances } = await this.getAccount(network, ledger.userAccount.id.address);
 
           return {
             empty: Object.values(balances).every((balance) => balance.isEqualTo(0)),
@@ -59,12 +70,12 @@ export class LedgerHandler implements HDHandler<number> {
       );
 
       if (newOffset < maxOffset) {
-        const nextAccounts = await scanAccountsInternal(start + maxOffset, newOffset);
+        const nextAccounts = await scanAccountsInternal(start + maxOffset - currentOffset, newOffset);
 
         return newAccounts.concat(nextAccounts);
       }
 
-      return newAccounts.slice(newOffset - maxOffset, maxOffset);
+      return newAccounts;
     };
 
     const accounts = await scanAccountsInternal(0);

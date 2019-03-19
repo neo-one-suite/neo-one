@@ -1,11 +1,4 @@
-import {
-  Account,
-  AddressString,
-  NetworkType,
-  PublicKeyString,
-  UserAccount,
-  UserAccountID,
-} from '@neo-one/client-common';
+import { Account, AddressString, NetworkType, UserAccount, UserAccountID } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
 import { mergeScanLatest, utils } from '@neo-one/utils';
 import _ from 'lodash';
@@ -24,20 +17,13 @@ type HDAccounts<Identifier> = {
 };
 
 export interface HDProvider {
+  readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
   readonly getNetworks: () => ReadonlyArray<NetworkType>;
   readonly networks$: Observable<ReadonlyArray<NetworkType>>;
-  readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
-}
-
-export interface HDStore<Identifier> {
-  readonly getPublicKey: (account: Identifier) => Promise<PublicKeyString>;
-  readonly sign: (options: { readonly message: Buffer; readonly account: Identifier }) => Promise<Buffer>;
-  readonly close: () => Promise<void>;
 }
 
 export interface HDHandler<Identifier> {
   readonly byteLimit?: number;
-  // tslint:disable-next-line:no-any
   readonly scanAccounts: (network: NetworkType, maxOffset?: number) => Promise<ReadonlyArray<HDAccount<Identifier>>>;
   readonly sign: (options: { readonly message: Buffer; readonly account: Identifier }) => Promise<Buffer>;
   readonly close: () => Promise<void>;

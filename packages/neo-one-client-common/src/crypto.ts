@@ -586,10 +586,11 @@ const isSignatureContract = (script: Buffer) => script.length === 35 && script[0
 
 const isStandardContract = (script: Buffer) => isSignatureContract(script) || isMultiSigContract(script);
 
+// https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
 const HARDENED_KEY_OFFSET = 0x80000000;
 const EXTENDED_KEY_BYTES = 78;
 
-// Need eyes, according to https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki#node-serialization this isn't special.
+// According to https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki#node-serialization this isn't special.
 const BIP32_VERSION = {
   public: 0x0488b21e,
   private: 0x0488ade4,
@@ -746,7 +747,7 @@ const deriveChildKey = (node: HDNode, index: number, hardened: boolean): HDNode 
   };
 };
 
-// privateNode lets you serialize the just the public key even on a private HDNode.
+// privateNode lets you serialize to just the encoded public key, even on a private HDNode.
 const serializeHDNode = (node: HDNode, privateNode = true): string => {
   if (privateNode && node.privateKey === undefined) {
     throw new InvalidBIP32SerializePrivateNodeError();

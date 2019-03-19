@@ -2,13 +2,19 @@ import { Account, AddressString, NetworkType, publicKeyToAddress } from '@neo-on
 import { Monitor } from '@neo-one/monitor';
 import _ from 'lodash';
 import { InvalidMasterPathError } from '../../errors';
-import { HDAccount, HDHandler, HDStore } from './HDKeyStore';
+import { HDAccount, HDHandler } from './HDKeyStore';
+import { HDStore } from './types';
 
 export type LocalPath = [number, number, number];
 export type LocalHDAccount = HDAccount<LocalPath>;
 
 export interface HDLocalStore extends HDStore<LocalPath> {
   readonly getMasterPath: () => Promise<ReadonlyArray<number>>;
+}
+
+interface ScanInterface {
+  readonly empty: boolean;
+  readonly accounts: ReadonlyArray<LocalHDAccount>;
 }
 
 export class LocalHDHandler implements HDHandler<[number, number, number]> {
@@ -23,15 +29,19 @@ export class LocalHDHandler implements HDHandler<[number, number, number]> {
     this.store = store;
   }
 
-  public async scanAccounts(network: NetworkType): Promise<ReadonlyArray<LocalHDAccount>> {
+  public async scanAccounts(network: NetworkType, maxOffset = 5): Promise<ReadonlyArray<LocalHDAccount>> {
     const masterPath = await this.store.getMasterPath();
     switch (masterPath.length) {
       case 0:
-        return this.scanTree(network, 5);
+        return this.scanTree(network, maxOffset);
       case 1:
-        return this.scanWallet(network, masterPath[0]);
+        const wallet = await this.scanWallet(network, masterPath[0], maxOffset);
+
+        return _.flatten(wallet.accounts);
       case 2:
-        return this.scanChain(network, masterPath as [number, number], 10);
+        const chain = await this.scanChain(network, masterPath as [number, number], maxOffset);
+
+        return _.flatten(chain.accounts);
       default:
         throw new InvalidMasterPathError(masterPath);
     }
@@ -46,59 +56,61 @@ export class LocalHDHandler implements HDHandler<[number, number, number]> {
   }
 
   private async scanTree(network: NetworkType, maxOffset: number): Promise<ReadonlyArray<LocalHDAccount>> {
-    const scanTreeInternal = async (start: number, currentOffset = 0): Promise<ReadonlyArray<LocalHDAccount>> => {
-      const uncheckedAccounts = await Promise.all(
-        _.range(start, start + maxOffset).map(async (index) => this.scanWallet(network, index)),
+    const scanTreeInternal = async (
+      start: number,
+      currentOffset = 0,
+    ): Promise<ReadonlyArray<ReadonlyArray<LocalHDAccount>>> => {
+      const uncheckedWallets = await Promise.all(
+        _.range(start, start + maxOffset - currentOffset).map(async (index) => this.scanWallet(network, index)),
       );
 
-      const { accounts: newAccounts, offset: newOffset } = uncheckedAccounts.reduce<{
-        readonly accounts: ReadonlyArray<LocalHDAccount>;
+      const { wallets: newWallets, offset: newOffset } = uncheckedWallets.reduce<{
+        readonly wallets: ReadonlyArray<ReadonlyArray<LocalHDAccount>>;
         readonly offset: number;
       }>(
         (acc, unchecked) => ({
-          accounts: acc.accounts.concat(unchecked),
-          offset: unchecked.length === 2 ? acc.offset + 1 : 1,
+          wallets: acc.wallets.concat([unchecked.accounts]),
+          offset: unchecked.empty ? acc.offset + 1 : 1,
         }),
         {
-          accounts: [],
+          wallets: [],
           offset: currentOffset,
         },
       );
 
       if (newOffset < maxOffset) {
-        const nextAccounts = await scanTreeInternal(start + maxOffset, newOffset);
+        const nextAccounts = await scanTreeInternal(start + maxOffset - currentOffset, newOffset);
 
-        return newAccounts.concat(nextAccounts);
+        return newWallets.concat(nextAccounts);
       }
 
-      return newAccounts.slice(newOffset - maxOffset, maxOffset);
+      return newWallets;
     };
 
     const wallets = await scanTreeInternal(0);
 
-    return wallets.slice(0, wallets.length - (maxOffset - 2));
+    return _.flatten(wallets.slice(0, wallets.length - (maxOffset - 2)));
   }
 
-  private async scanWallet(network: NetworkType, walletIndex: number): Promise<ReadonlyArray<LocalHDAccount>> {
+  private async scanWallet(network: NetworkType, walletIndex: number, maxOffset?: number): Promise<ScanInterface> {
     const externalPath: [number, number] = [walletIndex, 0];
     const internalPath: [number, number] = [walletIndex, 1];
 
     const scannedChains = await Promise.all([
-      this.scanChain(network, externalPath, 10),
-      this.scanChain(network, internalPath, 10),
+      this.scanChain(network, externalPath, maxOffset),
+      this.scanChain(network, internalPath, maxOffset),
     ]);
 
-    return _.flatten(scannedChains);
+    return {
+      empty: scannedChains.every((chain) => chain.empty),
+      accounts: _.flatten(scannedChains.map(({ accounts }) => accounts)),
+    };
   }
 
-  private async scanChain(
-    network: NetworkType,
-    chainIndex: [number, number],
-    maxOffset: number,
-  ): Promise<ReadonlyArray<LocalHDAccount>> {
+  private async scanChain(network: NetworkType, chainIndex: [number, number], maxOffset = 5): Promise<ScanInterface> {
     const scanChainInternal = async (start: number, currentOffset = 0): Promise<ReadonlyArray<LocalHDAccount>> => {
       const localHDAccounts = await Promise.all(
-        _.range(start, start + maxOffset).map(async (num) => {
+        _.range(start, start + maxOffset - currentOffset).map(async (num) => {
           const path: LocalPath = [chainIndex[0], chainIndex[1], num];
           const key = await this.store.getPublicKey(path);
 
@@ -108,7 +120,7 @@ export class LocalHDHandler implements HDHandler<[number, number, number]> {
 
       const unscannedAccounts = await Promise.all(
         localHDAccounts.map(async (account) => {
-          const { balances } = await this.getAccount(network, account.userAccount.publicKey);
+          const { balances } = await this.getAccount(network, account.userAccount.id.address);
 
           return {
             empty: Object.values(balances).every((balance) => balance.isEqualTo(0)),
@@ -123,7 +135,7 @@ export class LocalHDHandler implements HDHandler<[number, number, number]> {
       }>(
         (acc, unscanned) => ({
           accounts: acc.accounts.concat(unscanned.account),
-          offset: unscanned.empty ? acc.offset + 1 : 0,
+          offset: unscanned.empty ? acc.offset + 1 : 1,
         }),
         {
           accounts: [],
@@ -132,17 +144,22 @@ export class LocalHDHandler implements HDHandler<[number, number, number]> {
       );
 
       if (newOffset < maxOffset) {
-        const nextAccounts = await scanChainInternal(start + maxOffset, newOffset);
+        const nextAccounts = await scanChainInternal(start + maxOffset - currentOffset, newOffset);
 
         return newAccounts.concat(nextAccounts);
       }
 
-      return newAccounts.slice(newOffset - maxOffset, maxOffset);
+      return newAccounts;
     };
 
     const accounts = await scanChainInternal(0);
 
-    return accounts.slice(0, accounts.length - (maxOffset - 1));
+    const accountsTrimmed = accounts.slice(0, accounts.length - (maxOffset - 2));
+
+    return {
+      empty: accountsTrimmed.length === 2,
+      accounts: accountsTrimmed,
+    };
   }
 
   private publicKeyToLocalHDAccount(path: LocalPath, publicKey: string, network: NetworkType): LocalHDAccount {

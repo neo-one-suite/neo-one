@@ -10,7 +10,7 @@ import {
   LedgerStatusCodeError,
   LedgerTransactionDenied,
 } from '../../errors';
-import { HDStore } from './HDKeyStore';
+import { HDStore } from './types';
 
 export interface LedgerQueueRequest {
   readonly msg: Buffer;
@@ -56,7 +56,7 @@ const processLedgerStatus = (status: string): void => {
   }
 };
 
-export class LedgerStore implements HDStore<number> {
+export class LedgerNanoStore implements HDStore<number> {
   public static readonly byteLimit = LedgerTransport.byteLimit;
   public static readonly type = LedgerTransport.type;
 
@@ -73,7 +73,7 @@ export class LedgerStore implements HDStore<number> {
     const ledger = await transport.open(paths[0]);
     ledger.setScrambleKey('NEO');
 
-    return new LedgerStore(ledger);
+    return new LedgerNanoStore(ledger);
   };
 
   private readonly ledger: HWLedger;

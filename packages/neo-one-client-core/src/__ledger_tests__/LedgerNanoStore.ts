@@ -1,11 +1,11 @@
 import { publicKeyToAddress } from '@neo-one/client-common';
-import { LedgerStore } from '../user/keystore/LedgerStore';
+import { LedgerNanoStore } from '../user/keystore/LedgerNanoStore';
 
 describe(`Ledger Store`, () => {
-  let store: LedgerStore;
+  let store: LedgerNanoStore;
 
   beforeAll(async () => {
-    store = await LedgerStore.init();
+    store = await LedgerNanoStore.init();
   });
 
   test(`gets pubKey`, async () => {
