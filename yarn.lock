@@ -1191,7 +1191,7 @@
     "@types/istanbul-lib-coverage" "^1.1.0"
     "@types/yargs" "^12.0.9"
 
-"@ledgerhq/devices@^4.46.0", "@ledgerhq/devices@^4.47.0":
+"@ledgerhq/devices@^4.47.0":
   version "4.47.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/devices/-/devices-4.47.0.tgz#96a0bd9a32be3b5280df1d714fe60fc68a08b9b9"
   integrity sha512-wm409sLf0GrvcQBtnoAmLw5TW3zYPE5cxNxZ/6+GmiFMHjULtNWMsNWp9inHZO513yhnOZ615GxJMEuyr8PXYQ==
@@ -17909,10 +17909,10 @@ tslint-consistent-codestyle@1.15.1:
     tslib "^1.7.1"
     tsutils "^2.29.0"
 
-tslint-immutable@5.4.0:
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/tslint-immutable/-/tslint-immutable-5.4.0.tgz#55d2156066642f44ad96e2ce59bbd59d6a8f70f4"
-  integrity sha512-8lZG7hNYRFOJv/p/Wb8/1cgizWSRpn4W3GSNWUVye9WyeO/LRbxp88pzNO8Een3RCMbHa3o7oW2UWa+Sx6hCBA==
+tslint-immutable@5.5.0:
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/tslint-immutable/-/tslint-immutable-5.5.0.tgz#9c994c5aaaf9a26fa47d3d0f229c03bba4195765"
+  integrity sha512-t5W3QT01s78ampkLfUod1xXRGqhz+v5d8ANJjjaoHebI1OOq3MP7y7+nW9d911qvwVhMAbGd3feUoKBIh0Dz+A==
   dependencies:
     tsutils "^2.28.0 || ^3.0.0"
 
