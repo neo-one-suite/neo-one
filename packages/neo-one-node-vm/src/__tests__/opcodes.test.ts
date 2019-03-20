@@ -404,20 +404,67 @@ const OPCODES = ([
         // JMP + CALL + RET
         gas: FEES.ONE.add(FEES.ONE).add(FEES.ONE),
       },
-
-      // RET is tested above
       {
-        op: 'APPCALL',
-        buffer: Buffer.alloc(20, 10),
-        // Result of Contract Script defined above
-        result: [new IntegerStackItem(new BN(2)), new IntegerStackItem(new BN(3))],
-
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(contract));
-        },
-        gas: FEES.TEN,
+        op: 'CALL_I',
+        // 1 return value, 0 parameters, Jump ahead 2 + 4 over the jump (2) + return (1) + param (1) bytes.
+        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([0]), new ScriptBuilder().emitInt16LE(6).build()]),
+        // jump to PUSH4, then return, then invoke PUSH2, PUSH3, and PUSH4 again
+        postOps: [{ op: 'PUSH1' }, { op: 'PUSH2' }, { op: 'PUSH3' }, { op: 'PUSH4' }, { op: 'RET' }],
+        result: [
+          new IntegerStackItem(new BN(4)),
+          new IntegerStackItem(new BN(3)),
+          new IntegerStackItem(new BN(2)),
+          new IntegerStackItem(new BN(1)),
+          new IntegerStackItem(new BN(4)),
+        ],
+        // CALL_I RET RET
+        gas: FEES.ONE.add(FEES.ONE).add(FEES.ONE),
       },
-
+      {
+        op: 'CALL_I',
+        // 2 return value, 0 parameters, Jump ahead 1 + 4 over the jump (2) + return (1) + param (1) bytes.
+        buffer: Buffer.concat([Buffer.from([2]), Buffer.from([0]), new ScriptBuilder().emitInt16LE(5).build()]),
+        // jump to PUSH3, PUSH4, then return, then invoke PUSH2, PUSH3, and PUSH4 again
+        postOps: [{ op: 'PUSH1' }, { op: 'PUSH2' }, { op: 'PUSH3' }, { op: 'PUSH4' }, { op: 'RET' }],
+        result: [
+          new IntegerStackItem(new BN(4)),
+          new IntegerStackItem(new BN(3)),
+          new IntegerStackItem(new BN(2)),
+          new IntegerStackItem(new BN(1)),
+          new IntegerStackItem(new BN(4)),
+          new IntegerStackItem(new BN(3)),
+        ],
+        // CALL_I RET RET
+        gas: FEES.ONE.add(FEES.ONE).add(FEES.ONE),
+      },
+      {
+        op: 'CALL_I',
+        // 1 return value, 2 parameters, Jump ahead 1 + 4 over the jump (2) + return (1) + param (1) bytes.
+        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([2]), new ScriptBuilder().emitInt16LE(5).build()]),
+        postOps: [{ op: 'PUSH2' }, { op: 'PUSH3' }, { op: 'ADD' }, { op: 'RET' }],
+        // jump to ADD (adds the two args), then return, then invoke PUSH2, PUSH3, and ADD again
+        args: [new BN(5), new BN(7)],
+        result: [new IntegerStackItem(new BN(5)), new IntegerStackItem(new BN(12))],
+        // CALL_I ADD RET ADD RET
+        gas: FEES.ONE.add(FEES.ONE)
+          .add(FEES.ONE)
+          .add(FEES.ONE)
+          .add(FEES.ONE),
+      },
+      {
+        op: 'CALL_I',
+        // 0 return value, 2 parameters, Jump ahead 1 + 4 over the jump (2) + return (1) + param (1) bytes.
+        buffer: Buffer.concat([Buffer.from([0]), Buffer.from([2]), new ScriptBuilder().emitInt16LE(5).build()]),
+        postOps: [{ op: 'PUSH2' }, { op: 'PUSH3' }, { op: 'ADD' }, { op: 'RET' }],
+        // jump to ADD (adds the two args), then return, then invoke PUSH2, PUSH3, and ADDs again
+        args: [new BN(5), new BN(7)],
+        result: [new IntegerStackItem(new BN(5))],
+        // CALL_I ADD RET ADD RET
+        gas: FEES.ONE.add(FEES.ONE)
+          .add(FEES.ONE)
+          .add(FEES.ONE)
+          .add(FEES.ONE),
+      },
       {
         op: 'APPCALL',
         buffer: Buffer.alloc(20, 0),

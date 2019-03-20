@@ -57,6 +57,10 @@ export interface TestNode {
     readonly transaction: InvocationTransaction;
     readonly sourceMaps: SourceMaps;
   }>;
+  readonly executeBytes: (
+    script: string,
+    options?: InvokeExecuteTransactionOptions,
+  ) => Promise<{ readonly receipt: RawInvokeReceipt; readonly transaction: InvocationTransaction }>;
   readonly compileScript: (script: string) => CompileResult;
   readonly masterWallet: LocalWallet;
   readonly client: Client;
@@ -232,6 +236,20 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
       await checkRawResult(invokeReceipt, mutableSourceMaps);
 
       return { receipt: invokeReceipt, transaction: result.transaction, sourceMaps: mutableSourceMaps };
+    },
+    async executeBytes(script, options = {}) {
+      const result = await userAccountProviders.memory.__execute(script, {
+        from: masterWallet.userAccount.id,
+        systemFee: new BigNumber(-1),
+        ...options,
+      });
+
+      const [invokeReceipt] = await Promise.all([
+        result.confirmed({ timeoutMS: 5000 }),
+        developerClient.runConsensusNow(),
+      ]);
+
+      return { receipt: invokeReceipt, transaction: result.transaction };
     },
     compileScript: getCompiledScript,
     client,

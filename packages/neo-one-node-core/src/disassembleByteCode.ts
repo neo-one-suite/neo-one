@@ -1,5 +1,5 @@
 // tslint:disable prefer-switch
-import { assertByteCode, Byte, Op, OpCode } from '@neo-one/client-common';
+import { Byte, isByteCode, Op, OpCode } from '@neo-one/client-common';
 import { BinaryReader, utils } from './utils';
 
 const createHexString = (bytes: Buffer): string => {
@@ -23,7 +23,12 @@ export const disassembleByteCode = (bytes: Buffer): ReadonlyArray<Line> => {
   // tslint:disable-next-line no-loop-statement
   while (reader.hasMore()) {
     const pc = reader.index;
-    const byte = assertByteCode(reader.readUInt8());
+    const potentialByte = reader.readUInt8();
+    const byte = isByteCode(potentialByte) ? potentialByte : undefined;
+    if (byte === undefined) {
+      mutableResult.push([pc, 'UNKNOWN', undefined]);
+      continue;
+    }
 
     const pushBytes = byte >= Op.PUSHBYTES1 && byte <= Op.PUSHBYTES75;
     const pushData1 = byte === Op.PUSHDATA1;
@@ -68,7 +73,14 @@ export const disassembleByteCode = (bytes: Buffer): ReadonlyArray<Line> => {
     } else if (byte === Op.CALL_ED || byte === Op.CALL_EDT || byte === Op.CALL_I) {
       const returnValueCount = reader.readBytes(1);
       const parametersCount = reader.readBytes(1);
-      mutableResult.push([pc, opCode, `${createHexString(returnValueCount)} ${createHexString(parametersCount)}`]);
+      const jumpVal = byte === Op.CALL_I ? reader.readBytes(2) : undefined;
+      mutableResult.push([
+        pc,
+        opCode,
+        `${createHexString(returnValueCount)} ${createHexString(parametersCount)} ${
+          jumpVal === undefined ? '' : createHexString(jumpVal)
+        }`,
+      ]);
     } else {
       mutableResult.push([pc, opCode, undefined]);
     }

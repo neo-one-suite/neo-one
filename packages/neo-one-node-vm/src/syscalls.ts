@@ -132,13 +132,19 @@ export const createSysCall = ({
   invoke,
 });
 
-const getHashOrIndex = ({ arg }: { readonly arg: StackItem }): UInt256 | number | undefined => {
+const getHashOrIndex = ({
+  context,
+  arg,
+}: {
+  readonly context: ExecutionContext;
+  readonly arg: StackItem;
+}): UInt256 | number | undefined => {
   const buffer = arg.asBuffer();
   let hashOrIndex;
   if (buffer.length === 32) {
     hashOrIndex = arg.asUInt256();
   } else if (buffer.length <= 5) {
-    hashOrIndex = arg.asBigInteger().toNumber();
+    hashOrIndex = arg.asBigInteger(context.blockchain.currentBlockIndex).toNumber();
   }
 
   return hashOrIndex;
@@ -228,11 +234,22 @@ const createContract = async ({
   readonly args: ReadonlyArray<StackItem>;
 }) => {
   const script = args[0].asBuffer();
-  const parameterList = [...args[1].asBuffer()].map(assertContractParameterType);
+  // Removed check of valid ContractParameterTypes to match neo
+  const parameterList = [...args[1].asBuffer()].filter((parameter) => {
+    let validParam = true;
+    try {
+      assertContractParameterType(parameter);
+      // tslint:disable-next-line no-unused
+    } catch (error) {
+      validParam = false;
+    }
 
-  const returnType = assertContractParameterType(args[2].asBigInteger().toNumber());
+    return validParam;
+  });
 
-  const contractProperties = assertContractPropertyState(args[3].asBigInteger().toNumber());
+  const returnType = assertContractParameterType(args[2].asBigIntegerUnsafe().toNumber());
+
+  const contractProperties = assertContractPropertyState(args[3].asBigIntegerUnsafe().toNumber());
 
   const name = args[4].asString();
   const codeVersion = args[5].asString();
@@ -276,7 +293,7 @@ const checkStorage = async ({ context, hash }: { readonly context: ExecutionCont
 function getContractFee<T>(func: (args: CreateSysCallArgs, fee: BN) => T): (args: CreateSysCallArgs) => T {
   return (args) => {
     const { context: contextIn } = args;
-    const contractProperties = assertContractPropertyState(contextIn.stack[3].asBigInteger().toNumber());
+    const contractProperties = assertContractPropertyState(contextIn.stack[3].asBigIntegerUnsafe().toNumber());
 
     let fee = common.ONE_HUNDRED_FIXED8;
 
@@ -349,7 +366,7 @@ const createPut = ({ name }: { readonly name: 'Neo.Storage.Put' | 'Neo.Storage.P
 
       const value = args[2].asBuffer();
       const flags =
-        name === 'Neo.Storage.Put' ? StorageFlags.None : assertStorageFlags(args[3].asBigInteger().toNumber());
+        name === 'Neo.Storage.Put' ? StorageFlags.None : assertStorageFlags(args[3].asBigIntegerUnsafe().toNumber());
       const item = await context.blockchain.storageItem.tryGet({ hash, key });
       if (item === undefined) {
         await context.blockchain.storageItem.add(new StorageItem({ hash, key, value, flags }));
@@ -405,10 +422,13 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     in: 1,
     invoke: async ({ context, args }) => {
       const { onNotify } = context.init.listeners;
+
       if (onNotify !== undefined) {
         onNotify({
           scriptHash: context.scriptHash,
-          args: args[0].asArray().map((item) => item.toContractParameter()),
+          args: args[0].isArray()
+            ? args[0].asArray().map((item) => item.toContractParameter())
+            : [args[0].toContractParameter()],
         });
       }
 
@@ -490,7 +510,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     out: 1,
     fee: FEES.ONE_HUNDRED,
     invoke: async ({ context, args }) => {
-      const hashOrIndex = getHashOrIndex({ arg: args[0] });
+      const hashOrIndex = getHashOrIndex({ context, arg: args[0] });
       if (hashOrIndex === undefined) {
         throw new InvalidGetHeaderArgumentsError(context);
       }
@@ -510,6 +530,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     fee: FEES.TWO_HUNDRED,
     invoke: async ({ context, args }) => {
       const hashOrIndex = getHashOrIndex({
+        context,
         arg: args[0],
       });
 
@@ -747,7 +768,9 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     invoke: ({ context, args }) => ({
       context,
       results: [
-        new TransactionStackItem(getIndex(context, args[1].asBigInteger().toNumber(), args[0].asBlock().transactions)),
+        new TransactionStackItem(
+          getIndex(context, args[1].asBigIntegerUnsafe().toNumber(), args[0].asBlock().transactions),
+        ),
       ],
     }),
   }),
@@ -1470,14 +1493,14 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
         throw new UnexpectedScriptContainerError(context);
       }
 
-      const assetType = assertAssetType(args[0].asBigInteger().toNumber());
+      const assetType = assertAssetType(args[0].asBigIntegerUnsafe().toNumber());
       if (assetType === AssetType.GoverningToken || assetType === AssetType.UtilityToken) {
         throw new InvalidAssetTypeError(context);
       }
 
       const name = args[1].asString();
-      const amount = args[2].asBigInteger();
-      const precision = args[3].asBigInteger().toNumber();
+      const amount = args[2].asBigIntegerUnsafe();
+      const precision = args[3].asBigIntegerUnsafe().toNumber();
       const owner = args[4].asECPoint();
       const admin = args[5].asUInt160();
       const issuer = args[6].asUInt160();
@@ -1507,7 +1530,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
   }),
 
   'Neo.Asset.Renew': ({ context: contextIn }) => {
-    const yearsIn = contextIn.stack[1].asBigInteger();
+    const yearsIn = contextIn.stack[1].asBigInteger(contextIn.blockchain.currentBlockIndex);
 
     return createSysCall({
       name: 'Neo.Asset.Renew',
@@ -1516,7 +1539,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
       fee: common.FIVE_THOUSAND_FIXED8.mul(yearsIn),
       invoke: async ({ context, args }) => {
         const { hash } = args[0].asAsset();
-        const years = args[1].asBigInteger();
+        const years = args[1].asBigIntegerUnsafe();
 
         const asset = await context.blockchain.asset.get({ hash });
         let { expiration } = asset;
@@ -1666,11 +1689,14 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
       await checkStorage({ context, hash });
       const key = args[1].asBuffer();
       const existing = await context.blockchain.storageItem.tryGet({ hash, key });
-      if (existing !== undefined && hasStorageFlag(existing.flags, StorageFlags.Constant)) {
-        throw new ConstantStorageError(context, key);
-      }
 
-      await context.blockchain.storageItem.delete({ hash, key });
+      if (existing !== undefined) {
+        if (hasStorageFlag(existing.flags, StorageFlags.Constant)) {
+          throw new ConstantStorageError(context, key);
+        }
+
+        await context.blockchain.storageItem.delete({ hash, key });
+      }
 
       return { context };
     },

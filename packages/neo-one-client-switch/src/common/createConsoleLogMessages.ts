@@ -58,7 +58,7 @@ const inspect = (value: any, wrapString = false): any => {
 const extractValueFromStackItem = (stackItem: StackItem): any => {
   const type = stackItem
     .asArray()[0]
-    .asBigInteger()
+    .asBigIntegerUnsafe()
     .toNumber();
 
   switch (type) {
@@ -76,7 +76,7 @@ const extractValueFromStackItem = (stackItem: StackItem): any => {
     case 5:
       return stackItem
         .asArray()[1]
-        .asBigInteger()
+        .asBigIntegerUnsafe()
         .toString(10);
     case 6:
       return _.fromPairs(

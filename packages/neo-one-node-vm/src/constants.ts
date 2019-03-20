@@ -21,6 +21,7 @@ export const MAX_INVOCATION_STACK_SIZE = 1024;
 export const MAX_ARRAY_SIZE = 1024;
 export const MAX_ARRAY_SIZE_BN = new BN(1024);
 export const BLOCK_HEIGHT_YEAR = 2000000;
+export const BLOCK_HEIGHT_MAX_SIZE_CHECKS = Number.MAX_SAFE_INTEGER;
 const ratio = 100000;
 export const FEES = {
   ONE: new BN(ratio * 1),

@@ -1,14 +1,28 @@
 // tslint:disable no-implicit-dependencies no-any no-loop-statement prefer-immediate-return no-var-before-return no-console
-import { scriptHashToAddress, utils } from '@neo-one/client-common';
+import { addressToScriptHash, scriptHashToAddress, utils } from '@neo-one/client-common';
 import { NEOONEDataProvider } from '@neo-one/client-core';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { toArray } from '@reactivex/ix-es2015-cjs/asynciterable/toarray';
+import fetch from 'cross-fetch';
+import _ from 'lodash';
 
 // const oneRPCURL = 'https://neotracker.io/rpc';
 // const waitMS = 65000
 const oneRPCURL = 'http://localhost:40200/rpc';
 const waitMS = 1000;
-const testRPCURL = 'http://seed3.cityofzion.io:8080';
+const testEndpoints: ReadonlyArray<string> = [
+  'http://node1.nyc3.bridgeprotocol.io:10332',
+  'http://node2.nyc3.bridgeprotocol.io:10332',
+  'https://seed1.switcheo.network:10331',
+  'https://seed2.switcheo.network:10331',
+  'https://seed3.switcheo.network:10331',
+  'http://seed1.aphelion-neo.com:10332',
+  'http://seed2.aphelion-neo.com:10332',
+  'http://seed3.aphelion-neo.com:10332',
+  'http://seed4.aphelion-neo.com:10332',
+];
+const testRPCURL = testEndpoints[0];
+const BATCH_SIZE = 100;
 
 const hashes: ReadonlyArray<string> = [
   '0x8a4d2865d01ec8e6add72e3dfdd20c12f44834e3',
@@ -72,6 +86,8 @@ const hashes: ReadonlyArray<string> = [
   '0xfc732edee1efdf968c23c20a9628eaa5a6ccb934',
 ];
 
+// const hashes: ReadonlyArray<string> = ['0x3a4acd3647086e7c44398aac0349802e6a171129'];
+
 const oneProvider = new NEOONEDataProvider({
   network: 'main',
   rpcURL: oneRPCURL,
@@ -81,6 +97,27 @@ const testProvider = new NEOONEDataProvider({
   network: 'main',
   rpcURL: testRPCURL,
 });
+
+const fetchStorage = async (endpoint: string, item: any): Promise<string> => {
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'getstorage',
+      params: [addressToScriptHash(item.address), item.key],
+    }),
+  });
+
+  const json = await response.json();
+
+  return json.result;
+};
 
 const convertNumber = (value: string) => {
   try {
@@ -125,12 +162,12 @@ const logItem = (item: any) => {
   }
 };
 
-const getStorage = async (provider: any, item: any): Promise<any> => {
+const getStorage = async (endpoint: string, item: any): Promise<any> => {
   let tries = 3;
   let error;
   while (tries >= 0) {
     try {
-      const result = await provider.getStorage(item.hash, item.key);
+      const result = await fetchStorage(endpoint, item);
 
       return result;
     } catch (err) {
@@ -144,45 +181,50 @@ const getStorage = async (provider: any, item: any): Promise<any> => {
 };
 
 const verifyStorage = async (hash: string): Promise<void> => {
-  const storageItems = await toArray(AsyncIterableX.from(oneProvider.iterStorage(hash)));
+  const storageItems = await toArray(AsyncIterableX.from(oneProvider.iterStorage(scriptHashToAddress(hash))));
+  const storageItemChunks = _.chunk(storageItems, BATCH_SIZE);
+  const storageItemCount = storageItems.length;
 
   let totalEqual = 0;
-  await Promise.all(
-    storageItems.map(async (itemIn) => {
-      let [currentItem, testItem] = await Promise.all([
-        getStorage(oneProvider, itemIn),
-        getStorage(testProvider, itemIn),
-      ]);
-
-      if (!isEqual(currentItem, testItem)) {
-        await new Promise<void>((resolve) => setTimeout(resolve, 5000));
-        [currentItem, testItem] = await Promise.all([
-          getStorage(oneProvider, itemIn),
-          getStorage(testProvider, itemIn),
+  let count = 0;
+  for (const chunk of storageItemChunks) {
+    await Promise.all(
+      chunk.map(async (itemIn) => {
+        count += 1;
+        let [currentItem, testItem] = await Promise.all([
+          getStorage(oneRPCURL, itemIn),
+          getStorage(testRPCURL, itemIn),
         ]);
-      }
 
-      if (!isEqual(currentItem, testItem)) {
-        console.log('NOT EQUAL:');
-        console.log(currentItem.hash);
-        console.log(currentItem.key);
-        try {
-          console.log(scriptHashToAddress(`0x${reverse(currentItem.key)}`));
-        } catch {
-          try {
-            console.log(Buffer.from(currentItem.key, 'hex').toString('utf8'));
-          } catch {
-            // Ignore errors
-          }
+        if (!isEqual(currentItem, testItem)) {
+          await new Promise<void>((resolve) => setTimeout(resolve, 5000));
+          [currentItem, testItem] = await Promise.all([getStorage(oneRPCURL, itemIn), getStorage(testRPCURL, itemIn)]);
         }
-        logItem(currentItem);
-        logItem(testItem);
-        console.log('\n');
-      } else {
-        totalEqual += 1;
-      }
-    }),
-  );
+
+        if (!isEqual(currentItem, testItem)) {
+          console.log('NOT EQUAL:');
+          console.log(currentItem.hash);
+          console.log(currentItem.key);
+          try {
+            console.log(scriptHashToAddress(`0x${reverse(currentItem.key)}`));
+          } catch {
+            try {
+              console.log(Buffer.from(currentItem.key, 'hex').toString('utf8'));
+            } catch {
+              // Ignore errors
+            }
+          }
+          logItem(currentItem);
+          logItem(testItem);
+          console.log('\n');
+        } else {
+          totalEqual += 1;
+        }
+      }),
+    );
+    console.log(`Processed ${count} storage items. ${storageItemCount - count} remaining.`);
+  }
+
   console.log(`Total Equal: ${totalEqual}`);
 };
 

@@ -2,6 +2,8 @@
 import { common, crypto, ScriptBuilder, UInt160, utils, VMState } from '@neo-one/client-common';
 import { DefaultMonitor } from '@neo-one/monitor';
 import {
+  ArrayContractParameter,
+  ByteArrayContractParameter,
   ExecuteScriptsResult,
   Input,
   InvocationTransaction,
@@ -102,10 +104,11 @@ describe('execute', () => {
     return result.stack[0];
   };
 
-  const executeSetupScript = async (script: Buffer) => {
+  const executeSetupScript = async (script: Buffer, gas = utils.ZERO) => {
     const result = await executeSimple({
       blockchain,
       transaction: transactions.createInvocation({ script }),
+      gas,
     });
 
     return checkResult(result);
@@ -574,6 +577,35 @@ describe('execute', () => {
         mockBlockchain();
       });
 
+      test('should add malformed address to storage', async () => {
+        await mintTokens();
+        const value = new BN(10);
+
+        const result = await executeSimple({
+          blockchain,
+          transaction: transactions.createInvocation({
+            script: new ScriptBuilder()
+              .emitAppCall(
+                conciergeContract.hash,
+                'transfer',
+                conciergeSenderAddress,
+                new ScriptBuilder()
+                  .emit(
+                    Buffer.from(
+                      '4164636f57696a714c756a4a4a626b69344776696a5a5053726d37534a6b5551394d2020e4bda0e79a845549443a204a5953364e41',
+                      'hex',
+                    ),
+                  )
+                  .build(),
+                value,
+              )
+              .build(),
+          }),
+        });
+
+        expectSuccess(result);
+      });
+
       _.range(1, 4).forEach((count) => testTransfer({ count, success: true }));
       _.range(4, 6).forEach((count) => testTransfer({ count, success: false }));
 
@@ -1008,6 +1040,321 @@ describe('execute', () => {
 
         testUtils.verifyListeners(listeners);
       });
+    });
+  });
+
+  describe('narrative token', () => {
+    const { narrativeTokenContract } = transactions;
+
+    const narrativeTokenCrowdsaleRegister = async (bytes: Buffer, fail?: boolean) => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emitAppCall(narrativeTokenContract.hash, 'crowdsale_register', new ScriptBuilder().emit(bytes).build())
+            .build(),
+        }),
+      });
+
+      if (fail) {
+        expectThrow(result);
+      } else {
+        expectSuccess(result);
+      }
+    };
+
+    const narrativeTokenCrowdsaleDeregister = async (bytes: Buffer) => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emitAppCall(narrativeTokenContract.hash, 'crowdsale_deregister', new ScriptBuilder().emit(bytes).build())
+            .build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    const mockBlockchain = () => {
+      blockchain = createBlockchain({
+        contracts: [narrativeTokenContract],
+      });
+    };
+
+    const deploy = async () =>
+      executeSetupScript(new ScriptBuilder().emitAppCall(narrativeTokenContract.hash, 'deploy').build());
+
+    beforeEach(() => {
+      mockBlockchain();
+    });
+
+    test('crowdsale register - fails at free GAS limit for bulk addresses', async () => {
+      const ret = await deploy();
+      expect(ret.asBoolean()).toBeTruthy();
+
+      await narrativeTokenCrowdsaleRegister(Buffer.from('23ba2703c53263e8d6e522dc32203339dcd8eee9', 'hex'));
+      await narrativeTokenCrowdsaleRegister(
+        Buffer.from(
+          '5c2721a33bf665880fb2c1c0d504d92dcfe1616f03a8b007549dd4d19f367d6b71ed5c6fe9aa827298d3602f1e4f5ba179481398e55593862a0df92c62b9d04e2d8b2a989d72c3c9478c18f2ef714cf2c2c1bac70b182dbf8434323013c72d66c57591d849b197c38b07107c7ac4097ba47c1c9c39a04409dbfae7df8d49ad1319079604318ba12252ace7f1ace575f6847bc025bb30d752d73892bbb875e8d2baa6caaaf1b6efeb33744ace65f19fad05b26e12c1e347ae7770a182a4934e47332bebbd4cc848692cf5480980a6d99833e84fece90e31b196cbfe775ea2beb13b95ed41179becfb21dffcfbc3696d56dd270aa03397e5831c6b21f3542bfec1bf48fdafc51b2a9364f1d85268737eb7421911f6f581744475ab2bec031da981f65df6372f0a9dabcc4d5a174cadc544894ee83981fc66021d33025579f4eec82b96c64588ff0def56e0b0304f584f0acfa9632d6a3d3c88d3689b06954f57bcc860e78de1713d98982fb2a042a9b9a973435b5d49ddaca01d707ae0287bc0f0c2cceeb41a15131c5f98a6b690ca6c57366d229bd2b2f266b5b240f2057f50eb43f41945d84f65776cc194dd408e2cbb12a665cd2b9502b576cd518f09f9eddec27374fe8c9978db7d50a8144bb7dd13f517e8f0e1b4f90b20918f605fbcbfd6afa86a36b7555bfb9910128651af954dfa3a7de539949b4c0c4d28b55ac089e85cd8ec118f8ea34e2a7045b5d17a344b63f2dde9bef9a3ae624320d73875dff29fd7a4779f6dca2417e6f8c7f6b62d7f8ee2d22a87228f0c8b456fb43dc9fdb04793044493e9403daefed173a9e5a82acdfb7f40c4845419d360c06efe559805a52f4c554ff5d8de17ba8a28d815cbb32e904328d57179ef7282d5e33b546ee6',
+          'hex',
+        ),
+        true,
+      );
+
+      testUtils.verifyListeners(listeners);
+    });
+
+    test('crowdsale deregister - does not log delete for nonexistent address', async () => {
+      const ret = await deploy();
+      expect(ret.asBoolean()).toBeTruthy();
+
+      await narrativeTokenCrowdsaleRegister(Buffer.from('23ba2703c53263e8d6e522dc32203339dcd8eee9', 'hex'));
+      await narrativeTokenCrowdsaleDeregister(Buffer.from('23ba2703c53263e8d6e522dc32203339dcd8eee9', 'hex'));
+      await narrativeTokenCrowdsaleDeregister(Buffer.from('dbfae7df8d49ad1319079604318ba12252ace7f1', 'hex'));
+
+      testUtils.verifyListeners(listeners);
+    });
+  });
+
+  describe('Wowbit token', () => {
+    const { wowbitTokenContract } = transactions;
+
+    const mockBlockchain = () => {
+      blockchain = createBlockchain({
+        contracts: [wowbitTokenContract],
+      });
+    };
+
+    const deploy = async () =>
+      executeSetupScript(
+        new ScriptBuilder().emitAppCall(wowbitTokenContract.hash, 'deploy').build(),
+        common.ONE_THOUSAND_FIXED8,
+      );
+
+    beforeEach(() => {
+      mockBlockchain();
+    });
+
+    test('deploy - negative buffer conversion works properly', async () => {
+      const ret = await deploy();
+      expect(ret.asBoolean()).toBeTruthy();
+
+      testUtils.verifyBlockchainSnapshot(blockchain);
+      testUtils.verifyListeners(listeners);
+    });
+  });
+
+  describe('Mystery invoke', () => {
+    const { mysteryScript } = transactions;
+
+    const mockBlockchain = () => {
+      blockchain = createBlockchain({ contracts: [] });
+
+      blockchain.contract.tryGet = jest.fn(async () => Promise.resolve(undefined));
+      blockchain.contract.add = jest.fn(async () => Promise.resolve());
+    };
+
+    const deploy = async () =>
+      executeSetupScript(new ScriptBuilder().emit(mysteryScript).build(), common.ONE_THOUSAND_FIXED8);
+
+    beforeEach(() => {
+      mockBlockchain();
+    });
+
+    test('deploy - invalid contract paramter ignored', async () => {
+      const ret = await deploy();
+      expect(ret).toBeTruthy();
+
+      testUtils.verifyBlockchainSnapshot(blockchain);
+      testUtils.verifyListeners(listeners);
+    });
+  });
+
+  describe('Aphelion exchange', () => {
+    const { aphelionExchangeContract } = transactions;
+
+    const mockBlockchain = () => {
+      blockchain = createBlockchain({ contracts: [aphelionExchangeContract] });
+    };
+
+    const deploy = async () =>
+      executeSetupScript(
+        new ScriptBuilder().emitAppCall(aphelionExchangeContract.hash, 'deploy').build(),
+        common.ONE_THOUSAND_FIXED8,
+      );
+
+    const setManager = async () => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emit(
+              Buffer.from(
+                '141a1af8a9f46ebcaa47f3b2f967dd7bf606d8931651c10a7365744d616e6167657267cbf29df42fb950a4456787ec4ebf2076795f8948',
+                'hex',
+              ),
+            )
+            .build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    beforeEach(() => {
+      mockBlockchain();
+    });
+
+    test('deploy + set manager - CALL_I opcode', async () => {
+      await deploy();
+      await setManager();
+
+      testUtils.verifyBlockchainSnapshot(blockchain);
+      testUtils.verifyListeners(listeners);
+    });
+  });
+
+  describe('Bridge Protocol', () => {
+    const { bridgeProtocolTokenContract, bridgeProtocolKeyServer } = transactions;
+
+    const mockBlockchain = () => {
+      blockchain = createBlockchain({ contracts: [bridgeProtocolTokenContract, bridgeProtocolKeyServer] });
+    };
+
+    const deployToken = async () =>
+      executeSetupScript(
+        new ScriptBuilder().emitAppCall(bridgeProtocolTokenContract.hash, 'deploy').build(),
+        common.ONE_THOUSAND_FIXED8,
+      );
+
+    // https://neotracker.io/tx/f0531b93b1771ad093774d4aea423b838d513b1c823f44ad686582a543ce8317
+    const deployKeyServer = async () =>
+      executeSetupScript(
+        new ScriptBuilder()
+          .emit(Buffer.from('025b5d04696e697467f8b65f752e5c0eb9d8b19d7f7198db03ef5fb4a4', 'hex'))
+          .build(),
+        common.ONE_THOUSAND_FIXED8,
+      );
+
+    const publish = async () => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emit(
+              Buffer.from(
+                '14aefaa22d12d1222db572901ba81478da2803bb2b4d8f022d2d2d2d2d424547494e20504750205055424c4943204b455920424c4f434b2d2d2d2d2d0d0a56657273696f6e3a204f70656e5047502e6a732076332e312e300d0a436f6d6d656e743a2068747470733a2f2f6f70656e7067706a732e6f72670d0a0d0a786a4d45572f6c343252594a4b775942424148615277384241516441356c6e326d70414150374864645834506c54774f51425658305a475942542b720a6636784757624c786833504e4b454a796157526e5a53425159584e7a634739796443413859573576626b4269636d6c6b5a32567759584e7a634739790a64433570627a37436477515146676f414b515543572f6c343251594c435163494177494a454b6755654e6f6f413773724242554943674944466749420a41686b4241687344416834424141414148674541727962314574726c53315870587558636c595568506b44345055516c7835587a6c3070354e526e740a735334412f693230434d57346e67312b42762f5548316266496247355871736742666e4e4c4a6a744f584e74413355507a6a6745572f6c343252494b0a4b7759424241475856514546415145485142545944733873494d2b5669446a52336567325065746646715962632f564a536535575a316b4b677234530a4177454942384a68424267574341415442514a622b586a5a4352436f46486a614b414f374b77496244414141457145412f3342596f5a5641666b31380a704f4d556f612f5a446e32476e4a5447312f4f456c684b4a4558553543614944415039315032373557527a686d77364a337a6a55753279652f5777510a5950492f414e434841532f766c344c6443413d3d0d0a3d336f514b0d0a2d2d2d2d2d454e4420504750205055424c4943204b455920424c4f434b2d2d2d2d2d0d0a0d0a14aefaa22d12d1222db572901ba81478da2803bb2b14a1502468141d9b6832da9d2e455bde41779faea554c1077075626c69736867f8b65f752e5c0eb9d8b19d7f7198db03ef5fb4a4',
+                'hex',
+              ),
+            )
+            .build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    beforeEach(() => {
+      mockBlockchain();
+    });
+
+    test('publish', async () => {
+      const retToken = await deployToken();
+      expect(retToken.asBoolean()).toBeTruthy();
+      const retKeyServer = await deployKeyServer();
+      expect(retKeyServer.asBoolean()).toBeTruthy();
+
+      await publish();
+
+      testUtils.verifyListeners(listeners);
+    });
+  });
+
+  describe('NEX Token', () => {
+    const { nexTokenContract } = transactions;
+
+    const mockBlockchain = () => {
+      blockchain = createBlockchain({ contracts: [nexTokenContract] });
+    };
+
+    const initializeOwners = async () => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emit(
+              Buffer.from('025b5d10696e697469616c697a654f776e657273672911176a2e804903ac8a39447c6e084736cd4a3a', 'hex'),
+            )
+            .build(),
+        }),
+        gas: common.ONE_HUNDRED_FIXED8,
+      });
+
+      expectSuccess(result);
+    };
+
+    const deploy = async () => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emit(Buffer.from('025b5d066465706c6f79672911176a2e804903ac8a39447c6e084736cd4a3a', 'hex'))
+            .build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    const ownerMint = async (owner: string) => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder().emitAppCall(nexTokenContract.hash, 'ownerMint', Buffer.from(owner)).build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    const getOwners = async () => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder().emitAppCall(nexTokenContract.hash, 'getOwners').build(),
+        }),
+      });
+
+      return ((result.stack[0] as ArrayContractParameter).value as ReadonlyArray<ByteArrayContractParameter>).map(
+        ({ value }) => common.asUInt160(value),
+      );
+    };
+
+    const transfer = async (from: UInt160, to: UInt160, amount: BN) => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder().emitAppCall(nexTokenContract.hash, 'transfer', from, to, amount).build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    beforeEach(() => {
+      mockBlockchain();
+    });
+
+    test('transfer', async () => {
+      await initializeOwners();
+      await deploy();
+      await ownerMint('owner1');
+      const owners = await getOwners();
+
+      await transfer(owners[0], owners[1], new BN(5));
+
+      testUtils.verifyListeners(listeners);
     });
   });
 });

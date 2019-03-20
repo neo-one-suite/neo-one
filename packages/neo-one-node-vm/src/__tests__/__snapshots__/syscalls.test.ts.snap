@@ -1,14 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`syscalls Neo.Account.GetBalance 1`] = `
-Array [
-  Array [
-    Object {
-      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Account.GetBalance 1`] = `"account.tryGet"`;
 
 exports[`syscalls Neo.Account.GetBalance 2`] = `
 Array [
@@ -20,15 +12,29 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Account.GetBalance 3`] = `Array []`;
+exports[`syscalls Neo.Account.GetBalance 3`] = `"account.get"`;
 
-exports[`syscalls Neo.Account.GetBalance 4`] = `Array []`;
+exports[`syscalls Neo.Account.GetBalance 4`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
 
 exports[`syscalls Neo.Account.GetBalance 5`] = `Array []`;
 
 exports[`syscalls Neo.Account.GetBalance 6`] = `Array []`;
 
-exports[`syscalls Neo.Account.GetBalance 7`] = `
+exports[`syscalls Neo.Account.GetBalance 7`] = `Array []`;
+
+exports[`syscalls Neo.Account.GetBalance 8`] = `Array []`;
+
+exports[`syscalls Neo.Account.GetBalance 9`] = `"account.tryGet"`;
+
+exports[`syscalls Neo.Account.GetBalance 10`] = `
 Array [
   Array [
     Object {
@@ -38,7 +44,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Account.GetBalance 8`] = `
+exports[`syscalls Neo.Account.GetBalance 11`] = `"account.get"`;
+
+exports[`syscalls Neo.Account.GetBalance 12`] = `
 Array [
   Array [
     Object {
@@ -48,15 +56,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Account.GetBalance 9`] = `Array []`;
+exports[`syscalls Neo.Account.GetBalance 13`] = `Array []`;
 
-exports[`syscalls Neo.Account.GetBalance 10`] = `Array []`;
+exports[`syscalls Neo.Account.GetBalance 14`] = `Array []`;
 
-exports[`syscalls Neo.Account.GetBalance 11`] = `Array []`;
+exports[`syscalls Neo.Account.GetBalance 15`] = `Array []`;
 
-exports[`syscalls Neo.Account.GetBalance 12`] = `Array []`;
+exports[`syscalls Neo.Account.GetBalance 16`] = `Array []`;
 
-exports[`syscalls Neo.Account.GetScriptHash 1`] = `
+exports[`syscalls Neo.Account.GetScriptHash 1`] = `"account.tryGet"`;
+
+exports[`syscalls Neo.Account.GetScriptHash 2`] = `
 Array [
   Array [
     Object {
@@ -65,8 +75,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Account.GetScriptHash 2`] = `Array []`;
 
 exports[`syscalls Neo.Account.GetScriptHash 3`] = `Array []`;
 
@@ -74,7 +82,11 @@ exports[`syscalls Neo.Account.GetScriptHash 4`] = `Array []`;
 
 exports[`syscalls Neo.Account.GetScriptHash 5`] = `Array []`;
 
-exports[`syscalls Neo.Account.GetVotes 1`] = `
+exports[`syscalls Neo.Account.GetScriptHash 6`] = `Array []`;
+
+exports[`syscalls Neo.Account.GetVotes 1`] = `"account.tryGet"`;
+
+exports[`syscalls Neo.Account.GetVotes 2`] = `
 Array [
   Array [
     Object {
@@ -83,8 +95,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Account.GetVotes 2`] = `Array []`;
 
 exports[`syscalls Neo.Account.GetVotes 3`] = `Array []`;
 
@@ -92,15 +102,9 @@ exports[`syscalls Neo.Account.GetVotes 4`] = `Array []`;
 
 exports[`syscalls Neo.Account.GetVotes 5`] = `Array []`;
 
-exports[`syscalls Neo.Account.SetVotes 1`] = `
-Array [
-  Array [
-    Object {
-      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Account.GetVotes 6`] = `Array []`;
+
+exports[`syscalls Neo.Account.SetVotes 1`] = `"account.tryGet"`;
 
 exports[`syscalls Neo.Account.SetVotes 2`] = `
 Array [
@@ -112,7 +116,21 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Account.SetVotes 3`] = `
+exports[`syscalls Neo.Account.SetVotes 3`] = `"account.get"`;
+
+exports[`syscalls Neo.Account.SetVotes 4`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Account.SetVotes 5`] = `"account.update"`;
+
+exports[`syscalls Neo.Account.SetVotes 6`] = `
 Array [
   Array [
     Object {
@@ -138,49 +156,55 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Account.SetVotes 4`] = `Array []`;
+exports[`syscalls Neo.Account.SetVotes 7`] = `Array []`;
 
-exports[`syscalls Neo.Account.SetVotes 5`] = `Array []`;
+exports[`syscalls Neo.Account.SetVotes 8`] = `Array []`;
 
-exports[`syscalls Neo.Account.SetVotes 6`] = `Array []`;
-
-exports[`syscalls Neo.Account.SetVotes 7`] = `
-Array [
-  Array [
-    Object {
-      "address": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
-      "votes": Array [
-        "02232ce8d2e2063dce0451131851d47421bfc4fc1da4db116fca5302c0756462fa",
-      ],
-    },
-  ],
-]
-`;
-
-exports[`syscalls Neo.Account.SetVotes 8`] = `
-Array [
-  Array [
-    Object {
-      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
-    },
-  ],
-]
-`;
-
-exports[`syscalls Neo.Account.SetVotes 9`] = `
-Array [
-  Array [
-    Object {
-      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Account.SetVotes 9`] = `Array []`;
 
 exports[`syscalls Neo.Account.SetVotes 10`] = `
 Array [
   Array [
     Object {
+      "address": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+      "votes": Array [
+        "02232ce8d2e2063dce0451131851d47421bfc4fc1da4db116fca5302c0756462fa",
+      ],
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Account.SetVotes 11`] = `"account.tryGet"`;
+
+exports[`syscalls Neo.Account.SetVotes 12`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Account.SetVotes 13`] = `"account.get"`;
+
+exports[`syscalls Neo.Account.SetVotes 14`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Account.SetVotes 15`] = `"account.update"`;
+
+exports[`syscalls Neo.Account.SetVotes 16`] = `
+Array [
+  Array [
+    Object {
       "__$type": "Account",
       "balances": Object {
         "0x0101010101010101010101010101010101010101010101010101010101010101": "10",
@@ -203,7 +227,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Account.SetVotes 11`] = `
+exports[`syscalls Neo.Account.SetVotes 17`] = `"account.delete"`;
+
+exports[`syscalls Neo.Account.SetVotes 18`] = `
 Array [
   Array [
     Object {
@@ -213,13 +239,13 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Account.SetVotes 12`] = `Array []`;
+exports[`syscalls Neo.Account.SetVotes 19`] = `Array []`;
 
-exports[`syscalls Neo.Account.SetVotes 13`] = `Array []`;
+exports[`syscalls Neo.Account.SetVotes 20`] = `Array []`;
 
-exports[`syscalls Neo.Account.SetVotes 14`] = `Array []`;
+exports[`syscalls Neo.Account.SetVotes 21`] = `Array []`;
 
-exports[`syscalls Neo.Account.SetVotes 15`] = `
+exports[`syscalls Neo.Account.SetVotes 22`] = `
 Array [
   Array [
     Object {
@@ -232,7 +258,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Asset.Create 1`] = `
+exports[`syscalls Neo.Asset.Create 1`] = `"asset.add"`;
+
+exports[`syscalls Neo.Asset.Create 2`] = `
 Array [
   Array [
     Object {
@@ -258,15 +286,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Asset.Create 2`] = `Array []`;
-
 exports[`syscalls Neo.Asset.Create 3`] = `Array []`;
 
 exports[`syscalls Neo.Asset.Create 4`] = `Array []`;
 
 exports[`syscalls Neo.Asset.Create 5`] = `Array []`;
 
-exports[`syscalls Neo.Asset.GetAdmin 1`] = `
+exports[`syscalls Neo.Asset.Create 6`] = `Array []`;
+
+exports[`syscalls Neo.Asset.GetAdmin 1`] = `"asset.get"`;
+
+exports[`syscalls Neo.Asset.GetAdmin 2`] = `
 Array [
   Array [
     Object {
@@ -275,8 +305,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Asset.GetAdmin 2`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetAdmin 3`] = `Array []`;
 
@@ -284,7 +312,11 @@ exports[`syscalls Neo.Asset.GetAdmin 4`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetAdmin 5`] = `Array []`;
 
-exports[`syscalls Neo.Asset.GetAmount 1`] = `
+exports[`syscalls Neo.Asset.GetAdmin 6`] = `Array []`;
+
+exports[`syscalls Neo.Asset.GetAmount 1`] = `"asset.get"`;
+
+exports[`syscalls Neo.Asset.GetAmount 2`] = `
 Array [
   Array [
     Object {
@@ -293,8 +325,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Asset.GetAmount 2`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetAmount 3`] = `Array []`;
 
@@ -302,7 +332,11 @@ exports[`syscalls Neo.Asset.GetAmount 4`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetAmount 5`] = `Array []`;
 
-exports[`syscalls Neo.Asset.GetAssetId 1`] = `
+exports[`syscalls Neo.Asset.GetAmount 6`] = `Array []`;
+
+exports[`syscalls Neo.Asset.GetAssetId 1`] = `"asset.get"`;
+
+exports[`syscalls Neo.Asset.GetAssetId 2`] = `
 Array [
   Array [
     Object {
@@ -311,8 +345,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Asset.GetAssetId 2`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetAssetId 3`] = `Array []`;
 
@@ -320,7 +352,11 @@ exports[`syscalls Neo.Asset.GetAssetId 4`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetAssetId 5`] = `Array []`;
 
-exports[`syscalls Neo.Asset.GetAssetType 1`] = `
+exports[`syscalls Neo.Asset.GetAssetId 6`] = `Array []`;
+
+exports[`syscalls Neo.Asset.GetAssetType 1`] = `"asset.get"`;
+
+exports[`syscalls Neo.Asset.GetAssetType 2`] = `
 Array [
   Array [
     Object {
@@ -329,8 +365,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Asset.GetAssetType 2`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetAssetType 3`] = `Array []`;
 
@@ -338,7 +372,11 @@ exports[`syscalls Neo.Asset.GetAssetType 4`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetAssetType 5`] = `Array []`;
 
-exports[`syscalls Neo.Asset.GetAvailable 1`] = `
+exports[`syscalls Neo.Asset.GetAssetType 6`] = `Array []`;
+
+exports[`syscalls Neo.Asset.GetAvailable 1`] = `"asset.get"`;
+
+exports[`syscalls Neo.Asset.GetAvailable 2`] = `
 Array [
   Array [
     Object {
@@ -347,8 +385,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Asset.GetAvailable 2`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetAvailable 3`] = `Array []`;
 
@@ -356,7 +392,11 @@ exports[`syscalls Neo.Asset.GetAvailable 4`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetAvailable 5`] = `Array []`;
 
-exports[`syscalls Neo.Asset.GetIssuer 1`] = `
+exports[`syscalls Neo.Asset.GetAvailable 6`] = `Array []`;
+
+exports[`syscalls Neo.Asset.GetIssuer 1`] = `"asset.get"`;
+
+exports[`syscalls Neo.Asset.GetIssuer 2`] = `
 Array [
   Array [
     Object {
@@ -365,8 +405,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Asset.GetIssuer 2`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetIssuer 3`] = `Array []`;
 
@@ -374,7 +412,11 @@ exports[`syscalls Neo.Asset.GetIssuer 4`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetIssuer 5`] = `Array []`;
 
-exports[`syscalls Neo.Asset.GetOwner 1`] = `
+exports[`syscalls Neo.Asset.GetIssuer 6`] = `Array []`;
+
+exports[`syscalls Neo.Asset.GetOwner 1`] = `"asset.get"`;
+
+exports[`syscalls Neo.Asset.GetOwner 2`] = `
 Array [
   Array [
     Object {
@@ -383,8 +425,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Asset.GetOwner 2`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetOwner 3`] = `Array []`;
 
@@ -392,7 +432,11 @@ exports[`syscalls Neo.Asset.GetOwner 4`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetOwner 5`] = `Array []`;
 
-exports[`syscalls Neo.Asset.GetPrecision 1`] = `
+exports[`syscalls Neo.Asset.GetOwner 6`] = `Array []`;
+
+exports[`syscalls Neo.Asset.GetPrecision 1`] = `"asset.get"`;
+
+exports[`syscalls Neo.Asset.GetPrecision 2`] = `
 Array [
   Array [
     Object {
@@ -402,15 +446,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Asset.GetPrecision 2`] = `Array []`;
-
 exports[`syscalls Neo.Asset.GetPrecision 3`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetPrecision 4`] = `Array []`;
 
 exports[`syscalls Neo.Asset.GetPrecision 5`] = `Array []`;
 
-exports[`syscalls Neo.Asset.Renew 1`] = `
+exports[`syscalls Neo.Asset.GetPrecision 6`] = `Array []`;
+
+exports[`syscalls Neo.Asset.Renew 1`] = `"asset.get"`;
+
+exports[`syscalls Neo.Asset.Renew 2`] = `
 Array [
   Array [
     Object {
@@ -425,7 +471,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Asset.Renew 2`] = `
+exports[`syscalls Neo.Asset.Renew 3`] = `"asset.update"`;
+
+exports[`syscalls Neo.Asset.Renew 4`] = `
 Array [
   Array [
     Object {
@@ -454,15 +502,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Asset.Renew 3`] = `Array []`;
-
-exports[`syscalls Neo.Asset.Renew 4`] = `Array []`;
-
 exports[`syscalls Neo.Asset.Renew 5`] = `Array []`;
 
 exports[`syscalls Neo.Asset.Renew 6`] = `Array []`;
 
-exports[`syscalls Neo.Asset.Renew 7`] = `
+exports[`syscalls Neo.Asset.Renew 7`] = `Array []`;
+
+exports[`syscalls Neo.Asset.Renew 8`] = `Array []`;
+
+exports[`syscalls Neo.Asset.Renew 9`] = `"asset.get"`;
+
+exports[`syscalls Neo.Asset.Renew 10`] = `
 Array [
   Array [
     Object {
@@ -477,7 +527,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Asset.Renew 8`] = `
+exports[`syscalls Neo.Asset.Renew 11`] = `"asset.update"`;
+
+exports[`syscalls Neo.Asset.Renew 12`] = `
 Array [
   Array [
     Object {
@@ -506,15 +558,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Asset.Renew 9`] = `Array []`;
+exports[`syscalls Neo.Asset.Renew 13`] = `Array []`;
 
-exports[`syscalls Neo.Asset.Renew 10`] = `Array []`;
+exports[`syscalls Neo.Asset.Renew 14`] = `Array []`;
 
-exports[`syscalls Neo.Asset.Renew 11`] = `Array []`;
+exports[`syscalls Neo.Asset.Renew 15`] = `Array []`;
 
-exports[`syscalls Neo.Asset.Renew 12`] = `Array []`;
+exports[`syscalls Neo.Asset.Renew 16`] = `Array []`;
 
-exports[`syscalls Neo.Asset.Renew 13`] = `
+exports[`syscalls Neo.Asset.Renew 17`] = `"asset.get"`;
+
+exports[`syscalls Neo.Asset.Renew 18`] = `
 Array [
   Array [
     Object {
@@ -529,7 +583,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Asset.Renew 14`] = `
+exports[`syscalls Neo.Asset.Renew 19`] = `"asset.update"`;
+
+exports[`syscalls Neo.Asset.Renew 20`] = `
 Array [
   Array [
     Object {
@@ -558,15 +614,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Asset.Renew 15`] = `Array []`;
+exports[`syscalls Neo.Asset.Renew 21`] = `Array []`;
 
-exports[`syscalls Neo.Asset.Renew 16`] = `Array []`;
+exports[`syscalls Neo.Asset.Renew 22`] = `Array []`;
 
-exports[`syscalls Neo.Asset.Renew 17`] = `Array []`;
+exports[`syscalls Neo.Asset.Renew 23`] = `Array []`;
 
-exports[`syscalls Neo.Asset.Renew 18`] = `Array []`;
+exports[`syscalls Neo.Asset.Renew 24`] = `Array []`;
 
-exports[`syscalls Neo.Attribute.GetData 1`] = `
+exports[`syscalls Neo.Attribute.GetData 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Attribute.GetData 2`] = `
 Array [
   Array [
     Object {
@@ -575,8 +633,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Attribute.GetData 2`] = `Array []`;
 
 exports[`syscalls Neo.Attribute.GetData 3`] = `Array []`;
 
@@ -584,7 +640,11 @@ exports[`syscalls Neo.Attribute.GetData 4`] = `Array []`;
 
 exports[`syscalls Neo.Attribute.GetData 5`] = `Array []`;
 
-exports[`syscalls Neo.Attribute.GetUsage 1`] = `
+exports[`syscalls Neo.Attribute.GetData 6`] = `Array []`;
+
+exports[`syscalls Neo.Attribute.GetUsage 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Attribute.GetUsage 2`] = `
 Array [
   Array [
     Object {
@@ -593,8 +653,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Attribute.GetUsage 2`] = `Array []`;
 
 exports[`syscalls Neo.Attribute.GetUsage 3`] = `Array []`;
 
@@ -602,7 +660,11 @@ exports[`syscalls Neo.Attribute.GetUsage 4`] = `Array []`;
 
 exports[`syscalls Neo.Attribute.GetUsage 5`] = `Array []`;
 
-exports[`syscalls Neo.Block.GetTransaction 1`] = `
+exports[`syscalls Neo.Attribute.GetUsage 6`] = `Array []`;
+
+exports[`syscalls Neo.Block.GetTransaction 1`] = `"block.get"`;
+
+exports[`syscalls Neo.Block.GetTransaction 2`] = `
 Array [
   Array [
     Object {
@@ -611,8 +673,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Block.GetTransaction 2`] = `Array []`;
 
 exports[`syscalls Neo.Block.GetTransaction 3`] = `Array []`;
 
@@ -620,7 +680,11 @@ exports[`syscalls Neo.Block.GetTransaction 4`] = `Array []`;
 
 exports[`syscalls Neo.Block.GetTransaction 5`] = `Array []`;
 
-exports[`syscalls Neo.Block.GetTransactionCount 1`] = `
+exports[`syscalls Neo.Block.GetTransaction 6`] = `Array []`;
+
+exports[`syscalls Neo.Block.GetTransactionCount 1`] = `"block.get"`;
+
+exports[`syscalls Neo.Block.GetTransactionCount 2`] = `
 Array [
   Array [
     Object {
@@ -629,8 +693,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Block.GetTransactionCount 2`] = `Array []`;
 
 exports[`syscalls Neo.Block.GetTransactionCount 3`] = `Array []`;
 
@@ -638,7 +700,11 @@ exports[`syscalls Neo.Block.GetTransactionCount 4`] = `Array []`;
 
 exports[`syscalls Neo.Block.GetTransactionCount 5`] = `Array []`;
 
-exports[`syscalls Neo.Block.GetTransactions 1`] = `
+exports[`syscalls Neo.Block.GetTransactionCount 6`] = `Array []`;
+
+exports[`syscalls Neo.Block.GetTransactions 1`] = `"block.get"`;
+
+exports[`syscalls Neo.Block.GetTransactions 2`] = `
 Array [
   Array [
     Object {
@@ -648,15 +714,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Block.GetTransactions 2`] = `Array []`;
-
 exports[`syscalls Neo.Block.GetTransactions 3`] = `Array []`;
 
 exports[`syscalls Neo.Block.GetTransactions 4`] = `Array []`;
 
 exports[`syscalls Neo.Block.GetTransactions 5`] = `Array []`;
 
-exports[`syscalls Neo.Blockchain.GetAccount 1`] = `
+exports[`syscalls Neo.Block.GetTransactions 6`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetAccount 1`] = `"account.tryGet"`;
+
+exports[`syscalls Neo.Blockchain.GetAccount 2`] = `
 Array [
   Array [
     Object {
@@ -665,8 +733,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Blockchain.GetAccount 2`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetAccount 3`] = `Array []`;
 
@@ -674,7 +740,11 @@ exports[`syscalls Neo.Blockchain.GetAccount 4`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetAccount 5`] = `Array []`;
 
-exports[`syscalls Neo.Blockchain.GetAccount 6`] = `
+exports[`syscalls Neo.Blockchain.GetAccount 6`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetAccount 7`] = `"account.tryGet"`;
+
+exports[`syscalls Neo.Blockchain.GetAccount 8`] = `
 Array [
   Array [
     Object {
@@ -684,15 +754,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Blockchain.GetAccount 7`] = `Array []`;
-
-exports[`syscalls Neo.Blockchain.GetAccount 8`] = `Array []`;
-
 exports[`syscalls Neo.Blockchain.GetAccount 9`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetAccount 10`] = `Array []`;
 
-exports[`syscalls Neo.Blockchain.GetAsset 1`] = `
+exports[`syscalls Neo.Blockchain.GetAccount 11`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetAccount 12`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetAsset 1`] = `"asset.get"`;
+
+exports[`syscalls Neo.Blockchain.GetAsset 2`] = `
 Array [
   Array [
     Object {
@@ -702,15 +774,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Blockchain.GetAsset 2`] = `Array []`;
-
 exports[`syscalls Neo.Blockchain.GetAsset 3`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetAsset 4`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetAsset 5`] = `Array []`;
 
-exports[`syscalls Neo.Blockchain.GetBlock 1`] = `
+exports[`syscalls Neo.Blockchain.GetAsset 6`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetBlock 1`] = `"block.get"`;
+
+exports[`syscalls Neo.Blockchain.GetBlock 2`] = `
 Array [
   Array [
     Object {
@@ -719,8 +793,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Blockchain.GetBlock 2`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetBlock 3`] = `Array []`;
 
@@ -728,7 +800,11 @@ exports[`syscalls Neo.Blockchain.GetBlock 4`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetBlock 5`] = `Array []`;
 
-exports[`syscalls Neo.Blockchain.GetContract 1`] = `
+exports[`syscalls Neo.Blockchain.GetBlock 6`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetContract 1`] = `"contract.tryGet"`;
+
+exports[`syscalls Neo.Blockchain.GetContract 2`] = `
 Array [
   Array [
     Object {
@@ -737,8 +813,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Blockchain.GetContract 2`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetContract 3`] = `Array []`;
 
@@ -746,7 +820,11 @@ exports[`syscalls Neo.Blockchain.GetContract 4`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetContract 5`] = `Array []`;
 
-exports[`syscalls Neo.Blockchain.GetContract 6`] = `
+exports[`syscalls Neo.Blockchain.GetContract 6`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetContract 7`] = `"contract.tryGet"`;
+
+exports[`syscalls Neo.Blockchain.GetContract 8`] = `
 Array [
   Array [
     Object {
@@ -756,15 +834,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Blockchain.GetContract 7`] = `Array []`;
-
-exports[`syscalls Neo.Blockchain.GetContract 8`] = `Array []`;
-
 exports[`syscalls Neo.Blockchain.GetContract 9`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetContract 10`] = `Array []`;
 
-exports[`syscalls Neo.Blockchain.GetHeader 1`] = `
+exports[`syscalls Neo.Blockchain.GetContract 11`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetContract 12`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetHeader 1`] = `"header.get"`;
+
+exports[`syscalls Neo.Blockchain.GetHeader 2`] = `
 Array [
   Array [
     Object {
@@ -774,13 +854,13 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Blockchain.GetHeader 2`] = `Array []`;
-
 exports[`syscalls Neo.Blockchain.GetHeader 3`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetHeader 4`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetHeader 5`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetHeader 6`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetHeight 1`] = `Array []`;
 
@@ -790,7 +870,9 @@ exports[`syscalls Neo.Blockchain.GetHeight 3`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetHeight 4`] = `Array []`;
 
-exports[`syscalls Neo.Blockchain.GetTransaction 1`] = `
+exports[`syscalls Neo.Blockchain.GetTransaction 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Blockchain.GetTransaction 2`] = `
 Array [
   Array [
     Object {
@@ -799,8 +881,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Blockchain.GetTransaction 2`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetTransaction 3`] = `Array []`;
 
@@ -808,7 +888,11 @@ exports[`syscalls Neo.Blockchain.GetTransaction 4`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetTransaction 5`] = `Array []`;
 
-exports[`syscalls Neo.Blockchain.GetTransactionHeight 1`] = `
+exports[`syscalls Neo.Blockchain.GetTransaction 6`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetTransactionHeight 1`] = `"transactionData.get"`;
+
+exports[`syscalls Neo.Blockchain.GetTransactionHeight 2`] = `
 Array [
   Array [
     Object {
@@ -818,13 +902,13 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Blockchain.GetTransactionHeight 2`] = `Array []`;
-
 exports[`syscalls Neo.Blockchain.GetTransactionHeight 3`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetTransactionHeight 4`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetTransactionHeight 5`] = `Array []`;
+
+exports[`syscalls Neo.Blockchain.GetTransactionHeight 6`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetValidators 1`] = `Array []`;
 
@@ -842,7 +926,9 @@ exports[`syscalls Neo.Blockchain.GetValidators 7`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetValidators 8`] = `Array []`;
 
-exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 1`] = `
+exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 1`] = `"output.get"`;
+
+exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 2`] = `
 Array [
   Array [
     Object {
@@ -856,7 +942,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 2`] = `
+exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 3`] = `"transaction.get"`;
+
+exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 4`] = `
 Array [
   Array [
     Object {
@@ -866,15 +954,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 3`] = `Array []`;
-
-exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 4`] = `Array []`;
-
 exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 5`] = `Array []`;
 
 exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 6`] = `Array []`;
 
-exports[`syscalls Neo.Contract.Create 1`] = `
+exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 7`] = `Array []`;
+
+exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 8`] = `Array []`;
+
+exports[`syscalls Neo.Contract.Create 1`] = `"contract.tryGet"`;
+
+exports[`syscalls Neo.Contract.Create 2`] = `
 Array [
   Array [
     Object {
@@ -884,7 +974,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Contract.Create 2`] = `
+exports[`syscalls Neo.Contract.Create 3`] = `"contract.add"`;
+
+exports[`syscalls Neo.Contract.Create 4`] = `
 Array [
   Array [
     Object {
@@ -910,15 +1002,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Contract.Create 3`] = `Array []`;
-
-exports[`syscalls Neo.Contract.Create 4`] = `Array []`;
-
 exports[`syscalls Neo.Contract.Create 5`] = `Array []`;
 
 exports[`syscalls Neo.Contract.Create 6`] = `Array []`;
 
-exports[`syscalls Neo.Contract.Destroy 1`] = `
+exports[`syscalls Neo.Contract.Create 7`] = `Array []`;
+
+exports[`syscalls Neo.Contract.Create 8`] = `Array []`;
+
+exports[`syscalls Neo.Contract.Destroy 1`] = `"contract.tryGet"`;
+
+exports[`syscalls Neo.Contract.Destroy 2`] = `
 Array [
   Array [
     Object {
@@ -928,15 +1022,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Contract.Destroy 2`] = `Array []`;
-
 exports[`syscalls Neo.Contract.Destroy 3`] = `Array []`;
 
 exports[`syscalls Neo.Contract.Destroy 4`] = `Array []`;
 
 exports[`syscalls Neo.Contract.Destroy 5`] = `Array []`;
 
-exports[`syscalls Neo.Contract.GetScript 1`] = `
+exports[`syscalls Neo.Contract.Destroy 6`] = `Array []`;
+
+exports[`syscalls Neo.Contract.GetScript 1`] = `"contract.tryGet"`;
+
+exports[`syscalls Neo.Contract.GetScript 2`] = `
 Array [
   Array [
     Object {
@@ -946,13 +1042,13 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Contract.GetScript 2`] = `Array []`;
-
 exports[`syscalls Neo.Contract.GetScript 3`] = `Array []`;
 
 exports[`syscalls Neo.Contract.GetScript 4`] = `Array []`;
 
 exports[`syscalls Neo.Contract.GetScript 5`] = `Array []`;
+
+exports[`syscalls Neo.Contract.GetScript 6`] = `Array []`;
 
 exports[`syscalls Neo.Contract.GetStorageContext 1`] = `Array []`;
 
@@ -962,7 +1058,9 @@ exports[`syscalls Neo.Contract.GetStorageContext 3`] = `Array []`;
 
 exports[`syscalls Neo.Contract.GetStorageContext 4`] = `Array []`;
 
-exports[`syscalls Neo.Contract.IsPayable 1`] = `
+exports[`syscalls Neo.Contract.IsPayable 1`] = `"contract.tryGet"`;
+
+exports[`syscalls Neo.Contract.IsPayable 2`] = `
 Array [
   Array [
     Object {
@@ -972,15 +1070,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Contract.IsPayable 2`] = `Array []`;
-
 exports[`syscalls Neo.Contract.IsPayable 3`] = `Array []`;
 
 exports[`syscalls Neo.Contract.IsPayable 4`] = `Array []`;
 
 exports[`syscalls Neo.Contract.IsPayable 5`] = `Array []`;
 
-exports[`syscalls Neo.Contract.Migrate 1`] = `
+exports[`syscalls Neo.Contract.IsPayable 6`] = `Array []`;
+
+exports[`syscalls Neo.Contract.Migrate 1`] = `"contract.tryGet"`;
+
+exports[`syscalls Neo.Contract.Migrate 2`] = `
 Array [
   Array [
     Object {
@@ -995,7 +1095,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Contract.Migrate 2`] = `
+exports[`syscalls Neo.Contract.Migrate 3`] = `"contract.add"`;
+
+exports[`syscalls Neo.Contract.Migrate 4`] = `
 Array [
   Array [
     Object {
@@ -1021,7 +1123,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Contract.Migrate 3`] = `
+exports[`syscalls Neo.Contract.Migrate 5`] = `"storageItem.getAll$"`;
+
+exports[`syscalls Neo.Contract.Migrate 6`] = `
 Array [
   Array [
     Object {
@@ -1031,7 +1135,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Contract.Migrate 4`] = `
+exports[`syscalls Neo.Contract.Migrate 7`] = `"storageItem.add"`;
+
+exports[`syscalls Neo.Contract.Migrate 8`] = `
 Array [
   Array [
     StorageItem {
@@ -1047,11 +1153,11 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Contract.Migrate 5`] = `Array []`;
+exports[`syscalls Neo.Contract.Migrate 9`] = `Array []`;
 
-exports[`syscalls Neo.Contract.Migrate 6`] = `Array []`;
+exports[`syscalls Neo.Contract.Migrate 10`] = `Array []`;
 
-exports[`syscalls Neo.Contract.Migrate 7`] = `
+exports[`syscalls Neo.Contract.Migrate 11`] = `
 Array [
   Array [
     Object {
@@ -1062,7 +1168,7 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Contract.Migrate 8`] = `Array []`;
+exports[`syscalls Neo.Contract.Migrate 12`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Next 1`] = `Array []`;
 
@@ -1096,36 +1202,42 @@ exports[`syscalls Neo.Enumerator.Next 15`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Next 16`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Next 17`] = `
-Array [
-  Array [
-    Object {
-      "hash": "686302f409a2f3a10c2a7e547703d5032b877c75",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Enumerator.Next 17`] = `"contract.get"`;
 
 exports[`syscalls Neo.Enumerator.Next 18`] = `
 Array [
   Array [
     Object {
       "hash": "686302f409a2f3a10c2a7e547703d5032b877c75",
-      "prefix": "01",
     },
   ],
 ]
 `;
 
-exports[`syscalls Neo.Enumerator.Next 19`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Next 19`] = `"storageItem.getAll$"`;
 
-exports[`syscalls Neo.Enumerator.Next 20`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Next 20`] = `
+Array [
+  Array [
+    Object {
+      "hash": "686302f409a2f3a10c2a7e547703d5032b877c75",
+      "prefix": "01",
+    },
+  ],
+]
+`;
 
 exports[`syscalls Neo.Enumerator.Next 21`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Next 22`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Next 23`] = `
+exports[`syscalls Neo.Enumerator.Next 23`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Next 24`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Next 25`] = `"contract.get"`;
+
+exports[`syscalls Neo.Enumerator.Next 26`] = `
 Array [
   Array [
     Object {
@@ -1135,7 +1247,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Enumerator.Next 24`] = `
+exports[`syscalls Neo.Enumerator.Next 27`] = `"storageItem.getAll$"`;
+
+exports[`syscalls Neo.Enumerator.Next 28`] = `
 Array [
   Array [
     Object {
@@ -1146,13 +1260,13 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Enumerator.Next 25`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Next 29`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Next 26`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Next 30`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Next 27`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Next 31`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Next 28`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Next 32`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Value 1`] = `Array []`;
 
@@ -1178,36 +1292,42 @@ exports[`syscalls Neo.Enumerator.Value 11`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Value 12`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Value 13`] = `
-Array [
-  Array [
-    Object {
-      "hash": "fb29c2128c2a8645fe1a11e977363792c9cc696b",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Enumerator.Value 13`] = `"contract.get"`;
 
 exports[`syscalls Neo.Enumerator.Value 14`] = `
 Array [
   Array [
     Object {
       "hash": "fb29c2128c2a8645fe1a11e977363792c9cc696b",
-      "prefix": "01",
     },
   ],
 ]
 `;
 
-exports[`syscalls Neo.Enumerator.Value 15`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Value 15`] = `"storageItem.getAll$"`;
 
-exports[`syscalls Neo.Enumerator.Value 16`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Value 16`] = `
+Array [
+  Array [
+    Object {
+      "hash": "fb29c2128c2a8645fe1a11e977363792c9cc696b",
+      "prefix": "01",
+    },
+  ],
+]
+`;
 
 exports[`syscalls Neo.Enumerator.Value 17`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Value 18`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Value 19`] = `
+exports[`syscalls Neo.Enumerator.Value 19`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Value 20`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Value 21`] = `"contract.get"`;
+
+exports[`syscalls Neo.Enumerator.Value 22`] = `
 Array [
   Array [
     Object {
@@ -1217,7 +1337,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Enumerator.Value 20`] = `
+exports[`syscalls Neo.Enumerator.Value 23`] = `"storageItem.getAll$"`;
+
+exports[`syscalls Neo.Enumerator.Value 24`] = `
 Array [
   Array [
     Object {
@@ -1228,44 +1350,50 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Enumerator.Value 21`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Value 25`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Value 22`] = `Array []`;
-
-exports[`syscalls Neo.Enumerator.Value 23`] = `Array []`;
-
-exports[`syscalls Neo.Enumerator.Value 24`] = `Array []`;
-
-exports[`syscalls Neo.Enumerator.Value 25`] = `
-Array [
-  Array [
-    Object {
-      "hash": "f5d6309866e65fd8fb1622221c57851dd0cef6b4",
-    },
-  ],
-]
-`;
-
-exports[`syscalls Neo.Enumerator.Value 26`] = `
-Array [
-  Array [
-    Object {
-      "hash": "f5d6309866e65fd8fb1622221c57851dd0cef6b4",
-      "prefix": "01",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Enumerator.Value 26`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Value 27`] = `Array []`;
 
 exports[`syscalls Neo.Enumerator.Value 28`] = `Array []`;
 
-exports[`syscalls Neo.Enumerator.Value 29`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Value 29`] = `"contract.get"`;
 
-exports[`syscalls Neo.Enumerator.Value 30`] = `Array []`;
+exports[`syscalls Neo.Enumerator.Value 30`] = `
+Array [
+  Array [
+    Object {
+      "hash": "f5d6309866e65fd8fb1622221c57851dd0cef6b4",
+    },
+  ],
+]
+`;
 
-exports[`syscalls Neo.Header.GetConsensusData 1`] = `
+exports[`syscalls Neo.Enumerator.Value 31`] = `"storageItem.getAll$"`;
+
+exports[`syscalls Neo.Enumerator.Value 32`] = `
+Array [
+  Array [
+    Object {
+      "hash": "f5d6309866e65fd8fb1622221c57851dd0cef6b4",
+      "prefix": "01",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Enumerator.Value 33`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Value 34`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Value 35`] = `Array []`;
+
+exports[`syscalls Neo.Enumerator.Value 36`] = `Array []`;
+
+exports[`syscalls Neo.Header.GetConsensusData 1`] = `"header.get"`;
+
+exports[`syscalls Neo.Header.GetConsensusData 2`] = `
 Array [
   Array [
     Object {
@@ -1274,8 +1402,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Header.GetConsensusData 2`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetConsensusData 3`] = `Array []`;
 
@@ -1283,7 +1409,11 @@ exports[`syscalls Neo.Header.GetConsensusData 4`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetConsensusData 5`] = `Array []`;
 
-exports[`syscalls Neo.Header.GetHash 1`] = `
+exports[`syscalls Neo.Header.GetConsensusData 6`] = `Array []`;
+
+exports[`syscalls Neo.Header.GetHash 1`] = `"header.get"`;
+
+exports[`syscalls Neo.Header.GetHash 2`] = `
 Array [
   Array [
     Object {
@@ -1292,8 +1422,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Header.GetHash 2`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetHash 3`] = `Array []`;
 
@@ -1301,7 +1429,11 @@ exports[`syscalls Neo.Header.GetHash 4`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetHash 5`] = `Array []`;
 
-exports[`syscalls Neo.Header.GetIndex 1`] = `
+exports[`syscalls Neo.Header.GetHash 6`] = `Array []`;
+
+exports[`syscalls Neo.Header.GetIndex 1`] = `"header.get"`;
+
+exports[`syscalls Neo.Header.GetIndex 2`] = `
 Array [
   Array [
     Object {
@@ -1310,8 +1442,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Header.GetIndex 2`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetIndex 3`] = `Array []`;
 
@@ -1319,7 +1449,11 @@ exports[`syscalls Neo.Header.GetIndex 4`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetIndex 5`] = `Array []`;
 
-exports[`syscalls Neo.Header.GetMerkleRoot 1`] = `
+exports[`syscalls Neo.Header.GetIndex 6`] = `Array []`;
+
+exports[`syscalls Neo.Header.GetMerkleRoot 1`] = `"header.get"`;
+
+exports[`syscalls Neo.Header.GetMerkleRoot 2`] = `
 Array [
   Array [
     Object {
@@ -1328,8 +1462,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Header.GetMerkleRoot 2`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetMerkleRoot 3`] = `Array []`;
 
@@ -1337,7 +1469,11 @@ exports[`syscalls Neo.Header.GetMerkleRoot 4`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetMerkleRoot 5`] = `Array []`;
 
-exports[`syscalls Neo.Header.GetNextConsensus 1`] = `
+exports[`syscalls Neo.Header.GetMerkleRoot 6`] = `Array []`;
+
+exports[`syscalls Neo.Header.GetNextConsensus 1`] = `"header.get"`;
+
+exports[`syscalls Neo.Header.GetNextConsensus 2`] = `
 Array [
   Array [
     Object {
@@ -1346,8 +1482,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Header.GetNextConsensus 2`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetNextConsensus 3`] = `Array []`;
 
@@ -1355,7 +1489,11 @@ exports[`syscalls Neo.Header.GetNextConsensus 4`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetNextConsensus 5`] = `Array []`;
 
-exports[`syscalls Neo.Header.GetPrevHash 1`] = `
+exports[`syscalls Neo.Header.GetNextConsensus 6`] = `Array []`;
+
+exports[`syscalls Neo.Header.GetPrevHash 1`] = `"header.get"`;
+
+exports[`syscalls Neo.Header.GetPrevHash 2`] = `
 Array [
   Array [
     Object {
@@ -1364,8 +1502,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Header.GetPrevHash 2`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetPrevHash 3`] = `Array []`;
 
@@ -1373,7 +1509,11 @@ exports[`syscalls Neo.Header.GetPrevHash 4`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetPrevHash 5`] = `Array []`;
 
-exports[`syscalls Neo.Header.GetTimestamp 1`] = `
+exports[`syscalls Neo.Header.GetPrevHash 6`] = `Array []`;
+
+exports[`syscalls Neo.Header.GetTimestamp 1`] = `"header.get"`;
+
+exports[`syscalls Neo.Header.GetTimestamp 2`] = `
 Array [
   Array [
     Object {
@@ -1382,8 +1522,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Header.GetTimestamp 2`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetTimestamp 3`] = `Array []`;
 
@@ -1391,7 +1529,11 @@ exports[`syscalls Neo.Header.GetTimestamp 4`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetTimestamp 5`] = `Array []`;
 
-exports[`syscalls Neo.Header.GetVersion 1`] = `
+exports[`syscalls Neo.Header.GetTimestamp 6`] = `Array []`;
+
+exports[`syscalls Neo.Header.GetVersion 1`] = `"header.get"`;
+
+exports[`syscalls Neo.Header.GetVersion 2`] = `
 Array [
   Array [
     Object {
@@ -1401,15 +1543,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Header.GetVersion 2`] = `Array []`;
-
 exports[`syscalls Neo.Header.GetVersion 3`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetVersion 4`] = `Array []`;
 
 exports[`syscalls Neo.Header.GetVersion 5`] = `Array []`;
 
-exports[`syscalls Neo.Input.GetHash 1`] = `
+exports[`syscalls Neo.Header.GetVersion 6`] = `Array []`;
+
+exports[`syscalls Neo.Input.GetHash 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Input.GetHash 2`] = `
 Array [
   Array [
     Object {
@@ -1418,8 +1562,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Input.GetHash 2`] = `Array []`;
 
 exports[`syscalls Neo.Input.GetHash 3`] = `Array []`;
 
@@ -1427,7 +1569,11 @@ exports[`syscalls Neo.Input.GetHash 4`] = `Array []`;
 
 exports[`syscalls Neo.Input.GetHash 5`] = `Array []`;
 
-exports[`syscalls Neo.Input.GetIndex 1`] = `
+exports[`syscalls Neo.Input.GetHash 6`] = `Array []`;
+
+exports[`syscalls Neo.Input.GetIndex 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Input.GetIndex 2`] = `
 Array [
   Array [
     Object {
@@ -1436,8 +1582,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Input.GetIndex 2`] = `Array []`;
 
 exports[`syscalls Neo.Input.GetIndex 3`] = `Array []`;
 
@@ -1445,7 +1589,11 @@ exports[`syscalls Neo.Input.GetIndex 4`] = `Array []`;
 
 exports[`syscalls Neo.Input.GetIndex 5`] = `Array []`;
 
-exports[`syscalls Neo.InvocationTransaction.GetScript 1`] = `
+exports[`syscalls Neo.Input.GetIndex 6`] = `Array []`;
+
+exports[`syscalls Neo.InvocationTransaction.GetScript 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.InvocationTransaction.GetScript 2`] = `
 Array [
   Array [
     Object {
@@ -1455,13 +1603,13 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.InvocationTransaction.GetScript 2`] = `Array []`;
-
 exports[`syscalls Neo.InvocationTransaction.GetScript 3`] = `Array []`;
 
 exports[`syscalls Neo.InvocationTransaction.GetScript 4`] = `Array []`;
 
 exports[`syscalls Neo.InvocationTransaction.GetScript 5`] = `Array []`;
+
+exports[`syscalls Neo.InvocationTransaction.GetScript 6`] = `Array []`;
 
 exports[`syscalls Neo.Iterator.Create 1`] = `Array []`;
 
@@ -1479,7 +1627,9 @@ exports[`syscalls Neo.Iterator.Key 3`] = `Array []`;
 
 exports[`syscalls Neo.Iterator.Key 4`] = `Array []`;
 
-exports[`syscalls Neo.Iterator.Key 5`] = `
+exports[`syscalls Neo.Iterator.Key 5`] = `"contract.get"`;
+
+exports[`syscalls Neo.Iterator.Key 6`] = `
 Array [
   Array [
     Object {
@@ -1489,7 +1639,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Iterator.Key 6`] = `
+exports[`syscalls Neo.Iterator.Key 7`] = `"storageItem.getAll$"`;
+
+exports[`syscalls Neo.Iterator.Key 8`] = `
 Array [
   Array [
     Object {
@@ -1500,15 +1652,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Iterator.Key 7`] = `Array []`;
-
-exports[`syscalls Neo.Iterator.Key 8`] = `Array []`;
-
 exports[`syscalls Neo.Iterator.Key 9`] = `Array []`;
 
 exports[`syscalls Neo.Iterator.Key 10`] = `Array []`;
 
-exports[`syscalls Neo.Output.GetAssetId 1`] = `
+exports[`syscalls Neo.Iterator.Key 11`] = `Array []`;
+
+exports[`syscalls Neo.Iterator.Key 12`] = `Array []`;
+
+exports[`syscalls Neo.Output.GetAssetId 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Output.GetAssetId 2`] = `
 Array [
   Array [
     Object {
@@ -1517,8 +1671,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Output.GetAssetId 2`] = `Array []`;
 
 exports[`syscalls Neo.Output.GetAssetId 3`] = `Array []`;
 
@@ -1526,7 +1678,11 @@ exports[`syscalls Neo.Output.GetAssetId 4`] = `Array []`;
 
 exports[`syscalls Neo.Output.GetAssetId 5`] = `Array []`;
 
-exports[`syscalls Neo.Output.GetScriptHash 1`] = `
+exports[`syscalls Neo.Output.GetAssetId 6`] = `Array []`;
+
+exports[`syscalls Neo.Output.GetScriptHash 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Output.GetScriptHash 2`] = `
 Array [
   Array [
     Object {
@@ -1535,8 +1691,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Output.GetScriptHash 2`] = `Array []`;
 
 exports[`syscalls Neo.Output.GetScriptHash 3`] = `Array []`;
 
@@ -1544,7 +1698,11 @@ exports[`syscalls Neo.Output.GetScriptHash 4`] = `Array []`;
 
 exports[`syscalls Neo.Output.GetScriptHash 5`] = `Array []`;
 
-exports[`syscalls Neo.Output.GetValue 1`] = `
+exports[`syscalls Neo.Output.GetScriptHash 6`] = `Array []`;
+
+exports[`syscalls Neo.Output.GetValue 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Output.GetValue 2`] = `
 Array [
   Array [
     Object {
@@ -1554,13 +1712,13 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Output.GetValue 2`] = `Array []`;
-
 exports[`syscalls Neo.Output.GetValue 3`] = `Array []`;
 
 exports[`syscalls Neo.Output.GetValue 4`] = `Array []`;
 
 exports[`syscalls Neo.Output.GetValue 5`] = `Array []`;
+
+exports[`syscalls Neo.Output.GetValue 6`] = `Array []`;
 
 exports[`syscalls Neo.Runtime.CheckWitness 1`] = `Array []`;
 
@@ -1706,28 +1864,21 @@ exports[`syscalls Neo.Runtime.Serialize 23`] = `Array []`;
 
 exports[`syscalls Neo.Runtime.Serialize 24`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Delete 1`] = `
-Array [
-  Array [
-    Object {
-      "hash": "bff26630a34d202045d1fc72a9f905b0f308f43d",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Storage.Delete 1`] = `"contract.get"`;
 
 exports[`syscalls Neo.Storage.Delete 2`] = `
 Array [
   Array [
     Object {
       "hash": "bff26630a34d202045d1fc72a9f905b0f308f43d",
-      "key": "",
     },
   ],
 ]
 `;
 
-exports[`syscalls Neo.Storage.Delete 3`] = `
+exports[`syscalls Neo.Storage.Delete 3`] = `"storageItem.tryGet"`;
+
+exports[`syscalls Neo.Storage.Delete 4`] = `
 Array [
   Array [
     Object {
@@ -1738,13 +1889,26 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Delete 4`] = `Array []`;
+exports[`syscalls Neo.Storage.Delete 5`] = `"storageItem.delete"`;
 
-exports[`syscalls Neo.Storage.Delete 5`] = `Array []`;
-
-exports[`syscalls Neo.Storage.Delete 6`] = `Array []`;
+exports[`syscalls Neo.Storage.Delete 6`] = `
+Array [
+  Array [
+    Object {
+      "hash": "bff26630a34d202045d1fc72a9f905b0f308f43d",
+      "key": "",
+    },
+  ],
+]
+`;
 
 exports[`syscalls Neo.Storage.Delete 7`] = `Array []`;
+
+exports[`syscalls Neo.Storage.Delete 8`] = `Array []`;
+
+exports[`syscalls Neo.Storage.Delete 9`] = `Array []`;
+
+exports[`syscalls Neo.Storage.Delete 10`] = `Array []`;
 
 exports[`syscalls Neo.Storage.Find 1`] = `
 Array [
@@ -1764,7 +1928,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Find 2`] = `
+exports[`syscalls Neo.Storage.Find 2`] = `"contract.get"`;
+
+exports[`syscalls Neo.Storage.Find 3`] = `
 Array [
   Array [
     Object {
@@ -1774,7 +1940,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Find 3`] = `
+exports[`syscalls Neo.Storage.Find 4`] = `"storageItem.getAll$"`;
+
+exports[`syscalls Neo.Storage.Find 5`] = `
 Array [
   Array [
     Object {
@@ -1785,44 +1953,50 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Find 4`] = `Array []`;
-
-exports[`syscalls Neo.Storage.Find 5`] = `Array []`;
-
 exports[`syscalls Neo.Storage.Find 6`] = `Array []`;
 
 exports[`syscalls Neo.Storage.Find 7`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Get 1`] = `
-Array [
-  Array [
-    Object {
-      "hash": "172a85ad477e8853f60c2bdce6e92b5492c4b5b3",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Storage.Find 8`] = `Array []`;
+
+exports[`syscalls Neo.Storage.Find 9`] = `Array []`;
+
+exports[`syscalls Neo.Storage.Get 1`] = `"contract.get"`;
 
 exports[`syscalls Neo.Storage.Get 2`] = `
 Array [
   Array [
     Object {
       "hash": "172a85ad477e8853f60c2bdce6e92b5492c4b5b3",
-      "key": "01",
     },
   ],
 ]
 `;
 
-exports[`syscalls Neo.Storage.Get 3`] = `Array []`;
+exports[`syscalls Neo.Storage.Get 3`] = `"storageItem.tryGet"`;
 
-exports[`syscalls Neo.Storage.Get 4`] = `Array []`;
+exports[`syscalls Neo.Storage.Get 4`] = `
+Array [
+  Array [
+    Object {
+      "hash": "172a85ad477e8853f60c2bdce6e92b5492c4b5b3",
+      "key": "01",
+    },
+  ],
+]
+`;
 
 exports[`syscalls Neo.Storage.Get 5`] = `Array []`;
 
 exports[`syscalls Neo.Storage.Get 6`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Get 7`] = `
+exports[`syscalls Neo.Storage.Get 7`] = `Array []`;
+
+exports[`syscalls Neo.Storage.Get 8`] = `Array []`;
+
+exports[`syscalls Neo.Storage.Get 9`] = `"contract.get"`;
+
+exports[`syscalls Neo.Storage.Get 10`] = `
 Array [
   Array [
     Object {
@@ -1832,7 +2006,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Get 8`] = `
+exports[`syscalls Neo.Storage.Get 11`] = `"storageItem.tryGet"`;
+
+exports[`syscalls Neo.Storage.Get 12`] = `
 Array [
   Array [
     Object {
@@ -1843,13 +2019,13 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Get 9`] = `Array []`;
+exports[`syscalls Neo.Storage.Get 13`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Get 10`] = `Array []`;
+exports[`syscalls Neo.Storage.Get 14`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Get 11`] = `Array []`;
+exports[`syscalls Neo.Storage.Get 15`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Get 12`] = `Array []`;
+exports[`syscalls Neo.Storage.Get 16`] = `Array []`;
 
 exports[`syscalls Neo.Storage.GetContext 1`] = `Array []`;
 
@@ -1867,28 +2043,34 @@ exports[`syscalls Neo.Storage.GetReadOnlyContext 3`] = `Array []`;
 
 exports[`syscalls Neo.Storage.GetReadOnlyContext 4`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 1`] = `
-Array [
-  Array [
-    Object {
-      "hash": "5a4dc5955ca2dcef435f4cdc40439ebf49632abd",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Storage.Put 1`] = `"contract.get"`;
 
 exports[`syscalls Neo.Storage.Put 2`] = `
 Array [
   Array [
     Object {
       "hash": "5a4dc5955ca2dcef435f4cdc40439ebf49632abd",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Storage.Put 3`] = `"storageItem.tryGet"`;
+
+exports[`syscalls Neo.Storage.Put 4`] = `
+Array [
+  Array [
+    Object {
+      "hash": "5a4dc5955ca2dcef435f4cdc40439ebf49632abd",
       "key": "",
     },
   ],
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 3`] = `
+exports[`syscalls Neo.Storage.Put 5`] = `"storageItem.add"`;
+
+exports[`syscalls Neo.Storage.Put 6`] = `
 Array [
   Array [
     StorageItem {
@@ -1904,15 +2086,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 4`] = `Array []`;
-
-exports[`syscalls Neo.Storage.Put 5`] = `Array []`;
-
-exports[`syscalls Neo.Storage.Put 6`] = `Array []`;
-
 exports[`syscalls Neo.Storage.Put 7`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 8`] = `
+exports[`syscalls Neo.Storage.Put 8`] = `Array []`;
+
+exports[`syscalls Neo.Storage.Put 9`] = `Array []`;
+
+exports[`syscalls Neo.Storage.Put 10`] = `Array []`;
+
+exports[`syscalls Neo.Storage.Put 11`] = `"contract.get"`;
+
+exports[`syscalls Neo.Storage.Put 12`] = `
 Array [
   Array [
     Object {
@@ -1922,7 +2106,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 9`] = `
+exports[`syscalls Neo.Storage.Put 13`] = `"storageItem.tryGet"`;
+
+exports[`syscalls Neo.Storage.Put 14`] = `
 Array [
   Array [
     Object {
@@ -1933,7 +2119,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 10`] = `
+exports[`syscalls Neo.Storage.Put 15`] = `"storageItem.add"`;
+
+exports[`syscalls Neo.Storage.Put 16`] = `
 Array [
   Array [
     StorageItem {
@@ -1949,15 +2137,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 11`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 17`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 12`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 18`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 13`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 19`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 14`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 20`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 15`] = `
+exports[`syscalls Neo.Storage.Put 21`] = `"contract.get"`;
+
+exports[`syscalls Neo.Storage.Put 22`] = `
 Array [
   Array [
     Object {
@@ -1967,7 +2157,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 16`] = `
+exports[`syscalls Neo.Storage.Put 23`] = `"storageItem.tryGet"`;
+
+exports[`syscalls Neo.Storage.Put 24`] = `
 Array [
   Array [
     Object {
@@ -1978,7 +2170,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 17`] = `
+exports[`syscalls Neo.Storage.Put 25`] = `"storageItem.add"`;
+
+exports[`syscalls Neo.Storage.Put 26`] = `
 Array [
   Array [
     StorageItem {
@@ -1994,15 +2188,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 18`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 27`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 19`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 28`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 20`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 29`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 21`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 30`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 22`] = `
+exports[`syscalls Neo.Storage.Put 31`] = `"contract.get"`;
+
+exports[`syscalls Neo.Storage.Put 32`] = `
 Array [
   Array [
     Object {
@@ -2012,7 +2208,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 23`] = `
+exports[`syscalls Neo.Storage.Put 33`] = `"storageItem.tryGet"`;
+
+exports[`syscalls Neo.Storage.Put 34`] = `
 Array [
   Array [
     Object {
@@ -2023,7 +2221,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 24`] = `
+exports[`syscalls Neo.Storage.Put 35`] = `"storageItem.update"`;
+
+exports[`syscalls Neo.Storage.Put 36`] = `
 Array [
   Array [
     Object {
@@ -2037,17 +2237,21 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 25`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 37`] = `"storageItem.add"`;
 
-exports[`syscalls Neo.Storage.Put 26`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 38`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 27`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 39`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 28`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 40`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 29`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 41`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 30`] = `
+exports[`syscalls Neo.Storage.Put 42`] = `Array []`;
+
+exports[`syscalls Neo.Storage.Put 43`] = `"contract.get"`;
+
+exports[`syscalls Neo.Storage.Put 44`] = `
 Array [
   Array [
     Object {
@@ -2057,7 +2261,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 31`] = `
+exports[`syscalls Neo.Storage.Put 45`] = `"storageItem.tryGet"`;
+
+exports[`syscalls Neo.Storage.Put 46`] = `
 Array [
   Array [
     Object {
@@ -2068,7 +2274,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 32`] = `
+exports[`syscalls Neo.Storage.Put 47`] = `"storageItem.add"`;
+
+exports[`syscalls Neo.Storage.Put 48`] = `
 Array [
   Array [
     StorageItem {
@@ -2084,13 +2292,13 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Storage.Put 33`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 49`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 34`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 50`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 35`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 51`] = `Array []`;
 
-exports[`syscalls Neo.Storage.Put 36`] = `Array []`;
+exports[`syscalls Neo.Storage.Put 52`] = `Array []`;
 
 exports[`syscalls Neo.StorageContext.AsReadOnly 1`] = `Array []`;
 
@@ -2100,7 +2308,9 @@ exports[`syscalls Neo.StorageContext.AsReadOnly 3`] = `Array []`;
 
 exports[`syscalls Neo.StorageContext.AsReadOnly 4`] = `Array []`;
 
-exports[`syscalls Neo.Transaction.GetAttributes 1`] = `
+exports[`syscalls Neo.Transaction.GetAttributes 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Transaction.GetAttributes 2`] = `
 Array [
   Array [
     Object {
@@ -2109,8 +2319,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Transaction.GetAttributes 2`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetAttributes 3`] = `Array []`;
 
@@ -2118,7 +2326,11 @@ exports[`syscalls Neo.Transaction.GetAttributes 4`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetAttributes 5`] = `Array []`;
 
-exports[`syscalls Neo.Transaction.GetHash 1`] = `
+exports[`syscalls Neo.Transaction.GetAttributes 6`] = `Array []`;
+
+exports[`syscalls Neo.Transaction.GetHash 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Transaction.GetHash 2`] = `
 Array [
   Array [
     Object {
@@ -2127,8 +2339,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Transaction.GetHash 2`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetHash 3`] = `Array []`;
 
@@ -2136,7 +2346,11 @@ exports[`syscalls Neo.Transaction.GetHash 4`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetHash 5`] = `Array []`;
 
-exports[`syscalls Neo.Transaction.GetInputs 1`] = `
+exports[`syscalls Neo.Transaction.GetHash 6`] = `Array []`;
+
+exports[`syscalls Neo.Transaction.GetInputs 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Transaction.GetInputs 2`] = `
 Array [
   Array [
     Object {
@@ -2145,8 +2359,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Transaction.GetInputs 2`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetInputs 3`] = `Array []`;
 
@@ -2154,7 +2366,11 @@ exports[`syscalls Neo.Transaction.GetInputs 4`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetInputs 5`] = `Array []`;
 
-exports[`syscalls Neo.Transaction.GetOutputs 1`] = `
+exports[`syscalls Neo.Transaction.GetInputs 6`] = `Array []`;
+
+exports[`syscalls Neo.Transaction.GetOutputs 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Transaction.GetOutputs 2`] = `
 Array [
   Array [
     Object {
@@ -2164,15 +2380,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Transaction.GetOutputs 2`] = `Array []`;
-
 exports[`syscalls Neo.Transaction.GetOutputs 3`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetOutputs 4`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetOutputs 5`] = `Array []`;
 
-exports[`syscalls Neo.Transaction.GetReferences 1`] = `
+exports[`syscalls Neo.Transaction.GetOutputs 6`] = `Array []`;
+
+exports[`syscalls Neo.Transaction.GetReferences 1`] = `"output.get"`;
+
+exports[`syscalls Neo.Transaction.GetReferences 2`] = `
 Array [
   Array [
     Object {
@@ -2186,7 +2404,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Transaction.GetReferences 2`] = `
+exports[`syscalls Neo.Transaction.GetReferences 3`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Transaction.GetReferences 4`] = `
 Array [
   Array [
     Object {
@@ -2195,16 +2415,18 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Transaction.GetReferences 3`] = `Array []`;
-
-exports[`syscalls Neo.Transaction.GetReferences 4`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetReferences 5`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetReferences 6`] = `Array []`;
 
-exports[`syscalls Neo.Transaction.GetType 1`] = `
+exports[`syscalls Neo.Transaction.GetReferences 7`] = `Array []`;
+
+exports[`syscalls Neo.Transaction.GetReferences 8`] = `Array []`;
+
+exports[`syscalls Neo.Transaction.GetType 1`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Transaction.GetType 2`] = `
 Array [
   Array [
     Object {
@@ -2213,8 +2435,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Transaction.GetType 2`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetType 3`] = `Array []`;
 
@@ -2222,35 +2442,43 @@ exports[`syscalls Neo.Transaction.GetType 4`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetType 5`] = `Array []`;
 
-exports[`syscalls Neo.Transaction.GetUnspentCoins 1`] = `
-Array [
-  Array [
-    Object {
-      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
-    },
-  ],
-]
-`;
+exports[`syscalls Neo.Transaction.GetType 6`] = `Array []`;
+
+exports[`syscalls Neo.Transaction.GetUnspentCoins 1`] = `"transaction.get"`;
 
 exports[`syscalls Neo.Transaction.GetUnspentCoins 2`] = `
 Array [
   Array [
     Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Transaction.GetUnspentCoins 3`] = `"transactionData.get"`;
+
+exports[`syscalls Neo.Transaction.GetUnspentCoins 4`] = `
+Array [
+  Array [
+    Object {
       "hash": "df09c9981eb0c4a2a182ce6090148647a2f4f6053c970380a645ed63b91ce258",
     },
   ],
 ]
 `;
 
-exports[`syscalls Neo.Transaction.GetUnspentCoins 3`] = `Array []`;
-
-exports[`syscalls Neo.Transaction.GetUnspentCoins 4`] = `Array []`;
-
 exports[`syscalls Neo.Transaction.GetUnspentCoins 5`] = `Array []`;
 
 exports[`syscalls Neo.Transaction.GetUnspentCoins 6`] = `Array []`;
 
-exports[`syscalls Neo.Transaction.GetUnspentCoins 7`] = `
+exports[`syscalls Neo.Transaction.GetUnspentCoins 7`] = `Array []`;
+
+exports[`syscalls Neo.Transaction.GetUnspentCoins 8`] = `Array []`;
+
+exports[`syscalls Neo.Transaction.GetUnspentCoins 9`] = `"transaction.get"`;
+
+exports[`syscalls Neo.Transaction.GetUnspentCoins 10`] = `
 Array [
   Array [
     Object {
@@ -2260,7 +2488,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Transaction.GetUnspentCoins 8`] = `
+exports[`syscalls Neo.Transaction.GetUnspentCoins 11`] = `"transactionData.get"`;
+
+exports[`syscalls Neo.Transaction.GetUnspentCoins 12`] = `
 Array [
   Array [
     Object {
@@ -2270,15 +2500,17 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Transaction.GetUnspentCoins 9`] = `Array []`;
+exports[`syscalls Neo.Transaction.GetUnspentCoins 13`] = `Array []`;
 
-exports[`syscalls Neo.Transaction.GetUnspentCoins 10`] = `Array []`;
+exports[`syscalls Neo.Transaction.GetUnspentCoins 14`] = `Array []`;
 
-exports[`syscalls Neo.Transaction.GetUnspentCoins 11`] = `Array []`;
+exports[`syscalls Neo.Transaction.GetUnspentCoins 15`] = `Array []`;
 
-exports[`syscalls Neo.Transaction.GetUnspentCoins 12`] = `Array []`;
+exports[`syscalls Neo.Transaction.GetUnspentCoins 16`] = `Array []`;
 
-exports[`syscalls Neo.Validator.Register 1`] = `
+exports[`syscalls Neo.Validator.Register 1`] = `"validator.tryGet"`;
+
+exports[`syscalls Neo.Validator.Register 2`] = `
 Array [
   Array [
     Object {
@@ -2287,8 +2519,6 @@ Array [
   ],
 ]
 `;
-
-exports[`syscalls Neo.Validator.Register 2`] = `Array []`;
 
 exports[`syscalls Neo.Validator.Register 3`] = `Array []`;
 
@@ -2296,7 +2526,11 @@ exports[`syscalls Neo.Validator.Register 4`] = `Array []`;
 
 exports[`syscalls Neo.Validator.Register 5`] = `Array []`;
 
-exports[`syscalls Neo.Validator.Register 6`] = `
+exports[`syscalls Neo.Validator.Register 6`] = `Array []`;
+
+exports[`syscalls Neo.Validator.Register 7`] = `"validator.tryGet"`;
+
+exports[`syscalls Neo.Validator.Register 8`] = `
 Array [
   Array [
     Object {
@@ -2306,7 +2540,9 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Validator.Register 7`] = `
+exports[`syscalls Neo.Validator.Register 9`] = `"validator.add"`;
+
+exports[`syscalls Neo.Validator.Register 10`] = `
 Array [
   Array [
     Object {
@@ -2320,13 +2556,13 @@ Array [
 ]
 `;
 
-exports[`syscalls Neo.Validator.Register 8`] = `Array []`;
-
-exports[`syscalls Neo.Validator.Register 9`] = `Array []`;
-
-exports[`syscalls Neo.Validator.Register 10`] = `Array []`;
-
 exports[`syscalls Neo.Validator.Register 11`] = `Array []`;
+
+exports[`syscalls Neo.Validator.Register 12`] = `Array []`;
+
+exports[`syscalls Neo.Validator.Register 13`] = `Array []`;
+
+exports[`syscalls Neo.Validator.Register 14`] = `Array []`;
 
 exports[`syscalls System.ExecutionEngine.GetCallingScriptHash 1`] = `Array []`;
 

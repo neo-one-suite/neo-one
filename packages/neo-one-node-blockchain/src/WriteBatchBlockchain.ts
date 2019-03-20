@@ -90,6 +90,7 @@ interface WriteBatchBlockchainOptions {
   readonly storage: BlockchainStorage;
   readonly vm: VM;
   readonly getValidators: WriteBlockchain['getValidators'];
+  readonly transactionHash?: UInt256;
 }
 
 interface Caches {
@@ -172,6 +173,7 @@ export class WriteBatchBlockchain {
   private readonly storage: BlockchainStorage;
   private readonly vm: VM;
   private readonly caches: Caches;
+  private readonly transactionHash: UInt256 | undefined;
 
   public constructor(options: WriteBatchBlockchainOptions) {
     this.settings = options.settings;
@@ -180,6 +182,7 @@ export class WriteBatchBlockchain {
     this.storage = options.storage;
     this.vm = options.vm;
     this.getValidators = options.getValidators;
+    this.transactionHash = options.transactionHash;
 
     const output = new OutputStorageCache(() => this.storage.output);
     this.caches = {
@@ -191,6 +194,7 @@ export class WriteBatchBlockchain {
         getKeyString: (key) => common.uInt160ToString(key.hash),
         createAddChange: (value) => ({ type: 'account', value }),
         createDeleteChange: (key) => ({ type: 'account', key }),
+        transactionHash: this.transactionHash,
       }),
       accountUnspent: new ReadGetAllAddDeleteStorageCache({
         name: 'accountUnspent',
@@ -201,6 +205,7 @@ export class WriteBatchBlockchain {
         matchesPartialKey: (value, key) => common.uInt160Equal(value.hash, key.hash),
         createAddChange: (value) => ({ type: 'accountUnspent', value }),
         createDeleteChange: (key) => ({ type: 'accountUnspent', key }),
+        transactionHash: this.transactionHash,
       }),
       accountUnclaimed: new ReadGetAllAddDeleteStorageCache({
         name: 'accountUnclaimed',
@@ -211,6 +216,7 @@ export class WriteBatchBlockchain {
         matchesPartialKey: (value, key) => common.uInt160Equal(value.hash, key.hash),
         createAddChange: (value) => ({ type: 'accountUnclaimed', value }),
         createDeleteChange: (key) => ({ type: 'accountUnclaimed', key }),
+        transactionHash: this.transactionHash,
       }),
       action: new ReadGetAllAddStorageCache({
         name: 'action',
@@ -223,6 +229,7 @@ export class WriteBatchBlockchain {
           (key.indexStart === undefined || value.index.gte(key.indexStart)) &&
           (key.indexStop === undefined || value.index.lte(key.indexStop)),
         createAddChange: (value) => ({ type: 'action', value }),
+        transactionHash: this.transactionHash,
       }),
       asset: new ReadAddUpdateStorageCache({
         name: 'asset',
@@ -231,6 +238,7 @@ export class WriteBatchBlockchain {
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
         createAddChange: (value) => ({ type: 'asset', value }),
+        transactionHash: this.transactionHash,
       }),
       block: new BlockLikeStorageCache({
         name: 'block',
@@ -239,6 +247,7 @@ export class WriteBatchBlockchain {
           tryGet: this.storage.block.tryGet,
         }),
         createAddChange: (value) => ({ type: 'block', value }),
+        transactionHash: this.transactionHash,
       }),
       blockData: new ReadAddStorageCache({
         name: 'blockData',
@@ -246,6 +255,7 @@ export class WriteBatchBlockchain {
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
         createAddChange: (value) => ({ type: 'blockData', value }),
+        transactionHash: this.transactionHash,
       }),
       header: new BlockLikeStorageCache({
         name: 'header',
@@ -254,6 +264,7 @@ export class WriteBatchBlockchain {
           tryGet: this.storage.header.tryGet,
         }),
         createAddChange: (value) => ({ type: 'header', value }),
+        transactionHash: this.transactionHash,
       }),
       transaction: new ReadAddStorageCache({
         name: 'transaction',
@@ -266,6 +277,7 @@ export class WriteBatchBlockchain {
             value.outputs.map(async (out, index) => output.add({ hash: value.hash, index, output: out })),
           );
         },
+        transactionHash: this.transactionHash,
       }),
       transactionData: new ReadAddUpdateStorageCache({
         name: 'transactionData',
@@ -274,6 +286,7 @@ export class WriteBatchBlockchain {
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
         createAddChange: (value) => ({ type: 'transactionData', value }),
+        transactionHash: this.transactionHash,
       }),
       output,
       contract: new ReadAddDeleteStorageCache({
@@ -283,6 +296,7 @@ export class WriteBatchBlockchain {
         getKeyString: (key) => common.uInt160ToString(key.hash),
         createAddChange: (value) => ({ type: 'contract', value }),
         createDeleteChange: (key) => ({ type: 'contract', key }),
+        transactionHash: this.transactionHash,
       }),
       storageItem: new ReadGetAllAddUpdateDeleteStorageCache({
         name: 'storageItem',
@@ -298,6 +312,7 @@ export class WriteBatchBlockchain {
           (key.prefix === undefined || key.prefix.every((byte, idx) => value.key[idx] === byte)),
         createAddChange: (value) => ({ type: 'storageItem', value }),
         createDeleteChange: (key) => ({ type: 'storageItem', key }),
+        transactionHash: this.transactionHash,
       }),
       validator: new ReadAllAddUpdateDeleteStorageCache({
         name: 'validator',
@@ -307,6 +322,7 @@ export class WriteBatchBlockchain {
         createAddChange: (value) => ({ type: 'validator', value }),
         update: (value, update) => value.update(update),
         createDeleteChange: (key) => ({ type: 'validator', key }),
+        transactionHash: this.transactionHash,
       }),
       invocationData: new ReadAddStorageCache({
         name: 'invocationData',
@@ -314,6 +330,7 @@ export class WriteBatchBlockchain {
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
         createAddChange: (value) => ({ type: 'invocationData', value }),
+        transactionHash: this.transactionHash,
       }),
       validatorsCount: new ReadAddUpdateMetadataStorageCache({
         name: 'validatorsCount',
@@ -662,6 +679,7 @@ export class WriteBatchBlockchain {
               storage: this as any,
               vm: this.vm,
               getValidators: this.getValidators,
+              transactionHash: transaction.hash,
             });
 
             const migratedContractHashes: Array<[UInt160, UInt160]> = [];
