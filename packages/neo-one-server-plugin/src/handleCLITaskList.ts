@@ -1,10 +1,10 @@
 import { utils } from '@neo-one/utils';
 import chalk from 'chalk';
 import cliTruncate from 'cli-truncate';
-import elegantSpinner from 'elegant-spinner';
 import figures from 'figures';
 import * as logSymbols from 'log-symbols';
 import logUpdate from 'log-update';
+import ora from 'ora';
 import { EMPTY, Observable, Subject, timer } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { indentString, stripAnsi } from './displayUtils';
@@ -19,12 +19,13 @@ const skipped = chalk.yellow(figures.arrowDown);
 
 const getSymbol = (task: TaskStatus, mutableSpinners: Spinners) => {
   if (mutableSpinners[task.id] == undefined) {
-    mutableSpinners[task.id] = elegantSpinner();
+    const spinner = ora({ color: 'yellow' });
+    mutableSpinners[task.id] = spinner;
   }
 
   const hasSubtasks = task.subtasks !== undefined && task.subtasks.length > 0;
   if (task.pending) {
-    return hasSubtasks ? pointer : chalk.yellow(mutableSpinners[task.id]());
+    return hasSubtasks ? pointer : chalk.yellow(mutableSpinners[task.id].frame().trim());
   }
 
   if (task.complete) {

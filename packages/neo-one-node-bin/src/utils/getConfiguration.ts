@@ -21,7 +21,7 @@ export interface NodeBinEnvironment {
 }
 
 interface SettingsEnvironment {
-  readonly type: 'main' | 'test';
+  readonly type: 'main' | 'test' | string;
   readonly privateNet?: boolean;
   readonly address?: string;
   readonly secondsPerBlock?: number;
