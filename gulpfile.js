@@ -246,7 +246,6 @@ const globs = {
     `!packages/*/src/__tests__/**/*`,
     `!packages/*/src/__e2e__/**/*`,
     `!packages/*/src/bin/**/*`,
-    `!packages/neo-one-developer-tools/src/*.ts`,
     `!packages/neo-one-developer-tools-frame/src/*.ts`,
     `!packages/neo-one-smart-contract-lib/src/*.ts`,
     `!packages/neo-one-server-plugin-wallet/src/contracts/*.ts`,
@@ -461,7 +460,8 @@ const compileTypescript = ((cache) =>
               .filter((dir) => dir !== 'src')
               .join(path.sep);
           }),
-        ),
+        )
+        .pipe(gulpFilter(['**', '!packages/neo-one-developer-tools/*.js'])),
       format.module === 'esm' ? "'" : '"',
     ).pipe(gulp.dest(getDest(format)));
   }))({});
@@ -474,8 +474,8 @@ gulp.task('compileDeveloperToolsFrame', async () => {
 
 const APP_ROOT_DIR = __dirname;
 
-const compileDeveloperTools = ((cache) =>
-  memoizeTask(cache, async function compileDeveloperTools(format) {
+const compileDeveloperToolsBundle = ((cache) =>
+  memoizeTask(cache, async function compileDeveloperToolsBundle(format) {
     const bundle = await rollup.rollup({
       input: path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-developer-tools', 'src', 'index.ts'),
       external: ['resize-observer-polyfill'],
@@ -503,8 +503,8 @@ const compileDeveloperTools = ((cache) =>
     });
   }))({});
 
-const buildAllNoDeveloperTools = ((cache) =>
-  memoizeTask(cache, function buildAllNoDeveloperTools(format, done, type) {
+const buildAllNoDeveloperToolsBundle = ((cache) =>
+  memoizeTask(cache, function buildAllNoDeveloperToolsBundle(format, done, type) {
     return gulp.parallel(
       ...[
         copyPkgFiles(format),
@@ -525,7 +525,9 @@ const buildAllNoDeveloperTools = ((cache) =>
 
 const buildAll = ((cache) =>
   memoizeTask(cache, function buildAll(format, done, type) {
-    return gulp.series(buildAllNoDeveloperTools(format, type), compileDeveloperTools(format))(done);
+    return format.browser
+      ? buildAllNoDeveloperToolsBundle(format, type)(done)
+      : gulp.series(buildAllNoDeveloperToolsBundle(format, type), compileDeveloperToolsBundle(format))(done);
   }))({});
 
 const install = ((cache) =>
@@ -828,7 +830,7 @@ gulp.task('copyMetadata', gulp.parallel(FORMATS.map((format) => copyMetadata(for
 gulp.task('copyFiles', gulp.parallel(FORMATS.map((format) => copyFiles(format))));
 gulp.task('copyRootPkg', gulp.parallel(FORMATS.map((format) => copyRootPkg(format))));
 gulp.task('copyRootTSConfig', gulp.parallel(FORMATS.map((format) => copyRootTSConfig(format))));
-gulp.task('compileDeveloperTools', gulp.parallel(FORMATS.map((format) => compileDeveloperTools(format))));
+gulp.task('compileDeveloperToolsBundle', gulp.parallel(FORMATS.map((format) => compileDeveloperToolsBundle(format))));
 gulp.task('buildTypescript', gulp.parallel(FORMATS.map((format) => compileTypescript(format))));
 gulp.task(
   'buildAll',
@@ -843,7 +845,7 @@ const buildE2ESeries = (type) =>
   gulp.series('compileDeveloperToolsFrame', buildAll(MAIN_FORMAT, type), install(MAIN_FORMAT));
 gulp.task('buildE2E', gulp.series('clean', buildE2ESeries()));
 
-const buildNodeSeries = (type) => gulp.series(buildAllNoDeveloperTools(MAIN_FORMAT, type), install(MAIN_FORMAT));
+const buildNodeSeries = (type) => gulp.series(buildAllNoDeveloperToolsBundle(MAIN_FORMAT, type), install(MAIN_FORMAT));
 gulp.task('buildNode', gulp.series('clean', buildNodeSeries()));
 
 gulp.task(
