@@ -8,6 +8,7 @@ export interface BlogProps {
   readonly title: string;
   readonly content: MarkdownContent;
   readonly date: string;
+  readonly link: string;
   readonly author: Author;
   readonly sidebar: ReadonlyArray<SectionData>;
 }

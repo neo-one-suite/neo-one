@@ -9,6 +9,7 @@ import { Content, MarkdownContent } from '../content';
 export interface TutorialProps {
   readonly title: string;
   readonly content: MarkdownContent;
+  readonly link: string;
   readonly sidebar: ReadonlyArray<SectionData>;
   readonly next?: AdjacentInfo;
   readonly previous?: AdjacentInfo;
