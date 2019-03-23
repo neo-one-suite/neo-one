@@ -7830,10 +7830,10 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-css-chunks-webpack-plugin@4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/extract-css-chunks-webpack-plugin/-/extract-css-chunks-webpack-plugin-4.0.1.tgz#8a25ecf89e4a31d74351e487e616ecc79e873052"
-  integrity sha512-axin0Qz65T4ZQl8FEGW1ZN31kwUJOO7CoiWv0aTupYjmmQdtr56qsW061MuLglzTNwDKTcSe7KbtuzMZ5uc3Cw==
+extract-css-chunks-webpack-plugin@4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/extract-css-chunks-webpack-plugin/-/extract-css-chunks-webpack-plugin-4.0.2.tgz#67c1de090079247b9eb4f9d179cd2717ca43c361"
+  integrity sha512-svwrtf8iENEm5DRhzJp2qpfvapEsVEkrElqUqz8/ZtyfvKA8uT6y4GneOgKBCKK6oh+iVPSHZ+FrI89sxG6EOQ==
   dependencies:
     loader-utils "^1.1.0"
     lodash "^4.17.11"
