@@ -14,4 +14,5 @@ export const resolveMiddleware = async (ctx: Context): Promise<void> => {
   const result = await resolveDependencies(body, getMonitor(ctx));
 
   ctx.body = result;
+  ctx.status = 200;
 };

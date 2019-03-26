@@ -15,10 +15,19 @@ import { EmptyBodyError, FetchError, MissingPackageJSONError } from './errors';
 
 const REGISTRY = 'https://registry.yarnpkg.com/';
 
+const getScopelessName = (name: string) => {
+  if (name[0] !== '@') {
+    return name;
+  }
+
+  return name.split('%2f')[1];
+};
+
 const getTarballURL = (name: string, version: string) => {
   const escapedName = getEscapedNPMName(name);
+  const scopelessName = getScopelessName(escapedName);
 
-  return `${REGISTRY}${escapedName}/-/${escapedName}-${version}.tgz`;
+  return `${REGISTRY}${escapedName}/-/${scopelessName}-${version}.tgz`;
 };
 
 const getPath = (path: string) =>
@@ -196,9 +205,9 @@ const resolvePackageWorker = async (name: string, version: string, monitor?: Mon
   const files = await defer(async () => extractPackage(url))
     .pipe(
       retryBackoff({
-        initialInterval: 250,
+        initialInterval: 100,
         maxRetries: 10,
-        maxInterval: 2500,
+        maxInterval: 750,
         onError: (error) => {
           if (monitor !== undefined) {
             monitor.logError({

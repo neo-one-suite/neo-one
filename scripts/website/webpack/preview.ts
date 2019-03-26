@@ -60,7 +60,7 @@ export const preview = ({ stage }: { readonly stage: Stage }): webpack.Configura
               runtimeCaching: [
                 {
                   urlPattern: /^https:\/\/.*.jsdelivr.com/,
-                  handler: 'cacheFirst',
+                  handler: 'CacheFirst',
                   options: {
                     cacheName: 'jsdelivr',
                     expiration: {
@@ -76,7 +76,7 @@ export const preview = ({ stage }: { readonly stage: Stage }): webpack.Configura
                   },
                 },
               ],
-              dontCacheBustUrlsMatching: /\.(?:\w{8}|\w{32})\./,
+              dontCacheBustURLsMatching: /\.(?:\w{8}|\w{32})\./,
               ...(stage === 'prod'
                 ? {
                     globDirectory: DIST_DIR,

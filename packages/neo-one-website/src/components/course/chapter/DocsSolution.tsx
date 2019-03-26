@@ -31,6 +31,7 @@ const HeaderWrapper = styled(Box)`
 const StyledMarkdown = styled(Markdown)`
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 0;
 
   &&& pre {

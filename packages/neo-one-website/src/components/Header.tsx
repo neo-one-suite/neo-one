@@ -35,7 +35,7 @@ const StyledToolbar = styled(Toolbar)`
   }
 `;
 
-const FocusableRouterLink = use(ToolbarFocusable, RouterLink, LinkBase);
+const FocusableRouterLink = use(RouterLink, LinkBase);
 
 const LogoLink = styled(FocusableRouterLink)`
   display: block;
@@ -104,24 +104,36 @@ export const Header = ({ path, ...props }: Props & React.ComponentProps<typeof W
   <Wrapper {...props}>
     <StyledToolbar>
       <LeftHeader>
-        <LogoLink linkColor="gray" data-test="header-logo" to="/">
-          <Logo />
-        </LogoLink>
-        <NavigationLink linkColor="gray" active={path === 'docs'} data-test="header-docs" to="/docs/getting-started">
-          Docs
-        </NavigationLink>
-        <CourseLink linkColor="gray" active={path === 'course'} data-test="header-course" to="/course">
-          Course
-        </CourseLink>
-        <NavigationLink linkColor="gray" active={path === 'tutorial'} data-test="header-tutorial" to="/tutorial">
-          Tutorial
-        </NavigationLink>
-        <NavigationLink linkColor="gray" active={path === 'blog'} data-test="header-blog" to="/blog">
-          Blog
-        </NavigationLink>
-        <NavigationLink linkColor="gray" active={path === 'reference'} data-test="header-reference" to="/reference">
-          Reference
-        </NavigationLink>
+        <ToolbarFocusable>
+          <LogoLink linkColor="gray" data-test="header-logo" to="/">
+            <Logo />
+          </LogoLink>
+        </ToolbarFocusable>
+        <ToolbarFocusable>
+          <NavigationLink linkColor="gray" active={path === 'docs'} data-test="header-docs" to="/docs/getting-started">
+            Docs
+          </NavigationLink>
+        </ToolbarFocusable>
+        <ToolbarFocusable>
+          <CourseLink linkColor="gray" active={path === 'course'} data-test="header-course" to="/course">
+            Course
+          </CourseLink>
+        </ToolbarFocusable>
+        <ToolbarFocusable>
+          <NavigationLink linkColor="gray" active={path === 'tutorial'} data-test="header-tutorial" to="/tutorial">
+            Tutorial
+          </NavigationLink>
+        </ToolbarFocusable>
+        <ToolbarFocusable>
+          <NavigationLink linkColor="gray" active={path === 'blog'} data-test="header-blog" to="/blog">
+            Blog
+          </NavigationLink>
+        </ToolbarFocusable>
+        <ToolbarFocusable>
+          <NavigationLink linkColor="gray" active={path === 'reference'} data-test="header-reference" to="/reference">
+            Reference
+          </NavigationLink>
+        </ToolbarFocusable>
       </LeftHeader>
       <ToolbarContent align="end">
         <GitHubLink

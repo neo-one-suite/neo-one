@@ -19,4 +19,3 @@ rm -f ./packages/neo-one-website/dist/transpiler.worker.js.map
 rm -f ./packages/neo-one-website/dist/ts.worker.js
 rm -f ./packages/neo-one-website/dist/ts.worker.js.gz
 rm -f ./packages/neo-one-website/dist/ts.worker.js.map
-cp ./packages/neo-one-website/dist/404/index.html ./packages/neo-one-website/dist/404.html

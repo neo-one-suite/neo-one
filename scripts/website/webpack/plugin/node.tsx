@@ -93,7 +93,7 @@ export const node = () => ({
                 runtimeCaching: [
                   {
                     urlPattern: /^https:\/\/.*.jsdelivr.com/,
-                    handler: 'cacheFirst',
+                    handler: 'CacheFirst',
                     options: {
                       cacheName: 'jsdelivr',
                       expiration: {
@@ -110,7 +110,7 @@ export const node = () => ({
                   },
                 ],
                 offlineGoogleAnalytics: true,
-                dontCacheBustUrlsMatching: /\.(?:\w{8}|\w{32})\./,
+                dontCacheBustURLsMatching: /\.(?:\w{8}|\w{32})\./,
                 ...(stageIn === 'prod'
                   ? {
                       globDirectory: path.resolve(WEBSITE_DIR, 'dist'),

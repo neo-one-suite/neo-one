@@ -8,4 +8,5 @@ export const pkgMiddleware = async (ctx: Context): Promise<void> => {
   const directives = [`max-age=${365 * 24 * 60 * 60}`, 'immutable', 'public'];
   ctx.set('Cache-Control', directives.join(', '));
   ctx.body = result;
+  ctx.status = 200;
 };

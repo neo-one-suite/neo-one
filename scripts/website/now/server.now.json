@@ -6,8 +6,16 @@
     { "src": "pkg.js", "use": "@now/node" }
   ],
   "routes": [
-    { "src": "^/resolve", "dest": "/resolve.js" },
-    { "src": "^/pkg", "dest": "/pkg.js" },
-    { "src": "^/.*", "status": 404 }
+    { "src": "/resolve", "dest": "/resolve.js", "headers":
+      {
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    { "src": "/pkg", "dest": "/pkg.js", "headers":
+      {
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    { "src": "/.*", "status": 404 }
   ]
 }

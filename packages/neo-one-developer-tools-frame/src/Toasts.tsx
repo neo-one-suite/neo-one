@@ -19,6 +19,9 @@ interface Props {
 }
 
 export function Toasts({ resizeHandler }: Props) {
+  // tslint:disable-next-line:no-unused
+  const [toasts, _addToast, removeToast] = useToasts();
+
   return (
     <SizeObserver
       onChange={({ width, height }: { width: number; height: number }) => {
@@ -34,18 +37,13 @@ export function Toasts({ resizeHandler }: Props) {
         }
       }}
     >
-      {({ sizeRef }: any) => {
-        // tslint:disable-next-line:no-unused
-        const [toasts, _addToast, removeToast] = useToasts();
-
-        return (
-          <Wrapper ref={sizeRef}>
-            {[...toasts].reverse().map((toast) => (
-              <Toast key={toast.id} toast={toast} removeToast={removeToast} />
-            ))}
-          </Wrapper>
-        );
-      }}
+      {({ sizeRef }: any) => (
+        <Wrapper ref={sizeRef}>
+          {[...toasts].reverse().map((toast) => (
+            <Toast key={toast.id} toast={toast} removeToast={removeToast} />
+          ))}
+        </Wrapper>
+      )}
     </SizeObserver>
   );
 }

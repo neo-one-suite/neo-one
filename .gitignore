@@ -74,3 +74,6 @@ flow-coverage/
 # Cypress
 cypress/videos
 cypress/screenshots
+
+# React-Static Artifacts
+/packages/neo-one-website/artifacts/

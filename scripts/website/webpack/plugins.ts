@@ -26,7 +26,7 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
         ),
         NEO_ONE_PREVIEW_URL: JSON.stringify(
           stage === 'prod' && process.env.NEO_ONE_STAGING !== 'true'
-            ? 'https://course-preview.neo-one.io'
+            ? 'https://preview.neo-one.io'
             : 'http://localhost:8080',
         ),
         NEO_ONE_TEST_RUNNER_URL: JSON.stringify(

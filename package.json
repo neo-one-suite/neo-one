@@ -105,15 +105,12 @@
     "e2e-ci-windows-8": "yarn run jest-windows-8 --config jest/e2e-ci.js --ci -w 1",
     "e2e-ci-9": "yarn run jest-9 --config jest/e2e-ci.js --ci -w 1",
     "e2e-ci-windows-9": "yarn run jest-windows-9 --config jest/e2e-ci.js --ci -w 1",
-
     "website:start-workers": "yarn run ts-node ./scripts/website/compile --watch --bundle workers",
     "website:start-overlay": "yarn run ts-node ./scripts/website/compile --watch --bundle overlay",
     "website:start-tools": "yarn run ts-node ./scripts/website/compile --watch --bundle tools",
     "website:start-preview": "yarn run ts-node ./scripts/website/compile --watch --bundle preview",
     "website:start-testRunner": "yarn run ts-node ./scripts/website/compile --watch --bundle testRunner",
     "website:start-server": "yarn run ts-node ./scripts/website/compile --watch --bundle server",
-    "website:start:dev": "concurrently -n 'workers,overlay,tools,preview,testRunner,server,static' --kill-others-on-fail \"yarn website:start-workers\" \"yarn website:start-overlay\" \"yarn website:start-tools\" \"yarn website:start-preview\" \"yarn website:start-testRunner\" \"yarn website:start-server\" \"yarn website:start-static\"",
-
     "website:start-static": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static start",
     "website:start-workers-prod": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true yarn run ts-node ./scripts/website/compile --watch --bundle workers",
     "website:start-overlay-prod": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true yarn run ts-node ./scripts/website/compile --watch --bundle overlay",
@@ -121,15 +118,13 @@
     "website:start-preview-prod": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true yarn run ts-node ./scripts/website/compile --watch --bundle preview",
     "website:start-testRunner-prod": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true yarn run ts-node ./scripts/website/compile --bundle testRunner && yarn run serve dist/testRunner -p 8081",
     "website:start-static-prod": "rm -rf ./packages/neo-one-website/publicOut && cp -r ./dist/workers ./packages/neo-one-website/publicOut && cp -r ./packages/neo-one-website/public/* ./packages/neo-one-website/publicOut && cross-env NEO_ONE_STAGING=true NEO_ONE_CACHE=true NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build --staging && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run serve packages/neo-one-website/dist -p 3000",
-
     "website:stage": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build --staging",
     "website:serve": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run serve packages/neo-one-website/dist -p 3000",
-
     "website:build-static": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build",
-    "website:deploy-static": "rm -rf ./dist && yarn run ts-node ./scripts/website/compile --bundle tools && yarn run ts-node ./scripts/website/compile --bundle workers && yarn run ts-node ./scripts/website/compile --bundle overlay && rm -rf ./packages/neo-one-website/publicOut && cp -r ./dist/workers ./packages/neo-one-website/publicOut && cp -r ./packages/neo-one-website/public/* ./packages/neo-one-website/publicOut && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build && sh ./scripts/rm-cruft && cp ./scripts/website/now/static.now.json ./packages/neo-one-website/dist/now.json && cd packages/neo-one-website/dist && now --public && now alias",
-    "website:deploy-testRunner": "rm -rf ./dist && yarn run ts-node ./scripts/website/compile --bundle tools && yarn run ts-node ./scripts/website/compile --bundle workers && yarn run ts-node ./scripts/website/compile --bundle testRunner && cp ./scripts/website/now/testRunner.now.json ./dist/testRunner/now.json && cd dist/testRunner && now --public && now alias",
-    "website:deploy-preview": "rm -rf ./dist && yarn run ts-node ./scripts/website/compile --bundle tools && yarn run ts-node ./scripts/website/compile --bundle overlay && yarn run ts-node ./scripts/website/compile --bundle preview && cp -r ./dist/overlay/* ./dist/preview && cp ./scripts/website/now/preview.now.json ./dist/preview/now.json && cd dist/preview && now --public && now alias",
-    "website:deploy-server": "rm -rf ./dist && yarn run ts-node ./scripts/website/compile --bundle server && cp ./scripts/website/now/server.now.json ./dist/server/now.json && cd dist/server && now --public && now alias",
+    "website:deploy-static": "rm -rf ./dist && yarn run ts-node ./scripts/website/compile --bundle tools && yarn run ts-node ./scripts/website/compile --bundle workers && yarn run ts-node ./scripts/website/compile --bundle overlay && rm -rf ./packages/neo-one-website/publicOut && cp -r ./dist/workers ./packages/neo-one-website/publicOut && cp -r ./packages/neo-one-website/public/* ./packages/neo-one-website/publicOut && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build && sh ./scripts/rm-cruft && cp ./scripts/website/now/static.now.json ./packages/neo-one-website/dist/now.json && cd packages/neo-one-website/dist && now --target production",
+    "website:deploy-testRunner": "rm -rf ./dist && yarn run ts-node ./scripts/website/compile --bundle tools && yarn run ts-node ./scripts/website/compile --bundle workers && yarn run ts-node ./scripts/website/compile --bundle testRunner && cp ./scripts/website/now/testRunner.now.json ./dist/testRunner/now.json && cd dist/testRunner && now --target production",
+    "website:deploy-preview": "rm -rf ./dist && yarn run ts-node ./scripts/website/compile --bundle tools && yarn run ts-node ./scripts/website/compile --bundle overlay && yarn run ts-node ./scripts/website/compile --bundle preview && cp -r ./dist/overlay/* ./dist/preview && cp ./scripts/website/now/preview.now.json ./dist/preview/now.json && cd dist/preview && now --target production",
+    "website:deploy-server": "rm -rf ./dist && yarn run ts-node ./scripts/website/compile --bundle server && cp ./scripts/website/now/server.now.json ./dist/server/now.json && cd dist/server && now --target production",
     "test:cypress": "yarn run ts-node ./scripts/runCypress.ts",
     "concatenate": "yarn run ts-node ./packages/neo-one-typescript-concatenator/src/entry.ts",
     "compile:developer-tools-frame": "cross-env NEO_ONE_DIST=true yarn run ts-node ./scripts/website/compile --bundle tools"
@@ -169,12 +164,11 @@
     "babel-plugin-lodash": "3.3.4",
     "babel-plugin-styled-components": "1.10.0",
     "babel-plugin-transform-imports": "1.5.1",
-    "babel-plugin-universal-import": "4.0.0",
+    "babel-plugin-universal-import": "3.1.2",
     "cache-loader": "2.0.1",
     "codecov": "3.2.0",
     "commitizen": "3.0.7",
     "compression-webpack-plugin": "2.0.0",
-    "concurrently": "^4.1.0",
     "connect-history-api-fallback": "1.6.0",
     "cross-env": "5.2.0",
     "css-loader": "2.1.1",
@@ -271,7 +265,8 @@
     "bn.js": "4.11.8",
     "regenerator-runtime": "0.13.1",
     "terser": "3.14.1",
-    "webpack": "4.29.6"
+    "webpack": "4.29.6",
+    "styled-components": "4.2.0"
   },
   "config": {
     "commitizen": {
