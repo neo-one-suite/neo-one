@@ -407,7 +407,7 @@ const copyTypescript = ((cache) =>
       .src(globs.typescript)
       .pipe(
         gulpFilter([
-          'packages/neo-one-smart-contract-lib/src/*.ts',
+          'packages/neo-one-smart-contract-lib/src/**/*.ts',
           'packages/neo-one-smart-contract/src/*.ts',
           'packages/neo-one-server-plugin-wallet/src/contracts/*.ts',
         ]),
