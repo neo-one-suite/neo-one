@@ -351,12 +351,20 @@ const createPut = ({ name }: { readonly name: 'Neo.Storage.Put' | 'Neo.Storage.P
       const flags =
         name === 'Neo.Storage.Put' ? StorageFlags.None : assertStorageFlags(args[3].asBigInteger().toNumber());
       const item = await context.blockchain.storageItem.tryGet({ hash, key });
-      if (item === undefined) {
-        await context.blockchain.storageItem.add(new StorageItem({ hash, key, value, flags }));
-      } else if (hasStorageFlag(item.flags, StorageFlags.Constant)) {
-        throw new ConstantStorageError(context, key);
-      } else {
+      // if (item === undefined) {
+      //   await context.blockchain.storageItem.add(new StorageItem({ hash, key, value, flags }));
+      // } else if (hasStorageFlag(item.flags, StorageFlags.Constant)) {
+      //   throw new ConstantStorageError(context, key);
+      // } else {
+      //   await context.blockchain.storageItem.update(item, { value, flags });
+      // }
+      if (item !== undefined) {
+        if (hasStorageFlag(item.flags, StorageFlags.Constant)) {
+          throw new ConstantStorageError(context, key);
+        }
         await context.blockchain.storageItem.update(item, { value, flags });
+      } else {
+        await context.blockchain.storageItem.add(new StorageItem({ hash, key, value, flags }));
       }
 
       return { context };
