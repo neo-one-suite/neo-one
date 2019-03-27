@@ -9,6 +9,10 @@ interface Props {
   readonly to: string;
 }
 
-export const RouterLink = ({ to, ...props }: Props & React.ComponentProps<typeof Link>) => (
-  <Prefetch path={to}>{({ handleRef }: any) => <Link ref={handleRef} to={to} {...props} />}</Prefetch>
-);
+export class RouterLink extends React.Component<Props & React.ComponentProps<typeof Link>> {
+  public render() {
+    const { to, ...props } = this.props;
+
+    return <Prefetch path={to}>{({ handleRef }: any) => <Link ref={handleRef} to={to} {...props} />}</Prefetch>;
+  }
+}

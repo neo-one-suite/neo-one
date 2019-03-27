@@ -19,7 +19,7 @@ export default () => (
     {/*
     // @ts-ignore */}
     <RouteData Loader={DocsLoading}>
-      {({ redirect }: ReferenceRedirectProps) => <Redirect to={redirect} noThrow={typeof window === 'undefined'} />}
+      {({ redirect }: ReferenceRedirectProps) => <Redirect to={redirect} noThrow />}
     </RouteData>
   </>
 );

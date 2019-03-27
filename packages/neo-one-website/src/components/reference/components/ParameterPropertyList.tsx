@@ -17,12 +17,12 @@ const ParameterLayout = styled(Box)`
 `;
 
 interface Props {
-  readonly values: ReadonlyArray<Parameter | Property>;
+  readonly values?: ReadonlyArray<Parameter | Property>;
   readonly subheading?: boolean;
   readonly title: string;
 }
 
-export const ParameterPropertyList = ({ values, subheading, title, ...props }: Props) => (
+export const ParameterPropertyList = ({ values = [], subheading, title, ...props }: Props) => (
   <ParameterLayout {...props}>
     <Title subheading={subheading}>{title}</Title>
     {values.map((value) => (

@@ -70,7 +70,7 @@ export const ToolbarFocusableComponent = forwardRef<HTMLDivElement, Props>(
       const toolbar = getToolbar();
 
       return toolbar !== null && toolbar.getAttribute('aria-orientation') === 'vertical';
-    }, [toolbar]);
+    }, [getToolbar]);
 
     const getPreviousFocusable = useCallback((focusables: NodeListOf<Focusable>, currentIndex: number) => {
       const index = currentIndex ? currentIndex - 1 : focusables.length - 1;

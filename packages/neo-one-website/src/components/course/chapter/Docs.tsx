@@ -23,6 +23,7 @@ const StyledMarkdown = styled(Markdown)`
   background-color: ${prop('theme.black')};
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
 `;
 
 interface Props {

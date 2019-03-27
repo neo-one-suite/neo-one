@@ -19,7 +19,7 @@ export default () => (
     {/*
     // @ts-ignore */}
     <RouteData Loader={BlogLoading}>
-      {({ redirect }: BlogRedirectProps) => <Redirect to={redirect} noThrow={typeof window === 'undefined'} />}
+      {({ redirect }: BlogRedirectProps) => <Redirect to={redirect} noThrow />}
     </RouteData>
   </>
 );

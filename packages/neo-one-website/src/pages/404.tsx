@@ -15,6 +15,6 @@ export default () => (
       <meta httpEquiv="content-type" content="text/html; charset=utf-8" />
       <meta httpEquiv="refresh" content={`0; url=${process.env.REACT_STATIC_PUBLIC_PATH}`} />
     </Helmet>
-    <Redirect to="/" noThrow={typeof window === 'undefined'} />
+    <Redirect to="/" noThrow />
   </MainLayout>
 );

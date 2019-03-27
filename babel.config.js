@@ -7,6 +7,7 @@ module.exports = {
       {
         modules: 'commonjs',
         useBuiltIns: 'entry',
+        corejs: '2.6.5',
         targets: { node: true },
       },
     ],
