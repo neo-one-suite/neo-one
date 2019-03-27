@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-compiler-node@1.1.0...@neo-one/smart-contract-compiler-node@1.1.1) (2019-03-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency typescript to v3.3.3333 ([ad271bb](https://github.com/neo-one-suite/neo-one/commit/ad271bb))
+* **deps:** update dependency typescript to v3.3.4000 ([0b71078](https://github.com/neo-one-suite/neo-one/commit/0b71078))
+
+
+
+
+
 # [1.1.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-compiler-node@1.0.2...@neo-one/smart-contract-compiler-node@1.1.0) (2019-02-21)
 
 **Note:** Version bump only for package @neo-one/smart-contract-compiler-node

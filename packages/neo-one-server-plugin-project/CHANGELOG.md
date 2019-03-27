@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-plugin-project@1.1.0...@neo-one/server-plugin-project@1.1.1) (2019-03-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @types/react to v16.8.5 ([b8eea1e](https://github.com/neo-one-suite/neo-one/commit/b8eea1e))
+* **deps:** update dependency @types/react to v16.8.8 ([966b5c9](https://github.com/neo-one-suite/neo-one/commit/966b5c9))
+* **deps:** update dependency bignumber.js to v8.1.1 ([2d6f93a](https://github.com/neo-one-suite/neo-one/commit/2d6f93a))
+* **deps:** update dependency typescript to v3.3.3333 ([ad271bb](https://github.com/neo-one-suite/neo-one/commit/ad271bb))
+* **deps:** update dependency typescript to v3.3.4000 ([0b71078](https://github.com/neo-one-suite/neo-one/commit/0b71078))
+
+
+
+
+
 # [1.1.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-plugin-project@1.0.3...@neo-one/server-plugin-project@1.1.0) (2019-02-21)
 
 **Note:** Version bump only for package @neo-one/server-plugin-project

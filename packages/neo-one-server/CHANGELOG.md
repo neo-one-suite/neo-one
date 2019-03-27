@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server@1.1.0...@neo-one/server@1.1.1) (2019-03-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency mali to ^0.12.0 ([7ae3c4c](https://github.com/neo-one-suite/neo-one/commit/7ae3c4c))
+* **deps:** update dependency mali to ^0.13.0 ([6c414cb](https://github.com/neo-one-suite/neo-one/commit/6c414cb))
+* **deps:** update dependency mali to ^0.14.0 ([9a06238](https://github.com/neo-one-suite/neo-one/commit/9a06238))
+
+
+
+
+
 # [1.1.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server@1.0.3...@neo-one/server@1.1.0) (2019-02-21)
 
 **Note:** Version bump only for package @neo-one/server

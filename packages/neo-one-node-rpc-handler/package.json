@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/node-rpc-handler",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "NEO•ONE RPC handler.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-common": "^1.1.0",
+    "@neo-one/client-common": "^1.1.1",
     "@neo-one/monitor": "^1.1.0",
-    "@neo-one/node-core": "^1.1.0",
+    "@neo-one/node-core": "^1.1.1",
     "@neo-one/types": "^1.1.0",
     "rxjs": "^6.4.0",
     "tslib": "^1.9.3"

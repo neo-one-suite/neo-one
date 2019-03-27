@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-common@1.1.0...@neo-one/client-common@1.1.1) (2019-03-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency bignumber.js to v8.1.1 ([2d6f93a](https://github.com/neo-one-suite/neo-one/commit/2d6f93a))
+* **jest:** fix a flaky crypto test - createKeyPair ([cd1e029](https://github.com/neo-one-suite/neo-one/commit/cd1e029))
+
+
+
+
+
 # [1.1.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-common@1.0.2...@neo-one/client-common@1.1.0) (2019-02-21)
 
 **Note:** Version bump only for package @neo-one/client-common

@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/editor-server@1.1.0...@neo-one/editor-server@1.1.1) (2019-03-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @types/lru-cache to v5 ([2fc1502](https://github.com/neo-one-suite/neo-one/commit/2fc1502))
+* **website:** large refactor / fixes for website ([b338261](https://github.com/neo-one-suite/neo-one/commit/b338261))
+
+
+
+
+
 # [1.1.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/editor-server@1.0.2...@neo-one/editor-server@1.1.0) (2019-02-21)
 
 **Note:** Version bump only for package @neo-one/editor-server

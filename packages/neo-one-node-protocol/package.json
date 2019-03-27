@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/node-protocol",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "NEO•ONE NEO node and consensus protocol.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-common": "^1.1.0",
+    "@neo-one/client-common": "^1.1.1",
     "@neo-one/monitor": "^1.1.0",
-    "@neo-one/node-consensus": "^1.1.0",
-    "@neo-one/node-core": "^1.1.0",
+    "@neo-one/node-consensus": "^1.1.1",
+    "@neo-one/node-core": "^1.1.1",
     "@neo-one/types": "^1.1.0",
     "@neo-one/utils": "^1.1.0",
     "@types/bloem": "^0.2.0",

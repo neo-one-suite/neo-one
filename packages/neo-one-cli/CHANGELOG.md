@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/cli@1.1.0...@neo-one/cli@1.1.1) (2019-03-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @types/inquirer to ^0.0.44 ([872f99b](https://github.com/neo-one-suite/neo-one/commit/872f99b))
+* **deps:** update dependency @types/inquirer to v6 ([bc4e905](https://github.com/neo-one-suite/neo-one/commit/bc4e905))
+* **deps:** update dependency log-update to v3 ([4fd5c9b](https://github.com/neo-one-suite/neo-one/commit/4fd5c9b))
+
+
+
+
+
 # [1.1.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/cli@1.0.3...@neo-one/cli@1.1.0) (2019-02-21)
 
 **Note:** Version bump only for package @neo-one/cli

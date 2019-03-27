@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@1.1.0...@neo-one/website@1.2.0) (2019-03-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @neo-one/react to v1.1.0 ([6814875](https://github.com/neo-one-suite/neo-one/commit/6814875))
+* **deps:** update dependency @neo-one/react-core to v1.1.0 ([f4e9299](https://github.com/neo-one-suite/neo-one/commit/f4e9299))
+* **deps:** update dependency @render-props/viewport to ^0.3.0 ([618db3c](https://github.com/neo-one-suite/neo-one/commit/618db3c))
+* **deps:** update dependency @types/react to v16.8.5 ([b8eea1e](https://github.com/neo-one-suite/neo-one/commit/b8eea1e))
+* **deps:** update dependency @types/react to v16.8.8 ([966b5c9](https://github.com/neo-one-suite/neo-one/commit/966b5c9))
+* **deps:** update dependency @types/react-dom to v16.8.3 ([16eed02](https://github.com/neo-one-suite/neo-one/commit/16eed02))
+* **deps:** update dependency @types/styled-components to v4.1.11 ([b362856](https://github.com/neo-one-suite/neo-one/commit/b362856))
+* **deps:** update dependency @types/styled-components to v4.1.12 ([6dbde93](https://github.com/neo-one-suite/neo-one/commit/6dbde93))
+* **deps:** update dependency bignumber.js to v8.1.1 ([2d6f93a](https://github.com/neo-one-suite/neo-one/commit/2d6f93a))
+* **deps:** update dependency prismjs to v1.16.0 ([0305bae](https://github.com/neo-one-suite/neo-one/commit/0305bae))
+* **deps:** update dependency react-universal-component to v4 ([161fad9](https://github.com/neo-one-suite/neo-one/commit/161fad9))
+* **deps:** update dependency styled-components to v4.2.0 ([604354c](https://github.com/neo-one-suite/neo-one/commit/604354c))
+* **web:** update some configs for dep upgrades ([712bdd9](https://github.com/neo-one-suite/neo-one/commit/712bdd9))
+* **website:** fix overflow styling ([d721ce9](https://github.com/neo-one-suite/neo-one/commit/d721ce9))
+* **website:** large refactor / fixes for website ([b338261](https://github.com/neo-one-suite/neo-one/commit/b338261))
+
+
+### Features
+
+* **node:** add node Documentation and Heroku Deployment ([da1d295](https://github.com/neo-one-suite/neo-one/commit/da1d295))
+
+
+
+
+
 # [1.1.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@1.0.3...@neo-one/website@1.1.0) (2019-02-21)
 
 **Note:** Version bump only for package @neo-one/website

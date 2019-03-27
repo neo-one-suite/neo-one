@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/react-core@1.1.0...@neo-one/react-core@1.1.1) (2019-03-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @types/react to v16.8.8 ([966b5c9](https://github.com/neo-one-suite/neo-one/commit/966b5c9))
+* **deps:** update dependency @types/styled-components to v4.1.11 ([b362856](https://github.com/neo-one-suite/neo-one/commit/b362856))
+* **deps:** update dependency @types/styled-components to v4.1.12 ([6dbde93](https://github.com/neo-one-suite/neo-one/commit/6dbde93))
+* **deps:** update dependency styled-components to v4.2.0 ([604354c](https://github.com/neo-one-suite/neo-one/commit/604354c))
+* **web:** update some configs for dep upgrades ([712bdd9](https://github.com/neo-one-suite/neo-one/commit/712bdd9))
+
+
+
+
+
 # [1.1.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/react-core@1.0.2...@neo-one/react-core@1.1.0) (2019-02-21)
 
 **Note:** Version bump only for package @neo-one/react-core
