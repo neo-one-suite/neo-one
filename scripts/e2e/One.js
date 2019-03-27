@@ -4,7 +4,7 @@ const execa = require('execa');
 const fs = require('fs-extra');
 const path = require('path');
 const tmp = require('tmp');
-const checkPort = require('../checkPort');
+const checkPort = require('./checkPort');
 class One {
   constructor() {
     this.mutableCleanup = [];
