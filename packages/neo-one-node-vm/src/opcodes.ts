@@ -473,6 +473,31 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
   },
 });
 
+const newArrayOrStruct = ({ name }: { readonly name: 'NEWARRAY' | 'NEWSTRUCT' }) =>
+  createOp({
+    name,
+    in: 1,
+    out: 1,
+    invoke: ({ context, args }) => {
+      let results;
+      if (args[0].isArray()) {
+        const array = args[0].asArray();
+        results = name === 'NEWARRAY' ? [new ArrayStackItem(array)] : [new StructStackItem(array)];
+      } else {
+        const count = vmUtils.toNumber(context, args[0].asBigInteger());
+
+        if (count > MAX_ARRAY_SIZE) {
+          throw new ContainerTooLargeError(context);
+        }
+
+        const fill = _.range(0, count).map(() => new BooleanStackItem(false));
+        results = name === 'NEWARRAY' ? [new ArrayStackItem(fill)] : [new StructStackItem(fill)];
+      }
+
+      return { context, results };
+    },
+  });
+
 const JMP = jump({ name: 'JMP' });
 
 const OPCODE_PAIRS = ([
@@ -1745,44 +1770,8 @@ const OPCODE_PAIRS = ([
         },
       }),
     ],
-    [
-      0xc5,
-      createOp({
-        name: 'NEWARRAY',
-        in: 1,
-        out: 1,
-        invoke: ({ context, args }) => {
-          const count = vmUtils.toNumber(context, args[0].asBigInteger());
-          if (count > MAX_ARRAY_SIZE) {
-            throw new ContainerTooLargeError(context);
-          }
-
-          return {
-            context,
-            results: [new ArrayStackItem(_.range(0, count).map(() => new BooleanStackItem(false)))],
-          };
-        },
-      }),
-    ],
-    [
-      0xc6,
-      createOp({
-        name: 'NEWSTRUCT',
-        in: 1,
-        out: 1,
-        invoke: ({ context, args }) => {
-          const count = vmUtils.toNumber(context, args[0].asBigInteger());
-          if (count > MAX_ARRAY_SIZE) {
-            throw new ContainerTooLargeError(context);
-          }
-
-          return {
-            context,
-            results: [new StructStackItem(_.range(0, count).map(() => new BooleanStackItem(false)))],
-          };
-        },
-      }),
-    ],
+    [0xc5, newArrayOrStruct({ name: 'NEWARRAY' })],
+    [0xc6, newArrayOrStruct({ name: 'NEWSTRUCT' })],
     [
       0xc7,
       createOp({
@@ -1937,39 +1926,6 @@ const OPCODE_PAIRS = ([
           return { context, results: [new ArrayStackItem(newValues)] };
         },
       }),
-    ],
-    [
-      0xce,
-      {
-        type: 'create',
-        create: ({ context: contextIn }) => {
-          const { stack } = contextIn;
-          const top = stack[0] as StackItem | undefined;
-          let _in;
-          if (top === undefined) {
-            // This will cause the op to throw once it's executed.
-            _in = 1;
-          } else {
-            _in = vmUtils.toNumber(contextIn, top.asBigInteger()) + 1;
-
-            if (_in < 0) {
-              throw new InvalidPackCountError(contextIn);
-            }
-          }
-
-          const { op } = createOp({
-            name: 'PACKSTRUCT',
-            in: _in,
-            out: 1,
-            invoke: ({ context, args }) => ({
-              context,
-              results: [new StructStackItem(args.slice(1))],
-            }),
-          });
-
-          return { op, context: contextIn };
-        },
-      },
     ],
     [0xe0, functionCallIsolated({ name: 'CALL_I' })],
     [0xe1, callIsolated({ name: 'CALL_E' })],

@@ -1331,19 +1331,6 @@ const OPCODES = ([
       },
 
       {
-        op: 'PACKSTRUCT',
-        args: [new BN(1), Buffer.alloc(1, 0), Buffer.alloc(1, 1), Buffer.alloc(1, 2)],
-
-        result: [
-          new StructStackItem([new BufferStackItem(Buffer.alloc(1, 0))]),
-          new BufferStackItem(Buffer.alloc(1, 1)),
-          new BufferStackItem(Buffer.alloc(1, 2)),
-        ],
-
-        gas: FEES.ONE,
-      },
-
-      {
         op: 'UNPACK',
         args: [[new BN(4), new BN(5)]],
         result: [new IntegerStackItem(new BN(2)), new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(5))],
@@ -1431,11 +1418,55 @@ const OPCODES = ([
       },
 
       {
+        op: 'NEWARRAY',
+        args: [[new BN(1), new BN(2), new BN(3)]],
+        result: [
+          new ArrayStackItem([
+            new IntegerStackItem(new BN(1)),
+            new IntegerStackItem(new BN(2)),
+            new IntegerStackItem(new BN(3)),
+          ]),
+        ],
+
+        gas: FEES.ONE,
+      },
+
+      {
+        op: 'NEWARRAY',
+        stackItems: [simpleStruct],
+        result: [new ArrayStackItem([new IntegerStackItem(new BN(1))])],
+
+        gas: FEES.ONE,
+      },
+
+      {
         op: 'NEWSTRUCT',
         args: [new BN(3)],
         result: [
           new StructStackItem([new BooleanStackItem(false), new BooleanStackItem(false), new BooleanStackItem(false)]),
         ],
+
+        gas: FEES.ONE,
+      },
+
+      {
+        op: 'NEWSTRUCT',
+        args: [[new BN(1), new BN(2), new BN(3)]],
+        result: [
+          new StructStackItem([
+            new IntegerStackItem(new BN(1)),
+            new IntegerStackItem(new BN(2)),
+            new IntegerStackItem(new BN(3)),
+          ]),
+        ],
+
+        gas: FEES.ONE,
+      },
+
+      {
+        op: 'NEWSTRUCT',
+        stackItems: [simpleStruct],
+        result: [new StructStackItem([new IntegerStackItem(new BN(1))])],
 
         gas: FEES.ONE,
       },
