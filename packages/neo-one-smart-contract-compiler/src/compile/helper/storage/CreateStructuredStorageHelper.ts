@@ -37,7 +37,8 @@ export class CreateStructuredStorageHelper extends StructuredStorageBaseHelper {
     // [3, prefix, size, arr]
     sb.emitPushInt(node, 3);
     // [struct]
-    sb.emitOp(node, 'PACKSTRUCT');
+    sb.emitOp(node, 'PACK');
+    sb.emitOp(node, 'NEWSTRUCT');
     // [val]
     sb.emitHelper(node, options, sb.helpers.wrapVal({ type: this.type }));
   }

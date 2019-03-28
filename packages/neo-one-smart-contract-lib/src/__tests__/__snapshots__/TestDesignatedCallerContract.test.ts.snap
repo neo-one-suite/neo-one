@@ -2,4 +2,4 @@
 
 exports[`TestDesignatedCaller deploy + transfer: deploy consumed 1`] = `"0"`;
 
-exports[`TestDesignatedCaller deploy + transfer: deploy cost 1`] = `"1.503"`;
+exports[`TestDesignatedCaller deploy + transfer: deploy cost 1`] = `"1.51"`;

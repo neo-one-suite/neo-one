@@ -2,4 +2,4 @@
 
 exports[`TestTransferableOwnership deploy + transfer: deploy consumed 1`] = `"0"`;
 
-exports[`TestTransferableOwnership deploy + transfer: deploy cost 1`] = `"1.173"`;
+exports[`TestTransferableOwnership deploy + transfer: deploy cost 1`] = `"1.178"`;
