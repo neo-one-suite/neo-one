@@ -35,7 +35,7 @@
     "app-root-dir": "1.0.2",
     "bignumber.js": "8.1.1",
     "levelup": "4.0.0",
-    "memdown": "3.0.0"
+    "memdown": "4.0.0"
   },
   "sideEffects": false
 }
