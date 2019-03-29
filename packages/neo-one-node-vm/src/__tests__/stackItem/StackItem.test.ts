@@ -69,7 +69,11 @@ describe('Stack Item Tests', () => {
 
     expect(integerItem.toContractParameter()).toMatchSnapshot();
     expect(integerItem.serialize()).toEqual(
-      Buffer.concat([Buffer.from([StackItemType.Integer]), Buffer.from([0x01]), Buffer.from([int])]),
+      Buffer.concat([
+        Buffer.from([StackItemType.Integer]),
+        Buffer.from([0x01]),
+        Buffer.from(utils.toSignedBuffer(int)),
+      ]),
     );
   });
 

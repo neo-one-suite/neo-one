@@ -28,7 +28,7 @@
     "lru-cache": "^5.0.0",
     "rxjs": "^6.4.0",
     "safe-stable-stringify": "^1.1.0",
-    "semver": "^5.6.0",
+    "semver": "^6.0.0",
     "tar": "^4.4.8"
   },
   "sideEffects": false

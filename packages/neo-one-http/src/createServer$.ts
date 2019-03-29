@@ -85,7 +85,10 @@ async function handleServer<T extends http.Server | https.Server, TOptions exten
 const finalizeServer = async (result: HandleServerResult<http.Server | https.Server> | undefined) => {
   if (result !== undefined && result.server !== undefined) {
     const { server } = result;
-    await new Promise<void>((resolve) => server.close(resolve));
+    await new Promise<void>((resolve, reject) => {
+      server.close(reject);
+      resolve();
+    });
   }
 };
 

@@ -97,12 +97,11 @@ export class NodeMonitor extends MonitorBase {
     clearInterval(prom.collectDefaultMetrics());
     await Promise.all([
       super.closeInternal(),
-      new Promise<void>((resolve) => {
-        if (this.mutableServer === undefined) {
-          resolve();
-        } else {
-          this.mutableServer.close(resolve);
+      new Promise<void>((resolve, reject) => {
+        if (this.mutableServer !== undefined) {
+          this.mutableServer.close(reject);
         }
+        resolve();
       }),
     ]);
   }

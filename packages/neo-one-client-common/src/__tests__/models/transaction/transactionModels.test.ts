@@ -88,7 +88,7 @@ describe('Invocation Transaction Model', () => {
 
   test('InvokeModel - Serialize Exclusive Base', () => {
     invokeModel.serializeExclusiveBase(testWriter);
-    expect(testWriter.buffer).toEqual([Buffer.from([gas]), script]);
+    expect(testWriter.buffer).toEqual([Buffer.from([script.length]), script]);
   });
 
   test('InvokeModel v1 - Serialize Exclusive Base', () => {
@@ -133,12 +133,12 @@ describe('Output Model', () => {
 
   const outputModel = new OutputModel(options);
 
-  test('Serialize Wire Base', () => {
+  test.only('Serialize Wire Base', () => {
     outputModel.serializeWireBase(testWriter);
     expect(testWriter.buffer).toEqual([
-      options.asset,
-      Buffer.concat([Buffer.from([options.value]), Buffer.from([...Array(7)].map(() => 0x00))]),
-      options.address,
+      common.uInt256ToBuffer(options.asset),
+      Buffer.from(options.value.toTwos(8 * 8).toArrayLike(Buffer, 'le', 8)),
+      Buffer.from(options.address),
     ]);
   });
 

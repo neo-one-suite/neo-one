@@ -147,7 +147,7 @@
     "@babel/preset-env": "7.4.2",
     "@babel/preset-react": "7.0.0",
     "@cypress/webpack-preprocessor": "4.0.3",
-    "@reactivex/ix-esnext-esm": "2.5.2",
+    "@reactivex/ix-esnext-esm": "2.5.3",
     "@types/autoprefixer": "9.4.0",
     "@types/cssnano": "4.0.0",
     "@types/jest": "24.0.11",
@@ -257,7 +257,7 @@
     "yargs": "13.2.2"
   },
   "resolutions": {
-    "@reactivex/ix-es2015-cjs": "2.5.1",
+    "@reactivex/ix-es2015-cjs": "2.5.3",
     "react-dom": "16.8.5",
     "react": "16.8.5",
     "ajv": "6.8.1",
