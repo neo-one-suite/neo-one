@@ -73,9 +73,10 @@ export class CreateWalletCRUD extends CreateCRUD<Wallet, WalletResourceOptions> 
           encryptedKey: wif,
           password,
         });
-      } else if (network === networkConstants.NETWORK_NAME.MAIN) {
-        throw new Error('Invalid private key. Please provide a private key or ' + 'NEP2 encrypted key.');
       } else {
+        if (network === networkConstants.NETWORK_NAME.MAIN) {
+          throw new Error('Invalid private key. Please provide a private key or ' + 'NEP2 encrypted key.');
+        }
         throw new Error(
           'Invalid private key. Please provide a valid private key or ' +
             'NEP2 encrypted key, or do not provide one at all and one will ' +

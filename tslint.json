@@ -40,6 +40,7 @@
     "no-parameter-properties": false,
     "prefer-function-over-method": false,
     "file-name-casing": false,
+    "static-this": false,
 
     "trailing-comma": [
       true,
@@ -123,7 +124,7 @@
     "export-name": true,
     "no-control-regex": true,
     "no-empty-line-after-opening-brace": true,
-    "no-increment-decrement": true,
+    "increment-decrement": true,
     "no-invalid-regexp": true,
     "no-regex-spaces": true,
     "no-single-line-block-comment": false,

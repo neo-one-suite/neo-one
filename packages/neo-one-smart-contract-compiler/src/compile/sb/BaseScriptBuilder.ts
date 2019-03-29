@@ -342,13 +342,16 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         this.emitJump(node, code, tags);
       } else if (code instanceof Jmp) {
         this.emitJump(node, code.plus(pc), tags);
-      } else if (code instanceof Jump) {
-        /* istanbul ignore next */
-        throw new Error('Something went wrong.');
-      } else if (code instanceof Line) {
-        this.emitLineRaw(node, code, tags);
       } else {
-        this.emitRaw(node, code, tags);
+        if (code instanceof Jump) {
+          /* istanbul ignore next */
+          throw new Error('Something went wrong.');
+        }
+        if (code instanceof Line) {
+          this.emitLineRaw(node, code, tags);
+        } else {
+          this.emitRaw(node, code, tags);
+        }
       }
     });
   }
