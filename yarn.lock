@@ -11451,9 +11451,10 @@ levelup@3.0.1:
     level-iterator-stream "~2.0.0"
     xtend "~4.0.0"
 
-levelup@4.0.0, levelup@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/levelup/-/levelup-4.0.0.tgz#87aa76d7ff2e4da641b3e90ef274061201adf3fa"
+levelup@4.0.1, levelup@^4.0.0:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/levelup/-/levelup-4.0.1.tgz#26321eb33ec1ddac1f29b1ac82f8b693e2cbf182"
+  integrity sha512-l7KXOkINXHgNqmz0v9bxvRnMCUG4gmShFrzFSZXXhcqFnfvKAW8NerVsTICpZtVhGOMAmhY6JsVoVh/tUPBmdg==
   dependencies:
     deferred-leveldown "~5.0.0"
     level-errors "~2.0.0"
