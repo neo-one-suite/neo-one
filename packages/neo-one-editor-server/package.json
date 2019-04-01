@@ -15,7 +15,7 @@
     "@types/koa-router": "^7.0.39",
     "@types/lodash": "^4.14.120",
     "@types/lru-cache": "^5.0.0",
-    "@types/semver": "^5.5.0",
+    "@types/semver": "^6.0.0",
     "@types/tar": "^4.0.0",
     "cross-fetch": "^3.0.1",
     "detective": "^5.2.0",
