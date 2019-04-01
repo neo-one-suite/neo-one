@@ -41,6 +41,7 @@
     "prefer-function-over-method": false,
     "file-name-casing": false,
     "static-this": false,
+    "no-null-undefined-union": false,
 
     "trailing-comma": [
       true,
