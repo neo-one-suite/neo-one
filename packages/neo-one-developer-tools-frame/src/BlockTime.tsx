@@ -109,14 +109,14 @@ interface TimeOptions {
 
 const createTime$ = ({ addError, block$ }: TimeOptions) =>
   concat(
-    _of(new Date().valueOf()),
+    _of(Date.now()),
     block$.pipe(
       map(({ block }) => block.time * 1000),
       distinctUntilChanged<number>(),
       catchError((error) => {
         addError(error);
 
-        return _of(new Date().valueOf());
+        return _of(Date.now());
       }),
     ),
   );
@@ -131,7 +131,7 @@ export function BlockTime() {
   const addError = useAddError();
   const { block$, developerClient } = useNetworkClients();
   const time = useStream(() => createTime$({ block$, addError }), [block$, addError]);
-  const minTime = useStream(() => createMinTime$({ block$, addError }), [block$, addError]);
+  const minTime = useStream(() => createMinTime$({ block$, addError }), [block$, addError], time);
   const [date, setDate] = useState(new Date(minTime));
 
   return (
@@ -172,7 +172,7 @@ export function BlockTime() {
           help="Fast Forward..."
           onClick={overlay.show}
         >
-          <TimeAgo time={time} />}
+          <TimeAgo time={time} />
           <MdFastForward />
         </ToolbarButton>
       )}
