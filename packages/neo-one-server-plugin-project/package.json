@@ -36,9 +36,9 @@
     "@neo-one/server-plugin-wallet": "^1.1.1",
     "@neo-one/smart-contract": "^1.1.0",
     "@neo-one/smart-contract-test": "1.0.0-alpha.44",
-    "@types/react": "16.8.10",
+    "@types/react": "16.8.11",
     "bignumber.js": "8.1.1",
-    "react": "16.8.5"
+    "react": "16.8.6"
   },
   "sideEffects": false
 }
