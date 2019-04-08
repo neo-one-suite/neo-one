@@ -9,13 +9,20 @@ import {
   SerializableValueArray,
   SmartContract,
 } from '@neo-one/smart-contract';
-import { NEP5Token } from './';
+import { NEP5Token } from '.';
+import { config } from 'rxjs';
+
+
+
+/*
+   NOTICE: BETA RELEASE
+   Preferred implementation will available when
+   higher order type inference in TS 3.4.1 is
+   supported by linters and tool-chain tested
+*/
 
 /* tslint:disable-next-line: no-let*/
 let mutableConfig = {};
-
-// ACCOUNTING: Tracking the Token Balances
-type BalanceStore = MapStorage<Address, Fixed<8>>;
 
 /*
 This implementation throws a TS2322 on the forEach() line...
@@ -24,6 +31,21 @@ This implementation throws a TS2322 on the forEach() line...
 */
 /* tslint:disable-next-line:readonly-array*/
 type CommonArgs = SerializableValue[];
+
+
+/* Wallet */
+
+function wallet(address: Address){
+  return {
+    receive: (amount){
+
+    },
+    transfer: (amount){
+      /* overload with transfer logic */
+    }
+  }
+}
+
 
 interface EventRegister {
   /*tslint:disable-next-line:readonly-array */
@@ -97,6 +119,7 @@ function registerListener<
   });
 }
 
+
 /*
   BEGIN EVENT REGISTER EXAMPLE
   ------------------------------------- */
@@ -116,6 +139,125 @@ END EVENT REGISTER EXAMPLE
 */
 
 const notify_of_error = createEventNotifier("Foobar'd");
+
+
+
+/* ====================================================
+   ====================================================
+              FEATURE: Escrow handler
+   ====================================================
+   ==================================================== */
+
+const ownership_transferred = createEventNotifier<Address, Address>("ownership transferred", "from", "to");
+
+abstract class OwnableContract extends SmartContract{
+  protected mutableOwner: Address = Address.from("none");
+
+  public get owner(): Address {
+      return this.mutableOwner;
+  }
+  public renounceOwnership(){
+    this.onlyOwner();
+    ownership_transferred(this.mutableOwner, Address.from("0"));
+  }
+  public transferOwnership(account: Address){
+    this._transferOwnership(account);
+  }
+  public isOwner(account:Address){
+    return this.owner===account;
+  }
+  protected initialOwner(owner:Address){
+    if(this.mutableOwner===Address.from("none")){
+      this.mutableOwner = owner;
+
+      return true;
+    }
+    throw new Error("invalid request");
+  }
+  protected onlyOwner(){
+    if(!Address.isCaller(this.mutableOwner)){
+      throw new Error("Not owner");
+    }
+  }
+  protected _transferOwnership(account: Address){
+    this.onlyOwner();
+    ownership_transferred(this.mutableOwner, account);
+    this.mutableOwner = account;
+  }
+}
+
+/* ====================================================
+   ====================================================
+              FEATURE: SecondaryContract
+   ====================================================
+   ==================================================== */
+
+const PrimaryTransferred = createEventNotifier("primary transferred","from","recipient");
+
+abstract class SecondaryContract extends SmartContract{
+  /* tslint:disable-next-line:prefer-readonly*/
+  private mutablePrimary: Address = this.initialPrimary();;
+
+  public get primary(){
+    return this.mutablePrimary;
+  }
+
+  public onlyPrimary(){
+    if(!Address.isCaller(this.mutablePrimary)){
+      throw new Error("not primary");
+    }
+  }
+  protected initialPrimary(): Address{
+    throw new Error("override this and set an initial ");
+  }
+}
+
+
+/* ====================================================
+   ====================================================
+              FEATURE: Escrow handler
+   ====================================================
+   ==================================================== */
+const escrow_deposit  = createEventNotifier<Address, Fixed<8>>("deposited", "payee","amount");
+const escrow_withdraw = createEventNotifier<Address, Fixed<8>>("deposited", "payee","amount");
+
+export abstract class Escrow extends SecondaryContract {
+  private readonly _deposits = MapStorage.for<Address, Fixed<8>>();
+
+  public depositsOf(payee: Address){
+    return this._deposits.has(payee) ? this._deposits.get(payee) : 0;
+  }
+
+  /**
+   * @dev Stores the sent amount as credit to be withdrawn.
+   * @param payee The destination address of the funds.
+   */
+  public deposit(payee: Address, amount: Fixed<8>) {
+      this.onlyPrimary();
+      this._deposits.set(payee, this.depositsOf(payee) + amount);
+      escrow_deposit(payee, amount);
+  }
+
+  /**
+   * @dev Withdraw accumulated balance for a payee.
+   * @param payee The address whose funds will be withdrawn and transferred to.
+   */
+  public withdraw(payee: Address) {
+    this.onlyPrimary();
+    const payment = this.depositsOf(payee);
+    this._deposits.set(payee, 0);
+
+    // payee.transfer(payment);
+
+    emit Withdrawn(payee, payment);
+  }
+
+}
+
+
+
+
+
 
 /* ====================================================
    ====================================================
@@ -434,7 +576,7 @@ const tokens_purchased = createEventNotifier<Address, Address, Fixed<8>, Fixed<8
   'qty tokens',
 );
 
-class CrowdsaleContract extends SmartContract {
+class CrowdsaleContract extends  Crowdsale<>(SmartContract){
   private readonly _token: Address;
   private readonly _rate: Fixed<8>;
   private readonly _owner: Address;
@@ -472,12 +614,12 @@ class CrowdsaleContract extends SmartContract {
     const tokens = this._getTokenAmount(amount);
     tokens_purchased(purchaser, beneficiary, amount, tokens);
     this._updatePurchasingState(purchaser, beneficiary, amount);
-    this._forwardFunds();
+    this._forwardFunds(amount, beneficiary);
     this._postValidatePurchase(purchaser, beneficiary, amount);
   }
   protected _preValidatePurchase(purchaser: Address, beneficiary: Address, amount: Fixed<8>) {}
   protected _updatePurchasingState(purchaser: Address, beneficiary: Address, amount: Fixed<8>) {}
-  protected _forwardFunds() {}
+  protected _forwardFunds(amount: Fixed<8>, account: Address) {}
   protected _postValidatePurchase(purchaser: Address, beneficiary: Address, amount: Fixed<8>) {}
   protected _getTokenAmount(amount) {
     return amount * this.rate;
@@ -596,7 +738,7 @@ interface TimedCrowdsaleConfigEntry {
   readonly timed: TimedCrowdsaleArgs;
 }
 
-export class TimedCrowdsale extends CrowdsaleContract {
+export abstract class TimedCrowdsale extends CrowdsaleContract {
   protected abstract readonly _openingTime: Fixed<8>;
   protected abstract mutableClosingTime: Fixed<8>;
 
@@ -649,7 +791,16 @@ export class TimedCrowdsale extends CrowdsaleContract {
 }
 
 // example Timed
-const myTimedCrowdSale = new TimedCrowdsale(Address.from('ABCDEFG'), 3, Address.from('Wallet'), Address.from('owner'));
+class MyTimedCrowdsale extends TimedCrowdsale {
+  protected readonly _openingTime: Fixed<8> = 600000;
+  protected mutableClosingTime: Fixed<8> = 120000;
+}
+const myTimedCrowdSale = new MyTimedCrowdsale(
+  Address.from('ABCDEFG'),
+  3,
+  Address.from('Wallet'),
+  Address.from('owner'),
+);
 
 /* ====================================================
    ====================================================
@@ -678,11 +829,6 @@ export abstract class PausableCrowdsale extends TimedCrowdsale {
     onlySigners(this.pausers, requestedBy);
     pauser_revoked(account, requestedBy);
   }
-  protected whenNotPaused() {
-    if (this.mutablePaused) {
-      throw new Error(' not paused ');
-    }
-  }
   public pause(requestedBy: Address) {
     onlyPausers(this.pausers, requestedBy);
     notify_paused(requestedBy);
@@ -700,6 +846,11 @@ export abstract class PausableCrowdsale extends TimedCrowdsale {
     this.whenNotPaused();
 
     return super._preValidatePurchase(purchaser, beneficiary, amount);
+  }
+  protected whenNotPaused() {
+    if (this.mutablePaused) {
+      throw new Error(' not paused ');
+    }
   }
 }
 
@@ -802,6 +953,10 @@ export abstract class FinalizableCrowdsale extends TimedCrowdsale {
   }
 }
 
+
+// ACCOUNTING: Tracking the Token Balances
+type BalanceStore = MapStorage<Address, Fixed<8>>;
+
 export abstract class TimedCrowdsaleWithBalances extends TimedCrowdsale {
   protected readonly _balances = MapStorage.for<Address, Fixed<8>>();
 
@@ -813,12 +968,129 @@ export abstract class TimedCrowdsaleWithBalances extends TimedCrowdsale {
     return this._balances.has(account) ? this._balances.get(account) : 0;
   }
 }
+
+/* ====================================================
+   ====================================================
+              FEATURE: RefundableCrowdsale
+   ====================================================
+   ==================================================== */
+
+// NEEDS  " WALLET "
+export abstract class RefundableCrowdsale extends FinalizableCrowdsale {
+  protected readonly _balances = MapStorage.for<Address, Fixed<8>>();
+  protected _escrow: Address;
+  protected _goal: Fixed<8>;
+
+  public goalReached() {
+    return this.neoRaised >= this._goal;
+  }
+  protected claimRefund(account: Address){
+
+  }
+  protected _updatePurchasingState(purchaser: Address, account: Address, amount: Fixed<8>) {
+    this._balances.set(account, this.balanceOf(account) + amount);
+    super._updatePurchasingState(purchaser, account, amount);
+  }
+  protected balanceOf(account: Address) {
+    return this._balances.has(account) ? this._balances.get(account) : 0;
+  }
+  protected _forwardFunds(amount: Fixed<8>, account: Address) {
+    // _escrow.deposit.value(amount)(account);
+  }
+  protected _finalization() {
+    if (this.goalReached()) {
+      // escrow.close();
+      // escrow.beneficiaryWithdraw();
+    } else {
+      // escrow.enableRefunds();
+    }
+    super._finalization();
+  }
+}
+
+
+const OwnershipTransferred = createEventNotifier<Address, Address>("ownership transfered", "previousOwner", "newOwner");
+
+abstract class Ownable extends CrowdsaleContract {
+    protected mutableOwner: Address;
+
+    /**
+     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
+     * account.
+     */
+    constructor ({owner, ...remaining}){
+      super({})
+        this.mutableOwner = owner;
+    }
+
+    /**
+     * @return the address of the owner.
+     */
+    public owner(): Address {
+        return this.mutableOwner;
+    }
+
+    fpublic isOwner(account: Address){
+
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner(account: Address) {
+      if(Address.isCaller(this) !this.isOwner(account)){
+        throw new Error(" not owner ");
+      }
+    }
+
+    /**
+     * @return true if `msg.sender` is the owner of the contract.
+     */
+    function isOwner() public view returns (bool) {
+        return msg.sender == this.mutableOwner;
+    }
+
+    /**
+     * @dev Allows the current owner to relinquish control of the contract.
+     * It will not be possible to call the functions with the `onlyOwner`
+     * modifier anymore.
+     * @notice Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public onlyOwner {
+        emit OwnershipTransferred(this.mutableOwner, address(0));
+        this.mutableOwner = address(0);
+    }
+
+    /**
+     * @dev Allows the current owner to transfer control of the contract to a newOwner.
+     * @param newOwner The address to transfer ownership to.
+     */
+    function transferOwnership(address newOwner) public onlyOwner {
+        _transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Transfers control of the contract to a newOwner.
+     * @param newOwner The address to transfer ownership to.
+     */
+    function _transferOwnership(address newOwner) internal {
+        require(newOwner != address(0));
+        emit OwnershipTransferred(this.mutableOwner, newOwner);
+        this.mutableOwner = newOwner;
+    }
+}
+
+
+
+
+
 /* ====================================================
    ====================================================
               FEATURE: PostDeliveryCrowdsale
    ====================================================
    ==================================================== */
-const delivered_tokens = createEventNotifier<Address, Fixed<8>>('Delievered Tokens', 'to', 'amout');
+const delivered_tokens = createEventNotifier<Address, Fixed<8>>('Delievered Tokens', 'to', 'amount');
 export abstract class PostDeliveryCrowdsale extends TimedCrowdsaleWithBalances {
   public withdrawTokens(account: Address) {
     this.onlyIfClosed();
@@ -827,7 +1099,8 @@ export abstract class PostDeliveryCrowdsale extends TimedCrowdsaleWithBalances {
       throw new Error('insufficent funds');
     }
     this._balances.set(account, 0);
-    //_deliverTokens(beneficiary, amount);
+
+    // _deliverTokens(beneficiary, amount);
   }
 }
 
@@ -845,6 +1118,7 @@ interface SnapshotStore {
   readonly _accountSnapshots: SnapShotBalanceStore;
   readonly mutableTotalSupplySnapshots: SnapshotTotalSupplyStore;
 }
+
 
 export abstract class WithSnapshots extends TimedCrowdsaleWithBalances {
   private readonly _accountSnapshots = MapStorage.for<Address, SerializableValueArray<Fixed<8>>>();
@@ -867,10 +1141,6 @@ export abstract class WithSnapshots extends TimedCrowdsaleWithBalances {
   }
 
   protected takeSnapshot(
-    totalSupply: Fixed<0>,
-    balanceStore: BalanceStore,
-    balanceHistory: SnapShotBalanceStore,
-    totalSupplySnaps: SnapShotBalanceStore,
     account: Address,
   ) {
     if (Address.isCaller(account)) {
@@ -892,9 +1162,9 @@ export abstract class WithSnapshots extends TimedCrowdsaleWithBalances {
 
 /** TEST  */
 class SampleCrowdsaleToken extends NEP5Token(SmartContract) {
-  public name: 'Sample Token';
-  public symbol: 'SXT';
-  public decimals: 8;
+  public readonly name: 'Sample Token';
+  public readonly symbol: 'SXT';
+  public readonly decimals: 8;
 }
 
 /* CROWDSALE */
