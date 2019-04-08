@@ -776,7 +776,7 @@ export interface BlockConstructor {
 export type SerializableKeySingle = number | string | boolean | Buffer;
 type SK = SerializableKeySingle;
 export type SerializableKey = SK | [SK, SK] | [SK, SK, SK] | [SK, SK, SK, SK];
-export interface SerializableValueArray extends ReadonlyArray<SerializableValue> {}
+export interface SerializableValueArray<T extends SerializableValue> extends ReadonlyArray<T> {}
 export interface SerializableValueMap extends ReadonlyMap<SerializableKeySingle, SerializableValue> {}
 export interface SerializableValueSet extends ReadonlySet<SerializableValue> {}
 export interface SerializableValueObject {
@@ -787,6 +787,7 @@ export interface SerializableValueObject {
  *
  * See the [Properties and Storage](https://neo-one.io/docs/properties-and-storage) chapter of the main guide for more information.
  */
+export type SerializableIndexes = number | string;
 export type SerializableValue =
   | undefined
   | null
@@ -794,7 +795,7 @@ export type SerializableValue =
   | string
   | boolean
   | Buffer
-  | SerializableValueArray
+  | SerializableValueArray<SerializableIndexes>
   | SerializableValueMap
   | SerializableValueSet
   | SerializableValueObject;
