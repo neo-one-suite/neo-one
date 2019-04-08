@@ -23,7 +23,6 @@ const Content = styled(Box)`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.subheading')};
   color: ${prop('theme.black')};
-  display: grid;
   margin: 0;
   gap: 16;
 `;
@@ -31,7 +30,6 @@ const Content = styled(Box)`
 const AssetItem = styled(Box)`
   grid-area: asset;
   display: grid;
-  grid-area: asset;
   min-width: 0;
   min-height: 0;
 `;

@@ -1,16 +1,16 @@
-import { Box, Link } from '@neo-one/react-common';
+import { Box, styledOmitProps } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 import { AdjacentInfo } from '../../types';
-import { RouterLink } from '../RouterLink';
+import { StyledRouterLink } from '../StyledRouterLink';
 
 export interface Props {
   readonly adjacent: AdjacentInfo;
   readonly next?: boolean;
 }
 
-const ArticleText = styled(Box)<{ readonly next: boolean }>`
+const ArticleText = styledOmitProps<{ readonly next: boolean }>(Box, ['next'])`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.caption')};
   color: ${prop('theme.gray0')};
@@ -18,7 +18,7 @@ const ArticleText = styled(Box)<{ readonly next: boolean }>`
   padding-bottom: 8px;
 `;
 
-const StyledLink = styled(Link.withComponent(RouterLink))`
+const StyledLink = styled(StyledRouterLink)`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.display1')};
 

@@ -1,11 +1,11 @@
 // tslint:disable no-null-keyword
-import { Link as ReactLink } from '@neo-one/react-common';
+import { styledOmitProps } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
-import { RouterLink } from '../RouterLink';
+import { StyledRouterLink } from '../StyledRouterLink';
 
-const Link = styled(ReactLink.withComponent(RouterLink))<{ readonly active: boolean }>`
+const Link = styledOmitProps<{ readonly active: boolean }>(StyledRouterLink, ['active'])`
   ${ifProp('active', prop('theme.fonts.axiformaBold'), prop('theme.fonts.axiformaRegular'))};
   ${prop('theme.fontStyles.subheading')};
 
@@ -21,6 +21,7 @@ const Link = styled(ReactLink.withComponent(RouterLink))<{ readonly active: bool
     color: ${prop('theme.accent')};
   }
 `;
+
 const ActiveBorder = styled.span`
   width: 4px;
   height: 24px;

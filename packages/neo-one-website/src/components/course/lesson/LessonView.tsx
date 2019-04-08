@@ -60,9 +60,7 @@ const Text = styled(Box)`
 
 export const LessonView = ({ selected }: Props) => (
   <Wrapper>
-    <Helmet>
-      <title>{`Lesson ${selected.lesson + 1}: ${selectLesson(selected).title} - NEO•ONE`}</title>
-    </Helmet>
+    <Helmet title={`Lesson ${selected.lesson + 1}: ${selectLesson(selected).title} - NEO•ONE`} />
     <BoxWrapper>
       <InnerWrapper>
         <Markdown source={selectLesson(selected).documentation} openAllLinksInNewTab />

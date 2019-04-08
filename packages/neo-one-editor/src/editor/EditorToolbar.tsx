@@ -1,5 +1,5 @@
 // tslint:disable no-any
-import { Box, Hidden } from '@neo-one/react-common';
+import { Box, DispatchWrapper, Hidden } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
@@ -8,7 +8,7 @@ import { selectConsoleOpen } from './redux';
 import { BuildAction, Console, Feedback, FileType, Help, Problems, RunTestsAction } from './toolbar';
 import { EditorFile, TextRange } from './types';
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(DispatchWrapper)`
   display: grid;
   flex: 0 0 auto;
   width: 100%;

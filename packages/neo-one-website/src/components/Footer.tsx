@@ -3,7 +3,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { LayoutWrapper } from './common';
-import { RouterLink } from './RouterLink';
+import { StyledRouterLink } from './StyledRouterLink';
 
 const LinkSectionTitle = styled(Box)`
   ${prop('theme.fonts.axiformaBold')};
@@ -11,9 +11,11 @@ const LinkSectionTitle = styled(Box)`
   color: ${prop('theme.gray2')};
 `;
 
-const NavLink = Link.withComponent(RouterLink);
+// tslint:disable-next-line:no-any
+const NavLink: any = Link.withComponent(StyledRouterLink);
 
-const ExternalLink = Link;
+// tslint:disable-next-line:no-any
+const ExternalLink: any = Link;
 
 const LinkSectionWrapper = styled(Box)`
   display: grid;

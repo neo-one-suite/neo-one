@@ -133,11 +133,11 @@ const StyledMarkdown = styled(Markdown)`
     }
   }
 
-  &&&& p img {
+  &&&& img {
     max-width: 100%;
   }
 
-  &&&& img {
+  &&&& p img {
     max-width: 100%;
   }
 `;

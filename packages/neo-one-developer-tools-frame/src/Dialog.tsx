@@ -66,7 +66,7 @@ export function Dialog({
   title,
 }: Props) {
   const resizeHandler = useContext(ResizeHandlerContext);
-  const [visible, showIn, hideIn, toggleIn] = useHidden(false);
+  const [visible, showIn, hideIn, toggleIn] = useHidden();
   const show = useCallback(() => {
     resizeHandler.maximize({ type: 'max', id: 'dialog' });
     showIn();

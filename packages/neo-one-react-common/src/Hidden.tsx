@@ -1,7 +1,7 @@
 // tslint:disable no-null-keyword no-object-mutation
-import { Box, callAll } from '@neo-one/react-core';
+import { Box, callAll, styledOmitProps } from '@neo-one/react-core';
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import { css } from 'styled-components';
 import { ifProp, prop, theme } from 'styled-tools';
 import {
   excludeTransition,
@@ -140,11 +140,39 @@ const HiddenComponent = forwardRef<HTMLDivElement, HiddenProps & React.Component
   },
 );
 
-export const Hidden = styled(HiddenComponent)<{
+interface HiddenStyledProps {
   readonly duration?: string;
   readonly timing?: string;
   readonly delay?: string;
-}>`
+  readonly translateX?: string | number;
+  readonly translateY?: string | number;
+  readonly originX?: string | number;
+  readonly originY?: string | number;
+  // tslint:disable-next-line:no-any
+  readonly defaultSlide: any;
+  // tslint:disable-next-line:no-any
+  readonly defaultExpand: any;
+  readonly slideOffset?: string | number;
+}
+
+const hiddenTheme = theme('Hidden');
+
+export const Hidden = styledOmitProps<HiddenStyledProps>(
+  HiddenComponent,
+  [
+    'duration',
+    'timing',
+    'delay',
+    'translateX',
+    'translateY',
+    'originX',
+    'originY',
+    'defaultSlide',
+    'defaultExpand',
+    'slideOffset',
+  ],
+  hiddenTheme,
+)`
   transform: ${translateWithProps};
   ${ifProp(
     hasTransition,
@@ -166,7 +194,7 @@ export const Hidden = styled(HiddenComponent)<{
       'display: none !important',
     )};
   }
-  ${theme('Hidden')};
+  ${hiddenTheme};
 `;
 
 Hidden.defaultProps = {

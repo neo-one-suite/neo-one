@@ -1,9 +1,9 @@
-import { Box, Link, List } from '@neo-one/react-common';
+import { Box, List } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Author } from '../content';
-import { RouterLink } from '../RouterLink';
+import { StyledRouterLink } from '../StyledRouterLink';
 
 interface Props {
   readonly title: string;
@@ -12,7 +12,8 @@ interface Props {
   readonly author: Author;
 }
 
-const StyledLink = styled(Link.withComponent(RouterLink))`
+// tslint:disable-next-line:no-any
+const StyledLink: any = styled(StyledRouterLink)`
   ${prop('theme.fontStyles.headline')};
 `;
 

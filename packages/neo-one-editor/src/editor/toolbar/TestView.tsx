@@ -1,4 +1,4 @@
-import { Box } from '@neo-one/react-common';
+import { DispatchWrapper } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
@@ -7,7 +7,7 @@ import { EditorState, selectConsoleSelectedTestSuite, selectConsoleTestSuites } 
 import { TestDetail } from './TestDetail';
 import { TestSummary } from './TestSummary';
 
-const StyledGrid = styled(Box)`
+const StyledGrid = styled(DispatchWrapper)`
   display: grid;
   grid:
     'summary detail' auto

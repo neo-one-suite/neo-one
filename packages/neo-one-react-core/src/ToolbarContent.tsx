@@ -1,12 +1,14 @@
-import styled from 'styled-components';
 import { prop, theme } from 'styled-tools';
 import { Box } from './Box';
+import { styledOmitProps } from './utils';
 
 export interface ToolbarContentProps {
   readonly align?: 'start' | 'center' | 'end';
 }
 
-export const ToolbarContent = styled(Box)<ToolbarContentProps>`
+const toolbarContentTheme = theme('ToolbarContent');
+
+export const ToolbarContent = styledOmitProps<ToolbarContentProps>(Box, ['align'], toolbarContentTheme)`
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: min-content;
@@ -20,7 +22,7 @@ export const ToolbarContent = styled(Box)<ToolbarContentProps>`
     justify-content: initial;
     align-content: ${prop('align')};
   }
-  ${theme('ToolbarContent')};
+  ${toolbarContentTheme};
 `;
 
 // tslint:disable-next-line:no-object-mutation

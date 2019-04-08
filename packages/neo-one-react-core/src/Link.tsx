@@ -1,8 +1,8 @@
-import styled from 'styled-components';
 import { prop, switchProp } from 'styled-tools';
 import { LinkBase } from './LinkBase';
+import { styledOmitProps } from './utils';
 
-export const Link = styled(LinkBase)<{ readonly linkColor: 'primary' | 'gray' | 'accent' | 'light' }>`
+export const Link = styledOmitProps<{ readonly linkColor: string }>(LinkBase, ['linkColor'])`
   color: ${switchProp('linkColor', {
     primary: prop('theme.primary'),
     accent: prop('theme.accent'),

@@ -36,6 +36,7 @@ const fadeSlideIn = keyframes`
     transform: translateY(40px);
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -45,6 +46,7 @@ const fadeSlideOut = keyframes`
   0% {
     opacity: 1;
   }
+
   100% {
     transform: translateY(40px);
     opacity: 0;
@@ -54,15 +56,17 @@ const fadeSlideOut = keyframes`
 const StyledHidden = styled(Hidden)`
   position: fixed;
   top: 0;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
+  bottom: 0;
+  left: 0;
+  right: 0;
   z-index: 2;
   height: 100vh;
   overflow-y: auto;
+
   &[aria-hidden='false'] {
     animation: ${fadeSlideIn} 500ms;
   }
+
   &[aria-hidden='true'] {
     animation: ${fadeSlideOut} 500ms;
   }

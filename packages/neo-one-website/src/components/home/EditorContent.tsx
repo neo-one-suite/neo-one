@@ -1,8 +1,8 @@
-import { Box, H2, Link } from '@neo-one/react-common';
+import { Box, H2 } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
 import { prop } from 'styled-tools';
-import { RouterLink } from '../RouterLink';
+import { StyledRouterLink } from '../StyledRouterLink';
 import { ContentWrapperBase } from './ContentWrapperBase';
 import { UniversalHomeEditor } from './UniversalHomeEditor';
 
@@ -56,7 +56,7 @@ const Wrapper = styled(Box)`
   }
 `;
 
-const StyledLink = Link.withComponent(RouterLink);
+const StyledLink = StyledRouterLink;
 
 export const EditorContent = () => (
   <Wrapper>

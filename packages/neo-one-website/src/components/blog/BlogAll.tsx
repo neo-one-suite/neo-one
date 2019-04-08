@@ -88,7 +88,7 @@ export const BlogAll = ({ posts, ...props }: BlogAllProps) => (
 
         <PostsGrid>
           {posts.map((post) => (
-            <PostLink path={post.slug} title={post.title} author={post.author} date={post.date} />
+            <PostLink key={post.slug} path={post.slug} title={post.title} author={post.author} date={post.date} />
           ))}
         </PostsGrid>
       </Box>
