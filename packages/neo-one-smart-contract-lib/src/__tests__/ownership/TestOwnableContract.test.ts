@@ -31,7 +31,7 @@ describe('Ownable', () => {
 
         expect(deployReceipt.result.gasConsumed.toString()).toMatchSnapshot('deploy consumed');
         expect(deployReceipt.result.gasCost.toString()).toMatchSnapshot('deploy cost');
-        expect(deployReceipt.result.value).toBeTruthy();
+        expect(deployReceipt.result.value).toEqual(true);
 
         const [initialOwner, recipient] = await Promise.all([
           smartContract.owner.confirmed(),
