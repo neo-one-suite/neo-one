@@ -18,7 +18,7 @@ import {
   translateWithProps,
 } from './transition';
 
-const { forwardRef, useCallback, useEffect, useRef, useState } = React;
+const { forwardRef, useCallback, useEffect, useRef, useState, useReducer } = React;
 
 export interface UseHiddenProps {
   readonly visible: boolean;
@@ -27,13 +27,43 @@ export interface UseHiddenProps {
   readonly toggle: () => void;
 }
 
-export const useHidden = (propVisible = false): [boolean, () => void, () => void, () => void] => {
-  const [visible, setVisible] = useState(propVisible);
-  const show = useCallback(() => setVisible(true), [setVisible]);
-  const hide = useCallback(() => setVisible(false), [setVisible]);
-  const toggle = useCallback(() => setVisible(!visible), [setVisible, visible]);
+export interface UseHiddenProps {
+  readonly visible: boolean;
+  readonly show: () => void;
+  readonly hide: () => void;
+  readonly toggle: () => void;
+}
 
-  return [visible, show, hide, toggle];
+interface HiddenAction {
+  readonly type: string;
+}
+
+interface HiddenState {
+  readonly visible: boolean;
+}
+
+const hiddenReducer = (state: HiddenState, action: HiddenAction) => {
+  switch (action.type) {
+    case 'show':
+      return { visible: true };
+    case 'hide':
+      return { visible: false };
+    case 'toggle':
+      return { visible: !state.visible };
+    default:
+      throw new Error();
+  }
+};
+
+export const useHidden = (propVisible = false) => {
+  const [state, dispatch] = useReducer(hiddenReducer, { visible: propVisible });
+
+  return {
+    ...state,
+    show: () => dispatch({ type: 'show' }),
+    hide: () => dispatch({ type: 'hide' }),
+    toggle: () => dispatch({ type: 'toggle' }),
+  };
 };
 
 export interface HiddenProps extends TransitionProps, OriginProps, TranslateProps, ExpandProps, SlideProps {

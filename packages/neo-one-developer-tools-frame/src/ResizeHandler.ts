@@ -67,7 +67,7 @@ export class ResizeHandler {
       this.mutableResizeTimeout = undefined;
       this.resize();
       // tslint:disable-next-line no-any
-    }, 1500) as any;
+    }, 500) as any;
   };
 
   private readonly resize = () => {

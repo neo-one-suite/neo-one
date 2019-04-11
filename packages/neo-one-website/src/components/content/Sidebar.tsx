@@ -128,8 +128,7 @@ interface Props {
 }
 
 export const Sidebar = ({ current, alwaysVisible, sections, ...props }: Props) => {
-  // tslint:disable-next-line:no-unused
-  const [visible, show, hide, toggle] = useHidden();
+  const { visible, hide, toggle } = useHidden();
 
   return (
     <Wrapper {...props}>

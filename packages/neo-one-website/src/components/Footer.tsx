@@ -11,11 +11,9 @@ const LinkSectionTitle = styled(Box)`
   color: ${prop('theme.gray2')};
 `;
 
-// tslint:disable-next-line:no-any
-const NavLink: any = Link.withComponent(StyledRouterLink);
+const NavLink = Link.withComponent(StyledRouterLink);
 
-// tslint:disable-next-line:no-any
-const ExternalLink: any = Link;
+const ExternalLink = Link;
 
 const LinkSectionWrapper = styled(Box)`
   display: grid;

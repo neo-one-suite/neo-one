@@ -54,10 +54,8 @@ interface Props extends ExternalProps {
   readonly complete: boolean;
 }
 
-// tslint:disable-next-line:no-unused
 const DocsFooterBase = ({ selected, complete, ...props }: Props) => {
-  // tslint:disable-next-line:no-unused
-  const [visible, show, hide, toggle] = useHidden();
+  const { visible, hide, toggle } = useHidden();
 
   return (
     <Wrapper>

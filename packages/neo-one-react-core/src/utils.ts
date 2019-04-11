@@ -71,28 +71,6 @@ type Result<P extends object, Q, R, T extends object> = ThemedStyledFunction<
   T
 >;
 
-// export function styledOmitProps<
-//   StyleProps extends object = {},
-//   // tslint:disable-next-line:no-any
-//   Cmp extends React.ElementType = 'div',
-//   // tslint:disable-next-line:no-any
-//   RefProps = any,
-//   CmpProps = React.ComponentProps<Cmp>
-// >(
-//   cmp: Cmp,
-//   omittedProps: ReadonlyArray<keyof StyleProps>,
-//   // tslint:disable-next-line:no-any
-//   theme: { [key in string]: any },
-// ): Result<StyleProps, CmpProps, RefProps, typeof theme> {
-//   const omittedPropsCmp = React.forwardRef<RefProps, CmpProps>((props, ref) => {
-//     const filteredProps = omit(props, omittedProps);
-
-//     return React.createElement(cmp, { ...filteredProps, ref });
-//   });
-
-//   return styled(omittedPropsCmp);
-// }
-
 // tslint:disable-next-line:no-any
 export const styledOmitProps = <StyleProps extends object = {}, RefProps = any>(
   component: React.ElementType,

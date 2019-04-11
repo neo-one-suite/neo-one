@@ -12,8 +12,7 @@ interface Props {
 }
 
 export const ProblemView = ({ problems, path, onSelectRange, ...props }: Props) => {
-  // tslint:disable-next-line:no-unused
-  const [visible, show, hide, toggle] = useHidden(true);
+  const { visible, toggle } = useHidden(true);
 
   return (
     <Box {...props}>

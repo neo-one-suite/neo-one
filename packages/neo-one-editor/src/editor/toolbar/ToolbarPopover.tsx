@@ -68,8 +68,7 @@ interface Props {
 }
 
 export const ToolbarPopover = ({ title, button, content, ...props }: Props) => {
-  // tslint:disable-next-line:no-unused
-  const [visible, show, hide, toggle] = useHidden(false);
+  const { visible, hide, toggle } = useHidden(false);
 
   return (
     <OuterWrapper>
