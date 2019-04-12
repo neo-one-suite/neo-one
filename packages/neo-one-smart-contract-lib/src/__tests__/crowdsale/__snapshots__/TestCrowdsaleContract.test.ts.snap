@@ -2,4 +2,4 @@
 
 exports[`Crowdsale deploy + transfer: deploy consumed 1`] = `"0"`;
 
-exports[`Crowdsale deploy + transfer: deploy cost 1`] = `"1.398"`;
+exports[`Crowdsale deploy + transfer: deploy cost 1`] = `"1.428"`;
