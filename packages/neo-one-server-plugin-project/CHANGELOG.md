@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-plugin-project@1.1.1...@neo-one/server-plugin-project@1.2.0) (2019-04-12)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @types/react to v16.8.10 ([1dcd6ba](https://github.com/neo-one-suite/neo-one/commit/1dcd6ba))
+* **website:** fix DeveloperTools and other bugs ([0cf87ca](https://github.com/neo-one-suite/neo-one/commit/0cf87ca))
+
+
+### Features
+
+* **config:** add default .neorc config ([58bdd27](https://github.com/neo-one-suite/neo-one/commit/58bdd27))
+
+
+
+
+
 ## [1.1.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-plugin-project@1.1.0...@neo-one/server-plugin-project@1.1.1) (2019-03-27)
 
 

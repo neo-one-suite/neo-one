@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-test@1.1.1...@neo-one/smart-contract-test@1.1.2) (2019-04-12)
+
+
+### Bug Fixes
+
+* **deps:** update dependency memdown to v4 ([ab094dd](https://github.com/neo-one-suite/neo-one/commit/ab094dd))
+
+
+
+
+
 ## [1.1.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-test@1.1.0...@neo-one/smart-contract-test@1.1.1) (2019-03-27)
 
 **Note:** Version bump only for package @neo-one/smart-contract-test

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server@1.1.1...@neo-one/server@1.1.2) (2019-04-12)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @grpc/proto-loader to ^0.5.0 ([8701d75](https://github.com/neo-one-suite/neo-one/commit/8701d75))
+
+
+
+
+
 ## [1.1.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server@1.1.0...@neo-one/server@1.1.1) (2019-03-27)
 
 

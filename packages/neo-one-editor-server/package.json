@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/editor-server",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "NEO•ONE editor server.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/http": "^1.1.0",
-    "@neo-one/monitor": "^1.1.0",
+    "@neo-one/http": "^1.1.1",
+    "@neo-one/monitor": "^1.1.1",
     "@neo-one/utils": "^1.1.0",
     "@neo-one/utils-node": "^1.1.0",
     "@types/graphlib": "^2.1.4",

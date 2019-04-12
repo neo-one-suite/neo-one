@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@1.2.0...@neo-one/website@1.2.1) (2019-04-12)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @neo-one/react-core to v1.1.1 ([fb5757a](https://github.com/neo-one-suite/neo-one/commit/fb5757a))
+* **deps:** update dependency @types/react to v16.8.10 ([1dcd6ba](https://github.com/neo-one-suite/neo-one/commit/1dcd6ba))
+* **deps:** update dependency react-redux to v7 ([9140a76](https://github.com/neo-one-suite/neo-one/commit/9140a76))
+* **website:** fix DeveloperTools and other bugs ([0cf87ca](https://github.com/neo-one-suite/neo-one/commit/0cf87ca))
+
+
+
+
+
 # [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@1.1.0...@neo-one/website@1.2.0) (2019-03-27)
 
 

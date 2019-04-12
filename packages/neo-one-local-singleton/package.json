@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/local-singleton",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "NEO•ONE local singleton stubs.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/local-browser": "^1.1.1",
-    "@neo-one/node-browser": "^1.1.1",
+    "@neo-one/local-browser": "^1.1.2",
+    "@neo-one/node-browser": "^1.1.2",
     "@neo-one/types": "^1.1.0",
     "@neo-one/worker": "^1.1.0",
     "tslib": "^1.9.3"

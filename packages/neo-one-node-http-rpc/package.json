@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/node-http-rpc",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "NEO•ONE RPC server.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/http": "^1.1.0",
-    "@neo-one/monitor": "^1.1.0",
-    "@neo-one/node-core": "^1.1.1",
-    "@neo-one/node-rpc-handler": "^1.1.1",
+    "@neo-one/http": "^1.1.1",
+    "@neo-one/monitor": "^1.1.1",
+    "@neo-one/node-core": "^1.1.2",
+    "@neo-one/node-rpc-handler": "^1.1.2",
     "@neo-one/types": "^1.1.0",
     "@neo-one/utils": "^1.1.0",
     "@types/koa": "^2.0.48",

@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/local",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "NEO•ONE local implementation.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-common": "^1.1.1",
-    "@neo-one/client-core": "^1.1.1",
-    "@neo-one/client-full-core": "^1.1.1",
+    "@neo-one/client-common": "^1.1.2",
+    "@neo-one/client-core": "^1.1.2",
+    "@neo-one/client-full-core": "^1.1.2",
     "@neo-one/types": "^1.1.0",
     "@neo-one/utils": "^1.1.0",
     "bignumber.js": "^8.1.1",

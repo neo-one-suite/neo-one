@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/node-vm",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "NEO•ONE NEO VM.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@neo-one/client-common": "^1.1.1",
-    "@neo-one/client-full-common": "^1.1.1",
-    "@neo-one/monitor": "^1.1.0",
-    "@neo-one/node-core": "^1.1.1",
+    "@neo-one/client-common": "^1.1.2",
+    "@neo-one/client-full-common": "^1.1.2",
+    "@neo-one/monitor": "^1.1.1",
+    "@neo-one/node-core": "^1.1.2",
     "@neo-one/types": "^1.1.0",
     "@neo-one/utils": "^1.1.0",
     "@reactivex/ix-es2015-cjs": "2.5.3",

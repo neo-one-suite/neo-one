@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/local-browser-worker",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "NEO•ONE local browser workers.",
   "main": "./src/index.ts",
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
-    "@neo-one/local-browser": "^1.1.1",
+    "@neo-one/local-browser": "^1.1.2",
     "@neo-one/worker": "^1.1.0",
     "@types/nanoid": "^1.2.0",
     "nanoid": "^2.0.1",

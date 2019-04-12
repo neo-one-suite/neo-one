@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-lib@1.2.0...@neo-one/smart-contract-lib@1.3.0) (2019-04-12)
+
+
+### Features
+
+* **mixins:** add transferable ownership mix-in ([a9bc3d9](https://github.com/neo-one-suite/neo-one/commit/a9bc3d9))
+
+
+
+
+
 # [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-lib@1.1.0...@neo-one/smart-contract-lib@1.2.0) (2019-03-27)
 
 
