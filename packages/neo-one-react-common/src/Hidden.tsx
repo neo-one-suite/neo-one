@@ -1,7 +1,7 @@
 // tslint:disable no-null-keyword no-object-mutation
-import { Box, callAll } from '@neo-one/react-core';
+import { Box, callAll, styledOmitProps } from '@neo-one/react-core';
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import { css } from 'styled-components';
 import { ifProp, prop, theme } from 'styled-tools';
 import {
   excludeTransition,
@@ -18,7 +18,7 @@ import {
   translateWithProps,
 } from './transition';
 
-const { forwardRef, useCallback, useEffect, useRef, useState } = React;
+const { forwardRef, useCallback, useEffect, useRef, useState, useReducer } = React;
 
 export interface UseHiddenProps {
   readonly visible: boolean;
@@ -27,13 +27,43 @@ export interface UseHiddenProps {
   readonly toggle: () => void;
 }
 
-export const useHidden = (propVisible = false): [boolean, () => void, () => void, () => void] => {
-  const [visible, setVisible] = useState(propVisible);
-  const show = useCallback(() => setVisible(true), [setVisible]);
-  const hide = useCallback(() => setVisible(false), [setVisible]);
-  const toggle = useCallback(() => setVisible(!visible), [setVisible, visible]);
+export interface UseHiddenProps {
+  readonly visible: boolean;
+  readonly show: () => void;
+  readonly hide: () => void;
+  readonly toggle: () => void;
+}
 
-  return [visible, show, hide, toggle];
+interface HiddenAction {
+  readonly type: string;
+}
+
+interface HiddenState {
+  readonly visible: boolean;
+}
+
+const hiddenReducer = (state: HiddenState, action: HiddenAction) => {
+  switch (action.type) {
+    case 'show':
+      return { visible: true };
+    case 'hide':
+      return { visible: false };
+    case 'toggle':
+      return { visible: !state.visible };
+    default:
+      throw new Error();
+  }
+};
+
+export const useHidden = (propVisible = false) => {
+  const [state, dispatch] = useReducer(hiddenReducer, { visible: propVisible });
+
+  return {
+    ...state,
+    show: () => dispatch({ type: 'show' }),
+    hide: () => dispatch({ type: 'hide' }),
+    toggle: () => dispatch({ type: 'toggle' }),
+  };
 };
 
 export interface HiddenProps extends TransitionProps, OriginProps, TranslateProps, ExpandProps, SlideProps {
@@ -140,11 +170,39 @@ const HiddenComponent = forwardRef<HTMLDivElement, HiddenProps & React.Component
   },
 );
 
-export const Hidden = styled(HiddenComponent)<{
+interface HiddenStyledProps {
   readonly duration?: string;
   readonly timing?: string;
   readonly delay?: string;
-}>`
+  readonly translateX?: string | number;
+  readonly translateY?: string | number;
+  readonly originX?: string | number;
+  readonly originY?: string | number;
+  // tslint:disable-next-line:no-any
+  readonly defaultSlide: any;
+  // tslint:disable-next-line:no-any
+  readonly defaultExpand: any;
+  readonly slideOffset?: string | number;
+}
+
+const hiddenTheme = theme('Hidden');
+
+export const Hidden = styledOmitProps<HiddenStyledProps>(
+  HiddenComponent,
+  [
+    'duration',
+    'timing',
+    'delay',
+    'translateX',
+    'translateY',
+    'originX',
+    'originY',
+    'defaultSlide',
+    'defaultExpand',
+    'slideOffset',
+  ],
+  hiddenTheme,
+)`
   transform: ${translateWithProps};
   ${ifProp(
     hasTransition,
@@ -166,7 +224,7 @@ export const Hidden = styled(HiddenComponent)<{
       'display: none !important',
     )};
   }
-  ${theme('Hidden')};
+  ${hiddenTheme};
 `;
 
 Hidden.defaultProps = {

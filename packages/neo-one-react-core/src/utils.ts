@@ -1,3 +1,7 @@
+import { omit } from 'lodash';
+import React from 'react';
+import styled, { ThemedStyledFunction } from 'styled-components';
+
 export const numberToPx = (value?: string | number) => {
   if (typeof value === 'number') {
     return `${value}px`;
@@ -60,3 +64,25 @@ export function getSelector(comp: string | React.ComponentType<any>): string {
 
   return NO_SELECTOR;
 }
+
+type Result<P extends object, Q, R, T extends object> = ThemedStyledFunction<
+  React.ForwardRefExoticComponent<React.PropsWithoutRef<Q> & React.RefAttributes<R>>,
+  P & Q,
+  T
+>;
+
+// tslint:disable-next-line:no-any
+export const styledOmitProps = <StyleProps extends object = {}, RefProps = any>(
+  component: React.ElementType,
+  omittedProps: ReadonlyArray<keyof StyleProps>,
+  // tslint:disable-next-line:no-any
+  theme: { [key in string]: any } = {},
+): Result<StyleProps, React.ComponentProps<typeof component>, RefProps, typeof theme> => {
+  const omittedPropsComponent = React.forwardRef<RefProps, React.ComponentProps<typeof component>>((props, ref) => {
+    const filteredProps = omit(props, omittedProps);
+
+    return React.createElement(component, { ...filteredProps, ref });
+  });
+
+  return styled(omittedPropsComponent);
+};

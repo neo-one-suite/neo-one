@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Toast as ToastType } from './ToastsContext';
 
-const { useCallback, useEffect } = React;
+const { useEffect, useCallback } = React;
 
 const Wrapper = styled(Box)`
   display: grid;
@@ -43,7 +43,7 @@ interface Props {
   readonly removeToast: (toast: string) => void;
 }
 export function Toast({ toast, removeToast }: Props) {
-  const [visible, show, hideIn] = useHidden(false);
+  const { visible, show, hide: hideIn } = useHidden(false);
   const hide = useCallback(() => {
     hideIn();
     setTimeout(() => removeToast(toast.id), 250);
@@ -65,7 +65,7 @@ export function Toast({ toast, removeToast }: Props) {
       clearTimeout(showTimer);
       clearTimeout(autoHideTimer);
     };
-  }, []);
+  }, [show, visible]);
 
   return (
     <Hidden fade visible={visible}>

@@ -30,10 +30,7 @@ interface SidebarListItemProps {
 }
 
 const SidebarListItem = ({ current, section, onClickLink, ...props }: SidebarListItemProps) => {
-  // tslint:disable-next-line:no-unused
-  const [visible, show, hide, toggle] = useHidden(
-    section.subsections.some((subsection) => current === subsection.slug),
-  );
+  const { visible, show, toggle } = useHidden(section.subsections.some((subsection) => current === subsection.slug));
   const prevCurrent = usePrevious(current);
   useEffect(() => {
     if (current !== prevCurrent && !visible && section.subsections.some((subsection) => current === subsection.slug)) {

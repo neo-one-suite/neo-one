@@ -1,9 +1,10 @@
-import styled from 'styled-components';
 import { theme } from 'styled-tools';
-import { bgColorWithProps, ColorProps, textColorWithProps } from './styledProps';
-import { use } from './use';
+import { bgColorWithProps, textColorWithProps } from './styledProps';
+import { styledOmitProps } from './utils';
 
-export const Box = styled(use('div'))<ColorProps>`
+const boxTheme = theme('Box');
+
+export const Box = styledOmitProps('div', ['opaque', 'pallete', 'tone'], boxTheme)`
   margin: unset;
   padding: unset;
   border: unset;
@@ -14,5 +15,5 @@ export const Box = styled(use('div'))<ColorProps>`
   box-sizing: border-box;
   background-color: ${bgColorWithProps};
   color: ${textColorWithProps};
-  ${theme('Box')};
+  ${boxTheme};
 `;

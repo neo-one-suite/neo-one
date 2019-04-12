@@ -1,11 +1,10 @@
-import { Link } from '@neo-one/react-common';
+import { styledOmitProps } from '@neo-one/react-common';
 // @ts-ignore
 import { Parser } from 'html-to-react';
 import * as React from 'react';
-import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 import { Prism } from '../../../common';
-import { RouterLink } from '../../RouterLink';
+import { StyledRouterLink } from '../../StyledRouterLink';
 import { WordTokens } from '../types';
 
 const PUNCTUATION: ReadonlyArray<string> = ['.', ',', '(', ')', '[', ']', '{', '}', '<', '>', ';', ':'];
@@ -15,7 +14,7 @@ const checkPunctuation = (idx: number, example: WordTokens, value: string) =>
     ? `${value}`
     : `${value} `;
 
-const StyledReferenceLink = styled(Link.withComponent(RouterLink))<{ readonly code?: boolean }>`
+const StyledReferenceLink = styledOmitProps<{ readonly code?: boolean }>(StyledRouterLink, ['code'])`
   font-family: ${ifProp('code', "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace")};
   ${prop('theme.fontStyles.subheading')};
 `;
@@ -44,7 +43,7 @@ export const buildExample = (example: WordTokens) =>
         )}
       </span>
     ) : (
-      <ReferenceLink to={token.slug} code idx={idx} value={token.value} example={example} />
+      <ReferenceLink key={idx} to={token.slug} code idx={idx} value={token.value} example={example} />
     ),
   );
 
@@ -53,6 +52,6 @@ export const buildText = (example: WordTokens) =>
     token.slug === undefined ? (
       <span key={idx}>{checkPunctuation(idx, example, token.value)}</span>
     ) : (
-      <ReferenceLink to={token.slug} idx={idx} value={token.value} example={example} />
+      <ReferenceLink key={idx} to={token.slug} idx={idx} value={token.value} example={example} />
     ),
   );

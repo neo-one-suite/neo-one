@@ -15,11 +15,14 @@ export const Portal = ({ children }: { readonly children: React.ReactNode }) => 
 
     return undefined;
   });
-  useEffect(() => {
-    if (wrapper !== undefined) {
-      document.body.removeChild(wrapper);
-    }
-  }, []);
+  useEffect(
+    () => () => {
+      if (wrapper !== undefined) {
+        document.body.removeChild(wrapper);
+      }
+    },
+    [wrapper],
+  );
 
   if (wrapper === undefined) {
     // tslint:disable-next-line:no-null-keyword

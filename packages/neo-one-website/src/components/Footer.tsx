@@ -3,7 +3,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { LayoutWrapper } from './common';
-import { RouterLink } from './RouterLink';
+import { StyledRouterLink } from './StyledRouterLink';
 
 const LinkSectionTitle = styled(Box)`
   ${prop('theme.fonts.axiformaBold')};
@@ -11,7 +11,7 @@ const LinkSectionTitle = styled(Box)`
   color: ${prop('theme.gray2')};
 `;
 
-const NavLink = Link.withComponent(RouterLink);
+const NavLink = Link.withComponent(StyledRouterLink);
 
 const ExternalLink = Link;
 

@@ -91,9 +91,9 @@ interface Props {
 }
 
 export function Toolbar({ resizeHandler }: Props) {
-  // tslint:disable-next-line:no-unused
-  const [visible, show, hide, toggle] = useHidden(false);
-  const maxWidth = useStream(() => resizeHandler.maxWidth$, [resizeHandler]);
+  const { visible, toggle } = useHidden(false);
+  const maxWidth = useStream(() => resizeHandler.maxWidth$, [resizeHandler], 40);
+
   const onChangeSize = useCallback(
     ({ width }: { width: number }) => {
       if (visible) {

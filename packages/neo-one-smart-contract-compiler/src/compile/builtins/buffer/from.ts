@@ -45,7 +45,7 @@ export class BufferFrom extends BuiltinMemberCall {
       sb.emitHelper(node, options, sb.helpers.unwrapString);
     } else {
       // [string]
-      sb.emitPushBuffer(node, Buffer.from(hash, encoding));
+      sb.emitPushBuffer(node, Buffer.from(hash, Buffer.isEncoding(encoding) ? encoding : undefined));
     }
     sb.emitHelper(node, optionsIn, sb.helpers.wrapBuffer);
   }

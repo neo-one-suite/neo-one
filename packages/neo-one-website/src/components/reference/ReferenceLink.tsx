@@ -1,8 +1,8 @@
-import { Box, Link } from '@neo-one/react-common';
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
 import { prop } from 'styled-tools';
-import { RouterLink } from '../RouterLink';
+import { StyledRouterLink } from '../StyledRouterLink';
 import { TypeIcon } from './common';
 import { ReferenceType } from './types';
 
@@ -12,7 +12,7 @@ interface Props {
   readonly type: ReferenceType;
 }
 
-const StyledLink = styled(Link.withComponent(RouterLink))`
+const StyledLink = styled(StyledRouterLink)`
   ${prop('theme.fontStyles.subheading')};
   ${prop('theme.fonts.axiformaRegular')};
 `;

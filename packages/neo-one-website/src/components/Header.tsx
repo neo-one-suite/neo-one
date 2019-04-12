@@ -1,9 +1,9 @@
 // tslint:disable no-any
-import { Box, Link, LinkBase, Logo, Toolbar, ToolbarContent, ToolbarFocusable, use } from '@neo-one/react-common';
+import { Box, Link, Logo, styledOmitProps, Toolbar, ToolbarContent, ToolbarFocusable } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
 import { ifProp, prop, withProp } from 'styled-tools';
-import { RouterLink } from './RouterLink';
+import { StyledRouterLinkBase } from './StyledRouterLink';
 
 const Wrapper = styled(Box)`
   display: flex;
@@ -35,9 +35,7 @@ const StyledToolbar = styled(Toolbar)`
   }
 `;
 
-const FocusableRouterLink = use(RouterLink, LinkBase);
-
-const LogoLink = styled(FocusableRouterLink)`
+const LogoLink = styled(StyledRouterLinkBase)`
   display: block;
   margin-right: 0;
   margin-bottom: 8px;
@@ -46,12 +44,12 @@ const LogoLink = styled(FocusableRouterLink)`
 
   @media (min-width: ${prop('theme.breakpoints.sm')}) {
     margin-right: 36px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     margin-top: 12px;
   }
 `;
 
-const NavigationLink: any = styled(FocusableRouterLink)<{ readonly active: boolean }>`
+const NavigationLink = styledOmitProps<{ readonly active: boolean }>(StyledRouterLinkBase, ['active'])`
   display: flex;
   align-items: center;
   ${prop('theme.fontStyles.headline')};
@@ -74,7 +72,7 @@ const NavigationLink: any = styled(FocusableRouterLink)<{ readonly active: boole
   }
 `;
 
-const FocusableLink: any = ToolbarFocusable.withComponent(Link);
+const FocusableLink = ToolbarFocusable.withComponent(Link);
 
 const GitHubLink = styled(FocusableLink)`
   @media (max-width: ${prop('theme.breakpoints.sm')}) {
@@ -105,7 +103,7 @@ export const Header = ({ path, ...props }: Props & React.ComponentProps<typeof W
     <StyledToolbar>
       <LeftHeader>
         <ToolbarFocusable>
-          <LogoLink linkColor="gray" data-test="header-logo" to="/">
+          <LogoLink data-test="header-logo" to="/">
             <Logo />
           </LogoLink>
         </ToolbarFocusable>

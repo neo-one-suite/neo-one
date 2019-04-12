@@ -1,10 +1,8 @@
-// tslint:disable no-any
-import { Box } from '@neo-one/react-common';
+import { Box, styledOmitProps } from '@neo-one/react-common';
 // @ts-ignore
 import Scrollable from '@render-props/scrollable';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 import {
   ConsoleOutput as ConsoleOutputType,
@@ -13,7 +11,7 @@ import {
   selectConsoleOutputOwner,
 } from '../redux';
 
-const Wrapper = styled(Box)<{ readonly shadowed: boolean }>`
+const Wrapper = styledOmitProps<{ readonly shadowed: boolean }>(Box, ['shadowed'])`
   color: ${prop('theme.gray0')};
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};
@@ -32,6 +30,7 @@ interface Props {
 
 const ConsoleOutputBase = ({ consoleOutput, consoleOutputOwner }: Props) => (
   <Scrollable>
+    {/* tslint:disable-next-line:no-any */}
     {({ scrollRef, scrollY, max, scrollToY, clientHeight }: any) => {
       if (clientHeight !== 0 && scrollY !== max.y) {
         scrollToY(max.y);

@@ -29,9 +29,7 @@ const StyledToolbar = styled(Toolbar)`
   }
 `;
 
-const FocusableRouterLink = ToolbarFocusable.withComponent(RouterLink);
-
-const LogoLink = styled(FocusableRouterLink)`
+const LogoLink = styled(RouterLink)`
   display: block;
   margin-right: 24px;
   margin-bottom: 16px;
@@ -43,15 +41,17 @@ const LogoLink = styled(FocusableRouterLink)`
   }
 `;
 
-const FocusableLink: any = ToolbarFocusable.withComponent(Link);
+const FocusableLink = ToolbarFocusable.withComponent(Link);
 
 export const CourseHeader = (props: React.ComponentProps<typeof Wrapper>) => (
   <Wrapper {...props}>
     <StyledToolbar>
       <ToolbarContent>
-        <LogoLink to="/course">
-          <LineLogoPrimary />
-        </LogoLink>
+        <ToolbarFocusable>
+          <LogoLink to="/course">
+            <LineLogoPrimary />
+          </LogoLink>
+        </ToolbarFocusable>
       </ToolbarContent>
       <ToolbarContent align="end">
         <FocusableLink linkColor="primary" href="/" target="_blank">

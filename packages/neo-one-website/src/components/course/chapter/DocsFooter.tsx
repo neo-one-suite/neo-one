@@ -1,5 +1,5 @@
 // tslint:disable no-null-keyword
-import { Box, Button, Hidden, useHidden } from '@neo-one/react-common';
+import { Button, DispatchWrapper, Hidden, useHidden } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
@@ -10,7 +10,7 @@ import { DocsSolution } from './DocsSolution';
 import { NextButton } from './NextButton';
 import { PreviousButton } from './PreviousButton';
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(DispatchWrapper)`
   display: grid;
   grid:
     'solution' auto
@@ -21,7 +21,7 @@ const Wrapper = styled(Box)`
   border-top: 1px solid ${prop('theme.gray5')};
 `;
 
-const FooterWrapperBase = styled(Box)`
+const FooterWrapperBase = styled(DispatchWrapper)`
   display: grid;
   grid-gap: 8px;
   padding: 8px;
@@ -55,8 +55,7 @@ interface Props extends ExternalProps {
 }
 
 const DocsFooterBase = ({ selected, complete, ...props }: Props) => {
-  // tslint:disable-next-line:no-unused
-  const [visible, show, hide, toggle] = useHidden();
+  const { visible, hide, toggle } = useHidden();
 
   return (
     <Wrapper>

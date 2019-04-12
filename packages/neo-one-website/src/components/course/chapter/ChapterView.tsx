@@ -49,11 +49,11 @@ const ChapterViewBase = ({ selected, progress }: Props) => {
 
   return (
     <StyledGrid>
-      <Helmet>
-        <title>
-          {`Lesson ${selected.lesson + 1} Chapter ${selected.chapter + 1}: ${selectChapter(selected).title} - NEO•ONE`}
-        </title>
-      </Helmet>
+      <Helmet
+        title={`Lesson ${selected.lesson + 1} Chapter ${selected.chapter + 1}: ${
+          selectChapter(selected).title
+        } - NEO•ONE`}
+      />
       <ProgressItem>
         <ProgressHeader selected={selected} />
       </ProgressItem>

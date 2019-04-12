@@ -69,9 +69,7 @@ export const Content = ({
   ...props
 }: Props) => (
   <StyledGrid {...props}>
-    <Helmet>
-      <title>{`${title} - NEO•ONE`}</title>
-    </Helmet>
+    <Helmet title={`${title} - NEO•ONE`} />
     <LayoutWrapper omitSpacer>
       <MainContent content={content} title={title} date={date} link={link} author={author} />
       <Sidebar current={current} sections={sidebar} alwaysVisible={sidebarAlwaysVisible} />

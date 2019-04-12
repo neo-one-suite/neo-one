@@ -1,8 +1,8 @@
-import { Background, Box, Button, LineLogoPrimary, Link } from '@neo-one/react-common';
+import { Background, Box, Button, LineLogoPrimary } from '@neo-one/react-common';
 import * as React from 'react';
 import styled from 'styled-components';
 import { prop } from 'styled-tools';
-import { RouterLink } from '../RouterLink';
+import { StyledRouterLinkBase } from '../StyledRouterLink';
 import { Authoring } from './Authoring';
 import { ContentWrapperBase } from './ContentWrapperBase';
 import { DeveloperTools } from './DeveloperTools';
@@ -41,12 +41,12 @@ const ButtonWrapper = styled(Box)`
   grid-gap: 24px;
 `;
 
-const LinkButton = Button.withComponent(RouterLink);
+const LinkButton = Button.withComponent(StyledRouterLinkBase);
 const StyledLinkButton = styled(LinkButton)`
   ${prop('theme.fontStyles.subheading')};
 `;
 
-const StyledLink = styled(Link.withComponent(RouterLink))`
+const StyledLink = styled(StyledRouterLinkBase)`
   ${prop('theme.fontStyles.subheading')};
   color: ${prop('theme.accent')};
 

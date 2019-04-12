@@ -22,7 +22,7 @@ export function useStream<T>(createStream$: () => Observable<T>, props: Dependen
     });
 
     return firstValue;
-  }, props);
+  }, [...props, subscriptionRef, setValueRef]);
   // Make sure we do a final cleanup of the subscription
   useEffect(
     () => () => {
@@ -30,7 +30,7 @@ export function useStream<T>(createStream$: () => Observable<T>, props: Dependen
         subscriptionRef.current.unsubscribe();
       }
     },
-    [],
+    [subscriptionRef],
   );
   const [value, setValue] = useState<T | undefined>(first);
   setValueRef.current = setValue;

@@ -1,12 +1,15 @@
-import styled, { css } from 'styled-components';
+import { css } from 'styled-components';
 import { ifProp, theme } from 'styled-tools';
 import { Box } from './Box';
+import { styledOmitProps } from './utils';
 
-export interface DividerProps {
-  readonly vertical?: boolean;
-}
+const dividerTheme = theme('Divider');
 
-export const Divider = styled(Box.withComponent('hr'))<DividerProps>`
+export const Divider = styledOmitProps<{ readonly vertical?: boolean }>(
+  Box.withComponent('hr'),
+  ['vertical'],
+  dividerTheme,
+)`
   border-color: currentColor;
   border-style: solid;
   opacity: 0.2;
@@ -24,5 +27,5 @@ export const Divider = styled(Box.withComponent('hr'))<DividerProps>`
       border-width: 1px 0 0 0;
     `,
   )};
-  ${theme('Divider')};
+  ${dividerTheme};
 `;

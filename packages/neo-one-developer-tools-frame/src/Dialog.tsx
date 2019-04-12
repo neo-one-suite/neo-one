@@ -1,4 +1,3 @@
-// tslint:disable no-any
 import {
   Backdrop,
   Box,
@@ -66,23 +65,25 @@ export function Dialog({
   title,
 }: Props) {
   const resizeHandler = useContext(ResizeHandlerContext);
-  const [visible, showIn, hideIn, toggleIn] = useHidden(false);
+  const { visible, show: showIn, hide: hideIn, toggle: toggleIn } = useHidden();
   const show = useCallback(() => {
     resizeHandler.maximize({ type: 'max', id: 'dialog' });
     showIn();
-  }, [showIn]);
+  }, [visible, showIn, resizeHandler]);
   const hide = useCallback(() => {
     resizeHandler.minimize('dialog');
+    resizeHandler.minimize('toolbarOnEnter');
     hideIn();
-  }, [hideIn]);
+  }, [visible, hideIn, resizeHandler]);
   const toggle = useCallback(() => {
     if (visible) {
       resizeHandler.minimize('dialog');
+      resizeHandler.minimize('toolbarOnEnter');
     } else {
       resizeHandler.maximize({ type: 'max', id: 'dialog' });
     }
     toggleIn();
-  }, [visible, toggleIn]);
+  }, [visible, toggleIn, resizeHandler]);
 
   const overlay = { visible, show, hide, toggle };
 
@@ -90,7 +91,7 @@ export function Dialog({
     <>
       {children(overlay)}
       <Portal>
-        <Backdrop onClick={hide} />
+        <Backdrop onClick={overlay.hide} />
         <Overlay unmount slide fade visible={visible}>
           <Shadow />
           <StyledCardFit>

@@ -52,7 +52,6 @@ const ImageWrapper = styled(Box)`
 
 const background: ReadonlyArray<string> = ['light', 'gray5', 'darkLight'];
 
-// tslint:disable-next-line no-any
 const StartButton = styled(Button)`
   grid-area: button;
   place-self: center;
@@ -139,8 +138,7 @@ const CourseSectionBase = ({ slug, course, index, progress }: Props) => {
   const Image = images[course.image];
   const bg = background[index % background.length];
 
-  // tslint:disable-next-line:no-unused
-  const [visible, _show, _hide, toggle] = useHidden(index === 0);
+  const { visible, toggle } = useHidden(index === 0);
 
   return (
     <ContentWrapper bg={bg}>

@@ -9,8 +9,7 @@ import './Modernizr';
 
 import '../static/css/app.css';
 
-// tslint:disable-next-line no-any
-setConfig({ pureSFC: true } as any);
+setConfig({ pureSFC: true });
 
 // tslint:disable-next-line no-any no-object-mutation
 (global as any).regeneratorRuntime = regeneratorRuntime;

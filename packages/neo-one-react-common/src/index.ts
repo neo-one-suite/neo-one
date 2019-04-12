@@ -1,6 +1,7 @@
 /// <reference types="@neo-one/types" />
 export * from './Backdrop';
 export * from './Background';
+export * from './DispatchWrapper';
 export * from './FileDisplay';
 export * from './FileIcon';
 export * from './FileTab';
