@@ -1153,14 +1153,14 @@
     "@types/istanbul-lib-coverage" "^2.0.0"
     "@types/yargs" "^12.0.9"
 
-"@ledgerhq/devices@^4.48.0", "@ledgerhq/devices@^4.50.0":
+"@ledgerhq/devices@^4.50.0":
   version "4.50.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/devices/-/devices-4.50.0.tgz#3a1b762948fd3720e73eafad4767d18a903a4b05"
   integrity sha512-Dtk3IiaNV2lMnfCABWx7+wJsOiJIzEUT6/1a5f1+g5vZoXf+3v+Bop7GB3ob/Xtfkxjk7wrlsglT8B/TrEVk3Q==
   dependencies:
     "@ledgerhq/errors" "^4.50.0"
 
-"@ledgerhq/errors@^4.48.0", "@ledgerhq/errors@^4.50.0":
+"@ledgerhq/errors@^4.50.0":
   version "4.50.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-4.50.0.tgz#d330e396d47bbbe474fe0adfa087eeb7edd76912"
   integrity sha512-Xg5GTDUWprVJ5zCWtfESLfI1qyr09JQH8pLtWDCkz3GxlwnFPtMAvKB9qUoc2Ou4zJ9DfsZdS8KaZ/2VKXkYGA==
@@ -1177,16 +1177,16 @@
     node-hid "^0.7.7"
     usb "^1.5.0"
 
-"@ledgerhq/hw-transport-u2f@4.48.0":
-  version "4.48.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.48.0.tgz#0419f7d54c989d6119450d9e505aa54a5d701c1f"
-  integrity sha512-qqKlLWDDibwKGWIcL3c9DLr9DdA+71AS5GwWGIJaKaOyGYeMK6uuJrqPphXO2xvHkPNG1B56vpAFy3ojp1mtMA==
+"@ledgerhq/hw-transport-u2f@4.50.0":
+  version "4.50.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.50.0.tgz#31605d3d40f8303cc26260d54b75ef0b6f96e752"
+  integrity sha512-/J//nWNshyxgUjdxw69eOVtd0QQa93knEOikgN0INmL2A0ozNQl8vTNxqIWEpKW+XhJbdq4ep35p4g5eIcgKQw==
   dependencies:
-    "@ledgerhq/errors" "^4.48.0"
-    "@ledgerhq/hw-transport" "^4.48.0"
+    "@ledgerhq/errors" "^4.50.0"
+    "@ledgerhq/hw-transport" "^4.50.0"
     u2f-api "0.2.7"
 
-"@ledgerhq/hw-transport@^4.48.0", "@ledgerhq/hw-transport@^4.50.0":
+"@ledgerhq/hw-transport@^4.50.0":
   version "4.50.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-4.50.0.tgz#2b4c8e9954a9fe7e616cb936ae105fa1de776095"
   integrity sha512-NDbTOkoAphL9er46wjni2CVn+s8ZfyDVgj2dVS00L/NYA3ajVX21DrRGMEI8P5/kdLx4KfID4Z1wsa6Hefj3EQ==
