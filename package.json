@@ -160,7 +160,7 @@
     "@types/webpack": "4.4.27",
     "@types/webpack-bundle-analyzer": "2.13.1",
     "@types/yargs": "13.0.0",
-    "all-contributors-cli": "6.2.0",
+    "all-contributors-cli": "6.3.0",
     "app-root-dir": "1.0.2",
     "autoprefixer": "9.5.1",
     "babel-core": "7.0.0-bridge.0",
