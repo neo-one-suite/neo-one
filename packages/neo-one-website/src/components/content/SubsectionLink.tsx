@@ -1,26 +1,31 @@
 // tslint:disable no-null-keyword
-import { styledOmitProps } from '@neo-one/react-common';
-import * as React from 'react';
+import { Link as BaseLink, styledOmitProps } from '@neo-one/react-common';
+import React from 'react';
 import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 import { StyledRouterLink } from '../StyledRouterLink';
 
-const Link = styledOmitProps<{ readonly active: boolean }>(StyledRouterLink, ['active'])`
-  ${ifProp('active', prop('theme.fonts.axiformaBold'), prop('theme.fonts.axiformaRegular'))};
-  ${prop('theme.fontStyles.subheading')};
+const getStyledLink = (linkFunc: typeof BaseLink) => styledOmitProps<{ readonly active: boolean }>(linkFunc, [
+  'active',
+])`
+${ifProp('active', prop('theme.fonts.axiformaBold'), prop('theme.fonts.axiformaRegular'))};
+${prop('theme.fontStyles.subheading')};
 
-  &:hover {
-    color: ${prop('theme.accent')};
-  }
+&:hover {
+  color: ${prop('theme.accent')};
+}
 
-  &:focus {
-    color: ${prop('theme.accent')};
-  }
+&:focus {
+  color: ${prop('theme.accent')};
+}
 
-  &.active {
-    color: ${prop('theme.accent')};
-  }
+&.active {
+  color: ${prop('theme.accent')};
+}
 `;
+
+const Link = getStyledLink(StyledRouterLink);
+const TutorialLink = getStyledLink(BaseLink);
 
 const ActiveBorder = styled.span`
   width: 4px;
@@ -42,12 +47,22 @@ interface Props {
   readonly children?: React.ReactNode;
 }
 
-export const SubsectionLink = ({ active, title, index, slug, children, onClick, ...props }: Props) => (
+export const SubsectionLink = ({ active, title, index, slug, children, ...props }: Props) => (
   <Wrapper {...props}>
-    <Link active={active} linkColor="gray" to={slug} onClick={onClick}>
+    <Link active={active} linkColor="gray" to={slug}>
       {active ? <ActiveBorder /> : null}
       {index === undefined ? title : `${index}. ${title}`}
     </Link>
+    {children}
+  </Wrapper>
+);
+
+export const TutorialSubsectionLink = ({ active, title, index, slug, children, ...props }: Props) => (
+  <Wrapper {...props}>
+    <TutorialLink active={active} linkColor="gray" href={slug}>
+      {active ? <ActiveBorder /> : null}
+      {index === undefined ? title : `${index}. ${title}`}
+    </TutorialLink>
     {children}
   </Wrapper>
 );

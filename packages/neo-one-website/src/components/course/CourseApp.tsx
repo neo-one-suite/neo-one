@@ -9,4 +9,5 @@ export const CourseApp: any =
     : universal(import('./App'), {
         loading: Loading,
         key: 'App',
+        ignoreBabelRename: true,
       });

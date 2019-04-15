@@ -9,4 +9,5 @@ export const UniversalHomeEditor: any =
     : universal(import('./HomeEditor'), {
         loading: Loading,
         key: 'HomeEditor',
+        ignoreBabelRename: true,
       });

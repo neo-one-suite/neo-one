@@ -1,10 +1,10 @@
 // tslint:disable no-null-keyword
 import { List } from '@neo-one/react-common';
-import * as React from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { ifProp } from 'styled-tools';
 import { SubsectionData } from '../../types';
-import { SubsectionLink } from './SubsectionLink';
+import { SubsectionLink, TutorialSubsectionLink } from './SubsectionLink';
 
 interface SubsectionProps {
   readonly current: string;
@@ -13,20 +13,24 @@ interface SubsectionProps {
   readonly onClickLink?: () => void;
 }
 
-const Subsection = ({ current, index, subsection, onClickLink, ...props }: SubsectionProps) => (
-  <SubsectionLink
-    active={current === subsection.slug}
-    title={subsection.title}
-    slug={subsection.slug}
-    index={index}
-    onClick={onClickLink}
-    {...props}
-  >
-    {subsection.subsections === undefined ? null : (
-      <SectionList current={current} subsections={subsection.subsections} onClickLink={onClickLink} indent />
-    )}
-  </SubsectionLink>
-);
+const Subsection = ({ current, index, subsection, onClickLink, ...props }: SubsectionProps) => {
+  const LinkFunc = subsection.slug.includes('/tutorial#') ? TutorialSubsectionLink : SubsectionLink;
+
+  return (
+    <LinkFunc
+      active={current === subsection.slug}
+      title={subsection.title}
+      slug={subsection.slug}
+      index={index}
+      onClick={onClickLink}
+      {...props}
+    >
+      {subsection.subsections === undefined ? null : (
+        <SectionList current={current} subsections={subsection.subsections} onClickLink={onClickLink} indent />
+      )}
+    </LinkFunc>
+  );
+};
 
 interface Props {
   readonly current: string;

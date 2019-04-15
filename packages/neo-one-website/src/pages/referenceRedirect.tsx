@@ -3,23 +3,27 @@
 import '../polyfill';
 
 import { Redirect } from '@reach/router';
-import * as React from 'react';
-import { RouteData } from 'react-static';
+import React from 'react';
+import { useRouteData } from 'react-static';
 import { Helmet } from '../components';
 import { DocsLoading } from '../layout';
+
+const { Suspense } = React;
 
 interface ReferenceRedirectProps {
   readonly redirect: string;
 }
 
 // tslint:disable-next-line:no-default-export export-name
-export default () => (
-  <>
-    <Helmet title="NEO•ONE Reference" />
-    {/*
-    // @ts-ignore */}
-    <RouteData Loader={DocsLoading}>
-      {({ redirect }: ReferenceRedirectProps) => <Redirect to={redirect} noThrow />}
-    </RouteData>
-  </>
-);
+export default () => {
+  const { redirect } = useRouteData<ReferenceRedirectProps>();
+
+  return (
+    <>
+      <Helmet title="NEO•ONE Reference" />
+      <Suspense fallback={<DocsLoading />}>
+        <Redirect to={redirect} noThrow />
+      </Suspense>
+    </>
+  );
+};

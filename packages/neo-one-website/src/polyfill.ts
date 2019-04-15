@@ -1,7 +1,6 @@
 // tslint:disable no-submodule-imports no-import-side-effect
 import '@babel/polyfill';
 // @ts-ignore
-import regeneratorRuntime from '@babel/runtime/regenerator';
 import { TrackJS } from '@neo-one/react-common';
 import { setConfig } from 'react-hot-loader';
 // @ts-ignore
@@ -10,9 +9,6 @@ import './Modernizr';
 import '../static/css/app.css';
 
 setConfig({ pureSFC: true });
-
-// tslint:disable-next-line no-any no-object-mutation
-(global as any).regeneratorRuntime = regeneratorRuntime;
 
 // tslint:disable no-object-mutation strict-type-predicates
 if (typeof window !== 'undefined') {

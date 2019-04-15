@@ -1,10 +1,11 @@
-// tslint:disable no-any
 // @ts-ignore
 import { ViewportConsumer } from '@render-props/viewport';
-import * as React from 'react';
+import React from 'react';
 import slugify from 'slugify';
-import { AdjacentInfo, SectionData } from '../../types';
+import { AdjacentInfo, SectionData, SubsectionData } from '../../types';
 import { Content, MarkdownContent } from '../content';
+
+const { useState } = React;
 
 export interface TutorialProps {
   readonly title: string;
@@ -13,6 +14,12 @@ export interface TutorialProps {
   readonly sidebar: ReadonlyArray<SectionData>;
   readonly next?: AdjacentInfo;
   readonly previous?: AdjacentInfo;
+}
+
+interface SectionScanResult {
+  readonly result: SubsectionData;
+  readonly currentOffset: number;
+  readonly done: boolean;
 }
 
 const NULL_OFFSET_RETURN = 10000000;
@@ -28,35 +35,60 @@ const getElementPosition = (title: string): number => {
   return NULL_OFFSET_RETURN;
 };
 
-export const Tutorial = (props: TutorialProps) => (
-  <ViewportConsumer>
-    {({ scrollY }: any) => {
-      let current = props.sidebar[0].subsections[0].slug;
-      // tslint:disable-next-line strict-type-predicates
-      if (typeof document !== 'undefined') {
-        let minOffset = Math.abs(getElementPosition(props.sidebar[0].subsections[0].title) - scrollY);
-        // tslint:disable-next-line no-loop-statement
-        for (const subsection of props.sidebar[0].subsections) {
-          const subsectionOffset = Math.abs(getElementPosition(subsection.title) - scrollY);
-          if (subsectionOffset < minOffset) {
-            minOffset = subsectionOffset;
-            current = subsection.slug;
-          }
+export const Tutorial = (props: TutorialProps) => {
+  const subSections = props.sidebar[0].subsections;
+  const [current, setCurrent] = useState(subSections[0]);
 
-          if (subsection.subsections !== undefined) {
-            // tslint:disable-next-line no-loop-statement
-            for (const subSubsection of subsection.subsections) {
-              const subSubsectionOffset = Math.abs(getElementPosition(subSubsection.title) - scrollY);
-              if (subSubsectionOffset < minOffset) {
-                minOffset = subSubsectionOffset;
-                current = subSubsection.slug;
-              }
-            }
+  const allSections = subSections.reduce<ReadonlyArray<SubsectionData>>((acc, section) => {
+    const newSections = section.subsections !== undefined ? [section].concat(section.subsections) : [section];
+
+    return acc.concat(newSections);
+  }, []);
+
+  const getElementOffset = (scrollValue: number, sectionTitle: string) =>
+    Math.abs(scrollValue - getElementPosition(sectionTitle));
+
+  const findClosestSection = (scrollY: number) =>
+    allSections.slice(1).reduce<SectionScanResult>(
+      (acc, section) => {
+        if (acc.done) {
+          return acc;
+        }
+
+        const offset = getElementOffset(scrollY, section.title);
+        if (offset < acc.currentOffset) {
+          return {
+            result: section,
+            currentOffset: offset,
+            done: false,
+          };
+        }
+
+        return {
+          ...acc,
+          done: true,
+        };
+      },
+      {
+        result: allSections[0],
+        currentOffset: getElementOffset(scrollY, allSections[0].title),
+        done: false,
+      },
+    ).result;
+
+  return (
+    <ViewportConsumer>
+      {({ scrollY }: { readonly scrollY: number }) => {
+        // tslint:disable:strict-type-predicates
+        if (typeof document !== 'undefined') {
+          const newSection = findClosestSection(scrollY);
+          if (newSection !== current) {
+            setCurrent(newSection);
           }
         }
-      }
 
-      return <Content current={current} sidebarAlwaysVisible {...props} />;
-    }}
-  </ViewportConsumer>
-);
+        return <Content current={current.slug} sidebarAlwaysVisible {...props} />;
+      }}
+    </ViewportConsumer>
+  );
+};

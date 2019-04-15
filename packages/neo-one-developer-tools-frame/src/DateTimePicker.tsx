@@ -56,7 +56,7 @@ export function DateTimePicker({
 
       setText(nextText);
       setError(undefined);
-      const parsedDate = parse(text, FORMAT, new Date());
+      const parsedDate = parse(nextText, FORMAT, new Date());
       if (Number.isNaN(parsedDate.valueOf())) {
         onError(`Invalid date. Expected format ${FORMAT}`);
       } else if (isBefore(parsedDate, minDate)) {
