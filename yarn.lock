@@ -9966,7 +9966,12 @@ istanbul-api@^2.1.1:
     minimatch "^3.0.4"
     once "^1.4.0"
 
-istanbul-lib-coverage@2.0.3, istanbul-lib-coverage@^2.0.2, istanbul-lib-coverage@^2.0.3:
+istanbul-lib-coverage@2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.4.tgz#927a354005d99dd43a24607bb8b33fd4e9aca1ad"
+  integrity sha512-LXTBICkMARVgo579kWDm8SqfB6nvSDKNqIOBEjmJRnL04JvoMHCYGWaMddQnseJYtkEuEvO/sIcOxPLk9gERug==
+
+istanbul-lib-coverage@^2.0.2, istanbul-lib-coverage@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.3.tgz#0b891e5ad42312c2b9488554f603795f9a2211ba"
 
