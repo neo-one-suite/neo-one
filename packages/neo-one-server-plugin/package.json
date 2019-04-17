@@ -23,7 +23,7 @@
     "chokidar": "^2.0.4",
     "cli-truncate": "^1.1.0",
     "env-paths": "^2.0.0",
-    "figures": "^2.0.0",
+    "figures": "^3.0.0",
     "fs-extra": "^7.0.1",
     "is-running": "^2.1.0",
     "log-symbols": "^2.2.0",
