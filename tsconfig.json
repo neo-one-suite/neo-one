@@ -41,6 +41,7 @@
     "packages/neo-one-smart-contract-lib/src/index.ts",
     "packages/neo-one-smart-contract-lib/src/ownership/*.ts",
     "packages/neo-one-smart-contract-lib/src/crowdsale/**/*.ts",
+    "packages/neo-one-smart-contract-lib/src/utils/**/*.ts",
     "packages/neo-one-smart-contract-lib/src/ICO.ts",
     "packages/neo-one-smart-contract-lib/src/NEP5Token.ts",
     "packages/neo-one-smart-contract-compiler/src/__data__/snippets/**/*.ts",

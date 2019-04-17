@@ -1,2 +1,3 @@
-// tslint:disable-next-line:export-name
 export { CrowdsaleContract } from './CrowdsaleContract';
+export { CrowdsaleWithCapperRole } from './withAccessRoles';
+export { IndividuallyCappedCrowdsale } from './validation';
