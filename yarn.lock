@@ -1158,26 +1158,26 @@
     "@types/istanbul-lib-coverage" "^2.0.0"
     "@types/yargs" "^12.0.9"
 
-"@ledgerhq/devices@^4.50.0", "@ledgerhq/devices@^4.53.0":
+"@ledgerhq/devices@^4.53.0":
   version "4.53.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/devices/-/devices-4.53.0.tgz#bff6a9a4bdc1a7b4899aeeadb74f25b426760e9f"
   integrity sha512-/JMsT72h1YsmG+rZ0FkJvdA3kBNc8ag49n9dETxoKtbVpk0yiOMWVRpUdlqKmiSCgFfCsyojlvDHYkVAHge9ZQ==
   dependencies:
     "@ledgerhq/errors" "^4.53.0"
 
-"@ledgerhq/errors@^4.50.0", "@ledgerhq/errors@^4.53.0":
+"@ledgerhq/errors@^4.53.0":
   version "4.53.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-4.53.0.tgz#cb0ed539538ecb63b7b801479f2ce4324032b920"
   integrity sha512-G/V4OHff/KTC+XC7Y4BbPGlEiVFXUdzgR/cdvj9laYKjZ6rsWe60cv4sT8lN6/8pBBvwpiC1oVsSrspuElX7Eg==
 
-"@ledgerhq/hw-transport-node-hid@4.50.0":
-  version "4.50.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid/-/hw-transport-node-hid-4.50.0.tgz#2c9165284d68fa5a60ea3fae087405d3755c8ee6"
-  integrity sha512-v+61v+J3bshWIL8XhdEiZIkKQPMdwgCsYXMu0JC1C2IU0B6T8CtBjDRrBZKa7RvlQt71oPyJu+2Q7MIOq/HvVQ==
+"@ledgerhq/hw-transport-node-hid@4.53.0":
+  version "4.53.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid/-/hw-transport-node-hid-4.53.0.tgz#1fdbfaf1b72ec2bf1fb14ce6d20d0d5491b42cab"
+  integrity sha512-1bM1hNwULZK522Z+E4qxf3KLVFO0X5lFcnXWXuZbXF72StuD6gxEYft1E9R+7iTyuvNM5muxCmMz8yVGNEsnmg==
   dependencies:
-    "@ledgerhq/devices" "^4.50.0"
-    "@ledgerhq/errors" "^4.50.0"
-    "@ledgerhq/hw-transport" "^4.50.0"
+    "@ledgerhq/devices" "^4.53.0"
+    "@ledgerhq/errors" "^4.53.0"
+    "@ledgerhq/hw-transport" "^4.53.0"
     lodash "^4.17.11"
     node-hid "^0.7.7"
     usb "^1.5.0"
@@ -1191,7 +1191,7 @@
     "@ledgerhq/hw-transport" "^4.53.0"
     u2f-api "0.2.7"
 
-"@ledgerhq/hw-transport@^4.50.0", "@ledgerhq/hw-transport@^4.53.0":
+"@ledgerhq/hw-transport@^4.53.0":
   version "4.53.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-4.53.0.tgz#7e0a222a1621aa565dad84a551eb50fb2d5d528b"
   integrity sha512-24t0FD/hhlNEPuMcOS0ht+xGuRxItouaYyANoCkqNNMLxrk3IvHYlQA/JNxuWNzE/rvkwt10oPAlpAfhQFwycA==

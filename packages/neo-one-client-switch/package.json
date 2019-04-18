@@ -21,7 +21,7 @@
     "tslib": "^1.9.3"
   },
   "optionalDependencies": {
-    "@ledgerhq/hw-transport-node-hid": "4.50.0"
+    "@ledgerhq/hw-transport-node-hid": "4.53.0"
   },
   "sideEffects": false
 }
