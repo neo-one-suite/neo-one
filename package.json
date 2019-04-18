@@ -235,7 +235,7 @@
     "stats-webpack-plugin": "0.7.0",
     "style-loader": "0.23.1",
     "styled-components": "4.2.0",
-    "stylelint": "10.0.0",
+    "stylelint": "10.0.1",
     "stylelint-config-standard": "18.3.0",
     "stylelint-config-styled-components": "0.1.1",
     "stylelint-processor-styled-components": "1.6.0",
