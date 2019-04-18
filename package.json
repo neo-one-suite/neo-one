@@ -230,7 +230,7 @@
     "rollup-plugin-typescript2": "0.20.1",
     "rollup-plugin-string": "3.0.0",
     "rxjs": "6.4.0",
-    "rxjs-tslint-rules": "4.21.0",
+    "rxjs-tslint-rules": "4.22.0",
     "source-map": "0.7.3",
     "stats-webpack-plugin": "0.7.0",
     "style-loader": "0.23.1",
