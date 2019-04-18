@@ -1,9 +1,9 @@
 import { Box, SplitPane } from '@neo-one/react-common';
 import { Redirect } from '@reach/router';
 import * as React from 'react';
-import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { Helmet } from '../../Helmet';
 import { getChapterTo } from '../common';
 import { selectChapter } from '../coursesData';
 import { ChaptersProgress, CourseState, selectLessonProgress } from '../redux';

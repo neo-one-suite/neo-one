@@ -1,6 +1,6 @@
 // tslint:disable no-null-keyword
-import * as React from 'react';
-import { Helmet as ReactHelmet } from 'react-helmet';
+import React from 'react';
+import { Head } from 'react-static';
 
 interface Props {
   readonly title: string;
@@ -9,33 +9,35 @@ interface Props {
 }
 
 export const Helmet = ({ title, description, children, ...props }: Props) => (
-  <ReactHelmet {...props}>
-    <title>{title}</title>
-    {/*
-    // @ts-ignore */}
-    <meta itemprop="name" content={title} />
-    <meta name="twitter:title" content={title} />
-    <meta property="og:title" content={title} />
-    {description === undefined ? null : <meta name="description" content={description} />}
-    {/*
-    // @ts-ignore */}
-    {description === undefined ? null : <meta itemprop="description" content={description} />}
-    {description === undefined ? null : <meta property="og:description" content={description} />}
-    {description === undefined ? null : <meta name="twitter:description" content={description} />}
-    {/*
-    // @ts-ignore */}
-    {description === undefined ? null : <meta itemprop="description" content={description} />}
-    <meta name="image" content="https://neo-one.io/social.png" />
-    {/*
-    // @ts-ignore */}
-    <meta itemprop="image" content="https://neo-one.io/social.png" />
-    <meta name="twitter:image:src" content="https://neo-one.io/social.png" />
-    <meta property="og:image" content="https://neo-one.io/social.png" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="@neo_one_suite" />
-    <meta property="og:url" content="https://neo-one.io" />
-    <meta property="og:site_name" content="NEO•ONE" />
-    <meta property="og:type" content="website" />
+  <Head
+    title={title}
+    {...props}
+    meta={[
+      { name: 'twitter:title', content: title },
+      // @ts-ignore
+      { itemprop: 'name', content: title },
+      { property: 'og:title', content: title },
+      // @ts-ignore
+      { itemprop: 'image', content: 'https://neo-one.io/social.png' },
+      { name: 'twitter:image:src', content: 'https://neo-one.io/social.png' },
+      { property: 'og:image', content: 'https://neo-one.io/social.png' },
+      { name: 'twitter:card', content: 'summary' },
+      { name: 'twitter:site', content: '@neo_one_suite' },
+      { property: 'og:url', content: 'https://neo-one.io' },
+      { property: 'og:site_name', content: 'NEO•ONE' },
+      { property: 'og:type', content: 'website' },
+    ].concat(
+      description === undefined
+        ? []
+        : [
+            { name: 'description', content: description },
+            // @ts-ignore
+            { itemprop: 'description', content: description },
+            { property: 'og:description', content: description },
+            { name: 'twitter:description', content: description },
+          ],
+    )}
+  >
     {children}
-  </ReactHelmet>
+  </Head>
 );

@@ -1,10 +1,10 @@
 // tslint:disable-next-line no-import-side-effect
 import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
 import { AdjacentInfo, SectionData } from '../../types';
 import { LayoutWrapper } from '../common';
+import { Helmet } from '../Helmet';
 import { ReferenceItem } from '../reference';
 import { DocFooter } from './DocFooter';
 import { MainContent } from './MainContent';

@@ -1,9 +1,9 @@
 import { Box, Button } from '@neo-one/react-common';
 import * as React from 'react';
-import { Helmet } from 'react-helmet';
 import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Footer } from '../../Footer';
+import { Helmet } from '../../Helmet';
 import { RouterLink } from '../../RouterLink';
 import { Markdown } from '../common';
 import { selectLesson } from '../coursesData';

@@ -1,6 +1,9 @@
 import path from 'path';
 import _ from 'lodash';
 
+import regeneratorRuntime from '@babel/runtime/regenerator';
+global.regeneratorRuntime = regeneratorRuntime;
+
 require('ts-node/register/transpile-only');
 const { getCourses } = require('./packages/neo-one-website/src/loaders/coursesLoader');
 const { getDocs } = require('./packages/neo-one-website/src/utils/getDocs');
@@ -11,13 +14,15 @@ const { getReferences } = require('./packages/neo-one-website/src/utils/getRefer
 const ROOT_DIR = path.resolve(__dirname);
 const ROOT = path.resolve(ROOT_DIR, 'packages', 'neo-one-website');
 
+const getPagePath = (file) => path.resolve(ROOT, 'src', 'pages', file);
+
 export default {
   paths: {
     root: ROOT,
     nodeModules: path.resolve(ROOT_DIR, 'node_modules'),
     public: 'publicOut',
   },
-  entry: path.join('src', 'index'),
+  entry: path.resolve(ROOT, 'src', 'index'),
   getSiteData: () => ({
     title: 'React Static',
   }),
@@ -33,19 +38,19 @@ export default {
     return [
       {
         path: '/',
-        component: 'src/pages/index',
+        template: getPagePath('index'),
       },
       {
         path: '/course',
-        component: 'src/pages/course',
+        template: getPagePath('course'),
         children: _.flatMap(
           Object.entries(courses).map(([slug, course]) =>
             course.lessons.map((_lesson, lesson) => ({
               path: `${slug}/${lesson + 1}`,
-              component: 'src/pages/course',
+              template: getPagePath('course'),
               children: _lesson.chapters.map((_chapter, chapter) => ({
                 path: `${chapter + 1}`,
-                component: 'src/pages/course',
+                template: getPagePath('course'),
               })),
             })),
           ),
@@ -53,58 +58,58 @@ export default {
       },
       {
         path: '/404',
-        component: 'src/pages/404',
+        template: getPagePath('404'),
       },
       {
         path: '/docs',
-        component: 'src/pages/docsRedirect',
+        template: getPagePath('docsRedirect'),
         getData: async () => ({
           redirect: docs[0].current,
         }),
         children: docs.map((doc) => ({
           path: doc.current.slice('/docs/'.length),
-          component: 'src/pages/docs',
+          template: getPagePath('docs'),
           getData: async () => doc,
         })),
       },
       {
         path: '/tutorial',
-        component: 'src/pages/tutorial',
+        template: getPagePath('tutorial'),
         getData: async () => tutorial,
       },
       {
         path: '/blog',
-        component: 'src/pages/blogRedirect',
+        template: getPagePath('blogRedirect'),
         getData: async () => ({
           redirect: blogs[0].current,
         }),
         children: blogs
           .map((blog) => ({
             path: blog.current.slice('/blog/'.length),
-            component: 'src/pages/blog',
+            template: getPagePath('blog'),
             getData: async () => blog,
           }))
           .concat([
             {
               path: 'all',
-              component: 'src/pages/blogAll',
+              template: getPagePath('blogAll'),
               getData: async () => blogAll,
             },
           ]),
       },
       {
         path: '/reference',
-        component: 'src/pages/referenceRedirect',
+        template: getPagePath('referenceRedirect'),
         getData: async () => ({
           redirect: references[0].current,
         }),
         children: references.map((moduleRef) => ({
           path: moduleRef.slug.slice('/reference/'.length),
-          component: 'src/pages/reference',
+          template: getPagePath('reference'),
           getData: async () => moduleRef,
           children: moduleRef.content.value.map((ref) => ({
             path: ref.slug.slice(`/reference/${moduleRef.title}/`.length),
-            component: 'src/pages/reference',
+            template: getPagePath('reference'),
             getData: async () => ref,
           })),
         })),
@@ -112,7 +117,17 @@ export default {
     ];
   },
   extractCssChunks: true,
+  productionSourceMaps: true,
   disablePreload: true,
-  plugins: [path.resolve(ROOT_DIR, 'scripts', 'website', 'webpack', 'plugin')],
+  plugins: [
+    path.resolve(ROOT_DIR, 'scripts', 'website', 'webpack', 'plugin'),
+    'react-static-plugin-reach-router',
+    [
+      'react-static-plugin-source-filesystem',
+      {
+        location: path.resolve(ROOT, 'src', 'pages'),
+      },
+    ],
+  ],
   siteRoot: 'https://neo-one.io',
 };
