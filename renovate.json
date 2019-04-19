@@ -1,8 +1,22 @@
 {
   "extends": [
     "config:base",
-    ":semanticCommits",
-    "group:all"
+    ":semanticCommits"
+  ],
+  "packageRules": [
+    {
+      "packageNames": ["typescript"],
+      "groupName": ["typescript"]
+    },
+    {
+      "packagePatterns": ["^react|^webpack|^rollup|^style"],
+      "groupName": ["web dependencies"]
+    },
+    {
+      "packagePatterns": ["*"],
+      "groupName": "misc dependencies",
+      "groupSlug": "misc"
+    }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"]
 }
