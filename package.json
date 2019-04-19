@@ -170,7 +170,7 @@
     "babel-plugin-styled-components": "1.10.0",
     "babel-plugin-transform-imports": "1.5.1",
     "babel-plugin-universal-import": "4.0.0",
-    "cache-loader": "2.0.1",
+    "cache-loader": "3.0.0",
     "codecov": "3.3.0",
     "commitizen": "3.0.7",
     "compression-webpack-plugin": "2.0.0",
