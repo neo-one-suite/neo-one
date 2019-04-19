@@ -5,18 +5,19 @@
   ],
   "packageRules": [
     {
-      "packageNames": ["typescript"],
-      "groupName": "typescript"
-    },
-    {
-      "packagePatterns": ["^react*|^webpack*|^rollup*|^style*"],
-      "groupName": "web dependencies"
-    },
-    {
       "packagePatterns": ["*"],
+      "excludePackagePatterns": ["^react.*|^webpack.*|^rollup.*|^style.*|typescript"],
       "groupName": "misc dependencies",
       "groupSlug": "misc",
       "separateMajorMinor": false
+    },
+    {
+      "packagePatterns": ["^react.*|^webpack.*|^rollup.*|^style.*"],
+      "groupName": "web dependencies"
+    },
+    {
+      "packageNames": ["typescript"],
+      "groupName": ["typescript"]
     }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"]
