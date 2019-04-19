@@ -6,7 +6,7 @@
   "browser": "./src/index.browser.ts",
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
-    "@ledgerhq/hw-transport-u2f": "4.50.0",
+    "@ledgerhq/hw-transport-u2f": "4.53.0",
     "@neo-one/client-common": "^1.1.2",
     "@neo-one/node-vm": "^1.1.2",
     "@neo-one/types": "^1.1.0",
@@ -21,7 +21,7 @@
     "tslib": "^1.9.3"
   },
   "optionalDependencies": {
-    "@ledgerhq/hw-transport-node-hid": "4.50.0"
+    "@ledgerhq/hw-transport-node-hid": "4.53.0"
   },
   "sideEffects": false
 }
