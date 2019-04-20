@@ -1,23 +1,22 @@
 {
   "extends": [
     "config:base",
+    "group:definitelyTyped",
     ":semanticCommits"
   ],
   "packageRules": [
     {
       "packagePatterns": ["*"],
-      "excludePackagePatterns": ["^react*", "^webpack*", "^rollup*", "^style*", "typescript", "^@types/"],
+      "excludePackagePatterns": ["^react*", "^webpack*", "^rollup*", "^style*", "typescript", "^@types/*"],
       "groupName": "misc dependencies",
       "groupSlug": "misc",
       "separateMajorMinor": false
     },
     {
       "packagePatterns": ["^react*", "^webpack*", "^rollup*", "^style*"],
-      "groupName": "web dependencies"
-    },
-    {
-      "packagePatterns": ["^@types/"],
-      "groupName": "types"
+      "groupName": "web dependencies",
+      "groupSlug": "web",
+      "separateMajorMinor": false
     },
     {
       "packageNames": ["typescript"],
