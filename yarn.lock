@@ -14943,7 +14943,7 @@ react-side-effect@^1.1.0:
     exenv "^1.2.1"
     shallowequal "^1.0.1"
 
-react-static-plugin-reach-router@^7.0.7:
+react-static-plugin-reach-router@7.0.7:
   version "7.0.7"
   resolved "https://registry.yarnpkg.com/react-static-plugin-reach-router/-/react-static-plugin-reach-router-7.0.7.tgz#aaf00203b7de9252a6cbb3af7f7d3655b982cc6d"
   integrity sha512-20ZkoWLvIf0qoGPYuKC6rvlyzs+k7lp1v4kR3ioWC2D0hUfmvSS1gy+IYCJZ9MPjrWhQkVfvbRJQhfC4N0VRIA==
