@@ -1796,13 +1796,21 @@
     npmlog "^4.1.2"
     write-file-atomic "^2.3.0"
 
-"@malijs/call-types@~0.3.0":
+"@malijs/call-types@^0.3.0", "@malijs/call-types@~0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@malijs/call-types/-/call-types-0.3.0.tgz#bc9c385f241c60d633c141e3ee5a376d1bfa86ff"
 
 "@malijs/compose@^1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@malijs/compose/-/compose-1.3.2.tgz#f3f50674f8718d8702f243e180ba30e1fe82d7b7"
+
+"@malijs/onerror@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@malijs/onerror/-/onerror-0.3.1.tgz#07b7faf59388e964d3a3859836d4a9e226cd6d79"
+  integrity sha512-nGFH+gypm0+cJDxEwJaxdKfhShwm62kOn6ZzU2Wi1DjSJj9/F1DfVhRHjyokIZdplknSRHhwk6m1lpWIoNl9Jg==
+  dependencies:
+    "@malijs/call-types" "^0.3.0"
+    error-inject "^1.0.0"
 
 "@material-ui/core@^3.4.0":
   version "3.9.2"
@@ -2685,12 +2693,6 @@
 "@types/npm-package-arg@^6.1.0":
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/@types/npm-package-arg/-/npm-package-arg-6.1.0.tgz#88bdfce72f6a3d5fa1053c8d44d655e7850642e4"
-
-"@types/ora@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@types/ora/-/ora-3.0.0.tgz#fd30d5414e00fc4608cc7e18b565dceb57f4f66c"
-  dependencies:
-    "@types/node" "*"
 
 "@types/pouchdb-adapter-fruitdown@*":
   version "6.1.2"
@@ -5234,9 +5236,10 @@ cli-spinners@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/cli-spinners/-/cli-spinners-0.1.2.tgz#bb764d88e185fb9e1e6a2a1f19772318f605e31c"
 
-cli-spinners@^1.1.0:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/cli-spinners/-/cli-spinners-1.3.1.tgz#002c1990912d0d59580c93bd36c056de99e4259a"
+cli-spinners@^2.0.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/cli-spinners/-/cli-spinners-2.1.0.tgz#22c34b4d51f573240885b201efda4e4ec9fff3c7"
+  integrity sha512-8B00fJOEh1HPrx4fo5eW16XmE1PcL1tGpGrxy63CXGP9nHdPBN63X75hA1zhvQuhVztJWLqV58Roj2qlNM7cAA==
 
 cli-table2@^0.2.0:
   version "0.2.0"
@@ -11842,21 +11845,6 @@ makeerror@1.0.x:
   dependencies:
     tmpl "1.0.x"
 
-mali-call-types@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/mali-call-types/-/mali-call-types-0.1.0.tgz#d4ea0a599485909083d98f1db003c46d39a4beca"
-
-mali-compose@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/mali-compose/-/mali-compose-1.2.0.tgz#ceb20d1d89f22e6d59b1da965ee5f94b1a029110"
-
-mali-onerror@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/mali-onerror/-/mali-onerror-0.2.0.tgz#25e5dde981ad5ce355a2d0506b55b91d9a6e7b1d"
-  dependencies:
-    error-inject "^1.0.0"
-    mali-call-types "^0.1.0"
-
 mali@^0.14.0:
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/mali/-/mali-0.14.0.tgz#05f34b078a53ef136dfba1d87ccdd49efbeff6ff"
@@ -13271,15 +13259,16 @@ ora@^0.2.3:
     cli-spinners "^0.1.2"
     object-assign "^4.0.1"
 
-ora@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/ora/-/ora-3.0.0.tgz#8179e3525b9aafd99242d63cc206fd64732741d0"
+ora@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/ora/-/ora-3.4.0.tgz#bf0752491059a3ef3ed4c85097531de9fdbcd318"
+  integrity sha512-eNwHudNbO1folBP3JsZ19v9azXWtQZjICdr3Q0TDPIaeBQ3mXLrh54wM+er0+hSp+dWKf+Z8KM58CYzEyIYxYg==
   dependencies:
-    chalk "^2.3.1"
+    chalk "^2.4.2"
     cli-cursor "^2.1.0"
-    cli-spinners "^1.1.0"
+    cli-spinners "^2.0.0"
     log-symbols "^2.2.0"
-    strip-ansi "^4.0.0"
+    strip-ansi "^5.2.0"
     wcwidth "^1.0.1"
 
 ordered-read-streams@^1.0.0:
