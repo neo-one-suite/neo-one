@@ -7,7 +7,7 @@
     "@neo-one/smart-contract-compiler": "^1.1.2",
     "@neo-one/smart-contract-compiler-node": "^1.1.1",
     "@neo-one/types": "^1.1.0",
-    "typescript": "3.3.4000"
+    "typescript": "3.4.5"
   },
   "sideEffects": false
 }

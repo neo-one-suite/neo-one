@@ -30,7 +30,7 @@
     "nanoid": "^2.0.1",
     "rxjs": "^6.4.0",
     "source-map": "^0.7.3",
-    "typescript": "3.3.4000"
+    "typescript": "3.4.5"
   },
   "devDependencies": {
     "@neo-one/server-plugin-wallet": "^1.1.2",
