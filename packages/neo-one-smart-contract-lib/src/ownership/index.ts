@@ -1,2 +1,2 @@
-// tslint:disable: export-name
 export { Ownable } from './Ownable';
+export { Secondary } from './Secondary';
