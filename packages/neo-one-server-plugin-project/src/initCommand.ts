@@ -34,8 +34,17 @@ export const initCommand = ({ cli }: InteractiveCLIArgs) =>
   cli.vorpal.command('init', 'Initialize neo-one in the current directory.').action(async () => {
     const cwd = process.cwd();
     const projectConfig = await loadProjectConfig(cwd);
-    const tsconfigPath = path.resolve(projectConfig.paths.contracts, 'tsconfig.json');
+    const relativeConfig = {
+      ...projectConfig,
+      paths: {
+        ...projectConfig.paths,
+        contracts: path.relative(process.cwd(), projectConfig.paths.contracts),
+        generated: path.relative(process.cwd(), projectConfig.paths.generated),
+      },
+    };
+    const tsconfigPath = path.resolve(relativeConfig.paths.contracts, 'tsconfig.json');
     const contractsPath = path.dirname(tsconfigPath);
+
     const tsData = {
       compilerOptions: {
         ...COMPILER_OPTIONS,
@@ -53,7 +62,7 @@ export const initCommand = ({ cli }: InteractiveCLIArgs) =>
 
     await Promise.all([
       initDataFile({ folder: projectConfig.paths.contracts, name: 'tsconfig.json', data: JSON.stringify(tsData), cli }),
-      initDataFile({ folder: cwd, name: '.onerc', data: JSON.stringify(projectConfig), cli }),
+      initDataFile({ folder: cwd, name: '.onerc', data: JSON.stringify(relativeConfig), cli }),
     ]);
 
     const rootTsConfigPath = path.resolve(cwd, 'tsconfig.json');
