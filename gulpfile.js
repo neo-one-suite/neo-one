@@ -247,7 +247,7 @@ const globs = {
     `!packages/*/src/__e2e__/**/*`,
     `!packages/*/src/bin/**/*`,
     `!packages/neo-one-developer-tools-frame/src/*.ts`,
-    `!packages/neo-one-smart-contract-lib/src/*.ts`,
+    `!packages/neo-one-smart-contract-lib/src/**/*.ts`,
     `!packages/neo-one-server-plugin-wallet/src/contracts/*.ts`,
   ].concat(skipGlobs),
   types: ['packages/neo-one-types/**/*', '!packages/neo-one-types/package.json'],
