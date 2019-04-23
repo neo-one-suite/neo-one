@@ -2,6 +2,7 @@
   "extends": [
     "config:base",
     "group:definitelyTyped",
+    "schedule:daily",
     ":semanticCommits"
   ],
   "packageRules": [
@@ -9,8 +10,7 @@
       "packagePatterns": ["*"],
       "excludePackagePatterns": ["^react*", "^webpack*", "^rollup*", "^style*", "typescript", "^@types/*"],
       "groupName": "misc dependencies",
-      "groupSlug": "misc",
-      "separateMajorMinor": false
+      "groupSlug": "misc"
     },
     {
       "packagePatterns": ["^react*", "^webpack*", "^rollup*", "^style*"],
