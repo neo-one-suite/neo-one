@@ -107,8 +107,8 @@ export class ServerManager {
     return this.getServerVersion();
   }
 
-  public compareVersions(verA: string, verB: string) {
-    return verA === verB ? 0 : semver.lt(verA, verB) ? -1 : 1;
+  public compareVersions(verA: string, verB: string): 0 | 1 | -1 {
+    return verA === verB ? 0 : semver.lt(verA, verB) ? 1 : -1;
   }
 
   public async getRelativeServerVersion({
@@ -183,13 +183,13 @@ export class ServerManager {
     readonly binary: Binary;
     readonly onStart?: () => void;
   }): Promise<{ readonly pid: number; readonly started: boolean; readonly newerVersion: string | undefined }> {
-    const [version, pid] = await Promise.all([
+    const [npmVersion, pid] = await Promise.all([
       npmCheck('@neo-one/cli', this.checkPath, CHECK_TIMEOUT_MS, CHECK_DELAY_SEC),
       this.checkAlive(port),
     ]);
 
     const newerVersion =
-      version !== undefined && this.compareVersions(this.serverVersion, version) ? version : undefined;
+      npmVersion !== undefined && this.compareVersions(this.serverVersion, npmVersion) > 0 ? npmVersion : undefined;
 
     if (pid !== undefined) {
       return { pid, started: false, newerVersion };
