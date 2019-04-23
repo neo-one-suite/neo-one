@@ -39,7 +39,7 @@
     "no-expression-statement": false,
     "no-parameter-properties": false,
     "prefer-function-over-method": false,
-    "file-name-casing": false,
+    "file-name-casing": [false, "camel-case"],
     "static-this": false,
     "no-null-undefined-union": false,
 
@@ -90,8 +90,7 @@
       "allow-undefined-union",
       "allow-string",
       "allow-number",
-      "allow-mix",
-      "allow-boolean-or-undefined"
+      "allow-mix"
     ],
     "no-implicit-dependencies": [
       true,
