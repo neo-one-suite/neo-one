@@ -1,4 +1,5 @@
 import {
+  assertSysCall,
   BinaryWriter,
   ByteBuffer,
   ByteCode,
@@ -8,6 +9,7 @@ import {
   OpCode,
   ScriptBuilder as ClientScriptBuilder,
   SysCallName,
+  toSysCallHash,
   UInt160,
   UnknownOpError,
   utils,
@@ -222,8 +224,8 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
         sourceMapGenerator.setSourceContent(filePath, node.getSourceFile().getFullText());
       }
 
-      const tag = tags[0] as string | undefined;
-      if (tag !== undefined) {
+      const tag = tags.join(',');
+      if (tag !== '') {
         const currentLength = mutableTagToLength[tag] as number | undefined;
         mutableTagToLength[tag] = currentLength === undefined ? finalValue.length : currentLength + finalValue.length;
       }
@@ -365,7 +367,8 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
       this.mutableFeatures = { ...this.mutableFeatures, storage: true };
     }
 
-    const sysCallBuffer = Buffer.from(name, 'ascii');
+    const sysCallBuffer = Buffer.allocUnsafe(4);
+    sysCallBuffer.writeUInt32LE(toSysCallHash(assertSysCall(name)), 0);
     const writer = new BinaryWriter();
     writer.writeVarBytesLE(sysCallBuffer);
     this.emitOp(node, 'SYSCALL', writer.toBuffer());

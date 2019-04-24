@@ -3,6 +3,7 @@ import { Call, Jmp, Jump, Line } from '../pc';
 import { KnownProgramCounter } from '../pc/KnownProgramCounter';
 import { Bytecode, SingleBytecode, Tags } from './ScriptBuilder';
 
+const MAX_SCRIPT_SIZE = 65536;
 // const MAX_JUMP = 32767;
 const MAX_JUMP = 32000;
 
@@ -302,6 +303,11 @@ export const resolveJumps = (bytecode: Bytecode, maxOffset: number = MAX_JUMP): 
   );
   if (length < MAX_JUMP) {
     return bytecode;
+  }
+
+  // We put this here because the implementation has some bugs in it when we're above the max script size.
+  if (length >= MAX_SCRIPT_SIZE) {
+    throw new Error(`Script too large: ${length} > ${MAX_SCRIPT_SIZE}`);
   }
 
   const codePoint = getCodePoint(bytecode);
