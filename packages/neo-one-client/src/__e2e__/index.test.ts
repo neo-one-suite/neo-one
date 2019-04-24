@@ -9,7 +9,7 @@ describe('@neo-one/client', () => {
     'OneClient',
     'nep5',
     // ./user
-    'LedgerKeyStore',
+    'createLedgerKeyStore',
     'LocalUserAccountProvider',
     'LocalKeyStore',
     'LocalMemoryStore',

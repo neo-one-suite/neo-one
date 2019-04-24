@@ -1,5 +1,50 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`BIP32 HD Node Functions parseMasterSeed - seed 0 1`] = `
+Object {
+  "chainCode": "9434d66ac194b3a199508dd4c86a1128d4a470bc70eda355d4853adfde9a4eb4",
+  "depth": 0,
+  "index": 0,
+  "privateKey": "bd48e646bb23273e227944e20a6bcbe18f34a85fb79f92a9fecf1943cbbd53ec",
+  "publicKey": "037d55b985a060788f0d45878062b8b7a7bdd814bf25a75cafc0a66e5441b1c4e0",
+  "version": 76066276,
+}
+`;
+
+exports[`BIP32 HD Node Functions parseMasterSeed - seed 1 1`] = `
+Object {
+  "chainCode": "643c38f1453f12f8a482db34c3d81a553c00f9e3b3a5d2e15a617f3d84d94e7c",
+  "depth": 0,
+  "index": 0,
+  "privateKey": "d107a68c44d48b9c109cdbe222036d93948a7728de4021e1235ce2132e8f24ce",
+  "publicKey": "030a7adbc2a1db440d10a669a8fb94fc7484c83580d62d4a52667c4e0ac898d201",
+  "version": 76066276,
+}
+`;
+
+exports[`BIP32 HD Node Functions parseMasterSeed - seed 2 1`] = `
+Object {
+  "chainCode": "80e2c47c401b8ebd232c02e9542820249e28357a9ea5dc63de24fbed0d9cb49f",
+  "depth": 0,
+  "index": 0,
+  "privateKey": "5d63e64705605fbfaba902b679fd05eaa80496fb684dd0ff7b2f329fcbfbdbb6",
+  "publicKey": "031dea26ee49be0ef913131953eea9c37d614eee3ec077b2e4bc583d6a793c7c76",
+  "version": 76066276,
+}
+`;
+
+exports[`BIP32 HD Node Functions serializeHDNode - private - seed 0 1`] = `"xprv9s21ZrQH143K3XwQrUq3xZucnHQzKtrnXopLZnsZYdZUMYgE8NRNGd7hcGohYjhDLnzGpyfSZLjFZGG8uCEKjFXdD2X7hN3M4FPn6NBzWJG"`;
+
+exports[`BIP32 HD Node Functions serializeHDNode - private - seed 1 1`] = `"xprv9s21ZrQH143K34Ekv4CckUKiPjnJksxsBVdBtQkHo9rQt7PMfPoYnmLS4HBMaYMi3aP3HJR3vesf5ZVdyNTzhupgTkBsC55aQb478gPQK4o"`;
+
+exports[`BIP32 HD Node Functions serializeHDNode - private - seed 2 1`] = `"xprv9s21ZrQH143K3LnKpY3TEX6Z9XAqRj4wvN8x5CkZonvbqNRLPrz8B2vf62CHLjCFQ6gAZG1CVue2SJmP4CpUUijM1qZEddqrzKPybeEyq1H"`;
+
+exports[`BIP32 HD Node Functions serializeHDNode - public - seed 0 1`] = `"xpub661MyMwAqRbcG21sxWN4KhrMLKFUjMadu2jwNBHB6y6TEM1NfujcpRSBTZJ3eminRgzDhnY6BxkxVdYJWY8kL7rRp6CJf7nA6jv8PpCtseg"`;
+
+exports[`BIP32 HD Node Functions serializeHDNode - public - seed 1 1`] = `"xpub661MyMwAqRbcFYKE25jd7cGSwmcoALgiYiYngo9uMVPPkuiWCw7oLZeuuYeRWFLajjG35TeTzXJSDMg8bWijjCZYHeKmxQMC8aUZatYocmZ"`;
+
+exports[`BIP32 HD Node Functions serializeHDNode - public - seed 2 1`] = `"xpub661MyMwAqRbcFprnvZaTbf3HhZ1KqBnoHb4YsbABN8TaiAkUwQJNiqF8wJgqZVVKXxLKqegF5gHJ7GeFD1RFwLxH974Dp3F2DzC93VkDGdb"`;
+
 exports[`Crypto Function Coverage CreateMultiSignatureVerificationScript - Multiple Keys 1`] = `"5321030d56c2d8dbe1069b910246f7f39d0f4b743557e90603f94fa1d5e8ab8f5fbcf02102ebbc1c117a9ab39a9bcfcb9e776feedee8ab870f5cdcdaee1dff07f1972996e42102f61596eafa6303d6782afee3f221254c028deeac620a28b96112a9d08594fd8853ae"`;
 
 exports[`Crypto Function Coverage CreateMultiSignatureVerificationScript - Single Key 1`] = `"512102f61596eafa6303d6782afee3f221254c028deeac620a28b96112a9d08594fd8851ae"`;

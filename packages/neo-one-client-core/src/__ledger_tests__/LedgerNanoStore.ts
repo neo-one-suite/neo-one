@@ -1,15 +1,15 @@
 import { publicKeyToAddress } from '@neo-one/client-common';
-import { LedgerHandler } from '../user/keystore/LedgerHandler';
+import { LedgerNanoStore } from '../user/keystore/LedgerNanoStore';
 
-describe(`Ledger Handler`, () => {
-  let handler: LedgerHandler;
+describe(`Ledger Store`, () => {
+  let store: LedgerNanoStore;
 
   beforeAll(async () => {
-    handler = await LedgerHandler.init();
+    store = await LedgerNanoStore.init();
   });
 
   test(`gets pubKey`, async () => {
-    const pubKey = await handler.getPublicKey(0);
+    const pubKey = await store.getPublicKey(0);
 
     expect(pubKey).toBeDefined();
     expect(pubKey.length).toEqual(66);
@@ -19,7 +19,7 @@ describe(`Ledger Handler`, () => {
   test(`gets multiple distinct pubKeys`, async () => {
     const values = [1, 2, 3];
 
-    const keys = await Promise.all(values.map(async (val) => handler.getPublicKey(val)));
+    const keys = await Promise.all(values.map(async (val) => store.getPublicKey(val)));
 
     expect(keys[0]).not.toEqual(keys[1]);
     expect(keys[1]).not.toEqual(keys[2]);
@@ -31,7 +31,7 @@ describe(`Ledger Handler`, () => {
       'hex',
     );
 
-    const test = await handler.sign({ message, account: 0 });
+    const test = await store.sign({ message, account: 0 });
     expect(test.length).toBeGreaterThan(2);
   });
 });

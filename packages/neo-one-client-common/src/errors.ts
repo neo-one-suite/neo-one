@@ -97,3 +97,28 @@ export const InvalidSignaturesError = makeErrorWithCode(
   'INVALID_SIGNATURES',
   (m: number, value: number) => `Expected ${m} unique signatures, found: ${value}.`,
 );
+
+export const InvalidBIP32VersionError = makeErrorWithCode(
+  'INVALID_BIP32_KEY_VERSION',
+  (version: number, expected: number) => `Expected key-version ${expected}; got ${version}`,
+);
+
+export const InvalidBIP32ExtendedKeyError = makeErrorWithCode(
+  'INVALID_BIP32_EXTENDED_KEY',
+  (key: string) => `Invalid Extended Key: ${key}`,
+);
+
+export const InvalidBIP32ChildIndexError = makeErrorWithCode(
+  'INVALID_BIP32_CHILD_INDEX',
+  (index: number) => `Index must be less than ${0x80000000}; got ${index}`,
+);
+
+export const InvalidBIP32HardenedError = makeErrorWithCode(
+  'INVALID_BIP32_HARDENED_CALL',
+  () => 'Cannot derive a hardened child key from a public key.',
+);
+
+export const InvalidBIP32SerializePrivateNodeError = makeErrorWithCode(
+  'INVALID_BIP32_PRIVATE_SERIALIZATION',
+  () => 'Cannot serialize a private extended key from a public node.',
+);

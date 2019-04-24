@@ -1,0 +1,556 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LocalHDHandler Chain Access Discovery - active account 1`] = `
+Array [
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AWx2o8GmmW7SHb6LU8J7cntUwdas87bSUd",
+        "network": "local",
+      },
+      "name": "0,0,0",
+      "publicKey": "032f9ad3ed7c74cb2b0f39f1add7c48c0e13fc2818156a1e3adadd24f294e1465c",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "ASrZn2xUoB3ZnxfQPGiY2XZWvRRc7B46xH",
+        "network": "local",
+      },
+      "name": "0,0,1",
+      "publicKey": "02110d9a39f37271f9b693e03cd4d575f7c9b85a00e05bc566ade5379a2868a580",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      2,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "ANbpLGyEiHbwu7qPkMaidydBXKXCUwttvp",
+        "network": "local",
+      },
+      "name": "0,0,2",
+      "publicKey": "036417a02f1742ed6e1afaff151d195119dc073f4157fb4eb21816a9c27bd8789c",
+    },
+  },
+]
+`;
+
+exports[`LocalHDHandler Chain Access Discovery 1`] = `
+Array [
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AWx2o8GmmW7SHb6LU8J7cntUwdas87bSUd",
+        "network": "local",
+      },
+      "name": "0,0,0",
+      "publicKey": "032f9ad3ed7c74cb2b0f39f1add7c48c0e13fc2818156a1e3adadd24f294e1465c",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "ASrZn2xUoB3ZnxfQPGiY2XZWvRRc7B46xH",
+        "network": "local",
+      },
+      "name": "0,0,1",
+      "publicKey": "02110d9a39f37271f9b693e03cd4d575f7c9b85a00e05bc566ade5379a2868a580",
+    },
+  },
+]
+`;
+
+exports[`LocalHDHandler Master Access Discovery - active account 1`] = `
+Array [
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AWx2o8GmmW7SHb6LU8J7cntUwdas87bSUd",
+        "network": "local",
+      },
+      "name": "0,0,0",
+      "publicKey": "032f9ad3ed7c74cb2b0f39f1add7c48c0e13fc2818156a1e3adadd24f294e1465c",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "ASrZn2xUoB3ZnxfQPGiY2XZWvRRc7B46xH",
+        "network": "local",
+      },
+      "name": "0,0,1",
+      "publicKey": "02110d9a39f37271f9b693e03cd4d575f7c9b85a00e05bc566ade5379a2868a580",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      1,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "ASLidMjjYqqDjvLnchsgHXrBhQTjSugphs",
+        "network": "local",
+      },
+      "name": "0,1,0",
+      "publicKey": "03bf678ad043693525e2780e15952e60c66e0c2434e7c5afe109aa2e6ea58b5dd1",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      1,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AanW6unB2CtQT2ZXR5cTLeKt7WQaRFBhBm",
+        "network": "local",
+      },
+      "name": "0,1,1",
+      "publicKey": "0240602f30d4a627fe4a4117adb18ec9caf24a879a87ea3b6c56a262756891c015",
+    },
+  },
+  Object {
+    "identifier": Array [
+      1,
+      0,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AdEppHQBaJF9qdiJ1mzgUKBHKtPMjF27zJ",
+        "network": "local",
+      },
+      "name": "1,0,0",
+      "publicKey": "03d865781b5180f56a79821667976612d603cc51970c2606051bd5c9037c12f4ad",
+    },
+  },
+  Object {
+    "identifier": Array [
+      1,
+      0,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AVExgsi9n49DCSX7Hn5kKvy24gMUCCfUGj",
+        "network": "local",
+      },
+      "name": "1,0,1",
+      "publicKey": "02f99430f82aef91249e0dcad24f7e6c6156ef487f68979bcc559f7aef6dacce48",
+    },
+  },
+  Object {
+    "identifier": Array [
+      1,
+      0,
+      2,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "ARAHce8eB6yyv5NjTNUMCc2hrkae59Ho6D",
+        "network": "local",
+      },
+      "name": "1,0,2",
+      "publicKey": "03baa7abf629f1f7ffb3c7d9013d284d0591c5234fc443a004539376b6c1757467",
+    },
+  },
+  Object {
+    "identifier": Array [
+      1,
+      1,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AUjQDMJyFjUa3bvWuJjEZ6fH55dcjMEB5g",
+        "network": "local",
+      },
+      "name": "1,1,0",
+      "publicKey": "03fc4ca5d5e758d5bdd5baa2474b426ea446bfc1c3d0e14c062b8d76b62e622aab",
+    },
+  },
+  Object {
+    "identifier": Array [
+      1,
+      1,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "Af5V39hs2H87ub8AhY5GbehMy6H21m2N4w",
+        "network": "local",
+      },
+      "name": "1,1,1",
+      "publicKey": "035c70803cc68d84f913d051a5d27c3ee7d4fd805eaef77702156a631aa1312c7d",
+    },
+  },
+  Object {
+    "identifier": Array [
+      2,
+      0,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AeRZ9RToqWK2Sn8hu7nUJcmRTf3USMmsEq",
+        "network": "local",
+      },
+      "name": "2,0,0",
+      "publicKey": "03ea8396fae38c42f604e251a370bf3ba22728db02d1a1d0e93c357fc7f2e90df8",
+    },
+  },
+  Object {
+    "identifier": Array [
+      2,
+      0,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AQ5KZ5VfhYUNaKW3sSSwPhpELjSXT9hXZs",
+        "network": "local",
+      },
+      "name": "2,0,1",
+      "publicKey": "032c69f5f5aa2f30e176654e0167eddf7334cb9e81e8addc9d08502eed01f38895",
+    },
+  },
+  Object {
+    "identifier": Array [
+      2,
+      1,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AUtXwSWuzjEZW8BJaineEDKJkBLmK8Zcn8",
+        "network": "local",
+      },
+      "name": "2,1,0",
+      "publicKey": "0276dc3e6340fcdd5510c399eaf71459eb045c331ba42e814a86ea1ddcffdece6d",
+    },
+  },
+  Object {
+    "identifier": Array [
+      2,
+      1,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AWjsiMz2AXQ4zr33qhndYRaL72LVyrnQ8B",
+        "network": "local",
+      },
+      "name": "2,1,1",
+      "publicKey": "0206a3fd57b88625696e0831bc91045bbe88fff3d0707394f50a043b1cd8bdaa75",
+    },
+  },
+]
+`;
+
+exports[`LocalHDHandler Master Access Discovery 1`] = `
+Array [
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AWx2o8GmmW7SHb6LU8J7cntUwdas87bSUd",
+        "network": "local",
+      },
+      "name": "0,0,0",
+      "publicKey": "032f9ad3ed7c74cb2b0f39f1add7c48c0e13fc2818156a1e3adadd24f294e1465c",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "ASrZn2xUoB3ZnxfQPGiY2XZWvRRc7B46xH",
+        "network": "local",
+      },
+      "name": "0,0,1",
+      "publicKey": "02110d9a39f37271f9b693e03cd4d575f7c9b85a00e05bc566ade5379a2868a580",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      1,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "ASLidMjjYqqDjvLnchsgHXrBhQTjSugphs",
+        "network": "local",
+      },
+      "name": "0,1,0",
+      "publicKey": "03bf678ad043693525e2780e15952e60c66e0c2434e7c5afe109aa2e6ea58b5dd1",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      1,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AanW6unB2CtQT2ZXR5cTLeKt7WQaRFBhBm",
+        "network": "local",
+      },
+      "name": "0,1,1",
+      "publicKey": "0240602f30d4a627fe4a4117adb18ec9caf24a879a87ea3b6c56a262756891c015",
+    },
+  },
+  Object {
+    "identifier": Array [
+      1,
+      0,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AdEppHQBaJF9qdiJ1mzgUKBHKtPMjF27zJ",
+        "network": "local",
+      },
+      "name": "1,0,0",
+      "publicKey": "03d865781b5180f56a79821667976612d603cc51970c2606051bd5c9037c12f4ad",
+    },
+  },
+  Object {
+    "identifier": Array [
+      1,
+      0,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AVExgsi9n49DCSX7Hn5kKvy24gMUCCfUGj",
+        "network": "local",
+      },
+      "name": "1,0,1",
+      "publicKey": "02f99430f82aef91249e0dcad24f7e6c6156ef487f68979bcc559f7aef6dacce48",
+    },
+  },
+  Object {
+    "identifier": Array [
+      1,
+      1,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AUjQDMJyFjUa3bvWuJjEZ6fH55dcjMEB5g",
+        "network": "local",
+      },
+      "name": "1,1,0",
+      "publicKey": "03fc4ca5d5e758d5bdd5baa2474b426ea446bfc1c3d0e14c062b8d76b62e622aab",
+    },
+  },
+  Object {
+    "identifier": Array [
+      1,
+      1,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "Af5V39hs2H87ub8AhY5GbehMy6H21m2N4w",
+        "network": "local",
+      },
+      "name": "1,1,1",
+      "publicKey": "035c70803cc68d84f913d051a5d27c3ee7d4fd805eaef77702156a631aa1312c7d",
+    },
+  },
+]
+`;
+
+exports[`LocalHDHandler Wallet Access Discovery - active account 1`] = `
+Array [
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AWx2o8GmmW7SHb6LU8J7cntUwdas87bSUd",
+        "network": "local",
+      },
+      "name": "0,0,0",
+      "publicKey": "032f9ad3ed7c74cb2b0f39f1add7c48c0e13fc2818156a1e3adadd24f294e1465c",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "ASrZn2xUoB3ZnxfQPGiY2XZWvRRc7B46xH",
+        "network": "local",
+      },
+      "name": "0,0,1",
+      "publicKey": "02110d9a39f37271f9b693e03cd4d575f7c9b85a00e05bc566ade5379a2868a580",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      2,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "ANbpLGyEiHbwu7qPkMaidydBXKXCUwttvp",
+        "network": "local",
+      },
+      "name": "0,0,2",
+      "publicKey": "036417a02f1742ed6e1afaff151d195119dc073f4157fb4eb21816a9c27bd8789c",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      1,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "ASLidMjjYqqDjvLnchsgHXrBhQTjSugphs",
+        "network": "local",
+      },
+      "name": "0,1,0",
+      "publicKey": "03bf678ad043693525e2780e15952e60c66e0c2434e7c5afe109aa2e6ea58b5dd1",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      1,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AanW6unB2CtQT2ZXR5cTLeKt7WQaRFBhBm",
+        "network": "local",
+      },
+      "name": "0,1,1",
+      "publicKey": "0240602f30d4a627fe4a4117adb18ec9caf24a879a87ea3b6c56a262756891c015",
+    },
+  },
+]
+`;
+
+exports[`LocalHDHandler Wallet Access Discovery 1`] = `
+Array [
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AWx2o8GmmW7SHb6LU8J7cntUwdas87bSUd",
+        "network": "local",
+      },
+      "name": "0,0,0",
+      "publicKey": "032f9ad3ed7c74cb2b0f39f1add7c48c0e13fc2818156a1e3adadd24f294e1465c",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      0,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "ASrZn2xUoB3ZnxfQPGiY2XZWvRRc7B46xH",
+        "network": "local",
+      },
+      "name": "0,0,1",
+      "publicKey": "02110d9a39f37271f9b693e03cd4d575f7c9b85a00e05bc566ade5379a2868a580",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      1,
+      0,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "ASLidMjjYqqDjvLnchsgHXrBhQTjSugphs",
+        "network": "local",
+      },
+      "name": "0,1,0",
+      "publicKey": "03bf678ad043693525e2780e15952e60c66e0c2434e7c5afe109aa2e6ea58b5dd1",
+    },
+  },
+  Object {
+    "identifier": Array [
+      0,
+      1,
+      1,
+    ],
+    "userAccount": Object {
+      "id": Object {
+        "address": "AanW6unB2CtQT2ZXR5cTLeKt7WQaRFBhBm",
+        "network": "local",
+      },
+      "name": "0,1,1",
+      "publicKey": "0240602f30d4a627fe4a4117adb18ec9caf24a879a87ea3b6c56a262756891c015",
+    },
+  },
+]
+`;

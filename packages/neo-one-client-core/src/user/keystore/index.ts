@@ -1,4 +1,10 @@
 export { LocalKeyStore, LocalWallet, LockedWallet, UnlockedWallet, LocalStore } from './LocalKeyStore';
+export { HDKeyStore, HDAccount, HDProvider, HDHandler } from './HDKeyStore';
 export * from './LocalMemoryStore';
 export * from './LocalStringStore';
-export * from './LedgerKeyStore';
+export * from './LocalHDStore';
+export * from './LocalHDHandler';
+export * from './createLedgerKeyStore';
+export * from './LedgerHandler';
+export * from './LedgerNanoStore';
+export * from './types';

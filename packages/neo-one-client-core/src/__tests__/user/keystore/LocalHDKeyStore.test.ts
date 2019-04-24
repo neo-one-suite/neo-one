@@ -1,33 +1,31 @@
 import { DefaultMonitor } from '@neo-one/monitor';
 import { Observable, of } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
-import { getLedgerAccounts } from '../../../__data__/';
+import { getLocalHDAccounts } from '../../../__data__';
 import { UnknownAccountError, UnknownNetworkError } from '../../../errors';
-import { HDAccount, HDHandler, HDKeyStore } from '../../../user/keystore';
+import { HDAccount, HDHandler, HDKeyStore, LocalPath } from '../../../user/';
 
 interface BootstrapOptions {
   readonly networks: ReadonlyArray<string>;
-  readonly byteLimit: number | undefined;
-  readonly scanAccounts: (network: string) => ReadonlyArray<HDAccount<number>>;
+  readonly scanAccounts: (network: string) => ReadonlyArray<HDAccount<LocalPath>>;
 }
 
-const testLedgerAccounts = getLedgerAccounts('test');
-const mainLedgerAccounts = getLedgerAccounts('main');
+const testHDAccounts = getLocalHDAccounts('test');
+const mainHDAccounts = getLocalHDAccounts('main');
 
-const getScanAccountsTest = (endIndex: number) => (_network: string) => testLedgerAccounts.slice(0, endIndex);
-const getScanAccountsMain = (endIndex: number) => (_network: string) => mainLedgerAccounts.slice(0, endIndex);
+const scanAccountsTest = (_network: string) => testHDAccounts;
 
-const mixedScanAccounts = (endIndex: number) => (network: string) => {
+const mixedScanAccounts = (network: string) => {
   if (network === 'test') {
-    return getScanAccountsTest(endIndex)('test');
+    return testHDAccounts;
   }
   if (network === 'main') {
-    return getScanAccountsMain(endIndex)('main');
+    return mainHDAccounts;
   }
   throw new Error('what');
 };
 
-describe('LedgerKeyStore', () => {
+describe('HDKeyStore', () => {
   const scanAccounts = jest.fn();
   const sign = jest.fn();
   const close = jest.fn();
@@ -35,19 +33,18 @@ describe('LedgerKeyStore', () => {
   const getNetworks = jest.fn();
   const getAccount = jest.fn();
 
-  const handler: HDHandler<number> = {
-    byteLimit: 256,
+  const handler: HDHandler<LocalPath> = {
     scanAccounts,
     sign,
     close,
   };
 
   let networks$: Observable<ReadonlyArray<string>>;
-  let keystore: HDKeyStore<number>;
+  let keystore: HDKeyStore<LocalPath>;
 
   const bootstrapKeystore = (options: Partial<BootstrapOptions> = {}) => {
     const networks = options.networks !== undefined ? options.networks : ['test'];
-    const mockScan = options.scanAccounts !== undefined ? options.scanAccounts : getScanAccountsTest(2);
+    const mockScan = options.scanAccounts !== undefined ? options.scanAccounts : scanAccountsTest;
     networks$ = of(networks);
     getNetworks.mockImplementation(() => networks);
     scanAccounts.mockImplementation(mockScan);
@@ -74,7 +71,7 @@ describe('LedgerKeyStore', () => {
     if (currentUserAccount === undefined) {
       throw new Error('For TS');
     }
-    expect(currentUserAccount).toEqual(testLedgerAccounts[0].userAccount);
+    expect(currentUserAccount).toEqual(testHDAccounts[0].userAccount);
   });
 
   test('account$', async () => {
@@ -85,15 +82,14 @@ describe('LedgerKeyStore', () => {
         take(1),
       )
       .toPromise();
-
-    expect(accounts).toEqual(testLedgerAccounts.slice(0, 2).map(({ userAccount }) => userAccount));
+    expect(accounts).toEqual(testHDAccounts.map(({ userAccount }) => userAccount));
   });
 
   test('byteLimit', () => {
     bootstrapKeystore();
     const result = keystore.byteLimit;
 
-    expect(result).toEqual(256);
+    expect(result).toBeUndefined();
   });
 
   test('getNetworks', () => {
@@ -112,11 +108,11 @@ describe('LedgerKeyStore', () => {
       )
       .toPromise();
 
-    expect(keystore.getCurrentUserAccount()).toEqual(testLedgerAccounts[0].userAccount);
+    expect(keystore.getCurrentUserAccount()).toEqual(testHDAccounts[0].userAccount);
     await keystore.selectUserAccount();
     expect(keystore.getCurrentUserAccount()).toEqual(undefined);
-    await keystore.selectUserAccount(testLedgerAccounts[0].userAccount.id);
-    expect(keystore.getCurrentUserAccount()).toEqual(testLedgerAccounts[0].userAccount);
+    await keystore.selectUserAccount(testHDAccounts[0].userAccount.id);
+    expect(keystore.getCurrentUserAccount()).toEqual(testHDAccounts[0].userAccount);
   });
 
   test('selectUserAccount - throws on bad network', async () => {
@@ -129,7 +125,7 @@ describe('LedgerKeyStore', () => {
       .toPromise();
     const badNetwork = 'badNetwork';
     const getLedgersThrow = keystore.selectUserAccount({
-      address: testLedgerAccounts[0].userAccount.id.address,
+      address: testHDAccounts[0].userAccount.id.address,
       network: badNetwork,
     });
 
@@ -147,16 +143,31 @@ describe('LedgerKeyStore', () => {
     const badAddress = 'badAddress';
     const getLedgersThrow = keystore.selectUserAccount({
       address: badAddress,
-      network: testLedgerAccounts[0].userAccount.id.network,
+      network: testHDAccounts[0].userAccount.id.network,
     });
 
     await expect(getLedgersThrow).rejects.toEqual(new UnknownAccountError(badAddress));
   });
 
-  test('getUserAccounts', async () => {
+  test('getUserAccounts - single', async () => {
+    bootstrapKeystore();
+
+    await keystore.currentUserAccount$
+      .pipe(
+        filter((value) => value !== undefined),
+        take(1),
+      )
+      .toPromise();
+
+    const result = keystore.getUserAccounts();
+
+    expect(result).toEqual(testHDAccounts.map(({ userAccount }) => userAccount));
+  });
+
+  test('getUserAccounts - mixed scan', async () => {
     bootstrapKeystore({
       networks: ['test', 'main'],
-      scanAccounts: mixedScanAccounts(2),
+      scanAccounts: mixedScanAccounts,
     });
 
     await keystore.currentUserAccount$
@@ -168,12 +179,7 @@ describe('LedgerKeyStore', () => {
 
     const result = keystore.getUserAccounts();
 
-    expect(result).toEqual([
-      testLedgerAccounts[0].userAccount,
-      testLedgerAccounts[1].userAccount,
-      mainLedgerAccounts[0].userAccount,
-      mainLedgerAccounts[1].userAccount,
-    ]);
+    expect(result).toEqual(testHDAccounts.concat(mainHDAccounts).map(({ userAccount }) => userAccount));
   });
 
   test('sign', async () => {
@@ -185,7 +191,7 @@ describe('LedgerKeyStore', () => {
       )
       .toPromise();
 
-    await keystore.sign({ account: testLedgerAccounts[0].userAccount.id, message: 'test' });
+    await keystore.sign({ account: testHDAccounts[0].userAccount.id, message: 'test' });
 
     expect(sign).toBeCalledTimes(1);
   });
@@ -200,7 +206,7 @@ describe('LedgerKeyStore', () => {
       )
       .toPromise();
 
-    await keystore.sign({ account: testLedgerAccounts[0].userAccount.id, message: 'test', monitor });
+    await keystore.sign({ account: testHDAccounts[0].userAccount.id, message: 'test', monitor });
 
     expect(sign).toBeCalledTimes(1);
   });

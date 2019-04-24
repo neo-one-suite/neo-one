@@ -130,3 +130,27 @@ export const NEOONEOneDataProviderSetRPCURLError = makeErrorWithCode(
   'INVALID_SET_RPC_URL_CALL',
   () => 'Cannot set rpcURL for NEOONEOneDataProvider',
 );
+export const InvalidHDAccountPermissionError = makeErrorWithCode(
+  'INVALID_HD_ACCOUNT_PERMISSION',
+  (account: [number, number, number]) => `Invalid permission for account at path: ${account}`,
+);
+export const UndiscoverableWalletError = makeErrorWithCode(
+  'UNDISCOVERABLE_WALLET',
+  (index: number) => `Invalid access to discover wallet at index: ${index}`,
+);
+export const UndiscoverableChainError = makeErrorWithCode(
+  'UNDISCOVERABLE_CHAIN',
+  (path: [number, number]) => `Invalid access to discover chain at index: ${path}`,
+);
+export const HDMasterDuplicateError = makeErrorWithCode(
+  'HD_MASTER_DUPLICATE_ERROR',
+  () => 'Storage returned multiple master keys',
+);
+export const InvalidHDStoredPathError = makeErrorWithCode(
+  'INVALID_HD_STORED_PATH',
+  (path: string) => `Storage returned an invalid key-path: ${path}`,
+);
+export const InvalidMasterPathError = makeErrorWithCode(
+  'INVALID_HD_MASTER_PATH',
+  (path: ReadonlyArray<number>) => `Invalid masterPath returned by HDStore: ${path}`,
+);
