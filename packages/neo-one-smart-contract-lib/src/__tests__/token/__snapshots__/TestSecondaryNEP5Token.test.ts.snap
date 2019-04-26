@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Secondary NEP5 Token deploy + transfer: deploy consumed 1`] = `"0"`;
+
+exports[`Secondary NEP5 Token deploy + transfer: deploy cost 1`] = `"3.201"`;

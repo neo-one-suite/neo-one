@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import * as path from 'path';
-import { tokenTester } from '../__data__';
+import { tokenTester } from '../../__data__';
 
 const issueValue = new BigNumber('1000000');
 
@@ -8,7 +8,7 @@ describe('RedToken', () => {
   test('properties + issue + balanceOf + totalSupply + transfer', async () => {
     await tokenTester({
       name: 'RedToken',
-      filePath: path.resolve(__dirname, '..', '__data__', 'contracts', 'RedToken.ts'),
+      filePath: path.resolve(__dirname, '..', '..', '__data__', 'contracts', 'examples', 'RedToken.ts'),
       smartContractName: 'redToken',
       symbol: 'RT',
       decimals: 8,

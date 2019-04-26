@@ -14,7 +14,7 @@ describe('TestICO', () => {
     await withContracts<{ testIco: SmartContractAny }>(
       [
         {
-          filePath: path.resolve(__dirname, '..', '__data__', 'contracts', 'TestICO.ts'),
+          filePath: path.resolve(__dirname, '..', '..', '__data__', 'contracts', 'examples', 'TestICO.ts'),
           name: 'TestICO',
         },
       ],

@@ -1,23 +1,24 @@
-import { InvokeReceipt, TransactionResult } from '@neo-one/client-common';
+import { tokenTester } from '../../__data__';
 import BigNumber from 'bignumber.js';
 import * as path from 'path';
-import { tokenTester } from '../__data__';
 
-describe('TestToken', () => {
+const issueValue = new BigNumber('1000000');
+
+describe('TestNEP5Token', () => {
   test('properties + issue + balanceOf + totalSupply + transfer', async () => {
     await tokenTester({
-      name: 'TestToken',
-      filePath: path.resolve(__dirname, '..', '__data__', 'contracts', 'TestToken.ts'),
-      smartContractName: 'testToken',
+      name: 'TestNEP5Token',
+      filePath: path.resolve(__dirname, '..', '..', '__data__', 'contracts', 'token', 'TestNEP5Token.ts'),
+      smartContractName: 'testNep5Token',
       symbol: 'TT',
       decimals: 8,
       deploy: async ({ masterAccountID, smartContract }) =>
         smartContract.deploy(masterAccountID.address, {
           from: masterAccountID,
         }) as Promise<TransactionResult<InvokeReceipt>>,
-      issueValue: new BigNumber('100'),
+      issueValue,
       transferValue: new BigNumber('10'),
-      description: 'The TestToken',
+      description: 'The TestNEP5Token',
       payable: false,
     });
   });

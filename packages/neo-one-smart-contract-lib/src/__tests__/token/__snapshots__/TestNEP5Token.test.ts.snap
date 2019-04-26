@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TestNEP5Token properties + issue + balanceOf + totalSupply + transfer: deploy consumed 1`] = `"0"`;
+
+exports[`TestNEP5Token properties + issue + balanceOf + totalSupply + transfer: deploy cost 1`] = `"3.127"`;
+
+exports[`TestNEP5Token properties + issue + balanceOf + totalSupply + transfer: transfer consume 1`] = `"0"`;
+
+exports[`TestNEP5Token properties + issue + balanceOf + totalSupply + transfer: transfer cost 1`] = `"3.499"`;
