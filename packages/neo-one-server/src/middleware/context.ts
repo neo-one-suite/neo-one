@@ -1,7 +1,7 @@
+import compose from '@malijs/compose';
+import onError from '@malijs/onerror';
 import { Monitor } from '@neo-one/monitor';
 import { Context } from 'mali';
-import compose from 'mali-compose';
-import onError from 'mali-onerror';
 import { getMonitor } from './common';
 
 export const context = ({ monitor }: { readonly monitor: Monitor }) =>
