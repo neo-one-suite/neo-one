@@ -754,11 +754,11 @@ export interface UserAccountProvider {
    *
    * If the `UserAccountProvider` does not support programatically selecting a `UserAccountID`, it should only ever expose one available `UserAccount` and manage selecting other `UserAccount`s outside of the application.
    */
-  readonly selectUserAccount: (id?: UserAccountID) => Promise<void>;
+  readonly selectUserAccount: (id?: UserAccountID, monitor?: Monitor) => Promise<void>;
   /**
    * Optional support for deleting a `UserAccount`
    */
-  readonly deleteUserAccount?: (id: UserAccountID) => Promise<void>;
+  readonly deleteUserAccount?: (id: UserAccountID, monitor?: Monitor) => Promise<void>;
   /**
    * Optional support for updating the name of a `UserAccount`
    */
