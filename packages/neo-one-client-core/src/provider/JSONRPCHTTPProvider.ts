@@ -14,6 +14,12 @@ const WATCH_TIMEOUT_MS = 5000;
 const PARSE_ERROR_CODE = -32700;
 const PARSE_ERROR_MESSAGE = 'Parse error';
 
+const getWaitTime = (response: Response) => {
+  const resetTimeout = response.headers.get('Retry-After');
+
+  return resetTimeout !== null ? Math.max(Number(resetTimeout), 1) + 2 : 2;
+};
+
 const browserFetch = async (input: RequestInfo, init: RequestInit, timeoutMS: number): Promise<Response> => {
   const controller = new AbortController();
 
@@ -107,11 +113,18 @@ const doRequest = async ({
 
   let remainingTries = tries;
   let parseErrorTries = 3;
+  let rateLimitTimeout: number | undefined;
   let result;
   let finalError: Error | undefined;
   // tslint:disable-next-line no-loop-statement
   while (remainingTries >= 0) {
     try {
+      if (rateLimitTimeout !== undefined) {
+        const sleepTime = rateLimitTimeout;
+        rateLimitTimeout = undefined;
+        finalError = undefined;
+        await new Promise<void>((resolve) => setTimeout(resolve, sleepTime * 1000));
+      }
       const response = await instrumentFetch(
         async (headers) =>
           fetch(
@@ -132,14 +145,16 @@ const doRequest = async ({
       if (!response.ok) {
         let text;
         try {
-          // eslint-disable-next-line
           text = await response.text();
         } catch {
           // Ignore errors
         }
+        if (response.status === 429) {
+          rateLimitTimeout = getWaitTime(response);
+        }
         throw new HTTPError(response.status, text);
       }
-      // eslint-disable-next-line
+
       result = await response.json();
       if (Array.isArray(result)) {
         return result;
@@ -186,7 +201,8 @@ const watchSingle = async ({
   readonly req: object;
   readonly timeoutMS: number;
   readonly monitor?: Monitor;
-}) => {
+  // tslint:disable-next-line: no-any
+}): Promise<any> => {
   const response = await instrumentFetch(
     async (headers) =>
       fetch(
@@ -209,6 +225,16 @@ const watchSingle = async ({
       text = await response.text();
     } catch {
       // Ignore errors
+    }
+    if (response.status === 429) {
+      await new Promise<void>((resolve) => setTimeout(resolve, getWaitTime(response) * 1000));
+
+      return watchSingle({
+        endpoint,
+        req,
+        timeoutMS,
+        monitor,
+      });
     }
     throw new HTTPError(response.status, text);
   }

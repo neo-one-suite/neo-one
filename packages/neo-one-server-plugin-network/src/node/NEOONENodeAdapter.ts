@@ -94,6 +94,11 @@ const makeDefaultConfig = (dataPath: string): NodeConfig => ({
         offset: 1,
         timeoutMS: 5000,
       },
+      rateLimit: {
+        enabled: true,
+        duration: 60000,
+        rate: 6000000,
+      },
     },
   },
 });

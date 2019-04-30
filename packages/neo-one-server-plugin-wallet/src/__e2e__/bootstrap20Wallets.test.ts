@@ -1,4 +1,4 @@
-import * as bootstrapTestUtils from '../__data__/bootstrapTestUtils';
+import { bootstrapTestUtils } from '../__data__/bootstrapTestUtils';
 
 describe('bootstrap 20 wallets', () => {
   test('bootstrap - 20 wallets', async () => {
