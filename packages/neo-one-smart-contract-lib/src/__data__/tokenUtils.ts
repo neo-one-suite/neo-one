@@ -9,7 +9,7 @@ import {
   UserAccountID,
 } from '@neo-one/client-common';
 import { SmartContractAny } from '@neo-one/client-core';
-import { withContracts } from '@neo-one/smart-contract-test';
+import { getContractFromOptions, withContracts } from '@neo-one/smart-contract-test';
 import BigNumber from 'bignumber.js';
 
 export interface DeployOptions {
@@ -41,7 +41,7 @@ const ZERO = {
   PUBLIC_KEY: '027f73dbc47133b08a4bc0fc04589fc76525baaf3bebe71bdd78053d559c41db70',
 };
 
-export const testToken = async ({
+export const tokenTester = async ({
   name,
   filePath,
   symbol,
@@ -65,8 +65,10 @@ export const testToken = async ({
     ],
     async (options) => {
       const { client, networkName, masterAccountID, masterPrivateKey } = options;
-      // tslint:disable-next-line no-any
-      const smartContract: SmartContractAny = (options as any)[smartContractName];
+
+      const smartContract = getContractFromOptions(options, smartContractName);
+      expect(smartContract).toBeDefined();
+
       let event: Event;
       if (deploy !== undefined) {
         const deployResult = await deploy({

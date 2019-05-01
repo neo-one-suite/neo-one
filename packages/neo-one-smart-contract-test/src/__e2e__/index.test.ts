@@ -2,7 +2,7 @@
 import * as api from '@neo-one/smart-contract-test';
 
 describe('@neo-one/smart-contract-test', () => {
-  const EXPECTED = ['withContracts'];
+  const EXPECTED = ['getContractFromOptions', 'withContracts'];
 
   test('has expected exports', () => {
     // tslint:disable-next-line no-array-mutation no-misleading-array-reverse

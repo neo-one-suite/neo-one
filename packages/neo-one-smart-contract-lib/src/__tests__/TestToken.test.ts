@@ -1,11 +1,11 @@
 import { InvokeReceipt, TransactionResult } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import * as path from 'path';
-import { testToken } from '../__data__';
+import { tokenTester } from '../__data__';
 
 describe('TestToken', () => {
   test('properties + issue + balanceOf + totalSupply + transfer', async () => {
-    await testToken({
+    await tokenTester({
       name: 'TestToken',
       filePath: path.resolve(__dirname, '..', '__data__', 'contracts', 'TestToken.ts'),
       smartContractName: 'testToken',
