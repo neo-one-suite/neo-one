@@ -57,7 +57,7 @@ export const useNetworkClients = () => {
 export interface LocalState {
   readonly autoConsensus: boolean;
   readonly autoSystemFee: boolean;
-  readonly tokens: ReadonlyArray<Token>;
+  readonly tokens: readonly Token[];
 }
 export interface LocalStateContextType {
   readonly localState$: BehaviorSubject<LocalState>;
@@ -104,16 +104,14 @@ export function LocalStateProvider({ children }: { readonly children: React.Reac
   return <LocalStateContext.Provider value={{ localState$, onChange }}>{children}</LocalStateContext.Provider>;
 }
 
-export const useTokens = (): [ReadonlyArray<Token>, (tokens: ReadonlyArray<Token>) => void] => {
+export const useTokens = (): [readonly Token[], (tokens: readonly Token[]) => void] => {
   const { localState$, onChange } = useContext(LocalStateContext);
   const tokens = useStream(
     () => localState$.pipe(map((localState) => localState.tokens, distinctUntilChanged())),
     [localState$],
     localState$.getValue().tokens,
   );
-  const onChangeTokens = useCallback((nextTokens: ReadonlyArray<Token>) => onChange({ tokens: nextTokens }), [
-    onChange,
-  ]);
+  const onChangeTokens = useCallback((nextTokens: readonly Token[]) => onChange({ tokens: nextTokens }), [onChange]);
 
   return [tokens, onChangeTokens];
 };

@@ -57,7 +57,7 @@ export class Client {
     return this.unary(this.client.getDebug, {}, (response) => JSON.parse(response.debug));
   }
 
-  public async getAllPlugins(): Promise<ReadonlyArray<string>> {
+  public async getAllPlugins(): Promise<readonly string[]> {
     return this.unary(this.client.getAllPlugins, {}, (response) => response.plugins);
   }
 
@@ -79,7 +79,7 @@ export class Client {
     readonly plugin: string;
     readonly resourceType: string;
     readonly options: object;
-  }): Observable<ReadonlyArray<BaseResource>> {
+  }): Observable<readonly BaseResource[]> {
     return this.makeReadObservable$(this.client.getResources(), {
       plugin,
       resourceType,

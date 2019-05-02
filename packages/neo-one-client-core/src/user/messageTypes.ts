@@ -7,7 +7,7 @@ interface BaseMessage {
 
 interface BaseMethodCall extends BaseMessage {
   readonly method: string;
-  readonly args: ReadonlyArray<SerializedValueToken>;
+  readonly args: readonly SerializedValueToken[];
   readonly confirm?: boolean;
 }
 

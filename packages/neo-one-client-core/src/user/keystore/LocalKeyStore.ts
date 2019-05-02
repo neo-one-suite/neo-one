@@ -77,13 +77,13 @@ export interface LocalStore {
   /**
    * @returns `Promise` that resolves to all available `LocalWallet`s.
    */
-  readonly getWallets: () => Promise<ReadonlyArray<LocalWallet>>;
+  readonly getWallets: () => Promise<readonly LocalWallet[]>;
   /**
    * Optional method that returns the available wallets synchronously.
    *
    * @returns All available `LocalWallet`s
    */
-  readonly getWalletsSync?: () => ReadonlyArray<LocalWallet>;
+  readonly getWalletsSync?: () => readonly LocalWallet[];
   /**
    * Save a wallet to the store.
    */
@@ -106,10 +106,10 @@ const flattenWallets = (wallets: Wallets) =>
  */
 export class LocalKeyStore implements KeyStore {
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;
-  public readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
-  public readonly wallets$: Observable<ReadonlyArray<LocalWallet>>;
+  public readonly userAccounts$: Observable<readonly UserAccount[]>;
+  public readonly wallets$: Observable<readonly LocalWallet[]>;
   private readonly currentAccountInternal$: BehaviorSubject<UserAccount | undefined>;
-  private readonly accountsInternal$: BehaviorSubject<ReadonlyArray<UserAccount>>;
+  private readonly accountsInternal$: BehaviorSubject<readonly UserAccount[]>;
   private readonly walletsInternal$: BehaviorSubject<Wallets>;
   private readonly store: LocalStore;
   private readonly initPromise: Promise<void>;
@@ -121,7 +121,7 @@ export class LocalKeyStore implements KeyStore {
       map(flattenWallets),
     );
 
-    this.accountsInternal$ = new BehaviorSubject([] as ReadonlyArray<UserAccount>);
+    this.accountsInternal$ = new BehaviorSubject([] as readonly UserAccount[]);
     this.wallets$
       .pipe(map((wallets) => wallets.map(({ userAccount }) => userAccount)))
       .subscribe(this.accountsInternal$);
@@ -142,11 +142,11 @@ export class LocalKeyStore implements KeyStore {
     return this.currentAccountInternal$.getValue();
   }
 
-  public getUserAccounts(): ReadonlyArray<UserAccount> {
+  public getUserAccounts(): readonly UserAccount[] {
     return this.accountsInternal$.getValue();
   }
 
-  public get wallets(): ReadonlyArray<LocalWallet> {
+  public get wallets(): readonly LocalWallet[] {
     return flattenWallets(this.walletsObj);
   }
 
@@ -410,7 +410,7 @@ export class LocalKeyStore implements KeyStore {
     this.initWithWallets(walletsList);
   }
 
-  private initWithWallets(walletsList: ReadonlyArray<LocalWallet>): void {
+  private initWithWallets(walletsList: readonly LocalWallet[]): void {
     const wallets = walletsList.reduce<Wallets>(
       (acc, wallet) => ({
         ...acc,

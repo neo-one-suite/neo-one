@@ -7,7 +7,7 @@ import { Prism } from '../../../common';
 import { StyledRouterLink } from '../../StyledRouterLink';
 import { WordTokens } from '../types';
 
-const PUNCTUATION: ReadonlyArray<string> = ['.', ',', '(', ')', '[', ']', '{', '}', '<', '>', ';', ':'];
+const PUNCTUATION: readonly string[] = ['.', ',', '(', ')', '[', ']', '{', '}', '<', '>', ';', ':'];
 
 const checkPunctuation = (idx: number, example: WordTokens, value: string) =>
   PUNCTUATION.includes(value) || (idx !== example.length - 1 && PUNCTUATION.includes(example[idx + 1].value))

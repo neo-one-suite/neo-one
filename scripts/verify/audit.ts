@@ -16,13 +16,13 @@ interface StorageAuditChange {
 interface StorageAuditBlock {
   readonly block: number;
   readonly size: number;
-  readonly storage: ReadonlyArray<StorageAuditChange>;
+  readonly storage: readonly StorageAuditChange[];
 }
 
 interface StorageMismatch {
   readonly index: number;
-  readonly one: ReadonlyArray<RawStorageChange>;
-  readonly neo: ReadonlyArray<RawStorageChange>;
+  readonly one: readonly RawStorageChange[];
+  readonly neo: readonly RawStorageChange[];
 }
 
 const NEO_STORAGE_AUDIT_PATH = path.resolve(os.homedir(), 'data', 'neo-storage-audit');
@@ -84,13 +84,13 @@ const getNEOStorageChangesForChange = (change: StorageAuditChange): RawStorageCh
   return { type, address, key };
 };
 
-const sortChanges = (changes: ReadonlyArray<RawStorageChange>) =>
+const sortChanges = (changes: readonly RawStorageChange[]) =>
   _.sortBy(changes, (change) => `${change.address}:${change.key}`);
 
 const getNEOStorageChanges = (block: StorageAuditBlock) =>
   sortChanges(block.storage.map(getNEOStorageChangesForChange));
 
-const getOneStorageChanges = (block: Block): ReadonlyArray<RawStorageChange> => {
+const getOneStorageChanges = (block: Block): readonly RawStorageChange[] => {
   const storageChanges = block.transactions
     .filter(
       (transaction): transaction is ConfirmedInvocationTransaction => transaction.type === 'InvocationTransaction',
@@ -126,7 +126,7 @@ const compareStorageChangeForBlock = async (auditBlock: StorageAuditBlock): Prom
 
 const iterBlocksInFile = async (filePath: string): Promise<StorageMismatch | undefined> => {
   const content = await fs.readFile(filePath, 'utf8');
-  const blocks: ReadonlyArray<StorageAuditBlock> = JSON.parse(`${content.slice(0, -3)}]`);
+  const blocks: readonly StorageAuditBlock[] = JSON.parse(`${content.slice(0, -3)}]`);
 
   const processed = await Promise.all(blocks.map(compareStorageChangeForBlock));
 

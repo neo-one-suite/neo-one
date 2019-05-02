@@ -125,7 +125,7 @@ describe('Client Tests', () => {
 
     const iterable = client.__iterActionsRaw('main');
 
-    let result: ReadonlyArray<RawAction> = [];
+    let result: readonly RawAction[] = [];
 
     // tslint:disable-next-line:no-loop-statement
     for await (const value of iterable) {

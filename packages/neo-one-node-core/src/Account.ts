@@ -31,13 +31,13 @@ export interface AccountAdd {
   readonly version?: number;
   readonly hash: UInt160;
   readonly isFrozen?: boolean;
-  readonly votes?: ReadonlyArray<ECPoint>;
+  readonly votes?: readonly ECPoint[];
   readonly balances?: { readonly [AssetHash in string]?: BN };
 }
 
 export interface AccountUpdate {
   readonly isFrozen?: boolean;
-  readonly votes?: ReadonlyArray<ECPoint>;
+  readonly votes?: readonly ECPoint[];
   readonly balances?: AccountAdd['balances'];
 }
 
@@ -75,7 +75,7 @@ export class Account extends BaseState
   public readonly hash: UInt160;
   public readonly hashHex: UInt160Hex;
   public readonly isFrozen: boolean;
-  public readonly votes: ReadonlyArray<ECPoint>;
+  public readonly votes: readonly ECPoint[];
   public readonly balances: { readonly [AssetHash in string]?: BN };
   public readonly equals: Equals = utils.equals(Account, this, (other) => common.uInt160Equal(this.hash, other.hash));
   public readonly toKeyString = utils.toKeyString(Account, () => this.hashHex);

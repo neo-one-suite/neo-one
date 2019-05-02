@@ -13,10 +13,10 @@ import {
 
 interface Options {
   readonly version: number;
-  readonly attributes: ReadonlyArray<AttributeModel>;
-  readonly inputs: ReadonlyArray<InputModel>;
-  readonly outputs: ReadonlyArray<OutputModel>;
-  readonly scripts: ReadonlyArray<WitnessModel>;
+  readonly attributes: readonly AttributeModel[];
+  readonly inputs: readonly InputModel[];
+  readonly outputs: readonly OutputModel[];
+  readonly scripts: readonly WitnessModel[];
   readonly hash?: UInt256;
 }
 
@@ -228,7 +228,7 @@ describe('Transaction Base Model', () => {
     const modelThrows = () =>
       new InvocationTransactionModel({
         // tslint:disable-next-line:no-object-literal-type-assertion
-        ...optionsBuilder({ version: 1, attributes: { length: badAmount } as ReadonlyArray<AttributeModel> }),
+        ...optionsBuilder({ version: 1, attributes: { length: badAmount } as readonly AttributeModel[] }),
         gas: new BN(1),
         script: Buffer.from([0x01]),
       });

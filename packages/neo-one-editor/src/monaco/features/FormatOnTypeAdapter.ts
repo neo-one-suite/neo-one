@@ -23,7 +23,7 @@ export class FormatOnTypeAdapter extends Adapter implements monaco.languages.OnT
       token,
       this.worker$.pipe(
         switchMap(
-          async (worker): Promise<ReadonlyArray<ts.TextChange>> =>
+          async (worker): Promise<readonly ts.TextChange[]> =>
             model.isDisposed()
               ? []
               : worker.getFormattingEditsAfterKeystroke(resource.path, positionToOffset(model, position), ch, options),

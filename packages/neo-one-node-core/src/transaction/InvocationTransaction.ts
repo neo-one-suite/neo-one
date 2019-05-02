@@ -117,7 +117,7 @@ export class InvocationTransaction extends TransactionBase<
     return this.gas;
   }
 
-  public async verify(options: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
+  public async verify(options: TransactionVerifyOptions): Promise<readonly VerifyScriptResult[]> {
     if (!this.gas.mod(utils.ONE_HUNDRED_MILLION).eq(utils.ZERO)) {
       throw new VerifyError('Invalid GAS amount');
     }

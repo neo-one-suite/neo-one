@@ -36,9 +36,9 @@ export class LedgerHandler implements HDHandler<number> {
     return store.sign(options);
   }
 
-  public async scanAccounts(network: NetworkType, maxOffset = 10): Promise<ReadonlyArray<Ledger>> {
+  public async scanAccounts(network: NetworkType, maxOffset = 10): Promise<readonly Ledger[]> {
     const store = await this.storePromise;
-    const scanAccountsInternal = async (start: number, currentOffset = 0): Promise<ReadonlyArray<Ledger>> => {
+    const scanAccountsInternal = async (start: number, currentOffset = 0): Promise<readonly Ledger[]> => {
       const ledgerAccounts = await Promise.all(
         _.range(start, start + maxOffset - currentOffset).map(async (num) => {
           const key = await store.getPublicKey(num);
@@ -59,7 +59,7 @@ export class LedgerHandler implements HDHandler<number> {
       );
 
       const { ledgerAccounts: newAccounts, offset: newOffset } = unscannedAccounts.reduce<{
-        readonly ledgerAccounts: ReadonlyArray<Ledger>;
+        readonly ledgerAccounts: readonly Ledger[];
         readonly offset: number;
       }>(
         (acc, unscanned) => ({

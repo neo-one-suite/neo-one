@@ -22,8 +22,8 @@ const Wrapper = styled(Label)`
 `;
 
 interface Props {
-  readonly to: ReadonlyArray<UserAccount>;
-  readonly onChangeTo: (value: ReadonlyArray<UserAccount>) => void;
+  readonly to: readonly UserAccount[];
+  readonly onChangeTo: (value: readonly UserAccount[]) => void;
 }
 
 export function TransferTo({ to, onChangeTo, ...props }: Props & React.ComponentProps<typeof Wrapper>) {

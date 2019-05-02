@@ -23,7 +23,7 @@ export interface Props {
   readonly asset: Asset;
   readonly amount: BigNumber | undefined;
   readonly loading: boolean;
-  readonly to: ReadonlyArray<UserAccount>;
+  readonly to: readonly UserAccount[];
   readonly onChangeAmount: (event: React.ChangeEvent<HTMLInputElement>) => void;
   readonly onChangeAsset: (asset: Asset) => void;
   readonly send: () => void;

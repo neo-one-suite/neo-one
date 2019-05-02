@@ -138,7 +138,7 @@ export class PouchDBFileSystem implements FileSystem {
     return value.content;
   };
 
-  public readonly readdirSync = (pathIn: string): ReadonlyArray<string> => {
+  public readonly readdirSync = (pathIn: string): readonly string[] => {
     const path = normalizePath(pathIn);
     if (this.files.has(path)) {
       throw createENOTDIR(path);

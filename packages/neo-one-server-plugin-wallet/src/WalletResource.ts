@@ -225,7 +225,7 @@ export class WalletResource {
   private mutableInitial: InitialOptions | undefined;
   private mutableNeoBalance: string | undefined;
   private mutableGasBalance: string | undefined;
-  private mutableBalance: ReadonlyArray<Coin>;
+  private mutableBalance: readonly Coin[];
   private readonly network$: Observable<Network | undefined>;
 
   public constructor({

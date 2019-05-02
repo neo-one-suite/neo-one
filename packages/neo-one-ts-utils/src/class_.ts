@@ -55,7 +55,7 @@ export function getExtendsOrThrow(node: ts.ClassDeclaration | ts.ClassExpression
 
 export function getImplements(
   node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ts.ExpressionWithTypeArguments> | undefined {
+): readonly ts.ExpressionWithTypeArguments[] | undefined {
   const implementsClause = heritage.getHeritageClauseByKind(node, ts.SyntaxKind.ImplementsKeyword);
   if (implementsClause === undefined) {
     return undefined;
@@ -66,11 +66,11 @@ export function getImplements(
 
 export function getImplementsArray(
   node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ts.ExpressionWithTypeArguments> {
+): readonly ts.ExpressionWithTypeArguments[] {
   return utils.getArray(getImplements(node));
 }
 
-export function getMembers(node: ts.ClassDeclaration | ts.ClassExpression): ReadonlyArray<ClassMemberType> {
+export function getMembers(node: ts.ClassDeclaration | ts.ClassExpression): readonly ClassMemberType[] {
   // tslint:disable-next-line readonly-array
   const members: Array<ts.ClassElement | ts.ParameterPropertyDeclaration> = [...node.members];
   const implementationCtors = members.filter(ts.isConstructorDeclaration).filter((c) => overload.isImplementation(c));
@@ -91,7 +91,7 @@ export function getMembers(node: ts.ClassDeclaration | ts.ClassExpression): Read
   return members.filter(isClassMember);
 }
 
-export function getConcreteMembers(node: ts.ClassDeclaration | ts.ClassExpression): ReadonlyArray<ClassMemberType> {
+export function getConcreteMembers(node: ts.ClassDeclaration | ts.ClassExpression): readonly ClassMemberType[] {
   return declaration.isAmbient(node)
     ? []
     : getMembers(node).filter((member) => {
@@ -105,29 +105,23 @@ export function getConcreteMembers(node: ts.ClassDeclaration | ts.ClassExpressio
 
 export function getInstanceProperties(
   node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ClassInstancePropertyType> {
+): readonly ClassInstancePropertyType[] {
   return getMembers(node).filter(isClassInstanceProperty);
 }
 
-export function getInstanceMembers(
-  node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ClassInstanceMemberType> {
+export function getInstanceMembers(node: ts.ClassDeclaration | ts.ClassExpression): readonly ClassInstanceMemberType[] {
   return getMembers(node).filter(isClassInstanceMember);
 }
 
-export function getInstanceMethods(
-  node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ts.MethodDeclaration> {
+export function getInstanceMethods(node: ts.ClassDeclaration | ts.ClassExpression): readonly ts.MethodDeclaration[] {
   return getInstanceMembers(node).filter(ts.isMethodDeclaration);
 }
 
-export function getMethods(node: ts.ClassDeclaration | ts.ClassExpression): ReadonlyArray<ts.MethodDeclaration> {
+export function getMethods(node: ts.ClassDeclaration | ts.ClassExpression): readonly ts.MethodDeclaration[] {
   return getMembers(node).filter(ts.isMethodDeclaration);
 }
 
-export function getSetAccessors(
-  node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ts.SetAccessorDeclaration> {
+export function getSetAccessors(node: ts.ClassDeclaration | ts.ClassExpression): readonly ts.SetAccessorDeclaration[] {
   return getMembers(node).filter(ts.isSetAccessor);
 }
 
@@ -140,53 +134,51 @@ export function getInstanceMethod(
 
 export function getConcreteInstanceProperties(
   node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ClassInstancePropertyType> {
+): readonly ClassInstancePropertyType[] {
   return getConcreteMembers(node).filter(isClassInstanceProperty);
 }
 
 export function getConcreteInstanceMembers(
   node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ClassInstanceMemberType> {
+): readonly ClassInstanceMemberType[] {
   return getConcreteMembers(node).filter(isClassInstanceMember);
 }
 
 export function getConcreteInstanceMethods(
   node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ts.MethodDeclaration> {
+): readonly ts.MethodDeclaration[] {
   return getConcreteInstanceMembers(node).filter(ts.isMethodDeclaration);
 }
 
 export function getStaticProperties(
   node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ClassStaticPropertyType> {
+): readonly ClassStaticPropertyType[] {
   return getMembers(node).filter(isClassStaticProperty);
 }
 
-export function getStaticMembers(node: ts.ClassDeclaration | ts.ClassExpression): ReadonlyArray<ClassStaticMemberType> {
+export function getStaticMembers(node: ts.ClassDeclaration | ts.ClassExpression): readonly ClassStaticMemberType[] {
   return getMembers(node).filter(isClassStaticMember);
 }
 
 export function getConcreteStaticProperties(
   node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ClassStaticPropertyType> {
+): readonly ClassStaticPropertyType[] {
   return getConcreteMembers(node).filter(isClassStaticProperty);
 }
 
 export function getConcreteStaticMembers(
   node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ClassStaticMemberType> {
+): readonly ClassStaticMemberType[] {
   return getConcreteMembers(node).filter(isClassStaticMember);
 }
 
 export function getConcreteStaticMethods(
   node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ts.MethodDeclaration> {
+): readonly ts.MethodDeclaration[] {
   return getConcreteStaticMembers(node).filter(ts.isMethodDeclaration);
 }
 
-export function getConstructors(
-  node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ts.ConstructorDeclaration> {
+export function getConstructors(node: ts.ClassDeclaration | ts.ClassExpression): readonly ts.ConstructorDeclaration[] {
   return node.members.filter(ts.isConstructorDeclaration);
 }
 
@@ -218,14 +210,14 @@ function getDerivedClassesWorker(
   languageService: ts.LanguageService,
   node: ts.ClassDeclaration,
   seen = new Set<ts.ClassDeclaration>(),
-): ReadonlyArray<ts.ClassDeclaration> {
+): readonly ts.ClassDeclaration[] {
   if (seen.has(node)) {
     return [];
   }
 
   return reference
     .findReferencesAsNodes(program, languageService, node)
-    .reduce<ReadonlyArray<ts.ClassDeclaration>>((acc, ref) => {
+    .reduce<readonly ts.ClassDeclaration[]>((acc, ref) => {
       const parent = node_.getParent(ref) as ts.Node | undefined;
       if (parent === undefined) {
         return acc;
@@ -247,7 +239,7 @@ export function getDerivedClasses(
   program: ts.Program,
   languageService: ts.LanguageService,
   node: ts.ClassDeclaration,
-): ReadonlyArray<ts.ClassDeclaration> {
+): readonly ts.ClassDeclaration[] {
   const result = getDerivedClassesWorker(program, languageService, node);
 
   return result.filter((value) => value !== node);
@@ -258,14 +250,14 @@ function getImplementorsWorker(
   languageService: ts.LanguageService,
   node: ts.ClassDeclaration | ts.InterfaceDeclaration,
   seen = new Set<ts.ClassDeclaration | ts.InterfaceDeclaration>(),
-): ReadonlyArray<ts.ClassDeclaration> {
+): readonly ts.ClassDeclaration[] {
   if (seen.has(node)) {
     return [];
   }
 
   return reference
     .findReferencesAsNodes(program, languageService, node)
-    .reduce<ReadonlyArray<ts.ClassDeclaration>>((acc, ref) => {
+    .reduce<readonly ts.ClassDeclaration[]>((acc, ref) => {
       const parent = node_.getParent(ref) as ts.Node | undefined;
       if (parent === undefined) {
         return acc;
@@ -299,7 +291,7 @@ export function getImplementors(
   program: ts.Program,
   languageService: ts.LanguageService,
   node: ts.InterfaceDeclaration,
-): ReadonlyArray<ts.ClassDeclaration> {
+): readonly ts.ClassDeclaration[] {
   return getImplementorsWorker(program, languageService, node);
 }
 
@@ -308,14 +300,14 @@ function getExtendorsWorker(
   languageService: ts.LanguageService,
   node: ts.ClassDeclaration,
   seen = new Set<ts.ClassDeclaration>(),
-): ReadonlyArray<ts.ClassDeclaration> {
+): readonly ts.ClassDeclaration[] {
   if (seen.has(node)) {
     return [];
   }
 
   return reference
     .findReferencesAsNodes(program, languageService, node)
-    .reduce<ReadonlyArray<ts.ClassDeclaration>>((acc, ref) => {
+    .reduce<readonly ts.ClassDeclaration[]>((acc, ref) => {
       const parent = node_.getParent(ref) as ts.Node | undefined;
       if (parent === undefined) {
         return acc;
@@ -340,22 +332,22 @@ export function getExtendors(
   program: ts.Program,
   languageService: ts.LanguageService,
   node: ts.ClassDeclaration,
-): ReadonlyArray<ts.ClassDeclaration> {
+): readonly ts.ClassDeclaration[] {
   return getExtendorsWorker(program, languageService, node);
 }
 
 export function getBaseTypes(
   typeChecker: ts.TypeChecker,
   node: ts.ClassDeclaration | ts.ClassExpression | ts.InterfaceDeclaration,
-): ReadonlyArray<ts.Type> {
+): readonly ts.Type[] {
   return type_.getBaseTypesArray(type_.getType(typeChecker, node));
 }
 
 export function getBaseTypesFlattened(
   typeChecker: ts.TypeChecker,
   node: ts.ClassDeclaration | ts.ClassExpression | ts.InterfaceDeclaration,
-): ReadonlyArray<ts.Type> {
-  function getBaseTypesWorker(type: ts.Type): ReadonlyArray<ts.Type> {
+): readonly ts.Type[] {
+  function getBaseTypesWorker(type: ts.Type): readonly ts.Type[] {
     if (type_.isIntersection(type)) {
       return _.flatten(type_.getIntersectionTypesArray(type).map(getBaseTypesWorker));
     }
@@ -371,14 +363,14 @@ export function getBaseTypesFlattened(
 export function getBaseClasses(
   typeChecker: ts.TypeChecker,
   node: ts.ClassDeclaration | ts.ClassExpression,
-): ReadonlyArray<ts.ClassDeclaration> {
+): readonly ts.ClassDeclaration[] {
   const baseTypes = getBaseTypesFlattened(typeChecker, node);
 
   return baseTypes
     .map((type) => type_.getSymbol(type))
     .filter(utils.notNull)
     .map((symbol) => symbol_.getDeclarations(symbol))
-    .reduce<ReadonlyArray<ts.Declaration>>((a, b) => a.concat(b), [])
+    .reduce<readonly ts.Declaration[]>((a, b) => a.concat(b), [])
     .filter(ts.isClassDeclaration);
 }
 

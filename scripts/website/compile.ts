@@ -61,7 +61,7 @@ const watchServer = async () => {
     .on('quit', () => {
       log('App has quit');
     })
-    .on('restart', (files: ReadonlyArray<string>) => {
+    .on('restart', (files: readonly string[]) => {
       log(`App restarted due to: ${JSON.stringify(files)}`);
     });
 

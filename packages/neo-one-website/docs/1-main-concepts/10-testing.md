@@ -88,7 +88,7 @@ interface TestOptions {
    *  8. 5 NEO and GAS
    *  9. 20 NEO and GAS
    */
-  readonly accountIDs: ReadonlyArray<UserAccountID>;
+  readonly accountIDs: readonly UserAccountID[];
 }
 ```
 

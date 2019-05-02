@@ -13,7 +13,7 @@ interface BlogPost {
 }
 
 export interface BlogAllProps {
-  readonly posts: ReadonlyArray<BlogPost>;
+  readonly posts: readonly BlogPost[];
 }
 
 const PostsGrid = styled(Box)`

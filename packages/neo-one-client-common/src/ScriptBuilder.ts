@@ -13,7 +13,7 @@ export class ScriptBuilder {
     this.mutableBuffers = [];
   }
 
-  public get buffers(): ReadonlyArray<Buffer> {
+  public get buffers(): readonly Buffer[] {
     return this.mutableBuffers;
   }
 

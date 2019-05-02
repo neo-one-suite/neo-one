@@ -23,7 +23,7 @@ export const getTokenAsset = (token: Token): TokenAsset => ({
   value: token.address,
 });
 
-export const ASSETS: ReadonlyArray<Asset> = [
+export const ASSETS: readonly Asset[] = [
   {
     type: 'asset',
     value: Hash256.NEO,

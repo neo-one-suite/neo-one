@@ -11,7 +11,7 @@ const Wrapper = styled(Box)`
 
 interface Props {
   readonly slug: string;
-  readonly lessons: ReadonlyArray<Lesson>;
+  readonly lessons: readonly Lesson[];
 }
 export const LessonList = ({ slug, lessons, ...props }: Props) => (
   <Wrapper {...props}>

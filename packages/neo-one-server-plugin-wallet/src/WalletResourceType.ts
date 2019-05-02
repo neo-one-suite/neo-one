@@ -47,7 +47,7 @@ export interface Wallet {
   readonly wif: string | undefined;
   readonly nep2: string | undefined;
   readonly publicKey: string;
-  readonly balance: ReadonlyArray<Coin>;
+  readonly balance: readonly Coin[];
 }
 
 export interface WalletResourceOptions {
@@ -104,7 +104,7 @@ export class WalletResourceType extends ResourceType<Wallet, WalletResourceOptio
     });
   }
 
-  public getListTable(resources: ReadonlyArray<Wallet>): ListTable {
+  public getListTable(resources: readonly Wallet[]): ListTable {
     return [['Wallet', 'Name', 'Address', 'Unlocked', 'NEO', 'GAS']].concat(
       _.sortBy(resources, (resource) => resource.name).map((resource) => [
         resource.network,

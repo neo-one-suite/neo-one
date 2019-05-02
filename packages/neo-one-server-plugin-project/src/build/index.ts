@@ -46,7 +46,7 @@ const getContractPaths = (ctx: any): ContractPaths => ctx.contractPaths;
 const getContracts = (ctx: any): Contracts => ctx.contracts;
 const getSmartContractNetworksDefinitions = (ctx: any): SmartContractNetworksDefinitions =>
   ctx.smartContractNetworkDefinitions;
-const getNetworkDefinitions = (ctx: any): ReadonlyArray<NetworkDefinition> => ctx.networkDefinitions;
+const getNetworkDefinitions = (ctx: any): readonly NetworkDefinition[] => ctx.networkDefinitions;
 const getWallet = (ctx: any): Wallet => ctx.wallet;
 const getNetworkMaybe = (ctx: any): Network | undefined => ctx.networkMaybe;
 const getNetwork = (ctx: any): Network => ctx.network;

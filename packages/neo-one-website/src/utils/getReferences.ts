@@ -8,24 +8,24 @@ import { ModuleLinks, ModuleLinksPaths, tokenizeDocText } from './tokenizeDocTex
 
 interface Parameter {
   readonly name: string;
-  readonly type: ReadonlyArray<string>;
-  readonly description: ReadonlyArray<string>;
-  readonly examples?: ReadonlyArray<ReadonlyArray<string>>;
+  readonly type: readonly string[];
+  readonly description: readonly string[];
+  readonly examples?: ReadonlyArray<readonly string[]>;
 }
 
 interface Property extends Parameter {}
 
 interface MethodBase {
   readonly name: string;
-  readonly text: ReadonlyArray<string>;
-  readonly parameters: ReadonlyArray<Parameter>;
+  readonly text: readonly string[];
+  readonly parameters: readonly Parameter[];
 }
 
 interface Method extends MethodBase {
-  readonly description: ReadonlyArray<string>;
-  readonly returns?: ReadonlyArray<string>;
+  readonly description: readonly string[];
+  readonly returns?: readonly string[];
   readonly internal?: boolean;
-  readonly examples?: ReadonlyArray<ReadonlyArray<string>>;
+  readonly examples?: ReadonlyArray<readonly string[]>;
 }
 
 const BASE_PATH = path.resolve(__dirname, 'build', 'partials', 'modules');
@@ -138,15 +138,15 @@ const extractMethodBase = ({
   examples,
 }: {
   readonly title: string;
-  readonly definition: ReadonlyArray<string>;
-  readonly description: ReadonlyArray<string>;
+  readonly definition: readonly string[];
+  readonly description: readonly string[];
   readonly links: ModuleLinks;
   readonly moduleName: string;
   readonly functionData?: {
-    readonly parameters: ReadonlyArray<Parameter>;
-    readonly returns?: ReadonlyArray<string>;
+    readonly parameters: readonly Parameter[];
+    readonly returns?: readonly string[];
   };
-  readonly examples?: ReadonlyArray<ReadonlyArray<string>>;
+  readonly examples?: ReadonlyArray<readonly string[]>;
 }) => ({
   title,
   definition: tokenizeDocText(definition, links, moduleName),
@@ -171,8 +171,8 @@ const extractMethodBase = ({
 });
 
 const extractMethods = (
-  methods: ReadonlyArray<Method>,
-  properties: ReadonlyArray<Property>,
+  methods: readonly Method[],
+  properties: readonly Property[],
   links: ModuleLinks,
   moduleName: string,
 ) => {
@@ -323,7 +323,7 @@ const getReference = async (refPath: string, links: ModuleLinks, moduleName: str
       contents.examples === undefined
         ? undefined
         : // Remove last element which is always empty to ensure the template follows the JSON comma pattern.
-          contents.examples.slice(0, -1).map((example: ReadonlyArray<string>) => ({
+          contents.examples.slice(0, -1).map((example: readonly string[]) => ({
             title: 'Example',
             code: true,
             data: tokenizeDocText(example, links, moduleName),

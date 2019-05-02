@@ -22,7 +22,7 @@ import { MainEngine } from './engine/main';
 import { EngineContentFiles, Test, TestRunnerCallbacks, TestSuite } from './types';
 
 interface TestsPassContainerProps {
-  readonly consoleTestSuites: ReadonlyArray<TestSuite>;
+  readonly consoleTestSuites: readonly TestSuite[];
   readonly onTestsPass?: () => void;
 }
 

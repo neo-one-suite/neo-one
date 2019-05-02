@@ -27,7 +27,7 @@ const calculateClaimAmount = async ({
     readonly endHeight: number;
   }>;
   readonly decrementInterval: number;
-  readonly generationAmount: ReadonlyArray<number>;
+  readonly generationAmount: readonly number[];
   readonly getSystemFee: (index: number) => Promise<BN>;
 }): Promise<BN> => {
   const grouped = Object.values(_.groupBy(coins, (coin) => `${coin.startHeight}:${coin.endHeight}`));
@@ -135,7 +135,7 @@ function weightedAverage(
 }
 
 function weightedFilter<T>(
-  input: ReadonlyArray<T>,
+  input: readonly T[],
   startIn: number,
   endIn: number,
   getValueIn: (value: T) => BN,

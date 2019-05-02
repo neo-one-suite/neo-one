@@ -18,13 +18,13 @@ const TO_PUBLIC_KEY = '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e
 
 const LOCAL = 'local';
 
-const getNetworks = async (): Promise<ReadonlyArray<Network>> => {
+const getNetworks = async (): Promise<readonly Network[]> => {
   const networksString = await one.execute('get network --json');
 
   return JSON.parse(networksString);
 };
 
-const getWallets = async (networkName: string): Promise<ReadonlyArray<Wallet>> => {
+const getWallets = async (networkName: string): Promise<readonly Wallet[]> => {
   const walletsString = await one.execute(`get wallet --json --network ${networkName}`);
 
   return JSON.parse(walletsString);
@@ -54,7 +54,7 @@ const getClients = async (
   return { client };
 };
 
-const getContracts = async (client: Client, networkName: string): Promise<ReadonlyArray<Contract>> => {
+const getContracts = async (client: Client, networkName: string): Promise<readonly Contract[]> => {
   const readClient = client.read(networkName);
 
   const mutableContracts: Contract[] = [];

@@ -36,7 +36,7 @@ export function getDefaultImport(node: ts.ImportDeclaration): ts.Identifier | un
 }
 
 // tslint:disable-next-line export-name
-export function getNamedImports(node: ts.ImportDeclaration): ReadonlyArray<ts.ImportSpecifier> {
+export function getNamedImports(node: ts.ImportDeclaration): readonly ts.ImportSpecifier[] {
   const clause = getImportClause(node);
   if (clause === undefined) {
     return [];

@@ -893,9 +893,9 @@ export class WriteBatchBlockchain {
 
   private async updateAccounts(
     monitor: Monitor,
-    inputs: ReadonlyArray<Input>,
-    claims: ReadonlyArray<Input>,
-    outputs: ReadonlyArray<OutputWithInput>,
+    inputs: readonly Input[],
+    claims: readonly Input[],
+    outputs: readonly OutputWithInput[],
     accountChanges: AccountChanges = {},
   ): Promise<void> {
     const [inputOutputs, claimOutputs] = await monitor.captureSpan(
@@ -927,10 +927,10 @@ export class WriteBatchBlockchain {
 
         await Promise.all(
           addressValues.map(async ([address, values]) => {
-            const spent = addressSpent[address] as ReadonlyArray<OutputWithInput> | undefined;
-            const claimed = addressClaimed[address] as ReadonlyArray<Input> | undefined;
-            const outs = addressOutputs[address] as ReadonlyArray<OutputWithInput> | undefined;
-            const changes = accountChanges[address] as ReadonlyArray<ECPoint> | undefined;
+            const spent = addressSpent[address] as readonly OutputWithInput[] | undefined;
+            const claimed = addressClaimed[address] as readonly Input[] | undefined;
+            const outs = addressOutputs[address] as readonly OutputWithInput[] | undefined;
+            const changes = accountChanges[address] as readonly ECPoint[] | undefined;
             await this.updateAccount(
               common.hexToUInt160(address),
               // tslint:disable-next-line no-unused
@@ -949,7 +949,7 @@ export class WriteBatchBlockchain {
     );
   }
 
-  private getOutputWithInput(transaction: Transaction): ReadonlyArray<OutputWithInput> {
+  private getOutputWithInput(transaction: Transaction): readonly OutputWithInput[] {
     return transaction.outputs.map((output, index) => ({
       output,
       input: new Input({ hash: transaction.hash, index }),
@@ -957,7 +957,7 @@ export class WriteBatchBlockchain {
   }
 
   private async getInputOutputs(
-    inputs: ReadonlyArray<Input>,
+    inputs: readonly Input[],
   ): Promise<
     ReadonlyArray<{
       readonly input: Input;
@@ -974,18 +974,18 @@ export class WriteBatchBlockchain {
   }
 
   private groupByAddress(
-    inputOutputs: ReadonlyArray<OutputWithInput>,
-  ): { readonly [key: string]: ReadonlyArray<OutputWithInput> } {
+    inputOutputs: readonly OutputWithInput[],
+  ): { readonly [key: string]: readonly OutputWithInput[] } {
     return _.groupBy(inputOutputs, ({ output }) => common.uInt160ToHex(output.address));
   }
 
   private async updateAccount(
     address: UInt160,
     values: ReadonlyArray<[UInt256, BN]>,
-    spent: ReadonlyArray<OutputWithInput>,
-    claimed: ReadonlyArray<Input>,
-    outputs: ReadonlyArray<OutputWithInput>,
-    votes: ReadonlyArray<ECPoint>,
+    spent: readonly OutputWithInput[],
+    claimed: readonly Input[],
+    outputs: readonly OutputWithInput[],
+    votes: readonly ECPoint[],
   ): Promise<void> {
     const account = await this.account.tryGet({ hash: address });
 
@@ -1056,8 +1056,8 @@ export class WriteBatchBlockchain {
 
   private async updateCoins(
     monitor: Monitor,
-    inputs: ReadonlyArray<Input>,
-    claims: ReadonlyArray<Input>,
+    inputs: readonly Input[],
+    claims: readonly Input[],
     block: Block,
   ): Promise<void> {
     await monitor.captureSpan(
@@ -1078,7 +1078,7 @@ export class WriteBatchBlockchain {
     );
   }
 
-  private async updateCoin(hash: UInt256, inputClaims: ReadonlyArray<InputClaim>, block: Block): Promise<void> {
+  private async updateCoin(hash: UInt256, inputClaims: readonly InputClaim[], block: Block): Promise<void> {
     const spentCoins = await this.transactionData.get({ hash });
     const endHeights = { ...spentCoins.endHeights };
     const claimed = { ...spentCoins.claimed };

@@ -3,16 +3,16 @@ import { TaskStatus } from './types';
 export const getTaskError = (task: TaskStatus): string | undefined =>
   task.subtasks !== undefined ? getTasksError(task.subtasks) : task.error;
 
-export const getTasksError = (tasks: ReadonlyArray<TaskStatus>): string | undefined =>
+export const getTasksError = (tasks: readonly TaskStatus[]): string | undefined =>
   tasks.map(getTaskError).filter((value) => value !== undefined)[0];
 
 export const isTaskDone = (task: TaskStatus): boolean =>
   getTaskError(task) !== undefined || task.skipped !== undefined || task.complete === true;
 
-export const areTasksDone = (tasks: ReadonlyArray<TaskStatus>): boolean =>
+export const areTasksDone = (tasks: readonly TaskStatus[]): boolean =>
   getTasksError(tasks) !== undefined || tasks.every((task) => task.skipped !== undefined || task.complete === true);
 
-export const skipAllTasks = (tasks: ReadonlyArray<TaskStatus>, reason: string): ReadonlyArray<TaskStatus> =>
+export const skipAllTasks = (tasks: readonly TaskStatus[], reason: string): readonly TaskStatus[] =>
   tasks.map((task) => {
     if (isTaskDone(task)) {
       return task;

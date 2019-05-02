@@ -16,7 +16,7 @@ interface Line {
   readonly value: string;
 }
 
-export const disassembleByteCode = (bytes: Buffer): ReadonlyArray<Line> => {
+export const disassembleByteCode = (bytes: Buffer): readonly Line[] => {
   const reader = new BinaryReader(bytes);
 
   const mutableResult: Array<[number, OpCode | 'UNKNOWN', string | undefined]> = [];

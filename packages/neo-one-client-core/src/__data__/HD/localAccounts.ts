@@ -1,5 +1,5 @@
 // tslint:disable-next-line:no-any
-export const localAccounts: ReadonlyArray<any> = [
+export const localAccounts: readonly any[] = [
   {
     identifier: [0, 0, 0],
     userAccount: {

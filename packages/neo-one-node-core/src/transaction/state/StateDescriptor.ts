@@ -121,7 +121,7 @@ export class StateDescriptor implements SerializableWire<StateDescriptor>, Seria
     }
   }
 
-  public getScriptHashesForVerifying(): ReadonlyArray<UInt160Hex> {
+  public getScriptHashesForVerifying(): readonly UInt160Hex[] {
     const { type } = this;
     switch (type) {
       case StateDescriptorType.Account:

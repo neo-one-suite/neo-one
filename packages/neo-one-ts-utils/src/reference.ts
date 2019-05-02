@@ -30,7 +30,7 @@ function getNodeForReferences(node: node_.AnyNameableNode | ts.Identifier): ts.N
 export function findReferences(
   languageService: ts.LanguageService,
   node: node_.AnyNameableNode | ts.Identifier,
-): ReadonlyArray<ts.ReferencedSymbol> {
+): readonly ts.ReferencedSymbol[] {
   return utils.getArray(
     languageService.findReferences(node.getSourceFile().fileName, getNodeForReferences(node).getStart()),
   );
@@ -38,9 +38,9 @@ export function findReferences(
 
 export function getNodesForReferences(
   program: ts.Program,
-  symbols: ReadonlyArray<ts.ReferencedSymbol>,
-): ReadonlyArray<ts.Node> {
-  return symbols.reduce<ReadonlyArray<ts.Node>>((acc, symbol) => {
+  symbols: readonly ts.ReferencedSymbol[],
+): readonly ts.Node[] {
+  return symbols.reduce<readonly ts.Node[]>((acc, symbol) => {
     const isAlias = symbol.definition.kind === ts.ScriptElementKind.alias;
     const references = isAlias ? symbol.references : symbol.references.filter((reference) => !reference.isDefinition);
 
@@ -61,6 +61,6 @@ export function findReferencesAsNodes(
   program: ts.Program,
   languageService: ts.LanguageService,
   node: node_.AnyNameableNode | ts.Identifier,
-): ReadonlyArray<ts.Node> {
+): readonly ts.Node[] {
   return getNodesForReferences(program, findReferences(languageService, node));
 }

@@ -6,7 +6,7 @@ import { UnknownAccountError, UnknownNetworkError } from '../../../errors';
 import { HDAccount, HDHandler, HDKeyStore } from '../../../user/keystore';
 
 interface BootstrapOptions {
-  readonly networks: ReadonlyArray<string>;
+  readonly networks: readonly string[];
   readonly byteLimit: number | undefined;
   readonly scanAccounts: (network: string) => ReadonlyArray<HDAccount<number>>;
 }
@@ -42,7 +42,7 @@ describe('LedgerKeyStore', () => {
     close,
   };
 
-  let networks$: Observable<ReadonlyArray<string>>;
+  let networks$: Observable<readonly string[]>;
   let keystore: HDKeyStore<number>;
 
   const bootstrapKeystore = (options: Partial<BootstrapOptions> = {}) => {

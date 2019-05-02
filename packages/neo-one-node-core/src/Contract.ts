@@ -26,7 +26,7 @@ export interface ContractAdd {
   readonly hash?: UInt160;
   readonly version?: number;
   readonly script: Buffer;
-  readonly parameterList: ReadonlyArray<ContractParameterType>;
+  readonly parameterList: readonly ContractParameterType[];
   readonly returnType: ContractParameterType;
   readonly contractProperties: ContractPropertyState;
   readonly name: string;
@@ -102,7 +102,7 @@ export const sizeOfContract = ({
   publishVersion,
 }: {
   readonly script: Buffer;
-  readonly parameterList: ReadonlyArray<ContractParameterType>;
+  readonly parameterList: readonly ContractParameterType[];
   readonly name: string;
   readonly codeVersion: string;
   readonly author: string;

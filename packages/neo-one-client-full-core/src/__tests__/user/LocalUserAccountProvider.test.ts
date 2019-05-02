@@ -227,7 +227,7 @@ describe('LocalUserAccountProvider', () => {
     await expect(result).rejects.toMatchSnapshot();
   });
 
-  const contractParameterTypes: ReadonlyArray<ContractParameterType> = [
+  const contractParameterTypes: readonly ContractParameterType[] = [
     'Signature',
     'Boolean',
     'Integer',
@@ -278,8 +278,8 @@ describe('LocalUserAccountProvider', () => {
 
   const publishAndDeployCases: ReadonlyArray<{
     readonly name: string;
-    readonly parameters: ReadonlyArray<ABIParameter> | undefined;
-    readonly params: ReadonlyArray<Param>;
+    readonly parameters: readonly ABIParameter[] | undefined;
+    readonly params: readonly Param[];
   }> = [
     {
       name: 'without params',
@@ -332,7 +332,7 @@ describe('LocalUserAccountProvider', () => {
     });
   });
 
-  const assetTypes: ReadonlyArray<AssetType> = [
+  const assetTypes: readonly AssetType[] = [
     'Credit',
     'Duty',
     'Governing',

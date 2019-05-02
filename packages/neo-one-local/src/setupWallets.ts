@@ -18,7 +18,7 @@ export interface BootstrapWallet {
   readonly amount: BigNumber;
 }
 
-export const WALLETS: ReadonlyArray<BootstrapWallet> = [
+export const WALLETS: readonly BootstrapWallet[] = [
   {
     name: 'alfa',
     privateKey: 'KyX5sPKRpAMb3XAFLUrHv7u1LxKkKFrpyJDgE4kceRX9FRJ4WRCQ',
@@ -127,7 +127,7 @@ export const setupWallets = async (
     account.balances[Hash256.NEO].isEqualTo(0)
   ) {
     const result = await client.transfer(
-      WALLETS.reduce<ReadonlyArray<Transfer>>((acc, wallet) => acc.concat(createWalletTransfers(wallet)), []),
+      WALLETS.reduce<readonly Transfer[]>((acc, wallet) => acc.concat(createWalletTransfers(wallet)), []),
     );
     await Promise.all([result.confirmed(), developerClient.runConsensusNow()]);
   }

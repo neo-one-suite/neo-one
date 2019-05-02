@@ -108,7 +108,7 @@ describe('LocalHDStore', () => {
   test('Saves on close', async () => {
     bootstrapSingle('m/0');
 
-    let setItems: ReadonlyArray<string> = [];
+    let setItems: readonly string[] = [];
     setItem.mockImplementation(async (key: string, _value: string) => (setItems = setItems.concat(key)));
 
     await store.getPublicKey([0, 0, 0]);

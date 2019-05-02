@@ -57,7 +57,7 @@ export class ProjectResourceType extends ResourceType<Project, ProjectResourceOp
     return new CRUD({ resourceType: this });
   }
 
-  public getListTable(resources: ReadonlyArray<Project>): ListTable {
+  public getListTable(resources: readonly Project[]): ListTable {
     return [['ID', 'Root Directory', 'Address', 'Unlocked', 'NEO', 'GAS']].concat(
       _.sortBy(resources, (resource) => resource.name).map((resource) => [resource.name, resource.rootDir]),
     );

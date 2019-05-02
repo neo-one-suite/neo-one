@@ -85,8 +85,8 @@ describe('NEOONEDataProvider', () => {
   };
 
   const verifyDefaultActions = (
-    actions: ReadonlyArray<RawAction>,
-    actionsJSON: ReadonlyArray<ActionJSON>,
+    actions: readonly RawAction[],
+    actionsJSON: readonly ActionJSON[],
     blockIndex: number,
     blockHash: string,
     index: number,

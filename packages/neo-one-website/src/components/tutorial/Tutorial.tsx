@@ -11,7 +11,7 @@ export interface TutorialProps {
   readonly title: string;
   readonly content: MarkdownContent;
   readonly link: string;
-  readonly sidebar: ReadonlyArray<SectionData>;
+  readonly sidebar: readonly SectionData[];
   readonly next?: AdjacentInfo;
   readonly previous?: AdjacentInfo;
 }
@@ -39,7 +39,7 @@ export const Tutorial = (props: TutorialProps) => {
   const subSections = props.sidebar[0].subsections;
   const [current, setCurrent] = useState(subSections[0]);
 
-  const allSections = subSections.reduce<ReadonlyArray<SubsectionData>>((acc, section) => {
+  const allSections = subSections.reduce<readonly SubsectionData[]>((acc, section) => {
     const newSections = section.subsections !== undefined ? [section].concat(section.subsections) : [section];
 
     return acc.concat(newSections);

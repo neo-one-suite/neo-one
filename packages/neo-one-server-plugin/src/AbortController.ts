@@ -35,9 +35,9 @@ export class AbortSignal extends EventEmitter {
 }
 
 export class CombinedAbortSignal extends AbortSignal {
-  public readonly signals: ReadonlyArray<AbortSignal>;
+  public readonly signals: readonly AbortSignal[];
 
-  public constructor(signals: ReadonlyArray<AbortSignal>) {
+  public constructor(signals: readonly AbortSignal[]) {
     super();
     this.signals = signals;
   }

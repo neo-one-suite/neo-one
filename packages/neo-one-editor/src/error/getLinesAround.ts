@@ -10,8 +10,8 @@ import { ScriptLine } from './StackFrame';
 export function getLinesAround(
   line: number,
   count: number,
-  linesIn: ReadonlyArray<string> | string,
-): ReadonlyArray<ScriptLine> {
+  linesIn: readonly string[] | string,
+): readonly ScriptLine[] {
   let lines = linesIn;
   if (typeof lines === 'string') {
     lines = lines.split('\n');

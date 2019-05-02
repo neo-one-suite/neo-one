@@ -152,5 +152,5 @@ export const InvalidHDStoredPathError = makeErrorWithCode(
 );
 export const InvalidMasterPathError = makeErrorWithCode(
   'INVALID_HD_MASTER_PATH',
-  (path: ReadonlyArray<number>) => `Invalid masterPath returned by HDStore: ${path}`,
+  (path: readonly number[]) => `Invalid masterPath returned by HDStore: ${path}`,
 );

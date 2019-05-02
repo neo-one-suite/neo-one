@@ -150,16 +150,16 @@ export interface CollectedLoggerLogOptions {
 export interface MetricOptions {
   readonly name: string;
   readonly help?: string;
-  readonly labelNames?: ReadonlyArray<Label>;
-  readonly labels?: ReadonlyArray<Labels>;
+  readonly labelNames?: readonly Label[];
+  readonly labels?: readonly Labels[];
 }
 
 export interface BucketedMetricOptions extends MetricOptions {
-  readonly buckets?: ReadonlyArray<number>;
+  readonly buckets?: readonly number[];
 }
 
 export interface PercentiledMetricOptions extends MetricOptions {
-  readonly percentiles?: ReadonlyArray<number>;
+  readonly percentiles?: readonly number[];
 }
 
 export type AllMetricOptions = MetricOptions | BucketedMetricOptions | PercentiledMetricOptions;
@@ -171,7 +171,7 @@ export interface MetricValue {
 
 export interface CollectedMetric<T extends MetricOptions | BucketedMetricOptions> {
   readonly metric: T;
-  readonly values: ReadonlyArray<MetricValue>;
+  readonly values: readonly MetricValue[];
 }
 export interface CollectedMetrics<T extends MetricOptions | BucketedMetricOptions> {
   readonly [name: string]: CollectedMetric<T>;
@@ -183,7 +183,7 @@ export interface MetricCollection {
 }
 
 export interface Report {
-  readonly logs: ReadonlyArray<CollectedLoggerLogOptions>;
+  readonly logs: readonly CollectedLoggerLogOptions[];
   readonly metrics: MetricCollection;
 }
 
@@ -195,7 +195,7 @@ export interface CounterBase {
 }
 
 export interface Counter extends CounterBase {
-  readonly getLabelNames: () => ReadonlyArray<Label>;
+  readonly getLabelNames: () => readonly Label[];
 }
 
 export interface GaugeBase {
@@ -210,7 +210,7 @@ export interface GaugeBase {
 }
 
 export interface Gauge extends GaugeBase {
-  readonly getLabelNames: () => ReadonlyArray<Label>;
+  readonly getLabelNames: () => readonly Label[];
 }
 
 export interface HistogramBase {
@@ -221,7 +221,7 @@ export interface HistogramBase {
 }
 
 export interface Histogram extends HistogramBase {
-  readonly getLabelNames: () => ReadonlyArray<Label>;
+  readonly getLabelNames: () => readonly Label[];
 }
 
 export interface SummaryBase {
@@ -232,7 +232,7 @@ export interface SummaryBase {
 }
 
 export interface Summary extends SummaryBase {
-  readonly getLabelNames: () => ReadonlyArray<Label>;
+  readonly getLabelNames: () => readonly Label[];
 }
 
 export type Metric = Counter | Gauge | Histogram | Summary;

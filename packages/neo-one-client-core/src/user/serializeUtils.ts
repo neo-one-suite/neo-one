@@ -6,9 +6,9 @@ export interface SerializedObject {
   readonly [key: string]: SerializedValueToken;
 }
 
-export type SerializedArray = ReadonlyArray<SerializedValueToken>;
+export type SerializedArray = readonly SerializedValueToken[];
 
-export type SerializedMap = ReadonlyArray<SerializedArrayToken>;
+export type SerializedMap = readonly SerializedArrayToken[];
 
 export interface SerializedStringToken {
   readonly type: 'String';
@@ -108,7 +108,7 @@ export interface DeserializedObject {
   readonly [key: string]: DeserializedValue;
 }
 // tslint:disable-next-line no-any
-export type DeserializedArray = ReadonlyArray<any>;
+export type DeserializedArray = readonly any[];
 
 // tslint:disable-next-line no-any
 export type DeserializedMap = Map<any, any>;

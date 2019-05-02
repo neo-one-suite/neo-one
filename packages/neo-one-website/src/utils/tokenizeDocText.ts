@@ -16,8 +16,8 @@ const PUNCTUATION: ReadonlyArray<[RegExp, string]> = [
 const BASE_PATH = 'https://neo-one.io';
 
 export interface ModuleLinksPaths {
-  readonly links: ReadonlyArray<string>;
-  readonly paths: ReadonlyArray<string>;
+  readonly links: readonly string[];
+  readonly paths: readonly string[];
 }
 
 export interface ModuleLinks {
@@ -41,8 +41,8 @@ const removeQuotes = (word: string) => (word.charAt(0) === '`' ? word.replace('`
 
 const handleInlineLinks = (
   text: string,
-  links: ReadonlyArray<string> = [],
-): { readonly linkText: string; readonly inlineLinks: ReadonlyArray<string> } => {
+  links: readonly string[] = [],
+): { readonly linkText: string; readonly inlineLinks: readonly string[] } => {
   if (text.includes(BASE_PATH)) {
     const start = text.indexOf('[');
     const end = text.indexOf(']');
@@ -93,5 +93,5 @@ const tokenizeText = (text: string, links: ModuleLinks, moduleName: string) => {
   });
 };
 
-export const tokenizeDocText = (textArray: ReadonlyArray<string>, links: ModuleLinks, moduleName: string) =>
+export const tokenizeDocText = (textArray: readonly string[], links: ModuleLinks, moduleName: string) =>
   tokenizeText(textArray.slice(0, textArray.length - 1).join(' \n'), links, moduleName);

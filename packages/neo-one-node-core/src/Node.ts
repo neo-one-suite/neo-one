@@ -27,7 +27,7 @@ export interface Node {
   ) => Promise<RelayTransactionResult>;
   readonly relayConsensusPayload: (payload: ConsensusPayload) => void;
   readonly relayBlock: (block: Block, monitor?: Monitor) => Promise<void>;
-  readonly connectedPeers: ReadonlyArray<Endpoint>;
+  readonly connectedPeers: readonly Endpoint[];
   readonly memPool: { readonly [hash: string]: Transaction };
   readonly syncMemPool: () => void;
   readonly consensus: Consensus | undefined;

@@ -51,10 +51,10 @@ export class IssueTransactionModel<
     inputs = this.inputs,
     outputs = this.outputs,
   }: {
-    readonly scripts?: ReadonlyArray<TWitness>;
-    readonly attributes?: ReadonlyArray<TAttribute>;
-    readonly inputs?: ReadonlyArray<TInput>;
-    readonly outputs?: ReadonlyArray<TOutput>;
+    readonly scripts?: readonly TWitness[];
+    readonly attributes?: readonly TAttribute[];
+    readonly inputs?: readonly TInput[];
+    readonly outputs?: readonly TOutput[];
   }): this {
     // tslint:disable-next-line no-any
     return new (this.constructor as any)({

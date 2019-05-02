@@ -161,7 +161,7 @@ const extractLog = (action: RawAction): ConsoleLog | undefined => {
   }
 };
 
-const extractConsoleLogs = (actions: ReadonlyArray<RawAction>): ReadonlyArray<ConsoleLog> => {
+const extractConsoleLogs = (actions: readonly RawAction[]): readonly ConsoleLog[] => {
   const mutableLogs: ConsoleLog[] = [];
   // tslint:disable-next-line no-loop-statement
   for (const action of actions) {
@@ -176,10 +176,10 @@ const extractConsoleLogs = (actions: ReadonlyArray<RawAction>): ReadonlyArray<Co
 };
 
 export const createConsoleLogMessages = async (
-  actions: ReadonlyArray<RawAction>,
+  actions: readonly RawAction[],
   sourceMapsIn: Promise<SourceMaps> = Promise.resolve({}),
   { bare = false, onlyFileName = false }: LogOptions = { bare: false, onlyFileName: false },
-): Promise<ReadonlyArray<string>> => {
+): Promise<readonly string[]> => {
   const logs = extractConsoleLogs(actions);
   if (bare) {
     return logs.map(({ message }) => message);

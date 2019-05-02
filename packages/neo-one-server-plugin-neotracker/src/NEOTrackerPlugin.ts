@@ -27,11 +27,11 @@ export class NEOTrackerPlugin extends Plugin {
     };
   }
 
-  public get dependencies(): ReadonlyArray<string> {
+  public get dependencies(): readonly string[] {
     return [networkConstants.PLUGIN];
   }
 
-  public get resourceTypes(): ReadonlyArray<ResourceType> {
+  public get resourceTypes(): readonly ResourceType[] {
     return [this.neotrackerResourceType];
   }
 

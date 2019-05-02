@@ -43,7 +43,7 @@ export interface AssetRegister {
 
 export interface ContractRegister {
   readonly script: BufferString;
-  readonly parameters: ReadonlyArray<ContractParameterType>;
+  readonly parameters: readonly ContractParameterType[];
   readonly returnType: ContractParameterType;
   readonly name: string;
   readonly codeVersion: string;
@@ -71,7 +71,7 @@ export interface UserAccountProvider extends UserAccountProviderLite {
   readonly publishAndDeploy: (
     contract: ContractRegister,
     abi: ABI,
-    params: ReadonlyArray<Param>,
+    params: readonly Param[],
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<PublishReceipt, InvocationTransaction>>;
@@ -80,7 +80,7 @@ export interface UserAccountProvider extends UserAccountProviderLite {
     options?: TransactionOptions,
   ) => Promise<TransactionResult<RegisterAssetReceipt, InvocationTransaction>>;
   readonly issue: (
-    transfers: ReadonlyArray<Transfer>,
+    transfers: readonly Transfer[],
     options?: TransactionOptions,
   ) => Promise<TransactionResult<TransactionReceipt, IssueTransaction>>;
   readonly read: (network: NetworkType) => DataProvider;
@@ -99,12 +99,12 @@ export interface DataProvider {
   readonly getBestBlockHash: (monitor?: Monitor) => Promise<Hash256String>;
   readonly getBlockCount: (monitor?: Monitor) => Promise<number>;
   readonly getContract: (address: AddressString, monitor?: Monitor) => Promise<Contract>;
-  readonly getMemPool: (monitor?: Monitor) => Promise<ReadonlyArray<Hash256String>>;
+  readonly getMemPool: (monitor?: Monitor) => Promise<readonly Hash256String[]>;
   readonly getTransaction: (hash: Hash256String, monitor?: Monitor) => Promise<Transaction>;
   readonly getOutput: (input: Input, monitor?: Monitor) => Promise<Output>;
-  readonly getConnectedPeers: (monitor?: Monitor) => Promise<ReadonlyArray<Peer>>;
+  readonly getConnectedPeers: (monitor?: Monitor) => Promise<readonly Peer[]>;
 }
 
 export interface InvokeExecuteTransactionOptions extends TransactionOptions {
-  readonly transfers?: ReadonlyArray<Transfer>;
+  readonly transfers?: readonly Transfer[];
 }

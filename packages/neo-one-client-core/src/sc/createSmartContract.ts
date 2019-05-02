@@ -46,7 +46,7 @@ import * as common from './common';
 
 interface ParamAndOptionsResults {
   // tslint:disable-next-line:no-any
-  readonly requiredArgs: ReadonlyArray<any>;
+  readonly requiredArgs: readonly any[];
   // tslint:disable-next-line:no-any
   readonly options: any;
   readonly forwardOptions: ForwardOptions | undefined;
@@ -66,9 +66,9 @@ export const getParamsAndOptions = ({
   client,
 }: {
   readonly definition: SmartContractDefinition;
-  readonly parameters: ReadonlyArray<ABIParameter>;
+  readonly parameters: readonly ABIParameter[];
   // tslint:disable-next-line no-any
-  readonly args: ReadonlyArray<any>;
+  readonly args: readonly any[];
   readonly sendUnsafe: boolean;
   readonly receive: boolean;
   readonly send: boolean;

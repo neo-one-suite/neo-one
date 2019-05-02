@@ -8,7 +8,7 @@ import {
 } from '../constants';
 
 export const createBinary = (
-  argv: ReadonlyArray<string>,
+  argv: readonly string[],
   {
     dir,
     serverPort,

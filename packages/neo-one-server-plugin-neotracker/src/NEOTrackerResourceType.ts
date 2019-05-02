@@ -72,7 +72,7 @@ export class NEOTrackerResourceType extends ResourceType<NEOTracker, NEOTrackerR
     });
   }
 
-  public getListTable(resources: ReadonlyArray<NEOTracker>): ListTable {
+  public getListTable(resources: readonly NEOTracker[]): ListTable {
     return [['Name', 'Type', 'URL', 'Live']].concat(
       _.sortBy(resources, (resource) => resource.name).map((resource) => [
         resource.name,

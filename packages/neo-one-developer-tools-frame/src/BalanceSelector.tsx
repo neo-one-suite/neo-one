@@ -40,7 +40,7 @@ const onChangeAsset = (asset: Asset) => {
   assetGlobal$.next(asset);
 };
 
-const getAsset = (tokens: ReadonlyArray<Token>, prevTokens: ReadonlyArray<Token> | undefined, asset: Asset) => {
+const getAsset = (tokens: readonly Token[], prevTokens: readonly Token[] | undefined, asset: Asset) => {
   if (prevTokens === undefined || prevTokens === tokens) {
     return asset;
   }

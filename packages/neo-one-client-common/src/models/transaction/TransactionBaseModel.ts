@@ -17,10 +17,10 @@ export interface TransactionBaseModelAdd<
   TWitness extends WitnessModel
 > {
   readonly version?: number;
-  readonly attributes?: ReadonlyArray<TAttribute>;
-  readonly inputs?: ReadonlyArray<TInput>;
-  readonly outputs?: ReadonlyArray<TOutput>;
-  readonly scripts?: ReadonlyArray<TWitness>;
+  readonly attributes?: readonly TAttribute[];
+  readonly inputs?: readonly TInput[];
+  readonly outputs?: readonly TOutput[];
+  readonly scripts?: readonly TWitness[];
   readonly hash?: UInt256;
 }
 
@@ -48,10 +48,10 @@ export abstract class TransactionBaseModel<
 
   public readonly type: Type;
   public readonly version: number;
-  public readonly attributes: ReadonlyArray<TAttribute>;
-  public readonly inputs: ReadonlyArray<TInput>;
-  public readonly outputs: ReadonlyArray<TOutput>;
-  public readonly scripts: ReadonlyArray<TWitness>;
+  public readonly attributes: readonly TAttribute[];
+  public readonly inputs: readonly TInput[];
+  public readonly outputs: readonly TOutput[];
+  public readonly scripts: readonly TWitness[];
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly serializeUnsigned: SerializeWire = createSerializeWire(this.serializeUnsignedBase.bind(this));
   private readonly hashInternal: () => UInt256;
@@ -86,10 +86,10 @@ export abstract class TransactionBaseModel<
   }
 
   public abstract clone(options: {
-    readonly scripts?: ReadonlyArray<TWitness>;
-    readonly attributes?: ReadonlyArray<TAttribute>;
-    readonly inputs?: ReadonlyArray<TInput>;
-    readonly outputs?: ReadonlyArray<TOutput>;
+    readonly scripts?: readonly TWitness[];
+    readonly attributes?: readonly TAttribute[];
+    readonly inputs?: readonly TInput[];
+    readonly outputs?: readonly TOutput[];
   }): this;
 
   public get hash(): UInt256 {

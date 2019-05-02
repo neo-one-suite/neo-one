@@ -6,7 +6,7 @@ import { ContractParameter } from './types';
 export const UnknownOpError = makeErrorWithCode('UNKNOWN_OP', (byteCode: string) => `Unknown op: ${byteCode}`);
 export const InvalidContractParameterError = makeErrorWithCode(
   'INVALID_CONTRACT_PARAMETER',
-  (parameter: ContractParameter, expected: ReadonlyArray<ContractParameter['type']>) =>
+  (parameter: ContractParameter, expected: readonly ContractParameter['type'][]) =>
     `Expected one of ${JSON.stringify(expected)} ` + `ContractParameterTypes, found ${parameter.type}`,
 );
 export const Base58CheckError = makeErrorWithCode(

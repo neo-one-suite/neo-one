@@ -17,7 +17,7 @@ export interface ContractModelAdd {
   readonly hash?: UInt160;
   readonly version?: number;
   readonly script: Buffer;
-  readonly parameterList: ReadonlyArray<ContractParameterTypeModel>;
+  readonly parameterList: readonly ContractParameterTypeModel[];
   readonly returnType: ContractParameterTypeModel;
   readonly contractProperties: ContractPropertyStateModel;
   readonly name: string;
@@ -29,7 +29,7 @@ export interface ContractModelAdd {
 
 export class ContractModel extends BaseState implements SerializableWire<ContractModel> {
   public readonly script: Buffer;
-  public readonly parameterList: ReadonlyArray<ContractParameterTypeModel>;
+  public readonly parameterList: readonly ContractParameterTypeModel[];
   public readonly returnType: ContractParameterTypeModel;
   public readonly name: string;
   public readonly codeVersion: string;

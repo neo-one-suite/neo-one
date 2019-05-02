@@ -35,20 +35,20 @@ export class StackFrame {
   public readonly _originalLineNumber: number | undefined;
   public readonly _originalColumnNumber: number | undefined;
 
-  public readonly _scriptCode: ReadonlyArray<ScriptLine> | undefined;
-  public readonly _originalScriptCode: ReadonlyArray<ScriptLine> | undefined;
+  public readonly _scriptCode: readonly ScriptLine[] | undefined;
+  public readonly _originalScriptCode: readonly ScriptLine[] | undefined;
 
   public constructor(
     functionNameIn?: string,
     fileName?: string,
     lineNumber?: number,
     columnNumber?: number,
-    scriptCode?: ReadonlyArray<ScriptLine>,
+    scriptCode?: readonly ScriptLine[],
     sourceFunctionName?: string,
     sourceFileName?: string,
     sourceLineNumber?: number,
     sourceColumnNumber?: number,
-    sourceScriptCode?: ReadonlyArray<ScriptLine>,
+    sourceScriptCode?: readonly ScriptLine[],
   ) {
     // tslint:disable-next-line no-let
     let functionName = functionNameIn;

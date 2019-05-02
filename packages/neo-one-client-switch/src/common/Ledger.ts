@@ -9,7 +9,7 @@ export interface Ledger {
   readonly byteLimit: number;
   readonly load: () => Promise<{
     readonly open: (path: string) => Promise<HWLedger>;
-    readonly list: () => Promise<ReadonlyArray<string>>;
+    readonly list: () => Promise<readonly string[]>;
     readonly isSupported: () => Promise<boolean>;
   }>;
 }

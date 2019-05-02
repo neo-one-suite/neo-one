@@ -27,7 +27,7 @@ export interface Network {
   readonly type: NetworkType;
   readonly height: number | undefined;
   readonly peers: number | undefined;
-  readonly nodes: ReadonlyArray<Node>;
+  readonly nodes: readonly Node[];
   readonly live: () => Promise<void>;
   readonly ready: () => Promise<void>;
 }
@@ -82,7 +82,7 @@ export class NetworkResourceType extends ResourceType<Network, NetworkResourceOp
     });
   }
 
-  public getListTable(resources: ReadonlyArray<Network>): ListTable {
+  public getListTable(resources: readonly Network[]): ListTable {
     return [['Name', 'Type', 'Height', 'Nodes']].concat(
       _.sortBy(resources, (resource) => resource.name).map((resource) => [
         resource.name,

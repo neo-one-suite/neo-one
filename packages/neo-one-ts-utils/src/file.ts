@@ -3,7 +3,7 @@ import * as node_ from './node';
 import * as statement from './statement';
 import * as utils from './utils';
 
-export function getSourceFiles(program: ts.Program): ReadonlyArray<ts.SourceFile> {
+export function getSourceFiles(program: ts.Program): readonly ts.SourceFile[] {
   return program.getSourceFiles();
 }
 
@@ -27,15 +27,15 @@ export function getText(node: ts.Node): string {
   return node_.getSourceFile(node).getFullText();
 }
 
-export function getImportDeclarations(node: ts.SourceFile): ReadonlyArray<ts.ImportDeclaration> {
+export function getImportDeclarations(node: ts.SourceFile): readonly ts.ImportDeclaration[] {
   return statement.getStatements(node).filter(ts.isImportDeclaration);
 }
 
-export function getExportDeclarations(node: ts.SourceFile): ReadonlyArray<ts.ExportDeclaration> {
+export function getExportDeclarations(node: ts.SourceFile): readonly ts.ExportDeclaration[] {
   return statement.getStatements(node).filter(ts.isExportDeclaration);
 }
 
-export function getExportAssignments(node: ts.SourceFile): ReadonlyArray<ts.ExportAssignment> {
+export function getExportAssignments(node: ts.SourceFile): readonly ts.ExportAssignment[] {
   return statement.getStatements(node).filter(ts.isExportAssignment);
 }
 
@@ -49,7 +49,7 @@ export function createSourceMapRange(node: ts.Node): ts.SourceMapRange {
   };
 }
 
-export function getExportedSymbols(typeChecker: ts.TypeChecker, node: ts.SourceFile): ReadonlyArray<ts.Symbol> {
+export function getExportedSymbols(typeChecker: ts.TypeChecker, node: ts.SourceFile): readonly ts.Symbol[] {
   const symbol = node_.getSymbol(typeChecker, node);
 
   return symbol === undefined ? [] : typeChecker.getExportsOfModule(symbol);

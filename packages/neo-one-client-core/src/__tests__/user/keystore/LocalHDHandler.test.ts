@@ -69,7 +69,7 @@ describe('LocalHDHandler', () => {
   });
 
   const bootstrapMockHandler = (
-    masterPath: ReadonlyArray<number>,
+    masterPath: readonly number[],
     getAccountMockIn?: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>,
   ) => {
     getMasterPath.mockImplementation(() => masterPath);

@@ -70,7 +70,7 @@ export function textProcessor() {
   return {
     $runAfter: ['paths-computed'],
     $runBefore: ['rendering-docs'],
-    $process(docs: ReadonlyArray<any>) {
+    $process(docs: readonly any[]) {
       docs
         .filter((doc: any) => doc.docType !== 'function-overload')
         .forEach((doc: any) => {

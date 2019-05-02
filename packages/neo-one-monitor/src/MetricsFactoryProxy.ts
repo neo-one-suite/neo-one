@@ -28,14 +28,14 @@ export interface MetricConstruct {
 
 export class MetricProxy<T> {
   protected readonly metric: T | undefined;
-  protected readonly labelNames: ReadonlyArray<string>;
+  protected readonly labelNames: readonly string[];
 
-  public constructor(metric?: T | undefined, labelNames: ReadonlyArray<string> = []) {
+  public constructor(metric?: T | undefined, labelNames: readonly string[] = []) {
     this.metric = metric;
     this.labelNames = labelNames;
   }
 
-  public getLabelNames(): ReadonlyArray<string> {
+  public getLabelNames(): readonly string[] {
     return this.labelNames;
   }
 

@@ -6,7 +6,7 @@ import typescript from 'dgeni-packages/typescript';
 import * as path from 'path';
 import { textProcessor } from './processors';
 
-const docFiles: ReadonlyArray<string> = [
+const docFiles: readonly string[] = [
   'neo-one-client-core/src/types.ts',
   'neo-one-client-core/src/Client.ts',
   'neo-one-client-core/src/DeveloperClient.ts',

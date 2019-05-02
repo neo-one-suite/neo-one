@@ -186,7 +186,7 @@ export class InteractiveCLI {
     this.setDelimiter();
   }
 
-  public async start(argv: ReadonlyArray<string>): Promise<void> {
+  public async start(argv: readonly string[]): Promise<void> {
     const { dir } = this.serverConfig;
     const paths = {
       data: dir === undefined ? defaultPaths.data : path.join(dir, 'data'),
@@ -465,7 +465,7 @@ export class InteractiveCLI {
     ];
   }
   // tslint:disable-next-line no-any
-  public async prompt(questions: ReadonlyArray<any>): Promise<any> {
+  public async prompt(questions: readonly any[]): Promise<any> {
     return inquirer.prompt(questions);
   }
 

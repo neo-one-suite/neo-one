@@ -28,13 +28,13 @@ export interface NetworkEnvironment {
 }
 
 export interface NetworkOptions {
-  readonly seeds?: ReadonlyArray<Endpoint>;
-  readonly peerSeeds?: ReadonlyArray<Endpoint>;
+  readonly seeds?: readonly Endpoint[];
+  readonly peerSeeds?: readonly Endpoint[];
   readonly maxConnectedPeers?: number;
-  readonly externalEndpoints?: ReadonlyArray<Endpoint>;
+  readonly externalEndpoints?: readonly Endpoint[];
   readonly connectPeersDelayMS?: number;
   readonly socketTimeoutMS?: number;
-  readonly connectErrorCodes?: ReadonlyArray<string>;
+  readonly connectErrorCodes?: readonly string[];
 }
 
 interface NetworkConstructOptions<Message, PeerData, PeerHealth extends PeerHealthBase>

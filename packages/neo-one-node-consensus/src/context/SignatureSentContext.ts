@@ -30,7 +30,7 @@ export class SignatureSentContext extends HeaderContext<SignatureSentContext> {
     });
   }
 
-  public cloneExpectedView({ expectedView }: { readonly expectedView: ReadonlyArray<number> }): SignatureSentContext {
+  public cloneExpectedView({ expectedView }: { readonly expectedView: readonly number[] }): SignatureSentContext {
     return new SignatureSentContext({
       type: this.type,
       viewNumber: this.viewNumber,

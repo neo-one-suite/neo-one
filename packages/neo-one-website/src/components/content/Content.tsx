@@ -32,12 +32,12 @@ export interface ReferenceItemPageData {
   readonly slug: string;
   readonly content: ReferenceItemContent;
   readonly current: string;
-  readonly sidebar: ReadonlyArray<SectionData>;
+  readonly sidebar: readonly SectionData[];
 }
 
 export interface ReferenceItemsContent {
   readonly type: 'referenceItems';
-  readonly value: ReadonlyArray<ReferenceItemPageData>;
+  readonly value: readonly ReferenceItemPageData[];
 }
 
 export type ContentType = MarkdownContent | ReferenceItemContent | ReferenceItemsContent;
@@ -47,7 +47,7 @@ interface Props {
   readonly sidebarAlwaysVisible: boolean;
   readonly title: string;
   readonly content: ContentType;
-  readonly sidebar: ReadonlyArray<SectionData>;
+  readonly sidebar: readonly SectionData[];
   readonly date?: string;
   readonly link: string;
   readonly author?: Author;

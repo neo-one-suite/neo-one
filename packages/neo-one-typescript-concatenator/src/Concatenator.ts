@@ -22,7 +22,7 @@ export interface ConcatenatorOptions {
 }
 
 export class Concatenator {
-  public readonly sourceFiles: ReadonlyArray<ts.SourceFile>;
+  public readonly sourceFiles: readonly ts.SourceFile[];
 
   private readonly sourceFile: ts.SourceFile;
   private readonly sourceFileExportSymbols: Set<ts.Symbol>;
@@ -323,7 +323,7 @@ export class Concatenator {
     return importDecl === undefined ? tsUtils.setOriginal(ts.createNotEmittedStatement(node), node) : importDecl;
   }
 
-  private getAllSourceFiles(sourceFile: ts.SourceFile): ReadonlyArray<ts.SourceFile> {
+  private getAllSourceFiles(sourceFile: ts.SourceFile): readonly ts.SourceFile[] {
     const sourceFilesMap = this.getAllSourceFilesWorker(sourceFile);
     const graph = _.flatten(
       [...sourceFilesMap.entries()].map(([file, files]) =>
@@ -338,8 +338,8 @@ export class Concatenator {
     return sorted.map((filePath) => filePathToSourceFile.get(filePath)).filter(utils.notNull);
   }
 
-  private getAllSourceFilesWorker(sourceFile: ts.SourceFile): Map<ts.SourceFile, ReadonlyArray<ts.SourceFile>> {
-    const sourceFileMap = new Map<ts.SourceFile, ReadonlyArray<ts.SourceFile>>();
+  private getAllSourceFilesWorker(sourceFile: ts.SourceFile): Map<ts.SourceFile, readonly ts.SourceFile[]> {
+    const sourceFileMap = new Map<ts.SourceFile, readonly ts.SourceFile[]>();
     const mapImportExport = (decl: ts.ImportDeclaration | ts.ExportDeclaration) => {
       const file = tsUtils.importExport.getModuleSpecifierSourceFile(this.context.typeChecker, decl);
       if (!this.isExternalFileImportExport(decl) && file !== undefined) {
@@ -488,7 +488,7 @@ export class Concatenator {
     }
   }
 
-  private filterModifiers(modifiers: ReadonlyArray<ts.Modifier> | undefined): ReadonlyArray<ts.Modifier> | undefined {
+  private filterModifiers(modifiers: readonly ts.Modifier[] | undefined): readonly ts.Modifier[] | undefined {
     if (modifiers === undefined) {
       return undefined;
     }

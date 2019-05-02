@@ -40,7 +40,7 @@ export class OutlineAdapter extends Adapter implements monaco.languages.Document
       token,
       this.worker$.pipe(
         switchMap(
-          async (worker): Promise<ReadonlyArray<ts.NavigationBarItem>> =>
+          async (worker): Promise<readonly ts.NavigationBarItem[]> =>
             model.isDisposed() ? [] : worker.getNavigationBarItems(resource.path),
         ),
         map((items) => {

@@ -8,7 +8,7 @@ export interface DocsProps {
   readonly title: string;
   readonly link: string;
   readonly content: MarkdownContent;
-  readonly sidebar: ReadonlyArray<SectionData>;
+  readonly sidebar: readonly SectionData[];
   readonly next?: AdjacentInfo;
   readonly previous?: AdjacentInfo;
 }

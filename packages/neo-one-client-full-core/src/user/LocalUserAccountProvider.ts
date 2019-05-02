@@ -141,7 +141,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   public async publishAndDeploy(
     contract: ContractRegister,
     abi: ABI,
-    params: ReadonlyArray<Param>,
+    params: readonly Param[],
     options?: TransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
@@ -220,7 +220,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   }
 
   public async issue(
-    transfers: ReadonlyArray<Transfer>,
+    transfers: readonly Transfer[],
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt, IssueTransaction>> {
     const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);

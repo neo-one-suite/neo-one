@@ -15,7 +15,7 @@ function stripInlineStacktrace(message: string): string {
     .join('\n'); // "  in Foo"
 }
 
-export function massage(warning: string, frames: ReadonlyArray<ReactFrame>): { message: string; stack: string } {
+export function massage(warning: string, frames: readonly ReactFrame[]): { message: string; stack: string } {
   let message = stripInlineStacktrace(warning);
 
   // Reassemble the stack with full filenames provided by React

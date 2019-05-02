@@ -18,10 +18,10 @@ export interface CRUDResourceOptions<Resource extends BaseResource, ResourceOpti
   readonly names?: NamesIn;
   readonly resourceType: ResourceType<Resource, ResourceOptions>;
   readonly help: string;
-  readonly aliases?: ReadonlyArray<string>;
-  readonly extraArgs?: ReadonlyArray<string>;
-  readonly options?: ReadonlyArray<CLIOption>;
-  readonly autocomplete?: ReadonlyArray<string>;
+  readonly aliases?: readonly string[];
+  readonly extraArgs?: readonly string[];
+  readonly options?: readonly CLIOption[];
+  readonly autocomplete?: readonly string[];
   readonly hidden?: boolean;
 }
 
@@ -66,7 +66,7 @@ export class CRUDResourceBase<
     return Promise.resolve(baseName);
   }
 
-  public async getCLIAutocomplete(options: GetCLIAutocompleteOptions): Promise<ReadonlyArray<string>> {
+  public async getCLIAutocomplete(options: GetCLIAutocompleteOptions): Promise<readonly string[]> {
     const { cli } = options;
     try {
       const resourceOptions = await this.getCLIAutocompleteResourceOptions(options);

@@ -191,7 +191,7 @@ const getAdditionalStarts = (files: Files, start: string, packageJSON: any) => {
     .filter((file) => !otherEntryPaths.has(file));
 };
 
-const getFilesWithExtensions = (files: Files, extensions: ReadonlyArray<string>) =>
+const getFilesWithExtensions = (files: Files, extensions: readonly string[]) =>
   _.fromPairs(
     Object.entries(files)
       .filter(([key]) => extensions.some((ext) => key.endsWith(ext)))

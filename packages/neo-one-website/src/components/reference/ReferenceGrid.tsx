@@ -33,7 +33,7 @@ const FilterWrapper = styled(Box)`
 `;
 
 interface Props {
-  readonly content: ReadonlyArray<ReferenceItem>;
+  readonly content: readonly ReferenceItem[];
 }
 
 export const ReferenceGrid = ({ content, ...props }: Props) => {

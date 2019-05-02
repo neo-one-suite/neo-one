@@ -2,7 +2,7 @@ import { common as clientCommon, crypto, UInt160 } from '@neo-one/client-common'
 import { Settings, TransactionType } from '@neo-one/node-core';
 import { common } from './common';
 
-const DEFAULT_VALIDATORS: ReadonlyArray<string> = [
+const DEFAULT_VALIDATORS: readonly string[] = [
   '0327da12b5c40200e9f65569476bbff2218da4f32548ff43b6387ec1416a231ee8',
   '026ce35b29147ad09e4afe4ec4a7319095f08198fa8babbe3c56e970b143528d22',
   '0209e7fd41dfb5c2f8dc72eb30358ac100ea8c72da18847befe06eade68cebfcb9',
@@ -20,7 +20,7 @@ export const createTest = ({
 }: {
   readonly privateNet?: boolean;
   readonly secondsPerBlock?: number;
-  readonly standbyValidators?: ReadonlyArray<string>;
+  readonly standbyValidators?: readonly string[];
   readonly address?: string;
 } = {}): Settings => {
   const standbyValidators = standbyValidatorsIn.map((value) => clientCommon.stringToECPoint(value));

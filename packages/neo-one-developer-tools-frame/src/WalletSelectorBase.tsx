@@ -21,7 +21,7 @@ export const makeOption = async ({
   readonly client: Client;
   readonly userAccount: UserAccount;
   readonly account: Account;
-  readonly tokens: ReadonlyArray<Token>;
+  readonly tokens: readonly Token[];
 }) => {
   const [assetBalances, tokenBalances] = await Promise.all([
     Promise.all(
@@ -107,7 +107,7 @@ export const getWalletSelectorOptions$ = (
   client: Client,
   userAccounts$: Client['userAccounts$'],
   block$: Client['block$'],
-  tokens: ReadonlyArray<Token>,
+  tokens: readonly Token[],
 ) =>
   concat(
     userAccounts$.pipe(
@@ -129,7 +129,7 @@ export const getWalletSelectorOptions$ = (
           }),
         ),
       ),
-      multicast(() => new ReplaySubject<ReadonlyArray<WalletSelectorOptionType>>(1)),
+      multicast(() => new ReplaySubject<readonly WalletSelectorOptionType[]>(1)),
       refCount(),
       catchError((error: Error) => {
         addError(error);

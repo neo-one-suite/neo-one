@@ -14,8 +14,8 @@ import { BinaryReader, utils } from './utils';
 export interface InvocationDataAdd {
   readonly hash: UInt256;
   readonly assetHash?: UInt256;
-  readonly contractHashes: ReadonlyArray<UInt160>;
-  readonly deletedContractHashes: ReadonlyArray<UInt160>;
+  readonly contractHashes: readonly UInt160[];
+  readonly deletedContractHashes: readonly UInt160[];
   readonly migratedContractHashes: ReadonlyArray<[UInt160, UInt160]>;
   readonly voteUpdates: ReadonlyArray<[UInt160, ReadonlyArray<ECPoint>]>;
   readonly blockIndex: number;
@@ -23,7 +23,7 @@ export interface InvocationDataAdd {
   readonly actionIndexStart: BN;
   readonly actionIndexStop: BN;
   readonly result: InvocationResult;
-  readonly storageChanges: ReadonlyArray<StorageChange>;
+  readonly storageChanges: readonly StorageChange[];
 }
 
 export interface InvocationDataKey {
@@ -81,8 +81,8 @@ export class InvocationData implements SerializableWire<InvocationData> {
 
   public readonly hash: UInt256;
   public readonly assetHash: UInt256 | undefined;
-  public readonly contractHashes: ReadonlyArray<UInt160>;
-  public readonly deletedContractHashes: ReadonlyArray<UInt160>;
+  public readonly contractHashes: readonly UInt160[];
+  public readonly deletedContractHashes: readonly UInt160[];
   public readonly migratedContractHashes: ReadonlyArray<[UInt160, UInt160]>;
   public readonly voteUpdates: ReadonlyArray<[UInt160, ReadonlyArray<ECPoint>]>;
   public readonly blockIndex: number;
@@ -90,7 +90,7 @@ export class InvocationData implements SerializableWire<InvocationData> {
   public readonly actionIndexStart: BN;
   public readonly actionIndexStop: BN;
   public readonly result: InvocationResult;
-  public readonly storageChanges: ReadonlyArray<StorageChange>;
+  public readonly storageChanges: readonly StorageChange[];
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 

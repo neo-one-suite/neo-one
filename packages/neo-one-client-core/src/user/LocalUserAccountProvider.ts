@@ -86,11 +86,11 @@ export interface KeyStore {
   /**
    * An `Observable` of all available `UserAccount`s
    */
-  readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
+  readonly userAccounts$: Observable<readonly UserAccount[]>;
   /**
    * @returns the available `UserAccount`s
    */
-  readonly getUserAccounts: () => ReadonlyArray<UserAccount>;
+  readonly getUserAccounts: () => readonly UserAccount[];
   /**
    * Select a specific `UserAccount` as the currently selected user account.
    *
@@ -116,18 +116,18 @@ export interface KeyStore {
 }
 
 export interface Provider {
-  readonly networks$: Observable<ReadonlyArray<NetworkType>>;
-  readonly getNetworks: () => ReadonlyArray<NetworkType>;
+  readonly networks$: Observable<readonly NetworkType[]>;
+  readonly getNetworks: () => readonly NetworkType[];
   readonly getUnclaimed: (
     network: NetworkType,
     address: AddressString,
     monitor?: Monitor,
-  ) => Promise<{ readonly unclaimed: ReadonlyArray<Input>; readonly amount: BigNumber }>;
+  ) => Promise<{ readonly unclaimed: readonly Input[]; readonly amount: BigNumber }>;
   readonly getUnspentOutputs: (
     network: NetworkType,
     address: AddressString,
     monitor?: Monitor,
-  ) => Promise<ReadonlyArray<InputOutput>>;
+  ) => Promise<readonly InputOutput[]>;
   readonly relayTransaction: (
     network: NetworkType,
     transaction: string,
@@ -161,7 +161,7 @@ export interface Provider {
 
 interface TransactionOptionsFull {
   readonly from: UserAccountID;
-  readonly attributes: ReadonlyArray<Attribute>;
+  readonly attributes: readonly Attribute[];
   readonly networkFee: BigNumber;
   readonly systemFee: BigNumber;
   readonly monitor?: Monitor;
@@ -210,8 +210,8 @@ interface FullTransfer extends Transfer {
 export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider extends Provider>
   implements UserAccountProvider {
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;
-  public readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
-  public readonly networks$: Observable<ReadonlyArray<NetworkType>>;
+  public readonly userAccounts$: Observable<readonly UserAccount[]>;
+  public readonly networks$: Observable<readonly NetworkType[]>;
   public readonly keystore: TKeyStore;
   public readonly provider: TProvider;
   public readonly deleteUserAccount?: (id: UserAccountID) => Promise<void>;
@@ -258,11 +258,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     return this.keystore.getCurrentUserAccount();
   }
 
-  public getUserAccounts(): ReadonlyArray<UserAccount> {
+  public getUserAccounts(): readonly UserAccount[] {
     return this.keystore.getUserAccounts();
   }
 
-  public getNetworks(): ReadonlyArray<NetworkType> {
+  public getNetworks(): readonly NetworkType[] {
     return this.provider.getNetworks();
   }
 
@@ -279,7 +279,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   }
 
   public async transfer(
-    transfers: ReadonlyArray<Transfer>,
+    transfers: readonly Transfer[],
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction>> {
     const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
@@ -725,7 +725,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     paramsZipped: ReadonlyArray<[string, Param | undefined]>,
     verify: boolean,
     from?: AddressString,
-  ): ReadonlyArray<Attribute> {
+  ): readonly Attribute[] {
     return [
       {
         usage: 'Remark14',
@@ -755,7 +755,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     verify: boolean,
-  ): ReadonlyArray<WitnessModel> {
+  ): readonly WitnessModel[] {
     return [
       verify
         ? new WitnessModel({
@@ -783,7 +783,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     reorderOutputs = (outputs) => outputs,
   }: {
     readonly script: Buffer;
-    readonly transfers?: ReadonlyArray<FullTransfer>;
+    readonly transfers?: readonly FullTransfer[];
     readonly options?: TransactionOptions;
     readonly onConfirm: (options: {
       readonly transaction: Transaction;
@@ -791,12 +791,12 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       readonly receipt: TransactionReceipt;
     }) => Promise<T> | T;
     readonly method: string;
-    readonly scripts?: ReadonlyArray<WitnessModel>;
+    readonly scripts?: readonly WitnessModel[];
     readonly labels?: Labels;
-    readonly rawInputs?: ReadonlyArray<Input>;
-    readonly rawOutputs?: ReadonlyArray<Output>;
+    readonly rawInputs?: readonly Input[];
+    readonly rawOutputs?: readonly Output[];
     readonly sourceMaps?: Promise<SourceMaps>;
-    readonly reorderOutputs?: (outputs: ReadonlyArray<Output>) => ReadonlyArray<Output>;
+    readonly reorderOutputs?: (outputs: readonly Output[]) => readonly Output[];
   }): Promise<TransactionResult<T, InvocationTransaction>> {
     const { from, attributes: attributesIn, networkFee, systemFee, monitor } = this.getTransactionOptions(options);
 
@@ -915,7 +915,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     sourceMaps,
     monitor,
   }: {
-    readonly inputs: ReadonlyArray<InputOutput>;
+    readonly inputs: readonly InputOutput[];
     readonly transaction: TransactionBaseModel;
     readonly from: UserAccountID;
     readonly onConfirm: (options: {
@@ -1006,7 +1006,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             : result.verifyResult.verifications.filter(({ failureMessage }) => failureMessage !== undefined);
         if (failures.length > 0) {
           const message = await processActionsAndMessage({
-            actions: failures.reduce<ReadonlyArray<RawAction>>((acc, { actions }) => acc.concat(actions), []),
+            actions: failures.reduce<readonly RawAction[]>((acc, { actions }) => acc.concat(actions), []),
             message: failures
               .map(({ failureMessage }) => failureMessage)
               .filter(commonUtils.notNull)
@@ -1017,7 +1017,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           throw new InvokeError(message);
         }
 
-        (transactionUnsigned.inputs as ReadonlyArray<InputModel>).forEach((transfer) =>
+        (transactionUnsigned.inputs as readonly InputModel[]).forEach((transfer) =>
           this.mutableUsedOutputs.add(`${common.uInt256ToString(transfer.hash)}:${transfer.index}`),
         );
 
@@ -1052,7 +1052,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     byteLimit,
   }: {
     readonly transactionUnsignedIn: TransactionBaseModel;
-    readonly inputs: ReadonlyArray<InputOutput>;
+    readonly inputs: readonly InputOutput[];
     readonly from: UserAccountID;
     readonly monitor?: Monitor;
     readonly byteLimit: number;
@@ -1070,8 +1070,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     const { unspentOutputs: consolidatableUnspents } = await this.getUnspentOutputs({ from, monitor });
     const assetToInputOutputsUnsorted = consolidatableUnspents
       .filter((unspent) => !inputs.some((input) => unspent.hash === input.hash && unspent.index === input.index))
-      .reduce<{ [key: string]: ReadonlyArray<InputOutput> }>((acc, unspent) => {
-        if ((acc[unspent.asset] as ReadonlyArray<InputOutput> | undefined) !== undefined) {
+      .reduce<{ [key: string]: readonly InputOutput[] }>((acc, unspent) => {
+        if ((acc[unspent.asset] as readonly InputOutput[] | undefined) !== undefined) {
           return {
             ...acc,
             [unspent.asset]: acc[unspent.asset].concat([unspent]),
@@ -1095,15 +1095,15 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     const { newInputs, updatedOutputs, remainingAssetToInputOutputs } = transactionUnsignedIn.outputs.reduce(
       (
         acc: {
-          readonly newInputs: ReadonlyArray<InputModel>;
-          readonly updatedOutputs: ReadonlyArray<OutputModel>;
+          readonly newInputs: readonly InputModel[];
+          readonly updatedOutputs: readonly OutputModel[];
           readonly remainingAssetToInputOutputs: typeof assetToInputOutputs;
         },
         output,
       ) => {
         const asset = common.uInt256ToString(output.asset);
 
-        const unspentOutputsIn = acc.remainingAssetToInputOutputs[asset] as ReadonlyArray<InputOutput> | undefined;
+        const unspentOutputsIn = acc.remainingAssetToInputOutputs[asset] as readonly InputOutput[] | undefined;
 
         const unspentOutputs =
           unspentOutputsIn === undefined || common.uInt160ToString(output.address) !== addressToScriptHash(from.address)
@@ -1161,8 +1161,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     ).reduce(
       (
         acc: {
-          readonly finalInputs: ReadonlyArray<InputModel>;
-          readonly newOutputs: ReadonlyArray<OutputModel>;
+          readonly finalInputs: readonly InputModel[];
+          readonly newOutputs: readonly OutputModel[];
         },
         [asset, outputs],
       ) => {
@@ -1225,7 +1225,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     witness,
   }: {
     readonly transaction: TransactionBaseModel;
-    readonly inputOutputs: ReadonlyArray<Output>;
+    readonly inputOutputs: readonly Output[];
     readonly address: AddressString;
     readonly witness: WitnessModel;
   }): TransactionBaseModel {
@@ -1274,7 +1274,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   }: {
     readonly from: UserAccountID;
     readonly monitor?: Monitor;
-  }): Promise<{ readonly unspentOutputs: ReadonlyArray<InputOutput>; readonly wasFiltered: boolean }> {
+  }): Promise<{ readonly unspentOutputs: readonly InputOutput[]; readonly wasFiltered: boolean }> {
     const [newBlockCount, allUnspentsIn] = await Promise.all([
       this.provider.getBlockCount(from.network, monitor),
       this.provider.getUnspentOutputs(from.network, from.address, monitor),
@@ -1297,18 +1297,18 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     gas,
     monitor,
   }: {
-    readonly transfers: ReadonlyArray<FullTransfer>;
+    readonly transfers: readonly FullTransfer[];
     readonly from: UserAccountID;
     readonly gas: BigNumber;
     readonly monitor?: Monitor;
-  }): Promise<{ readonly outputs: ReadonlyArray<Output>; readonly inputs: ReadonlyArray<InputOutput> }> {
+  }): Promise<{ readonly outputs: readonly Output[]; readonly inputs: readonly InputOutput[] }> {
     if (transfers.length === 0 && gas.lte(utils.ZERO_BIG_NUMBER)) {
       return { inputs: [], outputs: [] };
     }
 
     const mutableGroupedTransfers = _.groupBy(transfers, ({ from: transferFrom }) => transferFrom.address);
     if (gas.isGreaterThan(utils.ZERO_BIG_NUMBER)) {
-      const fromTransfers = mutableGroupedTransfers[from.address] as ReadonlyArray<FullTransfer> | undefined;
+      const fromTransfers = mutableGroupedTransfers[from.address] as readonly FullTransfer[] | undefined;
       const newTransfer: FullTransfer = {
         from,
         amount: gas,
@@ -1343,10 +1343,10 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     from,
     monitor,
   }: {
-    readonly transfers: ReadonlyArray<Transfer>;
+    readonly transfers: readonly Transfer[];
     readonly from: UserAccountID;
     readonly monitor?: Monitor;
-  }): Promise<{ readonly outputs: ReadonlyArray<Output>; readonly inputs: ReadonlyArray<InputOutput> }> {
+  }): Promise<{ readonly outputs: readonly Output[]; readonly inputs: readonly InputOutput[] }> {
     const { unspentOutputs: allOutputs, wasFiltered } = await this.getUnspentOutputs({ from, monitor });
 
     return Object.values(_.groupBy(transfers, ({ asset }) => asset)).reduce(
@@ -1354,9 +1354,9 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         const { asset } = toByAsset[0];
         const assetResults = toByAsset.reduce<{
           remaining: BigNumber;
-          remainingOutputs: ReadonlyArray<InputOutput>;
-          inputs: ReadonlyArray<InputOutput>;
-          outputs: ReadonlyArray<Output>;
+          remainingOutputs: readonly InputOutput[];
+          inputs: readonly InputOutput[];
+          outputs: readonly Output[];
         }>(
           ({ remaining, remainingOutputs, inputs, outputs: innerOutputs }, { amount, to }) => {
             const result = this.getTransferInputOutputs({
@@ -1416,13 +1416,13 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly to?: AddressString;
     readonly amount: BigNumber;
     readonly asset: Hash256String;
-    readonly remainingOutputs: ReadonlyArray<InputOutput>;
+    readonly remainingOutputs: readonly InputOutput[];
     readonly remaining: BigNumber;
     readonly wasFiltered: boolean;
   }): {
-    readonly inputs: ReadonlyArray<InputOutput>;
-    readonly outputs: ReadonlyArray<Output>;
-    readonly remainingOutputs: ReadonlyArray<InputOutput>;
+    readonly inputs: readonly InputOutput[];
+    readonly outputs: readonly Output[];
+    readonly remainingOutputs: readonly InputOutput[];
     readonly remaining: BigNumber;
   } {
     const amount = originalAmount.minus(remaining);
@@ -1518,15 +1518,15 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     return param;
   }
 
-  protected convertAttributes(attributes: ReadonlyArray<Attribute>): ReadonlyArray<AttributeModel> {
+  protected convertAttributes(attributes: readonly Attribute[]): readonly AttributeModel[] {
     return attributes.map((attribute) => converters.attribute(attribute));
   }
 
-  protected convertInputs(inputs: ReadonlyArray<Input>): ReadonlyArray<InputModel> {
+  protected convertInputs(inputs: readonly Input[]): readonly InputModel[] {
     return inputs.map((input) => converters.input(input));
   }
 
-  protected convertOutputs(outputs: ReadonlyArray<Output>): ReadonlyArray<OutputModel> {
+  protected convertOutputs(outputs: readonly Output[]): readonly OutputModel[] {
     return outputs.map((output) => converters.output(output));
   }
 

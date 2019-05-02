@@ -28,7 +28,7 @@ interface DocSectionConfig {
 
 const DOCS_SOURCE = path.resolve(__dirname, '..', '..', 'docs');
 
-export const getDocs = async (): Promise<ReadonlyArray<DocsProps>> => {
+export const getDocs = async (): Promise<readonly DocsProps[]> => {
   const docSections = await fs.readdir(DOCS_SOURCE);
   const [docFileLists, docSectionConfigs] = await Promise.all([
     Promise.all(docSections.map(getDocSection)),
@@ -63,7 +63,7 @@ export const getDocs = async (): Promise<ReadonlyArray<DocsProps>> => {
   }));
 };
 
-const getDocSection = async (section: string): Promise<ReadonlyArray<DocInfoBase>> => {
+const getDocSection = async (section: string): Promise<readonly DocInfoBase[]> => {
   const source = path.resolve(DOCS_SOURCE, section);
   const docFiles = await fs.readdir(source);
 
@@ -89,7 +89,7 @@ const getDoc = async (section: string, docFile: string): Promise<DocInfoBase> =>
 };
 
 const getDocSectionConfigs = async (
-  sections: ReadonlyArray<string>,
+  sections: readonly string[],
 ): Promise<{ readonly [section: string]: DocSectionConfig }> => {
   const pairs = await Promise.all(
     sections.map(async (section) => {
@@ -108,7 +108,7 @@ const getDocSectionConfig = async (section: string): Promise<DocSectionConfig> =
   return JSON.parse(contents);
 };
 
-const addAdjacent = (docs: ReadonlyArray<DocInfoBase>): ReadonlyArray<DocInfo> =>
+const addAdjacent = (docs: readonly DocInfoBase[]): readonly DocInfo[] =>
   docs.map((doc, idx) => {
     let previous;
     let next;

@@ -16,7 +16,7 @@ export interface ProcessTraceResult {
 }
 
 export interface ProcessTraceOptions {
-  readonly trace: ReadonlyArray<ProcessTraceTrace>;
+  readonly trace: readonly ProcessTraceTrace[];
   readonly sourceMaps?: SourceMaps;
   readonly onlyFileName?: boolean;
 }

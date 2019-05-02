@@ -15,7 +15,7 @@ export interface InvocationResultBaseAdd<T extends VMState> {
   readonly state: T;
   readonly gasConsumed: BN;
   readonly gasCost: BN;
-  readonly stack: ReadonlyArray<ContractParameter>;
+  readonly stack: readonly ContractParameter[];
 }
 
 export abstract class InvocationResultBase<T extends VMState = VMState> implements SerializableWire<InvocationResult> {
@@ -25,7 +25,7 @@ export abstract class InvocationResultBase<T extends VMState = VMState> implemen
     readonly state: VMState;
     readonly gasConsumed: BN;
     readonly gasCost: BN;
-    readonly stack: ReadonlyArray<ContractParameter>;
+    readonly stack: readonly ContractParameter[];
   } {
     const { reader } = options;
     const state = reader.readUInt8();
@@ -55,7 +55,7 @@ export abstract class InvocationResultBase<T extends VMState = VMState> implemen
   public readonly state: T;
   public readonly gasConsumed: BN;
   public readonly gasCost: BN;
-  public readonly stack: ReadonlyArray<ContractParameter>;
+  public readonly stack: readonly ContractParameter[];
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   protected readonly sizeExclusive: () => number;
   private readonly sizeInternal: () => number;

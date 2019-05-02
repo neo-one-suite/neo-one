@@ -5,7 +5,7 @@ export function getName(node: ts.Symbol): string {
   return node.name;
 }
 
-export function getDeclarations(node: ts.Symbol): ReadonlyArray<ts.Declaration> {
+export function getDeclarations(node: ts.Symbol): readonly ts.Declaration[] {
   const declarations = utils.getValueOrUndefined(node.declarations);
 
   return declarations === undefined ? [] : declarations;
