@@ -12,7 +12,7 @@ const { useCallback, useState } = React;
 
 export function WalletTransfer() {
   const [text, setText] = useState<string>('');
-  const [to, setTo] = useState<ReadonlyArray<UserAccount>>([]);
+  const [to, setTo] = useState<readonly UserAccount[]>([]);
   const [asset, setAsset] = useState<Asset>(ASSETS[0]);
   const [amount, setAmount] = useState<BigNumber | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);

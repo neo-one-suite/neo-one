@@ -101,12 +101,15 @@ export class ProjectResource {
   }
 
   public getDebug(): DescribeTable {
-    const table: ReadonlyArray<[string, string]> = [['Data Path', this.dataPath], ['Project Path', this.projectPath]];
+    const table: readonly (readonly [string, string])[] = [
+      ['Data Path', this.dataPath],
+      ['Project Path', this.projectPath],
+    ];
 
     return table.concat(
       Object.entries(this.toResource())
         .filter(([key]) => key !== 'sourceMaps')
-        .map<[string, string]>(([key, val]) => {
+        .map<readonly [string, string]>(([key, val]) => {
           if (val === undefined) {
             return [key, 'null'];
           }

@@ -2,7 +2,7 @@
 import ts from 'typescript';
 import * as utils from '../utils';
 
-export function getModifiers(node: ts.Node): ReadonlyArray<ts.Modifier> {
+export function getModifiers(node: ts.Node): readonly ts.Modifier[] {
   const modifiers = utils.getValueOrUndefined(node.modifiers);
 
   return modifiers === undefined ? [] : modifiers;

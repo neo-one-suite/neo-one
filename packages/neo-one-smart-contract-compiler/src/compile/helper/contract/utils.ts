@@ -24,7 +24,9 @@ export const createWrapParam = (sb: ScriptBuilder) => (
   );
 };
 
-export const findSuperDeployPropInfo = (contractInfo: ContractInfo): [ContractInfo, DeployPropInfo] | undefined => {
+export const findSuperDeployPropInfo = (
+  contractInfo: ContractInfo,
+): readonly [ContractInfo, DeployPropInfo] | undefined => {
   const superSmartContract = contractInfo.superSmartContract;
   if (superSmartContract === undefined) {
     return undefined;
@@ -40,7 +42,7 @@ export const findSuperDeployPropInfo = (contractInfo: ContractInfo): [ContractIn
   return findSuperDeployPropInfo(superSmartContract);
 };
 
-export const findDeployInfo = (contractInfo: ContractInfo): [ContractInfo, DeployPropInfo] | undefined => {
+export const findDeployInfo = (contractInfo: ContractInfo): readonly [ContractInfo, DeployPropInfo] | undefined => {
   const deployInfo = contractInfo.propInfos.find((propInfo): propInfo is DeployPropInfo => propInfo.type === 'deploy');
 
   return deployInfo === undefined ? findSuperDeployPropInfo(contractInfo) : [contractInfo, deployInfo];

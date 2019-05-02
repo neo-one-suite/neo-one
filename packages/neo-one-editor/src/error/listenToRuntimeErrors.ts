@@ -28,7 +28,7 @@ export type ErrorRecord = {
   error: Error;
   unhandledRejection: boolean;
   contextSize: number;
-  stackFrames: ReadonlyArray<StackFrame>;
+  stackFrames: readonly StackFrame[];
 };
 
 export function listenToRuntimeErrors(

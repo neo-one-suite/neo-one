@@ -37,19 +37,19 @@ export class WalletPlugin extends Plugin {
     };
   }
 
-  public get dependencies(): ReadonlyArray<string> {
+  public get dependencies(): readonly string[] {
     return [networkConstants.PLUGIN];
   }
 
-  public get resourceTypes(): ReadonlyArray<ResourceType> {
+  public get resourceTypes(): readonly ResourceType[] {
     return [this.walletResourceType];
   }
 
-  public get interactive(): ReadonlyArray<InteractiveCommand> {
+  public get interactive(): readonly InteractiveCommand[] {
     return [activateWallet(this), deactivateWallet(this), bootstrap(this)];
   }
 
-  public get createHooks(): ReadonlyArray<CreateHookConfig> {
+  public get createHooks(): readonly CreateHookConfig[] {
     return [
       {
         plugin: networkConstants.PLUGIN,
@@ -78,7 +78,7 @@ export class WalletPlugin extends Plugin {
     ];
   }
 
-  public get cliPostHooks(): ReadonlyArray<CLIHookConfig> {
+  public get cliPostHooks(): readonly CLIHookConfig[] {
     return [
       {
         name: 'create network',

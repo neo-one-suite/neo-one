@@ -41,7 +41,7 @@ const run = () => {
         interfaceNameToInterface[child.name.getText()] = child;
       }
 
-      if ((interfaceToDirectParents[child.name.getText()] as ReadonlyArray<string> | undefined) === undefined) {
+      if ((interfaceToDirectParents[child.name.getText()] as readonly string[] | undefined) === undefined) {
         interfaceToDirectParents[child.name.getText()] = [];
       }
 

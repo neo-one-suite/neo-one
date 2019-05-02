@@ -21,13 +21,13 @@ const calculateClaimAmount = async ({
   generationAmount,
   getSystemFee,
 }: {
-  readonly coins: ReadonlyArray<{
+  readonly coins: readonly {
     readonly value: BN;
     readonly startHeight: number;
     readonly endHeight: number;
-  }>;
+  }[];
   readonly decrementInterval: number;
-  readonly generationAmount: ReadonlyArray<number>;
+  readonly generationAmount: readonly number[];
   readonly getSystemFee: (index: number) => Promise<BN>;
 }): Promise<BN> => {
   const grouped = Object.values(_.groupBy(coins, (coin) => `${coin.startHeight}:${coin.endHeight}`));
@@ -112,10 +112,10 @@ function lazyOrValue<Value>(getValue: (() => Value) | Value): () => Value {
 }
 
 function weightedAverage(
-  input: ReadonlyArray<{
+  input: readonly {
     readonly value: number;
     readonly weight: BigNumber;
-  }>,
+  }[],
 ): number {
   let sumWeight = new BigNumber(0);
   let sumValue = new BigNumber(0);
@@ -135,11 +135,11 @@ function weightedAverage(
 }
 
 function weightedFilter<T>(
-  input: ReadonlyArray<T>,
+  input: readonly T[],
   startIn: number,
   endIn: number,
   getValueIn: (value: T) => BN,
-): ReadonlyArray<[T, BigNumber]> {
+): readonly (readonly [T, BigNumber])[] {
   const start = new BigNumber(startIn);
   const end = new BigNumber(endIn);
   const getValue = (value: T) => new BigNumber(getValueIn(value).toString(10));
@@ -147,7 +147,7 @@ function weightedFilter<T>(
 
   let sum = new BigNumber(0);
   let current = new BigNumber(0);
-  const mutableResult: Array<[T, BigNumber]> = [];
+  const mutableResult: [T, BigNumber][] = [];
   // tslint:disable-next-line no-loop-statement
   for (const value of input) {
     if (current.gte(end)) {

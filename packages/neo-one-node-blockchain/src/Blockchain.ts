@@ -368,7 +368,7 @@ export class Blockchain {
     });
   }
 
-  public async persistHeaders(_headers: ReadonlyArray<Header>): Promise<void> {
+  public async persistHeaders(_headers: readonly Header[]): Promise<void> {
     // We don't ever just persist the headers.
   }
 
@@ -424,7 +424,7 @@ export class Blockchain {
   }: {
     readonly monitor?: Monitor;
     readonly transaction: Transaction;
-    readonly memPool?: ReadonlyArray<Transaction>;
+    readonly memPool?: readonly Transaction[];
   }): Promise<VerifyTransactionResult> {
     try {
       const verifications = await this.getMonitor(monitor)
@@ -537,15 +537,15 @@ export class Blockchain {
   }
 
   public readonly getValidators = async (
-    transactions: ReadonlyArray<Transaction>,
+    transactions: readonly Transaction[],
     monitor?: Monitor,
-  ): Promise<ReadonlyArray<ECPoint>> =>
+  ): Promise<readonly ECPoint[]> =>
     this.getMonitor(monitor).captureSpanLog(async () => getValidators(this, transactions), {
       name: 'neo_blockchain_get_validators',
       level: { log: 'verbose', span: 'info' },
     });
 
-  public readonly calculateClaimAmount = async (claims: ReadonlyArray<Input>, monitor?: Monitor): Promise<BN> =>
+  public readonly calculateClaimAmount = async (claims: readonly Input[], monitor?: Monitor): Promise<BN> =>
     this.getMonitor(monitor).captureSpanLog(
       async () => {
         const spentCoins = await Promise.all(claims.map(async (claim) => this.tryGetSpentCoin(claim)));
@@ -788,13 +788,13 @@ export class Blockchain {
   };
   private readonly tryGetTransactionData = async (transaction: Transaction): Promise<TransactionData | undefined> =>
     this.transactionData.tryGet({ hash: transaction.hash });
-  private readonly getUnclaimed = async (hash: UInt160): Promise<ReadonlyArray<Input>> =>
+  private readonly getUnclaimed = async (hash: UInt160): Promise<readonly Input[]> =>
     this.accountUnclaimed
       .getAll$({ hash })
       .pipe(toArray())
       .toPromise()
       .then((values) => values.map((value) => value.input));
-  private readonly getUnspent = async (hash: UInt160): Promise<ReadonlyArray<Input>> => {
+  private readonly getUnspent = async (hash: UInt160): Promise<readonly Input[]> => {
     const unspent = await this.accountUnspent
       .getAll$({ hash })
       .pipe(toArray())
@@ -802,7 +802,7 @@ export class Blockchain {
 
     return unspent.map((value) => value.input);
   };
-  private readonly getAllValidators = async (): Promise<ReadonlyArray<Validator>> =>
+  private readonly getAllValidators = async (): Promise<readonly Validator[]> =>
     this.validator.all$.pipe(toArray()).toPromise();
   private readonly isSpent = async (input: OutputKey): Promise<boolean> => {
     const transactionData = await this.transactionData.tryGet({
@@ -851,7 +851,7 @@ export class Blockchain {
     this.monitor.log({ name: 'neo_blockchain_start' });
   }
 
-  // private readonly getVotes = async (transactions: ReadonlyArray<Transaction>): Promise<ReadonlyArray<Vote>> => {
+  // private readonly getVotes = async (transactions: readonly Transaction[]): Promise<readonly Vote[]> => {
   //   const inputs = await Promise.all(
   //     transactions.map(async (transaction) =>
   //       transaction.getReferences({
@@ -867,7 +867,7 @@ export class Blockchain {
   //   );
 
   //   const outputs = transactions
-  //     .reduce<ReadonlyArray<Output>>((acc, transaction) => acc.concat(transaction.outputs), [])
+  //     .reduce<readonly Output[]>((acc, transaction) => acc.concat(transaction.outputs), [])
   //     .map((output) => ({
   //       address: output.address,
   //       asset: output.asset,

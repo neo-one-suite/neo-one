@@ -17,7 +17,7 @@ const ParameterLayout = styled(Box)`
 `;
 
 interface Props {
-  readonly methods: ReadonlyArray<Method>;
+  readonly methods: readonly Method[];
   readonly staticMethods?: boolean;
 }
 

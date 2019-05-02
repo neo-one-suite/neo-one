@@ -8,7 +8,7 @@ const sourceMap = {
   file: 'file',
 };
 
-export const contractsPaths: ReadonlyArray<ContractPaths> = [
+export const contractsPaths: readonly ContractPaths[] = [
   {
     name: 'Token',
     contractPath: '/foo/bar/one/contracts/Token.ts',

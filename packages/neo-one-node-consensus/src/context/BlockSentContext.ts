@@ -1,7 +1,7 @@
 import { Context } from './Context';
 
 export class BlockSentContext extends Context<BlockSentContext> {
-  public cloneExpectedView({ expectedView }: { readonly expectedView: ReadonlyArray<number> }): BlockSentContext {
+  public cloneExpectedView({ expectedView }: { readonly expectedView: readonly number[] }): BlockSentContext {
     return new BlockSentContext({
       type: this.type,
       previousHash: this.previousHash,

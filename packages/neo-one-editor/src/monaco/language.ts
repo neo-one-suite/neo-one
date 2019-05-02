@@ -78,7 +78,7 @@ export async function setupLanguages(
   fsManager: FileSystemManager,
   fs: PouchDBFileSystem,
   id: string,
-  openFiles$: Observable<ReadonlyArray<string>>,
+  openFiles$: Observable<readonly string[]>,
 ): Promise<{ readonly dispose: () => void }> {
   const createMonacoWorkerManager = async (
     compilerOptions: ts.CompilerOptions,

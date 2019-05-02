@@ -8,7 +8,7 @@ import { ConsensusMessageType } from './ConsensusMessageType';
 export interface PrepareRequestAdd extends ConsensusMessageBaseAdd {
   readonly nonce: BN;
   readonly nextConsensus: UInt160;
-  readonly transactionHashes: ReadonlyArray<UInt256>;
+  readonly transactionHashes: readonly UInt256[];
   readonly minerTransaction: MinerTransaction;
   readonly signature: Buffer;
 }
@@ -48,7 +48,7 @@ export class PrepareRequestConsensusMessage extends ConsensusMessageBase<
 
   public readonly nonce: BN;
   public readonly nextConsensus: UInt160;
-  public readonly transactionHashes: ReadonlyArray<UInt256>;
+  public readonly transactionHashes: readonly UInt256[];
   public readonly minerTransaction: MinerTransaction;
   public readonly signature: Buffer;
 

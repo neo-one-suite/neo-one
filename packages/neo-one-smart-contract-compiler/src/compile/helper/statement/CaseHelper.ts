@@ -12,10 +12,10 @@ export interface Case {
 // Input: []
 // Output: []
 export class CaseHelper extends Helper {
-  private readonly cases: ReadonlyArray<Case>;
+  private readonly cases: readonly Case[];
   private readonly defaultCase: () => void;
 
-  public constructor(cases: ReadonlyArray<Case>, defaultCase: () => void) {
+  public constructor(cases: readonly Case[], defaultCase: () => void) {
     super();
     this.cases = cases;
     this.defaultCase = defaultCase;

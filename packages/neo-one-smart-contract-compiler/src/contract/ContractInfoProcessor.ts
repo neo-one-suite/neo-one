@@ -101,7 +101,7 @@ export type PropInfo =
 
 export interface ContractInfo {
   readonly smartContract: ts.ClassDeclaration | ts.ClassExpression;
-  readonly propInfos: ReadonlyArray<PropInfo>;
+  readonly propInfos: readonly PropInfo[];
   readonly superSmartContract?: ContractInfo;
 }
 
@@ -176,7 +176,7 @@ export class ContractInfoProcessor {
   private processClass(
     classDecl: ts.ClassDeclaration | ts.ClassExpression,
     classType: ts.Type | undefined,
-    baseTypes: ReadonlyArray<ts.Type> = [],
+    baseTypes: readonly ts.Type[] = [],
   ): ContractInfo {
     if (classType === undefined) {
       return { smartContract: classDecl, propInfos: [] };

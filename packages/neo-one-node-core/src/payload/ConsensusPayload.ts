@@ -22,7 +22,7 @@ export interface ConsensusPayloadAdd extends UnsignedConsensusPayloadAdd {
 }
 
 export interface ConsensusPayloadGetScriptHashesForVerifyingOptions {
-  readonly getValidators: () => Promise<ReadonlyArray<ECPoint>>;
+  readonly getValidators: () => Promise<readonly ECPoint[]>;
   readonly currentBlockHash: UInt256;
 }
 

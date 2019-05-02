@@ -44,7 +44,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
   } else if (getUserAccountProvidersOrHost !== undefined) {
     getUserAccountProviders = getUserAccountProvidersOrHost;
   }
-  const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [];
+  const providers: (NEOONEOneDataProvider | NEOONEDataProviderOptions)[] = [];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 46625 }));
   }

@@ -5,7 +5,7 @@ import { getEventName } from './getEventName';
 export const genForwardArgsFunction = (
   name: string,
   abi: ABIFunction,
-  parameters: ReadonlyArray<ABIParameter>,
+  parameters: readonly ABIParameter[],
 ): string =>
   `(${genFunctionParameters({ ...abi, constant: true }, parameters)[0]}) => [ForwardOptions<${getEventName(
     name,

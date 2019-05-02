@@ -100,7 +100,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   public async getUnclaimed(
     address: AddressString,
     monitor?: Monitor,
-  ): Promise<{ readonly unclaimed: ReadonlyArray<Input>; readonly amount: BigNumber }> {
+  ): Promise<{ readonly unclaimed: readonly Input[]; readonly amount: BigNumber }> {
     return this.capture(
       async (span) => {
         const account = await this.getAccountInternal(address, span);
@@ -126,7 +126,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     );
   }
 
-  public async getUnspentOutputs(address: AddressString, monitor?: Monitor): Promise<ReadonlyArray<InputOutput>> {
+  public async getUnspentOutputs(address: AddressString, monitor?: Monitor): Promise<readonly InputOutput[]> {
     return this.capture(
       async (span) => {
         const account = await this.getAccountInternal(address, span);
@@ -248,7 +248,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return this.convertContract(contract);
   }
 
-  public async getMemPool(monitor?: Monitor): Promise<ReadonlyArray<Hash256String>> {
+  public async getMemPool(monitor?: Monitor): Promise<readonly Hash256String[]> {
     return this.mutableClient.getMemPool(monitor);
   }
 
@@ -270,7 +270,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return this.convertOutput(output);
   }
 
-  public async getConnectedPeers(monitor?: Monitor): Promise<ReadonlyArray<Peer>> {
+  public async getConnectedPeers(monitor?: Monitor): Promise<readonly Peer[]> {
     return this.mutableClient.getConnectedPeers(monitor);
   }
 
@@ -301,7 +301,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   public async call(
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    params: readonly (ScriptBuilderParam | undefined)[],
     monitor?: Monitor,
   ): Promise<RawCallReceipt> {
     const testTransaction = new InvocationTransactionModel({
@@ -523,7 +523,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return convertTransaction(converted);
   }
 
-  private convertAttributes(attributes: ReadonlyArray<AttributeJSON>): ReadonlyArray<Attribute> {
+  private convertAttributes(attributes: readonly AttributeJSON[]): readonly Attribute[] {
     return attributes.map((attribute) => ({
       // tslint:disable-next-line no-any
       usage: attribute.usage as any,
@@ -531,7 +531,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     }));
   }
 
-  private convertInputs(inputs: ReadonlyArray<InputJSON>): ReadonlyArray<Input> {
+  private convertInputs(inputs: readonly InputJSON[]): readonly Input[] {
     return inputs.map((input) => this.convertInput(input));
   }
 
@@ -542,7 +542,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     };
   }
 
-  private convertOutputs(outputs: ReadonlyArray<OutputJSON>): ReadonlyArray<Output> {
+  private convertOutputs(outputs: readonly OutputJSON[]): readonly Output[] {
     return outputs.map((output) => this.convertOutput(output));
   }
 

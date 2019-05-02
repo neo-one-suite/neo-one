@@ -32,7 +32,7 @@ var isIframeReady: boolean = false;
 
 let editorHandler: null | EditorHandler = null;
 let currentBuildError: null | string = null;
-let currentRuntimeErrorRecords: Array<ErrorRecord> = [];
+let currentRuntimeErrorRecords: ErrorRecord[] = [];
 let currentRuntimeErrorOptions: null | RuntimeReportingOptions = null;
 let stopListeningToRuntimeErrors: null | (() => void) = null;
 

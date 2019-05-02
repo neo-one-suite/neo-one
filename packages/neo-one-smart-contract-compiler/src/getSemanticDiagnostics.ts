@@ -12,7 +12,7 @@ export const getSemanticDiagnostics = ({
   readonly filePath: string;
   readonly host: CompilerHost;
   readonly languageService: ts.LanguageService;
-}): ReadonlyArray<ts.Diagnostic> => {
+}): readonly ts.Diagnostic[] => {
   const context = createContextForLanguageService(filePath, languageService, host);
   let sourceFile: ts.SourceFile | undefined;
   try {

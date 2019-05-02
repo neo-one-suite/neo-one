@@ -17,7 +17,7 @@ export const createWithContracts = (
   getFS: () => FileSystem,
   createManager: () => Promise<WorkerManager<typeof JSONRPCLocalProvider>>,
 ) => async <T>(
-  contracts: ReadonlyArray<Contract>,
+  contracts: readonly Contract[],
   test: (contracts: T & TestOptions) => Promise<void>,
   options?: WithContractsOptions,
 ): Promise<void> =>

@@ -6,8 +6,8 @@ import { UnknownAccountError, UnknownNetworkError } from '../../../errors';
 import { HDAccount, HDHandler, HDKeyStore, LocalPath } from '../../../user/';
 
 interface BootstrapOptions {
-  readonly networks: ReadonlyArray<string>;
-  readonly scanAccounts: (network: string) => ReadonlyArray<HDAccount<LocalPath>>;
+  readonly networks: readonly string[];
+  readonly scanAccounts: (network: string) => readonly HDAccount<LocalPath>[];
 }
 
 const testHDAccounts = getLocalHDAccounts('test');
@@ -39,7 +39,7 @@ describe('HDKeyStore', () => {
     close,
   };
 
-  let networks$: Observable<ReadonlyArray<string>>;
+  let networks$: Observable<readonly string[]>;
   let keystore: HDKeyStore<LocalPath>;
 
   const bootstrapKeystore = (options: Partial<BootstrapOptions> = {}) => {

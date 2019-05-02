@@ -13,15 +13,15 @@ export interface ContractDependency {
 export interface Contract {
   readonly filePath: string;
   readonly name: string;
-  readonly dependencies: ReadonlyArray<ContractDependency>;
+  readonly dependencies: readonly ContractDependency[];
 }
-export type Contracts = ReadonlyArray<Contract>;
+export type Contracts = readonly Contract[];
 
 interface FilePathToContract {
   readonly [filePath: string]: Contract;
 }
 interface FilePathToDependencies {
-  readonly [filePath: string]: ReadonlyArray<ContractDependency>;
+  readonly [filePath: string]: readonly ContractDependency[];
 }
 
 export const scanContext = (context: Context): Contracts => {
@@ -55,7 +55,7 @@ export const scanContext = (context: Context): Contracts => {
 
           const dependency = { filePath, name };
           const dependenciesOut = references.reduce((innerAcc, reference) => {
-            let filePathDependencies = innerAcc[reference] as ReadonlyArray<ContractDependency> | undefined;
+            let filePathDependencies = innerAcc[reference] as readonly ContractDependency[] | undefined;
             if (filePathDependencies === undefined) {
               filePathDependencies = [];
             }
@@ -85,7 +85,7 @@ export const scanContext = (context: Context): Contracts => {
     );
 
   const unsortedContracts = Object.values(contracts).map((contract) => {
-    const filePathDependencies = dependencies[contract.filePath] as ReadonlyArray<ContractDependency> | undefined;
+    const filePathDependencies = dependencies[contract.filePath] as readonly ContractDependency[] | undefined;
 
     return {
       ...contract,

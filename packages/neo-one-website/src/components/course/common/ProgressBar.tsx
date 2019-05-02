@@ -12,7 +12,7 @@ interface Item {
 
 interface Props {
   readonly current?: number;
-  readonly items: ReadonlyArray<Item>;
+  readonly items: readonly Item[];
 }
 
 const SegmentBase = styled(Box)<{ readonly bg: 'current' | 'complete' | 'incomplete' }>`
@@ -47,7 +47,7 @@ const Wrapper = styled(Box)`
 interface ProgressItemProps {
   readonly idx: number;
   readonly isCurrent: boolean;
-  readonly items: ReadonlyArray<Item>;
+  readonly items: readonly Item[];
   readonly item: Item;
 }
 

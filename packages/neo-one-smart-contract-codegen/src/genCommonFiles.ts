@@ -43,7 +43,7 @@ export const genCommonFiles = ({
   framework,
   browser,
 }: {
-  readonly contractsPaths: ReadonlyArray<ContractPaths>;
+  readonly contractsPaths: readonly ContractPaths[];
   readonly projectID: string;
   readonly testPath: string;
   readonly commonTypesPath: string;
@@ -54,8 +54,8 @@ export const genCommonFiles = ({
   readonly generatedPath: string;
   readonly projectIDPath: string;
   readonly localDevNetworkName: string;
-  readonly wallets: ReadonlyArray<Wallet>;
-  readonly networks: ReadonlyArray<NetworkDefinition>;
+  readonly wallets: readonly Wallet[];
+  readonly networks: readonly NetworkDefinition[];
   readonly httpServerPort: number;
   readonly sourceMapsPath: string;
   readonly sourceMaps: SourceMaps;

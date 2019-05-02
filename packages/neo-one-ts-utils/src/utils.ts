@@ -11,7 +11,7 @@ export function throwIfNullOrUndefined<T>(value: T | null | undefined, name: str
 }
 
 // tslint:disable-next-line readonly-array
-export function getArray<T>(value: ReadonlyArray<T> | null | undefined): ReadonlyArray<T> {
+export function getArray<T>(value: readonly T[] | null | undefined): readonly T[] {
   const val = getValueOrUndefined(value);
 
   return val === undefined ? [] : val;

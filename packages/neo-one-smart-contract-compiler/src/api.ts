@@ -9,7 +9,7 @@ export const getSemanticDiagnostics = (
   filePath: string,
   languageService: ts.LanguageService,
   host: CompilerHost,
-): ReadonlyArray<ts.Diagnostic> => getSemanticDiagnosticsBase({ filePath, languageService, host });
+): readonly ts.Diagnostic[] => getSemanticDiagnosticsBase({ filePath, languageService, host });
 
 export const compileContract = (
   filePath: string,

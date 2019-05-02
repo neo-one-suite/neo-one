@@ -96,7 +96,7 @@ describe('ArrayLiteralExpressionCompiler', () => {
       y.set('b', 0);
       y.set('c', 1);
       y.set('d', 2);
-      const x: ReadonlyArray<[string, number]> = [['a', -1], ...y, ['e', 3]];
+      const x: readonly (readonly [string, number])[] = [['a', -1], ...y, ['e', 3]];
 
       assertEqual(x[0][0], 'a');
       assertEqual(x[1][0], 'b');
@@ -180,7 +180,7 @@ describe('ArrayLiteralExpressionCompiler', () => {
           this.storage.set('b', 0);
           this.storage.set('c', 1);
           this.storage.set('d', 2);
-          const x: ReadonlyArray<[string, number]> = [['a', -1], ...this.storage, ['e', 3]];
+          const x: readonly (readonly [string, number])[] = [['a', -1], ...this.storage, ['e', 3]];
 
           assertEqual(x[0][0], 'a');
           assertEqual(x[1][0], 'b');

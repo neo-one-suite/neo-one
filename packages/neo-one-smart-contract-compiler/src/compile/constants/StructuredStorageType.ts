@@ -7,7 +7,7 @@ export enum StructuredStorageType {
   SetStorage = 'SetStorage',
 }
 
-export const STRUCTURED_STORAGE_TYPES: ReadonlyArray<StructuredStorageType> = [
+export const STRUCTURED_STORAGE_TYPES: readonly StructuredStorageType[] = [
   ...new Set(Object.values(StructuredStorageType)),
 ];
 

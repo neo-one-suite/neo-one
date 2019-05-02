@@ -43,7 +43,7 @@ interface Coin {
 interface Wallet {
   readonly name: string;
   readonly address: string;
-  readonly balance: ReadonlyArray<Coin>;
+  readonly balance: readonly Coin[];
 }
 
 ASSET_INFO.forEach(({ privateKey, publicKey }) => {
@@ -111,7 +111,7 @@ const getSmartContracts = async ({
     }),
   );
 
-const testTransfersAndClaims = ({ transferWallets }: { readonly transferWallets: ReadonlyArray<Wallet> }) => {
+const testTransfersAndClaims = ({ transferWallets }: { readonly transferWallets: readonly Wallet[] }) => {
   const [firstWallets, secondWallets] = _.chunk(transferWallets, transferWallets.length / 2);
 
   firstWallets.forEach((wallet) => {
@@ -132,7 +132,7 @@ const testTransfersAndClaims = ({ transferWallets }: { readonly transferWallets:
   });
 };
 
-const getAddressToWallet = (wallets: ReadonlyArray<Wallet>): { readonly [address: string]: Wallet } => {
+const getAddressToWallet = (wallets: readonly Wallet[]): { readonly [address: string]: Wallet } => {
   const addressToWallet: { [address: string]: Wallet } = {};
   wallets.forEach((wallet) => {
     // tslint:disable-next-line no-object-mutation
@@ -146,8 +146,8 @@ const testAssets = ({
   wallets,
   transferWallets,
 }: {
-  readonly wallets: ReadonlyArray<Wallet>;
-  readonly transferWallets: ReadonlyArray<Wallet>;
+  readonly wallets: readonly Wallet[];
+  readonly transferWallets: readonly Wallet[];
 }) => {
   const addressToWallet = getAddressToWallet(wallets);
   // Order is important here due to the idx % 2 check below
@@ -206,8 +206,8 @@ const testTokens = async ({
   tokenGas,
   tokens,
 }: {
-  readonly wallets: ReadonlyArray<Wallet>;
-  readonly transferWallets: ReadonlyArray<Wallet>;
+  readonly wallets: readonly Wallet[];
+  readonly transferWallets: readonly Wallet[];
   readonly client: Client;
   readonly network: string;
   readonly tokenGas: string;
@@ -290,7 +290,7 @@ const testContracts = async ({ readClient, tokens }: { readonly readClient: Read
 };
 
 export interface Info {
-  readonly wallets: ReadonlyArray<Wallet>;
+  readonly wallets: readonly Wallet[];
 }
 
 interface Options {
@@ -300,7 +300,7 @@ interface Options {
 
 export async function getDefaultInfo({ network }: Options): Promise<Info> {
   const outputs = await one.execute(`get wallet --network ${network} --json`);
-  const wallets: ReadonlyArray<Info> = one
+  const wallets: readonly Info[] = one
     .parseJSON(outputs)
     // tslint:disable-next-line no-any
     .map((info: ResourceWallet) => ({

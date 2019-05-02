@@ -13,7 +13,7 @@ export class ScriptBuilder {
     this.mutableBuffers = [];
   }
 
-  public get buffers(): ReadonlyArray<Buffer> {
+  public get buffers(): readonly Buffer[] {
     return this.mutableBuffers;
   }
 
@@ -161,7 +161,7 @@ export class ScriptBuilder {
   }
 
   // tslint:disable-next-line readonly-array
-  public emitPushParams(...params: Array<ScriptBuilderParam | undefined>): this {
+  public emitPushParams(...params: (ScriptBuilderParam | undefined)[]): this {
     // tslint:disable-next-line no-loop-statement
     for (let i = params.length - 1; i >= 0; i -= 1) {
       this.emitPushParam(params[i]);
@@ -170,7 +170,7 @@ export class ScriptBuilder {
     return this;
   }
 
-  public emitPushArray(params: ReadonlyArray<ScriptBuilderParam | undefined>): this {
+  public emitPushArray(params: readonly (ScriptBuilderParam | undefined)[]): this {
     this.emitPushParams(...params);
     this.emitPushParam(params.length);
 
@@ -202,7 +202,7 @@ export class ScriptBuilder {
   }
 
   // tslint:disable-next-line readonly-array
-  public emitAppCallInvocation(operation: string, ...params: Array<ScriptBuilderParam | undefined>): this {
+  public emitAppCallInvocation(operation: string, ...params: (ScriptBuilderParam | undefined)[]): this {
     this.emitPushArray(params);
 
     return this.emitPushParam(operation);
@@ -213,21 +213,21 @@ export class ScriptBuilder {
   }
 
   // tslint:disable-next-line readonly-array
-  public emitAppCall(scriptHash: UInt160, operation: string, ...params: Array<ScriptBuilderParam | undefined>): this {
+  public emitAppCall(scriptHash: UInt160, operation: string, ...params: (ScriptBuilderParam | undefined)[]): this {
     this.emitAppCallInvocation(operation, ...params);
 
     return this.emitAppCallVerification(scriptHash);
   }
 
   // tslint:disable-next-line readonly-array
-  public emitTailCall(scriptHash: UInt160, operation: string, ...params: Array<ScriptBuilderParam | undefined>): this {
+  public emitTailCall(scriptHash: UInt160, operation: string, ...params: (ScriptBuilderParam | undefined)[]): this {
     this.emitAppCallInvocation(operation, ...params);
 
     return this.emitOp('TAILCALL', common.uInt160ToBuffer(scriptHash));
   }
 
   // tslint:disable-next-line readonly-array
-  public emitSysCall(sysCall: SysCallName, ...params: Array<ScriptBuilderParam | undefined>): this {
+  public emitSysCall(sysCall: SysCallName, ...params: (ScriptBuilderParam | undefined)[]): this {
     this.emitPushParams(...params);
     const sysCallBuffer = Buffer.from(sysCall, 'ascii');
     const writer = new BinaryWriter();

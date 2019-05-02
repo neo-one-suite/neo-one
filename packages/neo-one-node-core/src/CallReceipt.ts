@@ -3,5 +3,5 @@ import { InvocationResult } from './invocationResult';
 
 export interface CallReceipt {
   readonly result: InvocationResult;
-  readonly actions: ReadonlyArray<Action>;
+  readonly actions: readonly Action[];
 }

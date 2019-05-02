@@ -18,7 +18,7 @@ export const setupCLI = ({
   readonly monitor: Monitor;
   readonly shutdown: (options: { readonly exitCode: number; readonly error?: Error | undefined }) => void;
 
-  mutableShutdownFuncs: Array<() => Promise<void> | void>;
+  mutableShutdownFuncs: (() => Promise<void> | void)[];
   readonly config$: Subject<LogConfig>;
 } => {
   const { monitor, config$, cleanup } = createMonitor({ debug, logConsole });

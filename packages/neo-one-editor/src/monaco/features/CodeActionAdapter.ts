@@ -12,15 +12,15 @@ export class CodeActionAdapter extends Adapter implements monaco.languages.CodeA
     context: monaco.languages.CodeActionContext,
     token: monaco.CancellationToken, // tslint:disable readonly-array
   ):
-    | Array<monaco.languages.Command | monaco.languages.CodeAction>
-    | Promise<Array<monaco.languages.Command | monaco.languages.CodeAction>> {
+    | (monaco.languages.Command | monaco.languages.CodeAction)[]
+    | Promise<(monaco.languages.Command | monaco.languages.CodeAction)[]> {
     const resource = model.uri;
 
     return this.toPromise(
       token,
       this.worker$.pipe(
         switchMap(
-          async (worker): Promise<ReadonlyArray<ts.CodeFixAction>> =>
+          async (worker): Promise<readonly ts.CodeFixAction[]> =>
             model.isDisposed()
               ? []
               : worker.getCodeFixesAtPosition(

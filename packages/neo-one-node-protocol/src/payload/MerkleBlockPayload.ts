@@ -9,7 +9,7 @@ import {
 } from '@neo-one/node-core';
 export interface MerkleBlockPayloadAdd extends BlockBaseAdd {
   readonly transactionCount: number;
-  readonly hashes: ReadonlyArray<UInt256>;
+  readonly hashes: readonly UInt256[];
   readonly flags: Buffer;
 }
 
@@ -44,7 +44,7 @@ export class MerkleBlockPayload extends BlockBase implements SerializableWire<Me
   }
 
   public readonly transactionCount: number;
-  public readonly hashes: ReadonlyArray<UInt256>;
+  public readonly hashes: readonly UInt256[];
   public readonly flags: Buffer;
   private readonly merkleBlockPayloadSizeInternal: () => number;
 

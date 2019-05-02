@@ -114,7 +114,7 @@ export class IssueTransaction extends TransactionBase<
     return this.issueGetScriptHashesForVerifyingInternal(options);
   }
 
-  public async verify(options: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
+  public async verify(options: TransactionVerifyOptions): Promise<readonly VerifyScriptResult[]> {
     const [results] = await Promise.all([super.verify(options), this.verifyInternal(options)]);
 
     return results;

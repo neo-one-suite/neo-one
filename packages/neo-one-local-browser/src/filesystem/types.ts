@@ -6,6 +6,6 @@ export interface FileStat {
 export interface FileSystem {
   readonly statSync: (path: string) => FileStat;
   readonly readFileSync: (path: string) => string;
-  readonly readdirSync: (path: string) => ReadonlyArray<string>;
+  readonly readdirSync: (path: string) => readonly string[];
   readonly writeFile: (path: string, content: string) => Promise<void>;
 }

@@ -245,7 +245,7 @@ export class NEOTrackerResource {
   }
 
   public getDebug(): DescribeTable {
-    const table: ReadonlyArray<[string, string]> = [['Data Path', this.dataPath]];
+    const table: readonly (readonly [string, string])[] = [['Data Path', this.dataPath]];
 
     return table.concat(
       Object.entries(this.toResource())

@@ -10,7 +10,7 @@ import {
 } from '../../stackItem';
 
 describe('Enumerator/Iterator Stack Item Types', () => {
-  const testIterator: ReadonlyArray<{ readonly key: IntegerStackItem; readonly value: IntegerStackItem }> = [
+  const testIterator: readonly { readonly key: IntegerStackItem; readonly value: IntegerStackItem }[] = [
     { key: new IntegerStackItem(new BN(0)), value: new IntegerStackItem(new BN(1)) },
   ];
   const testAsyncIterable = AsyncIterableX.from(testIterator);

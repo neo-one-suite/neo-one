@@ -18,7 +18,7 @@ interface Options {
   readonly isSmartContract: boolean;
   readonly id: string;
   readonly endpoint: comlink.Endpoint;
-  readonly fileNames: ReadonlyArray<string>;
+  readonly fileNames: readonly string[];
 }
 
 interface ParsedBase {
@@ -53,7 +53,7 @@ const getVersion = () => {
 
 const createLanguageService = (
   fs: PouchDBFileSystem,
-  fileNamesIn: ReadonlyArray<string>,
+  fileNamesIn: readonly string[],
   compilerOptions: ts.CompilerOptions,
   isSmartContract: boolean,
   tmpFS: Map<string, string>,
@@ -133,7 +133,7 @@ const createLanguageService = (
   return ts.createLanguageService(host);
 };
 
-const clearFiles = (diagnostics: ReadonlyArray<ts.Diagnostic>) => {
+const clearFiles = (diagnostics: readonly ts.Diagnostic[]) => {
   // Clear the `file` field, which cannot be JSON'yfied because it
   // contains cyclic data structures.
   diagnostics.forEach((diag) => {
@@ -166,7 +166,7 @@ const convertFormattingOptions = (options: monaco.languages.FormattingOptions): 
   PlaceOpenBraceOnNewLineForControlBlocks: false,
   PlaceOpenBraceOnNewLineForFunctions: false,
 });
-const convertTags = (tags: ReadonlyArray<ts.JSDocTagInfo> | undefined) =>
+const convertTags = (tags: readonly ts.JSDocTagInfo[] | undefined) =>
   tags
     ? // tslint:disable-next-line:prefer-template
       '\n\n' +
@@ -224,7 +224,7 @@ export class AsyncLanguageService {
   public readonly getSyntacticDiagnostics = (
     fileName: string,
     files: { readonly [key: string]: string },
-  ): Promise<ReadonlyArray<FlattenedDiagnostic>> =>
+  ): Promise<readonly FlattenedDiagnostic[]> =>
     this.languageService.then((languageService) =>
       this.withTmpFS(files, () => {
         const diagnostics = languageService.getSyntacticDiagnostics(fileName);
@@ -240,7 +240,7 @@ export class AsyncLanguageService {
   public readonly getSemanticDiagnostics = (
     fileName: string,
     files: { readonly [key: string]: string },
-  ): Promise<ReadonlyArray<FlattenedDiagnostic>> =>
+  ): Promise<readonly FlattenedDiagnostic[]> =>
     Promise.all([this.fs, this.languageService]).then(([fs, languageService]) =>
       this.withTmpFS(files, () => {
         const diagnostics = this.isSmartContract
@@ -255,7 +255,7 @@ export class AsyncLanguageService {
       }),
     );
 
-  public readonly getCompilerOptionsDiagnostics = (_fileName: string): Promise<ReadonlyArray<ts.Diagnostic>> =>
+  public readonly getCompilerOptionsDiagnostics = (_fileName: string): Promise<readonly ts.Diagnostic[]> =>
     this.languageService.then((languageService) => {
       const diagnostics = languageService.getCompilerOptionsDiagnostics();
       clearFiles(diagnostics);
@@ -317,9 +317,9 @@ export class AsyncLanguageService {
     fileName: string,
     start: number,
     end: number,
-    errorCodes: ReadonlyArray<number>,
+    errorCodes: readonly number[],
     files: { readonly [key: string]: string },
-  ): Promise<ReadonlyArray<ts.CodeFixAction>> =>
+  ): Promise<readonly ts.CodeFixAction[]> =>
     this.languageService.then((languageService) =>
       this.withTmpFS(files, () =>
         languageService.getCodeFixesAtPosition(fileName, start, end, errorCodes, defaultFormatOptions, preferences),
@@ -343,7 +343,7 @@ export class AsyncLanguageService {
     | {
         readonly activeSignature: number;
         readonly activeParameter: number;
-        readonly signatures: ReadonlyArray<monaco.languages.SignatureInformation>;
+        readonly signatures: readonly monaco.languages.SignatureInformation[];
       }
     | undefined
   > => {
@@ -412,29 +412,29 @@ export class AsyncLanguageService {
   public readonly getOccurrencesAtPosition = (
     fileName: string,
     position: number,
-  ): Promise<ReadonlyArray<ts.ReferenceEntry> | undefined> =>
+  ): Promise<readonly ts.ReferenceEntry[] | undefined> =>
     // tslint:disable-next-line deprecation
     this.languageService.then((languageService) => languageService.getOccurrencesAtPosition(fileName, position));
 
   public readonly getDefinitionAtPosition = (
     fileName: string,
     position: number,
-  ): Promise<ReadonlyArray<ts.DefinitionInfo> | undefined> =>
+  ): Promise<readonly ts.DefinitionInfo[] | undefined> =>
     this.languageService.then((languageService) => languageService.getDefinitionAtPosition(fileName, position));
 
   public readonly getReferencesAtPosition = (
     fileName: string,
     position: number,
-  ): Promise<ReadonlyArray<ts.ReferenceEntry> | undefined> =>
+  ): Promise<readonly ts.ReferenceEntry[] | undefined> =>
     this.languageService.then((languageService) => languageService.getReferencesAtPosition(fileName, position));
 
-  public readonly getNavigationBarItems = (fileName: string): Promise<ReadonlyArray<ts.NavigationBarItem>> =>
+  public readonly getNavigationBarItems = (fileName: string): Promise<readonly ts.NavigationBarItem[]> =>
     this.languageService.then((languageService) => languageService.getNavigationBarItems(fileName));
 
   public readonly getFormattingEditsForDocument = (
     fileName: string,
     options: ts.FormatCodeOptions,
-  ): Promise<ReadonlyArray<ts.TextChange>> =>
+  ): Promise<readonly ts.TextChange[]> =>
     this.languageService.then((languageService) => languageService.getFormattingEditsForDocument(fileName, options));
 
   public readonly getFormattingEditsForRange = (
@@ -442,7 +442,7 @@ export class AsyncLanguageService {
     start: number,
     end: number,
     optionsIn: monaco.languages.FormattingOptions,
-  ): Promise<ReadonlyArray<ts.TextChange>> => {
+  ): Promise<readonly ts.TextChange[]> => {
     const options = convertFormattingOptions(optionsIn);
 
     return this.languageService.then((languageService) =>
@@ -455,7 +455,7 @@ export class AsyncLanguageService {
     postion: number,
     ch: string,
     optionsIn: monaco.languages.FormattingOptions,
-  ): Promise<ReadonlyArray<ts.TextChange>> => {
+  ): Promise<readonly ts.TextChange[]> => {
     const options = convertFormattingOptions(optionsIn);
 
     return this.languageService.then((languageService) =>

@@ -23,7 +23,7 @@ export const addHDKeysToCrypto = () => {
   });
 };
 
-export const getLedgerAccounts = (network: string): ReadonlyArray<HDAccount<number>> =>
+export const getLedgerAccounts = (network: string): readonly HDAccount<number>[] =>
   ledgerAccountsNoNetwork.map((account) => ({
     identifier: account.identifier,
     userAccount: {
@@ -33,7 +33,7 @@ export const getLedgerAccounts = (network: string): ReadonlyArray<HDAccount<numb
     },
   }));
 
-export const getLocalHDAccounts = (network: string): ReadonlyArray<HDAccount<LocalPath>> =>
+export const getLocalHDAccounts = (network: string): readonly HDAccount<LocalPath>[] =>
   localAccounts.map((account) => ({
     identifier: account.identifier,
     userAccount: {

@@ -132,7 +132,7 @@ export const NEOONEOneDataProviderSetRPCURLError = makeErrorWithCode(
 );
 export const InvalidHDAccountPermissionError = makeErrorWithCode(
   'INVALID_HD_ACCOUNT_PERMISSION',
-  (account: [number, number, number]) => `Invalid permission for account at path: ${account}`,
+  (account: readonly [number, number, number]) => `Invalid permission for account at path: ${account}`,
 );
 export const UndiscoverableWalletError = makeErrorWithCode(
   'UNDISCOVERABLE_WALLET',
@@ -140,7 +140,7 @@ export const UndiscoverableWalletError = makeErrorWithCode(
 );
 export const UndiscoverableChainError = makeErrorWithCode(
   'UNDISCOVERABLE_CHAIN',
-  (path: [number, number]) => `Invalid access to discover chain at index: ${path}`,
+  (path: readonly [number, number]) => `Invalid access to discover chain at index: ${path}`,
 );
 export const HDMasterDuplicateError = makeErrorWithCode(
   'HD_MASTER_DUPLICATE_ERROR',
@@ -152,5 +152,5 @@ export const InvalidHDStoredPathError = makeErrorWithCode(
 );
 export const InvalidMasterPathError = makeErrorWithCode(
   'INVALID_HD_MASTER_PATH',
-  (path: ReadonlyArray<number>) => `Invalid masterPath returned by HDStore: ${path}`,
+  (path: readonly number[]) => `Invalid masterPath returned by HDStore: ${path}`,
 );

@@ -1,8 +1,8 @@
 import { ABI, ABIDefault, ABIReturn } from '@neo-one/client-common';
 
 // tslint:disable-next-line:no-any
-const getCombinations = (list: ReadonlyArray<ReadonlyArray<any>>) => {
-  const floorsIn = list.reduceRight<ReadonlyArray<number>>((acc, right) => [right.length * acc[0]].concat(acc), [1]);
+const getCombinations = (list: readonly (readonly any[])[]) => {
+  const floorsIn = list.reduceRight<readonly number[]>((acc, right) => [right.length * acc[0]].concat(acc), [1]);
   const max = floorsIn[0];
   const floors = floorsIn.slice(1);
 
@@ -15,7 +15,7 @@ const getCombinations = (list: ReadonlyArray<ReadonlyArray<any>>) => {
   return [...Array(max)].map((_, index) => iteratorFuncs.map((func) => func(index)));
 };
 
-const abiFunctionOptions: ReadonlyArray<{ readonly [key in string]?: boolean }> = [
+const abiFunctionOptions: readonly { readonly [key in string]?: boolean }[] = [
   { constant: true },
   { send: true },
   { sendUnsafe: true },
@@ -27,14 +27,14 @@ const abiFunctionOptions: ReadonlyArray<{ readonly [key in string]?: boolean }> 
   {},
 ];
 
-const abiParameterOptions: ReadonlyArray<{ readonly [key in string]?: boolean | ABIDefault }> = [
+const abiParameterOptions: readonly { readonly [key in string]?: boolean | ABIDefault }[] = [
   { default: { type: 'sender' } },
   { rest: true },
   { default: { type: 'sender' }, rest: true },
   {},
 ];
 
-const abiReturns: ReadonlyArray<ABIReturn> = [
+const abiReturns: readonly ABIReturn[] = [
   {
     type: 'ForwardValue',
   },
@@ -71,7 +71,7 @@ const abiReturns: ReadonlyArray<ABIReturn> = [
 
 const boolReturnType: ABIReturn = { type: 'Boolean' };
 
-const createBaseABIFunctions = (): ReadonlyArray<ABI> => {
+const createBaseABIFunctions = (): readonly ABI[] => {
   const combinations = getCombinations([abiReturns, abiFunctionOptions]);
 
   return combinations.map(([abiReturn, abiFuncProps]) => {
@@ -90,7 +90,7 @@ const createBaseABIFunctions = (): ReadonlyArray<ABI> => {
   });
 };
 
-const createBaseABIEvents = (): ReadonlyArray<ABI> => {
+const createBaseABIEvents = (): readonly ABI[] => {
   const combinations = getCombinations([abiReturns, abiParameterOptions]);
 
   return combinations.map(([abiReturn, abiParamProps]) => {
@@ -120,7 +120,7 @@ const createBaseABIEvents = (): ReadonlyArray<ABI> => {
   });
 };
 
-const createBaseABIFunctionParameters = (): ReadonlyArray<ABI> => {
+const createBaseABIFunctionParameters = (): readonly ABI[] => {
   const combinations = getCombinations([abiReturns, abiParameterOptions]);
 
   return combinations.map(([abiReturn, abiParamProps]) => {

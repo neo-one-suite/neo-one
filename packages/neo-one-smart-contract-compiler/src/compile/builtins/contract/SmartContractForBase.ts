@@ -67,7 +67,7 @@ export abstract class SmartContractForBase extends BuiltinMemberCall {
 
     const handleParams = (
       prop: ts.Declaration,
-      paramDecls: ReadonlyArray<ts.ParameterDeclaration>,
+      paramDecls: readonly ts.ParameterDeclaration[],
       paramTypes: Map<ts.ParameterDeclaration, ts.Type | undefined>,
       innerOptions: VisitOptions,
     ) => {

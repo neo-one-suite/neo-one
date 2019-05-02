@@ -3,11 +3,11 @@ import { utils } from '@neo-one/utils';
 import ts from 'typescript';
 
 const getAllSourceFilesWorker = (
-  sourceFiles: ReadonlyArray<ts.SourceFile>,
+  sourceFiles: readonly ts.SourceFile[],
   typeChecker: ts.TypeChecker,
   seen = new Set<ts.SourceFile>(),
-): ReadonlyArray<ts.SourceFile> =>
-  sourceFiles.reduce<ReadonlyArray<ts.SourceFile>>((acc, sourceFile) => {
+): readonly ts.SourceFile[] =>
+  sourceFiles.reduce<readonly ts.SourceFile[]>((acc, sourceFile) => {
     if (seen.has(sourceFile)) {
       return [];
     }
@@ -31,6 +31,6 @@ const getAllSourceFilesWorker = (
   }, []);
 
 export const getAllSourceFiles = (
-  sourceFiles: ReadonlyArray<ts.SourceFile>,
+  sourceFiles: readonly ts.SourceFile[],
   typeChecker: ts.TypeChecker,
 ): Set<ts.SourceFile> => new Set(getAllSourceFilesWorker(sourceFiles, typeChecker));

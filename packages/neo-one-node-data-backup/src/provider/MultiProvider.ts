@@ -4,14 +4,14 @@ import { Environment } from '../types';
 import { Provider } from './Provider';
 
 export class MultiProvider extends Provider {
-  private readonly providers: ReadonlyArray<Provider>;
+  private readonly providers: readonly Provider[];
   private readonly environment: Environment;
 
   public constructor({
     providers,
     environment,
   }: {
-    readonly providers: ReadonlyArray<Provider>;
+    readonly providers: readonly Provider[];
     readonly environment: Environment;
   }) {
     super();

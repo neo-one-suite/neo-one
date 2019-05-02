@@ -44,7 +44,7 @@ export interface Props {
   readonly engine: MainEngine;
   readonly autoFocus?: boolean;
   readonly onValueChange?: (value: string) => void;
-  readonly onUpdateDiagnostics?: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
+  readonly onUpdateDiagnostics?: (path: string, diagnostics: readonly FileDiagnostic[]) => void;
 }
 
 export class MonacoEditor extends React.Component<Props> {
@@ -293,8 +293,8 @@ export class MonacoEditor extends React.Component<Props> {
 
   private convertDiagnostics(
     model: monaco.editor.ITextModel,
-    markers: ReadonlyArray<monaco.editor.IMarker>,
-  ): ReadonlyArray<FileDiagnostic> {
+    markers: readonly monaco.editor.IMarker[],
+  ): readonly FileDiagnostic[] {
     return markers.map((marker) => ({
       path: model.uri.path,
       owner: marker.owner,

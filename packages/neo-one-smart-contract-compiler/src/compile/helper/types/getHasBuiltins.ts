@@ -14,7 +14,7 @@ import { hasTransaction } from './transaction';
 
 type HasBuiltin = (context: Context, arg: ts.Node, argType: ts.Type) => boolean;
 
-const hasBuiltins: ReadonlyArray<HasBuiltin> = [
+const hasBuiltins: readonly HasBuiltin[] = [
   hasArray,
   hasAttribute,
   hasBuffer,
@@ -28,6 +28,6 @@ const hasBuiltins: ReadonlyArray<HasBuiltin> = [
   hasHeader,
 ];
 
-export function getHasBuiltins(context: Context, node: ts.Node, type: ts.Type): ReadonlyArray<HasBuiltin> {
+export function getHasBuiltins(context: Context, node: ts.Node, type: ts.Type): readonly HasBuiltin[] {
   return hasBuiltins.filter((hasBuiltin) => hasBuiltin(context, node, type));
 }

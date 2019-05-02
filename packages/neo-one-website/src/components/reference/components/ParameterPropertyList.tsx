@@ -17,7 +17,7 @@ const ParameterLayout = styled(Box)`
 `;
 
 interface Props {
-  readonly values?: ReadonlyArray<Parameter | Property>;
+  readonly values?: readonly (Parameter | Property)[];
   readonly subheading?: boolean;
   readonly title: string;
 }

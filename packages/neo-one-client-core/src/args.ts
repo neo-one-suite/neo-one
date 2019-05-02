@@ -129,7 +129,7 @@ export const assertNullableBigNumber = (name: string, value?: unknown): BigNumbe
   return assertBigNumber(name, value);
 };
 
-export const assertArray = (name: string, value?: unknown): ReadonlyArray<unknown> => {
+export const assertArray = (name: string, value?: unknown): readonly unknown[] => {
   if (!Array.isArray(value)) {
     throw new InvalidArgumentError('Array', name, value);
   }
@@ -137,7 +137,7 @@ export const assertArray = (name: string, value?: unknown): ReadonlyArray<unknow
   return value;
 };
 
-export const assertNullableArray = (name: string, value?: unknown): ReadonlyArray<unknown> => {
+export const assertNullableArray = (name: string, value?: unknown): readonly unknown[] => {
   if (value == undefined) {
     return [];
   }
@@ -579,7 +579,7 @@ export const assertPrivateKey = (name: string, valueIn?: unknown): PrivateKeyStr
   }
 };
 
-export const assertTransfers = (name: string, valueIn?: unknown): ReadonlyArray<Transfer> => {
+export const assertTransfers = (name: string, valueIn?: unknown): readonly Transfer[] => {
   const value = assertArray(name, valueIn);
 
   return value.map((val) => assertTransfer(name, val));

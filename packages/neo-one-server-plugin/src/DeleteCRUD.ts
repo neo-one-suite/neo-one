@@ -7,9 +7,9 @@ import { BaseResource, BaseResourceOptions, ExecuteTaskListResponse } from './ty
 export interface DeleteCRUDOptions<Resource extends BaseResource, ResourceOptions extends BaseResourceOptions> {
   readonly resourceType: ResourceType<Resource, ResourceOptions>;
   readonly help?: string;
-  readonly aliases?: ReadonlyArray<string>;
-  readonly options?: ReadonlyArray<CLIOption>;
-  readonly autocomplete?: ReadonlyArray<string>;
+  readonly aliases?: readonly string[];
+  readonly options?: readonly CLIOption[];
+  readonly autocomplete?: readonly string[];
   readonly hidden?: boolean;
 }
 

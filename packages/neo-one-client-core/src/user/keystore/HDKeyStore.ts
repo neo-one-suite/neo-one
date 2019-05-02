@@ -18,13 +18,13 @@ type HDAccounts<Identifier> = {
 
 export interface HDProvider {
   readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
-  readonly getNetworks: () => ReadonlyArray<NetworkType>;
-  readonly networks$: Observable<ReadonlyArray<NetworkType>>;
+  readonly getNetworks: () => readonly NetworkType[];
+  readonly networks$: Observable<readonly NetworkType[]>;
 }
 
 export interface HDHandler<Identifier> {
   readonly byteLimit?: number;
-  readonly scanAccounts: (network: NetworkType, maxOffset?: number) => Promise<ReadonlyArray<HDAccount<Identifier>>>;
+  readonly scanAccounts: (network: NetworkType, maxOffset?: number) => Promise<readonly HDAccount<Identifier>[]>;
   readonly sign: (options: { readonly message: Buffer; readonly account: Identifier }) => Promise<Buffer>;
   readonly close: () => Promise<void>;
 }
@@ -41,7 +41,7 @@ const flattenAccounts = <Identifier>(accounts: HDAccounts<Identifier>) =>
       .map((networkAccounts) => Object.values(networkAccounts)),
   ).filter(utils.notNull);
 
-const getNewNetworks = (networks: Set<NetworkType> | undefined, networksIn: ReadonlyArray<NetworkType>) => {
+const getNewNetworks = (networks: Set<NetworkType> | undefined, networksIn: readonly NetworkType[]) => {
   if (networks === undefined) {
     return networksIn;
   }
@@ -52,16 +52,16 @@ const getNewNetworks = (networks: Set<NetworkType> | undefined, networksIn: Read
 export class HDKeyStore<Identifier> implements KeyStore {
   public readonly byteLimit?: number;
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;
-  public readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
+  public readonly userAccounts$: Observable<readonly UserAccount[]>;
 
   private readonly provider: HDProvider;
   private readonly handler: HDHandler<Identifier>;
   private readonly accountsSubscription: Subscription;
 
   private readonly currentUserAccountInternal$: BehaviorSubject<UserAccount | undefined>;
-  private readonly userAccountsInternal$: BehaviorSubject<ReadonlyArray<UserAccount>>;
+  private readonly userAccountsInternal$: BehaviorSubject<readonly UserAccount[]>;
   private readonly accountsInternal$: BehaviorSubject<HDAccounts<Identifier>>;
-  private readonly accounts$: Observable<ReadonlyArray<HDAccount<Identifier>>>;
+  private readonly accounts$: Observable<readonly HDAccount<Identifier>[]>;
 
   public constructor(provider: HDProvider, handler: HDHandler<Identifier>) {
     this.provider = provider;
@@ -77,7 +77,7 @@ export class HDKeyStore<Identifier> implements KeyStore {
           const next = await Promise.all(
             networksFiltered.map(async (network) => this.handler.scanAccounts(network, 5)),
           );
-          const newAccounts = next.reduce<ReadonlyArray<HDAccount<Identifier>>>(
+          const newAccounts = next.reduce<readonly HDAccount<Identifier>[]>(
             (accum, newAccountsIn) => accum.concat(newAccountsIn),
             [],
           );
@@ -107,7 +107,7 @@ export class HDKeyStore<Identifier> implements KeyStore {
       map(flattenAccounts),
     );
 
-    this.userAccountsInternal$ = new BehaviorSubject<ReadonlyArray<UserAccount>>([]);
+    this.userAccountsInternal$ = new BehaviorSubject<readonly UserAccount[]>([]);
     this.accounts$
       .pipe(map((accounts) => accounts.map(({ userAccount }) => userAccount)))
       .subscribe(this.userAccountsInternal$);
@@ -132,11 +132,11 @@ export class HDKeyStore<Identifier> implements KeyStore {
     return this.currentUserAccountInternal$.getValue();
   }
 
-  public getUserAccounts(): ReadonlyArray<UserAccount> {
+  public getUserAccounts(): readonly UserAccount[] {
     return this.userAccountsInternal$.getValue();
   }
 
-  public getNetworks(): ReadonlyArray<NetworkType> {
+  public getNetworks(): readonly NetworkType[] {
     return this.provider.getNetworks();
   }
 

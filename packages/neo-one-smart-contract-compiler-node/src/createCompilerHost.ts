@@ -16,7 +16,7 @@ export const createCompilerHost = ({
   smartContractLibDir = path.dirname(require.resolve('@neo-one/smart-contract-lib')),
 }: Options = {}) => ({
   getAllTypescriptFilesInDir: async (dir: string) =>
-    new Promise<ReadonlyArray<string>>((resolve, reject) =>
+    new Promise<readonly string[]>((resolve, reject) =>
       glob(path.join(dir, '**', '*.ts'), (error, matches) => {
         if (error) {
           reject(error);
@@ -29,7 +29,7 @@ export const createCompilerHost = ({
   getSmartContractPath: (value: string) => pathResolve(smartContractDir, value),
   getSmartContractLibPath: (value: string) => pathResolve(smartContractLibDir, value),
   createLanguageServiceHost(
-    rootNamesIn: ReadonlyArray<string>,
+    rootNamesIn: readonly string[],
     options: ts.CompilerOptions,
     withTestHarness = false,
   ): ts.LanguageServiceHost {

@@ -4,7 +4,7 @@ import { createConsoleLogMessages } from '@neo-one/client-switch';
 import { helpers } from '../../../../__data__';
 import { DiagnosticCode } from '../../../../DiagnosticCode';
 
-const getMessages = async (receiptIn: CallReceiptJSON, sourceMaps: SourceMaps): Promise<ReadonlyArray<string>> => {
+const getMessages = async (receiptIn: CallReceiptJSON, sourceMaps: SourceMaps): Promise<readonly string[]> => {
   const receipt = convertCallReceipt(receiptIn);
 
   return createConsoleLogMessages(receipt.actions, Promise.resolve(sourceMaps), { onlyFileName: true });

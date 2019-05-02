@@ -7,7 +7,7 @@ export type CacheChange =
   | { readonly type: 'add'; readonly model: string; readonly key: string; readonly value: any }
   | { readonly type: 'delete'; readonly model: string; readonly key: string };
 
-const convertAddChange = (changeIn: AddChange): ReadonlyArray<CacheChange> => {
+const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
   const change = changeIn;
   switch (change.type) {
     case 'account':

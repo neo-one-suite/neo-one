@@ -52,7 +52,7 @@ import {
 } from './payload';
 import { PeerData } from './PeerData';
 
-const messageReceivedLabelNames: ReadonlyArray<string> = [labels.COMMAND_NAME];
+const messageReceivedLabelNames: readonly string[] = [labels.COMMAND_NAME];
 const messageReceivedLabels = Object.keys(Command).map((command) => ({
   [labels.COMMAND_NAME]: command,
 }));
@@ -85,7 +85,7 @@ export interface Options {
     readonly enabled: boolean;
     readonly options: ConsensusOptions;
   };
-  readonly rpcURLs?: ReadonlyArray<string>;
+  readonly rpcURLs?: readonly string[];
   readonly unhealthyPeerSeconds?: number;
 }
 
@@ -146,7 +146,7 @@ export class Node implements INode {
     return this.mutableConsensus;
   }
 
-  public get connectedPeers(): ReadonlyArray<Endpoint> {
+  public get connectedPeers(): readonly Endpoint[] {
     return this.network.connectedPeers.map((peer) => peer.endpoint);
   }
 
@@ -713,7 +713,7 @@ export class Node implements INode {
         throw new Error(result.error);
       }
 
-      const connected: ReadonlyArray<{ readonly address: string; readonly port: number }> = result.result.connected;
+      const connected: readonly { readonly address: string; readonly port: number }[] = result.result.connected;
       connected
         .map((peer) => {
           const { address, port } = peer;
@@ -1194,7 +1194,7 @@ export class Node implements INode {
     peer.close();
   }
 
-  private async getHeaders(getBlocks: GetBlocksPayload, maxHeight: number): Promise<ReadonlyArray<Header>> {
+  private async getHeaders(getBlocks: GetBlocksPayload, maxHeight: number): Promise<readonly Header[]> {
     let hashStopIndexPromise = Promise.resolve(maxHeight);
     if (!getBlocks.hashStop.equals(common.ZERO_UINT256)) {
       hashStopIndexPromise = this.blockchain.header
@@ -1248,7 +1248,7 @@ export class Node implements INode {
     flags,
   }: {
     readonly block: Block;
-    readonly flags: ReadonlyArray<boolean>;
+    readonly flags: readonly boolean[];
   }): MerkleBlockPayload {
     const tree = new MerkleTree(block.transactions.map((transaction) => transaction.hash)).trim(flags);
 

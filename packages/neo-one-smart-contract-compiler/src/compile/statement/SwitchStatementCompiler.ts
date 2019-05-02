@@ -7,7 +7,7 @@ import { VisitOptions } from '../types';
 
 interface DefaultAccum {
   readonly found: boolean;
-  readonly statements: ReadonlyArray<ts.Statement>;
+  readonly statements: readonly ts.Statement[];
 }
 
 export class SwitchStatementCompiler extends NodeCompiler<ts.SwitchStatement> {

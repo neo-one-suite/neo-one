@@ -4,7 +4,7 @@ import { toTypeScriptType } from '../utils';
 
 interface ParamAcc {
   readonly hasRequired: boolean;
-  readonly acc: ReadonlyArray<string>;
+  readonly acc: readonly string[];
 }
 
 interface Options {
@@ -50,10 +50,10 @@ const getRestParameter = (param: ABIParameter) =>
 
 export const genFunctionParameters = (
   abi: ABIFunction,
-  parameters: ReadonlyArray<ABIParameter> = abi.parameters === undefined ? [] : abi.parameters,
+  parameters: readonly ABIParameter[] = abi.parameters === undefined ? [] : abi.parameters,
   options: Options = {},
-): ReadonlyArray<string> => {
-  const [otherParameters, restParameter]: [ReadonlyArray<ABIParameter>, ABIParameter | undefined] =
+): readonly string[] => {
+  const [otherParameters, restParameter]: [readonly ABIParameter[], ABIParameter | undefined] =
     parameters.length > 0 && parameters[parameters.length - 1].rest
       ? [parameters.slice(0, -1), parameters[parameters.length - 1]]
       : [parameters.slice(), undefined];
@@ -73,7 +73,7 @@ export const genFunctionParameters = (
   );
 
   const paramOptions = getOptions(abi, options);
-  let forwardOptions: ReadonlyArray<string> = [];
+  let forwardOptions: readonly string[] = [];
   if (restParameter !== undefined && restParameter.type === 'ForwardValue') {
     forwardOptions = [`forwardOptions?: ${abi.constant ? 'ForwardOptions' : 'TForwardOptions'}`];
   }

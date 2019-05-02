@@ -8,7 +8,7 @@ export const genTest = ({
   commonTypesPath,
   mod = '@neo-one/smart-contract-test',
 }: {
-  readonly contractsPaths: ReadonlyArray<ContractPaths>;
+  readonly contractsPaths: readonly ContractPaths[];
   readonly testPath: string;
   readonly commonTypesPath: string;
   readonly mod?: string;

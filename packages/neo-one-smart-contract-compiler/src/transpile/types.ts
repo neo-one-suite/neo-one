@@ -2,7 +2,7 @@ import { ABI, ContractParameterType } from '@neo-one/client-common';
 import { RawSourceMap } from 'source-map';
 
 export interface Contract {
-  readonly parameters: ReadonlyArray<ContractParameterType>;
+  readonly parameters: readonly ContractParameterType[];
   readonly returnType: ContractParameterType;
   readonly name: string;
   readonly codeVersion: string;

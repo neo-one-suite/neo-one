@@ -40,14 +40,14 @@ interface Op {
 }
 
 interface TestCase extends Op {
-  readonly preOps?: ReadonlyArray<Op>;
-  readonly postOps?: ReadonlyArray<Op>;
-  readonly result: ReadonlyArray<StackItem>;
-  readonly resultAlt?: ReadonlyArray<StackItem>;
+  readonly preOps?: readonly Op[];
+  readonly postOps?: readonly Op[];
+  readonly result: readonly StackItem[];
+  readonly resultAlt?: readonly StackItem[];
   readonly gas: BN;
-  readonly args?: ReadonlyArray<ScriptBuilderParam | undefined>;
-  readonly argsAlt?: ReadonlyArray<ScriptBuilderParam | undefined>;
-  readonly stackItems?: ReadonlyArray<StackItem>;
+  readonly args?: readonly (ScriptBuilderParam | undefined)[];
+  readonly argsAlt?: readonly (ScriptBuilderParam | undefined)[];
+  readonly stackItems?: readonly StackItem[];
   readonly ref?: StackItem;
   // tslint:disable-next-line no-any
   readonly mockBlockchain?: (options: { readonly blockchain: any }) => void;
@@ -169,7 +169,7 @@ const OPCODES = ([
     result: [new BufferStackItem(Buffer.from([]))],
     gas: utils.ZERO,
   },
-] as ReadonlyArray<TestCase>)
+] as readonly TestCase[])
   .concat(
     _.range(0x01, 0x4c).map((idx) => ({
       // tslint:disable-next-line no-any
@@ -1599,7 +1599,7 @@ const OPCODES = ([
     // {
     //   op: 'THROWIFNOT',
     // },
-  ) as ReadonlyArray<TestCase>;
+  ) as readonly TestCase[];
 
 const monitor = DefaultMonitor.create({
   service: 'test',
@@ -1710,8 +1710,8 @@ describe('opcodes', () => {
       };
 
       const gasLeft = utils.ONE_HUNDRED_MILLION;
-      let stack: ReadonlyArray<StackItem> = [];
-      let stackAlt: ReadonlyArray<StackItem> = [];
+      let stack: readonly StackItem[] = [];
+      let stackAlt: readonly StackItem[] = [];
       if (mockBlockchain !== undefined) {
         mockBlockchain({ blockchain });
       }

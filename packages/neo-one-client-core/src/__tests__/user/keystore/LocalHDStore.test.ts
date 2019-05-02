@@ -55,7 +55,13 @@ describe('LocalHDStore', () => {
   test('MasterSeed Bootstrap - Single', async () => {
     bootstrapSingle('m');
 
-    const testPaths: ReadonlyArray<[number, number, number]> = [[0, 0, 0], [0, 0, 1], [0, 1, 0], [0, 1, 1], [2, 0, 3]];
+    const testPaths: readonly (readonly [number, number, number])[] = [
+      [0, 0, 0],
+      [0, 0, 1],
+      [0, 1, 0],
+      [0, 1, 1],
+      [2, 0, 3],
+    ];
 
     const masterPath = await store.getMasterPath();
     const accountKeys = await Promise.all(testPaths.map(async (path) => store.getPublicKey(path)));
@@ -67,7 +73,7 @@ describe('LocalHDStore', () => {
   test('Wallet Bootstrap - Single', async () => {
     bootstrapSingle('m/0');
 
-    const testPaths: ReadonlyArray<[number, number, number]> = [[0, 0, 0], [0, 0, 1], [0, 1, 0]];
+    const testPaths: readonly (readonly [number, number, number])[] = [[0, 0, 0], [0, 0, 1], [0, 1, 0]];
 
     const masterPath = await store.getMasterPath();
     const accountKeys = await Promise.all(testPaths.map(async (path) => store.getPublicKey(path)));
@@ -81,7 +87,7 @@ describe('LocalHDStore', () => {
   test('Chain Bootstrap - Single', async () => {
     bootstrapSingle('m/0/0');
 
-    const testPaths: ReadonlyArray<[number, number, number]> = [[0, 0, 0], [0, 0, 1]];
+    const testPaths: readonly (readonly [number, number, number])[] = [[0, 0, 0], [0, 0, 1]];
 
     const masterPath = await store.getMasterPath();
     const accountKeys = await Promise.all(testPaths.map(async (path) => store.getPublicKey(path)));
@@ -96,7 +102,7 @@ describe('LocalHDStore', () => {
   test('MasterSeed Bootstrap - Full', async () => {
     bootstrapFull();
 
-    const testPaths: ReadonlyArray<[number, number, number]> = [[0, 0, 0], [4, 1, 4]];
+    const testPaths: readonly (readonly [number, number, number])[] = [[0, 0, 0], [4, 1, 4]];
 
     const masterPath = await store.getMasterPath();
     const accountKeys = await Promise.all(testPaths.map(async (path) => store.getPublicKey(path)));
@@ -108,7 +114,7 @@ describe('LocalHDStore', () => {
   test('Saves on close', async () => {
     bootstrapSingle('m/0');
 
-    let setItems: ReadonlyArray<string> = [];
+    let setItems: readonly string[] = [];
     setItem.mockImplementation(async (key: string, _value: string) => (setItems = setItems.concat(key)));
 
     await store.getPublicKey([0, 0, 0]);

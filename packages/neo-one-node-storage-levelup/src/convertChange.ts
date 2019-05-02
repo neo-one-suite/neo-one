@@ -7,7 +7,7 @@ import { UnknownChangeTypeError, UnknownTypeError } from './errors';
 // tslint:disable-next-line no-any
 type AbstractBatch = any;
 
-const convertAddChange = (changeIn: AddChange): ReadonlyArray<AbstractBatch> => {
+const convertAddChange = (changeIn: AddChange): readonly AbstractBatch[] => {
   const change = changeIn;
   switch (change.type) {
     case 'account':
@@ -244,7 +244,7 @@ const convertDeleteChange = (change: DeleteChange): AbstractBatch => {
   }
 };
 
-export const convertChange = (change: Change): ReadonlyArray<AbstractBatch> => {
+export const convertChange = (change: Change): readonly AbstractBatch[] => {
   if (change.type === 'add') {
     return convertAddChange(change.change);
   }

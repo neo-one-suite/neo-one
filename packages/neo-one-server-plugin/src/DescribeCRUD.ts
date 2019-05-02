@@ -6,9 +6,9 @@ import { BaseResource, BaseResourceOptions } from './types';
 export interface DescribeCRUDOptions<Resource extends BaseResource, ResourceOptions extends BaseResourceOptions> {
   readonly resourceType: ResourceType<Resource, ResourceOptions>;
   readonly help?: string;
-  readonly aliases?: ReadonlyArray<string>;
-  readonly options?: ReadonlyArray<CLIOption>;
-  readonly autocomplete?: ReadonlyArray<string>;
+  readonly aliases?: readonly string[];
+  readonly options?: readonly CLIOption[];
+  readonly autocomplete?: readonly string[];
   readonly hidden?: boolean;
 }
 

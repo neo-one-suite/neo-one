@@ -28,15 +28,15 @@ export class NetworkPlugin extends Plugin {
     };
   }
 
-  public get resourceTypes(): ReadonlyArray<ResourceType> {
+  public get resourceTypes(): readonly ResourceType[] {
     return [this.networkResourceType];
   }
 
-  public get commands(): ReadonlyArray<(cliArgs: CLIArgs) => void> {
+  public get commands(): readonly ((cliArgs: CLIArgs) => void)[] {
     return [backupNode, restoreNode, startNode];
   }
 
-  public get interactive(): ReadonlyArray<InteractiveCommand> {
+  public get interactive(): readonly InteractiveCommand[] {
     return [activateNetwork(this), deactivateNetwork(this)];
   }
 }

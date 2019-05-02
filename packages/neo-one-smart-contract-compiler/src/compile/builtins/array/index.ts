@@ -43,20 +43,20 @@ class ArrayValue extends BuiltinInstanceOf {
 }
 class ArrayConstructorInterface extends BuiltinInterface {}
 
-const COMMON: ReadonlyArray<[string, Builtin]> = [
-  ['filter', new ArrayFilter()],
-  ['forEach', new ArrayForEach()],
-  ['__@iterator', new ArrayIterator()],
-  ['length', new ArrayLength()],
-  ['map', new ArrayMap()],
-  ['reduce', new ArrayReduce()],
-  ['toString', new ArrayToString()],
-  ['concat', new ArrayConcat()],
-  ['join', new ArrayJoin()],
-  ['slice', new ArraySlice()],
-  ['some', new ArraySome()],
-  ['every', new ArrayEvery()],
-  ['entries', new ArrayEntries()],
+const COMMON: readonly (readonly [string, Builtin])[] = [
+  ['filter', new ArrayFilter()] as const,
+  ['forEach', new ArrayForEach()] as const,
+  ['__@iterator', new ArrayIterator()] as const,
+  ['length', new ArrayLength()] as const,
+  ['map', new ArrayMap()] as const,
+  ['reduce', new ArrayReduce()] as const,
+  ['toString', new ArrayToString()] as const,
+  ['concat', new ArrayConcat()] as const,
+  ['join', new ArrayJoin()] as const,
+  ['slice', new ArraySlice()] as const,
+  ['some', new ArraySome()] as const,
+  ['every', new ArrayEvery()] as const,
+  ['entries', new ArrayEntries()] as const,
 ];
 
 // tslint:disable-next-line export-name

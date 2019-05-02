@@ -6,7 +6,7 @@ interface Storages {
   [key: string]: StorageItem;
 }
 
-export const createBlockchain = ({ contracts = [] }: { readonly contracts?: ReadonlyArray<Contract> }): any => {
+export const createBlockchain = ({ contracts = [] }: { readonly contracts?: readonly Contract[] }): any => {
   const blockchain = {
     contract: {},
     storageItem: {},

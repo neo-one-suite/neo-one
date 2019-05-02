@@ -17,7 +17,7 @@ export interface PackageConfig {
   readonly exports: (options: ExportsOptions) => Exports;
 }
 
-const packages: ReadonlyArray<PackageConfig> = [
+const packages: readonly PackageConfig[] = [
   {
     name: '@neo-one/client',
     path: '/node_modules/@neo-one/client/src/index.ts',
@@ -46,7 +46,7 @@ export interface PathWithExports {
 }
 
 export const getPathWithExports = (options: ExportsOptions, packagesIn = packages) =>
-  packagesIn.reduce<ReadonlyArray<PathWithExports>>(
+  packagesIn.reduce<readonly PathWithExports[]>(
     (acc, { name, path, exports }) =>
       acc.concat({
         name,

@@ -8,7 +8,7 @@ export type ContractResult = Omit<CompileContractResult, 'sourceMap'> & {
 };
 
 export type CommonCodeContract = ContractResult & {
-  readonly addresses: ReadonlyArray<string>;
+  readonly addresses: readonly string[];
 };
 
 export interface BuildFile {
@@ -16,4 +16,4 @@ export interface BuildFile {
   readonly content: string;
 }
 
-export type BuildFiles = ReadonlyArray<BuildFile>;
+export type BuildFiles = readonly BuildFile[];

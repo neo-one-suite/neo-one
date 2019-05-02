@@ -17,7 +17,7 @@ export interface CompileContractOptions extends WithLinked {
 
 export interface CompileContractResult {
   readonly abi: ABI;
-  readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
+  readonly diagnostics: readonly ts.Diagnostic[];
   readonly contract: ContractRegister;
   readonly sourceMap: Promise<RawSourceMap>;
 }

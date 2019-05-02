@@ -1,7 +1,7 @@
 import { ConnectedPeer, Endpoint } from '@neo-one/node-core';
 
 export class Network<Message, PeerData> {
-  public readonly connectedPeers: ReadonlyArray<ConnectedPeer<Message, PeerData>> = [];
+  public readonly connectedPeers: readonly ConnectedPeer<Message, PeerData>[] = [];
   public blacklistAndClose(_peer: ConnectedPeer<Message, PeerData>): void {
     // do nothing
   }

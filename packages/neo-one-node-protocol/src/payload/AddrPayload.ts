@@ -2,7 +2,7 @@ import { BinaryWriter, createSerializeWire, SerializableWire, SerializeWire } fr
 import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions } from '@neo-one/node-core';
 import { NetworkAddress } from './NetworkAddress';
 export interface AddrPayloadAdd {
-  readonly addresses: ReadonlyArray<NetworkAddress>;
+  readonly addresses: readonly NetworkAddress[];
 }
 
 export class AddrPayload implements SerializableWire<AddrPayload> {
@@ -20,7 +20,7 @@ export class AddrPayload implements SerializableWire<AddrPayload> {
     });
   }
 
-  public readonly addresses: ReadonlyArray<NetworkAddress>;
+  public readonly addresses: readonly NetworkAddress[];
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ addresses }: AddrPayloadAdd) {

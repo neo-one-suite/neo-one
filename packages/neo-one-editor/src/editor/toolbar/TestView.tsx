@@ -15,7 +15,7 @@ const StyledGrid = styled(DispatchWrapper)`
 `;
 
 interface Props {
-  readonly consoleTestSuites: ReadonlyArray<TestSuite>;
+  readonly consoleTestSuites: readonly TestSuite[];
   readonly consoleSelectedTestSuite?: string;
 }
 

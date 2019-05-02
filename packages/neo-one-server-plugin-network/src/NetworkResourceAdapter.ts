@@ -46,10 +46,10 @@ export interface NetworkResourceAdapterStaticOptions extends NetworkResourceAdap
 
 export interface NetworkResourceAdapterOptions extends NetworkResourceAdapterStaticOptions {
   readonly type: NetworkType;
-  readonly nodes: ReadonlyArray<NodeAdapter>;
+  readonly nodes: readonly NodeAdapter[];
 }
 
-const DEFAULT_MAIN_SEEDS: ReadonlyArray<EndpointConfig> = [
+const DEFAULT_MAIN_SEEDS: readonly EndpointConfig[] = [
   { type: 'tcp', host: 'node1.nyc3.bridgeprotocol.io', port: 10333 },
   { type: 'tcp', host: 'node2.nyc3.bridgeprotocol.io', port: 10333 },
   { type: 'tcp', host: 'seed1.switcheo.com', port: 10333 },
@@ -61,7 +61,7 @@ const DEFAULT_MAIN_SEEDS: ReadonlyArray<EndpointConfig> = [
   { type: 'tcp', host: 'seed4.aphelion-neo.com', port: 10333 },
 ];
 
-const DEFAULT_TEST_SEEDS: ReadonlyArray<EndpointConfig> = [
+const DEFAULT_TEST_SEEDS: readonly EndpointConfig[] = [
   { type: 'tcp', host: 'seed1.neo.org', port: 20333 },
   { type: 'tcp', host: 'seed2.neo.org', port: 20333 },
   { type: 'tcp', host: 'seed3.neo.org', port: 20333 },
@@ -97,7 +97,7 @@ export class NetworkResourceAdapter {
   public static create(adapterOptions: NetworkResourceAdapterInitOptions, options: NetworkResourceOptions): TaskList {
     const staticOptions = this.getStaticOptions(adapterOptions);
     let type: NodeOptions['type'];
-    let nodeSettings: ReadonlyArray<[string, NodeSettings]>;
+    let nodeSettings: readonly (readonly [string, NodeSettings])[];
     if (staticOptions.name === constants.NETWORK_NAME.MAIN) {
       type = NetworkType.Main;
       nodeSettings = [[staticOptions.name, this.getMainSettings(staticOptions)]];
@@ -178,7 +178,7 @@ export class NetworkResourceAdapter {
 
   private static getPrivateNetSettings(
     options: NetworkResourceAdapterStaticOptions,
-  ): ReadonlyArray<[string, NodeSettings]> {
+  ): readonly (readonly [string, NodeSettings])[] {
     const primaryPrivateKey = crypto.wifToPrivateKey(constants.PRIVATE_NET_PRIVATE_KEY, common.NEO_PRIVATE_KEY_VERSION);
     const primaryPublicKey = common.stringToECPoint(constants.PRIVATE_NET_PUBLIC_KEY);
     crypto.addPublicKey(primaryPrivateKey, primaryPublicKey);
@@ -392,7 +392,7 @@ export class NetworkResourceAdapter {
   private readonly nodesPath: string;
   private readonly nodesOptionsPath: string;
   private readonly state: ResourceState;
-  private readonly nodes$: BehaviorSubject<ReadonlyArray<NodeAdapter>>;
+  private readonly nodes$: BehaviorSubject<readonly NodeAdapter[]>;
 
   public constructor({
     name,
@@ -415,7 +415,7 @@ export class NetworkResourceAdapter {
     this.resource$ = this.nodes$.pipe(
       switchMap((nodes) =>
         combineLatest(timer(0, 2500), combineLatest(nodes.map((node) => node.node$))).pipe(
-          mergeScanLatest<[number, ReadonlyArray<Node>], Network>(
+          mergeScanLatest<[number, readonly Node[]], Network>(
             // tslint:disable-next-line no-unused
             async (_prev, [_time, currentNodes]): Promise<Network> => {
               const readyNode =
@@ -480,7 +480,7 @@ export class NetworkResourceAdapter {
     ];
   }
 
-  private get nodes(): ReadonlyArray<NodeAdapter> {
+  private get nodes(): readonly NodeAdapter[] {
     return this.nodes$.value;
   }
 

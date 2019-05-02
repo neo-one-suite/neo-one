@@ -9,7 +9,7 @@ export function getLocalTargetSymbol(typeChecker: ts.TypeChecker, node: ts.Expor
 export function getLocalTargetDeclarations(
   typeChecker: ts.TypeChecker,
   node: ts.ExportSpecifier,
-): ReadonlyArray<ts.Declaration> {
+): readonly ts.Declaration[] {
   const localSymbol = getLocalTargetSymbol(typeChecker, node);
   if (localSymbol === undefined) {
     return [];

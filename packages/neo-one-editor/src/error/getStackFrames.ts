@@ -13,7 +13,7 @@ export async function getStackFrames(
   engine: RemoteEngine,
   error: Error,
   contextSize = 3,
-): Promise<ReadonlyArray<StackFrame> | undefined> {
+): Promise<readonly StackFrame[] | undefined> {
   const parsedFrames = parse(error);
 
   return map(engine, parsedFrames, contextSize).then((enhancedFrames) => {

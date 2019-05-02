@@ -7,7 +7,7 @@ import { InvocationResultBase } from './InvocationResultBase';
 export interface InvocationResultSuccessAdd {
   readonly gasConsumed: BN;
   readonly gasCost: BN;
-  readonly stack: ReadonlyArray<ContractParameter>;
+  readonly stack: readonly ContractParameter[];
 }
 
 export class InvocationResultSuccess extends InvocationResultBase<VMState.Halt>

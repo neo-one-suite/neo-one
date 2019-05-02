@@ -76,7 +76,7 @@ class SetValue extends BuiltinNew {
 }
 class SetConstructorInterface extends BuiltinInterface {}
 
-const COMMON: ReadonlyArray<[string, Builtin]> = [
+const COMMON: readonly (readonly [string, Builtin])[] = [
   ['__@iterator', new SetIterator()],
   ['forEach', new SetForEach()],
   ['has', new MapHas()],

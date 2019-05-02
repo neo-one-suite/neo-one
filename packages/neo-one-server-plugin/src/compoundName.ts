@@ -1,8 +1,8 @@
 const SEPARATOR = '$!$';
-const make = ({ names, name }: { readonly names: ReadonlyArray<string>; readonly name: string }) =>
+const make = ({ names, name }: { readonly names: readonly string[]; readonly name: string }) =>
   names.concat([name]).join(SEPARATOR);
 
-const extract = (name: string): { readonly names: ReadonlyArray<string>; readonly name: string } => {
+const extract = (name: string): { readonly names: readonly string[]; readonly name: string } => {
   const names = name.split(SEPARATOR);
 
   return {

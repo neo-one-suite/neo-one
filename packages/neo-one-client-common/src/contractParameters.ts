@@ -176,7 +176,7 @@ const toSignature = (contractParameter: ContractParameter): SignatureString => {
   throw new InvalidContractParameterError(contractParameter, ['Signature']);
 };
 
-const toArray = (contractParameter: ContractParameter, parameter: ArrayABI): ReadonlyArray<Return> => {
+const toArray = (contractParameter: ContractParameter, parameter: ArrayABI): readonly Return[] => {
   if (contractParameter.type !== 'Array') {
     throw new InvalidContractParameterError(contractParameter, ['Array']);
   }
@@ -297,7 +297,7 @@ const toBufferNullable = wrapNullable(toBuffer) as (param: ContractParameter) =>
 const toArrayNullable = wrapNullableABI(toArray) as (
   param: ContractParameter,
   abi: ArrayABI,
-) => ReadonlyArray<Return | undefined> | undefined;
+) => readonly (Return | undefined)[] | undefined;
 const toMapNullable = wrapNullableABI(toMap) as (
   param: ContractParameter,
   abi: MapABI,

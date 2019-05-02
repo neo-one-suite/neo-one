@@ -8,7 +8,7 @@ export class HelperCapturingScriptBuilder extends ScopeCapturingScriptBuilder im
   private readonly mutableCapturedHelpersSet: Set<Helper> = new Set();
   private readonly mutableCapturedHelpers: Helper[] = [];
 
-  public getHelpers(): ReadonlyArray<Helper> {
+  public getHelpers(): readonly Helper[] {
     return [...this.mutableCapturedHelpers];
   }
 

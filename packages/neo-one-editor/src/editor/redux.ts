@@ -14,7 +14,7 @@ export interface ConsoleOutput {
 }
 
 export interface FileProblems {
-  readonly [path: string]: ReadonlyArray<FileDiagnostic>;
+  readonly [path: string]: readonly FileDiagnostic[];
 }
 
 export interface EditorState {
@@ -26,7 +26,7 @@ export interface EditorState {
     readonly output: ConsoleOutput;
     readonly outputOwner: string;
     readonly type: ConsoleType;
-    readonly testSuites: ReadonlyArray<TestSuite>;
+    readonly testSuites: readonly TestSuite[];
     readonly selectedTestSuite?: string;
     readonly testsRunning: boolean;
   };
@@ -62,7 +62,7 @@ const createInitialState = (
 
 interface SetFileProblems {
   readonly path: string;
-  readonly problems: ReadonlyArray<FileDiagnostic>;
+  readonly problems: readonly FileDiagnostic[];
 }
 
 interface UpdateTest {
@@ -115,7 +115,7 @@ const reducer = reducerWithInitialState(createInitialState())
   )
   .case(setFileProblems, (state, { path, problems }) =>
     produce(state, (draft) => {
-      const existingProblems = draft.console.problems[path] as ReadonlyArray<FileDiagnostic> | undefined;
+      const existingProblems = draft.console.problems[path] as readonly FileDiagnostic[] | undefined;
       if (existingProblems === undefined || !_.isEqual(existingProblems, problems)) {
         draft.console.problems[path] = [...problems];
         const allProblems = _.flatten(Object.values(draft.console.problems));

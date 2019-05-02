@@ -28,13 +28,13 @@ export interface NetworkEnvironment {
 }
 
 export interface NetworkOptions {
-  readonly seeds?: ReadonlyArray<Endpoint>;
-  readonly peerSeeds?: ReadonlyArray<Endpoint>;
+  readonly seeds?: readonly Endpoint[];
+  readonly peerSeeds?: readonly Endpoint[];
   readonly maxConnectedPeers?: number;
-  readonly externalEndpoints?: ReadonlyArray<Endpoint>;
+  readonly externalEndpoints?: readonly Endpoint[];
   readonly connectPeersDelayMS?: number;
   readonly socketTimeoutMS?: number;
-  readonly connectErrorCodes?: ReadonlyArray<string>;
+  readonly connectErrorCodes?: readonly string[];
 }
 
 interface NetworkConstructOptions<Message, PeerData, PeerHealth extends PeerHealthBase>
@@ -275,7 +275,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
     });
   }
 
-  public get connectedPeers(): ReadonlyArray<ConnectedPeer<Message, PeerData>> {
+  public get connectedPeers(): readonly ConnectedPeer<Message, PeerData>[] {
     return Object.values(this.mutableConnectedPeers).filter(utils.notNull);
   }
 

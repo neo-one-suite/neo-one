@@ -2,7 +2,7 @@ import { KnownLabel, metrics, Monitor } from '@neo-one/monitor';
 import { Context } from 'koa';
 import { getMonitor } from './common';
 
-const labelNames: ReadonlyArray<string> = [KnownLabel.HTTP_PATH, KnownLabel.HTTP_STATUS_CODE, KnownLabel.HTTP_METHOD];
+const labelNames: readonly string[] = [KnownLabel.HTTP_PATH, KnownLabel.HTTP_STATUS_CODE, KnownLabel.HTTP_METHOD];
 
 const REQUESTS_HISTOGRAM = metrics.createHistogram({
   name: 'http_server_request_duration_seconds',

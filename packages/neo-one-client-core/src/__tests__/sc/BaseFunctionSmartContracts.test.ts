@@ -15,7 +15,7 @@ const client: Client = {
 } as any;
 
 // tslint:disable-next-line:no-any
-const getABIFuncTest = (func: ABIFunction) => (args: ReadonlyArray<any>, argsName: string, error?: string) => {
+const getABIFuncTest = (func: ABIFunction) => (args: readonly any[], argsName: string, error?: string) => {
   test(`${argsName}`, () => {
     const abi = {
       functions: [func],
@@ -46,7 +46,7 @@ const getABIFuncTest = (func: ABIFunction) => (args: ReadonlyArray<any>, argsNam
 };
 
 // tslint:disable-next-line:no-any
-const events: ReadonlyArray<any> = [
+const events: readonly any[] = [
   {
     name: 'event',
     parameters: [],
@@ -55,7 +55,7 @@ const events: ReadonlyArray<any> = [
 
 describe('Transfer - No Function Options', () => {
   // tslint:disable-next-line:no-any
-  const parameters: ReadonlyArray<any> = [
+  const parameters: readonly any[] = [
     {
       forwardedValue: false,
       name: 'from',
@@ -128,7 +128,7 @@ describe('Transfer - No Function Options', () => {
 
 describe('Transfer - Complete Send - Optional ForwardValues', () => {
   // tslint:disable-next-line:no-any
-  const parameters: ReadonlyArray<any> = [
+  const parameters: readonly any[] = [
     {
       forwardedValue: false,
       name: 'from',
@@ -200,7 +200,7 @@ describe('Transfer - Complete Send - Optional ForwardValues', () => {
 
 describe('Transfer - Send - Optional ForwardValue', () => {
   // tslint:disable-next-line:no-any
-  const parameters: ReadonlyArray<any> = [
+  const parameters: readonly any[] = [
     {
       forwardedValue: false,
       name: 'from',
@@ -267,7 +267,7 @@ describe('Transfer - Send - Optional ForwardValue', () => {
 
 describe('Transfer - SendUnsafe&Receive', () => {
   // tslint:disable-next-line:no-any
-  const parameters: ReadonlyArray<any> = [
+  const parameters: readonly any[] = [
     {
       forwardedValue: false,
       name: 'from',
@@ -336,7 +336,7 @@ describe('Transfer - SendUnsafe&Receive', () => {
 
 describe('Transfer - No Forward Values', () => {
   // tslint:disable-next-line:no-any
-  const parameters: ReadonlyArray<any> = [
+  const parameters: readonly any[] = [
     {
       forwardedValue: false,
       name: 'from',
@@ -401,7 +401,7 @@ describe('Transfer - No Forward Values', () => {
 
 describe('Transfer - Other Rest Param', () => {
   // tslint:disable-next-line:no-any
-  const parameters: ReadonlyArray<any> = [
+  const parameters: readonly any[] = [
     {
       forwardedValue: false,
       name: 'from',
@@ -457,7 +457,7 @@ describe('Transfer - Other Rest Param', () => {
 
 describe('Transfer - No Rest, No ForwardValue', () => {
   // tslint:disable-next-line:no-any
-  const parameters: ReadonlyArray<any> = [
+  const parameters: readonly any[] = [
     {
       forwardedValue: false,
       name: 'from',

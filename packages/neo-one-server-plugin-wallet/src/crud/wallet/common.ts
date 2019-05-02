@@ -50,7 +50,7 @@ const promptPassword = async ({ cli, prompt }: { readonly cli: InteractiveCLI; r
     },
   ]);
 
-const walletOptions: ReadonlyArray<{ readonly option: string; readonly description: string }> = [
+const walletOptions: readonly { readonly option: string; readonly description: string }[] = [
   {
     option: '-n, --network <name>',
     description: 'Network the wallet is associated with.',

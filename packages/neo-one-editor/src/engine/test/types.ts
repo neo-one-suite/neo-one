@@ -90,12 +90,12 @@ export type JestEvent =
 export type TestStatus = 'pass' | 'fail' | 'skip';
 export interface TestResult {
   readonly duration: number | undefined | null;
-  readonly errors: ReadonlyArray<FormattedError>;
+  readonly errors: readonly FormattedError[];
   readonly status: TestStatus;
-  readonly testPath: ReadonlyArray<BlockName | TestName>;
+  readonly testPath: readonly (BlockName | TestName)[];
 }
 
-export type TestResults = ReadonlyArray<TestResult>;
+export type TestResults = readonly TestResult[];
 
 export interface State {
   readonly currentDescribeBlock: DescribeBlock;
@@ -106,16 +106,16 @@ export interface State {
 }
 
 export interface DescribeBlock {
-  readonly children: ReadonlyArray<DescribeBlock>;
-  readonly hooks: ReadonlyArray<Hook>;
+  readonly children: readonly DescribeBlock[];
+  readonly hooks: readonly Hook[];
   readonly mode: BlockMode;
   readonly name: BlockName;
   readonly parent: DescribeBlock | undefined | null;
-  readonly tests: ReadonlyArray<TestEntry>;
+  readonly tests: readonly TestEntry[];
 }
 
 export interface TestEntry {
-  readonly errors: ReadonlyArray<Exception>;
+  readonly errors: readonly Exception[];
   readonly fn: TestFn | undefined | null;
   readonly mode: TestMode;
   readonly name: TestName;

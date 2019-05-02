@@ -16,7 +16,7 @@ export interface ProcessTraceResult {
 }
 
 export interface ProcessTraceOptions {
-  readonly trace: ReadonlyArray<ProcessTraceTrace>;
+  readonly trace: readonly ProcessTraceTrace[];
   readonly sourceMaps?: SourceMaps;
   readonly onlyFileName?: boolean;
 }
@@ -25,17 +25,17 @@ export const processTrace = async ({
   trace,
   sourceMaps,
   onlyFileName,
-}: ProcessTraceOptions): Promise<ReadonlyArray<ProcessTraceResult | undefined>> => {
+}: ProcessTraceOptions): Promise<readonly (ProcessTraceResult | undefined)[]> => {
   if (sourceMaps === undefined) {
     return trace.map(() => undefined);
   }
 
   async function withSourceMaps(
     consumers: { [address: string]: SourceMapConsumer | undefined },
-    remainingSourceMaps: ReadonlyArray<[string, RawSourceMap]>,
-  ): Promise<ReadonlyArray<ProcessTraceResult | undefined>> {
+    remainingSourceMaps: readonly (readonly [string, RawSourceMap])[],
+  ): Promise<readonly (ProcessTraceResult | undefined)[]> {
     if (remainingSourceMaps.length === 0) {
-      const mutableTraceLines: Array<ProcessTraceResult | undefined> = [];
+      const mutableTraceLines: (ProcessTraceResult | undefined)[] = [];
       // tslint:disable-next-line no-loop-statement
       for (const { line: lineNumber, address } of trace) {
         const consumer = consumers[address];

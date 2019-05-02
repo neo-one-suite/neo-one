@@ -71,10 +71,10 @@ export class InvocationTransactionModel<
     inputs = this.inputs,
     outputs = this.outputs,
   }: {
-    readonly scripts?: ReadonlyArray<WitnessModel>;
-    readonly attributes?: ReadonlyArray<AttributeModel>;
-    readonly inputs?: ReadonlyArray<InputModel>;
-    readonly outputs?: ReadonlyArray<OutputModel>;
+    readonly scripts?: readonly WitnessModel[];
+    readonly attributes?: readonly AttributeModel[];
+    readonly inputs?: readonly InputModel[];
+    readonly outputs?: readonly OutputModel[];
   }): this {
     // tslint:disable-next-line no-any
     return new (this.constructor as any)({

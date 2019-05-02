@@ -17,12 +17,12 @@ export interface Toast {
 export type AddToast = (toast: Toast) => void;
 
 export interface ToastsContextType {
-  readonly toasts$: Observable<ReadonlyArray<Toast>>;
+  readonly toasts$: Observable<readonly Toast[]>;
   readonly addToast: AddToast;
   readonly removeToast: (id: string) => void;
 }
 
-const toasts$ = new BehaviorSubject<ReadonlyArray<Toast>>([]);
+const toasts$ = new BehaviorSubject<readonly Toast[]>([]);
 const addToast = (toast: Toast) => {
   const toasts = toasts$.getValue();
   const nextToasts = toasts.some((localToast) => localToast.id === toast.id) ? toasts : [...toasts, toast];
@@ -32,7 +32,7 @@ const removeToast = (id: string) => {
   toasts$.next(toasts$.getValue().filter((localToast) => localToast.id !== id));
 };
 
-export const useToasts = (): [ReadonlyArray<Toast>, typeof addToast, typeof removeToast] => {
+export const useToasts = (): readonly [readonly Toast[], typeof addToast, typeof removeToast] => {
   const toasts = useStream(() => toasts$, [toasts$], toasts$.getValue());
 
   return [toasts, addToast, removeToast];

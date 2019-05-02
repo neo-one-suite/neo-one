@@ -14,16 +14,18 @@ import { BinaryReader, utils } from './utils';
 export interface InvocationDataAdd {
   readonly hash: UInt256;
   readonly assetHash?: UInt256;
-  readonly contractHashes: ReadonlyArray<UInt160>;
-  readonly deletedContractHashes: ReadonlyArray<UInt160>;
-  readonly migratedContractHashes: ReadonlyArray<[UInt160, UInt160]>;
-  readonly voteUpdates: ReadonlyArray<[UInt160, ReadonlyArray<ECPoint>]>;
+  readonly contractHashes: readonly UInt160[];
+  readonly deletedContractHashes: readonly UInt160[];
+  // tslint:disable-next-line: readonly-array
+  readonly migratedContractHashes: readonly ([UInt160, UInt160])[];
+  // tslint:disable-next-line: readonly-array
+  readonly voteUpdates: readonly ([UInt160, readonly ECPoint[]])[];
   readonly blockIndex: number;
   readonly transactionIndex: number;
   readonly actionIndexStart: BN;
   readonly actionIndexStop: BN;
   readonly result: InvocationResult;
-  readonly storageChanges: ReadonlyArray<StorageChange>;
+  readonly storageChanges: readonly StorageChange[];
 }
 
 export interface InvocationDataKey {
@@ -43,7 +45,7 @@ export class InvocationData implements SerializableWire<InvocationData> {
 
       return [from, to];
     });
-    const voteUpdates = reader.readArray<[UInt160, ReadonlyArray<ECPoint>]>(() => {
+    const voteUpdates = reader.readArray<[UInt160, readonly ECPoint[]]>(() => {
       const address = reader.readUInt160();
       const votes = reader.readArray<ECPoint>(() => reader.readECPoint());
 
@@ -81,16 +83,18 @@ export class InvocationData implements SerializableWire<InvocationData> {
 
   public readonly hash: UInt256;
   public readonly assetHash: UInt256 | undefined;
-  public readonly contractHashes: ReadonlyArray<UInt160>;
-  public readonly deletedContractHashes: ReadonlyArray<UInt160>;
-  public readonly migratedContractHashes: ReadonlyArray<[UInt160, UInt160]>;
-  public readonly voteUpdates: ReadonlyArray<[UInt160, ReadonlyArray<ECPoint>]>;
+  public readonly contractHashes: readonly UInt160[];
+  public readonly deletedContractHashes: readonly UInt160[];
+  // tslint:disable-next-line: readonly-array
+  public readonly migratedContractHashes: readonly [UInt160, UInt160][];
+  // tslint:disable-next-line: readonly-array
+  public readonly voteUpdates: readonly ([UInt160, readonly ECPoint[]])[];
   public readonly blockIndex: number;
   public readonly transactionIndex: number;
   public readonly actionIndexStart: BN;
   public readonly actionIndexStop: BN;
   public readonly result: InvocationResult;
-  public readonly storageChanges: ReadonlyArray<StorageChange>;
+  public readonly storageChanges: readonly StorageChange[];
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 

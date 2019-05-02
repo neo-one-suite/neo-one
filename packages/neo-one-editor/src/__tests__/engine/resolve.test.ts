@@ -9,7 +9,7 @@ const createErrorWithCode = (code: string) => {
   return error;
 };
 
-const createFileSystem = (): [FileSystem, JestMocked<FileSystem>] => {
+const createFileSystem = (): readonly [FileSystem, JestMocked<FileSystem>] => {
   const fileSystem = {
     readdirSync: jest.fn(),
     statSync: jest.fn(() => {

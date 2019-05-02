@@ -6,8 +6,8 @@ export const genBrowserClient = ({
   networks,
 }: {
   readonly localDevNetworkName: string;
-  readonly wallets: ReadonlyArray<Wallet>;
-  readonly networks: ReadonlyArray<NetworkDefinition>;
+  readonly wallets: readonly Wallet[];
+  readonly networks: readonly NetworkDefinition[];
 }) => {
   const mutableImports = [
     'Client',

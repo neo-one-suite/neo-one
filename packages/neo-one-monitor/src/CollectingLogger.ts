@@ -26,7 +26,7 @@ export class CollectingLogger implements Logger {
     this.logs.push(logOptions);
   }
 
-  public collect(): ReadonlyArray<CollectedLoggerLogOptions> {
+  public collect(): readonly CollectedLoggerLogOptions[] {
     const localLogs = this.logs;
     // tslint:disable-next-line no-object-mutation
     this.logs = [];

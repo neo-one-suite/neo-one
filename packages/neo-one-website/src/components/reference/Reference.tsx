@@ -7,7 +7,7 @@ export interface ReferenceProps {
   readonly title: string;
   readonly link: string;
   readonly content: ReferenceItemsContent | ReferenceItemContent;
-  readonly sidebar: ReadonlyArray<SectionData>;
+  readonly sidebar: readonly SectionData[];
 }
 
 export const Reference = (props: ReferenceProps) => <Content sidebarAlwaysVisible {...props} />;

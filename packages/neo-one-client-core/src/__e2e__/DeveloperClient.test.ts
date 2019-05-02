@@ -109,7 +109,7 @@ async function getBlockTimes({
 }: {
   readonly client: Client;
   readonly networkName: string;
-}): Promise<ReadonlyArray<number>> {
+}): Promise<readonly number[]> {
   const readProvider = client.providers.memory.provider.read(networkName);
   const blockCount = await readProvider.getBlockCount();
   const indices = _.range(1, blockCount);

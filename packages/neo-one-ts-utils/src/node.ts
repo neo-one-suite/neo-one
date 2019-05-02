@@ -161,7 +161,7 @@ export function getSymbolOrThrow(typeChecker: ts.TypeChecker, node: ts.Node): ts
   return utils.throwIfNullOrUndefined(getSymbol(typeChecker, node), 'symbol');
 }
 
-function getChildren(node: ts.Node): ReadonlyArray<ts.Node> {
+function getChildren(node: ts.Node): readonly ts.Node[] {
   return node.getChildren();
 }
 

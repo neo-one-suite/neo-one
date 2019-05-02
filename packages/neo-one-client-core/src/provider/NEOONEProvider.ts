@@ -30,15 +30,15 @@ import { NEOONEOneDataProvider } from './NEOONEOneDataProvider';
  * Implements the `Provider` interface expected by a `LocalUserAccountProvider` using a NEO•ONE node.
  */
 export class NEOONEProvider implements Provider {
-  public readonly networks$: Observable<ReadonlyArray<NetworkType>>;
-  private readonly networksInternal$: BehaviorSubject<ReadonlyArray<NetworkType>>;
+  public readonly networks$: Observable<readonly NetworkType[]>;
+  private readonly networksInternal$: BehaviorSubject<readonly NetworkType[]>;
   // tslint:disable-next-line readonly-keyword
   private readonly mutableProviders: { [key: string]: NEOONEDataProvider | NEOONEOneDataProvider | undefined };
 
   public constructor(
-    options: ReadonlyArray<NEOONEDataProviderOptions | NEOONEOneDataProvider | NEOONEDataProvider> = [],
+    options: readonly (NEOONEDataProviderOptions | NEOONEOneDataProvider | NEOONEDataProvider)[] = [],
   ) {
-    this.networksInternal$ = new BehaviorSubject<ReadonlyArray<NetworkType>>([]);
+    this.networksInternal$ = new BehaviorSubject<readonly NetworkType[]>([]);
     this.networks$ = this.networksInternal$;
     this.mutableProviders = {};
 
@@ -54,7 +54,7 @@ export class NEOONEProvider implements Provider {
     this.networksInternal$.next(networks);
   }
 
-  public getNetworks(): ReadonlyArray<NetworkType> {
+  public getNetworks(): readonly NetworkType[] {
     return this.networksInternal$.getValue();
   }
 
@@ -69,7 +69,7 @@ export class NEOONEProvider implements Provider {
     network: NetworkType,
     address: AddressString,
     monitor?: Monitor,
-  ): Promise<{ readonly unclaimed: ReadonlyArray<Input>; readonly amount: BigNumber }> {
+  ): Promise<{ readonly unclaimed: readonly Input[]; readonly amount: BigNumber }> {
     return this.getProvider(network).getUnclaimed(address, monitor);
   }
 
@@ -77,7 +77,7 @@ export class NEOONEProvider implements Provider {
     network: NetworkType,
     address: AddressString,
     monitor?: Monitor,
-  ): Promise<ReadonlyArray<InputOutput>> {
+  ): Promise<readonly InputOutput[]> {
     return this.getProvider(network).getUnspentOutputs(address, monitor);
   }
 
@@ -113,7 +113,7 @@ export class NEOONEProvider implements Provider {
     network: NetworkType,
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    params: readonly (ScriptBuilderParam | undefined)[],
     monitor?: Monitor,
   ): Promise<RawCallReceipt> {
     return this.getProvider(network).call(contract, method, params, monitor);

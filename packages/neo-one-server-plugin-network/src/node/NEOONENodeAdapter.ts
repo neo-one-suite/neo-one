@@ -22,7 +22,7 @@ export interface NodeConfig {
     readonly test?: boolean;
     readonly privateNet?: boolean;
     readonly secondsPerBlock?: number;
-    readonly standbyValidators?: ReadonlyArray<string>;
+    readonly standbyValidators?: readonly string[];
     readonly address?: string;
   };
 
@@ -30,7 +30,7 @@ export interface NodeConfig {
   readonly options: FullNodeOptions;
 }
 
-const DEFAULT_RPC_URLS: ReadonlyArray<string> = [
+const DEFAULT_RPC_URLS: readonly string[] = [
   'http://node1.nyc3.bridgeprotocol.io:10332',
   'http://node2.nyc3.bridgeprotocol.io:10332',
   'https://seed1.switcheo.network:10331',
@@ -42,7 +42,7 @@ const DEFAULT_RPC_URLS: ReadonlyArray<string> = [
   'http://seed4.aphelion-neo.com:10332',
 ];
 
-const DEFAULT_SEEDS: ReadonlyArray<EndpointConfig> = [
+const DEFAULT_SEEDS: readonly EndpointConfig[] = [
   { type: 'tcp', host: 'node1.nyc3.bridgeprotocol.io', port: 10333 },
   { type: 'tcp', host: 'node2.nyc3.bridgeprotocol.io', port: 10333 },
   { type: 'tcp', host: 'seed1.switcheo.com', port: 10333 },

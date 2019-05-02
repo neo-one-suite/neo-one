@@ -34,7 +34,7 @@ const Subsection = ({ current, index, subsection, onClickLink, ...props }: Subse
 
 interface Props {
   readonly current: string;
-  readonly subsections: ReadonlyArray<SubsectionData>;
+  readonly subsections: readonly SubsectionData[];
   readonly onClickLink?: () => void;
   readonly indent?: boolean;
   readonly numbered?: boolean;

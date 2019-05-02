@@ -18,7 +18,7 @@ export const genGenerated = ({
   generatedPath,
   framework,
 }: {
-  readonly contractsPaths: ReadonlyArray<ContractPaths>;
+  readonly contractsPaths: readonly ContractPaths[];
   readonly commonTypesPath: string;
   readonly reactPath: string;
   readonly angularPath: string;

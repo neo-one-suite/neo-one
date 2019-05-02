@@ -10,7 +10,7 @@ export interface BlogProps {
   readonly date: string;
   readonly link: string;
   readonly author: Author;
-  readonly sidebar: ReadonlyArray<SectionData>;
+  readonly sidebar: readonly SectionData[];
 }
 
 export const Blog = (props: BlogProps) => <Content sidebarAlwaysVisible {...props} />;

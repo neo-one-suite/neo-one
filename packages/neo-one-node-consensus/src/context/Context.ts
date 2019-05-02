@@ -8,8 +8,8 @@ export interface ContextAdd {
   readonly viewNumber: number;
   readonly myIndex: number;
   readonly primaryIndex: number;
-  readonly expectedView: ReadonlyArray<number>;
-  readonly validators: ReadonlyArray<ECPoint>;
+  readonly expectedView: readonly number[];
+  readonly validators: readonly ECPoint[];
   readonly blockReceivedTimeSeconds: number;
 }
 
@@ -22,8 +22,8 @@ export class Context<TTHis extends Context<TTHis> = Context<any>> {
   public readonly viewNumber: number;
   public readonly myIndex: number;
   public readonly primaryIndex: number;
-  public readonly expectedView: ReadonlyArray<number>;
-  public readonly validators: ReadonlyArray<ECPoint>;
+  public readonly expectedView: readonly number[];
+  public readonly validators: readonly ECPoint[];
   public readonly blockReceivedTimeSeconds: number;
 
   public constructor({
@@ -53,7 +53,7 @@ export class Context<TTHis extends Context<TTHis> = Context<any>> {
     return Math.floor(this.validators.length - (this.validators.length - 1) / 3);
   }
 
-  public cloneExpectedView(_options: { readonly expectedView: ReadonlyArray<number> }): TTHis {
+  public cloneExpectedView(_options: { readonly expectedView: readonly number[] }): TTHis {
     throw new Error('Not Implemented');
   }
 

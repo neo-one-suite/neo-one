@@ -5,7 +5,7 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 export interface ParametersHelperOptions {
-  readonly params: ReadonlyArray<ts.ParameterDeclaration>;
+  readonly params: readonly ts.ParameterDeclaration[];
   readonly asArgsArr?: boolean;
   readonly map?: (param: ts.ParameterDeclaration, options: VisitOptions, isRestElement?: boolean) => void;
   readonly mapParam?: (param: ts.ParameterDeclaration, options: VisitOptions) => void;
@@ -14,7 +14,7 @@ export interface ParametersHelperOptions {
 // Input: [argsarr]
 // Output: []
 export class ParametersHelper extends Helper {
-  private readonly params: ReadonlyArray<ts.ParameterDeclaration>;
+  private readonly params: readonly ts.ParameterDeclaration[];
   private readonly asArgsArr: boolean;
   private readonly map?: (param: ts.ParameterDeclaration, options: VisitOptions, isRestElement?: boolean) => void;
   private readonly mapParam?: (param: ts.ParameterDeclaration, options: VisitOptions) => void;

@@ -5,7 +5,7 @@ import { getConfiguration } from './utils';
 
 export const startNode = async (): Promise<void> => {
   const { monitor, environment, settings, options$, chainFile, dumpChainFile } = getConfiguration();
-  let mutableShutdownFuncs: ReadonlyArray<() => Promise<void>> = [];
+  let mutableShutdownFuncs: readonly (() => Promise<void>)[] = [];
 
   const initiateShutdown = async () => {
     await Promise.all(mutableShutdownFuncs.map(async (func) => func()));

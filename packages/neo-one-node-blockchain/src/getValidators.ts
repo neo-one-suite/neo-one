@@ -74,7 +74,7 @@ const processTransaction = async (
 
   const touchedValidatorsSet = [
     ...new Set(
-      touchedValidators.reduce<ReadonlyArray<string>>(
+      touchedValidators.reduce<readonly string[]>(
         (acc, votes) => acc.concat(votes.map((vote) => common.ecPointToHex(vote))),
         [],
       ),
@@ -92,7 +92,7 @@ const processTransaction = async (
 
 // tslint:disable readonly-keyword readonly-array
 export interface AccountChanges {
-  [hash: string]: ReadonlyArray<ECPoint>;
+  [hash: string]: readonly ECPoint[];
 }
 export interface ValidatorVotesChanges {
   [hash: string]: BN;
@@ -115,7 +115,7 @@ export const getDescriptorChanges = async ({
   getAccount,
   governingTokenHash,
 }: {
-  readonly transactions: ReadonlyArray<StateTransaction>;
+  readonly transactions: readonly StateTransaction[];
   readonly getAccount: (hash: UInt160) => Promise<Account>;
   readonly governingTokenHash: UInt256Hex;
 }): Promise<{
@@ -127,7 +127,7 @@ export const getDescriptorChanges = async ({
   const validatorVotesChanges: ValidatorVotesChanges = {};
   const validatorRegisteredChanges: ValidatorRegisteredChanges = {};
   const validatorsCountChanges: ValidatorsCountChanges = [];
-  const allDescriptors = transactions.reduce<ReadonlyArray<StateDescriptor>>(
+  const allDescriptors = transactions.reduce<readonly StateDescriptor[]>(
     (acc, transaction) => acc.concat(transaction.descriptors),
     [],
   );
@@ -278,8 +278,8 @@ export const processStateTransaction = async ({
 
 export const getValidators = async (
   blockchain: Blockchain,
-  transactions: ReadonlyArray<Transaction>,
-): Promise<ReadonlyArray<ECPoint>> => {
+  transactions: readonly Transaction[],
+): Promise<readonly ECPoint[]> => {
   const cache = new ValidatorCache(blockchain);
   await Promise.all(transactions.map(async (transaction) => processTransaction(blockchain, cache, transaction)));
 

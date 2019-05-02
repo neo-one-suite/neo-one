@@ -22,7 +22,7 @@ export const EXECUTE_OPTIONS_DEFAULT = {
 
 export const executeScript = async (
   monitor: Monitor,
-  diagnostics: ReadonlyArray<ts.Diagnostic>,
+  diagnostics: readonly ts.Diagnostic[],
   compiledCode: string,
   sourceMap: Promise<RawSourceMap>,
   { prelude = Buffer.alloc(0, 0), ignoreWarnings = false }: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,

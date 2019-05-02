@@ -9,10 +9,10 @@ export interface CreateCRUDOptions<Resource extends BaseResource, ResourceOption
   readonly resourceType: ResourceType<Resource, ResourceOptions>;
   readonly name?: string;
   readonly help?: string;
-  readonly aliases?: ReadonlyArray<string>;
-  readonly extraArgs?: ReadonlyArray<string>;
-  readonly options?: ReadonlyArray<CLIOption>;
-  readonly autocomplete?: ReadonlyArray<string>;
+  readonly aliases?: readonly string[];
+  readonly extraArgs?: readonly string[];
+  readonly options?: readonly CLIOption[];
+  readonly autocomplete?: readonly string[];
   readonly startOnCreate?: boolean;
   readonly hidden?: boolean;
 }
@@ -56,7 +56,7 @@ export class CreateCRUD<
     this.startOnCreate = startOnCreate;
   }
 
-  public async getAutocomplete(_options: GetCLIAutocompleteOptions): Promise<ReadonlyArray<string>> {
+  public async getAutocomplete(_options: GetCLIAutocompleteOptions): Promise<readonly string[]> {
     return Promise.resolve(this.autocomplete);
   }
 

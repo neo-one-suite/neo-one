@@ -32,7 +32,7 @@ export const resolve = ({ module: mod, from, emptyModulePath, fs, files = new Se
   return (shims[resolved] as string | undefined) === undefined ? resolved : shims[resolved];
 };
 
-const loadShims = (pathsIn: ReadonlyArray<string>, emptyModulePath: string, fs: FileSystem): Shims => {
+const loadShims = (pathsIn: readonly string[], emptyModulePath: string, fs: FileSystem): Shims => {
   const mutablePaths = [...pathsIn];
   let currentPath = mutablePaths.shift();
   // tslint:disable-next-line no-loop-statement
@@ -181,7 +181,7 @@ export const getNodeModulesPaths = (start: string) => {
   const mutableParts = start.startsWith('/') ? start.slice(1).split('/') : start.split('/');
 
   return _.reverse(
-    mutableParts.reduce<ReadonlyArray<string>>(
+    mutableParts.reduce<readonly string[]>(
       (acc, part, i) => {
         if (part === 'node_modules') {
           return acc;

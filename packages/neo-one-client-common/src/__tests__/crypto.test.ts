@@ -196,7 +196,7 @@ describe('Crypto Errors', () => {
 
   test('CreateMultiSignatureVerificationScript - TooManyKeys', () => {
     // tslint:disable-next-line:no-object-literal-type-assertion
-    const badKeys = { length: 1025 } as ReadonlyArray<ECPoint>;
+    const badKeys = { length: 1025 } as readonly ECPoint[];
     expect(() => crypto.createMultiSignatureVerificationScript(3, badKeys)).toThrowError(
       'Too many public keys. Found: 1025, Max: 1024',
     );

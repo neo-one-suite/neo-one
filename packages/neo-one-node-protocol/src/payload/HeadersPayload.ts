@@ -1,7 +1,7 @@
 import { BinaryWriter, createSerializeWire, SerializableWire, SerializeWire } from '@neo-one/client-common';
 import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions, Header } from '@neo-one/node-core';
 export interface HeadersPayloadAdd {
-  readonly headers: ReadonlyArray<Header>;
+  readonly headers: readonly Header[];
 }
 
 export class HeadersPayload implements SerializableWire<HeadersPayload> {
@@ -19,7 +19,7 @@ export class HeadersPayload implements SerializableWire<HeadersPayload> {
     });
   }
 
-  public readonly headers: ReadonlyArray<Header>;
+  public readonly headers: readonly Header[];
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ headers }: HeadersPayloadAdd) {

@@ -15,7 +15,7 @@ import { InvocationResultBase } from './InvocationResultBase';
 export interface InvocationResultErrorAdd {
   readonly gasConsumed: BN;
   readonly gasCost: BN;
-  readonly stack: ReadonlyArray<ContractParameter>;
+  readonly stack: readonly ContractParameter[];
   readonly message: string;
 }
 

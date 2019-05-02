@@ -84,14 +84,12 @@ export class PluginManager {
         concat(
           _of([]),
           combineLatest(
-            Object.entries(this.mutableResourceManagers).reduce<
-              Array<Observable<[string, ReadonlyArray<BaseResource>]>>
-            >(
+            Object.entries(this.mutableResourceManagers).reduce<(Observable<[string, readonly BaseResource[]]>)[]>(
               (acc, [pluginName, pluginResourcesManagers]) =>
                 acc.concat(
                   Object.entries(pluginResourcesManagers).map(([resourceType, resourcesManager]) =>
                     resourcesManager.resources$.pipe(
-                      map<ReadonlyArray<BaseResource>, [string, ReadonlyArray<BaseResource>]>((resources) => [
+                      map<readonly BaseResource[], [string, readonly BaseResource[]]>((resources) => [
                         pluginResourceTypeUtil.make({
                           plugin: pluginName,
                           resourceType,
@@ -115,7 +113,7 @@ export class PluginManager {
     this.allResources$.subscribe().unsubscribe();
   }
 
-  public get plugins(): ReadonlyArray<string> {
+  public get plugins(): readonly string[] {
     return Object.keys(this.mutablePlugins);
   }
 
@@ -130,7 +128,7 @@ export class PluginManager {
       Promise.all(Object.values(this.mutablePlugins).map(async (plugin) => plugin.reset())),
       Promise.all(
         Object.values(this.mutableResourceManagers)
-          .reduce((acc: ReadonlyArray<ResourcesManager>, managers) => acc.concat(Object.values(managers)), [])
+          .reduce((acc: readonly ResourcesManager[], managers) => acc.concat(Object.values(managers)), [])
           .map(async (manager: ResourcesManager) => {
             await manager.reset();
           }),
@@ -138,7 +136,7 @@ export class PluginManager {
     ]);
   }
 
-  public async registerPlugins(pluginNames: ReadonlyArray<string>): Promise<void> {
+  public async registerPlugins(pluginNames: readonly string[]): Promise<void> {
     const plugins = pluginNames.map((pluginName) =>
       pluginsUtil.getPlugin({
         monitor: this.monitor,
@@ -146,7 +144,7 @@ export class PluginManager {
       }),
     );
 
-    const graph = plugins.reduce<ReadonlyArray<[string, string]>>(
+    const graph = plugins.reduce<readonly [string, string][]>(
       (acc, plugin) => acc.concat(plugin.dependencies.map<[string, string]>((dep) => [plugin.name, dep])),
       [],
     );

@@ -84,8 +84,8 @@ describe('NEOONEDataProvider', () => {
   };
 
   const verifyDefaultActions = (
-    actions: ReadonlyArray<RawAction>,
-    actionsJSON: ReadonlyArray<ActionJSON>,
+    actions: readonly RawAction[],
+    actionsJSON: readonly ActionJSON[],
     blockIndex: number,
     blockHash: string,
     index: number,
@@ -466,7 +466,7 @@ describe('NEOONEDataProvider', () => {
     expect(result.balances[Hash256.GAS].toString(10)).toEqual(accountJSON.balances[1].value);
   });
 
-  const convertedAssetTypes: ReadonlyArray<[AssetTypeJSON, AssetType]> = [
+  const convertedAssetTypes: readonly (readonly [AssetTypeJSON, AssetType])[] = [
     ['CreditFlag', 'Credit'],
     ['DutyFlag', 'Duty'],
     ['GoverningToken', 'Governing'],
@@ -577,7 +577,7 @@ describe('NEOONEDataProvider', () => {
     verifyContract(result, contractJSON);
   });
 
-  const convertedContractParameterTypes: ReadonlyArray<[ContractParameterTypeJSON, ContractParameterType]> = [
+  const convertedContractParameterTypes: readonly (readonly [ContractParameterTypeJSON, ContractParameterType])[] = [
     ['Signature', 'Signature'],
     ['Boolean', 'Boolean'],
     ['Integer', 'Integer'],

@@ -163,7 +163,7 @@ export class GCloudProvider extends Provider {
 
   private async getLatestTime(): Promise<{
     readonly time: number | undefined;
-    readonly files: ReadonlyArray<File>;
+    readonly files: readonly File[];
   }> {
     const { bucket, prefix } = this.options;
 

@@ -33,7 +33,7 @@ const Line = styled.p`
 
 interface Props {
   readonly title: string;
-  readonly lines: ReadonlyArray<string>;
+  readonly lines: readonly string[];
 }
 
 export const Proof = ({ title, lines, ...props }: Props) => (

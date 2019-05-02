@@ -18,7 +18,7 @@ type MutableExports =
   | {
       readonly type: 'exploreEval';
       readonly exports: Exports;
-      readonly missingPaths: ReadonlyArray<MissingPath>;
+      readonly missingPaths: readonly MissingPath[];
       readonly id: string;
     }
   | { readonly type: 'eval'; readonly exports: Exports };
@@ -94,7 +94,7 @@ export class TranspiledModule extends ModuleBase {
       }
 
       let missingPaths = this.uniquePaths(missingPathsIn);
-      let prevMissingPaths: ReadonlyArray<MissingPath> = [];
+      let prevMissingPaths: readonly MissingPath[] = [];
       // tslint:disable-next-line no-loop-statement
       while (!this.samePaths(missingPaths, prevMissingPaths)) {
         await this.engine.fetchDependencies(missingPaths);
@@ -125,11 +125,11 @@ export class TranspiledModule extends ModuleBase {
     });
   }
 
-  private uniquePaths(paths: ReadonlyArray<MissingPath>): ReadonlyArray<MissingPath> {
+  private uniquePaths(paths: readonly MissingPath[]): readonly MissingPath[] {
     return _.uniqBy(paths, (path) => `${path.request}:${path.currentPath}`);
   }
 
-  private samePaths(aIn: ReadonlyArray<MissingPath>, bIn: ReadonlyArray<MissingPath>): boolean {
+  private samePaths(aIn: readonly MissingPath[], bIn: readonly MissingPath[]): boolean {
     const sort = [({ request }: MissingPath) => request, ({ currentPath }: MissingPath) => currentPath];
     const a = _.sortBy(aIn, sort);
     const b = _.sortBy(bIn, sort);

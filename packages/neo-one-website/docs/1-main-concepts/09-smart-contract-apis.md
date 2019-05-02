@@ -141,11 +141,11 @@ interface InvokeReceipt<
   /**
    * The events emitted by the smart contract during the invocation.
    */
-  readonly events: ReadonlyArray<TEvent>;
+  readonly events: readonly TEvent[];
   /**
    * The logs emitted by the smart contract during the invocation.
    */
-  readonly logs: ReadonlyArray<Log>;
+  readonly logs: readonly Log[];
   /**
    * The original, unprocessed, raw invoke receipt. The `RawInvokeReceipt` is transformed into this object (the `InvokeReceipt`) using the ABI to parse out the events and transaction result.
    */

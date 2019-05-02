@@ -20,7 +20,7 @@ const getCLIResourceOptions = async ({ cli, options }: GetCLIResourceOptions): P
   );
 };
 
-const neotrackerOptions: ReadonlyArray<{ readonly option: string; readonly description: string }> = [
+const neotrackerOptions: readonly { readonly option: string; readonly description: string }[] = [
   {
     option: '-n, --network <name>',
     description: 'Network the NEO Tracker instance is associated with.',

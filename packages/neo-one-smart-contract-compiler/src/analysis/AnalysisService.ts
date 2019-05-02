@@ -33,7 +33,7 @@ export const DEFAULT_DIAGNOSTIC_OPTIONS = {
 };
 
 export interface SignatureTypes {
-  readonly paramDecls: ReadonlyArray<ts.ParameterDeclaration>;
+  readonly paramDecls: readonly ts.ParameterDeclaration[];
   readonly paramTypes: Map<ts.ParameterDeclaration, ts.Type | undefined>;
   readonly returnType: ts.Type | undefined;
 }
@@ -63,7 +63,7 @@ export class AnalysisService {
   public extractAllSignatures(
     node: ts.Node,
     options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
-  ): ReadonlyArray<SignatureTypes> {
+  ): readonly SignatureTypes[] {
     return this.extractAllSignaturesForType(node, this.getType(node), options);
   }
 
@@ -74,7 +74,7 @@ export class AnalysisService {
     return this.extractSignatureForType(node, this.getType(node), options);
   }
 
-  public getSignatures(node: ts.CallLikeExpression): ReadonlyArray<ts.Signature> | undefined {
+  public getSignatures(node: ts.CallLikeExpression): readonly ts.Signature[] | undefined {
     const signature = this.context.typeChecker.getResolvedSignature(node);
     if (signature !== undefined && !tsUtils.signature.isFailure(signature)) {
       return [signature];
@@ -92,7 +92,7 @@ export class AnalysisService {
     node: ts.Node,
     type: ts.Type | undefined,
     options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
-  ): ReadonlyArray<SignatureTypes> {
+  ): readonly SignatureTypes[] {
     const signatures = type === undefined ? undefined : tsUtils.type_.getCallSignatures(type);
     if (signatures === undefined) {
       return [];
@@ -123,7 +123,7 @@ export class AnalysisService {
   public extractSignaturesForCall(
     node: ts.CallLikeExpression,
     options: DiagnosticOptions = DEFAULT_DIAGNOSTIC_OPTIONS,
-  ): ReadonlyArray<SignatureTypes> | undefined {
+  ): readonly SignatureTypes[] | undefined {
     const signatures = this.getSignatures(node);
     if (signatures === undefined) {
       return undefined;
@@ -341,7 +341,7 @@ export class AnalysisService {
     });
   }
 
-  public getSymbolAndAllInheritedSymbols(node: ts.Node): ReadonlyArray<ts.Symbol> {
+  public getSymbolAndAllInheritedSymbols(node: ts.Node): readonly ts.Symbol[] {
     return this.memoized('get-symbol-and-all-inherited-symbols', nodeKey(node), () => {
       const symbol = this.getSymbol(node);
       const symbols = [symbol].filter(utils.notNull);
@@ -376,7 +376,7 @@ export class AnalysisService {
     );
   }
 
-  public findReferencesAsNodes(node: AnyNameableNode | ts.Identifier): ReadonlyArray<ts.Node> {
+  public findReferencesAsNodes(node: AnyNameableNode | ts.Identifier): readonly ts.Node[] {
     return this.memoized('find-references-as-nodes', nodeKey(node), () =>
       tsUtils.reference
         .findReferencesAsNodes(this.context.program, this.context.languageService, node)

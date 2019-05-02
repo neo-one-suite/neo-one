@@ -103,7 +103,7 @@ const getChapter = async (courseDir: string, lesson: string, chapter: string): P
 
 const getChapterFiles = async (
   dir: string,
-  files: ReadonlyArray<{ readonly initial?: string; readonly solution: string }>,
+  files: readonly { readonly initial?: string; readonly solution: string }[],
 ) => Promise.all(files.map(async ({ initial, solution }) => getChapterFile(dir, initial, solution)));
 
 const getChapterFile = async (dir: string, initial: string | undefined, solution: string): Promise<ChapterFile> => {
@@ -137,7 +137,7 @@ const getChapterFile = async (dir: string, initial: string | undefined, solution
   };
 };
 
-const getDirectories = async (filePath: string): Promise<ReadonlyArray<string>> => {
+const getDirectories = async (filePath: string): Promise<readonly string[]> => {
   const paths = await fs.readdir(filePath);
   const pathAndDir = await Promise.all(
     paths.map(async (fileName) => {

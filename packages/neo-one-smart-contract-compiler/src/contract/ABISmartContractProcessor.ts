@@ -23,7 +23,7 @@ export class ABISmartContractProcessor {
     };
   }
 
-  private processFunctions(): ReadonlyArray<ABIFunction> {
+  private processFunctions(): readonly ABIFunction[] {
     const deployInfo = this.findDeployInfo();
     const propInfos = this.contractInfo.propInfos
       .filter((propInfo) => propInfo.isPublic && propInfo.type !== 'deploy')
@@ -31,7 +31,7 @@ export class ABISmartContractProcessor {
 
     return _.flatten<ABIFunction>(
       propInfos.map(
-        (propInfo): ReadonlyArray<ABIFunction> => {
+        (propInfo): readonly ABIFunction[] => {
           switch (propInfo.type) {
             case 'deploy':
               return [
@@ -177,7 +177,7 @@ export class ABISmartContractProcessor {
     readonly callSignature: ts.Signature | undefined;
     readonly claim?: boolean;
     readonly send?: boolean;
-  }): ReadonlyArray<ABIParameter> {
+  }): readonly ABIParameter[] {
     if (callSignature === undefined) {
       return [];
     }
@@ -194,7 +194,7 @@ export class ABISmartContractProcessor {
     return parameters.map((parameter) => this.paramToABIParameter(parameter)).filter(utils.notNull);
   }
 
-  private processEvents(): ReadonlyArray<ABIEvent> {
+  private processEvents(): readonly ABIEvent[] {
     const createEventNotifierDecl = tsUtils.symbol.getDeclarations(
       this.context.builtins.getValueSymbol('createEventNotifier'),
     )[0];
@@ -215,14 +215,14 @@ export class ABISmartContractProcessor {
       })
       .filter(utils.notNull);
 
-    return calls.reduce<ReadonlyArray<ABIEvent>>((events, call) => {
+    return calls.reduce<readonly ABIEvent[]>((events, call) => {
       const event = this.toABIEvent(call, events);
 
       return event === undefined ? events : [...events, event];
     }, []);
   }
 
-  private toABIEvent(call: ts.CallExpression, events: ReadonlyArray<ABIEvent>): ABIEvent | undefined {
+  private toABIEvent(call: ts.CallExpression, events: readonly ABIEvent[]): ABIEvent | undefined {
     const callArguments = tsUtils.argumented.getArguments(call);
     const parent = tsUtils.node.getParent(call);
 
@@ -344,12 +344,12 @@ export class ABISmartContractProcessor {
     return parameter;
   }
 
-  private checkLastParam(parameters: ReadonlyArray<ts.Symbol>, value: string): boolean {
+  private checkLastParam(parameters: readonly ts.Symbol[], value: string): boolean {
     return this.checkLastParamBase(parameters, (decl, type) => this.context.builtins.isInterface(decl, type, value));
   }
 
   private checkLastParamBase(
-    parameters: ReadonlyArray<ts.Symbol>,
+    parameters: readonly ts.Symbol[],
     checkParamType: (decl: ts.Node, type: ts.Type) => boolean,
   ): boolean {
     if (parameters.length === 0) {

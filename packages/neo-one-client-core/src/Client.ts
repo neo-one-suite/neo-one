@@ -154,7 +154,7 @@ export class Client<
    *
    * Immediately emits the latest value when subscribed to.
    */
-  public readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
+  public readonly userAccounts$: Observable<readonly UserAccount[]>;
   /**
    * Emits a value whenever a new network is selected.
    *
@@ -167,7 +167,7 @@ export class Client<
    *
    * Immediately emits the latest value when subscribed to.
    */
-  public readonly networks$: Observable<ReadonlyArray<NetworkType>>;
+  public readonly networks$: Observable<readonly NetworkType[]>;
   protected readonly providers$: BehaviorSubject<TUserAccountProviders>;
   protected readonly selectedProvider$: BehaviorSubject<TUserAccountProvider>;
   private readonly currentNetworkInternal$: BehaviorSubject<NetworkType>;
@@ -406,7 +406,7 @@ export class Client<
   /**
    * @returns a list of all available `UserAccount`s
    */
-  public getUserAccounts(): ReadonlyArray<UserAccount> {
+  public getUserAccounts(): readonly UserAccount[] {
     return Object.values(this.providers).reduce(
       (acc: UserAccount[], provider) => acc.concat(provider.getUserAccounts()),
       [],
@@ -416,7 +416,7 @@ export class Client<
   /**
    * @returns a list of all available `NetworkType`s
    */
-  public getNetworks(): ReadonlyArray<NetworkType> {
+  public getNetworks(): readonly NetworkType[] {
     const providers = Object.values(this.providers);
 
     return [...new Set(providers.reduce((acc: NetworkType[], provider) => acc.concat(provider.getNetworks()), []))];
@@ -448,7 +448,7 @@ export class Client<
     to: AddressString,
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>;
-  public async transfer(transfers: ReadonlyArray<Transfer>, options?: TransactionOptions): Promise<TransactionResult>;
+  public async transfer(transfers: readonly Transfer[], options?: TransactionOptions): Promise<TransactionResult>;
   public async transfer(...argsIn: any[]): Promise<TransactionResult> {
     const { transfers, options } = this.getTransfersOptions(argsIn);
     await this.applyBeforeRelayHook(options);
@@ -505,8 +505,8 @@ export class Client<
   public async __invoke(
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     verify: boolean,
     optionsIn?: InvokeSendUnsafeReceiveTransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
@@ -525,8 +525,8 @@ export class Client<
   public async __invokeSend(
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     transfer: Transfer,
     optionsIn?: TransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
@@ -545,8 +545,8 @@ export class Client<
   public async __invokeCompleteSend(
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     hash: Hash256String,
     optionsIn?: TransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
@@ -565,8 +565,8 @@ export class Client<
   public async __invokeRefundAssets(
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     hash: Hash256String,
     optionsIn?: TransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
@@ -585,8 +585,8 @@ export class Client<
   public async __invokeClaim(
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     optionsIn?: TransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
@@ -605,7 +605,7 @@ export class Client<
     network: NetworkType,
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    params: readonly (ScriptBuilderParam | undefined)[],
     monitor?: Monitor,
   ): Promise<RawCallReceipt> {
     try {
@@ -717,9 +717,9 @@ export class Client<
   }
 
   protected getTransfersOptions(
-    argsIn: ReadonlyArray<any>,
+    argsIn: readonly any[],
   ): {
-    readonly transfers: ReadonlyArray<Transfer>;
+    readonly transfers: readonly Transfer[];
     readonly options: TransactionOptions;
   } {
     let transfers;

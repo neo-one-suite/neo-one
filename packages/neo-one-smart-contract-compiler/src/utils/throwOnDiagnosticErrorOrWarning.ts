@@ -2,7 +2,7 @@ import ts from 'typescript';
 
 import { getDiagnosticMessage } from './getDiagnosticMessage';
 
-export function throwOnDiagnosticErrorOrWarning(diagnostics: ReadonlyArray<ts.Diagnostic>, ignoreWarnings = false) {
+export function throwOnDiagnosticErrorOrWarning(diagnostics: readonly ts.Diagnostic[], ignoreWarnings = false) {
   const errors = diagnostics.filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
   const warnings = diagnostics.filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Warning);
   const errorMessage =

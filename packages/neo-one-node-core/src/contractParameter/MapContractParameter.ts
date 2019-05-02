@@ -10,10 +10,10 @@ export class MapContractParameter extends ContractParameterBase<
   ContractParameterType.Map
 > {
   public readonly type = ContractParameterType.Map;
-  public readonly value: ReadonlyArray<[ContractParameter, ContractParameter]>;
+  public readonly value: readonly (readonly [ContractParameter, ContractParameter])[];
   private readonly sizeInternal: () => number;
 
-  public constructor(value: ReadonlyArray<[ContractParameter, ContractParameter]>) {
+  public constructor(value: readonly (readonly [ContractParameter, ContractParameter])[]) {
     super();
     this.value = value;
     this.sizeInternal = utils.lazy(() => IOHelper.sizeOfArray(this.value, (val) => val[0].size + val[1].size));

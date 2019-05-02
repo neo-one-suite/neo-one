@@ -5,7 +5,7 @@ import { DiagnosticCode } from '../../../../DiagnosticCode';
 describe('Array.prototype.concat', () => {
   test('should concat array to array', async () => {
     await helpers.executeString(`
-      const x: ReadonlyArray<number> = [1, 2];
+      const x: readonly number[] = [1, 2];
       const y = [3];
       x.concat(y);
       const result = x.concat(y);
@@ -19,7 +19,7 @@ describe('Array.prototype.concat', () => {
 
   test('should "concat" many arrays to array', async () => {
     await helpers.executeString(`
-      const x: ReadonlyArray<number> = [1, 2];
+      const x: readonly number[] = [1, 2];
       const y = [3];
       const z = [4];
       const result = x['concat'](y, z);
@@ -34,7 +34,7 @@ describe('Array.prototype.concat', () => {
 
   test('should concat values to array', async () => {
     await helpers.executeString(`
-      const x: ReadonlyArray<number> = [1, 2];
+      const x: readonly number[] = [1, 2];
       const y = 3;
       const z = 4;
       const result = x.concat(y, z);
@@ -56,7 +56,7 @@ describe('Array.prototype.concat', () => {
           <T>(...items: (T | ConcatArray<T>)[]): T[];
         };
       }
-      const x: ReadonlyArray<number> | Arr<number> = [1, 2] as ReadonlyArray<number> | Arr<number>;
+      const x: readonly number[] | Arr<number> = [1, 2] as readonly number[] | Arr<number>;
       const y = 3;
       const z = 4;
       const result = x.concat(y, z);
@@ -72,7 +72,7 @@ describe('Array.prototype.concat', () => {
   test('cannot be referenced', async () => {
     helpers.compileString(
       `
-      const x: ReadonlyArray<number> = [0, 1, 2];
+      const x: readonly number[] = [0, 1, 2];
       const y = x.concat;
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },

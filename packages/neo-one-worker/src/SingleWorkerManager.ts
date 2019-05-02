@@ -26,7 +26,7 @@ export class SingleWorkerManager<T extends WorkerConstructor> {
   public constructor(
     endpointIn: endpoint.EndpointLike,
     options: WorkerOptions<T>,
-    private readonly disposables: ReadonlyArray<Disposable>,
+    private readonly disposables: readonly Disposable[],
     private readonly idleTimeoutMS: number,
     private readonly onDispose: (value: SingleWorkerManager<T>) => void,
   ) {

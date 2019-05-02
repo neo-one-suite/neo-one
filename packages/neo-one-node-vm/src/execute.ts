@@ -263,7 +263,7 @@ export const execute = async ({
   vmFeatures,
 }: {
   readonly monitor: Monitor;
-  readonly scripts: ReadonlyArray<Script>;
+  readonly scripts: readonly Script[];
   readonly blockchain: WriteBlockchain;
   readonly scriptContainer: ScriptContainer;
   readonly triggerType: TriggerType;

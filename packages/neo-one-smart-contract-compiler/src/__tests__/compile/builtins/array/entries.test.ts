@@ -90,7 +90,7 @@ describe('Array.prototype.entries', () => {
   test('cannot be referenced', async () => {
     helpers.compileString(
       `
-      const x: ReadonlyArray<number> = [0, 1, 2];
+      const x: readonly number[] = [0, 1, 2];
       const y = x.entries;
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },

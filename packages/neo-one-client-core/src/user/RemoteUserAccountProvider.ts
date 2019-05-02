@@ -80,30 +80,30 @@ async function* asyncGenerator(messageEndpoint: Endpoint, method: string, networ
 
 export class RemoteUserAccountProvider implements UserAccountProvider {
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;
-  public readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
-  public readonly networks$: Observable<ReadonlyArray<NetworkType>>;
+  public readonly userAccounts$: Observable<readonly UserAccount[]>;
+  public readonly networks$: Observable<readonly NetworkType[]>;
   private readonly messageEndpoint: Endpoint;
   private readonly currentAccountInternal$: BehaviorSubject<UserAccount | undefined>;
-  private readonly userAccountsInternal$: BehaviorSubject<ReadonlyArray<UserAccount>>;
-  private readonly networksInternal$: BehaviorSubject<ReadonlyArray<NetworkType>>;
+  private readonly userAccountsInternal$: BehaviorSubject<readonly UserAccount[]>;
+  private readonly networksInternal$: BehaviorSubject<readonly NetworkType[]>;
 
   public constructor({ endpoint }: { readonly endpoint: Endpoint }) {
     this.messageEndpoint = endpoint;
 
-    this.userAccountsInternal$ = new BehaviorSubject<ReadonlyArray<UserAccount>>([]);
+    this.userAccountsInternal$ = new BehaviorSubject<readonly UserAccount[]>([]);
     this.currentAccountInternal$ = new BehaviorSubject<UserAccount | undefined>(undefined);
-    this.networksInternal$ = new BehaviorSubject<ReadonlyArray<NetworkType>>([]);
+    this.networksInternal$ = new BehaviorSubject<readonly NetworkType[]>([]);
     this.messageEndpoint.addEventListener((event: Message) => {
       switch (event.type) {
         case 'OBSERVABLE': {
           if (event.id === 'userAccounts$') {
-            this.userAccountsInternal$.next(deserialize(event.value) as ReadonlyArray<UserAccount>);
+            this.userAccountsInternal$.next(deserialize(event.value) as readonly UserAccount[]);
           }
           if (event.id === 'currentUserAccount$') {
             this.currentAccountInternal$.next(deserialize(event.value) as UserAccount | undefined);
           }
           if (event.id === 'networks$') {
-            this.networksInternal$.next(deserialize(event.value) as ReadonlyArray<NetworkType>);
+            this.networksInternal$.next(deserialize(event.value) as readonly NetworkType[]);
           }
           break;
         }
@@ -162,11 +162,11 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     return result.result;
   }
 
-  public getUserAccounts(): ReadonlyArray<UserAccount> {
+  public getUserAccounts(): readonly UserAccount[] {
     return this.userAccountsInternal$.getValue();
   }
 
-  public getNetworks(): ReadonlyArray<NetworkType> {
+  public getNetworks(): readonly NetworkType[] {
     return this.networksInternal$.getValue();
   }
 
@@ -197,7 +197,7 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
   }
 
   public async transfer(
-    transfers: ReadonlyArray<Transfer>,
+    transfers: readonly Transfer[],
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction>> {
     return this.handleMethodWithConfirmation({
@@ -213,8 +213,8 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
   public async invoke(
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     verify: boolean,
     options?: InvokeSendUnsafeReceiveTransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -230,8 +230,8 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
   public async invokeSend(
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     transfer: Transfer,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -247,8 +247,8 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
   public async invokeCompleteSend(
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -264,8 +264,8 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
   public async invokeRefundAssets(
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -281,8 +281,8 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
   public async invokeClaim(
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
@@ -298,7 +298,7 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     network: NetworkType,
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    params: readonly (ScriptBuilderParam | undefined)[],
   ): Promise<RawCallReceipt> {
     const result = await this.handleRelayMethod({
       method: 'call',
@@ -315,7 +315,7 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
   }: {
     readonly method: string;
     // tslint:disable-next-line no-any
-    readonly args: ReadonlyArray<any>;
+    readonly args: readonly any[];
     readonly confirm?: boolean;
   }) {
     const id = getID();
@@ -351,7 +351,7 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
   }: {
     readonly method: string;
     // tslint:disable-next-line no-any
-    readonly args: ReadonlyArray<any>;
+    readonly args: readonly any[];
   }) {
     const result = await this.handleRelayMethod({
       method,

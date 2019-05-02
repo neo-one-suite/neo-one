@@ -34,7 +34,7 @@ import { JumpTable } from './JumpTable';
 import { resolveJumps } from './resolveJumps';
 import { Bytecode, CaptureResult, ScriptBuilder, SingleBytecode, SingleBytecodeValue, Tags } from './ScriptBuilder';
 
-const compilers: ReadonlyArray<ReadonlyArray<new () => NodeCompiler>> = [declarations, expressions, files, statements];
+const compilers: readonly (readonly (new () => NodeCompiler)[])[] = [declarations, expressions, files, statements];
 
 type Compilers = { [K in number]?: NodeCompiler };
 
@@ -47,7 +47,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   private readonly jumpTablePC: DeferredProgramCounter = new DeferredProgramCounter();
   // tslint:disable-next-line readonly-array
   private mutableCapturedBytecode: SingleBytecode[] | undefined;
-  private mutableProcessedByteCode: ReadonlyArray<SingleBytecode> = [];
+  private mutableProcessedByteCode: readonly SingleBytecode[] = [];
   private mutableCurrentTags: Tags = [];
   private readonly nodes: Map<ts.Node, number> = new Map();
   private readonly mutableModuleMap: { [K in string]?: number } = {};
@@ -63,10 +63,10 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     private readonly sourceFile: ts.SourceFile,
     private readonly contractInfo?: ContractInfo,
     private readonly linked: LinkedContracts = {},
-    private readonly allHelpers: ReadonlyArray<Helper> = [],
+    private readonly allHelpers: readonly Helper[] = [],
   ) {
     this.compilers = compilers
-      .reduce<ReadonlyArray<new () => NodeCompiler>>((acc, kindCompilers) => acc.concat(kindCompilers), [])
+      .reduce<readonly (new () => NodeCompiler)[]>((acc, kindCompilers) => acc.concat(kindCompilers), [])
       .reduce<Compilers>((acc, kindCompilerClass) => {
         const kindCompiler = new kindCompilerClass();
         if (acc[kindCompiler.kind] !== undefined) {

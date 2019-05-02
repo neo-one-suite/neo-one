@@ -61,7 +61,7 @@ export const getInitialContextAdd = ({
 }: {
   readonly blockchain: Blockchain;
   readonly publicKey: ECPoint;
-  readonly validators: ReadonlyArray<ECPoint>;
+  readonly validators: readonly ECPoint[];
   readonly blockReceivedTimeSeconds?: number;
 }) => {
   const blockIndex = blockchain.currentBlock.index + 1;
@@ -284,7 +284,7 @@ export const initializeConsensusInitial = ({
   });
 };
 
-export const incrementExpectedView = (context: Context): ReadonlyArray<number> => {
+export const incrementExpectedView = (context: Context): readonly number[] => {
   const mutableExpectedView = [...context.expectedView];
   mutableExpectedView[context.myIndex] += 1;
 

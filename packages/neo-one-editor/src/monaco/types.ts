@@ -6,7 +6,7 @@ import { AsyncLanguageService } from './AsyncLanguageService';
 export interface MonacoWorkerManager {
   readonly manager: WorkerManager<typeof AsyncLanguageService>;
   readonly fs: PouchDBFileSystem;
-  readonly openFiles$: Observable<ReadonlyArray<string>>;
+  readonly openFiles$: Observable<readonly string[]>;
   readonly fileChanged$: Observable<string>;
   readonly isLanguageFile: (file: string) => boolean;
 }

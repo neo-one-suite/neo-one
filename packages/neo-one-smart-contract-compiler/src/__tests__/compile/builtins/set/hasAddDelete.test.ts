@@ -22,7 +22,7 @@ describe('Set.prototype.hasAddDelete', () => {
 
   test('should respect reference semantics', async () => {
     await helpers.executeString(`
-      const x = new Set<ReadonlyArray<number>>();
+      const x = new Set<readonly number[]>();
       const y = [0];
       const z = [0];
       x.add(y).add(z);

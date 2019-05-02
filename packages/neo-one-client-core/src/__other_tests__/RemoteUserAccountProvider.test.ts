@@ -39,7 +39,7 @@ describe('RemoteUserAccountProvider', () => {
     ['map', new Map([[data.bns.a, data.numbers.b]])],
     ['object', { key: false }],
     ['forward', { name: 'forwardValue', converted: Buffer.alloc(20, 7), param: unlockedWallet.userAccount.id.address }],
-  ] as ReadonlyArray<[string, Param | undefined]>;
+  ] as readonly (readonly [string, Param | undefined])[];
   const transactionOptions = {
     from: unlockedWallet1.userAccount.id,
     attributes: [

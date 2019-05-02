@@ -18,7 +18,7 @@ export interface VerifyScriptResult {
   readonly failureMessage?: string;
   readonly hash: UInt160;
   readonly witness: Witness;
-  readonly actions: ReadonlyArray<Action>;
+  readonly actions: readonly Action[];
 }
 
 export type VerifyScript = (options: VerifyScriptOptions) => Promise<VerifyScriptResult>;
@@ -50,8 +50,8 @@ export interface ExecutionAction {
 
 export interface ExecuteScriptsResult {
   readonly state: VMState;
-  readonly stack: ReadonlyArray<ContractParameter>;
-  readonly stackAlt: ReadonlyArray<ContractParameter>;
+  readonly stack: readonly ContractParameter[];
+  readonly stackAlt: readonly ContractParameter[];
   readonly gasConsumed: BN;
   readonly gasCost: BN;
   readonly errorMessage?: string;
@@ -59,13 +59,13 @@ export interface ExecuteScriptsResult {
 
 export interface VMListeners {
   readonly onNotify?: (options: {
-    readonly args: ReadonlyArray<ContractParameter>;
+    readonly args: readonly ContractParameter[];
     readonly scriptHash: UInt160;
   }) => void;
 
   readonly onLog?: (options: { readonly message: string; readonly scriptHash: UInt160 }) => void;
   readonly onMigrateContract?: (options: { readonly from: UInt160; readonly to: UInt160 }) => void;
-  readonly onSetVotes?: (options: { readonly address: UInt160; readonly votes: ReadonlyArray<ECPoint> }) => void;
+  readonly onSetVotes?: (options: { readonly address: UInt160; readonly votes: readonly ECPoint[] }) => void;
 }
 
 export interface VMFeatureSwitches {
@@ -74,7 +74,7 @@ export interface VMFeatureSwitches {
 
 export type ExecuteScripts = (input: {
   readonly monitor: Monitor;
-  readonly scripts: ReadonlyArray<Script>;
+  readonly scripts: readonly Script[];
   readonly blockchain: WriteBlockchain;
   readonly scriptContainer: ScriptContainer;
   readonly triggerType: TriggerType;

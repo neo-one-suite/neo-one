@@ -24,7 +24,7 @@ describe('Array.prototype.join', () => {
       interface Arr<T> {
         join(separator?: string): string;
       }
-      const x: ReadonlyArray<number> | Arr<number> = [1, 2, 3] as ReadonlyArray<number> | Arr<number>;
+      const x: readonly number[] | Arr<number> = [1, 2, 3] as readonly number[] | Arr<number>;
 
       assertEqual('1|2|3', x['join']('|'));
     `);
@@ -33,7 +33,7 @@ describe('Array.prototype.join', () => {
   test('cannot be referenced', async () => {
     helpers.compileString(
       `
-      const x: ReadonlyArray<number> = [0, 1, 2];
+      const x: readonly number[] = [0, 1, 2];
       const y = x.join;
     `,
       { type: 'error', code: DiagnosticCode.InvalidBuiltinReference },

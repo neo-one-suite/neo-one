@@ -25,7 +25,7 @@ export interface MissingPath {
 
 export interface ExploreResult {
   readonly exports: Exports;
-  readonly missingPaths: ReadonlyArray<MissingPath>;
+  readonly missingPaths: readonly MissingPath[];
 }
 
 export abstract class ModuleBase {

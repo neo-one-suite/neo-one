@@ -10,10 +10,10 @@ export class SmartContractPlugin {
     // tslint:disable-next-line no-null-keyword
     const proxy: ts.LanguageService = Object.create(null);
     // tslint:disable-next-line no-loop-statement
-    for (const k of Object.keys(info.languageService) as Array<keyof ts.LanguageService>) {
+    for (const k of Object.keys(info.languageService) as (keyof ts.LanguageService)[]) {
       const x = info.languageService[k];
       // tslint:disable-next-line no-object-mutation no-any
-      proxy[k] = (...args: Array<{}>) => (x as any).apply(info.languageService, args);
+      proxy[k] = (...args: {}[]) => (x as any).apply(info.languageService, args);
     }
 
     proxy.getSemanticDiagnostics = (fileName) => {

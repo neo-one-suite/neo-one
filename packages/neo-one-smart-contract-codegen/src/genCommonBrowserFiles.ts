@@ -36,7 +36,7 @@ export const genCommonBrowserFiles = ({
   sourceMaps,
   framework,
 }: {
-  readonly contractsPaths: ReadonlyArray<ContractPaths>;
+  readonly contractsPaths: readonly ContractPaths[];
   readonly testPath: string;
   readonly commonTypesPath: string;
   readonly reactPath: string;
@@ -45,8 +45,8 @@ export const genCommonBrowserFiles = ({
   readonly clientPath: string;
   readonly generatedPath: string;
   readonly localDevNetworkName: string;
-  readonly wallets: ReadonlyArray<Wallet>;
-  readonly networks: ReadonlyArray<NetworkDefinition>;
+  readonly wallets: readonly Wallet[];
+  readonly networks: readonly NetworkDefinition[];
   readonly sourceMaps: SourceMaps;
   readonly framework: CodegenFramework;
 }): CommonBrowserFilesResult => {

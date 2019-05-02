@@ -25,7 +25,7 @@ describe('Map.prototype.get/set/has/delete', () => {
 
   test('should respect reference semantics', async () => {
     await helpers.executeString(`
-      const x = new Map<ReadonlyArray<number>, string>();
+      const x = new Map<readonly number[], string>();
       const y = [0];
       const z = [0];
       x.set(y, 'bar').set(z, 'baz');

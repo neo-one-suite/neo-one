@@ -11,7 +11,7 @@ import BN from 'bn.js';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
 import { BinaryReader } from './utils';
 
-type Votes = ReadonlyArray<BN | undefined>;
+type Votes = readonly (BN | undefined)[];
 export interface ValidatorsCountUpdate {
   readonly votes?: Votes;
 }

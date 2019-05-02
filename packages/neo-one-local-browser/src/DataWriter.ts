@@ -7,7 +7,7 @@ interface Resolver<K, R> {
 }
 
 export class DataWriter<K, V, R> {
-  private mutableResolvers: Array<Resolver<K, R>> = [];
+  private mutableResolvers: Resolver<K, R>[] = [];
   private mutableQueued: Map<K, V> = new Map();
 
   public constructor(private readonly batchWriteFunc: (data: Map<K, V>) => Promise<Map<K, R>>) {}

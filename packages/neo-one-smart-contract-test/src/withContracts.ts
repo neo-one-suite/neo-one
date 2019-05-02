@@ -11,7 +11,7 @@ import { createNode } from './createNode';
 export { Contract, WithContractsOptions, TestOptions };
 
 export const withContracts = async <T>(
-  contracts: ReadonlyArray<Contract>,
+  contracts: readonly Contract[],
   test: (contracts: T & TestOptions) => Promise<void>,
   options?: WithContractsOptions,
 ): Promise<void> =>

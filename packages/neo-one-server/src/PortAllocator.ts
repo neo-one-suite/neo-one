@@ -234,14 +234,14 @@ export class PortAllocator implements IPortAllocator {
         {
           type: 'list',
           table: [['Plugin', 'Resource Type', 'Resource', 'Name', 'Port']].concat(
-            Object.entries(this.mutablePorts).reduce<ReadonlyArray<[string, string, string, string, string]>>(
+            Object.entries(this.mutablePorts).reduce<readonly (readonly [string, string, string, string, string])[]>(
               (acc, [plugin, pluginPorts]) =>
                 acc.concat(
-                  Object.entries(pluginPorts).reduce<ReadonlyArray<[string, string, string, string, string]>>(
+                  Object.entries(pluginPorts).reduce<readonly (readonly [string, string, string, string, string])[]>(
                     (acc1, [resourceType, resourceTypePorts]) =>
                       acc1.concat(
                         Object.entries(resourceTypePorts).reduce<
-                          ReadonlyArray<[string, string, string, string, string]>
+                          readonly (readonly [string, string, string, string, string])[]
                         >(
                           (acc2, [resource, resourcePorts]) =>
                             acc2.concat(

@@ -13,7 +13,7 @@ const getExportOrMember = (sym: ts.Symbol, name: string) => {
   return member === undefined ? tsUtils.symbol.getExportOrThrow(sym, name) : member;
 };
 
-const findNonNull = <T>(value: ReadonlyArray<T | undefined>): T | undefined => value.find((val) => val !== undefined);
+const findNonNull = <T>(value: readonly (T | undefined)[]): T | undefined => value.find((val) => val !== undefined);
 
 const throwIfNull = <T>(value: T | undefined | null): T => {
   if (value == undefined) {
@@ -89,7 +89,7 @@ export class Builtins {
     isMember: (builtin: Builtin) => builtin is T,
     isEligible: (builtin: T) => boolean,
     symbolMembers = false,
-  ): ReadonlyArray<[string, T]> {
+  ): readonly (readonly [string, T])[] {
     const filterPseudoSymbol = (symbol: ts.Symbol, key: string) => {
       const symbolSymbol = this.getInterfaceSymbolBase('SymbolConstructor', this.getGlobals());
 
@@ -106,7 +106,7 @@ export class Builtins {
 
     const members = this.getAllMembers(this.getAnyInterfaceSymbol(name));
 
-    const mutableMembers: Array<[string, T]> = [];
+    const mutableMembers: (readonly [string, T])[] = [];
     members.forEach((builtin, memberSymbol) => {
       const memberName = tsUtils.symbol.getName(memberSymbol);
       if (
@@ -290,7 +290,7 @@ export class Builtins {
   private getOnlyMemberBase<T>(
     value: string,
     name: string,
-    getValue: (value: [ts.Symbol, Builtin]) => T,
+    getValue: (value: readonly [ts.Symbol, Builtin]) => T,
   ): T | undefined {
     return this.memoized('only-member-base', `${value}$${name}`, () => {
       const symbol = this.getAnyInterfaceOrValueSymbol(value);
@@ -402,7 +402,7 @@ export class Builtins {
 
   private getInterfaceSymbols(file: ts.SourceFile): { readonly [key: string]: ts.Symbol | undefined } {
     return this.memoized('interface-symbols', tsUtils.file.getFilePath(file), () => {
-      const interfaceDecls: ReadonlyArray<ts.Declaration> = tsUtils.statement.getInterfaces(file);
+      const interfaceDecls: readonly ts.Declaration[] = tsUtils.statement.getInterfaces(file);
       const decls = interfaceDecls.concat(tsUtils.statement.getEnums(file));
 
       return _.fromPairs(
@@ -417,7 +417,7 @@ export class Builtins {
     });
   }
 
-  private getInheritedSymbols(symbol: ts.Symbol, baseTypes: ReadonlyArray<ts.Type> = []): Set<ts.Symbol> {
+  private getInheritedSymbols(symbol: ts.Symbol, baseTypes: readonly ts.Type[] = []): Set<ts.Symbol> {
     return this.memoized('get-inherited-symbols', symbolKey(symbol), () => {
       const symbols = new Set();
       // tslint:disable-next-line no-loop-statement
@@ -463,7 +463,7 @@ export class Builtins {
 
   private getTypeSymbols(file: ts.SourceFile): { readonly [key: string]: ts.Symbol | undefined } {
     return this.memoized('type-symbols', tsUtils.file.getFilePath(file), () => {
-      const decls: ReadonlyArray<ts.Declaration> = tsUtils.statement.getTypeAliases(file);
+      const decls: readonly ts.Declaration[] = tsUtils.statement.getTypeAliases(file);
 
       return _.fromPairs(
         decls.map((decl) => {
@@ -477,7 +477,7 @@ export class Builtins {
     });
   }
 
-  private getFiles(): ReadonlyArray<ts.SourceFile> {
+  private getFiles(): readonly ts.SourceFile[] {
     return this.memoized('file-cache', 'files', () =>
       [this.getGlobals(), this.getContract(), this.getTestGlobals()].filter(utils.notNull),
     );

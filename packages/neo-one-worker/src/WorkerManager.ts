@@ -15,7 +15,7 @@ export class WorkerManager<T extends WorkerConstructor> {
     private readonly createEndpoint: () => Promise<EndpointLike> | EndpointLike,
     private readonly getOptions: () => {
       readonly options: WorkerOptions<T>;
-      readonly disposables: ReadonlyArray<Disposable>;
+      readonly disposables: readonly Disposable[];
     },
     private readonly idleTimeoutMS: number,
     forceRestart$?: Observable<void>,

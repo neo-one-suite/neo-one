@@ -9,7 +9,7 @@ export interface NodeSettings {
   readonly isTestNet?: boolean;
   readonly privateNet?: boolean;
   readonly secondsPerBlock?: number;
-  readonly standbyValidators?: ReadonlyArray<string>;
+  readonly standbyValidators?: readonly string[];
   readonly address?: string;
   readonly rpcPort: number;
   readonly listenTCPPort: number;
@@ -22,6 +22,6 @@ export interface NodeSettings {
     };
   };
 
-  readonly seeds: ReadonlyArray<string>;
-  readonly rpcEndpoints: ReadonlyArray<string>;
+  readonly seeds: readonly string[];
+  readonly rpcEndpoints: readonly string[];
 }

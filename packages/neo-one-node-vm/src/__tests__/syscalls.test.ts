@@ -59,8 +59,8 @@ const monitor = DefaultMonitor.create({
   service: 'test',
 });
 
-const testArray: ReadonlyArray<number> = [1, 2, 3];
-const testIterator: ReadonlyArray<{ readonly key: IntegerStackItem; readonly value: IntegerStackItem }> = [
+const testArray: readonly number[] = [1, 2, 3];
+const testIterator: readonly { readonly key: IntegerStackItem; readonly value: IntegerStackItem }[] = [
   { key: new IntegerStackItem(new BN(0)), value: new IntegerStackItem(new BN(1)) },
   { key: new IntegerStackItem(new BN(1)), value: new IntegerStackItem(new BN(2)) },
   { key: new IntegerStackItem(new BN(2)), value: new IntegerStackItem(new BN(3)) },
@@ -145,35 +145,35 @@ interface SysCall {
   readonly name: SysCallName;
   readonly type: 'sys';
 
-  readonly args?: ReadonlyArray<Arg>;
+  readonly args?: readonly Arg[];
 }
 
 interface OpCall {
   readonly name: OpCode;
   readonly type: 'op';
 
-  readonly args?: ReadonlyArray<Arg>;
+  readonly args?: readonly Arg[];
   readonly buffer?: Buffer;
 }
 type Call = SysCall | OpCall;
 
 interface Calls {
   readonly type: 'calls';
-  readonly calls: ReadonlyArray<Call>;
+  readonly calls: readonly Call[];
 }
 type Arg = Param | undefined | Calls;
 
 interface TestCase {
   readonly name: SysCallName;
   readonly result:
-    | ReadonlyArray<StackItem>
+    | readonly StackItem[]
     | ((options: {
         readonly transaction: InvocationTransaction;
       }) => // tslint:disable-next-line no-any
-      ReadonlyArray<StackItem> | ((result: any) => void));
+      readonly StackItem[] | ((result: any) => void));
 
   readonly gas: BN;
-  readonly args?: ReadonlyArray<Arg>;
+  readonly args?: readonly Arg[];
   readonly options?: Options;
   // tslint:disable-next-line no-any
   readonly mock?: (options: { readonly blockchain: any }) => void;
@@ -3268,7 +3268,7 @@ const SYSCALLS = [
 
     gas: FEES.ONE,
   },
-] as ReadonlyArray<TestCase>;
+] as readonly TestCase[];
 
 const handleCall = (sb: ScriptBuilder, call: Call) => {
   if (call.args !== undefined) {
@@ -3283,7 +3283,7 @@ const handleCall = (sb: ScriptBuilder, call: Call) => {
   }
 };
 
-const handleArgs = (sb: ScriptBuilder, args: ReadonlyArray<Arg>) => {
+const handleArgs = (sb: ScriptBuilder, args: readonly Arg[]) => {
   // tslint:disable-next-line no-loop-statement
   for (let i = args.length - 1; i >= 0; i -= 1) {
     // tslint:disable-next-line no-any
@@ -3408,7 +3408,7 @@ describe('syscalls', () => {
       };
 
       const gasLeft = common.ONE_HUNDRED_MILLION_FIXED8;
-      let stack: ReadonlyArray<StackItem> = [];
+      let stack: readonly StackItem[] = [];
 
       if (mock !== undefined) {
         mock({ blockchain });

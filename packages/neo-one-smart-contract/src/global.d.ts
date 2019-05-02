@@ -274,7 +274,7 @@ interface IterableIterator<T> extends Iterator<T> {
   readonly [one1]: unique symbol;
 }
 
-interface ReadonlyArray<T> extends Iterable<T> {
+interface readonly T[] extends Iterable<T> {
   readonly [Symbol.iterator]: () => IterableIterator<T>;
   /**
    * Gets the length of the array. This is a number one higher than the highest element defined in an array.
@@ -350,7 +350,7 @@ interface ReadonlyArray<T> extends Iterable<T> {
   readonly [one1]: unique symbol;
 }
 
-type ConcatArray<T> = Array<T> | ReadonlyArray<T>;
+type ConcatArray<T> = Array<T> | readonly T[];
 
 interface Array<T> extends Iterable<T> {
   readonly [Symbol.iterator]: () => IterableIterator<T>;
@@ -434,7 +434,7 @@ interface Array<T> extends Iterable<T> {
   push(...items: T[]): number;
 
   [n: number]: T;
-  readonly [one1]: ReadonlyArray<T>[typeof one1];
+  readonly [one1]: readonly T[][typeof one1];
 }
 interface ArrayConstructor {
   readonly [one0]: unique symbol;
@@ -477,7 +477,7 @@ interface Set<T> extends Iterable<T> {
   readonly [one1]: ReadonlySet<T>[typeof one1];
 }
 interface SetConstructor {
-  new <T = any>(values?: ReadonlyArray<T>): Set<T>;
+  new <T = any>(values?: readonly T[]): Set<T>;
   readonly prototype: Set<any>;
 }
 declare var Set: SetConstructor;

@@ -30,7 +30,7 @@ import {
 } from '@neo-one/node-core';
 import BN from 'bn.js';
 
-const internalData: ReadonlyArray<{
+const internalData: readonly {
   readonly version: number;
   readonly hash256: UInt256;
   readonly hash160: UInt160;
@@ -44,7 +44,7 @@ const internalData: ReadonlyArray<{
   readonly verification: Buffer;
   readonly invocation: Buffer;
   readonly publicKey: ECPoint;
-}> = [
+}[] = [
   {
     version: 1,
     hash160: common.asUInt160(Buffer.from('f3812db982f3b0089a21a278988efeec6a027b25', 'hex')),

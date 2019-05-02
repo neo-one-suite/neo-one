@@ -11,7 +11,7 @@ const _self = this;
 
 export interface Result {
   readonly exports: Exports;
-  readonly missingPaths: ReadonlyArray<MissingPath>;
+  readonly missingPaths: readonly MissingPath[];
 }
 
 export const evaluate = (engine: RemoteEngine, mod: TranspiledModule, exploreID?: string): Result => {

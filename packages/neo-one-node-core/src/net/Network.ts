@@ -14,7 +14,7 @@ export interface NegotiateResult<PeerData> {
 }
 
 export interface Network<Message, PeerData> {
-  readonly connectedPeers: ReadonlyArray<ConnectedPeer<Message, PeerData>>;
+  readonly connectedPeers: readonly ConnectedPeer<Message, PeerData>[];
   readonly blacklistAndClose: (peer: ConnectedPeer<Message, PeerData>) => void;
   readonly start: () => void;
   readonly stop: () => void;

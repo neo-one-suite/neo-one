@@ -83,7 +83,7 @@ export class ImportDeclarationCompiler extends NodeCompiler<ts.ImportDeclaration
     sb: ScriptBuilder,
     node: ts.ImportDeclaration,
     sourceFile: ts.SourceFile,
-  ): ReadonlyArray<ts.ImportSpecifier> {
+  ): readonly ts.ImportSpecifier[] {
     return tsUtils.importDeclaration
       .getNamedImports(node)
       .filter((namedImport) => sb.hasExport(sourceFile, this.getImportName(namedImport)));

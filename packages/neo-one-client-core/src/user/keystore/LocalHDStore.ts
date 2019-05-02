@@ -11,9 +11,9 @@ import {
 import { HDLocalStore, LocalPath } from './LocalHDHandler';
 
 interface ParsedNodePaths {
-  readonly accounts: ReadonlyArray<string>;
-  readonly chains: ReadonlyArray<string>;
-  readonly wallets?: ReadonlyArray<string>;
+  readonly accounts: readonly string[];
+  readonly chains: readonly string[];
+  readonly wallets?: readonly string[];
   readonly master?: string;
 }
 
@@ -87,7 +87,7 @@ const serializeTree = (tree: HDTree) => {
   return nodes;
 };
 
-const serializeNode = (node: HDNode, parentPath: ReadonlyArray<number>) => ({
+const serializeNode = (node: HDNode, parentPath: readonly number[]) => ({
   path: `m/${parentPath.concat(node.index).join('/')}`,
   serializedNode: crypto.serializeHDNode(node),
 });
@@ -102,10 +102,10 @@ const isChildOf = (parent: string) => {
   };
 };
 
-const filterAndRemaining = <T>(values: ReadonlyArray<T>, fn: (arg: T) => boolean) =>
+const filterAndRemaining = <T>(values: readonly T[], fn: (arg: T) => boolean) =>
   values.reduce<{
-    readonly matches: ReadonlyArray<T>;
-    readonly remaining: ReadonlyArray<T>;
+    readonly matches: readonly T[];
+    readonly remaining: readonly T[];
   }>(
     (acc, value) => {
       if (fn(value)) {
@@ -142,7 +142,7 @@ export interface LocalHDStorage {
   /**
    * Return all keys.
    */
-  readonly getAllKeys: () => Promise<ReadonlyArray<string>>;
+  readonly getAllKeys: () => Promise<readonly string[]>;
 }
 
 export class LocalHDStore implements HDLocalStore {
@@ -155,7 +155,7 @@ export class LocalHDStore implements HDLocalStore {
   }
 
   private readonly storage: LocalHDStorage;
-  private readonly initPromise: Promise<ReadonlyArray<number> | Error>;
+  private readonly initPromise: Promise<readonly number[] | Error>;
   private readonly treeInternal$: BehaviorSubject<HDTree>;
   private readonly mutableQueue: TreeUpdatePromise[];
   private mutableUpdating: boolean;
@@ -171,7 +171,7 @@ export class LocalHDStore implements HDLocalStore {
     this.initPromise = this.init();
   }
 
-  public async getMasterPath(): Promise<ReadonlyArray<number>> {
+  public async getMasterPath(): Promise<readonly number[]> {
     const init = await this.initPromise;
     if (init instanceof Error) {
       throw init;
@@ -237,7 +237,7 @@ export class LocalHDStore implements HDLocalStore {
     return newWallet;
   }
 
-  private async getChain(path: [number, number]): Promise<NodeChain> {
+  private async getChain(path: readonly [number, number]): Promise<NodeChain> {
     const wallet = await this.getWallet(path[0]);
     const maybeChain = wallet.chains[path[1]] as NodeChain | undefined;
 
@@ -286,9 +286,10 @@ export class LocalHDStore implements HDLocalStore {
     return newAccount;
   }
 
-  private async init(): Promise<ReadonlyArray<number> | Error> {
+  private async init(): Promise<readonly number[] | Error> {
     const pathKeys = await this.storage.getAllKeys();
-    const accessNode = pathKeys.sort((a, b) => {
+    // tslint:disable-next-line: no-array-mutation
+    const accessNode = pathKeys.slice().sort((a, b) => {
       if (a < b) {
         return -1;
       }
@@ -307,7 +308,7 @@ export class LocalHDStore implements HDLocalStore {
     return new InvalidHDStoredPathError(accessNode);
   }
 
-  private async getHDTree(keys: ReadonlyArray<string>) {
+  private async getHDTree(keys: readonly string[]) {
     const { accounts: accountsIn, chains: chainsIn, wallets: walletsIn, master } = keys.reduce<ParsedNodePaths>(
       (acc, path) => {
         const splitPath = path.split('/');
@@ -369,14 +370,14 @@ export class LocalHDStore implements HDLocalStore {
   }
 
   private async constructWallets(
-    walletPaths: ReadonlyArray<string>,
-    chainPaths: ReadonlyArray<string>,
-    accountPaths: ReadonlyArray<string>,
+    walletPaths: readonly string[],
+    chainPaths: readonly string[],
+    accountPaths: readonly string[],
   ): Promise<NodeWallets> {
     const constructed = await walletPaths.reduce<
       Promise<{
-        readonly accounts: ReadonlyArray<string>;
-        readonly chains: ReadonlyArray<string>;
+        readonly accounts: readonly string[];
+        readonly chains: readonly string[];
         readonly wallets: NodeWallets;
       }>
     >(
@@ -408,12 +409,12 @@ export class LocalHDStore implements HDLocalStore {
 
   private async constructWallet(
     walletPath: string,
-    chainPaths: ReadonlyArray<string>,
-    accountPaths: ReadonlyArray<string>,
+    chainPaths: readonly string[],
+    accountPaths: readonly string[],
   ): Promise<{
     readonly wallet: NodeWallet;
-    readonly remainingChains: ReadonlyArray<string>;
-    readonly remainingAccounts: ReadonlyArray<string>;
+    readonly remainingChains: readonly string[];
+    readonly remainingAccounts: readonly string[];
   }> {
     const isChild = isChildOf(walletPath);
     const walletNode = await this.getNodeFromPathOrUndefined(walletPath);
@@ -422,7 +423,7 @@ export class LocalHDStore implements HDLocalStore {
     const { chains, remainingAccounts } = await childPaths.reduce<
       Promise<{
         readonly chains: NodeChains;
-        readonly remainingAccounts: ReadonlyArray<string>;
+        readonly remainingAccounts: readonly string[];
       }>
     >(
       async (accPromise, child) => {
@@ -459,10 +460,10 @@ export class LocalHDStore implements HDLocalStore {
   private async constructChain(
     walletIndex: number,
     chainPath: string,
-    accountPaths: ReadonlyArray<string>,
+    accountPaths: readonly string[],
   ): Promise<{
     readonly chain: NodeChain;
-    readonly remainingAccounts: ReadonlyArray<string>;
+    readonly remainingAccounts: readonly string[];
   }> {
     const isChild = isChildOf(chainPath);
     const chainNode = await this.getNodeFromPath(chainPath);

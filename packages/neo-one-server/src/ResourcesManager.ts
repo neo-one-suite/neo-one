@@ -52,7 +52,7 @@ export class ResourcesManager<
 > {
   public readonly resourceType: ResourceType<Resource, ResourceOptions>;
   public readonly masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>;
-  public readonly resources$: Observable<ReadonlyArray<Resource>>;
+  public readonly resources$: Observable<readonly Resource[]>;
   private readonly monitor: Monitor;
   private readonly pluginManager: PluginManager;
   private readonly portAllocator: PortAllocator;
@@ -170,7 +170,7 @@ export class ResourcesManager<
     );
   }
 
-  public getResources$(options: ResourceOptions): Observable<ReadonlyArray<Resource>> {
+  public getResources$(options: ResourceOptions): Observable<readonly Resource[]> {
     return this.resources$.pipe(map((resources) => this.resourceType.filterResources(resources, options)));
   }
 
@@ -379,7 +379,7 @@ export class ResourcesManager<
       ),
     );
 
-    const abortTasks: ReadonlyArray<Task> = [
+    const abortTasks: readonly Task[] = [
       {
         title: `Abort ${create.names.ing} ${this.resourceType.names.lower} ${this.getSimpleName(name)}`,
         enabled: () => createTaskList !== undefined,
@@ -672,7 +672,7 @@ export class ResourcesManager<
     ]);
   }
 
-  public async init(): Promise<ReadonlyArray<InitError>> {
+  public async init(): Promise<readonly InitError[]> {
     return this.monitor.captureLog(
       async () => {
         await Promise.all([
@@ -741,7 +741,7 @@ export class ResourcesManager<
     });
   }
 
-  private async readDeps(depsPath: string): Promise<ReadonlyArray<ResourceDependency>> {
+  private async readDeps(depsPath: string): Promise<readonly ResourceDependency[]> {
     try {
       // tslint:disable-next-line prefer-immediate-return
       const deps = await fs.readJSON(depsPath);
@@ -757,7 +757,7 @@ export class ResourcesManager<
     }
   }
 
-  private deleteDeps(deps: ReadonlyArray<ResourceDependency>): TaskList {
+  private deleteDeps(deps: readonly ResourceDependency[]): TaskList {
     return new TaskList({
       tasks: deps.map(({ plugin, resourceType, name: dependentName }) => {
         const manager = this.pluginManager.getResourcesManager({
@@ -778,7 +778,7 @@ export class ResourcesManager<
     });
   }
 
-  private getStartDeps(deps: ReadonlyArray<ResourceDependency> | undefined): ReadonlyArray<ResourceDependency> {
+  private getStartDeps(deps: readonly ResourceDependency[] | undefined): readonly ResourceDependency[] {
     return (deps === undefined ? [] : deps).filter(
       ({ plugin, resourceType }) =>
         this.pluginManager
@@ -790,7 +790,7 @@ export class ResourcesManager<
     );
   }
 
-  private startDeps(deps: ReadonlyArray<ResourceDependency>): TaskList {
+  private startDeps(deps: readonly ResourceDependency[]): TaskList {
     return new TaskList({
       tasks: deps.map(({ plugin, resourceType, name: dependentName }) => {
         const manager = this.pluginManager.getResourcesManager({
@@ -814,7 +814,7 @@ export class ResourcesManager<
     });
   }
 
-  private getStopDeps(deps: ReadonlyArray<ResourceDependency> | undefined): ReadonlyArray<ResourceDependency> {
+  private getStopDeps(deps: readonly ResourceDependency[] | undefined): readonly ResourceDependency[] {
     return (deps === undefined ? [] : deps).filter(
       ({ plugin, resourceType }) =>
         this.pluginManager
@@ -826,7 +826,7 @@ export class ResourcesManager<
     );
   }
 
-  private stopDeps(deps: ReadonlyArray<ResourceDependency>): TaskList {
+  private stopDeps(deps: readonly ResourceDependency[]): TaskList {
     return new TaskList({
       tasks: deps.map(({ plugin, resourceType, name: dependentName }) => {
         const manager = this.pluginManager.getResourcesManager({
@@ -874,7 +874,7 @@ export class ResourcesManager<
     dependencies,
   }: {
     readonly name: string;
-    readonly dependencies: ReadonlyArray<ResourceDependency>;
+    readonly dependencies: readonly ResourceDependency[];
   }): void {
     dependencies.forEach(({ plugin, resourceType, name }) => {
       this.pluginManager
@@ -890,7 +890,7 @@ export class ResourcesManager<
     });
   }
 
-  private uniqueDeps(deps: ReadonlyArray<ResourceDependency>): ReadonlyArray<ResourceDependency> {
+  private uniqueDeps(deps: readonly ResourceDependency[]): readonly ResourceDependency[] {
     return _.uniqBy(deps, ({ plugin, resourceType, name }) => `${plugin}:${resourceType}:${name}`);
   }
 }

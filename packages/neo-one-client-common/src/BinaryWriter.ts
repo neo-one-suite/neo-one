@@ -9,7 +9,7 @@ export class BinaryWriter {
     this.mutableBuffer = [];
   }
 
-  public get buffer(): ReadonlyArray<Buffer> {
+  public get buffer(): readonly Buffer[] {
     return this.mutableBuffer;
   }
 
@@ -110,7 +110,7 @@ export class BinaryWriter {
     return this;
   }
 
-  public writeArray<T>(values: ReadonlyArray<T>, write: (value: T) => void): this {
+  public writeArray<T>(values: readonly T[], write: (value: T) => void): this {
     this.writeVarUIntLE(values.length);
     values.forEach(write);
 
@@ -118,7 +118,7 @@ export class BinaryWriter {
   }
 
   public writeObject<T, K extends keyof T>(value: T, write: (key: K, value: T[K]) => void): this {
-    const entries = Object.entries(value) as Array<[K, T[K]]>;
+    const entries = Object.entries(value) as [K, T[K]][];
     this.writeVarUIntLE(entries.length);
     entries.forEach(([key, val]) => {
       write(key, val);

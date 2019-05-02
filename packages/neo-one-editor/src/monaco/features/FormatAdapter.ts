@@ -18,7 +18,7 @@ export class FormatAdapter extends Adapter implements monaco.languages.DocumentR
       token,
       this.worker$.pipe(
         switchMap(
-          async (worker): Promise<ReadonlyArray<ts.TextChange>> =>
+          async (worker): Promise<readonly ts.TextChange[]> =>
             model.isDisposed()
               ? []
               : worker.getFormattingEditsForRange(

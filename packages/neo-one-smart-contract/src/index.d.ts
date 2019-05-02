@@ -776,7 +776,7 @@ export interface BlockConstructor {
 export type SerializableKeySingle = number | string | boolean | Buffer;
 type SK = SerializableKeySingle;
 export type SerializableKey = SK | [SK, SK] | [SK, SK, SK] | [SK, SK, SK, SK];
-export interface SerializableValueArray extends ReadonlyArray<SerializableValue> {}
+export interface SerializableValueArray extends readonly SerializableValue[] {}
 export interface SerializableValueMap extends ReadonlyMap<SerializableKeySingle, SerializableValue> {}
 export interface SerializableValueSet extends ReadonlySet<SerializableValue> {}
 export interface SerializableValueObject {
@@ -1216,7 +1216,7 @@ interface ForwardedValueTag<T extends SmartContractArg> {}
 export type ForwardedValue<T extends SmartContractArg> = T | (T & ForwardedValueTag<T>);
 
 interface SmartContractValueArray extends Array<SmartContractValue> {}
-interface SmartContractValueReadonlyArray extends ReadonlyArray<SmartContractValue> {}
+interface SmartContractValueReadonlyArray extends readonly SmartContractValue[] {}
 interface SmartContractValueMap extends Map<SmartContractValue, SmartContractValue> {}
 interface SmartContractValueReadonlyMap extends ReadonlyMap<SmartContractValue, SmartContractValue> {}
 interface SmartContractValueObject {

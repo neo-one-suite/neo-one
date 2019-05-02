@@ -49,7 +49,7 @@ const getUtilityValue = ({
   outputs,
   utilityToken,
 }: {
-  readonly outputs: ReadonlyArray<Output>;
+  readonly outputs: readonly Output[];
   readonly utilityToken: RegisterTransaction;
 }) =>
   outputs
@@ -78,20 +78,20 @@ export interface GetTransactionResultsOptions {
 }
 
 export interface TransactionVerifyOptions {
-  readonly calculateClaimAmount: (inputs: ReadonlyArray<Input>) => Promise<BN>;
+  readonly calculateClaimAmount: (inputs: readonly Input[]) => Promise<BN>;
   readonly isSpent: (key: OutputKey) => Promise<boolean>;
   readonly getAsset: (key: AssetKey) => Promise<Asset>;
   readonly getOutput: (key: OutputKey) => Promise<Output>;
   readonly tryGetAccount: (key: AccountKey) => Promise<Account | undefined>;
-  readonly standbyValidators: ReadonlyArray<ECPoint>;
-  readonly getAllValidators: () => Promise<ReadonlyArray<Validator>>;
+  readonly standbyValidators: readonly ECPoint[];
+  readonly getAllValidators: () => Promise<readonly Validator[]>;
   readonly verifyScript: VerifyScript;
   readonly currentHeight: number;
   readonly governingToken: RegisterTransaction;
   readonly utilityToken: RegisterTransaction;
   readonly fees: { [K in TransactionType]?: BN };
   readonly registerValidatorFee: BN;
-  readonly memPool?: ReadonlyArray<Transaction>;
+  readonly memPool?: readonly Transaction[];
 }
 
 /** @internal */
@@ -113,10 +113,10 @@ export function TransactionBase<
     public static deserializeTransactionBaseEndWireBase(
       options: DeserializeWireBaseOptions,
     ): {
-      readonly attributes: ReadonlyArray<Attribute>;
-      readonly inputs: ReadonlyArray<Input>;
-      readonly outputs: ReadonlyArray<Output>;
-      readonly scripts: ReadonlyArray<Witness>;
+      readonly attributes: readonly Attribute[];
+      readonly inputs: readonly Input[];
+      readonly outputs: readonly Output[];
+      readonly scripts: readonly Witness[];
     } {
       const { reader } = options;
       const attributes = reader.readArray(() => deserializeAttributeWireBase(options), MAX_TRANSACTION_ATTRIBUTES);
@@ -196,7 +196,7 @@ export function TransactionBase<
       async ({ getOutput }: GetTransactionResultsOptions): Promise<{ readonly [K in string]?: BN }> => {
         const inputOutputs = await this.getReferences({ getOutput });
         const mutableResults: { [K in string]?: BN } = {};
-        const addOutputs = (outputs: ReadonlyArray<Output>, negative?: boolean) => {
+        const addOutputs = (outputs: readonly Output[], negative?: boolean) => {
           outputs.forEach((output) => {
             const key = common.uInt256ToHex(output.asset);
             let result = mutableResults[key];
@@ -297,7 +297,7 @@ export function TransactionBase<
       return fee === undefined ? utils.ZERO : fee;
     }
 
-    public async getReferences(options: GetReferencesOptions): Promise<ReadonlyArray<Output>> {
+    public async getReferences(options: GetReferencesOptions): Promise<readonly Output[]> {
       return this.getReferencesInternal(options);
     }
 
@@ -311,7 +311,7 @@ export function TransactionBase<
       return this.baseGetScriptHashesForVerifyingInternal(options);
     }
 
-    public async verify(options: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
+    public async verify(options: TransactionVerifyOptions): Promise<readonly VerifyScriptResult[]> {
       if (this.size > MAX_TRANSACTION_SIZE) {
         throw new VerifyError('Transaction too large.');
       }
@@ -443,7 +443,7 @@ export function TransactionBase<
       getAsset,
       getOutput,
       verifyScript,
-    }: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
+    }: TransactionVerifyOptions): Promise<readonly VerifyScriptResult[]> {
       const hashesArr = await this.getSortedScriptHashesForVerifying({
         getAsset,
         getOutput,

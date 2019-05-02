@@ -3,10 +3,10 @@
 exports[`Array.prototype.entries cannot be referenced 1`] = `
 "snippetCode.ts (3,19): Builtin properties cannot be referenced
 
-      1 | 
-      2 |       const x: ReadonlyArray<number> = [0, 1, 2];
+      1 |
+      2 |       const x: readonly number[] = [0, 1, 2];
     > 3 |       const y = x.entries;
         |                   ^
-      4 |     
+      4 |
 "
 `;

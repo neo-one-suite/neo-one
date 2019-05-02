@@ -6,7 +6,7 @@ import { TestSummaryHeaderCommon } from './TestSummaryHeaderCommon';
 import { TestTextDark } from './TestText';
 
 interface Props {
-  readonly testSuites: ReadonlyArray<TestSuite>;
+  readonly testSuites: readonly TestSuite[];
 }
 
 export const TestSummaryHeader = ({ testSuites, ...props }: Props) => {

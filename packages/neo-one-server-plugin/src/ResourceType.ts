@@ -59,7 +59,7 @@ export class ResourceType<
 
   // Filter resources for return by getResources$. Passed the options given by
   // CRUDCLI#getOptions or CRUDCLI#getAutocompleteOptions.
-  public filterResources(resources: ReadonlyArray<Resource>, _options: ResourceOptions): ReadonlyArray<Resource> {
+  public filterResources(resources: readonly Resource[], _options: ResourceOptions): readonly Resource[] {
     return resources;
   }
 
@@ -106,7 +106,7 @@ export class ResourceType<
   // Format the resource information into a table, the first element in the
   // array will be the header. Must always return an array with at least one
   // element (the header).
-  public getListTable(resources: ReadonlyArray<Resource>): ListTable {
+  public getListTable(resources: readonly Resource[]): ListTable {
     return [['Name']].concat(resources.map((resource) => [resource.baseName]));
   }
 

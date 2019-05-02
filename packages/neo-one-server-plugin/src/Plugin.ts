@@ -46,7 +46,7 @@ export class Plugin {
     throw new Error('Not Implemented');
   }
 
-  public get resourceTypes(): ReadonlyArray<ResourceType> {
+  public get resourceTypes(): readonly ResourceType[] {
     return [];
   }
 
@@ -62,32 +62,32 @@ export class Plugin {
 
   // Names of plugins this module depends on, e.g.
   // ['@neo-one/server-plugin-network']
-  public get dependencies(): ReadonlyArray<string> {
+  public get dependencies(): readonly string[] {
     return [];
   }
 
   // Add additional commands.
-  public get commands(): ReadonlyArray<(cliArgs: CLIArgs) => void> {
+  public get commands(): readonly ((cliArgs: CLIArgs) => void)[] {
     return [];
   }
 
   // Add additional interactive commands
-  public get interactive(): ReadonlyArray<InteractiveCommand> {
+  public get interactive(): readonly InteractiveCommand[] {
     return [];
   }
 
   // Hook into other plugin's create resource lifecycle
-  public get createHooks(): ReadonlyArray<CreateHookConfig> {
+  public get createHooks(): readonly CreateHookConfig[] {
     return [];
   }
 
   // Hook into other plugin's command lifecycle
-  public get cliPreHooks(): ReadonlyArray<CLIHookConfig> {
+  public get cliPreHooks(): readonly CLIHookConfig[] {
     return [];
   }
 
   // Hook into other plugin's command lifecycle
-  public get cliPostHooks(): ReadonlyArray<CLIHookConfig> {
+  public get cliPostHooks(): readonly CLIHookConfig[] {
     return [];
   }
 

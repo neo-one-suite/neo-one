@@ -26,10 +26,10 @@ export const createInvocation = ({
 }: {
   readonly script: Buffer;
   readonly gas?: BN;
-  readonly attributes?: ReadonlyArray<Attribute>;
-  readonly inputs?: ReadonlyArray<Input>;
-  readonly outputs?: ReadonlyArray<Output>;
-  readonly scripts?: ReadonlyArray<Witness>;
+  readonly attributes?: readonly Attribute[];
+  readonly inputs?: readonly Input[];
+  readonly outputs?: readonly Output[];
+  readonly scripts?: readonly Witness[];
 }) =>
   new InvocationTransaction({
     script,
@@ -47,11 +47,11 @@ export const createClaim = ({
   scripts,
   claims,
 }: {
-  readonly attributes?: ReadonlyArray<Attribute>;
-  readonly inputs?: ReadonlyArray<Input>;
-  readonly outputs?: ReadonlyArray<Output>;
-  readonly scripts?: ReadonlyArray<Witness>;
-  readonly claims: ReadonlyArray<Input>;
+  readonly attributes?: readonly Attribute[];
+  readonly inputs?: readonly Input[];
+  readonly outputs?: readonly Output[];
+  readonly scripts?: readonly Witness[];
+  readonly claims: readonly Input[];
 }) =>
   new ClaimTransaction({
     attributes,

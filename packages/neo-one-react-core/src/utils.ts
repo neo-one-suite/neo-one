@@ -14,7 +14,7 @@ export const numberToPx = (value?: string | number) => {
 };
 
 // tslint:disable-next-line
-export const callAll = (...fns: Array<Function | undefined>) => (...args: any[]) =>
+export const callAll = (...fns: (Function | undefined)[]) => (...args: any[]) =>
   // tslint:disable-next-line
   fns.forEach((fn) => fn && fn(...args));
 
@@ -31,7 +31,7 @@ function isEmotion(comp: any) {
 }
 
 // tslint:disable-next-line:no-any
-function isReuse(comp: any): comp is { readonly uses: ReadonlyArray<React.ElementType> } {
+function isReuse(comp: any): comp is { readonly uses: readonly React.ElementType[] } {
   return Boolean(comp && Array.isArray(comp.uses));
 }
 
@@ -74,7 +74,7 @@ type Result<P extends object, Q, R, T extends object> = ThemedStyledFunction<
 // tslint:disable-next-line:no-any
 export const styledOmitProps = <StyleProps extends object = {}, RefProps = any>(
   component: React.ElementType,
-  omittedProps: ReadonlyArray<keyof StyleProps>,
+  omittedProps: readonly (keyof StyleProps)[],
   // tslint:disable-next-line:no-any
   theme: { [key in string]: any } = {},
 ): Result<StyleProps, React.ComponentProps<typeof component>, RefProps, typeof theme> => {

@@ -11,8 +11,8 @@ export const genClient = ({
   browser,
 }: {
   readonly localDevNetworkName: string;
-  readonly wallets: ReadonlyArray<Wallet>;
-  readonly networks: ReadonlyArray<NetworkDefinition>;
+  readonly wallets: readonly Wallet[];
+  readonly networks: readonly NetworkDefinition[];
   readonly clientPath: string;
   readonly projectIDPath: string;
   readonly httpServerPort: number;

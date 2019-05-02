@@ -18,7 +18,7 @@ export const createCompilerHost = ({ fs }: Options) => {
     getSmartContractPath,
     getSmartContractLibPath,
     createLanguageServiceHost(
-      rootNamesIn: ReadonlyArray<string>,
+      rootNamesIn: readonly string[],
       options: ts.CompilerOptions,
       withTestHarness = false,
     ): ts.LanguageServiceHost {

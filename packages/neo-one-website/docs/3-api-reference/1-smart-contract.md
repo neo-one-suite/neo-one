@@ -131,7 +131,7 @@ type SerializableValue =
   | string
   | boolean
   | Buffer
-  | ReadonlyArray<SerializableValue>
+  | readonly SerializableValue[]
   | ReadonlyMap<SerializableValue, SerializableValue>
   | ReadonlySet<SerializableValue>
   | { [key: string]: SerializableValue };

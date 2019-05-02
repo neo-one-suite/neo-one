@@ -47,7 +47,7 @@ class MapValue extends BuiltinNew {
 }
 class MapConstructorInterface extends BuiltinInterface {}
 
-const COMMON: ReadonlyArray<[string, Builtin]> = [
+const COMMON: readonly (readonly [string, Builtin])[] = [
   ['__@iterator', new MapIterator()],
   ['forEach', new MapForEach()],
   ['get', new MapGet()],

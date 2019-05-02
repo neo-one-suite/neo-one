@@ -122,7 +122,7 @@ export interface BlockchainStorage {
 }
 
 export interface VerifyTransactionResult {
-  readonly verifications: ReadonlyArray<VerifyScriptResult>;
+  readonly verifications: readonly VerifyScriptResult[];
 }
 
 export interface Blockchain extends BlockchainStorage {
@@ -143,24 +143,24 @@ export interface Blockchain extends BlockchainStorage {
     readonly block: Block;
     readonly unsafe?: boolean;
   }) => Promise<void>;
-  readonly persistHeaders: (headers: ReadonlyArray<Header>, monitor?: Monitor) => Promise<void>;
+  readonly persistHeaders: (headers: readonly Header[], monitor?: Monitor) => Promise<void>;
 
   readonly verifyBlock: (block: Block, monitor?: Monitor) => Promise<void>;
   readonly verifyTransaction: (param0: {
     readonly monitor?: Monitor;
     readonly transaction: Transaction;
-    readonly memPool?: ReadonlyArray<Transaction>;
+    readonly memPool?: readonly Transaction[];
   }) => Promise<VerifyTransactionResult>;
   readonly verifyConsensusPayload: (payload: ConsensusPayload, monitor?: Monitor) => Promise<void>;
 
   readonly getValidators: (
-    transactions: ReadonlyArray<Transaction>,
+    transactions: readonly Transaction[],
     monitor?: Monitor,
-  ) => Promise<ReadonlyArray<ECPoint>>;
+  ) => Promise<readonly ECPoint[]>;
 
   readonly invokeScript: (script: Buffer, monitor?: Monitor) => Promise<CallReceipt>;
   readonly invokeTransaction: (transaction: InvocationTransaction, monitor?: Monitor) => Promise<CallReceipt>;
-  readonly calculateClaimAmount: (inputs: ReadonlyArray<Input>, monitor?: Monitor) => Promise<BN>;
+  readonly calculateClaimAmount: (inputs: readonly Input[], monitor?: Monitor) => Promise<BN>;
 
   readonly updateSettings: (settings: Settings) => void;
   readonly stop: () => Promise<void>;

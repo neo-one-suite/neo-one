@@ -9,7 +9,7 @@ export const genReact = ({
   clientPath,
   browser,
 }: {
-  readonly contractsPaths: ReadonlyArray<ContractPaths>;
+  readonly contractsPaths: readonly ContractPaths[];
   readonly reactPath: string;
   readonly commonTypesPath: string;
   readonly clientPath: string;

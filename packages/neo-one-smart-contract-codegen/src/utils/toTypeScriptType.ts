@@ -35,7 +35,7 @@ export const toTypeScriptType = (
     case 'Object':
       return addOptional(`{
       ${Object.entries(abi.properties)
-        .reduce<ReadonlyArray<string>>(
+        .reduce<readonly string[]>(
           (acc, [key, val]) => acc.concat([`readonly '${key}': ${toTypeScriptType(val, { isParameter })}`]),
           [],
         )

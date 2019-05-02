@@ -70,7 +70,7 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
   public async getUnclaimed(
     address: AddressString,
     monitor?: Monitor,
-  ): Promise<{ readonly unclaimed: ReadonlyArray<Input>; readonly amount: BigNumber }> {
+  ): Promise<{ readonly unclaimed: readonly Input[]; readonly amount: BigNumber }> {
     const provider = await this.getProvider();
 
     return provider.getUnclaimed(address, monitor);
@@ -82,7 +82,7 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
     return provider.getClaimAmount(input, monitor);
   }
 
-  public async getUnspentOutputs(address: AddressString, monitor?: Monitor): Promise<ReadonlyArray<InputOutput>> {
+  public async getUnspentOutputs(address: AddressString, monitor?: Monitor): Promise<readonly InputOutput[]> {
     const provider = await this.getProvider();
 
     return provider.getUnspentOutputs(address, monitor);
@@ -152,7 +152,7 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
     return provider.getContract(address, monitor);
   }
 
-  public async getMemPool(monitor?: Monitor): Promise<ReadonlyArray<Hash256String>> {
+  public async getMemPool(monitor?: Monitor): Promise<readonly Hash256String[]> {
     const provider = await this.getProvider();
 
     return provider.getMemPool(monitor);
@@ -170,7 +170,7 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
     return provider.getOutput(input, monitor);
   }
 
-  public async getConnectedPeers(monitor?: Monitor): Promise<ReadonlyArray<Peer>> {
+  public async getConnectedPeers(monitor?: Monitor): Promise<readonly Peer[]> {
     const provider = await this.getProvider();
 
     return provider.getConnectedPeers(monitor);
@@ -191,7 +191,7 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
   public async call(
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    params: readonly (ScriptBuilderParam | undefined)[],
     monitor?: Monitor,
   ): Promise<RawCallReceipt> {
     const provider = await this.getProvider();

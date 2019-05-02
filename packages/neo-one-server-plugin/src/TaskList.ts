@@ -19,7 +19,7 @@ export interface Task {
 }
 
 export interface TaskListOptions {
-  readonly tasks: ReadonlyArray<Task>;
+  readonly tasks: readonly Task[];
   readonly concurrent?: boolean;
   readonly onError?: OnErrorFn;
   readonly onComplete?: () => void;
@@ -185,13 +185,13 @@ class TaskWrapper {
 export class TaskList {
   public mutableSuperOnError: (error: Error) => void;
   public readonly onError: OnErrorFn;
-  private readonly tasks: ReadonlyArray<TaskWrapper>;
+  private readonly tasks: readonly TaskWrapper[];
   private readonly concurrent: boolean;
   private readonly onComplete: () => void;
   private readonly onDone: OnDoneFn;
   private readonly initialContext: TaskContext;
   private readonly freshContext: boolean;
-  private readonly statusInternal$: ReplaySubject<ReadonlyArray<TaskStatus>>;
+  private readonly statusInternal$: ReplaySubject<readonly TaskStatus[]>;
   private mutableSubscription: Subscription | undefined;
 
   public constructor({
@@ -241,7 +241,7 @@ export class TaskList {
     this.statusInternal$ = new ReplaySubject(1);
   }
 
-  public get status$(): Observable<ReadonlyArray<TaskStatus>> {
+  public get status$(): Observable<readonly TaskStatus[]> {
     this.run().catch((error) => this.onError(error, {}));
 
     return this.statusInternal$;
@@ -259,7 +259,7 @@ export class TaskList {
     await this.abort$().toPromise();
   }
 
-  public abort$(): Observable<ReadonlyArray<TaskStatus>> {
+  public abort$(): Observable<readonly TaskStatus[]> {
     this.tasks.forEach((task) => task.abort());
 
     return this.status$;
@@ -282,7 +282,7 @@ export class TaskList {
     this.checkAll(ctx);
 
     this.mutableSubscription = combineLatest(this.tasks.map((task) => task.status$))
-      .pipe(map((statuses): ReadonlyArray<TaskStatus> => statuses.filter(utils.notNull)))
+      .pipe(map((statuses): readonly TaskStatus[] => statuses.filter(utils.notNull)))
       .subscribe(this.statusInternal$);
 
     await this.runTasks(ctx);

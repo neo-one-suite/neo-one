@@ -1,7 +1,7 @@
 import { css } from 'styled-components';
 import { prop } from 'styled-tools';
 
-const backup: ReadonlyArray<string> = [
+const backup: readonly string[] = [
   '-apple-system',
   'system-ui',
   'BlinkMacSystemFont',

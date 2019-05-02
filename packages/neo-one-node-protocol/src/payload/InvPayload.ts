@@ -3,7 +3,7 @@ import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions } from
 import { assertInventoryType, InventoryType } from './InventoryType';
 export interface InvPayloadAdd {
   readonly type: InventoryType;
-  readonly hashes: ReadonlyArray<UInt256>;
+  readonly hashes: readonly UInt256[];
 }
 
 export class InvPayload implements SerializableWire<InvPayload> {
@@ -22,7 +22,7 @@ export class InvPayload implements SerializableWire<InvPayload> {
   }
 
   public readonly type: InventoryType;
-  public readonly hashes: ReadonlyArray<UInt256>;
+  public readonly hashes: readonly UInt256[];
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ type, hashes }: InvPayloadAdd) {

@@ -115,7 +115,7 @@ class JumpStationCodePoint extends CodePoint {
 }
 
 const getCodePoint = (bytecode: Bytecode): CodePoint => {
-  const mutableSources: { [pc: number]: Array<JumpCodePoint | JumpStationCodePoint> } = {};
+  const mutableSources: { [pc: number]: (JumpCodePoint | JumpStationCodePoint)[] } = {};
   const mutableCodePoints: { [pc: number]: CodePoint } = {};
   const [firstNode, firstTags, firstBytecode] = bytecode[0];
   if (!(firstBytecode instanceof Jump)) {

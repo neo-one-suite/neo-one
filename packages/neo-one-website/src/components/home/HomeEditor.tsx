@@ -1,12 +1,12 @@
 import { FullEditor } from '@neo-one/editor';
 import * as React from 'react';
 
-const INITIAL_FILES: ReadonlyArray<{
+const INITIAL_FILES: readonly {
   readonly path: string;
   readonly content: string;
   readonly writable: boolean;
   readonly open: boolean;
-}> = [
+}[] = [
   {
     path: 'one/contracts/Token.one.ts',
     content: `import {

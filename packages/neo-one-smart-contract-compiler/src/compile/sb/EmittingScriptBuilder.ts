@@ -14,7 +14,7 @@ export interface EmittingScriptBuilderOptions {
   readonly scopes: Map<ts.Node, Map<number, ResolvedScope>>;
   readonly helpers: Helpers;
   readonly linked: LinkedContracts;
-  readonly allHelpers: ReadonlyArray<Helper>;
+  readonly allHelpers: readonly Helper[];
   readonly contractInfo?: ContractInfo;
 }
 

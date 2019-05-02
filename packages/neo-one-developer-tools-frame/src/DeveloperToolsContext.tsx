@@ -57,7 +57,7 @@ export const useNetworkClients = () => {
 export interface LocalState {
   readonly autoConsensus: boolean;
   readonly autoSystemFee: boolean;
-  readonly tokens: ReadonlyArray<Token>;
+  readonly tokens: readonly Token[];
 }
 export interface LocalStateContextType {
   readonly localState$: BehaviorSubject<LocalState>;
@@ -104,16 +104,14 @@ export function LocalStateProvider({ children }: { readonly children: React.Reac
   return <LocalStateContext.Provider value={{ localState$, onChange }}>{children}</LocalStateContext.Provider>;
 }
 
-export const useTokens = (): [ReadonlyArray<Token>, (tokens: ReadonlyArray<Token>) => void] => {
+export const useTokens = (): readonly [readonly Token[], (tokens: readonly Token[]) => void] => {
   const { localState$, onChange } = useContext(LocalStateContext);
   const tokens = useStream(
     () => localState$.pipe(map((localState) => localState.tokens, distinctUntilChanged())),
     [localState$],
     localState$.getValue().tokens,
   );
-  const onChangeTokens = useCallback((nextTokens: ReadonlyArray<Token>) => onChange({ tokens: nextTokens }), [
-    onChange,
-  ]);
+  const onChangeTokens = useCallback((nextTokens: readonly Token[]) => onChange({ tokens: nextTokens }), [onChange]);
 
   return [tokens, onChangeTokens];
 };
@@ -124,7 +122,7 @@ export const useResetLocalState = () => {
   return useCallback(() => onChange(INITIAL_LOCAL_STATE), [onChange]);
 };
 
-export const useAutoConsensus = (): [boolean, () => void] => {
+export const useAutoConsensus = (): readonly [boolean, () => void] => {
   const { localState$, onChange } = useContext(LocalStateContext);
   const autoConsensus = useStream(
     () => localState$.pipe(map((localState) => localState.autoConsensus, distinctUntilChanged())),
@@ -136,7 +134,7 @@ export const useAutoConsensus = (): [boolean, () => void] => {
   return [autoConsensus, toggle];
 };
 
-export const useAutoSystemFee = (): [boolean, () => void] => {
+export const useAutoSystemFee = (): readonly [boolean, () => void] => {
   const { localState$, onChange } = useContext(LocalStateContext);
   const autoSystemFee = useStream(
     () => localState$.pipe(map((localState) => localState.autoSystemFee, distinctUntilChanged())),

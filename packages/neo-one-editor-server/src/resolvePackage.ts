@@ -149,7 +149,7 @@ const resolveJavaScriptFiles = (files: Files, filePathIn: string, mapping: Mappi
       mutableResult[dtsFilePath] = dtsFile.toString('utf8');
     }
 
-    let requires: ReadonlyArray<string | number> | undefined;
+    let requires: readonly string | number[] | undefined;
     try {
       requires = detective(content);
     } catch {
@@ -191,7 +191,7 @@ const getAdditionalStarts = (files: Files, start: string, packageJSON: any) => {
     .filter((file) => !otherEntryPaths.has(file));
 };
 
-const getFilesWithExtensions = (files: Files, extensions: ReadonlyArray<string>) =>
+const getFilesWithExtensions = (files: Files, extensions: readonly string[]) =>
   _.fromPairs(
     Object.entries(files)
       .filter(([key]) => extensions.some((ext) => key.endsWith(ext)))

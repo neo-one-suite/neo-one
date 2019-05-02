@@ -18,9 +18,9 @@ import { StackFrame } from './StackFrame';
  */
 export async function map(
   engine: RemoteEngine,
-  frames: ReadonlyArray<StackFrame>,
+  frames: readonly StackFrame[],
   contextLines = 3,
-): Promise<ReadonlyArray<StackFrame>> {
+): Promise<readonly StackFrame[]> {
   initializeSourceMap();
   const mutableCache: { [fileName: string]: { fileSource: string; map: SourceMap } | undefined } = {};
   const mutableFiles: string[] = [];

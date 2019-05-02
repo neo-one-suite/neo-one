@@ -13,7 +13,7 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   INVALID: 'INVALID',
 };
 
-const rpcLabelNames: ReadonlyArray<string> = [KnownLabel.RPC_METHOD];
+const rpcLabelNames: readonly string[] = [KnownLabel.RPC_METHOD];
 const rpcLabels = Object.values(RPC_METHODS).map((method) => ({
   [KnownLabel.RPC_METHOD]: method,
 }));

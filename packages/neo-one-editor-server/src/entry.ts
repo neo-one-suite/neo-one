@@ -38,7 +38,7 @@ const monitor = DefaultMonitor.create({
   },
 });
 
-const mutableShudownFuncs: Array<() => Promise<void>> = [];
+const mutableShudownFuncs: (() => Promise<void>)[] = [];
 
 const initiateShutdown = async () => {
   await Promise.all(mutableShudownFuncs.map(async (func) => func()));

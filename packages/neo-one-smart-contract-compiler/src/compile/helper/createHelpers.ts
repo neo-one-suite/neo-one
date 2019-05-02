@@ -521,7 +521,7 @@ export interface Helpers {
 
   readonly forLoop: (options: ForLoopHelperOptions) => ForLoopHelper;
   readonly if: (options: IfHelperOptions) => IfHelper;
-  readonly case: (cases: ReadonlyArray<Case>, defaultCase: () => void) => CaseHelper;
+  readonly case: (cases: readonly Case[], defaultCase: () => void) => CaseHelper;
   readonly handleCompletion: HandleCompletionHelper;
   readonly return: ReturnHelper;
   readonly throw: ThrowHelper;

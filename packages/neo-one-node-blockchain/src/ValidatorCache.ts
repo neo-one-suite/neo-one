@@ -100,7 +100,7 @@ export class ValidatorCache {
     return newValidator;
   }
 
-  public async getAllValidators(): Promise<ReadonlyArray<Validator>> {
+  public async getAllValidators(): Promise<readonly Validator[]> {
     const validators = await this.blockchain.validator.all$.pipe(toArray()).toPromise();
     const mutablePublicKeyToValidator = _.fromPairs(
       validators.map((validator) => [common.ecPointToHex(validator.publicKey), validator]),

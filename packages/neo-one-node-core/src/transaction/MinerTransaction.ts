@@ -77,10 +77,10 @@ export class MinerTransaction extends TransactionBase<
     inputs = this.inputs,
     outputs = this.outputs,
   }: {
-    readonly scripts?: ReadonlyArray<Witness>;
-    readonly attributes?: ReadonlyArray<Attribute>;
-    readonly inputs?: ReadonlyArray<Input>;
-    readonly outputs?: ReadonlyArray<Output>;
+    readonly scripts?: readonly Witness[];
+    readonly attributes?: readonly Attribute[];
+    readonly inputs?: readonly Input[];
+    readonly outputs?: readonly Output[];
   }): this {
     // tslint:disable-next-line no-any
     return new (this.constructor as any)({
@@ -111,7 +111,7 @@ export class MinerTransaction extends TransactionBase<
     return utils.ZERO;
   }
 
-  public async verify(options: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
+  public async verify(options: TransactionVerifyOptions): Promise<readonly VerifyScriptResult[]> {
     const [results] = await Promise.all([super.verify(options), this.verifyInternal(options)]);
 
     return results;

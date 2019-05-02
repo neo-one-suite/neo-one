@@ -9,7 +9,7 @@ export const genVue = ({
   clientPath,
   browser,
 }: {
-  readonly contractsPaths: ReadonlyArray<ContractPaths>;
+  readonly contractsPaths: readonly ContractPaths[];
   readonly vuePath: string;
   readonly commonTypesPath: string;
   readonly clientPath: string;

@@ -141,7 +141,7 @@ Returns the currently selected [`NetworkType`](/docs/client#NetworkType).
 
 ```typescript
 interface Client {
-  readonly getUserAccounts: () => ReadonlyArray<UserAccount>;
+  readonly getUserAccounts: () => readonly UserAccount[];
 }
 ```
 
@@ -151,7 +151,7 @@ Returns a list of all available [`UserAccount`](/docs/client#UserAccount)s.
 
 ```typescript
 interface Client {
-  readonly getNetworks: () => ReadonlyArray<NetworkType>;
+  readonly getNetworks: () => readonly NetworkType[];
 }
 ```
 
@@ -249,7 +249,7 @@ Returns the currently selected [`UserAccount`](/docs/client#UserAccount) or `und
 
 ```typescript
 interface UserAccountProvider {
-  readonly getUserAccounts: () => ReadonlyArray<UserAccount>;
+  readonly getUserAccounts: () => readonly UserAccount[];
 }
 ```
 
@@ -259,7 +259,7 @@ Returns the available [`UserAccount`](/docs/client#UserAccount)s.
 
 ```typescript
 interface UserAccountProvider {
-  readonly getNetworks: () => ReadonlyArray<NetworkType>;
+  readonly getNetworks: () => readonly NetworkType[];
 }
 ```
 
@@ -340,7 +340,7 @@ While this method could be implemented simply as a function of `iterBlocks`, `it
 ```typescript
 interface UserAccountProvider {
   readonly transfer: (
-    transfers: ReadonlyArray<Transfer>,
+    transfers: readonly Transfer[],
     options?: TransactionOptions,
   ) => Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>;
 }
@@ -365,8 +365,8 @@ interface UserAccountProvider {
   readonly invoke: (
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     verify: boolean,
     options?: InvokeSendUnsafeReceiveTransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -383,8 +383,8 @@ interface UserAccountProvider {
   readonly invokeSend: (
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     transfer: Transfer,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -401,8 +401,8 @@ interface UserAccountProvider {
   readonly invokeCompleteSend: (
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -419,8 +419,8 @@ interface UserAccountProvider {
   readonly invokeRefundAssets: (
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -437,8 +437,8 @@ interface UserAccountProvider {
   readonly invokeClaim: (
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
@@ -455,7 +455,7 @@ interface UserAccountProvider {
     network: NetworkType,
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    params: readonly (ScriptBuilderParam | undefined)[],
     monitor?: Monitor,
   ) => Promise<RawCallReceipt>;
 }
@@ -927,7 +927,7 @@ type Param =
   | Hash256String
   | PublicKeyString
   | boolean
-  | ReadonlyArray<Param>
+  | readonly Param[]
   | ReadonlyMap<Param, Param>
   | { [prop: string]: Param }
   | ForwardValue;
@@ -946,7 +946,7 @@ type Return =
   | Hash256String
   | PublicKeyString
   | boolean
-  | ReadonlyArray<Return>
+  | readonly Return[]
   | ReadonlyMap<Return, Return>
   | { [key: string]: Return }
   | ContractParameter;

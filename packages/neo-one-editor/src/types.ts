@@ -11,10 +11,10 @@ export interface EngineContentFile {
   readonly open: boolean;
 }
 
-export type EngineContentFiles = ReadonlyArray<EngineContentFile>;
+export type EngineContentFiles = readonly EngineContentFile[];
 
 export interface EngineState {
-  readonly openFiles: ReadonlyArray<string>;
+  readonly openFiles: readonly string[];
 }
 
 export interface EditorContextType {
@@ -22,7 +22,7 @@ export interface EditorContextType {
 }
 
 export interface TestBase {
-  readonly name: ReadonlyArray<string>;
+  readonly name: readonly string[];
 }
 
 export interface TestFailure extends TestBase {
@@ -48,7 +48,7 @@ export type Test = TestFailure | TestSkip | TestPass | TestRunning;
 
 export interface TestSuite {
   readonly path: string;
-  readonly tests: ReadonlyArray<Test>;
+  readonly tests: readonly Test[];
   readonly error?: {
     readonly message: string;
     readonly stack?: string;

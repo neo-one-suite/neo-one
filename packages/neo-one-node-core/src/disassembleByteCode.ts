@@ -16,10 +16,10 @@ interface Line {
   readonly value: string;
 }
 
-export const disassembleByteCode = (bytes: Buffer): ReadonlyArray<Line> => {
+export const disassembleByteCode = (bytes: Buffer): readonly Line[] => {
   const reader = new BinaryReader(bytes);
 
-  const mutableResult: Array<[number, OpCode | 'UNKNOWN', string | undefined]> = [];
+  const mutableResult: [number, OpCode | 'UNKNOWN', string | undefined][] = [];
   // tslint:disable-next-line no-loop-statement
   while (reader.hasMore()) {
     const pc = reader.index;

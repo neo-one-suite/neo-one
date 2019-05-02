@@ -12,7 +12,7 @@ interface AsyncQueueOptions {
 export class AsyncQueue {
   private readonly concurrency: number;
   // tslint:disable-next-line no-any
-  private readonly mutableQueue: Array<QueueData<any>> = [];
+  private readonly mutableQueue: QueueData<any>[] = [];
   // tslint:disable-next-line no-any
   private readonly inflight: Map<string, Promise<any>> = new Map();
   private mutableRunning = 0;

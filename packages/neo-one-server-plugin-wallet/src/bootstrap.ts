@@ -39,7 +39,7 @@ const DEFAULT_NUM_WALLETS = 10;
 export const DEFAULT_MASTER_PRIVATE_KEY = '9e9522c90f4b33cac8a174353ae54651770f3f4dd1de78e74d9b49ba615d7c1f';
 const DEFAULT_MASTER_PUBLIC_KEY = '03396d8a87f1f77be1ca1e2d63ee3c1a642a9c45d3fb1dc2bfdd7ce680043244f2';
 const DEFAULT_NETWORK_NAME = 'priv';
-export const DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS: ReadonlyArray<[string, string]> = [
+export const DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS: readonly (readonly [string, string])[] = [
   [
     'e35ecb8189067a0a06f17f163be3db95c4b7805c81b48af1f4b8bbdfbeeb1afd',
     '020266f0d31fa8c1c28cfe8712cc26b6d41ff910deb02341dfe628573178906940',
@@ -92,7 +92,7 @@ export interface AssetInfo {
   readonly publicKey: string;
 }
 
-export const ASSET_INFO: ReadonlyArray<AssetInfo> = [
+export const ASSET_INFO: readonly AssetInfo[] = [
   {
     type: 'Token',
     name: 'redcoin',
@@ -128,7 +128,7 @@ export interface TokenInfo {
   readonly publicKey: string;
 }
 
-export const TOKEN_INFO: ReadonlyArray<TokenInfo> = [
+export const TOKEN_INFO: readonly TokenInfo[] = [
   {
     name: 'RedToken',
     amount: new BigNumber(1000000),
@@ -165,9 +165,9 @@ interface NetworkData {
 interface BootstrapData {
   readonly network: NetworkData;
   readonly master: WalletData;
-  readonly wallets: ReadonlyArray<WalletData>;
-  readonly assetWallets: ReadonlyArray<WalletData>;
-  readonly tokenWallets: ReadonlyArray<WalletData>;
+  readonly wallets: readonly WalletData[];
+  readonly assetWallets: readonly WalletData[];
+  readonly tokenWallets: readonly WalletData[];
 }
 
 const getNetwork = async ({ cli, options }: GetCLIResourceOptions): Promise<string> => {
@@ -324,7 +324,7 @@ async function initializeWallets({
   client,
   developerClient,
 }: {
-  readonly wallets: ReadonlyArray<WalletData>;
+  readonly wallets: readonly WalletData[];
   readonly master: WalletData;
   readonly client: Client;
   readonly developerClient: DeveloperClient;
@@ -361,7 +361,7 @@ async function initiateClaims({
   developerClient,
   provider,
 }: {
-  readonly wallets: ReadonlyArray<WalletData>;
+  readonly wallets: readonly WalletData[];
   readonly networkName: string;
   readonly client: Client;
   readonly developerClient: DeveloperClient;
@@ -388,7 +388,7 @@ async function setupWallets({
   developerClient,
   master,
 }: {
-  readonly wallets: ReadonlyArray<WalletData>;
+  readonly wallets: readonly WalletData[];
   readonly client: Client;
   readonly developerClient: DeveloperClient;
   readonly master: WalletData;
@@ -418,10 +418,10 @@ async function registerAssets({
   client,
   developerClient,
 }: {
-  readonly assetWallets: ReadonlyArray<WalletData>;
+  readonly assetWallets: readonly WalletData[];
   readonly client: Client;
   readonly developerClient: DeveloperClient;
-}): Promise<ReadonlyArray<AssetWithWallet>> {
+}): Promise<readonly AssetWithWallet[]> {
   const assetRegistrations = await Promise.all(
     utils.zip(ASSET_INFO, assetWallets).map(async ([asset, wallet]) =>
       client.registerAsset(
@@ -485,7 +485,7 @@ const issueAssets = async ({
   client,
   developerClient,
 }: {
-  readonly assets: ReadonlyArray<AssetWithWallet>;
+  readonly assets: readonly AssetWithWallet[];
   readonly client: Client;
   readonly developerClient: DeveloperClient;
 }) => {
@@ -499,7 +499,7 @@ async function createAssetTransfer({
   asset,
   client,
 }: {
-  readonly wallets: ReadonlyArray<WalletData>;
+  readonly wallets: readonly WalletData[];
   readonly asset: AssetWithWallet;
   readonly client: Client;
 }): Promise<TransactionResult> {
@@ -523,8 +523,8 @@ const transferAssets = async ({
   client,
   developerClient,
 }: {
-  readonly wallets: ReadonlyArray<WalletData>;
-  readonly assets: ReadonlyArray<AssetWithWallet>;
+  readonly wallets: readonly WalletData[];
+  readonly assets: readonly AssetWithWallet[];
   readonly client: Client;
   readonly developerClient: DeveloperClient;
 }) => {
@@ -571,7 +571,7 @@ async function getPresetData({
 }: {
   readonly cliOptions: GetCLIResourceOptions;
   readonly plugin: WalletPlugin;
-  readonly walletNames: ReadonlyArray<string>;
+  readonly walletNames: readonly string[];
 }): Promise<BootstrapData> {
   const rpcURL = await getRPC(cliOptions);
   const network = {
@@ -662,7 +662,7 @@ async function getNEOONEData({
 }: {
   readonly cliOptions: GetCLIResourceOptions;
   readonly plugin: WalletPlugin;
-  readonly walletNames: ReadonlyArray<string>;
+  readonly walletNames: readonly string[];
 }): Promise<BootstrapData> {
   const networkName = await getNetwork(cliOptions);
 
@@ -746,9 +746,9 @@ async function addWalletsToKeystore({
   readonly keystore: LocalKeyStore;
   readonly networkName: string;
   readonly master: WalletData;
-  readonly wallets: ReadonlyArray<WalletData>;
-  readonly assetWallets: ReadonlyArray<WalletData>;
-  readonly tokenWallets: ReadonlyArray<WalletData>;
+  readonly wallets: readonly WalletData[];
+  readonly assetWallets: readonly WalletData[];
+  readonly tokenWallets: readonly WalletData[];
 }): Promise<void> {
   await Promise.all(
     wallets
@@ -791,7 +791,7 @@ export const compileSmartContract = async (contractName: string): Promise<Contra
   };
 };
 
-const compileSmartContracts = async (contractNames: ReadonlyArray<string>): Promise<ReadonlyArray<ContractResult>> =>
+const compileSmartContracts = async (contractNames: readonly string[]): Promise<readonly ContractResult[]> =>
   Promise.all(contractNames.map(compileSmartContract));
 
 // tslint:disable-next-line no-suspicious-comment
@@ -819,11 +819,11 @@ const publishTokens = async ({
   client,
   developerClient,
 }: {
-  readonly tokenWallets: ReadonlyArray<WalletData>;
+  readonly tokenWallets: readonly WalletData[];
   readonly isRPC: boolean;
   readonly client: Client;
   readonly developerClient: DeveloperClient;
-}): Promise<ReadonlyArray<TokenWithWallet>> => {
+}): Promise<readonly TokenWithWallet[]> => {
   const wallets = utils.zip(tokenWallets, TOKEN_INFO).map(([wallet, token]) => ({
     wallet,
     token,
@@ -893,7 +893,7 @@ async function transferToken({
   count,
   developerClient,
 }: {
-  readonly tokens: ReadonlyArray<[TokenWithWallet, WalletData]>;
+  readonly tokens: readonly (readonly [TokenWithWallet, WalletData])[];
   readonly count: number;
   readonly developerClient: DeveloperClient;
 }): Promise<void> {
@@ -919,12 +919,12 @@ const transferTokens = async ({
   tokens,
   developerClient,
 }: {
-  readonly wallets: ReadonlyArray<WalletData>;
-  readonly tokens: ReadonlyArray<TokenWithWallet>;
+  readonly wallets: readonly WalletData[];
+  readonly tokens: readonly TokenWithWallet[];
   readonly developerClient: DeveloperClient;
 }) => {
   const count = wallets.length / 2;
-  const tokensWithWallets = tokens.map<[TokenWithWallet, ReadonlyArray<WalletData>]>((token, idx) => [
+  const tokensWithWallets = tokens.map<[TokenWithWallet, readonly WalletData[]]>((token, idx) => [
     token,
     idx % 2 === 0 ? wallets.slice(0, count) : wallets.slice(count),
   ]);

@@ -23,7 +23,7 @@ const lineNumberRegexes = [
 // Based on error formatting of webpack
 // https://github.com/webpack/webpack/blob/v3.5.5/lib/Stats.js#L183-L217
 export function parseCompileError(message: string): ErrorLocation | undefined {
-  const lines: Array<string> = message.split('\n');
+  const lines: string[] = message.split('\n');
   let fileName: string = '';
   let lineNumber: number = 0;
   let colNumber: number = 0;
@@ -40,7 +40,7 @@ export function parseCompileError(message: string): ErrorLocation | undefined {
 
     let k = 0;
     while (k < lineNumberRegexes.length) {
-      const match: Array<string> | null = line.match(lineNumberRegexes[k]);
+      const match: string[] | null = line.match(lineNumberRegexes[k]);
       if (match) {
         lineNumber = parseInt(match[1], 10);
         // colNumber starts with 0 and hence add 1

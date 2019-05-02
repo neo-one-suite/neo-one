@@ -20,7 +20,7 @@ export interface LocalStringStoreStorage {
   /**
    * Return all keys.
    */
-  readonly getAllKeys: () => Promise<ReadonlyArray<string>>;
+  readonly getAllKeys: () => Promise<readonly string[]>;
 }
 
 /**
@@ -29,7 +29,7 @@ export interface LocalStringStoreStorage {
 export class LocalStringStore implements LocalStore {
   public constructor(public readonly storage: LocalStringStoreStorage) {}
 
-  public async getWallets(): Promise<ReadonlyArray<LocalWallet>> {
+  public async getWallets(): Promise<readonly LocalWallet[]> {
     const keys = await this.storage.getAllKeys();
     const values = await Promise.all(keys.map(async (key) => this.storage.getItem(key)));
 

@@ -16,7 +16,7 @@ import {
   BuiltinInstanceMemberStructuredStorageProperty,
 } from './builtins';
 
-const PARAMETERS: ReadonlyArray<ContractParameterType> = ['String', 'Array'];
+const PARAMETERS: readonly ContractParameterType[] = ['String', 'Array'];
 const RETURN_TYPE: ContractParameterType = 'Buffer';
 
 const getSmartContract = (context: Context, sourceFile: ts.SourceFile) => {

@@ -7,14 +7,15 @@ import { ResourceAdapter } from './ResourceAdapter';
 import { ResourceType } from './ResourceType';
 import { Task, TaskList } from './TaskList';
 
-export type ListTable = ReadonlyArray<ReadonlyArray<string>>;
+export type ListTable = readonly (readonly string[])[];
 export interface SubDescribeTable {
   readonly type: 'describe';
   readonly table: DescribeTable;
 }
-export type DescribeTable = ReadonlyArray<
-  [string, string | { readonly type: 'list'; readonly table: ListTable } | SubDescribeTable]
->;
+export type DescribeTable = readonly (readonly [
+  string,
+  string | { readonly type: 'list'; readonly table: ListTable } | SubDescribeTable
+])[];
 
 export type ResourceState = 'started' | 'stopped';
 export interface BaseResource {
@@ -27,7 +28,7 @@ export interface BaseResource {
 
 export type BaseResourceOptions = object;
 export interface GetResourceResponse {
-  readonly resources: ReadonlyArray<BaseResource>;
+  readonly resources: readonly BaseResource[];
 }
 export interface DescribeResourceResponse {
   readonly resource: BaseResource;
@@ -36,7 +37,7 @@ export interface TaskStatus {
   readonly id: string;
   readonly title: string;
   readonly message?: string;
-  readonly subtasks?: ReadonlyArray<TaskStatus>;
+  readonly subtasks?: readonly TaskStatus[];
   readonly pending?: boolean;
   readonly skipped?: string | boolean;
   readonly complete?: boolean;
@@ -45,7 +46,7 @@ export interface TaskStatus {
 }
 
 export interface ExecuteTaskListResponse {
-  readonly tasks: ReadonlyArray<TaskStatus>;
+  readonly tasks: readonly TaskStatus[];
 }
 
 export interface ReadRequest {
@@ -86,20 +87,20 @@ export interface CRUDRequestStart extends ExecuteTaskListRequestStart {
 export interface CRUDRequestAbort extends ExecuteTaskListRequestAbort {}
 export type CRUDRequest = CRUDRequestStart | CRUDRequestAbort;
 export interface AllResources {
-  readonly [pluginResourceType: string]: ReadonlyArray<BaseResource>;
+  readonly [pluginResourceType: string]: readonly BaseResource[];
 }
 
 export interface Client {
   readonly getVersion: () => Promise<string>;
   readonly getDebug: () => Promise<DescribeTable>;
-  readonly getAllPlugins: () => Promise<ReadonlyArray<string>>;
+  readonly getAllPlugins: () => Promise<readonly string[]>;
   readonly getPlugins$: () => Observable<string>;
   readonly getAllResources$: () => Observable<AllResources>;
   readonly getResources$: (options: {
     readonly plugin: string;
     readonly resourceType: string;
     readonly options: BaseResourceOptions;
-  }) => Observable<ReadonlyArray<BaseResource>>;
+  }) => Observable<readonly BaseResource[]>;
   readonly getResource$: (options: {
     readonly plugin: string;
     readonly resourceType: string;
@@ -156,7 +157,7 @@ export interface Client {
 
 export interface Binary {
   readonly cmd: string;
-  readonly firstArgs: ReadonlyArray<string>;
+  readonly firstArgs: readonly string[];
 }
 
 export interface LogConfig {
@@ -170,7 +171,7 @@ export interface LogConfig {
 export interface CLIArgs {
   readonly monitor: Monitor;
   readonly shutdown: (options: { readonly exitCode: number; readonly error?: Error }) => void;
-  mutableShutdownFuncs: Array<() => void>;
+  mutableShutdownFuncs: (() => void)[];
   readonly logConfig$: Subject<LogConfig>;
   readonly vorpal: Vorpal;
   readonly debug: boolean;
@@ -197,7 +198,7 @@ export interface InteractiveCLI {
   readonly removeDelimiter: (key: string) => void;
   readonly resetDelimiter: () => void;
   // tslint:disable-next-line no-any
-  readonly prompt: (questions: ReadonlyArray<object>) => Promise<any>;
+  readonly prompt: (questions: readonly object[]) => Promise<any>;
   readonly monitor: Monitor | undefined;
   readonly exec: (command: string) => Promise<void>;
   readonly printDescribe: (describeTable: DescribeTable, log?: (value: string) => void) => void;
@@ -234,7 +235,7 @@ export interface ResourcesManager<
   ResourceOptions extends BaseResourceOptions = BaseResourceOptions
 > {
   readonly getResource: (options: { readonly name: string; readonly options: ResourceOptions }) => Promise<Resource>;
-  readonly getResources$: (options: ResourceOptions) => Observable<ReadonlyArray<Resource>>;
+  readonly getResources$: (options: ResourceOptions) => Observable<readonly Resource[]>;
   readonly getResource$: (options: {
     readonly name: string;
     readonly options: ResourceOptions;

@@ -34,7 +34,7 @@ export const FEES = {
 };
 
 export const FREE_GAS = common.TEN_FIXED8;
-export type ExecutionStack = ReadonlyArray<StackItem>;
+export type ExecutionStack = readonly StackItem[];
 export interface ExecutionInit {
   readonly scriptContainer: ScriptContainer;
   readonly triggerType: TriggerType;
@@ -94,14 +94,14 @@ export interface ExecutionContext {
 
 export interface OpResult {
   readonly context: ExecutionContext;
-  readonly results?: ReadonlyArray<StackItem>;
-  readonly resultsAlt?: ReadonlyArray<StackItem>;
+  readonly results?: readonly StackItem[];
+  readonly resultsAlt?: readonly StackItem[];
 }
 export interface OpInvokeArgs {
   readonly monitor: Monitor;
   readonly context: ExecutionContext;
-  readonly args: ReadonlyArray<StackItem>;
-  readonly argsAlt: ReadonlyArray<StackItem>;
+  readonly args: readonly StackItem[];
+  readonly argsAlt: readonly StackItem[];
 }
 export type OpInvoke = (input: OpInvokeArgs) => Promise<OpResult> | OpResult;
 export interface Op {

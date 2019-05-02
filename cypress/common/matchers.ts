@@ -1,6 +1,6 @@
 export interface ProblemRoot {
   readonly path: string;
-  readonly problems: ReadonlyArray<Problem>;
+  readonly problems: readonly Problem[];
 }
 export interface Problem {
   readonly error?: boolean;
@@ -10,7 +10,7 @@ export interface Problem {
   readonly endLine: number;
 }
 
-export const checkProblems = (problemRoots: ReadonlyArray<ProblemRoot>) => {
+export const checkProblems = (problemRoots: readonly ProblemRoot[]) => {
   const problems = problemRoots.reduce(
     (acc, root) => root.problems.reduce((innerAcc, { error = true }) => (error ? innerAcc + 1 : innerAcc), acc),
     0,
@@ -74,7 +74,7 @@ const checkProblem = ({
 export interface Tests {
   readonly failing: number;
   readonly passing: number;
-  readonly suites: ReadonlyArray<TestSuite>;
+  readonly suites: readonly TestSuite[];
 }
 
 export interface TestSuite {
@@ -83,11 +83,11 @@ export interface TestSuite {
   readonly passing: number;
   readonly failing: number;
   readonly error?: string;
-  readonly tests: ReadonlyArray<Test>;
+  readonly tests: readonly Test[];
 }
 
 export interface Test {
-  readonly name: ReadonlyArray<string>;
+  readonly name: readonly string[];
   readonly state: 'pass' | 'fail' | 'skip';
   readonly error?: string;
 }
@@ -272,7 +272,7 @@ export const enterSolution = ({ path }: { readonly path: string }) => {
 
 interface BuildOptions {
   readonly success: boolean;
-  readonly contracts: ReadonlyArray<string>;
+  readonly contracts: readonly string[];
 }
 
 export const build = ({ success, contracts }: BuildOptions) => {

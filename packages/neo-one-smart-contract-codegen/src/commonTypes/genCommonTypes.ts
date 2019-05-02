@@ -7,7 +7,7 @@ export const genCommonTypes = ({
   contractsPaths,
   commonTypesPath,
 }: {
-  readonly contractsPaths: ReadonlyArray<ContractPaths>;
+  readonly contractsPaths: readonly ContractPaths[];
   readonly commonTypesPath: string;
 }) => {
   const sortedPaths = _.sortBy(contractsPaths, [({ name }: ContractPaths) => name]);

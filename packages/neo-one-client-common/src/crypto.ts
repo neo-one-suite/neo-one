@@ -299,13 +299,13 @@ const compareKeys = (a: EC.KeyPair, b: EC.KeyPair): number => {
   return aPublic.getY().cmp(bPublic.getY());
 };
 
-const sortKeys = (publicKeys: ReadonlyArray<ECPoint>): ReadonlyArray<ECPoint> =>
+const sortKeys = (publicKeys: readonly ECPoint[]): readonly ECPoint[] =>
   publicKeys
     .map((publicKey) => ec().keyFromPublic(publicKey))
     .sort(compareKeys)
     .map(toECPointFromKeyPair);
 
-const createMultiSignatureVerificationScript = (mIn: number, publicKeys: ReadonlyArray<ECPoint>) => {
+const createMultiSignatureVerificationScript = (mIn: number, publicKeys: readonly ECPoint[]) => {
   const m = Math.floor(mIn);
   if (m < 1 || m > publicKeys.length) {
     throw new InvalidNumberOfKeysError(m, publicKeys.length);
@@ -327,7 +327,7 @@ const createMultiSignatureVerificationScript = (mIn: number, publicKeys: Readonl
   return builder.build();
 };
 
-const createMultiSignatureInvocationScript = (signatures: ReadonlyArray<Buffer>): Buffer => {
+const createMultiSignatureInvocationScript = (signatures: readonly Buffer[]): Buffer => {
   const builder = new ScriptBuilder();
   signatures.forEach((signature) => {
     builder.emitPush(signature);
@@ -338,7 +338,7 @@ const createMultiSignatureInvocationScript = (signatures: ReadonlyArray<Buffer>)
 
 const createMultiSignatureWitness = <TWitness extends WitnessModel>(
   mIn: number,
-  publicKeys: ReadonlyArray<ECPoint>,
+  publicKeys: readonly ECPoint[],
   publicKeyToSignature: { readonly [key: string]: Buffer },
   Witness: Constructor<TWitness>,
 ): TWitness => {
@@ -357,7 +357,7 @@ const createMultiSignatureWitness = <TWitness extends WitnessModel>(
   return new Witness({ verification, invocation });
 };
 
-const getConsensusAddress = (validators: ReadonlyArray<ECPoint>): UInt160 =>
+const getConsensusAddress = (validators: readonly ECPoint[]): UInt160 =>
   toScriptHash(
     createMultiSignatureVerificationScript(Math.floor(validators.length - (validators.length - 1) / 3), validators),
   );

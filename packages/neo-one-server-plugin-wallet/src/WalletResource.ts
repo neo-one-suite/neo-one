@@ -225,7 +225,7 @@ export class WalletResource {
   private mutableInitial: InitialOptions | undefined;
   private mutableNeoBalance: string | undefined;
   private mutableGasBalance: string | undefined;
-  private mutableBalance: ReadonlyArray<Coin>;
+  private mutableBalance: readonly Coin[];
   private readonly network$: Observable<Network | undefined>;
 
   public constructor({
@@ -327,7 +327,10 @@ export class WalletResource {
   }
 
   public getDebug(): DescribeTable {
-    const table: ReadonlyArray<[string, string]> = [['Data Path', this.dataPath], ['Wallet Path', this.walletPath]];
+    const table: readonly (readonly [string, string])[] = [
+      ['Data Path', this.dataPath],
+      ['Wallet Path', this.walletPath],
+    ];
 
     return table.concat(
       Object.entries(this.toResource()).map<[string, string]>(([key, val]) => {

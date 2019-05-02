@@ -39,7 +39,7 @@ interface ExternalProps {
 interface Props extends ExternalProps {
   readonly previewOpen: boolean;
   readonly previewEnabled: boolean;
-  readonly onChangeProblems: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
+  readonly onChangeProblems: (path: string, diagnostics: readonly FileDiagnostic[]) => void;
   readonly onOpenPreview: () => void;
 }
 
@@ -102,7 +102,7 @@ export const Editor = connect(
   }),
   (dispatch) => ({
     // tslint:disable-next-line no-unnecessary-type-annotation
-    onChangeProblems: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) =>
+    onChangeProblems: (path: string, diagnostics: readonly FileDiagnostic[]) =>
       dispatch(setFileProblems({ path, problems: diagnostics })),
     onOpenPreview: () => dispatch(openPreview()),
   }),

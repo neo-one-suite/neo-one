@@ -33,7 +33,7 @@ export class Context {
     this.builtins = createBuiltins(this);
   }
 
-  public get diagnostics(): ReadonlyArray<ts.Diagnostic> {
+  public get diagnostics(): readonly ts.Diagnostic[] {
     const errorDiagnostics = new Set<string>();
     // tslint:disable-next-line no-loop-statement
     for (const diagnostic of this.mutableDiagnostics) {

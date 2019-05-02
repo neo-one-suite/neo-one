@@ -88,8 +88,8 @@ export function convertInvocationResult(result: InvocationResultJSON): RawInvoca
 }
 
 export function convertContractParameters(
-  parameters: ReadonlyArray<ContractParameterJSON>,
-): ReadonlyArray<ContractParameter> {
+  parameters: readonly ContractParameterJSON[],
+): readonly ContractParameter[] {
   return parameters.map(convertContractParameter);
 }
 

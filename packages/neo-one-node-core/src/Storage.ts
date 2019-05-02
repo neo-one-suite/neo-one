@@ -49,7 +49,7 @@ export type DeleteChange =
 export type Change =
   | { readonly type: 'add'; readonly change: AddChange; readonly subType: 'add' | 'update' }
   | { readonly type: 'delete'; readonly change: DeleteChange };
-export type ChangeSet = ReadonlyArray<Change>;
+export type ChangeSet = readonly Change[];
 
 interface LatestReadStorage<Key, Value> extends ReadStorage<Key, Value> {
   readonly tryGetLatest: () => Promise<Value | undefined>;

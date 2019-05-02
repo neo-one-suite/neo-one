@@ -9,7 +9,7 @@ export const genAngular = ({
   clientPath,
   browser,
 }: {
-  readonly contractsPaths: ReadonlyArray<ContractPaths>;
+  readonly contractsPaths: readonly ContractPaths[];
   readonly angularPath: string;
   readonly commonTypesPath: string;
   readonly clientPath: string;

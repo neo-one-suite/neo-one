@@ -7,7 +7,7 @@ import { ProblemRoot } from './ProblemRoot';
 
 interface Props {
   readonly path: string;
-  readonly problems: ReadonlyArray<FileDiagnostic>;
+  readonly problems: readonly FileDiagnostic[];
   readonly onSelectRange: (path: string, range: TextRange) => void;
 }
 

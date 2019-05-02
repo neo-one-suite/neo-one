@@ -13,7 +13,7 @@ const StyledInput = styled(Input)`
 `;
 
 interface Props {
-  readonly options: ReadonlyArray<string>;
+  readonly options: readonly string[];
   readonly selected?: string;
   readonly onChange: (value: string) => void;
 }

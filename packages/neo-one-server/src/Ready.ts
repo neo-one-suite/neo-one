@@ -28,7 +28,7 @@ export class Ready {
     await fs.writeFile(this.getFilePath(name), name);
   }
 
-  public async getAll(): Promise<ReadonlyArray<string>> {
+  public async getAll(): Promise<readonly string[]> {
     try {
       const files = await fs.readdir(this.dir);
 

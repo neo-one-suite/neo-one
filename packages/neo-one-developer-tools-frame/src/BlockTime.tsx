@@ -38,7 +38,7 @@ interface TimeAgoProps {
   readonly time: number;
 }
 
-const SHORTEN_PAIRS: ReadonlyArray<[string, string]> = [
+const SHORTEN_PAIRS: readonly (readonly [string, string])[] = [
   [' seconds', 's'],
   [' second', 's'],
   [' minutes', 'm'],

@@ -1,6 +1,6 @@
 import { common, crypto, ECPoint, PrivateKey, PublicKeyString, UInt160 } from '@neo-one/client-common';
 
-export const keys: ReadonlyArray<{
+export const keys: readonly {
   readonly name: string;
   readonly address: string;
   readonly privateKey: PrivateKey;
@@ -12,7 +12,7 @@ export const keys: ReadonlyArray<{
   readonly encryptedWIF: string;
   readonly scriptHash: UInt160;
   readonly scriptHashString: string;
-}> = [
+}[] = [
   {
     name: 'first',
     address: 'ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW',

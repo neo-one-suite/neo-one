@@ -46,7 +46,7 @@ const runCypress = async ({ report, coverage }: { readonly report: boolean; read
 };
 
 // tslint:disable-next-line readonly-array
-const mutableCleanup: Array<() => Promise<void> | void> = [];
+const mutableCleanup: (() => Promise<void> | void)[] = [];
 
 // tslint:disable-next-line no-let
 let shuttingDown = false;

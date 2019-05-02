@@ -68,7 +68,7 @@ export interface TestNode {
 export interface Options {
   readonly script: Buffer;
   readonly abi: ABI;
-  readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
+  readonly diagnostics: readonly ts.Diagnostic[];
   readonly ignoreWarnings?: boolean;
 }
 

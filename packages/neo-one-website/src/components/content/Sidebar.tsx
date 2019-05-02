@@ -124,7 +124,7 @@ const IconWrapper = styled(Box)`
 interface Props {
   readonly current: string;
   readonly alwaysVisible: boolean;
-  readonly sections: ReadonlyArray<SectionData>;
+  readonly sections: readonly SectionData[];
 }
 
 export const Sidebar = ({ current, alwaysVisible, sections, ...props }: Props) => {

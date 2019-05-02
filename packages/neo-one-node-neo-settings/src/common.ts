@@ -11,7 +11,7 @@ import {
 import { utils } from '@neo-one/utils';
 import BN from 'bn.js';
 
-export const GENERATION_AMOUNT: ReadonlyArray<number> = [
+export const GENERATION_AMOUNT: readonly number[] = [
   8,
   7,
   6,
@@ -36,7 +36,7 @@ export const GENERATION_AMOUNT: ReadonlyArray<number> = [
   1,
 ];
 
-export const GENERATION_AMOUNT_PRIVATE: ReadonlyArray<number> = [8, 7, 6];
+export const GENERATION_AMOUNT_PRIVATE: readonly number[] = [8, 7, 6];
 export const ISSUE_AMOUNT_PRIVATE = clientCommon.fixed8FromDecimal(58000000);
 export const DECREMENT_INTERVAL = 2000000;
 export const SECONDS_PER_BLOCK = 15;

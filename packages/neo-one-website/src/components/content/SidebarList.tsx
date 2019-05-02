@@ -52,7 +52,7 @@ const SidebarListItem = ({ current, section, onClickLink, ...props }: SidebarLis
 
 interface Props {
   readonly current: string;
-  readonly sections: ReadonlyArray<SectionData>;
+  readonly sections: readonly SectionData[];
   readonly alwaysVisible: boolean;
   readonly onClickLink?: () => void;
 }

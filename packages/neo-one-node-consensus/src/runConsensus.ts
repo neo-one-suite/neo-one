@@ -33,7 +33,7 @@ const createMinerTransaction = async ({
 }: {
   readonly node: Node;
   readonly feeAddress: UInt160;
-  readonly transactions: ReadonlyArray<Transaction>;
+  readonly transactions: readonly Transaction[];
   readonly nonce: BN;
 }) => {
   const networkFee = await Block.calculateNetworkFee(node.blockchain.feeContext, transactions);

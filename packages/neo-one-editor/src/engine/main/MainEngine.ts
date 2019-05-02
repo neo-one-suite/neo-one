@@ -34,7 +34,7 @@ export interface EditorCallbacks {
 }
 
 interface EngineMeta {
-  readonly openFiles: ReadonlyArray<string>;
+  readonly openFiles: readonly string[];
 }
 
 interface EngineMetaWithRev {
@@ -106,7 +106,7 @@ interface CreateMainEngineOptions {
   readonly clearFS?: boolean;
 }
 
-export type Files = ReadonlyArray<string>;
+export type Files = readonly string[];
 
 interface MainEngineOptions {
   readonly fs: PouchDBFileSystem;
@@ -189,41 +189,41 @@ export class MainEngine {
     );
 
     const buildErrors$ = new Subject<string>();
-    const [fsSubscription, transpilePromises] = await transpilerManager.withInstance<
-      [Subscription, Array<Promise<void>>]
-    >(async (transpiler) => {
-      const mutableTranspilePromises: Array<Promise<void>> = [];
-      fs.files.forEach((file, path) => {
-        mutableTranspilePromises.push(maybeTranspile(transpiler, transpileCache, path, file.content));
-      });
-      const fsSubscriptionInner = fs
-        .bufferedChanges$()
-        .pipe(
-          mergeScanLatest(async (_acc, changes) => {
-            try {
-              await transpilerManager.withInstance(async (transpilerInner) => {
-                await Promise.all(
-                  changes.map(async (change) => {
-                    if (change.doc === undefined) {
-                      transpileCache.removeFile(change.id).catch((error) => {
-                        // tslint:disable-next-line no-console
-                        console.error(error);
-                      });
-                    } else {
-                      await maybeTranspile(transpilerInner, transpileCache, change.id, change.doc.content);
-                    }
-                  }),
-                );
-              });
-            } catch (error) {
-              buildErrors$.next(error.message);
-            }
-          }),
-        )
-        .subscribe();
+    const [fsSubscription, transpilePromises] = await transpilerManager.withInstance<[Subscription, Promise<void>[]]>(
+      async (transpiler) => {
+        const mutableTranspilePromises: Promise<void>[] = [];
+        fs.files.forEach((file, path) => {
+          mutableTranspilePromises.push(maybeTranspile(transpiler, transpileCache, path, file.content));
+        });
+        const fsSubscriptionInner = fs
+          .bufferedChanges$()
+          .pipe(
+            mergeScanLatest(async (_acc, changes) => {
+              try {
+                await transpilerManager.withInstance(async (transpilerInner) => {
+                  await Promise.all(
+                    changes.map(async (change) => {
+                      if (change.doc === undefined) {
+                        transpileCache.removeFile(change.id).catch((error) => {
+                          // tslint:disable-next-line no-console
+                          console.error(error);
+                        });
+                      } else {
+                        await maybeTranspile(transpilerInner, transpileCache, change.id, change.doc.content);
+                      }
+                    }),
+                  );
+                });
+              } catch (error) {
+                buildErrors$.next(error.message);
+              }
+            }),
+          )
+          .subscribe();
 
-      return [fsSubscriptionInner, mutableTranspilePromises];
-    });
+        return [fsSubscriptionInner, mutableTranspilePromises];
+      },
+    );
 
     try {
       await Promise.all(transpilePromises);

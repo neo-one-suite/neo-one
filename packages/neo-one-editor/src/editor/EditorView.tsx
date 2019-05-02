@@ -20,7 +20,7 @@ interface Props {
   readonly range?: TextRange;
   readonly openFiles: EditorFiles;
   readonly onSelectFile: (file: EditorFile) => void;
-  readonly onChangeProblems?: (path: string, diagnostics: ReadonlyArray<FileDiagnostic>) => void;
+  readonly onChangeProblems?: (path: string, diagnostics: readonly FileDiagnostic[]) => void;
 }
 
 export const EditorView = ({

@@ -272,19 +272,19 @@ export interface TransactionBase {
   /**
    * `Attribute`s attached to the `Transaction`.
    */
-  readonly attributes: ReadonlyArray<Attribute>;
+  readonly attributes: readonly Attribute[];
   /**
    * `Input`s of the `Transaction`.
    */
-  readonly inputs: ReadonlyArray<Input>;
+  readonly inputs: readonly Input[];
   /**
    * `Output`s of the `Transaction`.
    */
-  readonly outputs: ReadonlyArray<Output>;
+  readonly outputs: readonly Output[];
   /**
    * `Witness`es to the `Transaction`, i.e. the `Address`es that have signed the `Transasction`.
    */
-  readonly scripts: ReadonlyArray<Witness>;
+  readonly scripts: readonly Witness[];
   /**
    * GAS execution fee for the transaction.
    */
@@ -316,7 +316,7 @@ export interface ClaimTransaction extends TransactionBase {
   /**
    * The spent outputs that this `ClaimTransaction` is claiming `GAS` for.
    */
-  readonly claims: ReadonlyArray<Input>;
+  readonly claims: readonly Input[];
 }
 
 /**
@@ -556,7 +556,7 @@ export interface Block extends Header {
   /**
    * `Transaction`s contained in the `Block`.
    */
-  readonly transactions: ReadonlyArray<ConfirmedTransaction>;
+  readonly transactions: readonly ConfirmedTransaction[];
 }
 
 /**
@@ -660,11 +660,11 @@ export interface InvokeReceipt<TReturn extends Return = Return, TEvent extends E
   /**
    * The events emitted by the smart contract during the invocation.
    */
-  readonly events: ReadonlyArray<TEvent>;
+  readonly events: readonly TEvent[];
   /**
    * The logs emitted by the smart contract during the invocation.
    */
-  readonly logs: ReadonlyArray<Log>;
+  readonly logs: readonly Log[];
   /**
    * The original, unprocessed, raw invoke receipt. The `RawInvokeReceipt` is transformed into this object (the `InvokeReceipt`) using the `ABI` to parse out the `Event`s and `InvocationResult`.
    */
@@ -732,11 +732,11 @@ export interface UserAccountProvider {
   /**
    * An `Observable` that emits the available `UserAccount`s
    */
-  readonly userAccounts$: Observable<ReadonlyArray<UserAccount>>;
+  readonly userAccounts$: Observable<readonly UserAccount[]>;
   /**
    * An `Observable` that emits the available networks this `UserAccountProvider` knows how to function with.
    */
-  readonly networks$: Observable<ReadonlyArray<NetworkType>>;
+  readonly networks$: Observable<readonly NetworkType[]>;
   /**
    * @returns the currently selected `UserAccount` or `undefined` if one is not selected.
    */
@@ -744,11 +744,11 @@ export interface UserAccountProvider {
   /**
    * @returns the available `UserAccount`s
    */
-  readonly getUserAccounts: () => ReadonlyArray<UserAccount>;
+  readonly getUserAccounts: () => readonly UserAccount[];
   /**
    * @returns the available networks this `UserAccountProvider` knows how to function with.
    */
-  readonly getNetworks: () => ReadonlyArray<NetworkType>;
+  readonly getNetworks: () => readonly NetworkType[];
   /**
    * Set the given `UserAccountID` as the selected `UserAccount`.
    *
@@ -785,7 +785,7 @@ export interface UserAccountProvider {
    * Transfers native assets.
    */
   readonly transfer: (
-    transfers: ReadonlyArray<Transfer>,
+    transfers: readonly Transfer[],
     options?: TransactionOptions,
   ) => Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>;
   /**
@@ -804,8 +804,8 @@ export interface UserAccountProvider {
   readonly invoke: (
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     verify: boolean,
     options?: InvokeSendUnsafeReceiveTransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -818,8 +818,8 @@ export interface UserAccountProvider {
   readonly invokeSend: (
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     transfer: Transfer,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -832,8 +832,8 @@ export interface UserAccountProvider {
   readonly invokeCompleteSend: (
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -846,8 +846,8 @@ export interface UserAccountProvider {
   readonly invokeRefundAssets: (
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -860,8 +860,8 @@ export interface UserAccountProvider {
   readonly invokeClaim: (
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    params: readonly (ScriptBuilderParam | undefined)[],
+    paramsZipped: readonly (readonly [string, Param | undefined])[],
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
@@ -872,7 +872,7 @@ export interface UserAccountProvider {
     network: NetworkType,
     contract: AddressString,
     method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
+    params: readonly (ScriptBuilderParam | undefined)[],
     monitor?: Monitor,
   ) => Promise<RawCallReceipt>;
 }
@@ -1112,7 +1112,7 @@ export interface TransactionOptions {
   /**
    * Additional attributes to include with the transaction.
    */
-  attributes?: ReadonlyArray<Attribute>;
+  attributes?: readonly Attribute[];
   /**
    * An optional network fee to include with the transaction.
    */
@@ -1139,7 +1139,7 @@ export interface ForwardOptions<TEvent extends Event<string, any> = Event> {
   /**
    * Additional events that may be emitted due to forwarding arguments to another smart contract method.
    */
-  readonly events?: ReadonlyArray<ABIEvent>;
+  readonly events?: readonly ABIEvent[];
   readonly __tag?: TEvent;
 }
 
@@ -1150,7 +1150,7 @@ export interface InvokeSendUnsafeTransactionOptions extends TransactionOptions {
   /**
    * `Transfer`s that specify native assets to send from the contract.
    */
-  readonly sendFrom?: ReadonlyArray<Transfer>;
+  readonly sendFrom?: readonly Transfer[];
 }
 
 /**
@@ -1160,7 +1160,7 @@ export interface InvokeReceiveTransactionOptions extends TransactionOptions {
   /**
    * `Transfer`s that specify native assets to send to the contract.
    */
-  readonly sendTo?: ReadonlyArray<Omit<Transfer, 'to'>>;
+  readonly sendTo?: readonly Omit<Transfer, 'to'>[];
 }
 
 /**
@@ -1558,7 +1558,7 @@ export interface ABIFunction {
   /**
    * Parameters of the function.
    */
-  readonly parameters?: ReadonlyArray<ABIParameter>;
+  readonly parameters?: readonly ABIParameter[];
   /**
    * Return type of the function.
    */
@@ -1604,7 +1604,7 @@ export interface ABIEvent {
   /**
    * Parameters of the event.
    */
-  readonly parameters: ReadonlyArray<ABIParameter>;
+  readonly parameters: readonly ABIParameter[];
 }
 
 /**
@@ -1616,11 +1616,11 @@ export interface ABI {
   /**
    * Specification of the smart contract functions.
    */
-  readonly functions: ReadonlyArray<ABIFunction>;
+  readonly functions: readonly ABIFunction[];
   /**
    * Specification of the smart contract events.
    */
-  readonly events?: ReadonlyArray<ABIEvent>;
+  readonly events?: readonly ABIEvent[];
 }
 
 declare const OpaqueTagSymbol: unique symbol;
@@ -1784,7 +1784,7 @@ export interface Contract {
   /**
    * Expected parameters of this `Contract`
    */
-  readonly parameters: ReadonlyArray<ContractParameterType>;
+  readonly parameters: readonly ContractParameterType[];
   /**
    * Return type of this `Contract`
    */
@@ -1974,7 +1974,7 @@ export interface ArrayContractParameter {
   /**
    * An array of `ContractParameter`s.
    */
-  readonly value: ReadonlyArray<ContractParameter>;
+  readonly value: readonly ContractParameter[];
 }
 
 /**
@@ -1990,7 +1990,7 @@ export interface MapContractParameter {
   /**
    * A map of `ContractParameter` to `ContractParameter`. Represented as an array of pairs because JavaScript `Map` keys do not have the same semantics as the NEO VM.
    */
-  readonly value: ReadonlyArray<[ContractParameter, ContractParameter]>;
+  readonly value: readonly (readonly [ContractParameter, ContractParameter])[];
 }
 
 /**
@@ -2056,7 +2056,7 @@ export interface RawInvocationResultSuccess extends RawInvocationResultBase {
   /**
    * The state of the NEO VM after execution. Typically has one `ContractParameter` which is the return value of the method invoked.
    */
-  readonly stack: ReadonlyArray<ContractParameter>;
+  readonly stack: readonly ContractParameter[];
 }
 
 /**
@@ -2072,7 +2072,7 @@ export interface RawInvocationResultError extends RawInvocationResultBase {
   /**
    * The state of the NEO VM after execution. Typically has one `ContractParameter` which is the return value of the method invoked.
    */
-  readonly stack: ReadonlyArray<ContractParameter>;
+  readonly stack: readonly ContractParameter[];
   /**
    * A descriptive message indicating why the invocation failed.
    */
@@ -2137,7 +2137,7 @@ export interface RawNotification extends RawActionBase {
   /**
    * The raw arguments of the notifications. These are processed into the `parameters` parameter of the `Event` object using the `ABI`.
    */
-  readonly args: ReadonlyArray<ContractParameter>;
+  readonly args: readonly ContractParameter[];
 }
 
 /**
@@ -2237,7 +2237,7 @@ export type RawStorageChange = RawStorageChangeAdd | RawStorageChangeModify | Ra
  */
 export interface RawCallReceipt {
   readonly result: RawInvocationResult;
-  readonly actions: ReadonlyArray<RawAction>;
+  readonly actions: readonly RawAction[];
 }
 
 /**
@@ -2247,7 +2247,7 @@ export interface RawCallReceipt {
  */
 export interface RawInvokeReceipt extends TransactionReceipt {
   readonly result: RawInvocationResult;
-  readonly actions: ReadonlyArray<RawAction>;
+  readonly actions: readonly RawAction[];
 }
 
 /**
@@ -2297,7 +2297,7 @@ export interface VerifyScriptResult {
   /**
    * The actions emitted during the verification.
    */
-  readonly actions: ReadonlyArray<RawAction>;
+  readonly actions: readonly RawAction[];
 }
 
 /**
@@ -2307,7 +2307,7 @@ export interface VerifyTransactionResult {
   /**
    * All verifications that happened during the relay of the `Transaction`.
    */
-  readonly verifications: ReadonlyArray<VerifyScriptResult>;
+  readonly verifications: readonly VerifyScriptResult[];
 }
 
 /**
@@ -2335,15 +2335,15 @@ export interface RawInvocationData {
   /**
    * `Contract`s created by the invocation.
    */
-  readonly contracts: ReadonlyArray<Contract>;
+  readonly contracts: readonly Contract[];
   /**
    * `Contract`s deleted by the invocation.
    */
-  readonly deletedContractAddresses: ReadonlyArray<AddressString>;
+  readonly deletedContractAddresses: readonly AddressString[];
   /**
    * `Contract`s migrated (upgraded) by the invocation.
    */
-  readonly migratedContractAddresses: ReadonlyArray<[AddressString, AddressString]>;
+  readonly migratedContractAddresses: readonly (readonly [AddressString, AddressString])[];
   /**
    * Raw result of an invocation.
    */
@@ -2351,11 +2351,11 @@ export interface RawInvocationData {
   /**
    * Raw actions emitted by the invocation.
    */
-  readonly actions: ReadonlyArray<RawAction>;
+  readonly actions: readonly RawAction[];
   /**
    * Storage changes that occurred during this invocation
    */
-  readonly storageChanges: ReadonlyArray<RawStorageChange>;
+  readonly storageChanges: readonly RawStorageChange[];
 }
 
 export interface ParamJSONArray extends ReadonlyArray<ParamJSON> {}

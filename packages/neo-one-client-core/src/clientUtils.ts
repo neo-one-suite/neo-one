@@ -5,7 +5,7 @@ const getInvokeMethodInvocationScript = ({
   params,
 }: {
   readonly method: string;
-  readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
+  readonly params: readonly (ScriptBuilderParam | undefined)[];
 }): Buffer => {
   const sb = new ScriptBuilder();
   sb.emitAppCallInvocation(method, ...params);
@@ -20,7 +20,7 @@ const getInvokeMethodScript = ({
 }: {
   readonly address: AddressString;
   readonly method: string;
-  readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
+  readonly params: readonly (ScriptBuilderParam | undefined)[];
 }): Buffer => {
   const sb = new ScriptBuilder();
   sb.emitAppCall(common.stringToUInt160(addressToScriptHash(address)), method, ...params);

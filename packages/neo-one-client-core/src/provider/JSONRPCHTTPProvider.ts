@@ -51,7 +51,7 @@ const instrumentFetch = async <T extends { readonly status: number }>(
   endpoint: string,
   type: 'fetch' | 'watch',
   monitor?: Monitor,
-  monitors: ReadonlyArray<Monitor> = [],
+  monitors: readonly Monitor[] = [],
 ) => {
   const headers = {
     'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ const doRequest = async ({
   tries,
 }: {
   readonly endpoint: string;
-  readonly requests: ReadonlyArray<{ readonly monitor?: Monitor; readonly request: object }>;
+  readonly requests: readonly { readonly monitor?: Monitor; readonly request: object }[];
   readonly timeoutMS: number;
   readonly tries: number;
 }) => {

@@ -85,7 +85,7 @@ export const COMPILER_OPTIONS: ts.CompilerOptions = {
 };
 
 const makeContext = (
-  rootNames: ReadonlyArray<string>,
+  rootNames: readonly string[],
   host: CompilerHost,
   options: MakeContextOptions = DEFAULT_MAKE_CONTEXT_OPTIONS,
 ): Context => {
@@ -125,7 +125,7 @@ const createModifyHostFiles = (files: { readonly [fileName: string]: string | un
 };
 
 const createProgram = (
-  rootNames: ReadonlyArray<string>,
+  rootNames: readonly string[],
   host: CompilerHost,
   { modifyHost = defaultModifyHost, withTestHarness = false }: MakeContextOptions = DEFAULT_MAKE_CONTEXT_OPTIONS,
 ) => {

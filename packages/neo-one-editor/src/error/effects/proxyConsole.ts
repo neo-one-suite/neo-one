@@ -12,7 +12,7 @@ export interface ReactFrame {
   readonly lineNumber: number | null;
   readonly name: string | null;
 }
-const reactFrameStack: Array<ReadonlyArray<ReactFrame>> = [];
+const reactFrameStack: (readonly ReactFrame[])[] = [];
 
 // This is a stripped down barebones version of this proposal:
 // https://gist.github.com/sebmarkbage/bdefa100f19345229d526d0fdd22830f
@@ -23,7 +23,7 @@ const reactFrameStack: Array<ReadonlyArray<ReactFrame>> = [];
 const registerReactStack = () => {
   // tslint:disable-next-line strict-type-predicates
   if (typeof console !== 'undefined') {
-    (console as any).reactStack = (frames: ReadonlyArray<ReactFrame>) => reactFrameStack.push(frames);
+    (console as any).reactStack = (frames: readonly ReactFrame[]) => reactFrameStack.push(frames);
     (console as any).reactStackEnd = () => reactFrameStack.pop();
   }
 };
@@ -36,7 +36,7 @@ const unregisterReactStack = () => {
   }
 };
 
-type ConsoleProxyCallback = (message: string, frames: ReadonlyArray<ReactFrame>) => void;
+type ConsoleProxyCallback = (message: string, frames: readonly ReactFrame[]) => void;
 const permanentRegister = (type: string, callback: ConsoleProxyCallback) => {
   // tslint:disable-next-line strict-type-predicates
   if (typeof console !== 'undefined') {

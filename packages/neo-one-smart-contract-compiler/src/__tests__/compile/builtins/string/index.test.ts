@@ -25,7 +25,7 @@ describe('String', () => {
     await helpers.executeString(`
       const x = [String];
 
-      const foo = (value: ReadonlyArray<typeof String>) => {
+      const foo = (value: readonly typeof String[]) => {
         // do nothing
       };
 

@@ -18,7 +18,7 @@ export interface ForType {
 
 export interface ForTypeHelperOptions {
   readonly type: ts.Type | undefined;
-  readonly types: ReadonlyArray<ForType>;
+  readonly types: readonly ForType[];
   readonly single?: boolean;
   readonly singleUndefined?: (options: VisitOptions) => void;
   readonly optional?: boolean;
@@ -29,7 +29,7 @@ export interface ForTypeHelperOptions {
 // Output: []
 export class ForTypeHelper extends Helper {
   private readonly type: ts.Type | undefined;
-  private readonly types: ReadonlyArray<ForType>;
+  private readonly types: readonly ForType[];
   private readonly single: boolean;
   private readonly singleUndefined: ((options: VisitOptions) => void) | undefined;
   private readonly optional: boolean;

@@ -24,9 +24,9 @@ function notNull<T>(value: T | null | undefined): value is T {
 }
 
 // tslint:disable readonly-array
-function zip<T1, T2>(a: ArrayLike<T1>, b: ArrayLike<T2>): Array<[T1, T2]>;
-function zip<T1, T2, T3>(a: ArrayLike<T1>, b: ArrayLike<T2>, c: ArrayLike<T3>): Array<[T1, T2, T3]>;
-function zip<T>(...arrays: Array<ArrayLike<T> | null | undefined>): T[][] {
+function zip<T1, T2>(a: ArrayLike<T1>, b: ArrayLike<T2>): ([T1, T2])[];
+function zip<T1, T2, T3>(a: ArrayLike<T1>, b: ArrayLike<T2>, c: ArrayLike<T3>): ([T1, T2, T3])[];
+function zip<T>(...arrays: (ArrayLike<T> | null | undefined)[]): T[][] {
   // tslint:disable-next-line no-any
   return _.zip(...arrays) as any;
 }

@@ -10,9 +10,9 @@ import { HandleSuperConstruct, VisitOptions } from '../types';
 import { JumpTable } from './JumpTable';
 
 export type SingleBytecodeValue = Buffer | Jump | Line;
-export type Tags = ReadonlyArray<string>;
-export type SingleBytecode = [ts.Node, Tags, SingleBytecodeValue];
-export type Bytecode = ReadonlyArray<SingleBytecode>;
+export type Tags = readonly string[];
+export type SingleBytecode = readonly [ts.Node, Tags, SingleBytecodeValue];
+export type Bytecode = readonly SingleBytecode[];
 
 export interface CaptureResult {
   readonly length: number;

@@ -90,7 +90,7 @@ describe('ForOfStatementCompiler', () => {
 
   test('for of entries', async () => {
     await helpers.executeString(`
-      const x: ReadonlyArray<number> = [1, 2, 3];
+      const x: readonly number[] = [1, 2, 3];
       for (const [idx, value] of x.entries()) {
         assertEqual(value, idx + 1);
       }
@@ -100,7 +100,7 @@ describe('ForOfStatementCompiler', () => {
   test('for of entries - return', async () => {
     await helpers.executeString(`
       const func = () => {
-        const x: ReadonlyArray<number> = [1, 2, 3];
+        const x: readonly number[] = [1, 2, 3];
         for (const [idx, value] of x.entries()) {
           if (idx === 2) {
             return 0;
@@ -118,7 +118,7 @@ describe('ForOfStatementCompiler', () => {
   test('for of entries - throw', async () => {
     await helpers.executeString(`
       try {
-        const x: ReadonlyArray<number> = [1, 2, 3];
+        const x: readonly number[] = [1, 2, 3];
         for (const [idx, value] of x.entries()) {
           if (idx === 2) {
             throw new Error('hello');

@@ -25,7 +25,7 @@ import {
 import { TransactionType } from './TransactionType';
 
 export interface StateTransactionAdd extends TransactionBaseAdd {
-  readonly descriptors: ReadonlyArray<StateDescriptor>;
+  readonly descriptors: readonly StateDescriptor[];
 }
 
 export class StateTransaction extends TransactionBase<
@@ -56,7 +56,7 @@ export class StateTransaction extends TransactionBase<
     });
   }
 
-  public readonly descriptors: ReadonlyArray<StateDescriptor>;
+  public readonly descriptors: readonly StateDescriptor[];
   protected readonly sizeExclusive: () => number = utils.lazy(() =>
     IOHelper.sizeOfArray(this.descriptors, (descriptor) => descriptor.size),
   );
@@ -112,10 +112,10 @@ export class StateTransaction extends TransactionBase<
     inputs = this.inputs,
     outputs = this.outputs,
   }: {
-    readonly scripts?: ReadonlyArray<Witness>;
-    readonly attributes?: ReadonlyArray<Attribute>;
-    readonly inputs?: ReadonlyArray<Input>;
-    readonly outputs?: ReadonlyArray<Output>;
+    readonly scripts?: readonly Witness[];
+    readonly attributes?: readonly Attribute[];
+    readonly inputs?: readonly Input[];
+    readonly outputs?: readonly Output[];
   }): this {
     // tslint:disable-next-line no-any
     return new (this.constructor as any)({
@@ -144,7 +144,7 @@ export class StateTransaction extends TransactionBase<
     };
   }
 
-  public async verify(options: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
+  public async verify(options: TransactionVerifyOptions): Promise<readonly VerifyScriptResult[]> {
     const [results] = await Promise.all([super.verify(options), this.verifyInternal(options)]);
 
     return results;
