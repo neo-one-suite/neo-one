@@ -299,8 +299,8 @@ export class NEOONENodeAdapter extends NodeAdapter {
     return super
       .getDebug()
       .concat([
-        ['Process ID', this.mutableProcess === undefined ? 'null' : `${this.mutableProcess.pid}`],
-        ['Config Path', this.mutableConfig === undefined ? 'null' : this.mutableConfig.configPath],
+        ['Process ID', this.mutableProcess === undefined ? 'null' : `${this.mutableProcess.pid}`] as const,
+        ['Config Path', this.mutableConfig === undefined ? 'null' : this.mutableConfig.configPath] as const,
       ]);
   }
 

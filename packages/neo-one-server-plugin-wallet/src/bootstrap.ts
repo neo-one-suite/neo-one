@@ -39,7 +39,7 @@ const DEFAULT_NUM_WALLETS = 10;
 export const DEFAULT_MASTER_PRIVATE_KEY = '9e9522c90f4b33cac8a174353ae54651770f3f4dd1de78e74d9b49ba615d7c1f';
 const DEFAULT_MASTER_PUBLIC_KEY = '03396d8a87f1f77be1ca1e2d63ee3c1a642a9c45d3fb1dc2bfdd7ce680043244f2';
 const DEFAULT_NETWORK_NAME = 'priv';
-export const DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS: ReadonlyArray<[string, string]> = [
+export const DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS = [
   [
     'e35ecb8189067a0a06f17f163be3db95c4b7805c81b48af1f4b8bbdfbeeb1afd',
     '020266f0d31fa8c1c28cfe8712cc26b6d41ff910deb02341dfe628573178906940',
@@ -80,7 +80,8 @@ export const DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS: ReadonlyArray<[string, string]
     '31efd094e0e299daaae8e08c1f7e99df0d71f8f26b30924274901812a4730992',
     '036c6d633f38ebb5be31784031d065bae11cdba2999186c896366ebccf3efe538b',
   ],
-];
+] as const;
+
 export const DEFAULT_PRIVATE_KEYS = DEFAULT_PRIVATE_KEY_AND_PUBLIC_KEYS.map(([key]) => key);
 
 export interface AssetInfo {
@@ -893,7 +894,7 @@ async function transferToken({
   count,
   developerClient,
 }: {
-  readonly tokens: ReadonlyArray<[TokenWithWallet, WalletData]>;
+  readonly tokens: ReadonlyArray<readonly [TokenWithWallet, WalletData]>;
   readonly count: number;
   readonly developerClient: DeveloperClient;
 }): Promise<void> {
@@ -924,17 +925,16 @@ const transferTokens = async ({
   readonly developerClient: DeveloperClient;
 }) => {
   const count = wallets.length / 2;
-  const tokensWithWallets = tokens.map<[TokenWithWallet, readonly WalletData[]]>((token, idx) => [
+  const tokensWithWallets = tokens.map<[TokenWithWallet, ReadonlyArray<WalletData>]>((token, idx) => [
     token,
     idx % 2 === 0 ? wallets.slice(0, count) : wallets.slice(count),
   ]);
   // tslint:disable-next-line no-loop-statement
   for (const idx of _.range(count)) {
     await transferToken({
-      tokens: tokensWithWallets.map<[TokenWithWallet, WalletData]>(([token, tokenWallets]) => [
-        token,
-        tokenWallets[idx],
-      ]),
+      tokens: tokensWithWallets.map<readonly [TokenWithWallet, WalletData]>(
+        ([token, tokenWallets]) => [token, tokenWallets[idx]] as const,
+      ),
       count,
       developerClient,
     });

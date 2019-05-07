@@ -78,7 +78,7 @@ export abstract class NodeAdapter {
 
   public getDebug(): DescribeTable {
     return [
-      ['Data Path', this.dataPath],
+      ['Data Path', this.dataPath] as const,
       [
         'Settings',
         {
@@ -114,7 +114,7 @@ export abstract class NodeAdapter {
             ['RPC Endpoints', JSON.stringify(this.mutableSettings.rpcEndpoints, undefined, 2)],
           ],
         },
-      ],
+      ] as const,
     ];
   }
 

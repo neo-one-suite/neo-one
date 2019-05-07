@@ -113,6 +113,6 @@ export class ResourceType<
   // Format the resource information into a vertical table. Nested tables
   // can also be used as a value.
   public getDescribeTable(resource: Resource): DescribeTable {
-    return [['Name', resource.baseName]];
+    return [['Name', resource.baseName] as const];
   }
 }

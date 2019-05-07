@@ -237,7 +237,7 @@ export class LocalHDStore implements HDLocalStore {
     return newWallet;
   }
 
-  private async getChain(path: [number, number]): Promise<NodeChain> {
+  private async getChain(path: readonly [number, number]): Promise<NodeChain> {
     const wallet = await this.getWallet(path[0]);
     const maybeChain = wallet.chains[path[1]] as NodeChain | undefined;
 
@@ -262,7 +262,7 @@ export class LocalHDStore implements HDLocalStore {
   }
 
   private async getAccount(path: LocalPath): Promise<NodeAccount> {
-    const chain = await this.getChain([path[0], path[1]]);
+    const chain = await this.getChain([path[0], path[1]] as const);
     const maybeAccount = chain.accounts[path[2]] as NodeAccount | undefined;
 
     if (maybeAccount !== undefined) {

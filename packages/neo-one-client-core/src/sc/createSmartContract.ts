@@ -77,7 +77,7 @@ export const getParamsAndOptions = ({
   readonly client: Client;
 }): {
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
-  readonly paramsZipped: ReadonlyArray<[string, Param | undefined]>;
+  readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
   readonly options: InvokeSendUnsafeReceiveTransactionOptions;
   readonly forwardOptions: ForwardOptions;
   readonly network: NetworkType;
@@ -415,7 +415,8 @@ export const createSmartContract = ({
 
         return action;
       }),
-      filter(Boolean),
+      filter(utils.notNull),
+      filter<Event>(Boolean),
     );
 
   const iterLogs = (options?: SmartContractIterOptions): AsyncIterable<Log> =>
@@ -427,7 +428,8 @@ export const createSmartContract = ({
 
         return action;
       }),
-      filter(Boolean),
+      filter(utils.notNull),
+      filter<Log>(Boolean),
     );
 
   return definition.abi.functions.reduce<SmartContractAny>(

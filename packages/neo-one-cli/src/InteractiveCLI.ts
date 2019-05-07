@@ -460,8 +460,8 @@ export class InteractiveCLI {
 
   public getDebug(): DescribeTable {
     return [
-      ['Interactive CLI Log Path', this.mutableLogPath === undefined ? 'Unknown' : this.mutableLogPath],
-      ['Interactive CLI Config Path', this.clientConfig.configPath],
+      ['Interactive CLI Log Path', this.mutableLogPath === undefined ? 'Unknown' : this.mutableLogPath] as const,
+      ['Interactive CLI Config Path', this.clientConfig.configPath] as const,
     ];
   }
   // tslint:disable-next-line no-any

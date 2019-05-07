@@ -39,8 +39,8 @@ export interface SerializableInvocationData {
   readonly asset: Asset | undefined;
   readonly contracts: readonly Contract[];
   readonly deletedContractHashes: readonly UInt160[];
-  readonly migratedContractHashes: ReadonlyArray<[UInt160, UInt160]>;
-  readonly voteUpdates: ReadonlyArray<[UInt160, ReadonlyArray<ECPoint>]>;
+  readonly migratedContractHashes: ReadonlyArray<readonly [UInt160, UInt160]>;
+  readonly voteUpdates: ReadonlyArray<readonly [UInt160, ReadonlyArray<ECPoint>]>;
   readonly result: InvocationResult;
   readonly actions: readonly Action[];
   readonly storageChanges: readonly StorageChange[];

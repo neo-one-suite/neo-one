@@ -58,7 +58,7 @@ const normalizeEndpoint = (endpoint: Endpoint) => {
   });
 };
 
-const EXTERNAL_ENDPOINTS = new Set();
+const EXTERNAL_ENDPOINTS = new Set<string>();
 const MAX_CONNECTED_PEERS = 10;
 const CONNECT_PEERS_DELAY_MS = 5000;
 const SOCKET_TIMEOUT_MS = 1000 * 60;

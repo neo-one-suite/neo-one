@@ -139,7 +139,7 @@ function weightedFilter<T>(
   startIn: number,
   endIn: number,
   getValueIn: (value: T) => BN,
-): ReadonlyArray<[T, BigNumber]> {
+): ReadonlyArray<readonly [T, BigNumber]> {
   const start = new BigNumber(startIn);
   const end = new BigNumber(endIn);
   const getValue = (value: T) => new BigNumber(getValueIn(value).toString(10));
@@ -147,7 +147,7 @@ function weightedFilter<T>(
 
   let sum = new BigNumber(0);
   let current = new BigNumber(0);
-  const mutableResult: Array<[T, BigNumber]> = [];
+  const mutableResult: Array<readonly [T, BigNumber]> = [];
   // tslint:disable-next-line no-loop-statement
   for (const value of input) {
     if (current.gte(end)) {
@@ -170,7 +170,7 @@ function weightedFilter<T>(
     mutableResult.push([
       value,
       weight.gte(0) ? weight.integerValue(BigNumber.ROUND_FLOOR) : weight.integerValue(BigNumber.ROUND_CEIL),
-    ]);
+    ] as const);
   }
 
   return mutableResult;

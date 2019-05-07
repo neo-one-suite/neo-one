@@ -475,7 +475,7 @@ export class WriteBatchBlockchain {
   private async persistUTXOTransactions(
     monitor: Monitor,
     block: Block,
-    transactions: ReadonlyArray<[number, (ContractTransaction | ClaimTransaction | MinerTransaction)]>,
+    transactions: ReadonlyArray<readonly [number, (ContractTransaction | ClaimTransaction | MinerTransaction)]>,
     lastGlobalTransactionIndex: BN,
   ): Promise<void> {
     await monitor.captureSpan(
@@ -526,7 +526,7 @@ export class WriteBatchBlockchain {
   private async persistTransactions(
     monitor: Monitor,
     block: Block,
-    transactions: ReadonlyArray<[number, Transaction]>,
+    transactions: ReadonlyArray<readonly [number, Transaction]>,
     lastGlobalTransactionIndex: BN,
     lastGlobalActionIndex: BN,
   ): Promise<BN> {
@@ -664,8 +664,8 @@ export class WriteBatchBlockchain {
               getValidators: this.getValidators,
             });
 
-            const migratedContractHashes: Array<[UInt160, UInt160]> = [];
-            const voteUpdates: Array<[UInt160, ReadonlyArray<ECPoint>]> = [];
+            const migratedContractHashes: Array<readonly [UInt160, UInt160]> = [];
+            const voteUpdates: Array<readonly [UInt160, ReadonlyArray<ECPoint>]> = [];
             const actions: Array<NotificationAction | LogAction> = [];
             const result = await wrapExecuteScripts(async () =>
               this.vm.executeScripts({
@@ -710,10 +710,10 @@ export class WriteBatchBlockchain {
                     globalActionIndex = globalActionIndex.add(utils.ONE);
                   },
                   onMigrateContract: ({ from, to }) => {
-                    migratedContractHashes.push([from, to]);
+                    migratedContractHashes.push([from, to] as const);
                   },
                   onSetVotes: ({ address, votes }) => {
-                    voteUpdates.push([address, votes]);
+                    voteUpdates.push([address, votes] as const);
                   },
                 },
 
@@ -934,7 +934,7 @@ export class WriteBatchBlockchain {
             await this.updateAccount(
               common.hexToUInt160(address),
               // tslint:disable-next-line no-unused
-              values.map<[UInt256, BN]>(([_address, asset, value]) => [asset, value]),
+              values.map<readonly [UInt256, BN]>(([_address, asset, value]) => [asset, value] as const),
               spent === undefined ? [] : spent,
               claimed === undefined ? [] : claimed,
               outs === undefined ? [] : outs,
@@ -981,7 +981,7 @@ export class WriteBatchBlockchain {
 
   private async updateAccount(
     address: UInt160,
-    values: ReadonlyArray<[UInt256, BN]>,
+    values: ReadonlyArray<readonly [UInt256, BN]>,
     spent: readonly OutputWithInput[],
     claimed: readonly Input[],
     outputs: readonly OutputWithInput[],
@@ -999,7 +999,21 @@ export class WriteBatchBlockchain {
 
         return acc;
       },
-      account === undefined ? {} : { ...account.balances },
+      account === undefined
+        ? {}
+        : Object.entries(account.balances).reduce<{ [asset: string]: BN }>((acc, [key, value]) => {
+            if (value === undefined) {
+              return {
+                ...acc,
+                [key]: utils.ZERO,
+              };
+            }
+
+            return {
+              ...acc,
+              [key]: value,
+            };
+          }, {}),
     );
 
     const promises = [];

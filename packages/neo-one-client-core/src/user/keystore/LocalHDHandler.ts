@@ -5,7 +5,7 @@ import { InvalidMasterPathError } from '../../errors';
 import { HDAccount, HDHandler } from './HDKeyStore';
 import { HDStore } from './types';
 
-export type LocalPath = [number, number, number];
+export type LocalPath = readonly [number, number, number];
 export type LocalHDAccount = HDAccount<LocalPath>;
 
 export interface HDLocalStore extends HDStore<LocalPath> {
@@ -17,7 +17,7 @@ interface ScanInterface {
   readonly accounts: readonly LocalHDAccount[];
 }
 
-export class LocalHDHandler implements HDHandler<[number, number, number]> {
+export class LocalHDHandler implements HDHandler<LocalPath> {
   private readonly store: HDLocalStore;
   private readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
 
@@ -39,7 +39,7 @@ export class LocalHDHandler implements HDHandler<[number, number, number]> {
 
         return _.flatten(wallet.accounts);
       case 2:
-        const chain = await this.scanChain(network, masterPath as [number, number], maxOffset);
+        const chain = await this.scanChain(network, masterPath as readonly [number, number], maxOffset);
 
         return _.flatten(chain.accounts);
       default:
@@ -93,8 +93,8 @@ export class LocalHDHandler implements HDHandler<[number, number, number]> {
   }
 
   private async scanWallet(network: NetworkType, walletIndex: number, maxOffset?: number): Promise<ScanInterface> {
-    const externalPath: [number, number] = [walletIndex, 0];
-    const internalPath: [number, number] = [walletIndex, 1];
+    const externalPath = [walletIndex, 0] as const;
+    const internalPath = [walletIndex, 1] as const;
 
     const scannedChains = await Promise.all([
       this.scanChain(network, externalPath, maxOffset),
@@ -107,11 +107,15 @@ export class LocalHDHandler implements HDHandler<[number, number, number]> {
     };
   }
 
-  private async scanChain(network: NetworkType, chainIndex: [number, number], maxOffset = 5): Promise<ScanInterface> {
+  private async scanChain(
+    network: NetworkType,
+    chainIndex: readonly [number, number],
+    maxOffset = 5,
+  ): Promise<ScanInterface> {
     const scanChainInternal = async (start: number, currentOffset = 0): Promise<readonly LocalHDAccount[]> => {
       const localHDAccounts = await Promise.all(
         _.range(start, start + maxOffset - currentOffset).map(async (num) => {
-          const path: LocalPath = [chainIndex[0], chainIndex[1], num];
+          const path = [chainIndex[0], chainIndex[1], num] as const;
           const key = await this.store.getPublicKey(path);
 
           return this.publicKeyToLocalHDAccount(path, key, network);

@@ -49,7 +49,7 @@ export interface NetworkResourceAdapterOptions extends NetworkResourceAdapterSta
   readonly nodes: readonly NodeAdapter[];
 }
 
-const DEFAULT_MAIN_SEEDS: readonly EndpointConfig[]: ReadonlyArray<any> = [
+const DEFAULT_MAIN_SEEDS: readonly EndpointConfig[] = [
   { type: 'tcp', host: 'node1.nyc3.bridgeprotocol.io', port: 10333 },
   { type: 'tcp', host: 'node2.nyc3.bridgeprotocol.io', port: 10333 },
   { type: 'tcp', host: 'seed1.switcheo.com', port: 10333 },
@@ -61,7 +61,7 @@ const DEFAULT_MAIN_SEEDS: readonly EndpointConfig[]: ReadonlyArray<any> = [
   { type: 'tcp', host: 'seed4.aphelion-neo.com', port: 10333 },
 ];
 
-const DEFAULT_TEST_SEEDS: readonly EndpointConfig[]: ReadonlyArray<any> = [
+const DEFAULT_TEST_SEEDS: readonly EndpointConfig[] = [
   { type: 'tcp', host: 'seed1.neo.org', port: 20333 },
   { type: 'tcp', host: 'seed2.neo.org', port: 20333 },
   { type: 'tcp', host: 'seed3.neo.org', port: 20333 },
@@ -97,13 +97,13 @@ export class NetworkResourceAdapter {
   public static create(adapterOptions: NetworkResourceAdapterInitOptions, options: NetworkResourceOptions): TaskList {
     const staticOptions = this.getStaticOptions(adapterOptions);
     let type: NodeOptions['type'];
-    let nodeSettings: ReadonlyArray<[string, NodeSettings]>;
+    let nodeSettings: ReadonlyArray<readonly [string, NodeSettings]>;
     if (staticOptions.name === constants.NETWORK_NAME.MAIN) {
       type = NetworkType.Main;
-      nodeSettings = [[staticOptions.name, this.getMainSettings(staticOptions)]];
+      nodeSettings = [[staticOptions.name, this.getMainSettings(staticOptions)] as const];
     } else if (staticOptions.name === constants.NETWORK_NAME.TEST) {
       type = NetworkType.Test;
-      nodeSettings = [[staticOptions.name, this.getTestSettings(staticOptions)]];
+      nodeSettings = [[staticOptions.name, this.getTestSettings(staticOptions)] as const];
     } else {
       type = NetworkType.Private;
       nodeSettings = this.getPrivateNetSettings(staticOptions);
@@ -178,7 +178,7 @@ export class NetworkResourceAdapter {
 
   private static getPrivateNetSettings(
     options: NetworkResourceAdapterStaticOptions,
-  ): ReadonlyArray<[string, NodeSettings]> {
+  ): ReadonlyArray<readonly [string, NodeSettings]> {
     const primaryPrivateKey = crypto.wifToPrivateKey(constants.PRIVATE_NET_PRIVATE_KEY, common.NEO_PRIVATE_KEY_VERSION);
     const primaryPublicKey = common.stringToECPoint(constants.PRIVATE_NET_PUBLIC_KEY);
     crypto.addPublicKey(primaryPrivateKey, primaryPublicKey);
@@ -199,7 +199,7 @@ export class NetworkResourceAdapter {
     const secondsPerBlock = 15;
     const standbyValidators = configuration.map(({ publicKey }) => common.ecPointToString(publicKey));
 
-    return configuration.map<[string, NodeSettings]>((config) => {
+    return configuration.map<readonly [string, NodeSettings]>((config) => {
       const { name, rpcPort, listenTCPPort, telemetryPort, privateKey } = config;
       const otherConfiguration = configuration.filter(({ name: otherName }) => name !== otherName);
 
@@ -232,7 +232,7 @@ export class NetworkResourceAdapter {
         rpcEndpoints: otherConfiguration.map((otherConfig) => `http://localhost:${otherConfig.rpcPort}/rpc`),
       };
 
-      return [name, settings];
+      return [name, settings] as const;
     });
   }
 
@@ -392,7 +392,7 @@ export class NetworkResourceAdapter {
   private readonly nodesPath: string;
   private readonly nodesOptionsPath: string;
   private readonly state: ResourceState;
-  private readonly nodes$: BehaviorSubject<readonly readonly NodeAdapterreadonly []>;
+  private readonly nodes$: BehaviorSubject<readonly NodeAdapter[]>;
 
   public constructor({
     name,
@@ -462,21 +462,20 @@ export class NetworkResourceAdapter {
 
   public getDebug(): DescribeTable {
     return [
-      ['Type', this.type],
-      ['Data Path', this.dataPath],
-      ['Nodes Path', this.nodesPath],
-      ['Nodes Options Path', this.nodesOptionsPath],
-      ['State', this.state],
+      ['Type', this.type] as const,
+      ['Data Path', this.dataPath] as const,
+      ['Nodes Path', this.nodesPath] as const,
+      ['Nodes Options Path', this.nodesOptionsPath] as const,
+      ['State', this.state] as const,
       [
         'Nodes',
         {
           type: 'describe',
-          table: this.nodes.map<[string, SubDescribeTable]>((node) => [
-            node.name,
-            { type: 'describe', table: node.getDebug() },
-          ]),
+          table: this.nodes.map<readonly [string, SubDescribeTable]>(
+            (node) => [node.name, { type: 'describe', table: node.getDebug() }] as const,
+          ),
         },
-      ],
+      ] as const,
     ];
   }
 
@@ -485,7 +484,7 @@ export class NetworkResourceAdapter {
   }
 
   public async destroy(): Promise<void> {
-    this.nodes$.next([]);,
+    this.nodes$.next([]);
   }
 
   public delete(_options: NetworkResourceOptions): TaskList {

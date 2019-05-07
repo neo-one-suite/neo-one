@@ -32,10 +32,10 @@ const removeToast = (id: string) => {
   toasts$.next(toasts$.getValue().filter((localToast) => localToast.id !== id));
 };
 
-export const useToasts = (): [readonly Toast[], typeof addToast, typeof removeToast] => {
+export const useToasts = (): readonly [ReadonlyArray<Toast>, typeof addToast, typeof removeToast] => {
   const toasts = useStream(() => toasts$, [toasts$], toasts$.getValue());
 
-  return [toasts, addToast, removeToast];
+  return [toasts, addToast, removeToast] as const;
 };
 
 export type AddError = (error: Error) => void;

@@ -347,7 +347,7 @@ export const convertParams = ({
   readonly senderAddress?: AddressString;
 }): {
   readonly converted: ReadonlyArray<ScriptBuilderParam | undefined>;
-  readonly zipped: ReadonlyArray<[string, Param | undefined]>;
+  readonly zipped: ReadonlyArray<readonly [string, Param | undefined]>;
 } => {
   const parameters =
     parametersIn.length === 0 || !parametersIn[parametersIn.length - 1].rest ? parametersIn : parametersIn.slice(0, -1);
@@ -371,21 +371,23 @@ export const convertParams = ({
         getDefault({ parameter: parameters[params.length + idx], senderAddress }),
       ),
     ),
-  ) as Array<[ABIParameter, Param]>;
-  const converted = zip.map(([parameter, param]) =>
-    // tslint:disable-next-line no-any
-    (paramCheckers[parameter.type] as any)(parameter.name, param, parameter),
   );
-  // tslint:disable-next-line no-useless-cast
-  const zipped = zip.map<[string, Param | undefined]>(([parameter, param]) => [
-    parameter.name,
-    parameter.type === 'ForwardValue' ? (param as ForwardValue).param : param,
-  ]);
+
+  const converted = zip.map(([parameterIn, param]) => {
+    const parameter = parameterIn as ABIParameter;
+
+    // tslint:disable-next-line: no-any
+    return (paramCheckers[parameter.type] as any)(parameter.name, param, parameter);
+  });
+  const zipped = zip.map<readonly [string, Param | undefined]>(([parameterIn, param]) => {
+    const parameter = parameterIn as ABIParameter;
+
+    return [parameter.name, parameter.type === 'ForwardValue' ? (param as ForwardValue).param : param] as const;
+  });
 
   return { converted, zipped };
 };
 
-// tslint:disable-next-line no-any
 export const addForward = (
   func: ABIFunction,
   forwardEvents: readonly ABIEvent[],

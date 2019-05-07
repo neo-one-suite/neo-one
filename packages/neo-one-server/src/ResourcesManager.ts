@@ -666,10 +666,9 @@ export class ResourcesManager<
   }
 
   public getDebug(): DescribeTable {
-    return Object.entries(this.resourceAdapters).map<[string, SubDescribeTable]>(([name, adapter]) => [
-      name,
-      { type: 'describe', table: adapter.getDebug() },
-    ]);
+    return Object.entries(this.resourceAdapters).map<readonly [string, SubDescribeTable]>(
+      ([name, adapter]) => [name, { type: 'describe' as const, table: adapter.getDebug() }] as const,
+    );
   }
 
   public async init(): Promise<readonly InitError[]> {

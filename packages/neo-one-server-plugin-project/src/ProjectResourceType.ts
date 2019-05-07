@@ -64,6 +64,6 @@ export class ProjectResourceType extends ResourceType<Project, ProjectResourceOp
   }
 
   public getDescribeTable(resource: Project): DescribeTable {
-    return [['ID', resource.baseName], ['Root Directory', resource.rootDir]];
+    return [['ID', resource.baseName] as const, ['Root Directory', resource.rootDir] as const];
   }
 }

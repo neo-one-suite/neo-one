@@ -512,8 +512,10 @@ const OPCODE_PAIRS = ([
       }),
     }),
   ],
+  // tslint:disable-next-line: readonly-array
 ] as ReadonlyArray<[number, OpObject]>)
   .concat(
+    // tslint:disable-next-line: readonly-array
     _.range(0x01, 0x4c).map<[number, OpObject]>((idx) => [
       idx,
       createOp({
@@ -537,6 +539,7 @@ const OPCODE_PAIRS = ([
     [0x4f, pushNumber({ name: 'PUSHM1', value: -1 })],
   ])
   .concat(
+    // tslint:disable-next-line: readonly-array
     _.range(0x51, 0x61).map<[number, OpObject]>((idx) => {
       const value = idx - 0x50;
 
@@ -1952,8 +1955,10 @@ const OPCODE_PAIRS = ([
   ]);
 
 export const OPCODES = _.fromPairs(OPCODE_PAIRS) as { readonly [Byte in number]?: OpObject };
+// tslint:disable-next-line: readonly-array
 const STATIC_OPCODES = _.fromPairs(OPCODE_PAIRS.filter((value): value is [number, OpStatic] => value[1].type === 'op'));
 const CREATE_OPCODES = _.fromPairs(
+  // tslint:disable-next-line: readonly-array
   OPCODE_PAIRS.filter((value): value is [number, OpCreate] => value[1].type === 'create'),
 );
 

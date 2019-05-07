@@ -8,7 +8,7 @@ import { StackFrame } from './StackFrame';
 
 const regexExtractLocation = /\(?(.+?)(?::(\d+))?(?::(\d+))?\)?$/;
 
-function extractLocation(token: string | undefined): [string, number, number] {
+function extractLocation(token: string | undefined): readonly [string, number, number] {
   if (token === undefined) {
     throw new Error(`Invalid token: ${token}`);
   }

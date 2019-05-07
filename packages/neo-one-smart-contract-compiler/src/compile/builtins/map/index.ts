@@ -47,12 +47,12 @@ class MapValue extends BuiltinNew {
 }
 class MapConstructorInterface extends BuiltinInterface {}
 
-const COMMON: ReadonlyArray<[string, Builtin]> = [
-  ['__@iterator', new MapIterator()],
-  ['forEach', new MapForEach()],
-  ['get', new MapGet()],
-  ['has', new MapHas()],
-  ['size', new MapSize()],
+const COMMON: ReadonlyArray<readonly [string, Builtin]> = [
+  ['__@iterator', new MapIterator()] as const,
+  ['forEach', new MapForEach()] as const,
+  ['get', new MapGet()] as const,
+  ['has', new MapHas()] as const,
+  ['size', new MapSize()] as const,
 ];
 
 // tslint:disable-next-line export-name

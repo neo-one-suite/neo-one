@@ -96,9 +96,9 @@ export class NetworkResourceType extends ResourceType<Network, NetworkResourceOp
 
   public getDescribeTable(resource: Network): DescribeTable {
     return [
-      ['Name', resource.name],
-      ['Type', resource.type],
-      ['Height', resource.height === undefined ? 'Unknown' : `${resource.height}`],
+      ['Name', resource.name] as const,
+      ['Type', resource.type] as const,
+      ['Height', resource.height === undefined ? 'Unknown' : `${resource.height}`] as const,
       [
         'Nodes',
         {
@@ -116,7 +116,7 @@ export class NetworkResourceType extends ResourceType<Network, NetworkResourceOp
             ]),
           ),
         },
-      ],
+      ] as const,
     ];
   }
 }

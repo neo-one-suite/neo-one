@@ -806,7 +806,7 @@ export interface UserAccountProvider {
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     verify: boolean,
     options?: InvokeSendUnsafeReceiveTransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -820,7 +820,7 @@ export interface UserAccountProvider {
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     transfer: Transfer,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -834,7 +834,7 @@ export interface UserAccountProvider {
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -848,7 +848,7 @@ export interface UserAccountProvider {
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
@@ -862,7 +862,7 @@ export interface UserAccountProvider {
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     options?: TransactionOptions,
     sourceMaps?: Promise<SourceMaps>,
   ) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
@@ -1991,7 +1991,7 @@ export interface MapContractParameter {
   /**
    * A map of `ContractParameter` to `ContractParameter`. Represented as an array of pairs because JavaScript `Map` keys do not have the same semantics as the NEO VM.
    */
-  readonly value: ReadonlyArray<[ContractParameter, ContractParameter]>;
+  readonly value: ReadonlyArray<readonly [ContractParameter, ContractParameter]>;
 }
 
 /**
@@ -2344,7 +2344,7 @@ export interface RawInvocationData {
   /**
    * `Contract`s migrated (upgraded) by the invocation.
    */
-  readonly migratedContractAddresses: ReadonlyArray<[AddressString, AddressString]>;
+  readonly migratedContractAddresses: ReadonlyArray<readonly [AddressString, AddressString]>;
   /**
    * Raw result of an invocation.
    */

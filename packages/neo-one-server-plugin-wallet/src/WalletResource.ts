@@ -327,15 +327,18 @@ export class WalletResource {
   }
 
   public getDebug(): DescribeTable {
-    const table: ReadonlyArray<[string, string]> = [['Data Path', this.dataPath], ['Wallet Path', this.walletPath]];
+    const table: ReadonlyArray<readonly [string, string]> = [
+      ['Data Path', this.dataPath] as const,
+      ['Wallet Path', this.walletPath] as const,
+    ];
 
     return table.concat(
-      Object.entries(this.toResource()).map<[string, string]>(([key, val]) => {
+      Object.entries(this.toResource()).map<readonly [string, string]>(([key, val]) => {
         if (val === undefined) {
-          return [key, 'null'];
+          return [key, 'null'] as const;
         }
 
-        return [key, typeof val === 'string' ? val : JSON.stringify(val, undefined, 2)];
+        return [key, typeof val === 'string' ? val : JSON.stringify(val, undefined, 2)] as const;
       }),
     );
   }

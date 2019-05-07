@@ -13,7 +13,7 @@ export interface SubDescribeTable {
   readonly table: DescribeTable;
 }
 export type DescribeTable = ReadonlyArray<
-  [string, string | { readonly type: 'list'; readonly table: ListTable } | SubDescribeTable]
+  readonly [string, string | { readonly type: 'list'; readonly table: ListTable } | SubDescribeTable]
 >;
 
 export type ResourceState = 'started' | 'stopped';

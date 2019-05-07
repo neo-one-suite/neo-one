@@ -104,7 +104,7 @@ export function LocalStateProvider({ children }: { readonly children: React.Reac
   return <LocalStateContext.Provider value={{ localState$, onChange }}>{children}</LocalStateContext.Provider>;
 }
 
-export const useTokens = (): [readonly Token[], (tokens: readonly Token[]) => void] => {
+export const useTokens = (): readonly [ReadonlyArray<Token>, (tokens: ReadonlyArray<Token>) => void] => {
   const { localState$, onChange } = useContext(LocalStateContext);
   const tokens = useStream(
     () => localState$.pipe(map((localState) => localState.tokens, distinctUntilChanged())),
@@ -113,7 +113,7 @@ export const useTokens = (): [readonly Token[], (tokens: readonly Token[]) => vo
   );
   const onChangeTokens = useCallback((nextTokens: readonly Token[]) => onChange({ tokens: nextTokens }), [onChange]);
 
-  return [tokens, onChangeTokens];
+  return [tokens, onChangeTokens] as const;
 };
 
 export const useResetLocalState = () => {
@@ -122,7 +122,7 @@ export const useResetLocalState = () => {
   return useCallback(() => onChange(INITIAL_LOCAL_STATE), [onChange]);
 };
 
-export const useAutoConsensus = (): [boolean, () => void] => {
+export const useAutoConsensus = (): readonly [boolean, () => void] => {
   const { localState$, onChange } = useContext(LocalStateContext);
   const autoConsensus = useStream(
     () => localState$.pipe(map((localState) => localState.autoConsensus, distinctUntilChanged())),
@@ -131,10 +131,10 @@ export const useAutoConsensus = (): [boolean, () => void] => {
   );
   const toggle = useCallback(() => onChange({ autoConsensus: !autoConsensus }), [autoConsensus, onChange]);
 
-  return [autoConsensus, toggle];
+  return [autoConsensus, toggle] as const;
 };
 
-export const useAutoSystemFee = (): [boolean, () => void] => {
+export const useAutoSystemFee = (): readonly [boolean, () => void] => {
   const { localState$, onChange } = useContext(LocalStateContext);
   const autoSystemFee = useStream(
     () => localState$.pipe(map((localState) => localState.autoSystemFee, distinctUntilChanged())),
@@ -143,5 +143,5 @@ export const useAutoSystemFee = (): [boolean, () => void] => {
   );
   const toggle = useCallback(() => onChange({ autoSystemFee: !autoSystemFee }), [autoSystemFee, onChange]);
 
-  return [autoSystemFee, toggle];
+  return [autoSystemFee, toggle] as const;
 };

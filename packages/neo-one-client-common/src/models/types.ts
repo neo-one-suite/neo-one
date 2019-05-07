@@ -51,7 +51,7 @@ export interface InteropInterfaceContractParameterJSON {
 
 export interface MapContractParameterJSON {
   readonly type: 'Map';
-  readonly value: ReadonlyArray<[ContractParameterJSON, ContractParameterJSON]>;
+  readonly value: ReadonlyArray<readonly [ContractParameterJSON, ContractParameterJSON]>;
 }
 
 export interface PublicKeyContractParameterJSON {
@@ -185,8 +185,8 @@ export interface InvocationDataJSON {
   readonly asset?: AssetJSON;
   readonly contracts: readonly ContractJSON[];
   readonly deletedContractHashes: readonly string[];
-  readonly migratedContractHashes: ReadonlyArray<[string, string]>;
-  readonly voteUpdates: ReadonlyArray<[string, readonly string[]]>;
+  readonly migratedContractHashes: ReadonlyArray<readonly [string, string]>;
+  readonly voteUpdates: ReadonlyArray<readonly [string, ReadonlyArray<string>]>;
   readonly actions: readonly ActionJSON[];
   readonly storageChanges: readonly StorageChangeJSON[];
 }

@@ -259,12 +259,12 @@ const getBytecode = (first: CodePoint): Bytecode => {
     if (current instanceof JumpCodePoint) {
       const pc = getTargetPC(current, current.target);
       if (current.type === 'CALL') {
-        mutableOut.push([current.node, current.tags, new Call(pc)]);
+        mutableOut.push([current.node, current.tags, new Call(pc)] as const);
       } else {
-        mutableOut.push([current.node, current.tags, new Jmp(current.type, pc)]);
+        mutableOut.push([current.node, current.tags, new Jmp(current.type, pc)] as const);
       }
     } else if (current instanceof BufferCodePoint) {
-      mutableOut.push([current.node, current.tags, current.value]);
+      mutableOut.push([current.node, current.tags, current.value] as const);
     } else if (current instanceof JumpStationCodePoint) {
       const target = current.target;
       const reverseTarget = new Jmp('JMP', getTargetPC(current, current.reverseTarget));
@@ -273,19 +273,19 @@ const getBytecode = (first: CodePoint): Bytecode => {
           current.node,
           current.tags,
           new Jmp('JMP', new KnownProgramCounter(current.pc + current.length)),
-        ]);
-        mutableOut.push([current.node, current.tags, reverseTarget]);
+        ] as const);
+        mutableOut.push([current.node, current.tags, reverseTarget] as const);
       } else {
         mutableOut.push([
           current.node,
           current.tags,
           new Jmp('JMP', new KnownProgramCounter(current.pc + current.length)),
-        ]);
-        mutableOut.push([current.node, current.tags, reverseTarget]);
-        mutableOut.push([current.node, current.tags, new Jmp('JMP', getTargetPC(current, target))]);
+        ] as const);
+        mutableOut.push([current.node, current.tags, reverseTarget] as const);
+        mutableOut.push([current.node, current.tags, new Jmp('JMP', getTargetPC(current, target))] as const);
       }
     } else if (current instanceof LineCodePoint) {
-      mutableOut.push([current.node, current.tags, new Line()]);
+      mutableOut.push([current.node, current.tags, new Line()] as const);
     } else {
       throw new Error('Something went wrong.');
     }

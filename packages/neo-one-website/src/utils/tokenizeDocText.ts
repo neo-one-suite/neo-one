@@ -1,16 +1,16 @@
-const PUNCTUATION: ReadonlyArray<[RegExp, string]> = [
-  [/\./gm, '.'],
-  [/,/gm, ','],
-  [/\(/gm, '('],
-  [/\)/gm, ')'],
-  [/\[/gm, '['],
-  [/]/gm, ']'],
-  [/{/gm, '{'],
-  [/}/gm, '}'],
-  [/</gm, '<'],
-  [/>/gm, '>'],
-  [/;/gm, ';'],
-  [/:/gm, ':'],
+const PUNCTUATION: ReadonlyArray<readonly [RegExp, string]> = [
+  [/\./gm, '.'] as const,
+  [/,/gm, ','] as const,
+  [/\(/gm, '('] as const,
+  [/\)/gm, ')'] as const,
+  [/\[/gm, '['] as const,
+  [/]/gm, ']'] as const,
+  [/{/gm, '{'] as const,
+  [/}/gm, '}'] as const,
+  [/</gm, '<'] as const,
+  [/>/gm, '>'] as const,
+  [/;/gm, ';'] as const,
+  [/:/gm, ':'] as const,
 ];
 
 const BASE_PATH = 'https://neo-one.io';

@@ -297,7 +297,7 @@ export class TestRunner {
     }
   }
 
-  private async findTests(): Promise<readonly readonly ModuleBasereadonly []> {
+  private async findTests(): Promise<readonly ModuleBase[]> {
     const mutableTests: ModuleBase[] = [];
     const engine = await this.engine;
     engine.modules.forEach((mod, path) => {
@@ -306,6 +306,6 @@ export class TestRunner {
       }
     });
 
-    return mutableTests;,
+    return mutableTests;
   }
 }

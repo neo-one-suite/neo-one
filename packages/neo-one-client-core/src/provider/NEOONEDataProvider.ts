@@ -617,10 +617,9 @@ export class NEOONEDataProvider implements DeveloperProvider {
       asset: data.asset === undefined ? data.asset : this.convertAsset(data.asset),
       contracts: data.contracts.map((contract) => this.convertContract(contract)),
       deletedContractAddresses: data.deletedContractHashes.map(scriptHashToAddress),
-      migratedContractAddresses: data.migratedContractHashes.map<[AddressString, AddressString]>(([hash0, hash1]) => [
-        scriptHashToAddress(hash0),
-        scriptHashToAddress(hash1),
-      ]),
+      migratedContractAddresses: data.migratedContractHashes.map<readonly [AddressString, AddressString]>(
+        ([hash0, hash1]) => [scriptHashToAddress(hash0), scriptHashToAddress(hash1)] as const,
+      ),
       actions: data.actions.map((action, idx) =>
         convertAction(blockHash, blockIndex, transactionHash, transactionIndex, idx, action),
       ),

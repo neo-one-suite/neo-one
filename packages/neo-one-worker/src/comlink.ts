@@ -136,8 +136,8 @@ const throwTransferHandler = {
 };
 
 export const transferHandlers: Map<string, TransferHandler> = new Map([
-  ['PROXY', proxyTransferHandler],
-  ['THROW', throwTransferHandler],
+  ['PROXY', proxyTransferHandler] as const,
+  ['THROW', throwTransferHandler] as const,
 ]);
 
 let pingPongMessageCounter: number = 0;

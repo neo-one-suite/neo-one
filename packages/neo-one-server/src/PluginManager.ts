@@ -201,9 +201,9 @@ export class PluginManager {
 
   public getDebug(): DescribeTable {
     return [
-      ['Binary', `${this.binary.cmd} ${this.binary.firstArgs.join(' ')}`],
-      ['Port Allocator', { type: 'describe', table: this.portAllocator.getDebug() }],
-      ['Resources Managers', { type: 'describe', table: this.getResourcesManagersDebug() }],
+      ['Binary', `${this.binary.cmd} ${this.binary.firstArgs.join(' ')}`] as const,
+      ['Port Allocator', { type: 'describe', table: this.portAllocator.getDebug() }] as const,
+      ['Resources Managers', { type: 'describe', table: this.getResourcesManagersDebug() }] as const,
     ];
   }
 
@@ -282,19 +282,18 @@ export class PluginManager {
   }
 
   private getResourcesManagersDebug(): DescribeTable {
-    return Object.entries(this.mutableResourceManagers).map<[string, SubDescribeTable]>(
-      ([pluginName, resourceTypeManagers]) => [
-        pluginName.slice('@neo-one/server-plugin-'.length),
-        {
-          type: 'describe',
-          table: Object.entries(resourceTypeManagers).map<[string, SubDescribeTable]>(
-            ([resourceType, resourcesManager]) => [
-              resourceType,
-              { type: 'describe', table: resourcesManager.getDebug() },
-            ],
-          ),
-        },
-      ],
+    return Object.entries(this.mutableResourceManagers).map<readonly [string, SubDescribeTable]>(
+      ([pluginName, resourceTypeManagers]) =>
+        [
+          pluginName.slice('@neo-one/server-plugin-'.length),
+          {
+            type: 'describe',
+            table: Object.entries(resourceTypeManagers).map<readonly [string, SubDescribeTable]>(
+              ([resourceType, resourcesManager]) =>
+                [resourceType, { type: 'describe' as const, table: resourcesManager.getDebug() }] as const,
+            ),
+          },
+        ] as const,
     );
   }
 }

@@ -158,7 +158,7 @@ export const assertObject = (name: string, value?: unknown): { readonly [key: st
     throw new InvalidArgumentError('Object', name, value);
   }
 
-  return value;
+  return value as { readonly [key: string]: unknown };
 };
 
 export const assertNullableMap = (name: string, value?: unknown): ReadonlyMap<unknown, unknown> => {

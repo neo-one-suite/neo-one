@@ -86,6 +86,7 @@ const getPackageFiles = async (
   packageDir: string,
   outputPackageDir: string,
   omitFile = (_file: string) => false,
+  // tslint:disable-next-line: readonly-array
 ): Promise<ReadonlyArray<[string, string | undefined]>> => {
   loader.addContextDependency(packageDir);
   const filesPromise = new Promise<readonly string[]>((resolve, reject) =>

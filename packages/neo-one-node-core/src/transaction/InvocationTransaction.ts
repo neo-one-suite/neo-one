@@ -88,17 +88,19 @@ export class InvocationTransaction extends TransactionBase<
         asset: asset === undefined ? undefined : asset.serializeJSON(context),
         contracts: contracts.map((contract) => contract.serializeJSON(context)),
         deletedContractHashes: deletedContractHashes.map((hash) => common.uInt160ToString(hash)),
-        migratedContractHashes: migratedContractHashes.map<[string, string]>(([from, to]) => [
-          common.uInt160ToString(from),
-          common.uInt160ToString(to),
-        ]),
-        voteUpdates: voteUpdates.map<[string, string[]]>(([address, votes]) => [
-          crypto.scriptHashToAddress({
-            addressVersion: context.addressVersion,
-            scriptHash: address,
-          }),
-          votes.map((vote) => common.ecPointToString(vote)),
-        ]),
+        migratedContractHashes: migratedContractHashes.map<readonly [string, string]>(
+          ([from, to]) => [common.uInt160ToString(from), common.uInt160ToString(to)] as const,
+        ),
+        voteUpdates: voteUpdates.map<readonly [string, string[]]>(
+          ([address, votes]) =>
+            [
+              crypto.scriptHashToAddress({
+                addressVersion: context.addressVersion,
+                scriptHash: address,
+              }),
+              votes.map((vote) => common.ecPointToString(vote)),
+            ] as const,
+        ),
         actions: actions.map((action) => action.serializeJSON(context)),
         storageChanges: storageChanges.map((storageChange) => storageChange.serializeJSON(context)),
       };

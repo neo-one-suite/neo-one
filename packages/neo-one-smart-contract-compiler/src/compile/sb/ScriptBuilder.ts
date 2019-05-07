@@ -11,7 +11,7 @@ import { JumpTable } from './JumpTable';
 
 export type SingleBytecodeValue = Buffer | Jump | Line;
 export type Tags = ReadonlyArray<string>;
-export type SingleBytecode = [ts.Node, Tags, SingleBytecodeValue];
+export type SingleBytecode = readonly [ts.Node, Tags, SingleBytecodeValue];
 export type Bytecode = ReadonlyArray<SingleBytecode>;
 
 export interface CaptureResult {

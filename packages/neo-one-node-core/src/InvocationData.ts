@@ -16,8 +16,8 @@ export interface InvocationDataAdd {
   readonly assetHash?: UInt256;
   readonly contractHashes: readonly UInt160[];
   readonly deletedContractHashes: readonly UInt160[];
-  readonly migratedContractHashes: ReadonlyArray<[UInt160, UInt160]>;
-  readonly voteUpdates: ReadonlyArray<[UInt160, ReadonlyArray<ECPoint>]>;
+  readonly migratedContractHashes: ReadonlyArray<readonly [UInt160, UInt160]>;
+  readonly voteUpdates: ReadonlyArray<readonly [UInt160, ReadonlyArray<ECPoint>]>;
   readonly blockIndex: number;
   readonly transactionIndex: number;
   readonly actionIndexStart: BN;
@@ -37,17 +37,17 @@ export class InvocationData implements SerializableWire<InvocationData> {
     const assetHash = reader.readUInt256();
     const contractHashes = reader.readArray(() => reader.readUInt160());
     const deletedContractHashes = reader.readArray(() => reader.readUInt160());
-    const migratedContractHashes = reader.readArray<[UInt160, UInt160]>(() => {
+    const migratedContractHashes = reader.readArray<readonly [UInt160, UInt160]>(() => {
       const from = reader.readUInt160();
       const to = reader.readUInt160();
 
-      return [from, to];
+      return [from, to] as const;
     });
-    const voteUpdates = reader.readArray<[UInt160, ReadonlyArray<ECPoint>]>(() => {
+    const voteUpdates = reader.readArray<readonly [UInt160, ReadonlyArray<ECPoint>]>(() => {
       const address = reader.readUInt160();
       const votes = reader.readArray<ECPoint>(() => reader.readECPoint());
 
-      return [address, votes];
+      return [address, votes] as const;
     });
     const blockIndex = reader.readUInt32LE();
     const transactionIndex = reader.readUInt32LE();
@@ -83,8 +83,8 @@ export class InvocationData implements SerializableWire<InvocationData> {
   public readonly assetHash: UInt256 | undefined;
   public readonly contractHashes: readonly UInt160[];
   public readonly deletedContractHashes: readonly UInt160[];
-  public readonly migratedContractHashes: ReadonlyArray<[UInt160, UInt160]>;
-  public readonly voteUpdates: ReadonlyArray<[UInt160, ReadonlyArray<ECPoint>]>;
+  public readonly migratedContractHashes: ReadonlyArray<readonly [UInt160, UInt160]>;
+  public readonly voteUpdates: ReadonlyArray<readonly [UInt160, ReadonlyArray<ECPoint>]>;
   public readonly blockIndex: number;
   public readonly transactionIndex: number;
   public readonly actionIndexStart: BN;

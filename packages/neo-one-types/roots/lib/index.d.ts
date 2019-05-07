@@ -1,5 +1,5 @@
 // tslint:disable
-declare interface readonly T[] {
+declare interface ReadonlyArray<T> {
   sort(compareFn?: (a: T, b: T) => number): this;
   reverse(): this;
 }

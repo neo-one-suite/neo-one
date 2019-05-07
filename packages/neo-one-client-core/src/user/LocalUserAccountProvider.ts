@@ -381,7 +381,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     verify: boolean,
     options: InvokeSendUnsafeReceiveTransactionOptions = {},
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
@@ -446,7 +446,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     contract: AddressString,
     method: string,
     paramsIn: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     transfer: Transfer,
     options: TransactionOptions = {},
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
@@ -511,7 +511,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     options: TransactionOptions = {},
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
@@ -562,7 +562,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     options: TransactionOptions = {},
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
@@ -620,7 +620,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     options: TransactionOptions = {},
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
@@ -722,7 +722,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   protected getInvokeAttributes(
     contract: AddressString,
     method: string,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     verify: boolean,
     from?: AddressString,
   ): readonly Attribute[] {
@@ -1400,7 +1400,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           outputs,
         };
       },
-      { inputs: [] as InputOutput[], outputs: [] as Output[] },
+      { inputs: [] as ReadonlyArray<InputOutput>, outputs: [] as ReadonlyArray<Output> },
     );
   }
 
@@ -1427,7 +1427,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   } {
     const amount = originalAmount.minus(remaining);
 
-    const outputs: Output[] =
+    const outputs: ReadonlyArray<Output> =
       to === undefined
         ? []
         : [
@@ -1489,7 +1489,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   protected getInvokeAttributeTag(
     contract: AddressString,
     method: string,
-    paramsZipped: ReadonlyArray<[string, Param | undefined]>,
+    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
   ): string {
     return JSON.stringify({
       contract,

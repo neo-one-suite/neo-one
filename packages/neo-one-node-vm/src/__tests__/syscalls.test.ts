@@ -396,13 +396,13 @@ const SYSCALLS = [
           [
             new BufferStackItem(Buffer.from('key', 'utf8')).toStructuralKey(),
             new BufferStackItem(Buffer.from('key', 'utf8')),
-          ],
+          ] as const,
         ]),
         referenceValues: new Map([
           [
             new BufferStackItem(Buffer.from('key', 'utf8')).toStructuralKey(),
             new BufferStackItem(Buffer.from('value', 'utf8')),
-          ],
+          ] as const,
         ]),
       }),
     ],

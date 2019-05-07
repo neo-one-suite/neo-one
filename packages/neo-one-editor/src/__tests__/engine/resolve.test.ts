@@ -11,7 +11,7 @@ const createErrorWithCode = (code: string) => {
   return error;
 };
 
-const createFileSystem = (): [FileSystem, JestMocked<FileSystem>] => {
+const createFileSystem = (): readonly [FileSystem, JestMocked<FileSystem>] => {
   const fileSystem = {
     readdirSync: jest.fn(),
     statSync: jest.fn(() => {
@@ -24,7 +24,7 @@ const createFileSystem = (): [FileSystem, JestMocked<FileSystem>] => {
     // tslint:disable-next-line:no-any
   } as any;
 
-  return [fileSystem, fileSystem];
+  return [fileSystem, fileSystem] as const;
 };
 
 describe('resolve', () => {

@@ -120,7 +120,6 @@ const run = () => {
   const text = sourceFile.getText();
   const interfacesToSyntaxKinds = Object.entries(interfaceToAllChildren)
     .filter(([name]) => nodeChildren.has(name))
-    // tslint:disable-next-line no-any
     .filter(([name]) => !text.includes(`is${name}(`))
     .map<[string, string[]]>(([name, children]) => {
       const syntaxKinds =

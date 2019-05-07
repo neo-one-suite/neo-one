@@ -122,10 +122,9 @@ export function convertContractParameter(parameter: ContractParameterJSON): Cont
     case 'Map':
       return {
         type: 'Map',
-        value: parameter.value.map<[ContractParameter, ContractParameter]>(([key, val]) => [
-          convertContractParameter(key),
-          convertContractParameter(val),
-        ]),
+        value: parameter.value.map<readonly [ContractParameter, ContractParameter]>(
+          ([key, val]) => [convertContractParameter(key), convertContractParameter(val)] as const,
+        ),
       };
     case 'PublicKey':
       return parameter;

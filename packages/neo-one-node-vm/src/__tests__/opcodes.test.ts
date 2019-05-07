@@ -73,15 +73,15 @@ const mapStatic = new MapStackItem({
     [
       new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
       new BufferStackItem(Buffer.from('aaaa', 'hex')),
-    ],
+    ] as const,
     [
       new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
       new BufferStackItem(Buffer.from('bbbb', 'hex')),
-    ],
+    ] as const,
   ]),
   referenceValues: new Map([
-    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
-    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))],
+    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))] as const,
+    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))] as const,
   ]),
 });
 
@@ -90,15 +90,15 @@ const mapSetRef = new MapStackItem({
     [
       new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
       new BufferStackItem(Buffer.from('aaaa', 'hex')),
-    ],
+    ] as const,
     [
       new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
       new BufferStackItem(Buffer.from('bbbb', 'hex')),
-    ],
+    ] as const,
   ]),
   referenceValues: new Map([
-    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
-    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))],
+    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))] as const,
+    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))] as const,
   ]),
 });
 
@@ -107,15 +107,15 @@ const mapRemoveRef = new MapStackItem({
     [
       new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
       new BufferStackItem(Buffer.from('aaaa', 'hex')),
-    ],
+    ] as const,
     [
       new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
       new BufferStackItem(Buffer.from('bbbb', 'hex')),
-    ],
+    ] as const,
   ]),
   referenceValues: new Map([
-    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
-    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))],
+    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))] as const,
+    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))] as const,
   ]),
 });
 
@@ -1386,20 +1386,29 @@ const OPCODES = ([
               [
                 new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
                 new BufferStackItem(Buffer.from('aaaa', 'hex')),
-              ],
+              ] as const,
               [
                 new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
                 new BufferStackItem(Buffer.from('bbbb', 'hex')),
-              ],
+              ] as const,
               [
                 new BufferStackItem(Buffer.from('dddd', 'hex')).toStructuralKey(),
                 new BufferStackItem(Buffer.from('dddd', 'hex')),
-              ],
+              ] as const,
             ]),
             referenceValues: new Map([
-              [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
-              [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))],
-              [new BufferStackItem(Buffer.from('dddd', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(5))],
+              [
+                new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
+                new IntegerStackItem(new BN(1)),
+              ] as const,
+              [
+                new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
+                new IntegerStackItem(new BN(2)),
+              ] as const,
+              [
+                new BufferStackItem(Buffer.from('dddd', 'hex')).toStructuralKey(),
+                new IntegerStackItem(new BN(5)),
+              ] as const,
             ]),
           }),
         ],
@@ -1531,10 +1540,13 @@ const OPCODES = ([
               [
                 new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
                 new BufferStackItem(Buffer.from('aaaa', 'hex')),
-              ],
+              ] as const,
             ]),
             referenceValues: new Map([
-              [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
+              [
+                new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
+                new IntegerStackItem(new BN(1)),
+              ] as const,
             ]),
           }),
         ],

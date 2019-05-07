@@ -451,7 +451,7 @@ describe('LocalUserAccountProvider', () => {
       const invocationData = factory.createRawInvocationData();
       getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
-      const result = await provider.invoke(keys[1].address, 'foo', [true], [['firstArg', true]], verify, {
+      const result = await provider.invoke(keys[1].address, 'foo', [true], [['firstArg', true] as const], verify, {
         systemFee: new BigNumber(-1),
       });
       const confirmResult = await result.confirmed();

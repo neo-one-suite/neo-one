@@ -19,7 +19,7 @@ interface Line {
 export const disassembleByteCode = (bytes: Buffer): readonly Line[] => {
   const reader = new BinaryReader(bytes);
 
-  const mutableResult: Array<[number, OpCode | 'UNKNOWN', string | undefined]> = [];
+  const mutableResult: Array<readonly [number, OpCode | 'UNKNOWN', string | undefined]> = [];
   // tslint:disable-next-line no-loop-statement
   while (reader.hasMore()) {
     const pc = reader.index;
@@ -43,15 +43,15 @@ export const disassembleByteCode = (bytes: Buffer): readonly Line[] => {
       } else {
         numBytes = reader.readInt32LE();
       }
-      mutableResult.push([pc, opCode, createHexString(reader.readBytes(numBytes))]);
+      mutableResult.push([pc, opCode, createHexString(reader.readBytes(numBytes))] as const);
     } else if (byte === Op.JMP || byte === Op.JMPIF || byte === Op.JMPIFNOT || byte === Op.CALL) {
-      mutableResult.push([pc, opCode, `${reader.readInt16LE()}`]);
+      mutableResult.push([pc, opCode, `${reader.readInt16LE()}`] as const);
     } else if (byte === Op.APPCALL || byte === Op.TAILCALL) {
       const mutableAppBytes = [...reader.readBytes(20)];
       mutableAppBytes.reverse();
-      mutableResult.push([pc, opCode, createHexString(Buffer.from(mutableAppBytes))]);
+      mutableResult.push([pc, opCode, createHexString(Buffer.from(mutableAppBytes))] as const);
     } else if (byte === Op.SYSCALL) {
-      mutableResult.push([pc, opCode, utils.toASCII(reader.readVarBytesLE(252))]);
+      mutableResult.push([pc, opCode, utils.toASCII(reader.readVarBytesLE(252))] as const);
       // tslint:disable-next-line strict-type-predicate
     } else if (byte === Op.CALL_E || byte === Op.CALL_ET) {
       const returnValueCount = reader.readBytes(1);
@@ -64,13 +64,17 @@ export const disassembleByteCode = (bytes: Buffer): readonly Line[] => {
         `${createHexString(returnValueCount)} ${createHexString(parametersCount)} ${createHexString(
           Buffer.from(mutableAppBytes),
         )}`,
-      ]);
+      ] as const);
     } else if (byte === Op.CALL_ED || byte === Op.CALL_EDT || byte === Op.CALL_I) {
       const returnValueCount = reader.readBytes(1);
       const parametersCount = reader.readBytes(1);
-      mutableResult.push([pc, opCode, `${createHexString(returnValueCount)} ${createHexString(parametersCount)}`]);
+      mutableResult.push([
+        pc,
+        opCode,
+        `${createHexString(returnValueCount)} ${createHexString(parametersCount)}`,
+      ] as const);
     } else {
-      mutableResult.push([pc, opCode, undefined]);
+      mutableResult.push([pc, opCode, undefined] as const);
     }
   }
 

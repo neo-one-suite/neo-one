@@ -95,7 +95,10 @@ export class HDKeyStore<Identifier> implements KeyStore {
 
           return {
             accounts: nextAccounts,
-            scannedNetworks: acc === undefined ? new Set() : new Set([...acc.scannedNetworks].concat(networksFiltered)),
+            scannedNetworks:
+              acc === undefined
+                ? new Set<NetworkType>()
+                : new Set<NetworkType>([...acc.scannedNetworks].concat(networksFiltered)),
           };
         }),
         map(({ accounts }) => accounts),

@@ -246,16 +246,14 @@ export class NEOTrackerResource {
   }
 
   public getDebug(): DescribeTable {
-    const table: ReadonlyArray<[string, string]> = [['Data Path', this.dataPath]];
+    const table: ReadonlyArray<readonly [string, string]> = [['Data Path', this.dataPath] as const];
 
     return table.concat(
       Object.entries(this.toResource())
-        // tslint:disable-next-line no-unused
-        .filter(([key, val]) => typeof val !== 'function')
-        .map<[string, string]>(([key, val]) => [
-          key,
-          typeof val === 'string' ? val : JSON.stringify(val, undefined, 2),
-        ]),
+        .filter(([, val]) => typeof val !== 'function')
+        .map<readonly [string, string]>(
+          ([key, val]) => [key, typeof val === 'string' ? val : JSON.stringify(val, undefined, 2)] as const,
+        ),
     );
   }
 

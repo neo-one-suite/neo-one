@@ -85,10 +85,10 @@ export class NEOTrackerResourceType extends ResourceType<NEOTracker, NEOTrackerR
 
   public getDescribeTable(resource: NEOTracker): DescribeTable {
     return [
-      ['Name', resource.name],
-      ['Type', resource.network],
-      ['URL', resource.url],
-      ['Live', resource.live ? 'Yes' : 'No'],
+      ['Name', resource.name] as const,
+      ['Type', resource.network] as const,
+      ['URL', resource.url] as const,
+      ['Live', resource.live ? 'Yes' : 'No'] as const,
     ];
   }
 }

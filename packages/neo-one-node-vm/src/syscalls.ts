@@ -1858,6 +1858,7 @@ export const lookupSysCall = ({ context }: { readonly context: ExecutionContext 
     debugName = canonicalName;
   }
   const createCall = SYSCALLS_BY_HASH[key];
+  // tslint:disable-next-line: strict-type-predicates
   if (createCall === undefined) {
     throw new UnknownSysCallError(context, debugName);
   }
