@@ -19,7 +19,7 @@ interface Tokens {
   readonly [key: string]: string;
 }
 
-export async function getNetworkInfo(
+async function getNetworkInfo(
   network: string,
 ): Promise<{
   readonly height: number;
@@ -298,7 +298,7 @@ interface Options {
   readonly rpcURL: string;
 }
 
-export async function getDefaultInfo({ network }: Options): Promise<Info> {
+async function getDefaultInfo({ network }: Options): Promise<Info> {
   const outputs = await one.execute(`get wallet --network ${network} --json`);
   const wallets: ReadonlyArray<Info> = one
     .parseJSON(outputs)
@@ -317,7 +317,7 @@ export async function getDefaultInfo({ network }: Options): Promise<Info> {
   return { wallets };
 }
 
-export async function testBootstrap(
+async function testBootstrap(
   getCommand: (options: Options) => Promise<string>,
   numWallets: number,
   network: string,
@@ -380,3 +380,9 @@ export async function testBootstrap(
     testContracts({ readClient, tokens }),
   ]);
 }
+
+export const bootstrapTestUtils = {
+  testBootstrap,
+  getNetworkInfo,
+  getDefaultInfo,
+};
