@@ -16,7 +16,7 @@ export class FormatOnTypeAdapter extends Adapter implements monaco.languages.OnT
     options: monaco.languages.FormattingOptions,
     token: monaco.CancellationToken,
     // tslint:disable-next-line:readonly-array
-  ): monaco.Thenable<monaco.editor.ISingleEditOperation[]> {
+  ): monaco.Thenable<monaco.languages.TextEdit[]> {
     const resource = model.uri;
 
     return this.toPromise(
