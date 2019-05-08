@@ -2187,11 +2187,12 @@
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@types/app-root-dir/-/app-root-dir-0.1.0.tgz#ad0c090ea036b10f5cb4823d8e151495f23b271f"
 
-"@types/autoprefixer@9.4.0":
-  version "9.4.0"
-  resolved "https://registry.yarnpkg.com/@types/autoprefixer/-/autoprefixer-9.4.0.tgz#b72589130765cf8f7f403b9cec8ea81e507e759b"
-  integrity sha512-dN3gnhzPnDNmL0JckzmwPoEvqNTmIuvb/bRv73ku/TDqFBciBr4KtijA42Zbghkgxp5YomANvPphHOPeBQg+xw==
+"@types/autoprefixer@9.5.0":
+  version "9.5.0"
+  resolved "https://registry.yarnpkg.com/@types/autoprefixer/-/autoprefixer-9.5.0.tgz#aaf489be1bda03650717ef9cb01b8fc4d5eb1ad4"
+  integrity sha512-V5p6QSFDMlsNUOfRgCSbXcolHNkYgW0VsxBWg2RzZ3ckOSGvkmyCxj7cEkEM3GAJmepItITHhvHSXC0bLkrT9g==
   dependencies:
+    "@types/browserslist" "*"
     postcss "7.x.x"
 
 "@types/babel__code-frame@^7.0.0":
@@ -2261,6 +2262,11 @@
   dependencies:
     "@types/connect" "*"
     "@types/node" "*"
+
+"@types/browserslist@*":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@types/browserslist/-/browserslist-4.4.0.tgz#e2a5f7f8c7e97afb39f50812a77e5230d3ca2353"
+  integrity sha512-hrIjWSu7Hh96/rKlpChe58qHEwIZ0+F5Zf4QNdvSVP5LUXbaJM04g9tBjo702VTNqPZr5znEJeqNR3nAV3vJPg==
 
 "@types/bs58@^4.0.0":
   version "4.0.0"
@@ -2894,10 +2900,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@16.8.15", "@types/react@^16.8.2":
-  version "16.8.15"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.8.15.tgz#a76515fed5aa3e996603056f54427fec5f2a5122"
-  integrity sha512-dMhzw1rWK+wwJWvPp5Pk12ksSrm/z/C/+lOQbMZ7YfDQYnJ02bc0wtg4EJD9qrFhuxFrf/ywNgwTboucobJqQg==
+"@types/react@*", "@types/react@16.8.17", "@types/react@^16.8.2":
+  version "16.8.17"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.8.17.tgz#f287b76a5badb93bc9aa3f54521a3eb53d6c2374"
+  integrity sha512-pln3mgc6VfkNg92WXODul/ONo140huK9OMsx62GlBlZ2lvjNK86PQJhYMPLO1i66aF5O9OPyZefogvNltBIszA==
   dependencies:
     "@types/prop-types" "*"
     csstype "^2.2.0"
@@ -3020,10 +3026,10 @@
   dependencies:
     "@types/webpack" "*"
 
-"@types/webpack@*", "@types/webpack@4.4.29", "@types/webpack@^4.4.24":
-  version "4.4.29"
-  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.4.29.tgz#d2a1c1d8c071b06521d32cee1c6b33d704b54b2c"
-  integrity sha512-8KVp+cNy9OPYsa4jU6vWsBemn5ixJ0Durh95Cw/YpEKm5ks2ODhdXc4FG3Xc46KIbPrJolwY7mSZFNn1aU3hKg==
+"@types/webpack@*", "@types/webpack@4.4.31", "@types/webpack@^4.4.24":
+  version "4.4.31"
+  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.4.31.tgz#f59b9d8210cf4d2fd254fe6d1f5ba86e557867f5"
+  integrity sha512-WNALmv/wxy2+OoF7A5GD8BVotXnkuMHlojVWKj/neFHU3Ut2Azbu1A7Yi2Vr6eX3z+31XgR/dJ5NpX4pQZ7ieQ==
   dependencies:
     "@types/anymatch" "*"
     "@types/node" "*"
