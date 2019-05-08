@@ -33,7 +33,7 @@ export const getModel = (resource: monaco.Uri | string): monaco.editor.ITextMode
 export const convertTextChange = (
   model: monaco.editor.ITextModel,
   change: ts.TextChange,
-): monaco.editor.ISingleEditOperation => ({
+): monaco.languages.TextEdit => ({
   text: change.newText,
   range: textSpanToRange(model, change.span),
 });
@@ -42,7 +42,7 @@ export const convertAction = (
   model: monaco.editor.ITextModel,
   action: ts.CodeAction,
   // tslint:disable-next-line:readonly-array
-): monaco.editor.ISingleEditOperation[] =>
+): monaco.languages.TextEdit[] =>
   _.flatten(
     action.changes
       .filter((change) => change.fileName === model.uri.path)
