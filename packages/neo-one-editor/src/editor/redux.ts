@@ -20,13 +20,16 @@ export interface FileProblems {
 export interface EditorState {
   readonly console: {
     readonly open: boolean;
-    readonly problems: FileProblems;
-    readonly errorProblems: number;
-    readonly warningProblems: number;
+    // tslint:disable readonly-keyword
+    problems: FileProblems;
+    errorProblems: number;
+    warningProblems: number;
+    // tslint:enable readonly-keyword
     readonly output: ConsoleOutput;
     readonly outputOwner: string;
     readonly type: ConsoleType;
-    readonly testSuites: ReadonlyArray<TestSuite>;
+    // tslint:disable-next-line: readonly-array
+    readonly testSuites: TestSuite[];
     readonly selectedTestSuite?: string;
     readonly testsRunning: boolean;
   };
@@ -114,10 +117,13 @@ const reducer = reducerWithInitialState(createInitialState())
     }),
   )
   .case(setFileProblems, (state, { path, problems }) =>
-    produce(state, (draft) => {
+    produce<EditorState, EditorState>(state, (draft) => {
       const existingProblems = draft.console.problems[path] as ReadonlyArray<FileDiagnostic> | undefined;
       if (existingProblems === undefined || !_.isEqual(existingProblems, problems)) {
-        draft.console.problems[path] = [...problems];
+        draft.console.problems = {
+          ...draft.console.problems,
+          [path]: [...problems],
+        };
         const allProblems = _.flatten(Object.values(draft.console.problems));
         draft.console.errorProblems = allProblems.filter((problem) => problem.severity === 'error').length;
         draft.console.warningProblems = allProblems.filter((problem) => problem.severity === 'warning').length;
@@ -172,6 +178,7 @@ const reducer = reducerWithInitialState(createInitialState())
         if (foundTest !== undefined) {
           const index = testSuite.tests.indexOf(foundTest);
           if (index !== -1) {
+            // @ts-ignore
             // tslint:disable-next-line no-object-mutation no-array-mutation
             testSuite.tests[index] = {
               ...test,
