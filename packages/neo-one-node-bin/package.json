@@ -17,7 +17,7 @@
     "chokidar": "^3.0.0",
     "env-paths": "^2.0.0",
     "execa": "^1.0.0",
-    "fs-extra": "^7.0.1",
+    "fs-extra": "^8.0.0",
     "import-local": "^2.0.0",
     "rc": "^1.2.8",
     "rxjs": "^6.4.0",

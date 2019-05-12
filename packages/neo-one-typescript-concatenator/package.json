@@ -15,7 +15,7 @@
   "devDependencies": {
     "@neo-one/smart-contract-compiler-node": "^1.1.1",
     "app-root-dir": "1.0.2",
-    "fs-extra": "7.0.1",
+    "fs-extra": "8.0.0",
     "yargs": "13.2.2"
   },
   "sideEffects": false
