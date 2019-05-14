@@ -1891,6 +1891,45 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
+"@neo-one/cli@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@neo-one/cli/-/cli-1.1.1.tgz#83765bb480d1c1beea83ac30f7e0540fbedb9cd7"
+  integrity sha512-K/bVsbtJ0VOcYuLCQW0a4/Bttsar+Zb+iNX/iWbnlvSoH7EglRdTVZsfOfcqbRAt8nq/wVddyjuDf8/CzWZCUQ==
+  dependencies:
+    "@neo-one/monitor" "^1.1.0"
+    "@neo-one/server" "^1.1.1"
+    "@neo-one/server-client" "^1.1.1"
+    "@neo-one/server-plugin" "^1.1.1"
+    "@neo-one/server-plugin-neotracker" "^1.1.1"
+    "@neo-one/server-plugin-network" "^1.1.1"
+    "@neo-one/server-plugin-project" "^1.1.1"
+    "@neo-one/server-plugin-wallet" "^1.1.1"
+    "@neo-one/types" "^1.1.0"
+    "@neo-one/utils" "^1.1.0"
+    "@types/cli-table2" "^0.2.2"
+    "@types/env-paths" "^1.0.2"
+    "@types/fs-extra" "^5.0.4"
+    "@types/inquirer" "^6.0.0"
+    "@types/log-update" "^2.0.0"
+    "@types/ora" "^3.0.0"
+    "@types/triple-beam" "^1.3.0"
+    "@types/vorpal" "^1.11.0"
+    cli-table2 "^0.2.0"
+    env-paths "^2.0.0"
+    execa "^1.0.0"
+    fs-extra "^7.0.1"
+    import-local "^2.0.0"
+    inquirer "^6.2.2"
+    log-update "^3.0.0"
+    ora "^3.0.0"
+    rxjs "^6.4.0"
+    semver "^5.6.0"
+    source-map-support "^0.5.9"
+    triple-beam "^1.3.0"
+    tslib "^1.9.3"
+    vorpal "^1.12.0"
+    winston "^3.1.0"
+
 "@neo-one/ec-key@^0.0.4":
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/@neo-one/ec-key/-/ec-key-0.0.4.tgz#9ad27fda1ff3ad8194f62710f988c22ca7266839"
@@ -2447,6 +2486,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/fs-extra@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-7.0.0.tgz#9c4ad9e1339e7448a76698829def1f159c1b636c"
+  integrity sha512-ndoMMbGyuToTy4qB6Lex/inR98nPiNHacsgMPvy+zqMLgSxbt8VtWpDArpGp69h1fEDQHn1KB+9DWD++wgbwYA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/glob@^7.1.1":
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.1.1.tgz#aa59a1c6e3fbc421e07ccd31a944c30eba521575"
@@ -2705,9 +2751,10 @@
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/@types/modernizr/-/modernizr-3.5.2.tgz#4fe495d99910b27bf41be65cc21e07e2ef727f33"
 
-"@types/nanoid@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@types/nanoid/-/nanoid-1.2.0.tgz#c0141cfec5b4818016355389b0bd539097d872ff"
+"@types/nanoid@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/nanoid/-/nanoid-2.0.0.tgz#b59002c475e6dfcc26e67ba563ff61b512e5ebf8"
+  integrity sha512-NtwPHfAyU3IDXdKAB2OMPpAauHBg9gUjpOYr3FAzI84D70nWdS8k5mryteLvT/s1ACeAFAkGg132/XJVN4qx/w==
   dependencies:
     "@types/node" "*"
 
@@ -2742,6 +2789,13 @@
 "@types/npm-package-arg@^6.1.0":
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/@types/npm-package-arg/-/npm-package-arg-6.1.0.tgz#88bdfce72f6a3d5fa1053c8d44d655e7850642e4"
+
+"@types/ora@^3.0.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@types/ora/-/ora-3.2.0.tgz#b2f65d1283a8f36d8b0f9ee767e0732a2f429362"
+  integrity sha512-jll99xUKpiFbIFZSQcxm4numfsLaOWBzWNaRk3PvTSE7BPqTzzOCFmS0mQ7m8qkTfmYhuYbehTGsxkvRLPC++w==
+  dependencies:
+    ora "*"
 
 "@types/pouchdb-adapter-fruitdown@*":
   version "6.1.2"
@@ -13325,16 +13379,7 @@ optjs@~3.2.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/optjs/-/optjs-3.2.2.tgz#69a6ce89c442a44403141ad2f9b370bd5bb6f4ee"
 
-ora@^0.2.3:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/ora/-/ora-0.2.3.tgz#37527d220adcd53c39b73571d754156d5db657a4"
-  dependencies:
-    chalk "^1.1.1"
-    cli-cursor "^1.0.2"
-    cli-spinners "^0.1.2"
-    object-assign "^4.0.1"
-
-ora@^3.4.0:
+ora@*, ora@^3.0.0, ora@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/ora/-/ora-3.4.0.tgz#bf0752491059a3ef3ed4c85097531de9fdbcd318"
   integrity sha512-eNwHudNbO1folBP3JsZ19v9azXWtQZjICdr3Q0TDPIaeBQ3mXLrh54wM+er0+hSp+dWKf+Z8KM58CYzEyIYxYg==
@@ -13345,6 +13390,15 @@ ora@^3.4.0:
     log-symbols "^2.2.0"
     strip-ansi "^5.2.0"
     wcwidth "^1.0.1"
+
+ora@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/ora/-/ora-0.2.3.tgz#37527d220adcd53c39b73571d754156d5db657a4"
+  dependencies:
+    chalk "^1.1.1"
+    cli-cursor "^1.0.2"
+    cli-spinners "^0.1.2"
+    object-assign "^4.0.1"
 
 ordered-read-streams@^1.0.0:
   version "1.0.1"

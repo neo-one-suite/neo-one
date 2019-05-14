@@ -12,7 +12,7 @@
     "@types/elegant-spinner": "^1.0.0",
     "@types/env-paths": "^1.0.2",
     "@types/figures": "^2.0.0",
-    "@types/fs-extra": "^5.0.4",
+    "@types/fs-extra": "^7.0.0",
     "@types/is-running": "^2.1.0",
     "@types/log-symbols": "^2.0.0",
     "@types/log-update": "^2.0.0",
