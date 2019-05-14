@@ -4,6 +4,8 @@ import { Blockchain } from '@neo-one/node-blockchain';
 import { test as testNet } from '@neo-one/node-neo-settings';
 import { storage } from '@neo-one/node-storage-levelup';
 import { vm } from '@neo-one/node-vm';
+import fs from 'fs-extra';
+import LevelDOWN from 'leveldown';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
 import { RawSourceMap } from 'source-map';
@@ -34,7 +36,7 @@ export const executeScript = async (
     settings: testNet(),
     storage: storage({
       context: { messageMagic: testNet().messageMagic },
-      db: LevelUp(MemDown()),
+      db: LevelUp(LevelDOWN('/Users/alexfrag/data/leveldowntest')),
     }),
     vm,
     monitor,
@@ -47,6 +49,7 @@ export const executeScript = async (
 
   const address = scriptHashToAddress(common.uInt160ToString(crypto.toScriptHash(code)));
   await blockchain.stop();
+  await fs.emptyDir('/Users/alexfrag/data/leveldowntest');
 
   return {
     receipt: {

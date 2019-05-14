@@ -390,19 +390,21 @@ type DeleteFunc<Key> = (key: Key) => Promise<void>;
 function createDelete<Key>({ cache }: { readonly cache: ReadStorageCache<Key, any, any> }): DeleteFunc<Key> {
   return async (key: Key): Promise<void> => {
     const currentValue = await cache.tryGet(key);
+    const keyString = cache.getKeyString(key);
+    const value = cache.mutableValues[keyString];
     if (
-      cache.mutableValues[cache.getKeyString(key)] !== undefined &&
-      cache.mutableValues[cache.getKeyString(key)].type === 'add' &&
+      value !== undefined &&
+      value.type === 'add' &&
       // tslint:disable-next-line no-any
-      (cache.mutableValues[cache.getKeyString(key)] as any).subType === 'add' &&
-      cache.mutableValues[cache.getKeyString(key)].transactionHash !== undefined &&
-      cache.mutableValues[cache.getKeyString(key)].transactionHash === cache.transactionHash
+      (value as any).subType === 'add' &&
+      value.transactionHash !== undefined &&
+      value.transactionHash === cache.transactionHash
     ) {
       // tslint:disable-next-line no-dynamic-delete no-object-mutation
-      delete cache.mutableValues[cache.getKeyString(key)];
+      delete cache.mutableValues[keyString];
     } else if (currentValue !== undefined) {
       // tslint:disable-next-line no-object-mutation
-      cache.mutableValues[cache.getKeyString(key)] = { type: 'delete', key, transactionHash: cache.transactionHash };
+      cache.mutableValues[keyString] = { type: 'delete', key, transactionHash: cache.transactionHash };
     }
   };
 }

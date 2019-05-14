@@ -17,7 +17,7 @@ import {
 } from '@neo-one/node-core';
 import BN from 'bn.js';
 import _ from 'lodash';
-import { assets, createBlockchain, testUtils, transactions } from '../__data__';
+import { assets, createBlockchain, factory, testUtils, transactions } from '../__data__';
 import { execute } from '../execute';
 
 const monitor = DefaultMonitor.create({
@@ -1353,6 +1353,111 @@ describe('execute', () => {
       const owners = await getOwners();
 
       await transfer(owners[0], owners[1], new BN(5));
+
+      testUtils.verifyListeners(listeners);
+    });
+  });
+
+  describe('Time Coin', () => {
+    const { timeCoinContract } = transactions;
+
+    const mockBlockchain = () => {
+      blockchain = createBlockchain({ contracts: [timeCoinContract] });
+
+      blockchain.header = {
+        get: jest.fn(() => factory.createHeader()),
+      };
+
+      blockchain.storageItem.getAll$ = jest.fn(() => []);
+    };
+
+    const deploy = async () =>
+      executeSetupScript(
+        new ScriptBuilder().emitAppCall(timeCoinContract.hash, 'contractDeploy').build(),
+        common.ONE_THOUSAND_FIXED8,
+      );
+
+    const setOtcApprove = async (arg: number, address: UInt160) => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder().emitAppCall(timeCoinContract.hash, 'setOtcApprove', address, arg).build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    const transferWithLockupPeriod = async (from: UInt160, to: UInt160, amount: BN, time: Buffer) => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder()
+            .emitAppCall(timeCoinContract.hash, 'transferWithLockupPeriod', from, to, amount, time)
+            .build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    const transfer = async (from: UInt160, to: UInt160, amount: BN) => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder().emitAppCall(timeCoinContract.hash, 'transfer', from, to, amount).build(),
+        }),
+      });
+
+      expectSuccess(result);
+    };
+
+    beforeEach(() => {
+      mockBlockchain();
+    });
+
+    const primaryAddressScriptHash = common.asUInt160(Buffer.from('7d2185c97fa43cb41c5617941c6b68d146a84ae5', 'hex'));
+    const altAddressScriptHash = common.asUInt160(Buffer.from('a48c1ae6617e509347e5a385624b15f8872c8802', 'hex'));
+
+    test.only('deploy & transfer', async () => {
+      const ret = await deploy();
+      expect(ret).toBeTruthy();
+      await setOtcApprove(0, primaryAddressScriptHash);
+      await setOtcApprove(1, primaryAddressScriptHash);
+      await transferWithLockupPeriod(
+        primaryAddressScriptHash,
+        altAddressScriptHash,
+        new BN(30000000000),
+        Buffer.from('8047cb5d', 'hex'),
+      );
+      await transferWithLockupPeriod(
+        primaryAddressScriptHash,
+        altAddressScriptHash,
+        new BN(40000000000),
+        Buffer.from('8091445e', 'hex'),
+      );
+      await transferWithLockupPeriod(
+        primaryAddressScriptHash,
+        altAddressScriptHash,
+        new BN(50000000000),
+        Buffer.from('0069a25d', 'hex'),
+      );
+      blockchain.storageItem.getAll$ = jest.fn(() => [
+        {
+          key: Buffer.from('6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403', 'hex'),
+          value: Buffer.from('800400000203b71403020500ac23fc06820102010d000500ac23fc06', 'hex'),
+        },
+        {
+          key: Buffer.from('6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802121503', 'hex'),
+          value: Buffer.from('800400000203121503020500902f5009820102010d000500902f5009', 'hex'),
+        },
+        {
+          key: Buffer.from('6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b61403', 'hex'),
+          value: Buffer.from('800400000203b61403020500743ba40b820102010d000500743ba40b', 'hex'),
+        },
+      ]);
+
+      await transfer(altAddressScriptHash, primaryAddressScriptHash, new BN(120000000000));
 
       testUtils.verifyListeners(listeners);
     });

@@ -369,6 +369,7 @@ const createPut = ({ name }: { readonly name: 'Neo.Storage.Put' | 'Neo.Storage.P
         name === 'Neo.Storage.Put' ? StorageFlags.None : assertStorageFlags(args[3].asBigIntegerUnsafe().toNumber());
       const item = await context.blockchain.storageItem.tryGet({ hash, key });
       if (item === undefined) {
+        // console.log(`adding: ${key.toString('hex')}: ${value.toString('hex')}`);
         await context.blockchain.storageItem.add(new StorageItem({ hash, key, value, flags }));
       } else if (hasStorageFlag(item.flags, StorageFlags.Constant)) {
         throw new ConstantStorageError(context, key);
@@ -1251,16 +1252,25 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     invoke: async ({ context, args }) => {
       const hash = vmUtils.toStorageContext({ context, value: args[0] }).value;
       await checkStorage({ context, hash });
-
+      // const item = await context.blockchain.storageItem.tryGet({
+      //   hash,
+      //   key: Buffer.from('7072656669788102020105000100', 'hex'),
+      // });
+      // console.log(item);
       const prefix = args[1].asBuffer();
+      // console.log(`looking for: ${prefix.toString('hex')}`);
       const iterable = AsyncIterableX.from<StorageItem>(context.blockchain.storageItem.getAll$({ hash, prefix })).pipe<{
         key: BufferStackItem;
         value: BufferStackItem;
       }>(
-        asyncMap(({ key, value }) => ({
-          key: new BufferStackItem(key),
-          value: new BufferStackItem(value),
-        })),
+        asyncMap(({ key, value }) => {
+          // console.log(`found: ${key.toString('hex')}: ${value.toString('hex')}`);
+
+          return {
+            key: new BufferStackItem(key),
+            value: new BufferStackItem(value),
+          };
+        }),
       );
 
       return {

@@ -3017,6 +3017,3327 @@ exports[`execute NEX Token transfer 63`] = `Array []`;
 
 exports[`execute NEX Token transfer 64`] = `Array []`;
 
+exports[`execute Time Coin deploy & transfer 1`] = `"0"`;
+
+exports[`execute Time Coin deploy & transfer 2`] = `"contract.get"`;
+
+exports[`execute Time Coin deploy & transfer 3`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 4`] = `"storageItem.add"`;
+
+exports[`execute Time Coin deploy & transfer 5`] = `
+Array [
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "01",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "746f74616c546f6b656e537570706c79",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 6`] = `"storageItem.update"`;
+
+exports[`execute Time Coin deploy & transfer 7`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 8`] = `"storageItem.get"`;
+
+exports[`execute Time Coin deploy & transfer 9`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 10`] = `"storageItem.tryGet"`;
+
+exports[`execute Time Coin deploy & transfer 11`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "746f74616c546f6b656e537570706c79",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 12`] = `"storageItem.delete"`;
+
+exports[`execute Time Coin deploy & transfer 13`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 14`] = `"storageItem.getAll$"`;
+
+exports[`execute Time Coin deploy & transfer 15`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 16`] = `"action.add"`;
+
+exports[`execute Time Coin deploy & transfer 17`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 18`] = `"header.get"`;
+
+exports[`execute Time Coin deploy & transfer 19`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 20`] = `"0"`;
+
+exports[`execute Time Coin deploy & transfer 21`] = `"contract.get"`;
+
+exports[`execute Time Coin deploy & transfer 22`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 23`] = `"storageItem.add"`;
+
+exports[`execute Time Coin deploy & transfer 24`] = `
+Array [
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "01",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "746f74616c546f6b656e537570706c79",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 25`] = `"storageItem.update"`;
+
+exports[`execute Time Coin deploy & transfer 26`] = `
+Array [
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "",
+    },
+    Object {
+      "flags": 0,
+      "value": "01",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 27`] = `"storageItem.get"`;
+
+exports[`execute Time Coin deploy & transfer 28`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 29`] = `"storageItem.tryGet"`;
+
+exports[`execute Time Coin deploy & transfer 30`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "746f74616c546f6b656e537570706c79",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 31`] = `"storageItem.delete"`;
+
+exports[`execute Time Coin deploy & transfer 32`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 33`] = `"storageItem.getAll$"`;
+
+exports[`execute Time Coin deploy & transfer 34`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 35`] = `"action.add"`;
+
+exports[`execute Time Coin deploy & transfer 36`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 37`] = `"header.get"`;
+
+exports[`execute Time Coin deploy & transfer 38`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 39`] = `"0"`;
+
+exports[`execute Time Coin deploy & transfer 40`] = `"contract.get"`;
+
+exports[`execute Time Coin deploy & transfer 41`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 42`] = `"storageItem.add"`;
+
+exports[`execute Time Coin deploy & transfer 43`] = `
+Array [
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "01",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "746f74616c546f6b656e537570706c79",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00ac23fc06",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "800400000203b71403020500ac23fc06820102010d000500ac23fc06",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 44`] = `"storageItem.update"`;
+
+exports[`execute Time Coin deploy & transfer 45`] = `
+Array [
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "",
+    },
+    Object {
+      "flags": 0,
+      "value": "01",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+    Object {
+      "flags": 0,
+      "value": "0054489cf6f0e107",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 46`] = `"storageItem.get"`;
+
+exports[`execute Time Coin deploy & transfer 47`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 48`] = `"storageItem.tryGet"`;
+
+exports[`execute Time Coin deploy & transfer 49`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "746f74616c546f6b656e537570706c79",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 50`] = `"storageItem.delete"`;
+
+exports[`execute Time Coin deploy & transfer 51`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 52`] = `"storageItem.getAll$"`;
+
+exports[`execute Time Coin deploy & transfer 53`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "prefix": "6c6f636b7570735f7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "prefix": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 54`] = `"action.add"`;
+
+exports[`execute Time Coin deploy & transfer 55`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 56`] = `"header.get"`;
+
+exports[`execute Time Coin deploy & transfer 57`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 58`] = `"0"`;
+
+exports[`execute Time Coin deploy & transfer 59`] = `"contract.get"`;
+
+exports[`execute Time Coin deploy & transfer 60`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 61`] = `"storageItem.add"`;
+
+exports[`execute Time Coin deploy & transfer 62`] = `
+Array [
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "01",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "746f74616c546f6b656e537570706c79",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00ac23fc06",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "800400000203b71403020500ac23fc06820102010d000500ac23fc06",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802121503",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "800400000203121503020500902f5009820102010d000500902f5009",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 63`] = `"storageItem.update"`;
+
+exports[`execute Time Coin deploy & transfer 64`] = `
+Array [
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "",
+    },
+    Object {
+      "flags": 0,
+      "value": "01",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+    Object {
+      "flags": 0,
+      "value": "0054489cf6f0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": undefined,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "0054489cf6f0e107",
+    },
+    Object {
+      "flags": 0,
+      "value": "00c4184cedf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00ac23fc06",
+    },
+    Object {
+      "flags": 0,
+      "value": "003c534c10",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 65`] = `"storageItem.get"`;
+
+exports[`execute Time Coin deploy & transfer 66`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 67`] = `"storageItem.tryGet"`;
+
+exports[`execute Time Coin deploy & transfer 68`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "746f74616c546f6b656e537570706c79",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802121503",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802121503",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 69`] = `"storageItem.delete"`;
+
+exports[`execute Time Coin deploy & transfer 70`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 71`] = `"storageItem.getAll$"`;
+
+exports[`execute Time Coin deploy & transfer 72`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "prefix": "6c6f636b7570735f7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "prefix": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "prefix": "6c6f636b7570735f7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "prefix": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 73`] = `"action.add"`;
+
+exports[`execute Time Coin deploy & transfer 74`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 75`] = `"header.get"`;
+
+exports[`execute Time Coin deploy & transfer 76`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 77`] = `"0"`;
+
+exports[`execute Time Coin deploy & transfer 78`] = `"contract.get"`;
+
+exports[`execute Time Coin deploy & transfer 79`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 80`] = `"storageItem.add"`;
+
+exports[`execute Time Coin deploy & transfer 81`] = `
+Array [
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "01",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "746f74616c546f6b656e537570706c79",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00ac23fc06",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "800400000203b71403020500ac23fc06820102010d000500ac23fc06",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802121503",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "800400000203121503020500902f5009820102010d000500902f5009",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b61403",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "800400000203b61403020500743ba40b820102010d000500743ba40b",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 82`] = `"storageItem.update"`;
+
+exports[`execute Time Coin deploy & transfer 83`] = `
+Array [
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "",
+    },
+    Object {
+      "flags": 0,
+      "value": "01",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+    Object {
+      "flags": 0,
+      "value": "0054489cf6f0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": undefined,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "0054489cf6f0e107",
+    },
+    Object {
+      "flags": 0,
+      "value": "00c4184cedf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00ac23fc06",
+    },
+    Object {
+      "flags": 0,
+      "value": "003c534c10",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": undefined,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00c4184cedf0e107",
+    },
+    Object {
+      "flags": 0,
+      "value": "0050dda7e1f0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": undefined,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "003c534c10",
+    },
+    Object {
+      "flags": 0,
+      "value": "00b08ef01b",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 84`] = `"storageItem.get"`;
+
+exports[`execute Time Coin deploy & transfer 85`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 86`] = `"storageItem.tryGet"`;
+
+exports[`execute Time Coin deploy & transfer 87`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "746f74616c546f6b656e537570706c79",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802121503",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802121503",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b61403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b61403",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 88`] = `"storageItem.delete"`;
+
+exports[`execute Time Coin deploy & transfer 89`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 90`] = `"storageItem.getAll$"`;
+
+exports[`execute Time Coin deploy & transfer 91`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "prefix": "6c6f636b7570735f7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "prefix": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "prefix": "6c6f636b7570735f7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "prefix": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "prefix": "6c6f636b7570735f7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "prefix": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 92`] = `"action.add"`;
+
+exports[`execute Time Coin deploy & transfer 93`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 94`] = `"header.get"`;
+
+exports[`execute Time Coin deploy & transfer 95`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 96`] = `"0"`;
+
+exports[`execute Time Coin deploy & transfer 97`] = `"contract.get"`;
+
+exports[`execute Time Coin deploy & transfer 98`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 99`] = `"storageItem.add"`;
+
+exports[`execute Time Coin deploy & transfer 100`] = `
+Array [
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "01",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "746f74616c546f6b656e537570706c79",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00ac23fc06",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "800400000203b71403020500ac23fc06820102010d000500ac23fc06",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802121503",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "800400000203121503020500902f5009820102010d000500902f5009",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b61403",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "800400000203b61403020500743ba40b820102010d000500743ba40b",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 101`] = `"storageItem.update"`;
+
+exports[`execute Time Coin deploy & transfer 102`] = `
+Array [
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "",
+    },
+    Object {
+      "flags": 0,
+      "value": "01",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00006c98fdf0e107",
+    },
+    Object {
+      "flags": 0,
+      "value": "0054489cf6f0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": undefined,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "0054489cf6f0e107",
+    },
+    Object {
+      "flags": 0,
+      "value": "00c4184cedf0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": 0,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00ac23fc06",
+    },
+    Object {
+      "flags": 0,
+      "value": "003c534c10",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": undefined,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "00c4184cedf0e107",
+    },
+    Object {
+      "flags": 0,
+      "value": "0050dda7e1f0e107",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": undefined,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "003c534c10",
+    },
+    Object {
+      "flags": 0,
+      "value": "00b08ef01b",
+    },
+  ],
+  Array [
+    StorageItem {
+      "equals": [Function],
+      "flags": undefined,
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "0050dda7e1f0e107",
+    },
+    Object {
+      "flags": 0,
+      "value": "00006c98fdf0e107",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 103`] = `"storageItem.get"`;
+
+exports[`execute Time Coin deploy & transfer 104`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 105`] = `"storageItem.tryGet"`;
+
+exports[`execute Time Coin deploy & transfer 106`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "746f74616c546f6b656e537570706c79",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e7472616374496e697454696d65",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "636f6e747261637441646d696e",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802121503",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802121503",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b61403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b61403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6f7463417070726f7665645f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802121503",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b61403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f007d2185c97fa43cb41c5617941c6b68d146a84ae5",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 107`] = `"storageItem.delete"`;
+
+exports[`execute Time Coin deploy & transfer 108`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b71403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802121503",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802b61403",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "key": "62616c616e63655f00a48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 109`] = `"storageItem.getAll$"`;
+
+exports[`execute Time Coin deploy & transfer 110`] = `
+Array [
+  Array [
+    Object {
+      "hash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+      "prefix": "6c6f636b7570735fa48c1ae6617e509347e5a385624b15f8872c8802",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 111`] = `"action.add"`;
+
+exports[`execute Time Coin deploy & transfer 112`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 113`] = `"header.get"`;
+
+exports[`execute Time Coin deploy & transfer 114`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+  Array [
+    Object {
+      "hashOrIndex": 0,
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 115`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "7472616e73666572",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "00006c98fdf0e107",
+        },
+      ],
+      "scriptHash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "7472616e73666572",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "a48c1ae6617e509347e5a385624b15f8872c8802",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "00ac23fc06",
+        },
+      ],
+      "scriptHash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "7472616e73666572",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "a48c1ae6617e509347e5a385624b15f8872c8802",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "00902f5009",
+        },
+      ],
+      "scriptHash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "7472616e73666572",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "a48c1ae6617e509347e5a385624b15f8872c8802",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "00743ba40b",
+        },
+      ],
+      "scriptHash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "7472616e73666572",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "a48c1ae6617e509347e5a385624b15f8872c8802",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "7d2185c97fa43cb41c5617941c6b68d146a84ae5",
+        },
+        Object {
+          "__$type": "ByteArrayContractParameter",
+          "type": 5,
+          "value": "00b08ef01b",
+        },
+      ],
+      "scriptHash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 116`] = `
+Array [
+  Array [
+    Object {
+      "message": "ContractDeploy is success.",
+      "scriptHash": "d471621ecc3fb072a3a754254ba00b8ed0affa2f",
+    },
+  ],
+]
+`;
+
+exports[`execute Time Coin deploy & transfer 117`] = `Array []`;
+
+exports[`execute Time Coin deploy & transfer 118`] = `Array []`;
+
 exports[`execute Wowbit token deploy - negative buffer conversion works properly 1`] = `"contract.get"`;
 
 exports[`execute Wowbit token deploy - negative buffer conversion works properly 2`] = `

@@ -27,11 +27,21 @@ interface StorageMismatch {
 
 const NEO_STORAGE_AUDIT_PATH = path.resolve(os.homedir(), 'data', 'neo-storage-audit');
 
+// const FIRST_STORAGE = {
+//   folder: 'BlockStorage_1500000',
+//   file: 'dump-block-1445000.json',
+//   index: 1444843,
+// };
+
 const FIRST_STORAGE = {
-  folder: 'BlockStorage_1500000',
-  file: 'dump-block-1445000.json',
-  index: 1444843,
+  folder: 'BlockStorage_3500000',
+  file: 'dump-block-3495627.json',
+  index: 3500000,
 };
+
+const LOG_FILE = path.resolve(__dirname, 'log.json');
+
+const CHUNK_SIZE = 1;
 
 const oneRPCURL = 'http://localhost:40200/rpc';
 const oneProvider = new NEOONEDataProvider({
@@ -39,7 +49,7 @@ const oneProvider = new NEOONEDataProvider({
   rpcURL: oneRPCURL,
 });
 
-const reverse = (src: Buffer): Buffer => {
+export const reverse = (src: Buffer): Buffer => {
   const mutableOut = Buffer.allocUnsafe(src.length);
   // tslint:disable-next-line no-loop-statement
   for (let i = 0, j = src.length - 1; i <= j; i += 1, j -= 1) {
@@ -93,46 +103,73 @@ const getNEOStorageChanges = (block: StorageAuditBlock) =>
   sortChanges(block.storage.map(getNEOStorageChangesForChange));
 
 const getOneStorageChanges = (block: Block): ReadonlyArray<RawStorageChange> => {
-  const storageChanges = block.transactions
+  // const storageChanges = block.transactions
+  //   .filter(
+  //     (transaction): transaction is ConfirmedInvocationTransaction => transaction.type === 'InvocationTransaction',
+  //   )
+  //   .map((invocation) => invocation.invocationData.storageChanges);
+
+  block.transactions
     .filter(
       (transaction): transaction is ConfirmedInvocationTransaction => transaction.type === 'InvocationTransaction',
     )
-    .map((invocation) => invocation.invocationData.storageChanges);
-
-  const storageChangeAdds: { [K: string]: number } = {};
-  const storageChangesByKey = _.flatten(storageChanges).reduce<{ [key: string]: RawStorageChange }>(
-    (acc, storageChange) => {
-      const storageChangeKey = `${storageChange.address}:${storageChange.key}`;
-      const netAdd = storageChangeAdds[storageChangeKey];
-      if ((netAdd as number | undefined) === undefined) {
-        storageChangeAdds[storageChangeKey] = 0;
-      }
-      if (storageChange.type === 'Add' && netAdd !== 1) {
-        storageChangeAdds[storageChangeKey] += 1;
-      }
-      if (storageChange.type === 'Delete' && netAdd !== -1) {
-        storageChangeAdds[storageChangeKey] -= 1;
-      }
-
+    .forEach((invocation) => {
       if (
-        Object.keys(acc).includes(storageChangeKey) &&
-        storageChangeAdds[storageChangeKey] === 0 &&
-        storageChange.type === 'Delete'
+        invocation.script.includes(
+          `67${reverse(Buffer.from('a0777c3ce2b169d4a23bcba4565e3225a0122d95', 'hex')).toString('hex')}`,
+        )
       ) {
-        // tslint:disable-next-line:no-dynamic-delete
-        delete acc[storageChangeKey];
-      } else {
-        acc[storageChangeKey] = storageChange;
+        invocation.invocationData.storageChanges.forEach((change) => {
+          const oldLogs = fs.readJsonSync(LOG_FILE);
+          Object.keys(oldLogs).forEach((key) => {
+            if (change.key.includes(key)) {
+              console.log(invocation.invocationData);
+              const newLogs = {
+                ...oldLogs,
+                [key]: [...oldLogs[key], invocation],
+              };
+              fs.writeJsonSync(LOG_FILE, newLogs);
+              console.log('Added to log.');
+            }
+          });
+        });
       }
+    });
 
-      return acc;
-    },
-    {},
-  );
+  // const storageChangeAdds: { [K: string]: number } = {};
+  // const storageChangesByKey = _.flatten(storageChanges).reduce<{ [key: string]: RawStorageChange }>(
+  //   (acc, storageChange) => {
+  //     const storageChangeKey = `${storageChange.address}:${storageChange.key}`;
+  //     const netAdd = storageChangeAdds[storageChangeKey];
+  //     if ((netAdd as number | undefined) === undefined) {
+  //       storageChangeAdds[storageChangeKey] = 0;
+  //     }
+  //     if (storageChange.type === 'Add' && netAdd !== 1) {
+  //       storageChangeAdds[storageChangeKey] += 1;
+  //     }
+  //     if (storageChange.type === 'Delete' && netAdd !== -1) {
+  //       storageChangeAdds[storageChangeKey] -= 1;
+  //     }
 
-  return sortChanges(Object.values(storageChangesByKey)).map((value) =>
-    value.type === 'Add' || value.type === 'Modify' ? { ...value, type: 'Add' as 'Add' } : value,
-  );
+  //     if (
+  //       Object.keys(acc).includes(storageChangeKey) &&
+  //       storageChangeAdds[storageChangeKey] === 0 &&
+  //       storageChange.type === 'Delete'
+  //     ) {
+  //       // tslint:disable-next-line:no-dynamic-delete
+  //       delete acc[storageChangeKey];
+  //     } else {
+  //       acc[storageChangeKey] = storageChange;
+  //     }
+
+  //     return acc;
+  //   },
+  //   {},
+  // );
+
+  // return sortChanges(Object.values(storageChangesByKey)).map((value) =>
+  //   value.type === 'Add' || value.type === 'Modify' ? { ...value, type: 'Add' as 'Add' } : value,
+  // );
 };
 
 const compareStorageChangeForBlock = async (auditBlock: StorageAuditBlock): Promise<StorageMismatch | undefined> => {
@@ -244,7 +281,36 @@ const iterDirs = async () => {
   }
 };
 
-iterDirs().catch((error) => {
+const iterChunk = async (count: number) => {
+  const nextBlocks = Array.from({ length: CHUNK_SIZE }, (_value, key) => key + count);
+  await Promise.all(
+    nextBlocks.map(async (blockCount) => {
+      const block = await oneProvider.getBlock(blockCount);
+      await getOneStorageChanges(block);
+    }),
+  );
+};
+
+const iterChain = async () => {
+  let count = FIRST_STORAGE.index;
+  const blockHeight = await oneProvider.getBlockCount();
+  // tslint:disable-next-line no-loop-statement
+  while (count < blockHeight) {
+    await iterChunk(count);
+    count += CHUNK_SIZE;
+    if (count % 1000 === 0) {
+      console.log(`Processed ${count} blocks.`);
+    }
+  }
+};
+
+// iterDirs().catch((error) => {
+//   // tslint:disable-next-line:no-console
+//   console.error(error);
+//   process.exit(1);
+// });
+
+iterChain().catch((error) => {
   // tslint:disable-next-line:no-console
   console.error(error);
   process.exit(1);

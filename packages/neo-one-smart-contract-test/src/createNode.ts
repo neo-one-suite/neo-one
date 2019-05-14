@@ -2,6 +2,8 @@ import { common, crypto, privateKeyToScriptHash, wifToPrivateKey } from '@neo-on
 import { FullNode } from '@neo-one/node';
 import { createMain } from '@neo-one/node-neo-settings';
 import { constants } from '@neo-one/utils';
+import fs from 'fs-extra';
+import LevelDown from 'leveldown';
 import _ from 'lodash';
 import MemDown from 'memdown';
 import { BehaviorSubject } from 'rxjs';
@@ -10,13 +12,15 @@ import { getMonitor } from './getMonitor';
 
 const getPort = () => _.random(10000, 50000);
 
-export const createNode = async (omitCleanup = false) => {
+export const createNode = async (omitCleanup = false, useLeveldown = false) => {
   const port = getPort();
   const privateKey = wifToPrivateKey(constants.PRIVATE_NET_PRIVATE_KEY);
   crypto.addPublicKey(
     common.stringToPrivateKey(wifToPrivateKey(constants.PRIVATE_NET_PRIVATE_KEY)),
     common.stringToECPoint(constants.PRIVATE_NET_PUBLIC_KEY),
   );
+  const dataPath = '/Users/alexfrag/data/leveldowntest';
+  const leveldown = LevelDown(dataPath);
 
   const node = new FullNode(
     {
@@ -46,7 +50,7 @@ export const createNode = async (omitCleanup = false) => {
           },
         },
       }),
-      leveldown: MemDown(),
+      leveldown: useLeveldown ? leveldown : MemDown(),
     },
     /* istanbul ignore next */
     (error) => {
@@ -58,6 +62,7 @@ export const createNode = async (omitCleanup = false) => {
   );
   if (!omitCleanup) {
     addCleanup(async () => node.stop());
+    addCleanup(async () => fs.emptyDir(dataPath));
   }
   await node.start();
 
