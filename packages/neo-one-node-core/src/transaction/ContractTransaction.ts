@@ -1,4 +1,5 @@
 import { ContractTransactionJSON, InvalidFormatError, IOHelper, TransactionBaseModel } from '@neo-one/client-common';
+import { Constructor } from '@neo-one/utils';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { utils } from '../utils';
 import { Witness } from '../Witness';

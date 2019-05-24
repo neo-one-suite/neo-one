@@ -138,7 +138,7 @@
     "readonly-keyword": [true, "ignore-local", {"ignore-prefix": ["mutable", "this.mutable", "draft"] }],
     "readonly-array": [true, "ignore-local", {"ignore-prefix": ["mutable", "this.mutable", "draft"] }],
     "no-let": [true, "ignore-local"],
-    "no-array-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "ctx.mutable", "draft"] }],
+    "no-array-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "ctx.mutable", "draft"] }, "ignore-new-array"],
     "no-object-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "app.proxy", "app.silent", "ctx.", "draft", "$el"] }],
     "no-method-signature": true,
     "no-loop-statement": true,

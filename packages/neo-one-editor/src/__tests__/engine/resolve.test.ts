@@ -1,6 +1,8 @@
 import { FileSystem } from '@neo-one/local-browser';
 import { resolve } from '../../engine/remote/resolve';
 
+type JestMocked<T> = { [K in keyof T]: jest.Mock<T[K]> };
+
 const createErrorWithCode = (code: string) => {
   const error = new Error(code);
   // tslint:disable-next-line no-any no-object-mutation

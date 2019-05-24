@@ -1,5 +1,6 @@
 // tslint:disable no-object-mutation
 import { RawAction, UserAccountProvider } from '@neo-one/client-common';
+import { Modifiable } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable';
 import { of, of as _of } from 'rxjs';
 import { factory, keys } from '../__data__';

@@ -1,3 +1,5 @@
+/// <reference types="@neo-one/types/e2e"/>
+
 import { common, crypto, privateKeyToAddress } from '@neo-one/client-common';
 import { LocalKeyStore, LocalMemoryStore, NEOONEProvider } from '@neo-one/client-core';
 import { Client, LocalUserAccountProvider, ReadClient } from '@neo-one/client-full-core';

@@ -1,7 +1,8 @@
 import { CompileContractResult } from '@neo-one/smart-contract-compiler';
+import { OmitStrict } from '@neo-one/utils';
 import { RawSourceMap } from 'source-map';
 
-export type ContractResult = Omit<CompileContractResult, 'sourceMap'> & {
+export type ContractResult = OmitStrict<CompileContractResult, 'sourceMap'> & {
   readonly filePath: string;
   readonly name: string;
   readonly sourceMap: RawSourceMap;

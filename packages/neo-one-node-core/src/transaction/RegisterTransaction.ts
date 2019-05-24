@@ -11,6 +11,7 @@ import {
   UInt160,
   UInt160Hex,
 } from '@neo-one/client-common';
+import { Constructor } from '@neo-one/utils';
 import BN from 'bn.js';
 import { assertAssetType, AssetType, toJSONAssetType } from '../AssetType';
 import { VerifyError } from '../errors';

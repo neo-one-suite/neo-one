@@ -23,7 +23,7 @@ import { GetCLIResourceOptions, InteractiveCLI, InteractiveCLIArgs } from '@neo-
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
 import { compileContract, CompileContractResult } from '@neo-one/smart-contract-compiler';
 import { createCompilerHost } from '@neo-one/smart-contract-compiler-node';
-import { utils } from '@neo-one/utils';
+import { OmitStrict, utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
@@ -774,7 +774,7 @@ const findContracts = async (current: string): Promise<string> => {
   return findContracts(path.dirname(current));
 };
 
-type ContractResult = Omit<CompileContractResult, 'sourceMap'> & {
+type ContractResult = OmitStrict<CompileContractResult, 'sourceMap'> & {
   readonly sourceMap: RawSourceMap;
 };
 

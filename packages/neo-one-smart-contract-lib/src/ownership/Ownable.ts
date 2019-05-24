@@ -1,4 +1,4 @@
-import { Address, SmartContract, createEventNotifier } from '@neo-one/smart-contract';
+import { Address, createEventNotifier, SmartContract } from '@neo-one/smart-contract';
 
 const notifyTransferOwnership = createEventNotifier<Address, Address>('transfer_ownership', 'from', 'to');
 

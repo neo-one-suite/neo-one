@@ -6,6 +6,7 @@ import {
   TransactionBaseModel,
 } from '@neo-one/client-common';
 import { serializeContractWireBase } from '@neo-one/client-full-common';
+import { Constructor } from '@neo-one/utils';
 import { Contract, deserializeContractWireBase, sizeOfContract } from '../Contract';
 import { VerifyError } from '../errors';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';

@@ -15,6 +15,7 @@ import { DeveloperClient, LocalKeyStore, LocalWallet, NEOONEDataProvider, SmartC
 import { Client, InvokeExecuteTransactionOptions, ReadClient } from '@neo-one/client-full-core';
 import { createCompilerHost, pathResolve } from '@neo-one/smart-contract-compiler-node';
 import { tsUtils } from '@neo-one/ts-utils';
+import { Modifiable } from '@neo-one/utils';
 import * as appRootDir from 'app-root-dir';
 import BigNumber from 'bignumber.js';
 import ts from 'typescript';

@@ -1,6 +1,6 @@
 // tslint:disable no-any no-array-mutation
 import ECKey from '@neo-one/ec-key';
-import { utils } from '@neo-one/utils';
+import { Constructor, utils } from '@neo-one/utils';
 import BN from 'bn.js';
 import base58 from 'bs58';
 import xor from 'buffer-xor';

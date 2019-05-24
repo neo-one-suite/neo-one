@@ -1,5 +1,6 @@
-import { ABI, Contract, privateKeyToAddress, UserAccountID, wifToPrivateKey } from '@neo-one/client-common';
+/// <reference types="@neo-one/types/e2e"/>
 
+import { ABI, Contract, privateKeyToAddress, UserAccountID, wifToPrivateKey } from '@neo-one/client-common';
 import { DeveloperClient, Hash256, LocalKeyStore, LocalMemoryStore, NEOONEProvider } from '@neo-one/client-core';
 import { Client, LocalUserAccountProvider } from '@neo-one/client-full-core';
 import { Network } from '@neo-one/server-plugin-network';

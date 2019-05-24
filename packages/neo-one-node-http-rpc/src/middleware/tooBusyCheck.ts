@@ -1,14 +1,9 @@
 import { Context } from 'koa';
 // tslint:disable next-line match-default-export-name
 import tooBusy from 'toobusy-js';
+import { TooBusyCheckOptions } from './tooBusyCheckOptions';
 
-export interface Options {
-  readonly interval?: number;
-  readonly maxLag?: number;
-  readonly smoothingFactor?: number;
-}
-
-export const tooBusyCheck = (options: Options) => {
+export const tooBusyCheck = (options: TooBusyCheckOptions) => {
   if (options.interval !== undefined) {
     tooBusy.interval(options.interval);
   }
