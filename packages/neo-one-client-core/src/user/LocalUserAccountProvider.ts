@@ -1,35 +1,23 @@
 import {
-  Account,
   AddressString,
   addressToScriptHash,
-  Attribute,
-  AttributeModel,
   AttributeUsageModel,
-  Block,
   ClaimTransaction,
   ClaimTransactionModel,
   common,
   crypto,
-  ForwardValue,
   GetOptions,
-  Hash256String,
-  Input,
   InputModel,
   InputOutput,
   InvocationTransaction,
   InvocationTransactionModel,
-  InvokeSendUnsafeReceiveTransactionOptions,
   IterOptions,
   NetworkType,
   Output,
   OutputModel,
   Param,
-  ParamJSON,
   RawAction,
   RawCallReceipt,
-  RawInvocationData,
-  RawInvokeReceipt,
-  RelayTransactionResult,
   ScriptBuilder,
   ScriptBuilderParam,
   SourceMaps,
@@ -54,21 +42,15 @@ import { labels as labelNames, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { Observable } from 'rxjs';
-import { clientUtils } from '../clientUtils';
 import {
-  FundsInUseError,
-  InsufficientFundsError,
-  InsufficientSystemFeeError,
   InvalidTransactionError,
   InvokeError,
-  NoAccountError,
   NothingToClaimError,
-  NothingToRefundError,
-  NothingToSendError,
   NothingToTransferError,
   UnknownAccountError,
 } from '../errors';
 import { converters } from './converters';
+import { InvokeRawOptions, Provider, UserAccountProviderBase } from './UserAccountProviderBase';
 
 export interface KeyStore {
   /**
@@ -115,63 +97,6 @@ export interface KeyStore {
   }) => Promise<string>;
 }
 
-export interface Provider {
-  readonly networks$: Observable<readonly NetworkType[]>;
-  readonly getNetworks: () => readonly NetworkType[];
-  readonly getUnclaimed: (
-    network: NetworkType,
-    address: AddressString,
-    monitor?: Monitor,
-  ) => Promise<{ readonly unclaimed: readonly Input[]; readonly amount: BigNumber }>;
-  readonly getUnspentOutputs: (
-    network: NetworkType,
-    address: AddressString,
-    monitor?: Monitor,
-  ) => Promise<readonly InputOutput[]>;
-  readonly relayTransaction: (
-    network: NetworkType,
-    transaction: string,
-    monitor?: Monitor,
-  ) => Promise<RelayTransactionResult>;
-  readonly getTransactionReceipt: (
-    network: NetworkType,
-    hash: Hash256String,
-    options?: GetOptions,
-  ) => Promise<TransactionReceipt>;
-  readonly getInvocationData: (
-    network: NetworkType,
-    hash: Hash256String,
-    monitor?: Monitor,
-  ) => Promise<RawInvocationData>;
-  readonly testInvoke: (network: NetworkType, transaction: string, monitor?: Monitor) => Promise<RawCallReceipt>;
-  readonly call: (
-    network: NetworkType,
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    monitor?: Monitor,
-  ) => Promise<RawCallReceipt>;
-  readonly getBlockCount: (network: NetworkType, monitor?: Monitor) => Promise<number>;
-  readonly getTransaction: (network: NetworkType, hash: Hash256String, monitor?: Monitor) => Promise<Transaction>;
-  readonly getOutput: (network: NetworkType, input: Input, monitor?: Monitor) => Promise<Output>;
-  readonly iterBlocks: (network: NetworkType, options?: IterOptions) => AsyncIterable<Block>;
-  readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
-  readonly iterActionsRaw?: (network: NetworkType, options?: IterOptions) => AsyncIterable<RawAction>;
-}
-
-interface TransactionOptionsFull {
-  readonly from: UserAccountID;
-  readonly attributes: readonly Attribute[];
-  readonly networkFee: BigNumber;
-  readonly systemFee: BigNumber;
-  readonly monitor?: Monitor;
-}
-
-const NEO_ONE_ATTRIBUTE: Attribute = {
-  usage: 'Remark15',
-  data: Buffer.from('neo-one', 'utf8').toString('hex'),
-};
-
 const NEO_TRANSFER_DURATION_SECONDS = metrics.createHistogram({
   name: 'neo_transfer_duration_seconds',
 });
@@ -198,39 +123,26 @@ const NEO_INVOKE_RAW_FAILURES_TOTAL = metrics.createCounter({
   labelNames: [labelNames.INVOKE_RAW_METHOD],
 });
 
-interface FullTransfer extends Transfer {
-  readonly from: UserAccountID;
-}
-
 /**
  * Implements `UserAccountProvider` using a `KeyStore` instance and a `Provider` instance.
  *
  * See the [LocalUserAccountProvider](https://neo-one.io/docs/user-accounts#LocalUserAccountProvider) section of the advanced guide for more details.
  */
 export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider extends Provider>
+  extends UserAccountProviderBase<TProvider>
   implements UserAccountProvider {
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;
   public readonly userAccounts$: Observable<readonly UserAccount[]>;
   public readonly networks$: Observable<readonly NetworkType[]>;
   public readonly keystore: TKeyStore;
-  public readonly provider: TProvider;
-  public readonly deleteUserAccount?: (id: UserAccountID) => Promise<void>;
-  public readonly updateUserAccountName?: (options: UpdateAccountNameOptions) => Promise<void>;
-  public readonly iterActionsRaw?: (network: NetworkType, options?: IterOptions) => AsyncIterable<RawAction>;
-  protected readonly mutableUsedOutputs: Set<string>;
-  protected mutableBlockCount: number;
 
-  public constructor(constructorOptions: { readonly keystore: TKeyStore; readonly provider: TProvider }) {
-    const { keystore, provider } = constructorOptions;
+  public constructor({ keystore, provider }: { readonly keystore: TKeyStore; readonly provider: TProvider }) {
+    super({ provider });
     this.keystore = keystore;
-    this.provider = provider;
 
     this.currentUserAccount$ = keystore.currentUserAccount$;
     this.userAccounts$ = keystore.userAccounts$;
     this.networks$ = provider.networks$;
-
-    this.mutableBlockCount = 0;
-    this.mutableUsedOutputs = new Set<string>();
 
     const deleteUserAccountIn = this.keystore.deleteUserAccount;
     if (deleteUserAccountIn !== undefined) {
@@ -266,18 +178,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     return this.provider.getNetworks();
   }
 
-  public iterBlocks(network: NetworkType, options?: IterOptions): AsyncIterable<Block> {
-    return this.provider.iterBlocks(network, options);
-  }
-
-  public async getBlockCount(network: NetworkType, monitor?: Monitor): Promise<number> {
-    return this.provider.getBlockCount(network, monitor);
-  }
-
-  public async getAccount(network: NetworkType, address: AddressString, monitor?: Monitor): Promise<Account> {
-    return this.provider.getAccount(network, address, monitor);
-  }
-
   public async transfer(
     transfers: readonly Transfer[],
     options?: TransactionOptions,
@@ -290,6 +190,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           transfers: transfers.map((transfer) => ({ from, ...transfer })),
           from,
           gas: networkFee,
+          provider: this.provider,
           monitor: span,
         });
 
@@ -335,6 +236,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             from,
             gas: networkFee,
             transfers: [],
+            provider: this.provider,
             monitor: span,
           }),
         ]);
@@ -377,245 +279,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     );
   }
 
-  public async invoke(
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    verify: boolean,
-    options: InvokeSendUnsafeReceiveTransactionOptions = {},
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
-    const { attributes = [] } = options;
-    const transactionOptions = this.getTransactionOptions(options);
-    const { from } = transactionOptions;
-
-    const send = options.sendFrom === undefined ? [] : options.sendFrom;
-    const receive = options.sendTo === undefined ? [] : options.sendTo;
-    const contractID: UserAccountID = {
-      address: contract,
-      network: from.network,
-    };
-
-    return this.invokeRaw({
-      script: clientUtils.getInvokeMethodScript({
-        address: contract,
-        method,
-        params,
-      }),
-      transfers: send
-        .map((transfer) => ({ ...transfer, from: contractID }))
-        .concat(receive.map((transfer) => ({ ...transfer, from, to: contract }))),
-      options: {
-        ...transactionOptions,
-        attributes: attributes.concat(
-          this.getInvokeAttributes(
-            contract,
-            method,
-            paramsZipped,
-            // If we are sending from the contract, the script is already added as an input
-            verify && options.sendFrom === undefined && options.sendTo !== undefined,
-            // If we are sending to the contract, the script is already added as an input
-            // If we are sending from the contract, the script will not be automatically added in sendTransaction
-            options.sendTo === undefined && options.sendFrom !== undefined ? from.address : undefined,
-          ),
-        ),
-      },
-      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
-        blockIndex: receipt.blockIndex,
-        blockHash: receipt.blockHash,
-        transactionIndex: receipt.transactionIndex,
-        globalIndex: receipt.globalIndex,
-        result: data.result,
-        actions: data.actions,
-      }),
-      scripts: this.getInvokeScripts(
-        method,
-        params,
-        verify && (options.sendFrom !== undefined || options.sendTo !== undefined),
-      ),
-      method: 'invoke',
-      labels: {
-        [labelNames.INVOKE_METHOD]: method,
-      },
-      sourceMaps,
-    });
-  }
-
-  public async invokeSend(
-    contract: AddressString,
-    method: string,
-    paramsIn: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    transfer: Transfer,
-    options: TransactionOptions = {},
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
-    const transactionOptions = this.getTransactionOptions(options);
-    const { from, attributes } = transactionOptions;
-
-    const contractID: UserAccountID = {
-      address: contract,
-      network: from.network,
-    };
-
-    const params = paramsIn.concat([common.stringToUInt160(addressToScriptHash(transfer.to))]);
-
-    return this.invokeRaw({
-      script: clientUtils.getInvokeMethodScript({
-        address: contract,
-        method,
-        params,
-      }),
-      options: {
-        ...transactionOptions,
-        attributes: attributes.concat(this.getInvokeAttributes(contract, method, paramsZipped, false, from.address)),
-      },
-      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
-        blockIndex: receipt.blockIndex,
-        blockHash: receipt.blockHash,
-        transactionIndex: receipt.transactionIndex,
-        globalIndex: receipt.globalIndex,
-        result: data.result,
-        actions: data.actions,
-      }),
-      scripts: this.getInvokeScripts(method, params, true),
-      transfers: [
-        {
-          ...transfer,
-          to: contract,
-          from: contractID,
-        },
-      ],
-      reorderOutputs: (outputs) => {
-        const output = outputs.find(({ value }) => value.isEqualTo(transfer.amount));
-        if (output === undefined) {
-          throw new Error('Something went wrong.');
-        }
-        const outputIdx = outputs.indexOf(output);
-        if (outputIdx === -1) {
-          throw new Error('Something went wrong.');
-        }
-
-        return [outputs[outputIdx]].concat(outputs.slice(0, outputIdx)).concat(outputs.slice(outputIdx + 1));
-      },
-      method: 'invokeSend',
-      labels: {
-        [labelNames.INVOKE_METHOD]: method,
-      },
-      sourceMaps,
-    });
-  }
-
-  public async invokeCompleteSend(
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    hash: Hash256String,
-    options: TransactionOptions = {},
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
-    const transactionOptions = this.getTransactionOptions(options);
-    const { from, attributes, monitor } = transactionOptions;
-
-    const sendTransaction = await this.provider.getTransaction(from.network, hash, monitor);
-    if (sendTransaction.outputs.length === 0) {
-      throw new NothingToSendError();
-    }
-    const sendInput = { hash, index: 0 };
-    const sendOutput = {
-      ...sendTransaction.outputs[0],
-      address: from.address,
-    };
-
-    return this.invokeRaw({
-      script: clientUtils.getInvokeMethodScript({
-        address: contract,
-        method,
-        params,
-      }),
-      options: {
-        ...transactionOptions,
-        attributes: attributes.concat(this.getInvokeAttributes(contract, method, paramsZipped, false, from.address)),
-      },
-      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
-        blockIndex: receipt.blockIndex,
-        blockHash: receipt.blockHash,
-        transactionIndex: receipt.transactionIndex,
-        globalIndex: receipt.globalIndex,
-        result: data.result,
-        actions: data.actions,
-      }),
-      scripts: this.getInvokeScripts(method, params, true),
-      rawInputs: [sendInput],
-      rawOutputs: [sendOutput],
-      method: 'invokeCompleteSend',
-      labels: {
-        [labelNames.INVOKE_METHOD]: method,
-      },
-      sourceMaps,
-    });
-  }
-
-  public async invokeRefundAssets(
-    contract: AddressString,
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    hash: Hash256String,
-    options: TransactionOptions = {},
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
-  ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
-    const transactionOptions = this.getTransactionOptions(options);
-    const { from, attributes, monitor } = transactionOptions;
-
-    const refundTransaction = await this.provider.getTransaction(from.network, hash, monitor);
-    const refundOutputs = refundTransaction.outputs
-      .map((output, idx) => ({ output, idx }))
-      .filter(({ output }) => output.address === contract);
-    const inputs = refundOutputs.map(({ idx }) => ({ hash, index: idx }));
-    const outputs = Object.entries(_.groupBy(refundOutputs.map(({ output }) => output), (output) => output.asset)).map(
-      ([asset, assetOutputs]) => ({
-        address: from.address,
-        asset,
-        value: assetOutputs.reduce((acc, output) => acc.plus(output.value), new BigNumber('0')),
-      }),
-    );
-
-    if (inputs.length === 0) {
-      throw new NothingToRefundError();
-    }
-
-    return this.invokeRaw({
-      script: clientUtils.getInvokeMethodScript({
-        address: contract,
-        method,
-        params,
-      }),
-      options: {
-        ...transactionOptions,
-        attributes: attributes.concat(this.getInvokeAttributes(contract, method, paramsZipped, false, from.address)),
-      },
-      onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
-        blockIndex: receipt.blockIndex,
-        blockHash: receipt.blockHash,
-        transactionIndex: receipt.transactionIndex,
-        globalIndex: receipt.globalIndex,
-        result: data.result,
-        actions: data.actions,
-      }),
-      scripts: this.getInvokeScripts(method, params, true),
-      rawInputs: inputs,
-      rawOutputs: outputs,
-      method: 'invokeRefundAssets',
-      labels: {
-        [labelNames.INVOKE_METHOD]: method,
-      },
-      sourceMaps,
-    });
-  }
-
   public async invokeClaim(
     contract: AddressString,
     method: string,
@@ -634,6 +297,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
             from,
             gas: networkFee,
             transfers: [],
+            provider: this.provider,
             monitor: span,
           }),
         ]);
@@ -697,159 +361,41 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     await this.keystore.selectUserAccount(id, monitor);
   }
 
-  protected getTransactionOptions(options: TransactionOptions = {}): TransactionOptionsFull {
-    const { attributes = [], networkFee = utils.ZERO_BIG_NUMBER, systemFee = utils.ZERO_BIG_NUMBER } = options;
-
-    const { from: fromIn } = options;
-    let from = fromIn;
-    if (from === undefined) {
-      const fromAccount = this.getCurrentUserAccount();
-      if (fromAccount === undefined) {
-        throw new NoAccountError();
-      }
-      from = fromAccount.id;
-    }
-
-    return {
-      from,
-      attributes: attributes.concat([NEO_ONE_ATTRIBUTE]),
-      networkFee,
-      systemFee,
-      monitor: options.monitor,
-    };
-  }
-
-  protected getInvokeAttributes(
-    contract: AddressString,
-    method: string,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-    verify: boolean,
-    from?: AddressString,
-  ): readonly Attribute[] {
-    return [
-      {
-        usage: 'Remark14',
-        data: Buffer.from(
-          `neo-one-invoke:${this.getInvokeAttributeTag(contract, method, paramsZipped)}`,
-          'utf8',
-        ).toString('hex'),
-      },
-      verify
-        ? ({
-            usage: 'Script',
-            data: contract,
-            // tslint:disable-next-line no-any
-          } as any)
-        : undefined,
-      from === undefined
-        ? undefined
-        : ({
-            usage: 'Script',
-            data: from,
-            // tslint:disable-next-line no-any
-          } as any),
-    ].filter(commonUtils.notNull);
-  }
-
-  protected getInvokeScripts(
-    method: string,
-    params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    verify: boolean,
-  ): readonly WitnessModel[] {
-    return [
-      verify
-        ? new WitnessModel({
-            invocation: clientUtils.getInvokeMethodInvocationScript({
-              method,
-              params,
-            }),
-            verification: Buffer.alloc(0, 0),
-          })
-        : undefined,
-    ].filter(commonUtils.notNull);
-  }
-
   protected async invokeRaw<T extends TransactionReceipt>({
-    script,
     transfers = [],
     options = {},
+    invokeMethodOptions,
     onConfirm,
     method,
     scripts = [],
     labels = {},
     rawInputs = [],
     rawOutputs = [],
+    script: scriptIn,
     sourceMaps,
     reorderOutputs = (outputs) => outputs,
-  }: {
-    readonly script: Buffer;
-    readonly transfers?: readonly FullTransfer[];
-    readonly options?: TransactionOptions;
-    readonly onConfirm: (options: {
-      readonly transaction: Transaction;
-      readonly data: RawInvocationData;
-      readonly receipt: TransactionReceipt;
-    }) => Promise<T> | T;
-    readonly method: string;
-    readonly scripts?: readonly WitnessModel[];
-    readonly labels?: Labels;
-    readonly rawInputs?: readonly Input[];
-    readonly rawOutputs?: readonly Output[];
-    readonly sourceMaps?: Promise<SourceMaps>;
-    readonly reorderOutputs?: (outputs: readonly Output[]) => readonly Output[];
-  }): Promise<TransactionResult<T, InvocationTransaction>> {
-    const { from, attributes: attributesIn, networkFee, systemFee, monitor } = this.getTransactionOptions(options);
+  }: InvokeRawOptions<T>): Promise<TransactionResult<T, InvocationTransaction>> {
+    const { from, script, attributes: attributesIn, networkFee, systemFee, monitor } = this.invokeRawSetup(
+      options,
+      invokeMethodOptions,
+      scriptIn,
+    );
 
     return this.capture(
       async (span) => {
-        const { inputs: testInputs, outputs: testOutputs } = await this.getTransfersInputOutputs({
-          transfers,
-          from,
-          gas: networkFee,
-          monitor: span,
-        });
-
-        const attributes = attributesIn.concat({
-          usage: 'Remark15',
-          data: Buffer.from(`${utils.randomUInt()}`, 'utf8').toString('hex'),
-        });
-
-        const testTransaction = new InvocationTransactionModel({
-          version: 1,
-          inputs: this.convertInputs(rawInputs.concat(testInputs)),
-          outputs: this.convertOutputs(reorderOutputs(rawOutputs.concat(testOutputs))),
-          attributes: this.convertAttributes(attributes),
-          gas: common.TEN_THOUSAND_FIXED8,
+        const { gas, attributes, inputs, outputs } = await this.invokeRawGetInputsOutputs(
           script,
+          from,
+          networkFee,
+          systemFee,
+          attributesIn,
+          transfers,
+          rawInputs,
+          rawOutputs,
           scripts,
-        });
-
-        const callReceipt = await this.provider.testInvoke(
-          from.network,
-          testTransaction.serializeWire().toString('hex'),
+          sourceMaps,
           span,
         );
-
-        if (callReceipt.result.state === 'FAULT') {
-          const message = await processActionsAndMessage({
-            actions: callReceipt.actions,
-            message: callReceipt.result.message,
-            sourceMaps,
-          });
-          throw new InvokeError(message);
-        }
-
-        const gas = callReceipt.result.gasConsumed.integerValue(BigNumber.ROUND_UP);
-        if (gas.gt(utils.ZERO_BIG_NUMBER) && systemFee.lt(gas) && !systemFee.eq(utils.NEGATIVE_ONE_BIG_NUMBER)) {
-          throw new InsufficientSystemFeeError(systemFee, gas);
-        }
-
-        const { inputs, outputs } = await this.getTransfersInputOutputs({
-          transfers,
-          from,
-          gas: networkFee.plus(gas),
-          monitor: span,
-        });
 
         const invokeTransaction = new InvocationTransactionModel({
           version: 1,
@@ -1274,260 +820,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   }: {
     readonly from: UserAccountID;
     readonly monitor?: Monitor;
-  }): Promise<{ readonly unspentOutputs: readonly InputOutput[]; readonly wasFiltered: boolean }> {
-    const [newBlockCount, allUnspentsIn] = await Promise.all([
-      this.provider.getBlockCount(from.network, monitor),
-      this.provider.getUnspentOutputs(from.network, from.address, monitor),
-    ]);
-    if (newBlockCount !== this.mutableBlockCount) {
-      this.mutableUsedOutputs.clear();
-      this.mutableBlockCount = newBlockCount;
-    }
-    const unspentOutputs = allUnspentsIn.filter(
-      (unspent) => !this.mutableUsedOutputs.has(`${unspent.hash}:${unspent.index}`),
-    );
-    const wasFiltered = allUnspentsIn.length !== unspentOutputs.length;
-
-    return { unspentOutputs, wasFiltered };
-  }
-
-  protected async getTransfersInputOutputs({
-    transfers,
-    from,
-    gas,
-    monitor,
-  }: {
-    readonly transfers: readonly FullTransfer[];
-    readonly from: UserAccountID;
-    readonly gas: BigNumber;
-    readonly monitor?: Monitor;
-  }): Promise<{ readonly outputs: readonly Output[]; readonly inputs: readonly InputOutput[] }> {
-    if (transfers.length === 0 && gas.lte(utils.ZERO_BIG_NUMBER)) {
-      return { inputs: [], outputs: [] };
-    }
-
-    const mutableGroupedTransfers = _.groupBy(transfers, ({ from: transferFrom }) => transferFrom.address);
-    if (gas.isGreaterThan(utils.ZERO_BIG_NUMBER)) {
-      const fromTransfers = mutableGroupedTransfers[from.address] as readonly FullTransfer[] | undefined;
-      const newTransfer: FullTransfer = {
-        from,
-        amount: gas,
-        asset: common.GAS_ASSET_HASH,
-        // tslint:disable-next-line no-any
-      } as any;
-      mutableGroupedTransfers[from.address] =
-        fromTransfers === undefined ? [newTransfer] : fromTransfers.concat([newTransfer]);
-    }
-
-    const results = await Promise.all(
-      Object.values(mutableGroupedTransfers).map(async (transfersFrom) =>
-        this.getTransfersInputOutputsFrom({
-          transfers: transfersFrom,
-          from: transfersFrom[0].from,
-          monitor,
-        }),
-      ),
-    );
-
-    return results.reduce(
-      (acc, { outputs, inputs }) => ({
-        outputs: acc.outputs.concat(outputs),
-        inputs: acc.inputs.concat(inputs),
-      }),
-      { outputs: [], inputs: [] },
-    );
-  }
-
-  protected async getTransfersInputOutputsFrom({
-    transfers,
-    from,
-    monitor,
-  }: {
-    readonly transfers: readonly Transfer[];
-    readonly from: UserAccountID;
-    readonly monitor?: Monitor;
-  }): Promise<{ readonly outputs: readonly Output[]; readonly inputs: readonly InputOutput[] }> {
-    const { unspentOutputs: allOutputs, wasFiltered } = await this.getUnspentOutputs({ from, monitor });
-
-    return Object.values(_.groupBy(transfers, ({ asset }) => asset)).reduce(
-      (acc, toByAsset) => {
-        const { asset } = toByAsset[0];
-        const assetResults = toByAsset.reduce<{
-          remaining: BigNumber;
-          remainingOutputs: readonly InputOutput[];
-          inputs: readonly InputOutput[];
-          outputs: readonly Output[];
-        }>(
-          ({ remaining, remainingOutputs, inputs, outputs: innerOutputs }, { amount, to }) => {
-            const result = this.getTransferInputOutputs({
-              from: from.address,
-              to,
-              asset,
-              amount,
-              remainingOutputs,
-              remaining,
-              wasFiltered,
-            });
-
-            return {
-              remaining: result.remaining,
-              remainingOutputs: result.remainingOutputs,
-              inputs: inputs.concat(result.inputs),
-              outputs: innerOutputs.concat(result.outputs),
-            };
-          },
-          {
-            remaining: utils.ZERO_BIG_NUMBER,
-            remainingOutputs: allOutputs.filter((output) => output.asset === asset),
-            inputs: [],
-            outputs: [],
-          },
-        );
-
-        let outputs = acc.outputs.concat(assetResults.outputs);
-        if (assetResults.remaining.gt(utils.ZERO_BIG_NUMBER)) {
-          outputs = outputs.concat([
-            {
-              address: from.address,
-              asset,
-              value: assetResults.remaining,
-            },
-          ]);
-        }
-
-        return {
-          inputs: acc.inputs.concat(assetResults.inputs),
-          outputs,
-        };
-      },
-      { inputs: [] as ReadonlyArray<InputOutput>, outputs: [] as ReadonlyArray<Output> },
-    );
-  }
-
-  protected getTransferInputOutputs({
-    to,
-    amount: originalAmount,
-    asset,
-    remainingOutputs,
-    remaining,
-    wasFiltered,
-  }: {
-    readonly from: AddressString;
-    readonly to?: AddressString;
-    readonly amount: BigNumber;
-    readonly asset: Hash256String;
-    readonly remainingOutputs: readonly InputOutput[];
-    readonly remaining: BigNumber;
-    readonly wasFiltered: boolean;
-  }): {
-    readonly inputs: readonly InputOutput[];
-    readonly outputs: readonly Output[];
-    readonly remainingOutputs: readonly InputOutput[];
-    readonly remaining: BigNumber;
-  } {
-    const amount = originalAmount.minus(remaining);
-
-    const outputs: ReadonlyArray<Output> =
-      to === undefined
-        ? []
-        : [
-            {
-              address: to,
-              asset,
-              value: originalAmount,
-            },
-          ];
-
-    if (amount.lte(utils.ZERO_BIG_NUMBER)) {
-      return {
-        inputs: [],
-        outputs,
-        remainingOutputs,
-        remaining: remaining.minus(originalAmount),
-      };
-    }
-
-    const outputsOrdered = remainingOutputs.slice().sort((coinA, coinB) => coinA.value.comparedTo(coinB.value) * -1);
-
-    const sum = outputsOrdered.reduce<BigNumber>((acc, coin) => acc.plus(coin.value), utils.ZERO_BIG_NUMBER);
-
-    if (sum.lt(amount)) {
-      if (wasFiltered) {
-        throw new FundsInUseError(sum, amount, this.mutableUsedOutputs.size);
-      }
-      throw new InsufficientFundsError(sum, amount);
-    }
-
-    // find input coins
-    let k = 0;
-    let amountRemaining = amount.plus(utils.ZERO_BIG_NUMBER);
-    // tslint:disable-next-line no-loop-statement
-    while (outputsOrdered[k].value.lte(amountRemaining)) {
-      amountRemaining = amountRemaining.minus(outputsOrdered[k].value);
-      if (amountRemaining.isEqualTo(utils.ZERO_BIG_NUMBER)) {
-        break;
-      }
-      k += 1;
-    }
-
-    let coinAmount = utils.ZERO_BIG_NUMBER;
-    const mutableInputs: InputOutput[] = [];
-    // tslint:disable-next-line no-loop-statement
-    for (let i = 0; i < k + 1; i += 1) {
-      coinAmount = coinAmount.plus(outputsOrdered[i].value);
-      mutableInputs.push(outputsOrdered[i]);
-    }
-
-    return {
-      inputs: mutableInputs,
-      outputs,
-      remainingOutputs: outputsOrdered.slice(k + 1),
-      remaining: coinAmount.minus(amount),
-    };
-  }
-
-  protected getInvokeAttributeTag(
-    contract: AddressString,
-    method: string,
-    paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
-  ): string {
-    return JSON.stringify({
-      contract,
-      method,
-      params: paramsZipped.map(([name, param]) => [name, this.paramToJSON(param)]),
-    });
-  }
-
-  protected paramToJSON(param: Param): ParamJSON | undefined {
-    if (param === undefined) {
-      return param;
-    }
-
-    if (Array.isArray(param)) {
-      return param.map((value) => this.paramToJSON(value));
-    }
-
-    if (BigNumber.isBigNumber(param) || param instanceof BigNumber) {
-      return param.toString();
-    }
-
-    if (typeof param === 'object') {
-      return this.paramToJSON((param as ForwardValue).param);
-    }
-
-    return param;
-  }
-
-  protected convertAttributes(attributes: readonly Attribute[]): readonly AttributeModel[] {
-    return attributes.map((attribute) => converters.attribute(attribute));
-  }
-
-  protected convertInputs(inputs: readonly Input[]): readonly InputModel[] {
-    return inputs.map((input) => converters.input(input));
-  }
-
-  protected convertOutputs(outputs: readonly Output[]): readonly OutputModel[] {
-    return outputs.map((output) => converters.output(output));
+  }): Promise<{ readonly unspentOutputs: ReadonlyArray<InputOutput>; readonly wasFiltered: boolean }> {
+    return this.getUnspentOutputsBase({ from, provider: this.provider, monitor });
   }
 
   protected convertWitness(script: Witness): WitnessModel {

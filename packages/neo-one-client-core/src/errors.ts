@@ -3,6 +3,10 @@ import { makeErrorWithCode } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 
 export const UnknownNetworkError = makeErrorWithCode('UNKNOWN_NETWORK', (name: string) => `Unknown network ${name}`);
+export const UnknownProviderError = makeErrorWithCode(
+  'UNKNOWN_PROVIDER',
+  (network: string) => `No provider configured for network ${network}`,
+);
 export const UnknownAccountError = makeErrorWithCode(
   'UNKNOWN_ACCOUNT',
   (address: string) => `Unknown account ${address}`,
@@ -153,4 +157,9 @@ export const InvalidHDStoredPathError = makeErrorWithCode(
 export const InvalidMasterPathError = makeErrorWithCode(
   'INVALID_HD_MASTER_PATH',
   (path: readonly number[]) => `Invalid masterPath returned by HDStore: ${path}`,
+);
+
+export const NotImplementedError = makeErrorWithCode(
+  'NO_IMPLEMENTED',
+  (name: string) => `${name} not implemented for this provider.`,
 );

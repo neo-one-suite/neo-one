@@ -111,6 +111,7 @@ export class ScriptBuilder {
     return this;
   }
 
+  // Maintain consistency with @neo-one/client-core/src/user/DapiUserAccountProvider.ts
   public emitPushParam(param: ScriptBuilderParam | undefined): this {
     if (param === undefined) {
       return this.emitPush(Buffer.alloc(0, 0));

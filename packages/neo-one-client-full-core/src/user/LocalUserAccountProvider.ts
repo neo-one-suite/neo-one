@@ -235,6 +235,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         const { inputs, outputs } = await this.getTransfersInputOutputs({
           transfers: [],
           from,
+          provider: this.provider,
           gas: networkFee.plus(settings.issueGASFee),
           monitor: span,
         });
