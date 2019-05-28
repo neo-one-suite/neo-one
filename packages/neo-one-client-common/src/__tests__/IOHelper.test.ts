@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import _ from 'lodash';
 import { common } from '../common';
 import { IOHelper as helper } from '../IOHelper';
 import { utils } from '../utils';
@@ -7,7 +8,7 @@ describe('IOHelper Tests', () => {
   const createLongBuffer = (length: BN) => Buffer.allocUnsafe(length.toNumber());
 
   test('ECPoint Size', () => {
-    const ecPoint = common.asECPoint(Buffer.from([...Array(33)].map((_) => 0x00)));
+    const ecPoint = common.asECPoint(Buffer.from(_.range(33).map(() => 0x00)));
     expect(helper.sizeOfECPoint(ecPoint)).toEqual(33);
   });
 

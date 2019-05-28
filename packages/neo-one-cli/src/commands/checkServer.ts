@@ -11,10 +11,10 @@ export const checkServer = (args: CLIArgs) => {
     .action(async () => {
       const { serverConfig, shutdown } = setupServer('check-server', args);
 
-      const [dataPath, port] = await combineLatest(
+      const [dataPath, port] = await combineLatest([
         serverConfig.config$.pipe(map((conf) => conf.paths.data)),
         serverConfig.config$.pipe(map((conf) => conf.server.port)),
-      )
+      ])
         .pipe(take(1))
         .toPromise();
 

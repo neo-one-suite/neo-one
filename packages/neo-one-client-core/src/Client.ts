@@ -222,7 +222,7 @@ export class Client<
     );
 
     this.currentNetworkInternal$ = new BehaviorSubject(providerIn.getNetworks()[0]);
-    combineLatest(this.currentUserAccount$, this.selectedProvider$)
+    combineLatest([this.currentUserAccount$, this.selectedProvider$])
       .pipe(
         map(([currentAccount, provider]) => {
           if (currentAccount !== undefined) {
@@ -269,7 +269,7 @@ export class Client<
       multicast(() => new ReplaySubject<BlockEntry>(1)),
       refCount(),
     );
-    this.accountState$ = combineLatest(this.currentUserAccount$, this.block$).pipe(
+    this.accountState$ = combineLatest([this.currentUserAccount$, this.block$]).pipe(
       switchMap(async ([currentUserAccount]) => {
         if (currentUserAccount === undefined) {
           return undefined;

@@ -1,5 +1,6 @@
 import { utils } from '@neo-one/client-common';
 import BN from 'bn.js';
+import _ from 'lodash';
 import { factory } from '../../__data__';
 import {
   AccountStackItem,
@@ -78,7 +79,7 @@ describe('Stack Item Tests', () => {
   });
 
   test('Integer Stack Item - Errors', () => {
-    const badInt = new BN(Buffer.concat([...Array(33)].map(() => Buffer.from([0xff]))));
+    const badInt = new BN(Buffer.concat(_.range(33).map(() => Buffer.from([0xff]))));
     const integerStackItemThrows = () => new IntegerStackItem(badInt);
 
     expect(integerStackItemThrows).toThrowError('Integer too large. Max size is 256 bits.');

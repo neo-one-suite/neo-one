@@ -32,13 +32,13 @@ export function WalletSelector(props: any) {
   const { client, currentUserAccount$, userAccounts$, block$ } = useContext(DeveloperToolsContext);
   const [selectedUserAccount, options] = useStream(
     () =>
-      combineLatest(
+      combineLatest([
         currentUserAccount$.pipe(
           distinctUntilChanged(),
           map((value) => (value === undefined ? value : makeWalletSelectorValueOption({ userAccount: value }))),
         ),
         getWalletSelectorOptions$(addError, client, userAccounts$, block$, tokens),
-      ).pipe(
+      ]).pipe(
         catchError((error) => {
           addError(error);
 

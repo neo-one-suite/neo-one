@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { BinaryWriter } from '../../../BinaryWriter';
 import { common } from '../../../common';
 import {
@@ -72,7 +73,7 @@ describe('Buffer Attribute Model', () => {
 test('ECPoint Attribute Model', () => {
   resetWriter();
   const usage = 0x02;
-  const ecPoint = common.asECPoint(Buffer.from([...Array(33)].map(() => 0x01)));
+  const ecPoint = common.asECPoint(Buffer.from(_.range(33).map(() => 0x01)));
 
   const ecModel = new ECPointAttributeModel({ usage, value: ecPoint });
   ecModel.serializeWireBase(testWriter);

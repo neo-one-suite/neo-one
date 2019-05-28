@@ -19,7 +19,10 @@ const StyledSelect: any = styled(Select)`
 export function NetworkSelector() {
   const addError = useAddError();
   const { client, currentNetwork$, networks$ } = useContext(DeveloperToolsContext);
-  const [network, networks] = useStream(() => combineLatest(currentNetwork$, networks$), [currentNetwork$, networks$]);
+  const [network, networks] = useStream(() => combineLatest([currentNetwork$, networks$]), [
+    currentNetwork$,
+    networks$,
+  ]);
 
   return (
     <SettingsLabel>

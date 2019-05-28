@@ -211,7 +211,7 @@ export class InteractiveCLI {
       isShutdown = true;
     };
 
-    const logSubscription = combineLatest(
+    const logSubscription = combineLatest([
       this.mutableClientConfig.config$.pipe(
         map((config) => config.paths.log),
         distinctUntilChanged(),
@@ -221,7 +221,7 @@ export class InteractiveCLI {
         map((config) => config.log),
         distinctUntilChanged(),
       ),
-    )
+    ])
       .pipe(
         map(([logPath, config]) => {
           this.mutableLogPath = logPath;
@@ -244,7 +244,7 @@ export class InteractiveCLI {
       ...serverConfigWithoutDir,
     });
 
-    const start$ = combineLatest(
+    const start$ = combineLatest([
       serverConfig.config$.pipe(
         map((conf) => conf.paths.data),
         distinctUntilChanged(),
@@ -257,7 +257,7 @@ export class InteractiveCLI {
         map((conf) => conf.httpServer.port),
         distinctUntilChanged(),
       ),
-    ).pipe(
+    ]).pipe(
       mergeScan<[string, number, number], ServerManager | undefined>(
         (managerIn, [dataPath, port, httpPort]) =>
           defer(async () => {

@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import BN from 'bn.js';
+import _ from 'lodash';
 import { common } from '../common';
 import { utils } from '../utils';
 
@@ -68,7 +69,7 @@ describe('UInt256', () => {
 });
 
 describe('ECPoint', () => {
-  const ecBuffer = Buffer.from([...Array(33)].map(() => 0x01));
+  const ecBuffer = Buffer.from(_.range(33).map(() => 0x01));
   const ecPoint = common.asECPoint(ecBuffer);
   const ecString = '01'.repeat(common.ECPOINT_BUFFER_BYTES);
   const ecComp = common.stringToECPoint(`02${'01'.repeat(common.ECPOINT_BUFFER_BYTES - 1)}`);
@@ -111,7 +112,7 @@ describe('ECPoint', () => {
 });
 
 describe('PrivateKey', () => {
-  const privateBuffer = Buffer.from([...Array(32)].map(() => 0x01));
+  const privateBuffer = Buffer.from(_.range(32).map(() => 0x01));
   const privateKey = common.asPrivateKey(privateBuffer);
   const privateString = '01'.repeat(32);
 

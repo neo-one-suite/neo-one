@@ -1,4 +1,5 @@
 import { ABI, ABIDefault, ABIReturn } from '@neo-one/client-common';
+import _ from 'lodash';
 
 // tslint:disable-next-line:no-any
 const getCombinations = (list: ReadonlyArray<ReadonlyArray<any>>) => {
@@ -12,7 +13,7 @@ const getCombinations = (list: ReadonlyArray<ReadonlyArray<any>>) => {
       : (value: number) => item[Math.floor(value / floors[index]) % item.length],
   );
 
-  return [...Array(max)].map((_, index) => iteratorFuncs.map((func) => func(index)));
+  return _.range(max).map((_unused, index) => iteratorFuncs.map((func) => func(index)));
 };
 
 const abiFunctionOptions: ReadonlyArray<{ readonly [key in string]?: boolean }> = [

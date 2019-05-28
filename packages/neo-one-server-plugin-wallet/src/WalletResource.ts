@@ -257,7 +257,7 @@ export class WalletResource {
     this.mutableBalance = [];
 
     this.network$ = getNetwork$({ pluginManager, networkName });
-    this.resource$ = combineLatest(this.network$, timer(0, 5000)).pipe(
+    this.resource$ = combineLatest([this.network$, timer(0, 5000)]).pipe(
       concatMap(async (value) => {
         await this.update(value[0]);
 

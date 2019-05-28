@@ -29,6 +29,7 @@ import {
   WitnessAdd,
 } from '@neo-one/node-core';
 import BN from 'bn.js';
+import _ from 'lodash';
 
 const internalData: ReadonlyArray<{
   readonly version: number;
@@ -215,7 +216,7 @@ const createContract = (options: Partial<ContractAdd> = {}) =>
     ...options,
   });
 const createECPoint = (byte?: number) =>
-  common.asECPoint(Buffer.from([...Array(33)].map(() => (byte === undefined ? 0x01 : byte))));
+  common.asECPoint(Buffer.from(_.range(33).map(() => (byte === undefined ? 0x01 : byte))));
 
 const createInput = (options: Partial<InputModelAdd> = {}) =>
   new Input({

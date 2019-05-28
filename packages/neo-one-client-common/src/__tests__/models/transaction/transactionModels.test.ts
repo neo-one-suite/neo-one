@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import _ from 'lodash';
 import { BinaryWriter } from '../../../BinaryWriter';
 import { common, UInt256 } from '../../../common';
 import { AttributeModel, WitnessModel } from '../../../models';
@@ -54,7 +55,7 @@ describe('Claim Transaction Model', () => {
     claimModel.serializeExclusiveBase(testWriter);
     expect(testWriter.buffer).toEqual([
       Buffer.from([0x01]),
-      Buffer.from([...Array(32)].map(() => 0x00)),
+      Buffer.from(_.range(32).map(() => 0x00)),
       Buffer.from([0x01, 0x00]),
     ]);
   });
@@ -133,7 +134,7 @@ describe('Output Model', () => {
 
   const outputModel = new OutputModel(options);
 
-  test.only('Serialize Wire Base', () => {
+  test('Serialize Wire Base', () => {
     outputModel.serializeWireBase(testWriter);
     expect(testWriter.buffer).toEqual([
       common.uInt256ToBuffer(options.asset),
@@ -169,8 +170,8 @@ describe('Transaction Base Model', () => {
   const hashString = '0e4068fa4b68f8351bc61e5b9d9e348bdb0a1f5e4c727c263c2534bb2bd19709';
   const hash = common.hexToUInt256(hashString);
 
-  const privateKey = common.asPrivateKey(Buffer.from([...Array(32)].map(() => 0x01)));
-  const testSig = Buffer.from([...Array(64)].map(() => 0x00));
+  const privateKey = common.asPrivateKey(Buffer.from(_.range(32).map(() => 0x01)));
+  const testSig = Buffer.from(_.range(64).map(() => 0x00));
   const testEC = common.ECPOINT_INFINITY;
 
   test('Default Hash', () => {

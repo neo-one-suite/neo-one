@@ -14,6 +14,7 @@ import {
 } from '@neo-one/node-core';
 import BN from 'bn.js';
 import { randomBytes } from 'crypto';
+import _ from 'lodash';
 import { keys } from './keys';
 
 export const createInvocation = ({
@@ -140,7 +141,7 @@ export const badTransaction = new InvocationTransaction({
   script: Buffer.from('00c10a6d696e74546f6b656e7367dc6cc7701762e83d2d3795d27b1aac14469e5735', 'hex'),
 
   gas: utils.ZERO,
-  inputs: [...Array(1025)].map(
+  inputs: _.range(1025).map(
     (value) =>
       new Input({
         hash: common.bufferToUInt256(randomBytes(32)),
@@ -148,7 +149,7 @@ export const badTransaction = new InvocationTransaction({
       }),
   ),
 
-  outputs: [...Array(1025)].map(
+  outputs: _.range(1025).map(
     () =>
       new Output({
         value: new BN(54).mul(utils.ONE_HUNDRED_MILLION),

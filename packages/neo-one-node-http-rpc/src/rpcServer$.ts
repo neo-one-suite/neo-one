@@ -62,7 +62,7 @@ export const rpcServer$ = ({
   // tslint:disable-next-line no-any
 }): Observable<any> => {
   const monitor = monitorIn.at('rpc');
-  const app$ = combineLatest(
+  const app$ = combineLatest([
     options$.pipe(
       map((options) => options.liveHealthCheck),
       distinctUntilChanged(),
@@ -79,7 +79,7 @@ export const rpcServer$ = ({
       map((options) => options.rateLimit),
       distinctUntilChanged(),
     ),
-  ).pipe(
+  ]).pipe(
     map(([liveHealthCheckOptions, readyHealthCheckOptions, tooBusyCheckOptions, rateLimitOptions]) => {
       // tslint:disable-next-line:no-any
       const app = new Application<any, {}>();
@@ -140,7 +140,7 @@ export const rpcServer$ = ({
     map((options) => (options.server === undefined ? undefined : options.server.keepAliveTimeout)),
   );
 
-  return combineLatest(
+  return combineLatest([
     environment.http === undefined
       ? _of(undefined)
       : createServer$(monitor, app$, keepAliveTimeout$, environment.http, () => http.createServer()),
@@ -152,5 +152,5 @@ export const rpcServer$ = ({
             key: options.key,
           }),
         ),
-  );
+  ]);
 };

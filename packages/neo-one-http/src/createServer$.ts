@@ -100,7 +100,7 @@ export function createServer$<T extends http.Server | https.Server, TOptions ext
   options: TOptions,
   createServer: (options: TOptions) => T,
 ) {
-  return combineLatest(app$, keepAliveTimeout$).pipe(
+  return combineLatest([app$, keepAliveTimeout$]).pipe(
     mergeScanLatest<[Application, number | undefined], HandleServerResult<T> | undefined>(
       (prevResult, [app, keepAliveTimeout]) =>
         defer(async () =>

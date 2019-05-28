@@ -13,7 +13,7 @@ export const setupServer = (
     ...serverArgsWithoutDir,
   });
 
-  const logSubscription = combineLatest(
+  const logSubscription = combineLatest([
     serverConfig.config$.pipe(
       map((config) => config.paths.log),
       distinctUntilChanged(),
@@ -22,7 +22,7 @@ export const setupServer = (
       map((config) => config.log),
       distinctUntilChanged(),
     ),
-  )
+  ])
     .pipe(
       map(([path, config]) => ({
         name,

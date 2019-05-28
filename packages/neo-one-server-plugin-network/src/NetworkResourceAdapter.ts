@@ -414,7 +414,7 @@ export class NetworkResourceAdapter {
 
     this.resource$ = this.nodes$.pipe(
       switchMap((nodes) =>
-        combineLatest(timer(0, 2500), combineLatest(nodes.map((node) => node.node$))).pipe(
+        combineLatest([timer(0, 2500), combineLatest(nodes.map((node) => node.node$))]).pipe(
           mergeScanLatest<[number, ReadonlyArray<Node>], Network>(
             // tslint:disable-next-line no-unused
             async (_prev, [_time, currentNodes]): Promise<Network> => {

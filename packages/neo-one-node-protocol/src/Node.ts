@@ -366,7 +366,7 @@ export class Node implements INode {
       }),
     );
 
-    return combineLatest(network$, consensus$, options$);
+    return combineLatest([network$, consensus$, options$]);
   }
 
   public async relayTransaction(

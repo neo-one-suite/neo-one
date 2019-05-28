@@ -22,6 +22,7 @@ import {
 } from '@neo-one/node-core';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import BN from 'bn.js';
+import _ from 'lodash';
 import { of } from 'rxjs';
 import { factory, keys, testUtils, transactions } from '../__data__';
 import { BLOCK_HEIGHT_YEAR, ExecutionInit, FEES, Options } from '../constants';
@@ -88,7 +89,7 @@ const dummyBlock = {
 
 const badTransactionsBlock = {
   ...blockBase,
-  transactions: [...Array(1025)].map(() => transactions.kycTransaction),
+  transactions: _.range(1025).map(() => transactions.kycTransaction),
 };
 
 const ASSETHASH1 = common.uInt256ToHex(common.bufferToUInt256(Buffer.alloc(32, 1)));
@@ -2994,6 +2995,7 @@ const SYSCALLS = [
     mock: ({ blockchain }) => {
       blockchain.contract.tryGet = jest.fn(async () => Promise.resolve());
       blockchain.contract.add = jest.fn(async () => Promise.resolve());
+      // tslint:disable-next-line: deprecation seems like a bug from rxjs; We don't want the scheduler definition anyway.
       blockchain.storageItem.getAll$ = jest.fn(of);
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
