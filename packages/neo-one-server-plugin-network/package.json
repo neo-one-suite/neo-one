@@ -17,7 +17,7 @@
     "@neo-one/types": "^1.1.0",
     "@neo-one/utils": "^1.1.0",
     "@types/execa": "^0.9.0",
-    "@types/fs-extra": "^5.0.4",
+    "@types/fs-extra": "^7.0.0",
     "@types/lodash": "^4.14.120",
     "@types/vorpal": "^1.11.0",
     "cross-fetch": "^3.0.1",

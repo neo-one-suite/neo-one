@@ -13,7 +13,7 @@
     "@reactivex/ix-es2015-cjs": "2.5.3",
     "@types/lodash": "^4.14.120",
     "@types/tapable": "^1.0.4",
-    "bignumber.js": "^8.1.1",
+    "bignumber.js": "^9.0.0",
     "bn.js": "^4.11.8",
     "cross-fetch": "^3.0.1",
     "dataloader": "^1.4.0",
