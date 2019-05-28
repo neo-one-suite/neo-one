@@ -5,7 +5,7 @@
     "@types/react": "16.8.17",
     "@types/react-dom": "16.8.4",
     "@types/styled-components": "4.1.14",
-    "bignumber.js": "8.1.1",
+    "bignumber.js": "9.0.0",
     "react": "16.8.6",
     "react-dom": "16.8.6",
     "rxjs": "6.4.0",

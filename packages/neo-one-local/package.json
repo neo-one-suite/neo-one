@@ -9,7 +9,7 @@
     "@neo-one/client-full-core": "^1.1.2",
     "@neo-one/types": "^1.1.0",
     "@neo-one/utils": "^1.1.0",
-    "bignumber.js": "^8.1.1",
+    "bignumber.js": "^9.0.0",
     "tslib": "^1.9.3"
   },
   "sideEffects": false
