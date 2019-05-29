@@ -288,7 +288,7 @@ export class LocalHDStore implements HDLocalStore {
 
   private async init(): Promise<ReadonlyArray<number> | Error> {
     const pathKeys = await this.storage.getAllKeys();
-    const accessNode = pathKeys.sort((a, b) => {
+    const accessNode = pathKeys.slice().sort((a, b) => {
       if (a < b) {
         return -1;
       }

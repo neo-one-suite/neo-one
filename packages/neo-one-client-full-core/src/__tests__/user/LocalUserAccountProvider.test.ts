@@ -12,6 +12,7 @@ import {
 } from '@neo-one/client-common';
 import { Hash256, KeyStore } from '@neo-one/client-core';
 import { deserializeTransactionWire } from '@neo-one/node-core';
+import { Modifiable } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { of as _of } from 'rxjs';
 import { data, factory, keys } from '../../__data__';

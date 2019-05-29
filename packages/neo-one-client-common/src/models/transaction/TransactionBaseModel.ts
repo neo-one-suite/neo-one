@@ -1,3 +1,4 @@
+import { Constructor } from '@neo-one/utils';
 import { BinaryWriter } from '../../BinaryWriter';
 import { common, ECPoint, InvalidFormatError, PrivateKey, UInt256, UInt256Hex } from '../../common';
 import { crypto } from '../../crypto';

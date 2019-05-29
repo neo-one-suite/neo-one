@@ -1,4 +1,5 @@
 import { AttributeBaseModel, AttributeJSON } from '@neo-one/client-common';
+import { Constructor } from '@neo-one/utils';
 import { Equals, EquatableKey, ToKeyString } from '../../Equatable';
 import { DeserializeWireBaseOptions, SerializableJSON, SerializeJSONContext } from '../../Serializable';
 import { utils } from '../../utils';

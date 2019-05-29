@@ -1,5 +1,6 @@
 // tslint:disable deprecation no-any
 import { Monitor } from '@neo-one/monitor';
+import { OmitStrict } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import BN from 'bn.js';
 import { Observable } from 'rxjs';
@@ -1160,7 +1161,7 @@ export interface InvokeReceiveTransactionOptions extends TransactionOptions {
   /**
    * `Transfer`s that specify native assets to send to the contract.
    */
-  readonly sendTo?: ReadonlyArray<Omit<Transfer, 'to'>>;
+  readonly sendTo?: ReadonlyArray<OmitStrict<Transfer, 'to'>>;
 }
 
 /**

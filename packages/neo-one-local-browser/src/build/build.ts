@@ -9,6 +9,7 @@ import { NEOONEDataProvider } from '@neo-one/client-core';
 import { constants, deployContract, setupWallets } from '@neo-one/local';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { genCommonBrowserFiles, genFiles } from '@neo-one/smart-contract-codegen';
+import { Modifiable } from '@neo-one/utils';
 import { WorkerManager } from '@neo-one/worker';
 import { Subject } from 'rxjs';
 import { FileSystem } from '../filesystem';

@@ -1,3 +1,5 @@
+/// <reference types="@neo-one/types/e2e"/>
+
 import { common, crypto, privateKeyToAddress } from '@neo-one/client-common';
 import * as path from 'path';
 import {

@@ -15,7 +15,6 @@ import {
   readyHealthCheck,
   ReadyHealthCheckOptions,
   rpc,
-  tooBusyCheck,
   TooBusyCheckOptions,
 } from './middleware';
 
@@ -117,7 +116,9 @@ export const rpcServer$ = ({
       }
 
       if (tooBusyCheckOptions !== undefined && tooBusyCheckOptions.enabled) {
-        router.use(tooBusyCheck(tooBusyCheckOptions));
+        // only importing if we set options, tooBusy starts a loop that will be left open otherwise.
+        // tslint:disable-next-line: no-require-imports
+        router.use(require('./middleware/tooBusyCheck')(tooBusyCheckOptions));
       }
 
       if (environment.splashScreen !== undefined) {

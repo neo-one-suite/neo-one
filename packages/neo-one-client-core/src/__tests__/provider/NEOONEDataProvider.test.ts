@@ -28,6 +28,7 @@ import {
   TransactionJSON,
   VMState,
 } from '@neo-one/client-common';
+import { Modifiable } from '@neo-one/utils';
 import { toArray } from '@reactivex/ix-es2015-cjs/asynciterable/toarray';
 import BigNumber from 'bignumber.js';
 import { data, factory, keys } from '../../__data__';

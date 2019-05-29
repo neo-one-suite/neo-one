@@ -2,7 +2,7 @@
 import { Account, UserAccount } from '@neo-one/client-common';
 import { Client, Hash256, nep5 } from '@neo-one/client-core';
 import { Box, Select } from '@neo-one/react-common';
-import { utils } from '@neo-one/utils';
+import { PromiseReturnType, utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
 // tslint:disable-next-line no-submodule-imports

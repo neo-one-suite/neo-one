@@ -1,5 +1,6 @@
 import { Monitor } from '@neo-one/monitor';
 import { DescribeTable, killProcess } from '@neo-one/server-plugin';
+import { OmitStrict } from '@neo-one/utils';
 import fetch from 'cross-fetch';
 import execa from 'execa';
 import * as fs from 'fs-extra';
@@ -286,7 +287,7 @@ export class NEOTrackerResource {
     await this.start();
   };
 
-  private toResource(): Omit<NEOTracker, 'live'> {
+  private toResource(): OmitStrict<NEOTracker, 'live'> {
     return {
       plugin: this.resourceType.plugin.name,
       resourceType: this.resourceType.name,

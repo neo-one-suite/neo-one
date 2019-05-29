@@ -1,7 +1,7 @@
 import { ABI, ContractParameterType } from '@neo-one/client-common';
 import { ContractRegister } from '@neo-one/client-full-core';
 import { tsUtils } from '@neo-one/ts-utils';
-import { utils } from '@neo-one/utils';
+import { OmitStrict, utils } from '@neo-one/utils';
 import ts from 'typescript';
 import { DEFAULT_CONTRACT_PROPERTIES } from '../constants';
 import { Context } from '../Context';
@@ -120,7 +120,7 @@ const addContractInfo = (context: Context, contractInfo: ContractInfo) => {
 export interface SmartContractInfo {
   readonly contractInfo: ContractInfo | undefined;
   readonly abi: ABI;
-  readonly contract: Omit<ContractRegister, 'script'>;
+  readonly contract: OmitStrict<ContractRegister, 'script'>;
 }
 
 export const getSmartContractInfo = (context: Context, sourceFile: ts.SourceFile): SmartContractInfo => {

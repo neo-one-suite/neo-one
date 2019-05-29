@@ -12,7 +12,7 @@ import { getNetworkResourceManager, Network } from '@neo-one/server-plugin-netwo
 import { constants as walletConstants, getWalletResourceManager, Wallet } from '@neo-one/server-plugin-wallet';
 import { NetworkDefinition } from '@neo-one/smart-contract-codegen';
 import { Contracts as ContractPaths } from '@neo-one/smart-contract-compiler';
-import { utils } from '@neo-one/utils';
+import { Modifiable, utils } from '@neo-one/utils';
 import nanoid from 'nanoid';
 import { filter, take } from 'rxjs/operators';
 import { DiagnosticCategory } from 'typescript';

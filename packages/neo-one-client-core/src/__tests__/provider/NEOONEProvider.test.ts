@@ -1,4 +1,5 @@
 // tslint:disable no-object-mutation
+import { Modifiable } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable';
 import BigNumber from 'bignumber.js';
 import { take } from 'rxjs/operators';

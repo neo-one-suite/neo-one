@@ -1087,7 +1087,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     const assetToInputOutputs = Object.entries(assetToInputOutputsUnsorted).reduce(
       (acc: typeof assetToInputOutputsUnsorted, [_asset, outputs]) => ({
         ...acc,
-        [_asset]: outputs.sort((coinA, coinB) => coinA.value.comparedTo(coinB.value)),
+        [_asset]: outputs.slice().sort((coinA, coinB) => coinA.value.comparedTo(coinB.value)),
       }),
       assetToInputOutputsUnsorted,
     );
@@ -1447,7 +1447,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       };
     }
 
-    const outputsOrdered = remainingOutputs.sort((coinA, coinB) => coinA.value.comparedTo(coinB.value)).reverse();
+    const outputsOrdered = remainingOutputs.slice().sort((coinA, coinB) => coinA.value.comparedTo(coinB.value) * -1);
 
     const sum = outputsOrdered.reduce<BigNumber>((acc, coin) => acc.plus(coin.value), utils.ZERO_BIG_NUMBER);
 

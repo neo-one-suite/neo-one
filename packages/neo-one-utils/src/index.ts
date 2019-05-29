@@ -11,3 +11,4 @@ export * from './makeErrorWithCode';
 export * from './retryBackoff';
 export * from './upperCaseFirst';
 export * from './normalizePath';
+export * from './helperTypes';

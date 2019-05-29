@@ -13,7 +13,7 @@ import {
   UInt160,
   UInt160Hex,
 } from '@neo-one/client-common';
-import { utils as commonUtils } from '@neo-one/utils';
+import { Constructor, utils as commonUtils } from '@neo-one/utils';
 import BN from 'bn.js';
 import _ from 'lodash';
 import { Account, AccountKey } from '../Account';
