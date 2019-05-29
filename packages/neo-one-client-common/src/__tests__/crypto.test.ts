@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { keys } from '../__data__';
 import { common, ECPoint } from '../common';
 import { crypto } from '../crypto';
@@ -160,7 +161,7 @@ describe('Crypto Errors', () => {
     const verifyThrows = () =>
       crypto.verify({
         message,
-        signature: Buffer.from([...Array(65)].map(() => 0x01)),
+        signature: Buffer.from(_.range(65).map(() => 0x01)),
         publicKey: initKey,
       });
     expect(verifyThrows).toThrowError(`Invalid Signature length. Found: 65, Max: 64`);

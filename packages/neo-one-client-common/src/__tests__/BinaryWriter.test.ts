@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { BinaryWriter } from '../BinaryWriter';
 import { common } from '../common';
 import { utils } from '../utils';
@@ -37,7 +38,7 @@ describe('Binary Writer Tests', () => {
   });
 
   test('Write ECPoint', () => {
-    const ecPoint = common.asECPoint(Buffer.from([...Array(33)].map((_) => 0x00)));
+    const ecPoint = common.asECPoint(Buffer.from(_.range(33).map(() => 0x00)));
     const ecBuffer = writer.writeECPoint(ecPoint);
 
     expect(ecBuffer.buffer).toEqual([ecPoint]);

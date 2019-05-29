@@ -33,13 +33,13 @@ export class Server {
       distinctUntilChanged(),
     );
 
-    const portAllocator$ = combineLatest(
+    const portAllocator$ = combineLatest([
       dataPath$,
       serverConfig.config$.pipe(
         map((config) => config.ports),
         distinctUntilChanged(),
       ),
-    ).pipe(
+    ]).pipe(
       switchMap(([dataPath, ports]) =>
         defer(async () =>
           PortAllocator.create({
@@ -52,14 +52,14 @@ export class Server {
       ),
     );
 
-    const pluginManager$ = combineLatest(
+    const pluginManager$ = combineLatest([
       dataPath$,
       portAllocator$,
       serverConfig.config$.pipe(
         map((config) => config.httpServer.port),
         distinctUntilChanged(),
       ),
-    ).pipe(
+    ]).pipe(
       switchMap(([dataPath, portAllocator, httpServerPort]) =>
         defer(async () => {
           const pluginManager = new PluginManager({
@@ -77,7 +77,7 @@ export class Server {
       ),
     );
 
-    return combineLatest(dataPath$, pluginManager$).pipe(
+    return combineLatest([dataPath$, pluginManager$]).pipe(
       switchMap(([dataPath, pluginManager]) => {
         const server = new Server({
           monitor,
@@ -226,7 +226,7 @@ export class Server {
       ),
     );
 
-    return combineLatest(grpc$, http$);
+    return combineLatest([grpc$, http$]);
   }
 
   public async reset(): Promise<void> {

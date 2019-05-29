@@ -64,7 +64,7 @@
     "react-redux": "^7.0.0",
     "redux": "^4.0.1",
     "resize-observer-polyfill": "^1.5.0",
-    "resolve": "^1.8.1",
+    "resolve": "1.10.1",
     "rxjs": "^6.4.0",
     "source-map": "^0.7.3",
     "styled-components": "^4.2.0",

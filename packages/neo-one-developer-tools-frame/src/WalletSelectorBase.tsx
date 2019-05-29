@@ -114,7 +114,7 @@ export const getWalletSelectorOptions$ = (
       take(1),
       map((userAccounts) => userAccounts.map((userAccount) => makeWalletSelectorValueOption({ userAccount }))),
     ),
-    combineLatest(userAccounts$.pipe(distinctUntilChanged()), block$).pipe(
+    combineLatest([userAccounts$.pipe(distinctUntilChanged()), block$]).pipe(
       switchMap(async ([userAccounts]) =>
         Promise.all(
           userAccounts.map(async (userAccount) => {
