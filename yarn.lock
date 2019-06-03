@@ -3157,7 +3157,7 @@
   dependencies:
     "@types/webpack" "*"
 
-"@types/webpack-dev-server@^3.1.6":
+"@types/webpack-dev-server@3.1.6":
   version "3.1.6"
   resolved "https://registry.yarnpkg.com/@types/webpack-dev-server/-/webpack-dev-server-3.1.6.tgz#a674bcdbe045390e6301977790d465f4aeb5b1c0"
   integrity sha512-fysTHPetk7emf4XPj+GCbwGy56JTIUXWH7FuSABctCU2i+pczOD9bbUqd1+vT18WhqEqsr5v8SPshvm/FL3yDw==
@@ -18528,7 +18528,7 @@ webpack-dev-middleware@^3.7.0:
     range-parser "^1.2.1"
     webpack-log "^2.0.0"
 
-webpack-dev-server@^3.3.1, webpack-dev-server@^3.5.1:
+webpack-dev-server@3.5.1, webpack-dev-server@^3.3.1:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/webpack-dev-server/-/webpack-dev-server-3.5.1.tgz#4290ac709bb989dc7382c912899f79fd5677dabf"
   integrity sha512-0IdMGddJcnK9zesZOeHWl4uAOVfypn7DSrdNWtclROkVBXy/TcBN+6eEG1wNfLT9dXVfaRZZsLTJt0mJtgTQgw==
