@@ -1,12 +1,7 @@
-// @ts-ignore
-import history from 'connect-history-api-fallback';
 import execa from 'execa';
-// @ts-ignore
-import convert from 'koa-connect';
 import * as nodePath from 'path';
 import webpack from 'webpack';
-// @ts-ignore
-import serve from 'webpack-serve';
+import WebpackDevServer from 'webpack-dev-server';
 import yargs from 'yargs';
 import { createKillProcess } from './createKillProcess';
 import { overlay, preview, server, SERVER_DIST_DIR, testRunner, tools, workers } from './webpack';
@@ -29,31 +24,23 @@ const watchWorkers = () => watchConfig(workers({ stage: devStage }));
 const watchOverlay = () => watchConfig(overlay({ stage: devStage }));
 const watchTools = () => watchConfig(tools({ stage: devStage }));
 const watchWindow = async (config: webpack.Configuration, port: number) => {
-  const { app } = await serve(
-    {},
-    {
-      config,
-      open: false,
-      hotClient: false,
-      // tslint:disable-next-line no-any
-      add: (appIn: any) => {
-        appIn.use(
-          convert(
-            history({
-              verbose: false,
-              htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
-              index: '/index.html',
-            }),
-          ),
-        );
-      },
-      port,
+  const devServer = new WebpackDevServer(webpack(config), {
+    open: false,
+    hot: false,
+    historyApiFallback: {
+      verbose: false,
+      htmlAcceptHeaders: ['text/html', 'application/xhtml+xml'],
+      index: '/index.html',
     },
-  );
+    port,
+  });
+
+  const app = devServer.listen(port);
 
   return async () =>
-    new Promise<void>((resolve) => {
-      app.stop(resolve);
+    new Promise<void>((resolve, reject) => {
+      app.close(reject);
+      resolve();
     });
 };
 const watchPreview = async () => watchWindow(preview({ stage: devStage }), 8080);
