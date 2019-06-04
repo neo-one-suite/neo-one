@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-switch@1.1.2...@neo-one/client-switch@1.2.0) (2019-06-04)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @ledgerhq/hw-transport-u2f to v4.50.0 ([623a5fe](https://github.com/neo-one-suite/neo-one/commit/623a5fe))
+* **deps:** update dependency @ledgerhq/hw-transport-u2f to v4.53.0 ([9d05523](https://github.com/neo-one-suite/neo-one/commit/9d05523))
+
+
+### Features
+
+* **client:** Add HDKeyStore ([c09b44f](https://github.com/neo-one-suite/neo-one/commit/c09b44f))
+
+
+
+
+
 ## [1.1.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-switch@1.1.1...@neo-one/client-switch@1.1.2) (2019-04-12)
 
 **Note:** Version bump only for package @neo-one/client-switch

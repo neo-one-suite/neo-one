@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-plugin-wallet@1.1.2...@neo-one/server-plugin-wallet@1.1.3) (2019-06-04)
+
+
+### Bug Fixes
+
+* **@neo-one/types:** eliminate global types from @neo-one/types ([004330d](https://github.com/neo-one-suite/neo-one/commit/004330d))
+* **deps:** update definitelytyped ([a8aec42](https://github.com/neo-one-suite/neo-one/commit/a8aec42))
+* **deps:** update dependency fs-extra to v8 ([b11630d](https://github.com/neo-one-suite/neo-one/commit/b11630d))
+* **deps:** update misc dependencies ([0c9bdde](https://github.com/neo-one-suite/neo-one/commit/0c9bdde))
+* **npm:** update deps to remove install warnings ([29c08e8](https://github.com/neo-one-suite/neo-one/commit/29c08e8))
+* **rpc:** Re-enable RateLimit middleware by default ([3160174](https://github.com/neo-one-suite/neo-one/commit/3160174))
+
+
+
+
+
 ## [1.1.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-plugin-wallet@1.1.1...@neo-one/server-plugin-wallet@1.1.2) (2019-04-12)
 
 **Note:** Version bump only for package @neo-one/server-plugin-wallet

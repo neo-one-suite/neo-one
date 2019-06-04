@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/local-browser-worker@1.1.2...@neo-one/local-browser-worker@1.1.3) (2019-06-04)
+
+
+### Bug Fixes
+
+* **deps:** update definitelytyped ([a8aec42](https://github.com/neo-one-suite/neo-one/commit/a8aec42))
+
+
+
+
+
 ## [1.1.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/local-browser-worker@1.1.1...@neo-one/local-browser-worker@1.1.2) (2019-04-12)
 
 **Note:** Version bump only for package @neo-one/local-browser-worker

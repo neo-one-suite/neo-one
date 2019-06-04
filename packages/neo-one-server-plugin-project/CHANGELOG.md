@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-plugin-project@1.2.0...@neo-one/server-plugin-project@1.2.1) (2019-06-04)
+
+
+### Bug Fixes
+
+* **@neo-one/types:** eliminate global types from @neo-one/types ([004330d](https://github.com/neo-one-suite/neo-one/commit/004330d))
+* **deps:** update definitelytyped ([a8aec42](https://github.com/neo-one-suite/neo-one/commit/a8aec42))
+* **deps:** update dependency @types/react to v16.8.14 ([6a35697](https://github.com/neo-one-suite/neo-one/commit/6a35697))
+* **deps:** update dependency fs-extra to v8 ([b11630d](https://github.com/neo-one-suite/neo-one/commit/b11630d))
+* **deps:** update misc dependencies ([0c9bdde](https://github.com/neo-one-suite/neo-one/commit/0c9bdde))
+* **deps:** update misc dependencies ([8a3107a](https://github.com/neo-one-suite/neo-one/commit/8a3107a))
+* **onerc:** use relative paths ([8d6711b](https://github.com/neo-one-suite/neo-one/commit/8d6711b)), closes [#1383](https://github.com/neo-one-suite/neo-one/issues/1383)
+
+
+
+
+
 # [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-plugin-project@1.1.1...@neo-one/server-plugin-project@1.2.0) (2019-04-12)
 
 

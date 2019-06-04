@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-test-common@1.1.2...@neo-one/smart-contract-test-common@1.1.3) (2019-06-04)
+
+
+### Bug Fixes
+
+* **@neo-one/types:** eliminate global types from @neo-one/types ([004330d](https://github.com/neo-one-suite/neo-one/commit/004330d))
+* **deps:** update misc dependencies ([0c9bdde](https://github.com/neo-one-suite/neo-one/commit/0c9bdde))
+
+
+
+
+
 ## [1.1.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-test-common@1.1.1...@neo-one/smart-contract-test-common@1.1.2) (2019-04-12)
 
 **Note:** Version bump only for package @neo-one/smart-contract-test-common

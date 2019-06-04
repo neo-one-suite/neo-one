@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server@1.1.2...@neo-one/server@1.1.3) (2019-06-04)
+
+
+### Bug Fixes
+
+* **@neo-one/types:** eliminate global types from @neo-one/types ([004330d](https://github.com/neo-one-suite/neo-one/commit/004330d))
+* **deps:** update definitelytyped ([a8aec42](https://github.com/neo-one-suite/neo-one/commit/a8aec42))
+* **deps:** update dependency fs-extra to v8 ([b11630d](https://github.com/neo-one-suite/neo-one/commit/b11630d))
+* **npm:** update deps to remove install warnings ([29c08e8](https://github.com/neo-one-suite/neo-one/commit/29c08e8))
+
+
+
+
+
 ## [1.1.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server@1.1.1...@neo-one/server@1.1.2) (2019-04-12)
 
 
