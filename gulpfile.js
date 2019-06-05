@@ -407,9 +407,14 @@ const copyTypescript = ((cache) =>
       .src(globs.typescript)
       .pipe(
         gulpFilter([
-          'packages/neo-one-smart-contract-lib/src/**/*.ts',
-          'packages/neo-one-smart-contract/src/*.ts',
           'packages/neo-one-server-plugin-wallet/src/contracts/*.ts',
+          'packages/neo-one-smart-contract/src/*.ts',
+          'packages/neo-one-smart-contract-lib/src/**/*.ts',
+          `!packages/*/src/**/*.test.{ts,tsx}`,
+          `!packages/*/src/__data__/**/*`,
+          `!packages/*/src/__tests__/**/*`,
+          `!packages/*/src/__e2e__/**/*`,
+          `!packages/*/src/bin/**/*`,
         ]),
       )
       .pipe(
@@ -518,7 +523,6 @@ const buildAllNoDeveloperToolsBundle = ((cache) =>
         format.browser ? undefined : compileTypescript(format, type),
         format === MAIN_FORMAT ? 'buildBin' : undefined,
         format === MAIN_FORMAT ? 'createBin' : undefined,
-        format === MAIN_FORMAT ? 'copyBin' : undefined,
       ].filter((task) => task !== undefined),
     )(done);
   }))({});
@@ -753,7 +757,7 @@ const gulpBin = () =>
     }),
   );
 
-const binProject = ts.createProject(MAIN_BIN_FORMAT.tsconfig, { typescript });
+const binProject = ts.createProject(MAIN_BIN_FORMAT.tsconfig, { typescript, declaration: false });
 const binBanner = `#!/usr/bin/env node
 require('source-map-support').install({ handleUncaughtExceptions: false, environment: 'node' });
 const { defaultMetrics, metrics } = require('@neo-one/monitor');
@@ -818,8 +822,7 @@ gulp.task('createBin', () =>
     )
     .pipe(gulp.dest(getDest(MAIN_FORMAT))),
 );
-gulp.task('copyBin', () => gulpBin().pipe(gulp.dest(getDest(MAIN_FORMAT))));
-gulp.task('buildBin', gulp.parallel('compileBin', 'createBin', 'copyBin'));
+gulp.task('buildBin', gulp.parallel('compileBin', 'createBin'));
 
 gulp.task('clean', () => fs.remove(DIST));
 gulp.task('copyPkg', gulp.parallel(FORMATS.map((format) => copyPkg(format))));
