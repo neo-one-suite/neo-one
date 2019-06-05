@@ -270,15 +270,16 @@
   },
   "resolutions": {
     "@reactivex/ix-es2015-cjs": "2.5.3",
-    "react-dom": "16.8.6",
-    "react": "16.8.6",
     "ajv": "6.8.1",
     "babel-core": "7.0.0-bridge.0",
     "bn.js": "4.11.8",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
+    "resolve": "1.10.1",
     "regenerator-runtime": "0.13.1",
+    "styled-components": "4.2.0",
     "terser": "3.14.1",
-    "webpack": "4.32.2",
-    "styled-components": "4.2.0"
+    "webpack": "4.32.2"
   },
   "config": {
     "commitizen": {

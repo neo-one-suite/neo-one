@@ -55,7 +55,16 @@ Here's how to setup your local development environment:
   - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
 2. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
   - Be sure to invoke Create React App with the `--typescript` flag in order to enable TypeScript support: `npx create-react-app token --typescript`
-3. Install NEO•ONE using either [yarn](https://yarnpkg.com/) (`yarn add <package name>`) or [npm](https://www.npmjs.com/) (`npm install <package name>`).
+3. Install NEO•ONE using either [yarn](https://yarnpkg.com/)
+```bash
+yarn add @neo-one/suite
+````
+or [npm](https://www.npmjs.com/)
+```bash
+npm install @neo-one/suite
+```
+
+alternatively, install the individual packages `@neo-one/suite` wraps for you:
 
 ```bash
 yarn add @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-typescript-plugin
@@ -69,7 +78,7 @@ npm install @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-
 We recommend taking a moment to [setup your editor](/docs/environment-setup#Editor-Setup) to take advantage of inline NEO•ONE compiler diagnostics.
 
 5. Review the available [configuration options](/docs/config-options) and update your `.onerc` file as needed.
-* To follow along with the tutorial you configuration should look something like:
+* To follow along with the tutorial your configuration should look like:
 ```json
 {
   "codegen": {
