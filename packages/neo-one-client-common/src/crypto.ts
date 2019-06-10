@@ -45,7 +45,7 @@ const sha1 = (value: Buffer): Buffer =>
 const sha256 = sha256In;
 
 const rmd160 = (value: Buffer): Buffer =>
-  createHash('rmd160')
+  createHash(process.versions.hasOwnProperty('electron') ? 'ripemd160' : 'rmd160')
     .update(value)
     .digest();
 
