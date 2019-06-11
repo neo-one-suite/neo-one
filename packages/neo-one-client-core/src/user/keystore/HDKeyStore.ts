@@ -13,7 +13,7 @@ export interface HDAccount<Identifier> {
 }
 
 type HDAccounts<Identifier> = {
-  readonly [Network in string]?: { readonly [Address in string]?: HDAccount<Identifier> }
+  readonly [Network in string]?: { readonly [Address in string]?: HDAccount<Identifier> };
 };
 
 export interface HDProvider {

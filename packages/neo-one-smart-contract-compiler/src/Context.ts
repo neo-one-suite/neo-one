@@ -13,9 +13,7 @@ import { CompilerHost } from './types';
 const getErrorKey = (diagnostic: ts.Diagnostic) =>
   `${diagnostic.file}:${diagnostic.start}:${diagnostic.length}:${diagnostic.code}`;
 const getFullKey = (diagnostic: ts.Diagnostic) =>
-  `${diagnostic.file}:${diagnostic.start}:${diagnostic.length}:${diagnostic.category}:${diagnostic.code}:${
-    diagnostic.messageText
-  }`;
+  `${diagnostic.file}:${diagnostic.start}:${diagnostic.length}:${diagnostic.category}:${diagnostic.code}:${diagnostic.messageText}`;
 
 export class Context {
   public readonly builtins: Builtins;
@@ -104,9 +102,7 @@ export class Context {
     const expectedLength = (match === null ? [] : match).length;
     if (expectedLength !== args.length) {
       throw new Error(
-        `The provided arguments length (${
-          args.length
-        }) does not match the required arguments length (${expectedLength})`,
+        `The provided arguments length (${args.length}) does not match the required arguments length (${expectedLength})`,
       );
     }
 

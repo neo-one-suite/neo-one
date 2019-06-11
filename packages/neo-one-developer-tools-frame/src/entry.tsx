@@ -1,6 +1,4 @@
-// tslint:disable no-import-side-effect no-object-mutation
-import '@babel/polyfill';
-
+// tslint:disable: no-object-mutation
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { BehaviorSubject } from 'rxjs';

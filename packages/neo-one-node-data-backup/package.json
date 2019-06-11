@@ -4,7 +4,7 @@
   "description": "NEO•ONE node data path backup and restore.",
   "main": "./src/index.ts",
   "dependencies": {
-    "@google-cloud/storage": "^2.4.1",
+    "@google-cloud/storage": "^2.5.0",
     "@neo-one/monitor": "^1.1.2",
     "@neo-one/types": "^1.1.1",
     "@types/fs-extra": "^7.0.0",
@@ -12,7 +12,7 @@
     "@types/tar": "^4.0.0",
     "fs-extra": "^8.0.0",
     "megajs": "^0.16.0",
-    "tar": "^4.4.8",
+    "tar": "^4.4.10",
     "tslib": "^1.9.3"
   },
   "sideEffects": false

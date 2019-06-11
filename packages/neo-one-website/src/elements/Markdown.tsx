@@ -1,5 +1,7 @@
 import MarkdownIt from 'markdown-it';
-import anchor from 'markdown-it-anchor';
+// @ts-ignore
+// tslint:disable-next-line: no-submodule-imports
+import anchor from 'markdown-it-anchor/dist/markdownItAnchor.js';
 // @ts-ignore
 import container from 'markdown-it-container';
 import * as React from 'react';
@@ -53,9 +55,7 @@ const createMD = ({ withAnchors }: { readonly withAnchors: boolean }) => {
     });
 
   if (withAnchors) {
-    // tslint:disable-next-line no-any
-    md.use(anchor as any, {
-      permalink: true,
+    md.use(anchor, {
       slugify,
       level: [2, 3, 4, 5],
     });

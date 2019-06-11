@@ -35,6 +35,25 @@ describe('resolve', () => {
   });
 
   const mockFiles = (files: { [path: string]: string }) => {
+    const directories = new Set(
+      Object.keys(files).reduce<ReadonlyArray<string>>(
+        (acc, file) =>
+          acc.concat(
+            file
+              .split('/')
+              .slice(1, -1)
+              .reduce<ReadonlyArray<string>>((accInner, path) => {
+                if (accInner.length === 0) {
+                  return [`/${path}`];
+                }
+
+                return accInner.concat(`${accInner[accInner.length - 1]}/${path}`);
+              }, []),
+          ),
+        [],
+      ),
+    );
+
     fsMock.readFileSync.mockImplementation(((filePath: string) => {
       const file = files[filePath] as string | undefined;
       if (file !== undefined) {
@@ -49,6 +68,9 @@ describe('resolve', () => {
       const file = files[filePath] as string | undefined;
       if (file !== undefined) {
         return { isFile: () => true, isDirectory: () => false };
+      }
+      if (directories.has(filePath)) {
+        return { isFile: () => false, isDirectory: () => true };
       }
 
       throw createErrorWithCode('ENOENT');

@@ -1,22 +1,14 @@
 // tslint:disable no-submodule-imports no-null-keyword
+import { Circus } from '@jest/types';
 import { TrackJS } from '@neo-one/react-common';
-// @ts-ignore
 import run from 'jest-circus/build/run';
-import {
-  addEventHandler,
-  ROOT_DESCRIBE_BLOCK_NAME,
-  setState,
-  // @ts-ignore
-} from 'jest-circus/build/state';
-// @ts-ignore
+import { addEventHandler, ROOT_DESCRIBE_BLOCK_NAME, setState } from 'jest-circus/build/state';
 import { makeDescribe } from 'jest-circus/build/utils';
-// @ts-ignore
 import expect from 'jest-matchers';
 import { formatError } from '../../error';
 import { Test, TestRunnerCallbacks } from '../../types';
 import { ModuleBase, RemoteEngine } from '../remote';
 import { createTestEngine, CreateTestEngineOptions } from './createTestEngine';
-import { BlockName, DescribeBlock, JestEvent, TestEntry } from './types';
 
 const handleError = (error: Error) => {
   TrackJS.track(error);
@@ -50,8 +42,8 @@ function resetTestState() {
 }
 
 // tslint:disable-next-line no-let
-let doHandleEvent: ((event: JestEvent) => void) | undefined;
-const handleEvent = (event: JestEvent) => {
+let doHandleEvent: ((event: Circus.Event) => void) | undefined;
+const handleEvent = (event: Circus.Event) => {
   if (doHandleEvent !== undefined) {
     doHandleEvent(event);
   }
@@ -117,7 +109,7 @@ const runTestsSerially = async (
 
 interface TestEventHandler {
   readonly onEvaluateError: (error: Error) => void;
-  readonly handleTestEvent: (event: JestEvent) => void;
+  readonly handleTestEvent: (event: Circus.Event) => void;
 }
 
 const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks: TestRunnerCallbacks) => {
@@ -126,7 +118,8 @@ const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks
   let tests: ReadonlyArray<Test> = [];
   let now = Date.now();
 
-  const getBlockName = (blockName: BlockName) => {
+  const getBlockName = (blockName: Circus.BlockName) => {
+    // tslint:disable-next-line: strict-type-predicates
     if (typeof blockName === 'string') {
       return blockName;
     }
@@ -140,7 +133,8 @@ const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks
     // return `${blockIndex}`;
   };
 
-  const getFinalBlockName = (block: DescribeBlock) => {
+  const getFinalBlockName = (block: Circus.DescribeBlock) => {
+    // tslint:disable-next-line: strict-type-predicates
     if (typeof block.name === 'string') {
       return block.name;
     }
@@ -148,8 +142,8 @@ const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks
     return '0';
   };
 
-  const getTestName = (entry: TestEntry) => {
-    const getBlockNamesWorker = (block: DescribeBlock): ReadonlyArray<string> => {
+  const getTestName = (entry: Circus.TestEntry) => {
+    const getBlockNamesWorker = (block: Circus.DescribeBlock): ReadonlyArray<string> => {
       if (block.parent == undefined) {
         return [];
       }
@@ -174,7 +168,7 @@ const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks
         })
         .catch(handleError);
     },
-    handleTestEvent: (event: JestEvent) => {
+    handleTestEvent: (event: Circus.Event) => {
       switch (event.name) {
         case 'start_describe_definition':
           if (blockIndices.length !== paths.length + 1) {

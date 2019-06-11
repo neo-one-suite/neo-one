@@ -2,7 +2,7 @@ import { bodyParser, getMonitor } from '@neo-one/http';
 import { KnownLabel, metrics, Monitor } from '@neo-one/monitor';
 import { Context } from 'koa';
 import compose from 'koa-compose';
-import compress from 'koa-compress';
+import koaCompress from 'koa-compress';
 import { Server } from '../Server';
 
 const RPC_METHODS: { readonly [key: string]: string } = {
@@ -145,7 +145,7 @@ export const rpc = ({ server }: { readonly server: Server }) => {
     name: 'rpc',
     path: '/rpc',
     middleware: compose([
-      compress(),
+      koaCompress(),
       bodyParser(),
       async (ctx: Context): Promise<void> => {
         if (!ctx.is('application/json')) {

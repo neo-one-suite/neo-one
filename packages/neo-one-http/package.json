@@ -7,13 +7,13 @@
     "@neo-one/monitor": "^1.1.2",
     "@neo-one/types": "^1.1.1",
     "@neo-one/utils": "^1.1.1",
-    "@types/koa-convert": "^1.2.1",
+    "@types/koa-convert": "^1.2.2",
     "@types/koa-cors": "^0.0.0",
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",
     "koa-convert": "^1.2.0",
     "koa-cors": "^0.0.16",
-    "rxjs": "^6.4.0",
+    "rxjs": "^6.5.2",
     "tslib": "^1.9.3"
   },
   "sideEffects": false

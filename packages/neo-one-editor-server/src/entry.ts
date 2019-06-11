@@ -4,7 +4,7 @@ import { finalize } from '@neo-one/utils';
 import * as http from 'http';
 import Application from 'koa';
 import compose from 'koa-compose';
-import compress from 'koa-compress';
+import koaCompress from 'koa-compress';
 import Router from 'koa-router';
 import { BehaviorSubject } from 'rxjs';
 import { pkgMiddleware } from './pkgMiddleware';
@@ -113,8 +113,8 @@ app.on('error', appOnError({ monitor }));
 const router = new Router<any, {}>();
 
 router.use(context({ monitor }));
-router.use(cors).post('resolveDependencies', '/resolve', compose([compress(), bodyParser(), resolveMiddleware]));
-router.use(cors).get('resolvePackage', '/pkg', compose([compress(), pkgMiddleware]));
+router.use(cors).post('resolveDependencies', '/resolve', compose([koaCompress(), bodyParser(), resolveMiddleware]));
+router.use(cors).get('resolvePackage', '/pkg', compose([koaCompress(), pkgMiddleware]));
 
 app.use(router.routes());
 app.use(cors);

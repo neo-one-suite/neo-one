@@ -1247,7 +1247,7 @@ type IsValidSmartContract<T> = {
       : never
     : T[K] extends SmartContractValue
     ? T[K]
-    : never
+    : never;
 };
 
 /**

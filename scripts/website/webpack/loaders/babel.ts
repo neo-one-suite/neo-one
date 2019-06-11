@@ -23,8 +23,8 @@ export const babel = ({
         {
           targets: stage === 'node' ? { node: bundle === 'server' ? '8.9.0' : true } : { browsers },
           modules: false,
-          useBuiltIns: 'entry',
-          corejs: '2.6.5',
+          useBuiltIns: 'usage',
+          corejs: 3,
           ignoreBrowserslistConfig: true,
         },
       ],

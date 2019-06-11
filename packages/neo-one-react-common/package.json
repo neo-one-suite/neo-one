@@ -7,16 +7,16 @@
     "@neo-one/react-core": "^1.1.3",
     "@neo-one/types": "^1.1.1",
     "@types/react": "^16.8.2",
-    "@types/react-select": "^2.0.11",
-    "@types/styled-components": "^4.1.8",
-    "popper.js": "^1.14.7",
+    "@types/react-select": "^2.0.19",
+    "@types/styled-components": "^4.1.16",
+    "popper.js": "^1.15.0",
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
-    "react-draggable": "^3.0.5",
-    "react-select": "^3.0.0",
-    "styled-components": "^4.2.0",
+    "react-draggable": "^3.3.0",
+    "react-select": "^3.0.4",
+    "styled-components": "^4.3.1",
     "styled-tools": "^1.6.0",
-    "trackjs": "^3.0.0"
+    "trackjs": "^3.3.0"
   },
   "sideEffects": [
     "*.css"
