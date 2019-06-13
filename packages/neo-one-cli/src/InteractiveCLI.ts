@@ -268,47 +268,37 @@ export class InteractiveCLI {
             }
             manager = new ServerManager({ dataPath, serverVersion: VERSION });
 
-            // tslint:disable-next-line no-any
-            let spinner: any | undefined;
-            // tslint:disable-next-line no-any
-            let verSpinner: any | undefined;
-
             if (first) {
-              verSpinner = ora(`Checking for @neo-one/cli updates...`).start();
+              const versionSpinner = ora(`Checking for @neo-one/cli updates...`).start();
+              try {
+                const newVersion = await manager.getNewerServerVersion();
+                if (newVersion === undefined) {
+                  versionSpinner.succeed(`@neo-one/cli is current`);
+                } else {
+                  versionSpinner.warn(
+                    `A newer version (${newVersion}) of @neo-one/cli is available for download see https://neo-one.io/docs/environment-setup/#Updating for how to update.`,
+                  );
+                }
+              } catch (error) {
+                versionSpinner.fail(`Failed to check @neo-one/cli version; failure: ${error}`);
+              }
             }
 
+            const spinner = ora(`Starting ${name.title} server...`).start();
+
             try {
-              const { pid, newerVersion } = await manager.start({
+              const { pid } = await manager.start({
                 port,
                 httpPort,
                 binary: createBinary(argv, this.serverConfig),
-                onStart: () => {
-                  if (first) {
-                    spinner = ora(`Starting ${name.title} server...`).start();
-                  }
-                },
               });
 
-              if (verSpinner !== undefined) {
-                if (newerVersion === undefined) {
-                  verSpinner.succeed(`@neo-one/cli is current`);
-                } else {
-                  verSpinner.warn(
-                    `A newer version (${newerVersion}) of @neo-one/cli is available for download see https://neo-one.io/docs/environment-setup/#Updating for how to update.`,
-                  );
-                }
-              }
-
-              if (spinner !== undefined) {
-                spinner.succeed(`Started ${name.title} server (pid=${pid})`);
-              }
+              spinner.succeed(`${name.title} server running at (pid=${pid})`);
               this.mutableClient = new Client({ port });
 
               return manager;
             } catch (error) {
-              if (spinner !== undefined) {
-                spinner.fail(`Failed to start ${name.title} server: ${error.message}`);
-              }
+              spinner.fail(`Failed to start ${name.title} server: ${error.message}`);
               throw error;
             }
           }),
