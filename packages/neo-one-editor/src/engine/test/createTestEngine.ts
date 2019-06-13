@@ -2,14 +2,8 @@
 import { Builder } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { comlink, WorkerManager } from '@neo-one/worker';
-// @ts-ignore
-import jestTestHooks from 'jest-circus';
-import {
-  getState,
-  setState,
-  // @ts-ignore
-} from 'jest-circus/build/state';
-// @ts-ignore
+import * as jestTestHooks from 'jest-circus';
+import { getState, setState } from 'jest-circus/build/state';
 import expect from 'jest-matchers';
 import JestMock from 'jest-mock';
 import { createFileSystem, createTranspileCache } from '../create';

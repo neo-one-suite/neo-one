@@ -14,7 +14,7 @@
     "@types/app-root-dir": "0.1.0",
     "app-root-dir": "1.0.2",
     "bignumber.js": "9.0.0",
-    "tslib": "1.9.3"
+    "tslib": "1.10.0"
   },
   "sideEffects": false
 }

@@ -5,7 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 // tslint:disable
-import '@babel/polyfill';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { CompileErrorContainer } from './containers/CompileErrorContainer';

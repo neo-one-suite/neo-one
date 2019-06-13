@@ -5,7 +5,7 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@neo-one/types": "^1.1.1",
-    "@types/lodash": "^4.14.120",
+    "@types/lodash": "^4.14.134",
     "lodash": "^4.17.11",
     "source-map": "^0.7.3",
     "typescript": "3.3.4000"

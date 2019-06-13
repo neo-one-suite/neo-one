@@ -1,6 +1,4 @@
-// tslint:disable no-submodule-imports no-import-side-effect
-import '@babel/polyfill';
-// @ts-ignore
+// tslint:disable no-import-side-effect
 import { TrackJS } from '@neo-one/react-common';
 import { setConfig } from 'react-hot-loader';
 // @ts-ignore

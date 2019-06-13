@@ -1,6 +1,4 @@
-/// <reference types="@neo-one/types" />
-// tslint:disable no-object-mutation strict-type-predicates no-import-side-effect
-import '@babel/polyfill';
+// tslint:disable strict-type-predicates no-object-mutation
 
 import { TrackJS } from '@neo-one/react-common';
 

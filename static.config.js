@@ -1,9 +1,6 @@
 import path from 'path';
 import _ from 'lodash';
 
-import regeneratorRuntime from '@babel/runtime/regenerator';
-global.regeneratorRuntime = regeneratorRuntime;
-
 require('ts-node/register/transpile-only');
 const { getCourses } = require('./packages/neo-one-website/src/loaders/coursesLoader');
 const { getDocs } = require('./packages/neo-one-website/src/utils/getDocs');

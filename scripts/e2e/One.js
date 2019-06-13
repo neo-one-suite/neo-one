@@ -160,9 +160,7 @@ class One {
 
   _createCommand(commandIn) {
     const cmd = path.resolve(process.cwd(), 'dist', 'neo-one', 'node_modules', '.bin', 'neo-one');
-    const command = `${cmd} ${commandIn} --dir ${this.dirName} --server-port ${this.serverPort} --http-server-port ${
-      this.httpServerPort
-    } --min-port ${this.minPort}`;
+    const command = `${cmd} ${commandIn} --dir ${this.dirName} --server-port ${this.serverPort} --http-server-port ${this.httpServerPort} --min-port ${this.minPort}`;
     let additionalArgs = [];
     if (commandIn.startsWith('create') || commandIn.startsWith('delete')) {
       additionalArgs = ['--no-progress'];

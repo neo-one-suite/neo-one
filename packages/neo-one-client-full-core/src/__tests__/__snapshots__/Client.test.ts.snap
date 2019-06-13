@@ -428,16 +428,8 @@ Object {
             ],
           },
           "currentUserAccount$": Observable {
-            "_isScalar": true,
+            "_isScalar": false,
             "_subscribe": [Function],
-            "value": Object {
-              "id": Object {
-                "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                "network": "main",
-              },
-              "name": "Mock",
-              "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-            },
           },
           "deleteUserAccount": [MockFunction] {
             "calls": Array [
@@ -510,11 +502,8 @@ Object {
           "iterActionsRaw": [MockFunction],
           "iterBlocks": [MockFunction],
           "networks$": Observable {
-            "_isScalar": true,
+            "_isScalar": false,
             "_subscribe": [Function],
-            "value": Array [
-              "main",
-            ],
           },
           "publish": [MockFunction] {
             "calls": Array [
@@ -654,18 +643,8 @@ Object {
             ],
           },
           "userAccounts$": Observable {
-            "_isScalar": true,
+            "_isScalar": false,
             "_subscribe": [Function],
-            "value": Array [
-              Object {
-                "id": Object {
-                  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                  "network": "main",
-                },
-                "name": "Mock",
-                "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-              },
-            ],
           },
         },
         "closed": false,
@@ -673,12 +652,11 @@ Object {
         "isStopped": false,
         "observers": Array [
           SwitchMapSubscriber {
-            "_parent": InnerSubscriber {
-              "_parent": CombineLatestSubscriber {
-                "_parent": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+            "_parentOrParents": InnerSubscriber {
+              "_parentOrParents": CombineLatestSubscriber {
+                "_parentOrParents": MapSubscriber {
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -697,15 +675,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -731,16 +707,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
-                    "_parent": [Circular],
-                    "_parents": null,
+                    "_parentOrParents": [Circular],
                     "_subscriptions": Array [
                       SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
+                        "_parentOrParents": [Circular],
                         "_subscriptions": null,
                         "closed": false,
                         "subject": [Circular],
@@ -767,9 +740,8 @@ Object {
                 "active": 2,
                 "closed": false,
                 "destination": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -788,15 +760,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -857,16 +827,8 @@ Object {
                       ],
                     },
                     "currentUserAccount$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
                     },
                     "deleteUserAccount": [MockFunction] {
                       "calls": Array [
@@ -939,11 +901,8 @@ Object {
                     "iterActionsRaw": [MockFunction],
                     "iterBlocks": [MockFunction],
                     "networks$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        "main",
-                      ],
                     },
                     "publish": [MockFunction] {
                       "calls": Array [
@@ -1083,23 +1042,12 @@ Object {
                       ],
                     },
                     "userAccounts$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        Object {
-                          "id": Object {
-                            "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                            "network": "main",
-                          },
-                          "name": "Mock",
-                          "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        },
-                      ],
                     },
                   },
                 ],
               },
-              "_parents": null,
               "_subscriptions": Array [
                 [Circular],
               ],
@@ -1115,10 +1063,9 @@ Object {
               "outerIndex": 0,
               "outerValue": [Circular],
               "parent": CombineLatestSubscriber {
-                "_parent": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                "_parentOrParents": MapSubscriber {
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -1137,15 +1084,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -1171,16 +1116,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
-                    "_parent": [Circular],
-                    "_parents": null,
+                    "_parentOrParents": [Circular],
                     "_subscriptions": Array [
                       SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
+                        "_parentOrParents": [Circular],
                         "_subscriptions": null,
                         "closed": false,
                         "subject": [Circular],
@@ -1207,9 +1149,8 @@ Object {
                 "active": 2,
                 "closed": false,
                 "destination": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -1228,15 +1169,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -1297,16 +1236,8 @@ Object {
                       ],
                     },
                     "currentUserAccount$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
                     },
                     "deleteUserAccount": [MockFunction] {
                       "calls": Array [
@@ -1379,11 +1310,8 @@ Object {
                     "iterActionsRaw": [MockFunction],
                     "iterBlocks": [MockFunction],
                     "networks$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        "main",
-                      ],
                     },
                     "publish": [MockFunction] {
                       "calls": Array [
@@ -1523,18 +1451,8 @@ Object {
                       ],
                     },
                     "userAccounts$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        Object {
-                          "id": Object {
-                            "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                            "network": "main",
-                          },
-                          "name": "Mock",
-                          "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        },
-                      ],
                     },
                   },
                 ],
@@ -1543,11 +1461,9 @@ Object {
               "syncErrorThrown": false,
               "syncErrorValue": null,
             },
-            "_parents": null,
             "_subscriptions": Array [
               SubjectSubscription {
-                "_parent": [Circular],
-                "_parents": null,
+                "_parentOrParents": [Circular],
                 "_subscriptions": null,
                 "closed": false,
                 "subject": [Circular],
@@ -1556,11 +1472,10 @@ Object {
             ],
             "closed": false,
             "destination": InnerSubscriber {
-              "_parent": CombineLatestSubscriber {
-                "_parent": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+              "_parentOrParents": CombineLatestSubscriber {
+                "_parentOrParents": MapSubscriber {
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -1579,15 +1494,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -1613,16 +1526,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
-                    "_parent": [Circular],
-                    "_parents": null,
+                    "_parentOrParents": [Circular],
                     "_subscriptions": Array [
                       SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
+                        "_parentOrParents": [Circular],
                         "_subscriptions": null,
                         "closed": false,
                         "subject": [Circular],
@@ -1649,9 +1559,8 @@ Object {
                 "active": 2,
                 "closed": false,
                 "destination": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -1670,15 +1579,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -1739,16 +1646,8 @@ Object {
                       ],
                     },
                     "currentUserAccount$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
                     },
                     "deleteUserAccount": [MockFunction] {
                       "calls": Array [
@@ -1821,11 +1720,8 @@ Object {
                     "iterActionsRaw": [MockFunction],
                     "iterBlocks": [MockFunction],
                     "networks$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        "main",
-                      ],
                     },
                     "publish": [MockFunction] {
                       "calls": Array [
@@ -1965,23 +1861,12 @@ Object {
                       ],
                     },
                     "userAccounts$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        Object {
-                          "id": Object {
-                            "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                            "network": "main",
-                          },
-                          "name": "Mock",
-                          "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        },
-                      ],
                     },
                   },
                 ],
               },
-              "_parents": null,
               "_subscriptions": Array [
                 [Circular],
               ],
@@ -1997,10 +1882,9 @@ Object {
               "outerIndex": 0,
               "outerValue": [Circular],
               "parent": CombineLatestSubscriber {
-                "_parent": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                "_parentOrParents": MapSubscriber {
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -2019,15 +1903,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -2053,16 +1935,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
-                    "_parent": [Circular],
-                    "_parents": null,
+                    "_parentOrParents": [Circular],
                     "_subscriptions": Array [
                       SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
+                        "_parentOrParents": [Circular],
                         "_subscriptions": null,
                         "closed": false,
                         "subject": [Circular],
@@ -2089,9 +1968,8 @@ Object {
                 "active": 2,
                 "closed": false,
                 "destination": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -2110,15 +1988,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -2179,16 +2055,8 @@ Object {
                       ],
                     },
                     "currentUserAccount$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
                     },
                     "deleteUserAccount": [MockFunction] {
                       "calls": Array [
@@ -2261,11 +2129,8 @@ Object {
                     "iterActionsRaw": [MockFunction],
                     "iterBlocks": [MockFunction],
                     "networks$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        "main",
-                      ],
                     },
                     "publish": [MockFunction] {
                       "calls": Array [
@@ -2405,18 +2270,8 @@ Object {
                       ],
                     },
                     "userAccounts$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        Object {
-                          "id": Object {
-                            "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                            "network": "main",
-                          },
-                          "name": "Mock",
-                          "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        },
-                      ],
                     },
                   },
                 ],
@@ -2426,7 +2281,25 @@ Object {
               "syncErrorValue": null,
             },
             "index": 1,
-            "innerSubscription": undefined,
+            "innerSubscription": InnerSubscriber {
+              "_parentOrParents": null,
+              "_subscriptions": null,
+              "closed": true,
+              "destination": Object {
+                "closed": true,
+                "complete": [Function],
+                "error": [Function],
+                "next": [Function],
+              },
+              "index": 1,
+              "isStopped": true,
+              "outerIndex": undefined,
+              "outerValue": undefined,
+              "parent": [Circular],
+              "syncErrorThrowable": false,
+              "syncErrorThrown": false,
+              "syncErrorValue": null,
+            },
             "isStopped": false,
             "project": [Function],
             "syncErrorThrowable": false,
@@ -2434,11 +2307,10 @@ Object {
             "syncErrorValue": null,
           },
           InnerSubscriber {
-            "_parent": CombineLatestSubscriber {
-              "_parent": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+            "_parentOrParents": CombineLatestSubscriber {
+              "_parentOrParents": MapSubscriber {
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -2457,15 +2329,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -2491,19 +2361,15 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parents": null,
               "_subscriptions": Array [
                 InnerSubscriber {
-                  "_parent": [Circular],
-                  "_parents": null,
+                  "_parentOrParents": [Circular],
                   "_subscriptions": Array [
                     SwitchMapSubscriber {
-                      "_parent": [Circular],
-                      "_parents": null,
+                      "_parentOrParents": [Circular],
                       "_subscriptions": Array [
                         SubjectSubscription {
-                          "_parent": [Circular],
-                          "_parents": null,
+                          "_parentOrParents": [Circular],
                           "_subscriptions": null,
                           "closed": false,
                           "subject": [Circular],
@@ -2513,7 +2379,25 @@ Object {
                       "closed": false,
                       "destination": [Circular],
                       "index": 1,
-                      "innerSubscription": undefined,
+                      "innerSubscription": InnerSubscriber {
+                        "_parentOrParents": null,
+                        "_subscriptions": null,
+                        "closed": true,
+                        "destination": Object {
+                          "closed": true,
+                          "complete": [Function],
+                          "error": [Function],
+                          "next": [Function],
+                        },
+                        "index": 1,
+                        "isStopped": true,
+                        "outerIndex": undefined,
+                        "outerValue": undefined,
+                        "parent": [Circular],
+                        "syncErrorThrowable": false,
+                        "syncErrorThrown": false,
+                        "syncErrorValue": null,
+                      },
                       "isStopped": false,
                       "project": [Function],
                       "syncErrorThrowable": false,
@@ -2542,9 +2426,8 @@ Object {
               "active": 2,
               "closed": false,
               "destination": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -2563,15 +2446,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -2632,16 +2513,8 @@ Object {
                     ],
                   },
                   "currentUserAccount$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Object {
-                      "id": Object {
-                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                        "network": "main",
-                      },
-                      "name": "Mock",
-                      "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    },
                   },
                   "deleteUserAccount": [MockFunction] {
                     "calls": Array [
@@ -2714,11 +2587,8 @@ Object {
                   "iterActionsRaw": [MockFunction],
                   "iterBlocks": [MockFunction],
                   "networks$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      "main",
-                    ],
                   },
                   "publish": [MockFunction] {
                     "calls": Array [
@@ -2858,27 +2728,15 @@ Object {
                     ],
                   },
                   "userAccounts$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
-                    ],
                   },
                 },
               ],
             },
-            "_parents": null,
             "_subscriptions": Array [
               SubjectSubscription {
-                "_parent": [Circular],
-                "_parents": null,
+                "_parentOrParents": [Circular],
                 "_subscriptions": null,
                 "closed": false,
                 "subject": [Circular],
@@ -2897,10 +2755,9 @@ Object {
             "outerIndex": 1,
             "outerValue": [Circular],
             "parent": CombineLatestSubscriber {
-              "_parent": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+              "_parentOrParents": MapSubscriber {
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -2919,15 +2776,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -2953,19 +2808,15 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parents": null,
               "_subscriptions": Array [
                 InnerSubscriber {
-                  "_parent": [Circular],
-                  "_parents": null,
+                  "_parentOrParents": [Circular],
                   "_subscriptions": Array [
                     SwitchMapSubscriber {
-                      "_parent": [Circular],
-                      "_parents": null,
+                      "_parentOrParents": [Circular],
                       "_subscriptions": Array [
                         SubjectSubscription {
-                          "_parent": [Circular],
-                          "_parents": null,
+                          "_parentOrParents": [Circular],
                           "_subscriptions": null,
                           "closed": false,
                           "subject": [Circular],
@@ -2975,7 +2826,25 @@ Object {
                       "closed": false,
                       "destination": [Circular],
                       "index": 1,
-                      "innerSubscription": undefined,
+                      "innerSubscription": InnerSubscriber {
+                        "_parentOrParents": null,
+                        "_subscriptions": null,
+                        "closed": true,
+                        "destination": Object {
+                          "closed": true,
+                          "complete": [Function],
+                          "error": [Function],
+                          "next": [Function],
+                        },
+                        "index": 1,
+                        "isStopped": true,
+                        "outerIndex": undefined,
+                        "outerValue": undefined,
+                        "parent": [Circular],
+                        "syncErrorThrowable": false,
+                        "syncErrorThrown": false,
+                        "syncErrorValue": null,
+                      },
                       "isStopped": false,
                       "project": [Function],
                       "syncErrorThrowable": false,
@@ -3004,9 +2873,8 @@ Object {
               "active": 2,
               "closed": false,
               "destination": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -3025,15 +2893,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -3094,16 +2960,8 @@ Object {
                     ],
                   },
                   "currentUserAccount$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Object {
-                      "id": Object {
-                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                        "network": "main",
-                      },
-                      "name": "Mock",
-                      "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    },
                   },
                   "deleteUserAccount": [MockFunction] {
                     "calls": Array [
@@ -3176,11 +3034,8 @@ Object {
                   "iterActionsRaw": [MockFunction],
                   "iterBlocks": [MockFunction],
                   "networks$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      "main",
-                    ],
                   },
                   "publish": [MockFunction] {
                     "calls": Array [
@@ -3320,18 +3175,8 @@ Object {
                     ],
                   },
                   "userAccounts$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
-                    ],
                   },
                 },
               ],
@@ -3367,16 +3212,8 @@ Object {
             ],
           },
           "currentUserAccount$": Observable {
-            "_isScalar": true,
+            "_isScalar": false,
             "_subscribe": [Function],
-            "value": Object {
-              "id": Object {
-                "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                "network": "main",
-              },
-              "name": "Mock",
-              "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-            },
           },
           "deleteUserAccount": [MockFunction] {
             "calls": Array [
@@ -3449,11 +3286,8 @@ Object {
           "iterActionsRaw": [MockFunction],
           "iterBlocks": [MockFunction],
           "networks$": Observable {
-            "_isScalar": true,
+            "_isScalar": false,
             "_subscribe": [Function],
-            "value": Array [
-              "main",
-            ],
           },
           "publish": [MockFunction] {
             "calls": Array [
@@ -3593,18 +3427,8 @@ Object {
             ],
           },
           "userAccounts$": Observable {
-            "_isScalar": true,
+            "_isScalar": false,
             "_subscribe": [Function],
-            "value": Array [
-              Object {
-                "id": Object {
-                  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                  "network": "main",
-                },
-                "name": "Mock",
-                "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-              },
-            ],
           },
         },
         "closed": false,
@@ -3612,12 +3436,11 @@ Object {
         "isStopped": false,
         "observers": Array [
           SwitchMapSubscriber {
-            "_parent": InnerSubscriber {
-              "_parent": CombineLatestSubscriber {
-                "_parent": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+            "_parentOrParents": InnerSubscriber {
+              "_parentOrParents": CombineLatestSubscriber {
+                "_parentOrParents": MapSubscriber {
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -3636,15 +3459,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -3670,16 +3491,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
-                    "_parent": [Circular],
-                    "_parents": null,
+                    "_parentOrParents": [Circular],
                     "_subscriptions": Array [
                       SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
+                        "_parentOrParents": [Circular],
                         "_subscriptions": null,
                         "closed": false,
                         "subject": [Circular],
@@ -3706,9 +3524,8 @@ Object {
                 "active": 2,
                 "closed": false,
                 "destination": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -3727,15 +3544,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -3796,16 +3611,8 @@ Object {
                       ],
                     },
                     "currentUserAccount$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
                     },
                     "deleteUserAccount": [MockFunction] {
                       "calls": Array [
@@ -3878,11 +3685,8 @@ Object {
                     "iterActionsRaw": [MockFunction],
                     "iterBlocks": [MockFunction],
                     "networks$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        "main",
-                      ],
                     },
                     "publish": [MockFunction] {
                       "calls": Array [
@@ -4022,23 +3826,12 @@ Object {
                       ],
                     },
                     "userAccounts$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        Object {
-                          "id": Object {
-                            "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                            "network": "main",
-                          },
-                          "name": "Mock",
-                          "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        },
-                      ],
                     },
                   },
                 ],
               },
-              "_parents": null,
               "_subscriptions": Array [
                 [Circular],
               ],
@@ -4054,10 +3847,9 @@ Object {
               "outerIndex": 0,
               "outerValue": [Circular],
               "parent": CombineLatestSubscriber {
-                "_parent": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                "_parentOrParents": MapSubscriber {
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -4076,15 +3868,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -4110,16 +3900,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
-                    "_parent": [Circular],
-                    "_parents": null,
+                    "_parentOrParents": [Circular],
                     "_subscriptions": Array [
                       SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
+                        "_parentOrParents": [Circular],
                         "_subscriptions": null,
                         "closed": false,
                         "subject": [Circular],
@@ -4146,9 +3933,8 @@ Object {
                 "active": 2,
                 "closed": false,
                 "destination": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -4167,15 +3953,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -4236,16 +4020,8 @@ Object {
                       ],
                     },
                     "currentUserAccount$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
                     },
                     "deleteUserAccount": [MockFunction] {
                       "calls": Array [
@@ -4318,11 +4094,8 @@ Object {
                     "iterActionsRaw": [MockFunction],
                     "iterBlocks": [MockFunction],
                     "networks$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        "main",
-                      ],
                     },
                     "publish": [MockFunction] {
                       "calls": Array [
@@ -4462,18 +4235,8 @@ Object {
                       ],
                     },
                     "userAccounts$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        Object {
-                          "id": Object {
-                            "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                            "network": "main",
-                          },
-                          "name": "Mock",
-                          "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        },
-                      ],
                     },
                   },
                 ],
@@ -4482,11 +4245,9 @@ Object {
               "syncErrorThrown": false,
               "syncErrorValue": null,
             },
-            "_parents": null,
             "_subscriptions": Array [
               SubjectSubscription {
-                "_parent": [Circular],
-                "_parents": null,
+                "_parentOrParents": [Circular],
                 "_subscriptions": null,
                 "closed": false,
                 "subject": [Circular],
@@ -4495,11 +4256,10 @@ Object {
             ],
             "closed": false,
             "destination": InnerSubscriber {
-              "_parent": CombineLatestSubscriber {
-                "_parent": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+              "_parentOrParents": CombineLatestSubscriber {
+                "_parentOrParents": MapSubscriber {
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -4518,15 +4278,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -4552,16 +4310,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
-                    "_parent": [Circular],
-                    "_parents": null,
+                    "_parentOrParents": [Circular],
                     "_subscriptions": Array [
                       SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
+                        "_parentOrParents": [Circular],
                         "_subscriptions": null,
                         "closed": false,
                         "subject": [Circular],
@@ -4588,9 +4343,8 @@ Object {
                 "active": 2,
                 "closed": false,
                 "destination": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -4609,15 +4363,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -4678,16 +4430,8 @@ Object {
                       ],
                     },
                     "currentUserAccount$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
                     },
                     "deleteUserAccount": [MockFunction] {
                       "calls": Array [
@@ -4760,11 +4504,8 @@ Object {
                     "iterActionsRaw": [MockFunction],
                     "iterBlocks": [MockFunction],
                     "networks$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        "main",
-                      ],
                     },
                     "publish": [MockFunction] {
                       "calls": Array [
@@ -4904,23 +4645,12 @@ Object {
                       ],
                     },
                     "userAccounts$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        Object {
-                          "id": Object {
-                            "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                            "network": "main",
-                          },
-                          "name": "Mock",
-                          "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        },
-                      ],
                     },
                   },
                 ],
               },
-              "_parents": null,
               "_subscriptions": Array [
                 [Circular],
               ],
@@ -4936,10 +4666,9 @@ Object {
               "outerIndex": 0,
               "outerValue": [Circular],
               "parent": CombineLatestSubscriber {
-                "_parent": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                "_parentOrParents": MapSubscriber {
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -4958,15 +4687,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -4992,16 +4719,13 @@ Object {
                   "syncErrorValue": null,
                   "thisArg": [Circular],
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                   InnerSubscriber {
-                    "_parent": [Circular],
-                    "_parents": null,
+                    "_parentOrParents": [Circular],
                     "_subscriptions": Array [
                       SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
+                        "_parentOrParents": [Circular],
                         "_subscriptions": null,
                         "closed": false,
                         "subject": [Circular],
@@ -5028,9 +4752,8 @@ Object {
                 "active": 2,
                 "closed": false,
                 "destination": MapSubscriber {
-                  "_parent": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                  "_parentOrParents": SubjectSubscriber {
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -5049,15 +4772,13 @@ Object {
                     "syncErrorThrown": false,
                     "syncErrorValue": null,
                   },
-                  "_parents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
                   "closed": false,
                   "count": 1,
                   "destination": SubjectSubscriber {
-                    "_parent": null,
-                    "_parents": null,
+                    "_parentOrParents": null,
                     "_subscriptions": Array [
                       [Circular],
                     ],
@@ -5118,16 +4839,8 @@ Object {
                       ],
                     },
                     "currentUserAccount$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
                     },
                     "deleteUserAccount": [MockFunction] {
                       "calls": Array [
@@ -5200,11 +4913,8 @@ Object {
                     "iterActionsRaw": [MockFunction],
                     "iterBlocks": [MockFunction],
                     "networks$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        "main",
-                      ],
                     },
                     "publish": [MockFunction] {
                       "calls": Array [
@@ -5344,18 +5054,8 @@ Object {
                       ],
                     },
                     "userAccounts$": Observable {
-                      "_isScalar": true,
+                      "_isScalar": false,
                       "_subscribe": [Function],
-                      "value": Array [
-                        Object {
-                          "id": Object {
-                            "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                            "network": "main",
-                          },
-                          "name": "Mock",
-                          "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                        },
-                      ],
                     },
                   },
                 ],
@@ -5365,7 +5065,25 @@ Object {
               "syncErrorValue": null,
             },
             "index": 1,
-            "innerSubscription": undefined,
+            "innerSubscription": InnerSubscriber {
+              "_parentOrParents": null,
+              "_subscriptions": null,
+              "closed": true,
+              "destination": Object {
+                "closed": true,
+                "complete": [Function],
+                "error": [Function],
+                "next": [Function],
+              },
+              "index": 1,
+              "isStopped": true,
+              "outerIndex": undefined,
+              "outerValue": undefined,
+              "parent": [Circular],
+              "syncErrorThrowable": false,
+              "syncErrorThrown": false,
+              "syncErrorValue": null,
+            },
             "isStopped": false,
             "project": [Function],
             "syncErrorThrowable": false,
@@ -5373,11 +5091,10 @@ Object {
             "syncErrorValue": null,
           },
           InnerSubscriber {
-            "_parent": CombineLatestSubscriber {
-              "_parent": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+            "_parentOrParents": CombineLatestSubscriber {
+              "_parentOrParents": MapSubscriber {
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -5396,15 +5113,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -5430,19 +5145,15 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parents": null,
               "_subscriptions": Array [
                 InnerSubscriber {
-                  "_parent": [Circular],
-                  "_parents": null,
+                  "_parentOrParents": [Circular],
                   "_subscriptions": Array [
                     SwitchMapSubscriber {
-                      "_parent": [Circular],
-                      "_parents": null,
+                      "_parentOrParents": [Circular],
                       "_subscriptions": Array [
                         SubjectSubscription {
-                          "_parent": [Circular],
-                          "_parents": null,
+                          "_parentOrParents": [Circular],
                           "_subscriptions": null,
                           "closed": false,
                           "subject": [Circular],
@@ -5452,7 +5163,25 @@ Object {
                       "closed": false,
                       "destination": [Circular],
                       "index": 1,
-                      "innerSubscription": undefined,
+                      "innerSubscription": InnerSubscriber {
+                        "_parentOrParents": null,
+                        "_subscriptions": null,
+                        "closed": true,
+                        "destination": Object {
+                          "closed": true,
+                          "complete": [Function],
+                          "error": [Function],
+                          "next": [Function],
+                        },
+                        "index": 1,
+                        "isStopped": true,
+                        "outerIndex": undefined,
+                        "outerValue": undefined,
+                        "parent": [Circular],
+                        "syncErrorThrowable": false,
+                        "syncErrorThrown": false,
+                        "syncErrorValue": null,
+                      },
                       "isStopped": false,
                       "project": [Function],
                       "syncErrorThrowable": false,
@@ -5481,9 +5210,8 @@ Object {
               "active": 2,
               "closed": false,
               "destination": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -5502,15 +5230,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -5571,16 +5297,8 @@ Object {
                     ],
                   },
                   "currentUserAccount$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Object {
-                      "id": Object {
-                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                        "network": "main",
-                      },
-                      "name": "Mock",
-                      "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    },
                   },
                   "deleteUserAccount": [MockFunction] {
                     "calls": Array [
@@ -5653,11 +5371,8 @@ Object {
                   "iterActionsRaw": [MockFunction],
                   "iterBlocks": [MockFunction],
                   "networks$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      "main",
-                    ],
                   },
                   "publish": [MockFunction] {
                     "calls": Array [
@@ -5797,27 +5512,15 @@ Object {
                     ],
                   },
                   "userAccounts$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
-                    ],
                   },
                 },
               ],
             },
-            "_parents": null,
             "_subscriptions": Array [
               SubjectSubscription {
-                "_parent": [Circular],
-                "_parents": null,
+                "_parentOrParents": [Circular],
                 "_subscriptions": null,
                 "closed": false,
                 "subject": [Circular],
@@ -5836,10 +5539,9 @@ Object {
             "outerIndex": 1,
             "outerValue": [Circular],
             "parent": CombineLatestSubscriber {
-              "_parent": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+              "_parentOrParents": MapSubscriber {
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -5858,15 +5560,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -5892,19 +5592,15 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parents": null,
               "_subscriptions": Array [
                 InnerSubscriber {
-                  "_parent": [Circular],
-                  "_parents": null,
+                  "_parentOrParents": [Circular],
                   "_subscriptions": Array [
                     SwitchMapSubscriber {
-                      "_parent": [Circular],
-                      "_parents": null,
+                      "_parentOrParents": [Circular],
                       "_subscriptions": Array [
                         SubjectSubscription {
-                          "_parent": [Circular],
-                          "_parents": null,
+                          "_parentOrParents": [Circular],
                           "_subscriptions": null,
                           "closed": false,
                           "subject": [Circular],
@@ -5914,7 +5610,25 @@ Object {
                       "closed": false,
                       "destination": [Circular],
                       "index": 1,
-                      "innerSubscription": undefined,
+                      "innerSubscription": InnerSubscriber {
+                        "_parentOrParents": null,
+                        "_subscriptions": null,
+                        "closed": true,
+                        "destination": Object {
+                          "closed": true,
+                          "complete": [Function],
+                          "error": [Function],
+                          "next": [Function],
+                        },
+                        "index": 1,
+                        "isStopped": true,
+                        "outerIndex": undefined,
+                        "outerValue": undefined,
+                        "parent": [Circular],
+                        "syncErrorThrowable": false,
+                        "syncErrorThrown": false,
+                        "syncErrorValue": null,
+                      },
                       "isStopped": false,
                       "project": [Function],
                       "syncErrorThrowable": false,
@@ -5943,9 +5657,8 @@ Object {
               "active": 2,
               "closed": false,
               "destination": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -5964,15 +5677,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -6033,16 +5744,8 @@ Object {
                     ],
                   },
                   "currentUserAccount$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Object {
-                      "id": Object {
-                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                        "network": "main",
-                      },
-                      "name": "Mock",
-                      "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    },
                   },
                   "deleteUserAccount": [MockFunction] {
                     "calls": Array [
@@ -6115,11 +5818,8 @@ Object {
                   "iterActionsRaw": [MockFunction],
                   "iterBlocks": [MockFunction],
                   "networks$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      "main",
-                    ],
                   },
                   "publish": [MockFunction] {
                     "calls": Array [
@@ -6259,18 +5959,8 @@ Object {
                     ],
                   },
                   "userAccounts$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
-                    ],
                   },
                 },
               ],
@@ -6389,16 +6079,8 @@ Object {
               "call": [MockFunction],
               "claim": [MockFunction],
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                },
               },
               "deleteUserAccount": [MockFunction],
               "getAccount": [MockFunction],
@@ -6415,11 +6097,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction],
               "publishAndDeploy": [MockFunction],
@@ -6429,18 +6108,8 @@ Object {
               "transfer": [MockFunction],
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  },
-                ],
               },
             },
             "memory": Object {
@@ -6459,16 +6128,8 @@ Object {
                 ],
               },
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                },
               },
               "deleteUserAccount": [MockFunction] {
                 "calls": Array [
@@ -6541,11 +6202,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction] {
                 "calls": Array [
@@ -6685,18 +6343,8 @@ Object {
                 ],
               },
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  },
-                ],
               },
             },
           },
@@ -6719,16 +6367,8 @@ Object {
               "call": [MockFunction],
               "claim": [MockFunction],
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                },
               },
               "deleteUserAccount": [MockFunction],
               "getAccount": [MockFunction],
@@ -6745,11 +6385,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction],
               "publishAndDeploy": [MockFunction],
@@ -6759,18 +6396,8 @@ Object {
               "transfer": [MockFunction],
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  },
-                ],
               },
             },
             "memory": Object {
@@ -6789,16 +6416,8 @@ Object {
                 ],
               },
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                },
               },
               "deleteUserAccount": [MockFunction] {
                 "calls": Array [
@@ -6871,11 +6490,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction] {
                 "calls": Array [
@@ -7015,18 +6631,8 @@ Object {
                 ],
               },
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  },
-                ],
               },
             },
           },
@@ -7055,16 +6661,8 @@ Object {
               "call": [MockFunction],
               "claim": [MockFunction],
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                },
               },
               "deleteUserAccount": [MockFunction],
               "getAccount": [MockFunction],
@@ -7081,11 +6679,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction],
               "publishAndDeploy": [MockFunction],
@@ -7095,18 +6690,8 @@ Object {
               "transfer": [MockFunction],
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  },
-                ],
               },
             },
             "memory": Object {
@@ -7125,16 +6710,8 @@ Object {
                 ],
               },
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                },
               },
               "deleteUserAccount": [MockFunction] {
                 "calls": Array [
@@ -7207,11 +6784,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction] {
                 "calls": Array [
@@ -7351,18 +6925,8 @@ Object {
                 ],
               },
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  },
-                ],
               },
             },
           },
@@ -7385,16 +6949,8 @@ Object {
               "call": [MockFunction],
               "claim": [MockFunction],
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                },
               },
               "deleteUserAccount": [MockFunction],
               "getAccount": [MockFunction],
@@ -7411,11 +6967,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction],
               "publishAndDeploy": [MockFunction],
@@ -7425,18 +6978,8 @@ Object {
               "transfer": [MockFunction],
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  },
-                ],
               },
             },
             "memory": Object {
@@ -7455,16 +6998,8 @@ Object {
                 ],
               },
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                },
               },
               "deleteUserAccount": [MockFunction] {
                 "calls": Array [
@@ -7537,11 +7072,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction] {
                 "calls": Array [
@@ -7681,18 +7213,8 @@ Object {
                 ],
               },
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  },
-                ],
               },
             },
           },
@@ -7713,16 +7235,8 @@ Object {
           "call": [MockFunction],
           "claim": [MockFunction],
           "currentUserAccount$": Observable {
-            "_isScalar": true,
+            "_isScalar": false,
             "_subscribe": [Function],
-            "value": Object {
-              "id": Object {
-                "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                "network": "main",
-              },
-              "name": "Mock",
-              "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-            },
           },
           "deleteUserAccount": [MockFunction],
           "getAccount": [MockFunction],
@@ -7739,11 +7253,8 @@ Object {
           "iterActionsRaw": [MockFunction],
           "iterBlocks": [MockFunction],
           "networks$": Observable {
-            "_isScalar": true,
+            "_isScalar": false,
             "_subscribe": [Function],
-            "value": Array [
-              "main",
-            ],
           },
           "publish": [MockFunction],
           "publishAndDeploy": [MockFunction],
@@ -7753,18 +7264,8 @@ Object {
           "transfer": [MockFunction],
           "updateUserAccountName": [MockFunction],
           "userAccounts$": Observable {
-            "_isScalar": true,
+            "_isScalar": false,
             "_subscribe": [Function],
-            "value": Array [
-              Object {
-                "id": Object {
-                  "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                  "network": "main",
-                },
-                "name": "Mock",
-                "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-              },
-            ],
           },
         },
         "memory": Object {
@@ -7783,16 +7284,8 @@ Object {
             ],
           },
           "currentUserAccount$": Observable {
-            "_isScalar": true,
+            "_isScalar": false,
             "_subscribe": [Function],
-            "value": Object {
-              "id": Object {
-                "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                "network": "main",
-              },
-              "name": "Mock",
-              "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-            },
           },
           "deleteUserAccount": [MockFunction] {
             "calls": Array [
@@ -7865,11 +7358,8 @@ Object {
           "iterActionsRaw": [MockFunction],
           "iterBlocks": [MockFunction],
           "networks$": Observable {
-            "_isScalar": true,
+            "_isScalar": false,
             "_subscribe": [Function],
-            "value": Array [
-              "main",
-            ],
           },
           "publish": [MockFunction] {
             "calls": Array [
@@ -8009,18 +7499,8 @@ Object {
             ],
           },
           "userAccounts$": Observable {
-            "_isScalar": true,
+            "_isScalar": false,
             "_subscribe": [Function],
-            "value": Array [
-              Object {
-                "id": Object {
-                  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                  "network": "main",
-                },
-                "name": "Mock",
-                "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-              },
-            ],
           },
         },
       },
@@ -8057,16 +7537,8 @@ Object {
           ],
         },
         "currentUserAccount$": Observable {
-          "_isScalar": true,
+          "_isScalar": false,
           "_subscribe": [Function],
-          "value": Object {
-            "id": Object {
-              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-              "network": "main",
-            },
-            "name": "Mock",
-            "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-          },
         },
         "deleteUserAccount": [MockFunction] {
           "calls": Array [
@@ -8139,11 +7611,8 @@ Object {
         "iterActionsRaw": [MockFunction],
         "iterBlocks": [MockFunction],
         "networks$": Observable {
-          "_isScalar": true,
+          "_isScalar": false,
           "_subscribe": [Function],
-          "value": Array [
-            "main",
-          ],
         },
         "publish": [MockFunction] {
           "calls": Array [
@@ -8283,18 +7752,8 @@ Object {
           ],
         },
         "userAccounts$": Observable {
-          "_isScalar": true,
+          "_isScalar": false,
           "_subscribe": [Function],
-          "value": Array [
-            Object {
-              "id": Object {
-                "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                "network": "main",
-              },
-              "name": "Mock",
-              "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-            },
-          ],
         },
       },
       "closed": false,
@@ -8302,12 +7761,11 @@ Object {
       "isStopped": false,
       "observers": Array [
         SwitchMapSubscriber {
-          "_parent": InnerSubscriber {
-            "_parent": CombineLatestSubscriber {
-              "_parent": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+          "_parentOrParents": InnerSubscriber {
+            "_parentOrParents": CombineLatestSubscriber {
+              "_parentOrParents": MapSubscriber {
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -8326,15 +7784,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -8360,16 +7816,13 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parents": null,
               "_subscriptions": Array [
                 [Circular],
                 InnerSubscriber {
-                  "_parent": [Circular],
-                  "_parents": null,
+                  "_parentOrParents": [Circular],
                   "_subscriptions": Array [
                     SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
+                      "_parentOrParents": [Circular],
                       "_subscriptions": null,
                       "closed": false,
                       "subject": [Circular],
@@ -8396,9 +7849,8 @@ Object {
               "active": 2,
               "closed": false,
               "destination": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -8417,15 +7869,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -8498,16 +7948,8 @@ Object {
                     ],
                   },
                   "currentUserAccount$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Object {
-                      "id": Object {
-                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                        "network": "main",
-                      },
-                      "name": "Mock",
-                      "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    },
                   },
                   "deleteUserAccount": [MockFunction] {
                     "calls": Array [
@@ -8580,11 +8022,8 @@ Object {
                   "iterActionsRaw": [MockFunction],
                   "iterBlocks": [MockFunction],
                   "networks$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      "main",
-                    ],
                   },
                   "publish": [MockFunction] {
                     "calls": Array [
@@ -8724,23 +8163,12 @@ Object {
                     ],
                   },
                   "userAccounts$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
-                    ],
                   },
                 },
               ],
             },
-            "_parents": null,
             "_subscriptions": Array [
               [Circular],
             ],
@@ -8768,10 +8196,9 @@ Object {
               "thrownError": null,
             },
             "parent": CombineLatestSubscriber {
-              "_parent": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+              "_parentOrParents": MapSubscriber {
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -8790,15 +8217,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -8824,16 +8249,13 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parents": null,
               "_subscriptions": Array [
                 [Circular],
                 InnerSubscriber {
-                  "_parent": [Circular],
-                  "_parents": null,
+                  "_parentOrParents": [Circular],
                   "_subscriptions": Array [
                     SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
+                      "_parentOrParents": [Circular],
                       "_subscriptions": null,
                       "closed": false,
                       "subject": [Circular],
@@ -8860,9 +8282,8 @@ Object {
               "active": 2,
               "closed": false,
               "destination": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -8881,15 +8302,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -8962,16 +8381,8 @@ Object {
                     ],
                   },
                   "currentUserAccount$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Object {
-                      "id": Object {
-                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                        "network": "main",
-                      },
-                      "name": "Mock",
-                      "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    },
                   },
                   "deleteUserAccount": [MockFunction] {
                     "calls": Array [
@@ -9044,11 +8455,8 @@ Object {
                   "iterActionsRaw": [MockFunction],
                   "iterBlocks": [MockFunction],
                   "networks$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      "main",
-                    ],
                   },
                   "publish": [MockFunction] {
                     "calls": Array [
@@ -9188,18 +8596,8 @@ Object {
                     ],
                   },
                   "userAccounts$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
-                    ],
                   },
                 },
               ],
@@ -9208,11 +8606,9 @@ Object {
             "syncErrorThrown": false,
             "syncErrorValue": null,
           },
-          "_parents": null,
           "_subscriptions": Array [
             SubjectSubscription {
-              "_parent": [Circular],
-              "_parents": null,
+              "_parentOrParents": [Circular],
               "_subscriptions": null,
               "closed": false,
               "subject": [Circular],
@@ -9221,11 +8617,10 @@ Object {
           ],
           "closed": false,
           "destination": InnerSubscriber {
-            "_parent": CombineLatestSubscriber {
-              "_parent": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+            "_parentOrParents": CombineLatestSubscriber {
+              "_parentOrParents": MapSubscriber {
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -9244,15 +8639,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -9278,16 +8671,13 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parents": null,
               "_subscriptions": Array [
                 [Circular],
                 InnerSubscriber {
-                  "_parent": [Circular],
-                  "_parents": null,
+                  "_parentOrParents": [Circular],
                   "_subscriptions": Array [
                     SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
+                      "_parentOrParents": [Circular],
                       "_subscriptions": null,
                       "closed": false,
                       "subject": [Circular],
@@ -9314,9 +8704,8 @@ Object {
               "active": 2,
               "closed": false,
               "destination": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -9335,15 +8724,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -9416,16 +8803,8 @@ Object {
                     ],
                   },
                   "currentUserAccount$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Object {
-                      "id": Object {
-                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                        "network": "main",
-                      },
-                      "name": "Mock",
-                      "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    },
                   },
                   "deleteUserAccount": [MockFunction] {
                     "calls": Array [
@@ -9498,11 +8877,8 @@ Object {
                   "iterActionsRaw": [MockFunction],
                   "iterBlocks": [MockFunction],
                   "networks$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      "main",
-                    ],
                   },
                   "publish": [MockFunction] {
                     "calls": Array [
@@ -9642,23 +9018,12 @@ Object {
                     ],
                   },
                   "userAccounts$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
-                    ],
                   },
                 },
               ],
             },
-            "_parents": null,
             "_subscriptions": Array [
               [Circular],
             ],
@@ -9686,10 +9051,9 @@ Object {
               "thrownError": null,
             },
             "parent": CombineLatestSubscriber {
-              "_parent": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+              "_parentOrParents": MapSubscriber {
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -9708,15 +9072,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -9742,16 +9104,13 @@ Object {
                 "syncErrorValue": null,
                 "thisArg": [Circular],
               },
-              "_parents": null,
               "_subscriptions": Array [
                 [Circular],
                 InnerSubscriber {
-                  "_parent": [Circular],
-                  "_parents": null,
+                  "_parentOrParents": [Circular],
                   "_subscriptions": Array [
                     SubjectSubscription {
-                      "_parent": [Circular],
-                      "_parents": null,
+                      "_parentOrParents": [Circular],
                       "_subscriptions": null,
                       "closed": false,
                       "subject": [Circular],
@@ -9778,9 +9137,8 @@ Object {
               "active": 2,
               "closed": false,
               "destination": MapSubscriber {
-                "_parent": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                "_parentOrParents": SubjectSubscriber {
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -9799,15 +9157,13 @@ Object {
                   "syncErrorThrown": false,
                   "syncErrorValue": null,
                 },
-                "_parents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
                 "closed": false,
                 "count": 1,
                 "destination": SubjectSubscriber {
-                  "_parent": null,
-                  "_parents": null,
+                  "_parentOrParents": null,
                   "_subscriptions": Array [
                     [Circular],
                   ],
@@ -9880,16 +9236,8 @@ Object {
                     ],
                   },
                   "currentUserAccount$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Object {
-                      "id": Object {
-                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                        "network": "main",
-                      },
-                      "name": "Mock",
-                      "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    },
                   },
                   "deleteUserAccount": [MockFunction] {
                     "calls": Array [
@@ -9962,11 +9310,8 @@ Object {
                   "iterActionsRaw": [MockFunction],
                   "iterBlocks": [MockFunction],
                   "networks$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      "main",
-                    ],
                   },
                   "publish": [MockFunction] {
                     "calls": Array [
@@ -10106,18 +9451,8 @@ Object {
                     ],
                   },
                   "userAccounts$": Observable {
-                    "_isScalar": true,
+                    "_isScalar": false,
                     "_subscribe": [Function],
-                    "value": Array [
-                      Object {
-                        "id": Object {
-                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                          "network": "main",
-                        },
-                        "name": "Mock",
-                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                      },
-                    ],
                   },
                 },
               ],
@@ -10127,7 +9462,25 @@ Object {
             "syncErrorValue": null,
           },
           "index": 1,
-          "innerSubscription": undefined,
+          "innerSubscription": InnerSubscriber {
+            "_parentOrParents": null,
+            "_subscriptions": null,
+            "closed": true,
+            "destination": Object {
+              "closed": true,
+              "complete": [Function],
+              "error": [Function],
+              "next": [Function],
+            },
+            "index": 1,
+            "isStopped": true,
+            "outerIndex": undefined,
+            "outerValue": undefined,
+            "parent": [Circular],
+            "syncErrorThrowable": false,
+            "syncErrorThrown": false,
+            "syncErrorValue": null,
+          },
           "isStopped": false,
           "project": [Function],
           "syncErrorThrowable": false,
@@ -10135,11 +9488,10 @@ Object {
           "syncErrorValue": null,
         },
         InnerSubscriber {
-          "_parent": CombineLatestSubscriber {
-            "_parent": MapSubscriber {
-              "_parent": SubjectSubscriber {
-                "_parent": null,
-                "_parents": null,
+          "_parentOrParents": CombineLatestSubscriber {
+            "_parentOrParents": MapSubscriber {
+              "_parentOrParents": SubjectSubscriber {
+                "_parentOrParents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
@@ -10158,15 +9510,13 @@ Object {
                 "syncErrorThrown": false,
                 "syncErrorValue": null,
               },
-              "_parents": null,
               "_subscriptions": Array [
                 [Circular],
               ],
               "closed": false,
               "count": 1,
               "destination": SubjectSubscriber {
-                "_parent": null,
-                "_parents": null,
+                "_parentOrParents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
@@ -10192,19 +9542,15 @@ Object {
               "syncErrorValue": null,
               "thisArg": [Circular],
             },
-            "_parents": null,
             "_subscriptions": Array [
               InnerSubscriber {
-                "_parent": [Circular],
-                "_parents": null,
+                "_parentOrParents": [Circular],
                 "_subscriptions": Array [
                   SwitchMapSubscriber {
-                    "_parent": [Circular],
-                    "_parents": null,
+                    "_parentOrParents": [Circular],
                     "_subscriptions": Array [
                       SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
+                        "_parentOrParents": [Circular],
                         "_subscriptions": null,
                         "closed": false,
                         "subject": [Circular],
@@ -10214,7 +9560,25 @@ Object {
                     "closed": false,
                     "destination": [Circular],
                     "index": 1,
-                    "innerSubscription": undefined,
+                    "innerSubscription": InnerSubscriber {
+                      "_parentOrParents": null,
+                      "_subscriptions": null,
+                      "closed": true,
+                      "destination": Object {
+                        "closed": true,
+                        "complete": [Function],
+                        "error": [Function],
+                        "next": [Function],
+                      },
+                      "index": 1,
+                      "isStopped": true,
+                      "outerIndex": undefined,
+                      "outerValue": undefined,
+                      "parent": [Circular],
+                      "syncErrorThrowable": false,
+                      "syncErrorThrown": false,
+                      "syncErrorValue": null,
+                    },
                     "isStopped": false,
                     "project": [Function],
                     "syncErrorThrowable": false,
@@ -10255,9 +9619,8 @@ Object {
             "active": 2,
             "closed": false,
             "destination": MapSubscriber {
-              "_parent": SubjectSubscriber {
-                "_parent": null,
-                "_parents": null,
+              "_parentOrParents": SubjectSubscriber {
+                "_parentOrParents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
@@ -10276,15 +9639,13 @@ Object {
                 "syncErrorThrown": false,
                 "syncErrorValue": null,
               },
-              "_parents": null,
               "_subscriptions": Array [
                 [Circular],
               ],
               "closed": false,
               "count": 1,
               "destination": SubjectSubscriber {
-                "_parent": null,
-                "_parents": null,
+                "_parentOrParents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
@@ -10357,16 +9718,8 @@ Object {
                   ],
                 },
                 "currentUserAccount$": Observable {
-                  "_isScalar": true,
+                  "_isScalar": false,
                   "_subscribe": [Function],
-                  "value": Object {
-                    "id": Object {
-                      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  },
                 },
                 "deleteUserAccount": [MockFunction] {
                   "calls": Array [
@@ -10439,11 +9792,8 @@ Object {
                 "iterActionsRaw": [MockFunction],
                 "iterBlocks": [MockFunction],
                 "networks$": Observable {
-                  "_isScalar": true,
+                  "_isScalar": false,
                   "_subscribe": [Function],
-                  "value": Array [
-                    "main",
-                  ],
                 },
                 "publish": [MockFunction] {
                   "calls": Array [
@@ -10583,27 +9933,15 @@ Object {
                   ],
                 },
                 "userAccounts$": Observable {
-                  "_isScalar": true,
+                  "_isScalar": false,
                   "_subscribe": [Function],
-                  "value": Array [
-                    Object {
-                      "id": Object {
-                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                        "network": "main",
-                      },
-                      "name": "Mock",
-                      "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    },
-                  ],
                 },
               },
             ],
           },
-          "_parents": null,
           "_subscriptions": Array [
             SubjectSubscription {
-              "_parent": [Circular],
-              "_parents": null,
+              "_parentOrParents": [Circular],
               "_subscriptions": null,
               "closed": false,
               "subject": [Circular],
@@ -10622,10 +9960,9 @@ Object {
           "outerIndex": 1,
           "outerValue": [Circular],
           "parent": CombineLatestSubscriber {
-            "_parent": MapSubscriber {
-              "_parent": SubjectSubscriber {
-                "_parent": null,
-                "_parents": null,
+            "_parentOrParents": MapSubscriber {
+              "_parentOrParents": SubjectSubscriber {
+                "_parentOrParents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
@@ -10644,15 +9981,13 @@ Object {
                 "syncErrorThrown": false,
                 "syncErrorValue": null,
               },
-              "_parents": null,
               "_subscriptions": Array [
                 [Circular],
               ],
               "closed": false,
               "count": 1,
               "destination": SubjectSubscriber {
-                "_parent": null,
-                "_parents": null,
+                "_parentOrParents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
@@ -10678,19 +10013,15 @@ Object {
               "syncErrorValue": null,
               "thisArg": [Circular],
             },
-            "_parents": null,
             "_subscriptions": Array [
               InnerSubscriber {
-                "_parent": [Circular],
-                "_parents": null,
+                "_parentOrParents": [Circular],
                 "_subscriptions": Array [
                   SwitchMapSubscriber {
-                    "_parent": [Circular],
-                    "_parents": null,
+                    "_parentOrParents": [Circular],
                     "_subscriptions": Array [
                       SubjectSubscription {
-                        "_parent": [Circular],
-                        "_parents": null,
+                        "_parentOrParents": [Circular],
                         "_subscriptions": null,
                         "closed": false,
                         "subject": [Circular],
@@ -10700,7 +10031,25 @@ Object {
                     "closed": false,
                     "destination": [Circular],
                     "index": 1,
-                    "innerSubscription": undefined,
+                    "innerSubscription": InnerSubscriber {
+                      "_parentOrParents": null,
+                      "_subscriptions": null,
+                      "closed": true,
+                      "destination": Object {
+                        "closed": true,
+                        "complete": [Function],
+                        "error": [Function],
+                        "next": [Function],
+                      },
+                      "index": 1,
+                      "isStopped": true,
+                      "outerIndex": undefined,
+                      "outerValue": undefined,
+                      "parent": [Circular],
+                      "syncErrorThrowable": false,
+                      "syncErrorThrown": false,
+                      "syncErrorValue": null,
+                    },
                     "isStopped": false,
                     "project": [Function],
                     "syncErrorThrowable": false,
@@ -10741,9 +10090,8 @@ Object {
             "active": 2,
             "closed": false,
             "destination": MapSubscriber {
-              "_parent": SubjectSubscriber {
-                "_parent": null,
-                "_parents": null,
+              "_parentOrParents": SubjectSubscriber {
+                "_parentOrParents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
@@ -10762,15 +10110,13 @@ Object {
                 "syncErrorThrown": false,
                 "syncErrorValue": null,
               },
-              "_parents": null,
               "_subscriptions": Array [
                 [Circular],
               ],
               "closed": false,
               "count": 1,
               "destination": SubjectSubscriber {
-                "_parent": null,
-                "_parents": null,
+                "_parentOrParents": null,
                 "_subscriptions": Array [
                   [Circular],
                 ],
@@ -10843,16 +10189,8 @@ Object {
                   ],
                 },
                 "currentUserAccount$": Observable {
-                  "_isScalar": true,
+                  "_isScalar": false,
                   "_subscribe": [Function],
-                  "value": Object {
-                    "id": Object {
-                      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  },
                 },
                 "deleteUserAccount": [MockFunction] {
                   "calls": Array [
@@ -10925,11 +10263,8 @@ Object {
                 "iterActionsRaw": [MockFunction],
                 "iterBlocks": [MockFunction],
                 "networks$": Observable {
-                  "_isScalar": true,
+                  "_isScalar": false,
                   "_subscribe": [Function],
-                  "value": Array [
-                    "main",
-                  ],
                 },
                 "publish": [MockFunction] {
                   "calls": Array [
@@ -11069,18 +10404,8 @@ Object {
                   ],
                 },
                 "userAccounts$": Observable {
-                  "_isScalar": true,
+                  "_isScalar": false,
                   "_subscribe": [Function],
-                  "value": Array [
-                    Object {
-                      "id": Object {
-                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                        "network": "main",
-                      },
-                      "name": "Mock",
-                      "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                    },
-                  ],
                 },
               },
             ],
@@ -11105,16 +10430,8 @@ Object {
               "call": [MockFunction],
               "claim": [MockFunction],
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                },
               },
               "deleteUserAccount": [MockFunction],
               "getAccount": [MockFunction],
@@ -11131,11 +10448,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction],
               "publishAndDeploy": [MockFunction],
@@ -11145,18 +10459,8 @@ Object {
               "transfer": [MockFunction],
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  },
-                ],
               },
             },
             "memory": Object {
@@ -11175,16 +10479,8 @@ Object {
                 ],
               },
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                },
               },
               "deleteUserAccount": [MockFunction] {
                 "calls": Array [
@@ -11257,11 +10553,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction] {
                 "calls": Array [
@@ -11401,18 +10694,8 @@ Object {
                 ],
               },
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  },
-                ],
               },
             },
           },
@@ -11435,16 +10718,8 @@ Object {
               "call": [MockFunction],
               "claim": [MockFunction],
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                },
               },
               "deleteUserAccount": [MockFunction],
               "getAccount": [MockFunction],
@@ -11461,11 +10736,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction],
               "publishAndDeploy": [MockFunction],
@@ -11475,18 +10747,8 @@ Object {
               "transfer": [MockFunction],
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  },
-                ],
               },
             },
             "memory": Object {
@@ -11505,16 +10767,8 @@ Object {
                 ],
               },
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                },
               },
               "deleteUserAccount": [MockFunction] {
                 "calls": Array [
@@ -11587,11 +10841,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction] {
                 "calls": Array [
@@ -11731,18 +10982,8 @@ Object {
                 ],
               },
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  },
-                ],
               },
             },
           },
@@ -11771,16 +11012,8 @@ Object {
               "call": [MockFunction],
               "claim": [MockFunction],
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                },
               },
               "deleteUserAccount": [MockFunction],
               "getAccount": [MockFunction],
@@ -11797,11 +11030,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction],
               "publishAndDeploy": [MockFunction],
@@ -11811,18 +11041,8 @@ Object {
               "transfer": [MockFunction],
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  },
-                ],
               },
             },
             "memory": Object {
@@ -11841,16 +11061,8 @@ Object {
                 ],
               },
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                },
               },
               "deleteUserAccount": [MockFunction] {
                 "calls": Array [
@@ -11923,11 +11135,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction] {
                 "calls": Array [
@@ -12067,18 +11276,8 @@ Object {
                 ],
               },
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  },
-                ],
               },
             },
           },
@@ -12101,16 +11300,8 @@ Object {
               "call": [MockFunction],
               "claim": [MockFunction],
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                },
               },
               "deleteUserAccount": [MockFunction],
               "getAccount": [MockFunction],
@@ -12127,11 +11318,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction],
               "publishAndDeploy": [MockFunction],
@@ -12141,18 +11329,8 @@ Object {
               "transfer": [MockFunction],
               "updateUserAccountName": [MockFunction],
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9",
-                  },
-                ],
               },
             },
             "memory": Object {
@@ -12171,16 +11349,8 @@ Object {
                 ],
               },
               "currentUserAccount$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Object {
-                  "id": Object {
-                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                    "network": "main",
-                  },
-                  "name": "Mock",
-                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                },
               },
               "deleteUserAccount": [MockFunction] {
                 "calls": Array [
@@ -12253,11 +11423,8 @@ Object {
               "iterActionsRaw": [MockFunction],
               "iterBlocks": [MockFunction],
               "networks$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  "main",
-                ],
               },
               "publish": [MockFunction] {
                 "calls": Array [
@@ -12397,18 +11564,8 @@ Object {
                 ],
               },
               "userAccounts$": Observable {
-                "_isScalar": true,
+                "_isScalar": false,
                 "_subscribe": [Function],
-                "value": Array [
-                  Object {
-                    "id": Object {
-                      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-                      "network": "main",
-                    },
-                    "name": "Mock",
-                    "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
-                  },
-                ],
               },
             },
           },

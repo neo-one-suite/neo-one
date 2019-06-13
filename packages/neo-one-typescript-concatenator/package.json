@@ -6,7 +6,7 @@
   "dependencies": {
     "@neo-one/ts-utils": "^1.1.2",
     "@neo-one/utils": "^1.1.1",
-    "@types/lodash": "^4.14.120",
+    "@types/lodash": "^4.14.134",
     "@types/toposort": "^2.0.1",
     "lodash": "^4.17.11",
     "toposort": "^2.0.2",

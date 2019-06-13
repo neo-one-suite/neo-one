@@ -1,5 +1,4 @@
-// tslint:disable no-submodule-imports match-default-export-name no-import-side-effect
-import '@babel/polyfill';
+// tslint:disable match-default-export-name
 
 import { registerWorkerPouch } from '@neo-one/local-browser';
 import PouchDB from 'pouchdb';
