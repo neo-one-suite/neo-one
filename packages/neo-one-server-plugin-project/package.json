@@ -2,7 +2,7 @@
   "name": "@neo-one/server-plugin-project",
   "version": "1.2.1",
   "description": "NEO•ONE server plugin for project functionality.",
-  "main": "./src/index.ts",
+  "main": "./src/index",
   "dependencies": {
     "@neo-one/client-common": "^1.2.0",
     "@neo-one/client-core": "^1.2.0",

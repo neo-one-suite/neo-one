@@ -1690,11 +1690,7 @@ const OPCODE_PAIRS = ([
 
             return {
               context,
-              results: [
-                arrayValue instanceof StructStackItem && context.init.vmFeatures.structClone
-                  ? arrayValue.clone()
-                  : arrayValue,
-              ],
+              results: [arrayValue],
             };
           }
 
@@ -1708,9 +1704,7 @@ const OPCODE_PAIRS = ([
 
           return {
             context,
-            results: [
-              mapValue instanceof StructStackItem && context.init.vmFeatures.structClone ? mapValue.clone() : mapValue,
-            ],
+            results: [mapValue],
           };
         },
       }),

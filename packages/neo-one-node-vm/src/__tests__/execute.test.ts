@@ -52,9 +52,6 @@ const executeSimple = async ({
     skipWitnessVerify: skipWitnessVerify === undefined ? true : skipWitnessVerify,
     persistingBlock,
     listeners,
-    vmFeatures: {
-      structClone: false,
-    },
   });
 
 const neoBN = (value: string) => new BN(value, 10).mul(utils.ONE_HUNDRED_MILLION);

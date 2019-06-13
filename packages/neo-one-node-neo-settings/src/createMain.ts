@@ -75,8 +75,5 @@ export const createMain = ({
         },
       },
     },
-    features: {
-      structClone: privateNet ? -1 : Number.MAX_SAFE_INTEGER,
-    },
   };
 };

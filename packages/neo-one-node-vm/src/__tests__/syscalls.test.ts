@@ -3404,9 +3404,6 @@ describe('syscalls', () => {
         listeners,
         skipWitnessVerify: false,
         persistingBlock: flags.has('noPersistingBlock') ? undefined : (block as Block),
-        vmFeatures: {
-          structClone: true,
-        },
       };
 
       const gasLeft = common.ONE_HUNDRED_MILLION_FIXED8;

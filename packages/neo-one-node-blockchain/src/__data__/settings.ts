@@ -128,7 +128,4 @@ export const settings: Settings = {
       },
     },
   },
-  features: {
-    structClone: -1,
-  },
 };

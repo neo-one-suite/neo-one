@@ -2,7 +2,7 @@
   "name": "@neo-one/node-bin",
   "version": "1.2.2",
   "description": "NEO•ONE NEO executable full node.",
-  "main": "./src/index.ts",
+  "main": "./src/index",
   "dependencies": {
     "@neo-one/monitor": "^1.1.2",
     "@neo-one/node": "^1.1.3",

@@ -68,10 +68,6 @@ export interface VMListeners {
   readonly onSetVotes?: (options: { readonly address: UInt160; readonly votes: ReadonlyArray<ECPoint> }) => void;
 }
 
-export interface VMFeatureSwitches {
-  readonly structClone: boolean;
-}
-
 export type ExecuteScripts = (input: {
   readonly monitor: Monitor;
   readonly scripts: ReadonlyArray<Script>;
@@ -83,7 +79,6 @@ export type ExecuteScripts = (input: {
   readonly listeners?: VMListeners;
   readonly skipWitnessVerify?: boolean;
   readonly persistingBlock?: Block;
-  readonly vmFeatures: VMFeatureSwitches;
 }) => Promise<ExecuteScriptsResult>;
 
 export interface VM {

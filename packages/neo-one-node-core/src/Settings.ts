@@ -11,10 +11,6 @@ export interface VMSettings {
   };
 }
 
-export interface FeatureSwitches {
-  readonly structClone: number;
-}
-
 export interface Settings {
   readonly genesisBlock: Block;
   readonly governingToken: RegisterTransaction;
@@ -31,5 +27,4 @@ export interface Settings {
   readonly secondsPerBlock: number;
   readonly maxTransactionsPerBlock: number;
   readonly memPoolSize: number;
-  readonly features: FeatureSwitches;
 }

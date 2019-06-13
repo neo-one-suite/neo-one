@@ -2,7 +2,7 @@
   "name": "@neo-one/client-core",
   "version": "1.2.0",
   "description": "NEO•ONE client core types implementation.",
-  "main": "./src/index.ts",
+  "main": "./src/index",
   "dependencies": {
     "@neo-one/client-common": "^1.2.0",
     "@neo-one/client-switch": "^1.2.0",

@@ -2,7 +2,7 @@
   "name": "@neo-one/monitor",
   "version": "1.1.2",
   "description": "NEO•ONE monitoring.",
-  "main": "./src/index.ts",
+  "main": "./src/index",
   "browser": "./src/index.browser.ts",
   "dependencies": {
     "@neo-one/types": "^1.1.1",

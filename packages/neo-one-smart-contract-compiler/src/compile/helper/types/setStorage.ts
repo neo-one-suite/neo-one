@@ -3,10 +3,10 @@ import ts from 'typescript';
 import { Context } from '../../../Context';
 import { Types } from '../../constants';
 import { IsHelper } from './IsHelper';
-import { UnwrapHelper } from './UnwrapHelper';
+import { UnwrapCopyStructHelper } from './UnwrapCopyStructHelper';
 import { WrapHelper } from './WrapHelper';
 
-export class UnwrapSetStorageHelper extends UnwrapHelper {}
+export class UnwrapSetStorageHelper extends UnwrapCopyStructHelper {}
 export class WrapSetStorageHelper extends WrapHelper {
   protected readonly type = Types.SetStorage;
 }

@@ -2,7 +2,7 @@
   "name": "@neo-one/local-browser-worker",
   "version": "1.1.3",
   "description": "NEO•ONE local browser workers.",
-  "main": "./src/index.ts",
+  "main": "./src/index",
   "dependencies": {
     "@neo-one/local-browser": "^1.1.3",
     "@neo-one/worker": "^1.1.1",

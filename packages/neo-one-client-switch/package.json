@@ -2,8 +2,8 @@
   "name": "@neo-one/client-switch",
   "version": "1.2.0",
   "description": "NEO•ONE client library for browser/node differences.",
-  "main": "./src/index.ts",
-  "browser": "./src/index.browser.ts",
+  "main": "./src/index",
+  "browser": "./src/index.browser",
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
     "@ledgerhq/hw-transport-u2f": "4.61.0",

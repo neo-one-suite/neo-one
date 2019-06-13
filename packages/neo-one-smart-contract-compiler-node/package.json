@@ -2,7 +2,7 @@
   "name": "@neo-one/smart-contract-compiler-node",
   "version": "1.1.2",
   "description": "NEO•ONE TypeScript smart contract compiler node host.",
-  "main": "./src/index.ts",
+  "main": "./src/index",
   "dependencies": {
     "@neo-one/types": "^1.1.1",
     "@neo-one/utils": "^1.1.1",

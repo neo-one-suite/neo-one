@@ -8,7 +8,6 @@ import {
   Script,
   ScriptContainer,
   TriggerType,
-  VMFeatureSwitches,
   VMListeners,
   WriteBlockchain,
 } from '@neo-one/node-core';
@@ -260,7 +259,6 @@ export const execute = async ({
   listeners = {},
   skipWitnessVerify = false,
   persistingBlock,
-  vmFeatures,
 }: {
   readonly monitor: Monitor;
   readonly scripts: ReadonlyArray<Script>;
@@ -273,7 +271,6 @@ export const execute = async ({
   readonly listeners?: VMListeners;
   readonly skipWitnessVerify?: boolean;
   readonly persistingBlock?: Block;
-  readonly vmFeatures: VMFeatureSwitches;
 }): Promise<ExecuteScriptsResult> => {
   const monitor = monitorIn.at('vm');
   const init = {
@@ -283,7 +280,6 @@ export const execute = async ({
     listeners,
     skipWitnessVerify,
     persistingBlock,
-    vmFeatures,
   };
 
   let context;

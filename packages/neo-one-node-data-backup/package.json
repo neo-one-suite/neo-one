@@ -2,7 +2,7 @@
   "name": "@neo-one/node-data-backup",
   "version": "1.1.2",
   "description": "NEO•ONE node data path backup and restore.",
-  "main": "./src/index.ts",
+  "main": "./src/index",
   "dependencies": {
     "@google-cloud/storage": "^2.5.0",
     "@neo-one/monitor": "^1.1.2",

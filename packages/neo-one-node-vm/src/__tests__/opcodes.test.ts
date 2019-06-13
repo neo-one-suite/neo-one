@@ -1704,9 +1704,6 @@ describe('opcodes', () => {
         listeners: {},
         skipWitnessVerify: false,
         persistingBlock: block as any,
-        vmFeatures: {
-          structClone: true,
-        },
       };
 
       const gasLeft = utils.ONE_HUNDRED_MILLION;

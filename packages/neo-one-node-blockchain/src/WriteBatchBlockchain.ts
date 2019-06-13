@@ -718,9 +718,6 @@ export class WriteBatchBlockchain {
                 },
 
                 persistingBlock: block,
-                vmFeatures: {
-                  structClone: this.settings.features.structClone <= block.index,
-                },
               }),
             );
 
@@ -1100,43 +1097,3 @@ export class WriteBatchBlockchain {
     });
   }
 }
-
-/*
-
-     Possibly broken on TestNet:
-     if (
-       block.index !== 31331 && // Just seems like a bad script - unknown op
-       block.index !== 62024 && // Invalid order for Account arguments
-       block.index !== 131854 && // Calls contract without storage
-       block.index !== 163432 && // Calls contract without storage
-       block.index !== 163446 && // Calls contract without storage
-       block.index !== 163457 && // Calls contract without storage
-       block.index !== 163470 && // Calls contract without storage
-       block.index !== 163484 && // Calls contract without storage
-       block.index !== 163491 && // Calls contract without storage
-       block.index !== 163512 && // Calls contract without storage
-       block.index !== 460363 && // PICKITEM on non-array.
-       block.index !== 460376 && // PICKITEM on non-array.
-       block.index !== 460393 && // PICKITEM on non-array.
-       block.index !== 460410 && // PICKITEM on non-array.
-       block.index !== 561159 && // Bug in contract code - no inputs for transaction
-       block.index !== 568381 && // Bug in contract code - no inputs for transaction
-       block.index !== 572375 && // Bug in contract code - no inputs for transaction
-       block.index !== 608107 && // Unknown OP 0xDB (219)
-       block.index !== 608111 && // Unknown OP 0xDB (219)
-       block.index !== 608135 && // Unknown OP 0x70 (112)
-       block.index !== 609278 && // Unknown OP 0x70 (112)
-       block.index !== 609402 && // Unknown OP 0x70 (112)
-       block.index !== 609408 && // Unknown OP 0x70 (112)
-       block.index !== 609504 &&
-       block.index !== 609513 && // Unknown op: 0x70 (112)
-       block.index !== 637192 && // Seems like a bad argument to CheckWitness
-       !error.message.includes('Unknown op: 112') &&
-       !error.message.includes('Script execution threw an Error')
-     ) {
-       console.log(block.index);
-       console.error(error);
-       throw error;
-     }
-
-     */

@@ -9,6 +9,7 @@ module.exports = function(wallaby) {
       { pattern: 'tsconfig.json', instrument: false },
       { pattern: 'packages/*/tsconfig.json', instrument: false },
       'packages/*/src/**/*.ts?(x)',
+      'packages/*/src/**/*.d.ts?(x)',
       'packages/*/src/**/*.snap',
       '!packages/neo-one-server/src/**/*.ts?(x)',
       '!packages/neo-one-server-client/src/**/*.ts?(x)',
@@ -47,7 +48,7 @@ module.exports = function(wallaby) {
         '^@neo-one/ec-key': '@neo-one/ec-key',
         '^@neo-one/boa': '@neo-one/boa',
         '^@neo-one/csharp': '@neo-one/csharp',
-        '^@neo-one/(.+)': wallaby.projectCacheDir + '/packages/neo-one-$1/src',
+        '^@neo-one/(.+)': wallaby.projectCacheDir + '/packages/neo-one-$1',
       };
       jestConfig.transform = {};
       delete jestConfig.rootDir;
