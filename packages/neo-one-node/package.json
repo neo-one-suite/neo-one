@@ -18,7 +18,7 @@
     "@neo-one/utils": "^1.1.1",
     "@types/abstract-leveldown": "^5.0.1",
     "@types/leveldown": "^4.0.0",
-    "@types/levelup": "^3.1.0",
+    "@types/levelup": "^3.1.1",
     "@types/node-cron": "^2.0.2",
     "abstract-leveldown": "^6.0.3",
     "cross-fetch": "^3.0.4",

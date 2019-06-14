@@ -15,7 +15,7 @@
     "ajv": "^6.10.0",
     "chalk": "^2.4.2",
     "chokidar": "^3.0.1",
-    "cli-truncate": "^1.1.0",
+    "cli-truncate": "^2.0.0",
     "env-paths": "^2.2.0",
     "figures": "^3.0.0",
     "fs-extra": "^8.0.0",
