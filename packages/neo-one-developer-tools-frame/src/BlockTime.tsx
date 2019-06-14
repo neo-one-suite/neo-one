@@ -1,6 +1,7 @@
 import { Client } from '@neo-one/client-core';
 import { Box, Button, Divider, Paragraph, useStream } from '@neo-one/react-common';
-import { formatDistanceStrict } from 'date-fns';
+// tslint:disable-next-line: no-submodule-imports
+import formatDistanceStrict from 'date-fns/formatDistanceStrict';
 import * as React from 'react';
 import { MdFastForward } from 'react-icons/md';
 import { concat, of as _of, timer } from 'rxjs';

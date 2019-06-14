@@ -6,7 +6,7 @@
   "dependencies": {
     "@neo-one/node-browser": "^1.1.3",
     "@neo-one/worker": "^1.1.1",
-    "core-js": "^3.1.3",
+    "core-js": "^3.1.4",
     "regenerator-runtime": "^0.13.2"
   },
   "sideEffects": false
