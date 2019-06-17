@@ -1,4 +1,4 @@
-/* @hash 318d8dde636d3501fba475770694e147 */
+/* @hash 8572726a3f78b7018fc87e686561fc8f */
 // tslint:disable
 /* eslint-disable */
 import { sourceMaps } from '../sourceMaps';
@@ -7,7 +7,7 @@ import { tokenABI } from './abi';
 const definition = {
   networks: {
     local: {
-      address: 'AGe7fjvh9WuxRL3E1AJtKhsVuasCcAGrXs',
+      address: 'AKgzNjZy397DtvZMZRQQ2zH97sLS5BRUta',
     },
   },
   abi: tokenABI,
