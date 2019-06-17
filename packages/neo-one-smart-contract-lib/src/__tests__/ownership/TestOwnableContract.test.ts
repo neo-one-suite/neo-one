@@ -8,6 +8,8 @@ const RECIPIENT = {
   PUBLIC_KEY: '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
 };
 
+jest.setTimeout(60000);
+
 describe('Ownable', () => {
   test('deploy + transfer', async () => {
     await withContracts<{ testOwnable: SmartContractAny }>(

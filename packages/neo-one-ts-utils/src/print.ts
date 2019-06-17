@@ -47,7 +47,7 @@ export const printBundle = (
     },
   );
 
-  printer.writeBundle(ts.createBundle(files), undefined, writer, sourceMapGenerator);
+  printer.writeBundle(ts.createBundle(files), writer, sourceMapGenerator);
 
   const resolvedSourceMap: RawSourceMap = sourceMapGenerator.toJSON();
 
