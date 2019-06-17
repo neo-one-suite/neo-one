@@ -1,4 +1,4 @@
-/* @hash e04b43b307840103fc03047cbf89919a */
+/* @hash a0865259e496459ee4b3244097661ac0 */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -46,7 +46,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
   }
   const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 10031 }));
+    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 10001 }));
   }
   const provider = new NEOONEProvider(providers);
 
@@ -128,11 +128,11 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
 };
 
 export const createDeveloperClients = (host = 'localhost'): { [network: string]: DeveloperClient } => ({
-  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 10031 })),
+  local: new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 10001 })),
 });
 
 export const createLocalClients = (host = 'localhost'): { [network: string]: LocalClient } => {
-  const client = new OneClient(10031, host);
+  const client = new OneClient(10001, host);
   return {
     local: {
       getNEOTrackerURL: async () => {
