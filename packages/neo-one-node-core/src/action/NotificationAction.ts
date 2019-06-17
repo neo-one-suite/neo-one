@@ -5,7 +5,7 @@ import { ActionBase, ActionBaseAdd } from './ActionBase';
 import { ActionType } from './ActionType';
 
 export interface NotificationAdd extends ActionBaseAdd {
-  readonly args: ReadonlyArray<ContractParameter>;
+  readonly args: readonly ContractParameter[];
 }
 
 export class NotificationAction extends ActionBase<NotificationAction, ActionType.Notification>
@@ -23,7 +23,7 @@ export class NotificationAction extends ActionBase<NotificationAction, ActionTyp
     });
   }
 
-  public readonly args: ReadonlyArray<ContractParameter>;
+  public readonly args: readonly ContractParameter[];
 
   public constructor({ version, index, scriptHash, args }: NotificationAdd) {
     const options = {

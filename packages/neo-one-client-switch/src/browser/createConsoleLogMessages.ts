@@ -3,10 +3,10 @@ import { createConsoleLogMessages as createConsoleLogMessagesBase, LogOptions, S
 import { initializeSourceMap } from './initializeSourceMap';
 
 export const createConsoleLogMessages = async (
-  actions: ReadonlyArray<RawAction>,
+  actions: readonly RawAction[],
   sourceMaps: Promise<SourceMaps>,
   options: LogOptions,
-): Promise<ReadonlyArray<string>> => {
+): Promise<readonly string[]> => {
   if (process.env.NODE_ENV === 'production' && process.env.NEO_ONE_DEV !== 'true') {
     return [];
   }

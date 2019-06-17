@@ -10,7 +10,7 @@ const oneRPCURL = 'http://localhost:40200/rpc';
 const waitMS = 1000;
 const testRPCURL = 'http://seed3.cityofzion.io:8080';
 
-const hashes: ReadonlyArray<string> = [
+const hashes: readonly string[] = [
   '0x8a4d2865d01ec8e6add72e3dfdd20c12f44834e3',
   '0xce3a97d7cfaa770a5e51c5b12cd1d015fbb5f87d',
   '0xd3cce84d0800172d09c88ccad61130611bd047a4',

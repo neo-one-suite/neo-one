@@ -55,7 +55,13 @@ describe('LocalHDStore', () => {
   test('MasterSeed Bootstrap - Single', async () => {
     bootstrapSingle('m');
 
-    const testPaths: ReadonlyArray<[number, number, number]> = [[0, 0, 0], [0, 0, 1], [0, 1, 0], [0, 1, 1], [2, 0, 3]];
+    const testPaths = [
+      [0, 0, 0] as const,
+      [0, 0, 1] as const,
+      [0, 1, 0] as const,
+      [0, 1, 1] as const,
+      [2, 0, 3] as const,
+    ];
 
     const masterPath = await store.getMasterPath();
     const accountKeys = await Promise.all(testPaths.map(async (path) => store.getPublicKey(path)));
@@ -67,7 +73,7 @@ describe('LocalHDStore', () => {
   test('Wallet Bootstrap - Single', async () => {
     bootstrapSingle('m/0');
 
-    const testPaths: ReadonlyArray<[number, number, number]> = [[0, 0, 0], [0, 0, 1], [0, 1, 0]];
+    const testPaths = [[0, 0, 0] as const, [0, 0, 1] as const, [0, 1, 0] as const];
 
     const masterPath = await store.getMasterPath();
     const accountKeys = await Promise.all(testPaths.map(async (path) => store.getPublicKey(path)));
@@ -75,13 +81,13 @@ describe('LocalHDStore', () => {
     expect(masterPath).toEqual([0]);
     expect(accountKeys).toEqual(testPaths.map((path) => getPublicKey(`m/${path.join('/')}`)));
 
-    await expect(store.getPublicKey([1, 0, 0])).rejects.toEqual(new UndiscoverableWalletError(1));
+    await expect(store.getPublicKey([1, 0, 0] as const)).rejects.toEqual(new UndiscoverableWalletError(1));
   });
 
   test('Chain Bootstrap - Single', async () => {
     bootstrapSingle('m/0/0');
 
-    const testPaths: ReadonlyArray<[number, number, number]> = [[0, 0, 0], [0, 0, 1]];
+    const testPaths = [[0, 0, 0] as const, [0, 0, 1] as const];
 
     const masterPath = await store.getMasterPath();
     const accountKeys = await Promise.all(testPaths.map(async (path) => store.getPublicKey(path)));
@@ -89,14 +95,14 @@ describe('LocalHDStore', () => {
     expect(masterPath).toEqual([0, 0]);
     expect(accountKeys).toEqual(testPaths.map((path) => getPublicKey(`m/${path.join('/')}`)));
 
-    await expect(store.getPublicKey([1, 0, 0])).rejects.toEqual(new UndiscoverableWalletError(1));
-    await expect(store.getPublicKey([0, 1, 0])).rejects.toEqual(new UndiscoverableChainError([0, 1]));
+    await expect(store.getPublicKey([1, 0, 0] as const)).rejects.toEqual(new UndiscoverableWalletError(1));
+    await expect(store.getPublicKey([0, 1, 0] as const)).rejects.toEqual(new UndiscoverableChainError([0, 1] as const));
   });
 
   test('MasterSeed Bootstrap - Full', async () => {
     bootstrapFull();
 
-    const testPaths: ReadonlyArray<[number, number, number]> = [[0, 0, 0], [4, 1, 4]];
+    const testPaths = [[0, 0, 0] as const, [4, 1, 4] as const];
 
     const masterPath = await store.getMasterPath();
     const accountKeys = await Promise.all(testPaths.map(async (path) => store.getPublicKey(path)));
@@ -108,15 +114,15 @@ describe('LocalHDStore', () => {
   test('Saves on close', async () => {
     bootstrapSingle('m/0');
 
-    let setItems: ReadonlyArray<string> = [];
+    let setItems: readonly string[] = [];
     setItem.mockImplementation(async (key: string, _value: string) => (setItems = setItems.concat(key)));
 
-    await store.getPublicKey([0, 0, 0]);
+    await store.getPublicKey([0, 0, 0] as const);
     await store.close();
     expect(setItems).toEqual(['m/0', 'm/0/0', 'm/0/0/0']);
 
     setItems = [];
-    await Promise.all([store.getPublicKey([0, 0, 0]), store.getPublicKey([0, 1, 0])]);
+    await Promise.all([store.getPublicKey([0, 0, 0] as const), store.getPublicKey([0, 1, 0] as const)]);
     await store.close();
     expect(setItems).toEqual(['m/0', 'm/0/0', 'm/0/0/0', 'm/0/1', 'm/0/1/0']);
   });

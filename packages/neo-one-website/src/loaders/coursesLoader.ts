@@ -137,7 +137,7 @@ const getChapterFile = async (dir: string, initial: string | undefined, solution
   };
 };
 
-const getDirectories = async (filePath: string): Promise<ReadonlyArray<string>> => {
+const getDirectories = async (filePath: string): Promise<readonly string[]> => {
   const paths = await fs.readdir(filePath);
   const pathAndDir = await Promise.all(
     paths.map(async (fileName) => {

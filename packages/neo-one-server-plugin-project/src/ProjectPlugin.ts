@@ -34,15 +34,15 @@ export class ProjectPlugin extends Plugin {
     };
   }
 
-  public get dependencies(): ReadonlyArray<string> {
+  public get dependencies(): readonly string[] {
     return [networkConstants.PLUGIN, walletConstants.PLUGIN, neotrackerConstants.PLUGIN];
   }
 
-  public get resourceTypes(): ReadonlyArray<ResourceType> {
+  public get resourceTypes(): readonly ResourceType[] {
     return [this.projectResourceType];
   }
 
-  public get interactive(): ReadonlyArray<InteractiveCommand> {
+  public get interactive(): readonly InteractiveCommand[] {
     return [buildCommand, initCommand];
   }
 

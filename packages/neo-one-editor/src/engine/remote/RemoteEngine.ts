@@ -22,7 +22,7 @@ interface RemoteEngineOptions {
   readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
   readonly createJSONRPCLocalProviderManager: () => Promise<WorkerManager<typeof JSONRPCLocalProvider>>;
   readonly builderManager: WorkerManager<typeof Builder>;
-  readonly pathWithExports?: ReadonlyArray<PathWithExports>;
+  readonly pathWithExports?: readonly PathWithExports[];
   readonly globals?: Globals;
 }
 
@@ -81,8 +81,8 @@ export class RemoteEngine {
       createJSONRPCLocalProviderManager,
     }).concat(pathWithExportsIn);
     this.mutableModules = new Map([
-      [EMPTY_MODULE_PATH, new StaticExportsModule(this, EMPTY_MODULE_PATH, {})],
-      ['path', new StaticExportsModule(this, 'path', nodePath)],
+      [EMPTY_MODULE_PATH, new StaticExportsModule(this, EMPTY_MODULE_PATH, {})] as const,
+      ['path', new StaticExportsModule(this, 'path', nodePath)] as const,
     ]);
     // tslint:disable-next-line no-loop-statement
     for (const { name, exports } of pathWithExports) {
@@ -177,7 +177,7 @@ export class RemoteEngine {
     return mod;
   }
 
-  public async fetchDependencies(paths: ReadonlyArray<MissingPath>): Promise<void> {
+  public async fetchDependencies(paths: readonly MissingPath[]): Promise<void> {
     try {
       await Promise.all(paths.map(async (path) => this.fetchDependency(path)));
     } catch (error) {
@@ -233,7 +233,7 @@ export class RemoteEngine {
       }
     | undefined {
     const nodeModulesDirs = getNodeModulesPaths(nodePath.dirname(currentPath));
-    let packageJSONPaths: ReadonlyArray<string>;
+    let packageJSONPaths: readonly string[];
     if (request.startsWith('.')) {
       packageJSONPaths = nodeModulesDirs
         .map((path) => nodePath.resolve(path.slice(0, -'node_modules'.length), 'package.json'))
@@ -258,7 +258,7 @@ export class RemoteEngine {
     return undefined;
   }
 
-  private processFileTree(files: ReadonlyArray<DirectoryData | FileData>, currentPath?: string): ReadonlyArray<string> {
+  private processFileTree(files: ReadonlyArray<DirectoryData | FileData>, currentPath?: string): readonly string[] {
     return _.flatten(
       files.map((entry) => {
         if (entry.type === 'directory') {

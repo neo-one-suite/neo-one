@@ -4,7 +4,7 @@ import { getSyntaxKindName } from './syntaxKind';
 
 type HeritageClausableNode = ts.Node & { readonly heritageClauses?: ts.NodeArray<ts.HeritageClause> };
 
-export function getHeritageClauses(node: HeritageClausableNode): ReadonlyArray<ts.HeritageClause> {
+export function getHeritageClauses(node: HeritageClausableNode): readonly ts.HeritageClause[] {
   const heritageClauses = utils.getValueOrUndefined(node.heritageClauses);
   if (heritageClauses === undefined) {
     return [];
@@ -30,7 +30,7 @@ export function getHeritageClauseByKindOrThrow(
   );
 }
 
-export function getTypeNodes(node: ts.HeritageClause): ReadonlyArray<ts.ExpressionWithTypeArguments> {
+export function getTypeNodes(node: ts.HeritageClause): readonly ts.ExpressionWithTypeArguments[] {
   const types = utils.getValueOrUndefined(node.types);
 
   return types === undefined ? [] : types;

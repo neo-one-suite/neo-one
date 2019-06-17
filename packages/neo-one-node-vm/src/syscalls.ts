@@ -144,7 +144,7 @@ const getHashOrIndex = ({ arg }: { readonly arg: StackItem }): UInt256 | number 
   return hashOrIndex;
 };
 
-function getIndex<T>(context: ExecutionContext, index: number, values: ReadonlyArray<T>): T {
+function getIndex<T>(context: ExecutionContext, index: number, values: readonly T[]): T {
   if (index < 0 || index >= values.length) {
     throw new InvalidIndexError(context);
   }
@@ -225,7 +225,7 @@ const createContract = async ({
   args,
 }: {
   readonly context: ExecutionContext;
-  readonly args: ReadonlyArray<StackItem>;
+  readonly args: readonly StackItem[];
 }) => {
   const script = args[0].asBuffer();
   const parameterList = [...args[1].asBuffer()].map(assertContractParameterType);
@@ -1858,6 +1858,7 @@ export const lookupSysCall = ({ context }: { readonly context: ExecutionContext 
     debugName = canonicalName;
   }
   const createCall = SYSCALLS_BY_HASH[key];
+  // tslint:disable-next-line: strict-type-predicates
   if (createCall === undefined) {
     throw new UnknownSysCallError(context, debugName);
   }

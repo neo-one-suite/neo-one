@@ -3,7 +3,7 @@ import { SourceMaps } from '../common';
 import { createConsoleLogMessages } from './createConsoleLogMessages';
 
 export interface ProcessConsoleLogOptions {
-  readonly actions: ReadonlyArray<RawAction>;
+  readonly actions: readonly RawAction[];
   readonly sourceMaps?: Promise<SourceMaps>;
 }
 

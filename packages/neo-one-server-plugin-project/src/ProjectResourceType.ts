@@ -57,13 +57,13 @@ export class ProjectResourceType extends ResourceType<Project, ProjectResourceOp
     return new CRUD({ resourceType: this });
   }
 
-  public getListTable(resources: ReadonlyArray<Project>): ListTable {
+  public getListTable(resources: readonly Project[]): ListTable {
     return [['ID', 'Root Directory', 'Address', 'Unlocked', 'NEO', 'GAS']].concat(
       _.sortBy(resources, (resource) => resource.name).map((resource) => [resource.name, resource.rootDir]),
     );
   }
 
   public getDescribeTable(resource: Project): DescribeTable {
-    return [['ID', resource.baseName], ['Root Directory', resource.rootDir]];
+    return [['ID', resource.baseName] as const, ['Root Directory', resource.rootDir] as const];
   }
 }

@@ -47,7 +47,7 @@ export interface Wallet {
   readonly wif: string | undefined;
   readonly nep2: string | undefined;
   readonly publicKey: string;
-  readonly balance: ReadonlyArray<Coin>;
+  readonly balance: readonly Coin[];
 }
 
 export interface WalletResourceOptions {
@@ -104,7 +104,7 @@ export class WalletResourceType extends ResourceType<Wallet, WalletResourceOptio
     });
   }
 
-  public getListTable(resources: ReadonlyArray<Wallet>): ListTable {
+  public getListTable(resources: readonly Wallet[]): ListTable {
     return [['Wallet', 'Name', 'Address', 'Unlocked', 'NEO', 'GAS']].concat(
       _.sortBy(resources, (resource) => resource.name).map((resource) => [
         resource.network,
@@ -119,13 +119,13 @@ export class WalletResourceType extends ResourceType<Wallet, WalletResourceOptio
 
   public getDescribeTable(resource: Wallet): DescribeTable {
     const table: DescribeTable = [
-      ['Network', resource.network],
-      ['Name', resource.baseName],
-      ['Unlocked', resource.unlocked ? 'Yes' : 'No'],
-      ['Private Key', resource.wif === undefined ? 'Locked' : resource.wif],
-      ['NEP2', resource.nep2 === undefined ? 'N/A' : resource.nep2],
-      ['Public Key', resource.publicKey],
-      ['Address', resource.address],
+      ['Network', resource.network] as const,
+      ['Name', resource.baseName] as const,
+      ['Unlocked', resource.unlocked ? 'Yes' : 'No'] as const,
+      ['Private Key', resource.wif === undefined ? 'Locked' : resource.wif] as const,
+      ['NEP2', resource.nep2 === undefined ? 'N/A' : resource.nep2] as const,
+      ['Public Key', resource.publicKey] as const,
+      ['Address', resource.address] as const,
     ];
 
     return table.concat([
@@ -137,7 +137,7 @@ export class WalletResourceType extends ResourceType<Wallet, WalletResourceOptio
             _.sortBy(resource.balance, (coin) => coin.asset).map((coin) => [coin.assetName, coin.amount, coin.asset]),
           ),
         },
-      ],
+      ] as const,
     ]);
   }
 }

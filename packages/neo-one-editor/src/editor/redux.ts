@@ -14,7 +14,7 @@ export interface ConsoleOutput {
 }
 
 export interface FileProblems {
-  readonly [path: string]: ReadonlyArray<FileDiagnostic>;
+  readonly [path: string]: readonly FileDiagnostic[];
 }
 
 export interface EditorState {
@@ -65,7 +65,7 @@ const createInitialState = (
 
 interface SetFileProblems {
   readonly path: string;
-  readonly problems: ReadonlyArray<FileDiagnostic>;
+  readonly problems: readonly FileDiagnostic[];
 }
 
 interface UpdateTest {
@@ -111,14 +111,14 @@ const reducer = reducerWithInitialState(createInitialState())
       draft.console.outputOwner = owner;
     }),
   )
-  .case(setConsoleType, (state, consoleType) =>
+  .case<ConsoleType>(setConsoleType, (state, consoleType) =>
     produce(state, (draft) => {
       draft.console.type = consoleType;
     }),
   )
   .case(setFileProblems, (state, { path, problems }) =>
-    produce<EditorState, EditorState>(state, (draft) => {
-      const existingProblems = draft.console.problems[path] as ReadonlyArray<FileDiagnostic> | undefined;
+    produce(state, (draft) => {
+      const existingProblems = draft.console.problems[path] as readonly FileDiagnostic[] | undefined;
       if (existingProblems === undefined || !_.isEqual(existingProblems, problems)) {
         draft.console.problems = {
           ...draft.console.problems,
@@ -189,17 +189,17 @@ const reducer = reducerWithInitialState(createInitialState())
       }
     }),
   )
-  .case(setTestsRunning, (state, running) =>
+  .case<boolean>(setTestsRunning, (state, running) =>
     produce(state, (draft) => {
       draft.console.testsRunning = running;
     }),
   )
-  .case(setConsoleOpen, (state, open) =>
+  .case<boolean>(setConsoleOpen, (state, open) =>
     produce(state, (draft) => {
       draft.console.open = open;
     }),
   )
-  .case(openConsole, (state, consoleType) =>
+  .case<ConsoleType>(openConsole, (state, consoleType) =>
     produce(state, (draft) => {
       draft.console.open = true;
       draft.console.type = consoleType;

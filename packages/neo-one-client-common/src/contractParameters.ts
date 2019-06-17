@@ -176,7 +176,7 @@ const toSignature = (contractParameter: ContractParameter): SignatureString => {
   throw new InvalidContractParameterError(contractParameter, ['Signature']);
 };
 
-const toArray = (contractParameter: ContractParameter, parameter: ArrayABI): ReadonlyArray<Return> => {
+const toArray = (contractParameter: ContractParameter, parameter: ArrayABI): readonly Return[] => {
   if (contractParameter.type !== 'Array') {
     throw new InvalidContractParameterError(contractParameter, ['Array']);
   }
@@ -200,10 +200,9 @@ const toMap = (contractParameter: ContractParameter, parameter: MapABI): Readonl
   const valueConverter = contractParameters[value.type] as any;
 
   return new Map(
-    contractParameter.value.map<[Return | undefined, Return | undefined]>((val) => [
-      keyConverter(val[0], key),
-      valueConverter(val[1], value),
-    ]),
+    contractParameter.value.map<readonly [Return | undefined, Return | undefined]>(
+      (val) => [keyConverter(val[0], key), valueConverter(val[1], value)] as const,
+    ),
   );
 };
 

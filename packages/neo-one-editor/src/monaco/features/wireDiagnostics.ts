@@ -49,9 +49,7 @@ const convertDiagnostics = (
 export const wireDiagnostics = (manager: MonacoWorkerManager, languageID: string) => {
   const sources = new Set<string>();
 
-  const handleDiagnostics = (
-    diags: ReadonlyArray<{ file: string; diagnostics: ReadonlyArray<FlattenedDiagnostic> }>,
-  ) => {
+  const handleDiagnostics = (diags: ReadonlyArray<{ file: string; diagnostics: readonly FlattenedDiagnostic[] }>) => {
     diags.forEach(({ file, diagnostics }) => {
       const model = getModel(file);
       if (model) {
@@ -73,7 +71,7 @@ export const wireDiagnostics = (manager: MonacoWorkerManager, languageID: string
   };
 
   const mapDiagnostics = (
-    source$: Observable<ReadonlyArray<{ file: string; diagnostics: ReadonlyArray<FlattenedDiagnostic> }>>,
+    source$: Observable<ReadonlyArray<{ file: string; diagnostics: readonly FlattenedDiagnostic[] }>>,
   ) => source$.pipe(map(handleDiagnostics));
 
   const getDiagnosticsForFile = async (
@@ -91,7 +89,7 @@ export const wireDiagnostics = (manager: MonacoWorkerManager, languageID: string
     return { file, diagnostics };
   };
 
-  const getDiagnostics = async (files: ReadonlyArray<string>) => {
+  const getDiagnostics = async (files: readonly string[]) => {
     const mutableFiles: { [key: string]: string } = {};
     // tslint:disable-next-line no-loop-statement
     for (const file of files) {
@@ -103,7 +101,7 @@ export const wireDiagnostics = (manager: MonacoWorkerManager, languageID: string
     );
   };
 
-  const newFile$ = new Observable<ReadonlyArray<string>>((observer) => {
+  const newFile$ = new Observable<readonly string[]>((observer) => {
     const disposable = monaco.editor.onDidCreateModel((model) => {
       if (!model.isDisposed() && model.uri.scheme !== 'inmemory' && model.getModeId() === languageID) {
         observer.next([model.uri.path]);

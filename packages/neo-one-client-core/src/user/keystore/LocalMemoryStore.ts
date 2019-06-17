@@ -4,11 +4,11 @@ import { LocalStore, LocalWallet } from './LocalKeyStore';
  * Dummy implementation of the `LocalStore` interface which causes the `LocalKeyStore` to be entirely in-memory.
  */
 export class LocalMemoryStore implements LocalStore {
-  public async getWallets(): Promise<ReadonlyArray<LocalWallet>> {
+  public async getWallets(): Promise<readonly LocalWallet[]> {
     return Promise.resolve([]);
   }
 
-  public getWalletsSync(): ReadonlyArray<LocalWallet> {
+  public getWalletsSync(): readonly LocalWallet[] {
     return [];
   }
 

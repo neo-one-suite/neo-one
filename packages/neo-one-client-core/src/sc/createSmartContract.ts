@@ -46,7 +46,7 @@ import * as common from './common';
 
 interface ParamAndOptionsResults {
   // tslint:disable-next-line:no-any
-  readonly requiredArgs: ReadonlyArray<any>;
+  readonly requiredArgs: readonly any[];
   // tslint:disable-next-line:no-any
   readonly options: any;
   readonly forwardOptions: ForwardOptions | undefined;
@@ -66,9 +66,9 @@ export const getParamsAndOptions = ({
   client,
 }: {
   readonly definition: SmartContractDefinition;
-  readonly parameters: ReadonlyArray<ABIParameter>;
+  readonly parameters: readonly ABIParameter[];
   // tslint:disable-next-line no-any
-  readonly args: ReadonlyArray<any>;
+  readonly args: readonly any[];
   readonly sendUnsafe: boolean;
   readonly receive: boolean;
   readonly send: boolean;
@@ -77,7 +77,7 @@ export const getParamsAndOptions = ({
   readonly client: Client;
 }): {
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
-  readonly paramsZipped: ReadonlyArray<[string, Param | undefined]>;
+  readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
   readonly options: InvokeSendUnsafeReceiveTransactionOptions;
   readonly forwardOptions: ForwardOptions;
   readonly network: NetworkType;
@@ -415,7 +415,8 @@ export const createSmartContract = ({
 
         return action;
       }),
-      filter(Boolean),
+      filter(utils.notNull),
+      filter<Event>(Boolean),
     );
 
   const iterLogs = (options?: SmartContractIterOptions): AsyncIterable<Log> =>
@@ -427,7 +428,8 @@ export const createSmartContract = ({
 
         return action;
       }),
-      filter(Boolean),
+      filter(utils.notNull),
+      filter<Log>(Boolean),
     );
 
   return definition.abi.functions.reduce<SmartContractAny>(

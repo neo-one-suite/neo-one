@@ -89,6 +89,7 @@ export class Builtins {
     isMember: (builtin: Builtin) => builtin is T,
     isEligible: (builtin: T) => boolean,
     symbolMembers = false,
+    // tslint:disable-next-line: readonly-array
   ): ReadonlyArray<[string, T]> {
     const filterPseudoSymbol = (symbol: ts.Symbol, key: string) => {
       const symbolSymbol = this.getInterfaceSymbolBase('SymbolConstructor', this.getGlobals());
@@ -290,12 +291,14 @@ export class Builtins {
   private getOnlyMemberBase<T>(
     value: string,
     name: string,
-    getValue: (value: [ts.Symbol, Builtin]) => T,
+    getValue: (value: readonly [ts.Symbol, Builtin]) => T,
   ): T | undefined {
     return this.memoized('only-member-base', `${value}$${name}`, () => {
       const symbol = this.getAnyInterfaceOrValueSymbol(value);
       const members = this.getAllMembers(symbol);
-      const result = [...members.entries()].find(([memberSymbol]) => tsUtils.symbol.getName(memberSymbol) === name);
+      const result = [...members.entries()].find(([memberSymbol]) => tsUtils.symbol.getName(memberSymbol) === name) as
+        | undefined
+        | readonly [ts.Symbol, Builtin];
 
       return result === undefined ? undefined : getValue(result);
     });
@@ -316,6 +319,7 @@ export class Builtins {
         interfaceMembers === undefined ? [] : [...interfaceMembers.entries()],
       );
 
+      // @ts-ignore - not sure whats happening here
       return new Map(memberEntries);
     });
   }
@@ -417,9 +421,9 @@ export class Builtins {
     });
   }
 
-  private getInheritedSymbols(symbol: ts.Symbol, baseTypes: ReadonlyArray<ts.Type> = []): Set<ts.Symbol> {
+  private getInheritedSymbols(symbol: ts.Symbol, baseTypes: readonly ts.Type[] = []): Set<ts.Symbol> {
     return this.memoized('get-inherited-symbols', symbolKey(symbol), () => {
-      const symbols = new Set();
+      const symbols = new Set<ts.Symbol>();
       // tslint:disable-next-line no-loop-statement
       for (const decl of tsUtils.symbol.getDeclarations(symbol)) {
         if (ts.isInterfaceDeclaration(decl) || ts.isClassDeclaration(decl) || ts.isClassExpression(decl)) {

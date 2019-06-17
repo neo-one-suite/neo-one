@@ -261,7 +261,7 @@ export const execute = async ({
   persistingBlock,
 }: {
   readonly monitor: Monitor;
-  readonly scripts: ReadonlyArray<Script>;
+  readonly scripts: readonly Script[];
   readonly blockchain: WriteBlockchain;
   readonly scriptContainer: ScriptContainer;
   readonly triggerType: TriggerType;

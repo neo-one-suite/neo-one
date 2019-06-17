@@ -226,9 +226,9 @@ export class PortAllocator implements IPortAllocator {
 
   public getDebug(): DescribeTable {
     return [
-      ['Config Path', this.config.configPath],
-      ['Current Port', `${this.mutableCurrentPort}`],
-      ['Available Ports', JSON.stringify(this.mutableAvailablePorts)],
+      ['Config Path', this.config.configPath] as const,
+      ['Current Port', `${this.mutableCurrentPort}`] as const,
+      ['Available Ports', JSON.stringify(this.mutableAvailablePorts)] as const,
       [
         'Ports',
         {
@@ -262,7 +262,7 @@ export class PortAllocator implements IPortAllocator {
             ),
           ),
         },
-      ],
+      ] as const,
     ];
   }
 

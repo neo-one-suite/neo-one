@@ -23,7 +23,7 @@ interface BlogInfo {
 }
 
 export const getBlogs = async (): Promise<{
-  readonly blogs: ReadonlyArray<BlogProps>;
+  readonly blogs: readonly BlogProps[];
   readonly blogAll: BlogAllProps;
 }> => {
   const blogFiles = await fs.readdir(BLOG_SOURCE);

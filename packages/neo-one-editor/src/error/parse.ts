@@ -8,7 +8,7 @@ import { StackFrame } from './StackFrame';
 
 const regexExtractLocation = /\(?(.+?)(?::(\d+))?(?::(\d+))?\)?$/;
 
-function extractLocation(token: string | undefined): [string, number, number] {
+function extractLocation(token: string | undefined): readonly [string, number, number] {
   if (token === undefined) {
     throw new Error(`Invalid token: ${token}`);
   }
@@ -34,7 +34,7 @@ function extractLocation(token: string | undefined): [string, number, number] {
 const regexValidFrameChrome = /^\s*(at|in)\s.+(:\d+)/;
 const regexValidFrameFireFox = /(^|@)\S+:\d+|.+line\s+\d+\s+>\s+(eval|Function).+/;
 
-function parseStack(stack: ReadonlyArray<string>): ReadonlyArray<StackFrame> {
+function parseStack(stack: readonly string[]): readonly StackFrame[] {
   return stack
     .filter((e) => regexValidFrameChrome.test(e) || regexValidFrameFireFox.test(e))
     .map((eIn) => {
@@ -79,7 +79,7 @@ function parseStack(stack: ReadonlyArray<string>): ReadonlyArray<StackFrame> {
  * Turns an <code>Error</code>, or similar object, into a set of <code>StackFrame</code>s.
  * @alias parse
  */
-export function parse(error: Error | string | ReadonlyArray<string>): ReadonlyArray<StackFrame> {
+export function parse(error: Error | string | readonly string[]): readonly StackFrame[] {
   if (typeof error === 'string') {
     return parseStack(error.split('\n'));
   }

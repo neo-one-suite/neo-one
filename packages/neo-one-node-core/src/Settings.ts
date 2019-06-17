@@ -16,13 +16,13 @@ export interface Settings {
   readonly governingToken: RegisterTransaction;
   readonly utilityToken: RegisterTransaction;
   readonly decrementInterval: number;
-  readonly generationAmount: ReadonlyArray<number>;
+  readonly generationAmount: readonly number[];
   readonly fees: { [K in TransactionType]?: BN };
   readonly registerValidatorFee: BN;
   readonly messageMagic: number;
   readonly addressVersion: number;
   readonly privateKeyVersion: number;
-  readonly standbyValidators: ReadonlyArray<ECPoint>;
+  readonly standbyValidators: readonly ECPoint[];
   readonly vm: VMSettings;
   readonly secondsPerBlock: number;
   readonly maxTransactionsPerBlock: number;

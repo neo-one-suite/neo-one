@@ -14,7 +14,7 @@ export interface FileDiagnostic extends TextRange {
   readonly severity: FileDiagnosticSeverity;
 }
 
-export type EditorFiles = ReadonlyArray<EditorFile>;
+export type EditorFiles = readonly EditorFile[];
 
 export interface EditorFile {
   readonly path: string;

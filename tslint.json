@@ -42,6 +42,7 @@
     "file-name-casing": [false, "camel-case"],
     "static-this": false,
     "no-null-undefined-union": false,
+    "array-type": [true, "array-simple"],
 
     "trailing-comma": [
       true,

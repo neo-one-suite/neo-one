@@ -24,19 +24,19 @@ export interface Course {
   readonly title: string;
   readonly description: string;
   readonly image: CourseImage;
-  readonly lessons: ReadonlyArray<Lesson>;
+  readonly lessons: readonly Lesson[];
 }
 
 export interface Lesson {
   readonly title: string;
   readonly documentation: string;
-  readonly chapters: ReadonlyArray<Chapter>;
+  readonly chapters: readonly Chapter[];
 }
 
 export interface Chapter {
   readonly title: string;
   readonly documentation: string;
-  readonly files: ReadonlyArray<ChapterFile>;
+  readonly files: readonly ChapterFile[];
 }
 
 export interface ChapterFile {

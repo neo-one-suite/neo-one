@@ -5,7 +5,7 @@ import { TutorialProps } from '../components';
 import { SubsectionData } from '../types';
 
 export interface SectionHeaders {
-  readonly [key: string]: ReadonlyArray<string>;
+  readonly [key: string]: readonly string[];
 }
 
 const TUTORIAL_SOURCE = path.resolve(__dirname, '..', '..', 'tutorial', 'tutorial.md');
@@ -29,7 +29,7 @@ export const getTutorial = async (): Promise<TutorialProps> => {
 
 const slugifyTitle = (title: string) => `/tutorial#${slugify(title)}`;
 
-const parseSections = (tutorial: string): ReadonlyArray<SubsectionData> => {
+const parseSections = (tutorial: string): readonly SubsectionData[] => {
   const sections = tutorial.split('\n').filter((line) => line.includes('##'));
 
   let prevHeader: string;

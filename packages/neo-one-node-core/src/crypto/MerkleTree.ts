@@ -47,7 +47,7 @@ class MerkleTreeNode {
   }
 }
 
-const build = (leavesIn: ReadonlyArray<MerkleTreeNode>): MerkleTreeNode => {
+const build = (leavesIn: readonly MerkleTreeNode[]): MerkleTreeNode => {
   const leaves = leavesIn;
   if (leaves.length === 0) {
     throw new InvalidMerkleTreeException();
@@ -82,7 +82,7 @@ const build = (leavesIn: ReadonlyArray<MerkleTreeNode>): MerkleTreeNode => {
   return build(parents);
 };
 
-const trim = (node: MerkleTreeNode, index: number, depth: number, flags: ReadonlyArray<boolean>) => {
+const trim = (node: MerkleTreeNode, index: number, depth: number, flags: readonly boolean[]) => {
   const { leftChild, rightChild } = node;
   if (depth === 1 || leftChild === undefined) {
     return;
@@ -113,7 +113,7 @@ const depthFirstSearchWorker = (node: MerkleTreeNode, mutableHashes: UInt256[]):
   }
 };
 
-const depthFirstSearch = (node: MerkleTreeNode): ReadonlyArray<UInt256> => {
+const depthFirstSearch = (node: MerkleTreeNode): readonly UInt256[] => {
   const mutableHashes: UInt256[] = [];
   depthFirstSearchWorker(node, mutableHashes);
 
@@ -121,7 +121,7 @@ const depthFirstSearch = (node: MerkleTreeNode): ReadonlyArray<UInt256> => {
 };
 
 export class MerkleTree {
-  public static computeRoot(hashes: ReadonlyArray<UInt256>): UInt256 {
+  public static computeRoot(hashes: readonly UInt256[]): UInt256 {
     const tree = new this(hashes);
 
     return tree.root.hash;
@@ -130,7 +130,7 @@ export class MerkleTree {
   public readonly root: MerkleTreeNode;
   public readonly depth: number;
 
-  public constructor(hashesOrNode: ReadonlyArray<UInt256> | MerkleTreeNode) {
+  public constructor(hashesOrNode: readonly UInt256[] | MerkleTreeNode) {
     this.root = Array.isArray(hashesOrNode)
       ? build(hashesOrNode.map((hash) => new MerkleTreeNode({ hash })))
       : (hashesOrNode as MerkleTreeNode);
@@ -141,18 +141,18 @@ export class MerkleTree {
     }
   }
 
-  public trim(flags: ReadonlyArray<boolean>): MerkleTree {
+  public trim(flags: readonly boolean[]): MerkleTree {
     const result = this.root.clone();
     trim(result, 0, this.depth, flags);
 
     return new MerkleTree(result);
   }
 
-  public depthFirstSearch(): ReadonlyArray<UInt256> {
+  public depthFirstSearch(): readonly UInt256[] {
     return depthFirstSearch(this.root);
   }
 
-  public toHashArray(): ReadonlyArray<UInt256> {
+  public toHashArray(): readonly UInt256[] {
     return this.depthFirstSearch();
   }
 }

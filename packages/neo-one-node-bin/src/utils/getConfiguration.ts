@@ -25,7 +25,7 @@ interface SettingsEnvironment {
   readonly privateNet?: boolean;
   readonly address?: string;
   readonly secondsPerBlock?: number;
-  readonly standbyValidators?: ReadonlyArray<string>;
+  readonly standbyValidators?: readonly string[];
 }
 
 const DEFAULT_CONFIG = {

@@ -19,7 +19,7 @@ export interface ProcessErrorTrace {
 export interface ProcessErrorOptions {
   readonly message: string;
   readonly error?: ProcessErrorError;
-  readonly trace?: ReadonlyArray<ProcessErrorTrace>;
+  readonly trace?: readonly ProcessErrorTrace[];
   readonly sourceMaps?: SourceMaps;
 }
 
@@ -91,7 +91,7 @@ const processGenericError = async (message: string, sourceMaps: SourceMaps): Pro
 const processTraceError = async (
   message: string,
   error: ProcessErrorError,
-  trace: ReadonlyArray<ProcessErrorTrace>,
+  trace: readonly ProcessErrorTrace[],
   sourceMaps: SourceMaps,
 ): Promise<string> => {
   let sourceMap = Object.values(sourceMaps)[0];

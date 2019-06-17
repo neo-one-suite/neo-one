@@ -93,7 +93,7 @@ export class JSONRPCClient {
     );
   }
 
-  public async getMemPool(monitor?: Monitor): Promise<ReadonlyArray<string>> {
+  public async getMemPool(monitor?: Monitor): Promise<readonly string[]> {
     return this.withInstance(async (provider) => provider.request({ method: 'getrawmempool' }, monitor));
   }
 
@@ -180,7 +180,7 @@ export class JSONRPCClient {
     );
   }
 
-  public async getAllStorage(address: AddressString, monitor?: Monitor): Promise<ReadonlyArray<StorageItemJSON>> {
+  public async getAllStorage(address: AddressString, monitor?: Monitor): Promise<readonly StorageItemJSON[]> {
     return this.withInstance(async (provider) =>
       provider.request(
         {
@@ -231,7 +231,7 @@ export class JSONRPCClient {
     );
   }
 
-  public async getConnectedPeers(monitor?: Monitor): Promise<ReadonlyArray<Peer>> {
+  public async getConnectedPeers(monitor?: Monitor): Promise<readonly Peer[]> {
     return this.withInstance(async (provider) =>
       provider
         .request(

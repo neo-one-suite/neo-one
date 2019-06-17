@@ -10,10 +10,10 @@ export class MapContractParameter extends ContractParameterBase<
   ContractParameterType.Map
 > {
   public readonly type = ContractParameterType.Map;
-  public readonly value: ReadonlyArray<[ContractParameter, ContractParameter]>;
+  public readonly value: ReadonlyArray<readonly [ContractParameter, ContractParameter]>;
   private readonly sizeInternal: () => number;
 
-  public constructor(value: ReadonlyArray<[ContractParameter, ContractParameter]>) {
+  public constructor(value: ReadonlyArray<readonly [ContractParameter, ContractParameter]>) {
     super();
     this.value = value;
     this.sizeInternal = utils.lazy(() => IOHelper.sizeOfArray(this.value, (val) => val[0].size + val[1].size));
@@ -38,11 +38,10 @@ export class MapContractParameter extends ContractParameterBase<
 
   public serializeJSON(context: SerializeJSONContext): MapContractParameterJSON {
     return {
-      type: 'Map',
-      value: this.value.map<[ContractParameterJSON, ContractParameterJSON]>((val) => [
-        val[0].serializeJSON(context),
-        val[1].serializeJSON(context),
-      ]),
+      type: 'Map' as const,
+      value: this.value.map<readonly [ContractParameterJSON, ContractParameterJSON]>(
+        (val) => [val[0].serializeJSON(context), val[1].serializeJSON(context)] as const,
+      ),
     };
   }
 }

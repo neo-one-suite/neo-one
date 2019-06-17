@@ -7,16 +7,16 @@ import { ContractResult } from './compileContract';
 import { writeFile } from './writeFile';
 
 export type CommonCodeContract = ContractResult & {
-  readonly addresses: ReadonlyArray<string>;
+  readonly addresses: readonly string[];
 };
 
 export const generateCommonCode = async (
   project: ProjectConfig,
   projectID: string,
-  contracts: ReadonlyArray<CommonCodeContract>,
+  contracts: readonly CommonCodeContract[],
   localDevNetworkName: string,
-  wallets: ReadonlyArray<Wallet>,
-  networks: ReadonlyArray<NetworkDefinition>,
+  wallets: readonly Wallet[],
+  networks: readonly NetworkDefinition[],
   httpServerPort: number,
   sourceMapsIn: SourceMaps,
   browser: boolean,

@@ -5,8 +5,8 @@ import { FileSystem } from './filesystem';
 
 // tslint:disable
 interface FileSystemEntries {
-  readonly files: ReadonlyArray<string>;
-  readonly directories: ReadonlyArray<string>;
+  readonly files: readonly string[];
+  readonly directories: readonly string[];
 }
 
 interface WildcardMatcher {
@@ -19,7 +19,7 @@ function replaceWildcardCharacter(match: string, singleAsteriskRegexFragment: st
   return match === '*' ? singleAsteriskRegexFragment : match === '?' ? '[^/]' : '\\' + match;
 }
 
-const commonPackageFolders: ReadonlyArray<string> = ['node_modules', 'bower_components', 'jspm_packages'];
+const commonPackageFolders: readonly string[] = ['node_modules', 'bower_components', 'jspm_packages'];
 
 const implicitExcludePathRegexPattern = `(?!(${commonPackageFolders.join('|')})(/|$))`;
 
@@ -318,7 +318,7 @@ function getRootLength(path: string) {
 }
 
 function getRegularExpressionForWildcard(
-  specs: ReadonlyArray<string> | undefined,
+  specs: readonly string[] | undefined,
   basePath: string,
   usage: 'files' | 'directories' | 'exclude',
 ): string | undefined {
@@ -335,7 +335,7 @@ function getRegularExpressionForWildcard(
 }
 
 function getRegularExpressionsForWildcards(
-  specs: ReadonlyArray<string> | undefined,
+  specs: readonly string[] | undefined,
   basePath: string,
   usage: 'files' | 'directories' | 'exclude',
 ): string[] | undefined {
@@ -349,7 +349,7 @@ function getRegularExpressionsForWildcards(
   ).filter(utils.notNull);
 }
 
-function reducePathComponents(components: ReadonlyArray<string>) {
+function reducePathComponents(components: readonly string[]) {
   if (!_.some(components)) return [];
   const reduced = [components[0]];
   for (let i = 1; i < components.length; i++) {
@@ -484,18 +484,18 @@ function getSubPatternFromSpec(
 
 interface FileMatcherPatterns {
   /** One pattern for each "include" spec. */
-  includeFilePatterns: ReadonlyArray<string> | undefined;
+  includeFilePatterns: readonly string[] | undefined;
   /** One pattern matching one of any of the "include" specs. */
   includeFilePattern: string | undefined;
   includeDirectoryPattern: string | undefined;
   excludePattern: string | undefined;
-  basePaths: ReadonlyArray<string>;
+  basePaths: readonly string[];
 }
 
 function getFileMatcherPatterns(
   pathIn: string,
-  excludes: ReadonlyArray<string> | undefined,
-  includes: ReadonlyArray<string> | undefined,
+  excludes: readonly string[] | undefined,
+  includes: readonly string[] | undefined,
   useCaseSensitiveFileNames: boolean,
   currentDirectoryIn: string,
 ): FileMatcherPatterns {
@@ -525,7 +525,7 @@ function hasExtension(fileName: string): boolean {
 
 function getAnyExtensionFromPathWorker(
   path: string,
-  extensions: string | ReadonlyArray<string>,
+  extensions: string | readonly string[],
   stringEqualityComparer: (a: string, b: string) => boolean,
 ) {
   if (typeof extensions === 'string') extensions = [extensions];
@@ -568,12 +568,8 @@ function equateValues<T>(a: T, b: T) {
 }
 
 function getAnyExtensionFromPath(path: string): string;
-function getAnyExtensionFromPath(path: string, extensions: string | ReadonlyArray<string>, ignoreCase: boolean): string;
-function getAnyExtensionFromPath(
-  path: string,
-  extensions?: string | ReadonlyArray<string>,
-  ignoreCase?: boolean,
-): string {
+function getAnyExtensionFromPath(path: string, extensions: string | readonly string[], ignoreCase: boolean): string;
+function getAnyExtensionFromPath(path: string, extensions?: string | readonly string[], ignoreCase?: boolean): string {
   // Retrieves any string from the final "." onwards from a base file name.
   // Unlike extensionFromPath, which throws an exception on unrecognized extensions.
   if (extensions) {
@@ -591,7 +587,7 @@ function getAnyExtensionFromPath(
   return '';
 }
 
-export function getBaseFileName(path: string, extensions?: string | ReadonlyArray<string>, ignoreCase?: boolean) {
+export function getBaseFileName(path: string, extensions?: string | readonly string[], ignoreCase?: boolean) {
   path = normalizeSlashes(path);
 
   // if the path provided is itself the root, then it has not file name.
@@ -711,7 +707,7 @@ export function containsPath(parent: string, child: string, currentDirectory?: s
 
 function getBasePaths(
   path: string,
-  includes: ReadonlyArray<string> | undefined,
+  includes: readonly string[] | undefined,
   useCaseSensitiveFileNames: boolean,
 ): string[] {
   // Storage for our results in the form of literal paths (e.g. the paths as written by the user).
@@ -749,12 +745,12 @@ function getRegexFromPattern(pattern: string, useCaseSensitiveFileNames: boolean
 
 type Comparer<T> = (a: T, b: T) => Comparison;
 
-function sort<T>(array: ReadonlyArray<T>, comparer: Comparer<T>): T[] {
+function sort<T>(array: readonly T[], comparer: Comparer<T>): T[] {
   return array.slice().sort(comparer);
 }
 
 function findIndex<T>(
-  array: ReadonlyArray<T>,
+  array: readonly T[],
   predicate: (element: T, index: number) => boolean,
   startIndex?: number,
 ): number {
@@ -775,7 +771,7 @@ export function fileExtensionIs(path: string, extension: string): boolean {
   return path.length > extension.length && endsWith(path, extension);
 }
 
-export function fileExtensionIsOneOf(path: string, extensions: ReadonlyArray<string>): boolean {
+export function fileExtensionIsOneOf(path: string, extensions: readonly string[]): boolean {
   for (const extension of extensions) {
     if (fileExtensionIs(path, extension)) {
       return true;
@@ -787,9 +783,9 @@ export function fileExtensionIsOneOf(path: string, extensions: ReadonlyArray<str
 
 export function matchFiles(
   pathIn: string,
-  extensions: ReadonlyArray<string> | undefined,
-  excludes: ReadonlyArray<string> | undefined,
-  includes: ReadonlyArray<string> | undefined,
+  extensions: readonly string[] | undefined,
+  excludes: readonly string[] | undefined,
+  includes: readonly string[] | undefined,
   useCaseSensitiveFileNames: boolean,
   currentDirectoryIn: string,
   depth: number | undefined,
@@ -916,9 +912,9 @@ export const createFSHost = (fs: FileSystem) => {
 
   function readDirectory(
     path: string,
-    extensions?: ReadonlyArray<string>,
-    excludes?: ReadonlyArray<string>,
-    includes?: ReadonlyArray<string>,
+    extensions?: readonly string[],
+    excludes?: readonly string[],
+    includes?: readonly string[],
     depth?: number,
   ): string[] {
     return matchFiles(

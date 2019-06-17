@@ -1,15 +1,17 @@
-/* @hash 13652a6ff77951118a9ece183c6abc1b */
+/* @hash 7773852f14c6e9624ec4651b8e944dbf */
 // tslint:disable
 /* eslint-disable */
 import { icoABI } from './abi';
 import { sourceMaps } from '../sourceMaps';
- const definition = {
+
+const definition = {
   networks: {
     local: {
-      address: 'AQUpTfMEdj2NzvDmXi73YEGCrdmQvmGfoF',
+      address: 'Ae6so44HCmVWHfpFJhjg1zbHYYD2beR1pW',
     },
   },
   abi: icoABI,
   sourceMaps,
 };
- export const createICOSmartContract = (client) => client.smartContract(definition);
+
+export const createICOSmartContract = (client) => client.smartContract(definition);

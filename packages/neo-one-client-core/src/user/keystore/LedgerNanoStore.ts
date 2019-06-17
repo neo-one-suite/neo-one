@@ -28,7 +28,7 @@ const BIP44 = (accountIn = 0): Buffer => {
   return Buffer.from(`8000002C800003788000000000000000${'0'.repeat(8 - account.length)}${account}`, 'hex');
 };
 
-const chunkBuffer = (buffer: Buffer, chunkLength: number): ReadonlyArray<Buffer> => {
+const chunkBuffer = (buffer: Buffer, chunkLength: number): readonly Buffer[] => {
   if (buffer.length > chunkLength) {
     return [buffer.slice(0, chunkLength)].concat(chunkBuffer(buffer.slice(chunkLength), chunkLength));
   }

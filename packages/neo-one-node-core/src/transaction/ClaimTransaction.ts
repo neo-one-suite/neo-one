@@ -57,7 +57,7 @@ export class ClaimTransaction extends TransactionBase<
     });
   }
 
-  public readonly claims!: ReadonlyArray<Input>;
+  public readonly claims!: readonly Input[];
   protected readonly sizeExclusive: () => number = utils.lazy(
     () => IOHelper.sizeOfUInt8 + IOHelper.sizeOfArray(this.claims, (claim) => claim.size),
   );
@@ -92,7 +92,7 @@ export class ClaimTransaction extends TransactionBase<
     return utils.ZERO;
   }
 
-  public async getClaimReferences({ getOutput }: GetReferencesOptions): Promise<ReadonlyArray<Output>> {
+  public async getClaimReferences({ getOutput }: GetReferencesOptions): Promise<readonly Output[]> {
     return Promise.all(this.claims.map(async (input) => getOutput(input)));
   }
 
@@ -102,7 +102,7 @@ export class ClaimTransaction extends TransactionBase<
     return this.claimGetScriptHashesForVerifyingInternal(options);
   }
 
-  public async verify(options: TransactionVerifyOptions): Promise<ReadonlyArray<VerifyScriptResult>> {
+  public async verify(options: TransactionVerifyOptions): Promise<readonly VerifyScriptResult[]> {
     const [results] = await Promise.all([super.verify(options), this.verifyInternal(options)]);
 
     return results;

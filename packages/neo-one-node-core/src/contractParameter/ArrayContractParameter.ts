@@ -10,10 +10,10 @@ export class ArrayContractParameter extends ContractParameterBase<
   ContractParameterType.Array
 > {
   public readonly type = ContractParameterType.Array;
-  public readonly value: ReadonlyArray<ContractParameter>;
+  public readonly value: readonly ContractParameter[];
   private readonly sizeInternal: () => number;
 
-  public constructor(value: ReadonlyArray<ContractParameter>) {
+  public constructor(value: readonly ContractParameter[]) {
     super();
     this.value = value;
     this.sizeInternal = utils.lazy(() => IOHelper.sizeOfArray(this.value, (val) => val.size));

@@ -27,9 +27,9 @@ export interface CRUDBaseOptions<
   readonly command: string;
   readonly resourceType: ResourceType<Resource, ResourceOptions>;
   readonly help: string;
-  readonly aliases?: ReadonlyArray<string>;
-  readonly options?: ReadonlyArray<CLIOption>;
-  readonly autocomplete?: ReadonlyArray<string>;
+  readonly aliases?: readonly string[];
+  readonly options?: readonly CLIOption[];
+  readonly autocomplete?: readonly string[];
   readonly hidden?: boolean;
 }
 
@@ -50,9 +50,9 @@ export class CRUDBase<
   public readonly command: string;
   public readonly resourceType: ResourceType<Resource, ResourceOptions>;
   public readonly help: string;
-  public readonly aliases: ReadonlyArray<string>;
-  public readonly options: ReadonlyArray<CLIOption>;
-  public readonly autocomplete: ReadonlyArray<string>;
+  public readonly aliases: readonly string[];
+  public readonly options: readonly CLIOption[];
+  public readonly autocomplete: readonly string[];
   public readonly hidden: boolean;
 
   public constructor({

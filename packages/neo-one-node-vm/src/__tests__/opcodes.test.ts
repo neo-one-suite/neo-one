@@ -40,14 +40,14 @@ interface Op {
 }
 
 interface TestCase extends Op {
-  readonly preOps?: ReadonlyArray<Op>;
-  readonly postOps?: ReadonlyArray<Op>;
-  readonly result: ReadonlyArray<StackItem>;
-  readonly resultAlt?: ReadonlyArray<StackItem>;
+  readonly preOps?: readonly Op[];
+  readonly postOps?: readonly Op[];
+  readonly result: readonly StackItem[];
+  readonly resultAlt?: readonly StackItem[];
   readonly gas: BN;
   readonly args?: ReadonlyArray<ScriptBuilderParam | undefined>;
   readonly argsAlt?: ReadonlyArray<ScriptBuilderParam | undefined>;
-  readonly stackItems?: ReadonlyArray<StackItem>;
+  readonly stackItems?: readonly StackItem[];
   readonly ref?: StackItem;
   // tslint:disable-next-line no-any
   readonly mockBlockchain?: (options: { readonly blockchain: any }) => void;
@@ -73,15 +73,15 @@ const mapStatic = new MapStackItem({
     [
       new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
       new BufferStackItem(Buffer.from('aaaa', 'hex')),
-    ],
+    ] as const,
     [
       new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
       new BufferStackItem(Buffer.from('bbbb', 'hex')),
-    ],
+    ] as const,
   ]),
   referenceValues: new Map([
-    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
-    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))],
+    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))] as const,
+    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))] as const,
   ]),
 });
 
@@ -90,15 +90,15 @@ const mapSetRef = new MapStackItem({
     [
       new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
       new BufferStackItem(Buffer.from('aaaa', 'hex')),
-    ],
+    ] as const,
     [
       new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
       new BufferStackItem(Buffer.from('bbbb', 'hex')),
-    ],
+    ] as const,
   ]),
   referenceValues: new Map([
-    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
-    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))],
+    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))] as const,
+    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))] as const,
   ]),
 });
 
@@ -107,15 +107,15 @@ const mapRemoveRef = new MapStackItem({
     [
       new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
       new BufferStackItem(Buffer.from('aaaa', 'hex')),
-    ],
+    ] as const,
     [
       new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
       new BufferStackItem(Buffer.from('bbbb', 'hex')),
-    ],
+    ] as const,
   ]),
   referenceValues: new Map([
-    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
-    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))],
+    [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))] as const,
+    [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))] as const,
   ]),
 });
 
@@ -169,7 +169,7 @@ const OPCODES = ([
     result: [new BufferStackItem(Buffer.from([]))],
     gas: utils.ZERO,
   },
-] as ReadonlyArray<TestCase>)
+] as readonly TestCase[])
   .concat(
     _.range(0x01, 0x4c).map((idx) => ({
       // tslint:disable-next-line no-any
@@ -1386,20 +1386,29 @@ const OPCODES = ([
               [
                 new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
                 new BufferStackItem(Buffer.from('aaaa', 'hex')),
-              ],
+              ] as const,
               [
                 new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
                 new BufferStackItem(Buffer.from('bbbb', 'hex')),
-              ],
+              ] as const,
               [
                 new BufferStackItem(Buffer.from('dddd', 'hex')).toStructuralKey(),
                 new BufferStackItem(Buffer.from('dddd', 'hex')),
-              ],
+              ] as const,
             ]),
             referenceValues: new Map([
-              [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
-              [new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(2))],
-              [new BufferStackItem(Buffer.from('dddd', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(5))],
+              [
+                new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
+                new IntegerStackItem(new BN(1)),
+              ] as const,
+              [
+                new BufferStackItem(Buffer.from('bbbb', 'hex')).toStructuralKey(),
+                new IntegerStackItem(new BN(2)),
+              ] as const,
+              [
+                new BufferStackItem(Buffer.from('dddd', 'hex')).toStructuralKey(),
+                new IntegerStackItem(new BN(5)),
+              ] as const,
             ]),
           }),
         ],
@@ -1531,10 +1540,13 @@ const OPCODES = ([
               [
                 new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
                 new BufferStackItem(Buffer.from('aaaa', 'hex')),
-              ],
+              ] as const,
             ]),
             referenceValues: new Map([
-              [new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(), new IntegerStackItem(new BN(1))],
+              [
+                new BufferStackItem(Buffer.from('aaaa', 'hex')).toStructuralKey(),
+                new IntegerStackItem(new BN(1)),
+              ] as const,
             ]),
           }),
         ],
@@ -1599,7 +1611,7 @@ const OPCODES = ([
     // {
     //   op: 'THROWIFNOT',
     // },
-  ) as ReadonlyArray<TestCase>;
+  ) as readonly TestCase[];
 
 const monitor = DefaultMonitor.create({
   service: 'test',
@@ -1707,8 +1719,8 @@ describe('opcodes', () => {
       };
 
       const gasLeft = utils.ONE_HUNDRED_MILLION;
-      let stack: ReadonlyArray<StackItem> = [];
-      let stackAlt: ReadonlyArray<StackItem> = [];
+      let stack: readonly StackItem[] = [];
+      let stackAlt: readonly StackItem[] = [];
       if (mockBlockchain !== undefined) {
         mockBlockchain({ blockchain });
       }

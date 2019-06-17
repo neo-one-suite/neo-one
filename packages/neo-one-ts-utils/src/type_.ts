@@ -72,11 +72,11 @@ export function getAliasSymbol(type: ts.Type): ts.Symbol | undefined {
   return utils.getValueOrUndefined(type.aliasSymbol);
 }
 
-export function getAliasTypeArguments(type: ts.Type): ReadonlyArray<ts.Type> | undefined {
+export function getAliasTypeArguments(type: ts.Type): readonly ts.Type[] | undefined {
   return utils.getValueOrUndefined(type.aliasTypeArguments);
 }
 
-export function getAliasTypeArgumentsArray(type: ts.Type): ReadonlyArray<ts.Type> {
+export function getAliasTypeArgumentsArray(type: ts.Type): readonly ts.Type[] {
   return utils.getArray(getAliasTypeArguments(type));
 }
 
@@ -98,11 +98,11 @@ function getDefaultTypeFormatFlags(node?: ts.Node): ts.TypeFormatFlags {
   return formatFlags;
 }
 
-export function getProperties(type: ts.Type): ReadonlyArray<ts.Symbol> {
+export function getProperties(type: ts.Type): readonly ts.Symbol[] {
   return type.getProperties();
 }
 
-export function getConstructSignatures(type: ts.Type): ReadonlyArray<ts.Signature> {
+export function getConstructSignatures(type: ts.Type): readonly ts.Signature[] {
   return type.getConstructSignatures();
 }
 
@@ -119,11 +119,11 @@ export function getText(
   return typeChecker.typeToString(type, node, flags);
 }
 
-export function getBaseTypes(type: ts.Type): ReadonlyArray<ts.Type> | undefined {
+export function getBaseTypes(type: ts.Type): readonly ts.Type[] | undefined {
   return utils.getValueOrUndefined(type.getBaseTypes());
 }
 
-export function getBaseTypesArray(type: ts.Type): ReadonlyArray<ts.Type> {
+export function getBaseTypesArray(type: ts.Type): readonly ts.Type[] {
   return utils.getArray(getBaseTypes(type));
 }
 
@@ -137,33 +137,33 @@ function hasTypeFlag(type: ts.Type, flag: ts.TypeFlags): boolean {
   return (type.flags & flag) !== 0;
 }
 
-export function getAllTypes(type: ts.Type): ReadonlyArray<ts.Type> {
+export function getAllTypes(type: ts.Type): readonly ts.Type[] {
   const unionTypes = getUnionTypes(type);
   if (unionTypes !== undefined) {
-    return unionTypes.reduce<ReadonlyArray<ts.Type>>((acc, unionType) => acc.concat(getAllTypes(unionType)), []);
+    return unionTypes.reduce<readonly ts.Type[]>((acc, unionType) => acc.concat(getAllTypes(unionType)), []);
   }
 
   const intersectionTypes = getIntersectionTypes(type);
   if (intersectionTypes !== undefined) {
-    return intersectionTypes.reduce<ReadonlyArray<ts.Type>>((acc, unionType) => acc.concat(getAllTypes(unionType)), []);
+    return intersectionTypes.reduce<readonly ts.Type[]>((acc, unionType) => acc.concat(getAllTypes(unionType)), []);
   }
 
   return [type];
 }
 
-export function getTypes(type: ts.Type, isType: (type: ts.Type) => boolean): ReadonlyArray<ts.Type> {
+export function getTypes(type: ts.Type, isType: (type: ts.Type) => boolean): readonly ts.Type[] {
   if (isType(type)) {
     return [type];
   }
 
   const unionTypes = getUnionTypes(type);
   if (unionTypes !== undefined) {
-    return unionTypes.reduce<ReadonlyArray<ts.Type>>((acc, unionType) => acc.concat(getTypes(unionType, isType)), []);
+    return unionTypes.reduce<readonly ts.Type[]>((acc, unionType) => acc.concat(getTypes(unionType, isType)), []);
   }
 
   const intersectionTypes = getIntersectionTypes(type);
   if (intersectionTypes !== undefined) {
-    return intersectionTypes.reduce<ReadonlyArray<ts.Type>>(
+    return intersectionTypes.reduce<readonly ts.Type[]>(
       (acc, unionType) => acc.concat(getTypes(unionType, isType)),
       [],
     );
@@ -191,23 +191,23 @@ export function isTuple(type: ts.Type): type is ts.TupleTypeReference {
 export function hasTuple(type: ts.Type): boolean {
   return hasType(type, isTuple);
 }
-export function getTupleTypes(type: ts.Type): ReadonlyArray<ts.Type> {
+export function getTupleTypes(type: ts.Type): readonly ts.Type[] {
   return getTypes(type, isTuple);
 }
 // If undefined => not a tuple type
-export function getTupleElements(type: ts.Type): ReadonlyArray<ts.Type> | undefined {
+export function getTupleElements(type: ts.Type): readonly ts.Type[] | undefined {
   return isTuple(type) ? utils.getArray(type.typeArguments) : undefined;
 }
 
-export function getTypeArguments(type: ts.Type): ReadonlyArray<ts.Type> | undefined {
+export function getTypeArguments(type: ts.Type): readonly ts.Type[] | undefined {
   return isTypeReference(type) ? utils.getValueOrUndefined(type.typeArguments) : undefined;
 }
 
-export function getTypeArgumentsArray(type: ts.Type): ReadonlyArray<ts.Type> {
+export function getTypeArgumentsArray(type: ts.Type): readonly ts.Type[] {
   return utils.getArray(getTypeArguments(type));
 }
 
-export function getTypeArgumentsOrThrow(type: ts.Type): ReadonlyArray<ts.Type> {
+export function getTypeArgumentsOrThrow(type: ts.Type): readonly ts.Type[] {
   return utils.throwIfNullOrUndefined(getTypeArguments(type), 'type arguments');
 }
 
@@ -225,10 +225,10 @@ export function isUnion(type: ts.Type): type is ts.UnionType {
   return (type as any).isUnion === undefined ? false : type.isUnion();
 }
 
-export function getUnionTypes(type: ts.Type): ReadonlyArray<ts.Type> | undefined {
+export function getUnionTypes(type: ts.Type): readonly ts.Type[] | undefined {
   return isUnion(type) ? utils.getArray(type.types) : undefined;
 }
-export function getUnionTypesArray(type: ts.Type): ReadonlyArray<ts.Type> {
+export function getUnionTypesArray(type: ts.Type): readonly ts.Type[] {
   return utils.getArray(getUnionTypes(type));
 }
 
@@ -237,11 +237,11 @@ export function isIntersection(type: ts.Type): type is ts.IntersectionType {
   return (type as any).isIntersection === undefined ? false : type.isIntersection();
 }
 
-export function getIntersectionTypes(type: ts.Type): ReadonlyArray<ts.Type> | undefined {
+export function getIntersectionTypes(type: ts.Type): readonly ts.Type[] | undefined {
   return isIntersection(type) ? utils.getArray(type.types) : undefined;
 }
 
-export function getIntersectionTypesArray(type: ts.Type): ReadonlyArray<ts.Type> {
+export function getIntersectionTypesArray(type: ts.Type): readonly ts.Type[] {
   return utils.getArray(getIntersectionTypes(type));
 }
 
@@ -560,7 +560,7 @@ export function getArrayTypeOrThrow(type: ts.Type): ts.Type {
   return utils.throwIfNullOrUndefined(getArrayType(type), 'array type');
 }
 
-export function getArrayTypes(type: ts.Type): ReadonlyArray<ts.Type> {
+export function getArrayTypes(type: ts.Type): readonly ts.Type[] {
   return getTypes(type, isArray);
 }
 
@@ -583,7 +583,7 @@ export function hasVoidish(type: ts.Type): boolean {
   return hasType(type, isVoidish);
 }
 
-export function getCallSignatures(type: ts.Type): ReadonlyArray<ts.Signature> {
+export function getCallSignatures(type: ts.Type): readonly ts.Signature[] {
   return type.getCallSignatures();
 }
 

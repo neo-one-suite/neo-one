@@ -13,7 +13,7 @@ export interface ClaimTransactionModelAdd<
   TOutput extends OutputModel = OutputModel,
   TWitness extends WitnessModel = WitnessModel
 > extends TransactionBaseModelAdd<TAttribute, TInput, TOutput, TWitness> {
-  readonly claims: ReadonlyArray<TInput>;
+  readonly claims: readonly TInput[];
 }
 
 export class ClaimTransactionModel<
@@ -22,7 +22,7 @@ export class ClaimTransactionModel<
   TOutput extends OutputModel = OutputModel,
   TWitness extends WitnessModel = WitnessModel
 > extends TransactionBaseModel<TransactionTypeModel.Claim, TAttribute, TInput, TOutput, TWitness> {
-  public readonly claims: ReadonlyArray<InputModel>;
+  public readonly claims: readonly InputModel[];
   public constructor({
     version,
     attributes,
@@ -59,10 +59,10 @@ export class ClaimTransactionModel<
     inputs = this.inputs,
     outputs = this.outputs,
   }: {
-    readonly scripts?: ReadonlyArray<WitnessModel>;
-    readonly attributes?: ReadonlyArray<AttributeModel>;
-    readonly inputs?: ReadonlyArray<InputModel>;
-    readonly outputs?: ReadonlyArray<OutputModel>;
+    readonly scripts?: readonly WitnessModel[];
+    readonly attributes?: readonly AttributeModel[];
+    readonly inputs?: readonly InputModel[];
+    readonly outputs?: readonly OutputModel[];
   }): this {
     // tslint:disable-next-line no-any
     return new (this.constructor as any)({

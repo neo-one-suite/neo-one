@@ -1,7 +1,7 @@
 // tslint:disable no-object-literal-type-assertion
 import { build, checkProblems, enterSolution, nextButton, Problem, runTests, Test } from './matchers';
 
-export const ALL_SLUGS: ReadonlyArray<string> = [
+export const ALL_SLUGS: readonly string[] = [
   '/course/tokenomics/1/1',
   '/course/tokenomics/1/2',
   '/course/tokenomics/1/3',
@@ -39,7 +39,7 @@ export const lesson1 = ({
 }: {
   readonly error: string;
   readonly chapter: number;
-  readonly problems: ReadonlyArray<Problem>;
+  readonly problems: readonly Problem[];
   readonly testName?: string;
 }) => {
   it(`Lesson 1 Chapter ${chapter}`, () => {
@@ -121,7 +121,7 @@ export const lesson2 = ({
 }: {
   readonly chapter: number;
   readonly error: string;
-  readonly problems?: ReadonlyArray<Problem>;
+  readonly problems?: readonly Problem[];
   readonly testName?: string;
   readonly skip?: boolean;
 }) => {
@@ -216,7 +216,7 @@ export const lesson3 = ({
   testName,
 }: {
   readonly chapter: number;
-  readonly problems?: ReadonlyArray<Problem>;
+  readonly problems?: readonly Problem[];
   readonly error: string;
   readonly testName?: string;
 }) => {
@@ -324,9 +324,9 @@ export const lesson4 = ({
 }: {
   readonly error: string;
   readonly chapter: number;
-  readonly problems: ReadonlyArray<Problem>;
-  readonly contracts: ReadonlyArray<string>;
-  readonly secondContracts?: ReadonlyArray<string>;
+  readonly problems: readonly Problem[];
+  readonly contracts: readonly string[];
+  readonly secondContracts?: readonly string[];
   readonly testName?: string;
   readonly fileName?: string;
 }) => {

@@ -13,7 +13,7 @@ export type StatementedNode =
   | ts.CaseClause
   | ts.DefaultClause;
 
-export function getStatements(node: StatementedNode): ReadonlyArray<ts.Statement> {
+export function getStatements(node: StatementedNode): readonly ts.Statement[] {
   if (ts.isSourceFile(node) || ts.isCaseClause(node) || ts.isDefaultClause(node)) {
     return node.statements;
   }
@@ -37,7 +37,7 @@ export function getStatements(node: StatementedNode): ReadonlyArray<ts.Statement
   return (moduleBody as any).statements;
 }
 
-export function getClasses(node: StatementedNode): ReadonlyArray<ts.ClassDeclaration> {
+export function getClasses(node: StatementedNode): readonly ts.ClassDeclaration[] {
   return getStatements(node).filter(ts.isClassDeclaration);
 }
 
@@ -49,7 +49,7 @@ export function getClassOrThrow(node: StatementedNode, name: string): ts.ClassDe
   return utils.throwIfNullOrUndefined(getClass(node, name), 'class');
 }
 
-export function getInterfaces(node: StatementedNode): ReadonlyArray<ts.InterfaceDeclaration> {
+export function getInterfaces(node: StatementedNode): readonly ts.InterfaceDeclaration[] {
   return getStatements(node).filter(ts.isInterfaceDeclaration);
 }
 
@@ -61,7 +61,7 @@ export function getInterfaceOrThrow(node: StatementedNode, name: string): ts.Int
   return utils.throwIfNullOrUndefined(getInterface(node, name), 'interface');
 }
 
-export function getNamespaces(node: StatementedNode): ReadonlyArray<ts.ModuleDeclaration> {
+export function getNamespaces(node: StatementedNode): readonly ts.ModuleDeclaration[] {
   return getStatements(node).filter(ts.isModuleDeclaration);
 }
 
@@ -73,12 +73,12 @@ export function getNamespaceOrThrow(node: StatementedNode, name: string): ts.Mod
   return utils.throwIfNullOrUndefined(getNamespace(node, name), 'namespace');
 }
 
-export function getVariableStatements(node: StatementedNode): ReadonlyArray<ts.VariableStatement> {
+export function getVariableStatements(node: StatementedNode): readonly ts.VariableStatement[] {
   return getStatements(node).filter(ts.isVariableStatement);
 }
 
-export function getVariableDeclarations(node: StatementedNode): ReadonlyArray<ts.VariableDeclaration> {
-  return getVariableStatements(node).reduce<ReadonlyArray<ts.VariableDeclaration>>(
+export function getVariableDeclarations(node: StatementedNode): readonly ts.VariableDeclaration[] {
+  return getVariableStatements(node).reduce<readonly ts.VariableDeclaration[]>(
     (acc, value) => acc.concat(variable.getDeclarations(variable.getDeclarationList(value))),
     [],
   );
@@ -92,7 +92,7 @@ export function getVariableDeclarationOrThrow(node: StatementedNode, name: strin
   return utils.throwIfNullOrUndefined(getVariableDeclaration(node, name), 'variable declaration');
 }
 
-export function getTypeAliases(node: StatementedNode): ReadonlyArray<ts.TypeAliasDeclaration> {
+export function getTypeAliases(node: StatementedNode): readonly ts.TypeAliasDeclaration[] {
   return getStatements(node).filter(ts.isTypeAliasDeclaration);
 }
 
@@ -104,7 +104,7 @@ export function getTypeAliasOrThrow(node: StatementedNode, name: string): ts.Typ
   return utils.throwIfNullOrUndefined(getTypeAlias(node, name), 'type alias');
 }
 
-export function getFunctions(node: StatementedNode): ReadonlyArray<ts.FunctionDeclaration> {
+export function getFunctions(node: StatementedNode): readonly ts.FunctionDeclaration[] {
   return getStatements(node).filter(ts.isFunctionDeclaration);
 }
 
@@ -116,7 +116,7 @@ export function getFunctionOrThrow(node: StatementedNode, name: string): ts.Func
   return utils.throwIfNullOrUndefined(getFunction(node, name), 'function');
 }
 
-export function getEnums(node: StatementedNode): ReadonlyArray<ts.EnumDeclaration> {
+export function getEnums(node: StatementedNode): readonly ts.EnumDeclaration[] {
   return getStatements(node).filter(ts.isEnumDeclaration);
 }
 
@@ -132,7 +132,7 @@ export function getLabel(node: ts.BreakStatement | ts.ContinueStatement): ts.Ide
   return utils.getValueOrUndefined(node.label);
 }
 
-export function getClauses(node: ts.CaseBlock): ReadonlyArray<ts.CaseOrDefaultClause> {
+export function getClauses(node: ts.CaseBlock): readonly ts.CaseOrDefaultClause[] {
   return node.clauses;
 }
 

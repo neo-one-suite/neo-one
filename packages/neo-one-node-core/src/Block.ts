@@ -50,7 +50,7 @@ export interface BlockAdd {
   readonly nextConsensus: UInt160;
   readonly script?: Witness;
   readonly hash?: UInt256;
-  readonly transactions: ReadonlyArray<Transaction>;
+  readonly transactions: readonly Transaction[];
 }
 
 export interface BlockKey {
@@ -65,10 +65,10 @@ export interface BlockVerifyOptions {
   readonly getAsset: (key: AssetKey) => Promise<Asset>;
   readonly getOutput: (key: OutputKey) => Promise<Output>;
   readonly tryGetAccount: (key: AccountKey) => Promise<Account | undefined>;
-  readonly getValidators: (transactions: ReadonlyArray<Transaction>) => Promise<ReadonlyArray<ECPoint>>;
-  readonly standbyValidators: ReadonlyArray<ECPoint>;
-  readonly getAllValidators: () => Promise<ReadonlyArray<Validator>>;
-  readonly calculateClaimAmount: (inputs: ReadonlyArray<Input>) => Promise<BN>;
+  readonly getValidators: (transactions: readonly Transaction[]) => Promise<readonly ECPoint[]>;
+  readonly standbyValidators: readonly ECPoint[];
+  readonly getAllValidators: () => Promise<readonly Validator[]>;
+  readonly calculateClaimAmount: (inputs: readonly Input[]) => Promise<BN>;
   readonly verifyScript: VerifyScript;
   readonly currentHeight: number;
   readonly governingToken: RegisterTransaction;
@@ -79,7 +79,7 @@ export interface BlockVerifyOptions {
 }
 
 export class Block extends BlockBase implements SerializableWire<Block>, SerializableJSON<BlockJSON> {
-  public static async calculateNetworkFee(context: FeeContext, transactions: ReadonlyArray<Transaction>): Promise<BN> {
+  public static async calculateNetworkFee(context: FeeContext, transactions: readonly Transaction[]): Promise<BN> {
     const fees = await Promise.all(transactions.map(async (transaction) => transaction.getNetworkFee(context)));
 
     return fees.reduce((acc, fee) => acc.add(fee), utils.ZERO);
@@ -120,7 +120,7 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
     });
   }
 
-  public readonly transactions: ReadonlyArray<Transaction>;
+  public readonly transactions: readonly Transaction[];
   protected readonly sizeExclusive = utils.lazy(() =>
     IOHelper.sizeOfArray(this.transactions, (transaction) => transaction.size),
   );
@@ -173,7 +173,7 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
     transactions,
     script,
   }: {
-    readonly transactions: ReadonlyArray<Transaction>;
+    readonly transactions: readonly Transaction[];
     readonly script: Witness;
   }): Block {
     return new Block({

@@ -44,7 +44,7 @@ export class CLI {
     };
   }
 
-  public async start(argv: ReadonlyArray<string>): Promise<void> {
+  public async start(argv: readonly string[]): Promise<void> {
     const vorpal = new Vorpal();
     vorpal.version(VERSION);
 

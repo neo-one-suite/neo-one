@@ -7,8 +7,8 @@ interface ViewChangingContextAdd {
   readonly viewNumber: number;
   readonly myIndex: number;
   readonly primaryIndex: number;
-  readonly expectedView: ReadonlyArray<number>;
-  readonly validators: ReadonlyArray<ECPoint>;
+  readonly expectedView: readonly number[];
+  readonly validators: readonly ECPoint[];
   readonly blockReceivedTimeSeconds: number;
 }
 
@@ -36,7 +36,7 @@ export class ViewChangingContext extends Context<ViewChangingContext> {
     });
   }
 
-  public cloneExpectedView({ expectedView }: { readonly expectedView: ReadonlyArray<number> }): ViewChangingContext {
+  public cloneExpectedView({ expectedView }: { readonly expectedView: readonly number[] }): ViewChangingContext {
     return new ViewChangingContext({
       previousHash: this.previousHash,
       blockIndex: this.blockIndex,

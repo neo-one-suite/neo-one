@@ -17,9 +17,9 @@ export interface GetResources$Options<ResourceOptions extends BaseResourceOption
 export interface GetCRUDOptions<Resource extends BaseResource, ResourceOptions extends BaseResourceOptions> {
   readonly resourceType: ResourceType<Resource, ResourceOptions>;
   readonly help?: string;
-  readonly aliases?: ReadonlyArray<string>;
-  readonly options?: ReadonlyArray<CLIOption>;
-  readonly autocomplete?: ReadonlyArray<string>;
+  readonly aliases?: readonly string[];
+  readonly options?: readonly CLIOption[];
+  readonly autocomplete?: readonly string[];
   readonly hidden?: boolean;
 }
 
@@ -57,10 +57,7 @@ export class GetCRUD<
     return Promise.resolve();
   }
 
-  public getResources$({
-    client,
-    options,
-  }: GetResources$Options<ResourceOptions>): Observable<ReadonlyArray<Resource>> {
+  public getResources$({ client, options }: GetResources$Options<ResourceOptions>): Observable<readonly Resource[]> {
     return client
       .getResources$({
         plugin: this.resourceType.plugin.name,

@@ -13,7 +13,7 @@ const Wrapper = styled(Box)`
 `;
 
 interface Props {
-  readonly testSuites: ReadonlyArray<TestSuite>;
+  readonly testSuites: readonly TestSuite[];
   readonly selectedTestSuite?: string;
 }
 export const TestSummaryList = ({ testSuites, selectedTestSuite, ...props }: Props) => (

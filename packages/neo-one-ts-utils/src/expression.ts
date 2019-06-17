@@ -23,7 +23,7 @@ export function getExpressionForCall(node: ts.CallLikeExpression): ts.Expression
   return node.tag;
 }
 
-export function getElements(expression: ts.ArrayLiteralExpression): ReadonlyArray<ts.Expression> {
+export function getElements(expression: ts.ArrayLiteralExpression): readonly ts.Expression[] {
   const elements = utils.getValueOrUndefined(expression.elements);
 
   return elements === undefined ? [] : elements;
@@ -41,7 +41,7 @@ export function getRight(expression: ts.BinaryExpression): ts.Expression {
   return expression.right;
 }
 
-export function getArguments(expression: ts.CallExpression): ReadonlyArray<ts.Expression> {
+export function getArguments(expression: ts.CallExpression): readonly ts.Expression[] {
   return expression.arguments;
 }
 

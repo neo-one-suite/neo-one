@@ -1,5 +1,5 @@
 export interface PrepareCourseTestOptions {
-  readonly slugs: ReadonlyArray<string>;
+  readonly slugs: readonly string[];
 }
 
 export const prepareCourseTest = ({ slugs }: PrepareCourseTestOptions) => {

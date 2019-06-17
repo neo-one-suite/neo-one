@@ -12,7 +12,7 @@ import {
 } from '@neo-one/node-core';
 import BN from 'bn.js';
 
-const GENERATION_AMOUNT: ReadonlyArray<number> = [8, 7, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+const GENERATION_AMOUNT: readonly number[] = [8, 7, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
 const DECREMENT_INTERVAL = 2000000;
 const ONE_HUNDRED_MILLION = common.fixed8FromDecimal(100000000);

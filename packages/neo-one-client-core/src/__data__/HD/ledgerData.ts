@@ -42,7 +42,7 @@ export const ledgerKeys = {
 };
 
 // tslint:disable-next-line:no-any
-export const ledgerAccountsNoNetwork: ReadonlyArray<any> = [
+export const ledgerAccountsNoNetwork: readonly any[] = [
   {
     identifier: 0,
     userAccount: {

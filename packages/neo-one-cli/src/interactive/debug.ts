@@ -9,7 +9,7 @@ export const debug = (cli: InteractiveCLI) => {
 
       const table = cli
         .getDebug()
-        .concat([['Server Version', version]])
+        .concat([['Server Version', version] as const])
         .concat(dbg);
       cli.printDescribe(table);
     })

@@ -2,7 +2,7 @@ import { Monitor } from '@neo-one/monitor';
 import { Plugin } from '@neo-one/server-plugin';
 import { labels } from '@neo-one/utils';
 
-const DEFAULT_PLUGINS: ReadonlyArray<string> = [
+const DEFAULT_PLUGINS: readonly string[] = [
   '@neo-one/server-plugin-network',
   '@neo-one/server-plugin-wallet',
   '@neo-one/server-plugin-project',

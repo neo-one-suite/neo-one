@@ -7,7 +7,7 @@ export interface ResponseMessage {
   readonly result: any;
 }
 
-export type RequestArgs = ReadonlyArray<any>;
+export type RequestArgs = readonly any[];
 export type RequestType =
   | 'post'
   | 'put'

@@ -113,9 +113,9 @@ interface TestEventHandler {
 }
 
 const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks: TestRunnerCallbacks) => {
-  let paths: ReadonlyArray<string> = [];
-  let blockIndices: ReadonlyArray<number> = [];
-  let tests: ReadonlyArray<Test> = [];
+  let paths: readonly string[] = [];
+  let blockIndices: readonly number[] = [];
+  let tests: readonly Test[] = [];
   let now = Date.now();
 
   const getBlockName = (blockName: Circus.BlockName) => {
@@ -143,7 +143,7 @@ const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks
   };
 
   const getTestName = (entry: Circus.TestEntry) => {
-    const getBlockNamesWorker = (block: Circus.DescribeBlock): ReadonlyArray<string> => {
+    const getBlockNamesWorker = (block: Circus.DescribeBlock): readonly string[] => {
       if (block.parent == undefined) {
         return [];
       }
@@ -297,7 +297,7 @@ export class TestRunner {
     }
   }
 
-  private async findTests(): Promise<ReadonlyArray<ModuleBase>> {
+  private async findTests(): Promise<readonly ModuleBase[]> {
     const mutableTests: ModuleBase[] = [];
     const engine = await this.engine;
     engine.modules.forEach((mod, path) => {

@@ -43,7 +43,7 @@ const getSymbol = (task: TaskStatus, mutableSpinners: Spinners) => {
   return ' ';
 };
 
-const renderTasks = (tasks: ReadonlyArray<TaskStatus>, spinners: Spinners, level = 0): string => {
+const renderTasks = (tasks: readonly TaskStatus[], spinners: Spinners, level = 0): string => {
   let mutableOutput: string[] = [];
 
   tasks.forEach((task) => {

@@ -186,7 +186,7 @@ export class InteractiveCLI {
     this.setDelimiter();
   }
 
-  public async start(argv: ReadonlyArray<string>): Promise<void> {
+  public async start(argv: readonly string[]): Promise<void> {
     const { dir } = this.serverConfig;
     const paths = {
       data: dir === undefined ? defaultPaths.data : path.join(dir, 'data'),
@@ -460,12 +460,12 @@ export class InteractiveCLI {
 
   public getDebug(): DescribeTable {
     return [
-      ['Interactive CLI Log Path', this.mutableLogPath === undefined ? 'Unknown' : this.mutableLogPath],
-      ['Interactive CLI Config Path', this.clientConfig.configPath],
+      ['Interactive CLI Log Path', this.mutableLogPath === undefined ? 'Unknown' : this.mutableLogPath] as const,
+      ['Interactive CLI Config Path', this.clientConfig.configPath] as const,
     ];
   }
   // tslint:disable-next-line no-any
-  public async prompt(questions: ReadonlyArray<any>): Promise<any> {
+  public async prompt(questions: readonly any[]): Promise<any> {
     return inquirer.prompt(questions);
   }
 

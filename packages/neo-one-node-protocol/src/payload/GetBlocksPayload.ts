@@ -8,7 +8,7 @@ import {
 } from '@neo-one/client-common';
 import { BinaryReader, DeserializeWireBaseOptions, DeserializeWireOptions } from '@neo-one/node-core';
 export interface GetBlocksPayloadAdd {
-  readonly hashStart: ReadonlyArray<UInt256>;
+  readonly hashStart: readonly UInt256[];
   readonly hashStop?: UInt256;
 }
 
@@ -27,7 +27,7 @@ export class GetBlocksPayload implements SerializableWire<GetBlocksPayload> {
     });
   }
 
-  public readonly hashStart: ReadonlyArray<UInt256>;
+  public readonly hashStart: readonly UInt256[];
   public readonly hashStop: UInt256;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 

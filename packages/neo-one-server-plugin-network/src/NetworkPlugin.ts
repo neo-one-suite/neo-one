@@ -28,7 +28,7 @@ export class NetworkPlugin extends Plugin {
     };
   }
 
-  public get resourceTypes(): ReadonlyArray<ResourceType> {
+  public get resourceTypes(): readonly ResourceType[] {
     return [this.networkResourceType];
   }
 
@@ -36,7 +36,7 @@ export class NetworkPlugin extends Plugin {
     return [backupNode, restoreNode, startNode];
   }
 
-  public get interactive(): ReadonlyArray<InteractiveCommand> {
+  public get interactive(): readonly InteractiveCommand[] {
     return [activateNetwork(this), deactivateNetwork(this)];
   }
 }

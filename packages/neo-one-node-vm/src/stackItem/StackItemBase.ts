@@ -307,11 +307,11 @@ export class StackItemBase implements Equatable {
     return 0;
   }
 
-  protected incrementInternalArray(stackItems: ReadonlyArray<StackItem>, seen: Set<StackItemBase>): number {
+  protected incrementInternalArray(stackItems: readonly StackItem[], seen: Set<StackItemBase>): number {
     return stackItems.reduce((acc, val) => acc + val.increment(seen), 0);
   }
 
-  protected decrementInternalArray(stackItems: ReadonlyArray<StackItem>, seen: Set<StackItemBase>): number {
+  protected decrementInternalArray(stackItems: readonly StackItem[], seen: Set<StackItemBase>): number {
     return stackItems.reduce((acc, val) => acc + val.decrement(seen), 0);
   }
 

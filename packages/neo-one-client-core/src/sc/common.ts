@@ -81,10 +81,10 @@ export const getForwardValues = ({
   args,
   events,
 }: {
-  readonly parameters: ReadonlyArray<ABIParameter>;
+  readonly parameters: readonly ABIParameter[];
   // tslint:disable-next-line no-any
-  readonly args: ReadonlyArray<any>;
-  readonly events: ReadonlyArray<ABIEvent>;
+  readonly args: readonly any[];
+  readonly events: readonly ABIEvent[];
 }): ReadonlyArray<ForwardOptions | ForwardValue> => {
   const hasForwardOptions =
     parameters.length > 0 &&
@@ -117,7 +117,7 @@ export const getForwardValues = ({
   );
 };
 
-const createForwardValueArgs = (parameters: ReadonlyArray<ABIParameter>, events: ReadonlyArray<ABIEvent>) => (
+const createForwardValueArgs = (parameters: readonly ABIParameter[], events: readonly ABIEvent[]) => (
   // tslint:disable-next-line no-any readonly-array
   ...args: any[]
 ) => getForwardValues({ parameters, events, args });
@@ -126,9 +126,9 @@ export const convertActions = ({
   actions,
   events,
 }: {
-  readonly actions: ReadonlyArray<RawAction>;
-  readonly events: ReadonlyArray<ABIEvent>;
-}): ReadonlyArray<Action> => {
+  readonly actions: readonly RawAction[];
+  readonly events: readonly ABIEvent[];
+}): readonly Action[] => {
   const eventsObj = traceEvents.concat(events).reduce<{ [key: string]: ABIEvent }>(
     (acc, event) => ({
       ...acc,
@@ -149,16 +149,16 @@ export const convertActions = ({
     .filter(utils.notNull);
 };
 
-export const filterEvents = (actions: ReadonlyArray<Event | Log>): ReadonlyArray<Event> =>
+export const filterEvents = (actions: ReadonlyArray<Event | Log>): readonly Event[] =>
   actions.map((action) => (action.type === 'Event' ? action : undefined)).filter(utils.notNull);
-export const filterLogs = (actions: ReadonlyArray<Event | Log>): ReadonlyArray<Log> =>
+export const filterLogs = (actions: ReadonlyArray<Event | Log>): readonly Log[] =>
   actions.map((action) => (action.type === 'Log' ? action : undefined)).filter(utils.notNull);
 
 // tslint:disable-next-line no-any
 const isInvokeReceipt = (value: any): value is InvokeReceipt<ContractParameter> =>
   typeof value === 'object' && value.result !== undefined && value.events !== undefined && value.logs !== undefined;
 
-const createForwardValueReturn = (returnType: ABIReturn, forwardEvents: ReadonlyArray<ABIEvent>) => (
+const createForwardValueReturn = (returnType: ABIReturn, forwardEvents: readonly ABIEvent[]) => (
   receiptOrValue: InvokeReceipt<ContractParameter> | ContractParameter,
   // tslint:disable-next-line no-any
 ): any => {
@@ -195,8 +195,8 @@ export const getParametersObject = ({
   abiParameters,
   parameters,
 }: {
-  readonly abiParameters: ReadonlyArray<ABIParameter>;
-  readonly parameters: ReadonlyArray<ContractParameter>;
+  readonly abiParameters: readonly ABIParameter[];
+  readonly parameters: readonly ContractParameter[];
 }): EventParameters => {
   if (abiParameters.length !== parameters.length) {
     throw new InvalidContractArgumentCountError(abiParameters.length, parameters.length);
@@ -264,7 +264,7 @@ export const convertInvocationResult = async ({
 }: {
   readonly returnType: ABIReturn;
   readonly result: RawInvocationResult;
-  readonly actions: ReadonlyArray<RawAction>;
+  readonly actions: readonly RawAction[];
   readonly sourceMaps?: Promise<SourceMaps>;
 }): Promise<InvocationResult<Return | undefined>> => {
   const { gasConsumed, gasCost } = result;
@@ -302,7 +302,7 @@ export const convertCallResult = async ({
 }: {
   readonly returnType: ABIReturn;
   readonly result: RawInvocationResult;
-  readonly actions: ReadonlyArray<RawAction>;
+  readonly actions: readonly RawAction[];
   readonly sourceMaps?: Promise<SourceMaps>;
 }): Promise<Return | undefined> => {
   const result = await convertInvocationResult({ returnType, result: resultIn, actions, sourceMaps });
@@ -342,12 +342,12 @@ export const convertParams = ({
   params,
   senderAddress,
 }: {
-  readonly parameters: ReadonlyArray<ABIParameter>;
+  readonly parameters: readonly ABIParameter[];
   readonly params: ReadonlyArray<Param | undefined>;
   readonly senderAddress?: AddressString;
 }): {
   readonly converted: ReadonlyArray<ScriptBuilderParam | undefined>;
-  readonly zipped: ReadonlyArray<[string, Param | undefined]>;
+  readonly zipped: ReadonlyArray<readonly [string, Param | undefined]>;
 } => {
   const parameters =
     parametersIn.length === 0 || !parametersIn[parametersIn.length - 1].rest ? parametersIn : parametersIn.slice(0, -1);
@@ -371,24 +371,26 @@ export const convertParams = ({
         getDefault({ parameter: parameters[params.length + idx], senderAddress }),
       ),
     ),
-  ) as Array<[ABIParameter, Param]>;
-  const converted = zip.map(([parameter, param]) =>
-    // tslint:disable-next-line no-any
-    (paramCheckers[parameter.type] as any)(parameter.name, param, parameter),
   );
-  // tslint:disable-next-line no-useless-cast
-  const zipped = zip.map<[string, Param | undefined]>(([parameter, param]) => [
-    parameter.name,
-    parameter.type === 'ForwardValue' ? (param as ForwardValue).param : param,
-  ]);
+
+  const converted = zip.map(([parameterIn, param]) => {
+    const parameter = parameterIn as ABIParameter;
+
+    // tslint:disable-next-line: no-any
+    return (paramCheckers[parameter.type] as any)(parameter.name, param, parameter);
+  });
+  const zipped = zip.map<readonly [string, Param | undefined]>(([parameterIn, param]) => {
+    const parameter = parameterIn as ABIParameter;
+
+    return [parameter.name, parameter.type === 'ForwardValue' ? (param as ForwardValue).param : param] as const;
+  });
 
   return { converted, zipped };
 };
 
-// tslint:disable-next-line no-any
 export const addForward = (
   func: ABIFunction,
-  forwardEvents: ReadonlyArray<ABIEvent>,
+  forwardEvents: readonly ABIEvent[],
   // tslint:disable-next-line no-any
   value: any,
   // tslint:disable-next-line no-any

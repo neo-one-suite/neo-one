@@ -64,7 +64,7 @@ const CHECK_ENDPOINTS = 5;
 
 const fetchTallestBlockIndex = async (
   monitor: Monitor,
-  rpcEndpoints: ReadonlyArray<string>,
+  rpcEndpoints: readonly string[],
   timeoutMS: number,
   checkEndpoints?: number,
 ): Promise<number | undefined> => {
@@ -77,7 +77,7 @@ const fetchTallestBlockIndex = async (
   return _.max(counts.filter(utils.notNull).map((count) => count - 1));
 };
 export interface Options {
-  readonly rpcURLs: ReadonlyArray<string>;
+  readonly rpcURLs: readonly string[];
   readonly offset: number;
   readonly timeoutMS: number;
   readonly checkEndpoints?: number;

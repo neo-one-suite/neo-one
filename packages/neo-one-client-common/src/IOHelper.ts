@@ -48,7 +48,7 @@ const sizeOfVarString = (value: string): number => sizeOfVarBytesLE(Buffer.from(
 
 const sizeOfFixedString = (length: number): number => length;
 
-function sizeOfArray<T>(values: ReadonlyArray<T>, sizeOf: (value: T) => number): number {
+function sizeOfArray<T>(values: readonly T[], sizeOf: (value: T) => number): number {
   return values.reduce((acc, value) => acc + sizeOf(value), sizeOfVarUIntLE(values.length));
 }
 

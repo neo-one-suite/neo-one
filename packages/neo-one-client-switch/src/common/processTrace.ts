@@ -16,7 +16,7 @@ export interface ProcessTraceResult {
 }
 
 export interface ProcessTraceOptions {
-  readonly trace: ReadonlyArray<ProcessTraceTrace>;
+  readonly trace: readonly ProcessTraceTrace[];
   readonly sourceMaps?: SourceMaps;
   readonly onlyFileName?: boolean;
 }
@@ -32,7 +32,7 @@ export const processTrace = async ({
 
   async function withSourceMaps(
     consumers: { [address: string]: SourceMapConsumer | undefined },
-    remainingSourceMaps: ReadonlyArray<[string, RawSourceMap]>,
+    remainingSourceMaps: ReadonlyArray<readonly [string, RawSourceMap]>,
   ): Promise<ReadonlyArray<ProcessTraceResult | undefined>> {
     if (remainingSourceMaps.length === 0) {
       const mutableTraceLines: Array<ProcessTraceResult | undefined> = [];
@@ -89,5 +89,6 @@ export const processTrace = async ({
     );
   }
 
+  // @ts-ignore
   return withSourceMaps({}, Object.entries(sourceMaps));
 };

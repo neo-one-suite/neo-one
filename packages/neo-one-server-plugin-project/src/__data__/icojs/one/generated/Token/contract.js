@@ -1,15 +1,17 @@
-/* @hash 855f67c88d4d8781e3c7ad94342a1161 */
+/* @hash 318d8dde636d3501fba475770694e147 */
 // tslint:disable
 /* eslint-disable */
 import { sourceMaps } from '../sourceMaps';
 import { tokenABI } from './abi';
- const definition = {
+
+const definition = {
   networks: {
     local: {
-      address: 'ATdTfjgcYDUDiYdzfARiPyteN5UVmXby83',
+      address: 'AGe7fjvh9WuxRL3E1AJtKhsVuasCcAGrXs',
     },
   },
   abi: tokenABI,
   sourceMaps,
 };
- export const createTokenSmartContract = (client) => client.smartContract(definition);
+
+export const createTokenSmartContract = (client) => client.smartContract(definition);

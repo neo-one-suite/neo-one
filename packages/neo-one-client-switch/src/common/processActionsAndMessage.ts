@@ -9,7 +9,7 @@ export interface SourceMaps {
 }
 
 export interface ProcessActionsAndMessageOptions {
-  readonly actions: ReadonlyArray<RawAction>;
+  readonly actions: readonly RawAction[];
   readonly message: string;
   readonly sourceMaps?: Promise<SourceMaps>;
 }

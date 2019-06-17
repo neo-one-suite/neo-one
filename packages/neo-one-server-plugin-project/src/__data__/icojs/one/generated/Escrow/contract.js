@@ -1,15 +1,17 @@
-/* @hash 91276f4ff2e00a0ca53aeacf257770a0 */
+/* @hash 8ba7dddf66598845cd1a02feb19def4e */
 // tslint:disable
 /* eslint-disable */
 import { escrowABI } from './abi';
 import { sourceMaps } from '../sourceMaps';
+
 const definition = {
   networks: {
     local: {
-      address: 'AWu1S487KFtGHkx2gSe8BefCFdsZC8AVyt',
+      address: 'Ab11QcupxzRCG8k74Y92nre5xqakZGro7M',
     },
   },
   abi: escrowABI,
   sourceMaps,
 };
+
 export const createEscrowSmartContract = (client) => client.smartContract(definition);

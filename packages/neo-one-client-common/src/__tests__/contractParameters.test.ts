@@ -1,7 +1,7 @@
 import { data, keys } from '../__data__';
 import { common } from '../common';
 import { contractParameters, smartContractConverters } from '../contractParameters';
-import { BufferContractParameter, ContractParameter } from '../types';
+import { BufferContractParameter } from '../types';
 import { utils } from '../utils';
 
 describe('contractParameters', () => {
@@ -451,35 +451,35 @@ describe('contractParameters', () => {
 describe('Extra Contract Parameter Coverage', () => {
   const stringMap = [
     {
-      type: 'String' as 'String',
+      type: 'String' as const,
       value: 'one',
     },
     {
-      type: 'String' as 'String',
+      type: 'String' as const,
       value: '1',
     },
-  ] as [ContractParameter, ContractParameter];
+  ] as const;
 
   const mapParam = {
-    type: 'Map' as 'Map',
+    type: 'Map' as const,
     value: [stringMap],
   };
 
   const mapABI = {
-    type: 'Map' as 'Map',
+    type: 'Map' as const,
     key: {
-      type: 'String' as 'String',
+      type: 'String' as const,
     },
     value: {
-      type: 'String' as 'String',
+      type: 'String' as const,
     },
   };
 
   const objABI = {
-    type: 'Object' as 'Object',
+    type: 'Object' as const,
     properties: {
       one: {
-        type: 'String' as 'String',
+        type: 'String' as const,
       },
     },
   };
@@ -490,7 +490,7 @@ describe('Extra Contract Parameter Coverage', () => {
 
   test('toMap function', () => {
     const map = smartContractConverters.toMap(mapParam, mapABI);
-    expect(map).toEqual(new Map([['one', '1']]));
+    expect(map).toEqual(new Map([['one', '1'] as const]));
   });
 
   test('toObject function', () => {

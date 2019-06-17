@@ -26,7 +26,7 @@ export interface PackageJSON {
   readonly typings?: string;
   readonly dependencies?: Dependencies;
   readonly devDependencies?: Dependencies;
-  readonly sideEffects?: ReadonlyArray<string>;
+  readonly sideEffects?: readonly string[];
   readonly peerDependencies?: Dependencies;
 }
 
@@ -212,7 +212,7 @@ class Resolver {
     };
   }
 
-  private createTasks(dependencies: Dependencies, parentNode: string): ReadonlyArray<Task> {
+  private createTasks(dependencies: Dependencies, parentNode: string): readonly Task[] {
     return Object.entries(dependencies).map(([name, version]) => ({
       name,
       version,

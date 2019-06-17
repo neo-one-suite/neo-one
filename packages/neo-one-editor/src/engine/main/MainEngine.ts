@@ -34,7 +34,7 @@ export interface EditorCallbacks {
 }
 
 interface EngineMeta {
-  readonly openFiles: ReadonlyArray<string>;
+  readonly openFiles: readonly string[];
 }
 
 interface EngineMetaWithRev {
@@ -106,7 +106,7 @@ interface CreateMainEngineOptions {
   readonly clearFS?: boolean;
 }
 
-export type Files = ReadonlyArray<string>;
+export type Files = readonly string[];
 
 interface MainEngineOptions {
   readonly fs: PouchDBFileSystem;

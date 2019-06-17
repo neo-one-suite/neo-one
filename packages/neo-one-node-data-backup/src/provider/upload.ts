@@ -7,7 +7,7 @@ export const upload = async ({
   write,
 }: {
   readonly dataPath: string;
-  readonly fileList: ReadonlyArray<string>;
+  readonly fileList: readonly string[];
   readonly write: Writable;
 }) => {
   await new Promise<void>((resolve, reject) => {

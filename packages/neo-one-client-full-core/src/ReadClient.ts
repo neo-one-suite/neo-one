@@ -57,7 +57,7 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
     return this.dataProvider.getContract(clientArgs.assertAddress('address', address), monitor);
   }
 
-  public async getMemPool(monitor?: Monitor): Promise<ReadonlyArray<Hash256String>> {
+  public async getMemPool(monitor?: Monitor): Promise<readonly Hash256String[]> {
     return this.dataProvider.getMemPool(monitor);
   }
 
@@ -69,7 +69,7 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
     return this.dataProvider.getOutput(input, monitor);
   }
 
-  public async getConnectedPeers(monitor?: Monitor): Promise<ReadonlyArray<Peer>> {
+  public async getConnectedPeers(monitor?: Monitor): Promise<readonly Peer[]> {
     return this.dataProvider.getConnectedPeers(monitor);
   }
 }

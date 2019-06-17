@@ -25,7 +25,7 @@ export type HandlerResult =
   | undefined
   | void;
 // tslint:disable-next-line no-any
-export type Handler = (args: ReadonlyArray<any>, monitor: Monitor) => Promise<HandlerResult>;
+export type Handler = (args: readonly any[], monitor: Monitor) => Promise<HandlerResult>;
 
 interface Handlers {
   readonly [method: string]: Handler;
@@ -35,7 +35,7 @@ interface JSONRPCRequest {
   readonly jsonrpc: '2.0';
   readonly id?: number | undefined;
   readonly method: string;
-  readonly params?: ReadonlyArray<object> | object;
+  readonly params?: readonly object[] | object;
 }
 
 export class JSONRPCError {
@@ -88,7 +88,7 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   INVALID: 'INVALID',
 };
 
-const rpcLabelNames: ReadonlyArray<string> = [KnownLabel.RPC_METHOD];
+const rpcLabelNames: readonly string[] = [KnownLabel.RPC_METHOD];
 const rpcLabels = Object.values(RPC_METHODS).map((method) => ({
   [KnownLabel.RPC_METHOD]: method,
 }));
@@ -150,7 +150,7 @@ const createJSONRPCHandler = (handlers: Handlers) => {
         }
 
         const { params } = request;
-        let handlerParams: ReadonlyArray<object>;
+        let handlerParams: readonly object[];
         if (params === undefined) {
           handlerParams = [];
         } else if (Array.isArray(params)) {

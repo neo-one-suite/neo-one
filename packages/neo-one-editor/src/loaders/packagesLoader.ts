@@ -7,7 +7,7 @@ import _ from 'lodash';
 import * as path from 'path';
 import webpack from 'webpack';
 
-const INCLUDE_PACKAGES: ReadonlyArray<string> = [
+const INCLUDE_PACKAGES: readonly string[] = [
   'neo-one-client',
   'neo-one-client-common',
   'neo-one-client-core',
@@ -86,9 +86,10 @@ const getPackageFiles = async (
   packageDir: string,
   outputPackageDir: string,
   omitFile = (_file: string) => false,
+  // tslint:disable-next-line: readonly-array
 ): Promise<ReadonlyArray<[string, string | undefined]>> => {
   loader.addContextDependency(packageDir);
-  const filesPromise = new Promise<ReadonlyArray<string>>((resolve, reject) =>
+  const filesPromise = new Promise<readonly string[]>((resolve, reject) =>
     glob(path.join(packageDir, '**', '*'), (err, found) => {
       if (err) {
         reject(err);

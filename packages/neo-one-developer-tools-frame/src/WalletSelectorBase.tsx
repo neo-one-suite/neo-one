@@ -21,26 +21,28 @@ export const makeOption = async ({
   readonly client: Client;
   readonly userAccount: UserAccount;
   readonly account: Account;
-  readonly tokens: ReadonlyArray<Token>;
+  readonly tokens: readonly Token[];
 }) => {
   const [assetBalances, tokenBalances] = await Promise.all([
     Promise.all(
-      Object.entries(account.balances).map<Promise<[string, BigNumber] | undefined>>(async ([assetHash, value]) => {
-        if (assetHash === Hash256.NEO) {
-          return ['NEO', value];
-        }
+      Object.entries(account.balances).map<Promise<readonly [string, BigNumber] | undefined>>(
+        async ([assetHash, value]) => {
+          if (assetHash === Hash256.NEO) {
+            return ['NEO', value] as const;
+          }
 
-        if (assetHash === Hash256.GAS) {
-          return ['GAS', value];
-        }
+          if (assetHash === Hash256.GAS) {
+            return ['GAS', value] as const;
+          }
 
-        return undefined;
-      }),
+          return undefined;
+        },
+      ),
     ),
     Promise.all(
       tokens
         .filter((token) => token.network === userAccount.id.network)
-        .map<Promise<[string, BigNumber]>>(async (token) => {
+        .map<Promise<readonly [string, BigNumber]>>(async (token) => {
           const smartContract = nep5.createNEP5SmartContract(
             client,
             { [token.network]: { address: token.address } },
@@ -49,7 +51,7 @@ export const makeOption = async ({
 
           const balance = await smartContract.balanceOf(userAccount.id.address, { network: token.network });
 
-          return [token.symbol, balance];
+          return [token.symbol, balance] as const;
         }),
     ),
   ]);
@@ -107,7 +109,7 @@ export const getWalletSelectorOptions$ = (
   client: Client,
   userAccounts$: Client['userAccounts$'],
   block$: Client['block$'],
-  tokens: ReadonlyArray<Token>,
+  tokens: readonly Token[],
 ) =>
   concat(
     userAccounts$.pipe(
@@ -129,7 +131,7 @@ export const getWalletSelectorOptions$ = (
           }),
         ),
       ),
-      multicast(() => new ReplaySubject<ReadonlyArray<WalletSelectorOptionType>>(1)),
+      multicast(() => new ReplaySubject<readonly WalletSelectorOptionType[]>(1)),
       refCount(),
       catchError((error: Error) => {
         addError(error);

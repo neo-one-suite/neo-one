@@ -128,7 +128,7 @@ export class BinaryReader {
     return Buffer.from(values).toString('utf8');
   }
 
-  public readArray<T>(read: () => T, max = 0x1000000): ReadonlyArray<T> {
+  public readArray<T>(read: () => T, max = 0x1000000): readonly T[] {
     const count = this.readVarUIntLE(new BN(max)).toNumber();
 
     return _.range(count).map(read);

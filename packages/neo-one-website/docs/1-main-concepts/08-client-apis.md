@@ -40,7 +40,7 @@ class Client {
     to: AddressString,
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>;
-  public async transfer(transfers: ReadonlyArray<Transfer>, options?: TransactionOptions): Promise<TransactionResult>;
+  public async transfer(transfers: readonly Transfer[], options?: TransactionOptions): Promise<TransactionResult>;
 
   public async claim(optionsIn?: TransactionOptions): Promise<TransactionResult>;
 }
@@ -66,7 +66,7 @@ interface TransactionOptions {
   /**
    * Additional attributes to include with the transaction.
    */
-  attributes?: ReadonlyArray<Attribute>;
+  attributes?: readonly Attribute[];
   /**
    * An optional network fee to include with the transaction.
    */

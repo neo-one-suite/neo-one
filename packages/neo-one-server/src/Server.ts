@@ -235,18 +235,18 @@ export class Server {
 
   public getDebug(): DescribeTable {
     return [
-      ['Server Config Path', this.serverConfig.configPath],
-      ['Data Path', this.dataPath],
-      ['Server', { type: 'describe', table: this.getServerDebug() }],
-      ['Plugin Manager', { type: 'describe', table: this.pluginManager.getDebug() }],
+      ['Server Config Path', this.serverConfig.configPath] as const,
+      ['Data Path', this.dataPath] as const,
+      ['Server', { type: 'describe', table: this.getServerDebug() }] as const,
+      ['Plugin Manager', { type: 'describe', table: this.pluginManager.getDebug() }] as const,
     ];
   }
 
   private getServerDebug(): DescribeTable {
     return [
-      ['Port', this.getValue(this.mutableServerDebug.port)],
-      ['Process ID', this.getValue(this.mutableServerDebug.pid)],
-      ['Process ID Path', this.getValue(this.mutableServerDebug.pidPath)],
+      ['Port', this.getValue(this.mutableServerDebug.port)] as const,
+      ['Process ID', this.getValue(this.mutableServerDebug.pid)] as const,
+      ['Process ID Path', this.getValue(this.mutableServerDebug.pidPath)] as const,
     ];
   }
 

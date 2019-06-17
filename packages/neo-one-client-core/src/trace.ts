@@ -1,7 +1,7 @@
 import { ABIEvent } from '@neo-one/client-common';
 
 // tslint:disable-next-line export-name
-export const events: ReadonlyArray<ABIEvent> = [
+export const events: readonly ABIEvent[] = [
   {
     name: 'trace',
     parameters: [

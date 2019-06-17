@@ -45,7 +45,7 @@ const extractTrace = (action: RawAction): ProcessErrorTrace | undefined => {
   }
 };
 
-const extractTraces = (actions: ReadonlyArray<RawAction>): ReadonlyArray<ProcessErrorTrace> => {
+const extractTraces = (actions: readonly RawAction[]): readonly ProcessErrorTrace[] => {
   const mutableTraces: ProcessErrorTrace[] = [];
   // tslint:disable-next-line no-loop-statement
   for (const action of actions) {
@@ -65,10 +65,10 @@ const DEFAULT_ERROR = {
 };
 
 export const extractErrorTrace = (
-  actions: ReadonlyArray<RawAction>,
+  actions: readonly RawAction[],
 ): {
   readonly error?: ProcessErrorError;
-  readonly trace: ReadonlyArray<ProcessErrorTrace>;
+  readonly trace: readonly ProcessErrorTrace[];
 } => {
   const lastError = _.reverse([...actions])
     .map((action) => ({ action, error: extractError(action) }))

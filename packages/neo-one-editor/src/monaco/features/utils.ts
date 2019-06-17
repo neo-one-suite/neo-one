@@ -51,7 +51,7 @@ export const convertAction = (
 
 export const convertActions = (
   model: monaco.editor.ITextModel,
-  actions: ReadonlyArray<ts.CodeAction>,
+  actions: readonly ts.CodeAction[],
   // tslint:disable-next-line:readonly-array
 ): monaco.editor.ISingleEditOperation[] => _.flatten(actions.map((action) => convertAction(model, action)));
 

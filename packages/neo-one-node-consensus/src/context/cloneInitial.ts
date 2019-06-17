@@ -22,8 +22,8 @@ export function cloneInitial(
     readonly viewNumber: number;
     readonly myIndex?: number;
     readonly primaryIndex: number;
-    readonly expectedView?: ReadonlyArray<number>;
-    readonly validators?: ReadonlyArray<ECPoint>;
+    readonly expectedView?: readonly number[];
+    readonly validators?: readonly ECPoint[];
     readonly blockReceivedTimeSeconds?: number;
   },
 ): InitialContext {

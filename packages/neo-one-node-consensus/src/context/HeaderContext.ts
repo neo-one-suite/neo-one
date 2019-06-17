@@ -9,8 +9,8 @@ interface HeaderContextAdd {
   readonly viewNumber: number;
   readonly myIndex: number;
   readonly primaryIndex: number;
-  readonly expectedView: ReadonlyArray<number>;
-  readonly validators: ReadonlyArray<ECPoint>;
+  readonly expectedView: readonly number[];
+  readonly validators: readonly ECPoint[];
   readonly blockReceivedTimeSeconds: number;
   readonly transactions: Transactions;
   readonly signatures: ReadonlyArray<Buffer | undefined>;
@@ -18,7 +18,7 @@ interface HeaderContextAdd {
     | {
         readonly type: 'new';
         readonly previousHash: UInt256;
-        readonly transactionHashes: ReadonlyArray<UInt256Hex>;
+        readonly transactionHashes: readonly UInt256Hex[];
         readonly blockIndex: number;
         readonly nonce: BN;
         readonly timestamp: number;
@@ -27,14 +27,14 @@ interface HeaderContextAdd {
     | {
         readonly type: 'existing';
         readonly block: Block;
-        readonly transactionHashes: ReadonlyArray<UInt256Hex>;
+        readonly transactionHashes: readonly UInt256Hex[];
       };
 }
 
 // tslint:disable-next-line no-any
 export class HeaderContext<T extends HeaderContext<T> = HeaderContext<any>> extends Context<T> {
   public readonly transactions: Transactions;
-  public readonly transactionHashes: ReadonlyArray<UInt256Hex>;
+  public readonly transactionHashes: readonly UInt256Hex[];
   public readonly transactionHashesSet: Set<UInt256Hex>;
   public readonly signatures: ReadonlyArray<Buffer | undefined>;
   public readonly header: Block;

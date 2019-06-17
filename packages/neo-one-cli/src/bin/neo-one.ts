@@ -23,7 +23,7 @@ if (isStatic) {
   argv = argv.slice(0, staticIdx).concat(argv.slice(staticIdx + 1));
 }
 
-const quoteArgs = (args: ReadonlyArray<string>): ReadonlyArray<string> =>
+const quoteArgs = (args: readonly string[]): readonly string[] =>
   args.map((arg, idx) => {
     if (idx === 0) {
       return arg;

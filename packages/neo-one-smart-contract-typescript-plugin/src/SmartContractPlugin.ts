@@ -13,7 +13,7 @@ export class SmartContractPlugin {
     for (const k of Object.keys(info.languageService) as Array<keyof ts.LanguageService>) {
       const x = info.languageService[k];
       // tslint:disable-next-line no-object-mutation no-any
-      proxy[k] = (...args: Array<{}>) => (x as any).apply(info.languageService, args);
+      proxy[k] = (...args: any[]) => (x as any).apply(info.languageService, args);
     }
 
     proxy.getSemanticDiagnostics = (fileName) => {

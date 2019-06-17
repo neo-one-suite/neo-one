@@ -41,7 +41,7 @@ const run = () => {
         interfaceNameToInterface[child.name.getText()] = child;
       }
 
-      if ((interfaceToDirectParents[child.name.getText()] as ReadonlyArray<string> | undefined) === undefined) {
+      if ((interfaceToDirectParents[child.name.getText()] as readonly string[] | undefined) === undefined) {
         interfaceToDirectParents[child.name.getText()] = [];
       }
 
@@ -120,7 +120,6 @@ const run = () => {
   const text = sourceFile.getText();
   const interfacesToSyntaxKinds = Object.entries(interfaceToAllChildren)
     .filter(([name]) => nodeChildren.has(name))
-    // tslint:disable-next-line no-any
     .filter(([name]) => !text.includes(`is${name}(`))
     .map<[string, string[]]>(([name, children]) => {
       const syntaxKinds =

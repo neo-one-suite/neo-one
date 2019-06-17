@@ -48,7 +48,7 @@ export interface TracerReference {
   readonly __tracer: undefined;
 }
 export interface TracerStartSpanOptions {
-  readonly references?: ReadonlyArray<TracerReference>;
+  readonly references?: readonly TracerReference[];
   readonly tags?: object;
   readonly startTime?: number;
 }

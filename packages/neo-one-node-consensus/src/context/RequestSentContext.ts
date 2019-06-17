@@ -8,8 +8,8 @@ interface RequestSentContextAdd {
   readonly viewNumber: number;
   readonly myIndex: number;
   readonly primaryIndex: number;
-  readonly expectedView: ReadonlyArray<number>;
-  readonly validators: ReadonlyArray<ECPoint>;
+  readonly expectedView: readonly number[];
+  readonly validators: readonly ECPoint[];
   readonly blockReceivedTimeSeconds: number;
   readonly transactions: Transactions;
   readonly signatures: ReadonlyArray<Buffer | undefined>;
@@ -17,7 +17,7 @@ interface RequestSentContextAdd {
     | {
         readonly type: 'new';
         readonly previousHash: UInt256;
-        readonly transactionHashes: ReadonlyArray<UInt256Hex>;
+        readonly transactionHashes: readonly UInt256Hex[];
         readonly blockIndex: number;
         readonly nonce: BN;
         readonly timestamp: number;
@@ -26,7 +26,7 @@ interface RequestSentContextAdd {
     | {
         readonly type: 'existing';
         readonly block: Block;
-        readonly transactionHashes: ReadonlyArray<UInt256Hex>;
+        readonly transactionHashes: readonly UInt256Hex[];
       };
 }
 
@@ -56,7 +56,7 @@ export class RequestSentContext extends HeaderContext<RequestSentContext> {
     });
   }
 
-  public cloneExpectedView({ expectedView }: { readonly expectedView: ReadonlyArray<number> }): RequestSentContext {
+  public cloneExpectedView({ expectedView }: { readonly expectedView: readonly number[] }): RequestSentContext {
     return new RequestSentContext({
       viewNumber: this.viewNumber,
       myIndex: this.myIndex,

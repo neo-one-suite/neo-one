@@ -1,7 +1,7 @@
 import ts from 'typescript';
 import * as type_ from './type_';
 
-export function getParameters(signature: ts.Signature): ReadonlyArray<ts.Symbol> {
+export function getParameters(signature: ts.Signature): readonly ts.Symbol[] {
   return signature.parameters;
 }
 

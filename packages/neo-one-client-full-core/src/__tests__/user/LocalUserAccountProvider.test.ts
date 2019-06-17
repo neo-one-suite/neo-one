@@ -227,7 +227,7 @@ describe('LocalUserAccountProvider', () => {
     await expect(result).rejects.toMatchSnapshot();
   });
 
-  const contractParameterTypes: ReadonlyArray<ContractParameterType> = [
+  const contractParameterTypes: readonly ContractParameterType[] = [
     'Signature',
     'Boolean',
     'Integer',
@@ -278,8 +278,8 @@ describe('LocalUserAccountProvider', () => {
 
   const publishAndDeployCases: ReadonlyArray<{
     readonly name: string;
-    readonly parameters: ReadonlyArray<ABIParameter> | undefined;
-    readonly params: ReadonlyArray<Param>;
+    readonly parameters: readonly ABIParameter[] | undefined;
+    readonly params: readonly Param[];
   }> = [
     {
       name: 'without params',
@@ -332,7 +332,7 @@ describe('LocalUserAccountProvider', () => {
     });
   });
 
-  const assetTypes: ReadonlyArray<AssetType> = [
+  const assetTypes: readonly AssetType[] = [
     'Credit',
     'Duty',
     'Governing',
@@ -451,7 +451,7 @@ describe('LocalUserAccountProvider', () => {
       const invocationData = factory.createRawInvocationData();
       getInvocationData.mockImplementation(async () => Promise.resolve(invocationData));
 
-      const result = await provider.invoke(keys[1].address, 'foo', [true], [['firstArg', true]], verify, {
+      const result = await provider.invoke(keys[1].address, 'foo', [true], [['firstArg', true] as const], verify, {
         systemFee: new BigNumber(-1),
       });
       const confirmResult = await result.confirmed();

@@ -68,7 +68,7 @@ export const services = ({ server }: { readonly server: Server }) => {
               throw new Error('Unknown request');
           }
         }),
-        map((tasks: ReadonlyArray<TaskStatus>) => {
+        map((tasks: readonly TaskStatus[]) => {
           if (!done) {
             (ctx as any).res.write({ tasks: JSON.stringify(tasks) });
             if (areTasksDone(tasks)) {

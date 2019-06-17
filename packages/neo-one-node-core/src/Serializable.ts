@@ -37,13 +37,13 @@ export function createDeserializeWire<T>(deserializeWireBase: DeserializeWireBas
 
 export interface SerializableInvocationData {
   readonly asset: Asset | undefined;
-  readonly contracts: ReadonlyArray<Contract>;
-  readonly deletedContractHashes: ReadonlyArray<UInt160>;
-  readonly migratedContractHashes: ReadonlyArray<[UInt160, UInt160]>;
-  readonly voteUpdates: ReadonlyArray<[UInt160, ReadonlyArray<ECPoint>]>;
+  readonly contracts: readonly Contract[];
+  readonly deletedContractHashes: readonly UInt160[];
+  readonly migratedContractHashes: ReadonlyArray<readonly [UInt160, UInt160]>;
+  readonly voteUpdates: ReadonlyArray<readonly [UInt160, ReadonlyArray<ECPoint>]>;
   readonly result: InvocationResult;
-  readonly actions: ReadonlyArray<Action>;
-  readonly storageChanges: ReadonlyArray<StorageChange>;
+  readonly actions: readonly Action[];
+  readonly storageChanges: readonly StorageChange[];
 }
 
 export interface SerializeJSONContext {
@@ -53,8 +53,8 @@ export interface SerializeJSONContext {
     transaction: InvocationTransaction,
   ) => Promise<SerializableInvocationData | undefined>;
   readonly tryGetTransactionData: (transaction: Transaction) => Promise<TransactionData | undefined>;
-  readonly getUnclaimed: (hash: UInt160) => Promise<ReadonlyArray<Input>>;
-  readonly getUnspent: (hash: UInt160) => Promise<ReadonlyArray<Input>>;
+  readonly getUnclaimed: (hash: UInt160) => Promise<readonly Input[]>;
+  readonly getUnspent: (hash: UInt160) => Promise<readonly Input[]>;
 }
 
 export type SerializeJSON<TJSON> = (context: SerializeJSONContext) => TJSON | Promise<TJSON>;

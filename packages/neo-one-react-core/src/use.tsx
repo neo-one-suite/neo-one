@@ -51,8 +51,8 @@ export type InheritedProps<T extends keyof JSX.IntrinsicElements | React.Compone
  * @template T The type of the `use` prop
  */
 export type UseProps<T extends keyof JSX.IntrinsicElements | React.ComponentType<any>> = InheritedProps<T> & {
-  readonly use?: T | ReadonlyArray<T>;
-  readonly useNext?: T | ReadonlyArray<T>;
+  readonly use?: T | readonly T[];
+  readonly useNext?: T | readonly T[];
 };
 
 /**
@@ -63,7 +63,7 @@ export interface UseComponent<T extends keyof JSX.IntrinsicElements | React.Comp
   <TT extends keyof JSX.IntrinsicElements | React.ComponentType<any>>(
     props: InheritedProps<T> & UseProps<TT>,
   ): JSX.Element;
-  readonly uses: ReadonlyArray<T>;
+  readonly uses: readonly T[];
   readonly propTypes?: any;
   readonly defaultProps?: any;
   readonly displayName?: string;
@@ -87,7 +87,7 @@ function omit<P extends Dictionary, K extends keyof P>(object: P, ...paths: K[])
   return result as any;
 }
 
-function toArray<T>(arg?: T | ReadonlyArray<T>): ReadonlyArray<T> {
+function toArray<T>(arg?: T | readonly T[]): readonly T[] {
   if (typeof arg === 'undefined') {
     return [];
   }
@@ -95,7 +95,7 @@ function toArray<T>(arg?: T | ReadonlyArray<T>): ReadonlyArray<T> {
   return Array.isArray(arg) ? arg : [arg];
 }
 
-function arrayContainsArray(superset: ReadonlyArray<any>, subset: ReadonlyArray<any>) {
+function arrayContainsArray(superset: readonly any[], subset: readonly any[]) {
   if (superset.length < subset.length) {
     return false;
   }

@@ -50,7 +50,7 @@ const ImageWrapper = styled(Box)`
   align-items: center;
 `;
 
-const background: ReadonlyArray<string> = ['light', 'gray5', 'darkLight'];
+const background: readonly string[] = ['light', 'gray5', 'darkLight'];
 
 const StartButton = styled(Button)`
   grid-area: button;

@@ -20,7 +20,7 @@ export class CodeActionAdapter extends Adapter implements monaco.languages.CodeA
       token,
       this.worker$.pipe(
         switchMap(
-          async (worker): Promise<ReadonlyArray<ts.CodeFixAction>> =>
+          async (worker): Promise<readonly ts.CodeFixAction[]> =>
             model.isDisposed()
               ? []
               : worker.getCodeFixesAtPosition(

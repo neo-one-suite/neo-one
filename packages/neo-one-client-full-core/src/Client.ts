@@ -45,7 +45,7 @@ export class Client<TUserAccountProviders extends UserAccountProviders = any> ex
   public async publishAndDeploy(
     contract: ContractRegister,
     abi: ABI,
-    params: ReadonlyArray<Param> = [],
+    params: readonly Param[] = [],
     optionsIn?: TransactionOptions,
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
@@ -82,7 +82,7 @@ export class Client<TUserAccountProviders extends UserAccountProviders = any> ex
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt, IssueTransaction>>;
   public async issue(
-    transfers: ReadonlyArray<Transfer>,
+    transfers: readonly Transfer[],
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt, IssueTransaction>>;
   // tslint:disable-next-line readonly-array no-any

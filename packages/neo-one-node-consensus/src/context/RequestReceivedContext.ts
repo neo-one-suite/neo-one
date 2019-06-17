@@ -10,8 +10,8 @@ interface RequestReceivedContextAdd {
   readonly viewNumber: number;
   readonly myIndex: number;
   readonly primaryIndex: number;
-  readonly expectedView: ReadonlyArray<number>;
-  readonly validators: ReadonlyArray<ECPoint>;
+  readonly expectedView: readonly number[];
+  readonly validators: readonly ECPoint[];
   readonly blockReceivedTimeSeconds: number;
   readonly transactions: Transactions;
   readonly signatures: ReadonlyArray<Buffer | undefined>;
@@ -19,7 +19,7 @@ interface RequestReceivedContextAdd {
     | {
         readonly type: 'new';
         readonly previousHash: UInt256;
-        readonly transactionHashes: ReadonlyArray<UInt256Hex>;
+        readonly transactionHashes: readonly UInt256Hex[];
         readonly blockIndex: number;
         readonly nonce: BN;
         readonly timestamp: number;
@@ -28,7 +28,7 @@ interface RequestReceivedContextAdd {
     | {
         readonly type: 'existing';
         readonly block: Block;
-        readonly transactionHashes: ReadonlyArray<UInt256Hex>;
+        readonly transactionHashes: readonly UInt256Hex[];
       };
 }
 
@@ -77,7 +77,7 @@ export class RequestReceivedContext extends HeaderContext<RequestReceivedContext
     });
   }
 
-  public cloneViewChanging({ expectedView }: { readonly expectedView: ReadonlyArray<number> }): ViewChangingContext {
+  public cloneViewChanging({ expectedView }: { readonly expectedView: readonly number[] }): ViewChangingContext {
     return new ViewChangingContext({
       previousHash: this.previousHash,
       blockIndex: this.blockIndex,
@@ -114,7 +114,7 @@ export class RequestReceivedContext extends HeaderContext<RequestReceivedContext
     });
   }
 
-  public cloneExpectedView({ expectedView }: { readonly expectedView: ReadonlyArray<number> }): RequestReceivedContext {
+  public cloneExpectedView({ expectedView }: { readonly expectedView: readonly number[] }): RequestReceivedContext {
     return new RequestReceivedContext({
       viewNumber: this.viewNumber,
       myIndex: this.myIndex,

@@ -2,7 +2,7 @@ export type ReferenceType = 'Function' | 'Class' | 'Const' | 'Interface' | 'Enum
 
 export type TypeFilterOptions = 'All' | ReferenceType;
 
-export const TYPE_FILTER_OPTIONS: ReadonlyArray<TypeFilterOptions> = [
+export const TYPE_FILTER_OPTIONS: readonly TypeFilterOptions[] = [
   'All',
   'Function',
   'Class',
@@ -18,7 +18,7 @@ export interface WordToken {
   readonly value: string;
 }
 
-export type WordTokens = ReadonlyArray<WordToken>;
+export type WordTokens = readonly WordToken[];
 
 export interface Parameter {
   readonly name: string;
@@ -27,7 +27,7 @@ export interface Parameter {
 }
 
 export interface FunctionData {
-  readonly parameters?: ReadonlyArray<Parameter>;
+  readonly parameters?: readonly Parameter[];
   readonly returns?: WordTokens;
 }
 
@@ -36,16 +36,16 @@ export interface Method {
   readonly title: string;
   readonly description?: WordTokens;
   readonly definition: WordTokens;
-  readonly extra?: ReadonlyArray<ExtraData>;
+  readonly extra?: readonly ExtraData[];
 }
 
 export interface Property extends Parameter {}
 
 export interface InterfaceData {
   readonly constructorDefinition?: Method;
-  readonly properties?: ReadonlyArray<Property>;
-  readonly methods?: ReadonlyArray<Method>;
-  readonly staticMethods?: ReadonlyArray<Method>;
+  readonly properties?: readonly Property[];
+  readonly methods?: readonly Method[];
+  readonly staticMethods?: readonly Method[];
 }
 
 export interface ClassData extends InterfaceData {}
@@ -53,7 +53,7 @@ export interface ClassData extends InterfaceData {}
 export interface EnumMember extends Parameter {}
 
 export interface EnumData {
-  readonly members: ReadonlyArray<EnumMember>;
+  readonly members: readonly EnumMember[];
 }
 
 export interface ConstData extends InterfaceData {}
@@ -75,5 +75,5 @@ export interface ReferenceItem {
   readonly enumData?: EnumData;
   readonly constData?: ConstData;
   readonly interfaceData?: InterfaceData;
-  readonly extra?: ReadonlyArray<ExtraData>;
+  readonly extra?: readonly ExtraData[];
 }

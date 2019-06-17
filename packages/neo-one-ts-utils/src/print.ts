@@ -8,7 +8,7 @@ export interface Result {
 }
 export const printBundle = (
   programIn: ts.Program,
-  files: ReadonlyArray<ts.SourceFile>,
+  files: readonly ts.SourceFile[],
   substituteNode: (hint: ts.EmitHint, node: ts.Node) => ts.Node,
 ): Result => {
   // tslint:disable-next-line no-any
