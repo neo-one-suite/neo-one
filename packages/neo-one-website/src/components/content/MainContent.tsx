@@ -171,7 +171,7 @@ export const MainContent = ({ content, title, date, link, author, ...props }: Pr
     {date === undefined || author === undefined ? null : <DateAndAuthor date={date} author={author} />}
     {content.type === 'markdown' ? (
       <>
-        <StyledMarkdown source={content.value} linkColor="accent" light anchors />
+        <StyledMarkdown source={content.value} linkColor="accent" light anchors resetScroll />
         <EditPageLink link={link} />
       </>
     ) : (
