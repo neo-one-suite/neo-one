@@ -300,7 +300,6 @@ export enum SysCall {
   'Neo.Storage.Put' = 'Neo.Storage.Put',
   'Neo.Storage.PutEx' = 'Neo.Storage.PutEx',
   'Neo.Storage.Delete' = 'Neo.Storage.Delete',
-  'Neo.ClaimTransaction.GetClaimReferences' = 'Neo.ClaimTransaction.GetClaimReferences',
   'Neo.Witness.GetVerificationScript' = 'Neo.Witness.GetVerificationScript',
   'System.ExecutionEngine.GetScriptContainer' = 'System.ExecutionEngine.GetScriptContainer',
   'System.ExecutionEngine.GetExecutingScriptHash' = 'System.ExecutionEngine.GetExecutingScriptHash',

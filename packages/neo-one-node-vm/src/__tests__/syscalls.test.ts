@@ -1707,50 +1707,6 @@ const SYSCALLS = [
   },
 
   {
-    name: 'Neo.ClaimTransaction.GetClaimReferences',
-    result: [new ArrayStackItem([new OutputStackItem(transactions.claimOutput)])],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.claimTransaction));
-      blockchain.output.get = jest.fn(() => transactions.claimOutput);
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.ClaimTransaction.GetClaimReferences',
-    result: [],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.kycTransaction));
-    },
-    error: 'Expected ClaimTransaction.',
-    gas: FEES.ONE,
-  },
-
-  {
     name: 'Neo.Contract.GetScript',
     result: [new BufferStackItem(transactions.kycContract.script)],
     args: [

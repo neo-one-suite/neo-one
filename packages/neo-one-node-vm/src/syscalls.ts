@@ -21,7 +21,6 @@ import {
   Asset,
   AssetType,
   BinaryReader,
-  ClaimTransaction,
   Contract,
   InvocationTransaction,
   ScriptContainerType,
@@ -57,7 +56,6 @@ import {
   ContainerTooLargeError,
   ContractNoStorageError,
   InvalidAssetTypeError,
-  InvalidClaimTransactionError,
   InvalidContractGetStorageContextError,
   InvalidGetBlockArgumentsError,
   InvalidGetHeaderArgumentsError,
@@ -958,27 +956,6 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
       }
 
       throw new InvalidInvocationTransactionError(context);
-    },
-  }),
-
-  'Neo.ClaimTransaction.GetClaimReferences': createSysCall({
-    name: 'Neo.ClaimTransaction.GetClaimReferences',
-    in: 1,
-    out: 1,
-    invoke: async ({ context, args }) => {
-      const transaction = args[0].asTransaction();
-      if (transaction instanceof ClaimTransaction) {
-        const outputs = await transaction.getClaimReferences({
-          getOutput: context.blockchain.output.get,
-        });
-
-        return {
-          context,
-          results: [new ArrayStackItem(outputs.map((output) => new OutputStackItem(output)))],
-        };
-      }
-
-      throw new InvalidClaimTransactionError(context);
     },
   }),
 

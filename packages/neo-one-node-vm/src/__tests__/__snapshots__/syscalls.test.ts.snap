@@ -842,38 +842,6 @@ exports[`syscalls Neo.Blockchain.GetValidators 7`] = `Array []`;
 
 exports[`syscalls Neo.Blockchain.GetValidators 8`] = `Array []`;
 
-exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 1`] = `
-Array [
-  Array [
-    Object {
-      "__$type": "Input",
-      "hash": "0000000000000000000000000000000000000000000000000000000000000000",
-      "hashHex": "0x0000000000000000000000000000000000000000000000000000000000000000",
-      "index": 0,
-      "size": 34,
-    },
-  ],
-]
-`;
-
-exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 2`] = `
-Array [
-  Array [
-    Object {
-      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
-    },
-  ],
-]
-`;
-
-exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 3`] = `Array []`;
-
-exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 4`] = `Array []`;
-
-exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 5`] = `Array []`;
-
-exports[`syscalls Neo.ClaimTransaction.GetClaimReferences 6`] = `Array []`;
-
 exports[`syscalls Neo.Contract.Create 1`] = `
 Array [
   Array [
@@ -1750,7 +1718,7 @@ exports[`syscalls Neo.Storage.Find 1`] = `
 Array [
   IteratorStackItem {
     "mutableCount": 1,
-    "referenceID": 36,
+    "referenceID": 34,
     "value": StackItemIterator {
       "enumerator": Object {
         "next": [Function],
