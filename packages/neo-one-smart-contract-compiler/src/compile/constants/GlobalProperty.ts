@@ -6,4 +6,6 @@ export enum GlobalProperty {
   CommonStorage = 4,
   CommonStorageSerialized = 5,
   Cache = 6,
+  CacheStorage = 7,
+  DeleteCacheStorage = 8,
 }

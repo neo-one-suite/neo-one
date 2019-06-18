@@ -25,7 +25,7 @@ export const cacheStorage = ({
   const serializeHeaderKey = ({ hashOrIndex }: { hashOrIndex: number | UInt256 }) =>
     typeof hashOrIndex === 'number'
       ? `header:${hashOrIndex}`
-      : keys.typeKeyToSerializeKeyString.header({ hash: hashOrIndex });
+      : keys.typeKeyToSerializeKey.header({ hash: hashOrIndex });
 
   const headerBase = read.createReadStorage({
     cache,
@@ -40,9 +40,7 @@ export const cacheStorage = ({
   };
 
   const serializeBlockKey = ({ hashOrIndex }: { hashOrIndex: number | UInt256 }) =>
-    typeof hashOrIndex === 'number'
-      ? `block:${hashOrIndex}`
-      : keys.typeKeyToSerializeKeyString.block({ hash: hashOrIndex });
+    typeof hashOrIndex === 'number' ? `block:${hashOrIndex}` : keys.typeKeyToSerializeKey.block({ hash: hashOrIndex });
 
   const blockBase = read.createReadStorage({
     cache,
@@ -62,13 +60,13 @@ export const cacheStorage = ({
     blockData: read.createReadStorage({
       cache,
       storage: storage.blockData,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.blockData,
+      serializeKeyString: keys.typeKeyToSerializeKey.blockData,
     }),
 
     account: read.createReadAllStorage({
       cache,
       storage: storage.account,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.account,
+      serializeKeyString: keys.typeKeyToSerializeKey.account,
     }),
 
     accountUnspent: storage.accountUnspent,
@@ -77,43 +75,43 @@ export const cacheStorage = ({
     asset: read.createReadStorage({
       cache,
       storage: storage.asset,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.asset,
+      serializeKeyString: keys.typeKeyToSerializeKey.asset,
     }),
 
     transaction: read.createReadStorage({
       cache,
       storage: storage.transaction,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.transaction,
+      serializeKeyString: keys.typeKeyToSerializeKey.transaction,
     }),
 
     transactionData: read.createReadStorage({
       cache,
       storage: storage.transactionData,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.transactionData,
+      serializeKeyString: keys.typeKeyToSerializeKey.transactionData,
     }),
 
     output: read.createReadStorage({
       cache,
       storage: storage.output,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.output,
+      serializeKeyString: keys.typeKeyToSerializeKey.output,
     }),
 
     contract: read.createReadStorage({
       cache,
       storage: storage.contract,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.contract,
+      serializeKeyString: keys.typeKeyToSerializeKey.contract,
     }),
 
     storageItem: read.createReadGetAllStorage({
       cache,
       storage: storage.storageItem,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.storageItem,
+      serializeKeyString: keys.typeKeyToSerializeKey.storageItem,
     }),
 
     validator: read.createReadAllStorage({
       cache,
       storage: storage.validator,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.validator,
+      serializeKeyString: keys.typeKeyToSerializeKey.validator,
     }),
 
     invocationData: storage.invocationData,

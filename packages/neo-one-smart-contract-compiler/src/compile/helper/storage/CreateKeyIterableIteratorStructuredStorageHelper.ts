@@ -24,10 +24,12 @@ export class CreateKeyIterableIteratorStructuredStorageHelper extends Structured
         handleNext: (innerOptions) => {
           // [size, iterator]
           sb.scope.get(sb, node, innerOptions, size);
-          // [keyVal, valVal]
+          // [boolean, keyVal, valVal]
           sb.emitHelper(node, sb.pushValueOptions(innerOptions), sb.helpers.handleValueStructuredStorage);
-          // [keyVal]
-          sb.emitOp(node, 'NIP');
+          // [valVal, boolean, keyVal]
+          sb.emitOp(node, 'ROT');
+          // [boolean, keyVal]
+          sb.emitOp(node, 'DROP');
         },
       }),
     );

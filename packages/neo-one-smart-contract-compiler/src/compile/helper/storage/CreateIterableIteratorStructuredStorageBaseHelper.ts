@@ -32,6 +32,7 @@ export class CreateIterableIteratorStructuredStorageBaseHelper extends Structure
       options,
       sb.helpers.createIterableIteratorBase({
         handleNext: this.handleNext,
+        hasFilter: true,
       }),
     );
   }

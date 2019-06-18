@@ -36,7 +36,23 @@ export class ThrowCompletionBaseHelper extends Helper {
       sb.emitPushInt(node, constants.FINALLY_COMPLETION);
       sb.emitJmp(node, 'JMP', finallyPC);
     } else if (ts.isSourceFile(node) || (parent !== undefined && ts.isSourceFile(parent))) {
-      sb.emitOp(node, 'THROW');
+      sb.emitOp(node, 'DROP');
+      sb.emitHelper(
+        node,
+        options,
+        sb.helpers.if({
+          condition: () => {
+            sb.emitHelper(node, options, sb.helpers.invocationIsCaller);
+          },
+          whenTrue: () => {
+            sb.emitOp(node, 'THROW');
+          },
+          whenFalse: () => {
+            sb.emitPushBoolean(node, false);
+            sb.emitOp(node, 'RET');
+          },
+        }),
+      );
     } else {
       sb.emitPushInt(node, constants.THROW_COMPLETION);
       sb.emitOp(node, 'RET');

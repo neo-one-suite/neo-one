@@ -6,8 +6,7 @@ import { map } from 'rxjs/operators';
 import { KeyNotFoundError } from './errors';
 import { streamToObservable } from './streamToObservable';
 
-type SerializeKey<Key> = (key: Key) => Buffer;
-type SerializeKeyString<Key> = (key: Key) => string;
+type SerializeKey<Key> = (key: Key) => string;
 
 export function createTryGet<Key, Value>({
   get,
@@ -35,7 +34,7 @@ export function createTryGetLatest<Key, Value>({
   get,
 }: {
   readonly db: LevelUp;
-  readonly latestKey: Buffer;
+  readonly latestKey: string;
   readonly deserializeResult: (latestResult: Buffer) => Key;
   readonly get: (key: Key) => Promise<Value>;
 }): () => Promise<Value | undefined> {
@@ -57,22 +56,21 @@ export function createTryGetLatest<Key, Value>({
 export function createReadStorage<Key, Value>({
   db,
   serializeKey,
-  serializeKeyString,
   deserializeValue,
 }: {
   readonly db: LevelUp;
   readonly serializeKey: SerializeKey<Key>;
-  readonly serializeKeyString: SerializeKeyString<Key>;
   readonly deserializeValue: (value: Buffer) => Value;
 }): ReadStorage<Key, Value> {
   const get = async (key: Key): Promise<Value> => {
+    const serialized = serializeKey(key);
     try {
-      const result = await db.get(serializeKey(key));
+      const result = await db.get(serialized);
 
       return deserializeValue(result as Buffer);
     } catch (error) {
       if (error.notFound || error.code === 'KEY_NOT_FOUND') {
-        throw new KeyNotFoundError(serializeKeyString(key));
+        throw new KeyNotFoundError(serialized);
       }
 
       throw error;
@@ -89,8 +87,8 @@ export function createAll$<Value>({
   deserializeValue,
 }: {
   readonly db: LevelUp;
-  readonly minKey: Buffer;
-  readonly maxKey: Buffer;
+  readonly minKey: string;
+  readonly maxKey: string;
   readonly deserializeValue: (value: Buffer) => Value;
 }): Observable<Value> {
   return streamToObservable(() =>
@@ -104,22 +102,19 @@ export function createAll$<Value>({
 export function createReadAllStorage<Key, Value>({
   db,
   serializeKey,
-  serializeKeyString,
   minKey,
   maxKey,
   deserializeValue,
 }: {
   readonly db: LevelUp;
   readonly serializeKey: SerializeKey<Key>;
-  readonly serializeKeyString: SerializeKeyString<Key>;
-  readonly minKey: Buffer;
-  readonly maxKey: Buffer;
+  readonly minKey: string;
+  readonly maxKey: string;
   readonly deserializeValue: (value: Buffer) => Value;
 }): ReadAllStorage<Key, Value> {
   const readStorage = createReadStorage({
     db,
     serializeKey,
-    serializeKeyString,
     deserializeValue,
   });
 
@@ -133,22 +128,19 @@ export function createReadAllStorage<Key, Value>({
 export function createReadGetAllStorage<Key, Keys, Value>({
   db,
   serializeKey,
-  serializeKeyString,
   getMinKey,
   getMaxKey,
   deserializeValue,
 }: {
   readonly db: LevelUp;
   readonly serializeKey: SerializeKey<Key>;
-  readonly serializeKeyString: SerializeKeyString<Key>;
-  readonly getMinKey: (keys: Keys) => Buffer;
-  readonly getMaxKey: (keys: Keys) => Buffer;
+  readonly getMinKey: (keys: Keys) => string;
+  readonly getMaxKey: (keys: Keys) => string;
   readonly deserializeValue: (value: Buffer) => Value;
 }): ReadGetAllStorage<Key, Keys, Value> {
   const readStorage = createReadStorage({
     db,
     serializeKey,
-    serializeKeyString,
     deserializeValue,
   });
 
@@ -187,12 +179,10 @@ export function createTryGetMetadata<Value>({
 export function createReadMetadataStorage<Value>({
   db,
   key,
-  keyString,
   deserializeValue,
 }: {
   readonly db: LevelUp;
-  readonly key: Buffer;
-  readonly keyString: string;
+  readonly key: string;
   readonly deserializeValue: (value: Buffer) => Value;
 }): ReadMetadataStorage<Value> {
   const get = async (): Promise<Value> => {
@@ -202,7 +192,7 @@ export function createReadMetadataStorage<Value>({
       return deserializeValue(result as Buffer);
     } catch (error) {
       if (error.notFound || error.code === 'KEY_NOT_FOUND') {
-        throw new KeyNotFoundError(keyString);
+        throw new KeyNotFoundError(key);
       }
 
       throw error;

@@ -598,6 +598,19 @@ describe('MapStorage', () => {
         assertEqual(count, 2);
         assertEqual(result, valueC + valueD);
         assertEqual(keys, keyB + keyC);
+
+        storage.delete([addressB, hashB, keyB]);
+        count = 0;
+        result = 0;
+        keys = '';
+        for (const [key, value] of storage.at([addressB, hashB])) {
+          count += 1;
+          result += value;
+          keys += key;
+        }
+        assertEqual(count, 1);
+        assertEqual(result, valueD);
+        assertEqual(keys, keyC);
       }
 
       export class StorageContract extends SmartContract {

@@ -25,20 +25,16 @@ export class DeleteStorageHelper extends Helper {
           handleDefined: () => {
             // [keyBuffer]
             sb.emitOp(node, 'DROP');
-            // [context, keyBuffer]
-            sb.emitSysCall(node, 'Neo.Storage.GetContext');
             // []
-            sb.emitSysCall(node, 'Neo.Storage.Delete');
+            sb.emitHelper(node, options, sb.helpers.deleteStorageBase);
             // [boolean]
             sb.emitPushBoolean(node, true);
           },
         }),
       );
     } else {
-      // [context, keyBuffer]
-      sb.emitSysCall(node, 'Neo.Storage.GetContext');
       // []
-      sb.emitSysCall(node, 'Neo.Storage.Delete');
+      sb.emitHelper(node, options, sb.helpers.deleteStorageBase);
     }
   }
 }

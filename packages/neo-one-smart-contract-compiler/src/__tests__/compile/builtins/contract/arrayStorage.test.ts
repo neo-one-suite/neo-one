@@ -99,18 +99,26 @@ describe('ArrayStorage', () => {
         };
         private readonly prefix = ArrayStorage.for<string>();
 
-        public run(): void {
+        public setupStorage(): void {
+          const storage = this.prefix;
           const keyA = 'keyA';
           const keyB = 'keyB';
           const keyC = 'keyC';
           const keyD = 'keyD';
 
-          const storage = this.prefix;
-          storage.push(keyA, keyB);
-          const result = storage.push(keyC);
+          storage.push(keyA);
+          storage.push(keyB);
+          storage.push(keyC);
           storage.push(keyD);
+        }
 
-          assertEqual(result, 3);
+        public run(): void {
+          const storage = this.prefix;
+          const keyA = 'keyA';
+          const keyB = 'keyB';
+          const keyC = 'keyC';
+          const keyD = 'keyD';
+          assertEqual(storage.length, 4);
 
           let count = 0;
           let indices = 0;
@@ -165,6 +173,20 @@ describe('ArrayStorage', () => {
       import { Address, SmartContract } from '@neo-one/smart-contract';
 
       interface Contract {
+        deploy(): void;
+        setupStorage(): void;
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.deploy();
+      contract.setupStorage();
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        setupStorage(): void;
         run(): void;
       }
       const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));

@@ -88,12 +88,31 @@ export class CommonStorageHelper extends Helper {
           sb.emitOp(node, 'DROP');
         },
         whenFalse: () => {
-          // [keyBuffer, valueBuffer]
-          sb.emitPushBuffer(node, Buffer.alloc(0, 0));
-          // [context, keyBuffer, valBuffer]
-          sb.emitSysCall(node, 'Neo.Storage.GetContext');
-          // []
-          sb.emitSysCall(node, 'Neo.Storage.Put');
+          // [number, valueBuffer]
+          sb.emitSysCall(node, 'Neo.Runtime.GetTrigger');
+          // [number, number, valueBuffer]
+          sb.emitPushInt(node, 0x10);
+          sb.emitHelper(
+            node,
+            options,
+            sb.helpers.if({
+              condition: () => {
+                // [boolean, valueBuffer]
+                sb.emitOp(node, 'NUMEQUAL');
+              },
+              whenTrue: () => {
+                // [keyBuffer, valueBuffer]
+                sb.emitPushBuffer(node, Buffer.alloc(0, 0));
+                // [context, keyBuffer, valBuffer]
+                sb.emitSysCall(node, 'Neo.Storage.GetContext');
+                // []
+                sb.emitSysCall(node, 'Neo.Storage.Put');
+              },
+              whenFalse: () => {
+                sb.emitOp(node, 'DROP');
+              },
+            }),
+          );
         },
       }),
     );

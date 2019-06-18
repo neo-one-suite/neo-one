@@ -2,6 +2,15 @@ import { Hash256 } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
 import { helpers, keys } from '../../../../__data__';
 
+const properties = `
+public readonly properties = {
+  codeVersion: '1.0',
+  author: 'dicarlo2',
+  email: 'alex.dicarlo@neotracker.io',
+  description: 'The TestSmartContract',
+};
+`;
+
 describe('InvokeSmartContractHelper', () => {
   test('argument and return types', async () => {
     const node = await helpers.startNode();
@@ -268,5 +277,127 @@ describe('InvokeSmartContractHelper', () => {
     expect(foo.bar.array[1].toString()).toEqual('2');
     expect(foo.num.toString()).toEqual('10');
     expect(fooNullable).toEqual(undefined);
+  });
+
+  const createIterContract = async (node: helpers.TestNode) =>
+    node.addContract(`
+    import { MapStorage, SmartContract } from '@neo-one/smart-contract';
+
+    const keyA = 'keyA';
+    const keyB = 'keyB';
+    const keyC = 'keyC';
+    const valueA = 1;
+    const valueB = 2;
+    const valueC = 3;
+
+    export class TestSmartContract extends SmartContract {
+      ${properties}
+      private readonly storage = MapStorage.for<string, number>();
+
+      public setup(): boolean {
+        this.storage.set(keyA, valueA);
+        this.storage.set(keyB, valueB);
+        this.storage.set(keyC, valueC);
+
+        return true;
+      }
+
+      public testDeleteAndIter(): boolean {
+        assertEqual(this.storage.delete(keyB), true);
+
+        let count = 0;
+        let result = 0;
+        let keys = '';
+        this.storage.forEach((value, key) => {
+          count += 1;
+          result += value;
+          keys += key;
+        });
+        assertEqual(count, 2);
+        assertEqual(result, valueA + valueC);
+        assertEqual(keys, keyA + keyC);
+
+        count = 0;
+        result = 0;
+        keys = '';
+        for (const [key, value] of this.storage) {
+          count += 1;
+          result += value;
+          keys += key;
+        }
+        assertEqual(count, 2);
+        assertEqual(result, valueA + valueC);
+        assertEqual(keys, keyA + keyC);
+
+        this.storage[Symbol.iterator]();
+        const firstIterator = this.storage[Symbol.iterator]();
+
+        let firstResult = firstIterator.next();
+        assertEqual(firstResult.value[0], keyA);
+        assertEqual(firstResult.value[1], valueA);
+        assertEqual(firstResult.done, false);
+        firstResult = firstIterator.next();
+        assertEqual(firstResult.value[0], keyC);
+        assertEqual(firstResult.value[1], valueC);
+        assertEqual(firstResult.done, false);
+        firstResult = firstIterator.next();
+        assertEqual(firstResult.value as [string, number] | undefined, undefined);
+        assertEqual(firstResult.done, true);
+
+        return true;
+      }
+    }
+  `);
+
+  test('in memory delete of storage then iterate', async () => {
+    const node = await helpers.startNode();
+    const contract = await createIterContract(node);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        deploy(): boolean;
+        setup(): boolean;
+        testDeleteAndIter(): boolean;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+
+      assertEqual(contract.deploy(), true);
+      assertEqual(contract.setup(), true);
+      assertEqual(contract.testDeleteAndIter(), true);
+    `);
+  });
+
+  test('in memory delete of storage then iterate in separate transaction', async () => {
+    const node = await helpers.startNode();
+    const contract = await createIterContract(node);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        deploy(): boolean;
+        setup(): boolean;
+        testDeleteAndIter(): boolean;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+
+      assertEqual(contract.deploy(), true);
+      assertEqual(contract.setup(), true);
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        deploy(): boolean;
+        setup(): boolean;
+        testDeleteAndIter(): boolean;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+
+      assertEqual(contract.testDeleteAndIter(), true);
+    `);
   });
 });

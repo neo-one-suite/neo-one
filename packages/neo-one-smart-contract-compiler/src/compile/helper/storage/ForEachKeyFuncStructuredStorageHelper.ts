@@ -24,14 +24,20 @@ export class ForEachKeyFuncStructuredStorageHelper extends StructuredStorageBase
         handleNext: (innerOptions) => {
           // [size, iterator]
           sb.scope.get(sb, node, innerOptions, size);
-          // [keyVal, valVal]
+          // [boolean, keyVal, valVal]
           sb.emitHelper(node, innerOptions, sb.helpers.handleValueStructuredStorage);
-          // [keyVal]
-          sb.emitOp(node, 'NIP');
-          // [1, keyVal]
+          // [keyVal, boolean, valVal]
+          sb.emitOp(node, 'SWAP');
+          // [valVal, keyVal, boolean]
+          sb.emitOp(node, 'ROT');
+          // [keyVal, boolean]
+          sb.emitOp(node, 'DROP');
+          // [1, keyVal, boolean]
           sb.emitPushInt(node, 1);
-          // [argsarr]
+          // [argsarr, boolean]
           sb.emitOp(node, 'PACK');
+          // [boolean, argsarr]
+          sb.emitOp(node, 'SWAP');
         },
       }),
     );

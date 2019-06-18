@@ -10,6 +10,7 @@ export * from './HandleNormalHelper';
 export * from './HandleReceiveHelper';
 export * from './HandleSendHelper';
 export * from './HandleSendUnsafeHelper';
+export * from './InvocationIsCallerHelper';
 export * from './InvokeSmartContractHelper';
 export * from './InvokeSmartContractMethodHelper';
 export * from './IsCallerHelper';

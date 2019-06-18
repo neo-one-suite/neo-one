@@ -1,4 +1,5 @@
 export * from './AtStructuredStorageHelper';
+export * from './CacheStorageHelper';
 export * from './CommonStorageHelper';
 export * from './CreateIterableIteratorStructuredStorageBaseHelper';
 export * from './CreateIterableIteratorStructuredStorageHelper';
@@ -6,6 +7,8 @@ export * from './CreateIteratorStructuredStorageHelper';
 export * from './CreateKeyIterableIteratorStructuredStorageHelper';
 export * from './CreateStructuredStorageHelper';
 export * from './CreateValIterableIteratorStructuredStorageHelper';
+export * from './DeleteCacheStorageHelper';
+export * from './DeleteStorageBaseHelper';
 export * from './DeleteStorageHelper';
 export * from './DeleteStructuredStorageHelper';
 export * from './ForEachFuncStructuredStorageBaseHelper';

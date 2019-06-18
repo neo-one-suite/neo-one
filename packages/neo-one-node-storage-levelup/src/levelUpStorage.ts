@@ -55,7 +55,6 @@ export const levelUpStorage = ({
   const headerBase = read.createReadStorage({
     db,
     serializeKey: keys.typeKeyToSerializeKey.header,
-    serializeKeyString: keys.typeKeyToSerializeKeyString.header,
     deserializeValue: (buffer) =>
       Header.deserializeWire({
         context,
@@ -86,7 +85,6 @@ export const levelUpStorage = ({
   const blockBase = read.createReadStorage({
     db,
     serializeKey: keys.typeKeyToSerializeKey.block,
-    serializeKeyString: keys.typeKeyToSerializeKeyString.block,
     deserializeValue: (buffer) =>
       Block.deserializeWire({
         context,
@@ -117,7 +115,6 @@ export const levelUpStorage = ({
   const transaction = read.createReadStorage({
     db,
     serializeKey: keys.typeKeyToSerializeKey.transaction,
-    serializeKeyString: keys.typeKeyToSerializeKeyString.transaction,
     deserializeValue: (buffer) =>
       deserializeTransactionWire({
         context,
@@ -128,7 +125,6 @@ export const levelUpStorage = ({
   const output = read.createReadStorage({
     db,
     serializeKey: keys.typeKeyToSerializeKey.output,
-    serializeKeyString: keys.typeKeyToSerializeKeyString.output,
     deserializeValue: (buffer) => Output.deserializeWire({ context, buffer }),
   });
 
@@ -138,7 +134,6 @@ export const levelUpStorage = ({
     blockData: read.createReadStorage({
       db,
       serializeKey: keys.typeKeyToSerializeKey.blockData,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.blockData,
       deserializeValue: (buffer) =>
         BlockData.deserializeWire({
           context,
@@ -149,7 +144,6 @@ export const levelUpStorage = ({
     account: read.createReadAllStorage({
       db,
       serializeKey: keys.typeKeyToSerializeKey.account,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.account,
       minKey: keys.accountMinKey,
       maxKey: keys.accountMaxKey,
       deserializeValue: (buffer) =>
@@ -162,7 +156,6 @@ export const levelUpStorage = ({
     accountUnclaimed: read.createReadGetAllStorage({
       db,
       serializeKey: keys.typeKeyToSerializeKey.accountUnclaimed,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.accountUnclaimed,
       getMinKey: keys.getAccountUnclaimedKeyMin,
       getMaxKey: keys.getAccountUnclaimedKeyMax,
       deserializeValue: (buffer) =>
@@ -175,7 +168,6 @@ export const levelUpStorage = ({
     accountUnspent: read.createReadGetAllStorage({
       db,
       serializeKey: keys.typeKeyToSerializeKey.accountUnspent,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.accountUnspent,
       getMinKey: keys.getAccountUnspentKeyMin,
       getMaxKey: keys.getAccountUnspentKeyMax,
       deserializeValue: (buffer) =>
@@ -188,7 +180,6 @@ export const levelUpStorage = ({
     action: read.createReadGetAllStorage({
       db,
       serializeKey: keys.typeKeyToSerializeKey.action,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.action,
       getMinKey: keys.getActionKeyMin,
       getMaxKey: keys.getActionKeyMax,
       deserializeValue: (buffer) =>
@@ -201,7 +192,6 @@ export const levelUpStorage = ({
     asset: read.createReadStorage({
       db,
       serializeKey: keys.typeKeyToSerializeKey.asset,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.asset,
       deserializeValue: (buffer) =>
         Asset.deserializeWire({
           context,
@@ -213,7 +203,6 @@ export const levelUpStorage = ({
     transactionData: read.createReadStorage({
       db,
       serializeKey: keys.typeKeyToSerializeKey.transactionData,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.transactionData,
       deserializeValue: (buffer) => TransactionData.deserializeWire({ context, buffer }),
     }),
 
@@ -221,7 +210,6 @@ export const levelUpStorage = ({
     contract: read.createReadStorage({
       db,
       serializeKey: keys.typeKeyToSerializeKey.contract,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.contract,
       deserializeValue: (buffer) =>
         Contract.deserializeWire({
           context,
@@ -232,7 +220,6 @@ export const levelUpStorage = ({
     storageItem: read.createReadGetAllStorage({
       db,
       serializeKey: keys.typeKeyToSerializeKey.storageItem,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.storageItem,
       getMinKey: keys.getStorageItemKeyMin,
       getMaxKey: keys.getStorageItemKeyMax,
       deserializeValue: (buffer) =>
@@ -245,7 +232,6 @@ export const levelUpStorage = ({
     validator: read.createReadAllStorage({
       db,
       serializeKey: keys.typeKeyToSerializeKey.validator,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.validator,
       minKey: keys.validatorMinKey,
       maxKey: keys.validatorMaxKey,
       deserializeValue: (buffer) =>
@@ -258,7 +244,6 @@ export const levelUpStorage = ({
     invocationData: read.createReadStorage({
       db,
       serializeKey: keys.typeKeyToSerializeKey.invocationData,
-      serializeKeyString: keys.typeKeyToSerializeKeyString.invocationData,
       deserializeValue: (buffer) =>
         InvocationData.deserializeWire({
           context,
@@ -269,7 +254,6 @@ export const levelUpStorage = ({
     validatorsCount: read.createReadMetadataStorage({
       db,
       key: keys.validatorsCountKey,
-      keyString: keys.validatorsCountKeyString,
       deserializeValue: (buffer) =>
         ValidatorsCount.deserializeWire({
           context,

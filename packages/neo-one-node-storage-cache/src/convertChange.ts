@@ -15,7 +15,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'account',
-          key: keys.typeKeyToSerializeKeyString.account(change.value),
+          key: keys.typeKeyToSerializeKey.account(change.value),
           value: change.value,
         },
       ];
@@ -25,7 +25,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'accountUnclaimed',
-          key: keys.typeKeyToSerializeKeyString.accountUnclaimed({
+          key: keys.typeKeyToSerializeKey.accountUnclaimed({
             hash: change.value.hash,
             input: change.value.input,
           }),
@@ -39,7 +39,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'accountUnspent',
-          key: keys.typeKeyToSerializeKeyString.accountUnspent({
+          key: keys.typeKeyToSerializeKey.accountUnspent({
             hash: change.value.hash,
             input: change.value.input,
           }),
@@ -53,7 +53,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'action',
-          key: keys.typeKeyToSerializeKeyString.action({
+          key: keys.typeKeyToSerializeKey.action({
             index: change.value.index,
           }),
 
@@ -66,7 +66,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'asset',
-          key: keys.typeKeyToSerializeKeyString.asset(change.value),
+          key: keys.typeKeyToSerializeKey.asset(change.value),
           value: change.value,
         },
       ];
@@ -76,7 +76,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'block',
-          key: keys.typeKeyToSerializeKeyString.block(change.value),
+          key: keys.typeKeyToSerializeKey.block(change.value),
           value: change.value,
         },
 
@@ -93,7 +93,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'blockData',
-          key: keys.typeKeyToSerializeKeyString.blockData(change.value),
+          key: keys.typeKeyToSerializeKey.blockData(change.value),
           value: change.value,
         },
       ];
@@ -103,7 +103,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'header',
-          key: keys.typeKeyToSerializeKeyString.header(change.value),
+          key: keys.typeKeyToSerializeKey.header(change.value),
           value: change.value,
         },
 
@@ -120,7 +120,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'transaction',
-          key: keys.typeKeyToSerializeKeyString.transaction(change.value),
+          key: keys.typeKeyToSerializeKey.transaction(change.value),
           value: change.value,
         },
       ];
@@ -130,7 +130,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'output',
-          key: keys.typeKeyToSerializeKeyString.output({
+          key: keys.typeKeyToSerializeKey.output({
             hash: change.value.hash,
             index: change.value.index,
           }),
@@ -144,7 +144,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'transactionData',
-          key: keys.typeKeyToSerializeKeyString.transactionData(change.value),
+          key: keys.typeKeyToSerializeKey.transactionData(change.value),
           value: change.value,
         },
       ];
@@ -154,7 +154,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'contract',
-          key: keys.typeKeyToSerializeKeyString.contract(change.value),
+          key: keys.typeKeyToSerializeKey.contract(change.value),
           value: change.value,
         },
       ];
@@ -164,7 +164,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'storageItem',
-          key: keys.typeKeyToSerializeKeyString.storageItem({
+          key: keys.typeKeyToSerializeKey.storageItem({
             hash: change.value.hash,
             key: change.value.key,
           }),
@@ -178,7 +178,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'validator',
-          key: keys.typeKeyToSerializeKeyString.validator({
+          key: keys.typeKeyToSerializeKey.validator({
             publicKey: change.value.publicKey,
           }),
 
@@ -191,7 +191,7 @@ const convertAddChange = (changeIn: AddChange): readonly CacheChange[] => {
         {
           type: 'add',
           model: 'invocationData',
-          key: keys.typeKeyToSerializeKeyString.invocationData(change.value),
+          key: keys.typeKeyToSerializeKey.invocationData(change.value),
           value: change.value,
         },
       ];
@@ -218,42 +218,42 @@ const convertDeleteChange = (change: DeleteChange): CacheChange => {
       return {
         type: 'delete',
         model: 'account',
-        key: keys.typeKeyToSerializeKeyString.account(change.key),
+        key: keys.typeKeyToSerializeKey.account(change.key),
       };
 
     case 'accountUnclaimed':
       return {
         type: 'delete',
         model: 'accountUnclaimed',
-        key: keys.typeKeyToSerializeKeyString.accountUnclaimed(change.key),
+        key: keys.typeKeyToSerializeKey.accountUnclaimed(change.key),
       };
 
     case 'accountUnspent':
       return {
         type: 'delete',
         model: 'accountUnspent',
-        key: keys.typeKeyToSerializeKeyString.accountUnclaimed(change.key),
+        key: keys.typeKeyToSerializeKey.accountUnclaimed(change.key),
       };
 
     case 'contract':
       return {
         type: 'delete',
         model: 'contract',
-        key: keys.typeKeyToSerializeKeyString.contract(change.key),
+        key: keys.typeKeyToSerializeKey.contract(change.key),
       };
 
     case 'storageItem':
       return {
         type: 'delete',
         model: 'storageItem',
-        key: keys.typeKeyToSerializeKeyString.storageItem(change.key),
+        key: keys.typeKeyToSerializeKey.storageItem(change.key),
       };
 
     case 'validator':
       return {
         type: 'delete',
         model: 'validator',
-        key: keys.typeKeyToSerializeKeyString.validator(change.key),
+        key: keys.typeKeyToSerializeKey.validator(change.key),
       };
 
     default:

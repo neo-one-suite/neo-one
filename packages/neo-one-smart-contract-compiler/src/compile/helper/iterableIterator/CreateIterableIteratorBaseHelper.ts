@@ -6,16 +6,19 @@ import { Helper } from '../Helper';
 
 export interface CreateIterableIteratorBaseHelperOptions {
   readonly handleNext: (options: VisitOptions) => void;
+  readonly hasFilter?: boolean;
 }
 
 // Input: [iterator]
 // Output: [val]
 export class CreateIterableIteratorBaseHelper extends Helper {
   private readonly handleNext: (options: VisitOptions) => void;
+  private readonly hasFilter: boolean;
 
-  public constructor(options: CreateIterableIteratorBaseHelperOptions) {
+  public constructor({ handleNext, hasFilter = false }: CreateIterableIteratorBaseHelperOptions) {
     super();
-    this.handleNext = options.handleNext;
+    this.handleNext = handleNext;
+    this.hasFilter = hasFilter;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
@@ -86,36 +89,107 @@ export class CreateIterableIteratorBaseHelper extends Helper {
           sb.emitPushInt(node, IterableIteratorSlots.internalIterator);
           // [iterator]
           sb.emitOp(node, 'PICKITEM');
-          // [iterator, iterator]
-          sb.emitOp(node, 'DUP');
-          sb.emitHelper(
-            node,
-            innerOptions,
-            sb.helpers.if({
-              condition: () => {
-                // [boolean, iterator]
-                sb.emitSysCall(node, 'Neo.Enumerator.Next');
-              },
-              whenTrue: () => {
-                // [valueVal]
-                this.handleNext(innerOptions);
-                // [boolean, valueVal]
-                sb.emitPushBoolean(node, false);
-                // [doneVal]
-                sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
-              },
-              whenFalse: () => {
-                // []
-                sb.emitOp(node, 'DROP');
-                // [valueVal]
-                sb.emitHelper(node, innerOptions, sb.helpers.wrapUndefined);
-                // [boolean, valueVal]
-                sb.emitPushBoolean(node, true);
-                // [doneVal]
-                sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
-              },
-            }),
-          );
+          if (this.hasFilter) {
+            sb.emitHelper(
+              node,
+              innerOptions,
+              sb.helpers.forLoop({
+                condition: () => {
+                  sb.emitHelper(
+                    node,
+                    innerOptions,
+                    sb.helpers.if({
+                      condition: () => {
+                        // [iterator, iterator]
+                        sb.emitOp(node, 'DUP');
+                        // [boolean, iterator]
+                        sb.emitSysCall(node, 'Neo.Enumerator.Next');
+                      },
+                      whenTrue: () => {
+                        sb.emitHelper(
+                          node,
+                          innerOptions,
+                          sb.helpers.if({
+                            condition: () => {
+                              // [iterator, iterator]
+                              sb.emitOp(node, 'DUP');
+                              // [boolean, valueVal, iterator]
+                              this.handleNext(innerOptions);
+                            },
+                            whenTrue: () => {
+                              // [valueVal]
+                              sb.emitOp(node, 'NIP');
+                              // [boolean, valueVal]
+                              sb.emitPushBoolean(node, false);
+                              // [doneVal, valueVal]
+                              sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
+                              // [boolean, doneVal, valueVal]
+                              sb.emitPushBoolean(node, false);
+                            },
+                            whenFalse: () => {
+                              // [iterator]
+                              sb.emitOp(node, 'DROP');
+                              // [boolean, iterator]
+                              sb.emitPushBoolean(node, true);
+                            },
+                          }),
+                        );
+                      },
+                      whenFalse: () => {
+                        // []
+                        sb.emitOp(node, 'DROP');
+                        // [valueVal]
+                        sb.emitHelper(node, innerOptions, sb.helpers.wrapUndefined);
+                        // [boolean, valueVal]
+                        sb.emitPushBoolean(node, true);
+                        // [doneVal, valueVal]
+                        sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
+                        // [boolean, doneVal, valueVal]
+                        sb.emitPushBoolean(node, false);
+                      },
+                    }),
+                  );
+                },
+                each: () => {
+                  // do nothing
+                },
+                cleanup: () => {
+                  // do nothing
+                },
+              }),
+            );
+          } else {
+            sb.emitHelper(
+              node,
+              innerOptions,
+              sb.helpers.if({
+                condition: () => {
+                  // [iterator, iterator]
+                  sb.emitOp(node, 'DUP');
+                  // [boolean, iterator]
+                  sb.emitSysCall(node, 'Neo.Enumerator.Next');
+                },
+                whenTrue: () => {
+                  // [valueVal]
+                  this.handleNext(innerOptions);
+                  // [boolean, valueVal]
+                  sb.emitPushBoolean(node, false);
+                  // [doneVal, valueVal]
+                  sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
+                },
+                whenFalse: () => {
+                  // []
+                  sb.emitOp(node, 'DROP');
+                  // [valueVal]
+                  sb.emitHelper(node, innerOptions, sb.helpers.wrapUndefined);
+                  // [boolean, valueVal]
+                  sb.emitPushBoolean(node, true);
+                  // [doneVal, valueVal]
+                  sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
+                },
+              }),
+            );
+          }
           // [val]
           sb.emitHelper(node, innerOptions, sb.helpers.createIteratorResult);
           // []

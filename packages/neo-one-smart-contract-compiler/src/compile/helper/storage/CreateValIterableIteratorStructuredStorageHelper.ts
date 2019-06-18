@@ -13,7 +13,7 @@ export class CreateValIterableIteratorStructuredStorageHelper extends Structured
       sb.helpers.createIterableIteratorStructuredStorageBase({
         type: this.type,
         handleNext: (innerOptions) => {
-          // [valVal]
+          // [boolean, valVal]
           sb.emitHelper(node, sb.pushValueOptions(innerOptions), sb.helpers.handleValValueStructuredStorage);
         },
       }),

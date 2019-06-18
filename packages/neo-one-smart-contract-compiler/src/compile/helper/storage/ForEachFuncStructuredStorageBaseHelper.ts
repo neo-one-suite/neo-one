@@ -31,6 +31,7 @@ export class ForEachFuncStructuredStorageBaseHelper extends StructuredStorageBas
       node,
       options,
       sb.helpers.rawIteratorForEachFuncBase({
+        hasFilter: true,
         handleNext: this.handleNext,
       }),
     );

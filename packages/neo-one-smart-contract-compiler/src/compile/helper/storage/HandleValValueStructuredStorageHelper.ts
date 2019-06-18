@@ -4,7 +4,7 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 // Input: [iterator]
-// Output: [val]
+// Output: [boolean, val]
 export class HandleValValueStructuredStorageHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, options: VisitOptions): void {
     if (!options.pushValue) {
@@ -13,13 +13,39 @@ export class HandleValValueStructuredStorageHelper extends Helper {
       return;
     }
 
-    // [value]
-    sb.emitSysCall(node, 'Neo.Enumerator.Value');
-    // [arr]
-    sb.emitSysCall(node, 'Neo.Runtime.Deserialize');
-    // [1, arr]
-    sb.emitPushInt(node, 1);
-    // [val]
-    sb.emitOp(node, 'PICKITEM');
+    // [iterator, iterator]
+    sb.emitOp(node, 'DUP');
+    // [keyBuffer, iterator, size]
+    sb.emitSysCall(node, 'Neo.Iterator.Key');
+    sb.emitHelper(
+      node,
+      options,
+      sb.helpers.if({
+        condition: () => {
+          // [map, keyBuffer, iterator]
+          sb.emitHelper(node, options, sb.helpers.deleteCacheStorage);
+          // [keyBuffer, map, iterator]
+          sb.emitOp(node, 'SWAP');
+          // [iterator]
+          sb.emitOp(node, 'HASKEY');
+        },
+        whenTrue: () => {
+          // [boolean, iterator]
+          sb.emitPushBoolean(node, false);
+        },
+        whenFalse: () => {
+          // [value]
+          sb.emitSysCall(node, 'Neo.Enumerator.Value');
+          // [arr]
+          sb.emitSysCall(node, 'Neo.Runtime.Deserialize');
+          // [1, arr]
+          sb.emitPushInt(node, 1);
+          // [val]
+          sb.emitOp(node, 'PICKITEM');
+          // [boolean, val]
+          sb.emitPushBoolean(node, true);
+        },
+      }),
+    );
   }
 }

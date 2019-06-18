@@ -37,12 +37,28 @@ export class StructuredStorageReduceHelper extends StructuredStorageBaseHelper {
           sb.emitOp(node, 'SWAP');
           // [size, iterator, accum]
           sb.scope.get(sb, node, innerOptions, size);
-          // [keyVal, valVal, accum]
-          sb.emitHelper(node, innerOptions, sb.helpers.handleValueStructuredStorage);
-          // [accum, keyVal, valVal]
-          sb.emitOp(node, 'ROT');
-          // []
-          this.each(innerOptions);
+          sb.emitHelper(
+            node,
+            options,
+            sb.helpers.if({
+              condition: () => {
+                // [boolean, keyVal, valVal, accum]
+                sb.emitHelper(node, innerOptions, sb.helpers.handleValueStructuredStorage);
+              },
+              whenTrue: () => {
+                // [accum, keyVal, valVal]
+                sb.emitOp(node, 'ROT');
+                // []
+                this.each(innerOptions);
+              },
+              whenFalse: () => {
+                // [valVal, accum]
+                sb.emitOp(node, 'DROP');
+                // [accum]
+                sb.emitOp(node, 'DROP');
+              },
+            }),
+          );
         },
       }),
     );

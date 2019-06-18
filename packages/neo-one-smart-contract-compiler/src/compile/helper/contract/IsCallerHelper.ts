@@ -50,24 +50,8 @@ export class IsCallerHelper extends Helper {
               whenTrue: () => {
                 // [boolean]
                 sb.emitSysCall(node, 'Neo.Runtime.CheckWitness');
-                // [buffer, boolean]
-                sb.emitHelper(
-                  node,
-                  options,
-                  sb.helpers.getGlobalProperty({ property: GlobalProperty.CallingScriptHash }),
-                );
-                // [buffer, buffer, boolean]
-                sb.emitSysCall(node, 'System.ExecutionEngine.GetEntryScriptHash');
                 // [boolean, boolean]
-                sb.emitOp(node, 'EQUAL');
-                // [trigger, boolean, boolean]
-                sb.emitSysCall(node, 'Neo.Runtime.GetTrigger');
-                // [number, trigger, boolean, boolean]
-                sb.emitPushInt(node, 0x00);
-                // [boolean, boolean, boolean]
-                sb.emitOp(node, 'NUMEQUAL');
-                // [boolean, boolean]
-                sb.emitOp(node, 'BOOLOR');
+                sb.emitHelper(node, options, sb.helpers.invocationIsCaller);
                 // [boolean]
                 sb.emitOp(node, 'BOOLAND');
               },

@@ -27,12 +27,27 @@ export class StructuredStorageReduceValHelper extends StructuredStorageBaseHelpe
         each: (innerOptions) => {
           // [iterator, accum]
           sb.emitOp(node, 'SWAP');
-          // [valVal, accum]
-          sb.emitHelper(node, innerOptions, sb.helpers.handleValValueStructuredStorage);
-          // [accum, valVal]
-          sb.emitOp(node, 'SWAP');
-          // []
-          this.each(innerOptions);
+          // [accum]
+          sb.emitHelper(
+            node,
+            innerOptions,
+            sb.helpers.if({
+              condition: () => {
+                // [boolean, valVal, accum]
+                sb.emitHelper(node, innerOptions, sb.helpers.handleValValueStructuredStorage);
+              },
+              whenTrue: () => {
+                // [accum, valVal]
+                sb.emitOp(node, 'SWAP');
+                // [accum]
+                this.each(innerOptions);
+              },
+              whenFalse: () => {
+                // [accum]
+                sb.emitOp(node, 'DROP');
+              },
+            }),
+          );
         },
       }),
     );

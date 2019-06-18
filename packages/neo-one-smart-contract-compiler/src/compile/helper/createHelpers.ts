@@ -68,6 +68,7 @@ import {
   HandleSendHelper,
   HandleSendHelperOptions,
   HandleSendUnsafeHelper,
+  InvocationIsCallerHelper,
   InvokeSmartContractHelper,
   InvokeSmartContractHelperOptions,
   InvokeSmartContractMethodHelper,
@@ -175,6 +176,10 @@ import {
   MapDeleteHelper,
   MapEveryHelper,
   MapEveryHelperOptions,
+  MapFilterHelper,
+  MapFilterHelperOptions,
+  MapForEachHelper,
+  MapForEachHelperOptions,
   MapMapHelper,
   MapMapHelperOptions,
   MapReduceHelper,
@@ -212,6 +217,7 @@ import {
 } from './statement';
 import {
   AtStructuredStorageHelper,
+  CacheStorageHelper,
   CommonStorageHelper,
   CreateIterableIteratorStructuredStorageBaseHelper,
   CreateIterableIteratorStructuredStorageBaseHelperOptions,
@@ -221,6 +227,8 @@ import {
   CreateStructuredStorageHelper,
   CreateStructuredStorageHelperOptions,
   CreateValIterableIteratorStructuredStorageHelper,
+  DeleteCacheStorageHelper,
+  DeleteStorageBaseHelper,
   DeleteStorageHelper,
   DeleteStructuredStorageHelper,
   ForEachFuncStructuredStorageBaseHelper,
@@ -465,6 +473,7 @@ export interface Helpers {
     options: InvokeSmartContractMethodHelperOptions,
   ) => InvokeSmartContractMethodHelper;
   readonly getOutputAssetValueMap: GetOutputAssetValueMapHelper;
+  readonly invocationIsCaller: InvocationIsCallerHelper;
   readonly isCaller: IsCallerHelper;
   readonly isProcessedTransaction: IsProcessedTransactionHelper;
   readonly refundAssets: RefundAssetsHelper;
@@ -637,14 +646,19 @@ export interface Helpers {
   // map
   readonly mapDelete: MapDeleteHelper;
   readonly mapEvery: (options: MapEveryHelperOptions) => MapEveryHelper;
+  readonly mapForEach: (options: MapForEachHelperOptions) => MapForEachHelper;
+  readonly mapFilter: (options: MapFilterHelperOptions) => MapFilterHelper;
   readonly mapMap: (options: MapMapHelperOptions) => MapMapHelper;
   readonly mapReduce: (options: MapReduceHelperOptions) => MapReduceHelper;
   readonly mapSome: (options: MapSomeHelperOptions) => MapSomeHelper;
 
   // storage
+  readonly cacheStorage: CacheStorageHelper;
   readonly putCommonStorage: PutCommonStorageHelper;
   readonly handleUndefinedStorage: (options: HandleUndefinedStorageHelperOptions) => HandleUndefinedStorageHelper;
   readonly commonStorage: CommonStorageHelper;
+  readonly deleteCacheStorage: DeleteCacheStorageHelper;
+  readonly deleteStorageBase: DeleteStorageBaseHelper;
   readonly deleteStorage: DeleteStorageHelper;
   readonly iterStorage: IterStorageHelper;
   readonly putStorage: PutStorageHelper;
@@ -891,6 +905,7 @@ export const createHelpers = (): Helpers => {
     invokeSmartContract: (options) => new InvokeSmartContractHelper(options),
     invokeSmartContractMethod: (options) => new InvokeSmartContractMethodHelper(options),
     getOutputAssetValueMap: new GetOutputAssetValueMapHelper(),
+    invocationIsCaller: new InvocationIsCallerHelper(),
     isCaller: new IsCallerHelper(),
     isProcessedTransaction: new IsProcessedTransactionHelper(),
     refundAssets: new RefundAssetsHelper(),
@@ -1051,14 +1066,19 @@ export const createHelpers = (): Helpers => {
     // map
     mapDelete: new MapDeleteHelper(),
     mapEvery: (options) => new MapEveryHelper(options),
+    mapForEach: (options) => new MapForEachHelper(options),
+    mapFilter: (options) => new MapFilterHelper(options),
     mapMap: (options) => new MapMapHelper(options),
     mapReduce: (options) => new MapReduceHelper(options),
     mapSome: (options) => new MapSomeHelper(options),
 
     // storage
+    cacheStorage: new CacheStorageHelper(),
     putCommonStorage: new PutCommonStorageHelper(),
     handleUndefinedStorage: (options) => new HandleUndefinedStorageHelper(options),
     commonStorage: new CommonStorageHelper(),
+    deleteCacheStorage: new DeleteCacheStorageHelper(),
+    deleteStorageBase: new DeleteStorageBaseHelper(),
     deleteStorage: new DeleteStorageHelper(),
     iterStorage: new IterStorageHelper(),
     putStorage: new PutStorageHelper(),

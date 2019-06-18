@@ -34,7 +34,7 @@ export abstract class HandleSendUnsafeReceiveHelperBase extends Helper {
     // [boolean]
     sb.emitHelper(node, options, sb.helpers.isProcessedTransaction);
 
-    // !isReceiveMethod() && !onlyReceived()
+    // !isReceiveMethod() && !onlySentAssets()
     if (!this.opposite) {
       // [transaction, boolean]
       sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');

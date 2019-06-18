@@ -301,7 +301,7 @@ export const execute = async ({
       //       to callingScriptHash within executeScript. executeScript
       //       automatically hashes the input code to determine the current
       //       scriptHash.
-      const scriptHash = idx - 1 > 0 ? crypto.hash160(scripts[idx - 1].code) : undefined;
+      const scriptHash = idx - 1 >= 0 ? crypto.hash160(scripts[idx - 1].code) : undefined;
       let options: Options = {
         depth: scripts.length - idx,
         stack: [],

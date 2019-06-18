@@ -25,10 +25,24 @@ export class ForEachValStructuredStorageHelper extends StructuredStorageBaseHelp
       sb.helpers.forEachStructuredStorageBase({
         type: this.type,
         each: (innerOptions) => {
-          // [valVal]
-          sb.emitHelper(node, sb.pushValueOptions(innerOptions), sb.helpers.handleValValueStructuredStorage);
-          // []
-          this.each(sb.noPushValueOptions(innerOptions));
+          sb.emitHelper(
+            node,
+            sb.pushValueOptions(innerOptions),
+            sb.helpers.if({
+              condition: () => {
+                // [boolean, valVal]
+                sb.emitHelper(node, sb.pushValueOptions(innerOptions), sb.helpers.handleValValueStructuredStorage);
+              },
+              whenTrue: () => {
+                // []
+                this.each(sb.noPushValueOptions(innerOptions));
+              },
+              whenFalse: () => {
+                // []
+                sb.emitOp(node, 'DROP');
+              },
+            }),
+          );
         },
       }),
     );

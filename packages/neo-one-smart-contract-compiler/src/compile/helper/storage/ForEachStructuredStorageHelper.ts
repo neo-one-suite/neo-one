@@ -35,10 +35,27 @@ export class ForEachStructuredStorageHelper extends StructuredStorageBaseHelper 
         each: (innerOptions) => {
           // [size, iterator]
           sb.scope.get(sb, node, innerOptions, size);
-          // [keyVal, valVal]
-          sb.emitHelper(node, sb.pushValueOptions(innerOptions), sb.helpers.handleValueStructuredStorage);
-          // []
-          this.each(sb.noPushValueOptions(innerOptions));
+
+          sb.emitHelper(
+            node,
+            sb.pushValueOptions(innerOptions),
+            sb.helpers.if({
+              condition: () => {
+                // [boolean, keyVal, valVal]
+                sb.emitHelper(node, sb.pushValueOptions(innerOptions), sb.helpers.handleValueStructuredStorage);
+              },
+              whenTrue: () => {
+                // []
+                this.each(sb.noPushValueOptions(innerOptions));
+              },
+              whenFalse: () => {
+                // [valVal]
+                sb.emitOp(node, 'DROP');
+                // []
+                sb.emitOp(node, 'DROP');
+              },
+            }),
+          );
         },
       }),
     );

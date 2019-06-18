@@ -24,14 +24,20 @@ export class CreateIterableIteratorStructuredStorageHelper extends StructuredSto
         handleNext: (innerOptions) => {
           // [size, iterator]
           sb.scope.get(sb, node, innerOptions, size);
-          // [keyVal, valVal]
+          // [boolean, keyVal, valVal]
           sb.emitHelper(node, sb.pushValueOptions(innerOptions), sb.helpers.handleValueStructuredStorage);
-          // [number, keyVal, valueVal]
+          // [valVal, boolean, keyVal]
+          sb.emitOp(node, 'ROT');
+          // [keyVal, valVal, boolean]
+          sb.emitOp(node, 'ROT');
+          // [number, keyVal, valueVal, boolean]
           sb.emitPushInt(node, 2);
-          // [arr]
+          // [arr, boolean]
           sb.emitOp(node, 'PACK');
-          // [val]
+          // [val, boolean]
           sb.emitHelper(node, innerOptions, sb.helpers.wrapArray);
+          // [boolean, val]
+          sb.emitOp(node, 'SWAP');
         },
       }),
     );

@@ -9,46 +9,44 @@ import {
   StorageItemsKey,
   ValidatorKey,
 } from '@neo-one/node-core';
+import { utils } from '@neo-one/utils';
 import BN from 'bn.js';
-import bytewise from 'bytewise';
 
-const accountKeyPrefix = 'account';
-const accountUnclaimedKeyPrefix = 'accountUnclaimed';
-const accountUnspentKeyPrefix = 'accountUnspent';
-const actionKeyPrefix = 'action';
-const assetKeyPrefix = 'asset';
-const blockKeyPrefix = 'block';
-const blockDataKeyPrefix = 'blockData';
-const headerKeyPrefix = 'header';
-const headerHashKeyPrefix = 'header-index';
-const transactionKeyPrefix = 'transaction';
-const outputKeyPrefix = 'output';
-const transactionDataKeyPrefix = 'transactionData';
-const contractKeyPrefix = 'contract';
-const storageItemKeyPrefix = 'storageItem';
-const validatorKeyPrefix = 'validator';
-const invocationDataKeyPrefix = 'invocationData';
-const settingsPrefix = 'settings';
+const DELIMITER = '\x00';
+const createPrefix = (value: string) => `${value}${DELIMITER}`;
+const MAX_CHAR = '\xff';
+const createMax = (value: string) => `${value}${MAX_CHAR}`;
 
-const validatorsCountKeyString = 'validatorsCount';
-const validatorsCountKey = bytewise.encode([validatorsCountKeyString]);
+const accountKeyPrefix = createPrefix('0');
+const accountUnclaimedKeyPrefix = createPrefix('1');
+const accountUnspentKeyPrefix = createPrefix('2');
+const actionKeyPrefix = createPrefix('3');
+const assetKeyPrefix = createPrefix('4');
+const blockKeyPrefix = createPrefix('5');
+const blockDataKeyPrefix = createPrefix('6');
+const headerKeyPrefix = createPrefix('7');
+const headerHashKeyPrefix = createPrefix('8');
+const transactionKeyPrefix = createPrefix('9');
+const outputKeyPrefix = createPrefix('a');
+const transactionDataKeyPrefix = createPrefix('b');
+const contractKeyPrefix = createPrefix('c');
+const storageItemKeyPrefix = createPrefix('d');
+const validatorKeyPrefix = createPrefix('e');
+const invocationDataKeyPrefix = createPrefix('f');
+const settingsPrefix = createPrefix('g');
+const validatorsCountKey = createPrefix('h');
 
-const serializeHeaderIndexHashKey = (index: number): Buffer => bytewise.encode([headerHashKeyPrefix, index]);
-const serializeHeaderIndexHashKeyString = (index: number): string => `${headerHashKeyPrefix}:${index}`;
+const serializeHeaderIndexHashKey = (index: number) => `${headerHashKeyPrefix}${index}`;
 
-const maxHeaderHashKey = bytewise.encode([settingsPrefix, 'max-header-hash']);
-const maxBlockHashKey = bytewise.encode([settingsPrefix, 'max-block-hash']);
+const maxHeaderHashKey = `${settingsPrefix}0`;
+const maxBlockHashKey = `${settingsPrefix}1`;
 
-const createSerializeAccountInputKey = (prefix: string) => ({ hash, input }: AccountInputKey): Buffer =>
-  bytewise.encode([prefix, common.uInt160ToBuffer(hash), common.uInt256ToBuffer(input.hash), input.index]);
-
-const createSerializeAccountInputKeyString = (prefix: string) => ({ hash, input }: AccountInputKey): string =>
-  `${prefix}:` + `${common.uInt160ToString(hash)}:` + `${common.uInt256ToString(input.hash)}:` + `${input.index}`;
-const createGetAccountInputKeyMin = (prefix: string) => ({ hash }: AccountInputsKey): Buffer =>
-  bytewise.encode(bytewise.sorts.array.bound.lower([prefix, common.uInt160ToBuffer(hash)]));
-
-const createGetAccountInputKeyMax = (prefix: string) => ({ hash }: AccountInputsKey): Buffer =>
-  bytewise.encode(bytewise.sorts.array.bound.upper([prefix, common.uInt160ToBuffer(hash)]));
+const createSerializeAccountInputKey = (prefix: string) => ({ hash, input }: AccountInputKey): string =>
+  `${prefix}${common.uInt160ToString(hash)}${common.uInt256ToString(input.hash)}${input.index}`;
+const createGetAccountInputKeyMin = (prefix: string) => ({ hash }: AccountInputsKey): string =>
+  `${prefix}${common.uInt160ToString(hash)}`;
+const createGetAccountInputKeyMax = (prefix: string) => ({ hash }: AccountInputsKey): string =>
+  createMax(`${prefix}${common.uInt160ToString(hash)}`);
 
 const getAccountUnclaimedKeyMin = createGetAccountInputKeyMin(accountUnclaimedKeyPrefix);
 const getAccountUnclaimedKeyMax = createGetAccountInputKeyMax(accountUnclaimedKeyPrefix);
@@ -56,85 +54,46 @@ const getAccountUnclaimedKeyMax = createGetAccountInputKeyMax(accountUnclaimedKe
 const getAccountUnspentKeyMin = createGetAccountInputKeyMin(accountUnspentKeyPrefix);
 const getAccountUnspentKeyMax = createGetAccountInputKeyMax(accountUnspentKeyPrefix);
 
-const serializeStorageItemKey = ({ hash, key }: StorageItemKey): Buffer =>
-  bytewise.encode([storageItemKeyPrefix, common.uInt160ToBuffer(hash), key]);
-const serializeStorageItemKeyString = ({ hash, key }: StorageItemKey): string =>
-  `${storageItemKeyPrefix}:` + `${common.uInt160ToString(hash)}:` + `${key.toString('hex')}`;
-const getStorageItemKeyMin = ({ hash, prefix }: StorageItemsKey): Buffer => {
-  if (hash === undefined) {
-    return bytewise.encode(bytewise.sorts.array.bound.lower([storageItemKeyPrefix]));
-  }
+const serializeStorageItemKey = ({ hash, key }: StorageItemKey): string =>
+  `${storageItemKeyPrefix}${common.uInt160ToString(hash)}${key.toString('hex')}`;
+const getStorageItemKeyMin = ({ hash, prefix }: StorageItemsKey): string =>
+  [
+    storageItemKeyPrefix,
+    hash === undefined ? undefined : common.uInt160ToString(hash),
+    prefix === undefined ? undefined : prefix.toString('hex'),
+  ]
+    .filter(utils.notNull)
+    .join('');
+const getStorageItemKeyMax = (key: StorageItemsKey): string => createMax(getStorageItemKeyMin(key));
 
-  if (prefix === undefined) {
-    return bytewise.encode(bytewise.sorts.array.bound.lower([storageItemKeyPrefix, common.uInt160ToBuffer(hash)]));
-  }
+const serializeUInt64 = (value: BN) => value.toString(10, 8);
 
-  return bytewise.encode(
-    bytewise.sorts.array.bound.lower([storageItemKeyPrefix, common.uInt160ToBuffer(hash), prefix]),
-  );
-};
-const getStorageItemKeyMax = ({ hash, prefix }: StorageItemsKey): Buffer => {
-  if (hash === undefined) {
-    return bytewise.encode(bytewise.sorts.array.bound.upper([storageItemKeyPrefix]));
-  }
-
-  if (prefix === undefined) {
-    return bytewise.encode(bytewise.sorts.array.bound.upper([storageItemKeyPrefix, common.uInt160ToBuffer(hash)]));
-  }
-
-  return bytewise.encode(
-    bytewise.sorts.array.bound.upper([storageItemKeyPrefix, common.uInt160ToBuffer(hash), prefix]),
-  );
-};
-
-const serializeUInt64 = (value: BN) => value.toArrayLike(Buffer, 'be', 8);
-
-const serializeActionKey = ({ index }: ActionKey): Buffer => bytewise.encode([actionKeyPrefix, serializeUInt64(index)]);
-const serializeActionKeyString = ({ index }: ActionKey): string => `${actionKeyPrefix}:${index.toString(10)}`;
-
-const getActionKeyMin = ({ indexStart }: ActionsKey): Buffer =>
-  bytewise.encode(
-    bytewise.sorts.array.bound.lower(
-      [actionKeyPrefix, indexStart === undefined ? undefined : serializeUInt64(indexStart)].filter(Boolean),
-    ),
+const serializeActionKey = ({ index }: ActionKey): string => `${actionKeyPrefix}${serializeUInt64(index)}`;
+const getActionKeyMin = ({ indexStart }: ActionsKey): string =>
+  [actionKeyPrefix, indexStart === undefined ? undefined : serializeUInt64(indexStart)].filter(utils.notNull).join('');
+const getActionKeyMax = ({ indexStop }: ActionsKey): string =>
+  createMax(
+    [actionKeyPrefix, indexStop === undefined ? undefined : serializeUInt64(indexStop)].filter(utils.notNull).join(''),
   );
 
-const getActionKeyMax = ({ indexStop }: ActionsKey): Buffer =>
-  bytewise.encode(
-    bytewise.sorts.array.bound.upper(
-      [actionKeyPrefix, indexStop === undefined ? undefined : serializeUInt64(indexStop)].filter(
-        (value) => value !== undefined,
-      ),
-    ),
-  );
+const serializeValidatorKey = ({ publicKey }: ValidatorKey): string =>
+  `${validatorKeyPrefix}${common.ecPointToString(publicKey)}`;
+const validatorMinKey = validatorKeyPrefix;
+const validatorMaxKey = createMax(validatorKeyPrefix);
 
-const serializeValidatorKey = ({ publicKey }: ValidatorKey): Buffer =>
-  bytewise.encode([validatorKeyPrefix, common.ecPointToBuffer(publicKey)]);
-const serializeValidatorKeyString = ({ publicKey }: ValidatorKey): string =>
-  `${validatorKeyPrefix}:${common.ecPointToString(publicKey)}`;
-const validatorMinKey = bytewise.encode(bytewise.sorts.array.bound.lower([validatorKeyPrefix]));
-const validatorMaxKey = bytewise.encode(bytewise.sorts.array.bound.upper([validatorKeyPrefix]));
+const serializeUInt160Key = ({ hash }: { readonly hash: UInt160 }): string => common.uInt160ToString(hash);
+const serializeUInt256Key = ({ hash }: { readonly hash: UInt256 }): string => common.uInt256ToString(hash);
 
-const serializeUInt160Key = ({ hash }: { readonly hash: UInt160 }): Buffer => common.uInt160ToBuffer(hash);
-const serializeUInt256Key = ({ hash }: { readonly hash: UInt256 }): Buffer => common.uInt256ToBuffer(hash);
+const createSerializeUInt160Key = (prefix: string) => (input: { readonly hash: UInt160 }): string =>
+  `${prefix}${serializeUInt160Key(input)}`;
+const createSerializeUInt256Key = (prefix: string) => (input: { readonly hash: UInt256 }): string =>
+  `${prefix}${serializeUInt256Key(input)}`;
 
-const createSerializeUInt160Key = (prefix: string) => (input: { readonly hash: UInt160 }): Buffer =>
-  bytewise.encode([prefix, serializeUInt160Key(input)]);
-const createSerializeUInt256Key = (prefix: string) => (input: { readonly hash: UInt256 }): Buffer =>
-  bytewise.encode([prefix, serializeUInt256Key(input)]);
+const accountMinKey = accountKeyPrefix;
+const accountMaxKey = createMax(accountKeyPrefix);
 
-const createSerializeUInt160KeyString = (prefix: string) => (input: { readonly hash: UInt160 }): string =>
-  `${prefix}:${common.uInt160ToString(input.hash)}`;
-const createSerializeUInt256KeyString = (prefix: string) => (input: { readonly hash: UInt256 }): string =>
-  `${prefix}:${common.uInt256ToString(input.hash)}`;
-
-const accountMinKey = bytewise.encode(bytewise.sorts.array.bound.lower([accountKeyPrefix]));
-const accountMaxKey = bytewise.encode(bytewise.sorts.array.bound.upper([accountKeyPrefix]));
-
-const serializeOutputKey = ({ index, hash }: OutputKey): Buffer =>
-  bytewise.encode([outputKeyPrefix, serializeUInt256Key({ hash }), index]);
-const serializeOutputKeyString = ({ index, hash }: OutputKey): string =>
-  `${outputKeyPrefix}:${common.uInt256ToString(hash)}:${index}`;
+const serializeOutputKey = ({ index, hash }: OutputKey): string =>
+  `${outputKeyPrefix}${common.uInt256ToString(hash)}${index}`;
 
 const typeKeyToSerializeKey = {
   account: createSerializeUInt160Key(accountKeyPrefix),
@@ -154,30 +113,9 @@ const typeKeyToSerializeKey = {
   invocationData: createSerializeUInt256Key(invocationDataKeyPrefix),
 };
 
-const typeKeyToSerializeKeyString = {
-  account: createSerializeUInt160KeyString(accountKeyPrefix),
-  accountUnclaimed: createSerializeAccountInputKeyString(accountUnclaimedKeyPrefix),
-
-  accountUnspent: createSerializeAccountInputKeyString(accountUnspentKeyPrefix),
-  action: serializeActionKeyString,
-  asset: createSerializeUInt256KeyString(assetKeyPrefix),
-  block: createSerializeUInt256KeyString(blockKeyPrefix),
-  blockData: createSerializeUInt256KeyString(blockDataKeyPrefix),
-  header: createSerializeUInt256KeyString(headerKeyPrefix),
-  transaction: createSerializeUInt256KeyString(transactionKeyPrefix),
-  output: serializeOutputKeyString,
-  transactionData: createSerializeUInt256KeyString(transactionDataKeyPrefix),
-  contract: createSerializeUInt160KeyString(contractKeyPrefix),
-  storageItem: serializeStorageItemKeyString,
-  validator: serializeValidatorKeyString,
-  invocationData: createSerializeUInt256KeyString(invocationDataKeyPrefix),
-};
-
 export const keys = {
-  validatorsCountKeyString,
   validatorsCountKey,
   serializeHeaderIndexHashKey,
-  serializeHeaderIndexHashKeyString,
   maxHeaderHashKey,
   maxBlockHashKey,
   getAccountUnclaimedKeyMin,
@@ -187,7 +125,6 @@ export const keys = {
   getStorageItemKeyMin,
   getStorageItemKeyMax,
   serializeActionKey,
-  serializeActionKeyString,
   getActionKeyMin,
   getActionKeyMax,
   validatorMinKey,
@@ -195,5 +132,4 @@ export const keys = {
   accountMinKey,
   accountMaxKey,
   typeKeyToSerializeKey,
-  typeKeyToSerializeKeyString,
 };

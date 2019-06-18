@@ -2615,13 +2615,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/bytewise@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@types/bytewise/-/bytewise-1.1.0.tgz#4033a0bb18edac285da965d2e0ab71ea916e6de9"
-  integrity sha512-GG5EDZ5nvBb3mTYVzdTpCXY2xAg4iLD8KS8EBQfca4/MOWe2lpCvD++gr10lkTIVk8yDwhoJ/EfPHJDG+/Rwjw==
-  dependencies:
-    "@types/node" "*"
-
 "@types/caseless@*":
   version "0.12.2"
   resolved "https://registry.yarnpkg.com/@types/caseless/-/caseless-0.12.2.tgz#f65d3d6389e01eeb458bd54dc8f52b95a9463bc8"
@@ -5667,21 +5660,6 @@ bytes@3.1.0, bytes@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-3.1.0.tgz#f6cf7933a360e0588fa9fde85651cdc7f805d1f6"
   integrity sha512-zauLjrfCG+xvoyaqLoV8bLVXXNGC4JqlxFCutSDWA6fJrTo2ZuvLYTqZ7aHBLZSMOopbzwv8f+wZcVzfVTI2Dg==
-
-bytewise-core@^1.2.2:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/bytewise-core/-/bytewise-core-1.2.3.tgz#3fb410c7e91558eb1ab22a82834577aa6bd61d42"
-  integrity sha1-P7QQx+kVWOsasiqCg0V3qmvWHUI=
-  dependencies:
-    typewise-core "^1.2"
-
-bytewise@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/bytewise/-/bytewise-1.1.0.tgz#1d13cbff717ae7158094aa881b35d081b387253e"
-  integrity sha1-HRPL/3F65xWAlKqIGzXQgbOHJT4=
-  dependencies:
-    bytewise-core "^1.2.2"
-    typewise "^1.0.3"
 
 cacache@^11.0.1, cacache@^11.2.0, cacache@^11.3.2:
   version "11.3.2"
@@ -20471,18 +20449,6 @@ typescript@^3.2.2:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.5.1.tgz#ba72a6a600b2158139c5dd8850f700e231464202"
   integrity sha512-64HkdiRv1yYZsSe4xC1WVgamNigVYjlssIoaH2HcZF0+ijsk5YK2g0G34w9wJkze8+5ow4STd22AynfO6ZYYLw==
-
-typewise-core@^1.2, typewise-core@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/typewise-core/-/typewise-core-1.2.0.tgz#97eb91805c7f55d2f941748fa50d315d991ef195"
-  integrity sha1-l+uRgFx/VdL5QXSPpQ0xXZke8ZU=
-
-typewise@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/typewise/-/typewise-1.0.3.tgz#1067936540af97937cc5dcf9922486e9fa284651"
-  integrity sha1-EGeTZUCvl5N8xdz5kiSG6fooRlE=
-  dependencies:
-    typewise-core "^1.2.0"
 
 tz-offset@0.0.1:
   version "0.0.1"

@@ -3,26 +3,24 @@ import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
-// Input: [keyBuffer, valBuffer]
+// Input: [keyBuffer]
 // Output: []
-export class PutStorageHelper extends Helper {
+export class DeleteStorageBaseHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
-    // [keyBuffer, valBuffer, keyBuffer]
-    sb.emitOp(node, 'TUCK');
-    // [map, keyBuffer, valBuffer, keyBuffer]
+    // [storage, keyBuffer]
     sb.emitHelper(node, options, sb.helpers.cacheStorage);
-    // [keyBuffer, map, valBuffer, keyBuffer]
-    sb.emitOp(node, 'SWAP');
-    // [valBuffer, keyBuffer, map, keyBuffer]
-    sb.emitOp(node, 'ROT');
-    // []
-    sb.emitOp(node, 'SETITEM');
+    // [keyBuffer, storage, keyBuffer]
+    sb.emitOp(node, 'OVER');
+    // [keyBuffer]
+    sb.emitOp(node, 'REMOVE');
     // [map, keyBuffer]
     sb.emitHelper(node, options, sb.helpers.deleteCacheStorage);
     // [keyBuffer, map]
     sb.emitOp(node, 'SWAP');
+    // [boolean, keyBuffer, map]
+    sb.emitPushBoolean(node, true);
     // []
-    sb.emitOp(node, 'REMOVE');
+    sb.emitOp(node, 'SETITEM');
   }
 }
