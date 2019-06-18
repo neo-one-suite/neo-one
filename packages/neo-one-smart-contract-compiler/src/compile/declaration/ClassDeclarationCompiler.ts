@@ -109,24 +109,30 @@ export class ClassDeclarationCompiler extends NodeCompiler<ts.ClassDeclaration> 
 
     const addProperty = (property: ts.PropertyDeclaration, innerOptions: VisitOptions) => {
       const initializer = tsUtils.initializer.getInitializer(property);
-      if (initializer !== undefined) {
-        // [thisObjectVal, thisObjectVal]
-        sb.emitOp(initializer, 'DUP');
-
-        // [thisObjectVal]
-        switchProperty(
-          property,
-          innerOptions,
-          (innerInnerOptions) => {
+      const propNode = initializer === undefined ? property : initializer;
+      // [thisObjectVal, thisObjectVal]
+      sb.emitOp(propNode, 'DUP');
+      // [thisObjectVal]
+      switchProperty(
+        property,
+        innerOptions,
+        (innerInnerOptions) => {
+          if (initializer === undefined) {
+            sb.emitHelper(propNode, sb.pushValueOptions(innerInnerOptions), sb.helpers.wrapUndefined);
+          } else {
             sb.visit(initializer, sb.pushValueOptions(innerInnerOptions));
-            sb.emitHelper(initializer, innerOptions, sb.helpers.setDataPropertyObjectProperty);
-          },
-          (innerInnerOptions) => {
+          }
+          sb.emitHelper(propNode, innerOptions, sb.helpers.setDataPropertyObjectProperty);
+        },
+        (innerInnerOptions) => {
+          if (initializer === undefined) {
+            sb.emitHelper(propNode, sb.pushValueOptions(innerInnerOptions), sb.helpers.wrapUndefined);
+          } else {
             sb.visit(initializer, sb.pushValueOptions(innerInnerOptions));
-            sb.emitHelper(initializer, innerOptions, sb.helpers.setDataSymbolObjectProperty);
-          },
-        );
-      }
+          }
+          sb.emitHelper(propNode, innerOptions, sb.helpers.setDataSymbolObjectProperty);
+        },
+      );
     };
 
     // Create constructor function

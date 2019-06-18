@@ -2,4 +2,4 @@
 
 exports[`Secondary deploy + transfer: deploy consumed 1`] = `"0"`;
 
-exports[`Secondary deploy + transfer: deploy cost 1`] = `"1.27"`;
+exports[`Secondary deploy + transfer: deploy cost 1`] = `"1.279"`;

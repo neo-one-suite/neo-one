@@ -34,14 +34,17 @@ export class DeployHelper extends Helper {
             const property = propertyPropInfo.decl;
             if (ts.isPropertyDeclaration(property)) {
               const initializer = tsUtils.initializer.getInitializer(property);
-              if (initializer !== undefined) {
+              const propNode = initializer === undefined ? property : initializer;
+              if (initializer === undefined) {
+                sb.emitHelper(propNode, sb.pushValueOptions(innerOptions), sb.helpers.wrapUndefined);
+              } else {
                 // [val]
                 sb.visit(initializer, sb.pushValueOptions(innerOptions));
-                // [name, val]
-                sb.emitPushString(property, tsUtils.node.getName(property));
-                // []
-                sb.emitHelper(property, innerOptions, sb.helpers.putCommonStorage);
               }
+              // [name, val]
+              sb.emitPushString(property, tsUtils.node.getName(property));
+              // []
+              sb.emitHelper(property, innerOptions, sb.helpers.putCommonStorage);
             } else if (ts.isParameterPropertyDeclaration(property)) {
               const name = tsUtils.node.getName(property);
               // [val]
