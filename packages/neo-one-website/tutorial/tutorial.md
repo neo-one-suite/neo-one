@@ -50,7 +50,7 @@ This tutorial assumes you'll be working with a local development environment. **
 
 Here's how to setup your local development environment:
 
-1. Install [Node](https://nodejs.org) >= 8.9.0 (We recommend the latest version)
+1. Install [Node](https://nodejs.org) >= 8.16.0 (We recommend the latest version)
   - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
   - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
 2. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.

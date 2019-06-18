@@ -14,7 +14,7 @@ This page describes how to setup NEO•ONE using `yarn` or `npm`.
 
 ## Requirements
 
-- [Node](https://nodejs.org) >= 8.9.0 (We recommend the latest version)
+- [Node](https://nodejs.org) >= 8.16.0 (We recommend the latest version)
   - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
   - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
 

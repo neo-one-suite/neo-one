@@ -21,7 +21,7 @@ export const babel = ({
       [
         '@babel/preset-env',
         {
-          targets: stage === 'node' ? { node: bundle === 'server' ? '8.9.0' : true } : { browsers },
+          targets: stage === 'node' ? { node: bundle === 'server' ? '8.16.0' : true } : { browsers },
           modules: false,
           useBuiltIns: 'usage',
           corejs: 3,

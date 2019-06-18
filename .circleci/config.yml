@@ -11,18 +11,6 @@ aliases:
       - ~/.cache/yarn
     key: v5-yarn-8-{{ .Branch }}-{{ checksum "yarn.lock" }}
 
-  - &restore-yarn-cache-9
-    keys:
-      - v5-yarn-9-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      # Fallback in case checksum fails
-      - v5-yarn-9-{{ .Branch }}-
-
-  - &save-yarn-cache-9
-    paths:
-      - node_modules
-      - ~/.cache/yarn
-    key: v5-yarn-9-{{ .Branch }}-{{ checksum "yarn.lock" }}
-
   - &restore-yarn-cache-10
     keys:
       - v5-yarn-10-{{ .Branch }}-{{ checksum "yarn.lock" }}
@@ -34,18 +22,6 @@ aliases:
       - node_modules
       - ~/.cache/yarn
     key: v5-yarn-10-{{ .Branch }}-{{ checksum "yarn.lock" }}
-
-  - &restore-yarn-cache-11
-    keys:
-      - v5-yarn-11-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      # Fallback in case checksum fails
-      - v5-yarn-11-{{ .Branch }}-
-
-  - &save-yarn-cache-11
-    paths:
-      - node_modules
-      - ~/.cache/yarn
-    key: v5-yarn-11-{{ .Branch }}-{{ checksum "yarn.lock" }}
 
   - &filter-ignore-bors-tmp
     branches:
@@ -121,49 +97,6 @@ aliases:
           path: reports
     parallelism: 2
 
-  - &build-e2e9
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - restore-cache: *restore-yarn-cache-9
-      - run: *yarn
-      - save-cache: *save-yarn-cache-9
-      - run:
-          name: Build
-          command: yarn build:e2e
-      - persist_to_workspace:
-          root: ~/neo-one
-          paths:
-            - dist
-            - node_modules
-
-  - &test9
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - restore-cache: *restore-yarn-cache-9
-      - run: *yarn
-      - save-cache: *save-yarn-cache-9
-      - run:
-          name: Test
-          command: yarn test-ci-9 $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings)
-      - store_test_results:
-          path: reports
-    parallelism: 2
-
-  - &e2e9
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ./
-      - run:
-          name: E2E
-          command: yarn e2e-ci-9 $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
-      - store_test_results:
-          path: reports
-    parallelism: 2
-
   - &build-e2e10
     working_directory: ~/neo-one
     steps:
@@ -215,72 +148,13 @@ aliases:
           path: reports
     parallelism: 2
 
-  - &build-e2e11
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - restore-cache: *restore-yarn-cache-11
-      - run: *yarn
-      - save-cache: *save-yarn-cache-11
-      - run:
-          name: Build
-          command: yarn build:e2e
-      - persist_to_workspace:
-          root: ~/neo-one
-          paths:
-            - dist
-            - node_modules
-
-  - &test11
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - restore-cache: *restore-yarn-cache-11
-      - run: *yarn
-      - save-cache: *save-yarn-cache-11
-      - run:
-          name: Test
-          command: yarn test-ci $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
-      - run:
-          name: Upload Unit Test Coverage
-          command: yarn run codecov -f coverage/coverage-final.json -F unit
-          when: always
-      - store_test_results:
-          path: reports
-    parallelism: 2
-
-  - &e2e11
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ./
-      - run:
-          name: E2E
-          command: yarn nyc --reporter json yarn e2e-ci $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
-      - run:
-          name: Upload E2E Test Coverage
-          command: yarn run codecov -f coverage/coverage-final.json -F e2e
-          when: always
-      - store_test_results:
-          path: reports
-    parallelism: 2
-
 node8: &node8
   docker:
-    - image: neotracker/neo-one-circleci-node:8.9.0-4
-
-node9: &node9
-  docker:
-    - image: neotracker/neo-one-circleci-node:9.11.2-3
+    - image: neotracker/neo-one-circleci-node:8.16.0-4
 
 node10: &node10
   docker:
-    - image: neotracker/neo-one-circleci-node:10.13.0-1
-
-node11: &node11
-  docker:
-    - image: neotracker/neo-one-circleci-node:11.0.0-1
+    - image: neotracker/neo-one-circleci-node:10.16.0-1
 
 version: 2
 jobs:
@@ -294,16 +168,6 @@ jobs:
     <<: *node8
     <<: *build-e2e8
 
-  test9:
-    <<: *node9
-    <<: *test9
-  e2e9:
-    <<: *node9
-    <<: *e2e9
-  build-e2e9:
-    <<: *node9
-    <<: *build-e2e9
-
   test10:
     <<: *node10
     <<: *test10
@@ -313,16 +177,6 @@ jobs:
   build-e2e10:
     <<: *node10
     <<: *build-e2e10
-
-  test11:
-    <<: *node11
-    <<: *test11
-  e2e11:
-    <<: *node11
-    <<: *e2e11
-  build-e2e11:
-    <<: *node11
-    <<: *build-e2e11
 
   lint:
     <<: *node10
@@ -339,16 +193,6 @@ workflows:
       - e2e8:
           requires:
             - build-e2e8
-          filters: *filter-ignore-bors-tmp
-  test9:
-    jobs:
-      - build-e2e9:
-          filters: *filter-ignore-bors-tmp
-      - test9:
-          filters: *filter-ignore-bors-tmp
-      - e2e9:
-          requires:
-            - build-e2e9
           filters: *filter-ignore-bors-tmp
   test10:
     jobs:

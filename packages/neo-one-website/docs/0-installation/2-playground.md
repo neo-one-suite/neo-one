@@ -14,7 +14,7 @@ This guide will walk you through getting started with the [NEO•ONE Playground]
 
 ## Requirements
 
-  - [Node](https://nodejs.org) >= 8.9.0 (We recommend the latest version)
+  - [Node](https://nodejs.org) >= 8.16.0 (We recommend the latest version)
   - a package manager: [yarn](https://yarnpkg.com/)   **OR**   npm (distributed with Node)
 
 ---

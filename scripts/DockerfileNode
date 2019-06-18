@@ -1,4 +1,4 @@
-FROM neotracker/neo-one-circleci-node:10.13.0-1 as builder
+FROM neotracker/neo-one-circleci-node:10.16.0-1 as builder
 RUN mkdir -p /tmp/neo-one
 WORKDIR tmp/neo-one
 
