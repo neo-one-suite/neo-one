@@ -1,0 +1,104 @@
+"0xb8617fe166015cf4d272ba828bcce5b317b7e96bbab00add4ef36489947d02c4
+{ blockHash:
+   '0xc1300ab74b8ef5a38acdfa9dba891e99a9024e5e2aa1d2ddfabc130e8900a126',
+  blockIndex: 3534226,
+  transactionIndex: 8,
+  globalIndex: 25449567 }
+{ result:
+   { state: 'HALT',
+     gasConsumed: 0,
+     gasCost: 8.246,
+     stack: [ [Object] ] },
+  asset: undefined,
+  contracts: [],
+  deletedContractAddresses: [],
+  migratedContractAddresses: [],
+  actions:
+   [ { type: 'Notification',
+       version: 0,
+       blockIndex: 3534226,
+       blockHash:
+        '0xc1300ab74b8ef5a38acdfa9dba891e99a9024e5e2aa1d2ddfabc130e8900a126',
+       transactionIndex: 8,
+       transactionHash:
+        '0xb8617fe166015cf4d272ba828bcce5b317b7e96bbab00add4ef36489947d02c4',
+       index: 0,
+       globalIndex: 14147623,
+       address: 'AbArunq3PGYmQv4xhduTKva7r2ppUqeaDi',
+       args: [Array] },
+     { type: 'Notification',
+       version: 0,
+       blockIndex: 3534226,
+       blockHash:
+        '0xc1300ab74b8ef5a38acdfa9dba891e99a9024e5e2aa1d2ddfabc130e8900a126',
+       transactionIndex: 8,
+       transactionHash:
+        '0xb8617fe166015cf4d272ba828bcce5b317b7e96bbab00add4ef36489947d02c4',
+       index: 1,
+       globalIndex: 14147624,
+       address: 'AbArunq3PGYmQv4xhduTKva7r2ppUqeaDi',
+       args: [Array] },
+     { type: 'Notification',
+       version: 0,
+       blockIndex: 3534226,
+       blockHash:
+        '0xc1300ab74b8ef5a38acdfa9dba891e99a9024e5e2aa1d2ddfabc130e8900a126',
+       transactionIndex: 8,
+       transactionHash:
+        '0xb8617fe166015cf4d272ba828bcce5b317b7e96bbab00add4ef36489947d02c4',
+       index: 2,
+       globalIndex: 14147625,
+       address: 'AUdawyrLMskxXMUE8osX9mSLKz8R7777kE',
+       args: [Array] },
+     { type: 'Notification',
+       version: 0,
+       blockIndex: 3534226,
+       blockHash:
+        '0xc1300ab74b8ef5a38acdfa9dba891e99a9024e5e2aa1d2ddfabc130e8900a126',
+       transactionIndex: 8,
+       transactionHash:
+        '0xb8617fe166015cf4d272ba828bcce5b317b7e96bbab00add4ef36489947d02c4',
+       index: 3,
+       globalIndex: 14147626,
+       address: 'AUdawyrLMskxXMUE8osX9mSLKz8R7777kE',
+       args: [Array] },
+     { type: 'Notification',
+       version: 0,
+       blockIndex: 3534226,
+       blockHash:
+        '0xc1300ab74b8ef5a38acdfa9dba891e99a9024e5e2aa1d2ddfabc130e8900a126',
+       transactionIndex: 8,
+       transactionHash:
+        '0xb8617fe166015cf4d272ba828bcce5b317b7e96bbab00add4ef36489947d02c4',
+       index: 4,
+       globalIndex: 14147627,
+       address: 'AUdawyrLMskxXMUE8osX9mSLKz8R7777kE',
+       args: [Array] },
+     { type: 'Notification',
+       version: 0,
+       blockIndex: 3534226,
+       blockHash:
+        '0xc1300ab74b8ef5a38acdfa9dba891e99a9024e5e2aa1d2ddfabc130e8900a126',
+       transactionIndex: 8,
+       transactionHash:
+        '0xb8617fe166015cf4d272ba828bcce5b317b7e96bbab00add4ef36489947d02c4',
+       index: 5,
+       globalIndex: 14147628,
+       address: 'AUdawyrLMskxXMUE8osX9mSLKz8R7777kE',
+       args: [Array] } ],
+  storageChanges:
+   [ { type: 'Add',
+       address: 'AbArunq3PGYmQv4xhduTKva7r2ppUqeaDi',
+       key: '62616c616e6365732fbaa22d64a8c8f5a9940f359cb0cb1dfe49eb2c',
+       value:
+        '820100148d085e441a6e2e751e60146b9da2662b5afcc0c9020688c132e98e00' },
+     { type: 'Delete',
+       address: 'AUdawyrLMskxXMUE8osX9mSLKz8R7777kE',
+       key:
+        '42616c616e63655072656669785f002fbaa22d64a8c8f5a9940f359cb0cb1dfe49eb2c' },
+     { type: 'Modify',
+       address: 'AUdawyrLMskxXMUE8osX9mSLKz8R7777kE',
+       key:
+        '42616c616e63655072656669785f00d4c357a466cf12e8167b00a440f782705dcf2ba3',
+       value: '65aacad8cc00' } ] }
+[ { usage: 'Script', data: 'AL8Ez38qrKV6y12mQ5ovmKwA1WkmKURuFE' } ]"

@@ -219,7 +219,7 @@ const checkWitnessBuffer = async ({
       publicKey: common.bufferToECPoint(hashOrPublicKey),
     });
   }
-
+  // console.log(hashOrPublicKey);
   return checkWitness({
     context,
     hash: common.bufferToUInt160(hashOrPublicKey),
@@ -348,6 +348,15 @@ const createPut = ({ name }: { readonly name: 'Neo.Storage.Put' | 'Neo.Storage.P
     .div(utils.ONE_THOUSAND_TWENTY_FOUR)
     .add(utils.ONE);
 
+  // console.log(
+  //   new BN(keyIn.asBuffer().length)
+  //     .add(new BN(valueIn.asBuffer().length))
+  //     .sub(utils.ONE)
+  //     .div(utils.ONE_THOUSAND_TWENTY_FOUR)
+  //     .add(utils.ONE)
+  //     .toNumber(),
+  // );
+
   return createSysCall({
     name,
     in: expectedIn,
@@ -369,7 +378,6 @@ const createPut = ({ name }: { readonly name: 'Neo.Storage.Put' | 'Neo.Storage.P
         name === 'Neo.Storage.Put' ? StorageFlags.None : assertStorageFlags(args[3].asBigIntegerUnsafe().toNumber());
       const item = await context.blockchain.storageItem.tryGet({ hash, key });
       if (item === undefined) {
-        // console.log(`adding: ${key.toString('hex')}: ${value.toString('hex')}`);
         await context.blockchain.storageItem.add(new StorageItem({ hash, key, value, flags }));
       } else if (hasStorageFlag(item.flags, StorageFlags.Constant)) {
         throw new ConstantStorageError(context, key);
@@ -405,17 +413,25 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     in: 1,
     out: 1,
     fee: FEES.TWO_HUNDRED,
-    invoke: async ({ context, args }) => ({
-      context,
-      results: [
-        new BooleanStackItem(
-          await checkWitnessBuffer({
-            context,
-            hashOrPublicKey: args[0].asBuffer(),
-          }),
-        ),
-      ],
-    }),
+    invoke: async ({ context, args }) => {
+      const result = await checkWitnessBuffer({
+        context,
+        hashOrPublicKey: args[0].asBuffer(),
+      });
+
+      // console.log(`witnessCheck: ${result}`);
+      return {
+        context,
+        results: [
+          new BooleanStackItem(
+            await checkWitnessBuffer({
+              context,
+              hashOrPublicKey: args[0].asBuffer(),
+            }),
+          ),
+        ],
+      };
+    },
   }),
 
   'Neo.Runtime.Notify': createSysCall({
@@ -433,6 +449,16 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
         });
       }
 
+      // args[0].isArray()
+      //   ? console.log(
+      //       args[0]
+      //         .asArray()[0]
+      //         .asBuffer()
+      //         .toString('utf8'),
+      //     )
+      //   : console.log(args[0].asBuffer().toString('utf-8'));
+      // args[0].isArray() ? args[0].asArray().map((item) => console.log(item)) : [args[0].toContractParameter()];
+
       return { context };
     },
   }),
@@ -442,6 +468,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     in: 1,
     invoke: async ({ context, args }) => {
       const { onLog } = context.init.listeners;
+      // console.log(args[0].asString());
       if (onLog !== undefined) {
         onLog({
           scriptHash: context.scriptHash,
@@ -491,7 +518,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     out: 1,
     invoke: async ({ context, args }) => {
       const deserialized = deserializeStackItem(args[0].asBuffer());
-
+      // console.log(deserialized);
       return { context, results: [deserialized] };
     },
   }),
@@ -499,10 +526,12 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
   'Neo.Blockchain.GetHeight': createSysCall({
     name: 'Neo.Blockchain.GetHeight',
     out: 1,
-    invoke: ({ context }) => ({
-      context,
-      results: [new IntegerStackItem(new BN(context.blockchain.currentBlock.index))],
-    }),
+    invoke: ({ context }) => {
+      return {
+        context,
+        results: [new IntegerStackItem(new BN(context.blockchain.currentBlock.index))],
+      };
+    },
   }),
 
   'Neo.Blockchain.GetHeader': createSysCall({
@@ -706,10 +735,12 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     name: 'Neo.Header.GetTimestamp',
     in: 1,
     out: 1,
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new IntegerStackItem(new BN(args[0].asBlockBase().timestamp))],
-    }),
+    invoke: ({ context, args }) => {
+      return {
+        context,
+        results: [new IntegerStackItem(new BN(args[0].asBlockBase().timestamp))],
+      };
+    },
   }),
 
   'Neo.Header.GetConsensusData': createSysCall({
@@ -801,6 +832,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     in: 1,
     out: 1,
     invoke: ({ context, args }) => {
+      // console.log(args[0].asTransaction().attributes);
       if (args[0].asTransaction().attributes.length > MAX_ARRAY_SIZE) {
         /* istanbul ignore next */
         throw new ContainerTooLargeError(context);
@@ -997,20 +1029,27 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     name: 'Neo.Attribute.GetUsage',
     in: 1,
     out: 1,
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new IntegerStackItem(new BN(args[0].asAttribute().usage))],
-    }),
+    invoke: ({ context, args }) => {
+      // console.log(args);
+      // console.log(new BN(args[0].asAttribute().usage));
+      return {
+        context,
+        results: [new IntegerStackItem(new BN(args[0].asAttribute().usage))],
+      };
+    },
   }),
 
   'Neo.Attribute.GetData': createSysCall({
     name: 'Neo.Attribute.GetData',
     in: 1,
     out: 1,
-    invoke: ({ context, args }) => ({
-      context,
-      results: [args[0].asAttributeStackItem().toValueStackItem()],
-    }),
+    invoke: ({ context, args }) => {
+      // console.log(args[0].asAttributeStackItem().toValueStackItem());
+      return {
+        context,
+        results: [args[0].asAttributeStackItem().toValueStackItem()],
+      };
+    },
   }),
 
   'Neo.Input.GetHash': createSysCall({
@@ -1207,10 +1246,13 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
   'Neo.Storage.GetContext': createSysCall({
     name: 'Neo.Storage.GetContext',
     out: 1,
-    invoke: ({ context }) => ({
-      context,
-      results: [new StorageContextStackItem(context.scriptHash)],
-    }),
+    invoke: ({ context }) => {
+      // console.log('getting context...');
+      return {
+        context,
+        results: [new StorageContextStackItem(context.scriptHash)],
+      };
+    },
   }),
 
   'Neo.Storage.GetReadOnlyContext': createSysCall({
@@ -1231,11 +1273,12 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
       const hash = vmUtils.toStorageContext({ context, value: args[0] }).value;
       await checkStorage({ context, hash });
 
+      // console.log(`hash: ${hash.toString('hex')}, key: ${args[1].asBuffer().toString('hex')}`);
       const item = await context.blockchain.storageItem.tryGet({
         hash,
         key: args[1].asBuffer(),
       });
-
+      // console.log(item);
       const result = item === undefined ? Buffer.from([]) : item.value;
 
       return {
@@ -1252,13 +1295,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     invoke: async ({ context, args }) => {
       const hash = vmUtils.toStorageContext({ context, value: args[0] }).value;
       await checkStorage({ context, hash });
-      // const item = await context.blockchain.storageItem.tryGet({
-      //   hash,
-      //   key: Buffer.from('7072656669788102020105000100', 'hex'),
-      // });
-      // console.log(item);
       const prefix = args[1].asBuffer();
-      // console.log(`looking for: ${prefix.toString('hex')}`);
       const iterable = AsyncIterableX.from<StorageItem>(context.blockchain.storageItem.getAll$({ hash, prefix })).pipe<{
         key: BufferStackItem;
         value: BufferStackItem;
@@ -1741,10 +1778,12 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
   'System.ExecutionEngine.GetExecutingScriptHash': createSysCall({
     name: 'System.ExecutionEngine.GetExecutingScriptHash',
     out: 1,
-    invoke: async ({ context }) => ({
-      context,
-      results: [new UInt160StackItem(context.scriptHash)],
-    }),
+    invoke: async ({ context }) => {
+      return {
+        context,
+        results: [new UInt160StackItem(context.scriptHash)],
+      };
+    },
   }),
 
   'System.ExecutionEngine.GetCallingScriptHash': createSysCall({

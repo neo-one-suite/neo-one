@@ -1,0 +1,14 @@
+"{ type: 'Add',
+  address: 'AUdawyrLMskxXMUE8osX9mSLKz8R7777kE',
+  key:
+   '42616c616e63655072656669785f002fbaa22d64a8c8f5a9940f359cb0cb1dfe49eb2c',
+  value: '8023bce88e00' }
+{ type: 'Add',
+  address: 'AUdawyrLMskxXMUE8osX9mSLKz8R7777kE',
+  key:
+   '42616c616e63655072656669785f00d4c357a466cf12e8167b00a440f782705dcf2ba3',
+  value: 'e5860ef03d' }
+{ type: 'Add',
+  address: 'AbArunq3PGYmQv4xhduTKva7r2ppUqeaDi',
+  key: '62616c616e6365732fbaa22d64a8c8f5a9940f359cb0cb1dfe49eb2c',
+  value: '820100148d085e441a6e2e751e60146b9da2662b5afcc0c90203089e76' }"

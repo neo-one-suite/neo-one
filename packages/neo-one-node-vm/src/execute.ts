@@ -33,15 +33,21 @@ import {
 } from './errors';
 import { lookupOp } from './opcodes';
 import { StackItem } from './stackItem';
+import fs from 'fs-extra';
+import _ from 'lodash';
+
+const OP_LIST = [];
 
 const getErrorMessage = (error: Error) => `${error.message}\n${error.stack}`;
 
 const executeNext = async ({
   monitor,
   context: contextIn,
+  log,
 }: {
   readonly monitor: Monitor;
   readonly context: ExecutionContext;
+  readonly log: boolean;
 }): Promise<ExecutionContext> => {
   let context = contextIn;
   if (context.state !== VMState.None) {
@@ -72,6 +78,8 @@ const executeNext = async ({
 
   const args = context.stack.slice(0, op.in);
   const argsAlt = context.stackAlt.slice(0, op.inAlt);
+  // console.log(`${op.name}: ${op.fee.toString(10)}`);
+  // OP_LIST.push({ op: op.name, currentGAS: context.gasLeft.toString(10), fee: op.fee.toString(10) });
 
   context = {
     ...context,
@@ -85,6 +93,12 @@ const executeNext = async ({
   };
 
   if (context.gasLeft.lt(utils.ZERO)) {
+    // console.log(context.gasLeft.toString(10));
+    // console.log(context.gasLeft.add(op.fee).toString(10));
+    // console.log(op.fee.toString(10));
+    const index = _.findIndex(OP_LIST, (o) => o.currentGAS === '1000000000' && o.op === 'PUSH0');
+    const printOps = OP_LIST.slice(index);
+    fs.writeJSONSync('/Users/alexfrag/Documents/Development/NEO/neo-one/scripts/verify/ops.json', printOps);
     throw new OutOfGASError(context);
   }
 
@@ -141,16 +155,18 @@ const executeNext = async ({
 const run = async ({
   monitor,
   context: contextIn,
+  log,
 }: {
   readonly monitor: Monitor;
   readonly context: ExecutionContext;
+  readonly log: boolean;
 }): Promise<ExecutionContext> => {
   let context = contextIn;
   // tslint:disable-next-line no-loop-statement
   while (context.state === VMState.None) {
     try {
       // eslint-disable-next-line
-      context = await executeNext({ monitor, context });
+      context = await executeNext({ monitor, context, log });
     } catch (error) {
       context = {
         state: VMState.Fault,
@@ -197,6 +213,7 @@ export const executeScript = async ({
     stackCount = 0,
     pc = 0,
   } = {},
+  log,
 }: {
   readonly monitor: Monitor;
   readonly code: Buffer;
@@ -204,6 +221,7 @@ export const executeScript = async ({
   readonly init: ExecutionInit;
   readonly gasLeft: BN;
   readonly options?: Partial<Options>;
+  readonly log: boolean;
 }): Promise<ExecutionContext> => {
   const scriptHash = crypto.hash160(code);
 
@@ -229,7 +247,7 @@ export const executeScript = async ({
     stackCount,
   };
 
-  return monitor.captureSpanLog(async (span) => run({ monitor: span, context }), {
+  return monitor.captureSpanLog(async (span) => run({ monitor: span, context, log }), {
     name: 'neo_execute_script',
     level: { log: 'debug', span: 'debug' },
     error: { level: 'debug' },
@@ -261,6 +279,7 @@ export const execute = async ({
   skipWitnessVerify = false,
   persistingBlock,
   vmFeatures,
+  log,
 }: {
   readonly monitor: Monitor;
   readonly scripts: ReadonlyArray<Script>;
@@ -274,6 +293,7 @@ export const execute = async ({
   readonly skipWitnessVerify?: boolean;
   readonly persistingBlock?: Block;
   readonly vmFeatures: VMFeatureSwitches;
+  readonly log: boolean;
 }): Promise<ExecuteScriptsResult> => {
   const monitor = monitorIn.at('vm');
   const init = {
@@ -305,7 +325,8 @@ export const execute = async ({
       //       to callingScriptHash within executeScript. executeScript
       //       automatically hashes the input code to determine the current
       //       scriptHash.
-      const scriptHash = idx - 1 > 0 ? crypto.hash160(scripts[idx - 1].code) : undefined;
+      const scriptHash = idx - 1 >= 0 ? crypto.hash160(scripts[idx - 1].code) : undefined;
+      // console.log(scriptHash === undefined ? undefined : scriptHash.toString('hex'));
       let options: Options = {
         depth: scripts.length - idx,
         stack: [],
@@ -337,6 +358,7 @@ export const execute = async ({
         init,
         gasLeft: gas,
         options,
+        log,
       });
 
       gas = context.gasLeft;
@@ -347,7 +369,9 @@ export const execute = async ({
   } finally {
     span.end(err !== undefined);
   }
-
+  const index = _.findIndex(OP_LIST, (o) => o.currentGAS === '1000000000' && o.op === 'PUSH0');
+  const printOps = OP_LIST.slice(index);
+  fs.writeJSONSync('/Users/alexfrag/Documents/Development/NEO/neo-one/scripts/verify/ops.json', printOps);
   const finalContext = context;
   if (finalContext === undefined) {
     return {

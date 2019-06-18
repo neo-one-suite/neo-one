@@ -1,0 +1,104 @@
+"0xaabe4a5d967c841cac2d5fb9ec8582181e4f3e33aaacf198f538745ebe8e1dbc
+{ blockHash:
+   '0xa7897591485fb1a445382019e9cc5b750a2422bcf81440f28cae928ea6d45395',
+  blockIndex: 3534243,
+  transactionIndex: 7,
+  globalIndex: 25449765 }
+{ result:
+   { state: 'FAULT',
+     gasConsumed: 0,
+     gasCost: 0.337,
+     stack: [],
+     message:
+      'Insufficient return values. Found 0, expected 1\nPC:4449\nStack:\n\nLine:1\nScript Hash:0xa32bcf5d7082f740a4007b16e812cf66a457c3d4\nError [VM_ERROR]: Insufficient return values. Found 0, expected 1\nPC:4449\nStack:\n\nLine:1\nScript Hash:0xa32bcf5d7082f740a4007b16e812cf66a457c3d4\n    at Object.invoke (/Users/alexfrag/Documents/Development/NEO/neo-one/dist/neo-one/packages/neo-one-node-vm/opcodes.ts:433:19)' },
+  asset: undefined,
+  contracts: [],
+  deletedContractAddresses: [],
+  migratedContractAddresses: [],
+  actions:
+   [ { type: 'Notification',
+       version: 0,
+       blockIndex: 3534243,
+       blockHash:
+        '0xa7897591485fb1a445382019e9cc5b750a2422bcf81440f28cae928ea6d45395',
+       transactionIndex: 7,
+       transactionHash:
+        '0xaabe4a5d967c841cac2d5fb9ec8582181e4f3e33aaacf198f538745ebe8e1dbc',
+       index: 0,
+       globalIndex: 14147935,
+       address: 'AUdawyrLMskxXMUE8osX9mSLKz8R7777kE',
+       args: [Array] },
+     { type: 'Notification',
+       version: 0,
+       blockIndex: 3534243,
+       blockHash:
+        '0xa7897591485fb1a445382019e9cc5b750a2422bcf81440f28cae928ea6d45395',
+       transactionIndex: 7,
+       transactionHash:
+        '0xaabe4a5d967c841cac2d5fb9ec8582181e4f3e33aaacf198f538745ebe8e1dbc',
+       index: 1,
+       globalIndex: 14147936,
+       address: 'AUdawyrLMskxXMUE8osX9mSLKz8R7777kE',
+       args: [Array] },
+     { type: 'Notification',
+       version: 0,
+       blockIndex: 3534243,
+       blockHash:
+        '0xa7897591485fb1a445382019e9cc5b750a2422bcf81440f28cae928ea6d45395',
+       transactionIndex: 7,
+       transactionHash:
+        '0xaabe4a5d967c841cac2d5fb9ec8582181e4f3e33aaacf198f538745ebe8e1dbc',
+       index: 2,
+       globalIndex: 14147937,
+       address: 'AUdawyrLMskxXMUE8osX9mSLKz8R7777kE',
+       args: [Array] },
+     { type: 'Notification',
+       version: 0,
+       blockIndex: 3534243,
+       blockHash:
+        '0xa7897591485fb1a445382019e9cc5b750a2422bcf81440f28cae928ea6d45395',
+       transactionIndex: 7,
+       transactionHash:
+        '0xaabe4a5d967c841cac2d5fb9ec8582181e4f3e33aaacf198f538745ebe8e1dbc',
+       index: 3,
+       globalIndex: 14147938,
+       address: 'AUdawyrLMskxXMUE8osX9mSLKz8R7777kE',
+       args: [Array] },
+     { type: 'Notification',
+       version: 0,
+       blockIndex: 3534243,
+       blockHash:
+        '0xa7897591485fb1a445382019e9cc5b750a2422bcf81440f28cae928ea6d45395',
+       transactionIndex: 7,
+       transactionHash:
+        '0xaabe4a5d967c841cac2d5fb9ec8582181e4f3e33aaacf198f538745ebe8e1dbc',
+       index: 4,
+       globalIndex: 14147939,
+       address: 'AUdawyrLMskxXMUE8osX9mSLKz8R7777kE',
+       args: [Array] },
+     { type: 'Notification',
+       version: 0,
+       blockIndex: 3534243,
+       blockHash:
+        '0xa7897591485fb1a445382019e9cc5b750a2422bcf81440f28cae928ea6d45395',
+       transactionIndex: 7,
+       transactionHash:
+        '0xaabe4a5d967c841cac2d5fb9ec8582181e4f3e33aaacf198f538745ebe8e1dbc',
+       index: 5,
+       globalIndex: 14147940,
+       address: 'AbArunq3PGYmQv4xhduTKva7r2ppUqeaDi',
+       args: [Array] } ],
+  storageChanges: [] }
+[ { usage: 'Hash1',
+    data:
+     '0x0000000000000000000000000000000000000000000000000000000000000051' },
+  { usage: 'Hash2',
+    data:
+     '0x000000000000000000000000c9c0fc5a2b66a29d6b14601e752e6e1a445e088d' },
+  { usage: 'Hash4',
+    data:
+     '0x0000000000000000000000002ceb49fe1dcbb09c350f94a9f5c8a8642da2ba2f' },
+  { usage: 'Hash5',
+    data:
+     '0x0000000000000000000000000000000000000000000000000000008ee8bc2380' },
+  { usage: 'Script', data: 'AbArunq3PGYmQv4xhduTKva7r2ppUqeaDi' } ]"

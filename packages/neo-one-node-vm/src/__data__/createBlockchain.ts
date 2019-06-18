@@ -35,6 +35,9 @@ export const createBlockchain = ({ contracts = [] }: { readonly contracts?: Read
 
       return contract;
     });
+    blockchain.contract.tryGet = jest.fn(
+      async ({ hash }) => scriptHashToContract[common.uInt160ToString(hash)] as Contract | undefined,
+    );
   }
 
   const storage: { [key: string]: Storages } = {};

@@ -132,7 +132,7 @@ export class StackItemBase implements Equatable {
   }
 
   public asBigInteger(currentBlockIndex: number): BN {
-    if (currentBlockIndex < BLOCK_HEIGHT_MAX_SIZE_CHECKS) {
+    if (currentBlockIndex < BLOCK_HEIGHT_MAX_SIZE_CHECKS || currentBlockIndex === undefined) {
       return this.asBigIntegerUnsafe();
     }
     const value = this.asBuffer();

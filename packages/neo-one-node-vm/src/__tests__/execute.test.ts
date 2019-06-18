@@ -1,5 +1,5 @@
 // tslint:disable no-any no-let no-object-mutation no-empty
-import { common, crypto, ScriptBuilder, UInt160, utils, VMState } from '@neo-one/client-common';
+import { common, crypto, ScriptBuilder, UInt160, utils, VMState, JSONHelper } from '@neo-one/client-common';
 import { DefaultMonitor } from '@neo-one/monitor';
 import {
   ArrayContractParameter,
@@ -17,8 +17,9 @@ import {
 } from '@neo-one/node-core';
 import BN from 'bn.js';
 import _ from 'lodash';
-import { assets, createBlockchain, factory, testUtils, transactions } from '../__data__';
+import { assets, createBlockchain, factory, testUtils, transactions, keys } from '../__data__';
 import { execute } from '../execute';
+import fs from 'fs-extra';
 
 const monitor = DefaultMonitor.create({
   service: 'test',
@@ -1419,7 +1420,7 @@ describe('execute', () => {
     const primaryAddressScriptHash = common.asUInt160(Buffer.from('7d2185c97fa43cb41c5617941c6b68d146a84ae5', 'hex'));
     const altAddressScriptHash = common.asUInt160(Buffer.from('a48c1ae6617e509347e5a385624b15f8872c8802', 'hex'));
 
-    test.only('deploy & transfer', async () => {
+    test('deploy & transfer', async () => {
       const ret = await deploy();
       expect(ret).toBeTruthy();
       await setOtcApprove(0, primaryAddressScriptHash);
@@ -1460,6 +1461,700 @@ describe('execute', () => {
       await transfer(altAddressScriptHash, primaryAddressScriptHash, new BN(120000000000));
 
       testUtils.verifyListeners(listeners);
+    });
+  });
+
+  describe('Switcheo V3.1', () => {
+    const { switcheoV3Contract, switcheoV2TokenContract, nosTokenContract } = transactions;
+
+    const switcheoTokenTransfer = async (from: UInt160, to: UInt160, amount: BN) => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder().emitAppCall(switcheoV2TokenContract.hash, 'transfer', from, to, amount).build(),
+        }),
+        gas: common.ONE_HUNDRED_FIXED8,
+      });
+
+      expectSuccess(result);
+    };
+
+    const switcheoTokenDeploy = async () => {
+      const deployResult = await executeSetupScript(
+        new ScriptBuilder().emitAppCall(switcheoV2TokenContract.hash, 'deploy').build(),
+      );
+      expect(deployResult.asBoolean()).toBeTruthy();
+    };
+
+    const nosTokenTransfer = async (from: UInt160, to: UInt160, amount: Buffer) => {
+      const transaction = transactions.createInvocation({
+        script: new ScriptBuilder().emitAppCall(nosTokenContract.hash, 'transfer', from, to, amount).build(),
+      });
+
+      const result = await executeSimple({
+        blockchain,
+        transaction,
+        gas: common.ONE_HUNDRED_FIXED8,
+      });
+
+      expectSuccess(result);
+    };
+
+    const nosTokenDeploy = async () => {
+      const deployResult = await executeSetupScript(
+        new ScriptBuilder().emitAppCall(nosTokenContract.hash, 'admin', 'InitSmartContract').build(),
+      );
+      expect(deployResult.asBoolean()).toBeTruthy();
+      testUtils.verifyBlockchainSnapshot(blockchain);
+    };
+
+    const nosWhiteListTransferFromAdd = async (addr: UInt160) => {
+      const transaction = transactions.createInvocation({
+        script: new ScriptBuilder()
+          .emitAppCall(nosTokenContract.hash, 'admin', 'WhitelistTransferFromAdd', addr)
+          .build(),
+      });
+
+      const result = await executeSimple({
+        blockchain,
+        transaction,
+        gas: common.ONE_HUNDRED_FIXED8,
+      });
+
+      expectSuccess(result);
+    };
+
+    const initialize = async (addr1: UInt160, addr2: UInt160, addr3: UInt160) => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder().emitAppCall(switcheoV3Contract.hash, 'initialize', addr1, addr2, addr3).build(),
+        }),
+        gas: common.ONE_HUNDRED_FIXED8,
+      });
+
+      expectSuccess(result);
+    };
+
+    const addToWhitelist = async (address: UInt160) => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: new ScriptBuilder().emitAppCall(switcheoV3Contract.hash, 'addToWhitelist', address).build(),
+        }),
+        gas: common.ONE_HUNDRED_FIXED8,
+      });
+
+      expectSuccess(result);
+    };
+
+    const deposit = async (val: UInt160, address: UInt160, amount: BN) => {
+      const transaction = transactions.createInvocation({
+        script: new ScriptBuilder().emitAppCall(switcheoV3Contract.hash, 'deposit', val, address, amount).build(),
+      });
+
+      const result = await executeSimple({
+        blockchain,
+        transaction,
+        gas: common.ONE_HUNDRED_FIXED8,
+      });
+
+      expectSuccess(result);
+    };
+
+    const mockBlockchain = () => {
+      const timestamp = 1641700000;
+      const blockIndex = 2900000;
+      blockchain = createBlockchain({ contracts: [switcheoV3Contract, nosTokenContract, switcheoV2TokenContract] });
+
+      blockchain.currentBlock.timestamp = timestamp;
+      blockchain.currentBlock.index = blockIndex;
+
+      blockchain.header = {
+        get: jest.fn(async () => factory.createHeader({ index: blockIndex, timestamp })),
+      };
+    };
+
+    beforeEach(() => {
+      mockBlockchain();
+    });
+
+    const addr1 = common.asUInt160(Buffer.from('b7634295e58c6d7513c22d5881ba116db154e8de', 'hex'));
+    const addr2 = common.asUInt160(Buffer.from('7335f929546270b8f811a0f9427b5712457107e7', 'hex'));
+    const addr3 = common.asUInt160(Buffer.from('c202200f681f5d3b933c956cfedec18ee635bf5c', 'hex'));
+    const addr = common.asUInt160(Buffer.from('2fbaa22d64a8c8f5a9940f359cb0cb1dfe49eb2c', 'hex'));
+    const nosTokenHolderAddr = common.asUInt160(
+      Buffer.from([163, 78, 249, 186, 149, 73, 242, 165, 255, 174, 25, 102, 234, 143, 189, 222, 71, 131, 159, 32]),
+    );
+
+    const withdraw = async (attributes: ReadonlyArray<UInt256Attribute>) => {
+      const transaction = transactions.createInvocation({
+        script: new ScriptBuilder().emitTailCall(switcheoV3Contract.hash, 'withdraw').build(),
+        attributes,
+      });
+
+      const result = await executeSimple({
+        blockchain,
+        transaction,
+        log: true,
+        // gas: common.ONE_HUNDRED_FIXED8,
+      });
+
+      console.log(result.gasCost.toString(10));
+
+      expectSuccess(result);
+    };
+
+    // const withdrawAlt = async () => {
+    //   const transactionBytes = Buffer.from(
+    //     'd1012000c108776974686472617769d4c357a466cf12e8167b00a440f782705dcf2ba3000000000000000005a15100000000000000000000000000000000000000000000000000000000000000a28d085e441a6e2e751e60146b9da2662b5afcc0c9000000000000000000000000a42fbaa22d64a8c8f5a9940f359cb0cb1dfe49eb2c000000000000000000000000a58023bce88e00000000000000000000000000000000000000000000000000000020d4c357a466cf12e8167b00a440f782705dcf2ba3021ac5bd76c96d38473df4392668fe30de4f232166072c383f5cb5222b7ffdec020b003da4f07aea5c5a67912c10ae102b51ad61f6a1dc0f544a537f628c7161116850000001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600100000000000000b7634295e58c6d7513c22d5881ba116db154e8de03020000004140b56b8dd82154cfa559cbf94e0311865420e7415c1a5a1c73c0bd1cd2be7452f5711d36770e6c9912d8b25f74c03c7ed58f7ec4c5eb6f1f44bbc354fb270f5588232102c29b96cf2db558bd8265dfb29f425c9fc333a8b30c0e91b5b7338469e7939c87ac414030b45aa832d5ae9092fc549d145f0a51f3e54bc74f26effa19c0636d77b47f1d5497d6d4021283741a4f7f4f48ab5547b521c2389ad0c486c10daeeb75feac0f23210378e6c1fe50e74b2c72ddc372f5d28dca6eea5eedc182ff872f1dc617d8fed411ac',
+    //     'hex',
+    //   );
+    //   const transaction = deserializeTransactionWire({
+    //     context: { messageMagic: 7630401 },
+    //     buffer: transactionBytes,
+    //   }) as InvocationTransaction;
+
+    //   blockchain.output.get = jest.fn(async () =>
+    //     Promise.resolve(
+    //       new Output({
+    //         asset: common.stringToUInt256(common.NEO_ASSET_HASH),
+    //         value: new BN(204).mul(utils.ONE_HUNDRED_MILLION),
+    //         address: transactions.mintTransaction.outputs[1].address,
+    //       }),
+    //     ),
+    //   );
+    //   blockchain.asset.get = assets.createGetAsset();
+
+    //   const result = await executeSimple({
+    //     blockchain,
+    //     transaction,
+    //     gas: common.fixed8FromDecimal(0.001),
+    //     skipWitnessVerify: true,
+    //   });
+
+    //   expectSuccess(result);
+    // };
+
+    const n0sAttributes = [
+      new UInt256Attribute({
+        usage: 0xa1,
+        value: common.bufferToUInt256(
+          Buffer.from('5100000000000000000000000000000000000000000000000000000000000000', 'hex'),
+        ),
+      }),
+      new UInt256Attribute({
+        usage: 0xa2,
+        value: common.bufferToUInt256(
+          Buffer.concat([common.uInt160ToBuffer(nosTokenContract.hash), Buffer.alloc(12, 0)]),
+        ),
+      }),
+      new UInt256Attribute({
+        usage: 0xa4,
+        value: common.bufferToUInt256(Buffer.concat([common.uInt160ToBuffer(addr), Buffer.alloc(12, 0)])),
+      }),
+      new UInt256Attribute({
+        usage: 0xa5,
+        value: common.bufferToUInt256(
+          Buffer.from('8023bce88e000000000000000000000000000000000000000000000000000000', 'hex'),
+        ),
+      }),
+    ];
+
+    test.only('deposit & withdraw n0S tokens', async () => {
+      const depositBuff = Buffer.from('88c132e98e00', 'hex');
+      const depositBN = utils.fromSignedBuffer(depositBuff);
+
+      await nosTokenDeploy();
+      await nosWhiteListTransferFromAdd(switcheoV3Contract.hash);
+      await nosTokenTransfer(nosTokenHolderAddr, addr, depositBuff);
+      await initialize(addr3, addr2, addr1);
+      await addToWhitelist(nosTokenContract.hash);
+      await deposit(addr, nosTokenContract.hash, depositBN);
+      await withdraw(n0sAttributes);
+
+      testUtils.verifyListeners(listeners);
+    });
+
+    const switcheoAttributes = [
+      new UInt256Attribute({
+        usage: 0xa1,
+        value: common.bufferToUInt256(
+          Buffer.from('5100000000000000000000000000000000000000000000000000000000000000', 'hex'),
+        ),
+      }),
+      new UInt256Attribute({
+        usage: 0xa2,
+        value: common.bufferToUInt256(
+          Buffer.concat([common.uInt160ToBuffer(switcheoV2TokenContract.hash), Buffer.alloc(12, 0)]),
+        ),
+      }),
+      new UInt256Attribute({
+        usage: 0xa4,
+        value: common.bufferToUInt256(Buffer.concat([common.uInt160ToBuffer(addr), Buffer.alloc(12, 0)])),
+      }),
+      new UInt256Attribute({
+        usage: 0xa5,
+        value: common.bufferToUInt256(
+          Buffer.from('8023bce88e000000000000000000000000000000000000000000000000000000', 'hex'),
+        ),
+      }),
+    ];
+    const switcheoTokenHolderAddr = common.asUInt160(Buffer.from('46fca70ca7f0526d6955f915ce07cbe326fbadd0', 'hex'));
+
+    test('deposit & withdraw SWTH tokens', async () => {
+      const depositBuff = Buffer.from('88c132e98e00', 'hex');
+      const depositBN = utils.fromSignedBuffer(depositBuff);
+
+      await switcheoTokenDeploy();
+      await switcheoTokenTransfer(switcheoTokenHolderAddr, addr, depositBN);
+      await initialize(addr3, addr2, addr1);
+      await addToWhitelist(switcheoV2TokenContract.hash);
+      await deposit(addr, switcheoV2TokenContract.hash, depositBN);
+      await withdraw(switcheoAttributes);
+
+      testUtils.verifyListeners(listeners);
+    });
+  });
+
+  describe('Neo Comparison', () => {
+    const signature0 = crypto.sign({
+      message: Buffer.alloc(32, 10),
+      privateKey: keys[0].privateKey,
+    });
+
+    const signature1 = crypto.sign({
+      message: Buffer.alloc(32, 10),
+      privateKey: keys[1].privateKey,
+    });
+
+    const neoComparisonScript = new ScriptBuilder()
+      .emit(
+        Buffer.concat(
+          [new ScriptBuilder().emitOp('PUSH0').build()]
+            .concat(
+              _.range(0x01, 0x4c).map<Buffer>((idx) =>
+                new ScriptBuilder().emitOp(`PUSHBYTES${idx}` as any, Buffer.alloc(idx, 10)).build(),
+              ),
+            )
+            .concat([
+              new ScriptBuilder().emitOp('PUSHDATA1', Buffer.from([2, 10, 10])).build(),
+              new ScriptBuilder()
+                .emitOp('PUSHDATA2', Buffer.concat([Buffer.from([1, 1]), Buffer.alloc(257, 10)]))
+                .build(),
+              // new ScriptBuilder().emitOp('PUSHDATA4').emit(Buffer.concat([]).build(),
+              new ScriptBuilder().emitOp('PUSHM1').build(),
+            ])
+            .concat(
+              _.range(0x51, 0x61).map<Buffer>((idx) => new ScriptBuilder().emitOp(`PUSH${idx - 0x50}` as any).build()),
+            )
+            .concat([
+              new ScriptBuilder().emitOp('NOP').build(),
+              new ScriptBuilder()
+                .emitOp(
+                  'JMP',
+                  new ScriptBuilder()
+                    .emitInt16LE(3)
+                    .emitOp('PUSH1')
+                    .build(),
+                )
+                .build(),
+              new ScriptBuilder()
+                .emitOp(
+                  'JMPIF',
+                  new ScriptBuilder()
+                    .emitInt16LE(4)
+                    .emitOp('PUSH2')
+                    .emitOp('PUSH1')
+                    .build(),
+                )
+                .build(),
+              new ScriptBuilder()
+                .emitOp(
+                  'JMPIFNOT',
+                  new ScriptBuilder()
+                    .emitInt16LE(4)
+                    .emitOp('PUSH2')
+                    .emitOp('PUSH1')
+                    .build(),
+                )
+                .build(),
+              new ScriptBuilder()
+                .emitOp(
+                  'CALL',
+                  new ScriptBuilder()
+                    .emitInt16LE(6)
+                    .emitOp('JMP', new ScriptBuilder().emitInt16LE(5).build())
+                    .emitOp('PUSH1')
+                    .emitOp('RET')
+                    .build(),
+                )
+                .build(),
+              new ScriptBuilder().emitOp('TOALTSTACK').build(),
+              new ScriptBuilder().emitOp('DUPFROMALTSTACK').build(),
+              new ScriptBuilder().emitOp('FROMALTSTACK').build(),
+              new ScriptBuilder().emitOp('XDROP').build(),
+              new ScriptBuilder().emitOp('XSWAP').build(),
+              new ScriptBuilder().emitOp('XTUCK').build(),
+              new ScriptBuilder().emitOp('DEPTH').build(),
+              new ScriptBuilder().emitOp('DROP').build(),
+              new ScriptBuilder().emitOp('DUP').build(),
+              new ScriptBuilder().emitOp('NIP').build(),
+              new ScriptBuilder().emitOp('OVER').build(),
+              new ScriptBuilder().emitOp('PICK').build(),
+              new ScriptBuilder().emitOp('ROLL').build(),
+              new ScriptBuilder().emitOp('ROT').build(),
+              new ScriptBuilder().emitOp('SWAP').build(),
+              new ScriptBuilder().emitOp('TUCK').build(),
+              new ScriptBuilder().emitOp('CAT').build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES5', Buffer.from([11, 12, 13, 14, 15]))
+                .emitOp('PUSH1')
+                .emitOp('PUSH2')
+                .emitOp('SUBSTR')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES5', Buffer.from([11, 12, 13, 14, 15]))
+                .emitOp('PUSH1')
+                .emitOp('LEFT')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES5', Buffer.from([11, 12, 13, 14, 15]))
+                .emitOp('PUSH1')
+                .emitOp('RIGHT')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES10', Buffer.alloc(10, 10))
+                .emitOp('SIZE')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES5', Buffer.from([11, 12, 13, 14, 15]))
+                .emitOp('INVERT')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES10', Buffer.alloc(10, 0x0a))
+                .emitOp('PUSHBYTES10', Buffer.alloc(10, 0x0f))
+                .emitOp('AND')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES10', Buffer.alloc(10, 0x0a))
+                .emitOp('PUSHBYTES10', Buffer.alloc(10, 0x0f))
+                .emitOp('OR')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES10', Buffer.alloc(10, 0x0a))
+                .emitOp('PUSHBYTES10', Buffer.alloc(10, 0x0f))
+                .emitOp('XOR')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES10', Buffer.alloc(10, 0x0a))
+                .emitOp('PUSHBYTES10', Buffer.alloc(10, 0x0f))
+                .emitOp('EQUAL')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('INC')
+                .build(),
+              new ScriptBuilder().emitOp('DEC').build(),
+              new ScriptBuilder().emitOp('SIGN').build(),
+              new ScriptBuilder().emitOp('NEGATE').build(),
+              new ScriptBuilder().emitOp('ABS').build(),
+              new ScriptBuilder().emitOp('NOT').build(),
+              new ScriptBuilder().emitOp('NZ').build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH2')
+                .emitOp('ADD')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH2')
+                .emitOp('SUB')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH2')
+                .emitOp('MUL')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH2')
+                .emitOp('DIV')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH2')
+                .emitOp('MOD')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES5', Buffer.from([11, 12, 13, 14, 15]))
+                .emitOp('PUSH2')
+                .emitOp('SHL')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES5', Buffer.from([11, 12, 13, 14, 15]))
+                .emitOp('PUSH2')
+                .emitOp('SHR')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH0')
+                .emitOp('BOOLAND')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH0')
+                .emitOp('BOOLOR')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH0')
+                .emitOp('NUMEQUAL')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH0')
+                .emitOp('NUMNOTEQUAL')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH0')
+                .emitOp('LT')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH0')
+                .emitOp('GT')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH0')
+                .emitOp('LTE')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH0')
+                .emitOp('GTE')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH0')
+                .emitOp('MIN')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PUSH0')
+                .emitOp('MAX')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH2')
+                .emitOp('PUSH1')
+                .emitOp('PUSH0')
+                .emitOp('WITHIN')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('SHA1')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('SHA256')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES20', Buffer.alloc(20, 1))
+                .emitOp('HASH160')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES32', Buffer.alloc(32, 1))
+                .emitOp('HASH256')
+                .build(),
+              // new ScriptBuilder()
+              //   .emitOp(`PUSHBYTES64`, signature0)
+              //   .emitOp('PUSHBYTES33', common.ecPointToBuffer(keys[0].publicKey))
+              //   .emitOp('CHECKSIG')
+              //   .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES32', Buffer.alloc(32, 10))
+                .emitOp(`PUSHBYTES64`, signature0)
+                .emitOp('PUSHBYTES33', common.ecPointToBuffer(keys[0].publicKey))
+                .emitOp('VERIFY')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSHBYTES5', Buffer.from([11, 12, 13, 14, 15]))
+                .emitOp('ARRAYSIZE')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH4')
+                .emitOp('PUSH5')
+                .emitOp('PUSH6')
+                .emitOp('PUSH3')
+                .emitOp('PACK')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('PICKITEM')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('NEWARRAY')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH0')
+                .emitOp('PUSH7')
+                .emitOp('SETITEM')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('NEWARRAY')
+                .build(),
+              new ScriptBuilder().emitOp('UNPACK').build(),
+              new ScriptBuilder()
+                .emitOp('PUSH2')
+                .emitOp('NEWSTRUCT')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('APPEND')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH4')
+                .emitOp('PUSH5')
+                .emitOp('PUSH6')
+                .emitOp('PUSH3')
+                .emitOp('PACK')
+                .build(),
+              new ScriptBuilder().emitOp('REVERSE').build(),
+              new ScriptBuilder()
+                .emitOp('PUSH4')
+                .emitOp('PUSH5')
+                .emitOp('PUSH6')
+                .emitOp('PUSH3')
+                .emitOp('PACK')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH1')
+                .emitOp('REMOVE')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH4')
+                .emitOp('PUSH5')
+                .emitOp('PUSH6')
+                .emitOp('PUSH3')
+                .emitOp('PACK')
+                .build(),
+              new ScriptBuilder()
+                .emitOp('PUSH2')
+                .emitOp('HASKEY')
+                .build(),
+              new ScriptBuilder().emitOp('NEWMAP').build(),
+              new ScriptBuilder().emitOp('KEYS').build(),
+              new ScriptBuilder()
+                .emitOp('PUSH4')
+                .emitOp('PUSH5')
+                .emitOp('PUSH6')
+                .emitOp('PUSH3')
+                .emitOp('PACK')
+                .build(),
+              new ScriptBuilder().emitOp('VALUES').build(),
+              new ScriptBuilder()
+                .emitOp(
+                  'CALL_I',
+                  new ScriptBuilder()
+                    .emitUInt8(1)
+                    .emitUInt8(0)
+                    .emitInt16LE(6)
+                    .emitOp('JMP', new ScriptBuilder().emitInt16LE(5).build())
+                    .emitOp('PUSH1')
+                    .emitOp('RET')
+                    .build(),
+                )
+                .build(),
+              new ScriptBuilder().emitSysCall('System.Runtime.Platform').build(),
+              new ScriptBuilder().emitSysCall('System.Runtime.GetTrigger').build(),
+              new ScriptBuilder().emitSysCall('Neo.Runtime.Notify', 'notification').build(),
+              new ScriptBuilder().emitSysCall('Neo.Runtime.Log', 'log').build(),
+              new ScriptBuilder().emitSysCall('Neo.Runtime.GetTime').build(),
+              new ScriptBuilder().emitSysCall('Neo.Runtime.Serialize', 'cereal').build(),
+              new ScriptBuilder().emitSysCall('Neo.Runtime.Deserialize').build(),
+              new ScriptBuilder().emitSysCall('Neo.Blockchain.GetHeight').build(),
+              new ScriptBuilder().emitSysCall('Neo.Blockchain.GetHeader', 0).build(),
+              new ScriptBuilder().emitSysCall('Neo.Blockchain.GetBlock', 0).build(),
+              new ScriptBuilder().emitSysCall('Neo.Blockchain.GetTransaction', factory.createUInt256()).build(),
+              new ScriptBuilder().emitSysCall('Neo.Blockchain.GetTransactionHeight', factory.createUInt256()).build(),
+              new ScriptBuilder().emitSysCall('Neo.Blockchain.GetAccount', factory.createUInt160()).build(),
+              new ScriptBuilder().emitSysCall('Neo.Blockchain.GetAsset', factory.createUInt256()).build(),
+              new ScriptBuilder().emitSysCall('Neo.Blockchain.GetContract', transactions.nosTokenContract.hash).build(),
+              // new ScriptBuilder().emitSysCall('Neo.Header.GetHash', factory.createHeader()).build(),
+            ]),
+          // APPCALL = 0x67,
+          // SYSCALL = 0x68,
+          // TAILCALL = 0x69,
+          // CHECKSIG = 0xac,
+          // CHECKMULTISIG = 0xae,
+          // CALL_E = 0xe1,
+          // CALL_ED = 0xe2,
+          // CALL_ET = 0xe3,
+          // CALL_EDT = 0xe4,
+          // THROW = 0xf0,
+          // THROWIFNOT = 0xf1,
+          // 'Neo.Runtime.CheckWitness'
+          // 'Neo.Blockchain.GetValidators's
+        ),
+      )
+      .build();
+
+    const mockBlockchain = () => {
+      blockchain = createBlockchain({ contracts: [transactions.nosTokenContract] });
+
+      blockchain.header = {
+        get: jest.fn(async () => Promise.resolve(factory.createHeader())),
+      };
+      blockchain.block = {
+        get: jest.fn(async () => Promise.resolve(factory.createBlock())),
+      };
+      blockchain.transaction = {
+        get: jest.fn(async () =>
+          Promise.resolve(transactions.createInvocation({ script: new ScriptBuilder().emitOp('PUSH0').build() })),
+        ),
+      };
+      blockchain.transactionData = {
+        get: jest.fn(async () => Promise.resolve(factory.createTransactionData({}))),
+      };
+      blockchain.account = {
+        tryGet: jest.fn(async () => Promise.resolve(factory.createAccount())),
+      };
+      blockchain.asset = {
+        get: jest.fn(async () => Promise.resolve(factory.createAsset())),
+      };
+    };
+
+    const runScript = async () => {
+      const result = await executeSimple({
+        blockchain,
+        transaction: transactions.createInvocation({
+          script: neoComparisonScript,
+        }),
+        log: true,
+        gas: common.ONE_HUNDRED_FIXED8,
+      });
+
+      console.log(neoComparisonScript.toString('hex'));
+      fs.writeFileSync(
+        '/Users/alexfrag/Documents/Development/NEO/nixtest/neo/neo.UnitTests/hexScript.txt',
+        neoComparisonScript.toString('hex'),
+      );
+      console.log(result.stack.slice(0, 3));
+      expect(result.errorMessage).toBeUndefined();
+      expect(result.state).toEqual(VMState.Halt);
+      expect(result.gasCost.toNumber() / 100000000).toEqual(1.048);
+    };
+
+    beforeEach(() => {
+      mockBlockchain();
+    });
+
+    test.only('compare costs with same script on neo.UnitTests', async () => {
+      await runScript();
     });
   });
 });

@@ -98,6 +98,27 @@ const testProvider = new NEOONEDataProvider({
   rpcURL: testRPCURL,
 });
 
+const fetchTransaction = async (endpoint: string, hash: any): Promise<string> => {
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'getrawtransaction',
+      params: [hash, 1],
+    }),
+  });
+
+  const json = await response.json();
+
+  return json.result;
+};
+
 const fetchStorage = async (endpoint: string, item: any): Promise<string> => {
   const headers = {
     'Content-Type': 'application/json',
@@ -247,15 +268,13 @@ const test = async () => {
   }
 };
 
-getStorage(oneRPCURL, {
-  address: 'AVNeKnqNa8zHRMysAiMaBcPVT51T6p3MVi',
-  key: '09635c078e9535d4bbe22c78e9e999d765e00823',
-}).then((val) => console.log(val));
+fetchTransaction(oneRPCURL, 'aabe4a5d967c841cac2d5fb9ec8582181e4f3e33aaacf198f538745ebe8e1dbc').then((val) =>
+  console.log(val),
+);
 
-getStorage(testRPCURL, {
-  address: 'AVNeKnqNa8zHRMysAiMaBcPVT51T6p3MVi',
-  key: '09635c078e9535d4bbe22c78e9e999d765e00823',
-}).then((val) => console.log(val));
+fetchTransaction(testRPCURL, 'aabe4a5d967c841cac2d5fb9ec8582181e4f3e33aaacf198f538745ebe8e1dbc').then((val) =>
+  console.log(val),
+);
 
 // test()
 //   .then(() => {

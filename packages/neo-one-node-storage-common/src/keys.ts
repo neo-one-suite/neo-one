@@ -70,11 +70,7 @@ const getStorageItemKeyMin = ({ hash, prefix }: StorageItemsKey): Buffer => {
   }
 
   return bytewise.encode(
-    bytewise.sorts.array.bound.lower([
-      storageItemKeyPrefix,
-      common.uInt160ToBuffer(hash),
-      bytewise.sorts.binary.bound.lower(prefix),
-    ]),
+    bytewise.sorts.array.bound.lower([storageItemKeyPrefix, common.uInt160ToBuffer(hash), prefix]),
   );
 };
 const getStorageItemKeyMax = ({ hash, prefix }: StorageItemsKey): Buffer => {

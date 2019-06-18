@@ -27,6 +27,7 @@ import {
   ValidatorAdd,
   Witness,
   WitnessAdd,
+  TransactionData,
 } from '@neo-one/node-core';
 import BN from 'bn.js';
 
@@ -253,6 +254,36 @@ const createWitness = (options: Partial<WitnessAdd> = {}): Witness =>
     ...options,
   });
 
+const createTransactionData = ({
+  version,
+  hash = createUInt256(),
+  blockHash = createUInt256(),
+  startHeight = 0,
+  index: indexIn = 1,
+  globalIndex = new BN(1),
+  endHeights,
+  claimed,
+}: {
+  readonly version?: number;
+  readonly hash?: UInt256;
+  readonly blockHash?: UInt256;
+  readonly startHeight?: number;
+  readonly index?: number;
+  readonly globalIndex?: BN;
+  readonly endHeights?: any;
+  readonly claimed?: any;
+}) =>
+  new TransactionData({
+    version,
+    hash,
+    blockHash,
+    startHeight,
+    index: indexIn,
+    globalIndex,
+    endHeights,
+    claimed,
+  });
+
 export const factory = {
   createAccount,
   createAsset,
@@ -273,4 +304,5 @@ export const factory = {
   createWitness,
   incrementData,
   resetDataIndex,
+  createTransactionData,
 };

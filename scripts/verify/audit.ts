@@ -1,11 +1,11 @@
 // tslint:disable no-implicit-dependencies no-object-mutation no-array-mutation no-console
-import { Block, ConfirmedInvocationTransaction, RawStorageChange, scriptHashToAddress } from '@neo-one/client-common';
+import { Block, ConfirmedInvocationTransaction, RawStorageChange } from '@neo-one/client-common';
 import { NEOONEDataProvider } from '@neo-one/client-core';
-import { BinaryReader } from '@neo-one/node-core';
 import fs from 'fs-extra';
 import _ from 'lodash';
 import * as os from 'os';
 import * as path from 'path';
+import { reverseByteString, getPartsFromKey, getValue } from './utils';
 
 interface StorageAuditChange {
   readonly state: string;
@@ -35,53 +35,25 @@ const NEO_STORAGE_AUDIT_PATH = path.resolve(os.homedir(), 'data', 'neo-storage-a
 
 const FIRST_STORAGE = {
   folder: 'BlockStorage_3500000',
-  file: 'dump-block-3495627.json',
-  index: 3500000,
+  file: 'dump-block-3500000.json',
+  index: 3534243,
 };
 
-const LOG_FILE = path.resolve(__dirname, 'log.json');
+// const FIRST_STORAGE = {
+//   folder: 'BlockStorage_3000000',
+//   file: 'dump-block-3000000.json',
+//   index: 2904840,
+// };
 
-const CHUNK_SIZE = 1;
+// const LOG_FILE = path.resolve(__dirname, 'log.json');
+
+// const CHUNK_SIZE = 1;
 
 const oneRPCURL = 'http://localhost:40200/rpc';
 const oneProvider = new NEOONEDataProvider({
   network: 'main',
   rpcURL: oneRPCURL,
 });
-
-export const reverse = (src: Buffer): Buffer => {
-  const mutableOut = Buffer.allocUnsafe(src.length);
-  // tslint:disable-next-line no-loop-statement
-  for (let i = 0, j = src.length - 1; i <= j; i += 1, j -= 1) {
-    mutableOut[i] = src[j];
-    mutableOut[j] = src[i];
-  }
-
-  return mutableOut;
-};
-
-export const getPartsFromKey = (storageKey: string) => {
-  const scriptHash = `0x${reverse(Buffer.from(storageKey.slice(0, 40), 'hex')).toString('hex')}`;
-  const keyRaw = storageKey.slice(40);
-  const padding = parseInt(keyRaw.substring(keyRaw.length - 2), 16);
-  const key = keyRaw.substring(0, keyRaw.length - (padding + 1) * 2);
-  const keyFixed = _.chunk([...key], 34)
-    .map((chunk) => chunk.slice(0, 32))
-    .reduce((acc, chunk) => acc + chunk.join(''), '');
-
-  return {
-    scriptHash,
-    address: scriptHashToAddress(scriptHash),
-    key: keyFixed,
-  };
-};
-
-export const getValue = (storageValue: string) => {
-  const rawValue = storageValue.substring(2, storageValue.length - 2);
-  const binaryReader = new BinaryReader(Buffer.from(rawValue, 'hex'));
-
-  return binaryReader.readVarBytesLE().toString('hex');
-};
 
 const getType = (state: string): RawStorageChange['type'] =>
   state === 'Added' ? 'Add' : state === 'Changed' ? 'Modify' : 'Delete';
@@ -103,73 +75,106 @@ const getNEOStorageChanges = (block: StorageAuditBlock) =>
   sortChanges(block.storage.map(getNEOStorageChangesForChange));
 
 const getOneStorageChanges = (block: Block): ReadonlyArray<RawStorageChange> => {
-  // const storageChanges = block.transactions
-  //   .filter(
-  //     (transaction): transaction is ConfirmedInvocationTransaction => transaction.type === 'InvocationTransaction',
-  //   )
-  //   .map((invocation) => invocation.invocationData.storageChanges);
+  const storageChanges = block.transactions
+    .filter(
+      (transaction): transaction is ConfirmedInvocationTransaction => transaction.type === 'InvocationTransaction',
+    )
+    .map((invocation) => invocation.invocationData.storageChanges);
 
   block.transactions
     .filter(
       (transaction): transaction is ConfirmedInvocationTransaction => transaction.type === 'InvocationTransaction',
     )
     .forEach((invocation) => {
+      let check = false;
+      invocation.attributes.forEach((att) => {
+        const contractHash = 'c9c0fc5a2b66a29d6b14601e752e6e1a445e088d';
+        if (
+          att.data.includes(contractHash)
+          // ||
+          // att.data.includes(reverseByteString(contractHash)) ||
+          // invocation.script.includes(contractHash) ||
+          // invocation.script.includes(reverseByteString(contractHash))
+        ) {
+          check = true;
+        }
+      });
       if (
-        invocation.script.includes(
-          `67${reverse(Buffer.from('a0777c3ce2b169d4a23bcba4565e3225a0122d95', 'hex')).toString('hex')}`,
-        )
+        invocation.script.includes(`69${reverseByteString('a32bcf5d7082f740a4007b16e812cf66a457c3d4')}`) &&
+        // invocation.script.includes(`69${reverseByteString('78e6d16b914fe15bc16150aeb11d0c2a8e532bdds')}`)
+        invocation.script.includes('7769746864726177') &&
+        invocation.invocationData.result.state === 'FAULT'
       ) {
-        invocation.invocationData.storageChanges.forEach((change) => {
-          const oldLogs = fs.readJsonSync(LOG_FILE);
-          Object.keys(oldLogs).forEach((key) => {
-            if (change.key.includes(key)) {
-              console.log(invocation.invocationData);
-              const newLogs = {
-                ...oldLogs,
-                [key]: [...oldLogs[key], invocation],
-              };
-              fs.writeJsonSync(LOG_FILE, newLogs);
-              console.log('Added to log.');
-            }
-          });
-        });
+        console.log(invocation.hash);
+        console.log(invocation.receipt);
+        console.log(invocation.invocationData.result.stack);
+        console.log(invocation.invocationData);
+        console.log(invocation.attributes);
+        console.log('');
       }
     });
 
-  // const storageChangeAdds: { [K: string]: number } = {};
-  // const storageChangesByKey = _.flatten(storageChanges).reduce<{ [key: string]: RawStorageChange }>(
-  //   (acc, storageChange) => {
-  //     const storageChangeKey = `${storageChange.address}:${storageChange.key}`;
-  //     const netAdd = storageChangeAdds[storageChangeKey];
-  //     if ((netAdd as number | undefined) === undefined) {
-  //       storageChangeAdds[storageChangeKey] = 0;
-  //     }
-  //     if (storageChange.type === 'Add' && netAdd !== 1) {
-  //       storageChangeAdds[storageChangeKey] += 1;
-  //     }
-  //     if (storageChange.type === 'Delete' && netAdd !== -1) {
-  //       storageChangeAdds[storageChangeKey] -= 1;
-  //     }
-
+  // block.transactions
+  //   .filter(
+  //     (transaction): transaction is ConfirmedInvocationTransaction => transaction.type === 'InvocationTransaction',
+  //   )
+  //   .forEach((invocation) => {
   //     if (
-  //       Object.keys(acc).includes(storageChangeKey) &&
-  //       storageChangeAdds[storageChangeKey] === 0 &&
-  //       storageChange.type === 'Delete'
+  //       invocation.script.includes(
+  //         `67${reverse(Buffer.from('a0777c3ce2b169d4a23bcba4565e3225a0122d95', 'hex')).toString('hex')}`,
+  //       )
   //     ) {
-  //       // tslint:disable-next-line:no-dynamic-delete
-  //       delete acc[storageChangeKey];
-  //     } else {
-  //       acc[storageChangeKey] = storageChange;
+  //       invocation.invocationData.storageChanges.forEach((change) => {
+  //         const oldLogs = fs.readJsonSync(LOG_FILE);
+  //         Object.keys(oldLogs).forEach((key) => {
+  //           if (change.key.includes(key)) {
+  //             console.log(invocation.invocationData);
+  //             const newLogs = {
+  //               ...oldLogs,
+  //               [key]: [...oldLogs[key], invocation],
+  //             };
+  //             fs.writeJsonSync(LOG_FILE, newLogs);
+  //             console.log('Added to log.');
+  //           }
+  //         });
+  //       });
   //     }
+  //   });
 
-  //     return acc;
-  //   },
-  //   {},
-  // );
+  const storageChangeAdds: { [K: string]: number } = {};
+  const storageChangesByKey = _.flatten(storageChanges).reduce<{ [key: string]: RawStorageChange }>(
+    (acc, storageChange) => {
+      const storageChangeKey = `${storageChange.address}:${storageChange.key}`;
+      const netAdd = storageChangeAdds[storageChangeKey];
+      if ((netAdd as number | undefined) === undefined) {
+        storageChangeAdds[storageChangeKey] = 0;
+      }
+      if (storageChange.type === 'Add' && netAdd !== 1) {
+        storageChangeAdds[storageChangeKey] += 1;
+      }
+      if (storageChange.type === 'Delete' && netAdd !== -1) {
+        storageChangeAdds[storageChangeKey] -= 1;
+      }
 
-  // return sortChanges(Object.values(storageChangesByKey)).map((value) =>
-  //   value.type === 'Add' || value.type === 'Modify' ? { ...value, type: 'Add' as 'Add' } : value,
-  // );
+      if (
+        Object.keys(acc).includes(storageChangeKey) &&
+        storageChangeAdds[storageChangeKey] === 0 &&
+        storageChange.type === 'Delete'
+      ) {
+        // tslint:disable-next-line:no-dynamic-delete
+        delete acc[storageChangeKey];
+      } else {
+        acc[storageChangeKey] = storageChange;
+      }
+
+      return acc;
+    },
+    {},
+  );
+
+  return sortChanges(Object.values(storageChangesByKey)).map((value) =>
+    value.type === 'Add' || value.type === 'Modify' ? { ...value, type: 'Add' as 'Add' } : value,
+  );
 };
 
 const compareStorageChangeForBlock = async (auditBlock: StorageAuditBlock): Promise<StorageMismatch | undefined> => {
@@ -281,37 +286,37 @@ const iterDirs = async () => {
   }
 };
 
-const iterChunk = async (count: number) => {
-  const nextBlocks = Array.from({ length: CHUNK_SIZE }, (_value, key) => key + count);
-  await Promise.all(
-    nextBlocks.map(async (blockCount) => {
-      const block = await oneProvider.getBlock(blockCount);
-      await getOneStorageChanges(block);
-    }),
-  );
-};
+// const iterChunk = async (count: number) => {
+//   const nextBlocks = Array.from({ length: CHUNK_SIZE }, (_value, key) => key + count);
+//   await Promise.all(
+//     nextBlocks.map(async (blockCount) => {
+//       const block = await oneProvider.getBlock(blockCount);
+//       await getOneStorageChanges(block);
+//     }),
+//   );
+// };
 
-const iterChain = async () => {
-  let count = FIRST_STORAGE.index;
-  const blockHeight = await oneProvider.getBlockCount();
-  // tslint:disable-next-line no-loop-statement
-  while (count < blockHeight) {
-    await iterChunk(count);
-    count += CHUNK_SIZE;
-    if (count % 1000 === 0) {
-      console.log(`Processed ${count} blocks.`);
-    }
-  }
-};
+// const iterChain = async () => {
+//   let count = FIRST_STORAGE.index;
+//   const blockHeight = await oneProvider.getBlockCount();
+//   // tslint:disable-next-line no-loop-statement
+//   while (count < blockHeight) {
+//     await iterChunk(count);
+//     count += CHUNK_SIZE;
+//     if (count % 1000 === 0) {
+//       console.log(`Processed ${count} blocks.`);
+//     }
+//   }
+// };
 
-// iterDirs().catch((error) => {
-//   // tslint:disable-next-line:no-console
-//   console.error(error);
-//   process.exit(1);
-// });
-
-iterChain().catch((error) => {
+iterDirs().catch((error) => {
   // tslint:disable-next-line:no-console
   console.error(error);
   process.exit(1);
 });
+
+// iterChain().catch((error) => {
+//   // tslint:disable-next-line:no-console
+//   console.error(error);
+//   process.exit(1);
+// });

@@ -104,7 +104,7 @@ export const createOp = ({
   let fee = feeIn;
   if (fee === undefined) {
     const byteCode = OpCodeToByteCode[name];
-    fee = byteCode <= OpCodeToByteCode.PUSH16 || byteCode === OpCodeToByteCode.NOP ? utils.ZERO : FEES.ONE;
+    fee = byteCode <= OpCodeToByteCode.NOP ? utils.ZERO : FEES.ONE;
   }
 
   return {
@@ -298,7 +298,6 @@ const callIsolated = ({
       name,
       in: parametersCount + (dynamicCall ? 1 : 0),
       invocation: tailCall ? 0 : 1,
-      fee: FEES.TEN,
       invoke: async ({ monitor, context, args }) => {
         const { pc, scriptHash } = context;
         const hash = dynamicCall
@@ -396,12 +395,14 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
     parametersCount = parametersCount === -1 ? contextIn.stack.length : parametersCount;
     const jumpCount = contextIn.code.slice(contextIn.pc + 2, contextIn.pc + 4).readInt16LE(0);
     const nextPC = contextIn.pc + 4;
-
+    // console.log(contextIn.gasLeft.toString(10));
     const { op } = createOp({
       name,
       in: parametersCount,
       invocation: 1,
       invoke: async ({ monitor, context, args }) => {
+        // console.log(contextIn.gasLeft.toString(10));
+
         const resultContext = await context.engine.executeScript({
           monitor,
           code: context.code,
@@ -582,7 +583,8 @@ const OPCODE_PAIRS = ([
         type: 'create',
         create: ({ context }) => {
           const sysCall = lookupSysCall({ context });
-
+          // console.log(sysCall.name);
+          // console.log(context.gasLeft.toString(10));
           return {
             op: {
               name: 'SYSCALL',
@@ -1610,10 +1612,12 @@ const OPCODE_PAIRS = ([
         name: 'ARRAYSIZE',
         in: 1,
         out: 1,
-        invoke: ({ context, args }) => ({
-          context,
-          results: [new IntegerStackItem(new BN(args[0].size))],
-        }),
+        invoke: ({ context, args }) => {
+          return {
+            context,
+            results: [new IntegerStackItem(new BN(args[0].size))],
+          };
+        },
       }),
     ],
     [
@@ -1736,7 +1740,9 @@ const OPCODE_PAIRS = ([
             newItem = newItem.clone();
           }
           if (args[2].isArray()) {
+            // console.log(newItem);
             const index = vmUtils.toNumber(context, args[1].asBigIntegerUnsafe());
+            // console.log(index);
             const mutableValue = args[2].asArray();
             if (index < 0 || index >= mutableValue.length) {
               throw new InvalidSetItemIndexError(context);
