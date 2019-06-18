@@ -1,4 +1,4 @@
-/* @hash ed1f90f59dcdfd4abca05a816b0e4fd3 */
+/* @hash 46606159738ba3d36b1d2c889bb0d552 */
 // tslint:disable
 /* eslint-disable */
 import { Client, SmartContractDefinition } from '@neo-one/client';
@@ -9,7 +9,7 @@ import { sourceMaps } from '../sourceMaps';
 const definition: SmartContractDefinition = {
   networks: {
     local: {
-      address: 'ARqAzwfoNrZ2QNTaX5f5XqwhfFsRYioKNw',
+      address: 'AXAZs3F9QHWZzpGV2GdWEkkopUWGSyDwAf',
     },
   },
   abi: escrowABI,

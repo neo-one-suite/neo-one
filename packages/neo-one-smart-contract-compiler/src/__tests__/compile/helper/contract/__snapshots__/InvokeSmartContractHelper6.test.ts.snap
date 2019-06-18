@@ -1,17 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 1`] = `"1.101"`;
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 1`] = `"1.1"`;
 
-exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 2`] = `"1.954"`;
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 2`] = `"1.953"`;
 
-exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 3`] = `"1.963"`;
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 3`] = `"1.962"`;
 
-exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 4`] = `"1.648"`;
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 4`] = `"1.647"`;
 
-exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 5`] = `"3.494"`;
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 5`] = `"3.493"`;
 
-exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 6`] = `"0.77"`;
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 6`] = `"0.769"`;
 
-exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 7`] = `"3.463"`;
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 7`] = `"3.462"`;
 
-exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 8`] = `"0.77"`;
+exports[`InvokeSmartContractHelper class that used processedTransactions, send, receive and claim 8`] = `"0.769"`;
