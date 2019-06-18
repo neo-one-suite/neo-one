@@ -7,6 +7,11 @@ import * as utils from './utils';
 type TypedNode = ts.Node & { readonly type?: ts.TypeNode };
 type MaybeTypedNode = ts.Node & { readonly type?: ts.TypeNode };
 
+function getIntrinsicName(type: ts.Type): string | undefined {
+  // tslint:disable-next-line no-any
+  return (type as any).intrinsicName;
+}
+
 export function getTypeNode(node: TypedNode): ts.TypeNode;
 export function getTypeNode(node: MaybeTypedNode): ts.TypeNode | undefined;
 export function getTypeNode(node: TypedNode | MaybeTypedNode): ts.TypeNode | undefined {
@@ -216,8 +221,7 @@ export function isAny(type: ts.Type): boolean {
 }
 
 export function isErrorType(type: ts.Type): boolean {
-  // tslint:disable-next-line no-any
-  return isAny(type) && (type as any).intrinsicName === 'error';
+  return isAny(type) && getIntrinsicName(type) === 'error';
 }
 
 export function isUnion(type: ts.Type): type is ts.UnionType {
@@ -433,6 +437,15 @@ export function isOnlyBooleanLiteral(type: ts.Type): boolean {
 export function hasBooleanLiteral(type: ts.Type): boolean {
   return hasType(type, isBooleanLiteral);
 }
+export function isBooleanFalse(type: ts.Type): boolean {
+  return isTypeFlag(type, ts.TypeFlags.BooleanLiteral) && getIntrinsicName(type) === 'false';
+}
+export function isOnlyBooleanFalse(type: ts.Type): boolean {
+  return isOnlyType(type, isBooleanFalse);
+}
+export function hasBooleanFalse(type: ts.Type): boolean {
+  return hasType(type, isBooleanFalse);
+}
 export function isBooleanish(type: ts.Type): boolean {
   return hasTypeFlag(type, ts.TypeFlags.BooleanLike);
 }
@@ -589,4 +602,14 @@ export function getCallSignatures(type: ts.Type): readonly ts.Signature[] {
 
 export function getNonNullableType(type: ts.Type): ts.Type {
   return type.getNonNullableType();
+}
+
+export function filterUnion(checker: ts.TypeChecker, type: ts.Type, filter: (type: ts.Type) => boolean): ts.Type {
+  const types = getUnionTypes(type);
+  if (types === undefined) {
+    return type;
+  }
+
+  // tslint:disable-next-line no-any
+  return (checker as any).getUnionType(types.filter(filter));
 }

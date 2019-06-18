@@ -6,6 +6,7 @@ import { DiagnosticMessage } from '../../../DiagnosticMessage';
 import { ScriptBuilder } from '../../sb';
 import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
+import { hasBooleanFalse, isBooleanFalse } from './boolean';
 import { hasUndefined } from './undefined';
 
 type Process = (options: VisitOptions) => void;
@@ -21,6 +22,7 @@ export interface ForTypeHelperOptions {
   readonly types: ReadonlyArray<ForType>;
   readonly single?: boolean;
   readonly singleUndefined?: (options: VisitOptions) => void;
+  readonly singleFalse?: (options: VisitOptions) => void;
   readonly optional?: boolean;
   readonly defaultCase?: (options: VisitOptions) => void;
 }
@@ -32,15 +34,25 @@ export class ForTypeHelper extends Helper {
   private readonly types: ReadonlyArray<ForType>;
   private readonly single: boolean;
   private readonly singleUndefined: ((options: VisitOptions) => void) | undefined;
+  private readonly singleFalse: ((options: VisitOptions) => void) | undefined;
   private readonly optional: boolean;
   private readonly defaultCase: ((options: VisitOptions) => void) | undefined;
 
-  public constructor({ type, types, single, singleUndefined, defaultCase, optional = false }: ForTypeHelperOptions) {
+  public constructor({
+    type,
+    types,
+    single,
+    singleUndefined,
+    singleFalse,
+    defaultCase,
+    optional = false,
+  }: ForTypeHelperOptions) {
     super();
     this.type = type;
     this.types = types;
     this.single = single === undefined ? false : single;
     this.singleUndefined = singleUndefined;
+    this.singleFalse = singleFalse;
     this.optional = optional;
     this.defaultCase = defaultCase;
   }
@@ -51,6 +63,7 @@ export class ForTypeHelper extends Helper {
     // tslint:disable-next-line no-unnecessary-type-annotation
     let typeIn: ts.Type | undefined = this.type === undefined ? optionsIn.cast : this.type;
     let checkUndefinedSingle = false;
+    let checkFalseSingle = false;
     if (
       typeIn !== undefined &&
       this.single &&
@@ -59,6 +72,19 @@ export class ForTypeHelper extends Helper {
     ) {
       typeIn = tsUtils.type_.getNonNullableType(typeIn);
       checkUndefinedSingle = true;
+    }
+    if (
+      typeIn !== undefined &&
+      this.single &&
+      hasBooleanFalse(sb.context, node, typeIn) &&
+      this.singleFalse !== undefined
+    ) {
+      typeIn = tsUtils.type_.filterUnion(
+        sb.context.typeChecker,
+        typeIn,
+        (tpe) => !isBooleanFalse(sb.context, node, tpe),
+      );
+      checkFalseSingle = true;
     }
     const type = typeIn;
     const types = type === undefined ? this.types : this.types.filter((testType) => testType.hasType(type));
@@ -83,7 +109,7 @@ export class ForTypeHelper extends Helper {
           }
         : this.defaultCase;
 
-    if (this.single && types.length !== 1) {
+    if (this.single && (types.length !== 1 || (checkUndefinedSingle && checkFalseSingle))) {
       sb.context.reportError(node, DiagnosticCode.UnknownType, DiagnosticMessage.ResolveOneType);
 
       return;
@@ -93,6 +119,7 @@ export class ForTypeHelper extends Helper {
       defaultCase(noCastOptions);
     } else if (groupedTypes.size === 1) {
       const singleUndefined = this.singleUndefined;
+      const singleFalse = this.singleFalse;
       if (checkUndefinedSingle && singleUndefined !== undefined) {
         sb.emitHelper(
           node,
@@ -110,6 +137,29 @@ export class ForTypeHelper extends Helper {
             },
             whenTrue: () => {
               singleUndefined(options);
+            },
+            whenFalse: () => {
+              types[0].process(noCastOptions);
+            },
+          }),
+        );
+      } else if (checkFalseSingle && singleFalse !== undefined) {
+        sb.emitHelper(
+          node,
+          options,
+          sb.helpers.if({
+            condition: () => {
+              // [value, value]
+              sb.emitOp(node, 'DUP');
+              // [number, value]
+              sb.emitOp(node, 'SIZE');
+              // [number, number, value]
+              sb.emitPushInt(node, 0);
+              // [boolean, value]
+              sb.emitOp(node, 'NUMEQUAL');
+            },
+            whenTrue: () => {
+              singleFalse(options);
             },
             whenFalse: () => {
               types[0].process(noCastOptions);

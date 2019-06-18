@@ -400,4 +400,78 @@ describe('InvokeSmartContractHelper', () => {
       assertEqual(contract.testDeleteAndIter(), true);
     `);
   });
+
+  test('throws if called directly', async () => {
+    const node = await helpers.startNode();
+    const contract = await node.addContract(`
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        public doThrow(yes: boolean): number {
+          if (yes) {
+            throw new Error('throwing');
+          }
+
+          return 10;
+        }
+      }
+    `);
+
+    await expect(
+      node.executeString(`
+        import { Address, SmartContract } from '@neo-one/smart-contract';
+
+        interface Contract {
+          doThrow(yes: boolean): number | false;
+        }
+        const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+
+        contract.doThrow(true);
+      `),
+    ).rejects.toThrowError();
+  });
+
+  test('returns false on throw if called from another contract', async () => {
+    const node = await helpers.startNode();
+    const contract = await node.addContract(`
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+        public doThrow(yes: boolean): number {
+          if (yes) {
+            throw new Error('throwing');
+          }
+
+          return 10;
+        }
+      }
+    `);
+    const callingContract = await node.addContract(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        doThrow(yes: boolean): number | false;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+
+      export class TestSmartContract extends SmartContract {
+        public testThrow(): boolean {
+          assertEqual(contract.doThrow(true), false);
+          assertEqual(contract.doThrow(false), 10);
+
+          return true;
+        }
+      }
+    `);
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        testThrow(): boolean;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${callingContract.address}'));
+
+      assertEqual(contract.testThrow(), true);
+    `);
+  });
 });

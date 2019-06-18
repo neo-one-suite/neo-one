@@ -52,6 +52,10 @@ export class WrapValRecursiveHelper extends Helper {
       sb.emitHelper(node, innerOptions, sb.helpers.wrapUndefined);
     });
 
+    const handleBoolean = createHandleValue(true, (innerOptions) => {
+      sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
+    });
+
     const type = tsUtils.type_.getNonNullableType(this.type);
 
     sb.emitHelper(
@@ -61,6 +65,7 @@ export class WrapValRecursiveHelper extends Helper {
         type: this.type,
         single: true,
         singleUndefined: handleUndefined,
+        singleFalse: handleBoolean,
         optional: this.optional,
         array: createHandleValue(true, (innerOptions) => {
           const elements = tsUtils.type_.getTupleElements(type);
@@ -115,9 +120,7 @@ export class WrapValRecursiveHelper extends Helper {
         arrayStorage: createHandleValue(true, (innerOptions) => {
           sb.emitHelper(node, innerOptions, sb.helpers.throwTypeError);
         }),
-        boolean: createHandleValue(true, (innerOptions) => {
-          sb.emitHelper(node, innerOptions, sb.helpers.wrapBoolean);
-        }),
+        boolean: handleBoolean,
         buffer: createHandleValue(true, (innerOptions) => {
           if (
             this.checkValue &&
