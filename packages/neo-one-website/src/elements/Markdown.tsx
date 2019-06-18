@@ -265,16 +265,15 @@ export class Markdown extends React.Component<Props> {
 
   public componentDidMount(): void {
     this.handleUpdate();
+    if (this.props.resetScroll) {
+      window.scrollTo(0, 0);
+    }
   }
 
   public componentDidUpdate(prevProps: Props): void {
     this.handleUpdate();
-    const current = this.ref.current;
-    if (current && this.props.resetScroll && this.props.source !== prevProps.source) {
-      // tslint:disable-next-line no-object-mutation
-      current.scrollTop = 0;
-      // tslint:disable-next-line no-object-mutation
-      current.scrollLeft = 0;
+    if (this.props.resetScroll && this.props.source !== prevProps.source) {
+      window.scrollTo(0, 0);
     }
   }
 

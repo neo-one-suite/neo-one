@@ -126,6 +126,14 @@ export class ServerManager {
     return version;
   }
 
+  public async getNewerServerVersion(): Promise<string | undefined> {
+    const npmVersion = await npmCheck('@neo-one/cli', this.checkPath, CHECK_TIMEOUT_MS, CHECK_DELAY_SEC);
+
+    return npmVersion !== undefined && this.compareVersions(this.serverVersion, npmVersion) > 0
+      ? npmVersion
+      : undefined;
+  }
+
   public async checkAlive(port: number): Promise<number | undefined> {
     const pid = await this.getServerPID();
 
@@ -182,17 +190,11 @@ export class ServerManager {
     readonly httpPort: number;
     readonly binary: Binary;
     readonly onStart?: () => void;
-  }): Promise<{ readonly pid: number; readonly started: boolean; readonly newerVersion: string | undefined }> {
-    const [npmVersion, pid] = await Promise.all([
-      npmCheck('@neo-one/cli', this.checkPath, CHECK_TIMEOUT_MS, CHECK_DELAY_SEC),
-      this.checkAlive(port),
-    ]);
-
-    const newerVersion =
-      npmVersion !== undefined && this.compareVersions(this.serverVersion, npmVersion) > 0 ? npmVersion : undefined;
+  }): Promise<{ readonly pid: number; readonly started: boolean }> {
+    const pid = await this.checkAlive(port);
 
     if (pid !== undefined) {
-      return { pid, started: false, newerVersion };
+      return { pid, started: false };
     }
 
     if (onStart !== undefined) {
@@ -212,7 +214,7 @@ export class ServerManager {
     await waitRunning({ pid: child.pid });
     await waitReachable({ port: httpPort });
 
-    return { pid: child.pid, started: true, newerVersion };
+    return { pid: child.pid, started: true };
   }
 
   public async writeVersionPID(pid: number, version: string): Promise<void> {
