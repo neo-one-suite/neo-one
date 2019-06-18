@@ -23,12 +23,23 @@ aliases:
       - ~/.cache/yarn
     key: v5-yarn-10-{{ .Branch }}-{{ checksum "yarn.lock" }}
 
+  - &restore-yarn-cache-12
+    keys:
+      - v5-yarn-12-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      # Fallback in case checksum fails
+      - v5-yarn-12-{{ .Branch }}-
+
+  - &save-yarn-cache-12
+    paths:
+      - node_modules
+      - ~/.cache/yarn
+    key: v5-yarn-12-{{ .Branch }}-{{ checksum "yarn.lock" }}
+
   - &filter-ignore-bors-tmp
     branches:
       ignore:
         - staging.tmp
         - trying.tmp
-
 
   - &yarn
     |
@@ -38,9 +49,9 @@ aliases:
     working_directory: ~/neo-one
     steps:
       - checkout
-      - restore-cache: *restore-yarn-cache-10
+      - restore-cache: *restore-yarn-cache-12
       - run: *yarn
-      - save-cache: *save-yarn-cache-10
+      - save-cache: *save-yarn-cache-12
       - run:
           name: Prettier
           command: yarn nit
@@ -148,6 +159,57 @@ aliases:
           path: reports
     parallelism: 2
 
+  - &build-e2e12
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - restore-cache: *restore-yarn-cache-12
+      - run: *yarn
+      - save-cache: *save-yarn-cache-12
+      - run:
+          name: Build
+          command: yarn build:e2e
+      - persist_to_workspace:
+          root: ~/neo-one
+          paths:
+            - dist
+            - node_modules
+
+  - &test12
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - restore-cache: *restore-yarn-cache-12
+      - run: *yarn
+      - save-cache: *save-yarn-cache-12
+      - run:
+          name: Test
+          command: yarn test-ci $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
+      - run:
+          name: Upload Unit Test Coverage
+          command: yarn run codecov -f coverage/coverage-final.json -F unit
+          when: always
+      - store_test_results:
+          path: reports
+    parallelism: 2
+
+  - &e2e12
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+          name: E2E
+          command: yarn nyc --reporter json yarn e2e-ci $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
+      - run:
+          name: Upload E2E Test Coverage
+          command: yarn run codecov -f coverage/coverage-final.json -F e2e
+          when: always
+      - store_test_results:
+          path: reports
+    parallelism: 2
+
 node8: &node8
   docker:
     - image: neotracker/neo-one-circleci-node:8.16.0-4
@@ -155,6 +217,10 @@ node8: &node8
 node10: &node10
   docker:
     - image: neotracker/neo-one-circleci-node:10.16.0-1
+
+node12: &node12
+  docker:
+    - image: neotracker/neo-one-circleci-node:12.4.0-1
 
 version: 2
 jobs:
@@ -178,8 +244,18 @@ jobs:
     <<: *node10
     <<: *build-e2e10
 
+  test12:
+    <<: *node12
+    <<: *test12
+  e2e12:
+    <<: *node12
+    <<: *e2e12
+  build-e2e12:
+    <<: *node12
+    <<: *build-e2e12
+
   lint:
-    <<: *node10
+    <<: *node12
     <<: *lint
 
 workflows:
@@ -203,6 +279,18 @@ workflows:
       - e2e10:
           requires:
             - build-e2e10
+          filters: *filter-ignore-bors-tmp
+      - lint:
+          filters: *filter-ignore-bors-tmp
+  test12:
+    jobs:
+      - build-e2e12:
+          filters: *filter-ignore-bors-tmp
+      - test12:
+          filters: *filter-ignore-bors-tmp
+      - e2e12:
+          requires:
+            - build-e2e12
           filters: *filter-ignore-bors-tmp
       - lint:
           filters: *filter-ignore-bors-tmp
