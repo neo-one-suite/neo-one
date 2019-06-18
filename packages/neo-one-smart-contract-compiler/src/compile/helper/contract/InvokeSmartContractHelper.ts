@@ -269,11 +269,19 @@ export class InvokeSmartContractHelper extends Helper {
         }
 
         if (propInfo.send) {
-          sb.emitHelper(decl, options, sb.helpers.handleSend({ method: decl }));
+          sb.emitHelper(decl, options, sb.helpers.handleSend({ method: decl, returnType: propInfo.returnType }));
         } else if (propInfo.receive) {
-          sb.emitHelper(decl, options, sb.helpers.handleReceive({ opposite: propInfo.sendUnsafe, method: decl }));
+          sb.emitHelper(
+            decl,
+            options,
+            sb.helpers.handleReceive({ opposite: propInfo.sendUnsafe, method: decl, returnType: propInfo.returnType }),
+          );
         } else if (propInfo.sendUnsafe) {
-          sb.emitHelper(decl, options, sb.helpers.handleSendUnsafe({ opposite: propInfo.receive, method: decl }));
+          sb.emitHelper(
+            decl,
+            options,
+            sb.helpers.handleSendUnsafe({ opposite: propInfo.receive, method: decl, returnType: propInfo.returnType }),
+          );
         } else {
           sb.emitHelper(decl, options, sb.helpers.handleNormal({ propInfo }));
         }
@@ -402,18 +410,28 @@ export class InvokeSmartContractHelper extends Helper {
         options,
         sb.helpers.if({
           condition: () => {
+            // [boolean]
             sb.emitHelper(node, options, sb.helpers.applicationMatchesVerification);
+            // [boolean, boolean]
+            sb.emitOp(node, 'DUP');
           },
           whenTrue: () => {
+            // [value, boolean]
             func();
-          },
-          whenFalse: () => {
-            // []
+            // [boolean]
             sb.emitOp(node, 'DROP');
-            sb.emitPushBoolean(node, false);
           },
         }),
       );
+    };
+
+    const handleClaimVerify = (func: () => void) => {
+      // [value]
+      func();
+      // []
+      sb.emitOp(node, 'DROP');
+      // [boolean]
+      sb.emitPushBoolean(node, true);
     };
 
     const handleDefaultInvokeVerify = () => {
@@ -557,7 +575,19 @@ export class InvokeSmartContractHelper extends Helper {
                               sb.emitPushInt(node, 0);
                               // [arg]
                               sb.emitHelper(node, options, sb.helpers.getArgument);
-                              sb.emitHelper(node, options, sb.helpers.case(claimCases, throwDefault));
+                              sb.emitHelper(
+                                node,
+                                options,
+                                sb.helpers.case(
+                                  claimCases.map((propCase) => ({
+                                    ...propCase,
+                                    whenTrue: () => {
+                                      handleClaimVerify(propCase.whenTrue);
+                                    },
+                                  })),
+                                  throwDefault,
+                                ),
+                              );
                             },
                           }),
                         );

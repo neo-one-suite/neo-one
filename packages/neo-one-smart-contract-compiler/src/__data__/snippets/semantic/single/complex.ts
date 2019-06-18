@@ -91,16 +91,16 @@ export class ICO extends SmartContract {
   }
 
   @receive
-  public mintTokens(): boolean {
+  public mintTokens(): void {
     if (!this.hasStarted() || this.hasEnded()) {
       notifyRefund();
 
-      return false;
+      throw new Error('Invalid mintTokens');
     }
 
     const { references } = Blockchain.currentTransaction;
     if (references.length === 0) {
-      return false;
+      throw new Error('Invalid mintTokens');
     }
     const sender = references[0].address;
 
@@ -111,7 +111,7 @@ export class ICO extends SmartContract {
         if (!output.asset.equals(Hash256.NEO)) {
           notifyRefund();
 
-          return false;
+          throw new Error('Invalid mintTokens');
         }
 
         amount += output.value * this.amountPerNEO;
@@ -121,15 +121,13 @@ export class ICO extends SmartContract {
     if (amount > this.remaining) {
       notifyRefund();
 
-      return false;
+      throw new Error('Invalid mintTokens');
     }
 
     this.balances.set(sender, this.balanceOf(sender) + amount);
     this.mutableRemaining -= amount;
     this.mutableSupply += amount;
     notifyTransfer(undefined, sender, amount);
-
-    return true;
   }
 
   private hasStarted(): boolean {

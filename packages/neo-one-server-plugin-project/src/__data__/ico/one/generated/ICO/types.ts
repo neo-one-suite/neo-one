@@ -1,4 +1,4 @@
-/* @hash 40111576dd4b75816183640324b0c850 */
+/* @hash d99a203cecbe6aa47a8fe9c24422e667 */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -58,22 +58,22 @@ export interface ICOSmartContract<TClient extends Client = Client> extends Smart
   readonly icoDurationSeconds: () => Promise<BigNumber>;
   readonly mintTokens: {
     (options?: InvokeReceiveTransactionOptions): Promise<
-      TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>
+      TransactionResult<InvokeReceipt<undefined, ICOEvent>, InvocationTransaction>
     >;
     readonly confirmed: {
       (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<
-        InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }
+        InvokeReceipt<undefined, ICOEvent> & { readonly transaction: InvocationTransaction }
       >;
     };
   };
   readonly owner: () => Promise<AddressString>;
   readonly refundAssets: {
     (options?: InvokeSendUnsafeTransactionOptions): Promise<
-      TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>
+      TransactionResult<InvokeReceipt<undefined, ICOEvent>, InvocationTransaction>
     >;
     readonly confirmed: {
       (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<
-        InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }
+        InvokeReceipt<undefined, ICOEvent> & { readonly transaction: InvocationTransaction }
       >;
     };
   };

@@ -31,7 +31,7 @@ describe('Escrow', () => {
       if (mintReceipt.result.state === 'FAULT') {
         throw new Error(mintReceipt.result.message);
       }
-      expect(mintReceipt.result.value).toEqual(true);
+      expect(mintReceipt.result.value).toBeUndefined();
 
       // Deposit into the Escrow account
       const escrowAmount = new BigNumber(100);
@@ -82,7 +82,7 @@ describe('Escrow', () => {
       if (claimReceipt.result.state === 'FAULT') {
         throw new Error(claimReceipt.result.message);
       }
-      expect(claimReceipt.result.value).toEqual(true);
+      expect(claimReceipt.result.value).toBeUndefined();
       // Notice how the receipt has the events for both the Token contract we invoked as well as the Escrow contract.
       event = claimReceipt.events[0];
       expect(event.name).toEqual('transfer');
@@ -134,7 +134,7 @@ describe('Escrow', () => {
       if (refundReceipt.result.state === 'FAULT') {
         throw new Error(refundReceipt.result.message);
       }
-      expect(refundReceipt.result.value).toEqual(true);
+      expect(refundReceipt.result.value).toBeUndefined();
       event = refundReceipt.events[0];
       expect(event.name).toEqual('transfer');
       if (event.name !== 'transfer') {

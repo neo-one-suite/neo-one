@@ -11,22 +11,20 @@ import { Blockchain, Hash256, receive, SmartContract } from '@neo-one/smart-cont
 
 export class Example extends SmartContract {
   @receive
-  public receiveNativeAssets(): boolean {
+  public receiveNativeAssets(): void {
     const { references, outputs } = Blockchain.currentTransaction;
 
     if (references.length !== 1) {
-      return false;
+      throw new Error('Invalid receiveNativeAssets');
     }
 
     for (const output of outputs) {
       if (output.address.equals(this.address)) {
         if (!output.asset.equals(Hash256.GAS)) {
-          return false;
+          throw new Error('Invalid receiveNativeAssets');
         }
       }
     }
-
-    return true;
   }
 }
 ```
@@ -35,7 +33,7 @@ In this example, we're verifying that every output that is sent to the contract 
 
 ## Instructions
 
-  1. Add a check that returns `false` if `references.length === 0` to the `mintTokens` method. We always want a sender for minting tokens, so we expect at least one input.
+  1. Add a check that throws an error if `references.length === 0` to the `mintTokens` method. We always want a sender for minting tokens, so we expect at least one input.
   2. Add a similar check as the example for verifying that the assets sent to the contract are always `Hash256.NEO`.
 
 ## Test

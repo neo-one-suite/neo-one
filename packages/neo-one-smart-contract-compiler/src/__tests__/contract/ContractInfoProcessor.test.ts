@@ -281,24 +281,6 @@ describe('ContractInfoProcessor', () => {
     );
   });
 
-  test('@receive with incorrect return type', () => {
-    helpers.compileString(
-      `
-      import { SmartContract, receive } from '@neo-one/smart-contract';
-
-      export class TestSmartContract extends SmartContract {
-        ${properties}
-
-        @receive
-        public verify(): number {
-          return 20;
-        }
-      }
-    `,
-      { type: 'error', code: DiagnosticCode.InvalidContractMethod },
-    );
-  });
-
   test('@receive with @constant', () => {
     helpers.compileString(
       `
@@ -562,8 +544,7 @@ describe('ContractInfoProcessor', () => {
         ${properties}
 
         @claim
-        public foo(value: ForwardValue): boolean {
-          return true;
+        public foo(value: ForwardValue): void {
         }
       }
     `,
@@ -616,8 +597,7 @@ describe('ContractInfoProcessor', () => {
         ${properties}
 
         @claim
-        public foo(value: ForwardedValue<number>): boolean {
-          return true;
+        public foo(value: ForwardedValue<number>): void {
         }
       }
     `,

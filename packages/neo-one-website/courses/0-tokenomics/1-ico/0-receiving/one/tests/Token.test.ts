@@ -24,7 +24,7 @@ describe('Token', () => {
         throw new Error(mintReceipt.result.message);
       }
       expect(mintReceipt.result.state).toEqual('HALT');
-      expect(mintReceipt.result.value).toEqual(true);
+      expect(mintReceipt.result.value).toBeUndefined();
     });
   });
 

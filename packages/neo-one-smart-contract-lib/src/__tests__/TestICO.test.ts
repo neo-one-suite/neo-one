@@ -85,7 +85,7 @@ describe('TestICO', () => {
         const mintReceipt = await mintResult.confirmed({ timeoutMS: 2500 });
         expect(mintReceipt.result.gasConsumed.toString()).toMatchSnapshot('mint consumed');
         expect(mintReceipt.result.gasCost.toString()).toMatchSnapshot('mint cost');
-        expect(mintReceipt.result.value).toEqual(true);
+        expect(mintReceipt.result.value).toBeUndefined();
         expect(mintReceipt.events).toHaveLength(1);
         const event = mintReceipt.events[0];
         expect(event.name).toEqual('transfer');

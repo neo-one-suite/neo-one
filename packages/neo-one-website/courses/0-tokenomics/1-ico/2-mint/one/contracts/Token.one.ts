@@ -67,10 +67,10 @@ export class Token extends SmartContract {
   }
 
   @receive
-  public mintTokens(): boolean {
+  public mintTokens(): void {
     const { references, outputs } = Blockchain.currentTransaction;
     if (references.length === 0) {
-      return false;
+      throw new Error('Invalid mintTokens');
     }
 
     // tslint:disable-next-line no-loop-statement
@@ -78,12 +78,10 @@ export class Token extends SmartContract {
       // tslint:disable-next-line no-collapsible-if
       if (output.address.equals(this.address)) {
         if (!output.asset.equals(Hash256.NEO)) {
-          return false;
+          throw new Error('Invalid mintTokens');
         }
       }
     }
-
-    return true;
   }
 
   public issue(addr: Address, amount: Fixed<8>): void {

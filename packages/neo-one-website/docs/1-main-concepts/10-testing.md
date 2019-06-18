@@ -173,7 +173,7 @@ describe('Token', () => {
       if (receipt.result.state === 'FAULT') {
         throw new Error(receipt.result.message);
       }
-      expect(receipt.result.value).toEqual(true);
+      expect(receipt.result.value).toBeUndefined();
 
       // Fast forward past the end of the ICO
       await developerClient.fastForwardOffset(24 * 60 * 60);

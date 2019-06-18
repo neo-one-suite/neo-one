@@ -136,19 +136,19 @@ export class CNEO extends SmartContract {
   }
 
   @receive
-  public wrap(): boolean {
+  public wrap(): void {
     const transaction = Blockchain.currentTransaction;
     const { references } = transaction;
     if (references.length === 0) {
       // Nothing to refund
-      return false;
+      throw new Error('Invalid wrap');
     }
 
     // We're only going to credit one address, so just pick the first one from the references.
     const sender = references[0].address;
     // We loop over the entire reference list, so users will want to consolidate prior to invoking.
     if (references.some((reference) => reference.asset.equals(Hash256.NEO) && !reference.address.equals(sender))) {
-      return false;
+      throw new Error('Invalid wrap');
     }
 
     let amount = 0;
@@ -157,7 +157,7 @@ export class CNEO extends SmartContract {
       if (output.address.equals(this.address)) {
         // Don't allow transactions that send anything but NEO to the contract.
         if (!output.asset.equals(Hash256.NEO)) {
-          return false;
+          throw new Error('Invalid wrap');
         }
 
         amount += output.value;
@@ -165,25 +165,21 @@ export class CNEO extends SmartContract {
     }
 
     if (amount === 0) {
-      return false;
+      throw new Error('Invalid wrap');
     }
 
     this.balances.set(sender, this.balanceOf(sender) + amount);
     this.mutableSupply += amount;
     notifyTransfer(undefined, sender, amount);
-
-    return true;
   }
 
   @send
-  public unwrap(transfer: Transfer): boolean {
+  public unwrap(transfer: Transfer): void {
     // Implement me
-    return true;
   }
 
   @claim
-  public claim(): boolean {
+  public claim(): void {
     // Implement me
-    return true;
   }
 }

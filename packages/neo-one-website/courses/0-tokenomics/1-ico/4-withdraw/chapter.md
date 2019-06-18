@@ -4,9 +4,9 @@ We almost have a fully functioning ICO smart contract, though it's missing one p
 
 ## Learn
 
-Similar to `@receive`, we can decorate a method with `@sendUnsafe` to allow native assets to be sent from the smart contract to the desired address when invoking a smart contract method. Again, like `@receive`, it must return a boolean that indicates if the transfer should proceed.
+Similar to `@receive`, we can decorate a method with `@sendUnsafe` to allow native assets to be sent from the smart contract to the desired address when invoking a smart contract method. Again, like `@receive`, it must throw an error if the transfer should not proceed.
 
-The decorator is "unsafe" because it should only be used in cases where it's not possible for a malicious actor to invoke the method - if they can, it's possible for them to construct a parallel set of calls that result in the method returning `true` when in fact only one of the calls should have been allowed. Read more about this limitation in the [documentation](/docs/native-assets).
+The decorator is "unsafe" because it should only be used in cases where it's not possible for a malicious actor to invoke the method - if they can, it's possible for them to construct a parallel set of calls that result in the method returning successfully when in fact only one of the calls should have been allowed. Read more about this limitation in the [documentation](/docs/native-assets).
 
 In short, you only want to decorate a method with `@sendUnsafe` when the method checks that the caller is a "superuser", i.e. someone who is not going to attempt to cheat the contract. The most common case is to simply call `Address.isCaller(this.owner)` which checks that the method was only invoked by the owner of the smart contract. Let's take a look at an example.
 
@@ -17,8 +17,10 @@ export class Example extends SmartContract {
   public constructor(public readonly owner = Deploy.senderAddress) {}
 
   @sendUnsafe
-  public sendNativeAssetsUnsafe(): boolean {
-    return Address.isCaller(this.owner);
+  public sendNativeAssetsUnsafe(): void {
+    if (!Address.isCaller(this.owner)) {
+      throw new Error('Invalid transfer');
+    }
   }
 }
 ```
@@ -31,7 +33,7 @@ Note that any transaction which attempts to send native assets from the smart co
 
 ## Instructions
 
-  1. Add a method called `withdraw` that's decorated with `@sendUnsafe` and returns `true` when `Address.isCaller(this.owner)`.
+  1. Add a method called `withdraw` that's decorated with `@sendUnsafe` and throws an error when `!Address.isCaller(this.owner)`.
 
 ## Test
 

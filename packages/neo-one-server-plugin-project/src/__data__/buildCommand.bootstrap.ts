@@ -296,7 +296,7 @@ const verifySmartContracts = async (
   }
 
   expect(mintReceipt.result.state).toEqual('HALT');
-  expect(mintReceipt.result.value).toEqual(true);
+  expect(mintReceipt.result.value).toBeUndefined();
   expect(mintReceipt.result.gasCost).toMatchSnapshot('mint cost');
   expect(mintReceipt.result.gasConsumed).toMatchSnapshot('mint consumed');
   expect(mintReceipt.events).toHaveLength(1);

@@ -1,4 +1,4 @@
-/* @hash 778600196a40f02a64df654d199b0e44 */
+/* @hash 92bf39e9a0b258178c4a0615b94794a8 */
 // tslint:disable
 /* eslint-disable */
 import { ABI } from '@neo-one/client';
@@ -140,9 +140,8 @@ export const icoABI: ABI = {
       parameters: [],
       receive: true,
       returnType: {
-        forwardedValue: false,
         optional: false,
-        type: 'Boolean',
+        type: 'Void',
       },
       send: false,
       sendUnsafe: false,
@@ -151,7 +150,7 @@ export const icoABI: ABI = {
       name: 'refundAssets',
       parameters: [],
       returnType: {
-        type: 'Boolean',
+        type: 'Void',
       },
       sendUnsafe: true,
     },

@@ -427,35 +427,34 @@ The desination [`Address`](/docs/smart-contract#Address) of the transfer.
 
 #### `@send`
 
-Marks a [`SmartContract`](/docs/smart-contract#SmartContract) method that verifies [`Asset`](/docs/smart-contract#Asset) transfers from the [`SmartContract`](/docs/smart-contract#SmartContract). Method must return a boolean indicating whether the [`SmartContract`](/docs/smart-contract#SmartContract) wishes to approve sending the transferred [`Asset`](/docs/smart-contract#Asset)s. Method can take the [`Transfer`](/docs/smart-contract#Transfer) as the final argument. See the [Native Assets](/docs/native-assets) chapter of the advanced guide for more information.
+Marks a [`SmartContract`](/docs/smart-contract#SmartContract) method that verifies [`Asset`](/docs/smart-contract#Asset) transfers from the [`SmartContract`](/docs/smart-contract#SmartContract). Method must throw an error if the [`SmartContract`](/docs/smart-contract#SmartContract) does not wish to approve sending the transferred [`Asset`](/docs/smart-contract#Asset)s. Method can take the [`Transfer`](/docs/smart-contract#Transfer) as the final argument. See the [Native Assets](/docs/native-assets) chapter of the advanced guide for more information.
 
 **Example:**
 
 ```typescript
 export class Contract extends SmartContract {
   @send
-  public withdraw(arg0: Address, arg1: Fixed<8>, transfer: Transfer): boolean {
+  public withdraw(arg0: Address, arg1: Fixed<8>, transfer: Transfer): void {
     // Don't allow sending anything but NEO
     if (!transfer.asset.equals(Hash256.NEO)) {
-      return false;
+      throw new Error('Invalid withdraw');
     }
     // Do some additional checks on the transfer.to and transfer.amount being sent and other arguments.
-    return true;
   }
 }
 ```
 
 #### `@sendUnsafe`
 
-Marks a [`SmartContract`](/docs/smart-contract#SmartContract) method that verifies [`Asset`](/docs/smart-contract#Asset) transfers from the [`SmartContract`](/docs/smart-contract#SmartContract). Method must return a boolean indicating whether the [`SmartContract`](/docs/smart-contract#SmartContract) wishes to approve sending the transferred [`Asset`](/docs/smart-contract#Asset)s.  Note that unlike [`@send`](/docs/smart-contract#@send), [`@sendUnsafe`](/docs/smart-contract#@sendUnsafe) does not use a two-phase send. Smart contract authors must implement their own logic for safely sending assets from the contract. May be used in combination with [`@receive`](/docs/smart-contract#@receive). See the [Native Assets](/docs/native-assets) chapter of the advanced guide for more information.
+Marks a [`SmartContract`](/docs/smart-contract#SmartContract) method that verifies [`Asset`](/docs/smart-contract#Asset) transfers from the [`SmartContract`](/docs/smart-contract#SmartContract). Method must throw an error if the [`SmartContract`](/docs/smart-contract#SmartContract) does not wish to approve sending the transferred [`Asset`](/docs/smart-contract#Asset)s.  Note that unlike [`@send`](/docs/smart-contract#@send), [`@sendUnsafe`](/docs/smart-contract#@sendUnsafe) does not use a two-phase send. Smart contract authors must implement their own logic for safely sending assets from the contract. May be used in combination with [`@receive`](/docs/smart-contract#@receive). See the [Native Assets](/docs/native-assets) chapter of the advanced guide for more information.
 
 #### `@receive`
 
-Marks a [`SmartContract`](/docs/smart-contract#SmartContract) method that verifies receiving [`Asset`](/docs/smart-contract#Asset)s to the [`SmartContract`](/docs/smart-contract#SmartContract). Method must return a boolean indicating whether the [`SmartContract`](/docs/smart-contract#SmartContract) wishes to receive the transferred [`Asset`](/docs/smart-contract#Asset)s. May be used in combination with [`@sendUnsafe`](/docs/smart-contract#@sendUnsafe). See the [Native Assets](/docs/native-assets) chapter of the advanced guide for more information.
+Marks a [`SmartContract`](/docs/smart-contract#SmartContract) method that verifies receiving [`Asset`](/docs/smart-contract#Asset)s to the [`SmartContract`](/docs/smart-contract#SmartContract). Method must throw an error if the [`SmartContract`](/docs/smart-contract#SmartContract) does not wish to receive the transferred [`Asset`](/docs/smart-contract#Asset)s. May be used in combination with [`@sendUnsafe`](/docs/smart-contract#@sendUnsafe). See the [Native Assets](/docs/native-assets) chapter of the advanced guide for more information.
 
 #### `@claim`
 
-Marks a [`SmartContract`](/docs/smart-contract#SmartContract) method that verifies GAS claims from the [`SmartContract`](/docs/smart-contract#SmartContract). Method must return a boolean indicating whether the [`SmartContract`](/docs/smart-contract#SmartContract) wishes to allow GAS to be claimed. May optionally take the [`ClaimTransaction`](/docs/smart-contract#ClaimTransaction) this [`SmartContract`](/docs/smart-contract#SmartContract) is executed in as the last argument. Accessing `Blockchain.currentTransaction` will result in an error. See the [Native Assets](/docs/native-assets) chapter of the advanced guide for more information.
+Marks a [`SmartContract`](/docs/smart-contract#SmartContract) method that verifies GAS claims from the [`SmartContract`](/docs/smart-contract#SmartContract). Method must throw an error if the [`SmartContract`](/docs/smart-contract#SmartContract) does not wish to allow GAS to be claimed. May optionally take the [`ClaimTransaction`](/docs/smart-contract#ClaimTransaction) this [`SmartContract`](/docs/smart-contract#SmartContract) is executed in as the last argument. Accessing `Blockchain.currentTransaction` will result in an error. See the [Native Assets](/docs/native-assets) chapter of the advanced guide for more information.
 
 #### `@constant`
 

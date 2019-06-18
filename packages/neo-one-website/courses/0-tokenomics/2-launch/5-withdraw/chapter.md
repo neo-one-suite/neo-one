@@ -11,10 +11,8 @@ import { sendUnsafe, SmartContract } from '@neo-one/smart-contract';
 
 export class Example extends SmartContract {
   @sendUnsafe
-  public mySendUnsafe(value: string): boolean {
+  public mySendUnsafe(value: string): void {
     // do something with value + assets to be sent
-
-    return true;
   }
 }
 ```

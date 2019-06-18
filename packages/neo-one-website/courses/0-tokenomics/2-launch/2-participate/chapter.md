@@ -17,10 +17,8 @@ import { receive, SmartContract } from '@neo-one/smart-contract';
 
 export class Example extends SmartContract {
   @receive
-  public myReceive(value: string): boolean {
+  public myReceive(value: string): void {
     // do something with value + received assets
-
-    return true;
   }
 }
 ```

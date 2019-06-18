@@ -7,6 +7,7 @@ import { createWrapParam } from './utils';
 
 export interface HandleSendUnsafeReceiveHelperBaseOptions {
   readonly method: ts.MethodDeclaration;
+  readonly returnType: ts.Type | undefined;
   readonly opposite: boolean;
 }
 
@@ -15,11 +16,13 @@ export interface HandleSendUnsafeReceiveHelperBaseOptions {
 export abstract class HandleSendUnsafeReceiveHelperBase extends Helper {
   protected abstract readonly lessThan: boolean;
   private readonly method: ts.MethodDeclaration;
+  private readonly returnType: ts.Type | undefined;
   private readonly opposite: boolean;
 
-  public constructor({ method, opposite }: HandleSendUnsafeReceiveHelperBaseOptions) {
+  public constructor({ method, returnType, opposite }: HandleSendUnsafeReceiveHelperBaseOptions) {
     super();
     this.method = method;
+    this.returnType = returnType;
     this.opposite = opposite;
   }
 
@@ -96,24 +99,12 @@ export abstract class HandleSendUnsafeReceiveHelperBase extends Helper {
               }),
             );
 
-            // [booleanVal]
+            // [val]
             sb.emitHelper(node, innerOptions, sb.helpers.invokeSmartContractMethod({ method: this.method }));
-            // [boolean]
-            sb.emitHelper(node, innerOptions, sb.helpers.unwrapBoolean);
-            sb.emitHelper(
-              node,
-              innerOptions,
-              sb.helpers.if({
-                condition: () => {
-                  // [boolean, boolean]
-                  sb.emitOp(node, 'DUP');
-                },
-                whenTrue: () => {
-                  // [boolean]
-                  sb.emitHelper(node, innerOptions, sb.helpers.setProcessedTransaction);
-                },
-              }),
-            );
+            // [value]
+            sb.emitHelper(node, innerOptions, sb.helpers.unwrapValRecursive({ type: this.returnType }));
+            // [value]
+            sb.emitHelper(node, innerOptions, sb.helpers.setProcessedTransaction);
           });
         },
       }),

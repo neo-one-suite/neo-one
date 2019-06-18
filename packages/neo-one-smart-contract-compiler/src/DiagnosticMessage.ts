@@ -30,7 +30,7 @@ export enum DiagnosticMessage {
   InvalidContractMethodConstantNative = 'SmartContract methods marked with @send, @sendUnsafe, @receive or @claim cannot be @constant.',
   InvalidContractAbstract = 'Cannot compile abstract SmartContract.',
   InvalidContractNew = 'Cannot construct a SmartContract',
-  InvalidContractMethodNativeReturn = 'SmartContract methods marked with @send, @sendUnsafe, @receive or @claim must return a boolean.',
+  InvalidContractMethodNativeReturn = 'SmartContract methods marked with @claim must return void.',
   InvalidContractTypeForwardNative = 'Cannot use ForwardValue or ForwardedValue as parameters for methods marked with @send, @sendUnsafe, @receive or @claim.',
   SyscallReturnTypeExplicitCast = 'Syscall return type must be explicitly casted to expected type.',
   UnknownReference = 'Unknown reference %s',

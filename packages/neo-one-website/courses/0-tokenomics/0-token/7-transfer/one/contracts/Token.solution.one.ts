@@ -41,18 +41,18 @@ export class Token extends SmartContract {
     return balance === undefined ? 0 : balance;
   }
 
-  public transfer(from: Address, to: Address, amount: Fixed<8>): boolean {
+  public transfer(from: Address, to: Address, amount: Fixed<8>): true {
     if (amount < 0) {
       throw new Error(`Amount must be greater than 0: ${amount}`);
     }
 
     if (!Address.isCaller(from)) {
-      return false;
+      throw new Error('The from Address did not approve the operation.');
     }
 
     const fromBalance = this.balanceOf(from);
     if (fromBalance < amount) {
-      return false;
+      throw new Error('The from balance is insufficient.');
     }
 
     const toBalance = this.balanceOf(to);

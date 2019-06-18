@@ -29,7 +29,7 @@ describe('CNEO', () => {
       if (wrapReceipt.result.state === 'FAULT') {
         throw new Error(wrapReceipt.result.message);
       }
-      expect(wrapReceipt.result.value).toEqual(true);
+      expect(wrapReceipt.result.value).toBeUndefined();
 
       // Pre-approve the transfer by the Escrow account
       const escrowAmount = new BigNumber(100);
@@ -93,7 +93,7 @@ describe('CNEO', () => {
       if (claimReceipt.result.state === 'FAULT') {
         throw new Error(claimReceipt.result.message);
       }
-      expect(claimReceipt.result.value).toEqual(true);
+      expect(claimReceipt.result.value).toBeUndefined();
       // Notice how the receipt has the events for both the CNEO contract we invoked as well as the Escrow contract.
       event = claimReceipt.events[0];
       expect(event.name).toEqual('transfer');
@@ -129,7 +129,7 @@ describe('CNEO', () => {
       if (unwrapReceipt.result.state === 'FAULT') {
         throw new Error(unwrapReceipt.result.message);
       }
-      expect(unwrapReceipt.result.value).toEqual(true);
+      expect(unwrapReceipt.result.value).toBeUndefined();
       const unwrapEvent = unwrapReceipt.events[0];
       expect(unwrapEvent.name).toEqual('transfer');
       if (unwrapEvent.name !== 'transfer') {
@@ -146,7 +146,7 @@ describe('CNEO', () => {
       if (completeReceipt.result.state === 'FAULT') {
         throw new Error(completeReceipt.result.message);
       }
-      expect(completeReceipt.result.value).toEqual(true);
+      expect(completeReceipt.result.value).toBeUndefined();
 
       // Verify the balance and total supply have been deducted and that the toAccount has the NEO
       const [masterBalance, toBalance, totalSupply, toAccount, cneoAccountBefore] = await Promise.all([

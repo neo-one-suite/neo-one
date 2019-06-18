@@ -70,10 +70,10 @@ export class Token extends SmartContract {
   }
 
   @receive
-  public mintTokens(): boolean {
+  public mintTokens(): void {
     const { references, outputs } = Blockchain.currentTransaction;
     if (references.length === 0) {
-      return false;
+      throw new Error('Invalid mintTokens');
     }
 
     const sender = references[0].address;
@@ -82,7 +82,7 @@ export class Token extends SmartContract {
     for (const output of outputs) {
       if (output.address.equals(this.address)) {
         if (!output.asset.equals(Hash256.NEO)) {
-          return false;
+          throw new Error('Invalid mintTokens');
         }
 
         amount += output.value;
@@ -90,8 +90,6 @@ export class Token extends SmartContract {
     }
 
     this.issue(sender, amount);
-
-    return true;
   }
 
   private issue(addr: Address, amount: Fixed<8>): void {
@@ -151,7 +149,7 @@ describe('Token', () => {
       }
 
       expect(mintReceipt.result.state).toEqual('HALT');
-      expect(mintReceipt.result.value).toEqual(true);
+      expect(mintReceipt.result.value).toBeUndefined();
       expect(mintReceipt.events).toHaveLength(1);
       let event = mintReceipt.events[0];
       expect(event.name).toEqual('transfer');

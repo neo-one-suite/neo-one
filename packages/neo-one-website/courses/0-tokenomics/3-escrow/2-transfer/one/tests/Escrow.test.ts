@@ -31,7 +31,7 @@ describe('Escrow', () => {
       if (mintReceipt.result.state === 'FAULT') {
         throw new Error(mintReceipt.result.message);
       }
-      expect(mintReceipt.result.value).toEqual(true);
+      expect(mintReceipt.result.value).toBeUndefined();
 
       // Pre-approve the transfer by the Escrow account
       const escrowAmount = new BigNumber(100);

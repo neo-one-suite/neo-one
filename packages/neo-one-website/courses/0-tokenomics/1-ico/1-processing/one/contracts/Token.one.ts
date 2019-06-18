@@ -65,9 +65,7 @@ export class Token extends SmartContract {
   }
 
   @receive
-  public mintTokens(): boolean {
-    return true;
-  }
+  public mintTokens(): void {}
 
   public issue(addr: Address, amount: Fixed<8>): void {
     if (!Address.isCaller(this.owner)) {

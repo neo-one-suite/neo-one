@@ -1,4 +1,4 @@
-/* @hash 91e55d7365c55a795a8d26a6baa0f633 */
+/* @hash a3b959c7e23c97d9dd5edf0c5f0f6c37 */
 // tslint:disable
 /* eslint-disable */
 export const icoABI = {
@@ -138,9 +138,8 @@ export const icoABI = {
       parameters: [],
       receive: true,
       returnType: {
-        forwardedValue: false,
         optional: false,
-        type: 'Boolean',
+        type: 'Void',
       },
       send: false,
       sendUnsafe: false,
@@ -149,7 +148,7 @@ export const icoABI = {
       name: 'refundAssets',
       parameters: [],
       returnType: {
-        type: 'Boolean',
+        type: 'Void',
       },
       sendUnsafe: true,
     },

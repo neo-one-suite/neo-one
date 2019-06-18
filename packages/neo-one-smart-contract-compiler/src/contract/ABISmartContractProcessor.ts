@@ -49,7 +49,7 @@ export class ABISmartContractProcessor {
                   name: propInfo.name,
                   sendUnsafe: true,
                   parameters: [],
-                  returnType: BOOLEAN_RETURN,
+                  returnType: VOID_RETURN,
                 },
               ];
             case 'completeSend':
@@ -58,7 +58,7 @@ export class ABISmartContractProcessor {
                   name: propInfo.name,
                   completeSend: true,
                   parameters: [],
-                  returnType: BOOLEAN_RETURN,
+                  returnType: VOID_RETURN,
                 },
               ];
             case 'upgrade':
@@ -76,7 +76,7 @@ export class ABISmartContractProcessor {
                     { name: 'email', type: 'String' },
                     { name: 'description', type: 'String' },
                   ],
-                  returnType: BOOLEAN_RETURN,
+                  returnType: VOID_RETURN,
                 },
               ];
             case 'function':

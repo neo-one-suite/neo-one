@@ -11,18 +11,15 @@ Recall from Lesson 2 that we used the `@sendUnsafe` decorator in order to withdr
   1. The user "marks" the assets they wish to withdraw from the contract by constructing a transaction that sends those assets back to the smart contract.
   2. The user constructs a transaction that withdraws the previously "mark"ed assets to the desired address.
 
-With NEO•ONE, this process is implemented transparently both in terms of the implementation in the smart contract as well as invoking the methods in the NEO•ONE client APIs. Simply decorate a method with the `@send` decorator as before and return `true` if the transaction should proceed, and `false` otherwise. The method may optionally accept one argument in addition to any user defined arguments; a `Transfer` object. The `Transfere` object contains a `to` `Address` property that the assets will be sent to, an `asset` `Hash256` property corresponding to the asset to be sent, and an `amount` `Fixed<8>` property that will be sent. Typically your method will want to accept the `Transfer` argument in order to validate the transaction. Let's take a look at an example.
+With NEO•ONE, this process is implemented transparently both in terms of the implementation in the smart contract as well as invoking the methods in the NEO•ONE client APIs. Simply decorate a method with the `@send` decorator as before and throw an error if the transaction should not proceed. The method may optionally accept one argument in addition to any user defined arguments; a `Transfer` object. The `Transfere` object contains a `to` `Address` property that the assets will be sent to, an `asset` `Hash256` property corresponding to the asset to be sent, and an `amount` `Fixed<8>` property that will be sent. Typically your method will want to accept the `Transfer` argument in order to validate the transaction. Let's take a look at an example.
 
 ```typescript
 import { send, SmartContract, Transfer } from '@neo-one/smart-contract';
 
 export class Example extends SmartContract {
   @send
-  public withdraw(value: string, transfer: Transfer): boolean {
-    // Check internal state against the provided arguments and return false if the transfer should not proceed.
-
-    // Otherwise, return true.
-    return true;
+  public withdraw(value: string, transfer: Transfer): void {
+    // Check internal state against the provided arguments and throw an error if the transfer should not proceed.
   }
 }
 ```
@@ -55,16 +52,13 @@ import { ClaimTransaction, claim, SmartContract } from '@neo-one/smart-contract'
 
 export class Example extends SmartContract {
   @claim
-  public claimGAS(transaction: ClaimTransaction): boolean {
-    // Check internal state against the ClaimTransaction and return false if the claim should not proceed.
-
-    // Otherwise, return true.
-    return true;
+  public claimGAS(transaction: ClaimTransaction): void {
+    // Check internal state against the ClaimTransaction and throw an error if the claim should not proceed.
   }
 }
 ```
 
-Just like the other method decorators, we return `true` or `false` to indicate if the claim should proceed. Methods marked with `@claim` are invoked just like a normal method, so we'll skip showing another example and let you dive into trying out these 2 decorators.
+Just like the other method decorators, we throw an error to indicate if the claim should not proceed. Methods marked with `@claim` are invoked just like a normal method, so we'll skip showing another example and let you dive into trying out these 2 decorators.
 
 ## Instructions
 
@@ -72,16 +66,15 @@ We've started you off with a partial NEP-5 implementation of `CNEO`, it's up to 
 
 The `unwrap` method should do the following:
 
-  1. Return `false` if the `asset` transferred is not `NEO`.
-  2. Return `false` if the balance of the `to` address of the `Transfer` is less than the `amount` of the `Transfer`
+  1. Throw an error if the `asset` transferred is not `NEO`.
+  2. Throw an error if the balance of the `to` address of the `Transfer` is less than the `amount` of the `Transfer`
   3. Deduct `amount` from the balance of the `to` address.
   4. Deduct `amount` from the `mutableSupply` of the contract.
   5. Emit a transfer notification with `undefined` set as the `to` address (which represents burning the token)
-  6. Return `true`.
 
 Since there's not currently an efficient way to allow users to claim `GAS` for their `CNEO`, we'll make the `claim` method do the following:
 
-  1. Return `true` if `Address.isCaller(this.owner)`.
+  1. Throw an error if `!Address.isCaller(this.owner)`.
 
 Then at least the owner of `CNEO` can claim and distribute `GAS`.
 

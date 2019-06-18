@@ -3,7 +3,7 @@ import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import ts from 'typescript';
 import { STRUCTURED_STORAGE_TYPES, StructuredStorageType } from '../compile/constants';
-import { hasForwardValue, isOnlyBoolean } from '../compile/helper/types';
+import { hasForwardValue } from '../compile/helper/types';
 import {
   BUILTIN_PROPERTIES,
   ContractPropertyName,
@@ -474,9 +474,9 @@ export class ContractInfoProcessor {
       const receive = this.hasReceive(decl);
       const claim = this.hasClaim(decl);
       const constant = this.hasConstant(decl);
-      const requiresBoolean = send || sendUnsafe || receive || claim;
+      const isUTXO = send || sendUnsafe || receive || claim;
 
-      if (requiresBoolean && constant) {
+      if (isUTXO && constant) {
         const decorator = tsUtils.decoratable
           .getDecoratorsArray(decl)
           .find((dec) => this.isDecorator(dec, Decorator.constant));
@@ -490,16 +490,10 @@ export class ContractInfoProcessor {
       }
 
       const returnType = callSignatures.length >= 1 ? tsUtils.signature.getReturnType(callSignature) : undefined;
-      if (returnType !== undefined && requiresBoolean && !isOnlyBoolean(this.context, decl, returnType)) {
+      if (claim && returnType !== undefined && !tsUtils.type_.isVoid(returnType)) {
         const decorator = tsUtils.decoratable
           .getDecoratorsArray(decl)
-          .find(
-            (dec) =>
-              this.isDecorator(dec, Decorator.send) ||
-              this.isDecorator(dec, Decorator.sendUnsafe) ||
-              this.isDecorator(dec, Decorator.receive) ||
-              this.isDecorator(dec, Decorator.claim),
-          );
+          .find((dec) => this.isDecorator(dec, Decorator.claim));
         this.context.reportError(
           decorator === undefined ? decl : decorator,
           DiagnosticCode.InvalidContractMethod,
@@ -509,7 +503,7 @@ export class ContractInfoProcessor {
         return undefined;
       }
 
-      if (requiresBoolean && callSignatures.length >= 1) {
+      if (isUTXO && callSignatures.length >= 1) {
         const signatureTypes = this.context.analysis.extractSignatureTypes(decl, callSignatures[0]);
         if (signatureTypes !== undefined) {
           const invalidParams = signatureTypes.paramDecls.filter((param) => {

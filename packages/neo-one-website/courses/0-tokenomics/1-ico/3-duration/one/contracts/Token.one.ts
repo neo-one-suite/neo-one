@@ -74,10 +74,10 @@ export class Token extends SmartContract {
   }
 
   @receive
-  public mintTokens(): boolean {
+  public mintTokens(): void {
     const { references, outputs } = Blockchain.currentTransaction;
     if (references.length === 0) {
-      return false;
+      throw new Error('Invalid mintTokens');
     }
     const sender = references[0].address;
 
@@ -86,7 +86,7 @@ export class Token extends SmartContract {
     for (const output of outputs) {
       if (output.address.equals(this.address)) {
         if (!output.asset.equals(Hash256.NEO)) {
-          return false;
+          throw new Error('Invalid mintTokens');
         }
 
         amount += output.value * this.amountPerNEO;
@@ -94,13 +94,11 @@ export class Token extends SmartContract {
     }
 
     if (amount > this.remaining) {
-      return false;
+      throw new Error('Invalid mintTokens');
     }
 
     this.mutableRemaining -= amount;
     this.issue(sender, amount);
-
-    return true;
   }
 
   private issue(addr: Address, amount: Fixed<8>): void {

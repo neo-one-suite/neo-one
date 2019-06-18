@@ -20,17 +20,16 @@ import { receive, SmartContract } from '@neo-one/smart-contract';
 
 export class Example extends SmartContract {
   @receive
-  public receiveNativeAssets(): boolean {
-    return true;
+  public receiveNativeAssets(): void {
   }
 }
 ```
 
-In this very simple example, we've defined a method decorated with `@receive`. This enables the method to receive native assets of any kind, including NEO and GAS. Methods marked with `@receive` must return a `boolean` value to indicate whether or not the contract wants to receive the assets. Note, however, that there are cases where the contract may still receive assets, despite returning `false`, due to limitations in how NEO handles native UTXO assets. For these cases, we automatically generate a `refundAssets` method that clients of your smart contract may call to refund assets which were not processed by the smart contract (i.e. the smart contract returned `false` or was not actually called). Note that this method cannot refund assets if the smart contract invocation succeeded.
+In this very simple example, we've defined a method decorated with `@receive`. This enables the method to receive native assets of any kind, including NEO and GAS. Methods marked with `@receive` must throw an error to indicate if the contract does not want to receive the assets. Note, however, that there are cases where the contract may still receive assets, despite throwing an error, due to limitations in how NEO handles native UTXO assets. For these cases, we automatically generate a `refundAssets` method that clients of your smart contract may call to refund assets which were not processed by the smart contract (i.e. the smart contract threw an error or was not actually called). Note that this method cannot refund assets if the smart contract invocation succeeded.
 
 ## Instructions
 
-  1. Add a method called `mintTokens` that's decorated with `@receive` and returns `true`.
+  1. Add a method called `mintTokens` that's decorated with `@receive` and does not throw an error.
 
 In the following chapters we'll start expanding the method with more logic like converting NEO to tokens, but for now, we'll just accept all assets.
 

@@ -6,7 +6,7 @@ Native assets like NEO and GAS require special handling in smart contracts. This
 
 NEO employs the [Unspent Transaction Output](https://en.wikipedia.org/wiki/Unspent_transaction_output) (UTXO) system for native assets. Unfortunately, the UTXO system does not play well with smart contracts. Fortunately, NEO•ONE smart contracts abstract away most of the difficulty in handling native assets using the `@receive`, `@send`, `@sendUnsafe` and `@claim` [decorators](https://www.typescriptlang.org/docs/handbook/decorators.html).
 
-One commonality between every native asset method is that they must return a `boolean` indicating whether or not the transaction should proceed.
+One commonality between every native asset method is that they must throw an error if the transaction should not proceed.
 
 ---
 
@@ -21,11 +21,9 @@ Decorate a method with `@receive` to allow the method to be invoked when receivi
 ```typescript
 export class Contract extends SmartContract {
   @receive
-  public mintTokens(): boolean {
+  public mintTokens(): void {
     // Use Blockchain.currentTransaction to validate and process the inputs/outputs.
-    // Return false if it's an invalid combination
-
-    return true;
+    // Throw an error if it's an invalid combination
   }
 }
 ```
@@ -43,7 +41,7 @@ const receipt = await contract.mintTokens({
 })
 ```
 
-There are cases where a smart contract may receive native assets without a corresponding `@receive` method invocation, or sometimes even when the `@receive` method returns `false`. Unfortunately this is unavoidable, and to solve these cases every smart contract has an automatically generated method called `refundAssets`. Users may call this method when they have sent assets to the contract that were not properly processed. Using the NEO•ONE client APIs:
+There are cases where a smart contract may receive native assets without a corresponding `@receive` method invocation, or sometimes even when the `@receive` method throws an error. Unfortunately this is unavoidable, and to solve these cases every smart contract has an automatically generated method called `refundAssets`. Users may call this method when they have sent assets to the contract that were not properly processed. Using the NEO•ONE client APIs:
 
 ```typescript
 const transactionHash = ... // Hash of the transaction that needs to be refunded
@@ -63,9 +61,8 @@ Decorate a method with `@sendUnsafe` to enable assets to be sent from the contra
 ```typescript
 export class Contract extends SmartContract {
   @sendUnsafe
-  public withdraw(): boolean {
+  public withdraw(): void {
     // Typically check something like Address.isCaller(this.owner)
-    return true;
   }
 }
 ```
@@ -99,7 +96,7 @@ Decorate a method with `@send` to enable assets to be sent from the contract saf
   1. The user "marks" the assets they wish to withdraw from the contract by constructing a transaction that sends those assets back to the smart contract.
   2. The user constructs a transaction that withdraws the previously "mark"ed assets to the desired address.
 
-NEO•ONE abstract this process such that you only need to define a method decorated with `@send` that returns `true` or `false`. NEO•ONE handles the rest. This method may also accept a final argument, a `Transfer` object, that contains the details of the pending transfer:
+NEO•ONE abstract this process such that you only need to define a method decorated with `@send` that throws an error on invalid transactions. NEO•ONE handles the rest. This method may also accept a final argument, a `Transfer` object, that contains the details of the pending transfer:
 
 ```typescript
 interface Transfer {
@@ -114,10 +111,8 @@ For example, if you wanted to have a method that required a single argument, `va
 ```typescript
 export class Contract extends SmartContract {
   @send
-  public withdraw(value: string, transfer: Transfer): boolean {
-    // Validate the `transfer` should proceed. Return false if not.
-
-    return true;
+  public withdraw(value: string, transfer: Transfer): void {
+    // Validate the `transfer` should proceed. Throw an error if not.
   }
 }
 ```
@@ -150,10 +145,8 @@ Decorate a method with `@claim` to enable claiming GAS. `@claim` methods have a 
 ```typescript
 export class Contract extends SmartContract {
   @claim
-  public claim(transaction: ClaimTransaction): boolean {
-    // Validate the ClaimTransaction and return false if it is invalid
-
-    return true;
+  public claim(transaction: ClaimTransaction): void {
+    // Validate the ClaimTransaction and throw an error if it is invalid
   }
 }
 ```

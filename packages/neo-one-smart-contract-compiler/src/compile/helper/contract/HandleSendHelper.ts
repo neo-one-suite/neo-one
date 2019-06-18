@@ -9,16 +9,19 @@ import { createWrapParam } from './utils';
 
 export interface HandleSendHelperOptions {
   readonly method: ts.MethodDeclaration | ts.PropertyDeclaration;
+  readonly returnType: ts.Type | undefined;
 }
 
 // Input: []
 // Output: [boolean]
 export class HandleSendHelper extends Helper {
   private readonly method: ts.MethodDeclaration | ts.PropertyDeclaration;
+  private readonly returnType: ts.Type | undefined;
 
-  public constructor({ method }: HandleSendHelperOptions) {
+  public constructor({ method, returnType }: HandleSendHelperOptions) {
     super();
     this.method = method;
+    this.returnType = returnType;
   }
 
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
@@ -289,61 +292,47 @@ export class HandleSendHelper extends Helper {
                     }),
                   );
 
-                  // [booleanVal, receiver]
+                  // [val, receiver]
                   sb.emitHelper(node, innerOptions, sb.helpers.invokeSmartContractMethod({ method }));
-                  // [boolean, receiver]
-                  sb.emitHelper(node, innerOptions, sb.helpers.unwrapBoolean);
+                  // [value, receiver]
+                  sb.emitHelper(node, innerOptions, sb.helpers.unwrapValRecursive({ type: this.returnType }));
+                  // [receiver, value]
+                  sb.emitOp(node, 'SWAP');
+                  // [transaction, receiver, value]
+                  sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
+                  // [hash, receiver, value]
+                  sb.emitSysCall(node, 'Neo.Transaction.GetHash');
+                  // [bufferVal, receiver, value]
+                  sb.emitHelper(node, innerOptions, sb.helpers.wrapBuffer);
+                  // [receiver, bufferVal, value]
+                  sb.emitOp(node, 'SWAP');
+                  // [val, receiver, bufferVal, value]
                   sb.emitHelper(
                     node,
                     innerOptions,
-                    sb.helpers.if({
-                      condition: () => {
-                        // [boolean, receiver, boolean]
-                        sb.emitOp(node, 'TUCK');
-                      },
-                      whenTrue: () => {
-                        // [transaction, receiver, boolean]
-                        sb.emitSysCall(node, 'System.ExecutionEngine.GetScriptContainer');
-                        // [hash, receiver, boolean]
-                        sb.emitSysCall(node, 'Neo.Transaction.GetHash');
-                        // [bufferVal, receiver, boolean]
-                        sb.emitHelper(node, innerOptions, sb.helpers.wrapBuffer);
-                        // [receiver, bufferVal, boolean]
-                        sb.emitOp(node, 'SWAP');
-                        // [val, receiver, bufferVal, boolean]
-                        sb.emitHelper(
-                          node,
-                          innerOptions,
-                          sb.helpers.createStructuredStorage({
-                            prefix: ContractPropertyName.claimedTransactions,
-                            type: Types.MapStorage,
-                          }),
-                        );
-                        // [bufferVal, val, receiver, boolean]
-                        sb.emitOp(node, 'ROT');
-                        // [receiver, bufferVal, val, boolean]
-                        sb.emitOp(node, 'ROT');
-                        // [receiverVal, bufferVal, val, boolean]
-                        sb.emitHelper(node, innerOptions, sb.helpers.wrapBuffer);
-                        // [boolean]
-                        sb.emitHelper(
-                          node,
-                          options,
-                          sb.helpers.setStructuredStorage({
-                            type: Types.MapStorage,
-                            keyType: undefined,
-                            knownKeyType: Types.Buffer,
-                          }),
-                        );
-                        // [boolean]
-                        sb.emitHelper(node, innerOptions, sb.helpers.setProcessedTransaction);
-                      },
-                      whenFalse: () => {
-                        // [boolean]
-                        sb.emitOp(node, 'DROP');
-                      },
+                    sb.helpers.createStructuredStorage({
+                      prefix: ContractPropertyName.claimedTransactions,
+                      type: Types.MapStorage,
                     }),
                   );
+                  // [bufferVal, val, receiver, value]
+                  sb.emitOp(node, 'ROT');
+                  // [receiver, bufferVal, val, value]
+                  sb.emitOp(node, 'ROT');
+                  // [receiverVal, bufferVal, val, value]
+                  sb.emitHelper(node, innerOptions, sb.helpers.wrapBuffer);
+                  // [value]
+                  sb.emitHelper(
+                    node,
+                    options,
+                    sb.helpers.setStructuredStorage({
+                      type: Types.MapStorage,
+                      keyType: undefined,
+                      knownKeyType: Types.Buffer,
+                    }),
+                  );
+                  // [value]
+                  sb.emitHelper(node, innerOptions, sb.helpers.setProcessedTransaction);
                 });
               },
             }),

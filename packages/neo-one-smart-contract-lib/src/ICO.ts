@@ -22,14 +22,14 @@ export function ICO<TBase extends Constructor<SmartContract>>(Base: TBase) {
     }
 
     @receive
-    public mintTokens(): boolean {
+    public mintTokens(): void {
       if (!this.hasStarted() || this.hasEnded()) {
-        return false;
+        throw new Error('Invalid mintTokens');
       }
 
       const { references } = Blockchain.currentTransaction;
       if (references.length === 0) {
-        return false;
+        throw new Error('Invalid mintTokens');
       }
       const sender = references[0].address;
 
@@ -38,7 +38,7 @@ export function ICO<TBase extends Constructor<SmartContract>>(Base: TBase) {
       for (const output of Blockchain.currentTransaction.outputs) {
         if (output.address.equals(this.address)) {
           if (!output.asset.equals(Hash256.NEO)) {
-            return false;
+            throw new Error('Invalid mintTokens');
           }
 
           amount += output.value * this.amountPerNEO;
@@ -46,13 +46,11 @@ export function ICO<TBase extends Constructor<SmartContract>>(Base: TBase) {
       }
 
       if (amount > this.remaining) {
-        return false;
+        throw new Error('Invalid mintTokens');
       }
 
       this.mutableRemaining -= amount;
       this.issue(sender, amount);
-
-      return true;
     }
 
     public abstract getICOAmount(): Fixed<8>;

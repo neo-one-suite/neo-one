@@ -1,7 +1,7 @@
-/* @hash 1fed6cde1eaf23563a0247f4def3fb16 */
+/* @hash a57bc9bd5886f51f28a138a0c18823fd */
 // tslint:disable
 /* eslint-disable */
-/* @source-map-hash 10123d91f1124a2756cd13efc0357687 */
+/* @source-map-hash 67ff48db6a5549fa58aafef0baa18ff5 */
 import { OneClient } from '@neo-one/client';
 import { projectID } from './projectID';
 

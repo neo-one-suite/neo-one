@@ -98,20 +98,12 @@ describe('Token', () => {
       expect(event.parameters.to).toEqual(masterAccountID.address);
       expect(event.parameters.amount.toNumber()).toEqual(transferAmount.toNumber());
 
-      // Verify the failed result (returns false)
-      if (falseTransferReceipt0.result.state === 'FAULT') {
-        throw new Error(falseTransferReceipt0.result.message);
-      }
-      expect(falseTransferReceipt0.result.state).toEqual('HALT');
-      expect(falseTransferReceipt0.result.value).toEqual(false);
+      // Verify the failed result (throws an error)
+      expect(falseTransferReceipt0.result.state).toEqual('FAULT');
       expect(falseTransferReceipt0.events).toHaveLength(0);
 
-      // Verify the failed result (returns false)
-      if (falseTransferReceipt1.result.state === 'FAULT') {
-        throw new Error(falseTransferReceipt1.result.message);
-      }
-      expect(falseTransferReceipt1.result.state).toEqual('HALT');
-      expect(falseTransferReceipt1.result.value).toEqual(false);
+      // Verify the failed result (throws an error)
+      expect(falseTransferReceipt1.result.state).toEqual('FAULT');
       expect(falseTransferReceipt1.events).toHaveLength(0);
 
       // Validate that an error is thrown on the exceptional case of -1

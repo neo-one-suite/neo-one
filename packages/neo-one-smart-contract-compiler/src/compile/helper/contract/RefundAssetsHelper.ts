@@ -4,7 +4,7 @@ import { VisitOptions } from '../../types';
 import { Helper } from '../Helper';
 
 // Input: []
-// Output: [boolean]
+// Output: []
 export class RefundAssetsHelper extends Helper {
   public emit(sb: ScriptBuilder, node: ts.Node, optionsIn: VisitOptions): void {
     const options = sb.pushValueOptions(optionsIn);
@@ -138,9 +138,26 @@ export class RefundAssetsHelper extends Helper {
       }),
     );
 
-    if (!optionsIn.pushValue) {
-      // []
-      sb.emitOp(node, 'DROP');
+    sb.emitHelper(
+      node,
+      options,
+      sb.helpers.if({
+        condition: () => {
+          // do nothing
+        },
+        whenFalse: () => {
+          // ['InvalidRefundAssetsError']
+          sb.emitPushString(node, 'InvalidRefundAssetsError');
+          // [value]
+          sb.emitHelper(node, options, sb.helpers.wrapString);
+          // []
+          sb.emitHelper(node, options, sb.helpers.throw);
+        },
+      }),
+    );
+
+    if (optionsIn.pushValue) {
+      sb.emitHelper(node, options, sb.helpers.wrapUndefined);
     }
   }
 }

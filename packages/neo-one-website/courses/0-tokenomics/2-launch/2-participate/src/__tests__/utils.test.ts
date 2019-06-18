@@ -61,7 +61,7 @@ describe('utils', () => {
       }
 
       expect(mintReceipt.result.state).toEqual('HALT');
-      expect(mintReceipt.result.value).toEqual(true);
+      expect(mintReceipt.result.value).toBeUndefined();
       expect(mintReceipt.events).toHaveLength(1);
       let event = mintReceipt.events[0];
       expect(event.name).toEqual('transfer');

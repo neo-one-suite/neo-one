@@ -26,19 +26,6 @@ exports[`ContractInfoProcessor @receive with @constant 1`] = `
 "
 `;
 
-exports[`ContractInfoProcessor @receive with incorrect return type 1`] = `
-"snippetCode.ts (14,9): SmartContract methods marked with @send, @sendUnsafe, @receive or @claim must return a boolean.
-
-      12 | 
-      13 | 
-    > 14 |         @receive
-         |         ^
-      15 |         public verify(): number {
-      16 |           return 20;
-      17 |         }
-"
-`;
-
 exports[`ContractInfoProcessor @sendUnsafe with @constant 1`] = `
 "snippetCode.ts (15,9): SmartContract methods marked with @send, @sendUnsafe, @receive or @claim cannot be @constant.
 
@@ -70,11 +57,11 @@ exports[`ContractInfoProcessor invalid @claim method with ForwardValue 1`] = `
 
       13 | 
       14 |         @claim
-    > 15 |         public foo(value: ForwardValue): boolean {
+    > 15 |         public foo(value: ForwardValue): void {
          |                    ^
-      16 |           return true;
-      17 |         }
-      18 |       }
+      16 |         }
+      17 |       }
+      18 |     
 "
 `;
 
@@ -83,11 +70,11 @@ exports[`ContractInfoProcessor invalid @claim method with ForwardedValue 1`] = `
 
       13 | 
       14 |         @claim
-    > 15 |         public foo(value: ForwardedValue<number>): boolean {
+    > 15 |         public foo(value: ForwardedValue<number>): void {
          |                    ^
-      16 |           return true;
-      17 |         }
-      18 |       }
+      16 |         }
+      17 |       }
+      18 |     
 "
 `;
 

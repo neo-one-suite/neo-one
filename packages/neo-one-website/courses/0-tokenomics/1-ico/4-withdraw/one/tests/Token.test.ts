@@ -51,7 +51,7 @@ describe('Token', () => {
       }
 
       expect(mintReceipt.result.state).toEqual('HALT');
-      expect(mintReceipt.result.value).toEqual(true);
+      expect(mintReceipt.result.value).toBeUndefined();
       expect(mintReceipt.events).toHaveLength(1);
       let event = mintReceipt.events[0];
       expect(event.name).toEqual('transfer');
@@ -125,7 +125,7 @@ describe('Token', () => {
         throw new Error(withdrawReceipt.result.message);
       }
       expect(withdrawReceipt.result.state).toEqual('HALT');
-      expect(withdrawReceipt.result.value).toEqual(true);
+      expect(withdrawReceipt.result.value).toBeUndefined();
       const [toWalletAccount, contractAccount] = await Promise.all([
         client.getAccount(toAccountID),
         client.getAccount({

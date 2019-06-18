@@ -38,29 +38,49 @@ describe('InvokeSmartContractHelper', () => {
         }
 
         @send
-        public send(transfer: Transfer): boolean {
-          return transfer.to.equals(this.owner) && transfer.asset.equals(Hash256.NEO) && Address.isCaller(this.owner) && transfer.amount > 0;
+        public send(transfer: Transfer): number {
+          if (transfer.to.equals(this.owner) && transfer.asset.equals(Hash256.NEO) && Address.isCaller(this.owner) && transfer.amount > 0) {
+            return 10;
+          }
+
+          throw new Error('Invalid send');
         }
 
         @sendUnsafe
-        public sendUnsafe(): boolean {
-          return Address.isCaller(this.owner);
+        public sendUnsafe(): string {
+          if (Address.isCaller(this.owner)) {
+            return 'sendUnsafe';
+          }
+
+          throw new Error('Invalid sendUnsafe');
         }
 
         @receive
-        public receive(): boolean {
-          return Address.isCaller(this.owner);
+        public receive(): string {
+          if (Address.isCaller(this.owner)) {
+            return 'receive';
+          }
+
+          throw new Error('Invalid receive');
         }
 
         @sendUnsafe
         @receive
-        public sendUnsafeReceive(): boolean {
-          return Address.isCaller(this.owner);
+        public sendUnsafeReceive(): string | undefined {
+          if (Address.isCaller(this.owner)) {
+            return undefined;
+          }
+
+          throw new Error('sendUnsafeReceive');
         }
 
         @claim
-        public claim(transaction: ClaimTransaction): boolean {
-          return transaction.inputs.length === 0 && Address.isCaller(this.owner);
+        public claim(transaction: ClaimTransaction): void {
+          if (transaction.inputs.length === 0 && Address.isCaller(this.owner)) {
+            return;
+          }
+
+          throw new Error('claim');
         }
       }
     `);
@@ -103,44 +123,44 @@ describe('InvokeSmartContractHelper', () => {
             name: 'refundAssets',
             refundAssets: true,
             parameters: [],
-            returnType: { type: 'Boolean' },
+            returnType: { type: 'Void' },
           },
           {
             name: 'claim',
             claim: true,
             parameters: [],
-            returnType: { type: 'Boolean' },
+            returnType: { type: 'Void' },
           },
           {
             name: 'receive',
             receive: true,
             parameters: [],
-            returnType: { type: 'Boolean' },
+            returnType: { type: 'String' },
           },
           {
             name: 'send',
             send: true,
             parameters: [],
-            returnType: { type: 'Boolean' },
+            returnType: { type: 'Integer', decimals: 0 },
           },
           {
             name: 'completeSend',
             completeSend: true,
             parameters: [],
-            returnType: { type: 'Boolean' },
+            returnType: { type: 'Void' },
           },
           {
             name: 'sendUnsafe',
             sendUnsafe: true,
             parameters: [],
-            returnType: { type: 'Boolean' },
+            returnType: { type: 'String' },
           },
           {
             name: 'sendUnsafeReceive',
             sendUnsafe: true,
             receive: true,
             parameters: [],
-            returnType: { type: 'Boolean' },
+            returnType: { type: 'String', optional: true },
           },
         ],
       },
@@ -151,7 +171,7 @@ describe('InvokeSmartContractHelper', () => {
     const refundReceipt = await refundResult.confirmed();
     expect(refundReceipt.result.state).toEqual('HALT');
     if (refundReceipt.result.state === 'HALT') {
-      expect(refundReceipt.result.value).toBeTruthy();
+      expect(refundReceipt.result.value).toBeUndefined();
     }
     expect(refundReceipt.result.gasCost).toMatchSnapshot();
 
@@ -177,7 +197,7 @@ describe('InvokeSmartContractHelper', () => {
     const receiveReceipt = await receiveResult.confirmed();
     expect(receiveReceipt.result.state).toEqual('HALT');
     if (receiveReceipt.result.state === 'HALT') {
-      expect(receiveReceipt.result.value).toBeTruthy();
+      expect(receiveReceipt.result.value).toEqual('receive');
     }
     expect(receiveReceipt.result.gasCost).toMatchSnapshot();
 
@@ -193,7 +213,7 @@ describe('InvokeSmartContractHelper', () => {
     const sendUnsafeReceipt = await sendUnsafeResult.confirmed();
     expect(sendUnsafeReceipt.result.state).toEqual('HALT');
     if (sendUnsafeReceipt.result.state === 'HALT') {
-      expect(sendUnsafeReceipt.result.value).toBeTruthy();
+      expect(sendUnsafeReceipt.result.value).toEqual('sendUnsafe');
     }
     expect(sendUnsafeReceipt.result.gasCost).toMatchSnapshot();
 
@@ -219,6 +239,7 @@ describe('InvokeSmartContractHelper', () => {
     });
     const sendUnsafeReceiveReceipt = await sendUnsafeReceiveResult.confirmed();
     expect(sendUnsafeReceiveReceipt.result.state).toEqual('HALT');
+    expect(sendUnsafeReceiveReceipt.result.value).toBeUndefined();
     expect(sendUnsafeReceiveReceipt.result.gasCost).toMatchSnapshot();
 
     await expect(smartContract.refundAssets(sendUnsafeReceiveResult.transaction.hash)).rejects.toBeDefined();
@@ -252,6 +273,7 @@ describe('InvokeSmartContractHelper', () => {
     ]);
     const sendReceipt = await sendResult.confirmed();
     expect(sendReceipt.result.state).toEqual('HALT');
+    expect(sendReceipt.result.value.toString()).toEqual('10');
     expect(sendReceipt.result.gasCost).toMatchSnapshot();
 
     account = await node.client.read(accountID.network).getAccount(contract.address);
@@ -260,6 +282,7 @@ describe('InvokeSmartContractHelper', () => {
 
     const completeSendReceipt = await smartContract.completeSend.confirmed(sendResult.transaction.hash);
     expect(completeSendReceipt.result.state).toEqual('HALT');
+    expect(completeSendReceipt.result.value).toBeUndefined();
     expect(completeSendReceipt.result.gasCost).toMatchSnapshot();
 
     account = await node.client.read(accountID.network).getAccount(contract.address);
@@ -273,6 +296,7 @@ describe('InvokeSmartContractHelper', () => {
     });
     const sendReceipt0 = await sendResult0.confirmed();
     expect(sendReceipt0.result.state).toEqual('HALT');
+    expect(sendReceipt0.result.value.toString()).toEqual('10');
     expect(sendReceipt0.result.gasCost).toMatchSnapshot();
 
     account = await node.client.read(accountID.network).getAccount(contract.address);
@@ -281,6 +305,7 @@ describe('InvokeSmartContractHelper', () => {
 
     const completeSendReceipt0 = await smartContract.completeSend.confirmed(sendResult0.transaction.hash);
     expect(completeSendReceipt0.result.state).toEqual('HALT');
+    expect(completeSendReceipt0.result.value).toBeUndefined();
     expect(completeSendReceipt0.result.gasCost).toMatchSnapshot();
 
     account = await node.client.read(accountID.network).getAccount(contract.address);

@@ -290,13 +290,13 @@ export class Token extends SmartContract {
 
     // Verify that the `from` `Address` has approved this call.
     if (!Address.isCaller(from)) {
-      return false;
+      throw new Error('from Address did not approve the transfer');
     }
 
     // Sanity check that the `from` `Address` has enough balance
     const fromBalance = this.balanceOf(from);
     if (fromBalance < amount) {
-      return false;
+      throw new Error('From balance is insufficient');
     }
 
     // Update balances accordingly
@@ -311,7 +311,7 @@ export class Token extends SmartContract {
 
 Unlike methods decorated with `@constant`, normal instance methods may modify contract properties. Otherwise, they work the same as `@constant` methods and may contain arbitrary TypeScript code. Take a look at the comments in the above example for a detailed look at what we're doing on each line (and why we're doing it).
 
-You may be wondering why we throw `Error`s in some places and return `false` in others on failure. The general rule of thumb is that you should throw errors in "exceptional" cases and return `false` from a method to indicate failure for all other cases. What's an "exceptional" case? One where the caller has made a fundamental error in invoking your method. One concrete example is parameter bounds checking, for example, our `transfer` method will throw an `Error` when the `amount` to be transferred is less than `0`. Attempting to transfer less than `0` indicates a programmer error, i.e. the invocation is just fundamentally broken. Contrast this to attempting to transfer when the `from` balance is less than the desired amount to `transfer` - in this case we would return `false`. Since there is not (currently) a way to catch errors when invoking another smart contract, it makes sense to return `false` to enable other smart contracts to safely call your smart contract and have a chance to react to failures.
+For those of you that have experience with other NEO Smart Contract languages, you may notice that rather than returning `false` we always throw an `Error`. Not only is this more idiomatic TypeScript, but throwing an `Error` also has the side effect of reverting all storage changes. This ensures that when an assertion in an operation fails, there are no erroneous storage changes. Note that when your contract is called from another contract, we will always return `false` to that contract so that it has a chance to react to the failure. We do this because there is not (currently) a way for the calling contract to catch errors.
 
 The main difference for the NEO•ONE client APIs is that methods require relaying a transaction to the blockchain. This makes sense because a non-constant method by definiton mutates storage, and we need to persist those changes to the blockchain. We'll have to wait until the next section to test our `transfer` method since we don't currently have a way of creating tokens.
 
@@ -319,29 +319,29 @@ The main difference for the NEO•ONE client APIs is that methods require relayi
 
 The NEO blockchain supports native assets, the two most important ones being NEO and GAS. Native assets are Unspent Transaction Output (UTXO) based and are understood natively by the blockchain. Contrast this with tokens like the one we've built so far which live entirely in custom smart contracts. As a result, they require special handling within smart contracts. Luckily, NEO•ONE smart contracts abstract most of this away and let you focus on the logic of your smart contract.
 
-In order to receive native assets, we can decorate a method with `@receive`. Methods marked with `@receive` must return a `boolean` value to indicate whether or not the contract wants to receive the assets. Note, however, that there are cases where the contract may still receive assets, despite returning `false`, due to limitations in how NEO handles native UTXO assets. For these cases, we automatically generate a `refundAssets` method that clients of your smart contract may call to refund assets which were not processed by the smart contract (i.e. the smart contract returned `false` or was not called). Note that this method cannot refund assets if the smart contract invocation succeeded.
+In order to receive native assets, we can decorate a method with `@receive`. Methods marked with `@receive` must throw an error to indicate if the contract does not want to receive the assets. Note, however, that there are cases where the contract may still receive assets, despite throwing an error, due to limitations in how NEO handles native UTXO assets. For these cases, we automatically generate a `refundAssets` method that clients of your smart contract may call to refund assets which were not processed by the smart contract (i.e. the smart contract threw an error or was not called). Note that this method cannot refund assets if the smart contract invocation succeeded.
 
 Let's add the `mintTokens` method to our `Token` smart contract to enable minting new tokens.
 
 ```typescript
 export class Token extends SmartContract {
   @receive
-  public mintTokens(): boolean {
+  public mintTokens(): void {
     // Inspect the current transaction
     const { references, outputs } = Blockchain.currentTransaction;
     if (references.length === 0) {
-      return false;
+      throw new Error('Invalid mintTokens');
     }
 
     // Take the first sender address as the minter.
     const sender = references[0].address;
 
-    // Sum up the amount of NEO sent to the contract. If anything else is sent, return false.
+    // Sum up the amount of NEO sent to the contract. If anything else is sent, throw an error.
     let amount = 0;
     for (const output of outputs) {
       if (output.address.equals(this.address)) {
         if (!output.asset.equals(Hash256.NEO)) {
-          return false;
+          throw new Error('Invalid mintTokens');
         }
 
         amount += output.value;
@@ -349,8 +349,6 @@ export class Token extends SmartContract {
     }
 
     this.issue(sender, amount);
-
-    return true;
   }
 
   private issue(address: Address, amount: Fixed<8>): void {
@@ -384,7 +382,7 @@ await withContracts(async ({ token, accountIDs }) => {
   if (mintTokensReceipt.result.state === 'FAULT') {
     throw new Error(mintTokensReceipt.result.message);
   }
-  expect(mintTokensReceipt.result.value).toEqual(true);
+  expect(mintTokensReceipt.result.value).toBeUndefined();
 
   // Check that balance and total supply were updated appropriately
   const [balance, totalSupply] = await Promise.all([
