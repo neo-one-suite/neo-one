@@ -194,3 +194,8 @@ export const TemplateVMError = makeErrorWithCode('VM_ERROR', getMessage);
 export const ConstantStorageError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, key: Buffer) =>
   getMessage(context, `Storage at ${key.toString('hex')} is read only`),
 );
+export const InvalidVerifySyscallError = makeErrorWithCode(
+  'INVALID_VERIFY_SYSCALL_ERROR',
+  (context: ExecutionContext, syscall: string) =>
+    getMessage(context, `Syscall ${syscall} is not allowed during verification`),
+);

@@ -28,6 +28,7 @@ import {
   StorageFlags,
   StorageItem,
   TransactionType,
+  TriggerType,
   utils,
   Validator,
   Witness,
@@ -62,6 +63,7 @@ import {
   InvalidGetHeaderArgumentsError,
   InvalidIndexError,
   InvalidInvocationTransactionError,
+  InvalidVerifySyscallError,
   ItemTooLargeError,
   NotEligibleVoteError,
   StackUnderflowError,
@@ -336,6 +338,9 @@ const createPut = ({ name }: { readonly name: 'Neo.Storage.Put' | 'Neo.Storage.P
     in: expectedIn,
     fee: FEES.ONE_THOUSAND.mul(ratio),
     invoke: async ({ context, args }) => {
+      if (context.init.triggerType !== TriggerType.Application) {
+        throw new InvalidVerifySyscallError(context, name);
+      }
       const hash = vmUtils.toStorageContext({
         context,
         value: args[0],
@@ -1469,7 +1474,10 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     out: 1,
     fee: common.FIVE_THOUSAND_FIXED8,
     invoke: async ({ context, args }) => {
-      const { scriptContainer } = context.init;
+      const { scriptContainer, triggerType } = context.init;
+      if (triggerType !== TriggerType.Application) {
+        throw new InvalidVerifySyscallError(context, 'Neo.Asset.Create');
+      }
       if (scriptContainer.type !== ScriptContainerType.Transaction) {
         throw new UnexpectedScriptContainerError(context);
       }
@@ -1523,6 +1531,9 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
       out: 1,
       fee: common.FIVE_THOUSAND_FIXED8.mul(yearsIn),
       invoke: async ({ context, args }) => {
+        if (context.init.triggerType !== TriggerType.Application) {
+          throw new InvalidVerifySyscallError(context, 'Neo.Asset.Renew');
+        }
         const { hash } = args[0].asAsset();
         const years = args[1].asBigInteger();
 
@@ -1556,6 +1567,9 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
       out: 1,
       fee,
       invoke: async ({ context, args }) => {
+        if (context.init.triggerType !== TriggerType.Application) {
+          throw new InvalidVerifySyscallError(context, 'Neo.Contract.Create');
+        }
         const { contract } = await createContract({ context, args });
         const result = new ContractStackItem(contract);
 
@@ -1581,6 +1595,9 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
       out: 1,
       fee,
       invoke: async (options) => {
+        if (options.context.init.triggerType !== TriggerType.Application) {
+          throw new InvalidVerifySyscallError(options.context, 'Neo.Contract.Migrate');
+        }
         const { context: contextIn, args } = options;
         let context = contextIn;
         const { contract, created } = await createContract({ context, args });
@@ -1651,6 +1668,9 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
   'Neo.Contract.Destroy': createSysCall({
     name: 'Neo.Contract.Destroy',
     invoke: async (options) => {
+      if (options.context.init.triggerType !== TriggerType.Application) {
+        throw new InvalidVerifySyscallError(options.context, 'Neo.Contract.Destroy');
+      }
       await destroyContract(options);
 
       return { context: options.context };
