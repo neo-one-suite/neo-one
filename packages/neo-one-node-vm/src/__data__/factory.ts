@@ -1,3 +1,4 @@
+// tslint:disable no-any
 import { common, ECPoint, InputModelAdd, OutputModelAdd, UInt160, UInt256 } from '@neo-one/client-common';
 import {
   Account,
@@ -19,6 +20,7 @@ import {
   HeaderAdd,
   Input,
   Output,
+  TransactionData,
   UInt160Attribute,
   UInt160AttributeAdd,
   UInt256Attribute,
@@ -254,6 +256,36 @@ const createWitness = (options: Partial<WitnessAdd> = {}): Witness =>
     ...options,
   });
 
+const createTransactionData = ({
+  version,
+  hash = createUInt256(),
+  blockHash = createUInt256(),
+  startHeight = 0,
+  index: indexIn = 1,
+  globalIndex = new BN(1),
+  endHeights,
+  claimed,
+}: {
+  readonly version?: number;
+  readonly hash?: UInt256;
+  readonly blockHash?: UInt256;
+  readonly startHeight?: number;
+  readonly index?: number;
+  readonly globalIndex?: BN;
+  readonly endHeights?: any;
+  readonly claimed?: any;
+}) =>
+  new TransactionData({
+    version,
+    hash,
+    blockHash,
+    startHeight,
+    index: indexIn,
+    globalIndex,
+    endHeights,
+    claimed,
+  });
+
 export const factory = {
   createAccount,
   createAsset,
@@ -272,6 +304,7 @@ export const factory = {
   createUInt256Attribute,
   createValidator,
   createWitness,
+  createTransactionData,
   incrementData,
   resetDataIndex,
 };

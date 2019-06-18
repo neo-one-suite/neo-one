@@ -17,7 +17,7 @@ import {
   Witness,
 } from '@neo-one/node-core';
 import BN from 'bn.js';
-import { MAX_SIZE_BIG_INTEGER } from '../constants';
+import { BLOCK_HEIGHT_MAX_SIZE_CHECKS, MAX_SIZE_BIG_INTEGER } from '../constants';
 import { AttributeStackItem } from './AttributeStackItem';
 import {
   IntegerTooLargeError,
@@ -131,7 +131,10 @@ export class StackItemBase implements Equatable {
     throw new InvalidValueArrayError();
   }
 
-  public asBigInteger(): BN {
+  public asBigInteger(currentBlockIndex?: number): BN {
+    if (currentBlockIndex === undefined || currentBlockIndex < BLOCK_HEIGHT_MAX_SIZE_CHECKS) {
+      return this.asBigIntegerUnsafe();
+    }
     const value = this.asBuffer();
     if (value.length > MAX_SIZE_BIG_INTEGER) {
       /* istanbul ignore next */
@@ -139,6 +142,10 @@ export class StackItemBase implements Equatable {
     }
 
     return utils.fromSignedBuffer(value);
+  }
+
+  public asBigIntegerUnsafe(): BN {
+    return utils.fromSignedBuffer(this.asBuffer());
   }
 
   public asBuffer(): Buffer {

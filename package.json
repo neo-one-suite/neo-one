@@ -62,6 +62,7 @@
     ]
   },
   "scripts": {
+    "audit-storage": "yarn run ts-node ./scripts/verify/audit.ts",
     "cz": "git-cz",
     "lint-staged": "node ./node_modules/.bin/lint-staged",
     "gulp": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" gulp",

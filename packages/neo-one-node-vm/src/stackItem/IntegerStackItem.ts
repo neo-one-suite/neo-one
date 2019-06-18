@@ -10,11 +10,11 @@ import { StorageContextStackItem } from './StorageContextStackItem';
 export class IntegerStackItem extends StackItemBase {
   public readonly value: BN;
 
-  public constructor(value: BN) {
+  public constructor(value: BN, safe = true) {
     super();
     this.value = value;
 
-    if (this.asBuffer().length > MAX_SIZE_BIG_INTEGER) {
+    if (safe && this.asBuffer().length > MAX_SIZE_BIG_INTEGER) {
       throw new IntegerTooLargeError();
     }
   }

@@ -90,6 +90,7 @@ interface WriteBatchBlockchainOptions {
   readonly storage: BlockchainStorage;
   readonly vm: VM;
   readonly getValidators: WriteBlockchain['getValidators'];
+  readonly transactionHash?: UInt256;
 }
 
 interface Caches {
@@ -172,6 +173,7 @@ export class WriteBatchBlockchain {
   private readonly storage: BlockchainStorage;
   private readonly vm: VM;
   private readonly caches: Caches;
+  private readonly transactionHash: UInt256 | undefined;
 
   public constructor(options: WriteBatchBlockchainOptions) {
     this.settings = options.settings;
@@ -180,11 +182,13 @@ export class WriteBatchBlockchain {
     this.storage = options.storage;
     this.vm = options.vm;
     this.getValidators = options.getValidators;
+    this.transactionHash = options.transactionHash;
 
     const output = new OutputStorageCache(() => this.storage.output);
     this.caches = {
       account: new ReadAllAddUpdateDeleteStorageCache({
         name: 'account',
+        transactionHash: this.transactionHash,
         readAllStorage: () => this.storage.account,
         update: (value, update) => value.update(update),
         getKeyFromValue: (value) => ({ hash: value.hash }),
@@ -194,6 +198,7 @@ export class WriteBatchBlockchain {
       }),
       accountUnspent: new ReadGetAllAddDeleteStorageCache({
         name: 'accountUnspent',
+        transactionHash: this.transactionHash,
         readGetAllStorage: () => this.storage.accountUnspent,
         getKeyFromValue: (value) => ({ hash: value.hash, input: value.input }),
         getKeyString: (key) =>
@@ -204,6 +209,7 @@ export class WriteBatchBlockchain {
       }),
       accountUnclaimed: new ReadGetAllAddDeleteStorageCache({
         name: 'accountUnclaimed',
+        transactionHash: this.transactionHash,
         readGetAllStorage: () => this.storage.accountUnclaimed,
         getKeyFromValue: (value) => ({ hash: value.hash, input: value.input }),
         getKeyString: (key) =>
@@ -214,6 +220,7 @@ export class WriteBatchBlockchain {
       }),
       action: new ReadGetAllAddStorageCache({
         name: 'action',
+        transactionHash: this.transactionHash,
         readGetAllStorage: () => this.storage.action,
         getKeyFromValue: (value) => ({
           index: value.index,
@@ -226,6 +233,7 @@ export class WriteBatchBlockchain {
       }),
       asset: new ReadAddUpdateStorageCache({
         name: 'asset',
+        transactionHash: this.transactionHash,
         readStorage: () => this.storage.asset,
         update: (value, update) => value.update(update),
         getKeyFromValue: (value) => ({ hash: value.hash }),
@@ -234,6 +242,7 @@ export class WriteBatchBlockchain {
       }),
       block: new BlockLikeStorageCache({
         name: 'block',
+        transactionHash: this.transactionHash,
         readStorage: () => ({
           get: this.storage.block.get,
           tryGet: this.storage.block.tryGet,
@@ -242,6 +251,7 @@ export class WriteBatchBlockchain {
       }),
       blockData: new ReadAddStorageCache({
         name: 'blockData',
+        transactionHash: this.transactionHash,
         readStorage: () => this.storage.blockData,
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
@@ -249,6 +259,7 @@ export class WriteBatchBlockchain {
       }),
       header: new BlockLikeStorageCache({
         name: 'header',
+        transactionHash: this.transactionHash,
         readStorage: () => ({
           get: this.storage.header.get,
           tryGet: this.storage.header.tryGet,
@@ -257,6 +268,7 @@ export class WriteBatchBlockchain {
       }),
       transaction: new ReadAddStorageCache({
         name: 'transaction',
+        transactionHash: this.transactionHash,
         readStorage: () => this.storage.transaction,
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
@@ -269,6 +281,7 @@ export class WriteBatchBlockchain {
       }),
       transactionData: new ReadAddUpdateStorageCache({
         name: 'transactionData',
+        transactionHash: this.transactionHash,
         readStorage: () => this.storage.transactionData,
         update: (value, update) => value.update(update),
         getKeyFromValue: (value) => ({ hash: value.hash }),
@@ -278,6 +291,7 @@ export class WriteBatchBlockchain {
       output,
       contract: new ReadAddDeleteStorageCache({
         name: 'contract',
+        transactionHash: this.transactionHash,
         readStorage: () => this.storage.contract,
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt160ToString(key.hash),
@@ -286,6 +300,7 @@ export class WriteBatchBlockchain {
       }),
       storageItem: new ReadGetAllAddUpdateDeleteStorageCache({
         name: 'storageItem',
+        transactionHash: this.transactionHash,
         readGetAllStorage: () => this.storage.storageItem,
         update: (value, update) => value.update(update),
         getKeyFromValue: (value) => ({
@@ -301,6 +316,7 @@ export class WriteBatchBlockchain {
       }),
       validator: new ReadAllAddUpdateDeleteStorageCache({
         name: 'validator',
+        transactionHash: this.transactionHash,
         readAllStorage: () => this.storage.validator,
         getKeyFromValue: (value) => ({ publicKey: value.publicKey }),
         getKeyString: (key) => common.ecPointToString(key.publicKey),
@@ -310,6 +326,7 @@ export class WriteBatchBlockchain {
       }),
       invocationData: new ReadAddStorageCache({
         name: 'invocationData',
+        transactionHash: this.transactionHash,
         readStorage: () => this.storage.invocationData,
         getKeyFromValue: (value) => ({ hash: value.hash }),
         getKeyString: (key) => common.uInt256ToString(key.hash),
@@ -662,6 +679,7 @@ export class WriteBatchBlockchain {
               storage: this as any,
               vm: this.vm,
               getValidators: this.getValidators,
+              transactionHash: transaction.hash,
             });
 
             const migratedContractHashes: Array<readonly [UInt160, UInt160]> = [];
