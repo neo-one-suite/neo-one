@@ -18,7 +18,12 @@ const fromSignedBuffer = (value: Buffer): BN =>
 
 const toSignedBuffer = (value: BN): Buffer => {
   if (value.isNeg()) {
-    return value.toTwos((value.byteLength() + 1) * 8).toArrayLike(Buffer, 'le');
+    const negBuff = value.toTwos(value.byteLength() * 8).toArrayLike(Buffer, 'le');
+    const negNormalValue = fromSignedBuffer(negBuff);
+
+    const negPaddedBuff = value.toTwos((value.byteLength() + 1) * 8).toArrayLike(Buffer, 'le');
+
+    return value.eq(negNormalValue) ? negBuff : negPaddedBuff;
   }
 
   const buff = value.toArrayLike(Buffer, 'le');

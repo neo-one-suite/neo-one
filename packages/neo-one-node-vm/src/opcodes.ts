@@ -104,7 +104,7 @@ export const createOp = ({
   let fee = feeIn;
   if (fee === undefined) {
     const byteCode = OpCodeToByteCode[name];
-    fee = byteCode <= OpCodeToByteCode.PUSH16 || byteCode === OpCodeToByteCode.NOP ? utils.ZERO : FEES.ONE;
+    fee = byteCode <= OpCodeToByteCode.NOP ? utils.ZERO : FEES.ONE;
   }
 
   return {
@@ -392,24 +392,19 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
   type: 'create',
   create: ({ context: contextIn }) => {
     const returnValueCount = contextIn.code.slice(contextIn.pc, contextIn.pc + 1)[0];
-    const parametersCount = contextIn.code.slice(contextIn.pc + 1, contextIn.pc + 2)[0];
-
-    const nextPC = contextIn.pc + 2;
+    let parametersCount = contextIn.code.slice(contextIn.pc + 1, contextIn.pc + 2)[0];
+    parametersCount = parametersCount === -1 ? contextIn.stack.length : parametersCount;
+    const jumpCount = contextIn.code.slice(contextIn.pc + 2, contextIn.pc + 4).readInt16LE(0);
+    const nextPC = contextIn.pc + 4;
 
     const { op } = createOp({
       name,
       in: parametersCount,
       invocation: 1,
       invoke: async ({ monitor, context, args }) => {
-        const { pc } = context;
-
         const resultContext = await context.engine.executeScript({
           monitor,
-          code: Buffer.concat([
-            context.code.slice(0, pc - 1),
-            Buffer.from([OpCodeToByteCode.JMP]),
-            context.code.slice(pc),
-          ]),
+          code: context.code,
           blockchain: context.blockchain,
           init: context.init,
           gasLeft: context.gasLeft,
@@ -421,7 +416,7 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
             scriptHash: context.scriptHash,
             entryScriptHash: context.entryScriptHash,
             returnValueCount,
-            pc: pc - 1,
+            pc: context.pc + jumpCount + 1,
             stackCount: context.stackCount + args.reduce((acc, value) => acc + value.increment(), 0),
           },
         });
@@ -456,7 +451,7 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
             scriptHash: context.scriptHash,
             callingScriptHash: context.callingScriptHash,
             entryScriptHash: context.entryScriptHash,
-            pc: nextPC + 2,
+            pc: nextPC,
             depth: context.depth,
             returnValueCount: context.returnValueCount,
             stackCount,
@@ -484,7 +479,7 @@ const newArrayOrStruct = ({ name }: { readonly name: 'NEWARRAY' | 'NEWSTRUCT' })
         const array = args[0].asArray();
         results = name === 'NEWARRAY' ? [new ArrayStackItem(array)] : [new StructStackItem(array)];
       } else {
-        const count = vmUtils.toNumber(context, args[0].asBigInteger());
+        const count = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
 
         if (count > MAX_ARRAY_SIZE) {
           throw new ContainerTooLargeError(context);
@@ -678,7 +673,7 @@ const OPCODE_PAIRS = ([
         name: 'XDROP',
         in: 1,
         invoke: ({ context, args }) => {
-          const n = vmUtils.toNumber(context, args[0].asBigInteger());
+          const n = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
           if (n < 0) {
             throw new XDropNegativeError(context);
           }
@@ -705,7 +700,7 @@ const OPCODE_PAIRS = ([
         name: 'XSWAP',
         in: 1,
         invoke: ({ context, args }) => {
-          const n = vmUtils.toNumber(context, args[0].asBigInteger());
+          const n = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
           if (n < 0) {
             throw new XSwapNegativeError(context);
           }
@@ -724,7 +719,7 @@ const OPCODE_PAIRS = ([
         name: 'XTUCK',
         in: 1,
         invoke: ({ context, args }) => {
-          const n = vmUtils.toNumber(context, args[0].asBigInteger());
+          const n = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
           if (n <= 0) {
             throw new XTuckNegativeError(context);
           }
@@ -806,7 +801,7 @@ const OPCODE_PAIRS = ([
         in: 1,
         out: 1,
         invoke: ({ context, args }) => {
-          const n = vmUtils.toNumber(context, args[0].asBigInteger());
+          const n = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
           if (n < 0) {
             throw new PickNegativeError(context);
           }
@@ -825,7 +820,7 @@ const OPCODE_PAIRS = ([
         in: 1,
         out: 1,
         invoke: ({ context, args }) => {
-          const n = vmUtils.toNumber(context, args[0].asBigInteger());
+          const n = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
           if (n < 0) {
             throw new RollNegativeError(context);
           }
@@ -908,12 +903,12 @@ const OPCODE_PAIRS = ([
         in: 3,
         out: 1,
         invoke: ({ context, args }) => {
-          const end = vmUtils.toNumber(context, args[0].asBigInteger());
+          const end = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
           if (end < 0) {
             throw new SubstrNegativeEndError(context);
           }
 
-          const start = vmUtils.toNumber(context, args[1].asBigInteger());
+          const start = vmUtils.toNumber(context, args[1].asBigIntegerUnsafe());
           if (start < 0) {
             throw new SubstrNegativeStartError(context);
           }
@@ -932,7 +927,7 @@ const OPCODE_PAIRS = ([
         in: 2,
         out: 1,
         invoke: ({ context, args }) => {
-          const count = vmUtils.toNumber(context, args[0].asBigInteger());
+          const count = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
           if (count < 0) {
             throw new LeftNegativeError(context);
           }
@@ -951,7 +946,7 @@ const OPCODE_PAIRS = ([
         in: 2,
         out: 1,
         invoke: ({ context, args }) => {
-          const count = vmUtils.toNumber(context, args[0].asBigInteger());
+          const count = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
           if (count < 0) {
             throw new RightNegativeError(context);
           }
@@ -990,7 +985,7 @@ const OPCODE_PAIRS = ([
           context,
           results: [
             new IntegerStackItem(
-              utils.fromSignedBuffer(bitwise.buffer.not(utils.toSignedBuffer(args[0].asBigInteger()))),
+              utils.fromSignedBuffer(bitwise.buffer.not(utils.toSignedBuffer(args[0].asBigIntegerUnsafe()))),
             ),
           ],
         }),
@@ -1005,7 +1000,9 @@ const OPCODE_PAIRS = ([
         invoke: ({ context, args }) => ({
           context,
           results: [
-            new IntegerStackItem(vmUtils.bitwiseOp(bitwise.buffer.and, args[0].asBigInteger(), args[1].asBigInteger())),
+            new IntegerStackItem(
+              vmUtils.bitwiseOp(bitwise.buffer.and, args[0].asBigIntegerUnsafe(), args[1].asBigIntegerUnsafe()),
+            ),
           ],
         }),
       }),
@@ -1019,7 +1016,9 @@ const OPCODE_PAIRS = ([
         invoke: ({ context, args }) => ({
           context,
           results: [
-            new IntegerStackItem(vmUtils.bitwiseOp(bitwise.buffer.or, args[0].asBigInteger(), args[1].asBigInteger())),
+            new IntegerStackItem(
+              vmUtils.bitwiseOp(bitwise.buffer.or, args[0].asBigIntegerUnsafe(), args[1].asBigIntegerUnsafe()),
+            ),
           ],
         }),
       }),
@@ -1033,7 +1032,9 @@ const OPCODE_PAIRS = ([
         invoke: ({ context, args }) => ({
           context,
           results: [
-            new IntegerStackItem(vmUtils.bitwiseOp(bitwise.buffer.xor, args[0].asBigInteger(), args[1].asBigInteger())),
+            new IntegerStackItem(
+              vmUtils.bitwiseOp(bitwise.buffer.xor, args[0].asBigIntegerUnsafe(), args[1].asBigIntegerUnsafe()),
+            ),
           ],
         }),
       }),
@@ -1070,7 +1071,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new IntegerStackItem(args[0].asBigInteger().add(utils.ONE))],
+          results: [new IntegerStackItem(args[0].asBigInteger(context.blockchain.currentBlockIndex).add(utils.ONE))],
         }),
       }),
     ],
@@ -1082,7 +1083,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new IntegerStackItem(args[0].asBigInteger().sub(utils.ONE))],
+          results: [new IntegerStackItem(args[0].asBigInteger(context.blockchain.currentBlockIndex).sub(utils.ONE))],
         }),
       }),
     ],
@@ -1093,7 +1094,7 @@ const OPCODE_PAIRS = ([
         in: 1,
         out: 1,
         invoke: ({ context, args }) => {
-          const value = args[0].asBigInteger();
+          const value = args[0].asBigIntegerUnsafe();
           const mutableResults = [];
           if (value.isZero()) {
             mutableResults.push(new IntegerStackItem(utils.ZERO));
@@ -1115,7 +1116,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new IntegerStackItem(args[0].asBigInteger().neg())],
+          results: [new IntegerStackItem(args[0].asBigIntegerUnsafe().neg())],
         }),
       }),
     ],
@@ -1127,7 +1128,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new IntegerStackItem(args[0].asBigInteger().abs())],
+          results: [new IntegerStackItem(args[0].asBigIntegerUnsafe().abs())],
         }),
       }),
     ],
@@ -1151,7 +1152,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new BooleanStackItem(!args[0].asBigInteger().isZero())],
+          results: [new BooleanStackItem(!args[0].asBigIntegerUnsafe().isZero())],
         }),
       }),
     ],
@@ -1163,7 +1164,13 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new IntegerStackItem(args[1].asBigInteger().add(args[0].asBigInteger()))],
+          results: [
+            new IntegerStackItem(
+              args[1]
+                .asBigInteger(context.blockchain.currentBlockIndex)
+                .add(args[0].asBigInteger(context.blockchain.currentBlockIndex)),
+            ),
+          ],
         }),
       }),
     ],
@@ -1175,7 +1182,13 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new IntegerStackItem(args[1].asBigInteger().sub(args[0].asBigInteger()))],
+          results: [
+            new IntegerStackItem(
+              args[1]
+                .asBigInteger(context.blockchain.currentBlockIndex)
+                .sub(args[0].asBigInteger(context.blockchain.currentBlockIndex)),
+            ),
+          ],
         }),
       }),
     ],
@@ -1187,7 +1200,13 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new IntegerStackItem(args[1].asBigInteger().mul(args[0].asBigInteger()))],
+          results: [
+            new IntegerStackItem(
+              args[1]
+                .asBigInteger(context.blockchain.currentBlockIndex)
+                .mul(args[0].asBigInteger(context.blockchain.currentBlockIndex)),
+            ),
+          ],
         }),
       }),
     ],
@@ -1199,7 +1218,13 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new IntegerStackItem(args[1].asBigInteger().div(args[0].asBigInteger()))],
+          results: [
+            new IntegerStackItem(
+              args[1]
+                .asBigInteger(context.blockchain.currentBlockIndex)
+                .div(args[0].asBigInteger(context.blockchain.currentBlockIndex)),
+            ),
+          ],
         }),
       }),
     ],
@@ -1211,7 +1236,13 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new IntegerStackItem(args[1].asBigInteger().mod(args[0].asBigInteger()))],
+          results: [
+            new IntegerStackItem(
+              args[1]
+                .asBigInteger(context.blockchain.currentBlockIndex)
+                .mod(args[0].asBigInteger(context.blockchain.currentBlockIndex)),
+            ),
+          ],
         }),
       }),
     ],
@@ -1222,12 +1253,12 @@ const OPCODE_PAIRS = ([
         in: 2,
         out: 1,
         invoke: ({ context, args }) => {
-          const shift = args[0].asBigInteger();
+          const shift = args[0].asBigIntegerUnsafe();
           if (shift.toNumber() > MAX_SHL_SHR || shift.toNumber() < MIN_SHL_SHR) {
             throw new ShiftTooLargeError(context);
           }
 
-          const value = args[1].asBigInteger();
+          const value = args[1].asBigIntegerUnsafe();
           const result = new IntegerStackItem(vmUtils.shiftLeft(value, shift));
 
           return {
@@ -1244,12 +1275,12 @@ const OPCODE_PAIRS = ([
         in: 2,
         out: 1,
         invoke: ({ context, args }) => {
-          const shift = args[0].asBigInteger();
+          const shift = args[0].asBigIntegerUnsafe();
           if (shift.toNumber() > MAX_SHL_SHR || shift.toNumber() < MIN_SHL_SHR) {
             throw new ShiftTooLargeError(context);
           }
 
-          const value = args[1].asBigInteger();
+          const value = args[1].asBigIntegerUnsafe();
           const result = new IntegerStackItem(vmUtils.shiftRight(value, shift));
 
           return {
@@ -1291,7 +1322,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new BooleanStackItem(args[0].asBigInteger().eq(args[1].asBigInteger()))],
+          results: [new BooleanStackItem(args[0].asBigIntegerUnsafe().eq(args[1].asBigIntegerUnsafe()))],
         }),
       }),
     ],
@@ -1303,7 +1334,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new BooleanStackItem(!args[0].asBigInteger().eq(args[1].asBigInteger()))],
+          results: [new BooleanStackItem(!args[0].asBigIntegerUnsafe().eq(args[1].asBigIntegerUnsafe()))],
         }),
       }),
     ],
@@ -1315,7 +1346,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new BooleanStackItem(args[1].asBigInteger().lt(args[0].asBigInteger()))],
+          results: [new BooleanStackItem(args[1].asBigIntegerUnsafe().lt(args[0].asBigIntegerUnsafe()))],
         }),
       }),
     ],
@@ -1327,7 +1358,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new BooleanStackItem(args[1].asBigInteger().gt(args[0].asBigInteger()))],
+          results: [new BooleanStackItem(args[1].asBigIntegerUnsafe().gt(args[0].asBigIntegerUnsafe()))],
         }),
       }),
     ],
@@ -1339,7 +1370,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new BooleanStackItem(args[1].asBigInteger().lte(args[0].asBigInteger()))],
+          results: [new BooleanStackItem(args[1].asBigIntegerUnsafe().lte(args[0].asBigIntegerUnsafe()))],
         }),
       }),
     ],
@@ -1351,7 +1382,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new BooleanStackItem(args[1].asBigInteger().gte(args[0].asBigInteger()))],
+          results: [new BooleanStackItem(args[1].asBigIntegerUnsafe().gte(args[0].asBigIntegerUnsafe()))],
         }),
       }),
     ],
@@ -1363,7 +1394,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new IntegerStackItem(BN.min(args[1].asBigInteger(), args[0].asBigInteger()))],
+          results: [new IntegerStackItem(BN.min(args[1].asBigIntegerUnsafe(), args[0].asBigIntegerUnsafe()))],
         }),
       }),
     ],
@@ -1375,7 +1406,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => ({
           context,
-          results: [new IntegerStackItem(BN.max(args[1].asBigInteger(), args[0].asBigInteger()))],
+          results: [new IntegerStackItem(BN.max(args[1].asBigIntegerUnsafe(), args[0].asBigIntegerUnsafe()))],
         }),
       }),
     ],
@@ -1389,7 +1420,8 @@ const OPCODE_PAIRS = ([
           context,
           results: [
             new BooleanStackItem(
-              args[1].asBigInteger().lte(args[2].asBigInteger()) && args[2].asBigInteger().lt(args[0].asBigInteger()),
+              args[1].asBigIntegerUnsafe().lte(args[2].asBigIntegerUnsafe()) &&
+                args[2].asBigIntegerUnsafe().lt(args[0].asBigIntegerUnsafe()),
             ),
           ],
         }),
@@ -1519,7 +1551,7 @@ const OPCODE_PAIRS = ([
             }
             _in = 1;
           } else {
-            pubKeyCount = vmUtils.toNumber(contextIn, top.asBigInteger());
+            pubKeyCount = vmUtils.toNumber(contextIn, top.asBigIntegerUnsafe());
             if (pubKeyCount <= 0) {
               throw new InvalidCheckMultisigArgumentsError(contextIn);
             }
@@ -1530,7 +1562,7 @@ const OPCODE_PAIRS = ([
           if (next === undefined || next.isArray()) {
             _in += 1;
           } else {
-            const sigCount = vmUtils.toNumber(contextIn, next.asBigInteger());
+            const sigCount = vmUtils.toNumber(contextIn, next.asBigIntegerUnsafe());
             if (sigCount < 0) {
               throw new InvalidCheckMultisigArgumentsError(contextIn);
             }
@@ -1549,7 +1581,7 @@ const OPCODE_PAIRS = ([
                 index = 1;
                 publicKeys = args[0].asArray().map((value) => value.asECPoint());
               } else {
-                const count = vmUtils.toNumber(context, args[0].asBigInteger());
+                const count = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
                 index = count + 1;
                 publicKeys = args.slice(1, index).map((value) => value.asECPoint());
               }
@@ -1621,7 +1653,7 @@ const OPCODE_PAIRS = ([
             // This will cause the op to throw once it's executed.
             _in = 1;
           } else {
-            _in = vmUtils.toNumber(contextIn, top.asBigInteger()) + 1;
+            _in = vmUtils.toNumber(contextIn, top.asBigIntegerUnsafe()) + 1;
 
             if (_in < 0) {
               throw new InvalidPackCountError(contextIn);
@@ -1683,7 +1715,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => {
           if (args[1].isArray()) {
-            const index = vmUtils.toNumber(context, args[0].asBigInteger());
+            const index = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
             const val = args[1].asArray();
             if (index < 0 || index >= val.length) {
               throw new InvalidPickItemKeyError(context, `${index}`, JSON.stringify(args[1].convertJSON()));
@@ -1723,7 +1755,7 @@ const OPCODE_PAIRS = ([
             newItem = newItem.clone();
           }
           if (args[2].isArray()) {
-            const index = vmUtils.toNumber(context, args[1].asBigInteger());
+            const index = vmUtils.toNumber(context, args[1].asBigIntegerUnsafe());
             const mutableValue = args[2].asArray();
             if (index < 0 || index >= mutableValue.length) {
               throw new InvalidSetItemIndexError(context);
@@ -1826,7 +1858,7 @@ const OPCODE_PAIRS = ([
         in: 2,
         invoke: ({ context, args }) => {
           if (args[1].isArray()) {
-            const index = vmUtils.toNumber(context, args[0].asBigInteger());
+            const index = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
             const mutableValue = args[1].asArray();
             if (index < 0 || index >= mutableValue.length) {
               throw new InvalidRemoveIndexError(context, index);
@@ -1874,7 +1906,7 @@ const OPCODE_PAIRS = ([
         out: 1,
         invoke: ({ context, args }) => {
           if (args[1].isArray()) {
-            const index = vmUtils.toNumber(context, args[0].asBigInteger());
+            const index = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
             const val = args[1].asArray();
             if (index < 0) {
               throw new InvalidHasKeyIndexError(context);

@@ -3,10 +3,11 @@ import { StorageItem } from '@neo-one/node-core';
 
 // tslint:disable-next-line no-any
 export const verifyBlockchainSnapshot = (blockchain: any) => {
-  Object.values(blockchain).forEach((obj) => {
+  Object.entries(blockchain).forEach(([name, obj]) => {
     if (typeof obj === 'object' && obj !== null) {
-      Object.values(obj).forEach((maybeMock) => {
+      Object.entries(obj).forEach(([mockName, maybeMock]) => {
         if (maybeMock != undefined && maybeMock.mock != undefined) {
+          expect(`${name}.${mockName}`).toMatchSnapshot();
           expect(maybeMock.mock.calls).toMatchSnapshot();
         }
       });

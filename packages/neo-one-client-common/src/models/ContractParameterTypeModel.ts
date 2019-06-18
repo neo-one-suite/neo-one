@@ -16,7 +16,7 @@ export enum ContractParameterTypeModel {
   Void = 0xff,
 }
 
-const isContractParameterType = (value: number): value is ContractParameterTypeModel =>
+export const isContractParameterType = (value: number): value is ContractParameterTypeModel =>
   // tslint:disable-next-line strict-type-predicates
   ContractParameterTypeModel[value] !== undefined;
 

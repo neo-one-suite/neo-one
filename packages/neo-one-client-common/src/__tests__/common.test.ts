@@ -148,6 +148,11 @@ describe('utils extra coverage', () => {
   });
 
   test('toSignedBuffer (-1)', () => {
-    expect(utils.toSignedBuffer(new BN(-1))).toEqual(Buffer.concat([Buffer.from([0xff]), Buffer.from([0xff])]));
+    expect(utils.toSignedBuffer(new BN(-1))).toEqual(Buffer.from([0xff]));
+  });
+
+  test('toSignedBuffer <-> fromSignedBuffer', () => {
+    const num = new BN(-81);
+    expect(utils.fromSignedBuffer(utils.toSignedBuffer(num))).toEqual(num);
   });
 });
