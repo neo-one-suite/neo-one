@@ -344,6 +344,11 @@ describe('InvokeSmartContractHelper', () => {
         assertEqual(firstResult.value as [string, number] | undefined, undefined);
         assertEqual(firstResult.done, true);
 
+        const foo = (x: string, ...y: ([string, number])[]): string => y.reduce((acc, value) => acc + value[0], x);
+
+        assertEqual(foo('foo', ...this.storage), 'foo' + keyA + keyC);
+        assertEqual(foo('foo', ['bar', 10], ...this.storage), 'foobar' + keyA + keyC);
+
         return true;
       }
     }

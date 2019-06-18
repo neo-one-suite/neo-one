@@ -54,6 +54,11 @@ describe('InvokeSmartContractHelper', () => {
         assertEqual(firstResult.value as string | undefined, undefined);
         assertEqual(firstResult.done, true);
 
+        const foo = (x: string, ...y: string[]): string => y.reduce((acc, value) => acc + value, x);
+
+        assertEqual(foo('foo', ...this.storage), 'foo' + keyA + keyC);
+        assertEqual(foo('foo', 'bar', ...this.storage), 'foobar' + keyA + keyC);
+
         return true;
       }
     }
@@ -164,12 +169,17 @@ describe('InvokeSmartContractHelper', () => {
         assertEqual(firstResult.value as string | undefined, undefined);
         assertEqual(firstResult.done, true);
 
+        const foo = (x: string, ...y: string[]): string => y.reduce((acc, value) => acc + value, x);
+
+        assertEqual(foo('foo', ...this.storage), 'foo' + keyA + keyB);
+        assertEqual(foo('foo', 'bar', ...this.storage), 'foobar' + keyA + keyB);
+
         return true;
       }
     }
   `);
 
-  test('in memory delete of set storage then iterate', async () => {
+  test('in memory delete of array storage then iterate', async () => {
     const node = await helpers.startNode();
     const contract = await createIterArrayContract(node);
 
@@ -189,7 +199,7 @@ describe('InvokeSmartContractHelper', () => {
     `);
   });
 
-  test('in memory delete of set storage then iterate in separate transaction', async () => {
+  test('in memory delete of array storage then iterate in separate transaction', async () => {
     const node = await helpers.startNode();
     const contract = await createIterArrayContract(node);
 
