@@ -14,7 +14,7 @@
     "@types/koa-compose": "^3.2.4",
     "@types/koa-compress": "^2.0.9",
     "@types/koa-ratelimit-lru": "^1.0.0",
-    "@types/koa-router": "^7.0.40",
+    "@types/koa-router": "^7.0.41",
     "@types/koa-static": "^4.0.1",
     "@types/lodash": "^4.14.134",
     "@types/toobusy-js": "^0.5.2",

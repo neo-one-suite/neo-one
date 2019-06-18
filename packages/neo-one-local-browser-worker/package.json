@@ -7,9 +7,9 @@
     "@neo-one/local-browser": "^1.1.3",
     "@neo-one/worker": "^1.1.1",
     "@types/nanoid": "^2.0.0",
-    "core-js": "^3.1.3",
+    "core-js": "^3.1.4",
     "nanoid": "^2.0.1",
-    "pouchdb": "^7.0.0",
+    "pouchdb": "^7.1.1",
     "regenerator-runtime": "^0.13.2",
     "rxjs": "^6.5.2"
   },
