@@ -30,7 +30,7 @@ interface SettingsEnvironment {
 
 const DEFAULT_CONFIG = {
   environment: {
-    dataPath: envPaths('neo_one_node').data,
+    dataPath: envPaths('neo_one_node', { suffix: '' }).data,
     rpc: {
       http: {
         port: process.env.PORT !== undefined ? process.env.PORT : 8080,

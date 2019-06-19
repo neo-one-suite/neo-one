@@ -7,8 +7,7 @@ import { createHandler, RPCHandler } from '@neo-one/node-rpc-handler';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
 import { vm } from '@neo-one/node-vm';
 import { finalize } from '@neo-one/utils';
-// tslint:disable-next-line match-default-export-name
-import { Level as leveljs } from 'level-js';
+import Level from 'level-js';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
 import { BehaviorSubject, Subscription } from 'rxjs';
@@ -69,7 +68,7 @@ export class FullNode {
       privateNet: true,
     });
     const storage = levelupStorage({
-      db: LevelUp(this.options.type === 'persistent' ? leveljs(this.options.id) : MemDown()),
+      db: LevelUp(this.options.type === 'persistent' ? Level(this.options.id) : MemDown()),
       context: { messageMagic: settings.messageMagic },
     });
 
