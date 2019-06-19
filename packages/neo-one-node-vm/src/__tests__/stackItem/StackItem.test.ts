@@ -1,5 +1,5 @@
 import { utils } from '@neo-one/client-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import { factory } from '../../__data__';
 import {

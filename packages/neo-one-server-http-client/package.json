@@ -4,7 +4,7 @@
   "description": "NEO•ONE Server http client api.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/types": "^1.1.1",
+
     "cross-fetch": "^3.0.4",
     "tslib": "^1.9.3"
   },

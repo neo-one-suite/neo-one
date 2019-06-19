@@ -1,4 +1,3 @@
-/// <reference types="@neo-one/types" />
 export * from './Backdrop';
 export * from './Background';
 export * from './DispatchWrapper';

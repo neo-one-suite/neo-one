@@ -4,7 +4,7 @@
   "description": "NEO•ONE Server GRPC.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/types": "^1.1.1",
+
     "tslib": "^1.9.3"
   },
   "sideEffects": false

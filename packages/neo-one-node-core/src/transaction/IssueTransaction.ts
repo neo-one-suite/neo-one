@@ -1,7 +1,7 @@
 import { common, InvalidFormatError, IOHelper, IssueTransactionJSON, UInt160Hex } from '@neo-one/client-common';
 import { IssueTransactionModel } from '@neo-one/client-full-common';
 import { Constructor } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { VerifyError } from '../errors';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { utils } from '../utils';

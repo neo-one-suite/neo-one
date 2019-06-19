@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { ArrayStackItem, IntegerStackItem, MapStackItem } from '../../stackItem';
 
 describe('StackItem', () => {

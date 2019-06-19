@@ -1,4 +1,3 @@
-/// <reference types="@neo-one/types" />
 import { BinaryReader, Block, Blockchain, DeserializeWireContext } from '@neo-one/node-core';
 import { makeErrorWithCode } from '@neo-one/utils';
 import * as fs from 'fs';

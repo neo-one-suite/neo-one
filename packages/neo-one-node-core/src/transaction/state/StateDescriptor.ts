@@ -11,7 +11,7 @@ import {
   UInt160Hex,
 } from '@neo-one/client-common';
 import { utils as commonUtils } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { VerifyError } from '../../errors';
 import {
   createSerializeWire,

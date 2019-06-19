@@ -1,7 +1,7 @@
 import { common, crypto, Op as OpCodeToByteCode, OpCode, UInt160, utils, VMState } from '@neo-one/client-common';
 // tslint:disable-next-line:match-default-export-name
 import bitwise from 'bitwise';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import {
   ExecutionContext,

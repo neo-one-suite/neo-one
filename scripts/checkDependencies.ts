@@ -13,7 +13,7 @@ const log = (value: string | Error) => {
   }
 };
 
-const WHITELIST = new Set(['tslib', '@neo-one/types']);
+const WHITELIST = new Set(['tslib']);
 
 const dir = path.resolve(__dirname, '..', 'packages');
 

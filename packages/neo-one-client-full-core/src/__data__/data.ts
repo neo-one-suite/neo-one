@@ -1,7 +1,7 @@
 import { ABIParameter, ABIReturn, AssetType } from '@neo-one/client-common';
 import { Hash256 } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { keys } from './keys';
 
 const hash256s = {

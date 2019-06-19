@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { testUtils } from '../../__data__';
 import { BufferStackItem, IntegerStackItem, MapStackItem } from '../../stackItem';
 

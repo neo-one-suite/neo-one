@@ -12,7 +12,7 @@ import {
   utils,
   Witness,
 } from '@neo-one/node-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { randomBytes } from 'crypto';
 import { keys } from './keys';
 

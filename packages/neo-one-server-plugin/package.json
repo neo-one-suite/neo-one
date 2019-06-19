@@ -5,7 +5,7 @@
   "main": "./src/index",
   "dependencies": {
     "@neo-one/monitor": "^1.1.2",
-    "@neo-one/types": "^1.1.1",
+
     "@neo-one/utils": "^1.1.1",
     "@types/cli-truncate": "^1.1.0",
     "@types/fs-extra": "^7.0.0",

@@ -1,5 +1,5 @@
 import { BinaryWriter, common, ECPoint, IOHelper, UInt160, UInt256 } from '@neo-one/client-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { deserializeInvocationResultWireBase, InvocationResult } from './invocationResult';
 import {
   createSerializeWire,

@@ -1,7 +1,7 @@
 import { common, OpCode } from '@neo-one/client-common';
 import { disassembleByteCode } from '@neo-one/node-core';
 import { makeErrorWithCode } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { ExecutionContext } from './constants';
 
 const getLine = (context: ExecutionContext): number => {

@@ -10,7 +10,7 @@ import {
   UInt256,
   UInt256Hex,
 } from '@neo-one/client-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Equals, EquatableKey } from './Equatable';
 import { UnsignedBlockError } from './errors';
 import { Header, HeaderKey } from './Header';

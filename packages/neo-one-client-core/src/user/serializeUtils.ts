@@ -1,6 +1,6 @@
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 
 export interface SerializedObject {
   readonly [key: string]: SerializedValueToken;

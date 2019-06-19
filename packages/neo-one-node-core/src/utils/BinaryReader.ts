@@ -1,5 +1,5 @@
 import { common, ECPoint, InvalidFormatError, UInt160, UInt256 } from '@neo-one/client-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 
 export class BinaryReader {

@@ -10,7 +10,7 @@ import {
   UInt160,
   UInt256,
 } from '@neo-one/client-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Account, AccountKey } from './Account';
 import { Asset, AssetKey } from './Asset';
 import { BlockBase } from './BlockBase';

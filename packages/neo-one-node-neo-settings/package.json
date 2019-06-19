@@ -6,8 +6,8 @@
   "dependencies": {
     "@neo-one/client-common": "^1.2.0",
     "@neo-one/node-core": "^1.1.3",
-    "@neo-one/types": "^1.1.1",
     "@neo-one/utils": "^1.1.1",
+    "@types/bn.js": "^4.11.5",
     "bn.js": "^4.11.8",
     "tslib": "^1.9.3"
   },

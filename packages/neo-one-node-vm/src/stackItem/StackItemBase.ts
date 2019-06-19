@@ -16,7 +16,7 @@ import {
   VMSettings,
   Witness,
 } from '@neo-one/node-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { BLOCK_HEIGHT_MAX_SIZE_CHECKS, MAX_SIZE_BIG_INTEGER } from '../constants';
 import { AttributeStackItem } from './AttributeStackItem';
 import {

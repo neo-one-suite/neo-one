@@ -1,4 +1,3 @@
-/// <reference types="@neo-one/types" />
 export * from './Client';
 export * from './ReadClient';
 export * from './errors';

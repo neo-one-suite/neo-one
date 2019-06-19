@@ -9,7 +9,7 @@ import {
   Witness,
 } from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 
 export const GENERATION_AMOUNT: readonly number[] = [8, 7, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 

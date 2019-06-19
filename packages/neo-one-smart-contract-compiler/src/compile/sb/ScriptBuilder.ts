@@ -1,6 +1,6 @@
 // tslint:disable ban-types
 import { OpCode, SysCallName, UInt160 } from '@neo-one/client-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import ts from 'typescript';
 import { Context } from '../../Context';
 import { Helper, Helpers } from '../helper';

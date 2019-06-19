@@ -1,5 +1,5 @@
 import { common, crypto, JSONHelper, OutputJSON, OutputModel, UInt256 } from '@neo-one/client-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Equals, EquatableKey } from '../Equatable';
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializeJSONContext } from '../Serializable';
 import { BinaryReader, utils } from '../utils';

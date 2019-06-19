@@ -11,7 +11,7 @@ import {
   VMListeners,
   WriteBlockchain,
 } from '@neo-one/node-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import {
   ExecutionContext,

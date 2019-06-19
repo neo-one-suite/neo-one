@@ -1,4 +1,3 @@
-/// <reference types="@neo-one/types" />
 export * from './Box';
 export * from './Button';
 export * from './ButtonBase';

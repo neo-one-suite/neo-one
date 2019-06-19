@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { BinaryWriter } from './BinaryWriter';
 import { common, ECPoint, UInt160, UInt256 } from './common';
 import { InvalidParamError } from './errors';

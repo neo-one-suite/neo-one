@@ -1,5 +1,5 @@
 import { BinaryWriter, IntegerContractParameterJSON, IOHelper, utils } from '@neo-one/client-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { ContractParameterBase } from './ContractParameterBase';
 import { ContractParameterType } from './ContractParameterType';

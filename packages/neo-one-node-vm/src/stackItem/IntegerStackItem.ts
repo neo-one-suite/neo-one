@@ -1,6 +1,6 @@
 import { BinaryWriter, utils } from '@neo-one/client-common';
 import { ContractParameter, IntegerContractParameter } from '@neo-one/node-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { MAX_SIZE_BIG_INTEGER } from '../constants';
 import { IntegerTooLargeError, InvalidValueStorageContextStackItemError } from './errors';
 import { AsStorageContextStackItemOptions, StackItemBase } from './StackItemBase';

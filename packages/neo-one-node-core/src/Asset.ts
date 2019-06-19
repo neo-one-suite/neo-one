@@ -12,7 +12,7 @@ import {
 } from '@neo-one/client-common';
 import { BaseState } from '@neo-one/client-full-common';
 import { makeErrorWithCode } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { assertAssetType, AssetType, toJSONAssetType } from './AssetType';
 import { Equals, EquatableKey } from './Equatable';
 import {

@@ -36,7 +36,7 @@ import {
 import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { map as asyncMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import { defer } from 'rxjs';
 import { concatMap, map, toArray } from 'rxjs/operators';

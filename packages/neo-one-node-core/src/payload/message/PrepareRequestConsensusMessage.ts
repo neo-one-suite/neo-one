@@ -1,5 +1,5 @@
 import { BinaryWriter, common, InvalidFormatError, UInt160, UInt256 } from '@neo-one/client-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions } from '../../Serializable';
 import { MinerTransaction } from '../../transaction';
 import { ConsensusMessageBase, ConsensusMessageBaseAdd } from './ConsensusMessageBase';

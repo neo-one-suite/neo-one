@@ -13,7 +13,7 @@ import {
 } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 
 export function convertCallReceipt(receipt: CallReceiptJSON): RawCallReceipt {
   return {

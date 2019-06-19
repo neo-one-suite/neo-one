@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import { BinaryWriter } from '../../../BinaryWriter';
 import { common, UInt256 } from '../../../common';

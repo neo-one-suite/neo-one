@@ -6,9 +6,9 @@
       "@neo-one/*-esnext-browserify-esm": [
         "./neo-one-*/src"
       ],
-      "*": [
-        "../@types/*"
+      "bn.js": [
+        "../types/bn.js.d.ts"
       ]
-    }
+    },
   }
 }

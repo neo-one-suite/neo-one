@@ -1,6 +1,6 @@
 import { BinaryWriter, common, ECPoint, IOHelper, JSONHelper, ValidatorJSON } from '@neo-one/client-common';
 import { BaseState } from '@neo-one/client-full-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Equals, EquatableKey } from './Equatable';
 import {
   createSerializeWire,

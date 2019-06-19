@@ -27,7 +27,7 @@ import { finalize, labels, neverComplete, utils as commonUtils } from '@neo-one/
 import { ScalingBloem } from 'bloem';
 // tslint:disable-next-line:match-default-export-name
 import BloomFilter from 'bloom-filter';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import fetch from 'cross-fetch';
 import { Address6 } from 'ip-address';
 import _ from 'lodash';

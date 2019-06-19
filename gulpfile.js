@@ -236,6 +236,7 @@ const globs = {
     '!packages/*/src/**/*.test.{ts,tsx}',
     '!packages/*/src/__data__/**/*',
     '!packages/*/src/__tests__/**/*',
+    '!packages/*/src/__ledger_tests__/**/*',
     '!packages/*/src/__e2e__/**/*',
     '!packages/*/src/bin/**/*',
   ].concat(skipGlobs),
@@ -244,13 +245,14 @@ const globs = {
     `!packages/*/src/**/*.test.{ts,tsx}`,
     `!packages/*/src/__data__/**/*`,
     `!packages/*/src/__tests__/**/*`,
+    '!packages/*/src/__ledger_tests__/**/*',
     `!packages/*/src/__e2e__/**/*`,
     `!packages/*/src/bin/**/*`,
     `!packages/neo-one-developer-tools-frame/src/*.ts`,
     `!packages/neo-one-smart-contract-lib/src/**/*.ts`,
     `!packages/neo-one-server-plugin-wallet/src/contracts/*.ts`,
   ].concat(skipGlobs),
-  types: ['packages/neo-one-types/**/*', '!packages/neo-one-types/package.json'],
+  types: ['types/**/*'],
   bin: ['packages/*/src/bin/*.ts'].concat(skipGlobs),
   pkg: ['packages/*/package.json'].concat(skipGlobs),
   typescript: ['packages/*/src/**/*.ts'].concat(skipGlobs),
@@ -369,15 +371,8 @@ const transformBrowserPackageJSON = (format, orig, file) => ({
   browser: 'index.browser.js',
 });
 
-const transformTypesPackageJSON = (format, orig, file) => ({
-  ...transformBasePackageJSON(format, orig, file),
-  main: 'index.d.ts',
-});
-
 const transformPackageJSON = (format, orig, file) =>
-  orig.name === '@neo-one/types'
-    ? transformTypesPackageJSON(format, orig, file)
-    : smartContractPkgNames.some((p) => orig.name === p)
+  smartContractPkgNames.some((p) => orig.name === p)
     ? transformSmartContractPackageJSON(format, orig, file)
     : browserPkgNames.some((p) => orig.name === p)
     ? transformBrowserPackageJSON(format, orig, file)
@@ -396,11 +391,6 @@ const copyPkgFiles = ((cache) =>
     return gulp.src(globs.pkgFiles).pipe(gulp.dest(getDest(format)));
   }))({});
 
-const copyTypes = ((cache) =>
-  memoizeTask(cache, function copyTypes(format) {
-    return gulp.src(globs.types).pipe(gulp.dest(path.join(getDest(format), 'neo-one-types')));
-  }))({});
-
 const copyTypescript = ((cache) =>
   memoizeTask(cache, function copyTypescript(format) {
     return gulp
@@ -413,6 +403,7 @@ const copyTypescript = ((cache) =>
           `!packages/*/src/**/*.test.{ts,tsx}`,
           `!packages/*/src/__data__/**/*`,
           `!packages/*/src/__tests__/**/*`,
+          '!packages/*/src/__ledger_tests__/**/*',
           `!packages/*/src/__e2e__/**/*`,
           `!packages/*/src/bin/**/*`,
         ]),
@@ -451,13 +442,14 @@ const compileTypescript = ((cache) =>
   memoizeTask(cache, function compileTypescript(format, _done, type) {
     return gulpReplaceModule(
       format,
-      addFast(format, gulp.src(globs.src), type === 'fast')
+      addFast(format, gulp.src(globs.src.concat(globs.types)), type === 'fast')
         .pipe(gulpFilter(['**', '!**/*.proto'].concat(smartContractPkgs.map((p) => `!packages/${p}/**/*`))))
         .pipe(gulpSourcemaps.init())
         .pipe(type === 'fast' ? format.fastProject() : format.project())
         .pipe(gulpSourcemaps.mapSources(mapSources))
         .pipe(gulpSourcemaps.write())
         .pipe(gulpReplace('rxjs/internal', `rxjs/${format.module === 'esm' ? '_esm2015/' : ''}internal`))
+        .pipe(gulpReplace("import { BN } from 'bn.js';", "import BN from 'bn.js';"))
         .pipe(
           gulpRename((name) => {
             name.dirname = name.dirname
@@ -514,7 +506,6 @@ const buildAllNoDeveloperToolsBundle = ((cache) =>
       ...[
         copyPkgFiles(format),
         copyPkg(format),
-        copyTypes(format),
         copyTypescript(format),
         copyFiles(format),
         copyMetadata(format),
@@ -564,17 +555,24 @@ const copyRootTSConfig = ((cache) =>
   memoizeTask(cache, async function copyRootTSConfig(format) {
     const tsconfigContents = await fs.readFile(path.resolve(appRootDir.get(), 'tsconfig.json'), 'utf8');
     const tsconfig = JSON.parse(tsconfigContents);
+    console.log(tsconfig);
     const suffix = format === MAIN_FORMAT ? '' : `-${format.target}-${format.module}`;
-    tsconfig.compilerOptions.paths = {
-      '@neo-one/ec-key': ['../@types/@neo-one/ec-key'],
-      '@neo-one/boa': ['../@types/@neo-one/boa'],
-      '@neo-one/csharp': ['../@types/@neo-one/csharp'],
-      [`@neo-one/*${suffix}`]: ['./neo-one-*'],
-      '*': ['../@types/*'],
+    const {
+      compilerOptions: { paths, typeRoots, ...compilerRest },
+      ...configRest
+    } = tsconfig;
+    const newTSConfig = {
+      compilerOptions: {
+        paths: {
+          [`@neo-one/*${suffix}`]: ['./neo-one-*'],
+        },
+        ...compilerRest,
+      },
+      ...configRest,
     };
     const filePath = path.resolve(getDistBase(format), 'tsconfig.json');
     await fs.ensureDir(path.dirname(filePath));
-    await fs.writeFile(filePath, JSON.stringify(tsconfig, null, 2));
+    await fs.writeFile(filePath, JSON.stringify(newTSConfig, null, 2));
   }))({});
 
 const CLIENT_PACKAGES = new Set([
@@ -589,7 +587,6 @@ const CLIENT_PACKAGES = new Set([
   '@neo-one/node-vm',
   '@neo-one/client-full-common',
   '@neo-one/node-core',
-  '@neo-one/types',
 ]);
 
 const CLIENT_FULL_PACKAGES = new Set(
@@ -827,7 +824,6 @@ gulp.task('buildBin', gulp.parallel('compileBin', 'createBin'));
 gulp.task('clean', () => fs.remove(DIST));
 gulp.task('copyPkg', gulp.parallel(FORMATS.map((format) => copyPkg(format))));
 gulp.task('copyPkgFiles', gulp.parallel(FORMATS.map((format) => copyPkgFiles(format))));
-gulp.task('copyTypes', gulp.parallel(FORMATS.map((format) => copyTypes(format))));
 gulp.task('copyTypescript', gulp.parallel(FORMATS.map((format) => copyTypescript(format))));
 gulp.task('copyMetadata', gulp.parallel(FORMATS.map((format) => copyMetadata(format))));
 gulp.task('copyFiles', gulp.parallel(FORMATS.map((format) => copyFiles(format))));

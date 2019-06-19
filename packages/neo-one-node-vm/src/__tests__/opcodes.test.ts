@@ -13,7 +13,7 @@ import {
   UInt160Attribute,
   utils,
 } from '@neo-one/node-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import { keys, transactions } from '../__data__';
 import { ExecutionInit, FEES } from '../constants';

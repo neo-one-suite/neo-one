@@ -4,7 +4,7 @@
   "description": "NEO•ONE web workers.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/types": "^1.1.1",
+
     "rxjs": "^6.5.2",
     "tslib": "^1.9.3"
   },

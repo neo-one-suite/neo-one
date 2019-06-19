@@ -2581,7 +2581,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/bn.js@*":
+"@types/bn.js@*", "@types/bn.js@^4.11.5":
   version "4.11.5"
   resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-4.11.5.tgz#40e36197433f78f807524ec623afcf0169ac81dc"
   integrity sha512-AEAZcIZga0JgVMHNtl1CprA/hXX7/wPt79AgR4XqaDt7jyj3QWYw6LPoOiznPtugDmlubUnAahMs2PFxGcQrng==
@@ -2885,6 +2885,11 @@
   resolved "https://registry.yarnpkg.com/@types/jsbn/-/jsbn-1.2.29.tgz#28229bc0262c704a1506c3ed69a7d7e115bd7832"
   integrity sha512-2dVz9LTEGWVj9Ov9zaDnpvqHFV+W4bXtU0EUEGAzWfdRNO3dlUuosdHpENI6/oQW+Kejn0hAjk6P/czs9h/hvg==
 
+"@types/json-file-plus@^3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@types/json-file-plus/-/json-file-plus-3.3.0.tgz#978c01dedf3a899de0899e7a7b8abdbef061cbbb"
+  integrity sha512-MWNFEC+nMsWKmF+LiOmt53X2Y7hLrIa9poc6xCFvvxlf25YI9NrFCVstcwDdSqXERYasnmoRDQ+t6kOtVHFXDQ==
+
 "@types/jss@^9.5.6":
   version "9.5.8"
   resolved "https://registry.yarnpkg.com/@types/jss/-/jss-9.5.8.tgz#258391f42211c042fc965508d505cbdc579baa5b"
@@ -3005,6 +3010,13 @@
   integrity sha512-TPsB6seugMHuqGa3xPz4CgjSlmQdVf4VltxHGcdDSG3Fu7nKqD1zZVE+AnULq4oIgs2lIRcGHiDCgN7kZFDeUw==
   dependencies:
     "@types/node" "*"
+
+"@types/level-js@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@types/level-js/-/level-js-4.0.0.tgz#5f4373671456bff15dd21ea1398c8e00f5464b18"
+  integrity sha512-qy6ABFM/yyJ6RxuoxGpWCjHGkaBAlbEytvWYteL1uhcnUXBcSnxYb6xsh5k596LaA9om1Vp7pU1jYlyzLIAEAQ==
+  dependencies:
+    "@types/abstract-leveldown" "*"
 
 "@types/leveldown@^4.0.0":
   version "4.0.0"

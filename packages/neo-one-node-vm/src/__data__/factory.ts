@@ -30,7 +30,7 @@ import {
   Witness,
   WitnessAdd,
 } from '@neo-one/node-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 
 const internalData: ReadonlyArray<{

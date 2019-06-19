@@ -1,4 +1,3 @@
-/// <reference types="@neo-one/types" />
 export { InteractiveCLI } from './InteractiveCLI';
 export { CLI } from './CLI';
 

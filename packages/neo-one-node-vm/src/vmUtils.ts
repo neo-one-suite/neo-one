@@ -3,7 +3,7 @@ import { utils } from '@neo-one/client-common';
 import bitwise from 'bitwise';
 // tslint:disable-next-line:no-submodule-imports
 import { Bit, UInt8 } from 'bitwise/types';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import { ExecutionContext } from './constants';
 import { NumberTooLargeError, ReadOnlyStorageContextError } from './errors';
