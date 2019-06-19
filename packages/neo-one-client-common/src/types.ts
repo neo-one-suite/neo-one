@@ -2,7 +2,7 @@
 import { Monitor } from '@neo-one/monitor';
 import { OmitStrict } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Observable } from 'rxjs';
 import { RawSourceMap } from 'source-map';
 import { ECPoint, UInt160, UInt256 } from './common';

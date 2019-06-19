@@ -8,6 +8,6 @@
     "inlineSources": true,
     "inlineSourceMap": true,
     "declaration": true,
-    "stripInternal": true
+    "stripInternal": true,
   }
 }

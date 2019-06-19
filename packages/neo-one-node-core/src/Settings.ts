@@ -1,5 +1,5 @@
 import { ECPoint } from '@neo-one/client-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Block } from './Block';
 import { RegisterTransaction, TransactionType } from './transaction';
 

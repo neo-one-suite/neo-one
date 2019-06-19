@@ -21,7 +21,7 @@ import {
   WriteBlockchain,
 } from '@neo-one/node-core';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import { of } from 'rxjs';
 import { factory, keys, testUtils, transactions } from '../__data__';

@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { common } from '../common';
 import { JSONHelper as helper } from '../JSONHelper';
 

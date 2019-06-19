@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 
 const USHORT_MAX_NUMBER = 65535;
 const USHORT_MAX_NUMBER_PLUS_ONE = 65535 + 1;

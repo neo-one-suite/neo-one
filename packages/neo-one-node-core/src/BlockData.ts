@@ -8,7 +8,7 @@ import {
   UInt256,
   UInt256Hex,
 } from '@neo-one/client-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Equals, Equatable } from './Equatable';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
 import { BinaryReader, utils } from './utils';

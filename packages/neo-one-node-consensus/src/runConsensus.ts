@@ -10,7 +10,7 @@ import {
 } from '@neo-one/node-core';
 import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import {
   checkExpectedView,

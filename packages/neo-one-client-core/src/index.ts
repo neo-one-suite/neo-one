@@ -1,4 +1,3 @@
-/// <reference types="@neo-one/types" />
 import { Client as OneClient } from '@neo-one/server-http-client';
 import * as args from './args';
 import * as nep5 from './nep5';

@@ -1,5 +1,5 @@
 import { utils } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { createDeserializeWire, DeserializeWireBaseOptions } from '../Serializable';
 import { ActionType, assertActionType } from './ActionType';
 import { LogAction } from './LogAction';

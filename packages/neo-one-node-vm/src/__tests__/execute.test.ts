@@ -15,7 +15,7 @@ import {
   UInt256Attribute,
   VMListeners,
 } from '@neo-one/node-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import { assets, createBlockchain, factory, testUtils, transactions } from '../__data__';
 import { execute } from '../execute';

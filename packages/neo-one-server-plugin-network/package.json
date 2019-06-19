@@ -14,7 +14,7 @@
     "@neo-one/node-data-backup": "^1.1.2",
     "@neo-one/node-neo-settings": "^1.1.3",
     "@neo-one/server-plugin": "^1.1.3",
-    "@neo-one/types": "^1.1.1",
+
     "@neo-one/utils": "^1.1.1",
     "@types/execa": "^0.9.0",
     "@types/fs-extra": "^7.0.0",

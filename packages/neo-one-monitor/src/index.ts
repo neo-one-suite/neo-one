@@ -1,4 +1,3 @@
-/// <reference types="@neo-one/types" />
 export { CollectingLogger } from './CollectingLogger';
 export { NodeMonitor as DefaultMonitor } from './NodeMonitor';
 export { Reporter } from './Reporter';

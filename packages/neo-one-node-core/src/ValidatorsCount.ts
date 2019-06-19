@@ -7,7 +7,7 @@ import {
   utils,
 } from '@neo-one/client-common';
 import { BaseState } from '@neo-one/client-full-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
 import { BinaryReader } from './utils';
 

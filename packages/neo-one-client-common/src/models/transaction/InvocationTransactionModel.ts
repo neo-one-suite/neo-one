@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { BinaryWriter } from '../../BinaryWriter';
 import { InvalidFormatError } from '../../common';
 import { utils } from '../../utils';

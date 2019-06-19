@@ -1,5 +1,5 @@
 // tslint:disable no-any
-/// <reference types="@neo-one/types" />
+
 import { BrowserLocalClient, FileSystem } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { WorkerManager } from '@neo-one/worker';

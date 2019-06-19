@@ -14,7 +14,7 @@ import {
   UInt160Hex,
 } from '@neo-one/client-common';
 import { Constructor, utils as commonUtils } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import { Account, AccountKey } from '../Account';
 import { Asset, AssetKey } from '../Asset';

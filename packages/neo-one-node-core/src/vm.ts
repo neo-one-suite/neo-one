@@ -1,6 +1,6 @@
 import { common, ECPoint, UInt160, UInt256, VMState } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Action } from './action';
 import { Block } from './Block';
 import { WriteBlockchain } from './Blockchain';

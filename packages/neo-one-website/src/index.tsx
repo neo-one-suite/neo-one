@@ -1,4 +1,3 @@
-/// <reference types="@neo-one/types" />
 // tslint:disable-next-line no-import-side-effect
 import './polyfill';
 

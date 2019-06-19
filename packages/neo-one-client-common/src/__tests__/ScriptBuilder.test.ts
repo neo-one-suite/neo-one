@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { common } from '../common';
 import { Op } from '../models/vm';
 import { ScriptBuilder } from '../ScriptBuilder';

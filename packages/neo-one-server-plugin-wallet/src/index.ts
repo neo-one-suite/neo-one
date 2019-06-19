@@ -1,4 +1,3 @@
-/// <reference types="@neo-one/types" />
 import { WalletPlugin } from './WalletPlugin';
 
 export { getWalletResourceManager } from './getWalletResourceManager';

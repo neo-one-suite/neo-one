@@ -9,13 +9,17 @@
       "dom"
     ],
     "paths": {
-      "@neo-one/types": [
-        "./neo-one-types/"
-      ],
       "@neo-one/*": [
         "./neo-one-*/src"
+      ],
+      "bn.js": [
+        "../types/bn.js.d.ts"
       ]
     },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
     "pretty": true,
     "noEmit": true,
     "declaration": false,

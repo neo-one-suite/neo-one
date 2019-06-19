@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { common, ECPoint, InvalidFormatError } from './common';
 import { utils } from './utils';
 

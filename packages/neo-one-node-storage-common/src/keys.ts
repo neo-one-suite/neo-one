@@ -10,7 +10,7 @@ import {
   ValidatorKey,
 } from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 
 const DELIMITER = '\x00';
 const createPrefix = (value: string) => `${value}${DELIMITER}`;

@@ -1,5 +1,5 @@
 import { ActionBaseJSON, BinaryWriter, JSONHelper, UInt160 } from '@neo-one/client-common';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,

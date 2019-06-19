@@ -1,4 +1,3 @@
-/// <reference types="@neo-one/types/e2e"/>
 // tslint:disable-next-line no-implicit-dependencies
 import * as api from '@neo-one/client-full';
 

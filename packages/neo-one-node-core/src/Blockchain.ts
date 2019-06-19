@@ -1,6 +1,6 @@
 import { ECPoint } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { Observable } from 'rxjs';
 import { Account, AccountKey, AccountUpdate } from './Account';
 import { AccountUnclaimed, AccountUnclaimedKey, AccountUnclaimedsKey } from './AccountUnclaimed';

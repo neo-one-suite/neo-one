@@ -95,7 +95,7 @@ import {
 } from '@neo-one/client-common';
 import { Hash256, LockedWallet, nep5, UnlockedWallet } from '@neo-one/client-core';
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { AssetRegister, ContractRegister } from '../types';
 import { data } from './data';
 import { keys } from './keys';

@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import { common } from '../common';
 import { utils } from '../utils';

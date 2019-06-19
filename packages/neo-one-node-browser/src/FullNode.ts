@@ -8,7 +8,7 @@ import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
 import { vm } from '@neo-one/node-vm';
 import { finalize } from '@neo-one/utils';
 // tslint:disable-next-line match-default-export-name
-import leveljs from 'level-js';
+import { Level as leveljs } from 'level-js';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
 import { BehaviorSubject, Subscription } from 'rxjs';

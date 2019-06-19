@@ -24,7 +24,7 @@
     "@neo-one/react": "^1.1.0",
     "@neo-one/react-common": "^1.1.3",
     "@neo-one/smart-contract-test-browser": "^1.1.3",
-    "@neo-one/types": "^1.1.1",
+
     "@neo-one/utils": "^1.1.1",
     "@neo-one/worker": "^1.1.1",
     "@render-props/scrollable": "^0.1.20",

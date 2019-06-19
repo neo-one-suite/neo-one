@@ -1,5 +1,5 @@
 import { BigNumber } from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { factory } from '../../__data__/factory';
 import { keys } from '../../__data__/keys';
 import { convertContractParameter, convertInvocationResult } from '../../provider/convert';

@@ -1,5 +1,3 @@
-/// <reference types="@neo-one/types/e2e"/>
-
 import { UserAccountID, wifToPrivateKey } from '@neo-one/client-common';
 import {
   Client,

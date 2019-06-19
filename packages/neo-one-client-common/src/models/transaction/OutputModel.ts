@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { BinaryWriter } from '../../BinaryWriter';
 import { UInt160, UInt256 } from '../../common';
 import { IOHelper } from '../../IOHelper';

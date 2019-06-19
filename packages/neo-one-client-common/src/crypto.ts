@@ -1,7 +1,7 @@
 // tslint:disable no-any no-array-mutation
 import ECKey from '@neo-one/ec-key';
 import { Constructor, utils } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import base58 from 'bs58';
 import xor from 'buffer-xor';
 import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from 'crypto';
@@ -699,12 +699,12 @@ const deriveChildKey = (node: HDNode, index: number, hardened: boolean): HDNode 
   const shaLeft = new BN(sha.slice(0, 32));
   const shaRight = sha.slice(32);
 
-  if (shaLeft.cmp(ec().n) >= 0) {
+  if (shaLeft.cmp(ec().n as BN) >= 0) {
     return deriveChildKey(node, index + 1, hardened);
   }
 
   if (node.privateKey) {
-    const childKeyPrivate = shaLeft.add(new BN(node.privateKey)).mod(ec().n);
+    const childKeyPrivate = shaLeft.add(new BN(node.privateKey)).mod(ec().n as BN);
 
     if (childKeyPrivate.cmp(new BN(0)) === 0) {
       return deriveChildKey(node, index + 1, hardened);

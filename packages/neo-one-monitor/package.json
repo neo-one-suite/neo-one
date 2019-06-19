@@ -5,7 +5,7 @@
   "main": "./src/index",
   "browser": "./src/index.browser.ts",
   "dependencies": {
-    "@neo-one/types": "^1.1.1",
+
     "@neo-one/utils": "^1.1.1",
     "@types/koa": "^2.0.48",
     "@types/koa-mount": "^3.0.1",

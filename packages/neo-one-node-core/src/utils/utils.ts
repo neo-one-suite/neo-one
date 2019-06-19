@@ -1,6 +1,6 @@
 import { utils as clientUtils } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { randomBytes } from 'crypto';
 import _ from 'lodash';
 

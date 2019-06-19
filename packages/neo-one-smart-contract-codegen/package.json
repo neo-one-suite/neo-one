@@ -6,7 +6,7 @@
   "dependencies": {
     "@neo-one/client-common": "^1.2.0",
     "@neo-one/client-core": "^1.2.0",
-    "@neo-one/types": "^1.1.1",
+
     "@neo-one/utils": "^1.1.1",
     "@types/lodash": "^4.14.134",
     "@types/prettier": "^1.16.4",

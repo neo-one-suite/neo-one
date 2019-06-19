@@ -7,7 +7,7 @@ import {
   TransactionBaseModel,
 } from '@neo-one/client-common';
 import { Constructor } from '@neo-one/utils';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { VerifyError } from '../errors';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from '../Serializable';
 import { utils } from '../utils';

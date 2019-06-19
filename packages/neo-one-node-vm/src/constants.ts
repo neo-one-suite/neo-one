@@ -1,7 +1,7 @@
 import { common, OpCode, SysCallName, UInt160, VMState } from '@neo-one/client-common';
 import { Monitor } from '@neo-one/monitor';
 import { Block, ExecutionAction, ScriptContainer, TriggerType, VMListeners, WriteBlockchain } from '@neo-one/node-core';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { StackItem } from './stackItem';
 
 export const MAX_SHL_SHR = 65535;

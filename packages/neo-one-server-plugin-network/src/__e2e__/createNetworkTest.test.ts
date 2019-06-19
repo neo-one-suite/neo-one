@@ -1,5 +1,3 @@
-/// <reference types="@neo-one/types/e2e"/>
-
 import fetch from 'cross-fetch';
 import { Network } from '../NetworkResourceType';
 

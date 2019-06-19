@@ -1,4 +1,3 @@
-/// <reference types="@neo-one/types" />
 export * from './BinaryWriter';
 export * from './IOHelper';
 export * from './JSONHelper';

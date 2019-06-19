@@ -1,4 +1,3 @@
-/// <reference types="@neo-one/types" />
 export { FullNode } from './FullNode';
 export { fullNode$ } from './fullNode$';
 export {

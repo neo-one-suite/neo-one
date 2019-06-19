@@ -1,5 +1,5 @@
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable';
-import BN from 'bn.js';
+import { BN } from 'bn.js';
 import { deserializeStackItem } from '../..';
 import {
   BooleanStackItem,
