@@ -1,5 +1,4 @@
 // tslint:disable strict-type-predicates no-object-mutation
-
 import { TrackJS } from '@neo-one/react-common';
 
 if (typeof window !== 'undefined') {

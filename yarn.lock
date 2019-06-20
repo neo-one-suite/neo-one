@@ -3011,10 +3011,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/level-js@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@types/level-js/-/level-js-4.0.0.tgz#5f4373671456bff15dd21ea1398c8e00f5464b18"
-  integrity sha512-qy6ABFM/yyJ6RxuoxGpWCjHGkaBAlbEytvWYteL1uhcnUXBcSnxYb6xsh5k596LaA9om1Vp7pU1jYlyzLIAEAQ==
+"@types/level-js@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@types/level-js/-/level-js-4.0.1.tgz#e094b684e546b80346b2cec0562c4216d8d29eeb"
+  integrity sha512-WA8Zt0RUYVWT1lhyHnT0okmMY1m5MjxC8PvpUn9ojZaU+KNsTy3A2KBHaKtjttCN+o1h7K/eQlSjM20bDraeHA==
   dependencies:
     "@types/abstract-leveldown" "*"
 
@@ -3533,18 +3533,7 @@
     "@types/serve-static" "*"
     "@types/webpack" "*"
 
-"@types/webpack@*", "@types/webpack@^4.4.24":
-  version "4.4.32"
-  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.4.32.tgz#2d460cd33a15e568e93f38de5e628cf846396c51"
-  integrity sha512-mNARoaSJTzbiHxtZbf9NULFilu2frqD+g9Iyl9V2jPYJWXi+AC3Hz8lQWPZ5LLtgUm7iF4SDDMB/1bPrbRQgFw==
-  dependencies:
-    "@types/anymatch" "*"
-    "@types/node" "*"
-    "@types/tapable" "*"
-    "@types/uglify-js" "*"
-    source-map "^0.6.0"
-
-"@types/webpack@4.4.33":
+"@types/webpack@*", "@types/webpack@4.4.33", "@types/webpack@^4.4.33":
   version "4.4.33"
   resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-4.4.33.tgz#c43936ad0f350fd12fd7df3792a364ab8f64e2fa"
   integrity sha512-MU5Lokm30QHF9Wn0+yq/hnToPlEBRQVa72mgn1/W8OpJu63aRDKy0aEdMI+pCk8F6zwQJfSFaVzx1JN1MLXx8A==
@@ -18321,10 +18310,10 @@ rx-lite@^3.1.2:
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-3.1.2.tgz#19ce502ca572665f3b647b10939f97fd1615f102"
   integrity sha1-Gc5QLKVyZl87ZHsQk5+X/RYV8QI=
 
-rxjs-tslint-rules@4.24.1:
-  version "4.24.1"
-  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.24.1.tgz#7ada734d49a4bc569a1a31072ccd9c221ed175b0"
-  integrity sha512-/K5+WgsYv+wjnrsChyDTfz70sTY1bRNQWLUQq3jycLC1sIY39NCm3aWqAdm4WP2b5vOfgSyqzzP1C3oWC8Kofg==
+rxjs-tslint-rules@4.24.2:
+  version "4.24.2"
+  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.24.2.tgz#b5e33f379fb5559383b4d1753e0c48a956bbc56e"
+  integrity sha512-L+3auco6GlVWlvkHaM/Es3FGR2eWklAS4lM5vPrzwbUvVYIP0hNupVdq/ASURGROSYSUkI1gidL0WIY91uKqag==
   dependencies:
     "@phenomnomnominal/tsquery" "^3.0.0"
     decamelize "^3.0.0"

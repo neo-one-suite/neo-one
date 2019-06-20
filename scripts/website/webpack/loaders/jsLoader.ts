@@ -9,7 +9,6 @@ export const jsLoader = (options: { readonly stage: Stage; readonly bundle: Bund
     /react-static-browser-plugins\.js/,
     /@reactivex\/ix-esnext-esm/,
     /react-icons/,
-    /acorn/,
   ],
   use: [cacheLoader({ ...options, name: 'js' }), 'thread-loader', babelLoader(options)].filter(
     (value) => value !== undefined,

@@ -1,4 +1,4 @@
-import { FullNodeOptions, JSONRPCLocalProvider } from '@neo-one/node-browser';
+import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { comlink, WorkerManager } from '@neo-one/worker';
 import { JSONRPCLocalProviderWorker } from './JSONRPCLocalProviderWorker';
 
@@ -7,8 +7,7 @@ export const createJSONRPCLocalProviderManager = (id: string) =>
     new WorkerManager<typeof JSONRPCLocalProvider>(
       JSONRPCLocalProviderWorker,
       () => ({
-        // tslint:disable-next-line:no-object-literal-type-assertion
-        options: { type: 'persistent', id: `neo-one-node-${id}` } as FullNodeOptions,
+        options: { type: 'persistent' as const, id: `neo-one-node-${id}` },
         disposables: [],
       }),
       300 * 1000,
@@ -19,7 +18,7 @@ export const createMemoryJSONRPCLocalProviderManager = async () =>
   comlink.proxyValue(
     new WorkerManager<typeof JSONRPCLocalProvider>(
       JSONRPCLocalProviderWorker,
-      () => ({ options: { type: 'memory' as 'memory' }, disposables: [] }),
+      () => ({ options: { type: 'memory' as const }, disposables: [] }),
       300 * 1000,
     ),
   );
