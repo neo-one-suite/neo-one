@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.4](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-client@1.1.3...@neo-one/server-client@1.1.4) (2019-06-20)
+
+
+### Bug Fixes
+
+* **cli:** fix cli-spinner title flashing ([8bd0c96](https://github.com/neo-one-suite/neo-one/commit/8bd0c96))
+* **deps:** update dependency typescript to v3.5.1 ([#1365](https://github.com/neo-one-suite/neo-one/issues/1365)) ([ec89546](https://github.com/neo-one-suite/neo-one/commit/ec89546))
+
+
+
+
+
 ## [1.1.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-client@1.1.2...@neo-one/server-client@1.1.3) (2019-06-04)
 
 

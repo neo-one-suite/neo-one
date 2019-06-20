@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-compiler@1.1.3...@neo-one/smart-contract-compiler@1.2.0) (2019-06-20)
+
+
+### Bug Fixes
+
+* **@neo-one/smart-contract-compiler:** Fix undefined class properties ([675656f](https://github.com/neo-one-suite/neo-one/commit/675656f)), closes [#1342](https://github.com/neo-one-suite/neo-one/issues/1342)
+* **deps:** update dependency typescript to v3.5.1 ([#1365](https://github.com/neo-one-suite/neo-one/issues/1365)) ([ec89546](https://github.com/neo-one-suite/neo-one/commit/ec89546))
+* **node:** First wave of node fixes ([d50fd34](https://github.com/neo-one-suite/neo-one/commit/d50fd34))
+
+
+### Features
+
+* **@neo-one/smart-contract-compiler:** Allow external contracts to return false on error ([c92ea68](https://github.com/neo-one-suite/neo-one/commit/c92ea68))
+* **@neo-one/smart-contract-compiler:** Do not persist storage on uncaught exception ([bf261ca](https://github.com/neo-one-suite/neo-one/commit/bf261ca))
+* **@neo-one/smart-contract-compiler:** Switch to throwing errors rather than returning false in exc ([1ffda5a](https://github.com/neo-one-suite/neo-one/commit/1ffda5a))
+* **@neo-one/smart-contract-compiler:** Use syscall hash to reduce bytecode size ([b1885d8](https://github.com/neo-one-suite/neo-one/commit/b1885d8)), closes [#1388](https://github.com/neo-one-suite/neo-one/issues/1388) [#745](https://github.com/neo-one-suite/neo-one/issues/745)
+
+
+
+
+
 ## [1.1.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-compiler@1.1.2...@neo-one/smart-contract-compiler@1.1.3) (2019-06-04)
 
 

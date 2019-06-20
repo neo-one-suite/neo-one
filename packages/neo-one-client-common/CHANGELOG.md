@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-common@1.2.0...@neo-one/client-common@1.2.1) (2019-06-20)
+
+
+### Bug Fixes
+
+* **@neo-one/node-vm:** Remove GetClaimReferences ([6ab91a7](https://github.com/neo-one-suite/neo-one/commit/6ab91a7)), closes [#1412](https://github.com/neo-one-suite/neo-one/issues/1412)
+* **deps:** update dependency typescript to v3.5.1 ([#1365](https://github.com/neo-one-suite/neo-one/issues/1365)) ([ec89546](https://github.com/neo-one-suite/neo-one/commit/ec89546))
+* **node:** First wave of node fixes ([d50fd34](https://github.com/neo-one-suite/neo-one/commit/d50fd34))
+
+
+
+
+
 # [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-common@1.1.2...@neo-one/client-common@1.2.0) (2019-06-04)
 
 

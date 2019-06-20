@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-lib@1.4.0...@neo-one/smart-contract-lib@1.5.0) (2019-06-20)
+
+
+### Bug Fixes
+
+* **@neo-one/smart-contract-compiler:** Fix undefined class properties ([675656f](https://github.com/neo-one-suite/neo-one/commit/675656f)), closes [#1342](https://github.com/neo-one-suite/neo-one/issues/1342)
+* **build:** fix the build ([#1464](https://github.com/neo-one-suite/neo-one/issues/1464)) ([7eb87f9](https://github.com/neo-one-suite/neo-one/commit/7eb87f9))
+
+
+### Features
+
+* **@neo-one/smart-contract-compiler:** Do not persist storage on uncaught exception ([bf261ca](https://github.com/neo-one-suite/neo-one/commit/bf261ca))
+* **@neo-one/smart-contract-compiler:** Switch to throwing errors rather than returning false in exc ([1ffda5a](https://github.com/neo-one-suite/neo-one/commit/1ffda5a))
+* **@neo-one/smart-contract-compiler:** Use syscall hash to reduce bytecode size ([b1885d8](https://github.com/neo-one-suite/neo-one/commit/b1885d8)), closes [#1388](https://github.com/neo-one-suite/neo-one/issues/1388) [#745](https://github.com/neo-one-suite/neo-one/issues/745)
+
+
+
+
+
 # [1.4.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-lib@1.3.0...@neo-one/smart-contract-lib@1.4.0) (2019-06-04)
 
 

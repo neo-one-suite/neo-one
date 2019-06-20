@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/ts-utils@1.1.2...@neo-one/ts-utils@1.2.0) (2019-06-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency typescript to v3.5.1 ([#1365](https://github.com/neo-one-suite/neo-one/issues/1365)) ([ec89546](https://github.com/neo-one-suite/neo-one/commit/ec89546))
+
+
+### Features
+
+* **@neo-one/smart-contract-compiler:** Allow external contracts to return false on error ([c92ea68](https://github.com/neo-one-suite/neo-one/commit/c92ea68))
+
+
+
+
+
 ## [1.1.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/ts-utils@1.1.1...@neo-one/ts-utils@1.1.2) (2019-06-04)
 
 

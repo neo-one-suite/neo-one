@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-plugin-project@1.2.1...@neo-one/server-plugin-project@1.3.0) (2019-06-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency typescript to v3.5.1 ([#1365](https://github.com/neo-one-suite/neo-one/issues/1365)) ([ec89546](https://github.com/neo-one-suite/neo-one/commit/ec89546))
+
+
+### Features
+
+* **@neo-one/smart-contract-compiler:** Do not persist storage on uncaught exception ([bf261ca](https://github.com/neo-one-suite/neo-one/commit/bf261ca))
+* **@neo-one/smart-contract-compiler:** Switch to throwing errors rather than returning false in exc ([1ffda5a](https://github.com/neo-one-suite/neo-one/commit/1ffda5a))
+* **@neo-one/smart-contract-compiler:** Use syscall hash to reduce bytecode size ([b1885d8](https://github.com/neo-one-suite/neo-one/commit/b1885d8)), closes [#1388](https://github.com/neo-one-suite/neo-one/issues/1388) [#745](https://github.com/neo-one-suite/neo-one/issues/745)
+
+
+
+
+
 ## [1.2.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-plugin-project@1.2.0...@neo-one/server-plugin-project@1.2.1) (2019-06-04)
 
 

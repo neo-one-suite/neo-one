@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@1.3.0...@neo-one/website@1.4.0) (2019-06-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency typescript to v3.5.1 ([#1365](https://github.com/neo-one-suite/neo-one/issues/1365)) ([ec89546](https://github.com/neo-one-suite/neo-one/commit/ec89546))
+* **web:** update website docs with @neo-one/suite. Add resolve to our resolutions ([ae04105](https://github.com/neo-one-suite/neo-one/commit/ae04105))
+* **website:** fix the scroll sync issue ([e596b7b](https://github.com/neo-one-suite/neo-one/commit/e596b7b))
+* **website:** fix various website issues, some still outstanding ([659233c](https://github.com/neo-one-suite/neo-one/commit/659233c))
+
+
+### Features
+
+* **@neo-one/smart-contract-compiler:** Switch to throwing errors rather than returning false in exc ([1ffda5a](https://github.com/neo-one-suite/neo-one/commit/1ffda5a))
+
+
+
+
+
 # [1.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@1.2.1...@neo-one/website@1.3.0) (2019-06-04)
 
 

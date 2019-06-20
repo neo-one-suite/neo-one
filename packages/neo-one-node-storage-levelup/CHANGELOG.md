@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-storage-levelup@1.1.3...@neo-one/node-storage-levelup@1.2.0) (2019-06-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency typescript to v3.5.1 ([#1365](https://github.com/neo-one-suite/neo-one/issues/1365)) ([ec89546](https://github.com/neo-one-suite/neo-one/commit/ec89546))
+* **node:** First wave of node fixes ([d50fd34](https://github.com/neo-one-suite/neo-one/commit/d50fd34))
+
+
+### Features
+
+* **@neo-one/smart-contract-compiler:** Do not persist storage on uncaught exception ([bf261ca](https://github.com/neo-one-suite/neo-one/commit/bf261ca))
+
+
+
+
+
 ## [1.1.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-storage-levelup@1.1.2...@neo-one/node-storage-levelup@1.1.3) (2019-06-04)
 
 

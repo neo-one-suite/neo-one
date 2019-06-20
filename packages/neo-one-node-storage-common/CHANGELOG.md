@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-storage-common@1.1.3...@neo-one/node-storage-common@1.2.0) (2019-06-20)
+
+
+### Features
+
+* **@neo-one/smart-contract-compiler:** Do not persist storage on uncaught exception ([bf261ca](https://github.com/neo-one-suite/neo-one/commit/bf261ca))
+
+
+
+
+
 ## [1.1.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-storage-common@1.1.2...@neo-one/node-storage-common@1.1.3) (2019-06-04)
 
 
