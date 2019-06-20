@@ -2581,7 +2581,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/bn.js@*", "@types/bn.js@^4.11.5":
+"@types/bn.js@*", "@types/bn.js@4.11.5", "@types/bn.js@^4.11.5":
   version "4.11.5"
   resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-4.11.5.tgz#40e36197433f78f807524ec623afcf0169ac81dc"
   integrity sha512-AEAZcIZga0JgVMHNtl1CprA/hXX7/wPt79AgR4XqaDt7jyj3QWYw6LPoOiznPtugDmlubUnAahMs2PFxGcQrng==
@@ -2885,7 +2885,7 @@
   resolved "https://registry.yarnpkg.com/@types/jsbn/-/jsbn-1.2.29.tgz#28229bc0262c704a1506c3ed69a7d7e115bd7832"
   integrity sha512-2dVz9LTEGWVj9Ov9zaDnpvqHFV+W4bXtU0EUEGAzWfdRNO3dlUuosdHpENI6/oQW+Kejn0hAjk6P/czs9h/hvg==
 
-"@types/json-file-plus@^3.3.0":
+"@types/json-file-plus@3.3.0":
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/@types/json-file-plus/-/json-file-plus-3.3.0.tgz#978c01dedf3a899de0899e7a7b8abdbef061cbbb"
   integrity sha512-MWNFEC+nMsWKmF+LiOmt53X2Y7hLrIa9poc6xCFvvxlf25YI9NrFCVstcwDdSqXERYasnmoRDQ+t6kOtVHFXDQ==
