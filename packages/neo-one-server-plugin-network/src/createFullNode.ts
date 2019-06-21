@@ -71,13 +71,13 @@ export const createFullNode = async ({
         rpc: rpcEnvironment,
         node: nodeEnvironment,
         telemetry: telemetryEnvironment,
+        chainFile,
+        dumpChainFile,
       },
       options$: nodeConfig.config$.pipe(
         map((config) => config.options),
         distinctUntilChanged(),
       ),
-      chainFile,
-      dumpChainFile,
     },
     onError,
   );

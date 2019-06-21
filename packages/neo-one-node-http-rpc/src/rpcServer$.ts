@@ -42,8 +42,8 @@ export interface Options {
   readonly server?: ServerOptions;
   readonly liveHealthCheck?: LiveHealthCheckOptions;
   readonly readyHealthCheck?: ReadyHealthCheckOptions;
-  readonly tooBusyCheck?: TooBusyCheckOptions & { readonly enabled?: boolean };
   readonly rateLimit?: rateLimit.Options & { readonly enabled?: boolean };
+  readonly tooBusyCheck?: TooBusyCheckOptions & { readonly enabled?: boolean };
 }
 
 export const rpcServer$ = ({

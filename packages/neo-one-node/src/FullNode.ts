@@ -38,7 +38,7 @@ export class FullNode {
           }
         };
 
-        if (this.options.environment.haltAndBackup) {
+        if (this.options.environment.haltOnSync) {
           const port = this.getRPCPort();
 
           this.mutableWatcher = interval(5000)
@@ -88,7 +88,7 @@ export class FullNode {
 
     if (halted) {
       const options = await this.options.options$.pipe(take(1)).toPromise();
-      const backupOptions = options.backup !== undefined ? options.backup.options : undefined;
+      const backupOptions = options.backup !== undefined ? options.backup.provider : undefined;
       if (backupOptions !== undefined) {
         await this.backup(backupOptions);
       }

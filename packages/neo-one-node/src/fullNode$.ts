@@ -18,32 +18,35 @@ import { concat, defer, EMPTY, Observable, Observer, timer } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
 import { getDataPath } from './getDataPath';
 
-interface BackupEnvironment {
+export interface BackupEnvironment {
   readonly tmpPath?: string;
   readonly readyPath?: string;
 }
 
-interface BackupOptions {
-  readonly restore: boolean;
-  readonly backup?: {
-    readonly cronSchedule: string;
-  };
-
-  readonly options: BackupRestoreOptions;
+export interface BackupOptions {
+  readonly provider: BackupRestoreOptions;
+  readonly restore?: boolean;
+  readonly cronSchedule?: string;
 }
 
 interface TelemetryEnvironment {
   readonly port: number;
 }
-export interface Environment {
+
+export interface BaseEnvironment {
   readonly dataPath: string;
-  readonly rpc: RPCServerEnvironment;
-  readonly haltAndBackup?: boolean;
+  readonly chainFile?: string;
+  readonly dumpChainFile?: string;
+  readonly haltOnSync?: boolean;
   readonly levelDownOptions?: LevelDownOpenOptions;
+  readonly telemetry?: TelemetryEnvironment;
+}
+
+export interface Environment extends BaseEnvironment {
+  readonly rpc: RPCServerEnvironment;
   readonly node?: NodeEnvironment;
   readonly network?: NetworkEnvironment;
   readonly backup?: BackupEnvironment;
-  readonly telemetry?: TelemetryEnvironment;
 }
 
 export interface Options {
@@ -52,14 +55,13 @@ export interface Options {
   readonly rpc?: RPCServerOptions;
   readonly backup?: BackupOptions;
 }
+
 export interface FullNodeOptions {
   readonly monitor: Monitor;
   readonly settings: Settings;
   readonly environment: Environment;
   readonly options$: Observable<Options>;
   readonly leveldown?: AbstractLevelDOWN;
-  readonly chainFile?: string;
-  readonly dumpChainFile?: string;
 }
 
 export const fullNode$ = ({
@@ -68,8 +70,6 @@ export const fullNode$ = ({
   environment,
   options$,
   leveldown: customLeveldown,
-  chainFile,
-  dumpChainFile,
 }: // tslint:disable-next-line no-any
 FullNodeOptions): Observable<any> => {
   const dataPath = getDataPath(environment.dataPath);
@@ -90,7 +90,7 @@ FullNodeOptions): Observable<any> => {
           restore({
             monitor,
             environment: backupEnvironment,
-            options: backupOptions.options,
+            options: backupOptions.provider,
           }),
         );
       }
@@ -134,16 +134,16 @@ FullNodeOptions): Observable<any> => {
       monitor,
     });
 
-    if (chainFile !== undefined) {
+    if (environment.chainFile !== undefined) {
       await loadChain({
-        chain: { format: 'raw', path: chainFile },
+        chain: { format: 'raw', path: environment.chainFile },
         blockchain,
       });
     }
 
-    if (dumpChainFile !== undefined) {
+    if (environment.dumpChainFile !== undefined) {
       await dumpChain({
-        path: dumpChainFile,
+        path: environment.dumpChainFile,
         blockchain,
       });
     }
@@ -201,11 +201,11 @@ FullNodeOptions): Observable<any> => {
     distinctUntilChanged(),
     switchMap((backupOptionsIn) => {
       const backupOptions = backupOptionsIn;
-      if (backupOptions === undefined || backupOptions.backup === undefined) {
+      if (backupOptions === undefined || backupOptions.cronSchedule === undefined) {
         return node$;
       }
 
-      const { cronSchedule } = backupOptions.backup;
+      const { cronSchedule } = backupOptions;
 
       return new Observable((observer: Observer<{ type: 'start' } | { type: 'backup' }>) => {
         observer.next({ type: 'start' });
@@ -231,7 +231,7 @@ FullNodeOptions): Observable<any> => {
                 await backup({
                   monitor,
                   environment: backupEnvironment,
-                  options: backupOptions.options,
+                  options: backupOptions.provider,
                 });
               }),
             ),
