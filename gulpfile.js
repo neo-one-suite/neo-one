@@ -24,6 +24,8 @@ const rollupString = require('rollup-plugin-string');
 const rollupTypescript = require('rollup-plugin-typescript2');
 
 const rxjsTypes = new Set(['Observer']);
+const stdio = ['ignore', 'inherit', 'inherit'];
+const APP_ROOT_DIR = __dirname;
 
 const transformRxjsImportText = (importName) =>
   importName === 'EMPTY'
@@ -218,18 +220,16 @@ const smartContractPkgs = pkgJSONs.filter(([_p, pkgJSON]) => pkgJSON.smartContra
 const smartContractPkgNames = pkgJSONs
   .filter(([_p, pkgJSON]) => pkgJSON.smartContract)
   .map(([_p, pkgJSON]) => pkgJSON.name);
-const browserPkgs = pkgJSONs.filter(([_p, pkgJSON]) => pkgJSON.browser !== undefined).map(([p]) => p);
 const browserPkgNames = pkgJSONs
   .filter(([_p, pkgJSON]) => pkgJSON.browser !== undefined)
   .map(([_p, pkgJSON]) => pkgJSON.name);
-const indexPkgs = pkgs.filter((p) => !smartContractPkgs.includes(p));
 const pkgNames = pkgJSONs.map(([_p, pkgJSON]) => pkgJSON.name);
 const pkgNamesSet = new Set(pkgNames);
 
 const skipGlobs = SKIP_PACKAGES_LIST.map((pkg) => `!packages/${pkg}/**/*`);
 
 const globs = {
-  originalSrc: [
+  watchFiles: [
     'packages/*/src/**/*.{ts,tsx,js}',
     'packages/*/template/**/*',
     'packages/*/proto/**/*.proto',
@@ -240,19 +240,19 @@ const globs = {
     '!packages/*/src/__e2e__/**/*',
     '!packages/*/src/bin/**/*',
   ].concat(skipGlobs),
-  src: [
-    `packages/*/src/**/*.{ts,tsx}`,
-    `!packages/*/src/**/*.test.{ts,tsx}`,
-    `!packages/*/src/__data__/**/*`,
-    `!packages/*/src/__tests__/**/*`,
+  buildFiles: [
+    'packages/*/src/**/*.{ts,tsx}',
+    'types/**/*',
+    '!packages/*/src/**/*.test.{ts,tsx}',
+    '!packages/*/src/__data__/**/*',
+    '!packages/*/src/__tests__/**/*',
     '!packages/*/src/__ledger_tests__/**/*',
-    `!packages/*/src/__e2e__/**/*`,
-    `!packages/*/src/bin/**/*`,
-    `!packages/neo-one-developer-tools-frame/src/*.ts`,
-    `!packages/neo-one-smart-contract-lib/src/**/*.ts`,
-    `!packages/neo-one-server-plugin-wallet/src/contracts/*.ts`,
+    '!packages/*/src/__e2e__/**/*',
+    '!packages/*/src/bin/**/*',
+    '!packages/neo-one-developer-tools-frame/src/*.ts',
+    '!packages/neo-one-smart-contract-lib/src/**/*.ts',
+    '!packages/neo-one-server-plugin-wallet/src/contracts/*.ts',
   ].concat(skipGlobs),
-  types: ['types/**/*'],
   bin: ['packages/*/src/bin/*.ts'].concat(skipGlobs),
   pkg: ['packages/*/package.json'].concat(skipGlobs),
   typescript: ['packages/*/src/**/*.ts'].concat(skipGlobs),
@@ -263,7 +263,6 @@ const globs = {
     'packages/*/template/**/*',
     'packages/*/proto/**/*.proto',
   ].concat(skipGlobs),
-
   files: ['lerna.json', 'yarn.lock', 'tsconfig.json'],
   metadata: ['LICENSE', 'README.md'],
 };
@@ -400,12 +399,12 @@ const copyTypescript = ((cache) =>
           'packages/neo-one-server-plugin-wallet/src/contracts/*.ts',
           'packages/neo-one-smart-contract/src/*.ts',
           'packages/neo-one-smart-contract-lib/src/**/*.ts',
-          `!packages/*/src/**/*.test.{ts,tsx}`,
-          `!packages/*/src/__data__/**/*`,
-          `!packages/*/src/__tests__/**/*`,
+          '!packages/*/src/**/*.test.{ts,tsx}',
+          '!packages/*/src/__data__/**/*',
+          '!packages/*/src/__tests__/**/*',
           '!packages/*/src/__ledger_tests__/**/*',
-          `!packages/*/src/__e2e__/**/*`,
-          `!packages/*/src/bin/**/*`,
+          '!packages/*/src/__e2e__/**/*',
+          '!packages/*/src/bin/**/*',
         ]),
       )
       .pipe(
@@ -442,13 +441,18 @@ const compileTypescript = ((cache) =>
   memoizeTask(cache, function compileTypescript(format, _done, type) {
     return gulpReplaceModule(
       format,
-      addFast(format, gulp.src(globs.src.concat(globs.types)), type === 'fast')
+      addFast(format, gulp.src(globs.buildFiles), type === 'fast')
         .pipe(gulpFilter(['**', '!**/*.proto'].concat(smartContractPkgs.map((p) => `!packages/${p}/**/*`))))
         .pipe(gulpSourcemaps.init())
         .pipe(type === 'fast' ? format.fastProject() : format.project())
         .pipe(gulpSourcemaps.mapSources(mapSources))
         .pipe(gulpSourcemaps.write())
-        .pipe(gulpReplace('rxjs/internal', `rxjs/${format.module === 'esm' ? '_esm2015/' : ''}internal`))
+        .pipe(
+          gulpReplace(
+            `${RXJS_IMPORT}/internal`,
+            `${RXJS_IMPORT}/${format.module === 'esm' ? '_esm2015/' : ''}internal`,
+          ),
+        )
         .pipe(gulpReplace("import { BN } from 'bn.js';", "import BN from 'bn.js';"))
         .pipe(
           gulpRename((name) => {
@@ -465,11 +469,9 @@ const compileTypescript = ((cache) =>
 
 gulp.task('compileDeveloperToolsFrame', async () => {
   await execa('yarn', ['compile:developer-tools-frame'], {
-    stdio: ['ignore', 'inherit', 'inherit'],
+    stdio,
   });
 });
-
-const APP_ROOT_DIR = __dirname;
 
 const compileDeveloperToolsBundle = ((cache) =>
   memoizeTask(cache, async function compileDeveloperToolsBundle(format) {
@@ -529,7 +531,7 @@ const install = ((cache) =>
   memoizeTask(cache, async function install(format) {
     await execa.shell('yarn install --non-interactive --no-progress --ignore-engines', {
       cwd: getDistBaseCWD(format),
-      stdio: ['ignore', 'inherit', 'inherit'],
+      stdio,
     });
   }))({});
 
@@ -537,7 +539,7 @@ const publish = ((cache) =>
   memoizeTask(cache, async function publish(format) {
     await execa('yarn', ['lerna', 'exec', path.resolve(appRootDir.get(), 'scripts', 'try-publish')], {
       cwd: getDistBaseCWD(format),
-      stdio: ['ignore', 'inherit', 'inherit'],
+      stdio,
     });
   }))({});
 
@@ -555,7 +557,6 @@ const copyRootTSConfig = ((cache) =>
   memoizeTask(cache, async function copyRootTSConfig(format) {
     const tsconfigContents = await fs.readFile(path.resolve(appRootDir.get(), 'tsconfig.json'), 'utf8');
     const tsconfig = JSON.parse(tsconfigContents);
-    console.log(tsconfig);
     const suffix = format === MAIN_FORMAT ? '' : `-${format.target}-${format.module}`;
     const {
       compilerOptions: { paths, typeRoots, ...compilerRest },
@@ -851,8 +852,7 @@ gulp.task(
   'watch',
   gulp.series(buildE2ESeries('fast'), function startWatch() {
     noCache = true;
-    gulp.watch(globs.originalSrc, compileTypescript(MAIN_FORMAT, 'fast'));
-    gulp.watch(globs.bin, gulp.series('buildBin'));
+    gulp.watch(globs.watchFiles.concat(globs.bin), gulp.series(compileTypescript(MAIN_FORMAT, 'fast'), 'buildBin'));
   }),
 );
 
@@ -870,17 +870,17 @@ gulp.task('prepareRelease', async () => {
       '--github-release',
     ],
     {
-      stdio: ['ignore', 'inherit', 'inherit'],
+      stdio,
     },
   );
 });
 
 gulp.task('test', async () => {
-  await execa('yarn', ['test-ci'], { stdio: ['ignore', 'inherit', 'inherit'] });
+  await execa('yarn', ['test-ci'], { stdio });
 });
 
 gulp.task('e2e', async () => {
-  await execa('yarn', ['e2e-ci'], { stdio: ['ignore', 'inherit', 'inherit'] });
+  await execa('yarn', ['e2e-ci'], { stdio });
 });
 
 gulp.task('release', gulp.series('test', 'build', 'e2e', 'prepareRelease', 'copyPkg', 'publish'));
