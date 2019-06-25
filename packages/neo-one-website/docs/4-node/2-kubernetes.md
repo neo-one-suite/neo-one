@@ -72,13 +72,13 @@ spec:
         - name: node-data
           mountPath: /root/.local/share/neo_one_node
         args: [
-          "--options.node.rpcURLs=http://seed6.ngd.network:10332",
-          "--options.node.rpcURLs=https://seed1.red4sec.com:10332",
-          "--options.backup.restore=true",
-          "--options.backup.options.gcloud.projectID=neotracker-172901",
-          "--options.backup.options.gcloud.bucket=bucket-1.neo-one.io",
-          "--options.backup.options.gcloud.prefix=node_0",
-          "--options.backup.options.gcloud.maxSizeBytes=419430400"
+          "--node.rpcURLs=http://seed6.ngd.network:10332",
+          "--node.rpcURLs=https://seed1.red4sec.com:10332",
+          "--backup.restore=true",
+          "--backup.provider.gcloud.projectID=neotracker-172901",
+          "--backup.provider.gcloud.bucket=bucket-1.neo-one.io",
+          "--backup.provider.gcloud.prefix=node_0",
+          "--backup.provider.gcloud.maxSizeBytes=419430400"
         ]
         resources:
           requests:
@@ -115,21 +115,19 @@ There are two main benefits to deploying the nodes this way. If a pod needs to r
 Unlike in the local docker example we don't want to mount a configuration to this container, instead all configurations are passed in as either container arguments or environment variables, however environment variables cannot represent array values. All configuration options can be set this way including array values
 
 ```bash
-"--options.node.rpcURLs=http://seed6.ngd.network:10332",
-"--options.node.rpcURLs=https://seed1.red4sec.com:10332"
+"--node.rpcURLs=http://seed6.ngd.network:10332",
+"--node.rpcURLs=https://seed1.red4sec.com:10332"
 ```
 
 is the equivalent of
 
 ```bash
 {
-  "options": {
-    "node": {
-      "rpcURLs": [
-        "http://seed6.ngd.network:10332",
-        "https://seed1.red4sec.com:10332"
-      ]
-    }
+  "node": {
+    "rpcURLs": [
+      "http://seed6.ngd.network:10332",
+      "https://seed1.red4sec.com:10332"
+    ]
   }
 }
 ```

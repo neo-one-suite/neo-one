@@ -14,45 +14,21 @@ This section will serve as a reference for the NEO•ONE Node's many configurati
 ## Environment
 
 ```bash
+...
 {
   "environment": {
-
-    "dataPath": string,
-
-    "rpc": {
-      "http?": {
-        "port": number,
-        "host": string
-      },
-      "https?": {
-        "port": number,
-        "host": string,
-        "cert": string,
-        "key": string
-      }
-    },
-
-    "node": {
-      "externalPort": number
-    },
-
-    "network": {
-      "listenTCP": {
-        "port": number,
-        "host?": string
-      }
-    },
-
-    "backup": {
-      "tmpPath?": string,
-      "readyPath?": string
-    },
-
-     "telemetry": {
+    "dataPath?": string,
+    "chainFile?": string,
+    "dumpChainFile?": string,
+    "monitor?": string,
+    "haltOnSync?": boolean,
+    "levelDownOptions?": ???,
+    "telemetry?": {
       "port": number
     }
   }
 }
+...
 ```
 
 ### dataPath
@@ -63,49 +39,52 @@ This section will serve as a reference for the NEO•ONE Node's many configurati
 
 In the [local docker](/docs/node-docker#Examples) example we could store blockchain data in a location other than `/root/.local/share/neo_one_node`, it should be noted you will need to change the mount location as well.
 
-### haltAndBackup
+### chainFile
 
-*defaults to **false***
+*disabled by default*
 
-`environment.haltAndBackup` enables a watcher which will halt the node when the rpc server's `readyHealthCheck` passes and begin a backup if a location is specified which you are authorized to push to.
+Optional path for syncing from a local `chainFile`. A chainfile is a full binary of blockchain data that can be used to **hard** re-sync the chain. As opposed to a normal backup this is used to re-sync instead of restore. This is useful in extreme situations like a fork.
 
 ::: warning
 
 Note
 
-To properly halt and backup, you must also provide `options.backup` and `options.rpc.readyHealthCheck` configurations. In the case of google-cloud you must also provide service credentials.
+Syncing from a chainfile can take a **very** long time. Upwards of 30 hours.
 
 :::
 
-### rpc
+### dumpChainFile
 
-*by default only `http` is enabled on `localhost:8080` OR `localhost:$PORT` if you have set the environment variable $PORT*
+*disabled by default*
 
-`environment.rpc` is used to configure the rpc server's host options. You do not need to specify both `http` and `https` options.
+Optional path for outputting a `chainFile`.
+
+### monitor
+
+*defaults to **'info'***
+
+Desired logging level of the node monitor, options are
+```
+'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'silly'
+```
+
+### haltOnSync
+
+*defaults to **false***
+
+`haltOnSync` enables a watcher which will halt the node when the rpc server's `readyHealthCheck` passes and begin a backup if a location is specified which you are authorized to push to.
+
+::: warning
+
+Note
+
+To properly halt and backup, you must also provide `backup` and `rpc.readyHealthCheck` configurations. In the case of google-cloud you must also provide service credentials.
+
+:::
 
 ### levelDownOptions
 
-...
-
-### node
-
-*disabled by default*
-
-`environment.node.externalPort` specifies the external port of the node, useful for a deployment when the container ports are different from the cluster port.
-
-### network
-
-*disabled by default*
-
-`environment.network.listenTCP` when provided *at least* a port this allows other nodes to create TCP connections with this one over that port. `host` is optional and defaults to `localhost`.
-
-### backup
-
-*defaults to ${environment.dataPath}/tmp and ${environment.dataPath}/ready respectively*
-
-`environment.backup.tmpPath` specifies the location of downloaded backup files.
-
-`environment.backup.readyPath` specifies the location of the `ready` file generated after successfully extracting the backup.
+*see the [leveldown documentation](https://github.com/Level/leveldown#options)*
 
 ### telemetry
 
@@ -148,142 +127,62 @@ To properly halt and backup, you must also provide `options.backup` and `options
 
 List of consensus nodes.
 
-## Options
+## RPC
 
 ```bash
+...
 {
-  "options": {
-
-    "node": {
+  "rpc": {
+    "http?": {
+      "port": number,
+      "host": string
+    },
+    "https?": {
+      "port": number,
+      "host": string,
+      "cert": string,
+      "key": string
+    },
+    "server?": {
+      "keepAliveTimeout": number,
+    },
+    "liveHealthCheck?": {
       "rpcURLs?": string[],
-
-      "unhealthyPeerSeconds?": number,
-
-      "consensus?": {
-        "enabled": boolean,
-        "options": {
-          "privateKey": string,
-          "privateNet": boolean
-        }
-      }
+      "offset?": number,
+      "timeoutMS?": number,
+      "checkEndpoints?": number
     },
-
-    "network": {
-      "seeds?": string[],
-      "peerSeeds?": string[],
-      "externalEndpoints?": string[],
-      "maxConnectedPeers?": number,
-      "connectPeersDelayMS?": number,
-      "socketTimeoutMS?": number
+    "readyHealthCheck?": {
+      "rpcURLs?": string[],
+      "offset?": number,
+      "timeoutMS?": number,
+      "checkEndpoints?": number
     },
-
-    "rpc": {
-      "server": {
-        "keepAliveTimeout": number,
-      },
-
-      "liveHealthCheck": {
-        "rpcURLs?": string[],
-        "offset?": number,
-        "timeoutMS?": number,
-        "checkEndpoints?": number
-      },
-
-      "readyHealthCheck": {
-        "rpcURLs?": string[],
-        "offset?": number,
-        "timeoutMS?": number,
-        "checkEndpoints?": number
-      },
-
-      "tooBusyCheck": {
-        "enabled": boolean,
-        "interval?": number,
-        "maxLag?": number
-      },
-
-      "rateLimit": {
-        "enabled": boolean,
-        "duration?": number,
-        "max?": number
-      }
+    "tooBusyCheck?": {
+      "enabled": boolean,
+      "interval?": number,
+      "maxLag?": number
     },
-
-    "backup": {
-      "restore": boolean,
-
-      "backup?": {
-        "cronSchedule": string
-      },
-
-      "options": {
-        "gcloud?": {
-          "projectID": string,
-          "bucket": string,
-          "prefix": string,
-          "keepBackupCount?": number,
-          "maxSizeBytes?": number
-        },
-
-        "mega?": {
-          "download?": {
-            "id": string,
-            "key": string
-          },
-
-          "upload?": {
-            "email": string,
-            "password": string,
-            "file": string
-          }
-        }
-      }
+    "rateLimit?": {
+      "enabled": boolean,
+      "duration?": number,
+      "max?": number
     }
   }
 }
+...
 ```
 
-*by default none of these are defined*
-
-Unlike other configuration options, settings in `options` are watched and applied immediately to the node without having to restart.
-
-### node
-
-`options.node` controls connection and consensus options for connecting with other nodes.
+`rpc` options configures the internal RPC Server of the node. See `@neo-one/node-http-rpc`.
 
 ---
 
-`rpcURLs` specifies a list of known node RPC URLs you would like to try and connect to. A list of public mainnet hosts can be found at http://monitor.cityofzion.io/.
+*by default only http is enabled on `localhost:8080` OR `localhost:$PORT` if you have set the `PORT` environment variable*
 
-`unhealthyPeerSeconds` sets how long (in seconds) to wait for a peer response before deeming it 'unhealthy'. Defaults to 300 seconds.
+`rpc.http` or `rpc.https` are used to configure the rpc server’s host options. You do not need to specify both http and https options.
 
-`consensus` sets the consensus options for the node, requires a privateNet setup.
-  - `enabled` enables consensus.
-  - `options`
-
-### network
-
-`options.network` can be used to control seeds, endpoints, and socketTimeout defaults.
-
----
-
-`seeds` specifies external seeds you would like to connect to.
-
-`peerSeeds` specifies trusted seeds, typically ones run by yourself or on the same cluster.
-
-`externalEndpoints` specifies specific known external peers.
-
-`maxConnectedPeers` sets the maximum number of peers the node will attempt to hold a connection with at once. Defaults to 10.
-
-`connectPeersDelayMS` sets the amount of time (in milliseconds) to wait after requesting a peer connection before requesting another. Defaults to 5000.
-
-`socketTimeoutMS` sets the timeout of peer requests (in milliseconds). Defaults to 1 minute.
-
-### rpc
-
-`options.rpc` configures the internal RPC Server of the node. See `@neo-one/node-http-rpc`.
-
----
+### Hot Options
+*these options can be changed without restarting the node*
 
 `server.keepAliveTimeout`: if you would like your server to close after *x* seconds without activity set a timeout here (in milliseconds).
 
@@ -297,22 +196,143 @@ Unlike other configuration options, settings in `options` are watched and applie
 
 `rateLimit` (*experimental*): enable the rateLimiter middleware which throttles requests to the node when too many have been made from the same address over a period of time. Currently an experimental feature, see [koa-ratelimit-lru](https://github.com/Dreamacro/koa-ratelimit-lru) for more. Set `rateLimit.enabled` to **true** to experiment with it.
 
-### backup
+## Node
 
-`options.backup` handles the backup and restore configuration for the node.
+```bash
+...
+{
+  "node": {
+    "externalPort?": number,
+    "rpcURLs?": string[],
+    "consensus?": {
+      "enabled": boolean,
+      "privateKey": string,
+      "privateNet": boolean
+    }
+  }
+}
+...
+```
+
+`node` options control connections and consensus options for the NEO•ONE Node.
 
 ---
 
-`restore`: **true** to attempt and pull the latest backup from your provider on starting the node. **false** to ignore restoring and only backup.
+`externalPort` specifies the external port of the node, useful for a deployment when the container ports are different from the cluster port.
 
-`backup.cronschedule`: set a schedule for when to stop the node and backup. See `[cron format](http://www.nncron.ru/help/EN/working/cron-format.htm)
+### Hot Options
+*these options can be changed without restarting the node*
 
-`options` is where you will specify either a `gcloud` or `mega` provider. NEO•ONE maintains a public google cloud repository of backups you may restore from using:
+`rpcURLs` specifies a list of known node RPC URLs you would like to try and connect to. A list of public mainnet hosts can be found at http://monitor.cityofzion.io/.
+
+`unhealthyPeerSeconds` sets how long (in seconds) to wait for a peer response before deeming it 'unhealthy'. Defaults to 300 seconds.
+
+`consensus` sets the consensus options for the node, requires a privateNet setup.
+
+  - `enabled` enables consensus
+  - `privateKey` the key for the network
+  - `privateNet` true/false
+
+## Network
+
+```bash
+...
+{
+  "network": {
+    "listenTCP": {
+      "port": number,
+      "host?": string
+    },
+    "seeds?": string[],
+    "peerSeeds?": string[],
+    "externalEndpoints?": string[],
+    "maxConnectedPeers?": number,
+    "connectPeersDelayMS?": number,
+    "socketTimeoutMS?": number
+  }
+}
+...
+```
+
+`network` options can be used to control seeds, endpoints, and socketTimeout defaults.
+
+---
+
+`listenTCP` when provided at least a port this allows other nodes to create TCP connections with this one over that port. `host` is optional and defaults to 'localhost'.
+
+### Hot Options
+*these options can be changed without restarting the node*
+
+`seeds` specifies external seeds you would like to connect to.
+
+`peerSeeds` specifies trusted seeds, typically ones run by yourself or on the same cluster.
+
+`externalEndpoints` specifies specific known external peers.
+
+`maxConnectedPeers` sets the maximum number of peers the node will attempt to hold a connection with at once. Defaults to 10.
+
+`connectPeersDelayMS` sets the amount of time (in milliseconds) to wait after requesting a peer connection before requesting another. Defaults to 5000.
+
+`socketTimeoutMS` sets the timeout of peer requests (in milliseconds). Defaults to 1 minute.
+
+## backup
+```bash
+...
+{
+  "backup": {
+    "tmpPath?": string,
+    "readyPath?": string,
+    // observable options
+    "restore?": boolean,
+    "cronSchedule?": string,
+    "provider?": {
+      "gcloud?": {
+        "projectID": string,
+        "bucket": string,
+        "prefix": string,
+        "keepBackupCount?": number,
+        "maxSizeBytes?": number
+      },
+
+      "mega?": {
+        "download?": {
+          "id": string,
+          "key": string
+        },
+
+        "upload?": {
+          "email": string,
+          "password": string,
+          "file": string
+        }
+      }
+    }
+  }
+}
+...
+```
+
+`backup` options handle the backup and restore configuration for the node.
+
+---
+
+`tmpPath` *(defaults to ${environment.dataPath}/tmp)* specifies the file path to use for downloading backup files before extraction.
+
+`readyPath` *(defaults to ${environment.dataPath}/ready)* specifies the file path to use when flagging the restore as 'ready'.
+
+### Hot Options
+*these options can be changed without restarting the node*
+
+`restore`: set to **true** to attempt and pull the latest backup from your provider on starting the node, **false** to ignore restoring and only backup.
+
+`cronschedule`: set a schedule for when to stop the node and backup. See `[cron format](http://www.nncron.ru/help/EN/working/cron-format.htm)
+
+`provider` is where you will specify either a `gcloud` or `mega` provider. NEO•ONE maintains a public google cloud repository of backups you may restore from using:
 
 ```bash
 {
   "backup": {
-    "options": {
+    "provider": {
       "gcloud": {
         "projectID": "neotracker-172901",
         "bucket": "bucket-1.neo-one.io",
@@ -325,33 +345,3 @@ Unlike other configuration options, settings in `options` are watched and applie
 ```
 
 Where `maxSizeBytes` is the maximum size for a chunk of uploaded data.
-
-## Monitor
-
-```bash
-{
-  "monitor": {
-    "level": string
-  }
-}
-```
-
-## chainFile
-
-*disabled by default*
-
-Optional path for syncing from a local `chainFile`. A chainfile is a full binary of blockchain data that can be used to **hard** re-sync the chain. As opposed to a normal backup this is used to re-sync instead of restore. This is useful in extreme situations like a fork.
-
-::: warning
-
-Note
-
-Syncing from a chainfile can take a **very** long time. Upwards of 30 hours.
-
-:::
-
-## dumpChainFile
-
-*disabled by default*
-
-Optional path for outputting a `chainFile`.

@@ -22,13 +22,13 @@ services:
   node:
     image: quay.io/neoone/node
     command: [
-      "--options.node.rpcURLs=http://seed6.ngd.network:10332",
-      "--options.node.rpcURLs=https://seed1.red4sec.com:10332",
-      "--options.backup.restore=true",
-      "--options.backup.options.gcloud.projectID=neotracker-172901",
-      "--options.backup.options.gcloud.bucket=bucket-1.neo-one.io",
-      "--options.backup.options.gcloud.prefix=node_0",
-      "--options.backup.options.gcloud.maxSizeBytes=419430400"
+      "--node.rpcURLs=http://seed6.ngd.network:10332",
+      "--node.rpcURLs=https://seed1.red4sec.com:10332",
+      "--backup.restore=true",
+      "--backup.provider.gcloud.projectID=neotracker-172901",
+      "--backup.provider.gcloud.bucket=bucket-1.neo-one.io",
+      "--backup.provider.gcloud.prefix=node_0",
+      "--backup.provider.gcloud.maxSizeBytes=419430400"
     ]
     deploy:
       replicas: 1
