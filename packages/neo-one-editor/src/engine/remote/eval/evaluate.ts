@@ -16,11 +16,13 @@ export interface Result {
 
 export const evaluate = (engine: RemoteEngine, mod: TranspiledModule, exploreID?: string): Result => {
   const globals = engine.getGlobals(mod);
+  // @ts-ignore
+  const { default: _default, ...rest } = globals;
   const require = createRequire(engine, mod, exploreID);
   const code = mod.code;
   const module = { exports: {} };
-  const params = ['require', 'module', 'exports'].concat(Object.keys(globals));
-  const args = [require, module, module.exports, ...Object.values(globals)];
+  const params = ['require', 'module', 'exports'].concat(Object.keys(rest));
+  const args = [require, module, module.exports, ...Object.values(rest)];
   try {
     const evalCode = `(function evaluate(${params.join(', ')}) { ${code}\n})`;
     // tslint:disable-next-line ban-comma-operator

@@ -8,7 +8,7 @@
     "lodash": "^4.17.11",
     "react": "16.8.6",
     "rxjs": "6.5.2",
-    "styled-components": "4.3.1",
+    "styled-components": "4.3.2",
     "styled-tools": "1.7.1"
   },
   "sideEffects": false

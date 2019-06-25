@@ -5,7 +5,7 @@
   "main": "./src/index",
   "dependencies": {
     "@neo-one/react-core": "^1.1.4",
-    "@types/react": "^16.8.20",
+    "@types/react": "^16.8.22",
     "@types/react-select": "^2.0.19",
     "@types/styled-components": "^4.1.16",
     "popper.js": "^1.15.0",
@@ -13,7 +13,7 @@
     "react-dom": "^16.8.6",
     "react-draggable": "^3.3.0",
     "react-select": "^3.0.4",
-    "styled-components": "^4.3.1",
+    "styled-components": "^4.3.2",
     "styled-tools": "^1.6.0",
     "trackjs": "^3.3.0"
   },

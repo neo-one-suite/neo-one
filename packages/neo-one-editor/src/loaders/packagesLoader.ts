@@ -30,7 +30,6 @@ const INCLUDE_PACKAGES: readonly string[] = [
   'neo-one-smart-contract-test-browser',
   'neo-one-smart-contract-test-common',
   'neo-one-ts-utils',
-  'neo-one-types',
   'neo-one-typescript-concatenator',
   'neo-one-utils',
   'neo-one-worker',
