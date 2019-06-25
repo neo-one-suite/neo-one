@@ -48,12 +48,10 @@ When running the node locally it is quite easy to apply a configuration file com
 ```bash
 ## path/to/config.json
 {
-  "options": {
-    "node": {
-      "rpcURLs": {
-        "http://seed6.ngd.network:10332",
-        "http://seed10.ngd.network:10332"
-      }
+  "node": {
+    "rpcURLs": {
+      "http://seed6.ngd.network:10332",
+      "http://seed10.ngd.network:10332"
     }
   }
 }
@@ -68,7 +66,7 @@ node neo-one-node --config /path/to/config.json
 individual options can also be layered on top of our configuration
 
 ```bash
-node neo-one-node --config /path/to/config.json --monitor.level=verbose
+node neo-one-node --config /path/to/config.json --environment.monitor=verbose
 ```
 
 Finally you have the option of adding a `.neo_one_noderc` app configuration file anywhere in the app directory (recommended at `/neo-one/`) to apply you configuration by default; See [rc](https://github.com/dominictarr/rc#rc).

@@ -24,7 +24,7 @@ Upon successfully building the node-container and launching your app, you should
 You can quickly apply environment variable configuration options to the node using the __Config Vars__ in App >> Settings >> Config Vars. As an example we can set the monitor log-level using a `config var` with key:value
 
 ```bash
-neo_one_node_monitor__level verbose
+neo_one_node_environment__monitor verbose
 ```
 
 After applying the node will restart and update its configuration.
