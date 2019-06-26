@@ -4,4 +4,6 @@ export {
   Environment as FullNodeEnvironment,
   Options as FullNodeOptions,
   FullNodeOptions as FullNodeCreateOptions,
+  BackupEnvironment,
+  BackupOptions,
 } from './fullNode$';

@@ -1,4 +1,5 @@
-import { FullNodeEnvironment, FullNodeOptions as ConfigOptions } from '@neo-one/node';
+import { LogLevel } from '@neo-one/monitor';
+import { FullNodeCreateOptions, FullNodeEnvironment, FullNodeOptions as ConfigOptions } from '@neo-one/node';
 import { createMain, createTest } from '@neo-one/node-neo-settings';
 import chokidar from 'chokidar';
 import envPaths from 'env-paths';
@@ -7,18 +8,13 @@ import rc from 'rc';
 import { BehaviorSubject, concat, Observable, of } from 'rxjs';
 import { distinctUntilChanged, publishReplay, refCount, scan } from 'rxjs/operators';
 import SeamlessImmutable from 'seamless-immutable';
-import { createMonitor, MonitorEnvironment } from './createMonitor';
-
-export interface NodeBinEnvironment {
-  readonly fullNodeEnvironment: FullNodeEnvironment;
-  readonly settingsEnvironment: SettingsEnvironment;
-  readonly monitorEnvironment: MonitorEnvironment;
-  readonly options: ConfigOptions;
-  readonly dumpChainFile: string | undefined;
-  readonly chainFile: string | undefined;
-  // tslint:disable-next-line:readonly-array
-  readonly configs: string[] | undefined;
-}
+import { createMonitor } from './createMonitor';
+import {
+  extractBackupConfiguration,
+  extractNetworkConfiguration,
+  extractNodeConfiguration,
+  extractRPCConfiguration,
+} from './extractConfigurations';
 
 interface SettingsEnvironment {
   readonly type: 'main' | 'test' | string;
@@ -28,14 +24,22 @@ interface SettingsEnvironment {
   readonly standbyValidators?: readonly string[];
 }
 
+export interface NodeBinCreate {
+  readonly environment: FullNodeEnvironment & { readonly monitor: LogLevel };
+  readonly settings: SettingsEnvironment;
+  readonly options: ConfigOptions;
+  // tslint:disable-next-line: readonly-array
+  readonly configs: string[] | undefined;
+}
+
 const DEFAULT_CONFIG = {
   environment: {
     dataPath: envPaths('neo_one_node', { suffix: '' }).data,
-    rpc: {
-      http: {
-        port: process.env.PORT !== undefined ? process.env.PORT : 8080,
-        host: 'localhost',
-      },
+  },
+  rpc: {
+    http: {
+      port: process.env.PORT !== undefined ? process.env.PORT : 8080,
+      host: 'localhost',
     },
   },
   settings: {
@@ -61,35 +65,46 @@ const getSettings = (settings: SettingsEnvironment) => {
   }
 };
 
-const getFreshConfig = (): NodeBinEnvironment => {
-  const config = rc('neo_one_node', DEFAULT_CONFIG);
+const getFreshConfig = (): NodeBinCreate => {
+  const { settings, environment: environmentPartial, rpc, node, network, backup, configs } = rc(
+    'neo_one_node',
+    DEFAULT_CONFIG,
+  );
+  const { environment: rpcEnv, options: rpcOptions } = extractRPCConfiguration(rpc);
+  const { environment: nodeEnv, options: nodeOptions } = extractNodeConfiguration(node);
+  const { environment: networkEnv, options: networkOptions } = extractNetworkConfiguration(network);
+  const { environment: backupEnv, options: backupOptions } = extractBackupConfiguration(backup);
+
+  const environment = {
+    rpc: rpcEnv,
+    node: nodeEnv,
+    network: networkEnv,
+    backup: backupEnv,
+    ...environmentPartial,
+  };
+
+  const options = {
+    rpc: rpcOptions,
+    node: nodeOptions,
+    network: networkOptions,
+    backup: backupOptions,
+  };
 
   return {
-    fullNodeEnvironment: config.environment,
-    settingsEnvironment: config.settings,
-    monitorEnvironment: config.monitor,
-    options: config.options === undefined ? {} : config.options,
-    dumpChainFile: config.dumpChainFile,
-    chainFile: config.chainFile,
-    configs: config.configs,
+    settings,
+    environment,
+    options,
+    configs,
   };
 };
 
-export const getConfiguration = () => {
-  const {
-    fullNodeEnvironment: environment,
-    settingsEnvironment,
-    monitorEnvironment,
-    options: initialOptions,
-    dumpChainFile,
-    chainFile,
-    configs,
-  } = getFreshConfig();
+export const getConfiguration = (): FullNodeCreateOptions => {
+  const { environment, settings: settingsIn, options: initialOptions, configs } = getFreshConfig();
 
   fs.ensureDirSync(environment.dataPath);
 
-  const monitor = createMonitor(monitorEnvironment);
-  const settings = getSettings(settingsEnvironment);
+  const monitor = createMonitor({ level: environment.monitor });
+  const settings = getSettings(settingsIn);
 
   let options$: Observable<ConfigOptions> = new BehaviorSubject(initialOptions);
   if (configs !== undefined && configs.length > 0) {
@@ -119,5 +134,5 @@ export const getConfiguration = () => {
     );
   }
 
-  return { monitor, environment, settings, options$, dumpChainFile, chainFile };
+  return { environment, settings, monitor, options$ };
 };
