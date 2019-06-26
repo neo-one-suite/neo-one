@@ -65,16 +65,20 @@ export const initCommand = ({ cli }: InteractiveCLIArgs) =>
       initDataFile({ folder: cwd, name: '.onerc', data: JSON.stringify(relativeConfig), cli }),
     ]);
 
+    if (projectConfig.codegen.framework === 'none') {
+      cli.print('Unable to determine project framework, please specify it in .onerc');
+    }
+
     const rootTsConfigPath = path.resolve(cwd, 'tsconfig.json');
     const exists = await fs.pathExists(rootTsConfigPath);
     if (exists) {
       const file = await jsonFile(rootTsConfigPath);
       const currentExcludeIn = await file.get('exclude');
-      const currentExclude = currentExcludeIn === undefined ? [] : currentExcludeIn;
+      const currentExclude = new Set<string>(currentExcludeIn);
       file.set({
-        exclude: currentExclude.concat([
-          normalizePath(path.relative(cwd, path.join(projectConfig.paths.contracts, '*.ts'))),
-        ]),
+        exclude: [
+          ...currentExclude.add(normalizePath(path.relative(cwd, path.join(projectConfig.paths.contracts, '*.ts')))),
+        ],
       });
       await file.save();
       cli.print('Added contracts directory to root tsconfig exclude.');
