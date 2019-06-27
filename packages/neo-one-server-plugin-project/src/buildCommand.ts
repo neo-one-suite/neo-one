@@ -73,15 +73,22 @@ const doWatch = async (
     let subscription: Subscription | undefined = watchFiles$(projectConfig.paths.contracts)
       .pipe(
         mergeScanLatest(async () => {
+          // tslint:disable-next-line: no-console
+          console.log('Change detected, attempting re-build');
           cancel$ = new ReplaySubject<void>();
-          await build(cli, cancel$, progress, options);
+          try {
+            await build(cli, cancel$, progress, options);
+          } catch (error) {
+            // tslint:disable-next-line: no-console
+            console.error(`Re-build failed with ${error.message}\n`);
+          }
         }),
       )
       .subscribe({
         complete: () => {
           resolve();
         },
-        error: (error: Error) => {
+        error: (error) => {
           reject(error);
         },
       });

@@ -81,9 +81,10 @@ export const build = (
       {
         title: 'Find contracts',
         task: async (ctx) => {
-          ctx.contractPaths = await findContracts(getProjectConfig(ctx));
+          const config = getProjectConfig(ctx);
+          ctx.contractPaths = await findContracts(config);
           if (ctx.contractPaths.length === 0) {
-            throw new Error(`${JSON.stringify(getProjectConfig(ctx))}`);
+            throw new Error(`0 compilable smart contracts found in ${config.paths.contracts}`);
           }
         },
       },
