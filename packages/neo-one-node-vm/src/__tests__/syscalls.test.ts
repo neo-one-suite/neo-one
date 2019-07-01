@@ -3216,14 +3216,16 @@ const SYSCALLS = [
     result: [new UInt160StackItem(common.ZERO_UINT160)],
     gas: FEES.ONE,
     options: {
-      scriptHash: common.ZERO_UINT160,
+      scriptHashStack: [Buffer.alloc(20, 1), common.ZERO_UINT160, Buffer.alloc(20, 2)],
     },
   },
 
   {
     name: 'System.ExecutionEngine.GetEntryScriptHash',
-    result: ({ transaction }) => [new UInt160StackItem(crypto.toScriptHash(transaction.script))],
-
+    result: [new UInt160StackItem(common.ZERO_UINT160)],
+    options: {
+      scriptHashStack: [Buffer.alloc(20, 1), Buffer.alloc(20, 2), common.ZERO_UINT160],
+    },
     gas: FEES.ONE,
   },
 ] as readonly TestCase[];

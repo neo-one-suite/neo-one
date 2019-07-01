@@ -158,6 +158,7 @@ const run = async ({
         init: context.init,
         engine: context.engine,
         code: context.code,
+        scriptHashStack: context.scriptHashStack,
         scriptHash: context.scriptHash,
         callingScriptHash: context.callingScriptHash,
         entryScriptHash: context.entryScriptHash,
@@ -183,6 +184,7 @@ export const executeScript = async ({
   init,
   gasLeft,
   options: {
+    scriptHashStack = [],
     // tslint:disable no-unnecessary-initializer
     // @ts-ignore
     scriptHash: callingScriptHash = undefined,
@@ -215,6 +217,7 @@ export const executeScript = async ({
       executeScript,
     },
     code,
+    scriptHashStack,
     scriptHash,
     callingScriptHash,
     entryScriptHash: entryScriptHash === undefined ? scriptHash : entryScriptHash,
@@ -307,6 +310,7 @@ export const execute = async ({
         stack: [],
         stackAlt: [],
         createdContracts: {},
+        scriptHashStack: [entryScriptHash],
         scriptHash,
         entryScriptHash,
         returnValueCount,
@@ -319,6 +323,7 @@ export const execute = async ({
           stack: context.stack,
           stackAlt: context.stackAlt,
           createdContracts: context.createdContracts,
+          scriptHashStack: context.scriptHashStack,
           scriptHash,
           entryScriptHash,
           returnValueCount,

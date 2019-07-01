@@ -506,7 +506,7 @@ const OPCODES = ([
         mockBlockchain: ({ blockchain }) => {
           blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
         },
-        gas: FEES.TEN.add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE),
       },
       {
         op: 'CALL_E',
@@ -516,7 +516,7 @@ const OPCODES = ([
         mockBlockchain: ({ blockchain }) => {
           blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
         },
-        gas: FEES.TEN.add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE),
       },
       {
         op: 'CALL_E',
@@ -526,7 +526,7 @@ const OPCODES = ([
         mockBlockchain: ({ blockchain }) => {
           blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
         },
-        gas: FEES.TEN.add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE),
       },
       {
         op: 'CALL_ET',
@@ -536,7 +536,7 @@ const OPCODES = ([
         mockBlockchain: ({ blockchain }) => {
           blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
         },
-        gas: FEES.TEN.add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE),
         returnValueCount: 1,
       },
       {
@@ -547,7 +547,7 @@ const OPCODES = ([
         mockBlockchain: ({ blockchain }) => {
           blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
         },
-        gas: FEES.TEN.add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE),
         returnValueCount: 1,
       },
       {
@@ -558,7 +558,7 @@ const OPCODES = ([
         mockBlockchain: ({ blockchain }) => {
           blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
         },
-        gas: FEES.TEN.add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE),
         returnValueCount: 2,
       },
       {
@@ -569,7 +569,7 @@ const OPCODES = ([
         mockBlockchain: ({ blockchain }) => {
           blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
         },
-        gas: FEES.TEN.add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE),
       },
       {
         op: 'CALL_ED',
@@ -579,7 +579,7 @@ const OPCODES = ([
         mockBlockchain: ({ blockchain }) => {
           blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
         },
-        gas: FEES.TEN.add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE),
       },
       {
         op: 'CALL_ED',
@@ -589,7 +589,7 @@ const OPCODES = ([
         mockBlockchain: ({ blockchain }) => {
           blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
         },
-        gas: FEES.TEN.add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE),
       },
       {
         op: 'CALL_EDT',
@@ -599,7 +599,7 @@ const OPCODES = ([
         mockBlockchain: ({ blockchain }) => {
           blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
         },
-        gas: FEES.TEN.add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE),
         returnValueCount: 1,
       },
       {
@@ -610,7 +610,7 @@ const OPCODES = ([
         mockBlockchain: ({ blockchain }) => {
           blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
         },
-        gas: FEES.TEN.add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE),
         returnValueCount: 1,
       },
       {
@@ -621,7 +621,7 @@ const OPCODES = ([
         mockBlockchain: ({ blockchain }) => {
           blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
         },
-        gas: FEES.TEN.add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE),
         returnValueCount: 2,
       },
 
