@@ -1,17 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Binary Writer Tests Write FixedString 1`] = `
-Array [
-  "74657374",
-  "0000",
-]
-`;
+exports[`Binary Writer Tests VarUInt ranges - FFFF + 1 1`] = `"fe00000100"`;
 
-exports[`Binary Writer Tests Write Object 1`] = `
-Array [
-  "01",
-  "03",
-  "6f6e65",
-  "0100",
-]
-`;
+exports[`Binary Writer Tests VarUInt ranges - FFFF 1`] = `"fdffff"`;
+
+exports[`Binary Writer Tests VarUInt ranges - FFFFFFFF + 1 1`] = `"ff0000000001000000"`;
+
+exports[`Binary Writer Tests VarUInt ranges - FFFFFFFF 1`] = `"feffffffff"`;
+
+exports[`Binary Writer Tests Write FixedString 1`] = `"746573740000"`;
+
+exports[`Binary Writer Tests Write Object 1`] = `"01036f6e650100"`;

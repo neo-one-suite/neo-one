@@ -13,5 +13,5 @@ test('Witness Model Test', () => {
 
   witnessModel.serializeWireBase(testWriter);
 
-  expect(testWriter.buffer.length).toEqual(4);
+  expect(testWriter.toBuffer().length).toEqual(4);
 });

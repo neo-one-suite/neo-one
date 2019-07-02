@@ -57,7 +57,7 @@ describe('Buffer Attribute Model', () => {
     const usage = 0x90;
     const bufferModel = new BufferAttributeModel({ usage, value });
     bufferModel.serializeWireBase(testWriter);
-    expect(testWriter.buffer[0]).toEqual(Buffer.from([0x90]));
+    expect(testWriter.toBuffer()[0]).toEqual(0x90);
   });
 
   test('SerializeWireBase - URL Model', () => {
@@ -66,7 +66,7 @@ describe('Buffer Attribute Model', () => {
     const urlModel = new BufferAttributeModel({ usage: descriptionUrl, value });
 
     urlModel.serializeWireBase(testWriter);
-    expect(testWriter.buffer[0]).toEqual(Buffer.from([0x81]));
+    expect(testWriter.toBuffer()[0]).toEqual(0x81);
   });
 });
 
@@ -78,8 +78,10 @@ test('ECPoint Attribute Model', () => {
   const ecModel = new ECPointAttributeModel({ usage, value: ecPoint });
   ecModel.serializeWireBase(testWriter);
 
-  expect(testWriter.buffer[0]).toEqual(Buffer.from([usage]));
-  expect(testWriter.buffer[1].length).toEqual(32);
+  const result = testWriter.toBuffer();
+
+  expect(result[0]).toEqual(usage);
+  expect(result.slice(1).length).toEqual(32);
 });
 
 test('UInt160 Attribute Model', () => {
@@ -90,7 +92,7 @@ test('UInt160 Attribute Model', () => {
   const uInt160Model = new UInt160AttributeModel({ usage, value: uInt });
   uInt160Model.serializeWireBase(testWriter);
 
-  expect(testWriter.buffer[0]).toEqual(Buffer.from([usage]));
+  expect(testWriter.toBuffer()[0]).toEqual(usage);
 });
 
 test('UInt256 Attribute Model', () => {
@@ -101,5 +103,5 @@ test('UInt256 Attribute Model', () => {
   const uInt256Model = new UInt256AttributeModel({ usage, value: uInt });
   uInt256Model.serializeWireBase(testWriter);
 
-  expect(testWriter.buffer[0]).toEqual(Buffer.from([usage]));
+  expect(testWriter.toBuffer()[0]).toEqual(usage);
 });

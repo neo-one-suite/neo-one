@@ -53,11 +53,9 @@ describe('Claim Transaction Model', () => {
 
   test('Serialize Exclusive Base', () => {
     claimModel.serializeExclusiveBase(testWriter);
-    expect(testWriter.buffer).toEqual([
-      Buffer.from([0x01]),
-      Buffer.from(_.range(32).map(() => 0x00)),
-      Buffer.from([0x01, 0x00]),
-    ]);
+    expect(testWriter.toBuffer()).toEqual(
+      Buffer.concat([Buffer.from([0x01]), Buffer.from(_.range(32).map(() => 0x00)), Buffer.from([0x01, 0x00])]),
+    );
   });
 
   test('Clone Model', () => {
@@ -89,13 +87,15 @@ describe('Invocation Transaction Model', () => {
 
   test('InvokeModel - Serialize Exclusive Base', () => {
     invokeModel.serializeExclusiveBase(testWriter);
-    expect(testWriter.buffer).toEqual([Buffer.from([script.length]), script]);
+    expect(testWriter.toBuffer()).toEqual(Buffer.concat([Buffer.from([script.length]), script]));
   });
 
   test('InvokeModel v1 - Serialize Exclusive Base', () => {
     const versionOneModel = new InvocationTransactionModel({ ...optionsBuilder({}), version: 1, gas, script });
     versionOneModel.serializeExclusiveBase(testWriter);
-    expect(testWriter.buffer[2].length).toEqual(8);
+    expect(testWriter.toBuffer()).toEqual(
+      Buffer.concat([Buffer.from([script.length]), script, gas.toTwos(8 * 8).toArrayLike(Buffer, 'le', 8)]),
+    );
   });
 
   test('Clone Model', () => {
@@ -136,11 +136,13 @@ describe('Output Model', () => {
 
   test('Serialize Wire Base', () => {
     outputModel.serializeWireBase(testWriter);
-    expect(testWriter.buffer).toEqual([
-      common.uInt256ToBuffer(options.asset),
-      Buffer.from(options.value.toTwos(8 * 8).toArrayLike(Buffer, 'le', 8)),
-      Buffer.from(options.address),
-    ]);
+    expect(testWriter.toBuffer()).toEqual(
+      Buffer.concat([
+        common.uInt256ToBuffer(options.asset),
+        Buffer.from(options.value.toTwos(8 * 8).toArrayLike(Buffer, 'le', 8)),
+        Buffer.from(options.address),
+      ]),
+    );
   });
 
   test('Clone Model', () => {

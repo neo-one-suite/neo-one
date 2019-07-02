@@ -13,60 +13,60 @@ describe('Binary Writer Tests', () => {
   test('Write Int16LE', () => {
     const sixteenLE = writer.writeInt16LE(16);
 
-    expect(sixteenLE.buffer).toEqual([Buffer.concat([Buffer.from([0x10]), Buffer.from([0x00])])]);
+    expect(sixteenLE.toBuffer()).toEqual(Buffer.concat([Buffer.from([0x10]), Buffer.from([0x00])]));
   });
 
   test('Write UInt16BE', () => {
     const sixteenBE = writer.writeUInt16BE(16);
 
-    expect(sixteenBE.buffer).toEqual([Buffer.concat([Buffer.from([0x00]), Buffer.from([0x10])])]);
+    expect(sixteenBE.toBuffer()).toEqual(Buffer.concat([Buffer.from([0x00]), Buffer.from([0x10])]));
   });
 
   test('Write Int32LE', () => {
     const thirtyTwoLE = writer.writeInt32LE(32);
 
-    expect(thirtyTwoLE.buffer).toEqual([
+    expect(thirtyTwoLE.toBuffer()).toEqual(
       Buffer.concat([Buffer.from([0x20]), Buffer.from([0x00]), Buffer.from([0x00]), Buffer.from([0x00])]),
-    ]);
+    );
   });
 
   test('Write VarString', () => {
     const testString = '1';
     const varString = writer.writeVarString(testString, 2);
 
-    expect(varString.buffer).toEqual([Buffer.from([testString.length]), Buffer.from([0x31])]);
+    expect(varString.toBuffer()).toEqual(Buffer.concat([Buffer.from([testString.length]), Buffer.from([0x31])]));
   });
 
   test('Write ECPoint', () => {
     const ecPoint = common.asECPoint(Buffer.from(_.range(33).map(() => 0x00)));
     const ecBuffer = writer.writeECPoint(ecPoint);
 
-    expect(ecBuffer.buffer).toEqual([ecPoint]);
+    expect(ecBuffer.toBuffer()).toEqual(ecPoint);
   });
 
   test('Write ECPoint - Inf', () => {
     const ecPointInf = common.ECPOINT_INFINITY;
     const ecInf = writer.writeECPoint(ecPointInf);
 
-    expect(ecInf.buffer).toEqual([ecPointInf]);
+    expect(ecInf.toBuffer()).toEqual(ecPointInf);
   });
 
   test('Write Boolean - False', () => {
     const falsy = writer.writeBoolean(false);
 
-    expect(falsy.buffer).toEqual([Buffer.from([0x00])]);
+    expect(falsy.toBuffer()).toEqual(Buffer.from([0x00]));
   });
 
   test('Write Boolean - True', () => {
     const truthy = writer.writeBoolean(true);
 
-    expect(truthy.buffer).toEqual([Buffer.from([0x01])]);
+    expect(truthy.toBuffer()).toEqual(Buffer.from([0x01]));
   });
 
   test('Write FixedString', () => {
     const fixedString = writer.writeFixedString('test', 6);
 
-    expect(fixedString.buffer).toMatchSnapshot();
+    expect(fixedString.toBuffer()).toMatchSnapshot();
   });
 
   test('Write Object', () => {
@@ -79,31 +79,31 @@ describe('Binary Writer Tests', () => {
       writer.writeInt16LE(value);
     });
 
-    expect(writtenObject.buffer).toMatchSnapshot();
+    expect(writtenObject.toBuffer()).toMatchSnapshot();
   });
 
   test('VarUInt ranges - FFFF', () => {
     const varUInt = writer.writeVarUIntLE(utils.FFFF);
 
-    expect(varUInt.buffer[0]).toEqual(Buffer.from([0xfd]));
+    expect(varUInt.toBuffer()).toMatchSnapshot();
   });
 
   test('VarUInt ranges - FFFF + 1', () => {
     const varUInt = writer.writeVarUIntLE(utils.FFFF.add(utils.ONE));
 
-    expect(varUInt.buffer[0]).toEqual(Buffer.from([0xfe]));
+    expect(varUInt.toBuffer()).toMatchSnapshot();
   });
 
   test('VarUInt ranges - FFFFFFFF', () => {
     const varUInt = writer.writeVarUIntLE(utils.FFFFFFFF);
 
-    expect(varUInt.buffer[0]).toEqual(Buffer.from([0xfe]));
+    expect(varUInt.toBuffer()).toMatchSnapshot();
   });
 
   test('VarUInt ranges - FFFFFFFF + 1', () => {
     const varUInt = writer.writeVarUIntLE(utils.FFFFFFFF.add(utils.ONE));
 
-    expect(varUInt.buffer[0]).toEqual(Buffer.from([0xff]));
+    expect(varUInt.toBuffer()).toMatchSnapshot();
   });
 
   test('Errors - UInt Throws On LT 0', () => {

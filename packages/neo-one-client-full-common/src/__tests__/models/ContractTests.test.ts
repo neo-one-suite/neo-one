@@ -17,7 +17,7 @@ describe('Contract Model Tests', () => {
     });
 
     contractModel.serializeWireBase(writer);
-    expect(writer.buffer).toMatchSnapshot();
+    expect(writer.toBuffer()).toMatchSnapshot();
   });
 });
 

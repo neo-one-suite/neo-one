@@ -1,91 +1,201 @@
 import { BN } from 'bn.js';
-import { common, ECPoint, InvalidFormatError, UInt160, UInt160Hex, UInt256, UInt256Hex } from './common';
+import { common, ECPoint, ECPointHex, InvalidFormatError, UInt160, UInt160Hex, UInt256, UInt256Hex } from './common';
 import { utils } from './utils';
 
+interface OpOptions<T> {
+  readonly fn: (value: T, buffer: Buffer, pos: number) => void;
+  readonly length: number;
+  readonly value: T;
+}
+
+// tslint:disable-next-line: no-any
+class Op<OpValue = any> {
+  public readonly fn: (value: OpValue, buffer: Buffer, pos: number) => void;
+  public readonly length: number;
+  public readonly value: OpValue;
+  private mutableNext?: Op;
+
+  public constructor(options: OpOptions<OpValue>) {
+    this.fn = options.fn;
+    this.length = options.length;
+    this.value = options.value;
+  }
+
+  public get next() {
+    return this.mutableNext;
+  }
+
+  // tslint:disable-next-line: no-any
+  public setNext<NextValue = any>(nextOp: Op<NextValue>) {
+    if (this.mutableNext !== undefined) {
+      throw new Error('next operation already set for this op.');
+    }
+    this.mutableNext = nextOp;
+  }
+}
+
+const writeByte = (value: number, buffer: Buffer, position: number) => {
+  // tslint:disable-next-line: no-object-mutation no-bitwise
+  buffer[position] = value & 255;
+};
+
+const writeFromBuffer = (source: Buffer, target: Buffer, offset = 0) => {
+  source.forEach((bit, index) => {
+    // tslint:disable-next-line: no-object-mutation no-bitwise
+    target[index + offset] = bit & 255;
+  });
+};
+
+const writeUInt160 = (value: UInt160 | UInt160Hex, buffer: Buffer, position: number) => {
+  const result = common.uInt160ToBuffer(value);
+  if (result.length !== common.UINT160_BUFFER_BYTES) {
+    throw new Error('is this working?');
+  }
+  writeFromBuffer(result, buffer, position);
+};
+
+const writeUInt256 = (value: UInt256 | UInt256Hex, buffer: Buffer, position: number) => {
+  const result = common.uInt256ToBuffer(value);
+  if (result.length !== common.UINT256_BUFFER_BYTES) {
+    throw new Error('is this working?');
+  }
+  writeFromBuffer(result, buffer, position);
+};
+
+const writeECPoint = (value: ECPoint | ECPointHex, buffer: Buffer, position: number) => {
+  const result = common.ecPointToBuffer(value);
+  if (result.length !== common.ECPOINT_BUFFER_BYTES) {
+    throw new Error('is this working?');
+  }
+
+  writeFromBuffer(result, buffer, position);
+};
+
 export class BinaryWriter {
-  private readonly mutableBuffer: Buffer[];
+  private readonly head: Op;
+  private mutableLength: number;
+  private mutableTail: Omit<Op, 'next'>;
 
   public constructor() {
-    this.mutableBuffer = [];
+    this.head = new Op({
+      fn: () => {
+        // do nothing
+      },
+      length: 0,
+      value: undefined,
+    });
+    this.mutableTail = this.head;
+    this.mutableLength = 0;
   }
 
-  public get buffer(): readonly Buffer[] {
-    return this.mutableBuffer;
+  private get length() {
+    return this.mutableLength;
   }
 
-  public toBuffer(): Buffer {
-    return Buffer.concat(this.mutableBuffer);
+  public toBuffer() {
+    return this.finish();
   }
 
   public writeBytes(value: Buffer): this {
-    this.mutableBuffer.push(value);
-
-    return this;
+    return this.push({
+      fn: writeFromBuffer,
+      length: value.length,
+      value,
+    });
   }
 
   public writeUInt8(value: number): this {
-    const buffer = Buffer.allocUnsafe(1);
-    buffer.writeUInt8(value, 0);
-
-    return this.writeBytes(buffer);
+    return this.push({
+      fn: (val: number, buffer: Buffer, pos: number) => buffer.writeUInt8(val, pos),
+      length: 1,
+      value,
+    });
   }
 
   public writeInt16LE(value: number): this {
-    const buffer = Buffer.allocUnsafe(2);
-    buffer.writeInt16LE(value, 0);
-
-    return this.writeBytes(buffer);
+    return this.push({
+      fn: (val: number, buffer: Buffer, pos: number) => buffer.writeInt16LE(val, pos),
+      length: 2,
+      value,
+    });
   }
 
   public writeUInt16LE(value: number): this {
-    const buffer = Buffer.allocUnsafe(2);
-    buffer.writeUInt16LE(value, 0);
-
-    return this.writeBytes(buffer);
+    return this.push({
+      fn: (val: number, buffer: Buffer, pos: number) => buffer.writeUInt16LE(val, pos),
+      length: 2,
+      value,
+    });
   }
 
   public writeUInt16BE(value: number): this {
-    const buffer = Buffer.allocUnsafe(2);
-    buffer.writeUInt16BE(value, 0);
-
-    return this.writeBytes(buffer);
+    return this.push({
+      fn: (val: number, buffer: Buffer, pos: number) => buffer.writeUInt16BE(val, pos),
+      length: 2,
+      value,
+    });
   }
 
   public writeInt32LE(value: number): this {
-    const buffer = Buffer.allocUnsafe(4);
-    buffer.writeInt32LE(value, 0);
-
-    return this.writeBytes(buffer);
+    return this.push({
+      fn: (val: number, buffer: Buffer, pos: number) => buffer.writeInt32LE(val, pos),
+      length: 4,
+      value,
+    });
   }
 
   public writeUInt32LE(value: number): this {
-    const buffer = Buffer.allocUnsafe(4);
-    buffer.writeUInt32LE(value, 0);
-
-    return this.writeBytes(buffer);
+    return this.push({
+      fn: (val: number, buffer: Buffer, pos: number) => buffer.writeUInt32LE(val, pos),
+      length: 4,
+      value,
+    });
   }
 
   public writeInt64LE(value: BN): this {
-    return this.writeBytes(value.toTwos(8 * 8).toArrayLike(Buffer, 'le', 8));
+    return this.push({
+      fn: (val: BN, buffer: Buffer, pos: number) => {
+        const source = val.toTwos(8 * 8).toArrayLike(Buffer, 'le', 8);
+        writeFromBuffer(source, buffer, pos);
+      },
+      length: 8,
+      value,
+    });
   }
 
   public writeUInt64LE(value: BN): this {
-    return this.writeBytes(value.toArrayLike(Buffer, 'le', 8));
+    return this.push({
+      fn: (val: BN, buffer: Buffer, pos: number) => {
+        const source = val.toArrayLike(Buffer, 'le', 8);
+        writeFromBuffer(source, buffer, pos);
+      },
+      length: 8,
+      value,
+    });
   }
 
   public writeBoolean(value: boolean): this {
-    this.writeBytes(Buffer.from([value ? 1 : 0]));
-
-    return this;
+    return this.push({
+      fn: writeByte,
+      length: 1,
+      value: value ? 1 : 0,
+    });
   }
 
-  // Special methods that don't fit the LE mold and/or are specific to NEO.
   public writeUInt160(hash: UInt160 | UInt160Hex): this {
-    return this.writeBytes(common.uInt160ToBuffer(hash));
+    return this.push({
+      fn: writeUInt160,
+      length: common.UINT160_BUFFER_BYTES,
+      value: hash,
+    });
   }
 
   public writeUInt256(hash: UInt256 | UInt256Hex): this {
-    return this.writeBytes(common.uInt256ToBuffer(hash));
+    return this.push({
+      fn: writeUInt256,
+      length: common.UINT256_BUFFER_BYTES,
+      value: hash,
+    });
   }
 
   public writeFixed8(value: BN): this {
@@ -96,18 +206,22 @@ export class BinaryWriter {
     if (value.length > length) {
       throw new InvalidFormatError('String too long');
     }
-
-    const buffer = Buffer.from(value, 'utf8');
-    if (buffer.length > length) {
+    const stringBuffer = Buffer.from(value, 'utf8');
+    if (stringBuffer.length > length) {
       throw new InvalidFormatError('String buffer length too long');
     }
 
-    this.writeBytes(buffer);
-    if (buffer.length < length) {
-      this.writeBytes(Buffer.alloc(length - buffer.length, 0));
-    }
-
-    return this;
+    return this.push({
+      fn: (val: Buffer, buffer: Buffer, pos: number) => {
+        writeFromBuffer(val, buffer, pos);
+        const padLength = val.length - length;
+        if (padLength > 0) {
+          writeFromBuffer(Buffer.alloc(padLength, 0), buffer, pos + val.length);
+        }
+      },
+      length,
+      value: stringBuffer,
+    });
   }
 
   public writeArray<T>(values: readonly T[], write: (value: T) => void): this {
@@ -130,7 +244,13 @@ export class BinaryWriter {
   public writeVarBytesLE(value: Buffer): this {
     this.writeVarUIntLE(value.length);
 
-    return this.writeBytes(value);
+    return this.push({
+      fn: (val: Buffer, buffer: Buffer, pos: number) => {
+        writeFromBuffer(val, buffer, pos);
+      },
+      length: value.length,
+      value,
+    });
   }
 
   public writeVarUIntLE(valueIn: number | BN): this {
@@ -166,9 +286,40 @@ export class BinaryWriter {
 
   public writeECPoint(value: ECPoint): this {
     if (common.ecPointIsInfinity(value)) {
-      return this.writeBytes(Buffer.from([common.ECPOINT_INFINITY_BYTE]));
+      return this.push({
+        fn: writeByte,
+        length: 1,
+        value: common.ECPOINT_INFINITY_BYTE,
+      });
     }
 
-    return this.writeBytes(common.ecPointToBuffer(value));
+    return this.push({
+      fn: writeECPoint,
+      length: common.ECPOINT_BUFFER_BYTES,
+      value,
+    });
+  }
+
+  private finish() {
+    const computedBuffer = Buffer.alloc(this.length);
+    let head = this.head.next;
+    let position = 0;
+    // tslint:disable-next-line: no-loop-statement
+    while (head !== undefined) {
+      head.fn(head.value, computedBuffer, position);
+      position += head.length;
+      head = head.next;
+    }
+
+    return computedBuffer;
+  }
+
+  private push<T>(op: Omit<OpOptions<T>, 'next'>): this {
+    const newOp = new Op(op);
+    this.mutableTail.setNext(newOp);
+    this.mutableTail = newOp;
+    this.mutableLength += op.length;
+
+    return this;
   }
 }
