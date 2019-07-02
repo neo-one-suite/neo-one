@@ -1,11 +1,11 @@
-// tslint:disable no-implicit-dependencies
-import { Block, ConfirmedInvocationTransaction, RawStorageChange, scriptHashToAddress } from '@neo-one/client-common';
+// tslint:disable no-implicit-dependencies no-object-mutation no-array-mutation no-console
+import { Block, ConfirmedInvocationTransaction, RawStorageChange } from '@neo-one/client-common';
 import { NEOONEDataProvider } from '@neo-one/client-core';
-import { BinaryReader } from '@neo-one/node-core';
 import fs from 'fs-extra';
 import _ from 'lodash';
 import * as os from 'os';
 import * as path from 'path';
+import { getPartsFromKey, getValue } from './utils';
 
 interface StorageAuditChange {
   readonly state: string;
@@ -21,11 +21,12 @@ interface StorageAuditBlock {
 
 interface StorageMismatch {
   readonly index: number;
-  readonly one: readonly RawStorageChange[];
-  readonly neo: readonly RawStorageChange[];
+  readonly one: ReadonlyArray<RawStorageChange>;
+  readonly neo: ReadonlyArray<RawStorageChange>;
 }
 
 const NEO_STORAGE_AUDIT_PATH = path.resolve(os.homedir(), 'data', 'neo-storage-audit');
+
 const FIRST_STORAGE = {
   folder: 'BlockStorage_1500000',
   file: 'dump-block-1445000.json',
@@ -37,39 +38,6 @@ const oneProvider = new NEOONEDataProvider({
   network: 'main',
   rpcURL: oneRPCURL,
 });
-
-const reverse = (src: Buffer): Buffer => {
-  const mutableOut = Buffer.allocUnsafe(src.length);
-  // tslint:disable-next-line no-loop-statement
-  for (let i = 0, j = src.length - 1; i <= j; i += 1, j -= 1) {
-    mutableOut[i] = src[j];
-    mutableOut[j] = src[i];
-  }
-
-  return mutableOut;
-};
-
-const getPartsFromKey = (storageKey: string) => {
-  const scriptHash = `0x${reverse(Buffer.from(storageKey.slice(0, 40), 'hex')).toString('hex')}`;
-  const keyRaw = storageKey.slice(40);
-  const padding = parseInt(keyRaw.substring(keyRaw.length - 2), 16);
-  const key = keyRaw.substring(0, keyRaw.length - (padding + 1) * 2);
-  const keyFixed = _.chunk([...key], 34)
-    .map((chunk) => chunk.slice(0, 32))
-    .reduce((acc, chunk) => acc + chunk.join(''), '');
-
-  return {
-    address: scriptHashToAddress(scriptHash),
-    key: keyFixed,
-  };
-};
-
-const getValue = (storageValue: string) => {
-  const rawValue = storageValue.substring(2, storageValue.length - 2);
-  const binaryReader = new BinaryReader(Buffer.from(rawValue, 'hex'));
-
-  return binaryReader.readVarBytesLE().toString('hex');
-};
 
 const getType = (state: string): RawStorageChange['type'] =>
   state === 'Added' ? 'Add' : state === 'Changed' ? 'Modify' : 'Delete';
@@ -97,10 +65,31 @@ const getOneStorageChanges = (block: Block): readonly RawStorageChange[] => {
     )
     .map((invocation) => invocation.invocationData.storageChanges);
 
+  const storageChangeAdds: { [K: string]: number } = {};
   const storageChangesByKey = _.flatten(storageChanges).reduce<{ [key: string]: RawStorageChange }>(
     (acc, storageChange) => {
-      // tslint:disable-next-line:no-object-mutation
-      acc[`${storageChange.address}:${storageChange.key}`] = storageChange;
+      const storageChangeKey = `${storageChange.address}:${storageChange.key}`;
+      const netAdd = storageChangeAdds[storageChangeKey];
+      if ((netAdd as number | undefined) === undefined) {
+        storageChangeAdds[storageChangeKey] = 0;
+      }
+      if (storageChange.type === 'Add' && netAdd !== 1) {
+        storageChangeAdds[storageChangeKey] += 1;
+      }
+      if (storageChange.type === 'Delete' && netAdd !== -1) {
+        storageChangeAdds[storageChangeKey] -= 1;
+      }
+
+      if (
+        Object.keys(acc).includes(storageChangeKey) &&
+        storageChangeAdds[storageChangeKey] === 0 &&
+        storageChange.type === 'Delete'
+      ) {
+        // tslint:disable-next-line:no-dynamic-delete
+        delete acc[storageChangeKey];
+      } else {
+        acc[storageChangeKey] = storageChange;
+      }
 
       return acc;
     },
@@ -113,22 +102,70 @@ const getOneStorageChanges = (block: Block): readonly RawStorageChange[] => {
 };
 
 const compareStorageChangeForBlock = async (auditBlock: StorageAuditBlock): Promise<StorageMismatch | undefined> => {
-  const block = await oneProvider.getBlock(auditBlock.block);
-  const oneStorageChanges = getOneStorageChanges(block);
-  const neoStorageChanges = getNEOStorageChanges(auditBlock);
-  const mismatch = { index: block.index, one: oneStorageChanges, neo: neoStorageChanges };
-  if (!_.isEqual(oneStorageChanges, neoStorageChanges)) {
-    return mismatch;
-  }
+  try {
+    const block = await oneProvider.getBlock(auditBlock.block);
+    const oneStorageChanges = getOneStorageChanges(block);
+    const neoStorageChanges = getNEOStorageChanges(auditBlock);
+    const mismatch = { index: block.index, one: oneStorageChanges, neo: neoStorageChanges };
+    if (!_.isEqual(oneStorageChanges, neoStorageChanges)) {
+      console.log('one changes missing in neo:');
+      oneStorageChanges.forEach((change) => {
+        let found = false;
+        neoStorageChanges.forEach((neoChange) => {
+          if (_.isEqual(change, neoChange)) {
+            found = true;
+          }
+        });
+        if (!found) {
+          console.log(change);
+        }
+      });
+      console.log('neo changes missing in one:');
+      neoStorageChanges.forEach((neoChange) => {
+        let found = false;
+        oneStorageChanges.forEach((change) => {
+          if (_.isEqual(change, neoChange)) {
+            found = true;
+          }
+        });
+        if (!found) {
+          console.log(neoChange);
+        }
+      });
 
-  return undefined;
+      return { ...mismatch };
+    }
+
+    return undefined;
+  } catch (error) {
+    // tslint:disable-next-line:no-console
+    console.log(`Block Failed: ${auditBlock.block}`);
+    throw new Error(error);
+  }
 };
 
 const iterBlocksInFile = async (filePath: string): Promise<StorageMismatch | undefined> => {
   const content = await fs.readFile(filePath, 'utf8');
-  const blocks: readonly StorageAuditBlock[] = JSON.parse(`${content.slice(0, -3)}]`);
-
-  const processed = await Promise.all(blocks.map(compareStorageChangeForBlock));
+  let blocks: ReadonlyArray<StorageAuditBlock>;
+  try {
+    blocks = JSON.parse(`${content.slice(0, -3)}]`);
+    // tslint:disable-next-line:no-unused
+  } catch (error) {
+    try {
+      blocks = JSON.parse(`${content}`);
+      // tslint:disable-next-line:no-unused
+    } catch (newError) {
+      blocks = JSON.parse(`${content.replace(/]{/gm, ']},{').replace(/]]/gm, ']}]')}`);
+    }
+  }
+  const processed = [];
+  // tslint:disable-next-line no-loop-statement
+  for (const block of blocks) {
+    if (block.block >= FIRST_STORAGE.index) {
+      const val = await compareStorageChangeForBlock(block);
+      processed.push(val);
+    }
+  }
 
   return processed.filter((value) => value !== undefined)[0];
 };
@@ -146,7 +183,6 @@ const iterFilesInDir = async (dirPath: string): Promise<StorageMismatch | undefi
     if (value !== undefined) {
       return value;
     }
-    // tslint:disable-next-line:no-console
     console.log(`Processed ${fileName}`);
   }
 
@@ -164,7 +200,7 @@ const iterDirs = async () => {
   for (const dirName of dirs.slice(firstIndex)) {
     const value = await iterFilesInDir(path.resolve(NEO_STORAGE_AUDIT_PATH, dirName));
     if (value !== undefined) {
-      // tslint:disable-next-line:no-console
+      console.log(`full storage changes:`);
       console.log(value);
 
       return;

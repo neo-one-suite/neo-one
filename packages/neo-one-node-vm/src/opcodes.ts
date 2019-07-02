@@ -225,6 +225,7 @@ const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: b
           }
         }
         const contract = await context.blockchain.contract.get({ hash });
+        const scriptHashStack = [hash, ...context.scriptHashStack];
         const resultContext = await context.engine.executeScript({
           monitor,
           code: contract.script,
@@ -236,6 +237,7 @@ const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: b
             stackAlt: context.stackAlt,
             depth: tailCall ? context.depth : context.depth + 1,
             createdContracts: context.createdContracts,
+            scriptHashStack: tailCall ? scriptHashStack.slice(0, scriptHashStack.length - 1) : scriptHashStack,
             scriptHash: context.scriptHash,
             entryScriptHash: context.entryScriptHash,
             returnValueCount: -1,
@@ -258,6 +260,9 @@ const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: b
             init: context.init,
             engine: context.engine,
             code: context.code,
+            scriptHashStack: tailCall
+              ? context.scriptHashStack.slice(0, context.scriptHashStack.length - 1)
+              : context.scriptHashStack,
             scriptHash: context.scriptHash,
             callingScriptHash: context.callingScriptHash,
             entryScriptHash: context.entryScriptHash,
@@ -298,7 +303,6 @@ const callIsolated = ({
       name,
       in: parametersCount + (dynamicCall ? 1 : 0),
       invocation: tailCall ? 0 : 1,
-      fee: FEES.TEN,
       invoke: async ({ monitor, context, args }) => {
         const { pc, scriptHash } = context;
         const hash = dynamicCall
@@ -321,6 +325,8 @@ const callIsolated = ({
 
         const contract = await context.blockchain.contract.get({ hash });
         const nextStack = dynamicCall ? args.slice(1) : args;
+        const scriptHashStack = [hash, ...context.scriptHashStack];
+
         const resultContext = await context.engine.executeScript({
           monitor,
           code: contract.script,
@@ -332,6 +338,7 @@ const callIsolated = ({
             stackAlt: [],
             depth: tailCall ? context.depth : context.depth + 1,
             createdContracts: context.createdContracts,
+            scriptHashStack: tailCall ? scriptHashStack.slice(0, scriptHashStack.length - 1) : scriptHashStack,
             scriptHash: context.scriptHash,
             entryScriptHash: context.entryScriptHash,
             returnValueCount,
@@ -368,6 +375,9 @@ const callIsolated = ({
             init: context.init,
             engine: context.engine,
             code: context.code,
+            scriptHashStack: tailCall
+              ? context.scriptHashStack.slice(0, context.scriptHashStack.length - 1)
+              : context.scriptHashStack,
             scriptHash: context.scriptHash,
             callingScriptHash: context.callingScriptHash,
             entryScriptHash: context.entryScriptHash,
@@ -413,6 +423,7 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
             stackAlt: [],
             depth: context.depth + 1,
             createdContracts: context.createdContracts,
+            scriptHashStack: [context.scriptHash, ...context.scriptHashStack],
             scriptHash: context.scriptHash,
             entryScriptHash: context.entryScriptHash,
             returnValueCount,
@@ -448,6 +459,7 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
             init: context.init,
             engine: context.engine,
             code: context.code,
+            scriptHashStack: context.scriptHashStack,
             scriptHash: context.scriptHash,
             callingScriptHash: context.callingScriptHash,
             entryScriptHash: context.entryScriptHash,
@@ -958,7 +970,7 @@ const OPCODE_PAIRS = ([
 
           return {
             context,
-            results: [new BufferStackItem(value.slice(-count))],
+            results: [new BufferStackItem(value.slice(value.length - count, value.length))],
           };
         },
       }),

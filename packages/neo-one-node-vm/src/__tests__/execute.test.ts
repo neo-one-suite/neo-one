@@ -1,5 +1,5 @@
 // tslint:disable no-any no-let no-object-mutation no-empty
-import { common, crypto, ScriptBuilder, UInt160, utils, VMState } from '@neo-one/client-common';
+import { common, crypto, ScriptBuilder, UInt160, UInt256, utils, VMState } from '@neo-one/client-common';
 import { DefaultMonitor } from '@neo-one/monitor';
 import {
   ArrayContractParameter,
@@ -19,7 +19,6 @@ import { BN } from 'bn.js';
 import _ from 'lodash';
 import { assets, createBlockchain, factory, testUtils, transactions } from '../__data__';
 import { execute } from '../execute';
-// import fs from 'fs-extra';
 
 const monitor = DefaultMonitor.create({
   service: 'test',
@@ -1470,7 +1469,6 @@ describe('execute', () => {
         transaction: transactions.createInvocation({
           script: new ScriptBuilder().emitAppCall(switcheoV2TokenContract.hash, 'transfer', from, to, amount).build(),
         }),
-        gas: common.ONE_HUNDRED_FIXED8,
       });
 
       expectSuccess(result);
@@ -1483,80 +1481,151 @@ describe('execute', () => {
       expect(deployResult.asBoolean()).toBeTruthy();
     };
 
-    // const nosTokenTransfer = async (from: UInt160, to: UInt160, amount: Buffer) => {
-    //   const transaction = transactions.createInvocation({
-    //     script: new ScriptBuilder().emitAppCall(nosTokenContract.hash, 'transfer', from, to, amount).build(),
-    //   });
+    const nosTokenTransfer = async (from: UInt160, to: UInt160, amount: Buffer) => {
+      const transaction = transactions.createInvocation({
+        script: new ScriptBuilder().emitAppCall(nosTokenContract.hash, 'transfer', from, to, amount).build(),
+      });
 
-    //   const result = await executeSimple({
-    //     blockchain,
-    //     transaction,
-    //     gas: common.ONE_HUNDRED_FIXED8,
-    //   });
-
-    //   expectSuccess(result);
-    // };
-
-    // const nosTokenDeploy = async () => {
-    //   const deployResult = await executeSetupScript(
-    //     new ScriptBuilder().emitAppCall(nosTokenContract.hash, 'admin', 'InitSmartContract').build(),
-    //   );
-    //   expect(deployResult.asBoolean()).toBeTruthy();
-    //   testUtils.verifyBlockchainSnapshot(blockchain);
-    // };
-
-    // const nosWhiteListTransferFromAdd = async (addr: UInt160) => {
-    //   const transaction = transactions.createInvocation({
-    //     script: new ScriptBuilder()
-    //       .emitAppCall(nosTokenContract.hash, 'admin', 'WhitelistTransferFromAdd', addr)
-    //       .build(),
-    //   });
-
-    //   const result = await executeSimple({
-    //     blockchain,
-    //     transaction,
-    //     gas: common.ONE_HUNDRED_FIXED8,
-    //   });
-
-    //   expectSuccess(result);
-    // };
-
-    const initialize = async (address1: UInt160, addrress2: UInt160, address3: UInt160) => {
       const result = await executeSimple({
         blockchain,
-        transaction: transactions.createInvocation({
-          script: new ScriptBuilder()
-            .emitAppCall(switcheoV3Contract.hash, 'initialize', address1, addrress2, address3)
-            .build(),
-        }),
-        gas: common.ONE_HUNDRED_FIXED8,
+        transaction,
+      });
+
+      expectSuccess(result);
+    };
+
+    const nosTokenDeploy = async () => {
+      const script = new ScriptBuilder().emitAppCall(nosTokenContract.hash, 'admin', 'InitSmartContract').build();
+
+      const deployResult = await executeSetupScript(script);
+
+      expect(deployResult.asBoolean()).toBeTruthy();
+      testUtils.verifyBlockchainSnapshot(blockchain);
+    };
+
+    const nosWhiteListTransferFromAdd = async (address: UInt160) => {
+      const transaction = transactions.createInvocation({
+        script: new ScriptBuilder()
+          .emitAppCall(nosTokenContract.hash, 'admin', 'WhitelistTransferFromAdd', address)
+          .build(),
+      });
+
+      const result = await executeSimple({
+        blockchain,
+        transaction,
+      });
+
+      expectSuccess(result);
+    };
+
+    const initialize = async (address1: UInt160, address2: UInt160, address3: UInt160) => {
+      const transaction = transactions.createInvocation({
+        script: new ScriptBuilder()
+          .emitAppCall(switcheoV3Contract.hash, 'initialize', address1, address2, address3)
+          .build(),
+      });
+
+      const result = await executeSimple({
+        blockchain,
+        transaction,
       });
 
       expectSuccess(result);
     };
 
     const addToWhitelist = async (address: UInt160) => {
-      const result = await executeSimple({
-        blockchain,
-        transaction: transactions.createInvocation({
-          script: new ScriptBuilder().emitAppCall(switcheoV3Contract.hash, 'addToWhitelist', address).build(),
-        }),
-        gas: common.ONE_HUNDRED_FIXED8,
-      });
-
-      expectSuccess(result);
-    };
-
-    const deposit = async (val: UInt160, address: UInt160, amount: BN) => {
       const transaction = transactions.createInvocation({
-        script: new ScriptBuilder().emitAppCall(switcheoV3Contract.hash, 'deposit', val, address, amount).build(),
+        script: new ScriptBuilder().emitAppCall(switcheoV3Contract.hash, 'addToWhitelist', address).build(),
       });
 
       const result = await executeSimple({
         blockchain,
         transaction,
-        gas: common.ONE_HUNDRED_FIXED8,
       });
+
+      expectSuccess(result);
+    };
+
+    const deposit = async (
+      address: UInt160,
+      val: UInt160 | UInt256,
+      amount: BN,
+      inputs: ReadonlyArray<Input> = [],
+      outputs: ReadonlyArray<Output> = [],
+    ) => {
+      const transaction = transactions.createInvocation({
+        script: new ScriptBuilder().emitAppCall(switcheoV3Contract.hash, 'deposit', address, val, amount).build(),
+        inputs,
+        outputs,
+      });
+
+      const result = await executeSimple({
+        blockchain,
+        transaction,
+      });
+
+      expectSuccess(result);
+    };
+
+    const withdraw = async (attributes: ReadonlyArray<UInt256Attribute>) => {
+      const transaction = transactions.createInvocation({
+        script: new ScriptBuilder().emitTailCall(switcheoV3Contract.hash, 'withdraw').build(),
+        attributes,
+      });
+
+      const result = await executeSimple({
+        blockchain,
+        transaction,
+      });
+
+      expectSuccess(result);
+    };
+
+    const createAtomicSwap = async (
+      makerAddress: UInt160,
+      takerAddress: UInt160,
+      assetID: UInt256,
+      amount: Buffer | BN,
+      hashedSecret: UInt256,
+      expirtyTime: Buffer,
+      feeAssetID: UInt256,
+      feeAmount = new BN(0),
+      burnTokens = false,
+    ) => {
+      const transaction = transactions.createInvocation({
+        script: new ScriptBuilder()
+          .emitAppCall(
+            switcheoV3Contract.hash,
+            'createAtomicSwap',
+            makerAddress,
+            takerAddress,
+            assetID,
+            amount,
+            hashedSecret,
+            expirtyTime,
+            feeAssetID,
+            feeAmount,
+            burnTokens,
+          )
+          .build(),
+      });
+
+      const result = await executeSimple({
+        blockchain,
+        transaction,
+      });
+
+      expectSuccess(result);
+    };
+
+    const executeAtomicSwap = async (hashedSecret: UInt256, preImage: Buffer) => {
+      const transaction = transactions.createInvocation({
+        script: new ScriptBuilder()
+          .emitAppCall(switcheoV3Contract.hash, 'executeAtomicSwap', hashedSecret, preImage)
+          .build(),
+      });
+
+      const result = await executeSimple({ blockchain, transaction });
 
       expectSuccess(result);
     };
@@ -1582,97 +1651,49 @@ describe('execute', () => {
     const addr2 = common.asUInt160(Buffer.from('7335f929546270b8f811a0f9427b5712457107e7', 'hex'));
     const addr3 = common.asUInt160(Buffer.from('c202200f681f5d3b933c956cfedec18ee635bf5c', 'hex'));
     const addr = common.asUInt160(Buffer.from('2fbaa22d64a8c8f5a9940f359cb0cb1dfe49eb2c', 'hex'));
-    // const nosTokenHolderAddr = common.asUInt160(
-    //   Buffer.from([163, 78, 249, 186, 149, 73, 242, 165, 255, 174, 25, 102, 234, 143, 189, 222, 71, 131, 159, 32]),
-    // );
+    const nosTokenHolderAddr = common.asUInt160(
+      Buffer.from([163, 78, 249, 186, 149, 73, 242, 165, 255, 174, 25, 102, 234, 143, 189, 222, 71, 131, 159, 32]),
+    );
 
-    const withdraw = async (attributes: ReadonlyArray<UInt256Attribute>) => {
-      const transaction = transactions.createInvocation({
-        script: new ScriptBuilder().emitTailCall(switcheoV3Contract.hash, 'withdraw').build(),
-        attributes,
-      });
+    const n0sAttributes = [
+      new UInt256Attribute({
+        usage: 0xa1,
+        value: common.bufferToUInt256(
+          Buffer.from('5100000000000000000000000000000000000000000000000000000000000000', 'hex'),
+        ),
+      }),
+      new UInt256Attribute({
+        usage: 0xa2,
+        value: common.bufferToUInt256(
+          Buffer.concat([common.uInt160ToBuffer(nosTokenContract.hash), Buffer.alloc(12, 0)]),
+        ),
+      }),
+      new UInt256Attribute({
+        usage: 0xa4,
+        value: common.bufferToUInt256(Buffer.concat([common.uInt160ToBuffer(addr), Buffer.alloc(12, 0)])),
+      }),
+      new UInt256Attribute({
+        usage: 0xa5,
+        value: common.bufferToUInt256(
+          Buffer.from('8023bce88e000000000000000000000000000000000000000000000000000000', 'hex'),
+        ),
+      }),
+    ];
 
-      const result = await executeSimple({
-        blockchain,
-        transaction,
-        // gas: common.ONE_HUNDRED_FIXED8,
-      });
+    test('deposit & withdraw n0S tokens', async () => {
+      const depositBuff = Buffer.from('88c132e98e00', 'hex');
+      const depositBN = utils.fromSignedBuffer(depositBuff);
 
-      // console.log(result.gasCost.toString(10));
+      await nosTokenDeploy();
+      await nosWhiteListTransferFromAdd(switcheoV3Contract.hash);
+      await nosTokenTransfer(nosTokenHolderAddr, addr, depositBuff);
+      await initialize(addr3, addr2, addr1);
+      await addToWhitelist(nosTokenContract.hash);
+      await deposit(addr, nosTokenContract.hash, depositBN);
+      await withdraw(n0sAttributes);
 
-      expectSuccess(result);
-    };
-
-    // const withdrawAlt = async () => {
-    //   const transactionBytes = Buffer.from(
-    //     'd1012000c108776974686472617769d4c357a466cf12e8167b00a440f782705dcf2ba3000000000000000005a15100000000000000000000000000000000000000000000000000000000000000a28d085e441a6e2e751e60146b9da2662b5afcc0c9000000000000000000000000a42fbaa22d64a8c8f5a9940f359cb0cb1dfe49eb2c000000000000000000000000a58023bce88e00000000000000000000000000000000000000000000000000000020d4c357a466cf12e8167b00a440f782705dcf2ba3021ac5bd76c96d38473df4392668fe30de4f232166072c383f5cb5222b7ffdec020b003da4f07aea5c5a67912c10ae102b51ad61f6a1dc0f544a537f628c7161116850000001e72d286979ee6cb1b7e65dfddfb2e384100b8d148e7758de42e4168b71792c600100000000000000b7634295e58c6d7513c22d5881ba116db154e8de03020000004140b56b8dd82154cfa559cbf94e0311865420e7415c1a5a1c73c0bd1cd2be7452f5711d36770e6c9912d8b25f74c03c7ed58f7ec4c5eb6f1f44bbc354fb270f5588232102c29b96cf2db558bd8265dfb29f425c9fc333a8b30c0e91b5b7338469e7939c87ac414030b45aa832d5ae9092fc549d145f0a51f3e54bc74f26effa19c0636d77b47f1d5497d6d4021283741a4f7f4f48ab5547b521c2389ad0c486c10daeeb75feac0f23210378e6c1fe50e74b2c72ddc372f5d28dca6eea5eedc182ff872f1dc617d8fed411ac',
-    //     'hex',
-    //   );
-    //   const transaction = deserializeTransactionWire({
-    //     context: { messageMagic: 7630401 },
-    //     buffer: transactionBytes,
-    //   }) as InvocationTransaction;
-
-    //   blockchain.output.get = jest.fn(async () =>
-    //     Promise.resolve(
-    //       new Output({
-    //         asset: common.stringToUInt256(common.NEO_ASSET_HASH),
-    //         value: new BN(204).mul(utils.ONE_HUNDRED_MILLION),
-    //         address: transactions.mintTransaction.outputs[1].address,
-    //       }),
-    //     ),
-    //   );
-    //   blockchain.asset.get = assets.createGetAsset();
-
-    //   const result = await executeSimple({
-    //     blockchain,
-    //     transaction,
-    //     gas: common.fixed8FromDecimal(0.001),
-    //     skipWitnessVerify: true,
-    //   });
-
-    //   expectSuccess(result);
-    // };
-
-    // const n0sAttributes = [
-    //   new UInt256Attribute({
-    //     usage: 0xa1,
-    //     value: common.bufferToUInt256(
-    //       Buffer.from('5100000000000000000000000000000000000000000000000000000000000000', 'hex'),
-    //     ),
-    //   }),
-    //   new UInt256Attribute({
-    //     usage: 0xa2,
-    //     value: common.bufferToUInt256(
-    //       Buffer.concat([common.uInt160ToBuffer(nosTokenContract.hash), Buffer.alloc(12, 0)]),
-    //     ),
-    //   }),
-    //   new UInt256Attribute({
-    //     usage: 0xa4,
-    //     value: common.bufferToUInt256(Buffer.concat([common.uInt160ToBuffer(addr), Buffer.alloc(12, 0)])),
-    //   }),
-    //   new UInt256Attribute({
-    //     usage: 0xa5,
-    //     value: common.bufferToUInt256(
-    //       Buffer.from('8023bce88e000000000000000000000000000000000000000000000000000000', 'hex'),
-    //     ),
-    //   }),
-    // ];
-
-    // test.only('deposit & withdraw n0S tokens', async () => {
-    //   const depositBuff = Buffer.from('88c132e98e00', 'hex');
-    //   const depositBN = utils.fromSignedBuffer(depositBuff);
-
-    //   await nosTokenDeploy();
-    //   await nosWhiteListTransferFromAdd(switcheoV3Contract.hash);
-    //   await nosTokenTransfer(nosTokenHolderAddr, addr, depositBuff);
-    //   await initialize(addr3, addr2, addr1);
-    //   await addToWhitelist(nosTokenContract.hash);
-    //   await deposit(addr, nosTokenContract.hash, depositBN);
-    //   await withdraw(n0sAttributes);
-
-    //   testUtils.verifyListeners(listeners);
-    // });
+      testUtils.verifyListeners(listeners);
+    });
 
     const switcheoAttributes = [
       new UInt256Attribute({
@@ -1710,6 +1731,123 @@ describe('execute', () => {
       await addToWhitelist(switcheoV2TokenContract.hash);
       await deposit(addr, switcheoV2TokenContract.hash, depositBN);
       await withdraw(switcheoAttributes);
+
+      testUtils.verifyListeners(listeners);
+    });
+
+    test('atomic swap', async () => {
+      const timestamp = 1554800000;
+      const blockIndex = 2900000;
+
+      blockchain.currentBlock.timestamp = timestamp;
+      blockchain.currentBlock.index = blockIndex;
+
+      blockchain.header = {
+        get: jest.fn(async () => factory.createHeader({ index: blockIndex, timestamp })),
+      };
+
+      const makerAddress = common.asUInt160(Buffer.from('78fb1102d1dfef0d2b7a1fc6a29592c39ad3a674', 'hex'));
+      const takerAddress = common.asUInt160(Buffer.from('69cc2943e9523cd2e63e815b2f510a58162e995d', 'hex'));
+      const assetID = common.asUInt256(
+        Buffer.from('9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5', 'hex'),
+      );
+      const amount = Buffer.from('e033c00d', 'hex');
+      const hashSecret = common.asUInt256(
+        Buffer.from('d1a2ce56d5e119bc3a8893305e371cf3a9a6da9c9472b69d56081d7755d26207', 'hex'),
+      );
+      const preImage = Buffer.from('33366137646530382d366162632d343763372d623537302d366238366136373635353038', 'hex');
+      const expirtyTime = Buffer.from('e5a6ad5c', 'hex');
+      const neoBalance = neoBN('1000');
+
+      blockchain.output.get = jest.fn(async () =>
+        Promise.resolve(
+          new Output({
+            address: makerAddress,
+            value: neoBalance,
+            asset: assets.NEO_ASSET_HASH_UINT256,
+          }),
+        ),
+      );
+
+      const inputs = [
+        new Input({
+          hash: common.bufferToUInt256(Buffer.alloc(32, 5)),
+          index: 0,
+        }),
+      ];
+      const outputs = [
+        new Output({
+          address: switcheoV3Contract.hash,
+          value: neoBalance,
+          asset: assets.NEO_ASSET_HASH_UINT256,
+        }),
+      ];
+
+      await initialize(addr3, addr2, addr1);
+      await deposit(makerAddress, assets.NEO_ASSET_HASH_UINT256, neoBalance, inputs, outputs);
+      await createAtomicSwap(makerAddress, takerAddress, assetID, amount, hashSecret, expirtyTime, assetID);
+      await executeAtomicSwap(hashSecret, preImage);
+
+      testUtils.verifyListeners(listeners);
+    });
+  });
+
+  describe('Deep Brain', () => {
+    const { deepBrainContract } = transactions;
+
+    const mockBlockchain = () => {
+      const timestamp = 1513172344;
+      const blockIndex = 1699154;
+      blockchain = createBlockchain({ contracts: [deepBrainContract] });
+
+      blockchain.currentBlock.timestamp = timestamp;
+      blockchain.currentBlock.index = blockIndex;
+
+      blockchain.header = {
+        get: jest.fn(async () => factory.createHeader({ index: blockIndex, timestamp })),
+      };
+    };
+
+    const init = async () => {
+      const script = new ScriptBuilder().emitAppCall(deepBrainContract.hash, 'init').build();
+      const ret = await executeSetupScript(script, common.ONE_THOUSAND_FIXED8);
+
+      expect(ret).toBeTruthy();
+    };
+
+    const transfer = async (from: UInt160, to: UInt160, amount: BN) => {
+      const transaction = transactions.createInvocation({
+        script: new ScriptBuilder().emitAppCall(deepBrainContract.hash, 'transfer', from, to, amount).build(),
+      });
+      const result = await executeSimple({
+        blockchain,
+        transaction,
+      });
+
+      expectSuccess(result);
+    };
+
+    beforeEach(() => {
+      mockBlockchain();
+    });
+
+    const tokenHolderAddr = common.asUInt160(Buffer.from('f2b4b715c9a84fcca6bc6dc17351dd1c113f89a9', 'hex'));
+    const workAddr = common.asUInt160(Buffer.from('1c65bc389492f9b14c8a708bba1d013c428d9909', 'hex'));
+    const addr1 = common.asUInt160(Buffer.from('b511fe310e31bdbeea50b5bcf00107ed35b8f79d', 'hex'));
+    const addr2 = common.asUInt160(Buffer.from('4951c0bbd42cb2e7e96a08662b0aa779c9a1c383', 'hex'));
+
+    const startingBalance = new BN('8407482592097768');
+    const firstAmount = new BN('128425589200000');
+    const secondAmount = new BN('2686734000000');
+
+    test('transfers', async () => {
+      await init();
+
+      await transfer(tokenHolderAddr, workAddr, startingBalance);
+      await transfer(tokenHolderAddr, addr1, firstAmount);
+      await transfer(tokenHolderAddr, addr2, secondAmount);
+      await transfer(addr1, workAddr, firstAmount);
+      await transfer(addr2, workAddr, secondAmount);
 
       testUtils.verifyListeners(listeners);
     });

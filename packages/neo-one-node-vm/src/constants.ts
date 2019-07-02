@@ -45,6 +45,7 @@ export interface Options {
   readonly stack: ExecutionStack;
   readonly stackAlt: ExecutionStack;
   readonly createdContracts: CreatedContracts;
+  readonly scriptHashStack: readonly UInt160[];
   readonly scriptHash: UInt160 | undefined;
   readonly entryScriptHash: UInt160;
   readonly returnValueCount: number;
@@ -71,6 +72,7 @@ export interface ExecutionContext {
     }) => Promise<ExecutionContext>;
   };
   readonly code: Buffer;
+  readonly scriptHashStack: readonly UInt160[];
   readonly scriptHash: UInt160;
   readonly callingScriptHash: UInt160 | undefined;
   readonly entryScriptHash: UInt160;

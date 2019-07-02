@@ -98,6 +98,7 @@ import {
   WitnessStackItem,
 } from './stackItem';
 import { vmUtils } from './vmUtils';
+
 export interface CreateSysCallArgs {
   readonly context: ExecutionContext;
 }
@@ -1737,9 +1738,9 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     invoke: async ({ context }) => ({
       context,
       results: [
-        context.callingScriptHash === undefined
-          ? new BufferStackItem(Buffer.alloc(0, 0))
-          : new UInt160StackItem(context.callingScriptHash),
+        context.scriptHashStack.length > 1
+          ? new UInt160StackItem(context.scriptHashStack[1])
+          : new BufferStackItem(Buffer.alloc(0, 0)),
       ],
     }),
   }),
@@ -1749,7 +1750,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     out: 1,
     invoke: async ({ context }) => ({
       context,
-      results: [new UInt160StackItem(context.entryScriptHash)],
+      results: [new UInt160StackItem(context.scriptHashStack[context.scriptHashStack.length - 1])],
     }),
   }),
 };
