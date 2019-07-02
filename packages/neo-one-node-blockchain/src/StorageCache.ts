@@ -1,3 +1,4 @@
+// tslint:disable no-object-mutation no-dynamic-delete
 import { common, UInt256 } from '@neo-one/client-common';
 import {
   AddChange,
@@ -16,16 +17,16 @@ import { utils as commonUtils } from '@neo-one/utils';
 import { concat, defer, EMPTY, Observable, of as _of } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
 type TrackedChange<Key, AddValue, Value> =
-  | {
-      readonly type: 'add';
-      readonly addValue: AddValue;
-      readonly value: Value;
-      readonly subType: 'add' | 'update';
-      readonly transactionHash?: UInt256;
-    }
-  | { readonly type: 'delete'; readonly key: Key; readonly transactionHash?: UInt256 };
+  | { readonly type: 'add'; readonly addValue: AddValue; readonly value: Value; readonly subType: 'add' | 'update' }
+  | { readonly type: 'delete'; readonly key: Key };
 type GetFunc<Key, Value> = (key: Key) => Promise<Value>;
 type TryGetFunc<Key, Value> = (key: Key) => Promise<Value | undefined>;
+export interface TrackedChangeWithKey<Key, AddValue, Value> {
+  readonly type: string;
+  readonly key: string;
+  readonly value: TrackedChange<Key, AddValue, Value>;
+}
+export type TrackedChangeSet<Key, AddValue, Value> = ReadonlyArray<TrackedChangeWithKey<Key, AddValue, Value>>;
 
 function createGet<Key, Value>({
   tryGetTracked,
@@ -74,7 +75,6 @@ function createTryGet<Key, Value>({
 interface BaseReadStorageCacheOptions<Key, AddValue, Value> {
   readonly readStorage: () => ReadStorage<Key, Value>;
   readonly name: string;
-  readonly transactionHash?: UInt256;
   readonly createAddChange: (value: AddValue) => AddChange;
   readonly createDeleteChange?: (key: Key) => DeleteChange;
   readonly onAdd?: (value: AddValue) => Promise<void>;
@@ -83,9 +83,9 @@ interface BaseReadStorageCacheOptions<Key, AddValue, Value> {
 export class BaseReadStorageCache<Key, AddValue, Value> {
   public readonly get: GetFunc<Key, Value>;
   public readonly tryGet: TryGetFunc<Key, Value>;
+  public readonly tryGetValue: TryGetFunc<Key, Value>;
   public readonly onAdd: ((value: AddValue) => Promise<void>) | undefined;
   public readonly name: string;
-  public readonly transactionHash: UInt256 | undefined;
   // tslint:disable-next-line readonly-keyword
   public readonly mutableValues: { [key: string]: TrackedChange<Key, AddValue, Value> };
   protected readonly readStorage: () => ReadStorage<Key, Value>;
@@ -95,7 +95,6 @@ export class BaseReadStorageCache<Key, AddValue, Value> {
   public constructor(options: BaseReadStorageCacheOptions<Key, AddValue, Value>) {
     this.readStorage = options.readStorage;
     this.name = options.name;
-    this.transactionHash = options.transactionHash;
     this.createAddChange = options.createAddChange;
     this.createDeleteChange = options.createDeleteChange;
     this.onAdd = options.onAdd;
@@ -110,6 +109,7 @@ export class BaseReadStorageCache<Key, AddValue, Value> {
       readStorage: this.readStorage,
       tryGetTracked: this.tryGetTracked.bind(this),
     });
+    this.tryGetValue = (key) => this.readStorage().tryGet(key);
   }
 
   public getChangeSet(): ChangeSet {
@@ -128,7 +128,23 @@ export class BaseReadStorageCache<Key, AddValue, Value> {
     });
   }
 
-  protected tryGetTracked(_key: Key): TrackedChange<Key, AddValue, Value> | undefined {
+  public getTrackedChangeSet(): TrackedChangeSet<Key, AddValue, Value> {
+    const createDeleteChange = this.createDeleteChange;
+
+    return Object.entries(this.mutableValues).map(([key, value]) => {
+      if (value.type === 'delete') {
+        if (createDeleteChange === undefined) {
+          throw new Error('Invalid delete');
+        }
+
+        return { type: createDeleteChange(value.key).type, key, value };
+      }
+
+      return { type: this.createAddChange(value.addValue).type, key, value };
+    });
+  }
+
+  public tryGetTracked(_key: Key): TrackedChange<Key, AddValue, Value> | undefined {
     throw new Error('Not Implemented');
   }
 }
@@ -144,7 +160,6 @@ class ReadStorageCache<Key, AddValue, Value> extends BaseReadStorageCache<Key, A
     super({
       readStorage: options.readStorage,
       name: options.name,
-      transactionHash: options.transactionHash,
       createAddChange: options.createAddChange,
       createDeleteChange: options.createDeleteChange,
       onAdd: options.onAdd,
@@ -153,15 +168,18 @@ class ReadStorageCache<Key, AddValue, Value> extends BaseReadStorageCache<Key, A
     this.getKeyString = options.getKeyString;
   }
 
-  protected tryGetTracked(key: Key): TrackedChange<Key, AddValue, Value> | undefined {
+  public tryGetTracked(key: Key): TrackedChange<Key, AddValue, Value> | undefined {
     return this.mutableValues[this.getKeyString(key)];
+  }
+
+  public addTrackedChange(key: string, value: TrackedChange<Key, AddValue, Value>): void {
+    this.mutableValues[key] = value;
   }
 }
 
 interface ReadAllStorageCacheOptions<Key, Value> {
   readonly readAllStorage: () => ReadAllStorage<Key, Value>;
   readonly name: string;
-  readonly transactionHash?: UInt256;
   readonly createAddChange: (value: Value) => AddChange;
   readonly createDeleteChange?: (key: Key) => DeleteChange;
   readonly onAdd?: (value: Value) => Promise<void>;
@@ -181,7 +199,6 @@ class ReadAllStorageCache<Key, Value> extends ReadStorageCache<Key, Value, Value
         tryGet: options.readAllStorage().tryGet,
       }),
       name: options.name,
-      transactionHash: options.transactionHash,
       getKeyString: options.getKeyString,
       createAddChange: options.createAddChange,
       createDeleteChange: options.createDeleteChange,
@@ -219,7 +236,6 @@ class ReadAllStorageCache<Key, Value> extends ReadStorageCache<Key, Value, Value
 interface ReadGetAllStorageCacheOptions<Key, PartialKey, Value> {
   readonly readGetAllStorage: () => ReadGetAllStorage<Key, PartialKey, Value>;
   readonly name: string;
-  readonly transactionHash?: UInt256;
   readonly createAddChange: (value: Value) => AddChange;
   readonly createDeleteChange?: (key: Key) => DeleteChange;
   readonly onAdd?: (value: Value) => Promise<void>;
@@ -241,7 +257,6 @@ class ReadGetAllStorageCache<Key, PartialKey, Value> extends ReadStorageCache<Ke
         tryGet: options.readGetAllStorage().tryGet,
       }),
       name: options.name,
-      transactionHash: options.transactionHash,
       getKeyString: options.getKeyString,
       createAddChange: options.createAddChange,
       createDeleteChange: options.createDeleteChange,
@@ -281,29 +296,26 @@ class ReadGetAllStorageCache<Key, PartialKey, Value> extends ReadStorageCache<Ke
       );
   }
 }
-type AddFunc<Value> = (value: Value, force?: boolean) => Promise<void>;
+type AddFunc<Value> = (value: Value) => Promise<void>;
 
 function createAdd<Key, Value>({
   cache,
   getKeyFromValue,
   getKeyString,
+  allowDupes,
 }: {
   readonly cache: ReadStorageCache<Key, Value, Value>;
   readonly getKeyFromValue: (value: Value) => Key;
   readonly getKeyString: (key: Key) => string;
+  readonly allowDupes?: boolean;
 }): AddFunc<Value> {
-  const getCurrentValue = async (key: Key, value: Value | undefined) =>
-    value === undefined ? cache.tryGet(key) : value;
-
-  return async (value: Value, force?): Promise<void> => {
+  return async (value: Value): Promise<void> => {
     const key = getKeyFromValue(value);
 
-    let currentValue: Value | undefined;
-
-    if (!force) {
-      currentValue = await getCurrentValue(key, currentValue);
+    if (!allowDupes) {
+      const currentValue = await cache.tryGet(key);
       if (currentValue !== undefined) {
-        throw new Error(`Attempted to add an already existing object for key  ${cache.name}:${getKeyString(key)}.`);
+        throw new Error(`Attempted to add an already existing object for key ` + `${cache.name}:${getKeyString(key)}.`);
       }
     }
 
@@ -311,46 +323,15 @@ function createAdd<Key, Value>({
       await cache.onAdd(value);
     }
 
-    const keyString = cache.getKeyString(key);
-    const cacheVal = cache.mutableValues[keyString];
-
-    if (
-      (cacheVal as typeof cacheVal | undefined) !== undefined &&
-      cacheVal.type === 'delete' &&
-      cacheVal.transactionHash !== undefined &&
-      cacheVal.transactionHash === cache.transactionHash
-    ) {
-      currentValue = await getCurrentValue(key, currentValue);
-      if (currentValue === value) {
-        // tslint:disable-next-line no-object-mutation no-dynamic-delete
-        delete cache.mutableValues[keyString];
-      } else {
-        // tslint:disable-next-line no-object-mutation
-        cache.mutableValues[keyString] = {
-          type: 'add',
-          addValue: value,
-          value,
-          subType: 'update',
-          transactionHash: cache.transactionHash,
-        };
-      }
-    } else {
-      // tslint:disable-next-line no-object-mutation
-      cache.mutableValues[keyString] = {
-        type: 'add',
-        addValue: value,
-        value,
-        subType: 'add',
-        transactionHash: cache.transactionHash,
-      };
-    }
-
-    // tslint:disable-next-line no-object-mutation
+    const trackedChange = cache.tryGetTracked(key);
     cache.mutableValues[cache.getKeyString(key)] = {
       type: 'add',
       addValue: value,
       value,
-      subType: 'add',
+      // trackedChange can only be a delete type if it's undefined, otherwise cache.tryGet above would have returned a value
+      // In that case, we ignore the delete and register this as a storage item update
+      // Note that we only really care about this for storage items, where allowDupes is always false
+      subType: trackedChange === undefined ? 'add' : 'update',
     };
   };
 }
@@ -367,36 +348,22 @@ function createUpdate<Key, Value, Update>({
 }): UpdateFunc<Value, Update> {
   return async (value: Value, update: Update): Promise<Value> => {
     const key = getKeyFromValue(value);
-    const keyString = cache.getKeyString(key);
-    const cacheVal = cache.mutableValues[keyString];
-
     const updatedValue = updateFunc(value, update);
 
-    if (
-      (cacheVal as typeof cacheVal | undefined) !== undefined &&
-      cacheVal.type === 'add' &&
-      cacheVal.subType === 'add' &&
-      cacheVal.transactionHash !== undefined &&
-      cacheVal.transactionHash === cache.transactionHash
-    ) {
-      // tslint:disable-next-line no-object-mutation
-      cache.mutableValues[keyString] = {
-        type: 'add',
-        addValue: updatedValue,
-        value: updatedValue,
-        subType: 'add',
-        transactionHash: cache.transactionHash,
-      };
-    } else {
-      // tslint:disable-next-line no-object-mutation
-      cache.mutableValues[keyString] = {
-        type: 'add',
-        addValue: updatedValue,
-        value: updatedValue,
-        subType: 'update',
-        transactionHash: cache.transactionHash,
-      };
-    }
+    const trackedChange = cache.tryGetTracked(key);
+    cache.mutableValues[cache.getKeyString(key)] = {
+      type: 'add',
+      addValue: updatedValue,
+      value: updatedValue,
+      subType:
+        // trackedChange undefined -> value must exist so it's an update
+        // trackedChange.type === 'delete' -> value must have previously existed, so we ignore the delete and it's an update
+        // trackedChange.subType === 'update' -> value must have previously existed
+        // otherwise -> value did not exist, we're just adding twice.
+        trackedChange === undefined || trackedChange.type === 'delete' || trackedChange.subType === 'update'
+          ? 'update'
+          : 'add',
+    };
 
     return updatedValue;
   };
@@ -406,24 +373,12 @@ type DeleteFunc<Key> = (key: Key) => Promise<void>;
 // tslint:disable-next-line no-any
 function createDelete<Key>({ cache }: { readonly cache: ReadStorageCache<Key, any, any> }): DeleteFunc<Key> {
   return async (key: Key): Promise<void> => {
-    const keyString = cache.getKeyString(key);
-    const cacheVal = cache.mutableValues[keyString];
-
-    if (
-      (cacheVal as typeof cacheVal | undefined) !== undefined &&
-      cacheVal.type === 'add' &&
-      cacheVal.subType === 'add' &&
-      cacheVal.transactionHash !== undefined &&
-      cacheVal.transactionHash === cache.transactionHash
-    ) {
-      // tslint:disable-next-line no-dynamic-delete no-object-mutation
-      delete cache.mutableValues[keyString];
+    const currentValue = await cache.tryGetValue(key);
+    if (currentValue === undefined) {
+      // We did not have a value before, so just delete any tracked changes as if they never occurred.
+      delete cache.mutableValues[cache.getKeyString(key)];
     } else {
-      const currentValue = await cache.tryGet(key);
-      if (currentValue !== undefined) {
-        // tslint:disable-next-line no-object-mutation
-        cache.mutableValues[keyString] = { type: 'delete', key, transactionHash: cache.transactionHash };
-      }
+      cache.mutableValues[cache.getKeyString(key)] = { type: 'delete', key };
     }
   };
 }
@@ -443,7 +398,6 @@ export class ReadAddUpdateDeleteStorageCache<Key, Value, Update> extends ReadSto
     super({
       readStorage: options.readStorage,
       name: options.name,
-      transactionHash: options.transactionHash,
       getKeyString: options.getKeyString,
       createAddChange: options.createAddChange,
       createDeleteChange: options.createDeleteChange,
@@ -469,6 +423,7 @@ export class ReadAddUpdateDeleteStorageCache<Key, Value, Update> extends ReadSto
 interface ReadAddUpdateStorageCacheOptions<Key, Value, Update> extends ReadStorageCacheOptions<Key, Value, Value> {
   readonly update: (value: Value, update: Update) => Value;
   readonly getKeyFromValue: (value: Value) => Key;
+  readonly allowDupes?: boolean;
 }
 
 export class ReadAddUpdateStorageCache<Key, Value, Update> extends ReadStorageCache<Key, Value, Value> {
@@ -479,7 +434,6 @@ export class ReadAddUpdateStorageCache<Key, Value, Update> extends ReadStorageCa
     super({
       readStorage: options.readStorage,
       name: options.name,
-      transactionHash: options.transactionHash,
       getKeyString: options.getKeyString,
       createAddChange: options.createAddChange,
       createDeleteChange: options.createDeleteChange,
@@ -490,6 +444,7 @@ export class ReadAddUpdateStorageCache<Key, Value, Update> extends ReadStorageCa
       cache: this,
       getKeyFromValue: options.getKeyFromValue,
       getKeyString: options.getKeyString,
+      allowDupes: options.allowDupes,
     });
 
     this.update = createUpdate({
@@ -512,7 +467,6 @@ export class ReadAddDeleteStorageCache<Key, Value> extends ReadStorageCache<Key,
     super({
       readStorage: options.readStorage,
       name: options.name,
-      transactionHash: options.transactionHash,
       getKeyString: options.getKeyString,
       createAddChange: options.createAddChange,
       createDeleteChange: options.createDeleteChange,
@@ -531,6 +485,7 @@ export class ReadAddDeleteStorageCache<Key, Value> extends ReadStorageCache<Key,
 
 interface ReadAddStorageCacheOptions<Key, Value> extends ReadStorageCacheOptions<Key, Value, Value> {
   readonly getKeyFromValue: (value: Value) => Key;
+  readonly allowDupes?: boolean;
 }
 
 export class ReadAddStorageCache<Key, Value> extends ReadStorageCache<Key, Value, Value> {
@@ -540,7 +495,6 @@ export class ReadAddStorageCache<Key, Value> extends ReadStorageCache<Key, Value
     super({
       readStorage: options.readStorage,
       name: options.name,
-      transactionHash: options.transactionHash,
       getKeyString: options.getKeyString,
       createAddChange: options.createAddChange,
       createDeleteChange: options.createDeleteChange,
@@ -551,6 +505,7 @@ export class ReadAddStorageCache<Key, Value> extends ReadStorageCache<Key, Value
       cache: this,
       getKeyFromValue: options.getKeyFromValue,
       getKeyString: options.getKeyString,
+      allowDupes: options.allowDupes,
     });
   }
 }
@@ -572,7 +527,6 @@ export class ReadGetAllAddDeleteStorageCache<Key, PartialKey, Value> extends Rea
     super({
       readGetAllStorage: options.readGetAllStorage,
       name: options.name,
-      transactionHash: options.transactionHash,
       getKeyString: options.getKeyString,
       createAddChange: options.createAddChange,
       createDeleteChange: options.createDeleteChange,
@@ -610,7 +564,6 @@ export class ReadGetAllAddUpdateDeleteStorageCache<Key, PartialKey, Value, Updat
     super({
       readGetAllStorage: options.readGetAllStorage,
       name: options.name,
-      transactionHash: options.transactionHash,
       getKeyString: options.getKeyString,
       createAddChange: options.createAddChange,
       createDeleteChange: options.createDeleteChange,
@@ -647,7 +600,6 @@ export class ReadGetAllAddStorageCache<Key, PartialKey, Value> extends ReadGetAl
     super({
       readGetAllStorage: options.readGetAllStorage,
       name: options.name,
-      transactionHash: options.transactionHash,
       getKeyString: options.getKeyString,
       createAddChange: options.createAddChange,
       createDeleteChange: options.createDeleteChange,
@@ -678,7 +630,6 @@ export class ReadAllAddUpdateDeleteStorageCache<Key, Value, Update> extends Read
     super({
       readAllStorage: options.readAllStorage,
       name: options.name,
-      transactionHash: options.transactionHash,
       getKeyString: options.getKeyString,
       createAddChange: options.createAddChange,
       createDeleteChange: options.createDeleteChange,
@@ -713,7 +664,6 @@ export class ReadAllAddStorageCache<Key, Value> extends ReadAllStorageCache<Key,
     super({
       readAllStorage: options.readAllStorage,
       name: options.name,
-      transactionHash: options.transactionHash,
       getKeyString: options.getKeyString,
       createAddChange: options.createAddChange,
       createDeleteChange: options.createDeleteChange,
@@ -755,12 +705,10 @@ export class BlockLikeStorageCache<Value extends BlockLike> extends BaseReadStor
     this.mutableIndexValues = {};
   }
 
-  public async add(value: Value, force?: boolean): Promise<void> {
-    if (!force) {
-      const currentValue = await this.tryGet({ hashOrIndex: value.index });
-      if (currentValue !== undefined) {
-        throw new Error('Attempted to add an already existing object.');
-      }
+  public async add(value: Value): Promise<void> {
+    const currentValue = await this.tryGet({ hashOrIndex: value.index });
+    if (currentValue !== undefined) {
+      throw new Error('Attempted to add an already existing object.');
     }
 
     const addValue: TrackedChange<BlockLikeKey, Value, Value> = { type: 'add', addValue: value, value, subType: 'add' };
@@ -768,12 +716,16 @@ export class BlockLikeStorageCache<Value extends BlockLike> extends BaseReadStor
     this.mutableIndexValues[`${value.index}`] = addValue;
   }
 
-  protected tryGetTracked(key: BlockLikeKey): TrackedChange<BlockLikeKey, Value, Value> | undefined {
+  public tryGetTracked(key: BlockLikeKey): TrackedChange<BlockLikeKey, Value, Value> | undefined {
     if (typeof key.hashOrIndex !== 'number') {
       return this.mutableValues[common.uInt256ToString(key.hashOrIndex)];
     }
 
     return this.mutableIndexValues[`${key.hashOrIndex}`];
+  }
+
+  public addTrackedChange(key: string, value: TrackedChange<BlockLikeKey, Value, Value>): void {
+    this.mutableValues[key] = value;
   }
 }
 
@@ -796,16 +748,14 @@ export class OutputStorageCache extends ReadStorageCache<OutputKey, OutputValue,
       createAddChange: (value: OutputValue) => ({ type: 'output', value }),
     });
 
-    this.add = async (value: OutputValue, force?): Promise<void> => {
+    this.add = async (value: OutputValue): Promise<void> => {
       const key = { hash: value.hash, index: value.index };
 
-      if (!force) {
-        const currentValue = await this.tryGet(key);
-        if (currentValue !== undefined) {
-          throw new Error(
-            `Attempted to add an already existing object for key ${this.name}:${this.getKeyString(key)}.`,
-          );
-        }
+      const currentValue = await this.tryGet(key);
+      if (currentValue !== undefined) {
+        throw new Error(
+          `Attempted to add an already existing object for key ` + `${this.name}:${this.getKeyString(key)}.`,
+        );
       }
 
       this.mutableValues[this.getKeyString(key)] = {
@@ -921,8 +871,30 @@ export class BaseReadMetadataStorageCache<AddValue, Value> {
     return [{ type: 'add', change: this.createAddChange(value.addValue), subType: value.subType }];
   }
 
-  protected tryGetTracked(): TrackedMetadataChange<AddValue, Value> | undefined {
+  public getTrackedChangeSet(): TrackedChangeSet<string, AddValue, Value> {
+    const createDeleteChange = this.createDeleteChange;
+    const value = this.mutableValue;
+    if (value === undefined) {
+      return [];
+    }
+
+    if (value.type === 'delete') {
+      if (createDeleteChange === undefined) {
+        throw new Error('Invalid delete');
+      }
+
+      return [{ type: createDeleteChange().type, key: 'metadata', value: { ...value, key: 'metadata' } }];
+    }
+
+    return [{ type: this.createAddChange(value.addValue).type, key: 'metadata', value }];
+  }
+
+  public tryGetTracked(): TrackedMetadataChange<AddValue, Value> | undefined {
     return this.mutableValue;
+  }
+
+  public addTrackedChange(_key: string, value: TrackedMetadataChange<AddValue, Value>): void {
+    this.mutableValue = value;
   }
 }
 
@@ -938,7 +910,6 @@ function createAddMetadata<Value>({
       await cache.onAdd(value);
     }
 
-    // tslint:disable-next-line no-object-mutation
     cache.mutableValue = {
       type: 'add',
       addValue: value,
@@ -957,7 +928,6 @@ function createUpdateMetadata<Value, Update>({
 }): UpdateFunc<Value, Update> {
   return async (value: Value, update: Update): Promise<Value> => {
     const updatedValue = updateFunc(value, update);
-    // tslint:disable-next-line no-object-mutation
     cache.mutableValue = {
       type: 'add',
       addValue: updatedValue,

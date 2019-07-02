@@ -3,7 +3,6 @@ import { StorageFlags, StorageItem, StorageItemKey, StorageItemsKey, StorageItem
 import { ReadGetAllAddUpdateDeleteStorageCache } from '../StorageCache';
 
 describe('StorageCache', () => {
-  const hash256 = common.hexToUInt256('0x9bf50b229d070a243ec43f9979e1922d8275cbe2676b811e614ef4c3271ab7a9');
   const hash = common.asUInt160(Buffer.from('197ff6783d512a740d42f4cc4f5572955fa44c95', 'hex'));
   const key = common.asUInt160(Buffer.from('f3812db982f3b0089a21a278988efeec6a027b25', 'hex'));
 
@@ -14,7 +13,6 @@ describe('StorageCache', () => {
     StorageItemUpdate
   >({
     name: 'storageItem',
-    transactionHash: hash256,
     readGetAllStorage: jest.fn(() => ({
       get: jest.fn(),
       tryGet: jest.fn(),
