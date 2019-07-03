@@ -1,9 +1,7 @@
-// @ts-ignore
-import { curves } from 'elliptic';
 import { sha256 } from 'hash.js';
 
 // tslint:disable-next-line export-name
-export const p256 = new curves.PresetCurve({
+export const p256 = {
   type: 'short',
   // tslint:disable-next-line no-null-keyword
   prime: null,
@@ -1305,4 +1303,4 @@ export const p256 = new curves.PresetCurve({
       },
     },
   ],
-});
+};

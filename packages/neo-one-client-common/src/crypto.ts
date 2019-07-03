@@ -5,7 +5,7 @@ import { BN } from 'bn.js';
 import base58 from 'bs58';
 import xor from 'buffer-xor';
 import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from 'crypto';
-import { ec as EC } from 'elliptic';
+import { curves, ec as EC } from 'elliptic';
 import scrypt from 'scrypt-js';
 import WIF from 'wif';
 import { common, ECPoint, InvalidFormatError, PrivateKey, UInt160, UInt256 } from './common';
@@ -31,7 +31,7 @@ import { ScriptBuilder } from './ScriptBuilder';
 let ecCache: EC | undefined;
 const ec = () => {
   if (ecCache === undefined) {
-    ecCache = new EC(p256);
+    ecCache = new EC(new curves.PresetCurve(p256));
   }
 
   return ecCache;

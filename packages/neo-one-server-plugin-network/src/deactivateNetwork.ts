@@ -1,8 +1,9 @@
 import { InteractiveCLIArgs } from '@neo-one/server-plugin';
+import { Command } from 'vorpal';
 import { constants } from './constants';
 import { NetworkPlugin } from './NetworkPlugin';
 
-export const deactivateNetwork = (plugin: NetworkPlugin) => ({ cli }: InteractiveCLIArgs) =>
+export const deactivateNetwork = (plugin: NetworkPlugin) => ({ cli }: InteractiveCLIArgs): Command =>
   cli.vorpal
     .command(
       'deactivate network',

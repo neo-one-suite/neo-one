@@ -1,5 +1,4 @@
 import { CodegenFramework } from '@neo-one/smart-contract-codegen';
-import convict from 'convict';
 import * as path from 'path';
 
 export interface BuildTaskListOptions {
@@ -45,7 +44,7 @@ export interface ProjectConfig {
   };
 }
 
-export const projectConfigSchema: convict.Schema<ProjectConfig> = {
+export const projectConfigSchema = {
   paths: {
     contracts: {
       format: String,
@@ -70,4 +69,4 @@ export const projectConfigSchema: convict.Schema<ProjectConfig> = {
       default: false,
     },
   },
-};
+} as const;

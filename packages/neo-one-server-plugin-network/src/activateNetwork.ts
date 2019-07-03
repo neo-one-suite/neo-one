@@ -1,9 +1,10 @@
 import { InteractiveCLIArgs } from '@neo-one/server-plugin';
 import { take } from 'rxjs/operators';
+import { Command } from 'vorpal';
 import { constants } from './constants';
 import { NetworkPlugin } from './NetworkPlugin';
 
-export const activateNetwork = (plugin: NetworkPlugin) => ({ cli }: InteractiveCLIArgs) =>
+export const activateNetwork = (plugin: NetworkPlugin) => ({ cli }: InteractiveCLIArgs): Command =>
   cli.vorpal
     .command(
       'activate network <name>',

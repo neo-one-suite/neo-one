@@ -4,11 +4,13 @@
   "description": "NEO•ONE shared utils.",
   "main": "./src/index",
   "dependencies": {
-    "@types/lodash": "^4.14.134",
     "change-case": "^3.1.0",
     "lodash": "^4.17.11",
     "rxjs": "^6.5.2",
     "tslib": "^1.9.3"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.134"
   },
   "sideEffects": false
 }

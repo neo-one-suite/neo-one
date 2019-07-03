@@ -16,9 +16,7 @@
     "@neo-one/node-vm": "^1.2.0",
     "@neo-one/utils": "^1.1.2",
     "@types/abstract-leveldown": "^5.0.1",
-    "@types/leveldown": "^4.0.0",
     "@types/levelup": "^3.1.1",
-    "@types/node-cron": "^2.0.2",
     "abstract-leveldown": "^6.0.3",
     "cross-fetch": "^3.0.4",
     "leveldown": "^5.1.0",
@@ -26,6 +24,10 @@
     "node-cron": "^2.0.3",
     "rxjs": "^6.5.2",
     "tslib": "^1.9.3"
+  },
+  "devDependencies": {
+    "@types/leveldown": "^4.0.0",
+    "@types/node-cron": "^2.0.2"
   },
   "sideEffects": false
 }

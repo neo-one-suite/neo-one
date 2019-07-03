@@ -4,8 +4,10 @@
   "description": "NEO•ONE shared Nodejs utils.",
   "main": "./src/index",
   "dependencies": {
-    "@types/npm-package-arg": "^6.1.0",
     "npm-package-arg": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/npm-package-arg": "^6.1.0"
   },
   "sideEffects": false
 }
