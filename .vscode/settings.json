@@ -12,5 +12,9 @@
   "editor.formatOnPaste": false,
   "editor.formatOnSave": true,
   "cSpell.language": "en",
-  "deepscan.enable": true
+  "deepscan.enable": true,
+  "files.associations": {
+    "[Dd]ockerfile*": "dockerfile",
+    "docker-compose*": "yaml"
+  }
 }
