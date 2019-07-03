@@ -1,6 +1,6 @@
 FROM neotracker/neo-one-circleci-node:10.16.0-1 as builder
 RUN mkdir -p /tmp/neo-one
-WORKDIR tmp/neo-one
+WORKDIR /tmp/neo-one
 
 COPY package.json tsconfig.json lerna.json gulpfile.js yarn.lock LICENSE README.md ./
 COPY tsconfig/ tsconfig
