@@ -8942,7 +8942,18 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-css-chunks-webpack-plugin@4.5.2, extract-css-chunks-webpack-plugin@^4.5.1:
+extract-css-chunks-webpack-plugin@4.5.4:
+  version "4.5.4"
+  resolved "https://registry.yarnpkg.com/extract-css-chunks-webpack-plugin/-/extract-css-chunks-webpack-plugin-4.5.4.tgz#8c5bbefd29a2d16cb471e1f863f5926f11f73653"
+  integrity sha512-d/INFuuwHYad82Xz2g+OFbbiSn9m59HJBuL7oNUBj5v82MBM2nE3PcBsMlw7Ej+k8U1TD/FLO3fgV1I+51FcPQ==
+  dependencies:
+    loader-utils "^1.1.0"
+    normalize-url "1.9.1"
+    schema-utils "^1.0.0"
+    webpack-external-import "^0.0.1-beta.16"
+    webpack-sources "^1.1.0"
+
+extract-css-chunks-webpack-plugin@^4.5.1:
   version "4.5.2"
   resolved "https://registry.yarnpkg.com/extract-css-chunks-webpack-plugin/-/extract-css-chunks-webpack-plugin-4.5.2.tgz#41e4be8bfb3a2ac9195b9eb9b4bb816d03228b00"
   integrity sha512-UeDq6pUoroOOeY3RyxVb21SNxWTx2MRL9fRs8HCsw2aCLkvKImbybGLXxeBQjT9GlDWfzMH0gnclS786aT+zuA==
@@ -9509,6 +9520,15 @@ fs-extra@^4.0.2:
     jsonfile "^4.0.0"
     universalify "^0.1.0"
 
+fs-extra@^8.0.1:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-8.1.0.tgz#49d43c45a88cd9677668cb7be1b46efdb8d2e1c0"
+  integrity sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==
+  dependencies:
+    graceful-fs "^4.2.0"
+    jsonfile "^4.0.0"
+    universalify "^0.1.0"
+
 fs-minipass@^1.2.5:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/fs-minipass/-/fs-minipass-1.2.6.tgz#2c5cc30ded81282bfe8a0d7c7c1853ddeb102c07"
@@ -10040,6 +10060,11 @@ graceful-fs@4.X, graceful-fs@^4.0.0, graceful-fs@^4.1.10, graceful-fs@^4.1.11, g
   version "4.1.15"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.15.tgz#ffb703e1066e8a0eeaa4c8b80ba9253eeefbfb00"
   integrity sha512-6uHUhOPEBgQ24HM+r6b/QwWfZq+yiFcipKFrOFiBEnWdy5sdzYoi+pJeQaPI5qOLRFqWmAXUPQNsielzdLoecA==
+
+graceful-fs@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.0.tgz#8d8fdc73977cb04104721cb53666c1ca64cd328b"
+  integrity sha512-jpSvDPV4Cq/bgtpndIWbI5hmYxhQGHPC4d4cqBPb4DLniCfhJokdXhwhaDuLBGLQdvvRum/UiX6ECVIPvDXqdg==
 
 "graceful-readlink@>= 1.0.0":
   version "1.0.1"
@@ -18412,6 +18437,11 @@ schema-utils@^1.0.0:
     ajv-errors "^1.0.0"
     ajv-keywords "^3.1.0"
 
+scriptjs@^2.5.9:
+  version "2.5.9"
+  resolved "https://registry.yarnpkg.com/scriptjs/-/scriptjs-2.5.9.tgz#343915cd2ec2ed9bfdde2b9875cd28f59394b35f"
+  integrity sha512-qGVDoreyYiP1pkQnbnFAUIS5AjenNwwQBdl7zeos9etl+hYKWahjRTfzAZZYBv5xNHx7vNKCmaLDQZ6Fr2AEXg==
+
 scrypt-js@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/scrypt-js/-/scrypt-js-2.0.4.tgz#32f8c5149f0797672e551c07e230f834b6af5f16"
@@ -21237,6 +21267,16 @@ webpack-dev-server@3.7.2, webpack-dev-server@^3.3.1:
     webpack-dev-middleware "^3.7.0"
     webpack-log "^2.0.0"
     yargs "12.0.5"
+
+webpack-external-import@^0.0.1-beta.16:
+  version "0.0.1-beta.16"
+  resolved "https://registry.yarnpkg.com/webpack-external-import/-/webpack-external-import-0.0.1-beta.16.tgz#19140afe9fdcf86e7d97a0704269a4e81266d888"
+  integrity sha512-aY7GExAxRwUTgrxm7rpb+PS0NXeeO1tvv8Dk+vxwVvTwpSm8afGK4aNF+YwJtL3LiBayoWBj4ED3AZwB+Cm/Eg==
+  dependencies:
+    "@babel/helper-module-imports" "^7.0.0"
+    babel-traverse "^6.26.0"
+    fs-extra "^8.0.1"
+    scriptjs "^2.5.9"
 
 webpack-flush-chunks@^2.0.1:
   version "2.0.3"
