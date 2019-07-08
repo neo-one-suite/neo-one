@@ -9,6 +9,6 @@ export * from './onComplete';
 export * from './utils';
 export * from './makeErrorWithCode';
 export * from './retryBackoff';
-export * from './upperCaseFirst';
+export * from './changeCase';
 export * from './normalizePath';
 export * from './helperTypes';

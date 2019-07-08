@@ -9,5 +9,6 @@
     "inlineSourceMap": true,
     "declaration": true,
     "stripInternal": true,
+    "removeComments": true
   }
 }
