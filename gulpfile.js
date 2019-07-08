@@ -453,6 +453,8 @@ const compileTypescript = ((cache) =>
             `${RXJS_IMPORT}/${format.module === 'esm' ? '_esm2015/' : ''}internal`,
           ),
         )
+        .pipe(gulpReplace(/import\("(?:..\/)*neo-one-([^\)]*)\/src"\)/g, 'import("@neo-one/$1")'))
+        .pipe(gulpReplace(/import\("(?:..\/)*types\/bn.js"\).BN/g, 'import("bn.js")'))
         .pipe(gulpReplace("import { BN } from 'bn.js';", "import BN from 'bn.js';"))
         .pipe(
           gulpRename((name) => {
