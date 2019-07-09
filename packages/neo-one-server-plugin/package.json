@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@types/cli-truncate": "1.1.0",
-    "@types/fs-extra": "7.0.0",
+    "@types/fs-extra": "8.0.0",
     "@types/is-running": "2.1.0",
     "@types/seamless-immutable": "7.1.10"
   },

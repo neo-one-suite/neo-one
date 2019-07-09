@@ -24,7 +24,7 @@
     "tslib": "^1.9.3"
   },
   "devDependencies": {
-    "@types/fs-extra": "7.0.0",
+    "@types/fs-extra": "8.0.0",
     "@types/lodash": "4.14.134"
   },
   "sideEffects": false

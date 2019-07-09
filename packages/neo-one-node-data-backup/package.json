@@ -12,7 +12,7 @@
     "tslib": "^1.9.3"
   },
   "devDependencies": {
-    "@types/fs-extra": "7.0.0",
+    "@types/fs-extra": "8.0.0",
     "@types/megajs": "0.14.1",
     "@types/tar": "4.0.1"
   },
