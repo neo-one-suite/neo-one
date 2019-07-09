@@ -251,7 +251,7 @@ await withContracts(async ({ token, accountIDs }) => {
 });
 ```
 
-Notice how the methods correspond 1:1 to what's been declared in the smart contract. We're also making use of one of the automatically generated `UserAccountID`s as the `balanceOf` `Address` argument.
+Notice how the methods correspond 1:1 to what's been declared in the smart contract. We're also making use of one of the automatically generated `UserAccountID`s as the `balanceOf` `Address` argument. You can find the full list of automatically generated `UserAccountID`s in the [testing](/docs/testing) section of the docs.
 
 ### Constructors
 
@@ -366,8 +366,8 @@ Now that we can mint tokens, let's see how we can test both `transfer` and `mint
 
 ```typescript
 await withContracts(async ({ token, accountIDs }) => {
-  // We'll use this account for minting
-  const accountID = accountIDs[0];
+  // We'll use this account for minting because it starts with 10 NEO in it
+  const accountID = accountIDs[2];
   const amount = new BigNumber(10);
 
   // Mint the tokens and verify the transaction succeeds

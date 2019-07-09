@@ -82,3 +82,18 @@ Configure your IDE to use your local TypeScript installation and the `@neo-one/s
   3. Open a TypeScript file, then click the TypeScript version number in the lower right hand side of your editor and choose "Use Workspace Version"
 
 That's it! Enjoy inline smart contract compiler diagnostics.
+
+## Javascript Environment Requirements
+
+NEO•ONE depends on several types which older browser may not support.  NEO•ONE requires the collection types [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) and [Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set) as well as [Symbol.asyncIterator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/asyncIterator). If you support older browsers and devices which may not yet provide these natively, consider including a global polyfill in your bundled application, such as [core-js](https://github.com/zloirock/core-js) or [babel-polyfill](https://babeljs.io/docs/en/babel-polyfill/).
+
+To polyfill an environment for NEO•ONE using core-js, include the following lines at the top of your entry point.
+
+```typescript
+import 'core-js/es/map';
+import 'core-js/es/set';
+import 'core-js/es/symbol/async-iterator';
+```
+
+
+
