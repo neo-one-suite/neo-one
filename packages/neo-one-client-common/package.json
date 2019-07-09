@@ -22,12 +22,12 @@
     "wif": "^2.0.6"
   },
   "devDependencies": {
-    "@types/bs58": "^4.0.0",
-    "@types/buffer-xor": "^2.0.0",
-    "@types/elliptic": "^6.4.9",
-    "@types/lodash": "^4.14.134",
-    "@types/scrypt-js": "^2.0.3",
-    "@types/wif": "^2.0.1"
+    "@types/bs58": "4.0.0",
+    "@types/buffer-xor": "2.0.0",
+    "@types/elliptic": "6.4.9",
+    "@types/lodash": "4.14.134",
+    "@types/scrypt-js": "2.0.3",
+    "@types/wif": "2.0.1"
   },
   "sideEffects": false
 }

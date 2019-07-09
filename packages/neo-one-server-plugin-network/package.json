@@ -25,9 +25,9 @@
     "vorpal": "^1.12.0"
   },
   "devDependencies": {
-    "@types/execa": "^0.9.0",
-    "@types/fs-extra": "^7.0.0",
-    "@types/lodash": "^4.14.134"
+    "@types/execa": "0.9.0",
+    "@types/fs-extra": "7.0.0",
+    "@types/lodash": "4.14.134"
   },
   "sideEffects": false
 }

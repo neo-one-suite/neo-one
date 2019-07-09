@@ -18,8 +18,8 @@
     "tslib": "^1.9.3"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.134",
-    "@types/memdown": "^3.0.0"
+    "@types/lodash": "4.14.134",
+    "@types/memdown": "3.0.0"
   },
   "sideEffects": false
 }
