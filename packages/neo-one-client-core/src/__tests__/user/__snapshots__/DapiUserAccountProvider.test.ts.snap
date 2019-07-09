@@ -1,0 +1,1480 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DapiUserAccountProvider call 1`] = `
+Array [
+  Array [
+    "main",
+    "ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s",
+    "foo",
+    Array [
+      true,
+    ],
+    undefined,
+  ],
+]
+`;
+
+exports[`DapiUserAccountProvider claim - not implemented 1`] = `[Error [NOT_IMPLEMENTED]: executeClaim not implemented for this provider.]`;
+
+exports[`DapiUserAccountProvider invoke methods invoke 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "args": Array [
+          Object {
+            "type": "Integer",
+            "value": "100000000",
+          },
+          Object {
+            "type": "Integer",
+            "value": 20,
+          },
+          Object {
+            "type": "Hash160",
+            "value": "0707070707070707070707070707070707070707",
+          },
+          Object {
+            "type": "Hash256",
+            "value": "0808080808080808080808080808080808080808080808080808080808080808",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "090909090909090909090909090909090909090909090909090909090909090909",
+          },
+          Object {
+            "type": "String",
+            "value": "stringData",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "abc123",
+          },
+          Object {
+            "type": "Boolean",
+            "value": true,
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Object {
+                "type": "Integer",
+                "value": "1000000000",
+              },
+              Object {
+                "type": "Integer",
+                "value": 8,
+              },
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "Integer",
+                  "value": "100000000",
+                },
+                Object {
+                  "type": "Integer",
+                  "value": 8,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "String",
+                  "value": "key",
+                },
+                Object {
+                  "type": "Boolean",
+                  "value": false,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "",
+          },
+        ],
+        "assetIntentOverrides": Object {
+          "inputs": Array [
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+          ],
+          "outputs": Array [
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+          ],
+        },
+        "network": "main",
+        "operation": "deploy",
+        "scriptHash": "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+        "triggerContractVerification": true,
+        "txHashAttributes": Array [
+          Object {
+            "txAttrUsage": "Remark14",
+            "type": "String",
+            "value": "6e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457222c226d6574686f64223a226465706c6f79222c22706172616d73223a5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d2c5b22627566666572222c2262353030225d2c5b2261646472657373222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d2c5b2268617368323536222c22307862353030333464393762613863383336373538646531313234623663373764333862633737326162633961386632326338356537333839303134653735323334225d2c5b227075626c69634b6579222c22303230323861393938323665646330633937643138653232623639333233373364393038643332336161376639323635366137376563323665383836313639396566225d2c5b22626f6f6c65616e222c747275655d2c5b226172726179222c5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d5d5d2c5b226d6170222c6e756c6c5d2c5b226f626a656374222c6e756c6c5d2c5b22666f7277617264222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d5d7d",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "3130",
+          },
+        ],
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`DapiUserAccountProvider invoke methods invokeClaim - not implemented 1`] = `[Error [NOT_IMPLEMENTED]: executeInvokeClaim not implemented for this provider.]`;
+
+exports[`DapiUserAccountProvider invoke methods invokeCompleteSend 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "args": Array [
+          Object {
+            "type": "Integer",
+            "value": "100000000",
+          },
+          Object {
+            "type": "Integer",
+            "value": 20,
+          },
+          Object {
+            "type": "Hash160",
+            "value": "0707070707070707070707070707070707070707",
+          },
+          Object {
+            "type": "Hash256",
+            "value": "0808080808080808080808080808080808080808080808080808080808080808",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "090909090909090909090909090909090909090909090909090909090909090909",
+          },
+          Object {
+            "type": "String",
+            "value": "stringData",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "abc123",
+          },
+          Object {
+            "type": "Boolean",
+            "value": true,
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Object {
+                "type": "Integer",
+                "value": "1000000000",
+              },
+              Object {
+                "type": "Integer",
+                "value": 8,
+              },
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "Integer",
+                  "value": "100000000",
+                },
+                Object {
+                  "type": "Integer",
+                  "value": 8,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "String",
+                  "value": "key",
+                },
+                Object {
+                  "type": "Boolean",
+                  "value": false,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "",
+          },
+        ],
+        "assetIntentOverrides": Object {
+          "inputs": Array [
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+          ],
+          "outputs": Array [
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+          ],
+        },
+        "network": "main",
+        "operation": "deploy",
+        "scriptHash": "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+        "triggerContractVerification": true,
+        "txHashAttributes": Array [
+          Object {
+            "txAttrUsage": "Remark14",
+            "type": "String",
+            "value": "6e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457222c226d6574686f64223a226465706c6f79222c22706172616d73223a5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d2c5b22627566666572222c2262353030225d2c5b2261646472657373222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d2c5b2268617368323536222c22307862353030333464393762613863383336373538646531313234623663373764333862633737326162633961386632326338356537333839303134653735323334225d2c5b227075626c69634b6579222c22303230323861393938323665646330633937643138653232623639333233373364393038643332336161376639323635366137376563323665383836313639396566225d2c5b22626f6f6c65616e222c747275655d2c5b226172726179222c5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d5d5d2c5b226d6170222c6e756c6c5d2c5b226f626a656374222c6e756c6c5d2c5b22666f7277617264222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d5d7d",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "3130",
+          },
+        ],
+      },
+    ],
+    Array [
+      Object {
+        "args": Array [
+          Object {
+            "type": "Integer",
+            "value": "100000000",
+          },
+          Object {
+            "type": "Integer",
+            "value": 20,
+          },
+          Object {
+            "type": "Hash160",
+            "value": "0707070707070707070707070707070707070707",
+          },
+          Object {
+            "type": "Hash256",
+            "value": "0808080808080808080808080808080808080808080808080808080808080808",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "090909090909090909090909090909090909090909090909090909090909090909",
+          },
+          Object {
+            "type": "String",
+            "value": "stringData",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "abc123",
+          },
+          Object {
+            "type": "Boolean",
+            "value": true,
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Object {
+                "type": "Integer",
+                "value": "1000000000",
+              },
+              Object {
+                "type": "Integer",
+                "value": 8,
+              },
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "Integer",
+                  "value": "100000000",
+                },
+                Object {
+                  "type": "Integer",
+                  "value": 8,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "String",
+                  "value": "key",
+                },
+                Object {
+                  "type": "Boolean",
+                  "value": false,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "",
+          },
+          Object {
+            "type": "Hash160",
+            "value": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+          },
+        ],
+        "assetIntentOverrides": Object {
+          "inputs": Array [
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+          ],
+          "outputs": Array [
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+          ],
+        },
+        "network": "main",
+        "operation": "deploy",
+        "scriptHash": "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+        "triggerContractVerification": true,
+        "txHashAttributes": Array [
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark14",
+            "type": "String",
+            "value": "6e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457222c226d6574686f64223a226465706c6f79222c22706172616d73223a5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d2c5b22627566666572222c2262353030225d2c5b2261646472657373222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d2c5b2268617368323536222c22307862353030333464393762613863383336373538646531313234623663373764333862633737326162633961386632326338356537333839303134653735323334225d2c5b227075626c69634b6579222c22303230323861393938323665646330633937643138653232623639333233373364393038643332336161376639323635366137376563323665383836313639396566225d2c5b22626f6f6c65616e222c747275655d2c5b226172726179222c5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d5d5d2c5b226d6170222c6e756c6c5d2c5b226f626a656374222c6e756c6c5d2c5b22666f7277617264222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d5d7d",
+          },
+          Object {
+            "txAttrUsage": "Script",
+            "type": "String",
+            "value": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "3130",
+          },
+        ],
+      },
+    ],
+    Array [
+      Object {
+        "args": Array [
+          Object {
+            "type": "Integer",
+            "value": "100000000",
+          },
+          Object {
+            "type": "Integer",
+            "value": 20,
+          },
+          Object {
+            "type": "Hash160",
+            "value": "0707070707070707070707070707070707070707",
+          },
+          Object {
+            "type": "Hash256",
+            "value": "0808080808080808080808080808080808080808080808080808080808080808",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "090909090909090909090909090909090909090909090909090909090909090909",
+          },
+          Object {
+            "type": "String",
+            "value": "stringData",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "abc123",
+          },
+          Object {
+            "type": "Boolean",
+            "value": true,
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Object {
+                "type": "Integer",
+                "value": "1000000000",
+              },
+              Object {
+                "type": "Integer",
+                "value": 8,
+              },
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "Integer",
+                  "value": "100000000",
+                },
+                Object {
+                  "type": "Integer",
+                  "value": 8,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "String",
+                  "value": "key",
+                },
+                Object {
+                  "type": "Boolean",
+                  "value": false,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "",
+          },
+        ],
+        "assetIntentOverrides": Object {
+          "inputs": Array [
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+          ],
+          "outputs": Array [
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+          ],
+        },
+        "network": "main",
+        "operation": "deploy",
+        "scriptHash": "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+        "triggerContractVerification": true,
+        "txHashAttributes": Array [
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark14",
+            "type": "String",
+            "value": "6e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457222c226d6574686f64223a226465706c6f79222c22706172616d73223a5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d2c5b22627566666572222c2262353030225d2c5b2261646472657373222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d2c5b2268617368323536222c22307862353030333464393762613863383336373538646531313234623663373764333862633737326162633961386632326338356537333839303134653735323334225d2c5b227075626c69634b6579222c22303230323861393938323665646330633937643138653232623639333233373364393038643332336161376639323635366137376563323665383836313639396566225d2c5b22626f6f6c65616e222c747275655d2c5b226172726179222c5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d5d5d2c5b226d6170222c6e756c6c5d2c5b226f626a656374222c6e756c6c5d2c5b22666f7277617264222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d5d7d",
+          },
+          Object {
+            "txAttrUsage": "Script",
+            "type": "String",
+            "value": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "3130",
+          },
+        ],
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`DapiUserAccountProvider invoke methods invokeRefundAssets 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "args": Array [
+          Object {
+            "type": "Integer",
+            "value": "100000000",
+          },
+          Object {
+            "type": "Integer",
+            "value": 20,
+          },
+          Object {
+            "type": "Hash160",
+            "value": "0707070707070707070707070707070707070707",
+          },
+          Object {
+            "type": "Hash256",
+            "value": "0808080808080808080808080808080808080808080808080808080808080808",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "090909090909090909090909090909090909090909090909090909090909090909",
+          },
+          Object {
+            "type": "String",
+            "value": "stringData",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "abc123",
+          },
+          Object {
+            "type": "Boolean",
+            "value": true,
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Object {
+                "type": "Integer",
+                "value": "1000000000",
+              },
+              Object {
+                "type": "Integer",
+                "value": 8,
+              },
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "Integer",
+                  "value": "100000000",
+                },
+                Object {
+                  "type": "Integer",
+                  "value": 8,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "String",
+                  "value": "key",
+                },
+                Object {
+                  "type": "Boolean",
+                  "value": false,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "",
+          },
+        ],
+        "assetIntentOverrides": Object {
+          "inputs": Array [
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+          ],
+          "outputs": Array [
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+          ],
+        },
+        "network": "main",
+        "operation": "deploy",
+        "scriptHash": "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+        "triggerContractVerification": true,
+        "txHashAttributes": Array [
+          Object {
+            "txAttrUsage": "Remark14",
+            "type": "String",
+            "value": "6e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457222c226d6574686f64223a226465706c6f79222c22706172616d73223a5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d2c5b22627566666572222c2262353030225d2c5b2261646472657373222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d2c5b2268617368323536222c22307862353030333464393762613863383336373538646531313234623663373764333862633737326162633961386632326338356537333839303134653735323334225d2c5b227075626c69634b6579222c22303230323861393938323665646330633937643138653232623639333233373364393038643332336161376639323635366137376563323665383836313639396566225d2c5b22626f6f6c65616e222c747275655d2c5b226172726179222c5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d5d5d2c5b226d6170222c6e756c6c5d2c5b226f626a656374222c6e756c6c5d2c5b22666f7277617264222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d5d7d",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "3130",
+          },
+        ],
+      },
+    ],
+    Array [
+      Object {
+        "args": Array [
+          Object {
+            "type": "Integer",
+            "value": "100000000",
+          },
+          Object {
+            "type": "Integer",
+            "value": 20,
+          },
+          Object {
+            "type": "Hash160",
+            "value": "0707070707070707070707070707070707070707",
+          },
+          Object {
+            "type": "Hash256",
+            "value": "0808080808080808080808080808080808080808080808080808080808080808",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "090909090909090909090909090909090909090909090909090909090909090909",
+          },
+          Object {
+            "type": "String",
+            "value": "stringData",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "abc123",
+          },
+          Object {
+            "type": "Boolean",
+            "value": true,
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Object {
+                "type": "Integer",
+                "value": "1000000000",
+              },
+              Object {
+                "type": "Integer",
+                "value": 8,
+              },
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "Integer",
+                  "value": "100000000",
+                },
+                Object {
+                  "type": "Integer",
+                  "value": 8,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "String",
+                  "value": "key",
+                },
+                Object {
+                  "type": "Boolean",
+                  "value": false,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "",
+          },
+          Object {
+            "type": "Hash160",
+            "value": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+          },
+        ],
+        "assetIntentOverrides": Object {
+          "inputs": Array [
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+          ],
+          "outputs": Array [
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+          ],
+        },
+        "network": "main",
+        "operation": "deploy",
+        "scriptHash": "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+        "triggerContractVerification": true,
+        "txHashAttributes": Array [
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark14",
+            "type": "String",
+            "value": "6e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457222c226d6574686f64223a226465706c6f79222c22706172616d73223a5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d2c5b22627566666572222c2262353030225d2c5b2261646472657373222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d2c5b2268617368323536222c22307862353030333464393762613863383336373538646531313234623663373764333862633737326162633961386632326338356537333839303134653735323334225d2c5b227075626c69634b6579222c22303230323861393938323665646330633937643138653232623639333233373364393038643332336161376639323635366137376563323665383836313639396566225d2c5b22626f6f6c65616e222c747275655d2c5b226172726179222c5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d5d5d2c5b226d6170222c6e756c6c5d2c5b226f626a656374222c6e756c6c5d2c5b22666f7277617264222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d5d7d",
+          },
+          Object {
+            "txAttrUsage": "Script",
+            "type": "String",
+            "value": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "3130",
+          },
+        ],
+      },
+    ],
+    Array [
+      Object {
+        "args": Array [
+          Object {
+            "type": "Integer",
+            "value": "100000000",
+          },
+          Object {
+            "type": "Integer",
+            "value": 20,
+          },
+          Object {
+            "type": "Hash160",
+            "value": "0707070707070707070707070707070707070707",
+          },
+          Object {
+            "type": "Hash256",
+            "value": "0808080808080808080808080808080808080808080808080808080808080808",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "090909090909090909090909090909090909090909090909090909090909090909",
+          },
+          Object {
+            "type": "String",
+            "value": "stringData",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "abc123",
+          },
+          Object {
+            "type": "Boolean",
+            "value": true,
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Object {
+                "type": "Integer",
+                "value": "1000000000",
+              },
+              Object {
+                "type": "Integer",
+                "value": 8,
+              },
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "Integer",
+                  "value": "100000000",
+                },
+                Object {
+                  "type": "Integer",
+                  "value": 8,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "String",
+                  "value": "key",
+                },
+                Object {
+                  "type": "Boolean",
+                  "value": false,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "",
+          },
+        ],
+        "assetIntentOverrides": Object {
+          "inputs": Array [
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+          ],
+          "outputs": Array [
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+          ],
+        },
+        "network": "main",
+        "operation": "deploy",
+        "scriptHash": "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+        "triggerContractVerification": true,
+        "txHashAttributes": Array [
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark14",
+            "type": "String",
+            "value": "6e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457222c226d6574686f64223a226465706c6f79222c22706172616d73223a5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d2c5b22627566666572222c2262353030225d2c5b2261646472657373222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d2c5b2268617368323536222c22307862353030333464393762613863383336373538646531313234623663373764333862633737326162633961386632326338356537333839303134653735323334225d2c5b227075626c69634b6579222c22303230323861393938323665646330633937643138653232623639333233373364393038643332336161376639323635366137376563323665383836313639396566225d2c5b22626f6f6c65616e222c747275655d2c5b226172726179222c5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d5d5d2c5b226d6170222c6e756c6c5d2c5b226f626a656374222c6e756c6c5d2c5b22666f7277617264222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d5d7d",
+          },
+          Object {
+            "txAttrUsage": "Script",
+            "type": "String",
+            "value": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "3130",
+          },
+        ],
+      },
+    ],
+    Array [
+      Object {
+        "args": Array [
+          Object {
+            "type": "Integer",
+            "value": "100000000",
+          },
+          Object {
+            "type": "Integer",
+            "value": 20,
+          },
+          Object {
+            "type": "Hash160",
+            "value": "0707070707070707070707070707070707070707",
+          },
+          Object {
+            "type": "Hash256",
+            "value": "0808080808080808080808080808080808080808080808080808080808080808",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "090909090909090909090909090909090909090909090909090909090909090909",
+          },
+          Object {
+            "type": "String",
+            "value": "stringData",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "abc123",
+          },
+          Object {
+            "type": "Boolean",
+            "value": true,
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Object {
+                "type": "Integer",
+                "value": "1000000000",
+              },
+              Object {
+                "type": "Integer",
+                "value": 8,
+              },
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "Integer",
+                  "value": "100000000",
+                },
+                Object {
+                  "type": "Integer",
+                  "value": 8,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "String",
+                  "value": "key",
+                },
+                Object {
+                  "type": "Boolean",
+                  "value": false,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "",
+          },
+        ],
+        "assetIntentOverrides": Object {
+          "inputs": Array [
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+          ],
+          "outputs": Array [
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+          ],
+        },
+        "network": "main",
+        "operation": "deploy",
+        "scriptHash": "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+        "triggerContractVerification": true,
+        "txHashAttributes": Array [
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark14",
+            "type": "String",
+            "value": "6e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457222c226d6574686f64223a226465706c6f79222c22706172616d73223a5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d2c5b22627566666572222c2262353030225d2c5b2261646472657373222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d2c5b2268617368323536222c22307862353030333464393762613863383336373538646531313234623663373764333862633737326162633961386632326338356537333839303134653735323334225d2c5b227075626c69634b6579222c22303230323861393938323665646330633937643138653232623639333233373364393038643332336161376639323635366137376563323665383836313639396566225d2c5b22626f6f6c65616e222c747275655d2c5b226172726179222c5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d5d5d2c5b226d6170222c6e756c6c5d2c5b226f626a656374222c6e756c6c5d2c5b22666f7277617264222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d5d7d",
+          },
+          Object {
+            "txAttrUsage": "Script",
+            "type": "String",
+            "value": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "3130",
+          },
+        ],
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`DapiUserAccountProvider invoke methods invokeSend 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "args": Array [
+          Object {
+            "type": "Integer",
+            "value": "100000000",
+          },
+          Object {
+            "type": "Integer",
+            "value": 20,
+          },
+          Object {
+            "type": "Hash160",
+            "value": "0707070707070707070707070707070707070707",
+          },
+          Object {
+            "type": "Hash256",
+            "value": "0808080808080808080808080808080808080808080808080808080808080808",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "090909090909090909090909090909090909090909090909090909090909090909",
+          },
+          Object {
+            "type": "String",
+            "value": "stringData",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "abc123",
+          },
+          Object {
+            "type": "Boolean",
+            "value": true,
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Object {
+                "type": "Integer",
+                "value": "1000000000",
+              },
+              Object {
+                "type": "Integer",
+                "value": 8,
+              },
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "Integer",
+                  "value": "100000000",
+                },
+                Object {
+                  "type": "Integer",
+                  "value": 8,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "String",
+                  "value": "key",
+                },
+                Object {
+                  "type": "Boolean",
+                  "value": false,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "",
+          },
+        ],
+        "assetIntentOverrides": Object {
+          "inputs": Array [
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+          ],
+          "outputs": Array [
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+          ],
+        },
+        "network": "main",
+        "operation": "deploy",
+        "scriptHash": "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+        "triggerContractVerification": true,
+        "txHashAttributes": Array [
+          Object {
+            "txAttrUsage": "Remark14",
+            "type": "String",
+            "value": "6e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457222c226d6574686f64223a226465706c6f79222c22706172616d73223a5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d2c5b22627566666572222c2262353030225d2c5b2261646472657373222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d2c5b2268617368323536222c22307862353030333464393762613863383336373538646531313234623663373764333862633737326162633961386632326338356537333839303134653735323334225d2c5b227075626c69634b6579222c22303230323861393938323665646330633937643138653232623639333233373364393038643332336161376639323635366137376563323665383836313639396566225d2c5b22626f6f6c65616e222c747275655d2c5b226172726179222c5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d5d5d2c5b226d6170222c6e756c6c5d2c5b226f626a656374222c6e756c6c5d2c5b22666f7277617264222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d5d7d",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "3130",
+          },
+        ],
+      },
+    ],
+    Array [
+      Object {
+        "args": Array [
+          Object {
+            "type": "Integer",
+            "value": "100000000",
+          },
+          Object {
+            "type": "Integer",
+            "value": 20,
+          },
+          Object {
+            "type": "Hash160",
+            "value": "0707070707070707070707070707070707070707",
+          },
+          Object {
+            "type": "Hash256",
+            "value": "0808080808080808080808080808080808080808080808080808080808080808",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "090909090909090909090909090909090909090909090909090909090909090909",
+          },
+          Object {
+            "type": "String",
+            "value": "stringData",
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "abc123",
+          },
+          Object {
+            "type": "Boolean",
+            "value": true,
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Object {
+                "type": "Integer",
+                "value": "1000000000",
+              },
+              Object {
+                "type": "Integer",
+                "value": 8,
+              },
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "Integer",
+                  "value": "100000000",
+                },
+                Object {
+                  "type": "Integer",
+                  "value": 8,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "Array",
+            "value": Array [
+              Array [
+                Object {
+                  "type": "String",
+                  "value": "key",
+                },
+                Object {
+                  "type": "Boolean",
+                  "value": false,
+                },
+              ],
+            ],
+          },
+          Object {
+            "type": "ByteArray",
+            "value": "",
+          },
+          Object {
+            "type": "Hash160",
+            "value": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+          },
+        ],
+        "assetIntentOverrides": Object {
+          "inputs": Array [
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+            Object {
+              "index": 0,
+              "txid": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+            },
+          ],
+          "outputs": Array [
+            Object {
+              "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+              "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+              "value": "10",
+            },
+          ],
+        },
+        "network": "main",
+        "operation": "deploy",
+        "scriptHash": "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+        "triggerContractVerification": true,
+        "txHashAttributes": Array [
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark14",
+            "type": "String",
+            "value": "6e656f2d6f6e652d696e766f6b653a7b22636f6e7472616374223a22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457222c226d6574686f64223a226465706c6f79222c22706172616d73223a5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d2c5b22627566666572222c2262353030225d2c5b2261646472657373222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d2c5b2268617368323536222c22307862353030333464393762613863383336373538646531313234623663373764333862633737326162633961386632326338356537333839303134653735323334225d2c5b227075626c69634b6579222c22303230323861393938323665646330633937643138653232623639333233373364393038643332336161376639323635366137376563323665383836313639396566225d2c5b22626f6f6c65616e222c747275655d2c5b226172726179222c5b5b22756e646566696e6564222c6e756c6c5d2c5b226269676e756d626572222c223130225d5d5d2c5b226d6170222c6e756c6c5d2c5b226f626a656374222c6e756c6c5d2c5b22666f7277617264222c22414c7137415772684175654e366d4a4e716b3646484a6a6e73456f505279744c6457225d5d7d",
+          },
+          Object {
+            "txAttrUsage": "Script",
+            "type": "String",
+            "value": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "6e656f2d6f6e65",
+          },
+          Object {
+            "txAttrUsage": "Remark15",
+            "type": "String",
+            "value": "3130",
+          },
+        ],
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`DapiUserAccountProvider selectUserAccount - not implemented 1`] = `[Error [NOT_IMPLEMENTED]: selectUserAccount not implemented for this provider.]`;
+
+exports[`DapiUserAccountProvider transfer - nothing to transfer 1`] = `[Error [NOTHING_TO_TRANSFER]: Nothing to transfer.]`;
+
+exports[`DapiUserAccountProvider transfer 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "amount": "10",
+        "asset": "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+        "fee": "0",
+        "fromAddress": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+        "network": "main",
+        "toAddress": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
