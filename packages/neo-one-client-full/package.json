@@ -5,8 +5,7 @@
   "main": "./src/index",
   "dependencies": {
     "@neo-one/client": "^1.2.1",
-    "@neo-one/client-full-core": "^1.1.4",
-    "tslib": "^1.9.3"
+    "@neo-one/client-full-core": "^1.1.4"
   },
   "sideEffects": false
 }

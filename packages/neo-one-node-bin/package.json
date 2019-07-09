@@ -11,9 +11,6 @@
     "@neo-one/node-network": "^1.1.4",
     "@neo-one/node-protocol": "^1.1.4",
     "@neo-one/utils": "^1.1.2",
-    "@types/fs-extra": "^7.0.0",
-    "@types/rc": "^1.0.0",
-    "@types/seamless-immutable": "^7.1.10",
     "chokidar": "^3.0.1",
     "env-paths": "^2.2.0",
     "execa": "^1.0.0",
@@ -27,6 +24,11 @@
     "source-map-support": "^0.5.12",
     "tslib": "^1.9.3",
     "winston": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^7.0.0",
+    "@types/rc": "^1.0.0",
+    "@types/seamless-immutable": "^7.1.10"
   },
   "sideEffects": false
 }

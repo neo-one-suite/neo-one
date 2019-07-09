@@ -7,8 +7,6 @@
     "@neo-one/client-common": "^1.2.1",
     "@neo-one/node-core": "^1.1.4",
     "@neo-one/utils": "^1.1.2",
-    "@types/bn.js": "^4.11.5",
-    "bn.js": "^4.11.8",
     "tslib": "^1.9.3"
   },
   "sideEffects": false

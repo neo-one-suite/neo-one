@@ -4,10 +4,12 @@
   "description": "NEO•ONE TypeScript utils.",
   "main": "./src/index",
   "dependencies": {
-    "@types/lodash": "^4.14.134",
     "lodash": "^4.17.11",
     "source-map": "^0.7.3",
     "typescript": "3.5.2"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.134"
   },
   "sideEffects": false
 }

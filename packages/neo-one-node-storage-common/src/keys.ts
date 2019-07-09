@@ -10,7 +10,6 @@ import {
   ValidatorKey,
 } from '@neo-one/node-core';
 import { utils } from '@neo-one/utils';
-import { BN } from 'bn.js';
 
 const DELIMITER = '\x00';
 const createPrefix = (value: string) => `${value}${DELIMITER}`;
@@ -66,14 +65,12 @@ const getStorageItemKeyMin = ({ hash, prefix }: StorageItemsKey): string =>
     .join('');
 const getStorageItemKeyMax = (key: StorageItemsKey): string => createMax(getStorageItemKeyMin(key));
 
-const serializeUInt64 = (value: BN) => value.toString(10, 8);
-
-const serializeActionKey = ({ index }: ActionKey): string => `${actionKeyPrefix}${serializeUInt64(index)}`;
+const serializeActionKey = ({ index }: ActionKey): string => `${actionKeyPrefix}${index.toString(10, 8)}`;
 const getActionKeyMin = ({ indexStart }: ActionsKey): string =>
-  [actionKeyPrefix, indexStart === undefined ? undefined : serializeUInt64(indexStart)].filter(utils.notNull).join('');
+  [actionKeyPrefix, indexStart === undefined ? undefined : indexStart.toString(10, 8)].filter(utils.notNull).join('');
 const getActionKeyMax = ({ indexStop }: ActionsKey): string =>
   createMax(
-    [actionKeyPrefix, indexStop === undefined ? undefined : serializeUInt64(indexStop)].filter(utils.notNull).join(''),
+    [actionKeyPrefix, indexStop === undefined ? undefined : indexStop.toString(10, 8)].filter(utils.notNull).join(''),
   );
 
 const serializeValidatorKey = ({ publicKey }: ValidatorKey): string =>

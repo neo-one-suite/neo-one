@@ -10,14 +10,16 @@
     "@neo-one/client-common": "^1.2.1",
     "@neo-one/node-vm": "^1.2.0",
     "@neo-one/utils": "^1.1.2",
+    "lodash": "^4.17.11",
+    "source-map": "^0.7.3",
+    "tslib": "^1.9.3"
+  },
+  "devDependencies": {
     "@types/babel__code-frame": "^7.0.1",
     "@types/ledgerhq__hw-transport": "^4.21.1",
     "@types/ledgerhq__hw-transport-node-hid": "^4.22.1",
     "@types/ledgerhq__hw-transport-u2f": "^4.21.1",
-    "@types/lodash": "^4.14.134",
-    "lodash": "^4.17.11",
-    "source-map": "^0.7.3",
-    "tslib": "^1.9.3"
+    "@types/lodash": "^4.14.134"
   },
   "optionalDependencies": {
     "@ledgerhq/hw-transport-node-hid": "4.64.0"
