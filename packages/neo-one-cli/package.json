@@ -30,9 +30,9 @@
     "winston": "^3.1.0"
   },
   "devDependencies": {
-    "@types/cli-table2": "^0.2.2",
-    "@types/fs-extra": "^7.0.0",
-    "@types/inquirer": "^6.0.3"
+    "@types/cli-table2": "0.2.2",
+    "@types/fs-extra": "7.0.0",
+    "@types/inquirer": "6.0.3"
   },
   "sideEffects": false
 }

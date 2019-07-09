@@ -15,11 +15,11 @@
     "tslib": "^1.9.3"
   },
   "devDependencies": {
-    "@types/babel__code-frame": "^7.0.1",
-    "@types/ledgerhq__hw-transport": "^4.21.1",
-    "@types/ledgerhq__hw-transport-node-hid": "^4.22.1",
-    "@types/ledgerhq__hw-transport-u2f": "^4.21.1",
-    "@types/lodash": "^4.14.134"
+    "@types/babel__code-frame": "7.0.1",
+    "@types/ledgerhq__hw-transport": "4.21.1",
+    "@types/ledgerhq__hw-transport-node-hid": "4.22.1",
+    "@types/ledgerhq__hw-transport-u2f": "4.21.1",
+    "@types/lodash": "4.14.134"
   },
   "optionalDependencies": {
     "@ledgerhq/hw-transport-node-hid": "4.64.0"

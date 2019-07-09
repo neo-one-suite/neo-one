@@ -14,8 +14,8 @@
     "tslib": "^1.9.3"
   },
   "devDependencies": {
-    "@types/koa-convert": "^1.2.2",
-    "@types/koa-cors": "^0.0.0"
+    "@types/koa-convert": "1.2.2",
+    "@types/koa-cors": "0.0.0"
   },
   "sideEffects": false
 }
