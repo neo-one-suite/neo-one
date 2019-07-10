@@ -303,7 +303,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
         })
         .log({
           name: 'tcp_server_connect',
-          level: 'verbose',
+          level: 'debug',
           message: `Received socket connection from ${remoteAddress === undefined ? 'unknown' : remoteAddress}`,
         });
 
@@ -421,7 +421,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
             .log({
               name: 'neo_network_unhealthy_peer',
               message: `Peer at ${peer.endpoint} is unhealthy.`,
-              level: 'verbose',
+              level: 'debug',
             });
 
           this.blacklistAndClose(peer);
@@ -489,12 +489,12 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
           {
             name: 'neo_network_peer_connect',
             message: `Connecting to peer at ${endpoint}`,
-            level: 'debug',
+            level: 'trace',
             metric: NEO_NETWORK_PEER_CONNECT_TOTAL,
             error: {
               message: `Failed to connect to peer at ${endpoint}.`,
               metric: NEO_NETWORK_PEER_CONNECT_FAILURES_TOTAL,
-              level: 'debug',
+              level: 'trace',
             },
           },
         );
@@ -573,7 +573,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       })
       .log({
         name: 'neo_network_peer_error',
-        level: 'debug',
+        level: 'trace',
         message: `Encountered error with peer at ${peer.endpoint}.`,
         error,
       });
@@ -609,7 +609,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       .log({
         name: 'neo_network_peer_closed',
         message: `Peer closed at ${peer.endpoint}`,
-        level: 'verbose',
+        level: 'debug',
         metric: NEO_NETWORK_PEER_CLOSED_TOTAL,
       });
 

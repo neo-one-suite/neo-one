@@ -11,8 +11,6 @@ export interface ServerConfig {
   };
   readonly log: {
     readonly level: string;
-    readonly maxSize: number;
-    readonly maxFiles: number;
   };
   readonly ports: {
     readonly min: number;
@@ -44,8 +42,6 @@ export const createServerConfig = ({
       },
       log: {
         level: 'info',
-        maxSize: 10 * 1024 * 1024,
-        maxFiles: 5,
       },
       ports: {
         min: minPort === undefined ? 40200 : minPort,
@@ -83,11 +79,9 @@ export const createServerConfig = ({
         },
         log: {
           type: 'object',
-          required: ['level', 'maxSize', 'maxFiles'],
+          required: ['level'],
           properties: {
             level: { type: 'string' },
-            maxSize: { type: 'number' },
-            maxFiles: { type: 'number' },
           },
         },
         ports: {

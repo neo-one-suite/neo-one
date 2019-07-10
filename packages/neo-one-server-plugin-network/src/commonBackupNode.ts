@@ -80,8 +80,6 @@ export const processArgs = async (
         name: 'node',
         path: logPath,
         level: config.level,
-        maxSize: config.maxSize,
-        maxFiles: config.maxFiles,
       })),
     )
     .subscribe(logConfig$);

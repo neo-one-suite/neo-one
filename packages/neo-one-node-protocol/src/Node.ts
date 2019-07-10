@@ -317,7 +317,7 @@ export class Node implements INode {
       this.monitor.log({
         name: 'neo_protocol_start',
         message: 'Protocol started.',
-        level: 'verbose',
+        level: 'debug',
       });
     }).pipe(
       neverComplete(),
@@ -326,7 +326,7 @@ export class Node implements INode {
         this.monitor.log({
           name: 'neo_protocol_stop',
           message: 'Protocol stopped.',
-          level: 'verbose',
+          level: 'debug',
         });
       }),
     );
@@ -441,7 +441,7 @@ export class Node implements INode {
             },
             {
               name: 'neo_relay_transaction',
-              level: { log: 'verbose', span: 'info' },
+              level: { log: 'debug', span: 'info' },
               trace: true,
             },
           );
@@ -825,7 +825,7 @@ export class Node implements INode {
         },
         {
           name: 'neo_protocol_message_received',
-          level: 'debug',
+          level: 'trace',
           message: `Received ${message.value.command} from ${peer.endpoint}`,
           metric: NEO_PROTOCOL_MESSAGES_RECEIVED_TOTAL,
           error: {

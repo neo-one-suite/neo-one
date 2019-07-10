@@ -751,7 +751,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
     /* istanbul ignore next */
     return monitor.at('neo_one_data_provider').captureSpanLog(func, {
       name,
-      level: { log: 'verbose', span: 'info' },
+      level: { log: 'debug', span: 'info' },
       trace: true,
     });
   }

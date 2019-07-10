@@ -39,7 +39,7 @@ export interface Labels {
   - Force metrics and spans to be logged by using metricLevel and spanLevel
     respectively at verbose or higher.
 */
-export type LogLevel = 'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'silly';
+export type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent';
 export type LogLevelOption =
   | LogLevel
   | {

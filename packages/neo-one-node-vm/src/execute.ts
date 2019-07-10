@@ -233,8 +233,8 @@ export const executeScript = async ({
 
   return monitor.captureSpanLog(async (span) => run({ monitor: span, context }), {
     name: 'neo_execute_script',
-    level: { log: 'debug', span: 'debug' },
-    error: { level: 'debug' },
+    level: { log: 'trace', span: 'trace' },
+    error: { level: 'trace' },
   });
 };
 
@@ -291,7 +291,7 @@ export const execute = async ({
   let errorMessage;
   const span = monitor.startSpan({
     name: 'neo_execute_scripts',
-    level: 'debug',
+    level: 'trace',
   });
 
   let err;

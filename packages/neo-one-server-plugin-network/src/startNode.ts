@@ -23,8 +23,6 @@ export const startNode = ({ vorpal, monitor, shutdown, mutableShutdownFuncs, log
             name: 'node',
             path: logPath,
             level: config.level,
-            maxSize: config.maxSize,
-            maxFiles: config.maxFiles,
           })),
         )
         .subscribe(logConfig$);

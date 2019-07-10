@@ -22,7 +22,7 @@ describe('BrowserMonitor', () => {
   (error as any).code = 'red';
   const options2: LoggerLogOptions = {
     name: 'log2',
-    level: 'silly',
+    level: 'trace',
     message: 'test2',
     labels: { label2: 30 },
     data: { data1: '40' },

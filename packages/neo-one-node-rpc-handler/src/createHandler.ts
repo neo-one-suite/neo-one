@@ -174,7 +174,7 @@ const createJSONRPCHandler = (handlers: Handlers) => {
           error: SINGLE_REQUEST_ERRORS_COUNTER,
         },
 
-        level: { log: 'verbose', span: 'info' },
+        level: { log: 'debug', span: 'info' },
       },
     );
 
@@ -191,7 +191,7 @@ const createJSONRPCHandler = (handlers: Handlers) => {
       // tslint:disable-next-line prefer-immediate-return
       const result = await monitor.captureSpanLog(async (span) => handleRequest(span, request), {
         name: 'jsonrpc_server_request',
-        level: { log: 'verbose', span: 'info' },
+        level: { log: 'debug', span: 'info' },
         error: {},
       });
 

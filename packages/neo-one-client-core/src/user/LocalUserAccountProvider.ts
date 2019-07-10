@@ -1560,7 +1560,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       .captureSpanLog(func, {
         name,
         metric,
-        level: { log: 'verbose', span: 'info' },
+        level: { log: 'debug', span: 'info' },
         trace: true,
       });
   }

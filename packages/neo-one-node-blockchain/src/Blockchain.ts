@@ -539,7 +539,7 @@ export class Blockchain {
   ): Promise<readonly ECPoint[]> =>
     this.getMonitor(monitor).captureSpanLog(async () => getValidators(this, transactions), {
       name: 'neo_blockchain_get_validators',
-      level: { log: 'verbose', span: 'info' },
+      level: { log: 'debug', span: 'info' },
     });
 
   public readonly calculateClaimAmount = async (claims: readonly Input[], monitor?: Monitor): Promise<BN> =>
@@ -593,7 +593,7 @@ export class Blockchain {
       },
       {
         name: 'neo_blockchain_calculate_claim_amount',
-        level: { log: 'verbose', span: 'info' },
+        level: { log: 'debug', span: 'info' },
       },
     );
 
@@ -614,7 +614,7 @@ export class Blockchain {
           .withData({ [labels.NEO_BLOCK_INDEX]: entry.block.index })
           .captureSpanLog(async (span) => this.persistBlockInternal(span, entryNonNull.block, entryNonNull.unsafe), {
             name: 'neo_blockchain_persist_block_top_level',
-            level: { log: 'verbose', span: 'info' },
+            level: { log: 'debug', span: 'info' },
             metric: {
               total: NEO_BLOCKCHAIN_PERSIST_BLOCK_DURATION_SECONDS,
               error: NEO_BLOCKCHAIN_PERSIST_BLOCK_FAILURES_TOTAL,

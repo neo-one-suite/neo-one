@@ -22,7 +22,7 @@ export const context = ({ monitor }: { readonly monitor: Monitor }) =>
           },
           {
             name: 'grpc_server_request',
-            level: { log: 'verbose', span: 'info' },
+            level: { log: 'debug', span: 'info' },
             trace: true,
           },
         );

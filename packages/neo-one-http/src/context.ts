@@ -43,7 +43,7 @@ export const context = ({ monitor }: { readonly monitor: Monitor }) => async (
     },
     {
       name: 'http_server_request',
-      level: { log: 'verbose', span: 'info' },
+      level: { log: 'debug', span: 'info' },
       metric: {
         total: REQUESTS_HISTOGRAM,
         error: REQUEST_ERRORS_COUNTER,

@@ -110,7 +110,7 @@ export const rpc = ({ server }: { readonly server: Server }) => {
           error: SINGLE_REQUEST_ERRORS_COUNTER,
         },
 
-        level: { log: 'verbose', span: 'info' },
+        level: { log: 'debug', span: 'info' },
       },
     );
 
@@ -127,7 +127,7 @@ export const rpc = ({ server }: { readonly server: Server }) => {
       // tslint:disable-next-line prefer-immediate-return
       const result = await monitor.captureSpanLog(async (span) => handleRequest(span, request), {
         name: 'http_rpc_server_request',
-        level: { log: 'verbose', span: 'info' },
+        level: { log: 'debug', span: 'info' },
         error: {},
       });
 

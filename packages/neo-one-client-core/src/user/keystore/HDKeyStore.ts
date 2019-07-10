@@ -207,7 +207,7 @@ export class HDKeyStore<Identifier> implements KeyStore {
 
     return monitor.at('hd_key_store').captureSpanLog(func, {
       name,
-      level: { log: 'verbose', span: 'info' },
+      level: { log: 'debug', span: 'info' },
       trace: true,
     });
   }

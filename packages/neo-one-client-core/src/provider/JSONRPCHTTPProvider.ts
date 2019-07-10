@@ -89,7 +89,7 @@ const instrumentFetch = async <T extends { readonly status: number }>(
       },
       {
         name: 'http_client_request',
-        level: { log: 'verbose', span: 'info' },
+        level: { log: 'debug', span: 'info' },
         references: monitors.slice(1).map((parent) => monitor.childOf(parent)),
         trace: true,
       },
@@ -283,8 +283,8 @@ export class JSONRPCHTTPProvider extends JSONRPCProvider {
         })
         .captureSpanLog(async (span) => this.requestInternal(req, span), {
           name: 'jsonrpc_client_request',
-          level: { log: 'verbose', span: 'info' },
-          error: { level: 'verbose' },
+          level: { log: 'debug', span: 'info' },
+          error: { level: 'debug' },
           trace: true,
         });
     }

@@ -230,8 +230,6 @@ export class InteractiveCLI {
             name: 'interactiveCLI',
             path: logPath,
             level: config.level,
-            maxSize: config.maxSize,
-            maxFiles: config.maxFiles,
           };
         }),
       )

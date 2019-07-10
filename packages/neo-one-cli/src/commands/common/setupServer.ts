@@ -28,8 +28,6 @@ export const setupServer = (
         name,
         path,
         level: config.level,
-        maxSize: config.maxSize,
-        maxFiles: config.maxFiles,
       })),
     )
     .subscribe(logConfig$);

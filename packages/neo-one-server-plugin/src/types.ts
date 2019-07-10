@@ -163,8 +163,6 @@ export interface LogConfig {
   readonly name: string;
   readonly path: string;
   readonly level: string;
-  readonly maxSize: number;
-  readonly maxFiles: number;
 }
 
 export interface CLIArgs {

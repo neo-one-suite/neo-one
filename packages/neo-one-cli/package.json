@@ -13,6 +13,7 @@
     "@neo-one/server-plugin-project": "^1.3.0",
     "@neo-one/server-plugin-wallet": "^1.1.4",
     "@neo-one/utils": "^1.1.2",
+    "@types/pino": "^5.8.8",
     "@types/vorpal": "^1.11.0",
     "cli-table2": "^0.2.0",
     "env-paths": "^2.2.0",
@@ -22,12 +23,12 @@
     "inquirer": "^6.2.2",
     "log-update": "^3.2.0",
     "ora": "^3.4.0",
+    "pino": "^5.12.6",
     "rxjs": "^6.5.2",
     "semver": "^6.0.0",
     "source-map-support": "^0.5.12",
     "tslib": "^1.9.3",
-    "vorpal": "^1.12.0",
-    "winston": "^3.1.0"
+    "vorpal": "^1.12.0"
   },
   "devDependencies": {
     "@types/cli-table2": "0.2.2",

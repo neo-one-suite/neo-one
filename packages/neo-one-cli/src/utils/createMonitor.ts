@@ -2,8 +2,18 @@ import { DefaultMonitor, Monitor } from '@neo-one/monitor';
 import { LogConfig } from '@neo-one/server-plugin';
 import * as fs from 'fs-extra';
 import * as path from 'path';
+// tslint:disable-next-line: match-default-export-name
+import pino from 'pino';
 import { Subject } from 'rxjs';
-import { createLogger, format, transports } from 'winston';
+
+const getFileStream = (filePath: string) => {
+  fs.ensureDirSync(path.dirname(filePath));
+  if (process.env.NODE_ENV === 'production') {
+    return pino.extreme(filePath);
+  }
+
+  return pino.destination(filePath);
+};
 
 export const createMonitor = ({
   logConsole,
@@ -16,40 +26,38 @@ export const createMonitor = ({
   readonly monitor: Monitor;
   readonly cleanup: () => void;
 } => {
-  const formats = format.combine(format.timestamp(), format.json());
-  const logger = createLogger({
-    transports:
-      logConsole || debug
-        ? [
-            new transports.Console({
-              level: 'silly',
-              format: formats,
-            }),
-          ]
-        : [],
-  });
+  const initLevel = logConsole || debug ? 'trace' : 'silent';
+  let mutableLoggers: { readonly [k in string]: pino.Logger } = {
+    cli: pino({ level: initLevel, useLevelLabels: true }),
+  };
 
-  logger.on('error', (error) => {
-    // tslint:disable-next-line no-console
-    console.error(error);
-  });
+  let currentLogger: string;
   const monitor = DefaultMonitor.create({
     service: 'cli',
     logger: {
       log: (logMessage) => {
-        const { error, ...rest } = logMessage;
+        const { error, level, data, ...rest } = logMessage;
+        let message: typeof rest & { data?: typeof data; stack?: string | undefined } = { ...rest };
 
-        let message: typeof rest & { stack?: string | undefined } = { ...rest };
         if (error !== undefined) {
           message = {
             ...message,
             stack: error.stack,
           };
         }
+        if (data !== undefined && Object.entries(data).length > 0) {
+          message = {
+            ...message,
+            data,
+          };
+        }
+        const serviceLogger = mutableLoggers[currentLogger];
 
-        if (logger.transports.length > 0) {
-          // tslint:disable-next-line no-any
-          logger.log(message as any);
+        try {
+          mutableLoggers.cli[level](message);
+          serviceLogger[level](message);
+        } catch {
+          // do nothing
         }
       },
       close: (callback) => {
@@ -60,18 +68,8 @@ export const createMonitor = ({
             callback();
           }
         };
-        const numFlushes = logger.transports.length;
-        let numFlushed = 0;
-        logger.transports.forEach((transport) => {
-          transport.once('finish', () => {
-            numFlushed += 1;
-            if (numFlushes === numFlushed) {
-              setTimeout(doExit, 30);
-            }
-          });
 
-          transport.end();
-        });
+        Object.values(mutableLoggers).forEach((logger) => logger.flush());
 
         // Force an exit
         setTimeout(doExit, 250);
@@ -81,36 +79,31 @@ export const createMonitor = ({
 
   const config$ = new Subject<LogConfig>();
   const subscription = config$.subscribe({
-    next: ({ name, path: logPath, level, maxSize, maxFiles }) => {
+    next: ({ name, path: logPath, level: logLevel }) => {
       const filename = path.resolve(logPath, name, `${name}.log`);
-      fs.ensureDir(path.dirname(filename))
-        .then(() => {
-          logger.clear().add(
-            new transports.File({
-              format: formats,
-              filename,
-              level,
-              maxsize: maxSize,
-              maxFiles,
-            }),
-          );
-
-          if (debug) {
-            logger.add(
-              new transports.Console({
-                level: 'silly',
-                format: formats,
-              }),
-            );
-          }
-        })
-        .catch((error) => {
+      const maybeLogger = mutableLoggers[name];
+      // tslint:disable-next-line: strict-type-predicates
+      if (maybeLogger === undefined) {
+        try {
+          const level = debug ? 'trace' : logLevel;
+          mutableLoggers = {
+            ...mutableLoggers,
+            [name]: logPath
+              ? pino({ level, useLevelLabels: true }, getFileStream(filename))
+              : pino({ level, useLevelLabels: true }),
+          };
+        } catch (error) {
           monitor.logError({
             name: 'log_create_directory_error',
             message: 'Failed to create log directory',
             error,
           });
-        });
+        }
+      } else {
+        // tslint:disable-next-line: no-object-mutation
+        maybeLogger.level = logLevel;
+      }
+      currentLogger = name;
     },
   });
 

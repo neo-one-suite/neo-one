@@ -54,7 +54,7 @@ const fetchCount = async (monitor: Monitor, endpoint: string, timeoutMS: number)
       },
       {
         name: 'neo_rpc_check_ready_client_request',
-        level: { log: 'debug', span: 'debug' },
+        level: { log: 'trace', span: 'trace' },
         trace: true,
       },
     )

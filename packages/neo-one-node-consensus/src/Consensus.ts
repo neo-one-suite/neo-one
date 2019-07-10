@@ -164,7 +164,7 @@ export class Consensus {
     this.monitor.log({
       name: 'neo_consensus_start',
       message: 'Consensus started.',
-      level: 'verbose',
+      level: 'debug',
     });
 
     const initialResult = await initializeNewConsensus({
@@ -230,7 +230,7 @@ export class Consensus {
     this.monitor.log({
       name: 'neo_consensus_stop',
       message: 'Consensus stopped.',
-      level: 'verbose',
+      level: 'debug',
     });
   }
 

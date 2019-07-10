@@ -4,8 +4,6 @@ export interface ClientConfig {
   readonly paths: Paths;
   readonly log: {
     readonly level: string;
-    readonly maxSize: number;
-    readonly maxFiles: number;
   };
 }
 
@@ -17,8 +15,6 @@ export const createClientConfig = ({ paths }: { readonly paths: Paths }): Config
       paths,
       log: {
         level: 'info',
-        maxSize: 10 * 1024 * 1024,
-        maxFiles: 5,
       },
     },
     schema: {
@@ -38,11 +34,9 @@ export const createClientConfig = ({ paths }: { readonly paths: Paths }): Config
         },
         log: {
           type: 'object',
-          required: ['level', 'maxSize', 'maxFiles'],
+          required: ['level'],
           properties: {
             level: { type: 'string' },
-            maxSize: { type: 'number' },
-            maxFiles: { type: 'number' },
           },
         },
       },

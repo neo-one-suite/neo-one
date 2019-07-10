@@ -299,7 +299,8 @@ export class MonitorBase implements Span {
       })
       .filter(utils.notNull);
     if (
-      LogLevelToLevel[fullLevel.span] <= LogLevelToLevel[this.spanLogLevel] &&
+      // tslint:disable-next-line: no-any
+      LogLevelToLevel[fullLevel.span as any] <= LogLevelToLevel[this.spanLogLevel as any] &&
       (trace !== undefined || tracerReferences.length > 0)
     ) {
       span = this.tracer.startSpan(name, {
@@ -576,7 +577,11 @@ export class MonitorBase implements Span {
 
     if (this.span !== undefined) {
       const { span: tracerSpan } = this.span;
-      if (LogLevelToLevel[fullLevel.span] <= LogLevelToLevel[this.spanLogLevel] && tracerSpan !== undefined) {
+      if (
+        // tslint:disable-next-line: no-any
+        LogLevelToLevel[fullLevel.span as any] <= LogLevelToLevel[this.spanLogLevel as any] &&
+        tracerSpan !== undefined
+      ) {
         // tslint:disable-next-line no-any
         let spanLog: { [key: string]: any } = {
           event: name,

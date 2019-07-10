@@ -14,8 +14,6 @@ import { NodeAdapter, NodeStatus } from './NodeAdapter';
 export interface NodeConfig {
   readonly log: {
     readonly level: string;
-    readonly maxSize: number;
-    readonly maxFiles: number;
   };
 
   readonly settings: {
@@ -57,8 +55,6 @@ const DEFAULT_SEEDS: readonly EndpointConfig[] = [
 const makeDefaultConfig = (dataPath: string): NodeConfig => ({
   log: {
     level: 'info',
-    maxSize: 10 * 1024 * 1024,
-    maxFiles: 5,
   },
   settings: {
     test: false,
@@ -119,11 +115,9 @@ export const createNodeConfig = ({
       properties: {
         log: {
           type: 'object',
-          required: ['level', 'maxSize', 'maxFiles'],
+          required: ['level'],
           properties: {
             level: { type: 'string' },
-            maxSize: { type: 'number' },
-            maxFiles: { type: 'number' },
           },
         },
         settings: {
@@ -419,8 +413,6 @@ export class NEOONENodeAdapter extends NodeAdapter {
     return {
       log: {
         level: 'info',
-        maxSize: 10 * 1024 * 1024,
-        maxFiles: 5,
       },
       settings: {
         test: settings.isTestNet,

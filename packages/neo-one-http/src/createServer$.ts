@@ -74,7 +74,7 @@ async function handleServer<T extends http.Server | https.Server, TOptions exten
         .log({
           name: 'server_listen',
           message: `Server listening on ${host}:${port}`,
-          level: 'verbose',
+          level: 'debug',
         });
     }
   }

@@ -1,45 +1,35 @@
 import { DefaultMonitor, LogLevel, Monitor } from '@neo-one/monitor';
-import { createLogger, format, transports } from 'winston';
+// tslint:disable-next-line: match-default-export-name
+import pino from 'pino';
 
 export interface MonitorEnvironment {
   readonly level: LogLevel;
 }
 
-const DEFAULT_FORMATS = format.combine(format.timestamp(), format.json());
-
 export const createMonitor = ({ level }: MonitorEnvironment): Monitor => {
-  const logger = createLogger({
-    transports: [
-      new transports.Console({
-        level,
-        format: DEFAULT_FORMATS,
-      }),
-    ],
-  });
-
-  logger.on('error', (error) => {
-    // tslint:disable-next-line:no-console
-    console.error(error);
-  });
+  const logger = pino({ level, useLevelLabels: true });
 
   return DefaultMonitor.create({
     service: 'node',
     logger: {
       log: (logMessage) => {
-        const { error, ...rest } = logMessage;
+        const { error, level: logLevel, data, ...rest } = logMessage;
+        let message: typeof rest & { data?: typeof data; stack?: string | undefined } = { ...rest };
 
-        let message: typeof rest & { stack?: string | undefined } = { ...rest };
         if (error !== undefined) {
           message = {
             ...message,
             stack: error.stack,
           };
         }
-
-        if (logger.transports.length > 0) {
-          // tslint:disable-next-line no-any
-          logger.log(message as any);
+        if (data !== undefined && Object.entries(data).length > 0) {
+          message = {
+            ...message,
+            data,
+          };
         }
+
+        logger[logLevel](message);
       },
       close: (callback) => {
         let exited = false;
@@ -49,18 +39,7 @@ export const createMonitor = ({ level }: MonitorEnvironment): Monitor => {
             callback();
           }
         };
-        const numFlushes = logger.transports.length;
-        let numFlushed = 0;
-        logger.transports.forEach((transport) => {
-          transport.once('finish', () => {
-            numFlushed += 1;
-            if (numFlushes === numFlushed) {
-              setTimeout(doExit, 30);
-            }
-          });
-
-          transport.end();
-        });
+        logger.flush();
 
         // Force an exit
         setTimeout(doExit, 250);
