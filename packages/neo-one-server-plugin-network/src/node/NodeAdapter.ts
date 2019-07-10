@@ -1,9 +1,11 @@
-import { Monitor } from '@neo-one/monitor';
+import { serverLogger } from '@neo-one/logger';
 import { Binary, DescribeTable } from '@neo-one/server-plugin';
-import { labels, utils } from '@neo-one/utils';
+import { Labels, utils } from '@neo-one/utils';
 import { concat, Observable, of as _of, timer } from 'rxjs';
 import { concatMap, shareReplay } from 'rxjs/operators';
 import { NodeSettings } from '../types';
+
+const logger = serverLogger.child({ component: 'node_adapter' });
 
 export interface Node {
   readonly name: string;
@@ -25,23 +27,19 @@ export abstract class NodeAdapter {
   public readonly node$: Observable<Node>;
   protected readonly binary: Binary;
   protected readonly dataPath: string;
-  protected readonly monitor: Monitor;
   protected mutableSettings: NodeSettings;
 
   public constructor({
-    monitor,
     name,
     binary,
     dataPath,
     settings,
   }: {
-    readonly monitor: Monitor;
     readonly name: string;
     readonly binary: Binary;
     readonly dataPath: string;
     readonly settings: NodeSettings;
   }) {
-    this.monitor = monitor;
     this.name = name;
     this.binary = binary;
     this.dataPath = dataPath;
@@ -119,51 +117,48 @@ export abstract class NodeAdapter {
   }
 
   public async create(): Promise<void> {
-    await this.monitor.withData({ [labels.NODE_NAME]: this.name }).captureLog(async () => this.createInternal(), {
-      name: 'neo_node_adapter_create',
-      message: `Created node ${this.name}`,
-      error: `Failed to create node ${this.name}`,
-    });
+    const logData = { title: 'neo_node_adapter_create', [Labels.NODE_NAME]: this.name };
+    try {
+      await this.createInternal();
+      logger.info(logData, `Created node ${this.name}`);
+    } catch (error) {
+      logger.error({ ...logData, error }, `Failed to create node ${this.name}`);
+      throw error;
+    }
   }
 
   public async update(settings: NodeSettings): Promise<void> {
-    await this.monitor.withData({ [labels.NODE_NAME]: this.name }).captureLog(
-      async () => {
-        await this.updateInternal(settings);
-        this.mutableSettings = settings;
-      },
-      {
-        name: 'neo_node_adapter_update',
-        message: `Updated node ${this.name}`,
-        error: `Failed to update node ${this.name}`,
-      },
-    );
+    const logData = { title: 'neo_node_adapter_update', [Labels.NODE_NAME]: this.name };
+    try {
+      await this.updateInternal(settings);
+      this.mutableSettings = settings;
+      logger.info(logData, `Updated node ${this.name}`);
+    } catch (error) {
+      logger.error({ ...logData, error }, `Failed to update node ${this.name}`);
+      throw error;
+    }
   }
 
   public async start(): Promise<void> {
-    await this.monitor.withData({ [labels.NODE_NAME]: this.name }).captureLog(
-      async () => {
-        await this.startInternal();
-      },
-      {
-        name: 'neo_node_adapter_start',
-        message: `Started node ${this.name}`,
-        error: `Failed to start node ${this.name}`,
-      },
-    );
+    const logData = { title: 'neo_node_adapter_start', [Labels.NODE_NAME]: this.name };
+    try {
+      await this.startInternal();
+      logger.info(logData, `Started node ${this.name}`);
+    } catch (error) {
+      logger.error({ ...logData, error: error.message }, `Failed to start node ${this.name}`);
+      throw error;
+    }
   }
 
   public async stop(): Promise<void> {
-    await this.monitor.withData({ [labels.NODE_NAME]: this.name }).captureLog(
-      async () => {
-        await this.stopInternal();
-      },
-      {
-        name: 'neo_node_adapter_stop',
-        message: `Stopped node ${this.name}`,
-        error: `Failed to stop node ${this.name}`,
-      },
-    );
+    const logData = { title: 'neo_node_adapter_stop', [Labels.NODE_NAME]: this.name };
+    try {
+      await this.stopInternal();
+      logger.info(logData, `Stopped node ${this.name}`);
+    } catch (error) {
+      logger.error({ ...logData, error: error.message }, `Failed to stop node ${this.name}`);
+      throw error;
+    }
   }
 
   public abstract getNodeStatus(): NodeStatus;

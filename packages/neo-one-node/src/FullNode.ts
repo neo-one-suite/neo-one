@@ -81,9 +81,9 @@ export class FullNode {
     }
 
     if (this.mutableSubscription !== undefined) {
+      await finalize.wait();
       this.mutableSubscription.unsubscribe();
       this.mutableSubscription = undefined;
-      await finalize.wait();
     }
 
     if (halted) {
@@ -101,7 +101,6 @@ export class FullNode {
     }
 
     await backup({
-      monitor: this.options.monitor,
       environment: this.getBackupEnvironment(),
       options,
     });
@@ -113,7 +112,6 @@ export class FullNode {
     }
 
     await restore({
-      monitor: this.options.monitor,
       environment: this.getBackupEnvironment(),
       options,
     });

@@ -1,6 +1,6 @@
-import { Monitor } from '@neo-one/monitor';
+import { Logger } from '@neo-one/logger';
 import { Plugin } from '@neo-one/server-plugin';
-import { labels } from '@neo-one/utils';
+import { Labels } from '@neo-one/utils';
 
 const DEFAULT_PLUGINS: readonly string[] = [
   '@neo-one/server-plugin-network',
@@ -9,19 +9,18 @@ const DEFAULT_PLUGINS: readonly string[] = [
   '@neo-one/server-plugin-neotracker',
 ];
 
-const getPlugin = ({ monitor, pluginName }: { readonly monitor: Monitor; readonly pluginName: string }): Plugin => {
+const getPlugin = ({ logger, pluginName }: { readonly logger: Logger; readonly pluginName: string }): Plugin => {
   try {
     const module = require(pluginName);
     // tslint:disable-next-line variable-name
     const PluginClass = module.default === undefined ? module : module.default;
 
-    return new PluginClass({ monitor });
+    return new PluginClass({ logger });
   } catch (error) {
-    monitor.withLabels({ [labels.PLUGIN_NAME]: pluginName }).logError({
-      name: 'neo_load_plugin_error',
-      message: `Failed to load plugin: ${pluginName}`,
-      error,
-    });
+    logger.error(
+      { [Labels.PLUGIN_NAME]: pluginName, title: 'neo_load_plugin_error', error },
+      `Failed to load plugin: ${pluginName}`,
+    );
 
     throw error;
   }

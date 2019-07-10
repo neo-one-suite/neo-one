@@ -1,5 +1,4 @@
 import { Account, AddressString, NetworkType, publicKeyToAddress } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import _ from 'lodash';
 import { InvalidMasterPathError } from '../../errors';
 import { HDAccount, HDHandler } from './HDKeyStore';
@@ -19,10 +18,10 @@ interface ScanInterface {
 
 export class LocalHDHandler implements HDHandler<LocalPath> {
   private readonly store: HDLocalStore;
-  private readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
+  private readonly getAccount: (network: NetworkType, address: AddressString) => Promise<Account>;
 
   public constructor(
-    getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>,
+    getAccount: (network: NetworkType, address: AddressString) => Promise<Account>,
     store: HDLocalStore,
   ) {
     this.getAccount = getAccount;

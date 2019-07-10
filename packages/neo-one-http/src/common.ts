@@ -1,13 +1,13 @@
-import { Monitor } from '@neo-one/monitor';
+import { Logger } from '@neo-one/logger';
 import { Context } from 'koa';
 
-// tslint:disable-next-line export-name
-export const getMonitor = (ctx: Context): Monitor => {
-  const { monitor } = ctx.state;
-  if (monitor === undefined) {
+// tslint:disable-next-line: export-name
+export const getLogger = (ctx: Context): Logger => {
+  const { logger } = ctx.state;
+  if (logger === undefined) {
     ctx.throw(500);
     throw new Error('For TS');
   }
 
-  return monitor;
+  return logger;
 };

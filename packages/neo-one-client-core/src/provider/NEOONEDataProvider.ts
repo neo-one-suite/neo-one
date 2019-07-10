@@ -54,13 +54,13 @@ import {
   VerifyTransactionResult,
   VerifyTransactionResultJSON,
 } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
 import { flatten } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatten';
 import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
 import BigNumber from 'bignumber.js';
+import debug from 'debug';
 import _ from 'lodash';
 import { AsyncBlockIterator } from '../AsyncBlockIterator';
 import { clientUtils } from '../clientUtils';
@@ -69,6 +69,8 @@ import { convertAction, convertCallReceipt, convertInvocationResult } from './co
 import { JSONRPCClient } from './JSONRPCClient';
 import { JSONRPCHTTPProvider } from './JSONRPCHTTPProvider';
 import { JSONRPCProvider, JSONRPCProviderManager } from './JSONRPCProvider';
+
+const logger = debug('NEOONE:DataProvider');
 
 export interface NEOONEDataProviderOptions {
   readonly network: NetworkType;
@@ -99,68 +101,58 @@ export class NEOONEDataProvider implements DeveloperProvider {
 
   public async getUnclaimed(
     address: AddressString,
-    monitor?: Monitor,
   ): Promise<{ readonly unclaimed: readonly Input[]; readonly amount: BigNumber }> {
-    return this.capture(
-      async (span) => {
-        const account = await this.getAccountInternal(address, span);
-        const amounts = await Promise.all(
-          account.unclaimed.map(async (input) => this.mutableClient.getClaimAmount(input, span)),
-        );
+    return this.capture(async () => {
+      const account = await this.getAccountInternal(address);
+      const amounts = await Promise.all(
+        account.unclaimed.map(async (input) => this.mutableClient.getClaimAmount(input)),
+      );
 
-        return {
-          unclaimed: this.convertInputs(account.unclaimed),
-          amount: amounts.reduce((acc, amount) => acc.plus(amount), utils.ZERO_BIG_NUMBER),
-        };
-      },
-      'neo_get_unclaimed',
-      monitor,
-    );
+      return {
+        unclaimed: this.convertInputs(account.unclaimed),
+        amount: amounts.reduce((acc, amount) => acc.plus(amount), utils.ZERO_BIG_NUMBER),
+      };
+    }, 'neo_get_unclaimed');
   }
 
-  public async getClaimAmount(input: Input, monitor?: Monitor): Promise<BigNumber> {
+  public async getClaimAmount(input: Input): Promise<BigNumber> {
     return this.capture(
-      async (span) => this.mutableClient.getClaimAmount({ txid: input.hash, vout: input.index }, span),
+      async () => this.mutableClient.getClaimAmount({ txid: input.hash, vout: input.index }),
       'neo_get_claim_amount',
-      monitor,
     );
   }
 
-  public async getUnspentOutputs(address: AddressString, monitor?: Monitor): Promise<readonly InputOutput[]> {
-    return this.capture(
-      async (span) => {
-        const account = await this.getAccountInternal(address, span);
-        const outputs = await Promise.all(
-          account.unspent.map(
-            async (input): Promise<InputOutput | undefined> => {
-              const outputJSON = await this.mutableClient.getUnspentOutput(input, span);
+  public async getUnspentOutputs(address: AddressString): Promise<readonly InputOutput[]> {
+    return this.capture(async () => {
+      const account = await this.getAccountInternal(address);
+      const outputs = await Promise.all(
+        account.unspent.map(
+          async (input): Promise<InputOutput | undefined> => {
+            const outputJSON = await this.mutableClient.getUnspentOutput(input);
 
-              if (outputJSON === undefined) {
-                return undefined;
-              }
+            if (outputJSON === undefined) {
+              return undefined;
+            }
 
-              const output = this.convertOutput(outputJSON);
+            const output = this.convertOutput(outputJSON);
 
-              return {
-                asset: output.asset,
-                value: output.value,
-                address: output.address,
-                hash: input.txid,
-                index: input.vout,
-              };
-            },
-          ),
-        );
+            return {
+              asset: output.asset,
+              value: output.value,
+              address: output.address,
+              hash: input.txid,
+              index: input.vout,
+            };
+          },
+        ),
+      );
 
-        return outputs.filter(commonUtils.notNull);
-      },
-      'neo_get_unspent',
-      monitor,
-    );
+      return outputs.filter(commonUtils.notNull);
+    }, 'neo_get_unspent');
   }
 
-  public async relayTransaction(transaction: string, monitor?: Monitor): Promise<RelayTransactionResult> {
-    const result = await this.mutableClient.relayTransaction(transaction, monitor);
+  public async relayTransaction(transaction: string): Promise<RelayTransactionResult> {
+    const result = await this.mutableClient.relayTransaction(transaction);
 
     return this.convertRelayTransactionResult(result);
   }
@@ -171,10 +163,10 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return { ...result, globalIndex: new BigNumber(result.globalIndex) };
   }
 
-  public async getInvocationData(hash: Hash256String, monitor?: Monitor): Promise<RawInvocationData> {
+  public async getInvocationData(hash: Hash256String): Promise<RawInvocationData> {
     const [invocationData, transaction] = await Promise.all([
-      this.mutableClient.getInvocationData(hash, monitor),
-      this.mutableClient.getTransaction(hash, monitor),
+      this.mutableClient.getInvocationData(hash),
+      this.mutableClient.getTransaction(hash),
     ]);
 
     if (transaction.data === undefined) {
@@ -190,14 +182,14 @@ export class NEOONEDataProvider implements DeveloperProvider {
     );
   }
 
-  public async testInvoke(transaction: string, monitor?: Monitor): Promise<RawCallReceipt> {
-    const receipt = await this.mutableClient.testInvocation(transaction, monitor);
+  public async testInvoke(transaction: string): Promise<RawCallReceipt> {
+    const receipt = await this.mutableClient.testInvocation(transaction);
 
     return convertCallReceipt(receipt);
   }
 
-  public async getAccount(address: AddressString, monitor?: Monitor): Promise<Account> {
-    const account = await this.getAccountInternal(address, monitor);
+  public async getAccount(address: AddressString): Promise<Account> {
+    const account = await this.getAccountInternal(address);
 
     return {
       address,
@@ -211,8 +203,8 @@ export class NEOONEDataProvider implements DeveloperProvider {
     };
   }
 
-  public async getAsset(hash: Hash256String, monitor?: Monitor): Promise<Asset> {
-    const asset = await this.mutableClient.getAsset(hash, monitor);
+  public async getAsset(hash: Hash256String): Promise<Asset> {
+    const asset = await this.mutableClient.getAsset(hash);
 
     return this.convertAsset(asset);
   }
@@ -234,48 +226,45 @@ export class NEOONEDataProvider implements DeveloperProvider {
     );
   }
 
-  public async getBestBlockHash(monitor?: Monitor): Promise<Hash256String> {
-    return this.mutableClient.getBestBlockHash(monitor);
+  public async getBestBlockHash(): Promise<Hash256String> {
+    return this.mutableClient.getBestBlockHash();
   }
 
-  public async getBlockCount(monitor?: Monitor): Promise<number> {
-    return this.mutableClient.getBlockCount(monitor);
+  public async getBlockCount(): Promise<number> {
+    return this.mutableClient.getBlockCount();
   }
 
-  public async getContract(address: AddressString, monitor?: Monitor): Promise<Contract> {
-    const contract = await this.mutableClient.getContract(address, monitor);
+  public async getContract(address: AddressString): Promise<Contract> {
+    const contract = await this.mutableClient.getContract(address);
 
     return this.convertContract(contract);
   }
 
-  public async getMemPool(monitor?: Monitor): Promise<readonly Hash256String[]> {
-    return this.mutableClient.getMemPool(monitor);
+  public async getMemPool(): Promise<readonly Hash256String[]> {
+    return this.mutableClient.getMemPool();
   }
 
-  public async getTransaction(hash: Hash256String, monitor?: Monitor): Promise<Transaction> {
-    const transaction = await this.mutableClient.getTransaction(hash, monitor);
+  public async getTransaction(hash: Hash256String): Promise<Transaction> {
+    const transaction = await this.mutableClient.getTransaction(hash);
 
     return this.convertTransaction(transaction);
   }
 
-  public async getOutput(input: Input, monitor?: Monitor): Promise<Output> {
-    const output = await this.mutableClient.getOutput(
-      {
-        txid: input.hash,
-        vout: input.index,
-      },
-      monitor,
-    );
+  public async getOutput(input: Input): Promise<Output> {
+    const output = await this.mutableClient.getOutput({
+      txid: input.hash,
+      vout: input.index,
+    });
 
     return this.convertOutput(output);
   }
 
-  public async getConnectedPeers(monitor?: Monitor): Promise<readonly Peer[]> {
-    return this.mutableClient.getConnectedPeers(monitor);
+  public async getConnectedPeers(): Promise<readonly Peer[]> {
+    return this.mutableClient.getConnectedPeers();
   }
 
-  public async getNetworkSettings(monitor?: Monitor): Promise<NetworkSettings> {
-    const settings = await this.mutableClient.getNetworkSettings(monitor);
+  public async getNetworkSettings(): Promise<NetworkSettings> {
+    const settings = await this.mutableClient.getNetworkSettings();
 
     return this.convertNetworkSettings(settings);
   }
@@ -302,7 +291,6 @@ export class NEOONEDataProvider implements DeveloperProvider {
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    monitor?: Monitor,
   ): Promise<RawCallReceipt> {
     const testTransaction = new InvocationTransactionModel({
       version: 1,
@@ -314,37 +302,35 @@ export class NEOONEDataProvider implements DeveloperProvider {
       }),
     });
 
-    return this.testInvoke(testTransaction.serializeWire().toString('hex'), monitor);
+    return this.testInvoke(testTransaction.serializeWire().toString('hex'));
   }
 
-  public async runConsensusNow(monitor?: Monitor): Promise<void> {
-    return this.mutableClient.runConsensusNow(monitor);
+  public async runConsensusNow(): Promise<void> {
+    return this.mutableClient.runConsensusNow();
   }
 
-  public async updateSettings(options: Partial<PrivateNetworkSettings>, monitor?: Monitor): Promise<void> {
-    return this.mutableClient.updateSettings(options, monitor);
+  public async updateSettings(options: Partial<PrivateNetworkSettings>): Promise<void> {
+    return this.mutableClient.updateSettings(options);
   }
 
-  public async getSettings(monitor?: Monitor): Promise<PrivateNetworkSettings> {
-    return this.mutableClient.getSettings(monitor);
+  public async getSettings(): Promise<PrivateNetworkSettings> {
+    return this.mutableClient.getSettings();
   }
 
-  public async fastForwardOffset(seconds: number, monitor?: Monitor): Promise<void> {
-    return this.mutableClient.fastForwardOffset(seconds, monitor);
+  public async fastForwardOffset(seconds: number): Promise<void> {
+    return this.mutableClient.fastForwardOffset(seconds);
   }
 
-  public async fastForwardToTime(seconds: number, monitor?: Monitor): Promise<void> {
-    return this.mutableClient.fastForwardToTime(seconds, monitor);
+  public async fastForwardToTime(seconds: number): Promise<void> {
+    return this.mutableClient.fastForwardToTime(seconds);
   }
 
-  public async reset(monitor?: Monitor): Promise<void> {
-    return this.mutableClient.reset(monitor);
+  public async reset(): Promise<void> {
+    return this.mutableClient.reset();
   }
 
-  public iterStorage(address: AddressString, monitor?: Monitor): AsyncIterable<StorageItem> {
-    return AsyncIterableX.from(
-      this.mutableClient.getAllStorage(address, monitor).then((res) => AsyncIterableX.from(res)),
-    ).pipe(
+  public iterStorage(address: AddressString): AsyncIterable<StorageItem> {
+    return AsyncIterableX.from(this.mutableClient.getAllStorage(address).then((res) => AsyncIterableX.from(res))).pipe(
       // tslint:disable-next-line no-any
       flatten<StorageItem>() as any,
       map<StorageItemJSON, StorageItem>((storageItem) => this.convertStorageItem(storageItem)),
@@ -704,8 +690,8 @@ export class NEOONEDataProvider implements DeveloperProvider {
     }
   }
 
-  private async getAccountInternal(address: AddressString, monitor?: Monitor): Promise<AccountJSON> {
-    return this.mutableClient.getAccount(address, monitor);
+  private async getAccountInternal(address: AddressString): Promise<AccountJSON> {
+    return this.mutableClient.getAccount(address);
   }
 
   private convertNetworkSettings(settings: NetworkSettingsJSON): NetworkSettings {
@@ -743,16 +729,15 @@ export class NEOONEDataProvider implements DeveloperProvider {
     };
   }
 
-  private async capture<T>(func: (monitor?: Monitor) => Promise<T>, name: string, monitor?: Monitor): Promise<T> {
-    if (monitor === undefined) {
-      return func();
-    }
+  private async capture<T>(func: () => Promise<T>, title: string): Promise<T> {
+    try {
+      const result = await func();
+      logger('%o', { level: 'debug', title });
 
-    /* istanbul ignore next */
-    return monitor.at('neo_one_data_provider').captureSpanLog(func, {
-      name,
-      level: { log: 'verbose', span: 'info' },
-      trace: true,
-    });
+      return result;
+    } catch (error) {
+      logger('%o', { level: 'error', title, error: error.message });
+      throw error;
+    }
   }
 }

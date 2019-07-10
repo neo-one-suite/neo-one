@@ -1,5 +1,5 @@
 import { common, crypto, JSONHelper, RelayTransactionResultJSON, TransactionJSON, utils } from '@neo-one/client-common';
-import { KnownLabel, metrics, Monitor } from '@neo-one/monitor';
+import { nodeLogger } from '@neo-one/logger';
 import {
   Account,
   Blockchain,
@@ -13,7 +13,11 @@ import {
   TransactionData,
   TransactionType,
 } from '@neo-one/node-core';
+import { Labels, labelToTag } from '@neo-one/utils';
+import { AggregationType, globalStats, MeasureUnit, TagMap } from '@opencensus/core';
 import { filter, switchMap, take, timeout, toArray } from 'rxjs/operators';
+
+const logger = nodeLogger.child({ component: 'rpc-handler' });
 
 export type HandlerPrimitive = string | number | boolean;
 export type HandlerResult =
@@ -25,7 +29,7 @@ export type HandlerResult =
   | undefined
   | void;
 // tslint:disable-next-line no-any
-export type Handler = (args: readonly any[], monitor: Monitor) => Promise<HandlerResult>;
+export type Handler = (args: readonly any[]) => Promise<HandlerResult>;
 
 interface Handlers {
   readonly [method: string]: Handler;
@@ -88,22 +92,29 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   INVALID: 'INVALID',
 };
 
-const rpcLabelNames: readonly string[] = [KnownLabel.RPC_METHOD];
-const rpcLabels = Object.values(RPC_METHODS).map((method) => ({
-  [KnownLabel.RPC_METHOD]: method,
-}));
+const rpcTag = labelToTag(Labels.RPC_METHOD);
 
-const SINGLE_REQUESTS_HISTOGRAM = metrics.createHistogram({
-  name: 'jsonrpc_server_single_request_duration_seconds',
-  labelNames: rpcLabelNames,
-  labels: rpcLabels,
-});
+const requestDurations = globalStats.createMeasureDouble('request/duration', MeasureUnit.MS);
+const requestErrors = globalStats.createMeasureInt64('request/failures', MeasureUnit.UNIT);
 
-const SINGLE_REQUEST_ERRORS_COUNTER = metrics.createCounter({
-  name: 'jsonrpc_server_single_request_failures_total',
-  labelNames: rpcLabelNames,
-  labels: rpcLabels,
-});
+const SINGLE_REQUESTS_HISTOGRAM = globalStats.createView(
+  'jsonrpc_server_single_request_duration_ms',
+  requestDurations,
+  AggregationType.DISTRIBUTION,
+  [rpcTag],
+  'distribution of request durations',
+  [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
+);
+globalStats.registerView(SINGLE_REQUESTS_HISTOGRAM);
+
+const SINGLE_REQUEST_ERRORS_COUNTER = globalStats.createView(
+  'jsonrpc_server_single_request_failures_total',
+  requestErrors,
+  AggregationType.COUNT,
+  [rpcTag],
+  'total number of request errors',
+);
+globalStats.registerView(SINGLE_REQUEST_ERRORS_COUNTER);
 
 const createJSONRPCHandler = (handlers: Handlers) => {
   // tslint:disable-next-line no-any
@@ -124,78 +135,98 @@ const createJSONRPCHandler = (handlers: Handlers) => {
   };
 
   // tslint:disable-next-line no-any
-  const handleSingleRequest = async (monitor: Monitor, requestIn: any) =>
-    monitor.captureSpanLog(
-      async (span) => {
-        let request;
-        try {
-          request = validateRequest(requestIn);
-        } finally {
-          let method = RPC_METHODS.UNKNOWN;
-          if (request !== undefined) {
-            ({ method } = request);
-          } else if (typeof requestIn === 'object') {
-            ({ method } = requestIn);
-          }
-
-          if ((RPC_METHODS[method] as string | undefined) === undefined) {
-            method = RPC_METHODS.INVALID;
-          }
-
-          span.setLabels({ [span.labels.RPC_METHOD]: method });
-        }
-        const handler = handlers[request.method] as Handler | undefined;
-        if (handler === undefined) {
-          throw new JSONRPCError(-32601, 'Method not found');
+  const handleSingleRequest = async (requestIn: any) => {
+    const startTime = Date.now();
+    let labels = {};
+    let method = RPC_METHODS.UNKNOWN;
+    try {
+      let request;
+      try {
+        request = validateRequest(requestIn);
+      } finally {
+        if (request !== undefined) {
+          ({ method } = request);
+        } else if (typeof requestIn === 'object') {
+          ({ method } = requestIn);
         }
 
-        const { params } = request;
-        let handlerParams: readonly object[];
-        if (params === undefined) {
-          handlerParams = [];
-        } else if (Array.isArray(params)) {
-          handlerParams = params;
-        } else {
-          handlerParams = [params];
+        if ((RPC_METHODS[method] as string | undefined) === undefined) {
+          method = RPC_METHODS.INVALID;
         }
 
-        const result = await handler(handlerParams, monitor);
+        labels = { [Labels.RPC_METHOD]: method };
+      }
+      const handler = handlers[request.method] as Handler | undefined;
+      if (handler === undefined) {
+        throw new JSONRPCError(-32601, 'Method not found');
+      }
 
-        return {
-          jsonrpc: '2.0',
-          result,
-          id: request.id === undefined ? undefined : request.id,
-        };
-      },
-      {
-        name: 'jsonrpc_server_single_request',
-        metric: {
-          total: SINGLE_REQUESTS_HISTOGRAM,
-          error: SINGLE_REQUEST_ERRORS_COUNTER,
+      const { params } = request;
+      let handlerParams: readonly object[];
+      if (params === undefined) {
+        handlerParams = [];
+      } else if (Array.isArray(params)) {
+        handlerParams = params;
+      } else {
+        handlerParams = [params];
+      }
+
+      const result = await handler(handlerParams);
+      logger.debug({ title: 'jsonrpc_server_single_request', ...labels });
+
+      globalStats.record([
+        {
+          measure: requestDurations,
+          value: Date.now() - startTime,
         },
+      ]);
 
-        level: { log: 'verbose', span: 'info' },
-      },
-    );
+      return {
+        jsonrpc: '2.0',
+        result,
+        id: request.id === undefined ? undefined : request.id,
+      };
+    } catch (error) {
+      logger.error({ title: 'jsonrpc_server_single_request', ...labels, error: error.message });
+      const tags = new TagMap();
+      tags.set(rpcTag, { value: method });
+      globalStats.record(
+        [
+          {
+            measure: requestErrors,
+            value: 1,
+          },
+        ],
+        tags,
+      );
 
-  const handleRequest = (monitor: Monitor, request: unknown) => {
-    if (Array.isArray(request)) {
-      return Promise.all(request.map(async (batchRequest) => handleSingleRequest(monitor, batchRequest)));
+      throw error;
     }
-
-    return handleSingleRequest(monitor, request);
   };
 
-  const handleRequestSafe = async (monitor: Monitor, request: unknown): Promise<object | object[]> => {
-    try {
-      // tslint:disable-next-line prefer-immediate-return
-      const result = await monitor.captureSpanLog(async (span) => handleRequest(span, request), {
-        name: 'jsonrpc_server_request',
-        level: { log: 'verbose', span: 'info' },
-        error: {},
-      });
+  const handleRequest = async (request: unknown) => {
+    if (Array.isArray(request)) {
+      return Promise.all(request.map(async (batchRequest) => handleSingleRequest(batchRequest)));
+    }
 
-      // tslint:disable-next-line no-var-before-return
+    return handleSingleRequest(request);
+  };
+
+  const handleRequestSafe = async (
+    labels: Record<string, string>,
+    request: unknown,
+  ): Promise<object | readonly object[]> => {
+    try {
+      // tslint:disable-next-line: no-any
+      let result: any;
+      try {
+        result = await handleRequest(request);
+        logger.debug({ title: 'jsonrpc_server_request', ...labels });
+      } catch (error) {
+        logger.error({ title: 'jsonrpc_server_request', ...labels, error });
+        throw error;
+      }
+
       return result;
     } catch (error) {
       let errorResponse = {
@@ -220,8 +251,7 @@ const createJSONRPCHandler = (handlers: Handlers) => {
     }
   };
 
-  return async (request: unknown, monitor: Monitor) =>
-    handleRequestSafe(monitor.withLabels({ [monitor.labels.RPC_TYPE]: 'jsonrpc' }), request);
+  return async (request: unknown) => handleRequestSafe({ [Labels.RPC_TYPE]: 'jsonrpc' }, request);
 };
 
 const getTransactionReceipt = (value: TransactionData) => ({
@@ -232,7 +262,7 @@ const getTransactionReceipt = (value: TransactionData) => ({
 });
 
 // tslint:disable-next-line no-any
-export type RPCHandler = (request: unknown, monitor: Monitor) => Promise<any>;
+export type RPCHandler = (request: unknown) => Promise<any>;
 
 export const createHandler = ({
   blockchain,
@@ -554,7 +584,7 @@ export const createHandler = ({
               timeout(new Date(Date.now() + watchTimeoutMS)),
             )
             .toPromise();
-        } catch {
+        } catch (error) {
           throw new JSONRPCError(-100, 'Unknown transaction');
         }
       } else {

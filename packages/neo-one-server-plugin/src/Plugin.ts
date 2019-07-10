@@ -1,10 +1,10 @@
-import { Monitor } from '@neo-one/monitor';
+import { Logger } from '@neo-one/logger';
 import { ResourceType } from './ResourceType';
 import { TaskList } from './TaskList';
 import { CLIArgs, CLIHook, CreateHook, InteractiveCommand, PluginManager } from './types';
 
 export interface PluginOptions {
-  readonly monitor: Monitor;
+  readonly logger: Logger;
 }
 
 export interface CLIHookConfig {
@@ -19,10 +19,10 @@ export interface CreateHookConfig {
 }
 
 export class Plugin {
-  public readonly monitor: Monitor;
+  public readonly logger: Logger;
 
-  public constructor({ monitor }: PluginOptions) {
-    this.monitor = monitor;
+  public constructor({ logger }: PluginOptions) {
+    this.logger = logger;
   }
 
   // Called when the user requests a full reset of neo-one

@@ -1,5 +1,4 @@
 import { Account, AddressString, NetworkType, publicKeyToAddress } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import _ from 'lodash';
 import { HDAccount, HDHandler } from './HDKeyStore';
 import { HDStore } from './types';
@@ -14,14 +13,15 @@ export interface LedgerStore {
 }
 
 export class LedgerHandler implements HDHandler<number> {
+  public static readonly suffix: 'ledger';
   public readonly byteLimit: number;
   public readonly type: string;
 
   private readonly storePromise: Promise<ConnectedLedgerStore>;
-  private readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
+  private readonly getAccount: (network: NetworkType, address: AddressString) => Promise<Account>;
 
   public constructor(options: {
-    readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
+    readonly getAccount: (network: NetworkType, address: AddressString) => Promise<Account>;
     readonly store: LedgerStore;
   }) {
     this.getAccount = options.getAccount;

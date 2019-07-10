@@ -1,4 +1,4 @@
-import { Monitor } from '@neo-one/monitor';
+import { cliLogger, getLogPath } from '@neo-one/logger';
 import { plugins as pluginsUtil } from '@neo-one/server';
 import {
   Client,
@@ -30,6 +30,14 @@ import Vorpal, { Args, CommandInstance } from 'vorpal';
 import { commands, createPlugin } from './interactive';
 import { ClientConfig, createBinary, createClientConfig, setupCLI } from './utils';
 import { reportError } from './utils/reportError';
+
+const logger = cliLogger.child({ component: 'interactive' });
+
+const shutdownReport = (logFile: string, shutdownCB: () => void) => {
+  reportError(logFile)
+    .then(shutdownCB)
+    .catch(shutdownCB);
+};
 
 // tslint:disable-next-line readonly-array
 const getTable = (head?: string[]) =>
@@ -66,15 +74,8 @@ interface Sessions {
   [plugin: string]: Session;
 }
 
-const shutdownReport = (logFile: string, shutdownCB: () => void) => {
-  reportError(logFile)
-    .then(shutdownCB)
-    .catch(shutdownCB);
-};
-
 export class InteractiveCLI {
   public readonly vorpal: Vorpal;
-  public readonly debug: boolean;
   private readonly mutableSessions: Sessions;
   private readonly sessions$: BehaviorSubject<Sessions>;
   // tslint:disable-next-line readonly-keyword readonly-array
@@ -86,31 +87,26 @@ export class InteractiveCLI {
   private readonly mutablePlugins: { [name: string]: Plugin };
   private mutableClient: Client | undefined;
   private mutableClientConfig: Config<ClientConfig> | undefined;
-  private mutableMonitor: Monitor | undefined;
   private readonly serverConfig: {
     readonly dir?: string;
     readonly serverPort?: number;
     readonly httpServerPort?: number;
     readonly minPort?: number;
   };
-  private mutableLogPath: string | undefined;
   private mutableThrowError = false;
 
   public constructor({
-    debug,
     dir,
     serverPort,
     httpServerPort,
     minPort,
   }: {
-    readonly debug: boolean;
     readonly dir?: string;
     readonly serverPort?: number;
     readonly httpServerPort?: number;
     readonly minPort?: number;
   }) {
     this.vorpal = new Vorpal().version(VERSION);
-    this.debug = debug;
     this.mutableSessions = {};
     this.sessions$ = new BehaviorSubject<Session>({});
     this.mutablePreHooks = {};
@@ -122,14 +118,6 @@ export class InteractiveCLI {
 
   public get throwError(): boolean {
     return this.mutableThrowError;
-  }
-
-  public get monitor(): Monitor {
-    if (this.mutableMonitor === undefined) {
-      throw new Error('Something went wrong');
-    }
-
-    return this.mutableMonitor;
   }
 
   public get client(): Client {
@@ -191,17 +179,15 @@ export class InteractiveCLI {
     const paths = {
       data: dir === undefined ? defaultPaths.data : path.join(dir, 'data'),
       config: dir === undefined ? defaultPaths.config : path.join(dir, 'config'),
-      cache: dir === undefined ? defaultPaths.cache : path.join(dir, 'cache'),
       log: dir === undefined ? defaultPaths.log : path.join(dir, 'log'),
+      cache: dir === undefined ? defaultPaths.cache : path.join(dir, 'cache'),
       temp: dir === undefined ? defaultPaths.temp : path.join(dir, 'temp'),
     };
 
-    const { monitor, config$: logConfig$, mutableShutdownFuncs, shutdown: shutdownIn } = setupCLI({
+    const { mutableShutdownFuncs, shutdown: shutdownIn } = setupCLI({
       vorpal: this.vorpal,
-      debug: this.debug,
     });
 
-    this.mutableMonitor = monitor;
     this.mutableClientConfig = createClientConfig({ paths });
 
     let isShutdown = false;
@@ -211,38 +197,14 @@ export class InteractiveCLI {
       isShutdown = true;
     };
 
-    const logSubscription = combineLatest([
-      this.mutableClientConfig.config$.pipe(
-        map((config) => config.paths.log),
-        distinctUntilChanged(),
-      ),
-
-      this.mutableClientConfig.config$.pipe(
-        map((config) => config.log),
-        distinctUntilChanged(),
-      ),
-    ])
-      .pipe(
-        map(([logPath, config]) => {
-          this.mutableLogPath = logPath;
-
-          return {
-            name: 'interactiveCLI',
-            path: logPath,
-            level: config.level,
-            maxSize: config.maxSize,
-            maxFiles: config.maxFiles,
-          };
-        }),
-      )
-      .subscribe(logConfig$);
-    mutableShutdownFuncs.push(() => logSubscription.unsubscribe());
-
     const { dir: _dir, ...serverConfigWithoutDir } = this.serverConfig;
     const serverConfig = createServerConfig({
       paths,
       ...serverConfigWithoutDir,
     });
+
+    const maybeLogPath = getLogPath('cli');
+    const logPath = maybeLogPath ? maybeLogPath : paths.log;
 
     const start$ = combineLatest([
       serverConfig.config$.pipe(
@@ -305,32 +267,22 @@ export class InteractiveCLI {
         undefined,
         1,
       ),
-      switchMap(() => this.client.getPlugins$().pipe(map((pluginName) => this.registerPlugin(monitor, pluginName)))),
+      switchMap(() => this.client.getPlugins$().pipe(map((pluginName) => this.registerPlugin(pluginName)))),
       publishReplay(1),
       refCount(),
     );
 
     const subscription = start$.subscribe({
       error: (error) => {
-        monitor.logError({
-          name: 'cli_uncaught_error',
-          message: 'Something went wrong. Shutting down.',
-          error,
-        });
-
+        logger.error({ title: 'cli_uncaught_error', error: error.message }, 'Something went wrong. Shutting down.');
         this.vorpal.log(`Something went wrong: ${error.message}. Shutting down.`);
-
-        shutdownReport(paths.log, () => {
+        shutdownReport(logPath, () => {
           shutdown({ exitCode: 1, error });
         });
       },
       complete: () => {
         const message = 'Something went wrong: CLI unexpectedly exited. Shutting down.';
-        monitor.log({
-          name: 'cli_uncaught_complete',
-          message,
-          level: 'error',
-        });
+        logger.error({ title: 'cli_uncaught_complete' }, message);
 
         this.vorpal.log(message);
         shutdownReport(paths.log, () => {
@@ -342,7 +294,7 @@ export class InteractiveCLI {
     mutableShutdownFuncs.push(() => subscription.unsubscribe());
     await start$.pipe(take(1)).toPromise();
     const plugins = await this.client.getAllPlugins();
-    plugins.forEach((plugin) => this.registerPlugin(monitor, plugin));
+    plugins.forEach((plugin) => this.registerPlugin(plugin));
 
     if (!isShutdown) {
       commands.forEach((command) => command(this));
@@ -449,10 +401,7 @@ export class InteractiveCLI {
   }
 
   public getDebug(): DescribeTable {
-    return [
-      ['Interactive CLI Log Path', this.mutableLogPath === undefined ? 'Unknown' : this.mutableLogPath] as const,
-      ['Interactive CLI Config Path', this.clientConfig.configPath] as const,
-    ];
+    return [['Interactive CLI Config Path', this.clientConfig.configPath] as const];
   }
   // tslint:disable-next-line no-any
   public async prompt(questions: readonly any[]): Promise<any> {
@@ -471,11 +420,11 @@ export class InteractiveCLI {
     }
   }
 
-  private registerPlugin(monitor: Monitor, pluginName: string): void {
+  private registerPlugin(pluginName: string): void {
     const plugin = this.mutablePlugins[pluginName] as Plugin | undefined;
     if (plugin === undefined) {
       this.mutablePlugins[pluginName] = pluginsUtil.getPlugin({
-        monitor,
+        logger,
         pluginName,
       });
 

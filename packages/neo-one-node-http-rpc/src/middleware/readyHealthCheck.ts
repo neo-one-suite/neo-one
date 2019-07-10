@@ -1,4 +1,4 @@
-import { getMonitor } from '@neo-one/http';
+import { getLogger } from '@neo-one/http';
 import { Blockchain } from '@neo-one/node-core';
 import { Context } from 'koa';
 import { checkReady, Options as CheckReadyOptions } from './checkReady';
@@ -15,8 +15,8 @@ export const readyHealthCheck = ({
   name: 'readyHealthCheck',
   path: '/ready_health_check',
   middleware: async (ctx: Context) => {
-    const monitor = getMonitor(ctx);
-    const ready = await checkReady({ monitor, blockchain, options });
+    const logger = getLogger(ctx);
+    const ready = await checkReady({ logger, blockchain, options });
     ctx.status = ready ? 200 : 500;
   },
 });

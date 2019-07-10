@@ -7,7 +7,6 @@ Array [
     "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
     "deploy",
     Array [],
-    undefined,
   ],
 ]
 `;
@@ -72,7 +71,6 @@ Array [
         "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
         "network": "main",
       },
-      "monitor": undefined,
       "networkFee": undefined,
       "systemFee": undefined,
     },
@@ -11784,7 +11782,6 @@ Array [
         "address": "AVf4UGKevVrMR1j3UkPsuoYKSC4ocoAkKx",
         "network": "main",
       },
-      "monitor": undefined,
       "networkFee": undefined,
       "systemFee": undefined,
     },

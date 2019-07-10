@@ -1,6 +1,5 @@
 // tslint:disable no-array-mutation no-object-mutation
 import { common, ECPoint, UInt160, UInt256, utils } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import {
   Account,
   AccountKey,
@@ -64,7 +63,7 @@ import {
   VM,
   WriteBlockchain,
 } from '@neo-one/node-core';
-import { labels, utils as commonUtils } from '@neo-one/utils';
+import { utils as commonUtils } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { GenesisBlockNotRegisteredError } from './errors';
@@ -377,36 +376,25 @@ export class WriteBatchBlockchain {
     );
   }
 
-  public async persistBlock(monitorIn: Monitor, block: Block): Promise<void> {
-    const monitor = monitorIn.at('write_blockchain').withData({
-      [labels.NEO_BLOCK_INDEX]: block.index,
-    });
+  public async persistBlock(block: Block): Promise<void> {
+    const [maybePrevBlockData, outputContractsList] = await Promise.all([
+      block.index === 0 ? Promise.resolve(undefined) : this.blockData.get({ hash: block.previousHash }),
+      Promise.all(
+        [
+          ...new Set(
+            block.transactions.reduce<string[]>(
+              (acc, transaction) =>
+                acc.concat(transaction.outputs.map((output) => common.uInt160ToString(output.address))),
 
-    const [maybePrevBlockData, outputContractsList] = await monitor.captureSpan(
-      async () =>
-        Promise.all([
-          block.index === 0 ? Promise.resolve(undefined) : this.blockData.get({ hash: block.previousHash }),
-          Promise.all(
-            [
-              ...new Set(
-                block.transactions.reduce<string[]>(
-                  (acc, transaction) =>
-                    acc.concat(transaction.outputs.map((output) => common.uInt160ToString(output.address))),
-
-                  [],
-                ),
-              ),
-            ].map(async (hash) => this.contract.tryGet({ hash: common.stringToUInt160(hash) })),
+              [],
+            ),
           ),
+        ].map(async (hash) => this.contract.tryGet({ hash: common.stringToUInt160(hash) })),
+      ),
 
-          this.block.add(block),
-          this.header.add(block.header),
-        ]),
-
-      {
-        name: 'neo_write_blockchain_stage_0',
-      },
-    );
+      this.block.add(block),
+      this.header.add(block.header),
+    ]);
 
     const prevBlockData =
       maybePrevBlockData === undefined
@@ -436,135 +424,104 @@ export class WriteBatchBlockchain {
         !transaction.outputs.some((output) => outputContracts[common.uInt160ToString(output.address)] !== undefined),
     );
 
-    const [globalActionIndex] = await monitor.captureSpan(
-      async (span) =>
-        Promise.all([
-          rest.length > 0
-            ? this.persistTransactions(
-                span,
-                block,
-                // tslint:disable-next-line no-any
-                rest as any,
-                prevBlockData.lastGlobalTransactionIndex,
-                prevBlockData.lastGlobalActionIndex,
-              )
-            : Promise.resolve(prevBlockData.lastGlobalActionIndex),
-          utxo.length > 0
-            ? // tslint:disable-next-line no-any
-              this.persistUTXOTransactions(span, block, utxo as any, prevBlockData.lastGlobalTransactionIndex)
-            : Promise.resolve(),
-        ]),
+    const [globalActionIndex] = await Promise.all([
+      rest.length > 0
+        ? this.persistTransactions(
+            block,
+            // tslint:disable-next-line no-any
+            rest as any,
+            prevBlockData.lastGlobalTransactionIndex,
+            prevBlockData.lastGlobalActionIndex,
+          )
+        : Promise.resolve(prevBlockData.lastGlobalActionIndex),
+      utxo.length > 0
+        ? // tslint:disable-next-line no-any
+          this.persistUTXOTransactions(block, utxo as any, prevBlockData.lastGlobalTransactionIndex)
+        : Promise.resolve(),
+    ]);
 
-      {
-        name: 'neo_write_blockchain_stage_1',
-      },
-    );
+    await this.blockData.add(
+      new BlockData({
+        hash: block.hash,
+        lastGlobalTransactionIndex: prevBlockData.lastGlobalTransactionIndex.add(new BN(block.transactions.length)),
 
-    await monitor.captureSpan(
-      async () =>
-        this.blockData.add(
-          new BlockData({
-            hash: block.hash,
-            lastGlobalTransactionIndex: prevBlockData.lastGlobalTransactionIndex.add(new BN(block.transactions.length)),
-
-            lastGlobalActionIndex: globalActionIndex,
-            systemFee: prevBlockData.systemFee.add(
-              block.getSystemFee({
-                getOutput: this.output.get,
-                governingToken: this.settings.governingToken,
-                utilityToken: this.settings.utilityToken,
-                fees: this.settings.fees,
-                registerValidatorFee: this.settings.registerValidatorFee,
-              }),
-            ),
+        lastGlobalActionIndex: globalActionIndex,
+        systemFee: prevBlockData.systemFee.add(
+          block.getSystemFee({
+            getOutput: this.output.get,
+            governingToken: this.settings.governingToken,
+            utilityToken: this.settings.utilityToken,
+            fees: this.settings.fees,
+            registerValidatorFee: this.settings.registerValidatorFee,
           }),
         ),
-
-      { name: 'neo_write_blockchain_stage_2' },
+      }),
     );
   }
 
   private async persistUTXOTransactions(
-    monitor: Monitor,
     block: Block,
     transactions: ReadonlyArray<readonly [number, (ContractTransaction | ClaimTransaction | MinerTransaction)]>,
     lastGlobalTransactionIndex: BN,
   ): Promise<void> {
-    await monitor.captureSpan(
-      async (span) => {
-        const inputs = [];
-        const claims = [];
-        const outputWithInputs = [];
-        // tslint:disable-next-line no-unused no-loop-statement no-dead-store
-        for (const idxAndTransaction of transactions) {
-          const transaction = idxAndTransaction[1];
-          inputs.push(...transaction.inputs);
-          if (transaction.type === TransactionType.Claim && transaction instanceof ClaimTransaction) {
-            claims.push(...transaction.claims);
-          }
-          outputWithInputs.push(...this.getOutputWithInput(transaction));
-        }
-        await Promise.all([
-          Promise.all(
-            // tslint:disable-next-line no-unused
-            transactions.map(async ([idx, transaction]) => this.transaction.add(transaction)),
+    const inputs = [];
+    const claims = [];
+    const outputWithInputs = [];
+    // tslint:disable-next-line no-unused no-loop-statement no-dead-store
+    for (const idxAndTransaction of transactions) {
+      const transaction = idxAndTransaction[1];
+      inputs.push(...transaction.inputs);
+      if (transaction.type === TransactionType.Claim && transaction instanceof ClaimTransaction) {
+        claims.push(...transaction.claims);
+      }
+      outputWithInputs.push(...this.getOutputWithInput(transaction));
+    }
+    await Promise.all([
+      Promise.all(
+        // tslint:disable-next-line no-unused
+        transactions.map(async ([idx, transaction]) => this.transaction.add(transaction)),
+      ),
+      Promise.all(
+        transactions.map(async ([idx, transaction]) =>
+          this.transactionData.add(
+            new TransactionData({
+              hash: transaction.hash,
+              startHeight: block.index,
+              blockHash: block.hash,
+              index: idx,
+              globalIndex: lastGlobalTransactionIndex.add(new BN(idx + 1)),
+            }),
           ),
-          Promise.all(
-            transactions.map(async ([idx, transaction]) =>
-              this.transactionData.add(
-                new TransactionData({
-                  hash: transaction.hash,
-                  startHeight: block.index,
-                  blockHash: block.hash,
-                  index: idx,
-                  globalIndex: lastGlobalTransactionIndex.add(new BN(idx + 1)),
-                }),
-              ),
-            ),
-          ),
+        ),
+      ),
 
-          this.updateAccounts(span, inputs, claims, outputWithInputs),
-          this.updateCoins(span, inputs, claims, block),
-        ]);
-      },
-      {
-        name: 'neo_write_blockchain_persist_utxo_transactions',
-      },
-    );
+      this.updateAccounts(inputs, claims, outputWithInputs),
+      this.updateCoins(inputs, claims, block),
+    ]);
   }
 
   private async persistTransactions(
-    monitor: Monitor,
     block: Block,
     transactions: ReadonlyArray<readonly [number, Transaction]>,
     lastGlobalTransactionIndex: BN,
     lastGlobalActionIndex: BN,
   ): Promise<BN> {
-    return monitor.captureSpan(
-      async (span) => {
-        let globalActionIndex = lastGlobalActionIndex.add(utils.ONE);
-        // tslint:disable-next-line no-loop-statement
-        for (const [idx, transaction] of transactions) {
-          globalActionIndex = await this.persistTransaction(
-            span,
-            block,
-            transaction,
-            idx,
-            lastGlobalTransactionIndex,
-            globalActionIndex,
-          );
-        }
+    let globalActionIndex = lastGlobalActionIndex.add(utils.ONE);
+    // tslint:disable-next-line no-loop-statement
+    for (const [idx, transaction] of transactions) {
+      globalActionIndex = await this.persistTransaction(
+        block,
+        transaction,
+        idx,
+        lastGlobalTransactionIndex,
+        globalActionIndex,
+      );
+    }
 
-        return globalActionIndex.sub(utils.ONE);
-      },
-      {
-        name: 'neo_write_blockchain_persist_transactions',
-      },
-    );
+    return globalActionIndex.sub(utils.ONE);
   }
 
   private async persistTransaction(
-    monitor: Monitor,
     block: Block,
     transactionIn: Transaction,
     transactionIndex: number,
@@ -572,380 +529,340 @@ export class WriteBatchBlockchain {
     globalActionIndexIn: BN,
   ): Promise<BN> {
     let globalActionIndex = globalActionIndexIn;
-    await monitor
-      .withLabels({ [labels.NEO_TRANSACTION_TYPE]: transactionIn.type })
-      .withData({ [labels.NEO_TRANSACTION_HASH]: transactionIn.hashHex })
-      .captureSpan(
-        async (span) => {
-          const transaction = transactionIn;
-          const claims =
-            transaction.type === TransactionType.Claim && transaction instanceof ClaimTransaction
-              ? transaction.claims
-              : [];
-          let accountChanges = {};
-          let validatorChanges = {};
-          let validatorsCountChanges: ValidatorsCountChanges = [];
-          if (transaction.type === TransactionType.State && transaction instanceof StateTransaction) {
-            ({ accountChanges, validatorChanges, validatorsCountChanges } = await getDescriptorChanges({
-              transactions: [transaction],
-              getAccount: async (hash) =>
-                this.account
-                  .tryGet({ hash })
-                  .then((account) => (account === undefined ? new Account({ hash }) : account)),
+    const transaction = transactionIn;
+    const claims =
+      transaction.type === TransactionType.Claim && transaction instanceof ClaimTransaction ? transaction.claims : [];
+    let accountChanges = {};
+    let validatorChanges = {};
+    let validatorsCountChanges: ValidatorsCountChanges = [];
+    if (transaction.type === TransactionType.State && transaction instanceof StateTransaction) {
+      ({ accountChanges, validatorChanges, validatorsCountChanges } = await getDescriptorChanges({
+        transactions: [transaction],
+        getAccount: async (hash) =>
+          this.account.tryGet({ hash }).then((account) => (account === undefined ? new Account({ hash }) : account)),
 
-              governingTokenHash: this.settings.governingToken.hashHex,
-            }));
-          }
-          await Promise.all([
-            this.transaction.add(transaction),
-            this.transactionData.add(
-              new TransactionData({
-                hash: transaction.hash,
-                blockHash: block.hash,
-                startHeight: block.index,
-                index: transactionIndex,
-                globalIndex: lastGlobalTransactionIndex.add(new BN(transactionIndex + 1)),
-              }),
-            ),
+        governingTokenHash: this.settings.governingToken.hashHex,
+      }));
+    }
+    await Promise.all([
+      this.transaction.add(transaction),
+      this.transactionData.add(
+        new TransactionData({
+          hash: transaction.hash,
+          blockHash: block.hash,
+          startHeight: block.index,
+          index: transactionIndex,
+          globalIndex: lastGlobalTransactionIndex.add(new BN(transactionIndex + 1)),
+        }),
+      ),
 
-            this.updateAccounts(span, transaction.inputs, claims, this.getOutputWithInput(transaction), accountChanges),
+      this.updateAccounts(transaction.inputs, claims, this.getOutputWithInput(transaction), accountChanges),
 
-            this.updateCoins(span, transaction.inputs, claims, block),
-            this.processStateTransaction(span, validatorChanges, validatorsCountChanges),
-          ]);
+      this.updateCoins(transaction.inputs, claims, block),
+      this.processStateTransaction(validatorChanges, validatorsCountChanges),
+    ]);
 
-          if (transaction.type === TransactionType.Register && transaction instanceof RegisterTransaction) {
-            await this.asset.add(
-              new Asset({
-                hash: transaction.hash,
-                type: transaction.asset.type,
-                name: transaction.asset.name,
-                amount: transaction.asset.amount,
-                precision: transaction.asset.precision,
-                owner: transaction.asset.owner,
-                admin: transaction.asset.admin,
-                issuer: transaction.asset.admin,
-                expiration: this.currentBlockIndex + 2 * 2000000,
-                isFrozen: false,
-              }),
-            );
-          } else if (transaction.type === TransactionType.Issue && transaction instanceof IssueTransaction) {
-            const results = await Promise.all(
-              Object.entries(
-                transaction.getTransactionResults({
-                  getOutput: this.output.get,
-                }),
-              ),
-            );
-
-            await Promise.all(
-              results.map(async ([assetHex, value]) => {
-                const hash = common.stringToUInt256(assetHex);
-                const asset = await this.asset.get({ hash });
-                await this.asset.update(asset, {
-                  available: asset.available.add(value.neg()),
-                });
-              }),
-            );
-          } else if (transaction.type === TransactionType.Enrollment && transaction instanceof EnrollmentTransaction) {
-            await this.validator.add(
-              new Validator({
-                publicKey: transaction.publicKey,
-              }),
-            );
-          } else if (transaction.type === TransactionType.Publish && transaction instanceof PublishTransaction) {
-            const contract = await this.contract.tryGet({
-              hash: transaction.contract.hash,
-            });
-
-            if (contract === undefined) {
-              await this.contract.add(transaction.contract);
-            }
-          } else if (transaction.type === TransactionType.Invocation && transaction instanceof InvocationTransaction) {
-            const temporaryBlockchain = new WriteBatchBlockchain({
-              settings: this.settings,
-              currentBlock: this.currentBlockInternal,
-              currentHeader: this.currentHeader,
-              // tslint:disable-next-line no-any
-              storage: this as any,
-              vm: this.vm,
-              getValidators: this.getValidators,
-            });
-
-            const migratedContractHashes: Array<readonly [UInt160, UInt160]> = [];
-            const voteUpdates: Array<readonly [UInt160, ReadonlyArray<ECPoint>]> = [];
-            const actions: Array<NotificationAction | LogAction> = [];
-            const result = await wrapExecuteScripts(async () =>
-              this.vm.executeScripts({
-                monitor: span,
-                scripts: [{ code: transaction.script }],
-                blockchain: temporaryBlockchain,
-                scriptContainer: {
-                  type: ScriptContainerType.Transaction,
-                  value: transaction,
-                },
-
-                triggerType: TriggerType.Application,
-                action: {
-                  blockIndex: block.index,
-                  blockHash: block.hash,
-                  transactionIndex,
-                  transactionHash: transaction.hash,
-                },
-
-                gas: transaction.gas,
-                listeners: {
-                  onLog: ({ message, scriptHash }) => {
-                    actions.push(
-                      new LogAction({
-                        index: globalActionIndex,
-                        scriptHash,
-                        message,
-                      }),
-                    );
-
-                    globalActionIndex = globalActionIndex.add(utils.ONE);
-                  },
-                  onNotify: ({ args, scriptHash }) => {
-                    actions.push(
-                      new NotificationAction({
-                        index: globalActionIndex,
-                        scriptHash,
-                        args,
-                      }),
-                    );
-
-                    globalActionIndex = globalActionIndex.add(utils.ONE);
-                  },
-                  onMigrateContract: ({ from, to }) => {
-                    migratedContractHashes.push([from, to] as const);
-                  },
-                  onSetVotes: ({ address, votes }) => {
-                    voteUpdates.push([address, votes] as const);
-                  },
-                },
-
-                persistingBlock: block,
-              }),
-            );
-
-            const addActionsPromise = Promise.all(actions.map(async (action) => this.action.add(action)));
-
-            if (result instanceof InvocationResultSuccess) {
-              const assetChangeSet = temporaryBlockchain.asset.getChangeSet();
-              const assetHash = assetChangeSet
-                .map((change) =>
-                  change.type === 'add' && change.change.type === 'asset' ? change.change.value.hash : undefined,
-                )
-                .find((value) => value !== undefined);
-
-              const contractsChangeSet = temporaryBlockchain.contract.getChangeSet();
-              const contractHashes = contractsChangeSet
-                .map((change) =>
-                  change.type === 'add' && change.change.type === 'contract' ? change.change.value.hash : undefined,
-                )
-                .filter(commonUtils.notNull);
-
-              const deletedContractHashes = contractsChangeSet
-                .map((change) =>
-                  change.type === 'delete' && change.change.type === 'contract' ? change.change.key.hash : undefined,
-                )
-                .filter(commonUtils.notNull);
-
-              const storageChanges = temporaryBlockchain.storageItem
-                .getChangeSet()
-                .map((change) => {
-                  const addChange =
-                    change.type === 'add' && change.change.type === 'storageItem'
-                      ? { value: change.change.value, subType: change.subType }
-                      : undefined;
-                  if (addChange !== undefined) {
-                    const options = {
-                      hash: addChange.value.hash,
-                      key: addChange.value.key,
-                      value: addChange.value.value,
-                    };
-
-                    return addChange.subType === 'add'
-                      ? new StorageChangeAdd(options)
-                      : new StorageChangeModify(options);
-                  }
-
-                  const deleteChange =
-                    change.type === 'delete' && change.change.type === 'storageItem' ? change.change.key : undefined;
-                  if (deleteChange !== undefined) {
-                    return new StorageChangeDelete(deleteChange);
-                  }
-
-                  return undefined;
-                })
-                .filter(commonUtils.notNull);
-
-              temporaryBlockchain.getTrackedChangeSet().forEach((change) => {
-                this.caches[change.type as keyof Caches].addTrackedChange(change.key, change.value);
-              });
-              await Promise.all([
-                this.invocationData.add(
-                  new InvocationData({
-                    hash: transaction.hash,
-                    assetHash,
-                    contractHashes,
-                    deletedContractHashes,
-                    migratedContractHashes,
-                    voteUpdates,
-                    blockIndex: block.index,
-                    transactionIndex,
-                    actionIndexStart: globalActionIndexIn,
-                    actionIndexStop: globalActionIndex,
-                    result,
-                    storageChanges,
-                  }),
-                ),
-                addActionsPromise,
-              ]);
-            } else {
-              await Promise.all([
-                this.invocationData.add(
-                  new InvocationData({
-                    hash: transaction.hash,
-                    assetHash: undefined,
-                    contractHashes: [],
-                    deletedContractHashes: [],
-                    migratedContractHashes: [],
-                    voteUpdates: [],
-                    blockIndex: block.index,
-                    transactionIndex,
-                    actionIndexStart: globalActionIndexIn,
-                    actionIndexStop: globalActionIndex,
-                    result,
-                    storageChanges: [],
-                  }),
-                ),
-                addActionsPromise,
-              ]);
-            }
-          }
-        },
-        {
-          name: 'neo_write_blockchain_persist_single_transaction',
-        },
+    if (transaction.type === TransactionType.Register && transaction instanceof RegisterTransaction) {
+      await this.asset.add(
+        new Asset({
+          hash: transaction.hash,
+          type: transaction.asset.type,
+          name: transaction.asset.name,
+          amount: transaction.asset.amount,
+          precision: transaction.asset.precision,
+          owner: transaction.asset.owner,
+          admin: transaction.asset.admin,
+          issuer: transaction.asset.admin,
+          expiration: this.currentBlockIndex + 2 * 2000000,
+          isFrozen: false,
+        }),
       );
+    } else if (transaction.type === TransactionType.Issue && transaction instanceof IssueTransaction) {
+      const results = await Promise.all(
+        Object.entries(
+          transaction.getTransactionResults({
+            getOutput: this.output.get,
+          }),
+        ),
+      );
+
+      await Promise.all(
+        results.map(async ([assetHex, value]) => {
+          const hash = common.stringToUInt256(assetHex);
+          const asset = await this.asset.get({ hash });
+          await this.asset.update(asset, {
+            available: asset.available.add(value.neg()),
+          });
+        }),
+      );
+    } else if (transaction.type === TransactionType.Enrollment && transaction instanceof EnrollmentTransaction) {
+      await this.validator.add(
+        new Validator({
+          publicKey: transaction.publicKey,
+        }),
+      );
+    } else if (transaction.type === TransactionType.Publish && transaction instanceof PublishTransaction) {
+      const contract = await this.contract.tryGet({
+        hash: transaction.contract.hash,
+      });
+
+      if (contract === undefined) {
+        await this.contract.add(transaction.contract);
+      }
+    } else if (transaction.type === TransactionType.Invocation && transaction instanceof InvocationTransaction) {
+      const temporaryBlockchain = new WriteBatchBlockchain({
+        settings: this.settings,
+        currentBlock: this.currentBlockInternal,
+        currentHeader: this.currentHeader,
+        // tslint:disable-next-line no-any
+        storage: this as any,
+        vm: this.vm,
+        getValidators: this.getValidators,
+      });
+
+      const migratedContractHashes: Array<readonly [UInt160, UInt160]> = [];
+      const voteUpdates: Array<readonly [UInt160, ReadonlyArray<ECPoint>]> = [];
+      const actions: Array<NotificationAction | LogAction> = [];
+      const result = await wrapExecuteScripts(async () =>
+        this.vm.executeScripts({
+          scripts: [{ code: transaction.script }],
+          blockchain: temporaryBlockchain,
+          scriptContainer: {
+            type: ScriptContainerType.Transaction,
+            value: transaction,
+          },
+
+          triggerType: TriggerType.Application,
+          action: {
+            blockIndex: block.index,
+            blockHash: block.hash,
+            transactionIndex,
+            transactionHash: transaction.hash,
+          },
+
+          gas: transaction.gas,
+          listeners: {
+            onLog: ({ message, scriptHash }) => {
+              actions.push(
+                new LogAction({
+                  index: globalActionIndex,
+                  scriptHash,
+                  message,
+                }),
+              );
+
+              globalActionIndex = globalActionIndex.add(utils.ONE);
+            },
+            onNotify: ({ args, scriptHash }) => {
+              actions.push(
+                new NotificationAction({
+                  index: globalActionIndex,
+                  scriptHash,
+                  args,
+                }),
+              );
+
+              globalActionIndex = globalActionIndex.add(utils.ONE);
+            },
+            onMigrateContract: ({ from, to }) => {
+              migratedContractHashes.push([from, to] as const);
+            },
+            onSetVotes: ({ address, votes }) => {
+              voteUpdates.push([address, votes] as const);
+            },
+          },
+
+          persistingBlock: block,
+        }),
+      );
+
+      const addActionsPromise = Promise.all(actions.map(async (action) => this.action.add(action)));
+
+      if (result instanceof InvocationResultSuccess) {
+        const assetChangeSet = temporaryBlockchain.asset.getChangeSet();
+        const assetHash = assetChangeSet
+          .map((change) =>
+            change.type === 'add' && change.change.type === 'asset' ? change.change.value.hash : undefined,
+          )
+          .find((value) => value !== undefined);
+
+        const contractsChangeSet = temporaryBlockchain.contract.getChangeSet();
+        const contractHashes = contractsChangeSet
+          .map((change) =>
+            change.type === 'add' && change.change.type === 'contract' ? change.change.value.hash : undefined,
+          )
+          .filter(commonUtils.notNull);
+
+        const deletedContractHashes = contractsChangeSet
+          .map((change) =>
+            change.type === 'delete' && change.change.type === 'contract' ? change.change.key.hash : undefined,
+          )
+          .filter(commonUtils.notNull);
+
+        const storageChanges = temporaryBlockchain.storageItem
+          .getChangeSet()
+          .map((change) => {
+            const addChange =
+              change.type === 'add' && change.change.type === 'storageItem'
+                ? { value: change.change.value, subType: change.subType }
+                : undefined;
+            if (addChange !== undefined) {
+              const options = {
+                hash: addChange.value.hash,
+                key: addChange.value.key,
+                value: addChange.value.value,
+              };
+
+              return addChange.subType === 'add' ? new StorageChangeAdd(options) : new StorageChangeModify(options);
+            }
+
+            const deleteChange =
+              change.type === 'delete' && change.change.type === 'storageItem' ? change.change.key : undefined;
+            if (deleteChange !== undefined) {
+              return new StorageChangeDelete(deleteChange);
+            }
+
+            return undefined;
+          })
+          .filter(commonUtils.notNull);
+
+        temporaryBlockchain.getTrackedChangeSet().forEach((change) => {
+          this.caches[change.type as keyof Caches].addTrackedChange(change.key, change.value);
+        });
+        await Promise.all([
+          this.invocationData.add(
+            new InvocationData({
+              hash: transaction.hash,
+              assetHash,
+              contractHashes,
+              deletedContractHashes,
+              migratedContractHashes,
+              voteUpdates,
+              blockIndex: block.index,
+              transactionIndex,
+              actionIndexStart: globalActionIndexIn,
+              actionIndexStop: globalActionIndex,
+              result,
+              storageChanges,
+            }),
+          ),
+          addActionsPromise,
+        ]);
+      } else {
+        await Promise.all([
+          this.invocationData.add(
+            new InvocationData({
+              hash: transaction.hash,
+              assetHash: undefined,
+              contractHashes: [],
+              deletedContractHashes: [],
+              migratedContractHashes: [],
+              voteUpdates: [],
+              blockIndex: block.index,
+              transactionIndex,
+              actionIndexStart: globalActionIndexIn,
+              actionIndexStop: globalActionIndex,
+              result,
+              storageChanges: [],
+            }),
+          ),
+          addActionsPromise,
+        ]);
+      }
+    }
 
     return globalActionIndex;
   }
 
   private async processStateTransaction(
-    monitor: Monitor,
     validatorChanges: ValidatorChanges,
     validatorsCountChanges: ValidatorsCountChanges,
   ): Promise<void> {
-    await monitor.captureSpan(
-      async () => {
-        const validatorsCount = await this.validatorsCount.tryGet();
-        const validatorsCountVotes = validatorsCount === undefined ? [] : [...validatorsCount.votes];
-        // tslint:disable-next-line no-loop-statement
-        for (const [index, value] of validatorsCountChanges.entries()) {
-          validatorsCountVotes[index] = value;
-        }
+    const validatorsCount = await this.validatorsCount.tryGet();
+    const validatorsCountVotes = validatorsCount === undefined ? [] : [...validatorsCount.votes];
+    // tslint:disable-next-line no-loop-statement
+    for (const [index, value] of validatorsCountChanges.entries()) {
+      validatorsCountVotes[index] = value;
+    }
 
-        await Promise.all([
-          Promise.all(
-            Object.entries(validatorChanges).map(async ([publicKeyHex, { registered, votes }]) => {
-              const publicKey = common.hexToECPoint(publicKeyHex);
-              const validator = await this.validator.tryGet({ publicKey });
-              if (validator === undefined) {
-                await this.validator.add(
-                  new Validator({
-                    publicKey,
-                    registered,
-                    votes,
-                  }),
-                );
-              } else if (
-                ((registered !== undefined && !registered) || (registered === undefined && !validator.registered)) &&
-                ((votes !== undefined && votes.eq(utils.ZERO)) ||
-                  (votes === undefined && validator.votes.eq(utils.ZERO)))
-              ) {
-                await this.validator.delete({ publicKey: validator.publicKey });
-              } else {
-                await this.validator.update(validator, { votes, registered });
-              }
+    await Promise.all([
+      Promise.all(
+        Object.entries(validatorChanges).map(async ([publicKeyHex, { registered, votes }]) => {
+          const publicKey = common.hexToECPoint(publicKeyHex);
+          const validator = await this.validator.tryGet({ publicKey });
+          if (validator === undefined) {
+            await this.validator.add(
+              new Validator({
+                publicKey,
+                registered,
+                votes,
+              }),
+            );
+          } else if (
+            ((registered !== undefined && !registered) || (registered === undefined && !validator.registered)) &&
+            ((votes !== undefined && votes.eq(utils.ZERO)) || (votes === undefined && validator.votes.eq(utils.ZERO)))
+          ) {
+            await this.validator.delete({ publicKey: validator.publicKey });
+          } else {
+            await this.validator.update(validator, { votes, registered });
+          }
+        }),
+      ),
+      validatorsCount === undefined
+        ? this.validatorsCount.add(
+            new ValidatorsCount({
+              votes: validatorsCountVotes,
             }),
-          ),
-          validatorsCount === undefined
-            ? this.validatorsCount.add(
-                new ValidatorsCount({
-                  votes: validatorsCountVotes,
-                }),
-              )
-            : (async () => {
-                await this.validatorsCount.update(validatorsCount, {
-                  votes: validatorsCountVotes,
-                });
-              })(),
-        ]);
-      },
-      {
-        name: 'neo_write_blockchain_process_state_transaction',
-      },
-    );
+          )
+        : (async () => {
+            await this.validatorsCount.update(validatorsCount, {
+              votes: validatorsCountVotes,
+            });
+          })(),
+    ]);
   }
 
   private async updateAccounts(
-    monitor: Monitor,
     inputs: readonly Input[],
     claims: readonly Input[],
     outputs: readonly OutputWithInput[],
     accountChanges: AccountChanges = {},
   ): Promise<void> {
-    const [inputOutputs, claimOutputs] = await monitor.captureSpan(
-      async () => Promise.all([this.getInputOutputs(inputs), this.getInputOutputs(claims)]),
-      {
-        name: 'neo_write_blockchain_update_accounts_get_input_outputs',
-      },
+    const [inputOutputs, claimOutputs] = await Promise.all([
+      this.getInputOutputs(inputs),
+      this.getInputOutputs(claims),
+    ]);
+
+    const addressValues = Object.entries(
+      _.groupBy(
+        inputOutputs
+          .map<[UInt160, UInt256, BN]>(({ output }) => [output.address, output.asset, output.value.neg()])
+          .concat(outputs.map<[UInt160, UInt256, BN]>(({ output }) => [output.address, output.asset, output.value])),
+        ([address]) => common.uInt160ToHex(address),
+      ),
     );
 
-    await monitor.captureSpan(
-      async () => {
-        const addressValues = Object.entries(
-          _.groupBy(
-            inputOutputs
-              .map<[UInt160, UInt256, BN]>(({ output }) => [output.address, output.asset, output.value.neg()])
-              .concat(
-                outputs.map<[UInt160, UInt256, BN]>(({ output }) => [output.address, output.asset, output.value]),
-              ),
-            ([address]) => common.uInt160ToHex(address),
-          ),
-        );
+    const addressSpent = this.groupByAddress(inputOutputs);
+    const addressClaimed = _.mapValues(this.groupByAddress(claimOutputs), (values) => values.map(({ input }) => input));
 
-        const addressSpent = this.groupByAddress(inputOutputs);
-        const addressClaimed = _.mapValues(this.groupByAddress(claimOutputs), (values) =>
-          values.map(({ input }) => input),
-        );
+    const addressOutputs = _.groupBy(outputs, (output) => common.uInt160ToHex(output.output.address));
 
-        const addressOutputs = _.groupBy(outputs, (output) => common.uInt160ToHex(output.output.address));
-
-        await Promise.all(
-          addressValues.map(async ([address, values]) => {
-            const spent = addressSpent[address] as readonly OutputWithInput[] | undefined;
-            const claimed = addressClaimed[address] as readonly Input[] | undefined;
-            const outs = addressOutputs[address] as readonly OutputWithInput[] | undefined;
-            const changes = accountChanges[address] as readonly ECPoint[] | undefined;
-            await this.updateAccount(
-              common.hexToUInt160(address),
-              // tslint:disable-next-line no-unused
-              values.map<readonly [UInt256, BN]>(([_address, asset, value]) => [asset, value] as const),
-              spent === undefined ? [] : spent,
-              claimed === undefined ? [] : claimed,
-              outs === undefined ? [] : outs,
-              changes === undefined ? [] : changes,
-            );
-          }),
+    await Promise.all(
+      addressValues.map(async ([address, values]) => {
+        const spent = addressSpent[address] as readonly OutputWithInput[] | undefined;
+        const claimed = addressClaimed[address] as readonly Input[] | undefined;
+        const outs = addressOutputs[address] as readonly OutputWithInput[] | undefined;
+        const changes = accountChanges[address] as readonly ECPoint[] | undefined;
+        await this.updateAccount(
+          common.hexToUInt160(address),
+          // tslint:disable-next-line no-unused
+          values.map<readonly [UInt256, BN]>(([_address, asset, value]) => [asset, value] as const),
+          spent === undefined ? [] : spent,
+          claimed === undefined ? [] : claimed,
+          outs === undefined ? [] : outs,
+          changes === undefined ? [] : changes,
         );
-      },
-      {
-        name: 'neo_write_blockchain_update_accounts_process',
-      },
+      }),
     );
   }
 
@@ -1068,27 +985,15 @@ export class WriteBatchBlockchain {
     await Promise.all(promises);
   }
 
-  private async updateCoins(
-    monitor: Monitor,
-    inputs: readonly Input[],
-    claims: readonly Input[],
-    block: Block,
-  ): Promise<void> {
-    await monitor.captureSpan(
-      async () => {
-        const inputClaims = inputs
-          .map<InputClaim>((input) => ({ type: 'input', input, hash: input.hash }))
-          .concat(claims.map<InputClaim>((input) => ({ type: 'claim', input, hash: input.hash })));
+  private async updateCoins(inputs: readonly Input[], claims: readonly Input[], block: Block): Promise<void> {
+    const inputClaims = inputs
+      .map<InputClaim>((input) => ({ type: 'input', input, hash: input.hash }))
+      .concat(claims.map<InputClaim>((input) => ({ type: 'claim', input, hash: input.hash })));
 
-        const hashInputClaims = Object.entries(_.groupBy(inputClaims, ({ hash }) => common.uInt256ToHex(hash)));
+    const hashInputClaims = Object.entries(_.groupBy(inputClaims, ({ hash }) => common.uInt256ToHex(hash)));
 
-        await Promise.all(
-          hashInputClaims.map(async ([hash, values]) => this.updateCoin(common.hexToUInt256(hash), values, block)),
-        );
-      },
-      {
-        name: 'neo_write_blockchain_update_coins',
-      },
+    await Promise.all(
+      hashInputClaims.map(async ([hash, values]) => this.updateCoin(common.hexToUInt256(hash), values, block)),
     );
   }
 

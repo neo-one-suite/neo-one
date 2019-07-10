@@ -5,6 +5,7 @@
   "main": "./src/index",
   "dependencies": {
     "@neo-one/http": "^1.1.4",
+    "@neo-one/logger": "^1.0.0",
     "@neo-one/monitor": "^1.1.4",
     "@neo-one/node-core": "^1.1.5",
     "@neo-one/node-rpc-handler": "^1.1.5",

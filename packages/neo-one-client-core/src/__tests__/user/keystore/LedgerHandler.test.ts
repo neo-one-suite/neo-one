@@ -1,5 +1,4 @@
 import { AddressString, NetworkType, publicKeyToAddress } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import { ledgerKeys } from '../../../__data__';
 import { ConnectedLedgerStore, LedgerHandler, LedgerStore } from '../../../user/keystore/';
@@ -29,7 +28,7 @@ const getPublicKeyMock = (index: number): string => {
 const getAccountMock = (index: number) => {
   const activeAddress = publicKeyToAddress(getPublicKeyMock(index));
 
-  return (_network: NetworkType, address: AddressString, _monitor?: Monitor) => {
+  return (_network: NetworkType, address: AddressString) => {
     if (address === activeAddress) {
       return activeAccount;
     }

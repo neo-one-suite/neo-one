@@ -1,5 +1,4 @@
 import { Block, GetOptions, IterOptions } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import _ from 'lodash';
 
 type Item = { readonly type: 'value'; readonly value: Block } | { readonly type: 'error'; readonly error: Error };
@@ -9,7 +8,7 @@ interface Resolver {
 }
 
 interface Client {
-  readonly getBlockCount: (monitor?: Monitor) => Promise<number>;
+  readonly getBlockCount: () => Promise<number>;
   readonly getBlock: (index: number, options?: GetOptions) => Promise<Block>;
 }
 
@@ -35,11 +34,10 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
   private readonly indexStop: number | undefined;
   private readonly fetchTimeoutMS: number;
   private readonly batchSize: number;
-  private readonly monitor: Monitor | undefined;
 
   public constructor({
     client,
-    options: { indexStart, indexStop, monitor },
+    options: { indexStart, indexStop },
     fetchTimeoutMS = FETCH_TIMEOUT_MS,
     batchSize = BATCH_SIZE,
   }: AsyncBlockIteratorOptions) {
@@ -52,7 +50,6 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
     this.indexStop = indexStop;
     this.fetchTimeoutMS = fetchTimeoutMS;
     this.batchSize = batchSize;
-    this.monitor = monitor === undefined ? undefined : monitor.at('async_block_iterator');
   }
 
   public [Symbol.asyncIterator]() {
@@ -138,7 +135,7 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
     let startHeight = this.mutableStartHeight;
     let indexIn = this.mutableCurrentIndex;
     if (startHeight === undefined || indexIn === undefined) {
-      const blockCount = await this.client.getBlockCount(this.monitor);
+      const blockCount = await this.client.getBlockCount();
       if (startHeight === undefined) {
         startHeight = blockCount - 1;
         this.mutableStartHeight = startHeight;
@@ -163,7 +160,7 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
       const [block, newStartHeight] = await Promise.all([
         this.fetchOne(index),
         // Refresh the block count in case we got behind somehow
-        this.client.getBlockCount(this.monitor),
+        this.client.getBlockCount(),
       ]);
 
       incIndex(1);
@@ -192,12 +189,9 @@ export class AsyncBlockIterator implements AsyncIterator<Block> {
       const block = await this.client.getBlock(
         index,
         isBatch
-          ? {
-              monitor: this.monitor,
-            }
+          ? {}
           : {
               timeoutMS: this.fetchTimeoutMS,
-              monitor: this.monitor,
             },
       );
 

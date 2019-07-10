@@ -1,4 +1,3 @@
-import { DefaultMonitor } from '@neo-one/monitor';
 import fetch from 'cross-fetch';
 import { HTTPError, InvalidRPCResponseError, JSONRPCError, UnknownBlockError } from '../../errors';
 import { JSONRPCHTTPProvider } from '../../provider/JSONRPCHTTPProvider';
@@ -198,40 +197,6 @@ describe('JSONRPCHTTPProvider', () => {
       headers: {
         'Content-Type': 'application/json',
       },
-
-      body: JSON.stringify(expectedReqTimeout),
-      timeout: 1000 + 5000,
-    });
-  });
-
-  test('watchSingle successful result - monitor', async () => {
-    const monitor = DefaultMonitor.create({ service: 'test' });
-    const reqTimeout = { method: 'getblockcount', watchTimeoutMS: 1000 };
-    const expectedReqTimeout = {
-      jsonrpc: '2.0',
-      id: 1,
-      method: reqTimeout.method,
-      params: [reqTimeout.watchTimeoutMS],
-    };
-
-    const expected = {};
-    fetchMock.mockImplementation(async () =>
-      Promise.resolve({
-        ok: true,
-        json: async () => Promise.resolve({ result: expected }),
-      }),
-    );
-
-    const result = provider.request(reqTimeout, monitor);
-
-    await expect(result).resolves.toBe(expected);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenCalledWith(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-
       body: JSON.stringify(expectedReqTimeout),
       timeout: 1000 + 5000,
     });

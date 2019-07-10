@@ -1,4 +1,4 @@
-import { Monitor } from '@neo-one/monitor';
+import { globalStats, startTracing } from '@neo-one/client-switch';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { Settings } from '@neo-one/node-core';
 import { backup, BackupRestoreOptions, restore } from '@neo-one/node-data-backup';
@@ -9,6 +9,8 @@ import { Node, NodeEnvironment, NodeOptions } from '@neo-one/node-protocol';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
 import { vm } from '@neo-one/node-vm';
 import { finalize, neverComplete } from '@neo-one/utils';
+import { JaegerTraceExporter } from '@opencensus/exporter-jaeger';
+import { PrometheusStatsExporter } from '@opencensus/exporter-prometheus';
 import { AbstractLevelDOWN } from 'abstract-leveldown';
 import LevelDOWN, { LevelDownOpenOptions } from 'leveldown';
 import LevelUp from 'levelup';
@@ -33,6 +35,10 @@ interface TelemetryEnvironment {
   readonly port: number;
 }
 
+interface TracingEnvironment {
+  readonly port: number;
+}
+
 export interface BaseEnvironment {
   readonly dataPath: string;
   readonly chainFile?: string;
@@ -40,6 +46,7 @@ export interface BaseEnvironment {
   readonly haltOnSync?: boolean;
   readonly levelDownOptions?: LevelDownOpenOptions;
   readonly telemetry?: TelemetryEnvironment;
+  readonly tracing?: TracingEnvironment;
 }
 
 export interface Environment extends BaseEnvironment {
@@ -57,7 +64,6 @@ export interface Options {
 }
 
 export interface FullNodeOptions {
-  readonly monitor: Monitor;
   readonly settings: Settings;
   readonly environment: Environment;
   readonly options$: Observable<Options>;
@@ -65,7 +71,6 @@ export interface FullNodeOptions {
 }
 
 export const fullNode$ = ({
-  monitor,
   settings,
   environment,
   options$,
@@ -88,7 +93,6 @@ FullNodeOptions): Observable<any> => {
       if (backupOptions !== undefined && backupOptions.restore) {
         return defer(async () =>
           restore({
-            monitor,
             environment: backupEnvironment,
             options: backupOptions.provider,
           }),
@@ -101,7 +105,28 @@ FullNodeOptions): Observable<any> => {
 
   const node$ = defer(async () => {
     if (environment.telemetry !== undefined) {
-      monitor.serveMetrics(environment.telemetry.port);
+      const exporter = new PrometheusStatsExporter({
+        port: environment.telemetry.port,
+        startServer: true,
+      });
+
+      globalStats.registerExporter(exporter);
+      finalize(() => {
+        exporter.stopServer();
+        globalStats.unregisterExporter(exporter);
+      });
+    }
+
+    if (environment.tracing !== undefined) {
+      const exporter = new JaegerTraceExporter({
+        serviceName: 'NEO-ONE',
+        host: 'localhost',
+        port: environment.tracing.port,
+        bufferTimeout: 100,
+      });
+
+      const stopTracing = startTracing(exporter);
+      finalize(stopTracing);
     }
 
     let levelDown = customLeveldown;
@@ -120,6 +145,14 @@ FullNodeOptions): Observable<any> => {
         });
       }
       levelDown = levelDownToOpen;
+      finalize(
+        async () =>
+          new Promise<void>((resolve) => {
+            levelDownToOpen.close(() => {
+              resolve();
+            });
+          }),
+      );
     }
 
     const storage = levelupStorage({
@@ -131,7 +164,6 @@ FullNodeOptions): Observable<any> => {
       settings,
       storage,
       vm,
-      monitor,
     });
 
     if (environment.chainFile !== undefined) {
@@ -160,7 +192,6 @@ FullNodeOptions): Observable<any> => {
     distinctUntilChanged((a, b) => a.blockchain === b.blockchain),
     switchMap(({ blockchain }) => {
       const node = new Node({
-        monitor,
         blockchain,
         environment: environment.node,
         options$: options$.pipe(
@@ -169,7 +200,6 @@ FullNodeOptions): Observable<any> => {
         ),
         createNetwork: (options) =>
           new Network({
-            monitor,
             environment: environment.network,
             options$: options$.pipe(
               map(({ network: networkOptions = {} }) => networkOptions),
@@ -184,7 +214,6 @@ FullNodeOptions): Observable<any> => {
     distinctUntilChanged((a, b) => a.blockchain === b.blockchain && a.node === b.node),
     switchMap(({ node, blockchain }) =>
       rpcServer$({
-        monitor,
         blockchain,
         node,
         environment: environment.rpc,
@@ -229,7 +258,6 @@ FullNodeOptions): Observable<any> => {
             switchMap(() =>
               defer(async () => {
                 await backup({
-                  monitor,
                   environment: backupEnvironment,
                   options: backupOptions.provider,
                 });

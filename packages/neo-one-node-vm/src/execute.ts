@@ -1,5 +1,5 @@
 import { crypto, utils, VMState } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
+import { nodeLogger } from '@neo-one/logger';
 import {
   Block,
   ByteArrayContractParameter,
@@ -33,13 +33,13 @@ import {
 import { lookupOp } from './opcodes';
 import { StackItem } from './stackItem';
 
+const logger = nodeLogger.child({ component: 'vm' });
+
 const getErrorMessage = (error: Error) => `${error.message}\n${error.stack}`;
 
 const executeNext = async ({
-  monitor,
   context: contextIn,
 }: {
-  readonly monitor: Monitor;
   readonly context: ExecutionContext;
 }): Promise<ExecutionContext> => {
   let context = contextIn;
@@ -89,7 +89,7 @@ const executeNext = async ({
 
   let result;
   try {
-    result = await op.invoke({ monitor, context, args, argsAlt });
+    result = await op.invoke({ context, args, argsAlt });
   } catch (error) {
     if (error.code === 'VM_ERROR') {
       throw error;
@@ -137,19 +137,13 @@ const executeNext = async ({
   return context;
 };
 
-const run = async ({
-  monitor,
-  context: contextIn,
-}: {
-  readonly monitor: Monitor;
-  readonly context: ExecutionContext;
-}): Promise<ExecutionContext> => {
+const run = async ({ context: contextIn }: { readonly context: ExecutionContext }): Promise<ExecutionContext> => {
   let context = contextIn;
   // tslint:disable-next-line no-loop-statement
   while (context.state === VMState.None) {
     try {
       // eslint-disable-next-line
-      context = await executeNext({ monitor, context });
+      context = await executeNext({ context });
     } catch (error) {
       context = {
         state: VMState.Fault,
@@ -178,7 +172,6 @@ const run = async ({
 };
 
 export const executeScript = async ({
-  monitor,
   code,
   blockchain,
   init,
@@ -199,7 +192,6 @@ export const executeScript = async ({
     pc = 0,
   } = {},
 }: {
-  readonly monitor: Monitor;
   readonly code: Buffer;
   readonly blockchain: WriteBlockchain;
   readonly init: ExecutionInit;
@@ -231,11 +223,15 @@ export const executeScript = async ({
     stackCount,
   };
 
-  return monitor.captureSpanLog(async (span) => run({ monitor: span, context }), {
-    name: 'neo_execute_script',
-    level: { log: 'debug', span: 'debug' },
-    error: { level: 'debug' },
-  });
+  try {
+    const result = await run({ context });
+    logger.trace({ title: 'neo_execute_script' });
+
+    return result;
+  } catch (error) {
+    logger.trace({ title: 'neo_execute_script', error });
+    throw error;
+  }
 };
 
 const safeToContractParameter = (item: StackItem, safe: boolean) => {
@@ -251,7 +247,6 @@ const safeToContractParameter = (item: StackItem, safe: boolean) => {
 };
 
 export const execute = async ({
-  monitor: monitorIn,
   scripts,
   blockchain,
   scriptContainer,
@@ -263,7 +258,6 @@ export const execute = async ({
   skipWitnessVerify = false,
   persistingBlock,
 }: {
-  readonly monitor: Monitor;
   readonly scripts: readonly Script[];
   readonly blockchain: WriteBlockchain;
   readonly scriptContainer: ScriptContainer;
@@ -275,7 +269,6 @@ export const execute = async ({
   readonly skipWitnessVerify?: boolean;
   readonly persistingBlock?: Block;
 }): Promise<ExecuteScriptsResult> => {
-  const monitor = monitorIn.at('vm');
   const init = {
     scriptContainer,
     triggerType,
@@ -289,12 +282,7 @@ export const execute = async ({
   const startingGas = gasIn.add(FREE_GAS);
   let gas = startingGas;
   let errorMessage;
-  const span = monitor.startSpan({
-    name: 'neo_execute_scripts',
-    level: 'debug',
-  });
 
-  let err;
   try {
     const entryScriptHash = crypto.hash160(scripts[0].code);
     // tslint:disable-next-line no-loop-statement
@@ -332,7 +320,6 @@ export const execute = async ({
       }
 
       context = await executeScript({
-        monitor: span,
         code: script.code,
         blockchain,
         init,
@@ -343,10 +330,7 @@ export const execute = async ({
       gas = context.gasLeft;
     }
   } catch (error) {
-    err = error;
     errorMessage = getErrorMessage(error);
-  } finally {
-    span.end(err !== undefined);
   }
 
   const finalContext = context;

@@ -1,5 +1,5 @@
 // tslint:disable no-dynamic-delete
-import { Monitor } from '@neo-one/monitor';
+import { Logger } from '@neo-one/logger';
 import {
   BaseResource,
   BaseResourceOptions,
@@ -15,7 +15,7 @@ import {
   Task,
   TaskList,
 } from '@neo-one/server-plugin';
-import { labels, utils } from '@neo-one/utils';
+import { Labels, utils } from '@neo-one/utils';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
 import * as path from 'path';
@@ -53,7 +53,7 @@ export class ResourcesManager<
   public readonly resourceType: ResourceType<Resource, ResourceOptions>;
   public readonly masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>;
   public readonly resources$: Observable<readonly Resource[]>;
-  private readonly monitor: Monitor;
+  private readonly logger: Logger;
   private readonly pluginManager: PluginManager;
   private readonly portAllocator: PortAllocator;
   private readonly plugin: Plugin;
@@ -81,23 +81,24 @@ export class ResourcesManager<
   };
 
   public constructor({
-    monitor,
+    logger,
     dataPath,
     pluginManager,
     resourceType,
     masterResourceAdapter,
     portAllocator,
   }: {
-    readonly monitor: Monitor;
+    readonly logger: Logger;
     readonly dataPath: string;
     readonly pluginManager: PluginManager;
     readonly resourceType: ResourceType<Resource, ResourceOptions>;
     readonly masterResourceAdapter: MasterResourceAdapter<Resource, ResourceOptions>;
     readonly portAllocator: PortAllocator;
   }) {
-    this.monitor = monitor.at('resources_manager').withLabels({
-      [labels.PLUGIN_NAME]: resourceType.plugin.name,
-      [labels.RESOURCETYPE_NAME]: resourceType.name,
+    this.logger = logger.child({
+      component: 'resources_manager',
+      [Labels.PLUGIN_NAME]: resourceType.plugin.name,
+      [Labels.RESOURCETYPE_NAME]: resourceType.name,
     });
 
     this.pluginManager = pluginManager;
@@ -147,26 +148,22 @@ export class ResourcesManager<
   }
 
   public async destroy(): Promise<void> {
-    await this.monitor.captureLog(
-      async () => {
-        await Promise.all(
-          Object.entries(this.resourceAdapters).map(async ([name, resourceAdapter]) => {
-            // tslint:disable-next-line no-any
-            await this.stop(name, {} as any)
-              .toPromise()
-              .catch(() => {
-                // do nothing
-              });
-            await this.destroyName(name, resourceAdapter).catch(() => {
-              // do nothing
-            });
-          }),
-        );
-      },
-      {
-        name: 'neo_resource_manager_destroy',
-        message: `Destroyed resource manager for ${this.plugin.name} ${this.resourceType.name}`,
-      },
+    await Promise.all(
+      Object.entries(this.resourceAdapters).map(async ([name, resourceAdapter]) => {
+        // tslint:disable-next-line no-any
+        await this.stop(name, {} as any)
+          .toPromise()
+          .catch(() => {
+            // do nothing
+          });
+        await this.destroyName(name, resourceAdapter).catch(() => {
+          // do nothing
+        });
+      }),
+    );
+    this.logger.info(
+      { title: 'neo_resource_manager_destroy' },
+      `Destroyed resource manager for ${this.plugin.name} ${this.resourceType.name}`,
     );
   }
 
@@ -672,60 +669,57 @@ export class ResourcesManager<
   }
 
   public async init(): Promise<readonly InitError[]> {
-    return this.monitor.captureLog(
-      async () => {
-        await Promise.all([
-          fs.ensureDir(this.resourcesPath),
-          fs.ensureDir(this.resourcesReady.dir),
-          fs.ensureDir(this.directDependentsPath),
-          fs.ensureDir(this.dependenciesPath),
-        ]);
+    try {
+      await Promise.all([
+        fs.ensureDir(this.resourcesPath),
+        fs.ensureDir(this.resourcesReady.dir),
+        fs.ensureDir(this.directDependentsPath),
+        fs.ensureDir(this.dependenciesPath),
+      ]);
 
-        const resources = await this.resourcesReady.getAll();
+      const resources = await this.resourcesReady.getAll();
 
-        const foundResourceAdapters = new Set();
-        resources.forEach((name: string) => {
-          if (foundResourceAdapters.has(name)) {
-            throw new Error(`Something went wrong, found duplicate resource name: ${this.getSimpleName(name)}`);
-          }
-          foundResourceAdapters.add(name);
-        });
+      const foundResourceAdapters = new Set();
+      resources.forEach((name: string) => {
+        if (foundResourceAdapters.has(name)) {
+          throw new Error(`Something went wrong, found duplicate resource name: ${this.getSimpleName(name)}`);
+        }
+        foundResourceAdapters.add(name);
+      });
 
-        this.resourceAdapters$.next({});
-        const results = await Promise.all(
-          resources.map(
-            async (name: string): Promise<InitError | undefined> => {
-              try {
-                const [dependencies, dependents] = await Promise.all([
-                  this.readDeps(this.getDependenciesPath(name)),
-                  this.readDeps(this.getDirectDependentsPath(name)),
-                  this.initName(name),
-                ]);
+      this.resourceAdapters$.next({});
+      const results = await Promise.all(
+        resources.map(
+          async (name: string): Promise<InitError | undefined> => {
+            try {
+              const [dependencies, dependents] = await Promise.all([
+                this.readDeps(this.getDependenciesPath(name)),
+                this.readDeps(this.getDirectDependentsPath(name)),
+                this.initName(name),
+              ]);
 
-                this.mutableDirectResourceDependents[name] = [...dependents];
+              this.mutableDirectResourceDependents[name] = [...dependents];
 
-                this.addDependents({ name, dependencies });
+              this.addDependents({ name, dependencies });
 
-                return undefined;
-              } catch (error) {
-                return {
-                  resourceType: this.resourceType.name,
-                  resource: name,
-                  error,
-                };
-              }
-            },
-          ),
-        );
+              return undefined;
+            } catch (error) {
+              return {
+                resourceType: this.resourceType.name,
+                resource: name,
+                error,
+              };
+            }
+          },
+        ),
+      );
+      this.logger.info({ title: 'neo_resource_manager_initialize' }, 'Initialized resource manager.');
 
-        return results.filter(utils.notNull);
-      },
-      {
-        name: 'neo_resource_manager_inititalize',
-        message: 'Initializing resource manager.',
-        error: 'Failed to initialize resource manager.',
-      },
-    );
+      return results.filter(utils.notNull);
+    } catch (error) {
+      this.logger.error({ title: 'neo_resource_manager_initialize', error }, 'Failed to initialize resource manager.');
+      throw error;
+    }
   }
 
   private async initName(name: string): Promise<void> {

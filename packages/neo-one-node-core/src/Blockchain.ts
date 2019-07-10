@@ -1,5 +1,4 @@
 import { ECPoint } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import { BN } from 'bn.js';
 import { Observable } from 'rxjs';
 import { Account, AccountKey, AccountUpdate } from './Account';
@@ -138,26 +137,21 @@ export interface Blockchain extends BlockchainStorage {
   readonly block$: Observable<Block>;
   readonly isPersistingBlock: boolean;
 
-  readonly persistBlock: (options: {
-    readonly monitor?: Monitor;
-    readonly block: Block;
-    readonly unsafe?: boolean;
-  }) => Promise<void>;
-  readonly persistHeaders: (headers: readonly Header[], monitor?: Monitor) => Promise<void>;
+  readonly persistBlock: (options: { readonly block: Block; readonly unsafe?: boolean }) => Promise<void>;
+  readonly persistHeaders: (headers: readonly Header[]) => Promise<void>;
 
-  readonly verifyBlock: (block: Block, monitor?: Monitor) => Promise<void>;
+  readonly verifyBlock: (block: Block) => Promise<void>;
   readonly verifyTransaction: (param0: {
-    readonly monitor?: Monitor;
     readonly transaction: Transaction;
     readonly memPool?: readonly Transaction[];
   }) => Promise<VerifyTransactionResult>;
-  readonly verifyConsensusPayload: (payload: ConsensusPayload, monitor?: Monitor) => Promise<void>;
+  readonly verifyConsensusPayload: (payload: ConsensusPayload) => Promise<void>;
 
-  readonly getValidators: (transactions: readonly Transaction[], monitor?: Monitor) => Promise<readonly ECPoint[]>;
+  readonly getValidators: (transactions: readonly Transaction[]) => Promise<readonly ECPoint[]>;
 
-  readonly invokeScript: (script: Buffer, monitor?: Monitor) => Promise<CallReceipt>;
-  readonly invokeTransaction: (transaction: InvocationTransaction, monitor?: Monitor) => Promise<CallReceipt>;
-  readonly calculateClaimAmount: (inputs: readonly Input[], monitor?: Monitor) => Promise<BN>;
+  readonly invokeScript: (script: Buffer) => Promise<CallReceipt>;
+  readonly invokeTransaction: (transaction: InvocationTransaction) => Promise<CallReceipt>;
+  readonly calculateClaimAmount: (inputs: readonly Input[]) => Promise<BN>;
 
   readonly updateSettings: (settings: Settings) => void;
   readonly stop: () => Promise<void>;

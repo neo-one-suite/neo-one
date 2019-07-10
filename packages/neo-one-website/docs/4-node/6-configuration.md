@@ -20,9 +20,12 @@ This section will serve as a reference for the NEO•ONE Node's many configurati
     "dataPath?": string,
     "chainFile?": string,
     "dumpChainFile?": string,
-    "monitor?": string,
     "haltOnSync?": boolean,
     "levelDownOptions?": ???,
+    "logging?": {
+      "level?": string,
+      "path?": string
+    },
     "telemetry?": {
       "port": number
     }
@@ -59,11 +62,11 @@ _disabled by default_
 
 Optional path for outputting a `chainFile`.
 
-### monitor
+### logging
 
-\*defaults to **'info'\***
+\*defaults to **{path: undefined, level: 'info'}\***
 
-Desired logging level of the node monitor, options are
+Desired logging level and output path of the node logging, options are for level are:
 
 ```
 'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'silly'

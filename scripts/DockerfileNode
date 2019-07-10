@@ -7,8 +7,8 @@ COPY tsconfig/ tsconfig
 COPY types/ types
 COPY packages/neo-one-utils/src/ packages/neo-one-utils/src
 COPY packages/neo-one-utils/package.json packages/neo-one-utils/
-COPY packages/neo-one-monitor/src/ packages/neo-one-monitor/src
-COPY packages/neo-one-monitor/package.json packages/neo-one-monitor/
+COPY packages/neo-one-logger/src/ packages/neo-one-logger/src
+COPY packages/neo-one-logger/package.json packages/neo-one-logger/
 COPY packages/neo-one-client/src/ packages/neo-one-client/src
 COPY packages/neo-one-client/package.json packages/neo-one-client/
 COPY packages/neo-one-client-common/src/ packages/neo-one-client-common/src

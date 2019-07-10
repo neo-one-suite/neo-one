@@ -33,7 +33,6 @@ import {
   WitnessModel,
 } from '@neo-one/client-common';
 import { processActionsAndMessage } from '@neo-one/client-switch';
-import { Monitor } from '@neo-one/monitor';
 import { utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { Observable } from 'rxjs';
@@ -71,11 +70,11 @@ export interface KeyStore {
    *
    * If the `KeyStore` implements selecting `UserAccount`s in a way that does not allow arbitrary `UserAccount`s to be programatically selected, then the `KeyStore` should only ever return one available `UserAccount` from the `userAccount$` and `getUserAccounts` properties.
    */
-  readonly selectUserAccount: (id?: UserAccountID, monitor?: Monitor) => Promise<void>;
+  readonly selectUserAccount: (id?: UserAccountID) => Promise<void>;
   /**
    * The `KeyStore` may optionally support deleting `UserAccount`s.
    */
-  readonly deleteUserAccount?: (id: UserAccountID, monitor?: Monitor) => Promise<void>;
+  readonly deleteUserAccount?: (id: UserAccountID) => Promise<void>;
   /**
    * The `KeyStore` may optionally support updating the `UserAccount` name.
    */
@@ -83,19 +82,11 @@ export interface KeyStore {
   /**
    * Sign an arbitrary message with the specified user account, returning a hex encoded string of the signature.
    */
-  readonly sign: (options: {
-    readonly account: UserAccountID;
-    readonly message: string;
-    readonly monitor?: Monitor;
-  }) => Promise<string>;
+  readonly sign: (options: { readonly account: UserAccountID; readonly message: string }) => Promise<string>;
 }
 
 export interface Provider extends ProviderBase {
-  readonly relayTransaction: (
-    network: NetworkType,
-    transaction: string,
-    monitor?: Monitor,
-  ) => Promise<RelayTransactionResult>;
+  readonly relayTransaction: (network: NetworkType, transaction: string) => Promise<RelayTransactionResult>;
 }
 
 /**
@@ -131,8 +122,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     const deleteUserAccountIn = this.keystore.deleteUserAccount;
     if (deleteUserAccountIn !== undefined) {
       const deleteUserAccount = deleteUserAccountIn.bind(this.keystore);
-      this.deleteUserAccount = async (id: UserAccountID, monitor?: Monitor): Promise<void> => {
-        await deleteUserAccount(id, monitor);
+      this.deleteUserAccount = async (id: UserAccountID): Promise<void> => {
+        await deleteUserAccount(id);
       };
     }
 
@@ -165,8 +156,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     return this.provider.getNetworks();
   }
 
-  public async selectUserAccount(id?: UserAccountID, monitor?: Monitor): Promise<void> {
-    await this.keystore.selectUserAccount(id, monitor);
+  public async selectUserAccount(id?: UserAccountID): Promise<void> {
+    await this.keystore.selectUserAccount(id);
   }
 
   protected async sendTransaction<TTransaction extends Transaction, T extends TransactionReceipt = TransactionReceipt>({
@@ -175,7 +166,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     from,
     onConfirm,
     sourceMaps,
-    monitor,
   }: {
     readonly inputs: readonly InputOutput[];
     readonly transaction: TransactionBaseModel;
@@ -185,17 +175,15 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       readonly receipt: TransactionReceipt;
     }) => Promise<T>;
     readonly sourceMaps?: Promise<SourceMaps>;
-    readonly monitor?: Monitor;
   }): Promise<TransactionResult<T, TTransaction>> {
     return this.capture(
-      async (span) => {
+      async () => {
         let transactionUnsigned = transactionUnsignedIn;
         if (this.keystore.byteLimit !== undefined) {
           transactionUnsigned = await this.consolidate({
             inputs,
             from,
             transactionUnsignedIn,
-            monitor,
             byteLimit: this.keystore.byteLimit,
           });
         }
@@ -224,7 +212,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           this.keystore.sign({
             account: from,
             message: transactionUnsigned.serializeUnsigned().toString('hex'),
-            monitor: span,
           }),
           Promise.all(
             transactionUnsigned.inputs.map(async (input) =>
@@ -260,7 +247,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           })
             .serializeWire()
             .toString('hex'),
-          span,
         );
         const failures =
           result.verifyResult === undefined
@@ -300,9 +286,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         };
       },
       {
-        name: 'neo_send_transaction',
+        title: 'neo_send_transaction',
       },
-      monitor,
     );
   }
 
@@ -318,7 +303,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     paramsZipped,
     from,
     sourceMaps,
-    monitor,
   }: {
     readonly contract: AddressString;
     readonly inputs: readonly InputOutput[];
@@ -331,7 +315,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
     readonly from: UserAccountID;
     readonly sourceMaps?: Promise<SourceMaps>;
-    readonly monitor?: Monitor;
   }): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
     const transaction = new ClaimTransactionModel({
       inputs: this.convertInputs(inputs),
@@ -359,7 +342,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       from,
       transaction,
       onConfirm: async ({ receipt }) => receipt,
-      monitor,
       sourceMaps,
     });
   }
@@ -369,13 +351,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     from: UserAccountID,
     attributes: readonly Attribute[],
     networkFee: BigNumber,
-    monitor?: Monitor,
   ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction>> {
     const { inputs, outputs } = await this.getTransfersInputOutputs({
       transfers: transfers.map((transfer) => ({ from, ...transfer })),
       from,
       gas: networkFee,
-      monitor,
     });
 
     if (inputs.length === 0 && this.keystore.byteLimit === undefined) {
@@ -395,7 +375,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       transaction,
       inputs,
       onConfirm: async ({ receipt }) => receipt,
-      monitor,
     });
   }
 
@@ -403,15 +382,13 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     from: UserAccountID,
     attributes: readonly Attribute[],
     networkFee: BigNumber,
-    monitor?: Monitor,
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
     const [{ unclaimed, amount }, { inputs, outputs }] = await Promise.all([
-      this.provider.getUnclaimed(from.network, from.address, monitor),
+      this.provider.getUnclaimed(from.network, from.address),
       this.getTransfersInputOutputs({
         from,
         gas: networkFee,
         transfers: [],
-        monitor,
       }),
     ]);
 
@@ -439,7 +416,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       from,
       transaction,
       onConfirm: async ({ receipt }) => receipt,
-      monitor,
     });
   }
 
@@ -456,7 +432,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     reorderOutputs,
     onConfirm,
     sourceMaps,
-    monitor,
   }: ExecuteInvokeScriptOptions<T>): Promise<TransactionResult<T, InvocationTransaction>> {
     const invokeTransaction = new InvocationTransactionModel({
       version: 1,
@@ -480,7 +455,6 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           return onConfirm({ transaction, receipt, data });
         },
         sourceMaps,
-        monitor,
       });
 
       // tslint:disable-next-line:no-var-before-return

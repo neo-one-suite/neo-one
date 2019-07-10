@@ -7,19 +7,17 @@ import { Context } from '../../Context';
 import { createContextForPath, createContextForSnippet } from '../../createContext';
 import { EXECUTE_OPTIONS_DEFAULT, ExecuteOptions, executeScript } from './executeScript';
 import { checkResult } from './extractors';
-import { getMonitor } from './getMonitor';
 
 const execute = async (
   context: Context,
   sourceFile: ts.SourceFile,
   options: ExecuteOptions = EXECUTE_OPTIONS_DEFAULT,
 ) => {
-  const monitor = getMonitor();
   const {
     contract: { script: compiledCode },
     sourceMap,
   } = compile({ context, sourceFile });
-  const { receipt, sourceMaps } = await executeScript(monitor, context.diagnostics, compiledCode, sourceMap, options);
+  const { receipt, sourceMaps } = await executeScript(context.diagnostics, compiledCode, sourceMap, options);
   await checkResult(receipt, sourceMaps, true);
 
   return { receipt, sourceMaps };

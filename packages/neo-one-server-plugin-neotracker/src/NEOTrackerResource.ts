@@ -1,6 +1,6 @@
-import { Monitor } from '@neo-one/monitor';
+import { Logger } from '@neo-one/logger';
 import { DescribeTable, killProcess } from '@neo-one/server-plugin';
-import { OmitStrict } from '@neo-one/utils';
+import { Labels, OmitStrict } from '@neo-one/utils';
 import fetch from 'cross-fetch';
 import execa from 'execa';
 import * as fs from 'fs-extra';
@@ -199,37 +199,26 @@ export class NEOTrackerResource {
       };
 
       child.stdout.on('data', (value: Buffer) => {
-        this.monitor.log({
-          name: 'neotracker_stdout',
-          message: value.toString('utf8'),
-        });
+        this.logger.info({ title: 'neotracker_stdout' }, value.toString('utf8'));
       });
 
       child.stderr.on('data', (value: Buffer) => {
-        this.monitor.log({
-          name: 'neotracker_stderr',
-          message: value.toString('utf8'),
-        });
+        this.logger.info({ title: 'neotracker_stderr' }, value.toString('utf8'));
       });
 
-      // tslint:disable-next-line no-floating-promises
       child
         .then(() => {
-          this.monitor.log({
-            name: 'neo_neotracker_exit',
-            message: 'Child process exited',
-          });
+          this.logger.info({ title: 'neo_neotracker_exit' }, 'Child process exited');
 
           this.mutableProcess = undefined;
 
           restart();
         })
         .catch((error: execa.ExecaError) => {
-          this.monitor.logError({
-            name: 'neo_neotracker_error',
-            message: `Child process exited with an error. ${error.message}\n${error.stdout}\n${error.stderr}`,
-            error,
-          });
+          this.logger.error(
+            { title: 'neo_neotracker_error', error },
+            `Child process exited with an error. ${error.message}\n${error.stdout}\n${error.stderr}`,
+          );
 
           this.mutableProcess = undefined;
         });
@@ -264,19 +253,18 @@ export class NEOTrackerResource {
       return response.ok;
     } catch (error) {
       if (error.code !== 'ECONNREFUSED') {
-        this.monitor.withData({ [this.monitor.labels.HTTP_PATH]: 'healthcheck' }).logError({
-          name: 'http_client_request',
-          message: 'NEO Tracker health check failed.',
-          error,
-        });
+        this.logger.error(
+          { [Labels.HTTP_PATH]: 'healthcheck', title: 'http_client_request', error },
+          'NEO Tracker health check failed.',
+        );
       }
 
       return false;
     }
   }
 
-  private get monitor(): Monitor {
-    return this.resourceType.plugin.monitor;
+  private get logger(): Logger {
+    return this.resourceType.plugin.logger;
   }
 
   private readonly reset = async () => {

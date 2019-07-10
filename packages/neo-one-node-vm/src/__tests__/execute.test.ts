@@ -1,6 +1,5 @@
 // tslint:disable no-any no-let no-object-mutation no-empty
 import { common, crypto, ScriptBuilder, UInt160, UInt256, utils, VMState } from '@neo-one/client-common';
-import { DefaultMonitor } from '@neo-one/monitor';
 import {
   ArrayContractParameter,
   ByteArrayContractParameter,
@@ -20,10 +19,6 @@ import _ from 'lodash';
 import { assets, createBlockchain, factory, testUtils, transactions } from '../__data__';
 import { execute } from '../execute';
 
-const monitor = DefaultMonitor.create({
-  service: 'test',
-});
-
 let listeners: VMListeners;
 
 const executeSimple = async ({
@@ -40,7 +35,6 @@ const executeSimple = async ({
   readonly skipWitnessVerify?: boolean;
 }) =>
   execute({
-    monitor,
     scripts: [{ code: transaction.script }],
     blockchain,
     scriptContainer: {

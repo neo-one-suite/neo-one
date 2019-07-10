@@ -1,6 +1,5 @@
 // tslint:disable no-any no-object-mutation
 import { common, utils } from '@neo-one/client-common';
-import { DefaultMonitor } from '@neo-one/monitor';
 import {
   AttributeUsage,
   BooleanContractParameter,
@@ -12,14 +11,11 @@ import { of as _of } from 'rxjs';
 import { settings } from '../__data__';
 import { Blockchain } from '../Blockchain';
 
-const monitor = DefaultMonitor.create({ service: 'test' });
-
 const createBlockchain = async ({ vm, storage }: { readonly vm: any; readonly storage: any }) =>
   Blockchain.create({
     settings,
     storage,
     vm,
-    monitor,
   });
 
 describe('Blockchain', () => {

@@ -1,4 +1,4 @@
-import { bodyParser, getMonitor } from '@neo-one/http';
+import { bodyParser } from '@neo-one/http';
 import { Blockchain, Node } from '@neo-one/node-core';
 import { createHandler } from '@neo-one/node-rpc-handler';
 import { Context } from 'koa';
@@ -21,8 +21,7 @@ export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; rea
 
         // tslint:disable-next-line no-any
         const { body } = ctx.request as any;
-        const monitor = getMonitor(ctx);
-        const result = await handler(body, monitor);
+        const result = await handler(body);
 
         ctx.body = result;
       },

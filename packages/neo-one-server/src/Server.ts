@@ -1,5 +1,5 @@
 import { context as httpContext, cors, createServer$, onError as appOnError } from '@neo-one/http';
-import { Monitor } from '@neo-one/monitor';
+import { Logger, serverLogger } from '@neo-one/logger';
 import { ServerConfig, ServerManager } from '@neo-one/server-client';
 import { proto } from '@neo-one/server-grpc';
 import { Binary, Config, DescribeTable, VERSION } from '@neo-one/server-plugin';
@@ -20,11 +20,9 @@ const PLUGIN_PATH = 'plugin';
 
 export class Server {
   public static init$({
-    monitor,
     binary,
     serverConfig,
   }: {
-    readonly monitor: Monitor;
     readonly binary: Binary;
     readonly serverConfig: Config<ServerConfig>;
   }): Observable<Server> {
@@ -43,7 +41,7 @@ export class Server {
       switchMap(([dataPath, ports]) =>
         defer(async () =>
           PortAllocator.create({
-            monitor,
+            logger: serverLogger,
             dataPath,
             portMin: ports.min,
             portMax: ports.max,
@@ -63,7 +61,7 @@ export class Server {
       switchMap(([dataPath, portAllocator, httpServerPort]) =>
         defer(async () => {
           const pluginManager = new PluginManager({
-            monitor,
+            logger: serverLogger,
             binary,
             portAllocator,
             dataPath: path.resolve(dataPath, PLUGIN_PATH),
@@ -80,7 +78,7 @@ export class Server {
     return combineLatest([dataPath$, pluginManager$]).pipe(
       switchMap(([dataPath, pluginManager]) => {
         const server = new Server({
-          monitor,
+          logger: serverLogger,
           serverConfig,
           dataPath,
           pluginManager,
@@ -97,7 +95,6 @@ export class Server {
   public readonly serverConfig: Config<ServerConfig>;
   public readonly dataPath: string;
   public readonly pluginManager: PluginManager;
-  private readonly monitor: Monitor;
   private readonly mutableServerDebug: {
     // tslint:disable-next-line readonly-keyword
     port?: number;
@@ -108,17 +105,15 @@ export class Server {
   };
 
   public constructor({
-    monitor,
     serverConfig,
     dataPath,
     pluginManager,
   }: {
-    readonly monitor: Monitor;
+    readonly logger: Logger;
     readonly serverConfig: Config<ServerConfig>;
     readonly dataPath: string;
     readonly pluginManager: PluginManager;
   }) {
-    this.monitor = monitor.at('server');
     this.serverConfig = serverConfig;
     this.dataPath = dataPath;
     this.pluginManager = pluginManager;
@@ -151,37 +146,25 @@ export class Server {
               }
             } else {
               await prevApp.close().catch((error: Error) => {
-                this.monitor.logError({
-                  name: 'grpc_app_close_error',
-                  message: 'Failed to close previous app',
-                  error,
-                });
+                serverLogger.error({ title: 'grpc_app_close_error', error }, 'Failed to close previous app');
               });
             }
             const app = new Mali(proto);
             app.silent = false;
             app.on('error', (error: Error, ctx: Context | undefined | null) => {
-              let monitor = this.monitor;
+              let logger = serverLogger;
               // tslint:disable-next-line:no-any
-              if (ctx != undefined && (ctx as any).state != undefined && (ctx as any).state.monitor != undefined) {
+              if (ctx != undefined && (ctx as any).state != undefined && (ctx as any).state.logger != undefined) {
                 // tslint:disable-next-line:no-any
-                ({ monitor } = (ctx as any).state);
+                logger = (ctx as any).state.logger;
               }
-              monitor.logError({
-                name: 'grpc_server_request_uncaught_error',
-                message: 'Uncaught grpc error.',
-                error,
-              });
+              logger.error({ title: 'grpc_server_request_uncaught_error', error }, 'Uncaught grpc error.');
             });
-            app.use(context({ monitor: this.monitor }));
+            app.use(context({ logger: serverLogger }));
             app.use(servicesMiddleware({ server: this }));
             this.mutableServerDebug.port = serverConfig.port;
             app.start(`0.0.0.0:${serverConfig.port}`);
-            this.monitor.log({
-              name: 'server_listen',
-              message: `GRPC Server listening on 0.0.0.0:${serverConfig.port}.`,
-              level: 'info',
-            });
+            serverLogger.info({ title: 'server' }, `GRPC Server listening on 0.0.0.0:${serverConfig.port}.`);
 
             return app;
           }),
@@ -201,13 +184,13 @@ export class Server {
         const app = new Application<any, {}>();
         app.silent = true;
 
-        app.on('error', appOnError({ monitor: this.monitor }));
+        app.on('error', appOnError(serverLogger));
 
         // tslint:disable-next-line:no-any
         const router = new Router<any, {}>();
 
         const rpcMiddleware = rpc({ server: this });
-        router.use(httpContext({ monitor: this.monitor }));
+        router.use(httpContext(serverLogger));
         router.use(cors).post(rpcMiddleware.name, rpcMiddleware.path, rpcMiddleware.middleware);
 
         app.use(router.routes());
@@ -220,9 +203,7 @@ export class Server {
 
     const http$ = this.serverConfig.config$.pipe(
       switchMap((config) =>
-        createServer$(this.monitor, app$, _of(60000), { host: '0.0.0.0', port: config.httpServer.port }, () =>
-          http.createServer(),
-        ),
+        createServer$(app$, _of(60000), { host: '0.0.0.0', port: config.httpServer.port }, () => http.createServer()),
       ),
     );
 

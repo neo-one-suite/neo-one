@@ -10,7 +10,7 @@ import {
   SubDescribeTable,
   TaskList,
 } from '@neo-one/server-plugin';
-import { labels, mergeScanLatest, utils } from '@neo-one/utils';
+import { Labels, mergeScanLatest, utils } from '@neo-one/utils';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { BehaviorSubject, combineLatest, Observable, timer } from 'rxjs';
@@ -297,12 +297,11 @@ export class NetworkResourceAdapter {
   }
 
   private static createNodeAdapter(
-    { resourceType, binary }: NetworkResourceAdapterStaticOptions,
+    { binary }: NetworkResourceAdapterStaticOptions,
     { name, dataPath, settings, options }: NodeOptions,
   ): NodeAdapter {
     if (options.type === undefined || options.type === 'neo-one') {
       return new NEOONENodeAdapter({
-        monitor: resourceType.plugin.monitor,
         name,
         binary,
         dataPath,
@@ -343,15 +342,10 @@ export class NetworkResourceAdapter {
 
       await fs.writeFile(nodeOptionsPath, JSON.stringify(nodeOptions));
     } catch (error) {
-      options.resourceType.plugin.monitor
-        .withData({
-          [labels.NODE_NAME]: nodeOptions.name,
-        })
-        .logError({
-          name: 'neo_network_resource_adapter_write_node_options_error',
-          message: 'Failed to persist node options',
-          error,
-        });
+      options.resourceType.plugin.logger.error(
+        { title: 'neo_network_resource_adapter_write_node_options_error', [Labels.NODE_NAME]: nodeOptions.name, error },
+        'Failed to persist node options',
+      );
 
       throw error;
     }
@@ -366,15 +360,14 @@ export class NetworkResourceAdapter {
 
       return JSON.parse(contents);
     } catch (error) {
-      resourceType.plugin.monitor
-        .withData({
-          [labels.NODE_OPTIONSPATH]: nodeOptionsPath,
-        })
-        .logError({
-          name: 'neo_network_resource_adapter_read_node_options_error',
-          message: 'Failed to read node options.',
+      resourceType.plugin.logger.error(
+        {
+          title: 'neo_network_resource_adapter_read_node_options_error',
+          [Labels.NODE_OPTIONSPATH]: nodeOptionsPath,
           error,
-        });
+        },
+        'Failed to read node options.',
+      );
 
       throw error;
     }
@@ -521,10 +514,12 @@ export class NetworkResourceAdapter {
           task: async () => {
             const start = utils.nowSeconds();
             await this.live();
-            this.resourceType.plugin.monitor.log({
-              name: 'neo_network_resource_adapter_node_live',
-              message: `Started in ${utils.nowSeconds() - start} seconds`,
-            });
+            this.resourceType.plugin.logger.info(
+              {
+                name: 'neo_network_resource_adapter_node_live',
+              },
+              `Started in ${utils.nowSeconds() - start} seconds`,
+            );
           },
         },
       ],

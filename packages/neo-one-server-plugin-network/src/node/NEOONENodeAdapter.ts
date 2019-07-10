@@ -1,7 +1,8 @@
-import { Monitor } from '@neo-one/monitor';
+import { serverLogger } from '@neo-one/logger';
 import { FullNodeEnvironment, FullNodeOptions } from '@neo-one/node';
 import { createEndpoint, EndpointConfig } from '@neo-one/node-core';
 import { Binary, Config, DescribeTable, killProcess } from '@neo-one/server-plugin';
+import { Labels } from '@neo-one/utils';
 import fetch from 'cross-fetch';
 import execa from 'execa';
 import * as fs from 'fs-extra';
@@ -11,13 +12,9 @@ import { take } from 'rxjs/operators';
 import { NodeSettings } from '../types';
 import { NodeAdapter, NodeStatus } from './NodeAdapter';
 
-export interface NodeConfig {
-  readonly log: {
-    readonly level: string;
-    readonly maxSize: number;
-    readonly maxFiles: number;
-  };
+const logger = serverLogger.child({ component: 'neo_one_node_adapter' });
 
+export interface NodeConfig {
   readonly settings: {
     readonly test?: boolean;
     readonly privateNet?: boolean;
@@ -55,11 +52,6 @@ const DEFAULT_SEEDS: readonly EndpointConfig[] = [
 ];
 
 const makeDefaultConfig = (dataPath: string): NodeConfig => ({
-  log: {
-    level: 'info',
-    maxSize: 10 * 1024 * 1024,
-    maxFiles: 5,
-  },
   settings: {
     test: false,
   },
@@ -115,17 +107,7 @@ export const createNodeConfig = ({
     defaultConfig,
     schema: {
       type: 'object',
-      required: ['log'],
       properties: {
-        log: {
-          type: 'object',
-          required: ['level', 'maxSize', 'maxFiles'],
-          properties: {
-            level: { type: 'string' },
-            maxSize: { type: 'number' },
-            maxFiles: { type: 'number' },
-          },
-        },
         settings: {
           type: 'object',
           required: ['test'],
@@ -274,20 +256,17 @@ export class NEOONENodeAdapter extends NodeAdapter {
   private mutableProcess: execa.ExecaChildProcess | undefined;
 
   public constructor({
-    monitor,
     name,
     binary,
     dataPath,
     settings,
   }: {
-    readonly monitor: Monitor;
     readonly name: string;
     readonly binary: Binary;
     readonly dataPath: string;
     readonly settings: NodeSettings;
   }) {
     super({
-      monitor: monitor.at('neo_one_node_adapter'),
       name,
       binary,
       dataPath,
@@ -344,20 +323,11 @@ export class NEOONENodeAdapter extends NodeAdapter {
       // tslint:disable-next-line no-floating-promises
       child
         .then(() => {
-          this.monitor.log({
-            name: 'neo_node_adapter_node_exit',
-            message: 'Child process exited',
-          });
-
+          logger.info({ title: 'neo_node_adapter_node_exit' }, 'Child process exited');
           this.mutableProcess = undefined;
         })
         .catch((error: Error) => {
-          this.monitor.logError({
-            name: 'neo_node_adapter_node_error',
-            message: 'Child process exited with an error.',
-            error,
-          });
-
+          logger.error({ title: 'neo_node_adapter_node_error', error }, 'Child process exited with an error.');
           this.mutableProcess = undefined;
         });
     }
@@ -378,11 +348,10 @@ export class NEOONENodeAdapter extends NodeAdapter {
       return response.ok;
     } catch (error) {
       if (error.code !== 'ECONNREFUSED') {
-        this.monitor.withData({ [this.monitor.labels.HTTP_PATH]: rpcPath }).logError({
-          name: 'http_client_request',
-          message: 'Failed to check RPC.',
-          error,
-        });
+        logger.error(
+          { [Labels.HTTP_PATH]: rpcPath, title: 'http_client_request_error', error },
+          'Failed to check RPC.',
+        );
       }
 
       return false;
@@ -417,11 +386,6 @@ export class NEOONENodeAdapter extends NodeAdapter {
 
   private createConfig(settings: NodeSettings): NodeConfig {
     return {
-      log: {
-        level: 'info',
-        maxSize: 10 * 1024 * 1024,
-        maxFiles: 5,
-      },
       settings: {
         test: settings.isTestNet,
         privateNet: settings.privateNet,

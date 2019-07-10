@@ -1,5 +1,4 @@
 // tslint:disable deprecation no-any
-import { Monitor } from '@neo-one/monitor';
 import { OmitStrict } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
@@ -755,11 +754,11 @@ export interface UserAccountProvider {
    *
    * If the `UserAccountProvider` does not support programatically selecting a `UserAccountID`, it should only ever expose one available `UserAccount` and manage selecting other `UserAccount`s outside of the application.
    */
-  readonly selectUserAccount: (id?: UserAccountID, monitor?: Monitor) => Promise<void>;
+  readonly selectUserAccount: (id?: UserAccountID) => Promise<void>;
   /**
    * Optional support for deleting a `UserAccount`
    */
-  readonly deleteUserAccount?: (id: UserAccountID, monitor?: Monitor) => Promise<void>;
+  readonly deleteUserAccount?: (id: UserAccountID) => Promise<void>;
   /**
    * Optional support for updating the name of a `UserAccount`
    */
@@ -767,11 +766,11 @@ export interface UserAccountProvider {
   /**
    * @returns the current `Block` height.
    */
-  readonly getBlockCount: (network: NetworkType, monitor?: Monitor) => Promise<number>;
+  readonly getBlockCount: (network: NetworkType) => Promise<number>;
   /**
    * @returns `Account` for the specified network and address. Note that the provided network and address may not correspond to one of the available `UserAccount`s.
    */
-  readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
+  readonly getAccount: (network: NetworkType, address: AddressString) => Promise<Account>;
   /**
    * @returns `AsyncIterable` of `Block`s on the argument `network`.
    */
@@ -874,7 +873,6 @@ export interface UserAccountProvider {
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    monitor?: Monitor,
   ) => Promise<RawCallReceipt>;
 }
 
@@ -909,27 +907,27 @@ export interface DeveloperProvider {
   /**
    * Trigger consensus to run immediately.
    */
-  readonly runConsensusNow: (monitor?: Monitor) => Promise<void>;
+  readonly runConsensusNow: () => Promise<void>;
   /**
    * Update the network's settings.
    */
-  readonly updateSettings: (options: Partial<PrivateNetworkSettings>, monitor?: Monitor) => Promise<void>;
+  readonly updateSettings: (options: Partial<PrivateNetworkSettings>) => Promise<void>;
   /**
    * @returns the current network settings.
    */
-  readonly getSettings: (monitor?: Monitor) => Promise<PrivateNetworkSettings>;
+  readonly getSettings: () => Promise<PrivateNetworkSettings>;
   /**
    * @param seconds fast forward by `seconds` number of seconds.
    */
-  readonly fastForwardOffset: (seconds: number, monitor?: Monitor) => Promise<void>;
+  readonly fastForwardOffset: (seconds: number) => Promise<void>;
   /**
    * @param seconds fast forward to the unix timestamp defined by `seconds`
    */
-  readonly fastForwardToTime: (seconds: number, monitor?: Monitor) => Promise<void>;
+  readonly fastForwardToTime: (seconds: number) => Promise<void>;
   /**
    * Reset the network to it's initial state, restarting from the genesis `Block`.
    */
-  readonly reset: (monitor?: Monitor) => Promise<void>;
+  readonly reset: () => Promise<void>;
 }
 
 /**
@@ -1048,10 +1046,6 @@ export interface SmartContractReadOptions {
    * The network to read the smart contract data for. By default this is the network of the currently selected user account.
    */
   readonly network?: NetworkType;
-  /**
-   * The `Monitor` to use for tracking all asynchronous calls made in the process of pulling data.
-   */
-  readonly monitor?: Monitor;
 }
 
 /**
@@ -1072,17 +1066,10 @@ export interface BlockFilter {
    */
   readonly indexStop?: number;
 }
-
 /**
  * Additional optional options for methods that iterate over data by block index.
  */
-export interface IterOptions extends BlockFilter {
-  /**
-   * The `Monitor` to use for tracking all asynchronous calls made in the process of pulling data.
-   */
-  readonly monitor?: Monitor;
-}
-
+export interface IterOptions extends BlockFilter {}
 /**
  * Common options for operations that fetch data from the blockchain.
  */
@@ -1091,10 +1078,6 @@ export interface GetOptions {
    * Time in milliseconds before timing out the operation.
    */
   readonly timeoutMS?: number;
-  /**
-   * `Monitor` to use for all logging of the operation.
-   */
-  readonly monitor?: Monitor;
 }
 
 /**
@@ -1126,10 +1109,6 @@ export interface TransactionOptions {
    * A `systemFee` of `-1`, i.e. `new BigNumber(-1)` indicates no limit on the fee. This is typically used only during development.
    */
   systemFee?: BigNumber;
-  /**
-   * The `Monitor` to use for tracking and logging all asynchronous calls made during the transaction.
-   */
-  monitor?: Monitor;
   // tslint:enable readonly-keyword
 }
 
@@ -1183,10 +1162,6 @@ export interface UpdateAccountNameOptions {
    * New name of the `UserAccount`.
    */
   readonly name: string;
-  /**
-   * Optional `Monitor` for any logging that occurs during the update process.
-   */
-  readonly monitor?: Monitor;
 }
 
 /**

@@ -1,9 +1,8 @@
 // tslint:disable no-any
-import { Monitor } from '@neo-one/monitor';
+import { editorLogger } from '@neo-one/logger';
 import { retryBackoff } from '@neo-one/utils';
 import { getEscapedNPMName } from '@neo-one/utils-node';
 import fetch from 'cross-fetch';
-
 // @ts-ignore
 import detective from 'detective';
 import _ from 'lodash';
@@ -203,7 +202,7 @@ const getFilesWithExtensions = (files: Files, extensions: readonly string[]) =>
 
 const getDTS = (files: Files) => getFilesWithExtensions(files, ['.d.ts']);
 
-const resolvePackageWorker = async (name: string, version: string, monitor?: Monitor): Promise<Result> => {
+const resolvePackageWorker = async (name: string, version: string): Promise<Result> => {
   const url = getTarballURL(name, version);
   const files = await defer(async () => extractPackage(url))
     .pipe(
@@ -212,12 +211,7 @@ const resolvePackageWorker = async (name: string, version: string, monitor?: Mon
         maxRetries: 10,
         maxInterval: 750,
         onError: (error) => {
-          if (monitor !== undefined) {
-            monitor.logError({
-              name: 'resolve_package_extract_package_error',
-              error,
-            });
-          }
+          editorLogger.error({ title: 'resolve_package_extract_package_error', error });
         },
       }),
     )
@@ -285,21 +279,16 @@ const cache = new LRUCache<string, Promise<Result>>({
   max: 1000,
 });
 
-export const resolvePackage = async (name: string, version: string, monitor?: Monitor) => {
+export const resolvePackage = async (name: string, version: string) => {
   const key = `${name}@${version}`;
   const pkg = cache.get(key);
   if (pkg !== undefined) {
     return pkg;
   }
 
-  const result = resolvePackageWorker(name, version, monitor);
+  const result = resolvePackageWorker(name, version);
   result.catch((error) => {
-    if (monitor !== undefined) {
-      monitor.logError({
-        name: 'resolve_package_final_error',
-        error,
-      });
-    }
+    editorLogger.error({ title: 'resolve_package_final_error', error });
 
     cache.del(key);
   });

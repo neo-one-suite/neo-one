@@ -1,4 +1,3 @@
-import { getMonitor } from '@neo-one/http';
 import { Context } from 'koa';
 import { resolveDependencies } from './resolveDependencies';
 
@@ -11,7 +10,7 @@ export const resolveMiddleware = async (ctx: Context): Promise<void> => {
 
   // tslint:disable-next-line no-any
   const { body } = ctx.request as any;
-  const result = await resolveDependencies(body, getMonitor(ctx));
+  const result = await resolveDependencies(body);
 
   ctx.body = result;
   ctx.status = 200;

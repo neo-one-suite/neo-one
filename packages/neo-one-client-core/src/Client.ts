@@ -29,7 +29,6 @@ import {
   UserAccountProvider,
   UserAccountProviders,
 } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
 import { toObservable } from '@reactivex/ix-es2015-cjs/asynciterable/toobservable';
@@ -469,8 +468,8 @@ export class Client<
   /**
    * @returns `Promise` which resolves to an `Account` object for the provided `UserAccountID`.
    */
-  public async getAccount(id: UserAccountID, monitor?: Monitor): Promise<Account> {
-    return this.getNetworkProvider(id.network).getAccount(id.network, id.address, monitor);
+  public async getAccount(id: UserAccountID): Promise<Account> {
+    return this.getNetworkProvider(id.network).getAccount(id.network, id.address);
   }
 
   /**
@@ -606,10 +605,9 @@ export class Client<
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    monitor?: Monitor,
   ): Promise<RawCallReceipt> {
     try {
-      const receipt = await this.getNetworkProvider(network).call(network, contract, method, params, monitor);
+      const receipt = await this.getNetworkProvider(network).call(network, contract, method, params);
       await this.hooks.afterCall.promise(receipt);
 
       return receipt;

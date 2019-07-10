@@ -11,6 +11,7 @@
   "linterOptions": {
     "exclude": ["./packages/*/package.json", "./packages/*/template/**/*.ts", "./packages/*/template/**/*.tsx"]
   },
+  "defaultSeverity": "warning",
   "rules": {
     "cyclomatic-complexity": false,
     "no-unused-variable": false,

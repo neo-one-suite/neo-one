@@ -4,7 +4,6 @@ exports[`ReadClient getAccount 1`] = `
 Array [
   Array [
     "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-    undefined,
   ],
 ]
 `;
@@ -13,16 +12,13 @@ exports[`ReadClient getAsset 1`] = `
 Array [
   Array [
     "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
-    undefined,
   ],
 ]
 `;
 
 exports[`ReadClient getBestBlockHash 1`] = `
 Array [
-  Array [
-    undefined,
-  ],
+  Array [],
 ]
 `;
 
@@ -39,24 +35,19 @@ exports[`ReadClient getBlock 1`] = `
 Array [
   Array [
     "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
-    undefined,
   ],
 ]
 `;
 
 exports[`ReadClient getBlockCount 1`] = `
 Array [
-  Array [
-    undefined,
-  ],
+  Array [],
 ]
 `;
 
 exports[`ReadClient getConnectedPeers 1`] = `
 Array [
-  Array [
-    undefined,
-  ],
+  Array [],
 ]
 `;
 
@@ -64,16 +55,13 @@ exports[`ReadClient getContract 1`] = `
 Array [
   Array [
     "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-    undefined,
   ],
 ]
 `;
 
 exports[`ReadClient getMemPool 1`] = `
 Array [
-  Array [
-    undefined,
-  ],
+  Array [],
 ]
 `;
 
@@ -84,7 +72,6 @@ Array [
       "hash": "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
       "index": 0,
     },
-    undefined,
   ],
 ]
 `;
@@ -93,7 +80,6 @@ exports[`ReadClient getTransaction 1`] = `
 Array [
   Array [
     "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
-    undefined,
   ],
 ]
 `;
@@ -104,7 +90,6 @@ Array [
     Object {
       "indexStart": 3,
       "indexStop": 4,
-      "monitor": undefined,
     },
   ],
 ]

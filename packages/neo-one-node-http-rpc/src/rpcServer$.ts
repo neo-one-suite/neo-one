@@ -1,5 +1,5 @@
 import { context, cors, createServer$, onError as appOnError } from '@neo-one/http';
-import { Monitor } from '@neo-one/monitor';
+import { nodeLogger } from '@neo-one/logger';
 import { Blockchain, Node } from '@neo-one/node-core';
 import * as http from 'http';
 import Application from 'koa';
@@ -16,6 +16,8 @@ import {
   rpc,
   TooBusyCheckOptions,
 } from './middleware';
+
+const logger = nodeLogger.child({ component: 'rpc' });
 
 export interface ServerOptions {
   readonly keepAliveTimeout?: number;
@@ -39,20 +41,17 @@ export interface Options {
 }
 
 export const rpcServer$ = ({
-  monitor: monitorIn,
   blockchain,
   node,
   environment,
   options$,
 }: {
-  readonly monitor: Monitor;
   readonly blockchain: Blockchain;
   readonly node: Node;
   readonly environment: Environment;
   readonly options$: Observable<Options>;
   // tslint:disable-next-line no-any
 }): Observable<any> => {
-  const monitor = monitorIn.at('rpc');
   const app$ = combineLatest([
     options$.pipe(
       map((options) => options.liveHealthCheck),
@@ -77,13 +76,13 @@ export const rpcServer$ = ({
       app.proxy = true;
       app.silent = true;
 
-      app.on('error', appOnError({ monitor }));
+      app.on('error', appOnError(logger));
 
       // tslint:disable-next-line:no-any
       const router = new Router<any, {}>();
 
       const rpcMiddleware = rpc({ blockchain, node });
-      router.use(context({ monitor }));
+      router.use(context(logger));
 
       if (liveHealthCheckOptions !== undefined) {
         const liveMiddleware = liveHealthCheck({
@@ -135,5 +134,5 @@ export const rpcServer$ = ({
 
   return environment.http === undefined
     ? _of(undefined)
-    : createServer$(monitor, app$, keepAliveTimeout$, environment.http, () => http.createServer());
+    : createServer$(app$, keepAliveTimeout$, environment.http, () => http.createServer());
 };

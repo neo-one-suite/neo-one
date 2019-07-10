@@ -1,6 +1,6 @@
 /// <reference types="@reactivex/ix-es2015-cjs" />
 import { common, crypto, ECPoint, PrivateKey, UInt160 } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
+import { nodeLogger } from '@neo-one/logger';
 import { ConsensusPayload, Node, Transaction } from '@neo-one/node-core';
 import { finalize, mergeScanLatest, utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
@@ -16,6 +16,8 @@ import { handlePersistBlock } from './handlePersistBlock';
 import { handleTransactionReceived } from './handleTransactionReceived';
 import { runConsensus } from './runConsensus';
 import { Event, Result } from './types';
+
+const logger = nodeLogger.child({ component: 'consensus' });
 
 export interface Options {
   readonly privateKey: string;
@@ -36,18 +38,9 @@ export class Consensus {
   private readonly options$: Observable<InternalOptions>;
   private readonly node: Node;
   private mutableConsensusContext: ConsensusContext;
-  private readonly monitor: Monitor;
   private mutableStartPromise: Promise<void> | undefined;
 
-  public constructor({
-    options$,
-    node,
-    monitor,
-  }: {
-    readonly options$: Observable<Options>;
-    readonly node: Node;
-    readonly monitor: Monitor;
-  }) {
+  public constructor({ options$, node }: { readonly options$: Observable<Options>; readonly node: Node }) {
     this.mutableQueue = new ConsensusQueue();
     this.options$ = options$.pipe(
       map((options) => {
@@ -66,7 +59,6 @@ export class Consensus {
 
     this.node = node;
     this.mutableConsensusContext = new ConsensusContext();
-    this.monitor = monitor.at('node_consensus');
   }
 
   public start$(): Observable<void> {
@@ -164,11 +156,7 @@ export class Consensus {
   }
 
   private async start(options: InternalOptions): Promise<void> {
-    this.monitor.log({
-      name: 'neo_consensus_start',
-      message: 'Consensus started.',
-      level: 'verbose',
-    });
+    logger.debug({ title: 'neo_consensus_start' }, 'Consensus started.');
 
     const initialResult = await initializeNewConsensus({
       blockchain: this.node.blockchain,
@@ -237,11 +225,7 @@ export class Consensus {
         // do nothing
       });
 
-    this.monitor.log({
-      name: 'neo_consensus_stop',
-      message: 'Consensus stopped.',
-      level: 'verbose',
-    });
+    logger.debug({ title: 'neo_consensus_stop' }, 'Consensus stopped.');
   }
 
   private handleResult(result: Result<Context>): Context {

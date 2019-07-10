@@ -1,4 +1,3 @@
-import { LogLevel } from '@neo-one/monitor';
 import { FullNodeCreateOptions, FullNodeEnvironment, FullNodeOptions as ConfigOptions } from '@neo-one/node';
 import { createMain, createTest } from '@neo-one/node-neo-settings';
 import chokidar from 'chokidar';
@@ -8,7 +7,6 @@ import rc from 'rc';
 import { BehaviorSubject, concat, Observable, of } from 'rxjs';
 import { distinctUntilChanged, publishReplay, refCount, scan } from 'rxjs/operators';
 import SeamlessImmutable from 'seamless-immutable';
-import { createMonitor } from './createMonitor';
 import {
   extractBackupConfiguration,
   extractNetworkConfiguration,
@@ -25,7 +23,7 @@ interface SettingsEnvironment {
 }
 
 export interface NodeBinCreate {
-  readonly environment: FullNodeEnvironment & { readonly monitor: LogLevel };
+  readonly environment: FullNodeEnvironment;
   readonly settings: SettingsEnvironment;
   readonly options: ConfigOptions;
   // tslint:disable-next-line: readonly-array
@@ -64,10 +62,15 @@ const getSettings = (settings: SettingsEnvironment) => {
 };
 
 const getFreshConfig = (): NodeBinCreate => {
-  const { settings, environment: environmentPartial, rpc, node, network, backup, configs } = rc(
-    'neo_one_node',
-    DEFAULT_CONFIG,
-  );
+  const {
+    settings,
+    environment: { _logger, ...environmentPartial },
+    rpc,
+    node,
+    network,
+    backup,
+    configs,
+  } = rc('neo_one_node', DEFAULT_CONFIG);
   const { environment: rpcEnv, options: rpcOptions } = extractRPCConfiguration(rpc);
   const { environment: nodeEnv, options: nodeOptions } = extractNodeConfiguration(node);
   const { environment: networkEnv, options: networkOptions } = extractNetworkConfiguration(network);
@@ -101,7 +104,6 @@ export const getConfiguration = (): FullNodeCreateOptions => {
 
   fs.ensureDirSync(environment.dataPath);
 
-  const monitor = createMonitor({ level: environment.monitor });
   const settings = getSettings(settingsIn);
 
   let options$: Observable<ConfigOptions> = new BehaviorSubject(initialOptions);
@@ -132,5 +134,5 @@ export const getConfiguration = (): FullNodeCreateOptions => {
     );
   }
 
-  return { environment, settings, monitor, options$ };
+  return { environment, settings, options$ };
 };

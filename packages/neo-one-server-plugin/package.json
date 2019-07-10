@@ -4,7 +4,7 @@
   "description": "NEO•ONE Server plugin API.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/monitor": "^1.1.4",
+    "@neo-one/logger": "^1.0.0",
     "@neo-one/utils": "^1.1.3",
     "@types/vorpal": "^1.11.0",
     "ajv": "^6.10.2",

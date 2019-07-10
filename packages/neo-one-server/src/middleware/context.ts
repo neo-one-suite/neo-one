@@ -1,37 +1,47 @@
 import compose from '@malijs/compose';
 import onError from '@malijs/onerror';
-import { Monitor } from '@neo-one/monitor';
+import { addAttributesToSpan, SpanKind, tracer } from '@neo-one/client-switch';
+import { Logger } from '@neo-one/logger';
+import { Labels } from '@neo-one/utils';
 import { Context } from 'mali';
-import { getMonitor } from './common';
 
-export const context = ({ monitor }: { readonly monitor: Monitor }) =>
+const getLabels = (ctx: Context) => ({
+  [Labels.RPC_TYPE]: 'grpc',
+  [Labels.RPC_METHOD]: ctx.fullName,
+});
+
+export const context = ({ logger }: { readonly logger: Logger }) =>
   compose([
     async (ctx: Context, next) => {
-      // tslint:disable-next-line:no-any no-object-mutation
-      (ctx as any).state = {};
-      await monitor
-        .withLabels({
-          [monitor.labels.RPC_TYPE]: 'grpc',
-          [monitor.labels.RPC_METHOD]: ctx.fullName,
-        })
-        .captureSpanLog(
-          async (span) => {
-            // tslint:disable-next-line:no-any no-object-mutation
-            (ctx as any).monitor = span;
-            await next();
-          },
-          {
-            name: 'grpc_server_request',
-            level: { log: 'verbose', span: 'info' },
-            trace: true,
-          },
-        );
+      const spanExtract = tracer.propagation.extract({
+        getHeader: (name: string) => {
+          try {
+            return ctx.get(name);
+          } catch {
+            return undefined;
+          }
+        },
+      });
+      const spanContext = spanExtract !== null ? spanExtract : undefined;
+      const labels = getLabels(ctx);
+      const childLogger = logger.child({ labels });
+      // tslint:disable-next-line: no-object-mutation no-any
+      (ctx as any).state = { logger: childLogger };
+      await tracer.startRootSpan({ spanContext, name: 'grpc_server_request', kind: SpanKind.SERVER }, async (span) => {
+        addAttributesToSpan(span, labels);
+        try {
+          await next();
+          childLogger.debug({ title: 'grpc_server_request' });
+        } catch (error) {
+          childLogger.error({ title: 'grpc_server_request', error });
+          throw error;
+        } finally {
+          span.end();
+        }
+      });
     },
     onError((error, ctx) => {
-      getMonitor(ctx).logError({
-        name: 'grpc_server_request_uncaught_error',
-        message: 'Uncaught request error.',
-        error,
-      });
+      const labels = getLabels(ctx);
+      logger.error({ title: 'grpc_server_request_uncaught_error', error, ...labels }, 'Uncaught request error.');
     }),
   ]);

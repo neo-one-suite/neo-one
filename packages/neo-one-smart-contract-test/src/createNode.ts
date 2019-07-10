@@ -6,7 +6,6 @@ import _ from 'lodash';
 import MemDown from 'memdown';
 import { BehaviorSubject } from 'rxjs';
 import { addCleanup } from './addCleanup';
-import { getMonitor } from './getMonitor';
 
 const getPort = () => _.random(10000, 50000);
 
@@ -20,7 +19,6 @@ export const createNode = async (omitCleanup = false) => {
 
   const node = new FullNode(
     {
-      monitor: getMonitor(),
       settings: createMain({
         privateNet: true,
         standbyValidators: [constants.PRIVATE_NET_PUBLIC_KEY],

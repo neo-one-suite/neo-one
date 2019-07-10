@@ -1,5 +1,4 @@
 import { common, crypto } from '@neo-one/client-common';
-import { DefaultMonitor, Monitor } from '@neo-one/monitor';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { createMain } from '@neo-one/node-neo-settings';
 import { Node } from '@neo-one/node-protocol';
@@ -26,12 +25,10 @@ export interface InMemoryFullNode {
 export type FullNodeOptions = PersistentFullNode | InMemoryFullNode;
 
 export class FullNode {
-  private readonly monitor: Monitor;
   private mutableSubscription: Subscription | undefined;
   private readonly startPromise: Promise<RPCHandler>;
 
   public constructor(private readonly options: FullNodeOptions) {
-    this.monitor = DefaultMonitor.create({ service: 'node' });
     this.startPromise = this.startInternal();
   }
 
@@ -53,7 +50,7 @@ export class FullNode {
   public async handleRequest(data: any): Promise<any> {
     const handler = await this.startPromise;
 
-    return handler(data, this.monitor);
+    return handler(data);
   }
 
   private async startInternal(): Promise<RPCHandler> {
@@ -76,7 +73,6 @@ export class FullNode {
       settings,
       storage,
       vm,
-      monitor: this.monitor,
     });
     const nodeOptions$ = new BehaviorSubject({
       consensus: {
@@ -88,7 +84,6 @@ export class FullNode {
       },
     });
     const node = new Node({
-      monitor: this.monitor,
       blockchain,
       environment: {},
       options$: nodeOptions$,

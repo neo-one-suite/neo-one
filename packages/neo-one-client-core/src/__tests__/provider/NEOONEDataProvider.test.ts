@@ -713,7 +713,7 @@ describe('NEOONEDataProvider', () => {
 
     await provider.updateSettings(options);
 
-    expect(updateSettings).toHaveBeenCalledWith(options, undefined);
+    expect(updateSettings).toHaveBeenCalledWith(options);
   });
 
   test('fastForwardOffset', async () => {
@@ -723,7 +723,7 @@ describe('NEOONEDataProvider', () => {
 
     await provider.fastForwardOffset(options);
 
-    expect(fastForwardOffset).toHaveBeenCalledWith(options, undefined);
+    expect(fastForwardOffset).toHaveBeenCalledWith(options);
   });
 
   test('fastForwardToTime', async () => {
@@ -733,7 +733,7 @@ describe('NEOONEDataProvider', () => {
 
     await provider.fastForwardToTime(options);
 
-    expect(fastForwardToTime).toHaveBeenCalledWith(options, undefined);
+    expect(fastForwardToTime).toHaveBeenCalledWith(options);
   });
 
   test('reset', async () => {

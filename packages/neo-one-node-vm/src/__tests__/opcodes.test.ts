@@ -1,6 +1,5 @@
 // tslint:disable no-object-mutation no-any no-loop-statement
 import { BinaryWriter, crypto, OpCode, ScriptBuilder, ScriptBuilderParam } from '@neo-one/client-common';
-import { DefaultMonitor } from '@neo-one/monitor';
 import {
   AttributeUsage,
   Contract,
@@ -1678,10 +1677,6 @@ const OPCODES = ([
     // },
   ) as readonly TestCase[];
 
-const monitor = DefaultMonitor.create({
-  service: 'test',
-});
-
 describe('opcodes', () => {
   // tslint:disable-next-line no-any
   const filterMethods = (value: any): any => {
@@ -1796,7 +1791,6 @@ describe('opcodes', () => {
         const argsContext = await executeScript({
           code: argsSB.build(),
           blockchain: blockchain as any,
-          monitor: monitor as any,
           init,
           gasLeft,
         });
@@ -1812,7 +1806,6 @@ describe('opcodes', () => {
         const argsAltContext = await executeScript({
           code: argsAltSB.build(),
           blockchain: blockchain as any,
-          monitor: monitor as any,
           init,
           gasLeft,
         });
@@ -1821,7 +1814,6 @@ describe('opcodes', () => {
       }
 
       const context = await executeScript({
-        monitor: monitor as any,
         code: transaction.script,
         blockchain: blockchain as any,
         init,

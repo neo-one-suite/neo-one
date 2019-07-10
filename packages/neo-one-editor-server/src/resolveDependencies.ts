@@ -1,4 +1,4 @@
-import { Monitor } from '@neo-one/monitor';
+import { editorLogger } from '@neo-one/logger';
 import { retryBackoff } from '@neo-one/utils';
 import { getEscapedNPMName } from '@neo-one/utils-node';
 import fetch from 'cross-fetch';
@@ -60,7 +60,7 @@ const cache = new LRUCache<string, Promise<RegistryPackage>>({
 class Resolver {
   private readonly graph: Graph;
 
-  public constructor(private readonly monitor?: Monitor) {
+  public constructor() {
     this.graph = new Graph();
   }
 
@@ -192,12 +192,7 @@ class Resolver {
           maxRetries: 10,
           maxInterval: 2500,
           onError: (error) => {
-            if (this.monitor !== undefined) {
-              this.monitor.logError({
-                name: 'resolve_dependencies_fetch_registry_package_error',
-                error,
-              });
-            }
+            editorLogger.error({ title: 'resolve_dependencies_fetch_registry_package_error', error });
           },
         }),
       )
@@ -225,24 +220,16 @@ const resolutionCache = new LRUCache<string, Promise<ResolvedDependencies>>({
   max: 1000,
 });
 
-export async function resolveDependencies(
-  dependencies: Dependencies,
-  monitor?: Monitor,
-): Promise<ResolvedDependencies> {
+export async function resolveDependencies(dependencies: Dependencies): Promise<ResolvedDependencies> {
   const key = stringify(dependencies);
   const resolved = resolutionCache.get(key);
   if (resolved !== undefined) {
     return resolved;
   }
 
-  const result = new Resolver(monitor).resolve(dependencies);
+  const result = new Resolver().resolve(dependencies);
   result.catch((error) => {
-    if (monitor !== undefined) {
-      monitor.logError({
-        name: 'resolve_dependencies_final_error',
-        error,
-      });
-    }
+    editorLogger.error({ title: 'resolve_dependencies_final_error', error });
 
     cache.del(key);
   });

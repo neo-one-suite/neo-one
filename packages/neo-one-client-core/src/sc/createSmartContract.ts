@@ -207,7 +207,7 @@ const createCall = ({
   readonly func: ABIFunction;
   // tslint:disable-next-line no-any
 }) => async (...args: any[]): Promise<Return | undefined> => {
-  const { params, network, address, options } = getParamsAndOptions({
+  const { params, network, address } = getParamsAndOptions({
     definition,
     parameters,
     args,
@@ -219,7 +219,7 @@ const createCall = ({
     client,
   });
 
-  const receipt = await client.__call(network, address, name, params, options.monitor);
+  const receipt = await client.__call(network, address, name, params);
 
   return common.convertCallResult({
     returnType,

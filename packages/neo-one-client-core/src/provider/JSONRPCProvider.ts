@@ -1,5 +1,4 @@
 // tslint:disable no-any
-import { Monitor } from '@neo-one/monitor';
 import { JSONRPCError, UnknownBlockError } from '../errors';
 
 /**
@@ -38,7 +37,7 @@ export interface JSONRPCProviderManager {
  * Base interface for handling `JSONRPCRequest`s and returning `JSONRPCResponse`s.
  */
 export abstract class JSONRPCProvider {
-  public abstract request(req: JSONRPCRequest, monitor?: Monitor): Promise<JSONRPCResponse>;
+  public abstract request(req: JSONRPCRequest): Promise<JSONRPCResponse>;
 
   protected readonly handleResponse = (responseJSON: any): any => {
     if (responseJSON.error !== undefined) {

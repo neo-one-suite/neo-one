@@ -1,3 +1,4 @@
+import { cliLogger } from '@neo-one/logger';
 import { Server } from '@neo-one/server';
 import { CLIArgs, name } from '@neo-one/server-plugin';
 import { setupServer } from './common';
@@ -5,28 +6,22 @@ import { setupServer } from './common';
 export const startServer = (args: CLIArgs) => {
   const { vorpal, binary } = args;
   vorpal.command('start server', `Starts the ${name.title} server`).action(async () => {
-    const { monitor, serverConfig, shutdown, mutableShutdownFuncs } = setupServer('server', args);
+    const { serverConfig, shutdown, mutableShutdownFuncs } = setupServer(args);
 
     const subscription = Server.init$({
-      monitor,
       serverConfig,
       binary,
     }).subscribe({
       error: (error) => {
-        monitor.logError({
-          name: 'server_uncaught_error',
-          message: 'Uncaught server error. Shutting down.',
-          error,
-        });
+        cliLogger.error(
+          { title: 'server_uncaught_error', error: error.message },
+          'Uncaught server error. Shutting down.',
+        );
 
         shutdown({ exitCode: 1, error });
       },
       complete: () => {
-        monitor.log({
-          name: 'server_uncaught_complete',
-          message: 'Something went wrong. Shutting down.',
-          level: 'error',
-        });
+        cliLogger.error({ title: 'server_uncaught_complete' }, 'Something went wrong. Shutting down.');
 
         shutdown({ exitCode: 1 });
       },

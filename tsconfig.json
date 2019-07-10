@@ -4,22 +4,12 @@
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
-    "lib": [
-      "esnext",
-      "dom"
-    ],
+    "lib": ["esnext", "dom"],
     "paths": {
-      "@neo-one/*": [
-        "./neo-one-*/src"
-      ],
-      "bn.js": [
-        "../types/bn.js.d.ts"
-      ]
+      "@neo-one/*": ["./neo-one-*/src"],
+      "bn.js": ["../types/bn.js.d.ts"]
     },
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types"
-    ],
+    "typeRoots": ["./node_modules/@types", "./types"],
     "pretty": true,
     "noEmit": true,
     "declaration": false,

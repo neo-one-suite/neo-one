@@ -1,10 +1,11 @@
 // tslint:disable no-object-mutation no-any
+import { getFinalLogger, nodeLogger } from '@neo-one/logger';
 import { FullNode } from '@neo-one/node';
 import { finalize } from '@neo-one/utils';
 import { getConfiguration } from './utils';
 
 export const startNode = async (): Promise<void> => {
-  const { environment, settings, monitor, options$ } = getConfiguration();
+  const { environment, settings, options$ } = getConfiguration();
   let mutableShutdownFuncs: ReadonlyArray<() => Promise<void>> = [];
 
   const initiateShutdown = async () => {
@@ -12,75 +13,60 @@ export const startNode = async (): Promise<void> => {
     await finalize.wait();
   };
 
+  // tslint:disable-next-line:no-let
   let shutdownInitiated = false;
-  const shutdown = ({ exitCode: exitCodeIn, error }: { exitCode: number; error?: Error | undefined }) => {
-    const exitCode =
-      error !== undefined && (error as any).exitCode != undefined && typeof (error as any).exitCode === 'number'
-        ? (error as any).exitCode
-        : exitCodeIn;
+  const shutdown = ({
+    exitCode,
+    error: errorIn,
+  }: {
+    readonly exitCode: number;
+    readonly error?: Error | undefined;
+  }) => {
     if (!shutdownInitiated) {
       shutdownInitiated = true;
-      monitor
-        .captureLog(initiateShutdown, {
-          name: 'node_shutdown',
-          message: 'Shutdown cleanly.',
-          error: 'Failed to shutdown cleanly',
-        })
+      const finalLogger = getFinalLogger(nodeLogger);
+      errorIn
+        ? finalLogger.error({ exitCode, error: errorIn }, 'error, shutting down')
+        : finalLogger.info({ exitCode }, 'shutting down');
+
+      initiateShutdown()
         .then(() => {
-          monitor.close(() => {
-            process.exit(exitCode);
-          });
+          finalLogger.info({ exitCode }, 'shutdown');
+          process.exit(exitCode);
         })
-        .catch(() => {
-          monitor.close(() => {
-            process.exit(exitCode > 0 ? exitCode : 1);
-          });
+        .catch((error) => {
+          finalLogger.error({ exitCode, err: error }, 'shutdown (error)');
+          process.exit(1);
         });
     }
   };
 
   process.on('unhandledRejection', (errorIn) => {
     const error = errorIn as Error;
-    monitor.logError({
-      name: 'unhandled_rejection',
-      message: 'Unhandled rejection. Shutting down.',
-      error,
-    });
-
+    nodeLogger.fatal({ title: 'unhandled_rejection', error }, 'Unhandled rejection. Shutting down.');
     shutdown({ exitCode: 1, error });
   });
 
   process.on('uncaughtException', (error) => {
-    monitor.logError({
-      name: 'uncaught_exception',
-      message: 'Uncaught exception. Shutting down.',
-      error,
-    });
+    nodeLogger.fatal({ title: 'uncaught_exception', error }, 'Uncaught exception. Shutting down.');
 
     shutdown({ exitCode: 1, error });
   });
 
   process.on('SIGINT', () => {
-    monitor.log({
-      name: 'node_sigint',
-      message: 'Exiting...',
-    });
+    nodeLogger.info({ title: 'node_sigint' }, 'Exiting...');
 
     shutdown({ exitCode: 0 });
   });
 
   process.on('SIGTERM', () => {
-    monitor.log({
-      name: 'node_sigterm',
-      message: 'Exiting...',
-    });
+    nodeLogger.info({ title: 'node_sigterm' }, 'Exiting...');
 
     shutdown({ exitCode: 0 });
   });
 
   try {
     const fullNode = new FullNode({
-      monitor,
       environment,
       settings,
       options$,
@@ -91,11 +77,7 @@ export const startNode = async (): Promise<void> => {
 
     await fullNode.start();
   } catch (error) {
-    monitor.logError({
-      name: 'unexpected_error',
-      message: 'Unexpected error, failed to start',
-      error,
-    });
+    nodeLogger.error({ title: 'unexpected_error', error }, 'Unexpected error, failed to start');
 
     shutdown({ exitCode: 1, error });
   }

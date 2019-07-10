@@ -1,5 +1,5 @@
 // tslint:disable readonly-keyword no-loop-statement no-object-mutation no-dynamic-delete
-import { Monitor } from '@neo-one/monitor';
+import { Logger } from '@neo-one/logger';
 import { Config, DescribeTable, PortAllocator as IPortAllocator } from '@neo-one/server-plugin';
 import _ from 'lodash';
 import { take } from 'rxjs/operators';
@@ -61,12 +61,12 @@ const createPortAllocatorConfig = ({ dataPath }: { readonly dataPath: string }):
 
 export class PortAllocator implements IPortAllocator {
   public static async create({
-    monitor,
+    logger,
     dataPath,
     portMin,
     portMax,
   }: {
-    readonly monitor: Monitor;
+    readonly logger: Logger;
     readonly dataPath: string;
     readonly portMin: number;
     readonly portMax: number;
@@ -75,7 +75,7 @@ export class PortAllocator implements IPortAllocator {
     const { ports } = await config.config$.pipe(take(1)).toPromise();
 
     return new PortAllocator({
-      monitor,
+      logger,
       config,
       ports,
       portMin,
@@ -83,7 +83,7 @@ export class PortAllocator implements IPortAllocator {
     });
   }
 
-  private readonly monitor: Monitor;
+  private readonly logger: Logger;
   private readonly mutablePorts: Ports;
   private mutableCurrentPort: number;
   private readonly mutableAvailablePorts: number[];
@@ -92,19 +92,19 @@ export class PortAllocator implements IPortAllocator {
   private mutableShouldPersist: boolean;
 
   public constructor({
-    monitor,
+    logger,
     ports,
     portMin,
     portMax,
     config,
   }: {
-    readonly monitor: Monitor;
+    readonly logger: Logger;
     readonly ports: Ports;
     readonly portMin: number;
     readonly portMax: number;
     readonly config: Config<PortAllocatorConfig>;
   }) {
-    this.monitor = monitor.at('port_allocator');
+    this.logger = logger.child({ component: 'port_allocator' });
 
     // tslint:disable-next-line no-let
     let maxPort = -1;
@@ -278,11 +278,7 @@ export class PortAllocator implements IPortAllocator {
     try {
       await this.config.update({ config: { ports: this.mutablePorts } });
     } catch (error) {
-      this.monitor.logError({
-        name: 'neo_update_config_error',
-        message: 'Failed to update config',
-        error,
-      });
+      this.logger.error({ title: 'neo_update_config_error', error }, 'Failed to update config');
     }
 
     this.mutablePersisting = false;

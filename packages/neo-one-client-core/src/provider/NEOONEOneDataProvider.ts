@@ -24,7 +24,6 @@ import {
   Transaction,
   TransactionReceipt,
 } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import { Client as OneClient } from '@neo-one/server-http-client';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
@@ -69,29 +68,28 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
 
   public async getUnclaimed(
     address: AddressString,
-    monitor?: Monitor,
   ): Promise<{ readonly unclaimed: readonly Input[]; readonly amount: BigNumber }> {
     const provider = await this.getProvider();
 
-    return provider.getUnclaimed(address, monitor);
+    return provider.getUnclaimed(address);
   }
 
-  public async getClaimAmount(input: Input, monitor?: Monitor): Promise<BigNumber> {
+  public async getClaimAmount(input: Input): Promise<BigNumber> {
     const provider = await this.getProvider();
 
-    return provider.getClaimAmount(input, monitor);
+    return provider.getClaimAmount(input);
   }
 
-  public async getUnspentOutputs(address: AddressString, monitor?: Monitor): Promise<readonly InputOutput[]> {
+  public async getUnspentOutputs(address: AddressString): Promise<readonly InputOutput[]> {
     const provider = await this.getProvider();
 
-    return provider.getUnspentOutputs(address, monitor);
+    return provider.getUnspentOutputs(address);
   }
 
-  public async relayTransaction(transaction: string, monitor?: Monitor): Promise<RelayTransactionResult> {
+  public async relayTransaction(transaction: string): Promise<RelayTransactionResult> {
     const provider = await this.getProvider();
 
-    return provider.relayTransaction(transaction, monitor);
+    return provider.relayTransaction(transaction);
   }
 
   public async getTransactionReceipt(hash: Hash256String, options?: GetOptions): Promise<TransactionReceipt> {
@@ -100,28 +98,28 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
     return provider.getTransactionReceipt(hash, options);
   }
 
-  public async getInvocationData(hash: Hash256String, monitor?: Monitor): Promise<RawInvocationData> {
+  public async getInvocationData(hash: Hash256String): Promise<RawInvocationData> {
     const provider = await this.getProvider();
 
-    return provider.getInvocationData(hash, monitor);
+    return provider.getInvocationData(hash);
   }
 
-  public async testInvoke(transaction: string, monitor?: Monitor): Promise<RawCallReceipt> {
+  public async testInvoke(transaction: string): Promise<RawCallReceipt> {
     const provider = await this.getProvider();
 
-    return provider.testInvoke(transaction, monitor);
+    return provider.testInvoke(transaction);
   }
 
-  public async getAccount(address: AddressString, monitor?: Monitor): Promise<Account> {
+  public async getAccount(address: AddressString): Promise<Account> {
     const provider = await this.getProvider();
 
-    return provider.getAccount(address, monitor);
+    return provider.getAccount(address);
   }
 
-  public async getAsset(hash: Hash256String, monitor?: Monitor): Promise<Asset> {
+  public async getAsset(hash: Hash256String): Promise<Asset> {
     const provider = await this.getProvider();
 
-    return provider.getAsset(hash, monitor);
+    return provider.getAsset(hash);
   }
 
   public async getBlock(hashOrIndex: Hash256String | number, options?: GetOptions): Promise<Block> {
@@ -134,52 +132,52 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
     return AsyncIterableX.from(this.getProvider()).pipe<Block>(flatMap((provider) => provider.iterBlocks(options)));
   }
 
-  public async getBestBlockHash(monitor?: Monitor): Promise<Hash256String> {
+  public async getBestBlockHash(): Promise<Hash256String> {
     const provider = await this.getProvider();
 
-    return provider.getBestBlockHash(monitor);
+    return provider.getBestBlockHash();
   }
 
-  public async getBlockCount(monitor?: Monitor): Promise<number> {
+  public async getBlockCount(): Promise<number> {
     const provider = await this.getProvider();
 
-    return provider.getBlockCount(monitor);
+    return provider.getBlockCount();
   }
 
-  public async getContract(address: AddressString, monitor?: Monitor): Promise<Contract> {
+  public async getContract(address: AddressString): Promise<Contract> {
     const provider = await this.getProvider();
 
-    return provider.getContract(address, monitor);
+    return provider.getContract(address);
   }
 
-  public async getMemPool(monitor?: Monitor): Promise<readonly Hash256String[]> {
+  public async getMemPool(): Promise<readonly Hash256String[]> {
     const provider = await this.getProvider();
 
-    return provider.getMemPool(monitor);
+    return provider.getMemPool();
   }
 
-  public async getTransaction(hash: Hash256String, monitor?: Monitor): Promise<Transaction> {
+  public async getTransaction(hash: Hash256String): Promise<Transaction> {
     const provider = await this.getProvider();
 
-    return provider.getTransaction(hash, monitor);
+    return provider.getTransaction(hash);
   }
 
-  public async getOutput(input: Input, monitor?: Monitor): Promise<Output> {
+  public async getOutput(input: Input): Promise<Output> {
     const provider = await this.getProvider();
 
-    return provider.getOutput(input, monitor);
+    return provider.getOutput(input);
   }
 
-  public async getConnectedPeers(monitor?: Monitor): Promise<readonly Peer[]> {
+  public async getConnectedPeers(): Promise<readonly Peer[]> {
     const provider = await this.getProvider();
 
-    return provider.getConnectedPeers(monitor);
+    return provider.getConnectedPeers();
   }
 
-  public async getNetworkSettings(monitor?: Monitor): Promise<NetworkSettings> {
+  public async getNetworkSettings(): Promise<NetworkSettings> {
     const provider = await this.getProvider();
 
-    return provider.getNetworkSettings(monitor);
+    return provider.getNetworkSettings();
   }
 
   public iterActionsRaw(options: IterOptions = {}): AsyncIterable<RawAction> {
@@ -192,47 +190,46 @@ export class NEOONEOneDataProvider implements DeveloperProvider {
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    monitor?: Monitor,
   ): Promise<RawCallReceipt> {
     const provider = await this.getProvider();
 
-    return provider.call(contract, method, params, monitor);
+    return provider.call(contract, method, params);
   }
 
-  public async runConsensusNow(monitor?: Monitor): Promise<void> {
+  public async runConsensusNow(): Promise<void> {
     const provider = await this.getProvider();
 
-    return provider.runConsensusNow(monitor);
+    return provider.runConsensusNow();
   }
 
-  public async updateSettings(options: Partial<PrivateNetworkSettings>, monitor?: Monitor): Promise<void> {
+  public async updateSettings(options: Partial<PrivateNetworkSettings>): Promise<void> {
     const provider = await this.getProvider();
 
-    return provider.updateSettings(options, monitor);
+    return provider.updateSettings(options);
   }
 
-  public async getSettings(monitor?: Monitor): Promise<PrivateNetworkSettings> {
+  public async getSettings(): Promise<PrivateNetworkSettings> {
     const provider = await this.getProvider();
 
-    return provider.getSettings(monitor);
+    return provider.getSettings();
   }
 
-  public async fastForwardOffset(seconds: number, monitor?: Monitor): Promise<void> {
+  public async fastForwardOffset(seconds: number): Promise<void> {
     const provider = await this.getProvider();
 
-    return provider.fastForwardOffset(seconds, monitor);
+    return provider.fastForwardOffset(seconds);
   }
 
-  public async fastForwardToTime(seconds: number, monitor?: Monitor): Promise<void> {
+  public async fastForwardToTime(seconds: number): Promise<void> {
     const provider = await this.getProvider();
 
-    return provider.fastForwardToTime(seconds, monitor);
+    return provider.fastForwardToTime(seconds);
   }
 
-  public async reset(monitor?: Monitor): Promise<void> {
+  public async reset(): Promise<void> {
     const provider = await this.getProvider();
 
-    return provider.reset(monitor);
+    return provider.reset();
   }
 
   private async getProvider(): Promise<NEOONEDataProvider> {

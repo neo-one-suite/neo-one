@@ -1,4 +1,3 @@
-import { Monitor } from '@neo-one/monitor';
 import { FullNode } from '@neo-one/node';
 import { createMain, createTest } from '@neo-one/node-neo-settings';
 import { Config } from '@neo-one/server-plugin';
@@ -10,14 +9,12 @@ import { NEOONENodeConfig } from './node';
 export const createFullNode = async ({
   dataPath,
   nodeConfig,
-  monitor,
   chainFile,
   dumpChainFile,
   onError,
 }: {
   readonly dataPath: string;
   readonly nodeConfig: Config<NEOONENodeConfig>;
-  readonly monitor: Monitor;
   readonly chainFile?: string;
   readonly dumpChainFile?: string;
   readonly onError?: (error: Error) => void;
@@ -64,7 +61,6 @@ export const createFullNode = async ({
 
   return new FullNode(
     {
-      monitor,
       settings,
       environment: {
         dataPath: storagePath,

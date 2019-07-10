@@ -1,3 +1,4 @@
+import { cliLogger } from '@neo-one/logger';
 import { plugins as pluginsUtil } from '@neo-one/server';
 import { Client, createServerConfig } from '@neo-one/server-client';
 import { CLIArgs, paths as defaultPaths, VERSION } from '@neo-one/server-plugin';
@@ -15,31 +16,26 @@ export class CLI {
     readonly serverPort?: number;
     readonly minPort?: number;
   };
-  public readonly paths: Paths;
-  private readonly debug: boolean;
+  public readonly paths: Omit<Paths, 'log'>;
   private readonly plugins: Set<string>;
 
   public constructor({
-    debug,
     dir,
     serverPort,
     httpServerPort,
     minPort,
   }: {
-    readonly debug: boolean;
     readonly dir?: string;
     readonly serverPort?: number;
     readonly httpServerPort?: number;
     readonly minPort?: number;
   }) {
-    this.debug = debug;
     this.plugins = new Set();
     this.serverConfig = { dir, serverPort, httpServerPort, minPort };
     this.paths = {
       data: dir === undefined ? defaultPaths.data : path.join(dir, 'data'),
       config: dir === undefined ? defaultPaths.config : path.join(dir, 'config'),
       cache: dir === undefined ? defaultPaths.cache : path.join(dir, 'cache'),
-      log: dir === undefined ? defaultPaths.log : path.join(dir, 'log'),
       temp: dir === undefined ? defaultPaths.temp : path.join(dir, 'temp'),
     };
   }
@@ -48,20 +44,15 @@ export class CLI {
     const vorpal = new Vorpal();
     vorpal.version(VERSION);
 
-    const { monitor, config$: logConfig$, mutableShutdownFuncs, shutdown } = setupCLI({
-      logConsole: false,
+    const { mutableShutdownFuncs, shutdown } = setupCLI({
       vorpal,
-      debug: this.debug,
     });
 
     const cliArgs: CLIArgs = {
-      monitor,
       vorpal,
-      debug: this.debug,
       binary: createBinary(argv, this.serverConfig),
       shutdown,
       mutableShutdownFuncs,
-      logConfig$,
       serverArgs: this.serverConfig,
       paths: this.paths,
     };
@@ -117,7 +108,7 @@ export class CLI {
     if (!this.plugins.has(pluginName)) {
       this.plugins.add(pluginName);
       const plugin = pluginsUtil.getPlugin({
-        monitor: cliArgs.monitor,
+        logger: cliLogger,
         pluginName,
       });
 
