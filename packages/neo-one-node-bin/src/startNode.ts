@@ -85,7 +85,8 @@ export const startNode = async (): Promise<void> => {
     options$,
   });
 
-  mutableShutdownFuncs = mutableShutdownFuncs.concat(fullNode.stop);
+  const stop = fullNode.stop.bind(fullNode);
+  mutableShutdownFuncs = mutableShutdownFuncs.concat(stop);
 
   await fullNode.start();
 };
