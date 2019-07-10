@@ -33,7 +33,7 @@ yarn install
 ## Compile
 
 ```bash
-# npm run neo-one build
+# npx neo-one build
 yarn neo-one build
 ```
 
@@ -44,7 +44,7 @@ This will start up a local network, compile the smart contracts located in the `
 ## Start the Playground
 
 ```bash
-# npm run start
+# npm start
 yarn start
 ```
 

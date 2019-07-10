@@ -73,7 +73,7 @@ yarn add @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-con
 npm install @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-typescript-plugin
 ```
 
-4. Run `yarn neo-one init` or `npm run neo-one init`
+4. Run `yarn neo-one init` or `npx neo-one init`
 
 We recommend taking a moment to [setup your editor](/docs/environment-setup#Editor-Setup) to take advantage of inline NEO•ONE compiler diagnostics.
 
@@ -124,7 +124,7 @@ This smart contract doesn't do a whole lot, in fact it does nothing, but this is
   4. Deploy the smart contracts to the private NEO network.
   5. Generate code for use in your decentralized app.
 
-Additionally, you may run `yarn neo-one build` OR `npm run neo-one build` with the `--reset` flag to reset the network. Running with `--watch` will execute the above process whenever you make a change to your smart contracts.
+Additionally, you may run `yarn neo-one build` OR `npx neo-one build` with the `--reset` flag to reset the network. Running with `--watch` will execute the above process whenever you make a change to your smart contracts.
 
 ### Testing
 
