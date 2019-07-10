@@ -9,6 +9,6 @@
       "bn.js": [
         "../types/bn.js.d.ts"
       ]
-    },
+    }
   }
 }

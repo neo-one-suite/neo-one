@@ -10,9 +10,8 @@ import { DeveloperClient, LocalKeyStore, NEOONEDataProvider, NEOONEProvider } fr
 import { Client, LocalUserAccountProvider, PublishReceipt } from '@neo-one/client-full-core';
 import { setupWallets } from '@neo-one/local';
 import { compileContract, CompilerHost } from '@neo-one/smart-contract-compiler';
-import { Modifiable } from '@neo-one/utils';
+import { camel, Modifiable } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
-import { camel } from 'change-case';
 
 export interface Contract {
   readonly filePath: string;
