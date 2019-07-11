@@ -189,7 +189,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     );
 
     return this.invokeRaw({
-      script: sb.build(),
+      invokeMethodOptionsOrScript: sb.build(),
       options,
       onConfirm: async ({ receipt, data }): Promise<RegisterAssetReceipt> => {
         let result;
@@ -277,7 +277,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     const { from } = this.getTransactionOptions(options);
 
     return this.invokeRaw({
-      script: Buffer.from(script, 'hex'),
+      invokeMethodOptionsOrScript: Buffer.from(script, 'hex'),
       options,
       transfers: options.transfers === undefined ? [] : options.transfers.map((transfer) => ({ ...transfer, from })),
       onConfirm: ({ receipt, data }): RawInvokeReceipt => ({
@@ -333,7 +333,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     emit(sb, from);
 
     return this.invokeRaw({
-      script: sb.build(),
+      invokeMethodOptionsOrScript: sb.build(),
       options,
       onConfirm: async ({ receipt, data }): Promise<PublishReceipt> => {
         let result;
