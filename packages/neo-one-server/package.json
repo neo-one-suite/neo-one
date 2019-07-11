@@ -36,7 +36,7 @@
   "devDependencies": {
     "@types/fs-extra": "8.0.0",
     "@types/grpc-error": "1.0.0",
-    "@types/koa-router": "7.0.41",
+    "@types/koa-router": "7.0.42",
     "@types/lodash": "4.14.134",
     "@types/toposort": "2.0.1"
   },
