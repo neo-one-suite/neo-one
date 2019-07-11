@@ -52,6 +52,8 @@ import lib_es2017_string_d_ts from '!raw-loader!../../../../../node_modules/type
 // @ts-ignore
 import lib_es2017_typedarrays_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2017.typedarrays.d.ts';
 // @ts-ignore
+import lib_es2018_asynciterable_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2018.asynciterable.d.ts';
+// @ts-ignore
 import lib_es2018_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2018.d.ts';
 // @ts-ignore
 import lib_es2018_full_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2018.full.d.ts';
@@ -62,6 +64,26 @@ import lib_es2018_promise_d_ts from '!raw-loader!../../../../../node_modules/typ
 // @ts-ignore
 import lib_es2018_regexp_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2018.regexp.d.ts';
 // @ts-ignore
+import lib_es2019_array_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2019.array.d.ts';
+// @ts-ignore
+import lib_es2019_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2019.d.ts';
+// @ts-ignore
+import lib_es2019_full_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2019.full.d.ts';
+// @ts-ignore
+import lib_es2019_object_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2019.object.d.ts';
+// @ts-ignore
+import lib_es2019_string_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2019.string.d.ts';
+// @ts-ignore
+import lib_es2019_symbol_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2019.symbol.d.ts';
+// @ts-ignore
+import lib_es2020_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2020.d.ts';
+// @ts-ignore
+import lib_es2020_full_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2020.full.d.ts';
+// @ts-ignore
+import lib_es2020_string_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2020.string.d.ts';
+// @ts-ignore
+import lib_es2020_symbol_wellknown_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es2020.symbol.wellknown.d.ts';
+// @ts-ignore
 import lib_es5_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es5.d.ts';
 // @ts-ignore
 import lib_es6_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.es6.d.ts';
@@ -69,6 +91,8 @@ import lib_es6_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib
 import lib_esnext_array_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.esnext.array.d.ts';
 // @ts-ignore
 import lib_esnext_asynciterable_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.esnext.asynciterable.d.ts';
+// @ts-ignore
+import lib_esnext_bigint_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.esnext.bigint.d.ts';
 // @ts-ignore
 import lib_esnext_d_ts from '!raw-loader!../../../../../node_modules/typescript/lib/lib.esnext.d.ts';
 // @ts-ignore
@@ -117,15 +141,27 @@ export const initializeFileSystem = async (fs: FileSystem): Promise<void> => {
     writeFile(fs, '/node_modules/typescript/lib/lib.es2017.sharedmemory.d.ts', lib_es2017_sharedmemory_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.es2017.string.d.ts', lib_es2017_string_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.es2017.typedarrays.d.ts', lib_es2017_typedarrays_d_ts),
+    writeFile(fs, '/node_modules/typescript/lib/lib.es2018.asynciterable.d.ts', lib_es2018_asynciterable_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.es2018.d.ts', lib_es2018_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.es2018.full.d.ts', lib_es2018_full_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.es2018.intl.d.ts', lib_es2018_intl_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.es2018.promise.d.ts', lib_es2018_promise_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.es2018.regexp.d.ts', lib_es2018_regexp_d_ts),
+    writeFile(fs, '/node_modules/typescript/lib/lib.es2019.array.d.ts', lib_es2019_array_d_ts),
+    writeFile(fs, '/node_modules/typescript/lib/lib.es2019.d.ts', lib_es2019_d_ts),
+    writeFile(fs, '/node_modules/typescript/lib/lib.es2019.full.d.ts', lib_es2019_full_d_ts),
+    writeFile(fs, '/node_modules/typescript/lib/lib.es2019.object.d.ts', lib_es2019_object_d_ts),
+    writeFile(fs, '/node_modules/typescript/lib/lib.es2019.string.d.ts', lib_es2019_string_d_ts),
+    writeFile(fs, '/node_modules/typescript/lib/lib.es2019.symbol.d.ts', lib_es2019_symbol_d_ts),
+    writeFile(fs, '/node_modules/typescript/lib/lib.es2020.d.ts', lib_es2020_d_ts),
+    writeFile(fs, '/node_modules/typescript/lib/lib.es2020.full.d.ts', lib_es2020_full_d_ts),
+    writeFile(fs, '/node_modules/typescript/lib/lib.es2020.string.d.ts', lib_es2020_string_d_ts),
+    writeFile(fs, '/node_modules/typescript/lib/lib.es2020.symbol.wellknown.d.ts', lib_es2020_symbol_wellknown_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.es5.d.ts', lib_es5_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.es6.d.ts', lib_es6_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.esnext.array.d.ts', lib_esnext_array_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.esnext.asynciterable.d.ts', lib_esnext_asynciterable_d_ts),
+    writeFile(fs, '/node_modules/typescript/lib/lib.esnext.bigint.d.ts', lib_esnext_bigint_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.esnext.d.ts', lib_esnext_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.esnext.full.d.ts', lib_esnext_full_d_ts),
     writeFile(fs, '/node_modules/typescript/lib/lib.esnext.intl.d.ts', lib_esnext_intl_d_ts),
