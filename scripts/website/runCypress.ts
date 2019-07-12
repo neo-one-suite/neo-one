@@ -17,7 +17,7 @@ const runCypress = async () => {
   const { NODE_OPTIONS, TS_NODE_PROJECT, ...newEnv } = process.env;
   const cypressRetries = '3';
   const finalEnv = { ...newEnv, CYPRESS_RETRIES: cypressRetries };
-  let command = ['cypress', 'run', '--spec'];
+  let command = ['cypress', 'run', '--browser', 'chrome', '--spec'];
   command = argv.express
     ? command.concat(['cypress/integration/TokenomicsCourse/Lesson2/Chapter5.ts'])
     : command.concat(['cypress/integration/**/*']);
