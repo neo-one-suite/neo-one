@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@types/js-priority-queue": "0.0.5",
-    "@types/lodash": "4.14.134"
+    "@types/lodash": "4.14.136"
   },
   "sideEffects": false
 }
