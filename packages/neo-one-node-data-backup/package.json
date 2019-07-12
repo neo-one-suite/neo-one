@@ -14,7 +14,7 @@
   "devDependencies": {
     "@types/fs-extra": "8.0.0",
     "@types/megajs": "0.14.1",
-    "@types/tar": "4.0.1"
+    "@types/tar": "4.0.3"
   },
   "sideEffects": false
 }
