@@ -41,9 +41,8 @@ aliases:
         - staging.tmp
         - trying.tmp
 
-  - &yarn
-    |
-      yarn install --non-interactive --cache-folder ~/.cache/yarn --ignore-engines
+  - &yarn |
+    yarn install --non-interactive --cache-folder ~/.cache/yarn --ignore-engines
 
   - &lint
     working_directory: ~/neo-one
@@ -210,6 +209,73 @@ aliases:
           path: reports
     parallelism: 2
 
+  - &playground12
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - restore-cache: *restore-yarn-cache-12
+      - run: *yarn
+      - save-cache: *save-yarn-cache-12
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Clone NEO-ONE Playground
+          command: git clone https://github.com/neo-one-suite/neo-one-playground.git
+      - run:
+          name: Yarn Build NEO-ONE
+          command: yarn build:e2e
+      - run:
+          name: Yarn Install NEO-ONE Playground
+          command: cd neo-one-playground && yarn install
+      - run:
+          name: Replace NEO-ONE Packages with Dist
+          command: yarn playground:replace-packages
+      - run:
+          name: Add .nyc_output Directory
+          command: mkdir .nyc_output
+      - run:
+          name: Test Website
+          command: cd neo-one-playground && yarn test:cypress --coverage
+      - run:
+          name: Coverage Report
+          command: yarn nyc report --reporter=json
+          when: always
+      - run:
+          name: Upload Unit Test Coverage
+          command: yarn run codecov -f coverage/coverage-final.json -F cypress
+          when: always
+      - run:
+          name: Test Smart Contracts
+          command: yarn test
+      - store_artifacts:
+          path: cypress/screenshots
+
+  - &cypress10
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - restore-cache: *restore-yarn-cache-10
+      - run: *yarn
+      - save-cache: *save-yarn-cache-10
+      - run:
+          name: Add .nyc_output Directory
+          command: mkdir .nyc_output
+      - run:
+          name: Tests
+          command: yarn test:cypress --coverage
+      - run:
+          name: Coverage Report
+          command: yarn nyc report --reporter=json
+          when: always
+      - run:
+          name: Upload Unit Test Coverage
+          command: yarn run codecov -f coverage/coverage-final.json -F cypress
+          when: always
+      - store_artifacts:
+          path: cypress/videos
+      - store_artifacts:
+          path: cypress/screenshots
+
 node8: &node8
   docker:
     - image: neotracker/neo-one-circleci-node:8.16.0-4
@@ -221,6 +287,10 @@ node10: &node10
 node12: &node12
   docker:
     - image: neotracker/neo-one-circleci-node:12.4.0-1
+
+chrome: &chrome69
+  docker:
+    - image: cypress/browsers:chrome69
 
 version: 2
 jobs:
@@ -257,6 +327,12 @@ jobs:
   lint:
     <<: *node12
     <<: *lint
+  playground12:
+    <<: *chrome69
+    <<: *playground12
+  cypress10:
+    <<: *node10
+    <<: *cypress10
 
 workflows:
   version: 2
@@ -294,3 +370,9 @@ workflows:
           filters: *filter-ignore-bors-tmp
       - lint:
           filters: *filter-ignore-bors-tmp
+  test-website:
+    jobs:
+      - cypress10
+  test-playground:
+    jobs:
+      - playground12
