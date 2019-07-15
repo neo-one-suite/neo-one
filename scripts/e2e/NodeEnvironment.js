@@ -5,7 +5,10 @@ const One = require('./One');
 class NodeEnvironment extends JestNodeEnvironment {
   constructor(config, options) {
     super(config, options);
-    this.testEnvironmentOptions = config.testEnvironmentOptions == undefined ? {} : config.testEnvironmentOptions;
+    this.testEnvironmentOptions =
+      config.testEnvironmentOptions == undefined
+        ? {}
+        : config.testEnvironmentOptions;
   }
 
   async setup() {

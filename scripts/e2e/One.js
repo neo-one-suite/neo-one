@@ -110,7 +110,9 @@ class One {
 
     if (!ready) {
       await this.teardown();
-      throw new Error(`Failed to start NEO-ONE server.\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}`);
+      throw new Error(
+        `Failed to start NEO-ONE server.\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}`,
+      );
     }
   }
 
@@ -159,7 +161,14 @@ class One {
   }
 
   _createCommand(commandIn) {
-    const cmd = path.resolve(process.cwd(), 'dist', 'neo-one', 'node_modules', '.bin', 'neo-one');
+    const cmd = path.resolve(
+      process.cwd(),
+      'dist',
+      'neo-one',
+      'node_modules',
+      '.bin',
+      'neo-one',
+    );
     const command = `${cmd} ${commandIn} --dir ${this.dirName} --server-port ${this.serverPort} --http-server-port ${this.httpServerPort} --min-port ${this.minPort}`;
     let additionalArgs = [];
     if (commandIn.startsWith('create') || commandIn.startsWith('delete')) {
@@ -181,9 +190,9 @@ class One {
       .then(({ stdout }) => stdout)
       .catch((error) => {
         throw new Error(
-          `Command:\n${[cmd].concat(args).join(' ')}\n\nSTDOUT:\n${error.stdout}\n\nSTDERR:\n${
-            error.stderr
-          }\n\nERROR:\n${error.toString()}`,
+          `Command:\n${[cmd].concat(args).join(' ')}\n\nSTDOUT:\n${
+            error.stdout
+          }\n\nSTDERR:\n${error.stderr}\n\nERROR:\n${error.toString()}`,
         );
       });
   }
