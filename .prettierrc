@@ -1,7 +1,58 @@
+
 {
   "arrowParens": "always",
-  "parser": "typescript",
   "printWidth": 120,
   "singleQuote": true,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "overrides": [
+    {
+      "files": "*.ts",
+      "options": {
+        "parser": "typescript",
+        "printWidth": 120
+      }
+    },
+    {
+      "files": "*.js",
+      "options": {
+        "parser": "flow",
+        "printWidth": 80
+      }
+    },
+    {
+      "files": "*.md",
+      "options": {
+        "parser": "markdown",
+        "printWidth": 120
+      }
+    },
+    {
+      "files": "*rc",
+      "options": {
+        "parser": "json",
+        "printWidth": 120
+      }
+    },
+    {
+      "files": "*.json",
+      "options": {
+        "parser": "json",
+        "printWidth": 120
+      }
+    },
+    {
+      "files": "*.yaml",
+      "options": {
+        "parser": "yaml",
+        "printWidth": 120
+      }
+    },
+    {
+      "files": "*.yml",
+      "options": {
+        "parser": "yaml",
+        "printWidth": 120
+      }
+    }
+  ]
 }
