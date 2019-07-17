@@ -4,9 +4,9 @@
   "description": "NEO•ONE TypeScript utils.",
   "main": "./src/index",
   "dependencies": {
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "source-map": "^0.7.3",
-    "typescript": "3.5.2"
+    "typescript": "3.5.3"
   },
   "devDependencies": {
     "@types/lodash": "4.14.136"

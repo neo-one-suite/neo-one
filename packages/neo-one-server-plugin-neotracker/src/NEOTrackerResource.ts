@@ -227,7 +227,7 @@ export class NEOTrackerResource {
         .catch((error: execa.ExecaError) => {
           this.monitor.logError({
             name: 'neo_neotracker_error',
-            message: `Child process exited with an error. ${error.code}\n${error.stdout}\n${error.stderr}`,
+            message: `Child process exited with an error. ${error.message}\n${error.stdout}\n${error.stderr}`,
             error,
           });
 

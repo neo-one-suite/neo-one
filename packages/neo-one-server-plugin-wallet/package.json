@@ -16,7 +16,7 @@
     "@neo-one/utils": "^1.1.2",
     "bignumber.js": "^9.0.0",
     "fs-extra": "^8.0.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "ora": "^3.4.0",
     "redux-persist-node-storage": "^2.0.0",
     "rxjs": "^6.5.2",

@@ -16,7 +16,7 @@
     "bn.js": "^4.11.8",
     "cross-fetch": "^3.0.4",
     "dataloader": "^1.4.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "rxjs": "^6.5.2",
     "safe-stable-stringify": "^1.1.0",
     "tapable": "^1.1.3",
