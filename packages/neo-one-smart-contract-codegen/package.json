@@ -7,7 +7,7 @@
     "@neo-one/client-common": "^1.2.1",
     "@neo-one/client-core": "^1.2.1",
     "@neo-one/utils": "^1.1.2",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "prettier": "^1.18.2",
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3"

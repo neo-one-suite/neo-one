@@ -6,11 +6,11 @@
   "browser": "./src/index.browser",
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
-    "@ledgerhq/hw-transport-u2f": "4.62.0",
+    "@ledgerhq/hw-transport-u2f": "4.66.0",
     "@neo-one/client-common": "^1.2.1",
     "@neo-one/node-vm": "^1.2.0",
     "@neo-one/utils": "^1.1.2",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "source-map": "^0.7.3",
     "tslib": "^1.9.3"
   },

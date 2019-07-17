@@ -6,7 +6,7 @@
   "dependencies": {
     "@neo-one/node-core": "^1.1.4",
     "@neo-one/utils": "^1.1.2",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "tslib": "^1.9.3"
   },
   "devDependencies": {

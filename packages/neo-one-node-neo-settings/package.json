@@ -8,7 +8,7 @@
     "@neo-one/node-core": "^1.1.4",
     "@neo-one/utils": "^1.1.2",
     "@types/bn.js": "^4.11.5",
-    "bn.js": "^4.11.8",
+    "bn.js": "^5.0.0",
     "tslib": "^1.9.3"
   },
   "sideEffects": false

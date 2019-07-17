@@ -6,7 +6,7 @@ import { PromiseReturnType, utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
 // tslint:disable-next-line no-submodule-imports
-import { FormatOptionLabelMeta } from 'react-select/lib/Select';
+import { FormatOptionLabelMeta } from 'react-select/src/Select';
 import { combineLatest, concat, of, ReplaySubject } from 'rxjs';
 import { catchError, distinctUntilChanged, map, multicast, refCount, switchMap, take } from 'rxjs/operators';
 import styled from 'styled-components';
