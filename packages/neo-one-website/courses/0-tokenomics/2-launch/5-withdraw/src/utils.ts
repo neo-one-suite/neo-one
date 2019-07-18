@@ -44,7 +44,7 @@ export const getTokenInfo = async (token: TokenSmartContract, address?: AddressS
 export const handleMint = async (
   token: TokenSmartContract,
   amount: BigNumber,
-): Promise<InvokeReceipt<boolean, TokenEvent>> => {
+): Promise<InvokeReceipt<undefined, TokenEvent>> => {
   const result = await token.mintTokens({
     sendTo: [
       {

@@ -37,7 +37,7 @@ export const optimization = ({
   readonly stage: Stage;
   readonly bundle: Bundle;
 }): webpack.Options.Optimization => {
-  if (stage === 'dev') {
+  if (stage === 'dev' || (stage === 'prod' && bundle === 'workers')) {
     return {
       concatenateModules: false,
     };

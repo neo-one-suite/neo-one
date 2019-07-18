@@ -43,6 +43,6 @@ export const handleMint = async (
   token: TokenSmartContract,
   amount: BigNumber,
   // @ts-ignore
-): Promise<InvokeReceipt<boolean, TokenEvent>> => {
+): Promise<InvokeReceipt<undefined, TokenEvent>> => {
   // Implement me
 };

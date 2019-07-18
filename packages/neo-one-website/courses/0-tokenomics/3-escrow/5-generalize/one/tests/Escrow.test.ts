@@ -110,7 +110,7 @@ describe('Escrow', () => {
       if (claimReceipt.result.state === 'FAULT') {
         throw new Error(claimReceipt.result.message);
       }
-      expect(claimReceipt.result.value).toBeUndefined();
+      expect(claimReceipt.result.value).toEqual(true);
       // Notice how the receipt has the events for both the Token contract we invoked as well as the Escrow contract.
       event = claimReceipt.events[0];
       expect(event.name).toEqual('transfer');
@@ -162,7 +162,7 @@ describe('Escrow', () => {
       if (refundReceipt.result.state === 'FAULT') {
         throw new Error(refundReceipt.result.message);
       }
-      expect(refundReceipt.result.value).toBeUndefined();
+      expect(refundReceipt.result.value).toEqual(true);
       event = refundReceipt.events[0];
       expect(event.name).toEqual('transfer');
       if (event.name !== 'transfer') {

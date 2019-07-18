@@ -1,5 +1,4 @@
 import { DeveloperProvider, PrivateNetworkSettings } from '@neo-one/client-common';
-import { enqueuePostPromiseJob } from '@neo-one/utils';
 
 /**
  * Client which controls a development network.
@@ -17,13 +16,7 @@ export class DeveloperClient {
    */
   public async runConsensusNow(): Promise<void> {
     if (this.mutableRunConsensusNow === undefined) {
-      this.mutableRunConsensusNow = new Promise((resolve, reject) => {
-        enqueuePostPromiseJob(() => {
-          this.runConsensusNowInternal()
-            .then(resolve)
-            .catch(reject);
-        });
-      });
+      this.mutableRunConsensusNow = this.runConsensusNowInternal();
     }
 
     return this.mutableRunConsensusNow;

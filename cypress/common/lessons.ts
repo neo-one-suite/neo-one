@@ -1,5 +1,5 @@
 // tslint:disable no-object-literal-type-assertion
-import { build, checkProblems, enterSolution, nextButton, Problem, runTests, Test } from './matchers';
+import { build, checkProblems, enterSolution, resetEditorTab, nextButton, Problem, runTests, Test } from './matchers';
 
 export const ALL_SLUGS: readonly string[] = [
   '/course/tokenomics/1/1',
@@ -53,6 +53,7 @@ export const lesson1 = ({
       nextButton();
     }
 
+    cy.reload(true);
     build({ success: chapter === 1 ? false : true, contracts: ['Token'] });
     runTests({
       passing: 0,
@@ -136,6 +137,7 @@ export const lesson2 = ({
       nextButton();
     }
 
+    cy.reload(true);
     build({ success: true, contracts: ['Token'] });
     runTests({
       passing: 0,
@@ -233,6 +235,7 @@ export const lesson3 = ({
       nextButton();
     }
 
+    cy.reload(true);
     build({ success: true, contracts: ['Token'] });
     runTests({
       passing: 0,
@@ -274,7 +277,7 @@ export const lesson3 = ({
     ]);
     enterSolution({ path: 'src/utils.ts' });
     if (chapter === 6) {
-      enterSolution({ path: 'one/contracts/ICO.tsx' });
+      enterSolution({ path: 'src/ICO.tsx' });
     }
     build({ success: true, contracts: ['Token'] });
     checkProblems([
@@ -283,6 +286,7 @@ export const lesson3 = ({
         problems: [],
       },
     ]);
+    resetEditorTab({ path: `src/__tests__/utils.test.ts` });
     runTests({
       passing: 1,
       failing: 0,
@@ -290,7 +294,7 @@ export const lesson3 = ({
         {
           basename: 'utils.test.ts',
           dirname: 'src/__tests__',
-          passing: 1,
+          passing: chapter === 3 || chapter === 4 || chapter === 5 || chapter === 6 ? 2 : 1,
           failing: 0,
           tests: [
             {
@@ -342,6 +346,7 @@ export const lesson4 = ({
       nextButton();
     }
 
+    cy.reload(true);
     build({ success: true, contracts });
     runTests({
       passing: 0,
@@ -369,8 +374,9 @@ export const lesson4 = ({
       },
     ]);
     enterSolution({ path: `one/contracts/${fileName}.one.ts` });
-    if (chapter === 3) {
+    if (chapter === 3 || chapter === 8) {
       enterSolution({ path: `one/contracts/Token.one.ts` });
+      resetEditorTab({ path: `one/contracts/${fileName}.one.ts` });
     }
     build({ success: true, contracts: secondContracts === undefined ? contracts : secondContracts });
     checkProblems([
