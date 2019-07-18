@@ -174,7 +174,7 @@
     "@types/styled-components": "4.1.16",
     "@types/webpack": "4.4.34",
     "@types/webpack-bundle-analyzer": "2.13.2",
-    "@types/webpack-dev-server": "3.1.6",
+    "@types/webpack-dev-server": "3.1.7",
     "@types/yargs": "13.0.0",
     "all-contributors-cli": "6.7.0",
     "app-root-dir": "1.0.2",
