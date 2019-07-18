@@ -1,16 +1,30 @@
 import { BN } from 'bn.js';
 import { BinaryWriter } from './BinaryWriter';
 import { common, ECPoint, UInt160, UInt256 } from './common';
-import { InvalidParamError } from './errors';
 import { ByteBuffer, ByteCode, Op, OpCode, SysCallName } from './models/vm';
-import { ScriptBuilderParam } from './types';
+import { ParamToCallbacks, ScriptBuilderParam } from './types';
 import { utils } from './utils';
 
 export class ScriptBuilder {
   private readonly mutableBuffers: Buffer[];
+  private readonly pushParamCallbacks: ParamToCallbacks<this>;
 
   public constructor() {
     this.mutableBuffers = [];
+
+    this.pushParamCallbacks = {
+      undefined: () => this.emitPush(Buffer.alloc(0, 0)),
+      array: (param) => this.emitPushArray(param),
+      map: (param) => this.emitPushMap(param),
+      uInt160: (param) => this.emitPushUInt160(common.asUInt160(param)),
+      uInt256: (param) => this.emitPushUInt256(common.asUInt256(param)),
+      ecPoint: (param) => this.emitPushECPoint(common.asECPoint(param)),
+      number: (param) => this.emitPushInt(param),
+      string: (param) => this.emitPushString(param),
+      boolean: (param) => this.emitPushBoolean(param),
+      buffer: (param) => this.emitPush(param),
+      object: (param) => this.emitPushObject(param),
+    };
   }
 
   public get buffers(): readonly Buffer[] {
@@ -112,52 +126,7 @@ export class ScriptBuilder {
   }
 
   public emitPushParam(param: ScriptBuilderParam | undefined): this {
-    if (param === undefined) {
-      return this.emitPush(Buffer.alloc(0, 0));
-    }
-
-    if (Array.isArray(param)) {
-      return this.emitPushArray(param);
-    }
-
-    if (param instanceof Map) {
-      return this.emitPushMap(param);
-    }
-
-    if (common.isUInt160(param)) {
-      return this.emitPushUInt160(common.asUInt160(param));
-    }
-
-    if (common.isUInt256(param)) {
-      return this.emitPushUInt256(common.asUInt256(param));
-    }
-
-    if (common.isECPoint(param)) {
-      return this.emitPushECPoint(common.asECPoint(param));
-    }
-
-    if (typeof param === 'number' || BN.isBN(param)) {
-      return this.emitPushInt(param);
-    }
-
-    if (typeof param === 'string') {
-      return this.emitPushString(param);
-    }
-
-    if (typeof param === 'boolean') {
-      return this.emitPushBoolean(param);
-    }
-
-    if (param instanceof Buffer) {
-      return this.emitPush(param);
-    }
-
-    // tslint:disable-next-line strict-type-predicates
-    if (typeof param === 'object') {
-      return this.emitPushObject(param);
-    }
-    /* istanbul ignore next */
-    throw new InvalidParamError(typeof param);
+    return common.paramTo(param, this.pushParamCallbacks);
   }
 
   // tslint:disable-next-line readonly-array

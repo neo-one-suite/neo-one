@@ -788,7 +788,7 @@ export interface UserAccountProvider {
   readonly transfer: (
     transfers: readonly Transfer[],
     options?: TransactionOptions,
-  ) => Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>;
+  ) => Promise<TransactionResult<TransactionReceipt, InvocationTransaction | ContractTransaction>>;
   /**
    * Claim all claimable GAS.
    */
@@ -1657,6 +1657,20 @@ export type ScriptBuilderParam =
   | ScriptBuilderParamArray
   | ScriptBuilderParamMap
   | ScriptBuilderParamObject;
+
+export interface ParamToCallbacks<T> {
+  readonly undefined: () => T;
+  readonly array: (param: ScriptBuilderParamArray) => T;
+  readonly map: (param: ScriptBuilderParamMap) => T;
+  readonly uInt160: (param: UInt160) => T;
+  readonly uInt256: (param: UInt256) => T;
+  readonly ecPoint: (param: ECPoint) => T;
+  readonly number: (param: number | BN) => T;
+  readonly string: (param: string) => T;
+  readonly boolean: (param: boolean) => T;
+  readonly buffer: (param: Buffer) => T;
+  readonly object: (param: ScriptBuilderParamObject) => T;
+}
 
 export interface ParamArray extends ReadonlyArray<Param> {}
 export interface ParamMap extends ReadonlyMap<Param, Param> {}

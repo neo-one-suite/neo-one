@@ -8,6 +8,7 @@ import {
   Block,
   ClaimTransaction,
   common,
+  ContractTransaction,
   ForwardValue,
   GetOptions,
   Hash256String,
@@ -240,6 +241,10 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     throw new NotImplementedError('getNetworks');
   }
 
+  public async selectUserAccount(_id?: UserAccountID, _monitor?: Monitor): Promise<void> {
+    throw new NotImplementedError('selectUserAccount');
+  }
+
   public iterBlocks(network: NetworkType, options?: IterOptions): AsyncIterable<Block> {
     return this.provider.iterBlocks(network, options);
   }
@@ -255,7 +260,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
   public async transfer(
     transfers: readonly Transfer[],
     options?: TransactionOptions,
-  ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction>> {
+  ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction | ContractTransaction>> {
     const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
 
     return this.capture(
@@ -1274,7 +1279,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     attributes: readonly Attribute[],
     networkFee: BigNumber,
     monitor?: Monitor,
-  ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction>>;
+  ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction | ContractTransaction>>;
 
   protected abstract async executeClaim(
     from: UserAccountID,
