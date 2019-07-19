@@ -187,7 +187,7 @@
     "babel-plugin-universal-import": "4.0.0",
     "cache-loader": "4.0.1",
     "codecov": "3.5.0",
-    "commitizen": "3.1.1",
+    "commitizen": "3.1.2",
     "compression-webpack-plugin": "3.0.0",
     "concurrently": "4.1.1",
     "connect-history-api-fallback": "1.6.0",
