@@ -1,11 +1,15 @@
 // tslint:disable no-any
+import styled from '@emotion/styled';
 import * as React from 'react';
 import { DraggableCore, DraggableEventHandler } from 'react-draggable';
-import styled from 'styled-components';
-import { prop } from 'styled-tools';
+import { prop, withProp } from 'styled-tools';
 
-// tslint:disable-next-line no-any
-const Wrapper: any = styled.div.attrs(({ lr, size }: { readonly lr: boolean; readonly size: number }) => {
+interface WrapperProps {
+  readonly lr: boolean;
+  readonly size: number;
+}
+
+const wrapperFunc = (lr: boolean, size: number) => {
   let grid: string;
   if (lr) {
     grid = `
@@ -22,13 +26,17 @@ const Wrapper: any = styled.div.attrs(({ lr, size }: { readonly lr: boolean; rea
   }
 
   return {
-    style: {
-      grid,
-    },
+    grid,
   };
-})`
+};
+
+const wrapperWithProps = withProp<WrapperProps, ReturnType<typeof wrapperFunc>>(['lr', 'size'], wrapperFunc);
+
+// tslint:disable-next-line no-any
+const Wrapper: any = styled('div')`
   display: grid;
   min-height: 0;
+  ${wrapperWithProps}
 `;
 
 export const SplitPaneResizer = styled.div`

@@ -1,5 +1,5 @@
+import styled from '@emotion/styled';
 import { ButtonBase } from '@neo-one/react-core';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
 export const IconButton = styled(ButtonBase)`

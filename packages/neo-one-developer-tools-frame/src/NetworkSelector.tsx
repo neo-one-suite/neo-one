@@ -1,8 +1,8 @@
 // tslint:disable no-any
+import styled from '@emotion/styled';
 import { Select, useStream } from '@neo-one/react-common';
 import * as React from 'react';
 import { combineLatest } from 'rxjs';
-import styled from 'styled-components';
 import { DeveloperToolsContext } from './DeveloperToolsContext';
 import { SettingsLabel } from './SettingsLabel';
 import { useAddError } from './ToastsContext';

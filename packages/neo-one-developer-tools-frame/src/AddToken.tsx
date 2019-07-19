@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
 import { nep5 } from '@neo-one/client-core';
 import { Box, Button, TextInput } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { DeveloperToolsContext, useTokens } from './DeveloperToolsContext';
 import { useAddError } from './ToastsContext';
 

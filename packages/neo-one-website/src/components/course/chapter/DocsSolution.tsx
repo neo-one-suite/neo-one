@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { Box, FileTab } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { Markdown } from '../common';
 import { selectChapter } from '../coursesData';
 import { SelectedChapter } from '../types';

@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
 import * as React from 'react';
 import { MdError, MdWarning } from 'react-icons/md';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
 import {
   EditorState,
   openConsole,

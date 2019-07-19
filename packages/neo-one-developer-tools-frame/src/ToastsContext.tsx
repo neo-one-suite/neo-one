@@ -1,8 +1,8 @@
+import styled from '@emotion/styled';
 import { Box, useStream } from '@neo-one/react-common';
 import { enqueuePostPromiseJob } from '@neo-one/utils';
 import * as React from 'react';
 import { BehaviorSubject, Observable } from 'rxjs';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
 const { useMemo } = React;

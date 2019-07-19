@@ -40,7 +40,6 @@ export const plugins = ({ stage, bundle }: { readonly stage: Stage; readonly bun
         NODE_ENV: JSON.stringify(stage === 'dev' ? 'development' : 'production'),
         NODE_DEBUG: JSON.stringify(''),
         REACT_STATIC_DISABLE_PRELOAD: JSON.stringify('true'),
-        SC_ATTR: JSON.stringify('data-styled-components'),
       },
     }),
     new webpack.EnvironmentPlugin(

@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { Image } from '@neo-one/react-core';
 import React from 'react';
-import styled from 'styled-components';
 import lineLogoPrimary from '../static/img/lineLogoPrimary.svg';
 
 const StyledImage = styled(Image)`

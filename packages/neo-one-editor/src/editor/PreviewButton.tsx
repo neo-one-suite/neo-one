@@ -1,9 +1,9 @@
 // tslint:disable no-null-keyword
+import styled from '@emotion/styled';
 import { Box, ButtonBase } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdOpenInBrowser } from 'react-icons/md';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 import { closePreview, EditorState, openPreview, selectPreviewEnabled, selectPreviewOpen } from './redux';
 

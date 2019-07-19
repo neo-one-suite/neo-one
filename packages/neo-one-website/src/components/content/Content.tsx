@@ -1,7 +1,7 @@
 // tslint:disable-next-line no-import-side-effect
+import styled from '@emotion/styled';
 import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { AdjacentInfo, SectionData } from '../../types';
 import { LayoutWrapper } from '../common';
 import { Helmet } from '../Helmet';

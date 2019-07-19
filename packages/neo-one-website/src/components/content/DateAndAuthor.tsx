@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { Box, Link } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Author } from './types';
 

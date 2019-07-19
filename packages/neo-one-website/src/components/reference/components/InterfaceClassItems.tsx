@@ -1,8 +1,8 @@
 // tslint:disable no-null-keyword
+import styled from '@emotion/styled';
 import { Box } from '@neo-one/react-common';
 import _ from 'lodash';
 import * as React from 'react';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Title } from '../common';
 import { ClassData, InterfaceData } from '../types';

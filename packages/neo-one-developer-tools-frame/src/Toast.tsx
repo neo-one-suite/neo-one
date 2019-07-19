@@ -1,8 +1,8 @@
+import styled from '@emotion/styled';
 // tslint:disable no-null-keyword
 import { Box, Hidden, IconButton, Shadow, useHidden } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdClose } from 'react-icons/md';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Toast as ToastType } from './ToastsContext';
 

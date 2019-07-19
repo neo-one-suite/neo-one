@@ -1,8 +1,8 @@
 // tslint:disable no-any
+import styled from '@emotion/styled';
 import { Box, DispatchWrapper, Hidden } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { selectConsoleOpen } from './redux';
 import { BuildAction, Console, Feedback, FileType, Help, Problems, RunTestsAction } from './toolbar';

@@ -1,4 +1,5 @@
 // tslint:disable no-object-mutation
+import styled from '@emotion/styled';
 import { nep5 } from '@neo-one/client-core';
 import { Box, usePrevious, useStream } from '@neo-one/react-common';
 import { utils } from '@neo-one/utils';
@@ -6,7 +7,6 @@ import BigNumber from 'bignumber.js';
 import * as React from 'react';
 import { BehaviorSubject, of } from 'rxjs';
 import { catchError, filter, switchMap } from 'rxjs/operators';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { DeveloperToolsContext, useTokens } from './DeveloperToolsContext';
 import { useAddError } from './ToastsContext';

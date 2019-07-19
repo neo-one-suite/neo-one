@@ -12,4 +12,10 @@ describe('resolvePackage', () => {
 
     expect(Object.keys(result)).toMatchSnapshot();
   });
+
+  test('resolve @emotion/styled', async () => {
+    const result = await resolvePackage('@babel/runtime', '7.5.4');
+
+    expect(Object.keys(result)).toMatchSnapshot();
+  });
 });

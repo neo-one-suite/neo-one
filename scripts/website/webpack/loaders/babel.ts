@@ -31,7 +31,7 @@ export const babel = ({
     ],
     plugins: [
       [
-        'babel-plugin-styled-components',
+        'babel-plugin-emotion',
         {
           pure: true,
           displayName: stage === 'dev',

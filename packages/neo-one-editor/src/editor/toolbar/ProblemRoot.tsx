@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
 import { Box, FileIcon } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdArrowDropDown } from 'react-icons/md';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { FileText } from './FileText';
 import { ProblemCount } from './ProblemCount';

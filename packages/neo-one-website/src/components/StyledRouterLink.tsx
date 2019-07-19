@@ -1,5 +1,5 @@
+import styled from '@emotion/styled';
 import { styledOmitProps } from '@neo-one/react-common';
-import styled from 'styled-components';
 import { prop, switchProp } from 'styled-tools';
 import { RouterLink } from './RouterLink';
 

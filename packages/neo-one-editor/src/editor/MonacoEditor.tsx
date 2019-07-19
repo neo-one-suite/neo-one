@@ -1,12 +1,12 @@
 // tslint:disable no-submodule-imports no-import-side-effect
 /// <reference types="monaco-editor/monaco" />
+import styled from '@emotion/styled';
 import { FileSystem } from '@neo-one/local-browser';
 import _ from 'lodash';
 import * as React from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import styled from 'styled-components';
 import { MainEngine } from '../engine/main';
 import { setupStandaloneEditor } from '../monaco/editor';
 import { LanguageID } from '../monaco/language';

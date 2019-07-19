@@ -1,8 +1,8 @@
 // tslint:disable no-null-keyword
+import styled from '@emotion/styled';
 import { Box, TextInput } from '@neo-one/react-common';
 import { format, isBefore, parse } from 'date-fns';
 import * as React from 'react';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
 const { useState, useCallback } = React;

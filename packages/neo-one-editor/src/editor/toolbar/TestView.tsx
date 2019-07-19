@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
 import { DispatchWrapper } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
 import { TestSuite } from '../../types';
 import { EditorState, selectConsoleSelectedTestSuite, selectConsoleTestSuites } from '../redux';
 import { TestDetail } from './TestDetail';

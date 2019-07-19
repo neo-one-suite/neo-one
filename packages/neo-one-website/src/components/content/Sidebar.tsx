@@ -1,7 +1,8 @@
+import { keyframes } from '@emotion/core';
+import styled from '@emotion/styled';
 import { Box, ButtonBase, Hidden, useHidden } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdClose, MdUnfoldMore } from 'react-icons/md';
-import styled, { keyframes } from 'styled-components';
 import { prop } from 'styled-tools';
 import { SectionData } from '../../types';
 import { SidebarSpacer } from '../common';

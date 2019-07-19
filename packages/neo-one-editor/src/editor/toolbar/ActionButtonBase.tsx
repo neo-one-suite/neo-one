@@ -1,7 +1,8 @@
 // tslint:disable no-null-keyword
+import { keyframes } from '@emotion/core';
+import styled from '@emotion/styled';
 import * as React from 'react';
 import { MdLoop } from 'react-icons/md';
-import styled, { keyframes } from 'styled-components';
 import { Text } from './Text';
 import { Wrapper } from './Wrapper';
 

@@ -1,5 +1,4 @@
-import { css } from 'styled-components';
-import { prop } from 'styled-tools';
+import { css } from '@emotion/core';
 
 const backup: readonly string[] = [
   '-apple-system',
@@ -22,6 +21,10 @@ export const axiforma = (font: string) =>
     .concat(backup)
     .map((f) => `"${f}"`)
     .join(', ');
+
+export interface Props {
+  readonly theme: typeof theme;
+}
 
 export const theme = {
   primary: '#00FF9C',
@@ -128,9 +131,9 @@ export const theme = {
       maxWidth: '42em',
     },
   },
-  Box: css`
+  Box: (props: Props) => css`
     box-sizing: border-box;
-    ${prop('theme.fonts.axiformaRegular')};
-    ${prop('theme.fontStyles.body1')};
+    ${props.theme.fonts.axiformaRegular};
+    ${props.theme.fontStyles.body1};
   `,
 };

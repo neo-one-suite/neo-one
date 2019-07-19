@@ -1,8 +1,8 @@
+import styled from '@emotion/styled';
 // tslint:disable no-any
 import { UserAccount } from '@neo-one/client-common';
 import { Label, useStream } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { DeveloperToolsContext, useTokens } from './DeveloperToolsContext';
 import { useAddError } from './ToastsContext';
 import { getWalletSelectorOptions$, makeWalletSelectorValueOption, WalletSelectorBase } from './WalletSelectorBase';

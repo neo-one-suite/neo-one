@@ -1,7 +1,7 @@
 // tslint:disable no-null-keyword
+import styled from '@emotion/styled';
 import { Link as BaseLink, styledOmitProps } from '@neo-one/react-common';
 import React from 'react';
-import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 import { StyledRouterLink } from '../StyledRouterLink';
 

@@ -1,6 +1,6 @@
+import styled, { CreateStyledComponentExtrinsic } from '@emotion/styled';
 import { omit } from 'lodash';
 import React from 'react';
-import styled, { ThemedStyledFunction } from 'styled-components';
 
 export const numberToPx = (value?: string | number) => {
   if (typeof value === 'number') {
@@ -65,7 +65,7 @@ export function getSelector(comp: string | React.ComponentType<any>): string {
   return NO_SELECTOR;
 }
 
-type Result<P extends object, Q, R, T extends object> = ThemedStyledFunction<
+type Result<P extends object, Q, R, T extends object> = CreateStyledComponentExtrinsic<
   React.ForwardRefExoticComponent<React.PropsWithoutRef<Q> & React.RefAttributes<R>>,
   P & Q,
   T

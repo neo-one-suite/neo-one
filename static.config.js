@@ -118,6 +118,7 @@ export default {
   disablePreload: true,
   plugins: [
     path.resolve(ROOT_DIR, 'scripts', 'website', 'webpack', 'plugin'),
+    'react-static-plugin-emotion',
     'react-static-plugin-reach-router',
     [
       'react-static-plugin-source-filesystem',

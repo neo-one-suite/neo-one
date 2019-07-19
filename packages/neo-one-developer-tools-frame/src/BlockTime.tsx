@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import { Client } from '@neo-one/client-core';
 import { Box, Button, Divider, Paragraph, useStream } from '@neo-one/react-common';
 // tslint:disable-next-line: no-submodule-imports
@@ -6,7 +7,7 @@ import * as React from 'react';
 import { MdFastForward } from 'react-icons/md';
 import { concat, of as _of, timer } from 'rxjs';
 import { catchError, distinctUntilChanged, map, skip, take } from 'rxjs/operators';
-import styled from 'styled-components';
+import { prop } from 'styled-tools';
 import { DateTimePicker } from './DateTimePicker';
 import { useNetworkClients } from './DeveloperToolsContext';
 import { Dialog } from './Dialog';
@@ -16,8 +17,9 @@ import { ToolbarButton } from './ToolbarButton';
 const { useState } = React;
 
 const StyledTime = styled(Box.withComponent('time'))`
-  min-width: ${({ value }: { readonly value: string }) => Math.max(30, value.length * 8)}px;
+  min-width: ${prop('minWidth')}px;
 `;
+const getMinWidth = (value: string) => Math.max(30, value.length * 8);
 
 const StyledDivider = styled(Divider)`
   height: 22px;
@@ -76,7 +78,7 @@ function TimeAgo({ time, ...props }: TimeAgoProps) {
 
     lastTime = (
       <>
-        <StyledTime data-test="neo-one-block-time-last-time-value" value={innerValue} {...props}>
+        <StyledTime data-test="neo-one-block-time-last-time-value" minWidth={getMinWidth(innerValue)} {...props}>
           {innerValue}
         </StyledTime>
         <StyledDivider vertical />
@@ -96,7 +98,7 @@ function TimeAgo({ time, ...props }: TimeAgoProps) {
   return (
     <>
       {lastTime}
-      <StyledTime data-test="neo-one-block-time-time-value" value={value} {...props}>
+      <StyledTime data-test="neo-one-block-time-time-value" minWidth={getMinWidth(value)} {...props}>
         {value}
       </StyledTime>
     </>

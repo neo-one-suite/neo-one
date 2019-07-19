@@ -1,8 +1,8 @@
 // tslint:disable no-array-mutation no-any
+import styled from '@emotion/styled';
 // @ts-ignore
 import SizeObserver from '@render-props/size-observer';
 import * as React from 'react';
-import styled from 'styled-components';
 import { ResizeHandler } from './ResizeHandler';
 import { Toast } from './Toast';
 import { useToasts } from './ToastsContext';

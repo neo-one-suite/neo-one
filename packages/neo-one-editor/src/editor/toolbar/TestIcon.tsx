@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
 import { LoadingDots } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdDone, MdError, MdFiberManualRecord } from 'react-icons/md';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
 const Failed = styled(MdError)`

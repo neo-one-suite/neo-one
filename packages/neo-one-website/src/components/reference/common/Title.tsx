@@ -1,6 +1,6 @@
 // stylelint-disable
+import styled from '@emotion/styled';
 import { H2 } from '@neo-one/react-common';
-import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 
 export const Title = styled(H2)<{ readonly subheading?: boolean }>`

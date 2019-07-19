@@ -1,5 +1,5 @@
+import styled from '@emotion/styled';
 import { Image } from '@neo-one/react-common';
-import styled from 'styled-components';
 
 export const AssetImage = styled(Image)`
   min-width: 0;

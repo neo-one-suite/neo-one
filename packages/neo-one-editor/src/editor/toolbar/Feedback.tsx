@@ -1,9 +1,9 @@
 // tslint:disable no-any
+import styled from '@emotion/styled';
 import { Box, ButtonBase as ButtonBaseBase, Input, Link, LinkBase } from '@neo-one/react-common';
 import * as React from 'react';
 import { FaTwitter } from 'react-icons/fa';
 import { IoMdHappy, IoMdSad } from 'react-icons/io';
-import styled from 'styled-components';
 import { ifProp, prop } from 'styled-tools';
 import { ToolbarPopover } from './ToolbarPopover';
 

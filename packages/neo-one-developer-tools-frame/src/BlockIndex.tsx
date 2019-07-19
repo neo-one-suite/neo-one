@@ -1,9 +1,10 @@
+import styled from '@emotion/styled';
 import { Box, useStream } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdPlayArrow } from 'react-icons/md';
 import { of } from 'rxjs';
 import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
-import styled from 'styled-components';
+import { prop } from 'styled-tools';
 import { useNetworkClients } from './DeveloperToolsContext';
 import { useAddError } from './ToastsContext';
 import { ToolbarButton } from './ToolbarButton';
@@ -11,7 +12,7 @@ import { ToolbarButton } from './ToolbarButton';
 const { useCallback } = React;
 
 const IndexWrapper = styled(Box)`
-  width: ${({ index }: { readonly index: number }) => index.toString().length * 10}px;
+  width: ${prop('width')}px;
 `;
 
 export function BlockIndex() {
@@ -36,6 +37,7 @@ export function BlockIndex() {
     [block$, addError],
     0,
   );
+  const width = index.toString().length * 10;
 
   return (
     <ToolbarButton
@@ -44,7 +46,7 @@ export function BlockIndex() {
       help="Run Consensus"
       onClick={onClick}
     >
-      <IndexWrapper data-test="neo-one-block-index-value" index={index}>
+      <IndexWrapper data-test="neo-one-block-index-value" width={width}>
         {index}
       </IndexWrapper>
       <MdPlayArrow />

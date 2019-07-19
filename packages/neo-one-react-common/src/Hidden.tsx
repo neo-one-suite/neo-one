@@ -1,8 +1,8 @@
 // tslint:disable no-null-keyword no-object-mutation
+import { css } from '@emotion/core';
 import { Box, callAll, styledOmitProps } from '@neo-one/react-core';
 import * as React from 'react';
-import { css } from 'styled-components';
-import { ifProp, prop, theme } from 'styled-tools';
+import { ifProp, theme } from 'styled-tools';
 import {
   excludeTransition,
   ExpandProps,
@@ -178,14 +178,44 @@ interface HiddenStyledProps {
   readonly translateY?: string | number;
   readonly originX?: string | number;
   readonly originY?: string | number;
+  readonly slideOffset?: string | number;
   // tslint:disable-next-line:no-any
   readonly defaultSlide: any;
   // tslint:disable-next-line:no-any
   readonly defaultExpand: any;
-  readonly slideOffset?: string | number;
 }
 
 const hiddenTheme = theme('Hidden');
+
+// tslint:disable-next-line:no-any
+const hiddenTransformOrigin = (props: any) => {
+  const transformOrigin = originWithProps(props);
+  if (hasTransition(props)) {
+    return css`
+      transform-origin: ${transformOrigin(props)};
+      transition: all ${props.duration} ${props.timing} ${props.delay};
+    `;
+  }
+
+  return '';
+};
+
+// tslint:disable-next-line:no-any
+const hiddenTransition = (props: any) => {
+  const slideWith = slideWithProps(props);
+  const scaleWith = scaleWithProps(props);
+
+  if (hasTransition(props)) {
+    return css`
+      transform: ${slideWith(props)} ${scaleWith};
+      visibility: hidden;
+      will-change: transform, opacity;
+      display: none !important;
+    `;
+  }
+
+  return '';
+};
 
 export const Hidden = styledOmitProps<HiddenStyledProps>(
   HiddenComponent,
@@ -203,26 +233,16 @@ export const Hidden = styledOmitProps<HiddenStyledProps>(
   ],
   hiddenTheme,
 )`
+  transition: ${css`
+    font-style: normal;
+    font-weight: 400;
+  `}
   transform: ${translateWithProps};
-  ${ifProp(
-    hasTransition,
-    css`
-      transform-origin: ${originWithProps};
-      transition: all ${prop('duration')} ${prop('timing')} ${prop('delay')};
-    `,
-  )};
+  ${hiddenTransformOrigin};
   &[aria-hidden='true'] {
     pointer-events: none;
     ${ifProp('fade', 'opacity: 0')};
-    ${ifProp(
-      hasTransition,
-      css`
-        transform: ${slideWithProps} ${scaleWithProps};
-        visibility: hidden;
-        will-change: transform, opacity;
-      `,
-      'display: none !important',
-    )};
+    ${hiddenTransition};
   }
   ${hiddenTheme};
 `;

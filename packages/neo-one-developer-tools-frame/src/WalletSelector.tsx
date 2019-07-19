@@ -1,11 +1,11 @@
 // tslint:disable no-null-keyword no-any
+import styled from '@emotion/styled';
 import { createPrivateKey } from '@neo-one/client-common';
 import { LocalKeyStore } from '@neo-one/client-core';
 import { Box, Button, useStream } from '@neo-one/react-common';
 import * as React from 'react';
 import { combineLatest, of } from 'rxjs';
 import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
-import styled from 'styled-components';
 import { DeveloperToolsContext, useTokens } from './DeveloperToolsContext';
 import { useAddError } from './ToastsContext';
 import { getWalletSelectorOptions$, makeWalletSelectorValueOption, WalletSelectorBase } from './WalletSelectorBase';

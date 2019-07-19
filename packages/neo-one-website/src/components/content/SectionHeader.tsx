@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
 import { ButtonBase } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdExpandLess, MdExpandMore } from 'react-icons/md';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
 interface Props {

@@ -1,8 +1,8 @@
 // tslint:disable no-any match-default-export-name
+import styled from '@emotion/styled';
 import { axiforma, theme } from '@neo-one/react-core';
 import * as React from 'react';
 import SelectBase from 'react-select';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
 // tslint:disable-next-line:no-any

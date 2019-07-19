@@ -1,9 +1,10 @@
 // tslint:disable no-null-keyword
+import { css } from '@emotion/core';
+import styled from '@emotion/styled';
 import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdClose, MdDeleteSweep } from 'react-icons/md';
 import { connect } from 'react-redux';
-import styled, { css } from 'styled-components';
 import {
   clearConsole,
   EditorState,
