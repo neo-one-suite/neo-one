@@ -9249,7 +9249,18 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-css-chunks-webpack-plugin@4.5.5, extract-css-chunks-webpack-plugin@^4.5.1:
+extract-css-chunks-webpack-plugin@4.5.6:
+  version "4.5.6"
+  resolved "https://registry.yarnpkg.com/extract-css-chunks-webpack-plugin/-/extract-css-chunks-webpack-plugin-4.5.6.tgz#7f41118696578a45b2cb3c30bf9b738a38c384df"
+  integrity sha512-mTkkgXS2VMDbZ9yJD98Fatu8bdr3ZUVD7AIGvmkClCNxHYgeg64Rykb5QE1s/Y2LknAu6a20F26ZjO7AohckVw==
+  dependencies:
+    loader-utils "^1.1.0"
+    normalize-url "1.9.1"
+    schema-utils "^1.0.0"
+    webpack-external-import "^0.0.1-beta.16"
+    webpack-sources "^1.1.0"
+
+extract-css-chunks-webpack-plugin@^4.5.1:
   version "4.5.5"
   resolved "https://registry.yarnpkg.com/extract-css-chunks-webpack-plugin/-/extract-css-chunks-webpack-plugin-4.5.5.tgz#d62553210d572fc28e25158d41444634f81f4dc4"
   integrity sha512-v+eNPOAWEYOoDGV/PU2mDm3PW2UToIBFxrkpNebppiN5TgZBRcFOiHWRKjL/kghXdqkB5Rfj2fMk2JZWueVpsg==
