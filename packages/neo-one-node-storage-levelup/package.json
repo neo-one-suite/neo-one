@@ -13,7 +13,7 @@
     "tslib": "^1.9.3"
   },
   "devDependencies": {
-    "memdown": "4.0.0"
+    "memdown": "4.1.0"
   },
   "sideEffects": false
 }
