@@ -4,8 +4,8 @@
   "description": "NEO•ONE shared react.",
   "main": "./src/index",
   "dependencies": {
-    "@types/styled-components": "4.1.16",
-    "lodash": "^4.17.11",
+    "@types/styled-components": "4.1.18",
+    "lodash": "^4.17.14",
     "react": "16.8.6",
     "rxjs": "6.5.2",
     "styled-components": "4.3.2",

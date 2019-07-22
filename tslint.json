@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "tslint:all",
-    "tslint-config-prettier"
-  ],
+  "extends": ["tslint:all", "tslint-config-prettier"],
   "rulesDirectory": [
     "tslint-microsoft-contrib",
     "./node_modules/tslint-immutable/rules",
@@ -12,11 +9,7 @@
     "./node_modules/rxjs-tslint-rules/dist/rules"
   ],
   "linterOptions": {
-    "exclude": [
-      "./packages/*/package.json",
-      "./packages/*/template/**/*.ts",
-      "./packages/*/template/**/*.tsx"
-    ]
+    "exclude": ["./packages/*/package.json", "./packages/*/template/**/*.ts", "./packages/*/template/**/*.tsx"]
   },
   "rules": {
     "cyclomatic-complexity": false,
@@ -41,6 +34,8 @@
     "prefer-function-over-method": false,
     "file-name-casing": [false, "camel-case"],
     "static-this": false,
+    "strict-comparisons": false,
+    "no-async-without-await": false,
     "no-null-undefined-union": false,
     "array-type": [true, "array-simple"],
 
@@ -57,15 +52,8 @@
       }
     ],
     "ordered-imports": true,
-    "quotemark": [
-      false,
-      "single",
-      "avoid-escape"
-    ],
-    "triple-equals": [
-      true,
-      "allow-undefined-check"
-    ],
+    "quotemark": [false, "single", "avoid-escape"],
+    "triple-equals": [true, "allow-undefined-check"],
     "member-ordering": [
       true,
       {
@@ -73,18 +61,8 @@
       }
     ],
     "no-inferrable-types": true,
-    "only-arrow-functions": [
-      true,
-      "allow-declarations"
-    ],
-    "no-submodule-imports": [
-      true,
-      "rxjs",
-      "@reactivex/ix-es2015-cjs",
-      "@reactivex",
-      "uuid",
-      "react-icons"
-    ],
+    "only-arrow-functions": [true, "allow-declarations"],
+    "no-submodule-imports": [true, "rxjs", "@reactivex/ix-es2015-cjs", "@reactivex", "uuid", "react-icons"],
     "strict-boolean-expressions": [
       true,
       "allow-null-union",
@@ -93,35 +71,17 @@
       "allow-number",
       "allow-mix"
     ],
-    "no-implicit-dependencies": [
-      true,
-      "dev"
-    ],
-    "comment-format": [
-      true,
-      "check-space"
-    ],
-    "no-void-expression": [
-      true,
-      "ignore-arrow-function-shorthand"
-    ],
+    "no-implicit-dependencies": [true, "dev"],
+    "comment-format": [true, "check-space"],
+    "no-void-expression": [true, "ignore-arrow-function-shorthand"],
     "no-this-assignment": [
       true,
       {
         "allow-destructuring": true
       }
     ],
-    "one-variable-per-declaration": [
-      true,
-      "ignore-for-loop"
-    ],
-    "variable-name": [
-      true,
-      "ban-keywords",
-      "check-format",
-      "allow-leading-underscore",
-      "allow-pascal-case"
-    ],
+    "one-variable-per-declaration": [true, "ignore-for-loop"],
+    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"],
     "export-name": true,
     "no-control-regex": true,
     "no-empty-line-after-opening-brace": true,
@@ -132,15 +92,22 @@
     "no-suspicious-comment": true,
     "no-unnecessary-field-initialization": true,
     "possible-timing-attack": true,
-    "prefer-array-literal": [ true, { "allow-type-parameters": true } ],
+    "prefer-array-literal": [true, { "allow-type-parameters": true }],
     "promise-must-complete": true,
     "use-named-parameter": true,
     "no-unused-expression": [true, "allow-fast-null-checks"],
-    "readonly-keyword": [true, "ignore-local", {"ignore-prefix": ["mutable", "this.mutable", "draft"] }],
-    "readonly-array": [true, "ignore-local", {"ignore-prefix": ["mutable", "this.mutable", "draft"] }],
+    "readonly-keyword": [true, "ignore-local", { "ignore-prefix": ["mutable", "this.mutable", "draft"] }],
+    "readonly-array": [true, "ignore-local", { "ignore-prefix": ["mutable", "this.mutable", "draft"] }],
     "no-let": [true, "ignore-local"],
-    "no-array-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "ctx.mutable", "draft"] }, "ignore-new-array"],
-    "no-object-mutation": [true, {"ignore-prefix": ["mutable", "this.mutable", "app.proxy", "app.silent", "ctx.", "draft", "$el"] }],
+    "no-array-mutation": [
+      true,
+      { "ignore-prefix": ["mutable", "this.mutable", "ctx.mutable", "draft"] },
+      "ignore-new-array"
+    ],
+    "no-object-mutation": [
+      true,
+      { "ignore-prefix": ["mutable", "this.mutable", "app.proxy", "app.silent", "ctx.", "draft", "$el"] }
+    ],
     "no-method-signature": true,
     "no-loop-statement": true,
     "no-accessor-recursion": true,

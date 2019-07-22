@@ -36,7 +36,8 @@ const transformRxjsImportText = (importName) =>
     ? `rxjs/internal/observable/${importName}`
     : `rxjs/internal/${importName}`;
 
-const transformRxjsOperatorsImportText = (importName) => `rxjs/internal/operators/${importName}`;
+const transformRxjsOperatorsImportText = (importName) =>
+  `rxjs/internal/operators/${importName}`;
 
 const updateRxjsImportStatements = (callback, statement) =>
   statement.importClause.namedBindings.elements.map((elem) =>
@@ -45,10 +46,16 @@ const updateRxjsImportStatements = (callback, statement) =>
       statement.modifiers,
       typescript.createImportClause(
         undefined,
-        typescript.createNamedImports([typescript.createImportSpecifier(elem.propertyName, elem.name)]),
+        typescript.createNamedImports([
+          typescript.createImportSpecifier(elem.propertyName, elem.name),
+        ]),
       ),
       typescript.createStringLiteral(
-        callback(elem.propertyName === undefined ? elem.name.getText() : elem.propertyName.getText()),
+        callback(
+          elem.propertyName === undefined
+            ? elem.name.getText()
+            : elem.propertyName.getText(),
+        ),
       ),
     ),
   );
@@ -66,7 +73,10 @@ const transformImports = (statements) =>
           return updateRxjsImportStatements(transformRxjsImportText, statement);
         }
         if (moduleName === RXJS_OPERATORS_IMPORT) {
-          return updateRxjsImportStatements(transformRxjsOperatorsImportText, statement);
+          return updateRxjsImportStatements(
+            transformRxjsOperatorsImportText,
+            statement,
+          );
         }
       }
 
@@ -140,21 +150,32 @@ const FORMATS = [
   browser: browser === true,
   dist: createFormatDistName({ main, target, module, browser }),
   name: createFormatName({ main, target, module, browser }),
-  tsconfig: `tsconfig/tsconfig.${target}.${browser ? 'browserify.' : ''}${module}.json`,
+  tsconfig: `tsconfig/tsconfig.${target}.${
+    browser ? 'browserify.' : ''
+  }${module}.json`,
   tsconfigESM: `tsconfig/tsconfig.${target}.esm.json`,
-  fastProject: ts.createProject(`tsconfig/tsconfig.${target}.${browser ? 'browserify.' : ''}${module}.json`, {
-    typescript,
-    isolatedModules: true,
-  }),
-  project: ts.createProject(`tsconfig/tsconfig.${target}.${browser ? 'browserify.' : ''}${module}.json`, {
-    typescript,
-  }),
+  fastProject: ts.createProject(
+    `tsconfig/tsconfig.${target}.${browser ? 'browserify.' : ''}${module}.json`,
+    {
+      typescript,
+      isolatedModules: true,
+    },
+  ),
+  project: ts.createProject(
+    `tsconfig/tsconfig.${target}.${browser ? 'browserify.' : ''}${module}.json`,
+    {
+      typescript,
+    },
+  ),
 }));
 const MAIN_FORMAT = FORMATS[0];
 const MAIN_BIN_FORMAT = FORMATS[0];
 
 function getTaskHash(format, ...args) {
-  return (format.browser ? [format.target, format.module, 'browserify'] : [format.target, format.module])
+  return (format.browser
+    ? [format.target, format.module, 'browserify']
+    : [format.target, format.module]
+  )
     .concat(args.filter((x) => x !== void 0 && x !== ''))
     .join(`:`);
 }
@@ -167,7 +188,10 @@ const memoizeTask = (cache, taskFn) => (format, ...args) => {
       return taskFn(format, done, ...args);
     }
 
-    return cache[getTaskHash(format, ...args)] || (cache[getTaskHash(format, ...args)] = taskFn(format, done, ...args));
+    return (
+      cache[getTaskHash(format, ...args)] ||
+      (cache[getTaskHash(format, ...args)] = taskFn(format, done, ...args))
+    );
   };
   fn.displayName = `${taskFn.name || ``}:${getTaskHash(format, ...args)}:task`;
 
@@ -176,12 +200,15 @@ const memoizeTask = (cache, taskFn) => (format, ...args) => {
 
 const DIST = 'dist';
 const getDistBase = (format) => path.join(DIST, format.dist);
-const getDistBaseCWD = (format) => path.resolve(appRootDir.get(), getDistBase(format));
+const getDistBaseCWD = (format) =>
+  path.resolve(appRootDir.get(), getDistBase(format));
 const getDest = (format) => path.join(getDistBase(format), 'packages');
 
 const getPackageJSON = (pkg) => {
   try {
-    return JSON.parse(fs.readFileSync(path.resolve('packages', pkg, 'package.json'), 'utf-8'));
+    return JSON.parse(
+      fs.readFileSync(path.resolve('packages', pkg, 'package.json'), 'utf-8'),
+    );
   } catch (error) {
     console.log(`Invalid package.json: ${pkg}`);
     console.error(error);
@@ -209,14 +236,18 @@ const getPackageJSONs = () => {
     .readdirSync('packages')
     .filter((file) => !file.startsWith('.'))
     .filter((file) => !SKIP_PACKAGES.has(file))
-    .filter((pkg) => fs.pathExistsSync(path.resolve('packages', pkg, 'package.json')));
+    .filter((pkg) =>
+      fs.pathExistsSync(path.resolve('packages', pkg, 'package.json')),
+    );
   const pkgJSONs = pkgs.map((pkg) => [pkg, getPackageJSON(pkg)]);
 
   return { pkgs, pkgJSONs };
 };
 
 const { pkgs, pkgJSONs } = getPackageJSONs();
-const smartContractPkgs = pkgJSONs.filter(([_p, pkgJSON]) => pkgJSON.smartContract).map(([p]) => p);
+const smartContractPkgs = pkgJSONs
+  .filter(([_p, pkgJSON]) => pkgJSON.smartContract)
+  .map(([p]) => p);
 const smartContractPkgNames = pkgJSONs
   .filter(([_p, pkgJSON]) => pkgJSON.smartContract)
   .map(([_p, pkgJSON]) => pkgJSON.name);
@@ -267,7 +298,8 @@ const globs = {
   metadata: ['LICENSE', 'README.md'],
 };
 
-const getName = (format, name) => (format.name === '' ? name : `${name}-${format.name}`);
+const getName = (format, name) =>
+  format.name === '' ? name : `${name}-${format.name}`;
 const getBin = (format, file) => {
   if (format.name !== '') {
     return undefined;
@@ -285,7 +317,10 @@ const getBin = (format, file) => {
     _.flatMap(
       binFiles.map((binFile) => {
         const fileName = path.basename(binFile, '.ts');
-        return [[fileName, `./bin/${fileName}`], [`${fileName}.js`, `./bin/${fileName}.js`]];
+        return [
+          [fileName, `./bin/${fileName}`],
+          [`${fileName}.js`, `./bin/${fileName}.js`],
+        ];
       }),
     ),
   );
@@ -315,7 +350,11 @@ const mapDep = (format, depName) => {
     return DEP_MAPPING[format.target][format.module][depName];
   }
 
-  if (format.browser && depName.includes('@neo-one/') && !depName.includes('ec-key')) {
+  if (
+    format.browser &&
+    depName.includes('@neo-one/') &&
+    !depName.includes('ec-key')
+  ) {
     return `${depName}-browserify`;
   }
 
@@ -341,7 +380,9 @@ const transformBasePackageJSON = (format, orig, file) => {
         ? undefined
         : _.fromPairs(
             Object.entries(orig.dependencies)
-              .filter(([depName]) => depName !== '@neo-one/developer-tools-frame')
+              .filter(
+                ([depName]) => depName !== '@neo-one/developer-tools-frame',
+              )
               .map(([depName, version]) => [mapDep(format, depName), version]),
           ),
     publishConfig: {
@@ -361,8 +402,13 @@ const transformSrcPackageJSON = (format, orig, file) => ({
 
 const transformSmartContractPackageJSON = (format, orig, file) => ({
   ...transformBasePackageJSON(format, orig, file),
-  main: orig.main.startsWith('./src/') ? orig.main.slice('./src/'.length) : orig.main,
-  include: orig.include === undefined ? undefined : orig.include.map((filepath) => filepath.slice(0, 'src/'.length)),
+  main: orig.main.startsWith('./src/')
+    ? orig.main.slice('./src/'.length)
+    : orig.main,
+  include:
+    orig.include === undefined
+      ? undefined
+      : orig.include.map((filepath) => filepath.slice(0, 'src/'.length)),
 });
 
 const transformBrowserPackageJSON = (format, orig, file) => ({
@@ -381,7 +427,12 @@ const copyPkg = ((cache) =>
   memoizeTask(cache, function copyPkg(format) {
     return gulp
       .src(globs.pkg)
-      .pipe(jsonTransform((orig, file) => transformPackageJSON(format, orig, file), 2))
+      .pipe(
+        jsonTransform(
+          (orig, file) => transformPackageJSON(format, orig, file),
+          2,
+        ),
+      )
       .pipe(gulp.dest(getDest(format)));
   }))({});
 
@@ -420,7 +471,10 @@ const copyTypescript = ((cache) =>
 
 const copyMetadata = ((cache) =>
   memoizeTask(cache, function copyMetadata(format) {
-    return pkgs.reduce((stream, p) => stream.pipe(gulp.dest(path.join(getDest(format), p))), gulp.src(globs.metadata));
+    return pkgs.reduce(
+      (stream, p) => stream.pipe(gulp.dest(path.join(getDest(format), p))),
+      gulp.src(globs.metadata),
+    );
   }))({});
 
 const copyFiles = ((cache) =>
@@ -429,20 +483,41 @@ const copyFiles = ((cache) =>
   }))({});
 
 const addFast = (format, stream, shouldAdd) =>
-  shouldAdd ? stream.pipe(gulpPlumber()).pipe(gulpNewer({ dest: getDest(format), ext: '.js' })) : stream;
+  shouldAdd
+    ? stream
+        .pipe(gulpPlumber())
+        .pipe(gulpNewer({ dest: getDest(format), ext: '.js' }))
+    : stream;
 
 const quoted = (value, quote) => `${quote}${value}${quote}`;
 const gulpReplaceModule = (format, stream, quote = "'") =>
   Object.entries(DEP_MAPPING[format.target][format.module])
-    .concat(format === MAIN_FORMAT ? [] : pkgNames.map((p) => [quoted(p, quote), quoted(mapDep(format, p), quote)]))
-    .reduce((streamIn, [moduleName, replaceName]) => streamIn.pipe(gulpReplace(moduleName, replaceName)), stream);
+    .concat(
+      format === MAIN_FORMAT
+        ? []
+        : pkgNames.map((p) => [
+            quoted(p, quote),
+            quoted(mapDep(format, p), quote),
+          ]),
+    )
+    .reduce(
+      (streamIn, [moduleName, replaceName]) =>
+        streamIn.pipe(gulpReplace(moduleName, replaceName)),
+      stream,
+    );
 const mapSources = (sourcePath) => path.basename(sourcePath);
 const compileTypescript = ((cache) =>
   memoizeTask(cache, function compileTypescript(format, _done, type) {
     return gulpReplaceModule(
       format,
       addFast(format, gulp.src(globs.buildFiles), type === 'fast')
-        .pipe(gulpFilter(['**', '!**/*.proto'].concat(smartContractPkgs.map((p) => `!packages/${p}/**/*`))))
+        .pipe(
+          gulpFilter(
+            ['**', '!**/*.proto'].concat(
+              smartContractPkgs.map((p) => `!packages/${p}/**/*`),
+            ),
+          ),
+        )
         .pipe(gulpSourcemaps.init())
         .pipe(type === 'fast' ? format.fastProject() : format.project())
         .pipe(gulpSourcemaps.mapSources(mapSources))
@@ -450,12 +525,26 @@ const compileTypescript = ((cache) =>
         .pipe(
           gulpReplace(
             `${RXJS_IMPORT}/internal`,
-            `${RXJS_IMPORT}/${format.module === 'esm' ? '_esm2015/' : ''}internal`,
+            `${RXJS_IMPORT}/${
+              format.module === 'esm' ? '_esm2015/' : ''
+            }internal`,
           ),
         )
-        .pipe(gulpReplace(/import\("(?:..\/)*neo-one-([^\)]*)\/src"\)/g, 'import("@neo-one/$1")'))
-        .pipe(gulpReplace(/import\("(?:..\/)*types\/bn.js"\).BN/g, 'import("bn.js")'))
-        .pipe(gulpReplace("import { BN } from 'bn.js';", "import BN from 'bn.js';"))
+        .pipe(
+          gulpReplace(
+            /import\("(?:..\/)*neo-one-([^\)]*)\/src"\)/g,
+            'import("@neo-one/$1")',
+          ),
+        )
+        .pipe(
+          gulpReplace(
+            /import\("(?:..\/)*types\/bn.js"\).BN/g,
+            'import("bn.js")',
+          ),
+        )
+        .pipe(
+          gulpReplace("import { BN } from 'bn.js';", "import BN from 'bn.js';"),
+        )
         .pipe(
           gulpRename((name) => {
             name.dirname = name.dirname
@@ -478,14 +567,26 @@ gulp.task('compileDeveloperToolsFrame', async () => {
 const compileDeveloperToolsBundle = ((cache) =>
   memoizeTask(cache, async function compileDeveloperToolsBundle(format) {
     const bundle = await rollup.rollup({
-      input: path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-developer-tools', 'src', 'index.ts'),
+      input: path.resolve(
+        APP_ROOT_DIR,
+        'packages',
+        'neo-one-developer-tools',
+        'src',
+        'index.ts',
+      ),
       external: ['resize-observer-polyfill'],
       plugins: [
         rollupString.string({
           include: '**/*.raw.js',
         }),
         rollupTypescript({
-          cacheRoot: path.join('node_modules', '.cache', 'rts2', format.target, format.module),
+          cacheRoot: path.join(
+            'node_modules',
+            '.cache',
+            'rts2',
+            format.target,
+            format.module,
+          ),
           tsconfig: format.tsconfigESM,
           tsconfigOverride: {
             compilerOptions: {
@@ -505,7 +606,11 @@ const compileDeveloperToolsBundle = ((cache) =>
   }))({});
 
 const buildAllNoDeveloperToolsBundle = ((cache) =>
-  memoizeTask(cache, function buildAllNoDeveloperToolsBundle(format, done, type) {
+  memoizeTask(cache, function buildAllNoDeveloperToolsBundle(
+    format,
+    done,
+    type,
+  ) {
     return gulp.parallel(
       ...[
         copyPkgFiles(format),
@@ -526,23 +631,38 @@ const buildAll = ((cache) =>
   memoizeTask(cache, function buildAll(format, done, type) {
     return format.browser
       ? buildAllNoDeveloperToolsBundle(format, type)(done)
-      : gulp.series(buildAllNoDeveloperToolsBundle(format, type), compileDeveloperToolsBundle(format))(done);
+      : gulp.series(
+          buildAllNoDeveloperToolsBundle(format, type),
+          compileDeveloperToolsBundle(format),
+        )(done);
   }))({});
 
 const install = ((cache) =>
   memoizeTask(cache, async function install(format) {
-    await execa.shell('yarn install --non-interactive --no-progress --ignore-engines', {
-      cwd: getDistBaseCWD(format),
-      stdio,
-    });
+    await execa(
+      'yarn install --non-interactive --no-progress --ignore-engines',
+      {
+        cwd: getDistBaseCWD(format),
+        stdio,
+        shell: true,
+      },
+    );
   }))({});
 
 const publish = ((cache) =>
   memoizeTask(cache, async function publish(format) {
-    await execa('yarn', ['lerna', 'exec', path.resolve(appRootDir.get(), 'scripts', 'try-publish')], {
-      cwd: getDistBaseCWD(format),
-      stdio,
-    });
+    await execa(
+      'yarn',
+      [
+        'lerna',
+        'exec',
+        path.resolve(appRootDir.get(), 'scripts', 'try-publish'),
+      ],
+      {
+        cwd: getDistBaseCWD(format),
+        stdio,
+      },
+    );
   }))({});
 
 const rootPkg = { ...pkg, devDependencies: { ...pkg.devDependencies } };
@@ -557,9 +677,13 @@ const copyRootPkg = ((cache) =>
 
 const copyRootTSConfig = ((cache) =>
   memoizeTask(cache, async function copyRootTSConfig(format) {
-    const tsconfigContents = await fs.readFile(path.resolve(appRootDir.get(), 'tsconfig.json'), 'utf8');
+    const tsconfigContents = await fs.readFile(
+      path.resolve(appRootDir.get(), 'tsconfig.json'),
+      'utf8',
+    );
     const tsconfig = JSON.parse(tsconfigContents);
-    const suffix = format === MAIN_FORMAT ? '' : `-${format.target}-${format.module}`;
+    const suffix =
+      format === MAIN_FORMAT ? '' : `-${format.target}-${format.module}`;
     const {
       compilerOptions: { paths, typeRoots, ...compilerRest },
       ...configRest
@@ -593,7 +717,10 @@ const CLIENT_PACKAGES = new Set([
 ]);
 
 const CLIENT_FULL_PACKAGES = new Set(
-  [...CLIENT_PACKAGES].concat(['@neo-one/client-full', '@neo-one/client-full-core']),
+  [...CLIENT_PACKAGES].concat([
+    '@neo-one/client-full',
+    '@neo-one/client-full-core',
+  ]),
 );
 
 const CLIENT_BROWSERIFY = {
@@ -643,7 +770,13 @@ const getClientPkgDependencies = (pkgJSONMap, pkgs) => {
       dependencies = pkgJSONMap[pkg].dependencies;
     }
     Object.keys(dependencies).forEach((name) => {
-      if (!(name.includes('@neo-one') || name.includes('@types') || EXTERNALS_BLACKLIST.has(name))) {
+      if (
+        !(
+          name.includes('@neo-one') ||
+          name.includes('@types') ||
+          EXTERNALS_BLACKLIST.has(name)
+        )
+      ) {
         externals.add(name);
       }
     });
@@ -688,7 +821,10 @@ const copyBrowserifyTypes = ((cache) =>
       await Promise.all(
         allPackages.map(async (pkgName) => {
           if (CLIENT_FULL_PACKAGES.has(getPkgName(pkgName))) {
-            copyBrowserifyTypesFiles(path.resolve(inputPath, pkgName), path.resolve(outputPath, pkgName));
+            copyBrowserifyTypesFiles(
+              path.resolve(inputPath, pkgName),
+              path.resolve(outputPath, pkgName),
+            );
           } else {
             await fs.remove(path.resolve(outputPath, pkgName));
           }
@@ -705,39 +841,44 @@ const bundleBrowserify = ((cache) =>
       const outputPkgPath = getDest(format);
 
       await Promise.all(
-        Object.entries(CLIENT_BROWSERIFY).map(async ([pkgName, neoOneDependencies]) => {
-          const externals = getClientPkgDependencies(pkgJSONMap, neoOneDependencies);
+        Object.entries(CLIENT_BROWSERIFY).map(
+          async ([pkgName, neoOneDependencies]) => {
+            const externals = getClientPkgDependencies(
+              pkgJSONMap,
+              neoOneDependencies,
+            );
 
-          await new Promise((resolve, reject) =>
-            webpack(
-              webpackBrowserifyConfig(
-                externals,
-                path.resolve(inputPkgPath, pkgName),
-                path.resolve(outputPkgPath, pkgName),
+            await new Promise((resolve, reject) =>
+              webpack(
+                webpackBrowserifyConfig(
+                  externals,
+                  path.resolve(inputPkgPath, pkgName),
+                  path.resolve(outputPkgPath, pkgName),
+                ),
+                (err, stats) => {
+                  if (err) {
+                    reject(err);
+                  } else if (stats.hasErrors()) {
+                    console.log(
+                      stats.toString({
+                        performance: false,
+                        hash: false,
+                        timings: true,
+                        entrypoints: false,
+                        chunkOrigins: false,
+                        chunkModules: false,
+                        colors: true,
+                      }),
+                    );
+                    reject(new Error('Webpack bundling failed.'));
+                  } else {
+                    resolve(stats);
+                  }
+                },
               ),
-              (err, stats) => {
-                if (err) {
-                  reject(err);
-                } else if (stats.hasErrors()) {
-                  console.log(
-                    stats.toString({
-                      performance: false,
-                      hash: false,
-                      timings: true,
-                      entrypoints: false,
-                      chunkOrigins: false,
-                      chunkModules: false,
-                      colors: true,
-                    }),
-                  );
-                  reject(new Error('Webpack bundling failed.'));
-                } else {
-                  resolve(stats);
-                }
-              },
-            ),
-          );
-        }),
+            );
+          },
+        ),
       );
     }
   }))({});
@@ -745,19 +886,27 @@ const bundleBrowserify = ((cache) =>
 gulp.task(
   'browserify',
   gulp.parallel(
-    FORMATS.filter((format) => format.browser).map((format) => copyBrowserifyTypes(format)),
-    FORMATS.filter((format) => format.browser).map((format) => bundleBrowserify(format)),
+    FORMATS.filter((format) => format.browser).map((format) =>
+      copyBrowserifyTypes(format),
+    ),
+    FORMATS.filter((format) => format.browser).map((format) =>
+      bundleBrowserify(format),
+    ),
   ),
 );
 
 const gulpBin = () =>
   gulpReplaceModule(MAIN_FORMAT, gulp.src(globs.bin)).pipe(
     gulpRename((parsedPath) => {
-      parsedPath.dirname = parsedPath.dirname.slice(0, -'/src/bin'.length) + '/bin';
+      parsedPath.dirname =
+        parsedPath.dirname.slice(0, -'/src/bin'.length) + '/bin';
     }),
   );
 
-const binProject = ts.createProject(MAIN_BIN_FORMAT.tsconfig, { typescript, declaration: false });
+const binProject = ts.createProject(MAIN_BIN_FORMAT.tsconfig, {
+  typescript,
+  declaration: false,
+});
 const binBanner = `#!/usr/bin/env node
 require('source-map-support').install({ handleUncaughtExceptions: false, environment: 'node' });
 const { defaultMetrics, metrics } = require('@neo-one/monitor');
@@ -813,7 +962,10 @@ gulp.task('createBin', () =>
       through2.obj(function(file, enc, callback) {
         file.dirname = file.dirname.slice(0, -'/src/bin'.length) + '/bin';
         file.extname = '';
-        file.contents = Buffer.from(bin(`${path.basename(file.basename, '.ts')}.js`), 'utf8');
+        file.contents = Buffer.from(
+          bin(`${path.basename(file.basename, '.ts')}.js`),
+          'utf8',
+        );
 
         this.push(file);
 
@@ -826,17 +978,44 @@ gulp.task('buildBin', gulp.parallel('compileBin', 'createBin'));
 
 gulp.task('clean', () => fs.remove(DIST));
 gulp.task('copyPkg', gulp.parallel(FORMATS.map((format) => copyPkg(format))));
-gulp.task('copyPkgFiles', gulp.parallel(FORMATS.map((format) => copyPkgFiles(format))));
-gulp.task('copyTypescript', gulp.parallel(FORMATS.map((format) => copyTypescript(format))));
-gulp.task('copyMetadata', gulp.parallel(FORMATS.map((format) => copyMetadata(format))));
-gulp.task('copyFiles', gulp.parallel(FORMATS.map((format) => copyFiles(format))));
-gulp.task('copyRootPkg', gulp.parallel(FORMATS.map((format) => copyRootPkg(format))));
-gulp.task('copyRootTSConfig', gulp.parallel(FORMATS.map((format) => copyRootTSConfig(format))));
-gulp.task('compileDeveloperToolsBundle', gulp.parallel(FORMATS.map((format) => compileDeveloperToolsBundle(format))));
-gulp.task('buildTypescript', gulp.parallel(FORMATS.map((format) => compileTypescript(format))));
+gulp.task(
+  'copyPkgFiles',
+  gulp.parallel(FORMATS.map((format) => copyPkgFiles(format))),
+);
+gulp.task(
+  'copyTypescript',
+  gulp.parallel(FORMATS.map((format) => copyTypescript(format))),
+);
+gulp.task(
+  'copyMetadata',
+  gulp.parallel(FORMATS.map((format) => copyMetadata(format))),
+);
+gulp.task(
+  'copyFiles',
+  gulp.parallel(FORMATS.map((format) => copyFiles(format))),
+);
+gulp.task(
+  'copyRootPkg',
+  gulp.parallel(FORMATS.map((format) => copyRootPkg(format))),
+);
+gulp.task(
+  'copyRootTSConfig',
+  gulp.parallel(FORMATS.map((format) => copyRootTSConfig(format))),
+);
+gulp.task(
+  'compileDeveloperToolsBundle',
+  gulp.parallel(FORMATS.map((format) => compileDeveloperToolsBundle(format))),
+);
+gulp.task(
+  'buildTypescript',
+  gulp.parallel(FORMATS.map((format) => compileTypescript(format))),
+);
 gulp.task(
   'buildAll',
-  gulp.series('compileDeveloperToolsFrame', gulp.parallel(FORMATS.map((format) => buildAll(format)))),
+  gulp.series(
+    'compileDeveloperToolsFrame',
+    gulp.parallel(FORMATS.map((format) => buildAll(format))),
+  ),
 );
 gulp.task('install', gulp.parallel(FORMATS.map((format) => install(format))));
 gulp.task('publish', gulp.parallel(FORMATS.map((format) => publish(format))));
@@ -844,17 +1023,28 @@ gulp.task('publish', gulp.parallel(FORMATS.map((format) => publish(format))));
 gulp.task('build', gulp.series('clean', 'buildAll', 'install', 'browserify'));
 
 const buildE2ESeries = (type) =>
-  gulp.series('compileDeveloperToolsFrame', buildAll(MAIN_FORMAT, type), install(MAIN_FORMAT));
+  gulp.series(
+    'compileDeveloperToolsFrame',
+    buildAll(MAIN_FORMAT, type),
+    install(MAIN_FORMAT),
+  );
 gulp.task('buildE2E', gulp.series('clean', buildE2ESeries()));
 
-const buildNodeSeries = (type) => gulp.series(buildAllNoDeveloperToolsBundle(MAIN_FORMAT, type), install(MAIN_FORMAT));
+const buildNodeSeries = (type) =>
+  gulp.series(
+    buildAllNoDeveloperToolsBundle(MAIN_FORMAT, type),
+    install(MAIN_FORMAT),
+  );
 gulp.task('buildNode', gulp.series('clean', buildNodeSeries()));
 
 gulp.task(
   'watch',
   gulp.series(buildE2ESeries('fast'), function startWatch() {
     noCache = true;
-    gulp.watch(globs.watchFiles.concat(globs.bin), gulp.series(compileTypescript(MAIN_FORMAT, 'fast'), 'buildBin'));
+    gulp.watch(
+      globs.watchFiles.concat(globs.bin),
+      gulp.series(compileTypescript(MAIN_FORMAT, 'fast'), 'buildBin'),
+    );
   }),
 );
 
@@ -885,6 +1075,19 @@ gulp.task('e2e', async () => {
   await execa('yarn', ['e2e-ci'], { stdio });
 });
 
-gulp.task('release', gulp.series('test', 'build', 'e2e', 'prepareRelease', 'copyPkg', 'publish'));
+gulp.task(
+  'release',
+  gulp.series('test', 'build', 'e2e', 'prepareRelease', 'copyPkg', 'publish'),
+);
 
-gulp.task('fastRelease', gulp.series('build', 'prepareRelease', 'copyPkg', 'copyMetadata', 'copyPkgFiles', 'publish'));
+gulp.task(
+  'fastRelease',
+  gulp.series(
+    'build',
+    'prepareRelease',
+    'copyPkg',
+    'copyMetadata',
+    'copyPkgFiles',
+    'publish',
+  ),
+);

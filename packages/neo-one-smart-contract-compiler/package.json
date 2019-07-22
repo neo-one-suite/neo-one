@@ -15,10 +15,10 @@
     "@neo-one/utils": "^1.1.2",
     "@types/bn.js": "^4.11.5",
     "bn.js": "^4.11.8",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
-    "typescript": "3.5.2"
+    "typescript": "3.5.3"
   },
   "devDependencies": {
     "@neo-one/client-switch": "^1.2.1",

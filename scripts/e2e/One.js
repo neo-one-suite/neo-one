@@ -152,9 +152,9 @@ class One {
   }
 
   async _timeRequireSingle(mod) {
-    const { stdout } = await execa.shell(
+    const { stdout } = await execa(
       `node --eval "const start = Date.now(); require('${mod}'); console.log(Date.now() - start);"`,
-      { cwd: path.join(appRootDir.get(), 'dist', 'neo-one') },
+      { cwd: path.join(appRootDir.get(), 'dist', 'neo-one'), shell: true },
     );
 
     return parseInt(stdout);

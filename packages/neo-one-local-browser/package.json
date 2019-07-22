@@ -14,8 +14,8 @@
     "@neo-one/worker": "^1.1.2",
     "@types/lodash": "^4.14.134",
     "@types/nanoid": "^2.0.0",
-    "@types/pouchdb": "^6.3.3",
-    "lodash": "^4.17.11",
+    "@types/pouchdb": "^6.4.0",
+    "lodash": "^4.17.14",
     "nanoid": "^2.0.1",
     "pouchdb": "^7.1.1",
     "pouchdb-utils": "^7.1.1",
@@ -23,7 +23,7 @@
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
     "tslib": "^1.9.3",
-    "typescript": "3.5.2"
+    "typescript": "3.5.3"
   },
   "sideEffects": false
 }

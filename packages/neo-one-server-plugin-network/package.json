@@ -17,9 +17,9 @@
     "@neo-one/utils": "^1.1.2",
     "@types/vorpal": "^1.11.0",
     "cross-fetch": "^3.0.4",
-    "execa": "^1.0.0",
+    "execa": "^2.0.3",
     "fs-extra": "^8.0.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "rxjs": "^6.5.2",
     "tslib": "^1.9.3",
     "vorpal": "^1.12.0"
