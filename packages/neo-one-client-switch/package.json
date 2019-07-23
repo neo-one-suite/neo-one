@@ -22,7 +22,7 @@
     "@types/lodash": "4.14.136"
   },
   "optionalDependencies": {
-    "@ledgerhq/hw-transport-node-hid": "4.68.0"
+    "@ledgerhq/hw-transport-node-hid": "4.68.2"
   },
   "sideEffects": false
 }
