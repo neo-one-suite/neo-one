@@ -271,7 +271,7 @@
     "tslint-sonarts": "1.9.0",
     "typescript": "3.5.3",
     "typescript-styled-plugin": "0.14.0",
-    "url-loader": "2.0.1",
+    "url-loader": "2.1.0",
     "webpack": "4.35.3",
     "webpack-bundle-analyzer": "3.3.2",
     "webpack-dev-server": "3.7.2",
