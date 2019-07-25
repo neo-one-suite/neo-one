@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@neo-one/react": "1.1.0",
+    "@neo-one/react": "1.1.1",
     "@neo-one/react-core": "1.1.3",
     "@types/react": "16.8.20",
     "@types/react-dom": "16.8.4",
