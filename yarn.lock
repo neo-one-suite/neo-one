@@ -1383,7 +1383,7 @@
     "@ledgerhq/logs" "^4.68.2"
     rxjs "^6.5.2"
 
-"@ledgerhq/errors@^4.66.0", "@ledgerhq/errors@^4.68.2":
+"@ledgerhq/errors@^4.68.2":
   version "4.68.2"
   resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-4.68.2.tgz#634f132c9c95935668ac2af90991ce57ebc44d63"
   integrity sha512-JxMr4wj/9d7EQuTQ9khhJxQSzv5B6ZoLUm4spOY+FDfQo0ywx9qvD1NyBHHVzyn7uRtWvz/hOSfTSrlw2joM3w==
@@ -1413,17 +1413,17 @@
     node-hid "^0.7.9"
     usb "^1.6.0"
 
-"@ledgerhq/hw-transport-u2f@4.66.0":
-  version "4.66.0"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.66.0.tgz#3bde6e2af1d7ba00261dad5b39845fa9c613af82"
-  integrity sha512-XG0WJKcSxg85qw4X2Gtu892XNn3aydvmRwSHB330vbwej00bV8Fy5ko41wicXyVTv9tXGQa7tWkH3dbEbPH5PQ==
+"@ledgerhq/hw-transport-u2f@4.68.2":
+  version "4.68.2"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-u2f/-/hw-transport-u2f-4.68.2.tgz#35a92b40da8e7a8f878ddb72723a807644c55b45"
+  integrity sha512-dWdoxorHISipDO/1PgaXgSnnkoKBqPFWzlAbn1+9gfbT2B/zzh3q1h6A3Zy6Yoc2BIqhUS3pgpZkBNqzUN47Ew==
   dependencies:
-    "@ledgerhq/errors" "^4.66.0"
-    "@ledgerhq/hw-transport" "^4.66.0"
-    "@ledgerhq/logs" "^4.64.0"
+    "@ledgerhq/errors" "^4.68.2"
+    "@ledgerhq/hw-transport" "^4.68.2"
+    "@ledgerhq/logs" "^4.68.2"
     u2f-api "0.2.7"
 
-"@ledgerhq/hw-transport@^4.66.0", "@ledgerhq/hw-transport@^4.68.2":
+"@ledgerhq/hw-transport@^4.68.2":
   version "4.68.2"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-4.68.2.tgz#822f3f03e22372b7656451eb73e809d208cca119"
   integrity sha512-erGPXBXavw4V5CP2aG/04guPKJKJl50+Z3kl3PbI4RwUijVeWsCw3UwEyEor01AANJ480CwfGB8vhcRt4hkGeQ==
@@ -1432,7 +1432,7 @@
     "@ledgerhq/errors" "^4.68.2"
     events "^3.0.0"
 
-"@ledgerhq/logs@^4.64.0", "@ledgerhq/logs@^4.68.2":
+"@ledgerhq/logs@^4.68.2":
   version "4.68.2"
   resolved "https://registry.yarnpkg.com/@ledgerhq/logs/-/logs-4.68.2.tgz#3ba74680927807f83d9f0bfd7da45f192d2c0893"
   integrity sha512-iFwGIzPmAMDvxVLtTvBUo0DCWz8vVaD0C4IsprNaXbxu+AsDmlc9kO9CKLB5YFEZblKNNKqJMJDfKvg5brIpTw==
@@ -7444,7 +7444,7 @@ date-and-time@^0.7.0:
   resolved "https://registry.yarnpkg.com/date-and-time/-/date-and-time-0.7.0.tgz#26273355558877799f9c95888293fccee92fdb94"
   integrity sha512-qPHBPG0AQqbjP7wVf7vLv25/0bZRjYPiJiJtE0t6RqTswJR/6ExCXQLDnL5w4986j7i6470TMtalJxC8/UHrww==
 
-date-fns@2.0.0-beta.3:
+date-fns@2.0.0-beta.3, date-fns@^2.0.0-alpha.34:
   version "2.0.0-beta.3"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0-beta.3.tgz#2e28f5af945930f774ddd778e184d68227101d55"
   integrity sha512-z5O262BvHPhwUvA1weXH+AZodygnZUcORERw8hjwBUrRPGrAo2e/rjXfC8Ykf1OGJZGDuLnK/WXbEZBIc0exGQ==
@@ -7453,11 +7453,6 @@ date-fns@^1.23.0, date-fns@^1.27.2:
   version "1.30.1"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-1.30.1.tgz#2e71bf0b119153dbb4cc4e88d9ea5acfb50dc05c"
   integrity sha512-hBSVCvSmWC+QypYObzwGOd9wqdDpOt+0wl0KbU+R+uuZBS1jN8VsD1ss3irQDknRj5NvxiTF6oj/nDRnN/UQNw==
-
-date-fns@^2.0.0-alpha.34:
-  version "2.0.0-beta.2"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0-beta.2.tgz#ccd556df832ef761baa88c600f53d2e829245999"
-  integrity sha512-4cicZF707RNerr3/Q3CcdLo+3OHMCfrRXE7h5iFgn7AMvX07sqKLxSf8Yp+WJW5bvKr2cy9/PkctXLv4iFtOaA==
 
 date-now@^0.1.4:
   version "0.1.4"
@@ -17346,7 +17341,7 @@ react-helmet@^5.2.0, react-helmet@^5.2.1:
     react-fast-compare "^2.0.2"
     react-side-effect "^1.1.0"
 
-react-hot-loader@4.12.9:
+react-hot-loader@4.12.9, react-hot-loader@^4.12.7, react-hot-loader@^4.3.6, react-hot-loader@^4.8.4:
   version "4.12.9"
   resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.12.9.tgz#cb2a85731ca38366b0e9e28e7fd1dbd7dcacc1ef"
   integrity sha512-lWT3JpWUN7nGHSoI9c4MV+42ov79bd8aqwDzhoyKev3owIh+hbEivT6Mb81lCV6tWuqm9trKo2/Th2/YDhFCdw==
@@ -17358,20 +17353,6 @@ react-hot-loader@4.12.9:
     prop-types "^15.6.1"
     react-lifecycles-compat "^3.0.4"
     shallowequal "^1.1.0"
-    source-map "^0.7.3"
-
-react-hot-loader@^4.12.7, react-hot-loader@^4.3.6, react-hot-loader@^4.8.4:
-  version "4.12.7"
-  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.12.7.tgz#51ed57ee46c5d4d3906e58e8cdcd3f6ceeb1c0ec"
-  integrity sha512-ejnGcNttqIsgaLEpCl3KHLzFfKiEKHz/VTLYv57/xKQoryDMXQ/w31+jicrOAiCStYsY+KvrulVqkOqqkRaifg==
-  dependencies:
-    fast-levenshtein "^2.0.6"
-    global "^4.3.0"
-    hoist-non-react-statics "^3.3.0"
-    loader-utils "^1.1.0"
-    prop-types "^15.6.1"
-    react-lifecycles-compat "^3.0.4"
-    shallowequal "^1.0.2"
     source-map "^0.7.3"
 
 react-icons@^3.7.0:
@@ -18882,7 +18863,7 @@ sha.js@^2.4.0, sha.js@^2.4.8:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
 
-shallowequal@^1.0.1, shallowequal@^1.0.2, shallowequal@^1.1.0:
+shallowequal@^1.0.1, shallowequal@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/shallowequal/-/shallowequal-1.1.0.tgz#188d521de95b9087404fd4dcb68b13df0ae4e7f8"
   integrity sha512-y0m1JoUZSlPAjXVtPPW70aZWfIL/dSP7AFkRnniLCrK/8MDKog3TySTBmckD+RObVxH0v4Tox67+F14PdED2oQ==
