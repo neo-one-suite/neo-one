@@ -40,7 +40,7 @@ export class ClaimTransaction extends TransactionBase<
     const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Claim) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected transaction type to be ${TransactionType.Claim}. Received: ${type}`);
     }
 
     const claims = reader.readArray(() => Input.deserializeWireBase(options));

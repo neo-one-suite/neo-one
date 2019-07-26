@@ -79,7 +79,7 @@ export class NetworkAddress implements SerializableWire<NetworkAddress> {
   public serializeWireBase(writer: BinaryWriter): void {
     const address = NetworkAddress.getAddress6(this.host);
     if (address == undefined) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError('Network IP address undefined');
     }
     writer.writeUInt32LE(this.timestamp);
     writer.writeUInt64LE(this.services);

@@ -47,18 +47,24 @@ export class StateDescriptor implements SerializableWire<StateDescriptor>, Seria
     switch (type) {
       case StateDescriptorType.Account:
         if (key.length !== 20) {
-          throw new InvalidFormatError();
+          throw new InvalidFormatError(
+            `Expected StateDescriptor account key length to equal 20. Received: ${key.length}`,
+          );
         }
         if (field !== VOTES) {
-          throw new InvalidFormatError();
+          throw new InvalidFormatError(`Expected StateDescriptor account field to equal ${VOTES}. Received: ${field}`);
         }
         break;
       case StateDescriptorType.Validator:
         if (key.length !== 33) {
-          throw new InvalidFormatError();
+          throw new InvalidFormatError(
+            `Expected StateDescriptor validator key length to equal 33. Received: ${key.length}`,
+          );
         }
         if (field !== REGISTERED) {
-          throw new InvalidFormatError();
+          throw new InvalidFormatError(
+            `Expected StateDescriptor validator field to equal ${REGISTERED}. Received: ${field}`,
+          );
         }
         break;
       default:

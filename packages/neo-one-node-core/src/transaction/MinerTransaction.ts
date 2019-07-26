@@ -34,7 +34,7 @@ export class MinerTransaction extends TransactionBase<
     const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Miner) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected transaction type ${TransactionType.Miner}. Received: ${type}`);
     }
 
     const nonce = reader.readUInt32LE();
@@ -68,7 +68,7 @@ export class MinerTransaction extends TransactionBase<
     this.nonce = nonce;
 
     if (this.version !== 0) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected version to be 0. Received: ${this.version}`);
     }
   }
 

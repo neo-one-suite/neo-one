@@ -21,7 +21,7 @@ export class ContractTransaction extends TransactionBase<
     const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Contract) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected transaction type to be ${TransactionType.Contract}. Received: ${type}`);
     }
 
     const { attributes, inputs, outputs, scripts } = super.deserializeTransactionBaseEndWireBase(options);
@@ -49,7 +49,7 @@ export class ContractTransaction extends TransactionBase<
     });
 
     if (this.version !== 0) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected version to be 0. Received: ${this.version}`);
     }
   }
 

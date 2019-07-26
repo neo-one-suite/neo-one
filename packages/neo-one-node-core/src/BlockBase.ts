@@ -46,7 +46,7 @@ export abstract class BlockBase implements EquatableKey {
     const consensusData = reader.readUInt64LE();
     const nextConsensus = reader.readUInt160();
     if (reader.readUInt8() !== 1) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected BinaryReader\'s readUInt8(0) to be 1. Received: ${reader.readUInt8()}`);
     }
     const script = Witness.deserializeWireBase(options);
 

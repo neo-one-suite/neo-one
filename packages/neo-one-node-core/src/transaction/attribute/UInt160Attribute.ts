@@ -20,7 +20,7 @@ export class UInt160Attribute extends AttributeBase(UInt160AttributeModel) {
     const { reader } = options;
     const { usage } = super.deserializeAttributeWireBase(options);
     if (usage !== AttributeUsage.Script) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected attribute usage to be ${AttributeUsage.Script}. Received: ${usage}`);
     }
     const value = reader.readUInt160();
 

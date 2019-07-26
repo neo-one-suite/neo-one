@@ -40,7 +40,7 @@ export class StateTransaction extends TransactionBase<
     const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.State) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected transaction type ${TransactionType.State}. Received: ${type}`);
     }
 
     const descriptors = reader.readArray(() => StateDescriptor.deserializeWireBase(options));
@@ -79,7 +79,7 @@ export class StateTransaction extends TransactionBase<
     this.descriptors = descriptors;
 
     if (this.version !== 0) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected version to be 0. Received: ${this.version}`);
     }
 
     const getScriptHashesForVerifying = super.getScriptHashesForVerifying.bind(this);

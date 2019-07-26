@@ -40,7 +40,7 @@ export class BufferAttribute extends AttributeBase(BufferAttributeModel) {
         usage === AttributeUsage.Remark15
       )
     ) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Invalid AttributeUsageModel. Received: ${usage}`);
     }
     const value =
       usage === AttributeUsage.DescriptionUrl ? reader.readBytes(reader.readUInt8()) : reader.readVarBytesLE();
