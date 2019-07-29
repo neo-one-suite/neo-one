@@ -1,8 +1,8 @@
 // tslint:disable no-null-keyword no-object-mutation
+import styled from '@emotion/styled';
 import { getSelector } from '@neo-one/react-core';
 import Popper from 'popper.js';
 import * as React from 'react';
-import styled from 'styled-components';
 import { theme } from 'styled-tools';
 import { Hidden, HiddenProps } from './Hidden';
 import { PopoverArrow } from './PopoverArrow';

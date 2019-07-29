@@ -1,8 +1,8 @@
 // tslint:disable no-null-keyword
+import styled from '@emotion/styled';
 import { Box, SplitPane } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
 import { EditorContext } from '../EditorContext';
 import { Preview } from '../preview';
 import { EditorContextType } from '../types';

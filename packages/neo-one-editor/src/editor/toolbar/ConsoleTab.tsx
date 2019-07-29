@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { Box, ButtonBase } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { ifProp, prop, withProp } from 'styled-tools';
 
 const ButtonWrapper = styled(ButtonBase)`

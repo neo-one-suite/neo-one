@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import { withProp } from 'styled-tools';
 import { Fit } from './Fit';
 

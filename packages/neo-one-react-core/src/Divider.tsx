@@ -1,4 +1,4 @@
-import { css } from 'styled-components';
+import { css } from '@emotion/core';
 import { ifProp, theme } from 'styled-tools';
 import { Box } from './Box';
 import { styledOmitProps } from './utils';

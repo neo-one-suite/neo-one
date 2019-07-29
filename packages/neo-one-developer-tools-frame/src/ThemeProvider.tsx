@@ -1,6 +1,6 @@
 import { theme } from '@neo-one/react-common';
+import { ThemeProvider as ThemeProviderBase } from 'emotion-theming';
 import * as React from 'react';
-import { ThemeProvider as ThemeProviderBase } from 'styled-components';
 
 interface Props {
   readonly children: string | number | React.ReactElement | undefined;

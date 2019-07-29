@@ -1,5 +1,5 @@
+import styled from '@emotion/styled';
 import { Box } from '@neo-one/react-core';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import background from '../static/img/background.svg';
 

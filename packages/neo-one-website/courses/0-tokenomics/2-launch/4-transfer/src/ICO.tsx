@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import BigNumber from 'bignumber.js';
 // tslint:disable-next-line
 import { Client } from '@neo-one/client';
@@ -6,7 +7,6 @@ import { FromStream } from '@neo-one/react';
 // tslint:disable-next-line
 import { Box, Button, TextInput } from '@neo-one/react-core';
 import * as React from 'react';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 // @ts-ignore
 import { TokenSmartContract, WithContracts } from '../one/generated';

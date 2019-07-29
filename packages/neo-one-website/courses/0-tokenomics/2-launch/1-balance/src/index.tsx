@@ -1,8 +1,8 @@
 // tslint:disable-next-line
 import { theme } from '@neo-one/react-core';
+import { ThemeProvider } from 'emotion-theming';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { ThemeProvider } from 'styled-components';
 // @ts-ignore
 import { ContractsProvider } from '../one/generated';
 import { ICO } from './ICO';
@@ -15,4 +15,4 @@ const App = (
   </ThemeProvider>
 );
 
-ReactDOM.render(App, document.getElementById('app'));
+ReactDOM.render(App, document.getElementById('app')); 

@@ -1,9 +1,9 @@
 // tslint:disable-next-line
+import styled from '@emotion/styled';
 import { FromStream } from '@neo-one/react';
 import { Box } from '@neo-one/react-core';
 import * as React from 'react';
 import { defer } from 'rxjs';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 // @ts-ignore
 import { WithContracts } from '../one/generated';

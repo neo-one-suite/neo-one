@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { comlink } from '@neo-one/worker';
 import * as React from 'react';
-import styled from 'styled-components';
 import { MainEngine } from '../engine/main';
 
 const StyledIFrame = styled.iframe`

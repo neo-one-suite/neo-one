@@ -1,7 +1,7 @@
 // tslint:disable no-any strict-type-predicates
+import styled from '@emotion/styled';
 import { Box, Select, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 
 const { useCallback, useState } = React;
 

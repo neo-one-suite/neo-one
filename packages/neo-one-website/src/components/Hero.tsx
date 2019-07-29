@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { Background, Box, H1 } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Tagline } from '../elements';
 

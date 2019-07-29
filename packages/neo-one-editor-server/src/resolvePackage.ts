@@ -14,6 +14,8 @@ import * as tar from 'tar';
 import { EmptyBodyError, FetchError, MissingPackageJSONError } from './errors';
 
 const REGISTRY = 'https://registry.yarnpkg.com/';
+// Override logic for these packages and pull everything
+const PULL_ALL_FILES = new Set(['@babel/runtime']);
 
 const getScopelessName = (name: string) => {
   if (name[0] !== '@') {
@@ -187,6 +189,7 @@ const getAdditionalStarts = (files: Files, start: string, packageJSON: any) => {
           (!file.slice(1).includes('/') && file.endsWith('.js'))) &&
         nodePath.dirname(file) !== '/src',
     )
+    .concat(PULL_ALL_FILES.has(packageJSON.name) ? Object.keys(files).filter((file) => file.includes('helpers')) : [])
     .map((file) => resolveJavaScriptFilePath(files, file))
     .filter((file) => !otherEntryPaths.has(file));
 };

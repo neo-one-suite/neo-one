@@ -2,10 +2,10 @@
 import { GlobalFonts, theme } from '@neo-one/react-common';
 // @ts-ignore
 import { ViewportProvider } from '@render-props/viewport';
+import { ThemeProvider } from 'emotion-theming';
 import React from 'react';
 import { hot } from 'react-hot-loader';
 import { Root, Routes } from 'react-static';
-import { ThemeProvider } from 'styled-components';
 import { HomeLoading } from './layout';
 
 const { Suspense } = React;

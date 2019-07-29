@@ -1,9 +1,9 @@
+import styled from '@emotion/styled';
 import { PrivateNetworkSettings } from '@neo-one/client-common';
 import { TextInput, useStream } from '@neo-one/react-common';
 import * as React from 'react';
 import { defer } from 'rxjs';
 import { map } from 'rxjs/operators';
-import styled from 'styled-components';
 import { useNetworkClients } from './DeveloperToolsContext';
 import { SettingsLabel } from './SettingsLabel';
 import { useAddError } from './ToastsContext';

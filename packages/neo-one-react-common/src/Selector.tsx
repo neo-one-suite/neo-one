@@ -1,7 +1,7 @@
 // tslint:disable no-any
+import styled from '@emotion/styled';
 import { Input } from '@neo-one/react-core';
 import * as React from 'react';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
 const StyledInput = styled(Input)`

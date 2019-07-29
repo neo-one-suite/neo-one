@@ -1,7 +1,7 @@
 // tslint:disable no-map-without-usage
+import styled from '@emotion/styled';
 import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { TestSuite } from '../..//types';
 import { TestDetailError } from './TestDetailError';
 import { TestDetailListItem } from './TestDetailListItem';

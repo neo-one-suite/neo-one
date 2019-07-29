@@ -1,15 +1,16 @@
 {
   "dependencies": {
+    "@emotion/core": "10.0.14",
+    "@emotion/styled": "10.0.14",
     "@neo-one/react": "1.1.1",
     "@neo-one/react-core": "1.1.4",
     "@types/react": "16.8.23",
     "@types/react-dom": "16.8.5",
-    "@types/styled-components": "4.1.18",
     "bignumber.js": "9.0.0",
+    "emotion-theming": "10.0.14",
     "react": "16.8.6",
     "react-dom": "16.8.6",
     "rxjs": "6.5.2",
-    "styled-components": "4.3.2",
     "styled-tools": "1.7.1"
   }
 }

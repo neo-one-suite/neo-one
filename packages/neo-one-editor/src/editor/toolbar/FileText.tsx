@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
 import { Box } from '@neo-one/react-common';
 import * as nodePath from 'path';
 import * as React from 'react';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 
 const Wrapper = styled(Box)`

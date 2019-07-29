@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { Box, TextInput } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { ReferenceLink } from './ReferenceLink';
 import { TypeFilter } from './TypeFilter';
 import { ReferenceItem } from './types';

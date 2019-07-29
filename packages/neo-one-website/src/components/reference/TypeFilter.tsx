@@ -1,7 +1,7 @@
 // tslint:disable no-any
+import styled from '@emotion/styled';
 import { Select } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { TypeFilterOption } from './TypeFilterOption';
 import { TYPE_FILTER_OPTIONS, TypeFilterOptions } from './types';
 

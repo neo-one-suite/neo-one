@@ -1,5 +1,5 @@
+import styled from '@emotion/styled';
 import { ButtonBase } from '@neo-one/react-common';
-import styled from 'styled-components';
 
 export const Wrapper = styled(ButtonBase)`
   outline: none;

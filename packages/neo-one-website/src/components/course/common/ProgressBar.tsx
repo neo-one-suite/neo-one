@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { Box, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { prop, switchProp } from 'styled-tools';
 import { RouterLink } from '../../RouterLink';
 

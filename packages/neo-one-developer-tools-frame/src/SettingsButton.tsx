@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import * as React from 'react';
 import { MdSettings } from 'react-icons/md';
-import styled from 'styled-components';
 import { SettingsDialog } from './SettingsDialog';
 import { ToolbarButton } from './ToolbarButton';
 

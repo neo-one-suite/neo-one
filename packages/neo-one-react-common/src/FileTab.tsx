@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { ButtonBase } from '@neo-one/react-core';
 import * as React from 'react';
-import styled from 'styled-components';
 import { ifProp, prop, withProp } from 'styled-tools';
 import { FileDisplay } from './FileDisplay';
 import { File } from './types';

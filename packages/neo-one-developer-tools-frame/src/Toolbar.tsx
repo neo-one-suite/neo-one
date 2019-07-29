@@ -1,9 +1,9 @@
 // tslint:disable no-any
+import styled from '@emotion/styled';
 import { Box, Monogram, useHidden, useStream } from '@neo-one/react-common';
 // @ts-ignore
 import SizeObserver from '@render-props/size-observer';
 import * as React from 'react';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { BalanceSelector } from './BalanceSelector';
 import { BlockIndex } from './BlockIndex';

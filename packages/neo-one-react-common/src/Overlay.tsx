@@ -1,5 +1,5 @@
 // tslint:disable no-object-mutation
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import { theme } from 'styled-tools';
 import { Hidden } from './Hidden';
 

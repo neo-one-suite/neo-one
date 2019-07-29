@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
 import { Box, ButtonBase, Popover, useHidden } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdClose } from 'react-icons/md';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Wrapper } from './Wrapper';
 

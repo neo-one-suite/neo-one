@@ -1,6 +1,7 @@
+import { keyframes } from '@emotion/core';
+import styled from '@emotion/styled';
 import { Box } from '@neo-one/react-core';
 import * as React from 'react';
-import styled, { keyframes } from 'styled-components';
 import { prop } from 'styled-tools';
 import { Monogram } from './Monogram';
 

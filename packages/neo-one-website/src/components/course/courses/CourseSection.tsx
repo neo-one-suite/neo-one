@@ -1,7 +1,7 @@
+import styled from '@emotion/styled';
 import { Box, Button, useHidden } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Collapse } from '../../../containers';
 import { Client, Contract, Debugging, Num } from '../../../elements';

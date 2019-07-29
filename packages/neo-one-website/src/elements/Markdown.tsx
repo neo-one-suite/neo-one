@@ -1,3 +1,6 @@
+import { css } from '@emotion/core';
+import styled from '@emotion/styled';
+import { theme } from '@neo-one/react-common';
 import MarkdownIt from 'markdown-it';
 // @ts-ignore
 // tslint:disable-next-line: no-submodule-imports
@@ -6,8 +9,7 @@ import anchor from 'markdown-it-anchor/dist/markdownItAnchor.js';
 import container from 'markdown-it-container';
 import * as React from 'react';
 import slugify from 'slugify';
-import styled, { css } from 'styled-components';
-import { ifProp, prop, switchProp } from 'styled-tools';
+import { prop, switchProp } from 'styled-tools';
 import { Prism } from '../common';
 import { markdownTOC } from './markdownTOC';
 
@@ -72,12 +74,18 @@ const headerMargins = css`
   margin-bottom: 24px;
 `;
 
-const lightCode = css`
-  background-color: ${prop('theme.gray1')};
-  color: ${prop('theme.black')};
-  padding: 4px;
-  border-radius: 4px;
-`;
+const lightCode = (props: { readonly theme: typeof theme; readonly light: boolean }) => {
+  if (props.light) {
+    return css`
+      background-color: ${props.theme.gray1};
+      color: ${props.theme.black};
+      padding: 4px;
+      border-radius: 4px;
+    `;
+  }
+
+  return '';
+};
 
 const stretchCSS = css`
   margin-left: -24px;
@@ -125,7 +133,21 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent'; 
     margin-top: 16px;
   }
 
+  & code {
+    ${lightCode};
+    ${prop('theme.fontStyles.subheading')};
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    white-space: nowrap;
+  }
+
+  & pre > code {
+    color: inherit;
+    background-color: inherit;
+    white-space: pre;
+  }
+
   & a {
+    /* stylelint-disable-next-line */
     color: ${switchProp('linkColor', {
       primary: prop('theme.primary'),
       accent: prop('theme.accent'),
@@ -137,6 +159,7 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent'; 
   }
 
   & a code {
+    /* stylelint-disable-next-line */
     color: ${switchProp('linkColor', {
       primary: prop('theme.primary'),
       accent: prop('theme.accent'),
@@ -212,13 +235,6 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent'; 
     white-space: pre-wrap;
   }
 
-  & code {
-    ${ifProp('light', lightCode, '')};
-    ${prop('theme.fontStyles.subheading')};
-    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-    white-space: nowrap;
-  }
-
   & .header-anchor {
     vertical-align: top;
   }
@@ -243,11 +259,11 @@ const Wrapper = styled.div<{ readonly linkColor: 'primary' | 'gray' | 'accent'; 
     ${prop('theme.fonts.axiformaBold')};
   }
 
-  &&&& p img {
+  &&&& img {
     max-width: 100%;
   }
 
-  &&&& img {
+  &&&& p img {
     max-width: 100%;
   }
 `;

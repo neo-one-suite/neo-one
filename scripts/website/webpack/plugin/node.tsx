@@ -2,7 +2,6 @@
 // tslint:disable no-any
 import * as path from 'path';
 import * as React from 'react';
-import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
 import webpack from 'webpack';
 // @ts-ignore
 import nodeExternals from 'webpack-node-externals';
@@ -143,19 +142,8 @@ export const node = () => ({
 
     return mutableConfig;
   },
-  beforeRenderToElement: (App: any, { meta }: any) => {
-    // tslint:disable-next-line:no-object-mutation
-    meta.styleComponentsSheet = new ServerStyleSheet();
-
-    return (props: any) => (
-      <StyleSheetManager sheet={meta.styleComponentsSheet.instance}>
-        <App {...props} />
-      </StyleSheetManager>
-    );
-  },
   headElements: async (elements: any, { meta }: any) => [
     ...elements,
-    meta.styleComponentsSheet.getStyleElement(),
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-92599752-3" />,
     inlineScript(GTM),
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />,

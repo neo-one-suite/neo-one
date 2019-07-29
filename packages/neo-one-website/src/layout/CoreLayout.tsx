@@ -1,8 +1,8 @@
+import styled from '@emotion/styled';
 import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 // @ts-ignore
 import Headroom from 'react-headroom';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Footer, Header } from '../components';
 

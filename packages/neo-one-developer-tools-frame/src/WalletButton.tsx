@@ -1,9 +1,9 @@
+import styled from '@emotion/styled';
 import { Box, useStream } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdAccountBalance } from 'react-icons/md';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import styled from 'styled-components';
 import { DeveloperToolsContext } from './DeveloperToolsContext';
 import { useAddError } from './ToastsContext';
 import { ToolbarButton } from './ToolbarButton';

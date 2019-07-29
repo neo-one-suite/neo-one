@@ -1,7 +1,7 @@
 // tslint:disable no-null-keyword
+import styled from '@emotion/styled';
 import { List } from '@neo-one/react-common';
 import React from 'react';
-import styled from 'styled-components';
 import { ifProp } from 'styled-tools';
 import { SubsectionData } from '../../types';
 import { SubsectionLink, TutorialSubsectionLink } from './SubsectionLink';

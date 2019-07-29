@@ -1,8 +1,8 @@
 // tslint:disable no-null-keyword
+import styled from '@emotion/styled';
 import { Button, DispatchWrapper, Hidden, useHidden } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { CourseState, selectChapterProgress } from '../redux';
 import { SelectedChapter } from '../types';

@@ -1,7 +1,7 @@
 // tslint:disable no-any
+import styled from '@emotion/styled';
 import { Box, Link, Logo, styledOmitProps, Toolbar, ToolbarContent, ToolbarFocusable } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { ifProp, prop, withProp } from 'styled-tools';
 import { StyledRouterLinkBase } from './StyledRouterLink';
 
@@ -26,7 +26,7 @@ const StyledToolbar = styled(Toolbar)`
     overflow-x: auto;
   }
 
-  ${/* sc-sel */ ToolbarFocusable} {
+  ${ToolbarFocusable} {
     outline: none;
   }
 

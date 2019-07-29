@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { Box } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { FileDiagnostic, TextRange } from '../types';
 import { Problem } from './Problem';
 

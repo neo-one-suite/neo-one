@@ -1,10 +1,10 @@
+import styled from '@emotion/styled';
 import { Box, Loading } from '@neo-one/react-common';
 import { Redirect, RouteComponentProps, Router } from '@reach/router';
 import * as React from 'react';
 import { Provider } from 'react-redux';
 // tslint:disable-next-line no-submodule-imports
 import { PersistGate } from 'redux-persist/integration/react';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { ChapterView } from './chapter';
 import { CoursesView } from './courses';

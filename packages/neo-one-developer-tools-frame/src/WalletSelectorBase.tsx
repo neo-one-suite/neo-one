@@ -1,4 +1,5 @@
 // tslint:disable no-any
+import styled from '@emotion/styled';
 import { Account, UserAccount } from '@neo-one/client-common';
 import { Client, Hash256, nep5 } from '@neo-one/client-core';
 import { Box, Select } from '@neo-one/react-common';
@@ -9,7 +10,6 @@ import * as React from 'react';
 import { FormatOptionLabelMeta } from 'react-select/src/Select';
 import { combineLatest, concat, of, ReplaySubject } from 'rxjs';
 import { catchError, distinctUntilChanged, map, multicast, refCount, switchMap, take } from 'rxjs/operators';
-import styled from 'styled-components';
 import { Token } from './types';
 
 export const makeOption = async ({

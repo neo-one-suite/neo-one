@@ -1,7 +1,7 @@
 // tslint:disable no-any
+import styled from '@emotion/styled';
 import { Box, LineLogoPrimary, Link, Toolbar, ToolbarContent, ToolbarFocusable } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { RouterLink } from '../RouterLink';
 

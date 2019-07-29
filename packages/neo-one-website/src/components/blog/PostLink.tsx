@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { Box, List } from '@neo-one/react-common';
 import * as React from 'react';
-import styled from 'styled-components';
 import { prop } from 'styled-tools';
 import { Author } from '../content';
 import { StyledRouterLink } from '../StyledRouterLink';

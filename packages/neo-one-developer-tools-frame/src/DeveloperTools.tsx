@@ -26,6 +26,7 @@ export function DeveloperTools({ resizeHandler, clients$ }: Props) {
 
   return (
     <>
+      <GlobalFonts />
       <DeveloperToolsContext.Provider value={createContext(props)}>
         <ResizeHandlerContext.Provider value={resizeHandler}>
           <LocalStateProvider>
@@ -38,7 +39,6 @@ export function DeveloperTools({ resizeHandler, clients$ }: Props) {
           </LocalStateProvider>
         </ResizeHandlerContext.Provider>
       </DeveloperToolsContext.Provider>
-      <GlobalFonts />
     </>
   );
 }
