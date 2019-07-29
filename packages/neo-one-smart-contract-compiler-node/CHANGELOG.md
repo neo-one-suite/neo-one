@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.4](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-compiler-node@1.1.3...@neo-one/smart-contract-compiler-node@1.1.4) (2019-07-29)
+
+**Note:** Version bump only for package @neo-one/smart-contract-compiler-node
+
+
+
+
+
 ## [1.1.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-compiler-node@1.1.2...@neo-one/smart-contract-compiler-node@1.1.3) (2019-06-20)
 
 

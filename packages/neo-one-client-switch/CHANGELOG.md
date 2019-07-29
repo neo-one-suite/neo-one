@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-switch@1.2.1...@neo-one/client-switch@1.2.2) (2019-07-29)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @ledgerhq/hw-transport-u2f to v4.68.2 ([1ac7f9f](https://github.com/neo-one-suite/neo-one/commit/1ac7f9f))
+
+
+
+
+
 ## [1.2.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-switch@1.2.0...@neo-one/client-switch@1.2.1) (2019-06-20)
 
 

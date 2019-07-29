@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-full-common@1.1.4...@neo-one/client-full-common@1.2.0) (2019-07-29)
+
+
+### Features
+
+* **client:** rewrite binary writer ([3c70708](https://github.com/neo-one-suite/neo-one/commit/3c70708))
+
+
+
+
+
 ## [1.1.4](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-full-common@1.1.3...@neo-one/client-full-common@1.1.4) (2019-06-20)
 
 

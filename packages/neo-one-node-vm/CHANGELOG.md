@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-vm@1.2.0...@neo-one/node-vm@1.2.1) (2019-07-29)
+
+
+### Bug Fixes
+
+* **node:** Final round of node fixes ([a88a04e](https://github.com/neo-one-suite/neo-one/commit/a88a04e))
+
+
+
+
+
 # [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-vm@1.1.3...@neo-one/node-vm@1.2.0) (2019-06-20)
 
 

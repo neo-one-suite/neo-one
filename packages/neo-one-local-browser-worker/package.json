@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/local-browser-worker",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "NEO•ONE local browser workers.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/local-browser": "^1.1.4",
+    "@neo-one/local-browser": "^1.1.5",
     "@neo-one/worker": "^1.1.2",
     "@types/nanoid": "^2.0.0",
     "core-js": "^3.1.4",

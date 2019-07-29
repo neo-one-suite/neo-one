@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.5](https://github.com/neo-one-suite/neo-one/compare/@neo-one/developer-tools-frame@1.1.4...@neo-one/developer-tools-frame@1.1.5) (2019-07-29)
+
+
+### Bug Fixes
+
+* **website:** fix the testrunner ([63cdeff](https://github.com/neo-one-suite/neo-one/commit/63cdeff))
+
+
+
+
+
 ## [1.1.4](https://github.com/neo-one-suite/neo-one/compare/@neo-one/developer-tools-frame@1.1.3...@neo-one/developer-tools-frame@1.1.4) (2019-06-20)
 
 

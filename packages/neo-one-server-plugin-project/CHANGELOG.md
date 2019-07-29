@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-plugin-project@1.3.0...@neo-one/server-plugin-project@1.4.0) (2019-07-29)
+
+
+### Bug Fixes
+
+* **compiler:** catch errors when watching with neo-one build --watch ([cbf9651](https://github.com/neo-one-suite/neo-one/commit/cbf9651))
+* **node:** Final round of node fixes ([a88a04e](https://github.com/neo-one-suite/neo-one/commit/a88a04e))
+* **website:** fix the testrunner ([63cdeff](https://github.com/neo-one-suite/neo-one/commit/63cdeff))
+
+
+### Features
+
+* **cli:** 'yarn neo-one init' now properly identifies project framework, warns if it can't find one ([f751c2b](https://github.com/neo-one-suite/neo-one/commit/f751c2b))
+
+
+
+
+
 # [1.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/server-plugin-project@1.2.1...@neo-one/server-plugin-project@1.3.0) (2019-06-20)
 
 

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@1.4.0...@neo-one/website@1.4.1) (2019-07-29)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @neo-one/react to v1.1.1 ([c81d65d](https://github.com/neo-one-suite/neo-one/commit/c81d65d))
+* **deps:** update dependency @neo-one/react-core to v1.1.4 ([d8f5617](https://github.com/neo-one-suite/neo-one/commit/d8f5617))
+* **deps:** update dependency @types/react to v16.8.23 ([c340b38](https://github.com/neo-one-suite/neo-one/commit/c340b38))
+* **deps:** update dependency @types/react-dom to v16.8.5 ([d783fd5](https://github.com/neo-one-suite/neo-one/commit/d783fd5))
+* **deps:** update dependency styled-components to v4.3.2 ([610f3a8](https://github.com/neo-one-suite/neo-one/commit/610f3a8))
+* **website:** fix the testrunner ([63cdeff](https://github.com/neo-one-suite/neo-one/commit/63cdeff))
+
+
+
+
+
 # [1.4.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@1.3.0...@neo-one/website@1.4.0) (2019-06-20)
 
 

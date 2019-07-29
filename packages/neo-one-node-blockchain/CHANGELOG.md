@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.5](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-blockchain@1.1.4...@neo-one/node-blockchain@1.1.5) (2019-07-29)
+
+
+### Bug Fixes
+
+* **@neo-one/node-blockchain:** Fix handling of add/delete/update tracked changes ([277c00a](https://github.com/neo-one-suite/neo-one/commit/277c00a))
+* **node:** Final round of node fixes ([a88a04e](https://github.com/neo-one-suite/neo-one/commit/a88a04e))
+
+
+
+
+
 ## [1.1.4](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-blockchain@1.1.3...@neo-one/node-blockchain@1.1.4) (2019-06-20)
 
 

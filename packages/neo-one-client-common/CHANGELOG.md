@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-common@1.2.1...@neo-one/client-common@1.3.0) (2019-07-29)
+
+
+### Features
+
+* **client:** rewrite binary writer ([3c70708](https://github.com/neo-one-suite/neo-one/commit/3c70708))
+* **DapiUserAccountProvider:** Implement DapiUserAccountProvider for the dapi NEP ([afdd119](https://github.com/neo-one-suite/neo-one/commit/afdd119))
+
+
+
+
+
 ## [1.2.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-common@1.2.0...@neo-one/client-common@1.2.1) (2019-06-20)
 
 

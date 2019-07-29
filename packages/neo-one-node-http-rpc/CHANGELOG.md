@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-http-rpc@1.1.4...@neo-one/node-http-rpc@2.0.0) (2019-07-29)
+
+
+### chore
+
+* **node:** re-organize '@neo-one/node-bin' configuration layout ([1430584](https://github.com/neo-one-suite/neo-one/commit/1430584)), closes [#1102](https://github.com/neo-one-suite/neo-one/issues/1102)
+
+
+### BREAKING CHANGES
+
+* **node:** old node-bin configs/.rc will almost surely not work. While I update the documentation you can refer here for a rough draft of the new layout: https://gist.github.com/danwbyrne/c6ee99309fea79d90ac3044c0e6c25fe
+
+
+
+
+
 ## [1.1.4](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-http-rpc@1.1.3...@neo-one/node-http-rpc@1.1.4) (2019-06-20)
 
 
