@@ -238,7 +238,7 @@
     "prettier": "1.18.2",
     "react": "16.8.6",
     "react-dom": "16.8.6",
-    "react-hot-loader": "4.12.9",
+    "react-hot-loader": "4.12.10",
     "react-static": "7.1.0",
     "react-static-plugin-reach-router": "7.0.10",
     "react-static-plugin-source-filesystem": "7.1.0",
