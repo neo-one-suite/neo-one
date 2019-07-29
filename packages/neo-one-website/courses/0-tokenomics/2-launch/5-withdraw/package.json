@@ -3,7 +3,7 @@
     "@emotion/core": "10.0.14",
     "@emotion/styled": "10.0.14",
     "@neo-one/react": "1.1.1",
-    "@neo-one/react-core": "1.1.4",
+    "@neo-one/react-core": "1.1.5",
     "@types/react": "16.8.23",
     "@types/react-dom": "16.8.5",
     "bignumber.js": "9.0.0",
