@@ -220,7 +220,7 @@
     "jest-junit": "6.4.0",
     "json": "9.0.6",
     "koa-connect": "2.0.1",
-    "lerna": "3.15.0",
+    "lerna": "3.16.4",
     "lint-staged": "8.2.1",
     "lodash": "4.17.14",
     "lodash-webpack-plugin": "0.11.5",
