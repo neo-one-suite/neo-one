@@ -1,8 +1,22 @@
 {
-  "extends": [
-    "config:base",
-    "schedule:daily",
-    ":semanticCommits"
+  "extends": ["config:base", "group:definitelyTyped", "schedule:daily", ":semanticCommits"],
+  "packageRules": [
+    {
+      "packagePatterns": ["*"],
+      "excludePackagePatterns": ["^react*", "^webpack*", "^rollup*", "^style*", "typescript", "^@types/*"],
+      "groupName": "misc dependencies",
+      "groupSlug": "misc"
+    },
+    {
+      "packagePatterns": ["^react*", "^webpack*", "^rollup*", "^style*"],
+      "groupName": "web dependencies",
+      "groupSlug": "web",
+      "separateMajorMinor": false
+    },
+    {
+      "packageNames": ["typescript"],
+      "groupName": "typescript"
+    }
   ],
   "postUpdateOptions": ["yarnDedupeHighest"],
   "automerge": true,
