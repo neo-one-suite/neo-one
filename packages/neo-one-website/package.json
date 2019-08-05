@@ -5,8 +5,8 @@
   "main": "./src/index",
   "dependencies": {
     "@babel/runtime": "^7.5.4",
-    "@emotion/core": "10.0.14",
-    "@emotion/styled": "10.0.14",
+    "@emotion/core": "10.0.15",
+    "@emotion/styled": "10.0.15",
     "@neo-one/editor": "^1.1.5",
     "@neo-one/react": "^1.1.1",
     "@neo-one/react-common": "^1.1.5",

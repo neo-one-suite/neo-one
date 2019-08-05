@@ -4,8 +4,8 @@
   "description": "NEO•ONE shared react.",
   "main": "./src/index",
   "dependencies": {
-    "@emotion/core": "10.0.14",
-    "@emotion/styled": "10.0.14",
+    "@emotion/core": "10.0.15",
+    "@emotion/styled": "10.0.15",
     "emotion-theming": "10.0.14",
     "lodash": "^4.17.14",
     "react": "16.8.6",
