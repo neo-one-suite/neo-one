@@ -78,15 +78,25 @@ export const startNode = async (): Promise<void> => {
     shutdown({ exitCode: 0 });
   });
 
-  const fullNode = new FullNode({
-    monitor,
-    environment,
-    settings,
-    options$,
-  });
+  try {
+    const fullNode = new FullNode({
+      monitor,
+      environment,
+      settings,
+      options$,
+    });
 
-  const stop = fullNode.stop.bind(fullNode);
-  mutableShutdownFuncs = mutableShutdownFuncs.concat(stop);
+    const stop = fullNode.stop.bind(fullNode);
+    mutableShutdownFuncs = mutableShutdownFuncs.concat(stop);
 
-  await fullNode.start();
+    await fullNode.start();
+  } catch (error) {
+    monitor.logError({
+      name: 'unexpected_error',
+      message: 'Unexpected error, failed to start',
+      error,
+    });
+
+    shutdown({ exitCode: 1, error });
+  }
 };
