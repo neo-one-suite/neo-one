@@ -37,16 +37,16 @@ Voila! You should now be running the most recent NEO•ONE Node in a local docke
 
 ## Configuring
 
-There are **several** ways to configure the node; any [rc](https://github.com/dominictarr/rc#rc) type configuration is accepted. as an example we can set the `logging` level of the node to _trace_ using either:
+There are **several** ways to configure the node; any [rc](https://github.com/dominictarr/rc#rc) type configuration is accepted. as an example we can set the `logger` level of the node to _trace_ using either:
 
 ```bash
-docker run quay.io/neoone/node --environment.logging.level=trace
+docker run quay.io/neoone/node --environment.logger.level=trace
 ```
 
 or through environment variables
 
 ```bash
-docker run -e neo_one_node_environment__logging__level=trace quay.io/neoone/node
+docker run -e neo_one_node_environment__logger__level=trace quay.io/neoone/node
 ```
 
 Additionally you have the option of creating a `config` (no extension) file and mounting it directly to the container. By default the node will look for a config at `/etc/neo_one_node`.
@@ -57,7 +57,7 @@ So if we have a config
 ## /path/to/config
 {
   "environment": {
-    "logging": {
+    "logger": {
       "level": "trace"
     }
   }
@@ -121,7 +121,7 @@ to mount our configuration and local data file before starting the node. Go ahea
 To sync your node with other nodes on the network, you must specify them using the `node.rpcURLs` configuration setting. A list of current mainnet nodes can be found at: http://monitor.cityofzion.io/
 
 ```bash
-## /node-config/config
+#/node-config/config
 {
   "node": {
     "rpcURLs": [

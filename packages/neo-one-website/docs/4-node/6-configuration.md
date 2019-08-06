@@ -22,7 +22,7 @@ This section will serve as a reference for the NEO•ONE Node's many configurati
     "dumpChainFile?": string,
     "haltOnSync?": boolean,
     "levelDownOptions?": ???,
-    "logging?": {
+    "logger?": {
       "level?": string,
       "path?": string
     },
@@ -62,14 +62,14 @@ _disabled by default_
 
 Optional path for outputting a `chainFile`.
 
-### logging
+### logger
 
-\*defaults to **{path: undefined, level: 'info'}\***
+\*defaults to **{path: undefined, level: 'silent'}\***
 
 Desired logging level and output path of the node logging, options are for level are:
 
 ```
-'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'silly'
+'silent' | 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace'
 ```
 
 ### haltOnSync
@@ -113,7 +113,7 @@ _disabled by default_
 
 _defaults to 'main'_
 
-`settings.type` specifies which NEO network we are connecting to.
+`settings.type` specifies which NEO network we are connecting to. Pre-configured options are `main` and `test`.
 
 ### privateNet
 
@@ -206,8 +206,10 @@ _these options can be changed without restarting the node_
     "rpcURLs?": string[],
     "consensus?": {
       "enabled": boolean,
-      "privateKey": string,
-      "privateNet": boolean
+      "options": {
+        "privateKey": string,
+        "privateNet": boolean
+      }
     }
   }
 }
@@ -218,7 +220,7 @@ _these options can be changed without restarting the node_
 
 ---
 
-`externalPort` specifies the external port of the node, useful for a deployment when the container ports are different from the cluster port.
+`externalPort` specifies the external port of the node which it can send messages to peers on. Typically the same as `network.listenTCP`.
 
 ### Hot Options
 
@@ -231,8 +233,8 @@ _these options can be changed without restarting the node_
 `consensus` sets the consensus options for the node, requires a privateNet setup.
 
 - `enabled` enables consensus
-- `privateKey` the key for the network
-- `privateNet` true/false
+- `options.privateKey` the key for the network
+- `options.privateNet` true/false
 
 ## Network
 
@@ -269,7 +271,7 @@ _these options can be changed without restarting the node_
 
 `peerSeeds` specifies trusted seeds, typically ones run by yourself or on the same cluster.
 
-`externalEndpoints` specifies specific known external peers.
+`externalEndpoints` specifies specific known external peers that you want to _ignore_ starting connections with, for instance endpoints in another cluster managed by you.
 
 `maxConnectedPeers` sets the maximum number of peers the node will attempt to hold a connection with at once. Defaults to 10.
 
