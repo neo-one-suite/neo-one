@@ -1,11 +1,10 @@
 import { styledOmitProps } from '@neo-one/react-common';
 // @ts-ignore
-import { Parser } from 'html-to-react';
 import * as React from 'react';
 import { ifProp, prop } from 'styled-tools';
 import { Prism } from '../../../common';
 import { StyledRouterLink } from '../../StyledRouterLink';
-import { WordTokens } from '../types';
+import { WordToken, WordTokens } from '../types';
 
 const PUNCTUATION: readonly string[] = ['.', ',', '(', ')', '[', ']', '{', '}', '<', '>', ';', ':'];
 
@@ -33,15 +32,22 @@ const ReferenceLink = ({ to, value, idx, example, code = false, ...props }: Prop
   </StyledReferenceLink>
 );
 
+const getHighlightedHtml = ({
+  idx,
+  example,
+  token,
+}: {
+  readonly idx: number;
+  readonly example: WordTokens;
+  readonly token: WordToken;
+}): { readonly __html: string } => ({
+  __html: Prism.highlight(checkPunctuation(idx, example, token.value), Prism.languages.typescript, 'typescript'),
+});
+
 export const buildExample = (example: WordTokens) =>
   example.map((token, idx) =>
     token.slug === undefined ? (
-      <span key={idx}>
-        {new Parser().parse(
-          Prism.highlight(checkPunctuation(idx, example, token.value), Prism.languages.typescript, 'typescript'),
-          'text/xml',
-        )}
-      </span>
+      <span key={idx} dangerouslySetInnerHTML={getHighlightedHtml({ idx, example, token })}></span>
     ) : (
       <ReferenceLink key={idx} to={token.slug} code idx={idx} value={token.value} example={example} />
     ),
