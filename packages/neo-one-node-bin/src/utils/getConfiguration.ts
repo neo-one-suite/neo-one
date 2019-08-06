@@ -35,6 +35,7 @@ export interface NodeBinCreate {
 const DEFAULT_CONFIG = {
   environment: {
     dataPath: envPaths('neo_one_node', { suffix: '' }).data,
+    monitor: 'info',
   },
   rpc: {
     http: {
@@ -44,9 +45,6 @@ const DEFAULT_CONFIG = {
   },
   settings: {
     type: 'main',
-  },
-  monitor: {
-    level: 'info',
   },
 };
 
