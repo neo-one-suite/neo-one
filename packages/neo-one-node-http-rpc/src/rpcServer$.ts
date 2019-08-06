@@ -8,7 +8,7 @@ import rateLimit from 'koa-ratelimit-lru';
 import Router from 'koa-router';
 import serve from 'koa-static';
 import { combineLatest, Observable, of as _of } from 'rxjs';
-import { distinctUntilChanged, map, publishReplay, refCount } from 'rxjs/operators';
+import { distinctUntilChanged, map, publishReplay, refCount, switchMap } from 'rxjs/operators';
 import {
   liveHealthCheck,
   LiveHealthCheckOptions,
@@ -79,7 +79,7 @@ export const rpcServer$ = ({
       distinctUntilChanged(),
     ),
   ]).pipe(
-    map(([liveHealthCheckOptions, readyHealthCheckOptions, tooBusyCheckOptions, rateLimitOptions]) => {
+    switchMap(async ([liveHealthCheckOptions, readyHealthCheckOptions, tooBusyCheckOptions, rateLimitOptions]) => {
       // tslint:disable-next-line:no-any
       const app = new Application<any, {}>();
       app.proxy = true;
@@ -117,8 +117,8 @@ export const rpcServer$ = ({
 
       if (tooBusyCheckOptions !== undefined && tooBusyCheckOptions.enabled) {
         // only importing if we set options, tooBusy starts a loop that will be left open otherwise.
-        // tslint:disable-next-line: no-require-imports
-        router.use(require('./middleware/tooBusyCheck')(tooBusyCheckOptions));
+        const { tooBusyCheck } = await import('./middleware/tooBusyCheck');
+        router.use(tooBusyCheck(tooBusyCheckOptions));
       }
 
       if (environment.splashScreen !== undefined) {
