@@ -242,7 +242,7 @@
     "react-static-plugin-emotion": "7.0.10",
     "react-static-plugin-reach-router": "7.0.10",
     "react-static-plugin-source-filesystem": "7.1.0",
-    "rollup": "1.18.0",
+    "rollup": "1.19.2",
     "rollup-plugin-string": "3.0.0",
     "rollup-plugin-typescript2": "0.22.1",
     "rxjs": "6.5.2",
@@ -275,7 +275,7 @@
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-dev-server": "3.7.2",
     "webpack-node-externals": "1.7.2",
-    "webpackbar": "3.2.0",
+    "webpackbar": "4.0.0",
     "workbox-webpack-plugin": "4.3.1",
     "yargs": "13.3.0"
   },
