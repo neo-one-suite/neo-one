@@ -20,7 +20,9 @@ export class ECPointAttribute extends AttributeBase(ECPointAttributeModel) {
     const { reader } = options;
     const { usage } = super.deserializeAttributeWireBase(options);
     if (!(usage === AttributeUsage.ECDH02 || usage === AttributeUsage.ECDH03)) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(
+        `Expected attribute usage to be ${AttributeUsage.ECDH02} or ${AttributeUsage.ECDH03}. Received: ${usage}`,
+      );
     }
     const value = common.bufferToECPoint(Buffer.concat([Buffer.from([usage]), reader.readBytes(32)]));
 

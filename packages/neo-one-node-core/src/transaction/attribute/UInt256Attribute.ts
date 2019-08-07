@@ -39,7 +39,7 @@ export class UInt256Attribute extends AttributeBase(UInt256AttributeModel) {
         usage === AttributeUsage.Hash15
       )
     ) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Invalid AttributeUsageModel. Received: ${usage}`);
     }
     const value = reader.readUInt256();
 

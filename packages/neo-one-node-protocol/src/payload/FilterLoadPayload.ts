@@ -18,7 +18,7 @@ export class FilterLoadPayload implements SerializableWire<FilterLoadPayload> {
     const k = reader.readUInt8();
     const tweak = reader.readUInt32LE();
     if (k > 50) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected BinaryReader\'s readUInt8(0) to be less than 50. Received: ${k}`);
     }
 
     return new this({ filter, k, tweak });

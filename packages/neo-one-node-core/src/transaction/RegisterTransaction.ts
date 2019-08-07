@@ -56,7 +56,7 @@ export class RegisterTransaction extends TransactionBase<
     const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Register) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected transaction type ${TransactionType.Register}. Received: ${type}`);
     }
 
     const assetType = assertAssetType(reader.readUInt8());
@@ -114,7 +114,7 @@ export class RegisterTransaction extends TransactionBase<
     this.asset = asset;
 
     if (this.version !== 0) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected version to be 0. Received: ${this.version}`);
     }
 
     if (
@@ -122,7 +122,7 @@ export class RegisterTransaction extends TransactionBase<
       asset.type !== AssetType.GoverningToken &&
       asset.type !== AssetType.UtilityToken
     ) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`AssetType and asset owner are invalid`);
     }
 
     const getScriptHashesForVerifying = super.getScriptHashesForVerifying.bind(this);

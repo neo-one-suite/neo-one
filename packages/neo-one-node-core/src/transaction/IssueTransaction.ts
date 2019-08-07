@@ -31,7 +31,7 @@ export class IssueTransaction extends TransactionBase<
     const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Issue) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected transaction type to be ${TransactionType.Issue}. Received: ${type}`);
     }
 
     const { attributes, inputs, outputs, scripts } = super.deserializeTransactionBaseEndWireBase(options);

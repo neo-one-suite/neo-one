@@ -32,7 +32,9 @@ export class PrepareRequestConsensusMessage extends ConsensusMessageBase<
     }
     const minerTransaction = MinerTransaction.deserializeWireBase(options);
     if (!common.uInt256Equal(minerTransaction.hash, transactionHashes[0])) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(
+        `Expected minerTransaction hash (${minerTransaction.hash}) to equal first transaction hash (${transactionHashes[0]})`,
+      );
     }
     const signature = reader.readBytes(64);
 

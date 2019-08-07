@@ -43,7 +43,7 @@ export class EnrollmentTransaction extends TransactionBase<
     const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Enrollment) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected transaction type ${TransactionType.Enrollment}. Received: ${type}`);
     }
 
     const publicKey = reader.readECPoint();
@@ -82,7 +82,7 @@ export class EnrollmentTransaction extends TransactionBase<
     this.publicKey = publicKey;
 
     if (this.version !== 0) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected version to be 0. Received: ${this.version}`);
     }
 
     const getScriptHashesForVerifying = super.getScriptHashesForVerifying.bind(this);

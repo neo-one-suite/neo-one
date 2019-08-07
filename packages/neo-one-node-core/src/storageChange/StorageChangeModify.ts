@@ -14,7 +14,7 @@ export class StorageChangeModify extends StorageChangeAddModifyBase<StorageChang
   public static deserializeWireBase(options: DeserializeWireBaseOptions): StorageChangeModify {
     const { type, hash, key, value } = super.deserializeStorageChangeAddModifyWireBase(options);
     if (type !== StorageChangeType.Modify) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected storage change type to be ${StorageChangeType.Modify}. Received: ${type}`);
     }
 
     return new this({ hash, key, value });

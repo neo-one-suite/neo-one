@@ -15,7 +15,7 @@ export class InvocationResultSuccess extends InvocationResultBase<VMState.Halt>
   public static deserializeWireBase(options: DeserializeWireBaseOptions): InvocationResultSuccess {
     const { state, gasConsumed, gasCost, stack } = super.deserializeInvocationResultWireBase(options);
     if (state !== VMState.Halt) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected VMState state to be ${VMState.Halt}. Received: ${state}.`);
     }
 
     return new this({ gasConsumed, gasCost, stack });

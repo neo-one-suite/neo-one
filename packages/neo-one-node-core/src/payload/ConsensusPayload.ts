@@ -56,7 +56,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload
       consensusMessage,
     } = super.deserializeUnsignedConsensusPayloadWireBase(options);
     if (reader.readUInt8() !== 1) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected BinaryReader\'s readUInt8(0) to be 1. Received: ${reader.readUInt8()}`);
     }
     const script = Witness.deserializeWireBase(options);
 

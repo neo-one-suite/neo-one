@@ -16,7 +16,7 @@ export class ChangeViewConsensusMessage extends ConsensusMessageBase<
     const message = super.deserializeConsensusMessageBaseWireBase(options);
     const newViewNumber = reader.readUInt8();
     if (newViewNumber === 0) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected BinaryReader\'s readUInt8(0) to be 0. Received: ${newViewNumber}`);
     }
 
     return new this({

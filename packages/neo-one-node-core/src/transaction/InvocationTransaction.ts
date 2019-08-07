@@ -37,12 +37,12 @@ export class InvocationTransaction extends TransactionBase<
     const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Invocation) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected transaction type to be ${TransactionType.Invocation}. Received: ${type}`);
     }
 
     const script = reader.readVarBytesLE(MAX_SCRIPT_SIZE);
     if (script.length === 0) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError('Expected invocation script length to not be 0');
     }
 
     let gas = utils.ZERO;

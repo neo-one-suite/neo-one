@@ -33,7 +33,7 @@ export class PublishTransaction extends TransactionBase<
     const { type, version } = super.deserializeTransactionBaseStartWireBase(options);
 
     if (type !== TransactionType.Publish) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected transaction type to be ${TransactionType.Publish}. Received: ${type}`);
     }
 
     const contract = deserializeContractWireBase({
@@ -83,7 +83,7 @@ export class PublishTransaction extends TransactionBase<
     this.contract = contract;
 
     if (this.version > 1) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected version to be greater than 1. Received: ${this.version}`);
     }
   }
 

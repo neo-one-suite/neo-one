@@ -27,7 +27,7 @@ export class InvocationResultError extends InvocationResultBase<VMState.Fault>
     const { reader } = options;
     const { state, gasConsumed, gasCost, stack } = super.deserializeInvocationResultWireBase(options);
     if (state !== VMState.Fault) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected VMState to be: ${VMState.Fault}. Received: ${state}`);
     }
     const message = reader.readVarString(MAX_SIZE);
 

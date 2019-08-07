@@ -73,12 +73,16 @@ const deserializeMessageHeader = ({
   readonly checksum: number;
 } => {
   if (reader.readUInt32LE() !== context.messageMagic) {
-    throw new InvalidFormatError();
+    throw new InvalidFormatError(
+      `Expected BinaryReader readUInt32LE(0) to equal ${context.messageMagic}. Received: ${context.messageMagic}`,
+    );
   }
   const command = assertCommand(reader.readFixedString(COMMAND_LENGTH));
   const length = reader.readUInt32LE();
   if (length > PAYLOAD_MAX_SIZE) {
-    throw new InvalidFormatError();
+    throw new InvalidFormatError(
+      `Expected buffer readout to be less than max payload size of ${PAYLOAD_MAX_SIZE}. Received: ${length}`,
+    );
   }
   const checksum = reader.readUInt32LE();
 
@@ -90,8 +94,11 @@ export class Message implements SerializableWire<Message> {
     const { reader, context } = options;
     const { command, length, checksum } = deserializeMessageHeader(options);
     const payloadBuffer = reader.readBytes(length);
-    if (calculateChecksum(payloadBuffer) !== checksum) {
-      throw new InvalidFormatError();
+    const payloadBufferChecksum = calculateChecksum(payloadBuffer);
+    if (payloadBufferChecksum !== checksum) {
+      throw new InvalidFormatError(
+        `Expected payloadBuffer checksum to be ${checksum}. Received: ${payloadBufferChecksum}`,
+      );
     }
 
     const payloadOptions = {
@@ -221,7 +228,7 @@ export class Message implements SerializableWire<Message> {
         break;
       default:
         utils.assertNever(command);
-        throw new InvalidFormatError();
+        throw new InvalidFormatError(``);
     }
 
     return new this({ magic: context.messageMagic, value });
@@ -310,7 +317,7 @@ export class Message implements SerializableWire<Message> {
         break;
       default:
         utils.assertNever(value);
-        throw new InvalidFormatError();
+        throw new InvalidFormatError('Command does not exist');
     }
 
     writer.writeUInt32LE(payload.length);

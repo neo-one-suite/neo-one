@@ -13,7 +13,7 @@ export class StorageChangeDelete extends StorageChangeBase<StorageChangeType.Del
   public static deserializeWireBase(options: DeserializeWireBaseOptions): StorageChangeDelete {
     const { type, hash, key } = super.deserializeStorageChangeWireBase(options);
     if (type !== StorageChangeType.Delete) {
-      throw new InvalidFormatError();
+      throw new InvalidFormatError(`Expected storage change type to be ${StorageChangeType.Delete}. Received: ${type}`);
     }
 
     return new this({ hash, key });
