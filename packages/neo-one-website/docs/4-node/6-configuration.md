@@ -33,7 +33,7 @@ This section will serve as a reference for the NEO•ONE Node's many configurati
 
 ### dataPath
 
-*defaults to the data path supplied by [env-paths](https://www.npmjs.com/package/env-paths)*
+_defaults to the data path supplied by [env-paths](https://www.npmjs.com/package/env-paths)_
 
 `environment.dataPath` is the path used for storing blockchain data.
 
@@ -41,7 +41,7 @@ In the [local docker](/docs/node-docker#Examples) example we could store blockch
 
 ### chainFile
 
-*disabled by default*
+_disabled by default_
 
 Optional path for syncing from a local `chainFile`. A chainfile is a full binary of blockchain data that can be used to **hard** re-sync the chain. As opposed to a normal backup this is used to re-sync instead of restore. This is useful in extreme situations like a fork.
 
@@ -55,22 +55,23 @@ Syncing from a chainfile can take a **very** long time. Upwards of 30 hours.
 
 ### dumpChainFile
 
-*disabled by default*
+_disabled by default_
 
 Optional path for outputting a `chainFile`.
 
 ### monitor
 
-*defaults to **'info'***
+\*defaults to **'info'\***
 
 Desired logging level of the node monitor, options are
+
 ```
 'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'silly'
 ```
 
 ### haltOnSync
 
-*defaults to **false***
+\*defaults to **false\***
 
 `haltOnSync` enables a watcher which will halt the node when the rpc server's `readyHealthCheck` passes and begin a backup if a location is specified which you are authorized to push to.
 
@@ -84,11 +85,11 @@ To properly halt and backup, you must also provide `backup` and `rpc.readyHealth
 
 ### levelDownOptions
 
-*see the [leveldown documentation](https://github.com/Level/leveldown#options)*
+_see the [leveldown documentation](https://github.com/Level/leveldown#options)_
 
 ### telemetry
 
-*disabled by default*
+_disabled by default_
 
 `environment.telemetry.port` specifies the port to use when serving node-metrics. When enabled, you can visit `localhost:<port>/metrics` to view metrics.
 
@@ -107,19 +108,19 @@ To properly halt and backup, you must also provide `backup` and `rpc.readyHealth
 
 ### type
 
-*defaults to 'main'*
+_defaults to 'main'_
 
 `settings.type` specifies which NEO network we are connecting to.
 
 ### privateNet
 
-*defaults to **false***
+\*defaults to **false\***
 
 `settings.privateNet` specifies whether or not the node is connecting to a private network.
 
 ### address
 
-*defaults to '5fa99d93303775fe50ca119c327759313eccfa1c'*
+_defaults to '5fa99d93303775fe50ca119c327759313eccfa1c'_
 
 `settings.address` sets the initial address we send tokens to on private net.
 
@@ -136,12 +137,6 @@ List of consensus nodes.
     "http?": {
       "port": number,
       "host": string
-    },
-    "https?": {
-      "port": number,
-      "host": string,
-      "cert": string,
-      "key": string
     },
     "server?": {
       "keepAliveTimeout": number,
@@ -177,24 +172,26 @@ List of consensus nodes.
 
 ---
 
-*by default only http is enabled on `localhost:8080` OR `localhost:$PORT` if you have set the `PORT` environment variable*
+_by default only http is enabled on `localhost:8080` OR `localhost:$PORT` if you have set the `PORT` environment variable_
 
-`rpc.http` or `rpc.https` are used to configure the rpc server’s host options. You do not need to specify both http and https options.
+`rpc.http` is used to configure the rpc server’s host options. It is important in a kubernetes setup that `containerPort` matches `rpc.http.port`.
 
 ### Hot Options
-*these options can be changed without restarting the node*
 
-`server.keepAliveTimeout`: if you would like your server to close after *x* seconds without activity set a timeout here (in milliseconds).
+_these options can be changed without restarting the node_
 
-`liveHealthCheck` *&* `readyHealthCheck` share the same configuration.
+`server.keepAliveTimeout`: if you would like your server to close after _x_ seconds without activity set a timeout here (in milliseconds).
+
+`liveHealthCheck` _&_ `readyHealthCheck` share the same configuration.
+
 - `rpcURLs`: a list of RPC URLs to compare our node to
 - `offset`: the acceptable difference of blocks ahead/behind to count as `live` or `ready`
 - `timeoutMS`: timeout for RPC connections
 - `checkEndpoints`: the number of different endpoints to check against before passing `true`/`false`.
 
-`tooBusyCheck` (*experimental*): enable the tooBusy middleware which throttles requests to the node when under significant load. Currently an experimental feature, see [toobusy-js](https://github.com/strml/node-toobusy) for more. Set `tooBusyCheck.enabled` to **true** if you would like to try it.
+`tooBusyCheck` (_experimental_): enable the tooBusy middleware which throttles requests to the node when under significant load. Currently an experimental feature, see [toobusy-js](https://github.com/strml/node-toobusy) for more. Set `tooBusyCheck.enabled` to **true** if you would like to try it.
 
-`rateLimit` (*experimental*): enable the rateLimiter middleware which throttles requests to the node when too many have been made from the same address over a period of time. Currently an experimental feature, see [koa-ratelimit-lru](https://github.com/Dreamacro/koa-ratelimit-lru) for more. Set `rateLimit.enabled` to **true** to experiment with it.
+`rateLimit` (_experimental_): enable the rateLimiter middleware which throttles requests to the node when too many have been made from the same address over a period of time. Currently an experimental feature, see [koa-ratelimit-lru](https://github.com/Dreamacro/koa-ratelimit-lru) for more. Set `rateLimit.enabled` to **true** to experiment with it.
 
 ## Node
 
@@ -221,7 +218,8 @@ List of consensus nodes.
 `externalPort` specifies the external port of the node, useful for a deployment when the container ports are different from the cluster port.
 
 ### Hot Options
-*these options can be changed without restarting the node*
+
+_these options can be changed without restarting the node_
 
 `rpcURLs` specifies a list of known node RPC URLs you would like to try and connect to. A list of public mainnet hosts can be found at http://monitor.cityofzion.io/.
 
@@ -229,9 +227,9 @@ List of consensus nodes.
 
 `consensus` sets the consensus options for the node, requires a privateNet setup.
 
-  - `enabled` enables consensus
-  - `privateKey` the key for the network
-  - `privateNet` true/false
+- `enabled` enables consensus
+- `privateKey` the key for the network
+- `privateNet` true/false
 
 ## Network
 
@@ -261,7 +259,8 @@ List of consensus nodes.
 `listenTCP` when provided at least a port this allows other nodes to create TCP connections with this one over that port. `host` is optional and defaults to 'localhost'.
 
 ### Hot Options
-*these options can be changed without restarting the node*
+
+_these options can be changed without restarting the node_
 
 `seeds` specifies external seeds you would like to connect to.
 
@@ -276,6 +275,7 @@ List of consensus nodes.
 `socketTimeoutMS` sets the timeout of peer requests (in milliseconds). Defaults to 1 minute.
 
 ## backup
+
 ```bash
 ...
 {
@@ -316,12 +316,13 @@ List of consensus nodes.
 
 ---
 
-`tmpPath` *(defaults to ${environment.dataPath}/tmp)* specifies the file path to use for downloading backup files before extraction.
+`tmpPath` _(defaults to \${environment.dataPath}/tmp)_ specifies the file path to use for downloading backup files before extraction.
 
-`readyPath` *(defaults to ${environment.dataPath}/ready)* specifies the file path to use when flagging the restore as 'ready'.
+`readyPath` _(defaults to \${environment.dataPath}/ready)_ specifies the file path to use when flagging the restore as 'ready'.
 
 ### Hot Options
-*these options can be changed without restarting the node*
+
+_these options can be changed without restarting the node_
 
 `restore`: set to **true** to attempt and pull the latest backup from your provider on starting the node, **false** to ignore restoring and only backup.
 

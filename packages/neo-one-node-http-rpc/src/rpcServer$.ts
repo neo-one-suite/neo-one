@@ -2,7 +2,6 @@ import { context, cors, createServer$, onError as appOnError } from '@neo-one/ht
 import { Monitor } from '@neo-one/monitor';
 import { Blockchain, Node } from '@neo-one/node-core';
 import * as http from 'http';
-import * as https from 'https';
 import Application from 'koa';
 import rateLimit from 'koa-ratelimit-lru';
 import Router from 'koa-router';
@@ -23,13 +22,6 @@ export interface ServerOptions {
 }
 export interface Environment {
   readonly http?: {
-    readonly port: number;
-    readonly host: string;
-  };
-
-  readonly https?: {
-    readonly key: string;
-    readonly cert: string;
     readonly port: number;
     readonly host: string;
   };
@@ -141,17 +133,7 @@ export const rpcServer$ = ({
     map((options) => (options.server === undefined ? undefined : options.server.keepAliveTimeout)),
   );
 
-  return combineLatest([
-    environment.http === undefined
-      ? _of(undefined)
-      : createServer$(monitor, app$, keepAliveTimeout$, environment.http, () => http.createServer()),
-    environment.https === undefined
-      ? _of(undefined)
-      : createServer$(monitor, app$, keepAliveTimeout$, environment.https, (options) =>
-          https.createServer({
-            cert: options.cert,
-            key: options.key,
-          }),
-        ),
-  ]);
+  return environment.http === undefined
+    ? _of(undefined)
+    : createServer$(monitor, app$, keepAliveTimeout$, environment.http, () => http.createServer());
 };

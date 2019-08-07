@@ -16,13 +16,13 @@ If you are unfamiliar with Docker or do not have a version installed locally vis
 ## Requirements
 
 - [Docker](https://www.docker.com/get-started)
-  - Minimum: ***at least*** 2GB Memory, 1cpu, and 50GB Storage allocated
+  - Minimum: **_at least_** 2GB Memory, 1cpu, and 50GB Storage allocated
   - Recommended: 4GB Memory, 2cpu, and 60GB+ Storage allocated
-  (if you plan to deploy to a cluster you will need this for *each* pod/container)
+    (if you plan to deploy to a cluster you will need this for _each_ pod/container)
 
 ## Getting Started
 
-[![Docker Repository on Quay](https://quay.io/repository/neoone/node/status "Docker Repository on Quay")](https://quay.io/repository/neoone/node)
+[![Docker Repository on Quay](https://quay.io/repository/neoone/node/status 'Docker Repository on Quay')](https://quay.io/repository/neoone/node)
 
 NEO•ONE uses [quay](https://quay.io/) to automatically build the docker image every time a new version is published.
 
@@ -37,7 +37,7 @@ Voila! You should now be running the most recent NEO•ONE Node in a local docke
 
 ## Configuring
 
-There are __several__ ways to configure the node; any [rc](https://github.com/dominictarr/rc#rc) type configuration is accepted. as an example we can set the `monitor` level of the node to *verbose* using either:
+There are **several** ways to configure the node; any [rc](https://github.com/dominictarr/rc#rc) type configuration is accepted. as an example we can set the `monitor` level of the node to _verbose_ using either:
 
 ```bash
 docker run quay.io/neoone/node --environment.monitor=verbose
@@ -98,7 +98,7 @@ Upon visiting `localhost:8001/metrics` you should now see the node-metrics page.
 
 Note
 
-By default metrics are **disabled** so you *must* include the `--environment.telemetry.port=8001` argument or provide a telemetry port through other means of configuration (see above).
+By default metrics are **disabled** so you _must_ include the `--environment.telemetry.port=8001` argument or provide a telemetry port through other means of configuration (see above).
 
 :::
 
@@ -138,7 +138,7 @@ Upon successfully starting the node, you should begin to see `relay_block` event
 
 Note
 
-Its worth mentioning that syncing the entire blockchain can take a **very** long time. We recommend `restoring` to a recent backup (described below) and *then* syncing.
+Its worth mentioning that syncing the entire blockchain can take a **very** long time. We recommend `restoring` to a recent backup (described below) and _then_ syncing.
 
 :::
 
@@ -165,4 +165,4 @@ To download a backup of the most recent blockchain data and extract it you can c
 
 This tells the node where we want to restore from. Assuming there is an available google-cloud bucket to restore from (there will be for our example) it will download and extract the blockchain data to our defined `node-data` folder. This process can take multiple hours depending on network speeds as a fully synced backup is ~16GB in size.
 
-To restore ***and*** sync simply combine the above configurations.
+To restore **_and_** sync simply combine the above configurations.

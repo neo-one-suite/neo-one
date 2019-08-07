@@ -5,7 +5,7 @@ import { NodeEnvironment, NodeOptions } from '@neo-one/node-protocol';
 import _ from 'lodash';
 
 const envKeys = {
-  rpc: ['http', 'https', 'splashScreen'],
+  rpc: ['http', 'splashScreen'],
   backup: ['tmpPath', 'readyPath'],
   node: ['externalPort'],
   network: ['listenTCP'],
