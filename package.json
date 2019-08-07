@@ -217,7 +217,7 @@
     "istanbul-lib-coverage": "2.0.5",
     "jest": "24.8.0",
     "jest-environment-node": "24.8.0",
-    "jest-junit": "6.4.0",
+    "jest-junit": "7.0.0",
     "json": "9.0.6",
     "koa-connect": "2.0.1",
     "lerna": "3.16.4",
