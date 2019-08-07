@@ -32,7 +32,7 @@
   "devDependencies": {
     "@types/cli-table2": "0.2.2",
     "@types/fs-extra": "8.0.0",
-    "@types/inquirer": "6.0.3"
+    "@types/inquirer": "6.5.0"
   },
   "sideEffects": false
 }
