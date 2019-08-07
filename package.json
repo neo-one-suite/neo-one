@@ -166,7 +166,7 @@
     "@reactivex/ix-esnext-esm": "2.5.3",
     "@types/autoprefixer": "9.5.0",
     "@types/cssnano": "4.0.0",
-    "@types/jest": "24.0.16",
+    "@types/jest": "24.0.17",
     "@types/jest-matchers": "20.0.2",
     "@types/koa-bodyparser": "4.3.0",
     "@types/prettier": "1.16.4",
