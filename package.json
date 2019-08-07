@@ -199,7 +199,7 @@
     "eslint": "6.1.0",
     "execa": "2.0.3",
     "extract-css-chunks-webpack-plugin": "4.6.0",
-    "file-loader": "4.1.0",
+    "file-loader": "4.2.0",
     "fs-extra": "8.1.0",
     "gulp": "4.0.2",
     "gulp-babel": "8.0.0",
