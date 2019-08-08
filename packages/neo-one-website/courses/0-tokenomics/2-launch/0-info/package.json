@@ -8,8 +8,8 @@
     "@types/react-dom": "16.8.5",
     "bignumber.js": "9.0.0",
     "emotion-theming": "10.0.14",
-    "react": "16.8.6",
-    "react-dom": "16.8.6",
+    "react": "16.9.0",
+    "react-dom": "16.9.0",
     "rxjs": "6.5.2",
     "styled-tools": "1.7.1"
   }
