@@ -275,7 +275,7 @@
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-dev-server": "3.7.2",
     "webpack-node-externals": "1.7.2",
-    "webpackbar": "3.2.0",
+    "webpackbar": "4.0.0",
     "workbox-webpack-plugin": "4.3.1",
     "yargs": "13.3.0"
   },
