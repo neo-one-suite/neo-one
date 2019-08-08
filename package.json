@@ -242,7 +242,7 @@
     "react-static-plugin-emotion": "7.0.10",
     "react-static-plugin-reach-router": "7.0.10",
     "react-static-plugin-source-filesystem": "7.1.0",
-    "rollup": "1.18.0",
+    "rollup": "1.19.4",
     "rollup-plugin-string": "3.0.0",
     "rollup-plugin-typescript2": "0.22.1",
     "rxjs": "6.5.2",
