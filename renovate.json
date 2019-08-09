@@ -1,7 +1,8 @@
 {
   "extends": ["config:base", ":semanticCommits"],
   "schedule": ["after 12am and before 5am"],
-  "timezone": ["America/Los_Angeles"],
+  "timezone": "America/Los_Angeles",
+  "updateNotScheduled": false,
   "postUpdateOptions": ["yarnDedupeHighest"],
   "automerge": true,
   "major": {
