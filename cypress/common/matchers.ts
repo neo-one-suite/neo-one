@@ -10,7 +10,17 @@ export interface Problem {
   readonly endLine: number;
 }
 
-export const checkProblems = (problemRoots: readonly ProblemRoot[]) => {
+const resetEditor = () => {
+  cy.get('[data-test=monaco-editor] textarea').type('{cmd}a', { force: true });
+  cy.get('[data-test=monaco-editor] textarea').type('{cmd}/', { force: true });
+  cy.wait(500);
+  cy.get('[data-test=monaco-editor] textarea').type('{cmd}/', { force: true });
+  cy.wait(500);
+};
+
+export const checkProblems = (problemRoots: ReadonlyArray<ProblemRoot>) => {
+  resetEditor();
+  cy.wait(1000);
   const problems = problemRoots.reduce(
     (acc, root) => root.problems.reduce((innerAcc, { error = true }) => (error ? innerAcc + 1 : innerAcc), acc),
     0,
@@ -223,14 +233,21 @@ const checkTest = ({ name, state, error }: Test) => {
   }
 };
 
+export const resetEditorTab = ({ path }: { readonly path: string }) => {
+  cy.get(`[data-test="editor-header-file-tab-/${path}"]`).click({ force: true });
+  resetEditor();
+};
+
 export const enterSolution = ({ path }: { readonly path: string }) => {
   cy.get('[data-test=docs-footer-solution-button]').click();
-  cy.get(`[data-test="docs-solution-file-tab-${path}"]`).click();
-  cy.get(`[data-test="editor-header-file-tab-/${path}"]`).click();
+  cy.get(`[data-test="docs-solution-file-tab-${path}"]`).click({ force: true });
+  cy.get(`[data-test="editor-header-file-tab-/${path}"]`).click({ force: true });
+
+  const typeOptions = { force: true, delay: 0 };
 
   cy.get('[data-test=monaco-editor] textarea')
-    .type('{cmd}a', { force: true })
-    .type('{backspace}', { force: true });
+    .type('{cmd}a', typeOptions)
+    .type('{backspace}', typeOptions);
   cy.get('[data-test=docs-solution-markdown] > .code-toolbar > pre > code').then(($outerEl) => {
     const values = $outerEl.text().split('{');
 
@@ -240,33 +257,34 @@ export const enterSolution = ({ path }: { readonly path: string }) => {
         const innerInnerValues = innerValue.split('[');
         innerInnerValues.forEach((innerInnerValue, innerInnerIdx) => {
           if (innerInnerValue !== '') {
-            cy.get('[data-test=monaco-editor] textarea').type(innerInnerValue, { force: true });
+            cy.get('[data-test=monaco-editor] textarea').type(innerInnerValue, typeOptions);
           }
           if (innerInnerIdx !== innerInnerValues.length - 1) {
-            cy.get('[data-test=monaco-editor] textarea').type('[', { force: true });
+            cy.get('[data-test=monaco-editor] textarea').type('[', typeOptions);
             cy.wait(50);
-            cy.get('[data-test=monaco-editor] textarea').type('{rightarrow}', { force: true });
-            cy.get('[data-test=monaco-editor] textarea').type('{backspace}', { force: true });
+            cy.get('[data-test=monaco-editor] textarea').type('{rightarrow}', typeOptions);
+            cy.get('[data-test=monaco-editor] textarea').type('{backspace}', typeOptions);
           }
         });
 
         if (innerIdx !== innerValues.length - 1) {
-          cy.get('[data-test=monaco-editor] textarea').type('(', { force: true });
+          cy.get('[data-test=monaco-editor] textarea').type('(', typeOptions);
           cy.wait(50);
-          cy.get('[data-test=monaco-editor] textarea').type('{rightarrow}', { force: true });
-          cy.get('[data-test=monaco-editor] textarea').type('{backspace}', { force: true });
+          cy.get('[data-test=monaco-editor] textarea').type('{rightarrow}', typeOptions);
+          cy.get('[data-test=monaco-editor] textarea').type('{backspace}', typeOptions);
         }
       });
 
       if (idx !== values.length - 1) {
-        cy.get('[data-test=monaco-editor] textarea').type('{', { force: true });
+        cy.get('[data-test=monaco-editor] textarea').type('{', typeOptions);
         cy.wait(50);
-        cy.get('[data-test=monaco-editor] textarea').type('{rightarrow}', { force: true });
-        cy.get('[data-test=monaco-editor] textarea').type('{backspace}', { force: true });
+        cy.get('[data-test=monaco-editor] textarea').type('{rightarrow}', typeOptions);
+        cy.get('[data-test=monaco-editor] textarea').type('{backspace}', typeOptions);
       }
     });
   });
 
+  resetEditor();
   cy.get('[data-test=docs-footer-solution-button]').click();
 };
 
@@ -276,13 +294,14 @@ interface BuildOptions {
 }
 
 export const build = ({ success, contracts }: BuildOptions) => {
-  cy.get('[data-test=build]', { timeout: 60000 }).click();
+  cy.get('[data-test=build]', { timeout: 90000 }).click();
   const textPre = `Building...\nScanning for contracts...\nSetting up wallets...\n`;
   const textPost = `Generating code...\nDone`;
   const contractTexts = contracts.map((contract) => `Compiling contract ${contract}...\n`);
   const textFail = 'Building...\nScanning for contracts...\nNo contracts found.';
 
   if (success) {
+    cy.wait(6000);
     cy.get('[data-test=console-output]', { timeout: 30000 }).contains(textPre);
     contractTexts.forEach((contractText) =>
       cy.get('[data-test=console-output]', { timeout: 30000 }).contains(contractText),
@@ -296,9 +315,10 @@ export const build = ({ success, contracts }: BuildOptions) => {
   cy.get('[data-test=console-output]').should('have.text', '');
   cy.get('[data-test=console-close]').click();
   // Need to wait to allow transpiling to happen
-  cy.wait(5000);
+  cy.wait(10000);
 };
 
 export const nextButton = () => {
   cy.get('[data-test=next-button]').click();
+  cy.wait(5000);
 };

@@ -51,7 +51,7 @@ Blockchain at it's core is just a data structure. It's a linked list of blocks w
 
 In addition to the hash of the previous block, block's contain:
 
-  1. Roof of the transaction hash tree (Merkle Tree).
+  1. Root of the transaction hash tree (Merkle Tree).
   2. Timestamp at which the block was produced.
   3. Index of the block within the blockchain
   4. Transactions (not included in the hash, instead the root of Merkle Tree is included)

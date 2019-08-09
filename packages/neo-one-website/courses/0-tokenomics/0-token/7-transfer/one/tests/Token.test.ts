@@ -69,18 +69,13 @@ describe('Token', () => {
 
       // Try various transfers
       const transferAmount = new BigNumber(5);
-      const [successTransferReceipt, falseTransferReceipt0, falseTransferReceipt1] = await Promise.all([
+      const [successTransferReceipt, falseTransferReceipt0] = await Promise.all([
         // Successful because there are sufficient funds and the from account is the toWallet
-        token.transfer.confirmed(toAccountID.address, masterAccountID.address, transferAmount, {
-          from: toAccountID,
-        }),
+        token.transfer.confirmed(toAccountID.address, masterAccountID.address, transferAmount, { from: toAccountID }),
         // Returns false because the from account is the masterAccountID (the currently selected account)
         token.transfer.confirmed(toAccountID.address, masterAccountID.address, transferAmount),
-        // Returns false because the from account has insufficient funds
-        token.transfer.confirmed(toAccountID.address, masterAccountID.address, new BigNumber(20), {
-          from: toAccountID,
-        }),
       ]);
+
       if (successTransferReceipt.result.state === 'FAULT') {
         throw new Error(successTransferReceipt.result.message);
       }
@@ -98,13 +93,20 @@ describe('Token', () => {
       expect(event.parameters.to).toEqual(masterAccountID.address);
       expect(event.parameters.amount.toNumber()).toEqual(transferAmount.toNumber());
 
-      // Verify the failed result (throws an error)
+      // // Verify the failed result (throws an error)
       expect(falseTransferReceipt0.result.state).toEqual('FAULT');
-      expect(falseTransferReceipt0.events).toHaveLength(0);
+      expect(falseTransferReceipt0.events).toHaveLength(3);
 
-      // Verify the failed result (throws an error)
-      expect(falseTransferReceipt1.result.state).toEqual('FAULT');
-      expect(falseTransferReceipt1.events).toHaveLength(0);
+      // Validate that an error is thrown when the from account has insufficient funds
+      let falseTransferReceipt1: Error | undefined;
+      try {
+        await token.transfer.confirmed(toAccountID.address, masterAccountID.address, new BigNumber(20), {
+          from: toAccountID,
+        });
+      } catch (err) {
+        falseTransferReceipt1 = err;
+      }
+      expect(falseTransferReceipt1).toBeDefined();
 
       // Validate that an error is thrown on the exceptional case of -1
       let error: Error | undefined;

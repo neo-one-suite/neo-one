@@ -102,7 +102,10 @@ export class Consensus {
   public async runConsensusNow(): Promise<void> {
     const options = await this.options$.pipe(take(1)).toPromise();
     if (options.privateNet) {
-      this.mutableQueue.write({ type: 'timer' });
+      // tslint:disable-next-line promise-must-complete
+      await new Promise((resolve, reject) => {
+        this.mutableQueue.write({ type: 'timer', promise: { resolve, reject } });
+      });
     } else {
       throw new Error('Can only force consensus on a private network.');
     }
@@ -212,8 +215,15 @@ export class Consensus {
                 node: this.node,
                 options,
                 consensusContext: this.mutableConsensusContext,
+              }).catch((err) => {
+                if (event.promise !== undefined) {
+                  event.promise.reject(err);
+                }
+                throw err;
               });
-
+              if (event.promise !== undefined) {
+                event.promise.resolve();
+              }
               break;
             default:
               commonUtils.assertNever(event);
