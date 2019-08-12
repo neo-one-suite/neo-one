@@ -122,11 +122,7 @@ export class FullNode {
   private getRPCPort(): number {
     const rpcOptions = this.options.environment.rpc;
 
-    return rpcOptions.http !== undefined
-      ? rpcOptions.http.port
-      : rpcOptions.https !== undefined
-      ? rpcOptions.https.port
-      : 8080;
+    return rpcOptions.http !== undefined ? rpcOptions.http.port : 8080;
   }
 
   private getBackupEnvironment(): BackupRestoreEnvironment {
