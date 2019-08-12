@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@types/lodash": "4.14.136",
-    "@types/prettier": "1.18.1"
+    "@types/prettier": "1.18.2"
   },
   "sideEffects": false
 }
