@@ -1,3 +1,4 @@
+import envPaths from 'env-paths';
 import rc from 'rc';
 import { LogLevel } from './types';
 
@@ -18,15 +19,19 @@ export interface LoggersConfig {
 
 export type LoggersCreate = Required<Omit<LoggersConfig, '*'>>;
 
+const DEFAULT_LOG_PATH = envPaths('neo-one', { suffix: '' }).log;
+
 const DEFAULT_CONFIG = {
   ['editor-server']: {
     level: 'silent',
   },
   server: {
-    level: 'silent',
+    level: 'info',
+    path: DEFAULT_LOG_PATH,
   },
   cli: {
-    level: 'silent',
+    level: 'info',
+    path: DEFAULT_LOG_PATH,
   },
   http: {
     level: 'silent',
@@ -59,14 +64,17 @@ const getGlobalConfig = (level: LogLevel) =>
   } as const);
 
 export const getConfiguration = (): LoggersCreate => {
-  const { logger: maybeLogger } = rc('neo_one_node');
+  const { environment } = rc('neo_one_node');
+
+  const maybeLogger = environment !== undefined ? environment.logger : undefined;
   const maybePath = maybeLogger !== undefined ? maybeLogger.path : undefined;
   const maybeLevel = maybeLogger !== undefined ? maybeLogger.level : undefined;
+
   const loggingConfig = rc('neo_one_logging', {
     ...DEFAULT_CONFIG,
     node: {
-      path: maybePath === undefined ? undefined : maybePath,
-      level: maybeLevel === undefined ? 'silent' : maybeLevel,
+      path: maybePath === undefined ? DEFAULT_LOG_PATH : maybePath,
+      level: maybeLevel === undefined ? 'info' : maybeLevel,
     },
   });
 

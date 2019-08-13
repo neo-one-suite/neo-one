@@ -33,10 +33,14 @@ import { reportError } from './utils/reportError';
 
 const logger = cliLogger.child({ component: 'interactive' });
 
-const shutdownReport = (logFile: string, shutdownCB: () => void) => {
-  reportError(logFile)
-    .then(shutdownCB)
-    .catch(shutdownCB);
+const shutdownReport = (logFile: string | undefined, shutdownCB: () => void) => {
+  if (logFile !== undefined) {
+    reportError(logFile)
+      .then(shutdownCB)
+      .catch(shutdownCB);
+  } else {
+    shutdownCB();
+  }
 };
 
 // tslint:disable-next-line readonly-array
@@ -179,7 +183,6 @@ export class InteractiveCLI {
     const paths = {
       data: dir === undefined ? defaultPaths.data : path.join(dir, 'data'),
       config: dir === undefined ? defaultPaths.config : path.join(dir, 'config'),
-      log: dir === undefined ? defaultPaths.log : path.join(dir, 'log'),
       cache: dir === undefined ? defaultPaths.cache : path.join(dir, 'cache'),
       temp: dir === undefined ? defaultPaths.temp : path.join(dir, 'temp'),
     };
@@ -203,8 +206,7 @@ export class InteractiveCLI {
       ...serverConfigWithoutDir,
     });
 
-    const maybeLogPath = getLogPath('cli');
-    const logPath = maybeLogPath ? maybeLogPath : paths.log;
+    const logPath = getLogPath('server');
 
     const start$ = combineLatest([
       serverConfig.config$.pipe(
@@ -285,7 +287,7 @@ export class InteractiveCLI {
         logger.error({ title: 'cli_uncaught_complete' }, message);
 
         this.vorpal.log(message);
-        shutdownReport(paths.log, () => {
+        shutdownReport(logPath, () => {
           shutdown({ exitCode: 1 });
         });
       },

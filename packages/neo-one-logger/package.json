@@ -6,6 +6,7 @@
   "browser": "./src/index.browser.ts",
   "dependencies": {
     "@types/pino":"^5.8.8",
+    "env-paths": "^2.2.0",
     "fs-extra": "^8.1.0",
     "pino":"^5.12.6",
     "rc": "^1.2.8"

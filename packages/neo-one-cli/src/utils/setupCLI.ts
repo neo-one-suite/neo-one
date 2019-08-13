@@ -31,7 +31,7 @@ export const setupCLI = ({
       shutdownInitiated = true;
       const finalLogger = getFinalLogger(cliLogger);
       errorIn
-        ? finalLogger.error({ exitCode, error: errorIn }, 'error, shutting down')
+        ? finalLogger.error({ exitCode, error: errorIn.message, stack: errorIn.stack }, 'error, shutting down')
         : finalLogger.info({ exitCode }, 'shutting down');
 
       initiateShutdown()
