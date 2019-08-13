@@ -2464,17 +2464,30 @@
   dependencies:
     "@opencensus/web-types" "^0.0.3"
 
-"@opencensus/web-propagation-tracecontext@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@opencensus/web-propagation-tracecontext/-/web-propagation-tracecontext-0.0.3.tgz#86297f8c6bd657ce965dce69839789e43bd1d1a3"
-  integrity sha512-YXOi38GscRLIorFFhLl7ZQqcO8bzDVCo7qdbeExKI+hzyuC3RygswqQt7P9j23tnfoRBPTHxKwbJAY3JZYBcbw==
+"@opencensus/web-core@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@opencensus/web-core/-/web-core-0.0.5.tgz#cb22a0fb2bdcacd57cd6d71d2966794a63d92d17"
+  integrity sha512-nJClSEgD9uIlgGrMNLq8dZYkCKT0ZM8C9D1LU5UxBZxRvFye+7ZeiJWPtAYvnuh5MEDK+g+JYmrrBKHhTwammg==
   dependencies:
-    "@opencensus/web-core" "^0.0.3"
+    "@opencensus/web-types" "^0.0.5"
+    "@types/node" "^12.6.9"
+
+"@opencensus/web-propagation-tracecontext@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@opencensus/web-propagation-tracecontext/-/web-propagation-tracecontext-0.0.5.tgz#41fc72495651510a78c8062be051b698abac65ba"
+  integrity sha512-uAKymZTxK+njFdAbij4r8gmg16jfu1hQufCoteqnaLws8r3fyKhWgQnzorAwtqGRx+zn9HqEmCivmzpB0OgA5Q==
+  dependencies:
+    "@opencensus/web-core" "^0.0.5"
 
 "@opencensus/web-types@^0.0.3":
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/@opencensus/web-types/-/web-types-0.0.3.tgz#39f253ff8f72c0085756c815e68ffacdaf9c5e16"
   integrity sha512-bEjL1AQErMR5CIGM28sd2fjrfsNGYXatYqoEcS8kqPgxcl6TPZSA4o5cqGBsTnC6QALZh3CMzmjod8vIR/TcYw==
+
+"@opencensus/web-types@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@opencensus/web-types/-/web-types-0.0.5.tgz#7420ca9cbe2c99a587a66955080df2cef7092d56"
+  integrity sha512-DyijGm7h/6Tu8m5fUcElZCPjKGDXNXAyrHX7b9wCKZ5+25yQqedqOzZRUNEG44MCySrVNGYOyjHR4PVsnzsGPA==
 
 "@phenomnomnominal/tsquery@^3.0.0":
   version "3.0.0"
@@ -17625,24 +17638,10 @@ react-helmet@^5.2.0, react-helmet@^5.2.1:
     react-fast-compare "^2.0.2"
     react-side-effect "^1.1.0"
 
-react-hot-loader@4.12.11:
+react-hot-loader@4.12.11, react-hot-loader@^4.12.7, react-hot-loader@^4.3.6, react-hot-loader@^4.8.4:
   version "4.12.11"
   resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.12.11.tgz#06bd618d0a7343c8afa4a31206844f651193bae5"
   integrity sha512-ySsg1hPwr/5dkZCJVp1nZRbwbpbEQ+3e2+bn/D681Wvr9+o+5bLKkTGq0TXskj8HgCS3ScysXddOng9Cg+JKzw==
-  dependencies:
-    fast-levenshtein "^2.0.6"
-    global "^4.3.0"
-    hoist-non-react-statics "^3.3.0"
-    loader-utils "^1.1.0"
-    prop-types "^15.6.1"
-    react-lifecycles-compat "^3.0.4"
-    shallowequal "^1.1.0"
-    source-map "^0.7.3"
-
-react-hot-loader@^4.12.7, react-hot-loader@^4.3.6, react-hot-loader@^4.8.4:
-  version "4.12.10"
-  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.12.10.tgz#b3457c0f733423c4827c6d2672e50c9f8bedaf6b"
-  integrity sha512-dX+ZUigxQijWLsKPnxc0khuCt2sYiZ1W59LgSBMOLeGSG3+HkknrTlnJu6BCNdhYxbEQkGvBsr7zXlNWYUIhAQ==
   dependencies:
     fast-levenshtein "^2.0.6"
     global "^4.3.0"
