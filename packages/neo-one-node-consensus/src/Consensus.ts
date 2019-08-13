@@ -7,6 +7,7 @@ import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciter
 import { scan } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/scan';
 import { Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
+import semver from 'semver';
 import { initializeNewConsensus } from './common';
 import { ConsensusContext } from './ConsensusContext';
 import { ConsensusQueue } from './ConsensusQueue';
@@ -94,10 +95,14 @@ export class Consensus {
   public async runConsensusNow(): Promise<void> {
     const options = await this.options$.pipe(take(1)).toPromise();
     if (options.privateNet) {
-      // tslint:disable-next-line promise-must-complete
-      await new Promise((resolve, reject) => {
-        this.mutableQueue.write({ type: 'timer', promise: { resolve, reject } });
-      });
+      if (semver.satisfies(process.version, '<=8')) {
+        this.mutableQueue.write({ type: 'timer' });
+      } else {
+        // tslint:disable-next-line: promise-must-complete
+        await new Promise((resolve, reject) => {
+          this.mutableQueue.write({ type: 'timer', promise: { resolve, reject } });
+        });
+      }
     } else {
       throw new Error('Can only force consensus on a private network.');
     }
@@ -209,9 +214,11 @@ export class Consensus {
                 }
                 throw err;
               });
+
               if (event.promise !== undefined) {
                 event.promise.resolve();
               }
+
               break;
             default:
               commonUtils.assertNever(event);

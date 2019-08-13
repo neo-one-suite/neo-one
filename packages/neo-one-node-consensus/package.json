@@ -14,6 +14,7 @@
     "bn.js": "^4.11.8",
     "lodash": "^4.17.14",
     "rxjs": "^6.5.2",
+    "semver": "^6.3.0",
     "tslib": "^1.9.3"
   },
   "devDependencies": {

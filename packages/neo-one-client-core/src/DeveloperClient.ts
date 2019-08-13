@@ -1,4 +1,6 @@
 import { DeveloperProvider, PrivateNetworkSettings } from '@neo-one/client-common';
+import { enqueuePostPromiseJob } from '@neo-one/utils';
+import semver from 'semver';
 
 /**
  * Client which controls a development network.
@@ -16,7 +18,17 @@ export class DeveloperClient {
    */
   public async runConsensusNow(): Promise<void> {
     if (this.mutableRunConsensusNow === undefined) {
-      this.mutableRunConsensusNow = this.runConsensusNowInternal();
+      if (semver.satisfies(process.version, '<=8')) {
+        this.mutableRunConsensusNow = new Promise((resolve, reject) => {
+          enqueuePostPromiseJob(() => {
+            this.runConsensusNowInternal()
+              .then(resolve)
+              .catch(reject);
+          });
+        });
+      } else {
+        this.mutableRunConsensusNow = this.runConsensusNowInternal();
+      }
     }
 
     return this.mutableRunConsensusNow;
