@@ -9,7 +9,7 @@ export const checkServer = (args: CLIArgs) => {
   vorpal
     .command('check server', `Checks that the ${name.title} server is running. Primarily used for CI.`)
     .action(async () => {
-      const { serverConfig, shutdown } = setupServer('check-server', args);
+      const { serverConfig, shutdown } = setupServer(args);
 
       const [dataPath, port] = await combineLatest([
         serverConfig.config$.pipe(map((conf) => conf.paths.data)),

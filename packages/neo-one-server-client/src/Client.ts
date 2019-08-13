@@ -14,9 +14,9 @@ import { Observable, Observer, Subject } from 'rxjs';
 import { filter, map, publishReplay, refCount, take } from 'rxjs/operators';
 import { ReadError } from './errors';
 
-const packageDefinition = protoLoader.loadSync(proto, {});
-// tslint:disable-next-line no-any
-const { Server } = grpc.loadPackageDefinition(packageDefinition);
+const packageDefinition = protoLoader.loadSync(proto);
+const definition = grpc.loadPackageDefinition(packageDefinition);
+const { Server } = definition;
 
 type GRPCClient = grpc.Client & { readonly [key: string]: any };
 // tslint:disable-next-line readonly-keyword
@@ -62,7 +62,9 @@ export class Client {
   }
 
   public getPlugins$(): Observable<string> {
-    return this.makeReadObservable$(this.client.getPlugins()).pipe(map((response) => response.plugin));
+    const result = this.client.getPlugins();
+
+    return this.makeReadObservable$(result).pipe(map((response) => response.plugin));
   }
 
   public getAllResources$(): Observable<AllResources> {

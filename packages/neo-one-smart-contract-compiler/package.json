@@ -22,7 +22,6 @@
   },
   "devDependencies": {
     "@neo-one/client-switch": "^1.2.2",
-    "@neo-one/monitor": "^1.1.4",
     "@neo-one/node-blockchain": "^1.1.5",
     "@neo-one/node-neo-settings": "^1.1.5",
     "@neo-one/node-storage-levelup": "^1.2.1",

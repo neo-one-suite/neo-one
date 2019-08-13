@@ -707,7 +707,7 @@ const CLIENT_PACKAGES = new Set([
   '@neo-one/client-common',
   '@neo-one/client-core',
   '@neo-one/developer-tools',
-  '@neo-one/monitor',
+  '@neo-one/logger',
   '@neo-one/utils',
   '@neo-one/client-switch',
   '@neo-one/server-http-client',
@@ -909,8 +909,6 @@ const binProject = ts.createProject(MAIN_BIN_FORMAT.tsconfig, {
 });
 const binBanner = `#!/usr/bin/env node
 require('source-map-support').install({ handleUncaughtExceptions: false, environment: 'node' });
-const { defaultMetrics, metrics } = require('@neo-one/monitor');
-metrics.setFactory(defaultMetrics);
 `;
 gulp.task('compileBin', () =>
   gulpBin()
@@ -1041,10 +1039,7 @@ gulp.task(
   'watch',
   gulp.series(buildE2ESeries('fast'), function startWatch() {
     noCache = true;
-    gulp.watch(
-      globs.watchFiles.concat(globs.bin),
-      gulp.series(compileTypescript(MAIN_FORMAT, 'fast'), 'buildBin'),
-    );
+    gulp.watch(globs.watchFiles, compileTypescript(MAIN_FORMAT, 'fast'));
   }),
 );
 

@@ -1,5 +1,5 @@
 import { bodyParser, context, cors, createServer$, onError as appOnError } from '@neo-one/http';
-import { DefaultMonitor } from '@neo-one/monitor';
+import { editorLogger, getFinalLogger } from '@neo-one/logger';
 import { finalize } from '@neo-one/utils';
 import * as http from 'http';
 import Application from 'koa';
@@ -10,94 +10,43 @@ import { BehaviorSubject } from 'rxjs';
 import { pkgMiddleware } from './pkgMiddleware';
 import { resolveMiddleware } from './resolveMiddleware';
 
-const monitor = DefaultMonitor.create({
-  service: 'editor-server',
-  logger: {
-    log: (options) => {
-      if (
-        process.env.NODE_ENV !== 'production' ||
-        options.level === 'error' ||
-        options.level === 'warn' ||
-        options.level === 'info'
-      ) {
-        if (options.level === 'error') {
-          const { error, ...otherOptions } = options;
-          // tslint:disable-next-line no-console
-          console.error(error);
-          // tslint:disable-next-line no-console
-          console.log(otherOptions);
-        } else {
-          // tslint:disable-next-line no-console
-          console.log(options);
-        }
-      }
-    },
-    close: () => {
-      // do nothing
-    },
-  },
-});
-
-const mutableShudownFuncs: Array<() => Promise<void>> = [];
+const mutableShutdownFuncs: Array<() => Promise<void>> = [];
 
 const initiateShutdown = async () => {
-  await Promise.all(mutableShudownFuncs.map(async (func) => func()));
+  await Promise.all(mutableShutdownFuncs.map((func) => func()));
   await finalize.wait();
 };
 
-// tslint:disable-next-line no-let
+// tslint:disable-next-line:no-let
 let shutdownInitiated = false;
-const shutdown = ({
-  exitCode: exitCodeIn,
-  error,
-}: {
-  readonly exitCode: number;
-  readonly error?: Error | undefined;
-}) => {
-  const exitCode =
-    // tslint:disable-next-line no-any
-    error !== undefined && (error as any).exitCode != undefined && typeof (error as any).exitCode === 'number'
-      ? // tslint:disable-next-line no-any
-        (error as any).exitCode
-      : exitCodeIn;
+const shutdown = ({ exitCode, error: errorIn }: { readonly exitCode: number; readonly error?: Error | undefined }) => {
   if (!shutdownInitiated) {
     shutdownInitiated = true;
-    monitor
-      .captureLog(initiateShutdown, {
-        name: 'cli_shutdown',
-        message: 'Shutdown cleanly.',
-        error: 'Failed to shutdown cleanly',
-      })
+    const finalLogger = getFinalLogger(editorLogger);
+    errorIn
+      ? finalLogger.error({ exitCode, error: errorIn }, 'error, shutting down')
+      : finalLogger.info({ exitCode }, 'shutting down');
+
+    initiateShutdown()
       .then(() => {
-        monitor.close(() => {
-          process.exit(exitCode);
-        });
+        finalLogger.info({ exitCode }, 'shutdown');
+        process.exit(exitCode);
       })
-      .catch(() => {
-        monitor.close(() => {
-          process.exit(exitCode > 0 ? exitCode : 1);
-        });
+      .catch((error) => {
+        finalLogger.error({ exitCode, err: error }, 'shutdown (error)');
+        process.exit(1);
       });
   }
 };
 
 process.on('unhandledRejection', (errorIn) => {
   const error = errorIn as Error;
-  monitor.logError({
-    name: 'unhandled_rejection',
-    message: 'Unhandled rejection. Shutting down.',
-    error,
-  });
-
+  editorLogger.fatal({ title: 'unhandled_rejection', error: error.message }, 'Unhandled rejection. Shutting down.');
   shutdown({ exitCode: 1, error });
 });
 
 process.on('uncaughtException', (error) => {
-  monitor.logError({
-    name: 'uncaught_exception',
-    message: 'Uncaught exception. Shutting down.',
-    error,
-  });
+  editorLogger.fatal({ title: 'uncaught_exception', error: error.message }, 'Uncaught exception. Shutting down.');
 
   shutdown({ exitCode: 1, error });
 });
@@ -107,12 +56,12 @@ const app = new Application<any, {}>();
 app.proxy = true;
 app.silent = true;
 
-app.on('error', appOnError({ monitor }));
+app.on('error', appOnError(editorLogger));
 
 // tslint:disable-next-line:no-any
 const router = new Router<any, {}>();
 
-router.use(context({ monitor }));
+router.use(context(editorLogger));
 router.use(cors).post('resolveDependencies', '/resolve', compose([koaCompress(), bodyParser(), resolveMiddleware]));
 router.use(cors).get('resolvePackage', '/pkg', compose([koaCompress(), pkgMiddleware]));
 
@@ -123,26 +72,24 @@ app.use(router.allowedMethods());
 const app$ = new BehaviorSubject(app);
 const keepAliveTimeout$ = new BehaviorSubject(undefined);
 
-const susbcription = createServer$(monitor, app$, keepAliveTimeout$, { host: '0.0.0.0', port: 3001 }, () =>
+const subscription = createServer$(app$, keepAliveTimeout$, { host: '0.0.0.0', port: 3001 }, () =>
   http.createServer(),
 ).subscribe({
   error: (error) => {
-    monitor.logError({
-      name: 'uncaught_server_exception',
-      message: 'Uncaught exception. Shutting down.',
-      error,
-    });
+    editorLogger.error(
+      { title: 'uncaught_server_exception', error: error.message },
+      'Uncaught exception. Shutting down.',
+    );
 
     shutdown({ exitCode: 1, error });
   },
   complete: () => {
-    monitor.logError({
-      name: 'uncaught_server_complete',
-      message: 'Unexpected complete. Shutting down.',
-      error: new Error('Unexpected complete'),
-    });
+    editorLogger.error(
+      { title: 'uncaught_server_complete', error: new Error('Unexpected complete') },
+      'Unexpected complete. Shutting down.',
+    );
 
     shutdown({ exitCode: 1 });
   },
 });
-mutableShudownFuncs.push(async () => susbcription.unsubscribe());
+mutableShutdownFuncs.push(async () => subscription.unsubscribe());

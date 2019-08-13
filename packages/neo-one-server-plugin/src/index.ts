@@ -47,7 +47,6 @@ export {
   InteractiveCLI,
   InteractiveCLIArgs,
   InteractiveCommand,
-  LogConfig,
   ListTable,
   ExecuteTaskListResponse,
   PluginManager,

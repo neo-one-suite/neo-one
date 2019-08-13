@@ -1,5 +1,4 @@
 import { CallReceiptJSON, common, crypto, scriptHashToAddress, SourceMaps } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { test as testNet } from '@neo-one/node-neo-settings';
 import { storage } from '@neo-one/node-storage-levelup';
@@ -21,7 +20,6 @@ export const EXECUTE_OPTIONS_DEFAULT = {
 };
 
 export const executeScript = async (
-  monitor: Monitor,
   diagnostics: ReadonlyArray<ts.Diagnostic>,
   compiledCode: string,
   sourceMap: Promise<RawSourceMap>,
@@ -37,13 +35,12 @@ export const executeScript = async (
       db: LevelUp(MemDown()),
     }),
     vm,
-    monitor,
   });
 
   throwOnDiagnosticErrorOrWarning(diagnostics, ignoreWarnings);
 
   const code = Buffer.concat([prelude, Buffer.from(compiledCode, 'hex')]);
-  const [receipt, resolvedSourceMap] = await Promise.all([blockchain.invokeScript(code, monitor), sourceMap]);
+  const [receipt, resolvedSourceMap] = await Promise.all([blockchain.invokeScript(code), sourceMap]);
 
   const address = scriptHashToAddress(common.uInt160ToString(crypto.toScriptHash(code)));
   await blockchain.stop();

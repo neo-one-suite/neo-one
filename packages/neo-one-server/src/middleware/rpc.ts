@@ -1,5 +1,7 @@
-import { bodyParser, getMonitor } from '@neo-one/http';
-import { KnownLabel, metrics, Monitor } from '@neo-one/monitor';
+import { AggregationType, globalStats, MeasureUnit, TagMap } from '@neo-one/client-switch';
+import { bodyParser, getLogger } from '@neo-one/http';
+import { Logger } from '@neo-one/logger';
+import { Labels, labelToTag } from '@neo-one/utils';
 import { Context } from 'koa';
 import compose from 'koa-compose';
 import koaCompress from 'koa-compress';
@@ -13,22 +15,29 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   INVALID: 'INVALID',
 };
 
-const rpcLabelNames: readonly string[] = [KnownLabel.RPC_METHOD];
-const rpcLabels = Object.values(RPC_METHODS).map((method) => ({
-  [KnownLabel.RPC_METHOD]: method,
-}));
+const rpcTag = labelToTag(Labels.RPC_METHOD);
 
-const SINGLE_REQUESTS_HISTOGRAM = metrics.createHistogram({
-  name: 'http_rpc_server_single_request_duration_seconds',
-  labelNames: rpcLabelNames,
-  labels: rpcLabels,
-});
+const durationMS = globalStats.createMeasureInt64('request/duration', MeasureUnit.SEC);
+const requestsFailures = globalStats.createMeasureInt64('request/failures', MeasureUnit.UNIT);
 
-const SINGLE_REQUEST_ERRORS_COUNTER = metrics.createCounter({
-  name: 'http_rpc_server_single_request_failures_total',
-  labelNames: rpcLabelNames,
-  labels: rpcLabels,
-});
+const SINGLE_REQUESTS_HISTOGRAM = globalStats.createView(
+  'http_rpc_server_single_request_duration_seconds',
+  durationMS,
+  AggregationType.DISTRIBUTION,
+  [rpcTag],
+  'distribution of single requests duration',
+  [1, 2, 5, 7.5, 10, 12.5, 15, 17.5, 20],
+);
+globalStats.registerView(SINGLE_REQUESTS_HISTOGRAM);
+
+const SINGLE_REQUEST_ERRORS_COUNTER = globalStats.createView(
+  'http_rpc_server_single_request_failures_total',
+  requestsFailures,
+  AggregationType.COUNT,
+  [rpcTag],
+  'total number of rpc request failures',
+);
+globalStats.registerView(SINGLE_REQUEST_ERRORS_COUNTER);
 
 interface RPCRequest {
   readonly method: string;
@@ -58,78 +67,94 @@ export const rpc = ({ server }: { readonly server: Server }) => {
   };
 
   // tslint:disable-next-line no-any
-  const handleSingleRequest = async (monitor: Monitor, requestIn: any) =>
-    monitor.captureSpanLog(
-      async (span) => {
-        let request;
-        try {
-          request = validateRequest(requestIn);
-        } finally {
-          let method = RPC_METHODS.UNKNOWN;
-          if (request !== undefined) {
-            ({ method } = request);
-          } else if (typeof requestIn === 'object') {
-            ({ method } = requestIn);
-          }
-
-          if ((RPC_METHODS[method] as string | undefined) === undefined) {
-            method = RPC_METHODS.INVALID;
-          }
-
-          span.setLabels({ [span.labels.RPC_METHOD]: method });
+  const handleSingleRequest = async (logger: Logger, requestIn: any) => {
+    let result: RPCResult;
+    const startTime = Date.now();
+    let request;
+    let method = RPC_METHODS.UNKNOWN;
+    try {
+      try {
+        request = validateRequest(requestIn);
+      } finally {
+        if (request !== undefined) {
+          ({ method } = request);
+        } else if (typeof requestIn === 'object') {
+          ({ method } = requestIn);
         }
 
-        let result: RPCResult;
-        switch (request.method) {
-          case 'executeTaskList':
-            await server.pluginManager
-              .getPlugin({ plugin: request.plugin })
-              .executeTaskList(server.pluginManager, JSON.stringify(request.options))
-              .toPromise();
-            result = { type: 'ok', message: 'Success!' };
-            break;
-          case 'request':
-            const response = await server.pluginManager
-              .getPlugin({ plugin: request.plugin })
-              .request(server.pluginManager, JSON.stringify(request.options));
-            result = { type: 'ok', response };
-            break;
-          case 'ready':
-            result = { type: 'ok' };
-            break;
-          default:
-            throw new Error('Method not found');
+        if ((RPC_METHODS[method] as string | undefined) === undefined) {
+          method = RPC_METHODS.INVALID;
         }
+      }
 
-        return result;
-      },
-      {
-        name: 'http_rpc_server_single_request',
-        metric: {
-          total: SINGLE_REQUESTS_HISTOGRAM,
-          error: SINGLE_REQUEST_ERRORS_COUNTER,
-        },
+      switch (request.method) {
+        case 'executeTaskList':
+          await server.pluginManager
+            .getPlugin({ plugin: request.plugin })
+            .executeTaskList(server.pluginManager, JSON.stringify(request.options))
+            .toPromise();
+          result = { type: 'ok', message: 'Success!' };
+          break;
+        case 'request':
+          const response = await server.pluginManager
+            .getPlugin({ plugin: request.plugin })
+            .request(server.pluginManager, JSON.stringify(request.options));
+          result = { type: 'ok', response };
+          break;
+        case 'ready':
+          result = { type: 'ok' };
+          break;
+        default:
+          throw new Error('Method not found');
+      }
+      logger.debug({ title: 'http_rpc_server_single_request', [Labels.RPC_METHOD]: request.method });
 
-        level: { log: 'verbose', span: 'info' },
-      },
-    );
+      const tags = new TagMap();
+      tags.set(rpcTag, { value: method });
+      globalStats.record(
+        [
+          {
+            measure: durationMS,
+            value: Date.now() - startTime,
+          },
+        ],
+        tags,
+      );
+    } catch (error) {
+      logger.error({ title: 'http_rpc_server_single_request', error });
 
-  const handleRequest = (monitor: Monitor, request: {}) => {
-    if (Array.isArray(request)) {
-      return Promise.all(request.map(async (batchRequest) => handleSingleRequest(monitor, batchRequest)));
+      const tags = new TagMap();
+      tags.set(rpcTag, { value: method });
+      globalStats.record(
+        [
+          {
+            measure: requestsFailures,
+            value: 1,
+          },
+        ],
+        tags,
+      );
+      throw error;
     }
 
-    return handleSingleRequest(monitor, request);
+    return result;
   };
 
-  const handleRequestSafe = async (monitor: Monitor, request: {}): Promise<object | object[]> => {
+  const handleRequest = async (logger: Logger, request: {}) => {
+    if (Array.isArray(request)) {
+      return Promise.all(request.map(async (batchRequest) => handleSingleRequest(logger, batchRequest)));
+    }
+
+    return handleSingleRequest(logger, request);
+  };
+
+  const handleRequestSafe = async (logger: Logger, request: {}): Promise<RPCResult | RPCResult[]> => {
     try {
       // tslint:disable-next-line prefer-immediate-return
-      const result = await monitor.captureSpanLog(async (span) => handleRequest(span, request), {
-        name: 'http_rpc_server_request',
-        level: { log: 'verbose', span: 'info' },
-        error: {},
-      });
+      const result = await handleRequest(logger, request);
+      // name: 'http_rpc_server_request',
+      // level: { log: 'debug', span: 'info' },
+      // error: {},
 
       // tslint:disable-next-line no-var-before-return
       return result;
@@ -154,8 +179,8 @@ export const rpc = ({ server }: { readonly server: Server }) => {
 
         // tslint:disable-next-line no-any
         const { body } = ctx.request as any;
-        const monitor = getMonitor(ctx);
-        const result = await handleRequestSafe(monitor.withLabels({ [monitor.labels.RPC_TYPE]: 'http' }), body);
+        const logger = getLogger(ctx);
+        const result = await handleRequestSafe(logger, body);
 
         ctx.status = 200;
         ctx.body = result;

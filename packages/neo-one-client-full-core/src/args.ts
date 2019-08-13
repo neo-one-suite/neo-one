@@ -37,8 +37,6 @@ export const assertIterOptions = (name: string, options?: unknown): IterOptions 
   const output = {
     indexStart: args.assertProperty(options, 'IterOptions', 'indexStart', assertNullableNumber),
     indexStop: args.assertProperty(options, 'IterOptions', 'indexStop', assertNullableNumber),
-    // tslint:disable-next-line no-any
-    monitor: (options as any).monitor,
   };
 
   if (output.indexStart !== undefined && output.indexStop !== undefined && output.indexStart > output.indexStop) {

@@ -1,12 +1,15 @@
-import { Monitor } from '@neo-one/monitor';
-import { labels, utils } from '@neo-one/utils';
+import { addAttributesToSpan, Span, SpanKind, tracer } from '@neo-one/client-switch';
+import { Labels } from '@neo-one/utils';
 // tslint:disable-next-line match-default-export-name
 import _fetch from 'cross-fetch';
 import DataLoader from 'dataloader';
+import debug from 'debug';
 import stringify from 'safe-stable-stringify';
 import { HTTPError, InvalidRPCResponseError, JSONRPCError } from '../errors';
 import { AbortController } from './AbortController.ponyfill';
 import { JSONRPCProvider, JSONRPCRequest } from './JSONRPCProvider';
+
+const logger = debug('NEOONE:JSONRPCProvider');
 
 const TIMEOUT_MS = 20000;
 const WATCH_TIMEOUT_MS = 5000;
@@ -56,44 +59,47 @@ const instrumentFetch = async <T extends { readonly status: number }>(
   doFetch: (headers: Record<string, string>) => Promise<T>,
   endpoint: string,
   type: 'fetch' | 'watch',
-  monitor?: Monitor,
-  monitors: readonly Monitor[] = [],
+  span: Span,
 ) => {
-  const headers = {
+  // tslint:disable-next-line: no-any
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
+  const labels = {
+    [Labels.HTTP_URL]: endpoint,
+    [Labels.HTTP_METHOD]: 'POST',
+    [Labels.JSONRPC_TYPE]: type,
+  };
 
-  if (monitor === undefined) {
-    return doFetch(headers);
+  addAttributesToSpan(span, labels);
+
+  try {
+    if (tracer.active) {
+      tracer.propagation.inject(
+        {
+          setHeader: (name: string, value: string) => {
+            // tslint:disable-next-line: no-object-mutation
+            headers[name] = value;
+          },
+        },
+        span.spanContext,
+      );
+    }
+
+    let status = -1;
+    try {
+      const resp = await doFetch(headers);
+      status = resp.status;
+      logger('%o', { level: 'debug', title: 'http_client_request', ...labels });
+
+      return resp;
+    } finally {
+      span.addAttribute(Labels.HTTP_STATUS_CODE, status);
+    }
+  } catch (error) {
+    logger('%o', { level: 'error', title: 'http_client_request', ...labels, error: error.message });
+    throw error;
   }
-
-  return monitor
-    .withLabels({
-      [monitor.labels.HTTP_URL]: endpoint,
-      [monitor.labels.HTTP_METHOD]: 'POST',
-      [labels.JSONRPC_TYPE]: type,
-    })
-    .captureSpanLog(
-      async (span) => {
-        // tslint:disable-next-line no-any
-        span.inject(monitor.formats.HTTP, headers as any);
-        let status = -1;
-        try {
-          const resp = await doFetch(headers);
-          status = resp.status;
-
-          return resp;
-        } finally {
-          span.setLabels({ [monitor.labels.HTTP_STATUS_CODE]: status });
-        }
-      },
-      {
-        name: 'http_client_request',
-        level: { log: 'verbose', span: 'info' },
-        references: monitors.slice(1).map((parent) => monitor.childOf(parent)),
-        trace: true,
-      },
-    );
 };
 
 const doRequest = async ({
@@ -103,13 +109,12 @@ const doRequest = async ({
   tries,
 }: {
   readonly endpoint: string;
-  readonly requests: ReadonlyArray<{ readonly monitor?: Monitor; readonly request: object }>;
+  readonly requests: ReadonlyArray<{ readonly span: Span; readonly request: object }>;
   readonly timeoutMS: number;
   readonly tries: number;
 }) => {
-  const monitors = requests.map((req) => req.monitor).filter(utils.notNull);
-  const monitor = monitors[0];
   const body = JSON.stringify(requests.map((req) => req.request));
+  const span = requests[0].span;
 
   let remainingTries = tries;
   let parseErrorTries = 3;
@@ -138,8 +143,7 @@ const doRequest = async ({
           ),
         endpoint,
         'fetch',
-        monitor,
-        monitors,
+        span,
       );
 
       if (!response.ok) {
@@ -195,12 +199,12 @@ const watchSingle = async ({
   endpoint,
   req,
   timeoutMS,
-  monitor,
+  span,
 }: {
   readonly endpoint: string;
   readonly req: object;
   readonly timeoutMS: number;
-  readonly monitor?: Monitor;
+  readonly span: Span;
   // tslint:disable-next-line: no-any
 }): Promise<any> => {
   const response = await instrumentFetch(
@@ -216,7 +220,7 @@ const watchSingle = async ({
       ),
     endpoint,
     'watch',
-    monitor,
+    span,
   );
 
   if (!response.ok) {
@@ -233,7 +237,7 @@ const watchSingle = async ({
         endpoint,
         req,
         timeoutMS,
-        monitor,
+        span,
       });
     }
     throw new HTTPError(response.status, text);
@@ -248,7 +252,7 @@ const watchSingle = async ({
 export class JSONRPCHTTPProvider extends JSONRPCProvider {
   public readonly endpoint: string;
   // tslint:disable-next-line no-any
-  public readonly batcher: DataLoader<{ readonly monitor?: Monitor; readonly request: any }, any>;
+  public readonly batcher: DataLoader<{ readonly span: Span; readonly request: any }, any>;
 
   public constructor(endpoint: string) {
     super();
@@ -272,28 +276,33 @@ export class JSONRPCHTTPProvider extends JSONRPCProvider {
   }
 
   // tslint:disable-next-line no-any
-  public async request(req: JSONRPCRequest, monitor?: Monitor): Promise<any> {
-    if (monitor !== undefined) {
-      return monitor
-        .at('jsonrpc_http_provider')
-        .withLabels({
-          [monitor.labels.RPC_TYPE]: 'jsonrpc',
-          [monitor.labels.RPC_METHOD]: req.method,
-          [monitor.labels.SPAN_KIND]: 'client',
-        })
-        .captureSpanLog(async (span) => this.requestInternal(req, span), {
-          name: 'jsonrpc_client_request',
-          level: { log: 'verbose', span: 'info' },
-          error: { level: 'verbose' },
-          trace: true,
-        });
-    }
+  public async request(req: JSONRPCRequest): Promise<any> {
+    const labels = {
+      [Labels.RPC_TYPE]: 'jsonrpc',
+      [Labels.RPC_METHOD]: req.method,
+      [Labels.SPAN_KIND]: 'client',
+    };
 
-    return this.requestInternal(req);
+    return tracer.startRootSpan({ name: 'json_rpc_client_request', kind: SpanKind.CLIENT }, async (span) => {
+      addAttributesToSpan(span, labels);
+
+      try {
+        const result = await this.requestInternal(req, span);
+        logger({ level: 'debug', title: 'jsonrpc_client_request', ...labels });
+
+        return result;
+      } catch (error) {
+        logger({ level: 'error', title: 'jsonrpc_client_request', ...labels, error: error.message });
+
+        throw error;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   // tslint:disable-next-line no-any
-  private async requestInternal(req: JSONRPCRequest, monitor?: Monitor): Promise<any> {
+  private async requestInternal(req: JSONRPCRequest, span: Span): Promise<any> {
     let response;
     const { watchTimeoutMS, params = [] } = req;
     if (watchTimeoutMS !== undefined) {
@@ -305,13 +314,12 @@ export class JSONRPCHTTPProvider extends JSONRPCProvider {
           method: req.method,
           params: params.concat([watchTimeoutMS]),
         },
-
+        span,
         timeoutMS: watchTimeoutMS,
-        monitor,
       });
     } else {
       response = await this.batcher.load({
-        monitor,
+        span,
         request: {
           jsonrpc: '2.0',
           id: 1,

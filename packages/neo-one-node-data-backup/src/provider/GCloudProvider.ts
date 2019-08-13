@@ -1,12 +1,14 @@
 // tslint:disable-next-line:no-submodule-imports
 import { File } from '@google-cloud/storage/build/src/file';
-import { Monitor } from '@neo-one/monitor';
+import { nodeLogger } from '@neo-one/logger';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Environment } from '../types';
 import { extract } from './extract';
 import { Provider } from './Provider';
 import { upload } from './upload';
+
+const logger = nodeLogger.child({ component: 'gcloud_provider' });
 
 export interface Options {
   readonly projectID: string;
@@ -38,8 +40,7 @@ export class GCloudProvider extends Provider {
     return time !== undefined;
   }
 
-  public async restore(monitorIn: Monitor): Promise<void> {
-    const monitor = monitorIn.at('gcloud_provider');
+  public async restore(): Promise<void> {
     const { prefix } = this.options;
     const { dataPath, tmpPath } = this.environment;
 
@@ -58,28 +59,30 @@ export class GCloudProvider extends Provider {
 
     // tslint:disable-next-line no-loop-statement
     for (const { file, filePath } of fileAndPaths) {
-      await monitor
-        .withData({ filePath })
-        .captureSpanLog(async () => file.download({ destination: filePath, validation: true }), {
-          name: 'neo_restore_download',
-        });
+      try {
+        await file.download({ destination: filePath, validation: true });
+        logger.info({ filePath, title: 'neo_restore_download' });
+      } catch (error) {
+        logger.error({ filePath, title: 'neo_restore_download', error });
+        throw error;
+      }
     }
     await Promise.all(
-      fileAndPaths.map(async ({ filePath }) =>
-        monitor.withData({ filePath }).captureSpanLog(
-          async () =>
-            extract({
-              downloadPath: filePath,
-              dataPath,
-            }),
-          { name: 'neo_restore_extract' },
-        ),
-      ),
+      fileAndPaths.map(async ({ filePath }) => {
+        try {
+          await extract({
+            downloadPath: filePath,
+            dataPath,
+          });
+          logger.info({ filePath, title: 'neo_restore_extract' });
+        } catch (error) {
+          logger.error({ filePath, title: 'neo_restore_extract', error });
+        }
+      }),
     );
   }
 
-  public async backup(monitorIn: Monitor): Promise<void> {
-    const monitor = monitorIn.at('gcloud_provider');
+  public async backup(): Promise<void> {
     const { bucket, prefix, keepBackupCount = KEEP_BACKUP_COUNT, maxSizeBytes = MAX_SIZE } = this.options;
     const { dataPath } = this.environment;
 
@@ -115,50 +118,57 @@ export class GCloudProvider extends Provider {
     const time = Math.round(Date.now() / 1000);
     // tslint:disable-next-line no-loop-statement
     for (const [idx, fileList] of mutableFileLists.entries()) {
-      await monitor.withData({ part: idx }).captureSpanLog(
-        async () =>
-          upload({
-            dataPath,
-            write: storage
-              .bucket(bucket)
-              .file([prefix, `${time}`, `storage_part_${idx}.db.tar.gz`].join('/'))
-              .createWriteStream({ validation: true }),
-            fileList,
-          }),
-        { name: 'neo_backup_push' },
-      );
+      try {
+        await upload({
+          dataPath,
+          write: storage
+            .bucket(bucket)
+            .file([prefix, `${time}`, `storage_part_${idx}.db.tar.gz`].join('/'))
+            .createWriteStream({ validation: true }),
+          fileList,
+        });
+        logger.info({ part: idx, title: 'neo_backup_push' });
+      } catch (error) {
+        logger.error({ part: idx, title: 'neo_backup_push', error });
+        throw error;
+      }
+    }
+    try {
+      await storage
+        .bucket(bucket)
+        .file([prefix, `${time}`, METADATA_NAME].join('/'))
+        .save('', undefined);
+      logger.info({ title: 'neo_backup_push' });
+    } catch (error) {
+      logger.error({ title: 'neo_backup_push', error });
+      throw error;
     }
 
-    await monitor.captureSpanLog<Promise<void>>(
-      async () =>
-        storage
-          .bucket(bucket)
-          .file([prefix, `${time}`, METADATA_NAME].join('/'))
-          .save('', undefined),
-      { name: 'neo_backup_push' },
-    );
+    let fileNames: File[];
+    try {
+      const result = await storage.bucket(bucket).getFiles({ prefix });
+      [fileNames] = result;
+      logger.info({ title: 'neo_backup_list_files' });
+    } catch (error) {
+      logger.error({ title: 'neo_backup_list_files', error });
+      throw error;
+    }
 
-    const [fileNames] = await monitor.captureSpanLog(
-      // tslint:disable-next-line no-any no-void-expression no-use-of-empty-return-value
-      async () => (storage.bucket(bucket).getFiles({ prefix }) as any) as Promise<[File[]]>,
-      {
-        name: 'neo_backup_list_files',
-      },
-    );
     const times = [...new Set(fileNames.map((file) => extractTime(prefix, file)))];
     // tslint:disable-next-line no-array-mutation
     times.sort();
 
     const deleteTimes = times.slice(0, -keepBackupCount);
-    await monitor.captureSpanLog<Promise<void[]>>(
-      async () =>
-        Promise.all(
-          deleteTimes.map(async (deleteTime) =>
-            storage.bucket(bucket).deleteFiles({ prefix: [prefix, `${deleteTime}`].join('/') }),
-          ),
+    try {
+      await Promise.all(
+        deleteTimes.map(async (deleteTime) =>
+          storage.bucket(bucket).deleteFiles({ prefix: [prefix, `${deleteTime}`].join('/') }),
         ),
-      { name: 'neo_backup_delete_old' },
-    );
+      );
+      logger.info({ title: 'neo_backup_delete_old' });
+    } catch (error) {
+      logger.error({ title: 'neo_backup_delete_old', error });
+    }
   }
 
   private async getLatestTime(): Promise<{

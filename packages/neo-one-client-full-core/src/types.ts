@@ -28,7 +28,6 @@ import {
   Transfer,
   UserAccountProvider as UserAccountProviderLite,
 } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 
 export interface AssetRegister {
@@ -92,17 +91,17 @@ export interface UserAccountProviders {
 
 export interface DataProvider {
   readonly network: NetworkType;
-  readonly getAccount: (address: AddressString, monitor?: Monitor) => Promise<Account>;
-  readonly getAsset: (hash: Hash256String, monitor?: Monitor) => Promise<Asset>;
+  readonly getAccount: (address: AddressString) => Promise<Account>;
+  readonly getAsset: (hash: Hash256String) => Promise<Asset>;
   readonly getBlock: (hashOrIndex: number | Hash256String, options?: GetOptions) => Promise<Block>;
   readonly iterBlocks: (options?: IterOptions) => AsyncIterable<Block>;
-  readonly getBestBlockHash: (monitor?: Monitor) => Promise<Hash256String>;
-  readonly getBlockCount: (monitor?: Monitor) => Promise<number>;
-  readonly getContract: (address: AddressString, monitor?: Monitor) => Promise<Contract>;
-  readonly getMemPool: (monitor?: Monitor) => Promise<readonly Hash256String[]>;
-  readonly getTransaction: (hash: Hash256String, monitor?: Monitor) => Promise<Transaction>;
-  readonly getOutput: (input: Input, monitor?: Monitor) => Promise<Output>;
-  readonly getConnectedPeers: (monitor?: Monitor) => Promise<readonly Peer[]>;
+  readonly getBestBlockHash: () => Promise<Hash256String>;
+  readonly getBlockCount: () => Promise<number>;
+  readonly getContract: (address: AddressString) => Promise<Contract>;
+  readonly getMemPool: () => Promise<readonly Hash256String[]>;
+  readonly getTransaction: (hash: Hash256String) => Promise<Transaction>;
+  readonly getOutput: (input: Input) => Promise<Output>;
+  readonly getConnectedPeers: () => Promise<readonly Peer[]>;
 }
 
 export interface InvokeExecuteTransactionOptions extends TransactionOptions {

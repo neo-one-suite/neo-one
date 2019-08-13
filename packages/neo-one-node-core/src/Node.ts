@@ -1,4 +1,3 @@
-import { Monitor } from '@neo-one/monitor';
 import { Block } from './Block';
 import { Blockchain, VerifyTransactionResult } from './Blockchain';
 import { Endpoint } from './net';
@@ -26,7 +25,7 @@ export interface Node {
     options?: { readonly throwVerifyError?: boolean; readonly forceAdd?: boolean },
   ) => Promise<RelayTransactionResult>;
   readonly relayConsensusPayload: (payload: ConsensusPayload) => void;
-  readonly relayBlock: (block: Block, monitor?: Monitor) => Promise<void>;
+  readonly relayBlock: (block: Block) => Promise<void>;
   readonly connectedPeers: readonly Endpoint[];
   readonly memPool: { readonly [hash: string]: Transaction };
   readonly syncMemPool: () => void;

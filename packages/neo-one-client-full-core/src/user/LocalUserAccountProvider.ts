@@ -38,7 +38,6 @@ import {
 } from '@neo-one/client-core';
 import { ContractModel, getContractProperties, IssueTransactionModel } from '@neo-one/client-full-common';
 import { processActionsAndMessage, processConsoleLogMessages } from '@neo-one/client-switch';
-import { Monitor } from '@neo-one/monitor';
 import { utils as commonUtils } from '@neo-one/utils';
 import { NothingToIssueError } from '../errors';
 import {
@@ -112,7 +111,7 @@ const toAssetType = (assetType: AssetType): AssetTypeModel => {
 };
 
 export interface Provider extends ProviderLite {
-  readonly getNetworkSettings: (network: NetworkType, monitor?: Monitor) => Promise<NetworkSettings>;
+  readonly getNetworkSettings: (network: NetworkType) => Promise<NetworkSettings>;
   readonly read: (network: NetworkType) => DataProvider;
 }
 
@@ -223,20 +222,19 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     transfers: readonly Transfer[],
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt, IssueTransaction>> {
-    const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
+    const { from, attributes, networkFee } = this.getTransactionOptions(options);
 
     return this.capture(
-      async (span) => {
+      async () => {
         if (transfers.length === 0) {
           throw new NothingToIssueError();
         }
 
-        const settings = await this.provider.getNetworkSettings(from.network, span);
+        const settings = await this.provider.getNetworkSettings(from.network);
         const { inputs, outputs } = await this.getTransfersInputOutputs({
           transfers: [],
           from,
           gas: networkFee.plus(settings.issueGASFee),
-          monitor: span,
         });
 
         const issueOutputs = outputs.concat(
@@ -258,14 +256,11 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
           from,
           transaction,
           onConfirm: async ({ receipt }) => receipt,
-          monitor: span,
         });
       },
       {
-        name: 'neo_issue',
+        title: 'neo_issue',
       },
-
-      monitor,
     );
   }
 

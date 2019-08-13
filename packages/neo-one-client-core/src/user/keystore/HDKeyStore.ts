@@ -1,11 +1,13 @@
 import { Account, AddressString, NetworkType, UserAccount, UserAccountID } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import { mergeScanLatest, utils } from '@neo-one/utils';
+import debug from 'debug';
 import _ from 'lodash';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { UnknownAccountError, UnknownNetworkError } from '../../errors';
 import { KeyStore } from '../LocalUserAccountProvider';
+
+const logger = debug('NEOONE:HDKeystore');
 
 export interface HDAccount<Identifier> {
   readonly identifier: Identifier;
@@ -17,13 +19,14 @@ type HDAccounts<Identifier> = {
 };
 
 export interface HDProvider {
-  readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
+  readonly getAccount: (network: NetworkType, address: AddressString) => Promise<Account>;
   readonly getNetworks: () => readonly NetworkType[];
   readonly networks$: Observable<readonly NetworkType[]>;
 }
 
 export interface HDHandler<Identifier> {
   readonly byteLimit?: number;
+  readonly suffix?: string;
   readonly scanAccounts: (network: NetworkType, maxOffset?: number) => Promise<ReadonlyArray<HDAccount<Identifier>>>;
   readonly sign: (options: { readonly message: Buffer; readonly account: Identifier }) => Promise<Buffer>;
   readonly close: () => Promise<void>;
@@ -57,6 +60,8 @@ export class HDKeyStore<Identifier> implements KeyStore {
   private readonly provider: HDProvider;
   private readonly handler: HDHandler<Identifier>;
   private readonly accountsSubscription: Subscription;
+  // tslint:disable-next-line: no-any
+  private readonly logger: (...args: any) => void;
 
   private readonly currentUserAccountInternal$: BehaviorSubject<UserAccount | undefined>;
   private readonly userAccountsInternal$: BehaviorSubject<readonly UserAccount[]>;
@@ -66,6 +71,7 @@ export class HDKeyStore<Identifier> implements KeyStore {
   public constructor(provider: HDProvider, handler: HDHandler<Identifier>) {
     this.provider = provider;
     this.handler = handler;
+    this.logger = handler.suffix ? debug(`NEOONE:HDKeystore:${handler.suffix}`) : debug('NEOONE:HDKeystore');
 
     this.byteLimit = handler.byteLimit;
 
@@ -143,7 +149,7 @@ export class HDKeyStore<Identifier> implements KeyStore {
     return this.provider.getNetworks();
   }
 
-  public async selectUserAccount(id?: UserAccountID, _monitor?: Monitor): Promise<void> {
+  public async selectUserAccount(id?: UserAccountID): Promise<void> {
     if (id === undefined) {
       this.currentUserAccountInternal$.next(undefined);
     } else {
@@ -155,25 +161,19 @@ export class HDKeyStore<Identifier> implements KeyStore {
   public async sign({
     account,
     message,
-    monitor,
   }: {
     readonly account: UserAccountID;
     readonly message: string;
-    readonly monitor?: Monitor;
   }): Promise<string> {
-    return this.capture(
-      async () => {
-        const hdAccount = this.getHDAccount(account);
-        const response = await this.handler.sign({
-          message: Buffer.from(message, 'hex'),
-          account: hdAccount.identifier,
-        });
+    return this.capture(async () => {
+      const hdAccount = this.getHDAccount(account);
+      const response = await this.handler.sign({
+        message: Buffer.from(message, 'hex'),
+        account: hdAccount.identifier,
+      });
 
-        return response.toString('hex');
-      },
-      'neo_sign',
-      monitor,
-    );
+      return response.toString('hex');
+    }, 'neo_sign');
   }
 
   public async close(): Promise<void> {
@@ -200,15 +200,15 @@ export class HDKeyStore<Identifier> implements KeyStore {
     return account;
   }
 
-  private async capture<T>(func: (monitor?: Monitor) => Promise<T>, name: string, monitor?: Monitor): Promise<T> {
-    if (monitor === undefined) {
-      return func();
-    }
+  private async capture<T>(func: () => Promise<T>, title: string): Promise<T> {
+    try {
+      const result = await func();
+      logger('%o', { title, level: 'debug' });
 
-    return monitor.at('hd_key_store').captureSpanLog(func, {
-      name,
-      level: { log: 'verbose', span: 'info' },
-      trace: true,
-    });
+      return result;
+    } catch (error) {
+      logger('%o', { title, level: 'error', error: error.message });
+      throw error;
+    }
   }
 }

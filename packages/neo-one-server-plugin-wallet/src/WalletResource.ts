@@ -9,7 +9,7 @@ import { LocalWallet, NEOONEDataProvider } from '@neo-one/client-core';
 import { ReadClient } from '@neo-one/client-full-core';
 import { compoundName, DescribeTable, PluginManager } from '@neo-one/server-plugin';
 import { constants as networkConstants, Network } from '@neo-one/server-plugin-network';
-import { labels } from '@neo-one/utils';
+import { Labels } from '@neo-one/utils';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { combineLatest, Observable, timer } from 'rxjs';
@@ -405,11 +405,10 @@ export class WalletResource {
         this.mutableNeoBalance = neoBalance;
         this.mutableGasBalance = gasBalance;
       } catch (error) {
-        this.resourceType.plugin.monitor.withData({ [labels.NEO_ADDRESS]: this.address }).logError({
-          name: 'neo_wallet_resource_update_wallet',
-          message: `Failed to update wallet ${this.address}`,
-          error,
-        });
+        this.resourceType.plugin.logger.error(
+          { title: 'neo_wallet_resource_update_wallet', [Labels.NEO_ADDRESS]: this.address, error },
+          `Failed to update wallet ${this.address}`,
+        );
       }
     }
   }

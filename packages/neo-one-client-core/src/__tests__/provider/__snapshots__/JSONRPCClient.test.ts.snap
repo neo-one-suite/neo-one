@@ -9,7 +9,6 @@ Array [
         10,
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -23,7 +22,6 @@ Array [
         10,
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -37,7 +35,6 @@ Array [
         "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -51,7 +48,6 @@ Array [
         "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -65,7 +61,6 @@ Array [
         "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -76,7 +71,6 @@ Array [
     Object {
       "method": "getbestblockhash",
     },
-    undefined,
   ],
 ]
 `;
@@ -92,7 +86,6 @@ Array [
       ],
       "watchTimeoutMS": undefined,
     },
-    undefined,
   ],
 ]
 `;
@@ -108,7 +101,6 @@ Array [
       ],
       "watchTimeoutMS": 1000,
     },
-    undefined,
   ],
 ]
 `;
@@ -119,7 +111,6 @@ Array [
     Object {
       "method": "getblockcount",
     },
-    undefined,
   ],
 ]
 `;
@@ -134,7 +125,6 @@ Array [
         2,
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -145,7 +135,6 @@ Array [
     Object {
       "method": "getpeers",
     },
-    undefined,
   ],
 ]
 `;
@@ -159,7 +148,6 @@ Array [
         "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -173,7 +161,6 @@ Array [
         "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -184,7 +171,6 @@ Array [
     Object {
       "method": "getrawmempool",
     },
-    undefined,
   ],
 ]
 `;
@@ -195,7 +181,6 @@ Array [
     Object {
       "method": "getnetworksettings",
     },
-    undefined,
   ],
 ]
 `;
@@ -210,7 +195,6 @@ Array [
         2,
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -221,7 +205,6 @@ Array [
     Object {
       "method": "getsettings",
     },
-    undefined,
   ],
 ]
 `;
@@ -236,7 +219,6 @@ Array [
         1,
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -251,7 +233,6 @@ Array [
       ],
       "watchTimeoutMS": 1000,
     },
-    undefined,
   ],
 ]
 `;
@@ -266,7 +247,6 @@ Array [
         2,
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -281,7 +261,6 @@ Array [
         2,
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -295,7 +274,6 @@ Array [
         "b500",
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -309,7 +287,6 @@ Array [
         "b500",
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -323,7 +300,6 @@ Array [
         "b500",
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -334,7 +310,6 @@ Array [
     Object {
       "method": "reset",
     },
-    undefined,
   ],
 ]
 `;
@@ -345,7 +320,6 @@ Array [
     Object {
       "method": "runconsensusnow",
     },
-    undefined,
   ],
 ]
 `;
@@ -359,7 +333,6 @@ Array [
         "b500",
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -373,7 +346,6 @@ Array [
         "b500",
       ],
     },
-    undefined,
   ],
 ]
 `;
@@ -389,7 +361,6 @@ Array [
         },
       ],
     },
-    undefined,
   ],
 ]
 `;

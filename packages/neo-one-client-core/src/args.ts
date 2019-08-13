@@ -679,7 +679,5 @@ export const assertTransactionOptions = (name: string, options?: unknown): Trans
     ),
     networkFee: assertProperty(options, 'TransactionOptions', 'networkFee', assertNullableBigNumber),
     systemFee: assertProperty(options, 'TransactionOptions', 'systemFee', assertNullableBigNumber),
-    // tslint:disable-next-line no-any
-    monitor: (options as any).monitor,
   };
 };

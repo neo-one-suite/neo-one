@@ -21,7 +21,6 @@ import {
   TransactionJSON,
   TransactionReceiptJSON,
 } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import { RelayTransactionError } from '../errors';
 import { JSONRPCProvider, JSONRPCProviderManager } from './JSONRPCProvider';
@@ -33,116 +32,91 @@ export class JSONRPCClient {
     this.provider = provider;
   }
 
-  public async getAccount(address: AddressString, monitor?: Monitor): Promise<AccountJSON> {
+  public async getAccount(address: AddressString): Promise<AccountJSON> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'getaccountstate',
-          params: [address],
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'getaccountstate',
+        params: [address],
+      }),
     );
   }
 
-  public async getAsset(hash: Hash256String, monitor?: Monitor): Promise<AssetJSON> {
+  public async getAsset(hash: Hash256String): Promise<AssetJSON> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'getassetstate',
-          params: [hash],
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'getassetstate',
+        params: [hash],
+      }),
     );
   }
 
   public async getBlock(hashOrIndex: Hash256String | number, options: GetOptions = {}): Promise<BlockJSON> {
-    const { timeoutMS, monitor } = options;
+    const { timeoutMS } = options;
 
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'getblock',
-          params: [hashOrIndex, 1],
-          watchTimeoutMS: timeoutMS,
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'getblock',
+        params: [hashOrIndex, 1],
+        watchTimeoutMS: timeoutMS,
+      }),
     );
   }
 
-  public async getBestBlockHash(monitor?: Monitor): Promise<string> {
-    return this.withInstance(async (provider) => provider.request({ method: 'getbestblockhash' }, monitor));
+  public async getBestBlockHash(): Promise<string> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getbestblockhash' }));
   }
 
-  public async getBlockCount(monitor?: Monitor): Promise<number> {
-    return this.withInstance(async (provider) => provider.request({ method: 'getblockcount' }, monitor));
+  public async getBlockCount(): Promise<number> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getblockcount' }));
   }
 
-  public async getContract(address: AddressString, monitor?: Monitor): Promise<ContractJSON> {
+  public async getContract(address: AddressString): Promise<ContractJSON> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'getcontractstate',
-          params: [addressToScriptHash(address)],
-        },
-
-        monitor,
-      ),
+      provider.request({
+        method: 'getcontractstate',
+        params: [addressToScriptHash(address)],
+      }),
     );
   }
 
-  public async getMemPool(monitor?: Monitor): Promise<readonly string[]> {
-    return this.withInstance(async (provider) => provider.request({ method: 'getrawmempool' }, monitor));
+  public async getMemPool(): Promise<readonly string[]> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getrawmempool' }));
   }
 
-  public async getTransaction(hash: Hash256String, monitor?: Monitor): Promise<TransactionJSON> {
+  public async getTransaction(hash: Hash256String): Promise<TransactionJSON> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'getrawtransaction',
-          params: [hash, 1],
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'getrawtransaction',
+        params: [hash, 1],
+      }),
     );
   }
 
-  public async getUnspentOutput(input: InputJSON, monitor?: Monitor): Promise<OutputJSON | undefined> {
+  public async getUnspentOutput(input: InputJSON): Promise<OutputJSON | undefined> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'gettxout',
-          params: [input.txid, input.vout],
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'gettxout',
+        params: [input.txid, input.vout],
+      }),
     );
   }
 
-  public async testInvokeRaw(script: BufferString, monitor?: Monitor): Promise<InvocationResultJSON> {
+  public async testInvokeRaw(script: BufferString): Promise<InvocationResultJSON> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'invokescript',
-          params: [script],
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'invokescript',
+        params: [script],
+      }),
     );
   }
 
-  public async relayTransaction(value: BufferString, monitor?: Monitor): Promise<RelayTransactionResultJSON> {
+  public async relayTransaction(value: BufferString): Promise<RelayTransactionResultJSON> {
     return this.withInstance(async (provider) =>
       provider
-        .request(
-          {
-            method: 'relaytransaction',
-            params: [value],
-          },
-          monitor,
-        )
+        .request({
+          method: 'relaytransaction',
+          params: [value],
+        })
         .catch((error) => {
           const [message, code]: [string, string] = error.message.split(':');
           if (error.code === 'JSON_RPC' && code === '-110') {
@@ -154,172 +128,132 @@ export class JSONRPCClient {
     );
   }
 
-  public async getOutput(input: InputJSON, monitor?: Monitor): Promise<OutputJSON> {
+  public async getOutput(input: InputJSON): Promise<OutputJSON> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'getoutput',
-          params: [input.txid, input.vout],
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'getoutput',
+        params: [input.txid, input.vout],
+      }),
     );
   }
 
-  public async getClaimAmount(input: InputJSON, monitor?: Monitor): Promise<BigNumber> {
+  public async getClaimAmount(input: InputJSON): Promise<BigNumber> {
     return this.withInstance(async (provider) =>
       provider
-        .request(
-          {
-            method: 'getclaimamount',
-            params: [input.txid, input.vout],
-          },
-          monitor,
-        )
+        .request({
+          method: 'getclaimamount',
+          params: [input.txid, input.vout],
+        })
         .then((res) => new BigNumber(res)),
     );
   }
 
-  public async getAllStorage(address: AddressString, monitor?: Monitor): Promise<readonly StorageItemJSON[]> {
+  public async getAllStorage(address: AddressString): Promise<readonly StorageItemJSON[]> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'getallstorage',
-          params: [addressToScriptHash(address)],
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'getallstorage',
+        params: [addressToScriptHash(address)],
+      }),
     );
   }
 
-  public async testInvocation(value: BufferString, monitor?: Monitor): Promise<CallReceiptJSON> {
+  public async testInvocation(value: BufferString): Promise<CallReceiptJSON> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'testinvocation',
-          params: [value],
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'testinvocation',
+        params: [value],
+      }),
     );
   }
 
   public async getTransactionReceipt(hash: Hash256String, options: GetOptions = {}): Promise<TransactionReceiptJSON> {
-    const { timeoutMS, monitor } = options;
+    const { timeoutMS } = options;
 
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'gettransactionreceipt',
-          params: [hash],
-          watchTimeoutMS: timeoutMS,
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'gettransactionreceipt',
+        params: [hash],
+        watchTimeoutMS: timeoutMS,
+      }),
     );
   }
 
-  public async getInvocationData(hash: Hash256String, monitor?: Monitor): Promise<InvocationDataJSON> {
+  public async getInvocationData(hash: Hash256String): Promise<InvocationDataJSON> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'getinvocationdata',
-          params: [hash],
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'getinvocationdata',
+        params: [hash],
+      }),
     );
   }
 
-  public async getConnectedPeers(monitor?: Monitor): Promise<readonly Peer[]> {
+  public async getConnectedPeers(): Promise<readonly Peer[]> {
     return this.withInstance(async (provider) =>
       provider
-        .request(
-          {
-            method: 'getpeers',
-          },
-          monitor,
-        )
+        .request({
+          method: 'getpeers',
+        })
         .then((result) => result.connected),
     );
   }
 
-  public async getNetworkSettings(monitor?: Monitor): Promise<NetworkSettingsJSON> {
+  public async getNetworkSettings(): Promise<NetworkSettingsJSON> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'getnetworksettings',
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'getnetworksettings',
+      }),
     );
   }
 
-  public async runConsensusNow(monitor?: Monitor): Promise<void> {
+  public async runConsensusNow(): Promise<void> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'runconsensusnow',
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'runconsensusnow',
+      }),
     );
   }
 
-  public async updateSettings(options: Partial<PrivateNetworkSettings>, monitor?: Monitor): Promise<void> {
+  public async updateSettings(options: Partial<PrivateNetworkSettings>): Promise<void> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'updatesettings',
-          params: [options],
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'updatesettings',
+        params: [options],
+      }),
     );
   }
 
-  public async getSettings(monitor?: Monitor): Promise<PrivateNetworkSettings> {
+  public async getSettings(): Promise<PrivateNetworkSettings> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'getsettings',
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'getsettings',
+      }),
     );
   }
 
-  public async fastForwardOffset(seconds: number, monitor?: Monitor): Promise<void> {
+  public async fastForwardOffset(seconds: number): Promise<void> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'fastforwardoffset',
-          params: [seconds],
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'fastforwardoffset',
+        params: [seconds],
+      }),
     );
   }
 
-  public async fastForwardToTime(seconds: number, monitor?: Monitor): Promise<void> {
+  public async fastForwardToTime(seconds: number): Promise<void> {
     return this.withInstance(async (provider) =>
-      provider.request(
-        {
-          method: 'fastforwardtotime',
-          params: [seconds],
-        },
-        monitor,
-      ),
+      provider.request({
+        method: 'fastforwardtotime',
+        params: [seconds],
+      }),
     );
   }
 
-  public async reset(monitor?: Monitor): Promise<void> {
-    return this.withInstance(async (provider) => provider.request({ method: 'reset' }, monitor));
+  public async reset(): Promise<void> {
+    return this.withInstance(async (provider) => provider.request({ method: 'reset' }));
   }
 
   private async withInstance<TResult>(func: (instance: JSONRPCProvider) => Promise<TResult>): Promise<TResult>;
   private async withInstance<TResult>(func: (instance: JSONRPCProvider) => TResult): Promise<TResult> {
-    // tslint:disable-next-line no-any
     if (this.provider instanceof JSONRPCProvider) {
       // tslint:disable-next-line no-any
       return func(this.provider as any);

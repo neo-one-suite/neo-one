@@ -1,78 +1,60 @@
 // tslint:disable no-object-mutation no-any
-import { Monitor } from '@neo-one/monitor';
-import { LogConfig } from '@neo-one/server-plugin';
+import { cliLogger, getFinalLogger } from '@neo-one/logger';
 import { finalize } from '@neo-one/utils';
-import { Subject } from 'rxjs';
 import Vorpal from 'vorpal';
-import { createMonitor } from './createMonitor';
 
 export const setupCLI = ({
   vorpal,
-  debug,
-  logConsole,
 }: {
   readonly vorpal: Vorpal;
-  readonly debug?: boolean;
-  readonly logConsole?: boolean;
 }): {
-  readonly monitor: Monitor;
   readonly shutdown: (options: { readonly exitCode: number; readonly error?: Error | undefined }) => void;
-
   mutableShutdownFuncs: Array<() => Promise<void> | void>;
-  readonly config$: Subject<LogConfig>;
 } => {
-  const { monitor, config$, cleanup } = createMonitor({ debug, logConsole });
-  const shutdownFuncs = [cleanup];
+  const shutdownFuncs = [async () => new Promise<void>((resolve) => setTimeout(resolve, 500))];
 
   const initiateShutdown = async () => {
     await Promise.all(shutdownFuncs.map((func) => func()));
     await finalize.wait();
   };
 
+  // tslint:disable-next-line:no-let
   let shutdownInitiated = false;
-  const shutdown = ({ exitCode: exitCodeIn, error }: { exitCode: number; error?: Error | undefined }) => {
-    const exitCode =
-      error !== undefined && (error as any).exitCode != undefined && typeof (error as any).exitCode === 'number'
-        ? (error as any).exitCode
-        : exitCodeIn;
+  const shutdown = ({
+    exitCode,
+    error: errorIn,
+  }: {
+    readonly exitCode: number;
+    readonly error?: Error | undefined;
+  }) => {
     if (!shutdownInitiated) {
       shutdownInitiated = true;
-      monitor
-        .captureLog(initiateShutdown, {
-          name: 'cli_shutdown',
-          message: 'Shutdown cleanly.',
-          error: 'Failed to shutdown cleanly',
-        })
+      const finalLogger = getFinalLogger(cliLogger);
+      errorIn
+        ? finalLogger.error({ exitCode, error: errorIn }, 'error, shutting down')
+        : finalLogger.info({ exitCode }, 'shutting down');
+
+      initiateShutdown()
         .then(() => {
-          monitor.close(() => {
-            process.exit(exitCode);
-          });
+          finalLogger.info({ exitCode }, 'shutdown');
+          process.exit(exitCode);
         })
-        .catch(() => {
-          monitor.close(() => {
-            process.exit(exitCode > 0 ? exitCode : 1);
-          });
+        .catch((error) => {
+          finalLogger.error({ exitCode, err: error }, 'shutdown (error)');
+          process.exit(1);
         });
     }
   };
 
   process.on('unhandledRejection', (errorIn) => {
     const error = errorIn as Error;
-    monitor.logError({
-      name: 'unhandled_rejection',
-      message: 'Unhandled rejection. Shutting down.',
-      error,
-    });
+    cliLogger.fatal({ title: 'unhandled_rejection', error: error.message }, 'Unhandled rejection. Shutting down.');
 
     shutdown({ exitCode: 1, error });
   });
 
   process.on('uncaughtException', (error) => {
-    monitor.logError({
-      name: 'uncaught_exception',
-      message: 'Uncaught exception. Shutting down.',
-      error,
-    });
+    cliLogger.fatal({ title: 'uncaught_exception', error: error.message }, 'Uncaught exception. Shutting down.');
 
     shutdown({ exitCode: 1, error });
   });
@@ -82,20 +64,14 @@ export const setupCLI = ({
     const ui = vorpal.ui as any;
     if (ui.sigintCalled && Date.now() - ui.sigintTime < 1000) {
       ui.parent.emit('vorpal_exit');
-      monitor.log({
-        name: 'sigint',
-        message: 'Exiting...',
-      });
+      cliLogger.info({ title: 'sigint' }, 'Exiting...');
 
       shutdown({ exitCode: 0 });
     } else {
       ui.sigintCalled = false;
       const text = vorpal.ui.input();
       if (!ui.parent) {
-        monitor.log({
-          name: 'sigint',
-          message: 'Exiting...',
-        });
+        cliLogger.info({ title: 'sigint' }, 'Exiting...');
 
         shutdown({ exitCode: 0 });
       } else if (ui.parent.session.cancelCommands) {
@@ -115,5 +91,5 @@ export const setupCLI = ({
     }
   });
 
-  return { monitor, shutdown, config$, mutableShutdownFuncs: shutdownFuncs };
+  return { shutdown, mutableShutdownFuncs: shutdownFuncs };
 };

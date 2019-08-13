@@ -1,5 +1,5 @@
-import { Monitor } from '@neo-one/monitor';
-import { finalize, mergeScanLatest } from '@neo-one/utils';
+import { httpLogger } from '@neo-one/logger';
+import { finalize, Labels, mergeScanLatest } from '@neo-one/utils';
 import * as http from 'http';
 import * as https from 'https';
 import Application from 'koa';
@@ -26,7 +26,6 @@ interface HandleServerResult<T extends http.Server | https.Server> {
 }
 
 async function handleServer<T extends http.Server | https.Server, TOptions extends ListenOptions>({
-  monitor,
   createServer,
   keepAliveTimeout,
   options,
@@ -37,7 +36,6 @@ async function handleServer<T extends http.Server | https.Server, TOptions exten
     server: undefined,
   },
 }: {
-  readonly monitor: Monitor;
   readonly createServer: (options: TOptions) => T;
   readonly keepAliveTimeout: number;
   readonly options: TOptions;
@@ -67,15 +65,7 @@ async function handleServer<T extends http.Server | https.Server, TOptions exten
       const { host, port } = options;
       await new Promise<void>((resolve) => safeServer.listen(port, host, 511, resolve));
 
-      monitor
-        .withLabels({
-          [monitor.labels.SPAN_KIND]: 'server',
-        })
-        .log({
-          name: 'server_listen',
-          message: `Server listening on ${host}:${port}`,
-          level: 'verbose',
-        });
+      httpLogger.debug({ [Labels.SPAN_KIND]: 'server', title: 'server_listen' }, `Server listening on ${host}:${port}`);
     }
   }
 
@@ -94,7 +84,6 @@ const finalizeServer = async (result: HandleServerResult<http.Server | https.Ser
 
 // tslint:disable-next-line export-name
 export function createServer$<T extends http.Server | https.Server, TOptions extends ListenOptions>(
-  monitor: Monitor,
   app$: Observable<Application>,
   keepAliveTimeout$: Observable<number | undefined>,
   options: TOptions,
@@ -105,7 +94,6 @@ export function createServer$<T extends http.Server | https.Server, TOptions ext
       (prevResult, [app, keepAliveTimeout]) =>
         defer(async () =>
           handleServer({
-            monitor,
             createServer,
             keepAliveTimeout: keepAliveTimeout === undefined ? 60000 : keepAliveTimeout,
             options,

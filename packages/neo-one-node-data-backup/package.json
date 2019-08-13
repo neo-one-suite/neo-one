@@ -5,7 +5,7 @@
   "main": "./src/index",
   "dependencies": {
     "@google-cloud/storage": "^3.0.3",
-    "@neo-one/monitor": "^1.1.4",
+    "@neo-one/logger": "^1.0.0",
     "fs-extra": "^8.0.0",
     "megajs": "^0.16.0",
     "tar": "^4.4.10",

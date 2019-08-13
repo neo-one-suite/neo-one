@@ -1,4 +1,3 @@
-import { DefaultMonitor } from '@neo-one/monitor';
 import { Observable, of } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { getLocalHDAccounts } from '../../../__data__';
@@ -192,21 +191,6 @@ describe('HDKeyStore', () => {
       .toPromise();
 
     await keystore.sign({ account: testHDAccounts[0].userAccount.id, message: 'test' });
-
-    expect(sign).toBeCalledTimes(1);
-  });
-
-  test('sign - with monitor', async () => {
-    bootstrapKeystore();
-    const monitor = DefaultMonitor.create({ service: 'test' });
-    await keystore.userAccounts$
-      .pipe(
-        filter((value) => value.length !== 0),
-        take(1),
-      )
-      .toPromise();
-
-    await keystore.sign({ account: testHDAccounts[0].userAccount.id, message: 'test', monitor });
 
     expect(sign).toBeCalledTimes(1);
   });

@@ -63,8 +63,7 @@ export const isTransactionOptions = (arg: any) =>
     (arg.systemFee !== undefined && BigNumber.isBigNumber(arg.systemFee)) ||
     (arg.sendFrom !== undefined && Array.isArray(arg.sendFrom)) ||
     (arg.sendTo !== undefined && Array.isArray(arg.sendTo)) ||
-    (arg.timeoutMS !== undefined && typeof arg.timeoutMS === 'number') ||
-    arg.monitor !== undefined);
+    (arg.timeoutMS !== undefined && typeof arg.timeoutMS === 'number'));
 
 // tslint:disable-next-line:no-any
 export const isForwardValueOptions = (arg: any): boolean =>
@@ -73,7 +72,6 @@ export const isForwardValueOptions = (arg: any): boolean =>
   arg.attributes === undefined &&
   arg.sytemFees === undefined &&
   arg.networkFees === undefined &&
-  arg.monitor === undefined &&
   ((arg.events !== undefined && Array.isArray(arg.events)) || (arg.__tag !== undefined && arg.__tag.type === 'Event'));
 
 export const getForwardValues = ({

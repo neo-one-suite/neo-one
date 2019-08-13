@@ -1,5 +1,5 @@
 import { common, crypto, ECPoint, ScriptBuilder, UInt160, VMState } from '@neo-one/client-common';
-import { metrics, Monitor } from '@neo-one/monitor';
+import { nodeLogger } from '@neo-one/logger';
 import {
   Action,
   Block,
@@ -28,7 +28,8 @@ import {
   VerifyTransactionResult,
   VM,
 } from '@neo-one/node-core';
-import { labels, utils as commonUtils } from '@neo-one/utils';
+import { Labels, utils as commonUtils } from '@neo-one/utils';
+import { AggregationType, globalStats, MeasureUnit } from '@opencensus/core';
 import { BN } from 'bn.js';
 import PriorityQueue from 'js-priority-queue';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
@@ -45,11 +46,12 @@ import { getValidators } from './getValidators';
 import { wrapExecuteScripts } from './wrapExecuteScripts';
 import { WriteBatchBlockchain } from './WriteBatchBlockchain';
 
+const logger = nodeLogger.child({ component: 'blockchain' });
+
 export interface CreateBlockchainOptions {
   readonly settings: Settings;
   readonly storage: Storage;
   readonly vm: VM;
-  readonly monitor: Monitor;
 }
 export interface BlockchainOptions extends CreateBlockchainOptions {
   readonly currentBlock: BlockchainType['currentBlock'] | undefined;
@@ -65,41 +67,76 @@ interface SpentCoin {
 }
 
 interface Entry {
-  readonly monitor: Monitor;
   readonly block: Block;
   readonly resolve: () => void;
   readonly reject: (error: Error) => void;
   readonly unsafe: boolean;
 }
 
-const NAMESPACE = 'blockchain';
+const blockFailures = globalStats.createMeasureInt64('persist/failures', MeasureUnit.UNIT);
+const blockCurrent = globalStats.createMeasureInt64('persist/current', MeasureUnit.UNIT);
+const blockProgress = globalStats.createMeasureInt64('persist/progress', MeasureUnit.UNIT);
 
-const NEO_BLOCKCHAIN_PERSIST_BLOCK_DURATION_SECONDS = metrics.createHistogram({
-  name: 'neo_blockchain_persist_block_duration_seconds',
-});
+const blockDurationMs = globalStats.createMeasureDouble(
+  'persist/duration',
+  MeasureUnit.MS,
+  'time to persist block in milliseconds',
+);
+const blockLatencySec = globalStats.createMeasureDouble(
+  'persist/latency',
+  MeasureUnit.SEC,
+  "'The latency from block timestamp to persist'",
+);
 
-const NEO_BLOCKCHAIN_PERSIST_BLOCK_FAILURES_TOTAL = metrics.createCounter({
-  name: 'neo_blockchain_persist_block_failures_total',
-});
+const NEO_BLOCKCHAIN_PERSIST_BLOCK_DURATION_MS = globalStats.createView(
+  'neo_blockchain_persist_block_duration_ms',
+  blockDurationMs,
+  AggregationType.DISTRIBUTION,
+  [],
+  'distribution of the persist duration',
+  [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
+);
+globalStats.registerView(NEO_BLOCKCHAIN_PERSIST_BLOCK_DURATION_MS);
 
-const NEO_BLOCKCHAIN_BLOCK_INDEX_GAUGE = metrics.createGauge({
-  name: 'neo_blockchain_block_index',
-  help: 'The current block index',
-});
+const NEO_BLOCKCHAIN_PERSIST_BLOCK_FAILURES_TOTAL = globalStats.createView(
+  'neo_blockchain_persist_block_failures_total',
+  blockFailures,
+  AggregationType.COUNT,
+  [],
+  'total blockchain failures',
+);
+globalStats.registerView(NEO_BLOCKCHAIN_PERSIST_BLOCK_FAILURES_TOTAL);
 
-const NEO_BLOCKCHAIN_PERSISTING_BLOCK_INDEX_GAUGE = metrics.createGauge({
-  name: 'neo_blockchain_persisting_block_index',
-  help: 'The current in progress persist index',
-});
+const NEO_BLOCKCHAIN_BLOCK_INDEX_GAUGE = globalStats.createView(
+  'neo_blockchain_block_index',
+  blockCurrent,
+  AggregationType.LAST_VALUE,
+  [],
+  'the current block index',
+);
+globalStats.registerView(NEO_BLOCKCHAIN_BLOCK_INDEX_GAUGE);
 
-const NEO_BLOCKCHAIN_PERSIST_BLOCK_LATENCY_SECONDS = metrics.createHistogram({
-  name: 'neo_blockchain_persist_block_latency_seconds',
-  help: 'The latency from block timestamp to persist',
-  buckets: [1, 2, 5, 7.5, 10, 12.5, 15, 17.5, 20],
-});
+const NEO_BLOCKCHAIN_PERSISTING_BLOCK_INDEX_GAUGE = globalStats.createView(
+  'neo_blockchain_persisting_block_index',
+  blockProgress,
+  AggregationType.LAST_VALUE,
+  [],
+  'The current in progress persist index',
+);
+globalStats.registerView(NEO_BLOCKCHAIN_PERSISTING_BLOCK_INDEX_GAUGE);
+
+const NEO_BLOCKCHAIN_PERSIST_BLOCK_LATENCY_SECONDS = globalStats.createView(
+  'neo_blockchain_persist_block_latency_seconds',
+  blockLatencySec,
+  AggregationType.DISTRIBUTION,
+  [],
+  'The latency from block timestamp to persist',
+  [1, 2, 5, 7.5, 10, 12.5, 15, 17.5, 20],
+);
+globalStats.registerView(NEO_BLOCKCHAIN_PERSIST_BLOCK_LATENCY_SECONDS);
 
 export class Blockchain {
-  public static async create({ settings, storage, vm, monitor }: CreateBlockchainOptions): Promise<BlockchainType> {
+  public static async create({ settings, storage, vm }: CreateBlockchainOptions): Promise<BlockchainType> {
     const [currentBlock, currentHeader] = await Promise.all([
       storage.block.tryGetLatest(),
       storage.header.tryGetLatest(),
@@ -116,7 +153,6 @@ export class Blockchain {
       settings,
       storage,
       vm,
-      monitor,
     });
 
     if (currentHeader === undefined) {
@@ -134,7 +170,6 @@ export class Blockchain {
   public readonly serializeJSONContext: BlockchainType['serializeJSONContext'];
   public readonly feeContext: BlockchainType['feeContext'];
 
-  private readonly monitor: Monitor;
   private readonly settings$: BehaviorSubject<Settings>;
   private readonly storage: Storage;
   private mutableCurrentBlock: BlockchainType['currentBlock'] | undefined;
@@ -158,9 +193,17 @@ export class Blockchain {
     this.vm = options.vm;
 
     this.settings$ = new BehaviorSubject(options.settings);
-    this.monitor = options.monitor.at(NAMESPACE);
-    NEO_BLOCKCHAIN_BLOCK_INDEX_GAUGE.set(this.currentBlockIndex);
-    NEO_BLOCKCHAIN_PERSISTING_BLOCK_INDEX_GAUGE.set(this.currentBlockIndex);
+
+    globalStats.record([
+      {
+        measure: blockProgress,
+        value: this.currentBlockIndex,
+      },
+      {
+        measure: blockCurrent,
+        value: this.currentBlockIndex,
+      },
+    ]);
 
     // tslint:disable-next-line no-this-assignment
     const self = this;
@@ -330,7 +373,7 @@ export class Blockchain {
       this.mutableRunning = false;
     }
 
-    this.monitor.log({ name: 'neo_blockchain_stop' });
+    logger.info({ title: 'neo_blockchain_stop' }, 'NEO blockchain stopped.');
   }
 
   public updateSettings(settings: Settings): void {
@@ -338,11 +381,9 @@ export class Blockchain {
   }
 
   public async persistBlock({
-    monitor,
     block,
     unsafe = false,
   }: {
-    readonly monitor?: Monitor;
     readonly block: Block;
     readonly unsafe?: boolean;
   }): Promise<void> {
@@ -356,7 +397,6 @@ export class Blockchain {
       this.mutableInQueue.add(block.hashHex);
 
       this.mutableBlockQueue.queue({
-        monitor: this.getMonitor(monitor),
         block,
         resolve,
         reject,
@@ -372,84 +412,61 @@ export class Blockchain {
     // We don't ever just persist the headers.
   }
 
-  public async verifyBlock(block: Block, monitor?: Monitor): Promise<void> {
-    await this.getMonitor(monitor)
-      .withData({ [labels.NEO_BLOCK_INDEX]: block.index })
-      .captureSpan(
-        async (span) =>
-          block.verify({
-            genesisBlock: this.settings.genesisBlock,
-            tryGetBlock: this.block.tryGet,
-            tryGetHeader: this.header.tryGet,
-            isSpent: this.isSpent,
-            getAsset: this.asset.get,
-            getOutput: this.output.get,
-            tryGetAccount: this.account.tryGet,
-            getValidators: this.getValidators,
-            standbyValidators: this.settings.standbyValidators,
-            getAllValidators: this.getAllValidators,
-            calculateClaimAmount: async (claims) => this.calculateClaimAmount(claims, span),
-            verifyScript: async (options) => this.verifyScript(options, span),
-            currentHeight: this.mutableCurrentBlock === undefined ? 0 : this.mutableCurrentBlock.index,
-            governingToken: this.settings.governingToken,
-            utilityToken: this.settings.utilityToken,
-            fees: this.settings.fees,
-            registerValidatorFee: this.settings.registerValidatorFee,
-          }),
-
-        { name: 'neo_blockchain_verify_block' },
-      );
+  public async verifyBlock(block: Block): Promise<void> {
+    await block.verify({
+      genesisBlock: this.settings.genesisBlock,
+      tryGetBlock: this.block.tryGet,
+      tryGetHeader: this.header.tryGet,
+      isSpent: this.isSpent,
+      getAsset: this.asset.get,
+      getOutput: this.output.get,
+      tryGetAccount: this.account.tryGet,
+      getValidators: this.getValidators,
+      standbyValidators: this.settings.standbyValidators,
+      getAllValidators: this.getAllValidators,
+      calculateClaimAmount: async (claims) => this.calculateClaimAmount(claims),
+      verifyScript: async (options) => this.verifyScript(options),
+      currentHeight: this.mutableCurrentBlock === undefined ? 0 : this.mutableCurrentBlock.index,
+      governingToken: this.settings.governingToken,
+      utilityToken: this.settings.utilityToken,
+      fees: this.settings.fees,
+      registerValidatorFee: this.settings.registerValidatorFee,
+    });
   }
 
-  public async verifyConsensusPayload(payload: ConsensusPayload, monitor?: Monitor): Promise<void> {
-    await this.getMonitor(monitor)
-      .withData({ [labels.NEO_CONSENSUS_HASH]: payload.hashHex })
-      .captureSpan(
-        async (span) =>
-          payload.verify({
-            getValidators: async () => this.getValidators([], span),
-            verifyScript: async (options) => this.verifyScript(options, span),
-            currentIndex: this.mutableCurrentBlock === undefined ? 0 : this.mutableCurrentBlock.index,
-            currentBlockHash: this.currentBlock.hash,
-          }),
-
-        { name: 'neo_blockchain_verify_consensus' },
-      );
+  public async verifyConsensusPayload(payload: ConsensusPayload): Promise<void> {
+    await payload.verify({
+      getValidators: async () => this.getValidators([]),
+      verifyScript: async (options) => this.verifyScript(options),
+      currentIndex: this.mutableCurrentBlock === undefined ? 0 : this.mutableCurrentBlock.index,
+      currentBlockHash: this.currentBlock.hash,
+    });
   }
 
   public async verifyTransaction({
-    monitor,
     transaction,
     memPool,
   }: {
-    readonly monitor?: Monitor;
     readonly transaction: Transaction;
     readonly memPool?: readonly Transaction[];
   }): Promise<VerifyTransactionResult> {
     try {
-      const verifications = await this.getMonitor(monitor)
-        .withData({ [labels.NEO_TRANSACTION_HASH]: transaction.hashHex })
-        .captureSpan(
-          async (span) =>
-            transaction.verify({
-              calculateClaimAmount: this.calculateClaimAmount,
-              isSpent: this.isSpent,
-              getAsset: this.asset.get,
-              getOutput: this.output.get,
-              tryGetAccount: this.account.tryGet,
-              standbyValidators: this.settings.standbyValidators,
-              getAllValidators: this.getAllValidators,
-              verifyScript: async (options) => this.verifyScript(options, span),
-              governingToken: this.settings.governingToken,
-              utilityToken: this.settings.utilityToken,
-              fees: this.settings.fees,
-              registerValidatorFee: this.settings.registerValidatorFee,
-              currentHeight: this.currentBlockIndex,
-              memPool,
-            }),
-
-          { name: 'neo_blockchain_verify_transaction' },
-        );
+      const verifications = await transaction.verify({
+        calculateClaimAmount: this.calculateClaimAmount,
+        isSpent: this.isSpent,
+        getAsset: this.asset.get,
+        getOutput: this.output.get,
+        tryGetAccount: this.account.tryGet,
+        standbyValidators: this.settings.standbyValidators,
+        getAllValidators: this.getAllValidators,
+        verifyScript: async (options) => this.verifyScript(options),
+        governingToken: this.settings.governingToken,
+        utilityToken: this.settings.utilityToken,
+        fees: this.settings.fees,
+        registerValidatorFee: this.settings.registerValidatorFee,
+        currentHeight: this.currentBlockIndex,
+        memPool,
+      });
 
       return { verifications };
     } catch (error) {
@@ -461,23 +478,22 @@ export class Blockchain {
     }
   }
 
-  public async invokeScript(script: Buffer, monitor?: Monitor): Promise<CallReceipt> {
+  public async invokeScript(script: Buffer): Promise<CallReceipt> {
     const transaction = new InvocationTransaction({
       script,
       gas: common.ONE_HUNDRED_FIXED8,
     });
 
-    return this.invokeTransaction(transaction, monitor);
+    return this.invokeTransaction(transaction);
   }
 
-  public async invokeTransaction(transaction: InvocationTransaction, monitor?: Monitor): Promise<CallReceipt> {
+  public async invokeTransaction(transaction: InvocationTransaction): Promise<CallReceipt> {
     const blockchain = this.createWriteBlockchain();
 
     const mutableActions: Action[] = [];
     let globalActionIndex = new BN(0);
     const result = await wrapExecuteScripts(async () =>
       this.vm.executeScripts({
-        monitor: this.getMonitor(monitor),
         scripts: [{ code: transaction.script }],
         blockchain,
         scriptContainer: {
@@ -533,69 +549,57 @@ export class Blockchain {
     await this.persistBlock({ block: this.settings.genesisBlock });
   }
 
-  public readonly getValidators = async (
-    transactions: readonly Transaction[],
-    monitor?: Monitor,
-  ): Promise<readonly ECPoint[]> =>
-    this.getMonitor(monitor).captureSpanLog(async () => getValidators(this, transactions), {
-      name: 'neo_blockchain_get_validators',
-      level: { log: 'verbose', span: 'info' },
+  public readonly getValidators = async (transactions: readonly Transaction[]): Promise<readonly ECPoint[]> => {
+    logger.debug({ title: 'neo_blockchain_get_validators' });
+
+    return getValidators(this, transactions);
+  };
+
+  public readonly calculateClaimAmount = async (claims: readonly Input[]): Promise<BN> => {
+    logger.debug({ title: 'neo_blockchain_calculate_claim_amount' });
+    const spentCoins = await Promise.all(claims.map(async (claim) => this.tryGetSpentCoin(claim)));
+
+    const filteredSpentCoinsIn = spentCoins.filter(commonUtils.notNull);
+    if (spentCoins.length !== filteredSpentCoinsIn.length) {
+      throw new CoinUnspentError(spentCoins.length - filteredSpentCoinsIn.length);
+    }
+
+    const filteredSpentCoins = filteredSpentCoinsIn.filter((spentCoin) => {
+      if (spentCoin.claimed) {
+        throw new CoinClaimedError(common.uInt256ToString(spentCoin.output.asset), spentCoin.output.value.toString(10));
+      }
+      if (!common.uInt256Equal(spentCoin.output.asset, this.settings.governingToken.hash)) {
+        throw new InvalidClaimError(
+          common.uInt256ToString(spentCoin.output.asset),
+          common.uInt256ToString(this.settings.governingToken.hash),
+        );
+      }
+
+      return true;
     });
 
-  public readonly calculateClaimAmount = async (claims: readonly Input[], monitor?: Monitor): Promise<BN> =>
-    this.getMonitor(monitor).captureSpanLog(
-      async () => {
-        const spentCoins = await Promise.all(claims.map(async (claim) => this.tryGetSpentCoin(claim)));
+    return utils.calculateClaimAmount({
+      coins: filteredSpentCoins.map((coin) => ({
+        value: coin.output.value,
+        startHeight: coin.startHeight,
+        endHeight: coin.endHeight,
+      })),
 
-        const filteredSpentCoinsIn = spentCoins.filter(commonUtils.notNull);
-        if (spentCoins.length !== filteredSpentCoinsIn.length) {
-          throw new CoinUnspentError(spentCoins.length - filteredSpentCoinsIn.length);
-        }
-
-        const filteredSpentCoins = filteredSpentCoinsIn.filter((spentCoin) => {
-          if (spentCoin.claimed) {
-            throw new CoinClaimedError(
-              common.uInt256ToString(spentCoin.output.asset),
-              spentCoin.output.value.toString(10),
-            );
-          }
-          if (!common.uInt256Equal(spentCoin.output.asset, this.settings.governingToken.hash)) {
-            throw new InvalidClaimError(
-              common.uInt256ToString(spentCoin.output.asset),
-              common.uInt256ToString(this.settings.governingToken.hash),
-            );
-          }
-
-          return true;
+      decrementInterval: this.settings.decrementInterval,
+      generationAmount: this.settings.generationAmount,
+      getSystemFee: async (index) => {
+        const header = await this.header.get({
+          hashOrIndex: index,
         });
 
-        return utils.calculateClaimAmount({
-          coins: filteredSpentCoins.map((coin) => ({
-            value: coin.output.value,
-            startHeight: coin.startHeight,
-            endHeight: coin.endHeight,
-          })),
-
-          decrementInterval: this.settings.decrementInterval,
-          generationAmount: this.settings.generationAmount,
-          getSystemFee: async (index) => {
-            const header = await this.header.get({
-              hashOrIndex: index,
-            });
-
-            const blockData = await this.blockData.get({
-              hash: header.hash,
-            });
-
-            return blockData.systemFee;
-          },
+        const blockData = await this.blockData.get({
+          hash: header.hash,
         });
+
+        return blockData.systemFee;
       },
-      {
-        name: 'neo_blockchain_calculate_claim_amount',
-        level: { log: 'verbose', span: 'info' },
-      },
-    );
+    });
+  };
 
   private async persistBlocksAsync(): Promise<void> {
     if (this.mutablePersistingBlocks || !this.mutableRunning) {
@@ -609,24 +613,46 @@ export class Blockchain {
 
       // tslint:disable-next-line no-loop-statement
       while (this.mutableRunning && entry !== undefined && entry.block.index === this.currentBlockIndex + 1) {
-        const entryNonNull = entry;
-        await entry.monitor
-          .withData({ [labels.NEO_BLOCK_INDEX]: entry.block.index })
-          .captureSpanLog(async (span) => this.persistBlockInternal(span, entryNonNull.block, entryNonNull.unsafe), {
-            name: 'neo_blockchain_persist_block_top_level',
-            level: { log: 'verbose', span: 'info' },
-            metric: {
-              total: NEO_BLOCKCHAIN_PERSIST_BLOCK_DURATION_SECONDS,
-              error: NEO_BLOCKCHAIN_PERSIST_BLOCK_FAILURES_TOTAL,
-            },
+        const startTime = Date.now();
 
-            trace: true,
-          });
+        const entryNonNull = entry;
+        const logData = {
+          [Labels.NEO_BLOCK_INDEX]: entry.block.index,
+          title: 'neo_blockchain_persist_block_top_level',
+        };
+        try {
+          await this.persistBlockInternal(entryNonNull.block, entryNonNull.unsafe);
+          logger.debug(logData);
+          globalStats.record([
+            {
+              measure: blockDurationMs,
+              value: Date.now() - startTime,
+            },
+          ]);
+        } catch (error) {
+          logger.error({ error, ...logData });
+          globalStats.record([
+            {
+              measure: blockFailures,
+              value: 1,
+            },
+          ]);
+
+          throw error;
+        }
 
         entry.resolve();
         this.mutableBlock$.next(entry.block);
-        NEO_BLOCKCHAIN_BLOCK_INDEX_GAUGE.set(entry.block.index);
-        NEO_BLOCKCHAIN_PERSIST_BLOCK_LATENCY_SECONDS.observe(this.monitor.nowSeconds() - entry.block.timestamp);
+        globalStats.record([
+          {
+            measure: blockCurrent,
+            value: entry.block.index,
+          },
+          {
+            measure: blockLatencySec,
+            value: Date.now() - entry.block.timestamp,
+          },
+        ]);
 
         entry = this.cleanBlockQueue();
       }
@@ -666,10 +692,11 @@ export class Blockchain {
     return undefined;
   }
 
-  private readonly verifyScript = async (
-    { scriptContainer, hash, witness }: VerifyScriptOptions,
-    monitor: Monitor,
-  ): Promise<VerifyScriptResult> => {
+  private readonly verifyScript = async ({
+    scriptContainer,
+    hash,
+    witness,
+  }: VerifyScriptOptions): Promise<VerifyScriptResult> => {
     let { verification } = witness;
     if (verification.length === 0) {
       const builder = new ScriptBuilder();
@@ -683,7 +710,6 @@ export class Blockchain {
     const mutableActions: Action[] = [];
     let globalActionIndex = new BN(0);
     const executeResult = await this.vm.executeScripts({
-      monitor: this.getMonitor(monitor),
       scripts: [{ code: witness.invocation }, { code: verification }],
       blockchain,
       scriptContainer,
@@ -840,7 +866,7 @@ export class Blockchain {
     this.mutableInQueue = new Set();
     this.mutableDoneRunningResolve = undefined;
     this.mutableRunning = true;
-    this.monitor.log({ name: 'neo_blockchain_start' });
+    logger.info({ title: 'neo_blockchain_start' }, 'NEO blockchain started.');
   }
 
   // private readonly getVotes = async (transactions: readonly Transaction[]): Promise<readonly Vote[]> => {
@@ -912,19 +938,22 @@ export class Blockchain {
   //   return votes.filter(commonUtils.notNull);
   // };
 
-  private async persistBlockInternal(monitor: Monitor, block: Block, unsafe?: boolean): Promise<void> {
-    NEO_BLOCKCHAIN_PERSISTING_BLOCK_INDEX_GAUGE.set(block.index);
+  private async persistBlockInternal(block: Block, unsafe?: boolean): Promise<void> {
+    globalStats.record([
+      {
+        measure: blockProgress,
+        value: block.index,
+      },
+    ]);
+
     if (!unsafe) {
-      await this.verifyBlock(block, monitor);
+      await this.verifyBlock(block);
     }
 
     const blockchain = this.createWriteBlockchain();
 
-    await blockchain.persistBlock(monitor, block);
-
-    await monitor.captureSpan(async () => this.storage.commit(blockchain.getChangeSet()), {
-      name: 'neo_blockchain_persist_block_commit_storage',
-    });
+    await blockchain.persistBlock(block);
+    await this.storage.commit(blockchain.getChangeSet());
 
     this.mutablePreviousBlock = this.mutableCurrentBlock;
     this.mutableCurrentBlock = block;
@@ -940,13 +969,5 @@ export class Blockchain {
       vm: this.vm,
       getValidators: this.getValidators,
     });
-  }
-
-  private getMonitor(monitor?: Monitor): Monitor {
-    if (monitor === undefined) {
-      return this.monitor;
-    }
-
-    return monitor.at(NAMESPACE);
   }
 }

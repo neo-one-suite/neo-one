@@ -1,5 +1,6 @@
+import { cliLogger } from '@neo-one/logger';
 import { Plugin } from '@neo-one/server-plugin';
-import { labels } from '@neo-one/utils';
+import { Labels } from '@neo-one/utils';
 import ora from 'ora';
 import { InteractiveCLI } from '../InteractiveCLI';
 import { createCRUD } from './createCRUD';
@@ -8,7 +9,6 @@ export const createPlugin = ({ cli, plugin }: { readonly cli: InteractiveCLI; re
   const commands = createCRUD({ cli, plugin }).concat(
     plugin.interactive.map((interactiveCommand) => interactiveCommand({ cli })),
   );
-
   // tslint:disable-next-line no-any
   commands.forEach((command: any) => {
     const fn = command._fn;
@@ -24,11 +24,10 @@ export const createPlugin = ({ cli, plugin }: { readonly cli: InteractiveCLI; re
         }
       } catch (error) {
         ora(error.message).fail();
-        cli.monitor.withLabels({ [labels.COMMAND_NAME]: command.name }).logError({
-          name: 'neo_command_error',
-          error,
-          message: `Command ${command.name} failed.`,
-        });
+        cliLogger.error(
+          { title: 'neo_command_error', [Labels.COMMAND_NAME]: command.name, error: error.message },
+          `Command ${command.name} failed.`,
+        );
 
         if (cli.throwError) {
           throw error;

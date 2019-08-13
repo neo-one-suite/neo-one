@@ -6,7 +6,6 @@
   "dependencies": {
     "@neo-one/client-common": "^1.3.0",
     "@neo-one/client-full-common": "^1.2.0",
-    "@neo-one/monitor": "^1.1.4",
     "@neo-one/utils": "^1.1.3",
     "@types/bn.js": "^4.11.5",
     "bignumber.js": "^9.0.0",

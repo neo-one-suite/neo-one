@@ -13,7 +13,6 @@ import {
   Transaction,
 } from '@neo-one/client-common';
 import { args as clientArgs } from '@neo-one/client-core';
-import { Monitor } from '@neo-one/monitor';
 import * as args from './args';
 import { DataProvider } from './types';
 
@@ -24,12 +23,12 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
     this.dataProvider = dataProvider;
   }
 
-  public async getAccount(address: AddressString, monitor?: Monitor): Promise<Account> {
-    return this.dataProvider.getAccount(clientArgs.assertAddress('address', address), monitor);
+  public async getAccount(address: AddressString): Promise<Account> {
+    return this.dataProvider.getAccount(clientArgs.assertAddress('address', address));
   }
 
-  public async getAsset(hash: Hash256String, monitor?: Monitor): Promise<Asset> {
-    return this.dataProvider.getAsset(clientArgs.assertHash256('hash', hash), monitor);
+  public async getAsset(hash: Hash256String): Promise<Asset> {
+    return this.dataProvider.getAsset(clientArgs.assertHash256('hash', hash));
   }
 
   public async getBlock(hash: number | Hash256String, optionsIn?: GetOptions): Promise<Block> {
@@ -38,38 +37,38 @@ export class ReadClient<TDataProvider extends DataProvider = DataProvider> {
       return this.dataProvider.getBlock(hash, options);
     }
 
-    return this.dataProvider.getBlock(clientArgs.assertHash256('hash', hash), options);
+    return this.dataProvider.getBlock(clientArgs.assertHash256('hash', hash));
   }
 
   public iterBlocks(options?: IterOptions): AsyncIterable<Block> {
     return this.dataProvider.iterBlocks(args.assertIterOptions('options', options));
   }
 
-  public async getBestBlockHash(monitor?: Monitor): Promise<Hash256String> {
-    return this.dataProvider.getBestBlockHash(monitor);
+  public async getBestBlockHash(): Promise<Hash256String> {
+    return this.dataProvider.getBestBlockHash();
   }
 
-  public async getBlockCount(monitor?: Monitor): Promise<number> {
-    return this.dataProvider.getBlockCount(monitor);
+  public async getBlockCount(): Promise<number> {
+    return this.dataProvider.getBlockCount();
   }
 
-  public async getContract(address: AddressString, monitor?: Monitor): Promise<Contract> {
-    return this.dataProvider.getContract(clientArgs.assertAddress('address', address), monitor);
+  public async getContract(address: AddressString): Promise<Contract> {
+    return this.dataProvider.getContract(clientArgs.assertAddress('address', address));
   }
 
-  public async getMemPool(monitor?: Monitor): Promise<readonly Hash256String[]> {
-    return this.dataProvider.getMemPool(monitor);
+  public async getMemPool(): Promise<readonly Hash256String[]> {
+    return this.dataProvider.getMemPool();
   }
 
-  public async getTransaction(hash: Hash256String, monitor?: Monitor): Promise<Transaction> {
-    return this.dataProvider.getTransaction(clientArgs.assertHash256('hash', hash), monitor);
+  public async getTransaction(hash: Hash256String): Promise<Transaction> {
+    return this.dataProvider.getTransaction(clientArgs.assertHash256('hash', hash));
   }
 
-  public async getOutput(input: Input, monitor?: Monitor): Promise<Output> {
-    return this.dataProvider.getOutput(input, monitor);
+  public async getOutput(input: Input): Promise<Output> {
+    return this.dataProvider.getOutput(input);
   }
 
-  public async getConnectedPeers(monitor?: Monitor): Promise<readonly Peer[]> {
-    return this.dataProvider.getConnectedPeers(monitor);
+  public async getConnectedPeers(): Promise<readonly Peer[]> {
+    return this.dataProvider.getConnectedPeers();
   }
 }

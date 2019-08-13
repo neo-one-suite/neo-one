@@ -1,4 +1,3 @@
-import { Monitor } from '@neo-one/monitor';
 import * as fs from 'fs-extra';
 import { Environment } from '../types';
 import { Provider } from './Provider';
@@ -19,21 +18,21 @@ export class MultiProvider extends Provider {
     this.environment = environment;
   }
 
-  public async restore(monitor: Monitor): Promise<void> {
+  public async restore(): Promise<void> {
     // tslint:disable-next-line no-loop-statement
     for (const provider of this.providers) {
       const canRestore = await provider.canRestore();
       if (canRestore) {
-        await provider.restore(monitor);
+        await provider.restore();
         break;
       }
     }
   }
 
-  public async backup(monitor: Monitor): Promise<void> {
+  public async backup(): Promise<void> {
     // tslint:disable-next-line no-loop-statement
     for (const provider of this.providers) {
-      await provider.backup(monitor);
+      await provider.backup();
       await fs.remove(this.environment.tmpPath);
       await fs.ensureDir(this.environment.tmpPath);
     }

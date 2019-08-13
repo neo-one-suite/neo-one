@@ -1,5 +1,4 @@
 import { common, ECPoint, UInt160, UInt256, VMState } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import { BN } from 'bn.js';
 import { Action } from './action';
 import { Block } from './Block';
@@ -66,7 +65,6 @@ export interface VMListeners {
 }
 
 export type ExecuteScripts = (input: {
-  readonly monitor: Monitor;
   readonly scripts: readonly Script[];
   readonly blockchain: WriteBlockchain;
   readonly scriptContainer: ScriptContainer;

@@ -1,5 +1,4 @@
 import { common, OpCode, SysCallName, UInt160, VMState } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import { Block, ExecutionAction, ScriptContainer, TriggerType, VMListeners, WriteBlockchain } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { StackItem } from './stackItem';
@@ -58,12 +57,8 @@ export interface ExecutionContext {
   readonly blockchain: WriteBlockchain;
   readonly init: ExecutionInit;
   readonly engine: {
-    readonly run: (input: {
-      readonly monitor: Monitor;
-      readonly context: ExecutionContext;
-    }) => Promise<ExecutionContext>;
+    readonly run: (input: { readonly context: ExecutionContext }) => Promise<ExecutionContext>;
     readonly executeScript: (input: {
-      readonly monitor: Monitor;
       readonly code: Buffer;
       readonly blockchain: WriteBlockchain;
       readonly init: ExecutionInit;
@@ -92,7 +87,6 @@ export interface OpResult {
   readonly resultsAlt?: readonly StackItem[];
 }
 export interface OpInvokeArgs {
-  readonly monitor: Monitor;
   readonly context: ExecutionContext;
   readonly args: readonly StackItem[];
   readonly argsAlt: readonly StackItem[];

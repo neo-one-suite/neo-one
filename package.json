@@ -74,7 +74,7 @@
     "neo-one": "node ./dist/neo-one/packages/neo-one-cli/bin/neo-one",
     "jest": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" jest",
     "test": "yarn run jest --config jest/unit.js",
-    "test-ci": "yarn run jest --config jest/unit-ci.js --ci -w 1",
+    "test-ci": "yarn run jest --config jest/unit-ci.js --ci -w 2",
     "test:ledger": "yarn run jest --config jest/ledger.js --w 1",
     "test:other": "yarn run jest --config jest/other.js --w 1",
     "e2e": "yarn run jest --config jest/e2e.js",

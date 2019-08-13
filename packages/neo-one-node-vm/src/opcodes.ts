@@ -210,7 +210,7 @@ const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: b
       in: isDynamic(hashIn) ? 1 : 0,
       invocation: tailCall ? 0 : 1,
       fee: FEES.TEN,
-      invoke: async ({ monitor, context, args }) => {
+      invoke: async ({ context, args }) => {
         const { pc, scriptHash } = context;
         let hash = common.bufferToUInt160(context.code.slice(pc, pc + 20));
         if (isDynamic(hash)) {
@@ -227,7 +227,6 @@ const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: b
         const contract = await context.blockchain.contract.get({ hash });
         const scriptHashStack = [hash, ...context.scriptHashStack];
         const resultContext = await context.engine.executeScript({
-          monitor,
           code: contract.script,
           blockchain: context.blockchain,
           init: context.init,
@@ -303,7 +302,7 @@ const callIsolated = ({
       name,
       in: parametersCount + (dynamicCall ? 1 : 0),
       invocation: tailCall ? 0 : 1,
-      invoke: async ({ monitor, context, args }) => {
+      invoke: async ({ context, args }) => {
         const { pc, scriptHash } = context;
         const hash = dynamicCall
           ? common.bufferToUInt160(args[0].asBuffer())
@@ -328,7 +327,6 @@ const callIsolated = ({
         const scriptHashStack = [hash, ...context.scriptHashStack];
 
         const resultContext = await context.engine.executeScript({
-          monitor,
           code: contract.script,
           blockchain: context.blockchain,
           init: context.init,
@@ -411,9 +409,8 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
       name,
       in: parametersCount,
       invocation: 1,
-      invoke: async ({ monitor, context, args }) => {
+      invoke: async ({ context, args }) => {
         const resultContext = await context.engine.executeScript({
-          monitor,
           code: context.code,
           blockchain: context.blockchain,
           init: context.init,
@@ -570,7 +567,7 @@ const OPCODE_PAIRS = ([
       createOp({
         name: 'CALL',
         invocation: 1,
-        invoke: async ({ monitor, context }) => {
+        invoke: async ({ context }) => {
           const { pc } = context;
           // High level:
           // Execute JMP in place of current op codes pc using same context
@@ -578,7 +575,6 @@ const OPCODE_PAIRS = ([
           // Set current pc to pc + 2
           const { op } = JMP;
           const { context: startContext } = await op.invoke({
-            monitor,
             context: {
               ...context,
               callingScriptHash: context.scriptHash,
@@ -588,7 +584,6 @@ const OPCODE_PAIRS = ([
           });
 
           const resultContext = await context.engine.run({
-            monitor,
             context: {
               ...startContext,
               depth: context.depth + 1,

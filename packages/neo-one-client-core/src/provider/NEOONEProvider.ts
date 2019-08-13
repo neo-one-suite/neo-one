@@ -18,7 +18,6 @@ import {
   Transaction,
   TransactionReceipt,
 } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { UnknownNetworkError } from '../errors';
@@ -68,25 +67,16 @@ export class NEOONEProvider implements Provider {
   public async getUnclaimed(
     network: NetworkType,
     address: AddressString,
-    monitor?: Monitor,
   ): Promise<{ readonly unclaimed: readonly Input[]; readonly amount: BigNumber }> {
-    return this.getProvider(network).getUnclaimed(address, monitor);
+    return this.getProvider(network).getUnclaimed(address);
   }
 
-  public async getUnspentOutputs(
-    network: NetworkType,
-    address: AddressString,
-    monitor?: Monitor,
-  ): Promise<readonly InputOutput[]> {
-    return this.getProvider(network).getUnspentOutputs(address, monitor);
+  public async getUnspentOutputs(network: NetworkType, address: AddressString): Promise<readonly InputOutput[]> {
+    return this.getProvider(network).getUnspentOutputs(address);
   }
 
-  public async relayTransaction(
-    network: NetworkType,
-    transaction: string,
-    monitor?: Monitor,
-  ): Promise<RelayTransactionResult> {
-    return this.getProvider(network).relayTransaction(transaction, monitor);
+  public async relayTransaction(network: NetworkType, transaction: string): Promise<RelayTransactionResult> {
+    return this.getProvider(network).relayTransaction(transaction);
   }
 
   public async getTransactionReceipt(
@@ -97,16 +87,12 @@ export class NEOONEProvider implements Provider {
     return this.getProvider(network).getTransactionReceipt(hash, options);
   }
 
-  public async getInvocationData(
-    network: NetworkType,
-    hash: Hash256String,
-    monitor?: Monitor,
-  ): Promise<RawInvocationData> {
-    return this.getProvider(network).getInvocationData(hash, monitor);
+  public async getInvocationData(network: NetworkType, hash: Hash256String): Promise<RawInvocationData> {
+    return this.getProvider(network).getInvocationData(hash);
   }
 
-  public async testInvoke(network: NetworkType, transaction: string, monitor?: Monitor): Promise<RawCallReceipt> {
-    return this.getProvider(network).testInvoke(transaction, monitor);
+  public async testInvoke(network: NetworkType, transaction: string): Promise<RawCallReceipt> {
+    return this.getProvider(network).testInvoke(transaction);
   }
 
   public async call(
@@ -114,37 +100,36 @@ export class NEOONEProvider implements Provider {
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    monitor?: Monitor,
   ): Promise<RawCallReceipt> {
-    return this.getProvider(network).call(contract, method, params, monitor);
+    return this.getProvider(network).call(contract, method, params);
   }
 
-  public async getNetworkSettings(network: NetworkType, monitor?: Monitor): Promise<NetworkSettings> {
-    return this.getProvider(network).getNetworkSettings(monitor);
+  public async getNetworkSettings(network: NetworkType): Promise<NetworkSettings> {
+    return this.getProvider(network).getNetworkSettings();
   }
 
-  public async getBlockCount(network: NetworkType, monitor?: Monitor): Promise<number> {
-    return this.getProvider(network).getBlockCount(monitor);
+  public async getBlockCount(network: NetworkType): Promise<number> {
+    return this.getProvider(network).getBlockCount();
   }
 
-  public async getTransaction(network: NetworkType, hash: Hash256String, monitor?: Monitor): Promise<Transaction> {
-    return this.getProvider(network).getTransaction(hash, monitor);
+  public async getTransaction(network: NetworkType, hash: Hash256String): Promise<Transaction> {
+    return this.getProvider(network).getTransaction(hash);
   }
 
-  public async getOutput(network: NetworkType, input: Input, monitor?: Monitor): Promise<Output> {
-    return this.getProvider(network).getOutput(input, monitor);
+  public async getOutput(network: NetworkType, input: Input): Promise<Output> {
+    return this.getProvider(network).getOutput(input);
   }
 
-  public async getClaimAmount(network: NetworkType, input: Input, monitor?: Monitor): Promise<BigNumber> {
-    return this.getProvider(network).getClaimAmount(input, monitor);
+  public async getClaimAmount(network: NetworkType, input: Input): Promise<BigNumber> {
+    return this.getProvider(network).getClaimAmount(input);
   }
 
   public read(network: NetworkType): NEOONEDataProvider | NEOONEOneDataProvider {
     return this.getProvider(network);
   }
 
-  public async getAccount(network: NetworkType, address: AddressString, monitor?: Monitor): Promise<Account> {
-    return this.getProvider(network).getAccount(address, monitor);
+  public async getAccount(network: NetworkType, address: AddressString): Promise<Account> {
+    return this.getProvider(network).getAccount(address);
   }
 
   public iterActionsRaw(network: NetworkType, options?: IterOptions): AsyncIterable<RawAction> {

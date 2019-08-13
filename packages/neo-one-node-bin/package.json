@@ -4,7 +4,7 @@
   "description": "NEO•ONE NEO executable full node.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/monitor": "^1.1.4",
+    "@neo-one/logger": "^1.0.0",
     "@neo-one/node": "^2.0.0",
     "@neo-one/node-http-rpc": "^2.0.0",
     "@neo-one/node-neo-settings": "^1.1.5",
@@ -22,11 +22,11 @@
     "seamless-immutable": "^7.1.4",
     "semver": "^6.0.0",
     "source-map-support": "^0.5.12",
-    "tslib": "^1.9.3",
-    "winston": "^3.1.0"
+    "tslib": "^1.9.3"
   },
   "devDependencies": {
     "@types/fs-extra": "8.0.0",
+    "@types/pino": "^5.8.8",
     "@types/rc": "1.1.0",
     "@types/seamless-immutable": "7.1.10"
   },

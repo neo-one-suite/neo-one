@@ -1,6 +1,5 @@
-import { Monitor } from '@neo-one/monitor';
 import { Paths } from 'env-paths';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import Vorpal, { Args, Command } from 'vorpal';
 import { ResourceDependency } from './MasterResourceAdapter';
 import { ResourceAdapter } from './ResourceAdapter';
@@ -159,28 +158,17 @@ export interface Binary {
   readonly firstArgs: readonly string[];
 }
 
-export interface LogConfig {
-  readonly name: string;
-  readonly path: string;
-  readonly level: string;
-  readonly maxSize: number;
-  readonly maxFiles: number;
-}
-
 export interface CLIArgs {
-  readonly monitor: Monitor;
   readonly shutdown: (options: { readonly exitCode: number; readonly error?: Error }) => void;
   mutableShutdownFuncs: Array<() => void>;
-  readonly logConfig$: Subject<LogConfig>;
   readonly vorpal: Vorpal;
-  readonly debug: boolean;
   readonly binary: Binary;
   readonly serverArgs: {
     readonly dir?: string;
     readonly serverPort?: number;
     readonly minPort?: number;
   };
-  readonly paths: Paths;
+  readonly paths: Omit<Paths, 'log'>;
 }
 // tslint:disable-next-line no-any
 export type Session = any;
@@ -188,7 +176,6 @@ export type Session = any;
 export interface InteractiveCLI {
   readonly vorpal: Vorpal;
   readonly client: Client;
-  readonly debug: boolean;
   readonly updateSession: (plugin: string, session: Session) => void;
   readonly mergeSession: (plugin: string, session: Session) => void;
   readonly getSession: (plugin: string) => Promise<Session>;
@@ -198,11 +185,10 @@ export interface InteractiveCLI {
   readonly resetDelimiter: () => void;
   // tslint:disable-next-line no-any
   readonly prompt: (questions: readonly object[]) => Promise<any>;
-  readonly monitor: Monitor | undefined;
   readonly exec: (command: string) => Promise<void>;
   readonly printDescribe: (describeTable: DescribeTable, log?: (value: string) => void) => void;
   readonly printList: (listTable: ListTable, log?: (value: string) => void) => void;
-  readonly print: (value: string) => void;
+  readonly print: (value: string, log?: (value: string) => void) => void;
   readonly getResourceType: (options: { readonly plugin: string; readonly resourceType: string }) => ResourceType;
 }
 

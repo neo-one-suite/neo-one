@@ -1,4 +1,4 @@
-import { Monitor } from '@neo-one/monitor';
+import { Logger } from '@neo-one/logger';
 import { PluginNotInstalledError, UnknownPluginResourceType } from '@neo-one/server-client';
 import {
   AllResources,
@@ -44,7 +44,7 @@ export class PluginManager {
   public readonly allResources$: Observable<AllResources>;
   public mutablePlugins: Plugins;
   public readonly plugins$: ReplaySubject<string>;
-  private readonly monitor: Monitor;
+  private readonly logger: Logger;
   private readonly binary: Binary;
   private readonly portAllocator: PortAllocator;
   private readonly dataPath: string;
@@ -53,19 +53,19 @@ export class PluginManager {
   private readonly update$: Subject<void>;
 
   public constructor({
-    monitor,
+    logger,
     binary,
     portAllocator,
     dataPath,
     httpServerPort,
   }: {
-    readonly monitor: Monitor;
+    readonly logger: Logger;
     readonly binary: Binary;
     readonly portAllocator: PortAllocator;
     readonly dataPath: string;
     readonly httpServerPort: number;
   }) {
-    this.monitor = monitor.at('plugin_manager');
+    this.logger = logger.child({ component: 'plugin_manager' });
     this.binary = binary;
     this.portAllocator = portAllocator;
     this.dataPath = dataPath;
@@ -139,7 +139,7 @@ export class PluginManager {
   public async registerPlugins(pluginNames: readonly string[]): Promise<void> {
     const plugins = pluginNames.map((pluginName) =>
       pluginsUtil.getPlugin({
-        monitor: this.monitor,
+        logger: this.logger,
         pluginName,
       }),
     );
@@ -233,7 +233,7 @@ export class PluginManager {
         });
 
         const resourcesManager = new ResourcesManager({
-          monitor: this.monitor,
+          logger: this.logger,
           dataPath: this.getResourcesManagerDataPath({
             plugin: plugin.name,
             resourceType: resourceType.name,

@@ -72,7 +72,6 @@ const minPort = minPortOut === undefined ? undefined : parseInt(minPortOut, 10);
 if (isStatic) {
   // tslint:disable-next-line no-floating-promises
   new CLI({
-    debug,
     dir,
     serverPort,
     httpServerPort,
@@ -81,7 +80,6 @@ if (isStatic) {
 } else {
   // tslint:disable-next-line no-floating-promises
   new InteractiveCLI({
-    debug,
     dir,
     serverPort,
     httpServerPort,

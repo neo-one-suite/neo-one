@@ -1,6 +1,5 @@
 // tslint:disable no-object-mutation
 import { BinaryWriter, common, crypto, OpCode, Param, ScriptBuilder, SysCallName } from '@neo-one/client-common';
-import { DefaultMonitor } from '@neo-one/monitor';
 import {
   Account,
   Asset,
@@ -55,10 +54,6 @@ import {
 } from '../stackItem';
 
 type flag = 'blockContainer' | 'consensusContainer' | 'useBadTransaction' | 'noPersistingBlock';
-
-const monitor = DefaultMonitor.create({
-  service: 'test',
-});
 
 const testArray: readonly number[] = [1, 2, 3];
 const testIterator: ReadonlyArray<{ readonly key: IntegerStackItem; readonly value: IntegerStackItem }> = [
@@ -3376,7 +3371,6 @@ describe('syscalls', () => {
         handleArgs(argsSB, args);
 
         const argsContext = await executeScript({
-          monitor,
           code: argsSB.build(),
           blockchain: blockchain as WriteBlockchain,
           init,
@@ -3388,7 +3382,6 @@ describe('syscalls', () => {
       }
 
       const context = await executeScript({
-        monitor,
         code: transaction.script,
         blockchain: blockchain as WriteBlockchain,
         init,

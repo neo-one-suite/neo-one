@@ -1,5 +1,4 @@
 import { Account, AddressString, NetworkType, publicKeyToAddress } from '@neo-one/client-common';
-import { Monitor } from '@neo-one/monitor';
 import BigNumber from 'bignumber.js';
 import { addHDKeysToCrypto, seedOne } from '../../../__data__';
 import { HDLocalStore, LocalHDHandler, LocalPath } from '../../../user';
@@ -29,7 +28,7 @@ const getPublicKeyMock = (path: LocalPath): string => {
 const getAccountMock = (activePath: LocalPath) => {
   const activeAddress = publicKeyToAddress(getPublicKeyMock(activePath));
 
-  return async (_network: NetworkType, address: AddressString, _monitor?: Monitor) => {
+  return async (_network: NetworkType, address: AddressString) => {
     if (address === activeAddress) {
       return Promise.resolve({
         address,
@@ -70,7 +69,7 @@ describe('LocalHDHandler', () => {
 
   const bootstrapMockHandler = (
     masterPath: readonly number[],
-    getAccountMockIn?: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>,
+    getAccountMockIn?: (network: NetworkType, address: AddressString) => Promise<Account>,
   ) => {
     getMasterPath.mockImplementation(() => masterPath);
     getPublicKey.mockImplementation(getPublicKeyMock);

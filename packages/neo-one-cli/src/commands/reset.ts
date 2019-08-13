@@ -1,3 +1,4 @@
+import { cliLogger } from '@neo-one/logger';
 import { Client, ServerManager } from '@neo-one/server-client';
 import { CLIArgs, name, VERSION } from '@neo-one/server-plugin';
 import * as fs from 'fs-extra';
@@ -11,7 +12,7 @@ export const reset = (args: CLIArgs) => {
     .command('reset', `Resets all data paths and starts ${name.title} fresh.`)
     .action(async () => {
       const spinner = ora(`Shutting down ${name.title} server`).start();
-      const { serverConfig, shutdown } = setupServer('reset', args);
+      const { serverConfig, shutdown } = setupServer(args);
       const config = await serverConfig.config$.pipe(take(1)).toPromise();
       const manager = new ServerManager({
         dataPath: config.paths.data,
@@ -26,6 +27,7 @@ export const reset = (args: CLIArgs) => {
       }
 
       spinner.succeed(`${name.title} server shutdown`);
+      cliLogger.info({ title: 'cli_server_shutdown' }, `${name.title} server shutdown`);
 
       spinner.start('Removing data directories');
       await Promise.all([
@@ -36,6 +38,7 @@ export const reset = (args: CLIArgs) => {
       ]);
 
       spinner.succeed('Nuked everything');
+      cliLogger.info({ title: 'cli_network_reset' });
 
       shutdown({ exitCode: 0 });
     })

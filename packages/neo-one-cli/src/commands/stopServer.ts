@@ -1,3 +1,4 @@
+import { cliLogger } from '@neo-one/logger';
 import { ServerManager } from '@neo-one/server-client';
 import { CLIArgs, name, VERSION } from '@neo-one/server-plugin';
 import ora from 'ora';
@@ -8,7 +9,7 @@ export const stopServer = (args: CLIArgs) => {
   const { vorpal } = args;
   vorpal.command('stop server', `Stops the ${name.title} server`).action(async () => {
     const spinner = ora(`Shutting down ${name.title} server`).start();
-    const { serverConfig, shutdown } = setupServer('stopServer', args);
+    const { serverConfig, shutdown } = setupServer(args);
 
     let manager;
     let pid;
@@ -22,6 +23,10 @@ export const stopServer = (args: CLIArgs) => {
       pid = await manager.getServerPID();
     } catch (error) {
       spinner.fail(`Failed to fetch ${name.title} server pid: ${error.message}`);
+      cliLogger.error(
+        { title: 'cli_server_stop', error: error.message },
+        `Failed to fetch ${name.title} server pid: ${error.message}`,
+      );
 
       shutdown({ exitCode: 1, error });
 
@@ -35,8 +40,13 @@ export const stopServer = (args: CLIArgs) => {
       try {
         await manager.kill();
         spinner.succeed(`${name.title} server shutdown (pid=${pid})`);
+        cliLogger.info({ title: 'cli_server_stop' }, `${name.title} server shutdown (pid=${pid})`);
       } catch (error) {
         spinner.fail(`Failed to shutdown ${name.title} server (pid=${pid}): ` + `${error.message}`);
+        cliLogger.error(
+          { title: 'cli_server_stop', error: error.message },
+          `Failed to shutdown ${name.title} server (pid=${pid}): ` + `${error.message}`,
+        );
 
         shutdown({ exitCode: 1, error });
 

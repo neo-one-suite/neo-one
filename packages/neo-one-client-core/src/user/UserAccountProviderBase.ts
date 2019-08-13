@@ -43,10 +43,17 @@ import {
   Witness,
   WitnessModel,
 } from '@neo-one/client-common';
-import { processActionsAndMessage } from '@neo-one/client-switch';
-import { Counter, Histogram, Labels, metrics, Monitor } from '@neo-one/monitor';
-import { labels as labelNames, utils as commonUtils } from '@neo-one/utils';
+import {
+  AggregationType,
+  globalStats,
+  Measure,
+  MeasureUnit,
+  processActionsAndMessage,
+  TagMap,
+} from '@neo-one/client-switch';
+import { Labels, labelToTag, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
+import debug from 'debug';
 import _ from 'lodash';
 import { Observable } from 'rxjs';
 import { clientUtils } from '../clientUtils';
@@ -63,6 +70,9 @@ import {
   NotImplementedError,
 } from '../errors';
 import { converters } from './converters';
+
+const logger = debug('NEOONE:LocalUserAccountProvider');
+const invokeTag = labelToTag(Labels.INVOKE_RAW_METHOD);
 
 export interface InvokeMethodOptions {
   readonly contract: AddressString;
@@ -82,7 +92,7 @@ export interface InvokeRawOptions<T extends TransactionReceipt> {
   }) => Promise<T> | T;
   readonly method: string;
   readonly scripts?: readonly WitnessModel[];
-  readonly labels?: Labels;
+  readonly labels?: Record<string, string>;
   readonly rawInputs?: readonly Input[];
   readonly rawOutputs?: readonly Output[];
   readonly sourceMaps?: Promise<SourceMaps>;
@@ -107,7 +117,6 @@ export interface ExecuteInvokeScriptOptions<T extends TransactionReceipt> {
     readonly receipt: TransactionReceipt;
   }) => Promise<T> | T;
   readonly sourceMaps?: Promise<SourceMaps>;
-  readonly monitor?: Monitor;
 }
 
 export interface ExecuteInvokeMethodOptions<T extends TransactionReceipt> extends ExecuteInvokeScriptOptions<T> {
@@ -126,7 +135,6 @@ export interface ExecuteInvokeClaimOptions {
   readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
   readonly from: UserAccountID;
   readonly sourceMaps?: Promise<SourceMaps>;
-  readonly monitor?: Monitor;
 }
 
 export interface Provider {
@@ -135,36 +143,26 @@ export interface Provider {
   readonly getUnclaimed: (
     network: NetworkType,
     address: AddressString,
-    monitor?: Monitor,
   ) => Promise<{ readonly unclaimed: readonly Input[]; readonly amount: BigNumber }>;
-  readonly getUnspentOutputs: (
-    network: NetworkType,
-    address: AddressString,
-    monitor?: Monitor,
-  ) => Promise<readonly InputOutput[]>;
+  readonly getUnspentOutputs: (network: NetworkType, address: AddressString) => Promise<readonly InputOutput[]>;
   readonly getTransactionReceipt: (
     network: NetworkType,
     hash: Hash256String,
     options?: GetOptions,
   ) => Promise<TransactionReceipt>;
-  readonly getInvocationData: (
-    network: NetworkType,
-    hash: Hash256String,
-    monitor?: Monitor,
-  ) => Promise<RawInvocationData>;
-  readonly testInvoke: (network: NetworkType, transaction: string, monitor?: Monitor) => Promise<RawCallReceipt>;
+  readonly getInvocationData: (network: NetworkType, hash: Hash256String) => Promise<RawInvocationData>;
+  readonly testInvoke: (network: NetworkType, transaction: string) => Promise<RawCallReceipt>;
   readonly call: (
     network: NetworkType,
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    monitor?: Monitor,
   ) => Promise<RawCallReceipt>;
-  readonly getBlockCount: (network: NetworkType, monitor?: Monitor) => Promise<number>;
-  readonly getTransaction: (network: NetworkType, hash: Hash256String, monitor?: Monitor) => Promise<Transaction>;
-  readonly getOutput: (network: NetworkType, input: Input, monitor?: Monitor) => Promise<Output>;
+  readonly getBlockCount: (network: NetworkType) => Promise<number>;
+  readonly getTransaction: (network: NetworkType, hash: Hash256String) => Promise<Transaction>;
+  readonly getOutput: (network: NetworkType, input: Input) => Promise<Output>;
   readonly iterBlocks: (network: NetworkType, options?: IterOptions) => AsyncIterable<Block>;
-  readonly getAccount: (network: NetworkType, address: AddressString, monitor?: Monitor) => Promise<Account>;
+  readonly getAccount: (network: NetworkType, address: AddressString) => Promise<Account>;
   readonly iterActionsRaw?: (network: NetworkType, options?: IterOptions) => AsyncIterable<RawAction>;
 }
 
@@ -173,7 +171,6 @@ interface TransactionOptionsFull {
   readonly attributes: readonly Attribute[];
   readonly networkFee: BigNumber;
   readonly systemFee: BigNumber;
-  readonly monitor?: Monitor;
 }
 
 const NEO_ONE_ATTRIBUTE: Attribute = {
@@ -181,31 +178,69 @@ const NEO_ONE_ATTRIBUTE: Attribute = {
   data: Buffer.from('neo-one', 'utf8').toString('hex'),
 };
 
-const NEO_TRANSFER_DURATION_SECONDS = metrics.createHistogram({
-  name: 'neo_transfer_duration_seconds',
-});
+const transferDurationSec = globalStats.createMeasureDouble('transfer/duration', MeasureUnit.SEC);
+const transferFailures = globalStats.createMeasureInt64('transfer/failures', MeasureUnit.UNIT);
+const claimDurationSec = globalStats.createMeasureDouble('claim/duration', MeasureUnit.SEC);
+const claimFailures = globalStats.createMeasureInt64('claim/failures', MeasureUnit.UNIT);
+const invokeDurationSec = globalStats.createMeasureDouble('invoke/duration', MeasureUnit.SEC);
+const invokeFailures = globalStats.createMeasureInt64('invoke/failures', MeasureUnit.UNIT);
 
-const NEO_TRANSFER_FAILURES_TOTAL = metrics.createCounter({
-  name: 'neo_transfer_failures_total',
-});
+const NEO_TRANSFER_DURATION_SECONDS = globalStats.createView(
+  'neo_transfer_duration_seconds',
+  transferDurationSec,
+  AggregationType.DISTRIBUTION,
+  [],
+  'transfer durations in seconds',
+  [1, 2, 5, 7.5, 10, 12.5, 15, 17.5, 20],
+);
+globalStats.registerView(NEO_TRANSFER_DURATION_SECONDS);
 
-const NEO_CLAIM_DURATION_SECONDS = metrics.createHistogram({
-  name: 'neo_claim_duration_seconds',
-});
+const NEO_TRANSFER_FAILURES_TOTAL = globalStats.createView(
+  'neo_transfer_failures_total',
+  transferFailures,
+  AggregationType.COUNT,
+  [],
+  'total transfer failures',
+);
+globalStats.registerView(NEO_TRANSFER_FAILURES_TOTAL);
 
-const NEO_CLAIM_FAILURES_TOTAL = metrics.createCounter({
-  name: 'neo_claim_failures_total',
-});
+const NEO_CLAIM_DURATION_SECONDS = globalStats.createView(
+  'neo_claim_duration_seconds',
+  claimDurationSec,
+  AggregationType.DISTRIBUTION,
+  [],
+  'claim durations in seconds',
+  [1, 2, 5, 7.5, 10, 12.5, 15, 17.5, 20],
+);
+globalStats.registerView(NEO_CLAIM_DURATION_SECONDS);
 
-const NEO_INVOKE_RAW_DURATION_SECONDS = metrics.createHistogram({
-  name: 'neo_invoke_raw_duration_seconds',
-  labelNames: [labelNames.INVOKE_RAW_METHOD],
-});
+const NEO_CLAIM_FAILURES_TOTAL = globalStats.createView(
+  'neo_claims_failures_total',
+  claimFailures,
+  AggregationType.COUNT,
+  [],
+  'total claims failures',
+);
+globalStats.registerView(NEO_CLAIM_FAILURES_TOTAL);
 
-const NEO_INVOKE_RAW_FAILURES_TOTAL = metrics.createCounter({
-  name: 'neo_invoke_raw_failures_total',
-  labelNames: [labelNames.INVOKE_RAW_METHOD],
-});
+const NEO_INVOKE_RAW_DURATION_SECONDS = globalStats.createView(
+  'neo_invoke_raw_duration_seconds',
+  invokeDurationSec,
+  AggregationType.DISTRIBUTION,
+  [invokeTag],
+  'invoke durations in seconds',
+  [1, 2, 5, 7.5, 10, 12.5, 15, 17.5, 20],
+);
+globalStats.registerView(NEO_INVOKE_RAW_DURATION_SECONDS);
+
+const NEO_INVOKE_RAW_FAILURES_TOTAL = globalStats.createView(
+  'neo_invoke_raw_failures_total',
+  invokeFailures,
+  AggregationType.COUNT,
+  [invokeTag],
+  'total invocation failures',
+);
+globalStats.registerView(NEO_INVOKE_RAW_FAILURES_TOTAL);
 
 interface FullTransfer extends Transfer {
   readonly from: UserAccountID;
@@ -241,7 +276,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     throw new NotImplementedError('getNetworks');
   }
 
-  public async selectUserAccount(_id?: UserAccountID, _monitor?: Monitor): Promise<void> {
+  public async selectUserAccount(_id?: UserAccountID): Promise<void> {
     throw new NotImplementedError('selectUserAccount');
   }
 
@@ -249,47 +284,39 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     return this.provider.iterBlocks(network, options);
   }
 
-  public async getBlockCount(network: NetworkType, monitor?: Monitor): Promise<number> {
-    return this.provider.getBlockCount(network, monitor);
+  public async getBlockCount(network: NetworkType): Promise<number> {
+    return this.provider.getBlockCount(network);
   }
 
-  public async getAccount(network: NetworkType, address: AddressString, monitor?: Monitor): Promise<Account> {
-    return this.provider.getAccount(network, address, monitor);
+  public async getAccount(network: NetworkType, address: AddressString): Promise<Account> {
+    return this.provider.getAccount(network, address);
   }
 
   public async transfer(
     transfers: readonly Transfer[],
     options?: TransactionOptions,
   ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction | ContractTransaction>> {
-    const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
+    const { from, attributes, networkFee } = this.getTransactionOptions(options);
 
-    return this.capture(
-      async (span) => this.executeTransfer(transfers, from, attributes, networkFee, span),
-      {
-        name: 'neo_transfer',
-        metric: {
-          total: NEO_TRANSFER_DURATION_SECONDS,
-          error: NEO_TRANSFER_FAILURES_TOTAL,
-        },
+    return this.capture(async () => this.executeTransfer(transfers, from, attributes, networkFee), {
+      title: 'neo_transfer',
+      measures: {
+        total: transferDurationSec,
+        error: transferFailures,
       },
-      monitor,
-    );
+    });
   }
 
   public async claim(options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
-    const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
+    const { from, attributes, networkFee } = this.getTransactionOptions(options);
 
-    return this.capture(
-      async (span) => this.executeClaim(from, attributes, networkFee, span),
-      {
-        name: 'neo_claim',
-        metric: {
-          total: NEO_CLAIM_DURATION_SECONDS,
-          error: NEO_CLAIM_FAILURES_TOTAL,
-        },
+    return this.capture(async () => this.executeClaim(from, attributes, networkFee), {
+      title: 'neo_claim',
+      measures: {
+        total: claimDurationSec,
+        error: claimFailures,
       },
-      monitor,
-    );
+    });
   }
 
   public async invoke(
@@ -351,7 +378,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       ),
       method: 'invoke',
       labels: {
-        [labelNames.INVOKE_METHOD]: method,
+        [Labels.INVOKE_METHOD]: method,
       },
       sourceMaps,
     });
@@ -416,7 +443,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       },
       method: 'invokeSend',
       labels: {
-        [labelNames.INVOKE_METHOD]: method,
+        [Labels.INVOKE_METHOD]: method,
       },
       sourceMaps,
     });
@@ -432,9 +459,9 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const transactionOptions = this.getTransactionOptions(options);
-    const { from, attributes, monitor } = transactionOptions;
+    const { from, attributes } = transactionOptions;
 
-    const sendTransaction = await this.provider.getTransaction(from.network, hash, monitor);
+    const sendTransaction = await this.provider.getTransaction(from.network, hash);
     if (sendTransaction.outputs.length === 0) {
       throw new NothingToSendError();
     }
@@ -467,7 +494,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       rawOutputs: [sendOutput],
       method: 'invokeCompleteSend',
       labels: {
-        [labelNames.INVOKE_METHOD]: method,
+        [Labels.INVOKE_METHOD]: method,
       },
       sourceMaps,
     });
@@ -483,9 +510,9 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const transactionOptions = this.getTransactionOptions(options);
-    const { from, attributes, monitor } = transactionOptions;
+    const { from, attributes } = transactionOptions;
 
-    const refundTransaction = await this.provider.getTransaction(from.network, hash, monitor);
+    const refundTransaction = await this.provider.getTransaction(from.network, hash);
     const refundOutputs = refundTransaction.outputs
       .map((output, idx) => ({ output, idx }))
       .filter(({ output }) => output.address === contract);
@@ -525,7 +552,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       rawOutputs: outputs,
       method: 'invokeRefundAssets',
       labels: {
-        [labelNames.INVOKE_METHOD]: method,
+        [Labels.INVOKE_METHOD]: method,
       },
       sourceMaps,
     });
@@ -539,17 +566,16 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     options: TransactionOptions = {},
     sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
-    const { from, attributes, networkFee, monitor } = this.getTransactionOptions(options);
+    const { from, attributes, networkFee } = this.getTransactionOptions(options);
 
     return this.capture(
-      async (span) => {
+      async () => {
         const [{ unclaimed, amount }, { inputs, outputs }] = await Promise.all([
-          this.provider.getUnclaimed(from.network, contract, span),
+          this.provider.getUnclaimed(from.network, contract),
           this.getTransfersInputOutputs({
             from,
             gas: networkFee,
             transfers: [],
-            monitor: span,
           }),
         ]);
 
@@ -569,17 +595,15 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
           params,
           paramsZipped,
           sourceMaps,
-          monitor: span,
         });
       },
       {
-        name: 'neo_claim',
-        metric: {
-          total: NEO_CLAIM_DURATION_SECONDS,
-          error: NEO_CLAIM_FAILURES_TOTAL,
+        title: 'neo_invoke_claim',
+        measures: {
+          total: claimDurationSec,
+          error: claimFailures,
         },
       },
-      monitor,
     );
   }
 
@@ -588,9 +612,8 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     contract: AddressString,
     method: string,
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
-    monitor?: Monitor,
   ): Promise<RawCallReceipt> {
-    return this.provider.call(network, contract, method, params, monitor);
+    return this.provider.call(network, contract, method, params);
   }
 
   protected getTransactionOptions(options: TransactionOptions = {}): TransactionOptionsFull {
@@ -611,7 +634,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       attributes: attributes.concat([NEO_ONE_ATTRIBUTE]),
       networkFee,
       systemFee,
-      monitor: options.monitor,
     };
   }
 
@@ -669,13 +691,11 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     inputs,
     transactionUnsignedIn,
     from,
-    monitor,
     byteLimit,
   }: {
     readonly transactionUnsignedIn: TransactionBaseModel;
     readonly inputs: readonly InputOutput[];
     readonly from: UserAccountID;
-    readonly monitor?: Monitor;
     readonly byteLimit: number;
   }): Promise<TransactionBaseModel> {
     const messageSize = transactionUnsignedIn.serializeUnsigned().length;
@@ -688,7 +708,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       readonly numNewOutputs?: number;
     }): number => messageSize + numNewInputs * InputModel.size + numNewOutputs * OutputModel.size;
 
-    const { unspentOutputs: consolidatableUnspents } = await this.getUnspentOutputs({ from, monitor });
+    const { unspentOutputs: consolidatableUnspents } = await this.getUnspentOutputs({ from });
     const assetToInputOutputsUnsorted = consolidatableUnspents
       .filter((unspent) => !inputs.some((input) => unspent.hash === input.hash && unspent.index === input.index))
       .reduce<{ [key: string]: readonly InputOutput[] }>((acc, unspent) => {
@@ -891,14 +911,12 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
 
   protected async getUnspentOutputs({
     from,
-    monitor,
   }: {
     readonly from: UserAccountID;
-    readonly monitor?: Monitor;
   }): Promise<{ readonly unspentOutputs: readonly InputOutput[]; readonly wasFiltered: boolean }> {
     const [newBlockCount, allUnspentsIn] = await Promise.all([
-      this.provider.getBlockCount(from.network, monitor),
-      this.provider.getUnspentOutputs(from.network, from.address, monitor),
+      this.provider.getBlockCount(from.network),
+      this.provider.getUnspentOutputs(from.network, from.address),
     ]);
     if (newBlockCount !== this.mutableBlockCount) {
       this.mutableUsedOutputs.clear();
@@ -916,12 +934,10 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     transfers,
     from,
     gas,
-    monitor,
   }: {
     readonly transfers: readonly FullTransfer[];
     readonly from: UserAccountID;
     readonly gas: BigNumber;
-    readonly monitor?: Monitor;
   }): Promise<{ readonly outputs: readonly Output[]; readonly inputs: readonly InputOutput[] }> {
     if (transfers.length === 0 && gas.lte(utils.ZERO_BIG_NUMBER)) {
       return { inputs: [], outputs: [] };
@@ -945,7 +961,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
         this.getTransfersInputOutputsFrom({
           transfers: transfersFrom,
           from: transfersFrom[0].from,
-          monitor,
         }),
       ),
     );
@@ -962,13 +977,11 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
   protected async getTransfersInputOutputsFrom({
     transfers,
     from,
-    monitor,
   }: {
     readonly transfers: readonly Transfer[];
     readonly from: UserAccountID;
-    readonly monitor?: Monitor;
   }): Promise<{ readonly outputs: readonly Output[]; readonly inputs: readonly InputOutput[] }> {
-    const { unspentOutputs: allOutputs, wasFiltered } = await this.getUnspentOutputs({ from, monitor });
+    const { unspentOutputs: allOutputs, wasFiltered } = await this.getUnspentOutputs({ from });
 
     return Object.values(_.groupBy(transfers, ({ asset }) => asset)).reduce(
       (acc, toByAsset) => {
@@ -1156,34 +1169,65 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
   }
 
   protected async capture<T>(
-    func: (monitor?: Monitor) => Promise<T>,
+    func: () => Promise<T>,
     {
-      name,
+      title,
       labels = {},
-      metric,
+      measures,
+      invoke = false,
     }: {
-      readonly name: string;
-      readonly labels?: Labels;
-      readonly metric?: {
-        readonly total: Histogram;
-        readonly error: Counter;
+      readonly title: string;
+      readonly labels?: Record<string, string>;
+      readonly measures?: {
+        readonly total?: Measure;
+        readonly error?: Measure;
       };
+      readonly invoke?: boolean;
     },
-    monitor?: Monitor,
   ): Promise<T> {
-    if (monitor === undefined) {
-      return func();
+    const tags = new TagMap();
+    if (invoke) {
+      const value = labels[Labels.INVOKE_RAW_METHOD];
+      // tslint:disable-next-line: strict-type-predicates
+      if (value === undefined) {
+        throw new Error('invocation should have a invoke method');
+      }
+      tags.set(invokeTag, { value });
     }
 
-    return monitor
-      .at('local_user_account_provider')
-      .withLabels(labels)
-      .captureSpanLog(func, {
-        name,
-        metric,
-        level: { log: 'verbose', span: 'info' },
-        trace: true,
-      });
+    const startTime = Date.now();
+    try {
+      const result = await func();
+      logger('%o', { title, level: 'verbose', ...labels });
+      if (measures !== undefined && measures.total !== undefined) {
+        globalStats.record(
+          [
+            {
+              measure: measures.total,
+              value: Date.now() - startTime,
+            },
+          ],
+          tags,
+        );
+      }
+
+      return result;
+    } catch (error) {
+      logger('%o', { title, level: 'error', error: error.message, ...labels });
+      if (measures !== undefined && measures.error !== undefined) {
+        globalStats.record(
+          [
+            {
+              measure: measures.error,
+              value: 1,
+            },
+          ],
+          tags,
+        );
+      }
+
+      throw error;
+    }
   }
 
   protected async checkSystemFees({
@@ -1197,7 +1241,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     rawOutputs = [],
     scripts = [],
     sourceMaps,
-    monitor,
     reorderOutputs = (outputs) => outputs,
   }: {
     readonly script: Buffer;
@@ -1210,7 +1253,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     readonly rawOutputs?: ReadonlyArray<Output>;
     readonly scripts?: ReadonlyArray<WitnessModel>;
     readonly sourceMaps?: Promise<SourceMaps>;
-    readonly monitor?: Monitor;
     readonly reorderOutputs?: (outputs: ReadonlyArray<Output>) => ReadonlyArray<Output>;
   }): Promise<{
     readonly gas: BigNumber;
@@ -1220,7 +1262,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       transfers,
       from,
       gas: networkFee,
-      monitor,
     });
 
     const attributes = attributesIn.concat({
@@ -1238,11 +1279,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       scripts,
     });
 
-    const callReceipt = await this.provider.testInvoke(
-      from.network,
-      testTransaction.serializeWire().toString('hex'),
-      monitor,
-    );
+    const callReceipt = await this.provider.testInvoke(from.network, testTransaction.serializeWire().toString('hex'));
 
     if (callReceipt.result.state === 'FAULT') {
       const message = await processActionsAndMessage({
@@ -1278,14 +1315,12 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     from: UserAccountID,
     attributes: readonly Attribute[],
     networkFee: BigNumber,
-    monitor?: Monitor,
   ): Promise<TransactionResult<TransactionReceipt, InvocationTransaction | ContractTransaction>>;
 
   protected abstract async executeClaim(
     from: UserAccountID,
     attributes: readonly Attribute[],
     networkFee: BigNumber,
-    monitor?: Monitor,
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
 
   protected async invokeRaw<T extends TransactionReceipt>({
@@ -1302,11 +1337,11 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     sourceMaps,
     reorderOutputs = (outputs) => outputs,
   }: InvokeRawOptions<T>) {
-    const { from, attributes: attributesIn, networkFee, systemFee, monitor } = this.getTransactionOptions(options);
+    const { from, attributes: attributesIn, networkFee, systemFee } = this.getTransactionOptions(options);
     const { script, invokeMethodOptions } = this.getScriptAndInvokeMethodOptions(invokeMethodOptionsOrScript);
 
     return this.capture(
-      async (span) => {
+      async () => {
         const { gas, attributes } = await this.checkSystemFees({
           script,
           transfers,
@@ -1318,7 +1353,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
           rawOutputs,
           scripts,
           sourceMaps,
-          monitor,
           reorderOutputs,
         });
 
@@ -1326,7 +1360,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
           transfers,
           from,
           gas: networkFee.plus(gas),
-          monitor: span,
         });
 
         return invokeMethodOptions === undefined
@@ -1344,7 +1377,6 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
               reorderOutputs,
               onConfirm,
               sourceMaps,
-              monitor: span,
             })
           : this.executeInvokeMethod({
               script,
@@ -1361,22 +1393,20 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
               reorderOutputs,
               onConfirm,
               sourceMaps,
-              monitor: span,
             });
       },
       {
-        name: 'neo_invoke_raw',
-        labels: {
-          ...labels,
-          [labelNames.INVOKE_RAW_METHOD]: method,
+        title: 'neo_invoke_raw',
+        invoke: true,
+        measures: {
+          total: invokeDurationSec,
+          error: invokeFailures,
         },
-
-        metric: {
-          total: NEO_INVOKE_RAW_DURATION_SECONDS,
-          error: NEO_INVOKE_RAW_FAILURES_TOTAL,
+        labels: {
+          [Labels.INVOKE_RAW_METHOD]: method,
+          ...labels,
         },
       },
-      monitor,
     );
   }
 

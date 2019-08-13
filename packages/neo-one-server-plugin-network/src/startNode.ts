@@ -1,10 +1,9 @@
+import { serverLogger } from '@neo-one/logger';
 import { CLIArgs } from '@neo-one/server-plugin';
-import * as path from 'path';
-import { distinctUntilChanged, map } from 'rxjs/operators';
 import { createFullNode } from './createFullNode';
 import { createNEOONENodeConfig } from './node';
 
-export const startNode = ({ vorpal, monitor, shutdown, mutableShutdownFuncs, logConfig$ }: CLIArgs) => {
+export const startNode = ({ vorpal, shutdown, mutableShutdownFuncs }: CLIArgs) => {
   vorpal
     .command('start node <dataPath>', `Starts a full node`)
     .option('-c, --chain <chain>', 'Path of a chain.acc file to bootstrap the node')
@@ -13,22 +12,6 @@ export const startNode = ({ vorpal, monitor, shutdown, mutableShutdownFuncs, log
       const { dataPath, options: cliOptions } = args;
 
       const nodeConfig = createNEOONENodeConfig({ dataPath });
-
-      const logPath = path.resolve(dataPath, 'log');
-      const logSubscription = nodeConfig.config$
-        .pipe(
-          map((config) => config.log),
-          distinctUntilChanged(),
-          map((config) => ({
-            name: 'node',
-            path: logPath,
-            level: config.level,
-            maxSize: config.maxSize,
-            maxFiles: config.maxFiles,
-          })),
-        )
-        .subscribe(logConfig$);
-      mutableShutdownFuncs.push(() => logSubscription.unsubscribe());
 
       let chainFile;
       if (cliOptions.chain != undefined) {
@@ -43,21 +26,23 @@ export const startNode = ({ vorpal, monitor, shutdown, mutableShutdownFuncs, log
       const node = await createFullNode({
         dataPath,
         nodeConfig,
-        monitor,
         chainFile,
         dumpChainFile,
         onError: (error) => {
-          monitor.logError({
-            name: 'neo_node_uncaught_error',
-            message: 'Uncaught node error, shutting down.',
-            error,
-          });
+          serverLogger.error(
+            {
+              title: 'neo_node_uncaught_error',
+              error,
+            },
+            'Uncaught node error, shutting down.',
+          );
 
           shutdown({ exitCode: 1, error });
         },
       });
 
       await node.start();
-      mutableShutdownFuncs.push(async () => node.stop());
+      const stop = node.stop.bind(node);
+      mutableShutdownFuncs.push(stop);
     });
 };

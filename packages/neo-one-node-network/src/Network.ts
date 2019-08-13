@@ -1,4 +1,4 @@
-import { metrics, Monitor } from '@neo-one/monitor';
+import { nodeLogger } from '@neo-one/logger';
 import {
   ConnectedPeer,
   createEndpoint,
@@ -10,13 +10,16 @@ import {
   Peer,
   PeerHealthBase,
 } from '@neo-one/node-core';
-import { utils } from '@neo-one/utils';
+import { Labels, utils } from '@neo-one/utils';
+import { AggregationType, globalStats, MeasureUnit } from '@opencensus/core';
 import _ from 'lodash';
 import * as net from 'net';
 import { Observable, Subscription } from 'rxjs';
 import { Duplex } from 'stream';
 import { UnsupportedEndpointType } from './errors';
 import { TCPPeer } from './TCPPeer';
+
+const logger = nodeLogger.child({ component: 'network' });
 
 export interface ListenTCP {
   readonly port: number;
@@ -39,7 +42,6 @@ export interface NetworkOptions {
 
 interface NetworkConstructOptions<Message, PeerData, PeerHealth extends PeerHealthBase>
   extends NetworkCreateOptions<Message, PeerData, PeerHealth> {
-  readonly monitor: Monitor;
   readonly environment?: NetworkEnvironment;
   readonly options$: Observable<NetworkOptions>;
 }
@@ -73,29 +75,58 @@ const CONNECT_ERROR_CODES = new Set([
   'ETIMEDOUT',
 ]);
 
-const NEO_NETWORK_PEER_CLOSED_TOTAL = metrics.createCounter({
-  name: 'neo_network_peer_closed_total',
-  help: 'Total number of times a peer was closed due to error or ending the socket.',
-});
+const peersClosed = globalStats.createMeasureInt64('peers/closed', MeasureUnit.UNIT);
+const peersTotal = globalStats.createMeasureInt64('peers/total', MeasureUnit.UNIT);
+const peersFailed = globalStats.createMeasureInt64('peers/failures', MeasureUnit.UNIT);
+const peersConnected = globalStats.createMeasureInt64('peers/connected', MeasureUnit.UNIT);
+const peersConnecting = globalStats.createMeasureInt64('peers/connecting', MeasureUnit.UNIT);
 
-const NEO_NETWORK_PEER_CONNECT_TOTAL = metrics.createCounter({
-  name: 'neo_network_peer_connect_total',
-});
+const NEO_NETWORK_PEER_CLOSED_TOTAL = globalStats.createView(
+  'neo_network_peer_closed_total',
+  peersClosed,
+  AggregationType.COUNT,
+  [],
+  'Total number of times a peer was closed due to error or ending the socket.',
+);
+globalStats.registerView(NEO_NETWORK_PEER_CLOSED_TOTAL);
 
-const NEO_NETWORK_PEER_CONNECT_FAILURES_TOTAL = metrics.createCounter({
-  name: 'neo_network_peer_connect_failures_total',
-});
+const NEO_NETWORK_PEER_CONNECT_TOTAL = globalStats.createView(
+  'neo_network_peer_connect_total',
+  peersTotal,
+  AggregationType.COUNT,
+  [],
+  'total number of peer connections received',
+);
+globalStats.registerView(NEO_NETWORK_PEER_CONNECT_TOTAL);
 
-const NEO_NETWORK_CONNECTED_PEERS_TOTAL = metrics.createGauge({
-  name: 'neo_network_connected_peers_total',
-});
+const NEO_NETWORK_PEER_CONNECT_FAILURES_TOTAL = globalStats.createView(
+  'neo_network_peer_connect_failures_total',
+  peersFailed,
+  AggregationType.COUNT,
+  [],
+  'total number of failed peer connections',
+);
+globalStats.registerView(NEO_NETWORK_PEER_CONNECT_FAILURES_TOTAL);
 
-const NEO_NETWORK_CONNECTING_PEERS_TOTAL = metrics.createGauge({
-  name: 'neo_network_connecting_peers_total',
-});
+const NEO_NETWORK_CONNECTED_PEERS_TOTAL = globalStats.createView(
+  'neo_network_connected_peers_total',
+  peersConnected,
+  AggregationType.LAST_VALUE,
+  [],
+  'number of currently connected peers',
+);
+globalStats.registerView(NEO_NETWORK_CONNECTED_PEERS_TOTAL);
+
+const NEO_NETWORK_CONNECTING_PEERS_TOTAL = globalStats.createView(
+  'neo_network_connecting_peers_total',
+  peersConnecting,
+  AggregationType.LAST_VALUE,
+  [],
+  'number of currently connecting peers',
+);
+globalStats.registerView(NEO_NETWORK_CONNECTING_PEERS_TOTAL);
 
 export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
-  private readonly monitor: Monitor;
   private mutableStarted: boolean;
   private mutableStopped: boolean;
   private mutableExternalEndpoints: Set<Endpoint>;
@@ -132,7 +163,6 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
 
   public constructor(options: NetworkConstructOptions<Message, PeerData, PeerHealth>) {
     const { environment = {}, options$ } = options;
-    this.monitor = options.monitor.at('node_network');
     this.mutableStarted = false;
     this.mutableStopped = false;
 
@@ -173,47 +203,39 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
     }
     this.mutableStarted = true;
     this.mutableStopped = false;
+    try {
+      this.mutableSubscription = this.options$.subscribe({
+        next: (options) => {
+          this.mutableSeeds = new Set(options.seeds);
+          this.mutablePeerSeeds = new Set(options.peerSeeds === undefined ? [] : options.peerSeeds);
+          if (options.seeds !== undefined) {
+            options.seeds.forEach((seed) => this.addEndpoint(seed));
+          }
+          this.mutableMaxConnectedPeers =
+            options.maxConnectedPeers === undefined ? MAX_CONNECTED_PEERS : options.maxConnectedPeers;
+          this.mutableExternalEndpoints =
+            options.externalEndpoints === undefined ? EXTERNAL_ENDPOINTS : new Set(options.externalEndpoints);
+          this.mutableConnectPeersDelayMS =
+            options.connectPeersDelayMS === undefined ? CONNECT_PEERS_DELAY_MS : options.connectPeersDelayMS;
+          this.mutableSocketTimeoutMS =
+            options.socketTimeoutMS === undefined ? SOCKET_TIMEOUT_MS : options.socketTimeoutMS;
+          this.mutableConnectErrorCodes =
+            options.connectErrorCodes === undefined ? CONNECT_ERROR_CODES : new Set(options.connectErrorCodes);
+        },
+        error: () => {
+          // do nothing
+        },
+      });
 
-    this.monitor.captureLog(
-      () => {
-        try {
-          this.mutableSubscription = this.options$.subscribe({
-            next: (options) => {
-              this.mutableSeeds = new Set(options.seeds);
-              this.mutablePeerSeeds = new Set(options.peerSeeds === undefined ? [] : options.peerSeeds);
-              if (options.seeds !== undefined) {
-                options.seeds.forEach((seed) => this.addEndpoint(seed));
-              }
-              this.mutableMaxConnectedPeers =
-                options.maxConnectedPeers === undefined ? MAX_CONNECTED_PEERS : options.maxConnectedPeers;
-              this.mutableExternalEndpoints =
-                options.externalEndpoints === undefined ? EXTERNAL_ENDPOINTS : new Set(options.externalEndpoints);
-              this.mutableConnectPeersDelayMS =
-                options.connectPeersDelayMS === undefined ? CONNECT_PEERS_DELAY_MS : options.connectPeersDelayMS;
-              this.mutableSocketTimeoutMS =
-                options.socketTimeoutMS === undefined ? SOCKET_TIMEOUT_MS : options.socketTimeoutMS;
-              this.mutableConnectErrorCodes =
-                options.connectErrorCodes === undefined ? CONNECT_ERROR_CODES : new Set(options.connectErrorCodes);
-            },
-            error: () => {
-              // do nothing
-            },
-          });
-
-          this.startServer();
-          // tslint:disable-next-line no-floating-promises
-          this.run();
-        } catch (error) {
-          this.mutableStarted = false;
-          throw error;
-        }
-      },
-      {
-        name: 'neo_network_start',
-        message: 'Network started.',
-        error: 'Network failed to start.',
-      },
-    );
+      this.startServer();
+      // tslint:disable-next-line no-floating-promises
+      this.run();
+      logger.info({ title: 'neo_network_start' }, 'Network started.');
+    } catch (error) {
+      logger.error({ title: 'neo_network_start', error }, 'Network failed to start.');
+      this.mutableStarted = false;
+      throw error;
+    }
   }
 
   public stop(): void {
@@ -221,44 +243,36 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       return;
     }
     this.mutableStopped = true;
+    try {
+      if (this.mutableConnectPeersTimeout !== undefined) {
+        clearTimeout(this.mutableConnectPeersTimeout);
+        this.mutableConnectPeersTimeout = undefined;
+      }
 
-    this.monitor.captureLog(
-      () => {
-        try {
-          if (this.mutableConnectPeersTimeout !== undefined) {
-            clearTimeout(this.mutableConnectPeersTimeout);
-            this.mutableConnectPeersTimeout = undefined;
-          }
-
-          Object.keys(this.mutableConnectedPeers).forEach((endpoint) => {
-            const peer = this.mutableConnectedPeers[endpoint];
-            if (peer !== undefined) {
-              peer.close();
-              const { [peer.endpoint]: _unused, ...mutableConnectedPeers } = this.mutableConnectedPeers;
-              this.mutableConnectedPeers = mutableConnectedPeers;
-            }
-          });
-
-          if (this.mutableTCPServer !== undefined) {
-            this.mutableTCPServer.close();
-          }
-
-          if (this.mutableSubscription !== undefined) {
-            this.mutableSubscription.unsubscribe();
-          }
-
-          this.mutableStarted = false;
-        } catch (error) {
-          this.mutableStopped = false;
-          throw error;
+      Object.keys(this.mutableConnectedPeers).forEach((endpoint) => {
+        const peer = this.mutableConnectedPeers[endpoint];
+        if (peer !== undefined) {
+          peer.close();
+          const { [peer.endpoint]: _unused, ...mutableConnectedPeers } = this.mutableConnectedPeers;
+          this.mutableConnectedPeers = mutableConnectedPeers;
         }
-      },
-      {
-        name: 'neo_network_stop',
-        message: 'Network stopped.',
-        error: 'Network failed to stop cleanly.',
-      },
-    );
+      });
+
+      if (this.mutableTCPServer !== undefined) {
+        this.mutableTCPServer.close();
+      }
+
+      if (this.mutableSubscription !== undefined) {
+        this.mutableSubscription.unsubscribe();
+      }
+
+      this.mutableStarted = false;
+      logger.info({ title: 'neo_network_stop' }, 'Network stopped.');
+    } catch (error) {
+      this.mutableStopped = false;
+      logger.error({ title: 'neo_network_stop', error }, 'Network failed to stop cleanly');
+      throw error;
+    }
   }
 
   public addEndpoint(endpoint: Endpoint): void {
@@ -296,16 +310,14 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
 
     const tcpServer = net.createServer({ pauseOnConnect: true }, (socket) => {
       const { remoteAddress, remotePort } = socket;
-      this.monitor
-        .withData({
-          [this.monitor.labels.PEER_ADDRESS]: remoteAddress,
-          [this.monitor.labels.PEER_PORT]: remotePort,
-        })
-        .log({
-          name: 'tcp_server_connect',
-          level: 'verbose',
-          message: `Received socket connection from ${remoteAddress === undefined ? 'unknown' : remoteAddress}`,
-        });
+      logger.debug(
+        {
+          [Labels.PEER_ADDRESS]: remoteAddress,
+          [Labels.PEER_PORT]: remotePort,
+          title: 'tcp_server_connect',
+        },
+        `Received socket connection from ${remoteAddress === undefined ? 'unknown' : remoteAddress}`,
+      );
 
       if (remoteAddress === undefined || remotePort === undefined) {
         socket.end();
@@ -323,37 +335,26 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
     });
     this.mutableTCPServer = tcpServer;
     tcpServer.on('error', (error) => {
-      this.monitor.logError({
-        name: 'tcp_server_uncaught_error',
-        message: 'TCP peer server encountered an error.',
-        error,
-      });
+      logger.error({ title: 'tcp_server_uncaught_error', error }, 'TCP peer server encountered an error.');
     });
     tcpServer.on('close', () => {
-      this.monitor.log({
-        name: 'tcp_server_close',
-        message: 'TCP server closed',
-      });
+      logger.info({ title: 'tcp_server_close' }, 'TCP server closed');
     });
     const host = listenTCP.host === undefined ? '0.0.0.0' : listenTCP.host;
     tcpServer.listen(listenTCP.port, host);
 
-    this.monitor
-      .withData({
+    logger.info(
+      {
         host,
         port: listenTCP.port,
-      })
-      .log({
-        name: 'tcp_server_listen',
-        message: `Listening on ${host}:${listenTCP.port}.`,
-      });
+        title: 'tcp_server_listen',
+      },
+      `Listening on ${host}:${listenTCP.port}.`,
+    );
   }
 
   private async run(): Promise<void> {
-    this.monitor.log({
-      name: 'neo_network_connect_loop_start',
-      message: 'Starting connect loop...',
-    });
+    logger.info({ title: 'neo_network_connect_loop_start' }, 'Starting connect loop...');
 
     // tslint:disable-next-line no-loop-statement
     while (!this.mutableStopped) {
@@ -368,17 +369,10 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
           }, this.mutableConnectPeersDelayMS) as any;
         });
       } catch (error) {
-        this.monitor.logError({
-          name: 'neo_network_connect_loop_error',
-          message: 'Connect loop encountered an error',
-          error,
-        });
+        logger.error({ title: 'neo_network_connect_loop_error', error }, 'Connect loop encountered an error');
       }
     }
-    this.monitor.log({
-      name: 'neo_network_connect_loop_stop',
-      message: 'Stopped connect loop.',
-    });
+    logger.info({ title: 'neo_network_connect_loop_stop' }, 'Stopped connect loop.');
   }
 
   private connectToPeers(): void {
@@ -414,15 +408,13 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
             [peer.endpoint]: health,
           };
         } else {
-          this.monitor
-            .withData({
-              [this.monitor.labels.PEER_ADDRESS]: peer.endpoint,
-            })
-            .log({
-              name: 'neo_network_unhealthy_peer',
-              message: `Peer at ${peer.endpoint} is unhealthy.`,
-              level: 'verbose',
-            });
+          logger.debug(
+            {
+              title: 'neo_network_unhealthy_peer',
+              [Labels.PEER_ADDRESS]: peer.endpoint,
+            },
+            `Peer at ${peer.endpoint} is unhealthy.`,
+          );
 
           this.blacklistAndClose(peer);
         }
@@ -470,42 +462,43 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       ...this.mutableConnectingPeers,
       [endpoint]: true,
     };
-    NEO_NETWORK_CONNECTING_PEERS_TOTAL.inc();
+    globalStats.record([
+      {
+        measure: peersConnecting,
+        value: 1,
+      },
+    ]);
 
+    const logData = { [Labels.PEER_ADDRESS]: endpoint, title: 'neo_network_peer_connect' };
     try {
-      await this.monitor
-        .withData({
-          [this.monitor.labels.PEER_ADDRESS]: endpoint,
-        })
-        .captureLog(
-          async () => {
-            const endpointConfig = getEndpointConfig(endpoint);
-            if (endpointConfig.type === 'tcp') {
-              await this.startPeerConnection(this.createTCPPeer(endpoint, socket), true);
-            } else {
-              throw new UnsupportedEndpointType(endpoint);
-            }
-          },
-          {
-            name: 'neo_network_peer_connect',
-            message: `Connecting to peer at ${endpoint}`,
-            level: 'debug',
-            metric: NEO_NETWORK_PEER_CONNECT_TOTAL,
-            error: {
-              message: `Failed to connect to peer at ${endpoint}.`,
-              metric: NEO_NETWORK_PEER_CONNECT_FAILURES_TOTAL,
-              level: 'debug',
-            },
-          },
-        );
+      const endpointConfig = getEndpointConfig(endpoint);
+      if (endpointConfig.type === 'tcp') {
+        await this.startPeerConnection(this.createTCPPeer(endpoint, socket), true);
+      } else {
+        throw new UnsupportedEndpointType(endpoint);
+      }
+
+      logger.trace(logData, `Connecting to peer at ${endpoint}`);
     } catch (error) {
+      logger.trace({ error, ...logData }, `Failed to connect to peer at ${endpoint}.`);
+      globalStats.record([
+        {
+          measure: peersFailed,
+          value: 1,
+        },
+      ]);
       if (this.mutableConnectErrorCodes.has(error.code)) {
         this.mutableBadEndpoints.add(endpoint);
       }
     } finally {
       const { [endpoint]: _unused, ...rest } = this.mutableConnectingPeers;
       this.mutableConnectingPeers = rest;
-      NEO_NETWORK_CONNECTING_PEERS_TOTAL.dec();
+      globalStats.record([
+        {
+          measure: peersConnecting,
+          value: -1,
+        },
+      ]);
     }
   }
 
@@ -545,7 +538,12 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
         ...this.mutableConnectedPeers,
         [peer.endpoint]: connectedPeer,
       };
-      NEO_NETWORK_CONNECTED_PEERS_TOTAL.inc();
+      globalStats.record([
+        {
+          measure: peersConnected,
+          value: 1,
+        },
+      ]);
       connectedPeer.peer.streamData((message) => this.onMessageReceivedInternal(connectedPeer, message));
 
       this.onEventInternal({
@@ -567,16 +565,10 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
   }
 
   private onError(peer: Peer<Message>, error: Error): void {
-    this.monitor
-      .withData({
-        [this.monitor.labels.PEER_ADDRESS]: peer.endpoint,
-      })
-      .log({
-        name: 'neo_network_peer_error',
-        level: 'debug',
-        message: `Encountered error with peer at ${peer.endpoint}.`,
-        error,
-      });
+    logger.trace(
+      { [Labels.PEER_ADDRESS]: peer.endpoint, title: 'neo_network_peer_error', error },
+      `Encountered error with peer at ${peer.endpoint}.`,
+    );
   }
 
   private onClose(peer: Peer<Message>): void {
@@ -588,12 +580,19 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
     const { [peer.endpoint]: _unused1, ...mutableConnectedPeers } = this.mutableConnectedPeers;
     this.mutableConnectedPeers = mutableConnectedPeers;
 
-    NEO_NETWORK_CONNECTED_PEERS_TOTAL.set(Object.keys(this.mutableConnectedPeers).length);
-
     const { [peer.endpoint]: _unused2, ...mutableConnectingPeers } = this.mutableConnectingPeers;
     this.mutableConnectingPeers = mutableConnectingPeers;
 
-    NEO_NETWORK_CONNECTING_PEERS_TOTAL.set(Object.keys(this.mutableConnectingPeers).length);
+    globalStats.record([
+      {
+        measure: peersConnected,
+        value: Object.keys(this.mutableConnectedPeers).length,
+      },
+      {
+        measure: peersConnecting,
+        value: Object.keys(this.mutableConnectingPeers).length,
+      },
+    ]);
 
     const endpoint = this.mutableReverseBlacklist[peer.endpoint];
     if (endpoint !== undefined) {
@@ -602,16 +601,17 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
 
       this.endpointBlacklist.delete(endpoint);
     }
-    this.monitor
-      .withData({
-        [this.monitor.labels.PEER_ADDRESS]: peer.endpoint,
-      })
-      .log({
-        name: 'neo_network_peer_closed',
-        message: `Peer closed at ${peer.endpoint}`,
-        level: 'verbose',
-        metric: NEO_NETWORK_PEER_CLOSED_TOTAL,
-      });
+
+    logger.debug(
+      { [Labels.PEER_ADDRESS]: peer.endpoint, title: 'neo_network_peer_closed' },
+      `Peer closed at ${peer.endpoint}`,
+    );
+    globalStats.record([
+      {
+        measure: peersClosed,
+        value: 1,
+      },
+    ]);
 
     this.onEventInternal({
       event: 'PEER_CLOSED',

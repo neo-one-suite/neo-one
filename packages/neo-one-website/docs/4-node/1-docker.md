@@ -37,16 +37,16 @@ Voila! You should now be running the most recent NEO•ONE Node in a local docke
 
 ## Configuring
 
-There are **several** ways to configure the node; any [rc](https://github.com/dominictarr/rc#rc) type configuration is accepted. as an example we can set the `monitor` level of the node to _verbose_ using either:
+There are **several** ways to configure the node; any [rc](https://github.com/dominictarr/rc#rc) type configuration is accepted. as an example we can set the `logging` level of the node to _trace_ using either:
 
 ```bash
-docker run quay.io/neoone/node --environment.monitor=verbose
+docker run quay.io/neoone/node --environment.logging.level=trace
 ```
 
 or through environment variables
 
 ```bash
-docker run -e neo_one_node_environment__monitor=verbose quay.io/neoone/node
+docker run -e neo_one_node_environment__logging__level=trace quay.io/neoone/node
 ```
 
 Additionally you have the option of creating a `config` (no extension) file and mounting it directly to the container. By default the node will look for a config at `/etc/neo_one_node`.
@@ -57,7 +57,9 @@ So if we have a config
 ## /path/to/config
 {
   "environment": {
-    "monitor": "verbose"
+    "logging": {
+      "level": "trace"
+    }
   }
 }
 ```

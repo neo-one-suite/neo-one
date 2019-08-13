@@ -1,8 +1,6 @@
 import { FullNode } from '@neo-one/node';
 import { BackupRestoreOptions } from '@neo-one/node-data-backup';
 import { CLIArgs } from '@neo-one/server-plugin';
-import * as path from 'path';
-import { distinctUntilChanged, map } from 'rxjs/operators';
 import { Args, Command } from 'vorpal';
 import { createFullNode } from './createFullNode';
 import { createNEOONENodeConfig } from './node';
@@ -31,7 +29,7 @@ export const processArgs = async (
   cliArgs: CLIArgs,
   args: Args,
 ): Promise<{ readonly node: FullNode; readonly options: BackupRestoreOptions } | undefined> => {
-  const { vorpal, monitor, shutdown, mutableShutdownFuncs, logConfig$ } = cliArgs;
+  const { vorpal, shutdown } = cliArgs;
   const { dataPath, provider, options: cliOptions } = args;
   let mega;
   let gcloud;
@@ -71,26 +69,10 @@ export const processArgs = async (
   const options = { gcloud, mega };
 
   const nodeConfig = createNEOONENodeConfig({ dataPath });
-  const logPath = path.resolve(dataPath, 'log');
-  const logSubscription = nodeConfig.config$
-    .pipe(
-      map((config) => config.log),
-      distinctUntilChanged(),
-      map((config) => ({
-        name: 'node',
-        path: logPath,
-        level: config.level,
-        maxSize: config.maxSize,
-        maxFiles: config.maxFiles,
-      })),
-    )
-    .subscribe(logConfig$);
-  mutableShutdownFuncs.push(() => logSubscription.unsubscribe());
 
   const node = await createFullNode({
     dataPath,
     nodeConfig,
-    monitor,
   });
 
   return { node, options };
