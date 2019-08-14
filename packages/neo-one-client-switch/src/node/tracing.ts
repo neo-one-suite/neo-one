@@ -11,6 +11,8 @@ import {
   SpanKind,
   TagMap,
 } from '@opencensus/core';
+import { JaegerTraceExporter } from '@opencensus/exporter-jaeger';
+import { PrometheusStatsExporter } from '@opencensus/exporter-prometheus';
 import { TracingBase } from '@opencensus/nodejs-base';
 import { TraceContextFormat } from '@opencensus/propagation-tracecontext';
 
@@ -30,15 +32,17 @@ const startTracing = (exporter: Exporter) => {
 };
 
 export {
-  startTracing,
-  TraceContextFormat,
-  tracer,
   AggregationType,
   globalStats,
+  JaegerTraceExporter,
   Measure,
   MeasureUnit,
+  NoopExporter,
+  PrometheusStatsExporter,
   Span,
   SpanKind,
+  startTracing,
   TagMap,
-  NoopExporter,
+  TraceContextFormat,
+  tracer,
 };

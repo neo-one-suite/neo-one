@@ -39,16 +39,26 @@ const globalStats: Stats = {
   getCurrentTagContext: noOp,
 };
 
+const PrometheusStatsExporter = {
+  onRegisterView: noOp,
+  onRecord: noOp,
+  start: noOp,
+  stop: noOp,
+};
+const JaegerTraceExporter = NoopExporter;
+
 export {
-  TraceContextFormat,
-  Span,
-  SpanKind,
   AggregationType,
+  globalStats,
+  JaegerTraceExporter,
   Measure,
   MeasureUnit,
-  TagMap,
   NoopExporter,
-  tracer,
+  PrometheusStatsExporter,
+  Span,
+  SpanKind,
   startTracing,
-  globalStats,
+  TagMap,
+  TraceContextFormat,
+  tracer,
 };

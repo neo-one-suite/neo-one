@@ -1,4 +1,5 @@
 import { common, crypto, JSONHelper, RelayTransactionResultJSON, TransactionJSON, utils } from '@neo-one/client-common';
+import { AggregationType, globalStats, MeasureUnit, TagMap } from '@neo-one/client-switch';
 import { nodeLogger } from '@neo-one/logger';
 import {
   Account,
@@ -14,7 +15,6 @@ import {
   TransactionType,
 } from '@neo-one/node-core';
 import { Labels, labelToTag } from '@neo-one/utils';
-import { AggregationType, globalStats, MeasureUnit, TagMap } from '@opencensus/core';
 import { filter, switchMap, take, timeout, toArray } from 'rxjs/operators';
 
 const logger = nodeLogger.child({ component: 'rpc-handler' });
@@ -584,7 +584,7 @@ export const createHandler = ({
               timeout(new Date(Date.now() + watchTimeoutMS)),
             )
             .toPromise();
-        } catch (error) {
+        } catch {
           throw new JSONRPCError(-100, 'Unknown transaction');
         }
       } else {

@@ -25,6 +25,8 @@
     "@types/lodash": "4.14.136"
   },
   "optionalDependencies": {
+    "@opencensus/exporter-prometheus": "^0.0.16",
+    "@opencensus/exporter-jaeger": "^0.0.16",
     "@ledgerhq/hw-transport-node-hid": "4.68.2",
     "@opencensus/core": "^0.0.16",
     "@opencensus/nodejs-base": "^0.0.16",

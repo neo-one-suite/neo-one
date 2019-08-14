@@ -1,4 +1,5 @@
 import { common, crypto, UInt256Hex, utils } from '@neo-one/client-common';
+import { AggregationType, globalStats, MeasureUnit } from '@neo-one/client-switch';
 import { nodeLogger } from '@neo-one/logger';
 import { Consensus, ConsensusOptions } from '@neo-one/node-consensus';
 import {
@@ -24,7 +25,6 @@ import {
   VerifyTransactionResult,
 } from '@neo-one/node-core';
 import { finalize, Labels, labelToTag, neverComplete, utils as commonUtils } from '@neo-one/utils';
-import { AggregationType, globalStats, MeasureUnit } from '@opencensus/core';
 import { ScalingBloem } from 'bloem';
 // tslint:disable-next-line:match-default-export-name
 import BloomFilter from 'bloom-filter';
