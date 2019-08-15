@@ -1,0 +1,22 @@
+name: DockerHub
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - \@neo-one/node-bin*
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    container:
+      image: neotracker/neo-one-circleci-node:10.16.0-1
+    steps:
+      - uses: actions/checkout@master
+      - uses: ./actions/dockerhub/
+        with:
+          args: -f ./scripts/DockerfileNode .
+        env:
+          DOCKER_NAMESPACE: neoonesuite
+          DOCKER_IMAGE_NAME: node-bin
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
