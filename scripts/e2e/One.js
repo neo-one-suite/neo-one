@@ -59,6 +59,12 @@ class One {
     return start;
   }
 
+  async configurePorts() {
+    this.serverPort = await this.getAvailableMinPortForRange(30);
+    this.httpServerPort = this.serverPort + 1;
+    this.minPort = this.serverPort + 2;
+  }
+
   async setupCLI() {
     if (this.server !== undefined) {
       return;
@@ -66,9 +72,7 @@ class One {
 
     this.dir = tmp.dirSync();
     this.dirName = this.dir.name;
-    this.serverPort = await this.getAvailableMinPortForRange(30);
-    this.httpServerPort = this.serverPort + 1;
-    this.minPort = this.serverPort + 2;
+    await this.configurePorts();
     const [cmd, args] = this._createCommand('start server --static-neo-one');
     this.server = execa(cmd, args, this._getEnv());
 

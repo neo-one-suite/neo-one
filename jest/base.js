@@ -11,6 +11,7 @@ if (process.platform === 'win32') {
 }
 
 module.exports = ({ path }) => ({
+  testRunner: 'jest-circus/runner',
   rootDir: nodePath.resolve(__dirname, '..'),
   globals: {
     'ts-jest': {
