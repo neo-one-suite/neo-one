@@ -4,7 +4,7 @@ import nodePath from 'path';
 import pino from 'pino';
 import { getConfiguration } from './getConfiguration';
 
-const config = getConfiguration();
+const { tests, config } = getConfiguration();
 const mutablePathRecord: Record<string, string | undefined> = {};
 
 const getPinoDestination = (path: string, name: string) => {
@@ -28,7 +28,18 @@ export const serverLogger = createLogger('server');
 export const nodeLogger = createLogger('node');
 export const cliLogger = createLogger('cli');
 export const httpLogger = createLogger('http');
-export const testLogger = createLogger('test');
 
 export const getFinalLogger = (logger: pino.Logger) => pino.final(logger);
 export const getLogPath = (name: keyof typeof config) => mutablePathRecord[name];
+
+export const silenceForTests = () => {
+  if (!tests.enabled) {
+    // tslint:disable: no-object-mutation
+    editorLogger.level = 'silent';
+    serverLogger.level = 'silent';
+    nodeLogger.level = 'silent';
+    cliLogger.level = 'silent';
+    httpLogger.level = 'silent';
+    // tslint:enable: no-object-mutation
+  }
+};
