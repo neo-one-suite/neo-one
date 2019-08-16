@@ -5,10 +5,10 @@
   "main": "./src/index",
   "dependencies": {
     "@neo-one/client-common": "^1.3.0",
+    "@neo-one/client-switch": "^1.2.2",
     "@neo-one/logger": "^1.0.0",
     "@neo-one/node-core": "^1.1.5",
     "@neo-one/utils": "^1.1.2",
-    "@opencensus/core": "^0.0.16",
     "rxjs": "^6.5.2",
     "tslib": "^1.9.3"
   },

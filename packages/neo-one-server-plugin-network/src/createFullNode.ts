@@ -1,80 +1,16 @@
-import { FullNode } from '@neo-one/node';
-import { createMain, createTest } from '@neo-one/node-neo-settings';
-import { Config } from '@neo-one/server-plugin';
+import { FullNode, FullNodeOptions } from '@neo-one/node';
 import * as fs from 'fs-extra';
-import * as path from 'path';
-import { distinctUntilChanged, map, take } from 'rxjs/operators';
-import { NEOONENodeConfig } from './node';
 
 export const createFullNode = async ({
-  dataPath,
-  nodeConfig,
+  options,
   chainFile,
   dumpChainFile,
-  onError,
 }: {
-  readonly dataPath: string;
-  readonly nodeConfig: Config<NEOONENodeConfig>;
+  readonly options: FullNodeOptions;
   readonly chainFile?: string;
   readonly dumpChainFile?: string;
-  readonly onError?: (error: Error) => void;
 }) => {
-  const storagePath = path.resolve(dataPath, 'chain');
-  const [settings, rpcEnvironment, nodeEnvironment, telemetryEnvironment] = await Promise.all([
-    nodeConfig.config$
-      .pipe(
-        map((config) => config.settings),
-        distinctUntilChanged(),
-        map((config) => {
-          const options = {
-            privateNet: config.privateNet,
-            secondsPerBlock: config.secondsPerBlock,
-            standbyValidators: config.standbyValidators === undefined ? undefined : [...config.standbyValidators],
-            address: config.address,
-          };
+  await fs.ensureDir(options.dataPath);
 
-          return config.test ? createTest(options) : createMain(options);
-        }),
-        take(1),
-      )
-      .toPromise(),
-    nodeConfig.config$
-      .pipe(
-        map((config) => config.environment.rpc),
-        take(1),
-      )
-      .toPromise(),
-    nodeConfig.config$
-      .pipe(
-        map((config) => config.environment.node),
-        take(1),
-      )
-      .toPromise(),
-    nodeConfig.config$
-      .pipe(
-        map((config) => config.environment.telemetry),
-        take(1),
-      )
-      .toPromise(),
-    fs.ensureDir(storagePath),
-  ]);
-
-  return new FullNode(
-    {
-      settings,
-      environment: {
-        dataPath: storagePath,
-        rpc: rpcEnvironment,
-        node: nodeEnvironment,
-        telemetry: telemetryEnvironment,
-        chainFile,
-        dumpChainFile,
-      },
-      options$: nodeConfig.config$.pipe(
-        map((config) => config.options),
-        distinctUntilChanged(),
-      ),
-    },
-    onError,
-  );
+  return new FullNode({ options, chainFile, dumpChainFile });
 };

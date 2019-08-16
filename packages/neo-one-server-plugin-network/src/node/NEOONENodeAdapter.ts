@@ -1,6 +1,7 @@
 import { serverLogger } from '@neo-one/logger';
-import { FullNodeEnvironment, FullNodeOptions } from '@neo-one/node';
+import { FullNodeOptions } from '@neo-one/node';
 import { createEndpoint, EndpointConfig } from '@neo-one/node-core';
+import { createMain, createTest, deserializeSettings, serializeSettings } from '@neo-one/node-neo-settings';
 import { Binary, Config, DescribeTable, killProcess } from '@neo-one/server-plugin';
 import { Labels } from '@neo-one/utils';
 import fetch from 'cross-fetch';
@@ -15,16 +16,8 @@ import { NodeAdapter, NodeStatus } from './NodeAdapter';
 const logger = serverLogger.child({ component: 'neo_one_node_adapter' });
 
 export interface NodeConfig {
-  readonly settings: {
-    readonly test?: boolean;
-    readonly privateNet?: boolean;
-    readonly secondsPerBlock?: number;
-    readonly standbyValidators?: readonly string[];
-    readonly address?: string;
-  };
-
-  readonly environment: FullNodeEnvironment;
-  readonly options: FullNodeOptions;
+  // tslint:disable-next-line no-any
+  readonly options: Omit<FullNodeOptions, 'blockchain'> & { readonly blockchain: any };
 }
 
 const DEFAULT_RPC_URLS: readonly string[] = [
@@ -52,30 +45,16 @@ const DEFAULT_SEEDS: readonly EndpointConfig[] = [
 ];
 
 const makeDefaultConfig = (dataPath: string): NodeConfig => ({
-  settings: {
-    test: false,
-  },
-  environment: {
-    dataPath: path.resolve(dataPath, 'node'),
-    rpc: {},
-    node: {},
-    network: {},
-  },
   options: {
+    dataPath: path.resolve(dataPath, 'node'),
+    blockchain: createMain(),
     node: {
-      consensus: {
-        enabled: false,
-        options: { privateKey: 'default', privateNet: false },
-      },
       rpcURLs: [...DEFAULT_RPC_URLS],
     },
     network: {
       seeds: DEFAULT_SEEDS.map(createEndpoint),
     },
     rpc: {
-      server: {
-        keepAliveTimeout: 60000,
-      },
       liveHealthCheck: {
         rpcURLs: DEFAULT_RPC_URLS,
         offset: 1,
@@ -85,11 +64,6 @@ const makeDefaultConfig = (dataPath: string): NodeConfig => ({
         rpcURLs: DEFAULT_RPC_URLS,
         offset: 1,
         timeoutMS: 5000,
-      },
-      rateLimit: {
-        enabled: true,
-        duration: 60000,
-        rate: 6000000,
       },
     },
   },
@@ -107,149 +81,20 @@ export const createNodeConfig = ({
     defaultConfig,
     schema: {
       type: 'object',
-      properties: {
-        settings: {
-          type: 'object',
-          required: ['test'],
-          properties: {
-            test: { type: 'boolean' },
-            privateNet: { type: 'boolean' },
-            secondsPerBlock: { type: 'number' },
-            standbyValidators: { type: 'array', items: { type: 'string' } },
-          },
-        },
-        environment: {
-          type: 'object',
-          required: ['dataPath', 'rpc', 'node', 'network'],
-          properties: {
-            dataPath: { type: 'string' },
-            rpc: {
-              type: 'object',
-              required: [],
-              properties: {
-                http: {
-                  type: 'object',
-                  required: ['host', 'port'],
-                  properties: {
-                    host: { type: 'string' },
-                    port: { type: 'number' },
-                  },
-                },
-
-                https: {
-                  type: 'object',
-                  required: ['host', 'port', 'key', 'cert'],
-                  properties: {
-                    host: { type: 'string' },
-                    port: { type: 'number' },
-                    key: { type: 'string' },
-                    cert: { type: 'string' },
-                  },
-                },
-              },
-            },
-            node: {
-              type: 'object',
-              required: [],
-              properties: {
-                externalPort: { type: 'number' },
-              },
-            },
-            network: {
-              type: 'object',
-              required: [],
-              properties: {
-                listenTCP: {
-                  type: 'object',
-                  required: ['port'],
-                  properties: {
-                    host: { type: 'string' },
-                    port: { type: 'number' },
-                  },
-                },
-
-                externalEndpoints: {
-                  type: 'array',
-                  items: { type: 'string' },
-                },
-
-                connectPeersDelayMS: { type: 'number' },
-                socketTimeoutMS: { type: 'number' },
-              },
-            },
-          },
-        },
-        options: {
-          type: 'object',
-          required: ['node', 'network', 'rpc'],
-          properties: {
-            node: {
-              type: 'object',
-              required: ['consensus', 'rpcURLs'],
-              properties: {
-                consensus: {
-                  type: 'object',
-                  required: ['enabled', 'options'],
-                  properties: {
-                    enabled: { type: 'boolean' },
-                    options: {
-                      type: 'object',
-                      required: ['privateKey', 'privateNet'],
-                      properties: {
-                        privateKey: { type: 'string' },
-                        privateNet: { type: 'boolean' },
-                      },
-                    },
-                  },
-                },
-                rpcURLs: { type: 'array', items: { type: 'string' } },
-              },
-            },
-            network: {
-              type: 'object',
-              required: ['seeds'],
-              properties: {
-                seeds: { type: 'array', items: { type: 'string' } },
-                maxConnectedPeers: { type: 'number' },
-              },
-            },
-            rpc: {
-              type: 'object',
-              required: ['server', 'liveHealthCheck', 'readyHealthCheck'],
-              properties: {
-                server: {
-                  type: 'object',
-                  required: ['keepAliveTimeout'],
-                  properties: {
-                    keepAliveTimeout: { type: 'number' },
-                  },
-                },
-                liveHealthCheck: {
-                  type: 'object',
-                  required: ['rpcURLs', 'offset', 'timeoutMS'],
-                  properties: {
-                    rpcURLs: { type: 'array', items: { type: 'string' } },
-                    offset: { type: 'number' },
-                    timeoutMS: { type: 'number' },
-                  },
-                },
-                readyHealthCheck: {
-                  type: 'object',
-                  required: ['rpcURLs', 'offset', 'timeoutMS'],
-                  properties: {
-                    rpcURLs: { type: 'array', items: { type: 'string' } },
-                    offset: { type: 'number' },
-                    timeoutMS: { type: 'number' },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
     },
     configPath: dataPath,
   });
+
+export const loadNodeOptions = async ({ dataPath }: { readonly dataPath: string }): Promise<FullNodeOptions> => {
+  const contents = await fs.readFile(path.join(dataPath, 'node.json'), 'utf8');
+
+  const { options } = JSON.parse(contents);
+
+  return {
+    ...options,
+    blockchain: deserializeSettings(options.blockchain),
+  };
+};
 
 export class NEOONENodeAdapter extends NodeAdapter {
   private mutableConfig: Config<NodeConfig> | undefined;
@@ -375,55 +220,48 @@ export class NEOONENodeAdapter extends NodeAdapter {
 
     const nodeConfig = await config.config$.pipe(take(1)).toPromise();
     const newNodeConfig = this.createConfig(settings);
-    await fs.ensureDir(newNodeConfig.environment.dataPath);
+    await fs.ensureDir(newNodeConfig.options.dataPath);
     await config.update({ config: newNodeConfig });
 
-    return !(
-      _.isEqual(nodeConfig.settings, newNodeConfig.settings) &&
-      _.isEqual(nodeConfig.environment, newNodeConfig.environment)
-    );
+    return !_.isEqual(nodeConfig.options, newNodeConfig.options);
   }
 
   private createConfig(settings: NodeSettings): NodeConfig {
+    const blockchainSettings = {
+      test: settings.isTestNet,
+      privateNet: settings.privateNet,
+      secondsPerBlock: settings.secondsPerBlock,
+      standbyValidators: settings.standbyValidators,
+      address: settings.address,
+    };
+
     return {
-      settings: {
-        test: settings.isTestNet,
-        privateNet: settings.privateNet,
-        secondsPerBlock: settings.secondsPerBlock,
-        standbyValidators: settings.standbyValidators,
-        address: settings.address,
-      },
-      environment: {
+      options: {
+        blockchain: serializeSettings(
+          blockchainSettings.test ? createTest(blockchainSettings) : createMain(blockchainSettings),
+        ),
         dataPath: path.resolve(this.dataPath, 'chain'),
-        rpc: {
-          http: {
-            port: settings.rpcPort,
-            host: '0.0.0.0',
-          },
-        },
         node: {
           externalPort: settings.listenTCPPort,
+          consensus: settings.consensus,
+          rpcURLs: settings.rpcEndpoints,
         },
         network: {
+          seeds: settings.seeds,
           listenTCP: {
             port: settings.listenTCPPort,
             host: '0.0.0.0',
           },
         },
         telemetry: {
-          port: settings.telemetryPort,
-        },
-      },
-      options: {
-        node: {
-          consensus: settings.consensus,
-          rpcURLs: settings.rpcEndpoints,
-        },
-        network: {
-          seeds: settings.seeds,
+          prometheus: {
+            port: settings.telemetryPort,
+          },
         },
         rpc: {
-          server: {
+          http: {
+            port: settings.rpcPort,
+            host: '0.0.0.0',
             keepAliveTimeout: 60000,
           },
           liveHealthCheck: {

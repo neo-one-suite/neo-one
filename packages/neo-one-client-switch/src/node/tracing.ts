@@ -2,7 +2,7 @@
 // @ts-ignore
 import {
   AggregationType,
-  Exporter,
+  Config,
   globalStats,
   Measure,
   MeasureUnit,
@@ -11,34 +11,41 @@ import {
   SpanKind,
   TagMap,
 } from '@opencensus/core';
+import { JaegerTraceExporter, JaegerTraceExporterOptions } from '@opencensus/exporter-jaeger';
+import { PrometheusExporterOptions, PrometheusStatsExporter } from '@opencensus/exporter-prometheus';
 import { TracingBase } from '@opencensus/nodejs-base';
 import { TraceContextFormat } from '@opencensus/propagation-tracecontext';
 
 const tracing = TracingBase.instance;
 const tracer = tracing.tracer;
 
-const startTracing = (exporter: Exporter) => {
-  tracing.start({
-    propagation: new TraceContextFormat(),
-    exporter,
-  });
+const startTracing = (config: Config) => {
+  tracing.start(config);
 
   return () => {
-    tracing.unregisterExporter(exporter);
+    if (config.exporter !== undefined) {
+      tracing.unregisterExporter(config.exporter);
+    }
+
     tracing.stop();
   };
 };
 
 export {
-  startTracing,
-  TraceContextFormat,
-  tracer,
   AggregationType,
+  Config as TracingConfig,
   globalStats,
+  JaegerTraceExporter,
+  JaegerTraceExporterOptions,
   Measure,
   MeasureUnit,
+  NoopExporter,
+  PrometheusExporterOptions,
+  PrometheusStatsExporter,
   Span,
   SpanKind,
+  startTracing,
   TagMap,
-  NoopExporter,
+  TraceContextFormat,
+  tracer,
 };

@@ -20,20 +20,14 @@ export const withContracts = async <T>(
     test,
     createCompilerHost,
     async () => {
-      const { privateKey, rpcURL, node } = await createNode(true);
+      const { privateKey, rpcURL, node } = await createNode();
       const dataProvider = new NEOONEDataProvider({ network: 'priv', rpcURL });
 
       return {
         dataProvider,
         privateKey,
         cleanup: async () => {
-          // Give a chance for in-flight operations to complete before attempting to stop the node
-          await new Promise<void>((resolve) =>
-            setTimeout(async () => {
-              await node.stop();
-              resolve();
-            }, 100),
-          );
+          await node.stop();
         },
       };
     },

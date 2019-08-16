@@ -1,6 +1,6 @@
-import { bodyParser, context, cors, createServer$, onError as appOnError } from '@neo-one/http';
+import { bodyParser, context, cors, onError as appOnError, setupServer } from '@neo-one/http';
 import { editorLogger, getFinalLogger } from '@neo-one/logger';
-import { finalize } from '@neo-one/utils';
+import { Disposable, finalize, mergeScanLatest } from '@neo-one/utils';
 import * as http from 'http';
 import Application from 'koa';
 import compose from 'koa-compose';
@@ -70,26 +70,38 @@ app.use(cors);
 app.use(router.allowedMethods());
 
 const app$ = new BehaviorSubject(app);
-const keepAliveTimeout$ = new BehaviorSubject(undefined);
 
-const subscription = createServer$(app$, keepAliveTimeout$, { host: '0.0.0.0', port: 3001 }, () =>
-  http.createServer(),
-).subscribe({
-  error: (error) => {
-    editorLogger.error(
-      { title: 'uncaught_server_exception', error: error.message },
-      'Uncaught exception. Shutting down.',
-    );
+const subscription = app$
+  .pipe(
+    mergeScanLatest(async (disposable: Disposable | undefined, appInternal) => {
+      if (disposable !== undefined) {
+        await disposable();
+      }
 
-    shutdown({ exitCode: 1, error });
-  },
-  complete: () => {
-    editorLogger.error(
-      { title: 'uncaught_server_complete', error: new Error('Unexpected complete') },
-      'Unexpected complete. Shutting down.',
-    );
+      return setupServer(appInternal, http.createServer(), '0.0.0.0', 3001);
+    }),
+    finalize(async (disposable) => {
+      if (disposable !== undefined) {
+        await disposable();
+      }
+    }),
+  )
+  .subscribe({
+    error: (error) => {
+      editorLogger.error(
+        { title: 'uncaught_server_exception', error: error.message },
+        'Uncaught exception. Shutting down.',
+      );
 
-    shutdown({ exitCode: 1 });
-  },
-});
+      shutdown({ exitCode: 1, error });
+    },
+    complete: () => {
+      editorLogger.error(
+        { title: 'uncaught_server_complete', error: new Error('Unexpected complete') },
+        'Unexpected complete. Shutting down.',
+      );
+
+      shutdown({ exitCode: 1 });
+    },
+  });
 mutableShutdownFuncs.push(async () => subscription.unsubscribe());

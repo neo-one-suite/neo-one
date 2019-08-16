@@ -2,11 +2,9 @@
 import { common, crypto, ECPoint, PrivateKey, UInt160 } from '@neo-one/client-common';
 import { nodeLogger } from '@neo-one/logger';
 import { ConsensusPayload, Node, Transaction } from '@neo-one/node-core';
-import { finalize, mergeScanLatest, utils as commonUtils } from '@neo-one/utils';
+import { composeDisposables, Disposable, noopDisposable, utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { scan } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/scan';
-import { Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
 import { initializeNewConsensus } from './common';
 import { ConsensusContext } from './ConsensusContext';
 import { ConsensusQueue } from './ConsensusQueue';
@@ -35,42 +33,43 @@ const MS_IN_SECOND = 1000;
 export class Consensus {
   private mutableQueue: ConsensusQueue;
   private mutableTimer: number | undefined;
-  private readonly options$: Observable<InternalOptions>;
+  private readonly options: InternalOptions;
   private readonly node: Node;
   private mutableConsensusContext: ConsensusContext;
   private mutableStartPromise: Promise<void> | undefined;
 
-  public constructor({ options$, node }: { readonly options$: Observable<Options>; readonly node: Node }) {
+  public constructor({ options, node }: { readonly options: Options; readonly node: Node }) {
     this.mutableQueue = new ConsensusQueue();
-    this.options$ = options$.pipe(
-      map((options) => {
-        const privateKey = common.stringToPrivateKey(options.privateKey);
-        const publicKey = crypto.privateKeyToPublicKey(privateKey);
-        const feeAddress = crypto.publicKeyToScriptHash(publicKey);
 
-        return {
-          privateKey,
-          publicKey,
-          feeAddress,
-          privateNet: options.privateNet,
-        };
-      }),
-    );
+    const privateKey = common.stringToPrivateKey(options.privateKey);
+    const publicKey = crypto.privateKeyToPublicKey(privateKey);
+    const feeAddress = crypto.publicKeyToScriptHash(publicKey);
+    this.options = {
+      privateKey,
+      publicKey,
+      feeAddress,
+      privateNet: options.privateNet,
+    };
 
     this.node = node;
     this.mutableConsensusContext = new ConsensusContext();
   }
 
-  public start$(): Observable<void> {
-    return this.options$.pipe(
-      mergeScanLatest<InternalOptions, void>(async (_, options) => {
+  public async start(): Promise<Disposable> {
+    let disposable = noopDisposable;
+    try {
+      await this.pause();
+      this.doStart(this.options);
+
+      disposable = composeDisposables(disposable, async () => {
         await this.pause();
-        this.doStart(options);
-      }),
-      finalize(async () => {
-        await this.pause();
-      }),
-    );
+      });
+
+      return disposable;
+    } catch (err) {
+      await disposable();
+      throw err;
+    }
   }
 
   public onPersistBlock(): void {
@@ -92,8 +91,7 @@ export class Consensus {
   }
 
   public async runConsensusNow(): Promise<void> {
-    const options = await this.options$.pipe(take(1)).toPromise();
-    if (options.privateNet) {
+    if (this.options.privateNet) {
       // tslint:disable-next-line promise-must-complete
       await new Promise((resolve, reject) => {
         this.mutableQueue.write({ type: 'timer', promise: { resolve, reject } });
@@ -108,8 +106,7 @@ export class Consensus {
   }
 
   public async fastForwardOffset(seconds: number): Promise<void> {
-    const options = await this.options$.pipe(take(1)).toPromise();
-    if (options.privateNet) {
+    if (this.options.privateNet) {
       this.mutableConsensusContext.fastForwardOffset(seconds);
     } else {
       throw new Error('Can only fast forward on a private network.');
@@ -117,8 +114,7 @@ export class Consensus {
   }
 
   public async fastForwardToTime(seconds: number): Promise<void> {
-    const options = await this.options$.pipe(take(1)).toPromise();
-    if (options.privateNet) {
+    if (this.options.privateNet) {
       this.mutableConsensusContext.fastForwardToTime(seconds);
     } else {
       throw new Error('Can only fast forward on a private network.');
@@ -139,14 +135,13 @@ export class Consensus {
   }
 
   public async resume(): Promise<void> {
-    const options = await this.options$.pipe(take(1)).toPromise();
     // tslint:disable-next-line no-floating-promises
-    this.doStart(options);
+    this.doStart(this.options);
   }
 
   private doStart(options: InternalOptions): void {
     let completed = false;
-    const mutableStartPromise = this.start(options).then(() => {
+    const mutableStartPromise = this.startInternal(options).then(() => {
       completed = true;
       this.mutableStartPromise = undefined;
     });
@@ -155,7 +150,7 @@ export class Consensus {
     }
   }
 
-  private async start(options: InternalOptions): Promise<void> {
+  private async startInternal(options: InternalOptions): Promise<void> {
     logger.debug({ title: 'neo_consensus_start' }, 'Consensus started.');
 
     const initialResult = await initializeNewConsensus({

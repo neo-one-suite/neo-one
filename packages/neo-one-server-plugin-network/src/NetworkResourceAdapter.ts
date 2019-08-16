@@ -214,11 +214,8 @@ export class NetworkResourceAdapter {
         standbyValidators,
         address: primaryAddress,
         consensus: {
-          enabled: true,
-          options: {
-            privateKey: common.privateKeyToString(privateKey),
-            privateNet: true,
-          },
+          privateKey: common.privateKeyToString(privateKey),
+          privateNet: true,
         },
 
         seeds: otherConfiguration.map((otherConfig) =>
@@ -243,13 +240,6 @@ export class NetworkResourceAdapter {
       rpcPort: this.getRPCPort(options, options.name),
       listenTCPPort: this.getListenTCPPort(options, options.name),
       telemetryPort: this.getTelemetryPort(options, options.name),
-      consensus: {
-        enabled: false,
-        options: {
-          privateKey: 'doesntmatter',
-          privateNet: false,
-        },
-      },
       seeds: DEFAULT_MAIN_SEEDS.map(createEndpoint),
       rpcEndpoints: [
         'http://node1.nyc3.bridgeprotocol.io:10332',
@@ -272,14 +262,6 @@ export class NetworkResourceAdapter {
       rpcPort: this.getRPCPort(options, options.name),
       listenTCPPort: this.getListenTCPPort(options, options.name),
       telemetryPort: this.getTelemetryPort(options, options.name),
-      consensus: {
-        enabled: false,
-        options: {
-          privateKey: 'doesntmatter',
-          privateNet: false,
-        },
-      },
-
       seeds: DEFAULT_TEST_SEEDS.map(createEndpoint),
       rpcEndpoints: [
         'http://test1.cityofzion.io:8880',

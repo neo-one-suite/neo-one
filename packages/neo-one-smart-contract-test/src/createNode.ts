@@ -4,12 +4,11 @@ import { createMain } from '@neo-one/node-neo-settings';
 import { constants } from '@neo-one/utils';
 import _ from 'lodash';
 import MemDown from 'memdown';
-import { BehaviorSubject } from 'rxjs';
 import { addCleanup } from './addCleanup';
 
 const getPort = () => _.random(10000, 50000);
 
-export const createNode = async (omitCleanup = false) => {
+export const createNode = async () => {
   const port = getPort();
   const privateKey = wifToPrivateKey(constants.PRIVATE_NET_PRIVATE_KEY);
   crypto.addPublicKey(
@@ -17,46 +16,30 @@ export const createNode = async (omitCleanup = false) => {
     common.stringToECPoint(constants.PRIVATE_NET_PUBLIC_KEY),
   );
 
-  const node = new FullNode(
-    {
-      settings: createMain({
+  const node = new FullNode({
+    options: {
+      blockchain: createMain({
         privateNet: true,
         standbyValidators: [constants.PRIVATE_NET_PUBLIC_KEY],
         address: privateKeyToScriptHash(privateKey),
       }),
-      environment: {
-        dataPath: '/tmp/fakePath/',
-        rpc: {
-          http: {
-            port,
-            host: 'localhost',
-          },
+      dataPath: '/tmp/fakePath/',
+      rpc: {
+        http: {
+          port,
+          host: 'localhost',
         },
       },
-      options$: new BehaviorSubject({
-        node: {
-          consensus: {
-            enabled: true,
-            options: {
-              privateKey,
-              privateNet: true,
-            },
-          },
+      node: {
+        consensus: {
+          privateKey,
+          privateNet: true,
         },
-      }),
-      leveldown: MemDown(),
+      },
     },
-    /* istanbul ignore next */
-    (error) => {
-      // tslint:disable
-      console.error(error);
-      node.stop();
-      // tslint:enable
-    },
-  );
-  if (!omitCleanup) {
-    addCleanup(async () => node.stop());
-  }
+    leveldown: MemDown(),
+  });
+  addCleanup(async () => node.stop());
   await node.start();
 
   return {

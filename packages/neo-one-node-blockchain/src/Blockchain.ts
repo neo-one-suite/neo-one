@@ -1,4 +1,5 @@
 import { common, crypto, ECPoint, ScriptBuilder, UInt160, VMState } from '@neo-one/client-common';
+import { AggregationType, globalStats, MeasureUnit } from '@neo-one/client-switch';
 import { nodeLogger } from '@neo-one/logger';
 import {
   Action,
@@ -29,7 +30,6 @@ import {
   VM,
 } from '@neo-one/node-core';
 import { Labels, utils as commonUtils } from '@neo-one/utils';
-import { AggregationType, globalStats, MeasureUnit } from '@opencensus/core';
 import { BN } from 'bn.js';
 import PriorityQueue from 'js-priority-queue';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';

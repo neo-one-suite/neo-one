@@ -1,10 +1,8 @@
 import { CLIArgs, InteractiveCommand, Plugin, ResourceType } from '@neo-one/server-plugin';
 import { activateNetwork } from './activateNetwork';
-import { backupNode } from './backupNode';
 import { constants } from './constants';
 import { deactivateNetwork } from './deactivateNetwork';
 import { NetworkResourceType } from './NetworkResourceType';
-import { restoreNode } from './restoreNode';
 import { startNode } from './startNode';
 
 export class NetworkPlugin extends Plugin {
@@ -33,7 +31,7 @@ export class NetworkPlugin extends Plugin {
   }
 
   public get commands(): ReadonlyArray<(cliArgs: CLIArgs) => void> {
-    return [backupNode, restoreNode, startNode];
+    return [startNode];
   }
 
   public get interactive(): readonly InteractiveCommand[] {

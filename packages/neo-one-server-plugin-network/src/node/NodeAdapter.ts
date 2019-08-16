@@ -106,8 +106,11 @@ export abstract class NodeAdapter {
             ['RPC Port', JSON.stringify(this.mutableSettings.rpcPort)],
             ['Listen TCP Port', JSON.stringify(this.mutableSettings.listenTCPPort)],
             ['Telemetry Port', JSON.stringify(this.mutableSettings.telemetryPort)],
-            ['Consensus Enabled', this.mutableSettings.consensus.enabled ? 'Yes' : 'No'],
-            ['Consensus Private Key', this.mutableSettings.consensus.options.privateKey],
+            ['Consensus Enabled', this.mutableSettings.consensus !== undefined ? 'Yes' : 'No'],
+            [
+              'Consensus Private Key',
+              this.mutableSettings.consensus === undefined ? 'unused' : this.mutableSettings.consensus.privateKey,
+            ],
             ['Seeds', JSON.stringify(this.mutableSettings.seeds, undefined, 2)],
             ['RPC Endpoints', JSON.stringify(this.mutableSettings.rpcEndpoints, undefined, 2)],
           ],

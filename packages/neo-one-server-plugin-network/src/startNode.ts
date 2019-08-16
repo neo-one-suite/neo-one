@@ -1,9 +1,8 @@
-import { serverLogger } from '@neo-one/logger';
 import { CLIArgs } from '@neo-one/server-plugin';
 import { createFullNode } from './createFullNode';
-import { createNEOONENodeConfig } from './node';
+import { loadNEOONENodeOptions } from './node';
 
-export const startNode = ({ vorpal, shutdown, mutableShutdownFuncs }: CLIArgs) => {
+export const startNode = ({ vorpal, mutableShutdownFuncs }: CLIArgs) => {
   vorpal
     .command('start node <dataPath>', `Starts a full node`)
     .option('-c, --chain <chain>', 'Path of a chain.acc file to bootstrap the node')
@@ -11,7 +10,7 @@ export const startNode = ({ vorpal, shutdown, mutableShutdownFuncs }: CLIArgs) =
     .action(async (args) => {
       const { dataPath, options: cliOptions } = args;
 
-      const nodeConfig = createNEOONENodeConfig({ dataPath });
+      const options = await loadNEOONENodeOptions({ dataPath });
 
       let chainFile;
       if (cliOptions.chain != undefined) {
@@ -24,21 +23,9 @@ export const startNode = ({ vorpal, shutdown, mutableShutdownFuncs }: CLIArgs) =
       }
 
       const node = await createFullNode({
-        dataPath,
-        nodeConfig,
+        options,
         chainFile,
         dumpChainFile,
-        onError: (error) => {
-          serverLogger.error(
-            {
-              title: 'neo_node_uncaught_error',
-              error,
-            },
-            'Uncaught node error, shutting down.',
-          );
-
-          shutdown({ exitCode: 1, error });
-        },
       });
 
       await node.start();

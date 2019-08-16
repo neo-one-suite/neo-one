@@ -1,4 +1,5 @@
 import { common, crypto, UInt256Hex, utils } from '@neo-one/client-common';
+import { AggregationType, globalStats, MeasureUnit } from '@neo-one/client-switch';
 import { nodeLogger } from '@neo-one/logger';
 import { Consensus, ConsensusOptions } from '@neo-one/node-consensus';
 import {
@@ -23,8 +24,14 @@ import {
   TransactionType,
   VerifyTransactionResult,
 } from '@neo-one/node-core';
-import { finalize, Labels, labelToTag, neverComplete, utils as commonUtils } from '@neo-one/utils';
-import { AggregationType, globalStats, MeasureUnit } from '@opencensus/core';
+import {
+  composeDisposables,
+  Disposable,
+  Labels,
+  labelToTag,
+  noopDisposable,
+  utils as commonUtils,
+} from '@neo-one/utils';
 import { ScalingBloem } from 'bloem';
 // tslint:disable-next-line:match-default-export-name
 import BloomFilter from 'bloom-filter';
@@ -33,8 +40,6 @@ import fetch from 'cross-fetch';
 import { Address6 } from 'ip-address';
 import _ from 'lodash';
 import LRUCache from 'lru-cache';
-import { combineLatest, defer, Observable, of as _of } from 'rxjs';
-import { distinctUntilChanged, map, switchMap, take } from 'rxjs/operators';
 import { Command } from './Command';
 import { AlreadyConnectedError, NegotiationError } from './errors';
 import { Message, MessageTransform, MessageValue } from './Message';
@@ -93,14 +98,9 @@ export interface TransactionAndFee {
   readonly networkFee: BN;
 }
 
-export interface Environment {
-  readonly externalPort?: number;
-}
 export interface Options {
-  readonly consensus?: {
-    readonly enabled: boolean;
-    readonly options: ConsensusOptions;
-  };
+  readonly externalPort?: number;
+  readonly consensus?: ConsensusOptions;
   readonly rpcURLs?: readonly string[];
   readonly unhealthyPeerSeconds?: number;
 }
@@ -173,7 +173,7 @@ export class Node implements INode {
   // tslint:disable-next-line readonly-keyword
   private mutableMemPool: { [hash: string]: Transaction };
   private readonly network: Network<Message, PeerData>;
-  private readonly options$: Observable<Options>;
+  private readonly options: Options;
   private readonly externalPort: number;
   private readonly nonce: number;
   private readonly userAgent: string;
@@ -268,13 +268,11 @@ export class Node implements INode {
   public constructor({
     blockchain,
     createNetwork,
-    environment = {},
-    options$,
+    options,
   }: {
     readonly blockchain: Blockchain;
     readonly createNetwork: CreateNetwork;
-    readonly environment?: Environment;
-    readonly options$: Observable<Options>;
+    readonly options: Options;
   }) {
     this.blockchain = blockchain;
     this.network = createNetwork({
@@ -288,9 +286,9 @@ export class Node implements INode {
       onEvent: this.onEvent,
     });
 
-    this.options$ = options$;
+    this.options = options;
 
-    const { externalPort = 0 } = environment;
+    const { externalPort = 0 } = options;
     this.externalPort = externalPort;
     this.nonce = Math.floor(Math.random() * utils.UINT_MAX_NUMBER);
     this.userAgent = `NEO:neo-one-js:1.0.0-preview`;
@@ -320,54 +318,37 @@ export class Node implements INode {
     this.mutableBlockIndex = {};
   }
 
-  // tslint:disable-next-line no-any
-  public start$(): Observable<any> {
-    const network$ = defer(async () => {
+  public async start(): Promise<Disposable> {
+    let disposable = noopDisposable;
+
+    try {
       this.network.start();
       logger.debug({ title: 'neo_protocol_start' }, 'Protocol started.');
-    }).pipe(
-      neverComplete(),
-      finalize(() => {
+
+      disposable = composeDisposables(disposable, () => {
         this.network.stop();
         logger.debug({ title: 'neo_protocol_stop' }, 'Protocol stopped.');
-      }),
-    );
+      });
 
-    const defaultOptions = {
-      enabled: false,
-      options: { privateKey: 'unused', privateNet: false },
-    };
+      if (this.options.consensus !== undefined) {
+        const mutableConsensus = new Consensus({
+          options: this.options.consensus,
+          node: this,
+        });
+        this.mutableConsensus = mutableConsensus;
 
-    const consensus$ = this.options$.pipe(
-      map(({ consensus = defaultOptions }) => consensus.enabled),
-      distinctUntilChanged(),
-      switchMap((enabled) => {
-        if (enabled) {
-          const mutableConsensus = new Consensus({
-            options$: this.options$.pipe(
-              map(({ consensus = defaultOptions }) => consensus.options),
-              distinctUntilChanged(),
-            ),
+        const consensusDisposable = await mutableConsensus.start();
+        disposable = composeDisposables(disposable, consensusDisposable);
+      }
 
-            node: this,
-          });
+      this.mutableUnhealthyPeerSeconds =
+        this.options.unhealthyPeerSeconds === undefined ? UNHEALTHY_PEER_SECONDS : this.options.unhealthyPeerSeconds;
 
-          this.mutableConsensus = mutableConsensus;
-
-          return mutableConsensus.start$();
-        }
-
-        return _of(undefined);
-      }),
-    );
-
-    const options$ = this.options$.pipe(
-      map(({ unhealthyPeerSeconds = UNHEALTHY_PEER_SECONDS }) => {
-        this.mutableUnhealthyPeerSeconds = unhealthyPeerSeconds;
-      }),
-    );
-
-    return combineLatest([network$, consensus$, options$]);
+      return disposable;
+    } catch (err) {
+      await disposable();
+      throw err;
+    }
   }
 
   public async relayTransaction(
@@ -679,7 +660,7 @@ export class Node implements INode {
   }
 
   private async doFetchEndpointsFromRPC(): Promise<void> {
-    const { rpcURLs = [] } = await this.options$.pipe(take(1)).toPromise();
+    const { rpcURLs = [] } = this.options;
     await Promise.all(rpcURLs.map(async (rpcURL) => this.fetchEndpointsFromRPCURL(rpcURL)));
   }
 

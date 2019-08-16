@@ -1,13 +1,6 @@
-import {
-  addAttributesToSpan,
-  AggregationType,
-  globalStats,
-  MeasureUnit,
-  SpanKind,
-  tracer,
-} from '@neo-one/client-switch';
+import { AggregationType, globalStats, MeasureUnit, SpanKind, tracer } from '@neo-one/client-switch';
 import { Logger } from '@neo-one/logger';
-import { Labels, labelsToTags } from '@neo-one/utils';
+import { addAttributesToSpan, Labels, labelsToTags, utils } from '@neo-one/utils';
 import { Context } from 'koa';
 
 const labelNames: readonly string[] = [Labels.HTTP_PATH, Labels.HTTP_STATUS_CODE, Labels.HTTP_METHOD];
@@ -60,12 +53,12 @@ export const context = (logger: Logger) => async (ctx: Context, next: () => Prom
   const spanExtract = tracer.propagation.extract({ getHeader: (name: string) => ctx.headers[name] });
   const spanContext = spanExtract !== null ? spanExtract : undefined;
   const { spanLabels, logLabels } = getContextLabels(ctx);
-  const childLogger = logger.child({ labels: logLabels, service: 'http-server' });
+  const childLogger = logger.child({ service: 'http-server', ...logLabels });
   ctx.state.logger = childLogger;
   await tracer.startRootSpan({ spanContext, name: 'http_server_request', kind: SpanKind.SERVER }, async (span) => {
     addAttributesToSpan(span, spanLabels);
+    const startTime = utils.nowSeconds();
     try {
-      const startTime = Date.now();
       try {
         await next();
       } finally {
@@ -83,14 +76,8 @@ export const context = (logger: Logger) => async (ctx: Context, next: () => Prom
         }
       }
       childLogger.debug({ title: 'http_server_request' });
-      globalStats.record([
-        {
-          measure: requestSec,
-          value: Date.now() - startTime,
-        },
-      ]);
-    } catch (error) {
-      childLogger.error({ title: 'http_server_request', error });
+    } catch (err) {
+      childLogger.error({ title: 'http_server_request', err });
       globalStats.record([
         {
           measure: requestErrors,
@@ -98,17 +85,20 @@ export const context = (logger: Logger) => async (ctx: Context, next: () => Prom
         },
       ]);
 
-      throw error;
+      throw err;
     } finally {
+      globalStats.record([
+        {
+          measure: requestSec,
+          value: utils.nowSeconds() - startTime,
+        },
+      ]);
       span.end();
     }
   });
 };
 
-export const onError = (logger: Logger) => (error: Error, ctx?: Context) => {
+export const onError = (logger: Logger) => (err: Error, ctx?: Context) => {
   const labels = ctx !== undefined ? getContextLabels(ctx).logLabels : {};
-  logger.error(
-    { title: 'http_server_request_uncaught_error', error: error.message, ...labels },
-    'Unexpected uncaught request error.',
-  );
+  logger.error({ title: 'http_server_request_uncaught_error', err, ...labels }, 'Unexpected uncaught request error.');
 };

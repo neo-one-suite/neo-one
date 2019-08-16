@@ -1,3 +1,4 @@
+import { AggregationType, globalStats, MeasureUnit } from '@neo-one/client-switch';
 import { nodeLogger } from '@neo-one/logger';
 import {
   ConnectedPeer,
@@ -11,10 +12,8 @@ import {
   PeerHealthBase,
 } from '@neo-one/node-core';
 import { Labels, utils } from '@neo-one/utils';
-import { AggregationType, globalStats, MeasureUnit } from '@opencensus/core';
 import _ from 'lodash';
 import * as net from 'net';
-import { Observable, Subscription } from 'rxjs';
 import { Duplex } from 'stream';
 import { UnsupportedEndpointType } from './errors';
 import { TCPPeer } from './TCPPeer';
@@ -26,11 +25,8 @@ export interface ListenTCP {
   readonly host?: string;
 }
 
-export interface NetworkEnvironment {
-  readonly listenTCP?: ListenTCP;
-}
-
 export interface NetworkOptions {
+  readonly listenTCP?: ListenTCP;
   readonly seeds?: readonly Endpoint[];
   readonly peerSeeds?: readonly Endpoint[];
   readonly maxConnectedPeers?: number;
@@ -42,8 +38,7 @@ export interface NetworkOptions {
 
 interface NetworkConstructOptions<Message, PeerData, PeerHealth extends PeerHealthBase>
   extends NetworkCreateOptions<Message, PeerData, PeerHealth> {
-  readonly environment?: NetworkEnvironment;
-  readonly options$: Observable<NetworkOptions>;
+  readonly options: NetworkOptions;
 }
 
 const emptyFunction = () => {
@@ -132,7 +127,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
   private mutableExternalEndpoints: Set<Endpoint>;
   private mutableMaxConnectedPeers: number;
   private mutableConnectPeersDelayMS: number;
-  private readonly options$: Observable<NetworkOptions>;
+  private readonly options: NetworkOptions;
   private mutableSocketTimeoutMS: number;
   private mutableConnectErrorCodes: Set<string>;
   // tslint:disable prefer-readonly
@@ -150,7 +145,6 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
   private readonly listenTCP: ListenTCP | undefined;
   private mutableTCPServer: net.Server | undefined;
   private mutableConnectPeersTimeout: number | undefined;
-  private mutableSubscription: Subscription | undefined;
   private readonly negotiateInternal: (peer: Peer<Message>) => Promise<NegotiateResult<PeerData>>;
   private readonly checkPeerHealthInternal: (
     connectedPeer: ConnectedPeer<Message, PeerData>,
@@ -162,14 +156,14 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
   private readonly onEventInternal: OnNetworkEvent<Message, PeerData>;
 
   public constructor(options: NetworkConstructOptions<Message, PeerData, PeerHealth>) {
-    const { environment = {}, options$ } = options;
+    const { options: networkOptions } = options;
     this.mutableStarted = false;
     this.mutableStopped = false;
 
     this.mutableExternalEndpoints = EXTERNAL_ENDPOINTS;
     this.mutableMaxConnectedPeers = MAX_CONNECTED_PEERS;
     this.mutableConnectPeersDelayMS = CONNECT_PEERS_DELAY_MS;
-    this.options$ = options$;
+    this.options = networkOptions;
     this.mutableSocketTimeoutMS = SOCKET_TIMEOUT_MS;
     this.mutableConnectErrorCodes = CONNECT_ERROR_CODES;
 
@@ -184,7 +178,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
     this.mutableSeeds = new Set();
     this.mutablePeerSeeds = new Set();
 
-    this.listenTCP = environment.listenTCP;
+    this.listenTCP = networkOptions.listenTCP;
 
     this.negotiateInternal = options.negotiate;
     this.checkPeerHealthInternal = options.checkPeerHealth;
@@ -204,28 +198,22 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
     this.mutableStarted = true;
     this.mutableStopped = false;
     try {
-      this.mutableSubscription = this.options$.subscribe({
-        next: (options) => {
-          this.mutableSeeds = new Set(options.seeds);
-          this.mutablePeerSeeds = new Set(options.peerSeeds === undefined ? [] : options.peerSeeds);
-          if (options.seeds !== undefined) {
-            options.seeds.forEach((seed) => this.addEndpoint(seed));
-          }
-          this.mutableMaxConnectedPeers =
-            options.maxConnectedPeers === undefined ? MAX_CONNECTED_PEERS : options.maxConnectedPeers;
-          this.mutableExternalEndpoints =
-            options.externalEndpoints === undefined ? EXTERNAL_ENDPOINTS : new Set(options.externalEndpoints);
-          this.mutableConnectPeersDelayMS =
-            options.connectPeersDelayMS === undefined ? CONNECT_PEERS_DELAY_MS : options.connectPeersDelayMS;
-          this.mutableSocketTimeoutMS =
-            options.socketTimeoutMS === undefined ? SOCKET_TIMEOUT_MS : options.socketTimeoutMS;
-          this.mutableConnectErrorCodes =
-            options.connectErrorCodes === undefined ? CONNECT_ERROR_CODES : new Set(options.connectErrorCodes);
-        },
-        error: () => {
-          // do nothing
-        },
-      });
+      const options = this.options;
+
+      this.mutableSeeds = new Set(options.seeds);
+      this.mutablePeerSeeds = new Set(options.peerSeeds === undefined ? [] : options.peerSeeds);
+      if (options.seeds !== undefined) {
+        options.seeds.forEach((seed) => this.addEndpoint(seed));
+      }
+      this.mutableMaxConnectedPeers =
+        options.maxConnectedPeers === undefined ? MAX_CONNECTED_PEERS : options.maxConnectedPeers;
+      this.mutableExternalEndpoints =
+        options.externalEndpoints === undefined ? EXTERNAL_ENDPOINTS : new Set(options.externalEndpoints);
+      this.mutableConnectPeersDelayMS =
+        options.connectPeersDelayMS === undefined ? CONNECT_PEERS_DELAY_MS : options.connectPeersDelayMS;
+      this.mutableSocketTimeoutMS = options.socketTimeoutMS === undefined ? SOCKET_TIMEOUT_MS : options.socketTimeoutMS;
+      this.mutableConnectErrorCodes =
+        options.connectErrorCodes === undefined ? CONNECT_ERROR_CODES : new Set(options.connectErrorCodes);
 
       this.startServer();
       // tslint:disable-next-line no-floating-promises
@@ -260,10 +248,6 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
 
       if (this.mutableTCPServer !== undefined) {
         this.mutableTCPServer.close();
-      }
-
-      if (this.mutableSubscription !== undefined) {
-        this.mutableSubscription.unsubscribe();
       }
 
       this.mutableStarted = false;

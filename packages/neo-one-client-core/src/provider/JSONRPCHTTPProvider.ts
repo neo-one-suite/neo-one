@@ -1,5 +1,5 @@
-import { addAttributesToSpan, Span, SpanKind, tracer } from '@neo-one/client-switch';
-import { Labels } from '@neo-one/utils';
+import { Span, SpanKind, tracer } from '@neo-one/client-switch';
+import { addAttributesToSpan, Labels } from '@neo-one/utils';
 // tslint:disable-next-line match-default-export-name
 import _fetch from 'cross-fetch';
 import DataLoader from 'dataloader';

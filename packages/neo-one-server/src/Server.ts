@@ -1,15 +1,15 @@
-import { context as httpContext, cors, createServer$, onError as appOnError } from '@neo-one/http';
+import { context as httpContext, cors, onError as appOnError, setupServer } from '@neo-one/http';
 import { Logger, serverLogger } from '@neo-one/logger';
 import { ServerConfig, ServerManager } from '@neo-one/server-client';
 import { proto } from '@neo-one/server-grpc';
 import { Binary, Config, DescribeTable, VERSION } from '@neo-one/server-plugin';
-import { finalize } from '@neo-one/utils';
+import { Disposable, finalize, mergeScanLatest } from '@neo-one/utils';
 import * as http from 'http';
 import Application from 'koa';
 import Router from 'koa-router';
 import Mali, { Context } from 'mali';
 import * as path from 'path';
-import { BehaviorSubject, combineLatest, defer, Observable, of as _of } from 'rxjs';
+import { BehaviorSubject, combineLatest, defer, Observable } from 'rxjs';
 import { distinctUntilChanged, map, mergeScan, switchMap } from 'rxjs/operators';
 import { ServerRunningError } from './errors';
 import { context, rpc, services as servicesMiddleware } from './middleware';
@@ -201,10 +201,19 @@ export class Server {
       })(),
     );
 
-    const http$ = this.serverConfig.config$.pipe(
-      switchMap((config) =>
-        createServer$(app$, _of(60000), { host: '0.0.0.0', port: config.httpServer.port }, () => http.createServer()),
-      ),
+    const http$ = combineLatest([app$, this.serverConfig.config$]).pipe(
+      mergeScanLatest(async (disposable: Disposable | undefined, [app, config]) => {
+        if (disposable !== undefined) {
+          await disposable();
+        }
+
+        return setupServer(app, http.createServer(), '0.0.0.0', config.httpServer.port);
+      }),
+      finalize(async (disposable) => {
+        if (disposable !== undefined) {
+          await disposable();
+        }
+      }),
     );
 
     return combineLatest([grpc$, http$]);

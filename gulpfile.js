@@ -640,7 +640,7 @@ const buildAll = ((cache) =>
 const install = ((cache) =>
   memoizeTask(cache, async function install(format) {
     await execa(
-      'yarn install --non-interactive --no-progress --ignore-engines',
+      'yarn install --non-interactive --no-progress',
       {
         cwd: getDistBaseCWD(format),
         stdio,

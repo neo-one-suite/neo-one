@@ -1,21 +1,20 @@
-// tslint:disable: no-submodule-imports
+// tslint:disable no-submodule-imports readonly-keyword readonly-array
 import { tracing } from '@opencensus/web-core';
 import { NoopExporter } from '@opencensus/web-core/build/src/exporters/noop_exporter';
 import { TraceContextFormat } from '@opencensus/web-propagation-tracecontext';
-import { Exporter, Span, SpanKind } from '@opencensus/web-types';
+import { Config, ExporterConfig, Span, SpanKind } from '@opencensus/web-types';
 import { AggregationType, Measure, MeasureUnit, Stats } from '@opencensus/web-types/build/src/stats/types';
 import { TagMap } from '@opencensus/web-types/build/src/tags/tag-map';
 
 const tracer = tracing.tracer;
 
-const startTracing = (exporter: Exporter) => {
-  tracing.start({
-    propagation: new TraceContextFormat(),
-    exporter,
-  });
+const startTracing = (config: Config) => {
+  tracing.start(config);
 
   return () => {
-    tracing.unregisterExporter(exporter);
+    if (config.exporter !== undefined) {
+      tracing.unregisterExporter(config.exporter);
+    }
     tracing.stop();
   };
 };
@@ -39,16 +38,52 @@ const globalStats: Stats = {
   getCurrentTagContext: noOp,
 };
 
+const PrometheusStatsExporter = {
+  onRegisterView: noOp,
+  onRecord: noOp,
+  start: noOp,
+  stop: noOp,
+};
+
+export interface PrometheusExporterOptions extends ExporterConfig {
+  /** App prefix for metrics, if needed - default opencensus */
+  prefix?: string;
+  /**
+   * Port number for Prometheus exporter server
+   * Default registered port is 9464:
+   * https://github.com/prometheus/prometheus/wiki/Default-port-allocations
+   */
+  port?: number;
+  /**
+   * Define if the Prometheus exporter server will be started - default false
+   */
+  startServer?: boolean;
+}
+
+const JaegerTraceExporter = NoopExporter;
+
+export interface JaegerTraceExporterOptions extends ExporterConfig {
+  serviceName: string;
+  // tslint:disable-next-line no-any
+  tags?: any[];
+  host?: string;
+  port?: number;
+  maxPacketSize?: number;
+}
+
 export {
-  TraceContextFormat,
-  Span,
-  SpanKind,
   AggregationType,
+  Config as TracingConfig,
+  globalStats,
+  JaegerTraceExporter,
   Measure,
   MeasureUnit,
-  TagMap,
   NoopExporter,
-  tracer,
+  PrometheusStatsExporter,
+  Span,
+  SpanKind,
   startTracing,
-  globalStats,
+  TagMap,
+  TraceContextFormat,
+  tracer,
 };

@@ -14,12 +14,9 @@ export interface NodeSettings {
   readonly rpcPort: number;
   readonly listenTCPPort: number;
   readonly telemetryPort: number;
-  readonly consensus: {
-    readonly enabled: boolean;
-    readonly options: {
-      readonly privateKey: string;
-      readonly privateNet: boolean;
-    };
+  readonly consensus?: {
+    readonly privateKey: string;
+    readonly privateNet: boolean;
   };
 
   readonly seeds: readonly string[];

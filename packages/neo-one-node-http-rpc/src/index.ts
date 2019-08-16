@@ -1,2 +1,1 @@
-export { rpcServer$ } from './rpcServer$';
-export { Environment as RPCServerEnvironment, Options as RPCServerOptions, ServerOptions } from './rpcServer$';
+export { Options as RPCServerOptions, setupRPCServer } from './setupRPCServer';

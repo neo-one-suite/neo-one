@@ -5,11 +5,10 @@ import { Node } from '@neo-one/node-protocol';
 import { createHandler, RPCHandler } from '@neo-one/node-rpc-handler';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
 import { vm } from '@neo-one/node-vm';
-import { finalize } from '@neo-one/utils';
+import { Disposable, finalize } from '@neo-one/utils';
 import Level from 'level-js';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
-import { BehaviorSubject, Subscription } from 'rxjs';
 import { constants } from './constants';
 import { Network } from './Network';
 
@@ -25,7 +24,7 @@ export interface InMemoryFullNode {
 export type FullNodeOptions = PersistentFullNode | InMemoryFullNode;
 
 export class FullNode {
-  private mutableSubscription: Subscription | undefined;
+  private mutableDisposable: Disposable | undefined;
   private readonly startPromise: Promise<RPCHandler>;
 
   public constructor(private readonly options: FullNodeOptions) {
@@ -39,9 +38,9 @@ export class FullNode {
   }
 
   public async stop(): Promise<void> {
-    if (this.mutableSubscription !== undefined) {
-      this.mutableSubscription.unsubscribe();
-      this.mutableSubscription = undefined;
+    if (this.mutableDisposable !== undefined) {
+      await this.mutableDisposable();
+      this.mutableDisposable = undefined;
       await finalize.wait();
     }
   }
@@ -54,7 +53,6 @@ export class FullNode {
   }
 
   private async startInternal(): Promise<RPCHandler> {
-    let resolved = false;
     const primaryPrivateKey = crypto.wifToPrivateKey(constants.PRIVATE_NET_PRIVATE_KEY, common.NEO_PRIVATE_KEY_VERSION);
     const primaryPublicKey = common.stringToECPoint(constants.PRIVATE_NET_PUBLIC_KEY);
     crypto.addPublicKey(primaryPrivateKey, primaryPublicKey);
@@ -74,42 +72,19 @@ export class FullNode {
       storage,
       vm,
     });
-    const nodeOptions$ = new BehaviorSubject({
+    const nodeOptions = {
       consensus: {
-        enabled: true,
-        options: {
-          privateKey: common.privateKeyToString(primaryPrivateKey),
-          privateNet: true,
-        },
+        privateKey: common.privateKeyToString(primaryPrivateKey),
+        privateNet: true,
       },
-    });
+    };
     const node = new Node({
       blockchain,
-      environment: {},
-      options$: nodeOptions$,
+      options: nodeOptions,
       createNetwork: () => new Network(),
     });
 
-    await new Promise<void>((resolve, reject) => {
-      const handleError = (error: Error) => {
-        if (!resolved) {
-          resolved = true;
-          reject(error);
-        }
-      };
-      this.mutableSubscription = node.start$().subscribe({
-        next: () => {
-          if (!resolved) {
-            resolved = true;
-            resolve();
-          }
-        },
-        error: handleError,
-        complete: () => {
-          handleError(new Error('Unexpected end'));
-        },
-      });
-    });
+    this.mutableDisposable = await node.start();
 
     return createHandler({ blockchain, node });
   }

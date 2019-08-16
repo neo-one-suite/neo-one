@@ -11,7 +11,6 @@
     "@neo-one/logger": "^1.0.0",
     "@neo-one/node": "^2.0.0",
     "@neo-one/node-core": "^1.1.5",
-    "@neo-one/node-data-backup": "^1.1.4",
     "@neo-one/node-neo-settings": "^1.1.5",
     "@neo-one/server-plugin": "^1.1.5",
     "@neo-one/utils": "^1.1.3",

@@ -1,8 +1,8 @@
 import compose from '@malijs/compose';
 import onError from '@malijs/onerror';
-import { addAttributesToSpan, SpanKind, tracer } from '@neo-one/client-switch';
+import { SpanKind, tracer } from '@neo-one/client-switch';
 import { Logger } from '@neo-one/logger';
-import { Labels } from '@neo-one/utils';
+import { addAttributesToSpan, Labels } from '@neo-one/utils';
 import { Context } from 'mali';
 
 const getLabels = (ctx: Context) => ({
