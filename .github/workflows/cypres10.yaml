@@ -1,0 +1,22 @@
+name: cypress10
+on: [push, pull_request]
+jobs:
+  cypress10:
+    name: cypress10
+    runs-on: ubuntu-latest
+    container:
+      image: neotracker/neo-one-circleci-node:10.16.0-1
+    steps:
+      working-directory: ~/neo-one
+      - name: Yarn install
+      - run: yarn install
+      - name: Add .nyc_output directory
+      - run: mkdir .nyc_output
+      - name: Run prod-builds
+      - run: yarn website:prod-builds
+      - name: Run prod
+      - run: yarn website:prod
+      - name: Coverage report
+      - run: yarn nyc report --reporter=json
+      - name: Upload Unit Test Coverage
+      - run: yarn run codecov -f coverage/coverage-final.json -F cypress
