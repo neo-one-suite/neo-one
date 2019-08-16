@@ -336,43 +336,43 @@ jobs:
 
 workflows:
   version: 2
-  test8:
-    jobs:
-      - build-e2e8:
-          filters: *filter-ignore-bors-tmp
-      - test8:
-          filters: *filter-ignore-bors-tmp
-      - e2e8:
-          requires:
-            - build-e2e8
-          filters: *filter-ignore-bors-tmp
-  test10:
-    jobs:
-      - build-e2e10:
-          filters: *filter-ignore-bors-tmp
-      - test10:
-          filters: *filter-ignore-bors-tmp
-      - e2e10:
-          requires:
-            - build-e2e10
-          filters: *filter-ignore-bors-tmp
-      - lint:
-          filters: *filter-ignore-bors-tmp
-  test12:
-    jobs:
-      - build-e2e12:
-          filters: *filter-ignore-bors-tmp
-      - test12:
-          filters: *filter-ignore-bors-tmp
-      - e2e12:
-          requires:
-            - build-e2e12
-          filters: *filter-ignore-bors-tmp
-      - lint:
-          filters: *filter-ignore-bors-tmp
-  test-website:
-    jobs:
-      - cypress10
-  test-playground:
-    jobs:
-      - playground12
+  # test8:
+  #   jobs:
+  #     - build-e2e8:
+  #         filters: *filter-ignore-bors-tmp
+  #     - test8:
+  #         filters: *filter-ignore-bors-tmp
+  #     - e2e8:
+  #         requires:
+  #           - build-e2e8
+  #         filters: *filter-ignore-bors-tmp
+  # test10:
+  #   jobs:
+  #     - build-e2e10:
+  #         filters: *filter-ignore-bors-tmp
+  #     - test10:
+  #         filters: *filter-ignore-bors-tmp
+  #     - e2e10:
+  #         requires:
+  #           - build-e2e10
+  #         filters: *filter-ignore-bors-tmp
+  #     - lint:
+  #         filters: *filter-ignore-bors-tmp
+  # test12:
+  #   jobs:
+  #     - build-e2e12:
+  #         filters: *filter-ignore-bors-tmp
+  #     - test12:
+  #         filters: *filter-ignore-bors-tmp
+  #     - e2e12:
+  #         requires:
+  #           - build-e2e12
+  #         filters: *filter-ignore-bors-tmp
+  #     - lint:
+  #         filters: *filter-ignore-bors-tmp
+  # test-website:
+  #   jobs:
+  #     - cypress10
+  # test-playground:
+  #   jobs:
+  #     - playground12
