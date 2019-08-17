@@ -15,9 +15,9 @@
     "@opencensus/exporter-jaeger": "^0.0.16",
     "@opencensus/nodejs-base": "^0.0.16",
     "@opencensus/propagation-tracecontext": "^0.0.16",
-    "@opencensus/web-core": "^0.0.3",
-    "@opencensus/web-types": "^0.0.3",
-    "@opencensus/web-propagation-tracecontext": "^0.0.3",
+    "@opencensus/web-core": "^0.0.5",
+    "@opencensus/web-types": "^0.0.5",
+    "@opencensus/web-propagation-tracecontext": "^0.0.5",
     "lodash": "^4.17.14",
     "source-map": "^0.7.3",
     "tslib": "^1.9.3"

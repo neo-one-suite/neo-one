@@ -144,7 +144,7 @@ const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks
 
   const getTestName = (entry: Circus.TestEntry) => {
     const getBlockNamesWorker = (block: Circus.DescribeBlock): readonly string[] => {
-      if (block.parent == undefined) {
+      if (block.parent === undefined) {
         return [];
       }
       const parentNames = getBlockNamesWorker(block.parent);
