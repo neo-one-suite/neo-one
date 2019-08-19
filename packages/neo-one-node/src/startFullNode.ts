@@ -8,6 +8,7 @@ import {
   TraceContextFormat,
   TracingConfig,
 } from '@neo-one/client-switch';
+import { setGlobalLogLevel } from '@neo-one/logger/src';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { Settings } from '@neo-one/node-core';
 import { RPCServerOptions, setupRPCServer } from '@neo-one/node-http-rpc';
@@ -22,7 +23,12 @@ import fs from 'fs-extra';
 import LevelDOWN from 'leveldown';
 import LevelUp from 'levelup';
 
-interface TelemetryOptions {
+export interface LoggingOptions {
+  readonly level?: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent';
+}
+
+export interface TelemetryOptions {
+  readonly logging?: LoggingOptions;
   readonly prometheus?: Omit<PrometheusExporterOptions, 'startServer'>;
   readonly jaeger?: Omit<JaegerTraceExporterOptions, 'serviceName'>;
   readonly tracing?: Omit<TracingConfig, 'exporter' | 'propagation' | 'logger' | 'stats'>;
@@ -62,6 +68,10 @@ export const startFullNode = async ({
     await fs.ensureDir(dataPath);
 
     if (telemetry !== undefined) {
+      if (telemetry.logging !== undefined && telemetry.logging.level !== undefined) {
+        setGlobalLogLevel(telemetry.logging.level);
+      }
+
       if (telemetry.prometheus !== undefined) {
         const exporter = new PrometheusStatsExporter({
           ...telemetry.prometheus,
