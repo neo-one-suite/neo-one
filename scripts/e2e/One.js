@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const http = require('http');
 const execa = require('execa');
-const cosmiconfig = require('cosmiconfig');
 const fs = require('fs-extra');
 const nodePath = require('path');
 const tmp = require('tmp');

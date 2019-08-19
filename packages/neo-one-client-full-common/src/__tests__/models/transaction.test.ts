@@ -9,6 +9,6 @@ describe('Issue Transaction Model', () => {
         new IssueTransactionModel({
           version: badVersion,
         }),
-    ).toThrowError(`Expected version to be 0, found: ${badVersion}`);
+    ).toThrowError(`Expected version to be 1, found: ${badVersion}`);
   });
 });

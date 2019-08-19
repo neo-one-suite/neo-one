@@ -1,6 +1,7 @@
 const base = require('./base');
 
 module.exports = {
+  testRunner: 'jest-circus/runner',
   ...base({ path: 'e2e' }),
   displayName: 'e2e',
   testRegex: '^.*/__e2e__/.*\\.test\\.tsx?$',

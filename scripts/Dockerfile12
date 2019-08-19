@@ -14,10 +14,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Switch to the archive mirror until we can get people to
 # switch to Stretch.
 RUN if grep -q Debian /etc/os-release && grep -q jessie /etc/os-release; then \
-	rm /etc/apt/sources.list \
-    && echo "deb http://archive.debian.org/debian/ jessie main" >> /etc/apt/sources.list \
-    && echo "deb http://security.debian.org/debian-security jessie/updates main" >> /etc/apt/sources.list \
-	; fi
+  rm /etc/apt/sources.list \
+  && echo "deb http://archive.debian.org/debian/ jessie main" >> /etc/apt/sources.list \
+  && echo "deb http://security.debian.org/debian-security jessie/updates main" >> /etc/apt/sources.list \
+  ; fi
 
 # Make sure PATH includes ~/.local/bin
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=839155
@@ -28,9 +28,9 @@ RUN echo 'PATH="$HOME/.local/bin:$PATH"' >> /etc/profile.d/user-local-path.sh
 RUN apt-get update \
   && mkdir -p /usr/share/man/man1 \
   && apt-get install -y \
-    git mercurial xvfb apt \
-    locales sudo openssh-client ca-certificates tar gzip parallel \
-    net-tools netcat unzip zip bzip2 gnupg curl wget make
+  git mercurial xvfb apt \
+  locales sudo openssh-client ca-certificates tar gzip parallel \
+  net-tools netcat unzip zip bzip2 gnupg curl wget make lsof
 
 
 # Set timezone to UTC by default

@@ -7,16 +7,16 @@
     "@emotion/core": "10.0.14",
     "@emotion/styled": "10.0.14",
     "@neo-one/react-core": "^1.1.5",
-    "@types/react": "^16.8.23",
-    "@types/react-select": "^3.0.0",
+    "@types/react": "^16.9.2",
+    "@types/react-select": "^3.0.2",
     "emotion": "10.0.14",
     "popper.js": "^1.15.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-draggable": "^3.3.0",
+    "react-draggable": "^3.3.2",
     "react-select": "^3.0.4",
     "styled-tools": "^1.6.0",
-    "trackjs": "^3.3.0"
+    "trackjs": "^3.6.0"
   },
   "sideEffects": [
     "*.css"

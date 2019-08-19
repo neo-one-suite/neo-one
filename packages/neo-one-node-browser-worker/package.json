@@ -6,8 +6,8 @@
   "dependencies": {
     "@neo-one/node-browser": "^1.1.5",
     "@neo-one/worker": "^1.1.2",
-    "core-js": "^3.1.4",
-    "regenerator-runtime": "^0.13.2"
+    "core-js": "^3.2.1",
+    "regenerator-runtime": "^0.13.3"
   },
   "sideEffects": false
 }
