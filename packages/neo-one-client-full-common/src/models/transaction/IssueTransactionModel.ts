@@ -22,6 +22,7 @@ export class IssueTransactionModel<
   TOutput extends OutputModel = OutputModel,
   TWitness extends WitnessModel = WitnessModel
 > extends TransactionBaseModel<TransactionTypeModel.Issue, TAttribute, TInput, TOutput, TWitness> {
+  public static readonly VERSION: number = 1;
   public constructor({
     version,
     attributes,
@@ -40,8 +41,8 @@ export class IssueTransactionModel<
       hash,
     });
 
-    if (this.version !== 0) {
-      throw new InvalidVersionError(0, this.version);
+    if (this.version > 1) {
+      throw new InvalidVersionError(1, this.version);
     }
   }
 
