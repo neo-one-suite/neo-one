@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@types/npm-package-arg": "6.1.0",
-    "@types/pino": "5.8.8",
+    "@types/pino": "5.8.9",
     "@types/yargs": "13.0.2"
   },
   "sideEffects": false
