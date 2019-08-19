@@ -9,8 +9,13 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - run: pwd && ls
+      - run: ls scripts
+      - run: cat package.json
       - run: yarn install
       - run: mkdir .nyc_output
-      - run: yarn test:cypress-express
+      - run: yarn website:start:prod-builds
+      - run: ls dist
+      - run: yarn website:start:prod
+      - run: CYPRESS_RETRIES=3 yarn cypress run --spec cypress/integration/TokenomicsCourse/Lesson2/Chapter5.ts
       - run: yarn nyc report --reporter=json
       - run: yarn run codecov -f coverage/coverage-final.json -F cypress
