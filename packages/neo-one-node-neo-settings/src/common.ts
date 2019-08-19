@@ -85,6 +85,7 @@ const getGenesisBlock = ({ privateNet, governingToken, utilityToken, address, co
       governingToken,
       utilityToken,
       new IssueTransaction({
+        version: 0,
         outputs: [
           new Output({
             asset: governingToken.hash,
