@@ -19,6 +19,7 @@ export const start = (startFunc: StartFunc) => {
       bin: process.argv[0],
       args: [process.argv[1]],
     };
-    await startFunc(cmd, config);
+
+    return startFunc(cmd, config);
   });
 };
