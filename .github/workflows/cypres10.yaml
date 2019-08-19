@@ -11,7 +11,7 @@ jobs:
       - run: git clone https://github.com/neo-one-suite/neo-one.git neo-one-run && cd neo-one-run
       - run: cd neo-one-run && yarn install
       - run: cd neo-one-run && mkdir .nyc_output
-      - run: cd neo-one-run && yarn website:prod-builds
-      - run: cd neo-one-run && yarn website:prod
+      - run: cd neo-one-run && yarn website:start:prod-builds
+      - run: cd neo-one-run && yarn website:start:prod
       - run: cd neo-one-run && yarn nyc report --reporter=json
       - run: cd neo-one-run && yarn run codecov -f coverage/coverage-final.json -F cypress
