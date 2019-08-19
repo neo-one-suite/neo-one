@@ -163,7 +163,7 @@
     "@cypress/webpack-preprocessor": "4.1.0",
     "@reach/router": "1.2.1",
     "@reactivex/ix-esnext-esm": "2.5.3",
-    "@types/autoprefixer": "9.5.0",
+    "@types/autoprefixer": "9.6.1",
     "@types/cssnano": "4.0.0",
     "@types/jest": "24.0.17",
     "@types/jest-matchers": "20.0.2",
