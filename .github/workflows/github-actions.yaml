@@ -1,0 +1,16 @@
+name: Run Cypress Tests
+on: [push, pull_request]
+jobs:
+  cypress10:
+    name: cypress10
+    runs-on: ubuntu-18.04
+    container:
+      image: spencercorwin/neo-one-gh-actions-test:latest
+    steps:
+      - uses: actions/checkout@master
+      - run: pwd && ls
+      - run: yarn install
+      - run: mkdir .nyc_output
+      - run: yarn test:cypress-express
+      - run: yarn nyc report --reporter=json
+      - run: yarn run codecov -f coverage/coverage-final.json -F cypress
