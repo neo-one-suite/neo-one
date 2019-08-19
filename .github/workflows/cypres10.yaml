@@ -5,7 +5,7 @@ jobs:
     name: cypress10
     runs-on: ubuntu-18.04
     container:
-      image: neotracker/neo-one-circleci-node:10.16.0-1
+      image: spencercorwin/neo-one-gh-actions-test:latest
     steps:
       - run: yarn install
       - run: mkdir .nyc_output
