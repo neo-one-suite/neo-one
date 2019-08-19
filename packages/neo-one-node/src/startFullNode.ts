@@ -8,7 +8,7 @@ import {
   TraceContextFormat,
   TracingConfig,
 } from '@neo-one/client-switch';
-import { setGlobalLogLevel } from '@neo-one/logger/src';
+import { setGlobalLogLevel } from '@neo-one/logger';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { Settings } from '@neo-one/node-core';
 import { RPCServerOptions, setupRPCServer } from '@neo-one/node-http-rpc';

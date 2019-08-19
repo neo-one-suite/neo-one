@@ -17,8 +17,5 @@ const DEFAULT_OPTIONS = {
   blockchain: createMain(),
 };
 
-export const getConfiguration = (): FullNodeCreateOptions => {
-  const options = rc('neo-one', DEFAULT_OPTIONS) as FullNodeCreateOptions['options'];
-
-  return { options };
-};
+export const getOptions = (): FullNodeCreateOptions['options'] =>
+  rc('neo-one', DEFAULT_OPTIONS) as FullNodeCreateOptions['options'];

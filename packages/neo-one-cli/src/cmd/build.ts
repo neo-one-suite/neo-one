@@ -1,7 +1,7 @@
+import { Yarguments } from '@neo-one/utils-node';
 import yargs from 'yargs';
 import { createTasks } from '../build';
 import { start } from '../common';
-import { Yarguments } from '../types';
 
 export const command = 'build';
 export const describe = 'Builds the project and deploys it to the local development network.';

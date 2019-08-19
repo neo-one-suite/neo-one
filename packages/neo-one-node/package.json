@@ -5,6 +5,7 @@
   "main": "./src/index",
   "dependencies": {
     "@neo-one/client-switch": "^1.2.2",
+    "@neo-one/logger": "^1.0.0",
     "@neo-one/node-blockchain": "^1.1.5",
     "@neo-one/node-core": "^1.1.5",
     "@neo-one/node-http-rpc": "^2.0.0",

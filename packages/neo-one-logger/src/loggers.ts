@@ -15,9 +15,18 @@ export const rpcLogger = createLogger('rpc');
 export const cliLogger = createLogger('cli');
 export const httpLogger = createLogger('http');
 export const testLogger = createLogger('test');
-export const loggers = [editorLogger, serverLogger, nodeLogger, rpcLogger, cliLogger, httpLogger, testLogger];
+export const loggers: readonly pino.Logger[] = [
+  editorLogger,
+  serverLogger,
+  nodeLogger,
+  rpcLogger,
+  cliLogger,
+  httpLogger,
+  testLogger,
+];
 export const setGlobalLogLevel = (level: pino.LevelWithSilent) =>
   loggers.forEach((logger) => {
+    // tslint:disable-next-line no-object-mutation
     logger.level = level;
   });
 

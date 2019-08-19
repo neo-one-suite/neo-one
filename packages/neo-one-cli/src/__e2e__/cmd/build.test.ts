@@ -1,9 +1,10 @@
-import { Contract, UserAccountID, DeveloperClient, Hash256, Client } from '@neo-one/client';
-import { crypto, common, privateKeyToAddress, ABI } from '@neo-one/client-common';
+// tslint:disable no-any
+import { Client, Contract, DeveloperClient, Hash256, UserAccountID } from '@neo-one/client';
+import { ABI, common, crypto, privateKeyToAddress } from '@neo-one/client-common';
 import { constants } from '@neo-one/utils';
-import { getClients, getContracts } from '../../__data__';
 import BigNumber from 'bignumber.js';
 import * as nodePath from 'path';
+import { getClients, getContracts } from '../../__data__';
 
 jest.setTimeout(300 * 1000);
 
@@ -357,26 +358,26 @@ describe('build', () => {
       expect(escrowPairBalanceAfterClaim.toString()).toEqual('15');
     };
 
-    const nowSeconds = Math.round(Date.now() / 1000);
+    const start = Math.round(Date.now() / 1000);
     const exec = one.createExec('ico');
     one.addCleanup(async () => {
       await exec('stop network');
     });
     await exec('build');
 
-    const [{ client }, config] = await Promise.all([getClients('ico'), one.getProjectConfig('ico')]);
-    const contracts = await getContracts(client, constants.LOCAL_NETWORK_NAME);
+    const [{ client: outerClient }, config] = await Promise.all([getClients('ico'), one.getProjectConfig('ico')]);
+    const contracts = await getContracts(outerClient, constants.LOCAL_NETWORK_NAME);
     verifyICOContract(contracts.find((contract) => contract.name === 'ICO'));
     verifyTokenContract(contracts.find((contract) => contract.name === 'Token'));
     verifyEscrowContract(contracts.find((contract) => contract.name === 'Escrow'));
 
     await Promise.all([
-      verifySmartContractTesting(config.codegen.path, nowSeconds),
+      verifySmartContractTesting(config.codegen.path, start),
       verifySmartContractsManual(
         config.codegen.path,
         { network: constants.LOCAL_NETWORK_NAME, address: privateKeyToAddress(constants.PRIVATE_NET_PRIVATE_KEY) },
         { network: constants.LOCAL_NETWORK_NAME, address: privateKeyToAddress(TO_PRIVATE_KEY) },
-        nowSeconds,
+        start,
       ),
     ]);
   });
