@@ -7,7 +7,8 @@ jobs:
     container:
       image: spencercorwin/neo-one-gh-actions-test:latest
     steps:
-      - run: git checkout
+      - run: pwd && ls
+      - run: git clone https://github.com/neo-one-suite/neo-one.git neo-one-run && cd neo-one-run
       - run: yarn install
       - run: mkdir .nyc_output
       - run: yarn website:prod-builds
