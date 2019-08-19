@@ -1,14 +1,14 @@
 import { SourceMaps } from '@neo-one/client-common';
+import { CodegenFramework } from '@neo-one/utils';
 import { genAngular } from './angular';
 import { genClient, NetworkDefinition, Wallet } from './client';
 import { genCommonTypes } from './commonTypes';
 import { formatFile } from './formatFile';
 import { genGenerated } from './generated';
-import { genProjectID } from './projectID';
 import { genReact } from './react';
 import { genSourceMaps } from './sourceMaps';
 import { genTest } from './test';
-import { CodegenFramework, ContractPaths, FileResult } from './type';
+import { ContractPaths, FileResult } from './type';
 import { genVue } from './vue';
 
 export interface CommonFilesResult {
@@ -20,12 +20,10 @@ export interface CommonFilesResult {
   readonly vue: FileResult;
   readonly client: FileResult;
   readonly generated: FileResult;
-  readonly projectID: FileResult;
 }
 
 export const genCommonFiles = ({
   contractsPaths,
-  projectID,
   testPath,
   commonTypesPath,
   reactPath,
@@ -33,18 +31,15 @@ export const genCommonFiles = ({
   vuePath,
   clientPath,
   generatedPath,
-  projectIDPath,
   localDevNetworkName,
+  localDevNetworkPort,
   wallets,
   networks,
-  httpServerPort,
-  sourceMapsPath,
   sourceMaps,
   framework,
-  browser,
+  browserify,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
-  readonly projectID: string;
   readonly testPath: string;
   readonly commonTypesPath: string;
   readonly reactPath: string;
@@ -52,27 +47,22 @@ export const genCommonFiles = ({
   readonly vuePath: string;
   readonly clientPath: string;
   readonly generatedPath: string;
-  readonly projectIDPath: string;
   readonly localDevNetworkName: string;
+  readonly localDevNetworkPort: number;
   readonly wallets: ReadonlyArray<Wallet>;
   readonly networks: ReadonlyArray<NetworkDefinition>;
-  readonly httpServerPort: number;
   readonly sourceMapsPath: string;
   readonly sourceMaps: SourceMaps;
   readonly framework: CodegenFramework;
-  readonly browser: boolean;
+  readonly browserify: boolean;
 }): CommonFilesResult => {
-  const testFile = formatFile(genTest({ contractsPaths, testPath, commonTypesPath }));
-  const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }));
-  const sourceMapsFile = formatFile(
-    genSourceMaps({ httpServerPort, sourceMapsPath, projectIDPath, sourceMaps, browser }),
-  );
-  const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath, browser }));
-  const angularFile = formatFile(genAngular({ contractsPaths, angularPath, commonTypesPath, clientPath, browser }));
-  const vueFile = formatFile(genVue({ contractsPaths, vuePath, commonTypesPath, clientPath, browser }));
-  const clientFile = formatFile(
-    genClient({ localDevNetworkName, wallets, networks, clientPath, projectIDPath, httpServerPort, browser }),
-  );
+  const testFile = formatFile(genTest({ contractsPaths, testPath, commonTypesPath }), browserify);
+  const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }), browserify);
+  const sourceMapsFile = formatFile(genSourceMaps({ sourceMaps }), browserify);
+  const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath }), browserify);
+  const angularFile = formatFile(genAngular({ contractsPaths, angularPath, commonTypesPath, clientPath }), browserify);
+  const vueFile = formatFile(genVue({ contractsPaths, vuePath, commonTypesPath, clientPath }), browserify);
+  const clientFile = formatFile(genClient({ localDevNetworkName, localDevNetworkPort, wallets, networks }), browserify);
   const generatedFile = formatFile(
     genGenerated({
       contractsPaths,
@@ -84,8 +74,8 @@ export const genCommonFiles = ({
       generatedPath,
       framework,
     }),
+    browserify,
   );
-  const projectIDFile = formatFile(genProjectID({ projectID }));
 
   return {
     test: testFile,
@@ -96,6 +86,5 @@ export const genCommonFiles = ({
     vue: vueFile,
     client: clientFile,
     generated: generatedFile,
-    projectID: projectIDFile,
   };
 };

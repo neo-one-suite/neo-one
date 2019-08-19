@@ -369,7 +369,7 @@ interface UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     verify: boolean,
     options?: InvokeSendUnsafeReceiveTransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
 }
 ```
@@ -387,7 +387,7 @@ interface UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     transfer: Transfer,
     options?: TransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
 }
 ```
@@ -405,7 +405,7 @@ interface UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     options?: TransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
 }
 ```
@@ -423,7 +423,7 @@ interface UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     options?: TransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
 }
 ```
@@ -440,7 +440,7 @@ interface UserAccountProvider {
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     options?: TransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
 }
 ```

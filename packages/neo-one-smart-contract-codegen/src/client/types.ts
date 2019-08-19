@@ -6,5 +6,5 @@ export interface NetworkDefinition {
 
 export interface Wallet {
   readonly name: string;
-  readonly privateKey: string;
+  readonly wif: string;
 }

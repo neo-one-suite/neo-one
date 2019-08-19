@@ -177,7 +177,7 @@ const extractConsoleLogs = (actions: readonly RawAction[]): readonly ConsoleLog[
 
 export const createConsoleLogMessages = async (
   actions: readonly RawAction[],
-  sourceMapsIn: Promise<SourceMaps> = Promise.resolve({}),
+  sourceMaps: SourceMaps = {},
   { bare = false, onlyFileName = false }: LogOptions = { bare: false, onlyFileName: false },
 ): Promise<readonly string[]> => {
   const logs = extractConsoleLogs(actions);
@@ -185,7 +185,6 @@ export const createConsoleLogMessages = async (
     return logs.map(({ message }) => message);
   }
 
-  const sourceMaps = await sourceMapsIn;
   const traces = await processTrace({ trace: logs, sourceMaps, onlyFileName });
   const zipped = utils.zip(logs, traces);
 

@@ -1,3 +1,4 @@
+import { setupWallets } from '@neo-one/cli-common';
 import {
   common,
   crypto,
@@ -8,7 +9,6 @@ import {
 } from '@neo-one/client-common';
 import { DeveloperClient, LocalKeyStore, NEOONEDataProvider, NEOONEProvider } from '@neo-one/client-core';
 import { Client, LocalUserAccountProvider, PublishReceipt } from '@neo-one/client-full-core';
-import { setupWallets } from '@neo-one/local';
 import { compileContract, CompilerHost } from '@neo-one/smart-contract-compiler';
 import { camel, Modifiable } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
@@ -141,13 +141,7 @@ export const withContracts = async <T>(
       let result: TransactionResult<PublishReceipt>;
       // tslint:disable-next-line prefer-conditional-expression
       if (deploy) {
-        result = await client.publishAndDeploy(
-          contract,
-          abi,
-          [],
-          { systemFee: new BigNumber(-1) },
-          Promise.resolve(mutableSourceMaps),
-        );
+        result = await client.publishAndDeploy(contract, abi, [], { systemFee: new BigNumber(-1) }, mutableSourceMaps);
       } else {
         result = await client.publish(contract, { systemFee: new BigNumber(-1) });
       }
@@ -160,7 +154,7 @@ export const withContracts = async <T>(
       const smartContract = client.smartContract({
         networks: { [networkName]: { address } },
         abi,
-        sourceMaps: Promise.resolve(mutableSourceMaps),
+        sourceMaps: mutableSourceMaps,
       });
       mutableLinked[filePath] = { [name]: address };
 

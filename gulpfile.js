@@ -282,7 +282,6 @@ const globs = {
     '!packages/*/src/bin/**/*',
     '!packages/neo-one-developer-tools-frame/src/*.ts',
     '!packages/neo-one-smart-contract-lib/src/**/*.ts',
-    '!packages/neo-one-server-plugin-wallet/src/contracts/*.ts',
   ].concat(skipGlobs),
   bin: ['packages/*/src/bin/*.ts'].concat(skipGlobs),
   pkg: ['packages/*/package.json'].concat(skipGlobs),
@@ -447,7 +446,6 @@ const copyTypescript = ((cache) =>
       .src(globs.typescript)
       .pipe(
         gulpFilter([
-          'packages/neo-one-server-plugin-wallet/src/contracts/*.ts',
           'packages/neo-one-smart-contract/src/*.ts',
           'packages/neo-one-smart-contract-lib/src/**/*.ts',
           '!packages/*/src/**/*.test.{ts,tsx}',
@@ -639,14 +637,11 @@ const buildAll = ((cache) =>
 
 const install = ((cache) =>
   memoizeTask(cache, async function install(format) {
-    await execa(
-      'yarn install --non-interactive --no-progress',
-      {
-        cwd: getDistBaseCWD(format),
-        stdio,
-        shell: true,
-      },
-    );
+    await execa('yarn install --non-interactive --no-progress', {
+      cwd: getDistBaseCWD(format),
+      stdio,
+      shell: true,
+    });
   }))({});
 
 const publish = ((cache) =>
@@ -710,7 +705,6 @@ const CLIENT_PACKAGES = new Set([
   '@neo-one/logger',
   '@neo-one/utils',
   '@neo-one/client-switch',
-  '@neo-one/server-http-client',
   '@neo-one/node-vm',
   '@neo-one/client-full-common',
   '@neo-one/node-core',

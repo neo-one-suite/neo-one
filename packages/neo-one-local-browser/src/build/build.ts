@@ -1,3 +1,4 @@
+import { deployContract, setupWallets } from '@neo-one/cli-common';
 import {
   common,
   crypto,
@@ -6,10 +7,9 @@ import {
   SourceMaps,
 } from '@neo-one/client-common';
 import { NEOONEDataProvider } from '@neo-one/client-core';
-import { constants, deployContract, setupWallets } from '@neo-one/local';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { genCommonBrowserFiles, genFiles } from '@neo-one/smart-contract-codegen';
-import { Modifiable } from '@neo-one/utils';
+import { constants, Modifiable } from '@neo-one/utils';
 import { WorkerManager } from '@neo-one/worker';
 import { Subject } from 'rxjs';
 import { FileSystem } from '../filesystem';
@@ -76,7 +76,7 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
       provider,
       contract.contract,
       contract.abi,
-      Promise.resolve(mutableSourceMaps),
+      mutableSourceMaps,
       constants.PRIVATE_NET_PRIVATE_KEY,
     );
 
@@ -126,7 +126,7 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
       createContractPath,
       abi: contractResult.abi,
       sourceMapsPath,
-      browser: false,
+      browserify: false,
     });
 
     mutableFiles.push({ path: typesPath, content: typesContents.ts });
@@ -162,7 +162,7 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
     wallets: [
       {
         name: 'master',
-        privateKey: constants.PRIVATE_NET_PRIVATE_KEY,
+        wif: constants.PRIVATE_NET_WIF,
       },
     ].concat(wallets),
     networks: [],

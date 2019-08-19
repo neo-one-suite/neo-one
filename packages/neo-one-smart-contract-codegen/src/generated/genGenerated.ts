@@ -1,5 +1,6 @@
+import { CodegenFramework } from '@neo-one/utils';
 import _ from 'lodash';
-import { CodegenFramework, ContractPaths } from '../type';
+import { ContractPaths } from '../type';
 import { getRelativeImport } from '../utils';
 
 const createExport = (generatedPath: string, importPath: string) =>

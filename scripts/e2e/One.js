@@ -1,13 +1,15 @@
 const _ = require('lodash');
-const appRootDir = require('app-root-dir');
+const http = require('http');
 const execa = require('execa');
+const cosmiconfig = require('cosmiconfig');
 const fs = require('fs-extra');
-const path = require('path');
+const nodePath = require('path');
 const tmp = require('tmp');
 const checkPort = require('./checkPort');
 class One {
   constructor() {
     this.mutableCleanup = [];
+    this.projectEnv = {};
   }
 
   addCleanup(callback) {
@@ -17,30 +19,93 @@ class One {
   async cleanupTest() {
     const mutableCleanup = this.mutableCleanup;
     this.mutableCleanup = [];
-    await Promise.all(mutableCleanup.map(async (callback) => callback()));
+    await Promise.all(
+      mutableCleanup.map(async (callback) => {
+        try {
+          await callback();
+        } catch (err) {
+          console.error(err);
+        }
+      }),
+    );
+
+    this.projectEnv = {};
+  }
+
+  async setup() {
+    await this.setupPorts();
+  }
+
+  async setupPorts() {
+    const range = 10;
+    this.minPort = await this.getAvailableMinPortForRange(range);
+    this.maxPort = this.minPort + range;
   }
 
   async teardown() {
-    if (this.server === undefined) {
-      return;
-    }
-
-    try {
-      await this._exec('reset --static-neo-one');
-    } catch (error) {
-      this.server.kill('SIGINT');
-      await new Promise((resolve) => setTimeout(() => resolve(), 2500));
-      this.server.kill('SIGTERM');
-    }
-
-    await fs.remove(this.dir.name);
-
     await this.cleanupTest();
   }
 
-  async execute(command, options = {}) {
-    await this.setupCLI();
-    return this._exec(command, options);
+  createExec(project) {
+    return async (commandIn, options = {}) => {
+      const cmd = nodePath.resolve(
+        process.cwd(),
+        'dist',
+        'neo-one',
+        'node_modules',
+        '.bin',
+        'neo-one',
+      );
+      const args = commandIn.split(' ');
+      return this.execBase(commandIn, project, options)
+        .then(({ stdout }) => stdout)
+        .catch((error) => {
+          throw new Error(
+            `Command:\n${[cmd].concat(args).join(' ')}\n\nSTDOUT:\n${
+              error.stdout
+            }\n\nSTDERR:\n${error.stderr}\n\nERROR:\n${error.toString()}`,
+          );
+        });
+    };
+  }
+
+  execBase(commandIn, project, options = {}) {
+    const cmd = nodePath.resolve(
+      process.cwd(),
+      'dist',
+      'neo-one',
+      'node_modules',
+      '.bin',
+      'neo-one',
+    );
+    const args = commandIn.split(' ');
+    const proc = execa(cmd, args, this._getEnv(project, options));
+    // Uncomment these lines to debug e2e tests.
+    // proc.stdout.pipe(process.stdout);
+    // proc.stderr.pipe(process.stderr);
+    return proc;
+  }
+
+  createExecAsync(project) {
+    return (command, options = {}) => {
+      const proc = this.execBase(command, project, options);
+      this.mutableCleanup.push(async () => {
+        proc.kill();
+        await proc.catch(() => {
+          // do nothing
+        });
+      });
+    };
+  }
+
+  getTmpDir() {
+    const dir = tmp.dirSync().name;
+    fs.ensureDirSync(dir);
+    this.mutableCleanup.push(async () => {
+      await fs.remove(dir);
+    });
+
+    return dir;
   }
 
   async getAvailableMinPortForRange(range, start = 10000) {
@@ -59,74 +124,9 @@ class One {
     return start;
   }
 
-  async setupCLI() {
-    if (this.server !== undefined) {
-      return;
-    }
-
-    this.dir = tmp.dirSync();
-    this.dirName = this.dir.name;
-    this.serverPort = await this.getAvailableMinPortForRange(30);
-    this.httpServerPort = this.serverPort + 1;
-    this.minPort = this.serverPort + 2;
-    const [cmd, args] = this._createCommand('start server --static-neo-one');
-    this.server = execa(cmd, args, this._getEnv());
-
-    let stdout = '';
-    const stdoutListener = (res) => {
-      stdout += res;
-    };
-    this.server.stdout.on('data', stdoutListener);
-
-    let stderr = '';
-    const stderrListener = (res) => {
-      stderr += res;
-    };
-    this.server.stderr.on('data', stderrListener);
-
-    let exited = false;
-    const exitListener = () => {
-      exited = true;
-    };
-    this.server.on('exit', exitListener);
-
-    let tries = 60;
-    let ready = false;
-    while (!ready && !exited && tries >= 0) {
-      await new Promise((resolve) => setTimeout(() => resolve(), 1000));
-      const result = await this._exec('check server --static-neo-one');
-      try {
-        const lines = result.split('\n').filter((line) => line !== '');
-        ready = JSON.parse(lines[lines.length - 1]);
-      } catch (error) {
-        // Ignore errors
-      }
-      tries -= 1;
-    }
-
-    this.server.stdout.removeListener('data', stdoutListener);
-    this.server.stdout.removeListener('data', stderrListener);
-    this.server.removeListener('exit', exitListener);
-
-    if (!ready) {
-      await this.teardown();
-      throw new Error(
-        `Failed to start NEO-ONE server.\n\nSTDOUT:\n${stdout}\n\nSTDERR:\n${stderr}`,
-      );
-    }
-  }
-
-  parseJSON(value) {
-    try {
-      return JSON.parse(value);
-    } catch (error) {
-      throw new Error(`Value:\n${value}\n\nError:\n${error.toString()}`);
-    }
-  }
-
   async until(func, timeoutMSIn) {
     const start = Date.now();
-    const timeoutMS = timeoutMSIn == null ? 90 * 1000 : timeoutMSIn;
+    const timeoutMS = timeoutMSIn == null ? 5 * 1000 : timeoutMSIn;
     let finalError;
     while (Date.now() - start < timeoutMS) {
       try {
@@ -141,68 +141,42 @@ class One {
     throw finalError;
   }
 
-  async measureRequire(mod) {
-    return this._timeRequire(mod);
-  }
+  _getEnv(project, options = {}) {
+    this.projectEnv[project] = this.projectEnv[project] || {
+      ..._.fromPairs(
+        _.range(this.minPort, this.maxPort).map((port, idx) => [
+          `NEO_ONE_PORT_${idx}`,
+          port,
+        ]),
+      ),
+      NEO_ONE_TMP_DIR: this.getTmpDir(),
+    };
 
-  async _timeRequire(mod) {
-    await this._timeRequireSingle(mod);
-
-    return this._timeRequireSingle(mod);
-  }
-
-  async _timeRequireSingle(mod) {
-    const { stdout } = await execa(
-      `node --eval "const start = Date.now(); require('${mod}'); console.log(Date.now() - start);"`,
-      { cwd: path.join(appRootDir.get(), 'dist', 'neo-one'), shell: true },
-    );
-
-    return parseInt(stdout);
-  }
-
-  _createCommand(commandIn) {
-    const cmd = path.resolve(
-      process.cwd(),
-      'dist',
-      'neo-one',
-      'node_modules',
-      '.bin',
-      'neo-one',
-    );
-    const command = `${cmd} ${commandIn} --dir ${this.dirName} --server-port ${this.serverPort} --http-server-port ${this.httpServerPort} --min-port ${this.minPort}`;
-    let additionalArgs = [];
-    if (commandIn.startsWith('create') || commandIn.startsWith('delete')) {
-      additionalArgs = ['--no-progress'];
-    }
-
-    return [
-      command.split(' ')[0],
-      command
-        .split(' ')
-        .slice(1)
-        .concat(additionalArgs),
-    ];
-  }
-
-  _exec(commandIn, options = {}) {
-    const [cmd, args] = this._createCommand(commandIn);
-    return execa(cmd, args, this._getEnv(options))
-      .then(({ stdout }) => stdout)
-      .catch((error) => {
-        throw new Error(
-          `Command:\n${[cmd].concat(args).join(' ')}\n\nSTDOUT:\n${
-            error.stdout
-          }\n\nSTDERR:\n${error.stderr}\n\nERROR:\n${error.toString()}`,
-        );
-      });
-  }
-
-  _getEnv(options = {}) {
     return {
       ...options,
       maxBuffer: 20000 * 1024,
       windowsHide: true,
+      cwd: this.getProjectDir(project),
+      env: this.projectEnv[project],
     };
+  }
+
+  getProjectDir(project) {
+    return nodePath.resolve(
+      process.cwd(),
+      'packages',
+      'neo-one-cli',
+      'src',
+      '__data__',
+      'projects',
+      project,
+    );
+  }
+
+  async getProjectConfig(project) {
+    const stdout = await this.createExec(project)('info');
+
+    return JSON.parse(stdout);
   }
 }
 module.exports = One;

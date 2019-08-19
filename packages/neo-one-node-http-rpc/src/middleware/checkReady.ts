@@ -84,9 +84,9 @@ const fetchTallestBlockIndex = async (
   return _.max(counts.filter(utils.notNull).map((count) => count - 1));
 };
 export interface Options {
-  readonly rpcURLs: readonly string[];
-  readonly offset: number;
-  readonly timeoutMS: number;
+  readonly rpcURLs?: readonly string[];
+  readonly offset?: number;
+  readonly timeoutMS?: number;
   readonly checkEndpoints?: number;
 }
 
@@ -98,20 +98,18 @@ let lastCheckTime: number | undefined;
 export const checkReady = async ({
   logger,
   blockchain,
-  options,
+  options: { rpcURLs = [], offset = 3, timeoutMS = 1000, checkEndpoints },
 }: {
   readonly logger: Logger;
   readonly blockchain: Blockchain;
   readonly options: Options;
 }) => {
-  if (lastCheckTime === undefined || Date.now() - lastCheckTime > options.timeoutMS) {
+  if (lastCheckTime === undefined || Date.now() - lastCheckTime > timeoutMS) {
     lastCheckTime = Date.now();
-    lastCheckIndex = await fetchTallestBlockIndex(logger, options.rpcURLs, options.timeoutMS, options.checkEndpoints);
+    lastCheckIndex = await fetchTallestBlockIndex(logger, rpcURLs, timeoutMS, checkEndpoints);
   }
 
   return (
-    options.rpcURLs.length === 0 ||
-    lastCheckIndex === undefined ||
-    blockchain.currentBlockIndex >= lastCheckIndex - options.offset
+    rpcURLs.length === 0 || lastCheckIndex === undefined || blockchain.currentBlockIndex >= lastCheckIndex - offset
   );
 };

@@ -1,4 +1,4 @@
-import { Builder, dirname, normalizePath, PouchDBFileSystem } from '@neo-one/local-browser';
+import { dirname, normalizePath, PouchDBFileSystem } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { TrackJS } from '@neo-one/react-common';
 import { retryBackoff } from '@neo-one/utils';
@@ -21,7 +21,6 @@ interface RemoteEngineOptions {
   readonly transpileCache: PouchDBFileSystem;
   readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
   readonly createJSONRPCLocalProviderManager: () => Promise<WorkerManager<typeof JSONRPCLocalProvider>>;
-  readonly builderManager: WorkerManager<typeof Builder>;
   readonly pathWithExports?: readonly PathWithExports[];
   readonly globals?: Globals;
 }
@@ -67,7 +66,6 @@ export class RemoteEngine {
   public constructor({
     fs,
     transpileCache,
-    builderManager,
     jsonRPCLocalProviderManager,
     createJSONRPCLocalProviderManager,
     pathWithExports: pathWithExportsIn = [],
@@ -76,7 +74,6 @@ export class RemoteEngine {
     this.fs = fs;
     const pathWithExports = getPathWithExports({
       fs,
-      builderManager,
       jsonRPCLocalProviderManager,
       createJSONRPCLocalProviderManager,
     }).concat(pathWithExportsIn);

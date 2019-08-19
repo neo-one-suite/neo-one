@@ -1,5 +1,4 @@
 // tslint:disable no-submodule-imports no-null-keyword
-import { Builder } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { comlink, WorkerManager } from '@neo-one/worker';
 import * as jestTestHooks from 'jest-circus';
@@ -14,7 +13,6 @@ import { testPackages } from './testPackages';
 export interface CreateTestEngineOptions {
   readonly id: string;
   readonly endpoint: comlink.Endpoint;
-  readonly builderManager: WorkerManager<typeof Builder>;
   readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
   readonly createJSONRPCLocalProviderManager: () => Promise<WorkerManager<typeof JSONRPCLocalProvider>>;
 }
@@ -22,7 +20,6 @@ export interface CreateTestEngineOptions {
 export const createTestEngine = async ({
   id,
   endpoint,
-  builderManager,
   jsonRPCLocalProviderManager,
   createJSONRPCLocalProviderManager,
 }: CreateTestEngineOptions): Promise<RemoteEngine> => {
@@ -31,13 +28,11 @@ export const createTestEngine = async ({
   return new RemoteEngine({
     fs,
     transpileCache,
-    builderManager,
     jsonRPCLocalProviderManager,
     createJSONRPCLocalProviderManager,
     pathWithExports: getPathWithExports(
       {
         fs,
-        builderManager,
         jsonRPCLocalProviderManager,
         createJSONRPCLocalProviderManager,
       },

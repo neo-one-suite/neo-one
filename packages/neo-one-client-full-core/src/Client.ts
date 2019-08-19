@@ -47,7 +47,7 @@ export class Client<TUserAccountProviders extends UserAccountProviders = any> ex
     abi: ABI,
     params: readonly Param[] = [],
     optionsIn?: TransactionOptions,
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
     const options = clientArgs.assertTransactionOptions('options', optionsIn);
     await this.applyBeforeRelayHook(options);

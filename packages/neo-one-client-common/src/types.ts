@@ -1,5 +1,5 @@
 // tslint:disable deprecation no-any
-import { OmitStrict } from '@neo-one/utils';
+import { Configuration, OmitStrict } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import { Observable } from 'rxjs';
@@ -808,7 +808,7 @@ export interface UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     verify: boolean,
     options?: InvokeSendUnsafeReceiveTransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
   /**
    * Relays a transaction that is the first step of a two-step send process. The `Transfer`'s `to` property represents the ultimate destination of the funds, but this transaction will be constructed such that those funds are marked for transfer, not actually transferred.
@@ -822,7 +822,7 @@ export interface UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     transfer: Transfer,
     options?: TransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
   /**
    * Relays a transaction that is the second step of a two-step send process. The `hash` is the transaction hash of the first step in the process and is used to determine the amount to transfer to the `from` address.
@@ -836,7 +836,7 @@ export interface UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     options?: TransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
   /**
    * Refunds native assets that were not processed by the contract. The `hash` is the transaction hash that should be refunded and is used to construct the transfers for this transaction.
@@ -850,7 +850,7 @@ export interface UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     options?: TransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
   /**
    * Claims GAS. Currently only supports claiming all unclaimed GAS to the contract address.
@@ -863,7 +863,7 @@ export interface UserAccountProvider {
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     options?: TransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
   /**
    * Invokes the constant `method` on `contract` with `params` on `network`.
@@ -928,6 +928,14 @@ export interface DeveloperProvider {
    * Reset the network to it's initial state, restarting from the genesis `Block`.
    */
   readonly reset: () => Promise<void>;
+  /**
+   * Reset the project this network is associated with to it's initial state.
+   */
+  readonly getProjectConfiguration: () => Promise<Configuration | undefined>;
+  /**
+   * Reset the project this network is associated with to it's initial state.
+   */
+  readonly resetProject: () => Promise<void>;
 }
 
 /**
@@ -1035,7 +1043,7 @@ export interface SmartContractDefinition {
   /**
    * `SourceMaps` associated with the smart contract.
    */
-  readonly sourceMaps?: Promise<SourceMaps>;
+  readonly sourceMaps?: SourceMaps;
 }
 
 /**

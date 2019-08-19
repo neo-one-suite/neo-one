@@ -179,7 +179,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
         definition: {
           abi,
           networks: { [networkName]: { address: result.address } },
-          sourceMaps: Promise.resolve(mutableSourceMaps),
+          sourceMaps: mutableSourceMaps,
         },
       };
     },
@@ -223,7 +223,7 @@ export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<Te
       const result = await userAccountProviders.memory.__execute(
         outputScript,
         { from: masterWallet.userAccount.id, systemFee: new BigNumber(-1), ...options },
-        Promise.resolve(mutableSourceMaps),
+        mutableSourceMaps,
       );
 
       const [invokeReceipt] = await Promise.all([

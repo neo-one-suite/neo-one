@@ -508,7 +508,7 @@ export class Client<
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     verify: boolean,
     optionsIn?: InvokeSendUnsafeReceiveTransactionOptions,
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const options = optionsIn === undefined ? {} : optionsIn;
     await this.applyBeforeRelayHook(options);
@@ -528,7 +528,7 @@ export class Client<
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     transfer: Transfer,
     optionsIn?: TransactionOptions,
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const options = optionsIn === undefined ? {} : optionsIn;
     await this.applyBeforeRelayHook(options);
@@ -548,7 +548,7 @@ export class Client<
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     optionsIn?: TransactionOptions,
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const options = optionsIn === undefined ? {} : optionsIn;
     await this.applyBeforeRelayHook(options);
@@ -568,7 +568,7 @@ export class Client<
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     optionsIn?: TransactionOptions,
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const options = optionsIn === undefined ? {} : optionsIn;
     await this.applyBeforeRelayHook(options);
@@ -587,7 +587,7 @@ export class Client<
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     optionsIn?: TransactionOptions,
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
     const options = optionsIn === undefined ? {} : optionsIn;
     await this.applyBeforeRelayHook(options);

@@ -174,7 +174,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
       readonly transaction: Transaction;
       readonly receipt: TransactionReceipt;
     }) => Promise<T>;
-    readonly sourceMaps?: Promise<SourceMaps>;
+    readonly sourceMaps?: SourceMaps;
   }): Promise<TransactionResult<T, TTransaction>> {
     return this.capture(
       async () => {
@@ -314,7 +314,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
     readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
     readonly from: UserAccountID;
-    readonly sourceMaps?: Promise<SourceMaps>;
+    readonly sourceMaps?: SourceMaps;
   }): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
     const transaction = new ClaimTransactionModel({
       inputs: this.convertInputs(inputs),

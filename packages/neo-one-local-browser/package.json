@@ -4,6 +4,7 @@
   "description": "NEO•ONE local browser implementation.",
   "main": "./src/index",
   "dependencies": {
+    "@neo-one/cli-common": "^1.1.5",
     "@neo-one/client-common": "^1.3.0",
     "@neo-one/client-core": "^1.3.0",
     "@neo-one/local": "^1.1.5",

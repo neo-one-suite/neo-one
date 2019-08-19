@@ -98,7 +98,7 @@ const getImportClauses = (text: string) => {
   return mutableClauses;
 };
 
-export const genSmartContractTypes = (name: string, abi: ABI, browser: boolean) => {
+export const genSmartContractTypes = (name: string, abi: ABI) => {
   const events = abi.events === undefined ? [] : abi.events;
   const eventType = `export type ${getEventName(name)} = ${
     events.length === 0 ? 'never' : events.map((event) => getSingleEventName(name, event.name)).join(' | ')
@@ -113,9 +113,7 @@ ${genSmartContract(name, abi)}`;
   importClauses.sort();
 
   const bigNumberImport = text.includes('BigNumber') ? "\nimport BigNumber from 'bignumber.js';" : '';
-  const importDecl = `import { ${importClauses.join(', ')} } from '@neo-one/client${
-    browser ? '-browserify' : ''
-  }';${bigNumberImport}`;
+  const importDecl = `import { ${importClauses.join(', ')} } from '@neo-one/client';${bigNumberImport}`;
 
   return {
     ts: `${importDecl}

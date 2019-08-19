@@ -18,6 +18,7 @@ import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
 import { vm } from '@neo-one/node-vm';
 import { composeDisposables, Disposable, noopDisposable } from '@neo-one/utils';
 import { AbstractLevelDOWN } from 'abstract-leveldown';
+import fs from 'fs-extra';
 import LevelDOWN from 'leveldown';
 import LevelUp from 'levelup';
 
@@ -28,7 +29,7 @@ interface TelemetryOptions {
 }
 
 export interface Options {
-  readonly dataPath: string;
+  readonly path: string;
   readonly blockchain: Settings;
   readonly node?: NodeOptions;
   readonly network?: NetworkOptions;
@@ -45,7 +46,7 @@ export interface FullNodeOptions {
 
 export const startFullNode = async ({
   options: {
-    dataPath,
+    path: dataPath,
     blockchain: blockchainSettings,
     telemetry,
     node: nodeOptions = {},
@@ -58,6 +59,8 @@ export const startFullNode = async ({
 }: FullNodeOptions): Promise<Disposable> => {
   let disposable = noopDisposable;
   try {
+    await fs.ensureDir(dataPath);
+
     if (telemetry !== undefined) {
       if (telemetry.prometheus !== undefined) {
         const exporter = new PrometheusStatsExporter({

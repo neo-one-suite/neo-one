@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`buildCommand build: mint consumed 1`] = `"0"`;
-
-exports[`buildCommand build: mint consumed 2`] = `"0"`;
-
-exports[`buildCommand build: mint cost 1`] = `"6.657"`;
-
-exports[`buildCommand build: mint cost 2`] = `"6.657"`;

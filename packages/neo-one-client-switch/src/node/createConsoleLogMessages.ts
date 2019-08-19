@@ -3,6 +3,6 @@ import { createConsoleLogMessages as createConsoleLogMessagesBase, LogOptions, S
 
 export const createConsoleLogMessages = async (
   actions: readonly RawAction[],
-  sourceMaps: Promise<SourceMaps>,
+  sourceMaps: SourceMaps,
   options: LogOptions,
 ): Promise<readonly string[]> => createConsoleLogMessagesBase(actions, sourceMaps, options);

@@ -21,7 +21,6 @@ export class PreviewEngine extends RemoteEngine {
       const {
         id,
         endpoint,
-        builderManager,
         jsonRPCLocalProviderManager,
         createJSONRPCLocalProviderManager,
         openFile,
@@ -47,7 +46,6 @@ export class PreviewEngine extends RemoteEngine {
       const previewEngine = new PreviewEngine({
         fs,
         transpileCache,
-        builderManager,
         jsonRPCLocalProviderManager,
         createJSONRPCLocalProviderManager,
       });

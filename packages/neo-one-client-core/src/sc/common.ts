@@ -263,7 +263,7 @@ export const convertInvocationResult = async ({
   readonly returnType: ABIReturn;
   readonly result: RawInvocationResult;
   readonly actions: readonly RawAction[];
-  readonly sourceMaps?: Promise<SourceMaps>;
+  readonly sourceMaps?: SourceMaps;
 }): Promise<InvocationResult<Return | undefined>> => {
   const { gasConsumed, gasCost } = result;
   if (result.state === 'FAULT') {
@@ -301,7 +301,7 @@ export const convertCallResult = async ({
   readonly returnType: ABIReturn;
   readonly result: RawInvocationResult;
   readonly actions: readonly RawAction[];
-  readonly sourceMaps?: Promise<SourceMaps>;
+  readonly sourceMaps?: SourceMaps;
 }): Promise<Return | undefined> => {
   const result = await convertInvocationResult({ returnType, result: resultIn, actions, sourceMaps });
   if (result.state === 'FAULT') {

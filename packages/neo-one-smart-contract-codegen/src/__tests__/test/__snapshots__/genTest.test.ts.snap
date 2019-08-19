@@ -3,30 +3,21 @@
 exports[`genTest Token 1`] = `
 Object {
   "js": "
-import { withContracts as withContractsBase } from '@neo-one/smart-contract-test';
+import { createWithContracts } from '@neo-one/smart-contract-test';
 import * as path from 'path';
 
-export const withContracts = async (test, options) =>
-  withContractsBase(
-    [{ name: 'Token', filePath: path.resolve(__dirname, '../contracts/Token.ts') }, { name: 'ICO', filePath: path.resolve(__dirname, '../contracts/ICO.ts') }],
-    test,
-    options,
-  );
+export const withContracts = createWithContracts([
+  { name: 'Token', filePath: path.resolve(__dirname, '../../contracts/Token.ts') }, { name: 'ICO', filePath: path.resolve(__dirname, '../../contracts/ICO.ts') }
+]);
 ",
   "ts": "
-import { TestOptions, withContracts as withContractsBase, WithContractsOptions } from '@neo-one/smart-contract-test';
-import * as path from 'path';
+import { TestOptions, WithContractsOptions } from '@neo-one/smart-contract-test';
 import { Contracts } from './types';
 
-export const withContracts = async (
+export const withContracts: (
   test: (contracts: Contracts & TestOptions) => Promise<void>,
   options?: WithContractsOptions,
-): Promise<void> =>
-  withContractsBase<Contracts>(
-    [{ name: 'Token', filePath: path.resolve(__dirname, '../contracts/Token.ts') }, { name: 'ICO', filePath: path.resolve(__dirname, '../contracts/ICO.ts') }],
-    test,
-    options,
-  );
+) => Promise<void>;
 ",
 }
 `;

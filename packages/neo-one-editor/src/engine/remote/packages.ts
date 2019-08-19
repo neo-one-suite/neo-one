@@ -1,5 +1,5 @@
 import * as client from '@neo-one/client';
-import { BrowserLocalClient, Builder, FileSystem } from '@neo-one/local-browser';
+import { FileSystem } from '@neo-one/local-browser';
 import { JSONRPCLocalProvider } from '@neo-one/node-browser';
 import { WorkerManager } from '@neo-one/worker';
 import { Exports } from './types';
@@ -7,7 +7,6 @@ import { Exports } from './types';
 export interface ExportsOptions {
   readonly fs: FileSystem;
   readonly jsonRPCLocalProviderManager: WorkerManager<typeof JSONRPCLocalProvider>;
-  readonly builderManager: WorkerManager<typeof Builder>;
   readonly createJSONRPCLocalProviderManager: () => Promise<WorkerManager<typeof JSONRPCLocalProvider>>;
 }
 
@@ -26,16 +25,11 @@ const packages: readonly PackageConfig[] = [
   {
     name: '@neo-one/local-singleton',
     path: '/node_modules/@neo-one/local-singleton/src/index.ts',
-    exports: ({ fs, jsonRPCLocalProviderManager, builderManager, createJSONRPCLocalProviderManager }) => {
-      const browserLocalClient = new BrowserLocalClient(builderManager, jsonRPCLocalProviderManager);
-
-      return {
-        getFileSystem: () => fs,
-        getJSONRPCLocalProviderManager: () => jsonRPCLocalProviderManager,
-        getBrowserLocalClient: () => browserLocalClient,
-        createJSONRPCLocalProviderManager,
-      };
-    },
+    exports: ({ fs, jsonRPCLocalProviderManager, createJSONRPCLocalProviderManager }) => ({
+      getFileSystem: () => fs,
+      getJSONRPCLocalProviderManager: () => jsonRPCLocalProviderManager,
+      createJSONRPCLocalProviderManager,
+    }),
   },
 ];
 

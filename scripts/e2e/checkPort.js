@@ -45,7 +45,7 @@ function checkPort(port) {
   client = new net.Socket();
   client.once('connect', onConnect);
   client.once('error', onError);
-  client.connect({ port, host: '127.0.0.1' }, function() {});
+  client.connect({ port, host: '127.0.0.1' });
 
   return deferred.promise;
 }

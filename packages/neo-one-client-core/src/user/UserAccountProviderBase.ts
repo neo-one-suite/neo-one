@@ -95,7 +95,7 @@ export interface InvokeRawOptions<T extends TransactionReceipt> {
   readonly labels?: Record<string, string>;
   readonly rawInputs?: readonly Input[];
   readonly rawOutputs?: readonly Output[];
-  readonly sourceMaps?: Promise<SourceMaps>;
+  readonly sourceMaps?: SourceMaps;
   readonly reorderOutputs?: (outputs: readonly Output[]) => readonly Output[];
 }
 
@@ -116,7 +116,7 @@ export interface ExecuteInvokeScriptOptions<T extends TransactionReceipt> {
     readonly data: RawInvocationData;
     readonly receipt: TransactionReceipt;
   }) => Promise<T> | T;
-  readonly sourceMaps?: Promise<SourceMaps>;
+  readonly sourceMaps?: SourceMaps;
 }
 
 export interface ExecuteInvokeMethodOptions<T extends TransactionReceipt> extends ExecuteInvokeScriptOptions<T> {
@@ -134,7 +134,7 @@ export interface ExecuteInvokeClaimOptions {
   readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
   readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
   readonly from: UserAccountID;
-  readonly sourceMaps?: Promise<SourceMaps>;
+  readonly sourceMaps?: SourceMaps;
 }
 
 export interface Provider {
@@ -326,7 +326,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     verify: boolean,
     options: InvokeSendUnsafeReceiveTransactionOptions = {},
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const { attributes = [] } = options;
     const transactionOptions = this.getTransactionOptions(options);
@@ -391,7 +391,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     transfer: Transfer,
     options: TransactionOptions = {},
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const transactionOptions = this.getTransactionOptions(options);
     const { from, attributes } = transactionOptions;
@@ -456,7 +456,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     options: TransactionOptions = {},
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const transactionOptions = this.getTransactionOptions(options);
     const { from, attributes } = transactionOptions;
@@ -507,7 +507,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     options: TransactionOptions = {},
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const transactionOptions = this.getTransactionOptions(options);
     const { from, attributes } = transactionOptions;
@@ -564,7 +564,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     options: TransactionOptions = {},
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
     const { from, attributes, networkFee } = this.getTransactionOptions(options);
 
@@ -1252,7 +1252,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     readonly rawInputs?: ReadonlyArray<Input>;
     readonly rawOutputs?: ReadonlyArray<Output>;
     readonly scripts?: ReadonlyArray<WitnessModel>;
-    readonly sourceMaps?: Promise<SourceMaps>;
+    readonly sourceMaps?: SourceMaps;
     readonly reorderOutputs?: (outputs: ReadonlyArray<Output>) => ReadonlyArray<Output>;
   }): Promise<{
     readonly gas: BigNumber;

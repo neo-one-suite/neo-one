@@ -217,13 +217,11 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     verify: boolean,
     options?: InvokeSendUnsafeReceiveTransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
-    const sourceMapsArg = await this.handleSourceMapArg(sourceMaps);
-
     return this.handleMethodWithConfirmation({
       method: 'invoke',
-      args: [contract, method, params, paramsZipped, verify, options, sourceMapsArg],
+      args: [contract, method, params, paramsZipped, verify, options, sourceMaps],
     });
   }
 
@@ -234,13 +232,11 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     transfer: Transfer,
     options?: TransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
-    const sourceMapsArg = await this.handleSourceMapArg(sourceMaps);
-
     return this.handleMethodWithConfirmation({
       method: 'invokeSend',
-      args: [contract, method, params, paramsZipped, transfer, options, sourceMapsArg],
+      args: [contract, method, params, paramsZipped, transfer, options, sourceMaps],
     });
   }
 
@@ -251,13 +247,11 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     options?: TransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
-    const sourceMapsArg = await this.handleSourceMapArg(sourceMaps);
-
     return this.handleMethodWithConfirmation({
       method: 'invokeCompleteSend',
-      args: [contract, method, params, paramsZipped, hash, options, sourceMapsArg],
+      args: [contract, method, params, paramsZipped, hash, options, sourceMaps],
     });
   }
 
@@ -268,13 +262,11 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     hash: Hash256String,
     options?: TransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
-    const sourceMapsArg = await this.handleSourceMapArg(sourceMaps);
-
     return this.handleMethodWithConfirmation({
       method: 'invokeRefundAssets',
-      args: [contract, method, params, paramsZipped, hash, options, sourceMapsArg],
+      args: [contract, method, params, paramsZipped, hash, options, sourceMaps],
     });
   }
 
@@ -284,13 +276,11 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     options?: TransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
-    const sourceMapsArg = await this.handleSourceMapArg(sourceMaps);
-
     return this.handleMethodWithConfirmation({
       method: 'invokeClaim',
-      args: [contract, method, params, paramsZipped, options, sourceMapsArg],
+      args: [contract, method, params, paramsZipped, options, sourceMaps],
     });
   }
 
@@ -362,18 +352,6 @@ export class RemoteUserAccountProvider implements UserAccountProvider {
     return {
       ...result.result,
       confirmed: this.handleConfirmation(result.id),
-    };
-  }
-
-  private async handleSourceMapArg(sourceMaps?: Promise<SourceMaps>) {
-    if (sourceMaps === undefined) {
-      return undefined;
-    }
-    const sourceMapsResolve = await sourceMaps;
-
-    return {
-      type: 'SourceMap',
-      value: sourceMapsResolve,
     };
   }
 }

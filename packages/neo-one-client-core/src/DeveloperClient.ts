@@ -1,4 +1,5 @@
 import { DeveloperProvider, PrivateNetworkSettings } from '@neo-one/client-common';
+import { Configuration } from '@neo-one/utils';
 
 /**
  * Client which controls a development network.
@@ -59,8 +60,29 @@ export class DeveloperClient {
     await this.developerProvider.reset();
   }
 
+  /**
+   * Fetch the project configuration this network is associated with.
+   */
+  public async getProjectConfiguration(): Promise<Configuration | undefined> {
+    return this.developerProvider.getProjectConfiguration();
+  }
+
+  /**
+   * Reset the project this network is associated with to it's initial state.
+   */
+  public async resetProject(): Promise<void> {
+    await this.developerProvider.resetProject();
+  }
+
   private async runConsensusNowInternal(): Promise<void> {
     await this.developerProvider.runConsensusNow();
     this.mutableRunConsensusNow = undefined;
   }
+}
+
+/**
+ * An object of `DeveloperClient`s.
+ */
+export interface DeveloperClients {
+  readonly [network: string]: DeveloperClient;
 }

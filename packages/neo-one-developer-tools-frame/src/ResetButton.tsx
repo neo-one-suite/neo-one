@@ -9,12 +9,12 @@ const { useState, useCallback } = React;
 export function ResetButton() {
   const [disabled, setDisabled] = useState(false);
   const addError = useAddError();
-  const { client, localClient } = useNetworkClients();
+  const { client, developerClient } = useNetworkClients();
   const onClick = useCallback(() => {
-    if (localClient !== undefined) {
+    if (developerClient !== undefined) {
       setDisabled(true);
-      localClient
-        .reset()
+      developerClient
+        .resetProject()
         .then(() => {
           client.reset();
           setDisabled(false);
@@ -24,9 +24,9 @@ export function ResetButton() {
           setDisabled(false);
         });
     }
-  }, [client, localClient, setDisabled]);
+  }, [client, developerClient, setDisabled]);
 
-  if (localClient === undefined) {
+  if (developerClient === undefined) {
     // tslint:disable-next-line:no-null-keyword
     return null;
   }

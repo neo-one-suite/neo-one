@@ -20,23 +20,12 @@ export const createTokenSmartContract = (
 ) => client.smartContract(definition);
   ",
   "ts": "
-import { Client, SmartContractDefinition } from '@neo-one/client';import { sourceMaps } from '../sourceMaps';
-import { tokenABI } from './abi';
+import { Client } from '@neo-one/client';
 import { TokenSmartContract } from './types';
 
-const definition: SmartContractDefinition = {
-  networks: {
-  \\"main\\": {
-    \\"address\\": \\"iamahash\\"
-  }
-},
-  abi: tokenABI,
-  sourceMaps,
-};
-
-export const createTokenSmartContract = <TClient extends Client>(
+export const createTokenSmartContract: <TClient extends Client>(
   client: TClient,
-): TokenSmartContract<TClient> => client.smartContract<TokenSmartContract<TClient>>(definition);
+) => TokenSmartContract<TClient>;
 ",
 }
 `;

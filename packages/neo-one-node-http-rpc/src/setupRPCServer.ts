@@ -1,7 +1,7 @@
 import { context, cors, onError as appOnError, setupServer } from '@neo-one/http';
-import { nodeLogger } from '@neo-one/logger';
+import { nodeLogger, rpcLogger } from '@neo-one/logger';
 import { Blockchain, Node } from '@neo-one/node-core';
-import { Disposable } from '@neo-one/utils';
+import { Disposable, Labels } from '@neo-one/utils';
 import * as nodeHttp from 'http';
 import Application from 'koa';
 import Router from 'koa-router';
@@ -13,7 +13,7 @@ const logger = nodeLogger.child({ component: 'rpc' });
 export interface Options {
   readonly http?: {
     readonly port: number;
-    readonly host: string;
+    readonly host?: string;
     readonly keepAliveTimeout?: number;
   };
   readonly splashScreen?: {
@@ -80,5 +80,9 @@ export const setupRPCServer = async ({
 
   const server = nodeHttp.createServer();
 
-  return setupServer(app, server, http.host, http.port, http.keepAliveTimeout);
+  const { host = '0.0.0.0', port } = http;
+  const disposable = await setupServer(app, server, host, port, http.keepAliveTimeout);
+  rpcLogger.info({ [Labels.SPAN_KIND]: 'server', title: 'rpc_server_listen' }, `Server listening on ${host}:${port}`);
+
+  return disposable;
 };

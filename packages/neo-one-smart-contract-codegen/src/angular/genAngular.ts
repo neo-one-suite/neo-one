@@ -7,97 +7,59 @@ export const genAngular = ({
   angularPath,
   commonTypesPath,
   clientPath,
-  browser,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly angularPath: string;
   readonly commonTypesPath: string;
   readonly clientPath: string;
-  readonly browser: boolean;
-}) => ({
-  js: `
-import { Injectable } from '@angular/core';
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client${browser ? '-browserify' : ''}';
-import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(
-    angularPath,
-    clientPath,
-  )}';
+}) => {
+  const clientImport = getRelativeImport(angularPath, clientPath);
+  const contractImports = contractsPaths
+    .map(
+      ({ name, createContractPath }) =>
+        `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(angularPath, createContractPath)}';`,
+    )
+    .join('\n');
+  const contractProperties = contractsPaths
+    .map(({ name }) => `this.${lowerCaseFirst(name)} = ${getCreateSmartContractName(name)}(this.client);`)
+    .join('\n    ');
+  const contractTypeProperties = contractsPaths
+    .map(({ name }) => `public readonly ${lowerCaseFirst(name)}: Contracts['${lowerCaseFirst(name)}'];`)
+    .join('\n  ');
 
-${contractsPaths
-  .map(
-    ({ name, createContractPath }) =>
-      `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(angularPath, createContractPath)}';`,
-  )
-  .join('\n')}
+  return {
+    js: `
+import { Injectable } from '@angular/core';
+import { createClient, createDeveloperClients } from '${clientImport}';
+
+${contractImports}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ContractsService {
   constructor() {
-    this.client = createClient();
-    this.developerClients = createDeveloperClients();
-    this.localClients = createLocalClients();
-    ${contractsPaths
-      .map(({ name }) => `this.${lowerCaseFirst(name)} = ${getCreateSmartContractName(name)}(this.client);`)
-      .join('\n    ')}
+    this.setHost();
   }
 
   setHost(host) {
     this.client = createClient(host);
     this.developerClients = createDeveloperClients(host);
-    this.localClients = createLocalClients(host);
+    ${contractProperties}
   }
 }
     `,
-  ts: `
-import { Injectable } from '@angular/core';
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client${browser ? '-browserify' : ''}';
-import { createClient, createDeveloperClients, createLocalClients } from '${getRelativeImport(
-    angularPath,
-    clientPath,
-  )}';
+    ts: `
+import { Client, DeveloperClients, UserAccountProviders } from '@neo-one/client';
 import { Contracts } from '${getRelativeImport(angularPath, commonTypesPath)}';
+import { DefaultUserAccountProviders } from '${clientImport}';
 
-${contractsPaths
-  .map(
-    ({ name, createContractPath }) =>
-      `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(angularPath, createContractPath)}';`,
-  )
-  .join('\n')}
-
-export interface DeveloperClients {
-  readonly [network: string]: DeveloperClient;
-};
-export interface LocalClients {
-  readonly [network: string]: LocalClient;
-};
-
-@Injectable({
-  providedIn: 'root'
-})
-export class ContractsService {
-  public readonly client: Client;
+export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {
+  public readonly client: Client<TUserAccountProviders>;
   public readonly developerClients: DeveloperClients;
-  public readonly localClients: LocalClients;
-  ${contractsPaths
-    .map(({ name }) => `public readonly ${lowerCaseFirst(name)}: Contracts['${lowerCaseFirst(name)}'];`)
-    .join('\n  ')}
-
-  public constructor() {
-    this.client = createClient();
-    this.developerClients = createDeveloperClients();
-    this.localClients = createLocalClients();
-    ${contractsPaths
-      .map(({ name }) => `this.${lowerCaseFirst(name)} = ${getCreateSmartContractName(name)}(this.client);`)
-      .join('\n    ')}
-  }
-
-  public setHost(host) {
-    this.client = createClient(host);
-    this.developerClients = createDeveloperClients(host);
-    this.localClients = createLocalClients(host);
-  }
+  ${contractTypeProperties}
+  public setHost(host?: string);
 }
   `,
-});
+  };
+};

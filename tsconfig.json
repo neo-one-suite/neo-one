@@ -30,7 +30,7 @@
   },
   "exclude": [
     "dist",
-    "packages/neo-one-server-plugin-wallet/src/contracts/*.ts",
+    "packages/neo-one-cli/src/__data__/projects/*/contracts/**/*.ts",
     "packages/neo-one-smart-contract/src/*.d.ts",
     "packages/neo-one-smart-contract-lib/src/index.ts",
     "packages/neo-one-smart-contract-lib/src/ownership/*.ts",
@@ -40,8 +40,6 @@
     "packages/*/src/__data__/contracts/**/*.ts",
     "packages/*/template/**/*.ts",
     "packages/*/template/**/*.tsx",
-    "packages/neo-one-server-plugin-project/src/__data__/ico/one/contracts/*.ts",
-    "packages/neo-one-server-plugin-project/src/__data__/icojs/one/contracts/*.ts",
     "packages/neo-one-playground",
     "packages/neo-one-website/courses/**/contracts/*.ts",
     "cypress"

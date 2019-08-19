@@ -3,18 +3,20 @@ import { defer } from 'rxjs';
 import { useNetworkClients } from './DeveloperToolsContext';
 
 export const useNEOTrackerURL = () => {
-  const { localClient } = useNetworkClients();
+  const { developerClient } = useNetworkClients();
 
   return useStream(
     () =>
       defer(async () => {
-        if (localClient === undefined) {
+        if (developerClient === undefined) {
           return 'https://neotracker.io';
         }
 
-        return localClient.getNEOTrackerURL();
+        const configuration = await developerClient.getProjectConfiguration();
+
+        return configuration === undefined ? undefined : `http://localhost:${configuration.neotracker.port}`;
       }),
-    [localClient],
+    [developerClient],
     'https://neotracker.io',
   );
 };

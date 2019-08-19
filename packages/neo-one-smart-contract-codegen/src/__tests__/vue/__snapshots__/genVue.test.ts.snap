@@ -3,68 +3,40 @@
 exports[`genVue Token 1`] = `
 Object {
   "js": "
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
-import { createClient, createDeveloperClients, createLocalClients } from './client';
+import { createClient, createDeveloperClients } from './client';
 
 import { createTokenSmartContract } from './Token/contract';
 import { createICOSmartContract } from './ICO/contract';
 
-class ContractsService {
+export class ContractsService {
   constructor() {
-    this.client = createClient();
-    this.developerClients = createDeveloperClients();
-    this.localClients = createLocalClients();
-    this.token = createTokenSmartContract(this.client);
-    this.ico = createICOSmartContract(this.client);
+    this.setHost();
   }
 
   setHost(host) {
     this.client = createClient(host);
     this.developerClients = createDeveloperClients(host);
-    this.localClients = createLocalClients(host);
-  }
-}
-
-export const contractsService = new ContractsService();
-    ",
-  "ts": "
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client';
-import { createClient, createDeveloperClients, createLocalClients } from './client';
-import { Contracts } from './types';
-
-import { createTokenSmartContract } from './Token/contract';
-import { createICOSmartContract } from './ICO/contract';
-
-export interface DeveloperClients {
-  readonly [network: string]: DeveloperClient;
-};
-export interface LocalClients {
-  readonly [network: string]: LocalClient;
-};
-
-class ContractsService {
-  public readonly client: Client;
-  public readonly developerClients: DeveloperClients;
-  public readonly localClients: LocalClients;
-  public readonly token: Contracts['token'];
-  public readonly ico: Contracts['ico'];
-
-  public constructor() {
-    this.client = createClient();
-    this.developerClients = createDeveloperClients();
-    this.localClients = createLocalClients();
     this.token = createTokenSmartContract(this.client);
     this.ico = createICOSmartContract(this.client);
   }
-
-  public setHost(host: string) {
-    this.client = createClient(host);
-    this.developerClients = createDeveloperClients(host);
-    this.localClients = createLocalClients(host);
-  }
 }
 
-export const contractsService = new ContractsService();
+export const instance = new ContractsService();
+    ",
+  "ts": "
+import { Client, DeveloperClients, UserAccountProviders } from '@neo-one/client';
+import { Contracts } from './types';
+import { DefaultUserAccountProviders } from './client';
+
+export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {
+  public readonly client: Client<TUserAccountProviders>;
+  public readonly developerClients: DeveloperClients;
+  public readonly token: Contracts['token'];
+  public readonly ico: Contracts['ico'];
+  public setHost(host?: string);
+}
+
+export const instance: ContractsService
   ",
 }
 `;

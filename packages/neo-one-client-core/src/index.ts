@@ -1,4 +1,3 @@
-import { Client as OneClient } from '@neo-one/server-http-client';
 import * as args from './args';
 import * as nep5 from './nep5';
 
@@ -12,4 +11,4 @@ export * from './sc';
 export * from './trace';
 export * from './types';
 export * from './user';
-export { OneClient, args, nep5 };
+export { args, nep5 };

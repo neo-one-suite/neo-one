@@ -1,4 +1,4 @@
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client-core';
+import { Client, DeveloperClient } from '@neo-one/client-core';
 import { useStream } from '@neo-one/react-common';
 import localforage from 'localforage';
 import * as React from 'react';
@@ -11,7 +11,6 @@ const { useCallback, useContext } = React;
 export interface DeveloperToolsContextTypeBase {
   readonly client: Client;
   readonly developerClients: NetworkClients<DeveloperClient>;
-  readonly localClients: NetworkClients<LocalClient>;
 }
 
 export interface DeveloperToolsContextType extends DeveloperToolsContextTypeBase {
@@ -38,20 +37,16 @@ export const createContext = (options: DeveloperToolsContextTypeBase): Developer
 export const DeveloperToolsContext = React.createContext<DeveloperToolsContextType>(undefined as any);
 
 export const useNetworkClients = () => {
-  const { client, block$, developerClients, localClients } = useContext(DeveloperToolsContext);
-  const { developerClient, localClient } = useStream(
-    () =>
-      client.currentNetwork$.pipe(
-        map((network) => ({ developerClient: developerClients[network], localClient: localClients[network] })),
-      ),
-    [client, developerClients, localClients],
+  const { client, block$, developerClients } = useContext(DeveloperToolsContext);
+  const { developerClient } = useStream(
+    () => client.currentNetwork$.pipe(map((network) => ({ developerClient: developerClients[network] }))),
+    [client, developerClients],
     {
       developerClient: developerClients[client.getCurrentNetwork()],
-      localClient: localClients[client.getCurrentNetwork()],
     },
   );
 
-  return { client, block$, developerClient, localClient };
+  return { client, block$, developerClient };
 };
 
 export interface LocalState {

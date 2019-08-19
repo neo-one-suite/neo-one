@@ -1,10 +1,10 @@
 codecov:
   ci:
-    - !appveyor
+    - "!appveyor"
 
 ignore:
   - "jest"
-  - "scripts/e2e"
+  - "scripts"
 
 fixes:
   - "dist/neo-one::"

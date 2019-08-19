@@ -3,8 +3,15 @@
 exports[`genClient Token 1`] = `
 Object {
   "js": "
-import { Client, DeveloperClient, LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider, NEOONEProvider, NEOONEOneDataProvider, OneClient } from '@neo-one/client';
-import { projectID } from './projectID';
+import {
+  Client,
+  DeveloperClient,
+  LocalKeyStore,
+  LocalMemoryStore,
+  LocalUserAccountProvider,
+  NEOONEProvider,
+  NEOONEDataProvider,
+} from '@neo-one/client';
 
 const getDefaultUserAccountProviders = (provider) => ({
   memory: new LocalUserAccountProvider({
@@ -28,7 +35,7 @@ export const createClient = (getUserAccountProvidersOrHost) => {
     
   ];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 40100 }));
+    providers.push(new NEOONEDataProvider({ network: 'local', rpcURL: \`http://\${host}:40100/rpc\` }));
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
@@ -53,118 +60,27 @@ export const createClient = (getUserAccountProvidersOrHost) => {
 };
 
 export const createDeveloperClients = (host = 'localhost') => ({
-  'local': new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 40100 })),
+  'local': new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: \`http://\${host}:40100/rpc\` })),
 });
-
-export const createLocalClients = (host = 'localhost') => {
-  const client = new OneClient(40100, host);
-  return {
-    'local': {
-      getNEOTrackerURL: async () => {
-        const result = await client.request({
-          plugin: '@neo-one/server-plugin-project',
-          options: { type: 'neotracker', projectID },
-        });
-
-        return result.response;
-      },
-      reset: async () => {
-        await client.executeTaskList({
-          plugin: '@neo-one/server-plugin-project',
-          options: {
-            command: 'reset',
-            projectID,
-          },
-        });
-      },
-    },
-  };
-};
   ",
   "ts": "
-import { Client, DeveloperClient, LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider, NEOONEProvider, NEOONEOneDataProvider, OneClient, LocalClient, NEOONEDataProviderOptions, UserAccountProvider, UserAccountProviders } from '@neo-one/client';
-import { projectID } from './projectID';
+import {
+  DeveloperClients,
+  LocalKeyStore,
+  LocalUserAccountProvider,
+  NEOONEProvider,
+  UserAccountProviders,
+} from '@neo-one/client';
 
-export type DefaultUserAccountProviders = {
+export interface DefaultUserAccountProviders {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>,
 }
-const getDefaultUserAccountProviders = (provider: NEOONEProvider): DefaultUserAccountProviders => ({
-  memory: new LocalUserAccountProvider({
-    keystore: new LocalKeyStore(new LocalMemoryStore()),
-    provider,
-  }),
-});
 
-const isLocalUserAccountProvider = (userAccountProvider: UserAccountProvider): userAccountProvider is LocalUserAccountProvider<any, any> =>
-  userAccountProvider instanceof LocalUserAccountProvider;
-
-export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
+export const createClient: <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
   getUserAccountProvidersOrHost?: string | ((provider: NEOONEProvider) => TUserAccountProviders),
-): Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never, TUserAccountProviders> => {
-  let getUserAccountProviders = getDefaultUserAccountProviders as any;
-  let host = 'localhost'
-  if (typeof getUserAccountProvidersOrHost === 'string') {
-    host = getUserAccountProvidersOrHost;
-  } else if (getUserAccountProvidersOrHost !== undefined) {
-    getUserAccountProviders = getUserAccountProvidersOrHost;
-  }
-  const providers: Array<NEOONEOneDataProvider | NEOONEDataProviderOptions> = [
-    
-  ];
-  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 40100 }));
-  }
-  const provider = new NEOONEProvider(providers);
+) => Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never, TUserAccountProviders>;
 
-  const userAccountProviders = getUserAccountProviders(provider);
-  const localUserAccountProviders = Object.keys(userAccountProviders).map((key) => userAccountProviders[key]).filter(isLocalUserAccountProvider);
-  const localUserAccountProvider = localUserAccountProviders.find(
-    (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
-  );
-
-  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    if (localUserAccountProvider !== undefined) {
-      const localKeyStore = localUserAccountProvider.keystore;
-      if (localKeyStore instanceof LocalKeyStore) {
-        Promise.all([
-          localKeyStore.addUserAccount({ network: 'local', name: 'master', privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv' }),
-        ]).catch(() => {
-          // do nothing
-        });
-      }
-    }
-  }
-  return new Client(userAccountProviders);
-}
-
-export const createDeveloperClients = (host = 'localhost'): { [network: string]: DeveloperClient } => ({
-  'local': new DeveloperClient(new NEOONEOneDataProvider({ network: 'local', projectID, host, port: 40100 })),
-});
-
-export const createLocalClients = (host = 'localhost'): { [network: string]: LocalClient } => {
-  const client = new OneClient(40100, host);
-  return {
-    'local': {
-      getNEOTrackerURL: async () => {
-        const result = await client.request({
-          plugin: '@neo-one/server-plugin-project',
-          options: { type: 'neotracker', projectID },
-        });
-
-        return result.response;
-      },
-      reset: async () => {
-        await client.executeTaskList({
-          plugin: '@neo-one/server-plugin-project',
-          options: {
-            command: 'reset',
-            projectID,
-          },
-        });
-      },
-    },
-  };
-};
+export const createDeveloperClients: (host?: string) => DeveloperClients;
 ",
 }
 `;

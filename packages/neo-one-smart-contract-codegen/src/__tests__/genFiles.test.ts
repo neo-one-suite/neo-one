@@ -17,7 +17,7 @@ describe('genFiles', () => {
             address: 'iamahash',
           },
         },
-        browser: false,
+        browserify: false,
       }),
     ).toMatchSnapshot();
   });

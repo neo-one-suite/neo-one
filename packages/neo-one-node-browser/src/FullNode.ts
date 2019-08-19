@@ -1,3 +1,4 @@
+import { DeveloperClient } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-common';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { createMain } from '@neo-one/node-neo-settings';
@@ -5,7 +6,7 @@ import { Node } from '@neo-one/node-protocol';
 import { createHandler, RPCHandler } from '@neo-one/node-rpc-handler';
 import { storage as levelupStorage } from '@neo-one/node-storage-levelup';
 import { vm } from '@neo-one/node-vm';
-import { Disposable, finalize } from '@neo-one/utils';
+import { Disposable } from '@neo-one/utils';
 import Level from 'level-js';
 import LevelUp from 'levelup';
 import MemDown from 'memdown';
@@ -27,7 +28,11 @@ export class FullNode {
   private mutableDisposable: Disposable | undefined;
   private readonly startPromise: Promise<RPCHandler>;
 
-  public constructor(private readonly options: FullNodeOptions) {
+  public constructor(
+    private readonly options: FullNodeOptions,
+    private readonly developerClient: DeveloperClient,
+    private readonly build: () => Promise<void>,
+  ) {
     this.startPromise = this.startInternal();
   }
 
@@ -41,7 +46,6 @@ export class FullNode {
     if (this.mutableDisposable !== undefined) {
       await this.mutableDisposable();
       this.mutableDisposable = undefined;
-      await finalize.wait();
     }
   }
 
@@ -53,7 +57,7 @@ export class FullNode {
   }
 
   private async startInternal(): Promise<RPCHandler> {
-    const primaryPrivateKey = crypto.wifToPrivateKey(constants.PRIVATE_NET_PRIVATE_KEY, common.NEO_PRIVATE_KEY_VERSION);
+    const primaryPrivateKey = common.stringToPrivateKey(constants.PRIVATE_NET_PRIVATE_KEY);
     const primaryPublicKey = common.stringToECPoint(constants.PRIVATE_NET_PUBLIC_KEY);
     crypto.addPublicKey(primaryPrivateKey, primaryPublicKey);
 
@@ -86,6 +90,18 @@ export class FullNode {
 
     this.mutableDisposable = await node.start();
 
-    return createHandler({ blockchain, node });
+    return createHandler({
+      blockchain,
+      node,
+      handleResetProject: this.reset.bind(this),
+      handleGetProjectConfiguration: async () => undefined,
+    });
+  }
+
+  private async reset(): Promise<void> {
+    await this.developerClient.reset();
+    await this.developerClient.updateSettings({ secondsPerBlock: 15 });
+
+    await this.build();
   }
 }

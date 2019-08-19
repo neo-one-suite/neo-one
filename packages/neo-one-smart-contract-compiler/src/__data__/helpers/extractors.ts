@@ -20,7 +20,7 @@ export const checkRawResult = async (receipt: RawCallReceipt, sourceMaps: Source
       const message = await processActionsAndMessage({
         actions: receipt.actions,
         message: receipt.result.message,
-        sourceMaps: Promise.resolve(sourceMaps),
+        sourceMaps,
       });
 
       throw new Error(message);
@@ -31,7 +31,7 @@ export const checkRawResult = async (receipt: RawCallReceipt, sourceMaps: Source
 
   await processConsoleLogMessages({
     actions: receipt.actions,
-    sourceMaps: Promise.resolve(sourceMaps),
+    sourceMaps,
   });
 
   if (checkStack && receipt.result.stack.length !== 0) {

@@ -1,19 +1,35 @@
-import { JSONRPCProvider, JSONRPCRequest, JSONRPCResponse } from '@neo-one/client-core';
+import {
+  DeveloperClient,
+  JSONRPCProvider,
+  JSONRPCRequest,
+  JSONRPCResponse,
+  NEOONEDataProvider,
+} from '@neo-one/client-core';
+import { constants } from '@neo-one/utils';
 import { FullNode, FullNodeOptions } from './FullNode';
 
 // tslint:disable-next-line no-let
 let startPromise: Promise<FullNode> | undefined;
-const start = async (options: FullNodeOptions) => {
+const start = async (options: FullNodeOptions, provider: JSONRPCLocalProvider, build: () => Promise<void>) => {
   if (startPromise === undefined) {
-    const node = new FullNode(options);
+    const node = new FullNode(
+      options,
+      new DeveloperClient(new NEOONEDataProvider({ network: constants.LOCAL_NETWORK_NAME, rpcURL: provider })),
+      build,
+    );
     startPromise = node.start().then(() => node);
   }
 
   return startPromise;
 };
 
-const handleRequest = async (options: FullNodeOptions, req: JSONRPCRequest) => {
-  const node = await start(options);
+const handleRequest = async (
+  options: FullNodeOptions,
+  provider: JSONRPCLocalProvider,
+  build: () => Promise<void>,
+  req: JSONRPCRequest,
+) => {
+  const node = await start(options, provider, build);
   const { watchTimeoutMS, params = [] } = req;
 
   return node.handleRequest({
@@ -25,23 +41,24 @@ const handleRequest = async (options: FullNodeOptions, req: JSONRPCRequest) => {
 };
 
 export interface JSONRPCLocalProviderOptions {
-  readonly id: string;
+  readonly options: FullNodeOptions;
+  readonly build: () => Promise<void>;
 }
 
 export class JSONRPCLocalProvider extends JSONRPCProvider {
-  public constructor(private readonly options: FullNodeOptions) {
+  public constructor(private readonly options: JSONRPCLocalProviderOptions) {
     super();
   }
 
   public async request(req: JSONRPCRequest): Promise<JSONRPCResponse> {
     // Something weird with comlink causes the property to be wrapped in a function, so we do this as a workaround.
     const options = await this.getOptions();
-    const response = await handleRequest(options, req);
+    const response = await handleRequest(options.options, this, options.build, req);
 
     return this.handleResponse(response);
   }
 
-  private async getOptions(): Promise<FullNodeOptions> {
+  private async getOptions(): Promise<JSONRPCLocalProviderOptions> {
     return this.options;
   }
 }

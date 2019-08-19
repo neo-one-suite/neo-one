@@ -1,4 +1,4 @@
-import { common, crypto, privateKeyToScriptHash, wifToPrivateKey } from '@neo-one/client-common';
+import { common, crypto, privateKeyToScriptHash } from '@neo-one/client-common';
 import { FullNode } from '@neo-one/node';
 import { createMain } from '@neo-one/node-neo-settings';
 import { constants } from '@neo-one/utils';
@@ -10,11 +10,8 @@ const getPort = () => _.random(10000, 50000);
 
 export const createNode = async () => {
   const port = getPort();
-  const privateKey = wifToPrivateKey(constants.PRIVATE_NET_PRIVATE_KEY);
-  crypto.addPublicKey(
-    common.stringToPrivateKey(wifToPrivateKey(constants.PRIVATE_NET_PRIVATE_KEY)),
-    common.stringToECPoint(constants.PRIVATE_NET_PUBLIC_KEY),
-  );
+  const privateKey = constants.PRIVATE_NET_PRIVATE_KEY;
+  crypto.addPublicKey(common.stringToPrivateKey(privateKey), common.stringToECPoint(constants.PRIVATE_NET_PUBLIC_KEY));
 
   const node = new FullNode({
     options: {
@@ -23,7 +20,7 @@ export const createNode = async () => {
         standbyValidators: [constants.PRIVATE_NET_PUBLIC_KEY],
         address: privateKeyToScriptHash(privateKey),
       }),
-      dataPath: '/tmp/fakePath/',
+      path: '/tmp/fakePath/',
       rpc: {
         http: {
           port,

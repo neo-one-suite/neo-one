@@ -4,7 +4,7 @@ import envPaths from 'env-paths';
 import rc from 'rc';
 
 const DEFAULT_OPTIONS = {
-  dataPath: envPaths('neo-one', { suffix: '' }).data,
+  path: envPaths('neo-one', { suffix: '' }).data,
   rpc: {
     http:
       process.env.PORT === undefined

@@ -14,7 +14,6 @@ describe('genContract', () => {
             address: 'iamahash',
           },
         },
-        browser: false,
       }),
     ).toMatchSnapshot();
   });

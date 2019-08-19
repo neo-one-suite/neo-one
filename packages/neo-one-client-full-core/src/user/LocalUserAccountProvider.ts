@@ -142,7 +142,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     abi: ABI,
     params: readonly Param[],
     options?: TransactionOptions,
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
     return this.publishBase(
       'publish',
@@ -267,7 +267,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   public async __execute(
     script: BufferString,
     options: InvokeExecuteTransactionOptions = {},
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
     const { from } = this.getTransactionOptions(options);
 
@@ -292,7 +292,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     method: string,
     contractIn: ContractRegister,
     emit: (sb: ScriptBuilder, from: UserAccountID) => void,
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
     options?: TransactionOptions,
   ): Promise<TransactionResult<PublishReceipt, InvocationTransaction>> {
     const contract = new ContractModel({
@@ -362,7 +362,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
   protected async getInvocationResultError(
     data: RawInvocationData,
     result: RawInvocationResultError,
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<InvocationResultError> {
     const message = await processActionsAndMessage({
       actions: data.actions,
@@ -382,7 +382,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
     data: RawInvocationData,
     result: RawInvocationResultSuccess,
     value: T,
-    sourceMaps: Promise<SourceMaps> = Promise.resolve({}),
+    sourceMaps: SourceMaps = {},
   ): Promise<InvocationResultSuccess<T>> {
     await processConsoleLogMessages({
       actions: data.actions,

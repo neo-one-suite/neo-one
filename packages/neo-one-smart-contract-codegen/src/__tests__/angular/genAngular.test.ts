@@ -9,7 +9,6 @@ describe('genAngular', () => {
         commonTypesPath: '/foo/bar/one/generated/types.js',
         angularPath: '/foo/bar/one/generated/angular.service.js',
         clientPath: '/foo/bar/one/generated/client.js',
-        browser: false,
       }),
     ).toMatchSnapshot();
   });

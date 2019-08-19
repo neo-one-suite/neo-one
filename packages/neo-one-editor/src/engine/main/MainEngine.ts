@@ -164,8 +164,11 @@ export class MainEngine {
     });
 
     const output$ = new Subject<OutputMessage>();
-    const jsonRPCLocalProviderManager = createJSONRPCLocalProviderManager(id);
-    const builderManager = createBuilderManager(
+    let builderManager: WorkerManager<typeof Builder>;
+    const jsonRPCLocalProviderManager = createJSONRPCLocalProviderManager(id, async () =>
+      builderManager.withInstance((instance) => instance.build()),
+    );
+    builderManager = createBuilderManager(
       getFileSystemDBID(id),
       () => fileSystemManager.getEndpoint(),
       output$,
@@ -244,7 +247,10 @@ export class MainEngine {
       () => fileSystemManager.getEndpoint(),
       builderManager,
       jsonRPCLocalProviderManager,
-      createMemoryJSONRPCLocalProviderManager,
+      () =>
+        createMemoryJSONRPCLocalProviderManager(async () =>
+          builderManager.withInstance((instance) => instance.build()),
+        ),
       testRunnerCallbacks,
     );
 
@@ -385,7 +391,10 @@ export class MainEngine {
       endpoint,
       builderManager: comlink.proxyValue(this.builderManager),
       jsonRPCLocalProviderManager: comlink.proxyValue(this.jsonRPCLocalProviderManager),
-      createJSONRPCLocalProviderManager: createMemoryJSONRPCLocalProviderManager,
+      createJSONRPCLocalProviderManager: () =>
+        createMemoryJSONRPCLocalProviderManager(async () =>
+          this.builderManager.withInstance((instance) => instance.build()),
+        ),
       openFile: this.openFile,
     };
   }

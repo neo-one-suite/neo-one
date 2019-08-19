@@ -9,7 +9,6 @@ describe('genReact', () => {
         commonTypesPath: '/foo/bar/one/generated/types.js',
         reactPath: '/foo/bar/one/generated/react.js',
         clientPath: '/foo/bar/one/generated/client.js',
-        browser: false,
       }),
     ).toMatchSnapshot();
   });

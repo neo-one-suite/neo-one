@@ -12,7 +12,6 @@ export const genContract = ({
   sourceMapsPath,
   abiPath,
   networksDefinition,
-  browser,
 }: {
   readonly name: string;
   readonly createContractPath: string;
@@ -20,7 +19,6 @@ export const genContract = ({
   readonly abiPath: string;
   readonly sourceMapsPath: string;
   readonly networksDefinition: SmartContractNetworksDefinition;
-  readonly browser: boolean;
 }) => {
   const relativeTypes = getRelativeImport(createContractPath, typesPath);
   const smartContract = getSmartContractName(name);
@@ -45,21 +43,12 @@ export const ${getCreateSmartContractName(name)} = (
 ) => client.smartContract(definition);
   `,
     ts: `
-import { Client, SmartContractDefinition } from '@neo-one/client${browser ? '-browserify' : ''}';${
-      abiName >= 'sourceMaps' ? sourceMapsImport : ''
-    }
-import { ${abiName} } from '${relativeABI}';
-import { ${smartContract} } from '${relativeTypes}';${abiName >= 'sourceMaps' ? '' : sourceMapsImport}
+import { Client } from '@neo-one/client';
+import { ${smartContract} } from '${relativeTypes}';
 
-const definition: SmartContractDefinition = {
-  networks: ${stringify(networksDefinition, undefined, 2)},
-  abi: ${abiName},
-  sourceMaps,
-};
-
-export const ${getCreateSmartContractName(name)} = <TClient extends Client>(
+export const ${getCreateSmartContractName(name)}: <TClient extends Client>(
   client: TClient,
-): ${smartContract}<TClient> => client.smartContract<${smartContract}<TClient>>(definition);
+) => ${smartContract}<TClient>;
 `,
   };
 };

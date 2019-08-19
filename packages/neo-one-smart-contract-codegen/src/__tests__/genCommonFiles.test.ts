@@ -6,7 +6,6 @@ describe('genCommonFiles', () => {
     expect(
       genCommonFiles({
         contractsPaths,
-        projectID: 'foobar',
         commonTypesPath: '/foo/bar/one/generated/types.js',
         testPath: '/foo/bar/one/generated/test.js',
         reactPath: '/foo/bar/one/generated/react.jsx',
@@ -14,12 +13,11 @@ describe('genCommonFiles', () => {
         vuePath: '/foo/bar/one/generated/vue.js',
         clientPath: '/foo/bar/one/generated/client.js',
         generatedPath: '/foo/bar/one/generated/index.js',
-        projectIDPath: '/foo/bar/one/generated/projectID.js',
         localDevNetworkName: 'local',
         wallets: [
           {
             name: 'master',
-            privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
+            wif: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
           },
         ],
         networks: [
@@ -29,11 +27,11 @@ describe('genCommonFiles', () => {
             dev: true,
           },
         ],
-        httpServerPort: 40100,
+        localDevNetworkPort: 40100,
         sourceMapsPath: '/foo/bar/one/generated/sourceMaps.js',
         sourceMaps: {},
         framework: 'vue',
-        browser: false,
+        browserify: false,
       }),
     ).toMatchSnapshot();
   });

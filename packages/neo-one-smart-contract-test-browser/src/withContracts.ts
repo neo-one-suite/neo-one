@@ -13,7 +13,7 @@ import { WorkerManager } from '@neo-one/worker';
 
 export { TestOptions, WithContractsOptions, Contract };
 
-export const createWithContracts = (
+export const createWithContractsBase = (
   getFS: () => FileSystem,
   createManager: () => Promise<WorkerManager<typeof JSONRPCLocalProvider>>,
 ) => async <T>(
@@ -40,4 +40,4 @@ export const createWithContracts = (
     options,
   );
 
-export const withContracts = createWithContracts(getFileSystem, createJSONRPCLocalProviderManager);
+export const withContracts = createWithContractsBase(getFileSystem, createJSONRPCLocalProviderManager);

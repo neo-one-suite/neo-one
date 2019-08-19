@@ -1,6 +1,6 @@
 // tslint:disable no-any no-unused
 import { AddressString } from '@neo-one/client-common';
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client-core';
+import { Client, DeveloperClient } from '@neo-one/client-core';
 
 export interface NetworkClients<T> {
   readonly [network: string]: T | undefined;
@@ -15,7 +15,6 @@ export type OnResize = (options: OnResizeOptions) => void;
 export interface DeveloperToolsOptions {
   readonly client: Client;
   readonly developerClients: NetworkClients<DeveloperClient>;
-  readonly localClients: NetworkClients<LocalClient>;
   readonly maxWidth: number;
   readonly onResize: OnResize;
 }

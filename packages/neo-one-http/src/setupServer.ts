@@ -1,5 +1,3 @@
-import { httpLogger } from '@neo-one/logger';
-import { Labels } from '@neo-one/utils';
 import * as http from 'http';
 import * as https from 'https';
 import Application from 'koa';
@@ -15,7 +13,6 @@ export async function setupServer(
   // tslint:disable-next-line no-object-mutation
   server.keepAliveTimeout = keepAliveTimeout;
   await new Promise<void>((resolve) => server.listen(port, host, 511, resolve));
-  httpLogger.debug({ [Labels.SPAN_KIND]: 'server', title: 'server_listen' }, `Server listening on ${host}:${port}`);
 
   return async () => {
     await new Promise((resolve, reject) =>

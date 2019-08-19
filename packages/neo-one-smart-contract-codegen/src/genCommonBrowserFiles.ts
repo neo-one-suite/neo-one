@@ -1,13 +1,14 @@
 import { SourceMaps } from '@neo-one/client-common';
+import { CodegenFramework } from '@neo-one/utils';
 import { genAngular } from './angular';
 import { genBrowserClient, NetworkDefinition, Wallet } from './client';
 import { genCommonTypes } from './commonTypes';
 import { formatFile } from './formatFile';
 import { genGenerated } from './generated';
 import { genReact } from './react';
-import { genBrowserSourceMaps } from './sourceMaps';
+import { genSourceMaps } from './sourceMaps';
 import { genTest } from './test';
-import { CodegenFramework, ContractPaths, FileResult } from './type';
+import { ContractPaths, FileResult } from './type';
 import { genVue } from './vue';
 
 export interface CommonBrowserFilesResult {
@@ -52,15 +53,14 @@ export const genCommonBrowserFiles = ({
 }): CommonBrowserFilesResult => {
   const testFile = formatFile(
     genTest({ contractsPaths, testPath, commonTypesPath, mod: '@neo-one/smart-contract-test-browser' }),
+    false,
   );
-  const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }));
-  const sourceMapsFile = formatFile(genBrowserSourceMaps({ sourceMaps }));
-  const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath, browser: false }));
-  const angularFile = formatFile(
-    genAngular({ contractsPaths, angularPath, commonTypesPath, clientPath, browser: false }),
-  );
-  const vueFile = formatFile(genVue({ contractsPaths, vuePath, commonTypesPath, clientPath, browser: false }));
-  const clientFile = formatFile(genBrowserClient({ localDevNetworkName, wallets, networks }));
+  const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }), false);
+  const sourceMapsFile = formatFile(genSourceMaps({ sourceMaps }), false);
+  const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath }), false);
+  const angularFile = formatFile(genAngular({ contractsPaths, angularPath, commonTypesPath, clientPath }), false);
+  const vueFile = formatFile(genVue({ contractsPaths, vuePath, commonTypesPath, clientPath }), false);
+  const clientFile = formatFile(genBrowserClient({ localDevNetworkName, wallets, networks }), false);
   const generatedFile = formatFile(
     genGenerated({
       contractsPaths,
@@ -72,6 +72,7 @@ export const genCommonBrowserFiles = ({
       generatedPath,
       framework,
     }),
+    false,
   );
 
   return {

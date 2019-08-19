@@ -44,17 +44,3 @@ export interface SmartContractAny extends SmartContract {
   // tslint:disable-next-line no-any
   readonly [key: string]: any;
 }
-
-/**
- * Client which controls a local NEO•ONE toolchain.
- */
-export interface LocalClient {
-  /**
-   * Returns the local toolchain's NEO Tracker url.
-   */
-  readonly getNEOTrackerURL: () => Promise<string | undefined>;
-  /**
-   * Resets the local toolchain to its initial state by resetting the local developer network and redeploying contracts.
-   */
-  readonly reset: () => Promise<void>;
-}

@@ -14,43 +14,27 @@ export const genTest = ({
   readonly mod?: string;
 }) => ({
   js: `
-import { withContracts as withContractsBase } from '${mod}';
+import { createWithContracts } from '${mod}';
 import * as path from 'path';
 
-export const withContracts = async (test, options) =>
-  withContractsBase(
-    [${contractsPaths
-      .map(
-        ({ name, contractPath }) =>
-          `{ name: '${name}', filePath: path.resolve(__dirname, '${normalizePath(
-            path.relative(path.dirname(testPath), contractPath),
-          )}') }`,
-      )
-      .join(', ')}],
-    test,
-    options,
-  );
+export const withContracts = createWithContracts([
+  ${contractsPaths
+    .map(
+      ({ name, contractPath }) =>
+        `{ name: '${name}', filePath: path.resolve(__dirname, '${normalizePath(
+          path.relative(testPath, contractPath),
+        )}') }`,
+    )
+    .join(', ')}
+]);
 `,
   ts: `
-import { TestOptions, withContracts as withContractsBase, WithContractsOptions } from '${mod}';
-import * as path from 'path';
+import { TestOptions, WithContractsOptions } from '${mod}';
 import { Contracts } from '${getRelativeImport(testPath, commonTypesPath)}';
 
-export const withContracts = async (
+export const withContracts: (
   test: (contracts: Contracts & TestOptions) => Promise<void>,
   options?: WithContractsOptions,
-): Promise<void> =>
-  withContractsBase<Contracts>(
-    [${contractsPaths
-      .map(
-        ({ name, contractPath }) =>
-          `{ name: '${name}', filePath: path.resolve(__dirname, '${normalizePath(
-            path.relative(path.dirname(testPath), contractPath),
-          )}') }`,
-      )
-      .join(', ')}],
-    test,
-    options,
-  );
+) => Promise<void>;
 `,
 });

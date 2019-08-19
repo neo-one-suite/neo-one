@@ -50,13 +50,11 @@
     },
     "ignore": [
       "dist",
-      "packages/neo-one-server-plugin-wallet/src/contracts/*.ts",
+      "packages/neo-one-cli/src/__data__/projects/*/contracts/**/*.ts",
       "packages/neo-one-smart-contract/src/*.d.ts",
       "packages/neo-one-smart-contract-compiler/src/__data__/snippets/**/*.ts",
       "packages/neo-one-smart-contract-lib/src/*.ts",
       "packages/*/src/__data__/contracts/*.ts",
-      "packages/neo-one-server-plugin-project/src/__data__/ico/one/contracts/*.ts",
-      "packages/neo-one-server-plugin-project/src/__data__/icojs/one/contracts/*.ts",
       "packages/neo-one-playground",
       "cypress/**/*"
     ]
@@ -69,7 +67,7 @@
     "build": "yarn run gulp build",
     "build:e2e": "yarn run gulp buildE2E",
     "build:node": "yarn run gulp buildNode",
-    "watch": "yarn run gulp watch",
+    "watch:e2e": "yarn run gulp watch",
     "release": "yarn run gulp release",
     "neo-one": "node ./dist/neo-one/packages/neo-one-cli/bin/neo-one",
     "jest": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" jest",
@@ -79,7 +77,7 @@
     "test:other": "yarn run jest --config jest/other.js --w 1",
     "e2e": "yarn run jest --config jest/e2e.js",
     "e2e-ci": "yarn run jest --config jest/e2e-ci.js --ci -w 1",
-    "tsc": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" tsc && tsc -p packages/neo-one-smart-contract && tsc -p packages/neo-one-smart-contract-lib && tsc -p packages/neo-one-smart-contract-lib/src/__data__/contracts && tsc -p packages/neo-one-smart-contract-compiler/src/__data__/contracts && tsc -p packages/neo-one-server-plugin-project/src/__data__/ico/one/contracts",
+    "tsc": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" tsc && tsc -p packages/neo-one-smart-contract && tsc -p packages/neo-one-smart-contract-lib && tsc -p packages/neo-one-smart-contract-lib/src/__data__/contracts && tsc -p packages/neo-one-smart-contract-compiler/src/__data__/contracts",
     "tsc-fast": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" tsc",
     "ts-node": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json node -r ts-node/register/transpile-only",
     "nit:source": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.{ts,tsx}\"",

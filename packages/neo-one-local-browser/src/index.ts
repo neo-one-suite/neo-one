@@ -1,4 +1,3 @@
-export * from './BrowserLocalClient';
 export * from './build';
 export * from './filesystem';
 export * from './createCompilerHost';

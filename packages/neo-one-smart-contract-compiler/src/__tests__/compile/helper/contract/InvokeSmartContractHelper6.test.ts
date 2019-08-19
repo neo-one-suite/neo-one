@@ -164,7 +164,7 @@ describe('InvokeSmartContractHelper', () => {
           },
         ],
       },
-      sourceMaps: Promise.resolve(node.sourceMaps),
+      sourceMaps: node.sourceMaps,
     });
 
     const refundResult = await smartContract.refundAssets(transferResult.transaction.hash);
@@ -521,7 +521,7 @@ describe('InvokeSmartContractHelper', () => {
           },
         ],
       },
-      sourceMaps: Promise.resolve(node.sourceMaps),
+      sourceMaps: node.sourceMaps,
     });
 
     const escrowContract = node.client.smartContract({
@@ -578,7 +578,7 @@ describe('InvokeSmartContractHelper', () => {
           },
         ],
       },
-      sourceMaps: Promise.resolve(node.sourceMaps),
+      sourceMaps: node.sourceMaps,
     });
 
     let receipt = await tokenContract.issue.confirmed(accountID.address, new BigNumber('20'));

@@ -23,7 +23,6 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { UnknownNetworkError } from '../errors';
 import { Provider } from '../user';
 import { NEOONEDataProvider, NEOONEDataProviderOptions } from './NEOONEDataProvider';
-import { NEOONEOneDataProvider } from './NEOONEOneDataProvider';
 
 /**
  * Implements the `Provider` interface expected by a `LocalUserAccountProvider` using a NEO•ONE node.
@@ -32,20 +31,15 @@ export class NEOONEProvider implements Provider {
   public readonly networks$: Observable<readonly NetworkType[]>;
   private readonly networksInternal$: BehaviorSubject<readonly NetworkType[]>;
   // tslint:disable-next-line readonly-keyword
-  private readonly mutableProviders: { [key: string]: NEOONEDataProvider | NEOONEOneDataProvider | undefined };
+  private readonly mutableProviders: { [key: string]: NEOONEDataProvider | undefined };
 
-  public constructor(
-    options: ReadonlyArray<NEOONEDataProviderOptions | NEOONEOneDataProvider | NEOONEDataProvider> = [],
-  ) {
+  public constructor(options: ReadonlyArray<NEOONEDataProviderOptions | NEOONEDataProvider> = []) {
     this.networksInternal$ = new BehaviorSubject<readonly NetworkType[]>([]);
     this.networks$ = this.networksInternal$;
     this.mutableProviders = {};
 
     const networks = options.map((opts) => {
-      this.mutableProviders[opts.network] =
-        opts instanceof NEOONEDataProvider || opts instanceof NEOONEOneDataProvider
-          ? opts
-          : new NEOONEDataProvider(opts);
+      this.mutableProviders[opts.network] = opts instanceof NEOONEDataProvider ? opts : new NEOONEDataProvider(opts);
 
       return opts.network;
     });
@@ -124,7 +118,7 @@ export class NEOONEProvider implements Provider {
     return this.getProvider(network).getClaimAmount(input);
   }
 
-  public read(network: NetworkType): NEOONEDataProvider | NEOONEOneDataProvider {
+  public read(network: NetworkType): NEOONEDataProvider {
     return this.getProvider(network);
   }
 
@@ -140,7 +134,7 @@ export class NEOONEProvider implements Provider {
     return this.getProvider(network).iterBlocks(options);
   }
 
-  private getProvider(network: NetworkType): NEOONEDataProvider | NEOONEOneDataProvider {
+  private getProvider(network: NetworkType): NEOONEDataProvider {
     const provider = this.mutableProviders[network];
     if (provider === undefined) {
       throw new UnknownNetworkError(network);

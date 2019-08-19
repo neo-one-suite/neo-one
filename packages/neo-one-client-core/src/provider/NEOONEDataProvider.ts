@@ -54,7 +54,7 @@ import {
   VerifyTransactionResult,
   VerifyTransactionResultJSON,
 } from '@neo-one/client-common';
-import { utils as commonUtils } from '@neo-one/utils';
+import { Configuration, utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
 import { flatten } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatten';
@@ -327,6 +327,14 @@ export class NEOONEDataProvider implements DeveloperProvider {
 
   public async reset(): Promise<void> {
     return this.mutableClient.reset();
+  }
+
+  public async getProjectConfiguration(): Promise<Configuration | undefined> {
+    return this.mutableClient.getProjectConfiguration();
+  }
+
+  public async resetProject(): Promise<void> {
+    return this.mutableClient.resetProject();
   }
 
   public iterStorage(address: AddressString): AsyncIterable<StorageItem> {

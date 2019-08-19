@@ -13,7 +13,7 @@ class NodeEnvironment extends JestNodeEnvironment {
 
   async setup() {
     await super.setup();
-    this.global.one = this.createOne();
+    this.global.one = await this.createOne();
   }
 
   async teardown() {
@@ -23,7 +23,7 @@ class NodeEnvironment extends JestNodeEnvironment {
     await super.teardown();
   }
 
-  createOne() {
+  async createOne() {
     return new One();
   }
 }

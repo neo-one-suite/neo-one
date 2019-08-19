@@ -21,6 +21,7 @@ import {
   TransactionJSON,
   TransactionReceiptJSON,
 } from '@neo-one/client-common';
+import { Configuration } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { RelayTransactionError } from '../errors';
 import { JSONRPCProvider, JSONRPCProviderManager } from './JSONRPCProvider';
@@ -250,6 +251,14 @@ export class JSONRPCClient {
 
   public async reset(): Promise<void> {
     return this.withInstance(async (provider) => provider.request({ method: 'reset' }));
+  }
+
+  public async getProjectConfiguration(): Promise<Configuration | undefined> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getprojectconfiguration' }));
+  }
+
+  public async resetProject(): Promise<void> {
+    return this.withInstance(async (provider) => provider.request({ method: 'resetproject' }));
   }
 
   private async withInstance<TResult>(func: (instance: JSONRPCProvider) => Promise<TResult>): Promise<TResult>;

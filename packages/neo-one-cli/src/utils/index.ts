@@ -1,4 +1,2 @@
-export { createBinary } from './createBinary';
-export { createClientConfig } from './createClientConfig';
-export { setupCLI } from './setupCLI';
-export { ClientConfig } from './createClientConfig';
+export * from './killPort';
+export * from './writeFile';

@@ -8,7 +8,7 @@ describe('genClient', () => {
         wallets: [
           {
             name: 'master',
-            privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
+            wif: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
           },
         ],
         networks: [
@@ -18,10 +18,7 @@ describe('genClient', () => {
             dev: true,
           },
         ],
-        projectIDPath: '/foo/bar/one/generated/projectID.js',
-        clientPath: '/foo/bar/one/generated/client.js',
-        httpServerPort: 40100,
-        browser: false,
+        localDevNetworkPort: 40100,
       }),
     ).toMatchSnapshot();
   });

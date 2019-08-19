@@ -17,7 +17,7 @@ describe('genCommonBrowserFiles', () => {
         wallets: [
           {
             name: 'master',
-            privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
+            wif: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
           },
         ],
         networks: [

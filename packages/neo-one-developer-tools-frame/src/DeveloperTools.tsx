@@ -1,4 +1,4 @@
-import { Client, DeveloperClient, LocalClient } from '@neo-one/client-core';
+import { Client, DeveloperClient } from '@neo-one/client-core';
 import { GlobalFonts, useStream } from '@neo-one/react-common';
 import * as React from 'react';
 import { Observable } from 'rxjs';
@@ -13,7 +13,6 @@ import { NetworkClients } from './types';
 export interface Clients {
   readonly client: Client;
   readonly developerClients: NetworkClients<DeveloperClient>;
-  readonly localClients: NetworkClients<LocalClient>;
 }
 
 interface Props {

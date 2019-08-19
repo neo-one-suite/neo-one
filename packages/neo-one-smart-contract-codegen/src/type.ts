@@ -2,7 +2,6 @@ import { RawSourceMap } from 'source-map';
 
 export interface ContractPaths {
   readonly name: string;
-  readonly addresses: ReadonlyArray<string>;
   readonly sourceMap: RawSourceMap;
   readonly contractPath: string;
   readonly createContractPath: string;
@@ -14,5 +13,3 @@ export interface FileResult {
   readonly ts: string;
   readonly js?: string;
 }
-
-export type CodegenFramework = 'none' | 'react' | 'angular' | 'vue';

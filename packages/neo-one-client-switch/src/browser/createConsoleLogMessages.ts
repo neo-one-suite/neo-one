@@ -4,7 +4,7 @@ import { initializeSourceMap } from './initializeSourceMap';
 
 export const createConsoleLogMessages = async (
   actions: readonly RawAction[],
-  sourceMaps: Promise<SourceMaps>,
+  sourceMaps: SourceMaps,
   options: LogOptions,
 ): Promise<readonly string[]> => {
   if (process.env.NODE_ENV === 'production' && process.env.NEO_ONE_DEV !== 'true') {

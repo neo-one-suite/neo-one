@@ -54,7 +54,7 @@ describe('RemoteUserAccountProvider', () => {
     networkFee: data.bigNumbers.a,
     systemFee: data.bigNumbers.b,
   };
-  const sourceMap = Promise.resolve({
+  const sourceMap = {
     [keys[0].address]: {
       version: 1,
       sources: ['source1', 'source2'],
@@ -64,7 +64,7 @@ describe('RemoteUserAccountProvider', () => {
       mappings: 'mapping',
       file: 'file.ts',
     },
-  });
+  };
   const blockCount = 1337;
   const block = factory.createBlock();
   const rawAction = factory.createRawLog();

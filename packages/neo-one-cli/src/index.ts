@@ -1,5 +1,6 @@
-export { InteractiveCLI } from './InteractiveCLI';
-export { CLI } from './CLI';
+// tslint:disable no-import-side-effect export-name
+import './init';
 
-export * from './constants';
-export { setupCLI } from './utils';
+import * as cmd from './cmd';
+
+export { cmd };

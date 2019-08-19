@@ -72,7 +72,7 @@ export interface UserAccountProvider extends UserAccountProviderLite {
     abi: ABI,
     params: readonly Param[],
     options?: TransactionOptions,
-    sourceMaps?: Promise<SourceMaps>,
+    sourceMaps?: SourceMaps,
   ) => Promise<TransactionResult<PublishReceipt, InvocationTransaction>>;
   readonly registerAsset: (
     asset: AssetRegister,

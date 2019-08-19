@@ -476,21 +476,12 @@ const assertSmartContractNetworksDefinition = (name: string, value?: unknown): S
   ) as SmartContractNetworksDefinition;
 };
 
-// tslint:disable-next-line no-any
-const isPromise = (value: unknown): value is Promise<any> =>
-  // tslint:disable-next-line no-any
-  typeof value === 'object' && (value as any).then !== undefined;
-
-export const assertSourceMaps = (name: string, value?: unknown): Promise<SourceMaps> | undefined => {
+export const assertSourceMaps = (_name: string, value?: unknown): SourceMaps | undefined => {
   if (value == undefined) {
     return undefined;
   }
 
-  if (!isPromise(value)) {
-    throw new InvalidArgumentError('SourceMaps', name, value);
-  }
-
-  return value;
+  return value as SourceMaps;
 };
 
 export const assertSmartContractDefinition = (name: string, value?: unknown): SmartContractDefinition => {

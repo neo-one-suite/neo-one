@@ -1,7 +1,6 @@
 // tslint:disable no-object-mutation no-any
 import { getFinalLogger, nodeLogger } from '@neo-one/logger';
 import { FullNode } from '@neo-one/node';
-import { finalize } from '@neo-one/utils';
 import { getConfiguration } from './utils';
 
 export const startNode = async (): Promise<void> => {
@@ -10,7 +9,6 @@ export const startNode = async (): Promise<void> => {
 
   const initiateShutdown = async () => {
     await Promise.all(mutableShutdownFuncs.map(async (func) => func()));
-    await finalize.wait();
   };
 
   // tslint:disable-next-line:no-let

@@ -14,7 +14,7 @@ import {
   TransactionData,
   TransactionType,
 } from '@neo-one/node-core';
-import { Labels, labelToTag } from '@neo-one/utils';
+import { Configuration, Labels, labelToTag } from '@neo-one/utils';
 import { filter, switchMap, take, timeout, toArray } from 'rxjs/operators';
 
 const logger = nodeLogger.child({ component: 'rpc-handler' });
@@ -88,6 +88,8 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   fastforwardoffset: 'fastforwardoffset',
   fastforwardtotime: 'fastforwardtotime',
   reset: 'reset',
+  getProjectConfiguration: 'getprojectconfiguration',
+  resetProject: 'resetproject',
   UNKNOWN: 'UNKNOWN',
   INVALID: 'INVALID',
 };
@@ -267,9 +269,13 @@ export type RPCHandler = (request: unknown) => Promise<any>;
 export const createHandler = ({
   blockchain,
   node,
+  handleGetProjectConfiguration,
+  handleResetProject,
 }: {
   readonly blockchain: Blockchain;
   readonly node: Node;
+  readonly handleGetProjectConfiguration: () => Promise<Configuration | undefined>;
+  readonly handleResetProject: () => Promise<void>;
 }): RPCHandler => {
   const checkHeight = (height: number) => {
     if (height < 0 || height > blockchain.currentBlockIndex) {
@@ -670,6 +676,12 @@ export const createHandler = ({
       if (node.consensus !== undefined) {
         await node.consensus.resume();
       }
+
+      return true;
+    },
+    [RPC_METHODS.getprojectconfiguration]: async () => handleGetProjectConfiguration(),
+    [RPC_METHODS.resetproject]: async () => {
+      await handleResetProject();
 
       return true;
     },

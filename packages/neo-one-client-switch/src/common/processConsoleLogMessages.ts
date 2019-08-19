@@ -4,7 +4,7 @@ import { createConsoleLogMessages } from './createConsoleLogMessages';
 
 export interface ProcessConsoleLogOptions {
   readonly actions: readonly RawAction[];
-  readonly sourceMaps?: Promise<SourceMaps>;
+  readonly sourceMaps?: SourceMaps;
 }
 
 // tslint:disable-next-line no-let
