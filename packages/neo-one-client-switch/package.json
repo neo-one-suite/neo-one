@@ -27,7 +27,7 @@
     "@types/ledgerhq__hw-transport": "4.21.1",
     "@types/ledgerhq__hw-transport-node-hid": "4.22.1",
     "@types/ledgerhq__hw-transport-u2f": "4.21.1",
-    "@types/lodash": "4.14.136"
+    "@types/lodash": "4.14.137"
   },
   "optionalDependencies": {
     "@ledgerhq/hw-transport-node-hid": "4.68.2"
