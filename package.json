@@ -197,7 +197,7 @@
     "cz-conventional-changelog": "3.0.2",
     "date-fns": "2.0.0-beta.4",
     "eslint": "6.1.0",
-    "execa": "2.0.3",
+    "execa": "2.0.4",
     "extract-css-chunks-webpack-plugin": "4.6.0",
     "file-loader": "4.2.0",
     "fs-extra": "8.1.0",
