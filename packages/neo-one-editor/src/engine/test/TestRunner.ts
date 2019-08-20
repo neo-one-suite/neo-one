@@ -144,6 +144,7 @@ const createHandleTestEvent = (engine: RemoteEngine, test: ModuleBase, callbacks
 
   const getTestName = (entry: Circus.TestEntry) => {
     const getBlockNamesWorker = (block: Circus.DescribeBlock): readonly string[] => {
+      // tslint:disable-next-line
       if (block.parent == undefined) {
         return [];
       }

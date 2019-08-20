@@ -6,7 +6,7 @@
   "dependencies": {
     "@neo-one/smart-contract-compiler": "^1.2.1",
     "@neo-one/smart-contract-compiler-node": "^1.1.4",
-    "typescript": "3.5.3"
+    "typescript": "^3.5.3"
   },
   "sideEffects": false
 }

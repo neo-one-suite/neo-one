@@ -32,31 +32,19 @@
     "last 2 firefox versions"
   ],
   "lint-staged": {
-    "linters": {
-      "packages/*/src/**/*.{ts,tsx}": [
-        "yarn run prettier --write --config .prettierrc",
-        "git add",
-        "yarn run lint-files"
-      ],
-      "scripts/**/*.js": [
-        "yarn run prettier --write --config .prettierrc --parser flow",
-        "git add"
-      ],
-      "scripts/**/*.ts": [
-        "yarn run prettier --write --config .prettierrc",
-        "git add",
-        "yarn run lint-files"
-      ]
-    },
-    "ignore": [
-      "dist",
-      "packages/neo-one-cli/src/__data__/projects/*/contracts/**/*.ts",
-      "packages/neo-one-smart-contract/src/*.d.ts",
-      "packages/neo-one-smart-contract-compiler/src/__data__/snippets/**/*.ts",
-      "packages/neo-one-smart-contract-lib/src/*.ts",
-      "packages/*/src/__data__/contracts/*.ts",
-      "packages/neo-one-playground",
-      "cypress/**/*"
+    "packages/*/src/**/*.{ts,tsx}": [
+      "yarn run prettier --write --config .prettierrc",
+      "git add",
+      "yarn run lint-files"
+    ],
+    "scripts/**/*.js": [
+      "yarn run prettier --write --config .prettierrc --parser flow",
+      "git add"
+    ],
+    "scripts/**/*.ts": [
+      "yarn run prettier --write --config .prettierrc",
+      "git add",
+      "yarn run lint-files"
     ]
   },
   "scripts": {
@@ -163,14 +151,14 @@
     "@cypress/webpack-preprocessor": "4.1.0",
     "@reach/router": "1.2.1",
     "@reactivex/ix-esnext-esm": "2.5.3",
-    "@types/autoprefixer": "9.5.0",
+    "@types/autoprefixer": "9.6.1",
     "@types/cssnano": "4.0.0",
-    "@types/jest": "24.0.17",
+    "@types/jest": "24.0.18",
     "@types/jest-matchers": "20.0.2",
     "@types/koa-bodyparser": "4.3.0",
     "@types/prettier": "1.18.2",
-    "@types/react": "16.9.1",
-    "@types/webpack": "4.32.1",
+    "@types/react": "16.9.2",
+    "@types/webpack": "4.39.0",
     "@types/webpack-bundle-analyzer": "2.13.2",
     "@types/webpack-dev-server": "3.1.7",
     "@types/yargs": "13.0.2",
@@ -179,7 +167,7 @@
     "autoprefixer": "9.6.1",
     "babel-core": "7.0.0-bridge.0",
     "babel-loader": "8.0.6",
-    "babel-plugin-emotion": "10.0.14",
+    "babel-plugin-emotion": "10.0.16",
     "babel-plugin-lodash": "3.3.4",
     "babel-plugin-transform-imports": "2.0.0",
     "babel-plugin-universal-import": "4.0.0",
@@ -187,7 +175,7 @@
     "codecov": "3.5.0",
     "commitizen": "4.0.3",
     "compression-webpack-plugin": "3.0.0",
-    "concurrently": "4.1.1",
+    "concurrently": "4.1.2",
     "connect-history-api-fallback": "1.6.0",
     "cross-env": "5.2.0",
     "css-loader": "3.2.0",
@@ -196,8 +184,8 @@
     "cypress-plugin-retries": "1.2.2",
     "cz-conventional-changelog": "3.0.2",
     "date-fns": "2.0.0-beta.4",
-    "eslint": "6.1.0",
-    "execa": "2.0.3",
+    "eslint": "6.2.0",
+    "execa": "2.0.4",
     "extract-css-chunks-webpack-plugin": "4.6.0",
     "file-loader": "4.2.0",
     "fs-extra": "8.1.0",
@@ -212,16 +200,16 @@
     "gulp-replace": "1.0.0",
     "gulp-sourcemaps": "2.6.5",
     "gulp-typescript": "5.0.1",
-    "husky": "3.0.3",
+    "husky": "3.0.4",
     "is-running": "2.1.0",
     "istanbul-lib-coverage": "2.0.5",
-    "jest": "24.8.0",
-    "jest-environment-node": "24.8.0",
+    "jest": "24.9.0",
+    "jest-environment-node": "24.9.0",
     "jest-junit": "7.0.0",
     "json": "9.0.6",
     "koa-connect": "2.0.1",
     "lerna": "3.16.4",
-    "lint-staged": "8.2.1",
+    "lint-staged": "9.2.3",
     "lodash": "4.17.15",
     "lodash-webpack-plugin": "0.11.5",
     "mini-html-webpack-plugin": "2.0.0",
@@ -236,7 +224,7 @@
     "postcss-loader": "3.0.0",
     "prettier": "1.18.2",
     "react": "16.9.0",
-    "react-dom": "16.9.0",
+    "react-dom": "^16.9.0",
     "react-hot-loader": "4.12.11",
     "react-static": "7.1.0",
     "react-static-plugin-emotion": "7.0.10",
@@ -271,13 +259,13 @@
     "typescript": "3.5.3",
     "typescript-styled-plugin": "0.14.0",
     "url-loader": "2.1.0",
-    "webpack": "4.39.1",
+    "webpack": "4.39.2",
     "webpack-bundle-analyzer": "3.4.1",
     "webpack-dev-server": "3.8.0",
     "webpack-node-externals": "1.7.2",
     "webpackbar": "4.0.0",
     "workbox-webpack-plugin": "4.3.1",
-    "yargs": "13.3.0"
+    "yargs": "14.0.0"
   },
   "config": {
     "commitizen": {

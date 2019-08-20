@@ -212,15 +212,15 @@ aliases:
 
 node8: &node8
   docker:
-    - image: neotracker/neo-one-circleci-node:8.16.0-4
+    - image: neotracker/neo-one-circleci-node:8.16.0-5
 
 node10: &node10
   docker:
-    - image: neotracker/neo-one-circleci-node:10.16.0-1
+    - image: neotracker/neo-one-circleci-node:10.16.0-2
 
 node12: &node12
   docker:
-    - image: neotracker/neo-one-circleci-node:12.4.0-1
+    - image: neotracker/neo-one-circleci-node:12.4.0-2
 
 version: 2
 jobs:

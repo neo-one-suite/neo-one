@@ -4,13 +4,12 @@
   "description": "NEO•ONE shared react.",
   "main": "./src/index",
   "dependencies": {
-    "@emotion/core": "10.0.14",
-    "@emotion/styled": "10.0.14",
-    "emotion-theming": "10.0.14",
+    "@emotion/core": "^10.0.16",
+    "@emotion/styled": "^10.0.15",
     "lodash": "^4.17.14",
-    "react": "16.9.0",
-    "rxjs": "6.5.2",
-    "styled-tools": "1.7.1"
+    "react": "^16.9.0",
+    "rxjs": "^6.5.2",
+    "styled-tools": "^1.7.1"
   },
   "sideEffects": false
 }

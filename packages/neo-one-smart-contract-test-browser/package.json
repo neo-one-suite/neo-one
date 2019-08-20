@@ -8,11 +8,10 @@
     "@neo-one/local-browser": "^1.1.5",
     "@neo-one/local-singleton": "^1.1.5",
     "@neo-one/node-browser": "^1.1.5",
-    "@neo-one/node-browser-worker": "^1.1.5",
     "@neo-one/smart-contract-test-common": "^1.1.5",
     "@neo-one/utils": "^1.1.3",
     "@neo-one/worker": "^1.1.2",
-    "tslib": "^1.9.3"
+    "tslib": "^1.10.0"
   },
   "sideEffects": false
 }

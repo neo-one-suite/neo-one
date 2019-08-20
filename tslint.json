@@ -9,7 +9,18 @@
     "./node_modules/rxjs-tslint-rules/dist/rules"
   ],
   "linterOptions": {
-    "exclude": ["./packages/*/package.json", "./packages/*/template/**/*.ts", "./packages/*/template/**/*.tsx"]
+    "exclude": [
+      "./packages/*/package.json",
+      "./packages/*/template/**/*.ts",
+      "./packages/*/template/**/*.tsx",
+      "./packages/neo-one-cli/src/__data__/projects/*/contracts/**/*.ts",
+      "./packages/neo-one-smart-contract/src/*.d.ts",
+      "./packages/neo-one-smart-contract-compiler/src/__data__/snippets/**/*.ts",
+      "./packages/neo-one-smart-contract-lib/src/*.ts",
+      "./packages/*/src/__data__/contracts/*.ts",
+      "./packages/neo-one-playground",
+      "./cypress/**/*"
+    ]
   },
   "defaultSeverity": "warning",
   "rules": {

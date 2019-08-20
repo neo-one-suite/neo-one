@@ -8,12 +8,12 @@
     "execa": "^2.0.4",
     "npm-package-arg": "^6.1.0",
     "pino": "^5.12.6",
-    "yargs": "^13.3.0"
+    "yargs": "^14.0.0"
   },
   "devDependencies": {
-    "@types/npm-package-arg": "6.1.0",
-    "@types/pino": "5.8.8",
-    "@types/yargs": "13.0.2"
+    "@types/npm-package-arg": "^6.1.0",
+    "@types/pino": "^5.8.9",
+    "@types/yargs": "^13.0.2"
   },
   "sideEffects": false
 }

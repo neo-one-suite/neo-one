@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
-import { Box, ButtonBase } from '@neo-one/react-common';
+import { Box, ButtonBase, ifProp, prop, withProp } from '@neo-one/react-common';
 import * as React from 'react';
-import { ifProp, prop, withProp } from 'styled-tools';
 
 const ButtonWrapper = styled(ButtonBase)`
   padding: 8px;
@@ -23,7 +22,7 @@ const TextWrapper = styled(Box)<{ readonly selected: boolean }>`
   /* stylelint-disable-next-line */
   border-bottom: ${ifProp(
     'selected',
-    withProp('theme.gray0', (color) => `1px solid ${color}`),
+    withProp('theme.gray0', (color: string) => `1px solid ${color}`),
     '1px solid transparent',
   )};
 

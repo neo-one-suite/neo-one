@@ -20,6 +20,7 @@ export * from './ToolbarContent';
 export * from './ToolbarFocusable';
 export * from './styledProps';
 export * from './theme';
+export * from './tools';
 export * from './useStream';
 export * from './use';
 export * from './utils';

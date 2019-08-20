@@ -29,13 +29,8 @@ describe('NumericLiteralCompiler', () => {
   test('To the E', async () => {
     await helpers.executeString(`
       const toTheE = 123e5;
-      const toTheNegativeE = 123e-5;
 
       if (toTheE !== 12300000 ) {
-        throw 'Failure';
-      }
-
-      if (toTheNegativeE !== 0.00123 ) {
         throw 'Failure';
       }
     `);

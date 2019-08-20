@@ -6,10 +6,10 @@
   "dependencies": {
     "lodash": "^4.17.14",
     "source-map": "^0.7.3",
-    "typescript": "3.5.3"
+    "typescript": "^3.5.3"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.136"
+    "@types/lodash": "^4.14.137"
   },
   "sideEffects": false
 }

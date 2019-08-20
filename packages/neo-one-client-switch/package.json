@@ -6,31 +6,31 @@
   "browser": "./src/index.browser",
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
-    "@ledgerhq/hw-transport-u2f": "4.68.2",
+    "@ledgerhq/hw-transport-u2f": "^4.68.2",
     "@neo-one/client-common": "^1.3.0",
     "@neo-one/node-vm": "^1.2.1",
     "@neo-one/utils": "^1.1.3",
     "@opencensus/core": "^0.0.16",
-    "@opencensus/exporter-prometheus": "^0.0.16",
     "@opencensus/exporter-jaeger": "^0.0.16",
+    "@opencensus/exporter-prometheus": "^0.0.16",
     "@opencensus/nodejs-base": "^0.0.16",
     "@opencensus/propagation-tracecontext": "^0.0.16",
-    "@opencensus/web-core": "^0.0.3",
-    "@opencensus/web-types": "^0.0.3",
-    "@opencensus/web-propagation-tracecontext": "^0.0.3",
+    "@opencensus/web-core": "^0.0.5",
+    "@opencensus/web-propagation-tracecontext": "^0.0.5",
+    "@opencensus/web-types": "^0.0.5",
     "lodash": "^4.17.14",
     "source-map": "^0.7.3",
-    "tslib": "^1.9.3"
+    "tslib": "^1.10.0"
   },
   "devDependencies": {
-    "@types/babel__code-frame": "7.0.1",
-    "@types/ledgerhq__hw-transport": "4.21.1",
-    "@types/ledgerhq__hw-transport-node-hid": "4.22.1",
-    "@types/ledgerhq__hw-transport-u2f": "4.21.1",
-    "@types/lodash": "4.14.136"
+    "@types/babel__code-frame": "^7.0.1",
+    "@types/ledgerhq__hw-transport": "^4.21.1",
+    "@types/ledgerhq__hw-transport-node-hid": "^4.22.1",
+    "@types/ledgerhq__hw-transport-u2f": "^4.21.1",
+    "@types/lodash": "^4.14.137"
   },
   "optionalDependencies": {
-    "@ledgerhq/hw-transport-node-hid": "4.68.2"
+    "@ledgerhq/hw-transport-node-hid": "^4.68.2"
   },
   "sideEffects": false
 }

@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
-import { Box } from '@neo-one/react-common';
-import { prop, switchProp } from 'styled-tools';
+import { Box, prop, switchProp } from '@neo-one/react-common';
 
 export const ContentWrapper = styled(Box)<{ readonly bg: string }>`
   display: grid;

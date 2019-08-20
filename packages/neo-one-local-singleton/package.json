@@ -7,7 +7,7 @@
     "@neo-one/local-browser": "^1.1.5",
     "@neo-one/node-browser": "^1.1.5",
     "@neo-one/worker": "^1.1.2",
-    "tslib": "^1.9.3"
+    "tslib": "^1.10.0"
   },
   "sideEffects": false
 }

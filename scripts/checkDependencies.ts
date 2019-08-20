@@ -1,3 +1,4 @@
+// tslint:disable no-console
 import execa from 'execa';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
@@ -5,10 +6,8 @@ import * as path from 'path';
 
 const log = (value: string | Error) => {
   if (value instanceof Error) {
-    // tslint:disable-next-line no-console
     console.error(value);
   } else {
-    // tslint:disable-next-line no-console
     console.log(value);
   }
 };
@@ -83,14 +82,24 @@ const checkPackage = async (pkg: string) => {
   const pkgJSONContents = await fs.readFile(path.resolve(dir, pkg, 'package.json'), 'utf8');
 
   const pkgJSON = JSON.parse(pkgJSONContents);
-  const dependencies = pkgJSON.dependencies;
-  if (dependencies !== undefined) {
-    await Promise.all(
-      Object.keys(dependencies).map(async (dependency) => checkDependency(pkg, dependency, dependencies)),
-    );
+  const deps = pkgJSON.dependencies === undefined ? [] : pkgJSON.dependencies;
+  const devDeps = pkgJSON.devDependencies === undefined ? [] : pkgJSON.devDependencies;
+  const dependencies = { ...deps, ...devDeps };
+  await Promise.all(
+    Object.keys(dependencies).map(async (dependency) => checkDependency(pkg, dependency, dependencies)),
+  );
+
+  Object.entries(dependencies).forEach(([dep, version]) => {
+    if (!(version as string).startsWith('^')) {
+      console.log(`${pkg}: ${dep} missing caret`);
+    }
+  });
+
+  if (Object.keys(deps).some((dep) => dep.startsWith('@types'))) {
+    console.log(`${pkg} contains @types in dependencies`);
   }
 
-  return mergeDependencies(getDependencies(pkgJSON.dependencies), getDependencies(pkgJSON.dependencies));
+  return mergeDependencies(getDependencies(pkgJSON.dependencies), getDependencies(pkgJSON.devDependencies));
 };
 
 const run = async () => {

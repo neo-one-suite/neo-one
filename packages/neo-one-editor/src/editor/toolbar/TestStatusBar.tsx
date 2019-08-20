@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
-import { Box } from '@neo-one/react-common';
+import { Box, prop } from '@neo-one/react-common';
 import * as React from 'react';
-import { prop } from 'styled-tools';
 
 const Wrapper = styled(Box)<Props>`
   display: grid;

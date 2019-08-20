@@ -1,9 +1,8 @@
 import { css } from '@emotion/core';
 import styled from '@emotion/styled';
-import { Box } from '@neo-one/react-common';
+import { Box, prop } from '@neo-one/react-common';
 import * as React from 'react';
 import { MdError, MdWarning } from 'react-icons/md';
-import { prop } from 'styled-tools';
 import { FileDiagnostic, TextRange } from '../types';
 import { ProblemWrapper } from './ProblemWrapper';
 

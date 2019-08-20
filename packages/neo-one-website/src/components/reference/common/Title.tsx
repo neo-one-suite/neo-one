@@ -1,7 +1,6 @@
 // stylelint-disable
 import styled from '@emotion/styled';
-import { H2 } from '@neo-one/react-common';
-import { ifProp, prop } from 'styled-tools';
+import { H2, ifProp, prop } from '@neo-one/react-common';
 
 export const Title = styled(H2)<{ readonly subheading?: boolean }>`
   ${prop('theme.fonts.axiformaBold')};

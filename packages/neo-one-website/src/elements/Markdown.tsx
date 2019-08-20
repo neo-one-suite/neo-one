@@ -1,6 +1,6 @@
 import { css } from '@emotion/core';
 import styled from '@emotion/styled';
-import { theme } from '@neo-one/react-common';
+import { prop, switchProp, theme } from '@neo-one/react-common';
 import MarkdownIt from 'markdown-it';
 // @ts-ignore
 // tslint:disable-next-line: no-submodule-imports
@@ -9,7 +9,6 @@ import anchor from 'markdown-it-anchor/dist/markdownItAnchor.js';
 import container from 'markdown-it-container';
 import * as React from 'react';
 import slugify from 'slugify';
-import { prop, switchProp } from 'styled-tools';
 import { Prism } from '../common';
 import { markdownTOC } from './markdownTOC';
 
@@ -74,7 +73,8 @@ const headerMargins = css`
   margin-bottom: 24px;
 `;
 
-const lightCode = (props: { readonly theme: typeof theme; readonly light: boolean }) => {
+// tslint:disable-next-line no-any
+const lightCode: any = (props: { readonly theme: typeof theme; readonly light: boolean }) => {
   if (props.light) {
     return css`
       background-color: ${props.theme.gray1};

@@ -1,8 +1,7 @@
 import styled from '@emotion/styled';
-import { Box, ButtonBase } from '@neo-one/react-common';
+import { Box, ButtonBase, ifProp, prop } from '@neo-one/react-common';
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { ifProp, prop } from 'styled-tools';
 import { TestSuite } from '../../types';
 import { selectTestSuite } from '../redux';
 import { FileText } from './FileText';
