@@ -23,7 +23,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=8.16.0"
+    "node": ">=10.16.0"
   },
   "browserslist": [
     "last 2 chrome versions",

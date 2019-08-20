@@ -1,16 +1,4 @@
 aliases:
-  - &restore-yarn-cache-8
-    keys:
-      - v5-yarn-8-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      # Fallback in case checksum fails
-      - v5-yarn-8-{{ .Branch }}-
-
-  - &save-yarn-cache-8
-    paths:
-      - node_modules
-      - ~/.cache/yarn
-    key: v5-yarn-8-{{ .Branch }}-{{ checksum "yarn.lock" }}
-
   - &restore-yarn-cache-10
     keys:
       - v5-yarn-10-{{ .Branch }}-{{ checksum "yarn.lock" }}
@@ -64,49 +52,6 @@ aliases:
           name: Lint
           command: yarn lint
           when: always
-
-  - &build-e2e8
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - restore-cache: *restore-yarn-cache-8
-      - run: *yarn
-      - save-cache: *save-yarn-cache-8
-      - run:
-          name: Build
-          command: yarn build:e2e
-      - persist_to_workspace:
-          root: ~/neo-one
-          paths:
-            - dist
-            - node_modules
-
-  - &test8
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - restore-cache: *restore-yarn-cache-8
-      - run: *yarn
-      - save-cache: *save-yarn-cache-8
-      - run:
-          name: Test
-          command: yarn test-ci-8 $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings)
-      - store_test_results:
-          path: reports
-    parallelism: 2
-
-  - &e2e8
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ./
-      - run:
-          name: E2E
-          command: yarn e2e-ci-8 $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
-      - store_test_results:
-          path: reports
-    parallelism: 2
 
   - &build-e2e10
     working_directory: ~/neo-one
@@ -210,10 +155,6 @@ aliases:
           path: reports
     parallelism: 2
 
-node8: &node8
-  docker:
-    - image: neotracker/neo-one-circleci-node:8.16.0-5
-
 node10: &node10
   docker:
     - image: neotracker/neo-one-circleci-node:10.16.0-2
@@ -224,16 +165,6 @@ node12: &node12
 
 version: 2
 jobs:
-  test8:
-    <<: *node8
-    <<: *test8
-  e2e8:
-    <<: *node8
-    <<: *e2e8
-  build-e2e8:
-    <<: *node8
-    <<: *build-e2e8
-
   test10:
     <<: *node10
     <<: *test10
@@ -260,16 +191,6 @@ jobs:
 
 workflows:
   version: 2
-  test8:
-    jobs:
-      - build-e2e8:
-          filters: *filter-ignore-bors-tmp
-      - test8:
-          filters: *filter-ignore-bors-tmp
-      - e2e8:
-          requires:
-            - build-e2e8
-          filters: *filter-ignore-bors-tmp
   test10:
     jobs:
       - build-e2e10:
