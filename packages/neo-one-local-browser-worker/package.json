@@ -13,7 +13,7 @@
     "rxjs": "^6.5.2"
   },
   "devDependencies": {
-    "@types/nanoid": "^2.0.0"
+    "@types/nanoid": "2.0.0"
   },
   "sideEffects": false
 }

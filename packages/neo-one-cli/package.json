@@ -28,9 +28,9 @@
     "yargs": "^14.0.0"
   },
   "devDependencies": {
-    "@types/fs-extra": "^8.0.0",
-    "@types/listr": "^0.14.2",
-    "@types/yargs": "^13.0.2"
+    "@types/fs-extra": "8.0.0",
+    "@types/listr": "0.14.2",
+    "@types/yargs": "13.0.2"
   },
   "sideEffects": false
 }

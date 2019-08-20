@@ -11,8 +11,8 @@
     "@neo-one/client-common": "^1.3.0",
     "@neo-one/client-core": "^1.3.0",
     "@neo-one/smart-contract-test": "^1.1.5",
-    "bignumber.js": "^9.0.0",
-    "tslib": "^1.10.0"
+    "bignumber.js": "9.0.0",
+    "tslib": "1.10.0"
   },
   "sideEffects": false
 }

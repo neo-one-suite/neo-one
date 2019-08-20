@@ -15,7 +15,7 @@
     "yargs": "^14.0.0"
   },
   "devDependencies": {
-    "@types/rc": "^1.1.0"
+    "@types/rc": "1.1.0"
   },
   "sideEffects": false
 }

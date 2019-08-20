@@ -12,11 +12,11 @@
   },
   "devDependencies": {
     "@neo-one/smart-contract-compiler-node": "^1.1.4",
-    "@types/lodash": "^4.14.137",
-    "@types/toposort": "^2.0.1",
-    "app-root-dir": "^1.0.2",
-    "fs-extra": "^8.1.0",
-    "yargs": "^14.0.0"
+    "@types/lodash": "4.14.137",
+    "@types/toposort": "2.0.3",
+    "app-root-dir": "1.0.2",
+    "fs-extra": "8.1.0",
+    "yargs": "14.0.0"
   },
   "sideEffects": false
 }

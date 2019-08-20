@@ -11,9 +11,9 @@
     "tslib": "^1.10.0"
   },
   "devDependencies": {
-    "@types/convict": "^4.2.1",
-    "@types/cosmiconfig": "^5.0.3",
-    "@types/fs-extra": "^8.0.0"
+    "@types/convict": "4.2.1",
+    "@types/cosmiconfig": "5.0.3",
+    "@types/fs-extra": "8.0.0"
   },
   "sideEffects": false
 }

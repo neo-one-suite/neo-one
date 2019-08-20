@@ -9,7 +9,7 @@
     "pino-pretty": "^3.2.1"
   },
   "devDependencies": {
-    "@types/pino": "^5.8.9"
+    "@types/pino": "5.8.9"
   },
   "sideEffects": false
 }

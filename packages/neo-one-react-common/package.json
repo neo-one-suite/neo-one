@@ -16,8 +16,8 @@
     "trackjs": "^3.3.0"
   },
   "devDependencies": {
-    "@types/react": "^16.8.23",
-    "@types/react-select": "^3.0.0"
+    "@types/react": "16.9.2",
+    "@types/react-select": "3.0.2"
   },
   "sideEffects": [
     "*.css"
