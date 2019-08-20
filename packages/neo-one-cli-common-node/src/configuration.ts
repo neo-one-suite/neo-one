@@ -63,7 +63,7 @@ const getProjectFramework = async (rootDir: string): Promise<CodegenFramework> =
   // tslint:disable-next-line no-any
   let pkg: any;
   try {
-    pkg = fs.readFile(nodePath.resolve(rootDir, 'package.json'), 'utf8');
+    pkg = await fs.readFile(nodePath.resolve(rootDir, 'package.json'), 'utf8');
   } catch (err) {
     if (err.code === 'ENOENT') {
       return 'none';
