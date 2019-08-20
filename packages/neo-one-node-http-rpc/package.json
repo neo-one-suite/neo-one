@@ -6,6 +6,7 @@
   "dependencies": {
     "@neo-one/cli-common-node": "^1.1.5",
     "@neo-one/http": "^1.1.4",
+    "@neo-one/http-context": "^1.1.4",
     "@neo-one/logger": "^1.0.0",
     "@neo-one/monitor": "^1.1.4",
     "@neo-one/node-core": "^1.1.5",

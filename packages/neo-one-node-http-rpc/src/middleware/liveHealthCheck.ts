@@ -1,4 +1,4 @@
-import { getLogger } from '@neo-one/http';
+import { getLogger } from '@neo-one/http-context';
 import { Blockchain } from '@neo-one/node-core';
 import { Context } from 'koa';
 import { checkReady, Options as CheckReadyOptions } from './checkReady';

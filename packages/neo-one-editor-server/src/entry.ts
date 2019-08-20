@@ -1,4 +1,4 @@
-import { bodyParser, context, cors, onError as appOnError, setupServer } from '@neo-one/http';
+import { bodyParser, cors, setupServer } from '@neo-one/http';
 import { editorLogger, getFinalLogger } from '@neo-one/logger';
 import * as http from 'http';
 import Application from 'koa';
@@ -53,12 +53,9 @@ const app = new Application<any, {}>();
 app.proxy = true;
 app.silent = true;
 
-app.on('error', appOnError(editorLogger));
-
 // tslint:disable-next-line:no-any
 const router = new Router<any, {}>();
 
-router.use(context(editorLogger));
 router.use(cors).post('resolveDependencies', '/resolve', compose([koaCompress(), bodyParser(), resolveMiddleware]));
 router.use(cors).get('resolvePackage', '/pkg', compose([koaCompress(), pkgMiddleware]));
 

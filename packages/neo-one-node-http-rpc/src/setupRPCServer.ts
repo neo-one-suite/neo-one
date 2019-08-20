@@ -1,4 +1,5 @@
-import { context, cors, onError as appOnError, setupServer } from '@neo-one/http';
+import { cors, setupServer } from '@neo-one/http';
+import { context, onError as appOnError } from '@neo-one/http-context';
 import { nodeLogger, rpcLogger } from '@neo-one/logger';
 import { Blockchain, Node } from '@neo-one/node-core';
 import { Disposable, Labels } from '@neo-one/utils';

@@ -52,6 +52,7 @@ const watchServer = async () => {
 
   nodemon({
     script: nodePath.resolve(SERVER_DIST_DIR, 'index.js'),
+    watch: SERVER_DIST_DIR,
   });
 
   nodemon
