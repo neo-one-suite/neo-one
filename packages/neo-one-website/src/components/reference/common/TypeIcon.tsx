@@ -1,5 +1,6 @@
 // stylelint-disable
-import { Box, styledOmitProps } from '@neo-one/react-common';
+import styled from '@emotion/styled';
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import { ifProp, prop, switchProp } from 'styled-tools';
 import { TypeFilterOptions } from '../types';
@@ -14,7 +15,7 @@ interface StyledIconBoxProps {
   readonly fullIcon: boolean;
 }
 
-const IconBox = styledOmitProps<StyledIconBoxProps>(Box, ['bg', 'fullIcon'])`
+const IconBox = styled<typeof Box, StyledIconBoxProps>(Box)`
   background-color: ${switchProp('bg', {
     All: 'transparent',
     Class: prop('theme.primary'),

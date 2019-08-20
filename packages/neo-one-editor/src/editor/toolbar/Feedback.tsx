@@ -61,7 +61,7 @@ const ExperienceWrapper = styled(RowWrapper)`
   grid-gap: 8px;
 `;
 
-const InputBox = styled(Input)`
+const InputBox = styled(Input.withComponent('textarea'))`
   color: ${prop('theme.gray0')};
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};
@@ -89,7 +89,7 @@ const TweetButtonWrapper = styled(LinkBase)`
   grid-auto-columns: auto;
   grid-gap: 8px;
   background-color: #1da1f2;
-  color: #ffffff;
+  color: #fff;
   text-decoration: none;
   align-items: center;
   ${prop('theme.fonts.axiformaRegular')};
@@ -106,9 +106,8 @@ export const Feedback = (props: {}) => {
   const [text, setText] = useState('');
   const onClickHappy = useCallback(() => setHappy(true), [setHappy]);
   const onClickSad = useCallback(() => setHappy(false), [setHappy]);
-  const onChangeText = useCallback((event: React.ChangeEvent<HTMLInputElement>) => setText(event.currentTarget.value), [
-    setText,
-  ]);
+  // tslint:disable-next-line no-any
+  const onChangeText = useCallback((event: any) => setText(event.currentTarget.value), [setText]);
 
   return (
     <ToolbarPopover
@@ -137,7 +136,7 @@ export const Feedback = (props: {}) => {
           </ColumnWrapper>
           <BottomWrapper>
             <Text>Tell us why? ({257 - text.length} characters left)</Text>
-            <InputBox as="textarea" value={text} onChange={onChangeText} />
+            <InputBox value={text} onChange={onChangeText} />
             <TweetWrapper>
               <TweetButtonWrapper
                 href={`https://twitter.com/intent/tweet?hashtags=NEO&ref_src=twsrc%5Etfw&related=twitterapi%2Ctwitter&text=${encodeURIComponent(

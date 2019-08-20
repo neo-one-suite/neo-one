@@ -1,4 +1,5 @@
-import { bgColorWithProps, Box, styledOmitProps } from '@neo-one/react-core';
+import styled from '@emotion/styled';
+import { bgColorWithProps, Box } from '@neo-one/react-core';
 import * as React from 'react';
 import { prop, theme } from 'styled-tools';
 
@@ -25,11 +26,7 @@ const PopoverArrowComponent = (props: PopoverArrowProps & React.ComponentPropsWi
 
 const popoverTheme = theme('PopoverArrow');
 
-export const PopoverArrow = styledOmitProps<PopoverArrowProps>(
-  PopoverArrowComponent,
-  ['fillColor', 'strokeColor'],
-  popoverTheme,
-)`
+export const PopoverArrow = styled<typeof PopoverArrowComponent, PopoverArrowProps>(PopoverArrowComponent)`
   position: absolute;
   font-size: 30px;
   width: 1em;

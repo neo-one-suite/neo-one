@@ -40,7 +40,7 @@ export const useToasts = (): readonly [ReadonlyArray<Toast>, typeof addToast, ty
 
 export type AddError = (error: Error) => void;
 
-const ErrorText = styled(Box)`
+const ErrorText = styled(Box.withComponent('span'))`
   color: ${prop('theme.error')};
 `;
 
@@ -68,7 +68,7 @@ const createAddError = (addToastInternal: AddToast) => {
             id: `error:${mutableID}`,
             title: (
               <span data-test="neo-one-error-toast-title">
-                <ErrorText as="span">Error.&nbsp;</ErrorText>
+                <ErrorText>Error.&nbsp;</ErrorText>
                 <span>See console for more info.</span>
               </span>
             ),

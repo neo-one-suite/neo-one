@@ -1,10 +1,10 @@
+import styled from '@emotion/styled';
 import { theme } from 'styled-tools';
-import { bgColorWithProps, textColorWithProps } from './styledProps';
-import { styledOmitProps } from './utils';
+import { bgColorWithProps, ColorProps, textColorWithProps } from './styledProps';
 
 const boxTheme = theme('Box');
 
-export const Box = styledOmitProps('div', ['opaque', 'pallete', 'tone'], boxTheme)`
+export const Box = styled<'div', ColorProps>('div')`
   margin: unset;
   padding: unset;
   border: unset;

@@ -1,8 +1,8 @@
+import styled from '@emotion/styled';
 import { prop, switchProp } from 'styled-tools';
 import { LinkBase } from './LinkBase';
-import { styledOmitProps } from './utils';
 
-export const Link = styledOmitProps<{ readonly linkColor: string }>(LinkBase, ['linkColor'])`
+export const Link = styled<typeof LinkBase, { readonly linkColor: string }>(LinkBase)`
   color: ${switchProp('linkColor', {
     primary: prop('theme.primary'),
     accent: prop('theme.accent'),

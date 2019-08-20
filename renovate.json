@@ -1,5 +1,5 @@
 {
-  "extends": ["config:base", ":semanticCommits"],
+  "extends": ["config:base", ":semanticCommits", ":preserveSemverRanges"],
   "schedule": ["after 1am and before 5am on every weekday", "every weekend"],
   "timezone": "America/Los_Angeles",
   "updateNotScheduled": false,

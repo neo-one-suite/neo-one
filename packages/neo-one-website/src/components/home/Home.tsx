@@ -107,7 +107,9 @@ export const Home = (props: {}) => (
       <StyledLineLogoPrimary />
       <Headline>The One for easy, fast, & fun NEO blockchain development</Headline>
       <ButtonWrapper>
-        <StyledLinkButton to="docs/getting-started">Get Started</StyledLinkButton>
+        <StyledLinkButton linkColor="gray" to="docs/getting-started">
+          Get Started
+        </StyledLinkButton>
         <StyledLink to="course" linkColor="primary">
           Take Course >
         </StyledLink>

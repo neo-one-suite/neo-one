@@ -1,5 +1,4 @@
-import { styledOmitProps } from '@neo-one/react-common';
-// @ts-ignore
+import styled from '@emotion/styled';
 import * as React from 'react';
 import { ifProp, prop } from 'styled-tools';
 import { Prism } from '../../../common';
@@ -13,7 +12,7 @@ const checkPunctuation = (idx: number, example: WordTokens, value: string) =>
     ? `${value}`
     : `${value} `;
 
-const StyledReferenceLink = styledOmitProps<{ readonly code?: boolean }>(StyledRouterLink, ['code'])`
+const StyledReferenceLink = styled<typeof StyledRouterLink, { readonly code?: boolean }>(StyledRouterLink)`
   font-family: ${ifProp('code', "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace")};
   ${prop('theme.fontStyles.subheading')};
 `;

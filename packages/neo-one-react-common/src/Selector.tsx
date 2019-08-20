@@ -4,7 +4,7 @@ import { Input } from '@neo-one/react-core';
 import * as React from 'react';
 import { prop } from 'styled-tools';
 
-const StyledInput = styled(Input)`
+const StyledInput = styled(Input.withComponent('select'))`
   background-color: ${prop('theme.gray0')};
   outline: none;
   ${prop('theme.fonts.axiformaRegular')};
@@ -19,12 +19,8 @@ interface Props {
 }
 
 export const Selector = ({ options, selected, onChange, ...props }: Props) => (
-  <StyledInput
-    {...props}
-    as="select"
-    value={selected}
-    onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.value)}
-  >
+  // tslint:disable-next-line no-any
+  <StyledInput {...props} value={selected} onChange={(event: any) => onChange(event.target.value)}>
     {options.map((option) => (
       <option key={option}>{option}</option>
     ))}

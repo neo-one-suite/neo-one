@@ -12,7 +12,7 @@
     "buffer-xor": "^2.0.2",
     "elliptic": "^6.5.0",
     "hash.js": "^1.1.7",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.15",
     "rxjs": "^6.5.2",
     "scrypt-js": "^2.0.4",
     "source-map": "^0.7.3",

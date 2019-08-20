@@ -1,15 +1,13 @@
 import { css } from '@emotion/core';
+import styled from '@emotion/styled';
 import { ifProp, theme } from 'styled-tools';
 import { Box } from './Box';
-import { styledOmitProps } from './utils';
 
 const dividerTheme = theme('Divider');
 
-export const Divider = styledOmitProps<{ readonly vertical?: boolean }>(
-  Box.withComponent('hr'),
-  ['vertical'],
-  dividerTheme,
-)`
+const HRBox = Box.withComponent('hr');
+
+export const Divider = styled<typeof HRBox, { readonly vertical?: boolean }>(HRBox)`
   border-color: currentColor;
   border-style: solid;
   opacity: 0.2;

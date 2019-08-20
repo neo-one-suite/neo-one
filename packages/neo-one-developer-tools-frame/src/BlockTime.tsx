@@ -16,7 +16,8 @@ import { ToolbarButton } from './ToolbarButton';
 
 const { useState } = React;
 
-const StyledTime = styled(Box.withComponent('time'))`
+const Time = Box.withComponent('time');
+const StyledTime = styled<typeof Time, { readonly minWidth: number }>(Time)`
   min-width: ${prop('minWidth')}px;
 `;
 const getMinWidth = (value: string) => Math.max(30, value.length * 8);

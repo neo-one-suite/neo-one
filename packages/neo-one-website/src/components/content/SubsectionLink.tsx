@@ -1,31 +1,43 @@
 // tslint:disable no-null-keyword
 import styled from '@emotion/styled';
-import { Link as BaseLink, styledOmitProps } from '@neo-one/react-common';
+import { Link as BaseLink } from '@neo-one/react-common';
 import React from 'react';
 import { ifProp, prop } from 'styled-tools';
 import { StyledRouterLink } from '../StyledRouterLink';
 
-const getStyledLink = (linkFunc: typeof BaseLink) => styledOmitProps<{ readonly active: boolean }>(linkFunc, [
-  'active',
-])`
-${ifProp('active', prop('theme.fonts.axiformaBold'), prop('theme.fonts.axiformaRegular'))};
-${prop('theme.fontStyles.subheading')};
+const Link = styled<typeof StyledRouterLink, { readonly active: boolean }>(StyledRouterLink)`
+  ${ifProp('active', prop('theme.fonts.axiformaBold'), prop('theme.fonts.axiformaRegular'))};
+  ${prop('theme.fontStyles.subheading')};
 
-&:hover {
-  color: ${prop('theme.accent')};
-}
+  &:hover {
+    color: ${prop('theme.accent')};
+  }
 
-&:focus {
-  color: ${prop('theme.accent')};
-}
+  &:focus {
+    color: ${prop('theme.accent')};
+  }
 
-&.active {
-  color: ${prop('theme.accent')};
-}
+  &.active {
+    color: ${prop('theme.accent')};
+  }
 `;
 
-const Link = getStyledLink(StyledRouterLink);
-const TutorialLink = getStyledLink(BaseLink);
+const TutorialLink = styled<typeof BaseLink, { readonly active: boolean }>(BaseLink)`
+  ${ifProp('active', prop('theme.fonts.axiformaBold'), prop('theme.fonts.axiformaRegular'))};
+  ${prop('theme.fontStyles.subheading')};
+
+  &:hover {
+    color: ${prop('theme.accent')};
+  }
+
+  &:focus {
+    color: ${prop('theme.accent')};
+  }
+
+  &.active {
+    color: ${prop('theme.accent')};
+  }
+`;
 
 const ActiveBorder = styled.span`
   width: 4px;

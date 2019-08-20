@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box, styledOmitProps } from '@neo-one/react-common';
+import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import { ifProp, prop } from 'styled-tools';
 import { AdjacentInfo } from '../../types';
@@ -10,7 +10,7 @@ export interface Props {
   readonly next?: boolean;
 }
 
-const ArticleText = styledOmitProps<{ readonly next: boolean }>(Box, ['next'])`
+const ArticleText = styled<typeof Box, { readonly next: boolean }>(Box)`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.caption')};
   color: ${prop('theme.gray0')};

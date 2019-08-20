@@ -13,7 +13,7 @@
     "cross-fetch": "^3.0.4",
     "dataloader": "^1.4.0",
     "debug": "^4.1.1",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.15",
     "rxjs": "^6.5.2",
     "safe-stable-stringify": "^1.1.0",
     "tapable": "^1.1.3",

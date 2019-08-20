@@ -1,6 +1,6 @@
 // tslint:disable no-any
 import styled from '@emotion/styled';
-import { Box, Link, Logo, styledOmitProps, Toolbar, ToolbarContent, ToolbarFocusable } from '@neo-one/react-common';
+import { Box, Link, Logo, Toolbar, ToolbarContent, ToolbarFocusable } from '@neo-one/react-common';
 import * as React from 'react';
 import { ifProp, prop, withProp } from 'styled-tools';
 import { StyledRouterLinkBase } from './StyledRouterLink';
@@ -49,7 +49,7 @@ const LogoLink = styled(StyledRouterLinkBase)`
   }
 `;
 
-const NavigationLink = styledOmitProps<{ readonly active: boolean }>(StyledRouterLinkBase, ['active'])`
+const NavigationLink = styled<typeof StyledRouterLinkBase, { readonly active: boolean }>(StyledRouterLinkBase)`
   display: flex;
   align-items: center;
   ${prop('theme.fontStyles.headline')};
@@ -103,7 +103,7 @@ export const Header = ({ path, ...props }: Props & React.ComponentProps<typeof W
     <StyledToolbar>
       <LeftHeader>
         <ToolbarFocusable>
-          <LogoLink data-test="header-logo" to="/">
+          <LogoLink data-test="header-logo" to="/" linkColor="gray">
             <Logo />
           </LogoLink>
         </ToolbarFocusable>

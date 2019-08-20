@@ -11,7 +11,7 @@ import { ToolbarButton } from './ToolbarButton';
 
 const { useCallback } = React;
 
-const IndexWrapper = styled(Box)`
+const IndexWrapper = styled<typeof Box, { readonly width: number }>(Box)`
   width: ${prop('width')}px;
 `;
 

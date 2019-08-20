@@ -1,6 +1,7 @@
 // tslint:disable no-null-keyword no-object-mutation
 import { css } from '@emotion/core';
-import { Box, callAll, styledOmitProps } from '@neo-one/react-core';
+import styled from '@emotion/styled';
+import { Box, callAll } from '@neo-one/react-core';
 import * as React from 'react';
 import { ifProp, theme } from 'styled-tools';
 import {
@@ -170,7 +171,7 @@ const HiddenComponent = forwardRef<HTMLDivElement, HiddenProps & React.Component
   },
 );
 
-interface HiddenStyledProps {
+export interface HiddenStyledProps {
   readonly duration?: string;
   readonly timing?: string;
   readonly delay?: string;
@@ -179,10 +180,6 @@ interface HiddenStyledProps {
   readonly originX?: string | number;
   readonly originY?: string | number;
   readonly slideOffset?: string | number;
-  // tslint:disable-next-line:no-any
-  readonly defaultSlide: any;
-  // tslint:disable-next-line:no-any
-  readonly defaultExpand: any;
 }
 
 const hiddenTheme = theme('Hidden');
@@ -214,36 +211,21 @@ const hiddenTransition = (props: any) => {
     `;
   }
 
-  return '';
+  return css`
+    display: none !important;
+  `;
 };
 
-export const Hidden = styledOmitProps<HiddenStyledProps>(
-  HiddenComponent,
-  [
-    'duration',
-    'timing',
-    'delay',
-    'translateX',
-    'translateY',
-    'originX',
-    'originY',
-    'defaultSlide',
-    'defaultExpand',
-    'slideOffset',
-  ],
-  hiddenTheme,
-)`
-  transition: ${css`
-    font-style: normal;
-    font-weight: 400;
-  `}
+export const Hidden = styled<typeof HiddenComponent, HiddenStyledProps>(HiddenComponent)`
   transform: ${translateWithProps};
   ${hiddenTransformOrigin};
+
   &[aria-hidden='true'] {
     pointer-events: none;
     ${ifProp('fade', 'opacity: 0')};
     ${hiddenTransition};
   }
+
   ${hiddenTheme};
 `;
 

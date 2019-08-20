@@ -1,4 +1,4 @@
-// tslint:disable no-console
+// tslint:disable no-console no-any
 import execa from 'execa';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
@@ -78,9 +78,7 @@ const getDependencies = (obj: { readonly [name: string]: string } | undefined): 
   );
 };
 
-const checkPackage = async (pkg: string) => {
-  const pkgJSONContents = await fs.readFile(path.resolve(dir, pkg, 'package.json'), 'utf8');
-
+const checkPackageJSON = async (pkg: string, pkgJSONContents: any) => {
   const pkgJSON = JSON.parse(pkgJSONContents);
   const deps = pkgJSON.dependencies === undefined ? [] : pkgJSON.dependencies;
   const devDeps = pkgJSON.devDependencies === undefined ? [] : pkgJSON.devDependencies;
@@ -102,11 +100,26 @@ const checkPackage = async (pkg: string) => {
   return mergeDependencies(getDependencies(pkgJSON.dependencies), getDependencies(pkgJSON.devDependencies));
 };
 
+const checkPackage = async (pkg: string) => {
+  const pkgJSONContents = await fs.readFile(path.resolve(dir, pkg, 'package.json'), 'utf8');
+
+  return checkPackageJSON(pkg, pkgJSONContents);
+};
+
 const run = async () => {
   log('Checking dependencies...');
-  const packages = await fs.readdir(dir);
+  const [packages, pkgJSONContents] = await Promise.all([
+    fs.readdir(dir),
+    fs.readFile(path.resolve(__dirname, '..', 'package.json'), 'utf8'),
+  ]);
 
-  const depsList = await Promise.all(packages.filter((pkg) => pkg.startsWith('neo-one')).map(checkPackage));
+  const depsList = await Promise.all(
+    packages
+      .filter((pkg) => pkg.startsWith('neo-one'))
+      .map(checkPackage)
+      .concat(checkPackageJSON('root', pkgJSONContents)),
+  );
+
   const allDeps = depsList.reduce(mergeDependencies, {});
   Object.entries(allDeps)
     .filter((value) => value[1].size > 1)

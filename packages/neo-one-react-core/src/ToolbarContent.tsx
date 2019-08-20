@@ -1,6 +1,6 @@
+import styled from '@emotion/styled';
 import { prop, theme } from 'styled-tools';
 import { Box } from './Box';
-import { styledOmitProps } from './utils';
 
 export interface ToolbarContentProps {
   readonly align?: 'start' | 'center' | 'end';
@@ -8,7 +8,7 @@ export interface ToolbarContentProps {
 
 const toolbarContentTheme = theme('ToolbarContent');
 
-export const ToolbarContent = styledOmitProps<ToolbarContentProps>(Box, ['align'], toolbarContentTheme)`
+export const ToolbarContent = styled<typeof Box, ToolbarContentProps>(Box)`
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: min-content;

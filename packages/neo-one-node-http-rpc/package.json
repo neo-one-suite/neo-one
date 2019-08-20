@@ -18,7 +18,7 @@
     "koa-compress": "^3.0.0",
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.15",
     "tslib": "^1.10.0"
   },
   "devDependencies": {

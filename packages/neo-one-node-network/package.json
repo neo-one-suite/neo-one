@@ -8,7 +8,7 @@
     "@neo-one/logger": "^1.0.0",
     "@neo-one/node-core": "^1.1.5",
     "@neo-one/utils": "^1.1.3",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.15",
     "tslib": "^1.10.0"
   },
   "devDependencies": {

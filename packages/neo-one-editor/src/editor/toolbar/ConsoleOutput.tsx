@@ -1,4 +1,5 @@
-import { Box, styledOmitProps } from '@neo-one/react-common';
+import styled from '@emotion/styled';
+import { Box } from '@neo-one/react-common';
 // @ts-ignore
 import Scrollable from '@render-props/scrollable';
 import * as React from 'react';
@@ -11,7 +12,7 @@ import {
   selectConsoleOutputOwner,
 } from '../redux';
 
-const Wrapper = styledOmitProps<{ readonly shadowed: boolean }>(Box, ['shadowed'])`
+const Wrapper = styled<typeof Box, { readonly shadowed: boolean }>(Box)`
   color: ${prop('theme.gray0')};
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};

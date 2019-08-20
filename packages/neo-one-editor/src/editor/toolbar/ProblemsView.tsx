@@ -1,5 +1,6 @@
 // tslint:disable no-any
-import { Box, styledOmitProps } from '@neo-one/react-common';
+import styled from '@emotion/styled';
+import { Box } from '@neo-one/react-common';
 // @ts-ignore
 import Scrollable from '@render-props/scrollable';
 import _ from 'lodash';
@@ -10,7 +11,7 @@ import { FileProblems, selectConsoleProblems } from '../redux';
 import { TextRange } from '../types';
 import { ProblemView } from './ProblemView';
 
-const Wrapper = styledOmitProps<{ readonly shadowed: boolean }>(Box, ['shadowed'])`
+const Wrapper = styled<typeof Box, { readonly shadowed: boolean }>(Box)`
   display: grid;
   align-content: start;
   width: 100%;
