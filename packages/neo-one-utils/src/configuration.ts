@@ -1,5 +1,4 @@
 export type CodegenFramework = 'none' | 'react' | 'angular' | 'vue';
-export type CodegenLanguage = 'typescript' | 'javascript';
 
 export interface ContractsConfiguration {
   readonly path: string;
@@ -7,7 +6,6 @@ export interface ContractsConfiguration {
 
 export interface CodegenConfiguration {
   readonly path: string;
-  readonly language: CodegenLanguage;
   readonly framework: CodegenFramework;
   readonly browserify: boolean;
 }

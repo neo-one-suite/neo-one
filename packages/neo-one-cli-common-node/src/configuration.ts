@@ -16,10 +16,6 @@ export const configurationSchema = {
       format: String,
       default: nodePath.join('src', 'neo-one'),
     },
-    language: {
-      format: ['typescript', 'javascript'],
-      default: 'typescript',
-    },
     framework: {
       format: ['none', 'react', 'angular', 'vue'],
       default: 'none',
