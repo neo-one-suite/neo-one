@@ -1,6 +1,6 @@
 /// <reference types="@reactivex/ix-es2015-cjs" />
 import { common, crypto, ECPoint, PrivateKey, UInt160 } from '@neo-one/client-common';
-import { nodeLogger } from '@neo-one/logger';
+import { createChild, nodeLogger } from '@neo-one/logger';
 import { ConsensusPayload, Node, Transaction } from '@neo-one/node-core';
 import { composeDisposables, Disposable, noopDisposable, utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
@@ -15,7 +15,7 @@ import { handleTransactionReceived } from './handleTransactionReceived';
 import { runConsensus } from './runConsensus';
 import { Event, Result } from './types';
 
-const logger = nodeLogger.child({ component: 'consensus' });
+const logger = createChild(nodeLogger, { component: 'consensus' });
 
 export interface Options {
   readonly privateKey: string;

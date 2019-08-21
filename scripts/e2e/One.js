@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const http = require('http');
 const execa = require('execa');
-const cosmiconfig = require('cosmiconfig');
 const fs = require('fs-extra');
 const nodePath = require('path');
 const tmp = require('tmp');
@@ -86,6 +85,39 @@ class One {
     return proc;
   }
 
+  execBaseNode(commandIn, environment) {
+    const cmd = nodePath.resolve(
+      process.cwd(),
+      'dist',
+      'neo-one',
+      'node_modules',
+      '.bin',
+      'neo-one-node',
+    );
+    const args = commandIn.split(' ');
+    const proc = execa(cmd, args, environment);
+    // Uncomment these lines to debug e2e tests.
+    // proc.stdout.pipe(process.stdout);
+    // proc.stderr.pipe(process.stderr);
+    return proc;
+  }
+
+  createNodeProject(project) {
+    const environment = this._getEnvNode(project);
+    return {
+      exec: (command, options = {}) => {
+        const proc = this.execBaseNode(command, { ...options, environment });
+        this.mutableCleanup.push(async () => {
+          proc.kill();
+          await proc.catch(() => {
+            // do nothing
+          });
+        });
+      },
+      env: environment.env,
+    };
+  }
+
   createExecAsync(project) {
     return (command, options = {}) => {
       const proc = this.execBase(command, project, options);
@@ -139,6 +171,25 @@ class One {
     }
 
     throw finalError;
+  }
+
+  _getEnvNode(project) {
+    this.projectEnv[project] = this.projectEnv[project] || {
+      ..._.fromPairs(
+        _.range(this.minPort, this.maxPort).map((port, idx) => [
+          `NEO_ONE_PORT_${idx}`,
+          port,
+        ]),
+      ),
+      NEO_ONE_TMP_DIR: this.getTmpDir(),
+    };
+
+    return {
+      maxBuffer: 20000 * 1024,
+      windowsHide: true,
+      env: this.projectEnv[project],
+      cwd: this.projectEnv[project].NEO_ONE_TMP_DIR,
+    };
   }
 
   _getEnv(project, options = {}) {

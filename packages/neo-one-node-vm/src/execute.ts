@@ -1,5 +1,5 @@
 import { crypto, utils, VMState } from '@neo-one/client-common';
-import { nodeLogger } from '@neo-one/logger';
+import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Block,
   ByteArrayContractParameter,
@@ -33,7 +33,7 @@ import {
 import { lookupOp } from './opcodes';
 import { StackItem } from './stackItem';
 
-const logger = nodeLogger.child({ component: 'vm' });
+const logger = createChild(nodeLogger, { component: 'vm' });
 
 const getErrorMessage = (error: Error) => `${error.message}\n${error.stack}`;
 

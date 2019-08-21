@@ -8,7 +8,7 @@ import {
   utils,
 } from '@neo-one/client-common';
 import { AggregationType, globalStats, MeasureUnit, TagMap } from '@neo-one/client-switch';
-import { nodeLogger } from '@neo-one/logger';
+import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Account,
   Blockchain,
@@ -25,7 +25,7 @@ import {
 import { Labels, labelToTag } from '@neo-one/utils';
 import { filter, switchMap, take, timeout, toArray } from 'rxjs/operators';
 
-const logger = nodeLogger.child({ component: 'rpc-handler' });
+const logger = createChild(nodeLogger, { component: 'rpc-handler' });
 
 export type HandlerPrimitive = string | number | boolean;
 export type HandlerResult =
