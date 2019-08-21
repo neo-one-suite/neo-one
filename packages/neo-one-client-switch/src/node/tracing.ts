@@ -31,6 +31,8 @@ const startTracing = (config: Config) => {
   };
 };
 
+const getNewPropagation = () => new TraceContextFormat();
+
 export {
   AggregationType,
   Config as TracingConfig,
@@ -46,6 +48,6 @@ export {
   SpanKind,
   startTracing,
   TagMap,
-  TraceContextFormat,
+  getNewPropagation,
   tracer,
 };

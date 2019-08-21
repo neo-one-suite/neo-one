@@ -1,11 +1,11 @@
 import {
+  getNewPropagation,
   globalStats,
   JaegerTraceExporter,
   JaegerTraceExporterOptions,
   PrometheusExporterOptions,
   PrometheusStatsExporter,
   startTracing,
-  TraceContextFormat,
   TracingConfig,
 } from '@neo-one/client-switch';
 import { setGlobalLogLevel } from '@neo-one/logger';
@@ -94,7 +94,7 @@ export const startFullNode = async ({
 
         const stopTracing = startTracing({
           ...telemetry.tracing,
-          propagation: new TraceContextFormat(),
+          propagation: getNewPropagation(),
           exporter,
         });
 

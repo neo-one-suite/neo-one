@@ -32,7 +32,7 @@ export const testRunner = ({ stage }: { readonly stage: Stage }): webpack.Config
             <head>
               <meta charset="UTF-8">
               <title>${title}</title>
-              ${MiniHtmlWebpackPlugin.generateCSSReferences(css, publicPath)}
+              ${MiniHtmlWebpackPlugin.generateCSSReferences({ files: css, publicPath })}
               <style>
                 body {
                   margin: 0;
@@ -43,7 +43,7 @@ export const testRunner = ({ stage }: { readonly stage: Stage }): webpack.Config
             </head>
             <body>
               <div id="app"></div>
-              ${MiniHtmlWebpackPlugin.generateJSReferences(js, publicPath)}
+              ${MiniHtmlWebpackPlugin.generateJSReferences({ files: js, publicPath })}
             </body>
           </html>`,
     }),

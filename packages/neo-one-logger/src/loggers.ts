@@ -3,18 +3,23 @@ import { getPretty } from '@neo-one/logger-config';
 import pino from 'pino';
 
 const createLogger = (name: string, options: pino.LoggerOptions = {}) =>
-  pino(
-    { ...options, name, prettyPrint: getPretty() },
-    process.env.NODE_ENV === 'production' ? pino.extreme(1) : pino.destination(2),
-  );
+  options.browser !== undefined
+    ? pino({ ...options, name, prettyPrint: getPretty() })
+    : pino(
+        { ...options, name, prettyPrint: getPretty() },
+        process.env.NODE_ENV === 'production' ? pino.extreme(1) : pino.destination(2),
+      );
 
-export const editorLogger = createLogger('editor-server');
-export const serverLogger = createLogger('server');
-export const nodeLogger = createLogger('node');
-export const rpcLogger = createLogger('rpc');
-export const cliLogger = createLogger('cli');
-export const httpLogger = createLogger('http');
-export const testLogger = createLogger('test');
+// tslint:disable-next-line: strict-type-predicates
+const browserOptions = typeof window !== 'undefined' ? { browser: { asObject: true } } : {};
+
+export const editorLogger = createLogger('editor-server', browserOptions);
+export const serverLogger = createLogger('server', browserOptions);
+export const nodeLogger = createLogger('node', browserOptions);
+export const rpcLogger = createLogger('rpc', browserOptions);
+export const cliLogger = createLogger('cli', browserOptions);
+export const httpLogger = createLogger('http', browserOptions);
+export const testLogger = createLogger('test', browserOptions);
 export const loggers: readonly pino.Logger[] = [
   editorLogger,
   serverLogger,
