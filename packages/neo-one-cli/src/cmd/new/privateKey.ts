@@ -1,3 +1,4 @@
+// tslint:disable no-console
 import { createPrivateKey, privateKeyToAddress, privateKeyToWIF } from '@neo-one/client';
 import yargs from 'yargs';
 import { start } from '../../common';

@@ -1,4 +1,4 @@
-import { Configuration } from '@neo-one/utils';
+import { Configuration } from '@neo-one/client-common';
 import * as nodePath from 'path';
 
 export const getCommonPaths = (config: Configuration) => ({

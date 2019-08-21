@@ -1,7 +1,6 @@
 import { privateKeyToWIF } from '@neo-one/client';
-import { common, SourceMaps } from '@neo-one/client-common';
+import { common, Configuration, SourceMaps } from '@neo-one/client-common';
 import { genCommonFiles, NetworkDefinition } from '@neo-one/smart-contract-codegen';
-import { Configuration } from '@neo-one/utils';
 import * as fs from 'fs-extra';
 import { RawSourceMap } from 'source-map';
 import { getCommonPaths, getContractPaths, getPrimaryKeys, getTSPath } from '../common';

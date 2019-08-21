@@ -1,5 +1,4 @@
-import { SourceMaps } from '@neo-one/client-common';
-import { CodegenFramework } from '@neo-one/utils';
+import { CodegenFramework, SourceMaps } from '@neo-one/client-common';
 import { genAngular } from './angular';
 import { genBrowserClient, NetworkDefinition, Wallet } from './client';
 import { genCommonTypes } from './commonTypes';

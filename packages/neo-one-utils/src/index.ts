@@ -1,6 +1,5 @@
 export * from './AsyncQueue';
 export * from './changeCase';
-export * from './configuration';
 export * from './constants';
 export * from './Disposable';
 export * from './enqueuePostPromiseJob';

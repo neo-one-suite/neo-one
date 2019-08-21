@@ -6,6 +6,7 @@ import {
   BlockJSON,
   BufferString,
   CallReceiptJSON,
+  Configuration,
   ContractJSON,
   GetOptions,
   Hash256String,
@@ -21,7 +22,6 @@ import {
   TransactionJSON,
   TransactionReceiptJSON,
 } from '@neo-one/client-common';
-import { Configuration } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { RelayTransactionError } from '../errors';
 import { JSONRPCProvider, JSONRPCProviderManager } from './JSONRPCProvider';

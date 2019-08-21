@@ -12,6 +12,7 @@ import {
   Block,
   BlockJSON,
   common,
+  Configuration,
   ConfirmedTransaction,
   Contract,
   ContractJSON,
@@ -54,7 +55,7 @@ import {
   VerifyTransactionResult,
   VerifyTransactionResultJSON,
 } from '@neo-one/client-common';
-import { Configuration, utils as commonUtils } from '@neo-one/utils';
+import { utils as commonUtils } from '@neo-one/utils';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
 import { flatten } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatten';

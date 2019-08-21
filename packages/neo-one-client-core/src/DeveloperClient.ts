@@ -1,5 +1,4 @@
-import { DeveloperProvider, PrivateNetworkSettings } from '@neo-one/client-common';
-import { Configuration } from '@neo-one/utils';
+import { Configuration, DeveloperProvider, PrivateNetworkSettings } from '@neo-one/client-common';
 
 /**
  * Client which controls a development network.

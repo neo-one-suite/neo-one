@@ -1,4 +1,12 @@
-import { common, crypto, JSONHelper, RelayTransactionResultJSON, TransactionJSON, utils } from '@neo-one/client-common';
+import {
+  common,
+  Configuration,
+  crypto,
+  JSONHelper,
+  RelayTransactionResultJSON,
+  TransactionJSON,
+  utils,
+} from '@neo-one/client-common';
 import { AggregationType, globalStats, MeasureUnit, TagMap } from '@neo-one/client-switch';
 import { nodeLogger } from '@neo-one/logger';
 import {
@@ -14,7 +22,7 @@ import {
   TransactionData,
   TransactionType,
 } from '@neo-one/node-core';
-import { Configuration, Labels, labelToTag } from '@neo-one/utils';
+import { Labels, labelToTag } from '@neo-one/utils';
 import { filter, switchMap, take, timeout, toArray } from 'rxjs/operators';
 
 const logger = nodeLogger.child({ component: 'rpc-handler' });

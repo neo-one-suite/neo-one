@@ -1,6 +1,6 @@
 // tslint:disable no-object-mutation
+import { Configuration } from '@neo-one/client-common';
 import { Contracts } from '@neo-one/smart-contract-compiler';
-import { Configuration } from '@neo-one/utils';
 import Listr from 'listr';
 import { Command } from '../types';
 import { deployContract } from './deployContract';

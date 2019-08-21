@@ -1,6 +1,6 @@
 // tslint:disable: match-default-export-name
+import { getPretty } from '@neo-one/logger-config';
 import pino from 'pino';
-import { getPretty } from './pretty';
 
 const createLogger = (name: string, options: pino.LoggerOptions = {}) =>
   pino(

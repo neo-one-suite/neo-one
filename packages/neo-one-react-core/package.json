@@ -6,7 +6,6 @@
   "dependencies": {
     "@emotion/core": "^10.0.16",
     "@emotion/styled": "^10.0.15",
-    "lodash": "^4.17.15",
     "react": "^16.9.0",
     "rxjs": "^6.5.2",
     "styled-tools": "^1.7.1"

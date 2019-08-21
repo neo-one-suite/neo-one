@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "NEO•ONE logging utility",
   "main": "./src/index",
-  "browser": "./src/index.browser.ts",
   "dependencies": {
+    "@neo-one/logger-config": "^1.0.0",
     "pino": "^5.12.6",
     "pino-pretty": "^3.2.1"
   },
