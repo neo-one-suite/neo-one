@@ -1,8 +1,10 @@
 import { CodegenFramework, Configuration } from '@neo-one/utils';
 import convict from 'convict';
 import cosmiconfig from 'cosmiconfig';
+import importFresh from 'import-fresh';
 import * as fs from 'fs-extra';
 import * as nodePath from 'path';
+import tsNode from 'ts-node';
 
 export const configurationSchema = {
   contracts: {
@@ -117,12 +119,28 @@ const validateConfig = async (rootDir: string, configIn: cosmiconfig.Config): Pr
   };
 };
 
-export const loadConfiguration = async (): Promise<Configuration> => {
-  const explorer = cosmiconfig('neo-one');
-  const result = await explorer.search();
+// tslint:disable-next-line no-let
+let config: Configuration | undefined;
 
-  return validateConfig(
-    result === null ? process.cwd() : nodePath.dirname(result.filepath),
-    result === null ? {} : result.config,
-  );
+export const loadConfiguration = async (): Promise<Configuration> => {
+  if (config === undefined) {
+    const explorer = cosmiconfig('neo-one', {
+      loaders: {
+        '.ts': {
+          sync: (filePath: string): object => {
+            tsNode.register();
+
+            return importFresh(filePath) as object;
+          },
+        },
+      },
+    });
+    const result = await explorer.search();
+    config = await validateConfig(
+      result === null ? process.cwd() : nodePath.dirname(result.filepath),
+      result === null ? {} : result.config,
+    );
+  }
+
+  return config;
 };
