@@ -214,7 +214,7 @@ export const loadConfiguration = async (): Promise<Configuration> => {
         '.ts': {
           sync: (filePath: string): object => {
             register();
-            const obj = require(filePath) as any;
+            const obj = require(filePath);
 
             return obj.default === undefined ? obj : obj.default;
           },

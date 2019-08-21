@@ -1,6 +1,6 @@
 import { getClients as getClientsBase } from '@neo-one/cli-common';
-import { NEOONEDataProvider } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-common';
+import { NEOONEDataProvider } from '@neo-one/client-core';
 import { constants } from '@neo-one/utils';
 
 export const getClients = async (project: string) => {

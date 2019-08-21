@@ -1,5 +1,5 @@
-import { DeveloperClient } from '@neo-one/client';
 import { common, crypto } from '@neo-one/client-common';
+import { DeveloperClient } from '@neo-one/client-core';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { createMain } from '@neo-one/node-neo-settings';
 import { Node } from '@neo-one/node-protocol';

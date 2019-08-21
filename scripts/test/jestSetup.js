@@ -3,7 +3,7 @@ const { setGlobalLogLevel } = require('@neo-one/logger');
 
 disableConsoleLogForTest();
 setGlobalLogLevel('silent');
-jest.setTimeout(30 * 1000);
+jest.setTimeout(60 * 1000);
 
 afterEach(async () => {
   await one.cleanupTest();

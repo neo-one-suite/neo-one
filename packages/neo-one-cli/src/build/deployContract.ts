@@ -1,6 +1,5 @@
 import { deployContract as deployContractBase } from '@neo-one/cli-common';
-import { scriptHashToAddress } from '@neo-one/client';
-import { common, Configuration, crypto, SourceMaps } from '@neo-one/client-common';
+import { common, Configuration, crypto, scriptHashToAddress, SourceMaps } from '@neo-one/client-common';
 import { NEOONEDataProvider } from '@neo-one/client-core';
 import { compileContract, LinkedContracts } from '@neo-one/smart-contract-compiler';
 import { createCompilerHost } from '@neo-one/smart-contract-compiler-node';

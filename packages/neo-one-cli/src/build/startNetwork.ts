@@ -1,5 +1,5 @@
-import { DeveloperClient, NEOONEDataProvider } from '@neo-one/client';
 import { Configuration } from '@neo-one/client-common';
+import { DeveloperClient, NEOONEDataProvider } from '@neo-one/client-core';
 import fetch from 'cross-fetch';
 import execa from 'execa';
 import { Command } from '../types';
