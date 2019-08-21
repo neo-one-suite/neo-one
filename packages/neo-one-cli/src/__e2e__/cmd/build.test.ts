@@ -30,6 +30,22 @@ describe('build', () => {
       expect(contract.dynamicInvoke).toBeFalsy();
     };
 
+    const verifyCoinICOContract = (contract?: Contract): void => {
+      expect(contract).toBeDefined();
+      if (contract === undefined) {
+        throw new Error('For TS');
+      }
+      expect(contract.codeVersion).toEqual('1.0');
+      expect(contract.author).toEqual('dicarlo2');
+      expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
+      expect(contract.description).toEqual('NEO•ONE Coin ICO');
+      expect(contract.parameters).toEqual(['String', 'Array']);
+      expect(contract.returnType).toEqual('Buffer');
+      expect(contract.payable).toBeTruthy();
+      expect(contract.storage).toBeTruthy();
+      expect(contract.dynamicInvoke).toBeFalsy();
+    };
+
     const verifyTokenContract = (contract?: Contract): void => {
       expect(contract).toBeDefined();
       if (contract === undefined) {
@@ -39,6 +55,22 @@ describe('build', () => {
       expect(contract.author).toEqual('dicarlo2');
       expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
       expect(contract.description).toEqual('NEO•ONE Token');
+      expect(contract.parameters).toEqual(['String', 'Array']);
+      expect(contract.returnType).toEqual('Buffer');
+      expect(contract.payable).toBeFalsy();
+      expect(contract.storage).toBeTruthy();
+      expect(contract.dynamicInvoke).toBeTruthy();
+    };
+
+    const verifyCoinContract = (contract?: Contract): void => {
+      expect(contract).toBeDefined();
+      if (contract === undefined) {
+        throw new Error('For TS');
+      }
+      expect(contract.codeVersion).toEqual('1.0');
+      expect(contract.author).toEqual('dicarlo2');
+      expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
+      expect(contract.description).toEqual('NEO•ONE Coin');
       expect(contract.parameters).toEqual(['String', 'Array']);
       expect(contract.returnType).toEqual('Buffer');
       expect(contract.payable).toBeFalsy();
@@ -62,47 +94,23 @@ describe('build', () => {
       expect(contract.dynamicInvoke).toBeTruthy();
     };
 
-    const verifySmartContracts = async (
-      ico: any,
-      token: any,
-      escrow: any,
-      accountID: UserAccountID,
-      toAccountID: UserAccountID,
-      nowSeconds: number,
-      developerClient?: DeveloperClient,
-    ): Promise<void> => {
-      const [
-        name,
-        symbol,
-        decimals,
-        amountPerNEO,
-        icoOwner,
-        startTimeSeconds,
-        icoDurationSeconds,
-        initialTotalSupply,
-        [initialRemaining, initialBalance],
-      ] = await Promise.all([
-        token.name(),
-        token.symbol(),
-        token.decimals(),
-        ico.amountPerNEO(),
-        ico.owner(),
-        ico.startTimeSeconds(),
-        ico.icoDurationSeconds(),
-        token.totalSupply(),
-        Promise.all([ico.remaining(), token.balanceOf(accountID.address)]),
-      ]);
-      expect(name).toEqual('One');
-      expect(symbol).toEqual('ONE');
-      expect(decimals.toString()).toEqual('8');
-      expect(amountPerNEO.toString()).toEqual('10');
-      expect(icoOwner).toEqual(accountID.address);
-      expect(startTimeSeconds.gte(new BigNumber(nowSeconds))).toBeTruthy();
-      expect(icoDurationSeconds.toString()).toEqual('157700000');
-      expect(initialTotalSupply.toString()).toEqual('0');
-      expect(initialRemaining.toString()).toEqual(new BigNumber(10_000_000_000).toString());
-      expect(initialBalance.toString()).toEqual('0');
+    const verifyExchangeContract = (contract?: Contract): void => {
+      expect(contract).toBeDefined();
+      if (contract === undefined) {
+        throw new Error('For TS');
+      }
+      expect(contract.codeVersion).toEqual('1.0');
+      expect(contract.author).toEqual('dicarlo2');
+      expect(contract.email).toEqual('alex.dicarlo@neotracker.io');
+      expect(contract.description).toEqual('Exchange');
+      expect(contract.parameters).toEqual(['String', 'Array']);
+      expect(contract.returnType).toEqual('Buffer');
+      expect(contract.payable).toBeFalsy();
+      expect(contract.storage).toBeTruthy();
+      // expect(contract.dynamicInvoke).toBeTruthy();
+    };
 
+    const mintTokens = async (ico: any, accountID: UserAccountID, developerClient?: DeveloperClient): Promise<void> => {
       const mintResult = await ico.mintTokens({
         sendTo: [
           {
@@ -133,27 +141,93 @@ describe('build', () => {
       expect(event.parameters.from).toBeUndefined();
       expect(event.parameters.to).toEqual(accountID.address);
       expect(event.parameters.amount.toString()).toEqual('100');
+    };
 
-      await verifySmartContractAfterMint(ico, token, escrow, accountID, toAccountID, developerClient);
+    const verifySmartContracts = async (
+      ico: any,
+      coinICO: any,
+      token: any,
+      coin: any,
+      escrow: any,
+      exchange: any,
+      accountID: UserAccountID,
+      toAccountID: UserAccountID,
+      nowSeconds: number,
+      developerClient?: DeveloperClient,
+    ): Promise<void> => {
+      const [
+        name,
+        symbol,
+        decimals,
+        coinName,
+        coinSymbol,
+        amountPerNEO,
+        icoOwner,
+        startTimeSeconds,
+        icoDurationSeconds,
+        initialTotalSupply,
+        [initialRemaining, initialBalance],
+        initExchangeResult,
+        initialExchangeBalance,
+      ] = await Promise.all([
+        token.name(),
+        token.symbol(),
+        token.decimals(),
+        coin.name(),
+        coin.symbol(),
+        ico.amountPerNEO(),
+        ico.owner(),
+        ico.startTimeSeconds(),
+        ico.icoDurationSeconds(),
+        token.totalSupply(),
+        Promise.all([ico.remaining(), token.balanceOf(accountID.address)]),
+        exchange.initialize.confirmed(),
+        exchange.balanceOf(accountID.address, token.definition.networks[accountID.network].address),
+      ]);
+
+      expect(name).toEqual('One');
+      expect(symbol).toEqual('ONE');
+      expect(decimals.toString()).toEqual('8');
+      expect(coinName).toEqual('Two');
+      expect(coinSymbol).toEqual('TWO');
+      expect(amountPerNEO.toString()).toEqual('10');
+      expect(icoOwner).toEqual(accountID.address);
+      expect(startTimeSeconds.gte(new BigNumber(nowSeconds))).toBeTruthy();
+      expect(icoDurationSeconds.toString()).toEqual('157700000');
+      expect(initialTotalSupply.toString()).toEqual('0');
+      expect(initialRemaining.toString()).toEqual(new BigNumber(10_000_000_000).toString());
+      expect(initialBalance.toString()).toEqual('0');
+      expect(initExchangeResult.result.value).toEqual(true);
+      expect(initialExchangeBalance.toString()).toEqual('0');
+
+      await mintTokens(ico, accountID, developerClient);
+      await mintTokens(coinICO, accountID, developerClient);
+
+      await verifySmartContractAfterMint(ico, token, coin, escrow, exchange, accountID, toAccountID, developerClient);
     };
 
     const verifySmartContractTesting = async (codegenPath: string, nowSeconds: number) => {
       // tslint:disable-next-line no-require-imports
       const test = require(nodePath.resolve(codegenPath, 'test'));
-      await test.withContracts(async ({ ico, token, escrow, masterAccountID, networkName, client }: any) => {
-        await client.providers.memory.keystore.addUserAccount({
-          network: networkName,
-          privateKey: TO_PRIVATE_KEY,
-        });
-        await verifySmartContracts(
-          ico,
-          token,
-          escrow,
-          masterAccountID,
-          { network: networkName, address: privateKeyToAddress(TO_PRIVATE_KEY) },
-          nowSeconds,
-        );
-      });
+      await test.withContracts(
+        async ({ ico, coinIco, token, coin, escrow, exchange, masterAccountID, networkName, client }: any) => {
+          await client.providers.memory.keystore.addUserAccount({
+            network: networkName,
+            privateKey: TO_PRIVATE_KEY,
+          });
+          await verifySmartContracts(
+            ico,
+            coinIco,
+            token,
+            coin,
+            escrow,
+            exchange,
+            masterAccountID,
+            { network: networkName, address: privateKeyToAddress(TO_PRIVATE_KEY) },
+            nowSeconds,
+          );
+        },
+      );
     };
 
     const getGeneratedICOCode = (
@@ -169,6 +243,23 @@ describe('build', () => {
       // tslint:disable-next-line no-require-imports
       const contract = require(nodePath.resolve(dataRoot, 'ICO', 'contract'));
       const createSmartContract = contract.createICOSmartContract;
+
+      return { abi, contract: { createSmartContract } };
+    };
+
+    const getGeneratedCoinICOCode = (
+      dataRoot: string,
+    ): {
+      readonly abi: ABI;
+      readonly contract: {
+        readonly createSmartContract: (client: Client) => any;
+      };
+    } => {
+      // tslint:disable-next-line no-require-imports
+      const abi = require(nodePath.resolve(dataRoot, 'CoinICO', 'abi')).coinIcoABI;
+      // tslint:disable-next-line no-require-imports
+      const contract = require(nodePath.resolve(dataRoot, 'CoinICO', 'contract'));
+      const createSmartContract = contract.createCoinICOSmartContract;
 
       return { abi, contract: { createSmartContract } };
     };
@@ -190,6 +281,23 @@ describe('build', () => {
       return { abi, contract: { createSmartContract } };
     };
 
+    const getGeneratedCoinCode = (
+      dataRoot: string,
+    ): {
+      readonly abi: ABI;
+      readonly contract: {
+        readonly createSmartContract: (client: Client) => any;
+      };
+    } => {
+      // tslint:disable-next-line no-require-imports
+      const abi = require(nodePath.resolve(dataRoot, 'Coin', 'abi')).coinABI;
+      // tslint:disable-next-line no-require-imports
+      const contract = require(nodePath.resolve(dataRoot, 'Coin', 'contract'));
+      const createSmartContract = contract.createCoinSmartContract;
+
+      return { abi, contract: { createSmartContract } };
+    };
+
     const getGeneratedEscrowCode = (
       dataRoot: string,
     ): {
@@ -203,6 +311,23 @@ describe('build', () => {
       // tslint:disable-next-line no-require-imports
       const contract = require(nodePath.resolve(dataRoot, 'Escrow', 'contract'));
       const createSmartContract = contract.createEscrowSmartContract;
+
+      return { abi, contract: { createSmartContract } };
+    };
+
+    const getGeneratedExchangeCode = (
+      dataRoot: string,
+    ): {
+      readonly abi: ABI;
+      readonly contract: {
+        readonly createSmartContract: (client: Client) => any;
+      };
+    } => {
+      // tslint:disable-next-line no-require-imports
+      const abi = require(nodePath.resolve(dataRoot, 'Exchange', 'abi')).exchangeABI;
+      // tslint:disable-next-line no-require-imports
+      const contract = require(nodePath.resolve(dataRoot, 'Exchange', 'contract'));
+      const createSmartContract = contract.createExchangeSmartContract;
 
       return { abi, contract: { createSmartContract } };
     };
@@ -227,36 +352,67 @@ describe('build', () => {
       } = getGeneratedICOCode(dataRoot);
       expect(icoABI).toBeDefined();
       const {
+        abi: coinIcoABI,
+        contract: { createSmartContract: createCoinICOSmartContract },
+      } = getGeneratedCoinICOCode(dataRoot);
+      expect(coinIcoABI).toBeDefined();
+      const {
         abi: tokenABI,
         contract: { createSmartContract: createTokenSmartContract },
       } = getGeneratedTokenCode(dataRoot);
       expect(tokenABI).toBeDefined();
       const {
+        abi: coinABI,
+        contract: { createSmartContract: createCoinSmartContract },
+      } = getGeneratedCoinCode(dataRoot);
+      expect(coinABI).toBeDefined();
+      const {
         abi: escrowABI,
         contract: { createSmartContract: createEscrowSmartContract },
       } = getGeneratedEscrowCode(dataRoot);
       expect(escrowABI).toBeDefined();
+      const {
+        abi: exchangeABI,
+        contract: { createSmartContract: createExchangeSmartContract },
+      } = getGeneratedExchangeCode(dataRoot);
+      expect(exchangeABI).toBeDefined();
 
       const { createClient, createDeveloperClients } = getGeneratedCommonCode(dataRoot);
       const client = createClient();
       const developerClient = createDeveloperClients().local;
 
       const ico = createICOSmartContract(client);
+      const coinICO = createCoinICOSmartContract(client);
       const token = createTokenSmartContract(client);
+      const coin = createCoinSmartContract(client);
       const escrow = createEscrowSmartContract(client);
+      const exchange = createExchangeSmartContract(client);
 
       await client.providers.memory.keystore.addUserAccount({
         network: accountID.network,
         privateKey: TO_PRIVATE_KEY,
       });
 
-      await verifySmartContracts(ico, token, escrow, accountID, toAccountID, nowSeconds, developerClient);
+      await verifySmartContracts(
+        ico,
+        coinICO,
+        token,
+        coin,
+        escrow,
+        exchange,
+        accountID,
+        toAccountID,
+        nowSeconds,
+        developerClient,
+      );
     };
 
     const verifySmartContractAfterMint = async (
       ico: any,
       token: any,
+      coin: any,
       escrow: any,
+      exchange: any,
       accountID: UserAccountID,
       toAccountID: UserAccountID,
       developerClient?: DeveloperClient,
@@ -356,6 +512,157 @@ describe('build', () => {
       expect(balanceAfterClaim.toString()).toEqual('50');
       expect(toBalanceAfterClaim.toString()).toEqual('35');
       expect(escrowPairBalanceAfterClaim.toString()).toEqual('15');
+
+      await verifySmartContractExchange(token, coin, exchange, accountID, toAccountID, developerClient);
+    };
+
+    const verifySmartContractExchange = async (
+      token: any,
+      coin: any,
+      exchange: any,
+      accountID: UserAccountID,
+      toAccountID: UserAccountID,
+      developerClient?: DeveloperClient,
+    ): Promise<void> => {
+      const tokenAssetID = token.definition.networks[accountID.network].address;
+      const coinAssetID = coin.definition.networks[accountID.network].address;
+      const exchangeAddress = exchange.definition.networks[accountID.network].address;
+
+      const approveDepositReceipt = await token.approveSendTransfer.confirmed(
+        accountID.address,
+        exchangeAddress,
+        new BigNumber(10_00000000),
+      );
+      expect(approveDepositReceipt.result.value).toEqual(true);
+
+      const [exchangeDepositReceipt] = await Promise.all([
+        exchange.deposit.confirmed(accountID.address, tokenAssetID, new BigNumber(10_00000000)),
+        developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+      ]);
+      expect(exchangeDepositReceipt.result.value).toEqual(true);
+      expect(exchangeDepositReceipt.events).toHaveLength(1);
+
+      const [balanceAfterDeposit, exchangeBalanceAfterDeposit, tokensDeposited] = await Promise.all([
+        token.balanceOf(accountID.address),
+        token.balanceOf(exchangeAddress),
+        exchange.balanceOf(accountID.address, tokenAssetID),
+      ]);
+      expect(balanceAfterDeposit.toString()).toEqual('40');
+      expect(exchangeBalanceAfterDeposit.toString()).toEqual('10');
+      expect(tokensDeposited.toString()).toEqual('1000000000');
+
+      const [exchangeWithdrawalReceipt] = await Promise.all([
+        exchange.withdraw.confirmed(accountID.address, tokenAssetID, new BigNumber(4_00000000)),
+        developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+      ]);
+
+      expect(exchangeWithdrawalReceipt.result.value).toEqual(true);
+      expect(exchangeWithdrawalReceipt.events).toHaveLength(1);
+
+      const [balanceAfterWithdraw, exchangeBalanceAfterWithdraw, tokensWithdrawn] = await Promise.all([
+        token.balanceOf(accountID.address),
+        token.balanceOf(exchangeAddress),
+        exchange.balanceOf(accountID.address, tokenAssetID),
+      ]);
+      expect(balanceAfterWithdraw.toString()).toEqual('44');
+      expect(exchangeBalanceAfterWithdraw.toString()).toEqual('6');
+      expect(tokensWithdrawn.toString()).toEqual('600000000');
+
+      const [coinTransferReceipt, approveCoinDepositReceipt] = await Promise.all([
+        coin.transfer.confirmed(accountID.address, toAccountID.address, new BigNumber(100)),
+        coin.approveSendTransfer.confirmed(toAccountID.address, exchangeAddress, new BigNumber(70_00000000), {
+          from: toAccountID,
+        }),
+        developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+      ]);
+      expect(coinTransferReceipt.result.value).toEqual(true);
+      expect(approveCoinDepositReceipt.result.value).toEqual(true);
+
+      const [exchangeCoinDepositReceipt] = await Promise.all([
+        exchange.deposit.confirmed(toAccountID.address, coinAssetID, new BigNumber(70_00000000), { from: toAccountID }),
+        developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+      ]);
+      expect(exchangeCoinDepositReceipt.result.value).toEqual(true);
+
+      const [coinBalanceAfterDeposit, exchangeCoinBalanceAfterDeposit, coinsDeposited] = await Promise.all([
+        coin.balanceOf(toAccountID.address),
+        coin.balanceOf(exchangeAddress),
+        exchange.balanceOf(toAccountID.address, coinAssetID),
+      ]);
+      expect(coinBalanceAfterDeposit.toString()).toEqual('30');
+      expect(exchangeCoinBalanceAfterDeposit.toString()).toEqual('70');
+      expect(coinsDeposited.toString()).toEqual('7000000000');
+
+      const [makeOfferReceipt] = await Promise.all([
+        exchange.makeOffer.confirmed(
+          accountID.address,
+          tokenAssetID,
+          new BigNumber(5_00000000),
+          coinAssetID,
+          new BigNumber(50_00000000),
+          // tokenAssetID,
+          // new BigNumber(1_00000000),
+          'nonce1',
+        ),
+        developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+      ]);
+      expect(makeOfferReceipt.result.value).toEqual(true);
+      const offerHash = makeOfferReceipt.events[0].parameters.offerHash;
+      expect(offerHash).toBeDefined();
+
+      const offer = await exchange.getOffer(offerHash);
+      expect(offer.maker).toEqual(accountID.address);
+      expect(offer.offerAssetID).toEqual(tokenAssetID);
+      expect(offer.offerAmount.toString()).toEqual('500000000');
+      expect(offer.wantAssetID).toEqual(coinAssetID);
+      expect(offer.wantAmount.toString()).toEqual('5000000000');
+      // expect(offer.makerFeeAssetID).toEqual(tokenAssetID);
+      // expect(offer.makerFeeAvailableAmount.toString()).toEqual('100000000');
+      expect(offer.nonce).toEqual('nonce1');
+
+      const [fillOfferReceipt] = await Promise.all([
+        exchange.fillOffer.confirmed(toAccountID.address, offerHash, new BigNumber(3_00000000), { from: toAccountID }),
+        developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+      ]);
+      expect(fillOfferReceipt.result.value).toEqual(true);
+
+      const [
+        exchangeMakerTokenBalanceAfterFill,
+        exchangeTakerTokenBalanceAfterFill,
+        exchangeMakerCoinBalanceAfterFill,
+        exchangeTakerCoinBalanceAfterFill,
+        offerAfterFill,
+      ] = await Promise.all([
+        exchange.balanceOf(accountID.address, tokenAssetID),
+        exchange.balanceOf(toAccountID.address, tokenAssetID),
+        exchange.balanceOf(accountID.address, coinAssetID),
+        exchange.balanceOf(toAccountID.address, coinAssetID),
+        exchange.getOffer(offerHash),
+      ]);
+      expect(exchangeMakerTokenBalanceAfterFill.toString()).toEqual('100000000');
+      expect(exchangeTakerTokenBalanceAfterFill.toString()).toEqual('300000000');
+      expect(exchangeMakerCoinBalanceAfterFill.toString()).toEqual('3000000000');
+      expect(exchangeTakerCoinBalanceAfterFill.toString()).toEqual('4000000000');
+      expect(offerAfterFill.maker).toEqual(accountID.address);
+      expect(offerAfterFill.offerAssetID).toEqual(tokenAssetID);
+      expect(offerAfterFill.offerAmount.toString()).toEqual('200000000');
+      expect(offerAfterFill.wantAssetID).toEqual(coinAssetID);
+      expect(offerAfterFill.wantAmount.toString()).toEqual('2000000000');
+      // expect(offerAfterFill.makerFeeAssetID).toEqual(tokenAssetID);
+      // expect(offerAfterFill.makerFeeAvailableAmount.toString()).toEqual('100000000');
+      expect(offerAfterFill.nonce).toEqual('nonce1');
+
+      const [cancelOfferReceipt] = await Promise.all([
+        exchange.cancelOffer.confirmed(accountID.address, offerHash),
+        developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+      ]);
+      expect(cancelOfferReceipt.result.value).toEqual(true);
+      const [exchangeMakerTokenBalanceAfterCancel, offerAfterCancel] = await Promise.all([
+        exchange.balanceOf(accountID.address, tokenAssetID),
+        exchange.getOffer(offerHash),
+      ]);
+      expect(exchangeMakerTokenBalanceAfterCancel.toString()).toEqual('300000000');
+      expect(offerAfterCancel).toEqual(undefined);
     };
 
     const start = Math.round(Date.now() / 1000);
@@ -368,8 +675,11 @@ describe('build', () => {
     const [{ client: outerClient }, config] = await Promise.all([getClients('ico'), one.getProjectConfig('ico')]);
     const contracts = await getContracts(outerClient, constants.LOCAL_NETWORK_NAME);
     verifyICOContract(contracts.find((contract) => contract.name === 'ICO'));
+    verifyCoinICOContract(contracts.find((contract) => contract.name === 'CoinICO'));
     verifyTokenContract(contracts.find((contract) => contract.name === 'Token'));
+    verifyCoinContract(contracts.find((contract) => contract.name === 'Coin'));
     verifyEscrowContract(contracts.find((contract) => contract.name === 'Escrow'));
+    verifyExchangeContract(contracts.find((contract) => contract.name === 'Exchange'));
 
     await Promise.all([
       verifySmartContractTesting(config.codegen.path, start),

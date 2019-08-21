@@ -4,6 +4,14 @@ exports[`build is a one stop command for local development of the ico project: m
 
 exports[`build is a one stop command for local development of the ico project: mint consumed 2`] = `"0"`;
 
+exports[`build is a one stop command for local development of the ico project: mint consumed 3`] = `"0"`;
+
+exports[`build is a one stop command for local development of the ico project: mint consumed 4`] = `"0"`;
+
 exports[`build is a one stop command for local development of the ico project: mint cost 1`] = `"6.657"`;
 
 exports[`build is a one stop command for local development of the ico project: mint cost 2`] = `"6.657"`;
+
+exports[`build is a one stop command for local development of the ico project: mint cost 3`] = `"6.657"`;
+
+exports[`build is a one stop command for local development of the ico project: mint cost 4`] = `"6.657"`;
