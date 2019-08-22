@@ -23,7 +23,7 @@ then
 fi
 
 ## build the image locally
-docker build -t "$IMAGE_NAME" "${*:-.}" ## pass in the build command from user input, otherwise build in default mode
+docker build -t "$IMAGE_NAME ${*:-.}" ## pass in the build command from user input, otherwise build in default mode
 
 # push all the tags to registry
 docker tag "$IMAGE_NAME $REGISTRY_IMAGE:latest"
