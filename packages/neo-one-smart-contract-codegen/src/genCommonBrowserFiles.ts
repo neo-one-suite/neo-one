@@ -30,6 +30,7 @@ export const genCommonBrowserFiles = ({
   vuePath,
   clientPath,
   generatedPath,
+  sourceMapsPath,
   localDevNetworkName,
   wallets,
   networks,
@@ -47,6 +48,7 @@ export const genCommonBrowserFiles = ({
   readonly localDevNetworkName: string;
   readonly wallets: ReadonlyArray<Wallet>;
   readonly networks: ReadonlyArray<NetworkDefinition>;
+  readonly sourceMapsPath: string;
   readonly sourceMaps: SourceMaps;
   readonly framework: CodegenFramework;
 }): CommonBrowserFilesResult => {
@@ -55,7 +57,7 @@ export const genCommonBrowserFiles = ({
     false,
   );
   const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }), false);
-  const sourceMapsFile = formatFile(genSourceMaps({ sourceMaps }), false);
+  const sourceMapsFile = formatFile(genSourceMaps({ sourceMapsPath, sourceMaps }), false);
   const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath }), false);
   const angularFile = formatFile(genAngular({ contractsPaths, angularPath, commonTypesPath, clientPath }), false);
   const vueFile = formatFile(genVue({ contractsPaths, vuePath, commonTypesPath, clientPath }), false);

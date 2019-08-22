@@ -22,7 +22,7 @@ export const withContracts = createWithContracts([
     .map(
       ({ name, contractPath }) =>
         `{ name: '${name}', filePath: path.resolve(__dirname, '${normalizePath(
-          path.relative(testPath, contractPath),
+          path.relative(path.dirname(testPath), contractPath),
         )}') }`,
     )
     .join(', ')}

@@ -155,6 +155,7 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
     commonTypesPath,
     reactPath,
     angularPath,
+    sourceMapsPath,
     vuePath,
     clientPath,
     generatedPath,

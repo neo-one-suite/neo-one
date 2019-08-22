@@ -30,6 +30,7 @@ export const genCommonFiles = ({
   vuePath,
   clientPath,
   generatedPath,
+  sourceMapsPath,
   localDevNetworkName,
   localDevNetworkPort,
   wallets,
@@ -57,7 +58,7 @@ export const genCommonFiles = ({
 }): CommonFilesResult => {
   const testFile = formatFile(genTest({ contractsPaths, testPath, commonTypesPath }), browserify);
   const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }), browserify);
-  const sourceMapsFile = formatFile(genSourceMaps({ sourceMaps }), browserify);
+  const sourceMapsFile = formatFile(genSourceMaps({ sourceMapsPath, sourceMaps }), browserify);
   const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath }), browserify);
   const angularFile = formatFile(genAngular({ contractsPaths, angularPath, commonTypesPath, clientPath }), browserify);
   const vueFile = formatFile(genVue({ contractsPaths, vuePath, commonTypesPath, clientPath }), browserify);

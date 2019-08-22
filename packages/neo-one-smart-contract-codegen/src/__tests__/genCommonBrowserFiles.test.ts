@@ -13,6 +13,7 @@ describe('genCommonBrowserFiles', () => {
         vuePath: '/foo/bar/one/generated/vue.js',
         clientPath: '/foo/bar/one/generated/client.js',
         generatedPath: '/foo/bar/one/generated/index.js',
+        sourceMapsPath: '/foo/bar/one/generated/sourceMaps.js',
         localDevNetworkName: 'local',
         wallets: [
           {
