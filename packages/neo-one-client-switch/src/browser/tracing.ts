@@ -83,12 +83,17 @@ const globalStats: Stats = {
   getCurrentTagContext: noOp,
 };
 
-const PrometheusStatsExporter = {
-  onRegisterView: noOp,
-  onRecord: noOp,
-  start: noOp,
-  stop: noOp,
-};
+class PrometheusStatsExporter {
+  public onRegisterView = noOp;
+  public onRecord = noOp;
+  public start = noOp;
+  public stop = noOp;
+  public stopServer = noOp;
+  // tslint:disable-next-line: unnecessary-constructor no-any
+  public constructor(..._args: any[]) {
+    // do nothing
+  }
+}
 
 export interface PrometheusExporterOptions extends ExporterConfig {
   /** App prefix for metrics, if needed - default opencensus */
@@ -105,7 +110,12 @@ export interface PrometheusExporterOptions extends ExporterConfig {
   startServer?: boolean;
 }
 
-const JaegerTraceExporter = NoopExporter;
+class JaegerTraceExporter extends NoopExporter {
+  // tslint:disable-next-line: no-any
+  public constructor(..._args: any[]) {
+    super();
+  }
+}
 
 export interface JaegerTraceExporterOptions extends ExporterConfig {
   serviceName: string;

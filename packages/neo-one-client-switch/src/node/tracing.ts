@@ -19,7 +19,7 @@ import { TraceContextFormat } from '@opencensus/propagation-tracecontext';
 const tracing = TracingBase.instance;
 const tracer = tracing.tracer;
 
-const startTracing = (config: Config) => {
+const startTracing = async (config: Config) => {
   tracing.start(config);
 
   return () => {
@@ -31,7 +31,7 @@ const startTracing = (config: Config) => {
   };
 };
 
-const getNewPropagation = () => new TraceContextFormat();
+const getNewPropagation = async () => Promise.resolve(new TraceContextFormat());
 
 export {
   AggregationType,
