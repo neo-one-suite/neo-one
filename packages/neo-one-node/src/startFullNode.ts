@@ -92,9 +92,10 @@ export const startFullNode = async ({
           serviceName: 'NEO-ONE',
         });
 
-        const stopTracing = startTracing({
+        const propagation = await getNewPropagation();
+        const stopTracing = await startTracing({
           ...telemetry.tracing,
-          propagation: getNewPropagation(),
+          propagation,
           exporter,
         });
 
