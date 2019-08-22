@@ -11,6 +11,8 @@ COPY packages/neo-one-utils/src/ packages/neo-one-utils/src
 COPY packages/neo-one-utils/package.json packages/neo-one-utils/
 COPY packages/neo-one-logger/src/ packages/neo-one-logger/src
 COPY packages/neo-one-logger/package.json packages/neo-one-logger/
+COPY packages/neo-one-logger-config/src/ packages/neo-one-logger-config/src
+COPY packages/neo-one-logger-config/package.json packages/neo-one-logger-config/
 COPY packages/neo-one-cli-common-node/src/ packages/neo-one-cli-common-node/src
 COPY packages/neo-one-cli-common-node/package.json packages/neo-one-cli-common-node/
 COPY packages/neo-one-client/src/ packages/neo-one-client/src
