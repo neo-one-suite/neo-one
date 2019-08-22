@@ -5,10 +5,14 @@ WORKDIR /tmp/neo-one
 COPY package.json tsconfig.json lerna.json gulpfile.js yarn.lock LICENSE README.md ./
 COPY tsconfig/ tsconfig
 COPY types/ types
+COPY packages/neo-one-utils-node/src/ packages/neo-one-utils-node/src
+COPY packages/neo-one-utils-node/package.json packages/neo-one-utils-node/
 COPY packages/neo-one-utils/src/ packages/neo-one-utils/src
 COPY packages/neo-one-utils/package.json packages/neo-one-utils/
 COPY packages/neo-one-logger/src/ packages/neo-one-logger/src
 COPY packages/neo-one-logger/package.json packages/neo-one-logger/
+COPY packages/neo-one-cli-common-node/src/ packages/neo-one-cli-common-node/src
+COPY packages/neo-one-cli-common-node/package.json packages/neo-one-cli-common-node/
 COPY packages/neo-one-client/src/ packages/neo-one-client/src
 COPY packages/neo-one-client/package.json packages/neo-one-client/
 COPY packages/neo-one-client-common/src/ packages/neo-one-client-common/src
@@ -35,8 +39,6 @@ COPY packages/neo-one-node-consensus/src/ packages/neo-one-node-consensus/src
 COPY packages/neo-one-node-consensus/package.json packages/neo-one-node-consensus/
 COPY packages/neo-one-node-core/src/ packages/neo-one-node-core/src
 COPY packages/neo-one-node-core/package.json packages/neo-one-node-core/
-COPY packages/neo-one-node-data-backup/src/ packages/neo-one-node-data-backup/src
-COPY packages/neo-one-node-data-backup/package.json packages/neo-one-node-data-backup/
 COPY packages/neo-one-node-http-rpc/src/ packages/neo-one-node-http-rpc/src
 COPY packages/neo-one-node-http-rpc/package.json packages/neo-one-node-http-rpc/
 COPY packages/neo-one-node-neo-settings/src/ packages/neo-one-node-neo-settings/src
@@ -57,6 +59,10 @@ COPY packages/neo-one-node-vm/src/ packages/neo-one-node-vm/src
 COPY packages/neo-one-node-vm/package.json packages/neo-one-node-vm/
 COPY packages/neo-one-node/src/ packages/neo-one-node/src
 COPY packages/neo-one-node/package.json packages/neo-one-node/
+COPY packages/neo-one-http/src/ packages/neo-one-http/src
+COPY packages/neo-one-http/package.json packages/neo-one-http/
+COPY packages/neo-one-http-context/src/ packages/neo-one-http-context/src
+COPY packages/neo-one-http-context/package.json packages/neo-one-http-context/
 
 RUN sudo yarn install --non-interactive
 RUN yarn build:node

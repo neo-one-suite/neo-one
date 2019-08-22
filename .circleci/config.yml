@@ -29,9 +29,8 @@ aliases:
         - staging.tmp
         - trying.tmp
 
-  - &yarn
-    |
-      yarn install --non-interactive --cache-folder ~/.cache/yarn --ignore-engines
+  - &yarn |
+    yarn install --non-interactive --cache-folder ~/.cache/yarn --ignore-engines
 
   - &lint
     working_directory: ~/neo-one
