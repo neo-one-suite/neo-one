@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -u -e -E -o pipefail
+set -u -e -o pipefail
 
 ## mapping of var from user input or default value
 
