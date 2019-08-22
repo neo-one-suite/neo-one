@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-switch@1.2.2...@neo-one/client-switch@1.3.0) (2019-08-22)
+
+
+### Bug Fixes
+
+* **build:** change tracing exports slightly ([#1698](https://github.com/neo-one-suite/neo-one/issues/1698)) ([d606d33](https://github.com/neo-one-suite/neo-one/commit/d606d33))
+* **web:** fix logging / opencensus imports for website ([#1691](https://github.com/neo-one-suite/neo-one/issues/1691)) ([1e8a886](https://github.com/neo-one-suite/neo-one/commit/1e8a886))
+
+
+### Features
+
+* **monitor:** remove @neo-one/monitor. replace with opencensus, pino, and debug ([#1597](https://github.com/neo-one-suite/neo-one/issues/1597)) ([4b1a28f](https://github.com/neo-one-suite/neo-one/commit/4b1a28f))
+
+
+
+
+
 ## [1.2.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-switch@1.2.1...@neo-one/client-switch@1.2.2) (2019-07-29)
 
 

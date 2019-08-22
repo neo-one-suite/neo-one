@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-bin@2.0.0...@neo-one/node-bin@2.1.0) (2019-08-22)
+
+
+### Bug Fixes
+
+* **node:** fix shutdown process for node-bin ([0c4812a](https://github.com/neo-one-suite/neo-one/commit/0c4812a))
+
+
+### Features
+
+* **monitor:** remove @neo-one/monitor. replace with opencensus, pino, and debug ([#1597](https://github.com/neo-one-suite/neo-one/issues/1597)) ([4b1a28f](https://github.com/neo-one-suite/neo-one/commit/4b1a28f))
+* **node:** fixup node-bin error handling ([21e2e00](https://github.com/neo-one-suite/neo-one/commit/21e2e00))
+
+
+
+
+
 # [2.0.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-bin@1.2.3...@neo-one/node-bin@2.0.0) (2019-07-29)
 
 

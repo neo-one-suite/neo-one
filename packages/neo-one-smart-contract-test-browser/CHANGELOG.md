@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.6](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-test-browser@1.1.5...@neo-one/smart-contract-test-browser@1.1.6) (2019-08-22)
+
+**Note:** Version bump only for package @neo-one/smart-contract-test-browser
+
+
+
+
+
 ## [1.1.5](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-test-browser@1.1.4...@neo-one/smart-contract-test-browser@1.1.5) (2019-07-29)
 
 **Note:** Version bump only for package @neo-one/smart-contract-test-browser

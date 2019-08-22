@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/utils@1.1.3...@neo-one/utils@1.2.0) (2019-08-22)
+
+
+### Features
+
+* **monitor:** remove @neo-one/monitor. replace with opencensus, pino, and debug ([#1597](https://github.com/neo-one-suite/neo-one/issues/1597)) ([4b1a28f](https://github.com/neo-one-suite/neo-one/commit/4b1a28f))
+
+
+
+
+
 ## [1.1.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/utils@1.1.2...@neo-one/utils@1.1.3) (2019-07-29)
 
 **Note:** Version bump only for package @neo-one/utils

@@ -1,20 +1,20 @@
 {
   "name": "@neo-one/client-full-core",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "NEO•ONE client-full core types implementation.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/client-common": "^1.3.0",
-    "@neo-one/client-core": "^1.3.0",
-    "@neo-one/client-full-common": "^1.2.0",
-    "@neo-one/client-switch": "^1.2.2",
-    "@neo-one/utils": "^1.1.3",
+    "@neo-one/client-common": "^1.4.0",
+    "@neo-one/client-core": "^1.4.0",
+    "@neo-one/client-full-common": "^1.2.1",
+    "@neo-one/client-switch": "^1.3.0",
+    "@neo-one/utils": "^1.2.0",
     "bignumber.js": "^9.0.0",
     "lodash": "^4.17.15",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
-    "@neo-one/node-core": "^1.1.5",
+    "@neo-one/node-core": "^1.2.0",
     "@reactivex/ix-es2015-cjs": "^2.5.3",
     "@types/bn.js": "^4.11.5",
     "@types/lodash": "^4.14.137",

@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/client-common",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "NEO•ONE client common code.",
   "main": "./src/index",
   "dependencies": {
     "@neo-one/ec-key": "^0.1.0",
-    "@neo-one/utils": "^1.1.3",
+    "@neo-one/utils": "^1.2.0",
     "bignumber.js": "^9.0.0",
     "bn.js": "^5.0.0",
     "bs58": "^4.0.1",
