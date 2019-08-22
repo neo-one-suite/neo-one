@@ -169,7 +169,7 @@ const privateKeyToHex = (value: PrivateKey | PrivateKeyHex): PrivateKeyHex =>
   typeof value === 'string' ? value : value.toString('hex');
 
 const hexToPrivateKey = (value: PrivateKey | PrivateKeyHex): PrivateKey =>
-  bufferToPrivateKey(typeof value === 'string' ? Buffer.from(value, 'hex') : value);
+  bufferToPrivateKey(typeof value === 'string' ? Buffer.from(strip0x(value), 'hex') : value);
 
 const privateKeyToBuffer = (value: PrivateKey | PrivateKeyHex): Buffer =>
   typeof value === 'string' ? hexToPrivateKey(value) : value;
