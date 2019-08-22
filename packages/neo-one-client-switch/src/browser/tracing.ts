@@ -1,27 +1,72 @@
 // tslint:disable no-submodule-imports readonly-keyword readonly-array
-import { tracing } from '@opencensus/web-core';
 import { NoopExporter } from '@opencensus/web-core/build/src/exporters/noop_exporter';
-import { TraceContextFormat } from '@opencensus/web-propagation-tracecontext';
-import { Config, ExporterConfig, Span, SpanKind } from '@opencensus/web-types';
+import { Config, ExporterConfig, Propagation, Span, SpanKind, TracerBase, Tracing } from '@opencensus/web-types';
 import { AggregationType, Measure, MeasureUnit, Stats } from '@opencensus/web-types/build/src/stats/types';
 import { TagMap } from '@opencensus/web-types/build/src/tags/tag-map';
-
-const tracer = tracing.tracer;
-
-const startTracing = (config: Config) => {
-  tracing.start(config);
-
-  return () => {
-    if (config.exporter !== undefined) {
-      tracing.unregisterExporter(config.exporter);
-    }
-    tracing.stop();
-  };
-};
 
 // tslint:disable-next-line: no-any
 const noOp = (..._args: readonly any[]): any => {
   //
+};
+
+// tslint:disable no-any
+// tslint:disable-next-line: no-let
+let tracer: TracerBase = {
+  startRootSpan: <T>(_options: any, func: (root: any) => T) => {
+    const span = {
+      addAttribute: noOp,
+      spanContext: {},
+      end: noOp,
+    };
+
+    return func(span);
+  },
+  startChildSpan: noOp,
+  sampler: {} as any,
+  logger: {} as any,
+  activeTraceParams: {} as any,
+  active: false,
+  propagation: {} as any,
+  eventListeners: [],
+  start: noOp,
+  stop: noOp,
+  registerSpanEventListener: noOp,
+  unregisterSpanEventListener: noOp,
+  setCurrentRootSpan: noOp,
+  onStartSpan: noOp,
+  onEndSpan: noOp,
+};
+// tslint:enable no-any
+
+// tslint:disable-next-line: no-let
+let tracingCache: Tracing | undefined;
+const startTracing = async (config: Config) => {
+  if (tracingCache === undefined) {
+    const ocWeb = await import('@opencensus/web-core');
+    tracingCache = ocWeb.tracing;
+    tracer = tracingCache.tracer;
+  }
+  tracingCache.start(config);
+
+  return () => {
+    if (tracingCache !== undefined) {
+      if (config.exporter !== undefined) {
+        tracingCache.unregisterExporter(config.exporter);
+      }
+      tracingCache.stop();
+    }
+  };
+};
+
+// tslint:disable-next-line: no-let
+let createTraceContextFormat: (() => Propagation) | undefined;
+const getNewPropagation = async () => {
+  if (createTraceContextFormat === undefined) {
+    const ocTraceContext = await import('@opencensus/web-propagation-tracecontext');
+    createTraceContextFormat = () => new ocTraceContext.TraceContextFormat();
+  }
+
+  return createTraceContextFormat();
 };
 
 const globalStats: Stats = {
@@ -84,6 +129,6 @@ export {
   SpanKind,
   startTracing,
   TagMap,
-  TraceContextFormat,
+  getNewPropagation,
   tracer,
 };
