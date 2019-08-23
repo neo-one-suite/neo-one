@@ -19,6 +19,7 @@
     "@opencensus/web-propagation-tracecontext": "^0.0.5",
     "@opencensus/web-types": "^0.0.5",
     "lodash": "^4.17.15",
+    "regenerator-runtime": "^0.13.3",
     "source-map": "^0.7.3",
     "tslib": "^1.10.0"
   },
