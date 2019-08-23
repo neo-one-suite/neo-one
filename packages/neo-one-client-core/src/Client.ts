@@ -332,8 +332,8 @@ export class Client<
    *
    * @param networkIn `NetworkType` to select.
    */
-  public async selectNetwork(networkIn: NetworkType): Promise<void> {
-    const network = args.assertString('network', networkIn);
+  public async selectNetwork(network: NetworkType): Promise<void> {
+    args.assertString('network', network);
     const provider = this.getNetworkProvider(network);
     const account = provider.getCurrentUserAccount();
     if (account === undefined) {
@@ -468,14 +468,18 @@ export class Client<
   /**
    * @returns `Promise` which resolves to an `Account` object for the provided `UserAccountID`.
    */
-  public async getAccount(id: UserAccountID): Promise<Account> {
+  public async getAccount(idIn: UserAccountID): Promise<Account> {
+    const id = args.assertUserAccountID('id', idIn);
+
     return this.getNetworkProvider(id.network).getAccount(id.network, id.address);
   }
 
   /**
    * @internal
    */
-  public __iterActionsRaw(network: NetworkType, options?: IterOptions): AsyncIterable<RawAction> {
+  public __iterActionsRaw(network: NetworkType, optionsIn?: IterOptions): AsyncIterable<RawAction> {
+    args.assertString('network', network);
+    const options = args.assertNullableIterOptions('iterOptions', optionsIn);
     const provider = this.getNetworkProvider(network);
     if (provider.iterActionsRaw !== undefined) {
       return provider.iterActionsRaw(network, options);
@@ -510,7 +514,17 @@ export class Client<
     optionsIn?: InvokeSendUnsafeReceiveTransactionOptions,
     sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
-    const options = optionsIn === undefined ? {} : optionsIn;
+    args.assertAddress('contract', contract);
+    args.assertString('method', method);
+    args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
+    paramsZipped.forEach(([tupleString, tupleParam]) => [
+      args.assertString('tupleString', tupleString),
+      args.assertNullableParam('tupleParam', tupleParam),
+    ]);
+    args.assertArray('paramsZipped', paramsZipped);
+    args.assertBoolean('verify', verify);
+    const options = args.assertInvokeSendUnsafeReceiveTransactionOptions('options', optionsIn);
+    args.assertSourceMaps('sourceMaps', sourceMaps);
     await this.applyBeforeRelayHook(options);
 
     return this.addTransactionHooks(
@@ -530,7 +544,16 @@ export class Client<
     optionsIn?: TransactionOptions,
     sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
-    const options = optionsIn === undefined ? {} : optionsIn;
+    args.assertAddress('contract', contract);
+    args.assertString('method', method);
+    args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
+    paramsZipped.forEach(([tupleString, tupleParam]) => [
+      args.assertString('tupleString', tupleString),
+      args.assertNullableParam('tupleParam', tupleParam),
+    ]);
+    const options = args.assertTransactionOptions('options', optionsIn);
+    args.assertTransfer('transfer', transfer);
+    args.assertSourceMaps('sourceMaps', sourceMaps);
     await this.applyBeforeRelayHook(options);
 
     return this.addTransactionHooks(
@@ -550,7 +573,16 @@ export class Client<
     optionsIn?: TransactionOptions,
     sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
-    const options = optionsIn === undefined ? {} : optionsIn;
+    args.assertAddress('contract', contract);
+    args.assertString('method', method);
+    args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
+    paramsZipped.forEach(([tupleString, tupleParam]) => [
+      args.assertString('tupleString', tupleString),
+      args.assertNullableParam('tupleParam', tupleParam),
+    ]);
+    args.assertHash256('hash', hash);
+    const options = args.assertTransactionOptions('options', optionsIn);
+    args.assertSourceMaps('sourceMaps', sourceMaps);
     await this.applyBeforeRelayHook(options);
 
     return this.addTransactionHooks(
@@ -570,7 +602,16 @@ export class Client<
     optionsIn?: TransactionOptions,
     sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>> {
-    const options = optionsIn === undefined ? {} : optionsIn;
+    args.assertAddress('contract', contract);
+    args.assertString('method', method);
+    args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
+    paramsZipped.forEach(([tupleString, tupleParam]) => [
+      args.assertString('tupleString', tupleString),
+      args.assertNullableParam('tupleParam', tupleParam),
+    ]);
+    args.assertHash256('hash', hash);
+    const options = args.assertTransactionOptions('options', optionsIn);
+    args.assertSourceMaps('sourceMaps', sourceMaps);
     await this.applyBeforeRelayHook(options);
 
     return this.addTransactionHooks(
@@ -589,7 +630,15 @@ export class Client<
     optionsIn?: TransactionOptions,
     sourceMaps: SourceMaps = {},
   ): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>> {
-    const options = optionsIn === undefined ? {} : optionsIn;
+    args.assertAddress('contract', contract);
+    args.assertString('method', method);
+    args.assertArray('params', params).forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
+    paramsZipped.forEach(([tupleString, tupleParam]) => [
+      args.assertString('tupleString', tupleString),
+      args.assertNullableParam('tupleParam', tupleParam),
+    ]);
+    const options = args.assertTransactionOptions('options', optionsIn);
+    args.assertSourceMaps('sourceMaps', sourceMaps);
     await this.applyBeforeRelayHook(options);
 
     return this.addTransactionHooks(
@@ -607,6 +656,12 @@ export class Client<
     params: ReadonlyArray<ScriptBuilderParam | undefined>,
   ): Promise<RawCallReceipt> {
     try {
+      args.assertString('network', network);
+      args.assertAddress('contract', contract);
+      args.assertString('method', method);
+      args
+        .assertArray('params', params)
+        .forEach((param) => args.assertNullableScriptBuilderParam('params.param', param));
       const receipt = await this.getNetworkProvider(network).call(network, contract, method, params);
       await this.hooks.afterCall.promise(receipt);
 
@@ -626,7 +681,7 @@ export class Client<
   }
 
   protected getProvider(options: TransactionOptions = {}): TUserAccountProvider {
-    const { from } = options;
+    const { from } = args.assertTransactionOptions('options', options);
     if (from === undefined) {
       return this.selectedProvider$.getValue();
     }
@@ -646,6 +701,7 @@ export class Client<
   }
 
   protected getNetworkProvider(network: NetworkType): TUserAccountProvider {
+    args.assertString('network', network);
     const providers = Object.values(this.providers);
     const accountProvider = providers.find((provider) =>
       provider.getNetworks().some((providerNetwork) => providerNetwork === network),

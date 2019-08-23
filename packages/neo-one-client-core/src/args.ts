@@ -16,6 +16,8 @@ import {
   common,
   ForwardValue,
   Hash256String,
+  InvokeSendUnsafeReceiveTransactionOptions,
+  IterOptions,
   Param,
   PrivateKeyString,
   privateKeyToPublicKey,
@@ -32,7 +34,7 @@ import {
   UserAccountID,
   wifToPrivateKey,
 } from '@neo-one/client-common';
-import { utils } from '@neo-one/utils';
+import { OmitStrict, utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import { InvalidArgumentError } from './errors';
@@ -63,6 +65,17 @@ export const assertNullableBoolean = (name: string, value?: unknown): boolean | 
 
 export const assertNumber = (name: string, value?: unknown): number => {
   if (value == undefined || typeof value !== 'number') {
+    throw new InvalidArgumentError('number', name, value);
+  }
+
+  return value;
+};
+
+export const assertNullableNumber = (name: string, value?: unknown): number | undefined => {
+  if (value == undefined) {
+    return undefined;
+  }
+  if (typeof value !== 'number') {
     throw new InvalidArgumentError('number', name, value);
   }
 
@@ -496,7 +509,7 @@ export const assertSmartContractDefinition = (name: string, value?: unknown): Sm
   };
 };
 
-const assertScriptBuilderParam = (name: string, value?: unknown): ScriptBuilderParam => {
+export const assertScriptBuilderParam = (name: string, value?: unknown): ScriptBuilderParam => {
   if (value == undefined) {
     throw new InvalidArgumentError('ScriptBuilderParam', name, value);
   }
@@ -505,7 +518,7 @@ const assertScriptBuilderParam = (name: string, value?: unknown): ScriptBuilderP
   return value as any;
 };
 
-const assertNullableScriptBuilderParam = (name: string, value?: unknown): ScriptBuilderParam | undefined => {
+export const assertNullableScriptBuilderParam = (name: string, value?: unknown): ScriptBuilderParam | undefined => {
   if (value == undefined) {
     return undefined;
   }
@@ -513,7 +526,7 @@ const assertNullableScriptBuilderParam = (name: string, value?: unknown): Script
   return assertScriptBuilderParam(name, value);
 };
 
-const assertParam = (name: string, value?: unknown): Param => {
+export const assertParam = (name: string, value?: unknown): Param => {
   if (value == undefined) {
     throw new InvalidArgumentError('Param', name, value);
   }
@@ -522,7 +535,7 @@ const assertParam = (name: string, value?: unknown): Param => {
   return value as any;
 };
 
-const assertNullableParam = (name: string, value?: unknown): Param | undefined => {
+export const assertNullableParam = (name: string, value?: unknown): Param | undefined => {
   if (value == undefined) {
     return undefined;
   }
@@ -670,5 +683,80 @@ export const assertTransactionOptions = (name: string, options?: unknown): Trans
     ),
     networkFee: assertProperty(options, 'TransactionOptions', 'networkFee', assertNullableBigNumber),
     systemFee: assertProperty(options, 'TransactionOptions', 'systemFee', assertNullableBigNumber),
+  };
+};
+
+export const assertInvokeSendUnsafeReceiveTransactionOptions = (
+  name: string,
+  options?: unknown,
+): InvokeSendUnsafeReceiveTransactionOptions => {
+  if (options == undefined) {
+    return {};
+  }
+
+  if (!isObject(options)) {
+    throw new InvalidArgumentError('InvokeSendUnsafeReceiveTransactionOptions', name, options);
+  }
+
+  return {
+    from: assertProperty(options, 'InvokeSendUnsafeReceiveTransactionOptions', 'from', assertNullableUserAccountID),
+    attributes: assertProperty(
+      options,
+      'InvokeSendUnsafeReceiveTransactionOptions',
+      'attributes',
+      assertNullableArray,
+    ).map((value) => assertAttribute('TransactionOption.attributes', value)),
+    networkFee: assertProperty(
+      options,
+      'InvokeSendUnsafeReceiveTransactionOptions',
+      'networkFee',
+      assertNullableBigNumber,
+    ),
+    systemFee: assertProperty(
+      options,
+      'InvokeSendUnsafeReceiveTransactionOptions',
+      'systemFee',
+      assertNullableBigNumber,
+    ),
+    sendTo: assertProperty(options, 'InvokeSendUnsafeReceiveTransactionOptions', 'sendTo', assertNullableSendTo),
+    sendFrom: assertProperty(options, 'InvokeSendUnsafeReceiveTransactionOptions', 'sendFrom', assertNullableSendFrom),
+  };
+};
+
+const assertNullableSendTo = (name: string, value?: unknown): ReadonlyArray<OmitStrict<Transfer, 'to'>> | undefined => {
+  if (value == undefined) {
+    return undefined;
+  }
+
+  return assertNullableArray(name, value).map((transfer) => ({
+    amount: assertProperty(transfer, 'transfer', 'amount', assertBigNumber),
+    asset: assertProperty(transfer, 'transfer', 'asset', assertHash256),
+  }));
+};
+
+const assertNullableSendFrom = (name: string, value?: unknown): readonly Transfer[] | undefined => {
+  if (value == undefined) {
+    return undefined;
+  }
+
+  return assertTransfers(name, value);
+};
+
+export const assertNullableIterOptions = (name: string, options?: unknown): IterOptions | undefined => {
+  if (options == undefined) {
+    return undefined;
+  }
+  if (!isObject(options)) {
+    throw new InvalidArgumentError('IterOptions', name, options);
+  }
+  const indexStart = assertProperty(options, 'IterOptions', 'indexStart', assertNullableNumber);
+  const indexStop = assertProperty(options, 'IterOptions', 'indexStop', assertNullableNumber);
+  if (indexStart != undefined && indexStop != undefined && indexStart >= indexStop) {
+    throw new InvalidArgumentError('IterOptions', name, options);
+  }
+
+  return {
+    indexStart,
+    indexStop,
   };
 };

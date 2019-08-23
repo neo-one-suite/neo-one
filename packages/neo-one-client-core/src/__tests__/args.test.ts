@@ -193,6 +193,24 @@ describe('arg assertions', () => {
     expect(() => args.assertNumber('value', value)).toThrowErrorMatchingSnapshot();
   });
 
+  test('assertNullableNumber - number', () => {
+    const value = data.numbers.a;
+
+    expect(args.assertNullableNumber('value', value)).toEqual(value);
+  });
+
+  test('assertNullableNumber - undefined', () => {
+    const value = undefined;
+
+    expect(args.assertNullableNumber('value', value)).toEqual(value);
+  });
+
+  test('assertNullableNumber - non number', () => {
+    const value = true;
+
+    expect(() => args.assertNullableNumber('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
   test('assertArray - array', () => {
     const value = [data.numbers.a];
 
@@ -620,5 +638,163 @@ describe('arg assertions', () => {
     const value = data.transactionOptions.invalidNetworkFee;
 
     expect(() => args.assertTransactionOptions('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - notDefined', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.notDefined;
+
+    expect(args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toEqual({});
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - valid', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.valid;
+
+    expect(args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toEqual(value);
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - onlyFrom', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.onlyFrom;
+
+    expect(args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toEqual({ ...value, attributes: [] });
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - onlyFromScriptHash', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.onlyFromScriptHash;
+
+    expect(args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toEqual({
+      ...data.invokeSendUnsafeReceiveTransactionOptions.onlyFrom,
+      attributes: [],
+    });
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - onlyAttributes', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.onlyAttributes;
+
+    expect(args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toEqual(value);
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - onlyAttributesScriptHash', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.onlyAttributesScriptHash;
+
+    expect(args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toEqual(
+      data.invokeSendUnsafeReceiveTransactionOptions.onlyAttributes,
+    );
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - onlyNetworkFee', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.onlyNetworkFee;
+
+    expect(args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toEqual({ ...value, attributes: [] });
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - empty', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.empty;
+
+    expect(args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toEqual({ attributes: [] });
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - undefined', () => {
+    const value = undefined;
+
+    expect(args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toEqual({});
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - non object', () => {
+    const value = true;
+
+    expect(() => args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - invalidFrom', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.invalidFrom;
+
+    expect(() => args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - invalidAttributes', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.invalidAttributes;
+
+    expect(() => args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - invalidNetworkFee', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.invalidNetworkFee;
+
+    expect(() => args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - onlySendTo', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.onlySendTo;
+
+    expect(args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toEqual({
+      ...value,
+      attributes: [],
+    });
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - onlySendFromsValid', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.onlySendFromsInvalid;
+
+    expect(() => args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertInvokeSendUnsafeReceiveTransactionOptions - onlySendFromValid', () => {
+    const value = data.invokeSendUnsafeReceiveTransactionOptions.onlySendFromValid;
+
+    expect(args.assertInvokeSendUnsafeReceiveTransactionOptions('value', value)).toEqual({ ...value, attributes: [] });
+  });
+
+  test('assertNullableIterOptions - notDefined', () => {
+    const value = data.iterOptions.notDefined;
+
+    expect(args.assertNullableIterOptions('value', value)).toEqual(undefined);
+  });
+
+  test('assertNullableIterOptions - empty', () => {
+    const value = data.iterOptions.empty;
+
+    expect(args.assertNullableIterOptions('value', value)).toEqual(value);
+  });
+
+  test('assertNullableIterOptions - notObject', () => {
+    const value = data.iterOptions.notObject;
+
+    expect(() => args.assertNullableIterOptions('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertNullableIterOptions - onlyIndexStart', () => {
+    const value = data.iterOptions.onlyIndexStart;
+
+    expect(args.assertNullableIterOptions('value', value)).toEqual(value);
+  });
+
+  test('assertNullableIterOptions - onlyIndexStop', () => {
+    const value = data.iterOptions.onlyIndexStop;
+
+    expect(args.assertNullableIterOptions('value', value)).toEqual(value);
+  });
+
+  test('assertNullableIterOptions - validBlockFilter', () => {
+    const value = data.iterOptions.validBlockFilter;
+
+    expect(args.assertNullableIterOptions('value', value)).toEqual(value);
+  });
+
+  test('assertNullableIterOptions - invalidStart', () => {
+    const value = data.iterOptions.invalidStart;
+
+    expect(() => args.assertNullableIterOptions('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertNullableIterOptions - invalidStop', () => {
+    const value = data.iterOptions.invalidStop;
+
+    expect(() => args.assertNullableIterOptions('value', value)).toThrowErrorMatchingSnapshot();
+  });
+
+  test('assertNullableIterOptions - invalidBlockFilter', () => {
+    const value = data.iterOptions.invalidBlockFilter;
+
+    expect(() => args.assertNullableIterOptions('value', value)).toThrowErrorMatchingSnapshot();
   });
 });

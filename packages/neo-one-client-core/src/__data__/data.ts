@@ -210,6 +210,24 @@ const transactionOptions = {
   },
 };
 
+const iterOptions = {
+  notDefined: undefined,
+  empty: {},
+  notObject: 'notObject',
+  onlyIndexStart: blockFilters.onlyStart,
+  onlyIndexStop: blockFilters.onlyStop,
+  validBlockFilter: blockFilters.valid,
+  invalidStart: {
+    indexStart: 'one',
+    indexStop: 20,
+  },
+  invalidStop: {
+    indexStart: 1,
+    indexStop: 'twenty',
+  },
+  invalidBlockFilter: blockFilters.invalid,
+};
+
 const simpleReturnType = (returnType: ABIReturn) => ({
   functions: [
     {
@@ -361,6 +379,25 @@ const timestamps = {
   past: 1534365211,
 };
 
+const invokeSendUnsafeReceiveTransactionOptions = {
+  notDefined: undefined,
+  ...transactionOptions,
+  onlySendTo: {
+    sendTo: [
+      {
+        amount: transfer.a.amount,
+        asset: transfer.a.asset,
+      },
+    ],
+  },
+  onlySendFromsInvalid: {
+    sendFrom: transfers.invalidTransfer,
+  },
+  onlySendFromValid: {
+    sendFrom: transfers.valid,
+  },
+};
+
 export const data = {
   transactions,
   attributes,
@@ -373,6 +410,8 @@ export const data = {
   blockFilters,
   getOptions,
   transactionOptions,
+  iterOptions,
+  invokeSendUnsafeReceiveTransactionOptions,
   contractRegisters,
   abi,
   smartContractDefinition,

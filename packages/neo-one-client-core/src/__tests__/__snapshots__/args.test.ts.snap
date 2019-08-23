@@ -56,9 +56,29 @@ exports[`arg assertions assertHash256 - non-string 1`] = `"Expected string for v
 
 exports[`arg assertions assertHash256 - undefined 1`] = `"Expected string for value, found undefined"`;
 
+exports[`arg assertions assertInvokeSendUnsafeReceiveTransactionOptions - invalidAttributes 1`] = `"Expected Array for InvokeSendUnsafeReceiveTransactionOptions.attributes, found [object Object]"`;
+
+exports[`arg assertions assertInvokeSendUnsafeReceiveTransactionOptions - invalidFrom 1`] = `"Expected string for UserAccountID.network, found undefined"`;
+
+exports[`arg assertions assertInvokeSendUnsafeReceiveTransactionOptions - invalidNetworkFee 1`] = `"Expected Array for InvokeSendUnsafeReceiveTransactionOptions.attributes, found [object Object]"`;
+
+exports[`arg assertions assertInvokeSendUnsafeReceiveTransactionOptions - non object 1`] = `"Expected InvokeSendUnsafeReceiveTransactionOptions for value, found true"`;
+
+exports[`arg assertions assertInvokeSendUnsafeReceiveTransactionOptions - onlySendFromsValid 1`] = `"Expected Transfer for InvokeSendUnsafeReceiveTransactionOptions.sendFrom, found Foo"`;
+
 exports[`arg assertions assertNullableArray - non array 1`] = `"Expected Array for value, found true"`;
 
 exports[`arg assertions assertNullableBoolean - non boolean 1`] = `"Expected boolean for value, found 0"`;
+
+exports[`arg assertions assertNullableIterOptions - invalidBlockFilter 1`] = `"Expected IterOptions for value, found [object Object]"`;
+
+exports[`arg assertions assertNullableIterOptions - invalidStart 1`] = `"Expected number for IterOptions.indexStart, found one"`;
+
+exports[`arg assertions assertNullableIterOptions - invalidStop 1`] = `"Expected number for IterOptions.indexStop, found twenty"`;
+
+exports[`arg assertions assertNullableIterOptions - notObject 1`] = `"Expected IterOptions for value, found notObject"`;
+
+exports[`arg assertions assertNullableNumber - non number 1`] = `"Expected number for value, found true"`;
 
 exports[`arg assertions assertNumber - non number 1`] = `"Expected number for value, found true"`;
 
