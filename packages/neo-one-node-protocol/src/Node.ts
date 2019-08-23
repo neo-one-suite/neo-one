@@ -1,6 +1,6 @@
 import { common, crypto, UInt256Hex, utils } from '@neo-one/client-common';
 import { AggregationType, globalStats, MeasureUnit } from '@neo-one/client-switch';
-import { nodeLogger } from '@neo-one/logger';
+import { createChild, nodeLogger } from '@neo-one/logger';
 import { Consensus, ConsensusOptions } from '@neo-one/node-consensus';
 import {
   Block,
@@ -58,7 +58,7 @@ import {
 } from './payload';
 import { PeerData } from './PeerData';
 
-const logger = nodeLogger.child({ component: 'node-protocol' });
+const logger = createChild(nodeLogger, { component: 'node-protocol' });
 
 const messageReceivedTag = labelToTag(Labels.COMMAND_NAME);
 

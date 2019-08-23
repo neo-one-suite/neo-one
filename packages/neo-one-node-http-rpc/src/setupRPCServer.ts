@@ -1,6 +1,6 @@
 import { cors, setupServer } from '@neo-one/http';
 import { context, onError as appOnError } from '@neo-one/http-context';
-import { nodeLogger, rpcLogger } from '@neo-one/logger';
+import { createChild, nodeLogger, rpcLogger } from '@neo-one/logger';
 import { Blockchain, Node } from '@neo-one/node-core';
 import { Disposable, Labels } from '@neo-one/utils';
 import * as nodeHttp from 'http';
@@ -9,7 +9,7 @@ import Router from 'koa-router';
 import serve from 'koa-static';
 import { liveHealthCheck, LiveHealthCheckOptions, readyHealthCheck, ReadyHealthCheckOptions, rpc } from './middleware';
 
-const logger = nodeLogger.child({ component: 'rpc' });
+const logger = createChild(nodeLogger, { component: 'rpc' });
 
 export interface Options {
   readonly http?: {

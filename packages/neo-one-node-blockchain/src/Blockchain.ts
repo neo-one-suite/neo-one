@@ -1,6 +1,6 @@
 import { common, crypto, ECPoint, ScriptBuilder, UInt160, VMState } from '@neo-one/client-common';
 import { AggregationType, globalStats, MeasureUnit } from '@neo-one/client-switch';
-import { nodeLogger } from '@neo-one/logger';
+import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Action,
   Block,
@@ -46,7 +46,7 @@ import { getValidators } from './getValidators';
 import { wrapExecuteScripts } from './wrapExecuteScripts';
 import { WriteBatchBlockchain } from './WriteBatchBlockchain';
 
-const logger = nodeLogger.child({ component: 'blockchain' });
+const logger = createChild(nodeLogger, { component: 'blockchain' });
 
 export interface CreateBlockchainOptions {
   readonly settings: Settings;

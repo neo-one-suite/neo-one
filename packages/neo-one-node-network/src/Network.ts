@@ -1,5 +1,5 @@
 import { AggregationType, globalStats, MeasureUnit } from '@neo-one/client-switch';
-import { nodeLogger } from '@neo-one/logger';
+import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   ConnectedPeer,
   createEndpoint,
@@ -18,7 +18,7 @@ import { Duplex } from 'stream';
 import { UnsupportedEndpointType } from './errors';
 import { TCPPeer } from './TCPPeer';
 
-const logger = nodeLogger.child({ component: 'network' });
+const logger = createChild(nodeLogger, { component: 'network' });
 
 export interface ListenTCP {
   readonly port: number;

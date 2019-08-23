@@ -1,5 +1,5 @@
 import { AggregationType, globalStats, MeasureUnit, SpanKind, tracer } from '@neo-one/client-switch';
-import { Logger } from '@neo-one/logger';
+import { createChild, Logger } from '@neo-one/logger';
 import { addAttributesToSpan, Labels, labelsToTags, utils } from '@neo-one/utils';
 import { Context } from 'koa';
 
@@ -53,7 +53,7 @@ export const context = (logger: Logger) => async (ctx: Context, next: () => Prom
   const spanExtract = tracer.propagation.extract({ getHeader: (name: string) => ctx.headers[name] });
   const spanContext = spanExtract !== null ? spanExtract : undefined;
   const { spanLabels, logLabels } = getContextLabels(ctx);
-  const childLogger = logger.child({ service: 'http-server', ...logLabels });
+  const childLogger = createChild(logger, { service: 'http-server', ...logLabels });
   ctx.state.logger = childLogger;
   await tracer.startRootSpan({ spanContext, name: 'http_server_request', kind: SpanKind.SERVER }, async (span) => {
     addAttributesToSpan(span, spanLabels);
