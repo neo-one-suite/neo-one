@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/client-full",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "NEO•ONE client extended API.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/client": "^1.2.3",
-    "@neo-one/client-full-core": "^1.2.0"
+    "@neo-one/client": "^1.2.4",
+    "@neo-one/client-full-core": "^1.2.1"
   },
   "sideEffects": false
 }

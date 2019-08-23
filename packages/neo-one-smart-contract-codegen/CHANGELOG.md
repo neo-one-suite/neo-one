@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.7](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-codegen@1.1.6...@neo-one/smart-contract-codegen@1.1.7) (2019-08-23)
+
+
+### Bug Fixes
+
+* **tests:** update snapshots ([#1699](https://github.com/neo-one-suite/neo-one/issues/1699)) ([21d566e](https://github.com/neo-one-suite/neo-one/commit/21d566e))
+* **tests:** update snapshots again ([#1700](https://github.com/neo-one-suite/neo-one/issues/1700)) ([eeb182e](https://github.com/neo-one-suite/neo-one/commit/eeb182e))
+
+
+
+
+
 ## [1.1.6](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-codegen@1.1.5...@neo-one/smart-contract-codegen@1.1.6) (2019-08-22)
 
 **Note:** Version bump only for package @neo-one/smart-contract-codegen

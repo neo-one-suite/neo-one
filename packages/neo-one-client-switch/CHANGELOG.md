@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-switch@1.3.0...@neo-one/client-switch@1.4.0) (2019-08-23)
+
+
+### Features
+
+* **build:** fix bin package.jsons ([#1704](https://github.com/neo-one-suite/neo-one/issues/1704)) ([e7f9b83](https://github.com/neo-one-suite/neo-one/commit/e7f9b83))
+
+
+
+
+
 # [1.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-switch@1.2.2...@neo-one/client-switch@1.3.0) (2019-08-22)
 
 

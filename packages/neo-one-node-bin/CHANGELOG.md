@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-bin@2.1.0...@neo-one/node-bin@2.2.0) (2019-08-23)
+
+
+### Features
+
+* **build:** fix bin package.jsons ([#1704](https://github.com/neo-one-suite/neo-one/issues/1704)) ([e7f9b83](https://github.com/neo-one-suite/neo-one/commit/e7f9b83))
+* **e2e:** node-bin e2e consensus test ([0671932](https://github.com/neo-one-suite/neo-one/commit/0671932))
+
+
+
+
+
 # [2.1.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-bin@2.0.0...@neo-one/node-bin@2.1.0) (2019-08-22)
 
 
