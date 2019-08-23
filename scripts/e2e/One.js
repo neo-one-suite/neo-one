@@ -78,7 +78,13 @@ class One {
       'neo-one',
     );
     const args = commandIn.split(' ');
-    const proc = execa(cmd, args, this._getEnv(project, options));
+    const proc = execa(
+      cmd,
+      args,
+      options.environment
+        ? options.environment
+        : this._getEnv(project, options),
+    );
     // Uncomment these lines to debug e2e tests.
     // proc.stdout.pipe(process.stdout);
     // proc.stderr.pipe(process.stderr);
@@ -103,7 +109,7 @@ class One {
   }
 
   createNodeProject(project) {
-    const environment = this._getEnvNode(project);
+    const environment = this._getEnvTmpProject(project);
     return {
       exec: (command, options = {}) => {
         const proc = this.execBaseNode(command, { ...options, environment });
@@ -113,7 +119,29 @@ class One {
             // do nothing
           });
         });
+
+        return proc;
       },
+      env: environment.env,
+    };
+  }
+
+  createCLIProject(project) {
+    const environment = this._getEnvTmpProject(project);
+    return {
+      exec: (command, options = {}) =>
+        this.execBase(command, project, {
+          ...options,
+          environment,
+        })
+          .then(({ stdout }) => stdout)
+          .catch((error) => {
+            throw new Error(
+              `Command:\n${[cmd].concat(args).join(' ')}\n\nSTDOUT:\n${
+                error.stdout
+              }\n\nSTDERR:\n${error.stderr}\n\nERROR:\n${error.toString()}`,
+            );
+          }),
       env: environment.env,
     };
   }
@@ -173,7 +201,7 @@ class One {
     throw finalError;
   }
 
-  _getEnvNode(project) {
+  _setupProject(project) {
     this.projectEnv[project] = this.projectEnv[project] || {
       ..._.fromPairs(
         _.range(this.minPort, this.maxPort).map((port, idx) => [
@@ -183,6 +211,10 @@ class One {
       ),
       NEO_ONE_TMP_DIR: this.getTmpDir(),
     };
+  }
+
+  _getEnvTmpProject(project) {
+    this._setupProject(project);
 
     return {
       maxBuffer: 20000 * 1024,
@@ -193,15 +225,7 @@ class One {
   }
 
   _getEnv(project, options = {}) {
-    this.projectEnv[project] = this.projectEnv[project] || {
-      ..._.fromPairs(
-        _.range(this.minPort, this.maxPort).map((port, idx) => [
-          `NEO_ONE_PORT_${idx}`,
-          port,
-        ]),
-      ),
-      NEO_ONE_TMP_DIR: this.getTmpDir(),
-    };
+    this._setupProject(project);
 
     return {
       ...options,
