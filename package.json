@@ -227,7 +227,7 @@
     "react-static-plugin-source-filesystem": "^7.1.0",
     "rollup": "^1.19.4",
     "rollup-plugin-string": "^3.0.0",
-    "rollup-plugin-typescript2": "^0.22.1",
+    "rollup-plugin-typescript2": "^0.23.0",
     "rxjs": "^6.5.2",
     "rxjs-tslint-rules": "^4.24.3",
     "source-map": "^0.7.3",
