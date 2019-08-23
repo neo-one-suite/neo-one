@@ -251,8 +251,8 @@ import { createWithContracts } from '@neo-one/smart-contract-test-browser';
 import * as path from 'path';
 
 export const withContracts = createWithContracts([
-  { name: 'Token', filePath: path.resolve(__dirname, '../../contracts/Token.ts') },
-  { name: 'ICO', filePath: path.resolve(__dirname, '../../contracts/ICO.ts') },
+  { name: 'Token', filePath: path.resolve(__dirname, '../contracts/Token.ts') },
+  { name: 'ICO', filePath: path.resolve(__dirname, '../contracts/ICO.ts') },
 ]);
 ",
     "ts": "// tslint:disable
