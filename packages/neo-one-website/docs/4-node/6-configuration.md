@@ -11,60 +11,56 @@ This section will serve as a reference for the NEO•ONE Node's many configurati
 
 ---
 
-## Environment
+## Path
 
 ```bash
 ...
 {
-  "environment": {
-    "dataPath?": string,
-    "chainFile?": string,
-    "dumpChainFile?": string,
-    "haltOnSync?": boolean,
-    "levelDownOptions?": ???,
-    "logger?": {
-      "level?": string,
-      "path?": string
+  "path?": string
+}
+...
+```
+
+_defaults to the data path supplied by [env-paths](https://www.npmjs.com/package/env-paths)_
+
+`path` is the path used for storing blockchain data.
+
+In the [local docker](/docs/node-docker#Examples) example we could store blockchain data in a location other than `/root/.local/share/neo_one_node`, it should be noted you will need to change the mount location as well.
+
+## Telemetry
+
+```bash
+...
+{
+  "telemetry?": {
+    "logging?": {
+      "level": string
     },
-    "telemetry?": {
-      "port": number
+    "prometheus?": {
+      "prefix?": string,
+      "port?": number
+    },
+    "jaeger?": {
+      "host?": string,
+      "port?": number,
+      "maxPacketSize?": number
+    }
+    "tracing?": {
+      "logLevel?": number,
+      "plugins?": {},
+      "bufferSize?": number,
+      "bufferTimeout?": number
     }
   }
 }
 ...
 ```
 
-### dataPath
+`telemetry` options control the collection and exporting of logs, metrics, and spans from the node.
 
-_defaults to the data path supplied by [env-paths](https://www.npmjs.com/package/env-paths)_
+### Logging
 
-`environment.dataPath` is the path used for storing blockchain data.
-
-In the [local docker](/docs/node-docker#Examples) example we could store blockchain data in a location other than `/root/.local/share/neo_one_node`, it should be noted you will need to change the mount location as well.
-
-### chainFile
-
-_disabled by default_
-
-Optional path for syncing from a local `chainFile`. A chainfile is a full binary of blockchain data that can be used to **hard** re-sync the chain. As opposed to a normal backup this is used to re-sync instead of restore. This is useful in extreme situations like a fork.
-
-::: warning
-
-Note
-
-Syncing from a chainfile can take a **very** long time. Upwards of 30 hours.
-
-:::
-
-### dumpChainFile
-
-_disabled by default_
-
-Optional path for outputting a `chainFile`.
-
-### logger
-
-\*defaults to **{path: undefined, level: 'silent'}\***
+\*defaults to **{level: 'silent'}\***
 
 Desired logging level and output path of the node logging, options are for level are:
 
@@ -72,64 +68,73 @@ Desired logging level and output path of the node logging, options are for level
 'silent' | 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace'
 ```
 
-### haltOnSync
-
-\*defaults to **false\***
-
-`haltOnSync` enables a watcher which will halt the node when the rpc server's `readyHealthCheck` passes and begin a backup if a location is specified which you are authorized to push to.
-
-::: warning
-
-Note
-
-To properly halt and backup, you must also provide `backup` and `rpc.readyHealthCheck` configurations. In the case of google-cloud you must also provide service credentials.
-
-:::
-
-### levelDownOptions
-
-_see the [leveldown documentation](https://github.com/Level/leveldown#options)_
-
-### telemetry
+### Prometheus
 
 _disabled by default_
 
-`environment.telemetry.port` specifies the port to use when serving node-metrics. When enabled, you can visit `localhost:<port>/metrics` to view metrics.
+Enables the Prometheus exporter for exporting metrics about the NEO•ONE Node. You can add an app prefix and choose a port. If no port is set prometheus will default to port `9464`.
 
-## Settings
+### Jaeger
+
+_disabled by default_
+
+Enables the jaeger exporter for exporting spans from the NEO•ONE Node. You can optionally supply a host and port, as well as a limit on the exported packet size. See the [Jaeger homepage](https://www.jaegertracing.io/) for more.
+
+### Tracing
+
+_disabled by default_
+
+Enables trace collection for the NEO•ONE Node. This must be used in tangent with `jaeger` options in order to collect AND export span information from the Node. As advanced options you can enable extra opencensus plugins, as well as limit the size and timeout of spans waiting to be exported.
+
+## Blockchain
 
 ```bash
+...
+#basic configuration
 {
-  "settings": {
-    "type": string,
-    "privateNet": boolean,
-    "address": string,
-    "standbyValidators": string[]
-  }
+  "blockchain": 'main' | 'test'
 }
+...
 ```
 
-### type
+```bash
+#advanced configuration
+...
+{
+  "blockchain": {
+    "genesisBlock": string,
+    "governingToken": string,
+    "utilityToken": string,
+    "decrementInterval": number,
+    "generationAmount": number,
+    "fees": Record<string, string>,
+    "registerValidatorFee": string,
+    "messageMagic": number,
+    "addressVersion": number,
+    "privateKeyVersion": number,
+    "standbyValidators": string[],
+    "vm": {
+      "storageContext": {
+        "v0": {
+          "index": number
+        }
+      }
+    },
+    "secondsPerBlock": number,
+    "maxTransactionsPerBlock": number,
+    "memPoolSize": number
+  }
+}
+...
+```
 
-_defaults to 'main'_
+---
 
-`settings.type` specifies which NEO network we are connecting to. Pre-configured options are `main` and `test`.
+_defaults to `main`_
 
-### privateNet
+As a shortcut you can specify the blockchain default settings as `main` or `test` to point to the NEO mainnet/testnet.
 
-\*defaults to **false\***
-
-`settings.privateNet` specifies whether or not the node is connecting to a private network.
-
-### address
-
-_defaults to '5fa99d93303775fe50ca119c327759313eccfa1c'_
-
-`settings.address` sets the initial address we send tokens to on private net.
-
-### standbyValidators
-
-List of consensus nodes.
+In most cases the above will be enough, but you have the ability to define serialized blockchain settings. See [neo-one-node-consensus-test/config](https://github.com/neo-one-suite/neo-one/blob/master/packages/neo-one-node-bin/src/__data__/configs/consensus.ts) for an example of quickly constructing a privateNet using this method.
 
 ## RPC
 
@@ -139,10 +144,8 @@ List of consensus nodes.
   "rpc": {
     "http?": {
       "port": number,
-      "host": string
-    },
-    "server?": {
-      "keepAliveTimeout": number,
+      "host?": string,
+      "keepAliveTimeout?": number
     },
     "liveHealthCheck?": {
       "rpcURLs?": string[],
@@ -155,16 +158,6 @@ List of consensus nodes.
       "offset?": number,
       "timeoutMS?": number,
       "checkEndpoints?": number
-    },
-    "tooBusyCheck?": {
-      "enabled": boolean,
-      "interval?": number,
-      "maxLag?": number
-    },
-    "rateLimit?": {
-      "enabled": boolean,
-      "duration?": number,
-      "max?": number
     }
   }
 }
@@ -175,15 +168,15 @@ List of consensus nodes.
 
 ---
 
-_by default only http is enabled on `localhost:8080` OR `localhost:$PORT` if you have set the `PORT` environment variable_
+### HTTP
+
+_by default http is enabled on `localhost:8080` OR `localhost:$PORT` if you have set the `PORT` environment variable_
 
 `rpc.http` is used to configure the rpc server’s host options. It is important in a kubernetes setup that `containerPort` matches `rpc.http.port`.
 
-### Hot Options
+`keepAliveTimeout`: if you would like your server to close after _x_ seconds without activity set a timeout here (in milliseconds).
 
-_these options can be changed without restarting the node_
-
-`server.keepAliveTimeout`: if you would like your server to close after _x_ seconds without activity set a timeout here (in milliseconds).
+### Health Checks
 
 `liveHealthCheck` _&_ `readyHealthCheck` share the same configuration.
 
@@ -191,10 +184,6 @@ _these options can be changed without restarting the node_
 - `offset`: the acceptable difference of blocks ahead/behind to count as `live` or `ready`
 - `timeoutMS`: timeout for RPC connections
 - `checkEndpoints`: the number of different endpoints to check against before passing `true`/`false`.
-
-`tooBusyCheck` (_experimental_): enable the tooBusy middleware which throttles requests to the node when under significant load. Currently an experimental feature, see [toobusy-js](https://github.com/strml/node-toobusy) for more. Set `tooBusyCheck.enabled` to **true** if you would like to try it.
-
-`rateLimit` (_experimental_): enable the rateLimiter middleware which throttles requests to the node when too many have been made from the same address over a period of time. Currently an experimental feature, see [koa-ratelimit-lru](https://github.com/Dreamacro/koa-ratelimit-lru) for more. Set `rateLimit.enabled` to **true** to experiment with it.
 
 ## Node
 
@@ -221,10 +210,6 @@ _these options can be changed without restarting the node_
 ---
 
 `externalPort` specifies the external port of the node which it can send messages to peers on. Typically the same as `network.listenTCP`.
-
-### Hot Options
-
-_these options can be changed without restarting the node_
 
 `rpcURLs` specifies a list of known node RPC URLs you would like to try and connect to. A list of public mainnet hosts can be found at http://monitor.cityofzion.io/.
 
@@ -263,10 +248,6 @@ _these options can be changed without restarting the node_
 
 `listenTCP` when provided at least a port this allows other nodes to create TCP connections with this one over that port. `host` is optional and defaults to 'localhost'.
 
-### Hot Options
-
-_these options can be changed without restarting the node_
-
 `seeds` specifies external seeds you would like to connect to.
 
 `peerSeeds` specifies trusted seeds, typically ones run by yourself or on the same cluster.
@@ -278,76 +259,3 @@ _these options can be changed without restarting the node_
 `connectPeersDelayMS` sets the amount of time (in milliseconds) to wait after requesting a peer connection before requesting another. Defaults to 5000.
 
 `socketTimeoutMS` sets the timeout of peer requests (in milliseconds). Defaults to 1 minute.
-
-## backup
-
-```bash
-...
-{
-  "backup": {
-    "tmpPath?": string,
-    "readyPath?": string,
-    // observable options
-    "restore?": boolean,
-    "cronSchedule?": string,
-    "provider?": {
-      "gcloud?": {
-        "projectID": string,
-        "bucket": string,
-        "prefix": string,
-        "keepBackupCount?": number,
-        "maxSizeBytes?": number
-      },
-
-      "mega?": {
-        "download?": {
-          "id": string,
-          "key": string
-        },
-
-        "upload?": {
-          "email": string,
-          "password": string,
-          "file": string
-        }
-      }
-    }
-  }
-}
-...
-```
-
-`backup` options handle the backup and restore configuration for the node.
-
----
-
-`tmpPath` _(defaults to \${environment.dataPath}/tmp)_ specifies the file path to use for downloading backup files before extraction.
-
-`readyPath` _(defaults to \${environment.dataPath}/ready)_ specifies the file path to use when flagging the restore as 'ready'.
-
-### Hot Options
-
-_these options can be changed without restarting the node_
-
-`restore`: set to **true** to attempt and pull the latest backup from your provider on starting the node, **false** to ignore restoring and only backup.
-
-`cronschedule`: set a schedule for when to stop the node and backup. See `[cron format](http://www.nncron.ru/help/EN/working/cron-format.htm)
-
-`provider` is where you will specify either a `gcloud` or `mega` provider. NEO•ONE maintains a public google cloud repository of backups you may restore from using:
-
-```bash
-{
-  "backup": {
-    "provider": {
-      "gcloud": {
-        "projectID": "neotracker-172901",
-        "bucket": "bucket-1.neo-one.io",
-        "prefix": "node_0",
-        "maxSizeBytes": 419430400
-      }
-    }
-  }
-}
-```
-
-Where `maxSizeBytes` is the maximum size for a chunk of uploaded data.

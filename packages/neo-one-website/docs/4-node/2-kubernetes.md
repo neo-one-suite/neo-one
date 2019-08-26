@@ -68,7 +68,7 @@ spec:
     spec:
       containers:
       - name: neo-one-node
-        image: quay.io/neoone/node:1.5
+        image: neoonesuite/node
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -78,12 +78,7 @@ spec:
           mountPath: /root/.local/share/neo_one_node
         args: [
           "--node.rpcURLs=http://seed6.ngd.network:10332",
-          "--node.rpcURLs=https://seed1.red4sec.com:10332",
-          "--backup.restore=true",
-          "--backup.provider.gcloud.projectID=neotracker-172901",
-          "--backup.provider.gcloud.bucket=bucket-1.neo-one.io",
-          "--backup.provider.gcloud.prefix=node_0",
-          "--backup.provider.gcloud.maxSizeBytes=419430400"
+          "--node.rpcURLs=https://seed1.red4sec.com:10332"
         ]
         resources:
           requests:
@@ -139,8 +134,8 @@ While the above examples shows how to configure our pods with environment variab
 ```bash
 #/path/to/config.json
 {
-  "environment": {
-    "logger": {
+  "telemetry": {
+    "logging": {
       "level": "debug"
     }
   }
@@ -178,7 +173,7 @@ spec:
     spec:
       containers:
         - name: neo-one-node
-          image: quay.io/neoone/node:latest
+          image: neoonesuite/node
           ports:
             - containerPort: 8080
               name: node
@@ -322,7 +317,7 @@ spec:
     spec:
       containers:
         - name: neo-one-node
-          image: quay.io/neoone/node:1.5
+          image: neoonesuite/node
           ports:
             - containerPort: 8080
               name: node
