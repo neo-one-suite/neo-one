@@ -151,6 +151,8 @@
     "rxjs-finnish": true,
     "rxjs-no-ignored-error": false,
     "ban-ts-ignore": false,
-    "no-default-import": false
+    "no-default-import": false,
+    "strict-string-expressions": false,
+    "invalid-void": false
   }
 }
