@@ -30,7 +30,12 @@ export interface NEOTrackerConfiguration {
   readonly port: number;
 }
 
+export interface MigrationConfiguration {
+  readonly path: string;
+}
+
 export interface Configuration {
+  readonly migration: MigrationConfiguration;
   readonly contracts: ContractsConfiguration;
   readonly codegen: CodegenConfiguration;
   readonly network: NetworkConfiguration;

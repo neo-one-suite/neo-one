@@ -13,7 +13,7 @@
       "./packages/*/package.json",
       "./packages/*/template/**/*.ts",
       "./packages/*/template/**/*.tsx",
-      "./packages/neo-one-cli/src/__data__/projects/*/contracts/**/*.ts",
+      "./packages/neo-one-cli/src/__data__/projects/**/contracts/**/*.ts",
       "./packages/neo-one-smart-contract/src/*.d.ts",
       "./packages/neo-one-smart-contract-compiler/src/__data__/snippets/**/*.ts",
       "./packages/neo-one-smart-contract-lib/src/*.ts",

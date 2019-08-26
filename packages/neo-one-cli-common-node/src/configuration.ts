@@ -9,8 +9,11 @@ import { register } from 'ts-node';
 import { defaultNetworks } from './networks';
 
 const configurationDefaults = {
+  migration: {
+    path: nodePath.join('neo-one', 'migration.js'),
+  },
   contracts: {
-    path: 'contracts',
+    path: nodePath.join('neo-one', 'contracts'),
   },
   codegen: {
     path: nodePath.join('src', 'neo-one'),
@@ -30,6 +33,10 @@ const configurationDefaults = {
 
 const applyDefaults = (config: any = {}): Configuration => ({
   ...config,
+  migration: {
+    ...configurationDefaults.migration,
+    ...(config.migration === undefined ? {} : config.migration),
+  },
   contracts: {
     ...configurationDefaults.contracts,
     ...(config.contracts === undefined ? {} : config.contracts),
@@ -54,6 +61,14 @@ const configurationSchema = {
   allRequired: true,
   additionalProperties: false,
   properties: {
+    migration: {
+      type: 'object',
+      allRequired: true,
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string' },
+      },
+    },
     contracts: {
       type: 'object',
       allRequired: true,
@@ -108,6 +123,10 @@ const configurationSchema = {
 
 const relativizePaths = (config: Configuration) => ({
   ...config,
+  migration: {
+    ...config.migration,
+    path: nodePath.relative(process.cwd(), config.migration.path),
+  },
   contracts: {
     ...config.contracts,
     path: nodePath.relative(process.cwd(), config.contracts.path),
@@ -135,6 +154,10 @@ ${exportConfig} {
   contracts: {
     // NEO•ONE will look for smart contracts in this directory.
     path: '${config.contracts.path}',
+  },
+  migration: {
+    // NEO•ONE will load the deployment migration from this path.
+    path: '${config.migration.path}',
   },
   codegen: {
     // NEO•ONE will write source artifacts to this directory. This directory should be committed.
@@ -215,6 +238,10 @@ const validateConfig = async (rootDir: string, configIn: cosmiconfig.Config): Pr
   }
 
   return {
+    migration: {
+      ...config.migration,
+      path: nodePath.resolve(rootDir, config.migration.path),
+    },
     contracts: {
       ...config.contracts,
       path: nodePath.resolve(rootDir, config.contracts.path),
@@ -244,9 +271,9 @@ export const loadConfiguration = async (): Promise<Configuration> => {
     const explorer = cosmiconfig('neo-one', {
       loaders: {
         '.ts': {
-          sync: (filePath: string): object => {
+          async: async (filePath: string): Promise<object> => {
             register();
-            const obj = require(filePath);
+            const obj = await import(filePath);
 
             return obj.default === undefined ? obj : obj.default;
           },

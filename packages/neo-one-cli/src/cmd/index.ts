@@ -1,6 +1,7 @@
 import yargs from 'yargs';
 import * as build from './build';
 import * as convert from './convert';
+import * as deploy from './deploy';
 import * as info from './info';
 import * as init from './init';
 import * as newCmd from './new';
@@ -16,5 +17,6 @@ export const builder = (yargsBuilder: typeof yargs) =>
     .command(start.command, start.describe, start.builder)
     .command(stop.command, stop.describe, stop.builder)
     .command(build)
+    .command(deploy)
     .command(info)
     .command(init);
