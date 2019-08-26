@@ -12,7 +12,6 @@ import {
   Block,
   BlockJSON,
   common,
-  Configuration,
   ConfirmedTransaction,
   Contract,
   ContractJSON,
@@ -330,8 +329,8 @@ export class NEOONEDataProvider implements DeveloperProvider {
     return this.mutableClient.reset();
   }
 
-  public async getProjectConfiguration(): Promise<Configuration | undefined> {
-    return this.mutableClient.getProjectConfiguration();
+  public async getNEOTrackerURL(): Promise<string | undefined> {
+    return this.mutableClient.getNEOTrackerURL();
   }
 
   public async resetProject(): Promise<void> {

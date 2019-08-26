@@ -1,12 +1,4 @@
-import {
-  common,
-  Configuration,
-  crypto,
-  JSONHelper,
-  RelayTransactionResultJSON,
-  TransactionJSON,
-  utils,
-} from '@neo-one/client-common';
+import { common, crypto, JSONHelper, RelayTransactionResultJSON, TransactionJSON, utils } from '@neo-one/client-common';
 import { AggregationType, globalStats, MeasureUnit, TagMap } from '@neo-one/client-switch';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
@@ -96,8 +88,8 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   fastforwardoffset: 'fastforwardoffset',
   fastforwardtotime: 'fastforwardtotime',
   reset: 'reset',
-  getProjectConfiguration: 'getprojectconfiguration',
-  resetProject: 'resetproject',
+  getneotrackerurl: 'getneotrackerurl',
+  resetproject: 'resetproject',
   UNKNOWN: 'UNKNOWN',
   INVALID: 'INVALID',
 };
@@ -277,12 +269,12 @@ export type RPCHandler = (request: unknown) => Promise<any>;
 export const createHandler = ({
   blockchain,
   node,
-  handleGetProjectConfiguration,
+  handleGetNEOTrackerURL,
   handleResetProject,
 }: {
   readonly blockchain: Blockchain;
   readonly node: Node;
-  readonly handleGetProjectConfiguration: () => Promise<Configuration | undefined>;
+  readonly handleGetNEOTrackerURL: () => Promise<string | undefined>;
   readonly handleResetProject: () => Promise<void>;
 }): RPCHandler => {
   const checkHeight = (height: number) => {
@@ -687,7 +679,7 @@ export const createHandler = ({
 
       return true;
     },
-    [RPC_METHODS.getprojectconfiguration]: async () => handleGetProjectConfiguration(),
+    [RPC_METHODS.getneotrackerurl]: async () => handleGetNEOTrackerURL(),
     [RPC_METHODS.resetproject]: async () => {
       await handleResetProject();
 

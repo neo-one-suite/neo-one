@@ -1,5 +1,10 @@
-import { BootstrapWallet, setupWallets as setupWalletsBase, WALLETS as WALLETS_BASE } from '@neo-one/cli-common';
-import { common, Configuration, crypto, privateKeyToAddress, wifToPrivateKey } from '@neo-one/client-common';
+import {
+  BootstrapWallet,
+  Configuration,
+  setupWallets as setupWalletsBase,
+  WALLETS as WALLETS_BASE,
+} from '@neo-one/cli-common';
+import { common, crypto, privateKeyToAddress, wifToPrivateKey } from '@neo-one/client-common';
 import { NEOONEDataProvider } from '@neo-one/client-core';
 import { constants } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';

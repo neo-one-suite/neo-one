@@ -6,7 +6,6 @@ import {
   BlockJSON,
   BufferString,
   CallReceiptJSON,
-  Configuration,
   ContractJSON,
   GetOptions,
   Hash256String,
@@ -253,8 +252,8 @@ export class JSONRPCClient {
     return this.withInstance(async (provider) => provider.request({ method: 'reset' }));
   }
 
-  public async getProjectConfiguration(): Promise<Configuration | undefined> {
-    return this.withInstance(async (provider) => provider.request({ method: 'getprojectconfiguration' }));
+  public async getNEOTrackerURL(): Promise<string | undefined> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getneotrackerurl' }));
   }
 
   public async resetProject(): Promise<void> {

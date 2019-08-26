@@ -10,7 +10,7 @@ export const builder = (yargsBuilder: typeof yargs) =>
   yargsBuilder.positional('value', { type: 'string' }).demandOption('value');
 export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
   start(async () => {
-    const scriptHash = argv['value'];
+    const scriptHash = argv.value;
     const address = scriptHashToAddress(scriptHash);
     console.log(`Script Hash: ${scriptHash}`);
     console.log(`Address: ${address}`);

@@ -94,7 +94,7 @@ export class FullNode {
       blockchain,
       node,
       handleResetProject: this.reset.bind(this),
-      handleGetProjectConfiguration: async () => undefined,
+      handleGetNEOTrackerURL: async () => undefined,
     });
   }
 

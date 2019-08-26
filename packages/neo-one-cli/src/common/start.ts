@@ -1,5 +1,5 @@
+import { Configuration } from '@neo-one/cli-common';
 import { loadConfiguration } from '@neo-one/cli-common-node';
-import { Configuration } from '@neo-one/client-common';
 import { cliLogger } from '@neo-one/logger';
 import { Disposable } from '@neo-one/utils';
 import { createStart, StartReturn } from '@neo-one/utils-node';

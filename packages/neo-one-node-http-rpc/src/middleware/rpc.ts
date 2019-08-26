@@ -11,7 +11,11 @@ export const rpc = ({ blockchain, node }: { readonly blockchain: Blockchain; rea
   const handler = createHandler({
     blockchain,
     node,
-    handleGetProjectConfiguration: async () => loadConfiguration(),
+    handleGetNEOTrackerURL: async () => {
+      const config = await loadConfiguration();
+
+      return `http://localhost:${config.neotracker.port}`;
+    },
     handleResetProject: async () => {
       await execa(process.argv[0], [process.argv[1], 'build', '--reset']);
     },

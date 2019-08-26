@@ -1,4 +1,4 @@
-import { Configuration, DeveloperProvider, PrivateNetworkSettings } from '@neo-one/client-common';
+import { DeveloperProvider, PrivateNetworkSettings } from '@neo-one/client-common';
 
 /**
  * Client which controls a development network.
@@ -60,10 +60,10 @@ export class DeveloperClient {
   }
 
   /**
-   * Fetch the project configuration this network is associated with.
+   * Fetch the NEO tracker URL for the project.
    */
-  public async getProjectConfiguration(): Promise<Configuration | undefined> {
-    return this.developerProvider.getProjectConfiguration();
+  public async getNEOTrackerURL(): Promise<string | undefined> {
+    return this.developerProvider.getNEOTrackerURL();
   }
 
   /**

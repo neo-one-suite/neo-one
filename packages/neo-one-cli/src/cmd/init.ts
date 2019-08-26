@@ -1,6 +1,6 @@
 // tslint:disable no-console
+import { Configuration } from '@neo-one/cli-common';
 import { createDefaultConfigurationJavaScript, createDefaultConfigurationTypeScript } from '@neo-one/cli-common-node';
-import { Configuration } from '@neo-one/client-common';
 import { COMPILER_OPTIONS } from '@neo-one/smart-contract-compiler';
 import { normalizePath } from '@neo-one/utils';
 import * as fs from 'fs-extra';

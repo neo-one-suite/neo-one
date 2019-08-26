@@ -12,9 +12,7 @@ export const useNEOTrackerURL = () => {
           return 'https://neotracker.io';
         }
 
-        const configuration = await developerClient.getProjectConfiguration();
-
-        return configuration === undefined ? undefined : `http://localhost:${configuration.neotracker.port}`;
+        return developerClient.getNEOTrackerURL();
       }),
     [developerClient],
     'https://neotracker.io',

@@ -1,75 +1,110 @@
 // tslint:disable no-any
-import { CodegenFramework, Configuration } from '@neo-one/client-common';
-import convict from 'convict';
+import { CodegenFramework, Configuration } from '@neo-one/cli-common';
 import cosmiconfig from 'cosmiconfig';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
 import * as nodePath from 'path';
+import validate from 'schema-utils';
 import { register } from 'ts-node';
 import { defaultNetworks } from './networks';
 
-const checkNetworksValue = (val: any) => {
-  if (typeof val !== 'object') {
-    throw new Error('value must be an object');
-  }
-
-  if (typeof val.userAccountProvider !== 'function') {
-    throw new Error('userAccountProvider must be provided and be an async function');
-  }
-};
-
-export const configurationSchema = {
+const configurationDefaults = {
   contracts: {
-    path: {
-      format: String,
-      default: 'contracts',
-    },
+    path: 'contracts',
   },
   codegen: {
-    path: {
-      format: String,
-      default: nodePath.join('src', 'neo-one'),
-    },
-    framework: {
-      format: ['none', 'react', 'angular', 'vue'],
-      default: 'none',
-    },
-    browserify: {
-      format: Boolean,
-      default: false,
-    },
+    path: nodePath.join('src', 'neo-one'),
+    framework: 'none',
+    browserify: false,
   },
   network: {
-    path: {
-      format: String,
-      default: nodePath.join('.neo-one', 'network'),
-    },
-    port: {
-      format: Number,
-      default: 9040,
-    },
+    path: nodePath.join('.neo-one', 'network'),
+    port: 9040,
   },
-  networks: {
-    format: (val: any) => {
-      if (typeof val !== 'object') {
-        throw new Error('must be an object');
-      }
-
-      Object.values(val).forEach(checkNetworksValue);
-    },
-    default: defaultNetworks,
-  },
+  networks: defaultNetworks,
   neotracker: {
-    path: {
-      format: String,
-      default: nodePath.join('.neo-one', 'neotracker'),
+    path: nodePath.join('.neo-one', 'neotracker'),
+    port: 9041,
+  },
+};
+
+const applyDefaults = (config: any = {}): Configuration => ({
+  ...config,
+  contracts: {
+    ...configurationDefaults.contracts,
+    ...(config.contracts === undefined ? {} : config.contracts),
+  },
+  codegen: {
+    ...configurationDefaults.codegen,
+    ...(config.codegen === undefined ? {} : config.codegen),
+  },
+  network: {
+    ...configurationDefaults.network,
+    ...(config.network === undefined ? {} : config.network),
+  },
+  networks: config.networks === undefined ? configurationDefaults.networks : config.networks,
+  neotracker: {
+    ...configurationDefaults.neotracker,
+    ...(config.neotracker === undefined ? {} : config.neotracker),
+  },
+});
+
+const configurationSchema = {
+  type: 'object',
+  allRequired: true,
+  additionalProperties: false,
+  properties: {
+    contracts: {
+      type: 'object',
+      allRequired: true,
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string' },
+      },
     },
-    port: {
-      format: Number,
-      default: 9041,
+    codegen: {
+      type: 'object',
+      allRequired: true,
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string' },
+        framework: { type: 'string', enum: ['none', 'react', 'vue', 'angular'] },
+        browserify: { type: 'boolean' },
+      },
+    },
+    network: {
+      type: 'object',
+      allRequired: true,
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string' },
+        port: { type: 'number', multipleOf: 1.0, minimum: 0 },
+      },
+    },
+    networks: {
+      type: 'object',
+      additionalProperties: {
+        type: 'object',
+        allRequired: true,
+        additionalProperties: false,
+        properties: {
+          userAccountProvider: {
+            instanceof: 'Function',
+          },
+        },
+      },
+    },
+    neotracker: {
+      type: 'object',
+      allRequired: true,
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string' },
+        port: { type: 'number', multipleOf: 1.0, minimum: 0 },
+      },
     },
   },
-} as const;
+};
 
 const relativizePaths = (config: Configuration) => ({
   ...config,
@@ -171,11 +206,8 @@ const getProjectFramework = async (rootDir: string): Promise<CodegenFramework> =
 };
 
 const validateConfig = async (rootDir: string, configIn: cosmiconfig.Config): Promise<Configuration> => {
-  const validator = convict<Configuration>(configurationSchema);
-  validator.load(configIn);
-  validator.validate({ allowed: 'warn' });
-
-  const config = validator.getProperties();
+  const config = applyDefaults(configIn);
+  validate(configurationSchema, configIn, { name: 'NEO•ONE' } as any);
 
   let newFramework: CodegenFramework | undefined;
   if (Object.keys(configIn).length === 0) {

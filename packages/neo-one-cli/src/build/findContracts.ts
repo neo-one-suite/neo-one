@@ -1,4 +1,4 @@
-import { Configuration } from '@neo-one/client-common';
+import { Configuration } from '@neo-one/cli-common';
 import { Contracts, scan } from '@neo-one/smart-contract-compiler';
 import { createCompilerHost } from '@neo-one/smart-contract-compiler-node';
 

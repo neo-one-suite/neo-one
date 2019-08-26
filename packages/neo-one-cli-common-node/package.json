@@ -4,22 +4,23 @@
   "description": "NEO•ONE code common to the node cli and other node packages in NEO•ONE.",
   "main": "./src/index",
   "dependencies": {
+    "@neo-one/cli-common": "^1.1.7",
     "@neo-one/client-common": "^1.4.0",
     "@neo-one/client-core": "^1.4.1",
-    "convict": "^5.1.0",
     "cosmiconfig": "^5.2.1",
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.15",
     "prompts": "^2.2.1",
+    "schema-utils": "^2.1.0",
     "ts-node": "^8.3.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
-    "@types/convict": "^4.2.1",
     "@types/cosmiconfig": "^5.0.3",
     "@types/fs-extra": "^8.0.0",
     "@types/lodash": "^4.14.137",
-    "@types/prompts": "^2.0.1"
+    "@types/prompts": "^2.0.1",
+    "@types/schema-utils": "^1.0.0"
   },
   "sideEffects": false
 }

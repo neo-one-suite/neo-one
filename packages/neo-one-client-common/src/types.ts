@@ -929,9 +929,9 @@ export interface DeveloperProvider {
    */
   readonly reset: () => Promise<void>;
   /**
-   * Reset the project this network is associated with to it's initial state.
+   * Fetch the NEO tracker URL for the project.
    */
-  readonly getProjectConfiguration: () => Promise<Configuration | undefined>;
+  readonly getNEOTrackerURL: () => Promise<string | undefined>;
   /**
    * Reset the project this network is associated with to it's initial state.
    */
@@ -2395,41 +2395,3 @@ export interface StorageItem {
 }
 
 /* END LOW-LEVEL API */
-
-export type CodegenFramework = 'none' | 'react' | 'angular' | 'vue';
-
-export interface ContractsConfiguration {
-  readonly path: string;
-}
-
-export interface CodegenConfiguration {
-  readonly path: string;
-  readonly framework: CodegenFramework;
-  readonly browserify: boolean;
-}
-
-export interface NetworkConfiguration {
-  readonly path: string;
-  readonly port: number;
-}
-
-export interface NetworksNetworkConfiguration {
-  readonly userAccountProvider: () => Promise<UserAccountProvider>;
-}
-
-export interface NetworksConfiguration {
-  readonly [name: string]: NetworksNetworkConfiguration;
-}
-
-export interface NEOTrackerConfiguration {
-  readonly path: string;
-  readonly port: number;
-}
-
-export interface Configuration {
-  readonly contracts: ContractsConfiguration;
-  readonly codegen: CodegenConfiguration;
-  readonly network: NetworkConfiguration;
-  readonly networks: NetworksConfiguration;
-  readonly neotracker: NEOTrackerConfiguration;
-}

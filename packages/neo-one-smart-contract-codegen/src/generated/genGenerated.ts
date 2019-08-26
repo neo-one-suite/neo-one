@@ -1,4 +1,4 @@
-import { CodegenFramework } from '@neo-one/client-common';
+import { CodegenFramework } from '@neo-one/cli-common';
 import _ from 'lodash';
 import { ContractPaths } from '../type';
 import { getRelativeImport } from '../utils';
