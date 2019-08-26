@@ -9,6 +9,7 @@ interface ParamAcc {
 
 interface Options {
   readonly withConfirmedOptions?: boolean;
+  readonly migration?: boolean;
 }
 
 const getOptions = (abi: ABIFunction, { withConfirmedOptions = false }: Options = {}) => {
@@ -16,7 +17,7 @@ const getOptions = (abi: ABIFunction, { withConfirmedOptions = false }: Options 
     return withConfirmedOptions ? ['options?: GetOptions'] : [];
   }
 
-  const type = withConfirmedOptions ? '& GetOptions' : '';
+  const type = withConfirmedOptions ? ' & GetOptions' : '';
 
   if (abi.sendUnsafe && abi.receive) {
     return [`options?: InvokeSendUnsafeReceiveTransactionOptions${type}`];
@@ -45,8 +46,8 @@ const getOptions = (abi: ABIFunction, { withConfirmedOptions = false }: Options 
   return [`options?: TransactionOptions${type}`];
 };
 
-const getRestParameter = (param: ABIParameter) =>
-  `...${param.name}: ${toTypeScriptType(param, { isParameter: true, includeOptional: false })}[]`;
+const getRestParameter = (param: ABIParameter, migration = false) =>
+  `...${param.name}: ${toTypeScriptType(param, { isParameter: true, includeOptional: false, migration })}[]`;
 
 export const genFunctionParameters = (
   abi: ABIFunction,
@@ -65,6 +66,7 @@ export const genFunctionParameters = (
           `${param.name}${!acc.hasRequired && param.optional ? '?' : ''}: ${toTypeScriptType(param, {
             isParameter: true,
             includeOptional: false,
+            migration: options.migration,
           })}`,
         ),
       }),
@@ -79,19 +81,19 @@ export const genFunctionParameters = (
   }
   const withParamOptions = paramStrings
     .concat(paramOptions)
-    .concat(restParameter === undefined ? [] : [getRestParameter(restParameter)])
+    .concat(restParameter === undefined ? [] : [getRestParameter(restParameter, options.migration)])
     .join(', ');
   const withForwardOptions = paramStrings
     .concat(forwardOptions)
-    .concat(restParameter === undefined ? [] : [getRestParameter(restParameter)])
+    .concat(restParameter === undefined ? [] : [getRestParameter(restParameter, options.migration)])
     .join(', ');
   const withParamForwardOptions = paramStrings
     .concat(paramOptions)
     .concat(forwardOptions)
-    .concat(restParameter === undefined ? [] : [getRestParameter(restParameter)])
+    .concat(restParameter === undefined ? [] : [getRestParameter(restParameter, options.migration)])
     .join(', ');
   const withoutOptions = paramStrings
-    .concat(restParameter === undefined ? [] : [getRestParameter(restParameter)])
+    .concat(restParameter === undefined ? [] : [getRestParameter(restParameter, options.migration)])
     .join(', ');
 
   if (restParameter === undefined) {

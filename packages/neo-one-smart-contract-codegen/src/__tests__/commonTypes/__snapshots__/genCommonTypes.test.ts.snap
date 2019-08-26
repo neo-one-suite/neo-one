@@ -3,12 +3,17 @@
 exports[`genCommonTypes Token 1`] = `
 Object {
   "ts": "
-import { ICOSmartContract } from './ICO/types'
-import { TokenSmartContract } from './Token/types'
+import { ICOSmartContract, ICOMigrationSmartContract } from './ICO/types'
+import { TokenSmartContract, TokenMigrationSmartContract } from './Token/types'
 
 export interface Contracts {
   readonly ico: ICOSmartContract;
   readonly token: TokenSmartContract;
+}
+
+export interface MigrationContracts {
+  readonly ico: ICOMigrationSmartContract;
+  readonly token: TokenMigrationSmartContract;
 }
 ",
 }

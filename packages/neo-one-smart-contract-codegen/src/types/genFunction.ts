@@ -24,13 +24,16 @@ const getFunctionReturnType = (name: string, abi: ABIFunction) =>
 
 const getForwardType = (abi: ABIFunction) => (hasForward(abi) ? '<TForwardOptions extends ForwardOptions<any>>' : '');
 
-const getFunctionType = (name: string, abi: ABIFunction) =>
-  genFunctionParameters(abi)
+const getFunctionType = (name: string, abi: ABIFunction, migration = false) =>
+  genFunctionParameters(abi, abi.parameters, {
+    migration,
+  })
     .map((params) => `${getForwardType(abi)}(${params}): Promise<${getFunctionReturnType(name, abi)}>;`)
     .join('  \n');
-const getConfirmedType = (name: string, abi: ABIFunction) =>
+const getConfirmedType = (name: string, abi: ABIFunction, migration = false) =>
   genFunctionParameters(abi, abi.parameters, {
     withConfirmedOptions: true,
+    migration,
   })
     .map(
       (params) =>
@@ -41,9 +44,13 @@ const getConfirmedType = (name: string, abi: ABIFunction) =>
     )
     .join('    \n');
 
-export const genFunction = (name: string, abi: ABIFunction): string => `{
-  ${getFunctionType(name, abi)}
+export interface GenFunctionOptions {
+  readonly migration?: boolean;
+}
+
+export const genFunction = (name: string, abi: ABIFunction, options: GenFunctionOptions): string => `{
+  ${getFunctionType(name, abi, options.migration)}
   readonly confirmed: {
-    ${getConfirmedType(name, abi)}
+    ${getConfirmedType(name, abi, options.migration)}
   },
 }`;

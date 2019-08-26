@@ -26,7 +26,17 @@ export interface ArraySmartContract<TClient extends Client = Client> extends Sma
   readonly Array: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, ArrayEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<Array<boolean>, ArrayEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, ArrayEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface ArrayMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ArrayEvent> {
+  readonly Array: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, ArrayEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, ArrayEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -62,7 +72,17 @@ export interface Array_claimSmartContract<TClient extends Client = Client> exten
   readonly Array_claim: {
   (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+  },
+}
+}
+
+
+export interface Array_claimMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_claimEvent> {
+  readonly Array_claim: {
+  (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
   },
 }
 }
@@ -98,7 +118,17 @@ export interface Array_completeSendSmartContract<TClient extends Client = Client
   readonly Array_completeSend: {
   (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, Array_completeSendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Array_completeSendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_completeSendEvent> {
+  readonly Array_completeSend: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, Array_completeSendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -133,6 +163,11 @@ export type Array_constantEvent = never
 export interface Array_constantSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_constantEvent> {
   readonly Array_constant: () => Promise<Array<boolean>>;
 }
+
+
+export interface Array_constantMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_constantEvent> {
+  readonly Array_constant: () => Promise<Array<boolean>>;
+}
 ",
   },
 }
@@ -165,7 +200,17 @@ export interface Array_receiveSmartContract<TClient extends Client = Client> ext
   readonly Array_receive: {
   (options?: InvokeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, Array_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Array_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_receiveEvent> {
+  readonly Array_receive: {
+  (options?: InvokeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, Array_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -201,7 +246,17 @@ export interface Array_refundAssetsSmartContract<TClient extends Client = Client
   readonly Array_refundAssets: {
   (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, Array_refundAssetsEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Array_refundAssetsMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_refundAssetsEvent> {
+  readonly Array_refundAssets: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, Array_refundAssetsEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -237,7 +292,17 @@ export interface Array_sendSmartContract<TClient extends Client = Client> extend
   readonly Array_send: {
   (transfer: Transfer, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, Array_sendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (transfer: Transfer, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_sendEvent> & { readonly transaction: InvocationTransaction}>;
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_sendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Array_sendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_sendEvent> {
+  readonly Array_send: {
+  (transfer: Transfer, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, Array_sendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_sendEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -273,7 +338,17 @@ export interface Array_sendUnsafeSmartContract<TClient extends Client = Client> 
   readonly Array_sendUnsafe: {
   (options?: InvokeSendUnsafeTransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, Array_sendUnsafeEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeTransactionOptions& GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Array_sendUnsafeMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_sendUnsafeEvent> {
+  readonly Array_sendUnsafe: {
+  (options?: InvokeSendUnsafeTransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, Array_sendUnsafeEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -310,7 +385,17 @@ export interface Array_sendUnsafe_receiveSmartContract<TClient extends Client = 
   readonly Array_sendUnsafe_receive: {
   (options?: InvokeSendUnsafeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, Array_sendUnsafe_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Array_sendUnsafe_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_sendUnsafe_receiveEvent> {
+  readonly Array_sendUnsafe_receive: {
+  (options?: InvokeSendUnsafeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<Array<boolean>, Array_sendUnsafe_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<Array<boolean>, Array_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -343,7 +428,17 @@ export interface BooleanSmartContract<TClient extends Client = Client> extends S
   readonly Boolean: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, BooleanEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean | undefined, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface BooleanMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, BooleanEvent> {
+  readonly Boolean: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, BooleanEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -376,7 +471,21 @@ export interface BooleanSmartContract<TClient extends Client = Client> extends S
   readonly Boolean: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, BooleanEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+  readonly forwardBooleanReturn: {
+  <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E> ? InvokeReceipt<boolean, E | BooleanEvent> : never;
+  (result: ContractParameter): boolean
+}
+}
+
+
+export interface BooleanMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, BooleanEvent> {
+  readonly Boolean: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, BooleanEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
   readonly forwardBooleanReturn: {
@@ -414,7 +523,17 @@ export interface Boolean_claimSmartContract<TClient extends Client = Client> ext
   readonly Boolean_claim: {
   (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+  },
+}
+}
+
+
+export interface Boolean_claimMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_claimEvent> {
+  readonly Boolean_claim: {
+  (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
   },
 }
 }
@@ -448,7 +567,21 @@ export interface Boolean_claimSmartContract<TClient extends Client = Client> ext
   readonly Boolean_claim: {
   (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+  },
+}
+  readonly forwardBooleanClaimReturn: {
+  <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E> ? InvokeReceipt<boolean, E | Boolean_claimEvent> : never;
+  (result: ContractParameter): boolean
+}
+}
+
+
+export interface Boolean_claimMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_claimEvent> {
+  readonly Boolean_claim: {
+  (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
   },
 }
   readonly forwardBooleanClaimReturn: {
@@ -486,7 +619,17 @@ export interface Boolean_completeSendSmartContract<TClient extends Client = Clie
   readonly Boolean_completeSend: {
   (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, Boolean_completeSendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Boolean_completeSendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_completeSendEvent> {
+  readonly Boolean_completeSend: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, Boolean_completeSendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -520,7 +663,21 @@ export interface Boolean_completeSendSmartContract<TClient extends Client = Clie
   readonly Boolean_completeSend: {
   (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_completeSendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Boolean_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+  readonly forwardBooleanCompleteSendReturn: {
+  <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E> ? InvokeReceipt<boolean, E | Boolean_completeSendEvent> : never;
+  (result: ContractParameter): boolean
+}
+}
+
+
+export interface Boolean_completeSendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_completeSendEvent> {
+  readonly Boolean_completeSend: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_completeSendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
   readonly forwardBooleanCompleteSendReturn: {
@@ -557,6 +714,11 @@ export type Boolean_constantEvent = never
 export interface Boolean_constantSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_constantEvent> {
   readonly Boolean_constant: () => Promise<boolean | undefined>;
 }
+
+
+export interface Boolean_constantMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_constantEvent> {
+  readonly Boolean_constant: () => Promise<boolean | undefined>;
+}
 ",
   },
 }
@@ -584,6 +746,15 @@ Object {
 export type Boolean_constantEvent = never
 
 export interface Boolean_constantSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_constantEvent> {
+  readonly Boolean_constant: () => Promise<boolean>;
+  readonly forwardBooleanConstantReturn: {
+  <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E> ? InvokeReceipt<boolean, E | Boolean_constantEvent> : never;
+  (result: ContractParameter): boolean
+}
+}
+
+
+export interface Boolean_constantMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_constantEvent> {
   readonly Boolean_constant: () => Promise<boolean>;
   readonly forwardBooleanConstantReturn: {
   <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E> ? InvokeReceipt<boolean, E | Boolean_constantEvent> : never;
@@ -620,7 +791,17 @@ export interface Boolean_receiveSmartContract<TClient extends Client = Client> e
   readonly Boolean_receive: {
   (options?: InvokeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, Boolean_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Boolean_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_receiveEvent> {
+  readonly Boolean_receive: {
+  (options?: InvokeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, Boolean_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -654,7 +835,21 @@ export interface Boolean_receiveSmartContract<TClient extends Client = Client> e
   readonly Boolean_receive: {
   (options?: InvokeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Boolean_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+  readonly forwardBooleanReceiveReturn: {
+  <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E> ? InvokeReceipt<boolean, E | Boolean_receiveEvent> : never;
+  (result: ContractParameter): boolean
+}
+}
+
+
+export interface Boolean_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_receiveEvent> {
+  readonly Boolean_receive: {
+  (options?: InvokeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
   readonly forwardBooleanReceiveReturn: {
@@ -692,7 +887,17 @@ export interface Boolean_refundAssetsSmartContract<TClient extends Client = Clie
   readonly Boolean_refundAssets: {
   (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, Boolean_refundAssetsEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Boolean_refundAssetsMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_refundAssetsEvent> {
+  readonly Boolean_refundAssets: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, Boolean_refundAssetsEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -726,7 +931,21 @@ export interface Boolean_refundAssetsSmartContract<TClient extends Client = Clie
   readonly Boolean_refundAssets: {
   (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_refundAssetsEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Boolean_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+  readonly forwardBooleanRefundAssetsReturn: {
+  <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E> ? InvokeReceipt<boolean, E | Boolean_refundAssetsEvent> : never;
+  (result: ContractParameter): boolean
+}
+}
+
+
+export interface Boolean_refundAssetsMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_refundAssetsEvent> {
+  readonly Boolean_refundAssets: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_refundAssetsEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
   readonly forwardBooleanRefundAssetsReturn: {
@@ -764,7 +983,17 @@ export interface Boolean_sendSmartContract<TClient extends Client = Client> exte
   readonly Boolean_send: {
   (transfer: Transfer, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, Boolean_sendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (transfer: Transfer, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_sendEvent> & { readonly transaction: InvocationTransaction}>;
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_sendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Boolean_sendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_sendEvent> {
+  readonly Boolean_send: {
+  (transfer: Transfer, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, Boolean_sendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_sendEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -798,7 +1027,21 @@ export interface Boolean_sendSmartContract<TClient extends Client = Client> exte
   readonly Boolean_send: {
   (transfer: Transfer, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_sendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (transfer: Transfer, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Boolean_sendEvent> & { readonly transaction: InvocationTransaction}>;
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_sendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+  readonly forwardBooleanSendReturn: {
+  <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E> ? InvokeReceipt<boolean, E | Boolean_sendEvent> : never;
+  (result: ContractParameter): boolean
+}
+}
+
+
+export interface Boolean_sendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_sendEvent> {
+  readonly Boolean_send: {
+  (transfer: Transfer, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_sendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_sendEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
   readonly forwardBooleanSendReturn: {
@@ -836,7 +1079,17 @@ export interface Boolean_sendUnsafeSmartContract<TClient extends Client = Client
   readonly Boolean_sendUnsafe: {
   (options?: InvokeSendUnsafeTransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, Boolean_sendUnsafeEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeTransactionOptions& GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Boolean_sendUnsafeMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_sendUnsafeEvent> {
+  readonly Boolean_sendUnsafe: {
+  (options?: InvokeSendUnsafeTransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, Boolean_sendUnsafeEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -870,7 +1123,21 @@ export interface Boolean_sendUnsafeSmartContract<TClient extends Client = Client
   readonly Boolean_sendUnsafe: {
   (options?: InvokeSendUnsafeTransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_sendUnsafeEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeTransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Boolean_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+  readonly forwardBooleanSendUnsafeReturn: {
+  <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E> ? InvokeReceipt<boolean, E | Boolean_sendUnsafeEvent> : never;
+  (result: ContractParameter): boolean
+}
+}
+
+
+export interface Boolean_sendUnsafeMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_sendUnsafeEvent> {
+  readonly Boolean_sendUnsafe: {
+  (options?: InvokeSendUnsafeTransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_sendUnsafeEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
   readonly forwardBooleanSendUnsafeReturn: {
@@ -909,7 +1176,17 @@ export interface Boolean_sendUnsafe_receiveSmartContract<TClient extends Client 
   readonly Boolean_sendUnsafe_receive: {
   (options?: InvokeSendUnsafeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, Boolean_sendUnsafe_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Boolean_sendUnsafe_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_sendUnsafe_receiveEvent> {
+  readonly Boolean_sendUnsafe_receive: {
+  (options?: InvokeSendUnsafeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean | undefined, Boolean_sendUnsafe_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<boolean | undefined, Boolean_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -944,7 +1221,21 @@ export interface Boolean_sendUnsafe_receiveSmartContract<TClient extends Client 
   readonly Boolean_sendUnsafe_receive: {
   (options?: InvokeSendUnsafeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_sendUnsafe_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<boolean, Boolean_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+  readonly forwardBooleanSendUnsafeReceiveReturn: {
+  <T extends InvokeReceipt<ContractParameter>>(receipt: T): T extends InvokeReceipt<ContractParameter, infer E> ? InvokeReceipt<boolean, E | Boolean_sendUnsafe_receiveEvent> : never;
+  (result: ContractParameter): boolean
+}
+}
+
+
+export interface Boolean_sendUnsafe_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_sendUnsafe_receiveEvent> {
+  readonly Boolean_sendUnsafe_receive: {
+  (options?: InvokeSendUnsafeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_sendUnsafe_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
   readonly forwardBooleanSendUnsafeReceiveReturn: {
@@ -980,7 +1271,17 @@ export interface ForwardValueSmartContract<TClient extends Client = Client> exte
   readonly ForwardValue: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValueEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValueEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValueEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface ForwardValueMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValueEvent> {
+  readonly ForwardValue: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValueEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValueEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1013,7 +1314,17 @@ export interface ForwardValue_claimSmartContract<TClient extends Client = Client
   readonly ForwardValue_claim: {
   (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+  },
+}
+}
+
+
+export interface ForwardValue_claimMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_claimEvent> {
+  readonly ForwardValue_claim: {
+  (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
   },
 }
 }
@@ -1046,7 +1357,17 @@ export interface ForwardValue_completeSendSmartContract<TClient extends Client =
   readonly ForwardValue_completeSend: {
   (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValue_completeSendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface ForwardValue_completeSendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_completeSendEvent> {
+  readonly ForwardValue_completeSend: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValue_completeSendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1078,6 +1399,11 @@ export type ForwardValue_constantEvent = never
 export interface ForwardValue_constantSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_constantEvent> {
   readonly ForwardValue_constant: () => Promise<ContractParameter>;
 }
+
+
+export interface ForwardValue_constantMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_constantEvent> {
+  readonly ForwardValue_constant: () => Promise<ContractParameter>;
+}
 ",
   },
 }
@@ -1107,7 +1433,17 @@ export interface ForwardValue_receiveSmartContract<TClient extends Client = Clie
   readonly ForwardValue_receive: {
   (options?: InvokeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValue_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface ForwardValue_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_receiveEvent> {
+  readonly ForwardValue_receive: {
+  (options?: InvokeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValue_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1140,7 +1476,17 @@ export interface ForwardValue_refundAssetsSmartContract<TClient extends Client =
   readonly ForwardValue_refundAssets: {
   (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValue_refundAssetsEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface ForwardValue_refundAssetsMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_refundAssetsEvent> {
+  readonly ForwardValue_refundAssets: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValue_refundAssetsEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1173,7 +1519,17 @@ export interface ForwardValue_sendSmartContract<TClient extends Client = Client>
   readonly ForwardValue_send: {
   (transfer: Transfer, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValue_sendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (transfer: Transfer, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_sendEvent> & { readonly transaction: InvocationTransaction}>;
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_sendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface ForwardValue_sendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_sendEvent> {
+  readonly ForwardValue_send: {
+  (transfer: Transfer, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValue_sendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_sendEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1206,7 +1562,17 @@ export interface ForwardValue_sendUnsafeSmartContract<TClient extends Client = C
   readonly ForwardValue_sendUnsafe: {
   (options?: InvokeSendUnsafeTransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValue_sendUnsafeEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeTransactionOptions& GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface ForwardValue_sendUnsafeMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_sendUnsafeEvent> {
+  readonly ForwardValue_sendUnsafe: {
+  (options?: InvokeSendUnsafeTransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValue_sendUnsafeEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1240,7 +1606,17 @@ export interface ForwardValue_sendUnsafe_receiveSmartContract<TClient extends Cl
   readonly ForwardValue_sendUnsafe_receive: {
   (options?: InvokeSendUnsafeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValue_sendUnsafe_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface ForwardValue_sendUnsafe_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_sendUnsafe_receiveEvent> {
+  readonly ForwardValue_sendUnsafe_receive: {
+  (options?: InvokeSendUnsafeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<ContractParameter, ForwardValue_sendUnsafe_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<ContractParameter, ForwardValue_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1274,7 +1650,17 @@ export interface IntegerSmartContract<TClient extends Client = Client> extends S
   readonly Integer: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, IntegerEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<BigNumber, IntegerEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, IntegerEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface IntegerMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, IntegerEvent> {
+  readonly Integer: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, IntegerEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, IntegerEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1308,7 +1694,17 @@ export interface Integer_claimSmartContract<TClient extends Client = Client> ext
   readonly Integer_claim: {
   (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+  },
+}
+}
+
+
+export interface Integer_claimMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_claimEvent> {
+  readonly Integer_claim: {
+  (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
   },
 }
 }
@@ -1343,7 +1739,17 @@ export interface Integer_completeSendSmartContract<TClient extends Client = Clie
   readonly Integer_completeSend: {
   (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, Integer_completeSendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<BigNumber, Integer_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, Integer_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Integer_completeSendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_completeSendEvent> {
+  readonly Integer_completeSend: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, Integer_completeSendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, Integer_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1377,6 +1783,11 @@ export type Integer_constantEvent = never
 export interface Integer_constantSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_constantEvent> {
   readonly Integer_constant: () => Promise<BigNumber>;
 }
+
+
+export interface Integer_constantMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_constantEvent> {
+  readonly Integer_constant: () => Promise<BigNumber>;
+}
 ",
   },
 }
@@ -1408,7 +1819,17 @@ export interface Integer_receiveSmartContract<TClient extends Client = Client> e
   readonly Integer_receive: {
   (options?: InvokeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, Integer_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<BigNumber, Integer_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, Integer_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Integer_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_receiveEvent> {
+  readonly Integer_receive: {
+  (options?: InvokeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, Integer_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, Integer_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1443,7 +1864,17 @@ export interface Integer_refundAssetsSmartContract<TClient extends Client = Clie
   readonly Integer_refundAssets: {
   (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, Integer_refundAssetsEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<BigNumber, Integer_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, Integer_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Integer_refundAssetsMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_refundAssetsEvent> {
+  readonly Integer_refundAssets: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, Integer_refundAssetsEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, Integer_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1478,7 +1909,17 @@ export interface Integer_sendSmartContract<TClient extends Client = Client> exte
   readonly Integer_send: {
   (transfer: Transfer, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, Integer_sendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (transfer: Transfer, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<BigNumber, Integer_sendEvent> & { readonly transaction: InvocationTransaction}>;
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, Integer_sendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Integer_sendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_sendEvent> {
+  readonly Integer_send: {
+  (transfer: Transfer, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, Integer_sendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, Integer_sendEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1513,7 +1954,17 @@ export interface Integer_sendUnsafeSmartContract<TClient extends Client = Client
   readonly Integer_sendUnsafe: {
   (options?: InvokeSendUnsafeTransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, Integer_sendUnsafeEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeTransactionOptions& GetOptions): Promise<InvokeReceipt<BigNumber, Integer_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, Integer_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Integer_sendUnsafeMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_sendUnsafeEvent> {
+  readonly Integer_sendUnsafe: {
+  (options?: InvokeSendUnsafeTransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, Integer_sendUnsafeEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, Integer_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1549,7 +2000,17 @@ export interface Integer_sendUnsafe_receiveSmartContract<TClient extends Client 
   readonly Integer_sendUnsafe_receive: {
   (options?: InvokeSendUnsafeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, Integer_sendUnsafe_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<BigNumber, Integer_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, Integer_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Integer_sendUnsafe_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_sendUnsafe_receiveEvent> {
+  readonly Integer_sendUnsafe_receive: {
+  (options?: InvokeSendUnsafeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<BigNumber, Integer_sendUnsafe_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<BigNumber, Integer_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1589,7 +2050,17 @@ export interface MapSmartContract<TClient extends Client = Client> extends Smart
   readonly Map: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, MapEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, MapEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, MapEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface MapMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, MapEvent> {
+  readonly Map: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, MapEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, MapEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1629,7 +2100,17 @@ export interface Map_claimSmartContract<TClient extends Client = Client> extends
   readonly Map_claim: {
   (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+  },
+}
+}
+
+
+export interface Map_claimMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_claimEvent> {
+  readonly Map_claim: {
+  (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
   },
 }
 }
@@ -1670,7 +2151,17 @@ export interface Map_completeSendSmartContract<TClient extends Client = Client> 
   readonly Map_completeSend: {
   (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, Map_completeSendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Map_completeSendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_completeSendEvent> {
+  readonly Map_completeSend: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, Map_completeSendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1710,6 +2201,11 @@ export type Map_constantEvent = never
 export interface Map_constantSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_constantEvent> {
   readonly Map_constant: () => Promise<Map<BigNumber, boolean>>;
 }
+
+
+export interface Map_constantMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_constantEvent> {
+  readonly Map_constant: () => Promise<Map<BigNumber, boolean>>;
+}
 ",
   },
 }
@@ -1747,7 +2243,17 @@ export interface Map_receiveSmartContract<TClient extends Client = Client> exten
   readonly Map_receive: {
   (options?: InvokeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, Map_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Map_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_receiveEvent> {
+  readonly Map_receive: {
+  (options?: InvokeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, Map_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1788,7 +2294,17 @@ export interface Map_refundAssetsSmartContract<TClient extends Client = Client> 
   readonly Map_refundAssets: {
   (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, Map_refundAssetsEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Map_refundAssetsMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_refundAssetsEvent> {
+  readonly Map_refundAssets: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, Map_refundAssetsEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1829,7 +2345,17 @@ export interface Map_sendSmartContract<TClient extends Client = Client> extends 
   readonly Map_send: {
   (transfer: Transfer, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, Map_sendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (transfer: Transfer, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_sendEvent> & { readonly transaction: InvocationTransaction}>;
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_sendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Map_sendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_sendEvent> {
+  readonly Map_send: {
+  (transfer: Transfer, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, Map_sendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_sendEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1870,7 +2396,17 @@ export interface Map_sendUnsafeSmartContract<TClient extends Client = Client> ex
   readonly Map_sendUnsafe: {
   (options?: InvokeSendUnsafeTransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, Map_sendUnsafeEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeTransactionOptions& GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Map_sendUnsafeMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_sendUnsafeEvent> {
+  readonly Map_sendUnsafe: {
+  (options?: InvokeSendUnsafeTransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, Map_sendUnsafeEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1912,7 +2448,17 @@ export interface Map_sendUnsafe_receiveSmartContract<TClient extends Client = Cl
   readonly Map_sendUnsafe_receive: {
   (options?: InvokeSendUnsafeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, Map_sendUnsafe_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Map_sendUnsafe_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_sendUnsafe_receiveEvent> {
+  readonly Map_sendUnsafe_receive: {
+  (options?: InvokeSendUnsafeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<Map<BigNumber, boolean>, Map_sendUnsafe_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<Map<BigNumber, boolean>, Map_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },
 }
 }
@@ -1951,7 +2497,21 @@ export interface ObjectSmartContract<TClient extends Client = Client> extends Sm
       readonly 'property': boolean
     }, ObjectEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<{
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<{
+      readonly 'property': boolean
+    }, ObjectEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface ObjectMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ObjectEvent> {
+  readonly Object: {
+  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<{
+      readonly 'property': boolean
+    }, ObjectEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<{
       readonly 'property': boolean
     }, ObjectEvent> & { readonly transaction: InvocationTransaction}>;
   },
@@ -1991,7 +2551,17 @@ export interface Object_claimSmartContract<TClient extends Client = Client> exte
   readonly Object_claim: {
   (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
   readonly confirmed: {
-    (options?: TransactionOptions& GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
+  },
+}
+}
+
+
+export interface Object_claimMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_claimEvent> {
+  readonly Object_claim: {
+  (options?: TransactionOptions): Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+  readonly confirmed: {
+    (options?: TransactionOptions & GetOptions): Promise<TransactionReceipt & { readonly transaction: ClaimTransaction}>;
   },
 }
 }
@@ -2031,7 +2601,21 @@ export interface Object_completeSendSmartContract<TClient extends Client = Clien
       readonly 'property': boolean
     }, Object_completeSendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<{
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<{
+      readonly 'property': boolean
+    }, Object_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Object_completeSendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_completeSendEvent> {
+  readonly Object_completeSend: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<{
+      readonly 'property': boolean
+    }, Object_completeSendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<{
       readonly 'property': boolean
     }, Object_completeSendEvent> & { readonly transaction: InvocationTransaction}>;
   },
@@ -2072,6 +2656,13 @@ export interface Object_constantSmartContract<TClient extends Client = Client> e
       readonly 'property': boolean
     }>;
 }
+
+
+export interface Object_constantMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_constantEvent> {
+  readonly Object_constant: () => Promise<{
+      readonly 'property': boolean
+    }>;
+}
 ",
   },
 }
@@ -2108,7 +2699,21 @@ export interface Object_receiveSmartContract<TClient extends Client = Client> ex
       readonly 'property': boolean
     }, Object_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<{
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<{
+      readonly 'property': boolean
+    }, Object_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Object_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_receiveEvent> {
+  readonly Object_receive: {
+  (options?: InvokeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<{
+      readonly 'property': boolean
+    }, Object_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<{
       readonly 'property': boolean
     }, Object_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },
@@ -2150,7 +2755,21 @@ export interface Object_refundAssetsSmartContract<TClient extends Client = Clien
       readonly 'property': boolean
     }, Object_refundAssetsEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (hash: Hash256String, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<{
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<{
+      readonly 'property': boolean
+    }, Object_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Object_refundAssetsMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_refundAssetsEvent> {
+  readonly Object_refundAssets: {
+  (hash: Hash256String, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<{
+      readonly 'property': boolean
+    }, Object_refundAssetsEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (hash: Hash256String, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<{
       readonly 'property': boolean
     }, Object_refundAssetsEvent> & { readonly transaction: InvocationTransaction}>;
   },
@@ -2192,7 +2811,21 @@ export interface Object_sendSmartContract<TClient extends Client = Client> exten
       readonly 'property': boolean
     }, Object_sendEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (transfer: Transfer, options?: TransactionOptions& GetOptions): Promise<InvokeReceipt<{
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<{
+      readonly 'property': boolean
+    }, Object_sendEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Object_sendMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_sendEvent> {
+  readonly Object_send: {
+  (transfer: Transfer, options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<{
+      readonly 'property': boolean
+    }, Object_sendEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (transfer: Transfer, options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<{
       readonly 'property': boolean
     }, Object_sendEvent> & { readonly transaction: InvocationTransaction}>;
   },
@@ -2234,7 +2867,21 @@ export interface Object_sendUnsafeSmartContract<TClient extends Client = Client>
       readonly 'property': boolean
     }, Object_sendUnsafeEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeTransactionOptions& GetOptions): Promise<InvokeReceipt<{
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<{
+      readonly 'property': boolean
+    }, Object_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Object_sendUnsafeMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_sendUnsafeEvent> {
+  readonly Object_sendUnsafe: {
+  (options?: InvokeSendUnsafeTransactionOptions): Promise<TransactionResult<InvokeReceipt<{
+      readonly 'property': boolean
+    }, Object_sendUnsafeEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<InvokeReceipt<{
       readonly 'property': boolean
     }, Object_sendUnsafeEvent> & { readonly transaction: InvocationTransaction}>;
   },
@@ -2277,7 +2924,21 @@ export interface Object_sendUnsafe_receiveSmartContract<TClient extends Client =
       readonly 'property': boolean
     }, Object_sendUnsafe_receiveEvent>, InvocationTransaction>>;
   readonly confirmed: {
-    (options?: InvokeSendUnsafeReceiveTransactionOptions& GetOptions): Promise<InvokeReceipt<{
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<{
+      readonly 'property': boolean
+    }, Object_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
+  },
+}
+}
+
+
+export interface Object_sendUnsafe_receiveMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_sendUnsafe_receiveEvent> {
+  readonly Object_sendUnsafe_receive: {
+  (options?: InvokeSendUnsafeReceiveTransactionOptions): Promise<TransactionResult<InvokeReceipt<{
+      readonly 'property': boolean
+    }, Object_sendUnsafe_receiveEvent>, InvocationTransaction>>;
+  readonly confirmed: {
+    (options?: InvokeSendUnsafeReceiveTransactionOptions & GetOptions): Promise<InvokeReceipt<{
       readonly 'property': boolean
     }, Object_sendUnsafe_receiveEvent> & { readonly transaction: InvocationTransaction}>;
   },

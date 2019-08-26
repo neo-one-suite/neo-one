@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { ContractPaths } from '../type';
-import { getSmartContractName } from '../types';
+import { getMigrationSmartContractName, getSmartContractName } from '../types';
 import { getRelativeImport, lowerCaseFirst } from '../utils';
 
 export const genCommonTypes = ({
@@ -17,12 +17,21 @@ export const genCommonTypes = ({
 ${sortedPaths
   .map(
     ({ name, typesPath }) =>
-      `import { ${getSmartContractName(name)} } from '${getRelativeImport(commonTypesPath, typesPath)}'`,
+      `import { ${getSmartContractName(name)}, ${getMigrationSmartContractName(name)} } from '${getRelativeImport(
+        commonTypesPath,
+        typesPath,
+      )}'`,
   )
   .join('\n')}
 
 export interface Contracts {
   ${sortedPaths.map(({ name }) => `readonly ${lowerCaseFirst(name)}: ${getSmartContractName(name)};`).join('\n  ')}
+}
+
+export interface MigrationContracts {
+  ${sortedPaths
+    .map(({ name }) => `readonly ${lowerCaseFirst(name)}: ${getMigrationSmartContractName(name)};`)
+    .join('\n  ')}
 }
 `,
   };

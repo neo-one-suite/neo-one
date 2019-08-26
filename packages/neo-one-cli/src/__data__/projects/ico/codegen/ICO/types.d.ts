@@ -1,4 +1,4 @@
-/* @hash d99a203cecbe6aa47a8fe9c24422e667 */
+/* @hash 72d5b86dc9606a0141335a3c7d2dd8f6 */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -51,6 +51,50 @@ export interface ICOSmartContract<TClient extends Client = Client> extends Smart
         owner?: AddressString,
         startTimeSeconds?: BigNumber,
         icoDurationSeconds?: BigNumber,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }>;
+    };
+  };
+  readonly icoDurationSeconds: () => Promise<BigNumber>;
+  readonly mintTokens: {
+    (options?: InvokeReceiveTransactionOptions): Promise<
+      TransactionResult<InvokeReceipt<undefined, ICOEvent>, InvocationTransaction>
+    >;
+    readonly confirmed: {
+      (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<
+        InvokeReceipt<undefined, ICOEvent> & { readonly transaction: InvocationTransaction }
+      >;
+    };
+  };
+  readonly owner: () => Promise<AddressString>;
+  readonly refundAssets: {
+    (options?: InvokeSendUnsafeTransactionOptions): Promise<
+      TransactionResult<InvokeReceipt<undefined, ICOEvent>, InvocationTransaction>
+    >;
+    readonly confirmed: {
+      (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<
+        InvokeReceipt<undefined, ICOEvent> & { readonly transaction: InvocationTransaction }
+      >;
+    };
+  };
+  readonly remaining: () => Promise<BigNumber>;
+  readonly startTimeSeconds: () => Promise<BigNumber>;
+}
+
+export interface ICOMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ICOEvent> {
+  readonly amountPerNEO: () => Promise<BigNumber>;
+  readonly deploy: {
+    (
+      owner?: AddressString | Promise<AddressString>,
+      startTimeSeconds?: BigNumber | Promise<BigNumber>,
+      icoDurationSeconds?: BigNumber | Promise<BigNumber>,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        owner?: AddressString | Promise<AddressString>,
+        startTimeSeconds?: BigNumber | Promise<BigNumber>,
+        icoDurationSeconds?: BigNumber | Promise<BigNumber>,
         options?: TransactionOptions & GetOptions,
       ): Promise<InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }>;
     };

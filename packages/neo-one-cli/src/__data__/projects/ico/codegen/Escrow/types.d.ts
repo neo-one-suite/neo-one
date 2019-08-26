@@ -1,4 +1,4 @@
-/* @hash 4a15b5497f4ff197c914f4a871d746b3 */
+/* @hash f5dda482795549ffb4b4f85f8330eb4a */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -125,6 +125,98 @@ export interface EscrowSmartContract<TClient extends Client = Client> extends Sm
         to: AddressString,
         asset: AddressString,
         amount: BigNumber,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
+    };
+  };
+}
+
+export interface EscrowMigrationSmartContract<TClient extends Client = Client>
+  extends SmartContract<TClient, EscrowEvent> {
+  readonly approveReceiveTransfer: {
+    (
+      from: AddressString | Promise<AddressString>,
+      amount: BigNumber | Promise<BigNumber>,
+      asset: AddressString | Promise<AddressString>,
+      to: AddressString | Promise<AddressString>,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        from: AddressString | Promise<AddressString>,
+        amount: BigNumber | Promise<BigNumber>,
+        asset: AddressString | Promise<AddressString>,
+        to: AddressString | Promise<AddressString>,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
+    };
+  };
+  readonly forwardApproveReceiveTransferArgs: (
+    to: AddressString | Promise<AddressString>,
+  ) => [ForwardOptions<EscrowEvent>, ForwardValue];
+  readonly balanceOf: (
+    from: AddressString | Promise<AddressString>,
+    to: AddressString | Promise<AddressString>,
+    asset: AddressString | Promise<AddressString>,
+  ) => Promise<BigNumber>;
+  readonly claim: {
+    (
+      from: AddressString | Promise<AddressString>,
+      to: AddressString | Promise<AddressString>,
+      asset: AddressString | Promise<AddressString>,
+      amount: BigNumber | Promise<BigNumber>,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        from: AddressString | Promise<AddressString>,
+        to: AddressString | Promise<AddressString>,
+        asset: AddressString | Promise<AddressString>,
+        amount: BigNumber | Promise<BigNumber>,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
+    };
+  };
+  readonly deploy: {
+    (options?: TransactionOptions): Promise<
+      TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>
+    >;
+    readonly confirmed: {
+      (options?: TransactionOptions & GetOptions): Promise<
+        InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }
+      >;
+    };
+  };
+  readonly onRevokeSendTransfer: {
+    (
+      from: AddressString | Promise<AddressString>,
+      amount: BigNumber | Promise<BigNumber>,
+      asset: AddressString | Promise<AddressString>,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<undefined, EscrowEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        from: AddressString | Promise<AddressString>,
+        amount: BigNumber | Promise<BigNumber>,
+        asset: AddressString | Promise<AddressString>,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<undefined, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
+    };
+  };
+  readonly refund: {
+    (
+      from: AddressString | Promise<AddressString>,
+      to: AddressString | Promise<AddressString>,
+      asset: AddressString | Promise<AddressString>,
+      amount: BigNumber | Promise<BigNumber>,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        from: AddressString | Promise<AddressString>,
+        to: AddressString | Promise<AddressString>,
+        asset: AddressString | Promise<AddressString>,
+        amount: BigNumber | Promise<BigNumber>,
         options?: TransactionOptions & GetOptions,
       ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
     };

@@ -4,36 +4,39 @@ import { utils } from '@neo-one/utils';
 export interface Options {
   readonly isParameter: boolean;
   readonly includeOptional?: boolean;
+  readonly migration?: boolean;
 }
 
 export const toTypeScriptType = (
   abi: ABIReturn | ABIParameter,
-  { isParameter, includeOptional = true }: Options,
+  { isParameter, includeOptional = true, migration = false }: Options,
 ): string => {
   const addOptional = (value: string) => (includeOptional && abi.optional ? `${value} | undefined` : value);
+  const addMigration = (value: string) => (migration ? `(${value} | Promise<${value}>)` : value);
+  const addOptions = (value: string) => addMigration(addOptional(value));
   switch (abi.type) {
     case 'Signature':
-      return addOptional('SignatureString');
+      return addOptions('SignatureString');
     case 'Boolean':
-      return addOptional('boolean');
+      return addOptions('boolean');
     case 'Address':
-      return addOptional('AddressString');
+      return addOptions('AddressString');
     case 'Hash256':
-      return addOptional('Hash256String');
+      return addOptions('Hash256String');
     case 'Buffer':
-      return addOptional('BufferString');
+      return addOptions('BufferString');
     case 'PublicKey':
-      return addOptional('PublicKeyString');
+      return addOptions('PublicKeyString');
     case 'String':
-      return addOptional('string');
+      return addOptions('string');
     case 'Array':
-      return addOptional(`Array<${toTypeScriptType(abi.value, { isParameter })}>`);
+      return addOptions(`Array<${toTypeScriptType(abi.value, { isParameter })}>`);
     case 'Map':
-      return addOptional(
+      return addOptions(
         `Map<${toTypeScriptType(abi.key, { isParameter })}, ${toTypeScriptType(abi.value, { isParameter })}>`,
       );
     case 'Object':
-      return addOptional(`{
+      return addOptions(`{
       ${Object.entries(abi.properties)
         .reduce<ReadonlyArray<string>>(
           (acc, [key, val]) => acc.concat([`readonly '${key}': ${toTypeScriptType(val, { isParameter })}`]),
@@ -44,9 +47,9 @@ export const toTypeScriptType = (
     case 'Void':
       return 'undefined';
     case 'Integer':
-      return addOptional('BigNumber');
+      return addOptions('BigNumber');
     case 'ForwardValue':
-      return isParameter ? addOptional('ForwardValue') : addOptional('ContractParameter');
+      return isParameter ? addOptions('ForwardValue') : addOptions('ContractParameter');
     default:
       utils.assertNever(abi);
       throw new Error('Something went wrong');

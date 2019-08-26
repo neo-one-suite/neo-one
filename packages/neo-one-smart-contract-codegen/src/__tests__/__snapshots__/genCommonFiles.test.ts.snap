@@ -134,12 +134,17 @@ export const createDeveloperClients: (host?: string) => DeveloperClients;
     "js": undefined,
     "ts": "// tslint:disable
 /* eslint-disable */
-import { ICOSmartContract } from './ICO/types';
-import { TokenSmartContract } from './Token/types';
+import { ICOSmartContract, ICOMigrationSmartContract } from './ICO/types';
+import { TokenSmartContract, TokenMigrationSmartContract } from './Token/types';
 
 export interface Contracts {
   readonly ico: ICOSmartContract;
   readonly token: TokenSmartContract;
+}
+
+export interface MigrationContracts {
+  readonly ico: ICOMigrationSmartContract;
+  readonly token: TokenMigrationSmartContract;
 }
 ",
   },

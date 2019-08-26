@@ -1,5 +1,6 @@
 import { ABI } from '@neo-one/client-common';
 import { genEvent } from './genEvent';
+import { genMigrationSmartContract } from './genMigrationSmartContract';
 import { genSmartContract } from './genSmartContract';
 import { getEventName } from './getEventName';
 import { getSingleEventName } from './getSingleEventName';
@@ -106,7 +107,8 @@ export const genSmartContractTypes = (name: string, abi: ABI) => {
   const text = `
 ${events.map((event) => genEvent(name, event)).join('\n')}
 ${eventType}
-${genSmartContract(name, abi)}`;
+${genSmartContract(name, abi)}
+${genMigrationSmartContract(name, abi)}`;
 
   const importClauses = getImportClauses(text);
   // tslint:disable-next-line no-array-mutation

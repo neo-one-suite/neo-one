@@ -1,4 +1,4 @@
-/* @hash 307619511e1a6681f806914aa5d8eb44 */
+/* @hash c780fbe77a82ae61d801290d2ca92586 */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -156,6 +156,159 @@ export interface TokenSmartContract<TClient extends Client = Client> extends Sma
         options?: TransactionOptions & GetOptions,
         forwardOptions?: TForwardOptions,
         ...approveArgs: ForwardValue[]
+      ): Promise<
+        InvokeReceipt<boolean, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent> & {
+          readonly transaction: InvocationTransaction;
+        }
+      >;
+    };
+  };
+}
+
+export interface TokenMigrationSmartContract<TClient extends Client = Client>
+  extends SmartContract<TClient, TokenEvent> {
+  readonly approveReceiveTransfer: {
+    (
+      from: AddressString | Promise<AddressString>,
+      amount: BigNumber | Promise<BigNumber>,
+      asset: AddressString | Promise<AddressString>,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        from: AddressString | Promise<AddressString>,
+        amount: BigNumber | Promise<BigNumber>,
+        asset: AddressString | Promise<AddressString>,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<boolean, TokenEvent> & { readonly transaction: InvocationTransaction }>;
+    };
+  };
+  readonly approveSendTransfer: {
+    (
+      from: AddressString | Promise<AddressString>,
+      to: AddressString | Promise<AddressString>,
+      amount: BigNumber | Promise<BigNumber>,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        from: AddressString | Promise<AddressString>,
+        to: AddressString | Promise<AddressString>,
+        amount: BigNumber | Promise<BigNumber>,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<boolean, TokenEvent> & { readonly transaction: InvocationTransaction }>;
+    };
+  };
+  readonly approvedTransfer: (
+    from: AddressString | Promise<AddressString>,
+    to: AddressString | Promise<AddressString>,
+  ) => Promise<BigNumber>;
+  readonly balanceOf: (address: AddressString | Promise<AddressString>) => Promise<BigNumber>;
+  readonly decimals: () => Promise<BigNumber>;
+  readonly deploy: {
+    (options?: TransactionOptions): Promise<
+      TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>
+    >;
+    readonly confirmed: {
+      (options?: TransactionOptions & GetOptions): Promise<
+        InvokeReceipt<boolean, TokenEvent> & { readonly transaction: InvocationTransaction }
+      >;
+    };
+  };
+  readonly issue: {
+    (
+      to: AddressString | Promise<AddressString>,
+      amount: BigNumber | Promise<BigNumber>,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        to: AddressString | Promise<AddressString>,
+        amount: BigNumber | Promise<BigNumber>,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<boolean, TokenEvent> & { readonly transaction: InvocationTransaction }>;
+    };
+  };
+  readonly name: () => Promise<string>;
+  readonly onRevokeSendTransfer: {
+    (
+      from: AddressString | Promise<AddressString>,
+      amount: BigNumber | Promise<BigNumber>,
+      asset: AddressString | Promise<AddressString>,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<undefined, TokenEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        from: AddressString | Promise<AddressString>,
+        amount: BigNumber | Promise<BigNumber>,
+        asset: AddressString | Promise<AddressString>,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<undefined, TokenEvent> & { readonly transaction: InvocationTransaction }>;
+    };
+  };
+  readonly revokeSendTransfer: {
+    (
+      from: AddressString | Promise<AddressString>,
+      to: AddressString | Promise<AddressString>,
+      amount: BigNumber | Promise<BigNumber>,
+      options?: TransactionOptions,
+    ): Promise<TransactionResult<InvokeReceipt<boolean, TokenEvent>, InvocationTransaction>>;
+    readonly confirmed: {
+      (
+        from: AddressString | Promise<AddressString>,
+        to: AddressString | Promise<AddressString>,
+        amount: BigNumber | Promise<BigNumber>,
+        options?: TransactionOptions & GetOptions,
+      ): Promise<InvokeReceipt<boolean, TokenEvent> & { readonly transaction: InvocationTransaction }>;
+    };
+  };
+  readonly symbol: () => Promise<string>;
+  readonly totalSupply: () => Promise<BigNumber>;
+  readonly transfer: {
+    <TForwardOptions extends ForwardOptions<any>>(
+      from: AddressString | Promise<AddressString>,
+      to: AddressString | Promise<AddressString>,
+      amount: BigNumber | Promise<BigNumber>,
+      forwardOptions?: TForwardOptions,
+      ...approveArgs: (ForwardValue | Promise<ForwardValue>)[]
+    ): Promise<
+      TransactionResult<
+        InvokeReceipt<boolean, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent>,
+        InvocationTransaction
+      >
+    >;
+    <TForwardOptions extends ForwardOptions<any>>(
+      from: AddressString | Promise<AddressString>,
+      to: AddressString | Promise<AddressString>,
+      amount: BigNumber | Promise<BigNumber>,
+      options?: TransactionOptions,
+      forwardOptions?: TForwardOptions,
+      ...approveArgs: (ForwardValue | Promise<ForwardValue>)[]
+    ): Promise<
+      TransactionResult<
+        InvokeReceipt<boolean, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent>,
+        InvocationTransaction
+      >
+    >;
+    readonly confirmed: {
+      <TForwardOptions extends ForwardOptions<any>>(
+        from: AddressString | Promise<AddressString>,
+        to: AddressString | Promise<AddressString>,
+        amount: BigNumber | Promise<BigNumber>,
+        forwardOptions?: TForwardOptions,
+        ...approveArgs: (ForwardValue | Promise<ForwardValue>)[]
+      ): Promise<
+        InvokeReceipt<boolean, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent> & {
+          readonly transaction: InvocationTransaction;
+        }
+      >;
+      <TForwardOptions extends ForwardOptions<any>>(
+        from: AddressString | Promise<AddressString>,
+        to: AddressString | Promise<AddressString>,
+        amount: BigNumber | Promise<BigNumber>,
+        options?: TransactionOptions & GetOptions,
+        forwardOptions?: TForwardOptions,
+        ...approveArgs: (ForwardValue | Promise<ForwardValue>)[]
       ): Promise<
         InvokeReceipt<boolean, TForwardOptions extends ForwardOptions<infer T> ? TokenEvent | T : TokenEvent> & {
           readonly transaction: InvocationTransaction;
