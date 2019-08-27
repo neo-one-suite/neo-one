@@ -13,7 +13,7 @@
     "react-draggable": "^3.3.0",
     "react-select": "^3.0.4",
     "styled-tools": "^1.7.1",
-    "trackjs": "^3.3.0"
+    "trackjs": "^3.7.0"
   },
   "devDependencies": {
     "@types/react": "^16.9.2",

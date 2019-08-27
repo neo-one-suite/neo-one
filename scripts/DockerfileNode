@@ -1,4 +1,5 @@
-FROM neotracker/neo-one-circleci-node:10.16.0-1 as builder
+# neotracker/neo-one-circleci-node:12.9.0-1 2019-08-27
+FROM neotracker/neo-one-circleci-node@sha256:6f76ab22882896c057d9d805955892f1dee26bb1a4257a6d095d07d617aa4d5c as builder
 RUN mkdir -p /tmp/neo-one
 WORKDIR /tmp/neo-one
 
@@ -71,7 +72,8 @@ COPY packages/neo-one-http-context/package.json packages/neo-one-http-context/
 RUN sudo yarn install --non-interactive
 RUN yarn build:node
 
-FROM node:10-stretch-slim AS production
+# node:12.9.0-buster-slim 2019-08-27
+FROM node@sha256:d1cfeb3cc51782d51336e34bd477c5b1b46b32e5f49cd1c3829ef52f0a5250df AS production
 RUN mkdir -p neo-one
 COPY --from=builder tmp/neo-one/dist/neo-one/ neo-one/
 ENTRYPOINT ["node", "neo-one/packages/neo-one-node-bin/bin/neo-one-node"]

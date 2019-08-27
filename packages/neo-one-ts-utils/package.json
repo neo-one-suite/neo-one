@@ -9,7 +9,7 @@
     "typescript": "^3.5.3"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.137"
+    "@types/lodash": "^4.14.138"
   },
   "sideEffects": false
 }

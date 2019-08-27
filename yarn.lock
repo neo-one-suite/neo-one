@@ -2824,10 +2824,10 @@
     "@types/node" "*"
     rxjs "^6.5.1"
 
-"@types/lodash@^4.14.137":
-  version "4.14.137"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.137.tgz#8a4804937dc6462274ffcc088df8f14fc1b368e2"
-  integrity sha512-g4rNK5SRKloO+sUGbuO7aPtwbwzMgjK+bm9BBhLD7jGUiGR7zhwYEhSln/ihgYQBeIJ5j7xjyaYzrWTcu3UotQ==
+"@types/lodash@^4.14.138":
+  version "4.14.138"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.138.tgz#34f52640d7358230308344e579c15b378d91989e"
+  integrity sha512-A4uJgHz4hakwNBdHNPdxOTkYmXNgmUAKLbXZ7PKGslgeV0Mb8P3BlbYfPovExek1qnod4pDfRbxuzcVs3dlFLg==
 
 "@types/lru-cache@^5.1.0":
   version "5.1.0"
@@ -4975,9 +4975,9 @@ buffer@^4.3.0:
     isarray "^1.0.0"
 
 buffer@^5.2.1:
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.4.0.tgz#33294f5c1f26e08461e528b69fa06de3c45cbd8c"
-  integrity sha512-Xpgy0IwHK2N01ncykXTy6FpCWuM+CJSHoPVBLyNqyrWxsedpLvwsYUhf0ME3WRFNUhos0dMamz9cOS/xRDtU5g==
+  version "5.4.2"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.4.2.tgz#2012872776206182480eccb2c0fba5f672a2efef"
+  integrity sha512-iy9koArjAFCzGnx3ZvNA6Z0clIbbFgbdWQ0mKD3hO0krOrZh8UgA6qMKcZvwLJxS+D6iVR76+5/pV56yMNYTag==
   dependencies:
     base64-js "^1.0.2"
     ieee754 "^1.1.4"
@@ -18439,10 +18439,10 @@ tr46@^1.0.1:
   dependencies:
     punycode "^2.1.0"
 
-trackjs@^3.3.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/trackjs/-/trackjs-3.6.0.tgz#e1053c3ef7b861fb892cc10124364969d31db80f"
-  integrity sha512-N7gcDq12IxI2nTfT5CjMfzo8nPItPZmXiE/ZT/CmMDmLeV0oAJIxX1CAJQ3JD/cExGevS50Xc4k8kO1bNmLKEw==
+trackjs@^3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/trackjs/-/trackjs-3.7.0.tgz#d9bf6683c11a674b05e5ffcef0742c6bfd2362f9"
+  integrity sha512-hwhjGRzSU5xq4SFL2pv95pnLvJq6gN/TawrD6jopqQPl43xV0zXXWVEX0t1GS0KeQrpuuQjZc7cYXFtTnrsxQA==
 
 tree-kill@^1.2.1:
   version "1.2.1"

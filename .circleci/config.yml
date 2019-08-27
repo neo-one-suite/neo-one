@@ -156,11 +156,11 @@ aliases:
 
 node10: &node10
   docker:
-    - image: neotracker/neo-one-circleci-node:10.16.0-2
+    - image: neotracker/neo-one-circleci-node@sha256:0f047d3662ad72b75e9550e41b22a2be0bf7fa8ee6563b65272b5af966b07f20
 
 node12: &node12
   docker:
-    - image: neotracker/neo-one-circleci-node:12.4.0-2
+    - image: neotracker/neo-one-circleci-node@sha256:6f76ab22882896c057d9d805955892f1dee26bb1a4257a6d095d07d617aa4d5c
 
 version: 2
 jobs:

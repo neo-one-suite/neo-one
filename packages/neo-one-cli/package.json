@@ -36,7 +36,7 @@
   "devDependencies": {
     "@types/bn.js": "^4.11.5",
     "@types/fs-extra": "^8.0.0",
-    "@types/lodash": "^4.14.137",
+    "@types/lodash": "^4.14.138",
     "@types/listr": "^0.14.2",
     "@types/prompts": "^2.0.1",
     "@types/yargs": "^13.0.2"

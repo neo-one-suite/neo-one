@@ -17,7 +17,7 @@
   "devDependencies": {
     "@types/cosmiconfig": "^5.0.3",
     "@types/fs-extra": "^8.0.0",
-    "@types/lodash": "^4.14.137",
+    "@types/lodash": "^4.14.138",
     "@types/prompts": "^2.0.1",
     "@types/schema-utils": "^1.0.0"
   },

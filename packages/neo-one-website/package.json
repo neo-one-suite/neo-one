@@ -50,7 +50,7 @@
   "devDependencies": {
     "@types/clipboard": "^2.0.1",
     "@types/fs-extra": "^8.0.0",
-    "@types/lodash": "^4.14.137",
+    "@types/lodash": "^4.14.138",
     "@types/markdown-it": "^0.0.8",
     "@types/markdown-it-anchor": "^4.0.3",
     "@types/modernizr": "^3.5.3",

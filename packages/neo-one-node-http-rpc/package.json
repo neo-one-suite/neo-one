@@ -27,7 +27,7 @@
     "@types/koa-compress": "^2.0.9",
     "@types/koa-router": "^7.0.42",
     "@types/koa-static": "^4.0.1",
-    "@types/lodash": "^4.14.137"
+    "@types/lodash": "^4.14.138"
   },
   "sideEffects": false
 }
