@@ -1,5 +1,4 @@
 import { crypto, utils, VMState } from '@neo-one/client-common';
-import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Block,
   ByteArrayContractParameter,
@@ -32,8 +31,6 @@ import {
 } from './errors';
 import { lookupOp } from './opcodes';
 import { StackItem } from './stackItem';
-
-const logger = createChild(nodeLogger, { component: 'vm' });
 
 const getErrorMessage = (error: Error) => `${error.message}\n${error.stack}`;
 
@@ -223,15 +220,7 @@ export const executeScript = async ({
     stackCount,
   };
 
-  try {
-    const result = await run({ context });
-    logger.trace({ title: 'neo_execute_script' });
-
-    return result;
-  } catch (error) {
-    logger.trace({ title: 'neo_execute_script', error });
-    throw error;
-  }
+  return run({ context });
 };
 
 const safeToContractParameter = (item: StackItem, safe: boolean) => {
