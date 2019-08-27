@@ -191,8 +191,8 @@ class Resolver {
           initialInterval: 250,
           maxRetries: 10,
           maxInterval: 2500,
-          onError: (error) => {
-            editorLogger.error({ title: 'resolve_dependencies_fetch_registry_package_error', error });
+          onError: (err) => {
+            editorLogger.error({ name: 'resolve_dependencies_fetch_registry_package_error', err });
           },
         }),
       )
@@ -228,8 +228,8 @@ export async function resolveDependencies(dependencies: Dependencies): Promise<R
   }
 
   const result = new Resolver().resolve(dependencies);
-  result.catch((error) => {
-    editorLogger.error({ title: 'resolve_dependencies_final_error', error });
+  result.catch((err) => {
+    editorLogger.error({ name: 'resolve_dependencies_final_error', err });
 
     cache.del(key);
   });

@@ -299,7 +299,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     const { from, attributes, networkFee } = this.getTransactionOptions(options);
 
     return this.capture(async () => this.executeTransfer(transfers, from, attributes, networkFee), {
-      title: 'neo_transfer',
+      name: 'neo_transfer',
       measures: {
         total: transferDurationSec,
         error: transferFailures,
@@ -311,7 +311,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     const { from, attributes, networkFee } = this.getTransactionOptions(options);
 
     return this.capture(async () => this.executeClaim(from, attributes, networkFee), {
-      title: 'neo_claim',
+      name: 'neo_claim',
       measures: {
         total: claimDurationSec,
         error: claimFailures,
@@ -598,7 +598,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
         });
       },
       {
-        title: 'neo_invoke_claim',
+        name: 'neo_invoke_claim',
         measures: {
           total: claimDurationSec,
           error: claimFailures,
@@ -1171,12 +1171,12 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
   protected async capture<T>(
     func: () => Promise<T>,
     {
-      title,
+      name,
       labels = {},
       measures,
       invoke = false,
     }: {
-      readonly title: string;
+      readonly name: string;
       readonly labels?: Record<string, string>;
       readonly measures?: {
         readonly total?: Measure;
@@ -1195,16 +1195,16 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       tags.set(invokeTag, { value });
     }
 
-    const startTime = Date.now();
+    const startTime = commonUtils.nowSeconds();
     try {
       const result = await func();
-      logger('%o', { title, level: 'verbose', ...labels });
+      logger('%o', { name, level: 'verbose', ...labels });
       if (measures !== undefined && measures.total !== undefined) {
         globalStats.record(
           [
             {
               measure: measures.total,
-              value: Date.now() - startTime,
+              value: commonUtils.nowSeconds() - startTime,
             },
           ],
           tags,
@@ -1213,7 +1213,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
 
       return result;
     } catch (error) {
-      logger('%o', { title, level: 'error', error: error.message, ...labels });
+      logger('%o', { name, level: 'error', error: error.message, ...labels });
       if (measures !== undefined && measures.error !== undefined) {
         globalStats.record(
           [
@@ -1396,7 +1396,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
             });
       },
       {
-        title: 'neo_invoke_raw',
+        name: 'neo_invoke_raw',
         invoke: true,
         measures: {
           total: invokeDurationSec,

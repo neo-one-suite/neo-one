@@ -75,9 +75,9 @@ export const context = (logger: Logger) => async (ctx: Context, next: () => Prom
           }
         }
       }
-      childLogger.debug({ title: 'http_server_request' });
+      childLogger.debug({ name: 'http_server_request' });
     } catch (err) {
-      childLogger.error({ title: 'http_server_request', err });
+      childLogger.error({ name: 'http_server_request', err });
       globalStats.record([
         {
           measure: requestErrors,
@@ -100,5 +100,5 @@ export const context = (logger: Logger) => async (ctx: Context, next: () => Prom
 
 export const onError = (logger: Logger) => (err: Error, ctx?: Context) => {
   const labels = ctx !== undefined ? getContextLabels(ctx).logLabels : {};
-  logger.error({ title: 'http_server_request_uncaught_error', err, ...labels }, 'Unexpected uncaught request error.');
+  logger.error({ name: 'http_server_request_uncaught_error', err, ...labels }, 'Unexpected uncaught request error.');
 };

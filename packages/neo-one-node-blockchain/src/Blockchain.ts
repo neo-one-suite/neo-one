@@ -373,7 +373,7 @@ export class Blockchain {
       this.mutableRunning = false;
     }
 
-    logger.info({ title: 'neo_blockchain_stop' }, 'NEO blockchain stopped.');
+    logger.info({ name: 'neo_blockchain_stop' }, 'NEO blockchain stopped.');
   }
 
   public updateSettings(settings: Settings): void {
@@ -550,13 +550,13 @@ export class Blockchain {
   }
 
   public readonly getValidators = async (transactions: readonly Transaction[]): Promise<readonly ECPoint[]> => {
-    logger.debug({ title: 'neo_blockchain_get_validators' });
+    logger.debug({ name: 'neo_blockchain_get_validators' });
 
     return getValidators(this, transactions);
   };
 
   public readonly calculateClaimAmount = async (claims: readonly Input[]): Promise<BN> => {
-    logger.debug({ title: 'neo_blockchain_calculate_claim_amount' });
+    logger.debug({ name: 'neo_blockchain_calculate_claim_amount' });
     const spentCoins = await Promise.all(claims.map(async (claim) => this.tryGetSpentCoin(claim)));
 
     const filteredSpentCoinsIn = spentCoins.filter(commonUtils.notNull);
@@ -618,7 +618,7 @@ export class Blockchain {
         const entryNonNull = entry;
         const logData = {
           [Labels.NEO_BLOCK_INDEX]: entry.block.index,
-          title: 'neo_blockchain_persist_block_top_level',
+          name: 'neo_blockchain_persist_block_top_level',
         };
         try {
           await this.persistBlockInternal(entryNonNull.block, entryNonNull.unsafe);
@@ -629,8 +629,8 @@ export class Blockchain {
               value: Date.now() - startTime,
             },
           ]);
-        } catch (error) {
-          logger.error({ error, ...logData });
+        } catch (err) {
+          logger.error({ err, ...logData });
           globalStats.record([
             {
               measure: blockFailures,
@@ -638,7 +638,7 @@ export class Blockchain {
             },
           ]);
 
-          throw error;
+          throw err;
         }
 
         entry.resolve();
@@ -650,7 +650,7 @@ export class Blockchain {
           },
           {
             measure: blockLatencySec,
-            value: Date.now() - entry.block.timestamp,
+            value: commonUtils.nowSeconds() - entry.block.timestamp,
           },
         ]);
 
@@ -866,7 +866,7 @@ export class Blockchain {
     this.mutableInQueue = new Set();
     this.mutableDoneRunningResolve = undefined;
     this.mutableRunning = true;
-    logger.info({ title: 'neo_blockchain_start' }, 'NEO blockchain started.');
+    logger.info({ name: 'neo_blockchain_start' }, 'NEO blockchain started.');
   }
 
   // private readonly getVotes = async (transactions: readonly Transaction[]): Promise<readonly Vote[]> => {

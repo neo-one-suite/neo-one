@@ -83,7 +83,7 @@ export const setupRPCServer = async ({
 
   const { host = '0.0.0.0', port } = http;
   const disposable = await setupServer(app, server, host, port, http.keepAliveTimeout);
-  rpcLogger.info({ [Labels.SPAN_KIND]: 'server', title: 'rpc_server_listen' }, `Server listening on ${host}:${port}`);
+  rpcLogger.info({ [Labels.SPAN_KIND]: 'server', name: 'rpc_server_listen' }, `Server listening on ${host}:${port}`);
 
   return disposable;
 };

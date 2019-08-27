@@ -210,8 +210,8 @@ const resolvePackageWorker = async (name: string, version: string): Promise<Resu
         initialInterval: 100,
         maxRetries: 10,
         maxInterval: 750,
-        onError: (error) => {
-          editorLogger.error({ title: 'resolve_package_extract_package_error', error });
+        onError: (err) => {
+          editorLogger.error({ name: 'resolve_package_extract_package_error', err });
         },
       }),
     )
@@ -287,8 +287,8 @@ export const resolvePackage = async (name: string, version: string) => {
   }
 
   const result = resolvePackageWorker(name, version);
-  result.catch((error) => {
-    editorLogger.error({ title: 'resolve_package_final_error', error });
+  result.catch((err) => {
+    editorLogger.error({ name: 'resolve_package_final_error', err });
 
     cache.del(key);
   });

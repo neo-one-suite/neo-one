@@ -323,11 +323,11 @@ export class Node implements INode {
 
     try {
       this.network.start();
-      logger.debug({ title: 'neo_protocol_start' }, 'Protocol started.');
+      logger.debug({ name: 'neo_protocol_start' }, 'Protocol started.');
 
       disposable = composeDisposables(disposable, () => {
         this.network.stop();
-        logger.debug({ title: 'neo_protocol_stop' }, 'Protocol stopped.');
+        logger.debug({ name: 'neo_protocol_stop' }, 'Protocol stopped.');
       });
 
       if (this.options.consensus !== undefined) {
@@ -423,10 +423,10 @@ export class Node implements INode {
           this.mutableKnownTransactionHashes.add(transaction.hash);
 
           finalResult = { verifyResult };
-          logger.debug({ title: 'neo_relay_transaction', ...logLabels });
-        } catch (error) {
-          logger.error({ title: 'neo_relay_transaction', error, ...logLabels });
-          throw error;
+          logger.debug({ name: 'neo_relay_transaction', ...logLabels });
+        } catch (err) {
+          logger.error({ name: 'neo_relay_transaction', err, ...logLabels });
+          throw err;
         }
 
         return finalResult;
@@ -719,7 +719,7 @@ export class Node implements INode {
         .forEach((endpoint) => this.network.addEndpoint(endpoint));
     } catch (error) {
       logger.error(
-        { title: 'neo_protocol_fetch_endpoints_error', [Labels.HTTP_URL]: rpcURL, error },
+        { name: 'neo_protocol_fetch_endpoints_error', [Labels.HTTP_URL]: rpcURL, error },
         `Failed to fetch endpoints from ${rpcURL}`,
       );
     }
@@ -861,10 +861,10 @@ export class Node implements INode {
                 }),
               );
             }
-            logger.info({ title: 'neo_relay_block', [Labels.NEO_BLOCK_INDEX]: block.index });
-          } catch (error) {
-            logger.error({ title: 'neo_relay_block', [Labels.NEO_BLOCK_INDEX]: block.index, error });
-            throw error;
+            logger.info({ name: 'neo_relay_block', [Labels.NEO_BLOCK_INDEX]: block.index });
+          } catch (err) {
+            logger.error({ name: 'neo_relay_block', [Labels.NEO_BLOCK_INDEX]: block.index, err });
+            throw err;
           }
         }
 

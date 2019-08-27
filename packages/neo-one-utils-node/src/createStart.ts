@@ -17,7 +17,7 @@ export const createStart = (logger: P.Logger) => (startFunc: StartFunc) => {
         try {
           await func();
         } catch (err) {
-          logger.error({ title: 'shutdown_error', err });
+          logger.error({ name: 'shutdown_error', err });
         }
       }),
     );

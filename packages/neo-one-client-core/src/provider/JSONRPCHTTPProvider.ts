@@ -90,14 +90,14 @@ const instrumentFetch = async <T extends { readonly status: number }>(
     try {
       const resp = await doFetch(headers);
       status = resp.status;
-      logger('%o', { level: 'debug', title: 'http_client_request', ...labels });
+      logger('%o', { level: 'debug', name: 'http_client_request', ...labels });
 
       return resp;
     } finally {
       span.addAttribute(Labels.HTTP_STATUS_CODE, status);
     }
   } catch (error) {
-    logger('%o', { level: 'error', title: 'http_client_request', ...labels, error: error.message });
+    logger('%o', { level: 'error', name: 'http_client_request', ...labels, error: error.message });
     throw error;
   }
 };
@@ -288,11 +288,11 @@ export class JSONRPCHTTPProvider extends JSONRPCProvider {
 
       try {
         const result = await this.requestInternal(req, span);
-        logger({ level: 'debug', title: 'jsonrpc_client_request', ...labels });
+        logger({ level: 'debug', name: 'jsonrpc_client_request', ...labels });
 
         return result;
       } catch (error) {
-        logger({ level: 'error', title: 'jsonrpc_client_request', ...labels, error: error.message });
+        logger({ level: 'error', name: 'jsonrpc_client_request', ...labels, error: error.message });
 
         throw error;
       } finally {

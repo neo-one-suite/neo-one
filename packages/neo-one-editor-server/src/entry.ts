@@ -21,7 +21,7 @@ const shutdown = ({ exitCode, error: errorIn }: { readonly exitCode: number; rea
     shutdownInitiated = true;
     const finalLogger = getFinalLogger(editorLogger);
     errorIn
-      ? finalLogger.error({ exitCode, error: errorIn }, 'error, shutting down')
+      ? finalLogger.error({ exitCode, err: errorIn }, 'error, shutting down')
       : finalLogger.info({ exitCode }, 'shutting down');
 
     initiateShutdown()
@@ -29,8 +29,8 @@ const shutdown = ({ exitCode, error: errorIn }: { readonly exitCode: number; rea
         finalLogger.info({ exitCode }, 'shutdown');
         process.exit(exitCode);
       })
-      .catch((error) => {
-        finalLogger.error({ exitCode, err: error }, 'shutdown (error)');
+      .catch((err) => {
+        finalLogger.error({ exitCode, err }, 'shutdown (error)');
         process.exit(1);
       });
   }
@@ -38,12 +38,12 @@ const shutdown = ({ exitCode, error: errorIn }: { readonly exitCode: number; rea
 
 process.on('unhandledRejection', (errorIn) => {
   const error = errorIn as Error;
-  editorLogger.fatal({ title: 'unhandled_rejection', error: error.message }, 'Unhandled rejection. Shutting down.');
+  editorLogger.fatal({ name: 'unhandled_rejection', error: error.message }, 'Unhandled rejection. Shutting down.');
   shutdown({ exitCode: 1, error });
 });
 
 process.on('uncaughtException', (error) => {
-  editorLogger.fatal({ title: 'uncaught_exception', error: error.message }, 'Uncaught exception. Shutting down.');
+  editorLogger.fatal({ name: 'uncaught_exception', error: error.message }, 'Uncaught exception. Shutting down.');
 
   shutdown({ exitCode: 1, error });
 });
@@ -69,10 +69,7 @@ const start = async () => {
 };
 
 start().catch((error) => {
-  editorLogger.error(
-    { title: 'uncaught_server_exception', error: error.message },
-    'Uncaught exception. Shutting down.',
-  );
+  editorLogger.error({ name: 'uncaught_server_exception', error: error.message }, 'Uncaught exception. Shutting down.');
 
   shutdown({ exitCode: 1, error });
 });

@@ -151,7 +151,7 @@ export class Consensus {
   }
 
   private async startInternal(options: InternalOptions): Promise<void> {
-    logger.info({ title: 'neo_consensus_start' }, 'Consensus started.');
+    logger.info({ name: 'neo_consensus_start' }, 'Consensus started.');
 
     const initialResult = await initializeNewConsensus({
       blockchain: this.node.blockchain,
@@ -220,7 +220,7 @@ export class Consensus {
         // do nothing
       });
 
-    logger.info({ title: 'neo_consensus_stop' }, 'Consensus stopped.');
+    logger.info({ name: 'neo_consensus_stop' }, 'Consensus stopped.');
   }
 
   private handleResult(result: Result<Context>): Context {

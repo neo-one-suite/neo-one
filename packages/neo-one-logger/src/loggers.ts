@@ -2,11 +2,11 @@
 import { getPretty } from '@neo-one/logger-config';
 import pino from 'pino';
 
-const createLogger = (name: string, options: pino.LoggerOptions = {}) =>
+const createLogger = (service: string, options: pino.LoggerOptions = {}) =>
   options.browser !== undefined
-    ? pino({ ...options, name, prettyPrint: getPretty() })
+    ? pino({ ...options, base: { service }, prettyPrint: getPretty() })
     : pino(
-        { ...options, name, prettyPrint: getPretty() },
+        { ...options, base: { service }, prettyPrint: getPretty() },
         process.env.NODE_ENV === 'production' ? pino.extreme(1) : pino.destination(1),
       );
 

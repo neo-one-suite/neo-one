@@ -6,7 +6,7 @@ import _ from 'lodash';
 
 const fetchCount = async (logger: Logger, endpoint: string, timeoutMS: number): Promise<number | undefined> => {
   let logLabels: object = {
-    title: 'neo_rpc_check_ready_client_request',
+    name: 'neo_rpc_check_ready_client_request',
     [Labels.HTTP_METHOD]: 'POST',
     [Labels.SPAN_KIND]: 'client',
     [Labels.HTTP_URL]: endpoint,
@@ -60,8 +60,8 @@ const fetchCount = async (logger: Logger, endpoint: string, timeoutMS: number): 
     }
 
     return undefined;
-  } catch (error) {
-    logger.error({ ...logLabels, error });
+  } catch (err) {
+    logger.error({ ...logLabels, err });
 
     return undefined;
   }

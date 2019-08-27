@@ -259,7 +259,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         });
       },
       {
-        title: 'neo_issue',
+        name: 'neo_issue',
       },
     );
   }

@@ -286,7 +286,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider exte
         };
       },
       {
-        title: 'neo_send_transaction',
+        name: 'neo_send_transaction',
       },
     );
   }

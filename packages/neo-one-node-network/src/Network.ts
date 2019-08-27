@@ -218,11 +218,11 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       this.startServer();
       // tslint:disable-next-line no-floating-promises
       this.run();
-      logger.info({ title: 'neo_network_start' }, 'Network started.');
-    } catch (error) {
-      logger.error({ title: 'neo_network_start', error }, 'Network failed to start.');
+      logger.info({ name: 'neo_network_start' }, 'Network started.');
+    } catch (err) {
+      logger.error({ name: 'neo_network_start', err }, 'Network failed to start.');
       this.mutableStarted = false;
-      throw error;
+      throw err;
     }
   }
 
@@ -251,11 +251,11 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       }
 
       this.mutableStarted = false;
-      logger.info({ title: 'neo_network_stop' }, 'Network stopped.');
-    } catch (error) {
+      logger.info({ name: 'neo_network_stop' }, 'Network stopped.');
+    } catch (err) {
       this.mutableStopped = false;
-      logger.error({ title: 'neo_network_stop', error }, 'Network failed to stop cleanly');
-      throw error;
+      logger.error({ name: 'neo_network_stop', err }, 'Network failed to stop cleanly');
+      throw err;
     }
   }
 
@@ -298,7 +298,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
         {
           [Labels.PEER_ADDRESS]: remoteAddress,
           [Labels.PEER_PORT]: remotePort,
-          title: 'tcp_server_connect',
+          name: 'tcp_server_connect',
         },
         `Received socket connection from ${remoteAddress === undefined ? 'unknown' : remoteAddress}`,
       );
@@ -318,11 +318,11 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       this.connectToPeer({ endpoint, socket });
     });
     this.mutableTCPServer = tcpServer;
-    tcpServer.on('error', (error) => {
-      logger.error({ title: 'tcp_server_uncaught_error', error }, 'TCP peer server encountered an error.');
+    tcpServer.on('error', (err) => {
+      logger.error({ name: 'tcp_server_uncaught_error', err }, 'TCP peer server encountered an error.');
     });
     tcpServer.on('close', () => {
-      logger.info({ title: 'tcp_server_close' }, 'TCP server closed');
+      logger.info({ name: 'tcp_server_close' }, 'TCP server closed');
     });
     const host = listenTCP.host === undefined ? '0.0.0.0' : listenTCP.host;
     tcpServer.listen(listenTCP.port, host);
@@ -331,14 +331,14 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       {
         host,
         port: listenTCP.port,
-        title: 'tcp_server_listen',
+        name: 'tcp_server_listen',
       },
       `Listening on ${host}:${listenTCP.port}.`,
     );
   }
 
   private async run(): Promise<void> {
-    logger.info({ title: 'neo_network_connect_loop_start' }, 'Starting connect loop...');
+    logger.info({ name: 'neo_network_connect_loop_start' }, 'Starting connect loop...');
 
     // tslint:disable-next-line no-loop-statement
     while (!this.mutableStopped) {
@@ -352,11 +352,11 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
             // tslint:disable-next-line no-any
           }, this.mutableConnectPeersDelayMS) as any;
         });
-      } catch (error) {
-        logger.error({ title: 'neo_network_connect_loop_error', error }, 'Connect loop encountered an error');
+      } catch (err) {
+        logger.error({ name: 'neo_network_connect_loop_error', err }, 'Connect loop encountered an error');
       }
     }
-    logger.info({ title: 'neo_network_connect_loop_stop' }, 'Stopped connect loop.');
+    logger.info({ name: 'neo_network_connect_loop_stop' }, 'Stopped connect loop.');
   }
 
   private connectToPeers(): void {
@@ -394,7 +394,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
         } else {
           logger.debug(
             {
-              title: 'neo_network_unhealthy_peer',
+              name: 'neo_network_unhealthy_peer',
               [Labels.PEER_ADDRESS]: peer.endpoint,
             },
             `Peer at ${peer.endpoint} is unhealthy.`,
@@ -453,7 +453,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       },
     ]);
 
-    const logData = { [Labels.PEER_ADDRESS]: endpoint, title: 'neo_network_peer_connect' };
+    const logData = { [Labels.PEER_ADDRESS]: endpoint, name: 'neo_network_peer_connect' };
     try {
       const endpointConfig = getEndpointConfig(endpoint);
       if (endpointConfig.type === 'tcp') {
@@ -550,7 +550,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
 
   private onError(peer: Peer<Message>, error: Error): void {
     logger.trace(
-      { [Labels.PEER_ADDRESS]: peer.endpoint, title: 'neo_network_peer_error', error },
+      { [Labels.PEER_ADDRESS]: peer.endpoint, name: 'neo_network_peer_error', error },
       `Encountered error with peer at ${peer.endpoint}.`,
     );
   }
@@ -587,7 +587,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
     }
 
     logger.debug(
-      { [Labels.PEER_ADDRESS]: peer.endpoint, title: 'neo_network_peer_closed' },
+      { [Labels.PEER_ADDRESS]: peer.endpoint, name: 'neo_network_peer_closed' },
       `Peer closed at ${peer.endpoint}`,
     );
     globalStats.record([

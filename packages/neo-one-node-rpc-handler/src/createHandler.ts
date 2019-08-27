@@ -14,7 +14,7 @@ import {
   TransactionData,
   TransactionType,
 } from '@neo-one/node-core';
-import { Labels, labelToTag } from '@neo-one/utils';
+import { Labels, labelToTag, utils as commonUtils } from '@neo-one/utils';
 import { filter, switchMap, take, timeout, toArray } from 'rxjs/operators';
 
 const logger = createChild(nodeLogger, { component: 'rpc-handler' });
@@ -138,7 +138,7 @@ const createJSONRPCHandler = (handlers: Handlers) => {
 
   // tslint:disable-next-line no-any
   const handleSingleRequest = async (requestIn: any) => {
-    const startTime = Date.now();
+    const startTime = commonUtils.nowSeconds();
     let labels = {};
     let method = RPC_METHODS.UNKNOWN;
     try {
@@ -174,12 +174,12 @@ const createJSONRPCHandler = (handlers: Handlers) => {
       }
 
       const result = await handler(handlerParams);
-      logger.debug({ title: 'jsonrpc_server_single_request', ...labels });
+      logger.debug({ name: 'jsonrpc_server_single_request', ...labels });
 
       globalStats.record([
         {
           measure: requestDurations,
-          value: Date.now() - startTime,
+          value: commonUtils.nowSeconds() - startTime,
         },
       ]);
 
@@ -188,8 +188,8 @@ const createJSONRPCHandler = (handlers: Handlers) => {
         result,
         id: request.id === undefined ? undefined : request.id,
       };
-    } catch (error) {
-      logger.error({ title: 'jsonrpc_server_single_request', ...labels, error: error.message });
+    } catch (err) {
+      logger.error({ name: 'jsonrpc_server_single_request', ...labels, err });
       const tags = new TagMap();
       tags.set(rpcTag, { value: method });
       globalStats.record(
@@ -202,7 +202,7 @@ const createJSONRPCHandler = (handlers: Handlers) => {
         tags,
       );
 
-      throw error;
+      throw err;
     }
   };
 
@@ -223,10 +223,10 @@ const createJSONRPCHandler = (handlers: Handlers) => {
       let result: any;
       try {
         result = await handleRequest(request);
-        logger.debug({ title: 'jsonrpc_server_request', ...labels });
-      } catch (error) {
-        logger.error({ title: 'jsonrpc_server_request', ...labels, error });
-        throw error;
+        logger.debug({ name: 'jsonrpc_server_request', ...labels });
+      } catch (err) {
+        logger.error({ name: 'jsonrpc_server_request', ...labels, err });
+        throw err;
       }
 
       return result;
