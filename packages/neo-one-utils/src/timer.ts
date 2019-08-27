@@ -1,3 +1,4 @@
+// tslint:disable readonly-keyword no-object-mutation no-console
 const aggregateTime: { [name: string]: number } = {};
 const aggregateCount: { [name: string]: number } = {};
 

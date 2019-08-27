@@ -1,3 +1,4 @@
+// tslint:disable no-any no-empty promise-must-complete
 export interface Deferred<Value = any> {
   readonly resolve: (value: Value) => void;
   readonly reject: (error: Error) => void;

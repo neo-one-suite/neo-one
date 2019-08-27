@@ -1,11 +1,11 @@
 import {
   ForwardOptions,
   GetOptions,
+  Hash256String,
   Param,
   TransactionOptions,
-  UserAccountID,
   Transfer,
-  Hash256String,
+  UserAccountID,
 } from '@neo-one/client-common';
 import { Deferred } from './createDeferred';
 
@@ -24,7 +24,7 @@ export interface Action {
   readonly method: string;
   readonly params: readonly MigrationParam[];
   readonly options?: TransactionOptions & GetOptions;
-  readonly forwardOptions?: ForwardOptions<any>;
+  readonly forwardOptions?: ForwardOptions;
   readonly transfer?: Transfer;
   readonly hash?: Hash256String;
   readonly deferred: Deferred;

@@ -14,6 +14,7 @@ export const runMigration = async <Contracts extends SmartContractAny>(
     _.fromPairs(Object.entries(contracts).map(([name, contract]) => [name, contract.definition.abi])),
   );
   migration(
+    // tslint:disable-next-line no-any
     migrationContracts as any,
     network,
     client

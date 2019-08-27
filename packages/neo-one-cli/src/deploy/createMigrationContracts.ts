@@ -1,3 +1,4 @@
+// tslint:disable no-any promise-function-async
 import { ABI } from '@neo-one/client-common';
 import { getParamAndOptionsResults } from '@neo-one/client-core';
 import _ from 'lodash';
