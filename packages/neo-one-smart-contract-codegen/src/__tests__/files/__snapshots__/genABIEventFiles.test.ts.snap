@@ -39,20 +39,13 @@ export type ArrayEvent = ArrayArrayEvent
 export interface ArraySmartContract<TClient extends Client = Client> extends SmartContract<TClient, ArrayEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ArrayEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, ArrayEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, ArrayEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface ArrayMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ArrayEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ArrayEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, ArrayEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface ArrayMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, ArrayEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -101,20 +94,13 @@ export type Array_defaultEvent = Array_defaultArrayDefaultEvent
 export interface Array_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_defaultEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Array_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Array_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Array_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Array_defaultMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_defaultEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Array_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Array_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Array_defaultMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Array_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -164,20 +150,13 @@ export type Array_default_restEvent = Array_default_restArrayDefaultRestEvent
 export interface Array_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_default_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Array_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Array_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Array_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Array_default_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_default_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Array_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Array_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Array_default_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Array_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -224,20 +203,13 @@ export type Array_restEvent = Array_restArrayRestEvent
 export interface Array_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Array_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Array_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Array_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Array_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Array_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Array_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Array_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Array_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Array_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -281,20 +253,13 @@ export type BooleanEvent = BooleanBooleanEvent
 export interface BooleanSmartContract<TClient extends Client = Client> extends SmartContract<TClient, BooleanEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, BooleanEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface BooleanMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, BooleanEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, BooleanEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface BooleanMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -338,20 +303,13 @@ export type BooleanEvent = BooleanBooleanEvent
 export interface BooleanSmartContract<TClient extends Client = Client> extends SmartContract<TClient, BooleanEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, BooleanEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface BooleanMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, BooleanEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, BooleanEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface BooleanMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, BooleanEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -398,20 +356,13 @@ export type Boolean_defaultEvent = Boolean_defaultBooleanDefaultEvent
 export interface Boolean_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_defaultEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Boolean_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Boolean_defaultMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_defaultEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Boolean_defaultMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Boolean_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -458,20 +409,13 @@ export type Boolean_defaultEvent = Boolean_defaultBooleanDefaultEvent
 export interface Boolean_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_defaultEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Boolean_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Boolean_defaultMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_defaultEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Boolean_defaultMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Boolean_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -519,20 +463,13 @@ export type Boolean_default_restEvent = Boolean_default_restBooleanDefaultRestEv
 export interface Boolean_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_default_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Boolean_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Boolean_default_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_default_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Boolean_default_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Boolean_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -580,20 +517,13 @@ export type Boolean_default_restEvent = Boolean_default_restBooleanDefaultRestEv
 export interface Boolean_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_default_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Boolean_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Boolean_default_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_default_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Boolean_default_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Boolean_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -638,20 +568,13 @@ export type Boolean_restEvent = Boolean_restBooleanRestEvent
 export interface Boolean_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Boolean_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Boolean_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Boolean_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Boolean_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -696,20 +619,13 @@ export type Boolean_restEvent = Boolean_restBooleanRestEvent
 export interface Boolean_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Boolean_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Boolean_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Boolean_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Boolean_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Boolean_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Boolean_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Boolean_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -752,20 +668,13 @@ export type ForwardValueEvent = ForwardValueForwardValueEvent
 export interface ForwardValueSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValueEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ForwardValueEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, ForwardValueEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, ForwardValueEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface ForwardValueMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValueEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ForwardValueEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, ForwardValueEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface ForwardValueMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, ForwardValueEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -811,20 +720,13 @@ export type ForwardValue_defaultEvent = ForwardValue_defaultForwardValueDefaultE
 export interface ForwardValue_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_defaultEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ForwardValue_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, ForwardValue_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, ForwardValue_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface ForwardValue_defaultMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_defaultEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ForwardValue_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, ForwardValue_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface ForwardValue_defaultMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, ForwardValue_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -871,20 +773,13 @@ export type ForwardValue_default_restEvent = ForwardValue_default_restForwardVal
 export interface ForwardValue_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_default_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ForwardValue_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, ForwardValue_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, ForwardValue_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface ForwardValue_default_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_default_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ForwardValue_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, ForwardValue_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface ForwardValue_default_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, ForwardValue_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -928,20 +823,13 @@ export type ForwardValue_restEvent = ForwardValue_restForwardValueRestEvent
 export interface ForwardValue_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ForwardValue_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, ForwardValue_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, ForwardValue_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface ForwardValue_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ForwardValue_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ForwardValue_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, ForwardValue_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface ForwardValue_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, ForwardValue_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -986,20 +874,13 @@ export type IntegerEvent = IntegerIntegerEvent
 export interface IntegerSmartContract<TClient extends Client = Client> extends SmartContract<TClient, IntegerEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, IntegerEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, IntegerEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, IntegerEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface IntegerMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, IntegerEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, IntegerEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, IntegerEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface IntegerMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, IntegerEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -1047,20 +928,13 @@ export type Integer_defaultEvent = Integer_defaultIntegerDefaultEvent
 export interface Integer_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_defaultEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Integer_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Integer_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Integer_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Integer_defaultMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_defaultEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Integer_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Integer_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Integer_defaultMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Integer_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -1109,20 +983,13 @@ export type Integer_default_restEvent = Integer_default_restIntegerDefaultRestEv
 export interface Integer_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_default_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Integer_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Integer_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Integer_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Integer_default_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_default_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Integer_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Integer_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Integer_default_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Integer_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -1168,20 +1035,13 @@ export type Integer_restEvent = Integer_restIntegerRestEvent
 export interface Integer_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Integer_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Integer_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Integer_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Integer_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Integer_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Integer_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Integer_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Integer_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Integer_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -1232,20 +1092,13 @@ export type MapEvent = MapMapEvent
 export interface MapSmartContract<TClient extends Client = Client> extends SmartContract<TClient, MapEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, MapEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, MapEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, MapEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface MapMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, MapEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, MapEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, MapEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface MapMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, MapEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -1299,20 +1152,13 @@ export type Map_defaultEvent = Map_defaultMapDefaultEvent
 export interface Map_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_defaultEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Map_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Map_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Map_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Map_defaultMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_defaultEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Map_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Map_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Map_defaultMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Map_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -1367,20 +1213,13 @@ export type Map_default_restEvent = Map_default_restMapDefaultRestEvent
 export interface Map_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_default_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Map_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Map_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Map_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Map_default_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_default_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Map_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Map_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Map_default_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Map_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -1432,20 +1271,13 @@ export type Map_restEvent = Map_restMapRestEvent
 export interface Map_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Map_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Map_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Map_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Map_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Map_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Map_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Map_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Map_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Map_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -1495,20 +1327,13 @@ export type ObjectEvent = ObjectObjectEvent
 export interface ObjectSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ObjectEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ObjectEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, ObjectEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, ObjectEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface ObjectMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ObjectEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, ObjectEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, ObjectEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface ObjectMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, ObjectEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -1561,20 +1386,13 @@ export type Object_defaultEvent = Object_defaultObjectDefaultEvent
 export interface Object_defaultSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_defaultEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Object_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Object_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Object_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Object_defaultMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_defaultEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Object_defaultEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Object_defaultEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Object_defaultMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Object_defaultEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -1628,20 +1446,13 @@ export type Object_default_restEvent = Object_default_restObjectDefaultRestEvent
 export interface Object_default_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_default_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Object_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Object_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Object_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Object_default_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_default_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Object_default_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Object_default_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Object_default_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Object_default_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
@@ -1692,20 +1503,13 @@ export type Object_restEvent = Object_restObjectRestEvent
 export interface Object_restSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_restEvent> {
   readonly foo: {
   (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Object_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Object_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
+  readonly confirmed: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Object_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 }
 
 
-export interface Object_restMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, Object_restEvent> {
-  readonly foo: {
-  (options?: TransactionOptions): Promise<TransactionResult<InvokeReceipt<boolean, Object_restEvent>, InvocationTransaction>>;
-  readonly confirmed: {
-    (options?: TransactionOptions & GetOptions): Promise<InvokeReceipt<boolean, Object_restEvent> & { readonly transaction: InvocationTransaction}>;
-  },
-}
+export interface Object_restMigrationSmartContract {
+  readonly foo: (options?: TransactionOptions & GetOptions) => Promise<InvokeReceipt<boolean, Object_restEvent> & { readonly transaction: InvocationTransaction}>;
 }
 ",
   },
