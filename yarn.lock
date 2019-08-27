@@ -2225,6 +2225,14 @@
     "@opencensus/web-types" "^0.0.5"
     "@types/node" "^12.6.9"
 
+"@opencensus/web-core@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@opencensus/web-core/-/web-core-0.0.6.tgz#e2aed61c6881fdba106c1ed5a48701fe763b5e8b"
+  integrity sha512-qLIZPsbCGEYNEyfH8/ietJDYhfMfqbWtXp7mFCpE3RvCW/QBUzDnfDRyLJTF6s0Ad5VnlJQ9yF2baDkDAaanpg==
+  dependencies:
+    "@opencensus/web-types" "^0.0.6"
+    "@types/node" "^12.6.9"
+
 "@opencensus/web-propagation-tracecontext@^0.0.5":
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/@opencensus/web-propagation-tracecontext/-/web-propagation-tracecontext-0.0.5.tgz#41fc72495651510a78c8062be051b698abac65ba"
@@ -2236,6 +2244,11 @@
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/@opencensus/web-types/-/web-types-0.0.5.tgz#7420ca9cbe2c99a587a66955080df2cef7092d56"
   integrity sha512-DyijGm7h/6Tu8m5fUcElZCPjKGDXNXAyrHX7b9wCKZ5+25yQqedqOzZRUNEG44MCySrVNGYOyjHR4PVsnzsGPA==
+
+"@opencensus/web-types@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@opencensus/web-types/-/web-types-0.0.6.tgz#1f80b7ff3d3b2779559e5f53f46a38223a096aff"
+  integrity sha512-KiVZgqRneE6bpfvRlVn1CMfyibeBqgw4cmGHtKTtRvqyRMmR3rKDfZx/2YaevJGlx+BXduC5qAB7lwCHK0MD8g==
 
 "@phenomnomnominal/tsquery@^3.0.0":
   version "3.0.0"
