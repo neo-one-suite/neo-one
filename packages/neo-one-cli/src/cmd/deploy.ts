@@ -11,7 +11,7 @@ export const builder = (yargsBuilder: typeof yargs) =>
     .describe('network', 'Network to run the migration on.')
     .default('network', 'test');
 export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
-  start(async (_cmd, config) => {
-    await deploy(config, argv.network);
+  start(async (cmd, config) => {
+    await deploy(cmd, config, argv.network);
   });
 };

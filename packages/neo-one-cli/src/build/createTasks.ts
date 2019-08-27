@@ -2,6 +2,8 @@
 import { Configuration } from '@neo-one/cli-common';
 import { Contracts } from '@neo-one/smart-contract-compiler';
 import Listr from 'listr';
+import _ from 'lodash';
+import { loadDeployed } from '../common';
 import { Command } from '../types';
 import { deployContract } from './deployContract';
 import { findContracts } from './findContracts';
@@ -15,8 +17,13 @@ export const createTasks = (cmd: Command, config: Configuration, reset: boolean)
     {
       title: 'Start development network',
       task: async (ctx) => {
-        const [contracts] = await Promise.all([findContracts(config), startNetwork(cmd, config, reset)]);
+        const [contracts, deployed] = await Promise.all([
+          findContracts(config),
+          loadDeployed(config),
+          startNetwork(cmd, config, reset),
+        ]);
         ctx.foundContracts = contracts;
+        ctx.deployed = deployed;
       },
     },
     {
@@ -51,11 +58,23 @@ export const createTasks = (cmd: Command, config: Configuration, reset: boolean)
                 sourceMap,
               });
 
-              await generateCode(config, contract.filePath, contract.name, abi, {
-                local: {
-                  address,
-                },
-              });
+              const networksDefinition = ctx.deployed[contract.name] === undefined ? {} : ctx.deployed[contract.name];
+
+              await generateCode(
+                config,
+                contract.filePath,
+                contract.name,
+                abi,
+                _.merge(
+                  {},
+                  {
+                    local: {
+                      address,
+                    },
+                  },
+                  networksDefinition,
+                ),
+              );
             },
           })),
         );
