@@ -50,7 +50,7 @@
     "raw-loader": "^3.0.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "react-hot-loader": "^4.12.11",
+    "react-hot-loader": "^4.12.12",
     "react-icons": "^3.7.0",
     "react-redux": "^7.0.3",
     "redux": "^4.0.4",
@@ -64,7 +64,7 @@
     "typescript": "^3.5.3",
     "typescript-fsa": "^3.0.0-beta-2",
     "typescript-fsa-reducers": "^1.2.1",
-    "webpack": "^4.39.2"
+    "webpack": "^4.39.3"
   },
   "devDependencies": {
     "@types/color": "^3.0.0",
