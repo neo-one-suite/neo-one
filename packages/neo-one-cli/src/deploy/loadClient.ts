@@ -1,3 +1,4 @@
+// tslint:disable prefer-conditional-expression
 import { Configuration, WALLETS } from '@neo-one/cli-common';
 import { LocalKeyStore, LocalMemoryStore, NEOONEProvider } from '@neo-one/client-core';
 import { Client, LocalUserAccountProvider } from '@neo-one/client-full-core';

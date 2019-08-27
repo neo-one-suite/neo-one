@@ -29,7 +29,7 @@ export interface Action {
   readonly transfer?: Transfer;
   readonly hash?: Hash256String;
   readonly deferred: Deferred;
-  readonly args: any[];
+  readonly args: readonly any[];
 }
 
 export type Print = (value: any) => void;

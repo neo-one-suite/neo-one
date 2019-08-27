@@ -1,3 +1,4 @@
+// tslint:disable promise-function-async no-any no-loop-statement
 import { SourceMaps } from '@neo-one/client-common';
 import { getParamAndOptionsResults, SmartContractAny } from '@neo-one/client-core';
 import { Client } from '@neo-one/client-full-core';

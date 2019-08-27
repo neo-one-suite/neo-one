@@ -1,6 +1,6 @@
+// tslint:disable no-loop-statement
 import { Configuration } from '@neo-one/cli-common';
 import { common, crypto, scriptHashToAddress, SourceMaps } from '@neo-one/client-common';
-import { Client } from '@neo-one/client-full-core';
 import { compileContract, CompileContractResult, LinkedContracts } from '@neo-one/smart-contract-compiler';
 import { createCompilerHost } from '@neo-one/smart-contract-compiler-node';
 import { DiagnosticCategory } from 'typescript';
@@ -34,7 +34,7 @@ const compile = async (filePath: string, name: string, linked: LinkedContracts, 
   };
 };
 
-export const loadContracts = async (config: Configuration, client: Client, print: Print) => {
+export const loadContracts = async (config: Configuration, print: Print) => {
   print('Loading contracts');
   const contracts = await findContracts(config);
   let linked: LinkedContracts = {};
