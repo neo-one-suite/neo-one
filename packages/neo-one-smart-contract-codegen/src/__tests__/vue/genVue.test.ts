@@ -6,7 +6,7 @@ describe('genVue', () => {
     expect(
       genVue({
         contractsPaths,
-        commonTypesPath: '/foo/bar/one/generated/types.js',
+        contractsPath: '/foo/bar/one/generated/contracts.js',
         vuePath: '/foo/bar/one/generated/vue.js',
         clientPath: '/foo/bar/one/generated/client.js',
       }),

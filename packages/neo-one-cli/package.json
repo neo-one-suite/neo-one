@@ -9,7 +9,7 @@
     "@neo-one/cli-common-node": "^1.1.7",
     "@neo-one/client-common": "^1.4.0",
     "@neo-one/client-core": "^1.4.1",
-    "@neo-one/client-full": "^1.1.7",
+    "@neo-one/client-full-core": "^1.2.1",
     "@neo-one/logger": "^1.2.0",
     "@neo-one/logger-config": "^1.0.1",
     "@neo-one/node": "^2.1.1",

@@ -5,12 +5,12 @@ import { getRelativeImport, normalizePath } from '../utils';
 export const genTest = ({
   contractsPaths,
   testPath,
-  commonTypesPath,
+  contractsPath,
   mod = '@neo-one/smart-contract-test',
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly testPath: string;
-  readonly commonTypesPath: string;
+  readonly contractsPath: string;
   readonly mod?: string;
 }) => ({
   js: `
@@ -30,7 +30,7 @@ export const withContracts = createWithContracts([
 `,
   ts: `
 import { TestOptions, WithContractsOptions } from '${mod}';
-import { Contracts } from '${getRelativeImport(testPath, commonTypesPath)}';
+import { Contracts } from '${getRelativeImport(testPath, contractsPath)}';
 
 export const withContracts: (
   test: (contracts: Contracts & TestOptions) => Promise<void>,

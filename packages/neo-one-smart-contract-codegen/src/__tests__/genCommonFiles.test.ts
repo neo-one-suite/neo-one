@@ -6,7 +6,7 @@ describe('genCommonFiles', () => {
     expect(
       genCommonFiles({
         contractsPaths,
-        commonTypesPath: '/foo/bar/one/generated/types.js',
+        contractsPath: '/foo/bar/one/generated/contracts.js',
         testPath: '/foo/bar/one/generated/test.js',
         reactPath: '/foo/bar/one/generated/react.jsx',
         angularPath: '/foo/bar/one/generated/angular.service.js',

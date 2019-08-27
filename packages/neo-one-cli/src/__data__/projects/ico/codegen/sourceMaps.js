@@ -1,4 +1,4 @@
-/* @hash 734104cc7bae681c27982ee0860544d5 */
+/* @hash 3e1a9fbcb46b4386913e8ab884d8bb8b */
 // tslint:disable
 /* eslint-disable */
 let sourceMapsIn = {};
@@ -8,7 +8,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
     AXAZs3F9QHWZzpGV2GdWEkkopUWGSyDwAf: {
       version: 3,
       sources: [
-        '../contracts/Escrow.ts',
+        '../neo-one/contracts/Escrow.ts',
         '../../../../../../../dist/neo-one/packages/neo-one-smart-contract/index.d.ts',
       ],
       names: [],
@@ -22,7 +22,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
     AaYf2HD7ruLa11ZwXjBvYSvkPAZGQRuySQ: {
       version: 3,
       sources: [
-        '../contracts/Token.ts',
+        '../neo-one/contracts/Token.ts',
         '../../../../../../../dist/neo-one/packages/neo-one-smart-contract/index.d.ts',
       ],
       names: [],
@@ -36,8 +36,8 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
     Adiq4sMWabmjD7S45BCvW2uVgFDofmTbyo: {
       version: 3,
       sources: [
-        '../contracts/ICO.ts',
-        '../contracts/Token.ts',
+        '../neo-one/contracts/ICO.ts',
+        '../neo-one/contracts/Token.ts',
         '../../../../../../../dist/neo-one/packages/neo-one-smart-contract/index.d.ts',
       ],
       names: [],

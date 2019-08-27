@@ -1,8 +1,8 @@
-/* @hash 4301a15c8eaa3db2edd5ea02b6234983 */
+/* @hash d3ac2bd004d3ab370f9268e69ce113f6 */
 // tslint:disable
 /* eslint-disable */
 import { TestOptions, WithContractsOptions } from '@neo-one/smart-contract-test';
-import { Contracts } from './types';
+import { Contracts } from './contracts';
 
 export const withContracts: (
   test: (contracts: Contracts & TestOptions) => Promise<void>,

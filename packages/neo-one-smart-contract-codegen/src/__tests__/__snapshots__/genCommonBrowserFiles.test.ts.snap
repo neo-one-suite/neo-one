@@ -30,7 +30,7 @@ export class ContractsService {
     "ts": "// tslint:disable
 /* eslint-disable */
 import { Client, DeveloperClients, UserAccountProviders } from '@neo-one/client';
-import { Contracts } from './types';
+import { Contracts } from './contracts';
 import { DefaultUserAccountProviders } from './client';
 
 export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {
@@ -124,22 +124,35 @@ export const createClient: <TUserAccountProviders extends UserAccountProviders<a
 export const createDeveloperClients: () => DeveloperClients;
 ",
   },
-  "commonTypes": Object {
-    "js": undefined,
+  "contracts": Object {
+    "js": "// tslint:disable
+/* eslint-disable */
+import { createICOSmartContract } from './ICO/contract';
+import { createTokenSmartContract } from './Token/contract';
+
+export const createContracts = (client) => ({
+  ico: createICOSmartContract(client),
+  token: createTokenSmartContract(client),
+});
+",
     "ts": "// tslint:disable
 /* eslint-disable */
+import { Client } from '@neo-one/client';
+
 import { ICOSmartContract, ICOMigrationSmartContract } from './ICO/types';
 import { TokenSmartContract, TokenMigrationSmartContract } from './Token/types';
 
-export interface Contracts {
-  readonly ico: ICOSmartContract;
-  readonly token: TokenSmartContract;
+export interface Contracts<TClient extends Client = Client> {
+  readonly ico: ICOSmartContract<TClient>;
+  readonly token: TokenSmartContract<TClient>;
 }
 
 export interface MigrationContracts {
   readonly ico: ICOMigrationSmartContract;
   readonly token: TokenMigrationSmartContract;
 }
+
+export const createContracts: <TClient extends Client>(client: TClient) => Contracts<TClient>;
 ",
   },
   "generated": Object {
@@ -154,7 +167,7 @@ export * from './ICO/abi';
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
-export * from './types';
+export * from './contracts';
 export * from './react';
 export * from './client';
 export * from './Token/contract';
@@ -207,7 +220,7 @@ export const WithContracts = ({ children }) => <Context.Consumer>{children}</Con
 /* eslint-disable */
 import { Client, DeveloperClient, DeveloperClients } from '@neo-one/client';
 import * as React from 'react';
-import { Contracts } from './types';
+import { Contracts } from './contracts';
 
 export interface WithClients<TClient extends Client> {
   readonly client: TClient;
@@ -263,7 +276,7 @@ export const withContracts = createWithContracts([
     "ts": "// tslint:disable
 /* eslint-disable */
 import { TestOptions, WithContractsOptions } from '@neo-one/smart-contract-test-browser';
-import { Contracts } from './types';
+import { Contracts } from './contracts';
 
 export const withContracts: (
   test: (contracts: Contracts & TestOptions) => Promise<void>,
@@ -297,7 +310,7 @@ export const instance = new ContractsService();
     "ts": "// tslint:disable
 /* eslint-disable */
 import { Client, DeveloperClients, UserAccountProviders } from '@neo-one/client';
-import { Contracts } from './types';
+import { Contracts } from './contracts';
 import { DefaultUserAccountProviders } from './client';
 
 export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {

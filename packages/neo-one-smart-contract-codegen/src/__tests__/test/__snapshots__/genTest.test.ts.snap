@@ -12,7 +12,7 @@ export const withContracts = createWithContracts([
 ",
   "ts": "
 import { TestOptions, WithContractsOptions } from '@neo-one/smart-contract-test';
-import { Contracts } from './types';
+import { Contracts } from './contracts';
 
 export const withContracts: (
   test: (contracts: Contracts & TestOptions) => Promise<void>,

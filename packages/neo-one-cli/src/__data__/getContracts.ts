@@ -1,4 +1,5 @@
-import { Client, Contract } from '@neo-one/client-full';
+import { Contract } from '@neo-one/client-common';
+import { Client } from '@neo-one/client-full-core';
 
 export const getContracts = async (client: Client, networkName: string): Promise<readonly Contract[]> => {
   const readClient = client.read(networkName);

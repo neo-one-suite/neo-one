@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./packages",
     "target": "esnext",
-    "module": "esnext",
+    "module": "commonjs",
     "moduleResolution": "node",
     "lib": ["esnext", "dom"],
     "paths": {
@@ -26,7 +26,8 @@
     "noUnusedParameters": false,
     "allowUnreachableCode": false,
     "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true
   },
   "exclude": [
     "dist",

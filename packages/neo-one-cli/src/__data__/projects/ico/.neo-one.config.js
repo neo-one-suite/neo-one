@@ -6,7 +6,7 @@ const neotrackerPort = parseInt(process.env.NEO_ONE_PORT_1 === undefined ? 10001
 
 module.exports = {
   migration: {
-    path: nodePath.join('neo-one', 'migration.js'),
+    path: nodePath.join('neo-one', 'migration.ts'),
   },
   codegen: {
     path: 'codegen',

@@ -2,7 +2,7 @@ import { CodegenFramework } from '@neo-one/cli-common';
 import { SourceMaps } from '@neo-one/client-common';
 import { genAngular } from './angular';
 import { genBrowserClient, NetworkDefinition, Wallet } from './client';
-import { genCommonTypes } from './commonTypes';
+import { genContracts } from './contracts';
 import { formatFile } from './formatFile';
 import { genGenerated } from './generated';
 import { genReact } from './react';
@@ -13,7 +13,7 @@ import { genVue } from './vue';
 
 export interface CommonBrowserFilesResult {
   readonly test: FileResult;
-  readonly commonTypes: FileResult;
+  readonly contracts: FileResult;
   readonly sourceMaps: FileResult;
   readonly react: FileResult;
   readonly angular: FileResult;
@@ -25,7 +25,7 @@ export interface CommonBrowserFilesResult {
 export const genCommonBrowserFiles = ({
   contractsPaths,
   testPath,
-  commonTypesPath,
+  contractsPath,
   reactPath,
   angularPath,
   vuePath,
@@ -40,7 +40,7 @@ export const genCommonBrowserFiles = ({
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly testPath: string;
-  readonly commonTypesPath: string;
+  readonly contractsPath: string;
   readonly reactPath: string;
   readonly angularPath: string;
   readonly vuePath: string;
@@ -54,19 +54,19 @@ export const genCommonBrowserFiles = ({
   readonly framework: CodegenFramework;
 }): CommonBrowserFilesResult => {
   const testFile = formatFile(
-    genTest({ contractsPaths, testPath, commonTypesPath, mod: '@neo-one/smart-contract-test-browser' }),
+    genTest({ contractsPaths, testPath, contractsPath, mod: '@neo-one/smart-contract-test-browser' }),
     false,
   );
-  const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }), false);
+  const contractsFile = formatFile(genContracts({ contractsPaths, contractsPath }), false);
   const sourceMapsFile = formatFile(genSourceMaps({ sourceMapsPath, sourceMaps }), false);
-  const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath }), false);
-  const angularFile = formatFile(genAngular({ contractsPaths, angularPath, commonTypesPath, clientPath }), false);
-  const vueFile = formatFile(genVue({ contractsPaths, vuePath, commonTypesPath, clientPath }), false);
+  const reactFile = formatFile(genReact({ contractsPaths, reactPath, contractsPath, clientPath }), false);
+  const angularFile = formatFile(genAngular({ contractsPaths, angularPath, contractsPath, clientPath }), false);
+  const vueFile = formatFile(genVue({ contractsPaths, vuePath, contractsPath, clientPath }), false);
   const clientFile = formatFile(genBrowserClient({ localDevNetworkName, wallets, networks }), false);
   const generatedFile = formatFile(
     genGenerated({
       contractsPaths,
-      commonTypesPath,
+      contractsPath,
       reactPath,
       angularPath,
       vuePath,
@@ -79,7 +79,7 @@ export const genCommonBrowserFiles = ({
 
   return {
     test: testFile,
-    commonTypes: commonTypesFile,
+    contracts: contractsFile,
     sourceMaps: sourceMapsFile,
     react: reactFile,
     angular: angularFile,

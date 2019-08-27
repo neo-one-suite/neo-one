@@ -2,7 +2,7 @@ import { CodegenFramework } from '@neo-one/cli-common';
 import { SourceMaps } from '@neo-one/client-common';
 import { genAngular } from './angular';
 import { genClient, NetworkDefinition, Wallet } from './client';
-import { genCommonTypes } from './commonTypes';
+import { genContracts } from './contracts';
 import { formatFile } from './formatFile';
 import { genGenerated } from './generated';
 import { genReact } from './react';
@@ -13,7 +13,7 @@ import { genVue } from './vue';
 
 export interface CommonFilesResult {
   readonly test: FileResult;
-  readonly commonTypes: FileResult;
+  readonly contracts: FileResult;
   readonly sourceMaps: FileResult;
   readonly react: FileResult;
   readonly angular: FileResult;
@@ -25,7 +25,7 @@ export interface CommonFilesResult {
 export const genCommonFiles = ({
   contractsPaths,
   testPath,
-  commonTypesPath,
+  contractsPath,
   reactPath,
   angularPath,
   vuePath,
@@ -42,7 +42,7 @@ export const genCommonFiles = ({
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly testPath: string;
-  readonly commonTypesPath: string;
+  readonly contractsPath: string;
   readonly reactPath: string;
   readonly angularPath: string;
   readonly vuePath: string;
@@ -57,17 +57,17 @@ export const genCommonFiles = ({
   readonly framework: CodegenFramework;
   readonly browserify: boolean;
 }): CommonFilesResult => {
-  const testFile = formatFile(genTest({ contractsPaths, testPath, commonTypesPath }), browserify);
-  const commonTypesFile = formatFile(genCommonTypes({ contractsPaths, commonTypesPath }), browserify);
+  const testFile = formatFile(genTest({ contractsPaths, testPath, contractsPath }), browserify);
+  const contractsFile = formatFile(genContracts({ contractsPaths, contractsPath }), browserify);
   const sourceMapsFile = formatFile(genSourceMaps({ sourceMapsPath, sourceMaps }), browserify);
-  const reactFile = formatFile(genReact({ contractsPaths, reactPath, commonTypesPath, clientPath }), browserify);
-  const angularFile = formatFile(genAngular({ contractsPaths, angularPath, commonTypesPath, clientPath }), browserify);
-  const vueFile = formatFile(genVue({ contractsPaths, vuePath, commonTypesPath, clientPath }), browserify);
+  const reactFile = formatFile(genReact({ contractsPaths, reactPath, contractsPath, clientPath }), browserify);
+  const angularFile = formatFile(genAngular({ contractsPaths, angularPath, contractsPath, clientPath }), browserify);
+  const vueFile = formatFile(genVue({ contractsPaths, vuePath, contractsPath, clientPath }), browserify);
   const clientFile = formatFile(genClient({ localDevNetworkName, localDevNetworkPort, wallets, networks }), browserify);
   const generatedFile = formatFile(
     genGenerated({
       contractsPaths,
-      commonTypesPath,
+      contractsPath,
       reactPath,
       angularPath,
       vuePath,
@@ -80,7 +80,7 @@ export const genCommonFiles = ({
 
   return {
     test: testFile,
-    commonTypes: commonTypesFile,
+    contracts: contractsFile,
     sourceMaps: sourceMapsFile,
     react: reactFile,
     angular: angularFile,

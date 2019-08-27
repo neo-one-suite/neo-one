@@ -5,12 +5,12 @@ import { getRelativeImport, lowerCaseFirst } from '../utils';
 export const genReact = ({
   contractsPaths,
   reactPath,
-  commonTypesPath,
+  contractsPath,
   clientPath,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly reactPath: string;
-  readonly commonTypesPath: string;
+  readonly contractsPath: string;
   readonly clientPath: string;
 }) => ({
   js: `
@@ -61,7 +61,7 @@ export const WithContracts = ({ children }) => (
   ts: `
 import { Client, DeveloperClient, DeveloperClients } from '@neo-one/client';
 import * as React from 'react';
-import { Contracts } from '${getRelativeImport(reactPath, commonTypesPath)}';
+import { Contracts } from '${getRelativeImport(reactPath, contractsPath)}';
 
 export interface WithClients<TClient extends Client> {
   readonly client: TClient;

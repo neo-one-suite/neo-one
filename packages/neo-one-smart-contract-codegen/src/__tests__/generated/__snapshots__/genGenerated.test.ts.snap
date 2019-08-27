@@ -12,7 +12,7 @@ export * from './ICO/contract';
 export * from './ICO/abi';
 ",
   "ts": "
-export * from './types';
+export * from './contracts';
 export * from './angular.service';
 export * from './client';
 export * from './Token/contract';

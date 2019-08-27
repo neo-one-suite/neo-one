@@ -6,7 +6,7 @@ describe('genGenerated', () => {
     expect(
       genGenerated({
         contractsPaths,
-        commonTypesPath: '/foo/bar/one/generated/types.js',
+        contractsPath: '/foo/bar/one/generated/contracts.js',
         reactPath: '/foo/bar/one/generated/react.jsx',
         angularPath: '/foo/bar/one/generated/angular.service.js',
         vuePath: '/foo/bar/one/generated/vue.js',

@@ -27,7 +27,7 @@ export class ContractsService {
     ",
   "ts": "
 import { Client, DeveloperClients, UserAccountProviders } from '@neo-one/client';
-import { Contracts } from './types';
+import { Contracts } from './contracts';
 import { DefaultUserAccountProviders } from './client';
 
 export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {

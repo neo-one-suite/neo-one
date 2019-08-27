@@ -1,12 +1,12 @@
 import { contractsPaths } from '../../__data__/contractsPaths';
-import { genCommonTypes } from '../../commonTypes';
+import { genContracts } from '../../contracts';
 
-describe('genCommonTypes', () => {
+describe('genContracts', () => {
   test('Token', () => {
     expect(
-      genCommonTypes({
+      genContracts({
         contractsPaths,
-        commonTypesPath: '/foo/bar/one/generated/types.js',
+        contractsPath: '/foo/bar/one/generated/contracts.js',
       }),
     ).toMatchSnapshot();
   });

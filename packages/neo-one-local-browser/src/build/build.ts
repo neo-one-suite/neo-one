@@ -95,7 +95,7 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
   const generated = 'one/generated';
   const sourceMapsPath = `${generated}/sourceMaps.ts`;
   const testPath = `${generated}/test.ts`;
-  const commonTypesPath = `${generated}/types.ts`;
+  const contractsPath = `${generated}/contracts.ts`;
   const reactPath = `${generated}/react.tsx`;
   const angularPath = `${generated}/angular.service.ts`;
   const vuePath = `${generated}/vue.js`;
@@ -145,14 +145,14 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
   const {
     sourceMaps: sourceMapsContents,
     test: testContents,
-    commonTypes: commonTypesContents,
+    contracts: contractsContents,
     react: reactContents,
     client: clientContents,
     generated: generatedContents,
   } = genCommonBrowserFiles({
     contractsPaths,
     testPath,
-    commonTypesPath,
+    contractsPath,
     reactPath,
     angularPath,
     sourceMapsPath,
@@ -173,7 +173,7 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
 
   mutableFiles.push({ path: sourceMapsPath, content: sourceMapsContents.ts });
   mutableFiles.push({ path: testPath, content: testContents.ts });
-  mutableFiles.push({ path: commonTypesPath, content: commonTypesContents.ts });
+  mutableFiles.push({ path: contractsPath, content: contractsContents.ts });
   mutableFiles.push({ path: reactPath, content: reactContents.ts });
   mutableFiles.push({ path: clientPath, content: clientContents.ts });
   mutableFiles.push({ path: generatedPath, content: generatedContents.ts });

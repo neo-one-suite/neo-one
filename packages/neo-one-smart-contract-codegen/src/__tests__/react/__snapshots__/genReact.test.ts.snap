@@ -45,7 +45,7 @@ export const WithContracts = ({ children }) => (
   "ts": "
 import { Client, DeveloperClient, DeveloperClients } from '@neo-one/client';
 import * as React from 'react';
-import { Contracts } from './types';
+import { Contracts } from './contracts';
 
 export interface WithClients<TClient extends Client> {
   readonly client: TClient;

@@ -6,7 +6,7 @@ describe('genAngular', () => {
     expect(
       genAngular({
         contractsPaths,
-        commonTypesPath: '/foo/bar/one/generated/types.js',
+        contractsPath: '/foo/bar/one/generated/contracts.js',
         angularPath: '/foo/bar/one/generated/angular.service.js',
         clientPath: '/foo/bar/one/generated/client.js',
       }),

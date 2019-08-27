@@ -121,7 +121,7 @@ For each contract, the toolchain will emit 3 files:
 - `one/generated/react.tsx` - Contains two react components, that when used together allow you to easily access all of the tools you need to write a dapp with React throughout your component tree. Read more in the [React](/docs/react) advanced guide. We also provide similar tools for apps written in [Angular](/docs/angular) or [Vue](/docs/vue)!
 - `one/generated/sourceMaps.ts` - Contains all of the smart contract source maps. These source maps are not included in the production build in order to reduce the bundle size.
 - `one/generated/test.ts` - Contains the `withContracts` test helper. We'll learn more about this helper in the following chapters.
-- `one/generated/types.ts` - Contains the `Contracts` type whose properties are the smart contract APIs for your dapp.
+- `one/generated/contracts.ts` - Contains the `Contracts` type whose properties are the smart contract APIs for your dapp.
 
 ---
 

@@ -1,7 +1,7 @@
-/* @hash 85a13698b2c418e37ce9d9084abfc00e */
+/* @hash 8238f5f90a5a1053cfbed1e1c50b1701 */
 // tslint:disable
 /* eslint-disable */
-export * from './types';
+export * from './contracts';
 export * from './client';
 export * from './Escrow/contract';
 export * from './Escrow/types';

@@ -98,8 +98,8 @@ const enable = (options: DeveloperToolsOptions) => {
       const script = iframeWindow.document.createElement('script');
       // tslint:disable-next-line no-object-mutation
       script.type = 'text/javascript';
-      // tslint:disable-next-line no-object-mutation
-      script.innerHTML = iframeScript;
+      // tslint:disable-next-line no-object-mutation no-any
+      script.innerHTML = iframeScript as any;
       iframeDocument.body.append(script);
     }
   };

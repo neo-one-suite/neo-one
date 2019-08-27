@@ -6,7 +6,7 @@ describe('genReact', () => {
     expect(
       genReact({
         contractsPaths,
-        commonTypesPath: '/foo/bar/one/generated/types.js',
+        contractsPath: '/foo/bar/one/generated/contracts.js',
         reactPath: '/foo/bar/one/generated/react.js',
         clientPath: '/foo/bar/one/generated/client.js',
       }),

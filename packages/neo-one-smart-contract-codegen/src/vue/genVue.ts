@@ -5,12 +5,12 @@ import { getRelativeImport, lowerCaseFirst } from '../utils';
 export const genVue = ({
   contractsPaths,
   vuePath,
-  commonTypesPath,
+  contractsPath,
   clientPath,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
   readonly vuePath: string;
-  readonly commonTypesPath: string;
+  readonly contractsPath: string;
   readonly clientPath: string;
 }) => {
   const clientImport = getRelativeImport(vuePath, clientPath);
@@ -49,7 +49,7 @@ export const instance = new ContractsService();
     `,
     ts: `
 import { Client, DeveloperClients, UserAccountProviders } from '@neo-one/client';
-import { Contracts } from '${getRelativeImport(vuePath, commonTypesPath)}';
+import { Contracts } from '${getRelativeImport(vuePath, contractsPath)}';
 import { DefaultUserAccountProviders } from '${clientImport}';
 
 export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {

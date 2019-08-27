@@ -11,7 +11,7 @@ const createNewLineExport = (generatedPath: string, importPath: string) =>
 
 export const genGenerated = ({
   contractsPaths,
-  commonTypesPath,
+  contractsPath,
   reactPath,
   angularPath,
   vuePath,
@@ -20,7 +20,7 @@ export const genGenerated = ({
   framework,
 }: {
   readonly contractsPaths: ReadonlyArray<ContractPaths>;
-  readonly commonTypesPath: string;
+  readonly contractsPath: string;
   readonly reactPath: string;
   readonly angularPath: string;
   readonly vuePath: string;
@@ -29,7 +29,7 @@ export const genGenerated = ({
   readonly framework: CodegenFramework;
 }) => ({
   ts: `
-${createExport(generatedPath, commonTypesPath)}${
+${createExport(generatedPath, contractsPath)}${
     framework === 'react' ? createNewLineExport(generatedPath, reactPath) : ''
   }${framework === 'angular' ? createNewLineExport(generatedPath, angularPath) : ''}${
     framework === 'vue' ? createNewLineExport(generatedPath, vuePath) : ''
