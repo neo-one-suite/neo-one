@@ -1,8 +1,6 @@
 import { makeErrorWithCode } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
-import { InvalidParamError } from './errors';
-import { ParamToCallbacks, ScriptBuilderParam } from './types';
 
 /* istanbul ignore next */
 export const InvalidFormatError = makeErrorWithCode(
@@ -217,55 +215,6 @@ const FIVE_THOUSAND_FIXED8 = fixed8FromDecimal(5000);
 const TEN_THOUSAND_FIXED8 = fixed8FromDecimal(10000);
 const ONE_HUNDRED_MILLION_FIXED8 = fixed8FromDecimal(100000000);
 
-const paramTo = <T>(param: ScriptBuilderParam | undefined, callbacks: ParamToCallbacks<T>): T => {
-  if (param === undefined) {
-    return callbacks.undefined();
-  }
-
-  if (Array.isArray(param)) {
-    return callbacks.array(param);
-  }
-
-  if (param instanceof Map) {
-    return callbacks.map(param);
-  }
-
-  if (isUInt160(param)) {
-    return callbacks.uInt160(param);
-  }
-
-  if (isUInt256(param)) {
-    return callbacks.uInt256(param);
-  }
-
-  if (isECPoint(param)) {
-    return callbacks.ecPoint(param);
-  }
-
-  if (typeof param === 'number' || BN.isBN(param)) {
-    return callbacks.number(param);
-  }
-
-  if (typeof param === 'string') {
-    return callbacks.string(param);
-  }
-
-  if (typeof param === 'boolean') {
-    return callbacks.boolean(param);
-  }
-
-  if (param instanceof Buffer) {
-    return callbacks.buffer(param);
-  }
-
-  // tslint:disable-next-line strict-type-predicates
-  if (typeof param === 'object') {
-    return callbacks.object(param);
-  }
-  /* istanbul ignore next */
-  throw new InvalidParamError(typeof param);
-};
-
 export const common = {
   D8,
   NEO_ADDRESS_VERSION: 23,
@@ -332,5 +281,4 @@ export const common = {
   fixedFromDecimal,
   fixedToDecimal,
   reverse,
-  paramTo,
 };

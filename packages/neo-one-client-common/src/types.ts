@@ -1620,8 +1620,8 @@ export interface ForwardValue {
   readonly [OpaqueTagSymbol]: unique symbol;
 }
 
-export interface ScriptBuilderParamArray extends Array<ScriptBuilderParam | undefined> {}
-export interface ScriptBuilderParamMap extends Map<ScriptBuilderParam | undefined, ScriptBuilderParam | undefined> {}
+export interface ScriptBuilderParamArray extends Array<ScriptBuilderParam> {}
+export interface ScriptBuilderParamMap extends Map<ScriptBuilderParam, ScriptBuilderParam> {}
 export interface ScriptBuilderParamObject {
   readonly [key: string]: ScriptBuilderParam;
 }
@@ -1629,6 +1629,7 @@ export interface ScriptBuilderParamObject {
  * `Param` is converted internally via the `ABI` definition into a `ScriptBuilderParam` which is used to actually invoke the method on the smart contract.
  */
 export type ScriptBuilderParam =
+  | undefined
   | BN
   | number
   | UInt160
@@ -1641,22 +1642,23 @@ export type ScriptBuilderParam =
   | ScriptBuilderParamMap
   | ScriptBuilderParamObject;
 
-export interface ParamToCallbacks<T> {
+export interface ScriptBuilderParamToCallbacks<T> {
   readonly undefined: () => T;
   readonly array: (param: ScriptBuilderParamArray) => T;
   readonly map: (param: ScriptBuilderParamMap) => T;
   readonly uInt160: (param: UInt160) => T;
   readonly uInt256: (param: UInt256) => T;
   readonly ecPoint: (param: ECPoint) => T;
-  readonly number: (param: number | BN) => T;
+  readonly bn: (param: BN) => T;
+  readonly number: (param: number) => T;
   readonly string: (param: string) => T;
   readonly boolean: (param: boolean) => T;
   readonly buffer: (param: Buffer) => T;
   readonly object: (param: ScriptBuilderParamObject) => T;
 }
 
-export interface ParamArray extends ReadonlyArray<Param> {}
-export interface ParamMap extends ReadonlyMap<Param, Param> {}
+export interface ParamArray extends Array<Param> {}
+export interface ParamMap extends Map<Param, Param> {}
 export interface ParamObject {
   readonly [key: string]: Param;
 }
@@ -1666,6 +1668,7 @@ export interface ParamObject {
 export type Param =
   | undefined
   | BigNumber
+  | string
   | BufferString
   | AddressString
   | Hash256String
@@ -1675,6 +1678,18 @@ export type Param =
   | ParamMap
   | ParamObject
   | ForwardValue;
+
+export interface ParamToCallbacks<T> {
+  readonly undefined: () => T;
+  readonly bigNumber: (param: BigNumber) => T;
+  readonly string: (param: string) => T;
+  readonly boolean: (param: boolean) => T;
+  readonly array: (param: ParamArray) => T;
+  readonly map: (param: ParamMap) => T;
+  readonly object: (param: ParamObject) => T;
+  readonly forwardValue: (param: ForwardValue) => T;
+}
+
 export interface ReturnArray extends ReadonlyArray<Return> {}
 export interface ReturnMap extends ReadonlyMap<Return, Return> {}
 export interface ReturnObject {

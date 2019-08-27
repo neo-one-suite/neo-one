@@ -9,6 +9,9 @@ import { register } from 'ts-node';
 import { defaultNetworks } from './networks';
 
 const configurationDefaults = {
+  artifacts: {
+    path: nodePath.join('neo-one', 'artifacts'),
+  },
   migration: {
     path: nodePath.join('neo-one', 'migration.js'),
   },
@@ -33,6 +36,10 @@ const configurationDefaults = {
 
 const applyDefaults = (config: any = {}): Configuration => ({
   ...config,
+  artifacts: {
+    ...configurationDefaults.artifacts,
+    ...(config.artifacts === undefined ? {} : config.artifacts),
+  },
   migration: {
     ...configurationDefaults.migration,
     ...(config.migration === undefined ? {} : config.migration),
@@ -61,6 +68,14 @@ const configurationSchema = {
   allRequired: true,
   additionalProperties: false,
   properties: {
+    artifacts: {
+      type: 'object',
+      allRequired: true,
+      additionalProperties: false,
+      properties: {
+        path: { type: 'string' },
+      },
+    },
     migration: {
       type: 'object',
       allRequired: true,
@@ -123,6 +138,10 @@ const configurationSchema = {
 
 const relativizePaths = (config: Configuration) => ({
   ...config,
+  artifacts: {
+    ...config.artifacts,
+    path: nodePath.relative(process.cwd(), config.artifacts.path),
+  },
   migration: {
     ...config.migration,
     path: nodePath.relative(process.cwd(), config.migration.path),
@@ -154,6 +173,10 @@ ${exportConfig} {
   contracts: {
     // NEO•ONE will look for smart contracts in this directory.
     path: '${config.contracts.path}',
+  },
+  artifacts: {
+    // NEO•ONE will store build and deployment artifacts that should be checked in to vcs in this directory.
+    path: '${config.artifacts.path}',
   },
   migration: {
     // NEO•ONE will load the deployment migration from this path.
@@ -238,6 +261,10 @@ const validateConfig = async (rootDir: string, configIn: cosmiconfig.Config): Pr
   }
 
   return {
+    artifacts: {
+      ...config.artifacts,
+      path: nodePath.resolve(rootDir, config.artifacts.path),
+    },
     migration: {
       ...config.migration,
       path: nodePath.resolve(rootDir, config.migration.path),

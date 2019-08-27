@@ -3,15 +3,15 @@ import {
   addressToScriptHash,
   Attribute,
   ClaimTransaction,
-  common,
   ContractTransaction,
   Input,
   InvocationTransaction,
   NetworkType,
   Output,
-  ParamToCallbacks,
   PublicKeyString,
   ScriptBuilderParam,
+  scriptBuilderParamTo,
+  ScriptBuilderParamToCallbacks,
   TransactionReceipt,
   TransactionResult,
   Transfer,
@@ -43,7 +43,7 @@ import {
   UserAccountProviderBase,
 } from './UserAccountProviderBase';
 
-const paramToArgDataTypeCallbacks: ParamToCallbacks<Argument> = {
+const paramToArgDataTypeCallbacks: ScriptBuilderParamToCallbacks<Argument> = {
   undefined: () => ({
     type: 'ByteArray',
     value: Buffer.alloc(0, 0),
@@ -72,6 +72,10 @@ const paramToArgDataTypeCallbacks: ParamToCallbacks<Argument> = {
     type: 'Integer',
     value: param,
   }),
+  bn: (param) => ({
+    type: 'Integer',
+    value: param.toString(10),
+  }),
   string: (param) => ({
     type: 'String',
     value: param,
@@ -90,8 +94,8 @@ const paramToArgDataTypeCallbacks: ParamToCallbacks<Argument> = {
   }),
 };
 
-const paramToArgDataType = (param: ScriptBuilderParam | undefined): Argument =>
-  common.paramTo<Argument>(param, paramToArgDataTypeCallbacks);
+const paramToArgDataType = (param: ScriptBuilderParam): Argument =>
+  scriptBuilderParamTo<Argument>(param, paramToArgDataTypeCallbacks);
 
 export class DapiUserAccountProvider<TProvider extends Provider> extends UserAccountProviderBase<TProvider>
   implements UserAccountProvider {

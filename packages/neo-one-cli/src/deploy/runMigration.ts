@@ -1,4 +1,5 @@
 // tslint:disable promise-function-async no-any no-loop-statement
+import { Configuration } from '@neo-one/cli-common';
 import { SourceMaps } from '@neo-one/client-common';
 import { getParamAndOptionsResults, SmartContractAny } from '@neo-one/client-core';
 import { Client } from '@neo-one/client-full-core';
@@ -6,7 +7,11 @@ import { CompileContractResult } from '@neo-one/smart-contract-compiler';
 import { camel } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
+import prompts from 'prompts';
+import { Deployed, saveDeployed } from '../common';
+import { getActionResult, saveInvokeReceipt, savePublishReceipt } from './actionResult';
 import { createDeferred } from './createDeferred';
+import { printAction } from './printAction';
 import { Action, Migration, Print } from './types';
 
 interface NameToContract {
@@ -18,6 +23,7 @@ interface Contracts {
 }
 
 export const runMigration = async (
+  config: Configuration,
   migration: Migration,
   contractResults: readonly CompileContractResult[],
   sourceMaps: SourceMaps,
@@ -71,12 +77,48 @@ export const runMigration = async (
     ]),
   );
 
+  const filterExecutedActions = async (actions: readonly Action[]) => {
+    const actionAndExecuted = await Promise.all(
+      actions.map(async (action) => {
+        const result = await getActionResult(config, network, action);
+
+        if (result !== undefined) {
+          action.deferred.resolve(result);
+        }
+
+        return { action, executed: result !== undefined };
+      }),
+    );
+
+    return actionAndExecuted.filter(({ executed }) => !executed).map(({ action }) => action);
+  };
+
+  let deployed: Deployed = {};
   const execute = async () => {
-    const currentActions = mutableActions;
+    let currentActions = mutableActions;
     mutableActions = [];
+
+    print('Calculating actions to execute.');
+    currentActions = await filterExecutedActions(currentActions);
+
+    if (currentActions.length > 0) {
+      print('Will execute:');
+      currentActions.forEach((action) => printAction(action, print));
+
+      const { confirmed } = await prompts({
+        type: 'confirm',
+        name: 'confirmed',
+        message: 'Proceed with execution?',
+      });
+
+      if (!confirmed) {
+        throw new Error('User cancelled execution');
+      }
+    }
+
     for (const action of currentActions) {
       print('Executing action:');
-      print(JSON.stringify(action, undefined, 2));
+      printAction(action, print);
       try {
         if (action.method === 'deploy') {
           const contract = nameToContract[action.contract];
@@ -110,6 +152,16 @@ export const runMigration = async (
             }),
           };
 
+          deployed = {
+            ...deployed,
+            [action.contract]: {
+              [network]: {
+                address: receipt.result.value.address,
+              },
+            },
+          };
+
+          await savePublishReceipt(config, network, action, receipt);
           action.deferred.resolve(receipt);
         } else {
           const args = await Promise.all(action.args);
@@ -118,12 +170,17 @@ export const runMigration = async (
             throw new Error(receipt.result.message);
           }
 
+          await saveInvokeReceipt(config, network, action, receipt);
           action.deferred.resolve(receipt);
         }
       } catch (err) {
         action.deferred.reject(err);
         throw err;
       }
+    }
+
+    if (mutableActions.length > 0) {
+      await execute();
     }
   };
 
@@ -138,4 +195,6 @@ export const runMigration = async (
   );
 
   await execute();
+
+  await saveDeployed(config, deployed);
 };

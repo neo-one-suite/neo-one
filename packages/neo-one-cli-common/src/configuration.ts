@@ -34,7 +34,12 @@ export interface MigrationConfiguration {
   readonly path: string;
 }
 
+export interface ArtifactsConfiguration {
+  readonly path: string;
+}
+
 export interface Configuration {
+  readonly artifacts: ArtifactsConfiguration;
   readonly migration: MigrationConfiguration;
   readonly contracts: ContractsConfiguration;
   readonly codegen: CodegenConfiguration;
