@@ -11,4 +11,5 @@ export * from './neverComplete';
 export * from './normalizePath';
 export * from './onComplete';
 export * from './retryBackoff';
+export * from './timer';
 export * from './utils';
