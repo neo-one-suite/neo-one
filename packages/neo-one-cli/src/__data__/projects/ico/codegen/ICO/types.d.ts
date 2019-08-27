@@ -1,4 +1,4 @@
-/* @hash 72d5b86dc9606a0141335a3c7d2dd8f6 */
+/* @hash 8b95758943c21aea9e5a6b028f96b9c0 */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -46,81 +46,51 @@ export interface ICOSmartContract<TClient extends Client = Client> extends Smart
       icoDurationSeconds?: BigNumber,
       options?: TransactionOptions,
     ): Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>>;
-    readonly confirmed: {
-      (
-        owner?: AddressString,
-        startTimeSeconds?: BigNumber,
-        icoDurationSeconds?: BigNumber,
-        options?: TransactionOptions & GetOptions,
-      ): Promise<InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }>;
-    };
+    readonly confirmed: (
+      owner?: AddressString,
+      startTimeSeconds?: BigNumber,
+      icoDurationSeconds?: BigNumber,
+      options?: TransactionOptions & GetOptions,
+    ) => Promise<InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }>;
   };
   readonly icoDurationSeconds: () => Promise<BigNumber>;
   readonly mintTokens: {
     (options?: InvokeReceiveTransactionOptions): Promise<
       TransactionResult<InvokeReceipt<undefined, ICOEvent>, InvocationTransaction>
     >;
-    readonly confirmed: {
-      (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<
-        InvokeReceipt<undefined, ICOEvent> & { readonly transaction: InvocationTransaction }
-      >;
-    };
+    readonly confirmed: (
+      options?: InvokeReceiveTransactionOptions & GetOptions,
+    ) => Promise<InvokeReceipt<undefined, ICOEvent> & { readonly transaction: InvocationTransaction }>;
   };
   readonly owner: () => Promise<AddressString>;
   readonly refundAssets: {
     (options?: InvokeSendUnsafeTransactionOptions): Promise<
       TransactionResult<InvokeReceipt<undefined, ICOEvent>, InvocationTransaction>
     >;
-    readonly confirmed: {
-      (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<
-        InvokeReceipt<undefined, ICOEvent> & { readonly transaction: InvocationTransaction }
-      >;
-    };
+    readonly confirmed: (
+      options?: InvokeSendUnsafeTransactionOptions & GetOptions,
+    ) => Promise<InvokeReceipt<undefined, ICOEvent> & { readonly transaction: InvocationTransaction }>;
   };
   readonly remaining: () => Promise<BigNumber>;
   readonly startTimeSeconds: () => Promise<BigNumber>;
 }
 
-export interface ICOMigrationSmartContract<TClient extends Client = Client> extends SmartContract<TClient, ICOEvent> {
+export interface ICOMigrationSmartContract {
   readonly amountPerNEO: () => Promise<BigNumber>;
-  readonly deploy: {
-    (
-      owner?: AddressString | Promise<AddressString>,
-      startTimeSeconds?: BigNumber | Promise<BigNumber>,
-      icoDurationSeconds?: BigNumber | Promise<BigNumber>,
-      options?: TransactionOptions,
-    ): Promise<TransactionResult<InvokeReceipt<boolean, ICOEvent>, InvocationTransaction>>;
-    readonly confirmed: {
-      (
-        owner?: AddressString | Promise<AddressString>,
-        startTimeSeconds?: BigNumber | Promise<BigNumber>,
-        icoDurationSeconds?: BigNumber | Promise<BigNumber>,
-        options?: TransactionOptions & GetOptions,
-      ): Promise<InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }>;
-    };
-  };
+  readonly deploy: (
+    owner?: AddressString | Promise<AddressString>,
+    startTimeSeconds?: BigNumber | Promise<BigNumber>,
+    icoDurationSeconds?: BigNumber | Promise<BigNumber>,
+    options?: TransactionOptions & GetOptions,
+  ) => Promise<InvokeReceipt<boolean, ICOEvent> & { readonly transaction: InvocationTransaction }>;
   readonly icoDurationSeconds: () => Promise<BigNumber>;
-  readonly mintTokens: {
-    (options?: InvokeReceiveTransactionOptions): Promise<
-      TransactionResult<InvokeReceipt<undefined, ICOEvent>, InvocationTransaction>
-    >;
-    readonly confirmed: {
-      (options?: InvokeReceiveTransactionOptions & GetOptions): Promise<
-        InvokeReceipt<undefined, ICOEvent> & { readonly transaction: InvocationTransaction }
-      >;
-    };
-  };
+  readonly mintTokens: (
+    options?: InvokeReceiveTransactionOptions & GetOptions,
+  ) => Promise<InvokeReceipt<undefined, ICOEvent> & { readonly transaction: InvocationTransaction }>;
   readonly owner: () => Promise<AddressString>;
-  readonly refundAssets: {
-    (options?: InvokeSendUnsafeTransactionOptions): Promise<
-      TransactionResult<InvokeReceipt<undefined, ICOEvent>, InvocationTransaction>
-    >;
-    readonly confirmed: {
-      (options?: InvokeSendUnsafeTransactionOptions & GetOptions): Promise<
-        InvokeReceipt<undefined, ICOEvent> & { readonly transaction: InvocationTransaction }
-      >;
-    };
-  };
+  readonly refundAssets: (
+    options?: InvokeSendUnsafeTransactionOptions & GetOptions,
+  ) => Promise<InvokeReceipt<undefined, ICOEvent> & { readonly transaction: InvocationTransaction }>;
   readonly remaining: () => Promise<BigNumber>;
   readonly startTimeSeconds: () => Promise<BigNumber>;
 }

@@ -54,41 +54,24 @@ interface ParamAndOptionsResults {
   readonly hash: Hash256String | undefined;
 }
 
-export const getParamsAndOptions = ({
-  definition: { networks },
+export const getParamAndOptionsResults = ({
   parameters,
   args,
-  sendUnsafe,
-  receive,
   send,
   completeSend,
   refundAssets,
-  client,
 }: {
-  readonly definition: SmartContractDefinition;
   readonly parameters: readonly ABIParameter[];
   // tslint:disable-next-line no-any
   readonly args: readonly any[];
-  readonly sendUnsafe: boolean;
-  readonly receive: boolean;
   readonly send: boolean;
   readonly completeSend: boolean;
   readonly refundAssets: boolean;
-  readonly client: Client;
-}): {
-  readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
-  readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
-  readonly options: InvokeSendUnsafeReceiveTransactionOptions;
-  readonly forwardOptions: ForwardOptions;
-  readonly network: NetworkType;
-  readonly address: AddressString;
-  readonly transfer?: Transfer;
-  readonly hash?: Hash256String;
-} => {
+}): ParamAndOptionsResults => {
   const hasRest = parameters.length > 0 && parameters[parameters.length - 1].rest;
   const hasForwardValueOptions = hasRest && parameters[parameters.length - 1].type === 'ForwardValue';
 
-  const { requiredArgs, forwardOptions, options: optionsIn, transfer, hash } = args.reduceRight<ParamAndOptionsResults>(
+  return args.reduceRight<ParamAndOptionsResults>(
     (acc, right) => {
       if (hasForwardValueOptions && acc.forwardOptions === undefined && common.isForwardValueOptions(right)) {
         return {
@@ -143,6 +126,46 @@ export const getParamsAndOptions = ({
       hash: undefined,
     },
   );
+};
+
+export const getParamsAndOptions = ({
+  definition: { networks },
+  parameters,
+  args,
+  sendUnsafe,
+  receive,
+  send,
+  completeSend,
+  refundAssets,
+  client,
+}: {
+  readonly definition: SmartContractDefinition;
+  readonly parameters: readonly ABIParameter[];
+  // tslint:disable-next-line no-any
+  readonly args: readonly any[];
+  readonly sendUnsafe: boolean;
+  readonly receive: boolean;
+  readonly send: boolean;
+  readonly completeSend: boolean;
+  readonly refundAssets: boolean;
+  readonly client: Client;
+}): {
+  readonly params: ReadonlyArray<ScriptBuilderParam | undefined>;
+  readonly paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>;
+  readonly options: InvokeSendUnsafeReceiveTransactionOptions;
+  readonly forwardOptions: ForwardOptions;
+  readonly network: NetworkType;
+  readonly address: AddressString;
+  readonly transfer?: Transfer;
+  readonly hash?: Hash256String;
+} => {
+  const { requiredArgs, forwardOptions, options: optionsIn, transfer, hash } = getParamAndOptionsResults({
+    parameters,
+    args,
+    send,
+    completeSend,
+    refundAssets,
+  });
 
   if (transfer === undefined && send) {
     throw new TransferArgumentExpectedError();

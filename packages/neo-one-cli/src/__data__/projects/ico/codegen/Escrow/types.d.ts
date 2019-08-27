@@ -1,4 +1,4 @@
-/* @hash f5dda482795549ffb4b4f85f8330eb4a */
+/* @hash f8ffd0b09b5f7eb9dc30108a869436e9 */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -58,15 +58,13 @@ export interface EscrowSmartContract<TClient extends Client = Client> extends Sm
       to: AddressString,
       options?: TransactionOptions,
     ): Promise<TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>>;
-    readonly confirmed: {
-      (
-        from: AddressString,
-        amount: BigNumber,
-        asset: AddressString,
-        to: AddressString,
-        options?: TransactionOptions & GetOptions,
-      ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
-    };
+    readonly confirmed: (
+      from: AddressString,
+      amount: BigNumber,
+      asset: AddressString,
+      to: AddressString,
+      options?: TransactionOptions & GetOptions,
+    ) => Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
   };
   readonly forwardApproveReceiveTransferArgs: (to: AddressString) => [ForwardOptions<EscrowEvent>, ForwardValue];
   readonly balanceOf: (from: AddressString, to: AddressString, asset: AddressString) => Promise<BigNumber>;
@@ -78,38 +76,32 @@ export interface EscrowSmartContract<TClient extends Client = Client> extends Sm
       amount: BigNumber,
       options?: TransactionOptions,
     ): Promise<TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>>;
-    readonly confirmed: {
-      (
-        from: AddressString,
-        to: AddressString,
-        asset: AddressString,
-        amount: BigNumber,
-        options?: TransactionOptions & GetOptions,
-      ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
-    };
+    readonly confirmed: (
+      from: AddressString,
+      to: AddressString,
+      asset: AddressString,
+      amount: BigNumber,
+      options?: TransactionOptions & GetOptions,
+    ) => Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
   };
   readonly deploy: {
     (options?: TransactionOptions): Promise<
       TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>
     >;
-    readonly confirmed: {
-      (options?: TransactionOptions & GetOptions): Promise<
-        InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }
-      >;
-    };
+    readonly confirmed: (
+      options?: TransactionOptions & GetOptions,
+    ) => Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
   };
   readonly onRevokeSendTransfer: {
     (from: AddressString, amount: BigNumber, asset: AddressString, options?: TransactionOptions): Promise<
       TransactionResult<InvokeReceipt<undefined, EscrowEvent>, InvocationTransaction>
     >;
-    readonly confirmed: {
-      (
-        from: AddressString,
-        amount: BigNumber,
-        asset: AddressString,
-        options?: TransactionOptions & GetOptions,
-      ): Promise<InvokeReceipt<undefined, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
-    };
+    readonly confirmed: (
+      from: AddressString,
+      amount: BigNumber,
+      asset: AddressString,
+      options?: TransactionOptions & GetOptions,
+    ) => Promise<InvokeReceipt<undefined, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
   };
   readonly refund: {
     (
@@ -119,38 +111,24 @@ export interface EscrowSmartContract<TClient extends Client = Client> extends Sm
       amount: BigNumber,
       options?: TransactionOptions,
     ): Promise<TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>>;
-    readonly confirmed: {
-      (
-        from: AddressString,
-        to: AddressString,
-        asset: AddressString,
-        amount: BigNumber,
-        options?: TransactionOptions & GetOptions,
-      ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
-    };
+    readonly confirmed: (
+      from: AddressString,
+      to: AddressString,
+      asset: AddressString,
+      amount: BigNumber,
+      options?: TransactionOptions & GetOptions,
+    ) => Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
   };
 }
 
-export interface EscrowMigrationSmartContract<TClient extends Client = Client>
-  extends SmartContract<TClient, EscrowEvent> {
-  readonly approveReceiveTransfer: {
-    (
-      from: AddressString | Promise<AddressString>,
-      amount: BigNumber | Promise<BigNumber>,
-      asset: AddressString | Promise<AddressString>,
-      to: AddressString | Promise<AddressString>,
-      options?: TransactionOptions,
-    ): Promise<TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>>;
-    readonly confirmed: {
-      (
-        from: AddressString | Promise<AddressString>,
-        amount: BigNumber | Promise<BigNumber>,
-        asset: AddressString | Promise<AddressString>,
-        to: AddressString | Promise<AddressString>,
-        options?: TransactionOptions & GetOptions,
-      ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
-    };
-  };
+export interface EscrowMigrationSmartContract {
+  readonly approveReceiveTransfer: (
+    from: AddressString | Promise<AddressString>,
+    amount: BigNumber | Promise<BigNumber>,
+    asset: AddressString | Promise<AddressString>,
+    to: AddressString | Promise<AddressString>,
+    options?: TransactionOptions & GetOptions,
+  ) => Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
   readonly forwardApproveReceiveTransferArgs: (
     to: AddressString | Promise<AddressString>,
   ) => [ForwardOptions<EscrowEvent>, ForwardValue];
@@ -159,66 +137,27 @@ export interface EscrowMigrationSmartContract<TClient extends Client = Client>
     to: AddressString | Promise<AddressString>,
     asset: AddressString | Promise<AddressString>,
   ) => Promise<BigNumber>;
-  readonly claim: {
-    (
-      from: AddressString | Promise<AddressString>,
-      to: AddressString | Promise<AddressString>,
-      asset: AddressString | Promise<AddressString>,
-      amount: BigNumber | Promise<BigNumber>,
-      options?: TransactionOptions,
-    ): Promise<TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>>;
-    readonly confirmed: {
-      (
-        from: AddressString | Promise<AddressString>,
-        to: AddressString | Promise<AddressString>,
-        asset: AddressString | Promise<AddressString>,
-        amount: BigNumber | Promise<BigNumber>,
-        options?: TransactionOptions & GetOptions,
-      ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
-    };
-  };
-  readonly deploy: {
-    (options?: TransactionOptions): Promise<
-      TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>
-    >;
-    readonly confirmed: {
-      (options?: TransactionOptions & GetOptions): Promise<
-        InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }
-      >;
-    };
-  };
-  readonly onRevokeSendTransfer: {
-    (
-      from: AddressString | Promise<AddressString>,
-      amount: BigNumber | Promise<BigNumber>,
-      asset: AddressString | Promise<AddressString>,
-      options?: TransactionOptions,
-    ): Promise<TransactionResult<InvokeReceipt<undefined, EscrowEvent>, InvocationTransaction>>;
-    readonly confirmed: {
-      (
-        from: AddressString | Promise<AddressString>,
-        amount: BigNumber | Promise<BigNumber>,
-        asset: AddressString | Promise<AddressString>,
-        options?: TransactionOptions & GetOptions,
-      ): Promise<InvokeReceipt<undefined, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
-    };
-  };
-  readonly refund: {
-    (
-      from: AddressString | Promise<AddressString>,
-      to: AddressString | Promise<AddressString>,
-      asset: AddressString | Promise<AddressString>,
-      amount: BigNumber | Promise<BigNumber>,
-      options?: TransactionOptions,
-    ): Promise<TransactionResult<InvokeReceipt<boolean, EscrowEvent>, InvocationTransaction>>;
-    readonly confirmed: {
-      (
-        from: AddressString | Promise<AddressString>,
-        to: AddressString | Promise<AddressString>,
-        asset: AddressString | Promise<AddressString>,
-        amount: BigNumber | Promise<BigNumber>,
-        options?: TransactionOptions & GetOptions,
-      ): Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
-    };
-  };
+  readonly claim: (
+    from: AddressString | Promise<AddressString>,
+    to: AddressString | Promise<AddressString>,
+    asset: AddressString | Promise<AddressString>,
+    amount: BigNumber | Promise<BigNumber>,
+    options?: TransactionOptions & GetOptions,
+  ) => Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
+  readonly deploy: (
+    options?: TransactionOptions & GetOptions,
+  ) => Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
+  readonly onRevokeSendTransfer: (
+    from: AddressString | Promise<AddressString>,
+    amount: BigNumber | Promise<BigNumber>,
+    asset: AddressString | Promise<AddressString>,
+    options?: TransactionOptions & GetOptions,
+  ) => Promise<InvokeReceipt<undefined, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
+  readonly refund: (
+    from: AddressString | Promise<AddressString>,
+    to: AddressString | Promise<AddressString>,
+    asset: AddressString | Promise<AddressString>,
+    amount: BigNumber | Promise<BigNumber>,
+    options?: TransactionOptions & GetOptions,
+  ) => Promise<InvokeReceipt<boolean, EscrowEvent> & { readonly transaction: InvocationTransaction }>;
 }

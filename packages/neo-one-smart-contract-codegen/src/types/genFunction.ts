@@ -30,27 +30,35 @@ const getFunctionType = (name: string, abi: ABIFunction, migration = false) =>
   })
     .map((params) => `${getForwardType(abi)}(${params}): Promise<${getFunctionReturnType(name, abi)}>;`)
     .join('  \n');
-const getConfirmedType = (name: string, abi: ABIFunction, migration = false) =>
-  genFunctionParameters(abi, abi.parameters, {
+
+const createConfirmedFunc = (abi: ABIFunction, params: string, name: string, arrow = false) =>
+  `${getForwardType(abi)}(${params})${arrow ? ' =>' : ':'} Promise<${getFunctionReturnReceipt(
+    name,
+    abi,
+  )} & { readonly transaction: ${getFunctionReturnTransaction(abi)}}>;`;
+const getConfirmedType = (name: string, abi: ABIFunction, migration = false) => {
+  const paramss = genFunctionParameters(abi, abi.parameters, {
     withConfirmedOptions: true,
     migration,
-  })
-    .map(
-      (params) =>
-        `${getForwardType(abi)}(${params}): Promise<${getFunctionReturnReceipt(
-          name,
-          abi,
-        )} & { readonly transaction: ${getFunctionReturnTransaction(abi)}}>;`,
-    )
-    .join('    \n');
+  });
+
+  if (paramss.length === 1) {
+    return createConfirmedFunc(abi, paramss[0], name, true);
+  }
+
+  return `{
+  ${paramss.map((params) => createConfirmedFunc(abi, params, name)).join('    \n')}
+}`;
+};
 
 export interface GenFunctionOptions {
   readonly migration?: boolean;
 }
 
-export const genFunction = (name: string, abi: ABIFunction, options: GenFunctionOptions): string => `{
+export const genFunction = (name: string, abi: ABIFunction, options: GenFunctionOptions): string =>
+  options.migration
+    ? getConfirmedType(name, abi, options.migration)
+    : `{
   ${getFunctionType(name, abi, options.migration)}
-  readonly confirmed: {
-    ${getConfirmedType(name, abi, options.migration)}
-  },
+  readonly confirmed: ${getConfirmedType(name, abi, options.migration)}
 }`;

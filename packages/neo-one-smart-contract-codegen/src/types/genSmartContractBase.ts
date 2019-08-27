@@ -7,10 +7,11 @@ import { genForwardReturnFunction } from './genForwardReturnFunction';
 import { genFunction } from './genFunction';
 import { getEventName } from './getEventName';
 
-export const genSmartContractBase = (name: string, interfaceName: string, abi: ABI, migration = false): string => `
-export interface ${interfaceName}<TClient extends Client = Client> extends SmartContract<TClient, ${getEventName(
-  name,
-)}> {
+export const genSmartContractBase = (name: string, interfaceName: string, abi: ABI, migration = false): string => {
+  const extendsClause = `<TClient extends Client = Client> extends SmartContract<TClient, ${getEventName(name)}>`;
+
+  return `
+export interface ${interfaceName}${migration ? '' : extendsClause} {
   ${_.flatten(
     _.sortBy(abi.functions, [(func: ABIFunction) => func.name]).map((func) => {
       const parameters = func.parameters === undefined ? [] : func.parameters;
@@ -42,3 +43,4 @@ export interface ${interfaceName}<TClient extends Client = Client> extends Smart
   ).join('\n  ')}
 }
 `;
+};
