@@ -364,11 +364,13 @@ export const convertParams = ({
 
   const zip = _.zip(
     parameters.concat(restParameter === undefined ? [] : _.range(0, additionalParameters).map(() => restParameter)),
-    params.concat(
-      _.range(0, additionalParams).map((idx) =>
-        getDefault({ parameter: parameters[params.length + idx], senderAddress }),
+    params
+      .map((param, idx) => (param === undefined ? getDefault({ parameter: parameters[idx], senderAddress }) : param))
+      .concat(
+        _.range(0, additionalParams).map((idx) =>
+          getDefault({ parameter: parameters[params.length + idx], senderAddress }),
+        ),
       ),
-    ),
   );
 
   const converted = zip.map(([parameterIn, param]) => {

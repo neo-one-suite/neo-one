@@ -1,1 +1,1 @@
-export * from './createTasks';
+export * from './deploy';

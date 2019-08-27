@@ -1,3 +1,4 @@
+// tslint:disable no-any
 import {
   ForwardOptions,
   GetOptions,
@@ -11,7 +12,7 @@ import { Deferred } from './createDeferred';
 
 export type MigrationContractsBase = object;
 
-export type Migration<Contracts extends MigrationContractsBase> = (
+export type Migration<Contracts extends MigrationContractsBase = MigrationContractsBase> = (
   contracts: Contracts,
   network: string,
   userAccountIDs: readonly UserAccountID[],
@@ -28,4 +29,7 @@ export interface Action {
   readonly transfer?: Transfer;
   readonly hash?: Hash256String;
   readonly deferred: Deferred;
+  readonly args: any[];
 }
+
+export type Print = (value: any) => void;
