@@ -6,7 +6,7 @@ on:
     tags:
       - \@neo-one/node-bin*
 jobs:
-  push:
+  node:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@a14471d838f6a7ce15cab8740f25e337c51e7cad
@@ -16,5 +16,17 @@ jobs:
         env:
           DOCKER_NAMESPACE: neoonesuite
           DOCKER_IMAGE_NAME: node
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  node-gsutil:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@a14471d838f6a7ce15cab8740f25e337c51e7cad
+      - uses: ./actions/dockerhub/
+        with:
+          args: -f ./scripts/DockerfileNodeGSUtil .
+        env:
+          DOCKER_NAMESPACE: neoonesuite
+          DOCKER_IMAGE_NAME: node-gsutil
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
