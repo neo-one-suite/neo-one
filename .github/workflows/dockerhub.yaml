@@ -4,7 +4,7 @@ on:
     branches:
       - master
     tags:
-      - '*neo-one/node-bin*'
+      - \@neo-one/node-bin*
 jobs:
   push:
     runs-on: ubuntu-18.04
