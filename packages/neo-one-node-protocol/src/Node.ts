@@ -717,9 +717,9 @@ export class Node implements INode {
           }),
         )
         .forEach((endpoint) => this.network.addEndpoint(endpoint));
-    } catch (error) {
+    } catch (err) {
       logger.error(
-        { name: 'neo_protocol_fetch_endpoints_error', [Labels.HTTP_URL]: rpcURL, error },
+        { name: 'neo_protocol_fetch_endpoints_error', [Labels.HTTP_URL]: rpcURL, err },
         `Failed to fetch endpoints from ${rpcURL}`,
       );
     }
