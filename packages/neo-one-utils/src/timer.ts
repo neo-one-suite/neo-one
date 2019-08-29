@@ -19,13 +19,11 @@ export const timer = (name: string) => {
   };
 };
 
-const report = () => {
+export const reportTimers = () => {
   Object.entries(aggregateTime).forEach(([name, duration]) => {
     const count = aggregateCount[name];
     console.log(`${name} - Total Time: ${duration}ms. Count: ${count}. Avg: ${duration / count}ms`);
   });
 
-  setTimeout(report, 10000);
+  setTimeout(reportTimers, 10000);
 };
-
-setTimeout(report, 10000);
