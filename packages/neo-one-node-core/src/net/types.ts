@@ -10,8 +10,12 @@ export type Endpoint = string;
 export const createEndpoint = ({ type, host, port }: EndpointConfig): Endpoint => `${type}://${host}:${port}`;
 
 export const getEndpointConfig = (endpoint: Endpoint): EndpointConfig => {
-  const [type, host, port] = endpoint.split(':');
+  const result = /([a-zA-Z]+):\/\/(.*):(\d+)/gu.exec(endpoint);
+  if (result === null) {
+    throw new Error(`Invalid endpoint: ${endpoint}`);
+  }
+  const [type, host, port] = result.slice(1);
 
   // tslint:disable-next-line no-any
-  return { type: type as any, host: host.slice(2), port: parseInt(port, 10) };
+  return { type: type as any, host, port: parseInt(port, 10) };
 };

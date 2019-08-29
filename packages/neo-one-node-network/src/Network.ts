@@ -449,7 +449,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
     globalStats.record([
       {
         measure: peersConnecting,
-        value: 1,
+        value: Object.keys(this.mutableConnectingPeers).length,
       },
     ]);
 
@@ -463,15 +463,15 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       }
 
       logger.trace(logData, `Connecting to peer at ${endpoint}`);
-    } catch (error) {
-      logger.trace({ error, ...logData }, `Failed to connect to peer at ${endpoint}.`);
+    } catch (err) {
+      logger.trace({ err, ...logData }, `Failed to connect to peer at ${endpoint}.`);
       globalStats.record([
         {
           measure: peersFailed,
           value: 1,
         },
       ]);
-      if (this.mutableConnectErrorCodes.has(error.code)) {
+      if (this.mutableConnectErrorCodes.has(err.code)) {
         this.mutableBadEndpoints.add(endpoint);
       }
     } finally {
@@ -480,7 +480,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       globalStats.record([
         {
           measure: peersConnecting,
-          value: -1,
+          value: Object.keys(this.mutableConnectingPeers).length,
         },
       ]);
     }
@@ -525,7 +525,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       globalStats.record([
         {
           measure: peersConnected,
-          value: 1,
+          value: Object.keys(this.mutableConnectedPeers).length,
         },
       ]);
       connectedPeer.peer.streamData((message) => this.onMessageReceivedInternal(connectedPeer, message));
