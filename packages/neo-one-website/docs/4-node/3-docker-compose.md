@@ -20,15 +20,10 @@ We'll be deploying with docker-compose using `swarm` mode. The `docker-compose.y
 version: "3.1"
 services:
   node:
-    image: quay.io/neoone/node
+    image: neoonesuite/node
     command: [
       "--node.rpcURLs=http://seed6.ngd.network:10332",
-      "--node.rpcURLs=https://seed1.red4sec.com:10332",
-      "--backup.restore=true",
-      "--backup.provider.gcloud.projectID=neotracker-172901",
-      "--backup.provider.gcloud.bucket=bucket-1.neo-one.io",
-      "--backup.provider.gcloud.prefix=node_0",
-      "--backup.provider.gcloud.maxSizeBytes=419430400"
+      "--node.rpcURLs=https://seed1.red4sec.com:10332"
     ]
     deploy:
       replicas: 1
@@ -90,3 +85,18 @@ or check its most recent logs
 ```bash
 docker logs <container_id>
 ```
+
+## Health Checks
+
+You can add health checks to a docker swarm similar to a kubernetes setup. After enabling live checks in the NEO•ONE Node configuration we can enable a probe by adding the following to our compose configuration:
+
+```yml
+healthcheck:
+  test: ['CMD', 'curl', '-f', 'http://localhost:<node-port>/live_health_check']
+  interval: 1m30s
+  timeout: 10s
+  retries: 3
+  start_period: 45s
+```
+
+See [docker documentation](https://docs.docker.com/compose/compose-file/#healthcheck) for more information about health check configurations.
