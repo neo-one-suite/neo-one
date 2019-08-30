@@ -130,6 +130,7 @@ export const runMigration = async (
             {
               ...(action.options === undefined ? {} : action.options),
               systemFee: new BigNumber(1000),
+              networkFee: new BigNumber(1),
             },
             sourceMaps,
           );
@@ -161,7 +162,7 @@ export const runMigration = async (
             },
           };
 
-          await savePublishReceipt(config, network, action, receipt);
+          await Promise.all([saveDeployed(config, deployed), savePublishReceipt(config, network, action, receipt)]);
           action.deferred.resolve(receipt);
         } else {
           const args = await Promise.all(action.args);
@@ -195,6 +196,4 @@ export const runMigration = async (
   );
 
   await execute();
-
-  await saveDeployed(config, deployed);
 };

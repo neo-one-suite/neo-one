@@ -1,4 +1,5 @@
-import { LocalKeyStore, LocalMemoryStore, LocalUserAccountProvider, NEOONEProvider } from '@neo-one/client-core';
+import { LocalKeyStore, LocalMemoryStore, NEOONEProvider } from '@neo-one/client-core';
+import { LocalUserAccountProvider } from '@neo-one/client-full-core';
 import prompts from 'prompts';
 
 const createUserAccountProviderFunc = (network: string, rpcURL: string) => async () => {

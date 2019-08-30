@@ -1,6 +1,7 @@
 // tslint:disable no-object-mutation
 import { Configuration } from '@neo-one/cli-common';
 import { Contracts } from '@neo-one/smart-contract-compiler';
+import { camel } from '@neo-one/utils';
 import Listr from 'listr';
 import _ from 'lodash';
 import { loadDeployed } from '../common';
@@ -58,7 +59,8 @@ export const createTasks = (cmd: Command, config: Configuration, reset: boolean)
                 sourceMap,
               });
 
-              const networksDefinition = ctx.deployed[contract.name] === undefined ? {} : ctx.deployed[contract.name];
+              const networksDefinition =
+                ctx.deployed[camel(contract.name)] === undefined ? {} : ctx.deployed[camel(contract.name)];
 
               await generateCode(
                 config,

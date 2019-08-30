@@ -2,15 +2,24 @@
   "escrow": {
     "local": {
       "address": "AXAZs3F9QHWZzpGV2GdWEkkopUWGSyDwAf"
+    },
+    "test": {
+      "address": "AXAZs3F9QHWZzpGV2GdWEkkopUWGSyDwAf"
     }
   },
   "ico": {
     "local": {
       "address": "Adiq4sMWabmjD7S45BCvW2uVgFDofmTbyo"
+    },
+    "test": {
+      "address": "Adiq4sMWabmjD7S45BCvW2uVgFDofmTbyo"
     }
   },
   "token": {
     "local": {
+      "address": "AaYf2HD7ruLa11ZwXjBvYSvkPAZGQRuySQ"
+    },
+    "test": {
       "address": "AaYf2HD7ruLa11ZwXjBvYSvkPAZGQRuySQ"
     }
   }

@@ -1,4 +1,4 @@
-/* @hash 3544bbef7d820f32033f6a3d8421c1af */
+/* @hash 768032287dcf0f7846afd18c79893a7b */
 // tslint:disable
 /* eslint-disable */
 import { escrowABI } from './abi';
@@ -7,6 +7,9 @@ import { sourceMaps } from '../sourceMaps';
 const definition = {
   networks: {
     local: {
+      address: 'AXAZs3F9QHWZzpGV2GdWEkkopUWGSyDwAf',
+    },
+    test: {
       address: 'AXAZs3F9QHWZzpGV2GdWEkkopUWGSyDwAf',
     },
   },
