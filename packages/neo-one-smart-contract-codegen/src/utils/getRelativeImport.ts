@@ -8,7 +8,15 @@ const stripTS = (value: string) =>
     path.dirname(value),
     path.basename(
       value,
-      value.endsWith('.jsx') ? '.jsx' : value.endsWith('.tsx') ? '.tsx' : value.endsWith('.js') ? '.js' : '.ts',
+      value.endsWith('.jsx')
+        ? '.jsx'
+        : value.endsWith('.tsx')
+        ? '.tsx'
+        : value.endsWith('.js')
+        ? '.js'
+        : value.endsWith('.d.ts')
+        ? '.d.ts'
+        : '.ts',
     ),
   );
 
