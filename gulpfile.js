@@ -543,6 +543,7 @@ const compileTypescript = ((cache) =>
         .pipe(
           gulpReplace("import { BN } from 'bn.js';", "import BN from 'bn.js';"),
         )
+        .pipe(gulpReplace('../static', './static'))
         .pipe(
           gulpRename((name) => {
             name.dirname = name.dirname
