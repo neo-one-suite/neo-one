@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-switch@1.4.0...@neo-one/client-switch@1.4.1) (2019-08-30)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @opencensus/web-types to ^0.0.6 ([7670360](https://github.com/neo-one-suite/neo-one/commit/7670360))
+
+
+
+
+
 # [1.4.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-switch@1.3.0...@neo-one/client-switch@1.4.0) (2019-08-23)
 
 

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-common@1.4.0...@neo-one/client-common@1.4.1) (2019-08-30)
+
+**Note:** Version bump only for package @neo-one/client-common
+
+
+
+
+
 # [1.4.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-common@1.3.0...@neo-one/client-common@1.4.0) (2019-08-22)
 
 

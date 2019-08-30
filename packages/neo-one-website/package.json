@@ -1,15 +1,15 @@
 {
   "name": "@neo-one/website",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "NEO•ONE website.",
   "main": "./src/index",
   "dependencies": {
     "@babel/runtime": "^7.5.4",
     "@emotion/core": "^10.0.16",
     "@emotion/styled": "^10.0.15",
-    "@neo-one/editor": "^1.2.1",
+    "@neo-one/editor": "^1.2.2",
     "@neo-one/react": "^1.1.2",
-    "@neo-one/react-common": "^1.1.6",
+    "@neo-one/react-common": "^1.1.7",
     "@reach/router": "^1.2.1",
     "@render-props/viewport": "^0.3.1",
     "clipboard": "^2.0.3",

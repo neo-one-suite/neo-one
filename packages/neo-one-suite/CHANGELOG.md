@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.5](https://github.com/neo-one-suite/neo-one/compare/@neo-one/suite@1.2.4...@neo-one/suite@1.2.5) (2019-08-30)
+
+
+### Bug Fixes
+
+* **suite:** add smart-contract-lib to @neo-one/suite ([#1706](https://github.com/neo-one-suite/neo-one/issues/1706)) ([4745825](https://github.com/neo-one-suite/neo-one/commit/4745825))
+
+
+
+
+
 ## [1.2.4](https://github.com/neo-one-suite/neo-one/compare/@neo-one/suite@1.2.3...@neo-one/suite@1.2.4) (2019-08-23)
 
 **Note:** Version bump only for package @neo-one/suite

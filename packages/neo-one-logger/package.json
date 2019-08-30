@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/logger",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "NEO•ONE logging utility",
   "main": "./src/index",
   "dependencies": {

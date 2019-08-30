@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/editor-server",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "NEO•ONE editor server.",
   "main": "./src/index",
   "dependencies": {
     "@neo-one/http": "^1.2.0",
-    "@neo-one/logger": "^1.2.0",
-    "@neo-one/utils": "^1.2.0",
-    "@neo-one/utils-node": "^1.2.0",
+    "@neo-one/logger": "^1.2.1",
+    "@neo-one/utils": "^1.2.1",
+    "@neo-one/utils-node": "^1.2.1",
     "cross-fetch": "^3.0.4",
     "detective": "^5.2.0",
     "graphlib": "^2.1.7",
