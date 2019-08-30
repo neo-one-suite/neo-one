@@ -32,10 +32,6 @@ COPY packages/neo-one-client-full/src/ packages/neo-one-client-full/src
 COPY packages/neo-one-client-full/package.json packages/neo-one-client-full/
 COPY packages/neo-one-client-switch/src/ packages/neo-one-client-switch/src
 COPY packages/neo-one-client-switch/package.json packages/neo-one-client-switch/
-COPY packages/neo-one-developer-tools/src/ packages/neo-one-developer-tools/src
-COPY packages/neo-one-developer-tools/package.json packages/neo-one-developer-tools/
-COPY packages/neo-one-developer-tools-frame/src/ packages/neo-one-developer-tools-frame/src
-COPY packages/neo-one-developer-tools-frame/package.json packages/neo-one-developer-tools-frame/
 COPY packages/neo-one-node-bin/src/ packages/neo-one-node-bin/src
 COPY packages/neo-one-node-bin/package.json packages/neo-one-node-bin/
 COPY packages/neo-one-node-blockchain/src/ packages/neo-one-node-blockchain/src
@@ -68,9 +64,6 @@ COPY packages/neo-one-http/src/ packages/neo-one-http/src
 COPY packages/neo-one-http/package.json packages/neo-one-http/
 COPY packages/neo-one-http-context/src/ packages/neo-one-http-context/src
 COPY packages/neo-one-http-context/package.json packages/neo-one-http-context/
-COPY packages/neo-one-react-common/src/ packages/neo-one-react-common/src
-COPY packages/neo-one-react-common/static/ packages/neo-one-react-common/static
-COPY packages/neo-one-react-common/package.json packages/neo-one-react-common/
 
 RUN sudo yarn install --non-interactive
 RUN yarn build:node
