@@ -5,7 +5,7 @@ import { compileContract, CompileContractResult, LinkedContracts } from '@neo-on
 import { createCompilerHost } from '@neo-one/smart-contract-compiler-node';
 import { DiagnosticCategory } from 'typescript';
 import { findContracts } from '../build';
-import { Print } from './types';
+import { Print } from '../common';
 
 const compile = async (filePath: string, name: string, linked: LinkedContracts, sourceMaps: SourceMaps) => {
   const contract = compileContract(filePath, name, createCompilerHost(), linked);

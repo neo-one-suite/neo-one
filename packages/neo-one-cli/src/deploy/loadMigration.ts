@@ -1,6 +1,5 @@
 import { Configuration } from '@neo-one/cli-common';
-import { loadJS, loadTS } from './load';
-import { Print } from './types';
+import { loadJS, loadTS, Print } from '../common';
 
 export const loadMigration = async (config: Configuration, print: Print) => {
   print('Loading migration');

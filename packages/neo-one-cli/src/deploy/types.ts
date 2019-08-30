@@ -31,5 +31,3 @@ export interface Action {
   readonly deferred: Deferred;
   readonly args: readonly any[];
 }
-
-export type Print = (value: any) => void;

@@ -8,11 +8,11 @@ import { camel } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 import prompts from 'prompts';
-import { Deployed, saveDeployed } from '../common';
+import { Deployed, Print, saveDeployed } from '../common';
 import { getActionResult, saveInvokeReceipt, savePublishReceipt } from './actionResult';
 import { createDeferred } from './createDeferred';
 import { printAction } from './printAction';
-import { Action, Migration, Print } from './types';
+import { Action, Migration } from './types';
 
 interface NameToContract {
   readonly [name: string]: CompileContractResult;

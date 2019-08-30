@@ -879,7 +879,7 @@ export interface UserAccountProvider {
 /**
  * An object of `UserAccountProvider`s.
  */
-export interface UserAccountProviders<TUserAccountProvider extends UserAccountProvider> {
+export interface UserAccountProviders<TUserAccountProvider extends UserAccountProvider = UserAccountProvider> {
   /**
    * Key index may be arbitrary and is primarily intended to allow for a more specific `Client` TypeScript type to enable direct access to the underlying providers, if needed.
    */

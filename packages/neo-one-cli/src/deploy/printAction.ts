@@ -1,5 +1,6 @@
 import { Attribute, paramTo, TransactionOptions, Transfer } from '@neo-one/client-common';
-import { Action, MigrationParam, Print } from './types';
+import { Print } from '../common';
+import { Action, MigrationParam } from './types';
 
 // tslint:disable-next-line no-any
 const isPromise = (value: any): value is Promise<any> => value !== undefined && value.then !== undefined;
