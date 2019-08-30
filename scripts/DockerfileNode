@@ -69,6 +69,7 @@ COPY packages/neo-one-http/package.json packages/neo-one-http/
 COPY packages/neo-one-http-context/src/ packages/neo-one-http-context/src
 COPY packages/neo-one-http-context/package.json packages/neo-one-http-context/
 COPY packages/neo-one-react-common/src/ packages/neo-one-react-common/src
+COPY packages/neo-one-react-common/static/ packages/neo-one-react-common/static
 COPY packages/neo-one-react-common/package.json packages/neo-one-react-common/
 
 RUN sudo yarn install --non-interactive
