@@ -76,7 +76,6 @@ export const preview = ({ stage }: { readonly stage: Stage }): webpack.Configura
                   },
                 },
               ],
-              dontCacheBustURLsMatching: /\.(?:\w{8}|\w{32})\./,
               ...(stage === 'prod'
                 ? {
                     globDirectory: DIST_DIR,

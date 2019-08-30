@@ -10,8 +10,9 @@ const createLogger = (service: string, options: pino.LoggerOptions = {}) =>
         process.env.NODE_ENV === 'production' ? pino.extreme(1) : pino.destination(1),
       );
 
-// tslint:disable-next-line: strict-type-predicates
-const browserOptions = typeof window !== 'undefined' ? { browser: { asObject: true } } : {};
+const browserOptions =
+  // tslint:disable-next-line: strict-type-predicates
+  typeof window === 'undefined' && typeof origin === 'undefined' ? {} : { browser: { asObject: true } };
 
 export const editorLogger = createLogger('editor-server', browserOptions);
 export const serverLogger = createLogger('server', browserOptions);

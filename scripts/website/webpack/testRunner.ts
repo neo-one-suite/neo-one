@@ -76,7 +76,6 @@ export const testRunner = ({ stage }: { readonly stage: Stage }): webpack.Config
                   },
                 },
               ],
-              dontCacheBustURLsMatching: /\.(?:\w{8}|\w{32})\./,
               ...(stage === 'prod'
                 ? {
                     globDirectory: DIST_DIR,

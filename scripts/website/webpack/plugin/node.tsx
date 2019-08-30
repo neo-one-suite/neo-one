@@ -109,7 +109,6 @@ export const node = () => ({
                   },
                 ],
                 offlineGoogleAnalytics: true,
-                dontCacheBustURLsMatching: /\.(?:\w{8}|\w{32})\./,
                 ...(stageIn === 'prod'
                   ? {
                       globDirectory: path.resolve(WEBSITE_DIR, 'dist'),
