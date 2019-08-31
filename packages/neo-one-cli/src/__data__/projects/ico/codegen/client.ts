@@ -1,4 +1,4 @@
-/* @hash 06f90343402b78aef506c07458daeda4 */
+/* @hash 315d7e70c978082746938b92ca5a9167 */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -32,7 +32,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
     | string
     | ((provider: NEOONEProvider) => TUserAccountProviders) = getDefaultUserAccountProviders as any,
 ): Client<
-  TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never,
+  TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : any,
   TUserAccountProviders
 > => {
   let getUserAccountProviders = getDefaultUserAccountProviders;

@@ -109,7 +109,7 @@ const isLocalUserAccountProvider = (userAccountProvider: any): userAccountProvid
 
 export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
   getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders,
-): Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never, TUserAccountProviders> => {
+): Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : any, TUserAccountProviders> => {
   ${createClient}
 
   return new Client(userAccountProviders as any);

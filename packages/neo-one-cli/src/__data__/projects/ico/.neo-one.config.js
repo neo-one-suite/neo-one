@@ -20,6 +20,7 @@ module.exports = {
   codegen: {
     path: 'codegen',
     language: 'typescript',
+    framework: 'react',
   },
   network: {
     path: nodePath.join(tmpDir, 'node'),

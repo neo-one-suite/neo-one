@@ -141,7 +141,7 @@ const isLocalUserAccountProvider = (userAccountProvider: any): userAccountProvid
 export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
   getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders,
 ): Client<
-  TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never,
+  TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : any,
   TUserAccountProviders
 > => {
   const providers = [];
@@ -279,7 +279,7 @@ export const WithContracts = ({ children }) => <Context.Consumer>{children}</Con
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
-import { Client, DeveloperClient, DeveloperClients, DeveloperTools } from '@neo-one/client';
+import { Client, DeveloperClients, DeveloperTools } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from './contracts';
 import { createClient, createDeveloperClients } from './client';
@@ -292,6 +292,9 @@ export interface WithClients<TClient extends Client> {
   readonly host?: string;
 }
 export type ContractsWithClients<TClient extends Client> = Contracts & WithClients<TClient>;
+
+const Context = React.createContext<ContractsWithClients<any>>(undefined as any);
+
 export type ContractsProviderProps<TClient extends Client> = Partial<WithClients<TClient>> & {
   readonly children?: React.ReactNode;
 };

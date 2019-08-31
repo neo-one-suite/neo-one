@@ -118,7 +118,7 @@ const isLocalUserAccountProvider = (userAccountProvider: any): userAccountProvid
 
 export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
   getUserAccountProvidersOrHost: string | ((provider: NEOONEProvider) => TUserAccountProviders) = getDefaultUserAccountProviders as any,
-): Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never, TUserAccountProviders> => {
+): Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : any, TUserAccountProviders> => {
   let getUserAccountProviders = getDefaultUserAccountProviders;
   let host = 'localhost'
   if (typeof getUserAccountProvidersOrHost === 'string') {

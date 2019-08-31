@@ -66,7 +66,7 @@ export const ContractsProvider = ({
 export const WithContracts = ({ children }) => ${withContracts}
 `,
     ts: `
-import { Client, DeveloperClient, DeveloperClients, DeveloperTools } from '@neo-one/client';
+import { Client, DeveloperClients, DeveloperTools } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from '${getRelativeImport(reactPath, contractsPath)}';
 import { createClient, createDeveloperClients } from '${getRelativeImport(reactPath, clientPath)}';
@@ -78,6 +78,9 @@ export interface WithClients<TClient extends Client> {
   readonly host?: string;
 }
 export type ContractsWithClients<TClient extends Client> = Contracts & WithClients<TClient>;
+
+const Context = React.createContext<ContractsWithClients<any>>(undefined as any);
+
 export type ContractsProviderProps<TClient extends Client> = Partial<WithClients<TClient>> & {
   readonly children?: React.ReactNode;
 }
