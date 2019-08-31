@@ -1,7 +1,9 @@
-/* @hash dbf7cfc4c15b2b1a9879eb49dcc0fab7 */
+/* @hash 8f26a43615cb2db073a299c446a2f907 */
 // tslint:disable
 /* eslint-disable */
-export const escrowABI = {
+import { ABI } from '@neo-one/client';
+
+export const escrowABI: ABI = {
   events: [
     {
       name: 'balanceAvailable',

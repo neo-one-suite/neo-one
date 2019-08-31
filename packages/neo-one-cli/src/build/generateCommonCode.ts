@@ -96,7 +96,11 @@ export const generateCommonCode = async (
       },
     ].map(async ({ path, data }) => {
       if (data !== undefined) {
-        await Promise.all([writeFile(path, data.js), writeFile(getTSPath(path), data.ts)]);
+        if (config.codegen.language === 'typescript') {
+          await writeFile(getTSPath(path), data.ts);
+        } else {
+          await writeFile(path, data.js);
+        }
       }
     }),
   );

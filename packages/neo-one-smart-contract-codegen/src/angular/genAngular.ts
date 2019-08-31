@@ -24,8 +24,18 @@ export const genAngular = ({
     .map(({ name }) => `this.${lowerCaseFirst(name)} = ${getCreateSmartContractName(name)}(this.client);`)
     .join('\n    ');
   const contractTypeProperties = contractsPaths
-    .map(({ name }) => `public readonly ${lowerCaseFirst(name)}: Contracts['${lowerCaseFirst(name)}'];`)
+    .map(({ name }) => `public ${lowerCaseFirst(name)}: Contracts['${lowerCaseFirst(name)}'];`)
     .join('\n  ');
+
+  const injectable = `@Injectable({
+  providedIn: 'root'
+})`;
+  const constructor = `constructor() {
+  this.setHost();
+}`;
+  const setHost = `this.client = createClient(host);
+this.developerClients = createDeveloperClients(host);
+${contractProperties}`;
 
   return {
     js: `
@@ -34,31 +44,30 @@ import { createClient, createDeveloperClients } from '${clientImport}';
 
 ${contractImports}
 
-@Injectable({
-  providedIn: 'root'
-})
+${injectable}
 export class ContractsService {
-  constructor() {
-    this.setHost();
-  }
+  ${constructor}
 
   setHost(host) {
-    this.client = createClient(host);
-    this.developerClients = createDeveloperClients(host);
-    ${contractProperties}
+    ${setHost}
   }
 }
     `,
     ts: `
+import { Injectable } from '@angular/core';
 import { Client, DeveloperClients, UserAccountProviders } from '@neo-one/client';
 import { Contracts } from '${getRelativeImport(angularPath, contractsPath)}';
-import { DefaultUserAccountProviders } from '${clientImport}';
+import { DefaultUserAccountProviders, createClient, createDeveloperClients } from '${clientImport}';
 
+${injectable}
 export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {
-  public readonly client: Client<TUserAccountProviders>;
-  public readonly developerClients: DeveloperClients;
+  public client: Client<TUserAccountProviders>;
+  public developerClients: DeveloperClients;
   ${contractTypeProperties}
-  public setHost(host?: string);
+
+  public setHost(host?: string) {
+    ${setHost}
+  }
 }
   `,
   };

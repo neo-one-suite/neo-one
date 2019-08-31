@@ -93,46 +93,29 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
   }
 
   const generated = 'one/generated';
-  const sourceMapsPath = `${generated}/sourceMaps.d.ts`;
-  const sourceMapsPathJS = `${generated}/sourceMaps.js`;
-  const testPath = `${generated}/test.d.ts`;
-  const testPathJS = `${generated}/test.js`;
-  const contractsPath = `${generated}/contracts.d.ts`;
-  const contractsPathJS = `${generated}/contracts.js`;
-  const reactPath = `${generated}/react.d.ts`;
-  const reactPathJS = `${generated}/react.js`;
-  const angularPath = `${generated}/angular.service.d.ts`;
+  const sourceMapsPath = `${generated}/sourceMaps.ts`;
+  const testPath = `${generated}/test.ts`;
+  const contractsPath = `${generated}/contracts.ts`;
+  const reactPath = `${generated}/react.ts`;
+  const angularPath = `${generated}/angular.service.ts`;
   const vuePath = `${generated}/vue.d.js`;
-  const clientPath = `${generated}/client.d.ts`;
-  const clientPathJS = `${generated}/client.js`;
-  const generatedPath = `${generated}/index.d.ts`;
-  const generatedPathJS = `${generated}/index.js`;
+  const clientPath = `${generated}/client.ts`;
+  const generatedPath = `${generated}/index.ts`;
 
   const getContractPaths = (name: string) => {
     const base = `${generated}/${name}`;
-    const typesPath = `${base}/types.d.ts`;
-    const typesPathJS = `${base}/types.js`;
-    const abiPath = `${base}/abi.d.ts`;
-    const abiPathJS = `${base}/abi.js`;
-    const createContractPath = `${base}/contract.d.ts`;
-    const createContractPathJS = `${base}/contract.js`;
+    const typesPath = `${base}/types.ts`;
+    const abiPath = `${base}/abi.ts`;
+    const createContractPath = `${base}/contract.ts`;
 
-    return { typesPath, abiPath, createContractPath, typesPathJS, abiPathJS, createContractPathJS };
+    return { typesPath, abiPath, createContractPath };
   };
 
   const mutableFiles: BuildFile[] = [];
 
-  const pushFile = (path: string, content?: string) => {
-    if (content !== undefined) {
-      mutableFiles.push({ path, content });
-    }
-  };
-
   output$.next({ owner: 'neo-one', message: 'Generating code...' });
   mutableContracts.forEach((contractResult) => {
-    const { typesPath, abiPath, createContractPath, typesPathJS, abiPathJS, createContractPathJS } = getContractPaths(
-      contractResult.name,
-    );
+    const { typesPath, abiPath, createContractPath } = getContractPaths(contractResult.name);
 
     const { abi: abiContents, contract: contractContents, types: typesContents } = genFiles({
       name: contractResult.name,
@@ -147,11 +130,8 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
     });
 
     mutableFiles.push({ path: typesPath, content: typesContents.ts });
-    pushFile(typesPathJS, typesContents.js);
     mutableFiles.push({ path: abiPath, content: abiContents.ts });
-    pushFile(abiPathJS, abiContents.js);
     mutableFiles.push({ path: createContractPath, content: contractContents.ts });
-    pushFile(createContractPathJS, contractContents.js);
   });
 
   const contractsPaths = mutableContracts.map(({ name, filePath, sourceMap, addresses }) => ({
@@ -192,17 +172,11 @@ export const build = async ({ fs, output$, providerManager }: BuildOptions): Pro
   });
 
   mutableFiles.push({ path: sourceMapsPath, content: sourceMapsContents.ts });
-  pushFile(sourceMapsPathJS, sourceMapsContents.js);
   mutableFiles.push({ path: testPath, content: testContents.ts });
-  pushFile(testPathJS, testContents.js);
   mutableFiles.push({ path: contractsPath, content: contractsContents.ts });
-  pushFile(contractsPathJS, contractsContents.js);
   mutableFiles.push({ path: reactPath, content: reactContents.ts });
-  pushFile(reactPathJS, reactContents.js);
   mutableFiles.push({ path: clientPath, content: clientContents.ts });
-  pushFile(clientPathJS, clientContents.js);
   mutableFiles.push({ path: generatedPath, content: generatedContents.ts });
-  pushFile(generatedPathJS, generatedContents.js);
 
   output$.next({ owner: 'neo-one', message: 'Done' });
 

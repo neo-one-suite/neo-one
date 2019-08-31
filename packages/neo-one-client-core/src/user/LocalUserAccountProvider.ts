@@ -94,7 +94,7 @@ export interface Provider extends ProviderBase {
  *
  * See the [LocalUserAccountProvider](https://neo-one.io/docs/user-accounts#LocalUserAccountProvider) section of the advanced guide for more details.
  */
-export class LocalUserAccountProvider<TKeyStore extends KeyStore, TProvider extends Provider>
+export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TProvider extends Provider = Provider>
   extends UserAccountProviderBase<TProvider>
   implements UserAccountProvider {
   public readonly currentUserAccount$: Observable<UserAccount | undefined>;

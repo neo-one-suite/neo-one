@@ -28,5 +28,5 @@ export const getContractPaths = (config: Configuration, name: string) => {
 export const getTSPath = (filePath: string) =>
   nodePath.resolve(
     nodePath.dirname(filePath),
-    `${nodePath.basename(filePath, filePath.endsWith('.jsx') ? '.jsx' : '.js')}.d.ts`,
+    `${nodePath.basename(filePath, filePath.endsWith('.jsx') ? '.jsx' : '.js')}.ts`,
   );

@@ -2,8 +2,8 @@
 
 exports[`genContract Token 1`] = `
 Object {
-  "js": "import { sourceMaps } from '../sourceMaps';
-import { tokenABI } from './abi';
+  "js": "import { tokenABI } from './abi';
+import { sourceMaps } from '../sourceMaps';
 
 const definition = {
   networks: {
@@ -22,10 +22,22 @@ export const createTokenSmartContract = (
   "ts": "
 import { Client } from '@neo-one/client';
 import { TokenSmartContract } from './types';
+import { tokenABI } from './abi';
+import { sourceMaps } from '../sourceMaps';
 
-export const createTokenSmartContract: <TClient extends Client>(
+const definition = {
+  networks: {
+  \\"main\\": {
+    \\"address\\": \\"iamahash\\"
+  }
+},
+  abi: tokenABI,
+  sourceMaps,
+};
+
+export const createTokenSmartContract = <TClient extends Client>(
   client: TClient,
-) => TokenSmartContract<TClient>;
+): TokenSmartContract<TClient> => client.smartContract(definition);
 ",
 }
 `;

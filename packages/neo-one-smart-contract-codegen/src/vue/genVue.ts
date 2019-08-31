@@ -24,8 +24,16 @@ export const genVue = ({
     .map(({ name }) => `this.${lowerCaseFirst(name)} = ${getCreateSmartContractName(name)}(this.client);`)
     .join('\n    ');
   const contractTypeProperties = contractsPaths
-    .map(({ name }) => `public readonly ${lowerCaseFirst(name)}: Contracts['${lowerCaseFirst(name)}'];`)
+    .map(({ name }) => `public ${lowerCaseFirst(name)}: Contracts['${lowerCaseFirst(name)}'];`)
     .join('\n  ');
+
+  const constructor = `constructor() {
+  this.setHost();
+}`;
+
+  const setHost = `this.client = createClient(host);
+this.developerClients = createDeveloperClients(host);
+${contractProperties}`;
 
   return {
     js: `
@@ -34,14 +42,10 @@ import { createClient, createDeveloperClients } from '${clientImport}';
 ${contractImports}
 
 export class ContractsService {
-  constructor() {
-    this.setHost();
-  }
+  ${constructor}
 
   setHost(host) {
-    this.client = createClient(host);
-    this.developerClients = createDeveloperClients(host);
-    ${contractProperties}
+    ${setHost}
   }
 }
 
@@ -53,10 +57,15 @@ import { Contracts } from '${getRelativeImport(vuePath, contractsPath)}';
 import { DefaultUserAccountProviders } from '${clientImport}';
 
 export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {
-  public readonly client: Client<TUserAccountProviders>;
-  public readonly developerClients: DeveloperClients;
+  public client: Client<TUserAccountProviders>;
+  public developerClients: DeveloperClients;
   ${contractTypeProperties}
-  public setHost(host?: string);
+
+  ${constructor}
+
+  public setHost(host?: string) {
+    ${setHost}
+  }
 }
 
 export const instance: ContractsService

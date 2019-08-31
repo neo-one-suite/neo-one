@@ -43,9 +43,12 @@ export const WithContracts = ({ children }) => (
 );
 ",
   "ts": "
-import { Client, DeveloperClient, DeveloperClients } from '@neo-one/client';
+import { Client, DeveloperClient, DeveloperClients, DeveloperTools } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from './contracts';
+import { createClient, createDeveloperClients } from './client';
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
 
 export interface WithClients<TClient extends Client> {
   readonly client: TClient;
@@ -56,17 +59,38 @@ export type ContractsWithClients<TClient extends Client> = Contracts & WithClien
 export type ContractsProviderProps<TClient extends Client> = Partial<WithClients<TClient>> & {
   readonly children?: React.ReactNode;
 }
-export const ContractsProvider: <TClient extends Client>({
+export const ContractsProvider = <TClient extends Client>({
   client: clientIn,
   developerClients: developerClientsIn,
   host,
   children,
-}: ContractsProviderProps<TClient>) => React.ReactElement;
+}: ContractsProviderProps<TClient>) => {
+  const client = clientIn === undefined ? createClient(host) : clientIn;
+  const developerClients = developerClientsIn === undefined ? createDeveloperClients(host) : developerClientsIn;
+  DeveloperTools.enable({ client, developerClients });
+
+  return (
+    <Context.Provider
+      value={{
+        client,
+        developerClients,
+        token: createTokenSmartContract(client),
+      ico: createICOSmartContract(client),
+      }}
+    >
+      {children}
+    </Context.Provider>
+  );
+};
 
 export interface WithContractsProps<TClient extends Client> {
   readonly children: (contracts: ContractsWithClients<TClient>) => React.ReactNode;
 }
-export const WithContracts: <TClient extends Client>({ children }: WithContractsProps<TClient>) => React.ReactElement;
+export const WithContracts = <TClient extends Client>({ children }: WithContractsProps<TClient>) => (
+  <Context.Consumer>
+    {children}
+  </Context.Consumer>
+);
   ",
 }
 `;

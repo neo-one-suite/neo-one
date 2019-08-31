@@ -1,7 +1,9 @@
-/* @hash a3b959c7e23c97d9dd5edf0c5f0f6c37 */
+/* @hash 92bf39e9a0b258178c4a0615b94794a8 */
 // tslint:disable
 /* eslint-disable */
-export const icoABI = {
+import { ABI } from '@neo-one/client';
+
+export const icoABI: ABI = {
   events: [
     {
       name: 'transfer',

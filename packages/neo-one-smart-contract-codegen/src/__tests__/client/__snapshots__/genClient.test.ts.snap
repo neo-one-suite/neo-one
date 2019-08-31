@@ -35,7 +35,7 @@ export const createClient = (getUserAccountProvidersOrHost) => {
     
   ];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push(new NEOONEDataProvider({ network: 'local', rpcURL: \`http://\${host}:40100/rpc\` }));
+    providers.push({ network: 'local', rpcURL: \`http://\${host}:40100/rpc\` });
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
@@ -65,10 +65,14 @@ export const createDeveloperClients = (host = 'localhost') => ({
   ",
   "ts": "
 import {
+  Client,
+  DeveloperClient,
   DeveloperClients,
   LocalKeyStore,
+  LocalMemoryStore,
   LocalUserAccountProvider,
   NEOONEProvider,
+  NEOONEDataProvider,
   UserAccountProviders,
 } from '@neo-one/client';
 
@@ -76,11 +80,54 @@ export interface DefaultUserAccountProviders {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>,
 }
 
-export const createClient: <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
-  getUserAccountProvidersOrHost?: string | ((provider: NEOONEProvider) => TUserAccountProviders),
-) => Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never, TUserAccountProviders>;
+const getDefaultUserAccountProviders = (provider: NEOONEProvider) => ({
+  memory: new LocalUserAccountProvider({
+    keystore: new LocalKeyStore(new LocalMemoryStore()),
+    provider,
+  }),
+});
 
-export const createDeveloperClients: (host?: string) => DeveloperClients;
+export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
+  getUserAccountProvidersOrHost: string | ((provider: NEOONEProvider) => TUserAccountProviders) = getDefaultUserAccountProvider,
+): Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never, TUserAccountProviders> => {
+  let getUserAccountProviders = getDefaultUserAccountProviders;
+  let host = 'localhost'
+  if (typeof getUserAccountProvidersOrHost === 'string') {
+    host = getUserAccountProvidersOrHost;
+  } else if (getUserAccountProvidersOrHost !== undefined) {
+    getUserAccountProviders = getUserAccountProvidersOrHost;
+  }
+  const providers = [
+    
+  ];
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
+    providers.push({ network: 'local', rpcURL: \`http://\${host}:40100/rpc\` });
+  }
+  const provider = new NEOONEProvider(providers);
+  const userAccountProviders = getUserAccountProviders(provider);
+  const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
+  const localUserAccountProvider = localUserAccountProviders.find(
+    (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
+  );
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
+    if (localUserAccountProvider !== undefined) {
+      const localKeyStore = localUserAccountProvider.keystore;
+      if (localKeyStore instanceof LocalKeyStore) {
+        Promise.all([
+          localKeyStore.addUserAccount({ network: 'local', name: 'master', privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv' }),
+        ]).catch(() => {
+          // do nothing
+        });
+      }
+    }
+  }
+
+  return new Client(userAccountProviders);
+}
+
+export const createDeveloperClients = (host = 'localhost'): DeveloperClients => ({
+  'local': new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: \`http://\${host}:40100/rpc\` })),
+});
 ",
 }
 `;

@@ -1,6 +1,8 @@
-/* @hash 768032287dcf0f7846afd18c79893a7b */
+/* @hash df67490897dca2a3c83d9970be9638f7 */
 // tslint:disable
 /* eslint-disable */
+import { Client } from '@neo-one/client';
+import { EscrowSmartContract } from './types';
 import { escrowABI } from './abi';
 import { sourceMaps } from '../sourceMaps';
 
@@ -17,4 +19,5 @@ const definition = {
   sourceMaps,
 };
 
-export const createEscrowSmartContract = (client) => client.smartContract(definition);
+export const createEscrowSmartContract = <TClient extends Client>(client: TClient): EscrowSmartContract<TClient> =>
+  client.smartContract(definition);

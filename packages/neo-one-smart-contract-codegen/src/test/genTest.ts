@@ -12,12 +12,8 @@ export const genTest = ({
   readonly testPath: string;
   readonly contractsPath: string;
   readonly mod?: string;
-}) => ({
-  js: `
-import { createWithContracts } from '${mod}';
-import * as path from 'path';
-
-export const withContracts = createWithContracts([
+}) => {
+  const createWithContracts = `createWithContracts([
   ${contractsPaths
     .map(
       ({ name, contractPath }) =>
@@ -26,15 +22,24 @@ export const withContracts = createWithContracts([
         )}') }`,
     )
     .join(', ')}
-]);
+]);`;
+
+  return {
+    js: `
+import { createWithContracts } from '${mod}';
+import * as path from 'path';
+
+export const withContracts = ${createWithContracts}
 `,
-  ts: `
-import { TestOptions, WithContractsOptions } from '${mod}';
+    ts: `
+import { createWithContracts, TestOptions, WithContractsOptions } from '${mod}';
 import { Contracts } from '${getRelativeImport(testPath, contractsPath)}';
+import * as path from 'path';
 
 export const withContracts: (
   test: (contracts: Contracts & TestOptions) => Promise<void>,
   options?: WithContractsOptions,
-) => Promise<void>;
+) => Promise<void> = ${createWithContracts}
 `,
-});
+  };
+};

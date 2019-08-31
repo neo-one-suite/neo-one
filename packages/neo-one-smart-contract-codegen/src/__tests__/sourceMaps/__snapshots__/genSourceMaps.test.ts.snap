@@ -14,6 +14,12 @@ export const sourceMaps = sourceMapsIn;
   "ts": "
 import { SourceMaps } from '@neo-one/client';
 
+let sourceMapsIn: SourceMaps = {};
+
+if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
+  sourceMapsIn = {} as any;
+}
+
 export const sourceMaps: SourceMaps;
 ",
 }

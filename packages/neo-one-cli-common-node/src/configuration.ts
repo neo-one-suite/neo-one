@@ -1,5 +1,5 @@
 // tslint:disable no-any
-import { CodegenFramework, Configuration } from '@neo-one/cli-common';
+import { CodegenFramework, CodegenLanguage, Configuration } from '@neo-one/cli-common';
 import cosmiconfig from 'cosmiconfig';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
@@ -20,6 +20,7 @@ const configurationDefaults = {
   },
   codegen: {
     path: nodePath.join('src', 'neo-one'),
+    language: 'javascript',
     framework: 'none',
     browserify: false,
   },
@@ -98,6 +99,7 @@ const configurationSchema = {
       additionalProperties: false,
       properties: {
         path: { type: 'string' },
+        language: { type: 'string', enum: ['javascript', 'typescript'] },
         framework: { type: 'string', enum: ['none', 'react', 'vue', 'angular'] },
         browserify: { type: 'boolean' },
       },
@@ -185,6 +187,8 @@ ${exportConfig} {
   codegen: {
     // NEO•ONE will write source artifacts to this directory. This directory should be committed.
     path: '${config.codegen.path}',
+    // NEO•ONE will generate code in the language specified here. Can be one of 'javascript' or 'typescript'.
+    language: '${config.codegen.language}',
     // NEO•ONE will generate client helpers for the framework specified here. Can be one of 'react', 'angular', 'vue' or 'none'.
     framework: '${config.codegen.framework}',
     // Set this to true if you're using an environment like Expo that doesn't handle browserifying dependencies automatically.
@@ -226,7 +230,8 @@ const getProjectFramework = async (rootDir: string): Promise<CodegenFramework> =
   // tslint:disable-next-line no-any
   let pkg: any;
   try {
-    pkg = await fs.readFile(nodePath.resolve(rootDir, 'package.json'), 'utf8');
+    const contents = await fs.readFile(nodePath.resolve(rootDir, 'package.json'), 'utf8');
+    pkg = JSON.parse(contents);
   } catch (err) {
     if (err.code === 'ENOENT') {
       return 'none';
@@ -251,13 +256,20 @@ const getProjectFramework = async (rootDir: string): Promise<CodegenFramework> =
   return 'none';
 };
 
+const getProjectLanguage = async (rootDir: string): Promise<CodegenLanguage> => {
+  const exists = await fs.pathExists(nodePath.resolve(rootDir, 'tsconfig.json'));
+
+  return exists ? 'typescript' : 'javascript';
+};
+
 const validateConfig = async (rootDir: string, configIn: cosmiconfig.Config): Promise<Configuration> => {
   const config = applyDefaults(configIn);
   validate(configurationSchema, configIn, { name: 'NEO•ONE' } as any);
 
   let newFramework: CodegenFramework | undefined;
+  let newLanguage: CodegenLanguage | undefined;
   if (Object.keys(configIn).length === 0) {
-    newFramework = await getProjectFramework(rootDir);
+    [newFramework, newLanguage] = await Promise.all([getProjectFramework(rootDir), getProjectLanguage(rootDir)]);
   }
 
   return {
@@ -276,6 +288,7 @@ const validateConfig = async (rootDir: string, configIn: cosmiconfig.Config): Pr
     codegen: {
       ...config.codegen,
       path: nodePath.resolve(rootDir, config.codegen.path),
+      language: newLanguage === undefined ? config.codegen.language : newLanguage,
       framework: newFramework === undefined ? config.codegen.framework : newFramework,
     },
     network: {

@@ -10,44 +10,15 @@ export const genClient = ({
   readonly localDevNetworkPort: number;
   readonly wallets: ReadonlyArray<Wallet>;
   readonly networks: ReadonlyArray<NetworkDefinition>;
-}) => ({
-  js: `
-import {
-  Client,
-  DeveloperClient,
-  LocalKeyStore,
-  LocalMemoryStore,
-  LocalUserAccountProvider,
-  NEOONEProvider,
-  NEOONEDataProvider,
-} from '@neo-one/client';
-
-const getDefaultUserAccountProviders = (provider) => ({
-  memory: new LocalUserAccountProvider({
-    keystore: new LocalKeyStore(new LocalMemoryStore()),
-    provider,
-  }),
-});
-
-const isLocalUserAccountProvider = (userAccountProvider) =>
-  userAccountProvider instanceof LocalUserAccountProvider;
-
-export const createClient = (getUserAccountProvidersOrHost) => {
-  let getUserAccountProviders = getDefaultUserAccountProviders;
-  let host = 'localhost'
-  if (typeof getUserAccountProvidersOrHost === 'string') {
-    host = getUserAccountProvidersOrHost;
-  } else if (getUserAccountProvidersOrHost !== undefined) {
-    getUserAccountProviders = getUserAccountProvidersOrHost;
-  }
-  const providers = [
+}) => {
+  const createClient = `const providers = [
     ${networks
       .filter(({ name }) => name !== localDevNetworkName)
       .map(({ name, rpcURL }) => `{ network: '${name}', rpcURL: '${rpcURL}' },`)
       .join('\n    ')}
   ];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push(new NEOONEDataProvider({ network: '${localDevNetworkName}', rpcURL: \`http://\${host}:${localDevNetworkPort}/rpc\` }));
+    providers.push({ network: '${localDevNetworkName}', rpcURL: \`http://\${host}:${localDevNetworkPort}/rpc\` });
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
@@ -71,12 +42,9 @@ export const createClient = (getUserAccountProvidersOrHost) => {
         });
       }
     }
-  }
+  }`;
 
-  return new Client(userAccountProviders);
-};
-
-export const createDeveloperClients = (host = 'localhost') => ({${networks
+  const createDeveloperClients = `({${networks
     .filter(({ name, dev }) => dev && name !== localDevNetworkName)
     .map(
       ({ name, rpcURL }) =>
@@ -84,14 +52,58 @@ export const createDeveloperClients = (host = 'localhost') => ({${networks
     )
     .join('')}
   '${localDevNetworkName}': new DeveloperClient(new NEOONEDataProvider({ network: '${localDevNetworkName}', rpcURL: \`http://\${host}:${localDevNetworkPort}/rpc\` })),
-});
-  `,
-  ts: `
+});`;
+
+  const getDefaultUserAccountProviders = `({
+  memory: new LocalUserAccountProvider({
+    keystore: new LocalKeyStore(new LocalMemoryStore()),
+    provider,
+  }),
+});`;
+
+  return {
+    js: `
 import {
-  DeveloperClients,
+  Client,
+  DeveloperClient,
   LocalKeyStore,
+  LocalMemoryStore,
   LocalUserAccountProvider,
   NEOONEProvider,
+  NEOONEDataProvider,
+} from '@neo-one/client';
+
+const getDefaultUserAccountProviders = (provider) => ${getDefaultUserAccountProviders}
+
+const isLocalUserAccountProvider = (userAccountProvider) =>
+  userAccountProvider instanceof LocalUserAccountProvider;
+
+export const createClient = (getUserAccountProvidersOrHost) => {
+  let getUserAccountProviders = getDefaultUserAccountProviders;
+  let host = 'localhost'
+  if (typeof getUserAccountProvidersOrHost === 'string') {
+    host = getUserAccountProvidersOrHost;
+  } else if (getUserAccountProvidersOrHost !== undefined) {
+    getUserAccountProviders = getUserAccountProvidersOrHost;
+  }
+
+  ${createClient}
+
+  return new Client(userAccountProviders);
+};
+
+export const createDeveloperClients = (host = 'localhost') => ${createDeveloperClients}
+  `,
+    ts: `
+import {
+  Client,
+  DeveloperClient,
+  DeveloperClients,
+  LocalKeyStore,
+  LocalMemoryStore,
+  LocalUserAccountProvider,
+  NEOONEProvider,
+  NEOONEDataProvider,
   UserAccountProviders,
 } from '@neo-one/client';
 
@@ -99,10 +111,28 @@ export interface DefaultUserAccountProviders {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>,
 }
 
-export const createClient: <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
-  getUserAccountProvidersOrHost?: string | ((provider: NEOONEProvider) => TUserAccountProviders),
-) => Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never, TUserAccountProviders>;
+const getDefaultUserAccountProviders = (provider: NEOONEProvider) => ${getDefaultUserAccountProviders}
 
-export const createDeveloperClients: (host?: string) => DeveloperClients;
+const isLocalUserAccountProvider = (userAccountProvider: any): userAccountProvider is LocalUserAccountProvider =>
+  userAccountProvider instanceof LocalUserAccountProvider;
+
+export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
+  getUserAccountProvidersOrHost: string | ((provider: NEOONEProvider) => TUserAccountProviders) = getDefaultUserAccountProviders as any,
+): Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never, TUserAccountProviders> => {
+  let getUserAccountProviders = getDefaultUserAccountProviders;
+  let host = 'localhost'
+  if (typeof getUserAccountProvidersOrHost === 'string') {
+    host = getUserAccountProvidersOrHost;
+  } else if (getUserAccountProvidersOrHost !== undefined) {
+    getUserAccountProviders = getUserAccountProvidersOrHost as any;
+  }
+
+  ${createClient}
+
+  return new Client(userAccountProviders as any);
+}
+
+export const createDeveloperClients = (host = 'localhost'): DeveloperClients => ${createDeveloperClients}
 `,
-});
+  };
+};

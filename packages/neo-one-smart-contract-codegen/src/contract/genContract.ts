@@ -25,12 +25,10 @@ export const genContract = ({
   const relativeABI = getRelativeImport(createContractPath, abiPath);
   const relativeSourceMaps = getRelativeImport(createContractPath, sourceMapsPath);
   const abiName = getABIName(name);
-  const sourceMapsImport = `import { sourceMaps } from '${relativeSourceMaps}';`;
 
   return {
-    js: `${abiName >= 'sourceMaps' ? `${sourceMapsImport}\n` : ''}import { ${abiName} } from '${relativeABI}';${
-      abiName >= 'sourceMaps' ? '' : `\n${sourceMapsImport}`
-    }
+    js: `import { ${abiName} } from '${relativeABI}';
+import { sourceMaps } from '${relativeSourceMaps}';
 
 const definition = {
   networks: ${stringify(networksDefinition, undefined, 2)},
@@ -45,10 +43,18 @@ export const ${getCreateSmartContractName(name)} = (
     ts: `
 import { Client } from '@neo-one/client';
 import { ${smartContract} } from '${relativeTypes}';
+import { ${abiName} } from '${relativeABI}';
+import { sourceMaps } from '${relativeSourceMaps}';
 
-export const ${getCreateSmartContractName(name)}: <TClient extends Client>(
+const definition = {
+  networks: ${stringify(networksDefinition, undefined, 2)},
+  abi: ${abiName},
+  sourceMaps,
+};
+
+export const ${getCreateSmartContractName(name)} = <TClient extends Client>(
   client: TClient,
-) => ${smartContract}<TClient>;
+): ${smartContract}<TClient> => client.smartContract(definition);
 `,
   };
 };

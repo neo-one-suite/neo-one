@@ -29,16 +29,26 @@ export class ContractsService {
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
+import { Injectable } from '@angular/core';
 import { Client, DeveloperClients, UserAccountProviders } from '@neo-one/client';
 import { Contracts } from './contracts';
-import { DefaultUserAccountProviders } from './client';
+import { DefaultUserAccountProviders, createClient, createDeveloperClients } from './client';
 
+@Injectable({
+  providedIn: 'root',
+})
 export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {
-  public readonly client: Client<TUserAccountProviders>;
-  public readonly developerClients: DeveloperClients;
-  public readonly token: Contracts['token'];
-  public readonly ico: Contracts['ico'];
-  public setHost(host?: string);
+  public client: Client<TUserAccountProviders>;
+  public developerClients: DeveloperClients;
+  public token: Contracts['token'];
+  public ico: Contracts['ico'];
+
+  public setHost(host?: string) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.token = createTokenSmartContract(this.client);
+    this.ico = createICOSmartContract(this.client);
+  }
 }
 ",
   },
@@ -68,7 +78,7 @@ const isLocalUserAccountProvider = (userAccountProvider) => userAccountProvider 
 export const createClient = (getUserAccountProviders = getDefaultUserAccountProviders) => {
   const providers = [];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push(new NEOONEDataProvider({ network: 'local', rpcURL: getJSONRPCLocalProviderManager() }));
+    providers.push({ network: 'local', rpcURL: getJSONRPCLocalProviderManager() });
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
@@ -103,10 +113,14 @@ export const createDeveloperClients = () => ({
     "ts": "// tslint:disable
 /* eslint-disable */
 import {
+  Client,
+  DeveloperClient,
   DeveloperClients,
   LocalKeyStore,
+  LocalMemoryStore,
   LocalUserAccountProvider,
   NEOONEProvider,
+  NEOONEDataProvider,
   UserAccountProviders,
 } from '@neo-one/client';
 
@@ -114,14 +128,55 @@ export interface DefaultUserAccountProviders {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>;
 }
 
-export const createClient: <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
-  getUserAccountProviders?: (provider: NEOONEProvider) => TUserAccountProviders,
-) => Client<
+const getDefaultUserAccountProviders = (provider: NEOONEProvider) => ({
+  memory: new LocalUserAccountProvider({
+    keystore: new LocalKeyStore(new LocalMemoryStore()),
+    provider,
+  }),
+});
+
+const isLocalUserAccountProvider = (userAccountProvider: any): userAccountProvider is LocalUserAccountProvider =>
+  userAccountProvider instanceof LocalUserAccountProvider;
+
+export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
+  getUserAccountProviders: (provider: NEOONEProvider) => TUserAccountProviders = getDefaultUserAccountProviders,
+): Client<
   TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never,
   TUserAccountProviders
->;
+> => {
+  const providers = [];
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
+    providers.push({ network: 'local', rpcURL: getJSONRPCLocalProviderManager() });
+  }
+  const provider = new NEOONEProvider(providers);
+  const userAccountProviders = getUserAccountProviders(provider);
+  const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
+  const localUserAccountProvider = localUserAccountProviders.find(
+    (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
+  );
+  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
+    if (localUserAccountProvider !== undefined) {
+      const localKeyStore = localUserAccountProvider.keystore;
+      if (localKeyStore instanceof LocalKeyStore) {
+        Promise.all([
+          localKeyStore.addUserAccount({
+            network: 'local',
+            name: 'master',
+            privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
+          }),
+        ]).catch(() => {
+          // do nothing
+        });
+      }
+    }
+  }
 
-export const createDeveloperClients: () => DeveloperClients;
+  return new Client(userAccountProviders);
+};
+
+export const createDeveloperClients = (): DeveloperClients => ({
+  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: getJSONRPCLocalProviderManager() })),
+});
 ",
   },
   "contracts": Object {
@@ -142,6 +197,9 @@ import { Client } from '@neo-one/client';
 import { ICOSmartContract, ICOMigrationSmartContract } from './ICO/types';
 import { TokenSmartContract, TokenMigrationSmartContract } from './Token/types';
 
+import { createICOSmartContract } from './ICO/contract';
+import { createTokenSmartContract } from './Token/contract';
+
 export interface Contracts<TClient extends Client = Client> {
   readonly ico: ICOSmartContract<TClient>;
   readonly token: TokenSmartContract<TClient>;
@@ -152,7 +210,10 @@ export interface MigrationContracts {
   readonly token: TokenMigrationSmartContract;
 }
 
-export const createContracts: <TClient extends Client>(client: TClient) => Contracts<TClient>;
+export const createContracts = <TClient extends Client>(client: TClient): Contracts<TClient> => ({
+  ico: createICOSmartContract(client),
+  token: createTokenSmartContract(client),
+});
 ",
   },
   "generated": Object {
@@ -218,9 +279,12 @@ export const WithContracts = ({ children }) => <Context.Consumer>{children}</Con
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
-import { Client, DeveloperClient, DeveloperClients } from '@neo-one/client';
+import { Client, DeveloperClient, DeveloperClients, DeveloperTools } from '@neo-one/client';
 import * as React from 'react';
 import { Contracts } from './contracts';
+import { createClient, createDeveloperClients } from './client';
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
 
 export interface WithClients<TClient extends Client> {
   readonly client: TClient;
@@ -231,17 +295,36 @@ export type ContractsWithClients<TClient extends Client> = Contracts & WithClien
 export type ContractsProviderProps<TClient extends Client> = Partial<WithClients<TClient>> & {
   readonly children?: React.ReactNode;
 };
-export const ContractsProvider: <TClient extends Client>({
+export const ContractsProvider = <TClient extends Client>({
   client: clientIn,
   developerClients: developerClientsIn,
   host,
   children,
-}: ContractsProviderProps<TClient>) => React.ReactElement;
+}: ContractsProviderProps<TClient>) => {
+  const client = clientIn === undefined ? createClient(host) : clientIn;
+  const developerClients = developerClientsIn === undefined ? createDeveloperClients(host) : developerClientsIn;
+  DeveloperTools.enable({ client, developerClients });
+
+  return (
+    <Context.Provider
+      value={{
+        client,
+        developerClients,
+        token: createTokenSmartContract(client),
+        ico: createICOSmartContract(client),
+      }}
+    >
+      {children}
+    </Context.Provider>
+  );
+};
 
 export interface WithContractsProps<TClient extends Client> {
   readonly children: (contracts: ContractsWithClients<TClient>) => React.ReactNode;
 }
-export const WithContracts: <TClient extends Client>({ children }: WithContractsProps<TClient>) => React.ReactElement;
+export const WithContracts = <TClient extends Client>({ children }: WithContractsProps<TClient>) => (
+  <Context.Consumer>{children}</Context.Consumer>
+);
 ",
   },
   "sourceMaps": Object {
@@ -259,6 +342,12 @@ export const sourceMaps = sourceMapsIn;
 /* eslint-disable */
 import { SourceMaps } from '@neo-one/client';
 
+let sourceMapsIn: SourceMaps = {};
+
+if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
+  sourceMapsIn = {} as any;
+}
+
 export const sourceMaps: SourceMaps;
 ",
   },
@@ -275,13 +364,17 @@ export const withContracts = createWithContracts([
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
-import { TestOptions, WithContractsOptions } from '@neo-one/smart-contract-test-browser';
+import { createWithContracts, TestOptions, WithContractsOptions } from '@neo-one/smart-contract-test-browser';
 import { Contracts } from './contracts';
+import * as path from 'path';
 
 export const withContracts: (
   test: (contracts: Contracts & TestOptions) => Promise<void>,
   options?: WithContractsOptions,
-) => Promise<void>;
+) => Promise<void> = createWithContracts([
+  { name: 'Token', filePath: path.resolve(__dirname, '../contracts/Token.ts') },
+  { name: 'ICO', filePath: path.resolve(__dirname, '../contracts/ICO.ts') },
+]);
 ",
   },
   "vue": Object {
@@ -314,11 +407,21 @@ import { Contracts } from './contracts';
 import { DefaultUserAccountProviders } from './client';
 
 export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {
-  public readonly client: Client<TUserAccountProviders>;
-  public readonly developerClients: DeveloperClients;
-  public readonly token: Contracts['token'];
-  public readonly ico: Contracts['ico'];
-  public setHost(host?: string);
+  public client: Client<TUserAccountProviders>;
+  public developerClients: DeveloperClients;
+  public token: Contracts['token'];
+  public ico: Contracts['ico'];
+
+  constructor() {
+    this.setHost();
+  }
+
+  public setHost(host?: string) {
+    this.client = createClient(host);
+    this.developerClients = createDeveloperClients(host);
+    this.token = createTokenSmartContract(this.client);
+    this.ico = createICOSmartContract(this.client);
+  }
 }
 
 export const instance: ContractsService;

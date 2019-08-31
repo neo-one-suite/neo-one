@@ -12,21 +12,23 @@ export const genContracts = ({
   readonly contractsPath: string;
 }) => {
   const sortedPaths = _.sortBy(contractsPaths, [({ name }: ContractPaths) => name]);
+  const createImports = sortedPaths
+    .map(
+      ({ name, createContractPath }) =>
+        `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(contractsPath, createContractPath)}'`,
+    )
+    .join('\n');
+
+  const createContracts = `({
+    ${sortedPaths
+      .map(({ name }) => `${lowerCaseFirst(name)}: ${getCreateSmartContractName(name)}(client),`)
+      .join('\n  ')}
+  });`;
 
   return {
-    js: `${sortedPaths
-      .map(
-        ({ name, createContractPath }) =>
-          `import { ${getCreateSmartContractName(name)} } from '${getRelativeImport(
-            contractsPath,
-            createContractPath,
-          )}'`,
-      )
-      .join('\n')}
+    js: `${createImports}
 
-export const createContracts = (client) => ({
-  ${sortedPaths.map(({ name }) => `${lowerCaseFirst(name)}: ${getCreateSmartContractName(name)}(client),`).join('\n  ')}
-});
+export const createContracts = (client) => ${createContracts}
   `,
     ts: `import { Client } from '@neo-one/client';
 
@@ -40,6 +42,8 @@ ${sortedPaths
   )
   .join('\n')}
 
+${createImports}
+
 export interface Contracts<TClient extends Client = Client> {
   ${sortedPaths
     .map(({ name }) => `readonly ${lowerCaseFirst(name)}: ${getSmartContractName(name)}<TClient>;`)
@@ -52,7 +56,7 @@ export interface MigrationContracts {
     .join('\n  ')}
 }
 
-export const createContracts: <TClient extends Client>(client: TClient) => Contracts<TClient>;
+export const createContracts = <TClient extends Client>(client: TClient): Contracts<TClient> => ${createContracts};
 `,
   };
 };

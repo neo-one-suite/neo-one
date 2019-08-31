@@ -1,36 +1,51 @@
-/* @hash fc474f6166c3168cb793bef749f7d4b1 */
+/* @hash 06f90343402b78aef506c07458daeda4 */
 // tslint:disable
 /* eslint-disable */
 import {
   Client,
   DeveloperClient,
+  DeveloperClients,
   LocalKeyStore,
   LocalMemoryStore,
   LocalUserAccountProvider,
   NEOONEProvider,
   NEOONEDataProvider,
+  UserAccountProviders,
 } from '@neo-one/client';
 
-const getDefaultUserAccountProviders = (provider) => ({
+export interface DefaultUserAccountProviders {
+  readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>;
+}
+
+const getDefaultUserAccountProviders = (provider: NEOONEProvider) => ({
   memory: new LocalUserAccountProvider({
     keystore: new LocalKeyStore(new LocalMemoryStore()),
     provider,
   }),
 });
 
-const isLocalUserAccountProvider = (userAccountProvider) => userAccountProvider instanceof LocalUserAccountProvider;
+const isLocalUserAccountProvider = (userAccountProvider: any): userAccountProvider is LocalUserAccountProvider =>
+  userAccountProvider instanceof LocalUserAccountProvider;
 
-export const createClient = (getUserAccountProvidersOrHost) => {
+export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
+  getUserAccountProvidersOrHost:
+    | string
+    | ((provider: NEOONEProvider) => TUserAccountProviders) = getDefaultUserAccountProviders as any,
+): Client<
+  TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never,
+  TUserAccountProviders
+> => {
   let getUserAccountProviders = getDefaultUserAccountProviders;
   let host = 'localhost';
   if (typeof getUserAccountProvidersOrHost === 'string') {
     host = getUserAccountProvidersOrHost;
   } else if (getUserAccountProvidersOrHost !== undefined) {
-    getUserAccountProviders = getUserAccountProvidersOrHost;
+    getUserAccountProviders = getUserAccountProvidersOrHost as any;
   }
+
   const providers = [];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push(new NEOONEDataProvider({ network: 'local', rpcURL: `http://${host}:10000/rpc` }));
+    providers.push({ network: 'local', rpcURL: `http://${host}:10000/rpc` });
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
@@ -105,9 +120,9 @@ export const createClient = (getUserAccountProvidersOrHost) => {
     }
   }
 
-  return new Client(userAccountProviders);
+  return new Client(userAccountProviders as any);
 };
 
-export const createDeveloperClients = (host = 'localhost') => ({
+export const createDeveloperClients = (host = 'localhost'): DeveloperClients => ({
   local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: `http://${host}:10000/rpc` })),
 });

@@ -29,11 +29,13 @@ export const generateCode = async (
   });
 
   await fs.ensureDir(base);
-  await Promise.all([
-    writeFile(abiPath, abiFile.js),
-    writeFile(createContractPath, contract.js),
-    writeFile(getTSPath(abiPath), abiFile.ts),
-    writeFile(getTSPath(createContractPath), contract.ts),
-    writeFile(getTSPath(typesPath), types.ts),
-  ]);
+  if (config.codegen.language === 'typescript') {
+    await Promise.all([
+      writeFile(getTSPath(abiPath), abiFile.ts),
+      writeFile(getTSPath(createContractPath), contract.ts),
+      writeFile(getTSPath(typesPath), types.ts),
+    ]);
+  } else {
+    await Promise.all([writeFile(abiPath, abiFile.js), writeFile(createContractPath, contract.js)]);
+  }
 };
