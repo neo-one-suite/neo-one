@@ -20,7 +20,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
   sourceMapsIn = {} as any;
 }
 
-export const sourceMaps: SourceMaps;
+export const sourceMaps: SourceMaps = sourceMapsIn;
 ",
 }
 `;

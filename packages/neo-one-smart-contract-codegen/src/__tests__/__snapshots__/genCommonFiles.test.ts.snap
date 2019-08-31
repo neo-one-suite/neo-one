@@ -82,6 +82,7 @@ export const createClient = (getUserAccountProvidersOrHost) => {
   } else if (getUserAccountProvidersOrHost !== undefined) {
     getUserAccountProviders = getUserAccountProvidersOrHost;
   }
+
   const providers = [];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     providers.push({ network: 'local', rpcURL: \`http://\${host}:40100/rpc\` });
@@ -141,10 +142,13 @@ const getDefaultUserAccountProviders = (provider: NEOONEProvider) => ({
   }),
 });
 
+const isLocalUserAccountProvider = (userAccountProvider: any): userAccountProvider is LocalUserAccountProvider =>
+  userAccountProvider instanceof LocalUserAccountProvider;
+
 export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
   getUserAccountProvidersOrHost:
     | string
-    | ((provider: NEOONEProvider) => TUserAccountProviders) = getDefaultUserAccountProvider,
+    | ((provider: NEOONEProvider) => TUserAccountProviders) = getDefaultUserAccountProviders as any,
 ): Client<
   TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never,
   TUserAccountProviders
@@ -154,8 +158,9 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
   if (typeof getUserAccountProvidersOrHost === 'string') {
     host = getUserAccountProvidersOrHost;
   } else if (getUserAccountProvidersOrHost !== undefined) {
-    getUserAccountProviders = getUserAccountProvidersOrHost;
+    getUserAccountProviders = getUserAccountProvidersOrHost as any;
   }
+
   const providers = [];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     providers.push({ network: 'local', rpcURL: \`http://\${host}:40100/rpc\` });
@@ -183,7 +188,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
     }
   }
 
-  return new Client(userAccountProviders);
+  return new Client(userAccountProviders as any);
 };
 
 export const createDeveloperClients = (host = 'localhost'): DeveloperClients => ({
@@ -360,7 +365,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
   sourceMapsIn = {} as any;
 }
 
-export const sourceMaps: SourceMaps;
+export const sourceMaps: SourceMaps = sourceMapsIn;
 ",
   },
   "test": Object {

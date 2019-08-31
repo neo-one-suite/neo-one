@@ -31,6 +31,7 @@ export const createClient = (getUserAccountProvidersOrHost) => {
   } else if (getUserAccountProvidersOrHost !== undefined) {
     getUserAccountProviders = getUserAccountProvidersOrHost;
   }
+
   const providers = [
     
   ];
@@ -87,16 +88,20 @@ const getDefaultUserAccountProviders = (provider: NEOONEProvider) => ({
   }),
 });
 
+const isLocalUserAccountProvider = (userAccountProvider: any): userAccountProvider is LocalUserAccountProvider =>
+  userAccountProvider instanceof LocalUserAccountProvider;
+
 export const createClient = <TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders>(
-  getUserAccountProvidersOrHost: string | ((provider: NEOONEProvider) => TUserAccountProviders) = getDefaultUserAccountProvider,
+  getUserAccountProvidersOrHost: string | ((provider: NEOONEProvider) => TUserAccountProviders) = getDefaultUserAccountProviders as any,
 ): Client<TUserAccountProviders extends UserAccountProviders<infer TUserAccountProvider> ? TUserAccountProvider : never, TUserAccountProviders> => {
   let getUserAccountProviders = getDefaultUserAccountProviders;
   let host = 'localhost'
   if (typeof getUserAccountProvidersOrHost === 'string') {
     host = getUserAccountProvidersOrHost;
   } else if (getUserAccountProvidersOrHost !== undefined) {
-    getUserAccountProviders = getUserAccountProvidersOrHost;
+    getUserAccountProviders = getUserAccountProvidersOrHost as any;
   }
+
   const providers = [
     
   ];
@@ -122,7 +127,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
     }
   }
 
-  return new Client(userAccountProviders);
+  return new Client(userAccountProviders as any);
 }
 
 export const createDeveloperClients = (host = 'localhost'): DeveloperClients => ({

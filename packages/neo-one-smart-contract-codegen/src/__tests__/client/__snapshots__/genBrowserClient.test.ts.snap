@@ -50,7 +50,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
   }
 }
 
-return new Client(userAccountProviders);
+  return new Client(userAccountProviders);
 };
 
 export const createDeveloperClients = () => ({
@@ -113,7 +113,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
   }
 }
 
-return new Client(userAccountProviders);
+  return new Client(userAccountProviders as any);
 }
 
 export const createDeveloperClients = (): DeveloperClients => ({

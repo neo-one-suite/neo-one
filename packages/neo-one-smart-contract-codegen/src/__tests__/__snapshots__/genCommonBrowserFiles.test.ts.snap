@@ -171,7 +171,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
     }
   }
 
-  return new Client(userAccountProviders);
+  return new Client(userAccountProviders as any);
 };
 
 export const createDeveloperClients = (): DeveloperClients => ({
@@ -348,7 +348,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
   sourceMapsIn = {} as any;
 }
 
-export const sourceMaps: SourceMaps;
+export const sourceMaps: SourceMaps = sourceMapsIn;
 ",
   },
   "test": Object {
