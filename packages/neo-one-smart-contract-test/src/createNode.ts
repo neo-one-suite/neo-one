@@ -4,7 +4,6 @@ import { createMain } from '@neo-one/node-neo-settings';
 import { constants } from '@neo-one/utils';
 import _ from 'lodash';
 import MemDown from 'memdown';
-import { addCleanup } from './addCleanup';
 
 const getPort = () => _.random(10000, 50000);
 
@@ -36,7 +35,6 @@ export const createNode = async () => {
     },
     leveldown: MemDown(),
   });
-  addCleanup(async () => node.stop());
   await node.start();
 
   return {

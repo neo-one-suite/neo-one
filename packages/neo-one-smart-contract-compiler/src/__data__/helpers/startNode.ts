@@ -127,7 +127,8 @@ const publish = async (
 };
 
 export const startNode = async (outerOptions: StartNodeOptions = {}): Promise<TestNode> => {
-  const { privateKey, rpcURL } = await createNode();
+  const { privateKey, rpcURL, node } = await createNode();
+  one.addCleanup(async () => node.stop());
   const dataProvider = new NEOONEDataProvider({ network: 'priv', rpcURL });
   const { client, masterWallet, networkName, userAccountProviders } = await getClients({ dataProvider, privateKey });
 
