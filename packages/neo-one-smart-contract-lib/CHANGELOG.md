@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.5](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-lib@1.5.4...@neo-one/smart-contract-lib@1.5.5) (2019-08-31)
+
+**Note:** Version bump only for package @neo-one/smart-contract-lib
+
+
+
+
+
 ## [1.5.4](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-lib@1.5.3...@neo-one/smart-contract-lib@1.5.4) (2019-08-30)
 
 **Note:** Version bump only for package @neo-one/smart-contract-lib

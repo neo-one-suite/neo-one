@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/client-full-core",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "NEO•ONE client-full core types implementation.",
   "main": "./src/index",
   "dependencies": {
     "@neo-one/client-common": "^1.4.1",
-    "@neo-one/client-core": "^1.4.2",
+    "@neo-one/client-core": "^1.4.3",
     "@neo-one/client-full-common": "^1.2.2",
     "@neo-one/client-switch": "^1.4.1",
     "@neo-one/utils": "^1.2.1",

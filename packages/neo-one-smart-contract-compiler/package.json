@@ -1,14 +1,14 @@
 {
   "name": "@neo-one/smart-contract-compiler",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "NEO•ONE TypeScript smart contract compiler.",
   "main": "./src/index",
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
     "@neo-one/client-common": "^1.4.1",
-    "@neo-one/client-core": "^1.4.2",
+    "@neo-one/client-core": "^1.4.3",
     "@neo-one/client-full-common": "^1.2.2",
-    "@neo-one/client-full-core": "^1.2.2",
+    "@neo-one/client-full-core": "^1.2.3",
     "@neo-one/smart-contract": "^1.1.1",
     "@neo-one/ts-utils": "^1.2.3",
     "@neo-one/typescript-concatenator": "^1.1.6",
