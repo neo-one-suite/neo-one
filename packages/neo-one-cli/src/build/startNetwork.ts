@@ -13,7 +13,7 @@ export const startNetwork = async (cmd: Command, config: Configuration, reset: b
   proc.unref();
 
   const start = Date.now();
-  const timeoutMS = 5 * 1000;
+  const timeoutMS = 30 * 1000;
   let ready = false;
   // tslint:disable-next-line no-loop-statement
   while (Date.now() - start < timeoutMS) {

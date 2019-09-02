@@ -12,6 +12,7 @@ export interface CodegenConfiguration {
   readonly language: CodegenLanguage;
   readonly framework: CodegenFramework;
   readonly browserify: boolean;
+  readonly codesandbox: boolean;
 }
 
 export interface NetworkConfiguration {

@@ -59,6 +59,9 @@ export const generateCommonCode = async (
     browserify: config.codegen.browserify,
   });
 
+  if (config.codegen.codesandbox) {
+    await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
+  }
   await fs.ensureDir(config.codegen.path);
   await Promise.all(
     [

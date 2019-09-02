@@ -1,2 +1,2 @@
-export * from './killPort';
+export * from './killProcess';
 export * from './writeFile';

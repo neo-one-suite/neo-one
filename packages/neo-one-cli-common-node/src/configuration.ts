@@ -23,6 +23,7 @@ const configurationDefaults = {
     language: 'javascript',
     framework: 'none',
     browserify: false,
+    codesandbox: false,
   },
   network: {
     path: nodePath.join('.neo-one', 'network'),
@@ -102,6 +103,7 @@ const configurationSchema = {
         language: { type: 'string', enum: ['javascript', 'typescript'] },
         framework: { type: 'string', enum: ['none', 'react', 'vue', 'angular'] },
         browserify: { type: 'boolean' },
+        codesandbox: { type: 'boolean' },
       },
     },
     network: {
@@ -193,6 +195,8 @@ ${exportConfig} {
     framework: '${config.codegen.framework}',
     // Set this to true if you're using an environment like Expo that doesn't handle browserifying dependencies automatically.
     browserify: ${config.codegen.browserify},
+    // Set this to true if you're running in codesandbox to workaround certain limitations of codesandbox.
+    codesandbox: ${config.codegen.codesandbox},
   },
   network: {
     // NEO•ONE will store network data here. This path should be ignored by your vcs, e.g. by specifiying it in a .gitignore file.

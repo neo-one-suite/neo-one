@@ -4,6 +4,7 @@
   "description": "NEO•ONE CLI for developing NEO dapps.",
   "main": "./src/index",
   "dependencies": {
+    "@babel/core": "^7.5.5",
     "@babel/register": "^7.5.5",
     "@neo-one/cli-common": "^1.1.9",
     "@neo-one/cli-common-node": "^1.1.9",
@@ -24,6 +25,7 @@
     "cross-fetch": "^3.0.4",
     "execa": "^2.0.4",
     "fs-extra": "^8.1.0",
+    "import-local": "^3.0.2",
     "listr": "^0.14.3",
     "lodash": "^4.17.15",
     "prompts": "^2.2.1",

@@ -2,9 +2,11 @@ import { common, crypto } from '@neo-one/client-common';
 import { cliLogger } from '@neo-one/logger';
 import { FullNode } from '@neo-one/node';
 import { createMain } from '@neo-one/node-neo-settings';
+import * as fs from 'fs-extra';
 import net from 'net';
+import * as nodePath from 'path';
 import yargs from 'yargs';
-import { getPrimaryKeys, start } from '../../common';
+import { getNetworkProcessIDFile, getPrimaryKeys, start } from '../../common';
 
 async function isRunning(port: number) {
   let resolve: (running: boolean) => void;
@@ -85,6 +87,10 @@ export const handler = () => {
     });
 
     await fullNode.start();
+
+    const pidFile = getNetworkProcessIDFile(config);
+    await fs.ensureDir(nodePath.dirname(pidFile));
+    await fs.writeFile(pidFile, process.pid);
 
     return async () => {
       await fullNode.stop();
