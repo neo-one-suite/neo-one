@@ -28,6 +28,9 @@ export const generateCode = async (
     browserify: config.codegen.browserify,
   });
 
+  if (config.codegen.codesandbox) {
+    await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
+  }
   await fs.ensureDir(base);
   if (config.codegen.language === 'typescript') {
     await Promise.all([
