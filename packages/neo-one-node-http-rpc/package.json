@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/node-http-rpc",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "NEO•ONE RPC server.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/cli-common-node": "^1.1.9",
+    "@neo-one/cli-common-node": "^1.1.10",
     "@neo-one/http": "^1.2.0",
     "@neo-one/http-context": "^1.2.1",
     "@neo-one/logger": "^1.2.1",
