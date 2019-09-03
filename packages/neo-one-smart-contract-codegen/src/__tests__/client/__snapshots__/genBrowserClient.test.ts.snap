@@ -70,6 +70,7 @@ import {
   NEOONEDataProvider,
   UserAccountProviders,
 } from '@neo-one/client';
+import { getJSONRPCLocalProviderManager } from '@neo-one/local-singleton';
 
 export interface DefaultUserAccountProviders {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>,
