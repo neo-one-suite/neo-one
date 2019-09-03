@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/node-bin",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "NEO•ONE NEO executable full node.",
   "main": "./src/index",
   "dependencies": {
     "@neo-one/logger": "^1.2.1",
-    "@neo-one/node": "^2.1.4",
+    "@neo-one/node": "^2.1.5",
     "@neo-one/node-neo-settings": "^1.1.7",
     "@neo-one/utils": "^1.2.1",
     "@neo-one/utils-node": "^1.2.1",

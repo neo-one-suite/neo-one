@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/cli-common-node",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "NEO•ONE code common to the node cli and other node packages in NEO•ONE.",
   "main": "./src/index",
   "dependencies": {
