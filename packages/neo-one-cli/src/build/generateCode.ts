@@ -29,7 +29,7 @@ export const generateCode = async (
   });
 
   if (config.codegen.codesandbox) {
-    await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
+    await new Promise((resolve) => setTimeout(resolve, 2 * 1000));
   }
   await fs.ensureDir(base);
   if (config.codegen.language === 'typescript') {

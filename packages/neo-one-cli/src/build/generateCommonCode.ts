@@ -60,7 +60,7 @@ export const generateCommonCode = async (
   });
 
   if (config.codegen.codesandbox) {
-    await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
+    await new Promise((resolve) => setTimeout(resolve, 2 * 1000));
   }
   await fs.ensureDir(config.codegen.path);
   await Promise.all(
