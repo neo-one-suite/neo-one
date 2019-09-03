@@ -1,4 +1,4 @@
-/* @hash cba68e4e6a85cf0f159f2654c6e62929 */
+/* @hash 7e8bb9e00347cedef395d8e1659239ec */
 // tslint:disable
 /* eslint-disable */
 import { Client, DeveloperClients, DeveloperTools } from '@neo-one/client';
@@ -52,3 +52,5 @@ export interface WithContractsProps<TClient extends Client> {
 export const WithContracts = <TClient extends Client>({ children }: WithContractsProps<TClient>) => (
   <Context.Consumer>{children}</Context.Consumer>
 );
+
+export const useContracts = <TClient extends Client>(): ContractsWithClients<TClient> => React.useContext(Context);

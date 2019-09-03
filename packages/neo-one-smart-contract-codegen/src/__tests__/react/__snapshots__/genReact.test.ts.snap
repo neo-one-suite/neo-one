@@ -41,6 +41,8 @@ export const WithContracts = ({ children }) => (
     {children}
   </Context.Consumer>
 );
+
+export const useContracts = () => React.useContext(Context);
 ",
   "ts": "
 import { Client, DeveloperClients, DeveloperTools } from '@neo-one/client';
@@ -94,6 +96,8 @@ export const WithContracts = <TClient extends Client>({ children }: WithContract
     {children}
   </Context.Consumer>
 );
+
+export const useContracts = <TClient extends Client>(): ContractsWithClients<TClient> => React.useContext(Context);
   ",
 }
 `;

@@ -276,6 +276,8 @@ export const ContractsProvider = ({
 };
 
 export const WithContracts = ({ children }) => <Context.Consumer>{children}</Context.Consumer>;
+
+export const useContracts = () => React.useContext(Context);
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
@@ -328,6 +330,8 @@ export interface WithContractsProps<TClient extends Client> {
 export const WithContracts = <TClient extends Client>({ children }: WithContractsProps<TClient>) => (
   <Context.Consumer>{children}</Context.Consumer>
 );
+
+export const useContracts = <TClient extends Client>(): ContractsWithClients<TClient> => React.useContext(Context);
 ",
   },
   "sourceMaps": Object {
