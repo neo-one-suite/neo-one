@@ -64,6 +64,8 @@ export const ContractsProvider = ({
 }) => ${contractsProvider}
 
 export const WithContracts = ({ children }) => ${withContracts}
+
+export const useContracts = () => React.useContext(Context);
 `,
     ts: `
 import { Client, DeveloperClients, DeveloperTools } from '@neo-one/client';
@@ -95,6 +97,8 @@ export interface WithContractsProps<TClient extends Client> {
   readonly children: (contracts: ContractsWithClients<TClient>) => React.ReactNode;
 }
 export const WithContracts = <TClient extends Client>({ children }: WithContractsProps<TClient>) => ${withContracts}
+
+export const useContracts = <TClient extends Client>(): ContractsWithClients<TClient> => React.useContext(Context);
   `,
   };
 };

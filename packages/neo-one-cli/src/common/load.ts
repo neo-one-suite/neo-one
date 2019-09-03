@@ -14,7 +14,11 @@ export const loadJS = async (path: string) => {
 };
 
 export const loadTS = async (path: string) => {
-  register();
+  register({
+    compilerOptions: {
+      module: 'commonjs',
+    },
+  });
 
   return load(path);
 };

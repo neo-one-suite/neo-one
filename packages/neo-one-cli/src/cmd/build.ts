@@ -7,7 +7,7 @@ export const command = 'build';
 export const describe = 'Builds the project and deploys it to the local development network.';
 export const builder = (yargsBuilder: typeof yargs) =>
   yargsBuilder
-    .string('reset')
+    .boolean('reset')
     .describe('reset', 'Reset the local project.')
     .default('reset', false);
 export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {

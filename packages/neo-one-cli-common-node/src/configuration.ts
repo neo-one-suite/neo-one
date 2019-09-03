@@ -316,7 +316,11 @@ export const loadConfiguration = async (): Promise<Configuration> => {
       loaders: {
         '.ts': {
           async: async (filePath: string): Promise<object> => {
-            register();
+            register({
+              compilerOptions: {
+                module: 'commonjs',
+              },
+            });
             const obj = await import(filePath);
 
             return obj.default === undefined ? obj : obj.default;
