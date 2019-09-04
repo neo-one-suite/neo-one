@@ -11,7 +11,7 @@
     "@neo-one/node-vm": "^1.4.2",
     "@neo-one/utils": "^1.2.1",
     "@opencensus/core": "^0.0.16",
-    "@opencensus/exporter-jaeger": "^0.0.16",
+    "@opencensus/exporter-jaeger": "^0.0.17",
     "@opencensus/exporter-prometheus": "^0.0.16",
     "@opencensus/nodejs-base": "^0.0.16",
     "@opencensus/propagation-tracecontext": "^0.0.16",

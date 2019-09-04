@@ -2184,12 +2184,23 @@
     shimmer "^1.2.0"
     uuid "^3.2.1"
 
-"@opencensus/exporter-jaeger@^0.0.16":
-  version "0.0.16"
-  resolved "https://registry.yarnpkg.com/@opencensus/exporter-jaeger/-/exporter-jaeger-0.0.16.tgz#901b71c9d05c8ef903d4fc7cb4eef8b71bd6cf9a"
-  integrity sha512-djwBrAO/nxTXGtfjbv/XG7MEE7OV+4Vktjjm+RtJj4OQFRzv/8ed2qOfLVUzmDIF501VkYV/TXH2m5tLIgXMeA==
+"@opencensus/core@^0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@opencensus/core/-/core-0.0.17.tgz#2cd7c211168eeda48667f8db19717c93955f5372"
+  integrity sha512-cFaS72oQmZJZdTEFOnHEopOVbgYbyVC0kaVt2IDNgjZV6cuKxTyWEKCLEAW8/VdWPz2MnflJZfeE0cRXQ1AB0g==
   dependencies:
-    "@opencensus/core" "^0.0.16"
+    continuation-local-storage "^3.2.1"
+    log-driver "^1.2.7"
+    semver "^6.0.0"
+    shimmer "^1.2.0"
+    uuid "^3.2.1"
+
+"@opencensus/exporter-jaeger@^0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@opencensus/exporter-jaeger/-/exporter-jaeger-0.0.17.tgz#c8366a51e314300f0c5a3afba2db966012b6fd62"
+  integrity sha512-8XrHUgnO0LLdXgazaCXWbuaOKoE9hpXuaw8I5DlIzZCv0aZyWH/MuHgJB+FfC18UWoQzOK221NF7Ko5epe7jyA==
+  dependencies:
+    "@opencensus/core" "^0.0.17"
     jaeger-client "~3.15.0"
 
 "@opencensus/exporter-prometheus@^0.0.16":
@@ -18737,12 +18748,7 @@ typescript-template-language-service-decorator@^2.2.0:
   resolved "https://registry.yarnpkg.com/typescript-template-language-service-decorator/-/typescript-template-language-service-decorator-2.2.0.tgz#4ee6d580f307fb9239978e69626f2775b8a59b2a"
   integrity sha512-xiolqt1i7e22rpqMaprPgSFVgU64u3b9n6EJlAaUYE61jumipKAdI1+O5khPlWslpTUj80YzjUKjJ2jxT0D74w==
 
-typescript@^3.2.2:
-  version "3.5.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.5.3.tgz#c830f657f93f1ea846819e929092f5fe5983e977"
-  integrity sha512-ACzBtm/PhXBDId6a6sDJfroT2pOWt/oOnk4/dElG5G33ZL776N3Y6/6bKZJBFpd+b05F3Ct9qDjMeJmRWtE2/g==
-
-typescript@^3.6.2:
+typescript@^3.2.2, typescript@^3.6.2:
   version "3.6.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.6.2.tgz#105b0f1934119dde543ac8eb71af3a91009efe54"
   integrity sha512-lmQ4L+J6mnu3xweP8+rOrUwzmN+MRAj7TgtJtDaXE5PMyX2kCrklhg3rvOsOIfNeAWMQWO2F1GPc1kMD2vLAfw==
