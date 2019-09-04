@@ -9,6 +9,8 @@ import {
 } from '@neo-one/client-common';
 import { DeveloperClient, LocalKeyStore, NEOONEDataProvider, NEOONEProvider } from '@neo-one/client-core';
 import { Client, LocalUserAccountProvider, PublishReceipt } from '@neo-one/client-full-core';
+import { disableConsoleLogForTest, enableConsoleLogForTest } from '@neo-one/client-switch';
+import { setGlobalLogLevel } from '@neo-one/logger';
 import { compileContract, CompilerHost } from '@neo-one/smart-contract-compiler';
 import { camel, Modifiable } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
@@ -42,6 +44,12 @@ export interface WithContractsOptions {
    * Defaults to `true`.
    */
   readonly autoSystemFee?: boolean;
+  /**
+   * Enable logs from various systems during testing.
+   *
+   * Defaults to `false`.
+   */
+  readonly logging?: boolean;
 }
 
 /**
@@ -105,8 +113,18 @@ export const withContracts = async <T>(
   test: (contracts: T & TestOptions) => Promise<void>,
   createCompilerHost: () => CompilerHost,
   getDataProvider: () => Promise<DataProviderOptions>,
-  { ignoreWarnings = false, deploy = true, autoConsensus = true, autoSystemFee = true }: WithContractsOptions = {},
+  {
+    ignoreWarnings = false,
+    deploy = true,
+    autoConsensus = true,
+    autoSystemFee = true,
+    logging = false,
+  }: WithContractsOptions = {},
 ): Promise<void> => {
+  if (!logging) {
+    disableConsoleLogForTest();
+    setGlobalLogLevel('silent');
+  }
   const { dataProvider, cleanup, privateKey } = await getDataProvider();
   const { client, developerClient, masterWallet, accountIDs } = await setupWallets(dataProvider, privateKey);
   const networkName = dataProvider.network;
@@ -175,6 +193,7 @@ export const withContracts = async <T>(
 
     await test(contractOptions);
   } finally {
+    enableConsoleLogForTest();
     await cleanup();
   }
 };
