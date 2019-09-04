@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-common",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "NEO•ONE client common code.",
   "main": "./src/index",
   "dependencies": {

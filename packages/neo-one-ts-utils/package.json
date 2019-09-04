@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/ts-utils",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "NEO•ONE TypeScript utils.",
   "main": "./src/index",
   "dependencies": {

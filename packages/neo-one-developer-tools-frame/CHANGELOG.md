@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.10](https://github.com/neo-one-suite/neo-one/compare/@neo-one/developer-tools-frame@1.1.9...@neo-one/developer-tools-frame@1.1.10) (2019-09-04)
+
+
+### Bug Fixes
+
+* **web:** fix developer tools clipping ([#1732](https://github.com/neo-one-suite/neo-one/issues/1732)) ([54a459e](https://github.com/neo-one-suite/neo-one/commit/54a459e))
+
+
+
+
+
 ## [1.1.9](https://github.com/neo-one-suite/neo-one/compare/@neo-one/developer-tools-frame@1.1.8...@neo-one/developer-tools-frame@1.1.9) (2019-08-31)
 
 **Note:** Version bump only for package @neo-one/developer-tools-frame

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.7](https://github.com/neo-one-suite/neo-one/compare/@neo-one/typescript-concatenator@1.1.6...@neo-one/typescript-concatenator@1.1.7) (2019-09-04)
+
+**Note:** Version bump only for package @neo-one/typescript-concatenator
+
+
+
+
+
 ## [1.1.6](https://github.com/neo-one-suite/neo-one/compare/@neo-one/typescript-concatenator@1.1.5...@neo-one/typescript-concatenator@1.1.6) (2019-08-30)
 
 **Note:** Version bump only for package @neo-one/typescript-concatenator

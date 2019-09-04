@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/node-bin",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "NEO•ONE NEO executable full node.",
   "main": "./src/index",
   "dependencies": {
     "@neo-one/logger": "^1.2.1",
-    "@neo-one/node": "^2.1.5",
-    "@neo-one/node-neo-settings": "^1.1.7",
+    "@neo-one/node": "^2.1.6",
+    "@neo-one/node-neo-settings": "^1.1.8",
     "@neo-one/utils": "^1.2.1",
     "@neo-one/utils-node": "^1.2.1",
     "env-paths": "^2.2.0",
@@ -15,8 +15,8 @@
     "yargs": "^14.0.0"
   },
   "devDependencies": {
-    "@neo-one/client": "^1.2.6",
-    "@neo-one/client-common": "^1.4.1",
+    "@neo-one/client": "^1.2.7",
+    "@neo-one/client-common": "^1.4.2",
     "@types/rc": "^1.1.0",
     "cross-fetch": "^3.0.4",
     "fs-extra": "^8.1.0"

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.10](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-full@1.1.9...@neo-one/client-full@1.1.10) (2019-09-04)
+
+**Note:** Version bump only for package @neo-one/client-full
+
+
+
+
+
 ## [1.1.9](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-full@1.1.8...@neo-one/client-full@1.1.9) (2019-08-31)
 
 **Note:** Version bump only for package @neo-one/client-full
