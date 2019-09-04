@@ -31,8 +31,8 @@ export const InvalidCommandError = makeErrorWithCode(
 );
 
 const isCommand = (command: string): command is Command =>
-  // tslint:disable-next-line strict-type-predicates no-any
-  Command[command as any] !== undefined;
+  // tslint:disable-next-line strict-type-predicates
+  Command[command as keyof typeof Command] !== undefined;
 
 export const assertCommand = (command: string): Command => {
   if (isCommand(command)) {

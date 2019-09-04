@@ -200,7 +200,7 @@ export type ByteCode = Op;
 export const Byte: { [K in ByteCode]: OpCode } = Op as any;
 // tslint:disable-next-line variable-name
 export const ByteBuffer: { [K in ByteCode]: Buffer } = _.fromPairs(
-  Object.values(Op).map((byteCode) => [byteCode, Buffer.from([byteCode])]),
+  Object.values(Op).map((byteCode) => [byteCode, Buffer.from([byteCode as number])]),
   // tslint:disable-next-line no-any
 ) as any;
 
@@ -310,8 +310,8 @@ export enum SysCall {
 export type SysCallName = keyof typeof SysCall;
 
 const isSysCall = (value: string): value is SysCall =>
-  // tslint:disable-next-line strict-type-predicates no-any
-  SysCall[value as any] !== undefined;
+  // tslint:disable-next-line strict-type-predicates
+  SysCall[value as SysCallName] !== undefined;
 
 export const assertSysCall = (value: string): SysCall => {
   if (isSysCall(value)) {

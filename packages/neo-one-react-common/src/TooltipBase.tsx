@@ -5,6 +5,7 @@ import { theme } from 'styled-tools';
 import { Popover } from './Popover';
 
 const { forwardRef, useEffect, useRef, useState } = React;
+const themeAny = theme as any;
 
 const TooltipBaseComponent = forwardRef<HTMLDivElement, React.ComponentPropsWithRef<typeof Popover>>((props, refIn) => {
   const myRef = useRef<HTMLDivElement>(null);
@@ -36,7 +37,7 @@ const TooltipBaseComponent = forwardRef<HTMLDivElement, React.ComponentPropsWith
 });
 
 export const TooltipBase = styled(TooltipBaseComponent)`
-  ${theme('TooltipBase')};
+  ${themeAny('TooltipBase')};
 `;
 
 TooltipBase.defaultProps = {

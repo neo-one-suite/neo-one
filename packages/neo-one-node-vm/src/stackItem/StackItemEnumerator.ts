@@ -27,7 +27,7 @@ export class StackItemEnumerator<T extends { readonly value: StackItemBase } = {
     if (!this.mutableDone) {
       const result = await this.enumerator.next();
       this.mutableCurrent = result.done ? undefined : result.value;
-      this.mutableDone = result.done;
+      this.mutableDone = !!result.done;
       if (this.mutableDone) {
         return false;
       }
