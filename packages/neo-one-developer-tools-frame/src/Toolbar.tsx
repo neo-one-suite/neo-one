@@ -4,7 +4,7 @@ import { Box, Monogram, useHidden, useStream } from '@neo-one/react-common';
 // @ts-ignore
 import SizeObserver from '@render-props/size-observer';
 import * as React from 'react';
-import { prop } from 'styled-tools';
+import { ifProp, prop } from 'styled-tools';
 import { BalanceSelector } from './BalanceSelector';
 import { BlockIndex } from './BlockIndex';
 import { BlockTime } from './BlockTime';
@@ -16,14 +16,14 @@ import { Toasts } from './Toasts';
 import { ToolbarButton } from './ToolbarButton';
 import { WalletButton } from './WalletButton';
 
-const { useCallback } = React;
+const { useCallback, useState } = React;
 
-const Wrapper = styled(Box)`
+const Wrapper = styled<typeof Box, { readonly active: boolean }>(Box)`
   display: flex;
   bottom: 0;
   left: 0;
   position: fixed;
-  transition: transform 0.5s ease-in-out;
+  ${ifProp('active', 'transition: transform 0.5s ease-in-out')}
 `;
 
 const InnerWrapper = styled(Box)`
@@ -93,10 +93,12 @@ interface Props {
 export function Toolbar({ resizeHandler }: Props) {
   const { visible, toggle } = useHidden(false);
   const maxWidth = useStream(() => resizeHandler.maxWidth$, [resizeHandler], 40);
+  const [active, setActive] = useState(false);
 
-  const onChangeSize = useCallback(
-    ({ width }: { width: number }) => {
-      if (visible) {
+  const onClick = useCallback(
+    (width: number) => () => {
+      setActive(true);
+      if (!visible) {
         resizeHandler.maximizeToolbar({
           type: 'px',
           id: 'toolbar',
@@ -106,26 +108,31 @@ export function Toolbar({ resizeHandler }: Props) {
       } else {
         resizeHandler.minimizeToolbar();
       }
+      toggle();
     },
-    [visible, resizeHandler, maxWidth],
+    [visible, resizeHandler, toggle, maxWidth, setActive],
   );
+
+  const onMouseEnter = useCallback(() => {
+    setActive(true);
+    resizeHandler.maximize({
+      type: 'max',
+      id: 'toolbarOnEnter',
+    });
+  }, [setActive]);
 
   return (
     <>
-      <SizeObserver onChange={onChangeSize}>
+      <SizeObserver every={150}>
         {({ sizeRef, width }: any) => (
           <Wrapper
             ref={sizeRef}
+            active={active}
             style={{
               transform: visible ? 'translate(0, 0)' : `translate(-${width - 40}px, 0)`,
               maxWidth,
             }}
-            onMouseEnter={() => {
-              resizeHandler.maximize({
-                type: 'max',
-                id: 'toolbarOnEnter',
-              });
-            }}
+            onMouseEnter={onMouseEnter}
             onMouseLeave={() => {
               resizeHandler.minimize('toolbarOnEnter');
             }}
@@ -139,7 +146,7 @@ export function Toolbar({ resizeHandler }: Props) {
               <NEOTrackerButton />
               <SettingsButton />
             </InnerWrapper>
-            <MonogramButton visible={visible} onClick={toggle} />
+            <MonogramButton visible={visible} onClick={onClick(width)} />
           </Wrapper>
         )}
       </SizeObserver>
