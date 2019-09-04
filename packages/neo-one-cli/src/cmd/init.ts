@@ -71,6 +71,30 @@ export class HelloWorld extends SmartContract {
 }
 `;
 
+    const helloWorldTestPath = nodePath.resolve(
+      config.codegen.path,
+      '..',
+      '__tests__',
+      `HelloWorld.test.${config.codegen.language === 'typescript' ? 'ts' : 'js'}`,
+    );
+    const helloWorldTestContents = `import { withContracts } from "../${nodePath.basename(config.codegen.path)}/test";
+
+describe('HelloWorld', () => {
+  it('responds with the given name', async () => {
+    await withContracts(async ({ helloWorld }) => {
+      const receipt = await helloWorld.hello.confirmed('Foo');
+      if (receipt.result.state === 'FAULT') {
+        throw new Error(receipt.result.message);
+      }
+
+      expect(receipt.result.value).toEqual('Hello Foo!');
+      expect(receipt.events).toHaveLength(1);
+      expect(receipt.events[0].parameters.name).toEqual('Hello Foo!');
+    });
+  });
+});
+`;
+
     const reactPath = nodePath.resolve(
       config.codegen.path,
       '..',
@@ -126,6 +150,7 @@ export const ExampleHelloWorld = () => {
     await Promise.all([
       writeFile(tsconfigPath, JSON.stringify(tsconfig, undefined, 2)),
       writeFile(helloWorldPath, helloWorldContents),
+      writeFile(helloWorldTestPath, helloWorldTestContents),
       handleConfig(config, rootTSConfigContents === undefined),
       argv.react ? writeFile(reactPath, reactContents) : Promise.resolve(),
     ]);
