@@ -1,4 +1,4 @@
-// tslint:disable no-null-keyword no-object-mutation
+// tslint:disable no-null-keyword no-object-mutation no-any
 import styled from '@emotion/styled';
 import * as React from 'react';
 import { theme } from 'styled-tools';

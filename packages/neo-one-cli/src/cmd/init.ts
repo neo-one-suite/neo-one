@@ -3,7 +3,7 @@ import { Configuration } from '@neo-one/cli-common';
 import { createDefaultConfigurationJavaScript, createDefaultConfigurationTypeScript } from '@neo-one/cli-common-node';
 import { COMPILER_OPTIONS } from '@neo-one/smart-contract-compiler';
 import { normalizePath } from '@neo-one/utils';
-import { Yarguments } from '@neo-one/utils-node/src';
+import { Yarguments } from '@neo-one/utils-node';
 import * as fs from 'fs-extra';
 import * as nodePath from 'path';
 import yargs from 'yargs';

@@ -1,3 +1,4 @@
+// tslint:disable no-any
 import styled from '@emotion/styled';
 import * as React from 'react';
 import { prop } from 'styled-tools';

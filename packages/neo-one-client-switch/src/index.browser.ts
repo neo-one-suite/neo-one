@@ -1,8 +1,9 @@
+export * from './browser';
 export {
+  disableConsoleLogForTest,
+  HWLedger,
+  initializeSourceMap,
   LogOptions,
   ProcessActionsAndMessageOptions,
   ProcessConsoleLogOptions,
-  disableConsoleLogForTest,
-  HWLedger,
 } from './common';
-export * from './browser';

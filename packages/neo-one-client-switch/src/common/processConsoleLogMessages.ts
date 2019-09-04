@@ -1,6 +1,7 @@
 import { RawAction } from '@neo-one/client-common';
 import { SourceMaps } from '../common';
 import { createConsoleLogMessages } from './createConsoleLogMessages';
+import { initializeSourceMap } from './initializeSourceMap';
 
 export interface ProcessConsoleLogOptions {
   readonly actions: readonly RawAction[];
@@ -18,6 +19,7 @@ export const enableConsoleLogForTest = () => {
 };
 
 export const processConsoleLogMessages = async ({ actions, sourceMaps }: ProcessConsoleLogOptions): Promise<void> => {
+  initializeSourceMap();
   if (!disabled) {
     const logs = await createConsoleLogMessages(actions, sourceMaps);
     if (logs.length > 0) {
