@@ -5,17 +5,14 @@ import { timer } from 'rxjs';
 import yargs from 'yargs';
 
 const argv = yargs
-  .boolean('report')
-  .describe('report', 'Write out test reports.')
-  .default('report', false)
-  .boolean('coverage')
-  .describe('coverage', 'Write coverage to .nyc_output.')
-  .default('coverage', false)
+  .boolean('local')
+  .describe('local', 'Run test locally')
+  .default('local', false)
   .boolean('express')
   .describe('express', 'Run quick test on a single course')
   .default('express', false).argv;
 
-const runCypress = async ({ report, coverage }: { readonly report: boolean; readonly coverage: boolean }) => {
+const runCypress = async () => {
   // tslint:disable-next-line no-unused
   const { NODE_OPTIONS, TS_NODE_PROJECT, ...newEnv } = process.env;
   const cypressRetries = '3';
@@ -24,17 +21,6 @@ const runCypress = async ({ report, coverage }: { readonly report: boolean; read
   command = argv.express
     ? command.concat(['cypress/integration/TokenomicsCourse/Lesson2/Chapter5.ts'])
     : command.concat(['cypress/integration/**/*']);
-  if (report) {
-    command = command.concat([
-      '--reporter',
-      'mocha-multi-reporters',
-      '--reporter-options',
-      `configFile=${path.resolve(__dirname, '..', 'mocha.json')}`,
-    ]);
-  }
-  if (coverage) {
-    command = command.concat(['--env', `coverageDir=${path.resolve(process.cwd(), '.nyc_output')}`]);
-  }
 
   console.log(`$ CYPRESS_RETRIES=${cypressRetries} yarn ${command.join(' ')}`);
   const proc = execa('yarn', command, {
@@ -92,30 +78,33 @@ process.on('SIGTERM', () => {
   shutdown(0);
 });
 
-const run = async ({ report, coverage }: { readonly report: boolean; readonly coverage: boolean }) => {
+const run = async () => {
+  const shutdownWait = 5000;
   console.log('$ yarn website:start:prod-builds');
-  console.log('$ yarn website:start:prod');
   const buildProc = execa('yarn', ['website:start:prod-builds']);
-  const startProc = execa('yarn', ['website:start:prod']);
-  mutableCleanup.push(
-    async () => {
-      startProc.kill();
-      await startProc;
-    },
-    async () => {
-      buildProc.kill();
-      await buildProc;
-    },
-  );
+  mutableCleanup.push(async () => {
+    buildProc.kill('SIGTERM', { forceKillAfterTimeout: shutdownWait });
+    await timer(shutdownWait + 500).toPromise();
+  });
 
   await buildProc;
+  console.log('$ yarn website:start:prod');
+  const startProc = execa('yarn', ['website:start:prod']);
+  mutableCleanup.push(async () => {
+    startProc.kill('SIGTERM', { forceKillAfterTimeout: shutdownWait });
+    await timer(shutdownWait + 500).toPromise();
+  });
+
+  const TEN_MINUTES = 10 * 60 * 1000;
   const THREE_MINUTES = 3 * 60 * 1000;
-  await timer(THREE_MINUTES).toPromise();
-  await runCypress({ report, coverage });
+  await timer(argv.local ? THREE_MINUTES : TEN_MINUTES).toPromise();
+  await runCypress();
 };
 
-run({ report: argv.report, coverage: argv.coverage })
-  .then(() => shutdown(0))
+run()
+  .then(() => {
+    shutdown(0);
+  })
   .catch((error) => {
     console.error(error);
     shutdown(1);
