@@ -3,6 +3,7 @@ import { Configuration } from '@neo-one/cli-common';
 import { createDefaultConfigurationJavaScript, createDefaultConfigurationTypeScript } from '@neo-one/cli-common-node';
 import { COMPILER_OPTIONS } from '@neo-one/smart-contract-compiler';
 import { normalizePath } from '@neo-one/utils';
+import { Yarguments } from '@neo-one/utils-node/src';
 import * as fs from 'fs-extra';
 import * as nodePath from 'path';
 import yargs from 'yargs';
@@ -31,8 +32,12 @@ const handleConfig = async (config: Configuration, useJavaScript: boolean) => {
 
 export const command = 'init';
 export const describe = 'Initializes a new project in the current directory.';
-export const builder = (yargsBuilder: typeof yargs) => yargsBuilder;
-export const handler = () => {
+export const builder = (yargsBuilder: typeof yargs) =>
+  yargsBuilder
+    .boolean('react')
+    .describe('react', 'Generate an example react component that uses the HelloWorld smart contract.')
+    .default('react', false);
+export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
   start(async (_cmd, config) => {
     const tsconfigPath = nodePath.resolve(config.contracts.path, 'tsconfig.json');
     const tsconfig = {
@@ -50,6 +55,65 @@ export const handler = () => {
       },
     };
 
+    const helloWorldPath = nodePath.resolve(config.contracts.path, 'HelloWorld.ts');
+    const helloWorldContents = `import { createEventNotifier, SmartContract } from '@neo-one/smart-contract';
+
+const hello = createEventNotifier<string>('hello', 'name');
+
+export class HelloWorld extends SmartContract {
+  public hello(name: string): string {
+    const value = \`Hello \${name}!\`;
+
+    hello(value);
+
+    return value;
+  }
+}
+`;
+
+    const reactPath = nodePath.resolve(
+      config.codegen.path,
+      '..',
+      `ExampleHelloWorld.${config.codegen.language === 'typescript' ? 'tsx' : 'jsx'}`,
+    );
+    const reactContents = `import React, { useCallback, useState } from 'react';
+import { useContracts } from './${nodePath.basename(config.codegen.path)}';
+
+export const ExampleHelloWorld = () => {
+  const { helloWorld } = useContracts();
+  const [name, setName] = useState('World');
+  const [response, setResponse] = useState('Hello World!');
+
+  const onChangeInput = useCallback((event${
+    config.codegen.language === 'typescript' ? ': React.ChangeEvent<HTMLInputElement>' : ''
+  }) => {
+    setName(event.target.value);
+  }, [name]);
+
+  const onSubmit = useCallback(() => {
+    helloWorld.hello.confirmed(name)
+      .then((receipt) => {
+        if (receipt.result.state === 'FAULT') {
+          throw new Error(receipt.result.message);
+        }
+
+        setResponse(receipt.result.value);
+      })
+      .catch((err) => {
+        setResponse(err.name);
+      })
+  }, [name, helloWorld]);
+
+  return (
+    <div>
+      <input type="text" value={name} onChange={onChangeInput}/>
+      <input type="button" value="Submit" onClick={onSubmit}/>
+      <div>{response}</div>
+    </div>
+  );
+}
+`;
+
     const rootTSConfigPath = nodePath.resolve(process.cwd(), 'tsconfig.json');
     const rootTSConfigContents = await fs.readFile(rootTSConfigPath, 'utf8').catch((err) => {
       if (err.code === 'ENOENT') {
@@ -61,7 +125,9 @@ export const handler = () => {
 
     await Promise.all([
       writeFile(tsconfigPath, JSON.stringify(tsconfig, undefined, 2)),
+      writeFile(helloWorldPath, helloWorldContents),
       handleConfig(config, rootTSConfigContents === undefined),
+      argv.react ? writeFile(reactPath, reactContents) : Promise.resolve(),
     ]);
 
     if (rootTSConfigContents) {
@@ -89,5 +155,9 @@ export const handler = () => {
         )}) to the "exclude" section of your root tsconfig.`,
       );
     }
+
+    console.log(
+      'NEO•ONE initialized, run `neo-one build` to deploy the HelloWorld smart contract to a local development network.',
+    );
   });
 };
