@@ -96,8 +96,8 @@ const run = async () => {
   });
 
   const TEN_MINUTES = 10 * 60 * 1000;
-  const THREE_MINUTES = 3 * 60 * 1000;
-  await timer(argv.local ? THREE_MINUTES : TEN_MINUTES).toPromise();
+  const FIVE_MINUTES = 5 * 60 * 1000;
+  await timer(argv.local ? FIVE_MINUTES : TEN_MINUTES).toPromise();
   await runCypress();
 };
 
