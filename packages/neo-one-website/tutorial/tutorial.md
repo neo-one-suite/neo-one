@@ -428,7 +428,7 @@ This section will take a look at how we can integrate the token smart contract i
 Integrating NEO•ONE with your dapp is similar to testing your smart contracts - we simply use the generated helper methods:
 
 ```typescript
-import { createClient, createTokenSmartContract } from './neo-one/';
+import { createClient, createTokenSmartContract } from './neo-one';
 
 const client = createClient();
 const token = createTokenSmartContract(client);
@@ -461,7 +461,7 @@ If you're using Angular to power your dapp, the NEO•ONE toolchain offers a too
 Regardless of the front-end framework you're using, the NEO•ONE Developer Tools contain all of the functionality necessary to control your private network and are simple to integrate:
 
 ```typescript
-import { createClient, createDeveloperClients } from './neo-one/';
+import { createClient, createDeveloperClients } from './neo-one';
 import { DeveloperTools } from '@neo-one/client';
 
 const client = createClient();

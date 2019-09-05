@@ -2,6 +2,7 @@
 slug: calling-smart-contracts
 title: Calling Smart Contracts
 ---
+
 Smart contracts are not very useful in isolation, they typically interact with other smart contracts that make up the building blocks of a larger piece of infrastructure.
 
 ---

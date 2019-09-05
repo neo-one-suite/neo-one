@@ -5,7 +5,7 @@ title: Smart Contract APIs
 
 The generated smart contract client APIs correspond directly with the properties and methods of your smart contract.
 
-The smart contract APIs are created at runtime based on the generated ABI in `one/generated/<ContractName>/abi.ts`. The exact structure of the ABI is not too important, we just need to understand what's happening at a high level. For every public property and method of your smart contract, a corresponding method is created on the smart contract object.
+The smart contract APIs are created at runtime based on the generated ABI in `src/neo-one/<ContractName>/abi.ts`. The exact structure of the ABI is not too important, we just need to understand what's happening at a high level. For every public property and method of your smart contract, a corresponding method is created on the smart contract object.
 
 ---
 
@@ -276,7 +276,7 @@ interface SmartContract<TClient extends Client, TEvent extends Event<string, any
 
 Let's go through each in more detail.
 
-`definition` is simply the `SmartContractDefinition` that generated the smart contract API object. This is the object created by the automatically generated helper method in `one/contracts/<ContractName>/contract.ts`. This is most commonly used to get the current `Address` of the smart contract we're interacting with:
+`definition` is simply the `SmartContractDefinition` that generated the smart contract API object. This is the object created by the automatically generated helper method in `src/neo-one/<ContractName>/contract.ts`. This is most commonly used to get the current `Address` of the smart contract we're interacting with:
 
 ```typescript
 const network = client.getCurrentNetwork();

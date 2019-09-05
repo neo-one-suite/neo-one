@@ -2,6 +2,7 @@
 slug: blockchain-basics
 title: Blockchain Basics
 ---
+
 Blockchain can be a complex concept, but this chapter should help distill down the most important parts required to become an effective dapp developer.
 
 We'll take a look at some of the foundational technologies of blockchain and learn how they each contribute to the larger picture. If you feel like you already have a strong grasp of blockchain fundamentals and just want to learn about NEO blockchain specifics, feel free to skip to the NEO Specifics section.
@@ -14,7 +15,7 @@ We'll take a look at some of the foundational technologies of blockchain and lea
 
 ## Peer to Peer Network
 
-Blockchain is a large peer to peer network, which means that there is no centralized server or authority. We typically refer to a peer in a blockchain network as a **node**. Each node is equal, though in some blockchains certain nodes have more responsibilities than others by taking on a specific role within the network ecosystem, such as that of a block producing node (sometimes called a miner). Some nodes are referred to as a full node which means they hold a copy of the entire blockchain on a single device. This adds resiliency to the network, as long as a single full node exists with a full copy of the blockchain, the network can be rebuilt. This is one of the key advantages to blockchain compared to traditional client-server models; there is no central point of failure, making it far less vulnerable to being exploited or lost. There is no central or dominant authority and no single party can control the network for their own gain. Blockchain networks are therefore both *distributed* and *decentralized*.
+Blockchain is a large peer to peer network, which means that there is no centralized server or authority. We typically refer to a peer in a blockchain network as a **node**. Each node is equal, though in some blockchains certain nodes have more responsibilities than others by taking on a specific role within the network ecosystem, such as that of a block producing node (sometimes called a miner). Some nodes are referred to as a full node which means they hold a copy of the entire blockchain on a single device. This adds resiliency to the network, as long as a single full node exists with a full copy of the blockchain, the network can be rebuilt. This is one of the key advantages to blockchain compared to traditional client-server models; there is no central point of failure, making it far less vulnerable to being exploited or lost. There is no central or dominant authority and no single party can control the network for their own gain. Blockchain networks are therefore both _distributed_ and _decentralized_.
 
 ---
 
@@ -36,10 +37,10 @@ The public key is typically referred to as the address of a user. In some blockc
 
 A hash function takes an input of any length and uses a mathematical algorithm to produce a fixed length output. Cryptographic hashing takes this one step further by making the hash cryptographically secure. In summary, a cryptographic hash function has several qualities:
 
-  1. Impossible to produce the same hash value from different inputs.
-  2. The same input will always produce the same hash value.
-  3. Computationally inexpensive to produce a hash value.
-  4. Impossible to determine the input based on the hash value.
+1. Impossible to produce the same hash value from different inputs.
+2. The same input will always produce the same hash value.
+3. Computationally inexpensive to produce a hash value.
+4. Impossible to determine the input based on the hash value.
 
 Another way to think about hashing is that it produces a unique digital fingerprint of the input. In blockchain, we see hashes everywhere. Transaction hashes are produced by hashing the contents of the transaction and are often referred to as the transaction id or TXID. Block hashes are produced by hashing the contents of the block.
 
@@ -51,10 +52,10 @@ Blockchain at it's core is just a data structure. It's a linked list of blocks w
 
 In addition to the hash of the previous block, block's contain:
 
-  1. Root of the transaction hash tree (Merkle Tree).
-  2. Timestamp at which the block was produced.
-  3. Index of the block within the blockchain
-  4. Transactions (not included in the hash, instead the root of Merkle Tree is included)
+1. Root of the transaction hash tree (Merkle Tree).
+2. Timestamp at which the block was produced.
+3. Index of the block within the blockchain
+4. Transactions (not included in the hash, instead the root of Merkle Tree is included)
 
 ::: warning
 
@@ -84,10 +85,10 @@ NEO's blockchain data structure is very similar to other blockchains and the gen
 
 One differentiating factor to be aware of is that NEO has several different types of transactions that can be included in a block; we'll list the most important ones below:
 
-  1. `ContractTransaction` - Used for transferring native assets. May only contain inputs and outputs.
-  2. `InvocationTransaction` - Used for invoking smart contracts. May contain inputs and outputs.
-  3. `ClaimTransaction` - Used for claiming accrued GAS
+1. `ContractTransaction` - Used for transferring native assets. May only contain inputs and outputs.
+2. `InvocationTransaction` - Used for invoking smart contracts. May contain inputs and outputs.
+3. `ClaimTransaction` - Used for claiming accrued GAS
 
-Take a look at the [@neo-one/client](/docs/client) reference for more details on the specific properties stored on each transaction type. Note the final transaction in that list, the `ClaimTransaction`, refers to claiming GAS. GAS is produced every block and allocated to every NEO holder in proportion to their holdings. NEO holders claim their GAS by submitting a `ClaimTransaction` to the network. GAS is used to "fuel" the network; it's used primarily for transaction fees and is also meant as the primary currency. NEO, on the other hand, is meant to represent ownership of the network and is used only for voting and generating GAS.
+Take a look at the [@neo-one/client](/reference/@neo-one/client) reference for more details on the specific properties stored on each transaction type. Note the final transaction in that list, the `ClaimTransaction`, refers to claiming GAS. GAS is produced every block and allocated to every NEO holder in proportion to their holdings. NEO holders claim their GAS by submitting a `ClaimTransaction` to the network. GAS is used to "fuel" the network; it's used primarily for transaction fees and is also meant as the primary currency. NEO, on the other hand, is meant to represent ownership of the network and is used only for voting and generating GAS.
 
 NEO uses a form of dPOS called Delegated Byzantine Fault Tolerance (dBFT). While we won't go into detail on the algorithm, the key differentiator of dBFT is that it results in one block finality. Once a block has been propagated on the network it cannot be reversed. Contrast this with most blockchain consensus algorithms which can have anywhere from 6 blocks to 40 or more block finality. NEO holders vote in consensus nodes which participate in producing new blocks via dBFT.

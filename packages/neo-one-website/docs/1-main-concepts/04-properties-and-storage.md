@@ -2,6 +2,7 @@
 slug: properties-and-storage
 title: Properties and Storage
 ---
+
 NEO•ONE stores persistent data in the class properties of the smart contract.
 
 ---
@@ -74,5 +75,4 @@ export class Contract extends SmartContract {
 }
 ```
 
-We'll learn more about event notifiers in a later chaper of the guide.
-
+We'll learn more about event notifiers in a later chapter of the guide.

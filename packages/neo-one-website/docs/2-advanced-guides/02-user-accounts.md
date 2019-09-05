@@ -2,6 +2,7 @@
 slug: user-accounts
 title: User Accounts
 ---
+
 NEO•ONE client APIs revolve around the concept of user accounts which represent a single address controlled by the user of the dapp.
 
 The `Client` class is an abstraction layer over `UserAccountProvider`s which implement the core logic. By using the `Client` class and the generated smart contract APIs throughout your dapp, you can ensure that your business logic is independent of the underlying `UserAccountProvider`s.
@@ -47,7 +48,7 @@ const getUserAccountProviders = (provider: NEOONEProvider) => {
   });
 
   return { dapp, extension, other, memory };
-}
+};
 
 const client = createClient(getUserAccountProviders);
 ```

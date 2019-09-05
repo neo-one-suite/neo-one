@@ -15,7 +15,7 @@ This can be useful for local debugging and if you would like to make your own co
 
 ## Requirements
 
-- [Node](https://nodejs.org) >= 8.16.0 (We recommend the latest version)
+- [Node](https://nodejs.org) >= 10.16.0 (We recommend the latest version)
   - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
   - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
 - [Yarn](https://yarnpkg.com/) (recommended)

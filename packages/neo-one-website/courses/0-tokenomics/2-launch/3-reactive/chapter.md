@@ -10,7 +10,7 @@ Up until this point we've mainly interacted with the automatically generated sma
 
 The `Client` class abstracts interaction with the blockchain using `UserAccount`s which are uniquely identified by a `UserAccountID` - a network (e.g. main network, test network, local network) and a NEO address. During initialization of your dapp you'll configure a `Client` with various `UserAccountProvider`s that serve to provide `UserAccount`s to the `Client`. For example, you might configure a `LocalUserAccountProvider` if you've implemented a full wallet in your dapp, though more commonly you would configure a `UserAccountProvider` that works with an existing wallet like NEO Tracker, nOS or NEX. By using the `Client` abstraction (also used by the generated smart contract APIs) throughout your dapp you can easily switch between and use different providers without changing a single line of your business logic.
 
-Once configured, the `Client` instance serves as the entrypoint for interacting with and reading from the NEO blockchain beyond interacting with your smart contract. In this chapter, we'll focus on reacting to changes in the blockchain, but you can take a look at the [documentation](/docs/client) on the `Client` APIs for a full description of what's available.
+Once configured, the `Client` instance serves as the entrypoint for interacting with and reading from the NEO blockchain beyond interacting with your smart contract. In this chapter, we'll focus on reacting to changes in the blockchain, but you can take a look at the [reference](/reference/@neo-one/client) on the `Client` APIs for a full description of what's available.
 
 The two most commonly used properties of the `Client` are the `block$` `Observable` and the `currentUserAccount$` `Observable`. By subscribing to the `block$` `Observable` we can easily update the UI in response to new blocks created on the blockchain. By subscribing to the `currentUserAccount$` `Observable` we have access to the currently selected account, regardless of which provider it's associated with.
 
@@ -36,7 +36,7 @@ const value$ = combineLatest(client.currentUserAccount$, client.block$).pipe(
     const value = await example.myConstantFunction(userAccount.id.address);
 
     return value;
-  })
+  }),
 );
 ```
 
@@ -45,16 +45,14 @@ Here we have a simple smart contract that returns a `Fixed<8>` value for a given
 Because using `Observable`s to reactively update a UI is a very common pattern in developing dapps, NEO•ONE offers a React component, `FromStream`, which helps simplify integrating with React. Using the above stream for example, we could reactively update a UI with the following:
 
 ```tsx
-<FromStream createStream={() => value$}>
-  {(value) => <div>{value}</div>}
-</FromStream>
+<FromStream createStream={() => value$}>{(value) => <div>{value}</div>}</FromStream>
 ```
 
 Now whenever the `value$` `Observable` from the above example emits a new `value`, the UI will automatically update with that value.
 
 ## Instructions
 
-  1. Implement the `createTokenInfoStream$` method. This method should return an `Observable` that calls the `getTokenInfo` function similar to the above examples, i.e. whenever the current user account changes or a new block comes in.
+1. Implement the `createTokenInfoStream$` method. This method should return an `Observable` that calls the `getTokenInfo` function similar to the above examples, i.e. whenever the current user account changes or a new block comes in.
 
 Remember, if you get stuck, you can click `Show Solution` to see the solution. If this is your first time working with `Observable`s they may seem a bit mysterious, but over time you'll add common patterns for using them to your toolbelt.
 
@@ -64,7 +62,7 @@ Once you've implemented the `createTokenInfoStream$` function correctly, try par
 
 The tests verify the stream by checking the emitted values update reactively to contributions.
 
-Before heading to the next chapter, take a look at how the `ICO` component (in `ICO.tsx`) uses the `FromStream` component we mentioned earlier to reactively update the UI in a very succint way. You'll also see how we're getting the `token` smart contract and `client` values - through the `WithContracts` component. This is a component that automatically wires up a React application to allow easy access to the functionality you need to interact with your dapp. Learn more about the React integration in the [documentation](/docs/react). Writing your app in Angular or Vue?  No problem! Check out our [Angular](/docs/angular) or [Vue](/docs/vue) advanced guides to learn about to tools we provide.
+Before heading to the next chapter, take a look at how the `ICO` component (in `ICO.tsx`) uses the `FromStream` component we mentioned earlier to reactively update the UI in a very succint way. You'll also see how we're getting the `token` smart contract and `client` values - through the `WithContracts` component. This is a component that automatically wires up a React application to allow easy access to the functionality you need to interact with your dapp. Learn more about the React integration in the [documentation](/docs/react). Writing your app in Angular or Vue? No problem! Check out our [Angular](/docs/angular) or [Vue](/docs/vue) advanced guides to learn about to tools we provide.
 
 ## Wrap Up
 

@@ -2,9 +2,10 @@
 slug: getting-started
 title: Getting Started
 ---
+
 This page is an overview of the NEO•ONE documentation and related resources.
 
-__NEO•ONE__ makes coding, testing and deploying NEO dapps easy, fast, efficient and enjoyable.
+**NEO•ONE** makes coding, testing and deploying NEO dapps easy, fast, efficient and enjoyable.
 
 ---
 
@@ -20,7 +21,7 @@ The links in this section will help you get started.
 
 ### Courses
 
-If you're interested in playing around with NEO•ONE or you prefer to __learn by doing__, check out [NEO•ONE Courses](/course). As you work through the first two lessons you'll experience the entire development lifecycle of a dapp by deploying a fully functioning ICO, from the smart contract that powers it all to the UI that enables participation. All directly from your browser - no environment setup required.
+If you're interested in playing around with NEO•ONE or you prefer to **learn by doing**, check out [NEO•ONE Courses](/course). As you work through the first two lessons you'll experience the entire development lifecycle of a dapp by deploying a fully functioning ICO, from the smart contract that powers it all to the UI that enables participation. All directly from your browser - no environment setup required.
 
 ### Tutorial
 
@@ -60,7 +61,7 @@ Once you're comfortable with the main concepts and have built some simple dapps 
 
 ### API Reference
 
-This documentation section is useful for learning about specific details of the NEO•ONE API. For example, the [@neo-one/smart-contract API reference](/docs/smart-contract) can provide details on the APIs available for smart contracts.
+This documentation section is useful for learning about specific details of the NEO•ONE API. For example, the [@neo-one/smart-contract API reference](/reference/@neo-one/smart-contract) can provide details on the APIs available for smart contracts.
 
 ---
 

@@ -2,6 +2,7 @@
 slug: forward-values
 title: Forward Values
 ---
+
 Forward values allow advanced interactivity between smart contracts, enabling use-cases that would not normally be possible.
 
 ---
@@ -16,23 +17,14 @@ Before we dive into the specifics, let's look at an example of how forward value
 
 ```typescript
 interface TokenPayableContract {
-  readonly approveReceiveTransfer: (
-    from: Address,
-    value: Fixed<8>,
-    ...args: ForwardValue[]
-  ) => boolean;
+  readonly approveReceiveTransfer: (from: Address, value: Fixed<8>, ...args: ForwardValue[]) => boolean;
 }
 
 export class Token extends SmartContract {
   // Note that the implementation here is only to show how we
   // can use forward values and is an incomplete implementation of a
   // Token transfer method.
-  public transfer(
-    from: Address,
-    to: Address,
-    value: Fixed<8>,
-    ...args: ForwardValue[]
-  ): boolean {
+  public transfer(from: Address, to: Address, value: Fixed<8>, ...args: ForwardValue[]): boolean {
     const contract = Contract.for(to);
     if (contract !== undefined) {
       const payableContract = SmartContract.for<TokenPayableContract>(to);
@@ -65,11 +57,7 @@ The counterpart to `ForwardValue` is the tagged type `ForwardedValue<T>`. `Forwa
 
 ```typescript
 export class Escrow extends SmartContract {
-  public approveReceiveTransfer(
-    from: Address,
-    value: Fixed<8>,
-    to: ForwardedValue<Address>,
-  ): boolean {
+  public approveReceiveTransfer(from: Address, value: Fixed<8>, to: ForwardedValue<Address>): boolean {
     // Update the escrow account for [from, to] with value
     return true;
   }
@@ -83,7 +71,7 @@ const receipt = await token.transfer.confirmed(
   from,
   escrow.definition.networks[networkName].address,
   value,
-  ...escrow.forwardApproveReceiveTransferArgs(to)
+  ...escrow.forwardApproveReceiveTransferArgs(to),
 );
 ```
 
@@ -96,10 +84,7 @@ const receipt = await token.transfer.confirmed(
   from,
   escrow.definition.networks[networkName].address,
   value,
-  ...escrow.forwardApproveReceiveTransferArgs(
-    to,
-    ...foo.forwardBarArgs('value')
-  )
+  ...escrow.forwardApproveReceiveTransferArgs(to, ...foo.forwardBarArgs('value')),
 );
 ```
 

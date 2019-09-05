@@ -2,6 +2,7 @@
 slug: vue
 title: Vue
 ---
+
 NEO•ONE has integration with Vue applications.
 
 Integrating NEO•ONE with Vue is a breeze using the generated NEO•ONE client APIs.
@@ -28,7 +29,7 @@ The `contractsService` is a singleton which provides access to all of the genera
 </template>
 
 <script lang="ts">
-import { contractsService } from '../one/generated';
+import { contractsService } from './neo-one';
 import Vue from 'vue';
 
 export default Vue.extend({
@@ -45,7 +46,7 @@ export default Vue.extend({
 </script>
 ```
 
-The `contractsService` makes responding to updates in the blockchain easy by providing access to observables.  Here's how you might use the `contractsService` to build a simple Vue component to update the current block count.
+The `contractsService` makes responding to updates in the blockchain easy by providing access to observables. Here's how you might use the `contractsService` to build a simple Vue component to update the current block count.
 
 ```typescript
 <template>
@@ -55,7 +56,7 @@ The `contractsService` makes responding to updates in the blockchain easy by pro
 </template>
 
 <script lang="ts">
-import { contractsService } from '../one/generated';
+import { contractsService } from './neo-one';
 import Vue from 'vue';
 
 export default Vue.extend({

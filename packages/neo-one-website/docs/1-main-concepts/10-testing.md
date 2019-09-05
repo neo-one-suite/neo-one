@@ -2,6 +2,7 @@
 slug: testing
 title: Testing
 ---
+
 Use your favorite unit test framework to test smart contracts using the NEO•ONE client APIs.
 
 ---
@@ -35,7 +36,7 @@ describe('Token', () => {
 });
 ```
 
-By convention, smart contract tests are located in `one/tests`, but you can place them wherever you'd like.
+By convention, smart contract tests are located in `src/__tests__`, but you can place them wherever you'd like.
 
 ::: warning
 
@@ -148,11 +149,13 @@ describe('Token', () => {
 
 `DeveloperClient` is a class that is configured to point at a local development network. This class provides methods that are useful during testing:
 
-  - `runConsensusNow(): Promise<void>` - trigger consensus to run immediately.
-  - `fastForwardOffset(seconds: number): Promise<void>` - fast forward the local network by `seconds` into the future. Use this method to test time-dependent smart contracts.
-  - `fastForwardToTime(seconds: number): Promise<void>` - fast forward to a particular unix timestamp in the future.
-  - `reset(): Promise<void>` - reset the local network to it's initial state starting at the genesis block.
-  - `updateSettings(options: Partial<PrivateNetworkSettings>): Promise<void>` - update settings for the private network. Currently only has a property for controlling the seconds per block.
+- `runConsensusNow(): Promise<void>` - trigger consensus to run immediately.
+- `fastForwardOffset(seconds: number): Promise<void>` - fast forward the local network by `seconds` into the future. Use this method to test time-dependent smart contracts.
+- `fastForwardToTime(seconds: number): Promise<void>` - fast forward to a particular unix timestamp in the future.
+- `reset(): Promise<void>` - reset the local network to it's initial state starting at the genesis block.
+- `getSettings(): Promise<PrivateNetworkSettings>` - Get the current settings of the private network.
+- `updateSettings(options: Partial<PrivateNetworkSettings>): Promise<void>` - update settings for the private network. Currently only has a property for controlling the seconds per block.
+- `getNEOTrackerURL(): Promise<string | undefined>` - fetches the NEO tracker URL for the project.
 
 Putting it all together, we might test a time dependent ICO contract like so:
 
@@ -165,10 +168,12 @@ describe('Token', () => {
 
       // Verify that we can participate in the ICO
       const receipt = await token.mintTokens.confirmed({
-        sendTo: [{
-          asset: Hash256.NEO,
-          amount: new BigNumber(10),
-        }],
+        sendTo: [
+          {
+            asset: Hash256.NEO,
+            amount: new BigNumber(10),
+          },
+        ],
       });
       if (receipt.result.state === 'FAULT') {
         throw new Error(receipt.result.message);
@@ -183,10 +188,12 @@ describe('Token', () => {
       let error: Error | undefined;
       try {
         await token.mintTokens.confirmed({
-          sendTo: [{
-            asset: Hash256.NEO,
-            amount: new BigNumber(10),
-          }],
+          sendTo: [
+            {
+              asset: Hash256.NEO,
+              amount: new BigNumber(10),
+            },
+          ],
         });
       } catch (err) {
         error = err;

@@ -22,9 +22,7 @@ If you are unfamiliar with Docker or do not have a version installed locally vis
 
 ## Getting Started
 
-[![Docker Repository on Quay](https://quay.io/repository/neoone/node/status 'Docker Repository on Quay')](https://quay.io/repository/neoone/node)
-
-NEO•ONE pushes a new node image every time a new version is published.
+NEO•ONE pushes a new node image to [dockerhub](https://hub.docker.com/r/neoonesuite/node) every time a new version is published.
 
 After you have installed Docker, run the following in a terminal:
 

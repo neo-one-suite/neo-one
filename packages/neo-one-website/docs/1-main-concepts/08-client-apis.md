@@ -110,18 +110,17 @@ The output directory for generated files is configurable. You can also change th
 
 For each contract, the toolchain will emit 3 files:
 
-- `one/generated/<ContractName>/abi.ts` - Contains the ABI that generates the client smart contract APIs at runtime that we'll discuss in the next chapter.
-- `one/generated/<ContractName>/contract.ts` - Contains the smart contract definition, which contains the ABI, the source maps for the contract and a mapping from network name to deployed address for the smart contract. Initially the network mapping will only contain the `local` network which represents your local development network. Once you deploy your smart contract to the TestNet or MainNet, it will also contain deployed contract addresses for those networks. The client APIs automatically choose which address to work with based on the network of the user account that is initiating the request. This file also contains a helper function for creating the smart contract APIs given a `Client`.
-- `one/generated/<ContractName>/types.ts` - Contains the TypeScript type definitions for the smart contract client APIs.
+- `src/neo-one/<ContractName>/abi.ts` - Contains the ABI that generates the client smart contract APIs at runtime that we'll discuss in the next chapter.
+- `src/neo-one/<ContractName>/contract.ts` - Contains the smart contract definition, which contains the ABI, the source maps for the contract and a mapping from network name to deployed address for the smart contract. Initially the network mapping will only contain the `local` network which represents your local development network. Once you deploy your smart contract to the TestNet or MainNet, it will also contain deployed contract addresses for those networks. The client APIs automatically choose which address to work with based on the network of the user account that is initiating the request. This file also contains a helper function for creating the smart contract APIs given a `Client`.
+- `src/neo-one/<ContractName>/types.ts` - Contains the TypeScript type definitions for the smart contract client APIs.
 
-6 files will also be emitted that are common to all of your smart contracts:
+5 files will also be emitted that are common to all of your smart contracts:
 
-- `one/generated/client.ts` - Contains helper functions for creating a fully configured `Client`. The `Client` is also configured automatically for local development with 11 user accounts that each have varying amounts of NEO and GAS. Additionally contains helper functions for creating `DeveloperClient`s and `LocalClient`s which can be used to control your local development environment. These are generally passed on to the NEO•ONE Developer Tools which we'll talk about in a later chapter.
-- `one/generated/projectID.ts` - This contains a unique identifier for your project. The NEO•ONE toolchain stores some of the information it needs locally on your machine referenced by this project identifier. This information should not be checked in, however we need to be able to associate it with a given project, hence we have the `projectID`.
-- `one/generated/react.tsx` - Contains two react components, that when used together allow you to easily access all of the tools you need to write a dapp with React throughout your component tree. Read more in the [React](/docs/react) advanced guide. We also provide similar tools for apps written in [Angular](/docs/angular) or [Vue](/docs/vue)!
-- `one/generated/sourceMaps.ts` - Contains all of the smart contract source maps. These source maps are not included in the production build in order to reduce the bundle size.
-- `one/generated/test.ts` - Contains the `withContracts` test helper. We'll learn more about this helper in the following chapters.
-- `one/generated/contracts.ts` - Contains the `Contracts` type whose properties are the smart contract APIs for your dapp.
+- `src/neo-one/client.ts` - Contains helper functions for creating a fully configured `Client`. The `Client` is also configured automatically for local development with 11 user accounts that each have varying amounts of NEO and GAS. Additionally contains helper functions for creating `DeveloperClient`s which can be used to control your local development environment. These are generally passed on to the NEO•ONE Developer Tools which we'll talk about in a later chapter.
+- `src/neo-one/react.tsx` - Contains two react components, that when used together allow you to easily access all of the tools you need to write a dapp with React throughout your component tree. Read more in the [React](/docs/react) advanced guide. We also provide similar tools for apps written in [Angular](/docs/angular) or [Vue](/docs/vue)!
+- `src/neo-one/sourceMaps.ts` - Contains all of the smart contract source maps. These source maps are not included in the production build in order to reduce the bundle size.
+- `src/neo-one/test.ts` - Contains the `withContracts` test helper. We'll learn more about this helper in the following chapters.
+- `src/neo-one/contracts.ts` - Contains the `Contracts` type whose properties are the smart contract APIs for your dapp.
 
 ---
 
@@ -130,7 +129,7 @@ For each contract, the toolchain will emit 3 files:
 Integrating the NEO•ONE client APIs in a vanilla JavaScript or TypeScript application is very simple - assuming we have a contract called `Token` and we're in the `src/index.ts` file using the default NEO•ONE toolchain paths:
 
 ```typescript
-import { createClient, createTokenSmartContract } from '../one/generated';
+import { createClient, createTokenSmartContract } from './neo-one';
 
 const client = createClient();
 const token = createTokenSmartContract(client);
@@ -152,6 +151,6 @@ As you prepare your dapp for production, you'll likely want to configure additio
 
 `@neo-one/client` exports many utility functions for working with private keys, addresses, public keys and script hashes:
 
-- The most common come in the form of conversion functions: `<fromFormat>To<toFormat>`, for example, `privateKeyToAddress`. See the full list in the [@neo-one/client](/docs/client) reference.
+- The most common come in the form of conversion functions: `<fromFormat>To<toFormat>`, for example, `privateKeyToAddress`. See the full list in the [@neo-one/client](/reference/@neo-one/client) reference.
 - `createPrivateKey` returns a new private key.
 - `decryptNEP2`, `encryptNEP2` and `isNEP2` implement [NEP-2](https://github.com/neo-project/proposals/blob/master/nep-2.mediawiki)
