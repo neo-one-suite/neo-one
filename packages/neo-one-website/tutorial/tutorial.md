@@ -20,9 +20,9 @@ This tutorial is designed for people who prefer to learn by doing. If you prefer
 
 The tutorial is divided into 3 sections:
 
-  1. [Setup](/tutorial#Setup) will give you a **starting point** to follow the tutorial.
-  2. [Create a Token](/tutorial#Create-a-Token) will teach you the **fundamentals** of NEO•ONE smart contract development.
-  3. [DApps](/tutorial#DApps) will cover how to **integrate** NEO•ONE into your DApps.
+1. [Setup](/tutorial#Setup) will give you a **starting point** to follow the tutorial.
+2. [Create a Token](/tutorial#Create-a-Token) will teach you the **fundamentals** of NEO•ONE smart contract development.
+3. [DApps](/tutorial#DApps) will cover how to **integrate** NEO•ONE into your DApps.
 
 While each section follows from the previous, you don't have to complete the entire tutorial to get value out of it. We'll cover a broad range of topics, so don't feel the need to try to complete the tutorial all in one sitting.
 
@@ -50,16 +50,23 @@ This tutorial assumes you'll be working with a local development environment. **
 
 Here's how to setup your local development environment:
 
-1. Install [Node](https://nodejs.org) >= 8.16.0 (We recommend the latest version)
-  - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
-  - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
+1. Install [Node](https://nodejs.org) >= 10.16.0 (We recommend the latest version)
+
+- Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
+- Windows: We recommend using [Chocolatey](https://chocolatey.org/).
+
 2. Follow the [installation instructions for Create React App](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to make a new project.
-  - Be sure to invoke Create React App with the `--typescript` flag in order to enable TypeScript support: `npx create-react-app token --typescript`
+
+- Be sure to invoke Create React App with the `--typescript` flag in order to enable TypeScript support: `npx create-react-app token --typescript`
+
 3. Install NEO•ONE using either [yarn](https://yarnpkg.com/)
+
 ```bash
 yarn add @neo-one/suite
-````
+```
+
 or [npm](https://www.npmjs.com/)
+
 ```bash
 npm install @neo-one/suite
 ```
@@ -67,26 +74,20 @@ npm install @neo-one/suite
 alternatively, install the individual packages `@neo-one/suite` wraps for you:
 
 ```bash
-yarn add @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-typescript-plugin
+yarn add @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
 ```
+
 ```bash
-npm install @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-typescript-plugin
+npm install @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-contract-test @neo-one/smart-contract-lib @neo-one/smart-contract-typescript-plugin
 ```
 
 4. Run `yarn neo-one init` or `npx neo-one init`
 
-We recommend taking a moment to [setup your editor](/docs/environment-setup#Editor-Setup) to take advantage of inline NEO•ONE compiler diagnostics.
+This command initializes a NEO•ONE project with a `Hello World` smart contract under `neo-one/contracts/HellowWorld.ts`, a unit test under `src/__tests__/HelloWorld.test.ts`, and a config file,`.neo-one.config.ts`. For this tutorial, we will be building a `Token` from the ground up, so you can go ahead and delete the two `HelloWorld` files. We also recommend taking a moment to [setup your editor](/docs/environment-setup#Editor-Setup) to take advantage of inline NEO•ONE compiler diagnostics.
 
-5. Review the available [configuration options](/docs/config-options) and update your `.onerc` file as needed.
-* To follow along with the tutorial your configuration should look like:
-```json
-{
-  "codegen": {
-    "language": "typescript",
-    "framework": "react",
-  }
-}
-```
+5. Review the available [configuration options](/docs/config-options) and update your `.neo-one.config.ts` file as needed.
+
+- This tutorial uses the default options. To follow along, nothing needs to be changed.
 
 ### Help, I'm Stuck!
 
@@ -100,7 +101,7 @@ Now that you're all setup, let's get started!
 
 ### Basic Smart Contract
 
-Every NEO•ONE smart contract starts with a TypeScript source file that exports a single [class](https://www.typescriptlang.org/docs/handbook/classes.html) extending `SmartContract`. So we'll start by creating the file `one/contracts/Token.ts` with the following:
+Every NEO•ONE smart contract starts with a TypeScript source file that exports a single [class](https://www.typescriptlang.org/docs/handbook/classes.html) extending `SmartContract`. So we'll start by creating the file `neo-one/contracts/Token.ts` with the following:
 
 ```typescript
 import { SmartContract } from '@neo-one/smart-contract';
@@ -118,23 +119,23 @@ For brevity, from here on we will not include the `import` statement for smart c
 
 This smart contract doesn't do a whole lot, in fact it does nothing, but this is the smallest compilable smart contract. Let's go ahead and build it to familiarize ourself with the NEO•ONE toolchain by running `yarn neo-one build`. This command will:
 
-  1. Start up a local private NEO network (if one has not already been started).
-  2. Setup wallets for testing with various amounts of NEO and GAS.
-  3. Compile the project's smart contracts
-  4. Deploy the smart contracts to the private NEO network.
-  5. Generate code for use in your decentralized app.
+1. Start up a local private NEO network (if one has not already been started).
+2. Setup wallets for testing with various amounts of NEO and GAS.
+3. Compile the project's smart contracts
+4. Deploy the smart contracts to the private NEO network.
+5. Generate code for use in your decentralized app.
 
 Additionally, you may run `yarn neo-one build` OR `npx neo-one build` with the `--reset` flag to reset the network. Running with `--watch` will execute the above process whenever you make a change to your smart contracts.
 
 ### Testing
 
-Throughout the tutorial we'll write tests for each piece of smart contract functionality. Run the tests using `yarn test` OR `npm test`. It's convention to put smart contract tests under `one/tests`, e.g. `one/tests/Token.test.ts`, however for this tutorial we'll put the tests under `src/__tests__/contracts` so that Jest will automatically pick them up without additional configuration. Create a new file `src/__tests__/contracts/Token.test.ts` and add the following:
+Throughout the tutorial we'll write tests for each piece of smart contract functionality. Run the tests using `yarn test` OR `npm test`. It's convention to put smart contract tests under `src/__tests__/`, e.g. `src/__tests__/Token.test.ts`. This way, jest will automatically pick up the tests without any additional configuration. Create a new file `src/__tests__/Token.test.ts` and add the following:
 
 ```typescript
 /**
  * @jest-environment node
  */
-import { withContracts } from '../../../one/generated/test';
+import { withContracts } from '../neo-one/test';
 
 describe('Token', () => {
   test('exists', async () => {
@@ -175,15 +176,7 @@ Now we'll want to test that we can access these properties and they have the exp
 
 ```typescript
 await withContracts(async ({ token }) => {
-  const [
-    name,
-    symbol,
-    decimals,
-  ] = await Promise.all([
-    token.name(),
-    token.symbol(),
-    token.decimals(),
-  ]);
+  const [name, symbol, decimals] = await Promise.all([token.name(), token.symbol(), token.decimals()]);
   expect(name).toEqual('Eon');
   expect(symbol).toEqual('EON');
   expect(decimals.toNumber()).toEqual(8);
@@ -239,13 +232,7 @@ We've added a [getter](https://www.typescriptlang.org/docs/handbook/classes.html
 
 ```typescript
 await withContracts(async ({ token, accountIDs }) => {
-  const [
-    totalSupply,
-    balance,
-  ] = await Promise.all([
-    token.totalSupply(),
-    token.balanceOf(accountIDs[0].address),
-  ]);
+  const [totalSupply, balance] = await Promise.all([token.totalSupply(), token.balanceOf(accountIDs[0].address)]);
   expect(totalSupply.toNumber()).toEqual(0);
   expect(balance.toNumber()).toEqual(0);
 });
@@ -274,7 +261,6 @@ Here we've defined a constructor that takes one argument, an `Address` [paramete
 `Address.isCaller` allows you to determine if the provided `Address` invoked this contract. In this example, we do a sanity check that the `owner` is the one who deployed the smart contract, which eliminates the possibility of accidentally setting the `owner` to an address that the publisher of the smart contract doesn't own.
 
 Since the `withContracts` helper already automatically deploys our contract, we don't need to add anything more to the tests to verify the constructor works as expected.
-
 
 ### Methods
 
@@ -362,9 +348,14 @@ export class Token extends SmartContract {
 
 Notice that we access the current transaction using `Blockchain.currentTransaction`. The transaction itself has many useful properties, but for now we are only interested in the `references` and `outputs` properties. The `outputs` defines the destination addresses and amounts for native assets. A reference is the corresponding `output` for the `input`s of the transaction.
 
-Now that we can mint tokens, let's see how we can test both `transfer` and `mintTokens`:
+Now that we can mint tokens, let's see how we can test both `transfer` and `mintTokens`. Note that any NEO•ONE types necessary in your tests should be imported from `@neo-one/client`:
 
 ```typescript
+import { Hash256 } from '@neo-one/client';
+import BigNumber from 'bignumber.js';
+
+...
+
 await withContracts(async ({ token, accountIDs }) => {
   // We'll use this account for minting because it starts with 10 NEO in it
   const accountID = accountIDs[2];
@@ -372,10 +363,12 @@ await withContracts(async ({ token, accountIDs }) => {
 
   // Mint the tokens and verify the transaction succeeds
   const mintTokensResult = await token.mintTokens({
-    sendTo: [{
-      amount,
-      asset: Hash256.NEO,
-    }],
+    sendTo: [
+      {
+        amount,
+        asset: Hash256.NEO,
+      },
+    ],
     from: accountID,
   });
   const mintTokensReceipt = await mintTokensResult.confirmed();
@@ -385,22 +378,16 @@ await withContracts(async ({ token, accountIDs }) => {
   expect(mintTokensReceipt.result.value).toBeUndefined();
 
   // Check that balance and total supply were updated appropriately
-  const [balance, totalSupply] = await Promise.all([
-    token.balanceOf(accountID.address),
-    token.totalSupply(),
-  ])
+  const [balance, totalSupply] = await Promise.all([token.balanceOf(accountID.address), token.totalSupply()]);
   expect(balance.toNumber()).toEqual(amount.toNumber());
   expect(totalSupply.toNumber()).toEqual(amount.toNumber());
 
   // Attempt a transfer
   const toAccountID = accountIDs[1];
   const transferAmount = new BigNumber(3);
-  const transferReceipt = await token.transfer.confirmed(
-    accountID.address,
-    toAccountID.address,
-    transferAmount,
-    { from: accountID },
-  );
+  const transferReceipt = await token.transfer.confirmed(accountID.address, toAccountID.address, transferAmount, {
+    from: accountID,
+  });
   if (transferReceipt.result.state === 'FAULT') {
     throw new Error(transferReceipt.result.message);
   }
@@ -411,7 +398,7 @@ await withContracts(async ({ token, accountIDs }) => {
     token.balanceOf(accountID.address),
     token.balanceOf(toAccountID.address),
     token.totalSupply(),
-  ])
+  ]);
   expect(fromBalance.toNumber()).toEqual(amount.minus(transferAmount).toNumber());
   expect(toBalance.toNumber()).toEqual(transferAmount.toNumber());
   expect(afterTotalSupply.toNumber()).toEqual(amount.toNumber());
@@ -422,7 +409,7 @@ Phew, quite a bit, but we're testing a lot of functionality here. Recall that we
 
 First, invoke the smart contract method which will return a `Promise<TransactionResult>`. The `TransactionResult` object contains two properties, `transaction` which is the full transaction object that was relayed to the network, and `confirmed` which is a function we can call to wait for the transaction to be confirmed.
 
-Second, call `confirmed` which returns a `Promise<InvokeReceipt>`. This `InvokeReceipt` contains many useful properties, like the `event`s that were emitted during execution as well as the final `result` of the smart contract. To learn more, take a look at the detailed [documentation](/docs/smart-contract-apis#methods) on invoking smart contract methods. Methods marked with `@receive` also take an additional argument for the native assets to send with the invocation.
+Second, call `confirmed` which returns a `Promise<InvokeReceipt>`. This `InvokeReceipt` contains many useful properties, like the `event`s that were emitted during execution as well as the final `result` of the smart contract invocation. To learn more, take a look at the detailed [documentation](/docs/smart-contract-apis#methods) on invoking smart contract methods. Methods marked with `@receive` also take an additional argument for the native assets to send with the invocation.
 
 Putting it all together, we see both forms of invoking smart contract methods in the above snippet. When we mint tokens, we use the 2-step form, and when we transfer we use the 1-step or shortcut form.
 
@@ -441,7 +428,7 @@ This section will take a look at how we can integrate the token smart contract i
 Integrating NEO•ONE with your dapp is similar to testing your smart contracts - we simply use the generated helper methods:
 
 ```typescript
-import { createClient, createTokenSmartContract } from '../one/generated';
+import { createClient, createTokenSmartContract } from './neo-one/';
 
 const client = createClient();
 const token = createTokenSmartContract(client);
@@ -474,14 +461,12 @@ If you're using Angular to power your dapp, the NEO•ONE toolchain offers a too
 Regardless of the front-end framework you're using, the NEO•ONE Developer Tools contain all of the functionality necessary to control your private network and are simple to integrate:
 
 ```typescript
-import { createClient, createDeveloperClients, createLocalClients } from '../one/generated';
+import { createClient, createDeveloperClients } from './neo-one/';
+import { DeveloperTools } from '@neo-one/client';
 
 const client = createClient();
 const developerClients = createDeveloperClients();
-const localClients = createLocalClients();
-DeveloperTools.enable({ client, developerClients, localClients });
+DeveloperTools.enable({ client, developerClients });
 ```
 
 Read more in the [Developer Tools](/docs/dapps#Developer-Tools) section of the main guide.
-
-
