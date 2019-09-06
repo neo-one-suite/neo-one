@@ -27,6 +27,28 @@ const rxjsTypes = new Set(['Observer']);
 const stdio = ['ignore', 'inherit', 'inherit'];
 const APP_ROOT_DIR = __dirname;
 
+const CLIENT_PACKAGES = new Set([
+  '@neo-one/client',
+  '@neo-one/client-common',
+  '@neo-one/client-core',
+  '@neo-one/developer-tools',
+  '@neo-one/utils',
+  '@neo-one/client-switch',
+  '@neo-one/node-vm',
+  '@neo-one/client-full-common',
+  '@neo-one/node-core',
+]);
+const CLIENT_FULL_PACKAGES = new Set(
+  [...CLIENT_PACKAGES].concat([
+    '@neo-one/client-full',
+    '@neo-one/client-full-core',
+  ]),
+);
+const CLIENT_BROWSERIFY = {
+  'neo-one-client': CLIENT_PACKAGES,
+  'neo-one-client-full': CLIENT_FULL_PACKAGES,
+};
+
 const transformRxjsImportText = (importName) =>
   importName === 'EMPTY'
     ? 'rxjs/internal/observable/empty'
@@ -170,6 +192,7 @@ const FORMATS = [
 }));
 const MAIN_FORMAT = FORMATS[0];
 const MAIN_BIN_FORMAT = FORMATS[0];
+const BROWSER_FORMAT = FORMATS[2];
 
 function getTaskHash(format, ...args) {
   return (format.browser
@@ -341,7 +364,7 @@ const DEP_MAPPING = {
   },
 };
 const mapDep = (format, depName) => {
-  if (pkgNamesSet.has(depName)) {
+  if (pkgNamesSet.has(depName) && !format.browser) {
     return getName(format, depName);
   }
 
@@ -349,11 +372,7 @@ const mapDep = (format, depName) => {
     return DEP_MAPPING[format.target][format.module][depName];
   }
 
-  if (
-    format.browser &&
-    depName.includes('@neo-one/') &&
-    !depName.includes('ec-key')
-  ) {
+  if (format.browser && CLIENT_FULL_PACKAGES.has(depName)) {
     return `${depName}-browserify`;
   }
 
@@ -698,31 +717,6 @@ const copyRootTSConfig = ((cache) =>
     await fs.writeFile(filePath, JSON.stringify(newTSConfig, null, 2));
   }))({});
 
-const CLIENT_PACKAGES = new Set([
-  '@neo-one/client',
-  '@neo-one/client-common',
-  '@neo-one/client-core',
-  '@neo-one/developer-tools',
-  '@neo-one/logger',
-  '@neo-one/utils',
-  '@neo-one/client-switch',
-  '@neo-one/node-vm',
-  '@neo-one/client-full-common',
-  '@neo-one/node-core',
-]);
-
-const CLIENT_FULL_PACKAGES = new Set(
-  [...CLIENT_PACKAGES].concat([
-    '@neo-one/client-full',
-    '@neo-one/client-full-core',
-  ]),
-);
-
-const CLIENT_BROWSERIFY = {
-  'neo-one-client': CLIENT_PACKAGES,
-  'neo-one-client-full': CLIENT_FULL_PACKAGES,
-};
-
 const webpackBrowserifyConfig = (externals, inputPath, outputPath) => ({
   entry: inputPath,
   output: {
@@ -737,7 +731,7 @@ const webpackBrowserifyConfig = (externals, inputPath, outputPath) => ({
   externals,
   plugins: [
     new webpack.BannerPlugin({
-      banner: `Symbol.asyncIterator = Symbol.asyncIterator || Symbol.for("asyncIterator");`,
+      banner: `if(!Symbol.asyncIterator) {Symbol.asyncIterator = Symbol.asyncIterator || Symbol("Symbol.asyncIterator");}`,
       raw: true,
     }),
   ],
@@ -815,7 +809,11 @@ const copyBrowserifyTypes = ((cache) =>
       const allPackages = await fs.readdir(inputPath);
       await Promise.all(
         allPackages.map(async (pkgName) => {
-          if (CLIENT_FULL_PACKAGES.has(getPkgName(pkgName))) {
+          const pkgNameMatcher = getPkgName(pkgName);
+          if (
+            CLIENT_FULL_PACKAGES.has(pkgNameMatcher) ||
+            pkgNameMatcher === '@neo-one/suite'
+          ) {
             copyBrowserifyTypesFiles(
               path.resolve(inputPath, pkgName),
               path.resolve(outputPath, pkgName),
@@ -874,6 +872,25 @@ const bundleBrowserify = ((cache) =>
             );
           },
         ),
+      );
+    }
+  }))({});
+
+const cleanBrowserifyDirectory = ((cache) =>
+  memoizeTask(cache, async function cleanBrowserifyDirectory(format) {
+    if (format.browser) {
+      const destPath = getDest(format);
+      const pkgs = await fs.readdir(destPath);
+      await Promise.all(
+        pkgs.map(async (pkgName) => {
+          const pkgNameMatcher = getPkgName(pkgName);
+          if (
+            !CLIENT_FULL_PACKAGES.has(pkgNameMatcher) &&
+            pkgNameMatcher !== '@neo-one/suite'
+          ) {
+            await fs.remove(path.resolve(destPath, pkgName));
+          }
+        }),
       );
     }
   }))({});
@@ -1065,9 +1082,19 @@ gulp.task('e2e', async () => {
   await execa('yarn', ['e2e-ci'], { stdio });
 });
 
+gulp.task('cleanBrowserifyDirectory', cleanBrowserifyDirectory(BROWSER_FORMAT));
+
 gulp.task(
   'release',
-  gulp.series('test', 'build', 'e2e', 'prepareRelease', 'copyPkg', 'publish'),
+  gulp.series(
+    'test',
+    'build',
+    'e2e',
+    'prepareRelease',
+    'copyPkg',
+    'cleanBrowserifyDirectory',
+    'publish',
+  ),
 );
 
 gulp.task(
@@ -1078,6 +1105,7 @@ gulp.task(
     'copyPkg',
     'copyMetadata',
     'copyPkgFiles',
+    'cleanBrowserifyDirectory',
     'publish',
   ),
 );
