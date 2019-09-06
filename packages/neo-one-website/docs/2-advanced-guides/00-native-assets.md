@@ -2,6 +2,7 @@
 slug: native-assets
 title: Native Assets
 ---
+
 Native assets like NEO and GAS require special handling in smart contracts. This guide will show you how.
 
 NEO employs the [Unspent Transaction Output](https://en.wikipedia.org/wiki/Unspent_transaction_output) (UTXO) system for native assets. Unfortunately, the UTXO system does not play well with smart contracts. Fortunately, NEO•ONE smart contracts abstract away most of the difficulty in handling native assets using the `@receive`, `@send`, `@sendUnsafe` and `@claim` [decorators](https://www.typescriptlang.org/docs/handbook/decorators.html).
@@ -34,11 +35,13 @@ Invoking a method marked with `@receive` is identical to a normal method, but th
 
 ```typescript
 const receipt = await contract.mintTokens({
-  sendTo: [{
-    asset: Hash256.NEO,
-    amount: new BigNumber(10),
-  }],
-})
+  sendTo: [
+    {
+      asset: Hash256.NEO,
+      amount: new BigNumber(10),
+    },
+  ],
+});
 ```
 
 There are cases where a smart contract may receive native assets without a corresponding `@receive` method invocation, or sometimes even when the `@receive` method throws an error. Unfortunately this is unavoidable, and to solve these cases every smart contract has an automatically generated method called `refundAssets`. Users may call this method when they have sent assets to the contract that were not properly processed. Using the NEO•ONE client APIs:
@@ -81,11 +84,13 @@ Calling a method marked with `@sendUnsafe` is similar to `@receive` in that it a
 
 ```typescript
 const receipt = await contract.withdraw.confirmed({
-  sendFrom: [{
-    asset: Hash256.NEO,
-    amount: new BigNumber(10),
-    to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-  }],
+  sendFrom: [
+    {
+      asset: Hash256.NEO,
+      amount: new BigNumber(10),
+      to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+    },
+  ],
 });
 ```
 
@@ -93,8 +98,8 @@ const receipt = await contract.withdraw.confirmed({
 
 Decorate a method with `@send` to enable assets to be sent from the contract safely. `@send` requires two transactions to send assets from the contract. At a high level the steps are:
 
-  1. The user "marks" the assets they wish to withdraw from the contract by constructing a transaction that sends those assets back to the smart contract.
-  2. The user constructs a transaction that withdraws the previously "mark"ed assets to the desired address.
+1. The user "marks" the assets they wish to withdraw from the contract by constructing a transaction that sends those assets back to the smart contract.
+2. The user constructs a transaction that withdraws the previously "mark"ed assets to the desired address.
 
 NEO•ONE abstract this process such that you only need to define a method decorated with `@send` that throws an error on invalid transactions. NEO•ONE handles the rest. This method may also accept a final argument, a `Transfer` object, that contains the details of the pending transfer:
 
@@ -123,11 +128,13 @@ Calling a method marked with `@send` is identical to `@sendUnsafe`, however, the
 // This transaction only sends assets from the contract to itself,
 // marking them for withdrawal by a followup transaction.
 const receipt = await contract.withdraw.confirmed('value', {
-  sendFrom: [{
-    asset: Hash256.NEO,
-    amount: new BigNumber(10),
-    to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
-  }],
+  sendFrom: [
+    {
+      asset: Hash256.NEO,
+      amount: new BigNumber(10),
+      to: 'APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR',
+    },
+  ],
 });
 // Complete the withdrawal process using the transaction hash
 const finalReceipt = await contract.completeSend.confirmed(receipt.transaction.hash);
@@ -139,8 +146,8 @@ const finalReceipt = await contract.completeSend.confirmed(receipt.transaction.h
 
 Decorate a method with `@claim` to enable claiming GAS. `@claim` methods have a few restrictions:
 
-  1. `@claim` methods may not modify contract storage. They act like `@constant` methods.
-  2. `@claim` methods may not access `Blockchain.currentTransaction`, instead they may optionally accept the `ClaimTransaction` that the method was invoked in as the final argument.
+1. `@claim` methods may not modify contract storage. They act like `@constant` methods.
+2. `@claim` methods may not access `Blockchain.currentTransaction`, instead they may optionally accept the `ClaimTransaction` that the method was invoked in as the final argument.
 
 ```typescript
 export class Contract extends SmartContract {

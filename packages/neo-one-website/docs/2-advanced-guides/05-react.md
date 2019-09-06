@@ -2,6 +2,7 @@
 slug: react
 title: React
 ---
+
 NEO•ONE has first-class integration with React applications.
 
 Integrating NEO•ONE with React is a breeze using the generated NEO•ONE client APIs. We also offer a `FromStream` component that make using `Observable`s in the client APIs within your React components much simpler.
@@ -21,7 +22,7 @@ The NEO•ONE toolchain emits two components that aid in integrating a React app
 The `ContractsProvider` component should be used at the root of your application as it provides the NEO•ONE client and smart contract APIs to all children in its React tree using the [React context API](https://reactjs.org/docs/context.html):
 
 ```tsx
-import { ContractsProvider } from '../one/generated';
+import { ContractsProvider } from './neo-one';
 import * as ReactDOM from 'react-dom';
 import { App } from './App';
 
@@ -36,7 +37,7 @@ ReactDOM.render(app, document.getElementById('app'));
 `ContractsProvider` by default uses the generated helper methods to create the required props, but you may customize this by passing in your own `Client`, `DeveloperClient`s and/or `LocalClient`s:
 
 ```tsx
-import { ContractsProvider, createClient } from '../one/generated';
+import { ContractsProvider, createClient } from './neo-one';
 import * as ReactDOM from 'react-dom';
 import { App } from './App';
 
@@ -54,11 +55,7 @@ ReactDOM.render(app, document.getElementById('app'));
 Once you've included `ContractsProvider` in your application, you may use the `WithContracts` component anywhere in your application to access the NEO•ONE client APIs. `WithContracts` is is a [render props](https://reactjs.org/docs/render-props.html) component that passes the `client` and your smart contract APIs to its child function:
 
 ```tsx
-<WithContracts>
-  {({ token }) => (
-    <div onClick={() => token.withdraw.confirmed()}>Withdraw</div>
-  )}
-</WithContracts>
+<WithContracts>{({ token }) => <div onClick={() => token.withdraw.confirmed()}>Withdraw</div>}</WithContracts>
 ```
 
 ---
@@ -71,11 +68,7 @@ Once you've included `ContractsProvider` in your application, you may use the `W
 <WithContracts>
   {({ client }) => (
     <FromStream props={[client]} createStream={() => client.block$}>
-      {(block) => (
-        <div>
-          The current block index is: {block.index}
-        </div>
-      )}
+      {(block) => <div>The current block index is: {block.index}</div>}
     </FromStream>
   )}
 </WithContracts>

@@ -2,6 +2,7 @@
 slug: hello-world
 title: Hello World
 ---
+
 The smallest NEO•ONE smart contract looks like this
 
 ```typescript

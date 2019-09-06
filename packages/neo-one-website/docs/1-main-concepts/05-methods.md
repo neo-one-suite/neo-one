@@ -2,6 +2,7 @@
 slug: methods
 title: Methods
 ---
+
 Methods are the core component of smart contract logic.
 
 ---
@@ -19,7 +20,7 @@ export class HelloWorld extends SmartContract {
   public constructor(
     // Blockchain.currentBlockTime contains the timestamp of the current block, i.e. the block that
     // the transaction which invoked this method is included in.
-    public readonly startTime = Blockchain.currentBlockTime + (60 * 60),
+    public readonly startTime = Blockchain.currentBlockTime + 60 * 60,
     // Deploy.senderAddress is a special property that is filled in with the Address
     // of the user who deployed the contract.
     public readonly owner = Deploy.senderAddress,
@@ -35,11 +36,11 @@ Note in this example we've used [parameter properties](https://www.typescriptlan
 
 Public instance methods come in several flavors but they effectively break down into 3 categories:
 
-  1. Normal instance methods. These have no restrictions and work identically to instance methods in normal TypeScript.
-  2. Constant instance methods. Designated with the `@constant` decorator, these methods may not modify smart contract properties.
-  3. Native asset instance methods. Designated with the `@receive`, `@sendUnsafe`, `@send` and `@claim` decorators. Read more about these in the [Native Assets](/docs/native-assets) advanced guide.
+1. Normal instance methods. These have no restrictions and work identically to instance methods in normal TypeScript.
+2. Constant instance methods. Designated with the `@constant` decorator, these methods may not modify smart contract properties.
+3. Native asset instance methods. Designated with the `@receive`, `@sendUnsafe`, `@send` and `@claim` decorators. Read more about these in the [Native Assets](/docs/native-assets) advanced guide.
 
-Public instance methods define the API of the smart contract. In the following example we have two methods. One is a constant method since it's decorated with `@constant`. The other is a normal instance method which modifies the smart contract propery `mutableClosing`.
+Public instance methods define the API of the smart contract. In the following example we have two methods. One is a constant method since it's decorated with `@constant`. The other is a normal instance method which modifies the smart contract property `mutableClosing`.
 
 ```typescript
 export class HelloWorld extends SmartContract {

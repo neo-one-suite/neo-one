@@ -2,11 +2,12 @@
 slug: standard-library
 title: Standard Library
 ---
+
 NEO•ONE includes a library of standard smart contract values, functions, interfaces and classes.
 
 This chapter will go into detail on some of the more common values and types that we will use throughout the guide. While working through the rest of the chapters you may want to keep this page handy.
 
-For more details, check out the [Smart Contract](/docs/smart-contract) reference.
+For more details, check out the [Smart Contract](/reference/@neo-one/smart-contract) reference.
 
 ---
 
@@ -18,9 +19,9 @@ For more details, check out the [Smart Contract](/docs/smart-contract) reference
 
 The standard library includes several specialized value types which are defined in a way that makes them difficult to use incorrectly. For example, it's a static compile time error to pass an `Address` where a `Hash256` is expected, even though both are really just [`Buffer`s](https://nodejs.org/api/buffer.html) underneath the hood.
 
-  - `Address` - a `Buffer` that represents a NEO address.
-  - `Hash256` - a `Buffer` that represents a NEO 256 bit hash, most commonly used for asset ids like `NEO` or `GAS` asset ids.
-  - `PublicKey` - a `Buffer` that represents a public key.
+- `Address` - a `Buffer` that represents a NEO address.
+- `Hash256` - a `Buffer` that represents a NEO 256 bit hash, most commonly used for asset ids like `NEO` or `GAS` asset ids.
+- `PublicKey` - a `Buffer` that represents a public key.
 
 Each of the value types can be created from a string literal using the `from` [static method](https://www.typescriptlang.org/docs/handbook/classes.html#static-properties), for example, `Address.from('APyEx5f4Zm4oCHwFWiSTaph1fPBxZacYVR')`. `Hash256` also contains static properties for the `NEO` and `GAS` `Hash256` values.
 
@@ -50,10 +51,10 @@ This makes it easy to do things like display the result of a smart contract meth
 
 The `Blockchain` value contains several properties pertaining to the current state of the blockchain, the current transaction and the current invocation:
 
-  - `Blockchain.currentBlockTime` - the timestamp of the `Block` that this `Transaction` will be included in.
-  - `Blockchain.currentHeight` - index of the last `Block` persisted to the blockchain.
-  - `Blockchain.currentTransaction` - the current `InvocationTransaction`.
-  - `Blockchain.currentCallerContract` - the `Address` of the smart contract that directly invoked this contract. May be `undefined` if the current invocation was not from another smart contract.
+- `Blockchain.currentBlockTime` - the timestamp of the `Block` that this `Transaction` will be included in.
+- `Blockchain.currentHeight` - index of the last `Block` persisted to the blockchain.
+- `Blockchain.currentTransaction` - the current `InvocationTransaction`.
+- `Blockchain.currentCallerContract` - the `Address` of the smart contract that directly invoked this contract. May be `undefined` if the current invocation was not from another smart contract.
 
 ---
 

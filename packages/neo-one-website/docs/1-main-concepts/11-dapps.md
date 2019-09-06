@@ -2,6 +2,7 @@
 slug: dapps
 title: Decentralized Apps
 ---
+
 Building a decentralized app doesn't have to be hard, use these tools from NEO•ONE to make it quick and easy.
 
 In addition to the client APIs we've already walked through, there are a few properties on the `Client` that help make your app reactive. We'll also cover using the NEO•ONE Developer Tools to help speed up manual testing of your dapp.
@@ -26,7 +27,7 @@ class Client {
   public readonly block$: Observable<{
     readonly block: Block;
     readonly network: NetworkType;
-  }>
+  }>;
 }
 ```
 
@@ -37,7 +38,7 @@ We can update application state that depends on new blocks by subscribing to the
 ```typescript
 client.block$.subscribe(({ block, network }) => {
   // Update application state using the latest block and network
-})
+});
 ```
 
 ::: warning
@@ -51,25 +52,27 @@ If you're using React, check out the `FromStream` component in the [React](/docs
 One common use-case is to update the user balance whenever a new block is persisted. For example, if we're displaying the user's NEO and GAS balance:
 
 ```typescript
-client.block$.pipe(
-  switchMap(async () => {
-    const userAccount = client.getCurrentUserAccount();
-    if (userAccount === undefined) {
-      return undefined;
+client.block$
+  .pipe(
+    switchMap(async () => {
+      const userAccount = client.getCurrentUserAccount();
+      if (userAccount === undefined) {
+        return undefined;
+      }
+
+      const account = await client.getAccount(userAccount.id);
+
+      return { neo: account.balances[Hash256.NEO], gas: account.balances[Hash256.GAS] };
+    }),
+  )
+  .subscribe((result) => {
+    if (result === undefined) {
+      // Update the UI when a user account is not selected
+    } else {
+      const { neo, gas } = result;
+      // Update the UI with the new neo and gas values.
     }
-
-    const account = await client.getAccount(userAccount.id)
-
-    return { neo: account.balances[Hash256.NEO], gas: account.balances[Hash256.GAS] };
-  }),
-).subscribe((result) => {
-  if (result === undefined) {
-    // Update the UI when a user account is not selected
-  } else {
-    const { neo, gas } = result;
-    // Update the UI with the new neo and gas values.
-  }
-});
+  });
 ```
 
 This is a fairly common pattern, so `Client` already exposes an `Observable` for it:
@@ -102,10 +105,10 @@ client.accountState$.subscribe((result) => {
     const gas = result.account.balances[Hash256.GAS];
     // Update the UI with the new neo and gas values.
   }
-})
+});
 ```
 
-Take a look at the [@neo-one/client](/docs/client) reference for details on all available `Observable`s.
+Take a look at the [@neo-one/client](/reference/@neo-one/client) reference for details on all available `Observable`s.
 
 ---
 
@@ -113,23 +116,22 @@ Take a look at the [@neo-one/client](/docs/client) reference for details on all 
 
 NEO•ONE Developer Tools simplify the process of developing and manually testing your dapp. They contain all of the functionality necessary to control your private network:
 
-  - Immediately run consensus
-  - Fast forward to a future time
-  - Reset the local network to it's initial state
-  - Full wallet implementation with the same set of pre-configured wallets as tests
-  - Settings for controlling automatic consensus and system fees, seconds per block and adding NEP-5 token addresses to the wallet
-  - Notifications when transactions are confirmed with links to view the transaction on a local NEO Tracker instance
+- Immediately run consensus
+- Fast forward to a future time
+- Reset the local network to it's initial state
+- Full wallet implementation with the same set of pre-configured wallets as tests
+- Settings for controlling automatic consensus and system fees, seconds per block and adding NEP-5 token addresses to the wallet
+- Notifications when transactions are confirmed with links to view the transaction on a local NEO Tracker instance
 
 Enabling the Developer Tools is easy:
 
 ```typescript
 const client = createClient();
 const developerClients = createDeveloperClients();
-const localClients = createLocalClients();
-DeveloperTools.enable({ client, developerClients, localClients });
+DeveloperTools.enable({ client, developerClients });
 ```
 
-Simply use the generated helper functions in `one/generated/client.ts` to construct the various clients the Developer Tools require and then call `enable`.
+Simply use the generated helper functions in `src/neo-one/client.ts` to construct the various clients the Developer Tools require and then call `enable`.
 
 ::: warning
 
