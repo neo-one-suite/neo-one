@@ -27,8 +27,5 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "*/*/*/one/contracts/*.ts",
-    "*/*/*/one/contracts/*.solution.ts"
-  ]
+  "include": ["*/*/*/one/contracts/*.ts", "*/*/*/one/contracts/*.solution.ts"]
 }

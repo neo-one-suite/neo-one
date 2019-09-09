@@ -1,3 +1,4 @@
+/// <reference types="@emotion/core"/>
 import styled from '@emotion/styled';
 // tslint:disable-next-line
 import { FromStream } from '@neo-one/react';
