@@ -7,7 +7,6 @@ Object {
 /* eslint-disable */
 import { Injectable } from '@angular/core';
 import { createClient, createDeveloperClients } from './client';
-
 import { createTokenSmartContract } from './Token/contract';
 import { createICOSmartContract } from './ICO/contract';
 
@@ -16,7 +15,10 @@ import { createICOSmartContract } from './ICO/contract';
 })
 export class ContractsService {
   constructor() {
-    this.setHost();
+    this.client = createClient();
+    this.developerClients = createDeveloperClients();
+    this.token = createTokenSmartContract(this.client);
+    this.ico = createICOSmartContract(this.client);
   }
 
   setHost(host) {
@@ -30,18 +32,27 @@ export class ContractsService {
     "ts": "// tslint:disable
 /* eslint-disable */
 import { Injectable } from '@angular/core';
-import { Client, DeveloperClients, UserAccountProviders } from '@neo-one/client';
+import { Client, DeveloperClients } from '@neo-one/client';
 import { Contracts } from './contracts';
-import { DefaultUserAccountProviders, createClient, createDeveloperClients } from './client';
+import { createClient, createDeveloperClients } from './client';
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {
-  public client: Client<TUserAccountProviders>;
+export class ContractsService {
+  public client: Client;
   public developerClients: DeveloperClients;
   public token: Contracts['token'];
   public ico: Contracts['ico'];
+
+  constructor() {
+    this.client = createClient();
+    this.developerClients = createDeveloperClients();
+    this.token = createTokenSmartContract(this.client);
+    this.ico = createICOSmartContract(this.client);
+  }
 
   public setHost(host?: string) {
     this.client = createClient(host);
@@ -79,7 +90,7 @@ export const createClient = (getUserAccountProvidersOrHost) => {
   let host = 'localhost';
   if (typeof getUserAccountProvidersOrHost === 'string') {
     host = getUserAccountProvidersOrHost;
-  } else if (getUserAccountProvidersOrHost !== undefined) {
+  } else if (getUserAccountProvidersOrHost != undefined) {
     getUserAccountProviders = getUserAccountProvidersOrHost;
   }
 
@@ -157,7 +168,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
   let host = 'localhost';
   if (typeof getUserAccountProvidersOrHost === 'string') {
     host = getUserAccountProvidersOrHost;
-  } else if (getUserAccountProvidersOrHost !== undefined) {
+  } else if (getUserAccountProvidersOrHost != undefined) {
     getUserAccountProviders = getUserAccountProvidersOrHost as any;
   }
 
@@ -405,13 +416,15 @@ export const withContracts: (
     "js": "// tslint:disable
 /* eslint-disable */
 import { createClient, createDeveloperClients } from './client';
-
 import { createTokenSmartContract } from './Token/contract';
 import { createICOSmartContract } from './ICO/contract';
 
 export class ContractsService {
   constructor() {
-    this.setHost();
+    this.client = createClient();
+    this.developerClients = createDeveloperClients();
+    this.token = createTokenSmartContract(this.client);
+    this.ico = createICOSmartContract(this.client);
   }
 
   setHost(host) {
@@ -422,22 +435,27 @@ export class ContractsService {
   }
 }
 
-export const instance = new ContractsService();
+export const contractsService = new ContractsService();
 ",
     "ts": "// tslint:disable
 /* eslint-disable */
-import { Client, DeveloperClients, UserAccountProviders } from '@neo-one/client';
+import { Client, DeveloperClients } from '@neo-one/client';
+import { createClient, createDeveloperClients } from './client';
 import { Contracts } from './contracts';
-import { DefaultUserAccountProviders } from './client';
+import { createTokenSmartContract } from './Token/contract';
+import { createICOSmartContract } from './ICO/contract';
 
-export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {
-  public client: Client<TUserAccountProviders>;
+export class ContractsService {
+  public client: Client;
   public developerClients: DeveloperClients;
   public token: Contracts['token'];
   public ico: Contracts['ico'];
 
   constructor() {
-    this.setHost();
+    this.client = createClient();
+    this.developerClients = createDeveloperClients();
+    this.token = createTokenSmartContract(this.client);
+    this.ico = createICOSmartContract(this.client);
   }
 
   public setHost(host?: string) {
@@ -448,7 +466,7 @@ export class ContractsService<TUserAccountProviders extends UserAccountProviders
   }
 }
 
-export const instance: ContractsService;
+export const contractsService = new ContractsService();
 ",
   },
 }
