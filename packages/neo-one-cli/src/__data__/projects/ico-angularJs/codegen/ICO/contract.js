@@ -1,4 +1,4 @@
-/* @hash 9d7029f5ff407fa62af9bcb39a2894ff */
+/* @hash 2e3acfafdc43a4cdf560189bd85abe94 */
 // tslint:disable
 /* eslint-disable */
 import { icoABI } from './abi';
@@ -7,7 +7,7 @@ import { sourceMaps } from '../sourceMaps';
 const definition = {
   networks: {
     local: {
-      address: 'Adiq4sMWabmjD7S45BCvW2uVgFDofmTbyo',
+      address: 'ARW79N7gAWHytcWSkkXvwrJiR4FTyvf2f8',
     },
   },
   abi: icoABI,

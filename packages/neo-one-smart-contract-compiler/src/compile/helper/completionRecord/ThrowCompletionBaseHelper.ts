@@ -49,6 +49,7 @@ export class ThrowCompletionBaseHelper extends Helper {
           },
           whenFalse: () => {
             sb.emitPushBoolean(node, false);
+            sb.emitPushInt(node, constants.NORMAL_COMPLETION);
             sb.emitOp(node, 'RET');
           },
         }),

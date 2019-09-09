@@ -414,6 +414,7 @@ import { IsContractHelper, UnwrapContractHelper, WrapContractHelper } from './ty
 import { IsHeaderHelper, UnwrapHeaderHelper, WrapHeaderHelper } from './types/header';
 
 export interface Helpers {
+  readonly mutableCache: { [K in string]?: Helper };
   // account
   readonly isAccount: IsAccountHelper;
   readonly wrapAccount: WrapAccountHelper;
@@ -830,8 +831,8 @@ export interface Helpers {
   readonly getGlobalProperty: (options: GetGlobalPropertyHelperOptions) => GetGlobalPropertyHelper;
 }
 
-export const createHelpers = (): Helpers => {
-  const mutableCache: { [K in string]?: Helper } = {};
+export const createHelpers = (prevHelpers?: Helpers): Helpers => {
+  const mutableCache: { [K in string]?: Helper } = prevHelpers === undefined ? {} : prevHelpers.mutableCache;
 
   function memoized<Options, T extends Helper>(
     helperClass: (new (options: Options) => T) & KeyedHelper<Options>,
@@ -847,7 +848,24 @@ export const createHelpers = (): Helpers => {
     };
   }
 
+  const mutableUniqueCache: { [K in string]?: Helper } = {};
+  function memoizedUnique<Options, T extends Helper>(
+    helperClass: (new (options: Options) => T) & KeyedHelper<Options>,
+  ): (options: Options) => T {
+    return (options: Options) => {
+      const key = helperClass.getKey(options);
+      let value = mutableUniqueCache[key];
+      if (value === undefined) {
+        mutableUniqueCache[key] = value = new helperClass(options);
+      }
+
+      return value as T;
+    };
+  }
+
   return {
+    mutableCache,
+
     // account
     isAccount: new IsAccountHelper(),
     wrapAccount: new WrapAccountHelper(),
@@ -918,7 +936,7 @@ export const createHelpers = (): Helpers => {
     completeSend: new CompleteSendHelper(),
     deploy: (options) => new DeployHelper(options),
     upgrade: (options) => new UpgradeHelper(options),
-    handleNormal: (options) => new HandleNormalHelper(options),
+    handleNormal: memoizedUnique(HandleNormalHelper),
     handleSend: (options) => new HandleSendHelper(options),
     handleReceive: (options) => new HandleReceiveHelper(options),
     handleSendUnsafe: (options) => new HandleSendUnsafeHelper(options),

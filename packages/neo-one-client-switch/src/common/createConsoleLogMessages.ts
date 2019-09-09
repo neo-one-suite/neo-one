@@ -63,23 +63,23 @@ const extractValueFromStackItem = (stackItem: StackItem): any => {
     .toNumber();
 
   switch (type) {
-    case 0:
-      return undefined;
     case 1:
+      return undefined;
+    case 2:
       // tslint:disable-next-line no-null-keyword
       return null;
-    case 2:
-      return stackItem.asArray()[1].asBoolean();
     case 3:
-      return stackItem.asArray()[1].asString();
+      return stackItem.asArray()[1].asBoolean();
     case 4:
-      return `Symbol(${stackItem.asArray()[1].asString()})`;
+      return stackItem.asArray()[1].asString();
     case 5:
+      return `Symbol(${stackItem.asArray()[1].asString()})`;
+    case 6:
       return stackItem
         .asArray()[1]
         .asBigIntegerUnsafe()
         .toString(10);
-    case 6:
+    case 7:
       return _.fromPairs(
         utils.zip(
           stackItem
@@ -94,17 +94,17 @@ const extractValueFromStackItem = (stackItem: StackItem): any => {
             .map(extractValueFromStackItem),
         ),
       );
-    case 7:
+    case 8:
       return stackItem
         .asArray()[1]
         .asArray()
         .map(extractValueFromStackItem);
-    case 8:
+    case 9:
       return stackItem
         .asArray()[1]
         .asBuffer()
         .toString('hex');
-    case 9:
+    case 10:
       // tslint:disable-next-line no-any
       return new Map<any, any>(
         stackItem
@@ -113,7 +113,7 @@ const extractValueFromStackItem = (stackItem: StackItem): any => {
           // tslint:disable-next-line no-any
           .map<any>((value) => value.asArray().map(extractValueFromStackItem)),
       );
-    case 10:
+    case 11:
       return new Set(
         stackItem
           .asArray()[1]
