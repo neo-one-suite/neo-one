@@ -1,4 +1,4 @@
-/* @hash df67490897dca2a3c83d9970be9638f7 */
+/* @hash 0fbc4e67b9658e21a3a70c09098f3244 */
 // tslint:disable
 /* eslint-disable */
 import { Client } from '@neo-one/client';
@@ -9,10 +9,7 @@ import { sourceMaps } from '../sourceMaps';
 const definition = {
   networks: {
     local: {
-      address: 'AXAZs3F9QHWZzpGV2GdWEkkopUWGSyDwAf',
-    },
-    test: {
-      address: 'AXAZs3F9QHWZzpGV2GdWEkkopUWGSyDwAf',
+      address: 'AVtU2izPDU8HPiw4ZCuyqAsxg6WjUa7w29',
     },
   },
   abi: escrowABI,

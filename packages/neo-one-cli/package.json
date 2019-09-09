@@ -42,7 +42,8 @@
     "@types/listr": "^0.14.2",
     "@types/lodash": "^4.14.138",
     "@types/prompts": "^2.0.1",
-    "@types/yargs": "^13.0.2"
+    "@types/yargs": "^13.0.2",
+    "zone.js": "^0.10.2"
   },
   "sideEffects": false
 }

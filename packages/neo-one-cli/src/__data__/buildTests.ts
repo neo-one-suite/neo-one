@@ -369,11 +369,11 @@ export const buildTests = async (project: string) => {
 
   await Promise.all([
     verifySmartContractTesting(config.codegen.path, start),
-    // verifySmartContractsManual(
-    //   config.codegen.path,
-    //   { network: constants.LOCAL_NETWORK_NAME, address: privateKeyToAddress(constants.PRIVATE_NET_PRIVATE_KEY) },
-    //   { network: constants.LOCAL_NETWORK_NAME, address: privateKeyToAddress(TO_PRIVATE_KEY) },
-    //   start,
-    // ),
+    verifySmartContractsManual(
+      config.codegen.path,
+      { network: constants.LOCAL_NETWORK_NAME, address: privateKeyToAddress(constants.PRIVATE_NET_PRIVATE_KEY) },
+      { network: constants.LOCAL_NETWORK_NAME, address: privateKeyToAddress(TO_PRIVATE_KEY) },
+      start,
+    ),
   ]);
 };

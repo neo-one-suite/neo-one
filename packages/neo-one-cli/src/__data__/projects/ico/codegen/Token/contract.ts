@@ -1,4 +1,4 @@
-/* @hash c065d3971c94cb5787604bb881209aed */
+/* @hash 263c8504db4e13520cc3c13f6046952f */
 // tslint:disable
 /* eslint-disable */
 import { Client } from '@neo-one/client';
@@ -9,10 +9,7 @@ import { sourceMaps } from '../sourceMaps';
 const definition = {
   networks: {
     local: {
-      address: 'AaYf2HD7ruLa11ZwXjBvYSvkPAZGQRuySQ',
-    },
-    test: {
-      address: 'AaYf2HD7ruLa11ZwXjBvYSvkPAZGQRuySQ',
+      address: 'AWFQ5usn6UPEQo85pNxLyNuuGnSvC9uckv',
     },
   },
   abi: tokenABI,
