@@ -2235,14 +2235,6 @@
   dependencies:
     "@opencensus/core" "^0.0.16"
 
-"@opencensus/web-core@^0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@opencensus/web-core/-/web-core-0.0.6.tgz#e2aed61c6881fdba106c1ed5a48701fe763b5e8b"
-  integrity sha512-qLIZPsbCGEYNEyfH8/ietJDYhfMfqbWtXp7mFCpE3RvCW/QBUzDnfDRyLJTF6s0Ad5VnlJQ9yF2baDkDAaanpg==
-  dependencies:
-    "@opencensus/web-types" "^0.0.6"
-    "@types/node" "^12.6.9"
-
 "@opencensus/web-core@^0.0.7":
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/@opencensus/web-core/-/web-core-0.0.7.tgz#daa5fed6d5909be867f8eecd4ff88ac818b0aec3"
