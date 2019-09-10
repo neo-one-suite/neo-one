@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/cli",
+      "comment": "Add e2e exchange test based on switcheo",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/cli",
+  "email": "ahfragapane@gmail.com"
+}

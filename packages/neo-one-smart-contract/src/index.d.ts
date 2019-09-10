@@ -1450,11 +1450,11 @@ export interface CryptoConstructor {
   /**
    * Returns a `Buffer` of the RMD160 hash of the SHA256 hash of the input.
    */
-  readonly hash160: (value: Hashable) => Buffer;
+  readonly hash160: (value: Hashable) => Address;
   /**
    * Returns a `Buffer` of the SHA256 hash of the SHA256 hash of the input.
    */
-  readonly hash256: (value: Hashable) => Buffer;
+  readonly hash256: (value: Hashable) => Hash256;
 }
 /**
  * Contains various cryptography functions.
