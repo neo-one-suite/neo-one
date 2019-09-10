@@ -2243,17 +2243,30 @@
     "@opencensus/web-types" "^0.0.6"
     "@types/node" "^12.6.9"
 
-"@opencensus/web-propagation-tracecontext@^0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@opencensus/web-propagation-tracecontext/-/web-propagation-tracecontext-0.0.6.tgz#e40ac5eb1f1440c0d946329046af10fcbfec7fed"
-  integrity sha512-l/8+LxFfovrDFngjUqPlP+1+JtRaX4yxm7G7AFH0OYslfNjczpmEq4DAIPD7d4Xl+x3Dxb6X2CTmYvPLt+mKPw==
+"@opencensus/web-core@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@opencensus/web-core/-/web-core-0.0.7.tgz#daa5fed6d5909be867f8eecd4ff88ac818b0aec3"
+  integrity sha512-UHAwQMP2kgWKuLkrEGpH0/NSLeiib4/E2SIMCUdTpqXgDWVEBab2hnBLQDWkfC6TgFLMWNDP7BI13HqIyKhQvQ==
   dependencies:
-    "@opencensus/web-core" "^0.0.6"
+    "@opencensus/web-types" "^0.0.7"
+    "@types/node" "^12.6.9"
+
+"@opencensus/web-propagation-tracecontext@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@opencensus/web-propagation-tracecontext/-/web-propagation-tracecontext-0.0.7.tgz#c037eb5e90964464643bcea55d2a827851c16dce"
+  integrity sha512-nsoftaJ2I4axkBsNertmSlTxSlc34IeW28UVK5sesC6RO3RiWnDHHG3EzTfjoH0f0Vfx53DqhrO0cPjca228fA==
+  dependencies:
+    "@opencensus/web-core" "^0.0.7"
 
 "@opencensus/web-types@^0.0.6":
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/@opencensus/web-types/-/web-types-0.0.6.tgz#1f80b7ff3d3b2779559e5f53f46a38223a096aff"
   integrity sha512-KiVZgqRneE6bpfvRlVn1CMfyibeBqgw4cmGHtKTtRvqyRMmR3rKDfZx/2YaevJGlx+BXduC5qAB7lwCHK0MD8g==
+
+"@opencensus/web-types@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@opencensus/web-types/-/web-types-0.0.7.tgz#4426de1fe5aa8f624db395d2152b902874f0570a"
+  integrity sha512-xB+w7ZDAu3YBzqH44rCmG9/RlrOmFuDPt/bpf17eJr8eZSrLt7nc7LnWdxM9Mmoj/YKMHpxRg28txu3TcpiL+g==
 
 "@phenomnomnominal/tsquery@^3.0.0":
   version "3.0.0"
