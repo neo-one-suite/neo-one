@@ -5,7 +5,6 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://neo-one.io/docs/how-to-contribute)
 [![DeepScan grade](https://deepscan.io/api/projects/1846/branches/8291/badge/grade.svg)](https://deepscan.io/dashboard#view=project&pid=1846&bid=8291)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1639/badge)](https://bestpractices.coreinfrastructure.org/projects/1639)
-[![Docker Repository on Quay](https://quay.io/repository/neoone/node/status "Docker Repository on Quay")](https://quay.io/repository/neoone/node)
 
 ## [Documentation](https://neo-one.io)
 
