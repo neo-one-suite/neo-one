@@ -20,6 +20,10 @@ export const genClient = ({
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
     providers.push({ network: '${localDevNetworkName}', rpcURL: \`http://\${host}:${localDevNetworkPort}/rpc\` });
   }
+  const neoDapi = window.neoDapi;
+  if (neoDapi !== undefined) {
+    providers.push(new )
+  }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
   const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
@@ -65,6 +69,7 @@ export const genClient = ({
     js: `
 import {
   Client,
+  DapiUserAccountProvider,
   DeveloperClient,
   LocalKeyStore,
   LocalMemoryStore,
