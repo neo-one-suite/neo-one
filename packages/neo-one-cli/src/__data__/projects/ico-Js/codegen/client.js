@@ -1,8 +1,9 @@
-/* @hash 934c467bc7f58333e802a28c7de08d58 */
+/* @hash 928e5fe093c52b2b04b94972323cbacc */
 // tslint:disable
 /* eslint-disable */
 import {
   Client,
+  DapiUserAccountProvider,
   DeveloperClient,
   LocalKeyStore,
   LocalMemoryStore,
@@ -11,12 +12,30 @@ import {
   NEOONEDataProvider,
 } from '@neo-one/client';
 
-const getDefaultUserAccountProviders = (provider) => ({
-  memory: new LocalUserAccountProvider({
-    keystore: new LocalKeyStore(new LocalMemoryStore()),
-    provider,
-  }),
-});
+const getDefaultUserAccountProviders = (provider) => {
+  const localUserAccountProvider = {
+    memory: new LocalUserAccountProvider({
+      keystore: new LocalKeyStore(new LocalMemoryStore()),
+      provider,
+    }),
+  };
+
+  const dapi = typeof globalThis === 'undefined' ? undefined : globalThis.neoDapi;
+  if (dapi !== undefined) {
+    return {
+      ...localUserAccountProvider,
+      dapi: new DapiUserAccountProvider({
+        dapi,
+        provider,
+        onError: (error) => {
+          throw error;
+        },
+      }),
+    };
+  }
+
+  return localUserAccountProvider;
+};
 
 const isLocalUserAccountProvider = (userAccountProvider) => userAccountProvider instanceof LocalUserAccountProvider;
 
@@ -31,7 +50,7 @@ export const createClient = (getUserAccountProvidersOrHost) => {
 
   const providers = [];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push({ network: 'local', rpcURL: `http://${host}:10490/rpc` });
+    providers.push({ network: 'local', rpcURL: `http://${host}:11040/rpc` });
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
@@ -110,5 +129,5 @@ export const createClient = (getUserAccountProvidersOrHost) => {
 };
 
 export const createDeveloperClients = (host = 'localhost') => ({
-  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: `http://${host}:10490/rpc` })),
+  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: `http://${host}:11040/rpc` })),
 });

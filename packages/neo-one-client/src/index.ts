@@ -182,6 +182,9 @@ export {
 
 export {
   Client,
+  connectRemoteUserAccountProvider,
+  Dapi,
+  DapiUserAccountProvider,
   DeveloperClient,
   DeveloperClients,
   Hash256,
@@ -199,6 +202,7 @@ export {
   NEOONEDataProvider,
   NEOONEDataProviderOptions,
   NEOONEProvider,
+  RemoteUserAccountProvider,
   SmartContract,
   SmartContractAny,
   UnlockedWallet,
