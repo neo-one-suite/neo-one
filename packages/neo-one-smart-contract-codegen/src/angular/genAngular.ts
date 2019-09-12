@@ -30,18 +30,19 @@ export const genAngular = ({
   const injectable = `@Injectable({
   providedIn: 'root'
 })`;
-  const constructor = `constructor() {
-  this.setHost();
-}`;
-  const setHost = `this.client = createClient(host);
-this.developerClients = createDeveloperClients(host);
+
+  const setHost = (host: string) => `this.client = createClient(${host});
+this.developerClients = createDeveloperClients(${host});
 ${contractProperties}`;
+
+  const constructor = `constructor() {
+  ${setHost('')}
+}`;
 
   return {
     js: `
 import { Injectable } from '@angular/core';
 import { createClient, createDeveloperClients } from '${clientImport}';
-
 ${contractImports}
 
 ${injectable}
@@ -49,24 +50,27 @@ export class ContractsService {
   ${constructor}
 
   setHost(host) {
-    ${setHost}
+    ${setHost('host')}
   }
 }
     `,
     ts: `
 import { Injectable } from '@angular/core';
-import { Client, DeveloperClients, UserAccountProviders } from '@neo-one/client';
+import { Client, DeveloperClients } from '@neo-one/client';
 import { Contracts } from '${getRelativeImport(angularPath, contractsPath)}';
-import { DefaultUserAccountProviders, createClient, createDeveloperClients } from '${clientImport}';
+import { createClient, createDeveloperClients } from '${clientImport}';
+${contractImports}
 
 ${injectable}
-export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {
-  public client: Client<TUserAccountProviders>;
+export class ContractsService {
+  public client: Client;
   public developerClients: DeveloperClients;
   ${contractTypeProperties}
 
+  ${constructor}
+
   public setHost(host?: string) {
-    ${setHost}
+    ${setHost('host')}
   }
 }
   `,

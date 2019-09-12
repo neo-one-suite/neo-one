@@ -1096,6 +1096,39 @@ export interface DeployConstructor {
  * @param name Event name
  * @param argName Event argument name
  */
+export function createEventNotifier<A0, A1, A2, A3, A4, A5, A6, A7, A8>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+  arg2Name: string,
+  arg3Name: string,
+  arg4Name: string,
+  arg5Name: string,
+  arg6Name: string,
+  arg7Name: string,
+  arg8Name: string,
+): (arg0: A0, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, arg6: A6, arg7: A7, arg8: A8) => void;
+export function createEventNotifier<A0, A1, A2, A3, A4, A5, A6, A7>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+  arg2Name: string,
+  arg3Name: string,
+  arg4Name: string,
+  arg5Name: string,
+  arg6Name: string,
+  arg7Name: string,
+): (arg0: A0, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, arg6: A6, arg7: A7) => void;
+export function createEventNotifier<A0, A1, A2, A3, A4, A5, A6>(
+  name: string,
+  arg0Name: string,
+  arg1Name: string,
+  arg2Name: string,
+  arg3Name: string,
+  arg4Name: string,
+  arg5Name: string,
+  arg6Name: string,
+): (arg0: A0, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, arg6: A6) => void;
 export function createEventNotifier<A0, A1, A2, A3, A4, A5>(
   name: string,
   arg0Name: string,

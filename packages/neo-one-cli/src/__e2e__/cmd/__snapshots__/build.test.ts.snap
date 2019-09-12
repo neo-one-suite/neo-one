@@ -1,9 +1,49 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`build is a one stop command for local development of the ico project: mint consumed 1`] = `"0"`;
+exports[`build (js, angular) is a one stop command for local development of the ico project using javascript and the angular framework.: mint consumed 1`] = `"0"`;
 
-exports[`build is a one stop command for local development of the ico project: mint consumed 2`] = `"0"`;
+exports[`build (js, angular) is a one stop command for local development of the ico project using javascript and the angular framework.: mint consumed 2`] = `"0"`;
 
-exports[`build is a one stop command for local development of the ico project: mint cost 1`] = `"6.657"`;
+exports[`build (js, angular) is a one stop command for local development of the ico project using javascript and the angular framework.: mint cost 1`] = `"6.733"`;
 
-exports[`build is a one stop command for local development of the ico project: mint cost 2`] = `"6.657"`;
+exports[`build (js, angular) is a one stop command for local development of the ico project using javascript and the angular framework.: mint cost 2`] = `"6.733"`;
+
+exports[`build (js, react) is a one stop command for local development of the ico project using javascript and the react framework.: mint consumed 1`] = `"0"`;
+
+exports[`build (js, react) is a one stop command for local development of the ico project using javascript and the react framework.: mint consumed 2`] = `"0"`;
+
+exports[`build (js, react) is a one stop command for local development of the ico project using javascript and the react framework.: mint cost 1`] = `"6.733"`;
+
+exports[`build (js, react) is a one stop command for local development of the ico project using javascript and the react framework.: mint cost 2`] = `"6.733"`;
+
+exports[`build (js, vue) is a one stop command for local development of the ico project using javascript and the vue framework.: mint consumed 1`] = `"0"`;
+
+exports[`build (js, vue) is a one stop command for local development of the ico project using javascript and the vue framework.: mint consumed 2`] = `"0"`;
+
+exports[`build (js, vue) is a one stop command for local development of the ico project using javascript and the vue framework.: mint cost 1`] = `"6.733"`;
+
+exports[`build (js, vue) is a one stop command for local development of the ico project using javascript and the vue framework.: mint cost 2`] = `"6.733"`;
+
+exports[`build (ts, angular) is a one stop command for local development of the ico project using typescript and the angular framework.: mint consumed 1`] = `"0"`;
+
+exports[`build (ts, angular) is a one stop command for local development of the ico project using typescript and the angular framework.: mint consumed 2`] = `"0"`;
+
+exports[`build (ts, angular) is a one stop command for local development of the ico project using typescript and the angular framework.: mint cost 1`] = `"6.733"`;
+
+exports[`build (ts, angular) is a one stop command for local development of the ico project using typescript and the angular framework.: mint cost 2`] = `"6.733"`;
+
+exports[`build (ts, react) is a one stop command for local development of the ico project using typescript and the react framework.: mint consumed 1`] = `"0"`;
+
+exports[`build (ts, react) is a one stop command for local development of the ico project using typescript and the react framework.: mint consumed 2`] = `"0"`;
+
+exports[`build (ts, react) is a one stop command for local development of the ico project using typescript and the react framework.: mint cost 1`] = `"6.733"`;
+
+exports[`build (ts, react) is a one stop command for local development of the ico project using typescript and the react framework.: mint cost 2`] = `"6.733"`;
+
+exports[`build (ts, vue) is a one stop command for local development of the ico project using typescript and the vue framework.: mint consumed 1`] = `"0"`;
+
+exports[`build (ts, vue) is a one stop command for local development of the ico project using typescript and the vue framework.: mint consumed 2`] = `"0"`;
+
+exports[`build (ts, vue) is a one stop command for local development of the ico project using typescript and the vue framework.: mint cost 1`] = `"6.733"`;
+
+exports[`build (ts, vue) is a one stop command for local development of the ico project using typescript and the vue framework.: mint cost 2`] = `"6.733"`;

@@ -3,6 +3,13 @@
   "version": "1.1.1",
   "description": "NEO•ONE smart contract apis.",
   "main": "./src/index.d.ts",
+  "scripts": {
+    "build": "",
+    "lint": ""
+  },
+  "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0"
+  },
   "smartContract": true,
   "sideEffects": false
 }

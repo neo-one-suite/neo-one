@@ -1,0 +1,23 @@
+{
+  "name": "@neo-one/build-tests",
+  "version": "1.0.0",
+  "description": "Tool package for running unit/e2e tests",
+  "scripts": {
+    "build": ""
+  },
+  "dependencies": {
+    "app-root-dir": "^1.0.2",
+    "@neo-one/build-tools": "^1.0.0",
+    "@neo-one/logger": "^1.2.1",
+    "babel-jest": "^24.9.0",
+    "bn.js": "^5.0.0",
+    "execa": "^2.0.4",
+    "fs-extra": "^8.1.0",
+    "jest": "^24.9.0",
+    "jest-circus": "^24.9.0",
+    "lodash": "^4.17.15",
+    "tmp": "^0.1.0",
+    "ts-jest": "^24.1.0"
+  },
+  "sideEffects": false
+}

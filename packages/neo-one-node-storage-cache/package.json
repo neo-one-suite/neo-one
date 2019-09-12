@@ -2,7 +2,13 @@
   "name": "@neo-one/node-storage-cache",
   "version": "1.2.4",
   "description": "NEO•ONE node storage cache.",
-  "main": "./src/index",
+  "main": "./lib/index",
+  "scripts": {
+    "build": "gulp",
+    "lint": "node ./node_modules/@neo-one/build-tools/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "tsc": "./node_modules/.bin/tsc --noEmit"
+  },
   "dependencies": {
     "@neo-one/client-common": "^1.4.2",
     "@neo-one/node-core": "^1.2.2",
@@ -12,7 +18,9 @@
     "tslib": "^1.10.0"
   },
   "devDependencies": {
-    "@types/lru-cache": "^5.1.0"
+    "@neo-one/build-tools": "^1.0.0",
+    "@types/lru-cache": "^5.1.0",
+    "gulp": "~4.0.2"
   },
   "sideEffects": false
 }

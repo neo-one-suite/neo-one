@@ -35,7 +35,9 @@ const TooltipBaseComponent = forwardRef<HTMLDivElement, React.ComponentPropsWith
   return <Popover {...props} ref={ref} visible={props.visible === undefined ? visible : props.visible} />;
 });
 
-export const TooltipBase = styled(TooltipBaseComponent)<{}, {}>`
+// type instantiation is excessively deep and possibly
+// @ts-ignore
+export const TooltipBase: any = styled(TooltipBaseComponent)<{}, {}>`
   ${theme('TooltipBase')};
 `;
 

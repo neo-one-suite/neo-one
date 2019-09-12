@@ -35,12 +35,18 @@ export const compile = ({ context, sourceFile, linked = {}, sourceMaps = {} }: C
   const helpers = createHelpers();
   const { contractInfo, abi, contract } = getSmartContractInfo(context, sourceFile);
 
-  const helperScriptBuilder = new HelperCapturingScriptBuilder(context, helpers, sourceFile, contractInfo, linked);
+  const helperScriptBuilder = new HelperCapturingScriptBuilder(
+    context,
+    createHelpers(helpers),
+    sourceFile,
+    contractInfo,
+    linked,
+  );
   helperScriptBuilder.process();
 
   const scopeScriptBuilder = new ScopeCapturingScriptBuilder(
     context,
-    helpers,
+    createHelpers(helpers),
     sourceFile,
     contractInfo,
     linked,
@@ -52,7 +58,7 @@ export const compile = ({ context, sourceFile, linked = {}, sourceMaps = {} }: C
     context,
     scopes: scopeScriptBuilder.getScopes(),
     sourceFile,
-    helpers,
+    helpers: createHelpers(helpers),
     linked,
     allHelpers: helperScriptBuilder.getHelpers(),
     contractInfo,

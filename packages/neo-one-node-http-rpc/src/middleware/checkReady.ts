@@ -95,15 +95,17 @@ let lastCheckIndex: number | undefined;
 let lastCheckTime: number | undefined;
 // tslint:enable no-let
 
+interface CheckReadyOptions {
+  readonly logger: Logger;
+  readonly blockchain: Blockchain;
+  readonly options: Options;
+}
+
 export const checkReady = async ({
   logger,
   blockchain,
   options: { rpcURLs = [], offset = 3, timeoutMS = 1000, checkEndpoints },
-}: {
-  readonly logger: Logger;
-  readonly blockchain: Blockchain;
-  readonly options: Options;
-}) => {
+}: CheckReadyOptions) => {
   if (lastCheckTime === undefined || Date.now() - lastCheckTime > timeoutMS) {
     lastCheckTime = Date.now();
     lastCheckIndex = await fetchTallestBlockIndex(logger, rpcURLs, timeoutMS, checkEndpoints);

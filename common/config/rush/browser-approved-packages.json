@@ -1,0 +1,1170 @@
+// DO NOT ADD COMMENTS IN THIS FILE.  They will be lost when the Rush tool resaves it.
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/approved-packages.schema.json",
+  "packages": [
+    {
+      "name": "@angular/core",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@babel/code-frame",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@babel/core",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "@babel/plugin-proposal-async-generator-functions",
+      "allowedCategories": [ "tools", "web" ]
+    },
+    {
+      "name": "@babel/plugin-proposal-class-properties",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@babel/plugin-proposal-numeric-separator",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@babel/plugin-proposal-object-rest-spread",
+      "allowedCategories": [ "tools", "web" ]
+    },
+    {
+      "name": "@babel/plugin-proposal-optional-catch-binding",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@babel/plugin-syntax-dynamic-import",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@babel/plugin-syntax-numeric-separator",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@babel/plugin-syntax-optional-catch-binding",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@babel/plugin-syntax-typescript",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@babel/plugin-transform-modules-commonjs",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@babel/plugin-transform-typescript",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@babel/polyfill",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@babel/preset-env",
+      "allowedCategories": [ "tools", "web" ]
+    },
+    {
+      "name": "@babel/preset-react",
+      "allowedCategories": [ "tools", "web" ]
+    },
+    {
+      "name": "@babel/register",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@babel/runtime",
+      "allowedCategories": [ "tools", "web" ]
+    },
+    {
+      "name": "@babel/standalone",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@cypress/webpack-preprocessor",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@emotion/core",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@emotion/styled",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@emotion/styled-base",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@jest/types",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@ledgerhq/hw-transport-node-hid",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@ledgerhq/hw-transport-u2f",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@microsoft/gulp-core-build",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@microsoft/gulp-core-build-typescript",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@microsoft/node-library-build",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "@microsoft/package-deps-hash",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@microsoft/rush-stack-compiler-3.4",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@microsoft/rush-stack-compiler-3.5",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "@neo-one/build-configs",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@neo-one/build-tools",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@neo-one/build-tools-common",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "@neo-one/build-tools-web",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@neo-one/built-tools",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/cli",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/cli-common",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/cli-common-node",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/client",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/client-common",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@neo-one/client-core",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@neo-one/client-full-common",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/client-full-core",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/client-switch",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@neo-one/developer-tools",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/developer-tools-frame",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/ec-key",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/editor",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@neo-one/http",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/http-context",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/local-browser",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/local-browser-worker",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@neo-one/local-singleton",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@neo-one/logger",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@neo-one/logger-config",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/node",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/node-bin",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/node-blockchain",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/node-browser",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/node-browser-worker",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@neo-one/node-consensus",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/node-core",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/node-http-rpc",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/node-neo-settings",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/node-network",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/node-offline",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/node-protocol",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/node-rpc-handler",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/node-storage-common",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/node-storage-levelup",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/node-vm",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/react",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@neo-one/react-common",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@neo-one/react-core",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/shared",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/smart-contract",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@neo-one/smart-contract-codegen",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/smart-contract-compiler",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/smart-contract-compiler-node",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/smart-contract-lib",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "@neo-one/smart-contract-test",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "@neo-one/smart-contract-test-browser",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@neo-one/smart-contract-test-common",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/smart-contract-typescript-plugin",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/ts-utils",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/typescript-concatenator",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/utils",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@neo-one/utils-node",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@neo-one/worker",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "@opencensus/core",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@opencensus/exporter-jaeger",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@opencensus/exporter-prometheus",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@opencensus/nodejs-base",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@opencensus/propagation-tracecontext",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@opencensus/web-core",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@opencensus/web-propagation-tracecontext",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@opencensus/web-types",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@reach/router",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@reactivex/ix-es2015-cjs",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@reactivex/ix-es2015-esm",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@reactivex/ix-esnext-esm",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@render-props/scrollable",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@render-props/size-observer",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "@render-props/viewport",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "@types/jest",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@types/lodash",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@types/node",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "abstract-leveldown",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "ajv",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "anser",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "app-root-dir",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "autoprefixer",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "babel-jest",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "babel-loader",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "babel-plugin-emotion",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "babel-plugin-lodash",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "babel-plugin-module-resolver",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "babel-plugin-universal-import",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "bignumber.js",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "bitwise",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "bloem",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "bloom-filter",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "bn.js",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "bs58",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "buffer-xor",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "cache-loader",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "clipboard",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "color",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "compression-webpack-plugin",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "core-js",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "cosmiconfig",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "cross-env",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "cross-fetch",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "cssnano",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "dataloader",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "date-fns",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "debug",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "detective",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "dgeni",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "dgeni-packages",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "elliptic",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "emotion",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "emotion-theming",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "env-paths",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "execa",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "extract-css-chunks-webpack-plugin",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "file-loader",
+      "allowedCategories": [ "tools", "web" ]
+    },
+    {
+      "name": "find-cache-dir",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "fs-extra",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "glob",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "graphlib",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "gray-matter",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "gulp",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "gulp-banner",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "gulp-filter",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "gulp-flatten",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "gulp-if",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "gulp-json-transform",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "gulp-plumber",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "gulp-rename",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "gulp-replace",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "gulp-sourcemaps",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "gulp-typescript",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "hash.js",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "html-entities",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "immer",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "import-local",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "ip-address",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "jest",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "jest-circus",
+      "allowedCategories": [ "tools", "web" ]
+    },
+    {
+      "name": "jest-matchers",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "jest-mock",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "js-priority-queue",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "koa",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "koa-bodyparser",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "koa-compose",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "koa-compress",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "koa-convert",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "koa-cors",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "koa-router",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "koa-static",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "level-js",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "leveldown",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "levelup",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "lint-staged",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "listr",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "loader-utils",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "localforage",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "lodash",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "lodash-webpack-plugin",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "lru-cache",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "markdown-it",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "markdown-it-anchor",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "markdown-it-container",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "memdown",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "mini-html-webpack-plugin",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "minimatch",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "mkdirp",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "modernizr",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "monaco-editor",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "monaco-textmate",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "nanoid",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "nodemon",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "npm-package-arg",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "onigasm",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "optimize-css-assets-webpack-plugin",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "path",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "pify",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "pino",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "pino-pretty",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "popper.js",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "postcss-flexbugs-fixes",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "pouchdb",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "pouchdb-utils",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "prettier",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "prismjs",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "prompts",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "prop-types",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "raw-loader",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "rc",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "react",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "react-dom",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "react-draggable",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "react-headroom",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "react-hot-loader",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "react-icons",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "react-redux",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "react-select",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "react-static",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "react-static-plugin-emotion",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "react-static-plugin-reach-router",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "react-static-plugin-source-filesystem",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "react-transition-group",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "react-universal-component",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "redux",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "redux-persist",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "regenerator-runtime",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "resize-observer-polyfill",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "resolve",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "rimraf",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "rollup",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "rollup-plugin-string",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "rollup-plugin-typescript2",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "rxjs",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "rxjs-tslint-rules",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "safe-stable-stringify",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "schema-utils",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "scrypt-js",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "semver",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "slugify",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "source-map",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "source-map-support",
+      "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "stats-webpack-plugin",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "styled-tools",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "tapable",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "tar",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "terser-webpack-plugin",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "thread-loader",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "through",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "through2",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "tmp",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "toposort",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "trackjs",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "ts-jest",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "ts-loader",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "ts-node",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "tslib",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "tslint",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "tslint-clean-code",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "tslint-config-prettier",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "tslint-consistent-codestyle",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "tslint-immutable",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "tslint-microsoft-contrib",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "tslint-sonarts",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "typescript",
+      "allowedCategories": [ "production", "tools", "web" ]
+    },
+    {
+      "name": "typescript-fsa",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "typescript-fsa-reducers",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "url-loader",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "webpack",
+      "allowedCategories": [ "tools", "web" ]
+    },
+    {
+      "name": "webpack-bundle-analyzer",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "webpack-dev-server",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "webpack-node-externals",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "webpack-stream",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "webpackbar",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "wif",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "workbox-webpack-plugin",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "yargs",
+      "allowedCategories": [ "production", "tools" ]
+    },
+    {
+      "name": "zone.js",
+      "allowedCategories": [ "production" ]
+    }
+  ]
+}

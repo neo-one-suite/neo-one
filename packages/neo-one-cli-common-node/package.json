@@ -2,7 +2,13 @@
   "name": "@neo-one/cli-common-node",
   "version": "1.1.12",
   "description": "NEO•ONE code common to the node cli and other node packages in NEO•ONE.",
-  "main": "./src/index",
+  "main": "./lib/index",
+  "scripts": {
+    "build": "gulp",
+    "lint": "node ./node_modules/@neo-one/build-tools/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "tsc": "./node_modules/.bin/tsc --noEmit"
+  },
   "dependencies": {
     "@neo-one/cli-common": "^1.1.11",
     "@neo-one/client-core": "^1.4.4",
@@ -12,15 +18,17 @@
     "lodash": "^4.17.15",
     "prompts": "^2.2.1",
     "schema-utils": "^2.1.0",
-    "ts-node": "^8.3.0",
+    "ts-node": "^8.4.1",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0",
     "@types/cosmiconfig": "^5.0.3",
     "@types/fs-extra": "^8.0.0",
     "@types/lodash": "^4.14.138",
     "@types/prompts": "^2.0.1",
-    "@types/schema-utils": "^1.0.0"
+    "@types/schema-utils": "^1.0.0",
+    "gulp": "~4.0.2"
   },
   "sideEffects": false
 }

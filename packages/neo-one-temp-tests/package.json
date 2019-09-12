@@ -1,0 +1,23 @@
+{
+  "name": "@neo-one/temp-tests",
+  "version": "1.0.0",
+  "description": "temporarily putting tests in here to resolve a cyclic dependency",
+  "main": "./lib/index.ts",
+  "smartContract": true,
+  "scripts": {
+    "build": "",
+    "lint:staged": ""
+  },
+  "devDependencies": {
+    "@neo-one/client-common": "^1.4.2",
+    "@neo-one/client-core": "^1.4.4",
+    "@neo-one/smart-contract": "^1.1.1",
+    "@neo-one/smart-contract-lib": "^1.5.8",
+    "@neo-one/smart-contract-test": "^1.2.6",
+    "@types/jest": "^24.0.18",
+    "bignumber.js": "^9.0.0",
+    "gulp": "~4.0.2",
+    "tslib": "^1.10.0"
+  },
+  "sideEffects": false
+}

@@ -1,27 +1,27 @@
 aliases:
   - &restore-yarn-cache-10
     keys:
-      - v5-yarn-10-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - v6-yarn-10-{{ .Branch }}-{{ checksum "common/config/yarn.lock" }}
       # Fallback in case checksum fails
-      - v5-yarn-10-{{ .Branch }}-
+      - v6-yarn-10-{{ .Branch }}-
 
   - &save-yarn-cache-10
     paths:
-      - node_modules
-      - ~/.cache/yarn
-    key: v5-yarn-10-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - common/temp/node_modules
+      - common/temp/yarn-cache
+    key: v6-yarn-10-{{ .Branch }}-{{ checksum "common/config/yarn.lock" }}
 
   - &restore-yarn-cache-12
     keys:
-      - v5-yarn-12-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - v6-yarn-12-{{ .Branch }}-{{ checksum "common/config/yarn.lock" }}
       # Fallback in case checksum fails
-      - v5-yarn-12-{{ .Branch }}-
+      - v6-yarn-12-{{ .Branch }}-
 
   - &save-yarn-cache-12
     paths:
-      - node_modules
-      - ~/.cache/yarn
-    key: v5-yarn-12-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - common/temp/node_modules
+      - common/temp/yarn-cache
+    key: v6-yarn-12-{{ .Branch }}-{{ checksum "common/config/yarn.lock" }}
 
   - &filter-ignore-bors-tmp
     branches:
@@ -29,27 +29,31 @@ aliases:
         - staging.tmp
         - trying.tmp
 
-  - &yarn |
-    yarn install --non-interactive --cache-folder ~/.cache/yarn --ignore-engines
+  - &install |
+    rush install
 
   - &lint
     working_directory: ~/neo-one
     steps:
       - checkout
       - restore-cache: *restore-yarn-cache-12
-      - run: *yarn
+      - run: *install
       - save-cache: *save-yarn-cache-12
       - run:
+          name: Changelog
+          command: rush change -v
+          when: always
+      - run:
           name: Prettier
-          command: yarn nit
+          command: rush nit
           when: always
       - run:
           name: Typescript
-          command: yarn tsc
+          command: rush tsc
           when: always
       - run:
           name: Lint
-          command: yarn lint
+          command: rush lint
           when: always
 
   - &build-e2e10
@@ -57,15 +61,16 @@ aliases:
     steps:
       - checkout
       - restore-cache: *restore-yarn-cache-10
-      - run: *yarn
+      - run: *install
       - save-cache: *save-yarn-cache-10
       - run:
           name: Build
-          command: yarn build:e2e
+          command: rush rebuild --verbose
       - persist_to_workspace:
           root: ~/neo-one
           paths:
-            - dist
+            - common
+            - temp
             - node_modules
 
   - &test10
@@ -73,7 +78,7 @@ aliases:
     steps:
       - checkout
       - restore-cache: *restore-yarn-cache-10
-      - run: *yarn
+      - run: *install
       - save-cache: *save-yarn-cache-10
       - run:
           name: Test
@@ -108,7 +113,7 @@ aliases:
     steps:
       - checkout
       - restore-cache: *restore-yarn-cache-12
-      - run: *yarn
+      - run: *install
       - save-cache: *save-yarn-cache-12
       - run:
           name: Build
@@ -124,7 +129,7 @@ aliases:
     steps:
       - checkout
       - restore-cache: *restore-yarn-cache-12
-      - run: *yarn
+      - run: *install
       - save-cache: *save-yarn-cache-12
       - run:
           name: Test

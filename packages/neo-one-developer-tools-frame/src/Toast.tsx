@@ -55,10 +55,10 @@ export function Toast({ toast, removeToast }: Props) {
       if (toast.autoHide !== undefined) {
         autoHideTimer = setTimeout(() => {
           hide();
-          // tslint:disable-next-line no-any
+          // tslint:disable-next-line no-any no-unnecessary-type-assertion no-useless-cast
         }, toast.autoHide) as any;
       }
-      // tslint:disable-next-line no-any
+      // tslint:disable-next-line no-any no-unnecessary-type-assertion no-useless-cast
     }, 500) as any;
 
     return () => {

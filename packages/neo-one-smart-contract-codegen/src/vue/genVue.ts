@@ -27,48 +27,48 @@ export const genVue = ({
     .map(({ name }) => `public ${lowerCaseFirst(name)}: Contracts['${lowerCaseFirst(name)}'];`)
     .join('\n  ');
 
-  const constructor = `constructor() {
-  this.setHost();
-}`;
-
-  const setHost = `this.client = createClient(host);
-this.developerClients = createDeveloperClients(host);
+  const setHost = (host: string) => `this.client = createClient(${host});
+this.developerClients = createDeveloperClients(${host});
 ${contractProperties}`;
+
+  const constructor = `constructor() {
+  ${setHost('')}
+}`;
 
   return {
     js: `
 import { createClient, createDeveloperClients } from '${clientImport}';
-
 ${contractImports}
 
 export class ContractsService {
   ${constructor}
 
   setHost(host) {
-    ${setHost}
+    ${setHost('host')}
   }
 }
 
-export const instance = new ContractsService();
+export const contractsService = new ContractsService();
     `,
     ts: `
-import { Client, DeveloperClients, UserAccountProviders } from '@neo-one/client';
+import { Client, DeveloperClients } from '@neo-one/client';
+import { createClient, createDeveloperClients } from '${clientImport}';
 import { Contracts } from '${getRelativeImport(vuePath, contractsPath)}';
-import { DefaultUserAccountProviders } from '${clientImport}';
+${contractImports}
 
-export class ContractsService<TUserAccountProviders extends UserAccountProviders<any> = DefaultUserAccountProviders> {
-  public client: Client<TUserAccountProviders>;
+export class ContractsService {
+  public client: Client;
   public developerClients: DeveloperClients;
   ${contractTypeProperties}
 
   ${constructor}
 
   public setHost(host?: string) {
-    ${setHost}
+    ${setHost('host')}
   }
 }
 
-export const instance: ContractsService
+export const contractsService = new ContractsService();
   `,
   };
 };

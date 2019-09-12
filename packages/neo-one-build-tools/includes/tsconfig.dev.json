@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "bn.js": ["node_modules/@neo-one/build-tools/types/bn.js.d.ts"]
+      // "@neo-one/*": ["../neo-one-*/src"]
+    }
+  },
+  "exclude": ["./node_modules", "./lib", "./src/__data__/contracts/**/*.ts", "./template/**/*.ts?(x)"]
+}

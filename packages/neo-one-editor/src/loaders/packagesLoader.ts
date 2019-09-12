@@ -14,6 +14,7 @@ const INCLUDE_PACKAGES: readonly string[] = [
   'neo-one-client-switch',
   'neo-one-developer-tools',
   'neo-one-local',
+  'neo-one-node-browser',
   'neo-one-local-browser',
   'neo-one-local-singleton',
   'neo-one-logger',

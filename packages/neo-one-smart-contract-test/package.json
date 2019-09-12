@@ -2,7 +2,13 @@
   "name": "@neo-one/smart-contract-test",
   "version": "1.2.6",
   "description": "NEO•ONE TypeScript smart contract test harness.",
-  "main": "./src/index",
+  "main": "./lib/index",
+  "scripts": {
+    "build": "gulp",
+    "lint": "node ./node_modules/@neo-one/build-tools/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "tsc": "./node_modules/.bin/tsc --noEmit"
+  },
   "dependencies": {
     "@neo-one/client-common": "^1.4.2",
     "@neo-one/client-core": "^1.4.4",
@@ -16,8 +22,12 @@
     "tslib": "^1.10.0"
   },
   "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0",
+    "@neo-one/smart-contract": "^1.1.1",
+    "@neo-one/smart-contract-lib": "^1.5.8",
     "@types/lodash": "^4.14.138",
-    "@types/memdown": "^3.0.0"
+    "@types/memdown": "^3.0.0",
+    "gulp": "~4.0.2"
   },
   "sideEffects": false
 }

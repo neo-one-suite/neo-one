@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "importHelpers": true,
+    "noEmitHelpers": true,
+    "noEmit": false,
+    "sourceMap": false,
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "module": "esnext",
+    "target": "es2017",
+    "esModuleInterop": false,
+    "resolveJsonModule": true
+  }
+}

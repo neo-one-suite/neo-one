@@ -1,3 +1,4 @@
+/// <reference types="@emotion/core"/>
 import styled from '@emotion/styled';
 import BigNumber from 'bignumber.js';
 // tslint:disable-next-line

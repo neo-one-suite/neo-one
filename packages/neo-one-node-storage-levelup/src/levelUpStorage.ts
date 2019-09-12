@@ -28,13 +28,12 @@ import { convertChange } from './convertChange';
 import { KeyNotFoundError } from './errors';
 import * as read from './read';
 
-export const levelUpStorage = ({
-  db,
-  context,
-}: {
+interface LevelUpStorageOptions {
   readonly db: LevelUp;
   readonly context: DeserializeWireContext;
-}): Storage => {
+}
+
+export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage => {
   const getHash = async ({ hashOrIndex }: HeaderKey): Promise<UInt256> => {
     let hash = hashOrIndex;
     if (typeof hash === 'number') {

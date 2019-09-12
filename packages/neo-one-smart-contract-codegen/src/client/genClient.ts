@@ -83,7 +83,7 @@ export const createClient = (getUserAccountProvidersOrHost) => {
   let host = 'localhost'
   if (typeof getUserAccountProvidersOrHost === 'string') {
     host = getUserAccountProvidersOrHost;
-  } else if (getUserAccountProvidersOrHost !== undefined) {
+  } else if (getUserAccountProvidersOrHost != undefined) {
     getUserAccountProviders = getUserAccountProvidersOrHost;
   }
 
@@ -123,7 +123,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
   let host = 'localhost'
   if (typeof getUserAccountProvidersOrHost === 'string') {
     host = getUserAccountProvidersOrHost;
-  } else if (getUserAccountProvidersOrHost !== undefined) {
+  } else if (getUserAccountProvidersOrHost != undefined) {
     getUserAccountProviders = getUserAccountProvidersOrHost as any;
   }
 

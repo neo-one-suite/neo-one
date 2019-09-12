@@ -1,0 +1,124 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/command-line.schema.json",
+  "commands": [
+    {
+      "commandKind": "global",
+      "name": "build-workers",
+      "summary": "Build NEO-ONE web workers",
+      "description": "build the NEO-ONE website workers from source",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle workers"
+    },
+    {
+      "commandKind": "global",
+      "name": "build-overlay",
+      "summary": "Build NEO-ONE web overlay",
+      "description": "build the NEO-ONE website overlay from source",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle overlay"
+    },
+    {
+      "commandKind": "global",
+      "name": "build-preview",
+      "summary": "Build NEO-ONE web preview",
+      "description": "build the NEO-ONE editor preview from source",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle preview"
+    },
+    {
+      "commandKind": "global",
+      "name": "build-test-runner",
+      "summary": "Build NEO-ONE test-runner",
+      "description": "build the NEO-ONE test-runner from source",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle testRunner"
+    },
+    {
+      "commandKind": "global",
+      "name": "start-server",
+      "summary": "Start NEO-ONE editor server",
+      "description": "Build and run the NEO-ONE editor server",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "mkdir -p ./dist/server && touch ./dist/server/index.js && cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --watch --bundle server"
+    },
+    {
+      "commandKind": "global",
+      "name": "start-website",
+      "summary": "Build NEO-ONE web preview",
+      "description": "build the NEO-ONE editor preview from source",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=./packages/neo-one-build-tools/includes/build-configs/tsconfig.es2017.cjs.json react-static start --config ./packages/neo-one-website/static.config.js"
+    },
+    {
+      "commandKind": "global",
+      "name": "serve-preview",
+      "summary": "Serve the NEO-ONE web preview",
+      "description": "Serve the NEO-ONE web preview",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "serve ./dist/preview -p 8080"
+    },
+    {
+      "commandKind": "global",
+      "name": "nit",
+      "summary": "find issues with formatting",
+      "description": "run prettier with the `--list-different` parameter for CI",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.{ts,tsx}\""
+    },
+    {
+      "commandKind": "global",
+      "name": "prettier",
+      "summary": "run prettier on the repo",
+      "description": "run prettier across packages typescript files",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "prettier --config .prettierrc --write \"packages/*/src/**/*.{ts,tsx}\""
+    },
+    {
+      "commandKind": "global",
+      "name": "test",
+      "summary": "unit test runner",
+      "description": "Run all jest tests using the `unit` config",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" jest --config ./packages/neo-one-build-tests/jest/unit.js"
+    },
+    {
+      "commandKind": "bulk",
+      "name": "lint:staged",
+      "summary": "Runs prettier/tslint across staged files",
+      "description": "Runs `lint:staged` across packages",
+      "safeForSimultaneousRushProcesses": true,
+      "ignoreDependencyOrder": true,
+      "enableParallelism": false,
+      "ignoreMissingScript": true
+    },
+    {
+      "commandKind": "bulk",
+      "name": "lint",
+      "summary": "Runs tslint for every package",
+      "description": "Runs tslint for every file in package",
+      "safeForSimultaneousRushProcesses": true,
+      "ignoreDependencyOrder": true,
+      "enableParallelism": true,
+      "ignoreMissingScript": true
+    },
+    {
+      "commandKind": "bulk",
+      "name": "tsc",
+      "summary": "test tsc",
+      "description": "temp",
+      "safeForSimultaneousRushProcesses": true,
+      "ignoreDependencyOrder": true,
+      "enableParallelism": true,
+      "ignoreMissingScript": true
+    }
+  ],
+  "parameters": [
+    {
+      "parameterKind": "flag",
+      "longName": "--watch",
+      "shortName": "-w",
+      "description": "flags this build command as watch",
+      "associatedCommands": ["build-workers", "build-overlay", "build-preview", "build-test-runner"]
+    }
+  ]
+}

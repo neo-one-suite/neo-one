@@ -1,0 +1,8 @@
+{
+  "extends": "./node_modules/@neo-one/build-tools/includes/tsconfig.dev.json",
+  "compilerOptions": {
+    "typeRoots": ["node_modules/@types", "node_modules/@neo-one/build-tools/types"]
+  },
+  "includes": ["node_modules/@neo-one/build-tools/types"],
+  "exclude": ["src/__data__/contracts/**/*.ts", "src/__data__/snippets/**/*.ts"]
+}

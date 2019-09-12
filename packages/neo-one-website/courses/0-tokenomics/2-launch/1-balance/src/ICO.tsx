@@ -1,4 +1,4 @@
-// tslint:disable-next-line
+/// <reference types="@emotion/core"/>
 import styled from '@emotion/styled';
 import { FromStream } from '@neo-one/react';
 import { Box } from '@neo-one/react-core';
