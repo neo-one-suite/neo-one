@@ -3,17 +3,25 @@
   "version": "2.3.0",
   "description": "NEO•ONE local browser workers.",
   "main": "./src/index",
+  "scripts": {
+    "build": "",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative"
+  },
   "dependencies": {
     "@neo-one/local-browser": "^2.3.0",
     "@neo-one/worker": "^2.3.0",
-    "core-js": "^3.1.4",
+    "core-js": "^3.2.1",
+    "file-loader": "^4.2.0",
     "nanoid": "^2.0.3",
     "pouchdb": "^7.1.1",
     "regenerator-runtime": "^0.13.3",
-    "rxjs": "^6.5.2"
+    "rxjs": "^6.5.3"
   },
   "devDependencies": {
-    "@types/nanoid": "^2.0.0"
+    "@neo-one/build-tools": "^1.0.0",
+    "@types/nanoid": "^2.0.0",
+    "@types/pouchdb": "^6.4.0"
   },
   "sideEffects": false
 }

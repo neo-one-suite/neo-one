@@ -50,7 +50,7 @@ export function DateTimePicker({
       const onError = (nextError: string) => {
         editingTimeout = setTimeout(() => {
           setError(nextError);
-          // tslint:disable-next-line no-any
+          // tslint:disable-next-line no-any no-unnecessary-type-assertion no-useless-cast
         }, 2000) as any;
       };
 

@@ -43,7 +43,7 @@ function workerEndpoint(worker: Worker): WorkerEndpoint {
   return {
     addEventListener: worker.addEventListener.bind(worker) as any,
     removeEventListener: worker.removeEventListener.bind(worker) as any,
-    postMessage: worker.postMessage.bind(worker),
+    postMessage: worker.postMessage.bind(worker) as any,
     start: () => {
       // do nothing
     },

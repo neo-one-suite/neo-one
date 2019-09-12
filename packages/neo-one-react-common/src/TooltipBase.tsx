@@ -35,8 +35,9 @@ const TooltipBaseComponent = forwardRef<HTMLDivElement, React.ComponentPropsWith
   return <Popover {...props} ref={ref} visible={props.visible === undefined ? visible : props.visible} />;
 });
 
-// tslint:disable-next-line no-any
-export const TooltipBase = styled(TooltipBaseComponent as any)<{}, {}>`
+// type instantiation is excessively deep and possibly
+// @ts-ignore
+export const TooltipBase: any = styled(TooltipBaseComponent)<{}, {}>`
   ${theme('TooltipBase')};
 `;
 

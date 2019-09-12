@@ -5,6 +5,7 @@ import * as React from 'react';
 interface Props {
   readonly children: string | number | React.ReactElement | undefined;
 }
+
 export function ThemeProvider({ children }: Props) {
   return <ThemeProviderBase theme={theme}>{children}</ThemeProviderBase>;
 }

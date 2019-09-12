@@ -2,18 +2,28 @@
   "name": "@neo-one/utils-node",
   "version": "2.3.0",
   "description": "NEO•ONE shared Nodejs utils.",
-  "main": "./src/index",
+  "main": "./lib/index",
+  "scripts": {
+    "build": "gulp",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "pack": "gulp pack"
+  },
   "dependencies": {
     "@neo-one/utils": "^2.3.0",
     "execa": "^3.2.0",
     "npm-package-arg": "^6.1.0",
     "pino": "^5.12.6",
-    "yargs": "^14.0.0"
+    "tslib": "^1.10.0",
+    "yargs": "^14.2.0"
   },
   "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0",
     "@types/npm-package-arg": "^6.1.0",
+    "@types/jest": "^24.0.18",
     "@types/pino": "^5.8.9",
-    "@types/yargs": "^13.0.2"
+    "@types/yargs": "^13.0.3",
+    "gulp": "~4.0.2"
   },
   "sideEffects": false
 }

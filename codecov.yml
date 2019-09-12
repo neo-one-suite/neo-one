@@ -3,13 +3,10 @@ codecov:
     - '!appveyor'
 
 ignore:
-  - 'jest'
+  - 'common'
   - 'scripts'
   - '**/__e2e__/**'
   - '**/__data__/**'
-
-fixes:
-  - 'dist/neo-one::'
 
 comment:
   layout: 'reach, diff, flags, files'

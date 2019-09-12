@@ -8,7 +8,7 @@ import { getSize } from './utils';
 // an equivalent rollup plugin for distributed version.
 // tslint:disable
 // @ts-ignore
-import iframeScript from '../../../dist/tools/tools.raw.js';
+import iframeScript from '@neo-one/developer-tools-frame/lib/tools.raw.js';
 // tslint:enable
 
 // tslint:disable no-let
@@ -43,7 +43,7 @@ const clearRefreshOptionsTimeout = () => {
 
 const refreshOptions = () => {
   clearRefreshOptionsTimeout();
-  // tslint:disable-next-line no-any
+  // tslint:disable-next-line no-any no-unnecessary-type-assertion no-useless-cast
   refreshOptionsTimeout = setTimeout(doRefreshOptions, 100) as any;
 };
 

@@ -2,13 +2,25 @@
   "name": "@neo-one/react-core",
   "version": "2.3.0",
   "description": "NEO•ONE shared react.",
-  "main": "./src/index",
+  "main": "./lib/index",
+  "scripts": {
+    "build": "gulp",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "pack": "gulp pack"
+  },
   "dependencies": {
-    "@emotion/core": "^10.0.16",
-    "@emotion/styled": "^10.0.15",
+    "@emotion/core": "^10.0.17",
+    "@emotion/styled": "^10.0.17",
+    "@types/react": "^16.9.11",
     "react": "^16.11.0",
-    "rxjs": "^6.5.2",
-    "styled-tools": "^1.7.1"
+    "rxjs": "^6.5.3",
+    "styled-tools": "^1.7.1",
+    "tslib": "^1.10.0"
+  },
+  "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0",
+    "gulp": "~4.0.2"
   },
   "sideEffects": false
 }

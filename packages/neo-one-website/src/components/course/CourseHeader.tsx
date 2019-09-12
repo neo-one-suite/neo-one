@@ -23,10 +23,6 @@ const StyledToolbar = styled(Toolbar)`
     grid-gap: 8px;
     padding: 0 8px;
   }
-
-  ${/* sc-sel */ ToolbarFocusable as any} {
-    outline: none;
-  }
 `;
 
 const LogoLink = styled(RouterLink)`

@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "importHelpers": true,
+    "noEmitHelpers": true,
+    "noEmit": false,
+    "declaration": true,
+    "removeComments": true,
+    "allowJs": false
+  },
+  "exclude": ["src/bin/**/*.ts"]
+}

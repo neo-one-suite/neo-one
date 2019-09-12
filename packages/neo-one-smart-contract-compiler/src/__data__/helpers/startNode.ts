@@ -1,3 +1,5 @@
+/// <reference types="@neo-one/build-tools/types/e2e" />
+
 import {
   ABI,
   common,

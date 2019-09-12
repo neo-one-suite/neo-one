@@ -65,7 +65,7 @@ export const makeOption = async ({
     // tslint:disable-next-line no-array-mutation
     balances: assetBalances
       .filter(utils.notNull)
-      .concat(tokenBalances)
+      .concat(tokenBalances.filter(utils.notNull))
       .sort(([nameA], [nameB]) => {
         if (nameA.localeCompare(nameB) === 0) {
           return 0;
