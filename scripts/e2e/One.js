@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const http = require('http');
 const execa = require('execa');
 const fs = require('fs-extra');
 const nodePath = require('path');

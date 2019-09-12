@@ -1,0 +1,34 @@
+name: Cypress
+on:
+  push:
+    branches:
+      - master
+      - staging
+      - trying
+  pull_request:
+    branches:
+      - master
+      - staging
+      - trying
+jobs:
+  cypress12:
+    name: cypress12
+    runs-on: macOS-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@94d077c24971944d312dd9197c1bdfba62b39878
+      - name: Install Node
+        run: brew update-reset && brew update && export PATH="/usr/local/bin:$PATH" && brew unlink node@6 && brew install node
+      - name: Install Chrome
+        run: brew cask install google-chrome
+      - name: Yarn Install
+        run: yarn install --non-interactive --ignore-engines
+      - name: Run Cypress Express Test
+        run: yarn test:cypress-express
+      - name: Store Cypress Screenshots
+        if: failure()
+        continue-on-error: true
+        uses: actions/upload-artifact@e20a7983ecacb840d6004bbaa6dd6f75eaff8af7
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
