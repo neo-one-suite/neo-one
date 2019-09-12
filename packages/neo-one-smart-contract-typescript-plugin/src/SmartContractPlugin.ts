@@ -18,7 +18,13 @@ export class SmartContractPlugin {
 
     proxy.getSemanticDiagnostics = (fileName) => {
       // tslint:disable-next-line no-non-null-assertion
-      const [result] = info.languageServiceHost.resolveModuleNames!(['@neo-one/smart-contract'], fileName);
+      const [result] = info.languageServiceHost.resolveModuleNames!(
+        ['@neo-one/smart-contract'],
+        fileName,
+        undefined,
+        undefined,
+        info.project.getCompilerOptions(),
+      );
 
       return [
         ...getSemanticDiagnostics(
