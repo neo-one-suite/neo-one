@@ -494,7 +494,10 @@ describe('InvokeSmartContractHelper', () => {
           },
           {
             name: 'issue',
-            parameters: [{ name: 'to', type: 'Address' }, { name: 'amount', type: 'Integer', decimals: 8 }],
+            parameters: [
+              { name: 'to', type: 'Address' },
+              { name: 'amount', type: 'Integer', decimals: 8 },
+            ],
             returnType: { type: 'Boolean' },
           },
         ],

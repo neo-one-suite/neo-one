@@ -335,7 +335,7 @@ export class ContractInfoProcessor {
         ts.isPropertyDeclaration(decl) ||
         ts.isGetAccessorDeclaration(decl) ||
         ts.isSetAccessorDeclaration(decl) ||
-        ts.isParameterPropertyDeclaration(decl, decl.parent)
+        ts.isParameterPropertyDeclaration(decl)
       )
     ) {
       return undefined;

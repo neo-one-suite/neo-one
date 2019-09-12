@@ -3,6 +3,12 @@
   "version": "2.3.1",
   "description": "NEO•ONE TypeScript smart contract test harness for browsers.",
   "main": "./src/index",
+  "scripts": {
+    "build": "",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
+  },
   "dependencies": {
     "@neo-one/client-core": "^2.3.0",
     "@neo-one/local-browser": "^2.3.1",
@@ -11,7 +17,11 @@
     "@neo-one/smart-contract-test-common": "^2.3.1",
     "@neo-one/utils": "^2.3.0",
     "@neo-one/worker": "^2.3.0",
+    "core-js": "^3.2.1",
     "tslib": "^1.10.0"
+  },
+  "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0"
   },
   "sideEffects": false
 }

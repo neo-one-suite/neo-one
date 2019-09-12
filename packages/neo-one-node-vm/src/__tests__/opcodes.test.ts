@@ -1315,7 +1315,10 @@ const OPCODES = ([
 
       {
         op: 'CHECKMULTISIG',
-        args: [[keys[0].publicKey, keys[1].publicKey], [signature0, signature1]],
+        args: [
+          [keys[0].publicKey, keys[1].publicKey],
+          [signature0, signature1],
+        ],
         result: [new BooleanStackItem(true)],
         mockTransaction: ({ transaction }) => {
           transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
@@ -1336,7 +1339,10 @@ const OPCODES = ([
 
       {
         op: 'CHECKMULTISIG',
-        args: [[keys[0].publicKey, keys[2].publicKey, keys[1].publicKey], [signature0, signature1]],
+        args: [
+          [keys[0].publicKey, keys[2].publicKey, keys[1].publicKey],
+          [signature0, signature1],
+        ],
 
         result: [new BooleanStackItem(true)],
         mockTransaction: ({ transaction }) => {

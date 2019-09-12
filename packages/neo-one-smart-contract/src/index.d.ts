@@ -1276,7 +1276,9 @@ type SmartContractArg = SmartContractValue | ForwardValue;
 type IsValidSmartContract<T> = {
   [K in keyof T]: T[K] extends Function
     ? Parameters<T[K]> extends SmartContractArg[]
-      ? (ReturnType<T[K]> extends SmartContractArg ? T[K] : never)
+      ? ReturnType<T[K]> extends SmartContractArg
+        ? T[K]
+        : never
       : never
     : T[K] extends SmartContractValue
     ? T[K]

@@ -424,10 +424,7 @@ export const createSmartContract = ({
   };
 
   const iterActions = (options?: SmartContractIterOptions): AsyncIterable<Action> =>
-    AsyncIterableX.from(iterActionsRaw(options)).pipe(
-      map(convertAction),
-      filter(utils.notNull),
-    );
+    AsyncIterableX.from(iterActionsRaw(options)).pipe(map(convertAction), filter(utils.notNull));
 
   const iterEvents = (options?: SmartContractIterOptions): AsyncIterable<Event> =>
     AsyncIterableX.from(iterActions(options)).pipe(

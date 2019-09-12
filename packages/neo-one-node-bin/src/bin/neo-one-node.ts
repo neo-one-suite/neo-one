@@ -1,6 +1,5 @@
-// tslint:disable-next-line no-implicit-dependencies
-import { cmd } from '@neo-one/node-bin';
 import yargs from 'yargs';
+import * as cmd from '../cmd';
 
 const { command } = cmd;
 // tslint:disable-next-line no-unused-expression

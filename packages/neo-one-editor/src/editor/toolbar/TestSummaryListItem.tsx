@@ -39,9 +39,6 @@ const TestSummaryListItemBase = ({ selected, testSuite, onClick, ...props }: Pro
   </Wrapper>
 );
 
-export const TestSummaryListItem = connect(
-  undefined,
-  (dispatch, { testSuite }: ExternalProps) => ({
-    onClick: () => dispatch(selectTestSuite(testSuite.path)),
-  }),
-)(TestSummaryListItemBase);
+export const TestSummaryListItem = connect(undefined, (dispatch, { testSuite }: ExternalProps) => ({
+  onClick: () => dispatch(selectTestSuite(testSuite.path)),
+}))(TestSummaryListItemBase);

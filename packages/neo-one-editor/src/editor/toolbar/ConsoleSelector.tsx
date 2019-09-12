@@ -19,9 +19,6 @@ const ConsoleSelectorBase = ({ consoleOutput, owner, onChange, ...props }: Props
   />
 );
 
-export const ConsoleSelector = connect(
-  selectConsoleOutput,
-  (dispatch) => ({
-    onChange: (owner: string) => dispatch(setConsoleOwner(owner)),
-  }),
-)(ConsoleSelectorBase);
+export const ConsoleSelector = connect(selectConsoleOutput, (dispatch) => ({
+  onChange: (owner: string) => dispatch(setConsoleOwner(owner)),
+}))(ConsoleSelectorBase);

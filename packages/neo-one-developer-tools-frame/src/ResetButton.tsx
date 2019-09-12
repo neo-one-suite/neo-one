@@ -16,7 +16,9 @@ export function ResetButton() {
       developerClient
         .resetProject()
         .then(() => {
-          client.reset();
+          developerClient.reset().catch(() => {
+            // do nothing
+          });
           setDisabled(false);
         })
         .catch((error) => {

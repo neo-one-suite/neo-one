@@ -3,9 +3,9 @@ import { isRunning } from '../../../common';
 
 describe('start network', () => {
   it('starts a private network', async () => {
-    const execAsync = one.createExecAsync('ico');
+    const execAsync = one.createExecAsync('ico-neotracker');
     execAsync('start network');
-    const config = await one.getProjectConfig('ico');
+    const config = await one.getProjectConfig('ico-neotracker');
 
     await one.until(async () => {
       const [live, ready] = await Promise.all([

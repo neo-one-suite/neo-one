@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Migrate to Rush",
+      "type": "minor",
+      "packageName": "@neo-one/react"
+    }
+  ],
+  "packageName": "@neo-one/react",
+  "email": "danwbyrne@gmail.com"
+}

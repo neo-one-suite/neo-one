@@ -349,7 +349,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
           this.mutableConnectPeersTimeout = setTimeout(() => {
             this.mutableConnectPeersTimeout = undefined;
             resolve();
-            // tslint:disable-next-line no-any
+            // tslint:disable-next-line no-any no-useless-cast
           }, this.mutableConnectPeersDelayMS) as any;
         });
       } catch (err) {

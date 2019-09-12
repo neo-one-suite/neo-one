@@ -76,9 +76,10 @@ const fetchTallestBlockIndex = async (
   checkEndpoints?: number,
 ): Promise<number | undefined> => {
   const counts = await Promise.all(
-    _.take(_.shuffle(rpcEndpoints), checkEndpoints === undefined ? CHECK_ENDPOINTS : checkEndpoints).map(
-      async (rpcEndpoint) => fetchCount(logger, rpcEndpoint, timeoutMS),
-    ),
+    _.take(
+      _.shuffle(rpcEndpoints),
+      checkEndpoints === undefined ? CHECK_ENDPOINTS : checkEndpoints,
+    ).map(async (rpcEndpoint) => fetchCount(logger, rpcEndpoint, timeoutMS)),
   );
 
   return _.max(counts.filter(utils.notNull).map((count) => count - 1));
@@ -95,15 +96,17 @@ let lastCheckIndex: number | undefined;
 let lastCheckTime: number | undefined;
 // tslint:enable no-let
 
+interface CheckReadyOptions {
+  readonly logger: Logger;
+  readonly blockchain: Blockchain;
+  readonly options: Options;
+}
+
 export const checkReady = async ({
   logger,
   blockchain,
   options: { rpcURLs = [], offset = 3, timeoutMS = 1000, checkEndpoints },
-}: {
-  readonly logger: Logger;
-  readonly blockchain: Blockchain;
-  readonly options: Options;
-}) => {
+}: CheckReadyOptions) => {
   if (lastCheckTime === undefined || Date.now() - lastCheckTime > timeoutMS) {
     lastCheckTime = Date.now();
     lastCheckIndex = await fetchTallestBlockIndex(logger, rpcURLs, timeoutMS, checkEndpoints);

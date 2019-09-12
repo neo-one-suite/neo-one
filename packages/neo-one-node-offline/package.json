@@ -2,7 +2,14 @@
   "name": "@neo-one/node-offline",
   "version": "2.3.0",
   "description": "NEO•ONE utility for loading serialized blocks (chain.acc) into a node.",
-  "main": "./src/index",
+  "main": "./lib/index",
+  "scripts": {
+    "build": "gulp",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "pack": "gulp pack",
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
+  },
   "dependencies": {
     "@neo-one/node-core": "^2.3.0",
     "@neo-one/utils": "^2.3.0",
@@ -10,7 +17,9 @@
     "tslib": "^1.10.0"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.138"
+    "@neo-one/build-tools": "^1.0.0",
+    "@types/lodash": "^4.14.138",
+    "gulp": "~4.0.2"
   },
   "sideEffects": false
 }

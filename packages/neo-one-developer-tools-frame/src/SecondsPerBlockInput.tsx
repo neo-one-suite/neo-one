@@ -77,7 +77,7 @@ export function SecondsPerBlockInput(props: React.ComponentProps<typeof TextInpu
         editSecondsPerBlockTimer = setTimeout(
           () => setSecondsPerBlockText(`${settings.secondsPerBlock}`),
           10000,
-          // tslint:disable-next-line no-any
+          // tslint:disable-next-line no-any no-unnecessary-type-assertion no-useless-cast
         ) as any;
       } else {
         updateSecondsPerBlockTimer = setTimeout(() => {
@@ -93,7 +93,7 @@ export function SecondsPerBlockInput(props: React.ComponentProps<typeof TextInpu
               addError(error);
               setEditable(true);
             });
-          // tslint:disable-next-line no-any
+          // tslint:disable-next-line no-any no-unnecessary-type-assertion no-useless-cast
         }, 2000) as any;
       }
     };

@@ -1,0 +1,4 @@
+{
+  "extends": "./node_modules/@neo-one/build-tools/includes/tsconfig.dev.json",
+  "include": ["src", "static/**/*.svg", "../neo-one-build-tools/types/global.d.ts", "static/global.d.ts"]
+}
