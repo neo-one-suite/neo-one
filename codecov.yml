@@ -1,16 +1,18 @@
 codecov:
   ci:
-    - "!appveyor"
+    - '!appveyor'
 
 ignore:
-  - "jest"
-  - "scripts"
+  - 'jest'
+  - 'scripts'
+  - '**/__e2e__/**'
+  - '**/__data__/**'
 
 fixes:
-  - "dist/neo-one::"
+  - 'dist/neo-one::'
 
 comment:
-  layout: "reach, diff, flags, files"
+  layout: 'reach, diff, flags, files'
 
 coverage:
   status:
