@@ -18,7 +18,8 @@ echo ref_value: $ref_value
 IMAGE_TAG=${ref_value//\//-} ## replace `/` with `-` in ref for docker tag requirement (master or 2019-03-13)
 IMAGE_TAG=${IMAGE_TAG//\@/v}
 IMAGE_TAG=${IMAGE_TAG:1}
-LATEST_TAG=latest-${GITHUB_SHA:0:7}
+SHA_TAG=${GITHUB_SHA:0:7}
+LATEST_TAG=latest
 NAMESPACE=${DOCKER_NAMESPACE:-$USERNAME} ## use github username as docker namespace unless specified
 IMAGE_NAME=${DOCKER_IMAGE_NAME:-$REPOSITORY} ## use github repository name as docker image name unless specified
 REGISTRY_IMAGE="$NAMESPACE/$IMAGE_NAME"
@@ -36,10 +37,15 @@ fi
 ## build the image locally
 docker build -t $IMAGE_NAME ${*:-.} ## pass in the build command from user input, otherwise build in default mode
 
-# push all the tags to registry
+# push sha tagged image to the repository
+docker tag $IMAGE_NAME $REGISTRY_IMAGE:$SHA_TAG
+docker push $REGISTRY_IMAGE:$SHA_TAG
+
+# push latest tagged image to the repository
 docker tag $IMAGE_NAME $REGISTRY_IMAGE:$LATEST_TAG
 docker push $REGISTRY_IMAGE:$LATEST_TAG
 
+# if releasing tags, push image tagged with tag
 if [ "${ref_type}" = "tags" ]
 then
   docker tag $IMAGE_NAME $REGISTRY_IMAGE:$IMAGE_TAG
