@@ -2,8 +2,6 @@
 
 set -u -e -o pipefail
 
-## mapping of var from user input or default value
-
 USERNAME=${GITHUB_REPOSITORY%%/*}
 REPOSITORY=${GITHUB_REPOSITORY#*/}
 
@@ -15,17 +13,8 @@ echo ref_tmp: $ref_tmp
 echo ref_type: $ref_type
 echo ref_value: $ref_value
 
-IMAGE_TAG=${ref_value//\//-} ## replace `/` with `-` in ref for docker tag requirement (master or 2019-03-13)
-IMAGE_TAG=${IMAGE_TAG//\@/v}
-IMAGE_TAG=${IMAGE_TAG:1}
-SHA_TAG=${GITHUB_SHA:0:7}
 LATEST_TAG=latest
-NAMESPACE=${DOCKER_NAMESPACE:-$USERNAME} ## use github username as docker namespace unless specified
-IMAGE_NAME=${DOCKER_IMAGE_NAME:-$REPOSITORY} ## use github repository name as docker image name unless specified
-REGISTRY_IMAGE="$NAMESPACE/$IMAGE_NAME"
-echo IMAGE_TAG: $IMAGE_TAG
-echo NAMESPAACE: $NAMESPACE
-echo IMAGE_NAME: $IMAGE_NAME
+REGISTRY_IMAGE="$DOCKER_NAMESPACE/$DOCKER_IMAGE_NAME"
 echo REGISTRY_IMAGE: $REGISTRY_IMAGE
 
 ## login if needed
@@ -35,19 +24,28 @@ then
 fi
 
 ## build the image locally
-docker build -t $IMAGE_NAME ${*:-.} ## pass in the build command from user input, otherwise build in default mode
-
-# push sha tagged image to the repository
-docker tag $IMAGE_NAME $REGISTRY_IMAGE:$SHA_TAG
-docker push $REGISTRY_IMAGE:$SHA_TAG
+docker build -t $DOCKER_IMAGE_NAME ${*:-.} ## pass in the build command from user input, otherwise build in default mode
 
 # push latest tagged image to the repository
-docker tag $IMAGE_NAME $REGISTRY_IMAGE:$LATEST_TAG
+docker tag $DOCKER_IMAGE_NAME $REGISTRY_IMAGE:$LATEST_TAG
 docker push $REGISTRY_IMAGE:$LATEST_TAG
 
-# if releasing tags, push image tagged with tag
-if [ "${ref_type}" = "tags" ]
+echo CHECKING MATCH: @neo-one/node-bin = "${ref_value:0:17}"
+# if releasing, push image tagged with tag
+if [ "${ref_value:0:17}" = "@neo-one/node-bin" ]
 then
-  docker tag $IMAGE_NAME $REGISTRY_IMAGE:$IMAGE_TAG
-  docker push $REGISTRY_IMAGE:$IMAGE_TAG
+  RELEASE_TAG=${ref_value//\//-} ## replace `/` with `-`
+  RELEASE_TAG=${RELEASE_TAG//\@/v} ## replace `@` with `v`
+  RELEASE_TAG=${RELEASE_TAG:1}
+  echo RELEASE_TAG: $RELEASE_TAG
+
+  docker tag $DOCKER_IMAGE_NAME $REGISTRY_IMAGE:$RELEASE_TAG
+  docker push $REGISTRY_IMAGE:$RELEASE_TAG
+else
+  # push sha tagged image to the repository
+  SHA_TAG=${GITHUB_SHA:0:7}
+  echo SHA_TAG: $SHA_TAG
+
+  docker tag $DOCKER_IMAGE_NAME $REGISTRY_IMAGE:$SHA_TAG
+  docker push $REGISTRY_IMAGE:$SHA_TAG
 fi
