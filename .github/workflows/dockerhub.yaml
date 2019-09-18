@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - master
-    tags:
-      - \@neo-one/node-bin*
+  release:
+    types: [created]
 jobs:
   node:
     runs-on: ubuntu-18.04
