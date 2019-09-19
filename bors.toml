@@ -6,5 +6,6 @@ status = [
   "ci/circleci: e2e12",
   "ci/circleci: build-e2e10",
   "ci/circleci: build-e2e12",
+  "Cypress%"
 ]
 timeout_sec = 18000
