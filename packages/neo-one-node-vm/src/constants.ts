@@ -13,16 +13,36 @@ export const MAX_ARRAY_SIZE = 1024;
 export const MAX_ARRAY_SIZE_BN = new BN(1024);
 export const BLOCK_HEIGHT_YEAR = 2000000;
 export const BLOCK_HEIGHT_MAX_SIZE_CHECKS = Number.MAX_SAFE_INTEGER;
-const ratio = 100000;
+
 export const FEES = {
-  ONE: new BN(ratio * 1),
-  TEN: new BN(ratio * 10),
-  TWENTY: new BN(ratio * 20),
-  ONE_HUNDRED: new BN(ratio * 100),
-  TWO_HUNDRED: new BN(ratio * 200),
-  FOUR_HUNDRED: new BN(ratio * 400),
-  FIVE_HUNDRED: new BN(ratio * 500),
-  ONE_THOUSAND: new BN(ratio * 1000),
+  30: new BN(30),
+  40: new BN(40),
+  60: new BN(60),
+  70: new BN(70),
+  100: new BN(100),
+  120: new BN(120),
+  150: new BN(150),
+  180: new BN(180),
+  200: new BN(200),
+  250: new BN(250),
+  300: new BN(300),
+  400: new BN(400),
+  500: new BN(500),
+  7_000: new BN(7000),
+  10_000: new BN(10000),
+  13_000: new BN(13000),
+  15_000: new BN(15000),
+  22_000: new BN(22000),
+  30_000: new BN(30000),
+  70_000: new BN(70000),
+  80_000: new BN(80000),
+  100_000: new BN(100000),
+  110_000: new BN(110000),
+  270_000: new BN(270000),
+  300_000: new BN(300000),
+  500_000: new BN(500000),
+  1_000_000: new BN(1000000),
+  2_500_000: new BN(2500000),
 };
 
 export const FREE_GAS = common.TEN_FIXED8;
@@ -39,6 +59,8 @@ export interface ExecutionInit {
 export interface CreatedContracts {
   readonly [hash: string]: UInt160;
 }
+export type InvocationCounter = Record<string, number | undefined>;
+
 export interface Options {
   readonly depth: number;
   readonly stack: ExecutionStack;
@@ -49,6 +71,7 @@ export interface Options {
   readonly entryScriptHash: UInt160;
   readonly returnValueCount: number;
   readonly stackCount: number;
+  readonly invocationCounter: InvocationCounter;
   readonly pc?: number;
 }
 export interface ExecutionContext {
@@ -79,6 +102,7 @@ export interface ExecutionContext {
   readonly createdContracts: CreatedContracts;
   readonly returnValueCount: number;
   readonly stackCount: number;
+  readonly invocationCounter: InvocationCounter;
 }
 
 export interface OpResult {
