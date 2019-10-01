@@ -20,7 +20,7 @@
     "rxjs": "^6.5.2",
     "safe-stable-stringify": "^1.1.0",
     "semver": "^6.0.0",
-    "tar": "^4.4.10"
+    "tar": "^5.0.0"
   },
   "devDependencies": {
     "@types/graphlib": "^2.1.5",
