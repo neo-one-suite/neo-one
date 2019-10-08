@@ -1,10 +1,7 @@
 // tslint:disable no-object-mutation no-any no-loop-statement
-import { BinaryWriter, crypto, OpCode, ScriptBuilder, ScriptBuilderParam } from '@neo-one/client-common';
+import { BinaryWriter, OpCode, ScriptBuilder, ScriptBuilderParam } from '@neo-one/client-common';
 import {
   AttributeUsage,
-  Contract,
-  ContractParameterType,
-  ContractPropertyState,
   NULL_ACTION,
   ScriptContainerType,
   Transaction,
@@ -25,8 +22,6 @@ import {
   MapStackItem,
   StackItem,
   StructStackItem,
-  UInt160StackItem,
-  UInt256StackItem,
 } from '../stackItem';
 
 const triggerType = TriggerType.Application;
@@ -122,51 +117,13 @@ const contractSB = new ScriptBuilder();
 contractSB.emitOp('PUSH3');
 contractSB.emitOp('PUSH2');
 
-const contract = new Contract({
-  script: contractSB.build(),
-  parameterList: [],
-  returnType: ContractParameterType.Void,
-  name: '',
-  codeVersion: '',
-  author: '',
-  email: '',
-  description: '',
-  contractProperties: ContractPropertyState.HasDynamicInvoke,
-});
-
-const multiplyContractSB = new ScriptBuilder();
-multiplyContractSB.emitOp('PUSH2');
-multiplyContractSB.emitOp('MUL');
-
-const multiplyContract = new Contract({
-  script: multiplyContractSB.build(),
-  parameterList: [],
-  returnType: ContractParameterType.Void,
-  name: '',
-  codeVersion: '',
-  author: '',
-  email: '',
-  description: '',
-  contractProperties: ContractPropertyState.HasDynamicInvoke,
-});
-
-const signature0 = crypto.sign({
-  message: Buffer.alloc(32, 10),
-  privateKey: keys[0].privateKey,
-});
-
-const signature1 = crypto.sign({
-  message: Buffer.alloc(32, 10),
-  privateKey: keys[1].privateKey,
-});
-
 // const hugeBuffer = Buffer.alloc(16843009, 0);
 
 const OPCODES = ([
   {
     op: 'PUSH0',
     result: [new BufferStackItem(Buffer.from([]))],
-    gas: utils.ZERO,
+    gas: FEES[30],
   },
 ] as readonly TestCase[])
   .concat(
@@ -175,7 +132,7 @@ const OPCODES = ([
       op: `PUSHBYTES${idx}` as any,
       buffer: Buffer.alloc(idx, 10),
       result: [new BufferStackItem(Buffer.alloc(idx, 10))],
-      gas: utils.ZERO,
+      gas: FEES[120],
     })),
   )
   .concat(
@@ -184,129 +141,129 @@ const OPCODES = ([
         op: 'PUSHDATA1',
         buffer: Buffer.from([2, 10, 10]),
         result: [new BufferStackItem(Buffer.alloc(2, 10))],
-        gas: utils.ZERO,
+        gas: FEES[180],
       },
 
       {
         op: 'PUSHDATA2',
         buffer: Buffer.concat([Buffer.from([1, 1]), Buffer.alloc(257, 10)]),
         result: [new BufferStackItem(Buffer.alloc(257, 10))],
-        gas: utils.ZERO,
+        gas: FEES[13_000],
       },
 
       // {
       //   op: 'PUSHDATA4',
       //   buffer: Buffer.concat([Buffer.from([1, 1, 1, 1]), hugeBuffer]),
       //   result: [new BufferStackItem(hugeBuffer)],
-      //   gas: utils.ZERO,
+      //   gas: FEES[110_000],
       // },
 
       {
         op: 'PUSHM1',
         result: [new IntegerStackItem(new BN(-1))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH1',
         result: [new IntegerStackItem(new BN(1))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH2',
         result: [new IntegerStackItem(new BN(2))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH3',
         result: [new IntegerStackItem(new BN(3))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH4',
         result: [new IntegerStackItem(new BN(4))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH5',
         result: [new IntegerStackItem(new BN(5))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH6',
         result: [new IntegerStackItem(new BN(6))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH7',
         result: [new IntegerStackItem(new BN(7))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH8',
         result: [new IntegerStackItem(new BN(8))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH9',
         result: [new IntegerStackItem(new BN(9))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH10',
         result: [new IntegerStackItem(new BN(10))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH11',
         result: [new IntegerStackItem(new BN(11))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH12',
         result: [new IntegerStackItem(new BN(12))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH13',
         result: [new IntegerStackItem(new BN(13))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH14',
         result: [new IntegerStackItem(new BN(14))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH15',
         result: [new IntegerStackItem(new BN(15))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'PUSH16',
         result: [new IntegerStackItem(new BN(16))],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
         op: 'NOP',
         result: [],
-        gas: utils.ZERO,
+        gas: FEES[30],
       },
 
       {
@@ -316,7 +273,7 @@ const OPCODES = ([
         postOps: [{ op: 'PUSH2' }, { op: 'PUSH3' }],
         result: [new IntegerStackItem(new BN(3)), new IntegerStackItem(new BN(2))],
 
-        gas: FEES.ONE,
+        gas: FEES[70].add(FEES[30]).add(FEES[30]),
       },
 
       {
@@ -325,7 +282,7 @@ const OPCODES = ([
         buffer: new ScriptBuilder().emitInt16LE(4).build(),
         postOps: [{ op: 'PUSH2' }, { op: 'PUSH3' }],
         result: [new IntegerStackItem(new BN(3))],
-        gas: FEES.ONE,
+        gas: FEES[70].add(FEES[30]),
       },
 
       {
@@ -335,7 +292,7 @@ const OPCODES = ([
         buffer: new ScriptBuilder().emitInt16LE(4).build(),
         postOps: [{ op: 'PUSH2' }, { op: 'PUSH3' }],
         result: [new IntegerStackItem(new BN(3))],
-        gas: FEES.ONE,
+        gas: FEES[70].add(FEES[30]),
       },
 
       {
@@ -345,8 +302,7 @@ const OPCODES = ([
         buffer: new ScriptBuilder().emitInt16LE(4).build(),
         postOps: [{ op: 'PUSH2' }, { op: 'PUSH3' }],
         result: [new IntegerStackItem(new BN(3)), new IntegerStackItem(new BN(2))],
-
-        gas: FEES.ONE,
+        gas: FEES[70].add(FEES[30]).add(FEES[30]),
       },
 
       {
@@ -356,7 +312,7 @@ const OPCODES = ([
         buffer: new ScriptBuilder().emitInt16LE(4).build(),
         postOps: [{ op: 'PUSH2' }, { op: 'PUSH3' }],
         result: [new IntegerStackItem(new BN(3))],
-        gas: FEES.ONE,
+        gas: FEES[70].add(FEES[30]),
       },
 
       {
@@ -366,8 +322,7 @@ const OPCODES = ([
         buffer: new ScriptBuilder().emitInt16LE(4).build(),
         postOps: [{ op: 'PUSH2' }, { op: 'PUSH3' }],
         result: [new IntegerStackItem(new BN(3)), new IntegerStackItem(new BN(2))],
-
-        gas: FEES.ONE,
+        gas: FEES[70].add(FEES[30]).add(FEES[30]),
       },
 
       {
@@ -378,8 +333,13 @@ const OPCODES = ([
         postOps: [{ op: 'PUSH2' }, { op: 'PUSH3' }, { op: 'RET' }],
         result: [new IntegerStackItem(new BN(3)), new IntegerStackItem(new BN(2)), new IntegerStackItem(new BN(3))],
 
-        // CALL + RET + RET
-        gas: FEES.ONE.add(FEES.ONE).add(FEES.ONE),
+        // CALL + RET + RET + PUSH3 + PUSH2 + PUSH3
+        gas: FEES[22_000]
+          .add(FEES[40])
+          .add(FEES[40])
+          .add(FEES[30])
+          .add(FEES[30])
+          .add(FEES[30]),
       },
 
       {
@@ -400,250 +360,28 @@ const OPCODES = ([
         ],
 
         result: [new IntegerStackItem(new BN(3))],
-        // JMP + CALL + RET
-        gas: FEES.ONE.add(FEES.ONE).add(FEES.ONE),
-      },
-
-      {
-        op: 'CALL_I',
-        // 1 return value, 0 parameters, Jump ahead 2 + 4 over the jump (2) + return (1) + param (1) bytes.
-        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([0]), new ScriptBuilder().emitInt16LE(6).build()]),
-        // jump to PUSH4, then return, then invoke PUSH2, PUSH3, and PUSH4 again
-        postOps: [{ op: 'PUSH1' }, { op: 'PUSH2' }, { op: 'PUSH3' }, { op: 'PUSH4' }, { op: 'RET' }],
-        result: [
-          new IntegerStackItem(new BN(4)),
-          new IntegerStackItem(new BN(3)),
-          new IntegerStackItem(new BN(2)),
-          new IntegerStackItem(new BN(1)),
-          new IntegerStackItem(new BN(4)),
-        ],
-        // CALL_I RET RET
-        gas: FEES.ONE.add(FEES.ONE).add(FEES.ONE),
-      },
-
-      {
-        op: 'CALL_I',
-        // 2 return value, 0 parameters, Jump ahead 1 + 4 over the jump (2) + return (1) + param (1) bytes.
-        buffer: Buffer.concat([Buffer.from([2]), Buffer.from([0]), new ScriptBuilder().emitInt16LE(5).build()]),
-        // jump to PUSH3, PUSH4, then return, then invoke PUSH2, PUSH3, and PUSH4 again
-        postOps: [{ op: 'PUSH1' }, { op: 'PUSH2' }, { op: 'PUSH3' }, { op: 'PUSH4' }, { op: 'RET' }],
-        result: [
-          new IntegerStackItem(new BN(4)),
-          new IntegerStackItem(new BN(3)),
-          new IntegerStackItem(new BN(2)),
-          new IntegerStackItem(new BN(1)),
-          new IntegerStackItem(new BN(4)),
-          new IntegerStackItem(new BN(3)),
-        ],
-        // CALL_I RET RET
-        gas: FEES.ONE.add(FEES.ONE).add(FEES.ONE),
-      },
-
-      {
-        op: 'CALL_I',
-        // 1 return value, 2 parameters, Jump ahead 1 + 4 over the jump (2) + return (1) + param (1) bytes.
-        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([2]), new ScriptBuilder().emitInt16LE(5).build()]),
-        postOps: [{ op: 'PUSH2' }, { op: 'PUSH3' }, { op: 'ADD' }, { op: 'RET' }],
-        // jump to ADD (adds the two args), then return, then invoke PUSH2, PUSH3, and ADD again
-        args: [new BN(5), new BN(7)],
-        result: [new IntegerStackItem(new BN(5)), new IntegerStackItem(new BN(12))],
-        // CALL_I ADD RET ADD RET
-        gas: FEES.ONE.add(FEES.ONE)
-          .add(FEES.ONE)
-          .add(FEES.ONE)
-          .add(FEES.ONE),
-      },
-
-      {
-        op: 'CALL_I',
-        // 0 return value, 2 parameters, Jump ahead 1 + 4 over the jump (2) + return (1) + param (1) bytes.
-        buffer: Buffer.concat([Buffer.from([0]), Buffer.from([2]), new ScriptBuilder().emitInt16LE(5).build()]),
-        postOps: [{ op: 'PUSH2' }, { op: 'PUSH3' }, { op: 'ADD' }, { op: 'RET' }],
-        // jump to ADD (adds the two args), then return, then invoke PUSH2, PUSH3, and ADDs again
-        args: [new BN(5), new BN(7)],
-        result: [new IntegerStackItem(new BN(5))],
-        // CALL_I ADD RET ADD RET
-        gas: FEES.ONE.add(FEES.ONE)
-          .add(FEES.ONE)
-          .add(FEES.ONE)
-          .add(FEES.ONE),
-      },
-
-      // RET is tested above
-      {
-        op: 'APPCALL',
-        buffer: Buffer.alloc(20, 10),
-        // Result of Contract Script defined above
-        result: [new IntegerStackItem(new BN(2)), new IntegerStackItem(new BN(3))],
-
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(contract));
-        },
-        gas: FEES.TEN,
-      },
-
-      {
-        op: 'APPCALL',
-        buffer: Buffer.alloc(20, 0),
-        args: [Buffer.alloc(20, 10)],
-        // Result of Contract Script defined above
-        result: [new IntegerStackItem(new BN(2)), new IntegerStackItem(new BN(3))],
-
-        // Slightly broken because we're actually running a dynamic invoke
-        // directly from a transaction, but it works because we mock return
-        // this contract with dynamic invoke enabled
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(contract));
-        },
-        gas: FEES.TEN,
-      },
-      {
-        op: 'CALL_E',
-        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([2]), Buffer.alloc(20, 10)]),
-        args: [new BN(2), new BN(3)],
-        result: [new IntegerStackItem(new BN(4))],
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
-        },
-        gas: FEES.ONE.add(FEES.ONE),
-      },
-      {
-        op: 'CALL_E',
-        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([1]), Buffer.alloc(20, 10)]),
-        args: [new BN(2), new BN(3)],
-        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
-        },
-        gas: FEES.ONE.add(FEES.ONE),
-      },
-      {
-        op: 'CALL_E',
-        buffer: Buffer.concat([Buffer.from([2]), Buffer.from([2]), Buffer.alloc(20, 10)]),
-        args: [new BN(2), new BN(3)],
-        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
-        },
-        gas: FEES.ONE.add(FEES.ONE),
-      },
-      {
-        op: 'CALL_ET',
-        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([2]), Buffer.alloc(20, 10)]),
-        args: [new BN(2), new BN(3)],
-        result: [new IntegerStackItem(new BN(4))],
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
-        },
-        gas: FEES.ONE.add(FEES.ONE),
-        returnValueCount: 1,
-      },
-      {
-        op: 'CALL_ET',
-        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([1]), Buffer.alloc(20, 10)]),
-        args: [new BN(2), new BN(3)],
-        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
-        },
-        gas: FEES.ONE.add(FEES.ONE),
-        returnValueCount: 1,
-      },
-      {
-        op: 'CALL_ET',
-        buffer: Buffer.concat([Buffer.from([2]), Buffer.from([2]), Buffer.alloc(20, 10)]),
-        args: [new BN(2), new BN(3)],
-        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
-        },
-        gas: FEES.ONE.add(FEES.ONE),
-        returnValueCount: 2,
-      },
-      {
-        op: 'CALL_ED',
-        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([2])]),
-        args: [Buffer.alloc(20, 10), new BN(2), new BN(3)],
-        result: [new IntegerStackItem(new BN(4))],
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
-        },
-        gas: FEES.ONE.add(FEES.ONE),
-      },
-      {
-        op: 'CALL_ED',
-        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([1])]),
-        args: [Buffer.alloc(20, 10), new BN(2), new BN(3)],
-        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
-        },
-        gas: FEES.ONE.add(FEES.ONE),
-      },
-      {
-        op: 'CALL_ED',
-        buffer: Buffer.concat([Buffer.from([2]), Buffer.from([2])]),
-        args: [Buffer.alloc(20, 10), new BN(2), new BN(3)],
-        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
-        },
-        gas: FEES.ONE.add(FEES.ONE),
-      },
-      {
-        op: 'CALL_EDT',
-        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([2])]),
-        args: [Buffer.alloc(20, 10), new BN(2), new BN(3)],
-        result: [new IntegerStackItem(new BN(4))],
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
-        },
-        gas: FEES.ONE.add(FEES.ONE),
-        returnValueCount: 1,
-      },
-      {
-        op: 'CALL_EDT',
-        buffer: Buffer.concat([Buffer.from([1]), Buffer.from([1])]),
-        args: [Buffer.alloc(20, 10), new BN(2), new BN(3)],
-        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
-        },
-        gas: FEES.ONE.add(FEES.ONE),
-        returnValueCount: 1,
-      },
-      {
-        op: 'CALL_EDT',
-        buffer: Buffer.concat([Buffer.from([2]), Buffer.from([2])]),
-        args: [Buffer.alloc(20, 10), new BN(2), new BN(3)],
-        result: [new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(3))],
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(multiplyContract));
-        },
-        gas: FEES.ONE.add(FEES.ONE),
-        returnValueCount: 2,
+        // JMP + CALL + RET + PUSH3
+        gas: FEES[70]
+          .add(FEES[22_000])
+          .add(FEES[40])
+          .add(FEES[30]),
       },
 
       {
         op: 'SYSCALL',
-        buffer: new BinaryWriter().writeVarBytesLE(Buffer.from('Neo.Blockchain.GetHeight', 'ascii')).toBuffer(),
+        buffer: new BinaryWriter().writeVarBytesLE(Buffer.from('System.Blockchain.GetHeight', 'ascii')).toBuffer(),
         result: [new IntegerStackItem(new BN(10))],
         mockBlockchain: ({ blockchain }) => {
           blockchain.currentBlock.index = 10;
         },
-        gas: FEES.ONE,
+        gas: FEES[400],
       },
 
       {
-        op: 'TAILCALL',
-        buffer: Buffer.alloc(20, 10),
-        // Result of Contract Script defined above
-        result: [new IntegerStackItem(new BN(2)), new IntegerStackItem(new BN(3))],
-
-        mockBlockchain: ({ blockchain }) => {
-          blockchain.contract.get = jest.fn(async () => Promise.resolve(contract));
-        },
-        gas: FEES.TEN,
+        op: 'DUPFROMALTSTACKBOTTOM',
+        argsAlt: [new BN(2), new BN(3)],
+        result: [new IntegerStackItem(new BN(3))],
+        gas: FEES[60],
       },
 
       {
@@ -651,7 +389,7 @@ const OPCODES = ([
         argsAlt: [new BN(1)],
         result: [new IntegerStackItem(new BN(1))],
         resultAlt: [new IntegerStackItem(new BN(1))],
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
@@ -659,21 +397,21 @@ const OPCODES = ([
         args: [new BN(1)],
         result: [],
         resultAlt: [new IntegerStackItem(new BN(1))],
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
         op: 'FROMALTSTACK',
         argsAlt: [new BN(1)],
         result: [new IntegerStackItem(new BN(1))],
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
         op: 'XDROP',
         args: [new BN(1), Buffer.alloc(1, 1), Buffer.alloc(1, 0)],
         result: [new BufferStackItem(Buffer.alloc(1, 1))],
-        gas: FEES.ONE,
+        gas: FEES[400],
       },
 
       {
@@ -681,7 +419,7 @@ const OPCODES = ([
         args: [new BN(1), Buffer.alloc(1, 1), Buffer.alloc(1, 0)],
         result: [new BufferStackItem(Buffer.alloc(1, 0)), new BufferStackItem(Buffer.alloc(1, 1))],
 
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
@@ -696,7 +434,7 @@ const OPCODES = ([
           new BufferStackItem(Buffer.alloc(1, 3)),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[400],
       },
 
       {
@@ -708,14 +446,14 @@ const OPCODES = ([
           new BufferStackItem(Buffer.alloc(1, 1)),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
         op: 'DROP',
         args: [Buffer.alloc(1, 0)],
         result: [],
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
@@ -723,14 +461,14 @@ const OPCODES = ([
         args: [Buffer.alloc(1, 0)],
         result: [new BufferStackItem(Buffer.alloc(1, 0)), new BufferStackItem(Buffer.alloc(1, 0))],
 
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
         op: 'NIP',
         args: [Buffer.alloc(1, 0), Buffer.alloc(1, 1)],
         result: [new BufferStackItem(Buffer.alloc(1, 0))],
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
@@ -742,7 +480,7 @@ const OPCODES = ([
           new BufferStackItem(Buffer.alloc(1, 1)),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
@@ -754,7 +492,7 @@ const OPCODES = ([
           new BufferStackItem(Buffer.alloc(1, 1)),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
@@ -767,7 +505,7 @@ const OPCODES = ([
           new BufferStackItem(Buffer.alloc(1, 2)),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[400],
       },
 
       {
@@ -779,7 +517,7 @@ const OPCODES = ([
           new BufferStackItem(Buffer.alloc(1, 2)),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
@@ -787,7 +525,7 @@ const OPCODES = ([
         args: [Buffer.alloc(1, 0), Buffer.alloc(1, 1)],
         result: [new BufferStackItem(Buffer.alloc(1, 1)), new BufferStackItem(Buffer.alloc(1, 0))],
 
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
@@ -799,7 +537,7 @@ const OPCODES = ([
           new BufferStackItem(Buffer.alloc(1, 0)),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
@@ -807,35 +545,35 @@ const OPCODES = ([
         args: [Buffer.alloc(1, 0), Buffer.alloc(1, 1)],
         result: [new BufferStackItem(Buffer.concat([Buffer.alloc(1, 1), Buffer.alloc(1, 0)]))],
 
-        gas: FEES.ONE,
+        gas: FEES[80_000],
       },
 
       {
         op: 'SUBSTR',
         args: [new BN(2), new BN(1), Buffer.from([11, 12, 13, 14, 15])],
         result: [new BufferStackItem(Buffer.from([12, 13]))],
-        gas: FEES.ONE,
+        gas: FEES[80_000],
       },
 
       {
         op: 'LEFT',
         args: [new BN(2), Buffer.from([11, 12, 13, 14, 15])],
         result: [new BufferStackItem(Buffer.from([11, 12]))],
-        gas: FEES.ONE,
+        gas: FEES[80_000],
       },
 
       {
         op: 'RIGHT',
         args: [new BN(2), Buffer.from([11, 12, 13, 14, 15])],
         result: [new BufferStackItem(Buffer.from([14, 15]))],
-        gas: FEES.ONE,
+        gas: FEES[80_000],
       },
 
       {
         op: 'SIZE',
         args: [Buffer.alloc(10, 1)],
         result: [new IntegerStackItem(new BN(10))],
-        gas: FEES.ONE,
+        gas: FEES[60],
       },
 
       {
@@ -843,7 +581,7 @@ const OPCODES = ([
         args: [Buffer.alloc(10, 0x0f)],
         result: [new IntegerStackItem(utils.fromSignedBuffer(Buffer.alloc(10, 0xf0)))],
 
-        gas: FEES.ONE,
+        gas: FEES[100],
       },
 
       {
@@ -851,7 +589,7 @@ const OPCODES = ([
         args: [Buffer.alloc(1, 0xf0)],
         result: [new IntegerStackItem(utils.fromSignedBuffer(Buffer.alloc(1, 0x0f)))],
 
-        gas: FEES.ONE,
+        gas: FEES[100],
       },
 
       {
@@ -859,7 +597,7 @@ const OPCODES = ([
         args: [Buffer.alloc(10, 0x0a), Buffer.alloc(10, 0x0f)],
         result: [new IntegerStackItem(utils.fromSignedBuffer(Buffer.alloc(10, 0x0a)))],
 
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
@@ -867,7 +605,7 @@ const OPCODES = ([
         args: [Buffer.alloc(1, 0xa0), Buffer.alloc(1, 0xa0)],
         result: [new IntegerStackItem(utils.fromSignedBuffer(Buffer.alloc(1, 0xa0)))],
 
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
@@ -875,7 +613,7 @@ const OPCODES = ([
         args: [Buffer.alloc(10, 0xa0), Buffer.alloc(10, 0x0a)],
         result: [new IntegerStackItem(utils.fromSignedBuffer(Buffer.alloc(10, 0xaa)))],
 
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
@@ -883,21 +621,21 @@ const OPCODES = ([
         args: [Buffer.alloc(10, 0xaa), Buffer.alloc(10, 0xaa)],
         result: [new IntegerStackItem(utils.fromSignedBuffer(Buffer.alloc(10, 0xaa)))],
 
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'OR',
         args: [2, 128],
         result: [new IntegerStackItem(new BN(130))],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'OR',
         args: [128, 2],
         result: [new IntegerStackItem(new BN(130))],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
@@ -905,7 +643,7 @@ const OPCODES = ([
         args: [Buffer.alloc(10, 0xa0), Buffer.alloc(10, 0x0a)],
         result: [new IntegerStackItem(utils.fromSignedBuffer(Buffer.alloc(10, 0xaa)))],
 
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
@@ -913,472 +651,343 @@ const OPCODES = ([
         args: [Buffer.alloc(10, 0xaa), Buffer.alloc(10, 0xaa)],
         result: [new IntegerStackItem(utils.fromSignedBuffer(Buffer.alloc(10, 0x00)))],
 
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'EQUAL',
         args: [Buffer.alloc(10, 0x01), Buffer.alloc(10, 0x01)],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'EQUAL',
         args: [Buffer.alloc(10, 0x01), []],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'EQUAL',
         args: [new BN(1), []],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'EQUAL',
         args: [true, []],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
-      // {
-      //   op: 'OP_EQUALVERIFY',
-      // },
-      // {
-      //   op: 'OP_RESERVED1',
-      // },
-      // {
-      //   op: 'OP_RESERVED2',
-      // },
       {
         op: 'INC',
         args: [new BN(1)],
         result: [new IntegerStackItem(new BN(2))],
-        gas: FEES.ONE,
+        gas: FEES[100],
       },
 
       {
         op: 'DEC',
         args: [new BN(2)],
         result: [new IntegerStackItem(new BN(1))],
-        gas: FEES.ONE,
+        gas: FEES[100],
       },
 
       {
         op: 'SIGN',
         args: [new BN(0)],
         result: [new IntegerStackItem(utils.ZERO)],
-        gas: FEES.ONE,
+        gas: FEES[100],
       },
 
       {
         op: 'SIGN',
         args: [new BN(-1)],
         result: [new IntegerStackItem(utils.NEGATIVE_ONE)],
-        gas: FEES.ONE,
+        gas: FEES[100],
       },
 
       {
         op: 'SIGN',
         args: [new BN(5)],
         result: [new IntegerStackItem(utils.ONE)],
-        gas: FEES.ONE,
+        gas: FEES[100],
       },
 
       {
         op: 'NEGATE',
         args: [new BN(5)],
         result: [new IntegerStackItem(new BN(-5))],
-        gas: FEES.ONE,
+        gas: FEES[100],
       },
 
       {
         op: 'ABS',
         args: [new BN(-1)],
         result: [new IntegerStackItem(new BN(1))],
-        gas: FEES.ONE,
+        gas: FEES[100],
       },
 
       {
         op: 'NOT',
         args: [true],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[100],
       },
 
       {
         op: 'NZ',
         args: [new BN(5)],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[100],
       },
 
       {
         op: 'NZ',
         args: [new BN(0)],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[100],
       },
 
       {
         op: 'ADD',
         args: [new BN(1), new BN(5)],
         result: [new IntegerStackItem(new BN(6))],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'SUB',
         args: [new BN(1), new BN(5)],
         result: [new IntegerStackItem(new BN(4))],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'MUL',
         args: [new BN(2), new BN(5)],
         result: [new IntegerStackItem(new BN(10))],
-        gas: FEES.ONE,
+        gas: FEES[300],
       },
 
       {
         op: 'DIV',
         args: [new BN(2), new BN(11)],
         result: [new IntegerStackItem(new BN(5))],
-        gas: FEES.ONE,
+        gas: FEES[300],
       },
 
       {
         op: 'MOD',
         args: [new BN(2), new BN(5)],
         result: [new IntegerStackItem(new BN(1))],
-        gas: FEES.ONE,
+        gas: FEES[300],
       },
 
       {
         op: 'SHL',
         args: [new BN(2), new BN(1)],
         result: [new IntegerStackItem(new BN(4))],
-        gas: FEES.ONE,
+        gas: FEES[300],
       },
 
       {
         op: 'SHL',
         args: [new BN(2), new BN(-1)],
         result: [new IntegerStackItem(new BN(-4))],
-        gas: FEES.ONE,
+        gas: FEES[300],
       },
 
       {
         op: 'SHR',
         args: [new BN(2), new BN(4)],
         result: [new IntegerStackItem(new BN(1))],
-        gas: FEES.ONE,
+        gas: FEES[300],
       },
 
       {
         op: 'SHR',
         args: [new BN(2), new BN(-4)],
         result: [new IntegerStackItem(new BN(-2))],
-        gas: FEES.ONE,
+        gas: FEES[300],
       },
 
       {
         op: 'BOOLAND',
         args: [true, false],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'BOOLAND',
         args: [true, true],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'BOOLAND',
         args: [false, false],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'BOOLOR',
         args: [true, false],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'BOOLOR',
         args: [true, true],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'BOOLOR',
         args: [false, false],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'NUMEQUAL',
         args: [new BN(4), new BN(4)],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'NUMEQUAL',
         args: [new BN(4), new BN(5)],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'NUMNOTEQUAL',
         args: [new BN(4), new BN(4)],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'NUMNOTEQUAL',
         args: [new BN(4), new BN(5)],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'LT',
         args: [new BN(4), new BN(5)],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'LT',
         args: [new BN(6), new BN(5)],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'GT',
         args: [new BN(4), new BN(5)],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'GT',
         args: [new BN(6), new BN(5)],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'LTE',
         args: [new BN(4), new BN(5)],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'LTE',
         args: [new BN(4), new BN(4)],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'LTE',
         args: [new BN(4), new BN(3)],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'GTE',
         args: [new BN(4), new BN(5)],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'GTE',
         args: [new BN(4), new BN(4)],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'GTE',
         args: [new BN(4), new BN(3)],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'MIN',
         args: [new BN(2), new BN(3)],
         result: [new IntegerStackItem(new BN(2))],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'MAX',
         args: [new BN(2), new BN(3)],
         result: [new IntegerStackItem(new BN(3))],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'WITHIN',
         args: [new BN(2), new BN(3), new BN(4)],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
         op: 'WITHIN',
         args: [new BN(5), new BN(3), new BN(4)],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
-      },
-
-      {
-        op: 'SHA1',
-        args: [Buffer.alloc(1, 1)],
-        result: [new BufferStackItem(crypto.sha1(Buffer.alloc(1, 1)))],
-        gas: FEES.TEN,
-      },
-
-      {
-        op: 'SHA256',
-        args: [Buffer.alloc(1, 1)],
-        result: [new BufferStackItem(crypto.sha256(Buffer.alloc(1, 1)))],
-        gas: FEES.TEN,
-      },
-
-      {
-        op: 'HASH160',
-        args: [Buffer.alloc(20, 1)],
-        result: [new UInt160StackItem(crypto.hash160(Buffer.alloc(20, 1)))],
-        gas: FEES.TWENTY,
-      },
-
-      {
-        op: 'HASH256',
-        args: [Buffer.alloc(32, 1)],
-        result: [new UInt256StackItem(crypto.hash256(Buffer.alloc(32, 1)))],
-        gas: FEES.TWENTY,
-      },
-
-      {
-        op: 'CHECKSIG',
-        args: [keys[0].publicKey, signature0],
-        result: [new BooleanStackItem(true)],
-        mockTransaction: ({ transaction }) => {
-          transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
-        },
-        gas: FEES.ONE_HUNDRED,
-      },
-
-      {
-        op: 'CHECKSIG',
-        args: [keys[0].publicKey, Buffer.alloc(64, 10)],
-        result: [new BooleanStackItem(false)],
-        gas: FEES.ONE_HUNDRED,
-      },
-
-      {
-        op: 'VERIFY',
-        args: [keys[0].publicKey, signature0, Buffer.alloc(32, 10)],
-        result: [new BooleanStackItem(true)],
-        gas: FEES.ONE_HUNDRED,
-      },
-
-      {
-        op: 'VERIFY',
-        args: [keys[0].publicKey, signature0, Buffer.alloc(32, 1)],
-        result: [new BooleanStackItem(false)],
-        gas: FEES.ONE_HUNDRED,
-      },
-
-      {
-        op: 'CHECKMULTISIG',
-        args: [[keys[0].publicKey, keys[1].publicKey], [signature0, signature1]],
-        result: [new BooleanStackItem(true)],
-        mockTransaction: ({ transaction }) => {
-          transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
-        },
-        gas: FEES.ONE_HUNDRED.mul(new BN(2)),
-      },
-
-      {
-        op: 'CHECKMULTISIG',
-        args: [new BN(2), keys[0].publicKey, keys[1].publicKey, new BN(2), signature0, signature1],
-
-        result: [new BooleanStackItem(true)],
-        mockTransaction: ({ transaction }) => {
-          transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
-        },
-        gas: FEES.ONE_HUNDRED.mul(new BN(2)),
-      },
-
-      {
-        op: 'CHECKMULTISIG',
-        args: [[keys[0].publicKey, keys[2].publicKey, keys[1].publicKey], [signature0, signature1]],
-
-        result: [new BooleanStackItem(true)],
-        mockTransaction: ({ transaction }) => {
-          transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
-        },
-        gas: FEES.ONE_HUNDRED.mul(new BN(3)),
-      },
-
-      {
-        op: 'CHECKMULTISIG',
-        args: [new BN(3), keys[0].publicKey, keys[2].publicKey, keys[1].publicKey, new BN(2), signature0, signature1],
-
-        result: [new BooleanStackItem(true)],
-        mockTransaction: ({ transaction }) => {
-          transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
-        },
-        gas: FEES.ONE_HUNDRED.mul(new BN(3)),
-      },
-
-      {
-        op: 'CHECKMULTISIG',
-        args: [[keys[0].publicKey, keys[1].publicKey], [Buffer.alloc(64, 10)]],
-        result: [new BooleanStackItem(false)],
-        gas: FEES.ONE_HUNDRED.mul(new BN(2)),
-      },
-
-      {
-        op: 'CHECKMULTISIG',
-        args: [new BN(2), keys[0].publicKey, keys[1].publicKey, new BN(1), Buffer.alloc(64, 10)],
-
-        result: [new BooleanStackItem(false)],
-        mockTransaction: ({ transaction }) => {
-          transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
-        },
-        gas: FEES.ONE_HUNDRED.mul(new BN(2)),
+        gas: FEES[200],
       },
 
       {
         op: 'ARRAYSIZE',
         args: [[true, false]],
         result: [new IntegerStackItem(new BN(2))],
-        gas: FEES.ONE,
+        gas: FEES[150],
       },
 
       {
@@ -1391,7 +1000,7 @@ const OPCODES = ([
           new BufferStackItem(Buffer.alloc(1, 2)),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[7_000],
       },
 
       {
@@ -1399,7 +1008,7 @@ const OPCODES = ([
         args: [[new BN(4), new BN(5)]],
         result: [new IntegerStackItem(new BN(2)), new IntegerStackItem(new BN(4)), new IntegerStackItem(new BN(5))],
 
-        gas: FEES.ONE,
+        gas: FEES[7_000],
       },
 
       {
@@ -1407,14 +1016,14 @@ const OPCODES = ([
         args: [new BN(1), [Buffer.alloc(1, 0), Buffer.alloc(1, 1), Buffer.alloc(1, 2)]],
 
         result: [new BufferStackItem(Buffer.alloc(1, 1))],
-        gas: FEES.ONE,
+        gas: FEES[270_000],
       },
 
       {
         op: 'PICKITEM',
         stackItems: [new BufferStackItem(Buffer.from('aaaa', 'hex')), mapStatic],
         result: [new IntegerStackItem(new BN(1))],
-        gas: FEES.ONE,
+        gas: FEES[270_000],
       },
 
       {
@@ -1427,7 +1036,7 @@ const OPCODES = ([
           ]),
         ],
         result: [new StructStackItem([new IntegerStackItem(new BN(1))])],
-        gas: FEES.ONE,
+        gas: FEES[270_000],
       },
 
       {
@@ -1436,7 +1045,7 @@ const OPCODES = ([
         stackItems: [new IntegerStackItem(new BN(5)), new IntegerStackItem(new BN(0)), setRef],
 
         result: [new ArrayStackItem([new IntegerStackItem(new BN(5))])],
-        gas: FEES.ONE,
+        gas: FEES[270_000],
       },
 
       {
@@ -1477,7 +1086,7 @@ const OPCODES = ([
           }),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[270_000],
       },
 
       {
@@ -1487,7 +1096,7 @@ const OPCODES = ([
           new ArrayStackItem([new BooleanStackItem(false), new BooleanStackItem(false), new BooleanStackItem(false)]),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[15_000],
       },
 
       {
@@ -1501,7 +1110,7 @@ const OPCODES = ([
           ]),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[15_000],
       },
 
       {
@@ -1509,7 +1118,7 @@ const OPCODES = ([
         stackItems: [simpleStruct],
         result: [new ArrayStackItem([new IntegerStackItem(new BN(1))])],
 
-        gas: FEES.ONE,
+        gas: FEES[15_000],
       },
 
       {
@@ -1519,7 +1128,7 @@ const OPCODES = ([
           new StructStackItem([new BooleanStackItem(false), new BooleanStackItem(false), new BooleanStackItem(false)]),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[15_000],
       },
 
       {
@@ -1533,7 +1142,7 @@ const OPCODES = ([
           ]),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[15_000],
       },
 
       {
@@ -1541,13 +1150,13 @@ const OPCODES = ([
         stackItems: [simpleStruct],
         result: [new StructStackItem([new IntegerStackItem(new BN(1))])],
 
-        gas: FEES.ONE,
+        gas: FEES[15_000],
       },
 
       {
         op: 'NEWMAP',
         result: [new MapStackItem()],
-        gas: FEES.ONE,
+        gas: FEES[200],
       },
 
       {
@@ -1555,7 +1164,7 @@ const OPCODES = ([
         ref: appendRef,
         stackItems: [new IntegerStackItem(new BN(3)), appendRef],
         result: [new ArrayStackItem([new IntegerStackItem(new BN(3))])],
-        gas: FEES.ONE,
+        gas: FEES[15_000],
       },
 
       {
@@ -1567,7 +1176,7 @@ const OPCODES = ([
             new StructStackItem([new IntegerStackItem(new BN(1))]),
           ]),
         ],
-        gas: FEES.ONE,
+        gas: FEES[15_000],
       },
 
       {
@@ -1582,7 +1191,7 @@ const OPCODES = ([
           ]),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[500],
       },
 
       {
@@ -1590,7 +1199,7 @@ const OPCODES = ([
         ref: removeRef,
         stackItems: [new IntegerStackItem(new BN(1)), removeRef],
         result: [new ArrayStackItem([new IntegerStackItem(new BN(1))])],
-        gas: FEES.ONE,
+        gas: FEES[500],
       },
 
       {
@@ -1615,42 +1224,42 @@ const OPCODES = ([
           }),
         ],
 
-        gas: FEES.ONE,
+        gas: FEES[500],
       },
 
       {
         op: 'HASKEY',
         args: [new BN(1), [new BN(0), new BN(1)]],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[270_000],
       },
 
       {
         op: 'HASKEY',
         args: [new BN(2), [new BN(0), new BN(1)]],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[270_000],
       },
 
       {
         op: 'HASKEY',
         stackItems: [new BufferStackItem(Buffer.from('aaaa', 'hex')), mapStatic],
         result: [new BooleanStackItem(true)],
-        gas: FEES.ONE,
+        gas: FEES[270_000],
       },
 
       {
         op: 'HASKEY',
         stackItems: [new BufferStackItem(Buffer.from('cccc', 'hex')), mapStatic],
         result: [new BooleanStackItem(false)],
-        gas: FEES.ONE,
+        gas: FEES[270_000],
       },
 
       {
         op: 'KEYS',
         stackItems: [mapStatic],
         result: [mapStatic.keys()],
-        gas: FEES.ONE,
+        gas: FEES[500],
       },
 
       {
@@ -1658,14 +1267,14 @@ const OPCODES = ([
         args: [[new BN(1), new BN(2)]],
         result: [new ArrayStackItem([new IntegerStackItem(new BN(1)), new IntegerStackItem(new BN(2))])],
 
-        gas: FEES.ONE,
+        gas: FEES[7_000],
       },
 
       {
         op: 'VALUES',
         stackItems: [mapStatic],
         result: [new ArrayStackItem(mapStatic.valuesArray())],
-        gas: FEES.ONE,
+        gas: FEES[7_000],
       },
     ],
 

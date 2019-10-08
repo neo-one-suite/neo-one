@@ -1,12 +1,8 @@
 // tslint:disable no-object-mutation
 import { BinaryWriter, common, crypto, OpCode, Param, ScriptBuilder, SysCallName } from '@neo-one/client-common';
 import {
-  Account,
-  Asset,
-  AssetType,
   AttributeUsage,
   Block,
-  Contract,
   Header,
   InvocationTransaction,
   NULL_ACTION,
@@ -16,7 +12,6 @@ import {
   TriggerType,
   UInt160Attribute,
   utils,
-  Validator,
   WriteBlockchain,
 } from '@neo-one/node-core';
 import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
@@ -24,25 +19,19 @@ import { BN } from 'bn.js';
 import _ from 'lodash';
 import { of } from 'rxjs';
 import { factory, keys, testUtils, transactions } from '../__data__';
-import { BLOCK_HEIGHT_YEAR, ExecutionInit, FEES, Options } from '../constants';
+import { ExecutionInit, FEES, Options } from '../constants';
 import { executeScript } from '../execute';
 import {
-  AccountStackItem,
   ArrayStackItem,
-  AssetStackItem,
-  AttributeStackItem,
   BlockStackItem,
   BooleanStackItem,
   BufferStackItem,
   ConsensusPayloadStackItem,
   ContractStackItem,
-  ECPointStackItem,
   HeaderStackItem,
-  InputStackItem,
   IntegerStackItem,
   IteratorStackItem,
   MapStackItem,
-  OutputStackItem,
   StackItem,
   StackItemIterator,
   StackItemType,
@@ -50,7 +39,6 @@ import {
   TransactionStackItem,
   UInt160StackItem,
   UInt256StackItem,
-  ValidatorStackItem,
 } from '../stackItem';
 
 type flag = 'blockContainer' | 'consensusContainer' | 'useBadTransaction' | 'noPersistingBlock';
@@ -87,54 +75,21 @@ const badTransactionsBlock = {
   transactions: _.range(1025).map(() => transactions.kycTransaction),
 };
 
-const ASSETHASH1 = common.uInt256ToHex(common.bufferToUInt256(Buffer.alloc(32, 1)));
-
-const account = {
-  version: 0,
-  hash: scriptAttributeHash,
-  isFrozen: false,
-  votes: [keys[0].publicKey, keys[1].publicKey],
-  balances: { [ASSETHASH1]: new BN(10) },
-};
-
-const noBalanceAccount = {
-  ...account,
-  balances: {},
-};
-
-const frozenAccount = {
-  ...noBalanceAccount,
-  isFrozen: true,
-};
-
-const asset = {
-  hash: common.bufferToUInt256(Buffer.alloc(32, 0)),
-  type: AssetType.Currency,
-  name: 'assetName',
-  amount: new BN(10),
-  precision: 8,
-  owner: keys[0].publicKey,
-  admin: scriptAttributeHash,
-  issuer: keys[1].scriptHash,
-  expiration: 2,
-  available: new BN(5),
-};
-
-const assetExpirationLT = {
-  ...asset,
-  expiration: 0,
-};
-
-const assetExpirationMax = {
-  ...asset,
-  expiration: utils.UINT_MAX.toNumber(),
-};
-
 const nextItem = new StorageItem({
   hash: scriptAttributeHash,
   key: Buffer.from('key', 'utf-8'),
   value: Buffer.from('val', 'utf-8'),
   flags: StorageFlags.None,
+});
+
+const signature0 = crypto.sign({
+  message: Buffer.alloc(32, 10),
+  privateKey: keys[0].privateKey,
+});
+
+const signature1 = crypto.sign({
+  message: Buffer.alloc(32, 10),
+  privateKey: keys[1].privateKey,
 });
 
 interface SysCall {
@@ -172,65 +127,67 @@ interface TestCase {
   readonly args?: readonly Arg[];
   readonly options?: Options;
   // tslint:disable-next-line no-any
-  readonly mock?: (options: { readonly blockchain: any }) => void;
+  readonly mockBlockchain?: (options: { readonly blockchain: any }) => void;
+  // tslint:disable-next-line no-any
+  readonly mockTransaction?: (options: { readonly transaction: any }) => void;
   readonly error?: string;
   readonly flags?: Set<flag>;
 }
 
 const SYSCALLS = [
   {
-    name: 'Neo.Runtime.GetTrigger',
+    name: 'System.Runtime.GetTrigger',
     result: [new IntegerStackItem(new BN(triggerType))],
-    gas: FEES.ONE,
+    gas: FEES[250],
   },
 
   {
-    name: 'Neo.Runtime.CheckWitness',
+    name: 'System.Runtime.CheckWitness',
     result: [new BooleanStackItem(true)],
     args: [scriptAttributeHash],
-    gas: FEES.TWO_HUNDRED,
+    gas: FEES[30_000],
   },
 
   {
-    name: 'Neo.Runtime.CheckWitness',
+    name: 'System.Runtime.CheckWitness',
     result: [new BooleanStackItem(false)],
     args: [keys[1].scriptHash],
-    gas: FEES.TWO_HUNDRED,
+    gas: FEES[30_000],
   },
 
   {
-    name: 'Neo.Runtime.Notify',
+    name: 'System.Runtime.Notify',
     result: [],
     args: [[true]],
-    gas: FEES.ONE,
+    gas: FEES[250],
   },
 
   {
-    name: 'Neo.Runtime.Log',
+    name: 'System.Runtime.Log',
     result: [],
     args: ['foo'],
-    gas: FEES.ONE,
+    gas: FEES[30_0000],
   },
 
   {
-    name: 'Neo.Runtime.GetTime',
+    name: 'System.Runtime.GetTime',
     result: [new IntegerStackItem(new BN(blockTime))],
-    gas: FEES.ONE,
+    gas: FEES[250],
   },
 
   {
-    name: 'Neo.Runtime.GetTime',
+    name: 'System.Runtime.GetTime',
     result: [new IntegerStackItem(new BN(15))],
-    gas: FEES.ONE,
+    gas: FEES[250],
     flags: new Set(['noPersistingBlock']),
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.currentBlock.timestamp = 0;
       blockchain.settings.secondsPerBlock = 15;
     },
   },
 
   {
-    name: 'Neo.Runtime.Serialize',
+    name: 'System.Runtime.Serialize',
     result: [
       new BufferStackItem(
         new BinaryWriter()
@@ -241,11 +198,11 @@ const SYSCALLS = [
     ],
 
     args: [Buffer.alloc(10, 1)],
-    gas: FEES.ONE,
+    gas: FEES[100_000],
   },
 
   {
-    name: 'Neo.Runtime.Serialize',
+    name: 'System.Runtime.Serialize',
     result: [
       new BufferStackItem(
         new BinaryWriter()
@@ -256,13 +213,13 @@ const SYSCALLS = [
     ],
 
     args: [Buffer.alloc(10, 1)],
-    gas: FEES.ONE,
+    gas: FEES[100_000],
   },
 
   // This one is a bit odd because true turns into emitting an integer
   // stack item.
   {
-    name: 'Neo.Runtime.Serialize',
+    name: 'System.Runtime.Serialize',
     result: [
       new BufferStackItem(
         new BinaryWriter()
@@ -273,11 +230,11 @@ const SYSCALLS = [
     ],
 
     args: [true],
-    gas: FEES.ONE,
+    gas: FEES[100_000],
   },
 
   {
-    name: 'Neo.Runtime.Serialize',
+    name: 'System.Runtime.Serialize',
     result: [
       new BufferStackItem(
         new BinaryWriter()
@@ -288,11 +245,11 @@ const SYSCALLS = [
     ],
 
     args: [new BN('10000000000000', 10)],
-    gas: FEES.ONE,
+    gas: FEES[100_000],
   },
 
   {
-    name: 'Neo.Runtime.Serialize',
+    name: 'System.Runtime.Serialize',
     result: [
       new BufferStackItem(
         new BinaryWriter()
@@ -309,20 +266,20 @@ const SYSCALLS = [
     ],
 
     args: [[new BN('10000000000000', 10)]],
-    gas: FEES.ONE,
+    gas: FEES[100_000],
   },
 
   {
-    name: 'Neo.Runtime.Serialize',
+    name: 'System.Runtime.Serialize',
     result: [],
     error: 'Item too large',
 
     args: [Buffer.alloc(1024 * 1024)],
-    gas: FEES.ONE,
+    gas: FEES[100_000],
   },
 
   {
-    name: 'Neo.Runtime.Serialize',
+    name: 'System.Runtime.Serialize',
     result: [
       new BufferStackItem(
         new BinaryWriter()
@@ -367,11 +324,11 @@ const SYSCALLS = [
       },
     ],
 
-    gas: FEES.ONE,
+    gas: FEES[100_000],
   },
 
   {
-    name: 'Neo.Runtime.Deserialize',
+    name: 'System.Runtime.Deserialize',
     result: [new BufferStackItem(Buffer.alloc(10, 1))],
     args: [
       new BinaryWriter()
@@ -380,11 +337,11 @@ const SYSCALLS = [
         .toBuffer(),
     ],
 
-    gas: FEES.ONE,
+    gas: FEES[500_000],
   },
 
   {
-    name: 'Neo.Runtime.Deserialize',
+    name: 'System.Runtime.Deserialize',
     result: [
       new MapStackItem({
         referenceKeys: new Map([
@@ -421,161 +378,203 @@ const SYSCALLS = [
         .toBuffer(),
     ],
 
-    gas: FEES.ONE,
+    gas: FEES[500_000],
   },
 
   {
-    name: 'Neo.Blockchain.GetHeight',
+    name: 'System.Runtime.GetInvocationCounter',
+    result: [new IntegerStackItem(new BN(1))],
+
+    gas: FEES[400],
+  },
+
+  {
+    name: 'Neo.Crypto.CheckSig',
+    result: [new BooleanStackItem(true)],
+    args: [keys[0].publicKey, signature0],
+    mockTransaction: ({ transaction }) => {
+      transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
+    },
+    gas: FEES[1_000_000],
+  },
+
+  {
+    name: 'Neo.Crypto.CheckSig',
+    result: [new BooleanStackItem(false)],
+    args: [keys[0].publicKey, Buffer.alloc(64, 10)],
+    gas: FEES[1_000_000],
+  },
+
+  {
+    name: 'System.Crypto.Verify',
+    result: [new BooleanStackItem(true)],
+    args: [Buffer.alloc(32, 10), keys[0].publicKey, signature0],
+    gas: FEES[1_000_000],
+  },
+
+  {
+    name: 'System.Crypto.Verify',
+    result: [new BooleanStackItem(false)],
+    args: [Buffer.alloc(32, 1), keys[0].publicKey, signature0],
+    gas: FEES[1_000_000],
+  },
+
+  {
+    name: 'Neo.Crypto.CheckMultiSig',
+    result: [new BooleanStackItem(true)],
+    args: [[keys[0].publicKey, keys[1].publicKey], [signature0, signature1]],
+    mockTransaction: ({ transaction }) => {
+      transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
+    },
+    gas: FEES[1_000_000].mul(new BN(2)),
+  },
+
+  {
+    name: 'Neo.Crypto.CheckMultiSig',
+    result: [new BooleanStackItem(true)],
+    args: [new BN(2), keys[0].publicKey, keys[1].publicKey, new BN(2), signature0, signature1],
+    mockTransaction: ({ transaction }) => {
+      transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
+    },
+    gas: FEES[1_000_000].mul(new BN(2)),
+  },
+
+  {
+    name: 'Neo.Crypto.CheckMultiSig',
+    result: [new BooleanStackItem(true)],
+    args: [[keys[0].publicKey, keys[2].publicKey, keys[1].publicKey], [signature0, signature1]],
+    mockTransaction: ({ transaction }) => {
+      transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
+    },
+    gas: FEES[1_000_000].mul(new BN(3)),
+  },
+
+  {
+    name: 'Neo.Crypto.CheckMultiSig',
+    result: [new BooleanStackItem(true)],
+    args: [new BN(3), keys[0].publicKey, keys[2].publicKey, keys[1].publicKey, new BN(2), signature0, signature1],
+    mockTransaction: ({ transaction }) => {
+      transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
+    },
+    gas: FEES[1_000_000].mul(new BN(3)),
+  },
+
+  {
+    name: 'Neo.Crypto.CheckMultiSig',
+    result: [new BooleanStackItem(false)],
+    args: [[keys[0].publicKey, keys[1].publicKey], [Buffer.alloc(64, 10)]],
+    gas: FEES[1_000_000].mul(new BN(2)),
+  },
+
+  {
+    name: 'Neo.Crypto.CheckMultiSig',
+    result: [new BooleanStackItem(false)],
+    args: [new BN(2), keys[0].publicKey, keys[1].publicKey, new BN(1), Buffer.alloc(64, 10)],
+    mockTransaction: ({ transaction }) => {
+      transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
+    },
+    gas: FEES[1_000_000].mul(new BN(2)),
+  },
+
+  {
+    name: 'System.Blockchain.GetHeight',
     result: [new IntegerStackItem(new BN(10))],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.currentBlock.index = 10;
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
-    name: 'Neo.Blockchain.GetHeader',
+    name: 'System.Blockchain.GetHeader',
     result: [new HeaderStackItem(new Header(blockBase))],
     args: [Buffer.alloc(32, 3)],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
-    gas: FEES.ONE_HUNDRED,
+    gas: FEES[7_000],
   },
   {
-    name: 'Neo.Blockchain.GetHeader',
+    name: 'System.Blockchain.GetHeader',
     result: [],
     args: [Buffer.alloc(6, 0)],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
-    gas: FEES.ONE_HUNDRED,
+    gas: FEES[7_000],
     error: 'Invalid GETHEADER Arguments',
   },
 
   {
-    name: 'Neo.Blockchain.GetBlock',
+    name: 'System.Blockchain.GetBlock',
     result: [new BlockStackItem(new Block(dummyBlock))],
     args: [Buffer.alloc(32, 3)],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.block.get = jest.fn(async () => Promise.resolve(new Block(dummyBlock)));
     },
-    gas: FEES.TWO_HUNDRED,
+    gas: FEES[2_500_000],
   },
 
   {
-    name: 'Neo.Blockchain.GetBlock',
+    name: 'System.Blockchain.GetBlock',
     result: [new BlockStackItem(new Block(dummyBlock))],
     args: [Buffer.alloc(6, 0)],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.block.get = jest.fn(async () => Promise.resolve(new Block(dummyBlock)));
     },
-    gas: FEES.TWO_HUNDRED,
+    gas: FEES[2_500_000],
     error: 'Invalid GETBLOCK Argument',
   },
 
   {
-    name: 'Neo.Blockchain.GetTransaction',
+    name: 'System.Blockchain.GetTransaction',
     result: [new TransactionStackItem(transactions.mintTransaction)],
     args: [Buffer.alloc(32, 3)],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
-    gas: FEES.ONE_HUNDRED,
+    gas: FEES[1_000_000],
   },
 
   {
-    name: 'Neo.Blockchain.GetTransactionHeight',
+    name: 'System.Blockchain.GetTransactionHeight',
     result: [new IntegerStackItem(new BN(10))],
     args: [Buffer.alloc(32, 3)],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.transactionData.get = jest.fn(async () => Promise.resolve({ startHeight: 10 }));
     },
-    gas: FEES.ONE_HUNDRED,
+    gas: FEES[1_000_000],
   },
 
   {
-    name: 'Neo.Blockchain.GetAccount',
-    result: [new AccountStackItem(new Account(account))],
-    args: [scriptAttributeHash],
-    mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(account)));
-    },
-    gas: FEES.ONE_HUNDRED,
-  },
-
-  {
-    name: 'Neo.Blockchain.GetAccount',
-    result: [new AccountStackItem(new Account({ hash: scriptAttributeHash }))],
-    args: [scriptAttributeHash],
-    mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(undefined));
-    },
-    gas: FEES.ONE_HUNDRED,
-  },
-
-  {
-    name: 'Neo.Blockchain.GetValidators',
-    result: [new ArrayStackItem([new ValidatorStackItem(new Validator({ publicKey: keys[0].publicKey }))])],
-
-    mock: ({ blockchain }) => {
-      blockchain.validator.all$ = {
-        pipe: () => ({
-          toPromise: () => [new ValidatorStackItem(new Validator({ publicKey: keys[0].publicKey }))],
-        }),
-      };
-    },
-    gas: FEES.TWO_HUNDRED,
-  },
-
-  {
-    name: 'Neo.Blockchain.GetValidators',
-    result: [new ArrayStackItem([new ECPointStackItem(keys[0].publicKey)])],
-    mock: ({ blockchain }) => {
-      blockchain.validator.all$ = of({ publicKey: keys[0].publicKey });
-    },
-    gas: FEES.TWO_HUNDRED,
-  },
-
-  {
-    name: 'Neo.Blockchain.GetAsset',
-    result: [new AssetStackItem(new Asset(asset))],
-    mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
-    },
-    args: [Buffer.alloc(32, 3)],
-    gas: FEES.ONE_HUNDRED,
-  },
-
-  {
-    name: 'Neo.Blockchain.GetContract',
+    name: 'System.Blockchain.GetContract',
     result: [new ContractStackItem(transactions.kycContract)],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.tryGet = jest.fn(async () => Promise.resolve(transactions.kycContract));
     },
     args: [scriptAttributeHash],
-    gas: FEES.ONE_HUNDRED,
+    gas: FEES[1_000_000],
   },
 
   {
-    name: 'Neo.Blockchain.GetContract',
+    name: 'System.Blockchain.GetContract',
     result: [new BufferStackItem(Buffer.alloc(0, 0))],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.tryGet = jest.fn(async () => Promise.resolve(undefined));
     },
     args: [scriptAttributeHash],
-    gas: FEES.ONE_HUNDRED,
+    gas: FEES[1_000_000],
   },
 
   {
-    name: 'Neo.Header.GetHash',
+    name: 'System.Header.GetHash',
     result: [new UInt256StackItem(blockBase.hash)],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetHeader',
+            name: 'System.Blockchain.GetHeader',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -583,10 +582,10 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
@@ -597,7 +596,7 @@ const SYSCALLS = [
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetHeader',
+            name: 'System.Blockchain.GetHeader',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -605,21 +604,21 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
-    name: 'Neo.Header.GetPrevHash',
+    name: 'System.Header.GetPrevHash',
     result: [new UInt256StackItem(blockBase.previousHash)],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetHeader',
+            name: 'System.Blockchain.GetHeader',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -627,21 +626,21 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
-    name: 'Neo.Header.GetIndex',
+    name: 'System.Header.GetIndex',
     result: [new IntegerStackItem(new BN(blockBase.index))],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetHeader',
+            name: 'System.Blockchain.GetHeader',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -649,10 +648,10 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
@@ -663,7 +662,7 @@ const SYSCALLS = [
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetHeader',
+            name: 'System.Blockchain.GetHeader',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -671,21 +670,21 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
-    name: 'Neo.Header.GetTimestamp',
+    name: 'System.Header.GetTimestamp',
     result: [new IntegerStackItem(new BN(blockBase.timestamp))],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetHeader',
+            name: 'System.Blockchain.GetHeader',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -693,32 +692,10 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Header.GetConsensusData',
-    result: [new IntegerStackItem(blockBase.consensusData)],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetHeader',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
-    },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
@@ -729,7 +706,7 @@ const SYSCALLS = [
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetHeader',
+            name: 'System.Blockchain.GetHeader',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -737,21 +714,21 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.header.get = jest.fn(async () => Promise.resolve(new Header(blockBase)));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
-    name: 'Neo.Block.GetTransactionCount',
+    name: 'System.Block.GetTransactionCount',
     result: [new IntegerStackItem(new BN(dummyBlock.transactions.length))],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetBlock',
+            name: 'System.Blockchain.GetBlock',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -759,14 +736,14 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.block.get = jest.fn(async () => Promise.resolve(new Block(dummyBlock)));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
-    name: 'Neo.Block.GetTransactions',
+    name: 'System.Block.GetTransactions',
     result: [
       new ArrayStackItem([
         new TransactionStackItem(transactions.kycTransaction),
@@ -779,7 +756,7 @@ const SYSCALLS = [
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetBlock',
+            name: 'System.Blockchain.GetBlock',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -787,14 +764,14 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.block.get = jest.fn(async () => Promise.resolve(new Block(dummyBlock)));
     },
-    gas: FEES.ONE,
+    gas: FEES[10_000],
   },
 
   {
-    name: 'Neo.Block.GetTransactions',
+    name: 'System.Block.GetTransactions',
     result: [],
     error: 'Container too large',
     args: [
@@ -802,7 +779,7 @@ const SYSCALLS = [
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetBlock',
+            name: 'System.Blockchain.GetBlock',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -810,21 +787,21 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.block.get = jest.fn(async () => Promise.resolve(new Block(badTransactionsBlock)));
     },
-    gas: FEES.ONE,
+    gas: FEES[10_000],
   },
 
   {
-    name: 'Neo.Block.GetTransaction',
+    name: 'System.Block.GetTransaction',
     result: [new TransactionStackItem(transactions.mintTransaction)],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetBlock',
+            name: 'System.Blockchain.GetBlock',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -834,21 +811,21 @@ const SYSCALLS = [
       new BN(1),
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.block.get = jest.fn(async () => Promise.resolve(new Block(dummyBlock)));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
-    name: 'Neo.Transaction.GetHash',
+    name: 'System.Transaction.GetHash',
     result: [new UInt256StackItem(transactions.mintTransaction.hash)],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetTransaction',
+            name: 'System.Blockchain.GetTransaction',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -856,305 +833,21 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
-    name: 'Neo.Transaction.GetType',
-    result: [new IntegerStackItem(new BN(transactions.mintTransaction.type))],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Transaction.GetAttributes',
-    result: [
-      new ArrayStackItem(transactions.mintTransaction.attributes.map((attribute) => new AttributeStackItem(attribute))),
-    ],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Transaction.GetInputs',
-    result: [new ArrayStackItem(transactions.mintTransaction.inputs.map((input) => new InputStackItem(input)))],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Transaction.GetInputs',
-    result: [],
-    error: 'Container too large',
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.badTransaction));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Transaction.GetOutputs',
-    result: [new ArrayStackItem(transactions.mintTransaction.outputs.map((output) => new OutputStackItem(output)))],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Transaction.GetOutputs',
-    result: [],
-    error: 'Container too large',
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.badTransaction));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Transaction.GetReferences',
-    result: [new ArrayStackItem([new OutputStackItem(transactions.mintTransaction.outputs[0])])],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-
-      blockchain.output.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction.outputs[0]));
-    },
-    gas: FEES.TWO_HUNDRED,
-  },
-
-  {
-    name: 'Neo.Transaction.GetReferences',
-    result: [],
-    error: 'Container too large',
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.badTransaction));
-      blockchain.output.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction.outputs[0]));
-    },
-    gas: FEES.TWO_HUNDRED,
-  },
-
-  {
-    name: 'Neo.Transaction.GetUnspentCoins',
-    result: [new ArrayStackItem(transactions.mintTransaction.outputs.map((output) => new OutputStackItem(output)))],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-
-      blockchain.transactionData.get = jest.fn(async () =>
-        Promise.resolve({
-          hash: common.bufferToUInt256(Buffer.alloc(32, 0)),
-          startHeight: 1,
-          endHeights: {},
-        }),
-      );
-    },
-    gas: FEES.TWO_HUNDRED,
-  },
-
-  {
-    name: 'Neo.Transaction.GetUnspentCoins',
-    result: [new ArrayStackItem([])],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-
-      blockchain.transactionData.get = jest.fn(async () =>
-        Promise.resolve({
-          hash: common.bufferToUInt256(Buffer.alloc(32, 0)),
-          startHeight: 1,
-          endHeights: { '0': 1, '1': 2 },
-        }),
-      );
-    },
-    gas: FEES.TWO_HUNDRED,
-  },
-
-  {
-    name: 'Neo.Transaction.GetUnspentCoins',
-    result: [],
-    error: 'Container too large',
-    flags: new Set(['useBadTransaction']),
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.badTransaction));
-
-      blockchain.transactionData.get = jest.fn(async () =>
-        Promise.resolve({
-          hash: common.bufferToUInt256(Buffer.alloc(32, 0)),
-          startHeight: 1,
-          endHeights: { '0': 1, '1': 2 },
-        }),
-      );
-    },
-    gas: FEES.TWO_HUNDRED,
-  },
-
-  {
-    name: 'Neo.InvocationTransaction.GetScript',
+    name: 'Neo.Transaction.GetScript',
     result: [new BufferStackItem(transactions.mintTransaction.script)],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetTransaction',
+            name: 'System.Blockchain.GetTransaction',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -1162,14 +855,14 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
-    name: 'Neo.InvocationTransaction.GetScript',
+    name: 'Neo.Transaction.GetScript',
     result: [],
     error: 'Expected InvocationTransaction',
     args: [
@@ -1177,7 +870,7 @@ const SYSCALLS = [
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetTransaction',
+            name: 'System.Blockchain.GetTransaction',
             type: 'sys',
             args: [Buffer.alloc(32, 3)],
           },
@@ -1185,520 +878,10 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.claimTransaction));
     },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Attribute.GetUsage',
-    result: [new IntegerStackItem(new BN(transactions.mintTransaction.attributes[0].usage))],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-
-          {
-            name: 'Neo.Transaction.GetAttributes',
-            type: 'sys',
-          },
-
-          {
-            name: 'PICKITEM',
-            type: 'op',
-            args: [new BN(0)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Attribute.GetData',
-    result: [new BufferStackItem(transactions.mintTransaction.attributes[0].value)],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-
-          {
-            name: 'Neo.Transaction.GetAttributes',
-            type: 'sys',
-          },
-
-          {
-            name: 'PICKITEM',
-            type: 'op',
-            args: [new BN(0)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Input.GetHash',
-    result: [new UInt256StackItem(transactions.mintTransaction.inputs[0].hash)],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-
-          {
-            name: 'Neo.Transaction.GetInputs',
-            type: 'sys',
-          },
-
-          {
-            name: 'PICKITEM',
-            type: 'op',
-            args: [new BN(0)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Input.GetIndex',
-    result: [new IntegerStackItem(new BN(transactions.mintTransaction.inputs[0].index))],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-
-          {
-            name: 'Neo.Transaction.GetInputs',
-            type: 'sys',
-          },
-
-          {
-            name: 'PICKITEM',
-            type: 'op',
-            args: [new BN(0)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Output.GetAssetId',
-    result: [new UInt256StackItem(transactions.mintTransaction.outputs[0].asset)],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-
-          {
-            name: 'Neo.Transaction.GetOutputs',
-            type: 'sys',
-          },
-
-          {
-            name: 'PICKITEM',
-            type: 'op',
-            args: [new BN(0)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Output.GetValue',
-    result: [new IntegerStackItem(transactions.mintTransaction.outputs[0].value)],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-
-          {
-            name: 'Neo.Transaction.GetOutputs',
-            type: 'sys',
-          },
-
-          {
-            name: 'PICKITEM',
-            type: 'op',
-            args: [new BN(0)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Output.GetScriptHash',
-    result: [new UInt160StackItem(transactions.mintTransaction.outputs[0].address)],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetTransaction',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-
-          {
-            name: 'Neo.Transaction.GetOutputs',
-            type: 'sys',
-          },
-
-          {
-            name: 'PICKITEM',
-            type: 'op',
-            args: [new BN(0)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.transaction.get = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Account.GetScriptHash',
-    result: [new UInt160StackItem(scriptAttributeHash)],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAccount',
-            type: 'sys',
-            args: [scriptAttributeHash],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(account)));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Account.GetVotes',
-    result: [new ArrayStackItem(new Account(account).votes.map((vote) => new ECPointStackItem(vote)))],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAccount',
-            type: 'sys',
-            args: [scriptAttributeHash],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(account)));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Account.GetBalance',
-    result: [new IntegerStackItem(account.balances[ASSETHASH1])],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAccount',
-            type: 'sys',
-            args: [scriptAttributeHash],
-          },
-        ],
-      },
-
-      common.bufferToUInt256(Buffer.alloc(32, 1)),
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(account)));
-
-      blockchain.account.get = jest.fn(async () => Promise.resolve(new Account(account)));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Account.GetBalance',
-    result: [new IntegerStackItem(utils.ZERO)],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAccount',
-            type: 'sys',
-            args: [scriptAttributeHash],
-          },
-        ],
-      },
-
-      common.bufferToUInt256(Buffer.alloc(32, 2)),
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(account)));
-
-      blockchain.account.get = jest.fn(async () => Promise.resolve(new Account(account)));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Asset.GetAssetId',
-    result: [new UInt256StackItem(asset.hash)],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAsset',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Asset.GetAssetType',
-    result: [new IntegerStackItem(new BN(asset.type))],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAsset',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Asset.GetAmount',
-    result: [new IntegerStackItem(new BN(asset.amount))],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAsset',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Asset.GetAvailable',
-    result: [new IntegerStackItem(new BN(asset.available))],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAsset',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Asset.GetPrecision',
-    result: [new IntegerStackItem(new BN(asset.precision))],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAsset',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Asset.GetOwner',
-    result: [new ECPointStackItem(asset.owner)],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAsset',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Asset.GetAdmin',
-    result: [new UInt160StackItem(asset.admin)],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAsset',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
-    },
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Asset.GetIssuer',
-    result: [new UInt160StackItem(asset.issuer)],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAsset',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
-    },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
@@ -1709,7 +892,7 @@ const SYSCALLS = [
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetContract',
+            name: 'System.Blockchain.GetContract',
             type: 'sys',
             args: [scriptAttributeHash],
           },
@@ -1717,10 +900,10 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.tryGet = jest.fn(async () => Promise.resolve(transactions.kycContract));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
@@ -1731,7 +914,7 @@ const SYSCALLS = [
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Blockchain.GetContract',
+            name: 'System.Blockchain.GetContract',
             type: 'sys',
             args: [scriptAttributeHash],
           },
@@ -1739,35 +922,35 @@ const SYSCALLS = [
       },
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.tryGet = jest.fn(async () => Promise.resolve(transactions.kycContract));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
-    name: 'Neo.Storage.GetContext',
+    name: 'System.Storage.GetContext',
     result: ({ transaction }) => [new StorageContextStackItem(crypto.toScriptHash(transaction.script))],
 
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
-    name: 'Neo.Storage.GetReadOnlyContext',
+    name: 'System.Storage.GetReadOnlyContext',
     result: ({ transaction }) => [new StorageContextStackItem(crypto.toScriptHash(transaction.script), true)],
 
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
-    name: 'Neo.Storage.Get',
+    name: 'System.Storage.Get',
     result: [new BufferStackItem(Buffer.alloc(10, 1))],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Storage.GetContext',
+            name: 'System.Storage.GetContext',
             type: 'sys',
           },
         ],
@@ -1776,23 +959,23 @@ const SYSCALLS = [
       Buffer.alloc(1, 1),
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve({ value: Buffer.alloc(10, 1) }));
     },
-    gas: FEES.ONE_HUNDRED,
+    gas: FEES[1_000_000],
   },
 
   {
-    name: 'Neo.Storage.Get',
+    name: 'System.Storage.Get',
     result: [new BufferStackItem(Buffer.from([]))],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Storage.GetContext',
+            name: 'System.Storage.GetContext',
             type: 'sys',
           },
         ],
@@ -1801,12 +984,12 @@ const SYSCALLS = [
       Buffer.alloc(1, 1),
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve(undefined));
     },
-    gas: FEES.ONE_HUNDRED,
+    gas: FEES[1_000_000],
   },
 
   {
@@ -1819,7 +1002,7 @@ const SYSCALLS = [
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Storage.GetContext',
+            name: 'System.Storage.GetContext',
             type: 'sys',
           },
         ],
@@ -1828,16 +1011,16 @@ const SYSCALLS = [
       Buffer.alloc(1, 1),
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of());
     },
-    gas: FEES.ONE,
+    gas: FEES[1_000_000],
   },
 
   {
-    name: 'Neo.StorageContext.AsReadOnly',
+    name: 'System.StorageContext.AsReadOnly',
     result: ({ transaction }) => (stack) => {
       expect(stack.length).toEqual(1);
       // It should equal the call's script hash.
@@ -1850,21 +1033,21 @@ const SYSCALLS = [
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Storage.GetContext',
+            name: 'System.Storage.GetContext',
             type: 'sys',
           },
         ],
       },
     ],
 
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
     name: 'Neo.Iterator.Create',
     result: [new IteratorStackItem(new StackItemIterator(testAsyncIterable[Symbol.asyncIterator]()))],
     args: [testArray],
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
@@ -1883,7 +1066,7 @@ const SYSCALLS = [
     ],
 
     result: [new BooleanStackItem(true)],
-    gas: FEES.ONE,
+    gas: FEES[1_000_000],
   },
 
   {
@@ -1923,7 +1106,7 @@ const SYSCALLS = [
     ],
 
     result: [new BooleanStackItem(true)],
-    gas: FEES.ONE,
+    gas: FEES[1_000_000],
   },
 
   {
@@ -1957,7 +1140,7 @@ const SYSCALLS = [
     ],
 
     result: [new BooleanStackItem(false)],
-    gas: FEES.ONE,
+    gas: FEES[1_000_000],
   },
 
   {
@@ -1991,7 +1174,7 @@ const SYSCALLS = [
     ],
 
     result: [new IntegerStackItem(new BN(1))],
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
@@ -2051,7 +1234,7 @@ const SYSCALLS = [
     ],
 
     result: [new BooleanStackItem(false)],
-    gas: FEES.ONE,
+    gas: FEES[1_000_000],
   },
 
   {
@@ -2111,7 +1294,7 @@ const SYSCALLS = [
     ],
 
     result: [new IntegerStackItem(new BN(2))],
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
@@ -2213,7 +1396,7 @@ const SYSCALLS = [
     ],
 
     result: [new BufferStackItem(Buffer.from('value2', 'utf8'))],
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
@@ -2315,7 +1498,7 @@ const SYSCALLS = [
     ],
 
     result: [new BufferStackItem(Buffer.from('key2', 'utf8'))],
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
@@ -2332,7 +1515,7 @@ const SYSCALLS = [
                 type: 'calls',
                 calls: [
                   {
-                    name: 'Neo.Storage.GetContext',
+                    name: 'System.Storage.GetContext',
                     type: 'sys',
                   },
                 ],
@@ -2346,12 +1529,12 @@ const SYSCALLS = [
     ],
 
     result: [new BooleanStackItem(true)],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(Buffer.alloc(1, 1), Buffer.alloc(1, 2)));
     },
-    gas: FEES.ONE,
+    gas: FEES[1_000_000],
   },
 
   {
@@ -2368,7 +1551,7 @@ const SYSCALLS = [
                 type: 'calls',
                 calls: [
                   {
-                    name: 'Neo.Storage.GetContext',
+                    name: 'System.Storage.GetContext',
                     type: 'sys',
                   },
                 ],
@@ -2382,12 +1565,12 @@ const SYSCALLS = [
     ],
 
     result: [new BooleanStackItem(false)],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of());
     },
-    gas: FEES.ONE,
+    gas: FEES[1_000_000],
   },
 
   {
@@ -2425,7 +1608,7 @@ const SYSCALLS = [
                                         type: 'calls',
                                         calls: [
                                           {
-                                            name: 'Neo.Storage.GetContext',
+                                            name: 'System.Storage.GetContext',
                                             type: 'sys',
                                           },
                                         ],
@@ -2451,12 +1634,12 @@ const SYSCALLS = [
     ],
 
     result: [new BufferStackItem(nextItem.key), new BooleanStackItem(true)],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
@@ -2494,7 +1677,7 @@ const SYSCALLS = [
                                         type: 'calls',
                                         calls: [
                                           {
-                                            name: 'Neo.Storage.GetContext',
+                                            name: 'System.Storage.GetContext',
                                             type: 'sys',
                                           },
                                         ],
@@ -2520,12 +1703,12 @@ const SYSCALLS = [
     ],
 
     result: [new BufferStackItem(nextItem.value), new BooleanStackItem(true)],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
@@ -2542,7 +1725,7 @@ const SYSCALLS = [
                 type: 'calls',
                 calls: [
                   {
-                    name: 'Neo.Storage.GetContext',
+                    name: 'System.Storage.GetContext',
                     type: 'sys',
                   },
                 ],
@@ -2576,12 +1759,12 @@ const SYSCALLS = [
     ],
 
     result: [new BufferStackItem(nextItem.value)],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
@@ -2598,7 +1781,7 @@ const SYSCALLS = [
                 type: 'calls',
                 calls: [
                   {
-                    name: 'Neo.Storage.GetContext',
+                    name: 'System.Storage.GetContext',
                     type: 'sys',
                   },
                 ],
@@ -2632,282 +1815,16 @@ const SYSCALLS = [
     ],
 
     result: [new BufferStackItem(nextItem.key)],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
-    name: 'Neo.Account.SetVotes',
-    result: [],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAccount',
-            type: 'sys',
-            args: [scriptAttributeHash],
-          },
-        ],
-      },
-
-      [keys[2].publicKey],
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(account)));
-
-      blockchain.account.get = jest.fn(async () => Promise.resolve(new Account(account)));
-
-      blockchain.settings.governingToken = { hashHex: ASSETHASH1 };
-      blockchain.account.update = jest.fn(async () =>
-        Promise.resolve({
-          ...account,
-          votes: [keys[2].publicKey],
-          isDeletable: () => false,
-        }),
-      );
-    },
-    gas: FEES.ONE_THOUSAND,
-  },
-
-  {
-    name: 'Neo.Account.SetVotes',
-    result: [],
-    error: 'Account Frozen',
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAccount',
-            type: 'sys',
-            args: [scriptAttributeHash],
-          },
-        ],
-      },
-
-      [keys[2].publicKey],
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(frozenAccount)));
-
-      blockchain.account.get = jest.fn(async () => Promise.resolve(new Account(frozenAccount)));
-
-      blockchain.settings.governingToken = { hashHex: ASSETHASH1 };
-      blockchain.account.update = jest.fn(async () =>
-        Promise.resolve({
-          ...account,
-          votes: [keys[2].publicKey],
-          isDeletable: () => false,
-        }),
-      );
-    },
-    gas: FEES.ONE_THOUSAND,
-  },
-
-  {
-    name: 'Neo.Account.SetVotes',
-    result: [],
-    error: 'Ineligible To Vote',
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAccount',
-            type: 'sys',
-            args: [scriptAttributeHash],
-          },
-        ],
-      },
-
-      [keys[2].publicKey],
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(noBalanceAccount)));
-
-      blockchain.account.get = jest.fn(async () => Promise.resolve(new Account(noBalanceAccount)));
-
-      blockchain.settings.governingToken = { hashHex: ASSETHASH1 };
-      blockchain.account.update = jest.fn(async () =>
-        Promise.resolve({
-          ...account,
-          votes: [keys[2].publicKey],
-          isDeletable: () => false,
-        }),
-      );
-    },
-    gas: FEES.ONE_THOUSAND,
-  },
-
-  {
-    name: 'Neo.Account.SetVotes',
-    result: [],
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAccount',
-            type: 'sys',
-            args: [scriptAttributeHash],
-          },
-        ],
-      },
-
-      [keys[2].publicKey],
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.account.tryGet = jest.fn(async () => Promise.resolve(new Account(account)));
-
-      blockchain.account.get = jest.fn(async () => Promise.resolve(new Account(account)));
-
-      blockchain.settings.governingToken = { hashHex: ASSETHASH1 };
-      blockchain.account.update = jest.fn(async () =>
-        Promise.resolve({
-          ...account,
-          votes: [keys[2].publicKey],
-          isDeletable: () => true,
-        }),
-      );
-
-      blockchain.account.delete = jest.fn(() => undefined);
-    },
-    gas: FEES.ONE_THOUSAND,
-  },
-
-  {
-    name: 'Neo.Validator.Register',
-    result: [new ValidatorStackItem(new Validator({ publicKey: keys[0].publicKey }))],
-
-    args: [keys[0].publicKey],
-    mock: ({ blockchain }) => {
-      blockchain.validator.tryGet = jest.fn(() => new Validator({ publicKey: keys[0].publicKey }));
-    },
-    gas: common.ONE_THOUSAND_FIXED8,
-  },
-
-  {
-    name: 'Neo.Validator.Register',
-    result: [new ValidatorStackItem(new Validator({ publicKey: keys[0].publicKey }))],
-    args: [keys[0].publicKey],
-    mock: ({ blockchain }) => {
-      blockchain.validator.tryGet = jest.fn(() => undefined);
-      blockchain.validator.add = jest.fn(() => true);
-    },
-    gas: common.ONE_THOUSAND_FIXED8,
-  },
-
-  {
-    name: 'Neo.Asset.Create',
-    result: [
-      new AssetStackItem(
-        new Asset({
-          ...asset,
-          hash: common.stringToUInt256('0x6859cd3caa26f28d8dd3e2eb29b05019f9dad3c0adf0215a1a4f198f4a9c4e29'),
-
-          available: new BN(0),
-        }),
-      ),
-    ],
-
-    args: [AssetType.Currency, 'assetName', new BN(10), 8, keys[0].publicKey, scriptAttributeHash, keys[1].scriptHash],
-
-    mock: ({ blockchain }) => {
-      blockchain.currentBlock.index = 2 - (2000000 + 1);
-      blockchain.asset.add = jest.fn(async () => Promise.resolve());
-    },
-    gas: common.FIVE_THOUSAND_FIXED8,
-  },
-
-  {
-    name: 'Neo.Asset.Renew',
-    result: [new IntegerStackItem(new BN(2).add(new BN(2).mul(new BN(BLOCK_HEIGHT_YEAR))))],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAsset',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-
-      new BN(2),
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(asset)));
-      blockchain.currentBlock.index = 1;
-      blockchain.asset.update = jest.fn(async () => Promise.resolve());
-    },
-    gas: common.FIVE_THOUSAND_FIXED8.mul(new BN(2)),
-  },
-  {
-    name: 'Neo.Asset.Renew',
-    result: [new IntegerStackItem(new BN(2).add(new BN(2).mul(new BN(BLOCK_HEIGHT_YEAR))))],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAsset',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-
-      new BN(2),
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(assetExpirationLT)));
-      blockchain.currentBlock.index = 1;
-      blockchain.asset.update = jest.fn(async () => Promise.resolve());
-    },
-    gas: common.FIVE_THOUSAND_FIXED8.mul(new BN(2)),
-  },
-  {
-    name: 'Neo.Asset.Renew',
-    result: [new IntegerStackItem(utils.UINT_MAX)],
-
-    args: [
-      {
-        type: 'calls',
-        calls: [
-          {
-            name: 'Neo.Blockchain.GetAsset',
-            type: 'sys',
-            args: [Buffer.alloc(32, 3)],
-          },
-        ],
-      },
-
-      new BN(2),
-    ],
-
-    mock: ({ blockchain }) => {
-      blockchain.asset.get = jest.fn(async () => Promise.resolve(new Asset(assetExpirationMax)));
-      blockchain.currentBlock.index = 1;
-      blockchain.asset.update = jest.fn(async () => Promise.resolve());
-    },
-    gas: common.FIVE_THOUSAND_FIXED8.mul(new BN(2)),
-  },
-  {
-    name: 'Neo.Contract.Create',
+    name: 'Neo.Contract.Update',
     result: [new ContractStackItem(transactions.kycContract)],
     args: [
       transactions.kycContract.script,
@@ -2921,29 +1838,7 @@ const SYSCALLS = [
       transactions.kycContract.description,
     ],
 
-    mock: ({ blockchain }) => {
-      blockchain.contract.tryGet = jest.fn(async () => Promise.resolve());
-      blockchain.contract.add = jest.fn(async () => Promise.resolve());
-    },
-    gas: common.FIVE_HUNDRED_FIXED8,
-  },
-
-  {
-    name: 'Neo.Contract.Migrate',
-    result: [new ContractStackItem(transactions.kycContract)],
-    args: [
-      transactions.kycContract.script,
-      Buffer.from([...transactions.kycContract.parameterList]),
-      transactions.kycContract.returnType,
-      transactions.kycContract.contractProperties,
-      transactions.kycContract.name,
-      transactions.kycContract.codeVersion,
-      transactions.kycContract.author,
-      transactions.kycContract.email,
-      transactions.kycContract.description,
-    ],
-
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.tryGet = jest.fn(async () => Promise.resolve());
       blockchain.contract.add = jest.fn(async () => Promise.resolve());
       // tslint:disable-next-line: deprecation seems like a bug from rxjs; We don't want the scheduler definition anyway.
@@ -2954,47 +1849,23 @@ const SYSCALLS = [
   },
 
   {
-    name: 'Neo.Contract.GetStorageContext',
-    options: {
-      stack: [new ContractStackItem(new Contract(transactions.kycContract))],
-      createdContracts: {
-        [transactions.kycContract.hashHex]: Buffer.from('f42c9189cbfc9d582b7039b29e2cf36ec1283f1b', 'hex'),
-      },
-    },
-    result: [new StorageContextStackItem(transactions.kycContract.hash)],
-    gas: FEES.ONE,
-  },
-  {
-    name: 'Neo.Contract.GetStorageContext',
-    options: {
-      stack: [new ContractStackItem(new Contract(transactions.kycContract))],
-      createdContracts: {
-        [transactions.kycContract.hashHex]: Buffer.from('f42c9189cbfc9d582b7039b29e2cf36ec1283f1a', 'hex'),
-      },
-    },
-    result: [new StorageContextStackItem(transactions.kycContract.hash)],
-    error: 'Invalid Contract.GetStorageContext context',
-    gas: FEES.ONE,
-  },
-
-  {
-    name: 'Neo.Contract.Destroy',
+    name: 'System.Contract.Destroy',
     result: [],
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.tryGet = jest.fn(async () => Promise.resolve());
     },
-    gas: FEES.ONE,
+    gas: FEES[1_000_000],
   },
 
   {
-    name: 'Neo.Storage.Put',
+    name: 'System.Storage.Put',
     result: [],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Storage.GetContext',
+            name: 'System.Storage.GetContext',
             type: 'sys',
           },
         ],
@@ -3004,24 +1875,24 @@ const SYSCALLS = [
       Buffer.alloc(0, 0),
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
-    gas: FEES.ONE_THOUSAND,
+    gas: utils.ZERO,
   },
 
   {
-    name: 'Neo.Storage.Put',
+    name: 'System.Storage.Put',
     result: [],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Storage.GetContext',
+            name: 'System.Storage.GetContext',
             type: 'sys',
           },
         ],
@@ -3031,24 +1902,24 @@ const SYSCALLS = [
       Buffer.alloc(0, 0),
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
-    gas: FEES.ONE_THOUSAND,
+    gas: new BN(102400000),
   },
 
   {
-    name: 'Neo.Storage.Put',
+    name: 'System.Storage.Put',
     result: [],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Storage.GetContext',
+            name: 'System.Storage.GetContext',
             type: 'sys',
           },
         ],
@@ -3058,25 +1929,25 @@ const SYSCALLS = [
       Buffer.alloc(0, 0),
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
-    gas: FEES.ONE_THOUSAND.mul(new BN(2)),
+    gas: new BN(102500000),
     error: 'Item too large',
   },
 
   {
-    name: 'Neo.Storage.Put',
+    name: 'System.Storage.Put',
     result: [],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Storage.GetContext',
+            name: 'System.Storage.GetContext',
             type: 'sys',
           },
         ],
@@ -3086,23 +1957,23 @@ const SYSCALLS = [
       Buffer.alloc(1024, 0),
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
-    gas: FEES.ONE_THOUSAND,
+    gas: new BN(102400000),
   },
   {
-    name: 'Neo.Storage.Put',
+    name: 'System.Storage.Put',
     result: [],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Storage.GetContext',
+            name: 'System.Storage.GetContext',
             type: 'sys',
           },
         ],
@@ -3112,25 +1983,25 @@ const SYSCALLS = [
       Buffer.alloc(1024, 0),
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve({ hasStorage: true }));
       blockchain.storageItem.update = jest.fn(async () => Promise.resolve());
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
-    gas: FEES.ONE_THOUSAND,
+    gas: new BN(102400000),
   },
 
   {
-    name: 'Neo.Storage.Put',
+    name: 'System.Storage.Put',
     result: [],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Storage.GetContext',
+            name: 'System.Storage.GetContext',
             type: 'sys',
           },
         ],
@@ -3140,24 +2011,24 @@ const SYSCALLS = [
       Buffer.alloc(1025, 0),
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
-    gas: FEES.ONE_THOUSAND.mul(new BN(2)),
+    gas: new BN(102500000),
   },
 
   {
-    name: 'Neo.Storage.Delete',
+    name: 'System.Storage.Delete',
     result: [],
     args: [
       {
         type: 'calls',
         calls: [
           {
-            name: 'Neo.Storage.GetContext',
+            name: 'System.Storage.GetContext',
             type: 'sys',
           },
         ],
@@ -3166,50 +2037,50 @@ const SYSCALLS = [
       Buffer.alloc(0, 0),
     ],
 
-    mock: ({ blockchain }) => {
+    mockBlockchain: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve({ flags: StorageFlags.None }));
       blockchain.storageItem.delete = jest.fn(async () => Promise.resolve());
     },
-    gas: FEES.ONE_HUNDRED,
+    gas: FEES[1_000_000],
   },
 
   {
     name: 'System.ExecutionEngine.GetScriptContainer',
     result: ({ transaction }) => [new TransactionStackItem(transaction)],
-    gas: FEES.ONE,
+    gas: FEES[250],
   },
 
   {
     name: 'System.ExecutionEngine.GetScriptContainer',
     flags: new Set(['blockContainer']),
     result: [new BlockStackItem(factory.createBlock({ timestamp: 15 }))],
-    gas: FEES.ONE,
+    gas: FEES[250],
   },
 
   {
     name: 'System.ExecutionEngine.GetScriptContainer',
     flags: new Set(['consensusContainer']),
     result: [new ConsensusPayloadStackItem(factory.createConsensusPayload({ timestamp: 15 }))],
-    gas: FEES.ONE,
+    gas: FEES[250],
   },
 
   {
     name: 'System.ExecutionEngine.GetExecutingScriptHash',
     result: ({ transaction }) => [new UInt160StackItem(crypto.toScriptHash(transaction.script))],
 
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 
   {
     name: 'System.ExecutionEngine.GetCallingScriptHash',
     result: [new BufferStackItem(Buffer.alloc(0, 0))],
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
   {
     name: 'System.ExecutionEngine.GetCallingScriptHash',
     result: [new UInt160StackItem(common.ZERO_UINT160)],
-    gas: FEES.ONE,
+    gas: FEES[400],
     options: {
       scriptHashStack: [Buffer.alloc(20, 1), common.ZERO_UINT160, Buffer.alloc(20, 2)],
     },
@@ -3221,7 +2092,7 @@ const SYSCALLS = [
     options: {
       scriptHashStack: [Buffer.alloc(20, 1), Buffer.alloc(20, 2), common.ZERO_UINT160],
     },
-    gas: FEES.ONE,
+    gas: FEES[400],
   },
 ] as readonly TestCase[];
 
@@ -3287,7 +2158,17 @@ describe('syscalls', () => {
 
   // tslint:disable-next-line no-loop-statement
   for (const testCase of SYSCALLS) {
-    const { name, result, gas, args = [], mock, options, flags = new Set<flag>(), error } = testCase;
+    const {
+      name,
+      result,
+      gas,
+      args = [],
+      mockBlockchain,
+      mockTransaction,
+      options,
+      flags = new Set<flag>(),
+      error,
+    } = testCase;
     test(name, async () => {
       const sb = new ScriptBuilder();
       sb.emitSysCall(name);
@@ -3300,6 +2181,10 @@ describe('syscalls', () => {
           }),
         ],
       });
+
+      if (mockTransaction !== undefined) {
+        mockTransaction({ transaction });
+      }
 
       const blockchain = {
         contract: {},
@@ -3362,8 +2247,8 @@ describe('syscalls', () => {
       const gasLeft = common.ONE_HUNDRED_MILLION_FIXED8;
       let stack: readonly StackItem[] = [];
 
-      if (mock !== undefined) {
-        mock({ blockchain });
+      if (mockBlockchain !== undefined) {
+        mockBlockchain({ blockchain });
       }
 
       if (args.length) {

@@ -199,3 +199,14 @@ export const InvalidVerifySyscallError = makeErrorWithCode(
   (context: ExecutionContext, syscall: string) =>
     getMessage(context, `Syscall ${syscall} is not allowed during verification`),
 );
+export const InvalidInvocationCounterError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, hash: string) =>
+  getMessage(context, `Could not find InvocationCounter for scriptHash: ${hash}`),
+);
+export const InvalidNativeDeployError = makeErrorWithCode(
+  'VM_ERROR',
+  (context: ExecutionContext, persistingBlockIndex: number | undefined) =>
+    getMessage(
+      context,
+      `Invalid Native Deploy - Native Contracts must be deployed at persistingBlock.index = 0, found: ${persistingBlockIndex}`,
+    ),
+);

@@ -1,10 +1,2 @@
-status = [
-  "ci/circleci: lint",
-  "ci/circleci: test10",
-  "ci/circleci: test12",
-  "ci/circleci: e2e10",
-  "ci/circleci: e2e12",
-  "ci/circleci: build-e2e10",
-  "ci/circleci: build-e2e12"
-]
+status = []
 timeout_sec = 18000
