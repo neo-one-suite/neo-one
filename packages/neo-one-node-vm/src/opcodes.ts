@@ -1,11 +1,10 @@
-import { common, crypto, Op as OpCodeToByteCode, OpCode, UInt160, utils, VMState } from '@neo-one/client-common';
+import { OpCode, utils, VMState } from '@neo-one/client-common';
 // tslint:disable-next-line:match-default-export-name
 import bitwise from 'bitwise';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import {
   ExecutionContext,
-  ExecutionStack,
   FEES,
   MAX_ARRAY_SIZE,
   MAX_ITEM_SIZE,
@@ -17,15 +16,11 @@ import {
 import {
   CodeOverflowError,
   ContainerTooLargeError,
-  ContractNoDynamicInvokeError,
-  InsufficientReturnValueError,
-  InvalidCheckMultisigArgumentsError,
   InvalidHasKeyIndexError,
   InvalidPackCountError,
   InvalidPickItemKeyError,
   InvalidRemoveIndexError,
   InvalidSetItemIndexError,
-  InvalidTailCallReturnValueError,
   ItemTooLargeError,
   LeftNegativeError,
   PickNegativeError,
@@ -51,8 +46,6 @@ import {
   MapStackItem,
   StackItem,
   StructStackItem,
-  UInt160StackItem,
-  UInt256StackItem,
 } from './stackItem';
 import { lookupSysCall } from './syscalls';
 import { vmUtils } from './vmUtils';
@@ -82,15 +75,16 @@ export interface CreateOpArgs {
 
 export const createOp = ({
   name,
+  fee,
   in: _in = 0,
   inAlt = 0,
   out = 0,
   outAlt = 0,
   invocation = 0,
-  fee: feeIn,
   invoke,
 }: {
   readonly name: OpCode;
+  readonly fee: BN;
   readonly in?: number;
   readonly inAlt?: number;
   readonly out?: number;
@@ -98,33 +92,25 @@ export const createOp = ({
   readonly invocation?: number;
   readonly array?: number;
   readonly item?: number;
-  readonly fee?: BN;
   readonly invoke: OpInvoke;
-}): OpStatic => {
-  let fee = feeIn;
-  if (fee === undefined) {
-    const byteCode = OpCodeToByteCode[name];
-    fee = byteCode <= OpCodeToByteCode.NOP ? utils.ZERO : FEES.ONE;
-  }
-
-  return {
-    type: 'op',
-    op: {
-      name,
-      in: _in,
-      inAlt,
-      out,
-      outAlt,
-      invocation,
-      fee,
-      invoke,
-    },
-  };
-};
+}): OpStatic => ({
+  type: 'op',
+  op: {
+    name,
+    in: _in,
+    inAlt,
+    out,
+    outAlt,
+    invocation,
+    fee,
+    invoke,
+  },
+});
 
 const pushNumber = ({ name, value }: { readonly name: OpCode; readonly value: number }) =>
   createOp({
     name,
+    fee: FEES[30],
     out: 1,
     invoke: ({ context }) => ({
       context,
@@ -132,9 +118,10 @@ const pushNumber = ({ name, value }: { readonly name: OpCode; readonly value: nu
     }),
   });
 
-const pushData = ({ name, numBytes }: { readonly name: OpCode; readonly numBytes: 1 | 2 | 4 }) =>
+const pushData = ({ name, numBytes, fee }: { readonly name: OpCode; readonly numBytes: 1 | 2 | 4; readonly fee: BN }) =>
   createOp({
     name,
+    fee,
     out: 1,
     invoke: ({ context }) => {
       const { code, pc } = context;
@@ -170,6 +157,7 @@ const pushData = ({ name, numBytes }: { readonly name: OpCode; readonly numBytes
 const jump = ({ name, checkTrue }: { readonly name: OpCode; readonly checkTrue?: boolean }) =>
   createOp({
     name,
+    fee: FEES[70],
     in: checkTrue === undefined ? 0 : 1,
     invoke: ({ context, args }) => {
       const { code } = context;
@@ -198,288 +186,10 @@ const jump = ({ name, checkTrue }: { readonly name: OpCode; readonly checkTrue?:
     },
   });
 
-const isDynamic = (hash: UInt160) => common.uInt160ToBuffer(hash).every((value) => value === 0);
-
-const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: boolean }): OpCreate => ({
-  type: 'create',
-  create: ({ context: contextIn }) => {
-    const hashIn = common.bufferToUInt160(contextIn.code.slice(contextIn.pc, contextIn.pc + 20));
-
-    const { op } = createOp({
-      name,
-      in: isDynamic(hashIn) ? 1 : 0,
-      invocation: tailCall ? 0 : 1,
-      fee: FEES.TEN,
-      invoke: async ({ context, args }) => {
-        const { pc, scriptHash } = context;
-        let hash = common.bufferToUInt160(context.code.slice(pc, pc + 20));
-        if (isDynamic(hash)) {
-          hash = common.bufferToUInt160(args[0].asBuffer());
-
-          const executingContract = await context.blockchain.contract.get({
-            hash: scriptHash,
-          });
-
-          if (!executingContract.hasDynamicInvoke) {
-            throw new ContractNoDynamicInvokeError(context, common.uInt160ToString(scriptHash));
-          }
-        }
-        const contract = await context.blockchain.contract.get({ hash });
-        const scriptHashStack = [hash, ...context.scriptHashStack];
-        const resultContext = await context.engine.executeScript({
-          code: contract.script,
-          blockchain: context.blockchain,
-          init: context.init,
-          gasLeft: context.gasLeft,
-          options: {
-            stack: context.stack,
-            stackAlt: context.stackAlt,
-            depth: tailCall ? context.depth : context.depth + 1,
-            createdContracts: context.createdContracts,
-            scriptHashStack: tailCall ? scriptHashStack.slice(0, scriptHashStack.length - 1) : scriptHashStack,
-            scriptHash: context.scriptHash,
-            entryScriptHash: context.entryScriptHash,
-            returnValueCount: -1,
-            stackCount: context.stackCount,
-          },
-        });
-
-        let { state } = resultContext;
-        if (state === VMState.Halt) {
-          // If it's a tail call, then the final recursive call executes the rest
-          // of the script, and we just return immediately here.
-          state = tailCall ? VMState.Halt : context.state;
-        }
-
-        return {
-          context: {
-            state,
-            errorMessage: resultContext.errorMessage,
-            blockchain: context.blockchain,
-            init: context.init,
-            engine: context.engine,
-            code: context.code,
-            scriptHashStack: tailCall
-              ? context.scriptHashStack.slice(0, context.scriptHashStack.length - 1)
-              : context.scriptHashStack,
-            scriptHash: context.scriptHash,
-            callingScriptHash: context.callingScriptHash,
-            entryScriptHash: context.entryScriptHash,
-            pc: pc + 20,
-            depth: context.depth,
-            returnValueCount: context.returnValueCount,
-            stackCount: resultContext.stackCount,
-            stack: resultContext.stack,
-            stackAlt: resultContext.stackAlt,
-            gasLeft: resultContext.gasLeft,
-            createdContracts: resultContext.createdContracts,
-          },
-        };
-      },
-    });
-
-    return { op, context: contextIn };
-  },
-});
-
-const callIsolated = ({
-  name,
-  dynamicCall,
-  tailCall,
-}: {
-  readonly name: OpCode;
-  readonly dynamicCall?: boolean;
-  readonly tailCall?: boolean;
-}): OpCreate => ({
-  type: 'create',
-  create: ({ context: contextIn }) => {
-    const returnValueCount = contextIn.code.slice(contextIn.pc, contextIn.pc + 1)[0];
-    const parametersCount = contextIn.code.slice(contextIn.pc + 1, contextIn.pc + 2)[0];
-
-    const nextPC = dynamicCall ? contextIn.pc + 2 : contextIn.pc + 22;
-
-    const { op } = createOp({
-      name,
-      in: parametersCount + (dynamicCall ? 1 : 0),
-      invocation: tailCall ? 0 : 1,
-      invoke: async ({ context, args }) => {
-        const { pc, scriptHash } = context;
-        const hash = dynamicCall
-          ? common.bufferToUInt160(args[0].asBuffer())
-          : common.bufferToUInt160(context.code.slice(pc + 2, pc + 22));
-
-        if (tailCall && context.returnValueCount !== returnValueCount) {
-          throw new InvalidTailCallReturnValueError(context, context.returnValueCount, returnValueCount);
-        }
-
-        if (dynamicCall) {
-          const executingContract = await context.blockchain.contract.get({
-            hash: scriptHash,
-          });
-
-          if (!executingContract.hasDynamicInvoke) {
-            throw new ContractNoDynamicInvokeError(context, common.uInt160ToString(scriptHash));
-          }
-        }
-
-        const contract = await context.blockchain.contract.get({ hash });
-        const nextStack = dynamicCall ? args.slice(1) : args;
-        const scriptHashStack = [hash, ...context.scriptHashStack];
-
-        const resultContext = await context.engine.executeScript({
-          code: contract.script,
-          blockchain: context.blockchain,
-          init: context.init,
-          gasLeft: context.gasLeft,
-          options: {
-            stack: nextStack,
-            stackAlt: [],
-            depth: tailCall ? context.depth : context.depth + 1,
-            createdContracts: context.createdContracts,
-            scriptHashStack: tailCall ? scriptHashStack.slice(0, scriptHashStack.length - 1) : scriptHashStack,
-            scriptHash: context.scriptHash,
-            entryScriptHash: context.entryScriptHash,
-            returnValueCount,
-            stackCount: context.stackCount + nextStack.reduce((acc, value) => acc + value.increment(), 0),
-          },
-        });
-
-        let { state, stackCount } = resultContext;
-        if (state === VMState.Halt) {
-          // If it's a tail call, then the final recursive call executes the rest
-          // of the script, and we just return immediately here.
-          state = tailCall ? VMState.Halt : context.state;
-        }
-
-        let stack: ExecutionStack = [];
-        if (returnValueCount === -1) {
-          stack = resultContext.stack;
-        } else if (returnValueCount > 0) {
-          if (resultContext.state === VMState.Halt && resultContext.stack.length < returnValueCount) {
-            throw new InsufficientReturnValueError(context, resultContext.stack.length, returnValueCount);
-          }
-
-          stack = resultContext.stack.slice(0, returnValueCount);
-          stackCount += resultContext.stack.slice(returnValueCount).reduce((acc, value) => acc + value.decrement(), 0);
-        }
-
-        stackCount += resultContext.stackAlt.reduce((acc, value) => acc + value.decrement(), 0);
-
-        return {
-          context: {
-            state,
-            errorMessage: resultContext.errorMessage,
-            blockchain: context.blockchain,
-            init: context.init,
-            engine: context.engine,
-            code: context.code,
-            scriptHashStack: tailCall
-              ? context.scriptHashStack.slice(0, context.scriptHashStack.length - 1)
-              : context.scriptHashStack,
-            scriptHash: context.scriptHash,
-            callingScriptHash: context.callingScriptHash,
-            entryScriptHash: context.entryScriptHash,
-            pc: nextPC,
-            depth: context.depth,
-            returnValueCount: context.returnValueCount,
-            stackCount,
-            stack: stack.concat(context.stack),
-            stackAlt: context.stackAlt,
-            gasLeft: resultContext.gasLeft,
-            createdContracts: resultContext.createdContracts,
-          },
-        };
-      },
-    });
-
-    return { op, context: contextIn };
-  },
-});
-
-const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => ({
-  type: 'create',
-  create: ({ context: contextIn }) => {
-    const returnValueCount = contextIn.code.slice(contextIn.pc, contextIn.pc + 1)[0];
-    let parametersCount = contextIn.code.slice(contextIn.pc + 1, contextIn.pc + 2)[0];
-    parametersCount = parametersCount === -1 ? contextIn.stack.length : parametersCount;
-    const jumpCount = contextIn.code.slice(contextIn.pc + 2, contextIn.pc + 4).readInt16LE(0);
-    const nextPC = contextIn.pc + 4;
-
-    const { op } = createOp({
-      name,
-      in: parametersCount,
-      invocation: 1,
-      invoke: async ({ context, args }) => {
-        const resultContext = await context.engine.executeScript({
-          code: context.code,
-          blockchain: context.blockchain,
-          init: context.init,
-          gasLeft: context.gasLeft,
-          options: {
-            stack: args,
-            stackAlt: [],
-            depth: context.depth + 1,
-            createdContracts: context.createdContracts,
-            scriptHashStack: [context.scriptHash, ...context.scriptHashStack],
-            scriptHash: context.scriptHash,
-            entryScriptHash: context.entryScriptHash,
-            returnValueCount,
-            pc: context.pc + jumpCount + 1,
-            stackCount: context.stackCount + args.reduce((acc, value) => acc + value.increment(), 0),
-          },
-        });
-
-        let { state, stackCount } = resultContext;
-        if (state === VMState.Halt) {
-          state = context.state;
-        }
-
-        let stack: ExecutionStack = [];
-        if (returnValueCount === -1) {
-          stack = resultContext.stack;
-        } else if (returnValueCount > 0) {
-          if (resultContext.stack.length < returnValueCount) {
-            throw new InsufficientReturnValueError(context, resultContext.stack.length, returnValueCount);
-          }
-
-          stack = resultContext.stack.slice(0, returnValueCount);
-          stackCount += resultContext.stack.slice(returnValueCount).reduce((acc, value) => acc + value.decrement(), 0);
-        }
-
-        stackCount += resultContext.stackAlt.reduce((acc, value) => acc + value.decrement(), 0);
-
-        return {
-          context: {
-            state,
-            errorMessage: resultContext.errorMessage,
-            blockchain: context.blockchain,
-            init: context.init,
-            engine: context.engine,
-            code: context.code,
-            scriptHashStack: context.scriptHashStack,
-            scriptHash: context.scriptHash,
-            callingScriptHash: context.callingScriptHash,
-            entryScriptHash: context.entryScriptHash,
-            pc: nextPC,
-            depth: context.depth,
-            returnValueCount: context.returnValueCount,
-            stackCount,
-            stack: stack.concat(context.stack),
-            stackAlt: context.stackAlt,
-            gasLeft: resultContext.gasLeft,
-            createdContracts: resultContext.createdContracts,
-          },
-        };
-      },
-    });
-
-    return { op, context: contextIn };
-  },
-});
-
 const newArrayOrStruct = ({ name }: { readonly name: 'NEWARRAY' | 'NEWSTRUCT' }) =>
   createOp({
     name,
+    fee: FEES[15_000],
     in: 1,
     out: 1,
     invoke: ({ context, args }) => {
@@ -509,6 +219,7 @@ const OPCODE_PAIRS = ([
     0x00,
     createOp({
       name: 'PUSH0',
+      fee: FEES[30],
       out: 1,
       invoke: ({ context }) => ({
         context,
@@ -525,6 +236,7 @@ const OPCODE_PAIRS = ([
       createOp({
         // tslint:disable-next-line no-any
         name: `PUSHBYTES${idx}` as any,
+        fee: FEES[120],
         out: 1,
         invoke: ({ context }) => ({
           context: {
@@ -537,9 +249,9 @@ const OPCODE_PAIRS = ([
     ]),
   )
   .concat([
-    [0x4c, pushData({ name: 'PUSHDATA1', numBytes: 1 })],
-    [0x4d, pushData({ name: 'PUSHDATA2', numBytes: 2 })],
-    [0x4e, pushData({ name: 'PUSHDATA4', numBytes: 4 })],
+    [0x4c, pushData({ name: 'PUSHDATA1', numBytes: 1, fee: FEES[180] })],
+    [0x4d, pushData({ name: 'PUSHDATA2', numBytes: 2, fee: FEES[13_000] })],
+    [0x4e, pushData({ name: 'PUSHDATA4', numBytes: 4, fee: FEES[110_000] })],
     [0x4f, pushNumber({ name: 'PUSHM1', value: -1 })],
   ])
   .concat(
@@ -556,6 +268,7 @@ const OPCODE_PAIRS = ([
       0x61,
       createOp({
         name: 'NOP',
+        fee: FEES[30],
         invoke: ({ context }) => ({ context }),
       }),
     ],
@@ -566,6 +279,7 @@ const OPCODE_PAIRS = ([
       0x65,
       createOp({
         name: 'CALL',
+        fee: FEES[22_000],
         invocation: 1,
         invoke: async ({ context }) => {
           const { pc } = context;
@@ -606,12 +320,12 @@ const OPCODE_PAIRS = ([
       0x66,
       createOp({
         name: 'RET',
+        fee: FEES[40],
         invoke: ({ context }) => ({
           context: { ...context, state: VMState.Halt },
         }),
       }),
     ],
-    [0x67, call({ name: 'APPCALL' })],
     [
       0x68,
       {
@@ -635,11 +349,23 @@ const OPCODE_PAIRS = ([
         },
       },
     ],
-    [0x69, call({ name: 'TAILCALL', tailCall: true })],
+    [
+      0x69,
+      createOp({
+        name: 'DUPFROMALTSTACKBOTTOM',
+        fee: FEES[60],
+        out: 1,
+        invoke: ({ context }) => ({
+          context,
+          results: [context.stackAlt[context.stackAlt.length - 1]],
+        }),
+      }),
+    ],
     [
       0x6a,
       createOp({
         name: 'DUPFROMALTSTACK',
+        fee: FEES[60],
         inAlt: 1,
         out: 1,
         outAlt: 1,
@@ -654,6 +380,7 @@ const OPCODE_PAIRS = ([
       0x6b,
       createOp({
         name: 'TOALTSTACK',
+        fee: FEES[60],
         in: 1,
         outAlt: 1,
         invoke: ({ context, args }) => ({
@@ -666,6 +393,7 @@ const OPCODE_PAIRS = ([
       0x6c,
       createOp({
         name: 'FROMALTSTACK',
+        fee: FEES[60],
         inAlt: 1,
         out: 1,
         invoke: ({ context, argsAlt }) => ({
@@ -678,6 +406,7 @@ const OPCODE_PAIRS = ([
       0x6d,
       createOp({
         name: 'XDROP',
+        fee: FEES[400],
         in: 1,
         invoke: ({ context, args }) => {
           const n = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
@@ -705,6 +434,7 @@ const OPCODE_PAIRS = ([
       0x72,
       createOp({
         name: 'XSWAP',
+        fee: FEES[60],
         in: 1,
         invoke: ({ context, args }) => {
           const n = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
@@ -724,6 +454,7 @@ const OPCODE_PAIRS = ([
       0x73,
       createOp({
         name: 'XTUCK',
+        fee: FEES[400],
         in: 1,
         invoke: ({ context, args }) => {
           const n = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
@@ -750,6 +481,7 @@ const OPCODE_PAIRS = ([
       0x74,
       createOp({
         name: 'DEPTH',
+        fee: FEES[60],
         out: 1,
         invoke: ({ context }) => ({
           context,
@@ -761,6 +493,7 @@ const OPCODE_PAIRS = ([
       0x75,
       createOp({
         name: 'DROP',
+        fee: FEES[60],
         in: 1,
         invoke: ({ context }) => ({ context }),
       }),
@@ -769,6 +502,7 @@ const OPCODE_PAIRS = ([
       0x76,
       createOp({
         name: 'DUP',
+        fee: FEES[60],
         in: 1,
         out: 2,
         invoke: ({ context, args }) => ({
@@ -781,6 +515,7 @@ const OPCODE_PAIRS = ([
       0x77,
       createOp({
         name: 'NIP',
+        fee: FEES[60],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -793,6 +528,7 @@ const OPCODE_PAIRS = ([
       0x78,
       createOp({
         name: 'OVER',
+        fee: FEES[60],
         in: 2,
         out: 3,
         invoke: ({ context, args }) => ({
@@ -805,6 +541,7 @@ const OPCODE_PAIRS = ([
       0x79,
       createOp({
         name: 'PICK',
+        fee: FEES[60],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => {
@@ -824,6 +561,7 @@ const OPCODE_PAIRS = ([
       0x7a,
       createOp({
         name: 'ROLL',
+        fee: FEES[400],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => {
@@ -852,6 +590,7 @@ const OPCODE_PAIRS = ([
       0x7b,
       createOp({
         name: 'ROT',
+        fee: FEES[60],
         in: 3,
         out: 3,
         invoke: ({ context, args }) => ({
@@ -864,6 +603,7 @@ const OPCODE_PAIRS = ([
       0x7c,
       createOp({
         name: 'SWAP',
+        fee: FEES[60],
         in: 2,
         out: 2,
         invoke: ({ context, args }) => ({
@@ -876,6 +616,7 @@ const OPCODE_PAIRS = ([
       0x7d,
       createOp({
         name: 'TUCK',
+        fee: FEES[60],
         in: 2,
         out: 3,
         invoke: ({ context, args }) => ({
@@ -888,6 +629,7 @@ const OPCODE_PAIRS = ([
       0x7e,
       createOp({
         name: 'CAT',
+        fee: FEES[80_000],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => {
@@ -907,6 +649,7 @@ const OPCODE_PAIRS = ([
       0x7f,
       createOp({
         name: 'SUBSTR',
+        fee: FEES[80_000],
         in: 3,
         out: 1,
         invoke: ({ context, args }) => {
@@ -931,6 +674,7 @@ const OPCODE_PAIRS = ([
       0x80,
       createOp({
         name: 'LEFT',
+        fee: FEES[80_000],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => {
@@ -950,6 +694,7 @@ const OPCODE_PAIRS = ([
       0x81,
       createOp({
         name: 'RIGHT',
+        fee: FEES[80_000],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => {
@@ -974,6 +719,7 @@ const OPCODE_PAIRS = ([
       0x82,
       createOp({
         name: 'SIZE',
+        fee: FEES[60],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -986,6 +732,7 @@ const OPCODE_PAIRS = ([
       0x83,
       createOp({
         name: 'INVERT',
+        fee: FEES[100],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1002,6 +749,7 @@ const OPCODE_PAIRS = ([
       0x84,
       createOp({
         name: 'AND',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1018,6 +766,7 @@ const OPCODE_PAIRS = ([
       0x85,
       createOp({
         name: 'OR',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1034,6 +783,7 @@ const OPCODE_PAIRS = ([
       0x86,
       createOp({
         name: 'XOR',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1050,6 +800,7 @@ const OPCODE_PAIRS = ([
       0x87,
       createOp({
         name: 'EQUAL',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1058,22 +809,11 @@ const OPCODE_PAIRS = ([
         }),
       }),
     ],
-    // [0x88, createOp({
-    //   name: 'OP_EQUALVERIFY',
-    //   invoke: ({ context }: OpInvokeArgs) => ({ context }),
-    // })],
-    // [0x89, createOp({
-    //   name: 'OP_RESERVED1',
-    //   invoke: ({ context }: OpInvokeArgs) => ({ context }),
-    // })],
-    // [0x8A, createOp({
-    //   name: 'OP_RESERVED2',
-    //   invoke: ({ context }: OpInvokeArgs) => ({ context }),
-    // })],
     [
       0x8b,
       createOp({
         name: 'INC',
+        fee: FEES[100],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1086,6 +826,7 @@ const OPCODE_PAIRS = ([
       0x8c,
       createOp({
         name: 'DEC',
+        fee: FEES[100],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1098,6 +839,7 @@ const OPCODE_PAIRS = ([
       0x8d,
       createOp({
         name: 'SIGN',
+        fee: FEES[100],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => {
@@ -1119,6 +861,7 @@ const OPCODE_PAIRS = ([
       0x8f,
       createOp({
         name: 'NEGATE',
+        fee: FEES[100],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1131,6 +874,7 @@ const OPCODE_PAIRS = ([
       0x90,
       createOp({
         name: 'ABS',
+        fee: FEES[100],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1143,6 +887,7 @@ const OPCODE_PAIRS = ([
       0x91,
       createOp({
         name: 'NOT',
+        fee: FEES[100],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1155,6 +900,7 @@ const OPCODE_PAIRS = ([
       0x92,
       createOp({
         name: 'NZ',
+        fee: FEES[100],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1167,6 +913,7 @@ const OPCODE_PAIRS = ([
       0x93,
       createOp({
         name: 'ADD',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1185,6 +932,7 @@ const OPCODE_PAIRS = ([
       0x94,
       createOp({
         name: 'SUB',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1203,6 +951,7 @@ const OPCODE_PAIRS = ([
       0x95,
       createOp({
         name: 'MUL',
+        fee: FEES[300],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1221,6 +970,7 @@ const OPCODE_PAIRS = ([
       0x96,
       createOp({
         name: 'DIV',
+        fee: FEES[300],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1239,6 +989,7 @@ const OPCODE_PAIRS = ([
       0x97,
       createOp({
         name: 'MOD',
+        fee: FEES[300],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1257,6 +1008,7 @@ const OPCODE_PAIRS = ([
       0x98,
       createOp({
         name: 'SHL',
+        fee: FEES[300],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => {
@@ -1279,6 +1031,7 @@ const OPCODE_PAIRS = ([
       0x99,
       createOp({
         name: 'SHR',
+        fee: FEES[300],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => {
@@ -1301,6 +1054,7 @@ const OPCODE_PAIRS = ([
       0x9a,
       createOp({
         name: 'BOOLAND',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1313,6 +1067,7 @@ const OPCODE_PAIRS = ([
       0x9b,
       createOp({
         name: 'BOOLOR',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1325,6 +1080,7 @@ const OPCODE_PAIRS = ([
       0x9c,
       createOp({
         name: 'NUMEQUAL',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1337,6 +1093,7 @@ const OPCODE_PAIRS = ([
       0x9e,
       createOp({
         name: 'NUMNOTEQUAL',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1349,6 +1106,7 @@ const OPCODE_PAIRS = ([
       0x9f,
       createOp({
         name: 'LT',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1361,6 +1119,7 @@ const OPCODE_PAIRS = ([
       0xa0,
       createOp({
         name: 'GT',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1373,6 +1132,7 @@ const OPCODE_PAIRS = ([
       0xa1,
       createOp({
         name: 'LTE',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1385,6 +1145,7 @@ const OPCODE_PAIRS = ([
       0xa2,
       createOp({
         name: 'GTE',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1397,6 +1158,7 @@ const OPCODE_PAIRS = ([
       0xa3,
       createOp({
         name: 'MIN',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1409,6 +1171,7 @@ const OPCODE_PAIRS = ([
       0xa4,
       createOp({
         name: 'MAX',
+        fee: FEES[200],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1421,6 +1184,7 @@ const OPCODE_PAIRS = ([
       0xa5,
       createOp({
         name: 'WITHIN',
+        fee: FEES[200],
         in: 3,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1435,211 +1199,10 @@ const OPCODE_PAIRS = ([
       }),
     ],
     [
-      0xa7,
-      createOp({
-        name: 'SHA1',
-        in: 1,
-        out: 1,
-        fee: FEES.TEN,
-        invoke: ({ context, args }) => ({
-          context,
-          results: [new BufferStackItem(crypto.sha1(args[0].asBuffer()))],
-        }),
-      }),
-    ],
-    [
-      0xa8,
-      createOp({
-        name: 'SHA256',
-        in: 1,
-        out: 1,
-        fee: FEES.TEN,
-        invoke: ({ context, args }) => ({
-          context,
-          results: [new BufferStackItem(crypto.sha256(args[0].asBuffer()))],
-        }),
-      }),
-    ],
-    [
-      0xa9,
-      createOp({
-        name: 'HASH160',
-        in: 1,
-        out: 1,
-        fee: FEES.TWENTY,
-        invoke: ({ context, args }) => ({
-          context,
-          results: [new UInt160StackItem(crypto.hash160(args[0].asBuffer()))],
-        }),
-      }),
-    ],
-    [
-      0xaa,
-      createOp({
-        name: 'HASH256',
-        in: 1,
-        out: 1,
-        fee: FEES.TWENTY,
-        invoke: ({ context, args }) => ({
-          context,
-          results: [new UInt256StackItem(crypto.hash256(args[0].asBuffer()))],
-        }),
-      }),
-    ],
-    [
-      0xac,
-      createOp({
-        name: 'CHECKSIG',
-        in: 2,
-        out: 1,
-        fee: FEES.ONE_HUNDRED,
-        invoke: async ({ context, args }) => {
-          const publicKey = args[0].asECPoint();
-          const signature = args[1].asBuffer();
-          let result;
-          try {
-            result = await crypto.verify({
-              message: context.init.scriptContainer.value.message,
-              signature,
-              publicKey,
-            });
-          } catch {
-            result = false;
-          }
-
-          return {
-            context,
-            results: [new BooleanStackItem(result)],
-          };
-        },
-      }),
-    ],
-    [
-      0xad,
-      createOp({
-        name: 'VERIFY',
-        in: 3,
-        out: 1,
-        fee: FEES.ONE_HUNDRED,
-        invoke: async ({ context, args }) => {
-          const publicKey = args[0].asECPoint();
-          const signature = args[1].asBuffer();
-          const message = args[2].asBuffer();
-          let result;
-          try {
-            result = await crypto.verify({
-              message,
-              signature,
-              publicKey,
-            });
-          } catch {
-            result = false;
-          }
-
-          return {
-            context,
-            results: [new BooleanStackItem(result)],
-          };
-        },
-      }),
-    ],
-    [
-      0xae,
-      {
-        type: 'create',
-        create: ({ context: contextIn }) => {
-          const { stack } = contextIn;
-          const top = stack[0] as StackItem | undefined;
-          let pubKeyCount = 0;
-          let _in;
-          if (top === undefined || top.isArray()) {
-            if (top !== undefined) {
-              pubKeyCount = top.asArray().length;
-            }
-            _in = 1;
-          } else {
-            pubKeyCount = vmUtils.toNumber(contextIn, top.asBigIntegerUnsafe());
-            if (pubKeyCount <= 0) {
-              throw new InvalidCheckMultisigArgumentsError(contextIn);
-            }
-            _in = pubKeyCount + 1;
-          }
-
-          const next = stack[_in] as StackItem | undefined;
-          if (next === undefined || next.isArray()) {
-            _in += 1;
-          } else {
-            const sigCount = vmUtils.toNumber(contextIn, next.asBigIntegerUnsafe());
-            if (sigCount < 0) {
-              throw new InvalidCheckMultisigArgumentsError(contextIn);
-            }
-            _in += sigCount + 1;
-          }
-
-          const { op } = createOp({
-            name: 'CHECKMULTISIG',
-            in: _in,
-            out: 1,
-            fee: pubKeyCount === 0 ? FEES.ONE : FEES.ONE_HUNDRED.mul(new BN(pubKeyCount)),
-            invoke: ({ context, args }) => {
-              let index;
-              let publicKeys;
-              if (args[0].isArray()) {
-                index = 1;
-                publicKeys = args[0].asArray().map((value) => value.asECPoint());
-              } else {
-                const count = vmUtils.toNumber(context, args[0].asBigIntegerUnsafe());
-                index = count + 1;
-                publicKeys = args.slice(1, index).map((value) => value.asECPoint());
-              }
-
-              const signatures = args[index].isArray()
-                ? args[index].asArray().map((value) => value.asBuffer())
-                : args.slice(index + 1).map((value) => value.asBuffer());
-
-              if (publicKeys.length === 0 || signatures.length === 0 || signatures.length > publicKeys.length) {
-                throw new InvalidCheckMultisigArgumentsError(context);
-              }
-
-              let result = true;
-              const n = publicKeys.length;
-              const m = signatures.length;
-              try {
-                // tslint:disable-next-line no-loop-statement
-                for (let i = 0, j = 0; result && i < m && j < n; ) {
-                  const currentResult = crypto.verify({
-                    message: context.init.scriptContainer.value.message,
-                    signature: signatures[i],
-                    publicKey: publicKeys[j],
-                  });
-
-                  if (currentResult) {
-                    i += 1;
-                  }
-                  j += 1;
-                  if (m - i > n - j) {
-                    result = false;
-                  }
-                }
-              } catch {
-                result = false;
-              }
-
-              return {
-                context,
-                results: [new BooleanStackItem(result)],
-              };
-            },
-          });
-
-          return { op, context: contextIn };
-        },
-      },
-    ],
-    [
       0xc0,
       createOp({
         name: 'ARRAYSIZE',
+        fee: FEES[150],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => ({
@@ -1673,6 +1236,7 @@ const OPCODE_PAIRS = ([
 
           const { op } = createOp({
             name: 'PACK',
+            fee: FEES[7_000],
             in: _in,
             out: 1,
             invoke: ({ context, args }) => ({
@@ -1695,6 +1259,7 @@ const OPCODE_PAIRS = ([
           const out = top === undefined ? 1 : top.asArray().length + 1;
           const { op } = createOp({
             name: 'UNPACK',
+            fee: FEES[7_000],
             in: 1,
             out,
             invoke: ({ context, args }) => {
@@ -1718,6 +1283,7 @@ const OPCODE_PAIRS = ([
       0xc3,
       createOp({
         name: 'PICKITEM',
+        fee: FEES[270_000],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => {
@@ -1755,6 +1321,7 @@ const OPCODE_PAIRS = ([
       0xc4,
       createOp({
         name: 'SETITEM',
+        fee: FEES[270_000],
         in: 3,
         invoke: ({ context, args }) => {
           let newItem = args[0];
@@ -1812,6 +1379,7 @@ const OPCODE_PAIRS = ([
       0xc7,
       createOp({
         name: 'NEWMAP',
+        fee: FEES[200],
         out: 1,
         invoke: ({ context }) => ({
           context,
@@ -1823,6 +1391,7 @@ const OPCODE_PAIRS = ([
       0xc8,
       createOp({
         name: 'APPEND',
+        fee: FEES[15_000],
         in: 2,
         invoke: ({ context, args }) => {
           let newItem = args[0];
@@ -1849,6 +1418,7 @@ const OPCODE_PAIRS = ([
       0xc9,
       createOp({
         name: 'REVERSE',
+        fee: FEES[500],
         in: 1,
         invoke: ({ context, args }) => {
           const mutableValue = args[0].asArray();
@@ -1862,6 +1432,7 @@ const OPCODE_PAIRS = ([
       0xca,
       createOp({
         name: 'REMOVE',
+        fee: FEES[500],
         in: 2,
         invoke: ({ context, args }) => {
           if (args[1].isArray()) {
@@ -1909,6 +1480,7 @@ const OPCODE_PAIRS = ([
       0xcb,
       createOp({
         name: 'HASKEY',
+        fee: FEES[270_000],
         in: 2,
         out: 1,
         invoke: ({ context, args }) => {
@@ -1939,6 +1511,7 @@ const OPCODE_PAIRS = ([
       0xcc,
       createOp({
         name: 'KEYS',
+        fee: FEES[500],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => {
@@ -1952,6 +1525,7 @@ const OPCODE_PAIRS = ([
       0xcd,
       createOp({
         name: 'VALUES',
+        fee: FEES[7_000],
         in: 1,
         out: 1,
         invoke: ({ context, args }) => {
@@ -1963,15 +1537,11 @@ const OPCODE_PAIRS = ([
         },
       }),
     ],
-    [0xe0, functionCallIsolated({ name: 'CALL_I' })],
-    [0xe1, callIsolated({ name: 'CALL_E' })],
-    [0xe2, callIsolated({ name: 'CALL_ED', dynamicCall: true })],
-    [0xe3, callIsolated({ name: 'CALL_ET', tailCall: true })],
-    [0xe4, callIsolated({ name: 'CALL_EDT', tailCall: true, dynamicCall: true })],
     [
       0xf0,
       createOp({
         name: 'THROW',
+        fee: FEES[30],
         invoke: ({ context }) => {
           throw new ThrowError(context);
         },
@@ -1981,6 +1551,7 @@ const OPCODE_PAIRS = ([
       0xf1,
       createOp({
         name: 'THROWIFNOT',
+        fee: FEES[30],
         in: 1,
         invoke: ({ context, args }) => {
           if (!args[0].asBoolean()) {

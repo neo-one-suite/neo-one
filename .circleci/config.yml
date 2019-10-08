@@ -1,187 +1,187 @@
-aliases:
-  - &restore-yarn-cache-10
-    keys:
-      - v8-yarn-10-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
-      # Fallback in case checksum fails
-      - v8-yarn-10-{{ .Branch }}-
+# aliases:
+#   - &restore-yarn-cache-10
+#     keys:
+#       - v8-yarn-10-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
+#       # Fallback in case checksum fails
+#       - v8-yarn-10-{{ .Branch }}-
 
-  - &save-yarn-cache-10
-    paths:
-      - common/temp/node_modules
-      - common/temp/yarn-cache
-    key: v8-yarn-10-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
+#   - &save-yarn-cache-10
+#     paths:
+#       - common/temp/node_modules
+#       - common/temp/yarn-cache
+#     key: v8-yarn-10-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
 
-  - &restore-yarn-cache-12
-    keys:
-      - v8-yarn-12-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
-      # Fallback in case checksum fails
-      - v8-yarn-12-{{ .Branch }}-
+#   - &restore-yarn-cache-12
+#     keys:
+#       - v8-yarn-12-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
+#       # Fallback in case checksum fails
+#       - v8-yarn-12-{{ .Branch }}-
 
-  - &save-yarn-cache-12
-    paths:
-      - common/temp/node_modules
-      - common/temp/yarn-cache
-    key: v8-yarn-12-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
+#   - &save-yarn-cache-12
+#     paths:
+#       - common/temp/node_modules
+#       - common/temp/yarn-cache
+#     key: v8-yarn-12-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
 
-  - &filter-ignore-bors-tmp
-    branches:
-      ignore:
-        - staging.tmp
-        - trying.tmp
+#   - &filter-ignore-bors-tmp
+#     branches:
+#       ignore:
+#         - staging.tmp
+#         - trying.tmp
 
-  - &install |
-    node common/scripts/install-run-rush.js install
+#   - &install |
+#     node common/scripts/install-run-rush.js install
 
-  - &nit
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - restore-cache: *restore-yarn-cache-12
-      - run: *install
-      - save-cache: *save-yarn-cache-12
-      - run:
-          name: Changelog
-          command: node common/scripts/install-run-rush.js change -v
-          when: always
-      - run:
-          name: Lint
-          command: node common/scripts/install-run-rush.js lint -p 8
-          when: always
-      - run:
-          name: Prettier
-          command: node common/scripts/install-run-rush.js nit
-          when: always
+#   - &nit
+#     working_directory: ~/neo-one
+#     steps:
+#       - checkout
+#       - restore-cache: *restore-yarn-cache-12
+#       - run: *install
+#       - save-cache: *save-yarn-cache-12
+#       - run:
+#           name: Changelog
+#           command: node common/scripts/install-run-rush.js change -v
+#           when: always
+#       - run:
+#           name: Lint
+#           command: node common/scripts/install-run-rush.js lint -p 8
+#           when: always
+#       - run:
+#           name: Prettier
+#           command: node common/scripts/install-run-rush.js nit
+#           when: always
 
-  - &build-10
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - restore-cache: *restore-yarn-cache-10
-      - run: *install
-      - save-cache: *save-yarn-cache-10
-      - run:
-          name: Build
-          command: node common/scripts/install-run-rush.js rebuild
-      - persist_to_workspace:
-          root: ~/neo-one
-          paths:
-            - common/temp/node_modules
-            - packages/*/lib
-            - packages/*/node_modules
+#   - &build-10
+#     working_directory: ~/neo-one
+#     steps:
+#       - checkout
+#       - restore-cache: *restore-yarn-cache-10
+#       - run: *install
+#       - save-cache: *save-yarn-cache-10
+#       - run:
+#           name: Build
+#           command: node common/scripts/install-run-rush.js rebuild
+#       - persist_to_workspace:
+#           root: ~/neo-one
+#           paths:
+#             - common/temp/node_modules
+#             - packages/*/lib
+#             - packages/*/node_modules
 
-  - &test10
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ./
-      - run:
-          name: Test
-          command: node common/scripts/install-run-rush.js test-ci --test-path-pattern '$(circleci tests glob packages/*/src/__tests__/**/*.test.ts)' --coverage
-      - run:
-          name: Upload Unit Test Coverage
-          command: node common/scripts/install-run-rush.js upload-coverage -F unit
-          when: always
-      - run:
-          name: E2E
-          command: node common/scripts/install-run-rush.js e2e-ci
-      # - run:
-      #     name: Upload E2E Test Coverage
-      #     command: node common/scripts/install-run-rush.js upload-coverage -F e2e
-      #     when: always
-      - store_test_results:
-          path: reports
-    parallelism: 2
+#   - &test10
+#     working_directory: ~/neo-one
+#     steps:
+#       - checkout
+#       - attach_workspace:
+#           at: ./
+#       - run:
+#           name: Test
+#           command: node common/scripts/install-run-rush.js test-ci --test-path-pattern '$(circleci tests glob packages/*/src/__tests__/**/*.test.ts)' --coverage
+#       - run:
+#           name: Upload Unit Test Coverage
+#           command: node common/scripts/install-run-rush.js upload-coverage -F unit
+#           when: always
+#       - run:
+#           name: E2E
+#           command: node common/scripts/install-run-rush.js e2e-ci
+#       # - run:
+#       #     name: Upload E2E Test Coverage
+#       #     command: node common/scripts/install-run-rush.js upload-coverage -F e2e
+#       #     when: always
+#       - store_test_results:
+#           path: reports
+#     parallelism: 2
 
-  - &build-12
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - restore-cache: *restore-yarn-cache-12
-      - run: *install
-      - save-cache: *save-yarn-cache-12
-      - run:
-          name: Build
-          command: node common/scripts/install-run-rush.js rebuild
-      - persist_to_workspace:
-          root: ~/neo-one
-          paths:
-            - common/temp/node_modules
-            - packages/*/lib
-            - packages/*/node_modules
+#   - &build-12
+#     working_directory: ~/neo-one
+#     steps:
+#       - checkout
+#       - restore-cache: *restore-yarn-cache-12
+#       - run: *install
+#       - save-cache: *save-yarn-cache-12
+#       - run:
+#           name: Build
+#           command: node common/scripts/install-run-rush.js rebuild
+#       - persist_to_workspace:
+#           root: ~/neo-one
+#           paths:
+#             - common/temp/node_modules
+#             - packages/*/lib
+#             - packages/*/node_modules
 
-  - &test12
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ./
-      - run:
-          name: Test
-          command: node common/scripts/install-run-rush.js test-ci --test-path-pattern '$(circleci tests glob packages/*/src/__tests__/**/*.test.ts)' --coverage
-      - run:
-          name: Upload Unit Test Coverage
-          command: node common/scripts/install-run-rush.js upload-coverage -F unit
-          when: always
-      - run:
-          name: E2E
-          command: node common/scripts/install-run-rush.js e2e-ci
-      # - run:
-      #     name: Upload E2E Test Coverage
-      #     command: node common/scripts/install-run-rush.js upload-coverage -F e2e
-      #     when: always
-      - store_test_results:
-          path: reports
-    parallelism: 2
+#   - &test12
+#     working_directory: ~/neo-one
+#     steps:
+#       - checkout
+#       - attach_workspace:
+#           at: ./
+#       - run:
+#           name: Test
+#           command: node common/scripts/install-run-rush.js test-ci --test-path-pattern '$(circleci tests glob packages/*/src/__tests__/**/*.test.ts)' --coverage
+#       - run:
+#           name: Upload Unit Test Coverage
+#           command: node common/scripts/install-run-rush.js upload-coverage -F unit
+#           when: always
+#       - run:
+#           name: E2E
+#           command: node common/scripts/install-run-rush.js e2e-ci
+#       # - run:
+#       #     name: Upload E2E Test Coverage
+#       #     command: node common/scripts/install-run-rush.js upload-coverage -F e2e
+#       #     when: always
+#       - store_test_results:
+#           path: reports
+#     parallelism: 2
 
-node10: &node10
-  docker:
-    - image: neotracker/neo-one-circleci-node@sha256:0f047d3662ad72b75e9550e41b22a2be0bf7fa8ee6563b65272b5af966b07f20
+# node10: &node10
+#   docker:
+#     - image: neotracker/neo-one-circleci-node@sha256:0f047d3662ad72b75e9550e41b22a2be0bf7fa8ee6563b65272b5af966b07f20
 
-node12: &node12
-  docker:
-    - image: neotracker/neo-one-circleci-node@sha256:6f76ab22882896c057d9d805955892f1dee26bb1a4257a6d095d07d617aa4d5c
+# node12: &node12
+#   docker:
+#     - image: neotracker/neo-one-circleci-node@sha256:6f76ab22882896c057d9d805955892f1dee26bb1a4257a6d095d07d617aa4d5c
 
-version: 2
-jobs:
-  test10:
-    <<: *node10
-    <<: *test10
-  build-10:
-    <<: *node10
-    <<: *build-10
+# version: 2
+# jobs:
+#   test10:
+#     <<: *node10
+#     <<: *test10
+#   build-10:
+#     <<: *node10
+#     <<: *build-10
 
-  test12:
-    <<: *node12
-    <<: *test12
-  build-12:
-    <<: *node12
-    <<: *build-12
+#   test12:
+#     <<: *node12
+#     <<: *test12
+#   build-12:
+#     <<: *node12
+#     <<: *build-12
 
-  nit:
-    <<: *node12
-    <<: *nit
+#   nit:
+#     <<: *node12
+#     <<: *nit
 
-workflows:
-  version: 2
-  test10:
-    jobs:
-      - nit:
-          filters: *filter-ignore-bors-tmp
-      - build-10:
-          filters: *filter-ignore-bors-tmp
-      - test10:
-          filters: *filter-ignore-bors-tmp
-          requires:
-            - build-10
+# workflows:
+#   version: 2
+#   test10:
+#     jobs:
+#       - nit:
+#           filters: *filter-ignore-bors-tmp
+#       - build-10:
+#           filters: *filter-ignore-bors-tmp
+#       - test10:
+#           filters: *filter-ignore-bors-tmp
+#           requires:
+#             - build-10
 
-  test12:
-    jobs:
-      - nit:
-          filters: *filter-ignore-bors-tmp
-      - build-12:
-          filters: *filter-ignore-bors-tmp
-      - test12:
-          filters: *filter-ignore-bors-tmp
-          requires:
-            - build-12
+#   test12:
+#     jobs:
+#       - nit:
+#           filters: *filter-ignore-bors-tmp
+#       - build-12:
+#           filters: *filter-ignore-bors-tmp
+#       - test12:
+#           filters: *filter-ignore-bors-tmp
+#           requires:
+#             - build-12

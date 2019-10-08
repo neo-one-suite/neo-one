@@ -1,4 +1,4 @@
-import { crypto, utils, VMState } from '@neo-one/client-common';
+import { common, crypto, utils, VMState } from '@neo-one/client-common';
 import {
   Block,
   ByteArrayContractParameter,
@@ -161,6 +161,7 @@ const run = async ({ context: contextIn }: { readonly context: ExecutionContext 
         createdContracts: context.createdContracts,
         returnValueCount: context.returnValueCount,
         stackCount: context.stackCount,
+        invocationCounter: context.invocationCounter,
       };
     }
   }
@@ -187,6 +188,7 @@ export const executeScript = async ({
     returnValueCount = -1,
     stackCount = 0,
     pc = 0,
+    invocationCounter = {},
   } = {},
 }: {
   readonly code: Buffer;
@@ -196,6 +198,11 @@ export const executeScript = async ({
   readonly options?: Partial<Options>;
 }): Promise<ExecutionContext> => {
   const scriptHash = crypto.hash160(code);
+  const scriptHashString = common.uInt160ToString(scriptHash);
+  let invocationCount = invocationCounter[scriptHashString];
+  if (invocationCount === undefined) {
+    invocationCount = 0;
+  }
 
   const context = {
     state: VMState.None,
@@ -218,6 +225,7 @@ export const executeScript = async ({
     createdContracts,
     returnValueCount,
     stackCount,
+    invocationCounter: { ...invocationCounter, [scriptHashString]: invocationCount + 1 },
   };
 
   return run({ context });
@@ -292,6 +300,7 @@ export const execute = async ({
         entryScriptHash,
         returnValueCount,
         stackCount: 0,
+        invocationCounter: {},
       };
 
       if (context !== undefined) {
@@ -305,6 +314,7 @@ export const execute = async ({
           entryScriptHash,
           returnValueCount,
           stackCount: context.stackCount,
+          invocationCounter: context.invocationCounter,
         };
       }
 
