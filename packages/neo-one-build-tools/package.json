@@ -10,8 +10,7 @@
   "scripts": {
     "build": "gulp",
     "lint": "./node_modules/.bin/tslint --project . --format codeFrame \"src/**/*.ts\"",
-    "lint:staged": "./node_modules/.bin/tslint --project . --format codeFrame \"src/**/*.ts\"",
-    "tsc": "./node_modules/.bin/tsc --noEmit"
+    "lint:staged": "./node_modules/.bin/tslint --project . --format codeFrame \"src/**/*.ts\""
   },
   "author": "Alex DiCarlo <alexdicarlo@gmail.com>",
   "homepage": "https://neo-one.io",
@@ -66,6 +65,7 @@
     "tslint-immutable": "^6.0.1",
     "tslint-microsoft-contrib": "^6.2.0",
     "tslint-sonarts": "^1.9.0",
+    "ts-node": "^8.4.1",
     "typescript": "^3.6.3",
     "yargs": "^14.2.0"
   },

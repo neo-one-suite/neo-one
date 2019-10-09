@@ -13,7 +13,8 @@ module.exports = {
     '!packages/*/src/__data__/*.ts',
   ],
   coveragePathIgnorePatterns: [
-    'node_modules',
+    '<rootDir>/common',
+    '<rootDir>/packages/.*/node_modules',
     '<rootDir>/packages/.*/src/__data__/contracts/.*',
     '<rootDir>/packages/.*/src/__data__/snippets/.*',
     '<rootDir>/packages/neo-one-smart-contract-compiler/src/scripts/generateTypes.ts',

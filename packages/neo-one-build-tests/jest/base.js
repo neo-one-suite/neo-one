@@ -1,4 +1,8 @@
 const nodePath = require('path');
+const appRootDir = require('app-root-dir');
+
+const APP_ROOT_DIR = process.cwd();
+appRootDir.set(APP_ROOT_DIR);
 
 let testPathIgnorePatterns = ['/node_modules/', '/courses/'];
 

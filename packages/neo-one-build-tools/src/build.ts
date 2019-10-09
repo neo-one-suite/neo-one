@@ -41,8 +41,6 @@ class BuildTask<Options = undefined> {
   }
 }
 
-export const cleanTask = async (format: Format) => Promise.all([fs.remove(format.dist) /*fs.remove(BIN)*/]);
-
 interface CopyStaticOptions {
   readonly dest: string;
 }
@@ -52,7 +50,6 @@ export const copyStaticTask = new BuildTask<CopyStaticOptions>(
   },
   ['src/**/*'].concat(ignoreGlobs),
 );
-
 copyStaticTask.enabled = false;
 
 export const compileTypescriptTask = new BuildTask<CompileTypescriptOptions>(
@@ -60,8 +57,8 @@ export const compileTypescriptTask = new BuildTask<CompileTypescriptOptions>(
   ['src/**/*.ts', 'src/**/*.tsx'].concat(ignoreGlobs),
 );
 
+export const cleanTask = async (format: Format) => Promise.all([fs.remove(format.dist) /*fs.remove(BIN)*/]);
 export const rollupToolsTask = new BuildTask(rollupDevTools, []);
-
 export const compileBinTask = new BuildTask(buildBin);
 
 type BuildType = 'main' | 'tools';

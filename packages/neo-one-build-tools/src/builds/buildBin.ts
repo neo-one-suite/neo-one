@@ -10,7 +10,15 @@ import ts from 'gulp-typescript';
 import path from 'path';
 import typescript from 'typescript';
 import { Format, MAIN_FORMAT } from '../formats';
-import { DIST, flattenBin, getInternalDependencies, getPackageJSON, gulpReplaceBin, gulpReplaceModule } from '../utils';
+import {
+  DIST,
+  flattenBin,
+  getInternalDependencies,
+  getPackageJSON,
+  gulpReplaceBin,
+  gulpReplaceModule,
+  replaceCmd,
+} from '../utils';
 
 const gulpBin = (binPath: string, internalDeps: readonly string[]) =>
   gulpReplaceModule(MAIN_FORMAT, internalDeps, gulp.src(binPath)).pipe(
@@ -40,6 +48,7 @@ const compileBin = (binGlob: string, deps: readonly string[], binLib: string) =>
     .pipe(gulpBanner(binBanner))
     // .pipe(gulpSourcemaps.mapSources(mapSources))
     // .pipe(gulpSourcemaps.write())
+    .pipe(replaceCmd)
     .pipe(flattenBin)
     .pipe(gulpReplaceBin(binLib))
     .pipe(gulp.dest(path.join(DIST)));

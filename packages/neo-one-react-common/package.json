@@ -6,8 +6,7 @@
   "scripts": {
     "build": "gulp",
     "lint": "node ./node_modules/@neo-one/build-tools/neo-one-lint.js",
-    "lint:staged": "lint-staged --relative",
-    "tsc": "./node_modules/.bin/tsc --noEmit"
+    "lint:staged": "lint-staged --relative"
   },
   "dependencies": {
     "@emotion/core": "^10.0.17",
