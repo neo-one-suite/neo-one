@@ -530,7 +530,7 @@ exports[`syscalls Neo.Storage.Find 1`] = `
 Array [
   IteratorStackItem {
     "mutableCount": 1,
-    "referenceID": 15,
+    "referenceID": 29,
     "value": StackItemIterator {
       "enumerator": Object {
         "next": [Function],
@@ -996,6 +996,22 @@ exports[`syscalls System.Runtime.GetInvocationCounter 2`] = `Array []`;
 exports[`syscalls System.Runtime.GetInvocationCounter 3`] = `Array []`;
 
 exports[`syscalls System.Runtime.GetInvocationCounter 4`] = `Array []`;
+
+exports[`syscalls System.Runtime.GetNotifications 1`] = `Array []`;
+
+exports[`syscalls System.Runtime.GetNotifications 2`] = `Array []`;
+
+exports[`syscalls System.Runtime.GetNotifications 3`] = `Array []`;
+
+exports[`syscalls System.Runtime.GetNotifications 4`] = `Array []`;
+
+exports[`syscalls System.Runtime.GetNotifications 5`] = `Array []`;
+
+exports[`syscalls System.Runtime.GetNotifications 6`] = `Array []`;
+
+exports[`syscalls System.Runtime.GetNotifications 7`] = `Array []`;
+
+exports[`syscalls System.Runtime.GetNotifications 8`] = `Array []`;
 
 exports[`syscalls System.Runtime.GetTime 1`] = `Array []`;
 

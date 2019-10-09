@@ -401,7 +401,12 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
         });
       }
 
-      return { context };
+      return {
+        context: {
+          ...context,
+          notifications: context.notifications.concat([{ scriptHash: context.scriptHash, args: args[0] }]),
+        },
+      };
     },
   }),
 
@@ -489,9 +494,22 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     out: 1,
     fee: FEES[10_000],
     invoke: async ({ context, args }) => {
-      // need to track notifications
+      const scriptHash = args[0].asBuffer().length === 0 ? undefined : args[0].asUInt160();
+      const notifications =
+        scriptHash === undefined
+          ? context.notifications
+          : context.notifications.filter((notification) => common.uInt160Equal(notification.scriptHash, scriptHash));
 
-      return { context, results: [] };
+      return {
+        context,
+        results: [
+          new ArrayStackItem(
+            notifications.map(
+              (notification) => new ArrayStackItem([new UInt160StackItem(notification.scriptHash), notification.args]),
+            ),
+          ),
+        ],
+      };
     },
   }),
 
