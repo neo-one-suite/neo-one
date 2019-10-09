@@ -61,6 +61,11 @@ export interface CreatedContracts {
 }
 export type InvocationCounter = Record<string, number | undefined>;
 
+export interface VMNotification {
+  readonly scriptHash: UInt160;
+  readonly args: StackItem;
+}
+
 export interface Options {
   readonly depth: number;
   readonly stack: ExecutionStack;
@@ -71,6 +76,7 @@ export interface Options {
   readonly entryScriptHash: UInt160;
   readonly returnValueCount: number;
   readonly stackCount: number;
+  readonly notifications: readonly VMNotification[];
   readonly invocationCounter: InvocationCounter;
   readonly pc?: number;
 }
@@ -89,6 +95,7 @@ export interface ExecutionContext {
       readonly options?: Options;
     }) => Promise<ExecutionContext>;
   };
+  readonly notifications: readonly VMNotification[];
   readonly code: Buffer;
   readonly scriptHashStack: readonly UInt160[];
   readonly scriptHash: UInt160;
