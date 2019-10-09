@@ -389,6 +389,74 @@ const SYSCALLS = [
   },
 
   {
+    name: 'System.Runtime.GetNotifications',
+    result: [
+      new ArrayStackItem([
+        new ArrayStackItem([
+          new UInt160StackItem(common.bufferToUInt160(Buffer.alloc(20, 0))),
+          new UInt256StackItem(common.bufferToUInt256(Buffer.alloc(32, 3))),
+        ]),
+        new ArrayStackItem([
+          new UInt160StackItem(common.bufferToUInt160(Buffer.alloc(20, 1))),
+          new ArrayStackItem([
+            new UInt256StackItem(common.bufferToUInt256(Buffer.alloc(32, 3))),
+            new BufferStackItem(Buffer.alloc(10, 0)),
+          ]),
+        ]),
+      ]),
+    ],
+    options: {
+      stack: [new BufferStackItem(Buffer.alloc(0, 0))],
+      notifications: [
+        {
+          scriptHash: common.bufferToUInt160(Buffer.alloc(20, 0)),
+          args: new UInt256StackItem(common.bufferToUInt256(Buffer.alloc(32, 3))),
+        },
+        {
+          scriptHash: common.bufferToUInt160(Buffer.alloc(20, 1)),
+          args: new ArrayStackItem([
+            new UInt256StackItem(common.bufferToUInt256(Buffer.alloc(32, 3))),
+            new BufferStackItem(Buffer.alloc(10, 0)),
+          ]),
+        },
+      ],
+    },
+    gas: FEES[10_000],
+  },
+
+  {
+    name: 'System.Runtime.GetNotifications',
+    result: [
+      new ArrayStackItem([
+        new ArrayStackItem([
+          new UInt160StackItem(common.bufferToUInt160(Buffer.alloc(20, 1))),
+          new ArrayStackItem([
+            new UInt256StackItem(common.bufferToUInt256(Buffer.alloc(32, 3))),
+            new BufferStackItem(Buffer.alloc(10, 0)),
+          ]),
+        ]),
+      ]),
+    ],
+    options: {
+      stack: [new UInt160StackItem(common.bufferToUInt160(Buffer.alloc(20, 1)))],
+      notifications: [
+        {
+          scriptHash: common.bufferToUInt160(Buffer.alloc(20, 0)),
+          args: new UInt256StackItem(common.bufferToUInt256(Buffer.alloc(32, 3))),
+        },
+        {
+          scriptHash: common.bufferToUInt160(Buffer.alloc(20, 1)),
+          args: new ArrayStackItem([
+            new UInt256StackItem(common.bufferToUInt256(Buffer.alloc(32, 3))),
+            new BufferStackItem(Buffer.alloc(10, 0)),
+          ]),
+        },
+      ],
+    },
+    gas: FEES[10_000],
+  },
+
+  {
     name: 'Neo.Crypto.CheckSig',
     result: [new BooleanStackItem(true)],
     args: [keys[0].publicKey, signature0],
