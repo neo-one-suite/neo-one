@@ -5,7 +5,7 @@
   "main": "./src/index",
   "dependencies": {
     "@neo-one/utils": "^1.2.1",
-    "execa": "^2.0.4",
+    "execa": "^3.0.0",
     "npm-package-arg": "^6.1.0",
     "pino": "^5.12.6",
     "yargs": "^14.0.0"
