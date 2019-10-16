@@ -320,6 +320,14 @@
       "description": "try to publish packages in `dist`",
       "safeForSimultaneousRushProcesses": false,
       "shellCommand": "node packages/neo-one-build-tools/bin/neo-one-publish.js"
+    },
+    {
+      "commandKind": "global",
+      "name": "audit-storage",
+      "summary": "Run audit.ts script",
+      "description": "Audits NEO blockchain storage against a neo-one node.",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "ts-node scripts/verify/audit.ts"
     }
   ],
   "parameters": [

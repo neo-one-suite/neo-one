@@ -53,8 +53,11 @@ import {
   InvalidVerifySyscallError,
   ItemTooLargeError,
   StackUnderflowError,
+  UnknownNativeContractError,
+  UnknownNativeContractMethodError,
   UnknownSysCallError,
 } from './errors';
+import { NativeContract } from './native';
 import {
   ArrayStackItem,
   BlockStackItem,
@@ -131,7 +134,13 @@ const getHashOrIndex = ({
   return hashOrIndex;
 };
 
-const checkWitness = async ({ context, hash }: { readonly context: ExecutionContext; readonly hash: UInt160 }) => {
+export const checkWitness = async ({
+  context,
+  hash,
+}: {
+  readonly context: ExecutionContext;
+  readonly hash: UInt160;
+}) => {
   const { scriptContainer, skipWitnessVerify } = context.init;
   if (skipWitnessVerify) {
     return true;
@@ -244,7 +253,8 @@ const createContract = async ({
 }) => {
   const script = args[0].asBuffer();
   // Removed check of valid ContractParameterTypes to match neo
-  const parameterList = [...args[1].asBuffer()].filter(isContractParameterType);
+  const manifestString = args[1].asString();
+  const manifest = JSON.parse(manifestString);
 
   const returnType = assertContractParameterType(args[2].asBigIntegerUnsafe().toNumber());
 
@@ -379,6 +389,25 @@ const createPut = ({ name }: { readonly name: 'System.Storage.Put' | 'System.Sto
 
       return { context };
     },
+  })({ context: contextIn });
+};
+
+const createNative = ({ name }: { readonly name: 'Neo.Native.Policy' }) => ({
+  context: contextIn,
+}: CreateSysCallArgs) => {
+  const contract = NativeContract[name];
+  if (contract === undefined) {
+    throw new UnknownNativeContractError(contextIn, name);
+  }
+  const methodName = contextIn.stack[0].asString();
+  const price = contract.getPrice(methodName);
+
+  return createSysCall({
+    name,
+    in: 2,
+    out: 1,
+    fee: price,
+    invoke: ({ context, args, argsAlt }) => contract.invoke({ context, args, argsAlt }),
   })({ context: contextIn });
 };
 
@@ -938,7 +967,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
 
   'Neo.Native.Deploy': createSysCall({
     name: 'Neo.Native.Deploy',
-    out: 1,
+    out: 0,
     fee: FEES[400],
     invoke: async ({ context }) => {
       if (context.init.persistingBlock === undefined) {
@@ -948,11 +977,20 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
         throw new InvalidNativeDeployError(context, context.init.persistingBlock.index);
       }
 
-      // Actually Deploy Native Contracts
+      await Promise.all(
+        Object.values(NativeContract).map(async (contract) =>
+          Promise.all([
+            contract.initialize(context),
+            context.blockchain.contract.add(new Contract({ script: contract.script, manifest: contract.manifest })),
+          ]),
+        ),
+      );
 
       return { context };
     },
   }),
+
+  'Neo.Native.Policy': createNative({ name: 'Neo.Native.Policy' }),
 
   'Neo.Enumerator.Create': createSysCall({
     name: 'Neo.Enumerator.Create',
