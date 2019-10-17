@@ -26,10 +26,6 @@ const StyledToolbar = styled(Toolbar)`
     overflow-x: auto;
   }
 
-  ${ToolbarFocusable} {
-    outline: none;
-  }
-
   @media (min-width: ${prop('theme.breakpoints.sm')}) {
     padding: 0 16px;
   }

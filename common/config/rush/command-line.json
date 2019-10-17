@@ -5,7 +5,7 @@
       "commandKind": "global",
       "name": "build-workers",
       "summary": "Build NEO-ONE web workers",
-      "description": "build the NEO-ONE website workers from source",
+      "description": "Build the NEO-ONE website workers from source",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle workers"
     },
@@ -13,7 +13,7 @@
       "commandKind": "global",
       "name": "build-overlay",
       "summary": "Build NEO-ONE web overlay",
-      "description": "build the NEO-ONE website overlay from source",
+      "description": "Build the NEO-ONE website overlay from source",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle overlay"
     },
@@ -21,17 +21,33 @@
       "commandKind": "global",
       "name": "build-preview",
       "summary": "Build NEO-ONE web preview",
-      "description": "build the NEO-ONE editor preview from source",
+      "description": "Build the NEO-ONE editor preview from source",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle preview"
     },
     {
       "commandKind": "global",
+      "name": "build-tools",
+      "summary": "Build NEO-ONE web tools",
+      "description": "Build the NEO-ONE tools from source",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --watch --bundle tools"
+    },
+    {
+      "commandKind": "global",
       "name": "build-test-runner",
       "summary": "Build NEO-ONE test-runner",
-      "description": "build the NEO-ONE test-runner from source",
+      "description": "Build the NEO-ONE test-runner from source",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle testRunner"
+    },
+    {
+      "commandKind": "global",
+      "name": "start-preview",
+      "summary": "Serve the NEO-ONE web preview",
+      "description": "Serve the NEO-ONE web preview",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "serve ./dist/preview -p 8080"
     },
     {
       "commandKind": "global",
@@ -44,18 +60,26 @@
     {
       "commandKind": "global",
       "name": "start-website",
-      "summary": "Build NEO-ONE web preview",
-      "description": "build the NEO-ONE editor preview from source",
+      "summary": "Build NEO-ONE website",
+      "description": "Build the NEO-ONE website from source",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=./packages/neo-one-build-tools/includes/build-configs/tsconfig.es2017.cjs.json react-static start --config ./packages/neo-one-website/static.config.js"
     },
     {
       "commandKind": "global",
-      "name": "serve-preview",
-      "summary": "Serve the NEO-ONE web preview",
-      "description": "Serve the NEO-ONE web preview",
+      "name": "build-website-prod",
+      "summary": "Build NEO-ONE website in prod mode",
+      "description": "Build the NEO-ONE website from source in prod mode",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "serve ./dist/preview -p 8080"
+      "shellCommand": "rm -rf ./packages/neo-one-website/publicOut && cp -r ./dist/workers ./packages/neo-one-website/publicOut && cp -r ./packages/neo-one-website/public/* ./packages/neo-one-website/publicOut && cross-env NEO_ONE_STAGING=true NEO_ONE_CACHE=true NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=./packages/neo-one-build-tools/includes/build-configs/tsconfig.es2017.cjs.json react-static build --staging --config ./packages/neo-one-website/static.config.js"
+    },
+    {
+      "commandKind": "global",
+      "name": "start-website-prod",
+      "summary": "Start NEO-ONE website in prod mode",
+      "description": "Start the NEO-ONE website from source in prod mode",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "serve packages/neo-one-website/dist -p 3000"
     },
     {
       "commandKind": "global",

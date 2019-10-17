@@ -196,7 +196,7 @@
     },
     {
       "name": "@neo-one/developer-tools-frame",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "web" ]
     },
     {
       "name": "@neo-one/ec-key",
@@ -461,6 +461,10 @@
     {
       "name": "autoprefixer",
       "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "axios",
+      "allowedCategories": [ "web" ]
     },
     {
       "name": "babel-jest",
@@ -951,7 +955,15 @@
       "allowedCategories": [ "web" ]
     },
     {
+      "name": "react-static-plugin-sitemap",
+      "allowedCategories": [ "web" ]
+    },
+    {
       "name": "react-static-plugin-source-filesystem",
+      "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "react-static-plugin-typescript",
       "allowedCategories": [ "web" ]
     },
     {
@@ -1021,6 +1033,10 @@
     {
       "name": "semver",
       "allowedCategories": [ "production", "web" ]
+    },
+    {
+      "name": "serve",
+      "allowedCategories": [ "web" ]
     },
     {
       "name": "slugify",
