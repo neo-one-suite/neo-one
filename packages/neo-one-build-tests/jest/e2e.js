@@ -3,7 +3,8 @@ const base = require('./base');
 module.exports = {
   ...base({ path: 'e2e' }),
   displayName: 'e2e',
-  testRunner: 'jest-circus/runner',
+  testRunner:
+    '<rootDir>/packages/neo-one-build-tests/node_modules/jest-circus/runner',
   testRegex: '^.*/__e2e__/.*\\.test\\.tsx?$',
   moduleNameMapper: {
     '^@neo-one/ec-key': '@neo-one/ec-key',
@@ -11,9 +12,7 @@ module.exports = {
     '^@neo-one/csharp': '@neo-one/csharp',
   },
   modulePathIgnorePatterns: [
-    '<rootDir>/package.json',
     '<rootDir>/packages/[a-z-]+/package.json',
-    '<rootDir>/dist/neo-one[a-z0-9-]+/package.json',
-    '<rootDir>/dist/neo-one[a-z0-9-]+/packages/package.json',
+    '<rootDir>/common',
   ],
 };

@@ -77,9 +77,48 @@
       "commandKind": "global",
       "name": "test",
       "summary": "unit test runner",
-      "description": "Run all jest tests using the `unit` config",
+      "description": "Run all jest unit tests",
       "safeForSimultaneousRushProcesses": false,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" jest --config ./packages/neo-one-build-tests/jest/unit.js"
+    },
+    {
+      "commandKind": "global",
+      "name": "test-ci",
+      "summary": "unit test runner (CI)",
+      "description": "Run all jest unit tests using the CI config",
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" jest --config ./packages/neo-one-build-tests/jest/unit-ci.js --ci -w 2"
+    },
+    {
+      "commandKind": "global",
+      "name": "e2e",
+      "summary": "e2e test runner",
+      "description": "Run all jest e2e tests",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" jest --config ./packages/neo-one-build-tests/jest/e2e.js"
+    },
+    {
+      "commandKind": "global",
+      "name": "e2e-ci",
+      "summary": "e2e test runner (CI)",
+      "description": "Run all jest e2e tests using the CI config",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" jest --config ./packages/neo-one-build-tests/jest/e2e-ci.js --ci -w 1"
+    },
+    {
+      "commandKind": "global",
+      "name": "e2e-ci:coverage",
+      "summary": "e2e test runner (CI)",
+      "description": "Run all jest e2e tests using the CI config with nyc coverage",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "nyc --reporter json cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" jest --config ./packages/neo-one-build-tests/jest/e2e-ci.js --ci -w 1"
+    },
+    {
+      "commandKind": "global",
+      "name": "upload-coverage",
+      "summary": "upload coverage (CI)",
+      "description": "uploaded codecov coverage reports from unit tests",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "codecov -f coverage/coverage-final.json"
     },
     {
       "commandKind": "bulk",
@@ -100,16 +139,6 @@
       "ignoreDependencyOrder": true,
       "enableParallelism": true,
       "ignoreMissingScript": true
-    },
-    {
-      "commandKind": "bulk",
-      "name": "tsc",
-      "summary": "test tsc",
-      "description": "temp",
-      "safeForSimultaneousRushProcesses": true,
-      "ignoreDependencyOrder": true,
-      "enableParallelism": true,
-      "ignoreMissingScript": true
     }
   ],
   "parameters": [
@@ -119,6 +148,38 @@
       "shortName": "-w",
       "description": "flags this build command as watch",
       "associatedCommands": ["build-workers", "build-overlay", "build-preview", "build-test-runner"]
+    },
+    {
+      "parameterKind": "flag",
+      "longName": "--coverage",
+      "shortName": "-c",
+      "description": "flag to enable coverage collection for jest",
+      "associatedCommands": ["test", "test-ci"]
+    },
+    {
+      "parameterKind": "string",
+      "longName": "--test-path-pattern",
+      "shortName": "-t",
+      "argumentName": "PATTERN",
+      "description": "jest pattern matching parameter",
+      "associatedCommands": ["test", "test-ci", "e2e", "e2e-ci", "e2e-ci:coverage"]
+    },
+    {
+      "parameterKind": "choice",
+      "longName": "--flags",
+      "shortName": "-F",
+      "description": "add a code coverage flag",
+      "associatedCommands": ["upload-coverage"],
+      "alternatives": [
+        {
+          "name": "unit",
+          "description": "flag for unit test coverage"
+        },
+        {
+          "name": "e2e",
+          "description": "flag for e2e test coverage"
+        }
+      ]
     }
   ]
 }

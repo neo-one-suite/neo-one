@@ -7,8 +7,7 @@
   "scripts": {
     "build": "gulp",
     "lint": "node ./node_modules/@neo-one/build-tools/neo-one-lint.js",
-    "lint:staged": "node ./node_modules/@neo-one/build-tools/neo-one-lint-staged.js",
-    "tsc": "./node_modules/.bin/tsc --noEmit"
+    "lint:staged": "node ./node_modules/@neo-one/build-tools/neo-one-lint-staged.js"
   },
   "dependencies": {
     "@types/node": "^12.7.7",

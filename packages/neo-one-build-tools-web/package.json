@@ -7,8 +7,7 @@
   "scripts": {
     "build": "gulp",
     "lint": "./node_modules/.bin/tslint --project . --format codeFrame \"src/**/*.ts\"",
-    "lint:staged": "./node_modules/.bin/tslint --project . --format codeFrame \"src/**/*.ts\"",
-    "tsc": "./node_modules/.bin/tsc --noEmit"
+    "lint:staged": "./node_modules/.bin/tslint --project . --format codeFrame \"src/**/*.ts\""
   },
   "author": "Alex DiCarlo <alexdicarlo@gmail.com>",
   "homepage": "https://neo-one.io",
@@ -51,7 +50,7 @@
     "ajv": "^6.10.2",
     "autoprefixer": "^9.6.1",
     "babel-loader": "^8.0.6",
-    "babel-plugin-emotion": "^10.0.19",
+    "babel-plugin-emotion": "^10.0.21",
     "babel-plugin-lodash": "^3.3.4",
     "babel-plugin-module-resolver": "^3.2.0",
     "babel-plugin-universal-import": "^4.0.0",

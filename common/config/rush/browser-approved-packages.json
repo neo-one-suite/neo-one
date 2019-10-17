@@ -240,7 +240,7 @@
     },
     {
       "name": "@neo-one/node-bin",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "tools" ]
     },
     {
       "name": "@neo-one/node-blockchain",
@@ -472,7 +472,7 @@
     },
     {
       "name": "babel-plugin-emotion",
-      "allowedCategories": [ "tools" ]
+      "allowedCategories": [ "tools", "web" ]
     },
     {
       "name": "babel-plugin-lodash",
@@ -521,6 +521,10 @@
     {
       "name": "clipboard",
       "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "codecov",
+      "allowedCategories": [ "tools" ]
     },
     {
       "name": "color",
@@ -695,6 +699,10 @@
       "allowedCategories": [ "tools", "web" ]
     },
     {
+      "name": "jest-junit",
+      "allowedCategories": [ "tools" ]
+    },
+    {
       "name": "jest-matchers",
       "allowedCategories": [ "web" ]
     },
@@ -829,6 +837,10 @@
     {
       "name": "npm-package-arg",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "nyc",
+      "allowedCategories": [ "tools" ]
     },
     {
       "name": "onigasm",

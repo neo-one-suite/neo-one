@@ -1,7 +1,7 @@
 aliases:
   - &restore-yarn-cache-10
     keys:
-      - v6-yarn-10-{{ .Branch }}-{{ checksum "common/config/yarn.lock" }}
+      - v6-yarn-10-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
       # Fallback in case checksum fails
       - v6-yarn-10-{{ .Branch }}-
 
@@ -9,11 +9,11 @@ aliases:
     paths:
       - common/temp/node_modules
       - common/temp/yarn-cache
-    key: v6-yarn-10-{{ .Branch }}-{{ checksum "common/config/yarn.lock" }}
+    key: v6-yarn-10-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
 
   - &restore-yarn-cache-12
     keys:
-      - v6-yarn-12-{{ .Branch }}-{{ checksum "common/config/yarn.lock" }}
+      - v6-yarn-12-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
       # Fallback in case checksum fails
       - v6-yarn-12-{{ .Branch }}-
 
@@ -21,7 +21,7 @@ aliases:
     paths:
       - common/temp/node_modules
       - common/temp/yarn-cache
-    key: v6-yarn-12-{{ .Branch }}-{{ checksum "common/config/yarn.lock" }}
+    key: v6-yarn-12-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
 
   - &filter-ignore-bors-tmp
     branches:
@@ -30,9 +30,9 @@ aliases:
         - trying.tmp
 
   - &install |
-    rush install
+    node common/scripts/install-run-rush.js install
 
-  - &lint
+  - &nit
     working_directory: ~/neo-one
     steps:
       - checkout
@@ -41,22 +41,14 @@ aliases:
       - save-cache: *save-yarn-cache-12
       - run:
           name: Changelog
-          command: rush change -v
+          command: node common/scripts/install-run-rush.js change -v
           when: always
       - run:
           name: Prettier
-          command: rush nit
-          when: always
-      - run:
-          name: Typescript
-          command: rush tsc
-          when: always
-      - run:
-          name: Lint
-          command: rush lint
+          command: node common/scripts/install-run-rush.js nit
           when: always
 
-  - &build-e2e10
+  - &build-10
     working_directory: ~/neo-one
     steps:
       - checkout
@@ -65,50 +57,45 @@ aliases:
       - save-cache: *save-yarn-cache-10
       - run:
           name: Build
-          command: rush rebuild --verbose
+          command: node common/scripts/install-run-rush.js rebuild --verbose
+      - run:
+          name: Lint
+          command: node common/scripts/install-run-rush.js lint -p 8
       - persist_to_workspace:
           root: ~/neo-one
           paths:
-            - common
-            - temp
-            - node_modules
+            - common/temp/node_modules
+            - packages/*/lib
+            - packages/*/node_modules
 
   - &test10
     working_directory: ~/neo-one
     steps:
       - checkout
+      - attach_workspace:
+          at: ./
       - restore-cache: *restore-yarn-cache-10
       - run: *install
       - save-cache: *save-yarn-cache-10
       - run:
           name: Test
-          command: yarn test-ci $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
+          command: node common/scripts/install-run-rush.js test-ci --test-path-pattern '$(circleci tests glob packages/*/src/__tests__/**/*.test.ts)' --coverage
       - run:
           name: Upload Unit Test Coverage
-          command: yarn run codecov -f coverage/coverage-final.json -F unit
+          command: node common/scripts/install-run-rush.js upload-coverage -F unit
           when: always
-      - store_test_results:
-          path: reports
-    parallelism: 2
-
-  - &e2e10
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ./
       - run:
           name: E2E
-          command: yarn nyc --reporter json yarn e2e-ci $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
-      - run:
-          name: Upload E2E Test Coverage
-          command: yarn run codecov -f coverage/coverage-final.json -F e2e
-          when: always
+          command: node common/scripts/install-run-rush.js e2e-ci --test-path-pattern '$(circleci tests glob packages/*/src/__e2e__/**/*.test.ts)'
+      # - run:
+      #     name: Upload E2E Test Coverage
+      #     command: node common/scripts/install-run-rush.js upload-coverage -F e2e
+      #     when: always
       - store_test_results:
           path: reports
     parallelism: 2
 
-  - &build-e2e12
+  - &build-12
     working_directory: ~/neo-one
     steps:
       - checkout
@@ -117,44 +104,40 @@ aliases:
       - save-cache: *save-yarn-cache-12
       - run:
           name: Build
-          command: yarn build:e2e
+          command: node common/scripts/install-run-rush.js rebuild --verbose
+      - run:
+          name: Lint
+          command: node common/scripts/install-run-rush.js lint -p 8
       - persist_to_workspace:
           root: ~/neo-one
           paths:
-            - dist
-            - node_modules
+            - common/temp/node_modules
+            - packages/*/lib
+            - packages/*/node_modules
 
   - &test12
     working_directory: ~/neo-one
     steps:
       - checkout
+      - attach_workspace:
+          at: ./
       - restore-cache: *restore-yarn-cache-12
       - run: *install
       - save-cache: *save-yarn-cache-12
       - run:
           name: Test
-          command: yarn test-ci $(circleci tests glob "packages/*/src/__tests__/**/*.test.ts" | circleci tests split --split-by=timings) --coverage
+          command: node common/scripts/install-run-rush.js test-ci --test-path-pattern '$(circleci tests glob packages/*/src/__tests__/**/*.test.ts)' --coverage
       - run:
           name: Upload Unit Test Coverage
-          command: yarn run codecov -f coverage/coverage-final.json -F unit
+          command: node common/scripts/install-run-rush.js upload-coverage -F unit
           when: always
-      - store_test_results:
-          path: reports
-    parallelism: 2
-
-  - &e2e12
-    working_directory: ~/neo-one
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ./
       - run:
           name: E2E
-          command: yarn nyc --reporter json yarn e2e-ci $(circleci tests glob "packages/*/src/__e2e__/**/*.test.ts" | circleci tests split --split-by=timings)
-      - run:
-          name: Upload E2E Test Coverage
-          command: yarn run codecov -f coverage/coverage-final.json -F e2e
-          when: always
+          command: node common/scripts/install-run-rush.js e2e-ci --test-path-pattern '$(circleci tests glob packages/*/src/__e2e__/**/*.test.ts)'
+      # - run:
+      #     name: Upload E2E Test Coverage
+      #     command: node common/scripts/install-run-rush.js upload-coverage -F e2e
+      #     when: always
       - store_test_results:
           path: reports
     parallelism: 2
@@ -172,50 +155,41 @@ jobs:
   test10:
     <<: *node10
     <<: *test10
-  e2e10:
+  build-10:
     <<: *node10
-    <<: *e2e10
-  build-e2e10:
-    <<: *node10
-    <<: *build-e2e10
+    <<: *build-10
 
   test12:
     <<: *node12
     <<: *test12
-  e2e12:
+  build-12:
     <<: *node12
-    <<: *e2e12
-  build-e2e12:
-    <<: *node12
-    <<: *build-e2e12
+    <<: *build-12
 
-  lint:
+  nit:
     <<: *node12
-    <<: *lint
+    <<: *nit
 
 workflows:
   version: 2
   test10:
     jobs:
-      - build-e2e10:
+      - nit:
+          filters: *filter-ignore-bors-tmp
+      - build-10:
           filters: *filter-ignore-bors-tmp
       - test10:
           filters: *filter-ignore-bors-tmp
-      - e2e10:
           requires:
-            - build-e2e10
-          filters: *filter-ignore-bors-tmp
-      - lint:
-          filters: *filter-ignore-bors-tmp
+            - build-10
+
   test12:
     jobs:
-      - build-e2e12:
+      - nit:
+          filters: *filter-ignore-bors-tmp
+      - build-12:
           filters: *filter-ignore-bors-tmp
       - test12:
           filters: *filter-ignore-bors-tmp
-      - e2e12:
           requires:
-            - build-e2e12
-          filters: *filter-ignore-bors-tmp
-      - lint:
-          filters: *filter-ignore-bors-tmp
+            - build-12

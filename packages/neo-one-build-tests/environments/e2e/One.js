@@ -49,11 +49,10 @@ class One {
     return async (commandIn, options = {}) => {
       const cmd = nodePath.resolve(
         process.cwd(),
-        'dist',
-        'neo-one',
-        'node_modules',
-        '.bin',
-        'neo-one',
+        'packages',
+        'neo-one-cli',
+        'bin',
+        'neo-one.js',
       );
       const args = commandIn.split(' ');
       return this.execBase(commandIn, project, options)
@@ -71,14 +70,13 @@ class One {
   execBase(commandIn, project, options = {}) {
     const cmd = nodePath.resolve(
       process.cwd(),
-      'dist',
-      'neo-one',
-      'node_modules',
-      '.bin',
-      'neo-one',
+      'packages',
+      'neo-one-cli',
+      'bin',
+      'neo-one.js',
     );
-    const args = commandIn.split(' ');
-    const proc = execa(cmd, args, this._getEnv(project, options));
+    const args = [cmd].concat(commandIn.split(' '));
+    const proc = execa('node', args, this._getEnv(project, options));
     // Uncomment these lines to debug e2e tests.
     // proc.stdout.pipe(process.stdout);
     // proc.stderr.pipe(process.stderr);
@@ -88,14 +86,13 @@ class One {
   execBaseNode(commandIn, environment) {
     const cmd = nodePath.resolve(
       process.cwd(),
-      'dist',
-      'neo-one',
-      'node_modules',
-      '.bin',
-      'neo-one-node',
+      'packages',
+      'neo-one-node-bin',
+      'bin',
+      'neo-one-node.js',
     );
-    const args = commandIn.split(' ');
-    const proc = execa(cmd, args, environment);
+    const args = [cmd].concat(commandIn.split(' '));
+    const proc = execa('node', args, environment);
     // Uncomment these lines to debug e2e tests.
     // proc.stdout.pipe(process.stdout);
     // proc.stderr.pipe(process.stderr);

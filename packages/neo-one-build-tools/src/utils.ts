@@ -72,6 +72,7 @@ export const replaceBNTypeImport = gulpReplace(
 );
 export const replaceBNImport = gulpReplace("import { BN } from 'bn.js';", "import BN from 'bn.js';");
 export const replaceStatic = gulpReplace('../static', './static');
+export const replaceCmd = gulpReplace('../cmd', './cmd');
 export const filterJS = (condition: boolean) => gulpIf(condition, gulpFilter(['**', '!**/*.js']));
 
 const CLIENT_PACKAGES = new Set([
