@@ -47,7 +47,15 @@ export const getPackages = async () => {
       return getPackageFiles(
         packagePath,
         path.join('@neo-one', packagePath.slice(PACKAGE_DIR_PREFIX.length)),
-        (file) => file.includes('__') || file.includes('node_modules') || (hasLib && file.includes('src')),
+        (file) =>
+          file.includes('__') ||
+          file.includes('node_modules') ||
+          (hasLib && file.includes('src')) ||
+          file.includes('.md') ||
+          file.includes('package-deps.json') ||
+          file.includes('.log') ||
+          file.includes('gulpfile.js') ||
+          file.includes('tsconfig'),
       );
     }),
   );
