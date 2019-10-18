@@ -1,6 +1,4 @@
 // tslint:disable no-submodule-imports no-implicit-dependencies
-// // @ts-ignore
-// import files from '!../../loaders/packagesLoaderEntry!../../../../neo-one-smart-contract';
 // @ts-ignore
 import jest_d_ts from '!raw-loader!../../../../../common/temp/node_modules/@types/jest/index.d.ts';
 // @ts-ignore
@@ -108,20 +106,17 @@ import lib_webworker_d_ts from '!raw-loader!../../../../../common/temp/node_modu
 // @ts-ignore
 import lib_webworker_importscripts_d_ts from '!raw-loader!../../../../../common/temp/node_modules/typescript/lib/lib.webworker.importscripts.d.ts';
 // @ts-ignore
-import contract_global_d_ts from '!raw-loader!../../../../neo-one-smart-contract/src/global.d.ts';
-// @ts-ignore
-import contract_harness_d_ts from '!raw-loader!../../../../neo-one-smart-contract/src/harness.d.ts';
-// @ts-ignore
-import contract_index_d_ts from '!raw-loader!../../../../neo-one-smart-contract/src/index.d.ts';
 import { FileSystem } from '@neo-one/local-browser';
 // @ts-ignore
 import jestPackageJSONContents from '../../../../../common/temp/node_modules/@types/jest/package.json';
 // @ts-ignore
 import nodePackageJSONContents from '../../../../../common/temp/node_modules/@types/node/package.json';
+import { getPackages } from '../../loaders/getPackages';
 
 const writeFile = async (fs: FileSystem, path: string, content: string) => fs.writeFile(path, content);
 
 export const initializeFileSystem = async (fs: FileSystem): Promise<void> => {
+  const includedPackages = await getPackages();
   // tslint:disable-next-line no-any
   await Promise.all<any>([
     writeFile(fs, '/node_modules/typescript/lib/lib.d.ts', lib_d_ts),
@@ -179,8 +174,11 @@ export const initializeFileSystem = async (fs: FileSystem): Promise<void> => {
     writeFile(fs, '/node_modules/@types/jest/package.json', JSON.stringify(jestPackageJSONContents)),
     writeFile(fs, '/node_modules/@types/node/index.d.ts', node_d_ts),
     writeFile(fs, '/node_modules/@types/node/package.json', JSON.stringify(nodePackageJSONContents)),
-    writeFile(fs, '/node_modules/@neo-one/smart-contract/index.d.ts', contract_index_d_ts),
-    writeFile(fs, '/node_modules/@neo-one/smart-contract/global.d.ts', contract_global_d_ts),
-    writeFile(fs, '/node_modules/@neo-one/smart-contract/harness.d.ts', contract_harness_d_ts),
+    Promise.all(
+      // tslint:disable-next-line no-any
+      Object.entries(includedPackages).map(async ([path, contents]: any) => {
+        await writeFile(fs, path, contents);
+      }),
+    ),
   ]);
 };

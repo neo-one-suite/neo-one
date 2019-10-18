@@ -9,7 +9,7 @@
   },
   "main": "./src/index",
   "dependencies": {
-    "@babel/runtime": "^7.6.2",
+    "@babel/runtime": "^7.6.3",
     "@emotion/core": "^10.0.17",
     "@emotion/styled": "^10.0.17",
     "@neo-one/editor": "^1.2.7",

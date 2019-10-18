@@ -1,3 +1,3 @@
 {
-  "extends": "./node_modules/@neo-one/build-tools/includes/tsconfig.dev.json"
+  "extends": "./node_modules/@neo-one/build-tools/includes/tsconfig.static.json"
 }
