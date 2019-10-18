@@ -59,11 +59,6 @@ export class PouchDBFileSystem implements FileSystem {
       }
     }
 
-    console.log('\n\n\n\n\n\n\nLOGGGING FILES\n\n\n\n\n\n\n\n');
-    for (const file of mutableFiles.keys()) {
-      console.log(file);
-    }
-    console.log('\n\n\n\n\n\n\nLOGGGING FILES\n\n\n\n\n\n\n\n');
     return new PouchDBFileSystem(db, changes$, subscription, mutableFiles);
   }
 
