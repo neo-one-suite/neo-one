@@ -45,7 +45,7 @@
     "@babel/polyfill": "^7.6.0",
     "@babel/preset-env": "^7.6.2",
     "@babel/preset-react": "^7.0.0",
-    "@babel/runtime": "^7.6.2",
+    "@babel/runtime": "^7.6.3",
     "@cypress/webpack-preprocessor": "^4.1.0",
     "ajv": "^6.10.2",
     "autoprefixer": "^9.6.1",

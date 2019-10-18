@@ -2,7 +2,7 @@
   "name": "@neo-one/editor-server",
   "version": "1.2.2",
   "description": "NEO•ONE editor server.",
-  "main": "./lib/index",
+  "main": "./src/index",
   "scripts": {
     "build": "",
     "lint": "node ./node_modules/@neo-one/build-tools/neo-one-lint.js",
