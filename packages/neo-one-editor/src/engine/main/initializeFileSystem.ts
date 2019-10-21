@@ -1,5 +1,7 @@
 // tslint:disable no-submodule-imports no-implicit-dependencies
 // @ts-ignore
+import files from '!../../loaders/packagesLoaderEntry!../../../../neo-one-smart-contract';
+// @ts-ignore
 import jest_d_ts from '!raw-loader!../../../../../common/temp/node_modules/@types/jest/index.d.ts';
 // @ts-ignore
 import node_d_ts from '!raw-loader!../../../../../common/temp/node_modules/@types/node/index.d.ts';
@@ -111,12 +113,10 @@ import { FileSystem } from '@neo-one/local-browser';
 import jestPackageJSONContents from '../../../../../common/temp/node_modules/@types/jest/package.json';
 // @ts-ignore
 import nodePackageJSONContents from '../../../../../common/temp/node_modules/@types/node/package.json';
-import { getPackages } from '../../loaders/getPackages';
 
 const writeFile = async (fs: FileSystem, path: string, content: string) => fs.writeFile(path, content);
 
 export const initializeFileSystem = async (fs: FileSystem): Promise<void> => {
-  const includedPackages = await getPackages();
   // tslint:disable-next-line no-any
   await Promise.all<any>([
     writeFile(fs, '/node_modules/typescript/lib/lib.d.ts', lib_d_ts),
@@ -176,7 +176,7 @@ export const initializeFileSystem = async (fs: FileSystem): Promise<void> => {
     writeFile(fs, '/node_modules/@types/node/package.json', JSON.stringify(nodePackageJSONContents)),
     Promise.all(
       // tslint:disable-next-line no-any
-      Object.entries(includedPackages).map(async ([path, contents]: any) => {
+      Object.entries(files).map(async ([path, contents]: any) => {
         await writeFile(fs, path, contents);
       }),
     ),

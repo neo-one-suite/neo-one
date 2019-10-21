@@ -1,10 +1,10 @@
 // tslint:disable no-array-mutation promise-function-async
-import { utils } from '@neo-one/utils';
 import * as fs from 'fs-extra';
 // tslint:disable-next-line match-default-export-name
 import glob from 'glob';
 import _ from 'lodash';
-import * as path from 'path';
+import path from 'path';
+import webpack from 'webpack';
 
 const INCLUDE_PACKAGES: readonly string[] = [
   'neo-one-client',
@@ -34,10 +34,36 @@ const INCLUDE_PACKAGES: readonly string[] = [
   'neo-one-utils',
   'neo-one-worker',
 ];
+
 const PACKAGES_DIR = path.resolve(__dirname, '..', '..', '..');
 const PACKAGE_DIR_PREFIX = path.join(PACKAGES_DIR, 'neo-one-');
 
-export const getPackages = async () => {
+export function packagesLoader(this: webpack.loader.LoaderContext) {
+  try {
+    compile(this);
+  } catch (e) {
+    // tslint:disable-next-line no-console
+    console.error(e, e.stack);
+    throw e;
+  }
+}
+
+const compile = (loader: webpack.loader.LoaderContext): void => {
+  const callback = loader.async();
+  if (callback) {
+    getPackagesExports(loader)
+      .then((result) => callback(undefined, result))
+      .catch(callback);
+  }
+};
+
+const getPackagesExports = async (loader: webpack.loader.LoaderContext): Promise<string> => {
+  const packages = await getPackages(loader);
+
+  return `module.exports = ${JSON.stringify(packages)};`;
+};
+
+export const getPackages = async (loader: webpack.loader.LoaderContext) => {
   const packageDirs = INCLUDE_PACKAGES;
   const packagePaths = packageDirs.map((dir) => path.resolve(PACKAGES_DIR, dir));
   const packageFilesList = await Promise.all(
@@ -45,6 +71,7 @@ export const getPackages = async () => {
       const hasLib = await fs.pathExists(path.resolve(packagePath, 'lib'));
 
       return getPackageFiles(
+        loader,
         packagePath,
         path.join('@neo-one', packagePath.slice(PACKAGE_DIR_PREFIX.length)),
         (file) =>
@@ -64,6 +91,7 @@ export const getPackages = async () => {
 };
 
 const getPackageFiles = async (
+  loader: webpack.loader.LoaderContext,
   packageDir: string,
   outputPackageDir: string,
   omitFile = (_file: string) => false,
@@ -88,6 +116,7 @@ const getPackageFiles = async (
 
       try {
         const content = await fs.readFile(file, 'utf8');
+        loader.addDependency(file);
 
         return [path.join('/', 'node_modules', outputPackageDir, file.slice(packageDir.length)), content];
       } catch (error) {
@@ -100,5 +129,6 @@ const getPackageFiles = async (
     }),
   );
 
-  return result.filter(utils.notNull);
+  // tslint:disable-next-line: strict-type-predicates
+  return result.filter((value) => value != undefined) as ReadonlyArray<[string, string | undefined]>;
 };
