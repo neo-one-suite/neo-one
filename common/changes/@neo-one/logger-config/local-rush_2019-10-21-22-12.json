@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Migrate to Rush",
+      "type": "minor",
+      "packageName": "@neo-one/logger-config"
+    }
+  ],
+  "packageName": "@neo-one/logger-config",
+  "email": "danwbyrne@gmail.com"
+}

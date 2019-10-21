@@ -1,6 +1,6 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
-  "rushVersion": "5.12.0",
+  "rushVersion": "5.16.0",
   "yarnVersion": "1.9.4",
   "nodeSupportedVersionRange": ">=10.13.0 <=12.10.0",
   "ensureConsistentVersions": true,
@@ -44,57 +44,68 @@
     {
       "packageName": "@neo-one/cli",
       "projectFolder": "packages/neo-one-cli",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/cli-common",
       "projectFolder": "packages/neo-one-cli-common",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/cli-common-node",
       "projectFolder": "packages/neo-one-cli-common-node",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/client",
       "projectFolder": "packages/neo-one-client",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/client-common",
       "projectFolder": "packages/neo-one-client-common",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/client-core",
       "projectFolder": "packages/neo-one-client-core",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/client-full",
       "projectFolder": "packages/neo-one-client-full",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/client-full-common",
       "projectFolder": "packages/neo-one-client-full-common",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/client-full-core",
       "projectFolder": "packages/neo-one-client-full-core",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/client-switch",
       "projectFolder": "packages/neo-one-client-switch",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/developer-tools",
       "projectFolder": "packages/neo-one-developer-tools",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/developer-tools-frame",
@@ -114,12 +125,14 @@
     {
       "packageName": "@neo-one/http",
       "projectFolder": "packages/neo-one-http",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/http-context",
       "projectFolder": "packages/neo-one-http-context",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/local-browser",
@@ -139,27 +152,32 @@
     {
       "packageName": "@neo-one/logger",
       "projectFolder": "packages/neo-one-logger",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/logger-config",
       "projectFolder": "packages/neo-one-logger-config",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node",
       "projectFolder": "packages/neo-one-node",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-bin",
       "projectFolder": "packages/neo-one-node-bin",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-blockchain",
       "projectFolder": "packages/neo-one-node-blockchain",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-browser",
@@ -174,107 +192,128 @@
     {
       "packageName": "@neo-one/node-consensus",
       "projectFolder": "packages/neo-one-node-consensus",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-core",
       "projectFolder": "packages/neo-one-node-core",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-http-rpc",
       "projectFolder": "packages/neo-one-node-http-rpc",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-neo-settings",
       "projectFolder": "packages/neo-one-node-neo-settings",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-network",
       "projectFolder": "packages/neo-one-node-network",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-offline",
       "projectFolder": "packages/neo-one-node-offline",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-protocol",
       "projectFolder": "packages/neo-one-node-protocol",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-rpc-handler",
       "projectFolder": "packages/neo-one-node-rpc-handler",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-storage-cache",
       "projectFolder": "packages/neo-one-node-storage-cache",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-storage-common",
       "projectFolder": "packages/neo-one-node-storage-common",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-storage-levelup",
       "projectFolder": "packages/neo-one-node-storage-levelup",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/node-vm",
       "projectFolder": "packages/neo-one-node-vm",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/react",
       "projectFolder": "packages/neo-one-react",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/react-common",
       "projectFolder": "packages/neo-one-react-common",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/react-core",
       "projectFolder": "packages/neo-one-react-core",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/smart-contract",
       "projectFolder": "packages/neo-one-smart-contract",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/smart-contract-codegen",
       "projectFolder": "packages/neo-one-smart-contract-codegen",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/smart-contract-compiler",
       "projectFolder": "packages/neo-one-smart-contract-compiler",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/smart-contract-compiler-node",
       "projectFolder": "packages/neo-one-smart-contract-compiler-node",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/smart-contract-lib",
       "projectFolder": "packages/neo-one-smart-contract-lib",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/smart-contract-test",
       "projectFolder": "packages/neo-one-smart-contract-test",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/smart-contract-test-browser",
@@ -284,17 +323,20 @@
     {
       "packageName": "@neo-one/smart-contract-test-common",
       "projectFolder": "packages/neo-one-smart-contract-test-common",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/smart-contract-typescript-plugin",
       "projectFolder": "packages/neo-one-smart-contract-typescript-plugin",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/suite",
       "projectFolder": "packages/neo-one-suite",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/temp-tests",
@@ -304,22 +346,26 @@
     {
       "packageName": "@neo-one/ts-utils",
       "projectFolder": "packages/neo-one-ts-utils",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/typescript-concatenator",
       "projectFolder": "packages/neo-one-typescript-concatenator",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/utils",
       "projectFolder": "packages/neo-one-utils",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/utils-node",
       "projectFolder": "packages/neo-one-utils-node",
-      "reviewCategory": "production"
+      "reviewCategory": "production",
+      "shouldPublish": true
     },
     {
       "packageName": "@neo-one/website",

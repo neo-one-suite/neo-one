@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Migrate to Rush",
+      "type": "minor",
+      "packageName": "@neo-one/node-offline"
+    }
+  ],
+  "packageName": "@neo-one/node-offline",
+  "email": "danwbyrne@gmail.com"
+}
