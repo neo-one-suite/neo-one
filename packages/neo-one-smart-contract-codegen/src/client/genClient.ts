@@ -11,7 +11,7 @@ export const genClient = ({
   readonly wallets: ReadonlyArray<Wallet>;
   readonly networks: ReadonlyArray<NetworkDefinition>;
 }) => {
-  const createClient = `const providers = [
+  const createClient = (language: 'ts' | 'js') => `const providers = [
     ${networks
       .filter(({ name }) => name !== localDevNetworkName)
       .map(({ name, rpcURL }) => `{ network: '${name}', rpcURL: '${rpcURL}' },`)
@@ -22,7 +22,9 @@ export const genClient = ({
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
-  const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
+  const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider)${
+    language === 'ts' ? ' as LocalUserAccountProvider[]' : ''
+  };
   const localUserAccountProvider = localUserAccountProviders.find(
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );
@@ -54,17 +56,28 @@ export const genClient = ({
   '${localDevNetworkName}': new DeveloperClient(new NEOONEDataProvider({ network: '${localDevNetworkName}', rpcURL: \`http://\${host}:${localDevNetworkPort}/rpc\` })),
 });`;
 
-  const getDefaultUserAccountProviders = `({
-  memory: new LocalUserAccountProvider({
-    keystore: new LocalKeyStore(new LocalMemoryStore()),
-    provider,
-  }),
-});`;
+  const getDefaultUserAccountProviders = (language: 'ts' | 'js') => `{
+    const localUserAccountProvider = {
+      memory: new LocalUserAccountProvider({
+        keystore: new LocalKeyStore(new LocalMemoryStore()),
+        provider,
+      })};
+
+      const dapi = typeof globalThis === 'undefined' ? undefined : ${
+        language === 'ts' ? '(globalThis as any)' : 'globalThis'
+      }.neoDapi;
+      if (dapi !== undefined) {
+        return {...localUserAccountProvider, dapi: new DapiUserAccountProvider({ dapi, provider, onError: (error) => { throw error }})}
+      }
+
+      return localUserAccountProvider;
+  };`;
 
   return {
     js: `
 import {
   Client,
+  DapiUserAccountProvider,
   DeveloperClient,
   LocalKeyStore,
   LocalMemoryStore,
@@ -73,7 +86,7 @@ import {
   NEOONEDataProvider,
 } from '@neo-one/client';
 
-const getDefaultUserAccountProviders = (provider) => ${getDefaultUserAccountProviders}
+const getDefaultUserAccountProviders = (provider) => ${getDefaultUserAccountProviders('js')}
 
 const isLocalUserAccountProvider = (userAccountProvider) =>
   userAccountProvider instanceof LocalUserAccountProvider;
@@ -87,7 +100,7 @@ export const createClient = (getUserAccountProvidersOrHost) => {
     getUserAccountProviders = getUserAccountProvidersOrHost;
   }
 
-  ${createClient}
+  ${createClient('js')}
 
   return new Client(userAccountProviders);
 };
@@ -97,6 +110,7 @@ export const createDeveloperClients = (host = 'localhost') => ${createDeveloperC
     ts: `
 import {
   Client,
+  DapiUserAccountProvider,
   DeveloperClient,
   DeveloperClients,
   LocalKeyStore,
@@ -111,7 +125,7 @@ export interface DefaultUserAccountProviders {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>,
 }
 
-const getDefaultUserAccountProviders = (provider: NEOONEProvider) => ${getDefaultUserAccountProviders}
+const getDefaultUserAccountProviders = (provider: NEOONEProvider) => ${getDefaultUserAccountProviders('ts')}
 
 const isLocalUserAccountProvider = (userAccountProvider: any): userAccountProvider is LocalUserAccountProvider =>
   userAccountProvider instanceof LocalUserAccountProvider;
@@ -127,7 +141,7 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
     getUserAccountProviders = getUserAccountProvidersOrHost as any;
   }
 
-  ${createClient}
+  ${createClient('ts')}
 
   return new Client(userAccountProviders as any);
 }
