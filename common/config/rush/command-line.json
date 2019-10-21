@@ -27,14 +27,6 @@
     },
     {
       "commandKind": "global",
-      "name": "build-tools",
-      "summary": "Build NEO-ONE web tools",
-      "description": "Build the NEO-ONE tools from source",
-      "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --watch --bundle tools"
-    },
-    {
-      "commandKind": "global",
       "name": "build-test-runner",
       "summary": "Build NEO-ONE test-runner",
       "description": "Build the NEO-ONE test-runner from source",
@@ -80,6 +72,14 @@
       "description": "Start the NEO-ONE website from source in prod mode",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "serve packages/neo-one-website/dist -p 3000"
+    },
+    {
+      "commandKind": "global",
+      "name": "clean",
+      "summary": "Clean up NEO-ONE packages",
+      "description": "Remove build logs from all packages (and optionally lib/* and package-deps.json)",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" node ./packages/neo-one-build-tools/lib/clean"
     },
     {
       "commandKind": "global",
@@ -179,6 +179,20 @@
       "shortName": "-c",
       "description": "flag to enable coverage collection for jest",
       "associatedCommands": ["test", "test-ci"]
+    },
+    {
+      "parameterKind": "flag",
+      "longName": "--debug",
+      "shortName": "-d",
+      "description": "enables logging/debug mode for associated command",
+      "associatedCommands": ["clean", "start-website"]
+    },
+    {
+      "parameterKind": "flag",
+      "longName": "--full",
+      "shortName": "-f",
+      "description": "enables cleaning of lib/* and *.build.log files",
+      "associatedCommands": ["clean"]
     },
     {
       "parameterKind": "string",
