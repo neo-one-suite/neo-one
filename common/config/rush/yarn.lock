@@ -631,7 +631,7 @@
     core-js "^2.6.5"
     regenerator-runtime "^0.13.2"
 
-"@babel/preset-env@^7.0.0", "@babel/preset-env@^7.5.5", "@babel/preset-env@^7.6.2":
+"@babel/preset-env@^7.0.0", "@babel/preset-env@^7.5.5", "@babel/preset-env@^7.6.2", "@babel/preset-env@^7.6.3":
   version "7.6.3"
   resolved "https://registry.yarnpkg.com/@babel/preset-env/-/preset-env-7.6.3.tgz#9e1bf05a2e2d687036d24c40e4639dc46cef2271"
   dependencies:
@@ -717,7 +717,7 @@
     core-js "^2.6.5"
     regenerator-runtime "^0.13.2"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.3.4", "@babel/runtime@^7.4.0", "@babel/runtime@^7.4.2", "@babel/runtime@^7.4.4", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.3.4", "@babel/runtime@^7.4.0", "@babel/runtime@^7.4.2", "@babel/runtime@^7.4.4", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.3":
   version "7.6.3"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.6.3.tgz#935122c74c73d2240cafd32ddb5fc2a6cd35cf1f"
   dependencies:
@@ -1351,6 +1351,7 @@
   version "0.0.0"
   resolved "file:./projects/build-tests.tgz"
   dependencies:
+    "@babel/preset-env" "^7.6.3"
     app-root-dir "^1.0.2"
     babel-jest "^24.9.0"
     bn.js "^5.0.0"
@@ -1377,7 +1378,7 @@
     "@babel/plugin-syntax-optional-catch-binding" "^7.2.0"
     "@babel/plugin-syntax-typescript" "^7.3.3"
     "@babel/polyfill" "^7.6.0"
-    "@babel/preset-env" "^7.6.2"
+    "@babel/preset-env" "^7.6.3"
     "@babel/preset-react" "^7.0.0"
     "@babel/runtime" "^7.6.3"
     "@cypress/webpack-preprocessor" "^4.1.0"
@@ -1741,7 +1742,6 @@
     "@babel/plugin-transform-modules-commonjs" "^7.2.0"
     "@babel/plugin-transform-typescript" "^7.5.2"
     "@babel/preset-react" "^7.0.0"
-    "@babel/runtime" "^7.6.3"
     "@babel/standalone" "^7.5.4"
     "@emotion/core" "^10.0.17"
     "@emotion/styled" "^10.0.17"
@@ -2237,6 +2237,8 @@
 "@rush-temp/smart-contract@file:./projects/smart-contract.tgz":
   version "0.0.0"
   resolved "file:./projects/smart-contract.tgz"
+  dependencies:
+    gulp "~4.0.2"
 
 "@rush-temp/suite@file:./projects/suite.tgz":
   version "0.0.0"
