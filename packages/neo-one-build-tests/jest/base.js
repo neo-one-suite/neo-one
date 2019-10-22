@@ -17,7 +17,7 @@ if (process.platform === 'win32') {
 }
 
 module.exports = ({ path }) => ({
-  rootDir: process.cwd(),
+  rootDir: APP_ROOT_DIR,
   modulePathIgnorePatterns: ['<rootDir>/common/'],
   globals: {
     'ts-jest': {
@@ -32,9 +32,17 @@ module.exports = ({ path }) => ({
     `${jest_root}/serializers/buffer.js`,
   ],
   testPathIgnorePatterns,
+  transformIgnorePatterns: ['node_modules', '/packages/.*/lib/'],
   transform: {
     '^.+\\.tsx?$': `${jest_root}/node_modules/ts-jest`,
-    '^.+\\.jsx?$': `${jest_root}/node_modules/babel-jest`,
+    '^.+\\.jsx?$': [
+      `${jest_root}/node_modules/babel-jest`,
+      {
+        configFile: require.resolve('../babel.config.js'),
+        babelrc: true,
+        babelrcRoots: './packages/*',
+      },
+    ],
   },
   testEnvironment: `${jest_root}/environments/${path}/NodeEnvironment.js`,
   setupFilesAfterEnv: [`${jest_root}/environments/${path}/jestSetup.js`],

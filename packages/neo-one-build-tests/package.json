@@ -5,10 +5,11 @@
   "scripts": {
     "build": ""
   },
-  "dependencies": {
-    "app-root-dir": "^1.0.2",
+  "devDependencies": {
+    "@babel/preset-env": "^7.6.3",
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/logger": "^1.2.1",
+    "app-root-dir": "^1.0.2",
     "babel-jest": "^24.9.0",
     "bn.js": "^5.0.0",
     "codecov": "^3.6.1",
