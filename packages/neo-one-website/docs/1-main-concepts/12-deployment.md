@@ -88,8 +88,21 @@ While the contract can no longer be invoked and the storage is not accessible, a
 
 ---
 
+### Migration File
+
+To deploy your contract to a network, you will need to define a `migration` file. The default location for this file is `neo-one/migration.ts`, but it can be [configured](/docs/config-options). A migration file simply exports a function to call the deploy method on your smart contracts with the appropriate arguments. It should look something like this:
+
+```typescript
+import BigNumber from 'bignumber.js';
+import { MigrationContracts } from '../src/neo-one';
+
+export default ({ token, ico, escrow }: MigrationContracts, _network: string) => {
+  token.deploy();
+  ico.deploy(undefined, new BigNumber(1566864121), undefined);
+  escrow.deploy();
+};
+```
+
 ## Deploying to a Public Network
 
-Coming soon.
-
-Stay tuned as we work out the production deployment story for the v1 release of NEO•ONE!
+Good news! This feature is now available. With that said, we want to work closely with the first few users to deploy to the TestNet or MainNet to ensure a smooth, bug-free experience. Please reach out if you are ready and we will quickly work with you to deploy.

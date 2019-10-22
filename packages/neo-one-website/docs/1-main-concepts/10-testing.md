@@ -13,10 +13,10 @@ Use your favorite unit test framework to test smart contracts using the NEO•ON
 
 ## withContracts
 
-The NEO•ONE toolchain generates a helper function called `withContracts` in `one/generated/test.ts` that makes testing a breeze:
+The NEO•ONE toolchain generates a helper function called `withContracts` in `src/neo-one/test.ts` that makes testing a breeze:
 
 ```typescript
-import { withContracts } from '../generated/test';
+import { withContracts } from '../neo-one/test';
 
 describe('Token', () => {
   test('the token has NEP-5 properties', async () => {
