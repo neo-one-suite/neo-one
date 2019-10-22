@@ -10,5 +10,6 @@ interface RouterLinkProps {
 export const RouterLink = ({ to, ...props }: RouterLinkProps & React.ComponentProps<typeof Link>) => {
   const ref = usePrefetch(to);
 
-  return <Link ref={ref} to={to} {...props} />;
+  // tslint:disable-next-line no-any
+  return <Link ref={ref as any} to={to} {...props} />;
 };

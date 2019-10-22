@@ -35,7 +35,8 @@ const TooltipBaseComponent = forwardRef<HTMLDivElement, React.ComponentPropsWith
   return <Popover {...props} ref={ref} visible={props.visible === undefined ? visible : props.visible} />;
 });
 
-export const TooltipBase = styled(TooltipBaseComponent)<{}, {}>`
+// tslint:disable-next-line no-any
+export const TooltipBase = styled(TooltipBaseComponent as any)<{}, {}>`
   ${theme('TooltipBase')};
 `;
 

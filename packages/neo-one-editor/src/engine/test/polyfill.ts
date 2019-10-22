@@ -4,7 +4,7 @@ import { TrackJS } from '@neo-one/react-common';
 if (typeof window !== 'undefined') {
   // @ts-ignore
   process.stdout = {
-    isTTY: undefined,
+    isTTY: false,
   };
 }
 
