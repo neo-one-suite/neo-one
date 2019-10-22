@@ -15,6 +15,7 @@
 # Playground
 /packages/neo-one-playground
 
+# Website
 /packages/neo-one-website/tmp
 /packages/neo-one-website/build
 /packages/neo-one-website/dist
@@ -79,3 +80,4 @@ cypress/screenshots
 # Rush files
 common/temp/**
 package-deps.json
+/packages/*/.rush
