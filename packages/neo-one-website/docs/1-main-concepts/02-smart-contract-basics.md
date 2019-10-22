@@ -28,7 +28,7 @@ The NEO•ONE toolchain currently only supports TypeScript smart contracts due t
 
 If you haven't already, prepare your project by following the instructions in the [Environment Setup](/docs/environment-setup) section.
 
-The NEO•ONE toolchain expects all smart contracts in your project to be contained within one parent folder. By default, that folder is `one/contracts`, though this location is [configurable](/docs/configuration). The main command you'll use from the NEO•ONE toolchain is:
+The NEO•ONE toolchain expects all smart contracts in your project to be contained within one parent folder. By default, that folder is `one/contracts`, though this location is [configurable](/docs/config-options). The main command you'll use from the NEO•ONE toolchain is:
 
 ```bash
 neo-one build
