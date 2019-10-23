@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/client-core",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "NEO•ONE client core types implementation.",
   "main": "./src/index",
   "dependencies": {
     "@neo-one/client-common": "^1.4.2",
-    "@neo-one/client-switch": "^1.4.2",
+    "@neo-one/client-switch": "^1.4.3",
     "@neo-one/utils": "^1.2.1",
     "@reactivex/ix-es2015-cjs": "^2.5.3",
     "bignumber.js": "^9.0.0",

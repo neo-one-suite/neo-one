@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/editor-server@1.2.2...@neo-one/editor-server@1.2.3) (2019-10-23)
+
+
+### Bug Fixes
+
+* **deps:** update dependency tar to v5 ([710c813](https://github.com/neo-one-suite/neo-one/commit/710c813f0a8d0a4fce26a71c56ba53db5d23f20d))
+
+
+
+
+
 ## [1.2.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/editor-server@1.2.1...@neo-one/editor-server@1.2.2) (2019-08-30)
 
 **Note:** Version bump only for package @neo-one/editor-server

@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/editor@1.2.7...@neo-one/editor@1.3.0) (2019-10-23)
+
+
+### Bug Fixes
+
+* **deps:** update dependency immer to v4 ([0509baa](https://github.com/neo-one-suite/neo-one/commit/0509baa6a0c7b51df1f7e44abf461062e768e64b))
+* **ts:** revert back to TS v3.5.3 until v3.6.3 is released ([070d519](https://github.com/neo-one-suite/neo-one/commit/070d5190bdacbec433af37c69fef1cc7702b8bde))
+* **website course:** include neo-one-node-browser in website ([#1784](https://github.com/neo-one-suite/neo-one/issues/1784)) ([b3d62a5](https://github.com/neo-one-suite/neo-one/commit/b3d62a59900ee8e4e3b10500f51b92ca4258f395))
+
+
+### Features
+
+* **ts:** upgrade to TS v3.6.3 ([82595a9](https://github.com/neo-one-suite/neo-one/commit/82595a91c063a4fa08ef06f631cd1dab4cb965f3))
+
+
+
+
+
 ## [1.2.7](https://github.com/neo-one-suite/neo-one/compare/@neo-one/editor@1.2.6...@neo-one/editor@1.2.7) (2019-09-04)
 
 **Note:** Version bump only for package @neo-one/editor

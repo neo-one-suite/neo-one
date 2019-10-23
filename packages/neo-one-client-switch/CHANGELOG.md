@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-switch@1.4.2...@neo-one/client-switch@1.4.3) (2019-10-23)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @opencensus/exporter-jaeger to ^0.0.17 ([6faa2f1](https://github.com/neo-one-suite/neo-one/commit/6faa2f10aa7b1a8c2323fc6540188f70ed83ec40))
+* **deps:** update dependency @opencensus/web-propagation-tracecontext to ^0.0.7 ([5194f4f](https://github.com/neo-one-suite/neo-one/commit/5194f4f10e4be3a0f0cfe1a2c7b359966b8702c5))
+
+
+
+
+
 ## [1.4.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-switch@1.4.1...@neo-one/client-switch@1.4.2) (2019-09-04)
 
 **Note:** Version bump only for package @neo-one/client-switch

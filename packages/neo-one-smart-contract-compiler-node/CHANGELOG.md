@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-compiler-node@1.1.7...@neo-one/smart-contract-compiler-node@1.2.0) (2019-10-23)
+
+
+### Bug Fixes
+
+* **ts:** revert back to TS v3.5.3 until v3.6.3 is released ([070d519](https://github.com/neo-one-suite/neo-one/commit/070d5190bdacbec433af37c69fef1cc7702b8bde))
+
+
+### Features
+
+* **ts:** upgrade to TS v3.6.3 ([82595a9](https://github.com/neo-one-suite/neo-one/commit/82595a91c063a4fa08ef06f631cd1dab4cb965f3))
+
+
+
+
+
 ## [1.1.7](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-compiler-node@1.1.6...@neo-one/smart-contract-compiler-node@1.1.7) (2019-09-04)
 
 **Note:** Version bump only for package @neo-one/smart-contract-compiler-node

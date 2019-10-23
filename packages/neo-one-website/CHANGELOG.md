@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.8](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@1.5.7...@neo-one/website@1.5.8) (2019-10-23)
+
+
+### Bug Fixes
+
+* **courses:** fix type error in courses related to emotion ([63adbd6](https://github.com/neo-one-suite/neo-one/commit/63adbd6210175e28bbdc52c2b83cf6a12e8891c0))
+* **deps:** update dependency @emotion/core to v10.0.20 ([0b8d4e9](https://github.com/neo-one-suite/neo-one/commit/0b8d4e952d5c7d7e158519b97b896ccc463abeb8))
+* **deps:** update dependency @emotion/core to v10.0.21 ([be72096](https://github.com/neo-one-suite/neo-one/commit/be720965f096dd1ac506628befb53887968aca1f))
+* **deps:** update dependency @types/react to v16.9.3 ([da14c34](https://github.com/neo-one-suite/neo-one/commit/da14c34ddbc73d5679394f05449c1b21446f2f06))
+* **deps:** update dependency @types/react to v16.9.4 ([64ee4f6](https://github.com/neo-one-suite/neo-one/commit/64ee4f642a0232635e15fe9a1b35fa36ee96b221))
+* **deps:** update dependency @types/react to v16.9.5 ([ab89ddf](https://github.com/neo-one-suite/neo-one/commit/ab89ddff61b59f2430fc7d55feec5162d1829f46))
+* **deps:** update dependency @types/react to v16.9.6 ([d6fb31b](https://github.com/neo-one-suite/neo-one/commit/d6fb31b2613c76bbae9008f047b4164bd5e82de4))
+* **deps:** update dependency @types/react to v16.9.7 ([366774e](https://github.com/neo-one-suite/neo-one/commit/366774e8dc9d2e4b8c3a28290e96b2abc99b5d2c))
+* **deps:** update dependency @types/react to v16.9.9 ([bfdff95](https://github.com/neo-one-suite/neo-one/commit/bfdff951103f23d5c24ecdf9aba42a5cad25e5df))
+* **deps:** update dependency @types/react-dom to v16.9.1 ([3517f63](https://github.com/neo-one-suite/neo-one/commit/3517f63a95538f28cae625a9c6ad262feaa2be8c))
+* **deps:** update dependency emotion-theming to v10.0.18 ([80e7c35](https://github.com/neo-one-suite/neo-one/commit/80e7c35f95e4d0e94cdafbfeb32b3cd6e2b0ea05))
+* **deps:** update dependency emotion-theming to v10.0.19 ([12144fa](https://github.com/neo-one-suite/neo-one/commit/12144fa1e508887a36958d6806ce8fbabb0d9813))
+* **deps:** update dependency immer to v4 ([0509baa](https://github.com/neo-one-suite/neo-one/commit/0509baa6a0c7b51df1f7e44abf461062e768e64b))
+* **deps:** update dependency markdown-it to v10 ([84641de](https://github.com/neo-one-suite/neo-one/commit/84641de1e1c257908e66487af625f0802b4a1677))
+* **deps:** update dependency rxjs to v6.5.3 ([a912759](https://github.com/neo-one-suite/neo-one/commit/a912759e36c9d3c03e0be018d4bce4223108d584))
+* **deps:** update emotion monorepo to v10.0.17 ([9ff33de](https://github.com/neo-one-suite/neo-one/commit/9ff33de478f61e0e9c3ae5270784b02c1173b31f))
+* **deps:** update react monorepo to v16.10.0 ([567d3e5](https://github.com/neo-one-suite/neo-one/commit/567d3e58582c2337ac19f65251e8b55f35a51c22))
+
+
+
+
+
 ## [1.5.7](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@1.5.6...@neo-one/website@1.5.7) (2019-09-04)
 
 **Note:** Version bump only for package @neo-one/website

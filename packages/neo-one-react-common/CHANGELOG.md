@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/react-common@1.1.8...@neo-one/react-common@1.2.0) (2019-10-23)
+
+
+### Bug Fixes
+
+* **deps:** update dependency react-draggable to v4 ([c502a45](https://github.com/neo-one-suite/neo-one/commit/c502a45f04a542ac1ccf191c3bb3e1899a336eda))
+* **emotion types:** remove any typecast for TooltipBase and type properly ([fff10e2](https://github.com/neo-one-suite/neo-one/commit/fff10e29641db94fc7b6a467c785703301aefd70))
+
+
+### Features
+
+* **ts:** upgrade to TS v3.6.3 ([82595a9](https://github.com/neo-one-suite/neo-one/commit/82595a91c063a4fa08ef06f631cd1dab4cb965f3))
+
+
+
+
+
 ## [1.1.8](https://github.com/neo-one-suite/neo-one/compare/@neo-one/react-common@1.1.7...@neo-one/react-common@1.1.8) (2019-09-04)
 
 **Note:** Version bump only for package @neo-one/react-common

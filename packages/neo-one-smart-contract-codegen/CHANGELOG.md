@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-codegen@1.1.13...@neo-one/smart-contract-codegen@1.2.0) (2019-10-23)
+
+
+### Features
+
+* **dapi codegen:** add DapiUserAccountProvider to client in codegen ([dc55a1d](https://github.com/neo-one-suite/neo-one/commit/dc55a1d1d60ecbf5682141e6dc275340f77d7ec3)), closes [#1687](https://github.com/neo-one-suite/neo-one/issues/1687)
+* **dapi codegen:** setup DapiUserAccountProvider by default during codegen ([6b438db](https://github.com/neo-one-suite/neo-one/commit/6b438dba827b47272d5fc11f390f6912eb0303bc))
+
+
+
+
+
 ## [1.1.13](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-codegen@1.1.12...@neo-one/smart-contract-codegen@1.1.13) (2019-09-04)
 
 
