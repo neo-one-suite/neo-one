@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/logger-config",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "NEO•ONE logging utility config",
   "main": "./src/index",
   "sideEffects": false

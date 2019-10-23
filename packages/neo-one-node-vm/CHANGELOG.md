@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-vm@1.4.2...@neo-one/node-vm@1.4.3) (2019-10-23)
+
+**Note:** Version bump only for package @neo-one/node-vm
+
+
+
+
+
 ## [1.4.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-vm@1.4.1...@neo-one/node-vm@1.4.2) (2019-09-04)
 
 **Note:** Version bump only for package @neo-one/node-vm

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.6](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-core@1.4.5...@neo-one/client-core@1.4.6) (2019-10-23)
+
+**Note:** Version bump only for package @neo-one/client-core
+
+
+
+
+
 ## [1.4.5](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client-core@1.4.4...@neo-one/client-core@1.4.5) (2019-10-23)
 
 **Note:** Version bump only for package @neo-one/client-core
