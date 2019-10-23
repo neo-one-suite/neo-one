@@ -1062,11 +1062,10 @@ gulp.task('prepareRelease', async () => {
       'lerna',
       'version',
       '--conventional-commits',
-      '--npm-tag=latest',
       '--yes',
       '--message',
       'chore(release): publish',
-      '--github-release',
+      '--create-release=github',
     ],
     {
       stdio,
