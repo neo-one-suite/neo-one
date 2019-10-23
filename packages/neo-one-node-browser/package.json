@@ -14,7 +14,7 @@
     "@neo-one/node-storage-levelup": "^1.2.4",
     "@neo-one/node-vm": "^1.4.2",
     "@neo-one/utils": "^1.2.1",
-    "level-js": "^4.0.1",
+    "level-js": "^5.0.0",
     "levelup": "^4.1.0",
     "memdown": "^5.0.0",
     "tslib": "^1.10.0"

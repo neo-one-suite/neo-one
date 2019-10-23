@@ -12,7 +12,7 @@ setConfig({ pureSFC: true });
 if (typeof window !== 'undefined') {
   // @ts-ignore
   process.stdout = {
-    isTTY: undefined,
+    isTTY: false,
   };
 
   TrackJS.install({

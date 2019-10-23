@@ -1,5 +1,5 @@
 // tslint:disable
-import * as Anser from 'anser';
+import Anser from 'anser';
 
 export type ErrorLocation = {
   fileName: string;

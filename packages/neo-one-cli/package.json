@@ -23,7 +23,7 @@
     "bignumber.js": "^9.0.0",
     "bn.js": "^5.0.0",
     "cross-fetch": "^3.0.4",
-    "execa": "^2.0.4",
+    "execa": "^3.2.0",
     "fs-extra": "^8.1.0",
     "import-local": "^3.0.2",
     "listr": "^0.14.3",
