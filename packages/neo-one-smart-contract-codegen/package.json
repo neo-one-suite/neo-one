@@ -1,13 +1,13 @@
 {
   "name": "@neo-one/smart-contract-codegen",
-  "version": "1.2.1",
+  "version": "2.3.0",
   "description": "NEO•ONE TypeScript smart contract codegen.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/cli-common": "^1.1.13",
-    "@neo-one/client-common": "^1.4.3",
-    "@neo-one/client-core": "^1.4.6",
-    "@neo-one/utils": "^1.2.2",
+    "@neo-one/cli-common": "^2.3.0",
+    "@neo-one/client-common": "^2.3.0",
+    "@neo-one/client-core": "^2.3.0",
+    "@neo-one/utils": "^2.3.0",
     "lodash": "^4.17.15",
     "prettier": "^1.18.2",
     "safe-stable-stringify": "^1.1.0",

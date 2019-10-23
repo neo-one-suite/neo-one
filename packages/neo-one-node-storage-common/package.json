@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/node-storage-common",
-  "version": "1.2.5",
+  "version": "2.3.0",
   "description": "NEO•ONE node storage common.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/client-common": "^1.4.3",
-    "@neo-one/node-core": "^1.2.3",
-    "@neo-one/utils": "^1.2.2",
+    "@neo-one/client-common": "^2.3.0",
+    "@neo-one/node-core": "^2.3.0",
+    "@neo-one/utils": "^2.3.0",
     "tslib": "^1.10.0"
   },
   "sideEffects": false

@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/utils",
-  "version": "1.2.2",
+  "version": "2.3.0",
   "description": "NEO•ONE shared utils.",
   "main": "./src/index",
   "dependencies": {

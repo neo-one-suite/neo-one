@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/utils-node@1.2.3...@neo-one/utils-node@2.3.0) (2019-10-23)
+
+**Note:** Version bump only for package @neo-one/utils-node
+
+
+
+
+
 ## [1.2.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/utils-node@1.2.2...@neo-one/utils-node@1.2.3) (2019-10-23)
 
 **Note:** Version bump only for package @neo-one/utils-node

@@ -1,14 +1,14 @@
 {
   "name": "@neo-one/node-rpc-handler",
-  "version": "1.3.4",
+  "version": "2.3.0",
   "description": "NEO•ONE RPC handler.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/client-common": "^1.4.3",
-    "@neo-one/client-switch": "^1.4.4",
-    "@neo-one/logger": "^1.2.2",
-    "@neo-one/node-core": "^1.2.3",
-    "@neo-one/utils": "^1.2.2",
+    "@neo-one/client-common": "^2.3.0",
+    "@neo-one/client-switch": "^2.3.0",
+    "@neo-one/logger": "^2.3.0",
+    "@neo-one/node-core": "^2.3.0",
+    "@neo-one/utils": "^2.3.0",
     "rxjs": "^6.5.2",
     "tslib": "^1.10.0"
   },

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-consensus@1.3.3...@neo-one/node-consensus@2.3.0) (2019-10-23)
+
+**Note:** Version bump only for package @neo-one/node-consensus
+
+
+
+
+
 ## [1.3.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-consensus@1.3.2...@neo-one/node-consensus@1.3.3) (2019-10-23)
 
 **Note:** Version bump only for package @neo-one/node-consensus

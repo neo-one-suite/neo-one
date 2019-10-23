@@ -1,11 +1,11 @@
 {
   "name": "@neo-one/node-browser-worker",
-  "version": "1.1.12",
+  "version": "2.3.0",
   "description": "NEO•ONE node browser workers.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/node-browser": "^1.2.6",
-    "@neo-one/worker": "^1.1.4",
+    "@neo-one/node-browser": "^2.3.0",
+    "@neo-one/worker": "^2.3.0",
     "core-js": "^3.1.4",
     "regenerator-runtime": "^0.13.3"
   },

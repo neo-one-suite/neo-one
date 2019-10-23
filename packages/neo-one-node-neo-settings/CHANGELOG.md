@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-neo-settings@1.1.9...@neo-one/node-neo-settings@2.3.0) (2019-10-23)
+
+**Note:** Version bump only for package @neo-one/node-neo-settings
+
+
+
+
+
 ## [1.1.9](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-neo-settings@1.1.8...@neo-one/node-neo-settings@1.1.9) (2019-10-23)
 
 **Note:** Version bump only for package @neo-one/node-neo-settings

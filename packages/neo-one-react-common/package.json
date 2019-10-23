@@ -1,12 +1,12 @@
 {
   "name": "@neo-one/react-common",
-  "version": "1.2.1",
+  "version": "2.3.0",
   "description": "NEO•ONE shared react.",
   "main": "./src/index",
   "dependencies": {
     "@emotion/core": "^10.0.16",
     "@emotion/styled": "^10.0.15",
-    "@neo-one/react-core": "^1.1.8",
+    "@neo-one/react-core": "^2.3.0",
     "popper.js": "^1.15.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",

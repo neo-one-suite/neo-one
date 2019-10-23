@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/logger",
-  "version": "1.2.2",
+  "version": "2.3.0",
   "description": "NEO•ONE logging utility",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/logger-config": "^1.0.2",
+    "@neo-one/logger-config": "^2.3.0",
     "pino": "^5.12.6",
     "pino-pretty": "^3.2.1"
   },

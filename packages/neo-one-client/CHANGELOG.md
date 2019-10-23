@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client@1.3.1...@neo-one/client@2.3.0) (2019-10-23)
+
+**Note:** Version bump only for package @neo-one/client
+
+
+
+
+
 ## [1.3.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/client@1.3.0...@neo-one/client@1.3.1) (2019-10-23)
 
 **Note:** Version bump only for package @neo-one/client

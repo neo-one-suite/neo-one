@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-browser-worker@1.1.12...@neo-one/node-browser-worker@2.3.0) (2019-10-23)
+
+**Note:** Version bump only for package @neo-one/node-browser-worker
+
+
+
+
+
 ## [1.1.12](https://github.com/neo-one-suite/neo-one/compare/@neo-one/node-browser-worker@1.1.11...@neo-one/node-browser-worker@1.1.12) (2019-10-23)
 
 **Note:** Version bump only for package @neo-one/node-browser-worker
