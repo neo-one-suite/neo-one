@@ -75,7 +75,7 @@ spec:
           name: node
         volumeMounts:
         - name: node-data
-          mountPath: /root/.local/share/neo_one_node
+          mountPath: /root/.local/share/neo-one
         args: [
           "--node.rpcURLs=http://seed6.ngd.network:10332",
           "--node.rpcURLs=https://seed1.red4sec.com:10332"
@@ -179,9 +179,9 @@ spec:
               name: node
           volumeMounts:
             - name: node-data
-              mountPath: /root/.local/share/neo_one_node
+              mountPath: /root/.local/share/neo-one
             - name: config-volume
-              mountPath: /etc/neo_one_node/config
+              mountPath: /etc/neo-one/config
               subPath: config
           resources:
             requests:
@@ -323,9 +323,9 @@ spec:
               name: node
           volumeMounts:
             - name: node-data
-              mountPath: /root/.local/share/neo_one_node
+              mountPath: /root/.local/share/neo-one
             - name: config-volume
-              mountPath: /etc/neo_one_node/config
+              mountPath: /etc/neo-one/config
               subPath: config
           resources:
             requests:

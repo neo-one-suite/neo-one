@@ -24,7 +24,7 @@ Upon successfully building the node-container and launching your app, you should
 You can quickly apply environment variable configuration options to the node using the **Config Vars** in App >> Settings >> Config Vars. As an example we can set the log-level using a `config var` with key:value
 
 ```bash
-neo_one_node_telemetry__logging__level verbose
+neo-one_telemetry__logging__level verbose
 ```
 
 After applying the node will restart and update its configuration.
@@ -33,7 +33,7 @@ After applying the node will restart and update its configuration.
 
 Note
 
-Because of the environment-variable syntax `rc` expects, you must use the `neo_one_node_<parent>__<child>` syntax when applying a value.
+Because of the environment-variable syntax `rc` expects, you must use the `neo-one_<parent>__<child>` syntax when applying a value.
 
 :::
 

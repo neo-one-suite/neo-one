@@ -34,7 +34,7 @@ services:
       restart_policy:
         condition: on-failure
     volumes:
-      - node-data:/root/.local/share/neo_one_node
+      - node-data:/root/.local/share/neo-one
 volumes:
   node-data:
 ```
