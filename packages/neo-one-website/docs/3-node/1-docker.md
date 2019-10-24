@@ -44,7 +44,7 @@ docker run neoonesuite/node --telemetry.logging.level=trace
 or through environment variables
 
 ```bash
-docker run -e neo_one_node_telemetry__logging__level=trace neoonesuite/node
+docker run -e neo-one_telemetry__logging__level=trace neoonesuite/node
 ```
 
 Additionally you have the option of creating a `config` (no extension) file and mounting it directly to the container. By default the node will look for a config at `/etc/neo-one`.
