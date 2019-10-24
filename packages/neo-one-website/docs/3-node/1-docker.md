@@ -22,7 +22,7 @@ If you are unfamiliar with Docker or do not have a version installed locally vis
 
 ## Getting Started
 
-NEO•ONE pushes a new node image to [dockerhub](https://hub.docker.com/r/neoonesuite/node) every time a new version is published.
+NEO•ONE pushes a new node image to [dockerhub](https://hub.docker.com/r/neoonesuite/node) every time a new version is published. We publish a new node image with each commit as well as tagged versions for official releases. We recommend using the most recent tagged version, such as `neoonesuite/node:neo-one-node-binv2.3.0`.
 
 After you have installed Docker, run the following in a terminal:
 
@@ -31,7 +31,7 @@ docker pull neoonesuite/node
 docker run neoonesuite/node
 ```
 
-Voila! You should now be running the most recent NEO•ONE Node in a local docker container and will see logs to confirm it has started. Since the NEO•ONE Node uses [pino](https://www.npmjs.com/package/pino) for logging we recommend piping the logs through [pino-pretty](https://github.com/pinojs/pino-pretty) during development.
+Voila! You should now be running the most recent NEO•ONE Node in a local docker container and will see logs to confirm it has started. Since the NEO•ONE Node uses [pino](https://www.npmjs.com/package/pino) for logging we recommend piping the logs through [pino-pretty](https://github.com/pinojs/pino-pretty) during development. Note that the node won't begin syncing with the blockchain until additional configuration is provided.
 
 ## Configuring
 
@@ -47,7 +47,7 @@ or through environment variables
 docker run -e neo_one_node_telemetry__logging__level=trace neoonesuite/node
 ```
 
-Additionally you have the option of creating a `config` (no extension) file and mounting it directly to the container. By default the node will look for a config at `/etc/neo_one_node`.
+Additionally you have the option of creating a `config` (no extension) file and mounting it directly to the container. By default the node will look for a config at `/etc/neo-one`.
 
 So if we have a config
 
@@ -65,7 +65,7 @@ So if we have a config
 located at `/path/to/config` we could mount this to the default location as:
 
 ```bash
-docker run -v /path/to:/etc/neo_one_node/ neoonesuite/node
+docker run -v /path/to:/etc/neo-one/ neoonesuite/node
 ```
 
 (Note that you must mount the **entire** folder the config file is in)
@@ -74,10 +74,10 @@ After running any the above you should see more logging on startup! For more con
 
 ## Storage
 
-Similarly to how we can mount a configuration folder to the container for local testing we can also mount a folder for storing the blockchain data our node will collect. By default, the node will use `/root/.local/share/neo_one_node` as its storage. We can mount a local folder `/path/to/node-data/` using
+Similarly to how we can mount a configuration folder to the container for local testing we can also mount a folder for storing the blockchain data our node will collect. By default, the node will use `/root/.local/share/neo-one` as its storage. We can mount a local folder `/path/to/node-data/` using
 
 ```bash
-docker run -v /path/to/node-data:/root/.local/share/neo_one_node neoonesuite/node
+docker run -v /path/to/node-data:/root/.local/share/neo-one neoonesuite/node
 ```
 
 This is helpful when testing locally as you won't have to re-sync your node-data on every restart.
@@ -109,7 +109,7 @@ The following configurations should be a solid jumping off point for working wit
 In all three examples we will use
 
 ```bash
-docker run -v /node-config/:/etc/neo_one_node/ -v /node-data/:/root/.local/share/neo_one_node neoonesuite/node
+docker run -v /node-config/:/etc/neo-one/ -v /node-data/:/root/.local/share/neo-one neoonesuite/node
 ```
 
 to mount our configuration and local data file before starting the node. Go ahead and create the two folders `node-config` and `node-data` if you would like to follow along.

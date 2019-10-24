@@ -25,7 +25,7 @@ _defaults to the data path supplied by [env-paths](https://www.npmjs.com/package
 
 `path` is the path used for storing blockchain data.
 
-In the [local docker](/docs/node-docker#Examples) example we could store blockchain data in a location other than `/root/.local/share/neo_one_node`, it should be noted you will need to change the mount location as well.
+In the [local docker](/docs/node-docker#Examples) example we could store blockchain data in a location other than `/root/.local/share/neo-one`, it should be noted you will need to change the mount location as well.
 
 ## Telemetry
 
@@ -65,7 +65,7 @@ In the [local docker](/docs/node-docker#Examples) example we could store blockch
 Desired logging level and output path of the node logging, options are for level are:
 
 ```
-'silent' | 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace'
+"silent" | "fatal" | "error" | "warn" | "info" | "debug" | "trace"
 ```
 
 ### Prometheus
@@ -92,7 +92,7 @@ Enables trace collection for the NEO•ONE Node. This must be used in tangent wi
 ...
 #basic configuration
 {
-  "blockchain": 'main' | 'test'
+  "blockchain": "main" | "test"
 }
 ...
 ```
