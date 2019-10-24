@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "@emotion/core": "10.0.21",
-    "@emotion/styled": "10.0.17",
+    "@emotion/core": "10.0.22",
+    "@emotion/styled": "10.0.22",
     "@neo-one/react": "1.1.2",
     "@neo-one/react-core": "1.1.6",
     "@types/react": "16.9.9",
