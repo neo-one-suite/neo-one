@@ -339,11 +339,6 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@neo-one/temp-tests",
-      "projectFolder": "packages/neo-one-temp-tests",
-      "reviewCategory": "tools"
-    },
-    {
       "packageName": "@neo-one/ts-utils",
       "projectFolder": "packages/neo-one-ts-utils",
       "reviewCategory": "production",

@@ -1,7 +1,7 @@
 import { common, crypto } from '@neo-one/client-common';
 import { SmartContractAny } from '@neo-one/client-core';
-import { withContracts } from '@neo-one/smart-contract-test';
 import * as path from 'path';
+import { withContracts } from '../../withContracts';
 
 const RECIPIENT = {
   PRIVATE_KEY: '9c111f04a34b3a07600fe701d308dce6e20c86268c105f21c2f30e9fef7e7968',
