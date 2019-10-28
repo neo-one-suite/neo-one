@@ -5,7 +5,8 @@
   "main": "./lib/index.d.ts",
   "scripts": {
     "build": "gulp",
-    "lint": ""
+    "lint": "",
+    "pack": "gulp pack"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",

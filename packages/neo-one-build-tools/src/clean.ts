@@ -1,6 +1,6 @@
 // tslint:disable no-console
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import fs from 'fs-extra';
+import path from 'path';
 import yargs from 'yargs';
 
 const argv = yargs

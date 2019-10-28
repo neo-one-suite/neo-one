@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "rootDir": ".",
-    "outDir": "lib",
     "target": "esnext",
     "module": "commonjs",
     "moduleResolution": "node",

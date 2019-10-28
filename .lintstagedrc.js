@@ -6,7 +6,7 @@ module.exports = {
       return acc.concat([
         `node ./node_modules/.bin/prettier --write ${filename}`,
         `git add ${path.resolve(process.cwd(), filename)}`,
-        `node ./node_modules/@neo-one/build-tools/neo-one-lint.js --staged --pattern \"${filename}\"`,
+        `node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js --staged --pattern \"${filename}\"`,
       ]);
     }, []),
 };

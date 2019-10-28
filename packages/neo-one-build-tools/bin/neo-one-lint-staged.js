@@ -4,7 +4,7 @@ const lintStaged = require('lint-staged');
 
 require('ts-node').register({
   transpileOnly: true,
-  project: path.resolve(__dirname, 'tsconfig.json'),
+  project: path.resolve(__dirname, '..', 'tsconfig.json'),
 });
 
 lintStaged({

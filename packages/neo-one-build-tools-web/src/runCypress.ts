@@ -4,13 +4,13 @@ import * as path from 'path';
 import { timer } from 'rxjs';
 import yargs from 'yargs';
 
-const argv = yargs
+const { argv } = yargs
   .boolean('local')
   .describe('local', 'Run test locally')
   .default('local', false)
   .boolean('express')
   .describe('express', 'Run quick test on a single course')
-  .default('express', false).argv;
+  .default('express', false);
 
 const runCypress = async () => {
   // tslint:disable-next-line no-unused

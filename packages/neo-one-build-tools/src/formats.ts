@@ -11,29 +11,29 @@ export interface Format {
   readonly module: 'cjs' | 'esm';
 }
 
-export const MAIN_FORMAT: Format = {
+const MAIN_FORMAT: Format = {
   target: 'es2017',
   module: 'cjs',
   browser: false,
-  dist: 'lib',
+  dist: 'main',
   name: '',
   packageDir: process.cwd(),
   tsconfig: path.resolve(__dirname, '../includes/build-configs/tsconfig.es2017.cjs.json'),
   tsconfigESM: path.resolve(__dirname, '../includes/build-configs/tsconfig.es2017.esm.json'),
 };
 
-export const NEXT_FORMAT: Format = {
+const NEXT_FORMAT: Format = {
   target: 'esnext',
   module: 'esm',
   browser: false,
   dist: 'next',
   name: 'esnext-esm',
   packageDir: process.cwd(),
-  tsconfig: path.resolve(__dirname, '../includes/build-configs/tsconfig.esnext.esm.js'),
-  tsconfigESM: path.resolve(__dirname, '../includes/build-configs/tsconfig.esnext.esm.js'),
+  tsconfig: path.resolve(__dirname, '../includes/build-configs/tsconfig.esnext.esm.json'),
+  tsconfigESM: path.resolve(__dirname, '../includes/build-configs/tsconfig.esnext.esm.json'),
 };
 
-export const BROWSER_FORMAT: Format = {
+const BROWSERIFY_FORMAT: Format = {
   target: 'es2017',
   module: 'cjs',
   browser: true,
@@ -42,4 +42,17 @@ export const BROWSER_FORMAT: Format = {
   packageDir: process.cwd(),
   tsconfig: path.resolve(__dirname, '../includes/build-configs/tsconfig.es2017.browserify.cjs.json'),
   tsconfigESM: path.resolve(__dirname, '../includes/build-configs/tsconfig.es2017.esm.json'),
+};
+
+export const getFormat = (requestedFormat: string) => {
+  switch (requestedFormat) {
+    case 'main':
+      return MAIN_FORMAT;
+    case 'next':
+      return NEXT_FORMAT;
+    case 'browserify':
+      return BROWSERIFY_FORMAT;
+    default:
+      throw new Error(`invalid requested format: ${requestedFormat}`);
+  }
 };

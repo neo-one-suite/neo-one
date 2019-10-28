@@ -5,7 +5,7 @@
   "main": "./src/index",
   "scripts": {
     "build": "",
-    "lint": "node ./node_modules/@neo-one/build-tools/neo-one-lint.js",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
     "lint:staged": "lint-staged --relative"
   },
   "dependencies": {

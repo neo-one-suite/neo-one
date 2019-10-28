@@ -32,6 +32,6 @@ export const rollupDevTools = (format: Format) => async () => {
 
   await bundle.write({
     format: format.module,
-    file: path.join(format.dist, 'index.js'),
+    file: path.join('lib', 'index.js'),
   });
 };

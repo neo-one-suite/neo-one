@@ -163,6 +163,24 @@
       "ignoreDependencyOrder": true,
       "enableParallelism": true,
       "ignoreMissingScript": true
+    },
+    {
+      "commandKind": "bulk",
+      "name": "pack",
+      "summary": "pack built files into 'dist'",
+      "description": "transform sources and other files for npm exporting",
+      "safeForSimultaneousRushProcesses": false,
+      "ignoreDependencyOrder": true,
+      "enableParallelism": true,
+      "ignoreMissingScript": true
+    },
+    {
+      "commandKind": "global",
+      "name": "release",
+      "summary": "release packed packages with given format",
+      "description": "try to publish packages in `dist`",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "node packages/neo-one-build-tools/bin/neo-one-publish.js"
     }
   ],
   "parameters": [
@@ -208,6 +226,27 @@
       "argumentName": "PATTERN",
       "description": "jest pattern matching parameter",
       "associatedCommands": ["test", "test-ci", "e2e", "e2e-ci", "e2e-ci:coverage"]
+    },
+    {
+      "parameterKind": "choice",
+      "longName": "--format",
+      "shortName": "-b",
+      "description": "specify an output build format (main, esm, browserify)",
+      "associatedCommands": ["build", "rebuild", "pack", "release"],
+      "alternatives": [
+        {
+          "name": "main",
+          "description": "the main output format (cjs)"
+        },
+        {
+          "name": "next",
+          "description": "esnext module format (esm)"
+        },
+        {
+          "name": "browserify",
+          "description": "special browserify format"
+        }
+      ]
     },
     {
       "parameterKind": "choice",

@@ -5,8 +5,9 @@
   "main": "./lib/index",
   "scripts": {
     "build": "gulp",
-    "lint": "node ./node_modules/@neo-one/build-tools/neo-one-lint.js",
-    "lint:staged": "lint-staged --relative"
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "pack": "gulp pack"
   },
   "dependencies": {
     "@neo-one/smart-contract-compiler": "^1.3.4",

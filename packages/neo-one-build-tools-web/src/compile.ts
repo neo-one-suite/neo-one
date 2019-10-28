@@ -6,13 +6,13 @@ import yargs from 'yargs';
 import { createKillProcess } from './createKillProcess';
 import { overlay, preview, server, SERVER_DIST_DIR, testRunner, tools, workers } from './webpack';
 
-const argv = yargs
+const { argv } = yargs
   .boolean('watch')
   .describe('watch', 'Run in watch mode.')
   .default('watch', false)
   .string('bundle')
   .describe('bundle', 'Bundle to compile.')
-  .default('bundle', 'react-static').argv;
+  .default('bundle', 'react-static');
 
 const devStage = process.env.NEO_ONE_PROD === 'true' ? 'prod' : 'dev';
 

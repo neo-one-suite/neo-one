@@ -719,6 +719,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "json",
+      "allowedCategories": [ "tools" ]
+    },
+    {
       "name": "koa",
       "allowedCategories": [ "production", "web" ]
     },

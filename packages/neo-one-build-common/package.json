@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "cross-env": "^6.0.0",
+    "json": "^9.0.6",
     "lint-staged": "^9.4.1",
     "rxjs-tslint-rules": "^4.24.3",
     "tslint": "^5.20.0",

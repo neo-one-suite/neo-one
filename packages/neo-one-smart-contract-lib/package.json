@@ -6,7 +6,8 @@
   "smartContract": true,
   "scripts": {
     "build": "gulp",
-    "lint": ""
+    "lint": "",
+    "pack": "gulp pack"
   },
   "dependencies": {
     "@neo-one/smart-contract": "^1.1.1"

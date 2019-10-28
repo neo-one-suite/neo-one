@@ -6,8 +6,9 @@
   "license": "MIT",
   "scripts": {
     "build": "gulp",
-    "lint": "node ./node_modules/@neo-one/build-tools/neo-one-lint.js",
-    "lint:staged": "node ./node_modules/@neo-one/build-tools/neo-one-lint-staged.js"
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "pack": "gulp pack"
   },
   "dependencies": {
     "@types/node": "^12.7.7",

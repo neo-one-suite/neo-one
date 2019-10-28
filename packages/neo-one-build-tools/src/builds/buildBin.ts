@@ -9,19 +9,11 @@ import gulpRename from 'gulp-rename';
 import ts from 'gulp-typescript';
 import path from 'path';
 import typescript from 'typescript';
-import { Format, MAIN_FORMAT } from '../formats';
-import {
-  DIST,
-  flattenBin,
-  getInternalDependencies,
-  getPackageJSON,
-  gulpReplaceBin,
-  gulpReplaceModule,
-  replaceCmd,
-} from '../utils';
+import { Format } from '../formats';
+import { flattenBin, gulpReplaceBin, gulpReplaceModule, replaceCmd } from '../utils';
 
-const gulpBin = (binPath: string, internalDeps: readonly string[]) =>
-  gulpReplaceModule(MAIN_FORMAT, internalDeps, gulp.src(binPath)).pipe(
+const gulpBin = (format: Format, binPath: string) =>
+  gulpReplaceModule(format, gulp.src(binPath)).pipe(
     gulpRename((parsedPath) => {
       if (parsedPath.dirname === undefined) {
         throw new Error('error creating bin');
@@ -31,35 +23,37 @@ const gulpBin = (binPath: string, internalDeps: readonly string[]) =>
     }),
   );
 
-const binProject = ts.createProject(MAIN_FORMAT.tsconfig, {
-  typescript,
-  declaration: false,
-});
-
 const binBanner = `#!/usr/bin/env node
 require('source-map-support').install({ handleUncaughtExceptions: false, environment: 'node' });
 `;
 
-const compileBin = (binGlob: string, deps: readonly string[], binLib: string) =>
-  gulpBin(binGlob, deps)
-    .pipe(gulpPlumber())
-    // .pipe(gulpSourcemaps.init())
-    .pipe(binProject())
-    .pipe(gulpBanner(binBanner))
-    // .pipe(gulpSourcemaps.mapSources(mapSources))
-    // .pipe(gulpSourcemaps.write())
-    .pipe(replaceCmd)
-    .pipe(flattenBin)
-    .pipe(gulpReplaceBin(binLib))
-    .pipe(gulp.dest(path.join(DIST)));
+const compileBin = (format: Format, binGlob: string) => {
+  const binProject = ts.createProject(format.tsconfig, {
+    typescript,
+    declaration: false,
+  });
 
-export const buildBin = (format: Format) => async () => {
+  return (
+    gulpBin(format, binGlob)
+      // .pipe(gulpSourcemaps.init())
+      .pipe(gulpPlumber())
+      .pipe(binProject())
+      .pipe(gulpBanner(binBanner))
+      // .pipe(gulpSourcemaps.mapSources(mapSources))
+      // .pipe(gulpSourcemaps.write())
+      .pipe(replaceCmd)
+      .pipe(flattenBin)
+      .pipe(gulpReplaceBin())
+      .pipe(gulp.dest('lib'))
+  );
+};
+
+export const buildBin = (format: Format) => () => {
+  /* build bin for main format only */
   if (format.name !== '') {
     return;
   }
 
-  const pkgJSON = await getPackageJSON();
-  const internalDependencies = getInternalDependencies(pkgJSON);
   const binPath = path.join(process.cwd(), 'src', 'bin');
   if (!fs.existsSync(binPath)) {
     return;
@@ -67,5 +61,5 @@ export const buildBin = (format: Format) => async () => {
 
   const binGlob = `${binPath}/*.ts`;
 
-  compileBin(binGlob, internalDependencies, pkgJSON.name);
+  return compileBin(format, binGlob);
 };

@@ -9,8 +9,6 @@ import { Format } from '../formats';
 import {
   filterJS,
   flattenSource,
-  getInternalDependencies,
-  getPackageJSON,
   gulpReplaceModule,
   replaceBNImport,
   replaceBNTypeImport,
@@ -25,13 +23,11 @@ export interface CompileTypescriptOptions {
 }
 
 // tslint:disable-next-line: readonly-array
-export const buildTypescript = (format: Format) => async (
+export const buildTypescript = (format: Format, pkgName?: string) => (
   glob: string[],
   options: CompileTypescriptOptions = { stripInternal: false },
 ) => {
-  const pkgJSON = await getPackageJSON();
-  const internalDependencies = getInternalDependencies(pkgJSON);
-  const isToolsPackage = pkgJSON.name === '@neo-one/developer-tools';
+  const isToolsPackage = pkgName === '@neo-one/developer-tools';
 
   const project = ts.createProject(format.tsconfig, {
     typescript,
@@ -41,7 +37,6 @@ export const buildTypescript = (format: Format) => async (
 
   return gulpReplaceModule(
     format,
-    internalDependencies,
     gulp
       .src(glob)
       .pipe(gulpPlumber())
@@ -53,6 +48,5 @@ export const buildTypescript = (format: Format) => async (
       .pipe(replaceStatic)
       .pipe(flattenSource)
       .pipe(filterJS(isToolsPackage)),
-    format.module === 'esm' ? "'" : '"',
-  ).pipe(gulp.dest(format.dist));
+  ).pipe(gulp.dest('lib'));
 };

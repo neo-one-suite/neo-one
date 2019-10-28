@@ -5,7 +5,9 @@
   "main": "./lib/index",
   "license": "MIT",
   "bin": {
-    "neo-one-lint": "/bin/neo-one-lint.js"
+    "neo-one-lint": "bin/neo-one-lint.js",
+    "neo-one-lint-staged": "bin/neo-one-lint-staged.js",
+    "neo-one-publish": "bin/neo-one-publish.js"
   },
   "scripts": {
     "build": "gulp",

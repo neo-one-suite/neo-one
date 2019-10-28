@@ -1,8 +1,19 @@
 // tslint:disable
 import fs from 'fs-extra';
 import gulp from 'gulp';
-import { MAIN_FORMAT, Format } from './formats';
+import { Format, getFormat } from './formats';
 import { buildBin, buildTypescript, rollupDevTools, CompileTypescriptOptions } from './builds';
+import yargs from 'yargs';
+import { getPackageInfo } from './utils';
+import { pack, copyData, packBin } from './pack';
+
+const defaultBuildFormat = process.env.NEO_ONE_BUILD_FORMAT !== undefined ? process.env.NEO_ONE_BUILD_FORMAT : 'main';
+
+const { argv } = yargs
+  .string('format')
+  .describe('format', 'specify an output library format')
+  .choices('format', ['main', 'next', 'browserify'])
+  .default('format', defaultBuildFormat);
 
 const ignoreGlobs = [
   '!src/__tests__/**/*',
@@ -17,22 +28,33 @@ class BuildTask<Options = undefined> {
   public enabled: boolean;
   public glob: string[];
   public options: Options | undefined;
-  public buildFormatFunction: (format: Format) => (glob: string[], options?: Options) => Promise<void> | void;
+  public buildFormatFunction: (
+    format: Format,
+    pkgName: string,
+    dependencies: string[],
+  ) => (glob: string[], options?: Options) => Promise<void> | void;
+  private packageInfo: Promise<{ readonly name: string; readonly dependencies: string[] }>;
 
   constructor(
-    fn: (format: Format) => (glob: string[], options?: Options) => Promise<void> | void,
+    fn: (
+      format: Format,
+      pkgName: string,
+      dependencies: string[],
+    ) => (glob: string[], options?: Options) => Promise<void> | void,
     initGlob?: string[],
   ) {
+    this.packageInfo = getPackageInfo();
     this.enabled = true;
     this.glob = initGlob ? initGlob : [];
     this.buildFormatFunction = fn;
   }
 
   public async execute(format: Format) {
+    const { name, dependencies } = await this.packageInfo;
     if (this.enabled) {
-      const buildFunction = this.buildFormatFunction(format);
+      const buildFunction = this.buildFormatFunction(format, name, dependencies);
       const executed = Promise.resolve(buildFunction(this.glob, this.options));
-      await executed;
+      return executed;
     }
   }
 
@@ -45,8 +67,8 @@ interface CopyStaticOptions {
   readonly dest: string;
 }
 export const copyStaticTask = new BuildTask<CopyStaticOptions>(
-  (format) => (glob, options) => {
-    gulp.src(glob, { nodir: true }).pipe(gulp.dest(options !== undefined ? options.dest : format.dist));
+  () => (glob, options) => {
+    gulp.src(glob, { nodir: true }).pipe(gulp.dest(options !== undefined ? options.dest : 'lib'));
   },
   ['src/**/*'].concat(ignoreGlobs),
 );
@@ -57,44 +79,55 @@ export const compileTypescriptTask = new BuildTask<CompileTypescriptOptions>(
   ['src/**/*.ts', 'src/**/*.tsx'].concat(ignoreGlobs),
 );
 
-export const cleanTask = async (format: Format) => Promise.all([fs.remove(format.dist) /*fs.remove(BIN)*/]);
+export const cleanTask = async () => Promise.all([fs.remove('lib')]);
+
 export const rollupToolsTask = new BuildTask(rollupDevTools, []);
+rollupToolsTask.enabled = false;
+
 export const compileBinTask = new BuildTask(buildBin);
 
-type BuildType = 'main' | 'tools';
-export const initialize = (format: Format | BuildType = 'main') => {
-  if (typeof format === 'string') {
-    switch (format) {
-      case 'main':
-        gulp.task('default', async (done) => {
-          await cleanTask(MAIN_FORMAT);
-          await fs.ensureDir(MAIN_FORMAT.dist);
-          await copyStaticTask.execute(MAIN_FORMAT);
-          await compileTypescriptTask.execute(MAIN_FORMAT);
-          await compileBinTask.execute(MAIN_FORMAT);
-          done();
-        });
-        break;
-      case 'tools':
-        gulp.task('default', async (done) => {
-          await cleanTask(MAIN_FORMAT);
-          await fs.ensureDir(MAIN_FORMAT.dist);
-          await compileTypescriptTask.execute(MAIN_FORMAT);
-          await rollupToolsTask.execute(MAIN_FORMAT);
-          done();
-        });
-        break;
-      default:
-        break;
-    }
-  } else {
-    gulp.task('default', async (done) => {
-      await cleanTask(format);
-      await fs.ensureDir(format.dist);
-      await copyStaticTask.execute(format);
-      await compileTypescriptTask.execute(format);
-      await compileBinTask.execute(format);
-      done();
-    });
-  }
+export const copyDataTask = new BuildTask<undefined>(copyData);
+
+export const packTask = new BuildTask<undefined>(pack, ['lib/**']);
+
+export const packBinTask = new BuildTask<undefined>(packBin);
+
+export const initialize = () => {
+  const format = getFormat(argv.format);
+
+  gulp.task('clean', async () => {
+    await fs.remove('lib').then(() => fs.ensureDir('lib'));
+  });
+
+  gulp.task('copyStatic', async () => {
+    await copyStaticTask.execute(format);
+  });
+
+  gulp.task('compileTS', async () => {
+    await compileTypescriptTask.execute(format);
+  });
+
+  gulp.task('compileBin', async () => {
+    await compileBinTask.execute(format);
+  });
+
+  gulp.task('rollupTools', async () => {
+    await rollupToolsTask.execute(format);
+  });
+
+  gulp.task('copyData', async () => {
+    await copyDataTask.execute(format);
+  });
+
+  gulp.task('pack', async () => {
+    await packTask.execute(format);
+  });
+
+  gulp.task('packBin', async () => {
+    await packBinTask.execute(format);
+  });
+
+  gulp.task('default', gulp.series('clean', 'copyStatic', 'compileTS', 'compileBin', 'rollupTools'));
+
+  gulp.task('pack', gulp.series('copyData', 'pack', 'packBin'));
 };
