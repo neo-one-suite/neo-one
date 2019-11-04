@@ -182,6 +182,13 @@
     },
     {
       "parameterKind": "flag",
+      "longName": "--update-snapshot",
+      "shortName": "-u",
+      "description": "update snapshot tests",
+      "associatedCommands": ["test", "e2e"]
+    },
+    {
+      "parameterKind": "flag",
       "longName": "--debug",
       "shortName": "-d",
       "description": "enables logging/debug mode for associated command",

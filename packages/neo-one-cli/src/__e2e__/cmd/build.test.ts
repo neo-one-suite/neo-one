@@ -3,13 +3,13 @@ import { buildTests } from '../../__data__';
 
 jest.setTimeout(300 * 1000);
 
-describe.only('build (ts, react)', () => {
+describe('build (ts, react)', () => {
   it('is a one stop command for local development of the ico project using typescript and the react framework.', async () => {
     await buildTests('ico');
   });
 });
 
-describe.only('build (js, react)', () => {
+describe('build (js, react)', () => {
   it('is a one stop command for local development of the ico project using javascript and the react framework.', async () => {
     await buildTests('ico-Js');
   });
