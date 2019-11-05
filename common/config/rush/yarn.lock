@@ -2220,8 +2220,10 @@
   version "0.0.0"
   resolved "file:./projects/smart-contract-test.tgz"
   dependencies:
+    "@types/jest" "^24.0.18"
     "@types/lodash" "^4.14.138"
     "@types/memdown" "^3.0.0"
+    bignumber.js "^9.0.0"
     gulp "~4.0.2"
     lodash "^4.17.15"
     memdown "^5.0.0"
@@ -2243,15 +2245,6 @@
 "@rush-temp/suite@file:./projects/suite.tgz":
   version "0.0.0"
   resolved "file:./projects/suite.tgz"
-
-"@rush-temp/temp-tests@file:./projects/temp-tests.tgz":
-  version "0.0.0"
-  resolved "file:./projects/temp-tests.tgz"
-  dependencies:
-    "@types/jest" "^24.0.18"
-    bignumber.js "^9.0.0"
-    gulp "~4.0.2"
-    tslib "^1.10.0"
 
 "@rush-temp/ts-utils@file:./projects/ts-utils.tgz":
   version "0.0.0"

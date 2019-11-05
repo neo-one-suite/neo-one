@@ -1,8 +1,8 @@
 import { common, crypto, privateKeyToAddress } from '@neo-one/client-common';
 import { Hash256, SmartContractAny } from '@neo-one/client-core';
-import { withContracts } from '@neo-one/smart-contract-test';
 import BigNumber from 'bignumber.js';
 import * as path from 'path';
+import { withContracts } from '../withContracts';
 
 const MINTER = {
   PRIVATE_KEY: '536f1e9f0466f6cd5b2ea5374d00f038786daa0f0e892161d6b0cb4d6b154740',

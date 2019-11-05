@@ -9,8 +9,8 @@ import {
   UserAccountID,
 } from '@neo-one/client-common';
 import { SmartContractAny } from '@neo-one/client-core';
-import { withContracts } from '@neo-one/smart-contract-test';
 import BigNumber from 'bignumber.js';
+import { withContracts } from '../withContracts';
 
 export interface DeployOptions {
   readonly masterPrivateKey: string;

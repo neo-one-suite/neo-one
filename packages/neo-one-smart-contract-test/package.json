@@ -24,8 +24,10 @@
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/smart-contract": "^1.1.1",
     "@neo-one/smart-contract-lib": "^1.5.8",
+    "@types/jest": "^24.0.18",
     "@types/lodash": "^4.14.138",
     "@types/memdown": "^3.0.0",
+    "bignumber.js": "^9.0.0",
     "gulp": "~4.0.2"
   },
   "sideEffects": false
