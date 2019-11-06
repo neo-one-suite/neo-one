@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Migrate to Rush",
+      "type": "minor",
+      "packageName": "@neo-one/node-storage-cache"
+    }
+  ],
+  "packageName": "@neo-one/node-storage-cache",
+  "email": "danwbyrne@gmail.com"
+}
