@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node ./node_modules/@neo-one/build-tools-web/lib/compile --bundle tools",
     "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
-    "lint:staged": "lint-staged --relative"
+    "lint:staged": "lint-staged --relative",
+    "tsc": "node node_modules/.bin/tsc --noEmit"
   },
   "dependencies": {
     "@emotion/core": "^10.0.17",

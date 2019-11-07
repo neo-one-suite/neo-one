@@ -1,16 +1,9 @@
-<<<<<<< HEAD
-/* @hash 893ab51f0aaf08008112d33346cc4e1d */
-=======
-/* @hash c76ec9ffa778cff7ed0ffda5826167f1 */
->>>>>>> feat(rush): Rush checkpoint, initial migration complete (#1803)
+/* @hash db83d007b86b64c594c868c08d8b514a */
 // tslint:disable
 /* eslint-disable */
 import {
   Client,
-<<<<<<< HEAD
   DapiUserAccountProvider,
-=======
->>>>>>> feat(rush): Rush checkpoint, initial migration complete (#1803)
   DeveloperClient,
   LocalKeyStore,
   LocalMemoryStore,
@@ -19,7 +12,6 @@ import {
   NEOONEDataProvider,
 } from '@neo-one/client';
 
-<<<<<<< HEAD
 const getDefaultUserAccountProviders = (provider) => {
   const localUserAccountProvider = {
     memory: new LocalUserAccountProvider({
@@ -44,14 +36,6 @@ const getDefaultUserAccountProviders = (provider) => {
 
   return localUserAccountProvider;
 };
-=======
-const getDefaultUserAccountProviders = (provider) => ({
-  memory: new LocalUserAccountProvider({
-    keystore: new LocalKeyStore(new LocalMemoryStore()),
-    provider,
-  }),
-});
->>>>>>> feat(rush): Rush checkpoint, initial migration complete (#1803)
 
 const isLocalUserAccountProvider = (userAccountProvider) => userAccountProvider instanceof LocalUserAccountProvider;
 
@@ -66,11 +50,7 @@ export const createClient = (getUserAccountProvidersOrHost) => {
 
   const providers = [];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-<<<<<<< HEAD
-    providers.push({ network: 'local', rpcURL: `http://${host}:10090/rpc` });
-=======
-    providers.push({ network: 'local', rpcURL: `http://${host}:10500/rpc` });
->>>>>>> feat(rush): Rush checkpoint, initial migration complete (#1803)
+    providers.push({ network: 'local', rpcURL: `http://${host}:10050/rpc` });
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
@@ -149,9 +129,5 @@ export const createClient = (getUserAccountProvidersOrHost) => {
 };
 
 export const createDeveloperClients = (host = 'localhost') => ({
-<<<<<<< HEAD
-  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: `http://${host}:10090/rpc` })),
-=======
-  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: `http://${host}:10500/rpc` })),
->>>>>>> feat(rush): Rush checkpoint, initial migration complete (#1803)
+  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: `http://${host}:10050/rpc` })),
 });

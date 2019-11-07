@@ -5,7 +5,7 @@ import yargs from 'yargs';
 
 const argv = yargs
   .boolean('full')
-  .describe('full', 'flag for also cleaning lib/* and package-deps.json')
+  .describe('full', 'flag for also cleaning lib/* and .rush/* directories')
   .default('full', false)
   .boolean('debug')
   .describe('debug', 'flag for logging actions')
@@ -34,8 +34,8 @@ logger(packagesToScan);
 const deleteAll = (modules: readonly string[]): void => {
   modules.forEach((dir) => {
     if (argv.full) {
-      logger(`Removing package-deps: ${path.resolve(dir, 'package-deps.json')}`);
-      fs.removeSync(path.resolve(dir, 'package-deps.json'));
+      logger(`Removing /.rush: ${path.resolve(dir, '.rush')}`);
+      fs.removeSync(path.resolve(dir, '.rush'));
       logger(`Removing /lib: ${path.resolve(dir, 'lib')}`);
       fs.removeSync(path.resolve(dir, 'lib'));
     }

@@ -1,4 +1,4 @@
 {
   "extends": "./node_modules/@neo-one/build-tools/includes/tsconfig.dev.json",
-  "exclude": []
+  "exclude": ["./src/__data__/projects/*/contracts/**/*.ts", "./src/__data__/projects/*/neo-one/contracts/**/*.ts"]
 }

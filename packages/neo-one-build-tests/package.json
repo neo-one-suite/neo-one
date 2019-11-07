@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Tool package for running unit/e2e tests",
   "scripts": {
-    "build": ""
+    "build": "",
+    "tsc": "node node_modules/.bin/tsc --noEmit"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.6.3",

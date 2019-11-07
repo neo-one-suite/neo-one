@@ -7,7 +7,8 @@
     "build": "gulp",
     "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
     "lint:staged": "lint-staged --relative",
-    "pack": "gulp pack"
+    "pack": "gulp pack",
+    "tsc": "node node_modules/.bin/tsc --noEmit"
   },
   "dependencies": {
     "@neo-one/logger-config": "^2.3.0",

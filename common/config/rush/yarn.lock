@@ -1344,9 +1344,10 @@
 
 "@rush-temp/build-common@file:./projects/build-common.tgz":
   version "0.0.0"
-  resolved "file:./projects/build-common.tgz#8209e151ec1fe9057314ec1842d6b3223e655a79"
+  resolved "file:./projects/build-common.tgz"
   dependencies:
     cross-env "^6.0.0"
+    husky "^3.0.9"
     json "^9.0.6"
     lint-staged "^9.4.1"
     rxjs-tslint-rules "^4.24.3"
@@ -1360,7 +1361,7 @@
 
 "@rush-temp/build-tests@file:./projects/build-tests.tgz":
   version "0.0.0"
-  resolved "file:./projects/build-tests.tgz#6f99eb2211a10a6b490102fb0445c16fae0a7582"
+  resolved "file:./projects/build-tests.tgz"
   dependencies:
     "@babel/preset-env" "^7.6.3"
     app-root-dir "^1.0.2"
@@ -1379,7 +1380,7 @@
 
 "@rush-temp/build-tools-web@file:./projects/build-tools-web.tgz":
   version "0.0.0"
-  resolved "file:./projects/build-tools-web.tgz#164b4e10941a286e92b21d28aace6755e702ea78"
+  resolved "file:./projects/build-tools-web.tgz"
   dependencies:
     "@babel/core" "^7.6.2"
     "@babel/plugin-proposal-async-generator-functions" "^7.2.0"
@@ -1454,7 +1455,7 @@
 
 "@rush-temp/build-tools@file:./projects/build-tools.tgz":
   version "0.0.0"
-  resolved "file:./projects/build-tools.tgz#6deb3ca07ec4f29f0b52fa5ae3fbf66c97b490c1"
+  resolved "file:./projects/build-tools.tgz"
   dependencies:
     "@types/fs-extra" "^8.0.0"
     "@types/gulp" "^4.0.6"
@@ -1501,7 +1502,7 @@
 
 "@rush-temp/cli-common-node@file:./projects/cli-common-node.tgz":
   version "0.0.0"
-  resolved "file:./projects/cli-common-node.tgz#e0b5dcb34fca1692faa476fed5285cfa58635f90"
+  resolved "file:./projects/cli-common-node.tgz"
   dependencies:
     "@types/cosmiconfig" "^5.0.3"
     "@types/fs-extra" "^8.0.0"
@@ -1519,7 +1520,7 @@
 
 "@rush-temp/cli-common@file:./projects/cli-common.tgz":
   version "0.0.0"
-  resolved "file:./projects/cli-common.tgz#b8c0646ce8db53d978aeb7119483f1a8f691fa4f"
+  resolved "file:./projects/cli-common.tgz"
   dependencies:
     bignumber.js "^9.0.0"
     gulp "~4.0.2"
@@ -1527,7 +1528,7 @@
 
 "@rush-temp/cli@file:./projects/cli.tgz":
   version "0.0.0"
-  resolved "file:./projects/cli.tgz#093d0769c8af797076e2891e28a0dbab06635a4a"
+  resolved "file:./projects/cli.tgz"
   dependencies:
     "@angular/core" "^8.2.7"
     "@babel/core" "^7.6.2"
@@ -1562,7 +1563,7 @@
 
 "@rush-temp/client-common@file:./projects/client-common.tgz":
   version "0.0.0"
-  resolved "file:./projects/client-common.tgz#fedbe5afbf1af94c183ff52a0bb80a51e4540e8b"
+  resolved "file:./projects/client-common.tgz"
   dependencies:
     "@neo-one/ec-key" "^0.1.0"
     "@types/bn.js" "^4.11.5"
@@ -1591,7 +1592,7 @@
 
 "@rush-temp/client-core@file:./projects/client-core.tgz":
   version "0.0.0"
-  resolved "file:./projects/client-core.tgz#87dcf2ed07068029d4d227f6d017a9b1dc8d1867"
+  resolved "file:./projects/client-core.tgz"
   dependencies:
     "@reactivex/ix-es2015-cjs" "^2.5.3"
     "@reactivex/ix-esnext-esm" "^2.5.3"
@@ -1614,7 +1615,7 @@
 
 "@rush-temp/client-full-common@file:./projects/client-full-common.tgz":
   version "0.0.0"
-  resolved "file:./projects/client-full-common.tgz#16e0c1cffd76d1b33210e731b329892a4264c90f"
+  resolved "file:./projects/client-full-common.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     gulp "~4.0.2"
@@ -1622,7 +1623,7 @@
 
 "@rush-temp/client-full-core@file:./projects/client-full-core.tgz":
   version "0.0.0"
-  resolved "file:./projects/client-full-core.tgz#c95b6c1762e298e4ec30fd4fc336b6321f236365"
+  resolved "file:./projects/client-full-core.tgz"
   dependencies:
     "@reactivex/ix-es2015-cjs" "^2.5.3"
     "@types/bn.js" "^4.11.5"
@@ -1637,13 +1638,13 @@
 
 "@rush-temp/client-full@file:./projects/client-full.tgz":
   version "0.0.0"
-  resolved "file:./projects/client-full.tgz#8d736690d0bd10044c8ec1ca3663723aeaa6d0a7"
+  resolved "file:./projects/client-full.tgz"
   dependencies:
     gulp "~4.0.2"
 
 "@rush-temp/client-switch@file:./projects/client-switch.tgz":
   version "0.0.0"
-  resolved "file:./projects/client-switch.tgz#70e02277a8c1f918e10bc2c897ef32ec6dd95e23"
+  resolved "file:./projects/client-switch.tgz"
   dependencies:
     "@babel/code-frame" "^7.0.0"
     "@ledgerhq/hw-transport-u2f" "^4.68.2"
@@ -1670,13 +1671,13 @@
 
 "@rush-temp/client@file:./projects/client.tgz":
   version "0.0.0"
-  resolved "file:./projects/client.tgz#8703e8b33a230688c013e5924c77f33e14d270fc"
+  resolved "file:./projects/client.tgz"
   dependencies:
     gulp "~4.0.2"
 
 "@rush-temp/developer-tools-frame@file:./projects/developer-tools-frame.tgz":
   version "0.0.0"
-  resolved "file:./projects/developer-tools-frame.tgz#b48f1574f3c4f6be364c816e7ab1f00ba91c56ee"
+  resolved "file:./projects/developer-tools-frame.tgz"
   dependencies:
     "@emotion/core" "^10.0.17"
     "@emotion/styled" "^10.0.17"
@@ -1705,7 +1706,7 @@
 
 "@rush-temp/developer-tools@file:./projects/developer-tools.tgz":
   version "0.0.0"
-  resolved "file:./projects/developer-tools.tgz#e31f1fa3b9998e5a015888d2231e0fcf79ba4e24"
+  resolved "file:./projects/developer-tools.tgz"
   dependencies:
     gulp "~4.0.2"
     resize-observer-polyfill "^1.5.0"
@@ -1713,7 +1714,7 @@
 
 "@rush-temp/editor-server@file:./projects/editor-server.tgz":
   version "0.0.0"
-  resolved "file:./projects/editor-server.tgz#9ab8b839d813b701d0a4c803130bf174a61e1c15"
+  resolved "file:./projects/editor-server.tgz"
   dependencies:
     "@types/graphlib" "^2.1.5"
     "@types/jest" "^24.0.18"
@@ -1742,7 +1743,7 @@
 
 "@rush-temp/editor@file:./projects/editor.tgz":
   version "0.0.0"
-  resolved "file:./projects/editor.tgz#255d72944fdda66777b6da3889e2a7797f1f5102"
+  resolved "file:./projects/editor.tgz"
   dependencies:
     "@babel/code-frame" "^7.0.0"
     "@babel/plugin-proposal-async-generator-functions" "^7.2.0"
@@ -1812,7 +1813,7 @@
 
 "@rush-temp/http-context@file:./projects/http-context.tgz":
   version "0.0.0"
-  resolved "file:./projects/http-context.tgz#c2547b314ef0d96bee7614e1f19652e0993b8bd5"
+  resolved "file:./projects/http-context.tgz"
   dependencies:
     "@types/koa" "^2.0.49"
     gulp "~4.0.2"
@@ -1821,7 +1822,7 @@
 
 "@rush-temp/http@file:./projects/http.tgz":
   version "0.0.0"
-  resolved "file:./projects/http.tgz#c6ff4cba9e166dfa848f00cb9dbe0be579bed02c"
+  resolved "file:./projects/http.tgz"
   dependencies:
     "@types/koa" "^2.0.49"
     "@types/koa-bodyparser" "^4.3.0"
@@ -1836,7 +1837,7 @@
 
 "@rush-temp/local-browser-worker@file:./projects/local-browser-worker.tgz":
   version "0.0.0"
-  resolved "file:./projects/local-browser-worker.tgz#1bee1fb1aa7a42f44dffe7aba9fa9312d9feeaf5"
+  resolved "file:./projects/local-browser-worker.tgz"
   dependencies:
     "@types/nanoid" "^2.0.0"
     "@types/pouchdb" "^6.4.0"
@@ -1849,7 +1850,7 @@
 
 "@rush-temp/local-browser@file:./projects/local-browser.tgz":
   version "0.0.0"
-  resolved "file:./projects/local-browser.tgz#484c1dc9f661f0b0bd9693800ae3942420475b9d"
+  resolved "file:./projects/local-browser.tgz"
   dependencies:
     "@types/lodash" "^4.14.138"
     "@types/nanoid" "^2.0.0"
@@ -1866,20 +1867,20 @@
 
 "@rush-temp/local-singleton@file:./projects/local-singleton.tgz":
   version "0.0.0"
-  resolved "file:./projects/local-singleton.tgz#a43a103cf39e988cc94f32601f47c54ee22314eb"
+  resolved "file:./projects/local-singleton.tgz"
   dependencies:
     tslib "^1.10.0"
 
 "@rush-temp/logger-config@file:./projects/logger-config.tgz":
   version "0.0.0"
-  resolved "file:./projects/logger-config.tgz#e08a99cfb217afcd1cede25260d95922c234a65d"
+  resolved "file:./projects/logger-config.tgz"
   dependencies:
     gulp "~4.0.2"
     tslib "^1.10.0"
 
 "@rush-temp/logger@file:./projects/logger.tgz":
   version "0.0.0"
-  resolved "file:./projects/logger.tgz#8af27e13c689f3943da2fe594333a740718f798d"
+  resolved "file:./projects/logger.tgz"
   dependencies:
     "@types/pino" "^5.8.9"
     gulp "~4.0.2"
@@ -1889,7 +1890,7 @@
 
 "@rush-temp/node-bin@file:./projects/node-bin.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-bin.tgz#04c606e1b4ebcadd15f16b0bc7ba013010e665ba"
+  resolved "file:./projects/node-bin.tgz"
   dependencies:
     "@types/fs-extra" "^8.0.0"
     "@types/jest" "^24.0.18"
@@ -1909,7 +1910,7 @@
 
 "@rush-temp/node-blockchain@file:./projects/node-blockchain.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-blockchain.tgz#d20518db1940b20ab39d948522bc7aba77593755"
+  resolved "file:./projects/node-blockchain.tgz"
   dependencies:
     "@types/bn.js" "^4.11.5"
     "@types/jest" "^24.0.18"
@@ -1924,7 +1925,7 @@
 
 "@rush-temp/node-browser-worker@file:./projects/node-browser-worker.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-browser-worker.tgz#261343813b17e7d56f4dd1492cac96964be154c3"
+  resolved "file:./projects/node-browser-worker.tgz"
   dependencies:
     core-js "^3.2.1"
     file-loader "^4.2.0"
@@ -1932,7 +1933,7 @@
 
 "@rush-temp/node-browser@file:./projects/node-browser.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-browser.tgz#18cf2c02c4da5d149e67d31936ca0a91f0149311"
+  resolved "file:./projects/node-browser.tgz"
   dependencies:
     "@types/level-js" "^4.0.1"
     "@types/levelup" "^3.1.1"
@@ -1944,7 +1945,7 @@
 
 "@rush-temp/node-consensus@file:./projects/node-consensus.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-consensus.tgz#a4a5d5f1d1f3e5ad494bdc707bb29670f7354953"
+  resolved "file:./projects/node-consensus.tgz"
   dependencies:
     "@reactivex/ix-es2015-cjs" "^2.5.3"
     "@types/bn.js" "^4.11.5"
@@ -1958,7 +1959,7 @@
 
 "@rush-temp/node-core@file:./projects/node-core.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-core.tgz#34a056b4699f31625dc870c5fbd5b87f2ad02bbd"
+  resolved "file:./projects/node-core.tgz"
   dependencies:
     "@types/bn.js" "^4.11.5"
     "@types/jest" "^24.0.18"
@@ -1974,7 +1975,7 @@
 
 "@rush-temp/node-http-rpc@file:./projects/node-http-rpc.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-http-rpc.tgz#6df544926588bc3a941b1936ea8baa7df143e2be"
+  resolved "file:./projects/node-http-rpc.tgz"
   dependencies:
     "@types/koa" "^2.0.49"
     "@types/koa-compose" "^3.2.4"
@@ -1995,7 +1996,7 @@
 
 "@rush-temp/node-neo-settings@file:./projects/node-neo-settings.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-neo-settings.tgz#7ac891582213e5e1672b4dd60e19540bfac53d7c"
+  resolved "file:./projects/node-neo-settings.tgz"
   dependencies:
     "@types/bn.js" "^4.11.5"
     "@types/lodash" "^4.14.138"
@@ -2006,7 +2007,7 @@
 
 "@rush-temp/node-network@file:./projects/node-network.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-network.tgz#96f6ebb39851613597d43d6d462fb3184e6cb1a7"
+  resolved "file:./projects/node-network.tgz"
   dependencies:
     "@types/lodash" "^4.14.138"
     gulp "~4.0.2"
@@ -2015,7 +2016,7 @@
 
 "@rush-temp/node-offline@file:./projects/node-offline.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-offline.tgz#2314e4e5c424bfab64eb4e5267b8a1231d7caeb8"
+  resolved "file:./projects/node-offline.tgz"
   dependencies:
     "@types/lodash" "^4.14.138"
     gulp "~4.0.2"
@@ -2024,7 +2025,7 @@
 
 "@rush-temp/node-protocol@file:./projects/node-protocol.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-protocol.tgz#3ab42dcee92ad02d429a48a595c0ae2e5845cbd1"
+  resolved "file:./projects/node-protocol.tgz"
   dependencies:
     "@types/bloem" "^0.2.0"
     "@types/bloom-filter" "^0.2.0"
@@ -2045,7 +2046,7 @@
 
 "@rush-temp/node-rpc-handler@file:./projects/node-rpc-handler.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-rpc-handler.tgz#f6d4a693a6c9cf45837865e69a0ebdd1179a56a9"
+  resolved "file:./projects/node-rpc-handler.tgz"
   dependencies:
     gulp "~4.0.2"
     rxjs "^6.5.3"
@@ -2053,7 +2054,7 @@
 
 "@rush-temp/node-storage-cache@file:./projects/node-storage-cache.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-storage-cache.tgz#62afadfd25a23e84d951ab6136ddc74b4b5f6a3b"
+  resolved "file:./projects/node-storage-cache.tgz"
   dependencies:
     "@types/lru-cache" "^5.1.0"
     gulp "~4.0.2"
@@ -2062,14 +2063,14 @@
 
 "@rush-temp/node-storage-common@file:./projects/node-storage-common.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-storage-common.tgz#2bf2a184288c5df4e8a043c33766f316bce31ca6"
+  resolved "file:./projects/node-storage-common.tgz"
   dependencies:
     gulp "~4.0.2"
     tslib "^1.10.0"
 
 "@rush-temp/node-storage-levelup@file:./projects/node-storage-levelup.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-storage-levelup.tgz#ac6dca3e8cea9117af50e4111142eddd81c1fde7"
+  resolved "file:./projects/node-storage-levelup.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     "@types/levelup" "^3.1.1"
@@ -2082,7 +2083,7 @@
 
 "@rush-temp/node-vm@file:./projects/node-vm.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-vm.tgz#bdd3772a91f1b4629fb44930a732a4e2aa3b0188"
+  resolved "file:./projects/node-vm.tgz"
   dependencies:
     "@reactivex/ix-es2015-cjs" "^2.5.3"
     "@reactivex/ix-esnext-esm" "^2.5.3"
@@ -2098,7 +2099,7 @@
 
 "@rush-temp/node@file:./projects/node.tgz":
   version "0.0.0"
-  resolved "file:./projects/node.tgz#e3964dfd39921ffaa4dc33168e530bdb194d95fd"
+  resolved "file:./projects/node.tgz"
   dependencies:
     "@types/abstract-leveldown" "^5.0.1"
     "@types/fs-extra" "^8.0.0"
@@ -2113,7 +2114,7 @@
 
 "@rush-temp/react-common@file:./projects/react-common.tgz":
   version "0.0.0"
-  resolved "file:./projects/react-common.tgz#f763f94aefd9073d5597d3308d98fdf27494eaf7"
+  resolved "file:./projects/react-common.tgz"
   dependencies:
     "@emotion/core" "^10.0.17"
     "@emotion/styled" "^10.0.17"
@@ -2133,7 +2134,7 @@
 
 "@rush-temp/react-core@file:./projects/react-core.tgz":
   version "0.0.0"
-  resolved "file:./projects/react-core.tgz#ce542391a3618ab053fb1ac3db09021e5030634e"
+  resolved "file:./projects/react-core.tgz"
   dependencies:
     "@emotion/core" "^10.0.17"
     "@emotion/styled" "^10.0.17"
@@ -2146,7 +2147,7 @@
 
 "@rush-temp/react@file:./projects/react.tgz":
   version "0.0.0"
-  resolved "file:./projects/react.tgz#776b9b2de12a7059f25c7a1fbbf5218e85ff07ca"
+  resolved "file:./projects/react.tgz"
   dependencies:
     "@types/react" "^16.0.0"
     gulp "~4.0.2"
@@ -2156,7 +2157,7 @@
 
 "@rush-temp/smart-contract-codegen@file:./projects/smart-contract-codegen.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-codegen.tgz#b37288c968f644a8835adde4726e4f94cc49ef59"
+  resolved "file:./projects/smart-contract-codegen.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     "@types/lodash" "^4.14.138"
@@ -2170,7 +2171,7 @@
 
 "@rush-temp/smart-contract-compiler-node@file:./projects/smart-contract-compiler-node.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-compiler-node.tgz#066733677dcecbaf483ebe72bc629869f8d06e74"
+  resolved "file:./projects/smart-contract-compiler-node.tgz"
   dependencies:
     "@types/app-root-dir" "^0.1.0"
     "@types/glob" "^7.1.1"
@@ -2182,7 +2183,7 @@
 
 "@rush-temp/smart-contract-compiler@file:./projects/smart-contract-compiler.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-compiler.tgz#f89ed91a6bdf4b56205dd260d846c35152ed52e4"
+  resolved "file:./projects/smart-contract-compiler.tgz"
   dependencies:
     "@babel/code-frame" "^7.0.0"
     "@types/app-root-dir" "^0.1.0"
@@ -2206,7 +2207,7 @@
 
 "@rush-temp/smart-contract-lib@file:./projects/smart-contract-lib.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-lib.tgz#f8e3167515a43303abd956811f13f64416dd3851"
+  resolved "file:./projects/smart-contract-lib.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     bignumber.js "^9.0.0"
@@ -2215,13 +2216,13 @@
 
 "@rush-temp/smart-contract-test-browser@file:./projects/smart-contract-test-browser.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-test-browser.tgz#826ca0e6ef45ffad12725c160301093030d11c0e"
+  resolved "file:./projects/smart-contract-test-browser.tgz"
   dependencies:
     tslib "^1.10.0"
 
 "@rush-temp/smart-contract-test-common@file:./projects/smart-contract-test-common.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-test-common.tgz#ecb876730054f82717b6ad35974ec19c83026644"
+  resolved "file:./projects/smart-contract-test-common.tgz"
   dependencies:
     bignumber.js "^9.0.0"
     gulp "~4.0.2"
@@ -2229,7 +2230,7 @@
 
 "@rush-temp/smart-contract-test@file:./projects/smart-contract-test.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-test.tgz#323cdbf9e332ab9b2994743d7022835c5aea140e"
+  resolved "file:./projects/smart-contract-test.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     "@types/lodash" "^4.14.138"
@@ -2242,26 +2243,26 @@
 
 "@rush-temp/smart-contract-typescript-plugin@file:./projects/smart-contract-typescript-plugin.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-typescript-plugin.tgz#6299ec237666783afa02bfa76f6a6d9ad043d78f"
+  resolved "file:./projects/smart-contract-typescript-plugin.tgz"
   dependencies:
     gulp "~4.0.2"
     typescript "^3.6.3"
 
 "@rush-temp/smart-contract@file:./projects/smart-contract.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract.tgz#e2dda84ffab87ea38b2c27e856e75b03daae4e0a"
+  resolved "file:./projects/smart-contract.tgz"
   dependencies:
     gulp "~4.0.2"
 
 "@rush-temp/suite@file:./projects/suite.tgz":
   version "0.0.0"
-  resolved "file:./projects/suite.tgz#70e31fc95feda06c2b18551ab287109949d0ad29"
+  resolved "file:./projects/suite.tgz"
   dependencies:
     gulp "~4.0.2"
 
 "@rush-temp/ts-utils@file:./projects/ts-utils.tgz":
   version "0.0.0"
-  resolved "file:./projects/ts-utils.tgz#1e55e51df608c7bb188f60b18a8a0e8bccfa3da6"
+  resolved "file:./projects/ts-utils.tgz"
   dependencies:
     "@types/lodash" "^4.14.138"
     gulp "~4.0.2"
@@ -2272,7 +2273,7 @@
 
 "@rush-temp/typescript-concatenator@file:./projects/typescript-concatenator.tgz":
   version "0.0.0"
-  resolved "file:./projects/typescript-concatenator.tgz#55d705b34ad0ab556625b98ecc1fe810791e4d61"
+  resolved "file:./projects/typescript-concatenator.tgz"
   dependencies:
     "@types/app-root-dir" "^0.1.0"
     "@types/fs-extra" "^8.0.0"
@@ -2291,7 +2292,7 @@
 
 "@rush-temp/utils-node@file:./projects/utils-node.tgz":
   version "0.0.0"
-  resolved "file:./projects/utils-node.tgz#90201174652be066e682e51a8832d130cd112352"
+  resolved "file:./projects/utils-node.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     "@types/npm-package-arg" "^6.1.0"
@@ -2306,7 +2307,7 @@
 
 "@rush-temp/utils@file:./projects/utils.tgz":
   version "0.0.0"
-  resolved "file:./projects/utils.tgz#31615c007e561679700c9388efd9ba72dd4fb545"
+  resolved "file:./projects/utils.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     "@types/lodash" "^4.14.138"
@@ -2320,7 +2321,7 @@
 
 "@rush-temp/website@file:./projects/website.tgz":
   version "0.0.0"
-  resolved "file:./projects/website.tgz#fd7691780fe63f62e8847a3d7a46c779a3b406f8"
+  resolved "file:./projects/website.tgz"
   dependencies:
     "@babel/runtime" "^7.6.3"
     "@emotion/core" "^10.0.17"
@@ -2381,7 +2382,7 @@
 
 "@rush-temp/worker@file:./projects/worker.tgz":
   version "0.0.0"
-  resolved "file:./projects/worker.tgz#ccebf99125883d9ecf5a0db280adb9c57c43f93b"
+  resolved "file:./projects/worker.tgz"
   dependencies:
     rxjs "^6.5.3"
     tslib "^1.10.0"
@@ -2931,6 +2932,10 @@
 "@types/node@^11.11.6":
   version "11.15.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-11.15.2.tgz#998b9cacc5f26e441d8396340818fde8e08aada5"
+
+"@types/normalize-package-data@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"
 
 "@types/npm-package-arg@^6.1.0":
   version "6.1.0"
@@ -7425,6 +7430,10 @@ get-proxy@^2.0.0:
   dependencies:
     npm-conf "^1.1.0"
 
+get-stdin@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/get-stdin/-/get-stdin-7.0.0.tgz#8d5de98f15171a125c5e516643c7a6d0ea8a96f6"
+
 get-stream@3.0.0, get-stream@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/get-stream/-/get-stream-3.0.0.tgz#8e943d1358dc37555054ecbe2edb05aa174ede14"
@@ -8253,6 +8262,22 @@ https-proxy-agent@^2.2.1:
 human-signals@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-1.1.1.tgz#c5b1cd14f50aeae09ab6c59fe63ba3395fe4dfa3"
+
+husky@^3.0.9:
+  version "3.0.9"
+  resolved "https://registry.yarnpkg.com/husky/-/husky-3.0.9.tgz#a2c3e9829bfd6b4957509a9500d2eef5dbfc8044"
+  dependencies:
+    chalk "^2.4.2"
+    ci-info "^2.0.0"
+    cosmiconfig "^5.2.1"
+    execa "^1.0.0"
+    get-stdin "^7.0.0"
+    opencollective-postinstall "^2.0.2"
+    pkg-dir "^4.2.0"
+    please-upgrade-node "^3.2.0"
+    read-pkg "^5.2.0"
+    run-node "^1.0.0"
+    slash "^3.0.0"
 
 iconv-lite@0.4.24, iconv-lite@^0.4.24, iconv-lite@^0.4.4, iconv-lite@~0.4.11, iconv-lite@~0.4.13:
   version "0.4.24"
@@ -9875,6 +9900,10 @@ liftoff@^3.1.0:
     rechoir "^0.6.2"
     resolve "^1.1.7"
 
+lines-and-columns@^1.1.6:
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.1.6.tgz#1c00c743b433cd0a4e80758f7b64a57440d9ff00"
+
 linkify-it@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/linkify-it/-/linkify-it-2.2.0.tgz#e3b54697e78bf915c70a38acd78fd09e0058b1cf"
@@ -10924,7 +10953,7 @@ nopt@~1.0.10:
   dependencies:
     abbrev "1"
 
-normalize-package-data@^2.3.2:
+normalize-package-data@^2.3.2, normalize-package-data@^2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/normalize-package-data/-/normalize-package-data-2.5.0.tgz#e66db1838b200c1dfc233225d12cb36520e234a8"
   dependencies:
@@ -11239,7 +11268,7 @@ only@~0.0.2:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/only/-/only-0.0.2.tgz#2afde84d03e50b9a8edc444e30610a70295edfb4"
 
-opencollective-postinstall@^2.0.0:
+opencollective-postinstall@^2.0.0, opencollective-postinstall@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/opencollective-postinstall/-/opencollective-postinstall-2.0.2.tgz#5657f1bede69b6e33a45939b061eb53d3c6c3a89"
 
@@ -11508,6 +11537,15 @@ parse-json@^4.0.0:
     error-ex "^1.3.1"
     json-parse-better-errors "^1.0.1"
 
+parse-json@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/parse-json/-/parse-json-5.0.0.tgz#73e5114c986d143efa3712d4ea24db9a4266f60f"
+  dependencies:
+    "@babel/code-frame" "^7.0.0"
+    error-ex "^1.3.1"
+    json-parse-better-errors "^1.0.1"
+    lines-and-columns "^1.1.6"
+
 parse-node-version@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/parse-node-version/-/parse-node-version-1.0.1.tgz#e2b5dbede00e7fa9bc363607f53327e8b073189b"
@@ -11746,7 +11784,7 @@ pkg-up@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
-please-upgrade-node@^3.1.1:
+please-upgrade-node@^3.1.1, please-upgrade-node@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/please-upgrade-node/-/please-upgrade-node-3.2.0.tgz#aeddd3f994c933e4ad98b99d9a556efa0e2fe942"
   dependencies:
@@ -12767,6 +12805,15 @@ read-pkg@^3.0.0:
     normalize-package-data "^2.3.2"
     path-type "^3.0.0"
 
+read-pkg@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/read-pkg/-/read-pkg-5.2.0.tgz#7bf295438ca5a33e56cd30e053b34ee7250c93cc"
+  dependencies:
+    "@types/normalize-package-data" "^2.4.0"
+    normalize-package-data "^2.5.0"
+    parse-json "^5.0.0"
+    type-fest "^0.6.0"
+
 "readable-stream@1 || 2", readable-stream@^2.0.0, readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.5, readable-stream@^2.0.6, readable-stream@^2.1.5, readable-stream@^2.2.2, readable-stream@^2.3.0, readable-stream@^2.3.3, readable-stream@^2.3.5, readable-stream@^2.3.6, readable-stream@~2.3.6:
   version "2.3.6"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.3.6.tgz#b11c27d88b8ff1fbe070643cf94b0c79ae1b0aaf"
@@ -13279,6 +13326,10 @@ run-async@^2.2.0, run-async@^2.3.0:
   resolved "https://registry.yarnpkg.com/run-async/-/run-async-2.3.0.tgz#0371ab4ae0bdd720d4166d7dfda64ff7a445a6c0"
   dependencies:
     is-promise "^2.1.0"
+
+run-node@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/run-node/-/run-node-1.0.0.tgz#46b50b946a2aa2d4947ae1d886e9856fd9cabe5e"
 
 run-parallel@^1.1.9:
   version "1.1.9"
@@ -14742,6 +14793,10 @@ type-check@~0.3.2:
 type-fest@^0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.5.2.tgz#d6ef42a0356c6cd45f49485c3b6281fc148e48a2"
+
+type-fest@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.6.0.tgz#8d2a2370d3df886eb5c90ada1c5bf6188acf838b"
 
 type-is@^1.6.16, type-is@~1.6.17, type-is@~1.6.18:
   version "1.6.18"
