@@ -1,16 +1,9 @@
-<<<<<<< HEAD
-/* @hash 5acda1db24d31773c1006f32e2885ad5 */
-=======
-/* @hash 7136f67e2171255d3f41965345acc369 */
->>>>>>> feat(rush): Rush checkpoint, initial migration complete (#1803)
+/* @hash 75addf13d49c998b009e371e02264bfe */
 // tslint:disable
 /* eslint-disable */
 import {
   Client,
-<<<<<<< HEAD
   DapiUserAccountProvider,
-=======
->>>>>>> feat(rush): Rush checkpoint, initial migration complete (#1803)
   DeveloperClient,
   DeveloperClients,
   LocalKeyStore,
@@ -25,7 +18,6 @@ export interface DefaultUserAccountProviders {
   readonly memory: LocalUserAccountProvider<LocalKeyStore, NEOONEProvider>;
 }
 
-<<<<<<< HEAD
 const getDefaultUserAccountProviders = (provider: NEOONEProvider) => {
   const localUserAccountProvider = {
     memory: new LocalUserAccountProvider({
@@ -50,14 +42,6 @@ const getDefaultUserAccountProviders = (provider: NEOONEProvider) => {
 
   return localUserAccountProvider;
 };
-=======
-const getDefaultUserAccountProviders = (provider: NEOONEProvider) => ({
-  memory: new LocalUserAccountProvider({
-    keystore: new LocalKeyStore(new LocalMemoryStore()),
-    provider,
-  }),
-});
->>>>>>> feat(rush): Rush checkpoint, initial migration complete (#1803)
 
 const isLocalUserAccountProvider = (userAccountProvider: any): userAccountProvider is LocalUserAccountProvider =>
   userAccountProvider instanceof LocalUserAccountProvider;
@@ -80,21 +64,13 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
 
   const providers = [];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-<<<<<<< HEAD
-    providers.push({ network: 'local', rpcURL: `http://${host}:10100/rpc` });
+    providers.push({ network: 'local', rpcURL: `http://${host}:10060/rpc` });
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
   const localUserAccountProviders = Object.values(userAccountProviders).filter(
     isLocalUserAccountProvider,
   ) as LocalUserAccountProvider[];
-=======
-    providers.push({ network: 'local', rpcURL: `http://${host}:10510/rpc` });
-  }
-  const provider = new NEOONEProvider(providers);
-  const userAccountProviders = getUserAccountProviders(provider);
-  const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
->>>>>>> feat(rush): Rush checkpoint, initial migration complete (#1803)
   const localUserAccountProvider = localUserAccountProviders.find(
     (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
   );
@@ -169,9 +145,5 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
 };
 
 export const createDeveloperClients = (host = 'localhost'): DeveloperClients => ({
-<<<<<<< HEAD
-  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: `http://${host}:10100/rpc` })),
-=======
-  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: `http://${host}:10510/rpc` })),
->>>>>>> feat(rush): Rush checkpoint, initial migration complete (#1803)
+  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: `http://${host}:10060/rpc` })),
 });

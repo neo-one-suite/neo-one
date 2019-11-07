@@ -23,5 +23,6 @@
     "allowUnreachableCode": false,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "exclude": ["./src/index.ts", "./src/ownership/*.ts", "./src/ICO.ts", "./src/NEP5Token.ts"]
 }

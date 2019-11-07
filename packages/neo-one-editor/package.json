@@ -7,7 +7,8 @@
   "scripts": {
     "build": "",
     "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
-    "lint:staged": "lint-staged --relative"
+    "lint:staged": "lint-staged --relative",
+    "tsc": "node node_modules/.bin/tsc --noEmit"
   },
   "dependencies": {
     "@babel/code-frame": "^7.0.0",

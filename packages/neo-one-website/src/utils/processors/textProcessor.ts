@@ -1,4 +1,5 @@
 // tslint:disable only-arrow-functions no-object-mutation no-any
+import ts from 'typescript';
 
 const extractTextWithoutComments = (declaration: ts.Declaration) =>
   declaration
