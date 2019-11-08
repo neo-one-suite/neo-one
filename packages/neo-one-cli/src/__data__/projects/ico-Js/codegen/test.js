@@ -5,11 +5,6 @@ import { createWithContracts } from '@neo-one/smart-contract-test';
 import * as path from 'path';
 
 export const withContracts = createWithContracts([
-<<<<<<< HEAD
-  { name: 'Escrow', filePath: path.resolve(__dirname, '../neo-one/contracts/Escrow.ts') },
-  { name: 'Token', filePath: path.resolve(__dirname, '../neo-one/contracts/Token.ts') },
-  { name: 'ICO', filePath: path.resolve(__dirname, '../neo-one/contracts/ICO.ts') },
-=======
   {
     name: 'Escrow',
     filePath: path.resolve(__dirname, '../neo-one/contracts/Escrow.ts'),
@@ -22,5 +17,4 @@ export const withContracts = createWithContracts([
     name: 'ICO',
     filePath: path.resolve(__dirname, '../neo-one/contracts/ICO.ts'),
   },
->>>>>>> feat(rush): Rush checkpoint, initial migration complete (#1803)
 ]);
