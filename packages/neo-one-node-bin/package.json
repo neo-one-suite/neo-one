@@ -12,7 +12,7 @@
     "env-paths": "^2.2.0",
     "rc": "^1.2.8",
     "tslib": "^1.10.0",
-    "yargs": "^14.0.0"
+    "yargs": "^15.0.0"
   },
   "devDependencies": {
     "@neo-one/client": "^2.3.0",

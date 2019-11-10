@@ -267,7 +267,7 @@
     "webpackbar": "^4.0.0",
     "workbox-webpack-plugin": "^4.3.1",
     "wtfnode": "^0.8.0",
-    "yargs": "^14.0.0"
+    "yargs": "^15.0.0"
   },
   "config": {
     "commitizen": {
