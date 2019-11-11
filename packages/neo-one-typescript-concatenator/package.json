@@ -16,7 +16,7 @@
     "lodash": "^4.17.15",
     "toposort": "^2.0.2",
     "tslib": "^1.10.0",
-    "typescript": "^3.6.3"
+    "typescript": "3.6.3"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
