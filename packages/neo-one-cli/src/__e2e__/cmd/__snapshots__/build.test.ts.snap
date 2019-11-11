@@ -36,13 +36,9 @@ exports[`build (ts, react) is a one stop command for local development of the ic
 
 exports[`build (ts, react) is a one stop command for local development of the ico project using typescript and the react framework.: mint consumed 2`] = `"0"`;
 
-exports[`build (ts, react) is a one stop command for local development of the ico project using typescript and the react framework.: mint consumed 3`] = `"0"`;
-
 exports[`build (ts, react) is a one stop command for local development of the ico project using typescript and the react framework.: mint cost 1`] = `"6.733"`;
 
 exports[`build (ts, react) is a one stop command for local development of the ico project using typescript and the react framework.: mint cost 2`] = `"6.733"`;
-
-exports[`build (ts, react) is a one stop command for local development of the ico project using typescript and the react framework.: mint cost 3`] = `"6.733"`;
 
 exports[`build (ts, vue) is a one stop command for local development of the ico project using typescript and the vue framework.: mint consumed 1`] = `"0"`;
 
