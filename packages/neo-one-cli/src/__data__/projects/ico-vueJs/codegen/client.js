@@ -20,7 +20,8 @@ const getDefaultUserAccountProviders = (provider) => {
     }),
   };
 
-  const dapi = typeof globalThis === 'undefined' ? undefined : globalThis.neoDapi;
+  const dapi =
+    typeof globalThis === 'undefined' ? undefined : globalThis.neoDapi;
   if (dapi !== undefined) {
     return {
       ...localUserAccountProvider,
@@ -37,7 +38,8 @@ const getDefaultUserAccountProviders = (provider) => {
   return localUserAccountProvider;
 };
 
-const isLocalUserAccountProvider = (userAccountProvider) => userAccountProvider instanceof LocalUserAccountProvider;
+const isLocalUserAccountProvider = (userAccountProvider) =>
+  userAccountProvider instanceof LocalUserAccountProvider;
 
 export const createClient = (getUserAccountProvidersOrHost) => {
   let getUserAccountProviders = getDefaultUserAccountProviders;
@@ -49,16 +51,25 @@ export const createClient = (getUserAccountProvidersOrHost) => {
   }
 
   const providers = [];
-  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
+  if (
+    process.env.NODE_ENV !== 'production' ||
+    process.env.NEO_ONE_DEV === 'true'
+  ) {
     providers.push({ network: 'local', rpcURL: `http://${host}:10070/rpc` });
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
-  const localUserAccountProviders = Object.values(userAccountProviders).filter(isLocalUserAccountProvider);
-  const localUserAccountProvider = localUserAccountProviders.find(
-    (userAccountProvider) => userAccountProvider.keystore instanceof LocalKeyStore,
+  const localUserAccountProviders = Object.values(userAccountProviders).filter(
+    isLocalUserAccountProvider,
   );
-  if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
+  const localUserAccountProvider = localUserAccountProviders.find(
+    (userAccountProvider) =>
+      userAccountProvider.keystore instanceof LocalKeyStore,
+  );
+  if (
+    process.env.NODE_ENV !== 'production' ||
+    process.env.NEO_ONE_DEV === 'true'
+  ) {
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
@@ -129,5 +140,10 @@ export const createClient = (getUserAccountProvidersOrHost) => {
 };
 
 export const createDeveloperClients = (host = 'localhost') => ({
-  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: `http://${host}:10070/rpc` })),
+  local: new DeveloperClient(
+    new NEOONEDataProvider({
+      network: 'local',
+      rpcURL: `http://${host}:10070/rpc`,
+    }),
+  ),
 });
