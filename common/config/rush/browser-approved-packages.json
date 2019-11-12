@@ -96,7 +96,7 @@
     },
     {
       "name": "@emotion/styled-base",
-      "allowedCategories": [ "tools" ]
+      "allowedCategories": [ "tools", "web" ]
     },
     {
       "name": "@jest/types",
@@ -308,7 +308,7 @@
     },
     {
       "name": "@neo-one/react-core",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "web" ]
     },
     {
       "name": "@neo-one/shared",
@@ -488,7 +488,7 @@
     },
     {
       "name": "babel-plugin-universal-import",
-      "allowedCategories": [ "tools" ]
+      "allowedCategories": [ "tools", "web" ]
     },
     {
       "name": "bignumber.js",

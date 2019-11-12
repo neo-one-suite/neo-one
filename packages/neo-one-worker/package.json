@@ -5,9 +5,9 @@
   "main": "./src/index",
   "scripts": {
     "build": "",
-    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint": "./node_modules/.bin/neo-one-lint",
     "lint:staged": "lint-staged --relative",
-    "tsc": "node node_modules/.bin/tsc --noEmit"
+    "tsc": "./node_modules/.bin/neo-one-tsc"
   },
   "dependencies": {
     "rxjs": "^6.5.3",
