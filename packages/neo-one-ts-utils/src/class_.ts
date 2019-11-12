@@ -15,7 +15,7 @@ export function isClassProperty(node: ts.Node): node is ClassPropertyType {
 
 export type ClassInstancePropertyType = ClassPropertyType | ts.ParameterPropertyDeclaration;
 export function isClassInstanceProperty(node: ts.Node): node is ClassInstancePropertyType {
-  return (isClassProperty(node) || ts.isParameterPropertyDeclaration(node, node.parent)) && !modifier.isStatic(node);
+  return (isClassProperty(node) || ts.isParameterPropertyDeclaration(node)) && !modifier.isStatic(node);
 }
 
 export type ClassInstanceMemberType = ts.MethodDeclaration | ClassInstancePropertyType;
@@ -80,7 +80,7 @@ export function getMembers(node: ts.ClassDeclaration | ts.ClassExpression): read
     let insertIndex = members.indexOf(ctor) + 1;
     // tslint:disable-next-line no-loop-statement
     for (const param of parametered.getParameters(ctor)) {
-      if (ts.isParameterPropertyDeclaration(param, param.parent)) {
+      if (ts.isParameterPropertyDeclaration(param)) {
         // tslint:disable-next-line no-array-mutation
         members.splice(insertIndex, 0, param);
         insertIndex += 1;

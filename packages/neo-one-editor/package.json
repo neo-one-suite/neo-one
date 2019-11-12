@@ -6,9 +6,9 @@
   "license": "MIT",
   "scripts": {
     "build": "",
-    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint": "./node_modules/.bin/neo-one-lint",
     "lint:staged": "lint-staged --relative",
-    "tsc": "node node_modules/.bin/tsc --noEmit"
+    "tsc": "./node_modules/.bin/neo-one-tsc"
   },
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
@@ -21,8 +21,8 @@
     "@babel/plugin-transform-typescript": "^7.5.2",
     "@babel/preset-react": "^7.0.0",
     "@babel/standalone": "^7.5.4",
-    "@emotion/core": "^10.0.17",
-    "@emotion/styled": "^10.0.17",
+    "@emotion/core": "^10.0.22",
+    "@emotion/styled": "^10.0.23",
     "@jest/types": "^24.8.0",
     "@neo-one/client": "^2.3.0",
     "@neo-one/client-switch": "^2.3.0",
