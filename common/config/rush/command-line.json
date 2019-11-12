@@ -79,7 +79,7 @@
       "summary": "Clean up NEO-ONE packages",
       "description": "Remove build logs from all packages (and optionally lib/* and .rush/* directories)",
       "safeForSimultaneousRushProcesses": false,
-      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" node ./packages/neo-one-build-tools/lib/clean"
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" node ./packages/neo-one-build-tools/bin/neo-one-clean.js"
     },
     {
       "commandKind": "global",

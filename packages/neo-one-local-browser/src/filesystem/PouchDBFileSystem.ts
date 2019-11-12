@@ -35,10 +35,7 @@ type Entry = WriteEntry | RemoveEntry;
 export class PouchDBFileSystem implements FileSystem {
   public static async create(db: Database): Promise<PouchDBFileSystem> {
     const mutableFiles: Files = new Map();
-    const changes$ = createChanges$(db).pipe(
-      retryBackoff(1000),
-      share(),
-    );
+    const changes$ = createChanges$(db).pipe(retryBackoff(1000), share());
     const subscription = changes$
       .pipe(
         map((change) => {

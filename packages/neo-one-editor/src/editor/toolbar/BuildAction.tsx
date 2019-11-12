@@ -43,9 +43,6 @@ const BuildActionBase = ({ openConsoleOutput, ...props }: Props) => {
   );
 };
 
-export const BuildAction = connect(
-  undefined,
-  (dispatch) => ({
-    openConsoleOutput: () => dispatch(openConsole('output')),
-  }),
-)(BuildActionBase);
+export const BuildAction = connect(undefined, (dispatch) => ({
+  openConsoleOutput: () => dispatch(openConsole('output')),
+}))(BuildActionBase);

@@ -517,13 +517,16 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       .map((output, idx) => ({ output, idx }))
       .filter(({ output }) => output.address === contract);
     const inputs = refundOutputs.map(({ idx }) => ({ hash, index: idx }));
-    const outputs = Object.entries(_.groupBy(refundOutputs.map(({ output }) => output), (output) => output.asset)).map(
-      ([asset, assetOutputs]) => ({
-        address: from.address,
-        asset,
-        value: assetOutputs.reduce((acc, output) => acc.plus(output.value), new BigNumber('0')),
-      }),
-    );
+    const outputs = Object.entries(
+      _.groupBy(
+        refundOutputs.map(({ output }) => output),
+        (output) => output.asset,
+      ),
+    ).map(([asset, assetOutputs]) => ({
+      address: from.address,
+      asset,
+      value: assetOutputs.reduce((acc, output) => acc.plus(output.value), new BigNumber('0')),
+    }));
 
     if (inputs.length === 0) {
       throw new NothingToRefundError();
@@ -764,7 +767,10 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
           updatedOutputs: acc.updatedOutputs.concat([
             output.clone({
               value: output.value.add(
-                utils.bigNumberToBN(tempIns.reduce((left, right) => left.plus(right.value), new BigNumber('0')), 8),
+                utils.bigNumberToBN(
+                  tempIns.reduce((left, right) => left.plus(right.value), new BigNumber('0')),
+                  8,
+                ),
               ),
             }),
           ]),
@@ -892,7 +898,10 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
 
       return transaction.clone({
         scripts: _.sortBy<[string, WitnessModel]>(
-          [[scriptHash, witness], [otherHash, otherScript]],
+          [
+            [scriptHash, witness],
+            [otherHash, otherScript],
+          ],
           [(value: [string, WitnessModel]) => value[0]],
         ).map((value) => value[1]),
       });

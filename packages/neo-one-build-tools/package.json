@@ -7,13 +7,14 @@
   "bin": {
     "neo-one-lint": "bin/neo-one-lint.js",
     "neo-one-lint-staged": "bin/neo-one-lint-staged.js",
-    "neo-one-publish": "bin/neo-one-publish.js"
+    "neo-one-publish": "bin/neo-one-publish.js",
+    "neo-one-tsc": "bin/neo-one-tsc.js"
   },
   "scripts": {
     "build": "gulp",
     "lint": "./node_modules/.bin/tslint --project . --format codeFrame \"src/**/*.ts\"",
     "lint:staged": "./node_modules/.bin/tslint --project . --format codeFrame \"src/**/*.ts\"",
-    "tsc": "node node_modules/.bin/tsc --noEmit"
+    "tsc": "node_modules/.bin/tsc --noEmit"
   },
   "author": "Alex DiCarlo <alexdicarlo@gmail.com>",
   "homepage": "https://neo-one.io",

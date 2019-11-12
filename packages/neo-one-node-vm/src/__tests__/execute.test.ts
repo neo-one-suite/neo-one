@@ -1317,9 +1317,9 @@ describe('execute', () => {
         }),
       });
 
-      return ((result.stack[0] as ArrayContractParameter).value as ReadonlyArray<ByteArrayContractParameter>).map(
-        ({ value }) => common.asUInt160(value),
-      );
+      return ((result.stack[0] as ArrayContractParameter).value as ReadonlyArray<
+        ByteArrayContractParameter
+      >).map(({ value }) => common.asUInt160(value));
     };
 
     const transfer = async (from: UInt160, to: UInt160, amount: BN) => {

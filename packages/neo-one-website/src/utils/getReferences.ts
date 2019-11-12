@@ -360,15 +360,16 @@ export const getReferences = async () => {
         type: 'All',
         content: {
           type: 'referenceItems',
-          value: _.sortBy(refItems.filter((item) => item !== undefined), [(item) => (item as ReferenceItem).name]).map(
-            (item) => ({
-              title: (item as ReferenceItem).name,
-              slug: (item as ReferenceItem).slug,
-              content: { type: 'referenceItem', value: item },
-              current: slug,
-              sidebar: getSidebar(links),
-            }),
-          ),
+          value: _.sortBy(
+            refItems.filter((item) => item !== undefined),
+            [(item) => (item as ReferenceItem).name],
+          ).map((item) => ({
+            title: (item as ReferenceItem).name,
+            slug: (item as ReferenceItem).slug,
+            content: { type: 'referenceItem', value: item },
+            current: slug,
+            sidebar: getSidebar(links),
+          })),
         },
         current: slug,
         sidebar: getSidebar(links),

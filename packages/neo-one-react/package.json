@@ -5,10 +5,10 @@
   "main": "./lib/index",
   "scripts": {
     "build": "gulp",
-    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint": "./node_modules/.bin/neo-one-lint",
     "lint:staged": "lint-staged --relative",
     "pack": "gulp pack",
-    "tsc": "node node_modules/.bin/tsc --noEmit"
+    "tsc": "./node_modules/.bin/neo-one-tsc"
   },
   "dependencies": {
     "tslib": "^1.10.0"

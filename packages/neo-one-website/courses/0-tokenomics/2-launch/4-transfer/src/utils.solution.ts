@@ -58,7 +58,7 @@ export const handleMint = async (
 };
 
 export const createTokenInfoStream$ = (client: Client, token: TokenSmartContract): Observable<TokenInfoResult> =>
-  combineLatest(client.currentUserAccount$, client.block$).pipe(
+  combineLatest([client.currentUserAccount$, client.block$]).pipe(
     switchMap(async ([userAccount]) =>
       getTokenInfo(token, userAccount === undefined ? undefined : userAccount.id.address),
     ),

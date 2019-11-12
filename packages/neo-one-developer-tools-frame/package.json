@@ -5,13 +5,14 @@
   "license": "MIT",
   "scripts": {
     "build": "node ./node_modules/@neo-one/build-tools-web/lib/compile --bundle tools",
-    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint": "./node_modules/.bin/neo-one-lint",
     "lint:staged": "lint-staged --relative",
-    "tsc": "node node_modules/.bin/tsc --noEmit"
+    "tsc": "./node_modules/.bin/neo-one-tsc"
   },
   "dependencies": {
-    "@emotion/core": "^10.0.17",
-    "@emotion/styled": "^10.0.17",
+    "@emotion/core": "^10.0.22",
+    "@emotion/styled": "^10.0.23",
+    "@emotion/styled-base": "^10.0.24",
     "@neo-one/client-common": "^2.3.0",
     "@neo-one/client-core": "^2.3.0",
     "@neo-one/react": "^2.3.0",

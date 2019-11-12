@@ -30,9 +30,6 @@ const RunTestsActionBase = ({ consoleTestsRunning, openConsoleTests, ...props }:
   </EditorContext.Consumer>
 );
 
-export const RunTestsAction = connect(
-  selectConsoleTestsRunning,
-  (dispatch) => ({
-    openConsoleTests: () => dispatch(openConsole('test')),
-  }),
-)(RunTestsActionBase);
+export const RunTestsAction = connect(selectConsoleTestsRunning, (dispatch) => ({
+  openConsoleTests: () => dispatch(openConsole('test')),
+}))(RunTestsActionBase);

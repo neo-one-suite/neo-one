@@ -64,7 +64,11 @@ export function BalanceSelector() {
   const addError = useAddError();
   const [tokens] = useTokens();
   const prevTokens = usePrevious(tokens);
-  const asset = getAsset(tokens, prevTokens, useStream(() => assetGlobal$, [assetGlobal$], assetGlobal$.getValue()));
+  const asset = getAsset(
+    tokens,
+    prevTokens,
+    useStream(() => assetGlobal$, [assetGlobal$], assetGlobal$.getValue()),
+  );
 
   const { client, accountState$ } = useContext(DeveloperToolsContext);
   const value = useStream(
