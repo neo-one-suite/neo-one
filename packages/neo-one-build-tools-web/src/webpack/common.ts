@@ -1,4 +1,4 @@
-import * as path from 'path';
+import path from 'path';
 import webpack from 'webpack';
 import { Bundle, Stage } from '../types';
 import { addDefaultRules } from './addDefaultRules';
@@ -7,8 +7,7 @@ import { node } from './node';
 import { optimization } from './optimization';
 import { rules } from './rules';
 
-const APP_ROOT_DIR = path.resolve(__dirname, '..', '..', '..', '..');
-const RUSH_NODE_MODULES = path.resolve(APP_ROOT_DIR, 'common', 'temp', 'node_modules');
+const TOOLS_NODE_MODULES = path.resolve(__dirname, '..', '..', 'node_modules');
 
 export const common = ({ stage, bundle }: { readonly stage: Stage; readonly bundle: Bundle }): webpack.Configuration =>
   addDefaultRules({
@@ -18,11 +17,9 @@ export const common = ({ stage, bundle }: { readonly stage: Stage; readonly bund
       aliasFields: ['browser'],
       extensions: ['.mjs', '.js', '.jsx', '.json', '.ts', '.tsx'],
       alias,
-      modules: [RUSH_NODE_MODULES, 'node_modules'],
-      symlinks: true,
     },
     resolveLoader: {
-      modules: [RUSH_NODE_MODULES],
+      modules: [TOOLS_NODE_MODULES, 'node_modules'],
     },
     optimization: optimization({ stage, bundle }),
     module: {

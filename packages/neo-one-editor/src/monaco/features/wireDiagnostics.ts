@@ -58,7 +58,11 @@ export const wireDiagnostics = (manager: MonacoWorkerManager, languageID: string
         Object.entries(_.groupBy(markers, ({ source }) => source)).forEach(([source, sourceMarkers]) => {
           sources.add(source);
           seenSources.add(source);
-          monaco.editor.setModelMarkers(model, source, sourceMarkers.map(({ data }) => data));
+          monaco.editor.setModelMarkers(
+            model,
+            source,
+            sourceMarkers.map(({ data }) => data),
+          );
         });
 
         sources.forEach((source) => {

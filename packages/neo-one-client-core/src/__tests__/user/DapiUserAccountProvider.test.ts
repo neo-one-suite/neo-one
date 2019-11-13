@@ -225,7 +225,13 @@ describe('DapiUserAccountProvider', () => {
       ['hash256', data.hash256s.a] as const,
       ['publicKey', keys[0].publicKeyString] as const,
       ['boolean', true] as const,
-      ['array', [['undefined', undefined], ['bignumber', data.bigNumbers.a]]] as const,
+      [
+        'array',
+        [
+          ['undefined', undefined],
+          ['bignumber', data.bigNumbers.a],
+        ],
+      ] as const,
       ['map', new Map([[data.bns.a, data.numbers.b] as const])] as const,
       ['object', { key: false }] as const,
       [

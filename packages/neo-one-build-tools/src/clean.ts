@@ -50,4 +50,4 @@ const deleteAll = (modules: readonly string[]): void => {
   console.log('Done cleaning.');
 };
 
-deleteAll(packagesToScan);
+export const clean = () => deleteAll(packagesToScan);

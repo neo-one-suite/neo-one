@@ -51,7 +51,10 @@ const NavigationLink = styled<typeof StyledRouterLinkBase, { readonly active: bo
   ${prop('theme.fontStyles.headline')};
   height: 100%;
   padding-top: 5px;
-  ${ifProp('active', withProp('theme.accent', (color) => `color: ${color};`))};
+  ${ifProp(
+    'active',
+    withProp('theme.accent', (color) => `color: ${color};`),
+  )};
   border-bottom: 5px solid ${ifProp('active', prop('theme.accent'), 'transparent')};
   text-decoration: none;
 

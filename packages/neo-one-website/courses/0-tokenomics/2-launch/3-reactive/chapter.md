@@ -31,7 +31,7 @@ export class Example extends SmartContract {
 import { combineLatest } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-const value$ = combineLatest(client.currentUserAccount$, client.block$).pipe(
+const value$ = combineLatest([client.currentUserAccount$, client.block$]).pipe(
   switchMap(async ([userAccount]) => {
     const value = await example.myConstantFunction(userAccount.id.address);
 

@@ -63,13 +63,19 @@ const abi = (decimals: number): ABI => ({
     },
     {
       name: 'forward',
-      parameters: [{ name: 'address', type: 'Address' }, { name: 'args', type: 'ForwardValue', rest: true }],
+      parameters: [
+        { name: 'address', type: 'Address' },
+        { name: 'args', type: 'ForwardValue', rest: true },
+      ],
       returnType: { type: 'ForwardValue' },
     },
     {
       name: 'forwardConstant',
       constant: true,
-      parameters: [{ name: 'address', type: 'Address' }, { name: 'args', type: 'ForwardValue', rest: true }],
+      parameters: [
+        { name: 'address', type: 'Address' },
+        { name: 'args', type: 'ForwardValue', rest: true },
+      ],
       returnType: { type: 'ForwardValue' },
     },
     {
