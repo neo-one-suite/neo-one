@@ -1044,7 +1044,7 @@
     },
     {
       "name": "serve",
-      "allowedCategories": [ "web" ]
+      "allowedCategories": [ "tools", "web" ]
     },
     {
       "name": "slugify",

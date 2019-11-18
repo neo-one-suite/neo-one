@@ -75,6 +75,22 @@
     },
     {
       "commandKind": "global",
+      "name": "link-root",
+      "summary": "Symlink node_modules to root (for prod website only)",
+      "description": "react-static errors in production mode if it doesn't find a root node_modules, this is a workaround",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "ln -s ./common/temp/node_modules ./node_modules"
+    },
+    {
+      "commandKind": "global",
+      "name": "unlink-root",
+      "summary": "remove the root node_modules symlink",
+      "description": "after finishing production website work you need to unlink the root node_modules",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "rm -rf ./node_modules"
+    },
+    {
+      "commandKind": "global",
       "name": "clean",
       "summary": "Clean up NEO-ONE packages",
       "description": "Remove build logs from all packages (and optionally lib/* and .rush/* directories)",
