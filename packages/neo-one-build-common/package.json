@@ -12,6 +12,7 @@
     "husky": "^3.0.9",
     "lint-staged": "^9.4.1",
     "rxjs-tslint-rules": "^4.24.3",
+    "serve": "^11.2.0",
     "tslint": "^5.20.0",
     "tslint-clean-code": "^0.2.9",
     "tslint-config-prettier": "^1.18.0",

@@ -8,6 +8,7 @@ import { optimization } from './optimization';
 import { rules } from './rules';
 
 const TOOLS_NODE_MODULES = path.resolve(__dirname, '..', '..', 'node_modules');
+const RUSH_NODE_MODULES = path.resolve(__dirname, '..', '..', '..', '..', 'common', 'temp', 'node_modules');
 
 export const common = ({ stage, bundle }: { readonly stage: Stage; readonly bundle: Bundle }): webpack.Configuration =>
   addDefaultRules({
@@ -17,6 +18,7 @@ export const common = ({ stage, bundle }: { readonly stage: Stage; readonly bund
       aliasFields: ['browser'],
       extensions: ['.mjs', '.js', '.jsx', '.json', '.ts', '.tsx'],
       alias,
+      modules: [RUSH_NODE_MODULES, 'node_modules'],
     },
     resolveLoader: {
       modules: [TOOLS_NODE_MODULES, 'node_modules'],
