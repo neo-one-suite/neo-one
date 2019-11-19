@@ -21,10 +21,16 @@ jobs:
         run: brew update-reset && brew update && export PATH="/usr/local/bin:$PATH" && brew unlink node@6 && brew install node
       - name: Install Chrome
         run: brew cask install google-chrome
-      - name: Yarn Install
-        run: yarn install --non-interactive --ignore-engines
+      - name: Rush Install
+        run: node/common/scripts/install-run-rush.js install
+      - name: Rush Rebuild
+        run: node/common/scripts/install-run-rush.js rebuild
+      - name: Rush Link Root
+        run: node/common/scripts/install-run-rush.js link-root
       - name: Run Cypress Express Test
-        run: yarn test:cypress-express
+        run: node/common/scripts/install-run-rush.js test-cypress --express
+      - name: Rush Unlink Root
+        run: node/common/scripts/install-run-rush.js unlink-root
       - name: Store Cypress Screenshots
         if: failure()
         continue-on-error: true

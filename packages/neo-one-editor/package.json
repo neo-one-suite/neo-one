@@ -6,9 +6,9 @@
   "license": "MIT",
   "scripts": {
     "build": "",
-    "lint": "./node_modules/.bin/neo-one-lint",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
     "lint:staged": "lint-staged --relative",
-    "tsc": "./node_modules/.bin/neo-one-tsc"
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
     "@babel/code-frame": "^7.0.0",

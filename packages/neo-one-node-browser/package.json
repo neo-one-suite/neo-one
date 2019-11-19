@@ -5,9 +5,9 @@
   "main": "./src/index",
   "scripts": {
     "build": "",
-    "lint": "./node_modules/.bin/neo-one-lint",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
     "lint:staged": "lint-staged --relative",
-    "tsc": "./node_modules/.bin/neo-one-tsc"
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
     "@neo-one/client-common": "^2.3.0",
@@ -20,6 +20,7 @@
     "@neo-one/node-storage-levelup": "^2.3.0",
     "@neo-one/node-vm": "^2.3.0",
     "@neo-one/utils": "^2.3.0",
+    "core-js": "^3.2.1",
     "level-js": "^5.0.0",
     "levelup": "^4.1.0",
     "memdown": "^5.0.0",

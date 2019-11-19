@@ -5,9 +5,9 @@
   "license": "MIT",
   "scripts": {
     "build": "node ./node_modules/@neo-one/build-tools-web/lib/compile --bundle tools",
-    "lint": "./node_modules/.bin/neo-one-lint",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
     "lint:staged": "lint-staged --relative",
-    "tsc": "./node_modules/.bin/neo-one-tsc"
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
     "@emotion/core": "^10.0.22",

@@ -17,13 +17,16 @@ const runCypress = async () => {
   const { NODE_OPTIONS, TS_NODE_PROJECT, ...newEnv } = process.env;
   const cypressRetries = '3';
   const finalEnv = { ...newEnv, CYPRESS_RETRIES: cypressRetries };
-  let command = ['cypress', 'run', '--browser', 'chrome', '--spec'];
+  let command = ['cypress-run', '--browser', 'chrome', '--spec'];
   command = argv.express
     ? command.concat(['cypress/integration/TokenomicsCourse/Lesson2/Chapter5.ts'])
-    : command.concat(['cypress/integration/**/*']);
+    : // the glob must be in two sets of quotes so that Cypress reads the glob inside a single set of quotes
+      command.concat(['"cypress/integration/**/*"']);
 
-  console.log(`$ CYPRESS_RETRIES=${cypressRetries} yarn ${command.join(' ')}`);
-  const proc = execa('yarn', command, {
+  console.log(
+    `$ rush CYPRESS_RETRIES=${cypressRetries} cypress run --browser chrome --spec ${command[command.length - 1]}`,
+  );
+  const proc = execa('node/common/scripts/install-run-rush.js', command, {
     env: finalEnv,
     extendEnv: false,
     cwd: path.resolve(__dirname, '..'),
@@ -80,16 +83,16 @@ process.on('SIGTERM', () => {
 
 const run = async () => {
   const shutdownWait = 5000;
-  console.log('$ yarn website:start:prod-builds');
-  const buildProc = execa('yarn', ['website:start:prod-builds']);
+  console.log('$ rush compile-website-prod');
+  const buildProc = execa('node/common/scripts/install-run-rush.js', ['compile-website-prod']);
   mutableCleanup.push(async () => {
     buildProc.kill('SIGTERM', { forceKillAfterTimeout: shutdownWait });
     await timer(shutdownWait + 500).toPromise();
   });
 
   await buildProc;
-  console.log('$ yarn website:start:prod');
-  const startProc = execa('yarn', ['website:start:prod']);
+  console.log('$ rush run-website-prod');
+  const startProc = execa('node/common/scripts/install-run-rush.js', ['run-website-prod']);
   mutableCleanup.push(async () => {
     startProc.kill('SIGTERM', { forceKillAfterTimeout: shutdownWait });
     await timer(shutdownWait + 500).toPromise();
