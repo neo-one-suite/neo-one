@@ -2,51 +2,9 @@ import { common, crypto } from '@neo-one/client-common';
 import { cliLogger } from '@neo-one/logger';
 import { FullNode } from '@neo-one/node';
 import { createMain } from '@neo-one/node-neo-settings';
-import * as fs from 'fs-extra';
-import net from 'net';
-import * as nodePath from 'path';
 import yargs from 'yargs';
-import { getNetworkProcessIDFile, getPrimaryKeys, start } from '../../common';
-
-async function isRunning(port: number) {
-  let resolve: (running: boolean) => void;
-  let reject: (err: Error) => void;
-  // tslint:disable-next-line promise-must-complete
-  const promise = new Promise<boolean>((resolver, rejector) => {
-    resolve = resolver;
-    reject = rejector;
-  });
-
-  const cleanup = () => {
-    client.removeAllListeners('connect');
-    client.removeAllListeners('error');
-    client.end();
-    client.destroy();
-    client.unref();
-  };
-
-  const onConnect = () => {
-    resolve(true);
-    cleanup();
-  };
-
-  const onError = (error: Error) => {
-    // tslint:disable-next-line no-any
-    if ((error as any).code !== 'ECONNREFUSED') {
-      reject(error);
-    } else {
-      resolve(false);
-    }
-    cleanup();
-  };
-
-  const client = new net.Socket();
-  client.once('connect', onConnect);
-  client.once('error', onError);
-  client.connect({ port, host: '127.0.0.1' });
-
-  return promise;
-}
+import { getPrimaryKeys, isRunning, start } from '../../common';
+import { writePidFile } from './writePidFile';
 
 export const command = 'network';
 export const describe = 'Start a NEO•ONE development network using the project configuration.';
@@ -88,9 +46,7 @@ export const handler = () => {
 
     await fullNode.start();
 
-    const pidFile = getNetworkProcessIDFile(config);
-    await fs.ensureDir(nodePath.dirname(pidFile));
-    await fs.writeFile(pidFile, process.pid);
+    await writePidFile('network', process, config);
 
     return async () => {
       await fullNode.stop();

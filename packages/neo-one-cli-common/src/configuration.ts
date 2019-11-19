@@ -31,6 +31,7 @@ export interface NetworksConfiguration {
 export interface NEOTrackerConfiguration {
   readonly path: string;
   readonly port: number;
+  readonly skip: boolean;
 }
 
 export interface MigrationConfiguration {

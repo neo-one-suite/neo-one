@@ -29,5 +29,6 @@ module.exports = {
   neotracker: {
     path: nodePath.join(tmpDir, 'neotracker'),
     port: neotrackerPort,
+    skip: false,
   },
 };
