@@ -15,6 +15,7 @@
   "deepscan.enable": true,
   "files.associations": {
     "[Dd]ockerfile*": "dockerfile",
-    "docker-compose*": "yaml"
+    "docker-compose*": "yaml",
+    "*.d.ts.map": "json"
   }
 }

@@ -14,7 +14,7 @@ const { argv } = yargs
 
 const APP_ROOT_DIR = path.resolve(__dirname, '..', '..', '..');
 const rushJSON = fs.readJsonSync(path.resolve(APP_ROOT_DIR, 'rush.json'));
-const PUBLISH_SCRIPT = path.resolve(__dirname, '..', 'scripts', 'try-publish');
+const PUBLISH_SCRIPT = path.resolve(APP_ROOT_DIR, 'scripts', 'try-publish');
 
 // tslint:disable: no-any
 const packages: readonly string[] = rushJSON.projects
@@ -23,8 +23,15 @@ const packages: readonly string[] = rushJSON.projects
 // tslint:enable no-any
 
 const publishPackage = async (format: Format, pkgName: string) => {
+  const packageDist = path.resolve(APP_ROOT_DIR, 'dist', format.dist, getName(format, pkgName));
+  const packageExists = await fs.pathExists(packageDist);
+
+  if (!packageExists) {
+    throw new Error(`no publishable package found at ${packageDist}`);
+  }
+
   await execa(PUBLISH_SCRIPT, {
-    cwd: path.resolve(APP_ROOT_DIR, 'dist', format.dist, getName(format, pkgName)),
+    cwd: packageDist,
     stdio: ['ignore', 'inherit', 'inherit'],
   });
 };

@@ -12,7 +12,7 @@
     "cypress": "3.4.1",
     "cypress-plugin-retries": "^1.2.2",
     "json": "^9.0.6",
-    "husky": "^3.0.9",
+    "husky": "^3.1.0",
     "lint-staged": "^9.4.1",
     "rxjs-tslint-rules": "^4.24.3",
     "serve": "^11.2.0",

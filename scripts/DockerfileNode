@@ -107,4 +107,5 @@ COPY --from=builder /tmp/neo-one/packages/neo-one-node-bin/lib packages/neo-one-
 COPY --from=builder /tmp/neo-one/packages/neo-one-node-bin/node_modules packages/neo-one-node-bin/node_modules/
 COPY --from=builder /tmp/neo-one/packages/neo-one-node-bin/bin packages/neo-one-node-bin/bin/
 COPY --from=builder /tmp/neo-one/common/temp/node_modules common/temp/node_modules/
-# ENTRYPOINT ["/usr/local/bin/node", "packages/neo-one-node-bin/bin/neo-one-node.js"]
+
+ENTRYPOINT ["/usr/local/bin/node", "packages/neo-one-node-bin/bin/neo-one-node.js"]

@@ -380,6 +380,12 @@
       "associatedCommands": ["clean"]
     },
     {
+      "parameterKind": "flag",
+      "longName": "--detect-open-handles",
+      "description": "pass through of jest's detectOpenHandle flag",
+      "associatedCommands": ["test", "test-ci", "e2e", "e2e-ci"]
+    },
+    {
       "parameterKind": "string",
       "longName": "--test-path-pattern",
       "shortName": "-t",

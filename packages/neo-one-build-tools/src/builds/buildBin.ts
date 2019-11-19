@@ -5,7 +5,7 @@ import gulp from 'gulp';
 import gulpBanner from 'gulp-banner';
 import gulpPlumber from 'gulp-plumber';
 import gulpRename from 'gulp-rename';
-// import gulpSourcemaps from 'gulp-sourcemaps';
+import gulpSourcemaps from 'gulp-sourcemaps';
 import ts from 'gulp-typescript';
 import path from 'path';
 import typescript from 'typescript';
@@ -13,15 +13,17 @@ import { Format } from '../formats';
 import { flattenBin, gulpReplaceBin, gulpReplaceModule, replaceCmd } from '../utils';
 
 const gulpBin = (format: Format, binPath: string) =>
-  gulpReplaceModule(format, gulp.src(binPath)).pipe(
-    gulpRename((parsedPath) => {
-      if (parsedPath.dirname === undefined) {
-        throw new Error('error creating bin');
-      }
-      // tslint:disable-next-line: no-object-mutation
-      parsedPath.dirname = `${parsedPath.dirname.slice(0, -'/src/bin'.length)}/bin`;
-    }),
-  );
+  gulpReplaceModule(format, gulp.src(binPath))
+    .pipe(gulpSourcemaps.init())
+    .pipe(
+      gulpRename((parsedPath) => {
+        if (parsedPath.dirname === undefined) {
+          throw new Error('error creating bin');
+        }
+        // tslint:disable-next-line: no-object-mutation
+        parsedPath.dirname = `${parsedPath.dirname.slice(0, -'/src/bin'.length)}/bin`;
+      }),
+    );
 
 const binBanner = `#!/usr/bin/env node
 require('source-map-support').install({ handleUncaughtExceptions: false, environment: 'node' });
@@ -33,19 +35,15 @@ const compileBin = (format: Format, binGlob: string) => {
     declaration: false,
   });
 
-  return (
-    gulpBin(format, binGlob)
-      // .pipe(gulpSourcemaps.init())
-      .pipe(gulpPlumber())
-      .pipe(binProject())
-      .pipe(gulpBanner(binBanner))
-      // .pipe(gulpSourcemaps.mapSources(mapSources))
-      // .pipe(gulpSourcemaps.write())
-      .pipe(replaceCmd)
-      .pipe(flattenBin)
-      .pipe(gulpReplaceBin())
-      .pipe(gulp.dest('lib'))
-  );
+  return gulpBin(format, binGlob)
+    .pipe(gulpPlumber())
+    .pipe(binProject())
+    .pipe(gulpBanner(binBanner))
+    .pipe(replaceCmd)
+    .pipe(flattenBin)
+    .pipe(gulpReplaceBin())
+    .pipe(gulpSourcemaps.write('.', { includeContent: false, sourceRoot: '../src' }))
+    .pipe(gulp.dest('lib'));
 };
 
 export const buildBin = (format: Format) => () => {

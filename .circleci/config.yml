@@ -1,27 +1,27 @@
 aliases:
-  - &restore-pnpm-store-10
+  - &restore-yarn-cache-10
     keys:
-      - v7-pnpm-10-{{ .Branch }}-{{ checksum "common/config/rush/pnpm-lock.yaml" }}
+      - v7-yarn-10-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
       # Fallback in case checksum fails
-      - v7-pnpm-10-{{ .Branch }}-
+      - v7-yarn-10-{{ .Branch }}-
 
-  - &save-pnpm-store-10
+  - &save-yarn-cache-10
     paths:
       - common/temp/node_modules
-      - common/temp/pnpm-store
-    key: v7-pnpm-10-{{ .Branch }}-{{ checksum "common/config/rush/pnpm-lock.yaml" }}
+      - common/temp/yarn-cache
+    key: v7-yarn-10-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
 
-  - &restore-pnpm-store-12
+  - &restore-yarn-cache-12
     keys:
-      - v7-pnpm-12-{{ .Branch }}-{{ checksum "common/config/rush/pnpm-lock.yaml" }}
+      - v7-yarn-12-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
       # Fallback in case checksum fails
-      - v7-pnpm-12-{{ .Branch }}-
+      - v7-yarn-12-{{ .Branch }}-
 
-  - &save-pnpm-store-12
+  - &save-yarn-cache-12
     paths:
       - common/temp/node_modules
-      - common/temp/pnpm-store
-    key: v7-pnpm-12-{{ .Branch }}-{{ checksum "common/config/rush/pnpm-lock.yaml" }}
+      - common/temp/yarn-cache
+    key: v7-yarn-12-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
 
   - &filter-ignore-bors-tmp
     branches:
@@ -36,12 +36,16 @@ aliases:
     working_directory: ~/neo-one
     steps:
       - checkout
-      - restore-cache: *restore-pnpm-store-12
+      - restore-cache: *restore-yarn-cache-12
       - run: *install
-      - save-cache: *save-pnpm-store-12
+      - save-cache: *save-yarn-cache-12
       - run:
           name: Changelog
           command: node common/scripts/install-run-rush.js change -v
+          when: always
+      - run:
+          name: Lint
+          command: node common/scripts/install-run-rush.js lint -p 8
           when: always
       - run:
           name: Prettier
@@ -52,15 +56,12 @@ aliases:
     working_directory: ~/neo-one
     steps:
       - checkout
-      - restore-cache: *restore-pnpm-store-10
+      - restore-cache: *restore-yarn-cache-10
       - run: *install
-      - save-cache: *save-pnpm-store-10
+      - save-cache: *save-yarn-cache-10
       - run:
           name: Build
           command: node common/scripts/install-run-rush.js rebuild
-      - run:
-          name: Lint
-          command: node common/scripts/install-run-rush.js lint -p 8
       - persist_to_workspace:
           root: ~/neo-one
           paths:
@@ -74,9 +75,9 @@ aliases:
       - checkout
       - attach_workspace:
           at: ./
-      - restore-cache: *restore-pnpm-store-10
+      - restore-cache: *restore-yarn-cache-10
       - run: *install
-      - save-cache: *save-pnpm-store-10
+      - save-cache: *save-yarn-cache-10
       - run:
           name: Test
           command: node common/scripts/install-run-rush.js test-ci --test-path-pattern '$(circleci tests glob packages/*/src/__tests__/**/*.test.ts)' --coverage
@@ -99,9 +100,9 @@ aliases:
     working_directory: ~/neo-one
     steps:
       - checkout
-      - restore-cache: *restore-pnpm-store-12
+      - restore-cache: *restore-yarn-cache-12
       - run: *install
-      - save-cache: *save-pnpm-store-12
+      - save-cache: *save-yarn-cache-12
       - run:
           name: Build
           command: node common/scripts/install-run-rush.js rebuild
@@ -121,9 +122,9 @@ aliases:
       - checkout
       - attach_workspace:
           at: ./
-      - restore-cache: *restore-pnpm-store-12
+      - restore-cache: *restore-yarn-cache-12
       - run: *install
-      - save-cache: *save-pnpm-store-12
+      - save-cache: *save-yarn-cache-12
       - run:
           name: Test
           command: node common/scripts/install-run-rush.js test-ci --test-path-pattern '$(circleci tests glob packages/*/src/__tests__/**/*.test.ts)' --coverage

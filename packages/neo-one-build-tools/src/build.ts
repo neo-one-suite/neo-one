@@ -88,7 +88,7 @@ export const compileBinTask = new BuildTask(buildBin);
 
 export const copyDataTask = new BuildTask<undefined>(copyData);
 
-export const packTask = new BuildTask<undefined>(pack, ['lib/**']);
+export const packTask = new BuildTask<undefined>(pack, ['lib/**', '!lib/**/*.map']);
 
 export const packBinTask = new BuildTask<undefined>(packBin);
 

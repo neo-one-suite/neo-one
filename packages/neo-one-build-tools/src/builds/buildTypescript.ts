@@ -1,9 +1,8 @@
 // tslint:disable: no-any match-default-export-name
 import gulp from 'gulp';
 import gulpPlumber from 'gulp-plumber';
-// import gulpSourcemaps from 'gulp-sourcemaps';
+import gulpSourcemaps from 'gulp-sourcemaps';
 import ts from 'gulp-typescript';
-// import path from 'path';
 import typescript from 'typescript';
 import { Format } from '../formats';
 import {
@@ -15,7 +14,6 @@ import {
   replaceInternalSources,
   replaceRXJSImport,
   replaceStatic,
-  // transformPackage,
 } from '../utils';
 
 export interface CompileTypescriptOptions {
@@ -40,6 +38,7 @@ export const buildTypescript = (format: Format, pkgName?: string) => (
     gulp
       .src(glob)
       .pipe(gulpPlumber())
+      .pipe(gulpSourcemaps.init())
       .pipe(project())
       .pipe(replaceRXJSImport(format))
       .pipe(replaceInternalSources)
@@ -47,6 +46,7 @@ export const buildTypescript = (format: Format, pkgName?: string) => (
       .pipe(replaceBNImport)
       .pipe(replaceStatic)
       .pipe(flattenSource)
+      .pipe(gulpSourcemaps.write('.', { includeContent: false, sourceRoot: '../src' }))
       .pipe(filterJS(isToolsPackage)),
   ).pipe(gulp.dest('lib'));
 };

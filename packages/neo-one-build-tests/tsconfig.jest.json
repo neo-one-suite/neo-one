@@ -24,8 +24,7 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "bn.js": ["node_modules/@neo-one/build-tools/types/bn.js.d.ts"],
-      "@neo-one/*": ["../neo-one-*/src"]
+      "bn.js": ["node_modules/@neo-one/build-tools/types/bn.js.d.ts"]
     }
   },
   "exclude": [

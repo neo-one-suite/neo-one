@@ -169,6 +169,7 @@ const createFormatOptionLabel = (isMulti?: boolean) => (
           <Box>{option.address}</Box>
         </>
       )}
+      {/* tslint:disable-next-line no-useless-cast */}
       {((option as any).balances === undefined ? [] : (option as any).balances).map(
         ([name, value]: [string, BigNumber]) => (
           // @ts-ignore
