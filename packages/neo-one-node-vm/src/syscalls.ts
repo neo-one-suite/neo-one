@@ -358,6 +358,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
       results: [new BufferStackItem(Buffer.from('NEO', 'ascii'))],
     }),
   }),
+
   'System.Runtime.GetTrigger': createSysCall({
     name: 'System.Runtime.GetTrigger',
     out: 1,
@@ -687,25 +688,6 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     }),
   }),
 
-  'System.Blockchain.GetHeader': createSysCall({
-    name: 'System.Blockchain.GetHeader',
-    in: 1,
-    out: 1,
-    fee: FEES[7_000],
-    invoke: async ({ context, args }) => {
-      const hashOrIndex = getHashOrIndex({ context, arg: args[0] });
-      if (hashOrIndex === undefined) {
-        throw new InvalidGetHeaderArgumentsError(context);
-      }
-      const header = await context.blockchain.header.get({ hashOrIndex });
-
-      return {
-        context,
-        results: [new HeaderStackItem(header)],
-      };
-    },
-  }),
-
   'System.Blockchain.GetBlock': createSysCall({
     name: 'System.Blockchain.GetBlock',
     in: 1,
@@ -780,194 +762,6 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'System.Header.GetHash': createSysCall({
-    name: 'System.Header.GetHash',
-    in: 1,
-    out: 1,
-    fee: FEES[400],
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new UInt256StackItem(args[0].asBlockBase().hash)],
-    }),
-  }),
-
-  'Neo.Header.GetVersion': createSysCall({
-    name: 'Neo.Header.GetVersion',
-    in: 1,
-    out: 1,
-    fee: FEES[400],
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new IntegerStackItem(new BN(args[0].asBlockBase().version))],
-    }),
-  }),
-
-  'System.Header.GetPrevHash': createSysCall({
-    name: 'System.Header.GetPrevHash',
-    in: 1,
-    out: 1,
-    fee: FEES[400],
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new UInt256StackItem(args[0].asBlockBase().previousHash)],
-    }),
-  }),
-
-  'System.Header.GetIndex': createSysCall({
-    name: 'System.Header.GetIndex',
-    in: 1,
-    out: 1,
-    fee: FEES[400],
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new IntegerStackItem(new BN(args[0].asBlockBase().index))],
-    }),
-  }),
-
-  'Neo.Header.GetMerkleRoot': createSysCall({
-    name: 'Neo.Header.GetMerkleRoot',
-    in: 1,
-    out: 1,
-    fee: FEES[400],
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new UInt256StackItem(args[0].asBlockBase().merkleRoot)],
-    }),
-  }),
-
-  'System.Header.GetTimestamp': createSysCall({
-    name: 'System.Header.GetTimestamp',
-    in: 1,
-    out: 1,
-    fee: FEES[400],
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new IntegerStackItem(new BN(args[0].asBlockBase().timestamp))],
-    }),
-  }),
-
-  'Neo.Header.GetNextConsensus': createSysCall({
-    name: 'Neo.Header.GetNextConsensus',
-    in: 1,
-    out: 1,
-    fee: FEES[400],
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new UInt160StackItem(args[0].asBlockBase().nextConsensus)],
-    }),
-  }),
-
-  'System.Block.GetTransactionCount': createSysCall({
-    name: 'System.Block.GetTransactionCount',
-    in: 1,
-    out: 1,
-    fee: FEES[400],
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new IntegerStackItem(new BN(args[0].asBlock().transactions.length))],
-    }),
-  }),
-
-  'System.Block.GetTransactions': createSysCall({
-    name: 'System.Block.GetTransactions',
-    in: 1,
-    out: 1,
-    fee: FEES[10_000],
-    invoke: ({ context, args }) => {
-      if (args[0].asBlock().transactions.length > MAX_ARRAY_SIZE) {
-        throw new ContainerTooLargeError(context);
-      }
-
-      return {
-        context,
-        results: [
-          new ArrayStackItem(
-            args[0].asBlock().transactions.map((transaction) => new TransactionStackItem(transaction)),
-          ),
-        ],
-      };
-    },
-  }),
-
-  'System.Block.GetTransaction': createSysCall({
-    name: 'System.Block.GetTransaction',
-    in: 2,
-    out: 1,
-    fee: FEES[400],
-    invoke: ({ context, args }) => ({
-      context,
-      results: [
-        new TransactionStackItem(
-          getIndex(context, args[1].asBigIntegerUnsafe().toNumber(), args[0].asBlock().transactions),
-        ),
-      ],
-    }),
-  }),
-
-  'System.Transaction.GetHash': createSysCall({
-    name: 'System.Transaction.GetHash',
-    in: 1,
-    out: 1,
-    fee: FEES[400],
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new UInt256StackItem(args[0].asTransaction().hash)],
-    }),
-  }),
-
-  'Neo.Transaction.GetWitnesses': createSysCall({
-    name: 'Neo.Transaction.GetWitnesses',
-    in: 1,
-    out: 1,
-    fee: FEES[10_000],
-    invoke: async ({ context, args }) => {
-      const transaction = args[0].asTransaction();
-
-      if (transaction.scripts.length > MAX_ARRAY_SIZE) {
-        throw new ContainerTooLargeError(context);
-      }
-
-      const hashes = await transaction.getSortedScriptHashesForVerifying({
-        getOutput: context.blockchain.output.get,
-        getAsset: context.blockchain.asset.get,
-      });
-      const witnesses = await Promise.all(
-        transaction.scripts.map(async (witness, idx) => {
-          if (witness.verification.length === 0) {
-            const contract = await context.blockchain.contract.get({ hash: common.stringToUInt160(hashes[idx]) });
-
-            return new Witness({
-              invocation: witness.invocation,
-              verification: contract.script,
-            });
-          }
-
-          return witness;
-        }),
-      );
-
-      return {
-        context,
-        results: [new ArrayStackItem(witnesses.map((witness) => new WitnessStackItem(witness)))],
-      };
-    },
-  }),
-
-  'Neo.Witness.GetVerificationScript': createSysCall({
-    name: 'Neo.Witness.GetVerificationScript',
-    in: 1,
-    out: 1,
-    fee: FEES[400],
-    invoke: async ({ context, args }) => {
-      const witness = args[0].asWitness();
-
-      return {
-        context,
-        results: [new BufferStackItem(witness.verification)],
-      };
-    },
-  }),
-
   'Neo.Transaction.GetScript': createSysCall({
     name: 'Neo.Transaction.GetScript',
     in: 1,
@@ -984,28 +778,6 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
 
       throw new InvalidInvocationTransactionError(context);
     },
-  }),
-
-  'Neo.Contract.GetScript': createSysCall({
-    name: 'Neo.Contract.GetScript',
-    in: 1,
-    out: 1,
-    fee: FEES[400],
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new BufferStackItem(args[0].asContract().script)],
-    }),
-  }),
-
-  'Neo.Contract.IsPayable': createSysCall({
-    name: 'Neo.Contract.IsPayable',
-    in: 1,
-    out: 1,
-    fee: FEES[400],
-    invoke: ({ context, args }) => ({
-      context,
-      results: [new BooleanStackItem(args[0].asContract().payable)],
-    }),
   }),
 
   'System.Storage.GetContext': createSysCall({
