@@ -14,15 +14,15 @@ const { argv } = yargs
   .describe('bundle', 'Bundle to compile.')
   .default('bundle', 'react-static');
 
-const devStage = process.env.NEO_ONE_PROD === 'true' ? 'prod' : 'dev';
+const stage = process.env.NEO_ONE_PROD === 'true' ? 'prod' : 'dev';
 
 const createDispose = (watcher: webpack.Compiler.Watching): (() => Promise<void>) => async () =>
   new Promise<void>((resolve) => watcher.close(resolve));
 const watchConfig = (config: webpack.Configuration): (() => Promise<void>) =>
   createDispose(webpack(config).watch({}, () => undefined));
-const watchWorkers = () => watchConfig(workers({ stage: devStage }));
-const watchOverlay = () => watchConfig(overlay({ stage: devStage }));
-const watchTools = () => watchConfig(tools({ stage: devStage }));
+const watchWorkers = () => watchConfig(workers({ stage }));
+const watchOverlay = () => watchConfig(overlay({ stage }));
+const watchTools = () => watchConfig(tools({ stage }));
 const watchWindow = async (config: webpack.Configuration, port: number) => {
   const devServer = new WebpackDevServer(webpack(config), {
     open: false,
@@ -43,10 +43,10 @@ const watchWindow = async (config: webpack.Configuration, port: number) => {
       resolve();
     });
 };
-const watchPreview = async () => watchWindow(preview({ stage: devStage }), 8080);
-const watchTestRunner = async () => watchWindow(testRunner({ stage: devStage }), 8081);
+const watchPreview = async () => watchWindow(preview({ stage }), 8080);
+const watchTestRunner = async () => watchWindow(testRunner({ stage }), 8081);
 const watchServer = async () => {
-  const stop = watchConfig(server({ stage: devStage }));
+  const stop = watchConfig(server({ stage }));
   // tslint:disable-next-line:no-require-imports
   const nodemon = require('nodemon');
 

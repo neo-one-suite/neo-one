@@ -5,10 +5,10 @@
   "main": "./lib/index",
   "scripts": {
     "build": "gulp",
-    "lint": "./node_modules/.bin/neo-one-lint",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
     "lint:staged": "lint-staged --relative",
     "pack": "gulp pack",
-    "tsc": "./node_modules/.bin/neo-one-tsc"
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
     "@neo-one/client-common": "^2.3.0",
@@ -16,6 +16,7 @@
     "@neo-one/node-core": "^2.3.0",
     "@neo-one/utils": "^2.3.0",
     "@reactivex/ix-es2015-cjs": "^2.5.3",
+    "@reactivex/ix-esnext-esm": "^2.5.3",
     "bignumber.js": "^9.0.0",
     "bn.js": "^5.0.0",
     "lodash": "^4.17.15",

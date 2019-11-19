@@ -4,7 +4,7 @@
   "description": "Tool package for running unit/e2e tests",
   "scripts": {
     "build": "",
-    "tsc": "./node_modules/.bin/neo-one-tsc"
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.6.3",

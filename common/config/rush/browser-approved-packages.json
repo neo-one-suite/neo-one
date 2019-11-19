@@ -539,6 +539,10 @@
       "allowedCategories": [ "tools" ]
     },
     {
+      "name": "concurrently",
+      "allowedCategories": [ "tools", "web" ]
+    },
+    {
       "name": "core-js",
       "allowedCategories": [ "production", "tools", "web" ]
     },
@@ -556,6 +560,14 @@
     },
     {
       "name": "cssnano",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "cypress",
+      "allowedCategories": [ "tools" ]
+    },
+    {
+      "name": "cypress-plugin-retries",
       "allowedCategories": [ "tools" ]
     },
     {

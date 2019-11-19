@@ -1,5 +1,5 @@
 // tslint:disable no-object-literal-type-assertion
-import { build, checkProblems, enterSolution, resetEditorTab, nextButton, Problem, runTests, Test } from './matchers';
+import { build, checkProblems, enterSolution, nextButton, Problem, resetEditorTab, runTests, Test } from './matchers';
 
 export const ALL_SLUGS: readonly string[] = [
   '/course/tokenomics/1/1',
@@ -54,7 +54,7 @@ export const lesson1 = ({
     }
 
     cy.reload(true);
-    build({ success: chapter === 1 ? false : true, contracts: ['Token'] });
+    build({ success: chapter !== 1, contracts: ['Token'] });
     runTests({
       passing: 0,
       failing: 1,
