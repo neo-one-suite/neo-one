@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@2.3.0...@neo-one/website@2.4.0) (2019-11-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @emotion/styled to v10.0.23 ([83ebac2](https://github.com/neo-one-suite/neo-one/commit/83ebac270f5f6008f0b3319cc50d5d583793647c))
+* **deps:** update dependency @neo-one/react-core to v1.1.8 ([4f0ad69](https://github.com/neo-one-suite/neo-one/commit/4f0ad69a7d2aa10102235f5b08139b6d11161081))
+* **deps:** update emotion monorepo to v10.0.22 ([0efe04d](https://github.com/neo-one-suite/neo-one/commit/0efe04d4008553a2bcd0b1ec7f28c02ccccad889))
+
+
+### Features
+
+* **neotracker:** add neotracker command to neo-one build ([#1870](https://github.com/neo-one-suite/neo-one/issues/1870)) ([9a3e32a](https://github.com/neo-one-suite/neo-one/commit/9a3e32af4301bcc0fb37353661696c88a194d9be))
+
+
+
+
+
 # [2.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/website@1.5.9...@neo-one/website@2.3.0) (2019-10-23)
 
 **Note:** Version bump only for package @neo-one/website

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/cli-common@2.3.0...@neo-one/cli-common@2.4.0) (2019-11-20)
+
+
+### Features
+
+* **neotracker:** add neotracker command to neo-one build ([#1870](https://github.com/neo-one-suite/neo-one/issues/1870)) ([9a3e32a](https://github.com/neo-one-suite/neo-one/commit/9a3e32af4301bcc0fb37353661696c88a194d9be))
+
+
+
+
+
 # [2.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/cli-common@1.1.13...@neo-one/cli-common@2.3.0) (2019-10-23)
 
 **Note:** Version bump only for package @neo-one/cli-common
