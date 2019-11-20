@@ -1,10 +1,10 @@
 {
   "name": "@neo-one/smart-contract-test-common",
-  "version": "2.3.1",
+  "version": "2.3.0",
   "description": "NEO•ONE TypeScript smart contract test harness common code.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/cli-common": "^2.4.0",
+    "@neo-one/cli-common": "^2.3.0",
     "@neo-one/client-common": "^2.3.0",
     "@neo-one/client-core": "^2.3.0",
     "@neo-one/client-full-core": "^2.3.0",

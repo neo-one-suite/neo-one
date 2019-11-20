@@ -1,15 +1,15 @@
 {
   "name": "@neo-one/smart-contract-test",
-  "version": "2.3.1",
+  "version": "2.3.0",
   "description": "NEO•ONE TypeScript smart contract test harness.",
   "main": "./src/index",
   "dependencies": {
     "@neo-one/client-common": "^2.3.0",
     "@neo-one/client-core": "^2.3.0",
-    "@neo-one/node": "^2.3.1",
+    "@neo-one/node": "^2.3.0",
     "@neo-one/node-neo-settings": "^2.3.0",
     "@neo-one/smart-contract-compiler-node": "^2.3.0",
-    "@neo-one/smart-contract-test-common": "^2.3.1",
+    "@neo-one/smart-contract-test-common": "^2.3.0",
     "@neo-one/utils": "^2.3.0",
     "lodash": "^4.17.15",
     "memdown": "^5.0.0",
