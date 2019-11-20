@@ -57,6 +57,8 @@ export default {
     path: '.neo-one/neotracker',
     // NEO•ONE will start an instance of NEO tracker using this port.
     port: 9041,
+    // Set to true if you'd like NEO•ONE to skip starting a NEO tracker instance when running 'neo-one build'.
+    skip: false,
   },
 };
 ```

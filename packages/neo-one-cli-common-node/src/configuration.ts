@@ -33,6 +33,7 @@ const configurationDefaults = {
   neotracker: {
     path: nodePath.join('.neo-one', 'neotracker'),
     port: 9041,
+    skip: false,
   },
 };
 
@@ -135,6 +136,7 @@ const configurationSchema = {
       properties: {
         path: { type: 'string' },
         port: { type: 'number', multipleOf: 1.0, minimum: 0 },
+        skip: { type: 'boolean' },
       },
     },
   },
@@ -212,6 +214,8 @@ ${exportConfig} {
     path: '${config.neotracker.path}',
     // NEO•ONE will start an instance of NEO tracker using this port.
     port: 9041,
+    // Set to true if you'd like NEO•ONE to skip starting a NEO tracker instance when running 'neo-one build'.
+    skip: false,
   }
 };
 `;

@@ -11,6 +11,7 @@ import { findContracts } from './findContracts';
 import { generateCode } from './generateCode';
 import { generateCommonCode } from './generateCommonCode';
 import { setupWallets } from './setupWallets';
+import { startNeotracker } from './startNeotracker';
 import { startNetwork } from './startNetwork';
 
 export const createTasks = (cmd: Command, config: Configuration, reset: boolean) =>
@@ -93,6 +94,15 @@ export const createTasks = (cmd: Command, config: Configuration, reset: boolean)
           },
         ];
         await generateCommonCode(config, ctx.contracts, networks, ctx.sourceMaps);
+      },
+    },
+    {
+      title: 'Start NEO tracker instance',
+      task: async (_ctx, task) => {
+        if (config.neotracker.skip) {
+          task.skip('NEO tracker instance skipped.');
+        }
+        await startNeotracker(cmd, config, reset);
       },
     },
   ]);
