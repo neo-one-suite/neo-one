@@ -1,14 +1,14 @@
 {
   "name": "@neo-one/local-browser",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "NEO•ONE local browser implementation.",
   "main": "./src/index",
   "dependencies": {
-    "@neo-one/cli-common": "^2.3.0",
+    "@neo-one/cli-common": "^2.4.0",
     "@neo-one/client-common": "^2.3.0",
     "@neo-one/client-core": "^2.3.0",
     "@neo-one/node-browser": "^2.3.0",
-    "@neo-one/smart-contract-codegen": "^2.3.0",
+    "@neo-one/smart-contract-codegen": "^2.3.1",
     "@neo-one/smart-contract-compiler": "^2.3.0",
     "@neo-one/utils": "^2.3.0",
     "@neo-one/worker": "^2.3.0",
