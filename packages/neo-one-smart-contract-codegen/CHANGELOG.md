@@ -3,14 +3,6 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [2.3.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-codegen@2.3.0...@neo-one/smart-contract-codegen@2.3.1) (2019-11-20)
-
-**Note:** Version bump only for package @neo-one/smart-contract-codegen
-
-
-
-
-
 # [2.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/smart-contract-codegen@1.2.1...@neo-one/smart-contract-codegen@2.3.0) (2019-10-23)
 
 **Note:** Version bump only for package @neo-one/smart-contract-codegen
