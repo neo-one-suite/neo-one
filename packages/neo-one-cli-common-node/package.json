@@ -7,7 +7,7 @@
     "@neo-one/cli-common": "^2.4.0",
     "@neo-one/client-core": "^2.3.0",
     "@neo-one/client-full-core": "^2.3.0",
-    "cosmiconfig": "^5.2.1",
+    "cosmiconfig": "^6.0.0",
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.15",
     "prompts": "^2.2.1",
