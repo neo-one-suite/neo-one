@@ -19,7 +19,7 @@
     "emotion-theming": "^10.0.14",
     "fs-extra": "^8.1.0",
     "gray-matter": "^4.0.2",
-    "immer": "^4.0.0",
+    "immer": "^5.0.0",
     "localforage": "^1.7.3",
     "lodash": "^4.17.15",
     "markdown-it": "^10.0.0",
