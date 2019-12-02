@@ -274,6 +274,10 @@ export class StackItemBase implements Equatable {
     throw new InvalidValueStorageContextStackItemError();
   }
 
+  public isNull(): boolean {
+    return false;
+  }
+
   public isArray(): boolean {
     return false;
   }

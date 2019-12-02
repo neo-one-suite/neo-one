@@ -1,5 +1,5 @@
 import { factory, testUtils } from '../../__data__';
-import { HeaderStackItem, InputStackItem, UInt160StackItem, UInt256StackItem } from '../../stackItem';
+import { HeaderStackItem, InputStackItem, NullStackItem, UInt160StackItem, UInt256StackItem } from '../../stackItem';
 
 describe('Stack Item Base', () => {
   const uInt160 = factory.createUInt160();
@@ -10,6 +10,7 @@ describe('Stack Item Base', () => {
   const uInt256StackItem = new UInt256StackItem(uInt256);
   const headerStackItem = new HeaderStackItem(header);
   const inputStackItem = new InputStackItem(input);
+  const nullStackItem = new NullStackItem();
 
   test('equals - undefined', () => {
     expect(uInt160StackItem.equals(undefined)).toBeFalsy();
@@ -100,6 +101,21 @@ describe('Stack Item Base', () => {
   });
   test('Errors - asIterator', () => {
     expect(() => uInt160StackItem.asIterator()).toThrowError('Invalid Value. Expected Iterator');
+  });
+  test('Base - isNull', () => {
+    expect(nullStackItem.isNull()).toBeTruthy();
+  });
+  test('Base - isNull', () => {
+    expect(uInt160StackItem.isNull()).toBeFalsy();
+  });
+  test('Base - isNull', () => {
+    expect(uInt256StackItem.isNull()).toBeFalsy();
+  });
+  test('Base - isNull', () => {
+    expect(headerStackItem.isNull()).toBeFalsy();
+  });
+  test('Base - isNull', () => {
+    expect(inputStackItem.isNull()).toBeFalsy();
   });
   test('Base - isMap', () => {
     expect(uInt160StackItem.isMap()).toBeFalsy();

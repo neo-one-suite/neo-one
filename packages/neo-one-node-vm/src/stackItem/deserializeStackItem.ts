@@ -8,6 +8,7 @@ import { BufferStackItem } from './BufferStackItem';
 import { UnsupportedStackItemSerdeError } from './errors';
 import { IntegerStackItem } from './IntegerStackItem';
 import { MapStackItem } from './MapStackItem';
+import { NullStackItem } from './NullStackItem';
 import { StackItem } from './StackItem';
 import { assertStackItemType, StackItemType } from './StackItemType';
 import { StructStackItem } from './StructStackItem';
@@ -47,6 +48,8 @@ const deserializeStackItemBase = (reader: BinaryReader): StackItem => {
 
       return new MapStackItem({ referenceKeys, referenceValues });
     }
+    case StackItemType.Null: // NULL
+      return new NullStackItem();
     /* istanbul ignore next */
     default:
       commonUtils.assertNever(type);
