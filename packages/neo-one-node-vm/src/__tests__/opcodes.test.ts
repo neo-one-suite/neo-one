@@ -20,6 +20,7 @@ import {
   BufferStackItem,
   IntegerStackItem,
   MapStackItem,
+  NullStackItem,
   StackItem,
   StructStackItem,
 } from '../stackItem';
@@ -261,6 +262,12 @@ const OPCODES = ([
       },
 
       {
+        op: 'PUSHNULL',
+        result: [new NullStackItem()],
+        gas: FEES[30],
+      },
+
+      {
         op: 'NOP',
         result: [],
         gas: FEES[30],
@@ -404,6 +411,34 @@ const OPCODES = ([
         op: 'FROMALTSTACK',
         argsAlt: [new BN(1)],
         result: [new IntegerStackItem(new BN(1))],
+        gas: FEES[60],
+      },
+
+      {
+        op: 'ISNULL',
+        preOps: [{ op: 'PUSHNULL' }],
+        result: [new BooleanStackItem(true)],
+        gas: FEES[60].add(FEES[30]),
+      },
+
+      {
+        op: 'ISNULL',
+        preOps: [{ op: 'PUSH16' }, { op: 'PUSHNULL' }],
+        result: [new BooleanStackItem(true), new IntegerStackItem(new BN(16))],
+        gas: FEES[60].add(FEES[30]).add(FEES[30]),
+      },
+
+      {
+        op: 'ISNULL',
+        preOps: [{ op: 'PUSHNULL' }, { op: 'PUSH16' }],
+        result: [new BooleanStackItem(false), new NullStackItem()],
+        gas: FEES[60].add(FEES[30]).add(FEES[30]),
+      },
+
+      {
+        op: 'ISNULL',
+        args: [new BN(1)],
+        result: [new BooleanStackItem(false)],
         gas: FEES[60],
       },
 

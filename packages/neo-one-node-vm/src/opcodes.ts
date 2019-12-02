@@ -44,6 +44,7 @@ import {
   BufferStackItem,
   IntegerStackItem,
   MapStackItem,
+  NullStackItem,
   StackItem,
   StructStackItem,
 } from './stackItem';
@@ -265,6 +266,15 @@ const OPCODE_PAIRS = ([
   )
   .concat([
     [
+      0x50,
+      createOp({
+        name: 'PUSHNULL',
+        fee: FEES[30],
+        out: 1,
+        invoke: ({ context }) => ({ context, results: [new NullStackItem()] }),
+      }),
+    ],
+    [
       0x61,
       createOp({
         name: 'NOP',
@@ -350,7 +360,7 @@ const OPCODE_PAIRS = ([
       },
     ],
     [
-      0x69,
+      0x6e,
       createOp({
         name: 'DUPFROMALTSTACKBOTTOM',
         fee: FEES[60],
@@ -399,6 +409,19 @@ const OPCODE_PAIRS = ([
         invoke: ({ context, argsAlt }) => ({
           context,
           results: [argsAlt[0]],
+        }),
+      }),
+    ],
+    [
+      0x70,
+      createOp({
+        name: 'ISNULL',
+        fee: FEES[60],
+        in: 1,
+        out: 1,
+        invoke: ({ context, args }) => ({
+          context,
+          results: [new BooleanStackItem(args[0].isNull())],
         }),
       }),
     ],

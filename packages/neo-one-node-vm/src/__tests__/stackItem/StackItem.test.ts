@@ -16,6 +16,7 @@ import {
   HeaderStackItem,
   InputStackItem,
   IntegerStackItem,
+  NullStackItem,
   OutputStackItem,
   StackItemType,
   StorageContextStackItem,
@@ -224,8 +225,22 @@ describe('Stack Item Tests', () => {
     expect(storageContextStackItem.asBuffer()).toEqual(Buffer.from(uInt160));
   });
 
+  test('Null Stack Item', () => {
+    const nullStackItem = new NullStackItem();
+    const secondNullStackItem = new NullStackItem();
+
+    expect(nullStackItem.equals(undefined)).toBe(true);
+    expect(nullStackItem.equals(nullStackItem)).toBe(true);
+    expect(nullStackItem.equals(secondNullStackItem)).toBe(true);
+    expect(nullStackItem.equals(new BufferStackItem(Buffer.from([0])))).toBe(false);
+    expect(() => nullStackItem.asBuffer()).toThrowError('Invalid Value. Expected Buffer');
+    expect(nullStackItem.asBoolean()).toEqual(false);
+    expect(nullStackItem.convertJSON()).toMatchSnapshot();
+    expect(nullStackItem.serialize()).toEqual(Buffer.from([StackItemType.Null]));
+  });
+
   test('StackItemType - Throws On Bad Assert', () => {
-    const badByte = 0xff;
+    const badByte = 0x99;
     expect(() => assertStackItemType(badByte)).toThrowError(`Expected StackItemType, found: ${badByte.toString(16)}`);
   });
 });
