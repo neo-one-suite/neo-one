@@ -14,6 +14,7 @@ import { InputStackItem } from './InputStackItem';
 import { IntegerStackItem } from './IntegerStackItem';
 import { IteratorStackItem } from './IteratorStackItem';
 import { MapStackItem } from './MapStackItem';
+import { NullStackItem } from './NullStackItem';
 import { OutputStackItem } from './OutputStackItem';
 import { StorageContextStackItem } from './StorageContextStackItem';
 import { StructStackItem } from './StructStackItem';
@@ -47,4 +48,5 @@ export type StackItem =
   | StorageContextStackItem
   | ECPointStackItem
   | StructStackItem
-  | WitnessStackItem;
+  | WitnessStackItem
+  | NullStackItem;
