@@ -144,6 +144,11 @@ export const InvalidGetBlockArgumentsError = makeErrorWithCode(
 export const InvalidIndexError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'Invalid Index.'),
 );
+export const InvalidTransactionIndexError = makeErrorWithCode(
+  'VM_ERROR',
+  (context: ExecutionContext, index: number, length: number) =>
+    getMessage(context, `Invalid Transaction Index Argument: ${index}. Transactions length: ${length}`),
+);
 export const InvalidInvocationTransactionError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'Expected InvocationTransaction.'),
 );

@@ -765,6 +765,70 @@ exports[`syscalls System.Blockchain.GetTransaction 5`] = `Array []`;
 
 exports[`syscalls System.Blockchain.GetTransaction 6`] = `Array []`;
 
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 1`] = `"block.tryGet"`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 2`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 3`] = `"transaction.tryGet"`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 4`] = `
+Array [
+  Array [
+    Object {
+      "hash": "a643872d1abf90296b503716c64662e1af0c4fe4e4efec893b7504a26a365abb",
+    },
+  ],
+]
+`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 5`] = `Array []`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 6`] = `Array []`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 7`] = `Array []`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 8`] = `Array []`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 9`] = `"block.tryGet"`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 10`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 11`] = `"transaction.tryGet"`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 12`] = `
+Array [
+  Array [
+    Object {
+      "hash": "df09c9981eb0c4a2a182ce6090148647a2f4f6053c970380a645ed63b91ce258",
+    },
+  ],
+]
+`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 13`] = `Array []`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 14`] = `Array []`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 15`] = `Array []`;
+
+exports[`syscalls System.Blockchain.GetTransactionFromBlock 16`] = `Array []`;
+
 exports[`syscalls System.Blockchain.GetTransactionHeight 1`] = `"transactionData.get"`;
 
 exports[`syscalls System.Blockchain.GetTransactionHeight 2`] = `
