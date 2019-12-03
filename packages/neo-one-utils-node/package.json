@@ -13,7 +13,7 @@
   "dependencies": {
     "@neo-one/utils": "^2.3.0",
     "execa": "^3.2.0",
-    "npm-package-arg": "^6.1.0",
+    "npm-package-arg": "^7.0.0",
     "pino": "^5.12.6",
     "tslib": "^1.10.0",
     "yargs": "^14.2.0"

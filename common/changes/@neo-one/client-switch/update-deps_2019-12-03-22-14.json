@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/client-switch",
+      "comment": "update @opencensus packages to 0.0.19",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/client-switch",
+  "email": "danwbyrne@gmail.com"
+}

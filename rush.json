@@ -22,11 +22,6 @@
   },
   "projects": [
     {
-      "packageName": "@neo-one/build-common",
-      "projectFolder": "packages/neo-one-build-common",
-      "reviewCategory": "tools"
-    },
-    {
       "packageName": "@neo-one/build-tools",
       "projectFolder": "packages/neo-one-build-tools",
       "reviewCategory": "tools"
