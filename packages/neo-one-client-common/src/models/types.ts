@@ -309,22 +309,50 @@ export interface AssetJSON {
 
 export type AssetTypeJSON = keyof typeof AssetTypeModel;
 
-export interface ContractJSON {
-  readonly version: number;
-  readonly hash: string;
-  readonly script: string;
-  readonly parameters: readonly ContractParameterTypeJSON[];
-  readonly returntype: ContractParameterTypeJSON;
+export interface ABIFunctionJSON {
   readonly name: string;
-  readonly code_version: string;
-  readonly author: string;
-  readonly email: string;
-  readonly description: string;
-  readonly properties: {
+  readonly parameters?: readonly ContractParameterJSON[];
+  readonly returnType: ContractParameterTypeJSON;
+  readonly constant?: boolean;
+}
+
+export interface ABIEventJSON {
+  readonly name: string;
+  readonly parameters: readonly ContractParameterJSON[];
+}
+
+export interface ABIJSON {
+  readonly hash: string;
+  readonly entryPoint: ABIFunctionJSON;
+  readonly methods: readonly ABIFunctionJSON[];
+  readonly events: readonly ABIEventJSON[];
+}
+
+export interface ContractGroupJSON {
+  readonly publicKey: string;
+  readonly signature: string;
+}
+
+export interface ContractPermissionsJSON {
+  readonly contract: string;
+  readonly methods: readonly string[];
+}
+
+export interface ContractManifestJSON {
+  readonly abi: ABIJSON;
+  readonly groups: ContractGroupJSON;
+  readonly permissions: ContractPermissionsJSON;
+  readonly trusts: readonly string[];
+  readonly safeMethods: readonly string[];
+  readonly features: {
     readonly storage: boolean;
-    readonly dynamic_invoke: boolean;
     readonly payable: boolean;
   };
+}
+
+export interface ContractJSON {
+  readonly script: string;
+  readonly manifest: ContractManifestJSON;
 }
 
 export interface BlockBaseJSON {

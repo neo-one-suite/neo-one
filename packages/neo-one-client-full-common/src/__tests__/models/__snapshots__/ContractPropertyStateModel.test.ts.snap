@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContractPropertyStateModel isContractPropertyState 1`] = `"Expected contract parameter type, found: -1"`;
+
+exports[`ContractPropertyStateModel isContractPropertyState 2`] = `"Expected contract parameter type, found: 2"`;
+
+exports[`ContractPropertyStateModel isContractPropertyState 3`] = `"Expected contract parameter type, found: 3"`;
+
+exports[`ContractPropertyStateModel isContractPropertyState 4`] = `"Expected contract parameter type, found: 6"`;
