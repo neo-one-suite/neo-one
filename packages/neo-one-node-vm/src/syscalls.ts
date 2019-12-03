@@ -46,6 +46,7 @@ import {
   InvalidInvocationCounterError,
   InvalidInvocationTransactionError,
   InvalidNativeDeployError,
+  InvalidTransactionIndexError,
   InvalidVerifySyscallError,
   ItemTooLargeError,
   StackUnderflowError,
@@ -63,6 +64,7 @@ import {
   HeaderStackItem,
   IntegerStackItem,
   IteratorStackItem,
+  NullStackItem,
   StackItem,
   StackItemEnumerator,
   StackItemIterator,
@@ -741,6 +743,47 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
       return {
         context,
         results: [new IntegerStackItem(new BN(transactionData.startHeight))],
+      };
+    },
+  }),
+
+  'System.Blockchain.GetTransactionFromBlock': createSysCall({
+    name: 'System.Blockchain.GetTransactionFromBlock',
+    in: 2,
+    out: 1,
+    fee: FEES[1_000_000],
+    invoke: async ({ context, args }) => {
+      const nullReturn = {
+        context,
+        results: [new NullStackItem()],
+      };
+      const hashOrIndex = getHashOrIndex({
+        context,
+        arg: args[0],
+      });
+      if (hashOrIndex === undefined) {
+        throw new InvalidGetBlockArgumentsError(context, args[0].asBufferMaybe());
+      }
+      const block = await context.blockchain.block.tryGet({ hashOrIndex });
+
+      if (block === undefined) {
+        return nullReturn;
+      }
+      const index = args[1].asBigIntegerUnsafe().toNumber();
+      if (index < 0 || index >= block.transactions.length) {
+        throw new InvalidTransactionIndexError(context, index, block.transactions.length);
+      }
+      const transaction = await context.blockchain.transaction.tryGet({
+        hash: block.transactions[index].hash,
+      });
+
+      if (transaction === undefined) {
+        return nullReturn;
+      }
+
+      return {
+        context,
+        results: [new TransactionStackItem(transaction)],
       };
     },
   }),

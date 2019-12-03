@@ -594,6 +594,52 @@ const SYSCALLS = [
   },
 
   {
+    name: 'System.Blockchain.GetTransactionFromBlock',
+    result: [new TransactionStackItem(transactions.kycTransaction)],
+    args: [Buffer.alloc(32, 3), new BN(0)],
+    mockBlockchain: ({ blockchain }) => {
+      blockchain.block.tryGet = jest.fn(async () => Promise.resolve(new Block(dummyBlock)));
+      blockchain.transaction.tryGet = jest.fn(async () => Promise.resolve(transactions.kycTransaction));
+    },
+    gas: FEES[1_000_000],
+  },
+
+  {
+    name: 'System.Blockchain.GetTransactionFromBlock',
+    result: [new TransactionStackItem(transactions.mintTransaction)],
+    args: [Buffer.alloc(32, 3), new BN(1)],
+    mockBlockchain: ({ blockchain }) => {
+      blockchain.block.tryGet = jest.fn(async () => Promise.resolve(new Block(dummyBlock)));
+      blockchain.transaction.tryGet = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
+    },
+    gas: FEES[1_000_000],
+  },
+
+  {
+    name: 'System.Blockchain.GetTransactionFromBlock',
+    result: [new TransactionStackItem(transactions.mintTransaction)],
+    args: [Buffer.alloc(32, 3), new BN(2)],
+    mockBlockchain: ({ blockchain }) => {
+      blockchain.block.tryGet = jest.fn(async () => Promise.resolve(new Block(dummyBlock)));
+      blockchain.transaction.tryGet = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
+    },
+    gas: FEES[1_000_000],
+    error: 'Invalid Transaction Index Argument: 2. Transactions length: 2',
+  },
+
+  {
+    name: 'System.Blockchain.GetTransactionFromBlock',
+    result: [new TransactionStackItem(transactions.mintTransaction)],
+    args: [Buffer.alloc(32, 3), new BN(-1)],
+    mockBlockchain: ({ blockchain }) => {
+      blockchain.block.tryGet = jest.fn(async () => Promise.resolve(new Block(dummyBlock)));
+      blockchain.transaction.tryGet = jest.fn(async () => Promise.resolve(transactions.mintTransaction));
+    },
+    gas: FEES[1_000_000],
+    error: 'Invalid Transaction Index Argument: -1. Transactions length: 2',
+  },
+
+  {
     name: 'System.Blockchain.GetContract',
     result: [new ContractStackItem(transactions.kycContract)],
     mockBlockchain: ({ blockchain }) => {

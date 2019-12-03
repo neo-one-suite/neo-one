@@ -222,6 +222,7 @@ export enum SysCall {
   'System.Blockchain.GetBlock' = 'System.Blockchain.GetBlock',
   'System.Blockchain.GetTransaction' = 'System.Blockchain.GetTransaction',
   'System.Blockchain.GetTransactionHeight' = 'System.Blockchain.GetTransactionHeight',
+  'System.Blockchain.GetTransactionFromBlock' = 'System.Blockchain.GetTransactionFromBlock',
   'System.Blockchain.GetContract' = 'System.Blockchain.GetContract',
   'System.Contract.Call' = 'System.Contract.Call',
   'System.Contract.Destroy' = 'System.Contract.Destroy',
