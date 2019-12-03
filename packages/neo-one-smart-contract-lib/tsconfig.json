@@ -1,25 +1,22 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "bn.js": ["node_modules/@neo-one/build-tools/types/bn.js.d.ts"]
+    },
     "target": "esnext",
     "module": "commonjs",
     "moduleResolution": "node",
-
     "noLib": true,
-    "typeRoots": [],
-
     "pretty": true,
-
-    "noEmit": true,
-    "declaration": false,
-
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": false,
     "experimentalDecorators": true,
-
+    "jsx": "react",
     "alwaysStrict": true,
     "strict": true,
-    "skipLibCheck": false,
-    "noUnusedLocals": true,
+    "skipLibCheck": true,
+    "noUnusedLocals": false,
     "noImplicitReturns": true,
     "allowUnusedLabels": false,
     "noUnusedParameters": false,
@@ -27,9 +24,5 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "src/ICO.ts",
-    "src/index.ts",
-    "src/Token.ts"
-  ]
+  "exclude": ["./src/index.ts", "./src/ownership/*.ts", "./src/ICO.ts", "./src/NEP5Token.ts"]
 }

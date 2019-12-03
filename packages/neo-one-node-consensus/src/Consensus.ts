@@ -236,7 +236,7 @@ export class Consensus {
     this.mutableTimer = setTimeout(
       () => this.mutableQueue.write({ type: 'timer' }),
       mutableTimerSeconds * MS_IN_SECOND,
-      // tslint:disable-next-line no-any
+      // tslint:disable-next-line no-any no-useless-cast
     ) as any;
   }
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 # pwd
-package=$(cat package.json | node ../../node_modules/.bin/json name)
-version=$(cat package.json | node ../../node_modules/.bin/json version)
+package=$(cat package.json | node ../../../common/temp/node_modules/.bin/json name)
+version=$(cat package.json | node ../../../common/temp/node_modules/.bin/json version)
 published=$(npm info $package@$version version || echo "0")
 if [[ "$version" = "$published" ]]; then
   echo "⚠️   $package@$version is already published!"

@@ -22,9 +22,7 @@ export type Without<T, K> = Pick<T, Exclude<keyof T, K>>;
  * @template U Union
  */
 // tslint:disable-next-line:no-unused
-export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void)
-  ? I
-  : never;
+export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
 
 /**
  * Use prop

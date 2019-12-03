@@ -1,3 +1,4 @@
+/// <reference types="@neo-one/build-tools/types/e2e" />
 // tslint:disable no-any
 import { ABI, common, Contract, crypto, privateKeyToAddress, UserAccountID } from '@neo-one/client-common';
 import { Client, DeveloperClient, Hash256 } from '@neo-one/client-core';

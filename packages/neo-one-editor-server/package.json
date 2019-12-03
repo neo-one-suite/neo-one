@@ -3,11 +3,18 @@
   "version": "2.3.0",
   "description": "NEO•ONE editor server.",
   "main": "./src/index",
+  "scripts": {
+    "build": "",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
+  },
   "dependencies": {
     "@neo-one/http": "^2.3.0",
     "@neo-one/logger": "^2.3.0",
     "@neo-one/utils": "^2.3.0",
     "@neo-one/utils-node": "^2.3.0",
+    "core-js": "^3.2.1",
     "cross-fetch": "^3.0.4",
     "detective": "^5.2.0",
     "graphlib": "^2.1.7",
@@ -17,20 +24,22 @@
     "koa-router": "^7.4.0",
     "lodash": "^4.17.15",
     "lru-cache": "^5.0.0",
-    "rxjs": "^6.5.2",
+    "rxjs": "^6.5.3",
     "safe-stable-stringify": "^1.1.0",
-    "semver": "^6.0.0",
+    "semver": "^6.3.0",
     "tar": "^5.0.0"
   },
   "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0",
     "@types/graphlib": "^2.1.5",
     "@types/koa": "^2.0.49",
     "@types/koa-compose": "^3.2.4",
     "@types/koa-compress": "^2.0.9",
     "@types/koa-router": "^7.0.42",
+    "@types/jest": "^24.0.18",
     "@types/lodash": "^4.14.138",
     "@types/lru-cache": "^5.1.0",
-    "@types/semver": "^6.0.1",
+    "@types/semver": "^6.0.2",
     "@types/tar": "^4.0.1"
   },
   "sideEffects": false

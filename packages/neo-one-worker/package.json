@@ -3,9 +3,19 @@
   "version": "2.3.0",
   "description": "NEO•ONE web workers.",
   "main": "./src/index",
+  "scripts": {
+    "build": "",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
+  },
   "dependencies": {
-    "rxjs": "^6.5.2",
+    "core-js": "^3.2.1",
+    "rxjs": "^6.5.3",
     "tslib": "^1.10.0"
+  },
+  "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0"
   },
   "sideEffects": false
 }

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Migrate to Rush",
+      "type": "minor",
+      "packageName": "@neo-one/client-full-core"
+    }
+  ],
+  "packageName": "@neo-one/client-full-core",
+  "email": "danwbyrne@gmail.com"
+}

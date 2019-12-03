@@ -1,31 +1,18 @@
 {
   "extends": ["tslint:all", "tslint-config-prettier"],
   "rulesDirectory": [
-    "tslint-microsoft-contrib",
-    "./node_modules/tslint-immutable/rules",
-    "./node_modules/tslint-consistent-codestyle/rules",
-    "./node_modules/tslint-sonarts/lib/rules/",
-    "./node_modules/tslint-clean-code/dist/build",
-    "./node_modules/rxjs-tslint-rules/dist/rules"
+    "./common/temp/node_modules/tslint-microsoft-contrib",
+    "./common/temp/node_modules/tslint-immutable/rules",
+    "./common/temp/node_modules/tslint-consistent-codestyle/rules",
+    "./common/temp/node_modules/tslint-sonarts/lib/rules/",
+    "./common/temp/node_modules/tslint-clean-code/dist/build",
+    "./common/temp/node_modules/rxjs-tslint-rules/dist/rules"
   ],
-  "linterOptions": {
-    "exclude": [
-      "./packages/*/package.json",
-      "./packages/*/template/**/*.ts",
-      "./packages/*/template/**/*.tsx",
-      "./packages/neo-one-cli/src/__data__/projects/**/contracts/**/*.ts",
-      "./packages/neo-one-smart-contract/src/*.d.ts",
-      "./packages/neo-one-smart-contract-compiler/src/__data__/snippets/**/*.ts",
-      "./packages/neo-one-smart-contract-lib/src/*.ts",
-      "./packages/*/src/__data__/contracts/*.ts",
-      "./packages/neo-one-playground",
-      "./cypress/**/*"
-    ]
-  },
-  "defaultSeverity": "warning",
+  "defaultSeverity": "error",
   "rules": {
     "cyclomatic-complexity": false,
     "no-unused-variable": false,
+    "no-inferred-empty-object-type": false,
     "no-duplicate-variable": false,
     "no-unbound-method": false,
     "completed-docs": false,
@@ -35,7 +22,6 @@
     "no-namespace": false,
     "typedef": false,
     "no-empty-interface": false,
-    "no-use-before-declare": false,
     "no-magic-numbers": false,
     "prefer-method-signature": false,
     "restrict-plus-operands": false,
@@ -47,6 +33,7 @@
     "file-name-casing": [false, "camel-case"],
     "static-this": false,
     "strict-comparisons": false,
+    "no-use-before-declare": null,
     "no-async-without-await": false,
     "no-null-undefined-union": false,
     "array-type": [true, "array-simple"],
@@ -126,6 +113,7 @@
     "no-collapsible-if": true,
     "no-unnecessary-else": true,
     "no-unnecessary-type-annotation": false,
+    "no-unnecessary-type-assertion": false,
     "no-unused": [true, "unused-function-expression-name", "unused-class-expression-name", "unused-catch-binding"],
     "no-var-before-return": true,
     "prefer-while": true,

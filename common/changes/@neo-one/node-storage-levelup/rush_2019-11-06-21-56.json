@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Migrate to Rush",
+      "type": "minor",
+      "packageName": "@neo-one/node-storage-levelup"
+    }
+  ],
+  "packageName": "@neo-one/node-storage-levelup",
+  "email": "danwbyrne@gmail.com"
+}

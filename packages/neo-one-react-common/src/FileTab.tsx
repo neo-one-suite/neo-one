@@ -10,7 +10,11 @@ const Wrapper = styled(ButtonBase)<{ readonly first: boolean; readonly selected:
   ${prop('theme.fontStyles.body1')};
   padding: 8px;
   cursor: pointer;
-  ${ifProp('first', '', withProp('theme.lightBlack', (color: string) => `border-left: 2px solid ${color}`))};
+  ${ifProp(
+    'first',
+    '',
+    withProp('theme.lightBlack', (color: string) => `border-left: 2px solid ${color}`),
+  )};
   outline: none;
   white-space: nowrap;
 `;

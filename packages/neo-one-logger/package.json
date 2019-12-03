@@ -2,14 +2,24 @@
   "name": "@neo-one/logger",
   "version": "2.3.0",
   "description": "NEO•ONE logging utility",
-  "main": "./src/index",
+  "main": "./lib/index",
+  "scripts": {
+    "build": "gulp",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "pack": "gulp pack",
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
+  },
   "dependencies": {
     "@neo-one/logger-config": "^2.3.0",
     "pino": "^5.12.6",
-    "pino-pretty": "^3.2.1"
+    "pino-pretty": "^3.2.1",
+    "tslib": "^1.10.0"
   },
   "devDependencies": {
-    "@types/pino": "^5.8.9"
+    "@neo-one/build-tools": "^1.0.0",
+    "@types/pino": "^5.8.9",
+    "gulp": "~4.0.2"
   },
   "sideEffects": false
 }

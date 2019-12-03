@@ -1,3 +1,5 @@
+/// <reference types="@neo-one/build-tools/types/e2e" />
+
 import { NEOONEDataProvider } from '@neo-one/client';
 import fetch from 'cross-fetch';
 import fs from 'fs-extra';

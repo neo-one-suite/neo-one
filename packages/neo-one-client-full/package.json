@@ -2,10 +2,21 @@
   "name": "@neo-one/client-full",
   "version": "2.3.0",
   "description": "NEO•ONE client extended API.",
-  "main": "./src/index",
+  "main": "./lib/index",
+  "scripts": {
+    "build": "gulp",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "pack": "gulp pack",
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
+  },
   "dependencies": {
     "@neo-one/client": "^2.3.0",
     "@neo-one/client-full-core": "^2.3.0"
+  },
+  "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0",
+    "gulp": "~4.0.2"
   },
   "sideEffects": false
 }

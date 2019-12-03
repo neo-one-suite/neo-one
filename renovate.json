@@ -3,7 +3,6 @@
   "schedule": ["after 1am and before 5am on every weekday", "every weekend"],
   "timezone": "America/Los_Angeles",
   "updateNotScheduled": false,
-  "postUpdateOptions": ["yarnDedupeHighest"],
   "automerge": true,
   "major": {
     "automerge": false

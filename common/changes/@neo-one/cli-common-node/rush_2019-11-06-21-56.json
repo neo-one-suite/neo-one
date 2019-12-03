@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Migrate to Rush",
+      "type": "minor",
+      "packageName": "@neo-one/cli-common-node"
+    }
+  ],
+  "packageName": "@neo-one/cli-common-node",
+  "email": "danwbyrne@gmail.com"
+}

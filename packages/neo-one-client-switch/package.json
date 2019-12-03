@@ -2,8 +2,15 @@
   "name": "@neo-one/client-switch",
   "version": "2.3.0",
   "description": "NEO•ONE client library for browser/node differences.",
-  "main": "./src/index",
-  "browser": "./src/index.browser",
+  "main": "./lib/index",
+  "browser": "./lib/index.browser",
+  "scripts": {
+    "build": "gulp",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "pack": "gulp pack",
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
+  },
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
     "@ledgerhq/hw-transport-u2f": "^4.68.2",
@@ -24,11 +31,13 @@
     "tslib": "^1.10.0"
   },
   "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0",
     "@types/babel__code-frame": "^7.0.1",
     "@types/ledgerhq__hw-transport": "^4.21.1",
     "@types/ledgerhq__hw-transport-node-hid": "^4.22.1",
     "@types/ledgerhq__hw-transport-u2f": "^4.21.1",
-    "@types/lodash": "^4.14.138"
+    "@types/lodash": "^4.14.138",
+    "gulp": "~4.0.2"
   },
   "optionalDependencies": {
     "@ledgerhq/hw-transport-node-hid": "^4.68.2"

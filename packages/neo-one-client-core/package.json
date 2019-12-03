@@ -2,28 +2,39 @@
   "name": "@neo-one/client-core",
   "version": "2.3.0",
   "description": "NEO•ONE client core types implementation.",
-  "main": "./src/index",
+  "main": "./lib/index",
+  "scripts": {
+    "build": "gulp",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "pack": "gulp pack",
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
+  },
   "dependencies": {
     "@neo-one/client-common": "^2.3.0",
     "@neo-one/client-switch": "^2.3.0",
     "@neo-one/utils": "^2.3.0",
     "@reactivex/ix-es2015-cjs": "^2.5.3",
+    "@reactivex/ix-esnext-esm": "^2.5.3",
     "bignumber.js": "^9.0.0",
     "bn.js": "^5.0.0",
     "cross-fetch": "^3.0.4",
     "dataloader": "^1.4.0",
     "debug": "^4.1.1",
     "lodash": "^4.17.15",
-    "rxjs": "^6.5.2",
+    "rxjs": "^6.5.3",
     "safe-stable-stringify": "^1.1.0",
     "tapable": "^1.1.3",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0",
     "@types/bn.js": "^4.11.5",
     "@types/debug": "^4.1.5",
+    "@types/jest": "^24.0.18",
     "@types/lodash": "^4.14.138",
-    "@types/tapable": "^1.0.4"
+    "@types/tapable": "^1.0.4",
+    "gulp": "~4.0.2"
   },
   "sideEffects": false
 }

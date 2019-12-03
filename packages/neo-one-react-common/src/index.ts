@@ -1,3 +1,4 @@
+/// <reference types="@neo-one/build-tools/types/static" />
 export * from './Backdrop';
 export * from './Background';
 export * from './DispatchWrapper';

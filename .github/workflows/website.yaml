@@ -18,13 +18,21 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@94d077c24971944d312dd9197c1bdfba62b39878
       - name: Install Node
-        run: brew update-reset && brew update && export PATH="/usr/local/bin:$PATH" && brew unlink node@6 && brew install node
+        run: brew update-reset && brew update && brew unlink node@12 && brew install node@10 && brew link node@10 --force
       - name: Install Chrome
         run: brew cask install google-chrome
-      - name: Yarn Install
-        run: yarn install --non-interactive --ignore-engines
+      - name: Install Rush
+        run: npm i -g @microsoft/rush@latest
+      - name: Rush Install
+        run: rush install
+      - name: Rush Rebuild
+        run: rush rebuild
+      - name: Rush Link Root
+        run: rush link-root
       - name: Run Cypress Express Test
-        run: yarn test:cypress-express
+        run: rush test-cypress --express
+      - name: Rush Unlink Root
+        run: rush unlink-root
       - name: Store Cypress Screenshots
         if: failure()
         continue-on-error: true

@@ -65,7 +65,7 @@ export const makeOption = async ({
     // tslint:disable-next-line no-array-mutation
     balances: assetBalances
       .filter(utils.notNull)
-      .concat(tokenBalances)
+      .concat(tokenBalances.filter(utils.notNull))
       .sort(([nameA], [nameB]) => {
         if (nameA.localeCompare(nameB) === 0) {
           return 0;
@@ -169,6 +169,7 @@ const createFormatOptionLabel = (isMulti?: boolean) => (
           <Box>{option.address}</Box>
         </>
       )}
+      {/* tslint:disable-next-line no-useless-cast */}
       {((option as any).balances === undefined ? [] : (option as any).balances).map(
         ([name, value]: [string, BigNumber]) => (
           // @ts-ignore
