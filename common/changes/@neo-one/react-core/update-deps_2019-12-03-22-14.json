@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/react-core",
+      "comment": "update @types/react to 16.9.14",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/react-core",
+  "email": "danwbyrne@gmail.com"
+}
