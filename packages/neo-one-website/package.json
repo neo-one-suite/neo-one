@@ -46,7 +46,7 @@
     "react-redux": "^7.0.3",
     "react-static": "^7.1.0",
     "react-static-plugin-emotion": "^7.2.2",
-    "react-static-plugin-source-filesystem": "7.1.0",
+    "react-static-plugin-source-filesystem": "7.2.3",
     "react-static-plugin-reach-router": "^7.2.2",
     "react-transition-group": "^4.2.1",
     "react-universal-component": "^4.0.0",
