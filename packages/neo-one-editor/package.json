@@ -56,7 +56,7 @@
     "nanoid": "^2.0.3",
     "onigasm": "^2.2.2",
     "prop-types": "^15.6.2",
-    "raw-loader": "^3.0.0",
+    "raw-loader": "^4.0.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-hot-loader": "^4.12.12",
