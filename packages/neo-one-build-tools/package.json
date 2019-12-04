@@ -60,7 +60,7 @@
     "minimatch": "^3.0.4",
     "rollup": "^1.21.4",
     "rollup-plugin-string": "^3.0.0",
-    "rollup-plugin-typescript2": "^0.24.2",
+    "rollup-plugin-typescript2": "^0.25.0",
     "rxjs-tslint-rules": "^4.24.3",
     "tslint": "^5.20.0",
     "tslint-clean-code": "^0.2.9",
