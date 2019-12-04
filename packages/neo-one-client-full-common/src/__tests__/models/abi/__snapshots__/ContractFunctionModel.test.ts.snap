@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContractFunctionModel - serializeWireBase Boolean 1`] = `"0866756e6374696f6e010105706172616d01ff"`;
+
+exports[`ContractFunctionModel - serializeWireBase Multiple Params 1`] = `"0866756e6374696f6e010105706172616d010205706172616d010705706172616d0107"`;
