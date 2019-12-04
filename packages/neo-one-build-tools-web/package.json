@@ -60,7 +60,7 @@
     "cssnano": "^4.1.10",
     "execa": "^3.2.0",
     "extract-css-chunks-webpack-plugin": "4.6.0",
-    "file-loader": "^4.2.0",
+    "file-loader": "^5.0.0",
     "find-cache-dir": "^3.0.0",
     "fs-extra": "^8.1.0",
     "loader-utils": "^1.2.3",
