@@ -1551,30 +1551,6 @@ export interface ABIFunction {
    * `true` if the function is constant or read-only.
    */
   readonly constant?: boolean;
-  /**
-   * `true` if the function is used for sending native assets with a two-phase send.
-   */
-  readonly send?: boolean;
-  /**
-   * `true` if the function is used for sending native assets.
-   */
-  readonly sendUnsafe?: boolean;
-  /**
-   * `true` if the function is used for receiving native assets.
-   */
-  readonly receive?: boolean;
-  /**
-   * `true` if the function is used for claiming GAS.
-   */
-  readonly claim?: boolean;
-  /**
-   * `true` if the function is used for refunding native assets.
-   */
-  readonly refundAssets?: boolean;
-  /**
-   * `true` if the function is used for the second phase of a send.
-   */
-  readonly completeSend?: boolean;
 }
 
 /**
@@ -1598,13 +1574,121 @@ export interface ABIEvent {
  */
 export interface ABI {
   /**
+   * Script hash of the contract.
+   */
+  readonly hash: UInt160;
+  /**
+   * Entrypoint is an ABIFunction which describes the entrypoint of the contract.
+   */
+  readonly entryPoint: ABIFunction;
+  /**
    * Specification of the smart contract functions.
    */
-  readonly functions: readonly ABIFunction[];
+  readonly methods: readonly ABIFunction[];
   /**
    * Specification of the smart contract events.
    */
   readonly events?: readonly ABIEvent[];
+}
+
+/**
+ * A group represents a set of mutually trusted contracts. A contract will allow any contract in the same group to invoke it, and the user interface will not give any warnings.
+ * A group is identified by a public key and must be accompanied by a signature for the contract hash to prove the contract is included in the group.
+ */
+export interface ContractGroup {
+  /**
+   * The public key identifying the group.
+   */
+  readonly publicKey: ECPoint;
+  /**
+   * Signature of the contract hash.
+   */
+  readonly signature: SignatureString;
+}
+
+/**
+ * Flag which determines what features are available to a contract.
+ */
+export enum ContractFeatures {
+  /**
+   * Contract does not use any available features.
+   */
+  NoProperty = 0x00,
+  /**
+   * Contract modifies blockchain storage.
+   */
+  HasStorage = 0x01,
+  /**
+   * Contract can receive native assets.
+   */
+  Payable = 0x04,
+  /**
+   * Contract modifies blockchain storage and can receive native assets.
+   */
+  HasStoragePayable = 0x05,
+}
+
+export interface WildcardContainer<T> {
+  readonly data: readonly T[];
+}
+
+export interface ContractPermissionDescriptor {
+  readonly hashOrGroup: UInt160 | ECPoint | undefined;
+  readonly isHash: () => boolean;
+  readonly isGroup: () => boolean;
+  readonly isWildcard: () => boolean;
+}
+
+/**
+ * Describes which contracts may be invoked and which methods are called.
+ */
+export interface ContractPermissions {
+  readonly contract: ContractPermissionDescriptor;
+  readonly methods: WildcardContainer<string>;
+  readonly isAllowed: (manifest: ContractManifest, method: string) => boolean;
+}
+
+/**
+ * A manifest explicitly declares the features and permissions a Contract will use. Once deployed, it will be limited by its declared list of
+ * features and permissions.
+ */
+export interface ContractManifest {
+  /**
+   * Max length for a valid Contract Manifest
+   */
+  readonly maxLength: 2048;
+  /**
+   * Size of serialized contract
+   */
+  readonly size: () => number;
+  /**
+   * Contract hash
+   */
+  readonly hash: () => UInt160;
+  /**
+   * Set of mutually trusted contracts
+   */
+  readonly groups: readonly ContractGroup[];
+  /**
+   * The features field describes what features are available for the contract.
+   */
+  readonly features: ContractFeatures;
+  /**
+   * Full specification of the functions and events of a smart contract. Used by the client APIs to generate the smart contract interface.
+   */
+  readonly abi: ABI;
+  /**
+   * Describes which contracts may be invoked and which methods are called.
+   */
+  readonly permissions: readonly ContractPermissions[];
+  /**
+   * The trusts field is an array containing a set of contract hashes or group public keys.
+   */
+  readonly trusts: WildcardContainer<UInt160>;
+  /**
+   * The safe methods field is an array containing a set of safe methods.
+   */
+  readonly safeMethods: WildcardContainer<string>;
 }
 
 declare const OpaqueTagSymbol: unique symbol;
