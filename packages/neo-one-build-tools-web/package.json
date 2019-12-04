@@ -67,7 +67,7 @@
     "lodash": "^4.17.15",
     "lodash-webpack-plugin": "^0.11.5",
     "mini-html-webpack-plugin": "^2.0.0",
-    "nodemon": "^1.19.3",
+    "nodemon": "^2.0.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "postcss-flexbugs-fixes": "^4.1.0",
     "react": "^16.11.0",

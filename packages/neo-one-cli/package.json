@@ -43,7 +43,7 @@
     "import-local": "^3.0.2",
     "listr": "^0.14.3",
     "lodash": "^4.17.15",
-    "nodemon": "^1.19.3",
+    "nodemon": "^2.0.0",
     "prompts": "^2.2.1",
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
