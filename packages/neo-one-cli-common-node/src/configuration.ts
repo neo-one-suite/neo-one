@@ -1,9 +1,10 @@
 // tslint:disable no-any
 import { CodegenFramework, CodegenLanguage, Configuration } from '@neo-one/cli-common';
-import cosmiconfig from 'cosmiconfig';
+import { cosmiconfig } from 'cosmiconfig';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
 import * as nodePath from 'path';
+// tslint:disable-next-line: match-default-export-name
 import validate from 'schema-utils';
 import { register } from 'ts-node';
 import { defaultNetworks } from './networks';
@@ -270,7 +271,7 @@ const getProjectLanguage = async (rootDir: string): Promise<CodegenLanguage> => 
   return exists ? 'typescript' : 'javascript';
 };
 
-const validateConfig = async (rootDir: string, configIn: cosmiconfig.Config): Promise<Configuration> => {
+const validateConfig = async (rootDir: string, configIn: any): Promise<Configuration> => {
   const config = applyDefaults(configIn);
   validate(configurationSchema, configIn, { name: 'NEO•ONE' } as any);
 
@@ -318,17 +319,15 @@ export const loadConfiguration = async (): Promise<Configuration> => {
   if (cachedConfig === undefined) {
     const explorer = cosmiconfig('neo-one', {
       loaders: {
-        '.ts': {
-          async: async (filePath: string): Promise<object> => {
-            register({
-              compilerOptions: {
-                module: 'commonjs',
-              },
-            });
-            const obj = await import(filePath);
+        '.ts': async (filePath: string): Promise<object> => {
+          register({
+            compilerOptions: {
+              module: 'commonjs',
+            },
+          });
+          const obj = await import(filePath);
 
-            return obj.default === undefined ? obj : obj.default;
-          },
+          return obj.default === undefined ? obj : obj.default;
         },
       },
       searchPlaces: ['.neo-one.config.js', '.neo-one.config.ts'],

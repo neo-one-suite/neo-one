@@ -48,8 +48,8 @@ const getContextLabels = (ctx: Context) => {
     },
   };
 };
-
-export const context = (logger: Logger) => async (ctx: Context, next: () => Promise<void>) => {
+type ContextFunctionType = (logger: Logger) => (ctx: Context, next: () => Promise<void>) => Promise<void>;
+export const context: ContextFunctionType = (logger) => async (ctx, next) => {
   const spanExtract = tracer.propagation.extract({ getHeader: (name: string) => ctx.headers[name] });
   const spanContext = spanExtract !== null ? spanExtract : undefined;
   const { spanLabels, logLabels } = getContextLabels(ctx);
@@ -98,7 +98,8 @@ export const context = (logger: Logger) => async (ctx: Context, next: () => Prom
   });
 };
 
-export const onError = (logger: Logger) => (err: Error, ctx?: Context) => {
+type OnErrorFunctionType = (logger: Logger) => (err: Error, ctx?: Context) => void;
+export const onError: OnErrorFunctionType = (logger) => (err, ctx) => {
   const labels = ctx !== undefined ? getContextLabels(ctx).logLabels : {};
   logger.error({ name: 'http_server_request_uncaught_error', err, ...labels }, 'Unexpected uncaught request error.');
 };

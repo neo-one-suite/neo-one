@@ -32,11 +32,11 @@ const Wrapper = styled(Box)`
     animation-fill-mode: both;
   }
 
-  & > div:first-child {
+  & > div:first-of-type {
     animation-delay: -0.32s;
   }
 
-  & > div:nth-child(2) {
+  & > div:nth-of-type(2) {
     animation-delay: -0.16s;
   }
 `;

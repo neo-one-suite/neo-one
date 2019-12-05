@@ -2,7 +2,14 @@
   "name": "@neo-one/cli-common",
   "version": "2.4.0",
   "description": "NEO•ONE code common to the cli and browser.",
-  "main": "./src/index",
+  "main": "./lib/index",
+  "scripts": {
+    "build": "gulp",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "pack": "gulp pack",
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
+  },
   "dependencies": {
     "@neo-one/client-common": "^2.3.0",
     "@neo-one/client-core": "^2.3.0",
@@ -10,6 +17,10 @@
     "@neo-one/utils": "^2.3.0",
     "bignumber.js": "^9.0.0",
     "tslib": "^1.10.0"
+  },
+  "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0",
+    "gulp": "~4.0.2"
   },
   "sideEffects": false
 }

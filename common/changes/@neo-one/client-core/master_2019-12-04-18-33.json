@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "update dependencies",
+      "type": "patch",
+      "packageName": "@neo-one/client-core"
+    }
+  ],
+  "packageName": "@neo-one/client-core",
+  "email": "danwbyrne@gmail.com"
+}

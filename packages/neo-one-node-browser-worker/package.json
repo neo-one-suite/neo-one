@@ -3,11 +3,21 @@
   "version": "2.3.0",
   "description": "NEO•ONE node browser workers.",
   "main": "./src/index",
+  "scripts": {
+    "build": "",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
+  },
   "dependencies": {
     "@neo-one/node-browser": "^2.3.0",
     "@neo-one/worker": "^2.3.0",
-    "core-js": "^3.1.4",
+    "core-js": "^3.2.1",
+    "file-loader": "^5.0.2",
     "regenerator-runtime": "^0.13.3"
+  },
+  "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0"
   },
   "sideEffects": false
 }

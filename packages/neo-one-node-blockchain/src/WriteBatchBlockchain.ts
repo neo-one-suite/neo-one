@@ -461,7 +461,7 @@ export class WriteBatchBlockchain {
 
   private async persistUTXOTransactions(
     block: Block,
-    transactions: ReadonlyArray<readonly [number, (ContractTransaction | ClaimTransaction | MinerTransaction)]>,
+    transactions: ReadonlyArray<readonly [number, ContractTransaction | ClaimTransaction | MinerTransaction]>,
     lastGlobalTransactionIndex: BN,
   ): Promise<void> {
     const inputs = [];
@@ -837,7 +837,9 @@ export class WriteBatchBlockchain {
       _.groupBy(
         inputOutputs
           .map<[UInt160, UInt256, BN]>(({ output }) => [output.address, output.asset, output.value.neg()])
-          .concat(outputs.map<[UInt160, UInt256, BN]>(({ output }) => [output.address, output.asset, output.value])),
+          .concat(
+            outputs.map<[UInt160, UInt256, BN]>(({ output }) => [output.address, output.asset, output.value]),
+          ),
         ([address]) => common.uInt160ToHex(address),
       ),
     );
@@ -988,7 +990,9 @@ export class WriteBatchBlockchain {
   private async updateCoins(inputs: readonly Input[], claims: readonly Input[], block: Block): Promise<void> {
     const inputClaims = inputs
       .map<InputClaim>((input) => ({ type: 'input', input, hash: input.hash }))
-      .concat(claims.map<InputClaim>((input) => ({ type: 'claim', input, hash: input.hash })));
+      .concat(
+        claims.map<InputClaim>((input) => ({ type: 'claim', input, hash: input.hash })),
+      );
 
     const hashInputClaims = Object.entries(_.groupBy(inputClaims, ({ hash }) => common.uInt256ToHex(hash)));
 

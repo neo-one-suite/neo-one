@@ -52,14 +52,11 @@ const NextButtonBase = ({ selected, onClick, complete, ...props }: Props) => {
   );
 };
 
-export const NextButton = connect(
-  undefined,
-  (dispatch, { selected, complete, onClick }: Props) => ({
-    onClick: () => {
-      if (!complete) {
-        dispatch(completeChapter(selected));
-      }
-      onClick();
-    },
-  }),
-)(NextButtonBase);
+export const NextButton = connect(undefined, (dispatch, { selected, complete, onClick }: Props) => ({
+  onClick: () => {
+    if (!complete) {
+      dispatch(completeChapter(selected));
+    }
+    onClick();
+  },
+}))(NextButtonBase);

@@ -2,6 +2,12 @@
   "name": "@neo-one/suite",
   "version": "2.3.1",
   "description": "NEO•ONE core dependencies for easy installation",
+  "scripts": {
+    "build": "",
+    "lint": "",
+    "lint:staged": "",
+    "pack": "gulp pack"
+  },
   "dependencies": {
     "@neo-one/cli": "^2.4.0",
     "@neo-one/client": "^2.3.0",
@@ -9,6 +15,10 @@
     "@neo-one/smart-contract-lib": "^2.3.1",
     "@neo-one/smart-contract-test": "^2.3.1",
     "@neo-one/smart-contract-typescript-plugin": "^2.3.0"
+  },
+  "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0",
+    "gulp": "~4.0.2"
   },
   "sideEffects": false
 }

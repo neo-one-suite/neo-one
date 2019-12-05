@@ -1,0 +1,7 @@
+{
+  "extends": "./node_modules/@neo-one/build-tools/includes/tsconfig.dev.json",
+  "compilerOptions": {
+    "typeRoots": []
+  },
+  "include": ["src/ICO.ts", "src/index.ts", "src/Token.ts"]
+}

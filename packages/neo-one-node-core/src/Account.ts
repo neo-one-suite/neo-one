@@ -154,7 +154,7 @@ export class Account extends BaseState
       votes: this.votes.map((vote) => JSONHelper.writeECPoint(vote)),
       balances: Object.entries(this.balances).map(([asset, value]) => ({
         asset: JSONHelper.writeUInt256(asset),
-        // tslint:disable-next-line no-non-null-assertion
+        // tslint:disable-next-line no-non-null-assertion no-unnecessary-type-assertion no-useless-cast
         value: JSONHelper.writeFixed8(value!),
       })),
 

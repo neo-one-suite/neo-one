@@ -43,9 +43,6 @@ const EditorBase = ({ selected, onTestsPass, ...props }: Props) => {
   );
 };
 
-export const Editor = connect(
-  undefined,
-  (dispatch, { selected }: ExternalProps) => ({
-    onTestsPass: () => dispatch(completeChapter(selected)),
-  }),
-)(EditorBase);
+export const Editor = connect(undefined, (dispatch, { selected }: ExternalProps) => ({
+  onTestsPass: () => dispatch(completeChapter(selected)),
+}))(EditorBase);

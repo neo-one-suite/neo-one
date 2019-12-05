@@ -6,7 +6,11 @@ export const conf = {
     lineComment: '//',
     blockComment: ['/*', '*/'],
   },
-  brackets: [['{', '}'], ['[', ']'], ['(', ')']],
+  brackets: [
+    ['{', '}'],
+    ['[', ']'],
+    ['(', ')'],
+  ],
   onEnterRules: [
     {
       // e.g. /** | */

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Migrate to Rush",
+      "type": "minor",
+      "packageName": "@neo-one/node-blockchain"
+    }
+  ],
+  "packageName": "@neo-one/node-blockchain",
+  "email": "danwbyrne@gmail.com"
+}

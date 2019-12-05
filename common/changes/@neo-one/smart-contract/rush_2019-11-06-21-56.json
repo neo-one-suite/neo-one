@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Migrate to Rush",
+      "type": "minor",
+      "packageName": "@neo-one/smart-contract"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract",
+  "email": "danwbyrne@gmail.com"
+}

@@ -24,9 +24,9 @@ module.exports = function(wallaby) {
     compilers: {
       '**/*.ts?(x)': wallaby.compilers.typeScript({
         ...require('./tsconfig.json').compilerOptions,
-        ...require('./tsconfig/tsconfig.build.json').compilerOptions,
-        ...require('./tsconfig/tsconfig.cjs.json').compilerOptions,
-        ...require('./tsconfig/tsconfig.es2017.cjs.json').compilerOptions,
+        ...require('./build-configs/tsconfig.build.json').compilerOptions,
+        ...require('./build-configs/tsconfig.cjs.json').compilerOptions,
+        ...require('./build-configs/tsconfig.es2017.cjs.json').compilerOptions,
         ...require('./tsconfig.jest.json').compilerOptions,
       }),
     },

@@ -1,6 +1,7 @@
 // tslint:disable no-any no-object-mutation readonly-keyword no-null-keyword no-submodule-imports no-unnecessary-type-annotation strict-boolean-expressions
 import styled from '@emotion/styled';
 import React from 'react';
+// @ts-ignore
 import Transition from 'react-transition-group/Transition';
 import { ifProp } from 'styled-tools';
 

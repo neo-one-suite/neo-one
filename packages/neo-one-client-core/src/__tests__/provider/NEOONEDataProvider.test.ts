@@ -487,7 +487,12 @@ describe('NEOONEDataProvider', () => {
   });
 
   test(`getAsset - extracts en name`, async () => {
-    const assetJSON = factory.createAssetJSON({ name: [{ lang: 'foo', name: 'bar' }, { lang: 'en', name: 'baz' }] });
+    const assetJSON = factory.createAssetJSON({
+      name: [
+        { lang: 'foo', name: 'bar' },
+        { lang: 'en', name: 'baz' },
+      ],
+    });
     client.getAsset = jest.fn(async () => Promise.resolve(assetJSON));
 
     const result = await provider.getAsset(data.hash256s.a);
@@ -495,7 +500,12 @@ describe('NEOONEDataProvider', () => {
   });
 
   test(`getAsset - otherwise, first name`, async () => {
-    const assetJSON = factory.createAssetJSON({ name: [{ lang: 'foo', name: 'bar' }, { lang: 'baz', name: 'baz' }] });
+    const assetJSON = factory.createAssetJSON({
+      name: [
+        { lang: 'foo', name: 'bar' },
+        { lang: 'baz', name: 'baz' },
+      ],
+    });
     client.getAsset = jest.fn(async () => Promise.resolve(assetJSON));
 
     const result = await provider.getAsset(data.hash256s.a);

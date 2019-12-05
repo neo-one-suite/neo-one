@@ -2,7 +2,8 @@
 import body from 'koa-bodyparser';
 import convert from 'koa-convert';
 
-export const bodyParser = () =>
+type BodyParser = () => ReturnType<typeof convert>;
+export const bodyParser: BodyParser = () =>
   convert(
     body({
       textLimit: '100mb',

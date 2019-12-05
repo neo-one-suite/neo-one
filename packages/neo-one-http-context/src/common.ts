@@ -1,8 +1,9 @@
 import { Logger } from '@neo-one/logger';
 import { Context } from 'koa';
 
+type GetLoggerType = (ctx: Context) => Logger;
 // tslint:disable-next-line: export-name
-export const getLogger = (ctx: Context): Logger => {
+export const getLogger: GetLoggerType = (ctx) => {
   const { logger } = ctx.state;
   if (logger === undefined) {
     ctx.throw(500);

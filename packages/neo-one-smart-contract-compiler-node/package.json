@@ -2,16 +2,28 @@
   "name": "@neo-one/smart-contract-compiler-node",
   "version": "2.3.0",
   "description": "NEO•ONE TypeScript smart contract compiler node host.",
-  "main": "./src/index",
+  "main": "./lib/index",
+  "scripts": {
+    "build": "gulp",
+    "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",
+    "lint:staged": "lint-staged --relative",
+    "pack": "gulp pack",
+    "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
+  },
   "dependencies": {
+    "@neo-one/smart-contract": "^2.3.0",
+    "@neo-one/smart-contract-lib": "^2.3.1",
     "@neo-one/utils": "^2.3.0",
     "app-root-dir": "^1.0.2",
     "glob": "^7.1.4",
-    "typescript": "^3.6.3"
+    "tslib": "^1.10.0",
+    "typescript": "3.6.3"
   },
   "devDependencies": {
+    "@neo-one/build-tools": "^1.0.0",
     "@types/app-root-dir": "^0.1.0",
-    "@types/glob": "^7.1.1"
+    "@types/glob": "^7.1.1",
+    "gulp": "~4.0.2"
   },
   "sideEffects": false
 }

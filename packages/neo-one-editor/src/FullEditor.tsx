@@ -205,27 +205,24 @@ class FullEditorBase extends React.Component<Props, State> {
   }
 }
 
-const ConnectedFullEditor = connect(
-  undefined,
-  (dispatch) => ({
-    appendOutput: (output: OutputMessage) => dispatch(appendConsole(output)),
-    clearStore: (options?: InitialEditorStateOptions) => dispatch(clearStoreBase(options)),
-    testRunnerCallbacks: {
-      onUpdateSuite: async (suite: TestSuite) => {
-        dispatch(updateTestSuite(suite));
-      },
-      onRemoveSuite: async (path: string) => {
-        dispatch(removeTestSuite(path));
-      },
-      onUpdateTest: async (path: string, test: Test) => {
-        dispatch(updateTest({ path, test }));
-      },
-      setTestsRunning: async (running: boolean) => {
-        dispatch(setTestsRunning(running));
-      },
+const ConnectedFullEditor = connect(undefined, (dispatch) => ({
+  appendOutput: (output: OutputMessage) => dispatch(appendConsole(output)),
+  clearStore: (options?: InitialEditorStateOptions) => dispatch(clearStoreBase(options)),
+  testRunnerCallbacks: {
+    onUpdateSuite: async (suite: TestSuite) => {
+      dispatch(updateTestSuite(suite));
     },
-  }),
-)(FullEditorBase);
+    onRemoveSuite: async (path: string) => {
+      dispatch(removeTestSuite(path));
+    },
+    onUpdateTest: async (path: string, test: Test) => {
+      dispatch(updateTest({ path, test }));
+    },
+    setTestsRunning: async (running: boolean) => {
+      dispatch(setTestsRunning(running));
+    },
+  },
+}))(FullEditorBase);
 
 export const FullEditor = cold((props: ExternalProps) => (
   <ReduxStoreProvider createStore={configureStore}>

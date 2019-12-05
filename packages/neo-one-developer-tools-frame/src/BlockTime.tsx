@@ -125,11 +125,7 @@ const createTime$ = ({ addError, block$ }: TimeOptions) =>
     ),
   );
 
-const createMinTime$ = (options: TimeOptions) =>
-  createTime$(options).pipe(
-    skip(1),
-    take<number>(1),
-  );
+const createMinTime$ = (options: TimeOptions) => createTime$(options).pipe(skip(1), take<number>(1));
 
 export function BlockTime() {
   const addError = useAddError();

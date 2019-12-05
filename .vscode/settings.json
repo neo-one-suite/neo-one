@@ -1,5 +1,5 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.tsdk": "common/temp/node_modules/typescript/lib",
   "typescript.format.insertSpaceBeforeFunctionParenthesis": false,
   "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
   "typescript.format.enable": false,
@@ -15,6 +15,10 @@
   "deepscan.enable": true,
   "files.associations": {
     "[Dd]ockerfile*": "dockerfile",
-    "docker-compose*": "yaml"
+    "docker-compose*": "yaml",
+    "*.d.ts.map": "json"
+  },
+  "search.exclude": {
+    "packages/*/lib/**": true
   }
 }

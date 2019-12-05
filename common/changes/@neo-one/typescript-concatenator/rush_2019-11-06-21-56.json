@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "Migrate to Rush",
+      "type": "minor",
+      "packageName": "@neo-one/typescript-concatenator"
+    }
+  ],
+  "packageName": "@neo-one/typescript-concatenator",
+  "email": "danwbyrne@gmail.com"
+}
