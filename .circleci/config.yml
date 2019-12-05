@@ -23,11 +23,11 @@ aliases:
       - common/temp/yarn-cache
     key: v8-yarn-12-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
 
-  - &filter-ignore-bors-tmp
+  # TEMPORARY FOR WORK ON BROKEN master-3.x BRANCH. REMOVE/REVERT ONCE READY.
+  - &filter-only-master
     branches:
-      ignore:
-        - staging.tmp
-        - trying.tmp
+      only:
+        - master
 
   - &install |
     node common/scripts/install-run-rush.js install
@@ -167,21 +167,21 @@ workflows:
   test10:
     jobs:
       - nit:
-          filters: *filter-ignore-bors-tmp
+          filters: *filter-only-master
       - build-10:
-          filters: *filter-ignore-bors-tmp
+          filters: *filter-only-master
       - test10:
-          filters: *filter-ignore-bors-tmp
+          filters: *filter-only-master
           requires:
             - build-10
 
   test12:
     jobs:
       - nit:
-          filters: *filter-ignore-bors-tmp
+          filters: *filter-only-master
       - build-12:
-          filters: *filter-ignore-bors-tmp
+          filters: *filter-only-master
       - test12:
-          filters: *filter-ignore-bors-tmp
+          filters: *filter-only-master
           requires:
             - build-12
