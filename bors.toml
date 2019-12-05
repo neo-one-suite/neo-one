@@ -1,5 +1,4 @@
 status = [
-  "DeepScan",
   "ci/circleci: nit",
   "ci/circleci: test10",
   "ci/circleci: test12",
