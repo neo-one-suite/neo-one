@@ -60,6 +60,39 @@ const verifyEscrowContract = (contract?: Contract): void => {
   expect(contract.dynamicInvoke).toBeTruthy();
 };
 
+const mintTokens = async (ico: any, accountID: UserAccountID, developerClient?: DeveloperClient): Promise<void> => {
+  const mintResult = await ico.mintTokens({
+    sendTo: [
+      {
+        amount: new BigNumber(10),
+        asset: Hash256.NEO,
+      },
+    ],
+  });
+
+  const [mintReceipt] = await Promise.all([
+    mintResult.confirmed(),
+    developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
+  ]);
+  if (mintReceipt.result.state === 'FAULT') {
+    throw new Error(mintReceipt.result.message);
+  }
+
+  expect(mintReceipt.result.state).toEqual('HALT');
+  expect(mintReceipt.result.value).toBeUndefined();
+  expect(mintReceipt.result.gasCost).toMatchSnapshot('mint cost');
+  expect(mintReceipt.result.gasConsumed).toMatchSnapshot('mint consumed');
+  expect(mintReceipt.events).toHaveLength(1);
+  const event = mintReceipt.events[0];
+  expect(event.name).toEqual('transfer');
+  if (event.name !== 'transfer') {
+    throw new Error('For TS');
+  }
+  expect(event.parameters.from).toBeUndefined();
+  expect(event.parameters.to).toEqual(accountID.address);
+  expect(event.parameters.amount.toString()).toEqual('100');
+};
+
 const verifySmartContracts = async (
   ico: any,
   token: any,
@@ -101,36 +134,7 @@ const verifySmartContracts = async (
   expect(initialRemaining.toString()).toEqual(new BigNumber(10_000_000_000).toString());
   expect(initialBalance.toString()).toEqual('0');
 
-  const mintResult = await ico.mintTokens({
-    sendTo: [
-      {
-        amount: new BigNumber(10),
-        asset: Hash256.NEO,
-      },
-    ],
-  });
-
-  const [mintReceipt] = await Promise.all([
-    mintResult.confirmed(),
-    developerClient === undefined ? Promise.resolve() : developerClient.runConsensusNow(),
-  ]);
-  if (mintReceipt.result.state === 'FAULT') {
-    throw new Error(mintReceipt.result.message);
-  }
-
-  expect(mintReceipt.result.state).toEqual('HALT');
-  expect(mintReceipt.result.value).toBeUndefined();
-  expect(mintReceipt.result.gasCost).toMatchSnapshot('mint cost');
-  expect(mintReceipt.result.gasConsumed).toMatchSnapshot('mint consumed');
-  expect(mintReceipt.events).toHaveLength(1);
-  const event = mintReceipt.events[0];
-  expect(event.name).toEqual('transfer');
-  if (event.name !== 'transfer') {
-    throw new Error('For TS');
-  }
-  expect(event.parameters.from).toBeUndefined();
-  expect(event.parameters.to).toEqual(accountID.address);
-  expect(event.parameters.amount.toString()).toEqual('100');
+  await mintTokens(ico, accountID, developerClient);
 
   await verifySmartContractAfterMint(ico, token, escrow, accountID, toAccountID, developerClient);
 };
