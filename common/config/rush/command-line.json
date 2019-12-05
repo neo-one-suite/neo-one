@@ -28,7 +28,7 @@
     {
       "commandKind": "global",
       "name": "compile-overlay-dev",
-      "summary": "Compile overlay in dev mode",
+      "summary": "Compile overlay [dev]",
       "description": "Compile the NEO-ONE website overlay",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle overlay --watch"
@@ -36,15 +36,15 @@
     {
       "commandKind": "global",
       "name": "compile-test-runner-dev",
-      "summary": "Compile test-runner in dev mode",
-      "description": "Compile the NEO-ONE test-runner in dev mode",
+      "summary": "Compile test-runner [dev]",
+      "description": "Compile the NEO-ONE test-runner [dev]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle testRunner --watch"
     },
     {
       "commandKind": "global",
       "name": "compile-preview-dev",
-      "summary": "Compile preview in dev mode",
+      "summary": "Compile preview [dev]",
       "description": "Compile the NEO-ONE editor preview",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle preview --watch"
@@ -52,7 +52,7 @@
     {
       "commandKind": "global",
       "name": "serve-server",
-      "summary": "Compile and serve editor server (only a dev mode)",
+      "summary": "Compile & serve editor server (only in dev mode)",
       "description": "Build and run the NEO-ONE editor server",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "mkdir -p ./dist/server && touch ./dist/server/index.js && cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --watch --bundle server"
@@ -60,16 +60,16 @@
     {
       "commandKind": "global",
       "name": "serve-static-dev",
-      "summary": "Build and serve static with React Static in dev mode",
-      "description": "Build and serve NEO-ONE website with React Static in dev mode",
+      "summary": "Build and serve static site [dev]",
+      "description": "Build and serve NEO-ONE website with React Static [dev]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=./packages/neo-one-build-tools/includes/build-configs/tsconfig.es2017.cjs.json react-static start --config ./packages/neo-one-website/static.config.js"
     },
     {
       "commandKind": "global",
       "name": "compile-website-dev",
-      "summary": "Compile workers, overlay bundles in dev mode",
-      "description": "Compile the workers and overlay bundles in dev mode",
+      "summary": "Compile workers & overlay bundles [dev]",
+      "description": "Compile the workers and overlay bundles [dev]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "concurrently -n 'workers,overlay' --kill-others-on-fail \"rush compile-workers-dev\" \"rush compile-overlay-dev\""
     },
@@ -77,14 +77,14 @@
       "commandKind": "global",
       "name": "run-website-dev",
       "summary": "Run website in dev mode (run compile-website-dev first)",
-      "description": "Run the entire NEO-ONE website in dev mode",
+      "description": "Run the entire NEO-ONE website [dev]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "concurrently -n 'preview,testRunner,server,static' --kill-others-on-fail \"rush compile-preview-dev\" \"rush compile-test-runner-dev\" \"rush serve-server\" \"rush serve-static-dev\""
     },
     {
       "commandKind": "global",
       "name": "compile-workers-prod",
-      "summary": "Compile workers",
+      "summary": "Compile workers [prod]",
       "description": "Compile the NEO-ONE website workers",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle workers"
@@ -92,7 +92,7 @@
     {
       "commandKind": "global",
       "name": "compile-overlay-prod",
-      "summary": "Compile overlay in dev mode",
+      "summary": "Compile overlay [dev]",
       "description": "Compile the NEO-ONE website overlay",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle overlay"
@@ -100,16 +100,16 @@
     {
       "commandKind": "global",
       "name": "serve-preview-prod",
-      "summary": "Compile and serve preview in prod mode",
-      "description": "Compile and serve the NEO-ONE editor preview in prod mode",
+      "summary": "Compile & serve preview [prod]",
+      "description": "Compile and serve the NEO-ONE editor preview [prod]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle preview && serve dist/preview -p 8080"
     },
     {
       "commandKind": "global",
       "name": "serve-test-runner-prod",
-      "summary": "Compile and serve test-runner in prod mode",
-      "description": "Compile and serve the NEO-ONE test-runner in prod mode",
+      "summary": "Compile & serve test-runner [prod]",
+      "description": "Compile and serve the NEO-ONE test-runner [prod]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle testRunner && serve dist/testRunner -p 8081"
     },
@@ -124,16 +124,16 @@
     {
       "commandKind": "global",
       "name": "compile-website-prod",
-      "summary": "Compile workers, overlay bundles in prod mode",
-      "description": "Compile the workers and overlay bundles in prod mode",
+      "summary": "Compile workers & overlay bundles [prod]",
+      "description": "Compile the workers and overlay bundles [prod]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "concurrently -n 'workers,overlay' --kill-others-on-fail \"rush compile-workers-prod\" \"rush compile-overlay-prod\""
     },
     {
       "commandKind": "global",
       "name": "run-website-prod",
-      "summary": "Run entire website in prod mode (run compile-website-prod & link-root before, run unlink-root when done)",
-      "description": "Run the entire NEO-ONE website in prod mode",
+      "summary": "Run entire website in prod (run compile-website-prod & link-root before, run unlink-root when done)",
+      "description": "Run the entire NEO-ONE website [prod]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "concurrently -n 'preview,testRunner,server,static' --kill-others-on-fail \"rush serve-preview-prod\" \"rush serve-test-runner-prod\" \"rush serve-server\" \"rush serve-static-prod\""
     },

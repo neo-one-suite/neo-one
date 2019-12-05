@@ -13,8 +13,8 @@
   "dependencies": {
     "@emotion/core": "^10.0.22",
     "@emotion/styled": "^10.0.23",
-    "@types/react": "^16.9.14",
-    "react": "^16.11.0",
+    "@types/react": "^16.9.15",
+    "react": "^16.12.0",
     "rxjs": "^6.5.3",
     "styled-tools": "^1.7.1",
     "tslib": "^1.10.0"
