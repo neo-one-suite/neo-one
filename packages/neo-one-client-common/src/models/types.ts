@@ -1,5 +1,6 @@
 import { AssetTypeModel } from './AssetTypeModel';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
+import { RelayResultReasonModel } from './RelayResultReasonModel';
 import { StateDescriptorTypeModel } from './StateDescriptorTypeModel';
 import { StorageFlagsModel } from './StorageFlagsModel';
 import { AttributeUsageModel } from './transaction';
@@ -15,8 +16,6 @@ export interface AccountJSON {
   readonly unspent: readonly InputJSON[];
   readonly unclaimed: readonly InputJSON[];
 }
-
-export type ContractParameterTypeJSON = keyof typeof ContractParameterTypeModel;
 
 export interface ContractParameterDeclarationJSON {
   readonly type: keyof typeof ContractParameterTypeModel;
@@ -95,6 +94,7 @@ export type ContractParameterJSON =
   | InteropInterfaceContractParameterJSON
   | VoidContractParameterJSON;
 
+export type ContractParameterTypeJSON = keyof typeof ContractParameterTypeModel;
 export type WitnessScopeJSON = keyof typeof WitnessScopeModel;
 
 export interface InvocationResultErrorJSON {
@@ -195,6 +195,8 @@ export interface OutputJSON {
   readonly address: string;
 }
 
+export type RelayResultReasonJSON = keyof typeof RelayResultReasonModel;
+
 export interface InvocationDataJSON {
   readonly result: InvocationResultJSON;
   readonly asset?: AssetJSON;
@@ -210,7 +212,7 @@ export interface TransactionJSON {
   readonly hash: string;
   readonly size: number;
   readonly version: number;
-  readonly nonce: string;
+  readonly nonce: number;
   readonly sender: string;
   readonly sys_fee: string;
   readonly net_fee: string;

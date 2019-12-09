@@ -200,7 +200,15 @@ export interface AddressAttribute extends AttributeBase {
  */
 export type Attribute = BufferAttribute | PublicKeyAttribute | Hash256Attribute | AddressAttribute;
 
-export type WitnessScope = 'Global' | 'CalledByEntry' | 'CustomContracts' | 'CustomGroups';
+export type WitnessScope =
+  | 'Global'
+  | 'CalledByEntry'
+  | 'CustomContracts'
+  | 'CustomGroups'
+  | 'CalledByEntryAndCustomContracts'
+  | 'CalledByEntryAndCustomGroups'
+  | 'CalledByEntryAndCustomGroupsAndCustomContracts'
+  | 'CustomContractsAndCustomGroups';
 
 /**
  * `Witness` is just that, a 'witness' to the transaction, meaning they have approved the transaction. Can vary from a simple signature of the transaction for a given `Address`' private key or a 'witness' being a smart contract and the way it's verified is by executing the smart contract code.

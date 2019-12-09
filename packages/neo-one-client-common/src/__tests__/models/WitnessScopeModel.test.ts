@@ -3,6 +3,7 @@ import {
   assertWitnessScopeJSON,
   toJSONWitnessScope,
   toWitnessScope,
+  witnessScopeHasFlag,
   WitnessScopeModel,
 } from '../../models/WitnessScopeModel';
 
@@ -17,6 +18,14 @@ describe('Witness Scope - Functions', () => {
   test('To JSON Witness Scope', () => {
     const JSONWitnessScope = toJSONWitnessScope(goodScope);
     expect(JSONWitnessScope).toEqual(goodString);
+  });
+  test('Has Flags - Should Pass', () => {
+    expect(witnessScopeHasFlag('CalledByEntryAndCustomContracts', 'CalledByEntry')).toEqual(true);
+    expect(witnessScopeHasFlag('CalledByEntryAndCustomContracts', 'CustomContracts')).toEqual(true);
+  });
+  test('Has Flags - Should Fail', () => {
+    expect(witnessScopeHasFlag('CalledByEntryAndCustomContracts', 'Global')).toEqual(false);
+    expect(witnessScopeHasFlag('CalledByEntryAndCustomContracts', 'CustomGroups')).toEqual(false);
   });
 });
 

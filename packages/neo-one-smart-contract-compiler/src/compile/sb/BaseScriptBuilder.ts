@@ -57,6 +57,7 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   private readonly mutableExportMap: { [K in string]?: Set<string> } = {};
   private mutableNextModuleIndex = 0;
   private mutableCurrentModuleIndex = 0;
+  // tslint:disable-next-line: prefer-readonly
   private mutableFeatures: Features = { storage: false, dynamicInvoke: false };
 
   public constructor(

@@ -9,7 +9,7 @@ export enum StorageFlagsModel {
 export const hasStorageFlag = (
   assetType: StorageFlagsModel,
   flag: StorageFlagsModel,
-  // tslint:disable-next-line
+  // tslint:disable-next-line: no-bitwise
 ): boolean => (assetType & flag) === flag;
 
 const isStorageFlags = (storageFlags: number): storageFlags is StorageFlagsModel =>

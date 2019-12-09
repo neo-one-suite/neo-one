@@ -23,21 +23,21 @@ export type UInt256AttributeUsageModel =
 
 export interface UInt256AttributeModelAdd {
   readonly usage: UInt256AttributeUsageModel;
-  readonly value: UInt256;
+  readonly data: UInt256;
 }
 
 export class UInt256AttributeModel extends AttributeBaseModel<UInt256AttributeUsageModel, UInt256> {
   public readonly usage: UInt256AttributeUsageModel;
-  public readonly value: UInt256;
+  public readonly data: UInt256;
 
-  public constructor({ usage, value }: UInt256AttributeModelAdd) {
+  public constructor({ usage, data }: UInt256AttributeModelAdd) {
     super();
     this.usage = usage;
-    this.value = value;
+    this.data = data;
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
-    writer.writeUInt256(this.value);
+    writer.writeUInt256(this.data);
   }
 }
