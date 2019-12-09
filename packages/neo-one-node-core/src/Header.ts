@@ -32,7 +32,7 @@ export class Header extends BlockBase implements SerializableWire<Header>, Seria
       index: blockBase.index,
       consensusData: blockBase.consensusData,
       nextConsensus: blockBase.nextConsensus,
-      script: blockBase.script,
+      witness: blockBase.witness,
     });
   }
 

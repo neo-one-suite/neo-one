@@ -3,7 +3,6 @@ import fs from 'fs-extra';
 import gulp from 'gulp';
 // @ts-ignore
 import gulpBanner from 'gulp-banner';
-import gulpPlumber from 'gulp-plumber';
 import gulpRename from 'gulp-rename';
 import gulpSourcemaps from 'gulp-sourcemaps';
 import ts from 'gulp-typescript';
@@ -36,7 +35,6 @@ const compileBin = (format: Format, binGlob: string) => {
   });
 
   return gulpBin(format, binGlob)
-    .pipe(gulpPlumber())
     .pipe(binProject())
     .pipe(gulpBanner(binBanner))
     .pipe(replaceCmd)

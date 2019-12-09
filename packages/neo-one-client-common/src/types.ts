@@ -200,44 +200,7 @@ export interface AddressAttribute extends AttributeBase {
  */
 export type Attribute = BufferAttribute | PublicKeyAttribute | Hash256Attribute | AddressAttribute;
 
-/**
- * `Input`s are a reference to an `Output` of a `Transaction` that has been persisted to the blockchain. The sum of the `value`s of the referenced `Output`s is the total amount transferred in the `Transaction`.
- */
-export interface Input {
-  /**
-   * Hash of the `Transaction` this input references.
-   */
-  readonly hash: Hash256String;
-  /**
-   * `Output` index within the `Transaction` this input references.
-   */
-  readonly index: number;
-}
-
-/**
- * Both the `Output` and it's reference as an `Input`.
- */
-export interface InputOutput extends Input, Output {}
-
-/**
- * `Output`s represent the destination `Address` and amount transferred of a given `Asset`.
- *
- * The sum of the unspent `Output`s of an `Address` represent the total balance of the `Address`.
- */
-export interface Output {
-  /**
-   * Hash of the `Asset` that was transferred.
-   */
-  readonly asset: Hash256String;
-  /**
-   * Amount transferred.
-   */
-  readonly value: BigNumber;
-  /**
-   * Destination `Address`.
-   */
-  readonly address: AddressString;
-}
+export type WitnessScope = 'Global' | 'CalledByEntry' | 'CustomContracts' | 'CustomGroups';
 
 /**
  * `Witness` is just that, a 'witness' to the transaction, meaning they have approved the transaction. Can vary from a simple signature of the transaction for a given `Address`' private key or a 'witness' being a smart contract and the way it's verified is by executing the smart contract code.
@@ -253,14 +216,29 @@ export interface Witness {
   readonly verification: BufferString;
 }
 
+export interface Cosigner {
+  /**
+   * Hash160 Address of the `Cosigner`.
+   */
+  readonly account: AddressString;
+  /**
+   * Scope of the witness.
+   */
+  readonly scopes: WitnessScope;
+  /**
+   * Array of contracts this address can verify.
+   */
+  readonly allowedContracts?: readonly AddressString[];
+  /**
+   * Array of contract groups this address can verify.
+   */
+  readonly allowedGroups?: readonly ECPoint[];
+}
+
 /**
  * Base interface for all `Transaction`s
  */
-export interface TransactionBase {
-  /**
-   * NEO protocol version.
-   */
-  readonly version: number;
+export interface Transaction {
   /**
    * `Hash256` of this `Transaction`.
    */
@@ -270,21 +248,17 @@ export interface TransactionBase {
    */
   readonly size: number;
   /**
-   * `Attribute`s attached to the `Transaction`.
+   * NEO protocol version.
    */
-  readonly attributes: readonly Attribute[];
+  readonly version: number;
   /**
-   * `Input`s of the `Transaction`.
+   * Unique number in order to ensure the hash for this transaction is unique.
    */
-  readonly inputs: readonly Input[];
+  readonly nonce: number;
   /**
-   * `Output`s of the `Transaction`.
+   * Hash160 address of the transaction sender.
    */
-  readonly outputs: readonly Output[];
-  /**
-   * `Witness`es to the `Transaction`, i.e. the `Address`es that have signed the `Transasction`.
-   */
-  readonly scripts: readonly Witness[];
+  readonly sender: AddressString;
   /**
    * GAS execution fee for the transaction.
    */
@@ -293,12 +267,29 @@ export interface TransactionBase {
    * GAS network priority fee for the transaction.
    */
   readonly networkFee: BigNumber;
+  /**
+   * Block expiration time.
+   */
+  readonly validUntilBlock: number;
+  /**
+   * `Attribute`s attached to the `Transaction`.
+   */
+  readonly attributes: readonly Attribute[];
+  /**
+   * Scope where the `witness`(es) is valid
+   */
+  readonly cosigners: readonly Cosigner[];
+  /**
+   * Contract script of the `Transaction`
+   */
+  readonly script: BufferString;
+  /**
+   * `Witness`es to the `Transaction`, i.e. the `Address`es that have signed the `Transasction`.
+   */
+  readonly witnesses: readonly Witness[];
 }
 
-/**
- * Common propreties for all `ConfirmedTransaction`s.
- */
-export interface ConfirmedTransactionBase {
+export interface ConfirmedTransaction {
   /**
    * 'Receipt' of the confirmed transaction on the blockchain. This contains properties like the block the `Transaction` was included in.
    */
@@ -306,216 +297,15 @@ export interface ConfirmedTransactionBase {
 }
 
 /**
- * Claims GAS for a set of spent `Output`s.
- */
-export interface ClaimTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `ClaimTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'ClaimTransaction';
-  /**
-   * The spent outputs that this `ClaimTransaction` is claiming `GAS` for.
-   */
-  readonly claims: readonly Input[];
-}
-
-/**
- * Confirmed variant of `ClaimTransaction`
- */
-export interface ConfirmedClaimTransaction extends ClaimTransaction, ConfirmedTransactionBase {}
-
-/**
- * Transfers first class `Asset`s
- */
-export interface ContractTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `ContractTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'ContractTransaction';
-}
-
-/**
- * Confirmed variant of `ContractTransaction`
- */
-export interface ConfirmedContractTransaction extends ContractTransaction, ConfirmedTransactionBase {}
-
-/**
- * Enrolls a new validator for a given `PublicKey`.
- *
- * @deprecated
- */
-export interface EnrollmentTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `Enrollmentransaction` from other `Transaction` object types.
-   */
-  readonly type: 'EnrollmentTransaction';
-  /**
-   * The public key that is being enrolled as a validator.
-   */
-  readonly publicKey: PublicKeyString;
-}
-
-/**
- * Confirmed variant of `EnrollmentTransaction`
- */
-export interface ConfirmedEnrollmentTransaction extends EnrollmentTransaction, ConfirmedTransactionBase {}
-
-/**
- * Issues new currency of a first-class `Asset`.
- */
-export interface IssueTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `IssueTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'IssueTransaction';
-}
-
-/**
- * Confirmed variant of `IssueTransaction`
- */
-export interface ConfirmedIssueTransaction extends IssueTransaction, ConfirmedTransactionBase {}
-
-/**
- * Runs a script in the NEO VM.
- */
-export interface InvocationTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `InvocationTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'InvocationTransaction';
-  /**
-   * Script to execute in the NEO VM.
-   */
-  readonly script: BufferString;
-  /**
-   * GAS that has been attached to be used for the `systemFee` of the `Transaction`. All attached GAS will be consumed by this operation, regardless of if execution fails or provides too much GAS.
-   */
-  readonly gas: BigNumber;
-}
-
-/**
- * Confirmed variant of `InvocationTransaction`
- */
-export interface ConfirmedInvocationTransaction extends InvocationTransaction, ConfirmedTransactionBase {
-  /**
-   * Additional raw data that is typically processed by an `ABI` for the client APIs.
-   */
-  readonly invocationData: RawInvocationData;
-}
-
-/**
- * First `Transaction` in each block which contains the `Block` rewards for the consensus node that produced the `Block`.
- */
-export interface MinerTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `MinerTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'MinerTransaction';
-  /**
-   * Unique number in order to ensure the hash for this transaction is unique.
-   */
-  readonly nonce: number;
-}
-
-/**
- * Confirmed variant of `MinerTransaction`
- */
-export interface ConfirmedMinerTransaction extends MinerTransaction, ConfirmedTransactionBase {}
-
-/**
- * Registers a new `Contract`
- *
- * @deprecated Replaced by `Client#publish`
- */
-export interface PublishTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `PublishTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'PublishTransaction';
-  /**
-   * `Contract` to publish.
-   */
-  readonly contract: Contract;
-}
-
-/**
- * Confirmed variant of `PublishTransaction`
- */
-export interface ConfirmedPublishTransaction extends PublishTransaction, ConfirmedTransactionBase {}
-
-/**
- * Registers a new first class `Asset`
- *
- * @deprecated Replaced by `Client#registerAsset`
- */
-export interface RegisterTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `RegisterTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'RegisterTransaction';
-  /**
-   * `Asset` information to register.
-   */
-  readonly asset: Pick<Asset, 'type' | 'name' | 'amount' | 'precision' | 'owner' | 'admin'>;
-}
-
-/**
- * Confirmed variant of `RegisterTransaction`
- */
-export interface ConfirmedRegisterTransaction extends RegisterTransaction, ConfirmedTransactionBase {}
-
-/**
- * Used for voting. Full support coming soon.
- */
-export interface StateTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `StateTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'StateTransaction';
-}
-
-/**
- * Confirmed variant of `StateTransaction`
- */
-export interface ConfirmedStateTransaction extends StateTransaction, ConfirmedTransactionBase {}
-
-/**
- * `Transaction`s are relayed to the blockchain and contain information that is to be permanently stored on the blockchain. They may contain `Input`s and `Output`s corresponding to transfers of native `Asset`s. Each `Transaction` type serves a particular purpose, see the documentation for each for more information.
- */
-export type Transaction =
-  | MinerTransaction
-  | IssueTransaction
-  | ClaimTransaction
-  | EnrollmentTransaction
-  | RegisterTransaction
-  | ContractTransaction
-  | PublishTransaction
-  | StateTransaction
-  | InvocationTransaction;
-/**
- * `Transaction` that has been confirmed on the blockchain. Includes all of the same properties as a `Transaction` as well as the `TransactionReceipt` of the confirmation.
- */
-export type ConfirmedTransaction =
-  | ConfirmedMinerTransaction
-  | ConfirmedIssueTransaction
-  | ConfirmedClaimTransaction
-  | ConfirmedEnrollmentTransaction
-  | ConfirmedRegisterTransaction
-  | ConfirmedContractTransaction
-  | ConfirmedPublishTransaction
-  | ConfirmedStateTransaction
-  | ConfirmedInvocationTransaction;
-
-/**
  * All of the properties of a `Block` except the `Transaction`s themselves.
  */
 export interface Header {
   /**
-   * NEO blockchain version
+   * NEO blockchain version.
    */
   readonly version: number;
   /**
-   * `Block` hash
+   * `Block` hash.
    */
   readonly hash: Hash256String;
   /**
@@ -527,17 +317,13 @@ export interface Header {
    */
   readonly merkleRoot: Hash256String;
   /**
-   * `Block` time persisted
+   * `Block` time persisted.
    */
   readonly time: number;
   /**
-   * `Block` index
+   * `Block` index.
    */
   readonly index: number;
-  /**
-   * Unique number to ensure the block hash is always unique.
-   */
-  readonly nonce: string;
   /**
    * Next consensus address.
    */
@@ -545,11 +331,26 @@ export interface Header {
   /**
    * 'Witness' to the `Block`'s validity.
    */
-  readonly script: Witness;
+  readonly witness: Witness;
   /**
    * Size in bytes of the `Block`.
    */
   readonly size: number;
+}
+
+export interface ConsensusData {
+  /**
+   * `ConsensusData` hash.
+   */
+  readonly hash: Hash256String;
+  /**
+   * TODO ???
+   */
+  readonly primaryIndex: number;
+  /**
+   * Unique number in order to ensure the hash for this `ConsensusData` is unique.
+   */
+  readonly nonce: number;
 }
 
 export interface Block extends Header {
@@ -557,6 +358,10 @@ export interface Block extends Header {
    * `Transaction`s contained in the `Block`.
    */
   readonly transactions: readonly ConfirmedTransaction[];
+  /**
+   * `ConsensusData` contained in the `Block`.
+   */
+  readonly consensusData: ConsensusData;
 }
 
 /**
@@ -784,14 +589,11 @@ export interface UserAccountProvider {
   /**
    * Transfers native assets.
    */
-  readonly transfer: (
-    transfers: readonly Transfer[],
-    options?: TransactionOptions,
-  ) => Promise<TransactionResult<TransactionReceipt, InvocationTransaction | ContractTransaction>>;
+  readonly transfer: (transfers: readonly Transfer[], options?: TransactionOptions) => Promise<TransactionResult>;
   /**
    * Claim all claimable GAS.
    */
-  readonly claim: (options?: TransactionOptions) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+  readonly claim: (options?: TransactionOptions) => Promise<TransactionResult>;
   /**
    * Invoke the specified `method` with the given `params` on `contract`.
    *
@@ -809,7 +611,7 @@ export interface UserAccountProvider {
     verify: boolean,
     options?: InvokeSendUnsafeReceiveTransactionOptions,
     sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  ) => Promise<TransactionResult>;
   /**
    * Relays a transaction that is the first step of a two-step send process. The `Transfer`'s `to` property represents the ultimate destination of the funds, but this transaction will be constructed such that those funds are marked for transfer, not actually transferred.
    *
@@ -823,7 +625,7 @@ export interface UserAccountProvider {
     transfer: Transfer,
     options?: TransactionOptions,
     sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  ) => Promise<TransactionResult>;
   /**
    * Relays a transaction that is the second step of a two-step send process. The `hash` is the transaction hash of the first step in the process and is used to determine the amount to transfer to the `from` address.
    *
@@ -837,7 +639,7 @@ export interface UserAccountProvider {
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  ) => Promise<TransactionResult>;
   /**
    * Refunds native assets that were not processed by the contract. The `hash` is the transaction hash that should be refunded and is used to construct the transfers for this transaction.
    *
@@ -851,7 +653,7 @@ export interface UserAccountProvider {
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  ) => Promise<TransactionResult>;
   /**
    * Claims GAS. Currently only supports claiming all unclaimed GAS to the contract address.
    *
@@ -864,7 +666,7 @@ export interface UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     options?: TransactionOptions,
     sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+  ) => Promise<TransactionResult>;
   /**
    * Invokes the constant `method` on `contract` with `params` on `network`.
    */

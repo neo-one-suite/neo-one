@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/smart-contract-compiler",
+      "comment": "Update a few calls related to Block/Transaction changes",
+      "type": "major"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract-compiler",
+  "email": "danwbyrne@gmail.com"
+}

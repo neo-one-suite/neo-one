@@ -1,5 +1,4 @@
 import { BN } from 'bn.js';
-import { common } from '../common';
 import { Op } from '../models/vm';
 import { ScriptBuilder } from '../ScriptBuilder';
 
@@ -97,11 +96,5 @@ describe('Scripter Builder Tests', () => {
       Buffer.from([0x00]),
       Buffer.from([Op.SETITEM]),
     ]);
-  });
-
-  test('emitTailCall', () => {
-    builder.emitTailCall(common.ZERO_UINT160, '+');
-
-    expect(builder.buffers[builder.buffers.length - 1].length).toEqual(20);
   });
 });

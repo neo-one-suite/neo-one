@@ -286,13 +286,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public emitOp(node: ts.Node, code: OpCode, buffer?: Buffer | undefined): void {
-    if (
-      ((code === 'APPCALL' || code === 'TAILCALL') && buffer !== undefined && buffer.equals(Buffer.alloc(20, 0))) ||
-      code === 'CALL_ED'
-    ) {
-      this.mutableFeatures = { ...this.mutableFeatures, dynamicInvoke: true };
-    }
-
     const bytecode = Op[code] as Op | undefined;
     if (bytecode === undefined) {
       /* istanbul ignore next */
@@ -363,10 +356,6 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
   }
 
   public emitSysCall(node: ts.Node, name: SysCallName): void {
-    if (name === 'Neo.Storage.Put' || name === 'Neo.Storage.Delete') {
-      this.mutableFeatures = { ...this.mutableFeatures, storage: true };
-    }
-
     const sysCallBuffer = Buffer.allocUnsafe(4);
     sysCallBuffer.writeUInt32LE(toSysCallHash(assertSysCall(name)), 0);
     const writer = new BinaryWriter();

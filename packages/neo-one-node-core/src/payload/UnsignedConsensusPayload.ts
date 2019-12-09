@@ -1,5 +1,4 @@
 import { BinaryWriter, UInt256 } from '@neo-one/client-common';
-import { utils as commonUtils } from '@neo-one/utils';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -26,7 +25,6 @@ export class UnsignedConsensusPayload implements SerializableWire<UnsignedConsen
     const previousHash = reader.readUInt256();
     const blockIndex = reader.readUInt32LE();
     const validatorIndex = reader.readUInt16LE();
-    const timestamp = reader.readUInt32LE();
     const messageBytes = reader.readVarBytesLE();
     const consensusMessage = deserializeConsensusMessageWire({
       context: options.context,
@@ -38,7 +36,6 @@ export class UnsignedConsensusPayload implements SerializableWire<UnsignedConsen
       previousHash,
       blockIndex,
       validatorIndex,
-      timestamp,
       consensusMessage,
     };
   };
@@ -58,7 +55,6 @@ export class UnsignedConsensusPayload implements SerializableWire<UnsignedConsen
   public readonly previousHash: UInt256;
   public readonly blockIndex: number;
   public readonly validatorIndex: number;
-  public readonly timestamp: number;
   public readonly consensusMessage: ConsensusMessage;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
@@ -67,14 +63,12 @@ export class UnsignedConsensusPayload implements SerializableWire<UnsignedConsen
     previousHash,
     blockIndex,
     validatorIndex,
-    timestamp,
     consensusMessage,
   }: UnsignedConsensusPayloadAdd) {
     this.version = version;
     this.previousHash = previousHash;
     this.blockIndex = blockIndex;
     this.validatorIndex = validatorIndex;
-    this.timestamp = timestamp === undefined ? commonUtils.nowSeconds() : timestamp;
     this.consensusMessage = consensusMessage;
   }
 
@@ -83,7 +77,6 @@ export class UnsignedConsensusPayload implements SerializableWire<UnsignedConsen
     writer.writeUInt256(this.previousHash);
     writer.writeUInt32LE(this.blockIndex);
     writer.writeUInt16LE(this.validatorIndex);
-    writer.writeUInt32LE(this.timestamp);
     writer.writeVarBytesLE(this.consensusMessage.serializeWire());
   }
 }

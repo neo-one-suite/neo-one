@@ -76,6 +76,14 @@ export const InvalidContractParameterTypeError = makeErrorWithCode(
   'INVALID_CONTRACT_PARAMETER_TYPE',
   (contractParameterType: number) => `Expected contract parameter type, found: ${contractParameterType.toString(16)}`,
 );
+export const InvalidWitnessScopeJSONError = makeErrorWithCode(
+  'INVALID_WITNESS_SCOPE_JSON',
+  (value: string) => `Invalid WitnessScope: ${value}`,
+);
+export const InvalidWitnessScopeError = makeErrorWithCode(
+  'INVALID_WITNESS_SCOPE',
+  (witnessScope: number) => `Expected witness scope, found: ${witnessScope.toString(16)}`,
+);
 export const InvalidAttributeUsageError = makeErrorWithCode(
   'INVALID_ATTRIBUTE_USAGE',
   (transactionAttributeUsage: number) =>

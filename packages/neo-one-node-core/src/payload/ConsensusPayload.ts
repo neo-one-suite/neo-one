@@ -4,6 +4,7 @@ import {
   crypto,
   ECPoint,
   InvalidFormatError,
+  IOHelper,
   PrivateKey,
   UInt256,
   UInt256Hex,
@@ -18,7 +19,7 @@ import { Witness } from '../Witness';
 import { UnsignedConsensusPayload, UnsignedConsensusPayloadAdd } from './UnsignedConsensusPayload';
 
 export interface ConsensusPayloadAdd extends UnsignedConsensusPayloadAdd {
-  readonly script: Witness;
+  readonly witness: Witness;
 }
 
 export interface ConsensusPayloadGetScriptHashesForVerifyingOptions {
@@ -39,9 +40,8 @@ export class ConsensusPayload extends UnsignedConsensusPayload
       previousHash: payload.previousHash,
       blockIndex: payload.blockIndex,
       validatorIndex: payload.validatorIndex,
-      timestamp: payload.timestamp,
       consensusMessage: payload.consensusMessage,
-      script: crypto.createWitness(payload.serializeWire(), key, Witness),
+      witness: crypto.createWitness(payload.serializeWire(), key, Witness),
     });
   }
 
@@ -52,22 +52,20 @@ export class ConsensusPayload extends UnsignedConsensusPayload
       previousHash,
       blockIndex,
       validatorIndex,
-      timestamp,
       consensusMessage,
     } = super.deserializeUnsignedConsensusPayloadWireBase(options);
     if (reader.readUInt8() !== 1) {
       throw new InvalidFormatError(`Expected BinaryReader\'s readUInt8(0) to be 1. Received: ${reader.readUInt8()}`);
     }
-    const script = Witness.deserializeWireBase(options);
+    const witness = Witness.deserializeWireBase(options);
 
     return new this({
       version,
       previousHash,
       blockIndex,
       validatorIndex,
-      timestamp,
       consensusMessage,
-      script,
+      witness,
     });
   }
 
@@ -78,7 +76,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload
     });
   }
 
-  public readonly script: Witness;
+  public readonly witness: Witness;
   public readonly toKeyString = utils.toKeyString(this.constructor as typeof ConsensusPayload, () => this.hashHex);
   public readonly equals: Equals = utils.equals(this.constructor as typeof ConsensusPayload, this, (other) =>
     common.uInt256Equal(this.hash, other.hash),
@@ -99,6 +97,16 @@ export class ConsensusPayload extends UnsignedConsensusPayload
   private readonly hashInternal = utils.lazy(() => crypto.hash256(this.message));
   private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
   private readonly messageInternal = utils.lazy(() => this.serializeUnsigned());
+  private readonly sizeInternal = utils.lazy(
+    () =>
+      IOHelper.sizeOfUInt32LE +
+      IOHelper.sizeOfUInt256 +
+      IOHelper.sizeOfUInt32LE +
+      IOHelper.sizeOfUInt16LE +
+      IOHelper.sizeOfVarBytesLE(this.message) +
+      IOHelper.sizeOfUInt8 +
+      this.witness.size,
+  );
 
   public constructor({
     version,
@@ -107,7 +115,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload
     validatorIndex,
     timestamp,
     consensusMessage,
-    script,
+    witness,
   }: ConsensusPayloadAdd) {
     super({
       version,
@@ -118,7 +126,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload
       consensusMessage,
     });
 
-    this.script = script;
+    this.witness = witness;
   }
 
   public get hash(): UInt256 {
@@ -133,6 +141,10 @@ export class ConsensusPayload extends UnsignedConsensusPayload
     return this.messageInternal();
   }
 
+  public get size(): number {
+    return this.sizeInternal();
+  }
+
   public serializeUnsigned(): Buffer {
     const writer = new BinaryWriter();
     super.serializeWireBase(writer);
@@ -143,7 +155,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload
   public serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
     writer.writeUInt8(1);
-    this.script.serializeWireBase(writer);
+    this.witness.serializeWireBase(writer);
   }
 
   public async verify({
@@ -174,7 +186,7 @@ export class ConsensusPayload extends UnsignedConsensusPayload
         verifyScript({
           scriptContainer,
           hash: common.hexToUInt160(hash),
-          witness: this.script,
+          witness: this.witness,
         }),
       ),
     );
