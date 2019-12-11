@@ -7,71 +7,71 @@ import {
   ContractGroupModel,
   ContractManifestModel,
   ContractModel,
-  ContractParameterModel,
+  ContractParameterDeclarationModel,
   ContractPermissionDescriptorModel,
   ContractPermissionsModel,
   ContractPropertyStateModel,
 } from '../models';
 
 export const contractParamModel = {
-  boolean: new ContractParameterModel({
+  boolean: new ContractParameterDeclarationModel({
     type: ContractParameterTypeModel.Boolean,
     name: 'param',
   }),
-  byteArray: new ContractParameterModel({
+  byteArray: new ContractParameterDeclarationModel({
     type: ContractParameterTypeModel.ByteArray,
     name: 'param',
   }),
-  hash160: new ContractParameterModel({
+  hash160: new ContractParameterDeclarationModel({
     type: ContractParameterTypeModel.Hash160,
     name: 'param',
   }),
-  hash256: new ContractParameterModel({
+  hash256: new ContractParameterDeclarationModel({
     type: ContractParameterTypeModel.Hash256,
     name: 'param',
   }),
-  array: new ContractParameterModel({
+  array: new ContractParameterDeclarationModel({
     type: ContractParameterTypeModel.Array,
     name: 'param',
   }),
-  integer: new ContractParameterModel({
+  integer: new ContractParameterDeclarationModel({
     type: ContractParameterTypeModel.Integer,
     name: 'param',
   }),
-  interopInterface: new ContractParameterModel({
+  interopInterface: new ContractParameterDeclarationModel({
     type: ContractParameterTypeModel.InteropInterface,
     name: 'param',
   }),
-  map: new ContractParameterModel({
+  map: new ContractParameterDeclarationModel({
     type: ContractParameterTypeModel.Map,
     name: 'param',
   }),
-  publicKey: new ContractParameterModel({
+  publicKey: new ContractParameterDeclarationModel({
     type: ContractParameterTypeModel.PublicKey,
     name: 'param',
   }),
-  signature: new ContractParameterModel({
+  signature: new ContractParameterDeclarationModel({
     type: ContractParameterTypeModel.Signature,
     name: 'param',
   }),
-  string: new ContractParameterModel({
+  string: new ContractParameterDeclarationModel({
     type: ContractParameterTypeModel.String,
     name: 'param',
   }),
-  void: new ContractParameterModel({
+  void: new ContractParameterDeclarationModel({
     type: ContractParameterTypeModel.Void,
     name: 'param',
   }),
 };
 
 export const contractFunctionModel = (
-  parameters: readonly ContractParameterModel[] = [contractParamModel.boolean],
+  parameters: readonly ContractParameterDeclarationModel[] = [contractParamModel.boolean],
   returnType: ContractParameterTypeModel = ContractParameterTypeModel.Void,
   name = 'function',
 ) => new ContractFunctionModel({ name, parameters, returnType });
 
 export const contractEventModel = (
-  parameters: readonly ContractParameterModel[] = [contractParamModel.boolean],
+  parameters: readonly ContractParameterDeclarationModel[] = [contractParamModel.boolean],
   name = 'event',
 ) => new ContractEventModel({ name, parameters });
 

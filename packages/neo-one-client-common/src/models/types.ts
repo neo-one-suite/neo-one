@@ -16,61 +16,68 @@ export interface AccountJSON {
   readonly unclaimed: readonly InputJSON[];
 }
 
-export interface ArrayContractParameterJSON {
+export type ContractParameterTypeJSON = keyof typeof ContractParameterTypeModel;
+
+export interface ContractParameterDeclarationJSON {
+  readonly type: keyof typeof ContractParameterTypeModel;
+  readonly name: string;
+}
+
+export interface ArrayContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Array';
   readonly value: readonly ContractParameterJSON[];
 }
 
-export interface BooleanContractParameterJSON {
+export interface BooleanContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Boolean';
   readonly value: boolean;
 }
 
-export interface ByteArrayContractParameterJSON {
+export interface ByteArrayContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'ByteArray';
   readonly value: string;
 }
 
-export interface Hash160ContractParameterJSON {
+export interface Hash160ContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Hash160';
   readonly value: string;
 }
 
-export interface Hash256ContractParameterJSON {
+export interface Hash256ContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Hash256';
   readonly value: string;
 }
 
-export interface IntegerContractParameterJSON {
+export interface IntegerContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Integer';
   readonly value: string;
 }
 
-export interface InteropInterfaceContractParameterJSON {
+export interface InteropInterfaceContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'InteropInterface';
 }
 
-export interface MapContractParameterJSON {
+export interface MapContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Map';
   readonly value: ReadonlyArray<readonly [ContractParameterJSON, ContractParameterJSON]>;
 }
 
-export interface PublicKeyContractParameterJSON {
+export interface PublicKeyContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'PublicKey';
   readonly value: string;
 }
 
-export interface SignatureContractParameterJSON {
+export interface SignatureContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Signature';
   readonly value: string;
 }
 
-export interface StringContractParameterJSON {
+export interface StringContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'String';
   readonly value: string;
 }
 
-export interface VoidContractParameterJSON {
+export interface VoidContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Void';
 }
 
@@ -88,7 +95,6 @@ export type ContractParameterJSON =
   | InteropInterfaceContractParameterJSON
   | VoidContractParameterJSON;
 
-export type ContractParameterTypeJSON = keyof typeof ContractParameterTypeModel;
 export type WitnessScopeJSON = keyof typeof WitnessScopeModel;
 
 export interface InvocationResultErrorJSON {
@@ -250,23 +256,23 @@ export interface AssetJSON {
 
 export type AssetTypeJSON = keyof typeof AssetTypeModel;
 
-export interface ABIFunctionJSON {
+export interface ContractFunctionJSON {
   readonly name: string;
-  readonly parameters?: readonly ContractParameterJSON[];
+  readonly parameters: readonly ContractParameterDeclarationJSON[];
   readonly returnType: ContractParameterTypeJSON;
   readonly constant?: boolean;
 }
 
-export interface ABIEventJSON {
+export interface ContractEventJSON {
   readonly name: string;
-  readonly parameters: readonly ContractParameterJSON[];
+  readonly parameters: readonly ContractParameterDeclarationJSON[];
 }
 
-export interface ABIJSON {
+export interface ContractAbiJSON {
   readonly hash: string;
-  readonly entryPoint: ABIFunctionJSON;
-  readonly methods: readonly ABIFunctionJSON[];
-  readonly events: readonly ABIEventJSON[];
+  readonly entryPoint: ContractFunctionJSON;
+  readonly methods: readonly ContractFunctionJSON[];
+  readonly events: readonly ContractEventJSON[];
 }
 
 export interface ContractGroupJSON {
@@ -274,15 +280,17 @@ export interface ContractGroupJSON {
   readonly signature: string;
 }
 
+export type ContractPermissionDescriptorJSON = string;
+
 export interface ContractPermissionsJSON {
-  readonly contract: string;
+  readonly contract: ContractPermissionDescriptorJSON;
   readonly methods: readonly string[];
 }
 
 export interface ContractManifestJSON {
-  readonly abi: ABIJSON;
-  readonly groups: ContractGroupJSON;
-  readonly permissions: ContractPermissionsJSON;
+  readonly abi: ContractAbiJSON;
+  readonly groups: readonly ContractGroupJSON[];
+  readonly permissions: readonly ContractPermissionsJSON[];
   readonly trusts: readonly string[];
   readonly safeMethods: readonly string[];
   readonly features: {

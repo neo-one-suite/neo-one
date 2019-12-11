@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContractParameterDeclarationModel - serializeWireBase Array 1`] = `"1005706172616d"`;
+
+exports[`ContractParameterDeclarationModel - serializeWireBase Boolean 1`] = `"0105706172616d"`;
+
+exports[`ContractParameterDeclarationModel - serializeWireBase ByteArray 1`] = `"0505706172616d"`;
+
+exports[`ContractParameterDeclarationModel - serializeWireBase Hash160 1`] = `"0305706172616d"`;
+
+exports[`ContractParameterDeclarationModel - serializeWireBase Hash256 1`] = `"0405706172616d"`;
+
+exports[`ContractParameterDeclarationModel - serializeWireBase Integer 1`] = `"0205706172616d"`;
+
+exports[`ContractParameterDeclarationModel - serializeWireBase InteropInterface 1`] = `"f005706172616d"`;
+
+exports[`ContractParameterDeclarationModel - serializeWireBase Map 1`] = `"1205706172616d"`;
+
+exports[`ContractParameterDeclarationModel - serializeWireBase PublicKey 1`] = `"0605706172616d"`;
+
+exports[`ContractParameterDeclarationModel - serializeWireBase Signature 1`] = `"0005706172616d"`;
+
+exports[`ContractParameterDeclarationModel - serializeWireBase String 1`] = `"0705706172616d"`;
+
+exports[`ContractParameterDeclarationModel - serializeWireBase Void 1`] = `"ff05706172616d"`;

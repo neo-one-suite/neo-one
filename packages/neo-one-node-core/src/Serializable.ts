@@ -1,7 +1,7 @@
 import { ECPoint, UInt160 } from '@neo-one/client-common';
 import { Action } from './action';
 import { Asset } from './Asset';
-import { Contract } from './Contract';
+import { Contract } from './contract';
 import { InvocationResult } from './invocationResult';
 import { StorageChange } from './storageChange';
 import { FeeContext, Input, InvocationTransaction, Transaction } from './transaction';
