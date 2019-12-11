@@ -20,6 +20,7 @@ import {
   OutputStackItem,
   StackItemType,
   StorageContextStackItem,
+  StringStackItem,
   UInt160StackItem,
   UInt256StackItem,
   ValidatorStackItem,
@@ -229,14 +230,31 @@ describe('Stack Item Tests', () => {
     const nullStackItem = new NullStackItem();
     const secondNullStackItem = new NullStackItem();
 
-    expect(nullStackItem.equals(undefined)).toBe(true);
+    expect(nullStackItem.equals(undefined)).toBe(false);
     expect(nullStackItem.equals(nullStackItem)).toBe(true);
-    expect(nullStackItem.equals(secondNullStackItem)).toBe(true);
+    expect(nullStackItem.equals(secondNullStackItem)).toBe(false);
     expect(nullStackItem.equals(new BufferStackItem(Buffer.from([0])))).toBe(false);
     expect(() => nullStackItem.asBuffer()).toThrowError('Invalid Value. Expected Buffer');
     expect(nullStackItem.asBoolean()).toEqual(false);
     expect(nullStackItem.convertJSON()).toMatchSnapshot();
     expect(nullStackItem.serialize()).toEqual(Buffer.from([StackItemType.Null]));
+  });
+
+  test('String Stack Item', () => {
+    const stringStackItem = new StringStackItem('test string');
+    const secondString = new StringStackItem('second string');
+    const anotherString = new StringStackItem('test string');
+
+    expect(stringStackItem.value).toEqual('test string');
+    expect(stringStackItem.equals(secondString)).toBeFalsy();
+    expect(stringStackItem.equals(anotherString)).toBeTruthy();
+    expect(stringStackItem.equals(stringStackItem)).toBeTruthy();
+    expect(stringStackItem.equals(new BufferStackItem(Buffer.from([0])))).toBeFalsy();
+    expect(stringStackItem.asBoolean()).toBeFalsy();
+    expect(stringStackItem.asString()).toEqual('test string');
+    expect(stringStackItem.asBuffer()).toMatchSnapshot();
+    expect(stringStackItem.toStructuralKey()).toMatchSnapshot();
+    expect(() => stringStackItem.serialize()).toThrowError('Unsupported StackItem serde.');
   });
 
   test('StackItemType - Throws On Bad Assert', () => {

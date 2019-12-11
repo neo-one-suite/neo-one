@@ -74,6 +74,10 @@ Object {
 
 exports[`Stack Item Tests Null Stack Item 1`] = `"UNKNOWN"`;
 
+exports[`Stack Item Tests String Stack Item 1`] = `"0b7465737420737472696e67"`;
+
+exports[`Stack Item Tests String Stack Item 2`] = `"0b7465737420737472696e67"`;
+
 exports[`Stack Item Tests UInt160 Stack Item 1`] = `
 Object {
   "__$type": "Hash160ContractParameter",

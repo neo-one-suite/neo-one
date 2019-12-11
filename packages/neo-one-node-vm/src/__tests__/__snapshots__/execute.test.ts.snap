@@ -9424,60 +9424,7 @@ exports[`execute Switcheo V3.1 deposit & withdraw SWTH tokens 99`] = `Array []`;
 
 exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 1`] = `"contract.get"`;
 
-exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 2`] = `
-Array [
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-    },
-  ],
-]
-`;
+exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 2`] = `Array []`;
 
 exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 3`] = `"contract.tryGet"`;
 
@@ -9485,65 +9432,7 @@ exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 4`] = `Array []`;
 
 exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 5`] = `"storageItem.add"`;
 
-exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 6`] = `
-Array [
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "436f6e7472616374496e697454696d65",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "a05ada61",
-    },
-  ],
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "42616c616e63655072656669785f00a34ef9ba9549f2a5ffae1966ea8fbdde47839f20",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "0080c6a47e8d03",
-    },
-  ],
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "546f6b656e546f74616c537570706c79",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "00c052b31ab361",
-    },
-  ],
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "436f6e747261637441646d696e4b6579",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "ac5dcfb1298d08af13dd5aeee94336cc2fe83e39",
-    },
-  ],
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "57686974654c6973745472616e7366657246726f6d53657474696e67436865636b6564",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "31",
-    },
-  ],
-]
-`;
+exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 6`] = `Array []`;
 
 exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 7`] = `"storageItem.update"`;
 
@@ -9555,64 +9444,7 @@ exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 10`] = `Array []`;
 
 exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 11`] = `"storageItem.tryGet"`;
 
-exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 12`] = `
-Array [
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "436f6e7472616374496e697454696d65",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "436f6e7472616374496e697454696d65",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "436f6e7472616374496e697454696d65",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "436f6e7472616374496e697454696d65",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "42616c616e63655072656669785f00a34ef9ba9549f2a5ffae1966ea8fbdde47839f20",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "546f6b656e546f74616c537570706c79",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "546f6b656e546f74616c537570706c79",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "436f6e747261637441646d696e4b6579",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "8d085e441a6e2e751e60146b9da2662b5afcc0c9",
-      "key": "57686974654c6973745472616e7366657246726f6d53657474696e67436865636b6564",
-    },
-  ],
-]
-`;
+exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 12`] = `Array []`;
 
 exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 13`] = `"storageItem.delete"`;
 
@@ -9624,15 +9456,7 @@ exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 16`] = `Array []`;
 
 exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 17`] = `"header.get"`;
 
-exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 18`] = `
-Array [
-  Array [
-    Object {
-      "hashOrIndex": 2900000,
-    },
-  ],
-]
-`;
+exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 18`] = `Array []`;
 
 exports[`execute Switcheo V3.1 deposit & withdraw n0S tokens 19`] = `"0"`;
 
@@ -17334,80 +17158,7 @@ exports[`execute Time Coin deploy & transfer 130`] = `Array []`;
 
 exports[`execute Wowbit token deploy - negative buffer conversion works properly 1`] = `"contract.get"`;
 
-exports[`execute Wowbit token deploy - negative buffer conversion works properly 2`] = `
-Array [
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-]
-`;
+exports[`execute Wowbit token deploy - negative buffer conversion works properly 2`] = `Array []`;
 
 exports[`execute Wowbit token deploy - negative buffer conversion works properly 3`] = `"contract.tryGet"`;
 
@@ -17415,142 +17166,11 @@ exports[`execute Wowbit token deploy - negative buffer conversion works properly
 
 exports[`execute Wowbit token deploy - negative buffer conversion works properly 5`] = `"storageItem.add"`;
 
-exports[`execute Wowbit token deploy - negative buffer conversion works properly 6`] = `
-Array [
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "73616c655374617274",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "40fba55a",
-    },
-  ],
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "73616c65456e64",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "e4fca55a",
-    },
-  ],
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "746f6b656e735065726e656f",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "64",
-    },
-  ],
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "746f6b656e73506572676173",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "19",
-    },
-  ],
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "6d696e5075726368617365416d6f756e74",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "00c836b2fe",
-    },
-  ],
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "6d61785075726368617365416d6f756e74",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "0080c6a47e8d03",
-    },
-  ],
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "746f74616c537570706c79",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "00e7b683f7be8a01",
-    },
-  ],
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "0c3d1f1df081e3c674cb07d5bb19a7592dcf7f9162616c616e6365",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "00e7b683f7be8a01",
-    },
-  ],
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "6465706c6f79",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "01",
-    },
-  ],
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "616374697665",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "01",
-    },
-  ],
-]
-`;
+exports[`execute Wowbit token deploy - negative buffer conversion works properly 6`] = `Array []`;
 
 exports[`execute Wowbit token deploy - negative buffer conversion works properly 7`] = `"storageItem.update"`;
 
-exports[`execute Wowbit token deploy - negative buffer conversion works properly 8`] = `
-Array [
-  Array [
-    StorageItem {
-      "equals": [Function],
-      "flags": 0,
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "746f74616c537570706c79",
-      "serializeWire": [Function],
-      "sizeInternal": [Function],
-      "value": "00e7b683f7be8a01",
-    },
-    Object {
-      "flags": 0,
-      "value": "000007d4512b4b8ade3009",
-    },
-  ],
-]
-`;
+exports[`execute Wowbit token deploy - negative buffer conversion works properly 8`] = `Array []`;
 
 exports[`execute Wowbit token deploy - negative buffer conversion works properly 9`] = `"storageItem.get"`;
 
@@ -17558,88 +17178,7 @@ exports[`execute Wowbit token deploy - negative buffer conversion works properly
 
 exports[`execute Wowbit token deploy - negative buffer conversion works properly 11`] = `"storageItem.tryGet"`;
 
-exports[`execute Wowbit token deploy - negative buffer conversion works properly 12`] = `
-Array [
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "6465706c6f79",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "73616c655374617274",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "73616c65456e64",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "746f6b656e735065726e656f",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "746f6b656e73506572676173",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "6d696e5075726368617365416d6f756e74",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "6d61785075726368617365416d6f756e74",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "746f74616c537570706c79",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "746f74616c537570706c79",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "746f74616c537570706c79",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "0c3d1f1df081e3c674cb07d5bb19a7592dcf7f9162616c616e6365",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "6465706c6f79",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-      "key": "616374697665",
-    },
-  ],
-]
-`;
+exports[`execute Wowbit token deploy - negative buffer conversion works properly 12`] = `Array []`;
 
 exports[`execute Wowbit token deploy - negative buffer conversion works properly 13`] = `"storageItem.delete"`;
 
@@ -17649,37 +17188,7 @@ exports[`execute Wowbit token deploy - negative buffer conversion works properly
 
 exports[`execute Wowbit token deploy - negative buffer conversion works properly 16`] = `Array []`;
 
-exports[`execute Wowbit token deploy - negative buffer conversion works properly 17`] = `
-Array [
-  Array [
-    Object {
-      "args": Array [
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "7472616e73666572",
-        },
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "",
-        },
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "0c3d1f1df081e3c674cb07d5bb19a7592dcf7f91",
-        },
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "00e7b683f7be8a01",
-        },
-      ],
-      "scriptHash": "4884e5000948c6fba7dfffb67288f24ba536bb40",
-    },
-  ],
-]
-`;
+exports[`execute Wowbit token deploy - negative buffer conversion works properly 17`] = `Array []`;
 
 exports[`execute Wowbit token deploy - negative buffer conversion works properly 18`] = `Array []`;
 
@@ -35928,61 +35437,13 @@ exports[`execute narrative token crowdsale register - fails at free GAS limit fo
 
 exports[`execute narrative token crowdsale register - fails at free GAS limit for bulk addresses 39`] = `Array []`;
 
-exports[`execute should fail kyc transaction with insufficient gas 1`] = `"Out of GAS"`;
+exports[`execute should fail kyc transaction with insufficient gas 1`] = `"Unknown op: 103"`;
 
 exports[`execute should fail kyc transaction with insufficient gas 2`] = `"0"`;
 
 exports[`execute should fail kyc transaction with insufficient gas 3`] = `"contract.get"`;
 
-exports[`execute should fail kyc transaction with insufficient gas 4`] = `
-Array [
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-]
-`;
+exports[`execute should fail kyc transaction with insufficient gas 4`] = `Array []`;
 
 exports[`execute should fail kyc transaction with insufficient gas 5`] = `"storageItem.add"`;
 
@@ -35994,256 +35455,17 @@ exports[`execute should fail kyc transaction with insufficient gas 8`] = `Array 
 
 exports[`execute should fail kyc transaction with insufficient gas 9`] = `"storageItem.tryGet"`;
 
-exports[`execute should fail kyc transaction with insufficient gas 10`] = `
-Array [
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-      "key": "6f776e6572",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-      "key": "6b79635f6f6b5c2721a33bf665880fb2c1c0d504d92dcfe1616f",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-      "key": "6b79635f6f6b03a8b007549dd4d19f367d6b71ed5c6fe9aa8272",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-      "key": "6b79635f6f6b98d3602f1e4f5ba179481398e55593862a0df92c",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-      "key": "6b79635f6f6b62b9d04e2d8b2a989d72c3c9478c18f2ef714cf2",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-      "key": "6b79635f6f6bc2c1bac70b182dbf8434323013c72d66c57591d8",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-      "key": "6b79635f6f6b49b197c38b07107c7ac4097ba47c1c9c39a04409",
-    },
-  ],
-  Array [
-    Object {
-      "hash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-      "key": "6b79635f6f6bdbfae7df8d49ad1319079604318ba12252ace7f1",
-    },
-  ],
-]
-`;
+exports[`execute should fail kyc transaction with insufficient gas 10`] = `Array []`;
 
 exports[`execute should fail kyc transaction with insufficient gas 11`] = `"storageItem.update"`;
 
-exports[`execute should fail kyc transaction with insufficient gas 12`] = `
-Array [
-  Array [
-    Object {
-      "value": "0000000000000000000000000000000000000000",
-    },
-    Object {
-      "flags": 0,
-      "value": "01",
-    },
-  ],
-  Array [
-    Object {
-      "value": "0000000000000000000000000000000000000000",
-    },
-    Object {
-      "flags": 0,
-      "value": "01",
-    },
-  ],
-  Array [
-    Object {
-      "value": "0000000000000000000000000000000000000000",
-    },
-    Object {
-      "flags": 0,
-      "value": "01",
-    },
-  ],
-  Array [
-    Object {
-      "value": "0000000000000000000000000000000000000000",
-    },
-    Object {
-      "flags": 0,
-      "value": "01",
-    },
-  ],
-  Array [
-    Object {
-      "value": "0000000000000000000000000000000000000000",
-    },
-    Object {
-      "flags": 0,
-      "value": "01",
-    },
-  ],
-  Array [
-    Object {
-      "value": "0000000000000000000000000000000000000000",
-    },
-    Object {
-      "flags": 0,
-      "value": "01",
-    },
-  ],
-  Array [
-    Object {
-      "value": "0000000000000000000000000000000000000000",
-    },
-    Object {
-      "flags": 0,
-      "value": "01",
-    },
-  ],
-]
-`;
+exports[`execute should fail kyc transaction with insufficient gas 12`] = `Array []`;
 
 exports[`execute should fail kyc transaction with insufficient gas 13`] = `"action.add"`;
 
 exports[`execute should fail kyc transaction with insufficient gas 14`] = `Array []`;
 
-exports[`execute should fail kyc transaction with insufficient gas 15`] = `
-Array [
-  Array [
-    Object {
-      "args": Array [
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "6b79635f726567697374726174696f6e",
-        },
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "5c2721a33bf665880fb2c1c0d504d92dcfe1616f",
-        },
-      ],
-      "scriptHash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "args": Array [
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "6b79635f726567697374726174696f6e",
-        },
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "03a8b007549dd4d19f367d6b71ed5c6fe9aa8272",
-        },
-      ],
-      "scriptHash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "args": Array [
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "6b79635f726567697374726174696f6e",
-        },
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "98d3602f1e4f5ba179481398e55593862a0df92c",
-        },
-      ],
-      "scriptHash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "args": Array [
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "6b79635f726567697374726174696f6e",
-        },
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "62b9d04e2d8b2a989d72c3c9478c18f2ef714cf2",
-        },
-      ],
-      "scriptHash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "args": Array [
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "6b79635f726567697374726174696f6e",
-        },
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "c2c1bac70b182dbf8434323013c72d66c57591d8",
-        },
-      ],
-      "scriptHash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "args": Array [
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "6b79635f726567697374726174696f6e",
-        },
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "49b197c38b07107c7ac4097ba47c1c9c39a04409",
-        },
-      ],
-      "scriptHash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-  Array [
-    Object {
-      "args": Array [
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "6b79635f726567697374726174696f6e",
-        },
-        Object {
-          "__$type": "ByteArrayContractParameter",
-          "type": 5,
-          "value": "dbfae7df8d49ad1319079604318ba12252ace7f1",
-        },
-      ],
-      "scriptHash": "fcd7d436b2fe02473935afdec640027e12d2252e",
-    },
-  ],
-]
-`;
+exports[`execute should fail kyc transaction with insufficient gas 15`] = `Array []`;
 
 exports[`execute should fail kyc transaction with insufficient gas 16`] = `Array []`;
 
