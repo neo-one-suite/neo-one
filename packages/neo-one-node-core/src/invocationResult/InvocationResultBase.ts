@@ -1,6 +1,6 @@
 import { assertVMState, BinaryWriter, IOHelper, utils, VMState } from '@neo-one/client-common';
 import { BN } from 'bn.js';
-import { ContractParameter, deserializeContractParameterWireBase } from '../contractParameter';
+import { ContractParameter, deserializeContractParameterWireBase } from '../contract';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,

@@ -1,5 +1,5 @@
 import { BinaryWriter, NotificationActionJSON } from '@neo-one/client-common';
-import { ContractParameter, deserializeContractParameterWireBase } from '../contractParameter';
+import { ContractParameter, deserializeContractParameterWireBase } from '../contract';
 import { DeserializeWireBaseOptions, SerializableJSON, SerializeJSONContext } from '../Serializable';
 import { ActionBase, ActionBaseAdd } from './ActionBase';
 import { ActionType } from './ActionType';

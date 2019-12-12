@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ContractPermissionsModel - serializeWireBase ECPoint 1`] = `"0248be3c070df745a60f3b8b494efcc6caf90244d803a9a72fe95d9bae2120ec70076d6574686f6431"`;
+exports[`ContractPermissionsModel - serializeWireBase ECPoint 1`] = `"210248be3c070df745a60f3b8b494efcc6caf90244d803a9a72fe95d9bae2120ec7001076d6574686f6431"`;
 
-exports[`ContractPermissionsModel - serializeWireBase UInt160 1`] = `"0101010101010101010101010101010101010101"`;
+exports[`ContractPermissionsModel - serializeWireBase UInt160 1`] = `"14010101010101010101010101010101010101010100"`;
 
-exports[`ContractPermissionsModel - serializeWireBase undefined 1`] = `"00076d6574686f6431076d6574686f6432"`;
+exports[`ContractPermissionsModel - serializeWireBase undefined 1`] = `"012a02076d6574686f6431076d6574686f6432"`;

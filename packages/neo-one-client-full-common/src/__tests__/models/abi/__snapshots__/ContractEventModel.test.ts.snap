@@ -2,4 +2,4 @@
 
 exports[`ContractEventModel - serializeWireBase Boolean 1`] = `"056576656e74010105706172616d"`;
 
-exports[`ContractEventModel - serializeWireBase Multiple Params 1`] = `"056576656e74010105706172616d010205706172616d010705706172616d"`;
+exports[`ContractEventModel - serializeWireBase Multiple Params 1`] = `"056576656e74030105706172616d0205706172616d0705706172616d"`;

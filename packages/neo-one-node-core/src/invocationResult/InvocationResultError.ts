@@ -8,7 +8,7 @@ import {
   VMState,
 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
-import { ContractParameter } from '../contractParameter';
+import { ContractParameter } from '../contract';
 import { DeserializeWireBaseOptions, SerializableJSON, SerializeJSONContext } from '../Serializable';
 import { InvocationResultBase } from './InvocationResultBase';
 
