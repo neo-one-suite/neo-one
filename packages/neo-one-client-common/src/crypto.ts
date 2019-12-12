@@ -263,7 +263,7 @@ const createInvocationScript = (message: Buffer, privateKey: PrivateKey): Buffer
 const createVerificationScript = (publicKey: ECPoint): Buffer => {
   const builder = new ScriptBuilder();
   builder.emitPushECPoint(publicKey);
-  builder.emitOp('CHECKSIG');
+  builder.emitSysCall('Neo.Crypto.CheckSig');
 
   return builder.build();
 };
@@ -322,7 +322,7 @@ const createMultiSignatureVerificationScript = (mIn: number, publicKeys: readonl
     builder.emitPushECPoint(ecPoint);
   });
   builder.emitPushInt(publicKeysSorted.length);
-  builder.emitOp('CHECKMULTISIG');
+  builder.emitSysCall('Neo.Crypto.CheckMultiSig');
 
   return builder.build();
 };
@@ -535,6 +535,13 @@ const decryptNEP2 = async ({
   return common.bufferToPrivateKey(privateKey);
 };
 
+const checkSigUint = Buffer.from([0x747476aa]);
+const checkMultiSigUint = Buffer.from([0xc7c34cba]);
+
+const isSignatureContract = (script: Buffer) =>
+  script.length === 39 && script[0] === 33 && script[34] === Op.SYSCALL && script.slice(34) === checkSigUint;
+
+// TODO: test the changes you just made here
 // tslint:disable
 const isMultiSigContract = (script: Buffer) => {
   let m = 0;
@@ -576,13 +583,11 @@ const isMultiSigContract = (script: Buffer) => {
       if (n != script[i++] - 80) return false;
       break;
   }
-  if (script[i++] != Op.CHECKMULTISIG) return false;
-  if (script.length != i) return false;
+  if (script.slice(i + 1) != checkMultiSigUint) return false;
+  if (script.length != i + 4) return false;
   return true;
 };
 // tslint:enable
-
-const isSignatureContract = (script: Buffer) => script.length === 35 && script[0] === 33 && script[34] === Op.CHECKSIG;
 
 const isStandardContract = (script: Buffer) => isSignatureContract(script) || isMultiSigContract(script);
 

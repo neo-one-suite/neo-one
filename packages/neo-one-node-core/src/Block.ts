@@ -14,6 +14,7 @@ import { BN } from 'bn.js';
 import { Account, AccountKey } from './Account';
 import { Asset, AssetKey } from './Asset';
 import { BlockBase } from './BlockBase';
+import { ConsensusData } from './ConsensusData';
 import { MerkleTree } from './crypto';
 import { VerifyError } from './errors';
 import { Header, HeaderKey } from './Header';
@@ -44,11 +45,11 @@ export interface BlockAdd {
   readonly version?: number;
   readonly previousHash: UInt256;
   readonly merkleRoot?: UInt256;
-  readonly timestamp: number;
+  readonly timestamp: BN;
   readonly index: number;
-  readonly consensusData: BN;
+  readonly consensusData: ConsensusData;
   readonly nextConsensus: UInt160;
-  readonly script?: Witness;
+  readonly witness?: Witness;
   readonly hash?: UInt256;
   readonly transactions: readonly Transaction[];
 }
@@ -79,6 +80,8 @@ export interface BlockVerifyOptions {
 }
 
 export class Block extends BlockBase implements SerializableWire<Block>, SerializableJSON<BlockJSON> {
+  public static readonly MaxContentsPerBlock = utils.USHORT_MAX;
+  public static readonly MaxTransactionsPerBlock = utils.USHORT_MAX.subn(1);
   public static async calculateNetworkFee(context: FeeContext, transactions: readonly Transaction[]): Promise<BN> {
     const fees = await Promise.all(transactions.map(async (transaction) => transaction.getNetworkFee(context)));
 
@@ -88,10 +91,16 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Block {
     const { reader } = options;
     const blockBase = super.deserializeBlockBaseWireBase(options);
-    const transactions = reader.readArray(() => deserializeTransactionWireBase(options), 0x10000);
+    const count = reader.readVarUIntLE(this.MaxContentsPerBlock).toNumber();
+    if (count === 0) {
+      throw new InvalidFormatError('expected count to be greater than 0');
+    }
+    const consensusData = ConsensusData.deserializeWireBase(options);
+    // TODO: check the logic here. This used to be {blockbase + transactionsLength + transactions} now it is {blockBase + transactionsLength + consensusData + transactions}
+    const transactions = reader.readArray(() => deserializeTransactionWireBase(options), 0x10000, count);
 
     if (transactions.length === 0) {
-      throw new InvalidFormatError('Expected at least one transcaction in the block');
+      throw new InvalidFormatError('Expected at least one transaction in the block');
     }
 
     const merkleRoot = MerkleTree.computeRoot(transactions.map((transaction) => transaction.hash));
@@ -106,9 +115,9 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
       merkleRoot: blockBase.merkleRoot,
       timestamp: blockBase.timestamp,
       index: blockBase.index,
-      consensusData: blockBase.consensusData,
+      consensusData,
       nextConsensus: blockBase.nextConsensus,
-      script: blockBase.script,
+      witness: blockBase.witness,
       transactions,
     });
   }
@@ -121,8 +130,9 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
   }
 
   public readonly transactions: readonly Transaction[];
-  protected readonly sizeExclusive = utils.lazy(() =>
-    IOHelper.sizeOfArray(this.transactions, (transaction) => transaction.size),
+  public readonly consensusData: ConsensusData;
+  protected readonly sizeExclusive = utils.lazy(
+    () => IOHelper.sizeOfArray(this.transactions, (transaction) => transaction.size) + this.consensusData.size,
   );
   private readonly headerInternal = utils.lazy(
     () =>
@@ -132,9 +142,8 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
         merkleRoot: this.merkleRoot,
         timestamp: this.timestamp,
         index: this.index,
-        consensusData: this.consensusData,
         nextConsensus: this.nextConsensus,
-        script: this.script,
+        witness: this.witness,
       }),
   );
 
@@ -145,7 +154,7 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
     index,
     consensusData,
     nextConsensus,
-    script,
+    witness,
     hash,
     transactions,
     merkleRoot = MerkleTree.computeRoot(transactions.map((transaction) => transaction.hash)),
@@ -156,13 +165,13 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
       merkleRoot,
       timestamp,
       index,
-      consensusData,
       nextConsensus,
-      script,
+      witness,
       hash,
     });
 
     this.transactions = transactions;
+    this.consensusData = consensusData;
   }
 
   public get header(): Header {
@@ -171,10 +180,10 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
 
   public clone({
     transactions,
-    script,
+    witness,
   }: {
     readonly transactions: readonly Transaction[];
-    readonly script: Witness;
+    readonly witness: Witness;
   }): Block {
     return new Block({
       version: this.version,
@@ -185,7 +194,7 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
       consensusData: this.consensusData,
       nextConsensus: this.nextConsensus,
       transactions,
-      script,
+      witness,
     });
   }
 
@@ -226,16 +235,16 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
       merkleroot: blockBaseJSON.merkleroot,
       time: blockBaseJSON.time,
       index: blockBaseJSON.index,
-      nonce: blockBaseJSON.nonce,
       nextconsensus: blockBaseJSON.nextconsensus,
-      script: blockBaseJSON.script,
+      witnesses: blockBaseJSON.witnesses,
       tx: await Promise.all(
         this.transactions.map(
           (transaction) => transaction.serializeJSON(context) as TransactionJSON | PromiseLike<TransactionJSON>,
         ),
       ),
       size: blockBaseJSON.size,
-      confirmations: blockBaseJSON.confirmations,
+      consensus_data: this.consensusData.serializeJSON(context),
+      // confirmations: blockBaseJSON.confirmations, TODO: is this our own property?
     };
   }
 
@@ -273,7 +282,7 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
     const { failureMessage } = await verifyScript({
       scriptContainer: { type: ScriptContainerType.Block, value: this },
       hash: previousHeader.nextConsensus,
-      witness: this.script,
+      witness: this.witness,
     });
 
     if (failureMessage !== undefined) {

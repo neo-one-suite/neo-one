@@ -180,7 +180,9 @@ export class ScriptBuilder {
   }
 
   public emitAppCallVerification(scriptHash: UInt160): this {
-    return this.emitOp('APPCALL', common.uInt160ToBuffer(scriptHash));
+    this.emitPushParam(common.uInt160ToBuffer(scriptHash));
+
+    return this.emitSysCall('System.Contract.Call');
   }
 
   // tslint:disable-next-line readonly-array
@@ -188,13 +190,6 @@ export class ScriptBuilder {
     this.emitAppCallInvocation(operation, ...params);
 
     return this.emitAppCallVerification(scriptHash);
-  }
-
-  // tslint:disable-next-line readonly-array
-  public emitTailCall(scriptHash: UInt160, operation: string, ...params: ScriptBuilderParam[]): this {
-    this.emitAppCallInvocation(operation, ...params);
-
-    return this.emitOp('TAILCALL', common.uInt160ToBuffer(scriptHash));
   }
 
   // tslint:disable-next-line readonly-array

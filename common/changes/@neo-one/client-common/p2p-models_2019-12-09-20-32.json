@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/client-common",
+      "comment": "Update Block & Transaction models",
+      "type": "major"
+    }
+  ],
+  "packageName": "@neo-one/client-common",
+  "email": "danwbyrne@gmail.com"
+}

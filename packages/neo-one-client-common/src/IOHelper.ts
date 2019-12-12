@@ -66,6 +66,7 @@ export const IOHelper = {
   sizeOfUInt32LE,
   sizeOfUInt64LE,
   sizeOfVarBytesLE,
+  sizeOfVarUIntLE,
   sizeOfVarString,
   sizeOfFixedString,
   sizeOfArray,
