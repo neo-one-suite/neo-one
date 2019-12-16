@@ -4,6 +4,9 @@ module.exports = {
   ...base({ path: 'test' }),
   displayName: 'unit',
   moduleNameMapper: {
+    '^@neo-one/ec-key': '@neo-one/ec-key',
+    '^@neo-one/boa': '@neo-one/boa',
+    '^@neo-one/csharp': '@neo-one/csharp',
     '^@neo-one/(.*)$': '<rootDir>/packages/neo-one-$1/src',
   },
   testRegex: '^.*/__tests__/.*\\.test\\.tsx?$',
