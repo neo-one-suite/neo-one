@@ -3,6 +3,9 @@ const base = require('./base');
 module.exports = {
   ...base({ path: 'test' }),
   displayName: 'unit',
+  moduleNameMapper: {
+    '^@neo-one/(.*)$': '<rootDir>/packages/neo-one-$1/src',
+  },
   testRegex: '^.*/__tests__/.*\\.test\\.tsx?$',
   coverageReporters: ['json'],
   collectCoverageFrom: [
