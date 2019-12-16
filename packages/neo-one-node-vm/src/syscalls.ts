@@ -65,6 +65,7 @@ import {
   IntegerStackItem,
   IteratorStackItem,
   NullStackItem,
+  serializeJson,
   StackItem,
   StackItemEnumerator,
   StackItemIterator,
@@ -521,11 +522,10 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     in: 1,
     out: 1,
     fee: FEES[400],
-    invoke: async ({ context, args }) => {
-      // need json serializable
-
-      return { context, results: [] };
-    },
+    invoke: async ({ context, args }) => ({
+      context,
+      results: [serializeJson(args[0])],
+    }),
   }),
 
   'Neo.Json.Deserialize': createSysCall({
@@ -533,11 +533,10 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     in: 1,
     out: 1,
     fee: FEES[400],
-    invoke: async ({ context, args }) => {
-      // need json serializable
-
-      return { context, results: [] };
-    },
+    invoke: async ({ context, args }) => ({
+      context,
+      results: [deserializeJson(args[0].asString())],
+    }),
   }),
 
   // double check this one

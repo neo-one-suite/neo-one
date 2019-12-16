@@ -17,6 +17,7 @@ import { MapStackItem } from './MapStackItem';
 import { NullStackItem } from './NullStackItem';
 import { OutputStackItem } from './OutputStackItem';
 import { StorageContextStackItem } from './StorageContextStackItem';
+import { StringStackItem } from './StringStackItem';
 import { StructStackItem } from './StructStackItem';
 import { TransactionStackItem } from './TransactionStackItem';
 import { UInt160StackItem } from './UInt160StackItem';
@@ -49,4 +50,5 @@ export type StackItem =
   | ECPointStackItem
   | StructStackItem
   | WitnessStackItem
-  | NullStackItem;
+  | NullStackItem
+  | StringStackItem;

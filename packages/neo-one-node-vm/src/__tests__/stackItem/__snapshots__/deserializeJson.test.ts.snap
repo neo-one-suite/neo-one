@@ -1,5 +1,115 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`deserializeJson array returns ArrayStackItem 1`] = `
+NullStackItem {
+  "mutableCount": 0,
+  "referenceID": 103,
+}
+`;
+
+exports[`deserializeJson null returns NullStackItem 1`] = `
+NullStackItem {
+  "mutableCount": 0,
+  "referenceID": 98,
+}
+`;
+
+exports[`deserializeJson object returns MapStackItem 1`] = `
+MapStackItem {
+  "mutableCount": 0,
+  "referenceID": 92,
+  "referenceKeys": Map {
+    "036b6579" => StringStackItem {
+      "mutableCount": 0,
+      "value": "key",
+    },
+  },
+  "referenceValues": Map {
+    "036b6579" => StringStackItem {
+      "mutableCount": 0,
+      "value": "value",
+    },
+  },
+}
+`;
+
+exports[`deserializeJson object returns MapStackItem 2`] = `
+MapStackItem {
+  "mutableCount": 0,
+  "referenceID": 96,
+  "referenceKeys": Map {
+    "056669727374" => StringStackItem {
+      "mutableCount": 0,
+      "value": "first",
+    },
+  },
+  "referenceValues": Map {
+    "056669727374" => MapStackItem {
+      "mutableCount": 0,
+      "referenceID": 95,
+      "referenceKeys": Map {
+        "067365636f6e64" => StringStackItem {
+          "mutableCount": 0,
+          "value": "second",
+        },
+        "057468697264" => StringStackItem {
+          "mutableCount": 0,
+          "value": "third",
+        },
+        "06666f75727468" => StringStackItem {
+          "mutableCount": 0,
+          "value": "fourth",
+        },
+        "056669667468" => StringStackItem {
+          "mutableCount": 0,
+          "value": "fifth",
+        },
+        "057369787468" => StringStackItem {
+          "mutableCount": 0,
+          "value": "sixth",
+        },
+      },
+      "referenceValues": Map {
+        "067365636f6e64" => ArrayStackItem {
+          "mutableCount": 0,
+          "referenceID": 93,
+          "value": Array [
+            StringStackItem {
+              "mutableCount": 0,
+              "value": "string",
+            },
+            IntegerStackItem {
+              "mutableCount": 0,
+              "value": "10",
+            },
+            BooleanStackItem {
+              "mutableCount": 0,
+              "value": true,
+            },
+          ],
+        },
+        "057468697264" => NullStackItem {
+          "mutableCount": 0,
+          "referenceID": 94,
+        },
+        "06666f75727468" => StringStackItem {
+          "mutableCount": 0,
+          "value": "string",
+        },
+        "056669667468" => IntegerStackItem {
+          "mutableCount": 0,
+          "value": "10",
+        },
+        "057369787468" => BooleanStackItem {
+          "mutableCount": 0,
+          "value": false,
+        },
+      },
+    },
+  },
+}
+`;
+
 exports[`syscalls Neo.Contract.Update 1`] = `"contract.tryGet"`;
 
 exports[`syscalls Neo.Contract.Update 2`] = `

@@ -111,6 +111,10 @@ export class MapStackItem extends StackItemBase {
     return [...this.referenceValues.values()];
   }
 
+  public entriesArray(): Array<[StackItem, StackItem]> {
+    return this.keysArray().map((key) => [key, this.get(key)]);
+  }
+
   public asMapStackItem(): MapStackItem {
     return this;
   }

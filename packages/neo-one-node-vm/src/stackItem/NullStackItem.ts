@@ -1,24 +1,15 @@
 import { BinaryWriter } from '@neo-one/client-common';
 import { InvalidValueBufferError } from './errors';
+import { getNextID } from './referenceCounter';
 import { StackItemBase } from './StackItemBase';
 import { StackItemType } from './StackItemType';
 
 export class NullStackItem extends StackItemBase {
-  public constructor() {
-    super();
-  }
+  private readonly referenceID = getNextID();
 
   // tslint:disable-next-line: no-any
   public equals(other: any): boolean {
     if (this === other) {
-      return true;
-    }
-
-    if (other instanceof NullStackItem) {
-      return true;
-    }
-
-    if (other === undefined) {
       return true;
     }
 
@@ -35,6 +26,10 @@ export class NullStackItem extends StackItemBase {
 
   public asBuffer(): Buffer {
     throw new InvalidValueBufferError();
+  }
+
+  public toStructuralKey(): string {
+    return `${this.referenceID}`;
   }
 
   protected serializeInternal(): Buffer {

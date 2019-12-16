@@ -25,8 +25,10 @@ export { StackItemEnumerator } from './StackItemEnumerator';
 export { StackItemIterator } from './StackItemIterator';
 export { WitnessStackItem } from './WitnessStackItem';
 export { NullStackItem } from './NullStackItem';
-
+export { StringStackItem } from './StringStackItem';
 export { deserializeStackItem } from './deserializeStackItem';
+export { serializeJson } from './serializeJson';
+export { deserializeJson } from './deserializeJson';
 export { StackItem } from './StackItem';
 
 export * from './StackItemType';

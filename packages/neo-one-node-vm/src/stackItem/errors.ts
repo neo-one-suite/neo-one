@@ -70,6 +70,13 @@ export const UnsupportedStackItemSerdeError = makeErrorWithCode(
   'UNSUPPORTED_STACK_ITEM_SERDE',
   () => 'Unsupported StackItem serde.',
 );
+export const UnsupportedStackItemJsonSerdeError = makeErrorWithCode(
+  'UNSUPPORTED_STACK_ITEM_JSON_SERDE',
+  () => 'Unsupported StackItem JSON serde.',
+);
+export const InvalidJsonError = makeErrorWithCode('INVALID_JSON', (error?) =>
+  error ? `Invalid JSON: ${error.message}.` : 'Invalid JSON.',
+);
 export const InvalidStorageStackItemEnumeratorError = makeErrorWithCode(
   'INVALID_STORAGE_STACK_ITEM_ENUMERATOR',
   () => 'Current is not set. The enumerator has been fully consumed or has not been initialized',
