@@ -1,35 +1,27 @@
 import { BinaryWriter, createSerializeWire, SerializableWire, SerializeWire } from '@neo-one/client-common';
-import { BaseState } from '../../BaseState';
 import { ContractPermissionDescriptorModel } from './ContractPermissionDescriptorModel';
 
-export interface ContractPermissionsModelAdd {
-  readonly contract: ContractPermissionDescriptorModel;
+export interface ContractPermissionsModelAdd<
+  TContractPermissionDescriptor extends ContractPermissionDescriptorModel = ContractPermissionDescriptorModel
+> {
+  readonly contract: TContractPermissionDescriptor;
   readonly methods: readonly string[];
 }
 
-export class ContractPermissionsModel extends BaseState implements SerializableWire<ContractPermissionsModel> {
-  public readonly contract: ContractPermissionDescriptorModel;
+export class ContractPermissionsModel<
+  TContractPermissionDescriptor extends ContractPermissionDescriptorModel = ContractPermissionDescriptorModel
+> implements SerializableWire<ContractPermissionsModel> {
+  public readonly contract: TContractPermissionDescriptor;
   public readonly methods: readonly string[];
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
-  public constructor({ contract, methods }: ContractPermissionsModelAdd) {
-    super({ version: undefined });
+  public constructor({ contract, methods }: ContractPermissionsModelAdd<TContractPermissionDescriptor>) {
     this.contract = contract;
     this.methods = methods;
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
-    serializeContractPermissionsWireBase({ writer, permissions: this });
+    this.contract.serializeWireBase(writer);
+    writer.writeArray(this.methods, (method) => writer.writeVarString(method));
   }
 }
-
-export const serializeContractPermissionsWireBase = ({
-  writer,
-  permissions,
-}: {
-  readonly writer: BinaryWriter;
-  readonly permissions: ContractPermissionsModel;
-}): void => {
-  permissions.contract.serializeWireBase(writer);
-  writer.writeArray(permissions.methods, (methodName) => writer.writeVarString(methodName));
-};

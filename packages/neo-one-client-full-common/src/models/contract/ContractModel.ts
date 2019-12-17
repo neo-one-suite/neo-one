@@ -1,5 +1,4 @@
 import { BinaryWriter, createSerializeWire, SerializableWire, SerializeWire } from '@neo-one/client-common';
-import { BaseState } from '../BaseState';
 import { ContractManifestModel } from './ContractManifestModel';
 
 export interface ContractModelAdd {
@@ -7,13 +6,12 @@ export interface ContractModelAdd {
   readonly manifest: ContractManifestModel;
 }
 
-export class ContractModel extends BaseState implements SerializableWire<ContractModel> {
+export class ContractModel implements SerializableWire<ContractModel> {
   public readonly script: Buffer;
   public readonly manifest: ContractManifestModel;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public constructor({ script, manifest }: ContractModelAdd) {
-    super({ version: undefined });
     this.script = script;
     this.manifest = manifest;
   }

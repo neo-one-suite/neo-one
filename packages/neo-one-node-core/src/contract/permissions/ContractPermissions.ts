@@ -1,25 +1,21 @@
 import { ContractPermissionsJSON, IOHelper } from '@neo-one/client-common';
 import { ContractPermissionsModel, ContractPermissionsModelAdd } from '@neo-one/client-full-common';
-import {
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableJSON,
-  SerializeJSONContext,
-} from '../../Serializable';
+import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from '../../Serializable';
 import { BinaryReader, utils } from '../../utils';
 import { ContractPermissionDescriptor } from './ContractPermissionDescriptor';
 
-export interface ContractPermissionsAdd extends ContractPermissionsModelAdd {}
+export type ContractPermissionsAdd = ContractPermissionsModelAdd<ContractPermissionDescriptor>;
 
-export class ContractPermissions extends ContractPermissionsModel implements SerializableJSON<ContractPermissionsJSON> {
-  public get size(): number {
-    return this.contractPermissionsSizeInternal();
-  }
-
+export class ContractPermissions extends ContractPermissionsModel<ContractPermissionDescriptor>
+  implements SerializableJSON<ContractPermissionsJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): ContractPermissions {
-    return deserializeContractPermissionsWireBase({
-      context: options.context,
-      reader: options.reader,
+    const { reader } = options;
+    const contract = ContractPermissionDescriptor.deserializeWireBase(options);
+    const methods = reader.readArray(() => reader.readVarString());
+
+    return new this({
+      contract,
+      methods,
     });
   }
 
@@ -30,45 +26,25 @@ export class ContractPermissions extends ContractPermissionsModel implements Ser
     });
   }
 
-  public readonly contractDeserializable: ContractPermissionDescriptor;
-
-  private readonly contractPermissionsSizeInternal = utils.lazy(() =>
-    sizeOfContractPermissions({
-      contract: this.contractDeserializable,
-      methods: this.methods,
-    }),
+  private readonly sizeInternal = utils.lazy(
+    () => this.contract.size + IOHelper.sizeOfArray(this.methods, (method) => IOHelper.sizeOfVarString(method)),
   );
 
-  public constructor({ contract, methods }: ContractPermissionsAdd) {
-    super({ contract, methods });
-    this.contractDeserializable = new ContractPermissionDescriptor({ hashOrGroup: contract.hashOrGroup });
+  public get size(): number {
+    return this.sizeInternal();
   }
 
-  public serializeJSON(context: SerializeJSONContext): ContractPermissionsJSON {
+  public clone(): ContractPermissions {
+    return new ContractPermissions({
+      contract: this.contract,
+      methods: this.methods,
+    });
+  }
+
+  public serializeJSON(): ContractPermissionsJSON {
     return {
-      contract: this.contractDeserializable.serializeJSON(context),
+      contract: this.contract.serializeJSON(),
       methods: this.methods,
     };
   }
 }
-
-export const sizeOfContractPermissions = ({
-  contract,
-  methods,
-}: {
-  readonly contract: ContractPermissionDescriptor;
-  readonly methods: readonly string[];
-}) => contract.size + IOHelper.sizeOfArray(methods, (method) => IOHelper.sizeOfVarString(method));
-
-export const deserializeContractPermissionsWireBase = ({
-  reader,
-  context,
-}: DeserializeWireBaseOptions): ContractPermissions => {
-  const contract = ContractPermissionDescriptor.deserializeWireBase({ reader, context });
-  const methods = reader.readArray(() => reader.readVarString());
-
-  return new ContractPermissions({
-    contract,
-    methods,
-  });
-};

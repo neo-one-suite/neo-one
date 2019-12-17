@@ -19,9 +19,7 @@ export class Header extends BlockBase implements SerializableWire<Header>, Seria
     const { reader } = options;
     const blockBase = super.deserializeBlockBaseWireBase(options);
     if (reader.readUInt8() !== 0) {
-      throw new InvalidFormatError(
-        `Expected Header BinaryReader readUInt8(0) to be 0. Received: ${reader.readUInt8()}`,
-      );
+      throw new InvalidFormatError(`Expected Header BinaryReader readUInt8() to be 0. Received: ${reader.readUInt8()}`);
     }
 
     return new this({
@@ -30,7 +28,6 @@ export class Header extends BlockBase implements SerializableWire<Header>, Seria
       merkleRoot: blockBase.merkleRoot,
       timestamp: blockBase.timestamp,
       index: blockBase.index,
-      consensusData: blockBase.consensusData,
       nextConsensus: blockBase.nextConsensus,
       witness: blockBase.witness,
     });

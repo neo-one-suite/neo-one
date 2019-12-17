@@ -138,8 +138,8 @@ export class Transaction extends TransactionModel<Attribute, Witness, Cosigner>
       witnesses,
     });
   }
-  // tslint:disable-next-line no-any
-  public static deserializeWire(options: DeserializeWireOptions): any {
+
+  public static deserializeWire(options: DeserializeWireOptions) {
     return this.deserializeWireBase({
       context: options.context,
       reader: new BinaryReader(options.buffer),

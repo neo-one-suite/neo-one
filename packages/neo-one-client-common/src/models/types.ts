@@ -156,10 +156,8 @@ export type ActionJSON = NotificationActionJSON | LogActionJSON;
 export type ActionTypeJSON = ActionJSON['type'];
 
 export interface StorageItemJSON {
-  readonly hash: string;
-  readonly key: string;
   readonly value: string;
-  readonly flags: StorageFlagsJSON;
+  readonly isConstant: boolean;
 }
 
 export type StorageFlagsJSON = keyof typeof StorageFlagsModel;
@@ -280,6 +278,12 @@ export interface ContractAbiJSON {
 export interface ContractGroupJSON {
   readonly publicKey: string;
   readonly signature: string;
+}
+
+export interface ContractStateJSON {
+  readonly hash: string;
+  readonly script: string;
+  readonly manifest: ContractManifestJSON;
 }
 
 export type ContractPermissionDescriptorJSON = string;

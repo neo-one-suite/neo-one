@@ -300,6 +300,28 @@ export class BinaryWriter {
     });
   }
 
+  // TODO: this logic could be done with reduce, just copied from C#
+  public writeBytesWithGrouping(value: Buffer): this {
+    let index = 0;
+    let remaining = value.length;
+    // tslint:disable-next-line: no-loop-statement
+    while (remaining >= common.GROUPING_SIZE_BYTES) {
+      this.writeBytes(value.slice(index, common.GROUPING_SIZE_BYTES));
+      this.writeUInt8(common.GROUPING_SIZE_BYTES);
+      index = index + common.GROUPING_SIZE_BYTES;
+      remaining = remaining - common.GROUPING_SIZE_BYTES;
+    }
+    if (remaining > 0) {
+      this.writeBytes(value.slice(index, remaining));
+    }
+    const padding = common.GROUPING_SIZE_BYTES - remaining;
+    // tslint:disable-next-line: prefer-array-literal
+    this.writeBytes(Buffer.from(Array(padding).map(() => 0x00)));
+    this.writeUInt8(remaining);
+
+    return this;
+  }
+
   private finish() {
     const computedBuffer = Buffer.alloc(this.length);
     let head = this.head.next;
