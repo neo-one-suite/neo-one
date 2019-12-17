@@ -24,26 +24,26 @@ export type BufferAttributeUsageModel =
 
 export interface BufferAttributeModelAdd {
   readonly usage: BufferAttributeUsageModel;
-  readonly value: Buffer;
+  readonly data: Buffer;
 }
 
 export class BufferAttributeModel extends AttributeBaseModel<BufferAttributeUsageModel, Buffer> {
   public readonly usage: BufferAttributeUsageModel;
-  public readonly value: Buffer;
+  public readonly data: Buffer;
 
-  public constructor({ usage, value }: BufferAttributeModelAdd) {
+  public constructor({ usage, data }: BufferAttributeModelAdd) {
     super();
     this.usage = usage;
-    this.value = value;
+    this.data = data;
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
     super.serializeWireBase(writer);
     if (this.usage === AttributeUsageModel.DescriptionUrl) {
-      writer.writeUInt8(this.value.length);
-      writer.writeBytes(this.value);
+      writer.writeUInt8(this.data.length);
+      writer.writeBytes(this.data);
     } else {
-      writer.writeVarBytesLE(this.value);
+      writer.writeVarBytesLE(this.data);
     }
   }
 }

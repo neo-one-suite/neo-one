@@ -64,6 +64,14 @@ export const InvalidStorageFlagsError = makeErrorWithCode(
   'INVALID_STORAGE_FLAGS',
   (storageFlags: number) => `Expected StorageFlags, found: ${storageFlags.toString(16)}`,
 );
+export const InvalidRelayResultReasonError = makeErrorWithCode(
+  'INVALID_RELAY_RESULT_REASON',
+  (reason: number) => `Expected RelayResultReason, found: ${reason.toString(16)}`,
+);
+export const InvalidRelayResultReasonJSONError = makeErrorWithCode(
+  'INVALID_RELAY_RESULT_REASON_JSON',
+  (value: string) => `Invalid RelayResultReason: ${value}`,
+);
 export const InvalidStateDescriptorTypeError = makeErrorWithCode(
   'INVALID_STATE_DESCRIPTOR_TYPE',
   (stateDescriptorType: number) => `Expected StateDescriptorType, found: ${stateDescriptorType.toString(16)}`,

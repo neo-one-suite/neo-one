@@ -539,15 +539,18 @@ const checkSigUint = Buffer.from([0x747476aa]);
 const checkMultiSigUint = Buffer.from([0xc7c34cba]);
 
 const isSignatureContract = (script: Buffer) =>
-  script.length === 39 && script[0] === 33 && script[34] === Op.SYSCALL && script.slice(34) === checkSigUint;
+  script.length === 40 &&
+  script[0] === Op.PUSHBYTES33 &&
+  script[34] === Op.PUSHNULL &&
+  script[35] === Op.SYSCALL &&
+  script.slice(36) === checkSigUint;
 
-// TODO: test the changes you just made here
 // tslint:disable
 const isMultiSigContract = (script: Buffer) => {
   let m = 0;
   let n = 0;
   let i = 0;
-  if (script.length < 37) return false;
+  if (script.length < 42) return false;
   if (script[i] > Op.PUSH16) return false;
   if (script[i] < Op.PUSH1 && script[i] !== 1 && script[i] !== 2) return false;
   switch (script[i]) {
@@ -583,8 +586,10 @@ const isMultiSigContract = (script: Buffer) => {
       if (n != script[i++] - 80) return false;
       break;
   }
-  if (script.slice(i + 1) != checkMultiSigUint) return false;
+  if (script[i++] !== Op.PUSHNULL) return false;
+  if (script[i++] !== Op.SYSCALL) return false;
   if (script.length != i + 4) return false;
+  if (script.slice(i) != checkMultiSigUint) return false;
   return true;
 };
 // tslint:enable

@@ -4,7 +4,7 @@ import { Asset } from './Asset';
 import { Contract } from './contract';
 import { InvocationResult } from './invocationResult';
 import { StorageChange } from './storageChange';
-import { FeeContext, Input, InvocationTransaction, Transaction } from './transaction';
+import { InvocationTransaction, Transaction } from './transaction';
 import { TransactionData } from './TransactionData';
 import { BinaryReader } from './utils';
 
@@ -48,13 +48,10 @@ export interface SerializableInvocationData {
 
 export interface SerializeJSONContext {
   readonly addressVersion: number;
-  readonly feeContext: FeeContext;
   readonly tryGetInvocationData: (
     transaction: InvocationTransaction,
   ) => Promise<SerializableInvocationData | undefined>;
   readonly tryGetTransactionData: (transaction: Transaction) => Promise<TransactionData | undefined>;
-  readonly getUnclaimed: (hash: UInt160) => Promise<readonly Input[]>;
-  readonly getUnspent: (hash: UInt160) => Promise<readonly Input[]>;
 }
 
 export type SerializeJSON<TJSON> = (context: SerializeJSONContext) => TJSON | Promise<TJSON>;
