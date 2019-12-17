@@ -3,26 +3,31 @@ import { ContractEventModel } from './ContractEventModel';
 import { ContractMethodDescriptorModel } from './ContractMethodDescriptorModel';
 
 export interface ContractABIModelAdd<
-  TContractFunction extends ContractMethodDescriptorModel = ContractMethodDescriptorModel,
+  TContractMethodDescriptor extends ContractMethodDescriptorModel = ContractMethodDescriptorModel,
   TContractEvent extends ContractEventModel = ContractEventModel
 > {
   readonly hash: UInt160;
-  readonly entryPoint: TContractFunction;
-  readonly methods: readonly TContractFunction[];
+  readonly entryPoint: TContractMethodDescriptor;
+  readonly methods: readonly TContractMethodDescriptor[];
   readonly events: readonly TContractEvent[];
 }
 
 export class ContractABIModel<
-  TContractFunction extends ContractMethodDescriptorModel = ContractMethodDescriptorModel,
+  TContractMethodDescriptor extends ContractMethodDescriptorModel = ContractMethodDescriptorModel,
   TContractEvent extends ContractEventModel = ContractEventModel
 > implements SerializableWire<ContractABIModel> {
   public readonly hash: UInt160;
-  public readonly entryPoint: TContractFunction;
-  public readonly methods: readonly TContractFunction[];
+  public readonly entryPoint: TContractMethodDescriptor;
+  public readonly methods: readonly TContractMethodDescriptor[];
   public readonly events: readonly TContractEvent[];
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
-  public constructor({ hash, entryPoint, methods, events }: ContractABIModelAdd<TContractFunction, TContractEvent>) {
+  public constructor({
+    hash,
+    entryPoint,
+    methods,
+    events,
+  }: ContractABIModelAdd<TContractMethodDescriptor, TContractEvent>) {
     this.hash = hash;
     this.entryPoint = entryPoint;
     this.methods = methods;

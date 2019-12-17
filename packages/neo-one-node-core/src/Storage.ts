@@ -1,4 +1,3 @@
-import { UInt256 } from '@neo-one/client-common';
 import { Account, AccountKey } from './Account';
 import { AccountUnclaimed, AccountUnclaimedKey } from './AccountUnclaimed';
 import { AccountUnspent, AccountUnspentKey } from './AccountUnspent';
@@ -7,12 +6,16 @@ import { Asset } from './Asset';
 import { Block, BlockKey } from './Block';
 import { Blockchain, ReadStorage } from './Blockchain';
 import { BlockData } from './BlockData';
-import { Contract, ContractKey } from './Contract';
+import { Contract, ContractKey } from './contract';
 import { Header, HeaderKey } from './Header';
 import { InvocationData } from './InvocationData';
 import { StorageItem, StorageItemKey } from './StorageItem';
 import { Transaction } from './transaction';
+<<<<<<< HEAD
 import { TransactionData } from './TransactionData';
+=======
+// import { TransactionData } from './TransactionData';
+>>>>>>> Bring consensus models in line with other models and update some transaction/block types
 import { Validator, ValidatorKey } from './Validator';
 import { ValidatorsCount } from './ValidatorsCount';
 
@@ -29,7 +32,7 @@ export type AddChange =
   | { readonly type: 'storageItem'; readonly value: StorageItem }
   | { readonly type: 'validator'; readonly value: Validator }
   | { readonly type: 'blockData'; readonly value: BlockData }
-  | { readonly type: 'transactionData'; readonly value: TransactionData }
+  // | { readonly type: 'transactionData'; readonly value: TransactionData }
   | { readonly type: 'invocationData'; readonly value: InvocationData }
   | { readonly type: 'validatorsCount'; readonly value: ValidatorsCount };
 export type DeleteChange =

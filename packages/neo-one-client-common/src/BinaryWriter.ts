@@ -316,7 +316,7 @@ export class BinaryWriter {
     }
     const padding = common.GROUPING_SIZE_BYTES - remaining;
     // tslint:disable-next-line: prefer-array-literal
-    this.writeBytes(Buffer.from(Array(padding).map(() => 0x00)));
+    this.writeBytes(Buffer.alloc(padding).fill(0x00));
     this.writeUInt8(remaining);
 
     return this;
