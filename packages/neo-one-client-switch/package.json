@@ -40,7 +40,7 @@
     "gulp": "~4.0.2"
   },
   "optionalDependencies": {
-    "@ledgerhq/hw-transport-node-hid": "^4.68.2"
+    "@ledgerhq/hw-transport-node-hid": "^5.0.0"
   },
   "sideEffects": false
 }
