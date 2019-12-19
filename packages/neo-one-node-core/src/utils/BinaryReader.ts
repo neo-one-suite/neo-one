@@ -196,6 +196,25 @@ export class BinaryReader {
     return common.bufferToECPoint(Buffer.concat([firstByte, this.readBytes(common.ECPOINT_BUFFER_BYTES - 1)]));
   }
 
+  // TODO: this logic could be made into a reduce
+  public readBytesWithGrouping(): Buffer {
+    let groups: Buffer[] = [];
+    let count = 16;
+    // tslint:disable-next-line: no-loop-statement
+    while (count === common.GROUPING_SIZE_BYTES) {
+      const group = this.readBytes(common.GROUPING_SIZE_BYTES);
+      count = this.readInt8();
+      if (count > common.GROUPING_SIZE_BYTES) {
+        throw new InvalidFormatError(`count should not be larger than 16, found: ${count}`);
+      }
+      if (count > 0) {
+        groups = groups.concat([group.slice(0, count)]);
+      }
+    }
+
+    return Buffer.concat(groups);
+  }
+
   private checkRead(numBytes: number): void {
     if (this.remaining < numBytes) {
       throw new InvalidFormatError(`Insufficient bytes remaining (${this.remaining}): ${numBytes}`);

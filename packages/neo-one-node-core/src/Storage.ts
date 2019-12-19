@@ -11,16 +11,10 @@ import { Contract, ContractKey } from './Contract';
 import { Header, HeaderKey } from './Header';
 import { InvocationData } from './InvocationData';
 import { StorageItem, StorageItemKey } from './StorageItem';
-import { Output, Transaction } from './transaction';
+import { Transaction } from './transaction';
 import { TransactionData } from './TransactionData';
 import { Validator, ValidatorKey } from './Validator';
 import { ValidatorsCount } from './ValidatorsCount';
-
-interface OutputValue {
-  readonly hash: UInt256;
-  readonly index: number;
-  readonly output: Output;
-}
 
 export type AddChange =
   | { readonly type: 'account'; readonly value: Account }
@@ -37,7 +31,6 @@ export type AddChange =
   | { readonly type: 'blockData'; readonly value: BlockData }
   | { readonly type: 'transactionData'; readonly value: TransactionData }
   | { readonly type: 'invocationData'; readonly value: InvocationData }
-  | { readonly type: 'output'; readonly value: OutputValue }
   | { readonly type: 'validatorsCount'; readonly value: ValidatorsCount };
 export type DeleteChange =
   | { readonly type: 'account'; readonly key: AccountKey }

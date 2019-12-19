@@ -1,25 +1,21 @@
-import { ContractEventJSON, IOHelper } from '@neo-one/client-common';
+import { common, ContractEventJSON, IOHelper } from '@neo-one/client-common';
 import { ContractEventModel, ContractEventModelAdd } from '@neo-one/client-full-common';
-import {
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableJSON,
-  SerializeJSONContext,
-} from '../../Serializable';
+import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from '../../Serializable';
 import { BinaryReader, utils } from '../../utils';
 import { ContractParameterDeclaration } from './parameters';
 
-export interface ContractEventAdd extends ContractEventModelAdd {}
+export type ContractEventAdd = ContractEventModelAdd<ContractParameterDeclaration>;
 
-export class ContractEvent extends ContractEventModel implements SerializableJSON<ContractEventJSON> {
-  public get size(): number {
-    return this.contractEventSizeInternal();
-  }
-
+export class ContractEvent extends ContractEventModel<ContractParameterDeclaration>
+  implements SerializableJSON<ContractEventJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): ContractEvent {
-    return deserializeContractEventWireBase({
-      context: options.context,
-      reader: options.reader,
+    const { reader } = options;
+    const name = reader.readVarString(common.MAX_CONTRACT_STRING);
+    const parameters = reader.readArray(() => ContractParameterDeclaration.deserializeWireBase(options));
+
+    return new this({
+      name,
+      parameters,
     });
   }
 
@@ -30,44 +26,25 @@ export class ContractEvent extends ContractEventModel implements SerializableJSO
     });
   }
 
-  public readonly parameterDeclarations: readonly ContractParameterDeclaration[];
-
-  private readonly contractEventSizeInternal = utils.lazy(() =>
-    sizeOfContractEvent({
-      name: this.name,
-      parameterDeclarations: this.parameterDeclarations,
-    }),
+  private readonly sizeInternal = utils.lazy(
+    () => IOHelper.sizeOfVarString(this.name) + IOHelper.sizeOfArray(this.parameters, (parameter) => parameter.size),
   );
 
-  public constructor({ name, parameters }: ContractEventAdd) {
-    super({ name, parameters });
-    this.parameterDeclarations = parameters.map(
-      (parameter) => new ContractParameterDeclaration({ name: parameter.name, type: parameter.type }),
-    );
+  public get size(): number {
+    return this.sizeInternal();
   }
 
-  public serializeJSON(context: SerializeJSONContext): ContractEventJSON {
+  public clone(): ContractEvent {
+    return new ContractEvent({
+      name: this.name,
+      parameters: this.parameters,
+    });
+  }
+
+  public serializeJSON(): ContractEventJSON {
     return {
       name: this.name,
-      parameters: this.parameterDeclarations.map((parameter) => parameter.serializeJSON(context)),
+      parameters: this.parameters.map((parameter) => parameter.serializeJSON()),
     };
   }
 }
-
-export const sizeOfContractEvent = ({
-  name,
-  parameterDeclarations,
-}: {
-  readonly name: string;
-  readonly parameterDeclarations: readonly ContractParameterDeclaration[];
-}) => IOHelper.sizeOfVarString(name) + IOHelper.sizeOfArray(parameterDeclarations, (parameter) => parameter.size);
-
-export const deserializeContractEventWireBase = ({ reader, context }: DeserializeWireBaseOptions): ContractEvent => {
-  const name = reader.readVarString(252);
-  const parameters = reader.readArray(() => ContractParameterDeclaration.deserializeWireBase({ reader, context }));
-
-  return new ContractEvent({
-    name,
-    parameters,
-  });
-};

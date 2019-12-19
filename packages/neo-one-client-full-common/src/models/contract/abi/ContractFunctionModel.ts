@@ -5,36 +5,29 @@ import {
   SerializableWire,
   SerializeWire,
 } from '@neo-one/client-common';
-import { ContractEventModel, ContractEventModelAdd, serializeContractEventWireBase } from './ContractEventModel';
+import { ContractEventModel, ContractEventModelAdd } from './ContractEventModel';
+import { ContractParameterDeclarationModel } from './ContractParameterDeclarationModel';
 
-export interface ContractFunctionModelAdd extends ContractEventModelAdd {
+export interface ContractFunctionModelAdd<
+  TContractParameterDeclaration extends ContractParameterDeclarationModel = ContractParameterDeclarationModel
+> extends ContractEventModelAdd<TContractParameterDeclaration> {
   readonly returnType: ContractParameterTypeModel;
 }
 
-export class ContractFunctionModel extends ContractEventModel implements SerializableWire<ContractFunctionModel> {
+export class ContractFunctionModel<
+  TContractParameterDeclaration extends ContractParameterDeclarationModel = ContractParameterDeclarationModel
+> extends ContractEventModel<TContractParameterDeclaration> implements SerializableWire<ContractFunctionModel> {
   public readonly returnType: ContractParameterTypeModel;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
-  public constructor({ name, parameters, returnType }: ContractFunctionModelAdd) {
-    super({ name, parameters });
-    this.returnType = returnType;
+  public constructor(options: ContractFunctionModelAdd<TContractParameterDeclaration>) {
+    super(options);
+    this.returnType = options.returnType;
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
-    serializeContractFunctionWireBase({ writer, method: this });
+    writer.writeVarString(this.name);
+    writer.writeArray(this.parameters, (parameter) => parameter.serializeWireBase(writer));
+    writer.writeUInt8(this.returnType);
   }
 }
-
-export const serializeContractFunctionWireBase = ({
-  writer,
-  method,
-}: {
-  readonly writer: BinaryWriter;
-  readonly method: ContractFunctionModel;
-}): void => {
-  serializeContractEventWireBase({
-    writer,
-    event: new ContractEventModel({ name: method.name, parameters: method.parameters }),
-  });
-  writer.writeUInt8(method.returnType);
-};

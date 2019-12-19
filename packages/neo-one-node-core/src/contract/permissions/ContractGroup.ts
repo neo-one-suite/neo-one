@@ -1,24 +1,18 @@
-import { common, ContractGroupJSON, ECPoint, IOHelper, SignatureString } from '@neo-one/client-common';
+import { common, ContractGroupJSON, IOHelper } from '@neo-one/client-common';
 import { ContractGroupModel, ContractGroupModelAdd } from '@neo-one/client-full-common';
-import {
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableJSON,
-  SerializeJSONContext,
-} from '../../Serializable';
+import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from '../../Serializable';
 import { BinaryReader, utils } from '../../utils';
 
-export interface ContractGroupAdd extends ContractGroupModelAdd {}
+export type ContractGroupAdd = ContractGroupModelAdd;
 
 export class ContractGroup extends ContractGroupModel implements SerializableJSON<ContractGroupJSON> {
-  public get size(): number {
-    return this.contractGroupSizeInternal();
-  }
+  public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): ContractGroup {
+    const publicKey = reader.readECPoint();
+    const signature = reader.readVarString();
 
-  public static deserializeWireBase(options: DeserializeWireBaseOptions): ContractGroup {
-    return deserializeContractGroupWireBase({
-      context: options.context,
-      reader: options.reader,
+    return new this({
+      publicKey,
+      signature,
     });
   }
 
@@ -29,35 +23,25 @@ export class ContractGroup extends ContractGroupModel implements SerializableJSO
     });
   }
 
-  private readonly contractGroupSizeInternal = utils.lazy(() =>
-    sizeOfContractGroup({
-      publicKey: this.publicKey,
-      signature: this.signature,
-    }),
+  private readonly sizeInternal = utils.lazy(
+    () => IOHelper.sizeOfECPoint(this.publicKey) + IOHelper.sizeOfVarString(this.signature),
   );
 
-  public serializeJSON(_context: SerializeJSONContext): ContractGroupJSON {
+  public get size(): number {
+    return this.sizeInternal();
+  }
+
+  public clone(): ContractGroup {
+    return new ContractGroup({
+      publicKey: this.publicKey,
+      signature: this.signature,
+    });
+  }
+
+  public serializeJSON(): ContractGroupJSON {
     return {
       publicKey: common.ecPointToString(this.publicKey),
       signature: this.signature,
     };
   }
 }
-
-export const sizeOfContractGroup = ({
-  publicKey,
-  signature,
-}: {
-  readonly publicKey: ECPoint;
-  readonly signature: SignatureString;
-}) => IOHelper.sizeOfECPoint(publicKey) + IOHelper.sizeOfVarString(signature);
-
-export const deserializeContractGroupWireBase = ({ reader }: DeserializeWireBaseOptions): ContractGroup => {
-  const publicKey = reader.readECPoint();
-  const signature = reader.readVarString();
-
-  return new ContractGroup({
-    publicKey,
-    signature,
-  });
-};

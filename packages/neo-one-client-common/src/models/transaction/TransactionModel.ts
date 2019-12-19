@@ -10,9 +10,9 @@ import { WitnessModel } from '../WitnessModel';
 import { AttributeModel } from './attribute';
 
 export interface TransactionModelAdd<
-  TAttribute extends AttributeModel,
-  TWitness extends WitnessModel,
-  TCosigner extends CosignerModel
+  TAttribute extends AttributeModel = AttributeModel,
+  TWitness extends WitnessModel = WitnessModel,
+  TCosigner extends CosignerModel = CosignerModel
 > {
   readonly version?: number;
   readonly attributes?: readonly TAttribute[];

@@ -1,30 +1,34 @@
-import { common, ContractManifestJSON, IOHelper, UInt160 } from '@neo-one/client-common';
+import { common, ContractManifestJSON, IOHelper } from '@neo-one/client-common';
 import {
   assertContractPropertyState,
   ContractManifestModel,
   ContractManifestModelAdd,
 } from '@neo-one/client-full-common';
-import {
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableJSON,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from '../Serializable';
 import { BinaryReader, utils } from '../utils';
 import { ContractABI } from './abi';
 import { ContractGroup, ContractPermissions } from './permissions';
 
-export interface ContractManifestAdd extends ContractManifestModelAdd {}
+export type ContractManifestAdd = ContractManifestModelAdd<ContractABI, ContractGroup, ContractPermissions>;
 
-export class ContractManifest extends ContractManifestModel implements SerializableJSON<ContractManifestJSON> {
-  public get size(): number {
-    return this.contractManifestSizeInternal();
-  }
-
+export class ContractManifest extends ContractManifestModel<ContractABI, ContractGroup, ContractPermissions>
+  implements SerializableJSON<ContractManifestJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): ContractManifest {
-    return deserializeContractManifestWireBase({
-      context: options.context,
-      reader: options.reader,
+    const { reader } = options;
+    const abi = ContractABI.deserializeWireBase(options);
+    const groups = reader.readArray(() => ContractGroup.deserializeWireBase(options));
+    const permissions = reader.readArray(() => ContractPermissions.deserializeWireBase(options));
+    const trusts = reader.readArray(reader.readUInt160);
+    const safeMethods = reader.readArray(reader.readVarString);
+    const features = assertContractPropertyState(reader.readUInt8());
+
+    return new this({
+      abi,
+      groups,
+      permissions,
+      trusts,
+      safeMethods,
+      features,
     });
   }
 
@@ -35,41 +39,39 @@ export class ContractManifest extends ContractManifestModel implements Serializa
     });
   }
 
-  public readonly groupsDeserializable: readonly ContractGroup[];
-  public readonly abiDeserializable: ContractABI;
-  public readonly permissionsDeserializable: readonly ContractPermissions[];
-
-  private readonly contractManifestSizeInternal = utils.lazy(() =>
-    sizeOfContractManifest({
-      abi: this.abiDeserializable,
-      groups: this.groupsDeserializable,
-      permissions: this.permissionsDeserializable,
-      trusts: this.trusts,
-      safeMethods: this.safeMethods,
-    }),
+  private readonly sizeInternal = utils.lazy(
+    () =>
+      this.abi.size +
+      IOHelper.sizeOfArray(this.groups, (group) => group.size) +
+      IOHelper.sizeOfArray(this.permissions, (permission) => permission.size) +
+      IOHelper.sizeOfArray(this.trusts, (_trust) => IOHelper.sizeOfUInt160) +
+      IOHelper.sizeOfArray(this.safeMethods, (method) => IOHelper.sizeOfVarString(method)) +
+      // features
+      IOHelper.sizeOfUInt8,
   );
 
-  public constructor({ groups, features, abi, permissions, trusts, safeMethods }: ContractManifestAdd) {
-    super({ groups, features, abi, permissions, trusts, safeMethods });
-    this.groupsDeserializable = groups.map(
-      (group) => new ContractGroup({ publicKey: group.publicKey, signature: group.signature }),
-    );
-    this.abiDeserializable = new ContractABI({
-      hash: abi.hash,
-      entryPoint: abi.entryPoint,
-      methods: abi.methods,
-      events: abi.events,
-    });
-    this.permissionsDeserializable = permissions.map(
-      (permission) => new ContractPermissions({ contract: permission.contract, methods: permission.methods }),
-    );
+  public get size() {
+    return this.sizeInternal();
   }
 
-  public serializeJSON(context: SerializeJSONContext): ContractManifestJSON {
+  public clone(): ContractManifest {
+    return new ContractManifest({
+      abi: this.abi.clone(),
+      groups: this.groups.map((group) => group.clone()),
+      features: this.features,
+      permissions: this.permissions.map((permission) => permission.clone()),
+      trusts: this.trusts,
+      safeMethods: this.safeMethods,
+      // TODO: when narrowing the type on ContractManifestModel make sure it has a `.clone()` method.
+      extra: this.extra !== undefined ? this.extra.clone() : undefined,
+    });
+  }
+
+  public serializeJSON(): ContractManifestJSON {
     return {
-      abi: this.abiDeserializable.serializeJSON(context),
-      groups: this.groupsDeserializable.map((group) => group.serializeJSON(context)),
-      permissions: this.permissionsDeserializable.map((permission) => permission.serializeJSON(context)),
+      abi: this.abi.serializeJSON(),
+      groups: this.groups.map((group) => group.serializeJSON()),
+      permissions: this.permissions.map((permission) => permission.serializeJSON()),
       trusts: this.trusts.map(common.uInt160ToString),
       safeMethods: this.safeMethods,
       features: {
@@ -79,45 +81,3 @@ export class ContractManifest extends ContractManifestModel implements Serializa
     };
   }
 }
-
-export const sizeOfContractManifest = ({
-  groups,
-  abi,
-  permissions,
-  trusts,
-  safeMethods,
-}: {
-  readonly groups: readonly ContractGroup[];
-  readonly abi: ContractABI;
-  readonly permissions: readonly ContractPermissions[];
-  readonly trusts: readonly UInt160[];
-  readonly safeMethods: readonly string[];
-}) =>
-  abi.size +
-  IOHelper.sizeOfArray(groups, (group) => group.size) +
-  IOHelper.sizeOfArray(permissions, (permission) => permission.size) +
-  IOHelper.sizeOfArray(trusts, (_trust) => IOHelper.sizeOfUInt160) +
-  IOHelper.sizeOfArray(safeMethods, (method) => IOHelper.sizeOfVarString(method)) +
-  // features
-  IOHelper.sizeOfUInt8;
-
-export const deserializeContractManifestWireBase = ({
-  reader,
-  context,
-}: DeserializeWireBaseOptions): ContractManifest => {
-  const abi = ContractABI.deserializeWireBase({ reader, context });
-  const groups = reader.readArray(() => ContractGroup.deserializeWireBase({ reader, context }));
-  const permissions = reader.readArray(() => ContractPermissions.deserializeWireBase({ reader, context }));
-  const trusts = reader.readArray(() => reader.readUInt160());
-  const safeMethods = reader.readArray(() => reader.readVarString());
-  const features = assertContractPropertyState(reader.readUInt8());
-
-  return new ContractManifest({
-    groups,
-    features,
-    abi,
-    permissions,
-    trusts,
-    safeMethods,
-  });
-};

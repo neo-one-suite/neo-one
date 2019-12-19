@@ -24,7 +24,7 @@ export interface Settings {
   readonly privateKeyVersion: number;
   readonly standbyValidators: readonly ECPoint[];
   readonly vm: VMSettings;
-  readonly secondsPerBlock: number;
+  readonly millisecondsPerBlock: number;
   readonly maxTransactionsPerBlock: number;
   readonly memPoolSize: number;
 }

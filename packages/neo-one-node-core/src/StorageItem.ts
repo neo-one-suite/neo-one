@@ -1,13 +1,4 @@
-import {
-  BinaryWriter,
-  common,
-  IOHelper,
-  JSONHelper,
-  StorageItemJSON,
-  toJSONStorageFlags,
-  UInt160,
-} from '@neo-one/client-common';
-import { Equals, Equatable } from './Equatable';
+import { BinaryWriter, IOHelper, JSONHelper, StorageItemJSON, UInt160 } from '@neo-one/client-common';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -17,19 +8,11 @@ import {
   SerializeJSONContext,
   SerializeWire,
 } from './Serializable';
-import { StorageFlags } from './StorageFlags';
 import { BinaryReader, utils } from './utils';
 
 export interface StorageItemAdd {
-  readonly hash: UInt160;
-  readonly key: Buffer;
   readonly value: Buffer;
-  readonly flags: StorageFlags;
-}
-
-export interface StorageItemUpdate {
-  readonly value: Buffer;
-  readonly flags: StorageFlags;
+  readonly isConstant: boolean;
 }
 
 export interface StorageItemsKey {
@@ -42,18 +25,14 @@ export interface StorageItemKey {
   readonly key: Buffer;
 }
 
-export class StorageItem implements SerializableWire<StorageItem>, Equatable, SerializableJSON<StorageItemJSON> {
+export class StorageItem implements SerializableWire<StorageItem>, SerializableJSON<StorageItemJSON> {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): StorageItem {
-    const hash = reader.readUInt160();
-    const key = reader.readVarBytesLE();
     const value = reader.readVarBytesLE();
-    const flags = reader.readUInt8();
+    const isConstant = reader.readBoolean();
 
     return new this({
-      hash,
-      key,
       value,
-      flags,
+      isConstant,
     });
   }
 
@@ -64,62 +43,37 @@ export class StorageItem implements SerializableWire<StorageItem>, Equatable, Se
     });
   }
 
-  public readonly hash: UInt160;
-  public readonly key: Buffer;
   public readonly value: Buffer;
-  public readonly flags: StorageFlags;
-  public readonly equals: Equals = utils.equals(
-    StorageItem,
-    this,
-    (other) =>
-      common.uInt160Equal(this.hash, other.hash) &&
-      this.key.equals(other.key) &&
-      this.value.equals(other.value) &&
-      this.flags === other.flags,
-  );
+  public readonly isConstant: boolean;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 
-  public constructor({ hash, key, value, flags }: StorageItemAdd) {
-    this.hash = hash;
-    this.key = key;
+  public constructor({ value, isConstant }: StorageItemAdd) {
     this.value = value;
-    this.flags = flags;
-    this.sizeInternal = utils.lazy(
-      () =>
-        IOHelper.sizeOfUInt160 +
-        IOHelper.sizeOfVarBytesLE(this.key) +
-        IOHelper.sizeOfVarBytesLE(this.value) +
-        IOHelper.sizeOfUInt8,
-    );
+    this.isConstant = isConstant;
+    this.sizeInternal = utils.lazy(() => IOHelper.sizeOfVarBytesLE(this.value) + IOHelper.sizeOfBoolean);
   }
 
   public get size(): number {
     return this.sizeInternal();
   }
 
-  public update({ value, flags }: StorageItemUpdate): StorageItem {
+  public clone(): StorageItem {
     return new StorageItem({
-      hash: this.hash,
-      key: this.key,
-      value,
-      flags,
+      value: this.value,
+      isConstant: this.isConstant,
     });
   }
 
   public serializeWireBase(writer: BinaryWriter): void {
-    writer.writeUInt160(this.hash);
-    writer.writeVarBytesLE(this.key);
     writer.writeVarBytesLE(this.value);
-    writer.writeUInt8(this.flags);
+    writer.writeBoolean(this.isConstant);
   }
 
   public serializeJSON(_context: SerializeJSONContext): StorageItemJSON {
     return {
-      hash: JSONHelper.writeUInt160(this.hash),
-      key: JSONHelper.writeBuffer(this.key),
       value: JSONHelper.writeBuffer(this.value),
-      flags: toJSONStorageFlags(this.flags),
+      isConstant: this.isConstant,
     };
   }
 }

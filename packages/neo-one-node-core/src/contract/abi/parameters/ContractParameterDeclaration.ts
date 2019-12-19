@@ -1,16 +1,12 @@
 import {
   assertContractParameterType,
+  common,
   ContractParameterDeclarationJSON,
   IOHelper,
   toJSONContractParameterType,
 } from '@neo-one/client-common';
 import { ContractParameterDeclarationModel } from '@neo-one/client-full-common';
-import {
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableJSON,
-  SerializeJSONContext,
-} from '../../../Serializable';
+import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from '../../../Serializable';
 import { BinaryReader, utils } from '../../../utils';
 import { ContractParameterType } from './ContractParameterType';
 
@@ -21,10 +17,15 @@ export interface ContractParameterDeclarationAdd {
 
 export class ContractParameterDeclaration extends ContractParameterDeclarationModel
   implements SerializableJSON<ContractParameterDeclarationJSON> {
-  public static deserializeWireBase(options: DeserializeWireBaseOptions): ContractParameterDeclaration {
-    return deserializeContractParameterDeclarationWireBase({
-      context: options.context,
-      reader: options.reader,
+  public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): ContractParameterDeclaration {
+    const type = assertContractParameterType(reader.readUInt8());
+    // TODO: implement this
+    // throw new Error(reader.remainingBuffer.toString('hex'));
+    const name = reader.readVarString(common.MAX_CONTRACT_STRING);
+
+    return new ContractParameterDeclaration({
+      name,
+      type,
     });
   }
 
@@ -35,36 +36,23 @@ export class ContractParameterDeclaration extends ContractParameterDeclarationMo
     });
   }
 
-  private readonly contractParameterDeclarationSizeInternal = utils.lazy(() =>
-    sizeOfContractParameterDeclaration({
-      name: this.name,
-    }),
-  );
+  private readonly sizeInternal = utils.lazy(() => IOHelper.sizeOfVarString(this.name) + IOHelper.sizeOfUInt8);
 
   public get size(): number {
-    return this.contractParameterDeclarationSizeInternal();
+    return this.sizeInternal();
   }
 
-  public serializeJSON(_context: SerializeJSONContext): ContractParameterDeclarationJSON {
+  public clone(): ContractParameterDeclaration {
+    return new ContractParameterDeclaration({
+      name: this.name,
+      type: this.type,
+    });
+  }
+
+  public serializeJSON(): ContractParameterDeclarationJSON {
     return {
       name: this.name,
       type: toJSONContractParameterType(this.type),
     };
   }
 }
-
-export const sizeOfContractParameterDeclaration = ({ name }: { readonly name: string }) =>
-  IOHelper.sizeOfVarString(name) + IOHelper.sizeOfUInt8;
-
-export const deserializeContractParameterDeclarationWireBase = ({
-  reader,
-}: DeserializeWireBaseOptions): ContractParameterDeclaration => {
-  const type = assertContractParameterType(reader.readUInt8());
-  // throw new Error(reader.remainingBuffer.toString('hex'));
-  const name = reader.readVarString(252);
-
-  return new ContractParameterDeclaration({
-    name,
-    type,
-  });
-};
