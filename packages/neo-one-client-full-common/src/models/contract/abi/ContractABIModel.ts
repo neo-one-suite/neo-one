@@ -1,9 +1,9 @@
 import { BinaryWriter, createSerializeWire, SerializableWire, SerializeWire, UInt160 } from '@neo-one/client-common';
 import { ContractEventModel } from './ContractEventModel';
-import { ContractFunctionModel } from './ContractFunctionModel';
+import { ContractMethodDescriptorModel } from './ContractMethodDescriptorModel';
 
 export interface ContractABIModelAdd<
-  TContractFunction extends ContractFunctionModel = ContractFunctionModel,
+  TContractFunction extends ContractMethodDescriptorModel = ContractMethodDescriptorModel,
   TContractEvent extends ContractEventModel = ContractEventModel
 > {
   readonly hash: UInt160;
@@ -13,7 +13,7 @@ export interface ContractABIModelAdd<
 }
 
 export class ContractABIModel<
-  TContractFunction extends ContractFunctionModel = ContractFunctionModel,
+  TContractFunction extends ContractMethodDescriptorModel = ContractMethodDescriptorModel,
   TContractEvent extends ContractEventModel = ContractEventModel
 > implements SerializableWire<ContractABIModel> {
   public readonly hash: UInt160;

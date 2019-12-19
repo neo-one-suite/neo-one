@@ -8,19 +8,19 @@ import {
 import { ContractEventModel, ContractEventModelAdd } from './ContractEventModel';
 import { ContractParameterDeclarationModel } from './ContractParameterDeclarationModel';
 
-export interface ContractFunctionModelAdd<
+export interface ContractMethodDescriptorModelAdd<
   TContractParameterDeclaration extends ContractParameterDeclarationModel = ContractParameterDeclarationModel
 > extends ContractEventModelAdd<TContractParameterDeclaration> {
   readonly returnType: ContractParameterTypeModel;
 }
 
-export class ContractFunctionModel<
+export class ContractMethodDescriptorModel<
   TContractParameterDeclaration extends ContractParameterDeclarationModel = ContractParameterDeclarationModel
-> extends ContractEventModel<TContractParameterDeclaration> implements SerializableWire<ContractFunctionModel> {
+> extends ContractEventModel<TContractParameterDeclaration> implements SerializableWire<ContractMethodDescriptorModel> {
   public readonly returnType: ContractParameterTypeModel;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
-  public constructor(options: ContractFunctionModelAdd<TContractParameterDeclaration>) {
+  public constructor(options: ContractMethodDescriptorModelAdd<TContractParameterDeclaration>) {
     super(options);
     this.returnType = options.returnType;
   }

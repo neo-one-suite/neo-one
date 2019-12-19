@@ -1,4 +1,4 @@
-import { contract as createContract, jsonContext, testContext as context } from '../../__data__';
+import { contract as createContract, testContext as context } from '../../__data__';
 import { Contract } from '../../contract';
 
 describe('Contract', () => {
@@ -14,7 +14,7 @@ describe('Contract', () => {
     expect(JSON.stringify(deserialized.manifest)).toEqual(JSON.stringify(contract.manifest));
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     // specifics values of ContractManifest checked in its tests
     expect(serializedJson.script).toEqual(contract.script.toString('hex'));
     expect(serializedJson.manifest).toBeDefined();

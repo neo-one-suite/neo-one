@@ -2,9 +2,8 @@ import { common } from '@neo-one/client-common';
 import {
   contractAbi,
   contractEvent,
-  contractFunction,
+  contractMethodDescriptor,
   contractParamDeclaration,
-  jsonContext,
   testContext as context,
 } from '../../../__data__';
 import { ContractABI, ContractParameterType } from '../../../contract';
@@ -26,7 +25,7 @@ describe('ContractABI', () => {
     expect(JSON.stringify(deserialized.events)).toEqual(JSON.stringify(abi.events));
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     expect(serializedJson.hash).toEqual(common.uInt160ToHex(abi.hash));
     expect(serializedJson.entryPoint.name).toEqual(abi.entryPoint.name);
     expect(serializedJson.entryPoint.parameters[0].type).toEqual('Boolean');
@@ -40,8 +39,8 @@ describe('ContractABI', () => {
   test('serialize/deserialize - multiple functions/events', () => {
     const abi = contractAbi(
       [
-        contractFunction(),
-        contractFunction(
+        contractMethodDescriptor(),
+        contractMethodDescriptor(
           [contractParamDeclaration.integer, contractParamDeclaration.signature],
           ContractParameterType.String,
         ),
@@ -66,7 +65,7 @@ describe('ContractABI', () => {
     expect(JSON.stringify(deserialized.events)).toEqual(JSON.stringify(abi.events));
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     expect(serializedJson.hash).toEqual(common.uInt160ToHex(abi.hash));
     expect(serializedJson.entryPoint.name).toEqual(abi.entryPoint.name);
     expect(serializedJson.entryPoint.parameters[0].type).toEqual('Boolean');

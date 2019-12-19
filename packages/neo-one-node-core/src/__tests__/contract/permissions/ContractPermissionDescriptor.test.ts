@@ -1,5 +1,5 @@
 import { common, ECPoint, UInt160 } from '@neo-one/client-common';
-import { contractPermissionDescriptor, jsonContext, testContext as context } from '../../../__data__';
+import { contractPermissionDescriptor, testContext as context } from '../../../__data__';
 import { ContractPermissionDescriptor } from '../../../contract';
 
 describe('ContractPermissionDescriptor', () => {
@@ -13,7 +13,7 @@ describe('ContractPermissionDescriptor', () => {
     expect(deserialized.hashOrGroup).toEqual(permission.hashOrGroup);
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     expect(serializedJson).toEqual(common.uInt160ToString(permission.hashOrGroup as UInt160));
   });
 
@@ -27,7 +27,7 @@ describe('ContractPermissionDescriptor', () => {
     expect(deserialized.hashOrGroup).toEqual(permission.hashOrGroup);
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     expect(serializedJson).toEqual(common.ecPointToString(permission.hashOrGroup as ECPoint));
   });
 
@@ -41,7 +41,7 @@ describe('ContractPermissionDescriptor', () => {
     expect(deserialized.hashOrGroup).toEqual(permission.hashOrGroup);
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     expect(serializedJson).toEqual('*');
   });
 });

@@ -1,5 +1,5 @@
 import { common } from '@neo-one/client-common';
-import { contractGroup, jsonContext, testContext as context } from '../../../__data__';
+import { contractGroup, testContext as context } from '../../../__data__';
 import { ContractGroup } from '../../../contract';
 
 describe('ContractGroup', () => {
@@ -15,7 +15,7 @@ describe('ContractGroup', () => {
     expect(deserialized.signature).toEqual(group.signature);
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     expect(serializedJson.publicKey).toEqual(common.ecPointToString(group.publicKey));
     expect(serializedJson.signature).toEqual(group.signature);
   });

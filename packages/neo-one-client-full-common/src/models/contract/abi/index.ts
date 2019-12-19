@@ -1,4 +1,4 @@
 export * from './ContractABIModel';
 export * from './ContractParameterDeclarationModel';
-export * from './ContractFunctionModel';
+export * from './ContractMethodDescriptorModel';
 export * from './ContractEventModel';

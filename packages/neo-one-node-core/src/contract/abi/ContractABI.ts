@@ -3,11 +3,11 @@ import { ContractABIModel, ContractABIModelAdd } from '@neo-one/client-full-comm
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from '../../Serializable';
 import { BinaryReader, utils } from '../../utils';
 import { ContractEvent } from './ContractEvent';
-import { ContractFunction } from './ContractFunction';
+import { ContractMethodDescriptor } from './ContractMethodDescriptor';
 
-export type ContractABIAdd = ContractABIModelAdd<ContractFunction, ContractEvent>;
+export type ContractABIAdd = ContractABIModelAdd<ContractMethodDescriptor, ContractEvent>;
 
-export class ContractABI extends ContractABIModel<ContractFunction, ContractEvent>
+export class ContractABI extends ContractABIModel<ContractMethodDescriptor, ContractEvent>
   implements SerializableJSON<ContractAbiJSON> {
   public get size(): number {
     return this.sizeInternal();
@@ -17,8 +17,8 @@ export class ContractABI extends ContractABIModel<ContractFunction, ContractEven
     const { reader } = options;
 
     const hash = reader.readUInt160();
-    const entryPoint = ContractFunction.deserializeWireBase(options);
-    const methods = reader.readArray(() => ContractFunction.deserializeWireBase(options));
+    const entryPoint = ContractMethodDescriptor.deserializeWireBase(options);
+    const methods = reader.readArray(() => ContractMethodDescriptor.deserializeWireBase(options));
     const events = reader.readArray(() => ContractEvent.deserializeWireBase(options));
 
     return new this({

@@ -1,5 +1,10 @@
 import { BinaryWriter, ContractParameterTypeModel } from '@neo-one/client-common';
-import { contractAbiModel, contractEventModel, contractFunctionModel, contractParamModel } from '../../../__data__';
+import {
+  contractAbiModel,
+  contractEventModel,
+  contractMethodDescriptorModel,
+  contractParamModel,
+} from '../../../__data__';
 
 describe('ContractABIModel - serializeWireBase', () => {
   let writer: BinaryWriter;
@@ -15,8 +20,8 @@ describe('ContractABIModel - serializeWireBase', () => {
   test('Multiple', () => {
     contractAbiModel(
       [
-        contractFunctionModel([contractParamModel.integer, contractParamModel.hash160]),
-        contractFunctionModel([contractParamModel.string], ContractParameterTypeModel.Integer),
+        contractMethodDescriptorModel([contractParamModel.integer, contractParamModel.hash160]),
+        contractMethodDescriptorModel([contractParamModel.string], ContractParameterTypeModel.Integer),
       ],
       [contractEventModel([contractParamModel.hash160, contractParamModel.hash256])],
     ).serializeWireBase(writer);

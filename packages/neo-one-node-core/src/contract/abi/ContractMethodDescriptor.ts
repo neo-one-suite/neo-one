@@ -1,24 +1,23 @@
 import {
   assertContractParameterType,
   common,
-  ContractFunctionJSON,
+  ContractMethodDescriptorJSON,
   IOHelper,
   toJSONContractParameterType,
 } from '@neo-one/client-common';
-import { ContractFunctionModel } from '@neo-one/client-full-common';
+import { ContractMethodDescriptorModel } from '@neo-one/client-full-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from '../../Serializable';
 import { BinaryReader, utils } from '../../utils';
 import { ContractEventAdd } from './ContractEvent';
 import { ContractParameterDeclaration, ContractParameterType } from './parameters';
 
-export interface ContractFunctionAdd extends ContractEventAdd {
+export interface ContractMethodDescriptorAdd extends ContractEventAdd {
   readonly returnType: ContractParameterType;
 }
 
-// TODO: rename this to `ContractMethodDescriptor` to match NEO? not super important just semantic
-export class ContractFunction extends ContractFunctionModel<ContractParameterDeclaration>
-  implements SerializableJSON<ContractFunctionJSON> {
-  public static deserializeWireBase(options: DeserializeWireBaseOptions): ContractFunction {
+export class ContractMethodDescriptor extends ContractMethodDescriptorModel<ContractParameterDeclaration>
+  implements SerializableJSON<ContractMethodDescriptorJSON> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): ContractMethodDescriptor {
     const { reader } = options;
     const name = reader.readVarString(common.MAX_CONTRACT_STRING);
     const parameters = reader.readArray(() => ContractParameterDeclaration.deserializeWireBase(options));
@@ -31,7 +30,7 @@ export class ContractFunction extends ContractFunctionModel<ContractParameterDec
     });
   }
 
-  public static deserializeWire(options: DeserializeWireOptions): ContractFunction {
+  public static deserializeWire(options: DeserializeWireOptions): ContractMethodDescriptor {
     return this.deserializeWireBase({
       context: options.context,
       reader: new BinaryReader(options.buffer),
@@ -49,15 +48,15 @@ export class ContractFunction extends ContractFunctionModel<ContractParameterDec
     return this.sizeInternal();
   }
 
-  public clone(): ContractFunction {
-    return new ContractFunction({
+  public clone(): ContractMethodDescriptor {
+    return new ContractMethodDescriptor({
       name: this.name,
       parameters: this.parameters.map((parameter) => parameter.clone()),
       returnType: this.returnType,
     });
   }
 
-  public serializeJSON(): ContractFunctionJSON {
+  public serializeJSON(): ContractMethodDescriptorJSON {
     return {
       name: this.name,
       parameters: this.parameters.map((parameter) => parameter.serializeJSON()),

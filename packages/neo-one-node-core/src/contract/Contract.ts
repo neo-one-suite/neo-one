@@ -59,7 +59,7 @@ export class Contract extends ContractModel implements SerializableJSON<Contract
     });
   }
 
-  public serializeJSON(context: SerializeJSONContext): ContractJSON {
+  public serializeJSON(): ContractJSON {
     return {
       script: JSONHelper.writeBuffer(this.script),
       manifest: this.manifestDeserializable.serializeJSON(context),
