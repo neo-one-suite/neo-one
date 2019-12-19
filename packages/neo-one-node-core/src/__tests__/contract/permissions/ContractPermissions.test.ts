@@ -1,5 +1,5 @@
 import { common, ECPoint, UInt160 } from '@neo-one/client-common';
-import { contractPermissions, jsonContext, testContext as context } from '../../../__data__';
+import { contractPermissions, testContext as context } from '../../../__data__';
 import { ContractPermissions } from '../../../contract';
 
 describe('ContractPermissions', () => {
@@ -16,7 +16,7 @@ describe('ContractPermissions', () => {
     expect(deserialized.methods).toEqual(methods);
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     expect(serializedJson.contract).toEqual(common.uInt160ToString(permissions.contract.hashOrGroup as UInt160));
     expect(serializedJson.methods).toEqual(methods);
   });
@@ -34,7 +34,7 @@ describe('ContractPermissions', () => {
     expect(deserialized.methods).toEqual(methods);
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     expect(serializedJson.contract).toEqual(common.ecPointToString(permissions.contract.hashOrGroup as ECPoint));
     expect(serializedJson.methods).toEqual(methods);
   });
@@ -52,7 +52,7 @@ describe('ContractPermissions', () => {
     expect(deserialized.methods).toEqual(methods);
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     expect(serializedJson.contract).toEqual('*');
     expect(serializedJson.methods).toEqual(methods);
   });

@@ -29,7 +29,7 @@ export class ContractPermissionDescriptor extends ContractPermissionDescriptorMo
 
   private readonly sizeInternal = utils.lazy(() => {
     if (this.hashOrGroup === undefined) {
-      return IOHelper.sizeOfUInt8 + IOHelper.sizeOfUInt160;
+      return IOHelper.sizeOfUInt8 + IOHelper.sizeOfUInt8;
     }
     if (common.isECPoint(this.hashOrGroup)) {
       return IOHelper.sizeOfUInt8 + IOHelper.sizeOfECPoint(this.hashOrGroup);

@@ -3,9 +3,9 @@ import { constants } from '@neo-one/utils';
 import {
   ContractABIModel,
   ContractEventModel,
-  ContractFunctionModel,
   ContractGroupModel,
   ContractManifestModel,
+  ContractMethodDescriptorModel,
   ContractModel,
   ContractParameterDeclarationModel,
   ContractPermissionDescriptorModel,
@@ -64,11 +64,11 @@ export const contractParamModel = {
   }),
 };
 
-export const contractFunctionModel = (
+export const contractMethodDescriptorModel = (
   parameters: readonly ContractParameterDeclarationModel[] = [contractParamModel.boolean],
   returnType: ContractParameterTypeModel = ContractParameterTypeModel.Void,
   name = 'function',
-) => new ContractFunctionModel({ name, parameters, returnType });
+) => new ContractMethodDescriptorModel({ name, parameters, returnType });
 
 export const contractEventModel = (
   parameters: readonly ContractParameterDeclarationModel[] = [contractParamModel.boolean],
@@ -76,9 +76,9 @@ export const contractEventModel = (
 ) => new ContractEventModel({ name, parameters });
 
 export const contractAbiModel = (
-  methods: readonly ContractFunctionModel[] = [contractFunctionModel()],
+  methods: readonly ContractMethodDescriptorModel[] = [contractMethodDescriptorModel()],
   events: readonly ContractEventModel[] = [contractEventModel()],
-  entryPoint: ContractFunctionModel = contractFunctionModel(),
+  entryPoint: ContractMethodDescriptorModel = contractMethodDescriptorModel(),
   hash = common.bufferToUInt160(Buffer.alloc(20, 1)),
 ) => new ContractABIModel({ hash, entryPoint, methods, events });
 

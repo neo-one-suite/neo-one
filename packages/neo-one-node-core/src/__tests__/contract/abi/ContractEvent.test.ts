@@ -1,4 +1,4 @@
-import { contractEvent, contractParamDeclaration, jsonContext, testContext as context } from '../../../__data__';
+import { contractEvent, contractParamDeclaration, testContext as context } from '../../../__data__';
 import { ContractEvent } from '../../../contract';
 
 describe('ContractEvent', () => {
@@ -16,7 +16,7 @@ describe('ContractEvent', () => {
     expect(deserialized.parameters[0].type).toEqual(event.parameters[0].type);
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     expect(serializedJson.name).toEqual(event.name);
     expect(serializedJson.parameters[0].name).toEqual('param');
     expect(serializedJson.parameters[0].type).toEqual('Boolean');
@@ -41,7 +41,7 @@ describe('ContractEvent', () => {
     });
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     expect(serializedJson.name).toEqual(event.name);
     expect(serializedJson.parameters[0].name).toEqual('param');
     expect(serializedJson.parameters[0].type).toEqual('Array');

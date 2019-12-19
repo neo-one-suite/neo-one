@@ -256,7 +256,7 @@ export interface AssetJSON {
 
 export type AssetTypeJSON = keyof typeof AssetTypeModel;
 
-export interface ContractFunctionJSON {
+export interface ContractMethodDescriptorJSON {
   readonly name: string;
   readonly parameters: readonly ContractParameterDeclarationJSON[];
   readonly returnType: ContractParameterTypeJSON;
@@ -270,8 +270,8 @@ export interface ContractEventJSON {
 
 export interface ContractAbiJSON {
   readonly hash: string;
-  readonly entryPoint: ContractFunctionJSON;
-  readonly methods: readonly ContractFunctionJSON[];
+  readonly entryPoint: ContractMethodDescriptorJSON;
+  readonly methods: readonly ContractMethodDescriptorJSON[];
   readonly events: readonly ContractEventJSON[];
 }
 

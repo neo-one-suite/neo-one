@@ -1,5 +1,5 @@
 import { common } from '@neo-one/client-common';
-import { contractManifest, jsonContext, testContext as context } from '../../__data__';
+import { contractManifest, testContext as context } from '../../__data__';
 import { ContractManifest } from '../../contract';
 
 describe('ContractManifest', () => {
@@ -23,7 +23,7 @@ describe('ContractManifest', () => {
     expect(deserialized.features).toEqual(manifest.features);
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     // specifics values of ContractABI, ContractGroup, and ContractPermissions checked in respective tests
     expect(serializedJson.abi).toBeDefined();
     expect(serializedJson.groups.length).toEqual(1);

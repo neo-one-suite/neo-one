@@ -4,9 +4,9 @@ import {
   Contract,
   ContractABI,
   ContractEvent,
-  ContractFunction,
   ContractGroup,
   ContractManifest,
+  ContractMethodDescriptor,
   ContractParameterDeclaration,
   ContractParameterType,
   ContractPermissionDescriptor,
@@ -15,8 +15,6 @@ import {
 } from '../contract';
 
 export const testContext = { messageMagic: 0 };
-// tslint:disable-next-line no-any
-export const jsonContext = {} as any;
 
 export const contractParamDeclaration = {
   boolean: new ContractParameterDeclaration({
@@ -78,21 +76,21 @@ export const contractEvent = (
     parameters,
   });
 
-export const contractFunction = (
+export const contractMethodDescriptor = (
   parameters: readonly ContractParameterDeclaration[] = [contractParamDeclaration.boolean],
   returnType: ContractParameterType = ContractParameterType.Void,
   name = 'event',
 ) =>
-  new ContractFunction({
+  new ContractMethodDescriptor({
     name,
     parameters,
     returnType,
   });
 
 export const contractAbi = (
-  methods: readonly ContractFunction[] = [contractFunction()],
+  methods: readonly ContractMethodDescriptor[] = [contractMethodDescriptor()],
   events: readonly ContractEvent[] = [contractEvent()],
-  entryPoint: ContractFunction = contractFunction(),
+  entryPoint: ContractMethodDescriptor = contractMethodDescriptor(),
   hash = common.bufferToUInt160(Buffer.alloc(20, 1)),
 ) => new ContractABI({ hash, entryPoint, methods, events });
 

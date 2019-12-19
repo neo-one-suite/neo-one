@@ -1,11 +1,11 @@
-import { contractFunction, contractParamDeclaration, jsonContext, testContext as context } from '../../../__data__';
-import { ContractFunction, ContractParameterType } from '../../../contract';
+import { contractMethodDescriptor, contractParamDeclaration, testContext as context } from '../../../__data__';
+import { ContractMethodDescriptor, ContractParameterType } from '../../../contract';
 
-describe('ContractFunction', () => {
+describe('ContractMethodDescriptor', () => {
   test('serialize/deserialize - one param', () => {
-    const fn = contractFunction();
+    const fn = contractMethodDescriptor();
     const serialized = fn.serializeWire();
-    const deserialized = ContractFunction.deserializeWire({
+    const deserialized = ContractMethodDescriptor.deserializeWire({
       context,
       buffer: serialized,
     });
@@ -17,7 +17,7 @@ describe('ContractFunction', () => {
     expect(deserialized.returnType).toEqual(fn.returnType);
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     expect(serializedJson.name).toEqual(fn.name);
     expect(serializedJson.parameters[0].name).toEqual('param');
     expect(serializedJson.parameters[0].type).toEqual('Boolean');
@@ -25,12 +25,12 @@ describe('ContractFunction', () => {
   });
 
   test('serialize/deserialize - multiple params', () => {
-    const fn = contractFunction(
+    const fn = contractMethodDescriptor(
       [contractParamDeclaration.array, contractParamDeclaration.integer, contractParamDeclaration.byteArray],
       ContractParameterType.String,
     );
     const serialized = fn.serializeWire();
-    const deserialized = ContractFunction.deserializeWire({
+    const deserialized = ContractMethodDescriptor.deserializeWire({
       context,
       buffer: serialized,
     });
@@ -42,7 +42,7 @@ describe('ContractFunction', () => {
     });
     expect(deserialized.size).toEqual(serialized.byteLength);
 
-    const serializedJson = deserialized.serializeJSON(jsonContext);
+    const serializedJson = deserialized.serializeJSON();
     expect(serializedJson.name).toEqual(fn.name);
     expect(serializedJson.parameters[0].name).toEqual('param');
     expect(serializedJson.parameters[0].type).toEqual('Array');
