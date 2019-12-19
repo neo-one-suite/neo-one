@@ -42,26 +42,26 @@ export class BufferAttribute extends AttributeBase(BufferAttributeModel) {
     ) {
       throw new InvalidFormatError(`Invalid AttributeUsageModel. Received: ${usage}`);
     }
-    const value =
+    const data =
       usage === AttributeUsage.DescriptionUrl ? reader.readBytes(reader.readUInt8()) : reader.readVarBytesLE();
 
-    return new BufferAttribute({ usage, value });
+    return new BufferAttribute({ usage, data });
   }
 
   public readonly size: number;
 
-  public constructor({ usage, value }: BufferAttributeAdd) {
-    super({ usage, value });
+  public constructor({ usage, data }: BufferAttributeAdd) {
+    super({ usage, data });
     this.size =
       this.usage === AttributeUsage.DescriptionUrl
-        ? IOHelper.sizeOfUInt8 + IOHelper.sizeOfUInt8 + this.value.length
-        : IOHelper.sizeOfUInt8 + IOHelper.sizeOfVarBytesLE(this.value);
+        ? IOHelper.sizeOfUInt8 + IOHelper.sizeOfUInt8 + this.data.length
+        : IOHelper.sizeOfUInt8 + IOHelper.sizeOfVarBytesLE(this.data);
   }
 
   public serializeJSON(_context: SerializeJSONContext): AttributeJSON {
     return {
       usage: toJSONAttributeUsage(this.usage),
-      data: JSONHelper.writeBuffer(this.value),
+      data: JSONHelper.writeBuffer(this.data),
     };
   }
 }

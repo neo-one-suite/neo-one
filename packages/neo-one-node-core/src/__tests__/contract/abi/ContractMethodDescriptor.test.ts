@@ -1,9 +1,9 @@
-import { contractMethodDescriptor, contractParamDeclaration, testContext as context } from '../../../__data__';
+import { contractParamDeclaration, createContractMethodDescriptor, testContext as context } from '../../../__data__';
 import { ContractMethodDescriptor, ContractParameterType } from '../../../contract';
 
 describe('ContractMethodDescriptor', () => {
   test('serialize/deserialize - one param', () => {
-    const fn = contractMethodDescriptor();
+    const fn = createContractMethodDescriptor();
     const serialized = fn.serializeWire();
     const deserialized = ContractMethodDescriptor.deserializeWire({
       context,
@@ -25,10 +25,14 @@ describe('ContractMethodDescriptor', () => {
   });
 
   test('serialize/deserialize - multiple params', () => {
-    const fn = contractMethodDescriptor(
-      [contractParamDeclaration.array, contractParamDeclaration.integer, contractParamDeclaration.byteArray],
-      ContractParameterType.String,
-    );
+    const fn = createContractMethodDescriptor({
+      parameters: [
+        contractParamDeclaration.array,
+        contractParamDeclaration.integer,
+        contractParamDeclaration.byteArray,
+      ],
+      returnType: ContractParameterType.String,
+    });
     const serialized = fn.serializeWire();
     const deserialized = ContractMethodDescriptor.deserializeWire({
       context,

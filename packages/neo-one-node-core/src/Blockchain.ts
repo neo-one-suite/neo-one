@@ -9,7 +9,7 @@ import { Asset, AssetKey, AssetUpdate } from './Asset';
 import { Block, BlockKey } from './Block';
 import { BlockData, BlockDataKey } from './BlockData';
 import { CallReceipt } from './CallReceipt';
-import { Contract, ContractKey } from './Contract';
+import { Contract, ContractKey } from './contract';
 import { Header, HeaderKey } from './Header';
 import { InvocationData, InvocationDataKey } from './InvocationData';
 import { ConsensusPayload } from './payload';

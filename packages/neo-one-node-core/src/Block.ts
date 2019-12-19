@@ -93,7 +93,7 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
     const blockBase = super.deserializeBlockBaseWireBase(options);
     const count = reader.readVarUIntLE(this.MaxContentsPerBlock).toNumber();
     if (count === 0) {
-      throw new InvalidFormatError('expected count to be greater than 0');
+      throw new InvalidFormatError('Expected count to be greater than 0');
     }
     const consensusData = ConsensusData.deserializeWireBase(options);
     // TODO: check the logic here. This used to be {blockbase + transactionsLength + transactions} now it is {blockBase + transactionsLength + consensusData + transactions}

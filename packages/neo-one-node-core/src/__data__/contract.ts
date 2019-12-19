@@ -1,12 +1,18 @@
-import { common, ECPoint, SignatureString, UInt160 } from '@neo-one/client-common';
+import { common, ECPoint, UInt160 } from '@neo-one/client-common';
 import { constants } from '@neo-one/utils';
 import {
   Contract,
   ContractABI,
+  ContractABIAdd,
+  ContractAdd,
   ContractEvent,
+  ContractEventAdd,
   ContractGroup,
+  ContractGroupAdd,
   ContractManifest,
+  ContractManifestAdd,
   ContractMethodDescriptor,
+  ContractMethodDescriptorAdd,
   ContractParameterDeclaration,
   ContractParameterType,
   ContractPermissionDescriptor,
@@ -67,39 +73,43 @@ export const contractParamDeclaration = {
   }),
 };
 
-export const contractEvent = (
-  parameters: readonly ContractParameterDeclaration[] = [contractParamDeclaration.boolean],
+export const createContractEvent = ({
+  parameters = [contractParamDeclaration.boolean],
   name = 'event',
-) =>
+}: Partial<ContractEventAdd> = {}) =>
   new ContractEvent({
     name,
     parameters,
   });
 
-export const contractMethodDescriptor = (
-  parameters: readonly ContractParameterDeclaration[] = [contractParamDeclaration.boolean],
-  returnType: ContractParameterType = ContractParameterType.Void,
+export const createContractMethodDescriptor = ({
+  parameters = [contractParamDeclaration.boolean],
+  returnType = ContractParameterType.Void,
   name = 'event',
-) =>
+}: Partial<ContractMethodDescriptorAdd> = {}) =>
   new ContractMethodDescriptor({
     name,
     parameters,
     returnType,
   });
 
-export const contractAbi = (
-  methods: readonly ContractMethodDescriptor[] = [contractMethodDescriptor()],
-  events: readonly ContractEvent[] = [contractEvent()],
-  entryPoint: ContractMethodDescriptor = contractMethodDescriptor(),
+export const createContractAbi = ({
+  methods = [createContractMethodDescriptor()],
+  events = [createContractEvent()],
+  entryPoint = createContractMethodDescriptor(),
   hash = common.bufferToUInt160(Buffer.alloc(20, 1)),
-) => new ContractABI({ hash, entryPoint, methods, events });
+}: Partial<ContractABIAdd> = {}) => new ContractABI({ hash, entryPoint, methods, events });
 
-export const contractGroup = (
-  publicKey: ECPoint = common.stringToECPoint(constants.PRIVATE_NET_PUBLIC_KEY),
-  signature: SignatureString = 'ccaab040cc25021c91567b75db4778853441869157b8f6aad960cdcf1069812480027a528ca9b98e2205027de20696f848cf81824eeb7af1d5110870870ceb67',
-) => new ContractGroup({ publicKey, signature });
+export const createContractGroup = ({
+  publicKey = common.stringToECPoint(constants.PRIVATE_NET_PUBLIC_KEY),
+  signature = 'ccaab040cc25021c91567b75db4778853441869157b8f6aad960cdcf1069812480027a528ca9b98e2205027de20696f848cf81824eeb7af1d5110870870ceb67',
+}: Partial<ContractGroupAdd> = {}) => new ContractGroup({ publicKey, signature });
 
-export const contractPermissionDescriptor = (hashOrGroupType: 'uint160' | 'ecpoint' | undefined) => {
+export const createContractPermissionDescriptor = ({
+  hashOrGroupType,
+}: {
+  readonly hashOrGroupType: 'uint160' | 'ecpoint' | undefined;
+}) => {
   let hashOrGroup: UInt160 | ECPoint | undefined;
   if (hashOrGroupType === 'uint160') {
     hashOrGroup = common.bufferToUInt160(Buffer.alloc(20, 1));
@@ -110,19 +120,25 @@ export const contractPermissionDescriptor = (hashOrGroupType: 'uint160' | 'ecpoi
   return new ContractPermissionDescriptor({ hashOrGroup });
 };
 
-export const contractPermissions = (
-  hashOrGroupType: 'uint160' | 'ecpoint' | undefined,
-  methods: readonly string[] = [],
-) => new ContractPermissions({ contract: contractPermissionDescriptor(hashOrGroupType), methods });
+export const createContractPermissions = ({
+  hashOrGroupType,
+  methods = [],
+}: {
+  readonly hashOrGroupType: 'uint160' | 'ecpoint' | undefined;
+  readonly methods: readonly string[];
+}) => new ContractPermissions({ contract: createContractPermissionDescriptor({ hashOrGroupType }), methods });
 
-export const contractManifest = (
-  groups: readonly ContractGroup[] = [contractGroup()],
-  features: ContractPropertyState = ContractPropertyState.HasStoragePayable,
-  abi: ContractABI = contractAbi(),
-  permissions: readonly ContractPermissions[] = [contractPermissions('uint160', ['method1'])],
-  trusts: readonly UInt160[] = [common.bufferToUInt160(Buffer.alloc(20, 1))],
-  safeMethods: readonly string[] = ['method1', 'method2'],
-) => new ContractManifest({ groups, features, abi, permissions, trusts, safeMethods });
+export const createContractManifest = ({
+  groups = [createContractGroup()],
+  features = ContractPropertyState.HasStoragePayable,
+  abi = createContractAbi(),
+  permissions = [createContractPermissions({ hashOrGroupType: 'uint160', methods: ['method1'] })],
+  trusts = [common.bufferToUInt160(Buffer.alloc(20, 1))],
+  safeMethods = ['method1', 'method2'],
+}: Partial<ContractManifestAdd> = {}) =>
+  new ContractManifest({ groups, features, abi, permissions, trusts, safeMethods });
 
-export const contract = (script: Buffer = Buffer.alloc(25), manifest: ContractManifest = contractManifest()) =>
-  new Contract({ script, manifest });
+export const createContract = ({
+  script = Buffer.alloc(25),
+  manifest = createContractManifest(),
+}: Partial<ContractAdd> = {}) => new Contract({ script, manifest });

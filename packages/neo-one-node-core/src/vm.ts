@@ -3,7 +3,7 @@ import { BN } from 'bn.js';
 import { Action } from './action';
 import { Block } from './Block';
 import { WriteBlockchain } from './Blockchain';
-import { ContractParameter } from './contractParameter';
+import { ContractParameter } from './contract';
 import { ScriptContainer } from './ScriptContainer';
 import { Witness } from './Witness';
 
@@ -23,8 +23,10 @@ export interface VerifyScriptResult {
 export type VerifyScript = (options: VerifyScriptOptions) => Promise<VerifyScriptResult>;
 
 export enum TriggerType {
-  Verification = 0x00,
-  Application = 0x10,
+  System = 0x01,
+  Verification = 0x20,
+  Application = 0x40,
+  // TODO: We may need to add an "All" member like they do in C# code
 }
 
 // Application

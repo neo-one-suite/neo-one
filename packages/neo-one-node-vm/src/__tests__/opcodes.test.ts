@@ -1386,7 +1386,7 @@ describe('opcodes', () => {
         attributes: [
           new UInt160Attribute({
             usage: AttributeUsage.Script,
-            value: scriptAttributeHash,
+            data: scriptAttributeHash,
           }),
         ],
       });

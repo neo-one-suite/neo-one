@@ -1,10 +1,10 @@
 import { common, ECPoint, UInt160 } from '@neo-one/client-common';
-import { contractPermissionDescriptor, testContext as context } from '../../../__data__';
+import { createContractPermissionDescriptor, testContext as context } from '../../../__data__';
 import { ContractPermissionDescriptor } from '../../../contract';
 
 describe('ContractPermissionDescriptor', () => {
   test('serialize/deserialize - uint160', () => {
-    const permission = contractPermissionDescriptor('uint160');
+    const permission = createContractPermissionDescriptor({ hashOrGroupType: 'uint160' });
     const serialized = permission.serializeWire();
     const deserialized = ContractPermissionDescriptor.deserializeWire({
       context,
@@ -18,7 +18,7 @@ describe('ContractPermissionDescriptor', () => {
   });
 
   test('serialize/deserialize - ecpoint', () => {
-    const permission = contractPermissionDescriptor('ecpoint');
+    const permission = createContractPermissionDescriptor({ hashOrGroupType: 'ecpoint' });
     const serialized = permission.serializeWire();
     const deserialized = ContractPermissionDescriptor.deserializeWire({
       context,
@@ -32,7 +32,7 @@ describe('ContractPermissionDescriptor', () => {
   });
 
   test('serialize/deserialize - undefined', () => {
-    const permission = contractPermissionDescriptor(undefined);
+    const permission = createContractPermissionDescriptor({ hashOrGroupType: undefined });
     const serialized = permission.serializeWire();
     const deserialized = ContractPermissionDescriptor.deserializeWire({
       context,

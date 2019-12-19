@@ -1,10 +1,10 @@
 import { common } from '@neo-one/client-common';
-import { contractGroup, testContext as context } from '../../../__data__';
+import { createContractGroup, testContext as context } from '../../../__data__';
 import { ContractGroup } from '../../../contract';
 
 describe('ContractGroup', () => {
   test('serialize/deserialize', () => {
-    const group = contractGroup();
+    const group = createContractGroup();
     const serialized = group.serializeWire();
     const deserialized = ContractGroup.deserializeWire({
       context,

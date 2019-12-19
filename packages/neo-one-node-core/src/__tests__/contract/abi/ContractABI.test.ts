@@ -1,16 +1,16 @@
 import { common } from '@neo-one/client-common';
 import {
-  contractAbi,
-  contractEvent,
-  contractMethodDescriptor,
   contractParamDeclaration,
+  createContractAbi,
+  createContractEvent,
+  createContractMethodDescriptor,
   testContext as context,
 } from '../../../__data__';
 import { ContractABI, ContractParameterType } from '../../../contract';
 
 describe('ContractABI', () => {
   test('serialize/deserialize - one function/event', () => {
-    const abi = contractAbi();
+    const abi = createContractAbi();
     const serialized = abi.serializeWire();
     const deserialized = ContractABI.deserializeWire({
       context,
@@ -37,20 +37,20 @@ describe('ContractABI', () => {
   });
 
   test('serialize/deserialize - multiple functions/events', () => {
-    const abi = contractAbi(
-      [
-        contractMethodDescriptor(),
-        contractMethodDescriptor(
-          [contractParamDeclaration.integer, contractParamDeclaration.signature],
-          ContractParameterType.String,
-        ),
+    const abi = createContractAbi({
+      methods: [
+        createContractMethodDescriptor(),
+        createContractMethodDescriptor({
+          parameters: [contractParamDeclaration.integer, contractParamDeclaration.signature],
+          returnType: ContractParameterType.String,
+        }),
       ],
-      [
-        contractEvent(),
-        contractEvent([]),
-        contractEvent([contractParamDeclaration.hash256, contractParamDeclaration.hash160]),
+      events: [
+        createContractEvent(),
+        createContractEvent({ parameters: [] }),
+        createContractEvent({ parameters: [contractParamDeclaration.hash256, contractParamDeclaration.hash160] }),
       ],
-    );
+    });
     const serialized = abi.serializeWire();
     const deserialized = ContractABI.deserializeWire({
       context,

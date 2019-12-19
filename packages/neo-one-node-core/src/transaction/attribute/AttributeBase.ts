@@ -7,8 +7,8 @@ import { AttributeUsage } from './AttributeUsage';
 
 export function AttributeBase<
   Usage extends AttributeUsage,
-  Value extends Buffer,
-  TBase extends Constructor<AttributeBaseModel<Usage, Value>>
+  Data extends Buffer,
+  TBase extends Constructor<AttributeBaseModel<Usage, Data>>
 >(Base: TBase) {
   abstract class AttributeBaseClass extends Base implements EquatableKey, SerializableJSON<AttributeJSON> {
     public static deserializeAttributeWireBase({ reader }: DeserializeWireBaseOptions): { readonly usage: number } {
@@ -22,10 +22,10 @@ export function AttributeBase<
       // tslint:disable-next-line no-any
       AttributeBaseClass as any,
       this,
-      (other: AttributeBaseClass) => this.usage === other.usage && this.value.equals(other.value),
+      (other: AttributeBaseClass) => this.usage === other.usage && this.data.equals(other.data),
     );
     public readonly toKeyString: ToKeyString = () =>
-      `${AttributeBaseClass.name}:${this.usage}:${this.value.toString('hex')}`;
+      `${AttributeBaseClass.name}:${this.usage}:${this.data.toString('hex')}`;
 
     public serializeJSON(_context: SerializeJSONContext): AttributeJSON {
       throw new Error('Not Implemented');

@@ -1,5 +1,6 @@
 import {
   BinaryWriter,
+  common,
   createSerializeWire,
   ECPoint,
   SerializableWire,
@@ -17,6 +18,18 @@ export class ContractPermissionDescriptorModel implements SerializableWire<Contr
 
   public constructor({ hashOrGroup }: ContractPermissionDescriptorModelAdd) {
     this.hashOrGroup = hashOrGroup;
+  }
+
+  public isHash(): boolean {
+    return this.hashOrGroup === undefined ? false : common.isUInt160(this.hashOrGroup);
+  }
+
+  public isGroup(): boolean {
+    return this.hashOrGroup === undefined ? false : common.isECPoint(this.hashOrGroup);
+  }
+
+  public isWildcard(): boolean {
+    return this.hashOrGroup === undefined;
   }
 
   public serializeWireBase(writer: BinaryWriter): void {

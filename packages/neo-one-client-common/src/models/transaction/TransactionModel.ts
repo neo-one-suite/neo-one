@@ -35,18 +35,6 @@ export class TransactionModel<
   TWitness extends WitnessModel = WitnessModel,
   TCosigner extends CosignerModel = CosignerModel
 > implements SerializableWire<TransactionModel> {
-  public get hash(): UInt256 {
-    return this.hashInternal();
-  }
-
-  public get hashHex(): UInt256Hex {
-    return this.hashHexInternal();
-  }
-
-  public get message(): Buffer {
-    return this.messageInternal();
-  }
-
   public static readonly VERSION: number = 0;
   public static readonly maxTransactionSize = MAX_VALID_UNTIL_BLOCK_INCREMENT;
   public static readonly maxValidUntilBlockIncrement = 2102400;
@@ -57,8 +45,6 @@ export class TransactionModel<
   public readonly version: number;
   public readonly nonce: number;
   public readonly sender: UInt160;
-  public readonly systemFee: BN;
-  public readonly networkFee: BN;
   public readonly validUntilBlock: number;
   public readonly attributes: readonly TAttribute[];
   public readonly cosigners: readonly TCosigner[];
@@ -67,6 +53,8 @@ export class TransactionModel<
 
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly serializeUnsigned: SerializeWire = createSerializeWire(this.serializeUnsignedBase.bind(this));
+  private readonly systemFeeInternal: () => BN;
+  private readonly networkFeeInternal: () => BN;
 
   private readonly hashInternal: () => UInt256;
   private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
@@ -93,8 +81,8 @@ export class TransactionModel<
     this.attributes = attributes;
     this.witnesses = witnesses;
     this.cosigners = cosigners;
-    this.systemFee = systemFee;
-    this.networkFee = networkFee;
+    this.systemFeeInternal = utils.lazy(() => systemFee);
+    this.networkFeeInternal = utils.lazy(() => networkFee);
     this.validUntilBlock = validUntilBlock;
     this.script = script;
     const hashIn = hash;
@@ -106,6 +94,27 @@ export class TransactionModel<
       );
     }
   }
+
+  public get hash(): UInt256 {
+    return this.hashInternal();
+  }
+
+  public get hashHex(): UInt256Hex {
+    return this.hashHexInternal();
+  }
+
+  public get message(): Buffer {
+    return this.messageInternal();
+  }
+
+  public get systemFee() {
+    return this.systemFeeInternal();
+  }
+
+  public get networkFee() {
+    return this.networkFeeInternal();
+  }
+
   public clone(options: { readonly witnesses?: readonly TWitness[] } = {}): this {
     // tslint:disable-next-line: no-any
     return new (this.constructor as any)({

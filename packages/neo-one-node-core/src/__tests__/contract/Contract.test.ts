@@ -1,4 +1,4 @@
-import { contract as createContract, testContext as context } from '../../__data__';
+import { createContract, testContext as context } from '../../__data__';
 import { Contract } from '../../contract';
 
 describe('Contract', () => {
