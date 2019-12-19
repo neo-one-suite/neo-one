@@ -22,22 +22,22 @@ export class UInt160Attribute extends AttributeBase(UInt160AttributeModel) {
     if (usage !== AttributeUsage.Script) {
       throw new InvalidFormatError(`Expected attribute usage to be ${AttributeUsage.Script}. Received: ${usage}`);
     }
-    const value = reader.readUInt160();
+    const data = reader.readUInt160();
 
-    return new this({ usage, value });
+    return new this({ usage, data });
   }
 
   public readonly size: number;
 
-  public constructor({ usage, value }: UInt160AttributeAdd) {
-    super({ usage, value });
+  public constructor({ usage, data }: UInt160AttributeAdd) {
+    super({ usage, data });
     this.size = IOHelper.sizeOfUInt8 + IOHelper.sizeOfUInt160;
   }
 
   public serializeJSON(_context: SerializeJSONContext): AttributeJSON {
     return {
       usage: toJSONAttributeUsage(this.usage),
-      data: JSONHelper.writeUInt160(this.value),
+      data: JSONHelper.writeUInt160(this.data),
     };
   }
 }

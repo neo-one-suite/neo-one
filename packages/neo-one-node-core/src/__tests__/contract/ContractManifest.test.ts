@@ -1,10 +1,10 @@
 import { common } from '@neo-one/client-common';
-import { contractManifest, testContext as context } from '../../__data__';
+import { createContractManifest, testContext as context } from '../../__data__';
 import { ContractManifest } from '../../contract';
 
 describe('ContractManifest', () => {
   test('serialize/deserialize', () => {
-    const manifest = contractManifest();
+    const manifest = createContractManifest();
     const serialized = manifest.serializeWire();
     const deserialized = ContractManifest.deserializeWire({
       context,

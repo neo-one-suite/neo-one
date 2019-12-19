@@ -1,9 +1,9 @@
-import { contractEvent, contractParamDeclaration, testContext as context } from '../../../__data__';
+import { contractParamDeclaration, createContractEvent, testContext as context } from '../../../__data__';
 import { ContractEvent } from '../../../contract';
 
 describe('ContractEvent', () => {
   test('serialize/deserialize - one param', () => {
-    const event = contractEvent();
+    const event = createContractEvent();
     const serialized = event.serializeWire();
     const deserialized = ContractEvent.deserializeWire({
       context,
@@ -23,11 +23,13 @@ describe('ContractEvent', () => {
   });
 
   test('serialize/deserialize - multiple params', () => {
-    const event = contractEvent([
-      contractParamDeclaration.array,
-      contractParamDeclaration.integer,
-      contractParamDeclaration.byteArray,
-    ]);
+    const event = createContractEvent({
+      parameters: [
+        contractParamDeclaration.array,
+        contractParamDeclaration.integer,
+        contractParamDeclaration.byteArray,
+      ],
+    });
     const serialized = event.serializeWire();
     const deserialized = ContractEvent.deserializeWire({
       context,

@@ -41,22 +41,22 @@ export class UInt256Attribute extends AttributeBase(UInt256AttributeModel) {
     ) {
       throw new InvalidFormatError(`Invalid AttributeUsageModel. Received: ${usage}`);
     }
-    const value = reader.readUInt256();
+    const data = reader.readUInt256();
 
-    return new this({ usage, value });
+    return new this({ usage, data });
   }
 
   public readonly size: number;
 
-  public constructor({ usage, value }: UInt256AttributeAdd) {
-    super({ usage, value });
+  public constructor({ usage, data }: UInt256AttributeAdd) {
+    super({ usage, data });
     this.size = IOHelper.sizeOfUInt8 + IOHelper.sizeOfUInt256;
   }
 
   public serializeJSON(_context: SerializeJSONContext): AttributeJSON {
     return {
       usage: toJSONAttributeUsage(this.usage),
-      data: JSONHelper.writeUInt256(this.value),
+      data: JSONHelper.writeUInt256(this.data),
     };
   }
 }

@@ -1,64 +1,35 @@
-import { common } from '@neo-one/client-common';
 import {
-  Attribute,
   BufferAttribute,
-  ClaimTransaction,
-  Contract,
+  contractParamDeclaration,
   ContractParameterType,
   ContractPropertyState,
-  Input,
-  InvocationTransaction,
-  Output,
-  utils,
-  Witness,
+  createContract,
+  createContractAbi,
+  createContractManifest,
+  createContractMethodDescriptor,
+  Transaction,
+  TransactionAdd,
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';
-import { randomBytes } from 'crypto';
 import { keys } from './keys';
 
-export const createInvocation = ({
-  script,
-  gas = utils.ZERO,
-  attributes,
-  inputs,
-  outputs,
-  scripts,
-}: {
-  readonly script: Buffer;
-  readonly gas?: BN;
-  readonly attributes?: ReadonlyArray<Attribute>;
-  readonly inputs?: ReadonlyArray<Input>;
-  readonly outputs?: ReadonlyArray<Output>;
-  readonly scripts?: ReadonlyArray<Witness>;
-}) =>
-  new InvocationTransaction({
+export const createTransaction = ({
+  nonce = 0,
+  sender = keys[0].scriptHash,
+  systemFee = new BN(1),
+  networkFee = new BN(1),
+  validUntilBlock = 102400,
+  script = Buffer.from([0x80]),
+  attributes = [],
+}: Partial<TransactionAdd> = {}) =>
+  new Transaction({
+    nonce,
+    sender,
+    systemFee,
+    networkFee,
+    validUntilBlock,
     script,
-    gas,
     attributes,
-    inputs,
-    outputs,
-    scripts,
-  });
-
-export const createClaim = ({
-  attributes,
-  inputs,
-  outputs,
-  scripts,
-  claims,
-}: {
-  readonly attributes?: ReadonlyArray<Attribute>;
-  readonly inputs?: ReadonlyArray<Input>;
-  readonly outputs?: ReadonlyArray<Output>;
-  readonly scripts?: ReadonlyArray<Witness>;
-  readonly claims: ReadonlyArray<Input>;
-}) =>
-  new ClaimTransaction({
-    attributes,
-    inputs,
-    outputs,
-    scripts,
-    claims,
   });
 
 const kycContractScript = Buffer.from(
@@ -66,102 +37,41 @@ const kycContractScript = Buffer.from(
   'hex',
 );
 
-export const kycContract = new Contract({
+export const kycContract = createContract({
   script: kycContractScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.Void,
-  name: '',
-  codeVersion: '',
-  author: '',
-  email: '',
-  description: '',
-  contractProperties: ContractPropertyState.HasStoragePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.void],
+      }),
+    }),
+  }),
 });
 
-export const kycTransaction = new InvocationTransaction({
+export const kycTransaction = createTransaction({
   script: Buffer.from(
     '4d80025c2721a33bf665880fb2c1c0d504d92dcfe1616f03a8b007549dd4d19f367d6b71ed5c6fe9aa827298d3602f1e4f5ba179481398e55593862a0df92c62b9d04e2d8b2a989d72c3c9478c18f2ef714cf2c2c1bac70b182dbf8434323013c72d66c57591d849b197c38b07107c7ac4097ba47c1c9c39a04409dbfae7df8d49ad1319079604318ba12252ace7f1ace575f6847bc025bb30d752d73892bbb875e8d2baa6caaaf1b6efeb33744ace65f19fad05b26e12c1e347ae7770a182a4934e47332bebbd4cc848692cf5480980a6d99833e84fece90e31b196cbfe775ea2beb13b95ed41179becfb21dffcfbc3696d56dd270aa03397e5831c6b21f3542bfec1bf48fdafc51b2a9364f1d85268737eb7421911f6f581744475ab2bec031da981f65df6372f0a9dabcc4d5a174cadc544894ee83981fc66021d33025579f4eec82b96c64588ff0def56e0b0304f584f0acfa9632d6a3d3c88d3689b06954f57bcc860e78de1713d98982fb2a042a9b9a973435b5d49ddaca01d707ae0287bc0f0c2cceeb41a15131c5f98a6b690ca6c57366d229bd2b2f266b5b240f2057f50eb43f41945d84f65776cc194dd408e2cbb12a665cd2b9502b576cd518f09f9eddec27374fe8c9978db7d50a8144bb7dd13f517e8f0e1b4f90b20918f605fbcbfd6afa86a36b7555bfb9910128651af954dfa3a7de539949b4c0c4d28b55ac089e85cd8ec118f8ea34e2a7045b5d17a344b63f2dde9bef9a3ae624320d73875dff29fd7a4779f6dca2417e6f8c7f6b62d7f8ee2d22a87228f0c8b456fb43dc9fdb04793044493e9403daefed173a9e5a82acdfb7f40c4845419d360c06efe559805a52f4c554ff5d8de17ba8a28d815cbb32e904328d57179ef7282d5e33b546ee651c11263726f776473616c655f726567697374657267fcd7d436b2fe02473935afdec640027e12d2252e',
     'hex',
   ),
-
-  gas: utils.ZERO,
 });
 
-export const mintTransaction = new InvocationTransaction({
+export const mintTransaction = createTransaction({
   script: Buffer.from('00c10a6d696e74546f6b656e7367dc6cc7701762e83d2d3795d27b1aac14469e5734', 'hex'),
-
-  gas: utils.ZERO,
-  inputs: [
-    new Input({
-      hash: common.bufferToUInt256(Buffer.alloc(32, 0)),
-      index: 0,
-    }),
-  ],
-
-  outputs: [
-    new Output({
-      value: new BN(54).mul(utils.ONE_HUNDRED_MILLION),
-      asset: common.stringToUInt256(common.NEO_ASSET_HASH),
-      address: kycContract.hash,
-    }),
-
-    new Output({
-      value: new BN(150).mul(utils.ONE_HUNDRED_MILLION),
-      asset: common.stringToUInt256(common.NEO_ASSET_HASH),
-      address: keys[0].scriptHash,
-    }),
-  ],
-
   attributes: [
     new BufferAttribute({
       usage: 0x81,
-      value: Buffer.alloc(32, 0),
+      data: Buffer.alloc(32, 0),
     }),
   ],
 });
 
-export const claimOutput = new Output({
-  value: new BN(54).mul(utils.ONE_HUNDRED_MILLION),
-  asset: common.stringToUInt256(common.NEO_ASSET_HASH),
-  address: kycContract.hash,
-});
-
-export const claimTransaction = createClaim({
-  claims: [
-    new Input({
-      hash: common.bufferToUInt256(Buffer.alloc(32, 0)),
-      index: 0,
-    }),
-  ],
-});
-
-export const badTransaction = new InvocationTransaction({
+export const badTransaction = createTransaction({
   script: Buffer.from('00c10a6d696e74546f6b656e7367dc6cc7701762e83d2d3795d27b1aac14469e5735', 'hex'),
-
-  gas: utils.ZERO,
-  // tslint:disable-next-line prefer-array-literal
-  inputs: [...Array(1025)].map(
-    (value) =>
-      new Input({
-        hash: common.bufferToUInt256(randomBytes(32)),
-        index: value,
-      }),
-  ),
-  // tslint:disable-next-line prefer-array-literal
-  outputs: [...Array(1025)].map(
-    () =>
-      new Output({
-        value: new BN(54).mul(utils.ONE_HUNDRED_MILLION),
-        asset: common.stringToUInt256(common.NEO_ASSET_HASH),
-        address: kycContract.hash,
-      }),
-  ),
-
   attributes: [
     new BufferAttribute({
       usage: 0x81,
-      value: Buffer.alloc(32, 0),
+      data: Buffer.alloc(32, 0),
     }),
   ],
 });
@@ -171,17 +81,17 @@ export const conciergeContractScript = Buffer.from(
   'hex',
 );
 
-export const conciergeContract = new Contract({
+export const conciergeContract = createContract({
   script: conciergeContractScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.Void,
-  name: '',
-  codeVersion: '',
-  author: '',
-  email: '',
-  description: '',
-  contractProperties: ContractPropertyState.HasStoragePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.Void,
+      }),
+    }),
+  }),
 });
 
 export const switcheoTokenContractScript = Buffer.from(
@@ -189,17 +99,17 @@ export const switcheoTokenContractScript = Buffer.from(
   'hex',
 );
 
-export const switcheoTokenContract = new Contract({
+export const switcheoTokenContract = createContract({
   script: switcheoTokenContractScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'Switcheo Token',
-  codeVersion: '1.0.0',
-  author: 'Ivan Poon',
-  email: 'ivan.poon@switcheo.network',
-  description: 'NEP-5 Token for Switcheo Network',
-  contractProperties: ContractPropertyState.HasStoragePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const switcheoContractScript = Buffer.from(
@@ -207,17 +117,17 @@ export const switcheoContractScript = Buffer.from(
   'hex',
 );
 
-export const switcheoContract = new Contract({
+export const switcheoContract = createContract({
   script: switcheoContractScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'Switcheo Exchange',
-  codeVersion: '1.0.0',
-  author: 'Switcheo',
-  email: 'engineering@switcheo.network',
-  description: 'Switcheo Exchange',
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const switcheoV3ContractScript = Buffer.from(
@@ -225,17 +135,17 @@ export const switcheoV3ContractScript = Buffer.from(
   'hex',
 );
 
-export const switcheoV3Contract = new Contract({
+export const switcheoV3Contract = createContract({
   script: switcheoV3ContractScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'Switcheo Exchange',
-  codeVersion: '3.1',
-  author: 'Switcheo',
-  email: 'engineering@switcheo.network',
-  description: 'Switcheo Exchange V3.1',
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const switcheoTokenV2ContractScript = Buffer.from(
@@ -243,17 +153,17 @@ export const switcheoTokenV2ContractScript = Buffer.from(
   'hex',
 );
 
-export const switcheoV2TokenContract = new Contract({
+export const switcheoV2TokenContract = createContract({
   script: switcheoTokenV2ContractScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'Switcheo Token',
-  codeVersion: '2.0.0',
-  author: 'Switcheo',
-  email: 'engineering@switcheo.network',
-  description: 'Switcheo Token',
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const nosTokenScript = Buffer.from(
@@ -261,17 +171,17 @@ export const nosTokenScript = Buffer.from(
   'hex',
 );
 
-export const nosTokenContract = new Contract({
+export const nosTokenContract = createContract({
   script: nosTokenScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'nOS Token',
-  codeVersion: '1.0',
-  author: 'nOS Limited',
-  email: 'contact@nos.io',
-  description: 'nOS Token NEP-5 Smart Contract - https://nos.io',
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const narrativeTokenScript = Buffer.from(
@@ -279,17 +189,17 @@ export const narrativeTokenScript = Buffer.from(
   'hex',
 );
 
-export const narrativeTokenContract = new Contract({
+export const narrativeTokenContract = createContract({
   script: narrativeTokenScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'Narrative Token',
-  codeVersion: '1.0.0',
-  author: 'Narrative Limited',
-  email: 'support@narrative.network',
-  description: 'Token for the Narrative Network',
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const wowbitTokenContractScript = Buffer.from(
@@ -297,17 +207,17 @@ export const wowbitTokenContractScript = Buffer.from(
   'hex',
 );
 
-export const wowbitTokenContract = new Contract({
+export const wowbitTokenContract = createContract({
   script: wowbitTokenContractScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'Narrative Token',
-  codeVersion: '1.0.0',
-  author: 'vido',
-  email: '',
-  description: 'Wowbit token',
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const rpxTokenContractScript = Buffer.from(
@@ -315,17 +225,17 @@ export const rpxTokenContractScript = Buffer.from(
   'hex',
 );
 
-export const rpxTokenContract = new Contract({
+export const rpxTokenContract = createContract({
   script: rpxTokenContractScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'RPX Sale',
-  codeVersion: '1.0.0',
-  author: 'Red Pulse',
-  email: 'rpx@red-pulse.com',
-  description: 'RPX Sale',
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const mysteryScript = Buffer.from(
@@ -338,17 +248,17 @@ export const aphelionExhangeScript = Buffer.from(
   'hex',
 );
 
-export const aphelionExchangeContract = new Contract({
+export const aphelionExchangeContract = createContract({
   script: aphelionExhangeScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'Aphelion Exchange',
-  codeVersion: '1.0.120040116',
-  author: 'APH Dev Team',
-  email: 'support@aphelion.orgs',
-  description: "Aphelion's Exchange",
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const aphelionDexScript = Buffer.from(
@@ -356,17 +266,17 @@ export const aphelionDexScript = Buffer.from(
   'hex',
 );
 
-export const aphelionDexContract = new Contract({
+export const aphelionDexContract = createContract({
   script: aphelionDexScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'Aphelion DEX v3',
-  codeVersion: '1.0.120050116',
-  author: 'APH Dev Team',
-  email: 'support@aphelion.orgs',
-  description: "Aphelion's Decentralized Exchange v3",
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const bridgeProtocolTokenContractScript = Buffer.from(
@@ -374,17 +284,17 @@ export const bridgeProtocolTokenContractScript = Buffer.from(
   'hex',
 );
 
-export const bridgeProtocolTokenContract = new Contract({
+export const bridgeProtocolTokenContract = createContract({
   script: bridgeProtocolTokenContractScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'Bridge Protocol',
-  codeVersion: '1',
-  author: 'Alex Guba, Thomas Lobker',
-  email: 'tokensale@bridgeprotocol.io',
-  description: 'Contract for TOLL NEP-5 token.',
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const bridgeProtocolKeyServerScript = Buffer.from(
@@ -392,17 +302,17 @@ export const bridgeProtocolKeyServerScript = Buffer.from(
   'hex',
 );
 
-export const bridgeProtocolKeyServer = new Contract({
+export const bridgeProtocolKeyServer = createContract({
   script: bridgeProtocolKeyServerScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'Bridge Protocol',
-  codeVersion: '1',
-  author: 'Thomas Lobker',
-  email: 'support@bridgeprotocol.io',
-  description: 'Bridge Protocol keyserver for the NEO Smart Economy',
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const nexTokenContractScript = Buffer.from(
@@ -410,17 +320,17 @@ export const nexTokenContractScript = Buffer.from(
   'hex',
 );
 
-export const nexTokenContract = new Contract({
+export const nexTokenContract = createContract({
   script: nexTokenContractScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'NEX Token',
-  codeVersion: '1',
-  author: 'Neon Exchange AG',
-  email: 'contact@neonexchange.org',
-  description: 'NEX Security Token: NEX is a platform for high performance decentralized exchange and payment',
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const timeCoinContractScript = Buffer.from(
@@ -428,17 +338,17 @@ export const timeCoinContractScript = Buffer.from(
   'hex',
 );
 
-export const timeCoinContract = new Contract({
+export const timeCoinContract = createContract({
   script: timeCoinContractScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'TimeCoin',
-  codeVersion: '1',
-  author: 'Time Innovation Pte. Ltd.',
-  email: 'info@timeinnovation.io',
-  description: 'https://timeinnovation.io',
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });
 
 export const deepBrainContractScript = Buffer.from(
@@ -446,15 +356,15 @@ export const deepBrainContractScript = Buffer.from(
   'hex',
 );
 
-export const deepBrainContract = new Contract({
+export const deepBrainContract = createContract({
   script: deepBrainContractScript,
-  parameterList: [ContractParameterType.String, ContractParameterType.Array],
-
-  returnType: ContractParameterType.ByteArray,
-  name: 'DBC Sale',
-  codeVersion: '1.0',
-  author: 'DeepBrainChain',
-  email: 'developer@deepbrainchain.org',
-  description: 'DBC Sale Contract',
-  contractProperties: ContractPropertyState.HasStorageDynamicInvokePayable,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
+        returnType: ContractParameterType.ByteArray,
+      }),
+    }),
+  }),
 });

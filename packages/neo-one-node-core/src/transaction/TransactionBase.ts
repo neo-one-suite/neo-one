@@ -31,7 +31,7 @@ import { VerifyScript /* VerifyScriptResult */ } from '../vm';
 import { Witness } from '../Witness';
 import { Attribute, /*AttributeUsage,*/ deserializeAttributeWireBase /*UInt160Attribute*/ } from './attribute';
 
-export interface TransactionAdd extends TransactionModelAdd<Attribute, Witness, Cosigner> {}
+export type TransactionAdd = TransactionModelAdd<Attribute, Witness, Cosigner>;
 
 // export interface FeeContext {
 //   readonly getOutput: (input: Input) => Promise<Output>;
@@ -65,13 +65,6 @@ export class Transaction extends TransactionModel<Attribute, Witness, Cosigner>
     return this.sizeInternal();
   }
 
-  public get systemFee() {
-    return this.systemFeeInternal();
-  }
-
-  public get networkFee() {
-    return this.networkFeeInternal();
-  }
   public static deserializeUnsigned(options: DeserializeWireBaseOptions) {
     const { reader } = options;
     const version = reader.readUInt8();
@@ -201,12 +194,6 @@ export class Transaction extends TransactionModel<Attribute, Witness, Cosigner>
       IOHelper.sizeOfVarBytesLE(this.script) +
       IOHelper.sizeOfArray(this.witnesses, (witness) => witness.size),
   );
-
-  // TODO: workout systemFee calculations
-  private readonly systemFeeInternal = utils.lazy(() => new BN(0));
-
-  // TODO: workout networkFee calculations
-  private readonly networkFeeInternal = utils.lazy(() => new BN(0));
 
   // TODO make sure this logic makes sense compared to C#
   public readonly equals: Equals<Transaction> = (other: Transaction) => {

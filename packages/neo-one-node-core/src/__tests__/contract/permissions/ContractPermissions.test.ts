@@ -1,11 +1,11 @@
 import { common, ECPoint, UInt160 } from '@neo-one/client-common';
-import { contractPermissions, testContext as context } from '../../../__data__';
+import { createContractPermissions, testContext as context } from '../../../__data__';
 import { ContractPermissions } from '../../../contract';
 
 describe('ContractPermissions', () => {
   test('serialize/deserialize - uint160', () => {
     const methods: readonly string[] = [];
-    const permissions = contractPermissions('uint160', methods);
+    const permissions = createContractPermissions({ hashOrGroupType: 'uint160', methods });
     const serialized = permissions.serializeWire();
     const deserialized = ContractPermissions.deserializeWire({
       context,
@@ -23,7 +23,7 @@ describe('ContractPermissions', () => {
 
   test('serialize/deserialize - ecpoint', () => {
     const methods = ['method1'];
-    const permissions = contractPermissions('ecpoint', methods);
+    const permissions = createContractPermissions({ hashOrGroupType: 'ecpoint', methods });
     const serialized = permissions.serializeWire();
     const deserialized = ContractPermissions.deserializeWire({
       context,
@@ -41,7 +41,7 @@ describe('ContractPermissions', () => {
 
   test('serialize/deserialize - undefined', () => {
     const methods = ['method1', 'method2'];
-    const permissions = contractPermissions(undefined, methods);
+    const permissions = createContractPermissions({ hashOrGroupType: undefined, methods });
     const serialized = permissions.serializeWire();
     const deserialized = ContractPermissions.deserializeWire({
       context,
