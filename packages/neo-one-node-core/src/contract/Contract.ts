@@ -1,28 +1,24 @@
 import { common, ContractJSON, IOHelper, JSONHelper, UInt160 } from '@neo-one/client-common';
 import { ContractModel, ContractModelAdd } from '@neo-one/client-full-common';
 import { Equals, EquatableKey } from '../Equatable';
-import {
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableJSON,
-  SerializeJSONContext,
-} from '../Serializable';
+import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from '../Serializable';
 import { BinaryReader, utils } from '../utils';
 import { ContractManifest } from './ContractManifest';
 
 export interface ContractKey {
   readonly hash: UInt160;
 }
-export interface ContractAdd extends ContractModelAdd {}
+export type ContractAdd = ContractModelAdd<ContractManifest>;
 
-export class Contract extends ContractModel implements SerializableJSON<ContractJSON>, EquatableKey {
-  public get size(): number {
-    return this.contractSizeInternal();
-  }
+export class Contract extends ContractModel<ContractManifest> implements SerializableJSON<ContractJSON>, EquatableKey {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Contract {
-    return deserializeContractWireBase({
-      context: options.context,
-      reader: options.reader,
+    const { reader } = options;
+    const script = reader.readVarBytesLE();
+    const manifest = ContractManifest.deserializeWireBase(options);
+
+    return new this({
+      script,
+      manifest,
     });
   }
 
@@ -38,31 +34,16 @@ export class Contract extends ContractModel implements SerializableJSON<Contract
   );
   public readonly toKeyString = utils.toKeyString(Contract, () => common.uInt160ToHex(this.manifest.abi.hash));
 
-  public readonly manifestDeserializable: ContractManifest;
+  private readonly sizeInternal = utils.lazy(() => IOHelper.sizeOfVarBytesLE(this.script) + this.manifest.size);
 
-  private readonly contractSizeInternal = utils.lazy(() =>
-    sizeOfContract({
-      script: this.script,
-      manifest: this.manifestDeserializable,
-    }),
-  );
-
-  public constructor({ script, manifest }: ContractAdd) {
-    super({ script, manifest });
-    this.manifestDeserializable = new ContractManifest({
-      groups: manifest.groups,
-      features: manifest.features,
-      abi: manifest.abi,
-      permissions: manifest.permissions,
-      trusts: manifest.trusts,
-      safeMethods: manifest.safeMethods,
-    });
+  public get size(): number {
+    return this.sizeInternal();
   }
 
   public serializeJSON(): ContractJSON {
     return {
       script: JSONHelper.writeBuffer(this.script),
-      manifest: this.manifestDeserializable.serializeJSON(context),
+      manifest: this.manifest.serializeJSON(),
     };
   }
 }
@@ -74,13 +55,3 @@ export const sizeOfContract = ({
   readonly script: Buffer;
   readonly manifest: ContractManifest;
 }) => IOHelper.sizeOfVarBytesLE(script) + manifest.size;
-
-export const deserializeContractWireBase = ({ reader, context }: DeserializeWireBaseOptions): Contract => {
-  const script = reader.readVarBytesLE();
-  const manifest = ContractManifest.deserializeWireBase({ reader, context });
-
-  return new Contract({
-    script,
-    manifest,
-  });
-};
