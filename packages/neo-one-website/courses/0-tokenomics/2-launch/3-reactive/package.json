@@ -1,13 +1,13 @@
 {
   "dependencies": {
-    "@emotion/core": "10.0.22",
-    "@emotion/styled": "10.0.23",
+    "@emotion/core": "10.0.27",
+    "@emotion/styled": "10.0.27",
     "@neo-one/react": "2.3.0",
     "@neo-one/react-core": "2.3.0",
     "@types/react": "16.9.17",
     "@types/react-dom": "16.9.1",
     "bignumber.js": "9.0.0",
-    "emotion-theming": "10.0.19",
+    "emotion-theming": "10.0.27",
     "react": "16.10.0",
     "react-dom": "16.10.0",
     "rxjs": "6.5.3",
