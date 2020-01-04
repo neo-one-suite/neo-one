@@ -8,17 +8,29 @@ describe('ContractPermissionDescriptorModel - serializeWireBase', () => {
   });
 
   test('UInt160', () => {
-    contractPermissionDescriptorModel('uint160').serializeWireBase(writer);
+    const permission = contractPermissionDescriptorModel('uint160');
+    expect(permission.isHash()).toBeTruthy();
+    expect(permission.isGroup()).toBeFalsy();
+    expect(permission.isWildcard()).toBeFalsy();
+    permission.serializeWireBase(writer);
     expect(writer.toBuffer()).toMatchSnapshot();
   });
 
   test('ECPoint', () => {
-    contractPermissionDescriptorModel('ecpoint').serializeWireBase(writer);
+    const permission = contractPermissionDescriptorModel('ecpoint');
+    expect(permission.isGroup()).toBeTruthy();
+    expect(permission.isHash()).toBeFalsy();
+    expect(permission.isWildcard()).toBeFalsy();
+    permission.serializeWireBase(writer);
     expect(writer.toBuffer()).toMatchSnapshot();
   });
 
   test('undefined', () => {
-    contractPermissionDescriptorModel(undefined).serializeWireBase(writer);
+    const permission = contractPermissionDescriptorModel(undefined);
+    expect(permission.isWildcard()).toBeTruthy();
+    expect(permission.isHash()).toBeFalsy();
+    expect(permission.isGroup()).toBeFalsy();
+    permission.serializeWireBase(writer);
     expect(writer.toBuffer()).toMatchSnapshot();
   });
 });
