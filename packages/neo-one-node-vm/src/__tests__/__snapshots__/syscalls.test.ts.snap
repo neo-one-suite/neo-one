@@ -717,6 +717,31 @@ exports[`syscalls System.Blockchain.GetTransactionHeight 5`] = `Array []`;
 
 exports[`syscalls System.Blockchain.GetTransactionHeight 6`] = `Array []`;
 
+exports[`syscalls System.Contract.Call 1`] = `"contract.tryGet"`;
+
+exports[`syscalls System.Contract.Call 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0101010101010101010101010101010101010101",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d62351631d2cc13da590348467f5375fd0464b35",
+    },
+  ],
+]
+`;
+
+exports[`syscalls System.Contract.Call 3`] = `Array []`;
+
+exports[`syscalls System.Contract.Call 4`] = `Array []`;
+
+exports[`syscalls System.Contract.Call 5`] = `Array []`;
+
+exports[`syscalls System.Contract.Call 6`] = `Array []`;
+
 exports[`syscalls System.Contract.Destroy 1`] = `"contract.tryGet"`;
 
 exports[`syscalls System.Contract.Destroy 2`] = `

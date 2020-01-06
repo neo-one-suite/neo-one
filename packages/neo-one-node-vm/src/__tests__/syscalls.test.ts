@@ -37,7 +37,6 @@ import {
   StackItem,
   StackItemIterator,
   StackItemType,
-  StorageContextStackItem,
   StringStackItem,
   TransactionStackItem,
   UInt160StackItem,
@@ -79,9 +78,6 @@ const dummyBlock = {
 const nextItem = new StorageItem({
   value: Buffer.from('val', 'utf-8'),
   isConstant: false,
-  // hash: scriptAttributeHash,
-  // key: Buffer.from('key', 'utf-8'),
-  // flags: StorageFlags.None,
 });
 
 const signature0 = crypto.sign({
@@ -164,18 +160,19 @@ export const nestedMapStackItem = new MapStackItem({
 export const nestedJsonToBuffer = Buffer.from(JSON.stringify(nestedJson));
 
 const callingContract = createContract();
-
 const contractToCallSB = new ScriptBuilder();
-contractToCallSB.emitOp('PUSH3');
-contractToCallSB.emitOp('PUSH2');
 const contractToCall = createContract({
   script: contractToCallSB.build(),
   manifest: createContractManifest({
     abi: createContractAbi({
-      hash: common.bufferToUInt160(Buffer.from('3775292229eccdf904f16fff8e83e7cffdc0f0ce', 'hex')),
+      hash: common.bufferToUInt160(Buffer.alloc(20, 1)),
     }),
   }),
 });
+
+const mockContractCallScriptHashString = common.uInt160ToString(
+  crypto.hash160(new ScriptBuilder().emitSysCall('System.Contract.Call').build()),
+);
 
 interface SysCall {
   readonly name: SysCallName;
@@ -262,12 +259,12 @@ const SYSCALLS = [
 
   {
     name: 'System.Runtime.GetTime',
-    result: [new IntegerStackItem(new BN(15))],
+    result: [new IntegerStackItem(new BN(15000))],
     gas: FEES[250],
     flags: new Set(['noPersistingBlock']),
     mockBlockchain: ({ blockchain }) => {
-      blockchain.currentBlock.timestamp = 0;
-      blockchain.settings.secondsPerBlock = 15;
+      blockchain.currentBlock.timestamp = new BN(0);
+      blockchain.settings.millisecondsPerBlock = 15000;
     },
   },
 
@@ -870,7 +867,7 @@ const SYSCALLS = [
     ],
 
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve({ value: Buffer.alloc(10, 1) }));
     },
@@ -895,7 +892,7 @@ const SYSCALLS = [
     ],
 
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve(undefined));
     },
@@ -922,7 +919,7 @@ const SYSCALLS = [
     ],
 
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of());
     },
@@ -1440,7 +1437,7 @@ const SYSCALLS = [
 
     result: [new BooleanStackItem(true)],
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(Buffer.alloc(1, 1), Buffer.alloc(1, 2)));
     },
@@ -1476,7 +1473,7 @@ const SYSCALLS = [
 
     result: [new BooleanStackItem(false)],
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of());
     },
@@ -1545,7 +1542,7 @@ const SYSCALLS = [
 
     result: [new BufferStackItem(nextItem.key), new BooleanStackItem(true)],
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
@@ -1614,7 +1611,7 @@ const SYSCALLS = [
 
     result: [new BufferStackItem(nextItem.value), new BooleanStackItem(true)],
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
@@ -1670,7 +1667,7 @@ const SYSCALLS = [
 
     result: [new BufferStackItem(nextItem.value)],
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
@@ -1726,7 +1723,7 @@ const SYSCALLS = [
 
     result: [new BufferStackItem(nextItem.key)],
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
     },
@@ -1793,7 +1790,7 @@ const SYSCALLS = [
         .mockImplementationOnce(async () => Promise.resolve(undefined));
     },
     gas: FEES[1_000_000],
-    error: `Contract Hash Not Found: ${common.uInt160ToString(scriptAttributeHash)}`,
+    error: `Contract Hash Not Found: ${mockContractCallScriptHashString}`,
   },
 
   {
@@ -1811,9 +1808,7 @@ const SYSCALLS = [
         .mockImplementationOnce(async () => Promise.resolve(callingContract));
     },
     gas: FEES[1_000_000],
-    error: `Contract Method Undefined for Contract: ${common.uInt160ToString(
-      callingContract.manifest.hash,
-    )}. Method: nonexistent-method`,
+    error: `Contract Method Undefined for Contract: ${mockContractCallScriptHashString}. Method: nonexistent-method`,
   },
 
   {
@@ -1821,7 +1816,7 @@ const SYSCALLS = [
     result: [],
     args: [
       Buffer.alloc(20, 10),
-      Buffer.from('restricted-method', 'utf-8'),
+      Buffer.from('method2', 'utf-8'),
       Buffer.from('arguments which need to be checked/changed', 'utf-8'),
     ],
     mockBlockchain: ({ blockchain }) => {
@@ -1831,21 +1826,18 @@ const SYSCALLS = [
         .mockImplementationOnce(async () => Promise.resolve(callingContract));
     },
     gas: FEES[1_000_000],
-    error: `Contract ${common.uInt160ToString(
-      callingContract.manifest.hash,
-    )} does not have permission to call restricted-method`,
+    error: `Contract ${mockContractCallScriptHashString} does not have permission to call method2`,
   },
 
-  // TODO: make this one work. make sure all arguments in are appropriate format
   {
     name: 'System.Contract.Call',
     result: [
-      Buffer.from('allowed-method', 'utf-8'),
-      Buffer.from('arguments which need to be checked/changed', 'utf-8'),
+      new BufferStackItem(Buffer.from('method1', 'utf-8')),
+      new BufferStackItem(Buffer.from('arguments which need to be checked/changed', 'utf-8')),
     ],
     args: [
-      Buffer.alloc(20, 10),
-      Buffer.from('allowed-method', 'utf-8'),
+      Buffer.alloc(20, 1),
+      Buffer.from('method1', 'utf-8'),
       Buffer.from('arguments which need to be checked/changed', 'utf-8'),
     ],
     mockBlockchain: ({ blockchain }) => {
@@ -1876,7 +1868,7 @@ const SYSCALLS = [
     ],
 
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
@@ -1903,7 +1895,7 @@ const SYSCALLS = [
     ],
 
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
@@ -1930,7 +1922,7 @@ const SYSCALLS = [
     ],
 
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
@@ -1958,7 +1950,7 @@ const SYSCALLS = [
     ],
 
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
@@ -1984,9 +1976,9 @@ const SYSCALLS = [
     ],
 
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
-      blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
       blockchain.storageItem.update = jest.fn(async () => Promise.resolve());
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
     },
@@ -2012,7 +2004,7 @@ const SYSCALLS = [
     ],
 
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
 
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve());
       blockchain.storageItem.add = jest.fn(async () => Promise.resolve());
@@ -2038,7 +2030,7 @@ const SYSCALLS = [
     ],
 
     mockBlockchain: ({ blockchain }) => {
-      blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
+      blockchain.contract.get = jest.fn(async () => Promise.resolve({ manifest: { hasStorage: true } }));
       blockchain.storageItem.tryGet = jest.fn(async () => Promise.resolve({ flags: StorageFlags.None }));
       blockchain.storageItem.delete = jest.fn(async () => Promise.resolve());
     },

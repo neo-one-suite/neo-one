@@ -35,7 +35,7 @@ describe('StorageCache', () => {
     const firstGet = await storageCache.tryGet({ hash, key });
     expect(firstGet).toBeUndefined();
 
-    const storageItem = new StorageItem({ hash, key, value: Buffer.from('hello', 'utf-8'), flags: StorageFlags.None });
+    const storageItem = new StorageItem({ value: Buffer.from('hello', 'utf-8'), isConstant: true });
     await storageCache.add(storageItem);
 
     const secondGet = await storageCache.tryGet({ hash, key });

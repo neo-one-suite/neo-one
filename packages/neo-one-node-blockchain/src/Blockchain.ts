@@ -650,7 +650,7 @@ export class Blockchain {
           },
           {
             measure: blockLatencySec,
-            value: commonUtils.nowSeconds() - entry.block.timestamp,
+            value: new BN(commonUtils.nowSeconds()).sub(entry.block.timestamp.divn(1000)).toNumber(),
           },
         ]);
 

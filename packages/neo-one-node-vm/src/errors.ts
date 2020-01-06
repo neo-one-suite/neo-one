@@ -158,8 +158,18 @@ export const InvalidClaimTransactionError = makeErrorWithCode('VM_ERROR', (conte
 export const ContractNoStorageError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, hash: string) =>
   getMessage(context, `Contract Does Not Have Storage: ${hash}`),
 );
-export const ContractNoDynamicInvokeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, hash: string) =>
-  getMessage(context, `Contract Does Not Have Dynamic Invoke: ${hash}`),
+export const ContractHashNotFoundError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, hash: string) =>
+  getMessage(context, `Contract Hash Not Found: ${hash}`),
+);
+export const ContractMethodUndefinedError = makeErrorWithCode(
+  'VM_ERROR',
+  (context: ExecutionContext, hash: string, method: string) =>
+    getMessage(context, `Contract Method Undefined for Contract: ${hash}. Method: ${method}`),
+);
+export const InvalidPermissionError = makeErrorWithCode(
+  'VM_ERROR',
+  (context: ExecutionContext, hash: string, method: string) =>
+    getMessage(context, `Contract ${hash} does not have permission to call ${method}`),
 );
 export const TooManyVotesError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'Too Many Votes'),
