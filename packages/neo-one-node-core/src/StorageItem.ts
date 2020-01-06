@@ -11,6 +11,8 @@ import {
 import { BinaryReader, utils } from './utils';
 
 export interface StorageItemAdd {
+  readonly hash: UInt160;
+  readonly key: Buffer;
   readonly value: Buffer;
   readonly isConstant: boolean;
 }
@@ -25,12 +27,20 @@ export interface StorageItemKey {
   readonly key: Buffer;
 }
 
+export interface StorageItemUpdate {
+  readonly value: Buffer;
+}
+
 export class StorageItem implements SerializableWire<StorageItem>, SerializableJSON<StorageItemJSON> {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): StorageItem {
+    const hash = reader.readUInt160();
+    const key = reader.readVarBytesLE();
     const value = reader.readVarBytesLE();
     const isConstant = reader.readBoolean();
 
     return new this({
+      hash,
+      key,
       value,
       isConstant,
     });
@@ -43,24 +53,37 @@ export class StorageItem implements SerializableWire<StorageItem>, SerializableJ
     });
   }
 
+  public readonly hash: UInt160;
+  public readonly key: Buffer;
   public readonly value: Buffer;
   public readonly isConstant: boolean;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly sizeInternal: () => number;
 
-  public constructor({ value, isConstant }: StorageItemAdd) {
+  public constructor({ hash, key, value, isConstant }: StorageItemAdd) {
+    this.hash = hash;
+    this.key = key;
     this.value = value;
     this.isConstant = isConstant;
-    this.sizeInternal = utils.lazy(() => IOHelper.sizeOfVarBytesLE(this.value) + IOHelper.sizeOfBoolean);
+    this.sizeInternal = utils.lazy(
+      () =>
+        IOHelper.sizeOfUInt160 +
+        IOHelper.sizeOfVarBytesLE(this.key) +
+        IOHelper.sizeOfVarBytesLE(this.value) +
+        IOHelper.sizeOfVarBytesLE(this.value) +
+        IOHelper.sizeOfBoolean,
+    );
   }
 
   public get size(): number {
     return this.sizeInternal();
   }
 
-  public clone(): StorageItem {
+  public update({ value }: StorageItemUpdate): StorageItem {
     return new StorageItem({
-      value: this.value,
+      hash: this.hash,
+      key: this.key,
+      value,
       isConstant: this.isConstant,
     });
   }
