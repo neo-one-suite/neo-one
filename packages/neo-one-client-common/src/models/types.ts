@@ -156,8 +156,10 @@ export type ActionJSON = NotificationActionJSON | LogActionJSON;
 export type ActionTypeJSON = ActionJSON['type'];
 
 export interface StorageItemJSON {
+  readonly hash: string;
+  readonly key: string;
   readonly value: string;
-  readonly isConstant: boolean;
+  readonly flags: StorageFlagsJSON;
 }
 
 export type StorageFlagsJSON = keyof typeof StorageFlagsModel;
