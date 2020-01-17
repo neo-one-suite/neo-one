@@ -2,7 +2,7 @@ import { common, OpCode } from '@neo-one/client-common';
 import { disassembleByteCode } from '@neo-one/node-core';
 import { makeErrorWithCode } from '@neo-one/utils';
 import { BN } from 'bn.js';
-import { ExecutionContext } from './constants';
+import { ExecutionContext, MAX_PAYLOAD_SIZE } from './constants';
 
 const getLine = (context: ExecutionContext): number => {
   try {
@@ -67,6 +67,13 @@ export const CodeOverflowError = makeErrorWithCode('VM_ERROR', (context: Executi
 );
 export const UnknownSysCallError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, sysCall: string) =>
   getMessage(context, `Unknown SysCall: ${sysCall}`),
+);
+export const UnknownNativeContractError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, name: string) =>
+  getMessage(context, `Unknown NativeContract: ${name}`),
+);
+export const UnknownNativeContractMethodError = makeErrorWithCode(
+  'VM_ERROR',
+  (context: ExecutionContext, name: string) => getMessage(context, `Unknown NativeContract Method: ${name}`),
 );
 export const UnknownOPError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'Unnown Op'),
@@ -214,8 +221,44 @@ export const InvalidVerifySyscallError = makeErrorWithCode(
   (context: ExecutionContext, syscall: string) =>
     getMessage(context, `Syscall ${syscall} is not allowed during verification`),
 );
+export const MaxPayloadExceededError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
+  getMessage(context, `Maximum payload size of ${MAX_PAYLOAD_SIZE} exceeded.`),
+);
+export const NotImplementedError = makeErrorWithCode(
+  'NATIVE_CONTRACT_ERROR',
+  (context: ExecutionContext, method: string) =>
+    getMessage(context, `Native contract method, ${method} is not implemented.`),
+);
+export const InvalidAmountError = makeErrorWithCode(
+  'NATIVE_CONTRACT_ERROR',
+  (context: ExecutionContext, expected: string, found: string) =>
+    getMessage(context, `Native NEP5 Contract expected amount greater than ${expected}, instead found, ${found}`),
+);
+export const InvalidVerifyNativeContractError = makeErrorWithCode(
+  'NATIVE_CONTRACT_ERROR',
+  (context: ExecutionContext, method: string) =>
+    getMessage(context, `Native Contract method, ${method} is not allowed during verification`),
+);
+export const InvalidNativeContractError = makeErrorWithCode(
+  'NATIVE_CONTRACT_ERROR',
+  (context: ExecutionContext, hash: string) =>
+    getMessage(context, `Expected to call ${hash}, instead called ${context.scriptHash}`),
+);
+export const InvalidNep5TokenError = makeErrorWithCode(
+  'NATIVE_CONTRACT_ERROR',
+  (context: ExecutionContext, name: string) =>
+    getMessage(context, `Expected to call Nep5Token, instead called ${name}`),
+);
+export const InvalidPolicyError = makeErrorWithCode(
+  'NATIVE_CONTRACT_ERROR',
+  (context: ExecutionContext, name: string) =>
+    getMessage(context, `Expected to call PolicyContract, instead called ${name}`),
+);
 export const InvalidInvocationCounterError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, hash: string) =>
   getMessage(context, `Could not find InvocationCounter for scriptHash: ${hash}`),
+);
+export const ValueNegativeError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, value: BN) =>
+  getMessage(context, `Expected positive NEO value, found: ${value.toString()}`),
 );
 export const InvalidNativeDeployError = makeErrorWithCode(
   'VM_ERROR',

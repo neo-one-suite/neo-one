@@ -13,8 +13,10 @@ export const MAX_ARRAY_SIZE = 1024;
 export const MAX_ARRAY_SIZE_BN = new BN(1024);
 export const BLOCK_HEIGHT_YEAR = 2000000;
 export const BLOCK_HEIGHT_MAX_SIZE_CHECKS = Number.MAX_SAFE_INTEGER;
+export const MAX_PAYLOAD_SIZE = new BN(0x02000000);
 
 export const FEES = {
+  0: new BN(0),
   30: new BN(30),
   40: new BN(40),
   60: new BN(60),
@@ -43,6 +45,8 @@ export const FEES = {
   500_000: new BN(500000),
   1_000_000: new BN(1000000),
   2_500_000: new BN(2500000),
+  3_000_000: new BN(3000000),
+  8_000_000: new BN(8000000),
 };
 
 export const FREE_GAS = common.TEN_FIXED8;

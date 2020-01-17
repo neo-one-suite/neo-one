@@ -252,6 +252,9 @@ export enum SysCall {
   'Neo.Iterator.Values' = 'Neo.Iterator.Values',
   'Neo.Json.Serialize' = 'Neo.Json.Serialize',
   'Neo.Json.Deserialize' = 'Neo.Json.Deserialize',
+  'Neo.Native.Policy' = 'Neo.Native.Policy',
+  'Neo.Native.Tokens.GAS' = 'Neo.Native.Tokens.GAS',
+  'Neo.Native.Tokens.NEO' = 'Neo.Native.Tokens.NEO',
 }
 
 export type SysCallName = keyof typeof SysCall;
