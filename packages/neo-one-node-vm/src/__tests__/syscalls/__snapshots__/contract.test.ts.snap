@@ -1,0 +1,91 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SysCalls: System.Binary System.Contract.Call 1`] = `"contract.tryGet"`;
+
+exports[`SysCalls: System.Binary System.Contract.Call 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0101010101010101010101010101010101010101",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d62351631d2cc13da590348467f5375fd0464b35",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Binary System.Contract.Call 3`] = `Array []`;
+
+exports[`SysCalls: System.Binary System.Contract.Call 4`] = `Array []`;
+
+exports[`SysCalls: System.Binary System.Contract.Call 5`] = `Array []`;
+
+exports[`SysCalls: System.Binary System.Contract.Call 6`] = `Array []`;
+
+exports[`SysCalls: System.Binary System.Contract.Destroy 1`] = `"contract.tryGet"`;
+
+exports[`SysCalls: System.Binary System.Contract.Destroy 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "f1f29fcdc9e39bc65568f779e075ceb24eb514bc",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Binary System.Contract.Destroy 3`] = `Array []`;
+
+exports[`SysCalls: System.Binary System.Contract.Destroy 4`] = `Array []`;
+
+exports[`SysCalls: System.Binary System.Contract.Destroy 5`] = `Array []`;
+
+exports[`SysCalls: System.Binary System.Contract.Destroy 6`] = `Array []`;
+
+exports[`SysCalls: System.Contract System.Contract.Call 1`] = `"contract.tryGet"`;
+
+exports[`SysCalls: System.Contract System.Contract.Call 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0101010101010101010101010101010101010101",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d62351631d2cc13da590348467f5375fd0464b35",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Contract System.Contract.Call 3`] = `Array []`;
+
+exports[`SysCalls: System.Contract System.Contract.Call 4`] = `Array []`;
+
+exports[`SysCalls: System.Contract System.Contract.Call 5`] = `Array []`;
+
+exports[`SysCalls: System.Contract System.Contract.Call 6`] = `Array []`;
+
+exports[`SysCalls: System.Contract System.Contract.Destroy 1`] = `"contract.tryGet"`;
+
+exports[`SysCalls: System.Contract System.Contract.Destroy 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "f1f29fcdc9e39bc65568f779e075ceb24eb514bc",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Contract System.Contract.Destroy 3`] = `Array []`;
+
+exports[`SysCalls: System.Contract System.Contract.Destroy 4`] = `Array []`;
+
+exports[`SysCalls: System.Contract System.Contract.Destroy 5`] = `Array []`;
+
+exports[`SysCalls: System.Contract System.Contract.Destroy 6`] = `Array []`;

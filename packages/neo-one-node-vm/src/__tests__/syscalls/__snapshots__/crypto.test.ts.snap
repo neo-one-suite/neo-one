@@ -1,0 +1,129 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 1`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 2`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 3`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 4`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 5`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 6`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 7`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 8`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 9`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 10`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 11`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 12`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 13`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 14`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 15`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 16`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 17`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 18`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 19`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 20`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 21`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 22`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 23`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaCheckMultiSig 24`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaVerify 1`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaVerify 2`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaVerify 3`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaVerify 4`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaVerify 5`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaVerify 6`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaVerify 7`] = `Array []`;
+
+exports[`SysCalls: Neo.Crypto Neo.Crypto.ECDsaVerify 8`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 1`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 2`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 3`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 4`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 5`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 6`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 7`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 8`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 9`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 10`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 11`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 12`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 13`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 14`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 15`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 16`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 17`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 18`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 19`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 20`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 21`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 22`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 23`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaCheckMultiSig 24`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaVerify 1`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaVerify 2`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaVerify 3`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaVerify 4`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaVerify 5`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaVerify 6`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaVerify 7`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Crypto.ECDsaVerify 8`] = `Array []`;

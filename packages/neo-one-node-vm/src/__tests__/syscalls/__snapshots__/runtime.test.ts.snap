@@ -1,0 +1,162 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SysCalls: System.Runtime System.Runtime.CheckWitness 1`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.CheckWitness 2`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.CheckWitness 3`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.CheckWitness 4`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.CheckWitness 5`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.CheckWitness 6`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.CheckWitness 7`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.CheckWitness 8`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetCallingScriptHash 1`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetCallingScriptHash 2`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetCallingScriptHash 3`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetCallingScriptHash 4`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetCallingScriptHash 5`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetCallingScriptHash 6`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetCallingScriptHash 7`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetCallingScriptHash 8`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetEntryScriptHash 1`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetEntryScriptHash 2`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetEntryScriptHash 3`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetEntryScriptHash 4`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetExecutingScriptHash 1`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetExecutingScriptHash 2`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetExecutingScriptHash 3`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetExecutingScriptHash 4`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetInvocationCounter 1`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetInvocationCounter 2`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetInvocationCounter 3`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetInvocationCounter 4`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetNotifications 1`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetNotifications 2`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetNotifications 3`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetNotifications 4`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetNotifications 5`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetNotifications 6`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetNotifications 7`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetNotifications 8`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetScriptContainer 1`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetScriptContainer 2`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetScriptContainer 3`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetScriptContainer 4`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetScriptContainer 5`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetScriptContainer 6`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetScriptContainer 7`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetScriptContainer 8`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetScriptContainer 9`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetScriptContainer 10`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetScriptContainer 11`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetScriptContainer 12`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetTime 1`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetTime 2`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetTime 3`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetTime 4`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetTime 5`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetTime 6`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetTime 7`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetTime 8`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetTrigger 1`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetTrigger 2`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetTrigger 3`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.GetTrigger 4`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.Log 1`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.Log 2`] = `
+Array [
+  Array [
+    Object {
+      "message": "foo",
+      "scriptHash": "fa82fc0625deba6ddd33c8d0afd25f86db906b81",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Runtime System.Runtime.Log 3`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.Log 4`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.Notify 1`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [
+        Object {
+          "__$type": "IntegerContractParameter",
+          "name": undefined,
+          "type": 2,
+          "value": "1",
+        },
+      ],
+      "scriptHash": "3de713696719d7aba1981ee6501c46950a3f4fd8",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Runtime System.Runtime.Notify 2`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.Notify 3`] = `Array []`;
+
+exports[`SysCalls: System.Runtime System.Runtime.Notify 4`] = `Array []`;

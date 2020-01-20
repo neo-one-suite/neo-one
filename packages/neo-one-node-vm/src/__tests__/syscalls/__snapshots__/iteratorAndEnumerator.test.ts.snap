@@ -1,0 +1,271 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 1`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 2`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 3`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 4`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 5`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 6`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 7`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 8`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 9`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 10`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 11`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 12`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 13`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 14`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 15`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 16`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 17`] = `"contract.get"`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 18`] = `
+Array [
+  Array [
+    Object {
+      "hash": "5bc6631a58b0b0a921bbf909e53e262fe507f144",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 19`] = `"storageItem.getAll$"`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 20`] = `
+Array [
+  Array [
+    Object {
+      "hash": "5bc6631a58b0b0a921bbf909e53e262fe507f144",
+      "prefix": "01",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 21`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 22`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 23`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 24`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 25`] = `"contract.get"`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 26`] = `
+Array [
+  Array [
+    Object {
+      "hash": "5bc6631a58b0b0a921bbf909e53e262fe507f144",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 27`] = `"storageItem.getAll$"`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 28`] = `
+Array [
+  Array [
+    Object {
+      "hash": "5bc6631a58b0b0a921bbf909e53e262fe507f144",
+      "prefix": "01",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 29`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 30`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 31`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Next 32`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 1`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 2`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 3`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 4`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 5`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 6`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 7`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 8`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 9`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 10`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 11`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 12`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 13`] = `"contract.get"`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 14`] = `
+Array [
+  Array [
+    Object {
+      "hash": "b2aa50568521792f74796ab14cb1d43f0ac3199a",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 15`] = `"storageItem.getAll$"`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 16`] = `
+Array [
+  Array [
+    Object {
+      "hash": "b2aa50568521792f74796ab14cb1d43f0ac3199a",
+      "prefix": "01",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 17`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 18`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 19`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 20`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 21`] = `"contract.get"`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 22`] = `
+Array [
+  Array [
+    Object {
+      "hash": "a2a95148e821acda94eeb156b3a0b363e41d1db7",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 23`] = `"storageItem.getAll$"`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 24`] = `
+Array [
+  Array [
+    Object {
+      "hash": "a2a95148e821acda94eeb156b3a0b363e41d1db7",
+      "prefix": "01",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 25`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 26`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 27`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 28`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 29`] = `"contract.get"`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 30`] = `
+Array [
+  Array [
+    Object {
+      "hash": "fc657bf8b3e2effb062a302002be86f6a47f8e98",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 31`] = `"storageItem.getAll$"`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 32`] = `
+Array [
+  Array [
+    Object {
+      "hash": "fc657bf8b3e2effb062a302002be86f6a47f8e98",
+      "prefix": "01",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 33`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 34`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 35`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Enumerator.Value 36`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Create 1`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Create 2`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Create 3`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Create 4`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Key 1`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Key 2`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Key 3`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Key 4`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Key 5`] = `"contract.get"`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Key 6`] = `
+Array [
+  Array [
+    Object {
+      "hash": "b2aa50568521792f74796ab14cb1d43f0ac3199a",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Key 7`] = `"storageItem.getAll$"`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Key 8`] = `
+Array [
+  Array [
+    Object {
+      "hash": "b2aa50568521792f74796ab14cb1d43f0ac3199a",
+      "prefix": "01",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Key 9`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Key 10`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Key 11`] = `Array []`;
+
+exports[`SysCalls: System.Iterator & System.Enumerator System.Iterator.Key 12`] = `Array []`;
