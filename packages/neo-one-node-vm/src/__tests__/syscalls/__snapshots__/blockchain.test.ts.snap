@@ -1,0 +1,173 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetBlock 1`] = `"block.get"`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetBlock 2`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetBlock 3`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetBlock 4`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetBlock 5`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetBlock 6`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetContract 1`] = `"contract.tryGet"`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetContract 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetContract 3`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetContract 4`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetContract 5`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetContract 6`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetContract 7`] = `"contract.tryGet"`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetContract 8`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetContract 9`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetContract 10`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetContract 11`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetContract 12`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetHeight 1`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetHeight 2`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetHeight 3`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetHeight 4`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransaction 1`] = `"transaction.get"`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransaction 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransaction 3`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransaction 4`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransaction 5`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransaction 6`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 1`] = `"block.tryGet"`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 2`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 3`] = `"transaction.tryGet"`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 4`] = `
+Array [
+  Array [
+    Object {
+      "hash": "89d5a84cc68f12151d1362b04494375efc7e1115bc9641e932c2fbdadd91cf78",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 5`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 6`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 7`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 8`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 9`] = `"block.tryGet"`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 10`] = `
+Array [
+  Array [
+    Object {
+      "hashOrIndex": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 11`] = `"transaction.tryGet"`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 12`] = `
+Array [
+  Array [
+    Object {
+      "hash": "2948e6a8504f9b0914e5de4f8b66bf9df6999ccc615b2aaca6b00164f0580c59",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 13`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 14`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 15`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionFromBlock 16`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionHeight 1`] = `"transactionData.get"`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionHeight 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionHeight 3`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionHeight 4`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionHeight 5`] = `Array []`;
+
+exports[`SysCalls: System.Blockchain System.Blockchain.GetTransactionHeight 6`] = `Array []`;

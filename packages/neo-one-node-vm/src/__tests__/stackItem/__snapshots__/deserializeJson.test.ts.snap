@@ -584,6 +584,789 @@ exports[`syscalls Neo.Json.Serialize 11`] = `Array []`;
 
 exports[`syscalls Neo.Json.Serialize 12`] = `Array []`;
 
+exports[`syscalls Neo.Native.Deploy 1`] = `"contract.add"`;
+
+exports[`syscalls Neo.Native.Deploy 2`] = `
+Array [
+  Array [
+    Object {
+      "__$type": "Contract",
+      "manifest": ContractManifest {
+        "abi": ContractABI {
+          "entryPoint": ContractMethodDescriptor {
+            "name": "main",
+            "parameters": Array [
+              ContractParameterDeclaration {
+                "name": "operation",
+                "serializeWire": [Function],
+                "sizeInternal": [Function],
+                "type": 7,
+              },
+              ContractParameterDeclaration {
+                "name": "args",
+                "serializeWire": [Function],
+                "sizeInternal": [Function],
+                "type": 16,
+              },
+            ],
+            "returnType": 2,
+            "serializeWire": [Function],
+            "sizeInternal": [Function],
+          },
+          "events": Array [],
+          "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+          "methods": Array [
+            ContractMethodDescriptor {
+              "name": "getMaxTransactionsPerBlock",
+              "parameters": Array [],
+              "returnType": 2,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "getMaxBlockSize",
+              "parameters": Array [],
+              "returnType": 2,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "getFeePerByte",
+              "parameters": Array [],
+              "returnType": 2,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "getBlockedAccounts",
+              "parameters": Array [],
+              "returnType": 16,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "setMaxBlockSize",
+              "parameters": Array [
+                ContractParameterDeclaration {
+                  "name": "value",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 2,
+                },
+              ],
+              "returnType": 1,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "setMaxTransactionsPerBlock",
+              "parameters": Array [
+                ContractParameterDeclaration {
+                  "name": "value",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 2,
+                },
+              ],
+              "returnType": 1,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "setFeePerByte",
+              "parameters": Array [
+                ContractParameterDeclaration {
+                  "name": "value",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 2,
+                },
+              ],
+              "returnType": 1,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "blockAccount",
+              "parameters": Array [
+                ContractParameterDeclaration {
+                  "name": "account",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 3,
+                },
+              ],
+              "returnType": 1,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "unblockAccount",
+              "parameters": Array [
+                ContractParameterDeclaration {
+                  "name": "account",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 3,
+                },
+              ],
+              "returnType": 1,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+          ],
+          "serializeWire": [Function],
+          "sizeInternal": [Function],
+        },
+        "extra": undefined,
+        "features": 0,
+        "groups": Array [],
+        "hasStorage": false,
+        "hashHexInternal": [Function],
+        "hashInternal": [Function],
+        "maxLength": 2048,
+        "payable": false,
+        "permissions": Array [
+          ContractPermissions {
+            "contract": ContractPermissionDescriptor {
+              "hashOrGroup": undefined,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            "methods": Array [],
+            "serializeWire": [Function],
+            "sizeInternal": [Function],
+          },
+        ],
+        "safeMethods": Array [
+          "getMaxTransactionsPerBlock",
+          "getMaxBlockSize",
+          "getFeePerByte",
+          "getBlockedAccounts",
+        ],
+        "serializeWire": [Function],
+        "sizeInternal": [Function],
+        "trusts": Array [],
+      },
+      "script": "68114e656f2e4e61746976652e506f6c696379",
+    },
+  ],
+  Array [
+    Object {
+      "__$type": "Contract",
+      "manifest": ContractManifest {
+        "abi": ContractABI {
+          "entryPoint": ContractMethodDescriptor {
+            "name": "main",
+            "parameters": Array [
+              ContractParameterDeclaration {
+                "name": "operation",
+                "serializeWire": [Function],
+                "sizeInternal": [Function],
+                "type": 7,
+              },
+              ContractParameterDeclaration {
+                "name": "args",
+                "serializeWire": [Function],
+                "sizeInternal": [Function],
+                "type": 16,
+              },
+            ],
+            "returnType": 2,
+            "serializeWire": [Function],
+            "sizeInternal": [Function],
+          },
+          "events": Array [],
+          "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+          "methods": Array [
+            ContractMethodDescriptor {
+              "name": "getSysFeeAmount",
+              "parameters": Array [],
+              "returnType": 7,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "name",
+              "parameters": Array [],
+              "returnType": 7,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "symbol",
+              "parameters": Array [],
+              "returnType": 7,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "decimals",
+              "parameters": Array [],
+              "returnType": 2,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "totalSupply",
+              "parameters": Array [],
+              "returnType": 2,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "balanceOf",
+              "parameters": Array [
+                ContractParameterDeclaration {
+                  "name": "account",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 3,
+                },
+              ],
+              "returnType": 2,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "transfer",
+              "parameters": Array [
+                ContractParameterDeclaration {
+                  "name": "from",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 3,
+                },
+                ContractParameterDeclaration {
+                  "name": "to",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 3,
+                },
+                ContractParameterDeclaration {
+                  "name": "amount",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 2,
+                },
+              ],
+              "returnType": 1,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+          ],
+          "serializeWire": [Function],
+          "sizeInternal": [Function],
+        },
+        "extra": undefined,
+        "features": 0,
+        "groups": Array [],
+        "hasStorage": false,
+        "hashHexInternal": [Function],
+        "hashInternal": [Function],
+        "maxLength": 2048,
+        "payable": false,
+        "permissions": Array [
+          ContractPermissions {
+            "contract": ContractPermissionDescriptor {
+              "hashOrGroup": undefined,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            "methods": Array [],
+            "serializeWire": [Function],
+            "sizeInternal": [Function],
+          },
+        ],
+        "safeMethods": Array [
+          "getSysFeeAmount",
+          "name",
+          "symbol",
+          "decimals",
+          "totalSupply",
+          "balanceOf",
+        ],
+        "serializeWire": [Function],
+        "sizeInternal": [Function],
+        "trusts": Array [],
+      },
+      "script": "68154e656f2e4e61746976652e546f6b656e732e474153",
+    },
+  ],
+  Array [
+    Object {
+      "__$type": "Contract",
+      "manifest": ContractManifest {
+        "abi": ContractABI {
+          "entryPoint": ContractMethodDescriptor {
+            "name": "main",
+            "parameters": Array [
+              ContractParameterDeclaration {
+                "name": "operation",
+                "serializeWire": [Function],
+                "sizeInternal": [Function],
+                "type": 7,
+              },
+              ContractParameterDeclaration {
+                "name": "args",
+                "serializeWire": [Function],
+                "sizeInternal": [Function],
+                "type": 16,
+              },
+            ],
+            "returnType": 2,
+            "serializeWire": [Function],
+            "sizeInternal": [Function],
+          },
+          "events": Array [],
+          "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+          "methods": Array [
+            ContractMethodDescriptor {
+              "name": "name",
+              "parameters": Array [],
+              "returnType": 7,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "symbol",
+              "parameters": Array [],
+              "returnType": 7,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "decimals",
+              "parameters": Array [],
+              "returnType": 2,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "totalSupply",
+              "parameters": Array [],
+              "returnType": 2,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "balanceOf",
+              "parameters": Array [
+                ContractParameterDeclaration {
+                  "name": "account",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 3,
+                },
+              ],
+              "returnType": 2,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            ContractMethodDescriptor {
+              "name": "transfer",
+              "parameters": Array [
+                ContractParameterDeclaration {
+                  "name": "from",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 3,
+                },
+                ContractParameterDeclaration {
+                  "name": "to",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 3,
+                },
+                ContractParameterDeclaration {
+                  "name": "amount",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 2,
+                },
+              ],
+              "returnType": 1,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+          ],
+          "serializeWire": [Function],
+          "sizeInternal": [Function],
+        },
+        "extra": undefined,
+        "features": 0,
+        "groups": Array [],
+        "hasStorage": false,
+        "hashHexInternal": [Function],
+        "hashInternal": [Function],
+        "maxLength": 2048,
+        "payable": false,
+        "permissions": Array [
+          ContractPermissions {
+            "contract": ContractPermissionDescriptor {
+              "hashOrGroup": undefined,
+              "serializeWire": [Function],
+              "sizeInternal": [Function],
+            },
+            "methods": Array [],
+            "serializeWire": [Function],
+            "sizeInternal": [Function],
+          },
+        ],
+        "safeMethods": Array [
+          "name",
+          "symbol",
+          "decimals",
+          "totalSupply",
+          "balanceOf",
+        ],
+        "serializeWire": [Function],
+        "sizeInternal": [Function],
+        "trusts": Array [],
+      },
+      "script": "68154e656f2e4e61746976652e546f6b656e732e4e454f",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Deploy 3`] = `"storageItem.add"`;
+
+exports[`syscalls Neo.Native.Deploy 4`] = `
+Array [
+  Array [
+    StorageItem {
+      "flags": 0,
+      "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+      "key": "10",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "000004",
+    },
+  ],
+  Array [
+    StorageItem {
+      "flags": 0,
+      "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+      "key": "17",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "0002",
+    },
+  ],
+  Array [
+    StorageItem {
+      "flags": 0,
+      "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+      "key": "0a",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "e803",
+    },
+  ],
+  Array [
+    StorageItem {
+      "flags": 0,
+      "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+      "key": "0f",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "0000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Deploy 5`] = `"storageItem.tryGet"`;
+
+exports[`syscalls Neo.Native.Deploy 6`] = `
+Array [
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "11",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+      "key": "11",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Deploy 7`] = `Array []`;
+
+exports[`syscalls Neo.Native.Deploy 8`] = `Array []`;
+
+exports[`syscalls Neo.Native.Deploy 9`] = `Array []`;
+
+exports[`syscalls Neo.Native.Deploy 10`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 1`] = `"storageItem.get"`;
+
+exports[`syscalls Neo.Native.Policy 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+      "key": "17",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 3`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 4`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 5`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 6`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 7`] = `"storageItem.get"`;
+
+exports[`syscalls Neo.Native.Policy 8`] = `
+Array [
+  Array [
+    Object {
+      "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+      "key": "10",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 9`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 10`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 11`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 12`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 13`] = `"storageItem.get"`;
+
+exports[`syscalls Neo.Native.Policy 14`] = `
+Array [
+  Array [
+    Object {
+      "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+      "key": "0a",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 15`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 16`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 17`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 18`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 19`] = `"storageItem.get"`;
+
+exports[`syscalls Neo.Native.Policy 20`] = `
+Array [
+  Array [
+    Object {
+      "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+      "key": "0f",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 21`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 22`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 23`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 24`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 25`] = `"storageItem.get"`;
+
+exports[`syscalls Neo.Native.Policy 26`] = `
+Array [
+  Array [
+    Object {
+      "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+      "key": "10",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 27`] = `"storageItem.update"`;
+
+exports[`syscalls Neo.Native.Policy 28`] = `
+Array [
+  Array [
+    undefined,
+    Object {
+      "flags": 0,
+      "value": "0a",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 29`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 30`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 31`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 32`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 33`] = `"storageItem.get"`;
+
+exports[`syscalls Neo.Native.Policy 34`] = `
+Array [
+  Array [
+    Object {
+      "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+      "key": "17",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 35`] = `"storageItem.update"`;
+
+exports[`syscalls Neo.Native.Policy 36`] = `
+Array [
+  Array [
+    undefined,
+    Object {
+      "flags": 0,
+      "value": "05",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 37`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 38`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 39`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 40`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 41`] = `"storageItem.get"`;
+
+exports[`syscalls Neo.Native.Policy 42`] = `
+Array [
+  Array [
+    Object {
+      "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+      "key": "0a",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 43`] = `"storageItem.update"`;
+
+exports[`syscalls Neo.Native.Policy 44`] = `
+Array [
+  Array [
+    undefined,
+    Object {
+      "flags": 0,
+      "value": "0a",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 45`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 46`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 47`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 48`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 49`] = `"storageItem.get"`;
+
+exports[`syscalls Neo.Native.Policy 50`] = `
+Array [
+  Array [
+    Object {
+      "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+      "key": "0f",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 51`] = `"storageItem.update"`;
+
+exports[`syscalls Neo.Native.Policy 52`] = `
+Array [
+  Array [
+    Object {
+      "value": "0000000000000000000000000000000000000000",
+    },
+    Object {
+      "flags": 0,
+      "value": "00000000000000000000000000000000000000000101010101010101010101010101010101010101",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 53`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 54`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 55`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 56`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 57`] = `"storageItem.get"`;
+
+exports[`syscalls Neo.Native.Policy 58`] = `
+Array [
+  Array [
+    Object {
+      "hash": "4ab5b57166b045ac8175c7e2fa48086689834ba0",
+      "key": "0f",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 59`] = `"storageItem.update"`;
+
+exports[`syscalls Neo.Native.Policy 60`] = `
+Array [
+  Array [
+    Object {
+      "value": "0101010101010101010101010101010101010101",
+    },
+    Object {
+      "flags": 0,
+      "value": "0101010101010101010101010101010101010101",
+    },
+  ],
+]
+`;
+
+exports[`syscalls Neo.Native.Policy 61`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 62`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 63`] = `Array []`;
+
+exports[`syscalls Neo.Native.Policy 64`] = `Array []`;
+
 exports[`syscalls Neo.Storage.Find 1`] = `
 Array [
   IteratorStackItem {
@@ -826,6 +1609,31 @@ exports[`syscalls System.Blockchain.GetTransactionHeight 4`] = `Array []`;
 exports[`syscalls System.Blockchain.GetTransactionHeight 5`] = `Array []`;
 
 exports[`syscalls System.Blockchain.GetTransactionHeight 6`] = `Array []`;
+
+exports[`syscalls System.Contract.Call 1`] = `"contract.tryGet"`;
+
+exports[`syscalls System.Contract.Call 2`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0101010101010101010101010101010101010101",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "d62351631d2cc13da590348467f5375fd0464b35",
+    },
+  ],
+]
+`;
+
+exports[`syscalls System.Contract.Call 3`] = `Array []`;
+
+exports[`syscalls System.Contract.Call 4`] = `Array []`;
+
+exports[`syscalls System.Contract.Call 5`] = `Array []`;
+
+exports[`syscalls System.Contract.Call 6`] = `Array []`;
 
 exports[`syscalls System.Contract.Destroy 1`] = `"contract.tryGet"`;
 

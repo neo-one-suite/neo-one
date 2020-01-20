@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SysCalls: System.Json System.Json.Deserialize 1`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Deserialize 2`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Deserialize 3`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Deserialize 4`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Deserialize 5`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Deserialize 6`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Deserialize 7`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Deserialize 8`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Deserialize 9`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Deserialize 10`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Deserialize 11`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Deserialize 12`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Serialize 1`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Serialize 2`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Serialize 3`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Serialize 4`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Serialize 5`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Serialize 6`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Serialize 7`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Serialize 8`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Serialize 9`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Serialize 10`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Serialize 11`] = `Array []`;
+
+exports[`SysCalls: System.Json System.Json.Serialize 12`] = `Array []`;
