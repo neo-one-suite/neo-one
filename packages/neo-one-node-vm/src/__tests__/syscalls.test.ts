@@ -76,8 +76,10 @@ const dummyBlock = {
 };
 
 const nextItem = new StorageItem({
+  hash: scriptAttributeHash,
+  key: Buffer.from('key', 'utf-8'),
   value: Buffer.from('val', 'utf-8'),
-  isConstant: false,
+  flags: StorageFlags.None,
 });
 
 const signature0 = crypto.sign({

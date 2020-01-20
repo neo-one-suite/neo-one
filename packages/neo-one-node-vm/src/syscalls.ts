@@ -149,10 +149,7 @@ export const checkWitness = async ({
   let scriptHashesForVerifying;
   switch (scriptContainer.type) {
     case ScriptContainerType.Transaction:
-      scriptHashesForVerifying = await scriptContainer.value.getScriptHashesForVerifying({
-        getOutput: context.blockchain.output.get,
-        getAsset: context.blockchain.asset.get,
-      });
+      scriptHashesForVerifying = scriptContainer.value.getScriptHashesForVerifying();
 
       break;
     case ScriptContainerType.Block:
@@ -384,7 +381,7 @@ const createPut = ({ name }: { readonly name: 'System.Storage.Put' | 'System.Sto
         await context.blockchain.storageItem.update(item, { value, flags });
       } else {
         // TODO: check that isConstant should be true
-        await context.blockchain.storageItem.add(new StorageItem({ value, isConstant }));
+        await context.blockchain.storageItem.add(new StorageItem({ hash, key, value, flags }));
       }
 
       return { context };
@@ -511,8 +508,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'System.Runtime.Serialize': createSysCall({
-    name: 'System.Runtime.Serialize',
+  'System.Binary.Serialize': createSysCall({
+    name: 'System.Binary.Serialize',
     in: 1,
     out: 1,
     fee: FEES[100_000],
@@ -527,8 +524,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'System.Runtime.Deserialize': createSysCall({
-    name: 'System.Runtime.Deserialize',
+  'System.Binary.Deserialize': createSysCall({
+    name: 'System.Binary.Deserialize',
     in: 1,
     out: 1,
     fee: FEES[500_000],
@@ -579,8 +576,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'Neo.Json.Serialize': createSysCall({
-    name: 'Neo.Json.Serialize',
+  'System.Json.Serialize': createSysCall({
+    name: 'System.Json.Serialize',
     in: 1,
     out: 1,
     fee: FEES[400],
@@ -590,8 +587,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     }),
   }),
 
-  'Neo.Json.Deserialize': createSysCall({
-    name: 'Neo.Json.Deserialize',
+  'System.Json.Deserialize': createSysCall({
+    name: 'System.Json.Deserialize',
     in: 1,
     out: 1,
     fee: FEES[400],
@@ -601,9 +598,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     }),
   }),
 
-  // double check this one
-  'System.Crypto.Verify': createSysCall({
-    name: 'System.Crypto.Verify',
+  'Neo.Crypto.ECDsaVerify': createSysCall({
+    name: 'Neo.Crypto.ECDsaVerify',
     in: 3,
     out: 1,
     fee: FEES[1_000_000],
@@ -629,33 +625,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'Neo.Crypto.CheckSig': createSysCall({
-    name: 'Neo.Crypto.CheckSig',
-    in: 2,
-    out: 1,
-    fee: FEES[1_000_000],
-    invoke: async ({ context, args }) => {
-      const publicKey = args[0].asECPoint();
-      const signature = args[1].asBuffer();
-      let result;
-      try {
-        result = await crypto.verify({
-          message: context.init.scriptContainer.value.message,
-          signature,
-          publicKey,
-        });
-      } catch {
-        result = false;
-      }
-
-      return {
-        context,
-        results: [new BooleanStackItem(result)],
-      };
-    },
-  }),
-
-  'Neo.Crypto.CheckMultiSig': ({ context: contextIn }) => {
+  'Neo.Crypto.ECDsaCheckMultiSig': ({ context: contextIn }) => {
     const { stack } = contextIn;
     const top = stack[0] as StackItem | undefined;
     let pubKeyCount = 0;
@@ -685,7 +655,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     }
 
     return createSysCall({
-      name: 'Neo.Crypto.CheckMultiSig',
+      name: 'Neo.Crypto.ECDsaCheckMultiSig',
       in: _in,
       out: 1,
       fee: pubKeyCount === 0 ? utils.ZERO : FEES[1_000_000].mul(new BN(pubKeyCount)),
@@ -866,24 +836,6 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'Neo.Transaction.GetScript': createSysCall({
-    name: 'Neo.Transaction.GetScript',
-    in: 1,
-    out: 1,
-    fee: FEES[400],
-    invoke: async ({ context, args }) => {
-      const transaction = args[0].asTransaction();
-      if (transaction instanceof Transaction) {
-        return {
-          context,
-          results: [new BufferStackItem(transaction.script)],
-        };
-      }
-
-      throw new InvalidInvocationTransactionError(context);
-    },
-  }),
-
   'System.Storage.GetContext': createSysCall({
     name: 'System.Storage.GetContext',
     out: 1,
@@ -927,8 +879,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'Neo.Storage.Find': createSysCall({
-    name: 'Neo.Storage.Find',
+  'System.Storage.Find': createSysCall({
+    name: 'System.Storage.Find',
     in: 2,
     out: 1,
     fee: FEES[1_000_000],
@@ -954,8 +906,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'System.StorageContext.AsReadOnly': createSysCall({
-    name: 'System.StorageContext.AsReadOnly',
+  'System.Storage.AsReadOnly': createSysCall({
+    name: 'System.Storage.AsReadOnly',
     in: 1,
     out: 1,
     fee: FEES[400],
@@ -992,8 +944,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
 
   'Neo.Native.Policy': createNative({ name: 'Neo.Native.Policy' }),
 
-  'Neo.Enumerator.Create': createSysCall({
-    name: 'Neo.Enumerator.Create',
+  'System.Enumerator.Create': createSysCall({
+    name: 'System.Enumerator.Create',
     in: 1,
     out: 1,
     fee: FEES[400],
@@ -1007,8 +959,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'Neo.Enumerator.Next': createSysCall({
-    name: 'Neo.Enumerator.Next',
+  'System.Enumerator.Next': createSysCall({
+    name: 'System.Enumerator.Next',
     in: 1,
     out: 1,
     fee: FEES[1_000_000],
@@ -1023,8 +975,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'Neo.Iterator.Create': createSysCall({
-    name: 'Neo.Iterator.Create',
+  'System.Iterator.Create': createSysCall({
+    name: 'System.Iterator.Create',
     in: 1,
     out: 1,
     fee: FEES[400],
@@ -1049,8 +1001,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'Neo.Iterator.Key': createSysCall({
-    name: 'Neo.Iterator.Key',
+  'System.Iterator.Key': createSysCall({
+    name: 'System.Iterator.Key',
     in: 1,
     out: 1,
     fee: FEES[400],
@@ -1061,8 +1013,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     }),
   }),
 
-  'Neo.Enumerator.Value': createSysCall({
-    name: 'Neo.Enumerator.Value',
+  'System.Enumerator.Value': createSysCall({
+    name: 'System.Enumerator.Value',
     in: 1,
     out: 1,
     fee: FEES[400],
@@ -1073,8 +1025,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     }),
   }),
 
-  'Neo.Enumerator.Concat': createSysCall({
-    name: 'Neo.Enumerator.Concat',
+  'System.Enumerator.Concat': createSysCall({
+    name: 'System.Enumerator.Concat',
     in: 2,
     out: 1,
     fee: FEES[400],
@@ -1084,8 +1036,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     }),
   }),
 
-  'Neo.Iterator.Concat': createSysCall({
-    name: 'Neo.Iterator.Concat',
+  'System.Iterator.Concat': createSysCall({
+    name: 'System.Iterator.Concat',
     in: 2,
     out: 1,
     fee: FEES[400],
@@ -1095,8 +1047,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     }),
   }),
 
-  'Neo.Iterator.Keys': createSysCall({
-    name: 'Neo.Iterator.Keys',
+  'System.Iterator.Keys': createSysCall({
+    name: 'System.Iterator.Keys',
     in: 1,
     out: 1,
     fee: FEES[400],
@@ -1106,8 +1058,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     }),
   }),
 
-  'Neo.Iterator.Values': createSysCall({
-    name: 'Neo.Iterator.Values',
+  'System.Iterator.Values': createSysCall({
+    name: 'System.Iterator.Values',
     in: 1,
     out: 1,
     fee: FEES[400],
@@ -1117,8 +1069,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     }),
   }),
 
-  'Neo.Account.IsStandard': createSysCall({
-    name: 'Neo.Account.IsStandard',
+  'System.Contract.IsStandard': createSysCall({
+    name: 'System.Contract.IsStandard',
     in: 1,
     out: 1,
     fee: FEES[30_000],
@@ -1133,9 +1085,9 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'Neo.Contract.Create': getContractFee((argsIn, fee) =>
+  'System.Contract.Create': getContractFee((argsIn, fee) =>
     createSysCall({
-      name: 'Neo.Contract.Create',
+      name: 'System.Contract.Create',
       in: 9,
       out: 1,
       fee,
@@ -1161,9 +1113,9 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     })(argsIn),
   ),
 
-  'Neo.Contract.Update': getContractFee((argsIn, fee) =>
+  'System.Contract.Update': getContractFee((argsIn, fee) =>
     createSysCall({
-      name: 'Neo.Contract.Update',
+      name: 'System.Contract.Update',
       in: 9,
       out: 1,
       fee,
@@ -1302,6 +1254,18 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
+  'System.Contract.CallEx': createSysCall({
+    name: 'System.Contract.CallEx',
+    in: 4,
+    out: 2,
+    fee: FEES[1_000_000],
+    invoke: ({ context, args }) => {
+      // TODO: Spencer to implement
+
+      return { context };
+    },
+  }),
+
   'System.Storage.Put': createPut({ name: 'System.Storage.Put' }),
 
   'System.Storage.PutEx': createPut({ name: 'System.Storage.PutEx' }),
@@ -1331,8 +1295,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'System.ExecutionEngine.GetScriptContainer': createSysCall({
-    name: 'System.ExecutionEngine.GetScriptContainer',
+  'System.Runtime.GetScriptContainer': createSysCall({
+    name: 'System.Runtime.GetScriptContainer',
     out: 1,
     fee: FEES[250],
     invoke: async ({ context }) => {
@@ -1358,8 +1322,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     },
   }),
 
-  'System.ExecutionEngine.GetExecutingScriptHash': createSysCall({
-    name: 'System.ExecutionEngine.GetExecutingScriptHash',
+  'System.Runtime.GetExecutingScriptHash': createSysCall({
+    name: 'System.Runtime.GetExecutingScriptHash',
     out: 1,
     fee: FEES[400],
     invoke: async ({ context }) => ({
@@ -1368,8 +1332,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     }),
   }),
 
-  'System.ExecutionEngine.GetCallingScriptHash': createSysCall({
-    name: 'System.ExecutionEngine.GetCallingScriptHash',
+  'System.Runtime.GetCallingScriptHash': createSysCall({
+    name: 'System.Runtime.GetCallingScriptHash',
     out: 1,
     fee: FEES[400],
     invoke: async ({ context }) => ({
@@ -1382,8 +1346,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     }),
   }),
 
-  'System.ExecutionEngine.GetEntryScriptHash': createSysCall({
-    name: 'System.ExecutionEngine.GetEntryScriptHash',
+  'System.Runtime.GetEntryScriptHash': createSysCall({
+    name: 'System.Runtime.GetEntryScriptHash',
     out: 1,
     fee: FEES[400],
     invoke: async ({ context }) => ({
@@ -1394,8 +1358,8 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
 };
 
 export const SYSCALL_ALIASES: { readonly [key: string]: string | undefined } = {
-  'Neo.Iterator.Next': 'Neo.Enumerator.Next',
-  'Neo.Iterator.Value': 'Neo.Enumerator.Value',
+  'System.Iterator.Next': 'System.Enumerator.Next',
+  'System.Iterator.Value': 'System.Enumerator.Value',
 };
 
 const SYS_CALL_STRING_LENGTH = 252;
