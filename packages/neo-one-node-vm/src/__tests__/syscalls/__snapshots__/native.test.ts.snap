@@ -197,7 +197,14 @@ Array [
           "methods": Array [
             ContractMethodDescriptor {
               "name": "getSysFeeAmount",
-              "parameters": Array [],
+              "parameters": Array [
+                ContractParameterDeclaration {
+                  "name": "index",
+                  "serializeWire": [Function],
+                  "sizeInternal": [Function],
+                  "type": 2,
+                },
+              ],
               "returnType": 7,
               "serializeWire": [Function],
               "sizeInternal": [Function],
@@ -782,3 +789,835 @@ exports[`SysCalls: Neo.Native Neo.Native.Policy 62`] = `Array []`;
 exports[`SysCalls: Neo.Native Neo.Native.Policy 63`] = `Array []`;
 
 exports[`SysCalls: Neo.Native Neo.Native.Policy 64`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 1`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 2`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 3`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 4`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 5`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 6`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 7`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 8`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 9`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 10`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 11`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 12`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 13`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 14`] = `
+Array [
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "11",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 15`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 16`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 17`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 18`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 19`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 20`] = `
+Array [
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "200101010101010101010101010101010101010101",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 21`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 22`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 23`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 24`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 25`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 26`] = `
+Array [
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "1505",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 27`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 28`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 29`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 30`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 31`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 32`] = `
+Array [
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "1505",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 33`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 34`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 35`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 36`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 37`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 38`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 39`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 40`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 41`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 42`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 43`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 44`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 45`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 46`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 47`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 48`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 49`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 50`] = `
+Array [
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 51`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [],
+      "scriptHash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 52`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 53`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 54`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 55`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 56`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 57`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 58`] = `
+Array [
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 59`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 60`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 61`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 62`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 63`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 64`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 65`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 66`] = `
+Array [
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 67`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 68`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 69`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 70`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 71`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 72`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 73`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 74`] = `
+Array [
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 75`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [],
+      "scriptHash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 76`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 77`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 78`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 79`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 80`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 81`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 82`] = `
+Array [
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "200000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 83`] = `"storageItem.delete"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 84`] = `
+Array [
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 85`] = `"storageItem.add"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 86`] = `
+Array [
+  Array [
+    StorageItem {
+      "flags": 0,
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "200000000000000000000000000000000000000000",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "05",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 87`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [],
+      "scriptHash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 88`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 89`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 90`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 91`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 92`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 93`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 94`] = `
+Array [
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+      "key": "200000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 95`] = `"storageItem.update"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 96`] = `
+Array [
+  Array [
+    Object {
+      "value": "5",
+    },
+    Object {
+      "flags": 0,
+      "value": "02",
+    },
+  ],
+  Array [
+    Object {
+      "value": "14",
+    },
+    Object {
+      "flags": 0,
+      "value": "11",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 97`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [],
+      "scriptHash": "173e6724888531bfb401c9f212c4f0b0b9569cdf",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 98`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 99`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.GAS 100`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 1`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 2`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 3`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 4`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 5`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 6`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 7`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 8`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 9`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 10`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 11`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 12`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 13`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 14`] = `
+Array [
+  Array [
+    Object {
+      "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+      "key": "11",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 15`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 16`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 17`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 18`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 19`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 20`] = `
+Array [
+  Array [
+    Object {
+      "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+      "key": "200101010101010101010101010101010101010101",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 21`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 22`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 23`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 24`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 25`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 26`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 27`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 28`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 29`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 30`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 31`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 32`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 33`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 34`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 35`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 36`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 37`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 38`] = `
+Array [
+  Array [
+    Object {
+      "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 39`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [],
+      "scriptHash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 40`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 41`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 42`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 43`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 44`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 45`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 46`] = `
+Array [
+  Array [
+    Object {
+      "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 47`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 48`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 49`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 50`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 51`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 52`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 53`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 54`] = `
+Array [
+  Array [
+    Object {
+      "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 55`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 56`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 57`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 58`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 59`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 60`] = `
+Array [
+  Array [
+    Object {
+      "hash": "3775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 61`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 62`] = `
+Array [
+  Array [
+    Object {
+      "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 63`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [],
+      "scriptHash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 64`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 65`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 66`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 67`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 68`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 69`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 70`] = `
+Array [
+  Array [
+    Object {
+      "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+      "key": "200000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 71`] = `"storageItem.delete"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 72`] = `
+Array [
+  Array [
+    Object {
+      "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 73`] = `"storageItem.add"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 74`] = `
+Array [
+  Array [
+    StorageItem {
+      "flags": 0,
+      "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+      "key": "200000000000000000000000000000000000000000",
+      "serializeWire": [Function],
+      "sizeInternal": [Function],
+      "value": "05",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 75`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [],
+      "scriptHash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 76`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 77`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 78`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 79`] = `"contract.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 80`] = `
+Array [
+  Array [
+    Object {
+      "hash": "0000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 81`] = `"storageItem.tryGet"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 82`] = `
+Array [
+  Array [
+    Object {
+      "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+      "key": "203775292229eccdf904f16fff8e83e7cffdc0f0ce",
+    },
+  ],
+  Array [
+    Object {
+      "hash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+      "key": "200000000000000000000000000000000000000000",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 83`] = `"storageItem.update"`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 84`] = `
+Array [
+  Array [
+    Object {
+      "value": "5",
+    },
+    Object {
+      "flags": 0,
+      "value": "02",
+    },
+  ],
+  Array [
+    Object {
+      "value": "14",
+    },
+    Object {
+      "flags": 0,
+      "value": "11",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 85`] = `
+Array [
+  Array [
+    Object {
+      "args": Array [],
+      "scriptHash": "a2d96c2ec153e9e3255a84db1881745555fecb6c",
+    },
+  ],
+]
+`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 86`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 87`] = `Array []`;
+
+exports[`SysCalls: Neo.Native Neo.Native.Tokens.NEO 88`] = `Array []`;

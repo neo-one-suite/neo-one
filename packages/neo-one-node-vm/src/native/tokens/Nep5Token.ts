@@ -1,4 +1,4 @@
-import { UInt160 } from '@neo-one/client-common';
+import { common, UInt160 } from '@neo-one/client-common';
 import { HasPayable } from '@neo-one/client-full-common';
 import { ContractParameterDeclaration, ContractParameterType, StorageFlags, StorageItem } from '@neo-one/node-core';
 import { BN } from 'bn.js';
@@ -144,7 +144,7 @@ export const NEP5_METHODS = (
         if (stateFrom.mutableBalance.lt(amount)) {
           return new BooleanStackItem(false);
         }
-        if (from === to) {
+        if (common.uInt160ToHex(from) === common.uInt160ToHex(to)) {
           onBalanceChange(context, from, stateFrom, new BN(0));
         } else {
           onBalanceChange(context, from, stateFrom, amount.neg());

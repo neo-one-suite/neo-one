@@ -1257,6 +1257,14 @@ exports[`syscalls Neo.Native.Policy 63`] = `Array []`;
 
 exports[`syscalls Neo.Native.Policy 64`] = `Array []`;
 
+exports[`syscalls Neo.Native.Tokens.GAS 1`] = `Array []`;
+
+exports[`syscalls Neo.Native.Tokens.GAS 2`] = `Array []`;
+
+exports[`syscalls Neo.Native.Tokens.GAS 3`] = `Array []`;
+
+exports[`syscalls Neo.Native.Tokens.GAS 4`] = `Array []`;
+
 exports[`syscalls Neo.Storage.Find 1`] = `
 Array [
   IteratorStackItem {

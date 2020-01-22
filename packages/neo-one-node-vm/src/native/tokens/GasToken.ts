@@ -1,5 +1,5 @@
 import { common } from '@neo-one/client-common';
-import { ContractParameterType } from '@neo-one/node-core';
+import { ContractParameterDeclaration, ContractParameterType } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { ExecutionContext, FEES, OpInvokeArgs } from '../../constants';
 import { IntegerStackItem } from '../../stackItem';
@@ -11,7 +11,7 @@ export const GAS_METHODS: readonly ContractMethodData[] = [
     name: 'getSysFeeAmount',
     price: FEES[0],
     returnType: ContractParameterType.String,
-    parameters: [],
+    parameters: [new ContractParameterDeclaration({ type: ContractParameterType.Integer, name: 'index' })],
     safeMethod: true,
     delegate: (contract: NativeContractBase) => async ({ context, args }: OpInvokeArgs) => {
       const index = args[0].asBigInteger();
