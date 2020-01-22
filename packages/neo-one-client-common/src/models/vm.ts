@@ -248,6 +248,8 @@ export enum SysCall {
   'System.Iterator.Values' = 'System.Iterator.Values',
   'Neo.Native.Deploy' = 'Neo.Native.Deploy',
   'Neo.Native.Policy' = 'Neo.Native.Policy',
+  'Neo.Native.Tokens.GAS' = 'Neo.Native.Tokens.GAS',
+  'Neo.Native.Tokens.NEO' = 'Neo.Native.Tokens.NEO',
   'Neo.Crypto.ECDsaVerify' = 'Neo.Crypto.ECDsaVerify',
   'Neo.Crypto.ECDsaCheckMultiSig' = 'Neo.Crypto.ECDsaCheckMultiSig',
   'System.Json.Serialize' = 'System.Json.Serialize',

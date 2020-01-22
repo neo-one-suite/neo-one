@@ -57,7 +57,7 @@ import {
   UnknownNativeContractMethodError,
   UnknownSysCallError,
 } from './errors';
-import { NativeContract } from './native';
+import { NativeContract, NativeContractServiceName } from './native';
 import {
   ArrayStackItem,
   BlockStackItem,
@@ -389,11 +389,11 @@ const createPut = ({ name }: { readonly name: 'System.Storage.Put' | 'System.Sto
   })({ context: contextIn });
 };
 
-const createNative = ({ name }: { readonly name: 'Neo.Native.Policy' }) => ({
+const createNative = ({ name }: { readonly name: NativeContractServiceName }) => ({
   context: contextIn,
 }: CreateSysCallArgs) => {
   const contract = NativeContract[name];
-  if (contract === undefined) {
+  if ((contract as typeof contract | undefined) === undefined) {
     throw new UnknownNativeContractError(contextIn, name);
   }
   const methodName = contextIn.stack[0].asString();
@@ -943,6 +943,10 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
   }),
 
   'Neo.Native.Policy': createNative({ name: 'Neo.Native.Policy' }),
+
+  'Neo.Native.Tokens.GAS': createNative({ name: 'Neo.Native.Tokens.GAS' }),
+
+  'Neo.Native.Tokens.NEO': createNative({ name: 'Neo.Native.Tokens.NEO' }),
 
   'System.Enumerator.Create': createSysCall({
     name: 'System.Enumerator.Create',

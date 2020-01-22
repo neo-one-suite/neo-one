@@ -3,12 +3,12 @@ import { GasToken, NeoToken } from './tokens';
 
 export interface NativeContract {
   readonly 'Neo.Native.Policy': PolicyContract;
-  readonly 'Neo.Native.Tokens.Gas': GasToken;
-  readonly 'Neo.Native.Tokens.Neo': NeoToken;
+  readonly 'Neo.Native.Tokens.GAS': GasToken;
+  readonly 'Neo.Native.Tokens.NEO': NeoToken;
 }
 
 export const NativeContract: NativeContract = {
   'Neo.Native.Policy': new PolicyContract(),
-  'Neo.Native.Tokens.Gas': new GasToken(),
-  'Neo.Native.Tokens.Neo': new NeoToken(),
+  'Neo.Native.Tokens.GAS': new GasToken(),
+  'Neo.Native.Tokens.NEO': new NeoToken(),
 };
