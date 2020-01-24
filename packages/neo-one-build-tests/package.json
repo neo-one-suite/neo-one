@@ -22,7 +22,7 @@
     "lodash": "^4.17.15",
     "nyc": "^14.1.1",
     "tmp": "^0.1.0",
-    "ts-jest": "^24.1.0"
+    "ts-jest": "^25.0.0"
   },
   "sideEffects": false
 }
