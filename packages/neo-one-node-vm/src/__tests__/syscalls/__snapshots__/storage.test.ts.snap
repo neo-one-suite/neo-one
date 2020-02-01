@@ -1,5 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`SysCalls: System.Storage System.Storage.AsReadOnly 1`] = `Array []`;
+
+exports[`SysCalls: System.Storage System.Storage.AsReadOnly 2`] = `Array []`;
+
+exports[`SysCalls: System.Storage System.Storage.AsReadOnly 3`] = `Array []`;
+
+exports[`SysCalls: System.Storage System.Storage.AsReadOnly 4`] = `Array []`;
+
 exports[`SysCalls: System.Storage System.Storage.Delete 1`] = `"contract.get"`;
 
 exports[`SysCalls: System.Storage System.Storage.Delete 2`] = `

@@ -19,6 +19,15 @@ export class ContractEvent extends ContractEventModel<ContractParameterDeclarati
     });
   }
 
+  public static fromJSON(eventJSON: ContractEventJSON): ContractEvent {
+    const { name, parameters } = eventJSON;
+
+    return new ContractEvent({
+      name,
+      parameters: parameters.map((parameter) => ContractParameterDeclaration.fromJSON(parameter)),
+    });
+  }
+
   public static deserializeWire(options: DeserializeWireOptions): ContractEvent {
     return this.deserializeWireBase({
       context: options.context,

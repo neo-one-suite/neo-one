@@ -16,6 +16,15 @@ export class ContractGroup extends ContractGroupModel implements SerializableJSO
     });
   }
 
+  public static fromJSON(groupJSON: ContractGroupJSON): ContractGroup {
+    const { publicKey, signature } = groupJSON;
+
+    return new ContractGroup({
+      publicKey: common.stringToECPoint(publicKey),
+      signature,
+    });
+  }
+
   public static deserializeWire(options: DeserializeWireOptions): ContractGroup {
     return this.deserializeWireBase({
       context: options.context,

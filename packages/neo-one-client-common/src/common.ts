@@ -51,6 +51,21 @@ const uInt160ToString = (value: UInt160 | UInt160Hex): string =>
 
 const stringToUInt160 = hexToUInt160;
 
+const stringToUInt160OrECPoint = (stringIn: string): UInt160 | ECPoint | undefined => {
+  try {
+    return stringToUInt160(stringIn);
+  } catch {
+    // do nothing
+  }
+  try {
+    return stringToECPoint(stringIn);
+  } catch {
+    // do nothing
+  }
+
+  return undefined;
+};
+
 const uInt160Equal = (a: UInt160, b: UInt160) => a.equals(b);
 
 const ZERO_UINT160 = Buffer.alloc(20, 0) as UInt160;
@@ -246,6 +261,7 @@ export const common = {
   hexToUInt160,
   uInt160ToString,
   stringToUInt160,
+  stringToUInt160OrECPoint,
   uInt160Equal,
   isUInt160,
   bufferToUInt160,

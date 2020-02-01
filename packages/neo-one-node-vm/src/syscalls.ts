@@ -14,19 +14,15 @@ import {
   UInt256,
   VMState,
 } from '@neo-one/client-common';
-import {
-  assertContractPropertyState,
-  ContractManifestModel,
-  ContractPermissionsModel,
-  HasStorage,
-} from '@neo-one/client-full-common';
+import { ContractManifestModel, ContractPermissionsModel } from '@neo-one/client-full-common';
 import {
   BinaryReader,
   Contract,
+  ContractABI,
+  ContractManifest,
   ScriptContainerType,
   StorageFlags,
   StorageItem,
-  Transaction,
   TriggerType,
   utils,
 } from '@neo-one/node-core';
@@ -36,17 +32,28 @@ import { map as asyncMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { defer } from 'rxjs';
-import { concatMap } from 'rxjs/operators';
-import { ExecutionContext, FEES, MAX_ITEM_SIZE, OpInvoke, OpInvokeArgs, SysCall } from './constants';
+import { concatMap, toArray } from 'rxjs/operators';
+import {
+  ExecutionContext,
+  FEES,
+  GAS_PER_BYTE,
+  MAX_ITEM_SIZE,
+  MAX_MANIFEST_LENGTH,
+  OpInvoke,
+  OpInvokeArgs,
+  SysCall,
+} from './constants';
 import {
   ConstantStorageError,
+  ContractAlreadyDeployedError,
   ContractHashNotFoundError,
   ContractMethodUndefinedError,
   ContractNoStorageError,
   InvalidCheckMultisigArgumentsError,
+  InvalidContractManifestError,
   InvalidGetBlockArgumentsError,
   InvalidInvocationCounterError,
-  InvalidInvocationTransactionError,
+  InvalidJsonError,
   InvalidNativeDeployError,
   InvalidPermissionError,
   InvalidTransactionIndexError,
@@ -54,7 +61,6 @@ import {
   ItemTooLargeError,
   StackUnderflowError,
   UnknownNativeContractError,
-  UnknownNativeContractMethodError,
   UnknownSysCallError,
 } from './errors';
 import { NativeContract, NativeContractServiceName } from './native';
@@ -241,50 +247,46 @@ const canCall = ({
   );
 };
 
-const createContract = async ({
-  context,
-  args,
+const manifestIsValid = ({
+  manifest,
+  hash,
 }: {
-  readonly context: ExecutionContext;
-  readonly args: readonly StackItem[];
-}) => {
-  const script = args[0].asBuffer();
-  // Removed check of valid ContractParameterTypes to match neo
-  const manifestString = args[1].asString();
-  const manifest = JSON.parse(manifestString);
-
-  const returnType = assertContractParameterType(args[2].asBigIntegerUnsafe().toNumber());
-
-  const contractProperties = assertContractPropertyState(args[3].asBigIntegerUnsafe().toNumber());
-
-  const name = args[4].asString();
-  const codeVersion = args[5].asString();
-  const author = args[6].asString();
-  const email = args[7].asString();
-  const description = args[8].asString();
-  const hash = crypto.hash160(script);
-  let contract = await context.blockchain.contract.tryGet({ hash });
-  let created = false;
-  if (contract === undefined) {
-    contract = new Contract({
-      script,
-      parameterList,
-
-      returnType,
-      contractProperties,
-      name,
-      codeVersion,
-      author,
-      email,
-      description,
-      hash,
-    });
-
-    await context.blockchain.contract.add(contract);
-    created = true;
+  readonly manifest: ContractManifest;
+  readonly hash: UInt160;
+}): boolean => {
+  if (!manifest.abi.hash.equals(hash)) {
+    return false;
+  }
+  const message = common.uInt160ToBuffer(hash);
+  if (
+    !manifest.groups.every(({ signature, publicKey }) =>
+      crypto.verify({ message, signature: Buffer.from(signature, 'hex'), publicKey }),
+    )
+  ) {
+    return false;
   }
 
-  return { contract, created };
+  return true;
+};
+
+const validateContractArgs = ({
+  args,
+  context,
+}: {
+  readonly args: readonly StackItem[];
+  readonly context: ExecutionContext;
+}): { readonly hash: UInt160; readonly script: Buffer; readonly manifestString: string } => {
+  const script = args[0].asBuffer();
+  if (script.length > MAX_ITEM_SIZE) {
+    throw new ItemTooLargeError(context);
+  }
+  const manifestString = args[1].asString();
+  if (manifestString.length > MAX_MANIFEST_LENGTH) {
+    throw new ItemTooLargeError(context);
+  }
+  const hash = crypto.hash160(script);
+
+  return { hash, script, manifestString };
 };
 
 const checkStorage = async ({ context, hash }: { readonly context: ExecutionContext; readonly hash: UInt160 }) => {
@@ -296,18 +298,11 @@ const checkStorage = async ({ context, hash }: { readonly context: ExecutionCont
   return contract;
 };
 
-// TODO: check this function
 function getContractFee<T>(func: (args: CreateSysCallArgs, fee: BN) => T): (args: CreateSysCallArgs) => T {
   return (args) => {
-    const { context: contextIn } = args;
-    const contractProperties = assertContractPropertyState(contextIn.stack[3].asBigIntegerUnsafe().toNumber());
-
-    let fee = common.ONE_HUNDRED_FIXED8;
-
-    if (HasStorage.has(contractProperties)) {
-      fee = fee.add(common.FOUR_HUNDRED_FIXED8);
-    }
-    // TODO: make sure fees are correct
+    const { context } = args;
+    const byteSize = context.stack[0].size + context.stack[1].size;
+    const fee = GAS_PER_BYTE.mul(new BN(byteSize));
 
     return func(args, fee);
   };
@@ -355,7 +350,6 @@ const createPut = ({ name }: { readonly name: 'System.Storage.Put' | 'System.Sto
     in: expectedIn,
     fee: FEES[100_000].mul(numBytes),
     invoke: async ({ context, args }) => {
-      // TODO: may need to look at this change
       if (context.init.triggerType !== TriggerType.Application) {
         throw new InvalidVerifySyscallError(context, name);
       }
@@ -380,7 +374,6 @@ const createPut = ({ name }: { readonly name: 'System.Storage.Put' | 'System.Sto
         }
         await context.blockchain.storageItem.update(item, { value, flags });
       } else {
-        // TODO: check that isConstant should be true
         await context.blockchain.storageItem.add(new StorageItem({ hash, key, value, flags }));
       }
 
@@ -600,17 +593,16 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
 
   'Neo.Crypto.ECDsaVerify': createSysCall({
     name: 'Neo.Crypto.ECDsaVerify',
-    in: 3,
+    in: 2,
     out: 1,
     fee: FEES[1_000_000],
-    invoke: async ({ context, args }) => {
-      const message = args[0].asBuffer();
-      const publicKey = args[1].asECPoint();
-      const signature = args[2].asBuffer();
+    invoke: ({ context, args }) => {
+      const publicKey = args[0].asECPoint();
+      const signature = args[1].asBuffer();
       let result;
       try {
-        result = await crypto.verify({
-          message,
+        result = crypto.verify({
+          message: context.init.scriptContainer.value.message,
           signature,
           publicKey,
         });
@@ -1092,26 +1084,41 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
   'System.Contract.Create': getContractFee((argsIn, fee) =>
     createSysCall({
       name: 'System.Contract.Create',
-      in: 9,
+      in: 2,
       out: 1,
       fee,
       invoke: async ({ context, args }) => {
-        if (context.init.triggerType !== TriggerType.Application) {
-          throw new InvalidVerifySyscallError(context, 'Neo.Contract.Create');
+        const { hash, script, manifestString } = validateContractArgs({ context, args });
+        const tryContract = await context.blockchain.contract.tryGet({ hash });
+        if (tryContract !== undefined) {
+          throw new ContractAlreadyDeployedError(context, hash);
         }
-        const { contract } = await createContract({ context, args });
-        const result = new ContractStackItem(contract);
+        let manifestJson;
+        try {
+          manifestJson = JSON.parse(manifestString);
+        } catch {
+          throw new InvalidJsonError(context, manifestString);
+        }
+        const manifest = ContractManifest.fromJSON(manifestJson);
+        const contract = new Contract({
+          script,
+          manifest,
+        });
+        if (!manifestIsValid({ manifest, hash })) {
+          throw new InvalidContractManifestError(context, manifest);
+        }
+
+        await context.blockchain.contract.add(contract);
 
         return {
           context: {
             ...context,
             createdContracts: {
               ...context.createdContracts,
-              [contract.hashHex]: context.scriptHash,
+              [contract.manifest.hashHex]: context.scriptHash,
             },
           },
-
-          results: [result],
+          results: [new ContractStackItem(contract)],
         };
       },
     })(argsIn),
@@ -1120,58 +1127,102 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
   'System.Contract.Update': getContractFee((argsIn, fee) =>
     createSysCall({
       name: 'System.Contract.Update',
-      in: 9,
-      out: 1,
+      in: 2,
       fee,
       invoke: async (options) => {
-        if (options.context.init.triggerType !== TriggerType.Application) {
-          throw new InvalidVerifySyscallError(options.context, 'Neo.Contract.Update');
-        }
         const { context: contextIn, args } = options;
         let context = contextIn;
-        const { contract, created } = await createContract({ context, args });
-        if (contract.hasStorage && created) {
-          await context.blockchain.storageItem
-            .getAll$({
-              hash: context.scriptHash,
-            })
-            .pipe(
-              concatMap((item) =>
-                defer(async () =>
-                  context.blockchain.storageItem.add(
-                    new StorageItem({
-                      hash: contract.hash,
-                      key: item.key,
-                      value: item.value,
-                      flags: StorageFlags.None,
-                    }),
+        const { hash, script, manifestString } = validateContractArgs({ context, args });
+
+        let contract = await context.blockchain.contract.tryGet({ hash: context.scriptHash });
+        if (contract === undefined) {
+          throw new ContractHashNotFoundError(contextIn, context.scriptHash);
+        }
+
+        if (script.length > 0) {
+          const tryHash = await context.blockchain.contract.tryGet({ hash });
+          if (hash.equals(context.scriptHash) || tryHash !== undefined) {
+            throw new ContractAlreadyDeployedError(context, hash);
+          }
+          contract = new Contract({
+            script,
+            manifest: new ContractManifest({
+              abi: new ContractABI({
+                hash,
+                entryPoint: contract.manifest.abi.entryPoint,
+                methods: contract.manifest.abi.methods,
+                events: contract.manifest.abi.events,
+              }),
+              groups: contract.manifest.groups,
+              features: contract.manifest.features,
+              permissions: contract.manifest.permissions,
+              trusts: contract.manifest.trusts,
+              safeMethods: contract.manifest.safeMethods,
+              extra: contract.manifest.extra,
+            }),
+          });
+
+          await context.blockchain.contract.add(contract);
+
+          if (contract.manifest.hasStorage) {
+            await context.blockchain.storageItem
+              .getAll$({ hash: context.scriptHash })
+              .pipe(
+                concatMap((item) =>
+                  defer(async () =>
+                    context.blockchain.storageItem.add(
+                      new StorageItem({
+                        hash: (contract as Contract).manifest.hash,
+                        key: item.key,
+                        value: item.value,
+                        flags: StorageFlags.None,
+                      }),
+                    ),
                   ),
                 ),
-              ),
-            )
-            .toPromise();
-          context = {
-            ...context,
-            createdContracts: {
-              ...context.createdContracts,
-              [contract.hashHex]: context.scriptHash,
-            },
-          };
+              )
+              .toPromise();
+
+            context = {
+              ...context,
+              createdContracts: {
+                ...context.createdContracts,
+                [contract.manifest.hashHex]: context.scriptHash,
+              },
+            };
+          }
+
+          await destroyContract(options);
         }
 
-        await destroyContract(options);
-
-        if (context.init.listeners.onMigrateContract !== undefined) {
-          context.init.listeners.onMigrateContract({
-            from: context.scriptHash,
-            to: contract.hash,
+        if (manifestString.length > 0) {
+          let manifestJson;
+          try {
+            manifestJson = JSON.parse(manifestString);
+          } catch {
+            throw new InvalidJsonError(context, manifestString);
+          }
+          const newManifest = ContractManifest.fromJSON(manifestJson);
+          contract = new Contract({
+            script: contract.script,
+            manifest: newManifest,
           });
+          if (!manifestIsValid({ manifest: newManifest, hash: crypto.hash160(contract.script) })) {
+            throw new InvalidContractManifestError(context, newManifest);
+          }
+          if (!contract.manifest.hasStorage) {
+            const tryGetStorage = await context.blockchain.storageItem
+              .getAll$({ hash: context.scriptHash })
+              .pipe(toArray())
+              .toPromise();
+
+            if (tryGetStorage.length !== 0) {
+              throw new InvalidContractManifestError(context, newManifest);
+            }
+          }
         }
 
-        return {
-          context,
-          results: [new ContractStackItem(contract)],
-        };
+        return { context };
       },
     })(argsIn),
   ),
@@ -1195,21 +1246,20 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
       const hash = args[0].asUInt160();
       const contractToCall = await context.blockchain.contract.tryGet({ hash });
       if (contractToCall === undefined) {
-        throw new ContractHashNotFoundError(context, common.uInt160ToString(hash));
+        throw new ContractHashNotFoundError(context, hash);
       }
       const contractMethod = args[1];
       const contractMethodString = contractMethod.asString();
       const contractArgs = args[2];
       const callingContract = await context.blockchain.contract.tryGet({ hash: context.scriptHash });
-      const scriptHashString = common.uInt160ToString(context.scriptHash);
       if (callingContract === undefined) {
-        throw new ContractHashNotFoundError(context, scriptHashString);
+        throw new ContractHashNotFoundError(context, context.scriptHash);
       }
       if (!contractToCall.manifest.safeMethods.includes(contractMethodString)) {
-        throw new ContractMethodUndefinedError(context, scriptHashString, contractMethodString);
+        throw new ContractMethodUndefinedError(context, context.scriptHash, contractMethodString);
       }
       if (!canCall({ callingContract, contractToCall, method: contractMethodString })) {
-        throw new InvalidPermissionError(context, scriptHashString, contractMethodString);
+        throw new InvalidPermissionError(context, context.scriptHash, contractMethodString);
       }
 
       const resultContext = await context.engine.executeScript({

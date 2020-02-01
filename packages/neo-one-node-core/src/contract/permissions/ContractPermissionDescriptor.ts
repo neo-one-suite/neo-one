@@ -20,6 +20,12 @@ export class ContractPermissionDescriptor extends ContractPermissionDescriptorMo
     });
   }
 
+  public static fromJSON(permissionDescriptorJSON: ContractPermissionDescriptorJSON): ContractPermissionDescriptor {
+    return new ContractPermissionDescriptor({
+      hashOrGroup: common.stringToUInt160OrECPoint(permissionDescriptorJSON),
+    });
+  }
+
   public static deserializeWire(options: DeserializeWireOptions): ContractPermissionDescriptor {
     return this.deserializeWireBase({
       context: options.context,
