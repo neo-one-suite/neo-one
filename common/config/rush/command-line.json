@@ -402,6 +402,12 @@
       "associatedCommands": ["test", "test-ci", "e2e", "e2e-ci", "e2e-ci:coverage"]
     },
     {
+      "parameterKind": "flag",
+      "longName": "--watch",
+      "description": "jest --watch flag",
+      "associatedCommands": ["test", "test-ci", "e2e", "e2e-ci", "e2e-ci:coverage"]
+    },
+    {
       "parameterKind": "string",
       "longName": "--max-workers",
       "shortName": "-w",
