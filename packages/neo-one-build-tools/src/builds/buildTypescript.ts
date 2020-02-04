@@ -1,6 +1,6 @@
 // tslint:disable: no-any match-default-export-name
 import gulp from 'gulp';
-import gulpPlumber from 'gulp-plumber';
+// import gulpPlumber from 'gulp-plumber';
 import gulpSourcemaps from 'gulp-sourcemaps';
 import ts from 'gulp-typescript';
 import typescript from 'typescript';
@@ -37,7 +37,7 @@ export const buildTypescript = (format: Format, pkgName?: string) => (
     format,
     gulp
       .src(glob)
-      .pipe(gulpPlumber())
+      // .pipe(gulpPlumber())
       .pipe(gulpSourcemaps.init())
       .pipe(project())
       .pipe(replaceRXJSImport(format))

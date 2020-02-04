@@ -1,9 +1,12 @@
+import { createChild, nodeLogger } from '@neo-one/logger';
 import { BinaryReader, Block, Blockchain, DeserializeWireContext } from '@neo-one/node-core';
 import { makeErrorWithCode } from '@neo-one/utils';
 import * as fs from 'fs';
 import _ from 'lodash';
 import { Readable, Transform, Writable } from 'stream';
 import * as zlib from 'zlib';
+
+const logger = createChild(nodeLogger, { service: 'chain-file' });
 
 export const InvalidBlockTransformEncodingError = makeErrorWithCode(
   'INVALID_BLOCK_TRANSFORM_ENCODING',
@@ -124,6 +127,11 @@ export const loadChain = async ({
   readonly chain: Chain;
 }): Promise<void> =>
   new Promise<void>((resolve, reject) => {
+    logger.info({
+      title: 'chain_file_load_start',
+      message: `attempting to sync from chain-file at: ${chain.path}`,
+    });
+
     const stream = getStream(chain);
     const transform = new BlockTransform(blockchain.deserializeWireContext);
 
@@ -178,15 +186,19 @@ export const loadChain = async ({
           }
 
           if (block.index === trackIndex) {
-            // tslint:disable-next-line no-console
-            console.log(`Loaded chain to current index in ${Date.now() - start} ms`);
+            logger.info({
+              title: 'chain_file_load',
+              message: `Loaded chain to current index in ${Date.now() - start} ms`,
+            });
 
             start = Date.now();
           } else if (block.index > trackIndex) {
             processed += 1;
             if (processed >= 100) {
-              // tslint:disable-next-line no-console
-              console.log(`Processed ${processed} blocks in ${Date.now() - start} ms (${block.index})`);
+              logger.info({
+                title: 'chain_file_read',
+                message: `Processed ${processed} blocks in ${Date.now() - start} ms (${block.index})`,
+              });
 
               processed = 0;
               start = Date.now();
@@ -233,8 +245,10 @@ const writeOut = async (blockchain: Blockchain, out: Writable, height: number): 
       await new Promise<void>((resolve) => out.write(buffer, () => resolve()));
       processed += 1;
       if (processed >= 100000) {
-        // tslint:disable-next-line no-console
-        console.log(`Processed ${processed} blocks in ${Date.now() - start} ms`);
+        logger.info({
+          title: 'chain_file_write',
+          message: `Processed ${processed} blocks in ${Date.now() - start} ms`,
+        });
 
         processed = 0;
         start = Date.now();

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/node-offline",
+      "comment": "feat(logs): add better logging to chainfile sync",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/node-offline",
+  "email": "danwbyrne@gmail.com"
+}
