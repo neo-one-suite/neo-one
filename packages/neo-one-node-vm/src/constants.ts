@@ -8,12 +8,14 @@ export const MIN_SHL_SHR = -MAX_SHL_SHR;
 export const MAX_SIZE_BIG_INTEGER = 32;
 export const MAX_STACK_SIZE = 2 * 1024;
 export const MAX_ITEM_SIZE = 1024 * 1024;
+export const MAX_MANIFEST_LENGTH = 2048;
 export const MAX_INVOCATION_STACK_SIZE = 1024;
 export const MAX_ARRAY_SIZE = 1024;
 export const MAX_ARRAY_SIZE_BN = new BN(1024);
 export const BLOCK_HEIGHT_YEAR = 2000000;
 export const BLOCK_HEIGHT_MAX_SIZE_CHECKS = Number.MAX_SAFE_INTEGER;
 export const MAX_PAYLOAD_SIZE = new BN(0x02000000);
+export const GAS_PER_BYTE = new BN(100000);
 
 export const FEES = {
   0: new BN(0),

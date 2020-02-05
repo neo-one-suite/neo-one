@@ -44,6 +44,11 @@ describe('UInt160', () => {
   test('Equals', () => {
     expect(common.uInt160Equal(uInt160, uInt160)).toBeTruthy();
   });
+
+  test('converts string to UInt160', () => {
+    expect(common.stringToUInt160OrECPoint(string160)).toEqual(uInt160);
+    expect(common.stringToUInt160OrECPoint('random string')).toEqual(undefined);
+  });
 });
 
 describe('UInt256', () => {
@@ -108,6 +113,11 @@ describe('ECPoint', () => {
 
   test('EC Point Compare - GT', () => {
     expect(common.ecPointCompare(ecComp, ecPoint)).toEqual(1);
+  });
+
+  test('converts string to ECPoint', () => {
+    expect(common.stringToUInt160OrECPoint(ecString)).toEqual(ecPoint);
+    expect(common.stringToUInt160OrECPoint('random string')).toEqual(undefined);
   });
 });
 

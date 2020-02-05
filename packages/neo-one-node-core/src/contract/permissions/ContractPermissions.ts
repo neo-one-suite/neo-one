@@ -19,6 +19,15 @@ export class ContractPermissions extends ContractPermissionsModel<ContractPermis
     });
   }
 
+  public static fromJSON(permissionJSON: ContractPermissionsJSON): ContractPermissions {
+    const { contract, methods } = permissionJSON;
+
+    return new ContractPermissions({
+      contract: ContractPermissionDescriptor.fromJSON(contract),
+      methods,
+    });
+  }
+
   public static deserializeWire(options: DeserializeWireOptions): ContractPermissions {
     return this.deserializeWireBase({
       context: options.context,

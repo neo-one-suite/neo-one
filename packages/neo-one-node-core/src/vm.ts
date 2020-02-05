@@ -62,6 +62,7 @@ export interface VMListeners {
   readonly onNotify?: (options: { readonly args: readonly ContractParameter[]; readonly scriptHash: UInt160 }) => void;
 
   readonly onLog?: (options: { readonly message: string; readonly scriptHash: UInt160 }) => void;
+  // TODO: we may be able to remove this listener since there is no SysCall `Neo.Contract.Migrate` anymore
   readonly onMigrateContract?: (options: { readonly from: UInt160; readonly to: UInt160 }) => void;
   readonly onSetVotes?: (options: { readonly address: UInt160; readonly votes: readonly ECPoint[] }) => void;
 }

@@ -16,34 +16,20 @@ const signature1 = crypto.sign({
 });
 
 const SYSCALLS: readonly TestCase[] = [
-  // {
-  //   name: 'Neo.Crypto.CheckSig',
-  //   result: [new BooleanStackItem(true)],
-  //   args: [keys[0].publicKey, signature0],
-  //   mockTransaction: ({ transaction }) => {
-  //     transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
-  //   },
-  //   gas: FEES[1_000_000],
-  // },
-
-  // {
-  //   name: 'Neo.Crypto.CheckSig',
-  //   result: [new BooleanStackItem(false)],
-  //   args: [keys[0].publicKey, Buffer.alloc(64, 10)],
-  //   gas: FEES[1_000_000],
-  // },
-
   {
     name: 'Neo.Crypto.ECDsaVerify',
     result: [new BooleanStackItem(true)],
-    args: [Buffer.alloc(32, 10), keys[0].publicKey, signature0],
+    args: [keys[0].publicKey, signature0],
+    mockTransaction: ({ transaction }) => {
+      transaction.messageInternal = jest.fn(() => Buffer.alloc(32, 10));
+    },
     gas: FEES[1_000_000],
   },
 
   {
     name: 'Neo.Crypto.ECDsaVerify',
     result: [new BooleanStackItem(false)],
-    args: [Buffer.alloc(32, 1), keys[0].publicKey, signature0],
+    args: [keys[0].publicKey, Buffer.alloc(64, 10)],
     gas: FEES[1_000_000],
   },
 

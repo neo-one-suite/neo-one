@@ -1,4 +1,4 @@
-import { ContractAbiJSON, IOHelper, JSONHelper } from '@neo-one/client-common';
+import { common, ContractAbiJSON, IOHelper, JSONHelper } from '@neo-one/client-common';
 import { ContractABIModel, ContractABIModelAdd } from '@neo-one/client-full-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from '../../Serializable';
 import { BinaryReader, utils } from '../../utils';
@@ -26,6 +26,17 @@ export class ContractABI extends ContractABIModel<ContractMethodDescriptor, Cont
       entryPoint,
       methods,
       events,
+    });
+  }
+
+  public static fromJSON(abiJSON: ContractAbiJSON): ContractABI {
+    const { hash, entryPoint, methods, events } = abiJSON;
+
+    return new ContractABI({
+      hash: common.stringToUInt160(hash),
+      entryPoint: ContractMethodDescriptor.fromJSON(entryPoint),
+      methods: methods.map((method) => ContractMethodDescriptor.fromJSON(method)),
+      events: events.map((event) => ContractEvent.fromJSON(event)),
     });
   }
 

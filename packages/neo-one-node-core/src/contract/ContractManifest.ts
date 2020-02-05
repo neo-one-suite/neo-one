@@ -3,6 +3,7 @@ import {
   assertContractPropertyState,
   ContractManifestModel,
   ContractManifestModelAdd,
+  getContractProperties,
 } from '@neo-one/client-full-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableJSON } from '../Serializable';
 import { BinaryReader, utils } from '../utils';
@@ -29,6 +30,19 @@ export class ContractManifest extends ContractManifestModel<ContractABI, Contrac
       trusts,
       safeMethods,
       features,
+    });
+  }
+
+  public static fromJSON(manifestJSON: ContractManifestJSON): ContractManifest {
+    const { abi, groups, permissions, trusts, safeMethods, features } = manifestJSON;
+
+    return new ContractManifest({
+      abi: ContractABI.fromJSON(abi),
+      groups: groups.map((group) => ContractGroup.fromJSON(group)),
+      permissions: permissions.map((permission) => ContractPermissions.fromJSON(permission)),
+      trusts: trusts.map((trust) => common.stringToUInt160(trust)),
+      safeMethods,
+      features: getContractProperties({ hasStorage: features.storage, payable: features.payable }),
     });
   }
 

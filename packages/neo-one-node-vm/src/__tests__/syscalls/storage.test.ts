@@ -99,29 +99,29 @@ const SYSCALLS: readonly TestCase[] = [
     gas: FEES[1_000_000],
   },
 
-  // {
-  //   name: 'System.Storage.AsReadOnly',
-  //   result: ({ transaction }) => (stack) => {
-  //     expect(stack.length).toEqual(1);
-  //     // It should equal the call's script hash.
-  //     expect(stack[0].value).not.toEqual(crypto.toScriptHash(transaction.script));
+  {
+    name: 'System.Storage.AsReadOnly',
+    result: ({ transaction }) => (stack) => {
+      expect(stack.length).toEqual(1);
+      // It should equal the call's script hash.
+      expect(stack[0].value).not.toEqual(crypto.toScriptHash(transaction.script));
 
-  //     expect(stack[0].isReadOnly).toBeTruthy();
-  //   },
-  //   args: [
-  //     {
-  //       type: 'calls',
-  //       calls: [
-  //         {
-  //           name: 'System.Storage.GetContext',
-  //           type: 'sys',
-  //         },
-  //       ],
-  //     },
-  //   ],
+      expect(stack[0].isReadOnly).toBeTruthy();
+    },
+    args: [
+      {
+        type: 'calls',
+        calls: [
+          {
+            name: 'System.Storage.GetContext',
+            type: 'sys',
+          },
+        ],
+      },
+    ],
 
-  //   gas: FEES[400],
-  // },
+    gas: FEES[400],
+  },
 
   {
     name: 'System.Storage.Put',

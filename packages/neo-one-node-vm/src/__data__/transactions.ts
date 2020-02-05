@@ -1,4 +1,6 @@
+import { crypto, ScriptBuilder } from '@neo-one/client-common';
 import {
+  AttributeUsage,
   BufferAttribute,
   contractParamDeclaration,
   ContractParameterType,
@@ -9,9 +11,13 @@ import {
   createContractMethodDescriptor,
   Transaction,
   TransactionAdd,
+  UInt160Attribute,
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';
+import { MAX_MANIFEST_LENGTH } from '../constants';
 import { keys } from './keys';
+
+export const manifestTooLarge = 'x'.repeat(MAX_MANIFEST_LENGTH + 1);
 
 export const createTransaction = ({
   nonce = 0,
@@ -42,6 +48,48 @@ export const kycContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(kycContractScript),
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.void],
+      }),
+    }),
+  }),
+});
+
+export const kycContractManifestString = JSON.stringify(kycContract.manifest.serializeJSON());
+
+export const kycContractNoGroups = createContract({
+  script: kycContractScript,
+  manifest: createContractManifest({
+    features: ContractPropertyState.NoProperty,
+    groups: [],
+    abi: createContractAbi({
+      hash: crypto.toScriptHash(kycContractScript),
+      entryPoint: createContractMethodDescriptor({
+        parameters: [contractParamDeclaration.void],
+      }),
+    }),
+  }),
+});
+
+export const kycContractNoGroupsManifestString = JSON.stringify(kycContractNoGroups.manifest.serializeJSON());
+
+export const contractUpdateTransaction = createTransaction({
+  script: new ScriptBuilder().emitSysCall('System.Contract.Update').build(),
+  attributes: [
+    new UInt160Attribute({
+      usage: AttributeUsage.Script,
+      data: keys[0].scriptHash,
+    }),
+  ],
+});
+
+export const kycContractMatchingUpdateScript = createContract({
+  script: contractUpdateTransaction.script,
+  manifest: createContractManifest({
+    features: ContractPropertyState.HasStoragePayable,
+    abi: createContractAbi({
+      hash: crypto.toScriptHash(kycContractScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.void],
       }),
@@ -86,6 +134,7 @@ export const conciergeContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(conciergeContractScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.Void,
@@ -104,6 +153,7 @@ export const switcheoTokenContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(switcheoTokenContractScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -122,6 +172,7 @@ export const switcheoContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(switcheoContractScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -140,6 +191,7 @@ export const switcheoV3Contract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(switcheoV3ContractScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -158,6 +210,7 @@ export const switcheoV2TokenContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(switcheoTokenV2ContractScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -176,6 +229,7 @@ export const nosTokenContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(nosTokenScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -194,6 +248,7 @@ export const narrativeTokenContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(narrativeTokenScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -212,6 +267,7 @@ export const wowbitTokenContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(wowbitTokenContractScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -230,6 +286,7 @@ export const rpxTokenContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(rpxTokenContractScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -253,6 +310,7 @@ export const aphelionExchangeContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(aphelionExhangeScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -271,6 +329,7 @@ export const aphelionDexContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(aphelionDexScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -289,6 +348,7 @@ export const bridgeProtocolTokenContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(bridgeProtocolTokenContractScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -307,6 +367,7 @@ export const bridgeProtocolKeyServer = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(bridgeProtocolKeyServerScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -325,6 +386,7 @@ export const nexTokenContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(nexTokenContractScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -343,6 +405,7 @@ export const timeCoinContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(timeCoinContractScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,
@@ -361,6 +424,7 @@ export const deepBrainContract = createContract({
   manifest: createContractManifest({
     features: ContractPropertyState.HasStoragePayable,
     abi: createContractAbi({
+      hash: crypto.toScriptHash(deepBrainContractScript),
       entryPoint: createContractMethodDescriptor({
         parameters: [contractParamDeclaration.string, contractParamDeclaration.array],
         returnType: ContractParameterType.ByteArray,

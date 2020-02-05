@@ -262,7 +262,6 @@ export interface ContractMethodDescriptorJSON {
   readonly name: string;
   readonly parameters: readonly ContractParameterDeclarationJSON[];
   readonly returnType: ContractParameterTypeJSON;
-  readonly constant?: boolean;
 }
 
 export interface ContractEventJSON {

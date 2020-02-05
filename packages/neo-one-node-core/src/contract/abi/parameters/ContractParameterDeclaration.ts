@@ -3,6 +3,7 @@ import {
   common,
   ContractParameterDeclarationJSON,
   IOHelper,
+  toContractParameterType,
   toJSONContractParameterType,
 } from '@neo-one/client-common';
 import { ContractParameterDeclarationModel } from '@neo-one/client-full-common';
@@ -26,6 +27,15 @@ export class ContractParameterDeclaration extends ContractParameterDeclarationMo
     return new ContractParameterDeclaration({
       name,
       type,
+    });
+  }
+
+  public static fromJSON(parameterDeclarationJSON: ContractParameterDeclarationJSON): ContractParameterDeclaration {
+    const { name, type } = parameterDeclarationJSON;
+
+    return new ContractParameterDeclaration({
+      name,
+      type: toContractParameterType(type),
     });
   }
 

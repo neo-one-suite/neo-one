@@ -1,5 +1,5 @@
-import { common, OpCode } from '@neo-one/client-common';
-import { disassembleByteCode } from '@neo-one/node-core';
+import { common, OpCode, UInt160 } from '@neo-one/client-common';
+import { ContractManifest, disassembleByteCode } from '@neo-one/node-core';
 import { makeErrorWithCode } from '@neo-one/utils';
 import { BN } from 'bn.js';
 import { ExecutionContext, MAX_PAYLOAD_SIZE } from './constants';
@@ -165,18 +165,29 @@ export const InvalidClaimTransactionError = makeErrorWithCode('VM_ERROR', (conte
 export const ContractNoStorageError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, hash: string) =>
   getMessage(context, `Contract Does Not Have Storage: ${hash}`),
 );
-export const ContractHashNotFoundError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, hash: string) =>
-  getMessage(context, `Contract Hash Not Found: ${hash}`),
+export const ContractHashNotFoundError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, hash: UInt160) =>
+  getMessage(context, `Contract Hash Not Found: ${common.uInt160ToString(hash)}`),
+);
+export const ContractAlreadyDeployedError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, hash: UInt160) =>
+  getMessage(context, `Contract Hash Already Exists: ${common.uInt160ToString(hash)}`),
+);
+export const InvalidJsonError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext, manifestString: string) =>
+  getMessage(context, `Invalid JSON: ${manifestString}`),
 );
 export const ContractMethodUndefinedError = makeErrorWithCode(
   'VM_ERROR',
-  (context: ExecutionContext, hash: string, method: string) =>
-    getMessage(context, `Contract Method Undefined for Contract: ${hash}. Method: ${method}`),
+  (context: ExecutionContext, hash: UInt160, method: string) =>
+    getMessage(context, `Contract Method Undefined for Contract: ${common.uInt160ToString(hash)}. Method: ${method}`),
+);
+export const InvalidContractManifestError = makeErrorWithCode(
+  'VM_ERROR',
+  (context: ExecutionContext, manifest: ContractManifest) =>
+    getMessage(context, `Contract Manifest Invalid: ${JSON.stringify(manifest.serializeJSON())}`),
 );
 export const InvalidPermissionError = makeErrorWithCode(
   'VM_ERROR',
-  (context: ExecutionContext, hash: string, method: string) =>
-    getMessage(context, `Contract ${hash} does not have permission to call ${method}`),
+  (context: ExecutionContext, hash: UInt160, method: string) =>
+    getMessage(context, `Contract ${common.uInt160ToString(hash)} does not have permission to call ${method}`),
 );
 export const TooManyVotesError = makeErrorWithCode('VM_ERROR', (context: ExecutionContext) =>
   getMessage(context, 'Too Many Votes'),

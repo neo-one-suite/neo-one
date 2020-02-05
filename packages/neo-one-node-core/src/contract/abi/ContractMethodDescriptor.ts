@@ -3,6 +3,7 @@ import {
   common,
   ContractMethodDescriptorJSON,
   IOHelper,
+  toContractParameterType,
   toJSONContractParameterType,
 } from '@neo-one/client-common';
 import { ContractMethodDescriptorModel } from '@neo-one/client-full-common';
@@ -27,6 +28,16 @@ export class ContractMethodDescriptor extends ContractMethodDescriptorModel<Cont
       name,
       parameters,
       returnType,
+    });
+  }
+
+  public static fromJSON(contractMethodJSON: ContractMethodDescriptorJSON): ContractMethodDescriptor {
+    const { name, parameters, returnType } = contractMethodJSON;
+
+    return new ContractMethodDescriptor({
+      name,
+      parameters: parameters.map((parameter) => ContractParameterDeclaration.fromJSON(parameter)),
+      returnType: toContractParameterType(returnType),
     });
   }
 
