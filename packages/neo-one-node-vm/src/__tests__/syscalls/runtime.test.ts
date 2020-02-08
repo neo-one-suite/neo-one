@@ -10,6 +10,7 @@ import {
   BufferStackItem,
   ConsensusPayloadStackItem,
   IntegerStackItem,
+  NullStackItem,
   TransactionStackItem,
   UInt160StackItem,
   UInt256StackItem,
@@ -40,14 +41,14 @@ const SYSCALLS: readonly TestCase[] = [
     name: 'System.Runtime.Notify',
     result: [],
     args: [[true]],
-    gas: FEES[250],
+    gas: FEES[1_000_000],
   },
 
   {
     name: 'System.Runtime.Log',
     result: [],
     args: ['foo'],
-    gas: FEES[30_0000],
+    gas: FEES[1_000_000],
   },
 
   {
@@ -171,7 +172,7 @@ const SYSCALLS: readonly TestCase[] = [
 
   {
     name: 'System.Runtime.GetCallingScriptHash',
-    result: [new BufferStackItem(Buffer.alloc(0, 0))],
+    result: [new NullStackItem()],
     gas: FEES[400],
   },
   {

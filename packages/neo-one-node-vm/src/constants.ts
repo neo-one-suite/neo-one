@@ -1,4 +1,4 @@
-import { common, OpCode, SysCallName, UInt160, VMState } from '@neo-one/client-common';
+import { OpCode, SysCallName, UInt160, VMState } from '@neo-one/client-common';
 import { Block, ExecutionAction, ScriptContainer, TriggerType, VMListeners, WriteBlockchain } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { StackItem } from './stackItem';
@@ -51,7 +51,7 @@ export const FEES = {
   8_000_000: new BN(8000000),
 };
 
-export const FREE_GAS = common.TEN_FIXED8;
+export const FREE_GAS = FEES[0];
 export type ExecutionStack = readonly StackItem[];
 export interface ExecutionInit {
   readonly scriptContainer: ScriptContainer;

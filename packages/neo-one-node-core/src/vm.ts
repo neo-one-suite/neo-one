@@ -26,7 +26,8 @@ export enum TriggerType {
   System = 0x01,
   Verification = 0x20,
   Application = 0x40,
-  // TODO: We may need to add an "All" member like they do in C# code
+  // tslint:disable-next-line: no-bitwise
+  All = 0x01 | 0x20 | 0x40,
 }
 
 // Application
@@ -62,7 +63,8 @@ export interface VMListeners {
   readonly onNotify?: (options: { readonly args: readonly ContractParameter[]; readonly scriptHash: UInt160 }) => void;
 
   readonly onLog?: (options: { readonly message: string; readonly scriptHash: UInt160 }) => void;
-  // TODO: we may be able to remove this listener since there is no SysCall `Neo.Contract.Migrate` anymore
+  // TODO: update this to be onUpdateContract. Make it implement the same type of logic for when "updating" contracts
+  // then add to System.Contract.Update syscall
   readonly onMigrateContract?: (options: { readonly from: UInt160; readonly to: UInt160 }) => void;
   readonly onSetVotes?: (options: { readonly address: UInt160; readonly votes: readonly ECPoint[] }) => void;
 }

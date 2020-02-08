@@ -301,8 +301,8 @@ const checkStorage = async ({ context, hash }: { readonly context: ExecutionCont
 function getContractFee<T>(func: (args: CreateSysCallArgs, fee: BN) => T): (args: CreateSysCallArgs) => T {
   return (args) => {
     const { context } = args;
-    const byteSize = context.stack[0].size + context.stack[1].size;
-    const fee = GAS_PER_BYTE.mul(new BN(byteSize));
+    const byteSize = new BN(context.stack[0].size).add(new BN(context.stack[1].size));
+    const fee = GAS_PER_BYTE.mul(byteSize);
 
     return func(args, fee);
   };
@@ -333,7 +333,6 @@ const destroyContract = async ({ context }: OpInvokeArgs) => {
   }
 };
 
-// TODO: fix this
 const createPut = ({ name }: { readonly name: 'System.Storage.Put' | 'System.Storage.PutEx' }) => ({
   context: contextIn,
 }: CreateSysCallArgs) => {
@@ -348,7 +347,7 @@ const createPut = ({ name }: { readonly name: 'System.Storage.Put' | 'System.Sto
   return createSysCall({
     name,
     in: expectedIn,
-    fee: FEES[100_000].mul(numBytes),
+    fee: GAS_PER_BYTE.mul(numBytes),
     invoke: async ({ context, args }) => {
       if (context.init.triggerType !== TriggerType.Application) {
         throw new InvalidVerifySyscallError(context, name);
@@ -443,7 +442,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
   'System.Runtime.Notify': createSysCall({
     name: 'System.Runtime.Notify',
     in: 1,
-    fee: FEES[250],
+    fee: FEES[1_000_000],
     invoke: async ({ context, args }) => {
       const { onNotify } = context.init.listeners;
       if (onNotify !== undefined) {
@@ -467,7 +466,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
   'System.Runtime.Log': createSysCall({
     name: 'System.Runtime.Log',
     in: 1,
-    fee: FEES[300_000],
+    fee: FEES[1_000_000],
     invoke: async ({ context, args }) => {
       const { onLog } = context.init.listeners;
       if (onLog !== undefined) {
@@ -573,7 +572,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     name: 'System.Json.Serialize',
     in: 1,
     out: 1,
-    fee: FEES[400],
+    fee: FEES[100_000],
     invoke: async ({ context, args }) => ({
       context,
       results: [serializeJson(args[0])],
@@ -584,7 +583,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     name: 'System.Json.Deserialize',
     in: 1,
     out: 1,
-    fee: FEES[400],
+    fee: FEES[500_000],
     invoke: async ({ context, args }) => ({
       context,
       results: [deserializeJson(args[0].asString())],
@@ -823,7 +822,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
 
       return {
         context,
-        results: [contract === undefined ? new BufferStackItem(Buffer.alloc(0, 0)) : new ContractStackItem(contract)],
+        results: [contract === undefined ? new NullStackItem() : new ContractStackItem(contract)],
       };
     },
   }),
@@ -862,11 +861,9 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
         key: args[1].asBuffer(),
       });
 
-      const result = item === undefined ? Buffer.from([]) : item.value;
-
       return {
         context,
-        results: [new BufferStackItem(result)],
+        results: [item === undefined ? new NullStackItem() : new BufferStackItem(item.value)],
       };
     },
   }),
@@ -1334,7 +1331,6 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
         value: args[0],
         write: true,
       }).value;
-      await checkStorage({ context, hash });
       const key = args[1].asBuffer();
       const existing = await context.blockchain.storageItem.tryGet({ hash, key });
       if (existing !== undefined) {
@@ -1393,9 +1389,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     invoke: async ({ context }) => ({
       context,
       results: [
-        context.scriptHashStack.length > 1
-          ? new UInt160StackItem(context.scriptHashStack[1])
-          : new BufferStackItem(Buffer.alloc(0, 0)),
+        context.scriptHashStack.length > 1 ? new UInt160StackItem(context.scriptHashStack[1]) : new NullStackItem(),
       ],
     }),
   }),
