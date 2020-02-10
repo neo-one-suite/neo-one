@@ -27,10 +27,5 @@
       "bn.js": ["node_modules/@neo-one/build-tools/types/bn.js.d.ts"]
     }
   },
-  "exclude": [
-    "./packages/*/node_modules",
-    "./packages/*/lib",
-    "./packages/*/src/__data__/contracts/**/*.ts",
-    "./packages/*/template/**/*.ts?(x)"
-  ]
+  "exclude": ["./packages/*/src/__data__/contracts/**/*.ts", "./packages/*/template/**/*.ts?(x)"]
 }
