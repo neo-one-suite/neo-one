@@ -86,42 +86,42 @@ const SYSCALLS: readonly TestCase[] = [
     name: 'System.Json.Serialize',
     result: [new StringStackItem(JSON.stringify(simpleJson))],
     args: [simpleJsonToBuffer],
-    gas: FEES[400],
+    gas: FEES[100_000],
   },
 
   {
     name: 'System.Json.Serialize',
     result: [new StringStackItem(JSON.stringify(nestedJson))],
     args: [nestedJsonToBuffer],
-    gas: FEES[400],
+    gas: FEES[100_000],
   },
 
   {
     name: 'System.Json.Serialize',
     result: [new StringStackItem(JSON.stringify(1))],
     args: [1],
-    gas: FEES[400],
+    gas: FEES[100_000],
   },
 
   {
     name: 'System.Json.Deserialize',
     result: [simpleMapStackItem],
     args: [JSON.stringify(simpleJson)],
-    gas: FEES[400],
+    gas: FEES[500_000],
   },
 
   {
     name: 'System.Json.Deserialize',
     result: [nestedMapStackItem],
     args: [JSON.stringify(nestedJson)],
-    gas: FEES[400],
+    gas: FEES[500_000],
   },
 
   {
     name: 'System.Json.Deserialize',
     result: [new IntegerStackItem(new BN(1))],
     args: ['1'],
-    gas: FEES[400],
+    gas: FEES[500_000],
   },
 ];
 

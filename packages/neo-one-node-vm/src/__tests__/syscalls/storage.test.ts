@@ -5,7 +5,7 @@ import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciter
 import { BN } from 'bn.js';
 import { runSysCalls, TestCase } from '../../__data__';
 import { FEES } from '../../constants';
-import { BufferStackItem, StorageContextStackItem } from '../../stackItem';
+import { BufferStackItem, NullStackItem, StorageContextStackItem } from '../../stackItem';
 
 const SYSCALLS: readonly TestCase[] = [
   {
@@ -49,7 +49,7 @@ const SYSCALLS: readonly TestCase[] = [
 
   {
     name: 'System.Storage.Get',
-    result: [new BufferStackItem(Buffer.from([]))],
+    result: [new NullStackItem()],
     args: [
       {
         type: 'calls',

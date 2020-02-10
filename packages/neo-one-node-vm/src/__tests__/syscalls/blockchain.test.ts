@@ -6,9 +6,9 @@ import { keys, runSysCalls, scriptAttributeHash, TestCase, transactions } from '
 import { FEES } from '../../constants';
 import {
   BlockStackItem,
-  BufferStackItem,
   ContractStackItem,
   IntegerStackItem,
+  NullStackItem,
   TransactionStackItem,
 } from '../../stackItem';
 
@@ -140,7 +140,7 @@ const SYSCALLS: readonly TestCase[] = [
 
   {
     name: 'System.Blockchain.GetContract',
-    result: [new BufferStackItem(Buffer.alloc(0, 0))],
+    result: [new NullStackItem()],
     mockBlockchain: ({ blockchain }) => {
       blockchain.contract.tryGet = jest.fn(async () => Promise.resolve(undefined));
     },
