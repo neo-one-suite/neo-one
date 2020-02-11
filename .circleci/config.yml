@@ -1,27 +1,27 @@
 aliases:
   - &restore-yarn-cache-10
     keys:
-      - v8-yarn-10-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
+      - v9-yarn-10-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
       # Fallback in case checksum fails
-      - v8-yarn-10-{{ .Branch }}-
+      - v9-yarn-10-{{ .Branch }}-
 
   - &save-yarn-cache-10
     paths:
       - common/temp/node_modules
       - common/temp/yarn-cache
-    key: v8-yarn-10-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
+    key: v9-yarn-10-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
 
   - &restore-yarn-cache-12
     keys:
-      - v8-yarn-12-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
+      - v9-yarn-12-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
       # Fallback in case checksum fails
-      - v8-yarn-12-{{ .Branch }}-
+      - v9-yarn-12-{{ .Branch }}-
 
   - &save-yarn-cache-12
     paths:
       - common/temp/node_modules
       - common/temp/yarn-cache
-    key: v8-yarn-12-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
+    key: v9-yarn-12-{{ .Branch }}-{{ checksum "common/config/rush/yarn.lock" }}
 
   - &filter-ignore-bors-tmp
     branches:

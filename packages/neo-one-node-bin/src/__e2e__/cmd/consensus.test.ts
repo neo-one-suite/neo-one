@@ -3,6 +3,7 @@
 import { NEOONEDataProvider } from '@neo-one/client';
 import fetch from 'cross-fetch';
 import fs from 'fs-extra';
+// tslint:disable-next-line: match-default-export-name
 import nodePath from 'path';
 import { consensus as testConfig } from '../../__data__/configs';
 
