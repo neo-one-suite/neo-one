@@ -38,7 +38,7 @@ module.exports = ({ path }) => ({
     '^.+\\.jsx?$': [
       `${jest_root}/node_modules/babel-jest`,
       {
-        configFile: require.resolve('../babel.config.js'),
+        configFile: require.resolve(jest_root + '/babel.config.js'),
         babelrc: true,
         babelrcRoots: './packages/*',
       },
