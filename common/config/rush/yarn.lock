@@ -1929,7 +1929,7 @@
 
 "@rush-temp/build-tests@file:./projects/build-tests.tgz":
   version "0.0.0"
-  resolved "file:./projects/build-tests.tgz#d72223165490f333b5e75327ff819663c4a0ca46"
+  resolved "file:./projects/build-tests.tgz"
   dependencies:
     "@babel/preset-env" "^7.6.3"
     app-root-dir "^1.0.2"
@@ -1948,7 +1948,7 @@
 
 "@rush-temp/build-tools-web@file:./projects/build-tools-web.tgz":
   version "0.0.0"
-  resolved "file:./projects/build-tools-web.tgz#9bf5478dd40e24f2a0e80088c972ddcef8b352ef"
+  resolved "file:./projects/build-tools-web.tgz"
   dependencies:
     "@babel/core" "^7.6.2"
     "@babel/plugin-proposal-async-generator-functions" "^7.2.0"
@@ -2022,7 +2022,7 @@
 
 "@rush-temp/build-tools@file:./projects/build-tools.tgz":
   version "0.0.0"
-  resolved "file:./projects/build-tools.tgz#33ff887893909b32a19d633687db662504d33647"
+  resolved "file:./projects/build-tools.tgz"
   dependencies:
     "@types/fs-extra" "^8.0.0"
     "@types/gulp" "^4.0.6"
@@ -2069,7 +2069,7 @@
 
 "@rush-temp/cli-common-node@file:./projects/cli-common-node.tgz":
   version "0.0.0"
-  resolved "file:./projects/cli-common-node.tgz#49fcb8b3ad12a04cb9bb85ef74856c4789e8bc80"
+  resolved "file:./projects/cli-common-node.tgz"
   dependencies:
     "@types/fs-extra" "^8.0.0"
     "@types/lodash" "^4.14.138"
@@ -2086,7 +2086,7 @@
 
 "@rush-temp/cli-common@file:./projects/cli-common.tgz":
   version "0.0.0"
-  resolved "file:./projects/cli-common.tgz#b8c0646ce8db53d978aeb7119483f1a8f691fa4f"
+  resolved "file:./projects/cli-common.tgz"
   dependencies:
     bignumber.js "^9.0.0"
     gulp "~4.0.2"
@@ -2094,7 +2094,7 @@
 
 "@rush-temp/cli@file:./projects/cli.tgz":
   version "0.0.0"
-  resolved "file:./projects/cli.tgz#d0bd474d93490ca5a2ebaea5f0e93b56275f6e99"
+  resolved "file:./projects/cli.tgz"
   dependencies:
     "@angular/core" "^8.2.7"
     "@babel/core" "^7.6.2"
@@ -2131,7 +2131,7 @@
 
 "@rush-temp/client-common@file:./projects/client-common.tgz":
   version "0.0.0"
-  resolved "file:./projects/client-common.tgz#663cc08778c16de97e7718ce275e1039f12163ef"
+  resolved "file:./projects/client-common.tgz"
   dependencies:
     "@neo-one/ec-key" "^0.1.0"
     "@types/bn.js" "^4.11.5"
@@ -2160,7 +2160,7 @@
 
 "@rush-temp/client-core@file:./projects/client-core.tgz":
   version "0.0.0"
-  resolved "file:./projects/client-core.tgz#eae3c7e3655480087cd454b0a93d072174abeda2"
+  resolved "file:./projects/client-core.tgz"
   dependencies:
     "@reactivex/ix-es2015-cjs" "^2.5.3"
     "@reactivex/ix-esnext-esm" "^2.5.3"
@@ -2183,7 +2183,7 @@
 
 "@rush-temp/client-full-common@file:./projects/client-full-common.tgz":
   version "0.0.0"
-  resolved "file:./projects/client-full-common.tgz#16e0c1cffd76d1b33210e731b329892a4264c90f"
+  resolved "file:./projects/client-full-common.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     gulp "~4.0.2"
@@ -2191,7 +2191,7 @@
 
 "@rush-temp/client-full-core@file:./projects/client-full-core.tgz":
   version "0.0.0"
-  resolved "file:./projects/client-full-core.tgz#c95b6c1762e298e4ec30fd4fc336b6321f236365"
+  resolved "file:./projects/client-full-core.tgz"
   dependencies:
     "@reactivex/ix-es2015-cjs" "^2.5.3"
     "@types/bn.js" "^4.11.5"
@@ -2206,13 +2206,13 @@
 
 "@rush-temp/client-full@file:./projects/client-full.tgz":
   version "0.0.0"
-  resolved "file:./projects/client-full.tgz#8d736690d0bd10044c8ec1ca3663723aeaa6d0a7"
+  resolved "file:./projects/client-full.tgz"
   dependencies:
     gulp "~4.0.2"
 
 "@rush-temp/client-switch@file:./projects/client-switch.tgz":
   version "0.0.0"
-  resolved "file:./projects/client-switch.tgz#eb170163ba46b026297e4aea3a408da93358d1ba"
+  resolved "file:./projects/client-switch.tgz"
   dependencies:
     "@babel/code-frame" "^7.0.0"
     "@ledgerhq/hw-transport-u2f" "^4.68.2"
@@ -2239,13 +2239,13 @@
 
 "@rush-temp/client@file:./projects/client.tgz":
   version "0.0.0"
-  resolved "file:./projects/client.tgz#8703e8b33a230688c013e5924c77f33e14d270fc"
+  resolved "file:./projects/client.tgz"
   dependencies:
     gulp "~4.0.2"
 
 "@rush-temp/developer-tools-frame@file:./projects/developer-tools-frame.tgz":
   version "0.0.0"
-  resolved "file:./projects/developer-tools-frame.tgz#4c33c2dbe2caf4ac69cf7e2cd9b22532a7195a43"
+  resolved "file:./projects/developer-tools-frame.tgz"
   dependencies:
     "@emotion/core" "^10.0.22"
     "@emotion/styled" "^10.0.23"
@@ -2274,7 +2274,7 @@
 
 "@rush-temp/developer-tools@file:./projects/developer-tools.tgz":
   version "0.0.0"
-  resolved "file:./projects/developer-tools.tgz#e31f1fa3b9998e5a015888d2231e0fcf79ba4e24"
+  resolved "file:./projects/developer-tools.tgz"
   dependencies:
     gulp "~4.0.2"
     resize-observer-polyfill "^1.5.0"
@@ -2282,7 +2282,7 @@
 
 "@rush-temp/editor-server@file:./projects/editor-server.tgz":
   version "0.0.0"
-  resolved "file:./projects/editor-server.tgz#9ab8b839d813b701d0a4c803130bf174a61e1c15"
+  resolved "file:./projects/editor-server.tgz"
   dependencies:
     "@types/graphlib" "^2.1.5"
     "@types/jest" "^24.0.18"
@@ -2311,7 +2311,7 @@
 
 "@rush-temp/editor@file:./projects/editor.tgz":
   version "0.0.0"
-  resolved "file:./projects/editor.tgz#b8f345c17fb3dc3cb81814440e122dc33fa9027f"
+  resolved "file:./projects/editor.tgz"
   dependencies:
     "@babel/code-frame" "^7.0.0"
     "@babel/plugin-proposal-async-generator-functions" "^7.2.0"
@@ -2354,7 +2354,7 @@
     jest-matchers "^20.0.3"
     jest-mock "^24.0.0"
     lodash "^4.17.15"
-    monaco-editor "^0.18.1"
+    monaco-editor "^0.17.1"
     monaco-textmate "^3.0.0"
     nanoid "^2.0.3"
     onigasm "^2.2.2"
@@ -2382,7 +2382,7 @@
 
 "@rush-temp/http-context@file:./projects/http-context.tgz":
   version "0.0.0"
-  resolved "file:./projects/http-context.tgz#c2547b314ef0d96bee7614e1f19652e0993b8bd5"
+  resolved "file:./projects/http-context.tgz"
   dependencies:
     "@types/koa" "^2.0.49"
     gulp "~4.0.2"
@@ -2391,7 +2391,7 @@
 
 "@rush-temp/http@file:./projects/http.tgz":
   version "0.0.0"
-  resolved "file:./projects/http.tgz#c6ff4cba9e166dfa848f00cb9dbe0be579bed02c"
+  resolved "file:./projects/http.tgz"
   dependencies:
     "@types/koa" "^2.0.49"
     "@types/koa-bodyparser" "^4.3.0"
@@ -2406,7 +2406,7 @@
 
 "@rush-temp/local-browser-worker@file:./projects/local-browser-worker.tgz":
   version "0.0.0"
-  resolved "file:./projects/local-browser-worker.tgz#1e9843ca121af30798adc6194e5106bf32d36844"
+  resolved "file:./projects/local-browser-worker.tgz"
   dependencies:
     "@types/nanoid" "^2.0.0"
     "@types/pouchdb" "^6.4.0"
@@ -2419,7 +2419,7 @@
 
 "@rush-temp/local-browser@file:./projects/local-browser.tgz":
   version "0.0.0"
-  resolved "file:./projects/local-browser.tgz#c68c577b35e90e02b19956363ef23c5b2e91cda7"
+  resolved "file:./projects/local-browser.tgz"
   dependencies:
     "@types/lodash" "^4.14.138"
     "@types/nanoid" "^2.0.0"
@@ -2437,21 +2437,21 @@
 
 "@rush-temp/local-singleton@file:./projects/local-singleton.tgz":
   version "0.0.0"
-  resolved "file:./projects/local-singleton.tgz#a4d04ed98bcefa5b806d0c271ec6766510949f10"
+  resolved "file:./projects/local-singleton.tgz"
   dependencies:
     core-js "^3.2.1"
     tslib "^1.10.0"
 
 "@rush-temp/logger-config@file:./projects/logger-config.tgz":
   version "0.0.0"
-  resolved "file:./projects/logger-config.tgz#e08a99cfb217afcd1cede25260d95922c234a65d"
+  resolved "file:./projects/logger-config.tgz"
   dependencies:
     gulp "~4.0.2"
     tslib "^1.10.0"
 
 "@rush-temp/logger@file:./projects/logger.tgz":
   version "0.0.0"
-  resolved "file:./projects/logger.tgz#8af27e13c689f3943da2fe594333a740718f798d"
+  resolved "file:./projects/logger.tgz"
   dependencies:
     "@types/pino" "^5.8.9"
     gulp "~4.0.2"
@@ -2461,7 +2461,7 @@
 
 "@rush-temp/node-bin@file:./projects/node-bin.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-bin.tgz#fc5ff4814a321514a9f995ce3fe8f002dfb08061"
+  resolved "file:./projects/node-bin.tgz"
   dependencies:
     "@types/fs-extra" "^8.0.0"
     "@types/jest" "^24.0.18"
@@ -2481,7 +2481,7 @@
 
 "@rush-temp/node-blockchain@file:./projects/node-blockchain.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-blockchain.tgz#d20518db1940b20ab39d948522bc7aba77593755"
+  resolved "file:./projects/node-blockchain.tgz"
   dependencies:
     "@types/bn.js" "^4.11.5"
     "@types/jest" "^24.0.18"
@@ -2496,7 +2496,7 @@
 
 "@rush-temp/node-browser-worker@file:./projects/node-browser-worker.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-browser-worker.tgz#1381e1248a89f4e8c455b4521dc13645094b167d"
+  resolved "file:./projects/node-browser-worker.tgz"
   dependencies:
     core-js "^3.2.1"
     file-loader "^5.0.2"
@@ -2504,7 +2504,7 @@
 
 "@rush-temp/node-browser@file:./projects/node-browser.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-browser.tgz#2352edf5c53d5a264be276446d5fda85ea897383"
+  resolved "file:./projects/node-browser.tgz"
   dependencies:
     "@types/level-js" "^4.0.1"
     "@types/levelup" "^3.1.1"
@@ -2517,7 +2517,7 @@
 
 "@rush-temp/node-consensus@file:./projects/node-consensus.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-consensus.tgz#f20381174fde6c7777a08fc8941d821462b7501d"
+  resolved "file:./projects/node-consensus.tgz"
   dependencies:
     "@reactivex/ix-es2015-cjs" "^2.5.3"
     "@reactivex/ix-esnext-esm" "^2.5.3"
@@ -2532,7 +2532,7 @@
 
 "@rush-temp/node-core@file:./projects/node-core.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-core.tgz#34a056b4699f31625dc870c5fbd5b87f2ad02bbd"
+  resolved "file:./projects/node-core.tgz"
   dependencies:
     "@types/bn.js" "^4.11.5"
     "@types/jest" "^24.0.18"
@@ -2548,7 +2548,7 @@
 
 "@rush-temp/node-http-rpc@file:./projects/node-http-rpc.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-http-rpc.tgz#0c690e5bd3bb77611537b43cebd8e4e1d98e7fb2"
+  resolved "file:./projects/node-http-rpc.tgz"
   dependencies:
     "@types/koa" "^2.0.49"
     "@types/koa-compose" "^3.2.4"
@@ -2569,7 +2569,7 @@
 
 "@rush-temp/node-neo-settings@file:./projects/node-neo-settings.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-neo-settings.tgz#7ac891582213e5e1672b4dd60e19540bfac53d7c"
+  resolved "file:./projects/node-neo-settings.tgz"
   dependencies:
     "@types/bn.js" "^4.11.5"
     "@types/lodash" "^4.14.138"
@@ -2580,7 +2580,7 @@
 
 "@rush-temp/node-network@file:./projects/node-network.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-network.tgz#96f6ebb39851613597d43d6d462fb3184e6cb1a7"
+  resolved "file:./projects/node-network.tgz"
   dependencies:
     "@types/lodash" "^4.14.138"
     gulp "~4.0.2"
@@ -2589,7 +2589,7 @@
 
 "@rush-temp/node-offline@file:./projects/node-offline.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-offline.tgz#2314e4e5c424bfab64eb4e5267b8a1231d7caeb8"
+  resolved "file:./projects/node-offline.tgz"
   dependencies:
     "@types/lodash" "^4.14.138"
     gulp "~4.0.2"
@@ -2598,7 +2598,7 @@
 
 "@rush-temp/node-protocol@file:./projects/node-protocol.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-protocol.tgz#3ab42dcee92ad02d429a48a595c0ae2e5845cbd1"
+  resolved "file:./projects/node-protocol.tgz"
   dependencies:
     "@types/bloem" "^0.2.0"
     "@types/bloom-filter" "^0.2.0"
@@ -2619,7 +2619,7 @@
 
 "@rush-temp/node-rpc-handler@file:./projects/node-rpc-handler.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-rpc-handler.tgz#f6d4a693a6c9cf45837865e69a0ebdd1179a56a9"
+  resolved "file:./projects/node-rpc-handler.tgz"
   dependencies:
     gulp "~4.0.2"
     rxjs "^6.5.3"
@@ -2627,7 +2627,7 @@
 
 "@rush-temp/node-storage-cache@file:./projects/node-storage-cache.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-storage-cache.tgz#62afadfd25a23e84d951ab6136ddc74b4b5f6a3b"
+  resolved "file:./projects/node-storage-cache.tgz"
   dependencies:
     "@types/lru-cache" "^5.1.0"
     gulp "~4.0.2"
@@ -2636,14 +2636,14 @@
 
 "@rush-temp/node-storage-common@file:./projects/node-storage-common.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-storage-common.tgz#2bf2a184288c5df4e8a043c33766f316bce31ca6"
+  resolved "file:./projects/node-storage-common.tgz"
   dependencies:
     gulp "~4.0.2"
     tslib "^1.10.0"
 
 "@rush-temp/node-storage-levelup@file:./projects/node-storage-levelup.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-storage-levelup.tgz#ac6dca3e8cea9117af50e4111142eddd81c1fde7"
+  resolved "file:./projects/node-storage-levelup.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     "@types/levelup" "^3.1.1"
@@ -2656,7 +2656,7 @@
 
 "@rush-temp/node-vm@file:./projects/node-vm.tgz":
   version "0.0.0"
-  resolved "file:./projects/node-vm.tgz#bdd3772a91f1b4629fb44930a732a4e2aa3b0188"
+  resolved "file:./projects/node-vm.tgz"
   dependencies:
     "@reactivex/ix-es2015-cjs" "^2.5.3"
     "@reactivex/ix-esnext-esm" "^2.5.3"
@@ -2672,7 +2672,7 @@
 
 "@rush-temp/node@file:./projects/node.tgz":
   version "0.0.0"
-  resolved "file:./projects/node.tgz#de5d5bec11d26b48f64fb7e2c80f474128fd56e4"
+  resolved "file:./projects/node.tgz"
   dependencies:
     "@types/abstract-leveldown" "^5.0.1"
     "@types/fs-extra" "^8.0.0"
@@ -2687,7 +2687,7 @@
 
 "@rush-temp/react-common@file:./projects/react-common.tgz":
   version "0.0.0"
-  resolved "file:./projects/react-common.tgz#c5ebbdb2960522652505d16028390f80204e4a38"
+  resolved "file:./projects/react-common.tgz"
   dependencies:
     "@emotion/core" "^10.0.22"
     "@emotion/styled" "^10.0.23"
@@ -2707,7 +2707,7 @@
 
 "@rush-temp/react-core@file:./projects/react-core.tgz":
   version "0.0.0"
-  resolved "file:./projects/react-core.tgz#c28d0c1c1ccccd13ae87bac0a38ee91d9eee5c95"
+  resolved "file:./projects/react-core.tgz"
   dependencies:
     "@emotion/core" "^10.0.22"
     "@emotion/styled" "^10.0.23"
@@ -2720,7 +2720,7 @@
 
 "@rush-temp/react@file:./projects/react.tgz":
   version "0.0.0"
-  resolved "file:./projects/react.tgz#776b9b2de12a7059f25c7a1fbbf5218e85ff07ca"
+  resolved "file:./projects/react.tgz"
   dependencies:
     "@types/react" "^16.0.0"
     gulp "~4.0.2"
@@ -2730,7 +2730,7 @@
 
 "@rush-temp/smart-contract-codegen@file:./projects/smart-contract-codegen.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-codegen.tgz#f64ba61d3ca51d12dd1d2f9c8449b5df31dcb63e"
+  resolved "file:./projects/smart-contract-codegen.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     "@types/lodash" "^4.14.138"
@@ -2744,7 +2744,7 @@
 
 "@rush-temp/smart-contract-compiler-node@file:./projects/smart-contract-compiler-node.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-compiler-node.tgz#d04f34264edeb0106339e4685949985860f81000"
+  resolved "file:./projects/smart-contract-compiler-node.tgz"
   dependencies:
     "@types/app-root-dir" "^0.1.0"
     "@types/glob" "^7.1.1"
@@ -2756,7 +2756,7 @@
 
 "@rush-temp/smart-contract-compiler@file:./projects/smart-contract-compiler.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-compiler.tgz#51575797f52cb76c34f876ae56c3222ffa09f476"
+  resolved "file:./projects/smart-contract-compiler.tgz"
   dependencies:
     "@babel/code-frame" "^7.0.0"
     "@types/app-root-dir" "^0.1.0"
@@ -2780,7 +2780,7 @@
 
 "@rush-temp/smart-contract-lib@file:./projects/smart-contract-lib.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-lib.tgz#f8e3167515a43303abd956811f13f64416dd3851"
+  resolved "file:./projects/smart-contract-lib.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     bignumber.js "^9.0.0"
@@ -2789,14 +2789,14 @@
 
 "@rush-temp/smart-contract-test-browser@file:./projects/smart-contract-test-browser.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-test-browser.tgz#6d06c607a6da418f3647bf9b3e4ef49ae2d67e19"
+  resolved "file:./projects/smart-contract-test-browser.tgz"
   dependencies:
     core-js "^3.2.1"
     tslib "^1.10.0"
 
 "@rush-temp/smart-contract-test-common@file:./projects/smart-contract-test-common.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-test-common.tgz#d67deb5579084662fb66beb1dcb208c37a9c68e0"
+  resolved "file:./projects/smart-contract-test-common.tgz"
   dependencies:
     bignumber.js "^9.0.0"
     gulp "~4.0.2"
@@ -2804,7 +2804,7 @@
 
 "@rush-temp/smart-contract-test@file:./projects/smart-contract-test.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-test.tgz#1c86383657df540ef7df6c741756c57992070319"
+  resolved "file:./projects/smart-contract-test.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     "@types/lodash" "^4.14.138"
@@ -2817,26 +2817,26 @@
 
 "@rush-temp/smart-contract-typescript-plugin@file:./projects/smart-contract-typescript-plugin.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract-typescript-plugin.tgz#9f3492020cbebd2ddaa1558f2fc3952e391d5d39"
+  resolved "file:./projects/smart-contract-typescript-plugin.tgz"
   dependencies:
     gulp "~4.0.2"
     typescript "3.6.3"
 
 "@rush-temp/smart-contract@file:./projects/smart-contract.tgz":
   version "0.0.0"
-  resolved "file:./projects/smart-contract.tgz#e2dda84ffab87ea38b2c27e856e75b03daae4e0a"
+  resolved "file:./projects/smart-contract.tgz"
   dependencies:
     gulp "~4.0.2"
 
 "@rush-temp/suite@file:./projects/suite.tgz":
   version "0.0.0"
-  resolved "file:./projects/suite.tgz#bb0dd3756584f9a24cde10161946952dd27498fd"
+  resolved "file:./projects/suite.tgz"
   dependencies:
     gulp "~4.0.2"
 
 "@rush-temp/ts-utils@file:./projects/ts-utils.tgz":
   version "0.0.0"
-  resolved "file:./projects/ts-utils.tgz#e28e0e908af0b8a47b6477a6d64a390f29c1112f"
+  resolved "file:./projects/ts-utils.tgz"
   dependencies:
     "@types/lodash" "^4.14.138"
     gulp "~4.0.2"
@@ -2847,7 +2847,7 @@
 
 "@rush-temp/typescript-concatenator@file:./projects/typescript-concatenator.tgz":
   version "0.0.0"
-  resolved "file:./projects/typescript-concatenator.tgz#2e1fe20e5e5e933f6796318d3814844140e8587c"
+  resolved "file:./projects/typescript-concatenator.tgz"
   dependencies:
     "@types/app-root-dir" "^0.1.0"
     "@types/fs-extra" "^8.0.0"
@@ -2866,7 +2866,7 @@
 
 "@rush-temp/utils-node@file:./projects/utils-node.tgz":
   version "0.0.0"
-  resolved "file:./projects/utils-node.tgz#55a5931de82e597bf4998e65f040f74994df2805"
+  resolved "file:./projects/utils-node.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     "@types/npm-package-arg" "^6.1.0"
@@ -2881,7 +2881,7 @@
 
 "@rush-temp/utils@file:./projects/utils.tgz":
   version "0.0.0"
-  resolved "file:./projects/utils.tgz#b9c1503236d0266568dd21dcedffd98928c5908d"
+  resolved "file:./projects/utils.tgz"
   dependencies:
     "@types/jest" "^24.0.18"
     "@types/lodash" "^4.14.138"
@@ -2895,7 +2895,7 @@
 
 "@rush-temp/website@file:./projects/website.tgz":
   version "0.0.0"
-  resolved "file:./projects/website.tgz#f53e0a8ef6ed49099d04fd668a7103b3ca27f363"
+  resolved "file:./projects/website.tgz"
   dependencies:
     "@babel/runtime" "^7.6.3"
     "@emotion/core" "^10.0.22"
@@ -2964,7 +2964,7 @@
 
 "@rush-temp/worker@file:./projects/worker.tgz":
   version "0.0.0"
-  resolved "file:./projects/worker.tgz#1685cf4ac1b6e6d572c78e7ebf9c3534ae79bb1b"
+  resolved "file:./projects/worker.tgz"
   dependencies:
     core-js "^3.2.1"
     rxjs "^6.5.3"
@@ -12501,7 +12501,7 @@ koa-better-body@^3.1.13:
     formidable "^1.2.1"
     koa-body-parsers tunnckoCore/body-parsers#patch-1
 
-"koa-body-parsers@github:tunnckoCore/body-parsers#patch-1":
+koa-body-parsers@tunnckoCore/body-parsers#patch-1:
   version "3.1.0"
   resolved "https://codeload.github.com/tunnckoCore/body-parsers/tar.gz/7788b9cf82d84f90bbd543f8753affb82baf3a96"
   dependencies:
@@ -13857,10 +13857,15 @@ moment@2.24.0:
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
   integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
 
-monaco-editor@^0.18.1:
-  version "0.18.1"
-  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.18.1.tgz#ced7c305a23109875feeaf395a504b91f6358cfc"
-  integrity sha512-fmL+RFZ2Hrezy+X/5ZczQW51LUmvzfcqOurnkCIRFTyjdVjzR7JvENzI6+VKBJzJdPh6EYL4RoWl92b2Hrk9fw==
+monaco-editor@^0.17.1:
+  version "0.17.1"
+  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.17.1.tgz#8fbe96ca54bfa75262706e044f8f780e904aa45c"
+  integrity sha512-JAc0mtW7NeO+0SwPRcdkfDbWLgkqL9WfP1NbpP9wNASsW6oWqgZqNIWt4teymGjZIXTElx3dnQmUYHmVrJ7HxA==
+
+monaco-editor@^0.20.0:
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.20.0.tgz#5d5009343a550124426cb4d965a4d27a348b4dea"
+  integrity sha512-hkvf4EtPJRMQlPC3UbMoRs0vTAFAYdzFQ+gpMb8A+9znae1c43q8Mab9iVsgTcg/4PNiLGGn3SlDIa8uvK1FIQ==
 
 monaco-textmate@^3.0.0:
   version "3.0.1"
