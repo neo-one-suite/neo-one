@@ -14,6 +14,7 @@ RUN sudo node common/scripts/install-run-rush.js rebuild -t @neo-one/node-bin
 # node:12.9.0-buster-slim 2019-08-27
 FROM node@sha256:d1cfeb3cc51782d51336e34bd477c5b1b46b32e5f49cd1c3829ef52f0a5250df AS production
 RUN mkdir -p /neo-one
+WORKDIR /neo-one
 COPY --from=builder /tmp/neo-one/packages/neo-one-utils/package.json packages/neo-one-utils/package.json
 COPY --from=builder /tmp/neo-one/packages/neo-one-utils/lib packages/neo-one-utils/lib/
 COPY --from=builder /tmp/neo-one/packages/neo-one-utils/node_modules packages/neo-one-utils/node_modules/
@@ -108,4 +109,4 @@ COPY --from=builder /tmp/neo-one/packages/neo-one-node-bin/bin packages/neo-one-
 COPY --from=builder /tmp/neo-one/common/temp/node_modules common/temp/node_modules/
 
 RUN apt-get -qqy update && apt-get install -qqy gcc python-dev python-setuptools libffi-dev python-pip && pip install gsutil
-ENTRYPOINT ["node", "neo-one/packages/neo-one-node-bin/bin/neo-one-node"]
+ENTRYPOINT ["/usr/local/bin/node", "packages/neo-one-node-bin/bin/neo-one-node.js"]
