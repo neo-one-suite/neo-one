@@ -791,7 +791,7 @@ export class Blockchain {
             })
             .pipe(toArray())
             .toPromise(),
-    ]);
+    ] as const);
 
     return {
       asset,
@@ -835,7 +835,7 @@ export class Blockchain {
     const [transactionData, output] = await Promise.all([
       this.transactionData.tryGet({ hash: input.hash }),
       this.output.get(input),
-    ]);
+    ] as const);
 
     if (transactionData === undefined) {
       return undefined;

@@ -104,6 +104,64 @@ describe('BinaryExpressionCompiler', () => {
     `);
   });
 
+  test('null ?? short-circuit [QuestionQuestionToken]', async () => {
+    await helpers.executeString(`
+      const x = null;
+      const result = x ?? true;
+      if (!result) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('undefined ?? short-circuit [QuestionQuestionToken]', async () => {
+    await helpers.executeString(`
+      const x = undefined;
+      const result = x ?? true;
+      if (!result) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('1 ?? 0 [QuestionQuestionToken]', async () => {
+    await helpers.executeString(`
+      const x: number = 1 ?? 0;
+      if (!(x === 1)) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('0 ?? 1 [QuestionQuestionToken]', async () => {
+    await helpers.executeString(`
+      const x: number = 1 ?? 0;
+      if (!(x === 1)) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('[] ?? 0 [QuestionQuestionToken]', async () => {
+    await helpers.executeString(`
+      const x: Array<unknown> = [];
+      const result = x ?? 0;
+      if (!(result === x)) {
+        throw 'Failure';
+      }
+    `);
+  });
+
+  test('"" ?? 0 [QuestionQuestionToken]', async () => {
+    await helpers.executeString(`
+      const x: string = "";
+      const result = x ?? 0;
+      if (!(result === "")) {
+        throw 'Failure';
+      }
+    `);
+  });
+
   test('1 < 1 [LessThanToken]', async () => {
     await helpers.executeString(`
       if (1 < 1) {

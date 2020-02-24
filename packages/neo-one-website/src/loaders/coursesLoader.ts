@@ -56,7 +56,7 @@ const getCourse = async (courseDir: string): Promise<Course> => {
   const [config, lessonDirs] = await Promise.all([
     fs.readFile(path.resolve(coursePath, CONFIG), 'utf8'),
     getDirectories(coursePath),
-  ]);
+  ] as const);
   const lessons = await Promise.all(lessonDirs.map(async (dir) => getLesson(courseDir, dir)));
 
   const configParsed = JSON.parse(config);
@@ -75,7 +75,7 @@ const getLesson = async (courseDir: string, lesson: string): Promise<Lesson> => 
     fs.readFile(path.resolve(lessonPath, CONFIG), 'utf8'),
     fs.readFile(path.resolve(lessonPath, LESSON), 'utf8'),
     getDirectories(lessonPath),
-  ]);
+  ] as const);
   const chapters = await Promise.all(chapterDirs.map(async (dir) => getChapter(courseDir, lesson, dir)));
 
   return {
@@ -128,7 +128,7 @@ const getChapterFile = async (dir: string, initial: string | undefined, solution
   const [initialContent, solutionContent] = await Promise.all([
     initial === undefined ? Promise.resolve(undefined) : readFile(initial),
     readFile(solution),
-  ]);
+  ] as const);
 
   return {
     path: initial === undefined ? solution : initial,

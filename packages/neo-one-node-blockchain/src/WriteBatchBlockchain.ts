@@ -394,7 +394,7 @@ export class WriteBatchBlockchain {
 
       this.block.add(block),
       this.header.add(block.header),
-    ]);
+    ] as const);
 
     const prevBlockData =
       maybePrevBlockData === undefined

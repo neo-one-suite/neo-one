@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/ts-utils",
+      "comment": "Upgrade TS to v3.8.1-rc",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/ts-utils",
+  "email": "spencercorwin@icloud.com"
+}

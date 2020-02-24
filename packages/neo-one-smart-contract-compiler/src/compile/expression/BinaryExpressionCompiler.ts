@@ -58,6 +58,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
         break;
       case ts.SyntaxKind.AmpersandAmpersandToken:
       case ts.SyntaxKind.BarBarToken:
+      case ts.SyntaxKind.QuestionQuestionToken:
         this.visitLogicalExpressionOperator(sb, kind, expr, options);
         break;
       /* istanbul ignore next */
@@ -162,7 +163,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
 
   private visitLogicalExpressionOperator(
     sb: ScriptBuilder,
-    kind: ts.LogicalOperator,
+    kind: ts.LogicalOperator | ts.SyntaxKind.QuestionQuestionToken,
     expr: ts.BinaryExpression,
     options: VisitOptions,
   ): void {
@@ -419,7 +420,7 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
   private visitLogicalExpressionOperatorBase(
     sb: ScriptBuilder,
     node: ts.Node,
-    kind: ts.LogicalOperator,
+    kind: ts.LogicalOperator | ts.SyntaxKind.QuestionQuestionToken,
     left: ts.Expression,
     right: ts.Expression,
     options: VisitOptions,
@@ -478,6 +479,41 @@ export class BinaryExpressionCompiler extends NodeCompiler<ts.BinaryExpression> 
                 sb.emitOp(node, 'DROP');
               }
               sb.visit(right, options);
+            },
+          }),
+        );
+        break;
+      }
+      case ts.SyntaxKind.QuestionQuestionToken: {
+        sb.emitHelper(
+          node,
+          options,
+          sb.helpers.if({
+            condition: () => {
+              // [left]
+              sb.visit(left, sb.pushValueOptions(options));
+              if (options.pushValue) {
+                // [left, left]
+                sb.emitOp(left, 'DUP');
+              }
+              // [leftBoolean, ?left]
+              sb.emitHelper(
+                left,
+                sb.pushValueOptions(options),
+                sb.helpers.toNullishBoolean({ type: sb.context.analysis.getType(left) }),
+              );
+            },
+            whenFalse: () => {
+              if (options.pushValue) {
+                sb.emitOp(node, 'DROP');
+              }
+              sb.visit(right, options);
+            },
+            whenTrue: () => {
+              if (options.pushValue) {
+                sb.emitOp(node, 'DROP');
+              }
+              sb.visit(left, options);
             },
           }),
         );

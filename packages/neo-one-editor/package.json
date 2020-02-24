@@ -10,6 +10,10 @@
     "lint:staged": "lint-staged --relative",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
+  "sideEffects": [
+    "src/engine/test/polyfill.ts",
+    "src/preview/window/polyfill.ts"
+  ],
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
     "@babel/plugin-proposal-async-generator-functions": "^7.2.0",
@@ -32,8 +36,8 @@
     "@neo-one/node-browser-worker": "^2.3.0",
     "@neo-one/react": "^2.3.0",
     "@neo-one/react-common": "^2.3.0",
-    "@neo-one/smart-contract-test-browser": "^2.3.1",
     "@neo-one/smart-contract-compiler": "^2.3.0",
+    "@neo-one/smart-contract-test-browser": "^2.3.1",
     "@neo-one/utils": "^2.3.0",
     "@neo-one/worker": "^2.3.0",
     "@render-props/scrollable": "^0.1.20",
@@ -71,7 +75,7 @@
     "styled-tools": "^1.7.1",
     "ts-node": "^8.4.1",
     "tslib": "^1.10.0",
-    "typescript": "3.6.3",
+    "typescript": "3.8.1-rc",
     "typescript-fsa": "^3.0.0-beta-2",
     "typescript-fsa-reducers": "^1.2.1",
     "webpack": "^4.40.2"
@@ -92,9 +96,5 @@
     "@types/react-redux": "^7.1.1",
     "@types/resolve": "^0.0.8",
     "@types/webpack": "^4.39.0"
-  },
-  "sideEffects": [
-    "src/engine/test/polyfill.ts",
-    "src/preview/window/polyfill.ts"
-  ]
+  }
 }

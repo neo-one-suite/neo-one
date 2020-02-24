@@ -33,7 +33,7 @@ export const getDocs = async (): Promise<readonly DocsProps[]> => {
   const [docFileLists, docSectionConfigs] = await Promise.all([
     Promise.all(docSections.map(getDocSection)),
     getDocSectionConfigs(docSections),
-  ]);
+  ] as const);
   const docsBare = _.flatten(docFileLists);
   const docs = addAdjacent(docsBare);
 

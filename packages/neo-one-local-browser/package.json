@@ -9,6 +9,7 @@
     "lint:staged": "lint-staged --relative",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
+  "sideEffects": false,
   "dependencies": {
     "@neo-one/cli-common": "^2.4.0",
     "@neo-one/client-common": "^2.3.0",
@@ -27,13 +28,12 @@
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
     "tslib": "^1.10.0",
-    "typescript": "3.6.3"
+    "typescript": "3.8.1-rc"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
     "@types/lodash": "^4.14.138",
     "@types/nanoid": "^2.0.0",
     "@types/pouchdb": "^6.4.0"
-  },
-  "sideEffects": false
+  }
 }

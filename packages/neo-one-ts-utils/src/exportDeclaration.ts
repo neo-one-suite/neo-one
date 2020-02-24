@@ -8,7 +8,7 @@ export function getNamedExports(node: ts.ExportDeclaration): readonly ts.ExportS
     return [];
   }
 
-  const exps = utils.getValueOrUndefined(namedExports.elements);
+  const exps = !ts.isNamedExports(namedExports) ? undefined : utils.getValueOrUndefined(namedExports.elements);
 
   return exps === undefined ? [] : exps;
 }

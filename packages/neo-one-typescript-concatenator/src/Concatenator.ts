@@ -125,7 +125,7 @@ export class Concatenator {
                 .filter(utils.notNull);
             }
           }
-        } else {
+        } else if (ts.isNamedExports(clause)) {
           elements = clause.elements
             .filter((element) => this.isExportedNode(element))
             .map((element) => {
@@ -140,6 +140,41 @@ export class Concatenator {
 
               return element;
             });
+        } else {
+          const exportFile = tsUtils.importExport.getModuleSpecifierSourceFile(this.context.typeChecker, node);
+          const namespaceIdentifier = clause.name;
+          if (exportFile !== undefined) {
+            const exportedSymbols = tsUtils.file.getExportedSymbols(this.context.typeChecker, exportFile);
+
+            return tsUtils.setOriginalRecursive(
+              ts.createVariableStatement(
+                [ts.createModifier(ts.SyntaxKind.ExportKeyword)],
+                ts.createVariableDeclarationList(
+                  [
+                    ts.createVariableDeclaration(
+                      this.getIdentifierForIdentifier(namespaceIdentifier),
+                      undefined,
+                      ts.createObjectLiteral(
+                        exportedSymbols
+                          .map((symbolIn) => {
+                            const symbol = tsUtils.symbol.getSymbolOrAlias(this.context.typeChecker, symbolIn);
+                            const identifier = this.getIdentifierForSymbol(symbol);
+                            if (identifier === undefined) {
+                              return undefined;
+                            }
+
+                            return ts.createPropertyAssignment(tsUtils.symbol.getName(symbolIn), identifier);
+                          })
+                          .filter(utils.notNull),
+                      ),
+                    ),
+                  ],
+                  ts.NodeFlags.Const,
+                ),
+              ),
+              node,
+            );
+          }
         }
 
         if (elements.length > 0) {

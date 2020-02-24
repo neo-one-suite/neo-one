@@ -29,6 +29,13 @@ export function getAliasedSymbol(typeChecker: ts.TypeChecker, node: ts.Symbol): 
     return utils.getValueOrUndefined(typeChecker.getAliasedSymbol(node));
   }
 
+  if (hasSymbolFlag(node, ts.SymbolFlags.TypeAlias)) {
+    const type = utils.getValueOrUndefined(typeChecker.getDeclaredTypeOfSymbol(node));
+    if (type !== undefined) {
+      return utils.getValueOrUndefined(type.getSymbol());
+    }
+  }
+
   return undefined;
 }
 

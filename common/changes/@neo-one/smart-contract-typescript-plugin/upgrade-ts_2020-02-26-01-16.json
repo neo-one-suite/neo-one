@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/smart-contract-typescript-plugin",
+      "comment": "Upgrade TS to v3.8.1-rc",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract-typescript-plugin",
+  "email": "spencercorwin@icloud.com"
+}

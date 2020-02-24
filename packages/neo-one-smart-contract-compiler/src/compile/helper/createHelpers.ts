@@ -347,6 +347,7 @@ import {
   SetPropertyObjectPropertyHelper,
   SetSymbolObjectPropertyHelper,
   ToBooleanHelper,
+  ToNullishBooleanHelper,
   ToNumberHelper,
   ToObjectHelper,
   ToPrimitiveHelper,
@@ -561,6 +562,7 @@ export interface Helpers {
   readonly unwrapSymbol: UnwrapSymbolHelper;
   readonly getObject: GetObjectHelper;
   readonly toBoolean: (options: TypedHelperOptions) => ToBooleanHelper;
+  readonly toNullishBoolean: (options: TypedHelperOptions) => ToNullishBooleanHelper;
   readonly toString: (options: ToStringHelperOptions) => ToStringHelper;
   readonly toNumber: (options: TypedHelperOptions) => ToNumberHelper;
   readonly toObject: (options: TypedHelperOptions) => ToObjectHelper;
@@ -1010,6 +1012,7 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     unwrapSymbol: new UnwrapSymbolHelper(),
     getObject: new GetObjectHelper(),
     toBoolean: (options) => new ToBooleanHelper(options),
+    toNullishBoolean: (options) => new ToNullishBooleanHelper(options),
     toString: (options) => new ToStringHelper(options),
     toNumber: (options) => new ToNumberHelper(options),
     toObject: (options) => new ToObjectHelper(options),

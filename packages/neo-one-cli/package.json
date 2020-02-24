@@ -13,12 +13,13 @@
   "bin": {
     "neo-one": "bin/neo-one.js"
   },
+  "sideEffects": false,
   "dependencies": {
     "@babel/core": "^7.6.2",
     "@babel/register": "^7.5.5",
-    "@neo-one/client": "^2.3.0",
     "@neo-one/cli-common": "^2.4.0",
     "@neo-one/cli-common-node": "^2.4.0",
+    "@neo-one/client": "^2.3.0",
     "@neo-one/client-common": "^2.3.0",
     "@neo-one/client-core": "^2.3.0",
     "@neo-one/client-full": "^2.3.0",
@@ -47,9 +48,9 @@
     "prompts": "^2.2.1",
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
-    "tslib": "^1.10.0",
     "ts-node": "^8.4.1",
-    "typescript": "3.6.3",
+    "tslib": "^1.10.0",
+    "typescript": "3.8.1-rc",
     "yargs": "^14.2.0"
   },
   "devDependencies": {
@@ -69,6 +70,5 @@
     "react": "^16.12.0",
     "rxjs": "^6.5.3",
     "zone.js": "^0.10.2"
-  },
-  "sideEffects": false
+  }
 }
