@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AwaitFunctionCompiler await 1`] = `
-"snippetCode.ts (2,7): 'await' expression is only allowed within an async function.
+"snippetCode.ts (2,7): 'await' expressions are only allowed at the top level of a file when that file is a module, but this file has no imports or exports. Consider adding an empty 'export {}' to make this file a module.
 
       1 | 
     > 2 |       await 2;

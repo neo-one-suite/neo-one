@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/typescript-concatenator",
+      "comment": "Upgrade TS to v3.8.1-rc. Add support for namespace exports",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/typescript-concatenator",
+  "email": "spencercorwin@icloud.com"
+}

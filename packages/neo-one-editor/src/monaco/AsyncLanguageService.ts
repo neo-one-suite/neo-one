@@ -241,7 +241,7 @@ export class AsyncLanguageService {
     fileName: string,
     files: { readonly [key: string]: string },
   ): Promise<readonly FlattenedDiagnostic[]> =>
-    Promise.all([this.fs, this.languageService]).then(([fs, languageService]) =>
+    Promise.all([this.fs, this.languageService] as const).then(([fs, languageService]) =>
       this.withTmpFS(files, () => {
         const diagnostics = this.isSmartContract
           ? getSemanticDiagnostics(fileName, languageService, createCompilerHost({ fs }))

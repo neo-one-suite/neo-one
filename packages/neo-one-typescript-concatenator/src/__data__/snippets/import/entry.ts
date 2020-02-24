@@ -80,3 +80,6 @@ export * from './foo3';
 export * from './foo4';
 // Export one of a multi-decl statement
 export { fizz } from './varDecl';
+// Namespace export
+export * as foo5 from './foo5';
+export * as somethingElse from './foo5';

@@ -180,7 +180,10 @@ export class StateDescriptor implements SerializableWire<StateDescriptor>, Seria
 
     const reader = new BinaryReader(this.value);
     const hash = common.bufferToUInt160(this.key);
-    const [account, validators] = await Promise.all([options.tryGetAccount({ hash }), options.getAllValidators()]);
+    const [account, validators] = await Promise.all([
+      options.tryGetAccount({ hash }),
+      options.getAllValidators(),
+    ] as const);
 
     if (account === undefined || account.isFrozen) {
       throw new VerifyError('Account is frozen');

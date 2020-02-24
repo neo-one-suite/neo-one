@@ -45,7 +45,7 @@ export class DeployHelper extends Helper {
               sb.emitPushString(property, tsUtils.node.getName(property));
               // []
               sb.emitHelper(property, innerOptions, sb.helpers.putCommonStorage);
-            } else if (ts.isParameterPropertyDeclaration(property)) {
+            } else if (ts.isParameterPropertyDeclaration(property, property.parent)) {
               const name = tsUtils.node.getName(property);
               // [val]
               sb.scope.get(sb, property, sb.pushValueOptions(innerOptions), name);

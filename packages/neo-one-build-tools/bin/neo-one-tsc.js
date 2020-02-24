@@ -2,8 +2,10 @@
 const path = require('path');
 const execa = require('execa');
 
-execa(path.resolve(__dirname, '..', 'node_modules', '.bin', 'tsc'), [
-  '--project',
-  '.',
-  '--noEmit',
-]);
+execa(
+  path.resolve(__dirname, '..', 'node_modules', '.bin', 'tsc'),
+  ['--project', '.', '--noEmit'],
+  {
+    stdio: 'inherit',
+  },
+);

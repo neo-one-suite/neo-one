@@ -9,6 +9,7 @@
     "lint:staged": "lint-staged --relative",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
+  "sideEffects": false,
   "dependencies": {
     "@emotion/core": "^10.0.22",
     "@emotion/styled": "^10.0.23",
@@ -43,6 +44,5 @@
     "@types/react": "^16.9.15",
     "@types/react-dom": "^16.9.4",
     "@types/react-select": "^3.0.0"
-  },
-  "sideEffects": false
+  }
 }

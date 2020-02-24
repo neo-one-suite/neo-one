@@ -2010,7 +2010,7 @@
     ts-loader "^6.1.0"
     ts-node "^8.4.1"
     tslint "^5.20.0"
-    typescript "3.6.3"
+    typescript "3.8.1-rc"
     url-loader "^3.0.0"
     webpack "^4.40.2"
     webpack-bundle-analyzer "^3.4.1"
@@ -2064,7 +2064,7 @@
     tslint-immutable "^6.0.1"
     tslint-microsoft-contrib "^6.2.0"
     tslint-sonarts "^1.9.0"
-    typescript "3.6.3"
+    typescript "3.8.1-rc"
     yargs "^14.2.0"
 
 "@rush-temp/cli-common-node@file:./projects/cli-common-node.tgz":
@@ -2125,7 +2125,7 @@
     source-map "^0.7.3"
     ts-node "^8.4.1"
     tslib "^1.10.0"
-    typescript "3.6.3"
+    typescript "3.8.1-rc"
     yargs "^14.2.0"
     zone.js "^0.10.2"
 
@@ -2375,7 +2375,7 @@
     styled-tools "^1.7.1"
     ts-node "^8.4.1"
     tslib "^1.10.0"
-    typescript "3.6.3"
+    typescript "3.8.1-rc"
     typescript-fsa "^3.0.0-beta-2"
     typescript-fsa-reducers "^1.2.1"
     webpack "^4.40.2"
@@ -2433,7 +2433,7 @@
     safe-stable-stringify "^1.1.0"
     source-map "^0.7.3"
     tslib "^1.10.0"
-    typescript "3.6.3"
+    typescript "3.8.1-rc"
 
 "@rush-temp/local-singleton@file:./projects/local-singleton.tgz":
   version "0.0.0"
@@ -2752,7 +2752,7 @@
     glob "^7.1.4"
     gulp "~4.0.2"
     tslib "^1.10.0"
-    typescript "3.6.3"
+    typescript "3.8.1-rc"
 
 "@rush-temp/smart-contract-compiler@file:./projects/smart-contract-compiler.tgz":
   version "0.0.0"
@@ -2776,7 +2776,7 @@
     safe-stable-stringify "^1.1.0"
     source-map "^0.7.3"
     tslib "^1.10.0"
-    typescript "3.6.3"
+    typescript "3.8.1-rc"
 
 "@rush-temp/smart-contract-lib@file:./projects/smart-contract-lib.tgz":
   version "0.0.0"
@@ -2820,7 +2820,7 @@
   resolved "file:./projects/smart-contract-typescript-plugin.tgz"
   dependencies:
     gulp "~4.0.2"
-    typescript "3.6.3"
+    typescript "3.8.1-rc"
 
 "@rush-temp/smart-contract@file:./projects/smart-contract.tgz":
   version "0.0.0"
@@ -2843,7 +2843,7 @@
     lodash "^4.17.15"
     source-map "^0.7.3"
     tslib "^1.10.0"
-    typescript "3.6.3"
+    typescript "3.8.1-rc"
 
 "@rush-temp/typescript-concatenator@file:./projects/typescript-concatenator.tgz":
   version "0.0.0"
@@ -2861,7 +2861,7 @@
     lodash "^4.17.15"
     toposort "^2.0.2"
     tslib "^1.10.0"
-    typescript "3.6.3"
+    typescript "3.8.1-rc"
     yargs "^14.2.0"
 
 "@rush-temp/utils-node@file:./projects/utils-node.tgz":
@@ -2891,7 +2891,7 @@
     lodash "^4.17.15"
     rxjs "^6.5.3"
     tslib "^1.10.0"
-    typescript "3.6.3"
+    typescript "3.8.1-rc"
 
 "@rush-temp/website@file:./projects/website.tgz":
   version "0.0.0"
@@ -2957,7 +2957,7 @@
     styled-tools "^1.7.1"
     ts-node "^8.4.1"
     tslib "^1.10.0"
-    typescript "3.6.3"
+    typescript "3.8.1-rc"
     typescript-fsa "^3.0.0-beta-2"
     typescript-fsa-reducers "^1.2.1"
     webpack "^4.40.2"
@@ -13862,11 +13862,6 @@ monaco-editor@^0.17.1:
   resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.17.1.tgz#8fbe96ca54bfa75262706e044f8f780e904aa45c"
   integrity sha512-JAc0mtW7NeO+0SwPRcdkfDbWLgkqL9WfP1NbpP9wNASsW6oWqgZqNIWt4teymGjZIXTElx3dnQmUYHmVrJ7HxA==
 
-monaco-editor@^0.20.0:
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.20.0.tgz#5d5009343a550124426cb4d965a4d27a348b4dea"
-  integrity sha512-hkvf4EtPJRMQlPC3UbMoRs0vTAFAYdzFQ+gpMb8A+9znae1c43q8Mab9iVsgTcg/4PNiLGGn3SlDIa8uvK1FIQ==
-
 monaco-textmate@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/monaco-textmate/-/monaco-textmate-3.0.1.tgz#b6d26d266aa12edaff7069dae0d6e3747cba5cd7"
@@ -15873,7 +15868,7 @@ preserve@^0.2.0:
   resolved "https://registry.yarnpkg.com/preserve/-/preserve-0.2.0.tgz#815ed1f6ebc65926f865b310c0713bcb3315ce4b"
   integrity sha1-gV7R9uvGWSb4ZbMQwHE7yzMVzks=
 
-prettier@^1.18.2:
+prettier@1.19.1, prettier@^1.18.2:
   version "1.19.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.1.tgz#f7d7f5ff8a9cd872a7be4ca142095956a60797cb"
   integrity sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==
@@ -19328,10 +19323,10 @@ typescript-fsa@^3.0.0-beta-2:
   resolved "https://registry.yarnpkg.com/typescript-fsa/-/typescript-fsa-3.0.0.tgz#3ad1cb915a67338e013fc21f67c9b3e0e110c912"
   integrity sha512-xiXAib35i0QHl/+wMobzPibjAH5TJLDj+qGq5jwVLG9qR4FUswZURBw2qihBm0m06tHoyb3FzpnJs1GRhRwVag==
 
-typescript@3.6.3:
-  version "3.6.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.6.3.tgz#fea942fabb20f7e1ca7164ff626f1a9f3f70b4da"
-  integrity sha512-N7bceJL1CtRQ2RiG0AQME13ksR7DiuQh/QehubYcghzv20tnh+MQnQIuJddTmsbqYj+dztchykemz0zFzlvdQw==
+typescript@3.8.1-rc:
+  version "3.8.1-rc"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.8.1-rc.tgz#f94333c14da70927ccd887be2e91be652a9a09f6"
+  integrity sha512-aOIe066DyZn2uYIiND6fXMUUJ70nxwu/lKhA92QuQzXyC86fr0ywo1qvO8l2m0EnDcfjprYPuFRgNgDj7U2GlQ==
 
 typescript@^3.2.2:
   version "3.7.3"

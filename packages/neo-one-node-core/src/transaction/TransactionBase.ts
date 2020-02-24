@@ -257,7 +257,7 @@ export function TransactionBase<
         this.getNetworkFee(context.feeContext),
         // tslint:disable-next-line no-any
         context.tryGetTransactionData(this as any),
-      ]);
+      ] as const);
 
       return {
         txid: common.uInt256ToString(this.hashHex),

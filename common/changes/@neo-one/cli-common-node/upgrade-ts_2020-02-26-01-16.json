@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/cli-common-node",
+      "comment": "Upgrade TS to v3.8.1-rc",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/cli-common-node",
+  "email": "spencercorwin@icloud.com"
+}

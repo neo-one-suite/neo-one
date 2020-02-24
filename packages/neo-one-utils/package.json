@@ -11,6 +11,7 @@
     "pack": "gulp pack",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
+  "sideEffects": false,
   "dependencies": {
     "@types/node": "^12.7.7",
     "lodash": "^4.17.15",
@@ -23,7 +24,6 @@
     "@types/lodash": "^4.14.138",
     "gulp": "~4.0.2",
     "jest": "^24.9.0",
-    "typescript": "3.6.3"
-  },
-  "sideEffects": false
+    "typescript": "3.8.1-rc"
+  }
 }
