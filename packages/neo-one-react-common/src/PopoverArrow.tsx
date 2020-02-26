@@ -6,6 +6,8 @@ import { prop, theme } from 'styled-tools';
 export interface PopoverArrowProps {
   readonly fillColor?: string;
   readonly strokeColor?: string;
+  readonly opaque?: boolean;
+  readonly palette?: string;
 }
 
 const PopoverArrowComponent = (props: PopoverArrowProps & React.ComponentPropsWithoutRef<typeof Box>) => (
@@ -26,7 +28,7 @@ const PopoverArrowComponent = (props: PopoverArrowProps & React.ComponentPropsWi
 
 const popoverTheme = theme('PopoverArrow');
 
-export const PopoverArrow = styled<typeof PopoverArrowComponent, PopoverArrowProps>(PopoverArrowComponent)`
+export const PopoverArrow = styled(PopoverArrowComponent)<{}, {}>`
   position: absolute;
   font-size: 30px;
   width: 1em;

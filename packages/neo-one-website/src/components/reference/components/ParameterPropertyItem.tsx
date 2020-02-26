@@ -16,7 +16,7 @@ const ParameterLayout = styled(Box)`
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
 `;
 
-const Name = styled(Box)`
+const Name = styled(Box)<{}, {}>`
   ${prop('theme.fonts.axiformaBold')};
   ${prop('theme.fontStyles.body1')};
 `;

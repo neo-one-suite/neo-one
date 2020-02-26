@@ -16,7 +16,7 @@ const animation = keyframes`
   }
 `;
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   height: 16px;
   display: grid;
   grid-auto-flow: column;

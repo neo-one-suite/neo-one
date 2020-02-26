@@ -8,7 +8,8 @@ import { courses } from '../coursesData';
 import { CourseExplainer } from './CourseExplainer';
 import { CourseSection } from './CourseSection';
 
-const StyledBackground = styled(Background)`
+// tslint:disable-next-line: no-any
+const StyledBackground = styled(Background)<any>`
   display: flex;
   color: ${prop('theme.gray0')};
   justify-content: center;
@@ -16,7 +17,7 @@ const StyledBackground = styled(Background)`
   width: 100%;
 `;
 
-const Headline = styled(Box)`
+const Headline = styled(Box)<{}, {}>`
   color: ${prop('theme.gray0')};
   ${prop('theme.fontStyles.display1')};
   ${prop('theme.fonts.axiformaRegular')};

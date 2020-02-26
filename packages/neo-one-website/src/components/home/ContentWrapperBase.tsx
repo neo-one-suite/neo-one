@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { Box } from '@neo-one/react-common';
 import { prop } from 'styled-tools';
 
-export const ContentWrapperBase = styled(Box)`
+export const ContentWrapperBase = styled(Box)<{}, {}>`
   display: grid;
   max-width: 1260px;
   padding-left: 24px;

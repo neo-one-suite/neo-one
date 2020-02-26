@@ -4,7 +4,7 @@ import { Input } from '@neo-one/react-core';
 import * as React from 'react';
 import { prop } from 'styled-tools';
 
-const StyledInput = styled(Input.withComponent('select'))`
+const StyledInput = styled(Input.withComponent('select'))<{}, {}>`
   background-color: ${prop('theme.gray0')};
   outline: none;
   ${prop('theme.fonts.axiformaRegular')};

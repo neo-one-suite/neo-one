@@ -10,12 +10,14 @@ interface Props {
   readonly fullIcon?: boolean;
 }
 
+// tslint:disable-next-line: no-unused
 interface StyledIconBoxProps {
   readonly bg: TypeFilterOptions;
   readonly fullIcon: boolean;
 }
 
-const IconBox = styled<typeof Box, StyledIconBoxProps>(Box)`
+// tslint:disable-next-line: no-any
+const IconBox = styled(Box)<any>`
   background-color: ${switchProp('bg', {
     All: 'transparent',
     Class: prop('theme.primary'),

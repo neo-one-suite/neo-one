@@ -135,6 +135,6 @@ export const ToolbarFocusableComponent = forwardRef<HTMLDivElement, Props>(
   },
 );
 
-export const ToolbarFocusable = styled(ToolbarFocusableComponent)`
+export const ToolbarFocusable = styled(ToolbarFocusableComponent)<{}, {}>`
   ${theme('ToolbarFocusable')};
 `;

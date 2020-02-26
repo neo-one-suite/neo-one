@@ -10,7 +10,7 @@ import { SidebarList } from './SidebarList';
 
 const Wrapper = styled(Box)``;
 
-const DesktopSidebarWrapper = styled(Box)`
+const DesktopSidebarWrapper = styled(Box)<{}, {}>`
   background-color: ${prop('theme.gray1')};
   position: fixed;
   height: 100vh;
@@ -26,7 +26,7 @@ const DesktopSidebarWrapper = styled(Box)`
   }
 `;
 
-const MobileWrapper = styled(Box)`
+const MobileWrapper = styled(Box)<{}, {}>`
   @media (min-width: ${prop('theme.breakpoints.sm')}) {
     display: none;
   }
@@ -73,7 +73,7 @@ const StyledHidden = styled(Hidden)`
   }
 `;
 
-const MobileSidebarWrapper = styled(Box)`
+const MobileSidebarWrapper = styled(Box)<{}, {}>`
   width: 100%;
   background-color: ${prop('theme.gray1')};
 `;

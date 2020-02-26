@@ -16,13 +16,15 @@ import { ToolbarButton } from './ToolbarButton';
 
 const { useState } = React;
 
-const Time = Box.withComponent('time');
-const StyledTime = styled<typeof Time, { readonly minWidth: number }>(Time)`
+// tslint:disable-next-line: no-any
+const Time = Box.withComponent<any>('time');
+const StyledTime = styled(Time)<typeof Time, { readonly minWidth: number }>`
   min-width: ${prop('minWidth')}px;
 `;
 const getMinWidth = (value: string) => Math.max(30, value.length * 8);
 
-const StyledDivider = styled(Divider)`
+// tslint:disable-next-line: no-any
+const StyledDivider = styled(Divider)<any>`
   height: 22px;
   margin: 0 8px;
 `;

@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { Box } from '@neo-one/react-common';
 import { prop } from 'styled-tools';
 
-export const SidebarSpacer = styled(Box)`
+export const SidebarSpacer = styled(Box)<{}, {}>`
   display: none;
 
   @media (min-width: ${prop('theme.breakpoints.sm')}) {

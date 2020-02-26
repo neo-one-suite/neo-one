@@ -6,7 +6,7 @@ import { prop } from 'styled-tools';
 import { Example, Text, Title } from '../common';
 import { ExtraData } from '../types';
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   grid-auto-flow: row;
   grid-gap: 32px;

@@ -5,7 +5,7 @@ import * as React from 'react';
 import { ifProp, prop, withProp } from 'styled-tools';
 import { StyledRouterLinkBase } from './StyledRouterLink';
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: flex;
   width: 100%;
   justify-content: center;
@@ -18,7 +18,8 @@ const Wrapper = styled(Box)`
   }
 `;
 
-const StyledToolbar = styled(Toolbar)`
+// tslint:disable-next-line: no-any
+const StyledToolbar = styled(Toolbar)<any>`
   && {
     height: 100%;
     grid-gap: 8px;
@@ -31,7 +32,8 @@ const StyledToolbar = styled(Toolbar)`
   }
 `;
 
-const LogoLink = styled(StyledRouterLinkBase)`
+// tslint:disable-next-line: no-any
+const LogoLink = styled(StyledRouterLinkBase)<any>`
   display: block;
   margin-right: 0;
   margin-bottom: 8px;
@@ -45,7 +47,8 @@ const LogoLink = styled(StyledRouterLinkBase)`
   }
 `;
 
-const NavigationLink = styled<typeof StyledRouterLinkBase, { readonly active: boolean }>(StyledRouterLinkBase)`
+// tslint:disable-next-line: no-any
+const NavigationLink = styled(StyledRouterLinkBase)<any>`
   display: flex;
   align-items: center;
   ${prop('theme.fontStyles.headline')};
@@ -73,19 +76,19 @@ const NavigationLink = styled<typeof StyledRouterLinkBase, { readonly active: bo
 
 const FocusableLink = ToolbarFocusable.withComponent(Link);
 
-const GitHubLink = styled(FocusableLink)`
+const GitHubLink = styled(FocusableLink)<{}, {}>`
   @media (max-width: ${prop('theme.breakpoints.sm')}) {
     display: none;
   }
 `;
 
-const CourseLink = styled(NavigationLink)`
+const CourseLink = styled(NavigationLink)<{}, {}>`
   @media (max-width: ${prop('theme.breakpoints.sm')}) {
     display: none;
   }
 `;
 
-const LeftHeader = styled(ToolbarContent)`
+const LeftHeader = styled(ToolbarContent)<{}, {}>`
   grid-gap: 32px;
 
   @media (max-width: ${prop('theme.breakpoints.md')}) {

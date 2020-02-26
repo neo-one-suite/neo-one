@@ -4,7 +4,7 @@ import * as React from 'react';
 import { prop } from 'styled-tools';
 import { Author } from './types';
 
-const Text = styled(Box)`
+const Text = styled(Box)<{}, {}>`
   ${prop('theme.fonts.axiformaRegular')}
   ${prop('theme.fontStyles.subheading')}
   color: ${prop('theme.black')};

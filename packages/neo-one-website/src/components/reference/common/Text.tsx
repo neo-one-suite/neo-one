@@ -5,7 +5,7 @@ import { prop } from 'styled-tools';
 import { WordTokens } from '../types';
 import { buildText } from './utils';
 
-export const StyledText = styled(Box)`
+export const StyledText = styled(Box)<{}, {}>`
   ${prop('theme.fontStyles.subheading')};
   ${prop('theme.fonts.axiformaRegular')};
 `;

@@ -12,16 +12,17 @@ interface Props {
   readonly author: Author;
 }
 
-const StyledLink = styled(StyledRouterLink)`
+// tslint:disable-next-line: no-any
+const StyledLink = styled(StyledRouterLink)<any>`
   ${prop('theme.fontStyles.headline')};
 `;
 
-const PostInfo = styled(Box)`
+const PostInfo = styled(Box)<{}, {}>`
   color: ${prop('theme.gray5')};
   ${prop('theme.fontStyles.subheading')};
 `;
 
-const Wrapper = styled(List)`
+const Wrapper = styled(List)<{}, {}>`
   list-style-type: none;
   max-width: 320px;
   border-bottom: 1px solid ${prop('theme.gray3')};

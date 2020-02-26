@@ -9,7 +9,8 @@ import { getWalletSelectorOptions$, makeWalletSelectorValueOption, WalletSelecto
 
 const { useContext } = React;
 
-const Wrapper = styled(Label)`
+// tslint:disable-next-line: no-any
+const Wrapper = styled(Label)<any>`
   border-top: 1px solid rgba(0, 0, 0, 0.3);
   margin-top: 8px;
   padding-top: 16px;
@@ -43,7 +44,7 @@ export function TransferTo({ to, onChangeTo, ...props }: Props & React.Component
       Transfer To
       <WalletSelectorBase
         data-test="neo-one-transfer-to-selector"
-        value={to.map((userAccount) => makeWalletSelectorValueOption({ userAccount }))}
+        value={to.map((userAccount: UserAccount) => makeWalletSelectorValueOption({ userAccount }))}
         options={options}
         onChange={(option: any) => {
           if (option != undefined) {

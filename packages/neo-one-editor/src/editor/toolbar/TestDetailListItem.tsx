@@ -8,7 +8,7 @@ import { TestDetailError } from './TestDetailError';
 import { TestIcon } from './TestIcon';
 import { TestText } from './TestText';
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   grid-gap: 0;
   grid-auto-flow: row;

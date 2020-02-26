@@ -14,7 +14,7 @@ export interface Props {
   readonly data: ClassData | InterfaceData;
 }
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   grid-auto-flow: row;
   grid-gap: 40px;

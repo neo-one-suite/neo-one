@@ -2,7 +2,8 @@ import styled from '@emotion/styled';
 import { Label } from '@neo-one/react-common';
 import { prop } from 'styled-tools';
 
-export const SettingsLabel = styled(Label)`
+// tslint:disable-next-line: no-any
+export const SettingsLabel = styled(Label)<any>`
   ${prop('theme.fontStyles.subheading')};
   grid-auto-flow: column;
   align-items: center;

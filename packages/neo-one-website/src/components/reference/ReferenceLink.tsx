@@ -12,7 +12,8 @@ interface Props {
   readonly type: ReferenceType;
 }
 
-const StyledLink = styled(StyledRouterLink)`
+// tslint:disable-next-line: no-any
+const StyledLink = styled(StyledRouterLink)<any>`
   ${prop('theme.fontStyles.subheading')};
   ${prop('theme.fonts.axiformaRegular')};
 `;

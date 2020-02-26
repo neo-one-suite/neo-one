@@ -39,7 +39,7 @@ const Wrapper: any = styled('div')`
   ${wrapperWithProps}
 `;
 
-export const SplitPaneResizer = styled.div`
+export const SplitPaneResizer = styled.div<{}, {}>`
   background-color: ${prop('theme.gray5')};
   background-clip: padding-box;
   box-sizing: border-box;

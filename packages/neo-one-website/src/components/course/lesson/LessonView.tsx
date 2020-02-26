@@ -18,7 +18,7 @@ const Wrapper = styled(Box)`
   width: 100%;
 `;
 
-const BoxWrapper = styled(Box)`
+const BoxWrapper = styled(Box)<{}, {}>`
   display: grid;
   background-color: ${prop('theme.gray6')};
   padding-top: 64px;
@@ -28,7 +28,7 @@ const BoxWrapper = styled(Box)`
   place-content: center;
 `;
 
-const InnerWrapper = styled(Box)`
+const InnerWrapper = styled(Box)<{}, {}>`
   display: grid;
   background-color: ${prop('theme.black')};
   max-width: 720px;
@@ -36,13 +36,14 @@ const InnerWrapper = styled(Box)`
   box-shadow: 0 6px 4px 4px rgba(0, 0, 0, 0.2);
 `;
 
-const StartButton = styled(Button.withComponent(RouterLink))`
+// tslint:disable-next-line: no-any
+const StartButton = styled(Button.withComponent<any>(RouterLink))`
   text-decoration: none;
   cursor: pointer;
   border-radius: 16px;
 `;
 
-const ButtonWrapper = styled(Box)`
+const ButtonWrapper = styled(Box)<{}, {}>`
   display: grid;
   color: ${prop('theme.gray0')};
   background-color: ${prop('theme.gray4')};
@@ -54,7 +55,7 @@ const ButtonWrapper = styled(Box)`
   padding: 8px;
 `;
 
-const Text = styled(Box)`
+const Text = styled(Box)<{}, {}>`
   ${prop('theme.fontStyles.headline')};
 `;
 

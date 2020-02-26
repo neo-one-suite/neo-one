@@ -17,7 +17,7 @@ import { ResizeHandlerContext } from './ResizeHandlerContext';
 
 const { useContext, useCallback } = React;
 
-const StyledHeader = styled(Box)`
+const StyledHeader = styled(Box)<{}, {}>`
   display: grid;
   grid-auto-flow: column;
   background-color: ${prop('theme.primary')};
@@ -27,13 +27,13 @@ const StyledHeader = styled(Box)`
   padding: 16px;
 `;
 
-const StyledHeading = styled(H3)`
+const StyledHeading = styled(H3)<{}, {}>`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.headline')};
   margin: 0;
 `;
 
-const StyledBody = styled(Box)`
+const StyledBody = styled(Box)<{}, {}>`
   display: grid;
   gap: 8px;
   background-color: ${prop('theme.gray0')};

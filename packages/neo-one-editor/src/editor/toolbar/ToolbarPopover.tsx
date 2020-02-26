@@ -5,7 +5,7 @@ import { MdClose } from 'react-icons/md';
 import { prop } from 'styled-tools';
 import { Wrapper } from './Wrapper';
 
-const HeaderWrapper = styled(Box)`
+const HeaderWrapper = styled(Box)<{}, {}>`
   display: grid;
   color: ${prop('theme.gray0')};
   grid-auto-flow: column;
@@ -20,7 +20,7 @@ const BodyWrapper = styled(Box)`
   padding-right: 8px;
 `;
 
-const TitleText = styled(Box)`
+const TitleText = styled(Box)<{}, {}>`
   padding-top: 8px;
   padding-bottom: 8px;
   ${prop('theme.fonts.axiformaRegular')};
@@ -34,7 +34,7 @@ const ToggleWrapper = styled(Wrapper)`
   ${prop('theme.fontStyles.caption')};
 `;
 
-const PopoverWrapper = styled(Box)`
+const PopoverWrapper = styled(Box)<{}, {}>`
   display: grid;
   grid-auto-flow: row;
   grid-auto-rows: auto;

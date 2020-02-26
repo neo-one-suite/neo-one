@@ -8,7 +8,7 @@ import { Toast as ToastType } from './ToastsContext';
 
 const { useEffect, useCallback } = React;
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   gap: 8px;
   background-color: ${prop('theme.gray0')};

@@ -4,7 +4,8 @@ import * as React from 'react';
 import { prop } from 'styled-tools';
 import { Tagline } from '../elements';
 
-const StyledBackground = styled(Background)`
+// tslint:disable-next-line: no-any
+const StyledBackground = styled(Background)<any>`
   display: flex;
   color: ${prop('theme.gray0')};
   justify-content: center;
@@ -12,7 +13,7 @@ const StyledBackground = styled(Background)`
   width: 100%;
 `;
 
-const Headline = styled(H1)`
+const Headline = styled(H1)<{}, {}>`
   align-self: start;
   justify-self: start;
   color: ${prop('theme.primary')};

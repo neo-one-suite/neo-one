@@ -18,7 +18,7 @@ const InnerEditorWrapper = styled(ContentWrapperBase)`
   justify-content: stretch;
 `;
 
-const TextWrapper = styled(ContentWrapperBase)`
+const TextWrapper = styled(ContentWrapperBase)<{}, {}>`
   grid-gap: 24px;
   border-bottom: 1px solid ${prop('theme.gray2')};
   padding-bottom: 32px;
@@ -31,19 +31,19 @@ const InnerTextWrapper = styled(Box)`
   grid-gap: 24px;
 `;
 
-const StyledHeading = styled(H2)`
+const StyledHeading = styled(H2)<{}, {}>`
   ${prop('theme.fontStyles.headline')};
   ${prop('theme.fonts.axiformaBold')};
   color: ${prop('theme.gray1')};
 `;
 
-const Text = styled(Box)`
+const Text = styled(Box)<{}, {}>`
   ${prop('theme.fontStyles.subheading')};
   ${prop('theme.fonts.axiformaRegular')};
   color: ${prop('theme.gray1')};
 `;
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   padding-top: 64px;
   background-color: ${prop('theme.black')};
@@ -56,7 +56,8 @@ const Wrapper = styled(Box)`
   }
 `;
 
-const StyledLink = StyledRouterLink;
+// tslint:disable-next-line: no-any
+const StyledLink = styled(StyledRouterLink)<any>``;
 
 export const EditorContent = () => (
   <Wrapper>

@@ -40,7 +40,7 @@ export const useToasts = (): readonly [ReadonlyArray<Toast>, typeof addToast, ty
 
 export type AddError = (error: Error) => void;
 
-const ErrorText = styled(Box.withComponent('span'))`
+const ErrorText = styled(Box.withComponent('span'))<{}, {}>`
   color: ${prop('theme.error')};
 `;
 

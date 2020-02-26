@@ -5,7 +5,7 @@ import { prop } from 'styled-tools';
 import { LayoutWrapper } from './common';
 import { StyledRouterLink } from './StyledRouterLink';
 
-const LinkSectionTitle = styled(Box)`
+const LinkSectionTitle = styled(Box)<{}, {}>`
   ${prop('theme.fonts.axiformaBold')};
   ${prop('theme.fontStyles.body1')};
   color: ${prop('theme.gray2')};
@@ -44,7 +44,7 @@ const LinkSection = ({
   </LinkSectionWrapper>
 );
 
-const FooterWrapper = styled(Box)`
+const FooterWrapper = styled(Box)<{}, {}>`
   display: grid;
   justify-content: center;
   grid-gap: 64px;
@@ -56,14 +56,14 @@ const FooterWrapper = styled(Box)`
   }
 `;
 
-const Copyright = styled(Box)`
+const Copyright = styled(Box)<{}, {}>`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.caption')};
   color: ${prop('theme.gray3')};
   text-align: center;
 `;
 
-const LinksGrid = styled(Box)`
+const LinksGrid = styled(Box)<{}, {}>`
   display: grid;
   grid-auto-flow: column;
   grid-gap: 64px;
@@ -73,7 +73,7 @@ const LinksGrid = styled(Box)`
   }
 `;
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   background-color: ${prop('theme.black')};
   box-shadow: inset 0 10px 10px -5px rgba(0, 0, 0, 0.2);

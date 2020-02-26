@@ -26,7 +26,8 @@ const getNextLesson = (selected: SelectedChapter) => {
   return course.lessons[selected.lesson + 1] as Lesson | undefined;
 };
 
-const ButtonLink = Button.withComponent(RouterLink);
+// tslint:disable-next-line: no-any
+const ButtonLink = Button.withComponent<any>(RouterLink);
 
 const NextButtonBase = ({ selected, onClick, complete, ...props }: Props) => {
   const nextChapter = getNextChapter(selected);

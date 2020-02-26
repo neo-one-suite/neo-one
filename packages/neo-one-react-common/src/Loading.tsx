@@ -19,7 +19,7 @@ const fadeInOut = keyframes`
   }
 `;
 
-const LoadingWrapper = styled(Box)`
+const LoadingWrapper = styled(Box)<{}, {}>`
   padding-top: 96px;
   flex: 1 1 auto;
   min-height: 512px;

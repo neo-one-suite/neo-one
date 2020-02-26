@@ -18,7 +18,7 @@ const Wrapper = styled(DispatchWrapper)`
     / auto;
 `;
 
-const ToolbarWrapper = styled(Box)`
+const ToolbarWrapper = styled(Box)<{}, {}>`
   display: grid;
   width: 100%;
   background-color: ${prop('theme.accent')};

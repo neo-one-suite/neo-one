@@ -13,7 +13,7 @@ import { prop } from 'styled-tools';
 import { TokenSmartContract, WithContracts } from '../one/generated';
 import { createTokenInfoStream$, handleMint, handleTransfer, handleWithdraw } from './utils';
 
-const InfoGrid = styled(Box)`
+const InfoGrid = styled(Box)<{}, {}>`
   display: grid;
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};
@@ -26,7 +26,7 @@ const InfoGrid = styled(Box)`
   gap: 0;
 `;
 
-const ContributeGrid = styled(Box)`
+const ContributeGrid = styled(Box)<{}, {}>`
   display: grid;
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};
@@ -40,7 +40,7 @@ const ContributeGrid = styled(Box)`
   margin: 8px;
 `;
 
-const TransferGrid = styled(Box)`
+const TransferGrid = styled(Box)<{}, {}>`
   display: grid;
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};
@@ -54,7 +54,7 @@ const TransferGrid = styled(Box)`
   margin: 8px;
 `;
 
-const WithdrawGrid = styled(Box)`
+const WithdrawGrid = styled(Box)<{}, {}>`
   display: grid;
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};

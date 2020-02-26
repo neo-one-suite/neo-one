@@ -1,8 +1,9 @@
 import styled from '@emotion/styled';
+import { ColorProps } from '@neo-one/react-core';
 import { theme } from 'styled-tools';
 import { Hidden } from './Hidden';
 
-export const Backdrop = styled(Hidden)`
+export const Backdrop = styled(Hidden)<ColorProps>`
   position: fixed;
   top: 0;
   left: 0;

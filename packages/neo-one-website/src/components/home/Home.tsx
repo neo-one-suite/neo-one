@@ -10,7 +10,8 @@ import { EditorContent } from './EditorContent';
 import { Proof } from './Proof';
 import { Testing } from './Testing';
 
-const StyledBackground = styled(Background)`
+// tslint:disable-next-line: no-any
+const StyledBackground = styled(Background)<any>`
   display: grid;
   place-content: center;
   place-items: center;
@@ -28,7 +29,7 @@ const StyledLineLogoPrimary = styled(LineLogoPrimary)`
   }
 `;
 
-const Headline = styled(Box)`
+const Headline = styled(Box)<{}, {}>`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.display1')};
   text-align: center;
@@ -41,12 +42,14 @@ const ButtonWrapper = styled(Box)`
   grid-gap: 24px;
 `;
 
-const LinkButton = Button.withComponent(StyledRouterLinkBase);
-const StyledLinkButton = styled(LinkButton)`
+// tslint:disable-next-line: no-any
+const LinkButton = Button.withComponent<any>(StyledRouterLinkBase);
+const StyledLinkButton = styled(LinkButton)<{}, {}>`
   ${prop('theme.fontStyles.subheading')};
 `;
 
-const StyledLink = styled(StyledRouterLinkBase)`
+// tslint:disable-next-line: no-any
+const StyledLink = styled(StyledRouterLinkBase)<any>`
   ${prop('theme.fontStyles.subheading')};
   color: ${prop('theme.accent')};
 
@@ -60,7 +63,7 @@ const CenterContentWrapper = styled(ContentWrapperBase)`
   justify-content: center;
 `;
 
-const ProofsWrapper = styled(Box)`
+const ProofsWrapper = styled(Box)<{}, {}>`
   display: grid;
   grid-auto-flow: column;
   padding-top: 64px;
@@ -73,7 +76,7 @@ const ProofsWrapper = styled(Box)`
   }
 `;
 
-const ProofsInnerWrapper = styled(Box)`
+const ProofsInnerWrapper = styled(Box)<{}, {}>`
   display: grid;
   grid-auto-flow: column;
 
@@ -83,7 +86,7 @@ const ProofsInnerWrapper = styled(Box)`
   }
 `;
 
-const FeaturesWrapper = styled(Box)`
+const FeaturesWrapper = styled(Box)<{}, {}>`
   display: grid;
   padding-top: 64px;
   padding-bottom: 64px;

@@ -10,7 +10,7 @@ interface Props {
   readonly className?: string;
 }
 
-const PreWrapper = styled(Box.withComponent('pre'))`
+const PreWrapper = styled(Box.withComponent('pre'))<{}, {}>`
   background-color: ${prop('theme.gray6')};
   ${prop('theme.fontStyles.subheading')};
   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
@@ -18,7 +18,7 @@ const PreWrapper = styled(Box.withComponent('pre'))`
   border-radius: 4px;
 `;
 
-const CodeWrapper = styled(Box.withComponent('code'))`
+const CodeWrapper = styled(Box.withComponent('code'))<{}, {}>`
   ${prop('theme.fontStyles.subheading')};
   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 `;

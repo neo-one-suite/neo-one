@@ -10,7 +10,8 @@ const Wrapper = styled(Box)`
   grid-auto-rows: auto;
 `;
 
-const Text = styled(Box)`
+// tslint:disable-next-line: no-any
+const Text = styled(Box)<any>`
   color: ${prop('theme.gray0')};
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.subheading')};

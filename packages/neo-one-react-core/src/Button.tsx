@@ -1,8 +1,9 @@
 import styled from '@emotion/styled';
 import { prop } from 'styled-tools';
 import { ButtonBase } from './ButtonBase';
+import { ColorProps } from './styledProps';
 
-export const Button = styled(ButtonBase)`
+export const Button = styled(ButtonBase)<typeof ButtonBase & ColorProps>`
   background-color: ${prop('theme.accent')};
   border: none;
   border-radius: 24px;

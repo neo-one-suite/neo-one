@@ -15,7 +15,7 @@ const Wrapper = styled(Box)`
     / auto;
 `;
 
-const Title = styled(ButtonBase.withComponent(RouterLink))`
+const Title = styled(ButtonBase.withComponent(RouterLink))<{}, {}>`
   width: 100%;
   ${prop('theme.fontStyles.headline')};
   ${prop('theme.fonts.axiformaMedium')};

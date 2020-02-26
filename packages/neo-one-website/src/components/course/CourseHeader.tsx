@@ -5,7 +5,7 @@ import * as React from 'react';
 import { prop } from 'styled-tools';
 import { RouterLink } from '../RouterLink';
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: flex;
   width: 100%;
   justify-content: center;
@@ -17,7 +17,8 @@ const Wrapper = styled(Box)`
   }
 `;
 
-const StyledToolbar = styled(Toolbar)`
+// tslint:disable-next-line: no-any
+const StyledToolbar = styled(Toolbar)<any>`
   &&& {
     height: 100%;
     grid-gap: 8px;
@@ -25,7 +26,7 @@ const StyledToolbar = styled(Toolbar)`
   }
 `;
 
-const LogoLink = styled(RouterLink)`
+const LogoLink = styled(RouterLink)<{}, {}>`
   display: block;
   margin-right: 24px;
   margin-bottom: 16px;

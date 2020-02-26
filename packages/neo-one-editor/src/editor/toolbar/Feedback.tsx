@@ -61,7 +61,8 @@ const ExperienceWrapper = styled(RowWrapper)`
   grid-gap: 8px;
 `;
 
-const InputBox = styled(Input.withComponent('textarea'))`
+// tslint:disable-next-line: no-any
+const InputBox = styled(Input.withComponent<any>('textarea'))`
   color: ${prop('theme.gray0')};
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};

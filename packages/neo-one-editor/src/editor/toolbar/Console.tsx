@@ -6,7 +6,7 @@ import { TextRange } from '../types';
 import { ConsoleContent } from './ConsoleContent';
 import { ConsoleHeader } from './ConsoleHeader';
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   width: 100%;
   grid:
