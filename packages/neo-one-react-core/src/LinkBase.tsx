@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 import { Box } from './Box';
+import { ColorProps } from './styledProps';
 
-export const LinkBase = styled(Box.withComponent('a'))`
+export const LinkBase = styled(Box.withComponent('a'))<ColorProps>`
   cursor: pointer;
 `;
 

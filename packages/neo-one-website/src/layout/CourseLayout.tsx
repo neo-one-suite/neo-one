@@ -4,7 +4,7 @@ import React from 'react';
 import { prop } from 'styled-tools';
 import { CourseHeader } from '../components';
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   &&& {
     display: flex;
     flex-direction: column;

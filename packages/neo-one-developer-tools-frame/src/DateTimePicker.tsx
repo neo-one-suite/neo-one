@@ -7,7 +7,7 @@ import { prop } from 'styled-tools';
 
 const { useState, useCallback } = React;
 
-const ErrorText = styled(Box)`
+const ErrorText = styled(Box)<{}, {}>`
   color: ${prop('theme.error')};
 `;
 

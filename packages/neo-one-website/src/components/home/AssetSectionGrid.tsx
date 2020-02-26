@@ -10,7 +10,7 @@ interface Props {
   readonly children: React.ReactNode;
 }
 
-const StyledHeading = styled.h2`
+const StyledHeading = styled.h2<{}, {}>`
   ${prop('theme.fonts.axiformaMedium')};
   ${prop('theme.fontStyles.headline')};
   /* stylelint-disable-next-line */
@@ -18,7 +18,7 @@ const StyledHeading = styled.h2`
   margin: 0;
 `;
 
-const Content = styled(Box)`
+const Content = styled(Box)<{}, {}>`
   display: grid;
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.subheading')};
@@ -40,7 +40,7 @@ const ContentItem = styled(Box)`
   gap: 16;
 `;
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   grid-template:
     'content asset' auto

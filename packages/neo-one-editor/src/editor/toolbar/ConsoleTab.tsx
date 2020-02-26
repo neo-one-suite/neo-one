@@ -15,7 +15,8 @@ const Wrapper = styled(Box)`
   grid-auto-flow: column;
 `;
 
-const TextWrapper = styled(Box)<{ readonly selected: boolean }>`
+// tslint:disable-next-line: no-any
+const TextWrapper = styled(Box)<any>`
   color: ${ifProp('selected', prop('theme.gray0'), prop('theme.gray2'))};
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};

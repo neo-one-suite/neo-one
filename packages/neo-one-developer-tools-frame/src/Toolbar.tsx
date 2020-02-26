@@ -18,7 +18,7 @@ import { WalletButton } from './WalletButton';
 
 const { useCallback, useState } = React;
 
-const Wrapper = styled<typeof Box, { readonly active: boolean }>(Box)`
+const Wrapper = styled(Box)<{ readonly active: boolean }, { readonly active: boolean }>`
   display: flex;
   bottom: 0;
   left: 0;

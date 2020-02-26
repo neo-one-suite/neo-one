@@ -19,7 +19,7 @@ const StyledHeadroom = styled(Headroom)`
   z-index: 9999;
 `;
 
-const Content = styled(Box)`
+const Content = styled(Box)<{}, {}>`
   width: 100%;
   background-color: ${prop('theme.gray0')};
 `;

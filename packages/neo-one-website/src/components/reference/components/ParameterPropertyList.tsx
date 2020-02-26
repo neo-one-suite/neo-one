@@ -6,7 +6,7 @@ import { Title } from '../common';
 import { Parameter, Property } from '../types';
 import { ParameterPropertyItem } from './ParameterPropertyItem';
 
-const ParameterLayout = styled(Box)`
+const ParameterLayout = styled(Box)<{}, {}>`
   display: grid;
   grid-auto-flow: row;
   grid-gap: 32px;

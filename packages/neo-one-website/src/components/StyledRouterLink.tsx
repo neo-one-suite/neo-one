@@ -31,7 +31,7 @@ export const StyledRouterLinkBase = styled<typeof RouterLink, StyledRouterLinkBa
   }
 `;
 
-export const StyledRouterLink = styled(StyledRouterLinkBase)`
+export const StyledRouterLink = styled(StyledRouterLinkBase)<{}, {}>`
   ${prop('theme.fonts.axiformaBold')};
   ${prop('theme.fontStyles.body1')};
 `;

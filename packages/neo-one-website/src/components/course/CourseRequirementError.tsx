@@ -13,7 +13,7 @@ const Wrapper = styled(Box)`
   width: 100%;
 `;
 
-const BoxWrapper = styled(Box)`
+const BoxWrapper = styled(Box)<{}, {}>`
   display: grid;
   background-color: ${prop('theme.gray6')};
   padding-top: 64px;
@@ -23,7 +23,7 @@ const BoxWrapper = styled(Box)`
   place-content: center;
 `;
 
-const InnerWrapper = styled(Box)`
+const InnerWrapper = styled(Box)<{}, {}>`
   display: grid;
   background-color: ${prop('theme.black')};
   max-width: 480px;
@@ -32,7 +32,7 @@ const InnerWrapper = styled(Box)`
   box-shadow: 0 6px 4px 4px rgba(0, 0, 0, 0.2);
 `;
 
-const Text = styled(Box)`
+const Text = styled(Box)<{}, {}>`
   color: ${prop('theme.gray0')};
   ${prop('theme.fontStyles.subheading')};
 `;

@@ -29,7 +29,9 @@ const StyledEditorFileIcon = styled(FileIcon)`
   height: 16px;
   width: 16px;
 `;
-const StyledProblemCount = styled(ProblemCount)`
+
+// tslint:disable-next-line: no-any
+const StyledProblemCount = styled(ProblemCount)<any>`
   padding-top: 1.5px;
 `;
 

@@ -8,7 +8,7 @@ const Wrapper = styled(Box)`
   place-items: center;
 `;
 
-const IconWrapper = styled(ButtonBase)`
+const IconWrapper = styled(ButtonBase)<typeof ButtonBase>`
   color: ${prop('theme.gray0')};
   cursor: pointer;
   outline: none;

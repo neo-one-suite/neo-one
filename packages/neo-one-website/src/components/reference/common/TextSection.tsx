@@ -6,7 +6,7 @@ import { WordTokens } from '../types';
 import { Text } from './Text';
 import { Title } from './Title';
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   grid-auto-flow: row;
   grid-gap: 32px;

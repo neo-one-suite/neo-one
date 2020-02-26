@@ -216,7 +216,17 @@ const hiddenTransition = (props: any) => {
   `;
 };
 
-export const Hidden = styled<typeof HiddenComponent, HiddenStyledProps>(HiddenComponent)`
+export const Hidden = styled(HiddenComponent)<
+  ExpandProps &
+    SlideProps & {
+      readonly duration?: string;
+      readonly timing?: string;
+      readonly defaultSlide?: string | undefined;
+      readonly defaultExpand?: string | undefined;
+      readonly visible?: boolean;
+      readonly unmount?: boolean;
+    }
+>`
   transform: ${translateWithProps};
   ${hiddenTransformOrigin};
 

@@ -10,7 +10,7 @@ import { DocsSolution } from './DocsSolution';
 import { NextButton } from './NextButton';
 import { PreviousButton } from './PreviousButton';
 
-const Wrapper = styled(DispatchWrapper)`
+const Wrapper = styled(DispatchWrapper)<{}, {}>`
   display: grid;
   grid:
     'solution' auto

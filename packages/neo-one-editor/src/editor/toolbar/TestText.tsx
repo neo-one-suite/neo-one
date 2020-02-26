@@ -8,14 +8,14 @@ export const TestText = styled(Box)<{}, {}>`
   color: ${prop('theme.gray0')};
 `;
 
-export const TestTextDark = styled(TestText)`
+export const TestTextDark = styled(TestText)<{}, {}>`
   color: ${prop('theme.gray3')};
 `;
 
-export const TestPassing = styled(TestText)`
+export const TestPassing = styled(TestText)<{}, {}>`
   color: ${prop('theme.primaryDark')};
 `;
 
-export const TestFailing = styled(TestText)`
+export const TestFailing = styled(TestText)<{}, {}>`
   color: ${prop('theme.error')};
 `;

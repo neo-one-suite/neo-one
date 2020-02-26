@@ -1,6 +1,6 @@
 // tslint:disable no-null-keyword no-object-mutation
 import styled from '@emotion/styled';
-import { getSelector } from '@neo-one/react-core';
+import { ColorProps, getSelector } from '@neo-one/react-core';
 import Popper from 'popper.js';
 import * as React from 'react';
 import { theme } from 'styled-tools';
@@ -124,7 +124,7 @@ const PopoverComponent = forwardRef<HTMLDivElement, PopoverProps & React.Compone
   },
 );
 
-export const Popover = styled(PopoverComponent)`
+export const Popover = styled(PopoverComponent)<ColorProps>`
   position: absolute;
   top: 0;
   left: 0;

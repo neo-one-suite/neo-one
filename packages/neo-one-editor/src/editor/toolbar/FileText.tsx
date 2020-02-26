@@ -13,13 +13,13 @@ const Wrapper = styled(Box)`
   grid-gap: 8px;
 `;
 
-const LightText = styled(Box)`
+const LightText = styled(Box)<{}, {}>`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};
   color: ${prop('theme.gray0')};
 `;
 
-const DarkText = styled(Box)`
+const DarkText = styled(Box)<{}, {}>`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.caption')};
   color: ${prop('theme.gray3')};

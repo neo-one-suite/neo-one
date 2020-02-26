@@ -5,8 +5,7 @@ import * as React from 'react';
 
 const { useCallback, useState } = React;
 
-// tslint:disable-next-line no-any
-const StyledSelect: any = styled(Select)`
+const StyledSelect = styled(Select)`
   &&& {
     border-right: 0;
     width: 100px;

@@ -5,17 +5,17 @@ import { prop } from 'styled-tools';
 import { maxWidth } from './constants';
 import { ContentWrapper } from './ContentWrapper';
 
-const NavLink = styled(Link)`
+const NavLink = styled(Link)<{}, {}>`
   ${prop('theme.fontStyles.subheading')};
 `;
 
-const Text = styled(Box)`
+const Text = styled(Box)<{}, {}>`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.subheading')};
   color: ${prop('theme.black')};
 `;
 
-const Header = styled(H2)`
+const Header = styled(H2)<{}, {}>`
   ${prop('theme.fonts.axiformaRegular')}
   ${prop('theme.fontStyles.headline')}
   color: ${prop('theme.black')};

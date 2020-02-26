@@ -8,7 +8,10 @@ export interface ToolbarContentProps {
 
 const toolbarContentTheme = theme('ToolbarContent');
 
-export const ToolbarContent = styled<typeof Box, ToolbarContentProps>(Box)`
+export const ToolbarContent = styled<typeof Box, ToolbarContentProps>(Box)<
+  { readonly align?: string },
+  { readonly align?: string }
+>`
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: min-content;

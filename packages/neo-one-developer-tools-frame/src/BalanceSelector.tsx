@@ -16,15 +16,14 @@ import { Token } from './types';
 
 const { useContext } = React;
 
-// tslint:disable-next-line no-any
-const AssetInput: any = styled(ToolbarSelector)`
+const AssetInput = styled(ToolbarSelector)`
   &&& {
     border-left: 0;
     width: 88px;
   }
 `;
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   grid-auto-flow: column;
   align-items: center;

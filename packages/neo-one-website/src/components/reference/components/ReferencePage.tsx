@@ -14,7 +14,7 @@ export interface Props {
   readonly content: ReferenceItem;
 }
 
-const PageLayout = styled(Box)`
+const PageLayout = styled(Box)<{}, {}>`
   display: grid;
   grid-gap: 32px;
 

@@ -4,7 +4,7 @@ import { bgColorWithProps, ColorProps, textColorWithProps } from './styledProps'
 
 const boxTheme = theme('Box');
 
-export const Box = styled<'div', ColorProps>('div')`
+export const Box = styled<'div', ColorProps>('div')<{}, {}>`
   margin: unset;
   padding: unset;
   border: unset;

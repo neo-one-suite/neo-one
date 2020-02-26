@@ -9,7 +9,7 @@ interface Props {
   readonly type: TypeFilterOptions;
 }
 
-const StyledBox = styled(Box)`
+const StyledBox = styled(Box)<{}, {}>`
   ${prop('theme.fontStyles.subheading')};
   ${prop('theme.fonts.axiformaRegular')};
 `;

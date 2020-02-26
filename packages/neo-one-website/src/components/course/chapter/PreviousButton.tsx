@@ -23,7 +23,8 @@ const getPreviousLesson = (selected: SelectedChapter) => {
   return course.lessons[selected.lesson - 1] as Lesson | undefined;
 };
 
-const ButtonLink = Button.withComponent(RouterLink);
+// tslint:disable-next-line: no-any
+const ButtonLink = Button.withComponent<any>(RouterLink);
 
 export const PreviousButton = ({ selected, onClick, ...props }: Props) => {
   const previousChapter = getPreviousChapter(selected);

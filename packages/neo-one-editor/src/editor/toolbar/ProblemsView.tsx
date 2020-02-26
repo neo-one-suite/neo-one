@@ -11,7 +11,7 @@ import { FileProblems, selectConsoleProblems } from '../redux';
 import { TextRange } from '../types';
 import { ProblemView } from './ProblemView';
 
-const Wrapper = styled<typeof Box, { readonly shadowed: boolean }>(Box)`
+const Wrapper = styled(Box)<{ readonly shadowed: boolean }, { readonly shadowed: boolean }>`
   display: grid;
   align-content: start;
   width: 100%;

@@ -11,7 +11,7 @@ interface Props {
   readonly definition: WordTokens;
 }
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   grid-gap: 16px;
 

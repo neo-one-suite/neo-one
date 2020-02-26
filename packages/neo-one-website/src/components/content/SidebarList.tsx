@@ -7,7 +7,7 @@ import { Section } from './Section';
 
 const { useEffect } = React;
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   background-color: ${prop('theme.gray1')};
   padding-top: 16px;
   padding-bottom: 16px;

@@ -10,7 +10,7 @@ import { prop } from 'styled-tools';
 import { WithContracts } from '../one/generated';
 import { getTokenInfo } from './utils';
 
-const StyledGrid = styled(Box)`
+const StyledGrid = styled(Box)<{}, {}>`
   display: grid;
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};

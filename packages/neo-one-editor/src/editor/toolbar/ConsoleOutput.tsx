@@ -12,7 +12,8 @@ import {
   selectConsoleOutputOwner,
 } from '../redux';
 
-const Wrapper = styled<typeof Box, { readonly shadowed: boolean }>(Box)`
+// tslint:disable-next-line: no-any
+const Wrapper = styled(Box)<any>`
   color: ${prop('theme.gray0')};
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.body1')};

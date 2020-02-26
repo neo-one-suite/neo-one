@@ -1,3 +1,4 @@
 import { Box } from './Box';
 
-export const ButtonBase = Box.withComponent('button');
+// tslint:disable-next-line: no-any
+export const ButtonBase = Box.withComponent<any>('button');

@@ -54,13 +54,13 @@ const ChapterRoute = ({ course, lesson, chapter }: RouteComponentProps<ChapterPa
   );
 };
 
-const DesktopWrapper = styled(Box)`
+const DesktopWrapper = styled(Box)<{}, {}>`
   @media (max-width: ${prop('theme.breakpoints.sm')}) {
     display: none;
   }
 `;
 
-const MobileWrapper = styled(Box)`
+const MobileWrapper = styled(Box)<{}, {}>`
   display: none;
 
   @media (max-width: ${prop('theme.breakpoints.sm')}) {
@@ -70,14 +70,14 @@ const MobileWrapper = styled(Box)`
   }
 `;
 
-const Header = styled.h1`
+const Header = styled.h1<{}, {}>`
   ${prop('theme.fonts.axiformaBold')}
   ${prop('theme.fontStyles.headline')}
   color: ${prop('theme.gray0')};
   margin: 0;
 `;
 
-const Text = styled(Box)`
+const Text = styled(Box)<{}, {}>`
   ${prop('theme.fonts.axiformaRegular')}
   ${prop('theme.fontStyles.subheading')}
   color: ${prop('theme.gray0')};

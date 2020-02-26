@@ -1,3 +1,4 @@
 import { Box } from './Box';
 
-export const Image = Box.withComponent('img');
+// tslint:disable-next-line: no-any
+export const Image = Box.withComponent<any>('img');

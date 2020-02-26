@@ -16,7 +16,7 @@ export interface BlogAllProps {
   readonly posts: readonly BlogPost[];
 }
 
-const PostsGrid = styled(Box)`
+const PostsGrid = styled(Box)<{}, {}>`
   display: grid;
   border-top: 1px solid ${prop('theme.gray3')};
   grid-template-columns: 1fr;
@@ -43,7 +43,7 @@ const PostsGrid = styled(Box)`
   }
 `;
 
-const Title = styled(Box)`
+const Title = styled(Box)<{}, {}>`
   ${prop('theme.fontStyles.display2')};
   margin-bottom: 16px;
 
@@ -57,7 +57,7 @@ const Title = styled(Box)`
   }
 `;
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   padding-left: 16px;
   padding-right: 16px;
   padding-top: 16px;

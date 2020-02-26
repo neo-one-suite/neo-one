@@ -5,7 +5,8 @@ import React from 'react';
 import { ifProp, prop } from 'styled-tools';
 import { StyledRouterLink } from '../StyledRouterLink';
 
-const Link = styled<typeof StyledRouterLink, { readonly active: boolean }>(StyledRouterLink)`
+// tslint:disable-next-line: no-any
+const Link = styled(StyledRouterLink)<any>`
   ${ifProp('active', prop('theme.fonts.axiformaBold'), prop('theme.fonts.axiformaRegular'))};
   ${prop('theme.fontStyles.subheading')};
 
@@ -39,7 +40,7 @@ const TutorialLink = styled<typeof BaseLink, { readonly active: boolean }>(BaseL
   }
 `;
 
-const ActiveBorder = styled.span`
+const ActiveBorder = styled.span<{}, {}>`
   width: 4px;
   height: 24px;
   border-left: 4px solid ${prop('theme.accent')};

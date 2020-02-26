@@ -15,7 +15,8 @@ import { ConsoleType } from '../types';
 import { Text } from './Text';
 import { Wrapper } from './Wrapper';
 
-const GridWrapper = styled(Text)`
+// tslint:disable-next-line: no-any
+const GridWrapper = styled(Text)<any>`
   display: grid;
   gap: 2px;
   grid-auto-flow: column;

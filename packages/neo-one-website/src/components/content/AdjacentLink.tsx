@@ -10,7 +10,7 @@ export interface Props {
   readonly next?: boolean;
 }
 
-const ArticleText = styled<typeof Box, { readonly next: boolean }>(Box)`
+const ArticleText = styled(Box)<{ readonly next: boolean }, { readonly next: boolean }>`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.caption')};
   color: ${prop('theme.gray0')};
@@ -18,7 +18,8 @@ const ArticleText = styled<typeof Box, { readonly next: boolean }>(Box)`
   padding-bottom: 8px;
 `;
 
-const StyledLink = styled(StyledRouterLink)`
+// tslint:disable-next-line: no-any
+const StyledLink = styled(StyledRouterLink)<any>`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.display1')};
 

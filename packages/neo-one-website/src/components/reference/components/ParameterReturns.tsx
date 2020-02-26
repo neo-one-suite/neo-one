@@ -13,7 +13,7 @@ export interface Props {
   readonly subheading?: boolean;
 }
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   grid-auto-flow: row;
   grid-gap: 32px;

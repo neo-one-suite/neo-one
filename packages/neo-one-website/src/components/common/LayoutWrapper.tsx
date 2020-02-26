@@ -5,7 +5,7 @@ import * as React from 'react';
 import { prop } from 'styled-tools';
 import { SidebarSpacer } from './SidebarSpacer';
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   grid:
     'content' 'sidebar' auto

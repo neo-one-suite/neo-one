@@ -3,7 +3,7 @@ import { Box, ButtonBase } from '@neo-one/react-common';
 import * as React from 'react';
 import { prop } from 'styled-tools';
 
-const Wrapper = styled(ButtonBase)`
+const Wrapper = styled(ButtonBase)<typeof ButtonBase>`
   cursor: pointer;
   outline: none;
   width: 100%;

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/react-core",
+      "comment": "Upgrade TS to v3.8.1-rc. Fix types.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/react-core",
+  "email": "spencercorwin@icloud.com"
+}

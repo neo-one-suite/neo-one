@@ -11,7 +11,7 @@ const Wrapper = styled(Box)`
   place-items: center;
 `;
 
-const StyledButton = styled(ButtonBase)<{ readonly open: boolean }>`
+const StyledButton = styled(ButtonBase)`
   color: ${ifProp('open', prop('theme.gray0'), prop('theme.gray3'))};
   cursor: pointer;
   outline: none;

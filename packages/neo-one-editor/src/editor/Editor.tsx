@@ -21,8 +21,7 @@ const Wrapper = styled(Box)`
   min-height: 0;
 `;
 
-// tslint:disable-next-line no-any
-const StyledSplitPane = styled(SplitPane as any)`
+const StyledSplitPane = styled(SplitPane)`
   min-height: 0;
   min-width: 0;
   height: 100%;

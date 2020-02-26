@@ -10,6 +10,9 @@
     "pack": "gulp pack",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
+  "sideEffects": [
+    "*.css"
+  ],
   "dependencies": {
     "@emotion/core": "^10.0.22",
     "@emotion/styled": "^10.0.23",
@@ -30,8 +33,5 @@
     "@types/react-dom": "^16.9.4",
     "@types/react-select": "^3.0.0",
     "gulp": "~4.0.2"
-  },
-  "sideEffects": [
-    "*.css"
-  ]
+  }
 }

@@ -7,7 +7,7 @@ import { AdjacentInfo } from '../../types';
 import { LayoutWrapper } from '../common';
 import { AdjacentLink } from './AdjacentLink';
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   justify-items: center;
   padding-top: 64px;
@@ -16,7 +16,7 @@ const Wrapper = styled(Box)`
   width: 100%;
 `;
 
-const LinkWrapper = styled(Box)`
+const LinkWrapper = styled(Box)<{}, {}>`
   display: grid;
   grid-auto-flow: column;
   justify-content: space-between;

@@ -3,7 +3,7 @@ import { Box } from '@neo-one/react-common';
 import * as React from 'react';
 import { prop } from 'styled-tools';
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Box)<{}, {}>`
   display: grid;
   margin-left: 8px;
   margin-right: 24px;
@@ -17,14 +17,14 @@ const Wrapper = styled(Box)`
   }
 `;
 
-const Title = styled.h2`
+const Title = styled.h2<{}, {}>`
   ${prop('theme.fonts.axiformaThin')};
   ${prop('theme.fontStyles.headline')};
   color: ${prop('theme.gray5')};
   margin: 0;
 `;
 
-const Line = styled.p`
+const Line = styled.p<{}, {}>`
   ${prop('theme.fonts.axiformaRegular')};
   ${prop('theme.fontStyles.subheading')};
   color: ${prop('theme.black')};

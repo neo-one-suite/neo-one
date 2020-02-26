@@ -9,7 +9,7 @@ import { useAddError } from './ToastsContext';
 
 const { useContext } = React;
 
-const StyledSelect: any = styled(Select)`
+const StyledSelect = styled(Select)`
   &&& {
     width: 100px;
     height: 40px;

@@ -12,7 +12,8 @@ const checkPunctuation = (idx: number, example: WordTokens, value: string) =>
     ? `${value}`
     : `${value} `;
 
-const StyledReferenceLink = styled<typeof StyledRouterLink, { readonly code?: boolean }>(StyledRouterLink)`
+// tslint:disable-next-line: no-any
+const StyledReferenceLink = styled(StyledRouterLink)<any>`
   font-family: ${ifProp('code', "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace")};
   ${prop('theme.fontStyles.subheading')};
 `;
