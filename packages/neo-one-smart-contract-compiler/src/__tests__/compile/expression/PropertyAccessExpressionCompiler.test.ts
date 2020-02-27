@@ -37,4 +37,52 @@ describe('PropertyAccessExpressionCompiler', () => {
       assertEqual(bar.length, 3);
     `);
   });
+
+  test('optional chaining returns undefined when undefined', async () => {
+    await helpers.executeString(`
+      const bar: { optionalProp: number } | null | undefined = null as { optionalProp: number } | null | undefined;
+
+      assertEqual(bar?.optionalProp, undefined);
+    `);
+  });
+
+  test('optional chaining returns undefined when null', async () => {
+    await helpers.executeString(`
+      const bar: { optionalProp: number } | null | undefined = undefined as { optionalProp: number } | null | undefined;
+
+      assertEqual(bar?.optionalProp, undefined);
+    `);
+  });
+
+  test('optional chaining returns property when defined', async () => {
+    await helpers.executeString(`
+      const bar: { optionalProp: number } | null | undefined = { optionalProp: 10 } as { optionalProp: number } | null | undefined;
+
+      assertEqual(bar?.optionalProp, 10);
+    `);
+  });
+
+  test('nested optional chaining returns undefined when null', async () => {
+    await helpers.executeString(`
+      const bar: { first?: { second?: number } | null } | null | undefined = { first: null } as { first?: { second?: number } | null } | null | undefined;
+
+      assertEqual(bar?.first?.second, undefined);
+    `);
+  });
+
+  test('nested optional chaining returns undefined when undefined', async () => {
+    await helpers.executeString(`
+      const bar: { first?: { second?: number } | null } | null | undefined = { first: undefined } as { first?: { second: number } | null } | null | undefined;
+
+      assertEqual(bar?.first?.second, undefined);
+    `);
+  });
+
+  test('nested optional chaining returns property when defined', async () => {
+    await helpers.executeString(`
+      const bar: { first?: { second?: number } } | null | undefined = { first: { second: 10 } } as { first?: { second: number } } | null | undefined;
+
+      assertEqual(bar?.first?.second, 10);
+    `);
+  });
 });

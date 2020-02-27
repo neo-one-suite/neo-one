@@ -105,6 +105,74 @@ describe('ClassDeclarationCompiler', () => {
     `);
   });
 
+  test('basic class with ECMAScript private member, inaccessible', async () => {
+    helpers.compileString(
+      `
+      class Foo {
+        #x: string = 'bar';
+
+        ['bar'](): string {
+          return this.#x;
+        }
+      }
+
+      const f = new Foo();
+      f.#x;
+    `,
+      { type: 'error' },
+    );
+  });
+
+  test('ECMAScript private member, no public modifier allowed', async () => {
+    helpers.compileString(
+      `
+      class Foo {
+        public #x: string = 'bar';
+      }
+    `,
+      { type: 'error' },
+    );
+  });
+
+  test('ECMAScript private member, no private modifier allowed', async () => {
+    helpers.compileString(
+      `
+      class Foo {
+        private #x: string = 'bar';
+      }
+    `,
+      { type: 'error' },
+    );
+  });
+
+  test('ECMAScript private member, extends does not override private member', async () => {
+    await helpers.executeString(
+      `
+      class Foo {
+        #x: string = 'bar';
+
+        getX(): string {
+          return this.#x;
+        }
+      }
+
+      class Bar extends Foo {
+        #x: string = 'baz';
+
+        getX(): string {
+          return this.#x;
+        }
+      }
+
+      const foo = new Foo();
+      const bar = new Bar();
+
+      assertEqual(foo.getX(), 'bar');
+      assertEqual(bar.getX(), 'baz');
+    `,
+    );
+  });
+
   test('basic class with get accessor', async () => {
     await helpers.executeString(`
       class Foo {

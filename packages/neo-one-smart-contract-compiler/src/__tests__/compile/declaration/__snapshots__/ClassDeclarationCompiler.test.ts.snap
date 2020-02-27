@@ -1,5 +1,40 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ClassDeclarationCompiler ECMAScript private member, no private modifier allowed 1`] = `
+"snippetCode.ts (3,9): An accessibility modifier cannot be used with a private identifier.
+
+      1 | 
+      2 |       class Foo {
+    > 3 |         private #x: string = 'bar';
+        |         ^
+      4 |       }
+      5 |     
+"
+`;
+
+exports[`ClassDeclarationCompiler ECMAScript private member, no public modifier allowed 1`] = `
+"snippetCode.ts (3,9): An accessibility modifier cannot be used with a private identifier.
+
+      1 | 
+      2 |       class Foo {
+    > 3 |         public #x: string = 'bar';
+        |         ^
+      4 |       }
+      5 |     
+"
+`;
+
+exports[`ClassDeclarationCompiler basic class with ECMAScript private member, inaccessible 1`] = `
+"snippetCode.ts (11,9): Property '#x' is not accessible outside class 'Foo' because it has a private identifier.
+
+       9 | 
+      10 |       const f = new Foo();
+    > 11 |       f.#x;
+         |         ^
+      12 |     
+"
+`;
+
 exports[`ClassDeclarationCompiler decorators 1`] = `
 "snippetCode.ts (7,9): Custom decorators are not supported
 

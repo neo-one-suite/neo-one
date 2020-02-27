@@ -146,4 +146,28 @@ describe('ElementAccessExpressionCompiler', () => {
       { type: 'error' },
     );
   });
+
+  test('optional element access returns undefined when undefined', async () => {
+    await helpers.executeString(`
+          const bar: { optionalProp: number } | null | undefined = null as { optionalProp: number } | null | undefined;
+
+          assertEqual(bar?.['optionalProp'], undefined);
+        `);
+  });
+
+  test('optional element access returns undefined when null', async () => {
+    await helpers.executeString(`
+          const bar: { optionalProp: number } | null | undefined = undefined as { optionalProp: number } | null | undefined;
+
+          assertEqual(bar?.['optionalProp'], undefined);
+        `);
+  });
+
+  test('optional element access returns property when defined', async () => {
+    await helpers.executeString(`
+          const bar: { optionalProp: number } | null | undefined = { optionalProp: 10 } as { optionalProp: number } | null | undefined;
+
+          assertEqual(bar?.['optionalProp'], 10);
+        `);
+  });
 });

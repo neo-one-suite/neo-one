@@ -116,4 +116,19 @@ describe('ObjectLiteralExpressionCompiler', () => {
       assertEqual(x.f, 4);
     `);
   });
+
+  test('private field identifier fails outside class', async () => {
+    helpers.compileString(
+      `
+      const y = {
+        a: 0,
+        #b: 10,
+        get f(): number {
+          return 4;
+        },
+      };
+    `,
+      { type: 'error' },
+    );
+  });
 });
