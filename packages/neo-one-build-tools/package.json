@@ -72,7 +72,7 @@
     "tslint-microsoft-contrib": "^6.2.0",
     "tslint-sonarts": "^1.9.0",
     "typescript": "3.8.1-rc",
-    "yargs": "^14.2.0"
+    "yargs": "^15.0.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^8.0.0",
@@ -86,6 +86,6 @@
     "@types/gulp-sourcemaps": "^0.0.32",
     "@types/lodash": "^4.14.138",
     "@types/minimatch": "^3.0.3",
-    "@types/yargs": "^13.0.3"
+    "@types/yargs": "^15.0.0"
   }
 }

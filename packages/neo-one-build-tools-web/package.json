@@ -86,7 +86,7 @@
     "webpack-node-externals": "^1.7.2",
     "webpackbar": "^4.0.0",
     "workbox-webpack-plugin": "^4.3.1",
-    "yargs": "^14.2.0"
+    "yargs": "^15.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
@@ -104,7 +104,7 @@
     "@types/webpack": "^4.39.0",
     "@types/webpack-bundle-analyzer": "^2.13.2",
     "@types/webpack-dev-server": "^3.1.7",
-    "@types/yargs": "^13.0.3",
+    "@types/yargs": "^15.0.0",
     "gulp": "~4.0.2",
     "gulp-rename": "^2.0.0",
     "gulp-typescript": "^5.0.1",
