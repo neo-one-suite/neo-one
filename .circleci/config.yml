@@ -134,6 +134,33 @@ aliases:
           path: reports
     parallelism: 2
 
+  - &playground12
+    working_directory: ~/neo-one
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Clone NEO-ONE Playground
+          command: git clone https://github.com/neo-one-suite/neo-one-playground.git
+      - run:
+          name: Yarn Install Playground
+          command: cd neo-one-playground && yarn install
+      - run:
+          name: Replace Playground's NEO-ONE Packages
+          command: node packages/neo-one-build-tools/lib/replacePackages
+      - run:
+          name: NEO-ONE Build
+          command: cd neo-one-playground && yarn neo-one build
+      - run:
+          name: Run Smart Contract Tests
+          command: cd neo-one-playground && yarn test
+      - run:
+          name: Run Playground Cypress Tests
+          command: cd neo-one-playground && yarn test:cypress
+      - store_artifacts:
+          path: /cypress/screenshots
+
 node10: &node10
   docker:
     - image: neotracker/neo-one-circleci-node@sha256:0f047d3662ad72b75e9550e41b22a2be0bf7fa8ee6563b65272b5af966b07f20
@@ -161,6 +188,9 @@ jobs:
   nit:
     <<: *node12
     <<: *nit
+  playground12:
+    <<: *node12
+    <<: *playground12
 
 workflows:
   version: 2
@@ -182,6 +212,10 @@ workflows:
       - build-12:
           filters: *filter-ignore-bors-tmp
       - test12:
+          filters: *filter-ignore-bors-tmp
+          requires:
+            - build-12
+      - playground12:
           filters: *filter-ignore-bors-tmp
           requires:
             - build-12

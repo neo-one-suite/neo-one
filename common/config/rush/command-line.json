@@ -242,6 +242,14 @@
     },
     {
       "commandKind": "global",
+      "name": "prep-playground",
+      "summary": "Copies built neo-one packages into neo-one-playground modules for testing",
+      "description": "Used for neo-one-playground CI check",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "node ./packages/neo-one-build-tools/lib/replacePackages"
+    },
+    {
+      "commandKind": "global",
       "name": "upload-coverage",
       "summary": "upload coverage (CI)",
       "description": "uploaded codecov coverage reports from unit tests",

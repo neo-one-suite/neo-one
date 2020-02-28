@@ -3,6 +3,7 @@ status = [
   "ci/circleci: test10",
   "ci/circleci: test12",
   "ci/circleci: build-10",
-  "ci/circleci: build-12"
+  "ci/circleci: build-12",
+  "ci/circleci: playground12"
 ]
 timeout_sec = 18000
