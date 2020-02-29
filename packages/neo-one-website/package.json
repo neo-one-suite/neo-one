@@ -63,7 +63,7 @@
     "styled-tools": "^1.7.1",
     "ts-node": "^8.4.1",
     "tslib": "^1.10.0",
-    "typescript": "3.8.1-rc",
+    "typescript": "3.8.3",
     "typescript-fsa": "^3.0.0-beta-2",
     "typescript-fsa-reducers": "^1.2.1",
     "webpack": "^4.40.2"
