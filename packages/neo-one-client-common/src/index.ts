@@ -6,6 +6,7 @@ export * from './errors';
 export * from './helpers';
 export * from './IOHelper';
 export * from './JSONHelper';
+export * from './NativeContract';
 export * from './models';
 export * from './paramUtils';
 export * from './ScriptBuilder';
