@@ -1,8 +1,10 @@
 import { BN } from 'bn.js';
 import { common, UInt160 } from './common';
 import { crypto } from './crypto';
+import { scriptHashToAddress } from './helpers';
 import { sha256 } from './models';
 import { ScriptBuilder } from './ScriptBuilder';
+import { AddressString } from './types';
 
 export type NativeContractServiceName = 'Neo.Native.Policy' | 'Neo.Native.Tokens.GAS' | 'Neo.Native.Tokens.NEO';
 
@@ -12,6 +14,7 @@ class NativeContract {
   public readonly scriptHex: string;
   public readonly hash: UInt160;
   public readonly scriptHash: string;
+  public readonly address: AddressString;
 
   public constructor(serviceName: NativeContractServiceName) {
     this.serviceName = serviceName;
@@ -21,6 +24,7 @@ class NativeContract {
     this.scriptHex = this.script.toString('hex');
     this.hash = crypto.toScriptHash(this.script);
     this.scriptHash = common.uInt160ToHex(this.hash);
+    this.address = scriptHashToAddress(this.scriptHash);
   }
 }
 

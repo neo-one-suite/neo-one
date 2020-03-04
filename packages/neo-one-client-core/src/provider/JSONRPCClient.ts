@@ -1,25 +1,20 @@
 import {
-  AccountJSON,
   AddressString,
   addressToScriptHash,
-  AssetJSON,
   BlockJSON,
   BufferString,
-  CallReceiptJSON,
+  ConfirmedTransactionJSON,
   ContractJSON,
+  ContractParameterJSON,
   GetOptions,
   Hash256String,
-  InputJSON,
-  InvocationDataJSON,
+  HeaderJSON,
   InvocationResultJSON,
-  NetworkSettingsJSON,
-  OutputJSON,
   Peer,
-  PrivateNetworkSettings,
+  PluginJSON,
   RelayTransactionResultJSON,
   StorageItemJSON,
-  TransactionJSON,
-  TransactionReceiptJSON,
+  ValidatorJSON,
 } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import { RelayTransactionError } from '../errors';
@@ -32,23 +27,7 @@ export class JSONRPCClient {
     this.provider = provider;
   }
 
-  public async getAccount(address: AddressString): Promise<AccountJSON> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'getaccountstate',
-        params: [address],
-      }),
-    );
-  }
-
-  public async getAsset(hash: Hash256String): Promise<AssetJSON> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'getassetstate',
-        params: [hash],
-      }),
-    );
-  }
+  // Blockchain
 
   public async getBlock(hashOrIndex: Hash256String | number, options: GetOptions = {}): Promise<BlockJSON> {
     const { timeoutMS } = options;
@@ -70,6 +49,27 @@ export class JSONRPCClient {
     return this.withInstance(async (provider) => provider.request({ method: 'getblockcount' }));
   }
 
+  public async getBlockHash(index: number): Promise<Hash256String> {
+    return this.withInstance(async (provider) => provider.request({ method: 'getblockhash', params: [index] }));
+  }
+
+  public async getBlockHeader(hashOrIndex: Hash256String | number, options: GetOptions = {}): Promise<HeaderJSON> {
+    const { timeoutMS } = options;
+
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getblockheader',
+        params: [hashOrIndex, 1],
+        watchTimeoutMS: timeoutMS,
+      }),
+    );
+  }
+  public async getBlockSysFee(index: number): Promise<BigNumber> {
+    return this.withInstance(async (provider) =>
+      provider.request({ method: 'getblocksysfee', params: [index] }).then((value) => new BigNumber(value)),
+    );
+  }
+
   public async getContract(address: AddressString): Promise<ContractJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
@@ -83,106 +83,53 @@ export class JSONRPCClient {
     return this.withInstance(async (provider) => provider.request({ method: 'getrawmempool' }));
   }
 
-  public async getTransaction(hash: Hash256String): Promise<TransactionJSON> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'getrawtransaction',
-        params: [hash, 1],
-      }),
-    );
-  }
-
-  public async getUnspentOutput(input: InputJSON): Promise<OutputJSON | undefined> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'gettxout',
-        params: [input.txid, input.vout],
-      }),
-    );
-  }
-
-  public async testInvokeRaw(script: BufferString): Promise<InvocationResultJSON> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'invokescript',
-        params: [script],
-      }),
-    );
-  }
-
-  public async relayTransaction(value: BufferString): Promise<RelayTransactionResultJSON> {
-    return this.withInstance(async (provider) =>
-      provider
-        .request({
-          method: 'relaytransaction',
-          params: [value],
-        })
-        .catch((error) => {
-          const [message, code]: [string, string] = error.message.split(':');
-          if (error.code === 'JSON_RPC' && code === '-110') {
-            throw new RelayTransactionError(message);
-          }
-
-          throw error;
-        }),
-    );
-  }
-
-  public async getOutput(input: InputJSON): Promise<OutputJSON> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'getoutput',
-        params: [input.txid, input.vout],
-      }),
-    );
-  }
-
-  public async getClaimAmount(input: InputJSON): Promise<BigNumber> {
-    return this.withInstance(async (provider) =>
-      provider
-        .request({
-          method: 'getclaimamount',
-          params: [input.txid, input.vout],
-        })
-        .then((res) => new BigNumber(res)),
-    );
-  }
-
-  public async getAllStorage(address: AddressString): Promise<readonly StorageItemJSON[]> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'getallstorage',
-        params: [addressToScriptHash(address)],
-      }),
-    );
-  }
-
-  public async testInvocation(value: BufferString): Promise<CallReceiptJSON> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'testinvocation',
-        params: [value],
-      }),
-    );
-  }
-
-  public async getTransactionReceipt(hash: Hash256String, options: GetOptions = {}): Promise<TransactionReceiptJSON> {
+  public async getTransaction(hash: Hash256String, options: GetOptions = {}): Promise<ConfirmedTransactionJSON> {
     const { timeoutMS } = options;
 
     return this.withInstance(async (provider) =>
       provider.request({
-        method: 'gettransactionreceipt',
-        params: [hash],
+        method: 'getrawtransaction',
+        params: [hash, 1],
         watchTimeoutMS: timeoutMS,
       }),
     );
   }
 
-  public async getInvocationData(hash: Hash256String): Promise<InvocationDataJSON> {
+  public async getTransactionHeight(hash: Hash256String): Promise<number> {
     return this.withInstance(async (provider) =>
       provider.request({
-        method: 'getinvocationdata',
+        method: 'gettransactionheight',
         params: [hash],
+      }),
+    );
+  }
+
+  public async getStorage(
+    scriptHashOrId: AddressString | number,
+    key: BufferString,
+  ): Promise<readonly StorageItemJSON[]> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getstorage',
+        params: [typeof scriptHashOrId === 'number' ? scriptHashOrId : addressToScriptHash(scriptHashOrId), key],
+      }),
+    );
+  }
+
+  public async getValidators(): Promise<ValidatorJSON> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getvalidators',
+      }),
+    );
+  }
+
+  // Node
+
+  public async getConnectionCount(): Promise<number> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getconnectioncount',
       }),
     );
   }
@@ -197,68 +144,133 @@ export class JSONRPCClient {
     );
   }
 
-  public async getNetworkSettings(): Promise<NetworkSettingsJSON> {
+  public async getVersion() {
     return this.withInstance(async (provider) =>
       provider.request({
-        method: 'getnetworksettings',
+        method: 'getversion',
       }),
     );
   }
 
-  public async runConsensusNow(): Promise<void> {
+  public async sendTransaction(value: BufferString, options: GetOptions = {}): Promise<RelayTransactionResultJSON> {
+    const { timeoutMS } = options;
+
+    return this.withInstance(async (provider) =>
+      provider
+        .request({
+          method: 'sendrawtransaction',
+          params: [value],
+          watchTimeoutMS: timeoutMS,
+        })
+        .catch((error) => {
+          const [message, code]: [string, string] = error.message.split(':');
+          if (error.code === 'JSON_RPC' && code === '-110') {
+            throw new RelayTransactionError(message);
+          }
+
+          throw error;
+        }),
+    );
+  }
+
+  // Smart Contract
+
+  public async invokeFunction(
+    contract: AddressString,
+    method: string,
+    args: readonly ContractParameterJSON[],
+  ): Promise<InvocationResultJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
-        method: 'runconsensusnow',
+        method: 'invokefunction',
+        params: [addressToScriptHash(contract), method, args],
       }),
     );
   }
 
-  public async updateSettings(options: Partial<PrivateNetworkSettings>): Promise<void> {
+  public async invokeScript(script: BufferString): Promise<InvocationResultJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
-        method: 'updatesettings',
-        params: [options],
+        method: 'invokescript',
+        params: [script],
       }),
     );
   }
 
-  public async getSettings(): Promise<PrivateNetworkSettings> {
+  // Utilities
+
+  public async listPlugins(): Promise<PluginJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
-        method: 'getsettings',
+        method: 'listplugins',
       }),
     );
   }
 
-  public async fastForwardOffset(seconds: number): Promise<void> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'fastforwardoffset',
-        params: [seconds],
-      }),
-    );
-  }
+  // Dev
 
-  public async fastForwardToTime(seconds: number): Promise<void> {
-    return this.withInstance(async (provider) =>
-      provider.request({
-        method: 'fastforwardtotime',
-        params: [seconds],
-      }),
-    );
-  }
+  // public async getNetworkSettings(): Promise<NetworkSettingsJSON> {
+  //   return this.withInstance(async (provider) =>
+  //     provider.request({
+  //       method: 'getnetworksettings',
+  //     }),
+  //   );
+  // }
 
-  public async reset(): Promise<void> {
-    return this.withInstance(async (provider) => provider.request({ method: 'reset' }));
-  }
+  // public async runConsensusNow(): Promise<void> {
+  //   return this.withInstance(async (provider) =>
+  //     provider.request({
+  //       method: 'runconsensusnow',
+  //     }),
+  //   );
+  // }
 
-  public async getNEOTrackerURL(): Promise<string | undefined> {
-    return this.withInstance(async (provider) => provider.request({ method: 'getneotrackerurl' }));
-  }
+  // public async updateSettings(options: Partial<PrivateNetworkSettings>): Promise<void> {
+  //   return this.withInstance(async (provider) =>
+  //     provider.request({
+  //       method: 'updatesettings',
+  //       params: [options],
+  //     }),
+  //   );
+  // }
 
-  public async resetProject(): Promise<void> {
-    return this.withInstance(async (provider) => provider.request({ method: 'resetproject' }));
-  }
+  // public async getSettings(): Promise<PrivateNetworkSettings> {
+  //   return this.withInstance(async (provider) =>
+  //     provider.request({
+  //       method: 'getsettings',
+  //     }),
+  //   );
+  // }
+
+  // public async fastForwardOffset(seconds: number): Promise<void> {
+  //   return this.withInstance(async (provider) =>
+  //     provider.request({
+  //       method: 'fastforwardoffset',
+  //       params: [seconds],
+  //     }),
+  //   );
+  // }
+
+  // public async fastForwardToTime(seconds: number): Promise<void> {
+  //   return this.withInstance(async (provider) =>
+  //     provider.request({
+  //       method: 'fastforwardtotime',
+  //       params: [seconds],
+  //     }),
+  //   );
+  // }
+
+  // public async reset(): Promise<void> {
+  //   return this.withInstance(async (provider) => provider.request({ method: 'reset' }));
+  // }
+
+  // public async getNEOTrackerURL(): Promise<string | undefined> {
+  //   return this.withInstance(async (provider) => provider.request({ method: 'getneotrackerurl' }));
+  // }
+
+  // public async resetProject(): Promise<void> {
+  //   return this.withInstance(async (provider) => provider.request({ method: 'resetproject' }));
+  // }
 
   private async withInstance<TResult>(func: (instance: JSONRPCProvider) => Promise<TResult>): Promise<TResult>;
   private async withInstance<TResult>(func: (instance: JSONRPCProvider) => TResult): Promise<TResult> {

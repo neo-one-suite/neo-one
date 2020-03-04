@@ -1,70 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`JSONRPCClient fastForwardOffset 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "fastforwardoffset",
-      "params": Array [
-        10,
-      ],
-    },
-  ],
-]
-`;
-
-exports[`JSONRPCClient fastForwardToTime 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "fastforwardtotime",
-      "params": Array [
-        10,
-      ],
-    },
-  ],
-]
-`;
-
-exports[`JSONRPCClient getAccount 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "getaccountstate",
-      "params": Array [
-        "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
-      ],
-    },
-  ],
-]
-`;
-
-exports[`JSONRPCClient getAllStorage 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "getallstorage",
-      "params": Array [
-        "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
-      ],
-    },
-  ],
-]
-`;
-
-exports[`JSONRPCClient getAsset 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "getassetstate",
-      "params": Array [
-        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
-      ],
-    },
-  ],
-]
-`;
-
 exports[`JSONRPCClient getBestBlockHash 1`] = `
 Array [
   Array [
@@ -115,14 +50,56 @@ Array [
 ]
 `;
 
-exports[`JSONRPCClient getClaimAmount 1`] = `
+exports[`JSONRPCClient getBlockHash 1`] = `
 Array [
   Array [
     Object {
-      "method": "getclaimamount",
+      "method": "getblockhash",
+      "params": Array [
+        10,
+      ],
+    },
+  ],
+]
+`;
+
+exports[`JSONRPCClient getBlockHeader - hash 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getblockheader",
       "params": Array [
         "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
-        2,
+        1,
+      ],
+      "watchTimeoutMS": undefined,
+    },
+  ],
+]
+`;
+
+exports[`JSONRPCClient getBlockHeader - index 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getblockheader",
+      "params": Array [
+        10,
+        1,
+      ],
+      "watchTimeoutMS": 1000,
+    },
+  ],
+]
+`;
+
+exports[`JSONRPCClient getBlockSysFee 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getblocksysfee",
+      "params": Array [
+        10,
       ],
     },
   ],
@@ -134,6 +111,16 @@ Array [
   Array [
     Object {
       "method": "getpeers",
+    },
+  ],
+]
+`;
+
+exports[`JSONRPCClient getConnectionCount 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getconnectioncount",
     },
   ],
 ]
@@ -152,19 +139,6 @@ Array [
 ]
 `;
 
-exports[`JSONRPCClient getInvocationData 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "getinvocationdata",
-      "params": Array [
-        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
-      ],
-    },
-  ],
-]
-`;
-
 exports[`JSONRPCClient getMemPool 1`] = `
 Array [
   Array [
@@ -175,35 +149,15 @@ Array [
 ]
 `;
 
-exports[`JSONRPCClient getNetworkSettings 1`] = `
+exports[`JSONRPCClient getStorage 1`] = `
 Array [
   Array [
     Object {
-      "method": "getnetworksettings",
-    },
-  ],
-]
-`;
-
-exports[`JSONRPCClient getOutput 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "getoutput",
+      "method": "getstorage",
       "params": Array [
-        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
-        2,
+        "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+        "5f8d70",
       ],
-    },
-  ],
-]
-`;
-
-exports[`JSONRPCClient getSettings 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "getsettings",
     },
   ],
 ]
@@ -218,126 +172,67 @@ Array [
         "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
         1,
       ],
-    },
-  ],
-]
-`;
-
-exports[`JSONRPCClient getTransactionReceipt 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "gettransactionreceipt",
-      "params": Array [
-        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
-      ],
       "watchTimeoutMS": 1000,
     },
   ],
 ]
 `;
 
-exports[`JSONRPCClient getUnspentOutput - defined 1`] = `
+exports[`JSONRPCClient getTransactionHeight 1`] = `
 Array [
   Array [
     Object {
-      "method": "gettxout",
+      "method": "gettransactionheight",
       "params": Array [
         "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
-        2,
       ],
     },
   ],
 ]
 `;
 
-exports[`JSONRPCClient getUnspentOutput - undefined 1`] = `
+exports[`JSONRPCClient getValidators 1`] = `
 Array [
   Array [
     Object {
-      "method": "gettxout",
+      "method": "getvalidators",
+    },
+  ],
+]
+`;
+
+exports[`JSONRPCClient getVersion 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getversion",
+    },
+  ],
+]
+`;
+
+exports[`JSONRPCClient invokeFunction 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "invokefunction",
       "params": Array [
-        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
-        2,
+        "0xcef0c0fdcfe7838eff6ff104f9cdec2922297537",
+        "balanceOf",
+        Array [
+          Object {
+            "name": "param",
+            "type": "Hash160",
+            "value": "ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s",
+          },
+        ],
       ],
     },
   ],
 ]
 `;
 
-exports[`JSONRPCClient relayTransaction - other error 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "relaytransaction",
-      "params": Array [
-        "b500",
-      ],
-    },
-  ],
-]
-`;
-
-exports[`JSONRPCClient relayTransaction - relay error 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "relaytransaction",
-      "params": Array [
-        "b500",
-      ],
-    },
-  ],
-]
-`;
-
-exports[`JSONRPCClient relayTransaction 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "relaytransaction",
-      "params": Array [
-        "b500",
-      ],
-    },
-  ],
-]
-`;
-
-exports[`JSONRPCClient reset 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "reset",
-    },
-  ],
-]
-`;
-
-exports[`JSONRPCClient runConsensusNow 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "runconsensusnow",
-    },
-  ],
-]
-`;
-
-exports[`JSONRPCClient testInvocation 1`] = `
-Array [
-  Array [
-    Object {
-      "method": "testinvocation",
-      "params": Array [
-        "b500",
-      ],
-    },
-  ],
-]
-`;
-
-exports[`JSONRPCClient testInvokeRaw 1`] = `
+exports[`JSONRPCClient invokeScript 1`] = `
 Array [
   Array [
     Object {
@@ -350,16 +245,53 @@ Array [
 ]
 `;
 
-exports[`JSONRPCClient updateSettings 1`] = `
+exports[`JSONRPCClient listPlugins 1`] = `
 Array [
   Array [
     Object {
-      "method": "updatesettings",
+      "method": "listplugins",
+    },
+  ],
+]
+`;
+
+exports[`JSONRPCClient sendTransaction - other error 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "sendrawtransaction",
       "params": Array [
-        Object {
-          "secondsPerBlock": 10,
-        },
+        "b500",
       ],
+      "watchTimeoutMS": undefined,
+    },
+  ],
+]
+`;
+
+exports[`JSONRPCClient sendTransaction - relay error 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "sendrawtransaction",
+      "params": Array [
+        "b500",
+      ],
+      "watchTimeoutMS": undefined,
+    },
+  ],
+]
+`;
+
+exports[`JSONRPCClient sendTransaction 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "sendrawtransaction",
+      "params": Array [
+        "b500",
+      ],
+      "watchTimeoutMS": undefined,
     },
   ],
 ]
