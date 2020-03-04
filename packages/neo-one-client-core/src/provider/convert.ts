@@ -9,7 +9,6 @@ import {
   RawCallReceipt,
   RawInvocationResult,
   scriptHashToAddress,
-  VMState,
 } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
@@ -69,21 +68,11 @@ export function convertAction(
 }
 
 export function convertInvocationResult(result: InvocationResultJSON): RawInvocationResult {
-  if (result.state === VMState.Fault) {
-    return {
-      state: 'FAULT',
-      gasConsumed: new BigNumber(result.gas_consumed),
-      gasCost: new BigNumber(result.gas_cost),
-      stack: convertContractParameters(result.stack),
-      message: result.message,
-    };
-  }
-
   return {
-    state: 'HALT',
+    state: result.state,
     gasConsumed: new BigNumber(result.gas_consumed),
-    gasCost: new BigNumber(result.gas_cost),
     stack: convertContractParameters(result.stack),
+    script: result.script,
   };
 }
 

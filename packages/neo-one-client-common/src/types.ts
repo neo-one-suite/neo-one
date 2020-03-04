@@ -297,12 +297,7 @@ export interface Transaction {
   readonly witnesses: readonly Witness[];
 }
 
-export interface ConfirmedTransaction {
-  /**
-   * 'Receipt' of the confirmed transaction on the blockchain. This contains properties like the block the `Transaction` was included in.
-   */
-  readonly receipt: TransactionReceipt;
-}
+export interface ConfirmedTransaction extends Transaction, TransactionReceipt {}
 
 /**
  * All of the properties of a `Block` except the `Transaction`s themselves.
@@ -337,20 +332,22 @@ export interface Header {
    */
   readonly nextConsensus: AddressString;
   /**
-   * 'Witness' to the `Block`'s validity.
+   * 'Witness'es to the `Block`'s validity.
    */
-  readonly witness: Witness;
+  readonly witnesses: readonly Witness[];
   /**
    * Size in bytes of the `Block`.
    */
   readonly size: number;
+  readonly confirmations: number;
+  readonly nextBlockHash?: string;
 }
 
 export interface ConsensusData {
   /**
    * `ConsensusData` hash.
    */
-  readonly hash: Hash256String;
+  // readonly hash: Hash256String;
   /**
    * TODO ???
    */
@@ -379,19 +376,23 @@ export interface TransactionReceipt {
   /**
    * `Block` index of the `Transaction` for this receipt.
    */
-  readonly blockIndex: number;
+  // readonly blockIndex: number;
   /**
    * `Block` hash of the `Transaction` for this receipt.
    */
   readonly blockHash: Hash256String;
   /**
+   * `Block` time of the `Transaction` for this receipt.
+   */
+  readonly blockTime: number;
+  /**
    * Transaction index of the `Transaction` within the `Block` for this receipt.
    */
-  readonly transactionIndex: number;
+  readonly transactionHash: Hash256String;
   /**
-   * Ordered globally unique index of the transaction.
+   * Number of `Block`s which have confirmed this transaction.
    */
-  readonly globalIndex: BigNumber;
+  readonly confirmations: number;
 }
 
 /**
@@ -419,13 +420,13 @@ export interface TransactionResult<
  */
 export interface RawInvocationResultBase {
   /**
-   * GAS consumed by the operation. This is the total GAS consumed after the free GAS is subtracted.
+   * GAS consumed by the operation.
    */
   readonly gasConsumed: BigNumber;
   /**
-   * The total GAS cost before subtracting the free GAS.
+   * Script run by the invocation.
    */
-  readonly gasCost: BigNumber;
+  readonly script: BufferString;
 }
 
 /**
@@ -450,10 +451,6 @@ export interface InvocationResultError extends RawInvocationResultBase {
    * Indicates a failed invocation.
    */
   readonly state: 'FAULT';
-  /**
-   * Failure reason.
-   */
-  readonly message: string;
 }
 
 /**
@@ -1344,7 +1341,7 @@ export type ForwardValueABI = ForwardValueABIParameter | ForwardValueABIReturn;
 /**
  * Function specification in the `ABI` of a smart contract.
  */
-export interface ABIFunction {
+export interface ContractMethodDescriptor {
   /**
    * Name of the function
    */
@@ -1352,7 +1349,7 @@ export interface ABIFunction {
   /**
    * Parameters of the function.
    */
-  readonly parameters?: readonly ABIParameter[];
+  readonly parameters: readonly ABIParameter[];
   /**
    * Return type of the function.
    */
@@ -1366,7 +1363,7 @@ export interface ABIFunction {
 /**
  * Event specification in the `ABI` of a smart contract.
  */
-export interface ABIEvent {
+export interface ContractEvent {
   /**
    * Name of the event.
    */
@@ -1382,7 +1379,7 @@ export interface ABIEvent {
  *
  * See the [Smart Contract APIs](https://neo-one.io/docs/smart-contract-apis) chapter of the main guide for more information.
  */
-export interface ABI {
+export interface ContractAbi {
   /**
    * Script hash of the contract.
    */
@@ -1486,7 +1483,7 @@ export interface ContractManifest {
   /**
    * Full specification of the functions and events of a smart contract. Used by the client APIs to generate the smart contract interface.
    */
-  readonly abi: ABI;
+  readonly abi: ContractAbi;
   /**
    * Describes which contracts may be invoked and which methods are called.
    */
@@ -1677,13 +1674,9 @@ export interface Asset {
  */
 export interface Contract {
   /**
-   * NEO protocol version.
-   */
-  readonly version: number;
-  /**
    * `AddressString` of this `Contract`.
    */
-  readonly address: AddressString;
+  readonly address: string;
   /**
    * `Contract` code.
    */
@@ -1691,43 +1684,7 @@ export interface Contract {
   /**
    * Expected parameters of this `Contract`
    */
-  readonly parameters: readonly ContractParameterType[];
-  /**
-   * Return type of this `Contract`
-   */
-  readonly returnType: ContractParameterType;
-  /**
-   * Name of this `Contract`. For informational purposes only.
-   */
-  readonly name: string;
-  /**
-   * Version of this `Contract`. For informational purposes only.
-   */
-  readonly codeVersion: string;
-  /**
-   * Author of this `Contract`. For informational purposes only.
-   */
-  readonly author: string;
-  /**
-   * Email of this `Contract`. For informational purposes only.
-   */
-  readonly email: string;
-  /**
-   * Description of this `Contract`. For informational purposes only.
-   */
-  readonly description: string;
-  /**
-   * `true` if this `Contract` can use storage.
-   */
-  readonly storage: boolean;
-  /**
-   * `true` if this `Contract` can make dynamic invocations.
-   */
-  readonly dynamicInvoke: boolean;
-  /**
-   * `true` if this `Contract` accepts first-class `Asset`s and/or tokens.
-   */
-  readonly payable: boolean;
+  readonly manifest: ContractManifest;
 }
 
 /* BEGIN LOW-LEVEL API */
@@ -1799,6 +1756,23 @@ export interface AddressContractParameter {
    * NEO address in base58 encoded string format.
    */
   readonly value: AddressString;
+}
+
+/**
+ * Invocation stack item for an `Hash160`.
+ *
+ * @see ContractParameter
+ * @see UInt160
+ */
+export interface Hash160ContractParameter {
+  /**
+   * `type` distinguishes `Hash160ContractParameter` from other `ContractParameter` object types.
+   */
+  readonly type: 'Hash160';
+  /**
+   * NEO address in base58 encoded string format.
+   */
+  readonly value: string;
 }
 
 /**
@@ -1936,6 +1910,7 @@ export type ContractParameter =
   | BooleanContractParameter
   | IntegerContractParameter
   | AddressContractParameter
+  | Hash160ContractParameter
   | Hash256ContractParameter
   | BufferContractParameter
   | PublicKeyContractParameter
@@ -1980,10 +1955,6 @@ export interface RawInvocationResultError extends RawInvocationResultBase {
    * The state of the NEO VM after execution. Typically has one `ContractParameter` which is the return value of the method invoked.
    */
   readonly stack: readonly ContractParameter[];
-  /**
-   * A descriptive message indicating why the invocation failed.
-   */
-  readonly message: string;
 }
 
 /**
