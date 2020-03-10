@@ -79,6 +79,21 @@ describe('CallExpressionCompiler', () => {
     `);
   });
 
+  test('nested property call', async () => {
+    await helpers.executeString(`
+      const foo = {
+        x: 1,
+        y: {
+          z(): number {
+            return 13;
+          }
+        }
+      };
+
+      assertEqual(foo.y.z(), 13);
+    `);
+  });
+
   test('method call', async () => {
     await helpers.executeString(`
       class Foo {
@@ -263,5 +278,239 @@ describe('CallExpressionCompiler', () => {
 
       assertEqual(x[Symbol.iterator]() !== undefined, true);
     `);
+  });
+
+  test('optional chain - element access with symbol - undefined', async () => {
+    await helpers.executeString(`
+        const foo = Symbol.for('hello');
+        const bar: { [foo]: (() => number) | null | undefined } = { [foo]: undefined } as unknown as { [foo]: (() => number) | null | undefined };
+
+        assertEqual(bar[foo]?.(), undefined);
+      `);
+  });
+
+  test('optional chain - element access with symbol - null', async () => {
+    await helpers.executeString(`
+        const foo = Symbol.for('hello');
+        const bar: { [foo]: (() => number) | null | undefined } = { [foo]: null } as unknown as { [foo]: (() => number) | null | undefined };
+
+        assertEqual(bar[foo]?.(), undefined);
+      `);
+  });
+
+  test('optional chain - element access with symbol - defined', async () => {
+    await helpers.executeString(`
+        const foo = Symbol.for('hello');
+        const bar: { [foo]: (() => number) | null | undefined } = { [foo]: () => 10 } as unknown as { [foo]: (() => number) | null | undefined };
+
+        assertEqual(bar[foo]?.(), 10);
+      `);
+  });
+
+  test('optional chain - element access with symbol - nested undefined', async () => {
+    await helpers.executeString(`
+        const foo = Symbol.for('hello');
+        const baz = Symbol.for('world');
+        const bar: { [foo]: { [baz]: (() => number) | null | undefined } } = { [foo]: { [baz]: undefined } } as unknown as { [foo]: { [baz]: (() => number) | null | undefined } };
+
+        assertEqual(bar[foo][baz]?.(), undefined);
+      `);
+  });
+
+  test('optional chain - element access with symbol - nested null', async () => {
+    await helpers.executeString(`
+        const foo = Symbol.for('hello');
+        const baz = Symbol.for('world');
+        const bar: { [foo]: { [baz]: (() => number) | null | undefined } } = { [foo]: { [baz]: null } } as unknown as { [foo]: { [baz]: (() => number) | null | undefined } };
+
+        assertEqual(bar[foo][baz]?.(), undefined);
+      `);
+  });
+
+  test('optional chain - element access with symbol - nested defined', async () => {
+    await helpers.executeString(`
+        const foo = Symbol.for('hello');
+        const baz = Symbol.for('world');
+        const bar: { [foo]: { [baz]: (() => number) | null | undefined } } = { [foo]: { [baz]: () => 10 } } as unknown as { [foo]: { [baz]: (() => number) | null | undefined } };
+
+        assertEqual(bar[foo][baz]?.(), 10);
+      `);
+  });
+
+  test('optional chain - element access with number - undefined', async () => {
+    await helpers.executeString(`
+        const foo = 0;
+        const bar: { [foo]: (() => number) | null | undefined } = { [foo]: undefined } as unknown as { [foo]: (() => number) | null | undefined };
+
+        assertEqual(bar[foo]?.(), undefined);
+      `);
+  });
+
+  test('optional chain - element access with number - null', async () => {
+    await helpers.executeString(`
+        const foo = 0;
+        const bar: { [foo]: (() => number) | null | undefined } = { [foo]: null } as unknown as { [foo]: (() => number) | null | undefined };
+
+        assertEqual(bar[foo]?.(), undefined);
+      `);
+  });
+
+  test('optional chain - element access with number - defined', async () => {
+    await helpers.executeString(`
+        const foo = 0;
+        const bar: { [foo]: (() => number) | null | undefined } = { [foo]: () => 10 } as unknown as { [foo]: (() => number) | null | undefined };
+
+        assertEqual(bar[foo]?.(), 10);
+      `);
+  });
+
+  test('optional chain - element access with number - nested undefined', async () => {
+    await helpers.executeString(`
+        const foo = 0;
+        const baz = 2;
+        const bar: { [foo]: { [baz]: (() => number) | null | undefined } } = { [foo]: { [baz]: undefined } } as unknown as { [foo]: { [baz]: (() => number) | null | undefined } };
+
+        assertEqual(bar[foo][baz]?.(), undefined);
+      `);
+  });
+
+  test('optional chain - element access with number - nested null', async () => {
+    await helpers.executeString(`
+        const foo = 0;
+        const baz = 2;
+        const bar: { [foo]: { [baz]: (() => number) | null | undefined } } = { [foo]: { [baz]: null } } as unknown as { [foo]: { [baz]: (() => number) | null | undefined } };
+
+        assertEqual(bar[foo][baz]?.(), undefined);
+      `);
+  });
+
+  test('optional chain - element access with number - nested defined', async () => {
+    await helpers.executeString(`
+        const foo = 0;
+        const baz = 2;
+        const bar: { [foo]: { [baz]: (() => number) | null | undefined } } = { [foo]: { [baz]: () => 10 } } as unknown as { [foo]: { [baz]: (() => number) | null | undefined } };
+
+        assertEqual(bar[foo][baz]?.(), 10);
+      `);
+  });
+
+  test('optional chain - element access with string - undefined', async () => {
+    await helpers.executeString(`
+        const bar: { foo: (() => number) | null | undefined } = { foo: undefined } as unknown as { foo: (() => number) | null | undefined };
+
+        assertEqual(bar['foo']?.(), undefined);
+      `);
+  });
+
+  test('optional chain - element access with string - null', async () => {
+    await helpers.executeString(`
+        const bar: { foo: (() => number) | null | undefined } = { foo: null } as unknown as { foo: (() => number) | null | undefined };
+
+        assertEqual(bar['foo']?.(), undefined);
+      `);
+  });
+
+  test('optional chain - element access with string - defined', async () => {
+    await helpers.executeString(`
+        const bar: { foo: (() => number) | null | undefined } = { foo: () => 10 } as unknown as { foo: (() => number) | null | undefined };
+
+        assertEqual(bar['foo']?.(), 10);
+      `);
+  });
+
+  test('optional chain - element access with string - nested undefined', async () => {
+    await helpers.executeString(`
+        const bar: { foo: { baz: (() => number) | null | undefined } } = { foo: { baz: undefined } } as unknown as { foo: { baz: (() => number) | null | undefined } };
+
+        assertEqual(bar['foo']['baz']?.(), undefined);
+      `);
+  });
+
+  test('optional chain - element access with string - nested null', async () => {
+    await helpers.executeString(`
+    const bar: { foo: { baz: (() => number) | null | undefined } } = { foo: { baz: null } } as unknown as { foo: { baz: (() => number) | null | undefined } };
+
+        assertEqual(bar['foo']['baz']?.(), undefined);
+      `);
+  });
+
+  test('optional chain - element access with string - nested defined', async () => {
+    await helpers.executeString(`
+        const bar: { foo: { baz: (() => number) | null | undefined } } = { foo: { baz: () => 10 } } as unknown as { foo: { baz: (() => number) | null | undefined } };
+
+        assertEqual(bar['foo']['baz']?.(), 10);
+      `);
+  });
+
+  test('optional chain - call expression - undefined', async () => {
+    await helpers.executeString(`
+        const bar: (() => number) | null | undefined = null as unknown as (() => number) | null | undefined;
+
+        assertEqual(bar?.(), undefined);
+      `);
+  });
+
+  test('optional chain - call expression - null', async () => {
+    await helpers.executeString(`
+        const bar: (() => number) | null | undefined = undefined as unknown as (() => number) | null | undefined;
+
+        assertEqual(bar?.(), undefined);
+      `);
+  });
+
+  test('optional chain - call expression - defined', async () => {
+    await helpers.executeString(`
+        const bar: (() => number) | null | undefined = (() => 10) as unknown as (() => number) | null | undefined;
+
+        assertEqual(bar?.(), 10);
+      `);
+  });
+
+  test('optional chain - property access - nested undefined', async () => {
+    await helpers.executeString(`
+        const bar: { foo: (() => number) | null | undefined } = { foo: undefined } as unknown as { foo: (() => number) | null | undefined };
+
+        assertEqual(bar.foo?.(), undefined);
+      `);
+  });
+
+  test('optional chain - property access - nested null', async () => {
+    await helpers.executeString(`
+        const bar: { foo: (() => number) | null | undefined } = { foo: null } as unknown as { foo: (() => number) | null | undefined };
+
+        assertEqual(bar.foo?.(), undefined);
+      `);
+  });
+
+  test('optional chain - property access - nested defined', async () => {
+    await helpers.executeString(`
+        const bar: { foo: (() => number) | null | undefined } = { foo: () => 10 } as unknown as { foo: (() => number) | null | undefined };
+
+        assertEqual(bar.foo?.(), 10);
+      `);
+  });
+
+  test('optional chain - property access - double nested undefined', async () => {
+    await helpers.executeString(`
+        const bar: { foo: { baz: (() => number) | null | undefined } } = { foo: { baz: undefined } } as unknown as { foo: { baz: (() => number) | null | undefined } };
+
+        assertEqual(bar.foo.baz?.(), undefined);
+      `);
+  });
+
+  test('optional chain - property access - double nested null', async () => {
+    await helpers.executeString(`
+    const bar: { foo: { baz: (() => number) | null | undefined } } = { foo: { baz: null } } as unknown as { foo: { baz: (() => number) | null | undefined } };
+
+        assertEqual(bar.foo.baz?.(), undefined);
+      `);
+  });
+
+  test('optional chain - property access - double nested defined', async () => {
+    await helpers.executeString(`
+        const bar: { foo: { baz: (() => number) | null | undefined } } = { foo: { baz: () => 10 } } as unknown as { foo: { baz: (() => number) | null | undefined } };
+
+        assertEqual(bar.foo.baz?.(), 10);
+      `);
   });
 });

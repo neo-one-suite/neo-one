@@ -12,6 +12,7 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
   public readonly kind = ts.SyntaxKind.ElementAccessExpression;
 
   public visitNode(sb: ScriptBuilder, expr: ts.ElementAccessExpression, optionsIn: VisitOptions): void {
+    const isOptionalChain = ts.isOptionalChain(expr);
     const value = tsUtils.expression.getExpression(expr);
     const valueType = sb.context.analysis.getType(value);
     const prop = tsUtils.expression.getArgumentExpressionOrThrow(expr);
@@ -77,6 +78,17 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
       // [objectVal]
       sb.emitOp(expr, 'DROP');
       throwTypeError(innerOptions);
+    };
+
+    const processUndefined = (innerOptions: VisitOptions) => {
+      // []
+      sb.emitOp(expr, 'DROP');
+      // [undefinedVal]
+      sb.emitHelper(expr, innerOptions, sb.helpers.wrapUndefined);
+    };
+
+    const throwTypeErrorUnlessOptionalChain = (innerOptions: VisitOptions) => {
+      isOptionalChain ? processUndefined(innerOptions) : throwTypeError(innerOptions);
     };
 
     const createHandleProp = (
@@ -469,12 +481,12 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
         arrayStorage: createProcessArrayStorage(),
         boolean: createProcessBuiltin('Boolean'),
         buffer: createProcessBuffer(),
-        null: throwTypeError,
+        null: throwTypeErrorUnlessOptionalChain,
         number: createProcessBuiltin('Number'),
         object: processObject,
         string: createProcessBuiltin('String'),
         symbol: createProcessBuiltin('Symbol'),
-        undefined: throwTypeError,
+        undefined: throwTypeErrorUnlessOptionalChain,
         map: createProcessBuiltin('Map'),
         mapStorage: createProcessBuiltin('MapStorage'),
         set: createProcessBuiltin('Set'),

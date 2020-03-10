@@ -9,3 +9,15 @@ exports[`AwaitFunctionCompiler await 1`] = `
       3 |     
 "
 `;
+
+exports[`AwaitFunctionCompiler await 2`] = `
+"snippetCode.ts (2,7): Unsupported syntax.
+
+      1 | 
+    > 2 |       await 2;
+        |       ^
+      3 | 
+      4 |       export {};
+      5 |     
+"
+`;

@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ObjectLiteralExpressionCompiler private field identifier fails outside class 1`] = `
+"snippetCode.ts (4,9): Private identifiers are not allowed outside class bodies.
+
+      2 |       const y = {
+      3 |         a: 0,
+    > 4 |         #b: 10,
+        |         ^
+      5 |         get f(): number {
+      6 |           return 4;
+      7 |         },
+"
+`;

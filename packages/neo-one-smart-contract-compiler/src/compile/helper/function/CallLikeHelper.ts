@@ -28,6 +28,7 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
     expression: ts.CallExpression | ts.TaggedTemplateExpression,
     optionsIn: VisitOptions,
   ): void {
+    const isOptionalChain = ts.isOptionalChain(expression);
     const expr = ts.isCallExpression(expression)
       ? tsUtils.expression.getExpression(expression)
       : tsUtils.template.getTag(expression);
@@ -54,6 +55,19 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       // []
       sb.emitOp(expr, 'DROP');
       sb.emitHelper(expr, innerOptions, sb.helpers.throwTypeError);
+    };
+
+    const processUndefined = (innerOptions: VisitOptions) => {
+      // [argsarr]
+      sb.emitOp(expr, 'DROP');
+      // []
+      sb.emitOp(expr, 'DROP');
+      // [undefinedVal]
+      sb.emitHelper(expr, innerOptions, sb.helpers.wrapUndefined);
+    };
+
+    const throwTypeErrorUnlessOptionalChain = (innerOptions: VisitOptions) => {
+      isOptionalChain ? processUndefined(innerOptions) : throwTypeError(innerOptions);
     };
 
     const handleArguments = (innerOptions: VisitOptions) => {
@@ -173,6 +187,67 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
       }
     };
 
+    const emitDropNTimes = (innerSb: ScriptBuilder, node: ts.Node, n: number) => {
+      // tslint:disable-next-line: no-loop-statement
+      for (let i = 0; i < n; i += 1) {
+        innerSb.emitOp(node, 'DROP');
+      }
+    };
+
+    // Input: [...vals]
+    // Output: isNullOrUndefined ? [undefinedVal] : callCallback()
+    const callIfNotNullOrUndefined = ({
+      innerOptions,
+      argsNum,
+      callback,
+    }: {
+      innerOptions: VisitOptions;
+      argsNum: number;
+      callback: () => void;
+    }) => {
+      sb.emitHelper(
+        expr,
+        optionsIn,
+        sb.helpers.if({
+          condition: () => {
+            // [val, ...vals]
+            sb.emitOp(expr, 'DUP');
+            // [isNull, ...vals]
+            sb.emitHelper(expr, optionsIn, sb.helpers.isNull);
+          },
+          whenTrue: () => {
+            // []
+            emitDropNTimes(sb, expr, argsNum);
+            // [undefinedVal]
+            sb.emitHelper(expr, innerOptions, sb.helpers.wrapUndefined);
+          },
+          whenFalse: () => {
+            sb.emitHelper(
+              expr,
+              optionsIn,
+              sb.helpers.if({
+                condition: () => {
+                  // [val, ...vals]
+                  sb.emitOp(expr, 'DUP');
+                  // [isUndefined, ...vals]
+                  sb.emitHelper(expr, optionsIn, sb.helpers.isUndefined);
+                },
+                whenTrue: () => {
+                  // []
+                  emitDropNTimes(sb, expr, argsNum);
+                  // [undefinedVal]
+                  sb.emitHelper(expr, innerOptions, sb.helpers.wrapUndefined);
+                },
+                whenFalse: () => {
+                  callback();
+                },
+              }),
+            );
+          },
+        }),
+      );
+    };
+
     const superExpression = ts.isCallExpression(expression) ? tsUtils.expression.getExpression(expression) : undefined;
     if (
       ts.isCallExpression(expression) &&
@@ -236,7 +311,13 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
         sb.emitPushString(name, nameValue);
         // [val, objectVal, argsarr]
         sb.emitHelper(expr, innerOptions, sb.helpers.getPropertyObjectProperty);
-        sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true }));
+        isOptionalChain
+          ? callIfNotNullOrUndefined({
+              innerOptions,
+              argsNum: 3,
+              callback: () => sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true })),
+            })
+          : sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true }));
       };
 
       const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
@@ -474,7 +555,14 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
         const handleStringBase = (innerInnerOptions: VisitOptions) => {
           // [val, objectVal, argsarr]
           sb.emitHelper(expr, innerInnerOptions, sb.helpers.getPropertyObjectProperty);
-          sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true }));
+          isOptionalChain
+            ? // valIsNullOrUndefined ? [undefinedVal] : invokeCall()
+              callIfNotNullOrUndefined({
+                innerOptions,
+                argsNum: 3,
+                callback: () => sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true })),
+              })
+            : sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true }));
         };
 
         const handleNumber = (innerInnerOptions: VisitOptions) => {
@@ -494,7 +582,14 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapSymbol);
           // [val, objectVal, argsarr]
           sb.emitHelper(expr, innerInnerOptions, sb.helpers.getSymbolObjectProperty);
-          sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true }));
+          isOptionalChain
+            ? // valIsNullOrUndefined ? [undefinedVal] : invokeCall()
+              callIfNotNullOrUndefined({
+                innerOptions,
+                argsNum: 3,
+                callback: () => sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true })),
+              })
+            : sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: true }));
         };
 
         // [argsarr, objectVal, thisVal]
@@ -578,6 +673,54 @@ export class CallLikeHelper extends Helper<ts.CallExpression | ts.TaggedTemplate
           contract: createProcessBuiltin('Contract'),
           header: createProcessBuiltin('Header'),
           block: createProcessBuiltin('Block'),
+        }),
+      );
+    } else if (ts.isCallExpression(expression)) {
+      const value = tsUtils.expression.getExpression(expression);
+      const valueType = sb.context.analysis.getType(value);
+
+      const processCall = () => {
+        sb.emitHelper(expr, optionsIn, sb.helpers.invokeCall({ bindThis: false }));
+      };
+
+      const options = sb.pushValueOptions(sb.noSetValueOptions(optionsIn));
+      // [argsarr]
+      handleArguments(options);
+      // [objectVal, argsarr]
+      sb.visit(expr, options);
+      sb.emitHelper(
+        value,
+        options,
+        sb.helpers.forBuiltinType({
+          type: valueType,
+          array: throwTypeError,
+          arrayStorage: throwTypeError,
+          boolean: throwTypeError,
+          buffer: throwTypeError,
+          null: throwTypeErrorUnlessOptionalChain,
+          number: throwTypeError,
+          object: processCall,
+          string: throwTypeError,
+          symbol: throwTypeError,
+          undefined: throwTypeErrorUnlessOptionalChain,
+          map: throwTypeError,
+          mapStorage: throwTypeError,
+          set: throwTypeError,
+          setStorage: throwTypeError,
+          error: throwTypeError,
+          forwardValue: throwTypeError,
+          iteratorResult: throwTypeError,
+          iterable: throwTypeError,
+          iterableIterator: throwTypeError,
+          transaction: throwTypeError,
+          output: throwTypeError,
+          attribute: throwTypeError,
+          input: throwTypeError,
+          account: throwTypeError,
+          asset: throwTypeError,
+          contract: throwTypeError,
+          header: throwTypeError,
+          block: throwTypeError,
         }),
       );
     } else {

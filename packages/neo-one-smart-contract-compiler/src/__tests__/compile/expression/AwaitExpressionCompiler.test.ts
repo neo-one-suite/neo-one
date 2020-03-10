@@ -9,4 +9,15 @@ describe('AwaitFunctionCompiler', () => {
       { type: 'error' },
     );
   });
+
+  test('await', async () => {
+    helpers.compileString(
+      `
+      await 2;
+
+      export {};
+    `,
+      { type: 'error' },
+    );
+  });
 });
