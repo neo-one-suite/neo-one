@@ -130,6 +130,11 @@ export const NEOONEOneDataProviderSetRPCURLError = makeErrorWithCode(
   'INVALID_SET_RPC_URL_CALL',
   () => 'Cannot set rpcURL for NEOONEOneDataProvider',
 );
+export const InvalidContractPermissionDescriptorError = makeErrorWithCode(
+  'INVALID_CONTRACT_PERMISSION_DESCRIPTOR',
+  (permission: string) =>
+    `Invalid Contract Permission Descriptor. Must be a valid UInt160, ECPoint, or '*'. Instead found, ${permission}`,
+);
 export const InvalidHDAccountPermissionError = makeErrorWithCode(
   'INVALID_HD_ACCOUNT_PERMISSION',
   (account: readonly [number, number, number]) => `Invalid permission for account at path: ${account}`,

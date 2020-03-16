@@ -1,21 +1,33 @@
 // tslint:disable no-object-mutation
 import {
   ActionJSON,
-  AddressString,
-  Asset,
-  AssetJSON,
-  AssetNameJSON,
-  AssetType,
-  AssetTypeJSON,
   CallReceiptJSON,
   common,
   ConfirmedTransaction,
+  ConfirmedTransactionJSON,
   Contract,
+  ContractAbi,
+  ContractAbiJSON,
+  ContractEvent,
+  ContractEventJSON,
+  ContractGroup,
+  ContractGroupJSON,
   ContractJSON,
+  ContractManifest,
+  ContractManifestJSON,
+  ContractMethodDescriptor,
+  ContractMethodDescriptorJSON,
+  ContractParameterDeclaration,
+  ContractParameterDeclarationJSON,
+  ContractParameterType,
+  ContractParameterTypeJSON,
+  ContractPermissionDescriptor,
+  ContractPermissionDescriptorJSON,
+  ContractPermissions,
+  ContractPermissionsJSON,
+  Cosigner,
+  CosignerJSON,
   InvocationResultJSON,
-  Output,
-  OutputJSON,
-  PublicKeyString,
   RawAction,
   RawCallReceipt,
   RawInvocationResult,
@@ -24,34 +36,15 @@ import {
   StorageItemJSON,
   Transaction,
   TransactionJSON,
-  VMState,
+  WildcardContainer,
+  WildcardContainerJSON,
 } from '@neo-one/client-common';
-import { Modifiable } from '@neo-one/utils';
+import { Modifiable, utils as commonUtils } from '@neo-one/utils';
 import { toArray } from '@reactivex/ix-es2015-cjs/asynciterable/toarray';
-import BigNumber from 'bignumber.js';
 import { data, factory, keys } from '../../__data__';
-import { Hash256 } from '../../Hash256';
 import { convertAction, JSONRPCClient, JSONRPCHTTPProvider, NEOONEDataProvider } from '../../provider';
 
 jest.mock('../../provider/JSONRPCClient');
-
-interface AssetBase {
-  readonly type: AssetType;
-  readonly name: string;
-  readonly amount: BigNumber;
-  readonly precision: number;
-  readonly owner: PublicKeyString;
-  readonly admin: AddressString;
-}
-
-interface AssetBaseJSON {
-  readonly type: AssetTypeJSON;
-  readonly name: AssetNameJSON;
-  readonly amount: string;
-  readonly precision: number;
-  readonly owner: string;
-  readonly admin: string;
-}
 
 describe('NEOONEDataProvider', () => {
   const network = 'local';
@@ -69,11 +62,10 @@ describe('NEOONEDataProvider', () => {
     invocationResult: RawInvocationResult,
     invocationResultJSON: InvocationResultJSON,
   ) => {
-    if (invocationResult.state !== 'HALT' || invocationResultJSON.state !== VMState.Halt) {
+    if (invocationResult.state !== 'HALT' || invocationResultJSON.state !== 'HALT') {
       throw new Error('For TS');
     }
     expect(invocationResult.gasConsumed.toString(10)).toEqual(invocationResultJSON.gas_consumed);
-    expect(invocationResult.gasCost.toString(10)).toEqual(invocationResultJSON.gas_cost);
     const firstStack = invocationResult.stack[0];
     const firstStackJSON = invocationResultJSON.stack[0];
     if (firstStack.type !== 'Integer' || firstStackJSON.type !== 'Integer') {
@@ -106,58 +98,172 @@ describe('NEOONEDataProvider', () => {
     verifyAction(actions[1], actionsJSON[1], 1);
   };
 
-  const verifyAssetBase = (
-    asset: AssetBase,
-    assetJSON: AssetBaseJSON,
-    toAssetType: string = assetJSON.type,
-    name = assetJSON.name,
-  ) => {
-    expect(asset.type).toEqual(toAssetType);
-    expect(asset.name).toEqual(name);
-    expect(asset.amount.toString(10)).toEqual(assetJSON.amount);
-    expect(asset.precision).toEqual(assetJSON.precision);
-    expect(asset.owner).toEqual(assetJSON.owner);
-    expect(asset.admin).toEqual(assetJSON.admin);
+  const verifyContractParameterType = (param: ContractParameterType, paramJSON: ContractParameterTypeJSON) => {
+    switch (paramJSON) {
+      case 'Signature':
+        expect(param).toEqual('Signature');
+        break;
+      case 'Boolean':
+        expect(param).toEqual('Boolean');
+        break;
+      case 'Integer':
+        expect(param).toEqual('Integer');
+        break;
+      case 'Hash160':
+        expect(param).toEqual('Address');
+        break;
+      case 'Hash256':
+        expect(param).toEqual('Hash256');
+        break;
+      case 'ByteArray':
+        expect(param).toEqual('Buffer');
+        break;
+      case 'PublicKey':
+        expect(param).toEqual('PublicKey');
+        break;
+      case 'String':
+        expect(param).toEqual('String');
+        break;
+      case 'Array':
+        expect(param).toEqual('Array');
+        break;
+      case 'Map':
+        expect(param).toEqual('Map');
+        break;
+      case 'InteropInterface':
+        expect(param).toEqual('InteropInterface');
+        break;
+      case 'Void':
+        expect(param).toEqual('Void');
+        break;
+      /* istanbul ignore next */
+      default:
+        commonUtils.assertNever(paramJSON);
+        throw new Error('For TS');
+    }
   };
 
-  const verifyAsset = (
-    asset: Asset,
-    assetJSON: AssetJSON,
-    toAssetType: string = assetJSON.type,
-    name = assetJSON.name,
+  const verifyContractParameterDeclaration = (
+    param: ContractParameterDeclaration,
+    paramJSON: ContractParameterDeclarationJSON,
   ) => {
-    verifyAssetBase(asset, assetJSON, toAssetType, name);
-    expect(asset.hash).toEqual(assetJSON.id);
-    expect(asset.available.toString(10)).toEqual(assetJSON.available);
-    expect(asset.issuer).toEqual(assetJSON.issuer);
-    expect(asset.expiration).toEqual(assetJSON.expiration);
-    expect(asset.frozen).toEqual(assetJSON.frozen);
+    expect(param.name).toEqual(paramJSON.name);
+    verifyContractParameterType(param.type, paramJSON.type);
   };
 
-  const verifyContract = (contract: Contract, contractJSON: ContractJSON, returnType = 'Buffer') => {
-    expect(contract.version).toEqual(contractJSON.version);
+  const verifyContractEvent = (event: ContractEvent, eventJSON: ContractEventJSON) => {
+    expect(event.name).toEqual(eventJSON.name);
+    event.parameters.forEach((param, idx) => verifyContractParameterDeclaration(param, eventJSON.parameters[idx]));
+  };
+
+  const verifyContractMethodDescriptor = (
+    method: ContractMethodDescriptor,
+    methodJSON: ContractMethodDescriptorJSON,
+  ) => {
+    expect(method.name).toEqual(methodJSON.name);
+    method.parameters.forEach((param, idx) => verifyContractParameterDeclaration(param, methodJSON.parameters[idx]));
+    verifyContractParameterType(method.returnType, methodJSON.returnType);
+  };
+
+  const verifyContractAbi = (abi: ContractAbi, abiJSON: ContractAbiJSON) => {
+    expect(abi.hash).toEqual(common.hexToUInt160(abiJSON.hash));
+    verifyContractMethodDescriptor(abi.entryPoint, abiJSON.entryPoint);
+    abi.methods.forEach((method, idx) => verifyContractMethodDescriptor(method, abiJSON.methods[idx]));
+    abi.events.forEach((event, idx) => verifyContractEvent(event, abiJSON.events[idx]));
+  };
+
+  const verifyContractGroup = (group: ContractGroup, groupJSON: ContractGroupJSON) => {
+    expect(group.publicKey).toEqual(common.hexToECPoint(groupJSON.publicKey));
+    expect(group.signature).toEqual(groupJSON.signature);
+  };
+
+  const verifyContractPermissionDescriptor = (
+    permissionDescriptor: ContractPermissionDescriptor,
+    permissionDescriptorJSON: ContractPermissionDescriptorJSON,
+  ) => {
+    let checked = false;
+    let permissionConverted;
+
+    if (permissionDescriptorJSON === '*') {
+      checked = true;
+    }
+
+    try {
+      permissionConverted = common.hexToUInt160(permissionDescriptorJSON);
+      checked = true;
+    } catch {
+      // do nothing
+    }
+
+    try {
+      permissionConverted = common.hexToECPoint(permissionDescriptorJSON);
+      checked = true;
+    } catch {
+      // do nothing
+    }
+
+    if (checked) {
+      expect(permissionDescriptor.hashOrGroup).toEqual(permissionConverted);
+    } else {
+      throw new Error('Invalid ContractPermissionDescriptorJSON');
+    }
+  };
+
+  const verifyWildcardContainer = <T, U>(
+    wildcard: WildcardContainer<T>,
+    wildcardJSON: WildcardContainerJSON<U>,
+    checkFunction: (t: T, u: U) => void,
+  ) => {
+    if (wildcard.data === undefined) {
+      expect(wildcardJSON).toEqual('*');
+    } else {
+      wildcard.data.forEach((val, idx) => checkFunction(val, (wildcardJSON as readonly U[])[idx]));
+    }
+  };
+
+  const verifyContractPermissions = (permission: ContractPermissions, permissionJSON: ContractPermissionsJSON) => {
+    verifyContractPermissionDescriptor(permission.contract, permissionJSON.contract);
+    verifyWildcardContainer<string, string>(permission.methods, permissionJSON.methods, (method, methodJSON) =>
+      expect(method).toEqual(methodJSON),
+    );
+  };
+
+  const verifyContractManifest = (manifest: ContractManifest, manifestJSON: ContractManifestJSON) => {
+    verifyContractAbi(manifest.abi, manifestJSON.abi);
+    manifest.groups.forEach((group, idx) => verifyContractGroup(group, manifestJSON.groups[idx]));
+    manifest.permissions.forEach((permission, idx) =>
+      verifyContractPermissions(permission, manifestJSON.permissions[idx]),
+    );
+    verifyWildcardContainer(manifest.trusts, manifestJSON.trusts, (trust, trustJSON) =>
+      expect(trust).toEqual(common.hexToUInt160(trustJSON)),
+    );
+    verifyWildcardContainer(manifest.safeMethods, manifestJSON.safeMethods, (method, methodJSON) =>
+      expect(method).toEqual(methodJSON),
+    );
+    expect(manifest.features).toEqual(manifestJSON.features);
+  };
+
+  const verifyContract = (contract: Contract, contractJSON: ContractJSON) => {
     expect(contract.address).toEqual(scriptHashToAddress(contractJSON.hash));
     expect(contract.script).toEqual(contractJSON.script);
-    expect(contract.parameters).toEqual(['Address', 'Buffer']);
-    expect(contract.returnType).toEqual(returnType);
-    expect(contract.name).toEqual(contractJSON.name);
-    expect(contract.codeVersion).toEqual(contractJSON.code_version);
-    expect(contract.author).toEqual(contractJSON.author);
-    expect(contract.email).toEqual(contractJSON.email);
-    expect(contract.description).toEqual(contractJSON.description);
-    expect(contract.storage).toEqual(contractJSON.properties.storage);
-    expect(contract.dynamicInvoke).toEqual(contractJSON.properties.dynamic_invoke);
-    expect(contract.payable).toEqual(contractJSON.properties.payable);
+    verifyContractManifest(contract.manifest, contractJSON.manifest);
   };
 
-  const verifyOutput = (output: Output, outputJSON: OutputJSON) => {
-    expect(output.asset).toEqual(outputJSON.asset);
-    expect(output.value.toString(10)).toEqual(outputJSON.value);
-    expect(output.address).toEqual(outputJSON.address);
+  const verifyCosigners = (cosigner: Cosigner, cosignerJSON: CosignerJSON) => {
+    expect(cosigner.account).toEqual(cosignerJSON.account);
+    expect(cosigner.scopes).toEqual(cosignerJSON.scopes);
+    expect(cosigner.allowedContracts).toEqual(cosignerJSON.allowedContracts);
+    if (cosigner.allowedGroups === undefined) {
+      expect(cosignerJSON.allowedContracts).toEqual(undefined);
+    } else {
+      cosigner.allowedGroups.forEach((group, idx) => {
+        expect(common.hexToECPoint(group)).toEqual((cosignerJSON.allowedGroups as readonly string[])[idx]);
+      });
+    }
   };
 
-  const verifyTransactionBase = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    expect(transaction.hash).toEqual(transactionJSON.txid);
+  const verifyTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
+    expect(transaction.hash).toEqual(transactionJSON.hash);
     expect(transaction.size).toEqual(transactionJSON.size);
     expect(transaction.version).toEqual(transactionJSON.version);
     expect(transaction.attributes.length).toEqual(transactionJSON.attributes.length);
@@ -169,91 +275,22 @@ describe('NEOONEDataProvider', () => {
     expect(transaction.attributes[2].data).toEqual(transactionJSON.attributes[2].data);
     expect(transaction.attributes[3].usage).toEqual(transactionJSON.attributes[3].usage);
     expect(transaction.attributes[3].data).toEqual(transactionJSON.attributes[3].data);
-    expect(transaction.inputs.length).toEqual(transactionJSON.vin.length);
-    expect(transaction.inputs[0].hash).toEqual(transactionJSON.vin[0].txid);
-    expect(transaction.inputs[0].index).toEqual(transactionJSON.vin[0].vout);
-    expect(transaction.outputs.length).toEqual(transactionJSON.vout.length);
-    verifyOutput(transaction.outputs[0], transactionJSON.vout[0]);
-    expect(transaction.scripts).toEqual(transactionJSON.scripts);
+    expect(transaction.nonce).toEqual(transactionJSON.nonce);
+    expect(transaction.sender).toEqual(transactionJSON.sender);
     expect(transaction.systemFee.toString(10)).toEqual(transactionJSON.sys_fee);
     expect(transaction.networkFee.toString(10)).toEqual(transactionJSON.net_fee);
+    expect(transaction.validUntilBlock).toEqual(transactionJSON.valid_until_block);
+    expect(transaction.witnesses).toEqual(transactionJSON.witnesses);
+    transaction.cosigners.forEach((cosigner, idx) => verifyCosigners(cosigner, transactionJSON.cosigners[idx]));
   };
 
-  const verifyClaimTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    if (transaction.type !== 'ClaimTransaction' || transactionJSON.type !== 'ClaimTransaction') {
-      throw new Error('For TS');
-    }
-    expect(transaction.claims.length).toEqual(transactionJSON.claims.length);
-    expect(transaction.claims[0].hash).toEqual(transactionJSON.claims[0].txid);
-    expect(transaction.claims[0].index).toEqual(transactionJSON.claims[0].vout);
-  };
+  const verifyConfirmedTransaction = (transaction: ConfirmedTransaction, transactionJSON: ConfirmedTransactionJSON) => {
+    verifyTransaction(transaction, transactionJSON);
 
-  const verifyContractTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    expect(transaction.type).toEqual('ContractTransaction');
-  };
-
-  const verifyEnrollmentTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    if (transaction.type !== 'EnrollmentTransaction' || transactionJSON.type !== 'EnrollmentTransaction') {
-      throw new Error('For TS');
-    }
-    expect(transaction.publicKey).toEqual(transactionJSON.pubkey);
-  };
-
-  const verifyInvocationTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    if (transaction.type !== 'InvocationTransaction' || transactionJSON.type !== 'InvocationTransaction') {
-      throw new Error('For TS');
-    }
-    expect(transaction.script).toEqual(transactionJSON.script);
-    expect(transaction.gas.toString(10)).toEqual(transactionJSON.gas);
-  };
-
-  const verifyIssueTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    expect(transaction.type).toEqual('IssueTransaction');
-  };
-
-  const verifyMinerTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    if (transaction.type !== 'MinerTransaction' || transactionJSON.type !== 'MinerTransaction') {
-      throw new Error('For TS');
-    }
-    expect(transaction.nonce).toEqual(transactionJSON.nonce);
-  };
-
-  const verifyPublishTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    if (transaction.type !== 'PublishTransaction' || transactionJSON.type !== 'PublishTransaction') {
-      throw new Error('For TS');
-    }
-    verifyContract(transaction.contract, transactionJSON.contract);
-  };
-
-  const verifyRegisterTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    if (transaction.type !== 'RegisterTransaction' || transactionJSON.type !== 'RegisterTransaction') {
-      throw new Error('For TS');
-    }
-    verifyAssetBase(transaction.asset, transactionJSON.asset);
-  };
-
-  const verifyStateTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    expect(transaction.type).toEqual('StateTransaction');
-  };
-
-  const verifyConfirmedTransaction = (transaction: ConfirmedTransaction, transactionJSON: TransactionJSON) => {
-    if (transactionJSON.data === undefined) {
-      throw new Error('For TS');
-    }
-
-    expect(transaction.receipt.blockHash).toEqual(transactionJSON.data.blockHash);
-    expect(transaction.receipt.blockIndex).toEqual(transactionJSON.data.blockIndex);
-    expect(transaction.receipt.transactionIndex).toEqual(transactionJSON.data.transactionIndex);
-    expect(transaction.receipt.globalIndex.toString(10)).toEqual(transactionJSON.data.globalIndex);
+    expect(transaction.blockHash).toEqual(transactionJSON.blockHash);
+    expect(transaction.blockTime).toEqual(transactionJSON.blockTime);
+    expect(transaction.transactionHash).toEqual(transactionJSON.transactionHash);
+    expect(transaction.confirmations).toEqual(transactionJSON.confirmations);
   };
 
   const verifyCallReceipt = (receipt: RawCallReceipt, receiptJSON: CallReceiptJSON) => {
@@ -277,53 +314,21 @@ describe('NEOONEDataProvider', () => {
     expect(currentClient).not.toBe((provider as any).mutableClient);
   });
 
-  test('getUnclaimed', async () => {
-    const accountJSON = factory.createAccountJSON();
-    client.getAccount = jest.fn(async () => Promise.resolve(accountJSON));
-    client.getClaimAmount = jest.fn(async () => Promise.resolve(data.bigNumbers.a));
-
-    const result = await provider.getUnclaimed(keys[0].address);
-
-    expect(result.amount).toEqual(data.bigNumbers.a.times(accountJSON.unclaimed.length));
-    expect(result.unclaimed[0].hash).toEqual(accountJSON.unclaimed[0].txid);
-    expect(result.unclaimed[0].index).toEqual(accountJSON.unclaimed[0].vout);
-    expect(result.unclaimed[1].hash).toEqual(accountJSON.unclaimed[1].txid);
-    expect(result.unclaimed[1].index).toEqual(accountJSON.unclaimed[1].vout);
-  });
-
-  test('getUnspent', async () => {
-    const accountJSON = factory.createAccountJSON();
-    const outputJSON = factory.createOutputJSON();
-    client.getAccount = jest.fn(async () => Promise.resolve(accountJSON));
-    client.getUnspentOutput = jest.fn(async (input) =>
-      input.vout === accountJSON.unspent[0].vout ? outputJSON : undefined,
-    );
-
-    const result = await provider.getUnspentOutputs(keys[0].address);
-
-    expect(result).toHaveLength(1);
-    expect(result[0].asset).toEqual(outputJSON.asset);
-    expect(result[0].value.toString(10)).toEqual(outputJSON.value);
-    expect(result[0].address).toEqual(outputJSON.address);
-    expect(result[0].hash).toEqual(accountJSON.unspent[0].txid);
-    expect(result[0].index).toEqual(accountJSON.unspent[0].vout);
-  });
-
-  test('relayTransaction', async () => {
-    const transactionJSON = factory.createInvocationTransactionJSON();
-    client.relayTransaction = jest.fn(async () =>
+  test('sendTransaction', async () => {
+    const transactionJSON = factory.createTransactionJSON();
+    client.sendTransaction = jest.fn(async () =>
       Promise.resolve({
         transaction: transactionJSON,
       }),
     );
 
-    const result = await provider.relayTransaction(data.serializedTransaction.valid);
+    const result = await provider.sendTransaction(data.serializedTransaction.valid);
 
-    verifyInvocationTransaction(result.transaction, transactionJSON);
+    verifyTransaction(result.transaction, transactionJSON);
   });
 
   test('verifyConvertTransaction', async () => {
-    const transactionJSON = factory.createInvocationTransactionJSON();
+    const transactionJSON = factory.createTransactionJSON();
 
     const actionJSON = factory.createLogActionJSON();
     const verificationScriptJSON = factory.createVerifyScriptResultJSON({
@@ -334,14 +339,14 @@ describe('NEOONEDataProvider', () => {
       verifications: [verificationScriptJSON],
     });
 
-    client.relayTransaction = jest.fn(async () =>
+    client.sendTransaction = jest.fn(async () =>
       Promise.resolve({
         transaction: transactionJSON,
         verifyResult: verifyResultJSON,
       }),
     );
 
-    const result = await provider.relayTransaction(data.serializedTransaction.valid);
+    const result = await provider.sendTransaction(data.serializedTransaction.valid);
 
     if (result.verifyResult === undefined) {
       throw new Error('for TS');
@@ -353,163 +358,38 @@ describe('NEOONEDataProvider', () => {
         witness: verificationScriptJSON.witness,
         address: scriptHashToAddress(verificationScriptJSON.hash),
         actions: [
-          convertAction(common.uInt256ToString(common.ZERO_UINT256), -1, transactionJSON.txid, -1, 0, actionJSON),
+          convertAction(common.uInt256ToString(common.ZERO_UINT256), -1, transactionJSON.hash, -1, 0, actionJSON),
         ],
       },
     ]);
   });
 
-  test('getTransactionReceipt', async () => {
-    const transactionReceipt = factory.createTransactionReceipt();
+  test('getTransaction', async () => {
+    const confirmedTransaction = factory.createConfirmedTransactionJSON();
     // tslint:disable-next-line:no-any
-    client.getTransactionReceipt = jest.fn(async () => Promise.resolve(transactionReceipt) as any);
+    client.getTransaction = jest.fn(async () => Promise.resolve(confirmedTransaction) as any);
 
-    const result = await provider.getTransactionReceipt(data.hash256s.a);
+    const result = await provider.getTransaction(data.hash256s.a);
 
-    expect(result).toEqual(transactionReceipt);
+    verifyConfirmedTransaction(result, confirmedTransaction);
   });
 
-  test('getInvocationData', async () => {
-    const transactionJSON = factory.createInvocationTransactionJSON();
-    const invocationData = transactionJSON.invocationData;
-    const transactionData = transactionJSON.data;
-    if (invocationData === undefined || transactionData === undefined) {
-      throw new Error('Something went wrong');
-    }
+  test('invokeRawScript', async () => {
+    const callReceiptJSON = factory.createInvocationResultSuccessJSON();
+    client.invokeScript = jest.fn(async () => Promise.resolve(callReceiptJSON));
 
-    client.getInvocationData = jest.fn(async () => Promise.resolve(invocationData));
-    client.getTransaction = jest.fn(async () => Promise.resolve(transactionJSON));
+    const result = await provider.invokeRawScript(data.serializedTransaction.valid);
 
-    const result = await provider.getInvocationData(data.hash256s.a);
-
-    verifyDefaultActions(
-      result.actions,
-      invocationData.actions,
-      transactionData.blockIndex,
-      transactionData.blockHash,
-      transactionData.transactionIndex,
-      transactionJSON.txid,
-    );
-
-    const notificationAction = result.actions[0];
-    const notificationActionJSON = invocationData.actions[0];
-    if (notificationAction.type !== 'Notification' || notificationActionJSON.type !== 'Notification') {
-      throw new Error('For TS');
-    }
-    expect(notificationAction.args.length).toEqual(notificationActionJSON.args.length);
-    const firstArg = notificationAction.args[0];
-    const firstArgJSON = notificationActionJSON.args[0];
-    if (firstArg.type !== 'Integer' || firstArgJSON.type !== 'Integer') {
-      throw new Error('For TS');
-    }
-    expect(firstArg.value.toString(10)).toEqual(firstArgJSON.value);
-
-    const logAction = result.actions[1];
-    const logActionJSON = invocationData.actions[1];
-    if (logAction.type !== 'Log' || logActionJSON.type !== 'Log') {
-      throw new Error('For TS');
-    }
-    expect(logAction.message).toEqual(logActionJSON.message);
-
-    const asset = result.asset;
-    const assetJSON = invocationData.asset;
-    if (asset === undefined || assetJSON === undefined) {
-      throw new Error('For TS');
-    }
-    verifyAsset(asset, assetJSON);
-
-    expect(result.contracts.length).toEqual(invocationData.contracts.length);
-    verifyContract(result.contracts[0], invocationData.contracts[0]);
-
-    expect(result.deletedContractAddresses.length).toEqual(invocationData.deletedContractHashes.length);
-    expect(result.deletedContractAddresses[0]).toEqual(scriptHashToAddress(invocationData.deletedContractHashes[0]));
-    expect(result.migratedContractAddresses.length).toEqual(invocationData.migratedContractHashes.length);
-    expect(result.migratedContractAddresses[0][0]).toEqual(
-      scriptHashToAddress(invocationData.migratedContractHashes[0][0]),
-    );
-    expect(result.migratedContractAddresses[0][1]).toEqual(
-      scriptHashToAddress(invocationData.migratedContractHashes[0][1]),
-    );
-
-    verifyInvocationResultSuccess(result.result, invocationData.result);
+    verifyInvocationResultSuccess(result, callReceiptJSON);
   });
 
-  test('getInvocationData - missing transaction data', async () => {
-    const { data: _data, ...transactionJSON } = factory.createInvocationTransactionJSON();
+  test('invokeFunction', async () => {
+    const callReceiptJSON = factory.createInvocationResultSuccessJSON();
+    client.invokeFunction = jest.fn(async () => Promise.resolve(callReceiptJSON));
 
-    // tslint:disable:no-any
-    client.getInvocationData = jest.fn(async () => Promise.resolve(transactionJSON.invocationData) as any);
-    client.getTransaction = jest.fn((async () => Promise.resolve(transactionJSON)) as any);
-    // tslint:enable:no-any
+    const result = await provider.invokeFunction(keys[0].address, 'foo', []);
 
-    await expect(provider.getInvocationData(data.hash256s.a)).rejects.toMatchSnapshot();
-  });
-
-  test('testInvoke', async () => {
-    const callReceiptJSON = factory.createCallReceiptJSON();
-    client.testInvocation = jest.fn(async () => Promise.resolve(callReceiptJSON));
-
-    const result = await provider.testInvoke(data.serializedTransaction.valid);
-
-    verifyCallReceipt(result, callReceiptJSON);
-  });
-
-  test('getAccount', async () => {
-    const accountJSON = factory.createAccountJSON();
-    client.getAccount = jest.fn(async () => Promise.resolve(accountJSON));
-
-    const result = await provider.getAccount(keys[0].address);
-
-    expect(result.address).toEqual(scriptHashToAddress(accountJSON.script_hash));
-    expect(result.balances[Hash256.NEO].toString(10)).toEqual(accountJSON.balances[0].value);
-    expect(result.balances[Hash256.GAS].toString(10)).toEqual(accountJSON.balances[1].value);
-  });
-
-  const convertedAssetTypes = [
-    ['CreditFlag', 'Credit'] as const,
-    ['DutyFlag', 'Duty'] as const,
-    ['GoverningToken', 'Governing'] as const,
-    ['UtilityToken', 'Utility'] as const,
-    ['Currency', 'Currency'] as const,
-    ['Share', 'Share'] as const,
-    ['Invoice', 'Invoice'] as const,
-    ['Token', 'Token'] as const,
-  ];
-
-  convertedAssetTypes.forEach(([from, to]) => {
-    test(`getAsset - ${from} -> ${to}`, async () => {
-      const assetJSON = factory.createAssetJSON({ type: from });
-      client.getAsset = jest.fn(async () => Promise.resolve(assetJSON));
-
-      const result = await provider.getAsset(data.hash256s.a);
-      verifyAsset(result, assetJSON, to);
-    });
-  });
-
-  test(`getAsset - extracts en name`, async () => {
-    const assetJSON = factory.createAssetJSON({
-      name: [
-        { lang: 'foo', name: 'bar' },
-        { lang: 'en', name: 'baz' },
-      ],
-    });
-    client.getAsset = jest.fn(async () => Promise.resolve(assetJSON));
-
-    const result = await provider.getAsset(data.hash256s.a);
-    verifyAsset(result, assetJSON, assetJSON.type, 'baz');
-  });
-
-  test(`getAsset - otherwise, first name`, async () => {
-    const assetJSON = factory.createAssetJSON({
-      name: [
-        { lang: 'foo', name: 'bar' },
-        { lang: 'baz', name: 'baz' },
-      ],
-    });
-    client.getAsset = jest.fn(async () => Promise.resolve(assetJSON));
-
-    const result = await provider.getAsset(data.hash256s.a);
-    verifyAsset(result, assetJSON, assetJSON.type, 'bar');
+    verifyInvocationResultSuccess(result, callReceiptJSON);
   });
 
   test('getBlock', async () => {
@@ -520,33 +400,20 @@ describe('NEOONEDataProvider', () => {
 
     expect(result.version).toEqual(blockJSON.version);
     expect(result.hash).toEqual(blockJSON.hash);
+    expect(result.size).toEqual(blockJSON.size);
     expect(result.previousBlockHash).toEqual(blockJSON.previousblockhash);
     expect(result.merkleRoot).toEqual(blockJSON.merkleroot);
-    expect(result.time).toEqual(blockJSON.time);
+    expect(result.time.toString()).toEqual(blockJSON.time);
     expect(result.index).toEqual(blockJSON.index);
-    expect(result.nonce).toEqual(blockJSON.nonce);
     expect(result.nextConsensus).toEqual(blockJSON.nextconsensus);
-    expect(result.script).toEqual(blockJSON.script);
-    expect(result.size).toEqual(blockJSON.size);
+    expect(result.witnesses[0].invocation).toEqual(blockJSON.witnesses[0].invocation);
+    expect(result.witnesses[0].verification).toEqual(blockJSON.witnesses[0].verification);
+    expect(result.confirmations).toEqual(blockJSON.confirmations);
+    expect(result.nextBlockHash).toEqual(blockJSON.nextblockhash);
     expect(result.transactions.length).toEqual(blockJSON.tx.length);
-    verifyMinerTransaction(result.transactions[0], blockJSON.tx[0]);
     verifyConfirmedTransaction(result.transactions[0], blockJSON.tx[0]);
-    verifyClaimTransaction(result.transactions[1], blockJSON.tx[1]);
-    verifyConfirmedTransaction(result.transactions[1], blockJSON.tx[1]);
-    verifyContractTransaction(result.transactions[2], blockJSON.tx[2]);
-    verifyConfirmedTransaction(result.transactions[2], blockJSON.tx[2]);
-    verifyEnrollmentTransaction(result.transactions[3], blockJSON.tx[3]);
-    verifyConfirmedTransaction(result.transactions[3], blockJSON.tx[3]);
-    verifyInvocationTransaction(result.transactions[4], blockJSON.tx[4]);
-    verifyConfirmedTransaction(result.transactions[4], blockJSON.tx[4]);
-    verifyIssueTransaction(result.transactions[5], blockJSON.tx[5]);
-    verifyConfirmedTransaction(result.transactions[5], blockJSON.tx[5]);
-    verifyPublishTransaction(result.transactions[6], blockJSON.tx[6]);
-    verifyConfirmedTransaction(result.transactions[6], blockJSON.tx[6]);
-    verifyRegisterTransaction(result.transactions[7], blockJSON.tx[7]);
-    verifyConfirmedTransaction(result.transactions[7], blockJSON.tx[7]);
-    verifyStateTransaction(result.transactions[8], blockJSON.tx[8]);
-    verifyConfirmedTransaction(result.transactions[8], blockJSON.tx[8]);
+    expect(result.consensusData.nonce).toEqual(blockJSON.consensus_data.nonce);
+    expect(result.consensusData.primaryIndex).toEqual(blockJSON.consensus_data.primary);
   });
 
   test('iterBlocks', async () => {
@@ -602,11 +469,14 @@ describe('NEOONEDataProvider', () => {
 
   convertedContractParameterTypes.forEach(([from, to]) => {
     test(`getContract - ${from} -> ${to}`, async () => {
-      const contractJSON = factory.createContractJSON({ returntype: from });
+      const methodJSON = factory.createContractMethodDescriptorJSON({ returnType: from });
+      const contractAbiJSON = factory.createContractAbiJSON({ methods: [methodJSON] });
+      const contractManifestJSON = factory.createContractManifestJSON({ abi: contractAbiJSON });
+      const contractJSON = factory.createContractJSON({ manifest: contractManifestJSON });
       client.getContract = jest.fn(async () => Promise.resolve(contractJSON));
 
       const result = await provider.getContract(keys[0].address);
-      verifyContract(result, contractJSON, to);
+      verifyContract(result, contractJSON);
     });
   });
 
@@ -619,24 +489,6 @@ describe('NEOONEDataProvider', () => {
     expect(result).toEqual(memPool);
   });
 
-  test('getTransaction', async () => {
-    const transactionJSON = factory.createInvocationTransactionJSON();
-    client.getTransaction = jest.fn(async () => Promise.resolve(transactionJSON));
-
-    const result = await provider.getTransaction(transactionJSON.txid);
-
-    verifyInvocationTransaction(result, transactionJSON);
-  });
-
-  test('getOutput', async () => {
-    const outputJSON = factory.createOutputJSON();
-    client.getOutput = jest.fn(async () => Promise.resolve(outputJSON));
-
-    const result = await provider.getOutput({ hash: data.hash256s.a, index: 0 });
-
-    verifyOutput(result, outputJSON);
-  });
-
   test('getConnectedPeers', async () => {
     const peersJSON = [factory.createPeerJSON()];
     client.getConnectedPeers = jest.fn(async () => Promise.resolve(peersJSON));
@@ -646,122 +498,109 @@ describe('NEOONEDataProvider', () => {
     expect(result).toEqual(peersJSON);
   });
 
-  test('getNetworkSettings', async () => {
-    const networkSettingsJSON = factory.createNetworkSettingsJSON();
-    client.getNetworkSettings = jest.fn(async () => Promise.resolve(networkSettingsJSON));
-
-    const result = await provider.getNetworkSettings();
-
-    expect(result.issueGASFee.toString(10)).toEqual(networkSettingsJSON.issueGASFee);
-  });
-
   const verifyStorage = (item: StorageItem, itemJSON: StorageItemJSON) => {
     expect(item.address).toEqual(keys[0].address);
     expect(item.key).toEqual(data.buffers.a);
     expect(item.value).toEqual(itemJSON.value);
   };
 
-  test('iterStorage', async () => {
-    const storageItemJSON = factory.createStorageItemJSON();
-    client.getAllStorage = jest.fn(async () => Promise.resolve([storageItemJSON]));
+  // test('iterStorage', async () => {
+  //   const storageItemJSON = factory.createStorageItemJSON();
+  //   client.getAllStorage = jest.fn(async () => Promise.resolve([storageItemJSON]));
 
-    const result = await toArray(provider.iterStorage(keys[0].address));
+  //   const result = await toArray(provider.iterStorage(keys[0].address));
 
-    expect(result).toHaveLength(1);
-    verifyStorage(result[0], storageItemJSON);
-  });
+  //   expect(result).toHaveLength(1);
+  //   verifyStorage(result[0], storageItemJSON);
+  // });
 
-  test('iterActionsRaw', async () => {
-    const blockJSON = factory.createBlockJSON();
-    client.getBlockCount = jest.fn(async () => Promise.resolve(2));
-    client.getBlock = jest.fn(async () => Promise.resolve(blockJSON));
+  // test('iterActionsRaw', async () => {
+  //   const blockJSON = factory.createBlockJSON();
+  //   client.getBlockCount = jest.fn(async () => Promise.resolve(2));
+  //   client.getBlock = jest.fn(async () => Promise.resolve(blockJSON));
 
-    const result = await toArray(provider.iterActionsRaw({ indexStart: 1, indexStop: 2 }));
+  //   const result = await toArray(provider.iterActionsRaw({ indexStart: 1, indexStop: 2 }));
 
-    expect(result.length).toEqual(2);
-    const transactionJSON = blockJSON.tx[4];
-    if (
-      transactionJSON.type !== 'InvocationTransaction' ||
-      transactionJSON.data === undefined ||
-      transactionJSON.invocationData === undefined
-    ) {
-      throw new Error('For TS');
-    }
+  //   expect(result.length).toEqual(2);
+  //   const transactionJSON = blockJSON.tx[4];
+  //   if (
+  //     transactionJSON.type !== 'InvocationTransaction' ||
+  //     transactionJSON.data === undefined ||
+  //     transactionJSON.invocationData === undefined
+  //   ) {
+  //     throw new Error('For TS');
+  //   }
 
-    verifyDefaultActions(
-      result,
-      transactionJSON.invocationData.actions,
-      transactionJSON.data.blockIndex,
-      transactionJSON.data.blockHash,
-      transactionJSON.data.transactionIndex,
-      transactionJSON.txid,
-    );
-  });
+  //   verifyDefaultActions(
+  //     result,
+  //     transactionJSON.invocationData.actions,
+  //     transactionJSON.data.blockIndex,
+  //     transactionJSON.data.blockHash,
+  //     transactionJSON.data.transactionIndex,
+  //     transactionJSON.txid,
+  //   );
+  // });
 
-  test('call', async () => {
-    const callReceiptJSON = factory.createCallReceiptJSON();
-    client.testInvocation = jest.fn(async () => Promise.resolve(callReceiptJSON));
+  // test('runConsensusNow', async () => {
+  //   const runConsensusNow = jest.fn(async () => Promise.resolve());
+  //   client.runConsensusNow = runConsensusNow;
 
-    const result = await provider.call(keys[0].address, 'foo', []);
+  //   await provider.runConsensusNow();
 
-    verifyCallReceipt(result, callReceiptJSON);
-  });
+  //   expect(runConsensusNow).toHaveBeenCalled();
+  // });
 
-  test('runConsensusNow', async () => {
-    const runConsensusNow = jest.fn(async () => Promise.resolve());
-    client.runConsensusNow = runConsensusNow;
+  // test('updateSettings', async () => {
+  //   const updateSettings = jest.fn(async () => Promise.resolve());
+  //   client.updateSettings = updateSettings;
+  //   const options = { secondsPerBlock: 10 };
 
-    await provider.runConsensusNow();
+  //   await provider.updateSettings(options);
 
-    expect(runConsensusNow).toHaveBeenCalled();
-  });
+  //   expect(updateSettings).toHaveBeenCalledWith(options);
+  // });
 
-  test('updateSettings', async () => {
-    const updateSettings = jest.fn(async () => Promise.resolve());
-    client.updateSettings = updateSettings;
-    const options = { secondsPerBlock: 10 };
+  // test('fastForwardOffset', async () => {
+  //   const fastForwardOffset = jest.fn(async () => Promise.resolve());
+  //   client.fastForwardOffset = fastForwardOffset;
+  //   const options = 10;
 
-    await provider.updateSettings(options);
+  //   await provider.fastForwardOffset(options);
 
-    expect(updateSettings).toHaveBeenCalledWith(options);
-  });
+  //   expect(fastForwardOffset).toHaveBeenCalledWith(options);
+  // });
 
-  test('fastForwardOffset', async () => {
-    const fastForwardOffset = jest.fn(async () => Promise.resolve());
-    client.fastForwardOffset = fastForwardOffset;
-    const options = 10;
+  // test('fastForwardToTime', async () => {
+  //   const fastForwardToTime = jest.fn(async () => Promise.resolve());
+  //   client.fastForwardToTime = fastForwardToTime;
+  //   const options = 10;
 
-    await provider.fastForwardOffset(options);
+  //   await provider.fastForwardToTime(options);
 
-    expect(fastForwardOffset).toHaveBeenCalledWith(options);
-  });
+  //   expect(fastForwardToTime).toHaveBeenCalledWith(options);
+  // });
 
-  test('fastForwardToTime', async () => {
-    const fastForwardToTime = jest.fn(async () => Promise.resolve());
-    client.fastForwardToTime = fastForwardToTime;
-    const options = 10;
+  // test('reset', async () => {
+  //   const reset = jest.fn(async () => Promise.resolve());
+  //   client.reset = reset;
 
-    await provider.fastForwardToTime(options);
+  //   await provider.reset();
 
-    expect(fastForwardToTime).toHaveBeenCalledWith(options);
-  });
-
-  test('reset', async () => {
-    const reset = jest.fn(async () => Promise.resolve());
-    client.reset = reset;
-
-    await provider.reset();
-
-    expect(reset).toHaveBeenCalled();
-  });
+  //   expect(reset).toHaveBeenCalled();
+  // });
 
   test('convertMapContractParamaterType - Map', async () => {
-    const contract = factory.createContractJSON({ parameters: ['Map'] });
-    client.getContract = jest.fn(async () => Promise.resolve(contract));
+    const methodJSON = factory.createContractMethodDescriptorJSON({
+      parameters: [factory.contractParamDeclarationJSON.map],
+    });
+    const contractAbiJSON = factory.createContractAbiJSON({ methods: [methodJSON] });
+    const contractManifestJSON = factory.createContractManifestJSON({ abi: contractAbiJSON });
+    const contractJSON = factory.createContractJSON({ manifest: contractManifestJSON });
+    client.getContract = jest.fn(async () => Promise.resolve(contractJSON));
 
     const result = await provider.getContract(keys[0].address);
 
-    expect(result.parameters).toEqual(['Map']);
+    verifyContract(result, contractJSON);
   });
 
   test('construction with rpcURL provider works', () => {
