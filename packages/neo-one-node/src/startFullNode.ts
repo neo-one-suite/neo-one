@@ -1,10 +1,10 @@
 import {
+  getJaegerTraceExporter,
   getNewPropagation,
+  getPrometheusExporter,
   globalStats,
-  JaegerTraceExporter,
   JaegerTraceExporterOptions,
   PrometheusExporterOptions,
-  PrometheusStatsExporter,
   startTracing,
   TracingConfig,
 } from '@neo-one/client-switch';
@@ -73,12 +73,12 @@ export const startFullNode = async ({
       }
 
       if (telemetry.prometheus !== undefined) {
-        const exporter = new PrometheusStatsExporter({
+        const exporter = await getPrometheusExporter({
           ...telemetry.prometheus,
           startServer: true,
         });
 
-        globalStats.registerExporter(exporter);
+        await globalStats.registerExporter(exporter);
 
         disposable = composeDisposables(disposable, async () => {
           await new Promise((resolve) => exporter.stopServer(resolve));
@@ -87,7 +87,7 @@ export const startFullNode = async ({
       }
 
       if (telemetry.jaeger !== undefined && telemetry.tracing !== undefined) {
-        const exporter = new JaegerTraceExporter({
+        const exporter = await getJaegerTraceExporter({
           ...telemetry.jaeger,
           serviceName: 'NEO-ONE',
         });

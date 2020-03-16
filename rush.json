@@ -251,6 +251,11 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@neo-one/node-tools",
+      "projectFolder": "packages/neo-one-node-tools",
+      "reviewCategory": "production"
+    },
+    {
       "packageName": "@neo-one/node-vm",
       "projectFolder": "packages/neo-one-node-vm",
       "reviewCategory": "production",

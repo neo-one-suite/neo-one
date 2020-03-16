@@ -99,6 +99,10 @@
       "allowedCategories": [ "tools", "web" ]
     },
     {
+      "name": "@google-cloud/storage",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@jest/types",
       "allowedCategories": [ "web" ]
     },
