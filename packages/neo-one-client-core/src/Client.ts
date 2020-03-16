@@ -29,8 +29,8 @@ import {
   UserAccountProvider,
   UserAccountProviders,
 } from '@neo-one/client-common';
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
-import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
+import { from as asyncIterableFrom, of as asyncIterableOf } from '@reactivex/ix-es2015-cjs/asynciterable/';
+import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/operators/flatmap';
 import { toObservable } from '@reactivex/ix-es2015-cjs/asynciterable/toobservable';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
@@ -485,7 +485,7 @@ export class Client<
       return provider.iterActionsRaw(network, options);
     }
 
-    return AsyncIterableX.from(provider.iterBlocks(network, options)).pipe<RawAction>(
+    return asyncIterableFrom(provider.iterBlocks(network, options)).pipe<RawAction>(
       flatMap(async (block) => {
         const actions = _.flatten(
           block.transactions.map((transaction) => {
@@ -497,7 +497,7 @@ export class Client<
           }),
         );
 
-        return AsyncIterableX.of(...actions);
+        return asyncIterableOf(...actions);
       }),
     );
   }

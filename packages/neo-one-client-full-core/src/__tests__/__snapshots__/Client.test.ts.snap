@@ -2291,8 +2291,242 @@ Object {
               },
               "index": 1,
               "isStopped": true,
-              "outerIndex": undefined,
-              "outerValue": undefined,
+              "outerIndex": 0,
+              "outerValue": Object {
+                "call": [MockFunction],
+                "claim": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      Object {},
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Promise {},
+                    },
+                  ],
+                },
+                "currentUserAccount$": Observable {
+                  "_isScalar": false,
+                  "_subscribe": [Function],
+                },
+                "deleteUserAccount": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      Object {
+                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                        "network": "main",
+                      },
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": undefined,
+                    },
+                  ],
+                },
+                "getAccount": [MockFunction],
+                "getBlockCount": [MockFunction],
+                "getCurrentUserAccount": [MockFunction] {
+                  "calls": Array [
+                    Array [],
+                    Array [],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Object {
+                        "id": Object {
+                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                          "network": "main",
+                        },
+                        "name": "Mock",
+                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                      },
+                    },
+                    Object {
+                      "type": "return",
+                      "value": Object {
+                        "id": Object {
+                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                          "network": "main",
+                        },
+                        "name": "Mock",
+                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                      },
+                    },
+                  ],
+                },
+                "getNetworks": [MockFunction] {
+                  "calls": Array [
+                    Array [],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Array [
+                        "main",
+                      ],
+                    },
+                  ],
+                },
+                "getUserAccounts": [MockFunction],
+                "invoke": [MockFunction],
+                "invokeClaim": [MockFunction],
+                "invokeCompleteSend": [MockFunction],
+                "invokeRefundAssets": [MockFunction],
+                "invokeSend": [MockFunction],
+                "issue": [MockFunction],
+                "iterActionsRaw": [MockFunction],
+                "iterBlocks": [MockFunction],
+                "networks$": Observable {
+                  "_isScalar": false,
+                  "_subscribe": [Function],
+                },
+                "publish": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      Object {
+                        "author": "dicarlo2",
+                        "codeVersion": "1.0",
+                        "description": "Hello World",
+                        "dynamicInvoke": false,
+                        "email": "alex.dicarlo@neotracker.io",
+                        "name": "MyContract",
+                        "parameters": Array [
+                          "Address",
+                          "Buffer",
+                        ],
+                        "payable": true,
+                        "returnType": "Buffer",
+                        "script": "5f8d70",
+                        "storage": true,
+                      },
+                      Object {},
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Promise {},
+                    },
+                  ],
+                },
+                "publishAndDeploy": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      Object {
+                        "author": "dicarlo2",
+                        "codeVersion": "1.0",
+                        "description": "Hello World",
+                        "dynamicInvoke": false,
+                        "email": "alex.dicarlo@neotracker.io",
+                        "name": "MyContract",
+                        "parameters": Array [
+                          "Address",
+                          "Buffer",
+                        ],
+                        "payable": true,
+                        "returnType": "Buffer",
+                        "script": "5f8d70",
+                        "storage": true,
+                      },
+                      Object {
+                        "events": Array [],
+                        "functions": Array [
+                          Object {
+                            "claim": undefined,
+                            "completeSend": undefined,
+                            "constant": undefined,
+                            "name": "deploy",
+                            "parameters": Array [],
+                            "receive": undefined,
+                            "refundAssets": undefined,
+                            "returnType": Object {
+                              "forwardedValue": undefined,
+                              "optional": undefined,
+                              "type": "Boolean",
+                            },
+                            "send": undefined,
+                            "sendUnsafe": undefined,
+                          },
+                        ],
+                      },
+                      Array [],
+                      Object {},
+                      Object {},
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Promise {},
+                    },
+                  ],
+                },
+                "read": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      "main",
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Object {},
+                    },
+                  ],
+                },
+                "registerAsset": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      Object {
+                        "admin": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                        "amount": "100000000",
+                        "issuer": "ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s",
+                        "name": "TheToken",
+                        "owner": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                        "precision": 8,
+                        "type": "Token",
+                      },
+                      Object {},
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Promise {},
+                    },
+                  ],
+                },
+                "selectUserAccount": [MockFunction],
+                "transfer": [MockFunction],
+                "updateUserAccountName": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      Object {
+                        "id": Object {
+                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                          "network": "main",
+                        },
+                        "name": "newName",
+                      },
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": undefined,
+                    },
+                  ],
+                },
+                "userAccounts$": Observable {
+                  "_isScalar": false,
+                  "_subscribe": [Function],
+                },
+              },
               "parent": [Circular],
               "syncErrorThrowable": false,
               "syncErrorThrown": false,
@@ -2389,8 +2623,242 @@ Object {
                         },
                         "index": 1,
                         "isStopped": true,
-                        "outerIndex": undefined,
-                        "outerValue": undefined,
+                        "outerIndex": 0,
+                        "outerValue": Object {
+                          "call": [MockFunction],
+                          "claim": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "currentUserAccount$": Observable {
+                            "_isScalar": false,
+                            "_subscribe": [Function],
+                          },
+                          "deleteUserAccount": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "network": "main",
+                                },
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": undefined,
+                              },
+                            ],
+                          },
+                          "getAccount": [MockFunction],
+                          "getBlockCount": [MockFunction],
+                          "getCurrentUserAccount": [MockFunction] {
+                            "calls": Array [
+                              Array [],
+                              Array [],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Object {
+                                  "id": Object {
+                                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                    "network": "main",
+                                  },
+                                  "name": "Mock",
+                                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                },
+                              },
+                              Object {
+                                "type": "return",
+                                "value": Object {
+                                  "id": Object {
+                                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                    "network": "main",
+                                  },
+                                  "name": "Mock",
+                                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                },
+                              },
+                            ],
+                          },
+                          "getNetworks": [MockFunction] {
+                            "calls": Array [
+                              Array [],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Array [
+                                  "main",
+                                ],
+                              },
+                            ],
+                          },
+                          "getUserAccounts": [MockFunction],
+                          "invoke": [MockFunction],
+                          "invokeClaim": [MockFunction],
+                          "invokeCompleteSend": [MockFunction],
+                          "invokeRefundAssets": [MockFunction],
+                          "invokeSend": [MockFunction],
+                          "issue": [MockFunction],
+                          "iterActionsRaw": [MockFunction],
+                          "iterBlocks": [MockFunction],
+                          "networks$": Observable {
+                            "_isScalar": false,
+                            "_subscribe": [Function],
+                          },
+                          "publish": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "author": "dicarlo2",
+                                  "codeVersion": "1.0",
+                                  "description": "Hello World",
+                                  "dynamicInvoke": false,
+                                  "email": "alex.dicarlo@neotracker.io",
+                                  "name": "MyContract",
+                                  "parameters": Array [
+                                    "Address",
+                                    "Buffer",
+                                  ],
+                                  "payable": true,
+                                  "returnType": "Buffer",
+                                  "script": "5f8d70",
+                                  "storage": true,
+                                },
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "publishAndDeploy": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "author": "dicarlo2",
+                                  "codeVersion": "1.0",
+                                  "description": "Hello World",
+                                  "dynamicInvoke": false,
+                                  "email": "alex.dicarlo@neotracker.io",
+                                  "name": "MyContract",
+                                  "parameters": Array [
+                                    "Address",
+                                    "Buffer",
+                                  ],
+                                  "payable": true,
+                                  "returnType": "Buffer",
+                                  "script": "5f8d70",
+                                  "storage": true,
+                                },
+                                Object {
+                                  "events": Array [],
+                                  "functions": Array [
+                                    Object {
+                                      "claim": undefined,
+                                      "completeSend": undefined,
+                                      "constant": undefined,
+                                      "name": "deploy",
+                                      "parameters": Array [],
+                                      "receive": undefined,
+                                      "refundAssets": undefined,
+                                      "returnType": Object {
+                                        "forwardedValue": undefined,
+                                        "optional": undefined,
+                                        "type": "Boolean",
+                                      },
+                                      "send": undefined,
+                                      "sendUnsafe": undefined,
+                                    },
+                                  ],
+                                },
+                                Array [],
+                                Object {},
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "read": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                "main",
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Object {},
+                              },
+                            ],
+                          },
+                          "registerAsset": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "admin": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "amount": "100000000",
+                                  "issuer": "ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s",
+                                  "name": "TheToken",
+                                  "owner": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                  "precision": 8,
+                                  "type": "Token",
+                                },
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "selectUserAccount": [MockFunction],
+                          "transfer": [MockFunction],
+                          "updateUserAccountName": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "id": Object {
+                                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                    "network": "main",
+                                  },
+                                  "name": "newName",
+                                },
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": undefined,
+                              },
+                            ],
+                          },
+                          "userAccounts$": Observable {
+                            "_isScalar": false,
+                            "_subscribe": [Function],
+                          },
+                        },
                         "parent": [Circular],
                         "syncErrorThrowable": false,
                         "syncErrorThrown": false,
@@ -2836,8 +3304,242 @@ Object {
                         },
                         "index": 1,
                         "isStopped": true,
-                        "outerIndex": undefined,
-                        "outerValue": undefined,
+                        "outerIndex": 0,
+                        "outerValue": Object {
+                          "call": [MockFunction],
+                          "claim": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "currentUserAccount$": Observable {
+                            "_isScalar": false,
+                            "_subscribe": [Function],
+                          },
+                          "deleteUserAccount": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "network": "main",
+                                },
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": undefined,
+                              },
+                            ],
+                          },
+                          "getAccount": [MockFunction],
+                          "getBlockCount": [MockFunction],
+                          "getCurrentUserAccount": [MockFunction] {
+                            "calls": Array [
+                              Array [],
+                              Array [],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Object {
+                                  "id": Object {
+                                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                    "network": "main",
+                                  },
+                                  "name": "Mock",
+                                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                },
+                              },
+                              Object {
+                                "type": "return",
+                                "value": Object {
+                                  "id": Object {
+                                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                    "network": "main",
+                                  },
+                                  "name": "Mock",
+                                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                },
+                              },
+                            ],
+                          },
+                          "getNetworks": [MockFunction] {
+                            "calls": Array [
+                              Array [],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Array [
+                                  "main",
+                                ],
+                              },
+                            ],
+                          },
+                          "getUserAccounts": [MockFunction],
+                          "invoke": [MockFunction],
+                          "invokeClaim": [MockFunction],
+                          "invokeCompleteSend": [MockFunction],
+                          "invokeRefundAssets": [MockFunction],
+                          "invokeSend": [MockFunction],
+                          "issue": [MockFunction],
+                          "iterActionsRaw": [MockFunction],
+                          "iterBlocks": [MockFunction],
+                          "networks$": Observable {
+                            "_isScalar": false,
+                            "_subscribe": [Function],
+                          },
+                          "publish": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "author": "dicarlo2",
+                                  "codeVersion": "1.0",
+                                  "description": "Hello World",
+                                  "dynamicInvoke": false,
+                                  "email": "alex.dicarlo@neotracker.io",
+                                  "name": "MyContract",
+                                  "parameters": Array [
+                                    "Address",
+                                    "Buffer",
+                                  ],
+                                  "payable": true,
+                                  "returnType": "Buffer",
+                                  "script": "5f8d70",
+                                  "storage": true,
+                                },
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "publishAndDeploy": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "author": "dicarlo2",
+                                  "codeVersion": "1.0",
+                                  "description": "Hello World",
+                                  "dynamicInvoke": false,
+                                  "email": "alex.dicarlo@neotracker.io",
+                                  "name": "MyContract",
+                                  "parameters": Array [
+                                    "Address",
+                                    "Buffer",
+                                  ],
+                                  "payable": true,
+                                  "returnType": "Buffer",
+                                  "script": "5f8d70",
+                                  "storage": true,
+                                },
+                                Object {
+                                  "events": Array [],
+                                  "functions": Array [
+                                    Object {
+                                      "claim": undefined,
+                                      "completeSend": undefined,
+                                      "constant": undefined,
+                                      "name": "deploy",
+                                      "parameters": Array [],
+                                      "receive": undefined,
+                                      "refundAssets": undefined,
+                                      "returnType": Object {
+                                        "forwardedValue": undefined,
+                                        "optional": undefined,
+                                        "type": "Boolean",
+                                      },
+                                      "send": undefined,
+                                      "sendUnsafe": undefined,
+                                    },
+                                  ],
+                                },
+                                Array [],
+                                Object {},
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "read": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                "main",
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Object {},
+                              },
+                            ],
+                          },
+                          "registerAsset": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "admin": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "amount": "100000000",
+                                  "issuer": "ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s",
+                                  "name": "TheToken",
+                                  "owner": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                  "precision": 8,
+                                  "type": "Token",
+                                },
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "selectUserAccount": [MockFunction],
+                          "transfer": [MockFunction],
+                          "updateUserAccountName": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "id": Object {
+                                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                    "network": "main",
+                                  },
+                                  "name": "newName",
+                                },
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": undefined,
+                              },
+                            ],
+                          },
+                          "userAccounts$": Observable {
+                            "_isScalar": false,
+                            "_subscribe": [Function],
+                          },
+                        },
                         "parent": [Circular],
                         "syncErrorThrowable": false,
                         "syncErrorThrown": false,
@@ -5075,8 +5777,242 @@ Object {
               },
               "index": 1,
               "isStopped": true,
-              "outerIndex": undefined,
-              "outerValue": undefined,
+              "outerIndex": 0,
+              "outerValue": Object {
+                "call": [MockFunction],
+                "claim": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      Object {},
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Promise {},
+                    },
+                  ],
+                },
+                "currentUserAccount$": Observable {
+                  "_isScalar": false,
+                  "_subscribe": [Function],
+                },
+                "deleteUserAccount": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      Object {
+                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                        "network": "main",
+                      },
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": undefined,
+                    },
+                  ],
+                },
+                "getAccount": [MockFunction],
+                "getBlockCount": [MockFunction],
+                "getCurrentUserAccount": [MockFunction] {
+                  "calls": Array [
+                    Array [],
+                    Array [],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Object {
+                        "id": Object {
+                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                          "network": "main",
+                        },
+                        "name": "Mock",
+                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                      },
+                    },
+                    Object {
+                      "type": "return",
+                      "value": Object {
+                        "id": Object {
+                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                          "network": "main",
+                        },
+                        "name": "Mock",
+                        "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                      },
+                    },
+                  ],
+                },
+                "getNetworks": [MockFunction] {
+                  "calls": Array [
+                    Array [],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Array [
+                        "main",
+                      ],
+                    },
+                  ],
+                },
+                "getUserAccounts": [MockFunction],
+                "invoke": [MockFunction],
+                "invokeClaim": [MockFunction],
+                "invokeCompleteSend": [MockFunction],
+                "invokeRefundAssets": [MockFunction],
+                "invokeSend": [MockFunction],
+                "issue": [MockFunction],
+                "iterActionsRaw": [MockFunction],
+                "iterBlocks": [MockFunction],
+                "networks$": Observable {
+                  "_isScalar": false,
+                  "_subscribe": [Function],
+                },
+                "publish": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      Object {
+                        "author": "dicarlo2",
+                        "codeVersion": "1.0",
+                        "description": "Hello World",
+                        "dynamicInvoke": false,
+                        "email": "alex.dicarlo@neotracker.io",
+                        "name": "MyContract",
+                        "parameters": Array [
+                          "Address",
+                          "Buffer",
+                        ],
+                        "payable": true,
+                        "returnType": "Buffer",
+                        "script": "5f8d70",
+                        "storage": true,
+                      },
+                      Object {},
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Promise {},
+                    },
+                  ],
+                },
+                "publishAndDeploy": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      Object {
+                        "author": "dicarlo2",
+                        "codeVersion": "1.0",
+                        "description": "Hello World",
+                        "dynamicInvoke": false,
+                        "email": "alex.dicarlo@neotracker.io",
+                        "name": "MyContract",
+                        "parameters": Array [
+                          "Address",
+                          "Buffer",
+                        ],
+                        "payable": true,
+                        "returnType": "Buffer",
+                        "script": "5f8d70",
+                        "storage": true,
+                      },
+                      Object {
+                        "events": Array [],
+                        "functions": Array [
+                          Object {
+                            "claim": undefined,
+                            "completeSend": undefined,
+                            "constant": undefined,
+                            "name": "deploy",
+                            "parameters": Array [],
+                            "receive": undefined,
+                            "refundAssets": undefined,
+                            "returnType": Object {
+                              "forwardedValue": undefined,
+                              "optional": undefined,
+                              "type": "Boolean",
+                            },
+                            "send": undefined,
+                            "sendUnsafe": undefined,
+                          },
+                        ],
+                      },
+                      Array [],
+                      Object {},
+                      Object {},
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Promise {},
+                    },
+                  ],
+                },
+                "read": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      "main",
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Object {},
+                    },
+                  ],
+                },
+                "registerAsset": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      Object {
+                        "admin": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                        "amount": "100000000",
+                        "issuer": "ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s",
+                        "name": "TheToken",
+                        "owner": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                        "precision": 8,
+                        "type": "Token",
+                      },
+                      Object {},
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": Promise {},
+                    },
+                  ],
+                },
+                "selectUserAccount": [MockFunction],
+                "transfer": [MockFunction],
+                "updateUserAccountName": [MockFunction] {
+                  "calls": Array [
+                    Array [
+                      Object {
+                        "id": Object {
+                          "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                          "network": "main",
+                        },
+                        "name": "newName",
+                      },
+                    ],
+                  ],
+                  "results": Array [
+                    Object {
+                      "type": "return",
+                      "value": undefined,
+                    },
+                  ],
+                },
+                "userAccounts$": Observable {
+                  "_isScalar": false,
+                  "_subscribe": [Function],
+                },
+              },
               "parent": [Circular],
               "syncErrorThrowable": false,
               "syncErrorThrown": false,
@@ -5173,8 +6109,242 @@ Object {
                         },
                         "index": 1,
                         "isStopped": true,
-                        "outerIndex": undefined,
-                        "outerValue": undefined,
+                        "outerIndex": 0,
+                        "outerValue": Object {
+                          "call": [MockFunction],
+                          "claim": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "currentUserAccount$": Observable {
+                            "_isScalar": false,
+                            "_subscribe": [Function],
+                          },
+                          "deleteUserAccount": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "network": "main",
+                                },
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": undefined,
+                              },
+                            ],
+                          },
+                          "getAccount": [MockFunction],
+                          "getBlockCount": [MockFunction],
+                          "getCurrentUserAccount": [MockFunction] {
+                            "calls": Array [
+                              Array [],
+                              Array [],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Object {
+                                  "id": Object {
+                                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                    "network": "main",
+                                  },
+                                  "name": "Mock",
+                                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                },
+                              },
+                              Object {
+                                "type": "return",
+                                "value": Object {
+                                  "id": Object {
+                                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                    "network": "main",
+                                  },
+                                  "name": "Mock",
+                                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                },
+                              },
+                            ],
+                          },
+                          "getNetworks": [MockFunction] {
+                            "calls": Array [
+                              Array [],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Array [
+                                  "main",
+                                ],
+                              },
+                            ],
+                          },
+                          "getUserAccounts": [MockFunction],
+                          "invoke": [MockFunction],
+                          "invokeClaim": [MockFunction],
+                          "invokeCompleteSend": [MockFunction],
+                          "invokeRefundAssets": [MockFunction],
+                          "invokeSend": [MockFunction],
+                          "issue": [MockFunction],
+                          "iterActionsRaw": [MockFunction],
+                          "iterBlocks": [MockFunction],
+                          "networks$": Observable {
+                            "_isScalar": false,
+                            "_subscribe": [Function],
+                          },
+                          "publish": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "author": "dicarlo2",
+                                  "codeVersion": "1.0",
+                                  "description": "Hello World",
+                                  "dynamicInvoke": false,
+                                  "email": "alex.dicarlo@neotracker.io",
+                                  "name": "MyContract",
+                                  "parameters": Array [
+                                    "Address",
+                                    "Buffer",
+                                  ],
+                                  "payable": true,
+                                  "returnType": "Buffer",
+                                  "script": "5f8d70",
+                                  "storage": true,
+                                },
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "publishAndDeploy": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "author": "dicarlo2",
+                                  "codeVersion": "1.0",
+                                  "description": "Hello World",
+                                  "dynamicInvoke": false,
+                                  "email": "alex.dicarlo@neotracker.io",
+                                  "name": "MyContract",
+                                  "parameters": Array [
+                                    "Address",
+                                    "Buffer",
+                                  ],
+                                  "payable": true,
+                                  "returnType": "Buffer",
+                                  "script": "5f8d70",
+                                  "storage": true,
+                                },
+                                Object {
+                                  "events": Array [],
+                                  "functions": Array [
+                                    Object {
+                                      "claim": undefined,
+                                      "completeSend": undefined,
+                                      "constant": undefined,
+                                      "name": "deploy",
+                                      "parameters": Array [],
+                                      "receive": undefined,
+                                      "refundAssets": undefined,
+                                      "returnType": Object {
+                                        "forwardedValue": undefined,
+                                        "optional": undefined,
+                                        "type": "Boolean",
+                                      },
+                                      "send": undefined,
+                                      "sendUnsafe": undefined,
+                                    },
+                                  ],
+                                },
+                                Array [],
+                                Object {},
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "read": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                "main",
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Object {},
+                              },
+                            ],
+                          },
+                          "registerAsset": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "admin": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "amount": "100000000",
+                                  "issuer": "ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s",
+                                  "name": "TheToken",
+                                  "owner": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                  "precision": 8,
+                                  "type": "Token",
+                                },
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "selectUserAccount": [MockFunction],
+                          "transfer": [MockFunction],
+                          "updateUserAccountName": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "id": Object {
+                                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                    "network": "main",
+                                  },
+                                  "name": "newName",
+                                },
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": undefined,
+                              },
+                            ],
+                          },
+                          "userAccounts$": Observable {
+                            "_isScalar": false,
+                            "_subscribe": [Function],
+                          },
+                        },
                         "parent": [Circular],
                         "syncErrorThrowable": false,
                         "syncErrorThrown": false,
@@ -5620,8 +6790,242 @@ Object {
                         },
                         "index": 1,
                         "isStopped": true,
-                        "outerIndex": undefined,
-                        "outerValue": undefined,
+                        "outerIndex": 0,
+                        "outerValue": Object {
+                          "call": [MockFunction],
+                          "claim": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "currentUserAccount$": Observable {
+                            "_isScalar": false,
+                            "_subscribe": [Function],
+                          },
+                          "deleteUserAccount": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "network": "main",
+                                },
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": undefined,
+                              },
+                            ],
+                          },
+                          "getAccount": [MockFunction],
+                          "getBlockCount": [MockFunction],
+                          "getCurrentUserAccount": [MockFunction] {
+                            "calls": Array [
+                              Array [],
+                              Array [],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Object {
+                                  "id": Object {
+                                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                    "network": "main",
+                                  },
+                                  "name": "Mock",
+                                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                },
+                              },
+                              Object {
+                                "type": "return",
+                                "value": Object {
+                                  "id": Object {
+                                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                    "network": "main",
+                                  },
+                                  "name": "Mock",
+                                  "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                },
+                              },
+                            ],
+                          },
+                          "getNetworks": [MockFunction] {
+                            "calls": Array [
+                              Array [],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Array [
+                                  "main",
+                                ],
+                              },
+                            ],
+                          },
+                          "getUserAccounts": [MockFunction],
+                          "invoke": [MockFunction],
+                          "invokeClaim": [MockFunction],
+                          "invokeCompleteSend": [MockFunction],
+                          "invokeRefundAssets": [MockFunction],
+                          "invokeSend": [MockFunction],
+                          "issue": [MockFunction],
+                          "iterActionsRaw": [MockFunction],
+                          "iterBlocks": [MockFunction],
+                          "networks$": Observable {
+                            "_isScalar": false,
+                            "_subscribe": [Function],
+                          },
+                          "publish": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "author": "dicarlo2",
+                                  "codeVersion": "1.0",
+                                  "description": "Hello World",
+                                  "dynamicInvoke": false,
+                                  "email": "alex.dicarlo@neotracker.io",
+                                  "name": "MyContract",
+                                  "parameters": Array [
+                                    "Address",
+                                    "Buffer",
+                                  ],
+                                  "payable": true,
+                                  "returnType": "Buffer",
+                                  "script": "5f8d70",
+                                  "storage": true,
+                                },
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "publishAndDeploy": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "author": "dicarlo2",
+                                  "codeVersion": "1.0",
+                                  "description": "Hello World",
+                                  "dynamicInvoke": false,
+                                  "email": "alex.dicarlo@neotracker.io",
+                                  "name": "MyContract",
+                                  "parameters": Array [
+                                    "Address",
+                                    "Buffer",
+                                  ],
+                                  "payable": true,
+                                  "returnType": "Buffer",
+                                  "script": "5f8d70",
+                                  "storage": true,
+                                },
+                                Object {
+                                  "events": Array [],
+                                  "functions": Array [
+                                    Object {
+                                      "claim": undefined,
+                                      "completeSend": undefined,
+                                      "constant": undefined,
+                                      "name": "deploy",
+                                      "parameters": Array [],
+                                      "receive": undefined,
+                                      "refundAssets": undefined,
+                                      "returnType": Object {
+                                        "forwardedValue": undefined,
+                                        "optional": undefined,
+                                        "type": "Boolean",
+                                      },
+                                      "send": undefined,
+                                      "sendUnsafe": undefined,
+                                    },
+                                  ],
+                                },
+                                Array [],
+                                Object {},
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "read": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                "main",
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Object {},
+                              },
+                            ],
+                          },
+                          "registerAsset": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "admin": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "amount": "100000000",
+                                  "issuer": "ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s",
+                                  "name": "TheToken",
+                                  "owner": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                  "precision": 8,
+                                  "type": "Token",
+                                },
+                                Object {},
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": Promise {},
+                              },
+                            ],
+                          },
+                          "selectUserAccount": [MockFunction],
+                          "transfer": [MockFunction],
+                          "updateUserAccountName": [MockFunction] {
+                            "calls": Array [
+                              Array [
+                                Object {
+                                  "id": Object {
+                                    "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                    "network": "main",
+                                  },
+                                  "name": "newName",
+                                },
+                              ],
+                            ],
+                            "results": Array [
+                              Object {
+                                "type": "return",
+                                "value": undefined,
+                              },
+                            ],
+                          },
+                          "userAccounts$": Observable {
+                            "_isScalar": false,
+                            "_subscribe": [Function],
+                          },
+                        },
                         "parent": [Circular],
                         "syncErrorThrowable": false,
                         "syncErrorThrown": false,
@@ -9472,8 +10876,242 @@ Object {
             },
             "index": 1,
             "isStopped": true,
-            "outerIndex": undefined,
-            "outerValue": undefined,
+            "outerIndex": 0,
+            "outerValue": Object {
+              "call": [MockFunction],
+              "claim": [MockFunction] {
+                "calls": Array [
+                  Array [
+                    Object {},
+                  ],
+                ],
+                "results": Array [
+                  Object {
+                    "type": "return",
+                    "value": Promise {},
+                  },
+                ],
+              },
+              "currentUserAccount$": Observable {
+                "_isScalar": false,
+                "_subscribe": [Function],
+              },
+              "deleteUserAccount": [MockFunction] {
+                "calls": Array [
+                  Array [
+                    Object {
+                      "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                      "network": "main",
+                    },
+                  ],
+                ],
+                "results": Array [
+                  Object {
+                    "type": "return",
+                    "value": undefined,
+                  },
+                ],
+              },
+              "getAccount": [MockFunction],
+              "getBlockCount": [MockFunction],
+              "getCurrentUserAccount": [MockFunction] {
+                "calls": Array [
+                  Array [],
+                  Array [],
+                ],
+                "results": Array [
+                  Object {
+                    "type": "return",
+                    "value": Object {
+                      "id": Object {
+                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                        "network": "main",
+                      },
+                      "name": "Mock",
+                      "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                    },
+                  },
+                  Object {
+                    "type": "return",
+                    "value": Object {
+                      "id": Object {
+                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                        "network": "main",
+                      },
+                      "name": "Mock",
+                      "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                    },
+                  },
+                ],
+              },
+              "getNetworks": [MockFunction] {
+                "calls": Array [
+                  Array [],
+                ],
+                "results": Array [
+                  Object {
+                    "type": "return",
+                    "value": Array [
+                      "main",
+                    ],
+                  },
+                ],
+              },
+              "getUserAccounts": [MockFunction],
+              "invoke": [MockFunction],
+              "invokeClaim": [MockFunction],
+              "invokeCompleteSend": [MockFunction],
+              "invokeRefundAssets": [MockFunction],
+              "invokeSend": [MockFunction],
+              "issue": [MockFunction],
+              "iterActionsRaw": [MockFunction],
+              "iterBlocks": [MockFunction],
+              "networks$": Observable {
+                "_isScalar": false,
+                "_subscribe": [Function],
+              },
+              "publish": [MockFunction] {
+                "calls": Array [
+                  Array [
+                    Object {
+                      "author": "dicarlo2",
+                      "codeVersion": "1.0",
+                      "description": "Hello World",
+                      "dynamicInvoke": false,
+                      "email": "alex.dicarlo@neotracker.io",
+                      "name": "MyContract",
+                      "parameters": Array [
+                        "Address",
+                        "Buffer",
+                      ],
+                      "payable": true,
+                      "returnType": "Buffer",
+                      "script": "5f8d70",
+                      "storage": true,
+                    },
+                    Object {},
+                  ],
+                ],
+                "results": Array [
+                  Object {
+                    "type": "return",
+                    "value": Promise {},
+                  },
+                ],
+              },
+              "publishAndDeploy": [MockFunction] {
+                "calls": Array [
+                  Array [
+                    Object {
+                      "author": "dicarlo2",
+                      "codeVersion": "1.0",
+                      "description": "Hello World",
+                      "dynamicInvoke": false,
+                      "email": "alex.dicarlo@neotracker.io",
+                      "name": "MyContract",
+                      "parameters": Array [
+                        "Address",
+                        "Buffer",
+                      ],
+                      "payable": true,
+                      "returnType": "Buffer",
+                      "script": "5f8d70",
+                      "storage": true,
+                    },
+                    Object {
+                      "events": Array [],
+                      "functions": Array [
+                        Object {
+                          "claim": undefined,
+                          "completeSend": undefined,
+                          "constant": undefined,
+                          "name": "deploy",
+                          "parameters": Array [],
+                          "receive": undefined,
+                          "refundAssets": undefined,
+                          "returnType": Object {
+                            "forwardedValue": undefined,
+                            "optional": undefined,
+                            "type": "Boolean",
+                          },
+                          "send": undefined,
+                          "sendUnsafe": undefined,
+                        },
+                      ],
+                    },
+                    Array [],
+                    Object {},
+                    Object {},
+                  ],
+                ],
+                "results": Array [
+                  Object {
+                    "type": "return",
+                    "value": Promise {},
+                  },
+                ],
+              },
+              "read": [MockFunction] {
+                "calls": Array [
+                  Array [
+                    "main",
+                  ],
+                ],
+                "results": Array [
+                  Object {
+                    "type": "return",
+                    "value": Object {},
+                  },
+                ],
+              },
+              "registerAsset": [MockFunction] {
+                "calls": Array [
+                  Array [
+                    Object {
+                      "admin": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                      "amount": "100000000",
+                      "issuer": "ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s",
+                      "name": "TheToken",
+                      "owner": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                      "precision": 8,
+                      "type": "Token",
+                    },
+                    Object {},
+                  ],
+                ],
+                "results": Array [
+                  Object {
+                    "type": "return",
+                    "value": Promise {},
+                  },
+                ],
+              },
+              "selectUserAccount": [MockFunction],
+              "transfer": [MockFunction],
+              "updateUserAccountName": [MockFunction] {
+                "calls": Array [
+                  Array [
+                    Object {
+                      "id": Object {
+                        "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                        "network": "main",
+                      },
+                      "name": "newName",
+                    },
+                  ],
+                ],
+                "results": Array [
+                  Object {
+                    "type": "return",
+                    "value": undefined,
+                  },
+                ],
+              },
+              "userAccounts$": Observable {
+                "_isScalar": false,
+                "_subscribe": [Function],
+              },
+            },
             "parent": [Circular],
             "syncErrorThrowable": false,
             "syncErrorThrown": false,
@@ -9570,8 +11208,242 @@ Object {
                       },
                       "index": 1,
                       "isStopped": true,
-                      "outerIndex": undefined,
-                      "outerValue": undefined,
+                      "outerIndex": 0,
+                      "outerValue": Object {
+                        "call": [MockFunction],
+                        "claim": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              Object {},
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Promise {},
+                            },
+                          ],
+                        },
+                        "currentUserAccount$": Observable {
+                          "_isScalar": false,
+                          "_subscribe": [Function],
+                        },
+                        "deleteUserAccount": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              Object {
+                                "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                "network": "main",
+                              },
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": undefined,
+                            },
+                          ],
+                        },
+                        "getAccount": [MockFunction],
+                        "getBlockCount": [MockFunction],
+                        "getCurrentUserAccount": [MockFunction] {
+                          "calls": Array [
+                            Array [],
+                            Array [],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Object {
+                                "id": Object {
+                                  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "network": "main",
+                                },
+                                "name": "Mock",
+                                "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                              },
+                            },
+                            Object {
+                              "type": "return",
+                              "value": Object {
+                                "id": Object {
+                                  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "network": "main",
+                                },
+                                "name": "Mock",
+                                "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                              },
+                            },
+                          ],
+                        },
+                        "getNetworks": [MockFunction] {
+                          "calls": Array [
+                            Array [],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Array [
+                                "main",
+                              ],
+                            },
+                          ],
+                        },
+                        "getUserAccounts": [MockFunction],
+                        "invoke": [MockFunction],
+                        "invokeClaim": [MockFunction],
+                        "invokeCompleteSend": [MockFunction],
+                        "invokeRefundAssets": [MockFunction],
+                        "invokeSend": [MockFunction],
+                        "issue": [MockFunction],
+                        "iterActionsRaw": [MockFunction],
+                        "iterBlocks": [MockFunction],
+                        "networks$": Observable {
+                          "_isScalar": false,
+                          "_subscribe": [Function],
+                        },
+                        "publish": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              Object {
+                                "author": "dicarlo2",
+                                "codeVersion": "1.0",
+                                "description": "Hello World",
+                                "dynamicInvoke": false,
+                                "email": "alex.dicarlo@neotracker.io",
+                                "name": "MyContract",
+                                "parameters": Array [
+                                  "Address",
+                                  "Buffer",
+                                ],
+                                "payable": true,
+                                "returnType": "Buffer",
+                                "script": "5f8d70",
+                                "storage": true,
+                              },
+                              Object {},
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Promise {},
+                            },
+                          ],
+                        },
+                        "publishAndDeploy": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              Object {
+                                "author": "dicarlo2",
+                                "codeVersion": "1.0",
+                                "description": "Hello World",
+                                "dynamicInvoke": false,
+                                "email": "alex.dicarlo@neotracker.io",
+                                "name": "MyContract",
+                                "parameters": Array [
+                                  "Address",
+                                  "Buffer",
+                                ],
+                                "payable": true,
+                                "returnType": "Buffer",
+                                "script": "5f8d70",
+                                "storage": true,
+                              },
+                              Object {
+                                "events": Array [],
+                                "functions": Array [
+                                  Object {
+                                    "claim": undefined,
+                                    "completeSend": undefined,
+                                    "constant": undefined,
+                                    "name": "deploy",
+                                    "parameters": Array [],
+                                    "receive": undefined,
+                                    "refundAssets": undefined,
+                                    "returnType": Object {
+                                      "forwardedValue": undefined,
+                                      "optional": undefined,
+                                      "type": "Boolean",
+                                    },
+                                    "send": undefined,
+                                    "sendUnsafe": undefined,
+                                  },
+                                ],
+                              },
+                              Array [],
+                              Object {},
+                              Object {},
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Promise {},
+                            },
+                          ],
+                        },
+                        "read": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              "main",
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Object {},
+                            },
+                          ],
+                        },
+                        "registerAsset": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              Object {
+                                "admin": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                "amount": "100000000",
+                                "issuer": "ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s",
+                                "name": "TheToken",
+                                "owner": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                "precision": 8,
+                                "type": "Token",
+                              },
+                              Object {},
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Promise {},
+                            },
+                          ],
+                        },
+                        "selectUserAccount": [MockFunction],
+                        "transfer": [MockFunction],
+                        "updateUserAccountName": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              Object {
+                                "id": Object {
+                                  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "network": "main",
+                                },
+                                "name": "newName",
+                              },
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": undefined,
+                            },
+                          ],
+                        },
+                        "userAccounts$": Observable {
+                          "_isScalar": false,
+                          "_subscribe": [Function],
+                        },
+                      },
                       "parent": [Circular],
                       "syncErrorThrowable": false,
                       "syncErrorThrown": false,
@@ -10041,8 +11913,242 @@ Object {
                       },
                       "index": 1,
                       "isStopped": true,
-                      "outerIndex": undefined,
-                      "outerValue": undefined,
+                      "outerIndex": 0,
+                      "outerValue": Object {
+                        "call": [MockFunction],
+                        "claim": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              Object {},
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Promise {},
+                            },
+                          ],
+                        },
+                        "currentUserAccount$": Observable {
+                          "_isScalar": false,
+                          "_subscribe": [Function],
+                        },
+                        "deleteUserAccount": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              Object {
+                                "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                "network": "main",
+                              },
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": undefined,
+                            },
+                          ],
+                        },
+                        "getAccount": [MockFunction],
+                        "getBlockCount": [MockFunction],
+                        "getCurrentUserAccount": [MockFunction] {
+                          "calls": Array [
+                            Array [],
+                            Array [],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Object {
+                                "id": Object {
+                                  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "network": "main",
+                                },
+                                "name": "Mock",
+                                "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                              },
+                            },
+                            Object {
+                              "type": "return",
+                              "value": Object {
+                                "id": Object {
+                                  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "network": "main",
+                                },
+                                "name": "Mock",
+                                "publicKey": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                              },
+                            },
+                          ],
+                        },
+                        "getNetworks": [MockFunction] {
+                          "calls": Array [
+                            Array [],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Array [
+                                "main",
+                              ],
+                            },
+                          ],
+                        },
+                        "getUserAccounts": [MockFunction],
+                        "invoke": [MockFunction],
+                        "invokeClaim": [MockFunction],
+                        "invokeCompleteSend": [MockFunction],
+                        "invokeRefundAssets": [MockFunction],
+                        "invokeSend": [MockFunction],
+                        "issue": [MockFunction],
+                        "iterActionsRaw": [MockFunction],
+                        "iterBlocks": [MockFunction],
+                        "networks$": Observable {
+                          "_isScalar": false,
+                          "_subscribe": [Function],
+                        },
+                        "publish": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              Object {
+                                "author": "dicarlo2",
+                                "codeVersion": "1.0",
+                                "description": "Hello World",
+                                "dynamicInvoke": false,
+                                "email": "alex.dicarlo@neotracker.io",
+                                "name": "MyContract",
+                                "parameters": Array [
+                                  "Address",
+                                  "Buffer",
+                                ],
+                                "payable": true,
+                                "returnType": "Buffer",
+                                "script": "5f8d70",
+                                "storage": true,
+                              },
+                              Object {},
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Promise {},
+                            },
+                          ],
+                        },
+                        "publishAndDeploy": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              Object {
+                                "author": "dicarlo2",
+                                "codeVersion": "1.0",
+                                "description": "Hello World",
+                                "dynamicInvoke": false,
+                                "email": "alex.dicarlo@neotracker.io",
+                                "name": "MyContract",
+                                "parameters": Array [
+                                  "Address",
+                                  "Buffer",
+                                ],
+                                "payable": true,
+                                "returnType": "Buffer",
+                                "script": "5f8d70",
+                                "storage": true,
+                              },
+                              Object {
+                                "events": Array [],
+                                "functions": Array [
+                                  Object {
+                                    "claim": undefined,
+                                    "completeSend": undefined,
+                                    "constant": undefined,
+                                    "name": "deploy",
+                                    "parameters": Array [],
+                                    "receive": undefined,
+                                    "refundAssets": undefined,
+                                    "returnType": Object {
+                                      "forwardedValue": undefined,
+                                      "optional": undefined,
+                                      "type": "Boolean",
+                                    },
+                                    "send": undefined,
+                                    "sendUnsafe": undefined,
+                                  },
+                                ],
+                              },
+                              Array [],
+                              Object {},
+                              Object {},
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Promise {},
+                            },
+                          ],
+                        },
+                        "read": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              "main",
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Object {},
+                            },
+                          ],
+                        },
+                        "registerAsset": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              Object {
+                                "admin": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                "amount": "100000000",
+                                "issuer": "ALfnhLg7rUyL6Jr98bzzoxz5J7m64fbR4s",
+                                "name": "TheToken",
+                                "owner": "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef",
+                                "precision": 8,
+                                "type": "Token",
+                              },
+                              Object {},
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": Promise {},
+                            },
+                          ],
+                        },
+                        "selectUserAccount": [MockFunction],
+                        "transfer": [MockFunction],
+                        "updateUserAccountName": [MockFunction] {
+                          "calls": Array [
+                            Array [
+                              Object {
+                                "id": Object {
+                                  "address": "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+                                  "network": "main",
+                                },
+                                "name": "newName",
+                              },
+                            ],
+                          ],
+                          "results": Array [
+                            Object {
+                              "type": "return",
+                              "value": undefined,
+                            },
+                          ],
+                        },
+                        "userAccounts$": Observable {
+                          "_isScalar": false,
+                          "_subscribe": [Function],
+                        },
+                      },
                       "parent": [Circular],
                       "syncErrorThrowable": false,
                       "syncErrorThrown": false,

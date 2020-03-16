@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "upgrade dependencies",
+      "type": "minor",
+      "packageName": "@neo-one/smart-contract-codegen"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract-codegen",
+  "email": "danwbyrne@gmail.com"
+}

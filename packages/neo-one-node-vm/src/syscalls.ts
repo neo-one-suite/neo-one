@@ -34,8 +34,8 @@ import {
   Witness,
 } from '@neo-one/node-core';
 import { utils as commonUtils } from '@neo-one/utils';
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
-import { map as asyncMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
+import { from as asyncIterableFrom } from '@reactivex/ix-es2015-cjs/asynciterable';
+import { map as asyncMap } from '@reactivex/ix-es2015-cjs/asynciterable/operators/map';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { defer } from 'rxjs';
@@ -1234,7 +1234,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
       await checkStorage({ context, hash });
 
       const prefix = args[1].asBuffer();
-      const iterable = AsyncIterableX.from<StorageItem>(context.blockchain.storageItem.getAll$({ hash, prefix })).pipe<{
+      const iterable = asyncIterableFrom<StorageItem>(context.blockchain.storageItem.getAll$({ hash, prefix })).pipe<{
         key: BufferStackItem;
         value: BufferStackItem;
       }>(
@@ -1266,7 +1266,7 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     in: 1,
     out: 1,
     invoke: async ({ context, args }) => {
-      const iterable = AsyncIterableX.from(args[0].asArray().map((value) => ({ value })));
+      const iterable = asyncIterableFrom(args[0].asArray().map((value) => ({ value })));
 
       return {
         context,
@@ -1296,13 +1296,13 @@ export const SYSCALLS: { readonly [K in SysCallEnum]: CreateSysCall } = {
     out: 1,
     invoke: async ({ context, args }) => {
       const iterable = args[0].isArray()
-        ? AsyncIterableX.from(
+        ? asyncIterableFrom(
             args[0].asArray().map((value, idx) => ({
               key: new IntegerStackItem(new BN(idx)),
               value,
             })),
           )
-        : AsyncIterableX.from(
+        : asyncIterableFrom(
             commonUtils
               .zip(args[0].asMapStackItem().keysArray(), args[0].asMapStackItem().valuesArray())
               .map(([key, value]) => ({ key, value })),

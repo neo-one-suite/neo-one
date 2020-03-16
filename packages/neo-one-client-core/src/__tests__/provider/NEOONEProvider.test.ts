@@ -1,10 +1,10 @@
 // tslint:disable no-object-mutation
 import { Modifiable } from '@neo-one/utils';
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable';
+import { from as asyncIterableFrom } from '@reactivex/ix-es2015-cjs/asynciterable';
 import BigNumber from 'bignumber.js';
 import { take } from 'rxjs/operators';
-import { data, factory, keys } from '../../__data__';
 import { NEOONEDataProvider, NEOONEProvider } from '../../provider';
+import { data, factory, keys } from '../../__data__';
 
 jest.mock('../../provider/NEOONEDataProvider');
 
@@ -156,7 +156,7 @@ describe('NEOONEProvider', () => {
   });
 
   test('iterActionsRaw', async () => {
-    const expected = AsyncIterableX.from([factory.createRawLog()]);
+    const expected = asyncIterableFrom([factory.createRawLog()]);
     dataProvider.iterActionsRaw = jest.fn(() => expected);
 
     const result = provider.iterActionsRaw(network);
@@ -165,7 +165,7 @@ describe('NEOONEProvider', () => {
   });
 
   test('iterBlocks', async () => {
-    const expected = AsyncIterableX.from([factory.createBlock()]);
+    const expected = asyncIterableFrom([factory.createBlock()]);
     dataProvider.iterBlocks = jest.fn(() => expected);
 
     const result = provider.iterBlocks(network);

@@ -1,9 +1,9 @@
 import { Hash256 } from '@neo-one/client-core';
 import { of as _of } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { data, factory, keys } from '../__data__';
 import { Client } from '../Client';
 import { UserAccountProvider } from '../types';
+import { data, factory, keys } from '../__data__';
 
 describe('Client', () => {
   // tslint:disable:no-any

@@ -28,9 +28,9 @@ import {
   Transfer,
 } from '@neo-one/client-common';
 import { utils } from '@neo-one/utils';
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
-import { filter } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/filter';
-import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
+import { from as asyncIterableFrom } from '@reactivex/ix-es2015-cjs/asynciterable';
+import { filter } from '@reactivex/ix-es2015-cjs/asynciterable/operators/filter';
+import { map } from '@reactivex/ix-es2015-cjs/asynciterable/operators/map';
 import * as argAssertions from '../args';
 import { Client } from '../Client';
 import {
@@ -413,7 +413,7 @@ export const createSmartContract = ({
     network = client.getCurrentNetwork(),
     ...iterOptions
   }: SmartContractIterOptions = {}): AsyncIterable<RawAction> =>
-    AsyncIterableX.from(client.__iterActionsRaw(network, iterOptions)).pipe<RawAction>(
+    asyncIterableFrom(client.__iterActionsRaw(network, iterOptions)).pipe<RawAction>(
       filter((action) => action.address === definition.networks[network].address),
     );
 
@@ -424,10 +424,10 @@ export const createSmartContract = ({
   };
 
   const iterActions = (options?: SmartContractIterOptions): AsyncIterable<Action> =>
-    AsyncIterableX.from(iterActionsRaw(options)).pipe(map(convertAction), filter(utils.notNull));
+    asyncIterableFrom(iterActionsRaw(options)).pipe(map(convertAction), filter(utils.notNull));
 
   const iterEvents = (options?: SmartContractIterOptions): AsyncIterable<Event> =>
-    AsyncIterableX.from(iterActions(options)).pipe(
+    asyncIterableFrom(iterActions(options)).pipe(
       map((action) => {
         if (action.type === 'Log') {
           return undefined;
@@ -440,7 +440,7 @@ export const createSmartContract = ({
     );
 
   const iterLogs = (options?: SmartContractIterOptions): AsyncIterable<Log> =>
-    AsyncIterableX.from(iterActions(options)).pipe(
+    asyncIterableFrom(iterActions(options)).pipe(
       map((action) => {
         if (action.type === 'Event') {
           return undefined;

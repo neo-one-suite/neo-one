@@ -1,9 +1,9 @@
 // tslint:disable variable-name no-non-null-assertion
 import { Action, InvokeReceipt, Transaction } from '@neo-one/client-common';
-import { AsyncIterableX, toArray } from '@reactivex/ix-es2015-cjs/asynciterable';
-import { data, factory, keys } from '../../__data__';
+import { from as asyncIterableFrom, toArray } from '@reactivex/ix-es2015-cjs/asynciterable';
 import { Client } from '../../Client';
 import { createSmartContract } from '../../sc';
+import { data, factory, keys } from '../../__data__';
 
 describe('createSmartContract', () => {
   const wallet = factory.createUnlockedWallet();
@@ -159,7 +159,7 @@ describe('createSmartContract', () => {
   const allActions = actions.concat(otherActions);
 
   test('iterActions', async () => {
-    __iterActionsRaw.mockImplementationOnce(() => AsyncIterableX.from(allActions));
+    __iterActionsRaw.mockImplementationOnce(() => asyncIterableFrom(allActions));
 
     const result = await toArray(contract.iterActions({ indexStart: 3, indexStop: 5 }));
 
@@ -170,7 +170,7 @@ describe('createSmartContract', () => {
   });
 
   test('iterEvents', async () => {
-    __iterActionsRaw.mockImplementationOnce(() => AsyncIterableX.from(allActions));
+    __iterActionsRaw.mockImplementationOnce(() => asyncIterableFrom(allActions));
 
     const result = await toArray(contract.iterEvents({ indexStart: 3, indexStop: 5 }));
 
@@ -180,7 +180,7 @@ describe('createSmartContract', () => {
   });
 
   test('iterLogs', async () => {
-    __iterActionsRaw.mockImplementationOnce(() => AsyncIterableX.from(allActions));
+    __iterActionsRaw.mockImplementationOnce(() => asyncIterableFrom(allActions));
 
     const result = await toArray(contract.iterLogs({ indexStart: 3, indexStop: 5 }));
 

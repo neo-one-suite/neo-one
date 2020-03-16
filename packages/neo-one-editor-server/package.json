@@ -21,13 +21,13 @@
     "koa": "^2.7.0",
     "koa-compose": "^4.1.0",
     "koa-compress": "^3.0.0",
-    "koa-router": "^7.4.0",
+    "koa-router": "^8.0.0",
     "lodash": "^4.17.15",
     "lru-cache": "^5.0.0",
     "rxjs": "^6.5.3",
     "safe-stable-stringify": "^1.1.0",
-    "semver": "^6.3.0",
-    "tar": "^5.0.0"
+    "semver": "^7.0.0",
+    "tar": "^6.0.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
@@ -36,10 +36,10 @@
     "@types/koa-compose": "^3.2.4",
     "@types/koa-compress": "^2.0.9",
     "@types/koa-router": "^7.0.42",
-    "@types/jest": "^24.0.18",
+    "@types/jest": "^25.0.0",
     "@types/lodash": "^4.14.138",
     "@types/lru-cache": "^5.1.0",
-    "@types/semver": "^6.0.2",
+    "@types/semver": "^7.0.0",
     "@types/tar": "^4.0.1"
   },
   "sideEffects": false

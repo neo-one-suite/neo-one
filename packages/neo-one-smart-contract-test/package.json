@@ -26,7 +26,7 @@
     "@neo-one/build-tools": "^1.0.0",
     "@neo-one/smart-contract": "^2.3.0",
     "@neo-one/smart-contract-lib": "^2.3.1",
-    "@types/jest": "^24.0.18",
+    "@types/jest": "^25.0.0",
     "@types/lodash": "^4.14.138",
     "@types/memdown": "^3.0.0",
     "bignumber.js": "^9.0.0",

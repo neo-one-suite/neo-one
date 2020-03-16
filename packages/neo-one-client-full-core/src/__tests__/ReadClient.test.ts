@@ -1,8 +1,8 @@
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable';
+import { from as asyncIterableFrom } from '@reactivex/ix-es2015-cjs/asynciterable';
 import { toArray } from '@reactivex/ix-es2015-cjs/asynciterable/toarray';
-import { data, factory, keys } from '../__data__';
 import { ReadClient } from '../ReadClient';
 import { DataProvider } from '../types';
+import { data, factory, keys } from '../__data__';
 
 describe('ReadClient', () => {
   const network = 'main';
@@ -80,7 +80,7 @@ describe('ReadClient', () => {
 
   test('iterBlocks', async () => {
     const value = factory.createBlock();
-    iterBlocks.mockImplementationOnce(() => AsyncIterableX.from([value]));
+    iterBlocks.mockImplementationOnce(() => asyncIterableFrom([value]));
 
     const result = await toArray(client.iterBlocks({ indexStart: 3, indexStop: 4 }));
 

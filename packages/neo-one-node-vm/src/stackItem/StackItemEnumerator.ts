@@ -1,5 +1,5 @@
 import { Equatable } from '@neo-one/node-core';
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
+import { from as asyncIterableFrom } from '@reactivex/ix-es2015-cjs/asynciterable';
 import { concat } from '@reactivex/ix-es2015-cjs/asynciterable/concat';
 import { InvalidStorageStackItemEnumeratorError } from './errors';
 import { StackItemBase } from './StackItemBase';
@@ -51,8 +51,8 @@ export class StackItemEnumerator<T extends { readonly value: StackItemBase } = {
     other: StackItemEnumerator<TOther>,
   ): StackItemEnumerator<T | TOther> {
     const iterable = concat(
-      AsyncIterableX.from<T>(this.enumerator as AsyncIterableIterator<T>),
-      AsyncIterableX.from<TOther>(other.enumerator as AsyncIterableIterator<TOther>),
+      asyncIterableFrom<T>(this.enumerator as AsyncIterableIterator<T>),
+      asyncIterableFrom<TOther>(other.enumerator as AsyncIterableIterator<TOther>),
     );
 
     return new StackItemEnumerator(iterable[Symbol.asyncIterator]());

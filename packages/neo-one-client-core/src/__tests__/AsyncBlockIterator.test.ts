@@ -1,5 +1,5 @@
 // tslint:disable no-object-mutation
-import { AsyncIterableX as AsyncIterable } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
+import { from as asyncIterableFrom } from '@reactivex/ix-es2015-cjs/asynciterable';
 import { toArray } from '@reactivex/ix-es2015-cjs/asynciterable/toarray';
 import _ from 'lodash';
 import { AsyncBlockIterator } from '../AsyncBlockIterator';
@@ -23,7 +23,7 @@ describe('AsyncBlockIterator', () => {
 
   const verifyBlockIterator = async () => {
     let index = 0;
-    await AsyncIterable.from(blockIterator).forEach((value) => {
+    await asyncIterableFrom(blockIterator).forEach((value) => {
       expect(value).toBe(blocks[index]);
       index += 1;
     });
@@ -58,7 +58,7 @@ describe('AsyncBlockIterator', () => {
     client.getBlockCount = jest.fn(async () => Promise.reject(error));
     let thrownError;
     try {
-      await toArray(AsyncIterable.from(blockIterator));
+      await toArray(asyncIterableFrom(blockIterator));
     } catch (err) {
       thrownError = err;
     }

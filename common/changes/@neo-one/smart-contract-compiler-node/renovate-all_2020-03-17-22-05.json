@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "upgrade dependencies",
+      "type": "minor",
+      "packageName": "@neo-one/smart-contract-compiler-node"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract-compiler-node",
+  "email": "danwbyrne@gmail.com"
+}

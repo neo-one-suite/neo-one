@@ -55,10 +55,10 @@ import {
   VerifyTransactionResultJSON,
 } from '@neo-one/client-common';
 import { utils as commonUtils } from '@neo-one/utils';
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
-import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatmap';
-import { flatten } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/flatten';
-import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
+import { from as asyncIterableFrom, of as asyncIterableOf } from '@reactivex/ix-es2015-cjs/asynciterable';
+import { flat as flatten } from '@reactivex/ix-es2015-cjs/asynciterable/operators/flat';
+import { flatMap } from '@reactivex/ix-es2015-cjs/asynciterable/operators/flatmap';
+import { map } from '@reactivex/ix-es2015-cjs/asynciterable/operators/map';
 import BigNumber from 'bignumber.js';
 import debug from 'debug';
 import _ from 'lodash';
@@ -216,7 +216,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   }
 
   public iterBlocks(options: IterOptions = {}): AsyncIterable<Block> {
-    return AsyncIterableX.from(
+    return asyncIterableFrom(
       new AsyncBlockIterator({
         client: this,
         options,
@@ -270,7 +270,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   }
 
   public iterActionsRaw(options: IterOptions = {}): AsyncIterable<RawAction> {
-    return AsyncIterableX.from(this.iterBlocks(options)).pipe<RawAction>(
+    return asyncIterableFrom(this.iterBlocks(options)).pipe<RawAction>(
       flatMap(async (block) => {
         const actions = _.flatten(
           block.transactions.map((transaction) => {
@@ -282,7 +282,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
           }),
         );
 
-        return AsyncIterableX.of(...actions);
+        return asyncIterableOf(...actions);
       }),
     );
   }
@@ -338,7 +338,7 @@ export class NEOONEDataProvider implements DeveloperProvider {
   }
 
   public iterStorage(address: AddressString): AsyncIterable<StorageItem> {
-    return AsyncIterableX.from(this.mutableClient.getAllStorage(address).then((res) => AsyncIterableX.from(res))).pipe(
+    return asyncIterableFrom(this.mutableClient.getAllStorage(address).then(asyncIterableFrom)).pipe(
       // tslint:disable-next-line no-any
       flatten<StorageItem>() as any,
       map<StorageItemJSON, StorageItem>((storageItem) => this.convertStorageItem(storageItem)),

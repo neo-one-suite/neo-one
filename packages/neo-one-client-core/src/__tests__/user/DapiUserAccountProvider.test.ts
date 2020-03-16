@@ -1,10 +1,10 @@
 // tslint:disable no-object-mutation
 import { common, ECPoint, Param, UInt160, UInt256, utils } from '@neo-one/client-common';
 import { Modifiable } from '@neo-one/utils';
-import { AsyncIterableX, toArray } from '@reactivex/ix-es2015-cjs/asynciterable';
+import { from as asyncIterableFrom, toArray } from '@reactivex/ix-es2015-cjs/asynciterable';
 import { of as _of } from 'rxjs';
-import { data, factory, keys } from '../../__data__';
 import { Dapi, DapiUserAccountProvider, Provider } from '../../user';
+import { data, factory, keys } from '../../__data__';
 
 describe('DapiUserAccountProvider', () => {
   utils.randomUInt = () => 10;
@@ -126,7 +126,7 @@ describe('DapiUserAccountProvider', () => {
   test('iterBlocks', async () => {
     const block = factory.createBlock();
 
-    iterBlocks.mockImplementation(() => AsyncIterableX.from([block]));
+    iterBlocks.mockImplementation(() => asyncIterableFrom([block]));
     const blockIterator = dapiProvider.iterBlocks(unlockedWallet.userAccount.id.network, {
       indexStart: 1,
       indexStop: 3,
@@ -139,7 +139,7 @@ describe('DapiUserAccountProvider', () => {
   test('iterActionsRaw', async () => {
     const rawAction = factory.createRawLog();
 
-    iterActionsRaw.mockImplementation(() => AsyncIterableX.from([rawAction]));
+    iterActionsRaw.mockImplementation(() => asyncIterableFrom([rawAction]));
     if (dapiProvider.iterActionsRaw === undefined) {
       throw new Error('iterActionsRaw should not be undefined.');
     }

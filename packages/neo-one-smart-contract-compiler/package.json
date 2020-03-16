@@ -26,7 +26,7 @@
     "safe-stable-stringify": "^1.1.0",
     "source-map": "^0.7.3",
     "tslib": "^1.10.0",
-    "typescript": "3.8.1-rc"
+    "typescript": "3.8.3"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
@@ -39,8 +39,8 @@
     "@types/app-root-dir": "^0.1.0",
     "@types/babel__code-frame": "^7.0.1",
     "@types/bn.js": "^4.11.5",
-    "@types/jest": "^24.0.18",
-    "@types/levelup": "^3.1.1",
+    "@types/jest": "^25.0.0",
+    "@types/levelup": "^4.0.0",
     "@types/lodash": "^4.14.138",
     "@types/memdown": "^3.0.0",
     "app-root-dir": "^1.0.2",

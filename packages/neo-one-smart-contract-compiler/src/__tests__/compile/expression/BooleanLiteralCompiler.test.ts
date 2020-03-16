@@ -1,7 +1,7 @@
 import { helpers } from '../../../__data__';
 
 describe('BooleanLiteralCompiler', () => {
-  test('true', async () => {
+  test.only('true', async () => {
     await helpers.executeString(`
       if (!true) {
         throw 'Failure';

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "upgrade dependencies",
+      "type": "minor",
+      "packageName": "@neo-one/ts-utils"
+    }
+  ],
+  "packageName": "@neo-one/ts-utils",
+  "email": "danwbyrne@gmail.com"
+}

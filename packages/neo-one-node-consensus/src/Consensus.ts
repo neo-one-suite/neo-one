@@ -3,8 +3,8 @@ import { common, crypto, ECPoint, PrivateKey, UInt160 } from '@neo-one/client-co
 import { createChild, nodeLogger } from '@neo-one/logger';
 import { ConsensusPayload, Node, Transaction } from '@neo-one/node-core';
 import { composeDisposables, Disposable, noopDisposable, utils as commonUtils } from '@neo-one/utils';
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
-import { scan } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/scan';
+import { from as asyncIterableFrom } from '@reactivex/ix-es2015-cjs/asynciterable';
+import { scan } from '@reactivex/ix-es2015-cjs/asynciterable/operators/scan';
 import { initializeNewConsensus } from './common';
 import { ConsensusContext } from './ConsensusContext';
 import { ConsensusQueue } from './ConsensusQueue';
@@ -159,7 +159,7 @@ export class Consensus {
       consensusContext: this.mutableConsensusContext,
     });
 
-    await AsyncIterableX.from(this.mutableQueue)
+    await asyncIterableFrom(this.mutableQueue)
       .pipe(
         scan(async (context: Context, event: Event) => {
           let result;

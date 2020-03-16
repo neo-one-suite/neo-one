@@ -19,11 +19,10 @@ import {
   Validator,
   WriteBlockchain,
 } from '@neo-one/node-core';
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
+import { from as asyncIterableFrom, of as asyncIterableOf } from '@reactivex/ix-es2015-cjs/asynciterable';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { of } from 'rxjs';
-import { factory, keys, testUtils, transactions } from '../__data__';
 import { BLOCK_HEIGHT_YEAR, ExecutionInit, FEES, Options } from '../constants';
 import { executeScript } from '../execute';
 import {
@@ -52,6 +51,7 @@ import {
   UInt256StackItem,
   ValidatorStackItem,
 } from '../stackItem';
+import { factory, keys, testUtils, transactions } from '../__data__';
 
 type flag = 'blockContainer' | 'consensusContainer' | 'useBadTransaction' | 'noPersistingBlock';
 
@@ -61,7 +61,7 @@ const testIterator: ReadonlyArray<{ readonly key: IntegerStackItem; readonly val
   { key: new IntegerStackItem(new BN(1)), value: new IntegerStackItem(new BN(2)) },
   { key: new IntegerStackItem(new BN(2)), value: new IntegerStackItem(new BN(3)) },
 ];
-const testAsyncIterable = AsyncIterableX.from(testIterator);
+const testAsyncIterable = asyncIterableFrom(testIterator);
 
 const triggerType = TriggerType.Application;
 const scriptAttributeHash = keys[0].scriptHash;
@@ -1831,7 +1831,7 @@ const SYSCALLS = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of());
+      blockchain.storageItem.getAll$ = jest.fn(asyncIterableOf);
     },
     gas: FEES.ONE,
   },
@@ -2349,7 +2349,7 @@ const SYSCALLS = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(Buffer.alloc(1, 1), Buffer.alloc(1, 2)));
+      blockchain.storageItem.getAll$ = jest.fn(() => asyncIterableOf(Buffer.alloc(1, 1), Buffer.alloc(1, 2)));
     },
     gas: FEES.ONE,
   },
@@ -2385,7 +2385,7 @@ const SYSCALLS = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of());
+      blockchain.storageItem.getAll$ = jest.fn(asyncIterableOf);
     },
     gas: FEES.ONE,
   },
@@ -2454,7 +2454,7 @@ const SYSCALLS = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
+      blockchain.storageItem.getAll$ = jest.fn(() => asyncIterableOf(nextItem));
     },
     gas: FEES.ONE,
   },
@@ -2523,7 +2523,7 @@ const SYSCALLS = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
+      blockchain.storageItem.getAll$ = jest.fn(() => asyncIterableOf(nextItem));
     },
     gas: FEES.ONE,
   },
@@ -2579,7 +2579,7 @@ const SYSCALLS = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
+      blockchain.storageItem.getAll$ = jest.fn(() => asyncIterableOf(nextItem));
     },
     gas: FEES.ONE,
   },
@@ -2635,7 +2635,7 @@ const SYSCALLS = [
     mock: ({ blockchain }) => {
       blockchain.contract.get = jest.fn(async () => Promise.resolve({ hasStorage: true }));
 
-      blockchain.storageItem.getAll$ = jest.fn(() => AsyncIterableX.of(nextItem));
+      blockchain.storageItem.getAll$ = jest.fn(() => asyncIterableOf(nextItem));
     },
     gas: FEES.ONE,
   },

@@ -1,7 +1,7 @@
 /// <reference types="@reactivex/ix-es2015-cjs" />
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable/asynciterablex';
 import { concat } from '@reactivex/ix-es2015-cjs/asynciterable/concat';
-import { map } from '@reactivex/ix-es2015-cjs/asynciterable/pipe/map';
+import { from } from '@reactivex/ix-es2015-cjs/asynciterable/from';
+import { map } from '@reactivex/ix-es2015-cjs/asynciterable/operators/map';
 import { InvalidStorageStackItemIteratorError } from './errors';
 import { StackItemBase } from './StackItemBase';
 import { StackItemEnumerator } from './StackItemEnumerator';
@@ -22,7 +22,7 @@ export class StackItemIterator extends StackItemEnumerator<Value> {
   }
 
   public keys(): StackItemEnumerator {
-    const iterable = AsyncIterableX.from(this.enumerator as AsyncIterableIterator<Value>).pipe<{
+    const iterable = from(this.enumerator as AsyncIterableIterator<Value>).pipe<{
       value: StackItemBase;
     }>(map(({ key }) => ({ value: key })));
 
@@ -30,7 +30,7 @@ export class StackItemIterator extends StackItemEnumerator<Value> {
   }
 
   public values(): StackItemEnumerator {
-    const iterable = AsyncIterableX.from(this.enumerator as AsyncIterableIterator<Value>).pipe<{
+    const iterable = from(this.enumerator as AsyncIterableIterator<Value>).pipe<{
       value: StackItemBase;
     }>(map(({ value }) => ({ value })));
 
@@ -39,8 +39,8 @@ export class StackItemIterator extends StackItemEnumerator<Value> {
 
   public concatIterator(other: StackItemIterator): StackItemIterator {
     const iterable = concat(
-      AsyncIterableX.from(this.enumerator as AsyncIterableIterator<Value>),
-      AsyncIterableX.from(other.enumerator as AsyncIterableIterator<Value>),
+      from(this.enumerator as AsyncIterableIterator<Value>),
+      from(other.enumerator as AsyncIterableIterator<Value>),
     );
 
     return new StackItemIterator(iterable[Symbol.asyncIterator]());

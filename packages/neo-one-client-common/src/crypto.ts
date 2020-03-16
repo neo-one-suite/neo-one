@@ -6,7 +6,8 @@ import base58 from 'bs58';
 import xor from 'buffer-xor';
 import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from 'crypto';
 import { curves, ec as EC } from 'elliptic';
-import scrypt from 'scrypt-js';
+// @ts-ignore wait for types to get updated to 3.0.0 export type
+import { scrypt } from 'scrypt-js';
 import WIF from 'wif';
 import { common, ECPoint, InvalidFormatError, PrivateKey, UInt160, UInt256 } from './common';
 import {
@@ -411,25 +412,18 @@ const getNEP2Derived = async ({
 }: {
   readonly password: string;
   readonly salt: Buffer;
-}): Promise<Buffer> =>
-  new Promise<Buffer>((resolve, reject) =>
-    scrypt(
-      Buffer.from(password.normalize('NFKC'), 'utf8'),
-      salt,
-      NEP2_KDFPARAMS.N,
-      NEP2_KDFPARAMS.r,
-      NEP2_KDFPARAMS.p,
-      NEP2_KDFPARAMS.dklen,
-      (error, _progress, key) => {
-        /* istanbul ignore next */
-        if (error != undefined) {
-          reject(error);
-        } else if (key) {
-          resolve(Buffer.from([...key]));
-        }
-      },
-    ),
+}): Promise<Buffer> => {
+  const resultPromise = scrypt(
+    Buffer.from(password.normalize('NFKC'), 'utf8'),
+    salt,
+    NEP2_KDFPARAMS.N,
+    NEP2_KDFPARAMS.r,
+    NEP2_KDFPARAMS.p,
+    NEP2_KDFPARAMS.dklen,
   );
+
+  return resultPromise.then((key: readonly number[]) => Buffer.from([...key]));
+};
 
 const getNEP2Salt = ({
   addressVersion,

@@ -24,9 +24,9 @@
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
     "@types/bn.js": "^4.11.5",
-    "@types/jest": "^24.0.18",
+    "@types/jest": "^25.0.0",
     "@types/lodash": "^4.14.138",
-    "@types/through": "^0.0.29",
+    "@types/through": "^0.0.30",
     "gulp": "~4.0.2"
   },
   "sideEffects": false

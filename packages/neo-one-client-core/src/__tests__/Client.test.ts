@@ -1,12 +1,12 @@
 // tslint:disable no-object-mutation
 import { RawAction, UserAccountProvider } from '@neo-one/client-common';
 import { Modifiable } from '@neo-one/utils';
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable';
+import { from as asyncIterableFrom } from '@reactivex/ix-es2015-cjs/asynciterable';
 import { of, of as _of } from 'rxjs';
-import { factory, keys } from '../__data__';
 import { Client } from '../Client';
 import { DeleteUserAccountUnsupportedError, UpdateUserAccountUnsupportedError } from '../errors';
 import { UnlockedWallet } from '../user';
+import { factory, keys } from '../__data__';
 
 const getMockProvider = (wallet: UnlockedWallet) => {
   const selectUserAccount = jest.fn();
@@ -121,7 +121,7 @@ describe('Client Tests', () => {
       transactions: [invocationTransaction, factory.createConfirmedMinerTransaction()],
     });
     providerOne.iterActionsRaw = undefined;
-    providerOne.iterBlocks = jest.fn(() => AsyncIterableX.from(of(block)));
+    providerOne.iterBlocks = jest.fn(() => asyncIterableFrom(of(block)));
 
     const iterable = client.__iterActionsRaw('main');
 

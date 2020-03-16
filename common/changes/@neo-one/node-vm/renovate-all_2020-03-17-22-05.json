@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "upgrade dependencies",
+      "type": "minor",
+      "packageName": "@neo-one/node-vm"
+    }
+  ],
+  "packageName": "@neo-one/node-vm",
+  "email": "danwbyrne@gmail.com"
+}

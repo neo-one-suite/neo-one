@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import { keys } from '../__data__';
 import { common, ECPoint } from '../common';
 import { crypto } from '../crypto';
 import { WitnessModel } from '../models';
+import { keys } from '../__data__';
 
 const initKey = common.hexToECPoint('02f61596eafa6303d6782afee3f221254c028deeac620a28b96112a9d08594fd88');
 const secondKey = common.hexToECPoint('030d56c2d8dbe1069b910246f7f39d0f4b743557e90603f94fa1d5e8ab8f5fbcf0');

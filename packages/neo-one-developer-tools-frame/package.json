@@ -19,7 +19,7 @@
     "@neo-one/react": "^2.3.0",
     "@neo-one/react-common": "^2.3.0",
     "@neo-one/utils": "^2.3.0",
-    "@reactivex/ix-esnext-esm": "^2.5.3",
+    "@reactivex/ix-esnext-esm": "^3.0.0",
     "@render-props/size-observer": "^0.1.18",
     "bignumber.js": "^9.0.0",
     "core-js": "^3.2.1",

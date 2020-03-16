@@ -1,4 +1,4 @@
-import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable';
+import { from as asyncIterableFrom } from '@reactivex/ix-es2015-cjs/asynciterable';
 import { BN } from 'bn.js';
 import { deserializeStackItem } from '../..';
 import {
@@ -13,7 +13,7 @@ describe('Enumerator/Iterator Stack Item Types', () => {
   const testIterator: ReadonlyArray<{ readonly key: IntegerStackItem; readonly value: IntegerStackItem }> = [
     { key: new IntegerStackItem(new BN(0)), value: new IntegerStackItem(new BN(1)) },
   ];
-  const testAsyncIterable = AsyncIterableX.from(testIterator);
+  const testAsyncIterable = asyncIterableFrom(testIterator);
 
   const stackItemEnumerator = new StackItemEnumerator(testAsyncIterable[Symbol.asyncIterator]());
   const stackItemIterator = new StackItemIterator(testAsyncIterable[Symbol.asyncIterator]());

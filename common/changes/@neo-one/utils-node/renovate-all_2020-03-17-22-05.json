@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "upgrade dependencies",
+      "type": "minor",
+      "packageName": "@neo-one/utils-node"
+    }
+  ],
+  "packageName": "@neo-one/utils-node",
+  "email": "danwbyrne@gmail.com"
+}

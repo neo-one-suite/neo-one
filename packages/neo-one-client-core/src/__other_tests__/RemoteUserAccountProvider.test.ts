@@ -1,12 +1,12 @@
 import { ECPoint, Param, TransactionResult, UInt160, UInt256 } from '@neo-one/client-common';
-import { AsyncIterableX, toArray } from '@reactivex/ix-es2015-cjs/asynciterable';
+import { from as asyncIterableFrom, toArray } from '@reactivex/ix-es2015-cjs/asynciterable';
 import { interval } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 // tslint:disable-next-line no-implicit-dependencies
 import { MessageChannel } from 'worker_threads';
-import { data, factory, keys } from '../__data__';
 import { Hash256 } from '../Hash256';
 import { connectRemoteUserAccountProvider, RemoteUserAccountProvider } from '../user';
+import { data, factory, keys } from '../__data__';
 
 describe('RemoteUserAccountProvider', () => {
   const unlockedWallet = factory.createUnlockedWallet();
@@ -79,10 +79,10 @@ describe('RemoteUserAccountProvider', () => {
   const updateUserAccountName = jest.fn(async () => Promise.resolve(undefined));
   const commonRawCallReceipt = factory.createRawCallReceipt();
   const call = jest.fn(async () => commonRawCallReceipt);
-  const iterBlocks = jest.fn(() => AsyncIterableX.from([block]));
+  const iterBlocks = jest.fn(() => asyncIterableFrom([block]));
   const getBlockCount = jest.fn(async () => blockCount);
   const getAccount = jest.fn(async () => unlockedWallet.userAccount);
-  const iterActionsRaw = jest.fn(() => AsyncIterableX.from([rawAction]));
+  const iterActionsRaw = jest.fn(() => asyncIterableFrom([rawAction]));
   let transfer: jest.Mock<Promise<TransactionResult>>;
 
   // tslint:disable-next-line no-any
@@ -419,7 +419,7 @@ describe('RemoteUserAccountProvider', () => {
     ]);
 
     expect(currentAccount).toEqual(unlockedWallet.userAccount);
-    expect(invokeClaimResult.transaction).toEqual(commonTransactionResult.transaction);
+    expect(invokeClaimResult?.transaction).toEqual(commonTransactionResult.transaction);
     expect(provider.invokeClaim.mock.calls).toMatchSnapshot();
     expect(count).toEqual(blockCount);
     expect(callResult).toEqual(commonRawCallReceipt);

@@ -17,12 +17,10 @@ describe('start network', () => {
     });
 
     execAsync('start neotracker');
-    // this allows us to run the e2e tests in parallel, successfully
-    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     await one.until(async () => {
       const live = await isRunning(config.neotracker.port);
       expect(live).toEqual(true);
-    });
+    }, 10000);
   });
 });

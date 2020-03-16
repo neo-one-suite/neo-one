@@ -13,15 +13,15 @@
   },
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
-    "@ledgerhq/hw-transport-u2f": "^4.68.2",
+    "@ledgerhq/hw-transport-u2f": "^5.0.0",
     "@neo-one/client-common": "^2.3.0",
     "@neo-one/node-vm": "^2.3.0",
     "@neo-one/utils": "^2.3.0",
-    "@opencensus/core": "^0.0.19",
-    "@opencensus/exporter-jaeger": "^0.0.19",
-    "@opencensus/exporter-prometheus": "^0.0.19",
-    "@opencensus/nodejs-base": "^0.0.19",
-    "@opencensus/propagation-tracecontext": "^0.0.19",
+    "@opencensus/core": "^0.0.20",
+    "@opencensus/exporter-jaeger": "^0.0.20",
+    "@opencensus/exporter-prometheus": "^0.0.20",
+    "@opencensus/nodejs-base": "^0.0.20",
+    "@opencensus/propagation-tracecontext": "^0.0.20",
     "@opencensus/web-core": "^0.0.7",
     "@opencensus/web-propagation-tracecontext": "^0.0.7",
     "@opencensus/web-types": "^0.0.7",
@@ -40,7 +40,7 @@
     "gulp": "~4.0.2"
   },
   "optionalDependencies": {
-    "@ledgerhq/hw-transport-node-hid": "^4.68.2"
+    "@ledgerhq/hw-transport-node-hid": "^5.0.0"
   },
   "sideEffects": false
 }
