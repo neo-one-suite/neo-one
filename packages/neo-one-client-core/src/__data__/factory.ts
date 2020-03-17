@@ -2,7 +2,6 @@
 import {
   Account,
   ActionBaseJSON,
-  AddressABIParameter,
   AddressAttribute,
   AddressContractParameter,
   ArrayContractParameterJSON,
@@ -18,14 +17,24 @@ import {
   ConfirmedTransactionJSON,
   ConsensusData,
   ConsensusDataJSON,
+  Contract,
+  ContractAbi,
   ContractAbiJSON,
+  ContractEvent,
   ContractEventJSON,
+  ContractGroup,
   ContractGroupJSON,
   ContractJSON,
+  ContractManifest,
   ContractManifestJSON,
   ContractMethodDescriptor,
   ContractMethodDescriptorJSON,
+  ContractParameterDeclaration,
   ContractParameterDeclarationJSON,
+  ContractPermissionDescriptor,
+  ContractPermissionDescriptorJSON,
+  ContractPermissions,
+  ContractPermissionsJSON,
   Cosigner,
   CosignerJSON,
   Hash160ContractParameterJSON,
@@ -33,8 +42,6 @@ import {
   Hash256ContractParameterJSON,
   Header,
   HeaderJSON,
-  IntegerABIParameter,
-  IntegerABIReturn,
   IntegerContractParameter,
   IntegerContractParameterJSON,
   InteropInterfaceContractParameterJSON,
@@ -59,8 +66,6 @@ import {
   RawNotification,
   SignatureContractParameterJSON,
   StorageItemJSON,
-  StringABIParameter,
-  StringABIReturn,
   StringContractParameter,
   StringContractParameterJSON,
   Transaction,
@@ -76,6 +81,7 @@ import {
   VerifyTransactionResultJSON,
   VersionJSON,
   VoidContractParameterJSON,
+  WildcardContainer,
   Witness,
   WitnessJSON,
 } from '@neo-one/client-common';
@@ -86,7 +92,7 @@ import { LockedWallet, UnlockedWallet } from '../user';
 import { data } from './data';
 import { keys } from './keys';
 
-export const contractParamDeclaration: { readonly [key: string]: ContractParameterDeclarationJSON } = {
+export const contractParamDeclarationJSON: { readonly [key: string]: ContractParameterDeclarationJSON } = {
   boolean: {
     type: 'Boolean',
     name: 'param',
@@ -138,18 +144,18 @@ export const contractParamDeclaration: { readonly [key: string]: ContractParamet
 };
 
 export const createContractEventJSON = ({
-  parameters = [contractParamDeclaration.boolean],
+  parameters = [contractParamDeclarationJSON.boolean],
   name = 'event',
-}: Partial<ContractEventJSON> = {}) => ({
+}: Partial<ContractEventJSON> = {}): ContractEventJSON => ({
   name,
   parameters,
 });
 
 export const createContractMethodDescriptorJSON = ({
-  parameters = [contractParamDeclaration.boolean],
+  parameters = [contractParamDeclarationJSON.boolean],
   returnType = 'Void',
   name = 'event',
-}: Partial<ContractMethodDescriptorJSON> = {}) => ({
+}: Partial<ContractMethodDescriptorJSON> = {}): ContractMethodDescriptorJSON => ({
   name,
   parameters,
   returnType,
@@ -160,26 +166,26 @@ export const createContractAbiJSON = ({
   events = [createContractEventJSON()],
   entryPoint = createContractMethodDescriptorJSON(),
   hash = keys[0].scriptHashString,
-}: Partial<ContractAbiJSON> = {}) => ({ hash, entryPoint, methods, events });
+}: Partial<ContractAbiJSON> = {}): ContractAbiJSON => ({ hash, entryPoint, methods, events });
 
 export const createContractGroupJSON = ({
   publicKey = keys[0].publicKeyString,
   signature = 'ccaab040cc25021c91567b75db4778853441869157b8f6aad960cdcf1069812480027a528ca9b98e2205027de20696f848cf81824eeb7af1d5110870870ceb67',
-}: Partial<ContractGroupJSON> = {}) => ({ publicKey, signature });
+}: Partial<ContractGroupJSON> = {}): ContractGroupJSON => ({ publicKey, signature });
 
 export const createContractPermissionDescriptorJSON = ({
   hashOrGroupType,
 }: {
   readonly hashOrGroupType: 'uint160' | 'ecpoint' | undefined;
-}) => {
-  let hashOrGroup: string | undefined;
+}): ContractPermissionDescriptorJSON => {
   if (hashOrGroupType === 'uint160') {
-    hashOrGroup = keys[0].scriptHashString;
-  } else if (hashOrGroupType === 'ecpoint') {
-    hashOrGroup = keys[0].publicKeyString;
+    return keys[0].scriptHashString;
+  }
+  if (hashOrGroupType === 'ecpoint') {
+    return keys[0].publicKeyString;
   }
 
-  return hashOrGroup;
+  return '*';
 };
 
 export const createContractPermissionsJSON = ({
@@ -188,7 +194,7 @@ export const createContractPermissionsJSON = ({
 }: {
   readonly hashOrGroupType: 'uint160' | 'ecpoint' | undefined;
   readonly methods: readonly string[];
-}) => ({ contract: createContractPermissionDescriptorJSON({ hashOrGroupType }), methods });
+}): ContractPermissionsJSON => ({ contract: createContractPermissionDescriptorJSON({ hashOrGroupType }), methods });
 
 export const createContractManifestJSON = ({
   groups = [createContractGroupJSON()],
@@ -197,13 +203,20 @@ export const createContractManifestJSON = ({
   permissions = [createContractPermissionsJSON({ hashOrGroupType: 'uint160', methods: ['method1'] })],
   trusts = [keys[0].scriptHashString],
   safeMethods = ['method1', 'method2'],
-}: Partial<ContractManifestJSON> = {}) => ({ groups, features, abi, permissions, trusts, safeMethods });
+}: Partial<ContractManifestJSON> = {}): ContractManifestJSON => ({
+  groups,
+  features,
+  abi,
+  permissions,
+  trusts,
+  safeMethods,
+});
 
 export const createContractJSON = ({
   hash = keys[0].scriptHashString,
   script = Buffer.alloc(25).toString('hex'),
   manifest = createContractManifestJSON(),
-}: Partial<ContractJSON> = {}) => ({ hash, script, manifest });
+}: Partial<ContractJSON> = {}): ContractJSON => ({ hash, script, manifest });
 
 const createActionBaseJSON = (options: Partial<ActionBaseJSON> = {}): ActionBaseJSON => ({
   version: 0,
@@ -438,8 +451,11 @@ const createHash256ContractParameterJSON = (
   ...options,
 });
 
-const createInteropInterfaceContractParameterJSON = (options: Partial<InteropInterfaceContractParameterJSON> = {}) => ({
+const createInteropInterfaceContractParameterJSON = (
+  options: Partial<InteropInterfaceContractParameterJSON> = {},
+): InteropInterfaceContractParameterJSON => ({
   type: 'InteropInterface' as 'InteropInterface',
+  name: 'param',
   ...options,
 });
 
@@ -507,73 +523,129 @@ const createPluginJSON = (options: Partial<PluginJSON> = {}): PluginJSON => ({
   ...options,
 });
 
-// export const createContractEvent = ({
-//   parameters = [contractParamDeclaration.boolean],
-//   name = 'event',
-// }: Partial<ContractEvent> = {}) => ({
-//   name,
-//   parameters,
-// });
+export const contractParamDeclaration: { readonly [key: string]: ContractParameterDeclaration } = {
+  boolean: {
+    type: 'Boolean',
+    name: 'param',
+  },
+  buffer: {
+    type: 'Buffer',
+    name: 'param',
+  },
+  hash160: {
+    type: 'Hash160',
+    name: 'param',
+  },
+  hash256: {
+    type: 'Hash256',
+    name: 'param',
+  },
+  array: {
+    type: 'Array',
+    name: 'param',
+  },
+  integer: {
+    type: 'Integer',
+    name: 'param',
+  },
+  interopInterface: {
+    type: 'InteropInterface',
+    name: 'param',
+  },
+  map: {
+    type: 'Map',
+    name: 'param',
+  },
+  publicKey: {
+    type: 'PublicKey',
+    name: 'param',
+  },
+  signature: {
+    type: 'Signature',
+    name: 'param',
+  },
+  string: {
+    type: 'String',
+    name: 'param',
+  },
+  void: {
+    type: 'Void',
+    name: 'param',
+  },
+};
 
-// export const createContractMethodDescriptor = ({
-//   parameters = [contractParamDeclaration.boolean],
-//   returnType = 'Void',
-//   name = 'event',
-// }: Partial<ContractMethodDescriptor> = {}) => ({
-//   name,
-//   parameters,
-//   returnType,
-// });
+export const createContractEvent = ({
+  parameters = [contractParamDeclaration.boolean],
+  name = 'event',
+}: Partial<ContractEvent> = {}): ContractEvent => ({
+  name,
+  parameters,
+});
 
-// export const createContractAbi = ({
-//   methods = [createContractMethodDescriptor()],
-//   events = [createContractEvent()],
-//   entryPoint = createContractMethodDescriptor(),
-//   hash = keys[0].scriptHash,
-// }: Partial<ContractAbi> = {}) => ({ hash, entryPoint, methods, events });
+export const createContractMethodDescriptor = ({
+  parameters = [contractParamDeclaration.boolean],
+  returnType = 'Void',
+  name = 'event',
+}: Partial<ContractMethodDescriptor> = {}): ContractMethodDescriptor => ({
+  name,
+  parameters,
+  returnType,
+});
 
-// export const createContractGroup = ({
-//   publicKey = keys[0].publicKey,
-//   signature = 'ccaab040cc25021c91567b75db4778853441869157b8f6aad960cdcf1069812480027a528ca9b98e2205027de20696f848cf81824eeb7af1d5110870870ceb67',
-// }: Partial<ContractGroup> = {}) => ({ publicKey, signature });
+export const createContractAbi = ({
+  methods = [createContractMethodDescriptor()],
+  events = [createContractEvent()],
+  entryPoint = createContractMethodDescriptor(),
+  hash = keys[0].scriptHash,
+}: Partial<ContractAbi> = {}): ContractAbi => ({ hash, entryPoint, methods, events });
 
-// export const createContractPermissionDescriptor = ({
-//   hashOrGroupType,
-// }: {
-//   readonly hashOrGroupType: 'uint160' | 'ecpoint' | undefined;
-// }) => {
-//   let hashOrGroup: string | undefined;
-//   if (hashOrGroupType === 'uint160') {
-//     hashOrGroup = keys[0].scriptHashString;
-//   } else if (hashOrGroupType === 'ecpoint') {
-//     hashOrGroup = keys[0].publicKeyString;
-//   }
+export const createContractGroup = ({
+  publicKey = keys[0].publicKey,
+  signature = 'ccaab040cc25021c91567b75db4778853441869157b8f6aad960cdcf1069812480027a528ca9b98e2205027de20696f848cf81824eeb7af1d5110870870ceb67',
+}: Partial<ContractGroup> = {}) => ({ publicKey, signature });
 
-//   return hashOrGroup;
-// };
+export const createWildcard = <T>(wildcard?: readonly T[]): WildcardContainer<T> => ({ data: wildcard });
 
-// export const createContractPermissions = ({
-//   hashOrGroupType,
-//   methods = [],
-// }: {
-//   readonly hashOrGroupType: 'uint160' | 'ecpoint' | undefined;
-//   readonly methods: readonly string[];
-// }) => ({ contract: createContractPermissionDescriptorJSON({ hashOrGroupType }), methods });
+export const createContractPermissionDescriptor = ({
+  hashOrGroupType,
+}: {
+  readonly hashOrGroupType: 'uint160' | 'ecpoint' | undefined;
+}): ContractPermissionDescriptor => {
+  if (hashOrGroupType === 'uint160') {
+    return { hashOrGroup: keys[0].scriptHash };
+  }
+  if (hashOrGroupType === 'ecpoint') {
+    return { hashOrGroup: keys[0].publicKey };
+  }
 
-// export const createContractManifest = ({
-//   groups = [createContractGroup()],
-//   features = { storage: true, payable: true },
-//   abi = createContractAbi(),
-//   permissions = [createContractPermissions({ hashOrGroupType: 'uint160', methods: ['method1'] })],
-//   trusts = [keys[0].scriptHashString],
-//   safeMethods = ['method1', 'method2'],
-// }: Partial<ContractManifest> = {}) => ({ groups, features, abi, permissions, trusts, safeMethods });
+  return { hashOrGroup: undefined };
+};
 
-// export const createContract = ({
-//   address = keys[0].address,
-//   script = Buffer.alloc(25).toString('hex'),
-//   manifest = createContractManifest(),
-// }: Partial<Contract> = {}) => ({ address, script, manifest });
+export const createContractPermissions = ({
+  hashOrGroupType,
+  methods = [],
+}: {
+  readonly hashOrGroupType: 'uint160' | 'ecpoint' | undefined;
+  readonly methods?: readonly string[];
+}): ContractPermissions => ({
+  contract: createContractPermissionDescriptor({ hashOrGroupType }),
+  methods: createWildcard<string>(methods),
+});
+
+export const createContractManifest = ({
+  groups = [createContractGroup()],
+  features = { storage: true, payable: true },
+  abi = createContractAbi(),
+  permissions = [createContractPermissions({ hashOrGroupType: 'uint160', methods: ['method1'] })],
+  trusts = createWildcard([keys[0].scriptHash]),
+  safeMethods = createWildcard(['method1', 'method2']),
+}: Partial<ContractManifest> = {}): ContractManifest => ({ groups, features, abi, permissions, trusts, safeMethods });
+
+export const createContract = ({
+  address = keys[0].address,
+  script = Buffer.alloc(25).toString('hex'),
+  manifest = createContractManifest(),
+}: Partial<Contract> = {}): Contract => ({ address, script, manifest });
 
 const createRawActionBase = (options: Partial<RawActionBase> = {}): RawActionBase => ({
   version: 0,
@@ -681,24 +753,28 @@ const createConfirmedTransaction = (options: Partial<ConfirmedTransaction> = {})
 const createAddressContractParameter = (options: Partial<AddressContractParameter> = {}): AddressContractParameter => ({
   type: 'Address',
   value: keys[0].address,
+  name: 'param',
   ...options,
 });
 
 const createStringContractParameter = (options: Partial<StringContractParameter> = {}): StringContractParameter => ({
   type: 'String',
   value: 'transfer',
+  name: 'param',
   ...options,
 });
 
 const createIntegerContractParameter = (options: Partial<IntegerContractParameter> = {}): IntegerContractParameter => ({
   type: 'Integer',
   value: new BN(20),
+  name: 'param',
   ...options,
 });
 
 const createBooleanContractParameter = (options: Partial<BooleanContractParameter> = {}): BooleanContractParameter => ({
   type: 'Boolean',
   value: true,
+  name: 'param',
   ...options,
 });
 
@@ -811,40 +887,40 @@ const createTransfer = (options: Partial<Transfer> = {}): Transfer => ({
   ...options,
 });
 
-const createAddressABIParameter = (options: Partial<AddressABIParameter> = {}): AddressABIParameter => ({
-  type: 'Address',
-  name: 'from',
-  ...options,
-});
+// const createAddressABIParameter = (options: Partial<AddressABIParameter> = {}): AddressABIParameter => ({
+//   type: 'Address',
+//   name: 'from',
+//   ...options,
+// });
 
-const createIntegerABIParameter = (options: Partial<IntegerABIParameter> = {}): IntegerABIParameter => ({
-  type: 'Integer',
-  name: 'amount',
-  decimals: 8,
-  ...options,
-});
+// const createIntegerABIParameter = (options: Partial<IntegerABIParameter> = {}): IntegerABIParameter => ({
+//   type: 'Integer',
+//   name: 'amount',
+//   decimals: 8,
+//   ...options,
+// });
 
-const createDeployABIFunction = (options: Partial<ContractMethodDescriptor> = {}): ContractMethodDescriptor => ({
-  name: 'deploy',
-  parameters: [],
-  returnType: { type: 'Boolean' },
-  ...options,
-});
+// const createDeployABIFunction = (options: Partial<ContractMethodDescriptor> = {}): ContractMethodDescriptor => ({
+//   name: 'deploy',
+//   parameters: [],
+//   returnType: { type: 'Boolean' },
+//   ...options,
+// });
 
-const createStringABIReturn = (): StringABIReturn => ({
-  type: 'String',
-});
+// const createStringABIReturn = (): StringABIReturn => ({
+//   type: 'String',
+// });
 
-const createIntegerABIReturn = (): IntegerABIReturn => ({
-  type: 'Integer',
-  decimals: 0,
-});
+// const createIntegerABIReturn = (): IntegerABIReturn => ({
+//   type: 'Integer',
+//   decimals: 0,
+// });
 
-const createStringABIParameter = (options: Partial<StringABIParameter> = {}): StringABIParameter => ({
-  type: 'String',
-  name: 'foo',
-  ...options,
-});
+// const createStringABIParameter = (options: Partial<StringABIParameter> = {}): StringABIParameter => ({
+//   type: 'String',
+//   name: 'foo',
+//   ...options,
+// });
 
 // const createABI = (options: Partial<ABI> = {}): ABI => ({
 //   ...nep5.abi(8),
@@ -903,7 +979,7 @@ const createHeader = (options: Partial<Header> = {}): Header => ({
   hash: data.hash256s.a,
   previousBlockHash: data.hash256s.b,
   merkleRoot: data.hash256s.c,
-  time: data.timestamps.past,
+  time: new BigNumber(100000),
   index: 10,
   nextConsensus: keys[0].address,
   size: 256,
@@ -915,7 +991,7 @@ const createHeader = (options: Partial<Header> = {}): Header => ({
 
 const createConsensusData = (options: Partial<ConsensusData> = {}): ConsensusData => ({
   primaryIndex: 123,
-  nonce: 123456555,
+  nonce: 'ab3f',
   ...options,
 });
 
@@ -942,6 +1018,11 @@ export const factory = {
   createVoidContractParameterJSON,
   createInvocationResultSuccessJSON,
   createInvocationResultErrorJSON,
+  createContractManifestJSON,
+  createContractAbiJSON,
+  createContractMethodDescriptorJSON,
+  contractParamDeclarationJSON,
+  createContract,
   createTransactionJSON,
   createCallReceiptJSON,
   createLogActionJSON,
@@ -950,7 +1031,6 @@ export const factory = {
   createVersionJSON,
   createPluginJSON,
   createVerifyScriptResultJSON,
-  createAddressABIParameter,
   createConfirmedTransactionJSON,
   createVerifyTransactionResultJSON,
   createBlockJSON,
@@ -972,7 +1052,6 @@ export const factory = {
   createUnlockedWallet,
   createOtherWallet,
   createTransfer,
-  createDeployABIFunction,
   createRawInvocationResultError,
   createRawInvocationResultSuccess,
   createRawLog,
@@ -980,10 +1059,6 @@ export const factory = {
   createAddressContractParameter,
   createIntegerContractParameter,
   createStringContractParameter,
-  createStringABIReturn,
-  createIntegerABIParameter,
-  createIntegerABIReturn,
-  createStringABIParameter,
   createRawTransferNotification,
   createBooleanContractParameter,
   createUserAccount,

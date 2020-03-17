@@ -322,7 +322,7 @@ export interface Header {
   /**
    * `Block` time persisted.
    */
-  readonly time: number;
+  readonly time: BigNumber;
   /**
    * `Block` index.
    */
@@ -355,7 +355,7 @@ export interface ConsensusData {
   /**
    * Unique number in order to ensure the hash for this `ConsensusData` is unique.
    */
-  readonly nonce: number;
+  readonly nonce: BufferString;
 }
 
 export interface Block extends Header {
@@ -1349,15 +1349,15 @@ export interface ContractMethodDescriptor {
   /**
    * Parameters of the function.
    */
-  readonly parameters: readonly ABIParameter[];
+  readonly parameters: readonly ContractParameterDeclaration[];
   /**
    * Return type of the function.
    */
-  readonly returnType: ABIReturn;
+  readonly returnType: ContractParameterType;
   /**
    * `true` if the function is constant or read-only.
    */
-  readonly constant?: boolean;
+  // readonly constant?: boolean;
 }
 
 /**
@@ -1371,7 +1371,7 @@ export interface ContractEvent {
   /**
    * Parameters of the event.
    */
-  readonly parameters: readonly ABIParameter[];
+  readonly parameters: readonly ContractParameterDeclaration[];
 }
 
 /**
@@ -1387,15 +1387,15 @@ export interface ContractAbi {
   /**
    * Entrypoint is an ABIFunction which describes the entrypoint of the contract.
    */
-  readonly entryPoint: ABIFunction;
+  readonly entryPoint: ContractMethodDescriptor;
   /**
    * Specification of the smart contract functions.
    */
-  readonly methods: readonly ABIFunction[];
+  readonly methods: readonly ContractMethodDescriptor[];
   /**
    * Specification of the smart contract events.
    */
-  readonly events?: readonly ABIEvent[];
+  readonly events: readonly ContractEvent[];
 }
 
 /**
@@ -1436,14 +1436,14 @@ export enum ContractFeatures {
 }
 
 export interface WildcardContainer<T> {
-  readonly data: readonly T[];
+  readonly data?: readonly T[];
 }
 
 export interface ContractPermissionDescriptor {
   readonly hashOrGroup: UInt160 | ECPoint | undefined;
-  readonly isHash: () => boolean;
-  readonly isGroup: () => boolean;
-  readonly isWildcard: () => boolean;
+  // readonly isHash: () => boolean;
+  // readonly isGroup: () => boolean;
+  // readonly isWildcard: () => boolean;
 }
 
 /**
@@ -1452,7 +1452,7 @@ export interface ContractPermissionDescriptor {
 export interface ContractPermissions {
   readonly contract: ContractPermissionDescriptor;
   readonly methods: WildcardContainer<string>;
-  readonly isAllowed: (manifest: ContractManifest, method: string) => boolean;
+  // readonly isAllowed: (manifest: ContractManifest, method: string) => boolean;
 }
 
 /**
@@ -1463,15 +1463,15 @@ export interface ContractManifest {
   /**
    * Max length for a valid Contract Manifest
    */
-  readonly maxLength: 2048;
-  /**
-   * Size of serialized contract
-   */
-  readonly size: () => number;
-  /**
-   * Contract hash
-   */
-  readonly hash: () => UInt160;
+  // readonly maxLength: 2048;
+  // /**
+  //  * Size of serialized contract
+  //  */
+  // readonly size: () => number;
+  // /**
+  //  * Contract hash
+  //  */
+  // readonly hash: () => UInt160;
   /**
    * Set of mutually trusted contracts
    */
@@ -1479,7 +1479,10 @@ export interface ContractManifest {
   /**
    * The features field describes what features are available for the contract.
    */
-  readonly features: ContractFeatures;
+  readonly features: {
+    readonly storage: boolean;
+    readonly payable: boolean;
+  };
   /**
    * Full specification of the functions and events of a smart contract. Used by the client APIs to generate the smart contract interface.
    */
@@ -1603,73 +1606,6 @@ export type Return =
   | ContractParameter;
 
 /**
- * Constants that describe the type of `Asset`.
- *
- * The two most important ones are `'Governing'` and `'Utility'` which are reserved for NEO and GAS respectively.
- */
-export type AssetType = 'Credit' | 'Duty' | 'Governing' | 'Utility' | 'Currency' | 'Share' | 'Invoice' | 'Token';
-
-/**
- * Attributes of a first class asset.
- *
- * Users will typically only interact with the NEO and GAS `Asset`s.
- *
- * @example
- *
- * const asset = readClient.getAsset(Hash256.NEO);
- * const neoAmount = asset.amount;
- *
- */
-export interface Asset {
-  /**
-   * `Hash256String` of this `Asset`.
-   */
-  readonly hash: Hash256String;
-  /**
-   * Type of the `Asset`
-   *
-   * @see AssetType
-   */
-  readonly type: AssetType;
-  /**
-   * User configurable name of the `Asset`
-   */
-  readonly name: string;
-  /**
-   * Total possible supply of the `Asset`
-   */
-  readonly amount: BigNumber;
-  /**
-   * Amount currently available of the `Asset`
-   */
-  readonly available: BigNumber;
-  /**
-   * Precision (number of decimal places) of the `Asset`
-   */
-  readonly precision: number;
-  /**
-   * Owner of the `Asset`.
-   */
-  readonly owner: PublicKeyString;
-  /**
-   * Admin of the `Asset`.
-   */
-  readonly admin: AddressString;
-  /**
-   * Issuer of the `Asset`.
-   */
-  readonly issuer: AddressString;
-  /**
-   * Unix timestamp of when the `Asset` must be renewed by or it expires.
-   */
-  readonly expiration: number;
-  /**
-   * `true` if no transfers are allowed with the `Asset`.
-   */
-  readonly frozen: boolean;
-}
-
-/**
  * Attributes of a deployed smart contract.
  */
 export interface Contract {
@@ -1689,13 +1625,18 @@ export interface Contract {
 
 /* BEGIN LOW-LEVEL API */
 
+export interface ContractParameterDeclaration {
+  readonly type: ContractParameter['type'];
+  readonly name: string;
+}
+
 /**
  * Invocation stack item for a `Signature`.
  *
  * @see ContractParameter
  * @see SignatureString
  */
-export interface SignatureContractParameter {
+export interface SignatureContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `SignatureContractParameter` from other `ContractParameter` object types.
    */
@@ -1711,7 +1652,7 @@ export interface SignatureContractParameter {
  *
  * @see ContractParameter
  */
-export interface BooleanContractParameter {
+export interface BooleanContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `BooleanContractParameter` from other `ContractParameter` object types.
    */
@@ -1730,7 +1671,7 @@ export interface BooleanContractParameter {
  *
  * @see ContractParameter
  */
-export interface IntegerContractParameter {
+export interface IntegerContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `IntegerContractParameter` from other `ContractParameter` object types.
    */
@@ -1747,7 +1688,7 @@ export interface IntegerContractParameter {
  * @see ContractParameter
  * @see AddressString
  */
-export interface AddressContractParameter {
+export interface AddressContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `AddressContractParameter` from other `ContractParameter` object types.
    */
@@ -1764,7 +1705,7 @@ export interface AddressContractParameter {
  * @see ContractParameter
  * @see UInt160
  */
-export interface Hash160ContractParameter {
+export interface Hash160ContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `Hash160ContractParameter` from other `ContractParameter` object types.
    */
@@ -1781,7 +1722,7 @@ export interface Hash160ContractParameter {
  * @see ContractParameter
  * @see Hash256String
  */
-export interface Hash256ContractParameter {
+export interface Hash256ContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `Hash256ContractParameter` from other `ContractParameter` object types.
    */
@@ -1798,7 +1739,7 @@ export interface Hash256ContractParameter {
  * @see ContractParameter
  * @see BufferString
  */
-export interface BufferContractParameter {
+export interface BufferContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `BufferContractParameter` from other `ContractParameter` object types.
    */
@@ -1815,7 +1756,7 @@ export interface BufferContractParameter {
  * @see ContractParameter
  * @see PublicKeyString
  */
-export interface PublicKeyContractParameter {
+export interface PublicKeyContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `PublicKeyContractParameter` from other `ContractParameter` object types.
    */
@@ -1831,7 +1772,7 @@ export interface PublicKeyContractParameter {
  *
  * @see ContractParameter
  */
-export interface StringContractParameter {
+export interface StringContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `StringContractParameter` from other `ContractParameter` object types.
    */
@@ -1847,7 +1788,7 @@ export interface StringContractParameter {
  *
  * @see ContractParameter
  */
-export interface ArrayContractParameter {
+export interface ArrayContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `ArrayContractParameter` from other `ContractParameter` object types.
    */
@@ -1863,7 +1804,7 @@ export interface ArrayContractParameter {
  *
  * @see ContractParameter
  */
-export interface MapContractParameter {
+export interface MapContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `MapContractParameter` from other `ContractParameter` object types.
    */
@@ -1881,7 +1822,7 @@ export interface MapContractParameter {
  *
  * @see ContractParameter
  */
-export interface InteropInterfaceContractParameter {
+export interface InteropInterfaceContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `InteropInterfaceContractParameter` from other `ContractParameter` object types.
    */
@@ -1893,7 +1834,7 @@ export interface InteropInterfaceContractParameter {
  *
  * @see ContractParameter
  */
-export interface VoidContractParameter {
+export interface VoidContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `VoidContractParameter` from other `ContractParameter` object types.
    */

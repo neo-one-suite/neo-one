@@ -1,10 +1,8 @@
-import { AssetTypeModel } from './AssetTypeModel';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
 import { RelayResultReasonModel } from './RelayResultReasonModel';
 import { StateDescriptorTypeModel } from './StateDescriptorTypeModel';
 import { StorageFlagsModel } from './StorageFlagsModel';
 import { AttributeUsageModel } from './transaction';
-import { VMState } from './vm';
 import { WitnessScopeModel } from './WitnessScopeModel';
 
 export interface ContractParameterDeclarationJSON {
@@ -174,16 +172,16 @@ export type AttributeUsageJSON = keyof typeof AttributeUsageModel;
 
 export type RelayResultReasonJSON = keyof typeof RelayResultReasonModel;
 
-export interface InvocationDataJSON {
-  readonly result: InvocationResultJSON;
-  readonly asset?: AssetJSON;
-  readonly contracts: readonly ContractJSON[];
-  readonly deletedContractHashes: readonly string[];
-  readonly migratedContractHashes: ReadonlyArray<readonly [string, string]>;
-  readonly voteUpdates: ReadonlyArray<readonly [string, ReadonlyArray<string>]>;
-  readonly actions: readonly ActionJSON[];
-  readonly storageChanges: readonly StorageChangeJSON[];
-}
+// export interface InvocationDataJSON {
+//   readonly result: InvocationResultJSON;
+//   readonly asset?: AssetJSON;
+//   readonly contracts: readonly ContractJSON[];
+//   readonly deletedContractHashes: readonly string[];
+//   readonly migratedContractHashes: ReadonlyArray<readonly [string, string]>;
+//   readonly voteUpdates: ReadonlyArray<readonly [string, ReadonlyArray<string>]>;
+//   readonly actions: readonly ActionJSON[];
+//   readonly storageChanges: readonly StorageChangeJSON[];
+// }
 
 export interface TransactionJSON {
   readonly hash: string;
@@ -219,6 +217,8 @@ export interface TransactionReceiptJSON {
 
 export interface ConfirmedTransactionJSON extends TransactionJSON, TransactionReceiptJSON {}
 
+export type WildcardContainerJSON<T> = readonly T[] | '*';
+
 export interface ContractMethodDescriptorJSON {
   readonly name: string;
   readonly parameters: readonly ContractParameterDeclarationJSON[];
@@ -242,19 +242,19 @@ export interface ContractGroupJSON {
   readonly signature: string;
 }
 
-export type ContractPermissionDescriptorJSON = string | undefined;
+export type ContractPermissionDescriptorJSON = string | '*';
 
 export interface ContractPermissionsJSON {
   readonly contract: ContractPermissionDescriptorJSON;
-  readonly methods: readonly string[];
+  readonly methods: WildcardContainerJSON<string>;
 }
 
 export interface ContractManifestJSON {
   readonly abi: ContractAbiJSON;
   readonly groups: readonly ContractGroupJSON[];
   readonly permissions: readonly ContractPermissionsJSON[];
-  readonly trusts: readonly string[];
-  readonly safeMethods: readonly string[];
+  readonly trusts: WildcardContainerJSON<string>;
+  readonly safeMethods: WildcardContainerJSON<string>;
   readonly features: {
     readonly storage: boolean;
     readonly payable: boolean;
@@ -289,7 +289,7 @@ export interface ConsensusDataJSON {
 export interface HeaderJSON extends BlockBaseJSON {}
 
 export interface BlockJSON extends BlockBaseJSON {
-  readonly tx: readonly TransactionJSON[];
+  readonly tx: readonly ConfirmedTransactionJSON[];
   readonly consensus_data: ConsensusDataJSON;
 }
 
