@@ -1,5 +1,5 @@
 import { common, crypto, JSONHelper, RelayTransactionResultJSON, TransactionJSON, utils } from '@neo-one/client-common';
-import { AggregationType, globalStats, MeasureUnit, TagMap } from '@neo-one/client-switch';
+import { AggregationType, getTagMap, globalStats, MeasureUnit } from '@neo-one/client-switch';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Account,
@@ -190,7 +190,7 @@ const createJSONRPCHandler = (handlers: Handlers) => {
       };
     } catch (err) {
       logger.error({ name: 'jsonrpc_server_single_request', ...labels, err });
-      const tags = new TagMap();
+      const tags = await getTagMap();
       tags.set(rpcTag, { value: method });
       globalStats.record(
         [

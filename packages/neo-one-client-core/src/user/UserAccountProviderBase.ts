@@ -45,11 +45,11 @@ import {
 } from '@neo-one/client-common';
 import {
   AggregationType,
+  getTagMap,
   globalStats,
   Measure,
   MeasureUnit,
   processActionsAndMessage,
-  TagMap,
 } from '@neo-one/client-switch';
 import { Labels, labelToTag, utils as commonUtils } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
@@ -1194,7 +1194,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       readonly invoke?: boolean;
     },
   ): Promise<T> {
-    const tags = new TagMap();
+    const tags = await getTagMap();
     if (invoke) {
       const value = labels[Labels.INVOKE_RAW_METHOD];
       // tslint:disable-next-line: strict-type-predicates

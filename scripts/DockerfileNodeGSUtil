@@ -10,6 +10,7 @@ COPY packages packages/
 
 RUN sudo node common/scripts/install-run-rush.js install
 RUN sudo node common/scripts/install-run-rush.js rebuild -t @neo-one/node-bin
+RUN sudo node common/scripts/install-run-rush.js build -t @neo-one/node-tools
 
 # node:12.9.0-buster-slim 2019-08-27
 FROM node@sha256:d1cfeb3cc51782d51336e34bd477c5b1b46b32e5f49cd1c3829ef52f0a5250df AS production
@@ -106,6 +107,10 @@ COPY --from=builder /tmp/neo-one/packages/neo-one-node-bin/package.json packages
 COPY --from=builder /tmp/neo-one/packages/neo-one-node-bin/lib packages/neo-one-node-bin/lib/
 COPY --from=builder /tmp/neo-one/packages/neo-one-node-bin/node_modules packages/neo-one-node-bin/node_modules/
 COPY --from=builder /tmp/neo-one/packages/neo-one-node-bin/bin packages/neo-one-node-bin/bin/
+COPY --from=builder /tmp/neo-one/packages/neo-one-node-tools/package.json packages/neo-one-node-tools/package.json
+COPY --from=builder /tmp/neo-one/packages/neo-one-node-tools/lib packages/neo-one-node-tools/lib/
+COPY --from=builder /tmp/neo-one/packages/neo-one-node-tools/node_modules packages/neo-one-node-tools/node_modules/
+COPY --from=builder /tmp/neo-one/packages/neo-one-node-tools/bin packages/neo-one-node-tools/bin/
 COPY --from=builder /tmp/neo-one/common/temp/node_modules common/temp/node_modules/
 
 RUN apt-get -qqy update && apt-get install -qqy gcc python-dev python-setuptools libffi-dev python-pip && pip install gsutil
