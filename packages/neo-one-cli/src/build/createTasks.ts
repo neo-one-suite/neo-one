@@ -97,12 +97,9 @@ export const createTasks = (cmd: Command, config: Configuration, reset: boolean)
       },
     },
     {
-      title: 'Start NEO tracker instance',
+      title: 'Start NEO Tracker instance',
       task: async (_ctx, task) => {
-        if (config.neotracker.skip) {
-          task.skip('NEO tracker instance skipped.');
-        }
-        await startNeotracker(cmd, config, reset);
+        config.neotracker.skip ? task.skip('NEO Tracker instance skipped.') : await startNeotracker(cmd, config, reset);
       },
     },
   ]);
