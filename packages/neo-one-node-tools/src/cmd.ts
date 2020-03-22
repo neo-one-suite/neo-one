@@ -8,11 +8,7 @@ const start = createStart(createChild(nodeLogger, { service: 'node-restore' }));
 export const command = 'node-restore';
 export const describe = 'restore node data from google bucket';
 export const builder = (yargsBuilder: typeof yargs) =>
-  yargsBuilder
-    .string('path')
-    .string('bucket')
-    .string('folder')
-    .demandOption(['path', 'bucket', 'folder']);
+  yargsBuilder.string('path').string('bucket').string('folder').demandOption(['path', 'bucket', 'folder']);
 export const handler = ({ path, bucket, folder }: Yarguments<ReturnType<typeof builder>>) => {
   start(async () => {
     const restoreFunc = await restore({ path, bucket, folder });

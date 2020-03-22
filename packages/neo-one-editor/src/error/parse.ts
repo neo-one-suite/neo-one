@@ -64,10 +64,7 @@ function parseStack(stack: readonly string[]): readonly StackFrame[] {
       if (e.indexOf('(at ') !== -1) {
         e = e.replace(/\(at /, '(');
       }
-      const dataOuter = e
-        .trim()
-        .split(/\s+/g)
-        .slice(1);
+      const dataOuter = e.trim().split(/\s+/g).slice(1);
       // tslint:disable-next-line no-array-mutation
       const lastOuter = dataOuter.pop();
 

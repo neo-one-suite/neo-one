@@ -567,32 +567,11 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
     if (value.length <= Op.PUSHBYTES75) {
       this.emitOpByte(node, value.length, value);
     } else if (value.length < 0x100) {
-      this.emitOp(
-        node,
-        'PUSHDATA1',
-        new ClientScriptBuilder()
-          .emitUInt8(value.length)
-          .emit(value)
-          .build(),
-      );
+      this.emitOp(node, 'PUSHDATA1', new ClientScriptBuilder().emitUInt8(value.length).emit(value).build());
     } else if (value.length < 0x10000) {
-      this.emitOp(
-        node,
-        'PUSHDATA2',
-        new ClientScriptBuilder()
-          .emitUInt16LE(value.length)
-          .emit(value)
-          .build(),
-      );
+      this.emitOp(node, 'PUSHDATA2', new ClientScriptBuilder().emitUInt16LE(value.length).emit(value).build());
     } else if (value.length < 0x100000000) {
-      this.emitOp(
-        node,
-        'PUSHDATA4',
-        new ClientScriptBuilder()
-          .emitUInt32LE(value.length)
-          .emit(value)
-          .build(),
-      );
+      this.emitOp(node, 'PUSHDATA4', new ClientScriptBuilder().emitUInt32LE(value.length).emit(value).build());
     } else {
       throw new Error('Value too large.');
     }

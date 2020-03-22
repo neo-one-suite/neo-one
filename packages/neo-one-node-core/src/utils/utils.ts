@@ -128,10 +128,7 @@ function weightedAverage(
     return 0;
   }
 
-  return sumValue
-    .div(sumWeight)
-    .integerValue(BigNumber.ROUND_FLOOR)
-    .toNumber();
+  return sumValue.div(sumWeight).integerValue(BigNumber.ROUND_FLOOR).toNumber();
 }
 
 function weightedFilter<T>(

@@ -4,6 +4,6 @@ export function value() {
   return val;
 }
 // tslint:disable-next-line no-default-export
-export default function() {
+export default function () {
   val += 1;
 }

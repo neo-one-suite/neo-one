@@ -233,10 +233,7 @@ const SYSCALLS = [
     name: 'Neo.Runtime.Serialize',
     result: [
       new BufferStackItem(
-        new BinaryWriter()
-          .writeUInt8(StackItemType.ByteArray)
-          .writeVarBytesLE(Buffer.alloc(10, 1))
-          .toBuffer(),
+        new BinaryWriter().writeUInt8(StackItemType.ByteArray).writeVarBytesLE(Buffer.alloc(10, 1)).toBuffer(),
       ),
     ],
 
@@ -248,10 +245,7 @@ const SYSCALLS = [
     name: 'Neo.Runtime.Serialize',
     result: [
       new BufferStackItem(
-        new BinaryWriter()
-          .writeUInt8(StackItemType.ByteArray)
-          .writeVarBytesLE(Buffer.alloc(10, 1))
-          .toBuffer(),
+        new BinaryWriter().writeUInt8(StackItemType.ByteArray).writeVarBytesLE(Buffer.alloc(10, 1)).toBuffer(),
       ),
     ],
 
@@ -265,10 +259,7 @@ const SYSCALLS = [
     name: 'Neo.Runtime.Serialize',
     result: [
       new BufferStackItem(
-        new BinaryWriter()
-          .writeUInt8(StackItemType.Integer)
-          .writeVarBytesLE(Buffer.alloc(1, 1))
-          .toBuffer(),
+        new BinaryWriter().writeUInt8(StackItemType.Integer).writeVarBytesLE(Buffer.alloc(1, 1)).toBuffer(),
       ),
     ],
 
@@ -373,12 +364,7 @@ const SYSCALLS = [
   {
     name: 'Neo.Runtime.Deserialize',
     result: [new BufferStackItem(Buffer.alloc(10, 1))],
-    args: [
-      new BinaryWriter()
-        .writeUInt8(StackItemType.ByteArray)
-        .writeVarBytesLE(Buffer.alloc(10, 1))
-        .toBuffer(),
-    ],
+    args: [new BinaryWriter().writeUInt8(StackItemType.ByteArray).writeVarBytesLE(Buffer.alloc(10, 1)).toBuffer()],
 
     gas: FEES.ONE,
   },
@@ -407,10 +393,7 @@ const SYSCALLS = [
         .writeUInt8(StackItemType.Map)
         .writeVarUIntLE(1)
         .writeBytes(
-          new BinaryWriter()
-            .writeUInt8(StackItemType.ByteArray)
-            .writeVarBytesLE(Buffer.from('key', 'utf8'))
-            .toBuffer(),
+          new BinaryWriter().writeUInt8(StackItemType.ByteArray).writeVarBytesLE(Buffer.from('key', 'utf8')).toBuffer(),
         )
         .writeBytes(
           new BinaryWriter()

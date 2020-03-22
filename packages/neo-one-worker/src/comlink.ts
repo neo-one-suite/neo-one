@@ -180,7 +180,7 @@ export function expose(rootObj: Exposable, endpoint: Endpoint | Window): void {
     throw Error('endpoint does not have all of addEventListener, removeEventListener and postMessage defined');
 
   activateEndpoint(endpoint);
-  attachMessageHandler(endpoint, async function(event: MessageEvent) {
+  attachMessageHandler(endpoint, async function (event: MessageEvent) {
     if (!event.data.id || !event.data.callPath) return;
     let iresult;
     const irequest = event.data as InvocationRequest;
@@ -363,7 +363,7 @@ function pingPongMessage(endpoint: Endpoint, msg: Object, transferables: Transfe
   });
 }
 
-function cbProxy(cb: CBProxyCallback, callPath: PropertyKey[] = [], target = function() {}): Proxy {
+function cbProxy(cb: CBProxyCallback, callPath: PropertyKey[] = [], target = function () {}): Proxy {
   return new Proxy(target, {
     construct(_target, argumentsList, proxy) {
       return cb({

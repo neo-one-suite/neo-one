@@ -448,10 +448,7 @@ const OPCODES = ([
         args: [new BN(5), new BN(7)],
         result: [new IntegerStackItem(new BN(5)), new IntegerStackItem(new BN(12))],
         // CALL_I ADD RET ADD RET
-        gas: FEES.ONE.add(FEES.ONE)
-          .add(FEES.ONE)
-          .add(FEES.ONE)
-          .add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE).add(FEES.ONE).add(FEES.ONE).add(FEES.ONE),
       },
 
       {
@@ -463,10 +460,7 @@ const OPCODES = ([
         args: [new BN(5), new BN(7)],
         result: [new IntegerStackItem(new BN(5))],
         // CALL_I ADD RET ADD RET
-        gas: FEES.ONE.add(FEES.ONE)
-          .add(FEES.ONE)
-          .add(FEES.ONE)
-          .add(FEES.ONE),
+        gas: FEES.ONE.add(FEES.ONE).add(FEES.ONE).add(FEES.ONE).add(FEES.ONE),
       },
 
       // RET is tested above

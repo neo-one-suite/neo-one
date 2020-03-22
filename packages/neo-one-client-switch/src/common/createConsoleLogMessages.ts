@@ -57,10 +57,7 @@ const inspect = (value: any, wrapString = false): any => {
 
 // tslint:disable-next-line no-any
 const extractValueFromStackItem = (stackItem: StackItem): any => {
-  const type = stackItem
-    .asArray()[0]
-    .asBigIntegerUnsafe()
-    .toNumber();
+  const type = stackItem.asArray()[0].asBigIntegerUnsafe().toNumber();
 
   switch (type) {
     case 1:
@@ -75,35 +72,18 @@ const extractValueFromStackItem = (stackItem: StackItem): any => {
     case 5:
       return `Symbol(${stackItem.asArray()[1].asString()})`;
     case 6:
-      return stackItem
-        .asArray()[1]
-        .asBigIntegerUnsafe()
-        .toString(10);
+      return stackItem.asArray()[1].asBigIntegerUnsafe().toString(10);
     case 7:
       return _.fromPairs(
         utils.zip(
-          stackItem
-            .asArray()[1]
-            .asArray()[0]
-            .asArray()
-            .map(extractValueFromStackItem),
-          stackItem
-            .asArray()[1]
-            .asArray()[1]
-            .asArray()
-            .map(extractValueFromStackItem),
+          stackItem.asArray()[1].asArray()[0].asArray().map(extractValueFromStackItem),
+          stackItem.asArray()[1].asArray()[1].asArray().map(extractValueFromStackItem),
         ),
       );
     case 8:
-      return stackItem
-        .asArray()[1]
-        .asArray()
-        .map(extractValueFromStackItem);
+      return stackItem.asArray()[1].asArray().map(extractValueFromStackItem);
     case 9:
-      return stackItem
-        .asArray()[1]
-        .asBuffer()
-        .toString('hex');
+      return stackItem.asArray()[1].asBuffer().toString('hex');
     case 10:
       // tslint:disable-next-line no-any
       return new Map<any, any>(
@@ -114,12 +94,7 @@ const extractValueFromStackItem = (stackItem: StackItem): any => {
           .map<any>((value) => value.asArray().map(extractValueFromStackItem)),
       );
     case 11:
-      return new Set(
-        stackItem
-          .asArray()[1]
-          .asArray()
-          .map(extractValueFromStackItem),
-      );
+      return new Set(stackItem.asArray()[1].asArray().map(extractValueFromStackItem));
     default:
       return `<unknown type ${type}>`;
   }
@@ -132,9 +107,7 @@ const extractMessageFromStackItem = (stackItem: StackItem): string => {
 };
 
 const extractMessage = (value: Buffer): string => {
-  const stackItems = deserializeStackItem(value)
-    .asArray()[1]
-    .asArray();
+  const stackItems = deserializeStackItem(value).asArray()[1].asArray();
 
   const messages = stackItems.map(extractMessageFromStackItem);
 

@@ -135,10 +135,7 @@ describe('LocalKeyStore', () => {
   });
 
   test('getWallet$', async () => {
-    const result = await keystore
-      .getWallet$(lockedWallet.userAccount.id)
-      .pipe(take(1))
-      .toPromise();
+    const result = await keystore.getWallet$(lockedWallet.userAccount.id).pipe(take(1)).toPromise();
 
     expect(result).toEqual(lockedWallet);
   });

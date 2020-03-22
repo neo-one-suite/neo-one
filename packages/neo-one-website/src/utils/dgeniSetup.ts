@@ -27,7 +27,7 @@ const docFiles: readonly string[] = [
 // Configuration of the typescript processor
 (typescript as any)
   // Configure additional jsdoc style tags to be recognized by the processor
-  .config(function(parseTagsProcessor: any) {
+  .config(function (parseTagsProcessor: any) {
     const tagDefs = parseTagsProcessor.tagDefinitions;
     // Register '@example' tags with the processor. Multiple instances allowed.
     tagDefs.push({ name: 'example', multi: true });
@@ -37,7 +37,7 @@ const docFiles: readonly string[] = [
     tagDefs.push({ name: 'internal' });
   })
   // Configure output paths for additional doc types
-  .config(function(computeIdsProcessor: any, computePathsProcessor: any) {
+  .config(function (computeIdsProcessor: any, computePathsProcessor: any) {
     // Configure ID for "getters". Must be manually configured to avoid potential conflict with a property.
     computeIdsProcessor.idTemplates.push({
       docTypes: ['get-accessor-info'],
@@ -75,7 +75,12 @@ export const dgeniSetup = new Package('neo-one-docs', [
   // Register our custom processor for our specific use case.
   .processor(textProcessor)
   // Configure subprocessors from typescript and nunjucks
-  .config(function(readFilesProcessor: any, readTypeScriptModules: any, templateFinder: any, writeFilesProcessor: any) {
+  .config(function (
+    readFilesProcessor: any,
+    readTypeScriptModules: any,
+    templateFinder: any,
+    writeFilesProcessor: any,
+  ) {
     // Register basePath used for resolving paths to typescript files to parse.
     readTypeScriptModules.basePath = path.resolve(__dirname, '../../..');
     // Register basePath used for resolving paths to javascript files to parse. Unused in our case, but needs to exist.

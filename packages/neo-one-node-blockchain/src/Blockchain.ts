@@ -813,10 +813,7 @@ export class Blockchain {
       .toPromise()
       .then((values) => values.map((value) => value.input));
   private readonly getUnspent = async (hash: UInt160): Promise<readonly Input[]> => {
-    const unspent = await this.accountUnspent
-      .getAll$({ hash })
-      .pipe(toArray())
-      .toPromise();
+    const unspent = await this.accountUnspent.getAll$({ hash }).pipe(toArray()).toPromise();
 
     return unspent.map((value) => value.input);
   };

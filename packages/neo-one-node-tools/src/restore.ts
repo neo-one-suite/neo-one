@@ -42,10 +42,7 @@ const getLocalMTime = async (path: string) => {
 const getCloudMTime = async (bucket: string, folder: string) => {
   const storage = new Storage();
 
-  const [metadata] = await storage
-    .bucket(bucket)
-    .file(nodePath.join(folder, 'LOG'))
-    .getMetadata();
+  const [metadata] = await storage.bucket(bucket).file(nodePath.join(folder, 'LOG')).getMetadata();
 
   return new Date(metadata.updated);
 };

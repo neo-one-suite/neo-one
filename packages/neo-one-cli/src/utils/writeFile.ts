@@ -9,9 +9,7 @@ export const writeFile = async (filePath: string, contents?: string) => {
   }
 
   const exists = await fs.pathExists(filePath);
-  const hash = createHash('md5')
-    .update(contents)
-    .digest('hex');
+  const hash = createHash('md5').update(contents).digest('hex');
   if (exists) {
     const currentContents = await fs.readFile(filePath, 'utf8');
     const match = hashRegex.exec(currentContents);

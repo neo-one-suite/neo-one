@@ -1,12 +1,6 @@
 // tslint:disable
 
-const slugify = (s: any) =>
-  encodeURIComponent(
-    String(s)
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, '-'),
-  );
+const slugify = (s: any) => encodeURIComponent(String(s).trim().toLowerCase().replace(/\s+/g, '-'));
 const defaults = {
   includeLevel: [1, 2],
   containerClass: 'table-of-contents',
@@ -49,7 +43,7 @@ export const markdownTOC = (md: any, o: any) => {
     match = tocRegexp.exec(state.src.substr(state.pos));
     match = !match
       ? []
-      : match.filter(function(m: any) {
+      : match.filter(function (m: any) {
           return m;
         });
     if (match.length < 1) {
@@ -76,7 +70,7 @@ export const markdownTOC = (md: any, o: any) => {
     return true;
   }
 
-  md.renderer.rules[open] = function() {
+  md.renderer.rules[open] = function () {
     var tocOpenHtml = `<div class="${options.containerClass}">`;
 
     if (options.containerHeaderHtml) {
@@ -86,7 +80,7 @@ export const markdownTOC = (md: any, o: any) => {
     return tocOpenHtml;
   };
 
-  md.renderer.rules[close] = function() {
+  md.renderer.rules[close] = function () {
     var tocFooterHtml = '';
 
     if (options.containerFooterHtml) {
@@ -96,7 +90,7 @@ export const markdownTOC = (md: any, o: any) => {
     return tocFooterHtml + `</div>`;
   };
 
-  md.renderer.rules[body] = function() {
+  md.renderer.rules[body] = function () {
     if (options.forceFullToc) {
       /*
 
@@ -186,7 +180,7 @@ export const markdownTOC = (md: any, o: any) => {
   }
 
   // Catch all the tokens for iteration later
-  md.core.ruler.push('grab_state', function(state: any) {
+  md.core.ruler.push('grab_state', function (state: any) {
     if (gstate === undefined) {
       gstate = state;
     }

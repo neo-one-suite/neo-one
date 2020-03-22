@@ -3,7 +3,7 @@ import * as bar from './bar';
 import baz from './baz';
 import { foo } from './foo';
 import { Address, foo as foo2, Foo2SmartContract, SmartContract } from './foo2';
-import type { MyType } from './onlyTypes'
+import type { MyType } from './onlyTypes';
 import incrementValue, { value } from './qux';
 import { FooType } from './type';
 
