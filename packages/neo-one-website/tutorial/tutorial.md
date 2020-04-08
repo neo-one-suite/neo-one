@@ -83,7 +83,7 @@ npm install @neo-one/cli @neo-one/client @neo-one/smart-contract @neo-one/smart-
 
 4. Run `yarn neo-one init` or `npx neo-one init`
 
-This command initializes a NEO•ONE project with a `Hello World` smart contract under `neo-one/contracts/HellowWorld.ts`, a unit test under `src/__tests__/HelloWorld.test.ts`, and a config file,`.neo-one.config.ts`. For this tutorial, we will be building a `Token` from the ground up, so you can go ahead and delete the two `HelloWorld` files. We also recommend taking a moment to [setup your editor](/docs/environment-setup#Editor-Setup) to take advantage of inline NEO•ONE compiler diagnostics.
+This command initializes a NEO•ONE project with a `Hello World` smart contract under `neo-one/contracts/HelloWorld.ts`, a unit test under `src/__tests__/HelloWorld.test.ts`, and a config file,`.neo-one.config.ts`. For this tutorial, we will be building a `Token` from the ground up, so you can go ahead and delete the two `HelloWorld` files. We also recommend taking a moment to [setup your editor](/docs/environment-setup#Editor-Setup) to take advantage of inline NEO•ONE compiler diagnostics.
 
 5. Review the available [configuration options](/docs/config-options) and update your `.neo-one.config.ts` file as needed.
 
