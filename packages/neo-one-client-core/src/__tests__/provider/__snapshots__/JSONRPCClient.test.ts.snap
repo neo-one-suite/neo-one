@@ -129,6 +129,19 @@ Array [
 ]
 `;
 
+exports[`JSONRPCClient getClaimable 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getclaimable",
+      "params": Array [
+        "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
+      ],
+    },
+  ],
+]
+`;
+
 exports[`JSONRPCClient getConnectedPeers 1`] = `
 Array [
   Array [
@@ -223,6 +236,19 @@ Array [
 ]
 `;
 
+exports[`JSONRPCClient getTransactionHeight 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "gettransactionheight",
+      "params": Array [
+        "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
+      ],
+    },
+  ],
+]
+`;
+
 exports[`JSONRPCClient getTransactionReceipt 1`] = `
 Array [
   Array [
@@ -259,6 +285,19 @@ Array [
       "params": Array [
         "0xb50034d97ba8c836758de1124b6c77d38bc772abc9a8f22c85e7389014e75234",
         2,
+      ],
+    },
+  ],
+]
+`;
+
+exports[`JSONRPCClient getUnspents 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "getunspents",
+      "params": Array [
+        "ALq7AWrhAueN6mJNqk6FHJjnsEoPRytLdW",
       ],
     },
   ],
@@ -319,6 +358,19 @@ Array [
   Array [
     Object {
       "method": "runconsensusnow",
+    },
+  ],
+]
+`;
+
+exports[`JSONRPCClient sendRawTransaction 1`] = `
+Array [
+  Array [
+    Object {
+      "method": "sendrawtransaction",
+      "params": Array [
+        "b500",
+      ],
     },
   ],
 ]

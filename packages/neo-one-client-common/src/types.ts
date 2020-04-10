@@ -1117,6 +1117,11 @@ export interface TransactionOptions {
    * A `systemFee` of `-1`, i.e. `new BigNumber(-1)` indicates no limit on the fee. This is typically used only during development.
    */
   systemFee?: BigNumber;
+  /**
+   * boolean which determines whether or not to skip the sysFee check before submitting an invocation transaction.  Used for working with contracts where the sysFee is known to be less
+   * than the 10 free GAS.  e.g. nep5
+   */
+  skipSysFeeCheck?: boolean;
   // tslint:enable readonly-keyword
 }
 

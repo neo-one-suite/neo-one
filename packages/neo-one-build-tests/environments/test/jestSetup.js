@@ -11,6 +11,8 @@ jest.setTimeout(120 * 1000);
 const tempConsole = global.console;
 global.console = {
   log: jest.fn(),
+  // uncomment to allow console.log in tests
+  // log: console.log,
   error: console.error,
   warn: console.warn,
   info: jest.fn(),

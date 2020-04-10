@@ -154,8 +154,15 @@ export const InvalidMasterPathError = makeErrorWithCode(
   'INVALID_HD_MASTER_PATH',
   (path: readonly number[]) => `Invalid masterPath returned by HDStore: ${path}`,
 );
-
 export const NotImplementedError = makeErrorWithCode(
   'NOT_IMPLEMENTED',
   (name: string) => `${name} not implemented for this provider.`,
+);
+export const NeoNotImplementedError = makeErrorWithCode(
+  'NEO_NOT_IMPLEMENTED',
+  (name: string) => `${name} not implemented for the NEODataProvider. Use a NEOONEDataProvider to use this method.`,
+);
+export const UnknownTransactionError = makeErrorWithCode(
+  'UNKNOWN_TRANSACTION',
+  (transaction: string) => `Unknown transaction: ${transaction}`,
 );

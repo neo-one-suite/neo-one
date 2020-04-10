@@ -4,18 +4,18 @@ import { AsyncIterableX } from '@reactivex/ix-es2015-cjs/asynciterable';
 import BigNumber from 'bignumber.js';
 import { take } from 'rxjs/operators';
 import { data, factory, keys } from '../../__data__';
-import { NEOONEDataProvider, NEOONEProvider } from '../../provider';
+import { NEODataProvider, NEOProvider } from '../../provider';
 
-jest.mock('../../provider/NEOONEDataProvider');
+jest.mock('../../provider/NEODataProvider');
 
 describe('NEOONEProvider', () => {
   const network = 'main';
   const rpcURL = 'https://neotracker.io/rpc';
 
-  let provider: NEOONEProvider;
-  let dataProvider: Modifiable<NEOONEDataProvider>;
+  let provider: NEOProvider;
+  let dataProvider: Modifiable<NEODataProvider>;
   beforeEach(() => {
-    provider = new NEOONEProvider([{ network, rpcURL }]);
+    provider = new NEOProvider([{ network, rpcURL }]);
     // tslint:disable-next-line no-any
     dataProvider = (provider as any).mutableProviders[network];
   });
@@ -27,7 +27,7 @@ describe('NEOONEProvider', () => {
   });
 
   test('networks$ - no networks', async () => {
-    const prov = new NEOONEProvider();
+    const prov = new NEOProvider();
 
     const result = await prov.networks$.pipe(take(1)).toPromise();
 
@@ -41,7 +41,7 @@ describe('NEOONEProvider', () => {
   });
 
   test('getNetworks - no networks', () => {
-    const prov = new NEOONEProvider();
+    const prov = new NEOProvider();
 
     const result = prov.getNetworks();
 
@@ -87,13 +87,17 @@ describe('NEOONEProvider', () => {
     // tslint:disable-next-line:no-any
     dataProvider.relayTransaction = jest.fn((async () => Promise.resolve(expected)) as any);
 
-    const result = await provider.relayTransaction(network, factory.createInvocationTransactionModel());
+    const result = await provider.relayTransaction(
+      network,
+      factory.createInvocationTransactionModel(),
+      new BigNumber(0.01),
+    );
 
     expect(result).toBe(expected);
   });
 
   test('getTransactionReceipt', async () => {
-    const expected = factory.createTransactionReceipt();
+    const expected = factory.createTransactionReceipt({ globalIndex: new BigNumber(-1) });
     dataProvider.getTransactionReceipt = jest.fn(async () => Promise.resolve(expected));
 
     const result = await provider.getTransactionReceipt(network, data.hash256s.a);
@@ -102,16 +106,17 @@ describe('NEOONEProvider', () => {
   });
 
   test('getInvocationData', async () => {
-    const expected = factory.createRawInvocationData();
-    dataProvider.getInvocationData = jest.fn(async () => Promise.resolve(expected));
+    dataProvider.getInvocationData = jest.fn(async () => {
+      throw new Error('Not Implemented.');
+    });
 
-    const result = await provider.getInvocationData(network, data.hash256s.a);
+    const result = provider.getInvocationData(network, data.hash256s.a);
 
-    expect(result).toBe(expected);
+    await expect(result).rejects.toThrowError('Not Implemented');
   });
 
   test('testInvoke', async () => {
-    const expected = factory.createRawCallReceipt();
+    const expected = factory.createRawCallReceipt({ actions: [] });
     dataProvider.testInvoke = jest.fn(async () => Promise.resolve(expected));
 
     const result = await provider.testInvoke(network, factory.createInvocationTransactionModel());
@@ -120,21 +125,23 @@ describe('NEOONEProvider', () => {
   });
 
   test('getClaimAmount', async () => {
-    const expected = new BigNumber('1');
-    dataProvider.getClaimAmount = jest.fn(async () => Promise.resolve(expected));
+    dataProvider.getClaimAmount = jest.fn(async () => {
+      throw new Error('Not Implemented.');
+    });
 
-    const result = await provider.getClaimAmount(network, factory.createInput());
+    const result = provider.getClaimAmount(network, factory.createInput());
 
-    expect(result).toBe(expected);
+    await expect(result).rejects.toThrowError('Not Implemented');
   });
 
   test('getNetworkSettings', async () => {
-    const expected = factory.createNetworkSettings();
-    dataProvider.getNetworkSettings = jest.fn(async () => Promise.resolve(expected));
+    dataProvider.getNetworkSettings = jest.fn(async () => {
+      throw new Error('Not Implemented.');
+    });
 
-    const result = await provider.getNetworkSettings(network);
+    const result = provider.getNetworkSettings(network);
 
-    expect(result).toBe(expected);
+    await expect(result).rejects.toThrowError('Not Implemented');
   });
 
   test('getAccount', async () => {
@@ -156,12 +163,13 @@ describe('NEOONEProvider', () => {
   });
 
   test('iterActionsRaw', async () => {
-    const expected = AsyncIterableX.from([factory.createRawLog()]);
-    dataProvider.iterActionsRaw = jest.fn(() => expected);
+    dataProvider.iterActionsRaw = jest.fn(() => {
+      throw new Error('Not Implemented.');
+    });
 
-    const result = provider.iterActionsRaw(network);
+    const result = () => provider.iterActionsRaw(network);
 
-    expect(result).toBe(expected);
+    expect(result).toThrowError('Not Implemented');
   });
 
   test('iterBlocks', async () => {

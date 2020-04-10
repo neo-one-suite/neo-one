@@ -1,57 +1,12 @@
 // tslint:disable no-object-mutation
-import {
-  ActionJSON,
-  AddressString,
-  Asset,
-  AssetJSON,
-  AssetNameJSON,
-  AssetType,
-  AssetTypeJSON,
-  CallReceiptJSON,
-  common,
-  ConfirmedTransaction,
-  Contract,
-  ContractJSON,
-  InvocationResultJSON,
-  Output,
-  OutputJSON,
-  PublicKeyString,
-  RawAction,
-  RawCallReceipt,
-  RawInvocationResult,
-  scriptHashToAddress,
-  StorageItem,
-  StorageItemJSON,
-  Transaction,
-  TransactionJSON,
-  VMState,
-} from '@neo-one/client-common';
+import { common, scriptHashToAddress, StorageItem, StorageItemJSON } from '@neo-one/client-common';
 import { Modifiable } from '@neo-one/utils';
 import { toArray } from '@reactivex/ix-es2015-cjs/asynciterable/toarray';
-import BigNumber from 'bignumber.js';
-import { data, factory, keys } from '../../__data__';
+import { data, factory, keys, verifyDataProvider as verify } from '../../__data__';
 import { Hash256 } from '../../Hash256';
 import { convertAction, JSONRPCClient, JSONRPCHTTPProvider, NEOONEDataProvider } from '../../provider';
 
 jest.mock('../../provider/JSONRPCClient');
-
-interface AssetBase {
-  readonly type: AssetType;
-  readonly name: string;
-  readonly amount: BigNumber;
-  readonly precision: number;
-  readonly owner: PublicKeyString;
-  readonly admin: AddressString;
-}
-
-interface AssetBaseJSON {
-  readonly type: AssetTypeJSON;
-  readonly name: AssetNameJSON;
-  readonly amount: string;
-  readonly precision: number;
-  readonly owner: string;
-  readonly admin: string;
-}
 
 describe('NEOONEDataProvider', () => {
   const network = 'local';
@@ -64,209 +19,6 @@ describe('NEOONEDataProvider', () => {
     // tslint:disable-next-line no-any
     client = (provider as any).mutableClient;
   });
-
-  const verifyInvocationResultSuccess = (
-    invocationResult: RawInvocationResult,
-    invocationResultJSON: InvocationResultJSON,
-  ) => {
-    if (invocationResult.state !== 'HALT' || invocationResultJSON.state !== VMState.Halt) {
-      throw new Error('For TS');
-    }
-    expect(invocationResult.gasConsumed.toString(10)).toEqual(invocationResultJSON.gas_consumed);
-    expect(invocationResult.gasCost.toString(10)).toEqual(invocationResultJSON.gas_cost);
-    const firstStack = invocationResult.stack[0];
-    const firstStackJSON = invocationResultJSON.stack[0];
-    if (firstStack.type !== 'Integer' || firstStackJSON.type !== 'Integer') {
-      throw new Error('For TS');
-    }
-    expect(firstStack.value.toString(10)).toEqual(firstStackJSON.value);
-  };
-
-  const verifyDefaultActions = (
-    actions: readonly RawAction[],
-    actionsJSON: readonly ActionJSON[],
-    blockIndex: number,
-    blockHash: string,
-    index: number,
-    txid: string,
-  ) => {
-    expect(actions.length).toEqual(actionsJSON.length);
-    const verifyAction = (actionResult: RawAction, action: ActionJSON, idx: number) => {
-      expect(actionResult.type).toEqual(action.type);
-      expect(actionResult.version).toEqual(action.version);
-      expect(actionResult.blockIndex).toEqual(blockIndex);
-      expect(actionResult.blockHash).toEqual(blockHash);
-      expect(actionResult.transactionIndex).toEqual(index);
-      expect(actionResult.transactionHash).toEqual(txid);
-      expect(actionResult.index).toEqual(idx);
-      expect(actionResult.globalIndex.toString(10)).toEqual(action.index);
-      expect(actionResult.address).toEqual(scriptHashToAddress(action.scriptHash));
-    };
-    verifyAction(actions[0], actionsJSON[0], 0);
-    verifyAction(actions[1], actionsJSON[1], 1);
-  };
-
-  const verifyAssetBase = (
-    asset: AssetBase,
-    assetJSON: AssetBaseJSON,
-    toAssetType: string = assetJSON.type,
-    name = assetJSON.name,
-  ) => {
-    expect(asset.type).toEqual(toAssetType);
-    expect(asset.name).toEqual(name);
-    expect(asset.amount.toString(10)).toEqual(assetJSON.amount);
-    expect(asset.precision).toEqual(assetJSON.precision);
-    expect(asset.owner).toEqual(assetJSON.owner);
-    expect(asset.admin).toEqual(assetJSON.admin);
-  };
-
-  const verifyAsset = (
-    asset: Asset,
-    assetJSON: AssetJSON,
-    toAssetType: string = assetJSON.type,
-    name = assetJSON.name,
-  ) => {
-    verifyAssetBase(asset, assetJSON, toAssetType, name);
-    expect(asset.hash).toEqual(assetJSON.id);
-    expect(asset.available.toString(10)).toEqual(assetJSON.available);
-    expect(asset.issuer).toEqual(assetJSON.issuer);
-    expect(asset.expiration).toEqual(assetJSON.expiration);
-    expect(asset.frozen).toEqual(assetJSON.frozen);
-  };
-
-  const verifyContract = (contract: Contract, contractJSON: ContractJSON, returnType = 'Buffer') => {
-    expect(contract.version).toEqual(contractJSON.version);
-    expect(contract.address).toEqual(scriptHashToAddress(contractJSON.hash));
-    expect(contract.script).toEqual(contractJSON.script);
-    expect(contract.parameters).toEqual(['Address', 'Buffer']);
-    expect(contract.returnType).toEqual(returnType);
-    expect(contract.name).toEqual(contractJSON.name);
-    expect(contract.codeVersion).toEqual(contractJSON.code_version);
-    expect(contract.author).toEqual(contractJSON.author);
-    expect(contract.email).toEqual(contractJSON.email);
-    expect(contract.description).toEqual(contractJSON.description);
-    expect(contract.storage).toEqual(contractJSON.properties.storage);
-    expect(contract.dynamicInvoke).toEqual(contractJSON.properties.dynamic_invoke);
-    expect(contract.payable).toEqual(contractJSON.properties.payable);
-  };
-
-  const verifyOutput = (output: Output, outputJSON: OutputJSON) => {
-    expect(output.asset).toEqual(outputJSON.asset);
-    expect(output.value.toString(10)).toEqual(outputJSON.value);
-    expect(output.address).toEqual(outputJSON.address);
-  };
-
-  const verifyTransactionBase = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    expect(transaction.hash).toEqual(transactionJSON.txid);
-    expect(transaction.size).toEqual(transactionJSON.size);
-    expect(transaction.version).toEqual(transactionJSON.version);
-    expect(transaction.attributes.length).toEqual(transactionJSON.attributes.length);
-    expect(transaction.attributes[0].usage).toEqual(transactionJSON.attributes[0].usage);
-    expect(transaction.attributes[0].data).toEqual(scriptHashToAddress(transactionJSON.attributes[0].data));
-    expect(transaction.attributes[1].usage).toEqual(transactionJSON.attributes[1].usage);
-    expect(transaction.attributes[1].data).toEqual(transactionJSON.attributes[1].data);
-    expect(transaction.attributes[2].usage).toEqual(transactionJSON.attributes[2].usage);
-    expect(transaction.attributes[2].data).toEqual(transactionJSON.attributes[2].data);
-    expect(transaction.attributes[3].usage).toEqual(transactionJSON.attributes[3].usage);
-    expect(transaction.attributes[3].data).toEqual(transactionJSON.attributes[3].data);
-    expect(transaction.inputs.length).toEqual(transactionJSON.vin.length);
-    expect(transaction.inputs[0].hash).toEqual(transactionJSON.vin[0].txid);
-    expect(transaction.inputs[0].index).toEqual(transactionJSON.vin[0].vout);
-    expect(transaction.outputs.length).toEqual(transactionJSON.vout.length);
-    verifyOutput(transaction.outputs[0], transactionJSON.vout[0]);
-    expect(transaction.scripts).toEqual(transactionJSON.scripts);
-    expect(transaction.systemFee.toString(10)).toEqual(transactionJSON.sys_fee);
-    expect(transaction.networkFee.toString(10)).toEqual(transactionJSON.net_fee);
-  };
-
-  const verifyClaimTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    if (transaction.type !== 'ClaimTransaction' || transactionJSON.type !== 'ClaimTransaction') {
-      throw new Error('For TS');
-    }
-    expect(transaction.claims.length).toEqual(transactionJSON.claims.length);
-    expect(transaction.claims[0].hash).toEqual(transactionJSON.claims[0].txid);
-    expect(transaction.claims[0].index).toEqual(transactionJSON.claims[0].vout);
-  };
-
-  const verifyContractTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    expect(transaction.type).toEqual('ContractTransaction');
-  };
-
-  const verifyEnrollmentTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    if (transaction.type !== 'EnrollmentTransaction' || transactionJSON.type !== 'EnrollmentTransaction') {
-      throw new Error('For TS');
-    }
-    expect(transaction.publicKey).toEqual(transactionJSON.pubkey);
-  };
-
-  const verifyInvocationTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    if (transaction.type !== 'InvocationTransaction' || transactionJSON.type !== 'InvocationTransaction') {
-      throw new Error('For TS');
-    }
-    expect(transaction.script).toEqual(transactionJSON.script);
-    expect(transaction.gas.toString(10)).toEqual(transactionJSON.gas);
-  };
-
-  const verifyIssueTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    expect(transaction.type).toEqual('IssueTransaction');
-  };
-
-  const verifyMinerTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    if (transaction.type !== 'MinerTransaction' || transactionJSON.type !== 'MinerTransaction') {
-      throw new Error('For TS');
-    }
-    expect(transaction.nonce).toEqual(transactionJSON.nonce);
-  };
-
-  const verifyPublishTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    if (transaction.type !== 'PublishTransaction' || transactionJSON.type !== 'PublishTransaction') {
-      throw new Error('For TS');
-    }
-    verifyContract(transaction.contract, transactionJSON.contract);
-  };
-
-  const verifyRegisterTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    if (transaction.type !== 'RegisterTransaction' || transactionJSON.type !== 'RegisterTransaction') {
-      throw new Error('For TS');
-    }
-    verifyAssetBase(transaction.asset, transactionJSON.asset);
-  };
-
-  const verifyStateTransaction = (transaction: Transaction, transactionJSON: TransactionJSON) => {
-    verifyTransactionBase(transaction, transactionJSON);
-    expect(transaction.type).toEqual('StateTransaction');
-  };
-
-  const verifyConfirmedTransaction = (transaction: ConfirmedTransaction, transactionJSON: TransactionJSON) => {
-    if (transactionJSON.data === undefined) {
-      throw new Error('For TS');
-    }
-
-    expect(transaction.receipt.blockHash).toEqual(transactionJSON.data.blockHash);
-    expect(transaction.receipt.blockIndex).toEqual(transactionJSON.data.blockIndex);
-    expect(transaction.receipt.transactionIndex).toEqual(transactionJSON.data.transactionIndex);
-    expect(transaction.receipt.globalIndex.toString(10)).toEqual(transactionJSON.data.globalIndex);
-  };
-
-  const verifyCallReceipt = (receipt: RawCallReceipt, receiptJSON: CallReceiptJSON) => {
-    verifyInvocationResultSuccess(receipt.result, receiptJSON.result);
-    verifyDefaultActions(
-      receipt.actions,
-      receiptJSON.actions,
-      0,
-      '0x​​​​​0000000000000000000000000000000000000000000000000000000000000000​​​​​',
-      0,
-      '0x​​​​​0000000000000000000000000000000000000000000000000000000000000000​​​​​',
-    );
-  };
 
   test('setRPCURL', () => {
     const currentClient = client;
@@ -317,9 +69,9 @@ describe('NEOONEDataProvider', () => {
       }),
     );
 
-    const result = await provider.relayTransaction(data.serializedTransaction.valid);
+    const result = await provider.relayTransaction(factory.createInvocationTransactionModel());
 
-    verifyInvocationTransaction(result.transaction, transactionJSON);
+    verify.verifyInvocationTransaction(result.transaction, transactionJSON);
   });
 
   test('verifyConvertTransaction', async () => {
@@ -341,7 +93,7 @@ describe('NEOONEDataProvider', () => {
       }),
     );
 
-    const result = await provider.relayTransaction(data.serializedTransaction.valid);
+    const result = await provider.relayTransaction(factory.createInvocationTransactionModel());
 
     if (result.verifyResult === undefined) {
       throw new Error('for TS');
@@ -382,7 +134,7 @@ describe('NEOONEDataProvider', () => {
 
     const result = await provider.getInvocationData(data.hash256s.a);
 
-    verifyDefaultActions(
+    verify.verifyDefaultActions(
       result.actions,
       invocationData.actions,
       transactionData.blockIndex,
@@ -416,10 +168,10 @@ describe('NEOONEDataProvider', () => {
     if (asset === undefined || assetJSON === undefined) {
       throw new Error('For TS');
     }
-    verifyAsset(asset, assetJSON);
+    verify.verifyAsset(asset, assetJSON);
 
     expect(result.contracts.length).toEqual(invocationData.contracts.length);
-    verifyContract(result.contracts[0], invocationData.contracts[0]);
+    verify.verifyContract(result.contracts[0], invocationData.contracts[0]);
 
     expect(result.deletedContractAddresses.length).toEqual(invocationData.deletedContractHashes.length);
     expect(result.deletedContractAddresses[0]).toEqual(scriptHashToAddress(invocationData.deletedContractHashes[0]));
@@ -431,7 +183,7 @@ describe('NEOONEDataProvider', () => {
       scriptHashToAddress(invocationData.migratedContractHashes[0][1]),
     );
 
-    verifyInvocationResultSuccess(result.result, invocationData.result);
+    verify.verifyInvocationResultSuccess(result.result, invocationData.result);
   });
 
   test('getInvocationData - missing transaction data', async () => {
@@ -449,9 +201,9 @@ describe('NEOONEDataProvider', () => {
     const callReceiptJSON = factory.createCallReceiptJSON();
     client.testInvocation = jest.fn(async () => Promise.resolve(callReceiptJSON));
 
-    const result = await provider.testInvoke(data.serializedTransaction.valid);
+    const result = await provider.testInvoke(factory.createInvocationTransactionModel());
 
-    verifyCallReceipt(result, callReceiptJSON);
+    verify.verifyCallReceipt(result, callReceiptJSON);
   });
 
   test('getAccount', async () => {
@@ -482,7 +234,7 @@ describe('NEOONEDataProvider', () => {
       client.getAsset = jest.fn(async () => Promise.resolve(assetJSON));
 
       const result = await provider.getAsset(data.hash256s.a);
-      verifyAsset(result, assetJSON, to);
+      verify.verifyAsset(result, assetJSON, to);
     });
   });
 
@@ -496,7 +248,7 @@ describe('NEOONEDataProvider', () => {
     client.getAsset = jest.fn(async () => Promise.resolve(assetJSON));
 
     const result = await provider.getAsset(data.hash256s.a);
-    verifyAsset(result, assetJSON, assetJSON.type, 'baz');
+    verify.verifyAsset(result, assetJSON, assetJSON.type, 'baz');
   });
 
   test(`getAsset - otherwise, first name`, async () => {
@@ -509,7 +261,7 @@ describe('NEOONEDataProvider', () => {
     client.getAsset = jest.fn(async () => Promise.resolve(assetJSON));
 
     const result = await provider.getAsset(data.hash256s.a);
-    verifyAsset(result, assetJSON, assetJSON.type, 'bar');
+    verify.verifyAsset(result, assetJSON, assetJSON.type, 'bar');
   });
 
   test('getBlock', async () => {
@@ -529,24 +281,24 @@ describe('NEOONEDataProvider', () => {
     expect(result.script).toEqual(blockJSON.script);
     expect(result.size).toEqual(blockJSON.size);
     expect(result.transactions.length).toEqual(blockJSON.tx.length);
-    verifyMinerTransaction(result.transactions[0], blockJSON.tx[0]);
-    verifyConfirmedTransaction(result.transactions[0], blockJSON.tx[0]);
-    verifyClaimTransaction(result.transactions[1], blockJSON.tx[1]);
-    verifyConfirmedTransaction(result.transactions[1], blockJSON.tx[1]);
-    verifyContractTransaction(result.transactions[2], blockJSON.tx[2]);
-    verifyConfirmedTransaction(result.transactions[2], blockJSON.tx[2]);
-    verifyEnrollmentTransaction(result.transactions[3], blockJSON.tx[3]);
-    verifyConfirmedTransaction(result.transactions[3], blockJSON.tx[3]);
-    verifyInvocationTransaction(result.transactions[4], blockJSON.tx[4]);
-    verifyConfirmedTransaction(result.transactions[4], blockJSON.tx[4]);
-    verifyIssueTransaction(result.transactions[5], blockJSON.tx[5]);
-    verifyConfirmedTransaction(result.transactions[5], blockJSON.tx[5]);
-    verifyPublishTransaction(result.transactions[6], blockJSON.tx[6]);
-    verifyConfirmedTransaction(result.transactions[6], blockJSON.tx[6]);
-    verifyRegisterTransaction(result.transactions[7], blockJSON.tx[7]);
-    verifyConfirmedTransaction(result.transactions[7], blockJSON.tx[7]);
-    verifyStateTransaction(result.transactions[8], blockJSON.tx[8]);
-    verifyConfirmedTransaction(result.transactions[8], blockJSON.tx[8]);
+    verify.verifyMinerTransaction(result.transactions[0], blockJSON.tx[0]);
+    verify.verifyConfirmedTransaction(result.transactions[0], blockJSON.tx[0]);
+    verify.verifyClaimTransaction(result.transactions[1], blockJSON.tx[1]);
+    verify.verifyConfirmedTransaction(result.transactions[1], blockJSON.tx[1]);
+    verify.verifyContractTransaction(result.transactions[2], blockJSON.tx[2]);
+    verify.verifyConfirmedTransaction(result.transactions[2], blockJSON.tx[2]);
+    verify.verifyEnrollmentTransaction(result.transactions[3], blockJSON.tx[3]);
+    verify.verifyConfirmedTransaction(result.transactions[3], blockJSON.tx[3]);
+    verify.verifyInvocationTransaction(result.transactions[4], blockJSON.tx[4]);
+    verify.verifyConfirmedTransaction(result.transactions[4], blockJSON.tx[4]);
+    verify.verifyIssueTransaction(result.transactions[5], blockJSON.tx[5]);
+    verify.verifyConfirmedTransaction(result.transactions[5], blockJSON.tx[5]);
+    verify.verifyPublishTransaction(result.transactions[6], blockJSON.tx[6]);
+    verify.verifyConfirmedTransaction(result.transactions[6], blockJSON.tx[6]);
+    verify.verifyRegisterTransaction(result.transactions[7], blockJSON.tx[7]);
+    verify.verifyConfirmedTransaction(result.transactions[7], blockJSON.tx[7]);
+    verify.verifyStateTransaction(result.transactions[8], blockJSON.tx[8]);
+    verify.verifyConfirmedTransaction(result.transactions[8], blockJSON.tx[8]);
   });
 
   test('iterBlocks', async () => {
@@ -583,7 +335,7 @@ describe('NEOONEDataProvider', () => {
 
     const result = await provider.getContract(keys[0].address);
 
-    verifyContract(result, contractJSON);
+    verify.verifyContract(result, contractJSON);
   });
 
   const convertedContractParameterTypes = [
@@ -606,7 +358,7 @@ describe('NEOONEDataProvider', () => {
       client.getContract = jest.fn(async () => Promise.resolve(contractJSON));
 
       const result = await provider.getContract(keys[0].address);
-      verifyContract(result, contractJSON, to);
+      verify.verifyContract(result, contractJSON, to);
     });
   });
 
@@ -625,7 +377,7 @@ describe('NEOONEDataProvider', () => {
 
     const result = await provider.getTransaction(transactionJSON.txid);
 
-    verifyInvocationTransaction(result, transactionJSON);
+    verify.verifyInvocationTransaction(result, transactionJSON);
   });
 
   test('getOutput', async () => {
@@ -634,7 +386,7 @@ describe('NEOONEDataProvider', () => {
 
     const result = await provider.getOutput({ hash: data.hash256s.a, index: 0 });
 
-    verifyOutput(result, outputJSON);
+    verify.verifyOutput(result, outputJSON);
   });
 
   test('getConnectedPeers', async () => {
@@ -688,7 +440,7 @@ describe('NEOONEDataProvider', () => {
       throw new Error('For TS');
     }
 
-    verifyDefaultActions(
+    verify.verifyDefaultActions(
       result,
       transactionJSON.invocationData.actions,
       transactionJSON.data.blockIndex,
@@ -704,7 +456,7 @@ describe('NEOONEDataProvider', () => {
 
     const result = await provider.call(keys[0].address, 'foo', []);
 
-    verifyCallReceipt(result, callReceiptJSON);
+    verify.verifyCallReceipt(result, callReceiptJSON);
   });
 
   test('runConsensusNow', async () => {

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/client-core",
+      "comment": "Add NEODataProvider to support C# node.  Add NEOProvider to support NEODataProvider.  Moved common code to DataProviderBase & ProviderBase.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/client-core",
+  "email": "ahfragapane@gmail.com"
+}

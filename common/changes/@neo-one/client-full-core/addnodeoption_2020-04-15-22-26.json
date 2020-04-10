@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/client-full-core",
+      "comment": "Update LocalUserAccountProvider test",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/client-full-core",
+  "email": "ahfragapane@gmail.com"
+}

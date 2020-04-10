@@ -720,6 +720,12 @@ export const assertInvokeSendUnsafeReceiveTransactionOptions = (
     ),
     sendTo: assertProperty(options, 'InvokeSendUnsafeReceiveTransactionOptions', 'sendTo', assertNullableSendTo),
     sendFrom: assertProperty(options, 'InvokeSendUnsafeReceiveTransactionOptions', 'sendFrom', assertNullableSendFrom),
+    skipSysFeeCheck: assertProperty(
+      options,
+      'InvokeSendUnsafeReceiveTransactionOptions',
+      'skipSysFeeCheck',
+      assertNullableBoolean,
+    ),
   };
 };
 

@@ -147,6 +147,16 @@ describe('JSONRPCClient', () => {
     expect(mockRequest.mock.calls).toMatchSnapshot();
   });
 
+  test('sendRawTransaction', async () => {
+    const value = true;
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.sendRawTransaction(data.buffers.a);
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
   test('relayTransaction', async () => {
     const value = factory.createInvocationTransactionJSON();
     mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
@@ -253,6 +263,36 @@ describe('JSONRPCClient', () => {
     mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
 
     const result = await client.getNetworkSettings();
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getClaimable', async () => {
+    const value = factory.createNeoClaimableJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getClaimable(keys[0].address);
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getUnspents', async () => {
+    const value = factory.createNeoUnspentJSON();
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getUnspents(keys[0].address);
+
+    expect(result).toEqual(value);
+    expect(mockRequest.mock.calls).toMatchSnapshot();
+  });
+
+  test('getTransactionHeight', async () => {
+    const value = 5000000;
+    mockRequest.mockImplementationOnce(async () => Promise.resolve(value));
+
+    const result = await client.getTransactionHeight(data.hash256s.a);
 
     expect(result).toEqual(value);
     expect(mockRequest.mock.calls).toMatchSnapshot();
