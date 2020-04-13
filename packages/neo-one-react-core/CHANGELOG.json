@@ -1,0 +1,28 @@
+{
+  "name": "@neo-one/react-core",
+  "entries": [
+    {
+      "version": "2.4.0",
+      "tag": "@neo-one/react-core_v2.4.0",
+      "date": "Mon, 13 Apr 2020 23:20:32 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "update dependencies"
+          },
+          {
+            "comment": "update @types/react to 16.9.14"
+          },
+          {
+            "comment": "Upgrade TS to v3.8.1-rc. Fix types."
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Migrate to Rush"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-full",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "NEO•ONE client extended API.",
   "main": "./lib/index",
   "scripts": {
@@ -11,8 +11,8 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/client": "^2.3.0",
-    "@neo-one/client-full-core": "^2.3.0"
+    "@neo-one/client": "^2.4.0",
+    "@neo-one/client-full-core": "^2.4.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",

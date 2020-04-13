@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-protocol",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "NEO•ONE NEO node and consensus protocol.",
   "main": "./lib/index",
   "scripts": {
@@ -11,12 +11,12 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/client-common": "^2.3.0",
-    "@neo-one/client-switch": "^2.3.0",
-    "@neo-one/logger": "^2.3.0",
-    "@neo-one/node-consensus": "^2.3.0",
-    "@neo-one/node-core": "^2.3.0",
-    "@neo-one/utils": "^2.3.0",
+    "@neo-one/client-common": "^2.4.0",
+    "@neo-one/client-switch": "^2.4.0",
+    "@neo-one/logger": "^2.4.0",
+    "@neo-one/node-consensus": "^2.4.0",
+    "@neo-one/node-core": "^2.4.0",
+    "@neo-one/utils": "^2.4.0",
     "bloem": "^0.2.4",
     "bloom-filter": "^0.2.0",
     "bn.js": "^5.0.0",

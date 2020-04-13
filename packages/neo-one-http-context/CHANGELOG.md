@@ -1,59 +1,11 @@
-# Change Log
+# Change Log - @neo-one/http-context
 
-All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+This log was last generated on Mon, 13 Apr 2020 23:20:32 GMT and should not be manually modified.
 
-# [2.3.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/http-context@1.2.4...@neo-one/http-context@2.3.0) (2019-10-23)
+## 2.4.0
+Mon, 13 Apr 2020 23:20:32 GMT
 
-**Note:** Version bump only for package @neo-one/http-context
+### Minor changes
 
+- Migrate to Rush
 
-
-
-
-## [1.2.4](https://github.com/neo-one-suite/neo-one/compare/@neo-one/http-context@1.2.3...@neo-one/http-context@1.2.4) (2019-10-23)
-
-**Note:** Version bump only for package @neo-one/http-context
-
-
-
-
-
-## [1.2.3](https://github.com/neo-one-suite/neo-one/compare/@neo-one/http-context@1.2.2...@neo-one/http-context@1.2.3) (2019-10-23)
-
-**Note:** Version bump only for package @neo-one/http-context
-
-
-
-
-
-## [1.2.2](https://github.com/neo-one-suite/neo-one/compare/@neo-one/http-context@1.2.1...@neo-one/http-context@1.2.2) (2019-09-04)
-
-**Note:** Version bump only for package @neo-one/http-context
-
-
-
-
-
-## [1.2.1](https://github.com/neo-one-suite/neo-one/compare/@neo-one/http-context@1.2.0...@neo-one/http-context@1.2.1) (2019-08-30)
-
-**Note:** Version bump only for package @neo-one/http-context
-
-
-
-
-
-# [1.2.0](https://github.com/neo-one-suite/neo-one/compare/@neo-one/http-context@1.1.5...@neo-one/http-context@1.2.0) (2019-08-23)
-
-
-### Features
-
-* **e2e:** node-bin e2e consensus test ([0671932](https://github.com/neo-one-suite/neo-one/commit/0671932))
-
-
-
-
-
-## 1.1.5 (2019-08-22)
-
-**Note:** Version bump only for package @neo-one/http-context

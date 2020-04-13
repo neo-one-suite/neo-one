@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-http-rpc",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "NEO•ONE RPC server.",
   "main": "./lib/index",
   "scripts": {
@@ -11,13 +11,13 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/cli-common-node": "^2.4.0",
-    "@neo-one/http": "^2.3.0",
-    "@neo-one/http-context": "^2.3.0",
-    "@neo-one/logger": "^2.3.0",
-    "@neo-one/node-core": "^2.3.0",
-    "@neo-one/node-rpc-handler": "^2.3.0",
-    "@neo-one/utils": "^2.3.0",
+    "@neo-one/cli-common-node": "^2.5.0",
+    "@neo-one/http": "^2.4.0",
+    "@neo-one/http-context": "^2.4.0",
+    "@neo-one/logger": "^2.4.0",
+    "@neo-one/node-core": "^2.4.0",
+    "@neo-one/node-rpc-handler": "^2.4.0",
+    "@neo-one/utils": "^2.4.0",
     "cross-fetch": "^3.0.4",
     "execa": "^3.2.0",
     "koa": "^2.7.0",
