@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/cli",
+      "comment": "add 'compile' command to cli",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/cli",
+  "email": "danwbyrne@gmail.com"
+}
