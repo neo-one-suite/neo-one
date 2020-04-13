@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/cli-common-node",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "NEO•ONE code common to the node cli and other node packages in NEO•ONE.",
   "main": "./lib/index",
   "scripts": {
@@ -11,9 +11,9 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/cli-common": "^2.4.0",
-    "@neo-one/client-core": "^2.3.0",
-    "@neo-one/client-full-core": "^2.3.0",
+    "@neo-one/cli-common": "^2.5.0",
+    "@neo-one/client-core": "^2.4.0",
+    "@neo-one/client-full-core": "^2.4.0",
     "cosmiconfig": "^6.0.0",
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.15",

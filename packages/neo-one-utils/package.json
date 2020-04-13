@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/utils",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "NEO•ONE shared utils.",
   "main": "./lib/index",
   "license": "MIT",

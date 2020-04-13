@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-compiler-node",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "NEO•ONE TypeScript smart contract compiler node host.",
   "main": "./lib/index",
   "scripts": {
@@ -12,9 +12,9 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/smart-contract": "^2.3.0",
-    "@neo-one/smart-contract-lib": "^2.3.1",
-    "@neo-one/utils": "^2.3.0",
+    "@neo-one/smart-contract": "^2.4.0",
+    "@neo-one/smart-contract-lib": "^2.4.0",
+    "@neo-one/utils": "^2.4.0",
     "app-root-dir": "^1.0.2",
     "glob": "^7.1.4",
     "tslib": "^1.10.0",

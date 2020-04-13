@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/react",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "NEO•ONE React utilities.",
   "main": "./lib/index",
   "scripts": {

@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-lib",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "NEO•ONE TypeScript common smart contracts.",
   "main": "./lib/index.ts",
   "smartContract": true,
@@ -10,12 +10,12 @@
     "pack": "gulp pack"
   },
   "dependencies": {
-    "@neo-one/smart-contract": "^2.3.0"
+    "@neo-one/smart-contract": "^2.4.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@neo-one/client-common": "^2.3.0",
-    "@neo-one/client-core": "^2.3.0",
+    "@neo-one/client-common": "^2.4.0",
+    "@neo-one/client-core": "^2.4.0",
     "@types/jest": "^24.0.18",
     "bignumber.js": "^9.0.0",
     "gulp": "~4.0.2",

@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-test",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "NEO•ONE TypeScript smart contract test harness.",
   "main": "./lib/index",
   "scripts": {
@@ -11,21 +11,21 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/client-common": "^2.3.0",
-    "@neo-one/client-core": "^2.3.0",
-    "@neo-one/node": "^2.3.1",
-    "@neo-one/node-neo-settings": "^2.3.0",
-    "@neo-one/smart-contract-compiler-node": "^2.3.0",
-    "@neo-one/smart-contract-test-common": "^2.3.1",
-    "@neo-one/utils": "^2.3.0",
+    "@neo-one/client-common": "^2.4.0",
+    "@neo-one/client-core": "^2.4.0",
+    "@neo-one/node": "^2.4.0",
+    "@neo-one/node-neo-settings": "^2.4.0",
+    "@neo-one/smart-contract-compiler-node": "^2.4.0",
+    "@neo-one/smart-contract-test-common": "^2.4.0",
+    "@neo-one/utils": "^2.4.0",
     "lodash": "^4.17.15",
     "memdown": "^5.0.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@neo-one/smart-contract": "^2.3.0",
-    "@neo-one/smart-contract-lib": "^2.3.1",
+    "@neo-one/smart-contract": "^2.4.0",
+    "@neo-one/smart-contract-lib": "^2.4.0",
     "@types/jest": "^24.0.18",
     "@types/lodash": "^4.14.138",
     "@types/memdown": "^3.0.0",
