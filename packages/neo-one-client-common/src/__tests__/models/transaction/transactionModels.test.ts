@@ -1,8 +1,11 @@
+import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import _ from 'lodash';
+import { data, keys } from '../../../__data__';
 import { BinaryWriter } from '../../../BinaryWriter';
 import { common, UInt256 } from '../../../common';
-import { AttributeModel, WitnessModel } from '../../../models';
+import { addressToScriptHash } from '../../../helpers';
+import { AttributeModel, BufferAttributeModel, UInt160AttributeModel, WitnessModel } from '../../../models';
 import {
   assertTransactionType,
   ClaimTransactionModel,
@@ -37,6 +40,13 @@ const optionsBuilder = ({
 });
 
 const defaultInput = new InputModel({ hash: common.ZERO_UINT256, index: 1 });
+const options = {
+  asset: common.ZERO_UINT256,
+  value: new BN(1),
+  address: common.ZERO_UINT160,
+};
+
+const outputModel = new OutputModel(options);
 
 // tslint:disable-next-line:no-let
 let testWriter: BinaryWriter = new BinaryWriter();
@@ -121,18 +131,55 @@ describe('Invocation Transaction Model', () => {
       new InvocationTransactionModel({ ...optionsBuilder({}), version: badVersion, gas, script });
     expect(versionThrow).toThrowError(`expected version <= 1, found: ${badVersion}`);
   });
+
+  test('getScriptHashesForVerifying', async () => {
+    const model = new InvocationTransactionModel({
+      ...optionsBuilder({
+        inputs: [defaultInput],
+        outputs: [outputModel],
+        attributes: [
+          new UInt160AttributeModel({
+            usage: 0x20,
+            value: common.hexToUInt160(addressToScriptHash(data.attributes.script.data)),
+          }),
+          new BufferAttributeModel({
+            usage: 0x90,
+            value: Buffer.from(data.attributes.description.data, 'hex'),
+          }),
+        ],
+      }),
+      gas,
+      script,
+    });
+    const result = await model.getScriptHashesForVerifying({
+      getOutput: jest.fn(async () =>
+        Promise.resolve({
+          asset: common.uInt256ToHex(options.asset),
+          value: new BigNumber(1),
+          address: keys[0].address,
+        }),
+      ),
+      getAsset: jest.fn(async () =>
+        Promise.resolve({
+          hash: data.hash256s.a,
+          available: new BigNumber(10000),
+          expiration: 6000000,
+          frozen: false,
+          ...data.assetRegisters.duty,
+        }),
+      ),
+    });
+
+    expect(result).toEqual([
+      addressToScriptHash(keys[0].address),
+      common.uInt160ToHex(options.address),
+      addressToScriptHash(data.attributes.script.data),
+    ]);
+  });
 });
 
 describe('Output Model', () => {
   beforeEach(resetWriter);
-
-  const options = {
-    asset: common.ZERO_UINT256,
-    value: new BN(1),
-    address: common.ZERO_UINT160,
-  };
-
-  const outputModel = new OutputModel(options);
 
   test('Serialize Wire Base', () => {
     outputModel.serializeWireBase(testWriter);

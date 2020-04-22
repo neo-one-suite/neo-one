@@ -8,7 +8,7 @@ export const InvalidFormatError = makeErrorWithCode(
   (reason?: string) => `Invalid format${reason === undefined ? '.' : `: ${reason}`}`,
 );
 
-const add0x = (value: string) => `0x${value}`;
+const add0x = (value: string) => (value.startsWith('0x') ? value : `0x${value}`);
 const strip0x = (value: string) => (value.startsWith('0x') ? value.substring(2) : value);
 const reverse = (src: Buffer): Buffer => {
   const mutableOut = Buffer.allocUnsafe(src.length);
@@ -239,6 +239,8 @@ export const common = {
   NEO_ASSET_HASH: '0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b',
   GAS_ASSET_HASH: '0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7',
   uInt160ToBuffer,
+  add0x,
+  strip0x,
   asUInt160,
   uInt160ToHex,
   hexToUInt160,

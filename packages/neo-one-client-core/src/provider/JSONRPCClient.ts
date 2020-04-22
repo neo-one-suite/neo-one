@@ -11,11 +11,13 @@ import {
   Hash256String,
   InputJSON,
   InvocationDataJSON,
-  InvocationResultJSON,
+  NeoClaimableJSON,
+  NeoUnspentJSON,
   NetworkSettingsJSON,
   OutputJSON,
   Peer,
   PrivateNetworkSettings,
+  RawInvocationResultJSON,
   RelayTransactionResultJSON,
   StorageItemJSON,
   TransactionJSON,
@@ -30,6 +32,15 @@ export class JSONRPCClient {
 
   public constructor(provider: JSONRPCProvider | JSONRPCProviderManager) {
     this.provider = provider;
+  }
+
+  public async getClaimable(address: AddressString): Promise<NeoClaimableJSON> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getclaimable',
+        params: [address],
+      }),
+    );
   }
 
   public async getAccount(address: AddressString): Promise<AccountJSON> {
@@ -101,11 +112,23 @@ export class JSONRPCClient {
     );
   }
 
-  public async testInvokeRaw(script: BufferString): Promise<InvocationResultJSON> {
+  public async getUnspents(address: AddressString): Promise<NeoUnspentJSON> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'getunspents',
+        params: [address],
+      }),
+    );
+  }
+
+  public async testInvokeRaw(
+    script: BufferString,
+    verifications: readonly BufferString[] = [],
+  ): Promise<RawInvocationResultJSON> {
     return this.withInstance(async (provider) =>
       provider.request({
         method: 'invokescript',
-        params: [script],
+        params: [script, ...verifications],
       }),
     );
   }
@@ -115,6 +138,24 @@ export class JSONRPCClient {
       provider
         .request({
           method: 'relaytransaction',
+          params: [value],
+        })
+        .catch((error) => {
+          const [message, code]: [string, string] = error.message.split(':');
+          if (error.code === 'JSON_RPC' && code === '-110') {
+            throw new RelayTransactionError(message);
+          }
+
+          throw error;
+        }),
+    );
+  }
+
+  public async sendRawTransaction(value: BufferString): Promise<boolean> {
+    return this.withInstance(async (provider) =>
+      provider
+        .request({
+          method: 'sendrawtransaction',
           params: [value],
         })
         .catch((error) => {
@@ -174,6 +215,15 @@ export class JSONRPCClient {
         method: 'gettransactionreceipt',
         params: [hash],
         watchTimeoutMS: timeoutMS,
+      }),
+    );
+  }
+
+  public async getTransactionHeight(hash: Hash256String): Promise<number> {
+    return this.withInstance(async (provider) =>
+      provider.request({
+        method: 'gettransactionheight',
+        params: [hash],
       }),
     );
   }

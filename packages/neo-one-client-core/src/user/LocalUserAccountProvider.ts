@@ -86,7 +86,11 @@ export interface KeyStore {
 }
 
 export interface Provider extends ProviderBase {
-  readonly relayTransaction: (network: NetworkType, transaction: string) => Promise<RelayTransactionResult>;
+  readonly relayTransaction: (
+    network: NetworkType,
+    transaction: TransactionBaseModel,
+    networkFee?: BigNumber | undefined,
+  ) => Promise<RelayTransactionResult>;
 }
 
 /**
@@ -165,6 +169,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     transaction: transactionUnsignedIn,
     from,
     onConfirm,
+    networkFee,
     sourceMaps,
   }: {
     readonly inputs: readonly InputOutput[];
@@ -174,6 +179,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       readonly transaction: Transaction;
       readonly receipt: TransactionReceipt;
     }) => Promise<T>;
+    readonly networkFee?: BigNumber;
     readonly sourceMaps?: SourceMaps;
   }): Promise<TransactionResult<T, TTransaction>> {
     return this.capture(
@@ -244,9 +250,8 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
             inputOutputs: inputOutputs.concat(claimOutputs),
             address,
             witness,
-          })
-            .serializeWire()
-            .toString('hex'),
+          }),
+          networkFee,
         );
         const failures =
           result.verifyResult === undefined
@@ -375,6 +380,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       transaction,
       inputs,
       onConfirm: async ({ receipt }) => receipt,
+      networkFee,
     });
   }
 
@@ -416,6 +422,7 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       from,
       transaction,
       onConfirm: async ({ receipt }) => receipt,
+      networkFee,
     });
   }
 

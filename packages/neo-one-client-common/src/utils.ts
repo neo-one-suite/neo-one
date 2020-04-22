@@ -79,6 +79,7 @@ export const utils = {
   SIXTEEN: new BN(16),
   ZERO_BIG_NUMBER: new BigNumber(0),
   NEGATIVE_ONE_BIG_NUMBER: new BigNumber(-1),
+  TEN_BIG_NUMBER: new BigNumber(10),
   toSignedBuffer,
   fromSignedBuffer,
   bigNumberToBN,

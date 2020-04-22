@@ -151,7 +151,7 @@ export interface Provider {
     options?: GetOptions,
   ) => Promise<TransactionReceipt>;
   readonly getInvocationData: (network: NetworkType, hash: Hash256String) => Promise<RawInvocationData>;
-  readonly testInvoke: (network: NetworkType, transaction: string) => Promise<RawCallReceipt>;
+  readonly testInvoke: (network: NetworkType, transaction: InvocationTransactionModel) => Promise<RawCallReceipt>;
   readonly call: (
     network: NetworkType,
     contract: AddressString,
@@ -171,6 +171,7 @@ interface TransactionOptionsFull {
   readonly attributes: readonly Attribute[];
   readonly networkFee: BigNumber;
   readonly systemFee: BigNumber;
+  readonly skipSysFeeCheck: boolean;
 }
 
 const NEO_ONE_ATTRIBUTE: Attribute = {
@@ -620,7 +621,12 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
   }
 
   protected getTransactionOptions(options: TransactionOptions = {}): TransactionOptionsFull {
-    const { attributes = [], networkFee = utils.ZERO_BIG_NUMBER, systemFee = utils.ZERO_BIG_NUMBER } = options;
+    const {
+      attributes = [],
+      networkFee = utils.ZERO_BIG_NUMBER,
+      systemFee = utils.ZERO_BIG_NUMBER,
+      skipSysFeeCheck = false,
+    } = options;
 
     const { from: fromIn } = options;
     let from = fromIn;
@@ -637,6 +643,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       attributes: attributes.concat([NEO_ONE_ATTRIBUTE]),
       networkFee,
       systemFee,
+      skipSysFeeCheck,
     };
   }
 
@@ -1251,6 +1258,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     scripts = [],
     sourceMaps,
     reorderOutputs = (outputs) => outputs,
+    skipSysFeeCheck = false,
   }: {
     readonly script: Buffer;
     readonly transfers?: ReadonlyArray<FullTransfer>;
@@ -1263,6 +1271,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     readonly scripts?: ReadonlyArray<WitnessModel>;
     readonly sourceMaps?: SourceMaps;
     readonly reorderOutputs?: (outputs: ReadonlyArray<Output>) => ReadonlyArray<Output>;
+    readonly skipSysFeeCheck?: boolean;
   }): Promise<{
     readonly gas: BigNumber;
     readonly attributes: ReadonlyArray<Attribute>;
@@ -1278,18 +1287,28 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
       data: Buffer.from(`${utils.randomUInt()}`, 'utf8').toString('hex'),
     });
 
+    if (skipSysFeeCheck) {
+      return { gas: utils.ZERO_BIG_NUMBER, attributes };
+    }
+
     const testTransaction = new InvocationTransactionModel({
       version: 1,
       inputs: this.convertInputs(rawInputs.concat(testInputs)),
       outputs: this.convertOutputs(reorderOutputs(rawOutputs.concat(testOutputs))),
-      attributes: this.convertAttributes(attributes),
+      attributes: this.convertAttributes(
+        attributes.concat([
+          {
+            usage: 'Script',
+            data: from.address,
+          },
+        ]),
+      ),
       gas: common.TEN_THOUSAND_FIXED8,
       script,
       scripts,
     });
 
-    const callReceipt = await this.provider.testInvoke(from.network, testTransaction.serializeWire().toString('hex'));
-
+    const callReceipt = await this.provider.testInvoke(from.network, testTransaction);
     if (callReceipt.result.state === 'FAULT') {
       const message = await processActionsAndMessage({
         actions: callReceipt.actions,
@@ -1346,7 +1365,9 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
     sourceMaps,
     reorderOutputs = (outputs) => outputs,
   }: InvokeRawOptions<T>) {
-    const { from, attributes: attributesIn, networkFee, systemFee } = this.getTransactionOptions(options);
+    const { from, attributes: attributesIn, networkFee, systemFee, skipSysFeeCheck } = this.getTransactionOptions(
+      options,
+    );
     const { script, invokeMethodOptions } = this.getScriptAndInvokeMethodOptions(invokeMethodOptionsOrScript);
 
     return this.capture(
@@ -1363,6 +1384,7 @@ export abstract class UserAccountProviderBase<TProvider extends Provider> {
           scripts,
           sourceMaps,
           reorderOutputs,
+          skipSysFeeCheck,
         });
 
         const { inputs, outputs } = await this.getTransfersInputOutputs({

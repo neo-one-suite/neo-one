@@ -734,10 +734,10 @@ describe('LocalUserAccountProvider', () => {
       );
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createContractTransaction();
-      relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
+      relayTransaction.mockImplementation(async (_network, transactionModel) => {
         const coreTransaction = deserializeTransactionWire({
           context,
-          buffer: Buffer.from(transactionSerialized, 'hex'),
+          buffer: transactionModel.serializeWire(),
         });
         expect(coreTransaction.serializeWire().length <= byteLimit).toBeTruthy();
         expect(coreTransaction.inputs.length).toEqual(unspent.length);
@@ -783,10 +783,10 @@ describe('LocalUserAccountProvider', () => {
       );
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createClaimTransaction();
-      relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
+      relayTransaction.mockImplementation(async (_network, transactionModel) => {
         const coreTransaction = deserializeTransactionWire({
           context,
-          buffer: Buffer.from(transactionSerialized, 'hex'),
+          buffer: transactionModel.serializeWire(),
         });
         expect(coreTransaction.serializeWire().length <= byteLimit).toBeTruthy();
         expect(coreTransaction.inputs.length).toEqual(unspent.length);
@@ -829,10 +829,10 @@ describe('LocalUserAccountProvider', () => {
       );
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createContractTransaction();
-      relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
+      relayTransaction.mockImplementation(async (_network, transactionModel) => {
         const coreTransaction = deserializeTransactionWire({
           context,
-          buffer: Buffer.from(transactionSerialized, 'hex'),
+          buffer: transactionModel.serializeWire(),
         });
         expect(coreTransaction.serializeWire().length <= byteLimit).toBeTruthy();
         expect(coreTransaction.inputs.length).toEqual(unspent.length);
@@ -882,10 +882,10 @@ describe('LocalUserAccountProvider', () => {
       );
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createContractTransaction();
-      relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
+      relayTransaction.mockImplementation(async (_network, transactionModel) => {
         const coreTransaction = deserializeTransactionWire({
           context,
-          buffer: Buffer.from(transactionSerialized, 'hex'),
+          buffer: transactionModel.serializeWire(),
         });
         expect(coreTransaction.serializeWire().length).toBeLessThanOrEqual(byteLimit);
         expect(coreTransaction.inputs.length).toEqual(2);
@@ -939,10 +939,10 @@ describe('LocalUserAccountProvider', () => {
       );
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createContractTransaction();
-      relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
+      relayTransaction.mockImplementation(async (_network, transactionModel) => {
         const coreTransaction = deserializeTransactionWire({
           context,
-          buffer: Buffer.from(transactionSerialized, 'hex'),
+          buffer: transactionModel.serializeWire(),
         });
         expect(coreTransaction.serializeWire().length <= byteLimit).toBeTruthy();
         expect(coreTransaction.inputs.length).toEqual(6);
@@ -991,10 +991,10 @@ describe('LocalUserAccountProvider', () => {
       );
       sign.mockImplementation(async () => Promise.resolve(data.buffers.a));
       const transaction = factory.createContractTransaction();
-      relayTransaction.mockImplementation(async (_network, transactionSerialized) => {
+      relayTransaction.mockImplementation(async (_network, transactionModel) => {
         const coreTransaction = deserializeTransactionWire({
           context,
-          buffer: Buffer.from(transactionSerialized, 'hex'),
+          buffer: transactionModel.serializeWire(),
         });
         expect(coreTransaction.serializeWire().length <= byteLimit).toBeTruthy();
         expect(coreTransaction.inputs.length).toEqual(3);

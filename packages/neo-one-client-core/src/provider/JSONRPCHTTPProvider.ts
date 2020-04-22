@@ -305,6 +305,7 @@ export class JSONRPCHTTPProvider extends JSONRPCProvider {
   private async requestInternal(req: JSONRPCRequest, span: Span): Promise<any> {
     let response;
     const { watchTimeoutMS, params = [] } = req;
+
     if (watchTimeoutMS !== undefined) {
       response = await watchSingle({
         endpoint: this.endpoint,

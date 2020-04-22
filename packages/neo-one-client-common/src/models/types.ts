@@ -106,6 +106,20 @@ export interface InvocationResultSuccessJSON {
 
 export type InvocationResultJSON = InvocationResultSuccessJSON | InvocationResultErrorJSON;
 
+export interface RawInvocationResultErrorJSON {
+  readonly state: 'FAULT';
+  readonly gas_consumed: string;
+  readonly stack: readonly ContractParameterJSON[];
+}
+
+export interface RawInvocationResultSuccessJSON {
+  readonly state: 'HALT';
+  readonly gas_consumed: string;
+  readonly stack: readonly ContractParameterJSON[];
+}
+
+export type RawInvocationResultJSON = RawInvocationResultSuccessJSON | RawInvocationResultErrorJSON;
+
 export interface StorageChangeAddJSON {
   readonly type: 'Add';
   readonly hash: string;
@@ -377,4 +391,40 @@ export interface ValidatorJSON {
   readonly publicKey: string;
   readonly registered: boolean;
   readonly votes: string;
+}
+
+export interface NeoClaimableJSON {
+  readonly claimable: readonly NeoInputClaimableJSON[];
+  readonly unclaimed: string;
+  readonly address: string;
+}
+
+export interface NeoInputClaimableJSON {
+  readonly txid: string;
+  readonly n: number;
+  readonly value: string;
+  readonly start_height: number;
+  readonly end_height: number;
+  readonly generated: string;
+  readonly sys_fee: string;
+  readonly unclaimed: string;
+}
+
+export interface NeoUnspentOutputJSON {
+  readonly txid: string;
+  readonly n: number;
+  readonly value: string;
+}
+
+export interface NeoBalanceJSON {
+  readonly unspent: readonly NeoUnspentOutputJSON[];
+  readonly asset_hash: string;
+  readonly asset: string;
+  readonly asset_symbol: string;
+  readonly amount: string;
+}
+
+export interface NeoUnspentJSON {
+  readonly balance: readonly NeoBalanceJSON[];
+  readonly address: string;
 }

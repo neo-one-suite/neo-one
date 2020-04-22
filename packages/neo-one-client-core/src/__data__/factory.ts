@@ -9,19 +9,23 @@ import {
   AddressABIParameter,
   AddressAttribute,
   AddressContractParameter,
+  addressToScriptHash,
   ArrayContractParameterJSON,
   Asset,
   AssetJSON,
   AttributeJSON,
+  AttributeUsageModel,
   Block,
   BlockJSON,
   BooleanContractParameter,
   BooleanContractParameterJSON,
   BufferAttribute,
+  BufferAttributeModel,
   ByteArrayContractParameterJSON,
   CallReceiptJSON,
   ClaimTransaction,
   ClaimTransactionJSON,
+  common,
   ConfirmedClaimTransaction,
   ConfirmedContractTransaction,
   ConfirmedEnrollmentTransaction,
@@ -36,6 +40,7 @@ import {
   ContractJSON,
   ContractTransaction,
   ContractTransactionJSON,
+  ECPointAttributeModel,
   EnrollmentTransaction,
   EnrollmentTransactionJSON,
   ForwardValue,
@@ -46,6 +51,7 @@ import {
   HeaderJSON,
   Input,
   InputJSON,
+  InputModel,
   InputOutput,
   IntegerABIParameter,
   IntegerABIReturn,
@@ -59,17 +65,25 @@ import {
   InvocationResultSuccessJSON,
   InvocationTransaction,
   InvocationTransactionJSON,
+  InvocationTransactionModel,
+  InvocationTransactionModelAdd,
   IssueTransaction,
   IssueTransactionJSON,
   LogActionJSON,
   MapContractParameterJSON,
   MinerTransaction,
   MinerTransactionJSON,
+  NeoBalanceJSON,
+  NeoClaimableJSON,
+  NeoInputClaimableJSON,
+  NeoUnspentJSON,
+  NeoUnspentOutputJSON,
   NetworkSettings,
   NetworkSettingsJSON,
   NotificationActionJSON,
   Output,
   OutputJSON,
+  OutputModel,
   Peer,
   PublicKeyAttribute,
   PublicKeyContractParameterJSON,
@@ -79,7 +93,9 @@ import {
   RawCallReceipt,
   RawInvocationData,
   RawInvocationResultError,
+  RawInvocationResultErrorJSON,
   RawInvocationResultSuccess,
+  RawInvocationResultSuccessJSON,
   RawInvokeReceipt,
   RawLog,
   RawNotification,
@@ -99,6 +115,8 @@ import {
   TransactionReceipt,
   TransactionResult,
   Transfer,
+  UInt160AttributeModel,
+  UInt256AttributeModel,
   UserAccount,
   UserAccountID,
   VerifyScriptResultJSON,
@@ -107,6 +125,7 @@ import {
   VoidContractParameterJSON,
   Witness,
   WitnessJSON,
+  WitnessModel,
 } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
@@ -298,6 +317,27 @@ const createInvocationResultErrorJSON = (
   ...options,
 });
 
+const createRawInvocationResultSuccessJSON = (
+  options: Partial<RawInvocationResultSuccessJSON> = {},
+): RawInvocationResultSuccessJSON => ({
+  state: 'HALT',
+  gas_consumed: '20',
+  gas_cost: '10',
+  stack: [createIntegerContractParameterJSON()],
+  ...options,
+});
+
+const createRawInvocationResultErrorJSON = (
+  options: Partial<RawInvocationResultErrorJSON> = {},
+): RawInvocationResultErrorJSON => ({
+  state: 'FAULT',
+  gas_consumed: '20',
+  gas_cost: '10',
+  stack: [createIntegerContractParameterJSON()],
+  message: '',
+  ...options,
+});
+
 const createInvocationDataJSON = (options: Partial<InvocationDataJSON> = {}): InvocationDataJSON => ({
   result: createInvocationResultSuccessJSON(),
   asset: createAssetJSON(),
@@ -369,6 +409,58 @@ const createInvocationTransactionJSON = (
   invocationData: createInvocationDataJSON(),
   ...options,
 });
+
+const createInvocationTransactionModel = (
+  options: Partial<InvocationTransactionModelAdd> = {},
+): InvocationTransactionModel => {
+  const invocation = createInvocationTransactionJSON();
+  const uInt160Attribute = createUInt160AttributeJSON();
+  const uInt256Attribute = createUInt256AttributeJSON();
+  const bufferAttribute = createBufferAttributeJSON();
+  const ecPointAttribute = createECPointAttributeJSON();
+
+  return new InvocationTransactionModel({
+    gas: new BN(invocation.gas),
+    script: Buffer.from(invocation.script, 'hex'),
+    version: invocation.version,
+    attributes: [
+      new UInt160AttributeModel({
+        usage: AttributeUsageModel[uInt160Attribute.usage] as 0x20,
+        value: common.hexToUInt160(uInt160Attribute.data),
+      }),
+      new UInt256AttributeModel({
+        usage: AttributeUsageModel[uInt256Attribute.usage] as 0xa1,
+        value: common.hexToUInt256(uInt256Attribute.data),
+      }),
+      new BufferAttributeModel({
+        usage: AttributeUsageModel[bufferAttribute.usage] as 0x90,
+        value: Buffer.from(bufferAttribute.data, 'hex'),
+      }),
+      new ECPointAttributeModel({
+        usage: AttributeUsageModel[ecPointAttribute.usage] as 0x02,
+        value: common.hexToECPoint(ecPointAttribute.data),
+      }),
+    ],
+    inputs: invocation.vin.map((input) => new InputModel({ hash: common.hexToUInt256(input.txid), index: input.vout })),
+    outputs: invocation.vout.map(
+      (output) =>
+        new OutputModel({
+          asset: common.hexToUInt256(output.asset),
+          value: new BN(output.value),
+          address: common.hexToUInt160(addressToScriptHash(output.address)),
+        }),
+    ),
+    scripts: invocation.scripts.map(
+      (script) =>
+        new WitnessModel({
+          invocation: Buffer.from(script.invocation, 'hex'),
+          verification: Buffer.from(script.verification, 'hex'),
+        }),
+    ),
+    hash: common.hexToUInt256(invocation.txid),
+    ...options,
+  });
+};
 
 const createMinerTransactionJSON = (options: Partial<MinerTransactionJSON> = {}): MinerTransactionJSON => ({
   ...createTransactionBaseJSON(),
@@ -1085,6 +1177,47 @@ const createBlock = (options: Partial<Block> = {}): Block => ({
   ...options,
 });
 
+const createNeoClaimableInputJSON = (options: Partial<NeoInputClaimableJSON> = {}): NeoInputClaimableJSON => ({
+  txid: data.hash256s.a,
+  n: 3,
+  value: '23',
+  start_height: 2000000,
+  end_height: 3000000,
+  generated: '1.23',
+  sys_fee: '.01',
+  unclaimed: '1.23',
+  ...options,
+});
+
+const createNeoClaimableJSON = (options: Partial<NeoClaimableJSON> = {}): NeoClaimableJSON => ({
+  claimable: [createNeoClaimableInputJSON()],
+  unclaimed: '1.23',
+  address: keys[0].address,
+  ...options,
+});
+
+const createNeoUnspentOutputJSON = (options: Partial<NeoUnspentOutputJSON> = {}): NeoUnspentOutputJSON => ({
+  txid: data.hash256s.b,
+  n: 0,
+  value: '.034',
+  ...options,
+});
+
+const createNeoBalanceJSON = (options: Partial<NeoBalanceJSON> = {}): NeoBalanceJSON => ({
+  unspent: [createNeoUnspentOutputJSON()],
+  asset_hash: data.hash256s.c,
+  asset: 'Gas',
+  asset_symbol: 'GAS',
+  amount: '.034',
+  ...options,
+});
+
+const createNeoUnspentJSON = (options: Partial<NeoUnspentJSON> = {}): NeoUnspentJSON => ({
+  balance: [createNeoBalanceJSON()],
+  address: keys[0].address,
+  ...options,
+});
+
 export const factory = {
   createAccountJSON,
   createAssetJSON,
@@ -1107,6 +1240,14 @@ export const factory = {
   createInvocationResultSuccessJSON,
   createInvocationResultErrorJSON,
   createInvocationTransactionJSON,
+  createMinerTransactionJSON,
+  createClaimTransactionJSON,
+  createContractTransactionJSON,
+  createEnrollmentTransactionJSON,
+  createIssueTransactionJSON,
+  createPublishTransactionJSON,
+  createRegisterTransactionJSON,
+  createStateTransactionJSON,
   createTransactionReceipt,
   createCallReceiptJSON,
   createLogActionJSON,
@@ -1170,4 +1311,12 @@ export const factory = {
   createStateTransaction,
   createAccount,
   createBlock,
+  createInvocationTransactionModel,
+  createNeoClaimableInputJSON,
+  createNeoClaimableJSON,
+  createNeoUnspentOutputJSON,
+  createNeoBalanceJSON,
+  createNeoUnspentJSON,
+  createRawInvocationResultSuccessJSON,
+  createRawInvocationResultErrorJSON,
 };
