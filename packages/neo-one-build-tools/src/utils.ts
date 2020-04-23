@@ -11,6 +11,8 @@ import { Format } from './formats';
 
 const RXJS_IMPORT = 'rxjs';
 
+const transformWhitelist = new Set(['@neo-one/ec-key']);
+
 export const getName = (format: Format, name: string) => (format.name === '' ? name : `${name}-${format.name}`);
 
 export const getPackageJSON = async () => {
@@ -114,6 +116,9 @@ export const mapDep = (format: Format, depName: string): string => {
 };
 
 export const transformInternalDeps = (format: Format, depName: string): string => {
+  if (transformWhitelist.has(depName)) {
+    return depName;
+  }
   if (depName.match(/^@neo-one\/.*/) && !format.browser) {
     return getName(format, depName);
   }
