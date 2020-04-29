@@ -428,3 +428,18 @@ export interface NeoUnspentJSON {
   readonly balance: readonly NeoBalanceJSON[];
   readonly address: string;
 }
+
+export interface NeoPreviewContractJSON {
+  readonly name: string;
+  readonly version: string;
+  readonly author: string;
+  readonly email: string;
+  readonly description: string;
+  readonly code: {
+    readonly hash: string;
+    readonly script: string;
+    readonly parameters: readonly ContractParameterTypeJSON[];
+    readonly returntype: ContractParameterTypeJSON;
+  };
+  readonly needstorage: boolean;
+}
