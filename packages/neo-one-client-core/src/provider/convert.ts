@@ -24,6 +24,7 @@ import {
   InvocationResultJSON,
   InvocationTransactionJSON,
   JSONHelper,
+  NeoPreviewContractJSON,
   NetworkSettings,
   NetworkSettingsJSON,
   Output,
@@ -287,7 +288,14 @@ export function convertAsset(asset: AssetJSON): Asset {
   };
 }
 
-export function convertContract(contract: ContractJSON): Contract {
+export function convertContract(contractIn: ContractJSON): Contract {
+  let contract = contractIn;
+  // tslint:disable-next-line no-any
+  if (typeof (contract.version as any) === 'string' && (contract.version as any).includes('preview')) {
+    // tslint:disable-next-line no-any
+    contract = convertPreviewContract(contract as any);
+  }
+
   return {
     version: contract.version,
     address: scriptHashToAddress(contract.hash),
@@ -302,6 +310,26 @@ export function convertContract(contract: ContractJSON): Contract {
     storage: contract.properties.storage,
     dynamicInvoke: contract.properties.dynamic_invoke,
     payable: contract.properties.payable,
+  };
+}
+
+export function convertPreviewContract(contract: NeoPreviewContractJSON): ContractJSON {
+  return {
+    version: 0,
+    hash: contract.code.hash,
+    script: contract.code.script,
+    parameters: contract.code.parameters,
+    returntype: contract.code.returntype,
+    name: contract.name,
+    code_version: 'preview',
+    author: contract.author,
+    email: contract.email,
+    description: contract.description,
+    properties: {
+      storage: contract.needstorage,
+      dynamic_invoke: false,
+      payable: false,
+    },
   };
 }
 
