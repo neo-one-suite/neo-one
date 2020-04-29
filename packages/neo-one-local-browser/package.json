@@ -12,8 +12,8 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/cli-common": "^2.5.0",
-    "@neo-one/client-common": "^2.4.0",
-    "@neo-one/client-core": "^2.4.0",
+    "@neo-one/client-common": "^2.5.0",
+    "@neo-one/client-core": "^2.5.0",
     "@neo-one/node-browser": "^2.3.0",
     "@neo-one/smart-contract-codegen": "^2.4.0",
     "@neo-one/smart-contract-compiler": "^2.4.0",

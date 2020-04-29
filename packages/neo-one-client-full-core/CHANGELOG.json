@@ -2,6 +2,26 @@
   "name": "@neo-one/client-full-core",
   "entries": [
     {
+      "version": "2.4.1",
+      "tag": "@neo-one/client-full-core_v2.4.1",
+      "date": "Thu, 23 Apr 2020 20:37:45 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update LocalUserAccountProvider test"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-common\" from `^2.4.0` to `^2.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/client-core\" from `^2.4.0` to `^2.5.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.4.0",
       "tag": "@neo-one/client-full-core_v2.4.0",
       "date": "Mon, 13 Apr 2020 23:20:32 GMT",

@@ -13,10 +13,10 @@
   "sideEffects": false,
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
-    "@neo-one/client-common": "^2.4.0",
-    "@neo-one/client-core": "^2.4.0",
+    "@neo-one/client-common": "^2.5.0",
+    "@neo-one/client-core": "^2.5.0",
     "@neo-one/client-full-common": "^2.4.0",
-    "@neo-one/client-full-core": "^2.4.0",
+    "@neo-one/client-full-core": "^2.4.1",
     "@neo-one/smart-contract": "^2.4.0",
     "@neo-one/ts-utils": "^2.4.0",
     "@neo-one/typescript-concatenator": "^2.4.0",

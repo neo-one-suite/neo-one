@@ -13,8 +13,8 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/cli-common": "^2.5.0",
-    "@neo-one/client-common": "^2.4.0",
-    "@neo-one/client-core": "^2.4.0",
+    "@neo-one/client-common": "^2.5.0",
+    "@neo-one/client-core": "^2.5.0",
     "@neo-one/utils": "^2.4.0",
     "lodash": "^4.17.15",
     "prettier": "^1.18.2",
