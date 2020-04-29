@@ -11,8 +11,8 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/client": "^2.4.0",
-    "@neo-one/client-full-core": "^2.4.0"
+    "@neo-one/client": "^2.5.0",
+    "@neo-one/client-full-core": "^2.4.1"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",

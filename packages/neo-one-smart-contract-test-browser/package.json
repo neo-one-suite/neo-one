@@ -10,7 +10,7 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/client-core": "^2.4.0",
+    "@neo-one/client-core": "^2.5.0",
     "@neo-one/local-browser": "^2.3.1",
     "@neo-one/local-singleton": "^2.3.1",
     "@neo-one/node-browser": "^2.3.0",

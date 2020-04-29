@@ -2,6 +2,18 @@
   "name": "@neo-one/client-common",
   "entries": [
     {
+      "version": "2.5.0",
+      "tag": "@neo-one/client-common_v2.5.0",
+      "date": "Thu, 23 Apr 2020 20:37:45 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Added types to support NEODataProvider & C# node"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.4.0",
       "tag": "@neo-one/client-common_v2.4.0",
       "date": "Mon, 13 Apr 2020 23:20:32 GMT",

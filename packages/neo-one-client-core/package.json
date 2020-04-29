@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-core",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "NEO•ONE client core types implementation.",
   "main": "./lib/index",
   "scripts": {
@@ -11,7 +11,7 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/client-common": "^2.4.0",
+    "@neo-one/client-common": "^2.5.0",
     "@neo-one/client-switch": "^2.4.0",
     "@neo-one/utils": "^2.4.0",
     "@reactivex/ix-es2015-cjs": "^2.5.3",

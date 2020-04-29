@@ -11,8 +11,8 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/client-common": "^2.4.0",
-    "@neo-one/client-core": "^2.4.0",
+    "@neo-one/client-common": "^2.5.0",
+    "@neo-one/client-core": "^2.5.0",
     "@neo-one/node": "^2.4.0",
     "@neo-one/node-neo-settings": "^2.4.0",
     "@neo-one/smart-contract-compiler-node": "^2.4.0",

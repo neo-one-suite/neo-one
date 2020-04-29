@@ -11,7 +11,7 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/client-core": "^2.4.0",
+    "@neo-one/client-core": "^2.5.0",
     "resize-observer-polyfill": "^1.5.0",
     "tslib": "^1.10.0"
   },
