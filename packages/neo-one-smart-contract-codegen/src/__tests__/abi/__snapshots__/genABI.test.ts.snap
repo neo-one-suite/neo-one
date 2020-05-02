@@ -31,34 +31,34 @@ Object {
       \\"name\\": \\"name\\",
       \\"parameters\\": [],
       \\"returnType\\": {
-          \\"type\\": \\"String\\"
-        }
+        \\"type\\": \\"String\\"
+      }
     },
     {
       \\"constant\\": true,
       \\"name\\": \\"symbol\\",
       \\"parameters\\": [],
       \\"returnType\\": {
-          \\"type\\": \\"String\\"
-        }
+        \\"type\\": \\"String\\"
+      }
     },
     {
       \\"constant\\": true,
       \\"name\\": \\"decimals\\",
       \\"parameters\\": [],
       \\"returnType\\": {
-          \\"decimals\\": 0,
-          \\"type\\": \\"Integer\\"
-        }
+        \\"decimals\\": 0,
+        \\"type\\": \\"Integer\\"
+      }
     },
     {
       \\"constant\\": true,
       \\"name\\": \\"totalSupply\\",
       \\"parameters\\": [],
       \\"returnType\\": {
-          \\"decimals\\": 4,
-          \\"type\\": \\"Integer\\"
-        }
+        \\"decimals\\": 4,
+        \\"type\\": \\"Integer\\"
+      }
     },
     {
       \\"name\\": \\"transfer\\",
@@ -128,34 +128,34 @@ export const tokenABI: ABI = {
       \\"name\\": \\"name\\",
       \\"parameters\\": [],
       \\"returnType\\": {
-          \\"type\\": \\"String\\"
-        }
+        \\"type\\": \\"String\\"
+      }
     },
     {
       \\"constant\\": true,
       \\"name\\": \\"symbol\\",
       \\"parameters\\": [],
       \\"returnType\\": {
-          \\"type\\": \\"String\\"
-        }
+        \\"type\\": \\"String\\"
+      }
     },
     {
       \\"constant\\": true,
       \\"name\\": \\"decimals\\",
       \\"parameters\\": [],
       \\"returnType\\": {
-          \\"decimals\\": 0,
-          \\"type\\": \\"Integer\\"
-        }
+        \\"decimals\\": 0,
+        \\"type\\": \\"Integer\\"
+      }
     },
     {
       \\"constant\\": true,
       \\"name\\": \\"totalSupply\\",
       \\"parameters\\": [],
       \\"returnType\\": {
-          \\"decimals\\": 4,
-          \\"type\\": \\"Integer\\"
-        }
+        \\"decimals\\": 4,
+        \\"type\\": \\"Integer\\"
+      }
     },
     {
       \\"name\\": \\"transfer\\",
