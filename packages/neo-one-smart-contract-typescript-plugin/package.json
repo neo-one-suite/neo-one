@@ -14,7 +14,7 @@
   "dependencies": {
     "@neo-one/smart-contract-compiler": "^2.4.0",
     "@neo-one/smart-contract-compiler-node": "^2.4.0",
-    "typescript": "3.8.1-rc"
+    "typescript": "3.8.3"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
