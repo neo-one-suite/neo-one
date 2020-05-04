@@ -37,10 +37,7 @@ const ec = () => {
   return ecCache;
 };
 
-const sha1 = (value: Buffer): Buffer =>
-  createHash('sha1')
-    .update(value)
-    .digest();
+const sha1 = (value: Buffer): Buffer => createHash('sha1').update(value).digest();
 
 const sha256 = sha256In;
 
@@ -53,10 +50,7 @@ const hash160 = (value: Buffer): UInt160 => common.bufferToUInt160(rmd160(sha256
 
 const hash256 = (value: Buffer): UInt256 => common.bufferToUInt256(sha256(sha256(value)));
 
-const hmacSha512 = (key: Buffer | string, data: Buffer) =>
-  createHmac('sha512', key)
-    .update(data)
-    .digest();
+const hmacSha512 = (key: Buffer | string, data: Buffer) => createHmac('sha512', key).update(data).digest();
 
 const sign = ({ message, privateKey }: { readonly message: Buffer; readonly privateKey: PrivateKey }): Buffer => {
   const sig = ec().sign(sha256(message), common.privateKeyToBuffer(privateKey));
@@ -143,12 +137,7 @@ const verify = ({
 
   const key = new ECKey({
     crv: 'P-256',
-    publicKey: Buffer.from(
-      ec()
-        .keyFromPublic(publicKey)
-        .getPublic(false, 'hex'),
-      'hex',
-    ),
+    publicKey: Buffer.from(ec().keyFromPublic(publicKey).getPublic(false, 'hex'), 'hex'),
   });
 
   return (key.createVerify('SHA256').update(message) as any).verify(signature);
@@ -723,13 +712,9 @@ const deriveChildKey = (node: HDNode, index: number, hardened: boolean): HDNode 
       version: BIP32_VERSION.private,
     };
   }
-  const parentKey = ec()
-    .keyFromPublic(node.publicKey)
-    .getPublic();
+  const parentKey = ec().keyFromPublic(node.publicKey).getPublic();
 
-  const childKey = ec()
-    .g.mul(shaLeft)
-    .add(parentKey);
+  const childKey = ec().g.mul(shaLeft).add(parentKey);
 
   if (childKey.isInfinity()) {
     return deriveChildKey(node, index + 1, false);

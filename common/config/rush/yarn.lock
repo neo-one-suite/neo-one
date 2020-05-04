@@ -2715,6 +2715,24 @@
     rxjs "^6.5.3"
     tslib "^1.10.0"
 
+"@rush-temp/node-tools@file:./projects/node-tools.tgz":
+  version "0.0.0"
+  resolved "file:./projects/node-tools.tgz#8f9fcb3b0a684e82162358d7141e2382de2f4616"
+  dependencies:
+    "@google-cloud/storage" "^4.3.2"
+    "@types/fs-extra" "^8.0.0"
+    "@types/rc" "^1.1.0"
+    "@types/yargs" "^13.0.3"
+    execa "^3.2.0"
+    fs-extra "^8.1.0"
+    gulp "~4.0.2"
+    import-local "^3.0.2"
+    rc "^1.2.8"
+    semver "^6.3.0"
+    source-map-support "^0.5.13"
+    tslib "^1.10.0"
+    yargs "^14.2.0"
+
 "@rush-temp/node-vm@file:./projects/node-vm.tgz":
   version "0.0.0"
   resolved "file:./projects/node-vm.tgz"
@@ -2798,7 +2816,7 @@
     "@types/prettier" "^1.18.2"
     gulp "~4.0.2"
     lodash "^4.17.15"
-    prettier "^1.18.2"
+    prettier "^2.0.1"
     safe-stable-stringify "^1.1.0"
     source-map "^0.7.3"
     tslib "^1.10.0"
@@ -16163,6 +16181,11 @@ prettier@^1.18.2:
   version "1.19.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.1.tgz#f7d7f5ff8a9cd872a7be4ca142095956a60797cb"
   integrity sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==
+
+prettier@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.0.1.tgz#3f00ac71263be34684b2b2c8d7e7f63737592dac"
+  integrity sha512-piXGBcY1zoFOG0MvHpNE5reAGseLmaCRifQ/fmfF49BcYkInEs/naD/unxGNAeOKFA5+JxVrPyMvMlpzcd20UA==
 
 pretty-bytes@^5.1.0:
   version "5.3.0"

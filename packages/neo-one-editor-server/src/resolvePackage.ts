@@ -31,12 +31,7 @@ const getTarballURL = (name: string, version: string) => {
   return `${REGISTRY}${escapedName}/-/${scopelessName}-${version}.tgz`;
 };
 
-const getPath = (path: string) =>
-  nodePath.sep +
-  path
-    .split(nodePath.sep)
-    .slice(1)
-    .join(nodePath.sep);
+const getPath = (path: string) => nodePath.sep + path.split(nodePath.sep).slice(1).join(nodePath.sep);
 
 interface Files {
   readonly [path: string]: Buffer | undefined;
@@ -180,11 +175,7 @@ const getAdditionalStarts = (files: Files, start: string, packageJSON: any) => {
     .filter(
       (file) =>
         file !== start &&
-        ((nodePath.basename(file) === 'index.js' &&
-          !nodePath
-            .dirname(file)
-            .slice(1)
-            .includes('/')) ||
+        ((nodePath.basename(file) === 'index.js' && !nodePath.dirname(file).slice(1).includes('/')) ||
           (!file.slice(1).includes('/') && file.endsWith('.js'))) &&
         nodePath.dirname(file) !== '/src',
     )

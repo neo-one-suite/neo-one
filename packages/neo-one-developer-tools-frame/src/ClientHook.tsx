@@ -59,9 +59,7 @@ class Hooker {
           id: transaction.hash,
           title: <span data-test="neo-one-transaction-toast-title">Transaction Confirmed</span>,
           message:
-            this.mutableNEOTrackerURL === undefined ? (
-              undefined
-            ) : (
+            this.mutableNEOTrackerURL === undefined ? undefined : (
               <span data-test="neo-one-transaction-toast-message">
                 View on&nbsp;
                 <Link

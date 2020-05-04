@@ -335,9 +335,9 @@ export const addTransaction = async ({
   readonly transaction: Transaction;
   readonly verify: boolean;
   readonly consensusContext: ConsensusContext;
-}): Promise<Result<
-  RequestReceivedContext | InitialContext | ViewChangingContext | SignatureSentContext | BlockSentContext
->> => {
+}): Promise<
+  Result<RequestReceivedContext | InitialContext | ViewChangingContext | SignatureSentContext | BlockSentContext>
+> => {
   let context = contextIn;
   const { blockchain } = node;
   const tx = await blockchain.transaction.tryGet({ hash: transaction.hash });

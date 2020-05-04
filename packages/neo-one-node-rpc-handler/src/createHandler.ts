@@ -534,10 +534,7 @@ export const createHandler = ({
     },
     [RPC_METHODS.getallstorage]: async (args) => {
       const hash = JSONHelper.readUInt160(args[0]);
-      const items = await blockchain.storageItem
-        .getAll$({ hash })
-        .pipe(toArray())
-        .toPromise();
+      const items = await blockchain.storageItem.getAll$({ hash }).pipe(toArray()).toPromise();
 
       return items.map((item) => item.serializeJSON(blockchain.serializeJSONContext));
     },

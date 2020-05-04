@@ -736,10 +736,7 @@ const OPCODE_PAIRS = ([
           return {
             context: {
               ...context,
-              stack: stack
-                .slice(0, n)
-                .concat([stack[0]])
-                .concat(stack.slice(n)),
+              stack: stack.slice(0, n).concat([stack[0]]).concat(stack.slice(n)),
               stackCount: context.stackCount + stack[0].increment(),
             },
           };

@@ -1,7 +1,7 @@
 // tslint:disable: no-let no-any
 import type { Config, Measure, Span, Stats, StatsEventListener, TracerBase } from '@opencensus/core';
-import type {  JaegerTraceExporter, JaegerTraceExporterOptions } from '@opencensus/exporter-jaeger';
-import type { PrometheusExporterOptions,  PrometheusStatsExporter } from '@opencensus/exporter-prometheus';
+import type { JaegerTraceExporter, JaegerTraceExporterOptions } from '@opencensus/exporter-jaeger';
+import type { PrometheusExporterOptions, PrometheusStatsExporter } from '@opencensus/exporter-prometheus';
 import type { TraceContextFormat } from '@opencensus/propagation-tracecontext';
 
 const noOp = (..._args: readonly any[]): any => {
@@ -39,12 +39,12 @@ let tracer: TracerBase = {
 
 // enums copied from types directly
 enum MeasureUnit {
-  UNIT = "1",
-  BYTE = "by",
-  KBYTE = "kb",
-  SEC = "s",
-  MS = "ms",
-  NS = "ns",
+  UNIT = '1',
+  BYTE = 'by',
+  KBYTE = 'kb',
+  SEC = 's',
+  MS = 'ms',
+  NS = 'ns',
 }
 
 enum AggregationType {
@@ -60,7 +60,9 @@ enum SpanKind {
   CLIENT = 2,
 }
 
-let globalStatsCache: Omit<Stats, 'registerExporter'> & {readonly registerExporter?: (listener: StatsEventListener) => void} = {
+let globalStatsCache: Omit<Stats, 'registerExporter'> & {
+  readonly registerExporter?: (listener: StatsEventListener) => void;
+} = {
   createView: noOp,
   registerView: noOp,
   createMeasureDouble: noOp,
@@ -75,7 +77,9 @@ let globalStatsCache: Omit<Stats, 'registerExporter'> & {readonly registerExport
 };
 
 let coreImportCache: Promise<typeof import('@opencensus/core')> | undefined;
-const globalStats: Omit<Stats, 'registerExporter'> & {readonly registerExporter: (listener: StatsEventListener) => Promise<void>}= {
+const globalStats: Omit<Stats, 'registerExporter'> & {
+  readonly registerExporter: (listener: StatsEventListener) => Promise<void>;
+} = {
   createView: globalStatsCache.createView,
   registerView: globalStatsCache.registerView,
   createMeasureDouble: globalStatsCache.createMeasureDouble,
@@ -85,7 +89,7 @@ const globalStats: Omit<Stats, 'registerExporter'> & {readonly registerExporter:
   getMetrics: globalStatsCache.getMetrics,
   registerExporter: async (listener: StatsEventListener) => {
     if (coreImportCache === undefined) {
-      coreImportCache = import('@opencensus/core')
+      coreImportCache = import('@opencensus/core');
     }
 
     if (globalStatsCache.registerExporter === undefined) {
@@ -102,9 +106,7 @@ const globalStats: Omit<Stats, 'registerExporter'> & {readonly registerExporter:
   unregisterExporter: globalStatsCache.unregisterExporter,
   withTagContext: globalStatsCache.withTagContext,
   getCurrentTagContext: globalStatsCache.getCurrentTagContext,
-}
-
-
+};
 
 let TracingBaseCache: Promise<typeof import('@opencensus/nodejs-base')> | undefined;
 const startTracing = async (config: Config) => {
@@ -126,7 +128,6 @@ const startTracing = async (config: Config) => {
   };
 };
 
-
 let TraceContextFormatCache: Promise<typeof import('@opencensus/propagation-tracecontext')> | undefined;
 const getNewPropagation = async (): Promise<TraceContextFormat> => {
   if (TraceContextFormatCache === undefined) {
@@ -138,7 +139,7 @@ const getNewPropagation = async (): Promise<TraceContextFormat> => {
 };
 
 let JaegerTraceExporterCache: Promise<typeof import('@opencensus/exporter-jaeger')> | undefined;
-const getJaegerTraceExporter = async (options: JaegerTraceExporterOptions ): Promise<JaegerTraceExporter> => {
+const getJaegerTraceExporter = async (options: JaegerTraceExporterOptions): Promise<JaegerTraceExporter> => {
   if (JaegerTraceExporterCache === undefined) {
     JaegerTraceExporterCache = import('@opencensus/exporter-jaeger');
   }
@@ -146,28 +147,28 @@ const getJaegerTraceExporter = async (options: JaegerTraceExporterOptions ): Pro
   const { JaegerTraceExporter: ImportedJaegerTraceExporter } = await JaegerTraceExporterCache;
 
   return new ImportedJaegerTraceExporter(options);
-}
+};
 
 let PrometheusExporterCache: Promise<typeof import('@opencensus/exporter-prometheus')> | undefined;
-const getPrometheusExporter = async (options: PrometheusExporterOptions ): Promise<PrometheusStatsExporter> => {
+const getPrometheusExporter = async (options: PrometheusExporterOptions): Promise<PrometheusStatsExporter> => {
   if (PrometheusExporterCache === undefined) {
     PrometheusExporterCache = import('@opencensus/exporter-prometheus');
   }
 
-  const { PrometheusStatsExporter: PrometheusExporter } = await PrometheusExporterCache
+  const { PrometheusStatsExporter: PrometheusExporter } = await PrometheusExporterCache;
 
   return new PrometheusExporter(options);
-}
+};
 
 const getTagMap = async () => {
   if (coreImportCache === undefined) {
-    coreImportCache = import('@opencensus/core')
-  };
+    coreImportCache = import('@opencensus/core');
+  }
 
   const { TagMap: ImportTagMap } = await coreImportCache;
 
   return new ImportTagMap();
-}
+};
 
 export {
   AggregationType,

@@ -340,10 +340,7 @@ export const assertVMState = (state: number): VMState => {
 
 export type SysCallHash = number & { readonly __uint256: undefined };
 
-export const sha256 = (value: Buffer): Buffer =>
-  createHash('sha256')
-    .update(value)
-    .digest();
+export const sha256 = (value: Buffer): Buffer => createHash('sha256').update(value).digest();
 
 // @ts-ignore
 const mutableCache: { [K in SysCall]: SysCallHash } = {};
