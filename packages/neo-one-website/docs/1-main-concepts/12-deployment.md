@@ -36,7 +36,7 @@ These properties have no impact on the execution of the contract, they're simply
 
 Every NEO•ONE smart contract automatically contains a public `upgrade` method. This method replaces the smart contract code as well as the static metadata associated with the contract while preserving the smart contract's storage. In other words, this method can be used to change the logic of your smart contract without losing the data.
 
-In order to make it possible to upgrade your contract, you _must_ specify the `approveUpgrade` `protected` method. This method should return a `boolean` indicating if the `upgrade` is approved:
+In order to make it possible to upgrade your contract, you _must_ specify the `approveUpgrade` `public` method. This method should return a `boolean` indicating if the `upgrade` is approved:
 
 ```typescript
 export class Contract extends SmartContract {
