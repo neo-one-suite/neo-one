@@ -24,6 +24,6 @@
     "@types/lodash": "^4.14.138",
     "gulp": "~4.0.2",
     "jest": "^24.9.0",
-    "typescript": "3.8.1-rc"
+    "typescript": "^3.8.3"
   }
 }

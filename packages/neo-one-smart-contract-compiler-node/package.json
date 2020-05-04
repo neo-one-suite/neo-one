@@ -18,7 +18,7 @@
     "app-root-dir": "^1.0.2",
     "glob": "^7.1.4",
     "tslib": "^1.10.0",
-    "typescript": "3.8.1-rc"
+    "typescript": "^3.8.3"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
