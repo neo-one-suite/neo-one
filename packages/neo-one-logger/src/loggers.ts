@@ -7,6 +7,7 @@ const createLogger = (service: string, options: pino.LoggerOptions = {}) =>
     ? pino({ ...options, base: { service }, prettyPrint: getPretty() })
     : pino(
         { ...options, base: { service }, prettyPrint: getPretty() },
+        // @ts-ignore
         process.env.NODE_ENV === 'production' ? pino.extreme(1) : pino.destination(1),
       );
 
@@ -38,6 +39,7 @@ export const setGlobalLogLevel = (level: pino.LevelWithSilent) =>
     logger.level = level;
   });
 
+// @ts-ignore
 export const getFinalLogger = (logger: pino.Logger) => pino.final(logger);
 
 export const createChild = (

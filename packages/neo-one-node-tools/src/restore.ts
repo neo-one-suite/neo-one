@@ -1,6 +1,7 @@
 import { Storage } from '@google-cloud/storage';
 import execa from 'execa';
 import fs from 'fs-extra';
+// tslint:disable-next-line: match-default-export-name
 import nodePath from 'path';
 
 interface RestoreOptions {
