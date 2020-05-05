@@ -9,7 +9,7 @@ import { CourseExplainer } from './CourseExplainer';
 import { CourseSection } from './CourseSection';
 
 // tslint:disable-next-line: no-any
-const StyledBackground = styled(Background)<any>`
+const StyledBackground = styled<any>(Background)<any>`
   display: flex;
   color: ${prop('theme.gray0')};
   justify-content: center;

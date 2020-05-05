@@ -11,7 +11,7 @@ import { Proof } from './Proof';
 import { Testing } from './Testing';
 
 // tslint:disable-next-line: no-any
-const StyledBackground = styled(Background)<any>`
+const StyledBackground = styled<any>(Background)<any>`
   display: grid;
   place-content: center;
   place-items: center;
