@@ -1,4 +1,3 @@
-import { AggregationType, globalStats, MeasureUnit } from '@neo-one/client-switch';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   ConnectedPeer,
@@ -69,57 +68,6 @@ const CONNECT_ERROR_CODES = new Set([
   'EADDRNOTAVAIL',
   'ETIMEDOUT',
 ]);
-
-const peersClosed = globalStats.createMeasureInt64('peers/closed', MeasureUnit.UNIT);
-const peersTotal = globalStats.createMeasureInt64('peers/total', MeasureUnit.UNIT);
-const peersFailed = globalStats.createMeasureInt64('peers/failures', MeasureUnit.UNIT);
-const peersConnected = globalStats.createMeasureInt64('peers/connected', MeasureUnit.UNIT);
-const peersConnecting = globalStats.createMeasureInt64('peers/connecting', MeasureUnit.UNIT);
-
-const NEO_NETWORK_PEER_CLOSED_TOTAL = globalStats.createView(
-  'neo_network_peer_closed_total',
-  peersClosed,
-  AggregationType.COUNT,
-  [],
-  'Total number of times a peer was closed due to error or ending the socket.',
-);
-globalStats.registerView(NEO_NETWORK_PEER_CLOSED_TOTAL);
-
-const NEO_NETWORK_PEER_CONNECT_TOTAL = globalStats.createView(
-  'neo_network_peer_connect_total',
-  peersTotal,
-  AggregationType.COUNT,
-  [],
-  'total number of peer connections received',
-);
-globalStats.registerView(NEO_NETWORK_PEER_CONNECT_TOTAL);
-
-const NEO_NETWORK_PEER_CONNECT_FAILURES_TOTAL = globalStats.createView(
-  'neo_network_peer_connect_failures_total',
-  peersFailed,
-  AggregationType.COUNT,
-  [],
-  'total number of failed peer connections',
-);
-globalStats.registerView(NEO_NETWORK_PEER_CONNECT_FAILURES_TOTAL);
-
-const NEO_NETWORK_CONNECTED_PEERS_TOTAL = globalStats.createView(
-  'neo_network_connected_peers_total',
-  peersConnected,
-  AggregationType.LAST_VALUE,
-  [],
-  'number of currently connected peers',
-);
-globalStats.registerView(NEO_NETWORK_CONNECTED_PEERS_TOTAL);
-
-const NEO_NETWORK_CONNECTING_PEERS_TOTAL = globalStats.createView(
-  'neo_network_connecting_peers_total',
-  peersConnecting,
-  AggregationType.LAST_VALUE,
-  [],
-  'number of currently connecting peers',
-);
-globalStats.registerView(NEO_NETWORK_CONNECTING_PEERS_TOTAL);
 
 export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
   private mutableStarted: boolean;
@@ -446,12 +394,6 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       ...this.mutableConnectingPeers,
       [endpoint]: true,
     };
-    globalStats.record([
-      {
-        measure: peersConnecting,
-        value: Object.keys(this.mutableConnectingPeers).length,
-      },
-    ]);
 
     const logData = { [Labels.PEER_ADDRESS]: endpoint, name: 'neo_network_peer_connect' };
     try {
@@ -465,24 +407,12 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       logger.trace(logData, `Connecting to peer at ${endpoint}`);
     } catch (err) {
       logger.trace({ err, ...logData }, `Failed to connect to peer at ${endpoint}.`);
-      globalStats.record([
-        {
-          measure: peersFailed,
-          value: 1,
-        },
-      ]);
       if (this.mutableConnectErrorCodes.has(err.code)) {
         this.mutableBadEndpoints.add(endpoint);
       }
     } finally {
       const { [endpoint]: _unused, ...rest } = this.mutableConnectingPeers;
       this.mutableConnectingPeers = rest;
-      globalStats.record([
-        {
-          measure: peersConnecting,
-          value: Object.keys(this.mutableConnectingPeers).length,
-        },
-      ]);
     }
   }
 
@@ -522,12 +452,7 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
         ...this.mutableConnectedPeers,
         [peer.endpoint]: connectedPeer,
       };
-      globalStats.record([
-        {
-          measure: peersConnected,
-          value: Object.keys(this.mutableConnectedPeers).length,
-        },
-      ]);
+
       connectedPeer.peer.streamData((message) => this.onMessageReceivedInternal(connectedPeer, message));
 
       this.onEventInternal({
@@ -567,17 +492,6 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
     const { [peer.endpoint]: _unused2, ...mutableConnectingPeers } = this.mutableConnectingPeers;
     this.mutableConnectingPeers = mutableConnectingPeers;
 
-    globalStats.record([
-      {
-        measure: peersConnected,
-        value: Object.keys(this.mutableConnectedPeers).length,
-      },
-      {
-        measure: peersConnecting,
-        value: Object.keys(this.mutableConnectingPeers).length,
-      },
-    ]);
-
     const endpoint = this.mutableReverseBlacklist[peer.endpoint];
     if (endpoint !== undefined) {
       const { [peer.endpoint]: _unused3, ...mutableReverseBlacklist } = this.mutableReverseBlacklist;
@@ -590,12 +504,6 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       { [Labels.PEER_ADDRESS]: peer.endpoint, name: 'neo_network_peer_closed' },
       `Peer closed at ${peer.endpoint}`,
     );
-    globalStats.record([
-      {
-        measure: peersClosed,
-        value: 1,
-      },
-    ]);
 
     this.onEventInternal({
       event: 'PEER_CLOSED',

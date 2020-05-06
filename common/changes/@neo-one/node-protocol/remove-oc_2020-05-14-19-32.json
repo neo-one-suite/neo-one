@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "remove opencensus metrics temporarily",
+      "type": "major",
+      "packageName": "@neo-one/node-protocol"
+    }
+  ],
+  "packageName": "@neo-one/node-protocol",
+  "email": "danwbyrne@gmail.com"
+}

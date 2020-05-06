@@ -1,31 +1,6 @@
-import { AggregationType, globalStats, MeasureUnit, SpanKind, tracer } from '@neo-one/client-switch';
 import { createChild, Logger } from '@neo-one/logger';
-import { addAttributesToSpan, Labels, labelsToTags, utils } from '@neo-one/utils';
+import { Labels } from '@neo-one/utils';
 import { Context } from 'koa';
-
-const labelNames: readonly string[] = [Labels.HTTP_PATH, Labels.HTTP_STATUS_CODE, Labels.HTTP_METHOD];
-
-const requestSec = globalStats.createMeasureInt64('requests/duration', MeasureUnit.SEC);
-const requestErrors = globalStats.createMeasureInt64('requests/failures', MeasureUnit.UNIT);
-
-const REQUESTS_HISTOGRAM = globalStats.createView(
-  'http_server_request_duration_seconds',
-  requestSec,
-  AggregationType.DISTRIBUTION,
-  labelsToTags(labelNames),
-  'distribution of the requests duration',
-  [1, 2, 5, 7.5, 10, 12.5, 15, 17.5, 20],
-);
-globalStats.registerView(REQUESTS_HISTOGRAM);
-
-const REQUEST_ERRORS_COUNTER = globalStats.createView(
-  'http_server_request_failures_total',
-  requestErrors,
-  AggregationType.COUNT,
-  labelsToTags(labelNames),
-  'total request failures',
-);
-globalStats.registerView(REQUEST_ERRORS_COUNTER);
 
 const getContextLabels = (ctx: Context) => {
   const spanLabels = {
@@ -35,7 +10,6 @@ const getContextLabels = (ctx: Context) => {
   };
 
   return {
-    spanLabels,
     logLabels: {
       [Labels.HTTP_HEADERS]: JSON.stringify(ctx.request.headers),
       [Labels.HTTP_URL]: ctx.request.originalUrl,
@@ -50,52 +24,18 @@ const getContextLabels = (ctx: Context) => {
 };
 type ContextFunctionType = (logger: Logger) => (ctx: Context, next: () => Promise<void>) => Promise<void>;
 export const context: ContextFunctionType = (logger) => async (ctx, next) => {
-  const spanExtract = tracer.propagation.extract({ getHeader: (name: string) => ctx.headers[name] });
-  const spanContext = spanExtract !== null ? spanExtract : undefined;
-  const { spanLabels, logLabels } = getContextLabels(ctx);
+  const { logLabels } = getContextLabels(ctx);
   const childLogger = createChild(logger, { service: 'http-server', ...logLabels });
   ctx.state.logger = childLogger;
-  await tracer.startRootSpan({ spanContext, name: 'http_server_request', kind: SpanKind.SERVER }, async (span) => {
-    addAttributesToSpan(span, spanLabels);
-    const startTime = utils.nowSeconds();
-    try {
-      try {
-        await next();
-      } finally {
-        addAttributesToSpan(span, {
-          [Labels.HTTP_STATUS_CODE]: ctx.status,
-          [Labels.HTTP_PATH]: 'unknown',
-        });
-        // tslint:disable-next-line no-any
-        const { router, routerName } = ctx as any;
-        if (router != undefined && routerName != undefined) {
-          const layer = router.route(routerName);
-          if (layer) {
-            span.addAttribute(Labels.HTTP_PATH, layer.path);
-          }
-        }
-      }
-      childLogger.debug({ name: 'http_server_request' });
-    } catch (err) {
-      childLogger.error({ name: 'http_server_request', err });
-      globalStats.record([
-        {
-          measure: requestErrors,
-          value: 1,
-        },
-      ]);
+  try {
+    await next();
 
-      throw err;
-    } finally {
-      globalStats.record([
-        {
-          measure: requestSec,
-          value: utils.nowSeconds() - startTime,
-        },
-      ]);
-      span.end();
-    }
-  });
+    childLogger.debug({ name: 'http_server_request' });
+  } catch (err) {
+    childLogger.error({ name: 'http_server_request', err });
+
+    throw err;
+  }
 };
 
 type OnErrorFunctionType = (logger: Logger) => (err: Error, ctx?: Context) => void;

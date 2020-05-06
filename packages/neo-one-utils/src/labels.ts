@@ -92,20 +92,3 @@ export enum Labels {
   JSONRPC_TYPE = 'jsonrpc.type',
   COMMAND_NAME = 'command.name',
 }
-
-export const labelToTag = (label: string) => ({
-  name: label.replace(/\./g, '_'),
-});
-
-export const labelsToTags = (labels: readonly string[]) => labels.map(labelToTag);
-
-interface Span {
-  readonly addAttribute: (key: string, value: string | number | boolean) => void;
-}
-
-// tslint:disable-next-line: export-name
-export const addAttributesToSpan = (span: Span, attributes: Record<string, string | number | boolean>) => {
-  Object.entries(attributes).forEach(([key, value]) => {
-    span.addAttribute(key, value);
-  });
-};

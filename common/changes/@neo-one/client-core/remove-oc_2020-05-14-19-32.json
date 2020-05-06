@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "remove opencensus metrics temporarily",
+      "type": "major",
+      "packageName": "@neo-one/client-core"
+    }
+  ],
+  "packageName": "@neo-one/client-core",
+  "email": "danwbyrne@gmail.com"
+}

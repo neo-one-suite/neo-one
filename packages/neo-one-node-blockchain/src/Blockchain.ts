@@ -1,5 +1,4 @@
 import { common, crypto, ECPoint, ScriptBuilder, UInt160, VMState } from '@neo-one/client-common';
-import { AggregationType, globalStats, MeasureUnit } from '@neo-one/client-switch';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Action,
@@ -73,68 +72,6 @@ interface Entry {
   readonly unsafe: boolean;
 }
 
-const blockFailures = globalStats.createMeasureInt64('persist/failures', MeasureUnit.UNIT);
-const blockCurrent = globalStats.createMeasureInt64('persist/current', MeasureUnit.UNIT);
-const blockProgress = globalStats.createMeasureInt64('persist/progress', MeasureUnit.UNIT);
-
-const blockDurationMs = globalStats.createMeasureDouble(
-  'persist/duration',
-  MeasureUnit.MS,
-  'time to persist block in milliseconds',
-);
-const blockLatencySec = globalStats.createMeasureDouble(
-  'persist/latency',
-  MeasureUnit.SEC,
-  "'The latency from block timestamp to persist'",
-);
-
-const NEO_BLOCKCHAIN_PERSIST_BLOCK_DURATION_MS = globalStats.createView(
-  'neo_blockchain_persist_block_duration_ms',
-  blockDurationMs,
-  AggregationType.DISTRIBUTION,
-  [],
-  'distribution of the persist duration',
-  [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
-);
-globalStats.registerView(NEO_BLOCKCHAIN_PERSIST_BLOCK_DURATION_MS);
-
-const NEO_BLOCKCHAIN_PERSIST_BLOCK_FAILURES_TOTAL = globalStats.createView(
-  'neo_blockchain_persist_block_failures_total',
-  blockFailures,
-  AggregationType.COUNT,
-  [],
-  'total blockchain failures',
-);
-globalStats.registerView(NEO_BLOCKCHAIN_PERSIST_BLOCK_FAILURES_TOTAL);
-
-const NEO_BLOCKCHAIN_BLOCK_INDEX_GAUGE = globalStats.createView(
-  'neo_blockchain_block_index',
-  blockCurrent,
-  AggregationType.LAST_VALUE,
-  [],
-  'the current block index',
-);
-globalStats.registerView(NEO_BLOCKCHAIN_BLOCK_INDEX_GAUGE);
-
-const NEO_BLOCKCHAIN_PERSISTING_BLOCK_INDEX_GAUGE = globalStats.createView(
-  'neo_blockchain_persisting_block_index',
-  blockProgress,
-  AggregationType.LAST_VALUE,
-  [],
-  'The current in progress persist index',
-);
-globalStats.registerView(NEO_BLOCKCHAIN_PERSISTING_BLOCK_INDEX_GAUGE);
-
-const NEO_BLOCKCHAIN_PERSIST_BLOCK_LATENCY_SECONDS = globalStats.createView(
-  'neo_blockchain_persist_block_latency_seconds',
-  blockLatencySec,
-  AggregationType.DISTRIBUTION,
-  [],
-  'The latency from block timestamp to persist',
-  [1, 2, 5, 7.5, 10, 12.5, 15, 17.5, 20],
-);
-globalStats.registerView(NEO_BLOCKCHAIN_PERSIST_BLOCK_LATENCY_SECONDS);
-
 export class Blockchain {
   public static async create({ settings, storage, vm }: CreateBlockchainOptions): Promise<BlockchainType> {
     const [currentBlock, currentHeader] = await Promise.all([
@@ -193,17 +130,6 @@ export class Blockchain {
     this.vm = options.vm;
 
     this.settings$ = new BehaviorSubject(options.settings);
-
-    globalStats.record([
-      {
-        measure: blockProgress,
-        value: this.currentBlockIndex,
-      },
-      {
-        measure: blockCurrent,
-        value: this.currentBlockIndex,
-      },
-    ]);
 
     // tslint:disable-next-line no-this-assignment
     const self = this;
@@ -613,8 +539,6 @@ export class Blockchain {
 
       // tslint:disable-next-line no-loop-statement
       while (this.mutableRunning && entry !== undefined && entry.block.index === this.currentBlockIndex + 1) {
-        const startTime = Date.now();
-
         const entryNonNull = entry;
         const logData = {
           [Labels.NEO_BLOCK_INDEX]: entry.block.index,
@@ -623,37 +547,14 @@ export class Blockchain {
         try {
           await this.persistBlockInternal(entryNonNull.block, entryNonNull.unsafe);
           logger.debug(logData);
-          globalStats.record([
-            {
-              measure: blockDurationMs,
-              value: Date.now() - startTime,
-            },
-          ]);
         } catch (err) {
           logger.error({ err, ...logData });
-          globalStats.record([
-            {
-              measure: blockFailures,
-              value: 1,
-            },
-          ]);
 
           throw err;
         }
 
         entry.resolve();
         this.mutableBlock$.next(entry.block);
-        globalStats.record([
-          {
-            measure: blockCurrent,
-            value: entry.block.index,
-          },
-          {
-            measure: blockLatencySec,
-            value: commonUtils.nowSeconds() - entry.block.timestamp,
-          },
-        ]);
-
         entry = this.cleanBlockQueue();
       }
 
@@ -936,13 +837,6 @@ export class Blockchain {
   // };
 
   private async persistBlockInternal(block: Block, unsafe?: boolean): Promise<void> {
-    globalStats.record([
-      {
-        measure: blockProgress,
-        value: block.index,
-      },
-    ]);
-
     if (!unsafe) {
       await this.verifyBlock(block);
     }
