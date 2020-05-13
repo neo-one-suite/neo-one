@@ -3,7 +3,6 @@ import { deserializeStackItem, StackItem } from '@neo-one/node-vm';
 import { utils } from '@neo-one/utils';
 import _ from 'lodash';
 import { SourceMaps } from '../common';
-import { initializeSourceMap } from './initializeSourceMap';
 import { processTrace } from './processTrace';
 
 export interface LogOptions {
@@ -154,7 +153,6 @@ export const createConsoleLogMessages = async (
   sourceMaps: SourceMaps = {},
   { bare = false, onlyFileName = false }: LogOptions = { bare: false, onlyFileName: false },
 ): Promise<readonly string[]> => {
-  initializeSourceMap();
   const logs = extractConsoleLogs(actions);
   if (bare) {
     return logs.map(({ message }) => message);
