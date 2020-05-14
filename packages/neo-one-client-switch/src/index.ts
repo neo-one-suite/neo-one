@@ -2,7 +2,6 @@ export {
   disableConsoleLogForTest,
   enableConsoleLogForTest,
   HWLedger,
-  initializeSourceMap,
   LogOptions,
   ProcessActionsAndMessageOptions,
   ProcessConsoleLogOptions,
