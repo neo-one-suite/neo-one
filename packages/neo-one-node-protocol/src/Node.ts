@@ -1,5 +1,4 @@
 import { common, crypto, UInt256Hex, utils } from '@neo-one/client-common';
-import { AggregationType, globalStats, MeasureUnit } from '@neo-one/client-switch';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import { Consensus, ConsensusOptions } from '@neo-one/node-consensus';
 import {
@@ -24,14 +23,7 @@ import {
   TransactionType,
   VerifyTransactionResult,
 } from '@neo-one/node-core';
-import {
-  composeDisposables,
-  Disposable,
-  Labels,
-  labelToTag,
-  noopDisposable,
-  utils as commonUtils,
-} from '@neo-one/utils';
+import { composeDisposables, Disposable, Labels, noopDisposable, utils as commonUtils } from '@neo-one/utils';
 import { ScalingBloem } from 'bloem';
 // tslint:disable-next-line:match-default-export-name
 import BloomFilter from 'bloom-filter';
@@ -59,39 +51,6 @@ import {
 import { PeerData } from './PeerData';
 
 const logger = createChild(nodeLogger, { component: 'node-protocol' });
-
-const messageReceivedTag = labelToTag(Labels.COMMAND_NAME);
-
-const messagesReceived = globalStats.createMeasureInt64('messages/received', MeasureUnit.UNIT);
-const messagesFailed = globalStats.createMeasureInt64('messages/failed', MeasureUnit.UNIT);
-const mempoolSize = globalStats.createMeasureInt64('mempool/size', MeasureUnit.UNIT);
-
-const NEO_PROTOCOL_MESSAGES_RECEIVED_TOTAL = globalStats.createView(
-  'neo_protocol_messages_received_total',
-  messagesReceived,
-  AggregationType.COUNT,
-  [messageReceivedTag],
-  'number of messages received',
-);
-globalStats.registerView(NEO_PROTOCOL_MESSAGES_RECEIVED_TOTAL);
-
-const NEO_PROTOCOL_MESSAGES_FAILURES_TOTAL = globalStats.createView(
-  'neo_protocol_messages_failures_total',
-  messagesFailed,
-  AggregationType.COUNT,
-  [messageReceivedTag],
-  'number of message failures',
-);
-globalStats.registerView(NEO_PROTOCOL_MESSAGES_FAILURES_TOTAL);
-
-const NEO_PROTOCOL_MEMPOOL_SIZE = globalStats.createView(
-  'neo_protocol_mempool_size',
-  mempoolSize,
-  AggregationType.LAST_VALUE,
-  [],
-  'current mempool size',
-);
-globalStats.registerView(NEO_PROTOCOL_MEMPOOL_SIZE);
 
 export interface TransactionAndFee {
   readonly transaction: Transaction;
@@ -256,12 +215,6 @@ export class Node implements INode {
         // tslint:disable-next-line no-dynamic-delete
         delete this.mutableMemPool[hash];
       });
-      globalStats.record([
-        {
-          measure: mempoolSize,
-          value: Object.keys(this.mutableMemPool).length,
-        },
-      ]);
     }
   }, TRIM_MEMPOOL_THROTTLE);
 
@@ -406,12 +359,6 @@ export class Node implements INode {
 
             if (verified) {
               this.mutableMemPool[transaction.hashHex] = transaction;
-              globalStats.record([
-                {
-                  measure: mempoolSize,
-                  value: Object.keys(this.mutableMemPool).length,
-                },
-              ]);
               if (this.mutableConsensus !== undefined) {
                 this.mutableConsensus.onTransactionReceived(transaction);
               }
@@ -875,12 +822,6 @@ export class Node implements INode {
           delete this.mutableMemPool[transaction.hashHex];
           this.mutableKnownTransactionHashes.add(transaction.hash);
         });
-        globalStats.record([
-          {
-            measure: mempoolSize,
-            value: Object.keys(this.mutableMemPool).length,
-          },
-        ]);
       } finally {
         this.tempKnownBlockHashes.delete(block.hashHex);
       }

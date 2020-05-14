@@ -1,13 +1,3 @@
-import {
-  getJaegerTraceExporter,
-  getNewPropagation,
-  getPrometheusExporter,
-  globalStats,
-  JaegerTraceExporterOptions,
-  PrometheusExporterOptions,
-  startTracing,
-  TracingConfig,
-} from '@neo-one/client-switch';
 import { setGlobalLogLevel } from '@neo-one/logger';
 import { Blockchain } from '@neo-one/node-blockchain';
 import { Settings } from '@neo-one/node-core';
@@ -29,9 +19,6 @@ export interface LoggingOptions {
 
 export interface TelemetryOptions {
   readonly logging?: LoggingOptions;
-  readonly prometheus?: Omit<PrometheusExporterOptions, 'startServer'>;
-  readonly jaeger?: Omit<JaegerTraceExporterOptions, 'serviceName'>;
-  readonly tracing?: Omit<TracingConfig, 'exporter' | 'propagation' | 'logger' | 'stats'>;
 }
 
 export interface Options {
@@ -67,40 +54,8 @@ export const startFullNode = async ({
   try {
     await fs.ensureDir(dataPath);
 
-    if (telemetry !== undefined) {
-      if (telemetry.logging !== undefined && telemetry.logging.level !== undefined) {
-        setGlobalLogLevel(telemetry.logging.level);
-      }
-
-      if (telemetry.prometheus !== undefined) {
-        const exporter = await getPrometheusExporter({
-          ...telemetry.prometheus,
-          startServer: true,
-        });
-
-        await globalStats.registerExporter(exporter);
-
-        disposable = composeDisposables(disposable, async () => {
-          await new Promise((resolve) => exporter.stopServer(resolve));
-          globalStats.unregisterExporter(exporter);
-        });
-      }
-
-      if (telemetry.jaeger !== undefined && telemetry.tracing !== undefined) {
-        const exporter = await getJaegerTraceExporter({
-          ...telemetry.jaeger,
-          serviceName: 'NEO-ONE',
-        });
-
-        const propagation = await getNewPropagation();
-        const stopTracing = await startTracing({
-          ...telemetry.tracing,
-          propagation,
-          exporter,
-        });
-
-        disposable = composeDisposables(disposable, stopTracing);
-      }
+    if (telemetry !== undefined && telemetry.logging !== undefined && telemetry.logging.level !== undefined) {
+      setGlobalLogLevel(telemetry.logging.level);
     }
 
     const levelDown = customLeveldown === undefined ? LevelDOWN(dataPath) : customLeveldown;
