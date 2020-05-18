@@ -14,7 +14,7 @@ export const rollupDevTools = (format: Format) => async () => {
     external: ['resize-observer-polyfill'],
     plugins: [
       rollupString.string({
-        include: path.join(APP_ROOT_DIR, 'neo-one-developer-tools-frame', 'lib', 'tools.raw.js'),
+        include: path.join(APP_ROOT_DIR, 'neo-one-developer-tools-frame', 'dist', 'tools.raw.js'),
       }),
       rollupTypescript({
         cacheRoot: path.join('node_modules', '.cache', 'rts2', format.target, format.module),
@@ -32,6 +32,6 @@ export const rollupDevTools = (format: Format) => async () => {
 
   await bundle.write({
     format: format.module,
-    file: path.join('lib', 'index.js'),
+    file: path.join('dist', format.dist, 'index.js'),
   });
 };

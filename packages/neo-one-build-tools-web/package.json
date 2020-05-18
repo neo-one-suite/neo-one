@@ -2,7 +2,7 @@
   "name": "@neo-one/build-tools-web",
   "version": "1.0.0",
   "description": "NEO•ONE web build tools.",
-  "main": "./lib/index",
+  "main": "./dist/index",
   "license": "MIT",
   "scripts": {
     "build": "gulp",

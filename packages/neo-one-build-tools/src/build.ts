@@ -5,7 +5,6 @@ import { Format, getFormat } from './formats';
 import { buildBin, buildTypescript, rollupDevTools, CompileTypescriptOptions } from './builds';
 import yargs from 'yargs';
 import { getPackageInfo } from './utils';
-import { pack, copyData, packBin } from './pack';
 
 const defaultBuildFormat = process.env.NEO_ONE_BUILD_FORMAT !== undefined ? process.env.NEO_ONE_BUILD_FORMAT : 'main';
 
@@ -66,9 +65,11 @@ class BuildTask<Options = undefined> {
 interface CopyStaticOptions {
   readonly dest: string;
 }
+
 export const copyStaticTask = new BuildTask<CopyStaticOptions>(
-  () => (glob, options) => {
-    gulp.src(glob, { nodir: true }).pipe(gulp.dest(options !== undefined ? options.dest : 'lib'));
+  (format) => (glob, options) => {
+    const outDest = `dist/${format.dist}`;
+    gulp.src(glob, { nodir: true }).pipe(gulp.dest(options !== undefined ? `${outDest}/${options.dest}` : outDest));
   },
   ['src/**/*'].concat(ignoreGlobs),
 );
@@ -79,24 +80,18 @@ export const compileTypescriptTask = new BuildTask<CompileTypescriptOptions>(
   ['src/**/*.ts', 'src/**/*.tsx'].concat(ignoreGlobs),
 );
 
-export const cleanTask = async () => Promise.all([fs.remove('lib')]);
-
 export const rollupToolsTask = new BuildTask(rollupDevTools, []);
 rollupToolsTask.enabled = false;
 
 export const compileBinTask = new BuildTask(buildBin);
 
-export const copyDataTask = new BuildTask<undefined>(copyData);
-
-export const packTask = new BuildTask<undefined>(pack, ['lib/**', '!lib/**/*.map']);
-
-export const packBinTask = new BuildTask<undefined>(packBin);
+export const formatString = argv.format;
 
 export const initialize = () => {
-  const format = getFormat(argv.format);
+  const format = getFormat(formatString);
 
   gulp.task('clean', async () => {
-    await fs.remove('lib').then(() => fs.ensureDir('lib'));
+    await fs.remove(`dist/${format.dist}`).then(() => fs.ensureDir(`dist`));
   });
 
   gulp.task('copyStatic', async () => {
@@ -115,19 +110,5 @@ export const initialize = () => {
     await rollupToolsTask.execute(format);
   });
 
-  gulp.task('copyData', async () => {
-    await copyDataTask.execute(format);
-  });
-
-  gulp.task('pack', async () => {
-    await packTask.execute(format);
-  });
-
-  gulp.task('packBin', async () => {
-    await packBinTask.execute(format);
-  });
-
   gulp.task('default', gulp.series('clean', 'copyStatic', 'compileTS', 'compileBin', 'rollupTools'));
-
-  gulp.task('pack', gulp.series('copyData', 'pack', 'packBin'));
 };

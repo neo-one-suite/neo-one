@@ -16,14 +16,14 @@ const flattenSource = gulpRename((name) => {
     .join(path.sep);
 });
 
-const clean = async () => fs.remove('lib');
+const clean = async () => fs.remove('dist');
 
 const buildTools = () =>
   gulp
     .src(['src/**/*.js', 'src/**/*.ts', 'src/**/*.tsx'])
     .pipe(ts.createProject('./tsconfig.json')())
     .pipe(flattenSource)
-    .pipe(gulp.dest('lib'));
+    .pipe(gulp.dest('dist'));
 
 gulp.task('default', async (done) => {
   await clean();

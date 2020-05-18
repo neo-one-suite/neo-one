@@ -5,7 +5,7 @@ const path = require('path');
 
 build.copyStaticTask.glob = ['static/**/*'];
 build.copyStaticTask.options = {
-  dest: path.join('lib', 'static'),
+  dest: 'static',
 };
 
 build.copyStaticTask.enabled = true;

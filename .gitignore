@@ -5,12 +5,16 @@
 /dist/
 /build/
 /tmp
-/packages/*/lib
+/packages/*/dist
 .rpt2_cache
 /reports
 .nyc_output
 .awcache
 .cache-loader
+
+# Release Files
+/packages/*/LICENSE
+/packages/*/README.md
 
 # Playground
 /packages/neo-one-playground

@@ -1,6 +1,10 @@
 {
   "extends": "./tsconfig.esm.json",
   "compilerOptions": {
-    "target": "esnext"
+    "target": "esnext",
+    "paths": {
+      "bn.js": ["node_modules/@neo-one/build-tools/types/bn.js.d.ts"],
+      "@neo-one/*": ["node_modules/@neo-one/*/dist/esm/index"]
+    }
   }
 }

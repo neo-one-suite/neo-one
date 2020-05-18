@@ -43,7 +43,7 @@ const compileBin = (format: Format, binGlob: string) => {
     .pipe(flattenBin)
     .pipe(gulpReplaceBin())
     .pipe(gulpSourcemaps.write('.', { includeContent: false, sourceRoot: '../src' }))
-    .pipe(gulp.dest('lib'));
+    .pipe(gulp.dest('dist/cjs'));
 };
 
 export const buildBin = (format: Format) => () => {

@@ -2,7 +2,7 @@
   "name": "@neo-one/build-tools",
   "version": "1.0.0",
   "description": "NEO•ONE build tools.",
-  "main": "./lib/index",
+  "main": "./dist/index",
   "license": "MIT",
   "bin": {
     "neo-one-lint": "bin/neo-one-lint.js",

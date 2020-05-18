@@ -8,7 +8,7 @@ import { getSize } from './utils';
 // an equivalent rollup plugin for distributed version.
 // tslint:disable
 // @ts-ignore
-import iframeScript from '@neo-one/developer-tools-frame/lib/tools.raw.js';
+import iframeScript from '@neo-one/developer-tools-frame/dist/tools.raw.js';
 // tslint:enable
 
 // tslint:disable no-let
