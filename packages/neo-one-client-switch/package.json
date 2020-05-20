@@ -2,8 +2,9 @@
   "name": "@neo-one/client-switch",
   "version": "2.4.0",
   "description": "NEO•ONE client library for browser/node differences.",
-  "main": "./lib/index",
-  "browser": "./lib/index.browser",
+  "main": "./dist/cjs/index",
+  "browser": "./dist/cjs/index.browser",
+  "module": "./dist/esm/index",
   "scripts": {
     "build": "gulp",
     "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",

@@ -2,7 +2,8 @@
   "name": "@neo-one/utils",
   "version": "2.4.0",
   "description": "NEO•ONE shared utils.",
-  "main": "./lib/index",
+  "main": "./dist/cjs/index",
+  "module": "./dist/esm/index",
   "license": "MIT",
   "scripts": {
     "build": "gulp",

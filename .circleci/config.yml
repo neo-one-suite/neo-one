@@ -66,7 +66,7 @@ aliases:
           root: ~/neo-one
           paths:
             - common/temp/node_modules
-            - packages/*/lib
+            - packages/*/dist
             - packages/*/node_modules
 
   - &test10
@@ -107,7 +107,7 @@ aliases:
           root: ~/neo-one
           paths:
             - common/temp/node_modules
-            - packages/*/lib
+            - packages/*/dist
             - packages/*/node_modules
 
   - &test12

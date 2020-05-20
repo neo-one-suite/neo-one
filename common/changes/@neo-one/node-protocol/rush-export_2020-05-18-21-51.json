@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "update package release process to take better advantage of rush tooling",
+      "type": "minor",
+      "packageName": "@neo-one/node-protocol"
+    }
+  ],
+  "packageName": "@neo-one/node-protocol",
+  "email": "danwbyrne@gmail.com"
+}

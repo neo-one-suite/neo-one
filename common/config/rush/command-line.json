@@ -250,6 +250,14 @@
     },
     {
       "commandKind": "global",
+      "name": "prepare",
+      "summary": "prepare packages for npm release",
+      "description": "Copy License/README to packages for npm release",
+      "safeForSimultaneousRushProcesses": false,
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" node ./packages/neo-one-build-tools/bin/neo-one-prepare.js"
+    },
+    {
+      "commandKind": "global",
       "name": "clean",
       "summary": "Clean up NEO-ONE packages",
       "description": "Remove build logs from all packages (and optionally lib/* and .rush/* directories)",
@@ -302,24 +310,6 @@
       "ignoreDependencyOrder": true,
       "enableParallelism": true,
       "ignoreMissingScript": true
-    },
-    {
-      "commandKind": "bulk",
-      "name": "pack",
-      "summary": "pack built files into 'dist'",
-      "description": "transform sources and other files for npm exporting",
-      "safeForSimultaneousRushProcesses": false,
-      "ignoreDependencyOrder": true,
-      "enableParallelism": true,
-      "ignoreMissingScript": true
-    },
-    {
-      "commandKind": "global",
-      "name": "release",
-      "summary": "release packed packages with given format",
-      "description": "try to publish packages in `dist`",
-      "safeForSimultaneousRushProcesses": false,
-      "shellCommand": "node packages/neo-one-build-tools/bin/neo-one-publish.js"
     }
   ],
   "parameters": [
@@ -406,7 +396,7 @@
       "longName": "--format",
       "shortName": "-b",
       "description": "specify an output build format (main, esm, browserify)",
-      "associatedCommands": ["build", "rebuild", "pack", "release"],
+      "associatedCommands": ["build", "rebuild"],
       "alternatives": [
         {
           "name": "main",

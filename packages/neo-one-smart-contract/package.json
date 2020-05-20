@@ -2,15 +2,10 @@
   "name": "@neo-one/smart-contract",
   "version": "2.4.0",
   "description": "NEO•ONE smart contract apis.",
-  "main": "./lib/index.d.ts",
+  "main": "./src/index.d.ts",
   "scripts": {
-    "build": "gulp",
-    "lint": "",
-    "pack": "gulp pack"
-  },
-  "devDependencies": {
-    "@neo-one/build-tools": "^1.0.0",
-    "gulp": "~4.0.2"
+    "build": "",
+    "lint": ""
   },
   "smartContract": true,
   "sideEffects": false

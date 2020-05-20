@@ -2,7 +2,7 @@
   "name": "@neo-one/cli",
   "version": "2.5.0",
   "description": "NEO•ONE CLI for developing NEO dapps.",
-  "main": "./lib/index",
+  "main": "./dist/cjs/index",
   "scripts": {
     "build": "gulp",
     "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",

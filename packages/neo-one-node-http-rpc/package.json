@@ -2,7 +2,8 @@
   "name": "@neo-one/node-http-rpc",
   "version": "2.4.0",
   "description": "NEO•ONE RPC server.",
-  "main": "./lib/index",
+  "main": "./dist/cjs/index",
+  "module": "./dist/esm/index",
   "scripts": {
     "build": "gulp",
     "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",

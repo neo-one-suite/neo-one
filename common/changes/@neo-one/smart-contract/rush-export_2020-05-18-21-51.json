@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "update package release process to take better advantage of rush tooling",
+      "type": "minor",
+      "packageName": "@neo-one/smart-contract"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract",
+  "email": "danwbyrne@gmail.com"
+}

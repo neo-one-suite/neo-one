@@ -48,5 +48,5 @@ export const buildTypescript = (format: Format, pkgName?: string) => (
       .pipe(flattenSource)
       .pipe(gulpSourcemaps.write('.', { includeContent: false, sourceRoot: '../src' }))
       .pipe(filterJS(isToolsPackage)),
-  ).pipe(gulp.dest('lib'));
+  ).pipe(gulp.dest(`dist/${format.dist}`));
 };

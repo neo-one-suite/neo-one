@@ -6,7 +6,7 @@ import { plugins } from './plugins';
 
 const APP_ROOT_DIR = path.resolve(__dirname, '..', '..', '..', '..');
 const TOOLS_PACKAGE = path.resolve(APP_ROOT_DIR, 'packages', 'neo-one-developer-tools-frame');
-const DIST_DIR = path.resolve(TOOLS_PACKAGE, 'lib');
+const DIST_DIR = path.resolve(TOOLS_PACKAGE, 'dist');
 
 export const tools = ({ stage }: { readonly stage: Stage }): webpack.Configuration => ({
   ...common({ stage, bundle: 'tools' }),

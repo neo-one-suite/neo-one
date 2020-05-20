@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "update package release process to take better advantage of rush tooling",
+      "type": "minor",
+      "packageName": "@neo-one/client-full-common"
+    }
+  ],
+  "packageName": "@neo-one/client-full-common",
+  "email": "danwbyrne@gmail.com"
+}

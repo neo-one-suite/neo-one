@@ -6,5 +6,5 @@
       "@neo-one/*": ["../neo-one-*/src"]
     }
   },
-  "exclude": ["./node_modules", "./lib", "./src/__data__/contracts/**/*.ts", "./template/**/*.ts?(x)"]
+  "exclude": ["./node_modules", "./dist", "./src/__data__/contracts/**/*.ts", "./template/**/*.ts?(x)"]
 }

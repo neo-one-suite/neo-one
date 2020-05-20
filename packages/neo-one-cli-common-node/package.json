@@ -2,7 +2,8 @@
   "name": "@neo-one/cli-common-node",
   "version": "2.5.0",
   "description": "NEO•ONE code common to the node cli and other node packages in NEO•ONE.",
-  "main": "./lib/index",
+  "main": "./dist/cjs/index",
+  "module": "./dist/esm/index",
   "scripts": {
     "build": "gulp",
     "lint": "node ./node_modules/@neo-one/build-tools/bin/neo-one-lint.js",

@@ -36,13 +36,22 @@ const deleteAll = (modules: readonly string[]): void => {
     if (argv.full) {
       logger(`Removing /.rush: ${path.resolve(dir, '.rush')}`);
       fs.removeSync(path.resolve(dir, '.rush'));
-      logger(`Removing /lib: ${path.resolve(dir, 'lib')}`);
-      fs.removeSync(path.resolve(dir, 'lib'));
+      logger(`Removing /dist: ${path.resolve(dir, 'dist')}`);
+      fs.removeSync(path.resolve(dir, 'dist'));
     }
     const filesInPackage = fs.readdirSync(dir);
     filesInPackage.forEach((file) => {
       if (file.includes('.log')) {
         logger(`Removing log file: ${path.resolve(dir, file)}`);
+        fs.removeSync(path.resolve(dir, file));
+      }
+      if (file === 'LICENSE') {
+        logger(`Removing LICENSE file: ${path.resolve(dir, file)}`);
+        fs.removeSync(path.resolve(dir, file));
+      }
+
+      if (file === 'README.md') {
+        logger(`Removing README.md from ${path.resolve(dir, file)}`);
         fs.removeSync(path.resolve(dir, file));
       }
     });

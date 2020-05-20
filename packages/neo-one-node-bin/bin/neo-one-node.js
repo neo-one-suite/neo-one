@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('../lib/neo-one-node.js');
+require('../dist/cjs/neo-one-node.js');
