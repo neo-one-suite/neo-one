@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/utils-node",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "NEO•ONE shared Nodejs utils.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -12,7 +12,7 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/utils": "^2.4.0",
+    "@neo-one/utils": "^2.5.0",
     "execa": "^3.2.0",
     "npm-package-arg": "^7.0.0",
     "pino": "^5.12.6",

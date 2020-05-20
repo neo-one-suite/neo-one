@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-rpc-handler",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "NEO•ONE RPC handler.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -12,11 +12,11 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/client-common": "^2.5.0",
-    "@neo-one/client-switch": "^2.4.0",
-    "@neo-one/logger": "^2.4.0",
-    "@neo-one/node-core": "^2.4.0",
-    "@neo-one/utils": "^2.4.0",
+    "@neo-one/client-common": "^2.6.0",
+    "@neo-one/client-switch": "^2.5.0",
+    "@neo-one/logger": "^2.5.0",
+    "@neo-one/node-core": "^2.5.0",
+    "@neo-one/utils": "^2.5.0",
     "rxjs": "^6.5.3",
     "tslib": "^1.10.0"
   },

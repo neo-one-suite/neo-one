@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-typescript-plugin",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "NEO•ONE TypeScript typescript plugin.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,8 +13,8 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/smart-contract-compiler": "^2.4.0",
-    "@neo-one/smart-contract-compiler-node": "^2.4.0",
+    "@neo-one/smart-contract-compiler": "^2.5.0",
+    "@neo-one/smart-contract-compiler-node": "^2.5.0",
     "typescript": "3.8.3"
   },
   "devDependencies": {

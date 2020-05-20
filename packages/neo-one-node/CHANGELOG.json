@@ -2,6 +2,56 @@
   "name": "@neo-one/node",
   "entries": [
     {
+      "version": "2.5.0",
+      "tag": "@neo-one/node_v2.5.0",
+      "date": "Wed, 20 May 2020 07:03:14 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "remove opencensus metrics temporarily"
+          },
+          {
+            "comment": "update package release process to take better advantage of rush tooling"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@neo-one/client-switch\" from `^2.4.0` to `^2.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/logger\" from `^2.4.0` to `^2.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-blockchain\" from `^2.4.0` to `^2.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-core\" from `^2.4.0` to `^2.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-http-rpc\" from `^2.4.0` to `^2.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-network\" from `^2.4.0` to `^2.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-offline\" from `^2.4.0` to `^2.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-protocol\" from `^2.4.0` to `^2.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-storage-levelup\" from `^2.4.0` to `^2.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/node-vm\" from `^2.4.0` to `^2.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/utils\" from `^2.4.0` to `^2.5.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.4.0",
       "tag": "@neo-one/node_v2.4.0",
       "date": "Mon, 13 Apr 2020 23:20:32 GMT",

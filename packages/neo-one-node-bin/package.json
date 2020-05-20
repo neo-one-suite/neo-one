@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-bin",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "NEO•ONE NEO executable full node.",
   "bin": {
     "neo-one-node": "bin/neo-one-node.js"
@@ -13,11 +13,11 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/logger": "^2.4.0",
-    "@neo-one/node": "^2.4.0",
-    "@neo-one/node-neo-settings": "^2.4.0",
-    "@neo-one/utils": "^2.4.0",
-    "@neo-one/utils-node": "^2.4.0",
+    "@neo-one/logger": "^2.5.0",
+    "@neo-one/node": "^2.5.0",
+    "@neo-one/node-neo-settings": "^2.5.0",
+    "@neo-one/utils": "^2.5.0",
+    "@neo-one/utils-node": "^2.5.0",
     "env-paths": "^2.2.0",
     "execa": "^3.2.0",
     "import-local": "^3.0.2",
@@ -29,8 +29,8 @@
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@neo-one/client": "^2.5.0",
-    "@neo-one/client-common": "^2.5.0",
+    "@neo-one/client": "^2.6.0",
+    "@neo-one/client-common": "^2.6.0",
     "@types/fs-extra": "^8.0.0",
     "@types/jest": "^24.0.18",
     "@types/rc": "^1.1.0",

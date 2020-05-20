@@ -2,6 +2,18 @@
   "name": "@neo-one/http",
   "entries": [
     {
+      "version": "2.5.0",
+      "tag": "@neo-one/http_v2.5.0",
+      "date": "Wed, 20 May 2020 07:03:14 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "update package release process to take better advantage of rush tooling"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.4.0",
       "tag": "@neo-one/http_v2.4.0",
       "date": "Mon, 13 Apr 2020 23:20:32 GMT",

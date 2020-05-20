@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-offline",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "NEO•ONE utility for loading serialized blocks (chain.acc) into a node.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -12,9 +12,9 @@
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
   "dependencies": {
-    "@neo-one/logger": "^2.4.0",
-    "@neo-one/node-core": "^2.4.0",
-    "@neo-one/utils": "^2.4.0",
+    "@neo-one/logger": "^2.5.0",
+    "@neo-one/node-core": "^2.5.0",
+    "@neo-one/utils": "^2.5.0",
     "lodash": "^4.17.15",
     "tslib": "^1.10.0"
   },
