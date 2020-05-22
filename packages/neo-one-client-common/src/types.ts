@@ -929,7 +929,7 @@ export interface DeveloperProvider {
    */
   readonly reset: () => Promise<void>;
   /**
-   * Fetch the NEO tracker URL for the project.
+   * Fetch the NEO Tracker URL for the project.
    */
   readonly getNEOTrackerURL: () => Promise<string | undefined>;
   /**

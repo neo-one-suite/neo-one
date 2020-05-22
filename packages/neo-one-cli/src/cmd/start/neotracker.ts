@@ -8,9 +8,9 @@ import { findKillProcess } from '../../utils';
 import { writePidFile } from './writePidFile';
 
 export const command = 'neotracker';
-export const describe = 'Start a NEO tracker instance using the project configuration.';
+export const describe = 'Start a NEO Tracker instance using the project configuration.';
 export const builder = (yargsBuilder: typeof yargs) =>
-  yargsBuilder.boolean('reset').describe('reset', 'Reset the NEO tracker database.').default('reset', false);
+  yargsBuilder.boolean('reset').describe('reset', 'Reset the NEO Tracker database.').default('reset', false);
 export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
   start(async (_cmd, config) => {
     const running = await isRunning(config.neotracker.port);
@@ -18,7 +18,7 @@ export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
       if (argv.reset) {
         await findKillProcess('neotracker', config);
       } else {
-        cliLogger.info('NEO tracker is already running');
+        cliLogger.info('NEO Tracker is already running');
 
         return undefined;
       }

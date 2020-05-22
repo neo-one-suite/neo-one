@@ -60,7 +60,7 @@ export class DeveloperClient {
   }
 
   /**
-   * Fetch the NEO tracker URL for the project.
+   * Fetch the NEO Tracker URL for the project.
    */
   public async getNEOTrackerURL(): Promise<string | undefined> {
     return this.developerProvider.getNEOTrackerURL();
