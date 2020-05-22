@@ -53,11 +53,11 @@ export default {
   // Refer to the documentation at https://neo-one.io/docs/configuration for more information.
   networks: defaultNetworks,
   neotracker: {
-    // NEO•ONE will start an instance of NEO tracker using this path for local data. This directory should not be committed.
+    // NEO•ONE will start an instance of NEO Tracker using this path for local data. This directory should not be committed.
     path: '.neo-one/neotracker',
-    // NEO•ONE will start an instance of NEO tracker using this port.
+    // NEO•ONE will start an instance of NEO Tracker using this port.
     port: 9041,
-    // Set to true if you'd like NEO•ONE to skip starting a NEO tracker instance when running 'neo-one build'.
+    // Set to true if you'd like NEO•ONE to skip starting a NEO Tracker instance when running 'neo-one build'.
     skip: false,
   },
 };

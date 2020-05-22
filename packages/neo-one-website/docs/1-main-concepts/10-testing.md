@@ -155,7 +155,7 @@ describe('Token', () => {
 - `reset(): Promise<void>` - reset the local network to it's initial state starting at the genesis block.
 - `getSettings(): Promise<PrivateNetworkSettings>` - Get the current settings of the private network.
 - `updateSettings(options: Partial<PrivateNetworkSettings>): Promise<void>` - update settings for the private network. Currently only has a property for controlling the seconds per block.
-- `getNEOTrackerURL(): Promise<string | undefined>` - fetches the NEO tracker URL for the project.
+- `getNEOTrackerURL(): Promise<string | undefined>` - fetches the NEO Tracker URL for the project.
 
 Putting it all together, we might test a time dependent ICO contract like so:
 
