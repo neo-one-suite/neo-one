@@ -21,12 +21,12 @@ const createUserAccountProviderFunc = (network: string, rpcURL: string) => async
 // tslint:disable-next-line export-name
 export const defaultNetworks = {
   main: {
-    userAccountProvider: createUserAccountProviderFunc('main', 'https://main.neo-one.io/rpc'),
+    userAccountProvider: createUserAccountProviderFunc('main', 'https://neotracker.io/rpc'),
   },
   test: {
-    userAccountProvider: createUserAccountProviderFunc('test', 'https://test.neo-one.io/rpc'),
+    userAccountProvider: createUserAccountProviderFunc('test', 'https://testnet.neotracker.io/rpc'),
   },
-  neoOne: {
-    userAccountProvider: createUserAccountProviderFunc('neo-one', 'https://neo-one.neo-one.io/rpc'),
+  local: {
+    userAccountProvider: createUserAccountProviderFunc('neo-one', 'localhost:9040'),
   },
 };
