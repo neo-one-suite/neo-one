@@ -19,6 +19,6 @@
     "*.d.ts.map": "json"
   },
   "search.exclude": {
-    "packages/*/lib/**": true
+    "packages/*/dist/**": true
   }
 }
