@@ -105,4 +105,18 @@ export default ({ token, ico, escrow }: MigrationContracts, _network: string) =>
 
 ## Deploying to a Public Network
 
-Good news! This feature is now available. With that said, we want to work closely with the first few users to deploy to the TestNet or MainNet to ensure a smooth, bug-free experience. Please reach out if you are ready and we will quickly work with you to deploy.
+Once you have successfully configured your `migration` file as explained above you are all set to deploy your Smart Contract! Using the set of [networks](/docs/config-options) defined in `.neo-one.config.js` you can deploy using the command:
+
+```bash
+yarn neo-one deploy --<network>
+```
+
+where `network` is one of the keys provided by your configuration. By default `yarn neo-one deploy` will use the `test` key.
+
+::: warning
+
+Note
+
+We HIGHLY recommend deploying to both a local private network _and_ the Neo TestNet before attempting to deploy to the MainNet.
+
+:::

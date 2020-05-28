@@ -62,3 +62,29 @@ export default {
   },
 };
 ```
+
+## Networks
+
+While we provide defaults for deployment networks it is also possible to use your own! You can provide a `name` and `rpcURL` to our [helper](https://github.com/neo-one-suite/neo-one/blob/ea855d82640550cb00830ea8a4596c8b01108cf7/packages/neo-one-cli-common-node/src/networks.ts#L5) which will prompt you to provide a list of `privateKeys` for use on the network when deploying _or_ you can provide your own UserAccountProvider, such as:
+
+```typescript
+const keystore = new LocalKeyStore(new LocalMemoryStore());
+keystore.addUserAccount('exampleNetwork', 'PRIVATE_KEY');
+export default {
+//...
+  networks: {
+    exampleNetwork: new LocalUserAccountProvider({
+      keystore,
+      provider: new NEOONEProvider([{ 'exampleNetwork', 'exampleRpcURL.io/rpc'}])
+    })
+  }
+}
+```
+
+::: warning
+
+Note
+
+While hard coding the `LocalUserAccountProvider` is a viable option in testing this also requires storing a `privateKey` as plain text in a file that would traditionally be checked into version control, i.e github. For this reason we recommend only using a hard coded value for local on-the-fly testing / debugging.
+
+:::
