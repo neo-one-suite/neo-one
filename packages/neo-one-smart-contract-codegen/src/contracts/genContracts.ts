@@ -49,7 +49,7 @@ export interface Contracts<TClient extends Client = Client> {
     .map(({ name }) => `readonly ${lowerCaseFirst(name)}: ${getSmartContractName(name)}<TClient>;`)
     .join('\n  ')}
 }
-
+// Refer to the MigrationSmartContract documentation at https://neo-one.io/docs/deployment for more information.
 export interface MigrationContracts {
   ${sortedPaths
     .map(({ name }) => `readonly ${lowerCaseFirst(name)}: ${getMigrationSmartContractName(name)};`)
