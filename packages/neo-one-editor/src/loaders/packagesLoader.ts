@@ -68,7 +68,7 @@ export const getPackages = async (loader: webpack.loader.LoaderContext) => {
   const packagePaths = packageDirs.map((dir) => path.resolve(PACKAGES_DIR, dir));
   const packageFilesList = await Promise.all(
     packagePaths.map(async (packagePath) => {
-      const hasLib = await fs.pathExists(path.resolve(packagePath, 'lib'));
+      const hasDist = await fs.pathExists(path.resolve(packagePath, 'dist'));
 
       return getPackageFiles(
         loader,
@@ -77,7 +77,7 @@ export const getPackages = async (loader: webpack.loader.LoaderContext) => {
         (file) =>
           file.includes('__') ||
           file.includes('node_modules') ||
-          (hasLib && file.includes('src')) ||
+          (hasDist && file.includes('src')) ||
           file.includes('.md') ||
           file.includes('package-deps.json') ||
           file.includes('.log') ||

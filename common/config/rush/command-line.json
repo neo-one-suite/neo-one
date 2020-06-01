@@ -23,7 +23,7 @@
       "summary": "Compile workers",
       "description": "Compile the NEO-ONE website workers",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle workers --watch"
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle workers --watch"
     },
     {
       "commandKind": "global",
@@ -31,7 +31,7 @@
       "summary": "Compile overlay [dev]",
       "description": "Compile the NEO-ONE website overlay",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle overlay --watch"
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle overlay --watch"
     },
     {
       "commandKind": "global",
@@ -39,7 +39,7 @@
       "summary": "Compile test-runner [dev]",
       "description": "Compile the NEO-ONE test-runner [dev]",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle testRunner --watch"
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle testRunner --watch"
     },
     {
       "commandKind": "global",
@@ -47,7 +47,7 @@
       "summary": "Compile preview [dev]",
       "description": "Compile the NEO-ONE editor preview",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle preview --watch"
+      "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle preview --watch"
     },
     {
       "commandKind": "global",
@@ -55,7 +55,7 @@
       "summary": "Compile & serve editor server (only in dev mode)",
       "description": "Build and run the NEO-ONE editor server",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "mkdir -p ./dist/server && touch ./dist/server/index.js && cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --watch --bundle server"
+      "shellCommand": "mkdir -p ./dist/server && touch ./dist/server/index.js && cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --watch --bundle server"
     },
     {
       "commandKind": "global",
@@ -87,7 +87,7 @@
       "summary": "Compile workers [prod]",
       "description": "Compile the NEO-ONE website workers",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle workers"
+      "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle workers"
     },
     {
       "commandKind": "global",
@@ -95,7 +95,7 @@
       "summary": "Compile overlay [dev]",
       "description": "Compile the NEO-ONE website overlay",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle overlay"
+      "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle overlay"
     },
     {
       "commandKind": "global",
@@ -103,7 +103,7 @@
       "summary": "Compile & serve preview [prod]",
       "description": "Compile and serve the NEO-ONE editor preview [prod]",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle preview && serve dist/preview -p 8080"
+      "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle preview && serve dist/preview -p 8080"
     },
     {
       "commandKind": "global",
@@ -111,7 +111,7 @@
       "summary": "Compile & serve test-runner [prod]",
       "description": "Compile and serve the NEO-ONE test-runner [prod]",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/lib/compile --bundle testRunner && serve dist/testRunner -p 8081"
+      "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle testRunner && serve dist/testRunner -p 8081"
     },
     {
       "commandKind": "global",
@@ -143,7 +143,7 @@
       "summary": "Only compile all website pieces for live deployment to NOW",
       "description": "Compile all website pieces and do nothing else",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "rm -rf ./dist && rm -rf ./packages/neo-one-website/dist && rush compile-website-prod && node ./packages/neo-one-build-tools-web/lib/compile --bundle testRunner && node ./packages/neo-one-build-tools-web/lib/compile --bundle server && node ./packages/neo-one-build-tools-web/lib/compile --bundle preview && rm -rf ./packages/neo-one-website/publicOut && cp -r ./dist/workers ./packages/neo-one-website/publicOut && cp -r ./packages/neo-one-website/public/* ./packages/neo-one-website/publicOut && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build && sh ./scripts/rm-cruft"
+      "shellCommand": "rm -rf ./dist && rm -rf ./packages/neo-one-website/dist && rush compile-website-prod && node ./packages/neo-one-build-tools-web/dist/compile --bundle testRunner && node ./packages/neo-one-build-tools-web/dist/compile --bundle server && node ./packages/neo-one-build-tools-web/dist/compile --bundle preview && rm -rf ./packages/neo-one-website/publicOut && cp -r ./dist/workers ./packages/neo-one-website/publicOut && cp -r ./packages/neo-one-website/public/* ./packages/neo-one-website/publicOut && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build && sh ./scripts/rm-cruft"
     },
     {
       "commandKind": "global",
@@ -238,7 +238,7 @@
       "summary": "Run Cypress tests. Run rush link-root/ rush unlink-root before/after (--express for express test, --local for shorter build wait)",
       "description": "after finishing production website work you need to unlink the root node_modules",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "node ./packages/neo-one-build-tools-web/lib/runCypress"
+      "shellCommand": "node ./packages/neo-one-build-tools-web/dist/runCypress"
     },
     {
       "commandKind": "global",
@@ -260,7 +260,7 @@
       "commandKind": "global",
       "name": "clean",
       "summary": "Clean up NEO-ONE packages",
-      "description": "Remove build logs from all packages (and optionally lib/* and .rush/* directories)",
+      "description": "Remove build logs from all packages (and optionally dist/* and .rush/* directories)",
       "safeForSimultaneousRushProcesses": false,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" node ./packages/neo-one-build-tools/bin/neo-one-clean.js"
     },
@@ -366,7 +366,7 @@
       "parameterKind": "flag",
       "longName": "--full",
       "shortName": "-f",
-      "description": "enables cleaning of lib/* and rush/* directories",
+      "description": "enables cleaning of dist/* and rush/* directories",
       "associatedCommands": ["clean"]
     },
     {

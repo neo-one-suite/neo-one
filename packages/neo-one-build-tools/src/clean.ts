@@ -5,7 +5,7 @@ import yargs from 'yargs';
 
 const argv = yargs
   .boolean('full')
-  .describe('full', 'flag for also cleaning lib/* and .rush/* directories')
+  .describe('full', 'flag for also cleaning dist/* and .rush/* directories')
   .default('full', false)
   .boolean('debug')
   .describe('debug', 'flag for logging actions')
