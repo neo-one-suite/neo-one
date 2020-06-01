@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/cli-common-node",
+      "comment": "update defaultNetworks to live nodes",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/cli-common-node",
+  "email": "danwbyrne@gmail.com"
+}
