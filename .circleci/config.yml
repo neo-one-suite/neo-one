@@ -77,7 +77,7 @@ aliases:
           at: ./
       - run:
           name: Test
-          command: node common/scripts/install-run-rush.js test-ci --test-path-pattern '$(circleci tests glob packages/*/src/__tests__/**/*.test.ts)' --coverage
+          command: node common/scripts/install-run-rush.js test-ci --test-path-pattern '$(circleci tests glob packages/*/src/__tests__/**.test.ts)' --coverage
       - run:
           name: Upload Unit Test Coverage
           command: node common/scripts/install-run-rush.js upload-coverage -F unit
@@ -118,7 +118,7 @@ aliases:
           at: ./
       - run:
           name: Test
-          command: node common/scripts/install-run-rush.js test-ci --test-path-pattern '$(circleci tests glob packages/*/src/__tests__/**/*.test.ts)' --coverage
+          command: node common/scripts/install-run-rush.js test-ci --test-path-pattern '$(circleci tests glob packages/*/src/__tests__/**.test.ts)' --coverage
       - run:
           name: Upload Unit Test Coverage
           command: node common/scripts/install-run-rush.js upload-coverage -F unit

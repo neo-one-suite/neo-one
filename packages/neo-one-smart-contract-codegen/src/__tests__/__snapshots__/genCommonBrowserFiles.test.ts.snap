@@ -216,7 +216,7 @@ export interface Contracts<TClient extends Client = Client> {
   readonly ico: ICOSmartContract<TClient>;
   readonly token: TokenSmartContract<TClient>;
 }
-
+// Refer to the MigrationSmartContract documentation at https://neo-one.io/docs/deployment for more information.
 export interface MigrationContracts {
   readonly ico: ICOMigrationSmartContract;
   readonly token: TokenMigrationSmartContract;
