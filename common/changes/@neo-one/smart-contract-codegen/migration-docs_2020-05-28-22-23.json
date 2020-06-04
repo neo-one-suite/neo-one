@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/smart-contract-codegen",
+      "comment": "",
+      "type": "none"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract-codegen",
+  "email": "danwbyrne@gmail.com"
+}
