@@ -1091,6 +1091,10 @@
       "allowedCategories": [ "production", "tools", "web" ]
     },
     {
+      "name": "synchronized-promise",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "tapable",
       "allowedCategories": [ "production" ]
     },

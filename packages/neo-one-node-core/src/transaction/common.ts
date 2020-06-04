@@ -1,4 +1,3 @@
-// tslint:disable no-loop-statement
 import { Input } from './Input';
 
 export const hasDuplicateInputs = (inputs: readonly Input[]): boolean => {

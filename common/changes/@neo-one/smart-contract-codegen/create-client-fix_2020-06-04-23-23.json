@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/smart-contract-codegen",
+      "comment": "fix #1997",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract-codegen",
+  "email": "danwbyrne@gmail.com"
+}
