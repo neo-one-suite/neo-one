@@ -61,7 +61,7 @@ describe('Blockchain', () => {
       assertEqual(transaction.type, TransactionType.Invocation);
 
       const attributes = transaction.attributes;
-      assertEqual(attributes.length, 3);
+      assertEqual(attributes.length, 4);
 
       const attribute = attributes[0];
 
