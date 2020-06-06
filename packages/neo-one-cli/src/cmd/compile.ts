@@ -4,7 +4,7 @@ import { start } from '../common';
 import { createTasks } from '../compile';
 
 export const command = 'compile';
-export const describe = 'compile a project and output code to a local directory';
+export const describe = 'Compiles a project and outputs code to a local directory.';
 export const builder = (yargsBuilder: typeof yargs) =>
   yargsBuilder
     .string('outDir')
