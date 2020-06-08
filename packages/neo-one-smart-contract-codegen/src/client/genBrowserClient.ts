@@ -35,16 +35,11 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
   if (localUserAccountProvider !== undefined) {
     const localKeyStore = localUserAccountProvider.keystore;
     if (localKeyStore instanceof LocalKeyStore) {
-      Promise.all([
+      addLocalKeysSync([
         ${wallets
-          .map(
-            ({ name, wif }) =>
-              `localKeyStore.addUserAccount({ network: '${localDevNetworkName}', name: '${name}', privateKey: '${wif}' }),`,
-          )
+          .map(({ name, wif }) => `{ network: '${localDevNetworkName}', name: '${name}', privateKey: '${wif}' },`)
           .join('\n          ')}
-      ]).catch(() => {
-        // do nothing
-      });
+      ], localKeyStore);
     }
   }
 }`;
@@ -62,6 +57,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true')
   return {
     js: `
 import {
+  addLocalKeysSync,
   Client,
   DeveloperClient,
   LocalKeyStore,
@@ -87,6 +83,7 @@ export const createDeveloperClients = () => ${createDeveloperClients}
   `,
     ts: `
 import {
+  addLocalKeysSync,
   Client,
   DeveloperClient,
   DeveloperClients,

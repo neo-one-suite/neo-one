@@ -4,6 +4,7 @@ exports[`genClient Token 1`] = `
 Object {
   "js": "
 import {
+  addLocalKeysSync,
   Client,
   DapiUserAccountProvider,
   DeveloperClient,
@@ -57,11 +58,9 @@ export const createClient = (getUserAccountProvidersOrHost) => {
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
-        Promise.all([
-          localKeyStore.addUserAccount({ network: 'local', name: 'master', privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv' }),
-        ]).catch(() => {
-          // do nothing
-        });
+        addLocalKeysSync([
+          { network: 'local', name: 'master', privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv' },
+        ], localKeyStore);
       }
     }
   }
@@ -75,6 +74,7 @@ export const createDeveloperClients = (host = 'localhost') => ({
   ",
   "ts": "
 import {
+  addLocalKeysSync,
   Client,
   DapiUserAccountProvider,
   DeveloperClient,
@@ -136,11 +136,9 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
-        Promise.all([
-          localKeyStore.addUserAccount({ network: 'local', name: 'master', privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv' }),
-        ]).catch(() => {
-          // do nothing
-        });
+        addLocalKeysSync([
+          { network: 'local', name: 'master', privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv' },
+        ], localKeyStore);
       }
     }
   }

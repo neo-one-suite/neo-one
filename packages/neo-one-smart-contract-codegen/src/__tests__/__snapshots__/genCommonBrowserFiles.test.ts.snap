@@ -67,6 +67,7 @@ export class ContractsService {
     "js": "// tslint:disable
 /* eslint-disable */
 import {
+  addLocalKeysSync,
   Client,
   DeveloperClient,
   LocalKeyStore,
@@ -101,15 +102,10 @@ export const createClient = (getUserAccountProviders = getDefaultUserAccountProv
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
-        Promise.all([
-          localKeyStore.addUserAccount({
-            network: 'local',
-            name: 'master',
-            privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
-          }),
-        ]).catch(() => {
-          // do nothing
-        });
+        addLocalKeysSync(
+          [{ network: 'local', name: 'master', privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv' }],
+          localKeyStore,
+        );
       }
     }
   }
@@ -124,6 +120,7 @@ export const createDeveloperClients = () => ({
     "ts": "// tslint:disable
 /* eslint-disable */
 import {
+  addLocalKeysSync,
   Client,
   DeveloperClient,
   DeveloperClients,
@@ -170,15 +167,10 @@ export const createClient = <TUserAccountProviders extends UserAccountProviders<
     if (localUserAccountProvider !== undefined) {
       const localKeyStore = localUserAccountProvider.keystore;
       if (localKeyStore instanceof LocalKeyStore) {
-        Promise.all([
-          localKeyStore.addUserAccount({
-            network: 'local',
-            name: 'master',
-            privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv',
-          }),
-        ]).catch(() => {
-          // do nothing
-        });
+        addLocalKeysSync(
+          [{ network: 'local', name: 'master', privateKey: 'L4qhHtwbiAMu1nrSmsTP5a3dJbxA3SNS6oheKnKd8E7KTJyCLcUv' }],
+          localKeyStore,
+        );
       }
     }
   }

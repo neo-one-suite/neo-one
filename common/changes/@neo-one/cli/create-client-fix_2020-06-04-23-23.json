@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/cli",
+      "comment": "",
+      "type": "none"
+    }
+  ],
+  "packageName": "@neo-one/cli",
+  "email": "danwbyrne@gmail.com"
+}
