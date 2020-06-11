@@ -39,6 +39,6 @@ export const startNeotracker = async (cmd: Command, config: Configuration, reset
   }
 
   if (!ready) {
-    throw new Error('Neotracker is not ready.');
+    throw new Error('NEO Tracker is not ready.');
   }
 };
