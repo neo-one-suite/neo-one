@@ -1118,8 +1118,9 @@ export interface TransactionOptions {
    */
   systemFee?: BigNumber;
   /**
-   * boolean which determines whether or not to skip the sysFee check before submitting an invocation transaction.  Used for working with contracts where the sysFee is known to be less
-   * than the 10 free GAS.  e.g. nep5
+   * Boolean which determines whether or not to skip the sysFee check before submitting an invocation transaction.  Used for working with contracts where the sysFee is known to be less
+   *
+   * than the 10 free GAS, i.e. NEP5 transactions.
    */
   skipSysFeeCheck?: boolean;
   // tslint:enable readonly-keyword

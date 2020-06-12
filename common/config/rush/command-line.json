@@ -4,7 +4,7 @@
     {
       "commandKind": "global",
       "name": "link-root",
-      "summary": "copy node_modules to root (for prod website only)",
+      "summary": "Copy node_modules to root (for prod website only)",
       "description": "react-static errors in production mode if it doesn't find a root node_modules, this is a workaround for now",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cp -r ./common/temp/node_modules ./node_modules"
@@ -12,8 +12,8 @@
     {
       "commandKind": "global",
       "name": "unlink-root",
-      "summary": "remove the root node_modules copy",
-      "description": "after finishing production website work you need to unlink the root node_modules",
+      "summary": "Remove the root node_modules copy",
+      "description": "After finishing production website work you need to unlink the root node_modules",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "rm -rf ./node_modules"
     },
@@ -21,7 +21,7 @@
       "commandKind": "global",
       "name": "compile-workers-dev",
       "summary": "Compile workers",
-      "description": "Compile the NEO-ONE website workers",
+      "description": "Compile the NEO•ONE website workers",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle workers --watch"
     },
@@ -29,7 +29,7 @@
       "commandKind": "global",
       "name": "compile-overlay-dev",
       "summary": "Compile overlay [dev]",
-      "description": "Compile the NEO-ONE website overlay",
+      "description": "Compile the NEO•ONE website overlay",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle overlay --watch"
     },
@@ -37,7 +37,7 @@
       "commandKind": "global",
       "name": "compile-test-runner-dev",
       "summary": "Compile test-runner [dev]",
-      "description": "Compile the NEO-ONE test-runner [dev]",
+      "description": "Compile the NEO•ONE test-runner [dev]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle testRunner --watch"
     },
@@ -45,7 +45,7 @@
       "commandKind": "global",
       "name": "compile-preview-dev",
       "summary": "Compile preview [dev]",
-      "description": "Compile the NEO-ONE editor preview",
+      "description": "Compile the NEO•ONE editor preview",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle preview --watch"
     },
@@ -53,7 +53,7 @@
       "commandKind": "global",
       "name": "serve-server",
       "summary": "Compile & serve editor server (only in dev mode)",
-      "description": "Build and run the NEO-ONE editor server",
+      "description": "Build and run the NEO•ONE editor server",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "mkdir -p ./dist/server && touch ./dist/server/index.js && cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --watch --bundle server"
     },
@@ -61,7 +61,7 @@
       "commandKind": "global",
       "name": "serve-static-dev",
       "summary": "Build and serve static site [dev]",
-      "description": "Build and serve NEO-ONE website with React Static [dev]",
+      "description": "Build and serve NEO•ONE website with React Static [dev]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=./packages/neo-one-build-tools/includes/build-configs/tsconfig.es2017.cjs.json react-static start --config ./packages/neo-one-website/static.config.js"
     },
@@ -77,7 +77,7 @@
       "commandKind": "global",
       "name": "run-website-dev",
       "summary": "Run website in dev mode (run compile-website-dev first)",
-      "description": "Run the entire NEO-ONE website [dev]",
+      "description": "Run the entire NEO•ONE website [dev]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "concurrently -n 'preview,testRunner,server,static' --kill-others-on-fail \"rush compile-preview-dev\" \"rush compile-test-runner-dev\" \"rush serve-server\" \"rush serve-static-dev\""
     },
@@ -85,7 +85,7 @@
       "commandKind": "global",
       "name": "compile-workers-prod",
       "summary": "Compile workers [prod]",
-      "description": "Compile the NEO-ONE website workers",
+      "description": "Compile the NEO•ONE website workers",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle workers"
     },
@@ -93,7 +93,7 @@
       "commandKind": "global",
       "name": "compile-overlay-prod",
       "summary": "Compile overlay [dev]",
-      "description": "Compile the NEO-ONE website overlay",
+      "description": "Compile the NEO•ONE website overlay",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle overlay"
     },
@@ -101,7 +101,7 @@
       "commandKind": "global",
       "name": "serve-preview-prod",
       "summary": "Compile & serve preview [prod]",
-      "description": "Compile and serve the NEO-ONE editor preview [prod]",
+      "description": "Compile and serve the NEO•ONE editor preview [prod]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle preview && serve dist/preview -p 8080"
     },
@@ -109,7 +109,7 @@
       "commandKind": "global",
       "name": "serve-test-runner-prod",
       "summary": "Compile & serve test-runner [prod]",
-      "description": "Compile and serve the NEO-ONE test-runner [prod]",
+      "description": "Compile and serve the NEO•ONE test-runner [prod]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "cross-env NEO_ONE_CACHE=true NEO_ONE_PROD=true NODE_OPTIONS=\"--max-old-space-size=3072\" node ./packages/neo-one-build-tools-web/dist/compile --bundle testRunner && serve dist/testRunner -p 8081"
     },
@@ -117,7 +117,7 @@
       "commandKind": "global",
       "name": "serve-static-prod",
       "summary": "Build and serve static with React Static and serve pkg",
-      "description": "Build and serve NEO-ONE website with React Static and serve pkg",
+      "description": "Build and serve NEO•ONE website with React Static and serve pkg",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "rm -rf ./packages/neo-one-website/publicOut && cp -r ./dist/workers ./packages/neo-one-website/publicOut && cp -r ./packages/neo-one-website/public/* ./packages/neo-one-website/publicOut && cross-env NEO_ONE_STAGING=true NEO_ONE_CACHE=true NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=./packages/neo-one-build-tools/includes/build-configs/tsconfig.es2017.cjs.json react-static build --staging --config ./packages/neo-one-website/static.config.js && serve ./packages/neo-one-website/dist -p 3000"
     },
@@ -133,7 +133,7 @@
       "commandKind": "global",
       "name": "run-website-prod",
       "summary": "Run entire website in prod (run compile-website-prod & link-root before, run unlink-root when done)",
-      "description": "Run the entire NEO-ONE website [prod]",
+      "description": "Run the entire NEO•ONE website [prod]",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "concurrently -n 'preview,testRunner,server,static' --kill-others-on-fail \"rush serve-preview-prod\" \"rush serve-test-runner-prod\" \"rush serve-server\" \"rush serve-static-prod\""
     },
@@ -188,7 +188,7 @@
     {
       "commandKind": "global",
       "name": "test",
-      "summary": "unit test runner",
+      "summary": "Unit test runner",
       "description": "Run all jest unit tests",
       "safeForSimultaneousRushProcesses": false,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" jest --config ./packages/neo-one-build-tests/jest/unit.js"
@@ -196,7 +196,7 @@
     {
       "commandKind": "global",
       "name": "test-ci",
-      "summary": "unit test runner (CI)",
+      "summary": "Unit test runner (CI)",
       "description": "Run all jest unit tests using the CI config",
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=3072\" jest --config ./packages/neo-one-build-tests/jest/unit-ci.js --ci -w 2"
     },
@@ -236,30 +236,30 @@
       "commandKind": "global",
       "name": "test-cypress",
       "summary": "Run Cypress tests. Run rush link-root/ rush unlink-root before/after (--express for express test, --local for shorter build wait)",
-      "description": "after finishing production website work you need to unlink the root node_modules",
+      "description": "After finishing production website work you need to unlink the root node_modules",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "node ./packages/neo-one-build-tools-web/dist/runCypress"
     },
     {
       "commandKind": "global",
       "name": "upload-coverage",
-      "summary": "upload coverage (CI)",
-      "description": "uploaded codecov coverage reports from unit tests",
+      "summary": "Upload coverage (CI)",
+      "description": "Upload codecov coverage reports from unit tests",
       "safeForSimultaneousRushProcesses": false,
       "shellCommand": "codecov -f coverage/coverage-final.json"
     },
     {
       "commandKind": "global",
       "name": "prepare",
-      "summary": "prepare packages for npm release",
-      "description": "Copy License/README to packages for npm release",
+      "summary": "Prepare packages for NPM release",
+      "description": "Copy License/README to packages for NPM release",
       "safeForSimultaneousRushProcesses": false,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" node ./packages/neo-one-build-tools/bin/neo-one-prepare.js"
     },
     {
       "commandKind": "global",
       "name": "clean",
-      "summary": "Clean up NEO-ONE packages",
+      "summary": "Clean up NEO•ONE packages",
       "description": "Remove build logs from all packages (and optionally dist/* and .rush/* directories)",
       "safeForSimultaneousRushProcesses": false,
       "shellCommand": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" node ./packages/neo-one-build-tools/bin/neo-one-clean.js"
@@ -267,16 +267,16 @@
     {
       "commandKind": "global",
       "name": "nit",
-      "summary": "find issues with formatting",
-      "description": "run prettier with the `--list-different` parameter for CI",
+      "summary": "Find issues with formatting",
+      "description": "Run prettier with the `--list-different` parameter for CI",
       "safeForSimultaneousRushProcesses": false,
       "shellCommand": "prettier --config .prettierrc --list-different \"packages/*/src/**/*.{ts,tsx}\""
     },
     {
       "commandKind": "global",
       "name": "prettier",
-      "summary": "run prettier on the repo",
-      "description": "run prettier across packages typescript files",
+      "summary": "Run prettier on the repo",
+      "description": "Run prettier across packages typescript files",
       "safeForSimultaneousRushProcesses": false,
       "shellCommand": "prettier --config .prettierrc --write \"packages/*/src/**/*.{ts,tsx}\""
     },
@@ -294,8 +294,8 @@
     {
       "commandKind": "bulk",
       "name": "lint:staged",
-      "summary": "Runs prettier/tslint across staged files",
-      "description": "Runs `lint:staged` across packages",
+      "summary": "Run prettier/tslint across staged files",
+      "description": "Run `lint:staged` across packages",
       "safeForSimultaneousRushProcesses": true,
       "ignoreDependencyOrder": true,
       "enableParallelism": true,
@@ -304,8 +304,8 @@
     {
       "commandKind": "bulk",
       "name": "lint",
-      "summary": "Runs tslint for every package",
-      "description": "Runs tslint for every file in package",
+      "summary": "Run tslint for every package",
+      "description": "Run tslint for every file in package",
       "safeForSimultaneousRushProcesses": true,
       "ignoreDependencyOrder": true,
       "enableParallelism": true,

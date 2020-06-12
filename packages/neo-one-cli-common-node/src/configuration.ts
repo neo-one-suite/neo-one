@@ -34,7 +34,7 @@ const configurationDefaults = {
   neotracker: {
     path: nodePath.join('.neo-one', 'neotracker'),
     port: 9041,
-    skip: false,
+    skip: true,
   },
 };
 
@@ -208,7 +208,7 @@ ${exportConfig} {
     port: ${config.network.port},
   },
   // NEO•ONE will configure various parts of the CLI that require network accounts using the value provided here, for example, when deploying contracts.
-  // Refer to the documentation at https://neo-one.io/docs/configuration for more information.
+  // Refer to the documentation at https://neo-one.io/docs/config-options for more information.
   networks: defaultNetworks,
   neotracker: {
     // NEO•ONE will start an instance of NEO Tracker using this path for local data. This directory should not be committed.
@@ -216,7 +216,7 @@ ${exportConfig} {
     // NEO•ONE will start an instance of NEO Tracker using this port.
     port: 9041,
     // Set to true if you'd like NEO•ONE to skip starting a NEO Tracker instance when running 'neo-one build'.
-    skip: false,
+    skip: true,
   }
 };
 `;
