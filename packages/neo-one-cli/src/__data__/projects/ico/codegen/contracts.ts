@@ -1,4 +1,4 @@
-/* @hash 05fd692dad792caa7b0650e950261f1f */
+/* @hash 793fa245837019b4c9e3a66341f16035 */
 // tslint:disable
 /* eslint-disable */
 import { Client } from '@neo-one/client';
@@ -16,7 +16,7 @@ export interface Contracts<TClient extends Client = Client> {
   readonly ico: ICOSmartContract<TClient>;
   readonly token: TokenSmartContract<TClient>;
 }
-
+// Refer to the MigrationSmartContract documentation at https://neo-one.io/docs/deployment for more information.
 export interface MigrationContracts {
   readonly escrow: EscrowMigrationSmartContract;
   readonly ico: ICOMigrationSmartContract;

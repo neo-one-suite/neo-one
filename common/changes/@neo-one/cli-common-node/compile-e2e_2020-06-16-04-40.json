@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/cli-common-node",
+      "comment": "Adds outDir to neo-one configuration.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/cli-common-node",
+  "email": "spencercorwin@icloud.com"
+}

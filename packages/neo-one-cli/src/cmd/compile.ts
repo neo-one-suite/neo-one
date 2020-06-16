@@ -9,12 +9,14 @@ export const builder = (yargsBuilder: typeof yargs) =>
   yargsBuilder
     .string('outDir')
     .describe('outDir', 'output code directory')
-    .default('outDir', './')
     .string('path')
     .describe('path', 'contract directory');
 
 export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
   start(async (_cmd, config) => {
-    await createTasks(argv.path ? argv.path : config.contracts.path, argv.outDir).run();
+    await createTasks(
+      argv.path ? argv.path : config.contracts.path,
+      argv.outDir ? argv.outDir : config.contracts.outDir,
+    ).run();
   });
 };

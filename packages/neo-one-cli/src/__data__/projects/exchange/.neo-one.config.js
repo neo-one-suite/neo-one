@@ -14,6 +14,9 @@ const neotrackerPort = parseInt(
 );
 
 module.exports = {
+  contracts: {
+    outDir: nodePath.join(tmpDir, 'compiled'),
+  },
   migration: {
     path: nodePath.join('neo-one', 'migration.ts'),
   },

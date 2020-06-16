@@ -126,7 +126,7 @@ class One {
     };
   }
 
-  getTmpDir() {
+  _getTmpDir() {
     const dir = tmp.dirSync().name;
     fs.ensureDirSync(dir);
     this.mutableCleanup.push(async () => {
@@ -177,7 +177,7 @@ class One {
           port,
         ]),
       ),
-      NEO_ONE_TMP_DIR: this.getTmpDir(),
+      NEO_ONE_TMP_DIR: this._getTmpDir(),
     };
 
     return {
@@ -196,7 +196,7 @@ class One {
           port,
         ]),
       ),
-      NEO_ONE_TMP_DIR: this.getTmpDir(),
+      NEO_ONE_TMP_DIR: this._getTmpDir(),
     };
 
     return {
