@@ -1,4 +1,4 @@
-/* @hash d6ea705b14f96cc6e36054a00d0ae431 */
+/* @hash cf67ecdbed890bdd640f40dacfed0a42 */
 // tslint:disable
 /* eslint-disable */
 import {
@@ -51,7 +51,7 @@ export const createClient = (getUserAccountProvidersOrHost) => {
 
   const providers = [];
   if (process.env.NODE_ENV !== 'production' || process.env.NEO_ONE_DEV === 'true') {
-    providers.push({ network: 'local', rpcURL: `http://${host}:10280/rpc` });
+    providers.push({ network: 'local', rpcURL: `http://${host}:10020/rpc` });
   }
   const provider = new NEOONEProvider(providers);
   const userAccountProviders = getUserAccountProviders(provider);
@@ -87,5 +87,5 @@ export const createClient = (getUserAccountProvidersOrHost) => {
 };
 
 export const createDeveloperClients = (host = 'localhost') => ({
-  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: `http://${host}:10280/rpc` })),
+  local: new DeveloperClient(new NEOONEDataProvider({ network: 'local', rpcURL: `http://${host}:10020/rpc` })),
 });

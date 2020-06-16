@@ -5,6 +5,7 @@ export type CodegenLanguage = 'typescript' | 'javascript';
 
 export interface ContractsConfiguration {
   readonly path: string;
+  readonly outDir: string;
 }
 
 export interface CodegenConfiguration {

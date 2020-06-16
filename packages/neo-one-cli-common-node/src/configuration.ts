@@ -18,6 +18,7 @@ const configurationDefaults = {
   },
   contracts: {
     path: nodePath.join('neo-one', 'contracts'),
+    outDir: nodePath.join('neo-one', 'compiled'),
   },
   codegen: {
     path: nodePath.join('src', 'neo-one'),
@@ -94,6 +95,7 @@ const configurationSchema = {
       additionalProperties: false,
       properties: {
         path: { type: 'string' },
+        outDir: { type: 'string' },
       },
     },
     codegen: {
@@ -156,6 +158,7 @@ const relativizePaths = (config: Configuration) => ({
   contracts: {
     ...config.contracts,
     path: nodePath.relative(process.cwd(), config.contracts.path),
+    outDir: nodePath.relative(process.cwd(), config.contracts.outDir),
   },
   codegen: {
     ...config.codegen,
@@ -180,6 +183,8 @@ ${exportConfig} {
   contracts: {
     // NEO•ONE will look for smart contracts in this directory.
     path: '${config.contracts.path}',
+    // The NEO•ONE compile command will output the compile results in this directory.
+    outDir: '${config.contracts.outDir}',
   },
   artifacts: {
     // NEO•ONE will store build and deployment artifacts that should be checked in to vcs in this directory.
@@ -296,6 +301,7 @@ const validateConfig = async (rootDir: string, configIn: any): Promise<Configura
     contracts: {
       ...config.contracts,
       path: nodePath.resolve(rootDir, config.contracts.path),
+      outDir: nodePath.resolve(rootDir, config.contracts.outDir),
     },
     codegen: {
       ...config.codegen,
