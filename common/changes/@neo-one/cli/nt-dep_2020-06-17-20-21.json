@@ -3,7 +3,7 @@
     {
       "packageName": "@neo-one/cli",
       "comment": "Remove @neotracker/core as a @neo-one/cli dependency.",
-      "type": "major"
+      "type": "minor"
     }
   ],
   "packageName": "@neo-one/cli",
