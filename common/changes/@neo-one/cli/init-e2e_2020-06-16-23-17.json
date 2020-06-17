@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/cli",
+      "comment": "Add E2E test for neo-one init command.",
+      "type": "none"
+    }
+  ],
+  "packageName": "@neo-one/cli",
+  "email": "spencercorwin@icloud.com"
+}
