@@ -33,8 +33,17 @@ export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
       '--dbFileName',
       nodePath.resolve(config.neotracker.path, 'db.sqlite'),
     ];
+    let neotrackerBinPath: string;
+    try {
+      neotrackerBinPath = require.resolve('@neotracker/core/bin');
+    } catch {
+      throw new Error(
+        '@neotracker/core not found. Try adding the @neotracker/core dependency to your ' +
+          'project with `yarn add @neotracker/core` or `npm install @neotracker/core`',
+      );
+    }
     const proc = execa(
-      nodePath.resolve(require.resolve('@neotracker/core/bin'), '../', 'neotracker'),
+      nodePath.resolve(neotrackerBinPath, '../', 'neotracker'),
       argv.reset ? args.concat(['--resetDB']) : args,
       {
         cleanup: false,

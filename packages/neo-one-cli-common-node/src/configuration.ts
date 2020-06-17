@@ -220,7 +220,7 @@ ${exportConfig} {
     path: '${config.neotracker.path}',
     // NEO•ONE will start an instance of NEO Tracker using this port.
     port: 9041,
-    // Set to true if you'd like NEO•ONE to skip starting a NEO Tracker instance when running 'neo-one build'.
+    // Set to false if you'd like NEO•ONE to start an instance of NEO Tracker when running 'neo-one build'. You will need @neotracker/core installed as a dependency for this to work.
     skip: true,
   }
 };

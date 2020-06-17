@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/cli",
+      "comment": "Remove @neotracker/core as a @neo-one/cli dependency.",
+      "type": "major"
+    }
+  ],
+  "packageName": "@neo-one/cli",
+  "email": "spencercorwin@icloud.com"
+}
