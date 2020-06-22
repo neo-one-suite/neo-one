@@ -61,7 +61,7 @@ export class EnrollmentTransaction extends TransactionBase<
   }
 
   public readonly publicKey: ECPoint;
-  protected readonly sizeExclusive: () => number = utils.lazy(
+  public readonly sizeExclusive: () => number = utils.lazy(
     () => IOHelper.sizeOfUInt8 + IOHelper.sizeOfECPoint(this.publicKey),
   );
   private readonly enrollmentGetScriptHashesForVerifyingInternal: (

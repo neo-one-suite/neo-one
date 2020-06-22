@@ -101,6 +101,8 @@ export function TransactionBase<
   TBase extends Constructor<TransactionBaseModel<Type, Attribute, Input, Output, Witness>>
 >(Base: TBase) {
   abstract class TransactionBaseClass extends Base implements EquatableKey, SerializableJSON<TransactionJSON> {
+    public static readonly WitnessConstructor: Constructor<Witness> = Witness;
+
     public static deserializeTransactionBaseStartWireBase({
       reader,
     }: DeserializeWireBaseOptions): { readonly type: TransactionType; readonly version: number } {
@@ -142,8 +144,6 @@ export function TransactionBase<
       });
     }
 
-    protected static readonly WitnessConstructor: Constructor<Witness> = Witness;
-
     public readonly equals: Equals = utils.equals(
       // tslint:disable-next-line no-any
       this.constructor as any,
@@ -159,7 +159,7 @@ export function TransactionBase<
         return [...hashes].sort();
       },
     );
-    private readonly sizeInternal = utils.lazy(
+    public readonly sizeInternal = utils.lazy(
       () =>
         IOHelper.sizeOfUInt8 +
         IOHelper.sizeOfArray(this.attributes, (attribute) => attribute.size) +
@@ -168,7 +168,7 @@ export function TransactionBase<
         IOHelper.sizeOfArray(this.scripts, (script) => script.size) +
         this.sizeExclusive(),
     );
-    private readonly networkFee = utils.lazyAsync(
+    public readonly networkFee = utils.lazyAsync(
       async (context: FeeContext): Promise<BN> => {
         const { getOutput, utilityToken } = context;
 
@@ -189,10 +189,10 @@ export function TransactionBase<
         return result.lt(utils.ZERO) ? utils.ZERO : result;
       },
     );
-    private readonly getReferencesInternal = utils.lazyAsync(async ({ getOutput }: GetReferencesOptions) =>
+    public readonly getReferencesInternal = utils.lazyAsync(async ({ getOutput }: GetReferencesOptions) =>
       Promise.all(this.inputs.map(async (input) => getOutput(input))),
     );
-    private readonly getTransactionResultsInternal = utils.lazyAsync(
+    public readonly getTransactionResultsInternal = utils.lazyAsync(
       async ({ getOutput }: GetTransactionResultsOptions): Promise<{ readonly [K in string]?: BN }> => {
         const inputOutputs = await this.getReferences({ getOutput });
         const mutableResults: { [K in string]?: BN } = {};
@@ -213,7 +213,7 @@ export function TransactionBase<
         return _.pickBy(mutableResults, (value) => value !== undefined && !value.eq(utils.ZERO));
       },
     );
-    private readonly baseGetScriptHashesForVerifyingInternal = utils.lazyAsync(
+    public readonly baseGetScriptHashesForVerifyingInternal = utils.lazyAsync(
       async ({ getOutput, getAsset }: TransactionGetScriptHashesForVerifyingOptions) => {
         const [inputHashes, outputHashes] = await Promise.all([
           Promise.all(
@@ -257,7 +257,7 @@ export function TransactionBase<
         this.getNetworkFee(context.feeContext),
         // tslint:disable-next-line no-any
         context.tryGetTransactionData(this as any),
-      ] as const);
+      ]);
 
       return {
         txid: common.uInt256ToString(this.hashHex),
@@ -343,9 +343,9 @@ export function TransactionBase<
       return results;
     }
 
-    protected readonly sizeExclusive: () => number = () => 0;
+    public readonly sizeExclusive: () => number = () => 0;
 
-    private async verifyDoubleSpend({ isSpent }: TransactionVerifyOptions): Promise<void> {
+    public async verifyDoubleSpend({ isSpent }: TransactionVerifyOptions): Promise<void> {
       const isDoubleSpend = await Promise.all(this.inputs.map(isSpent));
 
       if (isDoubleSpend.some((value) => value)) {
@@ -353,7 +353,7 @@ export function TransactionBase<
       }
     }
 
-    private async verifyOutputs({ getAsset, currentHeight }: TransactionVerifyOptions): Promise<void> {
+    public async verifyOutputs({ getAsset, currentHeight }: TransactionVerifyOptions): Promise<void> {
       const outputsGrouped = Object.entries(_.groupBy(this.outputs, (output) => common.uInt256ToHex(output.asset)));
 
       const hasInvalidOutputs = await Promise.all(
@@ -378,7 +378,7 @@ export function TransactionBase<
       }
     }
 
-    private async verifyTransactionResults({
+    public async verifyTransactionResults({
       getOutput,
       utilityToken,
       governingToken,
@@ -439,7 +439,7 @@ export function TransactionBase<
       }
     }
 
-    private async verifyScripts({
+    public async verifyScripts({
       getAsset,
       getOutput,
       verifyScript,

@@ -58,7 +58,7 @@ export class StateTransaction extends TransactionBase<
   }
 
   public readonly descriptors: readonly StateDescriptor[];
-  protected readonly sizeExclusive: () => number = utils.lazy(() =>
+  public readonly sizeExclusive: () => number = utils.lazy(() =>
     IOHelper.sizeOfArray(this.descriptors, (descriptor) => descriptor.size),
   );
   private readonly stateGetScriptHashesForVerifyingInternal: (
