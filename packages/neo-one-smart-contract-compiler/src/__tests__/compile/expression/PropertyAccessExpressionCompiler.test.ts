@@ -85,4 +85,12 @@ describe('PropertyAccessExpressionCompiler', () => {
       assertEqual(bar?.first?.second, 10);
     `);
   });
+
+  test('nested optional chaining returns property when undefined with non-null assertion', async () => {
+    await helpers.executeString(`
+      const bar: { first?: { second?: number } } | null | undefined = undefined as { first?: { second: number } } | null | undefined;
+
+      assertEqual(bar?.first!.second, undefined);
+    `);
+  });
 });

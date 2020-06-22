@@ -10,7 +10,7 @@ const Text = styled(Box)<{}, {}>`
   color: ${prop('theme.black')};
 `;
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(Link)<{}, {}>`
   ${prop('theme.fonts.axiformaRegular')}
   ${prop('theme.fontStyles.subheading')}
 `;

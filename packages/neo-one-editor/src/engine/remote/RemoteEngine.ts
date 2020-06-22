@@ -77,10 +77,11 @@ export class RemoteEngine {
       jsonRPCLocalProviderManager,
       createJSONRPCLocalProviderManager,
     }).concat(pathWithExportsIn);
+    // tslint:disable-next-line: no-useless-cast
     this.mutableModules = new Map([
-      [EMPTY_MODULE_PATH, new StaticExportsModule(this, EMPTY_MODULE_PATH, {})] as const,
-      ['path', new StaticExportsModule(this, 'path', nodePath)] as const,
-    ]);
+      [EMPTY_MODULE_PATH, new StaticExportsModule(this, EMPTY_MODULE_PATH, {})],
+      ['path', new StaticExportsModule(this, 'path', nodePath)],
+    ] as const);
     // tslint:disable-next-line no-loop-statement
     for (const { name, exports } of pathWithExports) {
       this.mutableModules.set(name, new StaticExportsModule(this, name, exports));

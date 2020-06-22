@@ -692,7 +692,7 @@ export class Blockchain {
             })
             .pipe(toArray())
             .toPromise(),
-    ] as const);
+    ]);
 
     return {
       asset,
@@ -733,7 +733,7 @@ export class Blockchain {
     const [transactionData, output] = await Promise.all([
       this.transactionData.tryGet({ hash: input.hash }),
       this.output.get(input),
-    ] as const);
+    ]);
 
     if (transactionData === undefined) {
       return undefined;
@@ -764,7 +764,7 @@ export class Blockchain {
     this.mutableInQueue = new Set();
     this.mutableDoneRunningResolve = undefined;
     this.mutableRunning = true;
-    logger.info({ name: 'neo_blockchain_start' }, 'NEO blockchain started.');
+    logger.info({ name: 'neo_blockchain_start' }, 'Neo blockchain started.');
   }
 
   // private readonly getVotes = async (transactions: readonly Transaction[]): Promise<readonly Vote[]> => {

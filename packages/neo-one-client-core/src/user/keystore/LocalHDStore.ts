@@ -262,7 +262,7 @@ export class LocalHDStore implements HDLocalStore {
   }
 
   private async getAccount(path: LocalPath): Promise<NodeAccount> {
-    const chain = await this.getChain([path[0], path[1]] as const);
+    const chain = await this.getChain([path[0], path[1]]);
     const maybeAccount = chain.accounts[path[2]] as NodeAccount | undefined;
 
     if (maybeAccount !== undefined) {

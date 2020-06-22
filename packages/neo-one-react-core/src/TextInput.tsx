@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import { prop } from 'styled-tools';
 import { Input } from './Input';
 
-export const TextInput = styled(Input)`
+export const TextInput = styled(Input)<{}, {}>`
   padding: 0 4px;
   outline: none;
   ${prop('theme.fonts.axiformaRegular')};

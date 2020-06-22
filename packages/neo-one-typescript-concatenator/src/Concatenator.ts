@@ -367,7 +367,7 @@ export class Concatenator {
     );
     const sorted = _.reverse(toposort(graph));
     const filePathToSourceFile = new Map(
-      [...sourceFilesMap.keys()].map<readonly [string, ts.SourceFile]>((file) => [file.fileName, file] as const),
+      [...sourceFilesMap.keys()].map<readonly [string, ts.SourceFile]>((file) => [file.fileName, file]),
     );
 
     return sorted.map((filePath) => filePathToSourceFile.get(filePath)).filter(utils.notNull);

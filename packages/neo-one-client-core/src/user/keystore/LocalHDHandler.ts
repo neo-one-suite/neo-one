@@ -92,8 +92,8 @@ export class LocalHDHandler implements HDHandler<LocalPath> {
   }
 
   private async scanWallet(network: NetworkType, walletIndex: number, maxOffset?: number): Promise<ScanInterface> {
-    const externalPath = [walletIndex, 0] as const;
-    const internalPath = [walletIndex, 1] as const;
+    const externalPath: readonly [number, number] = [walletIndex, 0];
+    const internalPath: readonly [number, number] = [walletIndex, 1];
 
     const scannedChains = await Promise.all([
       this.scanChain(network, externalPath, maxOffset),
@@ -114,7 +114,7 @@ export class LocalHDHandler implements HDHandler<LocalPath> {
     const scanChainInternal = async (start: number, currentOffset = 0): Promise<readonly LocalHDAccount[]> => {
       const localHDAccounts = await Promise.all(
         _.range(start, start + maxOffset - currentOffset).map(async (num) => {
-          const path = [chainIndex[0], chainIndex[1], num] as const;
+          const path: readonly [number, number, number] = [chainIndex[0], chainIndex[1], num];
           const key = await this.store.getPublicKey(path);
 
           return this.publicKeyToLocalHDAccount(path, key, network);

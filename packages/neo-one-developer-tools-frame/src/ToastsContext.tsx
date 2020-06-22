@@ -35,7 +35,7 @@ const removeToast = (id: string) => {
 export const useToasts = (): readonly [ReadonlyArray<Toast>, typeof addToast, typeof removeToast] => {
   const toasts = useStream(() => toasts$, [toasts$], toasts$.getValue());
 
-  return [toasts, addToast, removeToast] as const;
+  return [toasts, addToast, removeToast];
 };
 
 export type AddError = (error: Error) => void;

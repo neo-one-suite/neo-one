@@ -8,6 +8,7 @@
     "build": "",
     "lint": ""
   },
+  "sideEffects": false,
   "dependencies": {
     "@neo-one/smart-contract": "^2.5.0"
   },
@@ -17,6 +18,5 @@
     "@types/jest": "^24.0.18",
     "bignumber.js": "^9.0.0",
     "tslib": "^1.10.0"
-  },
-  "sideEffects": false
+  }
 }

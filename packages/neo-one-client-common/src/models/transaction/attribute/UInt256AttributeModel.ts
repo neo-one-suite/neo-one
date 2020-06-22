@@ -1,25 +1,26 @@
 import { BinaryWriter } from '../../../BinaryWriter';
 import { UInt256 } from '../../../common';
 import { AttributeBaseModel } from './AttributeBaseModel';
+import { AttributeUsageModel } from './AttributeUsageModel';
 
 export type UInt256AttributeUsageModel =
-  | 0x00
-  | 0x30
-  | 0xa1
-  | 0xa2
-  | 0xa3
-  | 0xa4
-  | 0xa5
-  | 0xa6
-  | 0xa7
-  | 0xa8
-  | 0xa9
-  | 0xaa
-  | 0xab
-  | 0xac
-  | 0xad
-  | 0xae
-  | 0xaf;
+  | AttributeUsageModel.ContractHash
+  | AttributeUsageModel.Vote
+  | AttributeUsageModel.Hash1
+  | AttributeUsageModel.Hash2
+  | AttributeUsageModel.Hash3
+  | AttributeUsageModel.Hash4
+  | AttributeUsageModel.Hash5
+  | AttributeUsageModel.Hash6
+  | AttributeUsageModel.Hash7
+  | AttributeUsageModel.Hash8
+  | AttributeUsageModel.Hash9
+  | AttributeUsageModel.Hash10
+  | AttributeUsageModel.Hash11
+  | AttributeUsageModel.Hash12
+  | AttributeUsageModel.Hash13
+  | AttributeUsageModel.Hash14
+  | AttributeUsageModel.Hash15;
 
 export interface UInt256AttributeModelAdd {
   readonly usage: UInt256AttributeUsageModel;

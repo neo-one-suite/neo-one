@@ -343,7 +343,7 @@ const createInvocationDataJSON = (options: Partial<InvocationDataJSON> = {}): In
   asset: createAssetJSON(),
   contracts: [createContractJSON()],
   deletedContractHashes: [keys[2].scriptHashString],
-  migratedContractHashes: [[keys[0].scriptHashString, keys[1].scriptHashString] as const],
+  migratedContractHashes: [[keys[0].scriptHashString, keys[1].scriptHashString]],
   voteUpdates: [],
   actions: [createNotificationActionJSON(), createLogActionJSON()],
   storageChanges: [],
@@ -594,7 +594,7 @@ const createInteropInterfaceContractParameterJSON = (options: Partial<InteropInt
 
 const createMapContractParameterJSON = (options: Partial<MapContractParameterJSON> = {}): MapContractParameterJSON => ({
   type: 'Map',
-  value: [[createIntegerContractParameterJSON(), createBooleanContractParameterJSON()] as const],
+  value: [[createIntegerContractParameterJSON(), createBooleanContractParameterJSON()]],
   ...options,
 });
 
@@ -826,7 +826,7 @@ const createRawInvocationData = (options: Partial<RawInvocationData> = {}): RawI
   asset: createAsset(),
   contracts: [createContract()],
   deletedContractAddresses: [keys[2].address],
-  migratedContractAddresses: [[keys[0].address, keys[1].address] as const],
+  migratedContractAddresses: [[keys[0].address, keys[1].address]],
   actions: [createRawNotification(), createRawLog()],
   storageChanges: [],
   ...options,

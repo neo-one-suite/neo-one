@@ -9,6 +9,7 @@
     "lint:staged": "lint-staged --relative",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
+  "sideEffects": false,
   "dependencies": {
     "@neo-one/client-core": "^2.6.0",
     "@neo-one/local-browser": "^2.3.1",
@@ -22,6 +23,5 @@
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0"
-  },
-  "sideEffects": false
+  }
 }

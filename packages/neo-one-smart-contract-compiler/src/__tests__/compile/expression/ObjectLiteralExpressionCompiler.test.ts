@@ -108,6 +108,7 @@ describe('ObjectLiteralExpressionCompiler', () => {
       };
       const x = {
         ...z,
+        //@ts-ignore
         f: 3,
         ...y,
       };
@@ -115,6 +116,28 @@ describe('ObjectLiteralExpressionCompiler', () => {
       assertEqual(x.a, 0);
       assertEqual(x.f, 4);
     `);
+  });
+
+  test('object with spread override errors', async () => {
+    helpers.compileString(
+      `
+      const y = {
+        a: 0,
+        get f(): number {
+          return 4;
+        },
+      };
+      const z = {
+        a: 1,
+      };
+      const x = {
+        ...z,
+        f: 3,
+        ...y,
+      };
+    `,
+      { type: 'error' },
+    );
   });
 
   test('private field identifier fails outside class', async () => {

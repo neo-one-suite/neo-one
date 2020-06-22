@@ -45,6 +45,7 @@ export class ErrorOverlay extends React.Component<Props, State> {
   public readonly getIframeWindow = (element: HTMLDivElement | null) => {
     if (element) {
       const document = element.ownerDocument;
+      // tslint:disable-next-line: strict-boolean-expressions
       if (document) {
         // tslint:disable-next-line no-object-mutation
         this.iframeWindow = document.defaultView === null ? undefined : document.defaultView;

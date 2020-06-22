@@ -603,9 +603,9 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
   private push(node: ts.Node, tags: Tags, value: SingleBytecodeValue): void {
     if (this.mutableCapturedBytecode !== undefined) {
-      this.mutableCapturedBytecode.push([node, tags, value] as const);
+      this.mutableCapturedBytecode.push([node, tags, value]);
     } else {
-      this.mutableBytecode.push([node, tags, value] as const);
+      this.mutableBytecode.push([node, tags, value]);
     }
   }
 }

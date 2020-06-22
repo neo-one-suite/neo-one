@@ -394,7 +394,7 @@ export class WriteBatchBlockchain {
 
       this.block.add(block),
       this.header.add(block.header),
-    ] as const);
+    ]);
 
     const prevBlockData =
       maybePrevBlockData === undefined
@@ -665,10 +665,10 @@ export class WriteBatchBlockchain {
               globalActionIndex = globalActionIndex.add(utils.ONE);
             },
             onMigrateContract: ({ from, to }) => {
-              migratedContractHashes.push([from, to] as const);
+              migratedContractHashes.push([from, to]);
             },
             onSetVotes: ({ address, votes }) => {
-              voteUpdates.push([address, votes] as const);
+              voteUpdates.push([address, votes]);
             },
           },
 
@@ -858,7 +858,7 @@ export class WriteBatchBlockchain {
         await this.updateAccount(
           common.hexToUInt160(address),
           // tslint:disable-next-line no-unused
-          values.map<readonly [UInt256, BN]>(([_address, asset, value]) => [asset, value] as const),
+          values.map<readonly [UInt256, BN]>(([_address, asset, value]) => [asset, value]),
           spent === undefined ? [] : spent,
           claimed === undefined ? [] : claimed,
           outs === undefined ? [] : outs,

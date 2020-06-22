@@ -8,6 +8,7 @@
     "lint:staged": "",
     "pack": "gulp pack"
   },
+  "sideEffects": false,
   "dependencies": {
     "@neo-one/cli": "^2.6.0",
     "@neo-one/client": "^2.6.0",
@@ -19,6 +20,5 @@
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
     "gulp": "~4.0.2"
-  },
-  "sideEffects": false
+  }
 }

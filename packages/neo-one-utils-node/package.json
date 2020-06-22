@@ -11,6 +11,7 @@
     "pack": "gulp pack",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
+  "sideEffects": false,
   "dependencies": {
     "@neo-one/utils": "^2.5.0",
     "execa": "^3.2.0",
@@ -21,11 +22,10 @@
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@types/npm-package-arg": "^6.1.0",
     "@types/jest": "^24.0.18",
+    "@types/npm-package-arg": "^6.1.0",
     "@types/pino": "^5.8.9",
     "@types/yargs": "^13.0.3",
     "gulp": "~4.0.2"
-  },
-  "sideEffects": false
+  }
 }

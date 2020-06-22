@@ -6,7 +6,7 @@ interface StyledRouterLinkBaseProps {
   readonly linkColor: 'primary' | 'gray' | 'accent' | 'light';
 }
 
-export const StyledRouterLinkBase = styled<typeof RouterLink, StyledRouterLinkBaseProps>(RouterLink)`
+export const StyledRouterLinkBase = styled<typeof RouterLink, StyledRouterLinkBaseProps>(RouterLink)<{}, {}>`
   color: ${switchProp('linkColor', {
     primary: prop('theme.primary'),
     accent: prop('theme.accent'),

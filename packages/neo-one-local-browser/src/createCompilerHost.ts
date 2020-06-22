@@ -1,6 +1,6 @@
 import { normalizePath, utils } from '@neo-one/utils';
 import ts from 'typescript';
-import { currentDirectory, useCaseSensitiveFileNames } from './constants';
+import { useCaseSensitiveFileNames } from './constants';
 import { FileSystem } from './filesystem';
 import { createFSHost } from './sys';
 import { getSmartContractLibPath, getSmartContractPath } from './utils';
@@ -63,7 +63,6 @@ export const createCompilerHost = ({ fs }: Options) => {
           // tslint:disable-next-line no-non-null-assertion
           return ts.ScriptSnapshot.fromString(servicesHost.readFile!(fileName)!);
         },
-        getCurrentDirectory: () => currentDirectory,
         getCompilationSettings: () => options,
         getDefaultLibFileName: (opts) => ts.getDefaultLibFilePath(opts),
         useCaseSensitiveFileNames: () => useCaseSensitiveFileNames,

@@ -1,8 +1,9 @@
 import { BinaryWriter } from '../../../BinaryWriter';
 import { UInt160 } from '../../../common';
 import { AttributeBaseModel } from './AttributeBaseModel';
+import { AttributeUsageModel } from './AttributeUsageModel';
 
-export type UInt160AttributeUsageModel = 0x20;
+export type UInt160AttributeUsageModel = AttributeUsageModel.Script;
 
 export interface UInt160AttributeModelAdd {
   readonly usage: UInt160AttributeUsageModel;

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/cli-common",
+      "comment": "Upgrade TypeScript from v3.8.3 to v3.9.5",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/cli-common",
+  "email": "spencercorwin@icloud.com"
+}

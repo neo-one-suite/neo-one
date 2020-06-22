@@ -125,14 +125,14 @@ describe('NEODataProvider', () => {
   });
 
   const convertedAssetTypes = [
-    ['CreditFlag', 'Credit'] as const,
-    ['DutyFlag', 'Duty'] as const,
-    ['GoverningToken', 'Governing'] as const,
-    ['UtilityToken', 'Utility'] as const,
-    ['Currency', 'Currency'] as const,
-    ['Share', 'Share'] as const,
-    ['Invoice', 'Invoice'] as const,
-    ['Token', 'Token'] as const,
+    ['CreditFlag', 'Credit'],
+    ['DutyFlag', 'Duty'],
+    ['GoverningToken', 'Governing'],
+    ['UtilityToken', 'Utility'],
+    ['Currency', 'Currency'],
+    ['Share', 'Share'],
+    ['Invoice', 'Invoice'],
+    ['Token', 'Token'],
   ];
 
   convertedAssetTypes.forEach(([from, to]) => {
@@ -264,17 +264,17 @@ describe('NEODataProvider', () => {
   });
 
   const convertedContractParameterTypes = [
-    ['Signature', 'Signature'] as const,
-    ['Boolean', 'Boolean'] as const,
-    ['Integer', 'Integer'] as const,
-    ['Hash160', 'Address'] as const,
-    ['Hash256', 'Hash256'] as const,
-    ['ByteArray', 'Buffer'] as const,
-    ['PublicKey', 'PublicKey'] as const,
-    ['String', 'String'] as const,
-    ['Array', 'Array'] as const,
-    ['InteropInterface', 'InteropInterface'] as const,
-    ['Void', 'Void'] as const,
+    ['Signature', 'Signature'],
+    ['Boolean', 'Boolean'],
+    ['Integer', 'Integer'],
+    ['Hash160', 'Address'],
+    ['Hash256', 'Hash256'],
+    ['ByteArray', 'Buffer'],
+    ['PublicKey', 'PublicKey'],
+    ['String', 'String'],
+    ['Array', 'Array'],
+    ['InteropInterface', 'InteropInterface'],
+    ['Void', 'Void'],
   ];
 
   convertedContractParameterTypes.forEach(([from, to]) => {

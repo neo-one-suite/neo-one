@@ -5,8 +5,8 @@ import { BufferStackItem, IntegerStackItem, MapStackItem } from '../../stackItem
 describe('Map Stack Item', () => {
   const keyStackItem = new IntegerStackItem(new BN(0));
   const valueStackItem = new BufferStackItem(Buffer.from([0x00]));
-  const keyMap = new Map<string, IntegerStackItem>([['0', keyStackItem] as const]);
-  const valueMap = new Map<string, BufferStackItem>([[valueStackItem.toStructuralKey(), valueStackItem] as const]);
+  const keyMap = new Map<string, IntegerStackItem>([['0', keyStackItem]]);
+  const valueMap = new Map<string, BufferStackItem>([[valueStackItem.toStructuralKey(), valueStackItem]]);
   const mapStackItem = new MapStackItem({
     referenceKeys: keyMap,
     referenceValues: valueMap,

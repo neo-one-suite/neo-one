@@ -36,7 +36,7 @@ export const findSuperDeployPropInfo = (
     (propInfo): propInfo is DeployPropInfo => propInfo.type === 'deploy',
   );
   if (superDeployPropInfo !== undefined) {
-    return [superSmartContract, superDeployPropInfo] as const;
+    return [superSmartContract, superDeployPropInfo];
   }
 
   return findSuperDeployPropInfo(superSmartContract);
@@ -45,5 +45,5 @@ export const findSuperDeployPropInfo = (
 export const findDeployInfo = (contractInfo: ContractInfo): readonly [ContractInfo, DeployPropInfo] | undefined => {
   const deployInfo = contractInfo.propInfos.find((propInfo): propInfo is DeployPropInfo => propInfo.type === 'deploy');
 
-  return deployInfo === undefined ? findSuperDeployPropInfo(contractInfo) : ([contractInfo, deployInfo] as const);
+  return deployInfo === undefined ? findSuperDeployPropInfo(contractInfo) : [contractInfo, deployInfo];
 };

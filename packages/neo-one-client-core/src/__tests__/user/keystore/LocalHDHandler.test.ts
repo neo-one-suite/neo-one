@@ -102,7 +102,7 @@ describe('LocalHDHandler', () => {
   });
 
   test('Chain Access Discovery - active account', async () => {
-    bootstrapMockHandler([0, 0], getAccountMock([0, 0, 1] as const));
+    bootstrapMockHandler([0, 0], getAccountMock([0, 0, 1]));
     const accounts = await handler.scanAccounts(network, 5);
 
     expect(accounts.length).toEqual(3);
@@ -110,7 +110,7 @@ describe('LocalHDHandler', () => {
   });
 
   test('Wallet Access Discovery - active account', async () => {
-    bootstrapMockHandler([0], getAccountMock([0, 0, 1] as const));
+    bootstrapMockHandler([0], getAccountMock([0, 0, 1]));
     const accounts = await handler.scanAccounts(network, 5);
 
     expect(accounts.length).toEqual(5);
@@ -118,7 +118,7 @@ describe('LocalHDHandler', () => {
   });
 
   test('Master Access Discovery - active account', async () => {
-    bootstrapMockHandler([], getAccountMock([1, 0, 1] as const));
+    bootstrapMockHandler([], getAccountMock([1, 0, 1]));
     const accounts = await handler.scanAccounts(network, 4);
 
     expect(accounts.length).toEqual(13);

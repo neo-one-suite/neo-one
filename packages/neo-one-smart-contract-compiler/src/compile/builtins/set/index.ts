@@ -77,10 +77,10 @@ class SetValue extends BuiltinNew {
 class SetConstructorInterface extends BuiltinInterface {}
 
 const COMMON: ReadonlyArray<readonly [string, Builtin]> = [
-  ['__@iterator', new SetIterator()] as const,
-  ['forEach', new SetForEach()] as const,
-  ['has', new MapHas()] as const,
-  ['size', new MapSize()] as const,
+  ['__@iterator', new SetIterator()],
+  ['forEach', new SetForEach()],
+  ['has', new MapHas()],
+  ['size', new MapSize()],
 ];
 
 // tslint:disable-next-line export-name

@@ -3,7 +3,7 @@ import { Box, ButtonBase, Tooltip, TooltipArrow } from '@neo-one/react-common';
 import * as React from 'react';
 import { prop } from 'styled-tools';
 
-const StyledButton = styled(ButtonBase)`
+const StyledButton = styled(ButtonBase)<{}, {}>`
   background-color: ${prop('theme.gray0')};
   border: 1px solid rgba(0, 0, 0, 0.3);
   border-right: 0;

@@ -1,8 +1,9 @@
 import { BinaryWriter } from '../../../BinaryWriter';
 import { common, ECPoint } from '../../../common';
 import { AttributeBaseModel } from './AttributeBaseModel';
+import { AttributeUsageModel } from './AttributeUsageModel';
 
-export type ECPointAttributeUsageModel = 0x02 | 0x03;
+export type ECPointAttributeUsageModel = AttributeUsageModel.ECDH02 | AttributeUsageModel.ECDH03;
 
 export interface ECPointAttributeModelAdd {
   readonly usage: ECPointAttributeUsageModel;

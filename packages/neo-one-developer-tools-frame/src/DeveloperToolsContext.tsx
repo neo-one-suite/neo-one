@@ -108,7 +108,7 @@ export const useTokens = (): readonly [ReadonlyArray<Token>, (tokens: ReadonlyAr
   );
   const onChangeTokens = useCallback((nextTokens: readonly Token[]) => onChange({ tokens: nextTokens }), [onChange]);
 
-  return [tokens, onChangeTokens] as const;
+  return [tokens, onChangeTokens];
 };
 
 export const useResetLocalState = () => {
@@ -126,7 +126,7 @@ export const useAutoConsensus = (): readonly [boolean, () => void] => {
   );
   const toggle = useCallback(() => onChange({ autoConsensus: !autoConsensus }), [autoConsensus, onChange]);
 
-  return [autoConsensus, toggle] as const;
+  return [autoConsensus, toggle];
 };
 
 export const useAutoSystemFee = (): readonly [boolean, () => void] => {
@@ -138,5 +138,5 @@ export const useAutoSystemFee = (): readonly [boolean, () => void] => {
   );
   const toggle = useCallback(() => onChange({ autoSystemFee: !autoSystemFee }), [autoSystemFee, onChange]);
 
-  return [autoSystemFee, toggle] as const;
+  return [autoSystemFee, toggle];
 };

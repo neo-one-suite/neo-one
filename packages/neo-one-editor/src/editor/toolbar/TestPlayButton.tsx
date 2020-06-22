@@ -4,7 +4,7 @@ import * as React from 'react';
 import { MdPlayArrow } from 'react-icons/md';
 import { prop } from 'styled-tools';
 
-const PlayButtonWrapper = styled(ButtonBase)`
+const PlayButtonWrapper = styled(ButtonBase)<{}, {}>`
   display: flex;
   justify-content: center;
   align-content: center;

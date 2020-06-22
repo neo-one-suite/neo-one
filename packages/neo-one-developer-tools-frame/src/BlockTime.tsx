@@ -44,20 +44,20 @@ interface TimeAgoProps {
   readonly time: number;
 }
 
-const SHORTEN_PAIRS = [
-  [' seconds', 's'] as const,
-  [' second', 's'] as const,
-  [' minutes', 'm'] as const,
-  [' minute', 'm'] as const,
-  [' hours', 'h'] as const,
-  [' hour', 'h'] as const,
-  [' days', 'D'] as const,
-  [' day', 'D'] as const,
-  [' months', 'M'] as const,
-  [' month', 'M'] as const,
-  [' years', 'Y'] as const,
-  [' year', 'Y'] as const,
-] as const;
+const SHORTEN_PAIRS: ReadonlyArray<readonly [string, string]> = [
+  [' seconds', 's'],
+  [' second', 's'],
+  [' minutes', 'm'],
+  [' minute', 'm'],
+  [' hours', 'h'],
+  [' hour', 'h'],
+  [' days', 'D'],
+  [' day', 'D'],
+  [' months', 'M'],
+  [' month', 'M'],
+  [' years', 'Y'],
+  [' year', 'Y'],
+];
 
 const shorten = (value: string) => {
   // tslint:disable-next-line no-loop-statement

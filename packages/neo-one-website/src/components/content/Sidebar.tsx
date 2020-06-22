@@ -78,7 +78,7 @@ const MobileSidebarWrapper = styled(Box)<{}, {}>`
   background-color: ${prop('theme.gray1')};
 `;
 
-const MobileButton = styled(ButtonBase)`
+const MobileButton = styled(ButtonBase)<{}, {}>`
   position: fixed;
   bottom: 48px;
   right: 24px;

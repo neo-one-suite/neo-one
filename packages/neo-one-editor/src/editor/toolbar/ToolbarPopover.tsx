@@ -27,7 +27,7 @@ const TitleText = styled(Box)<{}, {}>`
   ${prop('theme.fontStyles.headline')};
 `;
 
-const ToggleWrapper = styled(Wrapper)`
+const ToggleWrapper = styled(Wrapper)<{}, {}>`
   display: grid;
   color: ${prop('theme.gray0')};
   ${prop('theme.fonts.axiformaBook')};

@@ -24,7 +24,7 @@ const createFileSystem = (): readonly [FileSystem, JestMocked<FileSystem>] => {
     // tslint:disable-next-line:no-any
   } as any;
 
-  return [fileSystem, fileSystem] as const;
+  return [fileSystem, fileSystem];
 };
 
 describe('resolve', () => {

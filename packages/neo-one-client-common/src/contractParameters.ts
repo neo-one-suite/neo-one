@@ -200,9 +200,10 @@ const toMap = (contractParameter: ContractParameter, parameter: MapABI): Readonl
   const valueConverter = contractParameters[value.type] as any;
 
   return new Map(
-    contractParameter.value.map<readonly [Return | undefined, Return | undefined]>(
-      (val) => [keyConverter(val[0], key), valueConverter(val[1], value)] as const,
-    ),
+    contractParameter.value.map<readonly [Return | undefined, Return | undefined]>((val) => [
+      keyConverter(val[0], key),
+      valueConverter(val[1], value),
+    ]),
   );
 };
 

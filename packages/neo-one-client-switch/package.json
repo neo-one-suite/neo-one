@@ -12,6 +12,7 @@
     "pack": "gulp pack",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
+  "sideEffects": false,
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
     "@ledgerhq/hw-transport-u2f": "^4.68.2",
@@ -34,6 +35,5 @@
   },
   "optionalDependencies": {
     "@ledgerhq/hw-transport-node-hid": "^4.68.2"
-  },
-  "sideEffects": false
+  }
 }
