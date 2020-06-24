@@ -30,7 +30,9 @@ export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
       `${config.neotracker.port}`,
       '--nodeRpcUrl',
       `http://localhost:${config.network.port}/rpc`,
-      '--dbFileName',
+      '--client',
+      'sqlite',
+      '--db.connection.filename',
       nodePath.resolve(config.neotracker.path, 'db.sqlite'),
     ];
     let neotrackerBinPath: string;
