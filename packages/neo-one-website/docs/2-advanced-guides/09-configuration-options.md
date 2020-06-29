@@ -85,6 +85,6 @@ export default {
 
 Note
 
-While hard coding the `LocalUserAccountProvider` is a viable option in testing this also requires storing a `privateKey` as plain text in a file that would traditionally be checked into version control, i.e github. For this reason we recommend only using a hard coded value for local on-the-fly testing / debugging.
+While hard coding the `LocalUserAccountProvider` is a viable option in testing this also requires storing a `privateKey` as plain text in a file that would traditionally be checked into version control, like Git/GitHub. For this reason we recommend only using a hard coded value for local on-the-fly testing / debugging.
 
 :::
