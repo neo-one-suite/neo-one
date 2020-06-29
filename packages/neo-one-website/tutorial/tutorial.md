@@ -299,7 +299,7 @@ Unlike methods decorated with `@constant`, normal instance methods may modify co
 
 For those of you that have experience with other NEO Smart Contract languages, you may notice that rather than returning `false` we always throw an `Error`. Not only is this more idiomatic TypeScript, but throwing an `Error` also has the side effect of reverting all storage changes. This ensures that when an assertion in an operation fails, there are no erroneous storage changes. Note that when your contract is called from another contract, we will always return `false` to that contract so that it has a chance to react to the failure. We do this because there is not (currently) a way for the calling contract to catch errors.
 
-The main difference for the NEO•ONE client APIs is that methods require relaying a transaction to the blockchain. This makes sense because a non-constant method by definiton mutates storage, and we need to persist those changes to the blockchain. We'll have to wait until the next section to test our `transfer` method since we don't currently have a way of creating tokens.
+The main difference for the NEO•ONE client APIs is that non-constant methods require relaying a transaction to the blockchain. This makes sense because a non-constant method by definiton mutates storage, and we need to persist those changes to the blockchain. We'll have to wait until the next section to test our `transfer` method since we don't currently have a way of creating tokens.
 
 ### Native Asset Methods
 
