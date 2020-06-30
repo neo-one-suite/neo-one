@@ -451,35 +451,35 @@ describe('contractParameters', () => {
 describe('Extra Contract Parameter Coverage', () => {
   const stringMap = [
     {
-      type: 'String' as const,
+      type: 'String',
       value: 'one',
     },
     {
-      type: 'String' as const,
+      type: 'String',
       value: '1',
     },
-  ] as const;
+  ];
 
   const mapParam = {
-    type: 'Map' as const,
+    type: 'Map',
     value: [stringMap],
   };
 
   const mapABI = {
-    type: 'Map' as const,
+    type: 'Map',
     key: {
-      type: 'String' as const,
+      type: 'String',
     },
     value: {
-      type: 'String' as const,
+      type: 'String',
     },
   };
 
   const objABI = {
-    type: 'Object' as const,
+    type: 'Object',
     properties: {
       one: {
-        type: 'String' as const,
+        type: 'String',
       },
     },
   };
@@ -490,7 +490,7 @@ describe('Extra Contract Parameter Coverage', () => {
 
   test('toMap function', () => {
     const map = smartContractConverters.toMap(mapParam, mapABI);
-    expect(map).toEqual(new Map([['one', '1'] as const]));
+    expect(map).toEqual(new Map([['one', '1']]));
   });
 
   test('toObject function', () => {

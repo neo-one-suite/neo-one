@@ -28,11 +28,11 @@ export const makeOption = async ({
       Object.entries(account.balances).map<Promise<readonly [string, BigNumber] | undefined>>(
         async ([assetHash, value]) => {
           if (assetHash === Hash256.NEO) {
-            return ['NEO', value] as const;
+            return ['NEO', value];
           }
 
           if (assetHash === Hash256.GAS) {
-            return ['GAS', value] as const;
+            return ['GAS', value];
           }
 
           return undefined;
@@ -51,7 +51,7 @@ export const makeOption = async ({
 
           const balance = await smartContract.balanceOf(userAccount.id.address, { network: token.network });
 
-          return [token.symbol, balance] as const;
+          return [token.symbol, balance];
         }),
     ),
   ]);

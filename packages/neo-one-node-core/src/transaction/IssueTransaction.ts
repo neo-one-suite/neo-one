@@ -45,7 +45,7 @@ export class IssueTransaction extends TransactionBase<
     });
   }
 
-  protected readonly sizeExclusive: () => number = utils.lazy(() => IOHelper.sizeOfUInt8);
+  public readonly sizeExclusive: () => number = utils.lazy(() => IOHelper.sizeOfUInt8);
   private readonly issueGetScriptHashesForVerifyingInternal: (
     options: TransactionGetScriptHashesForVerifyingOptions,
   ) => Promise<Set<UInt160Hex>>;

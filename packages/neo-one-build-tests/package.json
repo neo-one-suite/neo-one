@@ -6,6 +6,7 @@
     "build": "",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
+  "sideEffects": false,
   "devDependencies": {
     "@babel/preset-env": "^7.6.3",
     "@neo-one/build-tools": "^1.0.0",
@@ -23,6 +24,5 @@
     "nyc": "^14.1.1",
     "tmp": "^0.1.0",
     "ts-jest": "^24.1.0"
-  },
-  "sideEffects": false
+  }
 }

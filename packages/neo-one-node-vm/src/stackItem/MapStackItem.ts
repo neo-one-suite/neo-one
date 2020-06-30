@@ -56,9 +56,10 @@ export class MapStackItem extends StackItemBase {
     newSeen.add(this);
 
     return new MapContractParameter(
-      this.keysArray().map<readonly [ContractParameter, ContractParameter]>(
-        (key) => [key.toContractParameter(newSeen), this.get(key).toContractParameter(newSeen)] as const,
-      ),
+      this.keysArray().map<readonly [ContractParameter, ContractParameter]>((key) => [
+        key.toContractParameter(newSeen),
+        this.get(key).toContractParameter(newSeen),
+      ]),
     );
   }
 

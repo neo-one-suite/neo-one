@@ -1,5 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ObjectLiteralExpressionCompiler object with spread override errors 1`] = `
+"snippetCode.ts (13,9): 'f' is specified more than once, so this usage will be overwritten.
+
+      11 |       const x = {
+      12 |         ...z,
+    > 13 |         f: 3,
+         |         ^
+      14 |         ...y,
+      15 |       };
+      16 |     
+"
+`;
+
 exports[`ObjectLiteralExpressionCompiler private field identifier fails outside class 1`] = `
 "snippetCode.ts (4,9): Private identifiers are not allowed outside class bodies.
 

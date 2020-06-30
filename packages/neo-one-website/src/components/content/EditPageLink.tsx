@@ -4,7 +4,7 @@ import { Link } from '@neo-one/react-common';
 import * as React from 'react';
 import { prop } from 'styled-tools';
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(Link)<{}, {}>`
   ${prop('theme.fonts.axiformaRegular')}
   ${prop('theme.fontStyles.subheading')}
 `;

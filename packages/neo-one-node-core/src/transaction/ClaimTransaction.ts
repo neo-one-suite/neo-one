@@ -58,7 +58,7 @@ export class ClaimTransaction extends TransactionBase<
   }
 
   public readonly claims!: readonly Input[];
-  protected readonly sizeExclusive: () => number = utils.lazy(
+  public readonly sizeExclusive: () => number = utils.lazy(
     () => IOHelper.sizeOfUInt8 + IOHelper.sizeOfArray(this.claims, (claim) => claim.size),
   );
   private readonly claimGetScriptHashesForVerifyingInternal: (

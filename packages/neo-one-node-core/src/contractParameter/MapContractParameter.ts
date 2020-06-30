@@ -39,9 +39,10 @@ export class MapContractParameter extends ContractParameterBase<
   public serializeJSON(context: SerializeJSONContext): MapContractParameterJSON {
     return {
       type: 'Map' as const,
-      value: this.value.map<readonly [ContractParameterJSON, ContractParameterJSON]>(
-        (val) => [val[0].serializeJSON(context), val[1].serializeJSON(context)] as const,
-      ),
+      value: this.value.map<readonly [ContractParameterJSON, ContractParameterJSON]>((val) => [
+        val[0].serializeJSON(context),
+        val[1].serializeJSON(context),
+      ]),
     };
   }
 }

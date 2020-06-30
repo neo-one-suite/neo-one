@@ -11,6 +11,7 @@
     "pack": "gulp pack",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
+  "sideEffects": false,
   "dependencies": {
     "@neo-one/cli-common-node": "^2.6.0",
     "@neo-one/http": "^2.5.0",
@@ -38,6 +39,5 @@
     "@types/koa-static": "^4.0.1",
     "@types/lodash": "^4.14.138",
     "gulp": "~4.0.2"
-  },
-  "sideEffects": false
+  }
 }

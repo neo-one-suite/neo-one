@@ -86,7 +86,7 @@ export class RegisterTransaction extends TransactionBase<
   }
 
   public readonly asset: Asset;
-  protected readonly sizeExclusive: () => number = utils.lazy(
+  public readonly sizeExclusive: () => number = utils.lazy(
     () =>
       IOHelper.sizeOfUInt8 +
       IOHelper.sizeOfUInt8 +

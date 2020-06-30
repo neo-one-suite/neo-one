@@ -63,7 +63,7 @@ export class InvocationTransaction extends TransactionBase<
     });
   }
 
-  protected readonly sizeExclusive: () => number = utils.lazy(
+  public readonly sizeExclusive: () => number = utils.lazy(
     () => IOHelper.sizeOfUInt8 + IOHelper.sizeOfVarBytesLE(this.script),
   );
 
@@ -88,19 +88,17 @@ export class InvocationTransaction extends TransactionBase<
         asset: asset === undefined ? undefined : asset.serializeJSON(context),
         contracts: contracts.map((contract) => contract.serializeJSON(context)),
         deletedContractHashes: deletedContractHashes.map((hash) => common.uInt160ToString(hash)),
-        migratedContractHashes: migratedContractHashes.map<readonly [string, string]>(
-          ([from, to]) => [common.uInt160ToString(from), common.uInt160ToString(to)] as const,
-        ),
-        voteUpdates: voteUpdates.map<readonly [string, string[]]>(
-          ([address, votes]) =>
-            [
-              crypto.scriptHashToAddress({
-                addressVersion: context.addressVersion,
-                scriptHash: address,
-              }),
-              votes.map((vote) => common.ecPointToString(vote)),
-            ] as const,
-        ),
+        migratedContractHashes: migratedContractHashes.map<readonly [string, string]>(([from, to]) => [
+          common.uInt160ToString(from),
+          common.uInt160ToString(to),
+        ]),
+        voteUpdates: voteUpdates.map<readonly [string, string[]]>(([address, votes]) => [
+          crypto.scriptHashToAddress({
+            addressVersion: context.addressVersion,
+            scriptHash: address,
+          }),
+          votes.map((vote) => common.ecPointToString(vote)),
+        ]),
         actions: actions.map((action) => action.serializeJSON(context)),
         storageChanges: storageChanges.map((storageChange) => storageChange.serializeJSON(context)),
       };

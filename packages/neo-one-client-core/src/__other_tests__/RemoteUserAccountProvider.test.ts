@@ -23,31 +23,28 @@ describe('RemoteUserAccountProvider', () => {
     Buffer.from('abc123', 'hex'),
     true,
     [data.bns.b, data.numbers.b],
-    new Map([[data.bns.a, data.numbers.b] as const]),
+    new Map([[data.bns.a, data.numbers.b]]),
     { key: false },
     undefined,
   ];
   const allParamsZipped = [
-    ['undefined', undefined] as const,
-    ['bignumber', data.bigNumbers.a] as const,
-    ['buffer', data.buffers.a] as const,
-    ['address', unlockedWallet.userAccount.id.address] as const,
-    ['hash256', data.hash256s.a] as const,
-    ['publicKey', keys[0].publicKeyString] as const,
-    ['boolean', true] as const,
+    ['undefined', undefined],
+    ['bignumber', data.bigNumbers.a],
+    ['buffer', data.buffers.a],
+    ['address', unlockedWallet.userAccount.id.address],
+    ['hash256', data.hash256s.a],
+    ['publicKey', keys[0].publicKeyString],
+    ['boolean', true],
     [
       'array',
       [
         ['undefined', undefined],
         ['bignumber', data.bigNumbers.a],
       ],
-    ] as const,
-    ['map', new Map([[data.bns.a, data.numbers.b] as const])] as const,
-    ['object', { key: false }] as const,
-    [
-      'forward',
-      { name: 'forwardValue', converted: Buffer.alloc(20, 7), param: unlockedWallet.userAccount.id.address },
-    ] as const,
+    ],
+    ['map', new Map([[data.bns.a, data.numbers.b]])],
+    ['object', { key: false }],
+    ['forward', { name: 'forwardValue', converted: Buffer.alloc(20, 7), param: unlockedWallet.userAccount.id.address }],
   ] as ReadonlyArray<readonly [string, Param | undefined]>;
   const transactionOptions = {
     from: unlockedWallet1.userAccount.id,

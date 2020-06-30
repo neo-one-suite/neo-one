@@ -241,6 +241,7 @@ export class AsyncLanguageService {
     fileName: string,
     files: { readonly [key: string]: string },
   ): Promise<readonly FlattenedDiagnostic[]> =>
+    // tslint:disable-next-line: no-useless-cast
     Promise.all([this.fs, this.languageService] as const).then(([fs, languageService]) =>
       this.withTmpFS(files, () => {
         const diagnostics = this.isSmartContract

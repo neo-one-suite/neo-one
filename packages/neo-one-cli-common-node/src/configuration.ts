@@ -283,10 +283,7 @@ const validateConfig = async (rootDir: string, configIn: any): Promise<Configura
   let newFramework: CodegenFramework | undefined;
   let newLanguage: CodegenLanguage | undefined;
   if (Object.keys(configIn).length === 0) {
-    [newFramework, newLanguage] = await Promise.all([
-      getProjectFramework(rootDir),
-      getProjectLanguage(rootDir),
-    ] as const);
+    [newFramework, newLanguage] = await Promise.all([getProjectFramework(rootDir), getProjectLanguage(rootDir)]);
   }
 
   return {

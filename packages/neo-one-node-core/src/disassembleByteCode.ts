@@ -25,7 +25,7 @@ export const disassembleByteCode = (bytes: Buffer): readonly Line[] => {
     const pc = reader.index;
     const byte = reader.readUInt8();
     if (!isByteCode(byte)) {
-      mutableResult.push([pc, 'UNKNOWN', undefined] as const);
+      mutableResult.push([pc, 'UNKNOWN', undefined]);
       continue;
     }
 
@@ -47,15 +47,15 @@ export const disassembleByteCode = (bytes: Buffer): readonly Line[] => {
       } else {
         numBytes = reader.readInt32LE();
       }
-      mutableResult.push([pc, opCode, createHexString(reader.readBytes(numBytes))] as const);
+      mutableResult.push([pc, opCode, createHexString(reader.readBytes(numBytes))]);
     } else if (byte === Op.JMP || byte === Op.JMPIF || byte === Op.JMPIFNOT || byte === Op.CALL) {
-      mutableResult.push([pc, opCode, `${reader.readInt16LE()}`] as const);
+      mutableResult.push([pc, opCode, `${reader.readInt16LE()}`]);
     } else if (byte === Op.APPCALL || byte === Op.TAILCALL) {
       const mutableAppBytes = [...reader.readBytes(20)];
       mutableAppBytes.reverse();
-      mutableResult.push([pc, opCode, createHexString(Buffer.from(mutableAppBytes))] as const);
+      mutableResult.push([pc, opCode, createHexString(Buffer.from(mutableAppBytes))]);
     } else if (byte === Op.SYSCALL) {
-      mutableResult.push([pc, opCode, utils.toASCII(reader.readVarBytesLE(252))] as const);
+      mutableResult.push([pc, opCode, utils.toASCII(reader.readVarBytesLE(252))]);
       // tslint:disable-next-line strict-type-predicate
     } else if (byte === Op.CALL_E || byte === Op.CALL_ET) {
       const returnValueCount = reader.readBytes(1);
@@ -68,7 +68,7 @@ export const disassembleByteCode = (bytes: Buffer): readonly Line[] => {
         `${createHexString(returnValueCount)} ${createHexString(parametersCount)} ${createHexString(
           Buffer.from(mutableAppBytes),
         )}`,
-      ] as const);
+      ]);
     } else if (byte === Op.CALL_ED || byte === Op.CALL_EDT || byte === Op.CALL_I) {
       const returnValueCount = reader.readBytes(1);
       const parametersCount = reader.readBytes(1);
@@ -79,9 +79,9 @@ export const disassembleByteCode = (bytes: Buffer): readonly Line[] => {
         `${createHexString(returnValueCount)} ${createHexString(parametersCount)} ${
           jumpVal === undefined ? '' : createHexString(jumpVal)
         }`,
-      ] as const);
+      ]);
     } else {
-      mutableResult.push([pc, opCode, undefined] as const);
+      mutableResult.push([pc, opCode, undefined]);
     }
   }
 

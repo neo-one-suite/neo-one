@@ -73,7 +73,7 @@ describe('Scripter Builder Tests', () => {
   });
 
   test('emitPushParam - Map', () => {
-    const testMap = new Map([[0, 1] as const]);
+    const testMap = new Map([[0, 1]]);
     builder.emitPushParam(testMap);
 
     expect(builder.buffers).toEqual([

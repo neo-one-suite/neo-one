@@ -35,7 +35,7 @@ export class ContractTransaction extends TransactionBase<
     });
   }
 
-  protected readonly sizeExclusive: () => number = utils.lazy(() => IOHelper.sizeOfUInt8);
+  public readonly sizeExclusive: () => number = utils.lazy(() => IOHelper.sizeOfUInt8);
 
   public constructor({ version, attributes, inputs, outputs, scripts, hash }: TransactionBaseAdd) {
     super({

@@ -41,13 +41,13 @@ export class InvocationData implements SerializableWire<InvocationData> {
       const from = reader.readUInt160();
       const to = reader.readUInt160();
 
-      return [from, to] as const;
+      return [from, to];
     });
     const voteUpdates = reader.readArray<readonly [UInt160, ReadonlyArray<ECPoint>]>(() => {
       const address = reader.readUInt160();
       const votes = reader.readArray<ECPoint>(() => reader.readECPoint());
 
-      return [address, votes] as const;
+      return [address, votes];
     });
     const blockIndex = reader.readUInt32LE();
     const transactionIndex = reader.readUInt32LE();

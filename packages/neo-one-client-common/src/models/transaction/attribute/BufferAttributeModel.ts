@@ -3,24 +3,24 @@ import { AttributeBaseModel } from './AttributeBaseModel';
 import { AttributeUsageModel } from './AttributeUsageModel';
 
 export type BufferAttributeUsageModel =
-  | 0x81
-  | 0x90
-  | 0xf0
-  | 0xf1
-  | 0xf2
-  | 0xf3
-  | 0xf4
-  | 0xf5
-  | 0xf6
-  | 0xf7
-  | 0xf8
-  | 0xf9
-  | 0xfa
-  | 0xfb
-  | 0xfc
-  | 0xfd
-  | 0xfe
-  | 0xff;
+  | AttributeUsageModel.DescriptionUrl
+  | AttributeUsageModel.Description
+  | AttributeUsageModel.Remark
+  | AttributeUsageModel.Remark1
+  | AttributeUsageModel.Remark2
+  | AttributeUsageModel.Remark3
+  | AttributeUsageModel.Remark4
+  | AttributeUsageModel.Remark5
+  | AttributeUsageModel.Remark6
+  | AttributeUsageModel.Remark7
+  | AttributeUsageModel.Remark8
+  | AttributeUsageModel.Remark9
+  | AttributeUsageModel.Remark10
+  | AttributeUsageModel.Remark11
+  | AttributeUsageModel.Remark12
+  | AttributeUsageModel.Remark13
+  | AttributeUsageModel.Remark14
+  | AttributeUsageModel.Remark15;
 
 export interface BufferAttributeModelAdd {
   readonly usage: BufferAttributeUsageModel;

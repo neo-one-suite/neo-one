@@ -54,9 +54,9 @@ export abstract class TransactionBaseModel<
   public readonly scripts: readonly TWitness[];
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   public readonly serializeUnsigned: SerializeWire = createSerializeWire(this.serializeUnsignedBase.bind(this));
-  private readonly hashInternal: () => UInt256;
-  private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
-  private readonly messageInternal = utils.lazy(() => this.serializeUnsigned());
+  public readonly hashInternal: () => UInt256;
+  public readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
+  public readonly messageInternal = utils.lazy(() => this.serializeUnsigned());
 
   public constructor({
     version,

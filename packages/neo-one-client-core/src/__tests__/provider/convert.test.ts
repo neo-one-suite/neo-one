@@ -89,7 +89,7 @@ describe('Convert Provider Helper Tests', () => {
     const integerJSON = factory.createIntegerContractParameterJSON();
     const booleanJSON = factory.createBooleanContractParameterJSON();
     const mapJSON = factory.createMapContractParameterJSON({
-      value: [[integerJSON, booleanJSON] as const],
+      value: [[integerJSON, booleanJSON]],
     });
 
     expect(convertContractParameter(mapJSON)).toEqual({

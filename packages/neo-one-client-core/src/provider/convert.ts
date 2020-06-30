@@ -158,9 +158,10 @@ export function convertContractParameter(parameter: ContractParameterJSON): Cont
     case 'Map':
       return {
         type: 'Map',
-        value: parameter.value.map<readonly [ContractParameter, ContractParameter]>(
-          ([key, val]) => [convertContractParameter(key), convertContractParameter(val)] as const,
-        ),
+        value: parameter.value.map<readonly [ContractParameter, ContractParameter]>(([key, val]) => [
+          convertContractParameter(key),
+          convertContractParameter(val),
+        ]),
       };
     case 'PublicKey':
       return parameter;
@@ -525,7 +526,7 @@ export function convertInvocationData(
     contracts: data.contracts.map(convertContract),
     deletedContractAddresses: data.deletedContractHashes.map(scriptHashToAddress),
     migratedContractAddresses: data.migratedContractHashes.map<readonly [AddressString, AddressString]>(
-      ([hash0, hash1]) => [scriptHashToAddress(hash0), scriptHashToAddress(hash1)] as const,
+      ([hash0, hash1]) => [scriptHashToAddress(hash0), scriptHashToAddress(hash1)],
     ),
     actions: data.actions.map((action, idx) =>
       convertAction(blockHash, blockIndex, transactionHash, transactionIndex, idx, action),

@@ -52,7 +52,7 @@ export class MinerTransaction extends TransactionBase<
   }
 
   public readonly nonce: number;
-  protected readonly sizeExclusive: () => number = utils.lazy(() => IOHelper.sizeOfUInt8 + IOHelper.sizeOfUInt32LE);
+  public readonly sizeExclusive: () => number = utils.lazy(() => IOHelper.sizeOfUInt8 + IOHelper.sizeOfUInt32LE);
 
   public constructor({ version, attributes, inputs, outputs, scripts, hash, nonce }: MinerTransactionAdd) {
     super({

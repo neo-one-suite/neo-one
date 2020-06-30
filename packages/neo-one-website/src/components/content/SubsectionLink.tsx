@@ -23,7 +23,7 @@ const Link = styled(StyledRouterLink)<any>`
   }
 `;
 
-const TutorialLink = styled<typeof BaseLink, { readonly active: boolean }>(BaseLink)`
+const TutorialLink = styled<typeof BaseLink, { readonly active: boolean }>(BaseLink)<{}, {}>`
   ${ifProp('active', prop('theme.fonts.axiformaBold'), prop('theme.fonts.axiformaRegular'))};
   ${prop('theme.fontStyles.subheading')};
 

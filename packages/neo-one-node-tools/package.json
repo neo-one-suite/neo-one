@@ -12,6 +12,7 @@
     "pack": "gulp pack",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
+  "sideEffects": false,
   "dependencies": {
     "@google-cloud/storage": "^4.3.2",
     "@neo-one/logger": "^2.5.0",
@@ -31,6 +32,5 @@
     "@types/yargs": "^13.0.3",
     "fs-extra": "^8.1.0",
     "gulp": "~4.0.2"
-  },
-  "sideEffects": false
+  }
 }

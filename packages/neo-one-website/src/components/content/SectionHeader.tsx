@@ -10,7 +10,7 @@ interface Props {
   readonly toggle?: () => void;
 }
 
-const SectionButton = styled(ButtonBase)`
+const SectionButton = styled(ButtonBase)<{}, {}>`
   ${prop('theme.fonts.axiformaBold')};
   ${prop('theme.fontStyles.subheading')};
   line-height: 3;

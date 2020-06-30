@@ -167,7 +167,7 @@ function weightedFilter<T>(
     mutableResult.push([
       value,
       weight.gte(0) ? weight.integerValue(BigNumber.ROUND_FLOOR) : weight.integerValue(BigNumber.ROUND_CEIL),
-    ] as const);
+    ]);
   }
 
   return mutableResult;

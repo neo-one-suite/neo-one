@@ -383,7 +383,7 @@ export const convertParams = ({
   const zipped = zip.map<readonly [string, Param | undefined]>(([parameterIn, param]) => {
     const parameter = parameterIn as ABIParameter;
 
-    return [parameter.name, parameter.type === 'ForwardValue' ? (param as ForwardValue).param : param] as const;
+    return [parameter.name, parameter.type === 'ForwardValue' ? (param as ForwardValue).param : param];
   });
 
   return { converted, zipped };

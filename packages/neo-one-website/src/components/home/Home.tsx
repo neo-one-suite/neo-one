@@ -114,7 +114,7 @@ export const Home = (props: {}) => (
           Get Started
         </StyledLinkButton>
         <StyledLink to="course" linkColor="primary">
-          Take Course >
+          Take Course {'>'}
         </StyledLink>
       </ButtonWrapper>
     </StyledBackground>

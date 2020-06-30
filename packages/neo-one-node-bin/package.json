@@ -12,6 +12,7 @@
     "pack": "gulp pack",
     "tsc": "node ./node_modules/@neo-one/build-tools/bin/neo-one-tsc.js"
   },
+  "sideEffects": false,
   "dependencies": {
     "@neo-one/logger": "^2.5.0",
     "@neo-one/node": "^2.5.0",
@@ -38,6 +39,5 @@
     "cross-fetch": "^3.0.4",
     "fs-extra": "^8.1.0",
     "gulp": "~4.0.2"
-  },
-  "sideEffects": false
+  }
 }
