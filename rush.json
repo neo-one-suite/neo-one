@@ -16,7 +16,7 @@
 
   "eventHooks": {
     "preRushInstall": [],
-    "postRushInstall": [],
+    "postRushInstall": ["node ./common/scripts/neo-one-prune.js"],
     "preRushBuild": [],
     "postRushBuild": []
   },
