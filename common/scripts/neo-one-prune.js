@@ -11,16 +11,42 @@ const NEO_ONE_NM_PATH = path.resolve(
 
 const whitelist = new Set(['ec-key']);
 
-const readDir = async (directory) =>
+const readDir = async (dir) =>
   new Promise((resolve, reject) =>
-    fs.readdir(directory, (err, files) => (err ? reject(err) : resolve(files))),
+    fs.readdir(dir, (err, files) => (err ? reject(err) : resolve(files))),
   );
-const rmDir = async (directory) =>
+
+const isDirectoryFn = async (pathToCheck) =>
   new Promise((resolve, reject) =>
-    fs.rmdir(directory, { recursive: true }, (err) =>
-      err ? reject(err) : resolve(),
+    fs.stat(pathToCheck, (err, stats) =>
+      err ? reject(err) : resolve(stats.isDirectory()),
     ),
   );
+
+const rmDir = async (dir) =>
+  new Promise((resolve, reject) =>
+    fs.rmdir(dir, (err) => (err ? reject(err) : resolve())),
+  );
+
+const rmFile = async (file) =>
+  new Promise((resolve, reject) =>
+    fs.unlink(file, (err) => (err ? reject(err) : resolve())),
+  );
+
+const rmFilesRecursive = async (pathIn) => {
+  const isDirectory = await isDirectoryFn(pathIn);
+  if (isDirectory) {
+    const paths = await readDir(pathIn);
+    await Promise.all(
+      paths.map(async (filePath) =>
+        rmFilesRecursive(path.resolve(pathIn, filePath)),
+      ),
+    );
+    await rmDir(pathIn);
+  } else {
+    await rmFile(pathIn);
+  }
+};
 
 /**
  * script for pruning NEO•ONE dependencies that get pulled during install by neotracker/core
@@ -32,7 +58,9 @@ const _run = async () => {
   await Promise.all(
     packages
       .filter((package) => !whitelist.has(package))
-      .map((package) => rmDir(path.resolve(NEO_ONE_NM_PATH, package))),
+      .map((package) =>
+        rmFilesRecursive(path.resolve(NEO_ONE_NM_PATH, package)),
+      ),
   );
 };
 
