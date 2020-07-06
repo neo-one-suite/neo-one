@@ -22,7 +22,7 @@
     "core-js": "^3.2.1",
     "lodash": "^4.17.15",
     "nanoid": "^2.0.3",
-    "pouchdb": "^7.1.1",
+    "pouchdb": "7.1.1",
     "pouchdb-utils": "^7.1.1",
     "rxjs": "^6.5.3",
     "safe-stable-stringify": "^1.1.0",

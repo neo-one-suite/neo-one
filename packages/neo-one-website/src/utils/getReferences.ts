@@ -71,7 +71,8 @@ const getLinksFromModule = async (currentPath: string, dirName: string): Promise
 };
 
 const getLinks = async (): Promise<{ readonly [moduleName: string]: ModuleLinksPaths }> => {
-  const moduleNames = await fs.readdir(BASE_PATH);
+  const moduleNamesIn = await fs.readdir(BASE_PATH);
+  const moduleNames = moduleNamesIn.filter((moduleName) => moduleName.startsWith('neo-one'));
 
   return moduleNames.reduce(async (acc, moduleName) => {
     const moduleLinks = await getLinksFromModule(BASE_PATH, moduleName);
