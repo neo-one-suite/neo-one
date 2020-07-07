@@ -2,12 +2,12 @@ import { LocalKeyStore, LocalMemoryStore, NEOONEProvider } from '@neo-one/client
 import { LocalUserAccountProvider } from '@neo-one/client-full-core';
 import prompts from 'prompts';
 
-const createUserAccountProviderFunc = (network: string, rpcURL: string) => async () => {
+export const createUserAccountProviderFunc = (network: string, rpcURL: string) => async () => {
   const keystore = new LocalKeyStore(new LocalMemoryStore());
   const { privateKeys } = await prompts({
     type: 'list',
     name: 'privateKeys',
-    message: `Please enter one or more private keys separated by commas for use on the ${network} network.`,
+    message: `Please enter one or more private keys separated by commas for use on the "${network}" network.`,
     validate: (value) => (value.length > 0 ? true : 'Must enter at least one private key.'),
   });
   await Promise.all(privateKeys.map((privateKey: string) => keystore.addUserAccount({ network, privateKey })));
