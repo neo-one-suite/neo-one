@@ -5,4 +5,4 @@ import * as cmd from './cmd';
 
 export { cmd };
 
-export { defaultNetworks } from '@neo-one/cli-common-node';
+export { createUserAccountProviderFunc, defaultNetworks } from '@neo-one/cli-common-node';

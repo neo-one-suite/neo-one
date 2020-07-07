@@ -3,7 +3,7 @@ slug: config-options
 title: Configuration Options
 ---
 
-NEO•ONE compiler configuration options
+NEO•ONE compiler configuration options.
 
 Configure NEO•ONE for your project.
 
@@ -65,19 +65,59 @@ export default {
 
 ## Networks
 
-While we provide defaults for deployment networks it is also possible to use your own! You can provide a `name` and `rpcURL` to our [helper](https://github.com/neo-one-suite/neo-one/blob/ea855d82640550cb00830ea8a4596c8b01108cf7/packages/neo-one-cli-common-node/src/networks.ts#L5) which will prompt you to provide a list of `privateKeys` for use on the network when deploying _or_ you can provide your own UserAccountProvider, such as:
+While we provide defaults for deployment networks it is also possible to use your own! You can provide a `name` and `rpcUrl` to our helper function `createUserAccountProviderFunc` from `@neo-one/cli`, which will prompt you to provide a list of `privateKeys` for use on the network when deploying:
 
 ```typescript
-const keystore = new LocalKeyStore(new LocalMemoryStore());
-keystore.addUserAccount('exampleNetwork', 'PRIVATE_KEY');
+import { createUserAccountProviderFunc, defaultNetworks } from '@neo-one/cli';
+
 export default {
-//...
+  // ...
   networks: {
-    exampleNetwork: new LocalUserAccountProvider({
-      keystore,
-      provider: new NEOONEProvider([{ 'exampleNetwork', 'exampleRpcURL.io/rpc'}])
-    })
+    ...defaultNetworks,
+    exampleNetwork: createUserAccountProviderFunc('exampleNetwork', 'exampleRpcUrl.io/rpc');
   }
+  // ...
+}
+```
+
+This is what the `createUserAccountProviderFunc` will do to create the new `LocalUserAccountProvider`:
+
+```typescript
+export const createUserAccountProviderFunc = (network: string, rpcURL: string) => async () => {
+  const keystore = new LocalKeyStore(new LocalMemoryStore());
+  const { privateKeys } = await prompts({
+    type: 'list',
+    name: 'privateKeys',
+    message: `Please enter one or more private keys separated by commas for use on the "${network}" network.`,
+    validate: (value) => (value.length > 0 ? true : 'Must enter at least one private key.'),
+  });
+  await Promise.all(privateKeys.map((privateKey: string) => keystore.addUserAccount({ network, privateKey })));
+
+  return new LocalUserAccountProvider({
+    keystore,
+    provider: new NEOONEProvider([{ network, rpcURL }]),
+  });
+};
+```
+
+Or you can create your own hard-coded `async` function that returns a `UserAccountProvider`, like so:
+
+```typescript
+export default {
+  // ...
+  networks: {
+    ...defaultNetworks,
+    exampleNetwork: async () => {
+      const keystore = new LocalKeyStore(new LocalMemoryStore());
+      await keystore.addUserAccount('exampleNetwork', 'PRIVATE_KEY');
+
+      return new LocalUserAccountProvider({
+        keystore,
+        provider: new NEOONEProvider([{ network: 'exampleNetwork', rpcUrl: 'exampleRpcUrl.io/rpc'}])
+      })
+    }
+  }
+  // ...
 }
 ```
 
@@ -85,6 +125,6 @@ export default {
 
 Note
 
-While hard coding the `LocalUserAccountProvider` is a viable option in testing this also requires storing a `privateKey` as plain text in a file that would traditionally be checked into version control, like Git/GitHub. For this reason we recommend only using a hard coded value for local on-the-fly testing / debugging.
+While hard-coding the `LocalUserAccountProvider` is a viable option in testing this also requires storing a private key as plain text in the `.neo-one.config.ts` file that is traditionally checked into version control, like Git/GitHub. For this reason we recommend only using a hard coded private key value for local on-the-fly testing and debugging.
 
 :::
