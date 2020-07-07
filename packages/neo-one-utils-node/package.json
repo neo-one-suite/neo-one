@@ -14,6 +14,8 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/utils": "^2.5.0",
+    "@types/pino": "^5.8.9",
+    "@types/yargs": "^13.0.3",
     "execa": "^3.2.0",
     "npm-package-arg": "^7.0.0",
     "pino": "^5.12.6",
@@ -24,8 +26,6 @@
     "@neo-one/build-tools": "^1.0.0",
     "@types/jest": "^24.0.18",
     "@types/npm-package-arg": "^6.1.0",
-    "@types/pino": "^5.8.9",
-    "@types/yargs": "^13.0.3",
     "gulp": "~4.0.2"
   }
 }

@@ -24,6 +24,7 @@
     "@neo-one/node-storage-levelup": "^2.5.0",
     "@neo-one/node-vm": "^2.5.0",
     "@neo-one/utils": "^2.5.0",
+    "@types/abstract-leveldown": "^5.0.1",
     "abstract-leveldown": "^6.0.3",
     "fs-extra": "^8.1.0",
     "leveldown": "^5.1.1",
@@ -32,7 +33,6 @@
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@types/abstract-leveldown": "^5.0.1",
     "@types/fs-extra": "^8.0.0",
     "@types/leveldown": "^4.0.0",
     "@types/levelup": "^3.1.1",

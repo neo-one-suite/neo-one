@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/client-common",
+      "comment": "Add appropriate @types dependencies.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/client-common",
+  "email": "spencercorwin@icloud.com"
+}

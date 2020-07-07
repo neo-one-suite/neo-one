@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/node-http-rpc",
+      "comment": "Add appropriate @types dependencies.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/node-http-rpc",
+  "email": "spencercorwin@icloud.com"
+}

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/react-common",
+      "comment": "Add appropriate @types dependencies.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/react-common",
+  "email": "spencercorwin@icloud.com"
+}

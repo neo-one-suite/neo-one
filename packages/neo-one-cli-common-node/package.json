@@ -16,6 +16,7 @@
     "@neo-one/cli-common": "^2.6.0",
     "@neo-one/client-core": "^2.6.0",
     "@neo-one/client-full-core": "^2.5.0",
+    "@types/lodash": "^4.14.138",
     "cosmiconfig": "^6.0.0",
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.15",
@@ -27,7 +28,6 @@
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
     "@types/fs-extra": "^8.0.0",
-    "@types/lodash": "^4.14.138",
     "@types/prompts": "^2.0.1",
     "@types/schema-utils": "^1.0.0",
     "gulp": "~4.0.2"
