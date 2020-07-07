@@ -125,7 +125,7 @@ export default {
     path.resolve(
       PACKAGE_DIR,
       'neo-one-build-tools-web',
-      'lib',
+      'dist',
       'webpack',
       'plugin',
     ),

@@ -90,6 +90,14 @@ const run = async () => {
     await timer(shutdownWait + 500).toPromise();
   });
 
+  // Uncomment (and build) to debug compile-website-prod command
+  // if (buildProc.stdout !== null) {
+  //   buildProc.stdout.pipe(process.stdout);
+  // }
+  // if (buildProc.stderr !== null) {
+  //   buildProc.stderr.pipe(process.stderr);
+  // }
+
   await buildProc;
   console.log('$ rush run-website-prod');
   const startProc = execa('rush', ['run-website-prod']);
@@ -98,9 +106,17 @@ const run = async () => {
     await timer(shutdownWait + 500).toPromise();
   });
 
-  const TEN_MINUTES = 10 * 60 * 1000;
-  const FIVE_MINUTES = 5 * 60 * 1000;
-  await timer(argv.local ? FIVE_MINUTES : TEN_MINUTES).toPromise();
+  // Uncomment (and build) to debug run-website-prod command
+  // if (startProc.stdout !== null) {
+  //   startProc.stdout.pipe(process.stdout);
+  // }
+  // if (startProc.stderr !== null) {
+  //   startProc.stderr.pipe(process.stderr);
+  // }
+
+  const FIFTEEN_MINUTES = 15 * 60 * 1000;
+  const EIGHT_MINUTES = 8 * 60 * 1000;
+  await timer(argv.local ? EIGHT_MINUTES : FIFTEEN_MINUTES).toPromise();
   await runCypress();
 };
 
