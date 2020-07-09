@@ -12,7 +12,7 @@ const LICENSE_PATH = path.resolve(APP_ROOT_DIR, 'LICENSE');
 const README_PATH = path.resolve(APP_ROOT_DIR, 'README.md');
 
 const rushJSON = JSON.parse(fs.readFileSync(RUSH_PATH, 'utf-8'));
-const packages = rushJSON.projects
+export const packages = rushJSON.projects
   .filter((project: RushProject) => project.shouldPublish)
   .map((project: RushProject) => project.projectFolder.slice('packages/'.length));
 

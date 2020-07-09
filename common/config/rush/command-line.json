@@ -281,6 +281,14 @@
       "shellCommand": "prettier --config .prettierrc --write \"packages/*/src/**/*.{ts,tsx}\""
     },
     {
+      "commandKind": "global",
+      "name": "check-type-deps",
+      "summary": "Run check.ts script",
+      "description": "Run check.ts script",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "node ./packages/neo-one-build-tools/dist/check"
+    },
+    {
       "commandKind": "bulk",
       "name": "tsc",
       "summary": "Run tsc --noEmit in each package",

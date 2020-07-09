@@ -62,6 +62,9 @@ aliases:
       - run:
           name: Build
           command: node common/scripts/install-run-rush.js rebuild
+      - run:
+          name: Check Type Dependencies
+          command: node common/scripts/install-run-rush.js check-type-deps
       - persist_to_workspace:
           root: ~/neo-one
           paths:
@@ -103,6 +106,9 @@ aliases:
       - run:
           name: Build
           command: node common/scripts/install-run-rush.js rebuild
+      - run:
+          name: Check Type Dependencies
+          command: node common/scripts/install-run-rush.js check-type-deps
       - persist_to_workspace:
           root: ~/neo-one
           paths:

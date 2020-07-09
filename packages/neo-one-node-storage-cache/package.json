@@ -17,12 +17,12 @@
     "@neo-one/node-core": "^2.5.0",
     "@neo-one/node-storage-common": "^2.5.0",
     "@neo-one/utils": "^2.5.0",
+    "@types/lru-cache": "^5.1.0",
     "lru-cache": "^5.0.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@types/lru-cache": "^5.1.0",
     "gulp": "~4.0.2"
   }
 }

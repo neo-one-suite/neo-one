@@ -19,6 +19,7 @@
     "@neo-one/node-neo-settings": "^2.5.0",
     "@neo-one/utils": "^2.5.0",
     "@neo-one/utils-node": "^2.5.0",
+    "@types/yargs": "^13.0.3",
     "env-paths": "^2.2.0",
     "execa": "^3.2.0",
     "import-local": "^3.0.2",
@@ -35,7 +36,6 @@
     "@types/fs-extra": "^8.0.0",
     "@types/jest": "^24.0.18",
     "@types/rc": "^1.1.0",
-    "@types/yargs": "^13.0.3",
     "cross-fetch": "^3.0.4",
     "fs-extra": "^8.1.0",
     "gulp": "~4.0.2"

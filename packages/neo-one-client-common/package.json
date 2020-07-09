@@ -15,6 +15,7 @@
   "dependencies": {
     "@neo-one/ec-key": "^0.1.0",
     "@neo-one/utils": "^2.5.0",
+    "@types/bn.js": "^4.11.5",
     "bignumber.js": "^9.0.0",
     "bn.js": "^5.0.0",
     "bs58": "^4.0.1",
@@ -31,7 +32,6 @@
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
-    "@types/bn.js": "^4.11.5",
     "@types/bs58": "^4.0.0",
     "@types/buffer-xor": "^2.0.0",
     "@types/elliptic": "^6.4.9",
