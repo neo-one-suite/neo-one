@@ -18,8 +18,10 @@ export class SwitchStatementCompiler extends NodeCompiler<ts.SwitchStatement> {
     sb.withProgramCounter((pc) => {
       const switchExpr = tsUtils.expression.getExpression(node);
       const switchExprType = sb.context.analysis.getType(switchExpr);
-
-      const breakOptions = sb.breakPCOptions(sb.noPushValueOptions(options), pc.getLast());
+      let breakOptions = sb.breakPCOptions(sb.noPushValueOptions(options), pc.getLast());
+      if (breakOptions.finallyPC !== undefined) {
+        breakOptions = sb.finallyPCOptions(breakOptions, pc.getLast());
+      }
 
       const caseBlock = tsUtils.statement.getCaseBlock(node);
       const clauses = tsUtils.statement.getClauses(caseBlock);
