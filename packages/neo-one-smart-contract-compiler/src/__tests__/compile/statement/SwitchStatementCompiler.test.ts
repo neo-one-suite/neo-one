@@ -117,4 +117,39 @@ describe('SwitchStatementCompiler', () => {
       assertEqual(result, 'c');
     `);
   });
+
+  test('switch break - inside SmartContract invocation', async () => {
+    const node = await helpers.startNode();
+    const contract = await node.addContract(`
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      export class TestSmartContract extends SmartContract {
+
+        public foo(): number {
+          const attribute: number = 0;
+
+          switch(attribute) {
+            case 0:
+              // do nothing
+              break;
+          }
+
+          // checking that this code runs after the break statement
+          return 10;
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        deploy(): boolean;
+        foo(): number;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+
+      assertEqual(contract.foo(), 10);
+    `);
+  });
 });

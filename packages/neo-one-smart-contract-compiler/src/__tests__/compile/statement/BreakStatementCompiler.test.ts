@@ -40,6 +40,44 @@ describe('BreakStatementCompiler', () => {
     `);
   });
 
+  test('break - inside SmartContract invocation', async () => {
+    const node = await helpers.startNode();
+    const contract = await node.addContract(`
+      import { SmartContract } from '@neo-one/smart-contract';
+
+      export class TestContract extends SmartContract {
+        public foo() {
+          let result = 0;
+          for (let i = 0; i < 10; i++) {
+            result += 10;
+            if (i > 1) {
+              break;
+            }
+          }
+
+          if (result != 30) {
+            throw 'Failure';
+          }
+
+          // checking that this code runs after the break statement
+          return 10;
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        deploy(): boolean;
+        foo(): number;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+
+      assertEqual(contract.foo(), 10);
+    `);
+  });
+
   test('break label', async () => {
     helpers.compileString(
       `
