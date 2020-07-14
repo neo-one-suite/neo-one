@@ -71,6 +71,15 @@ export abstract class ProviderBase<TDataProvider extends DataProviderBase> imple
     return this.getProvider(network).relayTransaction(transaction, networkFee);
   }
 
+  public async relayStrippedTransaction(
+    network: NetworkType,
+    verificationTransaction: InvocationTransactionModel,
+    relayTransaction: InvocationTransactionModel,
+    networkFee?: BigNumber,
+  ): Promise<RelayTransactionResult> {
+    return this.getProvider(network).relayStrippedTransaction(verificationTransaction, relayTransaction, networkFee);
+  }
+
   public async getTransactionReceipt(
     network: NetworkType,
     hash: Hash256String,

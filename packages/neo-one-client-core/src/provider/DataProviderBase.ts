@@ -126,6 +126,14 @@ export abstract class DataProviderBase implements DataProvider {
     return this.executeRelayTransaction(transaction, networkFee);
   }
 
+  public async relayStrippedTransaction(
+    verificationTransaction: InvocationTransactionModel,
+    relayTransaction: InvocationTransactionModel,
+    networkFee?: BigNumber,
+  ): Promise<RelayTransactionResult> {
+    return this.executeRelayStrippedTransaction(verificationTransaction, relayTransaction, networkFee);
+  }
+
   public async getTransactionReceipt(hash: Hash256String, options?: GetOptions): Promise<TransactionReceipt> {
     return this.executeGetTransactionReceipt(hash, options);
   }
@@ -250,6 +258,12 @@ export abstract class DataProviderBase implements DataProvider {
 
   protected abstract async executeRelayTransaction(
     transaction: TransactionBaseModel,
+    networkFee?: BigNumber,
+  ): Promise<RelayTransactionResult>;
+
+  protected abstract async executeRelayStrippedTransaction(
+    verificationTransaction: InvocationTransactionModel,
+    relayTransaction: InvocationTransactionModel,
     networkFee?: BigNumber,
   ): Promise<RelayTransactionResult>;
 

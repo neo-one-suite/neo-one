@@ -73,6 +73,7 @@ const RPC_METHODS: { readonly [key: string]: string } = {
   validateaddress: 'validateaddress',
   getpeers: 'getpeers',
   relaytransaction: 'relaytransaction',
+  relaystrippedtransaction: 'relaystrippedtransaction',
   getoutput: 'getoutput',
   getclaimamount: 'getclaimamount',
   getallstorage: 'getallstorage',
@@ -437,6 +438,49 @@ export const createHandler = ({
         const [transactionJSON, result] = await Promise.all<TransactionJSON, RelayTransactionResult>([
           transaction.serializeJSON(blockchain.serializeJSONContext),
           node.relayTransaction(transaction, { forceAdd: true, throwVerifyError: true }),
+        ]);
+        const resultJSON =
+          result.verifyResult === undefined
+            ? {}
+            : {
+                verifyResult: {
+                  verifications: result.verifyResult.verifications.map((verification) => ({
+                    hash: JSONHelper.writeUInt160(verification.hash),
+                    witness: verification.witness.serializeJSON(blockchain.serializeJSONContext),
+                    actions: verification.actions.map((action) =>
+                      action.serializeJSON(blockchain.serializeJSONContext),
+                    ),
+                    failureMessage: verification.failureMessage,
+                  })),
+                },
+              };
+
+        return {
+          ...resultJSON,
+          transaction: transactionJSON,
+        };
+      } catch (error) {
+        throw new JSONRPCError(-110, `Relay transaction failed: ${error.message}`);
+      }
+    },
+    [RPC_METHODS.relaystrippedtransaction]: async (args): Promise<RelayTransactionResultJSON> => {
+      const verificationTransaction = deserializeTransactionWire({
+        context: blockchain.deserializeWireContext,
+        buffer: JSONHelper.readBuffer(args[0]),
+      });
+
+      const relayTransaction = deserializeTransactionWire({
+        context: blockchain.deserializeWireContext,
+        buffer: JSONHelper.readBuffer(args[1]),
+      });
+
+      try {
+        const [transactionJSON, result] = await Promise.all<TransactionJSON, RelayTransactionResult>([
+          relayTransaction.serializeJSON(blockchain.serializeJSONContext),
+          node.relayStrippedTransaction(verificationTransaction, relayTransaction, {
+            forceAdd: true,
+            throwVerifyError: true,
+          }),
         ]);
         const resultJSON =
           result.verifyResult === undefined

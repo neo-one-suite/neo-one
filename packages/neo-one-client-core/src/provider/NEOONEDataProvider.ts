@@ -175,6 +175,19 @@ export class NEOONEDataProvider extends DataProviderBase implements DeveloperPro
     return convertRelayTransactionResult(result);
   }
 
+  protected async executeRelayStrippedTransaction(
+    verificationTransaction: InvocationTransactionModel,
+    relayTransaction: InvocationTransactionModel,
+    _networkFee?: BigNumber,
+  ): Promise<RelayTransactionResult> {
+    const result = await this.mutableClient.relayStrippedTransaction(
+      verificationTransaction.serializeWire().toString('hex'),
+      relayTransaction.serializeWire().toString('hex'),
+    );
+
+    return convertRelayTransactionResult(result);
+  }
+
   protected async executeGetTransactionReceipt(hash: Hash256String, options?: GetOptions): Promise<TransactionReceipt> {
     const result = await this.mutableClient.getTransactionReceipt(hash, options);
 

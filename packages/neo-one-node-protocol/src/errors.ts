@@ -13,3 +13,13 @@ export const AlreadyConnectedError = makeErrorWithCode(
   'ALREADY_CONNECTED',
   (reason: string) => `Negotiation failed: ${reason}`,
 );
+
+export const InvalidRelayStrippedTransactionType = makeErrorWithCode(
+  'INVALID_TRANSACTION_TYPE_FOR_STRIPPED_RELAY',
+  (type: number) => `tried to use relayStrippedTransaction on a ${type} transaction`,
+);
+
+export const RelayStrippedTransactionMismatch = makeErrorWithCode(
+  'RELAY_STRIPPED_TRANSACTION_MISMATCH',
+  () => "verificationTransaction and relayTransaction weren't identical transactions",
+);
