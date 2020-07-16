@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/smart-contract-compiler",
+      "comment": "Fix number mismatches in ArrayStorage, SetStorage, MapStorage.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract-compiler",
+  "email": "spencercorwin@icloud.com"
+}

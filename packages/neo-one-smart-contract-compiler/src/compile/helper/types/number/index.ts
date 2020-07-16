@@ -1,3 +1,4 @@
+export * from './CoerceToIntHelper';
 export * from './WrapNumberHelper';
 export * from './UnwrapNumberHelper';
 export * from './IsNumberHelper';

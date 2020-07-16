@@ -36,6 +36,8 @@ export class ArrayStoragePush extends BuiltinInstanceMemberCall {
       sb.emitOp(node, 'TUCK');
       // [idx, val, idx, val]
       sb.emitOp(node, 'OVER');
+      // [idx, val, idx, val]
+      sb.emitHelper(node, options, sb.helpers.coerceToInt);
       // [idxVal, val, idx, val]
       sb.emitHelper(node, options, sb.helpers.wrapNumber);
       // [valueVal, idxVal, val, idx, val]

@@ -17,6 +17,7 @@ describe('ElementAccessExpressionCompiler', () => {
       assertEqual(y[length], 3);
       assertEqual(y.length, 3);
       assertEqual(y[0], 0);
+      assertEqual(y[1 - 1], 0);
       assertEqual(y[1] as number | undefined, undefined);
       assertEqual(y[2], 2);
       assertEqual(y[2] += 1, 3);
