@@ -34,6 +34,14 @@ export class MapStorageGet extends BuiltinInstanceMemberCall {
     const type = sb.context.analysis.getType(arg);
     // [keyVal, val]
     sb.visit(arg, options);
+    if (arg.kind === ts.SyntaxKind.NumericLiteral) {
+      // [number, val]
+      sb.emitHelper(arg, options, sb.helpers.unwrapNumber);
+      // [number, val]
+      sb.emitHelper(arg, options, sb.helpers.coerceToInt);
+      // [keyVal, val]
+      sb.emitHelper(arg, options, sb.helpers.wrapNumber);
+    }
     // [val]
     sb.emitHelper(node, optionsIn, sb.helpers.getStructuredStorage({ type: Types.MapStorage, keyType: type }));
   }

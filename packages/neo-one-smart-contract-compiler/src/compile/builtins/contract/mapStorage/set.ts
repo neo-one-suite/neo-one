@@ -39,6 +39,14 @@ export class MapStorageSet extends BuiltinInstanceMemberCall {
     }
     // [keyVal, val]
     sb.visit(key, options);
+    if (key.kind === ts.SyntaxKind.NumericLiteral) {
+      // [number, val]
+      sb.emitHelper(key, options, sb.helpers.unwrapNumber);
+      // [number, val]
+      sb.emitHelper(key, options, sb.helpers.coerceToInt);
+      // [keyVal, val]
+      sb.emitHelper(key, options, sb.helpers.wrapNumber);
+    }
     // [valVal, keyVal, val]
     sb.visit(tsUtils.argumented.getArguments(node)[1], options);
     // []

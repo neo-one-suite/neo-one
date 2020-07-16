@@ -30,7 +30,7 @@ describe('SetStorage', () => {
           assertEqual(storage.has('foo'), true);
           assertEqual(storage.has('bar'), true);
 
-          storage.delete('bar')
+          storage.delete('bar');
           assertEqual(storage.delete('foo'), true);
           assertEqual(storage.delete('foo'), false);
           assertEqual(storage.has('foo'), false);
@@ -49,6 +49,81 @@ describe('SetStorage', () => {
           storageLike['has']('foo');
           storageLike['add']('foo');
           storageLike['delete']('foo');
+          storageLike[Symbol.iterator]();
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('add, delete, has - computed numbers', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { SetStorage, SmartContract } from '@neo-one/smart-contract';
+
+      export class StorageContract extends SmartContract {
+        public readonly properties = {
+          codeVersion: '1.0',
+          author: 'dicarlo2',
+          email: 'alex.dicarlo@neotracker.io',
+          description: 'StorageContract',
+        };
+        private readonly storage = SetStorage.for<number>();
+
+        public run(): void {
+          const storage = this.storage;
+          storage.has(1);
+          assertEqual(storage.has(1), false);
+
+          assertEqual(storage.delete(1), false);
+          storage.delete(1);
+          storage.add(0).add(1).add(16);
+          assertEqual(storage.has(1 - 1), true);
+          assertEqual(storage.has(2 - 1), true);
+          assertEqual(storage.has(17 - 1), true);
+
+          storage.delete(0);
+          assertEqual(storage.delete(1), true);
+          assertEqual(storage.delete(1), false);
+          assertEqual(storage.delete(16), true);
+          assertEqual(storage.has(0), false);
+          assertEqual(storage.has(1), false);
+          assertEqual(storage.has(16), false);
+
+          storage.add(1 - 1).add(2 - 1).add(17 - 1);
+          assertEqual(storage.has(0), true);
+          assertEqual(storage.has(1), true);
+          assertEqual(storage.has(16), true);
+          storage.delete(1 - 1);
+          storage.delete(2 - 1);
+          storage.delete(17 -1);
+          assertEqual(storage.has(1 - 1), false);
+          assertEqual(storage.has(2 - 1), false);
+          assertEqual(storage.has(17 - 1), false);
+
+          interface Storage<V> {
+            has(value: V): boolean;
+            add(value: V): this;
+            delete(value: V): boolean;
+            [Symbol.iterator](): IterableIterator<[V]>;
+          }
+
+          const storageLike: Storage<number> | SetStorage<number> =
+            storage as Storage<number> | SetStorage<number>;
+
+          storageLike['has'](0);
+          storageLike['add'](0);
+          storageLike['delete'](0);
           storageLike[Symbol.iterator]();
         }
       }

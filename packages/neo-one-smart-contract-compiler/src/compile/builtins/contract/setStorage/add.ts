@@ -39,6 +39,14 @@ export class SetStorageAdd extends BuiltinInstanceMemberCall {
     }
     // [keyVal, val]
     sb.visit(key, options);
+    if (key.kind === ts.SyntaxKind.NumericLiteral) {
+      // [number, val]
+      sb.emitHelper(key, options, sb.helpers.unwrapNumber);
+      // [number, val]
+      sb.emitHelper(key, options, sb.helpers.coerceToInt);
+      // [keyVal, val]
+      sb.emitHelper(key, options, sb.helpers.wrapNumber);
+    }
     // [value, keyVal, val]
     sb.emitPushBoolean(node, true);
     // []

@@ -276,6 +276,7 @@ import {
 import {
   ArrayLengthHelper,
   BufferLengthHelper,
+  CoerceToIntHelper,
   ConcatBufferHelper,
   CreateArrayHelper,
   CreateObjectHelper,
@@ -529,6 +530,7 @@ export interface Helpers {
   readonly invokeConstruct: (options?: InvokeConstructHelperOptions) => InvokeConstructHelper;
   readonly new: (options?: NewHelperOptions) => NewHelper;
   readonly parameters: (options: ParametersHelperOptions) => ParametersHelper;
+  readonly coerceToInt: CoerceToIntHelper;
 
   readonly forLoop: (options: ForLoopHelperOptions) => ForLoopHelper;
   readonly if: (options: IfHelperOptions) => IfHelper;
@@ -979,6 +981,7 @@ export const createHelpers = (prevHelpers?: Helpers): Helpers => {
     invokeConstruct: (options?) => new InvokeConstructHelper(options),
     new: (options?) => new NewHelper(options),
     parameters: (options) => new ParametersHelper(options),
+    coerceToInt: new CoerceToIntHelper(),
 
     forLoop: (options) => new ForLoopHelper(options),
     if: (options) => new IfHelper(options),

@@ -22,6 +22,10 @@ describe('ArrayLiteralExpressionCompiler', () => {
         throw 'Failure';
       }
 
+      if (x[1 - 1] !== 1) {
+        throw 'Failure';
+      }
+
       if (x[1] !== 2) {
         throw 'Failure';
       }

@@ -14,6 +14,7 @@ describe('ArrayStorage', () => {
       const test = (storage: ArrayStorage<string>) => {
         assertEqual(storage instanceof ArrayStorage, true);
         assertEqual(storage.length, 0);
+        assertEqual(storage.length, 1 - 1);
 
         storage[0] = '10';
         assertEqual(storage[0], '10');
@@ -56,6 +57,271 @@ describe('ArrayStorage', () => {
         assertEqual(storageLike[0] as string | undefined, undefined);
         assertEqual(storageLike['length'], 0);
         storageLike[Symbol.iterator]();
+      }
+
+      export class StorageContract extends SmartContract {
+        public readonly properties = {
+          codeVersion: '1.0',
+          author: 'dicarlo2',
+          email: 'alex.dicarlo@neotracker.io',
+          description: 'StorageContract',
+        };
+        private readonly storage = ArrayStorage.for<string>();
+
+        public run(): void {
+          test(this.storage);
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('get index by hardcoded and computed values', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { ArrayStorage, SmartContract } from '@neo-one/smart-contract';
+
+      const test = (storage: ArrayStorage<string>) => {
+        storage[0] = '10';
+        assertEqual(storage[0], '10');
+        assertEqual(storage[1 - 1], '10');
+        assertEqual(storage[0 + 0], '10');
+        assertEqual(storage[9 * 0], '10');
+        assertEqual(storage[0 / 9], '10');
+        storage[1] = '100';
+        assertEqual(storage[1], '100');
+        assertEqual(storage[2 - 1], '100');
+        assertEqual(storage[0 + 1], '100');
+        assertEqual(storage[1 / 1], '100');
+        assertEqual(storage[1 * 1], '100');
+        storage[18] = '18';
+        assertEqual(storage[18], '18');
+        assertEqual(storage[36 - 18], '18');
+        assertEqual(storage[13 + 5], '18');
+        assertEqual(storage[36 / 2], '18');
+        assertEqual(storage[3 * 6], '18');
+      }
+
+      export class StorageContract extends SmartContract {
+        public readonly properties = {
+          codeVersion: '1.0',
+          author: 'dicarlo2',
+          email: 'alex.dicarlo@neotracker.io',
+          description: 'StorageContract',
+        };
+        private readonly storage = ArrayStorage.for<string>();
+
+        public run(): void {
+          test(this.storage);
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('set index by subtracted values', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { ArrayStorage, SmartContract } from '@neo-one/smart-contract';
+
+      const test = (storage: ArrayStorage<string>) => {
+        storage[1 - 1] = '10';
+        assertEqual(storage[0], '10');
+        assertEqual(storage[2 - 2], '10');
+        assertEqual(storage[0 + 0], '10');
+        assertEqual(storage[9 * 0], '10');
+        assertEqual(storage[0 / 9], '10');
+        storage[2 - 1] = '100';
+        assertEqual(storage[1], '100');
+        assertEqual(storage[2 - 1], '100');
+        assertEqual(storage[0 + 1], '100');
+        assertEqual(storage[1 / 1], '100');
+        assertEqual(storage[1 * 1], '100');
+        storage[19 - 1] = '18';
+        assertEqual(storage[18], '18');
+        assertEqual(storage[36 - 18], '18');
+        assertEqual(storage[13 + 5], '18');
+        assertEqual(storage[36 / 2], '18');
+        assertEqual(storage[3 * 6], '18');
+      }
+
+      export class StorageContract extends SmartContract {
+        public readonly properties = {
+          codeVersion: '1.0',
+          author: 'dicarlo2',
+          email: 'alex.dicarlo@neotracker.io',
+          description: 'StorageContract',
+        };
+        private readonly storage = ArrayStorage.for<string>();
+
+        public run(): void {
+          test(this.storage);
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('set index by added values', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { ArrayStorage, SmartContract } from '@neo-one/smart-contract';
+
+      const test = (storage: ArrayStorage<string>) => {
+        storage[0 + 0] = '10';
+        assertEqual(storage[0], '10');
+        assertEqual(storage[2 - 2], '10');
+        assertEqual(storage[0 + 0], '10');
+        assertEqual(storage[9 * 0], '10');
+        assertEqual(storage[0 / 9], '10');
+        storage[1 + 0] = '100';
+        assertEqual(storage[1], '100');
+        assertEqual(storage[2 - 1], '100');
+        assertEqual(storage[0 + 1], '100');
+        assertEqual(storage[1 / 1], '100');
+        assertEqual(storage[1 * 1], '100');
+        storage[17 + 1] = '18';
+        assertEqual(storage[18], '18');
+        assertEqual(storage[36 - 18], '18');
+        assertEqual(storage[13 + 5], '18');
+        assertEqual(storage[36 / 2], '18');
+        assertEqual(storage[3 * 6], '18');
+      }
+
+      export class StorageContract extends SmartContract {
+        public readonly properties = {
+          codeVersion: '1.0',
+          author: 'dicarlo2',
+          email: 'alex.dicarlo@neotracker.io',
+          description: 'StorageContract',
+        };
+        private readonly storage = ArrayStorage.for<string>();
+
+        public run(): void {
+          test(this.storage);
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('set index by multiplied values', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { ArrayStorage, SmartContract } from '@neo-one/smart-contract';
+
+      const test = (storage: ArrayStorage<string>) => {
+        storage[0 * 9] = '10';
+        assertEqual(storage[0], '10');
+        assertEqual(storage[2 - 2], '10');
+        assertEqual(storage[0 + 0], '10');
+        assertEqual(storage[9 * 0], '10');
+        assertEqual(storage[0 / 9], '10');
+        storage[1 * 1] = '100';
+        assertEqual(storage[1], '100');
+        assertEqual(storage[2 - 1], '100');
+        assertEqual(storage[0 + 1], '100');
+        assertEqual(storage[1 / 1], '100');
+        assertEqual(storage[1 * 1], '100');
+        storage[6 * 3] = '18';
+        assertEqual(storage[18], '18');
+        assertEqual(storage[36 - 18], '18');
+        assertEqual(storage[13 + 5], '18');
+        assertEqual(storage[36 / 2], '18');
+        assertEqual(storage[3 * 6], '18');
+      }
+
+      export class StorageContract extends SmartContract {
+        public readonly properties = {
+          codeVersion: '1.0',
+          author: 'dicarlo2',
+          email: 'alex.dicarlo@neotracker.io',
+          description: 'StorageContract',
+        };
+        private readonly storage = ArrayStorage.for<string>();
+
+        public run(): void {
+          test(this.storage);
+        }
+      }
+    `);
+
+    await node.executeString(`
+      import { Address, SmartContract } from '@neo-one/smart-contract';
+
+      interface Contract {
+        run(): void;
+      }
+      const contract = SmartContract.for<Contract>(Address.from('${contract.address}'));
+      contract.run();
+    `);
+  });
+
+  test('set index by divided values', async () => {
+    const node = await helpers.startNode();
+
+    const contract = await node.addContract(`
+      import { ArrayStorage, SmartContract } from '@neo-one/smart-contract';
+
+      const test = (storage: ArrayStorage<string>) => {
+        storage[0 / 9] = '10';
+        assertEqual(storage[0], '10');
+        assertEqual(storage[2 - 2], '10');
+        assertEqual(storage[0 + 0], '10');
+        assertEqual(storage[9 * 0], '10');
+        assertEqual(storage[0 / 9], '10');
+        storage[1 / 1] = '100';
+        assertEqual(storage[1], '100');
+        assertEqual(storage[2 - 1], '100');
+        assertEqual(storage[0 + 1], '100');
+        assertEqual(storage[1 / 1], '100');
+        assertEqual(storage[1 * 1], '100');
+        storage[36 / 2] = '18';
+        assertEqual(storage[18], '18');
+        assertEqual(storage[36 - 18], '18');
+        assertEqual(storage[13 + 5], '18');
+        assertEqual(storage[36 / 2], '18');
+        assertEqual(storage[3 * 6], '18');
       }
 
       export class StorageContract extends SmartContract {
@@ -127,6 +393,15 @@ describe('ArrayStorage', () => {
             count += 1;
             indices += idx;
             keys += key;
+          });
+          storage.forEach((key, idx) => {
+            assertEqual(idx, idx + 0)
+            if (idx === 0) {
+              assertEqual(idx, 1 - 1);
+            }
+            if (idx === 1) {
+              assertEqual(idx, 2 - 1);
+            }
           });
           assertEqual(count, 4);
           assertEqual(indices, 6);

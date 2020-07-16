@@ -289,6 +289,8 @@ export class ElementAccessExpressionCompiler extends NodeCompiler<ts.ElementAcce
       const handleNumber = (innerInnerOptions: VisitOptions) => {
         // [number, objectVal]
         sb.emitHelper(prop, innerInnerOptions, sb.helpers.unwrapNumber);
+        // [number, objectVal]
+        sb.emitHelper(prop, innerInnerOptions, sb.helpers.coerceToInt);
         handleNumberBase(innerInnerOptions);
       };
 
