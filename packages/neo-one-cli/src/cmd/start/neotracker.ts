@@ -30,9 +30,10 @@ export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
       `${config.neotracker.port}`,
       '--nodeRpcUrl',
       `http://localhost:${config.network.port}/rpc`,
-      '--dbFileName',
+      '--db.connection.filename',
       nodePath.resolve(config.neotracker.path, 'db.sqlite'),
     ];
+
     let neotrackerBinPath: string;
     try {
       neotrackerBinPath = require.resolve('@neotracker/core/bin');
@@ -43,13 +44,14 @@ export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
       );
     }
     const proc = execa(
-      nodePath.resolve(neotrackerBinPath, '../', 'neotracker'),
+      nodePath.resolve(neotrackerBinPath, '..', 'neotracker'),
       argv.reset ? args.concat(['--resetDB']) : args,
       {
         cleanup: false,
         stdio: 'ignore',
       },
     );
+
     proc.unref();
 
     await writePidFile('neotracker', proc, config);
