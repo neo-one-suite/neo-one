@@ -5,7 +5,15 @@ import { OmitStrict, utils } from '@neo-one/utils';
 import ts from 'typescript';
 import { DEFAULT_CONTRACT_PROPERTIES } from '../constants';
 import { Context } from '../Context';
-import { ContractInfo, getABI, getAllPropInfos, getContractInfo, getContractProperties } from '../contract';
+import {
+  ContractInfo,
+  DebugInfo,
+  getABI,
+  getAllPropInfos,
+  getContractInfo,
+  getContractProperties,
+  getDebugInfo,
+} from '../contract';
 import { DiagnosticCode } from '../DiagnosticCode';
 import { DiagnosticMessage } from '../DiagnosticMessage';
 import {
@@ -120,6 +128,7 @@ const addContractInfo = (context: Context, contractInfo: ContractInfo) => {
 export interface SmartContractInfo {
   readonly contractInfo: ContractInfo | undefined;
   readonly abi: ABI;
+  readonly debugInfo: DebugInfo;
   readonly contract: OmitStrict<ContractRegister, 'script'>;
 }
 
@@ -138,6 +147,7 @@ export const getSmartContractInfo = (context: Context, sourceFile: ts.SourceFile
     return {
       contractInfo,
       abi: getABI(context, contractInfo),
+      debugInfo: getDebugInfo(context, contractInfo),
       contract: {
         parameters: PARAMETERS,
         returnType: RETURN_TYPE,
@@ -153,6 +163,12 @@ export const getSmartContractInfo = (context: Context, sourceFile: ts.SourceFile
     contractInfo,
     abi: {
       functions: [],
+      events: [],
+    },
+    debugInfo: {
+      entrypoint: '',
+      documents: [],
+      methods: [],
       events: [],
     },
     contract: {

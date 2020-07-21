@@ -33,7 +33,7 @@ export const compileForDiagnostics = ({ context, sourceFile }: DiagnosticCompile
 
 export const compile = ({ context, sourceFile, linked = {}, sourceMaps = {} }: CompileOptions): CompileResult => {
   const helpers = createHelpers();
-  const { contractInfo, abi, contract } = getSmartContractInfo(context, sourceFile);
+  const { contractInfo, abi, contract, debugInfo } = getSmartContractInfo(context, sourceFile);
 
   const helperScriptBuilder = new HelperCapturingScriptBuilder(
     context,
@@ -75,6 +75,7 @@ export const compile = ({ context, sourceFile, linked = {}, sourceMaps = {} }: C
     },
     abi,
     context,
+    debugInfo,
     sourceMap: finalResult.sourceMap,
   };
 };

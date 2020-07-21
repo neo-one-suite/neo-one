@@ -751,6 +751,10 @@
       "allowedCategories": [ "tools" ]
     },
     {
+      "name": "jszip",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "koa",
       "allowedCategories": [ "production", "web" ]
     },

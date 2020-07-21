@@ -3,9 +3,9 @@ import { Contracts } from '@neo-one/smart-contract-compiler';
 import Listr from 'listr';
 import { compileContract } from './compileContract';
 import { findContracts } from './findContracts';
-import { writeContract } from './writeContract';
+import { CompileWriteOptions, writeContract } from './writeContract';
 
-export const createTasks = (path: string, outDir: string) =>
+export const createTasks = (path: string, outDir: string, options: CompileWriteOptions) =>
   new Listr([
     {
       title: 'Find Contracts',
@@ -33,7 +33,7 @@ export const createTasks = (path: string, outDir: string) =>
                 innerCtx.sourceMaps,
               );
 
-              await writeContract(result, outDir);
+              await writeContract(contract.filePath, result, outDir, options);
 
               innerCtx.linked = linked;
               innerCtx.sourceMaps = sourceMaps;
