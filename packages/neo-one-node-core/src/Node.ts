@@ -24,6 +24,11 @@ export interface Node {
     transaction: Transaction,
     options?: { readonly throwVerifyError?: boolean; readonly forceAdd?: boolean },
   ) => Promise<RelayTransactionResult>;
+  readonly relayStrippedTransaction: (
+    verificationTransaction: Transaction,
+    relayTransaction: Transaction,
+    options?: { readonly throwVerifyError?: boolean; readonly forceAdd?: boolean },
+  ) => Promise<RelayTransactionResult>;
   readonly relayConsensusPayload: (payload: ConsensusPayload) => void;
   readonly relayBlock: (block: Block) => Promise<void>;
   readonly connectedPeers: readonly Endpoint[];

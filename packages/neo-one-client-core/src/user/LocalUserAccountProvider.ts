@@ -91,6 +91,12 @@ export interface Provider extends ProviderBase {
     transaction: TransactionBaseModel,
     networkFee?: BigNumber | undefined,
   ) => Promise<RelayTransactionResult>;
+  readonly relayStrippedTransaction: (
+    network: NetworkType,
+    verifcationTransaction: InvocationTransactionModel,
+    relayTransaction: InvocationTransactionModel,
+    networkFee?: BigNumber | undefined,
+  ) => Promise<RelayTransactionResult>;
 }
 
 /**
@@ -296,6 +302,153 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
     );
   }
 
+  protected async sendStrippedTransaction<T extends TransactionReceipt = TransactionReceipt>({
+    inputs,
+    transaction: transactionUnsignedIn,
+    from,
+    onConfirm,
+    networkFee,
+    sourceMaps,
+  }: {
+    readonly inputs: readonly InputOutput[];
+    readonly transaction: InvocationTransactionModel;
+    readonly from: UserAccountID;
+    readonly onConfirm: (options: {
+      readonly transaction: Transaction;
+      readonly receipt: TransactionReceipt;
+    }) => Promise<T>;
+    readonly networkFee?: BigNumber;
+    readonly sourceMaps?: SourceMaps;
+  }): Promise<TransactionResult<T, InvocationTransaction>> {
+    // when this problem invocation comes in we need to strip the bad verification script and then sign that transaction
+    return this.capture(
+      async () => {
+        let transactionUnsigned = transactionUnsignedIn;
+        if (this.keystore.byteLimit !== undefined) {
+          transactionUnsigned = (await this.consolidate({
+            inputs,
+            from,
+            transactionUnsignedIn,
+            byteLimit: this.keystore.byteLimit,
+          })) as InvocationTransactionModel;
+        }
+        const address = from.address;
+        if (
+          transactionUnsigned.inputs.length === 0 &&
+          // tslint:disable no-any
+          ((transactionUnsigned as any).claims == undefined ||
+            !Array.isArray((transactionUnsigned as any).claims) ||
+            (transactionUnsigned as any).claims.length === 0)
+          // tslint:enable no-any
+        ) {
+          transactionUnsigned = transactionUnsigned.clone({
+            attributes: transactionUnsigned.attributes.concat(
+              this.convertAttributes([
+                {
+                  usage: 'Script',
+                  data: address,
+                },
+              ]),
+            ),
+          });
+        }
+
+        const relayTransactionUnsigned = transactionUnsigned.clone({
+          attributes: [],
+          scripts: [],
+        });
+
+        const [verificationSignature, relaySignature, inputOutputs] = await Promise.all([
+          this.keystore.sign({
+            account: from,
+            message: transactionUnsigned.serializeUnsigned().toString('hex'),
+          }),
+          this.keystore.sign({
+            account: from,
+            message: relayTransactionUnsigned.serializeUnsigned().toString('hex'),
+          }),
+          Promise.all(
+            transactionUnsigned.inputs.map(async (input) =>
+              this.provider.getOutput(from.network, { hash: common.uInt256ToString(input.hash), index: input.index }),
+            ),
+          ),
+        ]);
+
+        const userAccount = this.getUserAccount(from);
+
+        const verificationWitness = crypto.createWitnessForSignature(
+          Buffer.from(verificationSignature, 'hex'),
+          common.stringToECPoint(userAccount.publicKey),
+          WitnessModel,
+        );
+
+        const relayWitness = crypto.createWitnessForSignature(
+          Buffer.from(relaySignature, 'hex'),
+          common.stringToECPoint(userAccount.publicKey),
+          WitnessModel,
+        );
+
+        const signedVerificationTransaction = this.addWitness({
+          transaction: transactionUnsigned,
+          inputOutputs,
+          address,
+          witness: verificationWitness,
+        }) as InvocationTransactionModel;
+
+        const signedRelayTransaction = relayTransactionUnsigned.clone({
+          scripts: [relayWitness],
+        });
+
+        const result = await this.provider.relayStrippedTransaction(
+          from.network,
+          signedVerificationTransaction,
+          signedRelayTransaction,
+          networkFee,
+        );
+
+        const failures =
+          result.verifyResult === undefined
+            ? []
+            : result.verifyResult.verifications.filter(({ failureMessage }) => failureMessage !== undefined);
+        if (failures.length > 0) {
+          const message = await processActionsAndMessage({
+            actions: failures.reduce<readonly RawAction[]>((acc, { actions }) => acc.concat(actions), []),
+            message: failures
+              .map(({ failureMessage }) => failureMessage)
+              .filter(commonUtils.notNull)
+              .join(' '),
+            sourceMaps,
+          });
+
+          throw new InvokeError(message);
+        }
+
+        transactionUnsigned.inputs.forEach((transfer) =>
+          this.mutableUsedOutputs.add(`${common.uInt256ToString(transfer.hash)}:${transfer.index}`),
+        );
+
+        const { transaction } = result;
+
+        return {
+          transaction: transaction as InvocationTransaction,
+          // tslint:disable-next-line no-unnecessary-type-annotation
+          confirmed: async (optionsIn: GetOptions = {}): Promise<T> => {
+            const options = {
+              ...optionsIn,
+              timeoutMS: optionsIn.timeoutMS === undefined ? 120000 : optionsIn.timeoutMS,
+            };
+            const receipt = await this.provider.getTransactionReceipt(from.network, transaction.hash, options);
+
+            return onConfirm({ transaction, receipt });
+          },
+        };
+      },
+      {
+        name: 'neo_send_stripped_transaction',
+      },
+    );
+  }
+
   protected async executeInvokeClaim({
     contract,
     inputs,
@@ -450,22 +603,31 @@ export class LocalUserAccountProvider<TKeyStore extends KeyStore = KeyStore, TPr
       scripts,
     });
 
+    const inputsFrom = inputs.filter((input) => input.address === from.address);
+
     try {
-      // tslint:disable-next-line prefer-immediate-return
-      const result = await this.sendTransaction<InvocationTransaction, T>({
-        from,
-        inputs,
-        transaction: invokeTransaction,
-        onConfirm: async ({ transaction, receipt }) => {
-          const data = await this.provider.getInvocationData(from.network, transaction.hash);
+      return scripts.length === 1 && scripts[0].verification.length === 0 && inputsFrom.length > 0
+        ? this.sendStrippedTransaction({
+            from,
+            inputs,
+            transaction: invokeTransaction,
+            onConfirm: async ({ transaction, receipt }) => {
+              const data = await this.provider.getInvocationData(from.network, transaction.hash);
 
-          return onConfirm({ transaction, receipt, data });
-        },
-        sourceMaps,
-      });
+              return onConfirm({ transaction, receipt, data });
+            },
+          })
+        : this.sendTransaction<InvocationTransaction, T>({
+            from,
+            inputs,
+            transaction: invokeTransaction,
+            onConfirm: async ({ transaction, receipt }) => {
+              const data = await this.provider.getInvocationData(from.network, transaction.hash);
 
-      // tslint:disable-next-line:no-var-before-return
-      return result;
+              return onConfirm({ transaction, receipt, data });
+            },
+            sourceMaps,
+          });
     } catch (error) {
       const message = await processActionsAndMessage({
         actions: [],

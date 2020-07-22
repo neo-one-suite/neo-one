@@ -11,11 +11,13 @@ import {
   Endpoint,
   getEndpointConfig,
   Header,
+  Input,
   MerkleTree,
   NegotiateResult,
   Network,
   NetworkEventMessage,
   Node as INode,
+  Output,
   Peer,
   RegisterTransaction,
   RelayTransactionResult,
@@ -33,7 +35,12 @@ import { Address6 } from 'ip-address';
 import _ from 'lodash';
 import LRUCache from 'lru-cache';
 import { Command } from './Command';
-import { AlreadyConnectedError, NegotiationError } from './errors';
+import {
+  AlreadyConnectedError,
+  InvalidRelayStrippedTransactionType,
+  NegotiationError,
+  RelayStrippedTransactionMismatch,
+} from './errors';
 import { Message, MessageTransform, MessageValue } from './Message';
 import {
   AddrPayload,
@@ -388,6 +395,113 @@ export class Node implements INode {
         }
       } finally {
         this.tempKnownTransactionHashes.delete(transaction.hashHex);
+      }
+    }
+
+    return result;
+  }
+
+  public async relayStrippedTransaction(
+    verificationTransaction: Transaction,
+    relayTransaction: Transaction,
+    {
+      throwVerifyError = false,
+      forceAdd = false,
+    }: { readonly throwVerifyError?: boolean; readonly forceAdd?: boolean } = {
+      throwVerifyError: false,
+      forceAdd: false,
+    },
+  ): Promise<RelayTransactionResult> {
+    const result = {};
+
+    // this should only be called by our special invocation transaction (this helps with TS);
+    if (
+      verificationTransaction.type !== TransactionType.Invocation ||
+      relayTransaction.type !== TransactionType.Invocation
+    ) {
+      throw new InvalidRelayStrippedTransactionType(verificationTransaction.type);
+    }
+
+    // verify they are still the same transaction besides witnesses/attributes
+    if (
+      verificationTransaction.inputs.length !== relayTransaction.inputs.length ||
+      verificationTransaction.outputs.length !== relayTransaction.outputs.length ||
+      !(_.zip(verificationTransaction.inputs, relayTransaction.inputs) as ReadonlyArray<
+        [Input, Input]
+      >).every(([verify, relay]) => verify.equals(relay)) ||
+      !(_.zip(verificationTransaction.outputs, relayTransaction.outputs) as ReadonlyArray<
+        [Output, Output]
+      >).every(([verify, relay]) => verify.equals(relay)) ||
+      !verificationTransaction.script.equals(relayTransaction.script)
+    ) {
+      throw new RelayStrippedTransactionMismatch();
+    }
+
+    if (!this.mutableKnownTransactionHashes.has(relayTransaction.hash)) {
+      this.tempKnownTransactionHashes.add(relayTransaction.hashHex);
+
+      try {
+        const memPool = Object.values(this.mutableMemPool);
+        if (memPool.length > MEM_POOL_SIZE / 2 && !forceAdd) {
+          this.mutableKnownTransactionHashes.add(relayTransaction.hash);
+
+          return result;
+        }
+        // tslint:disable-next-line prefer-immediate-return
+        let logLabels: {} = { [Labels.NEO_TRANSACTION_HASH]: relayTransaction.hashHex };
+        let finalResult: RelayTransactionResult;
+        try {
+          let foundTransaction;
+          try {
+            foundTransaction = await this.blockchain.transaction.tryGet({
+              hash: relayTransaction.hash,
+            });
+          } finally {
+            logLabels = {
+              [Labels.NEO_TRANSACTION_FOUND]: foundTransaction !== undefined,
+              ...logLabels,
+            };
+          }
+          let verifyResult: VerifyTransactionResult | undefined;
+          if (foundTransaction === undefined) {
+            // if we haven't verified it yet then use the verificationTransaction to do that
+            verifyResult = await this.blockchain.verifyTransaction({
+              transaction: verificationTransaction,
+              memPool: Object.values(this.mutableMemPool),
+            });
+            const verified = verifyResult.verifications.every(({ failureMessage }) => failureMessage === undefined);
+
+            if (verified) {
+              this.mutableMemPool[relayTransaction.hashHex] = relayTransaction;
+              if (this.mutableConsensus !== undefined) {
+                this.mutableConsensus.onTransactionReceived(relayTransaction);
+              }
+              this.relayTransactionInternal(relayTransaction);
+              await this.trimMemPool();
+            }
+          }
+
+          this.mutableKnownTransactionHashes.add(relayTransaction.hash);
+
+          finalResult = { verifyResult };
+          logger.debug({ name: 'neo_relay_transaction', ...logLabels });
+        } catch (err) {
+          logger.error({ name: 'neo_relay_transaction', err, ...logLabels });
+          throw err;
+        }
+
+        return finalResult;
+      } catch (error) {
+        if (
+          error.code === undefined ||
+          typeof error.code !== 'string' ||
+          !error.code.includes('VERIFY') ||
+          throwVerifyError
+        ) {
+          throw error;
+        }
+      } finally {
+        this.tempKnownTransactionHashes.delete(relayTransaction.hashHex);
       }
     }
 

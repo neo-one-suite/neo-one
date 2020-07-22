@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/node-protocol",
+      "comment": "fixup utxo invocation transactions",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@neo-one/node-protocol",
+  "email": "danwbyrne@gmail.com"
+}

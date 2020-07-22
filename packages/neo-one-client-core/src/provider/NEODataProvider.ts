@@ -190,6 +190,15 @@ export class NEODataProvider extends DataProviderBase {
 
     throw new NeoNotImplementedError('Transaction types besides Claim & Invocation are');
   }
+
+  protected async executeRelayStrippedTransaction(
+    verificationTransaction: InvocationTransactionModel,
+    _relayTransaction: InvocationTransactionModel,
+    networkFee?: BigNumber,
+  ): Promise<RelayTransactionResult> {
+    return this.executeRelayTransaction(verificationTransaction, networkFee);
+  }
+
   protected async executeGetUnspentOutputs(address: AddressString): Promise<readonly InputOutput[]> {
     const unspents = await this.mutableClient.getUnspents(address);
 
