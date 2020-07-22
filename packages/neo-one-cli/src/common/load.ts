@@ -1,5 +1,3 @@
-import { register } from 'ts-node';
-
 const load = async (path: string) => {
   const value = await import(path);
 
@@ -13,12 +11,4 @@ export const loadJS = async (path: string) => {
   return load(path);
 };
 
-export const loadTS = async (path: string) => {
-  register({
-    compilerOptions: {
-      module: 'commonjs',
-    },
-  });
-
-  return load(path);
-};
+export const loadTS = load;
