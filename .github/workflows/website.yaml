@@ -27,12 +27,12 @@ jobs:
         run: rush install
       - name: Rush Rebuild
         run: rush rebuild
+      - name: Prune node_modules
+        run: rush prune-node-modules
       - name: Rush Link Root
         run: rush link-root
       - name: Run Cypress Express Test
         run: rush test-cypress --express
-      - name: Rush Unlink Root
-        run: rush unlink-root
       - name: Store Cypress Screenshots
         if: failure()
         continue-on-error: true

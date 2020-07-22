@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "../node_modules",
+    "baseUrl": ".",
     "target": "es5",
     "types": ["cypress"],
 
@@ -15,7 +15,5 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "**/*.*"
-  ]
+  "include": ["**/*.*"]
 }

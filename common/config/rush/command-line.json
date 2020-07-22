@@ -19,6 +19,14 @@
     },
     {
       "commandKind": "global",
+      "name": "prune-node-modules",
+      "summary": "Prune common/temp/node_modules/@neo-one",
+      "description": "Prune common/temp/node_modules/@neo-one of all @neo-one packages (except ec-key) that are pulled down from NPM for @neotracker/core. Used before building the NEO•ONE website",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "node common/scripts/neo-one-prune.js"
+    },
+    {
+      "commandKind": "global",
       "name": "compile-workers-dev",
       "summary": "Compile workers",
       "description": "Compile the NEO•ONE website workers",
