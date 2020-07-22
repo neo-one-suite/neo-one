@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { compile, WithLinked } from './compile';
+import { DebugInfo } from './contract';
 import { createContextForPath, updateContext } from './createContext';
 import { transpile } from './transpile';
 import { CompilerHost } from './types';
@@ -20,6 +21,7 @@ export interface CompileContractResult {
   readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
   readonly contract: ContractRegister;
   readonly sourceMap: Promise<RawSourceMap>;
+  readonly debugInfo: DebugInfo;
 }
 
 export const compileContract = ({
@@ -39,7 +41,7 @@ export const compileContract = ({
       ? transpileContext
       : updateContext(transpileContext, { [filePath]: transpileResult.text });
 
-  const { abi, sourceMap: finalSourceMap, contract } = compile({
+  const { abi, sourceMap: finalSourceMap, contract, debugInfo } = compile({
     sourceFile: tsUtils.file.getSourceFileOrThrow(context.program, filePath),
     context,
     linked,
@@ -51,5 +53,6 @@ export const compileContract = ({
     sourceMap: finalSourceMap,
     abi,
     contract,
+    debugInfo,
   };
 };

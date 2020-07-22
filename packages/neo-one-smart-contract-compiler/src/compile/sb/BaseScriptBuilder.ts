@@ -213,7 +213,9 @@ export abstract class BaseScriptBuilder<TScope extends Scope> implements ScriptB
 
       const sourceFile = tsUtils.node.getSourceFile(node);
       const filePath = tsUtils.file.getFilePath(sourceFile);
+
       const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+
       sourceMapGenerator.addMapping({
         generated: { line: idx + 1, column: 0 },
         original: { line: line + 1, column: character },

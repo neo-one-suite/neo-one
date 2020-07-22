@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/smart-contract-compiler",
+      "comment": "add debug support",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract-compiler",
+  "email": "danwbyrne@gmail.com"
+}

@@ -3,6 +3,7 @@ import { ContractRegister } from '@neo-one/client-full-core';
 import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 import { Context } from '../Context';
+import { DebugInfo } from '../contract';
 import { ProgramCounter } from './pc';
 import { Name } from './scope';
 
@@ -45,4 +46,5 @@ export interface CompileResult {
   readonly abi: ABI;
   readonly context: Context;
   readonly sourceMap: Promise<RawSourceMap>;
+  readonly debugInfo: DebugInfo;
 }

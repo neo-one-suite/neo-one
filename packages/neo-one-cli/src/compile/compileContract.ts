@@ -17,6 +17,7 @@ export const compileContract = async (
   const address = scriptHashToAddress(
     common.uInt160ToString(crypto.toScriptHash(Buffer.from(contract.contract.script, 'hex'))),
   );
+
   const sourceMap = await contract.sourceMap;
   const nextSourceMaps = {
     ...sourceMaps,
