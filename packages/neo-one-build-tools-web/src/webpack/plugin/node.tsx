@@ -49,6 +49,7 @@ export const node = () => ({
   webpack: (mutableConfig: webpack.Configuration, { stage: stageIn }: { stage: Stage }) => {
     const stage = process.env.NEO_ONE_PROD === 'true' && stageIn === 'dev' ? 'prod' : stageIn;
     const resolve = mutableConfig.resolve === undefined ? {} : mutableConfig.resolve;
+    const addModules = [path.resolve(APP_ROOT_DIR, 'common', 'temp', 'node_modules')];
     mutableConfig.resolve = {
       ...resolve,
       mainFields: ['browser', 'module', 'main'],
@@ -58,6 +59,7 @@ export const node = () => ({
         ...(resolve.alias === undefined ? {} : resolve.alias),
         ...alias,
       },
+      modules: resolve.modules ? resolve.modules.concat(addModules) : addModules,
     };
 
     const mod = mutableConfig.module === undefined ? {} : mutableConfig.module;

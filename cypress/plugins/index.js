@@ -1,8 +1,12 @@
-const webpack = require('@cypress/webpack-preprocessor');
-const { addSeconds, format, parse } = require('date-fns');
-const nanoid = require('nanoid');
-const fs = require('fs-extra');
-const istanbul = require('istanbul-lib-coverage');
+const webpack = require('../../common/temp/node_modules/@cypress/webpack-preprocessor');
+const {
+  addSeconds,
+  format,
+  parse,
+} = require('../../common/temp/node_modules/date-fns');
+const nanoid = require('../../common/temp/node_modules/nanoid');
+const fs = require('../../common/temp/node_modules/fs-extra');
+const istanbul = require('../../common/temp/node_modules/istanbul-lib-coverage');
 const path = require('path');
 
 module.exports = (on) => {
@@ -10,6 +14,10 @@ module.exports = (on) => {
     webpackOptions: {
       resolve: {
         extensions: ['.ts', '.js'],
+        modules: ['./common/temp/node_modules'],
+      },
+      resolveLoader: {
+        modules: ['./common/temp/node_modules'],
       },
       module: {
         rules: [
