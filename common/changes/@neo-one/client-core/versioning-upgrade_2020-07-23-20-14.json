@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "bump package version for future release clarity",
+      "type": "none",
+      "packageName": "@neo-one/client-core"
+    }
+  ],
+  "packageName": "@neo-one/client-core",
+  "email": "danwbyrne@gmail.com"
+}

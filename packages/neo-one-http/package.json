@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/http",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "NEO•ONE http utilities.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "bump package version for future release clarity",
+      "type": "none",
+      "packageName": "@neo-one/node-rpc-handler"
+    }
+  ],
+  "packageName": "@neo-one/node-rpc-handler",
+  "email": "danwbyrne@gmail.com"
+}

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "bump package version for future release clarity",
+      "type": "none",
+      "packageName": "@neo-one/utils-node"
+    }
+  ],
+  "packageName": "@neo-one/utils-node",
+  "email": "danwbyrne@gmail.com"
+}

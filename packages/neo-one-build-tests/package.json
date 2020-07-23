@@ -10,7 +10,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.6.3",
     "@neo-one/build-tools": "^1.0.0",
-    "@neo-one/logger": "^2.5.0",
+    "@neo-one/logger": "^2.6.0",
     "app-root-dir": "^1.0.2",
     "babel-jest": "^24.9.0",
     "bn.js": "^5.0.0",

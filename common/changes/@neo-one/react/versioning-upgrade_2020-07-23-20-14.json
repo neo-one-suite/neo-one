@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "bump package version for future release clarity",
+      "type": "none",
+      "packageName": "@neo-one/react"
+    }
+  ],
+  "packageName": "@neo-one/react",
+  "email": "danwbyrne@gmail.com"
+}
