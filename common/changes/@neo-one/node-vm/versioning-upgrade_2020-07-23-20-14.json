@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "bump package version for future release clarity",
+      "type": "none",
+      "packageName": "@neo-one/node-vm"
+    }
+  ],
+  "packageName": "@neo-one/node-vm",
+  "email": "danwbyrne@gmail.com"
+}

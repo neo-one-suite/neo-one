@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/smart-contract-lib",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "NEO•ONE TypeScript common smart contracts.",
   "main": "./src/index.ts",
   "smartContract": true,
@@ -10,7 +10,7 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/smart-contract": "^2.5.0"
+    "@neo-one/smart-contract": "^2.6.0"
   },
   "devDependencies": {
     "@neo-one/client-common": "^2.6.0",

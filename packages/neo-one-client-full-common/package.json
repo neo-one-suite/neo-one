@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/client-full-common",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "NEO•ONE full client common code.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -14,7 +14,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/client-common": "^2.6.0",
-    "@neo-one/utils": "^2.5.0",
+    "@neo-one/utils": "^2.6.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {

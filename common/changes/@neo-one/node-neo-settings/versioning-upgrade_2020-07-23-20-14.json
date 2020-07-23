@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "bump package version for future release clarity",
+      "type": "none",
+      "packageName": "@neo-one/node-neo-settings"
+    }
+  ],
+  "packageName": "@neo-one/node-neo-settings",
+  "email": "danwbyrne@gmail.com"
+}

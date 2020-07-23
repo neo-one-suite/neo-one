@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "comment": "bump package version for future release clarity",
+      "type": "none",
+      "packageName": "@neo-one/http-context"
+    }
+  ],
+  "packageName": "@neo-one/http-context",
+  "email": "danwbyrne@gmail.com"
+}

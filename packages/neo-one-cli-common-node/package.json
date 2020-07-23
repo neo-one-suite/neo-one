@@ -15,7 +15,7 @@
   "dependencies": {
     "@neo-one/cli-common": "^2.6.0",
     "@neo-one/client-core": "^2.6.0",
-    "@neo-one/client-full-core": "^2.5.0",
+    "@neo-one/client-full-core": "^2.6.0",
     "@types/lodash": "^4.14.138",
     "cosmiconfig": "^6.0.0",
     "fs-extra": "^8.1.0",
