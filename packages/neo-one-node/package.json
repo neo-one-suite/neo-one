@@ -15,7 +15,7 @@
   "dependencies": {
     "@neo-one/client-switch": "^2.6.0",
     "@neo-one/logger": "^2.6.0",
-    "@neo-one/node-blockchain": "^2.6.0",
+    "@neo-one/node-blockchain": "^2.7.0-alpha",
     "@neo-one/node-core": "^2.6.0",
     "@neo-one/node-http-rpc": "^2.6.0",
     "@neo-one/node-network": "^2.6.0",
