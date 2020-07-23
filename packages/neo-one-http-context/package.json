@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/http-context",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "NEO•ONE http context utilities.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,9 +13,9 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-switch": "^2.6.0",
-    "@neo-one/logger": "^2.6.0",
-    "@neo-one/utils": "^2.6.0",
+    "@neo-one/client-switch": "^2.7.0",
+    "@neo-one/logger": "^2.6.1",
+    "@neo-one/utils": "^2.6.1",
     "@types/koa": "^2.0.49",
     "koa": "^2.7.0",
     "tslib": "^1.10.0"

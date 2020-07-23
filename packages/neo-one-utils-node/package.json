@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/utils-node",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "NEO•ONE shared Nodejs utils.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,7 +13,7 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/utils": "^2.6.0",
+    "@neo-one/utils": "^2.6.1",
     "@types/pino": "^5.8.9",
     "@types/yargs": "^13.0.3",
     "execa": "^3.2.0",

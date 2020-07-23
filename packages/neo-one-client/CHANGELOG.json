@@ -2,6 +2,26 @@
   "name": "@neo-one/client",
   "entries": [
     {
+      "version": "2.7.0",
+      "tag": "@neo-one/client_v2.7.0",
+      "date": "Thu, 23 Jul 2020 22:11:12 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "fix #1997"
+          },
+          {
+            "comment": "Upgrade TypeScript from v3.8.3 to v3.9.5"
+          }
+        ],
+        "none": [
+          {
+            "comment": "bump package version for future release clarity"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.6.0",
       "tag": "@neo-one/client_v2.6.0",
       "date": "Wed, 20 May 2020 07:03:14 GMT",

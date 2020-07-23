@@ -15,8 +15,8 @@
   "sideEffects": false,
   "dependencies": {
     "@google-cloud/storage": "^4.3.2",
-    "@neo-one/logger": "^2.6.0",
-    "@neo-one/utils-node": "^2.6.0",
+    "@neo-one/logger": "^2.6.1",
+    "@neo-one/utils-node": "^2.6.1",
     "execa": "^3.2.0",
     "import-local": "^3.0.2",
     "rc": "^1.2.8",

@@ -1,6 +1,6 @@
 {
   "name": "@neo-one/node-storage-common",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "NEO•ONE node storage common.",
   "main": "./dist/cjs/index",
   "module": "./dist/esm/index",
@@ -13,9 +13,9 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-common": "^2.6.0",
-    "@neo-one/node-core": "^2.6.0",
-    "@neo-one/utils": "^2.6.0",
+    "@neo-one/client-common": "^2.7.0",
+    "@neo-one/node-core": "^2.7.0",
+    "@neo-one/utils": "^2.6.1",
     "tslib": "^1.10.0"
   },
   "devDependencies": {

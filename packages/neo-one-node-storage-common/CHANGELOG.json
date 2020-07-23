@@ -2,6 +2,31 @@
   "name": "@neo-one/node-storage-common",
   "entries": [
     {
+      "version": "2.7.0",
+      "tag": "@neo-one/node-storage-common_v2.7.0",
+      "date": "Thu, 23 Jul 2020 22:11:12 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Dependency @neo-one/client-common version bump from ^2.6.0 to ^2.7.0."
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/utils\" from `^2.6.0` to `^2.6.1`"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Upgrade TypeScript from v3.8.3 to v3.9.5"
+          }
+        ],
+        "none": [
+          {
+            "comment": "bump package version for future release clarity"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.5.0",
       "tag": "@neo-one/node-storage-common_v2.5.0",
       "date": "Wed, 20 May 2020 07:03:14 GMT",

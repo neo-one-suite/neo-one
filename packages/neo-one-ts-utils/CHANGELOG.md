@@ -1,6 +1,13 @@
 # Change Log - @neo-one/ts-utils
 
-This log was last generated on Wed, 20 May 2020 07:03:14 GMT and should not be manually modified.
+This log was last generated on Thu, 23 Jul 2020 22:11:12 GMT and should not be manually modified.
+
+## 2.6.1
+Thu, 23 Jul 2020 22:11:12 GMT
+
+### Patches
+
+- Upgrade TypeScript from v3.8.3 to v3.9.5
 
 ## 2.5.0
 Wed, 20 May 2020 07:03:14 GMT

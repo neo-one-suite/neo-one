@@ -2,19 +2,19 @@
   {
     "definitionName": "lockStepVersion",
     "policyName": "CoreReleasePolicy",
-    "version": "2.6.0",
+    "version": "2.7.0",
     "nextBump": "minor"
   },
   {
     "definitionName": "lockStepVersion",
     "policyName": "NodeReleasePolicy",
-    "version": "2.6.0",
+    "version": "2.7.0",
     "nextBump": "minor"
   },
   {
     "definitionName": "lockStepVersion",
     "policyName": "WebReleasePolicy",
-    "version": "2.6.0",
+    "version": "2.7.0",
     "nextBump": "minor"
   }
 ]

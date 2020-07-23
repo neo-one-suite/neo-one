@@ -2,6 +2,43 @@
   "name": "@neo-one/node-http-rpc",
   "entries": [
     {
+      "version": "2.7.0",
+      "tag": "@neo-one/node-http-rpc_v2.7.0",
+      "date": "Thu, 23 Jul 2020 22:11:12 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Add appropriate @types dependencies."
+          },
+          {
+            "comment": "Upgrade TypeScript from v3.8.3 to v3.9.5"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Dependency @neo-one/cli-common-node version bump from ^2.6.0 to ^2.7.0."
+          },
+          {
+            "comment": "Dependency @neo-one/http version bump from ^2.6.0 to ^2.7.0."
+          },
+          {
+            "comment": "Dependency @neo-one/http-context version bump from ^2.6.0 to ^2.7.0."
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/logger\" from `^2.6.0` to `^2.6.1`"
+          },
+          {
+            "comment": "Updating dependency \"@neo-one/utils\" from `^2.6.0` to `^2.6.1`"
+          }
+        ],
+        "none": [
+          {
+            "comment": "bump package version for future release clarity"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.5.0",
       "tag": "@neo-one/node-http-rpc_v2.5.0",
       "date": "Wed, 20 May 2020 07:03:14 GMT",
