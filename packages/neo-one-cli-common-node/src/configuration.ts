@@ -19,10 +19,6 @@ const configurationDefaults = {
   contracts: {
     outDir: nodePath.join('neo-one', 'compiled'),
     path: nodePath.join('neo-one', 'contracts'),
-    json: true,
-    avm: false,
-    debug: false,
-    opcodes: false,
   },
   codegen: {
     path: nodePath.join('src', 'neo-one'),
@@ -194,13 +190,13 @@ ${exportConfig} {
     // NEO•ONE will look for smart contracts in this directory.
     path: '${config.contracts.path}',
     // Set this to true if you want the compile command to output JSON.
-    // json: ${config.contracts.json},
+    // json: ${true},
     // Set this to true if you want the compile command to output AVM.
-    // avm: ${config.contracts.avm},
+    // avm: ${false},
     // Set this to true if you want the compile command to output additional debug information.
-    // debug: ${config.contracts.debug},
+    // debug: ${false},
     // Set this to true if you want the compile command to output the AVM in a human-readable format for debugging (requires debug: true).
-    // opcodes: ${config.contracts.opcodes},
+    // opcodes: ${false},
   },
   artifacts: {
     // NEO•ONE will store build and deployment artifacts that should be checked in to vcs in this directory.

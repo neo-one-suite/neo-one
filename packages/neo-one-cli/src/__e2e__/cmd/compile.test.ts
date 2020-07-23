@@ -44,7 +44,10 @@ const testDebugFile = (contents: any) => {
 };
 
 const testCompileProject = async (project: string, options: CLICompileOptions) => {
-  const command = Object.entries(options).reduce((acc, [flag, value]) => acc.concat(` --${flag} ${value}`), 'compile');
+  const command = Object.entries(options).reduce(
+    (acc, [flag, value]) => (value === true ? acc.concat(` --${flag} ${value}`) : acc),
+    'compile',
+  );
   await one.createExec(project)(command);
 
   const {
