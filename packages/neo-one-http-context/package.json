@@ -13,7 +13,7 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@neo-one/client-switch": "^2.6.0",
+    "@neo-one/client-switch": "^2.7.0-alpha",
     "@neo-one/logger": "^2.6.0",
     "@neo-one/utils": "^2.6.0",
     "@types/koa": "^2.0.49",
