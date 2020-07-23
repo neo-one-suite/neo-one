@@ -31,6 +31,25 @@ Well-written bug reports with consistently reproducible steps are invaluable to 
 
 Feature requests are welcome. But take a moment to find out whether your idea fits with the scope and aims of the project. It's up to you to make a strong case to convince the project's developers of the merits of this feature. Please provide as much detail and context as possible.
 
+### How to Get Started in the NEO•ONE Repo
+
+- Make sure you have [Node](https://nodejs.org) >= 10.16.0 installed (We recommend the latest version).
+  - Linux and Mac: We recommend using [Node Version Manager](https://github.com/creationix/nvm).
+  - Windows: We recommend using [Chocolatey](https://chocolatey.org/).
+- Install [RushJS](https://rushjs.io/) with `npm install -g @microsoft/rush`.
+  - We use RushJS for monorepo management. When you get started in the NEO•ONE repo you will use RushJS for nearly every task, like installing dependencies, building the packages, running tests, etc.
+  - For more information on RushJS, see the [docs](https://rushjs.io/pages/intro/welcome/).
+  - All Rush commands should be run inside the NEO•ONE repo.
+- Clone the repo with `git clone https://github.com/neo-one-suite/neo-one.git`.
+- Then run `rush install` to install the dependencies.
+- Then run `rush build` to build the packages. Rush will perform an "incremental build", which means that it will only build packages whose source files have changed since the last successful build and the packages that depend on those packages.
+- You should now be ready to start making changes to the source code. Once you're done making changes make sure to run `rush build` before running E2E tests or trying to run a bin.
+- To run all the unit tests run `rush test`. To run all the E2E tests run `rush e2e`.
+  - There are A LOT of unit tests, which can take a few minutes to run all the way through. To only run a smaller set of tests you can specify a file or blob of tests to run with `rush test -t` or `rush e2e -t`.
+  - For example, if you wanted to only run the unit tests in `neo-one-client-common` you would run `rush test -t packages/neo-one-client-common/src/__tests__/**/*`
+- If you want to test your changes with the NEO•ONE CLI run `rush build`. Then, to start the CLI you'd run `node packages/neo-one-cli/bin/neo-one.js` from inside the NEO•ONE repository. You will then be running the new NEO•ONE CLI with your changes. From there you can see your new code directly in action.
+- To see all the available RushJS commands run `rush --help`.
+
 ### Your First Code Contribution
 
 Unsure where to begin contributing to NEO•ONE? Here are some great ways to get started:

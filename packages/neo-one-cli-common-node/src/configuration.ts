@@ -17,8 +17,12 @@ const configurationDefaults = {
     path: nodePath.join('neo-one', 'migration.js'),
   },
   contracts: {
-    path: nodePath.join('neo-one', 'contracts'),
     outDir: nodePath.join('neo-one', 'compiled'),
+    path: nodePath.join('neo-one', 'contracts'),
+    json: true,
+    avm: false,
+    debug: false,
+    opcodes: false,
   },
   codegen: {
     path: nodePath.join('src', 'neo-one'),
@@ -91,11 +95,15 @@ const configurationSchema = {
     },
     contracts: {
       type: 'object',
-      allRequired: true,
+      allRequired: false,
       additionalProperties: false,
       properties: {
-        path: { type: 'string' },
         outDir: { type: 'string' },
+        path: { type: 'string' },
+        json: { type: 'boolean' },
+        avm: { type: 'boolean' },
+        debug: { type: 'boolean' },
+        opcodes: { type: 'boolean' },
       },
     },
     codegen: {
@@ -157,8 +165,8 @@ const relativizePaths = (config: Configuration) => ({
   },
   contracts: {
     ...config.contracts,
-    path: nodePath.relative(process.cwd(), config.contracts.path),
     outDir: nodePath.relative(process.cwd(), config.contracts.outDir),
+    path: nodePath.relative(process.cwd(), config.contracts.path),
   },
   codegen: {
     ...config.codegen,
@@ -181,10 +189,18 @@ const createDefaultConfiguration = (configIn: Configuration, importDefaultNetwor
 
 ${exportConfig} {
   contracts: {
-    // NEO•ONE will look for smart contracts in this directory.
-    path: '${config.contracts.path}',
     // The NEO•ONE compile command will output the compile results in this directory.
     outDir: '${config.contracts.outDir}',
+    // NEO•ONE will look for smart contracts in this directory.
+    path: '${config.contracts.path}',
+    // Set this to true if you want the compile command to output JSON.
+    // json: ${config.contracts.json},
+    // Set this to true if you want the compile command to output AVM.
+    // avm: ${config.contracts.avm},
+    // Set this to true if you want the compile command to output additional debug information.
+    // debug: ${config.contracts.debug},
+    // Set this to true if you want the compile command to output the AVM in a human-readable format for debugging (requires debug: true).
+    // opcodes: ${config.contracts.opcodes},
   },
   artifacts: {
     // NEO•ONE will store build and deployment artifacts that should be checked in to vcs in this directory.
@@ -297,8 +313,8 @@ const validateConfig = async (rootDir: string, configIn: any): Promise<Configura
     },
     contracts: {
       ...config.contracts,
-      path: nodePath.resolve(rootDir, config.contracts.path),
       outDir: nodePath.resolve(rootDir, config.contracts.outDir),
+      path: nodePath.resolve(rootDir, config.contracts.path),
     },
     codegen: {
       ...config.codegen,
