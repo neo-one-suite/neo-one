@@ -37,6 +37,36 @@ const StyledMarkdown = styled(Markdown)`
   color: ${prop('theme.black')};
   min-width: 0;
 
+  & table {
+    border-collapse: collapse;
+  }
+  & td, th {
+    padding: 8px;
+  }
+  & th {
+    border: 1px solid ${prop('theme.black')};
+  }
+  & td {
+    border-left: 1px solid ${prop('theme.black')};
+    border-right: 1px solid ${prop('theme.black')};
+    border-top: 1px solid ${prop('theme.black')};
+  }
+  & th {
+    border-top: none;
+  }
+  & th:last-child {
+    border-right: none;
+  }
+  & th:first-child {
+    border-left: none;
+  }
+  & td:first-child {
+    border-left: none;
+  }
+  & td:last-child {
+    border-right: none;
+  }
+
   @media (min-width: ${prop('theme.breakpoints.md')}) {
     ${prop('theme.fontStyles.subheading')};
   }
