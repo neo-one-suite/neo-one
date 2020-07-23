@@ -7,7 +7,7 @@ twitter: https://twitter.com/neo_one_suite
 
 ## NEO•ONE 2.7
 
-We are excited to announce our latest release of NEO•ONE. For this release we have been focused on cleaning up bugs, adding new compiler features, expanding documentation, and preparing for future versions of NEO•ONE as we draw closer to the Neo3 release.
+We are excited to announce our latest [release](https://www.npmjs.com/package/@neo-one/cli) of NEO•ONE. For this release we have been focused on cleaning up bugs, adding new compiler features, expanding documentation, and preparing for future versions of NEO•ONE as we draw closer to the Neo3 release.
 
 To get started with NEO•ONE you can install our CLI with
 `yarn install @neo-one/cli`
