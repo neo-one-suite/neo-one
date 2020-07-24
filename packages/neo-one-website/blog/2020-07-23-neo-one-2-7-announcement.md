@@ -16,8 +16,8 @@ To get started with NEO•ONE you can install our CLI with
 
 Starting with NEO•ONE 2.7 you will be able to output your compiled smart contract to various format types as well as generate debug information as per the spec listed [here](https://github.com/ngdseattle/design-notes/blob/master/NDX-DN11%20-%20NEO%20Debug%20Info%20Specification.md). We hope this will give our users more freedom in the end-to-end tooling they choose to use for developing their smart contracts. To get started with testing these new features you can use:
 
-`yarn install @neo-one/cli`
-`yarn neo-one init`
+`yarn install @neo-one/cli`\
+`yarn neo-one init`\
 `yarn neo-one compile --json --avm --debug --opcodes`
 
 For more information on how to enable AVM / debug generation use
@@ -39,8 +39,8 @@ In continuing with our efforts to keep NEO•ONE up to date with Typescript we h
 We’ve added several new sections of documentation to the website:
 
 - [Deployment documentation](/docs/deployment)
-- [The NEO•ONE CLI](/docs/cli)
-- [Network configuration](/docs/configuration-options)
+- [The NEO•ONE CLI](/docs/CLI)
+- [Network configuration](/docs/config-options)
 - [Project contribution](/docs/how-to-contribute#How-Can-I-Contribute)
 - [Compiler contribution](/docs/smart-contract-compiler)
 
@@ -54,7 +54,7 @@ In NEO•ONE 2.7 several bugs have been fixed and features have been updated. Yo
 - [#2051 Update default network options](https://github.com/neo-one-suite/neo-one/pull/2051)
 - [#2093 Fix switch-statement execution](https://github.com/neo-one-suite/neo-one/pull/2093)
 - [#2095 Fix number mismatches in SetStorage, ArrayStorage and MapStorage](https://github.com/neo-one-suite/neo-one/pull/2095)
-- [#2086 Export `defaultnetwork` helper from CLI](https://github.com/neo-one-suite/neo-one/pull/2086)
+- [#2086 Export defaultnetwork helper from CLI](https://github.com/neo-one-suite/neo-one/pull/2086)
 - [#2080 Fix missing type declarations in shipped packages](https://github.com/neo-one-suite/neo-one/pull/2091)
 - [#2096 Fix ‘receive’ invocations when relaying transactions to a live network](https://github.com/neo-one-suite/neo-one/pull/2096)
 - [#2112 Fix error when using typescript migration file for deployment](https://github.com/neo-one-suite/neo-one/pull/2112)
