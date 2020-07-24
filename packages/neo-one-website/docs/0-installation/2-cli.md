@@ -1,5 +1,5 @@
 ---
-slug: CLI
+slug: cli
 title: CLI
 ---
 

@@ -39,7 +39,7 @@ In continuing with our efforts to keep NEO•ONE up to date with Typescript we h
 We’ve added several new sections of documentation to the website:
 
 - [Deployment documentation](/docs/deployment)
-- [The NEO•ONE CLI](/docs/CLI)
+- [The NEO•ONE CLI](/docs/cli)
 - [Network configuration](/docs/config-options)
 - [Project contribution](/docs/how-to-contribute#How-Can-I-Contribute)
 - [Compiler contribution](/docs/smart-contract-compiler)
