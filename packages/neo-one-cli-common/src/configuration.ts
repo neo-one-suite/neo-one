@@ -4,8 +4,12 @@ export type CodegenFramework = 'none' | 'react' | 'angular' | 'vue';
 export type CodegenLanguage = 'typescript' | 'javascript';
 
 export interface ContractsConfiguration {
-  readonly path: string;
   readonly outDir: string;
+  readonly path: string;
+  readonly json?: boolean;
+  readonly avm?: boolean;
+  readonly debug?: boolean;
+  readonly opcodes?: boolean;
 }
 
 export interface CodegenConfiguration {
