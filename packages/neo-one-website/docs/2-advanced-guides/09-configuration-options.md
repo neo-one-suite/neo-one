@@ -20,8 +20,18 @@ import { defaultNetworks } from '@neo-one/cli';
 
 export default {
   contracts: {
+    // The NEO•ONE compile command will output the compile results in this directory.
+    outDir: 'neo-one/compiled',
     // NEO•ONE will look for smart contracts in this directory.
     path: 'neo-one/contracts',
+    // Set this to true if you want the compile command to output JSON.
+    // json: true,
+    // Set this to true if you want the compile command to output AVM.
+    // avm: false,
+    // Set this to true if you want the compile command to output additional debug information.
+    // debug: false,
+    // Set this to true if you want the compile command to output the AVM in a human-readable format for debugging (requires debug: true).
+    // opcodes: false,
   },
   artifacts: {
     // NEO•ONE will store build and deployment artifacts that should be checked in to vcs in this directory.
@@ -113,12 +123,12 @@ export default {
 
       return new LocalUserAccountProvider({
         keystore,
-        provider: new NEOONEProvider([{ network: 'exampleNetwork', rpcUrl: 'exampleRpcUrl.io/rpc'}])
-      })
-    }
-  }
+        provider: new NEOONEProvider([{ network: 'exampleNetwork', rpcUrl: 'exampleRpcUrl.io/rpc' }]),
+      });
+    },
+  },
   // ...
-}
+};
 ```
 
 ::: warning
