@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/smart-contract-compiler",
+      "comment": "Pin level-js and levelup deps.",
+      "type": "none"
+    }
+  ],
+  "packageName": "@neo-one/smart-contract-compiler",
+  "email": "spencercorwin@icloud.com"
+}

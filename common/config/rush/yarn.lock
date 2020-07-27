@@ -1720,102 +1720,6 @@
     rxjs "^6.5.3"
     tslib "^1.10.0"
 
-"@neotracker/core@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@neotracker/core/-/core-1.4.0.tgz#7745677ea391a2fb4cdd11d6fcbc12e70101f32f"
-  integrity sha512-MKJOQCCCMXdsZXy3y+9evBaQuWgeLcC+HGS6dFlsEECH8yKJvPBOYgjZ93hFwOyDf3atyn60sQ2C2K6qlnhqMg==
-  dependencies:
-    "@material-ui/core" "^3.7.1"
-    "@neo-one/client-common" "^2.6.0"
-    "@neo-one/client-core" "^2.6.0"
-    "@neo-one/client-full" "^2.5.0"
-    "@neo-one/node-core" "^2.5.0"
-    "@neo-one/node-neo-settings" "^2.5.0"
-    "@neo-one/utils" "^2.5.0"
-    apollo-cache-inmemory "^1.3.10"
-    apollo-client "^2.4.6"
-    apollo-link "^1.2.3"
-    app-root-dir "^1.0.2"
-    bignumber.js "^9.0.0"
-    bn.js "^4.11.8"
-    change-case "^3.0.2"
-    chokidar "^2.0.3"
-    classnames "^2.2.6"
-    cross-fetch "^3.0.0"
-    cryptocompare "^0.6.0"
-    css.escape "^1.5.1"
-    dataloader "^1.4.0"
-    execa "^3.2.0"
-    fs-extra "^7.0.1"
-    graphql "14.5.8"
-    graphql-tag "^2.10.0"
-    graphql-tools "^4.0.3"
-    headroom.js "^0.9.4"
-    highcharts "^6.2.0"
-    http-errors "^1.7.0"
-    is-running "^2.1.0"
-    iterall "^1.2.2"
-    ix "^2.5.3"
-    js-sha3 "^0.8.0"
-    jss "^9.8.7"
-    jss-preset-default "^4.3.0"
-    knex "0.20.8"
-    koa "^2.11.0"
-    koa-better-body "^3.1.13"
-    koa-compose "^4.1.0"
-    koa-compress "^3.0.0"
-    koa-convert "^1.2.0"
-    koa-cors "^0.0.16"
-    koa-helmet "^5.2.0"
-    koa-ratelimit-lru "^1.0.2"
-    koa-router "^7.4.0"
-    locale2 "^2.3.1"
-    lodash "^4.17.11"
-    lru-cache "^4.1.1"
-    markdown-it "^8.4.2"
-    objection "^1.4.0"
-    pg "^7.7.1"
-    pino "^5.13.2"
-    prop-types "^15.6.2"
-    qr-image "^3.2.0"
-    rc "^1.2.8"
-    react "^16.7.0"
-    react-dom "^16.7.0"
-    react-helmet "^5.2.0"
-    react-jss "^8.6.1"
-    react-known-props "^2.4.0"
-    react-lifecycles-compat "^3.0.4"
-    react-loadable "^5.5.0"
-    react-redux "^5.1.1"
-    react-relay "1.6.2"
-    react-router "4.4.0-beta.1"
-    react-router-config "^4.4.0-beta.6"
-    react-router-dom "4.4.0-beta.1"
-    react-tippy "^1.2.3"
-    react-transition-group "^2.5.0"
-    recompose "^0.30.0"
-    redux "^4.0.1"
-    redux-actions "^2.6.4"
-    relay-compiler "1.6.2"
-    relay-runtime "1.6.2"
-    reselect "^4.0.0"
-    resolve-path "^1.4.0"
-    rxjs "^6.3.3"
-    safe-stable-stringify "^1.1.0"
-    scrypt-js "^2.0.4"
-    semver "^5.6.0"
-    serialize-javascript "^2.1.2"
-    sitemap "^5.0.1"
-    source-map-support "^0.5.16"
-    sql-summary "^1.0.1"
-    sqlite3 "4.0.4"
-    styled-components "^4.1.3"
-    timeago.js "^4.0.0-beta.1"
-    toobusy-js "^0.5.1"
-    ua-parser-js "^0.7.19"
-    uuid "^3.2.1"
-    ws "^6.1.2"
-
 "@neotracker/core@1.4.1":
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/@neotracker/core/-/core-1.4.1.tgz#eb9d34542ac33df0f709c509250b583c74f09eb7"
@@ -2213,7 +2117,6 @@
     "@types/bn.js" "^4.11.5"
     "@types/fs-extra" "^8.0.0"
     "@types/jest" "^24.0.18"
-    "@types/jszip" "^3.4.1"
     "@types/listr" "^0.14.2"
     "@types/lodash" "^4.14.138"
     "@types/prompts" "^2.0.1"
@@ -2615,8 +2518,8 @@
     "@types/levelup" "^3.1.1"
     "@types/memdown" "^3.0.0"
     core-js "^3.2.1"
-    level-js "^5.0.0"
-    levelup "^4.1.0"
+    level-js "5.0.0"
+    levelup "4.1.0"
     memdown "^5.0.0"
     tslib "^1.10.0"
 
@@ -2754,7 +2657,7 @@
     "@types/levelup" "^3.1.1"
     "@types/memdown" "^3.0.0"
     gulp "~4.0.2"
-    levelup "^4.1.0"
+    levelup "4.1.0"
     memdown "^5.0.0"
     rxjs "^6.5.3"
     tslib "^1.10.0"
@@ -2805,7 +2708,7 @@
     fs-extra "^8.1.0"
     gulp "~4.0.2"
     leveldown "^5.1.1"
-    levelup "^4.1.0"
+    levelup "4.1.0"
     tslib "^1.10.0"
 
 "@rush-temp/react-common@file:./projects/react-common.tgz":
@@ -2893,7 +2796,7 @@
     bignumber.js "^9.0.0"
     bn.js "^5.0.0"
     gulp "~4.0.2"
-    levelup "^4.1.0"
+    levelup "4.1.0"
     lodash "^4.17.15"
     memdown "^5.0.0"
     safe-stable-stringify "^1.1.0"
@@ -8076,6 +7979,14 @@ deferred-leveldown@~5.0.0:
     abstract-leveldown "~6.0.0"
     inherits "^2.0.3"
 
+deferred-leveldown@~5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/deferred-leveldown/-/deferred-leveldown-5.1.0.tgz#c21e40641a8e48530255a4ad31371cc7fe76b332"
+  integrity sha512-PvDY+BT2ONu2XVRgxHb77hYelLtMYxKSGuWuJJdVRXh9ntqx9GYTFJno/SKAz5xcd+yjQwyQeIZrUPjPvA52mg==
+  dependencies:
+    abstract-leveldown "~6.0.0"
+    inherits "^2.0.3"
+
 deferred-leveldown@~5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/deferred-leveldown/-/deferred-leveldown-5.3.0.tgz#27a997ad95408b61161aa69bd489b86c71b78058"
@@ -13164,6 +13075,16 @@ level-iterator-stream@~4.0.0:
     readable-stream "^3.4.0"
     xtend "^4.0.2"
 
+level-js@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/level-js/-/level-js-5.0.0.tgz#ad79d40248634a7517f53f3a1bb94a6127f1d46d"
+  integrity sha512-BIevs/NlfX1DCbuzt8+p2LCumiuDf6IHq5ehktqmcJVRxzfVdc6lXV2FB5cGkTYg4KAr7WfVkeUBAiTgevy19g==
+  dependencies:
+    abstract-leveldown "~6.2.1"
+    immediate "~3.2.3"
+    inherits "^2.0.3"
+    ltgt "^2.1.2"
+
 level-js@^4.0.0:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/level-js/-/level-js-4.0.2.tgz#fa51527fa38b87c4d111b0d0334de47fcda38f21"
@@ -13246,6 +13167,16 @@ levelup@4.0.2:
     level-iterator-stream "~4.0.0"
     xtend "~4.0.0"
 
+levelup@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/levelup/-/levelup-4.1.0.tgz#49ab5d3a341731cd102f91c6bc17a1acb1969a17"
+  integrity sha512-+Qhe2/jb5affN7BeFgWUUWVdYoGXO2nFS3QLEZKZynnQyP9xqA+7wgOz3fD8SST2UKpHQuZgjyJjTcB2nMl2dQ==
+  dependencies:
+    deferred-leveldown "~5.1.0"
+    level-errors "~2.0.0"
+    level-iterator-stream "~4.0.0"
+    xtend "~4.0.0"
+
 levelup@^4.1.0, levelup@^4.3.2:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/levelup/-/levelup-4.4.0.tgz#f89da3a228c38deb49c48f88a70fb71f01cafed6"
@@ -13286,6 +13217,13 @@ lie@3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/lie/-/lie-3.1.1.tgz#9a436b2cc7746ca59de7a41fa469b3efb76bd87e"
   integrity sha1-mkNrLMd0bKWd56QfpGmz77dr2H4=
+  dependencies:
+    immediate "~3.0.5"
+
+lie@~3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/lie/-/lie-3.3.0.tgz#dcf82dee545f46074daf200c7c1c5a08e0f40f6a"
+  integrity sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==
   dependencies:
     immediate "~3.0.5"
 
@@ -14452,11 +14390,6 @@ nan@^2.12.1, nan@^2.13.2:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.1.tgz#d7be34dfa3105b91494c3147089315eff8874b01"
   integrity sha512-isWHgVjnFjh2x2yuJ/tj3JbwoHu3UC2dX5G/88Cm24yB6YopVgxvBObDY7n5xW6ExmFhJpSEQqFPvq9zaXc8Jw==
 
-nan@~2.10.0:
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
-  integrity sha512-bAdJv7fBLhWC+/Bls0Oza+mvTaNQtP+1RyhhhvD95pgUJz6XM5IzgmxOkItJ9tkoCiplvAnXI1tNmmUD/eScyA==
-
 nanoid@^2.0.3:
   version "2.1.11"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-2.1.11.tgz#ec24b8a758d591561531b4176a01e3ab4f0f0280"
@@ -14658,22 +14591,6 @@ node-notifier@^5.4.2:
     semver "^5.5.0"
     shellwords "^0.1.1"
     which "^1.3.0"
-
-node-pre-gyp@^0.10.3:
-  version "0.10.3"
-  resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.10.3.tgz#3070040716afdc778747b61b6887bf78880b80fc"
-  integrity sha512-d1xFs+C/IPS8Id0qPTZ4bUT8wWryfR/OzzAFxweG+uLN85oPzyo2Iw6bVlLQ/JOdgNonXLCoRyqDzDWq4iw72A==
-  dependencies:
-    detect-libc "^1.0.2"
-    mkdirp "^0.5.1"
-    needle "^2.2.1"
-    nopt "^4.0.1"
-    npm-packlist "^1.1.6"
-    npmlog "^4.0.2"
-    rc "^1.2.7"
-    rimraf "^2.6.1"
-    semver "^5.3.0"
-    tar "^4"
 
 node-pre-gyp@^0.11.0:
   version "0.11.0"
@@ -18682,15 +18599,6 @@ sql-summary@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/sql-summary/-/sql-summary-1.0.1.tgz#a2dddb5435bae294eb11424a7330dc5bafe09c2b"
   integrity sha512-IpCr2tpnNkP3Jera4ncexsZUp0enJBLr+pHCyTweMUBrbJsTgQeLWx1FXLhoBj/MvcnUQpkgOn2EY8FKOkUzww==
-
-sqlite3@4.0.4:
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-4.0.4.tgz#1f75e3ededad6e26f7dd819929460ce44a49dfcd"
-  integrity sha512-CO8vZMyUXBPC+E3iXOCc7Tz2pAdq5BWfLcQmOokCOZW5S5sZ/paijiPOCdvzpdP83RroWHYa5xYlVqCxSqpnQg==
-  dependencies:
-    nan "~2.10.0"
-    node-pre-gyp "^0.10.3"
-    request "^2.87.0"
 
 sqlite3@4.0.9:
   version "4.0.9"
