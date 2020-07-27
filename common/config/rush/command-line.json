@@ -151,7 +151,7 @@
       "summary": "Only compile all website pieces for live deployment to NOW",
       "description": "Compile all website pieces and do nothing else",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "rm -rf ./dist && rm -rf ./packages/neo-one-website/dist && rush compile-website-prod && node ./packages/neo-one-build-tools-web/dist/compile --bundle testRunner && node ./packages/neo-one-build-tools-web/dist/compile --bundle server && node ./packages/neo-one-build-tools-web/dist/compile --bundle preview && rm -rf ./packages/neo-one-website/publicOut && cp -r ./dist/workers ./packages/neo-one-website/publicOut && cp -r ./packages/neo-one-website/public/* ./packages/neo-one-website/publicOut && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=tsconfig/tsconfig.es2017.cjs.json yarn run react-static build && sh ./scripts/rm-cruft"
+      "shellCommand": "rm -rf ./dist && rm -rf ./packages/neo-one-website/dist && rush compile-website-prod && node ./packages/neo-one-build-tools-web/dist/compile --bundle testRunner && node ./packages/neo-one-build-tools-web/dist/compile --bundle server && node ./packages/neo-one-build-tools-web/dist/compile --bundle preview && rm -rf ./packages/neo-one-website/publicOut && cp -r ./dist/workers ./packages/neo-one-website/publicOut && cp -r ./packages/neo-one-website/public/* ./packages/neo-one-website/publicOut && cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" TS_NODE_PROJECT=./packages/neo-one-build-tools/includes/build-configs/tsconfig.es2017.cjs.json react-static build --config ./packages/neo-one-website/static.config.js && sh ./scripts/rm-cruft"
     },
     {
       "commandKind": "global",
