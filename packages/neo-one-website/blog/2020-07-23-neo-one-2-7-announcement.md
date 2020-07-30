@@ -10,13 +10,13 @@ twitter: https://twitter.com/neo_one_suite
 We are excited to announce our latest [release](https://www.npmjs.com/package/@neo-one/cli) of NEO•ONE. For this release we have been focused on cleaning up bugs, adding new compiler features, expanding documentation, and preparing for future versions of NEO•ONE as we draw closer to the Neo3 release.
 
 To get started with NEO•ONE you can install our CLI with
-`yarn install @neo-one/cli`
+`yarn add @neo-one/cli`
 
 ## Compile
 
 Starting with NEO•ONE 2.7 you will be able to output your compiled smart contract to various format types as well as generate debug information as per the spec listed [here](https://github.com/ngdseattle/design-notes/blob/master/NDX-DN11%20-%20NEO%20Debug%20Info%20Specification.md). We hope this will give our users more freedom in the end-to-end tooling they choose to use for developing their smart contracts. To get started with testing these new features you can use:
 
-`yarn install @neo-one/cli`\
+`yarn add @neo-one/cli`\
 `yarn neo-one init`\
 `yarn neo-one compile --json --avm --debug --opcodes`
 
