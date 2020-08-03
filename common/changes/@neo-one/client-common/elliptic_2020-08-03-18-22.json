@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@neo-one/client-common",
+      "comment": "Update elliptic dependency.",
+      "type": "none"
+    }
+  ],
+  "packageName": "@neo-one/client-common",
+  "email": "spencercorwin@icloud.com"
+}

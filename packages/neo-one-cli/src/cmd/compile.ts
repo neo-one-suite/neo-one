@@ -8,17 +8,17 @@ export const describe = 'Compiles a project and outputs code to a local director
 export const builder = (yargsBuilder: typeof yargs) =>
   yargsBuilder
     .string('outDir')
-    .describe('outDir', 'Output code directory')
+    .describe('outDir', 'Output code directory.')
     .string('path')
-    .describe('path', 'Contract directory')
+    .describe('path', 'Contract directory.')
     .boolean('json')
-    .describe('json', 'Output the contract with the JSON format')
+    .describe('json', 'Output the contract with the JSON format.')
     .boolean('avm')
-    .describe('avm', 'Output the contract with the AVM format')
+    .describe('avm', 'Output the contract with the AVM format.')
     .boolean('debug')
-    .describe('debug', 'Output additional debug information')
+    .describe('debug', 'Output additional debug information.')
     .boolean('opcodes')
-    .describe('opcodes', 'Output the AVM in a human readable format for debugging, requires --debug');
+    .describe('opcodes', 'Output the AVM in a human readable format for debugging (requires --debug).');
 
 export const handler = (argv: Yarguments<ReturnType<typeof builder>>) => {
   start(async (_cmd, config) => {
