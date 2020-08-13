@@ -1,15 +1,23 @@
 import { BinaryWriter } from '../../../BinaryWriter';
 import { createSerializeWire, SerializableWire, SerializeWire } from '../../Serializable';
 import { AttributeModel } from './AttributeModel';
-import { AttributeUsageModel } from './AttributeUsageModel';
+import { AttributeTypeModel } from './AttributeTypeModel';
 
-export abstract class AttributeBaseModel<Usage extends AttributeUsageModel, Value extends Buffer>
-  implements SerializableWire<AttributeModel> {
-  public abstract readonly usage: Usage;
-  public abstract readonly value: Value;
+export abstract class AttributeBaseModel implements SerializableWire<AttributeModel> {
+  public abstract readonly type: AttributeTypeModel;
+  public abstract readonly allowMultiple: boolean;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
   public serializeWireBase(writer: BinaryWriter): void {
-    writer.writeUInt8(this.usage);
+    writer.writeUInt8(this.type);
+    this.serializeWithoutTypeBase(writer);
   }
+
+  // TODO: check
+  public verify(): boolean {
+    return true;
+  }
+
+  // TODO: check
+  protected abstract serializeWithoutTypeBase(writer: BinaryWriter): void;
 }

@@ -1,5 +1,4 @@
 import {
-  assertTransactionType,
   common,
   ECPoint,
   hasFlag,
@@ -37,7 +36,6 @@ import { Attribute, AttributeUsage, deserializeAttributeWireBase, UInt160Attribu
 import { hasDuplicateInputs, hasIntersectingInputs } from './common';
 import { Input } from './Input';
 import { Output, OutputKey } from './Output';
-import { RegisterTransaction } from './RegisterTransaction';
 import { Transaction } from './Transaction';
 import { TransactionType } from './TransactionType';
 
@@ -50,7 +48,7 @@ const getUtilityValue = ({
   utilityToken,
 }: {
   readonly outputs: readonly Output[];
-  readonly utilityToken: RegisterTransaction;
+  readonly utilityToken: Transaction;
 }) =>
   outputs
     .filter((output) => common.uInt256Equal(output.asset, utilityToken.hash))
@@ -58,8 +56,8 @@ const getUtilityValue = ({
 
 export interface FeeContext {
   readonly getOutput: (input: Input) => Promise<Output>;
-  readonly governingToken: RegisterTransaction;
-  readonly utilityToken: RegisterTransaction;
+  readonly governingToken: Transaction;
+  readonly utilityToken: Transaction;
   readonly fees: { [K in TransactionType]?: BN };
   readonly registerValidatorFee: BN;
 }
@@ -87,8 +85,8 @@ export interface TransactionVerifyOptions {
   readonly getAllValidators: () => Promise<readonly Validator[]>;
   readonly verifyScript: VerifyScript;
   readonly currentHeight: number;
-  readonly governingToken: RegisterTransaction;
-  readonly utilityToken: RegisterTransaction;
+  readonly governingToken: Transaction;
+  readonly utilityToken: Transaction;
   readonly fees: { [K in TransactionType]?: BN };
   readonly registerValidatorFee: BN;
   readonly memPool?: readonly Transaction[];
@@ -96,20 +94,18 @@ export interface TransactionVerifyOptions {
 
 /** @internal */
 export function TransactionBase<
-  Type extends TransactionType,
   TransactionJSON,
-  TBase extends Constructor<TransactionBaseModel<Type, Attribute, Input, Output, Witness>>
+  TBase extends Constructor<TransactionBaseModel<Attribute, Input, Output, Witness>>
 >(Base: TBase) {
   abstract class TransactionBaseClass extends Base implements EquatableKey, SerializableJSON<TransactionJSON> {
     public static readonly WitnessConstructor: Constructor<Witness> = Witness;
 
     public static deserializeTransactionBaseStartWireBase({
       reader,
-    }: DeserializeWireBaseOptions): { readonly type: TransactionType; readonly version: number } {
-      const type = assertTransactionType(reader.readUInt8());
+    }: DeserializeWireBaseOptions): { readonly version: number } {
       const version = reader.readUInt8();
 
-      return { type, version };
+      return { version };
     }
 
     public static deserializeTransactionBaseEndWireBase(
