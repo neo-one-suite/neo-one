@@ -252,7 +252,7 @@ const createInvocationScript = (message: Buffer, privateKey: PrivateKey): Buffer
 const createVerificationScript = (publicKey: ECPoint): Buffer => {
   const builder = new ScriptBuilder();
   builder.emitPushECPoint(publicKey);
-  builder.emitOp('CHECKSIG');
+  builder.emitSysCall('Neo.Crypto.VerifyWithECDsaSecp256r1'); // TODO: check
 
   return builder.build();
 };
@@ -311,7 +311,7 @@ const createMultiSignatureVerificationScript = (mIn: number, publicKeys: readonl
     builder.emitPushECPoint(ecPoint);
   });
   builder.emitPushInt(publicKeysSorted.length);
-  builder.emitOp('CHECKMULTISIG');
+  builder.emitSysCall('Neo.Crypto.CheckMultisigWithECDsaSecp256r1'); // TODO: check
 
   return builder.build();
 };
@@ -524,54 +524,78 @@ const decryptNEP2 = async ({
   return common.bufferToPrivateKey(privateKey);
 };
 
+const checkSigUInt = Buffer.from([0x747476aa]);
+const checkMultiSigUint = Buffer.from([0xc7c34cba]);
+
 // tslint:disable
 const isMultiSigContract = (script: Buffer) => {
   let m = 0;
   let n = 0;
   let i = 0;
-  if (script.length < 37) return false;
+  if (script.length < 43) return false;
   if (script[i] > Op.PUSH16) return false;
   if (script[i] < Op.PUSH1 && script[i] !== 1 && script[i] !== 2) return false;
   switch (script[i]) {
-    case 1:
+    case Op.PUSHINT8:
       m = script[++i];
       ++i;
       break;
-    case 2:
+    case Op.PUSHINT16:
       m = script.readUInt16LE(++i);
       i += 2;
       break;
     default:
-      m = script[i++] - 80;
-      break;
+      const b = script[i];
+      if (b >= Op.PUSH1 && b <= Op.PUSH16) {
+        m = b - Op.PUSH0;
+        ++i;
+        break;
+      }
+      return false;
   }
   if (m < 1 || m > 1024) return false;
-  while (script[i] == 33) {
+  while (script[i] == Op.PUSHDATA1) {
+    if (script.length <= i + 35) return false;
+    if (script[++i] !== 33) return false;
+    // points?.push(script.slice(i + 1, i + 1 + 33)); // TODO: add "points" List from C#
+
     i += 34;
-    if (script.length <= i) return false;
     ++n;
   }
   if (n < m || n > 1024) return false;
   switch (script[i]) {
-    case 1:
+    case Op.PUSHINT8:
       if (n != script[++i]) return false;
       ++i;
       break;
-    case 2:
+    case Op.PUSHINT16:
       if (script.length < i + 3 || n != script.readUInt16LE(++i)) return false;
       i += 2;
       break;
     default:
-      if (n != script[i++] - 80) return false;
-      break;
+      const b = script[i];
+      if (b >= Op.PUSH1 && b <= Op.PUSH16) {
+        if (n !== b - Op.PUSH0) return false;
+        ++i;
+        break;
+      }
+      return false;
   }
-  if (script[i++] != Op.CHECKMULTISIG) return false;
-  if (script.length != i) return false;
+  if (script[i++] !== Op.PUSHNULL) return false;
+  if (script[i++] !== Op.SYSCALL) return false;
+  if (script.length !== i + 4) return false;
+  if (script.slice(i) !== checkMultiSigUint) return false;
   return true;
 };
 // tslint:enable
 
-const isSignatureContract = (script: Buffer) => script.length === 35 && script[0] === 33 && script[34] === Op.CHECKSIG;
+const isSignatureContract = (script: Buffer) =>
+  script.length === 41 &&
+  script[0] === Op.PUSHDATA1 &&
+  script[1] === 33 &&
+  script[35] === Op.PUSHNULL &&
+  script[36] === Op.SYSCALL &&
+  script.slice(37) === checkSigUInt;
 
 const isStandardContract = (script: Buffer) => isSignatureContract(script) || isMultiSigContract(script);
 

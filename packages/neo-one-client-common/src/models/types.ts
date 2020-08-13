@@ -1,75 +1,70 @@
-import { AssetTypeModel } from './AssetTypeModel';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
-import { StateDescriptorTypeModel } from './StateDescriptorTypeModel';
 import { StorageFlagsModel } from './StorageFlagsModel';
-import { AttributeUsageModel } from './transaction';
+import { AttributeTypeModel } from './transaction/attribute/AttributeTypeModel';
+import { VerifyResultModel } from './VerifyResultModel';
 import { VMState } from './vm';
+import { WitnessScopeModel } from './WitnessScopeModel';
 
-export interface AccountJSON {
-  readonly version: number;
-  readonly script_hash: string;
-  readonly frozen: boolean;
-  readonly votes: readonly string[];
-  readonly balances: ReadonlyArray<{ readonly asset: string; readonly value: string }>;
-  readonly unspent: readonly InputJSON[];
-  readonly unclaimed: readonly InputJSON[];
+export interface ContractParameterDeclarationJSON {
+  readonly type: keyof typeof ContractParameterTypeModel;
+  readonly name: string;
 }
 
-export interface ArrayContractParameterJSON {
+export interface ArrayContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Array';
   readonly value: readonly ContractParameterJSON[];
 }
 
-export interface BooleanContractParameterJSON {
+export interface BooleanContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Boolean';
   readonly value: boolean;
 }
 
-export interface ByteArrayContractParameterJSON {
+export interface ByteArrayContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'ByteArray';
   readonly value: string;
 }
 
-export interface Hash160ContractParameterJSON {
+export interface Hash160ContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Hash160';
   readonly value: string;
 }
 
-export interface Hash256ContractParameterJSON {
+export interface Hash256ContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Hash256';
   readonly value: string;
 }
 
-export interface IntegerContractParameterJSON {
+export interface IntegerContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Integer';
   readonly value: string;
 }
 
-export interface InteropInterfaceContractParameterJSON {
+export interface InteropInterfaceContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'InteropInterface';
 }
 
-export interface MapContractParameterJSON {
+export interface MapContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Map';
   readonly value: ReadonlyArray<readonly [ContractParameterJSON, ContractParameterJSON]>;
 }
 
-export interface PublicKeyContractParameterJSON {
+export interface PublicKeyContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'PublicKey';
   readonly value: string;
 }
 
-export interface SignatureContractParameterJSON {
+export interface SignatureContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Signature';
   readonly value: string;
 }
 
-export interface StringContractParameterJSON {
+export interface StringContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'String';
   readonly value: string;
 }
 
-export interface VoidContractParameterJSON {
+export interface VoidContractParameterJSON extends ContractParameterDeclarationJSON {
   readonly type: 'Void';
 }
 
@@ -89,19 +84,24 @@ export type ContractParameterJSON =
 
 export type ContractParameterTypeJSON = keyof typeof ContractParameterTypeModel;
 
+export type WitnessScopeJSON = keyof typeof WitnessScopeModel;
+
+// TODO: rename to "TransactionResultErrorJSON" ?
 export interface InvocationResultErrorJSON {
-  readonly state: VMState.Fault;
+  readonly state: VMState.FAULT;
   readonly gas_consumed: string;
   readonly gas_cost: string;
   readonly stack: readonly ContractParameterJSON[];
-  readonly message: string;
+  readonly script: string;
 }
 
+// TODO: rename to "TransactionResultSuccessJSON" ?
 export interface InvocationResultSuccessJSON {
-  readonly state: VMState.Halt;
+  readonly state: VMState.HALT;
   readonly gas_consumed: string;
-  readonly gas_cost: string;
+  // readonly gas_cost: string; // TODO: check that this should be removed
   readonly stack: readonly ContractParameterJSON[];
+  readonly script: string; // TODO: check this
 }
 
 export type InvocationResultJSON = InvocationResultSuccessJSON | InvocationResultErrorJSON;
@@ -175,170 +175,106 @@ export interface WitnessJSON {
   readonly verification: string;
 }
 
+export interface SignerJSON {
+  readonly account: string;
+  readonly scopes: WitnessScopeJSON;
+  readonly allowedContracts?: readonly string[];
+  readonly allowedGroups?: readonly string[];
+}
+
 export interface AttributeJSON {
-  readonly usage: AttributeUsageJSON;
-  readonly data: string;
+  readonly type: AttributeTypeJSON;
+  readonly allowMultiple: boolean;
 }
 
-export type AttributeUsageJSON = keyof typeof AttributeUsageModel;
+export type AttributeTypeJSON = keyof typeof AttributeTypeModel;
 
-export interface InputJSON {
-  readonly txid: string;
-  readonly vout: number;
-}
+export type VerifyResultJSON = keyof typeof VerifyResultModel;
 
-export interface OutputJSON {
-  readonly n: number;
-  readonly asset: string;
-  readonly value: string;
-  readonly address: string;
-}
+// TODO: check that this can be removed. or rename to "TransactionDataJSON" ?
+// export interface InvocationDataJSON {
+//   readonly result: InvocationResultJSON;
+//   readonly asset?: AssetJSON;
+//   readonly contracts: readonly ContractJSON[];
+//   readonly deletedContractHashes: readonly string[];
+//   readonly migratedContractHashes: ReadonlyArray<readonly [string, string]>;
+//   readonly voteUpdates: ReadonlyArray<readonly [string, ReadonlyArray<string>]>;
+//   readonly actions: readonly ActionJSON[];
+//   readonly storageChanges: readonly StorageChangeJSON[];
+// }
 
-export interface InvocationDataJSON {
-  readonly result: InvocationResultJSON;
-  readonly asset?: AssetJSON;
-  readonly contracts: readonly ContractJSON[];
-  readonly deletedContractHashes: readonly string[];
-  readonly migratedContractHashes: ReadonlyArray<readonly [string, string]>;
-  readonly voteUpdates: ReadonlyArray<readonly [string, ReadonlyArray<string>]>;
-  readonly actions: readonly ActionJSON[];
-  readonly storageChanges: readonly StorageChangeJSON[];
-}
-
-export interface TransactionBaseJSON {
-  readonly txid: string;
+export interface TransactionJSON {
+  readonly hash: string;
   readonly size: number;
   readonly version: number;
-  readonly attributes: readonly AttributeJSON[];
-  readonly vin: readonly InputJSON[];
-  readonly vout: readonly OutputJSON[];
-  readonly scripts: readonly WitnessJSON[];
+  readonly nonce: number;
+  readonly sender: string;
   readonly sys_fee: string;
   readonly net_fee: string;
-  readonly data:
-    | {
-        readonly blockHash: string;
-        readonly blockIndex: number;
-        readonly transactionIndex: number;
-        readonly globalIndex: string;
-      }
-    | undefined;
-}
-
-export interface ClaimTransactionJSON extends TransactionBaseJSON {
-  readonly type: 'ClaimTransaction';
-  readonly claims: readonly InputJSON[];
-}
-
-export interface ContractTransactionJSON extends TransactionBaseJSON {
-  readonly type: 'ContractTransaction';
-}
-
-export interface EnrollmentTransactionJSON extends TransactionBaseJSON {
-  readonly type: 'EnrollmentTransaction';
-  readonly pubkey: string;
-}
-
-export interface IssueTransactionJSON extends TransactionBaseJSON {
-  readonly type: 'IssueTransaction';
-}
-
-export interface MinerTransactionJSON extends TransactionBaseJSON {
-  readonly type: 'MinerTransaction';
-  readonly nonce: number;
-}
-
-export interface PublishTransactionJSON extends TransactionBaseJSON {
-  readonly type: 'PublishTransaction';
-  readonly contract: ContractJSON;
-}
-
-export interface RegisterTransactionJSON extends TransactionBaseJSON {
-  readonly type: 'RegisterTransaction';
-  readonly asset: {
-    readonly type: AssetTypeJSON;
-    readonly name: AssetNameJSON;
-    readonly amount: string;
-    readonly precision: number;
-    readonly owner: string;
-    readonly admin: string;
-  };
-}
-
-export interface StateDescriptorJSON {
-  readonly type: StateDescriptorTypeJSON;
-  readonly key: string;
-  readonly field: string;
-  readonly value: string;
-}
-
-export type StateDescriptorTypeJSON = keyof typeof StateDescriptorTypeModel;
-
-export interface StateTransactionJSON extends TransactionBaseJSON {
-  readonly type: 'StateTransaction';
-  readonly descriptors: readonly StateDescriptorJSON[];
-}
-
-export interface InvocationTransactionJSON extends TransactionBaseJSON {
-  readonly type: 'InvocationTransaction';
+  readonly valid_until_block: number;
+  readonly attributes: readonly AttributeJSON[];
+  readonly signers: readonly SignerJSON[];
   readonly script: string;
-  readonly gas: string;
-  readonly invocationData?: InvocationDataJSON | undefined;
+  readonly witnesses: readonly WitnessJSON[];
 }
-
-export type TransactionJSON =
-  | MinerTransactionJSON
-  | IssueTransactionJSON
-  | ClaimTransactionJSON
-  | EnrollmentTransactionJSON
-  | RegisterTransactionJSON
-  | ContractTransactionJSON
-  | PublishTransactionJSON
-  | StateTransactionJSON
-  | InvocationTransactionJSON;
 
 export interface TransactionReceiptJSON {
-  readonly blockIndex: number;
+  readonly blockIndex: number; // TODO: check this
   readonly blockHash: string;
   readonly transactionIndex: number;
   readonly globalIndex: string;
 }
 
-export type AssetNameJSON = string | ReadonlyArray<{ readonly lang: string; readonly name: string }>;
+export interface ConfirmedTransactionJSON extends TransactionJSON, TransactionReceiptJSON {}
 
-export interface AssetJSON {
-  readonly version: number;
-  readonly id: string;
-  readonly type: AssetTypeJSON;
-  readonly name: AssetNameJSON;
-  readonly amount: string;
-  readonly available: string;
-  readonly precision: number;
-  readonly owner: string;
-  readonly admin: string;
-  readonly issuer: string;
-  readonly expiration: number;
-  readonly frozen: boolean;
+export type WildcardContainerJSON<T> = readonly T[] | '*';
+
+export interface ContractMethodDescriptorJSON {
+  readonly name: string;
+  readonly parameters: readonly ContractParameterDeclarationJSON[];
+  readonly returnType: ContractParameterTypeJSON;
 }
 
-export type AssetTypeJSON = keyof typeof AssetTypeModel;
-
-export interface ContractJSON {
-  readonly version: number;
-  readonly hash: string;
-  readonly script: string;
-  readonly parameters: readonly ContractParameterTypeJSON[];
-  readonly returntype: ContractParameterTypeJSON;
+export interface ContractEventJSON {
   readonly name: string;
-  readonly code_version: string;
-  readonly author: string;
-  readonly email: string;
-  readonly description: string;
-  readonly properties: {
+  readonly parameters: readonly ContractParameterDeclarationJSON[];
+}
+
+export interface ContractABIJSON {
+  readonly hash: string;
+  readonly entryPoint: ContractMethodDescriptorJSON;
+  readonly methods: readonly ContractMethodDescriptorJSON[];
+  readonly events: readonly ContractEventJSON[];
+}
+
+export interface ContractGroupJSON {
+  readonly publicKey: string;
+  readonly signature: string;
+}
+
+export type ContractPermissionDescriptorJSON = string | '*';
+
+export interface ContractPermissionJSON {
+  readonly contract: ContractPermissionDescriptorJSON;
+  readonly methods: ReadonlyArray<WildcardContainerJSON<string>>;
+}
+
+export interface ContractManifestJSON {
+  readonly abi: ContractABIJSON;
+  readonly groups: readonly ContractGroupJSON[];
+  readonly permissions: readonly ContractPermissionJSON[];
+  readonly trusts: WildcardContainerJSON<string>;
+  readonly safeMethods: WildcardContainerJSON<string>;
+  readonly features: {
     readonly storage: boolean;
-    readonly dynamic_invoke: boolean;
     readonly payable: boolean;
   };
+}
+
+export interface ContractJSON {
+  readonly hash: string;
+  readonly script: string;
+  readonly manifest: ContractManifestJSON;
 }
 
 export interface BlockBaseJSON {
@@ -346,19 +282,24 @@ export interface BlockBaseJSON {
   readonly hash: string;
   readonly previousblockhash: string;
   readonly merkleroot: string;
-  readonly time: number;
+  readonly time: string;
   readonly index: number;
-  readonly nonce: string;
   readonly nextconsensus: string;
-  readonly script: WitnessJSON;
-  readonly size: number;
+  readonly witnesses: readonly WitnessJSON[];
   readonly confirmations: number;
+  readonly nextblockhash?: string;
+}
+
+export interface ConsensusDataJSON {
+  readonly primary: number;
+  readonly nonce: string;
 }
 
 export interface HeaderJSON extends BlockBaseJSON {}
 
 export interface BlockJSON extends BlockBaseJSON {
-  readonly tx: readonly TransactionJSON[];
+  readonly tx: readonly ConfirmedTransactionJSON[];
+  readonly concensus_data: ConsensusDataJSON;
 }
 
 export interface NetworkSettingsJSON {
@@ -387,10 +328,22 @@ export interface RelayTransactionResultJSON {
 }
 
 export interface ValidatorJSON {
-  readonly version: number;
+  readonly active: boolean;
   readonly publicKey: string;
-  readonly registered: boolean;
   readonly votes: string;
+}
+
+export interface PluginJSON {
+  readonly name: string;
+  readonly version: string;
+  readonly interfaces: readonly string[];
+}
+
+export interface VersionJSON {
+  readonly tcpPort: number;
+  readonly wsPort: number;
+  readonly nonce: number;
+  readonly useragent: string;
 }
 
 export interface NeoClaimableJSON {

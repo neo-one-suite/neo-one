@@ -5,6 +5,7 @@ import { BN } from 'bn.js';
 import { Observable } from 'rxjs';
 import { RawSourceMap } from 'source-map';
 import { ECPoint, UInt160, UInt256 } from './common';
+import { ConsensusDataJSON } from './models';
 
 /**
  * Base58 encoded string that represents a NEO address.
@@ -200,44 +201,15 @@ export interface AddressAttribute extends AttributeBase {
  */
 export type Attribute = BufferAttribute | PublicKeyAttribute | Hash256Attribute | AddressAttribute;
 
-/**
- * `Input`s are a reference to an `Output` of a `Transaction` that has been persisted to the blockchain. The sum of the `value`s of the referenced `Output`s is the total amount transferred in the `Transaction`.
- */
-export interface Input {
-  /**
-   * Hash of the `Transaction` this input references.
-   */
-  readonly hash: Hash256String;
-  /**
-   * `Output` index within the `Transaction` this input references.
-   */
-  readonly index: number;
-}
-
-/**
- * Both the `Output` and it's reference as an `Input`.
- */
-export interface InputOutput extends Input, Output {}
-
-/**
- * `Output`s represent the destination `Address` and amount transferred of a given `Asset`.
- *
- * The sum of the unspent `Output`s of an `Address` represent the total balance of the `Address`.
- */
-export interface Output {
-  /**
-   * Hash of the `Asset` that was transferred.
-   */
-  readonly asset: Hash256String;
-  /**
-   * Amount transferred.
-   */
-  readonly value: BigNumber;
-  /**
-   * Destination `Address`.
-   */
-  readonly address: AddressString;
-}
+export type WitnessScope =
+  | 'Global'
+  | 'CalledByEntry'
+  | 'CustomContracts'
+  | 'CustomGroups'
+  | 'CalledByEntryAndCustomContracts'
+  | 'CalledByEntryAndCustomGroups'
+  | 'CalledByEntryAndCustomGroupsAndCustomContracts'
+  | 'CustomContractsAndCustomGroups';
 
 /**
  * `Witness` is just that, a 'witness' to the transaction, meaning they have approved the transaction. Can vary from a simple signature of the transaction for a given `Address`' private key or a 'witness' being a smart contract and the way it's verified is by executing the smart contract code.
@@ -253,14 +225,42 @@ export interface Witness {
   readonly verification: BufferString;
 }
 
+// TODO: add description
+export interface Signer {
+  /**
+   * Hash160 Address of the `Signer`.
+   */
+  readonly account: AddressString;
+  /**
+   * Scope of the witness.
+   */
+  readonly scopes: WitnessScope;
+  /**
+   * Array of contracts this address can verify;.
+   */
+  readonly allowedContracts?: readonly AddressString[];
+  /**
+   * Array of contract groups that this address can verify.
+   */
+  readonly allowedGroups?: readonly ECPoint[];
+}
+
 /**
  * Base interface for all `Transaction`s
  */
-export interface TransactionBase {
+export interface Transaction {
   /**
    * NEO protocol version.
    */
   readonly version: number;
+  /**
+   * Unique number in order to ensure the hash for this contract is unique.
+   */
+  readonly nonce: number;
+  /**
+   * Hash160 of the transaction sender.
+   */
+  readonly sender: AddressString;
   /**
    * `Hash256` of this `Transaction`.
    */
@@ -270,21 +270,13 @@ export interface TransactionBase {
    */
   readonly size: number;
   /**
+   * Block expiration time.
+   */
+  readonly validUntilBlock: number;
+  /**
    * `Attribute`s attached to the `Transaction`.
    */
   readonly attributes: readonly Attribute[];
-  /**
-   * `Input`s of the `Transaction`.
-   */
-  readonly inputs: readonly Input[];
-  /**
-   * `Output`s of the `Transaction`.
-   */
-  readonly outputs: readonly Output[];
-  /**
-   * `Witness`es to the `Transaction`, i.e. the `Address`es that have signed the `Transasction`.
-   */
-  readonly scripts: readonly Witness[];
   /**
    * GAS execution fee for the transaction.
    */
@@ -293,229 +285,34 @@ export interface TransactionBase {
    * GAS network priority fee for the transaction.
    */
   readonly networkFee: BigNumber;
-}
-
-/**
- * Common propreties for all `ConfirmedTransaction`s.
- */
-export interface ConfirmedTransactionBase {
   /**
-   * 'Receipt' of the confirmed transaction on the blockchain. This contains properties like the block the `Transaction` was included in.
+   * Scope where the `Witness`es are valid.
    */
-  readonly receipt: TransactionReceipt;
-}
-
-/**
- * Claims GAS for a set of spent `Output`s.
- */
-export interface ClaimTransaction extends TransactionBase {
+  readonly signers: readonly Signer[];
   /**
-   * `type` distinguishes `ClaimTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'ClaimTransaction';
-  /**
-   * The spent outputs that this `ClaimTransaction` is claiming `GAS` for.
-   */
-  readonly claims: readonly Input[];
-}
-
-/**
- * Confirmed variant of `ClaimTransaction`
- */
-export interface ConfirmedClaimTransaction extends ClaimTransaction, ConfirmedTransactionBase {}
-
-/**
- * Transfers first class `Asset`s
- */
-export interface ContractTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `ContractTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'ContractTransaction';
-}
-
-/**
- * Confirmed variant of `ContractTransaction`
- */
-export interface ConfirmedContractTransaction extends ContractTransaction, ConfirmedTransactionBase {}
-
-/**
- * Enrolls a new validator for a given `PublicKey`.
- *
- * @deprecated
- */
-export interface EnrollmentTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `Enrollmentransaction` from other `Transaction` object types.
-   */
-  readonly type: 'EnrollmentTransaction';
-  /**
-   * The public key that is being enrolled as a validator.
-   */
-  readonly publicKey: PublicKeyString;
-}
-
-/**
- * Confirmed variant of `EnrollmentTransaction`
- */
-export interface ConfirmedEnrollmentTransaction extends EnrollmentTransaction, ConfirmedTransactionBase {}
-
-/**
- * Issues new currency of a first-class `Asset`.
- */
-export interface IssueTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `IssueTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'IssueTransaction';
-}
-
-/**
- * Confirmed variant of `IssueTransaction`
- */
-export interface ConfirmedIssueTransaction extends IssueTransaction, ConfirmedTransactionBase {}
-
-/**
- * Runs a script in the NEO VM.
- */
-export interface InvocationTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `InvocationTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'InvocationTransaction';
-  /**
-   * Script to execute in the NEO VM.
+   * Contract script of the `Transaction`.
    */
   readonly script: BufferString;
   /**
-   * GAS that has been attached to be used for the `systemFee` of the `Transaction`. All attached GAS will be consumed by this operation, regardless of if execution fails or provides too much GAS.
+   * `Witness`es to the `Transaction`, i.e. the `Address`es that have signed the `Transasction`.
    */
-  readonly gas: BigNumber;
+  readonly witnesses: readonly Witness[];
 }
 
-/**
- * Confirmed variant of `InvocationTransaction`
- */
-export interface ConfirmedInvocationTransaction extends InvocationTransaction, ConfirmedTransactionBase {
-  /**
-   * Additional raw data that is typically processed by an `ABI` for the client APIs.
-   */
-  readonly invocationData: RawInvocationData;
-}
+// TODO: add description
+export interface ConfirmedTransaction extends Transaction, TransactionReceipt {}
 
-/**
- * First `Transaction` in each block which contains the `Block` rewards for the consensus node that produced the `Block`.
- */
-export interface MinerTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `MinerTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'MinerTransaction';
-  /**
-   * Unique number in order to ensure the hash for this transaction is unique.
-   */
-  readonly nonce: number;
-}
-
-/**
- * Confirmed variant of `MinerTransaction`
- */
-export interface ConfirmedMinerTransaction extends MinerTransaction, ConfirmedTransactionBase {}
-
-/**
- * Registers a new `Contract`
- *
- * @deprecated Replaced by `Client#publish`
- */
-export interface PublishTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `PublishTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'PublishTransaction';
-  /**
-   * `Contract` to publish.
-   */
-  readonly contract: Contract;
-}
-
-/**
- * Confirmed variant of `PublishTransaction`
- */
-export interface ConfirmedPublishTransaction extends PublishTransaction, ConfirmedTransactionBase {}
-
-/**
- * Registers a new first class `Asset`
- *
- * @deprecated Replaced by `Client#registerAsset`
- */
-export interface RegisterTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `RegisterTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'RegisterTransaction';
-  /**
-   * `Asset` information to register.
-   */
-  readonly asset: Pick<Asset, 'type' | 'name' | 'amount' | 'precision' | 'owner' | 'admin'>;
-}
-
-/**
- * Confirmed variant of `RegisterTransaction`
- */
-export interface ConfirmedRegisterTransaction extends RegisterTransaction, ConfirmedTransactionBase {}
-
-/**
- * Used for voting. Full support coming soon.
- */
-export interface StateTransaction extends TransactionBase {
-  /**
-   * `type` distinguishes `StateTransaction` from other `Transaction` object types.
-   */
-  readonly type: 'StateTransaction';
-}
-
-/**
- * Confirmed variant of `StateTransaction`
- */
-export interface ConfirmedStateTransaction extends StateTransaction, ConfirmedTransactionBase {}
-
-/**
- * `Transaction`s are relayed to the blockchain and contain information that is to be permanently stored on the blockchain. They may contain `Input`s and `Output`s corresponding to transfers of native `Asset`s. Each `Transaction` type serves a particular purpose, see the documentation for each for more information.
- */
-export type Transaction =
-  | MinerTransaction
-  | IssueTransaction
-  | ClaimTransaction
-  | EnrollmentTransaction
-  | RegisterTransaction
-  | ContractTransaction
-  | PublishTransaction
-  | StateTransaction
-  | InvocationTransaction;
-/**
- * `Transaction` that has been confirmed on the blockchain. Includes all of the same properties as a `Transaction` as well as the `TransactionReceipt` of the confirmation.
- */
-export type ConfirmedTransaction =
-  | ConfirmedMinerTransaction
-  | ConfirmedIssueTransaction
-  | ConfirmedClaimTransaction
-  | ConfirmedEnrollmentTransaction
-  | ConfirmedRegisterTransaction
-  | ConfirmedContractTransaction
-  | ConfirmedPublishTransaction
-  | ConfirmedStateTransaction
-  | ConfirmedInvocationTransaction;
-
+// TODO: header not yet checked
 /**
  * All of the properties of a `Block` except the `Transaction`s themselves.
  */
 export interface Header {
   /**
-   * NEO blockchain version
+   * NEO blockchain version.
    */
   readonly version: number;
   /**
-   * `Block` hash
+   * `Block` hash.
    */
   readonly hash: Hash256String;
   /**
@@ -527,11 +324,11 @@ export interface Header {
    */
   readonly merkleRoot: Hash256String;
   /**
-   * `Block` time persisted
+   * `Block` time persisted.
    */
-  readonly time: number;
+  readonly time: BigNumber;
   /**
-   * `Block` index
+   * `Block` index.
    */
   readonly index: number;
   /**
@@ -543,6 +340,10 @@ export interface Header {
    */
   readonly nextConsensus: AddressString;
   /**
+   * `Witness`es to the `Block`'s validity.
+   */
+  readonly witnesses: readonly Witness[];
+  /**
    * 'Witness' to the `Block`'s validity.
    */
   readonly script: Witness;
@@ -550,13 +351,42 @@ export interface Header {
    * Size in bytes of the `Block`.
    */
   readonly size: number;
+  /**
+   * Number of confirmations of the `Block`.
+   */
+  readonly confirmations: number;
+  /**
+   * The hash of the next `Block`.
+   */
+  readonly nextBlockHash?: string;
 }
 
+// TODO: check this
+export interface ConsensusData {
+  /**
+   * `ConsensusData` hash.
+   */
+  readonly hash: Hash256String;
+  /**
+   * TODO: add description
+   */
+  readonly primaryIndex: number;
+  /**
+   * Unique number in order to ensure the hash for this `ConcensusData` is unique.
+   */
+  readonly nonce: BufferString;
+}
+
+// TODO: check
 export interface Block extends Header {
   /**
    * `Transaction`s contained in the `Block`.
    */
   readonly transactions: readonly ConfirmedTransaction[];
+  /**
+   * `Transaction`s contained in the `Block`.
+   */
+  readonly consensusData: ConsensusData;
 }
 
 /**
@@ -566,19 +396,27 @@ export interface TransactionReceipt {
   /**
    * `Block` index of the `Transaction` for this receipt.
    */
-  readonly blockIndex: number;
+  readonly blockIndex: number; // TODO: remove blockIndex?
   /**
    * `Block` hash of the `Transaction` for this receipt.
    */
   readonly blockHash: Hash256String;
   /**
+   * `Block` time of the `Transaction` for this receipt.
+   */
+  readonly blockTime: number;
+  /**
    * Transaction index of the `Transaction` within the `Block` for this receipt.
    */
-  readonly transactionIndex: number;
+  readonly transactionHash: Hash256String;
   /**
    * Ordered globally unique index of the transaction.
    */
-  readonly globalIndex: BigNumber;
+  readonly globalIndex: BigNumber; // TODO: remove this? Keep or remove confirmations? Move somewhere else?
+  /**
+   * Number of `Block`s which have confirmed this transaction.
+   */
+  readonly confirmations: number;
 }
 
 /**
@@ -613,6 +451,10 @@ export interface RawInvocationResultBase {
    * The total GAS cost before subtracting the free GAS.
    */
   readonly gasCost: BigNumber;
+  /**
+   * Script run by the invocation.
+   */
+  readonly script: BufferString;
 }
 
 /**
@@ -640,7 +482,7 @@ export interface InvocationResultError extends RawInvocationResultBase {
   /**
    * Failure reason.
    */
-  readonly message: string;
+  readonly message: string; // TODO: remove message?
 }
 
 /**
@@ -784,14 +626,11 @@ export interface UserAccountProvider {
   /**
    * Transfers native assets.
    */
-  readonly transfer: (
-    transfers: readonly Transfer[],
-    options?: TransactionOptions,
-  ) => Promise<TransactionResult<TransactionReceipt, InvocationTransaction | ContractTransaction>>;
+  readonly transfer: (transfers: readonly Transfer[], options?: TransactionOptions) => Promise<TransactionResult>;
   /**
    * Claim all claimable GAS.
    */
-  readonly claim: (options?: TransactionOptions) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+  readonly claim: (options?: TransactionOptions) => Promise<TransactionResult>;
   /**
    * Invoke the specified `method` with the given `params` on `contract`.
    *
@@ -809,7 +648,7 @@ export interface UserAccountProvider {
     verify: boolean,
     options?: InvokeSendUnsafeReceiveTransactionOptions,
     sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  ) => Promise<TransactionResult>;
   /**
    * Relays a transaction that is the first step of a two-step send process. The `Transfer`'s `to` property represents the ultimate destination of the funds, but this transaction will be constructed such that those funds are marked for transfer, not actually transferred.
    *
@@ -823,7 +662,7 @@ export interface UserAccountProvider {
     transfer: Transfer,
     options?: TransactionOptions,
     sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  ) => Promise<TransactionResult>;
   /**
    * Relays a transaction that is the second step of a two-step send process. The `hash` is the transaction hash of the first step in the process and is used to determine the amount to transfer to the `from` address.
    *
@@ -837,7 +676,7 @@ export interface UserAccountProvider {
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  ) => Promise<TransactionResult>;
   /**
    * Refunds native assets that were not processed by the contract. The `hash` is the transaction hash that should be refunded and is used to construct the transfers for this transaction.
    *
@@ -851,7 +690,7 @@ export interface UserAccountProvider {
     hash: Hash256String,
     options?: TransactionOptions,
     sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult<RawInvokeReceipt, InvocationTransaction>>;
+  ) => Promise<TransactionResult>;
   /**
    * Claims GAS. Currently only supports claiming all unclaimed GAS to the contract address.
    *
@@ -864,7 +703,7 @@ export interface UserAccountProvider {
     paramsZipped: ReadonlyArray<readonly [string, Param | undefined]>,
     options?: TransactionOptions,
     sourceMaps?: SourceMaps,
-  ) => Promise<TransactionResult<TransactionReceipt, ClaimTransaction>>;
+  ) => Promise<TransactionResult>;
   /**
    * Invokes the constant `method` on `contract` with `params` on `network`.
    */
@@ -1039,7 +878,7 @@ export interface SmartContractDefinition {
   /**
    * `ABI` of the smart contract
    */
-  readonly abi: ABI;
+  readonly abi: ContractABI;
   /**
    * `SourceMaps` associated with the smart contract.
    */
@@ -1133,7 +972,7 @@ export interface ForwardOptions<TEvent extends Event<string, any> = Event> {
   /**
    * Additional events that may be emitted due to forwarding arguments to another smart contract method.
    */
-  readonly events?: readonly ABIEvent[];
+  readonly events?: readonly ContractEvent[];
   readonly __tag?: TEvent;
 }
 
@@ -1540,7 +1379,7 @@ export type ForwardValueABI = ForwardValueABIParameter | ForwardValueABIReturn;
 /**
  * Function specification in the `ABI` of a smart contract.
  */
-export interface ABIFunction {
+export interface ContractMethodDescriptor {
   /**
    * Name of the function
    */
@@ -1548,45 +1387,21 @@ export interface ABIFunction {
   /**
    * Parameters of the function.
    */
-  readonly parameters?: readonly ABIParameter[];
+  readonly parameters: readonly ContractParameterDeclaration[];
   /**
    * Return type of the function.
    */
-  readonly returnType: ABIReturn;
+  readonly returnType: ContractParameterType;
   /**
    * `true` if the function is constant or read-only.
    */
-  readonly constant?: boolean;
-  /**
-   * `true` if the function is used for sending native assets with a two-phase send.
-   */
-  readonly send?: boolean;
-  /**
-   * `true` if the function is used for sending native assets.
-   */
-  readonly sendUnsafe?: boolean;
-  /**
-   * `true` if the function is used for receiving native assets.
-   */
-  readonly receive?: boolean;
-  /**
-   * `true` if the function is used for claiming GAS.
-   */
-  readonly claim?: boolean;
-  /**
-   * `true` if the function is used for refunding native assets.
-   */
-  readonly refundAssets?: boolean;
-  /**
-   * `true` if the function is used for the second phase of a send.
-   */
-  readonly completeSend?: boolean;
+  // readonly constant?: boolean; // TODO: check
 }
 
 /**
  * Event specification in the `ABI` of a smart contract.
  */
-export interface ABIEvent {
+export interface ContractEvent {
   /**
    * Name of the event.
    */
@@ -1594,7 +1409,7 @@ export interface ABIEvent {
   /**
    * Parameters of the event.
    */
-  readonly parameters: readonly ABIParameter[];
+  readonly parameters: readonly ContractParameterDeclaration[];
 }
 
 /**
@@ -1602,15 +1417,130 @@ export interface ABIEvent {
  *
  * See the [Smart Contract APIs](https://neo-one.io/docs/smart-contract-apis) chapter of the main guide for more information.
  */
-export interface ABI {
+export interface ContractABI {
   /**
-   * Specification of the smart contract functions.
+   * Script hash of the contract.
    */
-  readonly functions: readonly ABIFunction[];
+  readonly hash: UInt160;
+  /**
+   * Entrypoint is an ABIFunction whcih describes the entrypoint of the contract.
+   */
+  readonly entryPoint: ContractMethodDescriptor;
+  /**
+   * Specification of the smart contract methods.
+   */
+  readonly methods: readonly ContractMethodDescriptor[];
   /**
    * Specification of the smart contract events.
    */
-  readonly events?: readonly ABIEvent[];
+  readonly events: readonly ContractEvent[];
+}
+
+/**
+ * A ConctractGroup represents a set of mutuallly trusted contracts. A contract will allow any contract in the same
+ * group to invoke it, and the user interface will not give any warnings. A group is identified by a public key
+ * and must be accompanied by a signature for the contract hash to prove the contract is included in the group.
+ */
+export interface ContractGroup {
+  /**
+   * The public key identifying the group.
+   */
+  readonly publicKey: ECPoint;
+  /**
+   * Signature of the contract hash.
+   */
+  readonly signature: SignatureString;
+}
+
+/**
+ * Flag which determines which features are available to a contract.
+ */
+export enum ContractFeatures {
+  /**
+   * Contract does not use any available features.
+   */
+  NoProperty = 0x00,
+  /**
+   * Contract modifies blockchain storage.
+   */
+  HasStorage = 0x01,
+  /**
+   * Contract can receive native assets.
+   */
+  Payable = 0x04,
+  /**
+   * Contract modifies blockchain storage and can receive native assets.
+   */
+  HasStoragePayable = 0x05,
+}
+
+export interface WildcardContainer<T> {
+  readonly data?: readonly T[];
+}
+
+export interface ContractPermissionDescriptor {
+  readonly hashOrGroup: UInt160 | ECPoint | undefined;
+  // TODO: what do do here? WIP?
+  // readonly isHash: () => boolean;
+  // readonly isGroup: () => boolean;
+  // readonly isWildcard: () => boolean;
+}
+
+/**
+ * Describes which contracts may be invoked and which methods are called.
+ */
+export interface ContractPermissions {
+  readonly contract: ContractPermissionDescriptor;
+  readonly methods: WildcardContainer<string>;
+  // TODO: what to do with isAllowed?
+  // readonly isAllowed: (manifest: ContractManifest, method: string) => boolean;
+}
+
+/**
+ * A manifest explicitly declares the features and permissions a Contract will use. Once deployed,
+ * it will be limited by its declared list of features and permissions.
+ */
+export interface ContractManifest {
+  /**
+   * Max length for a valid Contract Manifest.
+   */
+  // readonly maxLength: 2048; // TODO: what to do here?
+  /**
+   * Size of serialized contract.
+   */
+  // readonly size: () => number; // TODO: what to do here?
+  /**
+   * Contract hash.
+   */
+  // readonly hash: () => UInt160; // TODO: what to do here?
+  /**
+   * Set of mutually trusted contracts.
+   */
+  readonly groups: readonly ContractGroup[];
+  /**
+   * The features field describes what features are available for the contract.
+   */
+  readonly features: {
+    readonly storage: boolean;
+    readonly payable: boolean;
+  };
+  /**
+   * Full specification of the functions and events of a smart contract. Used by the Client APIs
+   * to generate the smart contract interface.
+   */
+  readonly abi: ContractABI;
+  /**
+   * Describes which contracts may be invoked and which methods are called.
+   */
+  readonly permissions: readonly ContractPermissions[];
+  /**
+   * The trusts field is an array containing a set of contract hashes or group of public keys.
+   */
+  readonly trusts: WildcardContainer<UInt160>;
+  /**
+   * The safeMethods field is an array containing a set of safe methods.
+   */
+  readonly safeMethods: WildcardContainer<string>;
 }
 
 declare const OpaqueTagSymbol: unique symbol;
@@ -1718,131 +1648,29 @@ export type Return =
   | ContractParameter;
 
 /**
- * Constants that describe the type of `Asset`.
- *
- * The two most important ones are `'Governing'` and `'Utility'` which are reserved for NEO and GAS respectively.
- */
-export type AssetType = 'Credit' | 'Duty' | 'Governing' | 'Utility' | 'Currency' | 'Share' | 'Invoice' | 'Token';
-
-/**
- * Attributes of a first class asset.
- *
- * Users will typically only interact with the NEO and GAS `Asset`s.
- *
- * @example
- *
- * const asset = readClient.getAsset(Hash256.NEO);
- * const neoAmount = asset.amount;
- *
- */
-export interface Asset {
-  /**
-   * `Hash256String` of this `Asset`.
-   */
-  readonly hash: Hash256String;
-  /**
-   * Type of the `Asset`
-   *
-   * @see AssetType
-   */
-  readonly type: AssetType;
-  /**
-   * User configurable name of the `Asset`
-   */
-  readonly name: string;
-  /**
-   * Total possible supply of the `Asset`
-   */
-  readonly amount: BigNumber;
-  /**
-   * Amount currently available of the `Asset`
-   */
-  readonly available: BigNumber;
-  /**
-   * Precision (number of decimal places) of the `Asset`
-   */
-  readonly precision: number;
-  /**
-   * Owner of the `Asset`.
-   */
-  readonly owner: PublicKeyString;
-  /**
-   * Admin of the `Asset`.
-   */
-  readonly admin: AddressString;
-  /**
-   * Issuer of the `Asset`.
-   */
-  readonly issuer: AddressString;
-  /**
-   * Unix timestamp of when the `Asset` must be renewed by or it expires.
-   */
-  readonly expiration: number;
-  /**
-   * `true` if no transfers are allowed with the `Asset`.
-   */
-  readonly frozen: boolean;
-}
-
-/**
  * Attributes of a deployed smart contract.
  */
 export interface Contract {
   /**
-   * NEO protocol version.
-   */
-  readonly version: number;
-  /**
    * `AddressString` of this `Contract`.
    */
-  readonly address: AddressString;
+  readonly address: string; // TODO: check this shouldn't be AddressString
   /**
    * `Contract` code.
    */
   readonly script: BufferString;
   /**
-   * Expected parameters of this `Contract`
+   * The `Contract`'s manifest.
    */
-  readonly parameters: readonly ContractParameterType[];
-  /**
-   * Return type of this `Contract`
-   */
-  readonly returnType: ContractParameterType;
-  /**
-   * Name of this `Contract`. For informational purposes only.
-   */
-  readonly name: string;
-  /**
-   * Version of this `Contract`. For informational purposes only.
-   */
-  readonly codeVersion: string;
-  /**
-   * Author of this `Contract`. For informational purposes only.
-   */
-  readonly author: string;
-  /**
-   * Email of this `Contract`. For informational purposes only.
-   */
-  readonly email: string;
-  /**
-   * Description of this `Contract`. For informational purposes only.
-   */
-  readonly description: string;
-  /**
-   * `true` if this `Contract` can use storage.
-   */
-  readonly storage: boolean;
-  /**
-   * `true` if this `Contract` can make dynamic invocations.
-   */
-  readonly dynamicInvoke: boolean;
-  /**
-   * `true` if this `Contract` accepts first-class `Asset`s and/or tokens.
-   */
-  readonly payable: boolean;
+  readonly manifest: ContractManifest;
 }
 
 /* BEGIN LOW-LEVEL API */
+
+export interface ContractParameterDeclaration {
+  readonly type: ContractParameter['type'];
+  readonly name: string;
+}
 
 /**
  * Invocation stack item for a `Signature`.
@@ -1850,7 +1678,7 @@ export interface Contract {
  * @see ContractParameter
  * @see SignatureString
  */
-export interface SignatureContractParameter {
+export interface SignatureContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `SignatureContractParameter` from other `ContractParameter` object types.
    */
@@ -1866,7 +1694,7 @@ export interface SignatureContractParameter {
  *
  * @see ContractParameter
  */
-export interface BooleanContractParameter {
+export interface BooleanContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `BooleanContractParameter` from other `ContractParameter` object types.
    */
@@ -1885,7 +1713,7 @@ export interface BooleanContractParameter {
  *
  * @see ContractParameter
  */
-export interface IntegerContractParameter {
+export interface IntegerContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `IntegerContractParameter` from other `ContractParameter` object types.
    */
@@ -1902,7 +1730,7 @@ export interface IntegerContractParameter {
  * @see ContractParameter
  * @see AddressString
  */
-export interface AddressContractParameter {
+export interface AddressContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `AddressContractParameter` from other `ContractParameter` object types.
    */
@@ -1914,12 +1742,29 @@ export interface AddressContractParameter {
 }
 
 /**
+ * Invocation stack item for a `Hash160`.
+ *
+ * @see ContractParameter
+ * @see UInt160
+ */
+export interface Hash160ContractParameter extends ContractParameterDeclaration {
+  /**
+   * `type` distinguishes `Hash160ContractParameter` from other `ContractParameter` object types.
+   */
+  readonly type: 'Hash160';
+  /**
+   * NEO address in base58 encoded string format.
+   */
+  readonly value: string;
+}
+
+/**
  * Invocation stack item for a `Hash256`.
  *
  * @see ContractParameter
  * @see Hash256String
  */
-export interface Hash256ContractParameter {
+export interface Hash256ContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `Hash256ContractParameter` from other `ContractParameter` object types.
    */
@@ -1936,7 +1781,7 @@ export interface Hash256ContractParameter {
  * @see ContractParameter
  * @see BufferString
  */
-export interface BufferContractParameter {
+export interface BufferContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `BufferContractParameter` from other `ContractParameter` object types.
    */
@@ -1953,7 +1798,7 @@ export interface BufferContractParameter {
  * @see ContractParameter
  * @see PublicKeyString
  */
-export interface PublicKeyContractParameter {
+export interface PublicKeyContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `PublicKeyContractParameter` from other `ContractParameter` object types.
    */
@@ -1969,7 +1814,7 @@ export interface PublicKeyContractParameter {
  *
  * @see ContractParameter
  */
-export interface StringContractParameter {
+export interface StringContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `StringContractParameter` from other `ContractParameter` object types.
    */
@@ -1985,7 +1830,7 @@ export interface StringContractParameter {
  *
  * @see ContractParameter
  */
-export interface ArrayContractParameter {
+export interface ArrayContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `ArrayContractParameter` from other `ContractParameter` object types.
    */
@@ -2001,7 +1846,7 @@ export interface ArrayContractParameter {
  *
  * @see ContractParameter
  */
-export interface MapContractParameter {
+export interface MapContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `MapContractParameter` from other `ContractParameter` object types.
    */
@@ -2019,7 +1864,7 @@ export interface MapContractParameter {
  *
  * @see ContractParameter
  */
-export interface InteropInterfaceContractParameter {
+export interface InteropInterfaceContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `InteropInterfaceContractParameter` from other `ContractParameter` object types.
    */
@@ -2031,7 +1876,7 @@ export interface InteropInterfaceContractParameter {
  *
  * @see ContractParameter
  */
-export interface VoidContractParameter {
+export interface VoidContractParameter extends ContractParameterDeclaration {
   /**
    * `type` distinguishes `VoidContractParameter` from other `ContractParameter` object types.
    */
@@ -2048,6 +1893,7 @@ export type ContractParameter =
   | BooleanContractParameter
   | IntegerContractParameter
   | AddressContractParameter
+  | Hash160ContractParameter
   | Hash256ContractParameter
   | BufferContractParameter
   | PublicKeyContractParameter
@@ -2095,7 +1941,7 @@ export interface RawInvocationResultError extends RawInvocationResultBase {
   /**
    * A descriptive message indicating why the invocation failed.
    */
-  readonly message: string;
+  // readonly message: string; // TODO: remove this?
 }
 
 /**
@@ -2350,7 +2196,7 @@ export interface RawInvocationData {
   /**
    * `Asset` created by the invocation.
    */
-  readonly asset?: Asset;
+  // readonly asset?: Asset; // TODO: check that we want to remove this. Replace somehow?
   /**
    * `Contract`s created by the invocation.
    */

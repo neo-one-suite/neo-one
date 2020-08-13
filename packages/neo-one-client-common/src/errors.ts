@@ -1,5 +1,6 @@
 import { makeErrorWithCode } from '@neo-one/utils';
 import { common, PrivateKey } from './common';
+import { OpCode } from './models/vm';
 import { ContractParameter } from './types';
 
 /* istanbul ignore next */
@@ -64,6 +65,14 @@ export const InvalidStorageFlagsError = makeErrorWithCode(
   'INVALID_STORAGE_FLAGS',
   (storageFlags: number) => `Expected StorageFlags, found: ${storageFlags.toString(16)}`,
 );
+export const InvalidVerifyResultError = makeErrorWithCode(
+  'INVALID_RELAY_RESULT_REASON',
+  (reason: number) => `Expected VerifyResult, found: ${reason.toString(16)}`,
+);
+export const InvalidVerifyResultJSONError = makeErrorWithCode(
+  'INVALID_RELAY_RESULT_REASON_JSON',
+  (value: string) => `Invalid VerifyResult: ${value}`,
+);
 export const InvalidStateDescriptorTypeError = makeErrorWithCode(
   'INVALID_STATE_DESCRIPTOR_TYPE',
   (stateDescriptorType: number) => `Expected StateDescriptorType, found: ${stateDescriptorType.toString(16)}`,
@@ -75,6 +84,22 @@ export const InvalidContractParameterTypeJSONError = makeErrorWithCode(
 export const InvalidContractParameterTypeError = makeErrorWithCode(
   'INVALID_CONTRACT_PARAMETER_TYPE',
   (contractParameterType: number) => `Expected contract parameter type, found: ${contractParameterType.toString(16)}`,
+);
+export const InvalidWitnessScopeJSONError = makeErrorWithCode(
+  'INVALID_WITNESS_SCOPE_JSON',
+  (value: string) => `Invalid WitnessScope: ${value}`,
+);
+export const InvalidWitnessScopeError = makeErrorWithCode(
+  'INVALID_WITNESS_SCOPE',
+  (witnessScope: number) => `Expected witness scope, found: ${witnessScope.toString(16)}`,
+);
+export const InvalidAttributeTypeJSONError = makeErrorWithCode(
+  'INVALID_ATTRIBUTE_TYPE',
+  (value: string) => `Invalid AttributeType: ${value}`,
+);
+export const InvalidAttributeTypeError = makeErrorWithCode(
+  'INVALID_ATTRIBUTE_TYPE',
+  (transactionAttributeType: number) => `Expected transaction type, found: ${transactionAttributeType.toString(16)}`,
 );
 export const InvalidAttributeUsageError = makeErrorWithCode(
   'INVALID_ATTRIBUTE_USAGE',
@@ -97,28 +122,27 @@ export const InvalidSignaturesError = makeErrorWithCode(
   'INVALID_SIGNATURES',
   (m: number, value: number) => `Expected ${m} unique signatures, found: ${value}.`,
 );
-
 export const InvalidBIP32VersionError = makeErrorWithCode(
   'INVALID_BIP32_KEY_VERSION',
   (version: number, expected: number) => `Expected key-version ${expected}; got ${version}`,
 );
-
 export const InvalidBIP32ExtendedKeyError = makeErrorWithCode(
   'INVALID_BIP32_EXTENDED_KEY',
   (key: string) => `Invalid Extended Key: ${key}`,
 );
-
 export const InvalidBIP32ChildIndexError = makeErrorWithCode(
   'INVALID_BIP32_CHILD_INDEX',
   (index: number) => `Index must be less than ${0x80000000}; got ${index}`,
 );
-
 export const InvalidBIP32HardenedError = makeErrorWithCode(
   'INVALID_BIP32_HARDENED_CALL',
   () => 'Cannot derive a hardened child key from a public key.',
 );
-
 export const InvalidBIP32SerializePrivateNodeError = makeErrorWithCode(
   'INVALID_BIP32_PRIVATE_SERIALIZATION',
   () => 'Cannot serialize a private extended key from a public node.',
+);
+export const InvalidJumpError = makeErrorWithCode(
+  'INVALID_JMP_OPCODE',
+  (op: OpCode) => `Expected valid JMP instruction; got ${op}`,
 );

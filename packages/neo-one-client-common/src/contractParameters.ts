@@ -49,6 +49,9 @@ const toBufferBuffer = (contractParameter: ContractParameter): Buffer => {
         }),
       );
       break;
+    case 'Hash160':
+      value = common.uInt160ToBuffer(JSONHelper.readUInt160(contractParameter.value));
+      break;
     case 'Hash256':
       value = common.uInt256ToBuffer(JSONHelper.readUInt256(contractParameter.value));
       break;
