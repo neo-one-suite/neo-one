@@ -107,6 +107,13 @@
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
+      "packageName": "@neo-one/csharp-vm",
+      "projectFolder": "packages/neo-one-csharp-vm",
+      "reviewCategory": "production",
+      "shouldPublish": true,
+      "versionPolicyName": "CoreReleasePolicy"
+    },
+    {
       "packageName": "@neo-one/developer-tools",
       "projectFolder": "packages/neo-one-developer-tools",
       "reviewCategory": "production",

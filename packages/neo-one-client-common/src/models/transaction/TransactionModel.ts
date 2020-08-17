@@ -19,7 +19,6 @@ export interface TransactionModelAdd<
   readonly witnesses?: readonly TWitness[];
   readonly signers?: readonly TSigner[];
   readonly nonce: number;
-  readonly sender: UInt160;
   readonly systemFee: BN;
   readonly networkFee: BN;
   readonly validUntilBlock: number;
@@ -31,7 +30,7 @@ export const MAX_TRANSACTION_ATTRIBUTES = 16;
 export const MAX_TRANSACTION_SIZE = 102400;
 export const MAX_VALID_UNTIL_BLOCK_INCREMENT = 2102400;
 
-export abstract class TransactionModel<
+export class TransactionModel<
   TAttribute extends AttributeModel = AttributeModel,
   TWitness extends WitnessModel = WitnessModel,
   TSigner extends SignerModel = SignerModel
@@ -118,7 +117,6 @@ export abstract class TransactionModel<
     return new (this.constructor as any)({
       version: this.version,
       nonce: this.nonce,
-      sender: this.sender,
       systemFee: this.systemFee,
       networkFee: this.networkFee,
       validUntilBlock: this.validUntilBlock,

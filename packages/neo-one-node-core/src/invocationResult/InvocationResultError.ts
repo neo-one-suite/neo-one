@@ -21,13 +21,13 @@ export interface InvocationResultErrorAdd {
 
 const MAX_SIZE = 1024;
 
-export class InvocationResultError extends InvocationResultBase<VMState.Fault>
+export class InvocationResultError extends InvocationResultBase<VMState.FAULT>
   implements SerializableJSON<InvocationResultErrorJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): InvocationResultError {
     const { reader } = options;
     const { state, gasConsumed, gasCost, stack } = super.deserializeInvocationResultWireBase(options);
-    if (state !== VMState.Fault) {
-      throw new InvalidFormatError(`Expected VMState to be: ${VMState.Fault}. Received: ${state}`);
+    if (state !== VMState.FAULT) {
+      throw new InvalidFormatError(`Expected VMState to be: ${VMState.FAULT}. Received: ${state}`);
     }
     const message = reader.readVarString(MAX_SIZE);
 
@@ -38,7 +38,7 @@ export class InvocationResultError extends InvocationResultBase<VMState.Fault>
   protected readonly sizeExclusive: () => number;
 
   public constructor({ gasConsumed, gasCost, stack, message }: InvocationResultErrorAdd) {
-    super({ state: VMState.Fault, gasConsumed, gasCost, stack });
+    super({ state: VMState.FAULT, gasConsumed, gasCost, stack });
     this.message = message;
     this.sizeExclusive = utils.lazy(() => IOHelper.sizeOfVarString(this.message));
   }
@@ -50,7 +50,7 @@ export class InvocationResultError extends InvocationResultBase<VMState.Fault>
 
   public serializeJSON(context: SerializeJSONContext): InvocationResultErrorJSON {
     return {
-      state: VMState.Fault,
+      state: VMState.FAULT,
       gas_consumed: JSONHelper.writeFixed8(this.gasConsumed),
       gas_cost: JSONHelper.writeFixed8(this.gasCost),
       stack: this.stack.map((value) => value.serializeJSON(context)),

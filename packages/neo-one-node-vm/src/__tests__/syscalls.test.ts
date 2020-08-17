@@ -3237,7 +3237,7 @@ const handleArgs = (sb: ScriptBuilder, args: readonly Arg[]) => {
   }
 };
 
-describe('syscalls', () => {
+describe.skip('syscalls', () => {
   // tslint:disable-next-line no-any
   const filterMethods = (value: any): any => {
     if (value == undefined) {

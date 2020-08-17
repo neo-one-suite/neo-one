@@ -6,6 +6,8 @@
 /build/
 /tmp
 /packages/*/dist
+/packages/*/lib/bin
+/packages/*/lib/obj
 .rpt2_cache
 /reports
 .nyc_output

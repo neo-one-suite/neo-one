@@ -278,16 +278,15 @@ export interface ContractJSON {
 }
 
 export interface BlockBaseJSON {
-  readonly version: number;
   readonly hash: string;
+  readonly size: number;
+  readonly version: number;
   readonly previousblockhash: string;
   readonly merkleroot: string;
   readonly time: string;
   readonly index: number;
   readonly nextconsensus: string;
   readonly witnesses: readonly WitnessJSON[];
-  readonly confirmations: number;
-  readonly nextblockhash?: string;
 }
 
 export interface ConsensusDataJSON {
@@ -298,8 +297,14 @@ export interface ConsensusDataJSON {
 export interface HeaderJSON extends BlockBaseJSON {}
 
 export interface BlockJSON extends BlockBaseJSON {
-  readonly tx: readonly ConfirmedTransactionJSON[];
-  readonly concensus_data: ConsensusDataJSON;
+  // TODO: this used to be `ConfirmedTransactionJSON[]`. Why?
+  readonly tx: readonly TransactionJSON[];
+  readonly consensusdata?: ConsensusDataJSON;
+}
+
+export interface TrimmedBlockJSON extends BlockBaseJSON {
+  readonly consensusdata?: ConsensusDataJSON;
+  readonly hashes: readonly string[];
 }
 
 export interface NetworkSettingsJSON {

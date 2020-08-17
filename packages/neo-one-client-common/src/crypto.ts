@@ -249,10 +249,11 @@ const createInvocationScriptForSignature = (signature: Buffer): Buffer => {
 const createInvocationScript = (message: Buffer, privateKey: PrivateKey): Buffer =>
   createInvocationScriptForSignature(sign({ message, privateKey }));
 
+// TODO: check this with c# engine
 const createVerificationScript = (publicKey: ECPoint): Buffer => {
   const builder = new ScriptBuilder();
   builder.emitPushECPoint(publicKey);
-  builder.emitSysCall('Neo.Crypto.VerifyWithECDsaSecp256r1'); // TODO: check
+  builder.emitSysCall('Neo.Crypto.VerifyWithECDsaSecp256r1');
 
   return builder.build();
 };
@@ -294,6 +295,7 @@ const sortKeys = (publicKeys: readonly ECPoint[]): readonly ECPoint[] =>
     .sort(compareKeys)
     .map(toECPointFromKeyPair);
 
+// TODO: check this with c# engine
 const createMultiSignatureVerificationScript = (mIn: number, publicKeys: readonly ECPoint[]) => {
   const m = Math.floor(mIn);
   if (m < 1 || m > publicKeys.length) {
@@ -311,7 +313,7 @@ const createMultiSignatureVerificationScript = (mIn: number, publicKeys: readonl
     builder.emitPushECPoint(ecPoint);
   });
   builder.emitPushInt(publicKeysSorted.length);
-  builder.emitSysCall('Neo.Crypto.CheckMultisigWithECDsaSecp256r1'); // TODO: check
+  builder.emitSysCall('Neo.Crypto.CheckMultisigWithECDsaSecp256r1');
 
   return builder.build();
 };

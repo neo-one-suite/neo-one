@@ -645,7 +645,7 @@ export class Blockchain {
     const result = { actions: mutableActions, hash, witness };
 
     const { stack, state, errorMessage } = executeResult;
-    if (state === VMState.Fault) {
+    if (state === VMState.FAULT) {
       return {
         ...result,
         failureMessage: errorMessage === undefined ? 'Script execution ended in a FAULT state' : errorMessage,

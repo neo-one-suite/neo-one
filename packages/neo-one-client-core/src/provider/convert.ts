@@ -105,7 +105,7 @@ export function convertAction(
 }
 
 export function convertInvocationResult(result: InvocationResultJSON): RawInvocationResult {
-  if (result.state === VMState.Fault) {
+  if (result.state === VMState.FAULT) {
     return {
       state: 'FAULT',
       gasConsumed: new BigNumber(result.gas_consumed),

@@ -299,7 +299,7 @@ const createIntegerContractParameterJSON = (
 const createInvocationResultSuccessJSON = (
   options: Partial<InvocationResultSuccessJSON> = {},
 ): InvocationResultSuccessJSON => ({
-  state: VMState.Halt,
+  state: VMState.HALT,
   gas_consumed: '20',
   gas_cost: '10',
   stack: [createIntegerContractParameterJSON()],
@@ -309,7 +309,7 @@ const createInvocationResultSuccessJSON = (
 const createInvocationResultErrorJSON = (
   options: Partial<InvocationResultErrorJSON> = {},
 ): InvocationResultErrorJSON => ({
-  state: VMState.Fault,
+  state: VMState.FAULT,
   gas_consumed: '20',
   gas_cost: '10',
   stack: [createIntegerContractParameterJSON()],

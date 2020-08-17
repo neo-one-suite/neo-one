@@ -9,7 +9,7 @@ const NEO_ONE_NM_PATH = path.resolve(
   '@neo-one',
 );
 
-const whitelist = new Set(['ec-key']);
+const whitelist = new Set(['ec-key', 'edge']);
 
 const readDir = async (dir) =>
   new Promise((resolve, reject) =>

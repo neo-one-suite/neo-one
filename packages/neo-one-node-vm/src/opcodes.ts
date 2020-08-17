@@ -245,10 +245,10 @@ const call = ({ name, tailCall }: { readonly name: OpCode; readonly tailCall?: b
         });
 
         let { state } = resultContext;
-        if (state === VMState.Halt) {
+        if (state === VMState.HALT) {
           // If it's a tail call, then the final recursive call executes the rest
           // of the script, and we just return immediately here.
-          state = tailCall ? VMState.Halt : context.state;
+          state = tailCall ? VMState.HALT : context.state;
         }
 
         return {
@@ -345,17 +345,17 @@ const callIsolated = ({
         });
 
         let { state, stackCount } = resultContext;
-        if (state === VMState.Halt) {
+        if (state === VMState.HALT) {
           // If it's a tail call, then the final recursive call executes the rest
           // of the script, and we just return immediately here.
-          state = tailCall ? VMState.Halt : context.state;
+          state = tailCall ? VMState.HALT : context.state;
         }
 
         let stack: ExecutionStack = [];
         if (returnValueCount === -1) {
           stack = resultContext.stack;
         } else if (returnValueCount > 0) {
-          if (resultContext.state === VMState.Halt && resultContext.stack.length < returnValueCount) {
+          if (resultContext.state === VMState.HALT && resultContext.stack.length < returnValueCount) {
             throw new InsufficientReturnValueError(context, resultContext.stack.length, returnValueCount);
           }
 
@@ -430,7 +430,7 @@ const functionCallIsolated = ({ name }: { readonly name: OpCode }): OpCreate => 
         });
 
         let { state, stackCount } = resultContext;
-        if (state === VMState.Halt) {
+        if (state === VMState.HALT) {
           state = context.state;
         }
 
@@ -595,7 +595,7 @@ const OPCODE_PAIRS = ([
               ...resultContext,
               callingScriptHash: context.callingScriptHash,
               pc: pc + 2,
-              state: resultContext.state === VMState.Fault ? VMState.Fault : VMState.None,
+              state: resultContext.state === VMState.FAULT ? VMState.FAULT : VMState.NONE,
               depth: context.depth,
             },
           };
@@ -607,7 +607,7 @@ const OPCODE_PAIRS = ([
       createOp({
         name: 'RET',
         invoke: ({ context }) => ({
-          context: { ...context, state: VMState.Halt },
+          context: { ...context, state: VMState.HALT },
         }),
       }),
     ],
