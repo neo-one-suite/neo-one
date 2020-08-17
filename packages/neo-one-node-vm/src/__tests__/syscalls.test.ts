@@ -2912,6 +2912,28 @@ const SYSCALLS = [
   },
 
   {
+    name: 'Neo.Contract.Create',
+    result: [new ContractStackItem(transactions.novemContract)],
+    args: [
+      transactions.novemContract.script,
+      Buffer.from([...transactions.novemContract.parameterList]),
+      transactions.novemContract.returnType,
+      transactions.novemContract.contractProperties,
+      transactions.novemContract.name,
+      transactions.novemContract.codeVersion,
+      transactions.novemContract.author,
+      transactions.novemContract.email,
+      transactions.novemContract.description,
+    ],
+
+    mock: ({ blockchain }) => {
+      blockchain.contract.tryGet = jest.fn(async () => Promise.resolve());
+      blockchain.contract.add = jest.fn(async () => Promise.resolve());
+    },
+    gas: common.FIVE_HUNDRED_FIXED8,
+  },
+
+  {
     name: 'Neo.Contract.Migrate',
     result: [new ContractStackItem(transactions.kycContract)],
     args: [

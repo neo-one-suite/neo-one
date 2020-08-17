@@ -15,7 +15,12 @@ import {
   UInt160,
   UInt256,
 } from '@neo-one/client-common';
-import { assertContractPropertyState, HasDynamicInvoke, HasStorage } from '@neo-one/client-full-common';
+import {
+  assertContractPropertyState,
+  ContractPropertyStateModel,
+  HasDynamicInvoke,
+  HasStorage,
+} from '@neo-one/client-full-common';
 import {
   Account,
   assertAssetType,
@@ -241,7 +246,17 @@ const createContract = async ({
 
   const returnType = assertContractParameterType(args[2].asBigIntegerUnsafe().toNumber());
 
-  const contractProperties = assertContractPropertyState(args[3].asBigIntegerUnsafe().toNumber());
+  // const contractProperties = assertContractPropertyState(args[3].asBigIntegerUnsafe().toNumber());
+  let contractProperties: ContractPropertyStateModel;
+  try {
+    contractProperties = assertContractPropertyState(args[3].asBigIntegerUnsafe().toNumber());
+  } catch (e) {
+    if (e.code === 'INVALID_CONTRACT_PROPERTY_STATE') {
+      contractProperties = ContractPropertyStateModel.HasStorageDynamicInvoke;
+    } else {
+      throw e;
+    }
+  }
 
   const name = args[4].asString();
   const codeVersion = args[5].asString();
@@ -285,7 +300,17 @@ const checkStorage = async ({ context, hash }: { readonly context: ExecutionCont
 function getContractFee<T>(func: (args: CreateSysCallArgs, fee: BN) => T): (args: CreateSysCallArgs) => T {
   return (args) => {
     const { context: contextIn } = args;
-    const contractProperties = assertContractPropertyState(contextIn.stack[3].asBigIntegerUnsafe().toNumber());
+    // const contractProperties = assertContractPropertyState(contextIn.stack[3].asBigIntegerUnsafe().toNumber());
+    let contractProperties: ContractPropertyStateModel;
+    try {
+      contractProperties = assertContractPropertyState(contextIn.stack[3].asBigIntegerUnsafe().toNumber());
+    } catch (e) {
+      if (e.code === 'INVALID_CONTRACT_PROPERTY_STATE') {
+        contractProperties = ContractPropertyStateModel.HasStorageDynamicInvoke;
+      } else {
+        throw e;
+      }
+    }
 
     let fee = common.ONE_HUNDRED_FIXED8;
 
