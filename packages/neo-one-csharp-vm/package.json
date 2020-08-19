@@ -13,7 +13,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/edge": "^15.0.0",
-    "@neo-one/node-core": "^2.7.0",
+    "@neo-one/csharp-core": "^2.7.0",
     "@neo-one/client-common": "^2.7.0",
     "bn.js": "^5.0.0"
   },

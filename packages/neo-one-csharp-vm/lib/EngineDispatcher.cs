@@ -47,15 +47,17 @@ namespace NEOONE
                 case "getresultstack":
                     return this._getResultStack();
 
+                case "getgasconsumed":
+                    return this._getGasConsumed();
+
                 // application engine methods
                 case "execute":
                     return this._execute();
 
                 case "loadscript":
                     byte[] rawBytes = (byte[])input.args.script;
-                    int scriptPosition = (int)input.args.position;
                     var script = new Script(rawBytes);
-                    return this._loadScript(script, scriptPosition);
+                    return this._loadScript(script);
 
                 // execution engine methods
                 case "loadclonedcontext":
@@ -74,7 +76,8 @@ namespace NEOONE
 
                 // internal testing
                 case "test":
-                    return this._test();
+                    long test = (long)input.args.test;
+                    return this._test(test);
 
                 default:
                     throw new InvalidOperationException($"'{method}' is not a valid method");
@@ -109,6 +112,12 @@ namespace NEOONE
             return this.engine.State;
         }
 
+        private long _getGasConsumed()
+        {
+            this.isInitialized();
+            return this.engine.GasConsumed;
+        }
+
         private VMState _execute()
         {
             this.isInitialized();
@@ -121,7 +130,7 @@ namespace NEOONE
             return this.engine.LoadClonedContext(initialPosition);
         }
 
-        private bool _loadScript(Script script, int initialPosition)
+        private bool _loadScript(Script script)
         {
             this.isInitialized();
             this.engine.LoadScript(script);
@@ -140,11 +149,10 @@ namespace NEOONE
             return this.engine.Pop();
         }
 
-        private dynamic _test()
+        private dynamic _test(long test)
         {
-            var entry = Assembly.GetEntryAssembly();
-
-            return entry;
+            long maxVerificationGas = 0_50000000;
+            return maxVerificationGas;
         }
 
         private bool _dispose()

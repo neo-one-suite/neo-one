@@ -1,4 +1,4 @@
-import { StackItemType } from './StackItemType';
+import { StackItemType } from '@neo-one/csharp-core';
 
 export interface StackItemReturnBase {
   readonly Type: keyof typeof StackItemType;
@@ -23,7 +23,7 @@ export interface BooleanStackItemReturn extends StackItemReturnBase {
 
 export interface IntegerStackItemReturn extends StackItemReturnBase {
   readonly Type: 'Integer';
-  readonly value: string | number; // it might just be one?
+  readonly value: string | number; // TODO: it might just be one?
   readonly Size: number;
 }
 

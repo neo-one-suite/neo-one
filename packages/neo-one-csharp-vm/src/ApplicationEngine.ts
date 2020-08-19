@@ -1,21 +1,37 @@
+import { common } from '@neo-one/client-common';
+import { CallFlags, TriggerType, Verifiable } from '@neo-one/csharp-core';
+import { BN } from 'bn.js';
 import _ from 'lodash';
 import { convertEngineOptions } from './converters';
 import { createEngineDispatcher } from './createEngineDispatcher';
 import { parse as parseStackItems } from './StackItems';
-import { EngineOptions } from './types';
+
+export interface EngineOptions {
+  readonly trigger: TriggerType;
+  readonly container?: Verifiable;
+  readonly snapshot?: boolean;
+  readonly gas: number;
+  readonly testMode?: boolean;
+}
 
 export class ApplicationEngine {
-  // getters
   public get trigger() {
     return this.engineDispatcher({
       method: 'gettrigger',
     });
   }
 
+  // TODO: make sure the fixed8 numbers are the same between c# and what I'm inputting (just for ease of mind);
   public get gasConsumed() {
-    return this.engineDispatcher({
-      method: 'getgasconsumed',
-    });
+    return common
+      .fixed8ToDecimal(
+        new BN(
+          this.engineDispatcher({
+            method: 'getgasconsumed',
+          }),
+        ),
+      )
+      .toNumber();
   }
 
   public get gasLeft() {
@@ -89,12 +105,12 @@ export class ApplicationEngine {
     });
   }
 
-  public loadScript(script: Buffer, position = 0) {
+  public loadScript(script: Buffer, callFlags = CallFlags.None) {
     return this.engineDispatcher({
       method: 'loadscript',
       args: {
         script,
-        position,
+        callFlags,
       },
     });
   }
@@ -103,11 +119,6 @@ export class ApplicationEngine {
     return this.engineDispatcher({
       method: 'checkscript',
     });
-  }
-
-  // not sure if we need this one?
-  public loadScriptWithFlags() {
-    // not implemented
   }
 
   // - start - some ExecutionEngine method definitions we might need under the hood
@@ -133,9 +144,12 @@ export class ApplicationEngine {
     });
   }
 
-  public test() {
+  public test(value: BN) {
     return this.engineDispatcher({
       method: 'test',
+      args: {
+        test: value.toNumber(),
+      },
     });
   }
 }

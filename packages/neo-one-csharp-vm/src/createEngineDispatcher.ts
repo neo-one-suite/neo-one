@@ -1,5 +1,5 @@
 import { UInt160, VMState } from '@neo-one/client-common';
-import { TriggerType } from '@neo-one/node-core';
+import { CallFlags, TriggerType } from '@neo-one/csharp-core';
 import path from 'path';
 import { constants } from './constants';
 import { convertEngineOptions } from './converters';
@@ -7,8 +7,10 @@ import { createCSharpDispatchInvoke, DefaultMethods, DispatchMethod } from './di
 import { StackItemReturn } from './StackItems';
 import { ExecutionContext } from './types';
 
-// tslint:disable-next-line
-type Notifications = any;
+interface LoadScriptArgs {
+  readonly script: Buffer;
+  readonly callFlags: CallFlags;
+}
 
 interface ExecutionEngineMethods extends DefaultMethods {
   // constructor
@@ -26,7 +28,8 @@ interface ExecutionEngineMethods extends DefaultMethods {
   // methods
   readonly execute: DispatchMethod<keyof typeof VMState>;
   readonly loadclonedcontext: DispatchMethod<ExecutionContext, { readonly position: number }>;
-  readonly loadscript: DispatchMethod<boolean, { readonly script: Buffer; readonly position: number }>;
+  readonly loadscript: DispatchMethod<boolean, LoadScriptArgs>;
+  // misc
   readonly peek: DispatchMethod<StackItemReturn, { readonly index: number }>;
   readonly pop: DispatchMethod<StackItemReturn>;
   readonly dispose: DispatchMethod<boolean>;

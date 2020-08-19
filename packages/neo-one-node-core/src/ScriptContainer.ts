@@ -1,7 +1,7 @@
 import { Block } from './Block';
 import { InvalidScriptContainerTypeError } from './errors';
 import { ConsensusPayload } from './payload';
-import { Transaction } from './transaction';
+import { Transaction } from './transaction/Transaction';
 
 export enum ScriptContainerType {
   Transaction = 0x00,

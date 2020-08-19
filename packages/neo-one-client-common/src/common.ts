@@ -217,7 +217,7 @@ const ONE_HUNDRED_MILLION_FIXED8 = fixed8FromDecimal(100000000);
 
 export const common = {
   D8,
-  NEO_ADDRESS_VERSION: 23,
+  NEO_ADDRESS_VERSION: 0x35,
   NEO_PRIVATE_KEY_VERSION: 0x80,
   GROUPING_SIZE_BYTES: 16, // TODO: remove? added by Dan?
   MAX_CONTRACT_STRING: 252, // TODO: remove? added by Dan?

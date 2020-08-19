@@ -1,14 +1,14 @@
 import { ScriptBuilder } from '@neo-one/client-common';
-import { TriggerType } from '@neo-one/node-core';
+import { TriggerType } from '@neo-one/csharp-core';
 import { withApplicationEngine } from '../ApplicationEngine';
 
 describe('ApplicationEngine test', () => {
-  test('NOP Script -- Halt', () => {
+  test('withApplicationEngine -- NOP Script -- Halt', () => {
     const state = withApplicationEngine(
       {
         trigger: TriggerType.Application,
         testMode: true,
-        gas: 100_000_000,
+        gas: 1,
       },
       (engine) => {
         const initState = engine.state;

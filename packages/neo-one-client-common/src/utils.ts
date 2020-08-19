@@ -53,6 +53,18 @@ function lazy<Value>(getValue: () => Value): () => Value {
   };
 }
 
+function lazyInput<Value, Input>(getValue: (input: Input) => Value): (input: Input) => Value {
+  let value: Value | undefined;
+
+  return (input) => {
+    if (value === undefined) {
+      value = getValue(input);
+    }
+
+    return value;
+  };
+}
+
 const randomUInt = (): number => Math.floor(Math.random() * UINT_MAX_NUMBER);
 
 export const utils = {
@@ -84,5 +96,6 @@ export const utils = {
   fromSignedBuffer,
   bigNumberToBN,
   lazy,
+  lazyInput,
   randomUInt,
 };

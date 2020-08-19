@@ -1,5 +1,4 @@
-import { IOHelper, JSONHelper, WitnessJSON, WitnessModel } from '@neo-one/client-common';
-import { Equals, EquatableKey } from './Equatable';
+import { crypto, IOHelper, JSONHelper, WitnessJSON, WitnessModel } from '@neo-one/client-common';
 import {
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
@@ -13,12 +12,20 @@ export interface WitnessAdd {
   readonly invocation: Buffer;
 }
 
-export class Witness extends WitnessModel implements SerializableJSON<WitnessJSON>, EquatableKey {
-  public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): Witness {
-    const invocation = reader.readVarBytesLE(utils.USHORT_MAX_NUMBER_PLUS_ONE);
-    const verification = reader.readVarBytesLE(utils.USHORT_MAX_NUMBER_PLUS_ONE);
+// TODO: put these somewhere else https://github.com/neo-project/neo/blob/master/src/neo/Network/P2P/Payloads/Witness.cs
+const invocationSize = 663;
+const verificationSize = 361;
 
-    return new this({ invocation, verification });
+export class Witness extends WitnessModel implements SerializableJSON<WitnessJSON> {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): Witness {
+    const { reader } = options;
+    const invocation = reader.readVarBytesLE(invocationSize);
+    const verification = reader.readVarBytesLE(verificationSize);
+
+    return new Witness({
+      invocation,
+      verification,
+    });
   }
 
   public static deserializeWire(options: DeserializeWireOptions): Witness {
@@ -28,24 +35,16 @@ export class Witness extends WitnessModel implements SerializableJSON<WitnessJSO
     });
   }
 
-  public static fromModel(witness: WitnessModel): Witness {
-    return new this({ invocation: witness.invocation, verification: witness.verification });
-  }
-
-  public readonly equals: Equals = utils.equals(
-    Witness,
-    this,
-    (other) => this.invocation.equals(other.invocation) && this.verification.equals(other.verification),
-  );
-  public readonly toKeyString = utils.toKeyString(
-    Witness,
-    () => `${this.invocation.toString('hex')}:${this.verification.toString('hex')}`,
-  );
   private readonly sizeInternal = utils.lazy(
     () => IOHelper.sizeOfVarBytesLE(this.invocation) + IOHelper.sizeOfVarBytesLE(this.verification),
   );
+  private readonly scriptHashInternal = utils.lazy(() => crypto.hash160(this.verification));
 
-  public get size(): number {
+  public get scriptHash() {
+    return this.scriptHashInternal();
+  }
+
+  public get size() {
     return this.sizeInternal();
   }
 

@@ -1,13 +1,11 @@
 // tslint:disable no-object-mutation no-dynamic-delete
-import { common, UInt256 } from '@neo-one/client-common';
+import { common } from '@neo-one/client-common';
 import {
   AddChange,
   Block,
   Change,
   ChangeSet,
   DeleteChange,
-  Output,
-  OutputKey,
   ReadAllStorage,
   ReadGetAllStorage,
   ReadMetadataStorage,
@@ -16,6 +14,7 @@ import {
 import { utils as commonUtils } from '@neo-one/utils';
 import { concat, defer, EMPTY, Observable, of as _of } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
+
 type TrackedChange<Key, AddValue, Value> =
   | { readonly type: 'add'; readonly addValue: AddValue; readonly value: Value; readonly subType: 'add' | 'update' }
   | { readonly type: 'delete'; readonly key: Key };
@@ -729,44 +728,6 @@ export class BlockLikeStorageCache<Value extends BlockLike> extends BaseReadStor
   }
 }
 
-interface OutputValue {
-  readonly hash: UInt256;
-  readonly index: number;
-  readonly output: Output;
-}
-
-const getOutputValueKeyString = (key: OutputKey): string => `${common.uInt256ToHex(key.hash)}:${key.index}`;
-
-export class OutputStorageCache extends ReadStorageCache<OutputKey, OutputValue, Output> {
-  public readonly add: AddFunc<OutputValue>;
-
-  public constructor(readStorage: () => ReadStorage<OutputKey, Output>) {
-    super({
-      readStorage,
-      name: 'output',
-      getKeyString: getOutputValueKeyString,
-      createAddChange: (value: OutputValue) => ({ type: 'output', value }),
-    });
-
-    this.add = async (value: OutputValue): Promise<void> => {
-      const key = { hash: value.hash, index: value.index };
-
-      const currentValue = await this.tryGet(key);
-      if (currentValue !== undefined) {
-        throw new Error(
-          `Attempted to add an already existing object for key ` + `${this.name}:${this.getKeyString(key)}.`,
-        );
-      }
-
-      this.mutableValues[this.getKeyString(key)] = {
-        type: 'add',
-        addValue: value,
-        value: value.output,
-        subType: 'add',
-      };
-    };
-  }
-}
 type TrackedMetadataChange<AddValue, Value> =
   | { readonly type: 'add'; readonly addValue: AddValue; readonly value: Value; readonly subType: 'add' | 'update' }
   | { readonly type: 'delete' };

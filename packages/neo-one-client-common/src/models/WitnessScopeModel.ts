@@ -41,14 +41,15 @@ export const assertWitnessScopeJSON = (value: string): WitnessScopeJSON => {
 export const toWitnessScope = (value: WitnessScopeJSON): WitnessScopeModel =>
   assertWitnessScope(WitnessScopeModel[value]);
 
-export const witnessScopeHasFlag = (value: keyof typeof WitnessScopeModel, flag: keyof typeof WitnessScopeModel) => {
-  if ((value === 'Global' && flag !== 'Global') || (value !== 'Global' && flag === 'Global')) {
+export const witnessScopeHasFlag = (value: WitnessScopeModel, flag: WitnessScopeModel) => {
+  if (
+    (value === WitnessScopeModel.Global && flag !== WitnessScopeModel.Global) ||
+    (value !== WitnessScopeModel.Global && flag === WitnessScopeModel.Global)
+  ) {
     return false;
   }
-  const valueHex = toWitnessScope(value);
-  const flagHex = toWitnessScope(flag);
   // tslint:disable-next-line: no-bitwise
-  if ((valueHex & flagHex) === flagHex) {
+  if ((value & flag) === flag) {
     return true;
   }
 

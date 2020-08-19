@@ -1,12 +1,12 @@
-import {
-  SerializableWire,
-  SerializableJSON,
-  DeserializeWireBaseOptions,
-  SerializeWire,
-  createSerializeWire,
-} from './Serializable';
-import { ConsensusDataJSON, BinaryWriter, IOHelper, crypto, UInt256 } from '@neo-one/client-common';
+import { BinaryWriter, ConsensusDataJSON, crypto, IOHelper, UInt256 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
+import {
+  createSerializeWire,
+  DeserializeWireBaseOptions,
+  SerializableJSON,
+  SerializableWire,
+  SerializeWire,
+} from './Serializable';
 import { utils } from './utils';
 
 // TODO: could put this somewhere else it is possible it changes?

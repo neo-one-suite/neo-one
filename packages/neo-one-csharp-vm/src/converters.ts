@@ -2,25 +2,18 @@
 our converters are in the same state as our types, only temporary while
 we flesh out what will need to be converted going from c# to JS / from neo3 to NEO•ONE
 */
-import { EngineOptions, Gas, StoreView, Verifiable } from './types';
+import { common } from '@neo-one/client-common';
+import { Verifiable } from '@neo-one/csharp-core';
+import { EngineOptions } from './ApplicationEngine';
+// tslint:disable: no-null-keyword
 
-// TODO: implement this with BigNumber eventually
-export const convertGas = (gas: Gas) => gas;
+// TODO implement container conversion in the EngineDispatcher
+export const convertContainer = (_container: Verifiable) => null;
 
-// TODO
-export const convertSnapshot = (_snapshot: StoreView) => _snapshot;
-
-// TODO
-export const convertContainer = (_container: Verifiable) => {
-  throw new Error('not implemented');
-};
-
-// tslint:disable
 export const convertEngineOptions = (options: EngineOptions) => ({
   trigger: options.trigger,
   container: options.container === undefined ? null : convertContainer(options.container),
-  snapshot: options.snapshot === undefined ? null : convertSnapshot(options.snapshot),
-  gas: convertGas(options.gas),
+  snapshot: options.snapshot === undefined ? false : options.snapshot,
+  gas: common.fixed8FromDecimal(options.gas.toString()).toNumber(),
   testMode: options.testMode,
 });
-// tslint:enable

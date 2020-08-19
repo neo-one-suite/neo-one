@@ -1,11 +1,16 @@
 import { common, ScriptBuilder } from '@neo-one/client-common';
-import { Block, ConsensusData, TriggerType, Witness } from '@neo-one/node-core';
+import {
+  Block,
+  ByteStringStackItem,
+  ConsensusData,
+  IntegerStackItem,
+  TriggerType,
+  Witness,
+} from '@neo-one/csharp-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { ApplicationEngine } from '../ApplicationEngine';
-import { ByteStringStackItem, IntegerStackItem } from '../StackItems';
 
-// tslint:disable: no-array-mutation
 describe('Application Engine SysCall Tests', () => {
   let engine: ApplicationEngine;
   let script: ScriptBuilder;
@@ -102,7 +107,7 @@ describe('Application Engine SysCall Tests', () => {
   test('System.Callback.Invoke -- Halt', () => {
     engine = new ApplicationEngine({
       trigger: TriggerType.Application,
-      gas: 100_000_000,
+      gas: 1,
       testMode: false,
     });
 
@@ -133,7 +138,7 @@ describe('Application Engine SysCall Tests', () => {
   test('System.Callback.CreateFromSyscall -- Halt', () => {
     engine = new ApplicationEngine({
       trigger: TriggerType.Application,
-      gas: 100_000_000,
+      gas: 1,
       testMode: false,
     });
 
@@ -170,7 +175,12 @@ describe('Application Engine SysCall Tests', () => {
     });
 
     test('With Snapshot option -- Halt', () => {
-      engine = new ApplicationEngine({ trigger: TriggerType.Application, snapshot: true, gas: 0, testMode: true });
+      engine = new ApplicationEngine({
+        trigger: TriggerType.Application,
+        snapshot: true,
+        gas: 0,
+        testMode: true,
+      });
       script.emitPushUInt256(block.hash);
       script.emitSysCall('System.Blockchain.GetBlock');
 

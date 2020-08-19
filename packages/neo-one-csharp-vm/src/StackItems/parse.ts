@@ -1,5 +1,5 @@
+import { PrimitiveStackItem, StackItem } from '@neo-one/csharp-core';
 import { BN } from 'bn.js';
-import { PrimitiveStackItem, StackItem } from './StackItem';
 import { PrimitiveStackItemReturn, StackItemReturn } from './StackItemReturn';
 
 export const parse = (stack: readonly StackItemReturn[]): readonly StackItem[] => stack.map(parseStackItem);

@@ -178,13 +178,12 @@ export interface WitnessJSON {
 export interface SignerJSON {
   readonly account: string;
   readonly scopes: WitnessScopeJSON;
-  readonly allowedContracts?: readonly string[];
-  readonly allowedGroups?: readonly string[];
+  readonly allowedcontracts?: readonly string[];
+  readonly allowedgroups?: readonly string[];
 }
 
 export interface AttributeJSON {
   readonly type: AttributeTypeJSON;
-  readonly allowMultiple: boolean;
 }
 
 export type AttributeTypeJSON = keyof typeof AttributeTypeModel;
@@ -209,9 +208,9 @@ export interface TransactionJSON {
   readonly version: number;
   readonly nonce: number;
   readonly sender: string;
-  readonly sys_fee: string;
-  readonly net_fee: string;
-  readonly valid_until_block: number;
+  readonly sysfee: string;
+  readonly netfee: string;
+  readonly validuntilblock: number;
   readonly attributes: readonly AttributeJSON[];
   readonly signers: readonly SignerJSON[];
   readonly script: string;
@@ -287,6 +286,8 @@ export interface BlockBaseJSON {
   readonly index: number;
   readonly nextconsensus: string;
   readonly witnesses: readonly WitnessJSON[];
+  // TODO: confirmations: number;
+  // TODO: nextblockhash?: string;
 }
 
 export interface ConsensusDataJSON {

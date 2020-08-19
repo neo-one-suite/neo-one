@@ -10,17 +10,21 @@ import {
   UInt256,
   UInt256Hex,
 } from '@neo-one/client-common';
+import { ContractModel } from '@neo-one/client-full-common';
 import { BN } from 'bn.js';
 import { Equals, EquatableKey } from './Equatable';
 import { UnsignedBlockError } from './errors';
-import { Header, HeaderKey } from './Header';
-import { createSerializeWire, DeserializeWireBaseOptions, SerializeJSONContext, SerializeWire } from './Serializable';
+import { Header } from './Header';
+import {
+  createSerializeWire,
+  DeserializeWireBaseOptions,
+  DeserializeWireOptions,
+  SerializeJSONContext,
+  SerializeWire,
+} from './Serializable';
 import { utils } from './utils';
+import { SnapshotMethods } from './Verifiable';
 import { Witness } from './Witness';
-
-export interface BlockGetScriptHashesForVerifyingOptions {
-  readonly getHeader: (key: HeaderKey) => Promise<Header>;
-}
 
 export interface BlockBaseAdd {
   readonly version?: number;
@@ -34,15 +38,10 @@ export interface BlockBaseAdd {
 }
 
 export abstract class BlockBase implements EquatableKey {
-  public static deserializeBlockBaseWireBase(options: DeserializeWireBaseOptions): BlockBaseAdd {
-    const {
-      version,
-      previousHash,
-      merkleRoot,
-      timestamp,
-      index,
-      nextConsensus,
-    } = this.deserializeBlockBaseWireBaseUnsigned(options);
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): BlockBaseAdd {
+    const { version, previousHash, merkleRoot, timestamp, index, nextConsensus } = this.deserializeWireBaseUnsigned(
+      options,
+    );
     const { reader } = options;
 
     const witnesses = reader.readArray(() => Witness.deserializeWireBase(options));
@@ -60,7 +59,7 @@ export abstract class BlockBase implements EquatableKey {
       witness: witnesses[0],
     };
   }
-  public static deserializeBlockBaseWireBaseUnsigned(options: DeserializeWireBaseOptions): BlockBaseAdd {
+  public static deserializeWireBaseUnsigned(options: DeserializeWireBaseOptions): BlockBaseAdd {
     const { reader } = options;
 
     const version = reader.readUInt32LE();
@@ -86,24 +85,24 @@ export abstract class BlockBase implements EquatableKey {
   public readonly timestamp: BN;
   public readonly index: number;
   public readonly nextConsensus: UInt160;
+  public readonly getScriptHashesForVerifying = utils.lazyAsync(async ({ tryGetHeader }: SnapshotMethods) => {
+    if (this.previousHash === common.ZERO_UINT256) {
+      return [this.witness.scriptHash];
+    }
+
+    const prevHeader = await tryGetHeader(this.previousHash);
+    if (prevHeader === undefined) {
+      // TODO: implement this as a makeError InvalidStorageHeaderFetch
+      throw new Error(`previous header hash ${this.previousHash} did not return a valid Header from storage`);
+    }
+
+    return [prevHeader.nextConsensus];
+  });
   // tslint:disable-next-line no-any
   public readonly equals: Equals = utils.equals(this.constructor as any, this, (other: any) =>
     common.uInt256Equal(this.hash, other.hash),
   );
   public readonly toKeyString = utils.toKeyString(BlockBase, () => this.hashHex);
-  // public readonly getScriptHashesForVerifying = utils.lazyAsync(
-  //   async ({ getHeader }: BlockGetScriptHashesForVerifyingOptions) => {
-  //     if (this.index === 0) {
-  //       return new Set([common.uInt160ToHex(crypto.toScriptHash(this.witness.verification))]);
-  //     }
-
-  //     const previousHeader = await getHeader({
-  //       hashOrIndex: this.previousHash,
-  //     });
-
-  //     return new Set([common.uInt160ToHex(previousHeader.nextConsensus)]);
-  //   },
-  // );
   public readonly serializeUnsigned: SerializeWire = createSerializeWire(this.serializeUnsignedBase.bind(this));
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly hashInternal: () => UInt256;
@@ -200,6 +199,23 @@ export abstract class BlockBase implements EquatableKey {
       witnesses: [this.witness.serializeJSON(context)],
       // confirmations: [] TODO: this is a property we used to use, do we still need?
     };
+  }
+
+  public async verify(options: SnapshotMethods) {
+    const prevHeader = await options.tryGetHeader(this.previousHash);
+    if (prevHeader === undefined) {
+      return false;
+    }
+
+    if (prevHeader.index + 1 !== this.index) {
+      return false;
+    }
+
+    if (prevHeader.timestamp.gte(this.timestamp)) {
+      return false;
+    }
+
+    return this.verifyWitnesses(options, utils.ONE_HUNDRED_MILLION);
   }
 
   protected readonly sizeExclusive: () => number = () => 0;
