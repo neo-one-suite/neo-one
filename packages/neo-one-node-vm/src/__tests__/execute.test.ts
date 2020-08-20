@@ -57,7 +57,7 @@ describe('execute', () => {
 
   const expectFailure = (result: ExecuteScriptsResult) => {
     expect(result.errorMessage).toBeUndefined();
-    expect(result.state).toEqual(VMState.Halt);
+    expect(result.state).toEqual(VMState.HALT);
     expect(result.stack.length).toEqual(1);
     expect(result.stack[0].asBoolean()).toBeFalsy();
     expect(result.gasConsumed.toString(10)).toMatchSnapshot();
@@ -69,14 +69,14 @@ describe('execute', () => {
     if (result.errorMessage !== undefined) {
       expect(result.errorMessage.split('\n')[0]).toMatchSnapshot();
     }
-    expect(result.state).toEqual(VMState.Fault);
+    expect(result.state).toEqual(VMState.FAULT);
     expect(result.gasConsumed.toString(10)).toMatchSnapshot();
     testUtils.verifyBlockchainSnapshot(blockchain);
   };
 
   const expectSuccess = (result: ExecuteScriptsResult) => {
     expect(result.errorMessage).toBeUndefined();
-    expect(result.state).toEqual(VMState.Halt);
+    expect(result.state).toEqual(VMState.HALT);
     expect(result.stack.length).toEqual(1);
     expect(result.stack[0].asBoolean()).toBeTruthy();
     expect(result.gasConsumed.toString(10)).toMatchSnapshot();
@@ -88,7 +88,7 @@ describe('execute', () => {
       throw new Error(result.errorMessage);
     }
 
-    if (result.state !== VMState.Halt) {
+    if (result.state !== VMState.HALT) {
       throw new Error(`Ended in ${result.state}`);
     }
 
@@ -144,7 +144,7 @@ describe('execute', () => {
         gas,
       });
 
-      if (state === VMState.Fault) {
+      if (state === VMState.FAULT) {
         const { errorMessage } = result;
         expect(errorMessage).toBeDefined();
         if (errorMessage !== undefined) {
@@ -160,9 +160,9 @@ describe('execute', () => {
     });
   };
 
-  testKYC('should fail kyc transaction with insufficient gas', utils.ZERO, VMState.Fault);
+  testKYC('should fail kyc transaction with insufficient gas', utils.ZERO, VMState.FAULT);
 
-  testKYC('should not fail kyc transaction with sufficient gas', common.ONE_HUNDRED_MILLION_FIXED8, VMState.Halt);
+  testKYC('should not fail kyc transaction with sufficient gas', common.ONE_HUNDRED_MILLION_FIXED8, VMState.HALT);
 
   test('should refund on mintTokens with insufficient presale', async () => {
     blockchain.contract.get = jest.fn(async () => Promise.resolve(transactions.kycContract));
@@ -198,7 +198,7 @@ describe('execute', () => {
     });
 
     expect(result.errorMessage).toBeUndefined();
-    expect(result.state).toEqual(VMState.Halt);
+    expect(result.state).toEqual(VMState.HALT);
     expect(result.gasConsumed.toString(10)).toMatchSnapshot();
     testUtils.verifyBlockchainSnapshot(blockchain);
     testUtils.verifyListeners(listeners);

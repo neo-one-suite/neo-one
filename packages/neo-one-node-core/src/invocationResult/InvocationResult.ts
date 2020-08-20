@@ -9,9 +9,9 @@ export const deserializeInvocationResultWireBase = (options: DeserializeWireBase
   const { reader } = options;
   const state = assertVMState(reader.clone().readUInt8());
   switch (state) {
-    case VMState.Fault:
+    case VMState.FAULT:
       return InvocationResultError.deserializeWireBase(options);
-    case VMState.Halt:
+    case VMState.HALT:
       return InvocationResultSuccess.deserializeWireBase(options);
     default:
       throw new Error('Invalid VM state');

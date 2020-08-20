@@ -252,7 +252,7 @@ const createInvocationScript = (message: Buffer, privateKey: PrivateKey): Buffer
 const createVerificationScript = (publicKey: ECPoint): Buffer => {
   const builder = new ScriptBuilder();
   builder.emitPushECPoint(publicKey);
-  builder.emitSysCall('Neo.Crypto.VerifyWithECDsaSecp256r1'); // TODO: check
+  builder.emitSysCall('Neo.Crypto.VerifyWithECDsaSecp256r1');
 
   return builder.build();
 };
@@ -311,7 +311,7 @@ const createMultiSignatureVerificationScript = (mIn: number, publicKeys: readonl
     builder.emitPushECPoint(ecPoint);
   });
   builder.emitPushInt(publicKeysSorted.length);
-  builder.emitSysCall('Neo.Crypto.CheckMultisigWithECDsaSecp256r1'); // TODO: check
+  builder.emitSysCall('Neo.Crypto.CheckMultisigWithECDsaSecp256r1');
 
   return builder.build();
 };

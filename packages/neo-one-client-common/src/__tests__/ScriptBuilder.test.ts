@@ -2,7 +2,7 @@ import { BN } from 'bn.js';
 import { Op } from '../models/vm';
 import { ScriptBuilder } from '../ScriptBuilder';
 
-describe('Scripter Builder Tests', () => {
+describe('Script Builder Tests', () => {
   let builder: ScriptBuilder;
 
   beforeEach(() => {

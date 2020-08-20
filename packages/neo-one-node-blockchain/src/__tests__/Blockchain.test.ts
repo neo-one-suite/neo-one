@@ -1,12 +1,6 @@
 // tslint:disable no-any no-object-mutation
-import { common, utils } from '@neo-one/client-common';
-import {
-  AttributeUsage,
-  BooleanContractParameter,
-  InvocationTransaction,
-  UInt160Attribute,
-  Witness,
-} from '@neo-one/node-core';
+import { BooleanContractParameter, Transaction, Witness } from '@neo-one/node-core';
+import { BN } from 'bn.js';
 import { of as _of } from 'rxjs';
 import { settings } from '../__data__';
 import { Blockchain } from '../Blockchain';
@@ -118,27 +112,22 @@ describe('Blockchain', () => {
   describe('verifyTransaction', () => {
     test('should throw error on invalid script', async () => {
       const blockchain = await createBlockchain({ vm, storage });
-      vm.executeScripts = jest.fn(() => ({
-        stack: [new BooleanContractParameter(false)],
-      }));
 
       const result = await blockchain.verifyTransaction({
-        transaction: new InvocationTransaction({
+        transaction: new Transaction({
           script: Buffer.alloc(1, 0),
-          gas: utils.ZERO,
-          attributes: [
-            new UInt160Attribute({
-              usage: AttributeUsage.Script,
-              value: common.ZERO_UINT160,
-            }),
-          ],
+          attributes: [],
 
-          scripts: [
+          witnesses: [
             new Witness({
               invocation: Buffer.alloc(0, 0),
               verification: Buffer.alloc(0, 0),
             }),
           ],
+          systemFee: new BN(0),
+          networkFee: new BN(0),
+          validUntilBlock: 100000,
+          nonce: 0,
         }),
       });
       const verifyResult = result.verifications.find(({ failureMessage }) => failureMessage !== undefined);

@@ -70,7 +70,7 @@ export class NEODataProvider extends DataProviderBase {
     if (result.state === 'HALT') {
       return convertCallReceipt({
         result: {
-          state: VMState.Halt,
+          state: VMState.HALT,
           gas_consumed: gasConsumed,
           gas_cost: result.gas_consumed,
           stack: result.stack,
@@ -81,7 +81,7 @@ export class NEODataProvider extends DataProviderBase {
 
     return convertCallReceipt({
       result: {
-        state: VMState.Fault,
+        state: VMState.FAULT,
         gas_consumed: gasConsumed,
         gas_cost: result.gas_consumed,
         stack: result.stack,

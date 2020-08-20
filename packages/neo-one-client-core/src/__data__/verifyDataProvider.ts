@@ -49,7 +49,7 @@ const verifyInvocationResultSuccess = (
 ) => {
   if (
     invocationResult.state !== 'HALT' ||
-    (invocationResultJSON.state !== VMState.Halt && invocationResultJSON.state !== 'HALT')
+    (invocationResultJSON.state !== VMState.HALT && invocationResultJSON.state !== 'HALT')
   ) {
     throw new Error('For TS');
   }

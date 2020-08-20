@@ -107,6 +107,24 @@
       "versionPolicyName": "CoreReleasePolicy"
     },
     {
+      "packageName": "@neo-one/csharp-blockchain",
+      "projectFolder": "packages/neo-one-csharp-blockchain",
+      "reviewCategory": "production",
+      "versionPolicyName": "CoreReleasePolicy"
+    },
+    {
+      "packageName": "@neo-one/csharp-core",
+      "projectFolder": "packages/neo-one-csharp-core",
+      "reviewCategory": "production",
+      "versionPolicyName": "CoreReleasePolicy"
+    },
+    {
+      "packageName": "@neo-one/csharp-vm",
+      "projectFolder": "packages/neo-one-csharp-vm",
+      "reviewCategory": "production",
+      "versionPolicyName": "CoreReleasePolicy"
+    },
+    {
       "packageName": "@neo-one/developer-tools",
       "projectFolder": "packages/neo-one-developer-tools",
       "reviewCategory": "production",

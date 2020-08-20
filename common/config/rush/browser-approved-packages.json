@@ -199,6 +199,14 @@
       "allowedCategories": [ "production", "tools", "web" ]
     },
     {
+      "name": "@neo-one/csharp-core",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/csharp-vm",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@neo-one/developer-tools",
       "allowedCategories": [ "production" ]
     },
@@ -208,6 +216,10 @@
     },
     {
       "name": "@neo-one/ec-key",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@neo-one/edge",
       "allowedCategories": [ "production" ]
     },
     {
@@ -605,6 +617,10 @@
     {
       "name": "dgeni-packages",
       "allowedCategories": [ "web" ]
+    },
+    {
+      "name": "edge-js",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "elliptic",

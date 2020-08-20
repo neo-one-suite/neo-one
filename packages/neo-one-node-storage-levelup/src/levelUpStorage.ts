@@ -9,7 +9,6 @@ import {
   BlockKey,
   Contract,
   deserializeActionWire,
-  deserializeTransactionWire,
   DeserializeWireContext,
   Header,
   HeaderKey,

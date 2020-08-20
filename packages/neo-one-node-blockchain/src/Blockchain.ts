@@ -7,19 +7,14 @@ import {
   CallReceipt,
   ConsensusPayload,
   Header,
-  Input,
-  InvocationTransaction,
   LogAction,
   NotificationAction,
   NULL_ACTION,
-  Output,
-  OutputKey,
   ScriptContainerType,
   SerializableInvocationData,
   Settings,
   Storage,
   Transaction,
-  TransactionData,
   TriggerType,
   utils,
   Validator,
@@ -56,13 +51,6 @@ export interface BlockchainOptions extends CreateBlockchainOptions {
   readonly currentBlock: BlockchainType['currentBlock'] | undefined;
   readonly previousBlock: BlockchainType['previousBlock'] | undefined;
   readonly currentHeader: BlockchainType['currentHeader'] | undefined;
-}
-
-interface SpentCoin {
-  readonly output: Output;
-  readonly startHeight: number;
-  readonly endHeight: number;
-  readonly claimed: boolean;
 }
 
 interface Entry {
@@ -378,8 +366,6 @@ export class Blockchain {
   }): Promise<VerifyTransactionResult> {
     try {
       const verifications = await transaction.verify({
-        calculateClaimAmount: this.calculateClaimAmount,
-        isSpent: this.isSpent,
         getAsset: this.asset.get,
         getOutput: this.output.get,
         tryGetAccount: this.account.tryGet,
@@ -405,7 +391,7 @@ export class Blockchain {
   }
 
   public async invokeScript(script: Buffer): Promise<CallReceipt> {
-    const transaction = new InvocationTransaction({
+    const transaction = new Transaction({
       script,
       gas: common.ONE_HUNDRED_FIXED8,
     });
@@ -413,7 +399,7 @@ export class Blockchain {
     return this.invokeTransaction(transaction);
   }
 
-  public async invokeTransaction(transaction: InvocationTransaction): Promise<CallReceipt> {
+  public async invokeTransaction(transaction: Transaction): Promise<CallReceipt> {
     const blockchain = this.createWriteBlockchain();
 
     const mutableActions: Action[] = [];
@@ -479,52 +465,6 @@ export class Blockchain {
     logger.debug({ name: 'neo_blockchain_get_validators' });
 
     return getValidators(this, transactions);
-  };
-
-  public readonly calculateClaimAmount = async (claims: readonly Input[]): Promise<BN> => {
-    logger.debug({ name: 'neo_blockchain_calculate_claim_amount' });
-    const spentCoins = await Promise.all(claims.map(async (claim) => this.tryGetSpentCoin(claim)));
-
-    const filteredSpentCoinsIn = spentCoins.filter(commonUtils.notNull);
-    if (spentCoins.length !== filteredSpentCoinsIn.length) {
-      throw new CoinUnspentError(spentCoins.length - filteredSpentCoinsIn.length);
-    }
-
-    const filteredSpentCoins = filteredSpentCoinsIn.filter((spentCoin) => {
-      if (spentCoin.claimed) {
-        throw new CoinClaimedError(common.uInt256ToString(spentCoin.output.asset), spentCoin.output.value.toString(10));
-      }
-      if (!common.uInt256Equal(spentCoin.output.asset, this.settings.governingToken.hash)) {
-        throw new InvalidClaimError(
-          common.uInt256ToString(spentCoin.output.asset),
-          common.uInt256ToString(this.settings.governingToken.hash),
-        );
-      }
-
-      return true;
-    });
-
-    return utils.calculateClaimAmount({
-      coins: filteredSpentCoins.map((coin) => ({
-        value: coin.output.value,
-        startHeight: coin.startHeight,
-        endHeight: coin.endHeight,
-      })),
-
-      decrementInterval: this.settings.decrementInterval,
-      generationAmount: this.settings.generationAmount,
-      getSystemFee: async (index) => {
-        const header = await this.header.get({
-          hashOrIndex: index,
-        });
-
-        const blockData = await this.blockData.get({
-          hash: header.hash,
-        });
-
-        return blockData.systemFee;
-      },
-    });
   };
 
   private async persistBlocksAsync(): Promise<void> {
@@ -645,7 +585,7 @@ export class Blockchain {
     const result = { actions: mutableActions, hash, witness };
 
     const { stack, state, errorMessage } = executeResult;
-    if (state === VMState.Fault) {
+    if (state === VMState.FAULT) {
       return {
         ...result,
         failureMessage: errorMessage === undefined ? 'Script execution ended in a FAULT state' : errorMessage,
@@ -670,7 +610,7 @@ export class Blockchain {
   };
 
   private readonly tryGetInvocationData = async (
-    transaction: InvocationTransaction,
+    transaction: Transaction,
   ): Promise<SerializableInvocationData | undefined> => {
     const data = await this.invocationData.tryGet({
       hash: transaction.hash,
@@ -705,54 +645,9 @@ export class Blockchain {
       storageChanges: data.storageChanges,
     };
   };
-  private readonly tryGetTransactionData = async (transaction: Transaction): Promise<TransactionData | undefined> =>
-    this.transactionData.tryGet({ hash: transaction.hash });
-  private readonly getUnclaimed = async (hash: UInt160): Promise<readonly Input[]> =>
-    this.accountUnclaimed
-      .getAll$({ hash })
-      .pipe(toArray())
-      .toPromise()
-      .then((values) => values.map((value) => value.input));
-  private readonly getUnspent = async (hash: UInt160): Promise<readonly Input[]> => {
-    const unspent = await this.accountUnspent.getAll$({ hash }).pipe(toArray()).toPromise();
 
-    return unspent.map((value) => value.input);
-  };
   private readonly getAllValidators = async (): Promise<readonly Validator[]> =>
     this.validator.all$.pipe(toArray()).toPromise();
-  private readonly isSpent = async (input: OutputKey): Promise<boolean> => {
-    const transactionData = await this.transactionData.tryGet({
-      hash: input.hash,
-    });
-
-    return (
-      transactionData !== undefined && (transactionData.endHeights[input.index] as number | undefined) !== undefined
-    );
-  };
-  private readonly tryGetSpentCoin = async (input: Input): Promise<SpentCoin | undefined> => {
-    const [transactionData, output] = await Promise.all([
-      this.transactionData.tryGet({ hash: input.hash }),
-      this.output.get(input),
-    ]);
-
-    if (transactionData === undefined) {
-      return undefined;
-    }
-
-    const endHeight = transactionData.endHeights[input.index] as number | undefined;
-    if (endHeight === undefined) {
-      return undefined;
-    }
-
-    const claimed = transactionData.claimed[input.index];
-
-    return {
-      output,
-      startHeight: transactionData.startHeight,
-      endHeight,
-      claimed: !!claimed,
-    };
-  };
 
   private start(): void {
     this.mutableBlock$ = new Subject();
@@ -766,75 +661,6 @@ export class Blockchain {
     this.mutableRunning = true;
     logger.info({ name: 'neo_blockchain_start' }, 'Neo blockchain started.');
   }
-
-  // private readonly getVotes = async (transactions: readonly Transaction[]): Promise<readonly Vote[]> => {
-  //   const inputs = await Promise.all(
-  //     transactions.map(async (transaction) =>
-  //       transaction.getReferences({
-  //         getOutput: this.output.get,
-  //       }),
-  //     ),
-  //   ).then((results) =>
-  //     results.reduce((acc, inputResults) => acc.concat(inputResults), []).map((output) => ({
-  //       address: output.address,
-  //       asset: output.asset,
-  //       value: output.value.neg(),
-  //     })),
-  //   );
-
-  //   const outputs = transactions
-  //     .reduce<readonly Output[]>((acc, transaction) => acc.concat(transaction.outputs), [])
-  //     .map((output) => ({
-  //       address: output.address,
-  //       asset: output.asset,
-  //       value: output.value,
-  //     }));
-
-  //   const changes = _.fromPairs(
-  //     Object.entries(
-  //       _.groupBy(
-  //         inputs
-  //           .concat(outputs)
-  //           .filter((output) => common.uInt256Equal(output.asset, this.settings.governingToken.hash)),
-
-  //         (output) => common.uInt160ToHex(output.address),
-  //       ),
-  //     ).map(([addressHex, addressOutputs]) => [
-  //       addressHex,
-  //       addressOutputs.reduce((acc, output) => acc.add(output.value), utils.ZERO),
-  //     ]),
-  //   );
-
-  //   const votes = await this.account.all$
-  //     .pipe(
-  //       filter((account) => account.votes.length > 0),
-  //       map((account) => {
-  //         let balance = account.balances[this.settings.governingToken.hashHex];
-  //         balance = balance === undefined ? utils.ZERO : balance;
-  //         const change = changes[account.hashHex];
-  //         balance = balance.add(change === undefined ? utils.ZERO : change);
-
-  //         return balance.lte(utils.ZERO)
-  //           ? undefined
-  //           : {
-  //               publicKeys: account.votes,
-  //               count: balance,
-  //             };
-  //       }),
-  //       toArray(),
-  //     )
-  //     .toPromise();
-  //   if (votes.length === 0) {
-  //     return [
-  //       {
-  //         publicKeys: this.settings.standbyValidators,
-  //         count: this.settings.governingToken.asset.amount,
-  //       },
-  //     ];
-  //   }
-
-  //   return votes.filter(commonUtils.notNull);
-  // };
 
   private async persistBlockInternal(block: Block, unsafe?: boolean): Promise<void> {
     if (!unsafe) {

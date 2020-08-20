@@ -13,11 +13,11 @@ export abstract class AttributeBaseModel implements SerializableWire<AttributeMo
     this.serializeWithoutTypeBase(writer);
   }
 
-  // TODO: check
   public verify(): boolean {
     return true;
   }
 
-  // TODO: check
-  protected abstract serializeWithoutTypeBase(writer: BinaryWriter): void;
+  protected serializeWithoutTypeBase(_writer: BinaryWriter): void {
+    // do nothing
+  }
 }

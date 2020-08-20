@@ -15,23 +15,23 @@ export interface TransactionModelAdd<
   TSigner extends SignerModel = SignerModel
 > {
   readonly version?: number;
-  readonly attributes?: readonly TAttribute[];
-  readonly witnesses?: readonly TWitness[];
-  readonly signers?: readonly TSigner[];
   readonly nonce: number;
-  readonly sender: UInt160;
   readonly systemFee: BN;
   readonly networkFee: BN;
   readonly validUntilBlock: number;
+  readonly attributes?: readonly TAttribute[];
+  readonly signers?: readonly TSigner[];
   readonly script: Buffer;
+  readonly witnesses?: readonly TWitness[];
   readonly hash?: UInt256;
 }
 
 export const MAX_TRANSACTION_ATTRIBUTES = 16;
 export const MAX_TRANSACTION_SIZE = 102400;
 export const MAX_VALID_UNTIL_BLOCK_INCREMENT = 2102400;
+export const DEFAULT_VERSION = 0;
 
-export abstract class TransactionModel<
+export class TransactionModel<
   TAttribute extends AttributeModel = AttributeModel,
   TWitness extends WitnessModel = WitnessModel,
   TSigner extends SignerModel = SignerModel
@@ -71,9 +71,7 @@ export abstract class TransactionModel<
     script,
     hash,
   }: TransactionModelAdd<TAttribute, TWitness, TSigner>) {
-    // workaround: babel fails to transpile if we have
-    // static VERSION: number = 0;
-    this.version = version === undefined ? (this.constructor as typeof TransactionModel).VERSION : version;
+    this.version = version === undefined ? DEFAULT_VERSION : version;
     this.nonce = nonce;
     this.sender = signers[0].account;
     this.attributes = attributes;
@@ -118,7 +116,6 @@ export abstract class TransactionModel<
     return new (this.constructor as any)({
       version: this.version,
       nonce: this.nonce,
-      sender: this.sender,
       systemFee: this.systemFee,
       networkFee: this.networkFee,
       validUntilBlock: this.validUntilBlock,
@@ -151,7 +148,6 @@ export abstract class TransactionModel<
   public serializeUnsignedBase(writer: BinaryWriter): void {
     writer.writeUInt8(this.version);
     writer.writeUInt32LE(this.nonce);
-    writer.writeUInt160(this.sender);
     writer.writeUInt64LE(this.systemFee);
     writer.writeUInt64LE(this.networkFee);
     writer.writeUInt32LE(this.validUntilBlock);

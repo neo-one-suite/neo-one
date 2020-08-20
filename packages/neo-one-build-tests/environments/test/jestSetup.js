@@ -15,7 +15,6 @@ global.console = {
   error: console.error,
   warn: console.warn,
   info: jest.fn(),
-  debug: jest.fn(),
 };
 
 afterEach(async () => {

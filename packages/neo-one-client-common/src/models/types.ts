@@ -178,13 +178,12 @@ export interface WitnessJSON {
 export interface SignerJSON {
   readonly account: string;
   readonly scopes: WitnessScopeJSON;
-  readonly allowedContracts?: readonly string[];
-  readonly allowedGroups?: readonly string[];
+  readonly allowedcontracts?: readonly string[];
+  readonly allowedgroups?: readonly string[];
 }
 
 export interface AttributeJSON {
   readonly type: AttributeTypeJSON;
-  readonly allowMultiple: boolean;
 }
 
 export type AttributeTypeJSON = keyof typeof AttributeTypeModel;
@@ -209,9 +208,9 @@ export interface TransactionJSON {
   readonly version: number;
   readonly nonce: number;
   readonly sender: string;
-  readonly sys_fee: string;
-  readonly net_fee: string;
-  readonly valid_until_block: number;
+  readonly sysfee: string;
+  readonly netfee: string;
+  readonly validuntilblock: number;
   readonly attributes: readonly AttributeJSON[];
   readonly signers: readonly SignerJSON[];
   readonly script: string;
@@ -278,16 +277,17 @@ export interface ContractJSON {
 }
 
 export interface BlockBaseJSON {
-  readonly version: number;
   readonly hash: string;
+  readonly size: number;
+  readonly version: number;
   readonly previousblockhash: string;
   readonly merkleroot: string;
   readonly time: string;
   readonly index: number;
   readonly nextconsensus: string;
   readonly witnesses: readonly WitnessJSON[];
-  readonly confirmations: number;
-  readonly nextblockhash?: string;
+  // TODO: confirmations: number;
+  // TODO: nextblockhash?: string;
 }
 
 export interface ConsensusDataJSON {
@@ -298,8 +298,14 @@ export interface ConsensusDataJSON {
 export interface HeaderJSON extends BlockBaseJSON {}
 
 export interface BlockJSON extends BlockBaseJSON {
-  readonly tx: readonly ConfirmedTransactionJSON[];
-  readonly concensus_data: ConsensusDataJSON;
+  // TODO: this used to be `ConfirmedTransactionJSON[]`. Why?
+  readonly tx: readonly TransactionJSON[];
+  readonly consensusdata?: ConsensusDataJSON;
+}
+
+export interface TrimmedBlockJSON extends BlockBaseJSON {
+  readonly consensusdata?: ConsensusDataJSON;
+  readonly hashes: readonly string[];
 }
 
 export interface NetworkSettingsJSON {

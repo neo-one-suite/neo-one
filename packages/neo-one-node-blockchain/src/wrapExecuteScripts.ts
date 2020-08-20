@@ -9,7 +9,7 @@ import {
 export const wrapExecuteScripts = async (execute: () => Promise<ExecuteScriptsResult>): Promise<InvocationResult> => {
   try {
     const result = await execute();
-    if (result.state === VMState.Halt) {
+    if (result.state === VMState.HALT) {
       return new InvocationResultSuccess({
         gasConsumed: result.gasConsumed,
         gasCost: result.gasCost,

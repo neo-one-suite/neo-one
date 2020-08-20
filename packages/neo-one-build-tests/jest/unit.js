@@ -5,6 +5,7 @@ module.exports = {
   displayName: 'unit',
   moduleNameMapper: {
     '^@neo-one/ec-key$': '@neo-one/ec-key',
+    '^@neo-one/edge$': '@neo-one/edge',
     '^@neo-one/boa$': '@neo-one/boa',
     '^@neo-one/csharp$': '@neo-one/csharp',
     '^@neo-one/smart-contract$':

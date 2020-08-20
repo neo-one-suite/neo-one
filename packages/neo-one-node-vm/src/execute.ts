@@ -40,14 +40,14 @@ const executeNext = async ({
   readonly context: ExecutionContext;
 }): Promise<ExecutionContext> => {
   let context = contextIn;
-  if (context.state !== VMState.None) {
+  if (context.state !== VMState.NONE) {
     return context;
   }
 
   if (context.pc >= context.code.length) {
     return {
       ...context,
-      state: VMState.Halt,
+      state: VMState.HALT,
     };
   }
 
@@ -137,13 +137,13 @@ const executeNext = async ({
 const run = async ({ context: contextIn }: { readonly context: ExecutionContext }): Promise<ExecutionContext> => {
   let context = contextIn;
   // tslint:disable-next-line no-loop-statement
-  while (context.state === VMState.None) {
+  while (context.state === VMState.NONE) {
     try {
       // eslint-disable-next-line
       context = await executeNext({ context });
     } catch (error) {
       context = {
-        state: VMState.Fault,
+        state: VMState.FAULT,
         errorMessage: getErrorMessage(error),
         blockchain: context.blockchain,
         init: context.init,
@@ -198,7 +198,7 @@ export const executeScript = async ({
   const scriptHash = crypto.hash160(code);
 
   const context = {
-    state: VMState.None,
+    state: VMState.NONE,
     blockchain,
     init,
     engine: {
@@ -275,7 +275,7 @@ export const execute = async ({
   try {
     const entryScriptHash = crypto.hash160(scripts[0].code);
     // tslint:disable-next-line no-loop-statement
-    for (let idx = 0; idx < scripts.length && (context === undefined || context.state === VMState.Halt); idx += 1) {
+    for (let idx = 0; idx < scripts.length && (context === undefined || context.state === VMState.HALT); idx += 1) {
       const script = scripts[idx];
       // NOTE: scriptHash has a different meaning here, it will be translated
       //       to callingScriptHash within executeScript. executeScript
@@ -325,7 +325,7 @@ export const execute = async ({
   const finalContext = context;
   if (finalContext === undefined) {
     return {
-      state: errorMessage === undefined ? VMState.Halt : VMState.Fault,
+      state: errorMessage === undefined ? VMState.HALT : VMState.FAULT,
       stack: [],
       stackAlt: [],
       gasConsumed: utils.ZERO,
@@ -340,11 +340,11 @@ export const execute = async ({
     gasConsumed = utils.ZERO;
   }
 
-  const state = errorMessage === undefined ? finalContext.state : VMState.Fault;
-  const toContractParameter = (item: StackItem) => safeToContractParameter(item, state === VMState.Fault);
+  const state = errorMessage === undefined ? finalContext.state : VMState.FAULT;
+  const toContractParameter = (item: StackItem) => safeToContractParameter(item, state === VMState.FAULT);
 
   return {
-    state: errorMessage === undefined ? finalContext.state : VMState.Fault,
+    state: errorMessage === undefined ? finalContext.state : VMState.FAULT,
     stack: finalContext.stack.map(toContractParameter),
     stackAlt: finalContext.stackAlt.map(toContractParameter),
     gasConsumed,

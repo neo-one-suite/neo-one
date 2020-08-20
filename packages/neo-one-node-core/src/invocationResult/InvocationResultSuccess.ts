@@ -10,24 +10,24 @@ export interface InvocationResultSuccessAdd {
   readonly stack: readonly ContractParameter[];
 }
 
-export class InvocationResultSuccess extends InvocationResultBase<VMState.Halt>
+export class InvocationResultSuccess extends InvocationResultBase<VMState.HALT>
   implements SerializableJSON<InvocationResultSuccessJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): InvocationResultSuccess {
     const { state, gasConsumed, gasCost, stack } = super.deserializeInvocationResultWireBase(options);
-    if (state !== VMState.Halt) {
-      throw new InvalidFormatError(`Expected VMState state to be ${VMState.Halt}. Received: ${state}.`);
+    if (state !== VMState.HALT) {
+      throw new InvalidFormatError(`Expected VMState state to be ${VMState.HALT}. Received: ${state}.`);
     }
 
     return new this({ gasConsumed, gasCost, stack });
   }
 
   public constructor({ gasConsumed, gasCost, stack }: InvocationResultSuccessAdd) {
-    super({ state: VMState.Halt, gasConsumed, gasCost, stack });
+    super({ state: VMState.HALT, gasConsumed, gasCost, stack });
   }
 
   public serializeJSON(context: SerializeJSONContext): InvocationResultSuccessJSON {
     return {
-      state: VMState.Halt,
+      state: VMState.HALT,
       gas_consumed: JSONHelper.writeFixed8(this.gasConsumed),
       gas_cost: JSONHelper.writeFixed8(this.gasCost),
       stack: this.stack.map((value) => value.serializeJSON(context)),
