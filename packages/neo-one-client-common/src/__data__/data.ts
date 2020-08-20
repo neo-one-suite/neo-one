@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import { common } from '../common';
-import { ABIParameter, ABIReturn, AssetType } from '../types';
+import { ABIParameter, ABIReturn } from '../types';
 import { keys } from './keys';
 
 const hash256s = {

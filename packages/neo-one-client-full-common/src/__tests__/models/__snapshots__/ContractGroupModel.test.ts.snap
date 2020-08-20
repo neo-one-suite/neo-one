@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContractGroupModel - serializeJSON Simple 1`] = `
+Object {
+  "publicKey": "0248be3c070df745a60f3b8b494efcc6caf90244d803a9a72fe95d9bae2120ec70",
+  "signature": "ccaab040cc25021c91567b75db4778853441869157b8f6aad960cdcf1069812480027a528ca9b98e2205027de20696f848cf81824eeb7af1d5110870870ceb67",
+}
+`;

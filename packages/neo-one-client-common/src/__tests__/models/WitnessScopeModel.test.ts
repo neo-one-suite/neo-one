@@ -7,7 +7,6 @@ import {
   WitnessScopeModel,
 } from '../../models/WitnessScopeModel';
 
-// TODO: check and run this test
 describe('Witness Scope - Functions', () => {
   const goodScope = WitnessScopeModel.Global;
   const goodString = 'Global';

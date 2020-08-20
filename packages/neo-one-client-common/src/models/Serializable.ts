@@ -13,3 +13,7 @@ export const createSerializeWire = (serializeWireBase: (writer: BinaryWriter) =>
 
   return writer.toBuffer();
 };
+
+export interface SerializableJSON<TJSON> {
+  readonly serializeJSON: () => TJSON;
+}

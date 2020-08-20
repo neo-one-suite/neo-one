@@ -73,10 +73,6 @@ export const InvalidVerifyResultJSONError = makeErrorWithCode(
   'INVALID_RELAY_RESULT_REASON_JSON',
   (value: string) => `Invalid VerifyResult: ${value}`,
 );
-export const InvalidStateDescriptorTypeError = makeErrorWithCode(
-  'INVALID_STATE_DESCRIPTOR_TYPE',
-  (stateDescriptorType: number) => `Expected StateDescriptorType, found: ${stateDescriptorType.toString(16)}`,
-);
 export const InvalidContractParameterTypeJSONError = makeErrorWithCode(
   'INVALID_CONTRACT_PARAMETER_TYPE_JSON',
   (value: string) => `Invalid ContractParameterType: ${value}`,

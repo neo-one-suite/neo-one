@@ -5,66 +5,66 @@ import { VerifyResultModel } from './VerifyResultModel';
 import { VMState } from './vm';
 import { WitnessScopeModel } from './WitnessScopeModel';
 
-export interface ContractParameterDeclarationJSON {
+export interface ContractParameterDefinitionJSON {
   readonly type: keyof typeof ContractParameterTypeModel;
   readonly name: string;
 }
 
-export interface ArrayContractParameterJSON extends ContractParameterDeclarationJSON {
+export interface ArrayContractParameterJSON extends ContractParameterDefinitionJSON {
   readonly type: 'Array';
   readonly value: readonly ContractParameterJSON[];
 }
 
-export interface BooleanContractParameterJSON extends ContractParameterDeclarationJSON {
+export interface BooleanContractParameterJSON extends ContractParameterDefinitionJSON {
   readonly type: 'Boolean';
   readonly value: boolean;
 }
 
-export interface ByteArrayContractParameterJSON extends ContractParameterDeclarationJSON {
+export interface ByteArrayContractParameterJSON extends ContractParameterDefinitionJSON {
   readonly type: 'ByteArray';
   readonly value: string;
 }
 
-export interface Hash160ContractParameterJSON extends ContractParameterDeclarationJSON {
+export interface Hash160ContractParameterJSON extends ContractParameterDefinitionJSON {
   readonly type: 'Hash160';
   readonly value: string;
 }
 
-export interface Hash256ContractParameterJSON extends ContractParameterDeclarationJSON {
+export interface Hash256ContractParameterJSON extends ContractParameterDefinitionJSON {
   readonly type: 'Hash256';
   readonly value: string;
 }
 
-export interface IntegerContractParameterJSON extends ContractParameterDeclarationJSON {
+export interface IntegerContractParameterJSON extends ContractParameterDefinitionJSON {
   readonly type: 'Integer';
   readonly value: string;
 }
 
-export interface InteropInterfaceContractParameterJSON extends ContractParameterDeclarationJSON {
+export interface InteropInterfaceContractParameterJSON extends ContractParameterDefinitionJSON {
   readonly type: 'InteropInterface';
 }
 
-export interface MapContractParameterJSON extends ContractParameterDeclarationJSON {
+export interface MapContractParameterJSON extends ContractParameterDefinitionJSON {
   readonly type: 'Map';
   readonly value: ReadonlyArray<readonly [ContractParameterJSON, ContractParameterJSON]>;
 }
 
-export interface PublicKeyContractParameterJSON extends ContractParameterDeclarationJSON {
+export interface PublicKeyContractParameterJSON extends ContractParameterDefinitionJSON {
   readonly type: 'PublicKey';
   readonly value: string;
 }
 
-export interface SignatureContractParameterJSON extends ContractParameterDeclarationJSON {
+export interface SignatureContractParameterJSON extends ContractParameterDefinitionJSON {
   readonly type: 'Signature';
   readonly value: string;
 }
 
-export interface StringContractParameterJSON extends ContractParameterDeclarationJSON {
+export interface StringContractParameterJSON extends ContractParameterDefinitionJSON {
   readonly type: 'String';
   readonly value: string;
 }
 
-export interface VoidContractParameterJSON extends ContractParameterDeclarationJSON {
+export interface VoidContractParameterJSON extends ContractParameterDefinitionJSON {
   readonly type: 'Void';
 }
 
@@ -191,16 +191,16 @@ export type AttributeTypeJSON = keyof typeof AttributeTypeModel;
 export type VerifyResultJSON = keyof typeof VerifyResultModel;
 
 // TODO: check that this can be removed. or rename to "TransactionDataJSON" ?
-// export interface InvocationDataJSON {
-//   readonly result: InvocationResultJSON;
-//   readonly asset?: AssetJSON;
-//   readonly contracts: readonly ContractJSON[];
-//   readonly deletedContractHashes: readonly string[];
-//   readonly migratedContractHashes: ReadonlyArray<readonly [string, string]>;
-//   readonly voteUpdates: ReadonlyArray<readonly [string, ReadonlyArray<string>]>;
-//   readonly actions: readonly ActionJSON[];
-//   readonly storageChanges: readonly StorageChangeJSON[];
-// }
+export interface InvocationDataJSON {
+  readonly result: InvocationResultJSON;
+  // readonly asset?: AssetJSON;
+  readonly contracts: readonly ContractJSON[];
+  readonly deletedContractHashes: readonly string[];
+  readonly migratedContractHashes: ReadonlyArray<readonly [string, string]>;
+  readonly voteUpdates: ReadonlyArray<readonly [string, ReadonlyArray<string>]>;
+  readonly actions: readonly ActionJSON[];
+  readonly storageChanges: readonly StorageChangeJSON[];
+}
 
 export interface TransactionJSON {
   readonly hash: string;
@@ -226,24 +226,25 @@ export interface TransactionReceiptJSON {
 
 export interface ConfirmedTransactionJSON extends TransactionJSON, TransactionReceiptJSON {}
 
-export type WildcardContainerJSON<T> = readonly T[] | '*';
+export type Wildcard = '*';
+export type WildcardContainerJSON<T> = readonly T[] | Wildcard;
 
 export interface ContractMethodDescriptorJSON {
   readonly name: string;
-  readonly parameters: readonly ContractParameterDeclarationJSON[];
+  readonly parameters: readonly ContractParameterDefinitionJSON[];
+  readonly offset?: number;
   readonly returnType: ContractParameterTypeJSON;
 }
 
-export interface ContractEventJSON {
+export interface ContractEventDescriptorJSON {
   readonly name: string;
-  readonly parameters: readonly ContractParameterDeclarationJSON[];
+  readonly parameters: readonly ContractParameterDefinitionJSON[];
 }
 
 export interface ContractABIJSON {
   readonly hash: string;
-  readonly entryPoint: ContractMethodDescriptorJSON;
   readonly methods: readonly ContractMethodDescriptorJSON[];
-  readonly events: readonly ContractEventJSON[];
+  readonly events: readonly ContractEventDescriptorJSON[];
 }
 
 export interface ContractGroupJSON {
@@ -251,12 +252,14 @@ export interface ContractGroupJSON {
   readonly signature: string;
 }
 
-export type ContractPermissionDescriptorJSON = string | '*';
+export type ContractPermissionDescriptorJSON = string;
 
 export interface ContractPermissionJSON {
   readonly contract: ContractPermissionDescriptorJSON;
-  readonly methods: ReadonlyArray<WildcardContainerJSON<string>>;
+  readonly methods: WildcardContainerJSON<string>;
 }
+
+export type Extra = JSON;
 
 export interface ContractManifestJSON {
   readonly abi: ContractABIJSON;
@@ -268,6 +271,13 @@ export interface ContractManifestJSON {
     readonly storage: boolean;
     readonly payable: boolean;
   };
+  readonly supportedStandards: readonly string[];
+  readonly extra?: Extra;
+}
+
+export interface ContractParameterDefinitionJSON {
+  readonly name: string;
+  readonly type: ContractParameterTypeJSON;
 }
 
 export interface ContractJSON {

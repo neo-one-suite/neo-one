@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContractPermissionModel - serializeJSON ECPoint 1`] = `
+Object {
+  "contract": "0248be3c070df745a60f3b8b494efcc6caf90244d803a9a72fe95d9bae2120ec70",
+  "methods": Array [
+    "method1",
+  ],
+}
+`;
+
+exports[`ContractPermissionModel - serializeJSON UInt160 1`] = `
+Object {
+  "contract": "0x0101010101010101010101010101010101010101",
+  "methods": Array [],
+}
+`;
+
+exports[`ContractPermissionModel - serializeJSON undefined 1`] = `
+Object {
+  "contract": "*",
+  "methods": Array [
+    "method1",
+    "method2",
+  ],
+}
+`;

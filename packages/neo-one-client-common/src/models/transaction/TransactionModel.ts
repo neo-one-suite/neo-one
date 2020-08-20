@@ -44,7 +44,7 @@ export class TransactionModel<
 
   public readonly version: number;
   public readonly nonce: number;
-  public readonly sender: UInt160;
+  public readonly sender?: UInt160;
   public readonly validUntilBlock: number;
   public readonly signers: readonly TSigner[];
   public readonly attributes: readonly TAttribute[];
@@ -73,7 +73,7 @@ export class TransactionModel<
   }: TransactionModelAdd<TAttribute, TWitness, TSigner>) {
     this.version = version === undefined ? DEFAULT_VERSION : version;
     this.nonce = nonce;
-    this.sender = signers[0].account;
+    this.sender = signers[0]?.account;
     this.attributes = attributes;
     this.witnesses = witnesses;
     this.signers = signers;

@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContractFeaturesModel isContractFeatures 1`] = `"Expected contract feature, found: -1"`;
+
+exports[`ContractFeaturesModel isContractFeatures 2`] = `"Expected contract feature, found: 2"`;
+
+exports[`ContractFeaturesModel isContractFeatures 3`] = `"Expected contract feature, found: 3"`;
+
+exports[`ContractFeaturesModel isContractFeatures 4`] = `"Expected contract feature, found: 6"`;

@@ -1,6 +1,7 @@
 import { makeErrorWithCode } from '@neo-one/utils';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
+import { Wildcard } from './models';
 
 /* istanbul ignore next */
 export const InvalidFormatError = makeErrorWithCode(
@@ -205,6 +206,8 @@ const fixedToDecimal = (value: BN, decimals: number): BigNumber => {
 
 const fixed8ToDecimal = (bn: BN): BigNumber => fixedToDecimal(bn, 8);
 
+const isWildcard = (input: unknown): input is Wildcard => input === '*';
+
 const NEGATIVE_SATOSHI_FIXED8 = new BN(-1);
 const TEN_FIXED8 = fixed8FromDecimal(10);
 const ONE_HUNDRED_FIXED8 = fixed8FromDecimal(100);
@@ -219,8 +222,9 @@ export const common = {
   D8,
   NEO_ADDRESS_VERSION: 0x35,
   NEO_PRIVATE_KEY_VERSION: 0x80,
-  GROUPING_SIZE_BYTES: 16, // TODO: remove? added by Dan?
-  MAX_CONTRACT_STRING: 252, // TODO: remove? added by Dan?
+  GROUPING_SIZE_BYTES: 16,
+  MAX_CONTRACT_STRING: 252,
+  MAX_MANIFEST_LENGTH: 4096,
   ECPOINT_BUFFER_BYTES,
   ECPOINT_INFINITY,
   ECPOINT_INFINITY_BYTE,
@@ -285,4 +289,5 @@ export const common = {
   fixedFromDecimal,
   fixedToDecimal,
   reverse,
+  isWildcard,
 };
