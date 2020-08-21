@@ -31,9 +31,9 @@ export interface IntegerStackItem extends StackItemBase {
 
 export interface ByteStringStackItem extends StackItemBase {
   readonly type: 'ByteString';
-  readonly value: string;
+  readonly value: Buffer;
   readonly size: number;
-  readonly _buffer: Buffer;
+  readonly asString: () => string;
 }
 
 export interface BufferStackItem extends StackItemBase {

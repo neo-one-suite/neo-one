@@ -1,32 +1,41 @@
 import { common } from '@neo-one/client-common';
-import { CallFlags, TriggerType, Verifiable } from '@neo-one/csharp-core';
+import { TriggerType, Verifiable } from '@neo-one/csharp-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
-import { convertEngineOptions } from './converters';
-import { createEngineDispatcher } from './createEngineDispatcher';
+import { EngineMethods } from './Methods';
 import { parse as parseStackItems } from './StackItems';
+import { DispatcherFunc, SnapshotName } from './types';
 
-export interface EngineOptions {
+export interface CreateOptions {
   readonly trigger: TriggerType;
   readonly container?: Verifiable;
-  readonly snapshot?: boolean;
+  readonly snapshot?: SnapshotName;
   readonly gas: number;
-  readonly testMode?: boolean;
+  readonly testMode: boolean;
+}
+
+interface ApplicationEngineDispatcher {
+  readonly dispatch: DispatcherFunc<EngineMethods>;
 }
 
 export class ApplicationEngine {
+  private readonly dispatch: DispatcherFunc<EngineMethods>;
+
+  public constructor(dispatcher: ApplicationEngineDispatcher) {
+    this.dispatch = dispatcher.dispatch.bind(this);
+  }
+
   public get trigger() {
-    return this.engineDispatcher({
+    return this.dispatch({
       method: 'gettrigger',
     });
   }
 
-  // TODO: make sure the fixed8 numbers are the same between c# and what I'm inputting (just for ease of mind);
   public get gasConsumed() {
     return common
       .fixed8ToDecimal(
         new BN(
-          this.engineDispatcher({
+          this.dispatch({
             method: 'getgasconsumed',
           }),
         ),
@@ -34,131 +43,60 @@ export class ApplicationEngine {
       .toNumber();
   }
 
-  public get gasLeft() {
-    return this.engineDispatcher({
-      method: 'getgasleft',
-    });
-  }
-
-  public get currentScriptHash() {
-    return this.engineDispatcher({
-      method: 'getcurrentscripthash',
-    });
-  }
-
-  public get callingScriptHash() {
-    return this.engineDispatcher({
-      method: 'getcallingscripthash',
-    });
-  }
-
-  public get entryScriptHash() {
-    return this.engineDispatcher({
-      method: 'getentryscripthash',
-    });
-  }
-
-  public get notifications() {
-    return this.engineDispatcher({
-      method: 'getnotifications',
-    });
-  }
-
   public get state() {
-    return this.engineDispatcher({
+    return this.dispatch({
       method: 'getvmstate',
     });
   }
 
-  // we reverse the resultStack since we don't want to use `pop`.
   public get resultStack() {
     return _.reverse(
       parseStackItems(
-        this.engineDispatcher({
+        this.dispatch({
           method: 'getresultstack',
         }),
       ),
     );
   }
 
-  public readonly init: boolean;
-  private readonly engineDispatcher: ReturnType<typeof createEngineDispatcher>;
-
-  public constructor(options: EngineOptions) {
-    this.engineDispatcher = createEngineDispatcher();
-    this.init = this.engineDispatcher({
+  public create({ trigger, container, gas, snapshot, testMode }: CreateOptions) {
+    return this.dispatch({
       method: 'create',
-      args: convertEngineOptions(options),
-    });
-  }
-
-  // -- application engine method definitions
-  public dispose() {
-    return this.engineDispatcher({
-      method: 'dispose',
+      args: {
+        trigger,
+        container,
+        gas: common.fixed8FromDecimal(gas.toString()).toString(),
+        snapshot,
+        testMode,
+      },
     });
   }
 
   public execute() {
-    return this.engineDispatcher({
+    return this.dispatch({
       method: 'execute',
     });
   }
 
-  public loadScript(script: Buffer, callFlags = CallFlags.None) {
-    return this.engineDispatcher({
+  public loadScript(script: Buffer) {
+    return this.dispatch({
       method: 'loadscript',
       args: {
         script,
-        callFlags,
       },
     });
   }
 
   public checkScript() {
-    return this.engineDispatcher({
+    return this.dispatch({
       method: 'checkscript',
     });
   }
 
-  // - start - some ExecutionEngine method definitions we might need under the hood
   public loadClonedContext(position: number) {
-    return this.engineDispatcher({
+    return this.dispatch({
       method: 'loadclonedcontext',
       args: { position },
     });
   }
-
-  public peek(index = 0) {
-    return this.engineDispatcher({
-      method: 'peek',
-      args: {
-        index,
-      },
-    });
-  }
-
-  public pop() {
-    return this.engineDispatcher({
-      method: 'pop',
-    });
-  }
-
-  public test(value: BN) {
-    return this.engineDispatcher({
-      method: 'test',
-      args: {
-        test: value.toNumber(),
-      },
-    });
-  }
 }
-
-// should be our equivalent of `(using var engine = new ApplicationEngine(...)) {...}`
-export const withApplicationEngine = <T = void>(options: EngineOptions, func: (engine: ApplicationEngine) => T): T => {
-  const engine = new ApplicationEngine(options);
-  const result = func(engine);
-  engine.dispose();
-
-  return result;
-};

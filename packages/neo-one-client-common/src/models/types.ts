@@ -207,7 +207,7 @@ export interface TransactionJSON {
   readonly size: number;
   readonly version: number;
   readonly nonce: number;
-  readonly sender: string;
+  readonly sender?: string;
   readonly sysfee: string;
   readonly netfee: string;
   readonly validuntilblock: number;

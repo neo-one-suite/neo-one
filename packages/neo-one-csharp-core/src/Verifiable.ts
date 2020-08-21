@@ -21,4 +21,4 @@ export interface VerifyResult {
   readonly result: boolean;
 }
 
-export type VerifyWitnesses = (verifiable: Verifiable, snapshot: SnapshotMethods, gasIn: BN) => Promise<boolean>;
+export type VerifyWitnesses = (verifiable: Verifiable, snapshot: SnapshotMethods, gasIn: number) => Promise<boolean>;

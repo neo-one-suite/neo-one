@@ -10,8 +10,8 @@ jest.setTimeout(120 * 1000);
 
 const tempConsole = global.console;
 global.console = {
-  // log: console.log, // Use this to debug source code
-  log: jest.fn(),
+  log: console.log, // Use this to debug source code
+  // log: jest.fn(),
   error: console.error,
   warn: console.warn,
   info: jest.fn(),

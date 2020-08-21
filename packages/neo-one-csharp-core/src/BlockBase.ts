@@ -2,6 +2,7 @@ import {
   BinaryWriter,
   BlockBaseJSON,
   common,
+  createGetHashData,
   crypto,
   InvalidFormatError,
   IOHelper,
@@ -13,14 +14,7 @@ import {
 import { BN } from 'bn.js';
 import { Equals, EquatableKey } from './Equatable';
 import { UnsignedBlockError } from './errors';
-import { Header } from './Header';
-import {
-  createSerializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializeJSONContext,
-  SerializeWire,
-} from './Serializable';
+import { createSerializeWire, DeserializeWireBaseOptions, SerializeJSONContext, SerializeWire } from './Serializable';
 import { utils } from './utils';
 import { SnapshotMethods, VerifyWitnesses } from './Verifiable';
 import { Witness } from './Witness';
@@ -106,7 +100,7 @@ export abstract class BlockBase implements EquatableKey {
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly hashInternal: () => UInt256;
   private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
-  private readonly messageInternal = utils.lazy(() => this.serializeUnsigned());
+  private readonly messageInternal = utils.lazy(() => createGetHashData(this.serializeUnsigned)());
   private readonly witnessInternal: Witness | undefined;
   private readonly sizeInternal = utils.lazy(
     () =>
@@ -204,8 +198,8 @@ export abstract class BlockBase implements EquatableKey {
     };
   }
 
-  public async verify(options: SnapshotMethods, verifyWitnesses: VerifyWitnesses) {
-    const prevHeader = await options.tryGetHeader(this.previousHash);
+  public async verify(snapshot: SnapshotMethods, verifyWitnesses: VerifyWitnesses) {
+    const prevHeader = await snapshot.tryGetHeader(this.previousHash);
     if (prevHeader === undefined) {
       return false;
     }
@@ -218,7 +212,7 @@ export abstract class BlockBase implements EquatableKey {
       return false;
     }
 
-    return verifyWitnesses(this, options, utils.ONE_HUNDRED_MILLION);
+    return verifyWitnesses(this, snapshot, 1);
   }
 
   protected readonly sizeExclusive: () => number = () => 0;

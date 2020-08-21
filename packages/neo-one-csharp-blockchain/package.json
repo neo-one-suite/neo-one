@@ -15,12 +15,16 @@
     "@neo-one/client-common": "^2.7.0",
     "@neo-one/csharp-core": "^2.7.0",
     "@neo-one/csharp-vm": "^2.7.0",
+    "@neo-one/logger": "^2.6.1",
     "bn.js": "^5.0.0",
-    "lodash": "^4.17.15"
+    "js-priority-queue": "^0.1.5",
+    "lodash": "^4.17.15",
+    "rxjs": "^6.5.3"
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
     "@types/jest": "^24.0.18",
+    "@types/js-priority-queue": "^0.0.5",
     "@types/lodash": "^4.14.138",
     "gulp": "~4.0.2",
     "tslib": "^1.10.0"

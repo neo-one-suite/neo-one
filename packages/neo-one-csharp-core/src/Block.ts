@@ -7,6 +7,7 @@ import {
   TransactionJSON,
   UInt256,
 } from '@neo-one/client-common';
+import _ from 'lodash';
 import { BlockBase, BlockBaseAdd } from './BlockBase';
 import { ConsensusData } from './ConsensusData';
 import { MerkleTree } from './crypto';
@@ -23,7 +24,8 @@ import { TrimmedBlock } from './TrimmedBlock';
 import { BinaryReader, utils } from './utils';
 import { Witness } from './Witness';
 
-export interface BlockAdd extends BlockBaseAdd {
+export interface BlockAdd extends Omit<BlockBaseAdd, 'merkleRoot'> {
+  readonly merkleRoot?: UInt256;
   readonly consensusData?: ConsensusData;
   readonly transactions: readonly Transaction[];
 }
@@ -80,7 +82,7 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
       throw new InvalidFormatError('Expected count to be greater than 0');
     }
     const consensusData = ConsensusData.deserializeWireBase(options);
-    const transactions = reader.readArray(() => Transaction.deserializeWireBase(options), 0x10000);
+    const transactions = _.range(count - 1).map(() => Transaction.deserializeWireBase(options));
 
     if (transactions.length !== count - 1) {
       throw new InvalidFormatError(`Expected ${count - 1} transactions on the block, found: ${transactions.length}`);
