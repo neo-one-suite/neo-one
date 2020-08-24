@@ -1,3 +1,3 @@
 export * from './BaseState';
-export * from './ContractModel';
-export * from './ContractPropertyStateModel';
+export * from './contract';
+export * from './permissions';

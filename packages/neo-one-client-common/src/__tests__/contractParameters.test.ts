@@ -5,7 +5,9 @@ import { BufferContractParameter } from '../types';
 import { utils } from '../utils';
 
 describe('contractParameters', () => {
-  const undefinedValue: BufferContractParameter = { type: 'Buffer', value: '' };
+  const randomName = 'random';
+
+  const undefinedValue: BufferContractParameter = { type: 'Buffer', value: '', name: randomName };
 
   test('String - optional undefined', () => {
     const result = contractParameters.String(undefinedValue, { type: 'String', optional: true });
@@ -16,7 +18,10 @@ describe('contractParameters', () => {
   test('String - optional defined', () => {
     const value = 'foo';
 
-    const result = contractParameters.String({ type: 'String', value }, { type: 'String', optional: true });
+    const result = contractParameters.String(
+      { type: 'String', value, name: randomName },
+      { type: 'String', optional: true },
+    );
 
     expect(result).toEqual(value);
   });
@@ -24,7 +29,7 @@ describe('contractParameters', () => {
   test('String - defined', () => {
     const value = 'foo';
 
-    const result = contractParameters.String({ type: 'String', value }, { type: 'String' });
+    const result = contractParameters.String({ type: 'String', value, name: randomName }, { type: 'String' });
 
     expect(result).toEqual(value);
   });
@@ -33,7 +38,7 @@ describe('contractParameters', () => {
     const value = 'foo';
 
     const result = contractParameters.String(
-      { type: 'Buffer', value: Buffer.from(value, 'utf8').toString('hex') },
+      { type: 'Buffer', value: Buffer.from(value, 'utf8').toString('hex'), name: randomName },
       { type: 'String' },
     );
 
@@ -41,7 +46,7 @@ describe('contractParameters', () => {
   });
 
   test('String - Invalid', () => {
-    const result = () => contractParameters.String({ type: 'Void' }, { type: 'String' });
+    const result = () => contractParameters.String({ type: 'Void', name: randomName }, { type: 'String' });
 
     expect(result).toThrowErrorMatchingSnapshot();
   });
@@ -55,7 +60,10 @@ describe('contractParameters', () => {
   test('Address - optional defined', () => {
     const value = keys[0].address;
 
-    const result = contractParameters.Address({ type: 'Address', value }, { type: 'Address', optional: true });
+    const result = contractParameters.Address(
+      { type: 'Address', value, name: randomName },
+      { type: 'Address', optional: true },
+    );
 
     expect(result).toMatchSnapshot();
   });
@@ -63,7 +71,7 @@ describe('contractParameters', () => {
   test('Address - defined', () => {
     const value = keys[0].address;
 
-    const result = contractParameters.Address({ type: 'Address', value }, { type: 'Address' });
+    const result = contractParameters.Address({ type: 'Address', value, name: randomName }, { type: 'Address' });
 
     expect(result).toMatchSnapshot();
   });
@@ -71,13 +79,16 @@ describe('contractParameters', () => {
   test('Address - defined', () => {
     const value = keys[0].scriptHash;
 
-    const result = contractParameters.Address({ type: 'Buffer', value: value.toString('hex') }, { type: 'Address' });
+    const result = contractParameters.Address(
+      { type: 'Buffer', value: value.toString('hex'), name: randomName },
+      { type: 'Address' },
+    );
 
     expect(result).toMatchSnapshot();
   });
 
   test('Address - Invalid', () => {
-    const result = () => contractParameters.Address({ type: 'Void' }, { type: 'Address' });
+    const result = () => contractParameters.Address({ type: 'Void', name: randomName }, { type: 'Address' });
 
     expect(result).toThrowErrorMatchingSnapshot();
   });
@@ -91,7 +102,10 @@ describe('contractParameters', () => {
   test('Hash256 - optional defined', () => {
     const value = data.hash256s.a;
 
-    const result = contractParameters.Hash256({ type: 'Hash256', value }, { type: 'Hash256', optional: true });
+    const result = contractParameters.Hash256(
+      { type: 'Hash256', value, name: randomName },
+      { type: 'Hash256', optional: true },
+    );
 
     expect(result).toMatchSnapshot();
   });
@@ -99,7 +113,7 @@ describe('contractParameters', () => {
   test('Hash256 - defined', () => {
     const value = data.hash256s.a;
 
-    const result = contractParameters.Hash256({ type: 'Hash256', value }, { type: 'Hash256' });
+    const result = contractParameters.Hash256({ type: 'Hash256', value, name: randomName }, { type: 'Hash256' });
 
     expect(result).toMatchSnapshot();
   });
@@ -108,7 +122,7 @@ describe('contractParameters', () => {
     const value = data.hash256s.a;
 
     const result = contractParameters.Hash256(
-      { type: 'Buffer', value: common.stringToUInt256(value).toString('hex') },
+      { type: 'Buffer', value: common.stringToUInt256(value).toString('hex'), name: randomName },
       { type: 'Hash256' },
     );
 
@@ -116,7 +130,7 @@ describe('contractParameters', () => {
   });
 
   test('Hash256 - Invalid', () => {
-    const result = () => contractParameters.Hash256({ type: 'Void' }, { type: 'Hash256' });
+    const result = () => contractParameters.Hash256({ type: 'Void', name: randomName }, { type: 'Hash256' });
 
     expect(result).toThrowErrorMatchingSnapshot();
   });
@@ -130,7 +144,10 @@ describe('contractParameters', () => {
   test('PublicKey - optional defined', () => {
     const value = keys[0].publicKeyString;
 
-    const result = contractParameters.PublicKey({ type: 'PublicKey', value }, { type: 'PublicKey', optional: true });
+    const result = contractParameters.PublicKey(
+      { type: 'PublicKey', value, name: randomName },
+      { type: 'PublicKey', optional: true },
+    );
 
     expect(result).toMatchSnapshot();
   });
@@ -138,7 +155,7 @@ describe('contractParameters', () => {
   test('PublicKey - defined', () => {
     const value = keys[0].publicKeyString;
 
-    const result = contractParameters.PublicKey({ type: 'PublicKey', value }, { type: 'PublicKey' });
+    const result = contractParameters.PublicKey({ type: 'PublicKey', value, name: randomName }, { type: 'PublicKey' });
 
     expect(result).toMatchSnapshot();
   });
@@ -147,7 +164,7 @@ describe('contractParameters', () => {
     const value = keys[0].publicKey;
 
     const result = contractParameters.PublicKey(
-      { type: 'Buffer', value: value.toString('hex') },
+      { type: 'Buffer', value: value.toString('hex'), name: randomName },
       { type: 'PublicKey' },
     );
 
@@ -155,7 +172,7 @@ describe('contractParameters', () => {
   });
 
   test('PublicKey - Invalid', () => {
-    const result = () => contractParameters.PublicKey({ type: 'Void' }, { type: 'PublicKey' });
+    const result = () => contractParameters.PublicKey({ type: 'Void', name: randomName }, { type: 'PublicKey' });
 
     expect(result).toThrowErrorMatchingSnapshot();
   });
@@ -170,7 +187,7 @@ describe('contractParameters', () => {
     const value = data.bns.a;
 
     const result = contractParameters.Integer(
-      { type: 'Integer', value },
+      { type: 'Integer', value, name: randomName },
       { type: 'Integer', optional: true, decimals: 4 },
     );
 
@@ -180,7 +197,10 @@ describe('contractParameters', () => {
   test('Integer - defined', () => {
     const value = data.bns.a;
 
-    const result = contractParameters.Integer({ type: 'Integer', value }, { type: 'Integer', decimals: 4 });
+    const result = contractParameters.Integer(
+      { type: 'Integer', value, name: randomName },
+      { type: 'Integer', decimals: 4 },
+    );
 
     expect(result).toMatchSnapshot();
   });
@@ -189,7 +209,7 @@ describe('contractParameters', () => {
     const value = data.bns.a;
 
     const result = contractParameters.Integer(
-      { type: 'Buffer', value: utils.toSignedBuffer(value).toString('hex') },
+      { type: 'Buffer', value: utils.toSignedBuffer(value).toString('hex'), name: randomName },
       { type: 'Integer', decimals: 4 },
     );
 
@@ -197,7 +217,8 @@ describe('contractParameters', () => {
   });
 
   test('Integer - Invalid', () => {
-    const result = () => contractParameters.Integer({ type: 'Void' }, { type: 'Integer', decimals: 4 });
+    const result = () =>
+      contractParameters.Integer({ type: 'Void', name: randomName }, { type: 'Integer', decimals: 4 });
 
     expect(result).toThrowErrorMatchingSnapshot();
   });
@@ -211,7 +232,10 @@ describe('contractParameters', () => {
   test('Boolean - optional defined', () => {
     const value = true;
 
-    const result = contractParameters.Boolean({ type: 'Boolean', value }, { type: 'Boolean', optional: true });
+    const result = contractParameters.Boolean(
+      { type: 'Boolean', value, name: randomName },
+      { type: 'Boolean', optional: true },
+    );
 
     expect(result).toEqual(value);
   });
@@ -219,7 +243,7 @@ describe('contractParameters', () => {
   test('Boolean - defined', () => {
     const value = false;
 
-    const result = contractParameters.Boolean({ type: 'Boolean', value }, { type: 'Boolean' });
+    const result = contractParameters.Boolean({ type: 'Boolean', value, name: randomName }, { type: 'Boolean' });
 
     expect(result).toEqual(value);
   });
@@ -228,7 +252,7 @@ describe('contractParameters', () => {
     const value = false;
 
     const result = contractParameters.Boolean(
-      { type: 'Array', value: [{ type: 'Boolean', value }] },
+      { type: 'Array', value: [{ type: 'Boolean', value, name: randomName }], name: randomName },
       { type: 'Boolean' },
     );
 
@@ -244,7 +268,10 @@ describe('contractParameters', () => {
   test('Buffer - optional defined', () => {
     const value = data.buffers.a;
 
-    const result = contractParameters.Buffer({ type: 'Buffer', value }, { type: 'Buffer', optional: true });
+    const result = contractParameters.Buffer(
+      { type: 'Buffer', value, name: randomName },
+      { type: 'Buffer', optional: true },
+    );
 
     expect(result).toMatchSnapshot();
   });
@@ -252,7 +279,7 @@ describe('contractParameters', () => {
   test('Buffer - defined', () => {
     const value = data.buffers.a;
 
-    const result = contractParameters.Buffer({ type: 'Buffer', value }, { type: 'Buffer' });
+    const result = contractParameters.Buffer({ type: 'Buffer', value, name: randomName }, { type: 'Buffer' });
 
     expect(result).toMatchSnapshot();
   });
@@ -260,7 +287,7 @@ describe('contractParameters', () => {
   test('Buffer - Signature', () => {
     const value = data.signatures.a;
 
-    const result = contractParameters.Buffer({ type: 'Signature', value }, { type: 'Buffer' });
+    const result = contractParameters.Buffer({ type: 'Signature', value, name: randomName }, { type: 'Buffer' });
 
     expect(result).toMatchSnapshot();
   });
@@ -268,7 +295,7 @@ describe('contractParameters', () => {
   test('Buffer - Boolean', () => {
     const value = true;
 
-    const result = contractParameters.Buffer({ type: 'Boolean', value }, { type: 'Buffer' });
+    const result = contractParameters.Buffer({ type: 'Boolean', value, name: randomName }, { type: 'Buffer' });
 
     expect(result).toMatchSnapshot();
   });
@@ -276,7 +303,7 @@ describe('contractParameters', () => {
   test('Buffer - Integer', () => {
     const value = data.bns.a;
 
-    const result = contractParameters.Buffer({ type: 'Integer', value }, { type: 'Buffer' });
+    const result = contractParameters.Buffer({ type: 'Integer', value, name: randomName }, { type: 'Buffer' });
 
     expect(result).toMatchSnapshot();
   });
@@ -284,7 +311,7 @@ describe('contractParameters', () => {
   test('Buffer - Address', () => {
     const value = keys[0].address;
 
-    const result = contractParameters.Buffer({ type: 'Address', value }, { type: 'Buffer' });
+    const result = contractParameters.Buffer({ type: 'Address', value, name: randomName }, { type: 'Buffer' });
 
     expect(result).toMatchSnapshot();
   });
@@ -292,7 +319,7 @@ describe('contractParameters', () => {
   test('Buffer - Hash256', () => {
     const value = data.hash256s.a;
 
-    const result = contractParameters.Buffer({ type: 'Hash256', value }, { type: 'Buffer' });
+    const result = contractParameters.Buffer({ type: 'Hash256', value, name: randomName }, { type: 'Buffer' });
 
     expect(result).toMatchSnapshot();
   });
@@ -300,7 +327,7 @@ describe('contractParameters', () => {
   test('Buffer - PublicKey', () => {
     const value = keys[0].publicKeyString;
 
-    const result = contractParameters.Buffer({ type: 'PublicKey', value }, { type: 'Buffer' });
+    const result = contractParameters.Buffer({ type: 'PublicKey', value, name: randomName }, { type: 'Buffer' });
 
     expect(result).toMatchSnapshot();
   });
@@ -308,31 +335,32 @@ describe('contractParameters', () => {
   test('Buffer - String', () => {
     const value = 'foo';
 
-    const result = contractParameters.Buffer({ type: 'String', value }, { type: 'Buffer' });
+    const result = contractParameters.Buffer({ type: 'String', value, name: randomName }, { type: 'Buffer' });
 
     expect(result).toMatchSnapshot();
   });
 
   test('Buffer - InteropInterface', () => {
-    const result = contractParameters.Buffer({ type: 'InteropInterface' }, { type: 'Buffer' });
+    const result = contractParameters.Buffer({ type: 'InteropInterface', name: randomName }, { type: 'Buffer' });
 
     expect(result).toMatchSnapshot();
   });
 
   test('Buffer - Void', () => {
-    const result = contractParameters.Buffer({ type: 'Void' }, { type: 'Buffer' });
+    const result = contractParameters.Buffer({ type: 'Void', name: randomName }, { type: 'Buffer' });
 
     expect(result).toMatchSnapshot();
   });
 
   test('Buffer - Array', () => {
-    const result = () => contractParameters.Buffer({ type: 'Array', value: [] }, { type: 'Buffer' });
+    const result = () => contractParameters.Buffer({ type: 'Array', value: [], name: randomName }, { type: 'Buffer' });
 
     expect(result).toThrowErrorMatchingSnapshot();
   });
 
   test('Buffer - Array optional', () => {
-    const result = () => contractParameters.Buffer({ type: 'Array', value: [] }, { type: 'Buffer', optional: true });
+    const result = () =>
+      contractParameters.Buffer({ type: 'Array', value: [], name: randomName }, { type: 'Buffer', optional: true });
 
     expect(result).toThrowErrorMatchingSnapshot();
   });
@@ -346,7 +374,10 @@ describe('contractParameters', () => {
   test('Signature - optional defined', () => {
     const value = data.signatures.a;
 
-    const result = contractParameters.Signature({ type: 'Signature', value }, { type: 'Signature', optional: true });
+    const result = contractParameters.Signature(
+      { type: 'Signature', value, name: randomName },
+      { type: 'Signature', optional: true },
+    );
 
     expect(result).toMatchSnapshot();
   });
@@ -354,7 +385,7 @@ describe('contractParameters', () => {
   test('Signature - defined', () => {
     const value = data.signatures.a;
 
-    const result = contractParameters.Signature({ type: 'Signature', value }, { type: 'Signature' });
+    const result = contractParameters.Signature({ type: 'Signature', value, name: randomName }, { type: 'Signature' });
 
     expect(result).toMatchSnapshot();
   });
@@ -362,13 +393,13 @@ describe('contractParameters', () => {
   test('Signature - defined', () => {
     const value = data.signatures.a;
 
-    const result = contractParameters.Signature({ type: 'Buffer', value }, { type: 'Signature' });
+    const result = contractParameters.Signature({ type: 'Buffer', value, name: randomName }, { type: 'Signature' });
 
     expect(result).toMatchSnapshot();
   });
 
   test('Signature - Invalid', () => {
-    const result = () => contractParameters.Signature({ type: 'Void' }, { type: 'Signature' });
+    const result = () => contractParameters.Signature({ type: 'Void', name: randomName }, { type: 'Signature' });
 
     expect(result).toThrowErrorMatchingSnapshot();
   });
@@ -387,7 +418,7 @@ describe('contractParameters', () => {
     const value = [false];
 
     const result = contractParameters.Array(
-      { type: 'Array', value: [{ type: 'Boolean', value: false }] },
+      { type: 'Array', value: [{ type: 'Boolean', value: false, name: randomName }], name: randomName },
       { type: 'Array', optional: true, value: { type: 'Boolean' } },
     );
 
@@ -398,7 +429,7 @@ describe('contractParameters', () => {
     const value = [true];
 
     const result = contractParameters.Array(
-      { type: 'Array', value: [{ type: 'Boolean', value: true }] },
+      { type: 'Array', value: [{ type: 'Boolean', value: true, name: randomName }], name: randomName },
       { type: 'Array', value: { type: 'Boolean' } },
     );
 
@@ -406,7 +437,8 @@ describe('contractParameters', () => {
   });
 
   test('Array - Invalid', () => {
-    const result = () => contractParameters.Array({ type: 'Void' }, { type: 'Array', value: { type: 'Boolean' } });
+    const result = () =>
+      contractParameters.Array({ type: 'Void', name: randomName }, { type: 'Array', value: { type: 'Boolean' } });
 
     expect(result).toThrowErrorMatchingSnapshot();
   });
@@ -418,13 +450,13 @@ describe('contractParameters', () => {
   });
 
   test('InteropInterface - optional defined', () => {
-    const result = smartContractConverters.toInteropInterfaceNullable({ type: 'InteropInterface' });
+    const result = smartContractConverters.toInteropInterfaceNullable({ type: 'InteropInterface', name: randomName });
 
     expect(result).toEqual(undefined);
   });
 
   test('InteropInterface - defined', () => {
-    const result = smartContractConverters.toInteropInterface({ type: 'InteropInterface' });
+    const result = smartContractConverters.toInteropInterface({ type: 'InteropInterface', name: randomName });
 
     expect(result).toEqual(undefined);
   });
@@ -436,19 +468,21 @@ describe('contractParameters', () => {
   });
 
   test('Void - optional defined', () => {
-    const result = contractParameters.Void({ type: 'Void' }, { type: 'Void', optional: true });
+    const result = contractParameters.Void({ type: 'Void', name: randomName }, { type: 'Void', optional: true });
 
     expect(result).toEqual(undefined);
   });
 
   test('Void - defined', () => {
-    const result = contractParameters.Void({ type: 'Void' }, { type: 'Void' });
+    const result = contractParameters.Void({ type: 'Void', name: randomName }, { type: 'Void' });
 
     expect(result).toEqual(undefined);
   });
 });
 
 describe('Extra Contract Parameter Coverage', () => {
+  const randomName = 'random';
+
   const stringMap = [
     {
       type: 'String',
@@ -463,7 +497,9 @@ describe('Extra Contract Parameter Coverage', () => {
   const mapParam = {
     type: 'Map',
     value: [stringMap],
-  };
+    name: randomName,
+    // tslint:disable-next-line: no-any
+  } as any;
 
   const mapABI = {
     type: 'Map',
@@ -473,7 +509,8 @@ describe('Extra Contract Parameter Coverage', () => {
     value: {
       type: 'String',
     },
-  };
+    // tslint:disable-next-line: no-any
+  } as any;
 
   const objABI = {
     type: 'Object',
@@ -482,7 +519,8 @@ describe('Extra Contract Parameter Coverage', () => {
         type: 'String',
       },
     },
-  };
+    // tslint:disable-next-line: no-any
+  } as any;
 
   test('toForwardValue', () => {
     expect(smartContractConverters.toForwardValue(mapParam)).toEqual(mapParam);
@@ -505,6 +543,7 @@ describe('Extra Contract Parameter Coverage', () => {
       smartContractConverters.toMap(
         {
           type: 'Void' as 'Void',
+          name: randomName,
         },
         mapABI,
       );
@@ -517,6 +556,7 @@ describe('Extra Contract Parameter Coverage', () => {
       smartContractConverters.toObject(
         {
           type: 'Void' as 'Void',
+          name: randomName,
         },
         objABI,
       );

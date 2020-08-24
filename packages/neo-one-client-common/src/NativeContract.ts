@@ -2,7 +2,7 @@ import { common, UInt160 } from './common';
 import { crypto } from './crypto';
 import { scriptHashToAddress } from './helpers';
 import { ScriptBuilder } from './ScriptBuilder';
-import { AddressString, ContractManifest } from './types';
+import { AddressString } from './types';
 
 export type NativeContractServiceName = 'Neo.Native.Policy' | 'Neo.Native.Tokens.GAS' | 'Neo.Native.Tokens.NEO';
 

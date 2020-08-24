@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContractEventDescriptorModel - serializeJSON Boolean 1`] = `
+Object {
+  "name": "event",
+  "parameters": Array [
+    Object {
+      "name": "param",
+      "type": "Boolean",
+    },
+  ],
+}
+`;
+
+exports[`ContractEventDescriptorModel - serializeJSON Multiple Params 1`] = `
+ContractEventDescriptorModel {
+  "name": "event",
+  "parameters": Array [
+    ContractParameterDefinitionModel {
+      "name": "param",
+      "type": 16,
+    },
+    ContractParameterDefinitionModel {
+      "name": "param",
+      "type": 17,
+    },
+    ContractParameterDefinitionModel {
+      "name": "param",
+      "type": 19,
+    },
+  ],
+}
+`;

@@ -1,6 +1,6 @@
 import { keys } from '../../__data__';
 import { common } from '../../common';
-import { CosignerAdd, CosignerModel } from '../../models/SignerModel';
+import { SignerAdd, SignerModel } from '../../models/SignerModel';
 import { toWitnessScope } from '../../models/WitnessScopeModel';
 
 const testAccount = keys[0].scriptHash;
@@ -12,17 +12,16 @@ const optionsBuilder = ({
   scopes = 'Global',
   allowedContracts = [],
   allowedGroups = [],
-}: Partial<CosignerAdd> = {}): CosignerAdd => ({
+}: Partial<SignerAdd> = {}): SignerAdd => ({
   account,
   scopes,
   allowedContracts,
   allowedGroups,
 });
 
-// TODO: check and run this test
-describe('Cosigner Model', () => {
+describe('Signer Model', () => {
   test('SerializeWire', () => {
-    const cosigner = new CosignerModel(optionsBuilder());
+    const cosigner = new SignerModel(optionsBuilder());
     const serialized = cosigner.serializeWire();
     expect(serialized).toEqual(
       Buffer.concat([common.uInt160ToBuffer(testAccount), Buffer.from([toWitnessScope('Global')])]),
@@ -30,7 +29,7 @@ describe('Cosigner Model', () => {
   });
 
   test('SerializeWire - CustomContracts Scope', () => {
-    const contractCosigner = new CosignerModel(
+    const contractCosigner = new SignerModel(
       optionsBuilder({
         scopes: 'CustomContracts',
         allowedContracts: [testContract],
@@ -48,7 +47,7 @@ describe('Cosigner Model', () => {
   });
 
   test('SerializeWire - CustomGroups Scope', () => {
-    const groupCosigner = new CosignerModel(
+    const groupCosigner = new SignerModel(
       optionsBuilder({
         scopes: 'CustomGroups',
         allowedGroups: [testGroup],
@@ -66,7 +65,7 @@ describe('Cosigner Model', () => {
   });
 
   test('SerializeWire - CustomContractsAndCustomGroups Scope', () => {
-    const bothCosigner = new CosignerModel(
+    const bothCosigner = new SignerModel(
       optionsBuilder({
         scopes: 'CustomContractsAndCustomGroups',
         allowedContracts: [testContract],

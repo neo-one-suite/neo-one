@@ -6,7 +6,7 @@ describe('VM Unit Tests - Functions', () => {
     expect(assertByteCode(goodByte)).toEqual(goodByte);
   });
   test('Assert SysCall', () => {
-    const goodSysCall = 'Neo.Storage.Put';
+    const goodSysCall = 'System.Storage.Put';
     expect(assertSysCall(goodSysCall)).toEqual(goodSysCall);
   });
   test('Assert VM State', () => {

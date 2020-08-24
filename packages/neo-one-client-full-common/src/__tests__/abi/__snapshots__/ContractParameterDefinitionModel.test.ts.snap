@@ -1,0 +1,85 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContractParameterModel - serializeJSON Array 1`] = `
+Object {
+  "name": "param",
+  "type": "Array",
+}
+`;
+
+exports[`ContractParameterModel - serializeJSON Boolean 1`] = `
+Object {
+  "name": "param",
+  "type": "Boolean",
+}
+`;
+
+exports[`ContractParameterModel - serializeJSON ByteArray 1`] = `
+Object {
+  "name": "param",
+  "type": "ByteArray",
+}
+`;
+
+exports[`ContractParameterModel - serializeJSON Hash160 1`] = `
+Object {
+  "name": "param",
+  "type": "Hash160",
+}
+`;
+
+exports[`ContractParameterModel - serializeJSON Hash256 1`] = `
+Object {
+  "name": "param",
+  "type": "Hash256",
+}
+`;
+
+exports[`ContractParameterModel - serializeJSON Integer 1`] = `
+Object {
+  "name": "param",
+  "type": "Integer",
+}
+`;
+
+exports[`ContractParameterModel - serializeJSON InteropInterface 1`] = `
+Object {
+  "name": "param",
+  "type": "InteropInterface",
+}
+`;
+
+exports[`ContractParameterModel - serializeJSON Map 1`] = `
+Object {
+  "name": "param",
+  "type": "Map",
+}
+`;
+
+exports[`ContractParameterModel - serializeJSON PublicKey 1`] = `
+Object {
+  "name": "param",
+  "type": "PublicKey",
+}
+`;
+
+exports[`ContractParameterModel - serializeJSON Signature 1`] = `
+Object {
+  "name": "param",
+  "type": "Signature",
+}
+`;
+
+exports[`ContractParameterModel - serializeJSON String 1`] = `
+Object {
+  "name": "param",
+  "type": "String",
+}
+`;
+
+exports[`ContractParameterModel - serializeJSON Void 1`] = `
+Object {
+  "name": "param",
+  "type": "Void",
+}
+`;

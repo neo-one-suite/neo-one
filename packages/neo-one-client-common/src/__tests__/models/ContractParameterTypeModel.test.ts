@@ -21,8 +21,8 @@ describe('Contract Parameter Type - Functions', () => {
 });
 
 describe('Contract Parameter Type - Errors', () => {
-  const badNum = 20;
-  const badString = '20';
+  const badNum = 50;
+  const badString = '50';
 
   test('Errors', () => {
     const contractParameterThrow = () => assertContractParameterType(badNum);

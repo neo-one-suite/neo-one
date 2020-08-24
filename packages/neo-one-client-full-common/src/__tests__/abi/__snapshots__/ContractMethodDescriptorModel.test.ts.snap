@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContractMethodDescriptorModel - serializeJSON Boolean 1`] = `
+Object {
+  "name": "function",
+  "offset": undefined,
+  "parameters": Array [
+    Object {
+      "name": "param",
+      "type": "Boolean",
+    },
+  ],
+  "returnType": "Void",
+}
+`;
+
+exports[`ContractMethodDescriptorModel - serializeJSON Multiple Params 1`] = `
+Object {
+  "name": "function",
+  "offset": undefined,
+  "parameters": Array [
+    Object {
+      "name": "param",
+      "type": "Boolean",
+    },
+    Object {
+      "name": "param",
+      "type": "Integer",
+    },
+    Object {
+      "name": "param",
+      "type": "String",
+    },
+  ],
+  "returnType": "String",
+}
+`;
