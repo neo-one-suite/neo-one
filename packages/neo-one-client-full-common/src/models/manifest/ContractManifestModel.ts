@@ -4,6 +4,7 @@ import {
   ContractManifestJSON,
   createSerializeWire,
   Extra,
+  JSONHelper,
   SerializableJSON,
   SerializableWire,
   SerializeWire,
@@ -12,9 +13,10 @@ import {
   utils,
   WildcardContainer,
 } from '@neo-one/client-common';
-import { ContractGroupModel, ContractPermissionModel } from '../permissions';
-import { ContractABIModel } from './abi';
+import { ContractABIModel } from './ContractABIModel';
 import { ContractFeaturesModel, HasPayable, HasStorage } from './ContractFeaturesModel';
+import { ContractGroupModel } from './ContractGroupModel';
+import { ContractPermissionModel } from './ContractPermissionModel';
 
 export interface ContractManifestModelAdd<
   TContractABI extends ContractABIModel = ContractABIModel,
@@ -26,8 +28,8 @@ export interface ContractManifestModelAdd<
   readonly supportedStandards: readonly string[];
   readonly abi: TContractABI;
   readonly permissions: readonly TContractPermission[];
-  readonly trusts: readonly UInt160[];
-  readonly safeMethods: readonly string[];
+  readonly trusts: WildcardContainer<UInt160>;
+  readonly safeMethods: WildcardContainer<string>;
   readonly extra?: Extra;
 }
 
@@ -35,15 +37,8 @@ export class ContractManifestModel<
   TContractABI extends ContractABIModel = ContractABIModel,
   TContractGroup extends ContractGroupModel = ContractGroupModel,
   TContractPermission extends ContractPermissionModel = ContractPermissionModel
-> implements SerializableWire<ContractManifestModel>, SerializableJSON<ContractManifestJSON> {
-  public get hash(): UInt160 {
-    return this.hashInternal();
-  }
-
-  public get hashHex(): UInt160Hex {
-    return this.hashHexInternal();
-  }
-  public readonly maxLength = common.MAX_MANIFEST_LENGTH;
+> implements SerializableWire, SerializableJSON<ContractManifestJSON> {
+  public static readonly maxLength = common.MAX_MANIFEST_LENGTH;
   public readonly groups: readonly TContractGroup[];
   public readonly features: ContractFeaturesModel;
   public readonly supportedStandards: readonly string[];
@@ -80,6 +75,14 @@ export class ContractManifestModel<
     this.extra = extra;
   }
 
+  public get hash(): UInt160 {
+    return this.hashInternal();
+  }
+
+  public get hashHex(): UInt160Hex {
+    return this.hashHexInternal();
+  }
+
   public serializeJSON(): ContractManifestJSON {
     return {
       groups: this.groups.map((group) => group.serializeJSON()),
@@ -90,7 +93,7 @@ export class ContractManifestModel<
       supportedStandards: this.supportedStandards,
       abi: this.abi.serializeJSON(),
       permissions: this.permissions.map((permission) => permission.serializeJSON()),
-      trusts: common.isWildcard(this.trusts) ? this.trusts : this.trusts.map((trust) => common.uInt160ToString(trust)),
+      trusts: common.isWildcard(this.trusts) ? this.trusts : this.trusts.map((trust) => JSONHelper.writeUInt160(trust)),
       safeMethods: this.safeMethods,
       extra: this.extra,
     };

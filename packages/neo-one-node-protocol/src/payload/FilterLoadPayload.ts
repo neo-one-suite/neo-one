@@ -12,7 +12,7 @@ export interface FilterLoadPayloadAdd {
   readonly tweak: number;
 }
 
-export class FilterLoadPayload implements SerializableWire<FilterLoadPayload> {
+export class FilterLoadPayload implements SerializableWire {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): FilterLoadPayload {
     const filter = reader.readVarBytesLE(36000);
     const k = reader.readUInt8();

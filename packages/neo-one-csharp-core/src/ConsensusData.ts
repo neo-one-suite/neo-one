@@ -15,7 +15,7 @@ export interface ConsensusDataAdd {
   readonly nonce: BN;
 }
 
-export class ConsensusData implements SerializableWire<ConsensusData>, SerializableJSON<ConsensusDataJSON> {
+export class ConsensusData implements SerializableWire, SerializableJSON<ConsensusDataJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): ConsensusData {
     const { reader } = options;
     const primaryIndex = reader.readVarUIntLE(DEFAULT_VALIDATORS_COUNT.subn(1)).toNumber();

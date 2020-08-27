@@ -16,7 +16,7 @@ import { Equals, EquatableKey } from './Equatable';
 import { UnsignedBlockError } from './errors';
 import { createSerializeWire, DeserializeWireBaseOptions, SerializeJSONContext, SerializeWire } from './Serializable';
 import { utils } from './utils';
-import { SnapshotMethods, VerifyWitnesses } from './Verifiable';
+import { StorageMethods, VerifyWitnesses } from './Verifiable';
 import { Witness } from './Witness';
 
 export interface BlockBaseAdd {
@@ -78,7 +78,7 @@ export abstract class BlockBase implements EquatableKey {
   public readonly timestamp: BN;
   public readonly index: number;
   public readonly nextConsensus: UInt160;
-  public readonly getScriptHashesForVerifying = utils.lazyAsync(async ({ tryGetHeader }: SnapshotMethods) => {
+  public readonly getScriptHashesForVerifying = utils.lazyAsync(async ({ tryGetHeader }: StorageMethods) => {
     if (this.previousHash === common.ZERO_UINT256) {
       return [this.witness.scriptHash];
     }
@@ -198,8 +198,8 @@ export abstract class BlockBase implements EquatableKey {
     };
   }
 
-  public async verify(snapshot: SnapshotMethods, verifyWitnesses: VerifyWitnesses) {
-    const prevHeader = await snapshot.tryGetHeader(this.previousHash);
+  public async verify(storage: StorageMethods, verifyWitnesses: VerifyWitnesses) {
+    const prevHeader = await storage.tryGetHeader(this.previousHash);
     if (prevHeader === undefined) {
       return false;
     }
@@ -212,7 +212,7 @@ export abstract class BlockBase implements EquatableKey {
       return false;
     }
 
-    return verifyWitnesses(this, snapshot, 1);
+    return verifyWitnesses(this, storage, 1);
   }
 
   protected readonly sizeExclusive: () => number = () => 0;

@@ -13,7 +13,7 @@ export interface MerkleBlockPayloadAdd extends BlockBaseAdd {
   readonly flags: Buffer;
 }
 
-export class MerkleBlockPayload extends BlockBase implements SerializableWire<MerkleBlockPayload> {
+export class MerkleBlockPayload extends BlockBase implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): MerkleBlockPayload {
     const { reader } = options;
     const blockBase = super.deserializeBlockBaseWireBase(options);

@@ -1472,7 +1472,7 @@ export enum ContractFeatures {
   HasStoragePayable = 0x05,
 }
 
-export type WildcardContainer<T> = readonly T[] | Wildcard;
+export type WildcardContainer<T> = T extends undefined ? Wildcard : readonly T[] | Wildcard;
 
 /**
  * Describes the contract to be invoked. Can be a contract hash, the public key of a group, or a wildcard.

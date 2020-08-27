@@ -65,7 +65,7 @@ const getCombinedModels = (
   return init.concat(transactions);
 };
 
-export class Block extends BlockBase implements SerializableWire<Block>, SerializableJSON<BlockJSON> {
+export class Block extends BlockBase implements SerializableWire, SerializableJSON<BlockJSON> {
   public static readonly MaxContentsPerBlock = utils.USHORT_MAX;
   public static readonly MaxTransactionsPerBlock = utils.USHORT_MAX.subn(1);
   // public static async calculateNetworkFee(context: FeeContext, transactions: readonly Transaction[]): Promise<BN> {

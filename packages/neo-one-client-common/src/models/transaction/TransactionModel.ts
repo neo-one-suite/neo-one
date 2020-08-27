@@ -35,7 +35,7 @@ export class TransactionModel<
   TAttribute extends AttributeModel = AttributeModel,
   TWitness extends WitnessModel = WitnessModel,
   TSigner extends SignerModel = SignerModel
-> implements SerializableWire<TransactionModel> {
+> implements SerializableWire {
   public static readonly VERSION: number = 0;
   public static readonly maxTransactionSize = MAX_TRANSACTION_SIZE;
   public static readonly maxValidBlockIncrement = MAX_VALID_UNTIL_BLOCK_INCREMENT;

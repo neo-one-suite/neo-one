@@ -30,7 +30,7 @@ export type TransactionAdd = TransactionModelAdd<Attribute, Witness, Signer>;
 
 export class Transaction
   extends TransactionModel<Attribute, Witness, Signer>
-  implements SerializableWire<Transaction>, SerializableJSON<TransactionJSON> {
+  implements SerializableWire, SerializableJSON<TransactionJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Transaction {
     const {
       version,

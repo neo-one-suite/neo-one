@@ -20,7 +20,7 @@ export interface TrimmedBlockAdd extends BlockBaseAdd {
   readonly hashes: readonly UInt256[];
 }
 
-export class TrimmedBlock extends BlockBase implements SerializableWire<TrimmedBlock> {
+export class TrimmedBlock extends BlockBase implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): TrimmedBlock {
     const {
       version,

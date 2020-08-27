@@ -100,7 +100,7 @@ const verify = ({
   readonly message: Buffer;
   readonly signature: Buffer;
   readonly publicKey: ECPoint;
-}) => {
+}): boolean => {
   if (signatureIn.length !== 64) {
     throw new InvalidSignatureError(signatureIn.length);
   }

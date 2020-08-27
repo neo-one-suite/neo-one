@@ -5,7 +5,7 @@ export interface AddrPayloadAdd {
   readonly addresses: readonly NetworkAddress[];
 }
 
-export class AddrPayload implements SerializableWire<AddrPayload> {
+export class AddrPayload implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): AddrPayload {
     const { reader } = options;
     const addresses = reader.readArray(() => NetworkAddress.deserializeWireBase(options));
