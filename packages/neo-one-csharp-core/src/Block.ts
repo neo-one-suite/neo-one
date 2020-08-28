@@ -30,10 +30,6 @@ export interface BlockAdd extends Omit<BlockBaseAdd, 'merkleRoot'> {
   readonly transactions: readonly Transaction[];
 }
 
-export interface BlockKey {
-  readonly hashOrIndex: UInt256 | number;
-}
-
 // export interface BlockVerifyOptions {
 //   readonly genesisBlock: Block;
 //   readonly tryGetBlock: (block: BlockKey) => Promise<Block | undefined>;

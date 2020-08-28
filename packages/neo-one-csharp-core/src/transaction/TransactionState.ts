@@ -1,7 +1,9 @@
-import { IOHelper, TransactionStateModel } from '@neo-one/client-common';
+import { IOHelper, TransactionStateModel, UInt256 } from '@neo-one/client-common';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../Serializable';
 import { BinaryReader, utils } from '../utils';
 import { Transaction } from './Transaction';
+
+export type TransactionKey = UInt256;
 
 export class TransactionState extends TransactionStateModel<Transaction> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): TransactionState {

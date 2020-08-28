@@ -1,15 +1,23 @@
-import { Block, Header, VM } from '@neo-one/csharp-core';
+import { Block, Blockchain as BlockchainType, BlockchainSettings, Header, Storage, VM } from '@neo-one/csharp-core';
 import PriorityQueue from 'js-priority-queue';
 import { Subject } from 'rxjs';
+import { GenesisBlockNotRegisteredError } from './errors';
 import { verifyWitnesses } from './verify';
 import { WriteBatchBlockchain } from './WriteBatchBlockchain';
 
 // TODO: bring logger over when its time;
 const logger = console;
 
-export interface BlockchainOptions {
+export interface CreateBlockchainOptions {
+  readonly settings: BlockchainSettings;
   readonly storage: Storage;
   readonly vm: VM;
+}
+
+export interface BlockchainOptions extends CreateBlockchainOptions {
+  readonly currentBlock: Block | undefined;
+  readonly previousBlock: Block | undefined;
+  readonly currentHeader: Header | undefined;
 }
 
 interface Entry {
@@ -20,8 +28,13 @@ interface Entry {
 }
 
 export class Blockchain {
+  public static async create({ settings, storage, vm }: CreateBlockchainOptions): Promise<BlockchainType> {
+    throw new Error('not implemented');
+  }
+  private readonly settings: BlockchainSettings;
   private readonly storage: Storage;
   private readonly vm: VM;
+
   private mutableBlockQueue: PriorityQueue<Entry> = new PriorityQueue({
     comparator: (a, b) => a.block.index - b.block.index,
   });
@@ -35,6 +48,7 @@ export class Blockchain {
   private mutableBlock$: Subject<Block> = new Subject();
 
   public constructor(options: BlockchainOptions) {
+    this.settings = options.settings;
     this.storage = options.storage;
     this.vm = options.vm;
   }

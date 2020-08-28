@@ -1,4 +1,4 @@
-import { common, createSerializeWire, crypto, IOHelper } from '@neo-one/client-common';
+import { common, createSerializeWire, crypto, IOHelper, UInt160 } from '@neo-one/client-common';
 import { ContractStateModel } from '@neo-one/client-full-common';
 import { ContractManifest } from './manifest';
 import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
@@ -9,6 +9,8 @@ export interface ContractStateAdd {
   readonly script: Buffer;
   readonly manifest: ContractManifest;
 }
+
+export type ContractKey = UInt160;
 
 export class ContractState extends ContractStateModel<ContractManifest> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): ContractState {
