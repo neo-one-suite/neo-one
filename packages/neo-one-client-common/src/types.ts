@@ -2290,6 +2290,7 @@ export type ParamJSON =
  * Constant settings used to initialize the client APIs.
  */
 export interface NetworkSettings {
+  // TODO: remove/replace this
   readonly issueGASFee: BigNumber;
 }
 

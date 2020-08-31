@@ -13,6 +13,7 @@
   "sideEffects": false,
   "dependencies": {
     "@neo-one/client-common": "^2.7.0",
+    "@neo-one/client-full-common": "^2.7.0",
     "@neo-one/utils": "^2.6.1",
     "bignumber.js": "^9.0.0",
     "bn.js": "^5.0.0",

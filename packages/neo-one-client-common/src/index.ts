@@ -8,6 +8,8 @@ export * from './IOHelper';
 export * from './JSONHelper';
 export * from './models';
 export * from './NativeContract';
+export * from './GasToken';
+export * from './NeoToken';
 export * from './paramUtils';
 export * from './BaseScriptBuilder';
 export * from './ScriptBuilder';

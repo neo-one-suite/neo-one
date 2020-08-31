@@ -190,7 +190,7 @@ export type AttributeTypeJSON = keyof typeof AttributeTypeModel;
 
 export type VerifyResultJSON = keyof typeof VerifyResultModel;
 
-// TODO: check that this can be removed. or rename to "TransactionDataJSON" ?
+// TODO: what extra invocation data are we going to include now?
 export interface InvocationDataJSON {
   readonly result: InvocationResultJSON;
   // readonly asset?: AssetJSON;
@@ -217,8 +217,14 @@ export interface TransactionJSON {
   readonly witnesses: readonly WitnessJSON[];
 }
 
+export interface TransactionWithInvocationDataJSON extends TransactionJSON {
+  readonly script: string;
+  readonly gas: string;
+  readonly invocationData?: InvocationDataJSON | undefined;
+}
+
 export interface TransactionReceiptJSON {
-  readonly blockIndex: number; // TODO: check this
+  readonly blockIndex: number;
   readonly blockHash: string;
   readonly transactionIndex: number;
   readonly globalIndex: string;
@@ -281,6 +287,7 @@ export interface ContractParameterDefinitionJSON {
 }
 
 export interface ContractJSON {
+  readonly id: number;
   readonly hash: string;
   readonly script: string;
   readonly manifest: ContractManifestJSON;

@@ -1,12 +1,19 @@
 import { common, UInt160 } from './common';
 import { crypto } from './crypto';
+import { GasToken } from './GasToken';
 import { scriptHashToAddress } from './helpers';
+import { NeoToken } from './NeoToken';
+import { PolicyContract } from './PolicyContract';
 import { ScriptBuilder } from './ScriptBuilder';
 import { AddressString } from './types';
 
-export type NativeContractServiceName = 'Neo.Native.Policy' | 'Neo.Native.Tokens.GAS' | 'Neo.Native.Tokens.NEO';
+export type NativeContractServiceName = 'Policy' | 'GAS' | 'NEO';
 
-class NativeContract {
+export class NativeContract {
+  public static readonly NEO: NeoToken;
+  public static readonly GAS: GasToken;
+  public static readonly Policy: PolicyContract;
+
   public readonly serviceName: NativeContractServiceName;
   public readonly script: Buffer;
   public readonly scriptHex: string;
@@ -26,9 +33,3 @@ class NativeContract {
     this.address = scriptHashToAddress(this.scriptHash);
   }
 }
-
-export const NativeContracts = {
-  NEO: new NativeContract('Neo.Native.Tokens.NEO'),
-  GAS: new NativeContract('Neo.Native.Tokens.GAS'),
-  Policy: new NativeContract('Neo.Native.Policy'),
-};

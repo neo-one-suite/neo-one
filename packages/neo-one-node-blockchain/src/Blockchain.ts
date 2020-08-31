@@ -1,4 +1,4 @@
-import { common, crypto, ECPoint, ScriptBuilder, UInt160, VMState } from '@neo-one/client-common';
+import { common, crypto, ECPoint, ScriptBuilder, VMState } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import {
   Action,

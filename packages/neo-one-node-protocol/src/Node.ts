@@ -1,4 +1,4 @@
-import { common, crypto, UInt256Hex, utils } from '@neo-one/client-common';
+import { common, crypto, UInt256Hex, utils, VersionJSON } from '@neo-one/client-common';
 import { createChild, nodeLogger } from '@neo-one/logger';
 import { Consensus, ConsensusOptions } from '@neo-one/node-consensus';
 import {
@@ -124,6 +124,15 @@ interface PeerHealth {
 }
 
 export class Node implements INode {
+  public get version(): VersionJSON {
+    return {
+      tcpPort: this.externalPort,
+      wsPort: -1,
+      nonce: this.nonce,
+      useragent: this.userAgent,
+    };
+  }
+
   public get consensus(): Consensus | undefined {
     return this.mutableConsensus;
   }
