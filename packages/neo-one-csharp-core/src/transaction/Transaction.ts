@@ -8,6 +8,7 @@ import {
   TransactionJSON,
   TransactionModel,
   TransactionModelAdd,
+  TransactionWithInvocationDataJSON,
   UInt160,
 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
@@ -27,7 +28,8 @@ import { Attribute, deserializeAttribute } from './attributes';
 export type TransactionAddUnsigned = Omit<TransactionModelAdd<Attribute, Witness, Signer>, 'witnesses'>;
 export type TransactionAdd = TransactionModelAdd<Attribute, Witness, Signer>;
 
-export class Transaction extends TransactionModel<Attribute, Witness, Signer>
+export class Transaction
+  extends TransactionModel<Attribute, Witness, Signer>
   implements SerializableWire<Transaction>, SerializableJSON<TransactionJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Transaction {
     const {
@@ -186,5 +188,12 @@ export class Transaction extends TransactionModel<Attribute, Witness, Signer>
       script: JSONHelper.writeBuffer(this.script),
       witnesses: this.witnesses.map((witness) => witness.serializeJSON(options)),
     };
+  }
+
+  public async serializeJSONWithInvocationData(
+    _options: SerializeJSONContext,
+  ): Promise<TransactionWithInvocationDataJSON> {
+    // TODO: Implement method similar to old InvocationTransaction.serializeJSON(), which includes extra invocation data
+    return Promise.reject();
   }
 }

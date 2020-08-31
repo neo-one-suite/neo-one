@@ -1,5 +1,5 @@
 // tslint:disable no-any no-object-mutation
-import { BooleanContractParameter, Transaction, Witness } from '@neo-one/node-core';
+import { Transaction, Witness } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { of as _of } from 'rxjs';
 import { settings } from '../__data__';

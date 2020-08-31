@@ -15,3 +15,5 @@ export * from './Verifiable';
 export * from './vm';
 export * from './Witness';
 export * from './CallFlags';
+export * from './TransactionData';
+export * from './Node';
