@@ -6,7 +6,7 @@ export interface WitnessAdd {
   readonly invocation: Buffer;
 }
 
-export class WitnessModel implements SerializableWire<WitnessModel> {
+export class WitnessModel implements SerializableWire {
   public readonly verification: Buffer;
   public readonly invocation: Buffer;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));

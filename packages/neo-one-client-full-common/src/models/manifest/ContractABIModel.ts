@@ -1,4 +1,4 @@
-import { common, ContractABIJSON, SerializableJSON, UInt160 } from '@neo-one/client-common';
+import { ContractABIJSON, JSONHelper, SerializableJSON, UInt160 } from '@neo-one/client-common';
 import { ContractEventDescriptorModel } from './ContractEventDescriptorModel';
 import { ContractMethodDescriptorModel } from './ContractMethodDescriptorModel';
 
@@ -27,7 +27,7 @@ export class ContractABIModel<
 
   public serializeJSON(): ContractABIJSON {
     return {
-      hash: common.uInt160ToString(this.hash),
+      hash: JSONHelper.writeUInt160(this.hash),
       methods: this.methods.map((method) => method.serializeJSON()),
       events: this.events.map((event) => event.serializeJSON()),
     };

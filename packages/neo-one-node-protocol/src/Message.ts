@@ -89,7 +89,7 @@ const deserializeMessageHeader = ({
   return { command, length, checksum };
 };
 
-export class Message implements SerializableWire<Message> {
+export class Message implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Message {
     const { reader, context } = options;
     const { command, length, checksum } = deserializeMessageHeader(options);

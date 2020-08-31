@@ -4,7 +4,7 @@ export interface FilterAddPayloadAdd {
   readonly data: Buffer;
 }
 
-export class FilterAddPayload implements SerializableWire<FilterAddPayload> {
+export class FilterAddPayload implements SerializableWire {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): FilterAddPayload {
     const data = reader.readVarBytesLE(520);
 

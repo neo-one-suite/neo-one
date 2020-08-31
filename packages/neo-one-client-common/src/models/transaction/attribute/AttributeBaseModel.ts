@@ -3,7 +3,7 @@ import { createSerializeWire, SerializableWire, SerializeWire } from '../../Seri
 import { AttributeModel } from './AttributeModel';
 import { AttributeTypeModel } from './AttributeTypeModel';
 
-export abstract class AttributeBaseModel implements SerializableWire<AttributeModel> {
+export abstract class AttributeBaseModel implements SerializableWire {
   public abstract readonly type: AttributeTypeModel;
   public abstract readonly allowMultiple: boolean;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));

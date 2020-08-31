@@ -15,11 +15,12 @@ export interface ContractMethodDescriptorModelAdd<
 }
 
 export class ContractMethodDescriptorModel<
-  TContractParameterDefinition extends ContractParameterDefinitionModel = ContractParameterDefinitionModel
-> extends ContractEventDescriptorModel<TContractParameterDefinition>
+    TContractParameterDefinition extends ContractParameterDefinitionModel = ContractParameterDefinitionModel
+  >
+  extends ContractEventDescriptorModel<TContractParameterDefinition>
   implements SerializableJSON<ContractMethodDescriptorJSON> {
   public readonly returnType: ContractParameterTypeModel;
-  private readonly offset?: number;
+  public readonly offset?: number;
 
   public constructor(options: ContractMethodDescriptorModelAdd<TContractParameterDefinition>) {
     super(options);

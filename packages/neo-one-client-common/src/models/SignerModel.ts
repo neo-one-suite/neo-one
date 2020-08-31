@@ -13,7 +13,7 @@ export interface SignerAdd {
 // Limits the number of AllowedContracts or AllowedGroups for deserialize
 export const MAX_SUB_ITEMS = 16;
 
-export class SignerModel implements SerializableWire<SignerModel> {
+export class SignerModel implements SerializableWire {
   public static readonly maxSubItems = MAX_SUB_ITEMS;
   public readonly account: UInt160;
   public readonly scopes: WitnessScopeModel;

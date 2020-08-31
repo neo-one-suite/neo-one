@@ -30,10 +30,6 @@ export interface BlockAdd extends Omit<BlockBaseAdd, 'merkleRoot'> {
   readonly transactions: readonly Transaction[];
 }
 
-export interface BlockKey {
-  readonly hashOrIndex: UInt256 | number;
-}
-
 // export interface BlockVerifyOptions {
 //   readonly genesisBlock: Block;
 //   readonly tryGetBlock: (block: BlockKey) => Promise<Block | undefined>;
@@ -65,7 +61,7 @@ const getCombinedModels = (
   return init.concat(transactions);
 };
 
-export class Block extends BlockBase implements SerializableWire<Block>, SerializableJSON<BlockJSON> {
+export class Block extends BlockBase implements SerializableWire, SerializableJSON<BlockJSON> {
   public static readonly MaxContentsPerBlock = utils.USHORT_MAX;
   public static readonly MaxTransactionsPerBlock = utils.USHORT_MAX.subn(1);
   // public static async calculateNetworkFee(context: FeeContext, transactions: readonly Transaction[]): Promise<BN> {

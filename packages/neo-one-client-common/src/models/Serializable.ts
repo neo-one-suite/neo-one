@@ -2,7 +2,7 @@ import { BinaryWriter } from '../BinaryWriter';
 
 export type SerializeWire = () => Buffer;
 // tslint:disable-next-line no-unused
-export interface SerializableWire<T> {
+export interface SerializableWire {
   readonly serializeWireBase: (writer: BinaryWriter) => void;
   readonly serializeWire: SerializeWire;
 }

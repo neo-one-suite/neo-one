@@ -1,13 +1,13 @@
-import { common, ContractGroupJSON, ECPoint, SerializableJSON, SignatureString } from '@neo-one/client-common';
+import { ContractGroupJSON, ECPoint, JSONHelper, SerializableJSON } from '@neo-one/client-common';
 
 export interface ContractGroupModelAdd {
   readonly publicKey: ECPoint;
-  readonly signature: SignatureString;
+  readonly signature: Buffer;
 }
 
 export class ContractGroupModel implements SerializableJSON<ContractGroupJSON> {
   public readonly publicKey: ECPoint;
-  public readonly signature: SignatureString;
+  public readonly signature: Buffer;
 
   public constructor({ publicKey, signature }: ContractGroupModelAdd) {
     this.publicKey = publicKey;
@@ -16,8 +16,8 @@ export class ContractGroupModel implements SerializableJSON<ContractGroupJSON> {
 
   public serializeJSON(): ContractGroupJSON {
     return {
-      publicKey: common.ecPointToString(this.publicKey),
-      signature: this.signature,
+      publicKey: JSONHelper.writeECPoint(this.publicKey),
+      signature: JSONHelper.writeBuffer(this.signature),
     };
   }
 }

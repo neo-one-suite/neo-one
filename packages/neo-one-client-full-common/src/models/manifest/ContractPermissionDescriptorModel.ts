@@ -14,7 +14,7 @@ export interface ContractPermissionDescriptorModelAdd {
 export class ContractPermissionDescriptorModel implements SerializableJSON<ContractPermissionDescriptorJSON> {
   public readonly hashOrGroup: UInt160 | ECPoint | Wildcard;
 
-  public constructor({ hashOrGroup }: ContractPermissionDescriptorModelAdd) {
+  public constructor({ hashOrGroup }: ContractPermissionDescriptorModelAdd = {}) {
     this.hashOrGroup = hashOrGroup === undefined ? '*' : hashOrGroup;
   }
 

@@ -1,3 +1,4 @@
+import { SignatureString } from '../types';
 import { ContractParameterTypeModel } from './ContractParameterTypeModel';
 import { StorageFlagsModel } from './StorageFlagsModel';
 import { AttributeTypeModel } from './transaction/attribute/AttributeTypeModel';
@@ -233,7 +234,7 @@ export interface TransactionReceiptJSON {
 export interface ConfirmedTransactionJSON extends TransactionJSON, TransactionReceiptJSON {}
 
 export type Wildcard = '*';
-export type WildcardContainerJSON<T> = readonly T[] | Wildcard;
+export type WildcardContainerJSON = readonly string[] | Wildcard;
 
 export interface ContractMethodDescriptorJSON {
   readonly name: string;
@@ -255,24 +256,27 @@ export interface ContractABIJSON {
 
 export interface ContractGroupJSON {
   readonly publicKey: string;
-  readonly signature: string;
+  readonly signature: SignatureString;
 }
 
 export type ContractPermissionDescriptorJSON = string;
 
 export interface ContractPermissionJSON {
   readonly contract: ContractPermissionDescriptorJSON;
-  readonly methods: WildcardContainerJSON<string>;
+  readonly methods: WildcardContainerJSON;
 }
 
-export type Extra = JSON;
+type ExtraValue = string | number | boolean | readonly ExtraValue[];
+export interface Extra {
+  readonly [k: string]: ExtraValue | Extra;
+}
 
 export interface ContractManifestJSON {
   readonly abi: ContractABIJSON;
   readonly groups: readonly ContractGroupJSON[];
   readonly permissions: readonly ContractPermissionJSON[];
-  readonly trusts: WildcardContainerJSON<string>;
-  readonly safeMethods: WildcardContainerJSON<string>;
+  readonly trusts: WildcardContainerJSON;
+  readonly safeMethods: WildcardContainerJSON;
   readonly features: {
     readonly storage: boolean;
     readonly payable: boolean;

@@ -4,7 +4,7 @@ export interface HeadersPayloadAdd {
   readonly headers: readonly Header[];
 }
 
-export class HeadersPayload implements SerializableWire<HeadersPayload> {
+export class HeadersPayload implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): HeadersPayload {
     const { reader } = options;
     const headers = reader.readArray(() => Header.deserializeWireBase(options));

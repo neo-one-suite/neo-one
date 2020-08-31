@@ -4,7 +4,6 @@ import {
   IOHelper,
   JSONHelper,
   SerializableWire,
-  Transaction,
   TrimmedBlockJSON,
   UInt256,
 } from '@neo-one/client-common';
@@ -13,6 +12,8 @@ import { BlockBase, BlockBaseAdd } from './BlockBase';
 import { ConsensusData } from './ConsensusData';
 import { Header } from './Header';
 import { DeserializeWireBaseOptions, SerializeJSONContext } from './Serializable';
+import { ReadStorage } from './Storage';
+import { TransactionKey, TransactionState } from './transaction';
 import { utils } from './utils';
 
 export interface TrimmedBlockAdd extends BlockBaseAdd {
@@ -20,7 +21,9 @@ export interface TrimmedBlockAdd extends BlockBaseAdd {
   readonly hashes: readonly UInt256[];
 }
 
-export class TrimmedBlock extends BlockBase implements SerializableWire<TrimmedBlock> {
+export type BlockKey = UInt256;
+
+export class TrimmedBlock extends BlockBase implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): TrimmedBlock {
     const {
       version,
@@ -30,7 +33,7 @@ export class TrimmedBlock extends BlockBase implements SerializableWire<TrimmedB
       index,
       nextConsensus,
       witness,
-    } = BlockBase.deserializeBlockBaseWireBase(options);
+    } = BlockBase.deserializeWireBase(options);
     const { reader } = options;
 
     const hashes = reader.readArray(reader.readUInt256, Block.MaxContentsPerBlock);
@@ -81,7 +84,7 @@ export class TrimmedBlock extends BlockBase implements SerializableWire<TrimmedB
     return this.headerInternal();
   }
 
-  public getBlock<Cache extends Map<UInt256, Transaction>>(cache: Cache) {
+  public async getBlock(storage: ReadStorage<TransactionKey, TransactionState>) {
     return new Block({
       version: this.version,
       previousHash: this.previousHash,
@@ -91,7 +94,13 @@ export class TrimmedBlock extends BlockBase implements SerializableWire<TrimmedB
       nextConsensus: this.nextConsensus,
       witness: this.witness,
       consensusData: this.consensusData,
-      transactions: this.hashes.slice(1).map(cache.get),
+      transactions: await Promise.all(
+        this.hashes.slice(1).map(async (hash) => {
+          const state = await storage.get(hash);
+
+          return state.transaction;
+        }),
+      ),
     });
   }
 

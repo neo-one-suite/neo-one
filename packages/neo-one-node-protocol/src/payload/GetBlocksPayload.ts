@@ -12,7 +12,7 @@ export interface GetBlocksPayloadAdd {
   readonly hashStop?: UInt256;
 }
 
-export class GetBlocksPayload implements SerializableWire<GetBlocksPayload> {
+export class GetBlocksPayload implements SerializableWire {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): GetBlocksPayload {
     const hashStart = reader.readArray(() => reader.readUInt256());
     const hashStop = reader.readUInt256();

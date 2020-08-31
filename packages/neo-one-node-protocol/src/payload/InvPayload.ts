@@ -6,7 +6,7 @@ export interface InvPayloadAdd {
   readonly hashes: readonly UInt256[];
 }
 
-export class InvPayload implements SerializableWire<InvPayload> {
+export class InvPayload implements SerializableWire {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): InvPayload {
     const type = assertInventoryType(reader.readUInt8());
     const hashes = reader.readArray(() => reader.readUInt256());

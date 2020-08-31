@@ -1,10 +1,23 @@
-import { Block, VM } from '@neo-one/csharp-core';
+import { Block, Blockchain as BlockchainType, BlockchainSettings, Header, Storage, VM } from '@neo-one/csharp-core';
 import PriorityQueue from 'js-priority-queue';
+import { Subject } from 'rxjs';
+import { GenesisBlockNotRegisteredError } from './errors';
 import { verifyWitnesses } from './verify';
+import { WriteBatchBlockchain } from './WriteBatchBlockchain';
 
-export interface BlockchainOptions {
+// TODO: bring logger over when its time;
+const logger = console;
+
+export interface CreateBlockchainOptions {
+  readonly settings: BlockchainSettings;
   readonly storage: Storage;
   readonly vm: VM;
+}
+
+export interface BlockchainOptions extends CreateBlockchainOptions {
+  readonly currentBlock: Block | undefined;
+  readonly previousBlock: Block | undefined;
+  readonly currentHeader: Header | undefined;
 }
 
 interface Entry {
@@ -15,18 +28,27 @@ interface Entry {
 }
 
 export class Blockchain {
+  public static async create({ settings, storage, vm }: CreateBlockchainOptions): Promise<BlockchainType> {
+    throw new Error('not implemented');
+  }
+  private readonly settings: BlockchainSettings;
   private readonly storage: Storage;
   private readonly vm: VM;
-  private readonly mutableBlockQueue: PriorityQueue<Entry> = new PriorityQueue({
+
+  private mutableBlockQueue: PriorityQueue<Entry> = new PriorityQueue({
     comparator: (a, b) => a.block.index - b.block.index,
   });
   private mutableCurrentBlock: Block | undefined;
-  private readonly mutableInQueue: Set<string> = new Set();
-  private readonly mutableRunning = false;
+  private mutablePreviousBlock: Block | undefined;
+  private mutableCurrentHeader: Header | undefined;
+  private mutablePersistingBlocks = false;
+  private mutableInQueue: Set<string> = new Set();
+  private mutableRunning = false;
   private mutableDoneRunningResolve: (() => void) | undefined;
-  private readonly mutableBlock$: Subject<Block> = new Subject();
+  private mutableBlock$: Subject<Block> = new Subject();
 
   public constructor(options: BlockchainOptions) {
+    this.settings = options.settings;
     this.storage = options.storage;
     this.vm = options.vm;
   }
@@ -44,7 +66,7 @@ export class Blockchain {
   }
 
   // TODO: make sure all of this storage is implemented
-  public get snapshotMethods() {
+  public get storageMethods() {
     return {
       tryGetBlock: this.storage.block.tryGet,
       tryGetHeader: this.storage.header.tryGet,
@@ -54,7 +76,7 @@ export class Blockchain {
   }
 
   public async verifyBlock(block: Block): Promise<void> {
-    const verification = await block.verify(this.snapshotMethods, verifyWitnesses);
+    const verification = await block.verify(this.storageMethods, verifyWitnesses);
     if (!verification) {
       // TODO: implement a makeError
       throw new Error('Block Verification Failed');
@@ -103,7 +125,7 @@ export class Blockchain {
       while (this.mutableRunning && entry !== undefined && entry.block.index === this.currentBlockIndex + 1) {
         const entryNonNull = entry;
         const logData = {
-          [Labels.NEO_BLOCK_INDEX]: entry.block.index,
+          // [Labels.NEO_BLOCK_INDEX]: entry.block.index, // TODO: bring Label over
           name: 'neo_blockchain_persist_block_top_level',
         };
         try {
@@ -137,22 +159,35 @@ export class Blockchain {
   }
 
   private cleanBlockQueue(): Entry | undefined {
-    let entry = this.dequeBlockQueue();
+    let entry = this.dequeueBlockQueue();
     // tslint:disable-next-line no-loop-statement
     while (entry !== undefined && entry.block.index <= this.currentBlockIndex) {
       entry.resolve();
-      entry = this.dequeBlockQueue();
+      entry = this.dequeueBlockQueue();
     }
 
     return entry;
   }
 
-  private dequeBlockQueue(): Entry | undefined {
+  private dequeueBlockQueue(): Entry | undefined {
     if (this.mutableBlockQueue.length > 0) {
       return this.mutableBlockQueue.dequeue();
     }
 
     return undefined;
+  }
+
+  private start(): void {
+    this.mutableBlock$ = new Subject();
+    this.mutablePersistingBlocks = false;
+    this.mutableBlockQueue = new PriorityQueue({
+      comparator: (a, b) => a.block.index - b.block.index,
+    });
+
+    this.mutableInQueue = new Set();
+    this.mutableDoneRunningResolve = undefined;
+    this.mutableRunning = true;
+    logger.info({ name: 'neo_blockchain_start' }, 'Neo blockchain started.');
   }
 
   private async persistBlockInternal(block: Block, verify?: boolean): Promise<void> {
@@ -168,5 +203,16 @@ export class Blockchain {
     this.mutablePreviousBlock = this.mutableCurrentBlock;
     this.mutableCurrentBlock = block;
     this.mutableCurrentHeader = block.header;
+  }
+
+  private createWriteBlockchain(): WriteBatchBlockchain {
+    return new WriteBatchBlockchain({
+      settings: this.settings,
+      currentBlock: this.mutableCurrentBlock,
+      currentHeader: this.mutableCurrentHeader,
+      storage: this.storage,
+      vm: this.vm,
+      getValidators: this.getValidators,
+    });
   }
 }

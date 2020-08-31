@@ -16,7 +16,7 @@ export interface VersionPayloadAdd {
   readonly relay: boolean;
 }
 
-export class VersionPayload implements SerializableWire<VersionPayload> {
+export class VersionPayload implements SerializableWire {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): VersionPayload {
     const protocolVersion = reader.readUInt32LE();
     const services = reader.readUInt64LE();

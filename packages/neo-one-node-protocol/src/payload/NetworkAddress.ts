@@ -18,7 +18,7 @@ export interface NetworkAddressAdd {
 
 const BYTE_LENGTH = 16;
 
-export class NetworkAddress implements SerializableWire<NetworkAddress> {
+export class NetworkAddress implements SerializableWire {
   public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): NetworkAddress {
     const timestamp = reader.readUInt32LE();
     const services = reader.readUInt64LE();

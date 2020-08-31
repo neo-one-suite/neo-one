@@ -1,14 +1,14 @@
 import { BinaryWriter, createSerializeWire, SerializableWire, SerializeWire } from '@neo-one/client-common';
-import { ContractManifestModel } from './ContractManifestModel';
+import { ContractManifestModel } from './manifest';
 
-export interface ContractModelAdd<TContractManifest extends ContractManifestModel = ContractManifestModel> {
+export interface ContractStateModelAdd<TContractManifest extends ContractManifestModel = ContractManifestModel> {
   readonly id: number;
   readonly script: Buffer;
   readonly manifest: TContractManifest;
 }
 
-export class ContractModel<TContractManifest extends ContractManifestModel = ContractManifestModel>
-  implements SerializableWire<ContractModel> {
+export class ContractStateModel<TContractManifest extends ContractManifestModel = ContractManifestModel>
+  implements SerializableWire {
   public readonly id: number;
   public readonly script: Buffer;
   public readonly manifest: TContractManifest;
@@ -16,7 +16,7 @@ export class ContractModel<TContractManifest extends ContractManifestModel = Con
   public readonly payable: boolean;
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
 
-  public constructor({ script, manifest, id }: ContractModelAdd<TContractManifest>) {
+  public constructor({ script, manifest, id }: ContractStateModelAdd<TContractManifest>) {
     this.id = id;
     this.script = script;
     this.manifest = manifest;

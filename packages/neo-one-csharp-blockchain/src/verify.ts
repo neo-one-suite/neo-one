@@ -2,7 +2,8 @@ import { UInt160 } from '@neo-one/client-common';
 import {
   BooleanStackItem,
   CallFlags,
-  SnapshotMethods,
+  ContractMethodDescriptor,
+  StorageMethods,
   TriggerType,
   Verifiable,
   VerifyResult,
@@ -19,12 +20,12 @@ interface ApplicationEngineVerifyOptions {
 
 const getApplicationEngineVerifyOptions = async (
   verification: Buffer,
-  snapshot: SnapshotMethods,
+  storage: StorageMethods,
   hash: UInt160,
   scriptHash: UInt160,
 ): Promise<ApplicationEngineVerifyOptions> => {
   if (verification.length === 0) {
-    const contractState = await snapshot.tryGetContract(hash);
+    const contractState = await storage.tryGetContract(hash);
     if (contractState === undefined) {
       // TODO: implement an error
       throw new Error('Failed to fetch contract from storage');
@@ -61,7 +62,7 @@ export const verifyWithApplicationEngine = (
   offset: number,
   init?: ContractMethodDescriptor,
 ): VerifyResult =>
-  withApplicationEngine({ trigger: TriggerType.Verification, container: verifiable, snapshot: true, gas }, (engine) => {
+  withApplicationEngine({ trigger: TriggerType.Verification, container: verifiable, storage: true, gas }, (engine) => {
     engine.loadScript(verification);
     engine.loadClonedContext(offset);
     if (init !== undefined) {
@@ -85,7 +86,7 @@ export const verifyWithApplicationEngine = (
 export const tryVerifyHash = async (
   hash: UInt160,
   index: number,
-  snapshot: SnapshotMethods,
+  storage: StorageMethods,
   verifiable: Verifiable,
   gas: number,
 ): Promise<VerifyResult> => {
@@ -93,7 +94,7 @@ export const tryVerifyHash = async (
   try {
     const { verification, offset, init } = await getApplicationEngineVerifyOptions(
       verificationScript,
-      snapshot,
+      storage,
       hash,
       scriptHash,
     );
@@ -106,7 +107,7 @@ export const tryVerifyHash = async (
 
 export const verifyWitnesses = async (
   verifiable: Verifiable,
-  snapshot: SnapshotMethods,
+  storage: StorageMethods,
   gasIn: number,
 ): Promise<boolean> => {
   if (gasIn < 0) {
@@ -117,7 +118,7 @@ export const verifyWitnesses = async (
 
   let hashes: readonly UInt160[];
   try {
-    hashes = await verifiable.getScriptHashesForVerifying(snapshot);
+    hashes = await verifiable.getScriptHashesForVerifying(storage);
   } catch {
     return false;
   }
@@ -139,10 +140,10 @@ export const verifyWitnesses = async (
       }
 
       return {
-        next: tryVerifyHash(hash, index, snapshot, verifiable, newGas),
+        next: tryVerifyHash(hash, index, storage, verifiable, newGas),
         previous: accPrevious && result,
       };
-    }, Promise.resolve({ next: tryVerifyHash(hashes[0], 0, snapshot, verifiable, gas), previous: true }));
+    }, Promise.resolve({ next: tryVerifyHash(hashes[0], 0, storage, verifiable, gas), previous: true }));
 
   const { result: finalResult } = await next;
 

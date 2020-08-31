@@ -1,18 +1,9 @@
-import { UInt160, UInt256 } from '@neo-one/client-common';
-import { BN } from 'bn.js';
-import { Header } from './Header';
-import { TrimmedBlock } from './TrimmedBlock';
+import { UInt160 } from '@neo-one/client-common';
+import { BlockchainStorage } from './Storage';
 import { Witness } from './Witness';
 
-export interface SnapshotMethods {
-  readonly tryGetBlock: (hash: UInt256) => Promise<TrimmedBlock | undefined>;
-  readonly tryGetHeader: (hash: UInt256) => Promise<Header | undefined>;
-  readonly tryGetContract: (hash: UInt160) => Promise<Contract | undefined>;
-  readonly tryGetStorage: (key: StorageKey) => Promise<StorageItem | undefined>;
-}
-
 export interface Verifiable {
-  readonly getScriptHashesForVerifying: (snapshot: SnapshotMethods) => Promise<readonly UInt160[]>;
+  readonly getScriptHashesForVerifying: (storage: BlockchainStorage) => Promise<readonly UInt160[]>;
   readonly witnesses: readonly Witness[];
 }
 
@@ -21,4 +12,4 @@ export interface VerifyResult {
   readonly result: boolean;
 }
 
-export type VerifyWitnesses = (verifiable: Verifiable, snapshot: SnapshotMethods, gasIn: number) => Promise<boolean>;
+export type VerifyWitnesses = (verifiable: Verifiable, storage: BlockchainStorage, gasIn: number) => Promise<boolean>;
