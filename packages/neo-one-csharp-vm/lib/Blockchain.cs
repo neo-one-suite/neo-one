@@ -5,11 +5,12 @@ namespace NEOONE
 {
     public class NeoOneBlockchain
     {
-        public static readonly Neo.NeoSystem NeoOneSystem;
+
+        private static readonly Neo.NeoSystem system;
 
         static NeoOneBlockchain()
         {
-            NeoOneSystem = new Neo.NeoSystem();
+            system = new Neo.NeoSystem();
             var _ = Blockchain.Singleton;
         }
 

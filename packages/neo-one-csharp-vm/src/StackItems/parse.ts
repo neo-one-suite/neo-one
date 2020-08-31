@@ -92,8 +92,8 @@ const parsePrimitiveStackItem = (item: PrimitiveStackItemReturn): PrimitiveStack
     case 'ByteString':
       return {
         type: 'ByteString',
-        value: item.value.toString('utf8'),
-        _buffer: item.value,
+        value: item.value,
+        asString: () => item.value.toString('utf8'),
         size: item.Size,
         isNull,
       };

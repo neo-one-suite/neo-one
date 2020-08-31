@@ -1,28 +1,20 @@
-import { ScriptBuilder } from '@neo-one/client-common';
 import { TriggerType } from '@neo-one/csharp-core';
-import { withApplicationEngine } from '../ApplicationEngine';
+import { ApplicationEngine } from '../ApplicationEngine';
+import { Dispatcher } from '../Dispatcher';
 
 describe('ApplicationEngine test', () => {
+  const dispatcher = new Dispatcher();
+  beforeEach(() => {
+    dispatcher.reset();
+  });
   test('withApplicationEngine -- NOP Script -- Halt', () => {
-    const state = withApplicationEngine(
-      {
-        trigger: TriggerType.Application,
-        testMode: true,
-        gas: 1,
-      },
-      (engine) => {
-        const initState = engine.state;
-        expect(initState).toEqual('BREAK');
+    const engine = new ApplicationEngine(dispatcher);
+    engine.create({
+      trigger: TriggerType.Application,
+      gas: 0,
+      testMode: true,
+    });
 
-        const script = new ScriptBuilder();
-        script.emitOp('NOP');
-
-        engine.loadScript(script.build());
-
-        return engine.execute();
-      },
-    );
-
-    expect(state).toEqual('HALT');
+    expect(engine.state).toEqual('BREAK');
   });
 });

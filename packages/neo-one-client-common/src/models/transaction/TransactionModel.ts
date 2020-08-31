@@ -4,7 +4,7 @@ import { BinaryWriter } from '../../BinaryWriter';
 import { common, ECPoint, InvalidFormatError, PrivateKey, UInt160, UInt256, UInt256Hex } from '../../common';
 import { crypto } from '../../crypto';
 import { utils } from '../../utils';
-import { createSerializeWire, SerializableWire, SerializeWire } from '../Serializable';
+import { createGetHashData, createSerializeWire, SerializableWire, SerializeWire } from '../Serializable';
 import { SignerModel } from '../SignerModel';
 import { WitnessModel } from '../WitnessModel';
 import { AttributeModel } from './attribute';
@@ -44,9 +44,9 @@ export class TransactionModel<
 
   public readonly version: number;
   public readonly nonce: number;
-  public readonly sender?: UInt160;
   public readonly validUntilBlock: number;
   public readonly signers: readonly TSigner[];
+  public readonly sender?: UInt160;
   public readonly attributes: readonly TAttribute[];
   public readonly script: Buffer;
   public readonly witnesses: readonly TWitness[];
@@ -57,7 +57,7 @@ export class TransactionModel<
   private readonly networkFeeInternal: () => BN;
   private readonly hashInternal: () => UInt256;
   private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
-  private readonly messageInternal = utils.lazy(() => this.serializeUnsigned());
+  private readonly messageInternal = utils.lazy(() => createGetHashData(this.serializeUnsigned)());
 
   public constructor({
     version,

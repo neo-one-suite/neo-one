@@ -10,12 +10,15 @@ import {
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { ApplicationEngine } from '../ApplicationEngine';
+import { Dispatcher } from '../Dispatcher';
 
 describe('Application Engine SysCall Tests', () => {
-  let engine: ApplicationEngine;
+  const dispatcher = new Dispatcher();
+  const engine = new ApplicationEngine(dispatcher);
   let script: ScriptBuilder;
   beforeEach(() => {
-    engine = new ApplicationEngine({
+    dispatcher.reset();
+    engine.create({
       trigger: TriggerType.Application,
       gas: 0,
       testMode: true,
@@ -86,11 +89,11 @@ describe('Application Engine SysCall Tests', () => {
       const resultStack = engine.resultStack;
       expect(resultStack.length).toEqual(5);
 
-      expect((resultStack[0] as ByteStringStackItem).value).toEqual('{"key":"value"}');
-      expect((resultStack[1] as ByteStringStackItem).value).toEqual('null');
-      expect((resultStack[2] as ByteStringStackItem).value).toEqual('"test"');
-      expect((resultStack[3] as ByteStringStackItem).value).toEqual('true');
-      expect((resultStack[4] as ByteStringStackItem).value).toEqual('5');
+      expect((resultStack[0] as ByteStringStackItem).asString()).toEqual('{"key":"value"}');
+      expect((resultStack[1] as ByteStringStackItem).asString()).toEqual('null');
+      expect((resultStack[2] as ByteStringStackItem).asString()).toEqual('"test"');
+      expect((resultStack[3] as ByteStringStackItem).asString()).toEqual('true');
+      expect((resultStack[4] as ByteStringStackItem).asString()).toEqual('5');
     });
 
     test('Fault -- Bad values', () => {
@@ -105,11 +108,13 @@ describe('Application Engine SysCall Tests', () => {
   });
 
   test('System.Callback.Invoke -- Halt', () => {
-    engine = new ApplicationEngine({
+    engine.create({
       trigger: TriggerType.Application,
       gas: 1,
       testMode: false,
     });
+
+    script = new ScriptBuilder();
 
     script.emitPushInt(5); // Callback argument 1
     script.emitPushInt(1); // Callback argument 2
@@ -136,11 +141,13 @@ describe('Application Engine SysCall Tests', () => {
   });
 
   test('System.Callback.CreateFromSyscall -- Halt', () => {
-    engine = new ApplicationEngine({
+    engine.create({
       trigger: TriggerType.Application,
       gas: 1,
       testMode: false,
     });
+
+    script = new ScriptBuilder();
 
     script.emitPush(Buffer.from([]));
     script.emitPushInt(1);
@@ -156,7 +163,7 @@ describe('Application Engine SysCall Tests', () => {
     const resultStack = engine.resultStack;
     expect(resultStack.length).toEqual(1);
     const byteStringItem = engine.resultStack[0] as ByteStringStackItem;
-    expect(byteStringItem._buffer.toString('hex')).toEqual(
+    expect(byteStringItem.value.toString('hex')).toEqual(
       'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
     );
   });
@@ -175,11 +182,11 @@ describe('Application Engine SysCall Tests', () => {
     });
 
     test('With Snapshot option -- Halt', () => {
-      engine = new ApplicationEngine({
+      engine.create({
         trigger: TriggerType.Application,
-        snapshot: true,
         gas: 0,
         testMode: true,
+        snapshot: 'main',
       });
       script.emitPushUInt256(block.hash);
       script.emitSysCall('System.Blockchain.GetBlock');
@@ -194,7 +201,7 @@ describe('Application Engine SysCall Tests', () => {
     });
 
     test('Without Snapshot option -- Fault', () => {
-      engine = new ApplicationEngine({ trigger: TriggerType.Application, gas: 0, testMode: true });
+      engine.create({ trigger: TriggerType.Application, gas: 0, testMode: true });
       script.emitPushUInt256(block.hash);
       script.emitSysCall('System.Blockchain.GetBlock');
 
