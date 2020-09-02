@@ -11,17 +11,19 @@ import { Block } from './Block';
 import { BlockBase, BlockBaseAdd } from './BlockBase';
 import { ConsensusData } from './ConsensusData';
 import { Header } from './Header';
-import { DeserializeWireBaseOptions, SerializeJSONContext } from './Serializable';
+import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializeJSONContext } from './Serializable';
 import { ReadStorage } from './Storage';
 import { TransactionKey, TransactionState } from './transaction';
-import { utils } from './utils';
+import { BinaryReader, utils } from './utils';
 
 export interface TrimmedBlockAdd extends BlockBaseAdd {
   readonly consensusData?: ConsensusData;
   readonly hashes: readonly UInt256[];
 }
 
-export type BlockKey = UInt256;
+export interface BlockKey {
+  readonly hashOrIndex: UInt256 | number;
+}
 
 export class TrimmedBlock extends BlockBase implements SerializableWire {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): TrimmedBlock {
@@ -49,6 +51,13 @@ export class TrimmedBlock extends BlockBase implements SerializableWire {
       witness,
       hashes,
       consensusData,
+    });
+  }
+
+  public static deserializeWire(options: DeserializeWireOptions) {
+    return this.deserializeWireBase({
+      context: options.context,
+      reader: new BinaryReader(options.buffer),
     });
   }
 

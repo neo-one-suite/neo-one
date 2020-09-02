@@ -173,6 +173,10 @@ export class Transaction
     return this.sizeInternal();
   }
 
+  public getScriptHashesForVerifying(): readonly UInt160[] {
+    return this.signers.map((signer) => signer.account);
+  }
+
   public serializeJSON(options: SerializeJSONContext): TransactionJSON {
     return {
       hash: JSONHelper.writeUInt256(this.hash),

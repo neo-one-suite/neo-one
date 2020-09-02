@@ -14,6 +14,8 @@ export * from './Serializable';
 export * from './Settings';
 export * from './Signer';
 export * from './Storage';
+export * from './StorageItem';
+export * from './StorageKey';
 export * from './StackItems';
 export * from './transaction';
 export * from './TrimmedBlock';

@@ -3,7 +3,9 @@ import { BlockchainStorage } from './Storage';
 import { Witness } from './Witness';
 
 export interface Verifiable {
-  readonly getScriptHashesForVerifying: (storage: BlockchainStorage) => Promise<readonly UInt160[]>;
+  readonly getScriptHashesForVerifying: (
+    storage: BlockchainStorage,
+  ) => Promise<readonly UInt160[]> | readonly UInt160[];
   readonly witnesses: readonly Witness[];
 }
 

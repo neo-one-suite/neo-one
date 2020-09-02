@@ -1,10 +1,10 @@
 import { ContractManifestJSON, IOHelper, JSONHelper, UInt160 } from '@neo-one/client-common';
 import { ContractManifestModel, getContractProperties } from '@neo-one/client-full-common';
+import { DeserializeWireBaseOptions, DeserializeWireOptions } from '../Serializable';
+import { BinaryReader, utils } from '../utils';
 import { ContractABI } from './ContractABI';
 import { ContractGroup } from './ContractGroup';
 import { ContractPermission } from './ContractPermission';
-import { DeserializeWireBaseOptions, DeserializeWireOptions } from './Serializable';
-import { BinaryReader, utils } from './utils';
 
 export class ContractManifest extends ContractManifestModel<ContractABI, ContractGroup, ContractPermission> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): ContractManifest {
