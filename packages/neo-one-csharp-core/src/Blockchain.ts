@@ -18,7 +18,7 @@ export interface Blockchain extends BlockchainStorage {
 
   readonly currentBlock: Block;
   readonly previousBlock: Block | undefined;
-  readonly currentHeader: Header;
+  readonly currentHeaderIndex: Header;
   readonly currentBlockIndex: number;
   readonly block$: Observable<Block>;
   readonly isPersistingBlock: boolean;

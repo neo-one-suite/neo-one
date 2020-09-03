@@ -1,4 +1,4 @@
-import path from 'path';
+import * as nodePath from 'path';
 import { ApplicationEngine, CreateOptions } from './ApplicationEngine';
 import { BaseMethods, EngineMethods, SnapshotMethods } from './Methods';
 import { SnapshotHandler } from './SnapshotHandler';
@@ -8,30 +8,36 @@ import { constants, createCSharpDispatchInvoke } from './utils';
 export interface DispatcherMethods extends BaseMethods, SnapshotMethods, EngineMethods {}
 
 const engineAssemblyOptions = {
-  assemblyFile: path.join(constants.CSHARP_APP_ROOT, 'Dispatcher.dll'),
+  assemblyFile: nodePath.join(constants.CSHARP_APP_ROOT, 'Dispatcher.dll'),
   methodName: 'Invoke',
   typeName: 'NEOONE.Dispatcher',
 };
 
 export const createDispatcher = () => createCSharpDispatchInvoke<DispatcherMethods>(engineAssemblyOptions);
 
+export interface DispatcherOptions {
+  readonly levelDBPath?: string;
+}
+
 export class Dispatcher {
   public readonly init: boolean;
   public readonly dispatch: DispatcherFunc<DispatcherMethods>;
+  public readonly options: DispatcherOptions;
 
-  public constructor() {
+  public constructor(options: DispatcherOptions = {}) {
+    this.options = options;
     this.dispatch = createDispatcher();
-    this.init = this.initialize();
+    this.init = this.initialize(this.options.levelDBPath);
   }
 
   public withSnapshots<T>(
     func: (snapshots: { readonly main: SnapshotHandler; readonly clone: Omit<SnapshotHandler, 'clone'> }) => T,
   ) {
+    this.resetSnapshots();
     const main = new SnapshotHandler(this, 'main');
     const clone = new SnapshotHandler(this, 'clone');
 
     const result = func({ main, clone });
-    this.resetSnapshots();
 
     return result;
   }
@@ -65,12 +71,15 @@ export class Dispatcher {
 
   public reset(): void {
     this.dispose();
-    this.initialize();
+    this.initialize(this.options.levelDBPath);
   }
 
-  private initialize(): boolean {
+  private initialize(path?: string): boolean {
     return this.dispatch({
       method: 'init',
+      args: {
+        path,
+      },
     });
   }
 }

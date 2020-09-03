@@ -1,7 +1,7 @@
 import { VMState } from '@neo-one/client-common';
-import { TriggerType, Verifiable } from '@neo-one/csharp-core';
+import { SnapshotName, TriggerType, Verifiable } from '@neo-one/csharp-core';
 import { StackItemReturn } from '../StackItems';
-import { DefaultMethods, DispatchMethod, SnapshotName } from '../types';
+import { DefaultMethods, DispatchMethod } from '../types';
 
 interface CreateEngineArgs {
   readonly trigger: TriggerType;

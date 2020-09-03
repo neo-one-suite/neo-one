@@ -1,8 +1,8 @@
 import { ContractPermissionJSON, ECPoint, UInt160 } from '@neo-one/client-common';
 import { ContractPermissionModel } from '@neo-one/client-full-common';
+import { utils } from '../utils';
 import { ContractManifest } from './ContractManifest';
 import { ContractPermissionDescriptor } from './ContractPermissionDescriptor';
-import { utils } from './utils';
 
 export class ContractPermission extends ContractPermissionModel<ContractPermissionDescriptor> {
   public static readonly defaultPermission = new ContractPermission({

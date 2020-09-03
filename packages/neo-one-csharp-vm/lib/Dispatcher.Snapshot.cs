@@ -1,10 +1,12 @@
 using System;
 using System.IO;
+using System.Linq;
 using Neo;
 using Neo.Ledger;
 using Neo.Network.P2P.Payloads;
 using Neo.Persistence;
 using Neo.VM;
+using NEOONE.Storage;
 
 namespace NEOONE
 {
@@ -19,9 +21,12 @@ namespace NEOONE
             snapshot_blocks_add,
             snapshot_transactions_add,
             snapshot_clone,
-            snapshot_set_height,
             snapshot_commit,
             snapshot_reset,
+            snapshot_change_block_hash_index,
+            snapshot_change_header_hash_index,
+            snapshot_set_persisting_block,
+            snapshot_get_change_set,
         }
 
         private dynamic dispatchSnapshotMethod(SnapshotMethod method, dynamic args)
@@ -56,17 +61,43 @@ namespace NEOONE
                 case SnapshotMethod.snapshot_clone:
                     return this._snapshotClone();
 
-                case SnapshotMethod.snapshot_set_height:
-                    uint index = (uint)args.index;
-                    return this._snapshotSetHeight(this.selectSnapshot(args.snapshot), index);
+                case SnapshotMethod.snapshot_change_block_hash_index:
+                    uint bIndex = (uint)args.index;
+                    UInt256 blockChangeHash = new UInt256((byte[])args.hash);
+
+                    return this._snapshotChangeBlockHashIndex(this.selectSnapshot(args.snapshot), bIndex, blockChangeHash);
+
+                case SnapshotMethod.snapshot_change_header_hash_index:
+                    uint hIndex = (uint)args.index;
+                    UInt256 headerChangeHash = new UInt256((byte[])args.hash);
+
+                    return this._snapshotChangeHeaderHashIndex(this.selectSnapshot(args.snapshot), hIndex, headerChangeHash);
+
+                case SnapshotMethod.snapshot_get_change_set:
+                    return this._snapshotGetChangeSet(this.selectSnapshot(args.snapshot, true));
+
 
                 case SnapshotMethod.snapshot_commit:
-                    this.selectCommitStore(
-                      this.selectSnapshot(args.snapshot, false),
+                    this._snapshotCommit(
+                      this.selectSnapshot(args.snapshot),
                       args.partial
-                    ).Commit();
+                    );
 
                     return true;
+
+                case SnapshotMethod.snapshot_set_persisting_block:
+                    byte[] persistingBlockSerialized = (byte[])args.block;
+                    Block persisting = new Block();
+                    using (MemoryStream ms = new MemoryStream(persistingBlockSerialized))
+                    using (BinaryReader reader = new BinaryReader(ms))
+                    {
+                        persisting.Deserialize(reader);
+                    }
+
+                    this.selectSnapshot(args.snapshot).PersistingBlock = persisting;
+
+                    return true;
+
 
                 case SnapshotMethod.snapshot_reset:
                     this.resetSnapshots();
@@ -81,7 +112,7 @@ namespace NEOONE
 
         private void resetSnapshots()
         {
-            this.snapshot = Blockchain.Singleton.GetSnapshot();
+            this.snapshot = new SnapshotView(this.store);
             this.clonedSnapshot = this.snapshot.Clone();
         }
 
@@ -99,16 +130,19 @@ namespace NEOONE
             }
         }
 
-        private CommitStore selectCommitStore(StoreView snapshot, string partial)
+        private void _snapshotCommit(SnapshotView snapshot, string partial)
         {
             switch (partial)
             {
                 case "blocks":
-                    return (CommitStore)snapshot.Blocks;
+                    snapshot.Blocks.Commit();
+                    break;
                 case "transactions":
-                    return (CommitStore)snapshot.Transactions;
+                    snapshot.Transactions.Commit();
+                    break;
                 default:
-                    return (CommitStore)snapshot;
+                    snapshot.Commit();
+                    break;
             }
         }
 
@@ -127,12 +161,27 @@ namespace NEOONE
             return true;
         }
 
-        private bool _snapshotSetHeight(StoreView snapshot, uint index)
+        private bool _snapshotChangeBlockHashIndex(StoreView snapshot, uint index, UInt256 hash)
         {
-            var height = snapshot.BlockHashIndex.GetAndChange();
-            height.Index = index;
+            var hashIndex = snapshot.BlockHashIndex.GetAndChange();
+            hashIndex.Index = index;
+            hashIndex.Hash = hash;
 
             return true;
+        }
+
+        private bool _snapshotChangeHeaderHashIndex(StoreView snapshot, uint index, UInt256 hash)
+        {
+            var hashIndex = snapshot.HeaderHashIndex.GetAndChange();
+            hashIndex.Index = index;
+            hashIndex.Hash = hash;
+
+            return true;
+        }
+
+        private dynamic _snapshotGetChangeSet(SnapshotView snapshot)
+        {
+            return new ChangeSet(snapshot).set.ToArray();
         }
 
         private bool _snapshotClone()

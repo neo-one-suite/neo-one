@@ -1,7 +1,7 @@
-import { VMState } from '@neo-one/client-common';
-import { Block, Transaction } from '@neo-one/csharp-core';
+import { UInt256, VMState } from '@neo-one/client-common';
+import { Block, SnapshotName, SnapshotPartial, Transaction } from '@neo-one/csharp-core';
 import { SnapshotMethods } from './Methods';
-import { DispatcherFunc, SnapshotName, SnapshotPartial } from './types';
+import { DispatcherFunc } from './types';
 
 interface SnapshotDispatcher {
   readonly dispatch: DispatcherFunc<SnapshotMethods>;
@@ -51,12 +51,36 @@ export class SnapshotHandler {
     });
   }
 
-  public setHeight(index: number) {
+  public changeBlockHashIndex(index: number, hash: UInt256) {
     return this.dispatch({
-      method: 'snapshot_set_height',
+      method: 'snapshot_change_block_hash_index',
       args: {
         index,
+        hash,
         snapshot: this.snapshot,
+      },
+    });
+  }
+
+  public changeHeaderHashIndex(index: number, hash: UInt256) {
+    return this.dispatch({
+      method: 'snapshot_change_header_hash_index',
+      args: {
+        index,
+        hash,
+        snapshot: this.snapshot,
+      },
+    });
+  }
+
+  public setPersistingBlock(block: Block) {
+    const buffer = block.serializeWire();
+
+    return this.dispatch({
+      method: 'snapshot_set_persisting_block',
+      args: {
+        snapshot: this.snapshot,
+        block: buffer,
       },
     });
   }
@@ -66,6 +90,15 @@ export class SnapshotHandler {
       method: 'snapshot_commit',
       args: {
         partial,
+        snapshot: this.snapshot,
+      },
+    });
+  }
+
+  public getChangeSet() {
+    return this.dispatch({
+      method: 'snapshot_get_change_set',
+      args: {
         snapshot: this.snapshot,
       },
     });

@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Neo.SmartContract;
 using System.Dynamic;
 using System.Collections.Generic;
+using NEOONE.Storage;
+using Neo.Persistence;
 
 namespace NEOONE
 {
@@ -10,27 +12,29 @@ namespace NEOONE
     {
 
         private ApplicationEngine engine;
+        private IStore store;
         private bool init = false;
 
         private enum BaseMethod
         {
             init,
             dispose,
-            test,
         }
 
-        private dynamic dispatchBaseMethod(BaseMethod method)
+        private dynamic dispatchBaseMethod(BaseMethod method, dynamic args)
         {
             switch (method)
             {
                 case BaseMethod.init:
-                    return this._init();
+                    if (args.path == null)
+                    {
+                        return this._init();
+                    }
+
+                    return this._init((string)args.path);
 
                 case BaseMethod.dispose:
                     return this._dispose();
-
-                case BaseMethod.test:
-                    return this._test();
 
                 default:
                     throw new InvalidOperationException();
@@ -38,23 +42,38 @@ namespace NEOONE
             }
         }
 
-        private bool _init()
+        private bool _init(string path)
         {
-            this.init = this.init ? true : NeoOneBlockchain.InitializeNeoOneSystem();
-            this.resetSnapshots();
+            if (!this.init)
+            {
+                this.store = new LevelDBStore(path).GetStore();
+                this.resetSnapshots();
 
-            return true;
+                this.init = true;
+            }
+
+            return this.init;
         }
 
-        private dynamic _test()
+        private bool _init()
         {
-            return true;
+            if (!this.init)
+            {
+                this.store = new MemoryStore();
+                this.resetSnapshots();
+
+                this.init = true;
+            }
+
+            return this.init;
         }
 
         private bool _dispose()
         {
             this.snapshot = null;
             this.clonedSnapshot = null;
+            this.store.Dispose();
+            this.store = null;
             this.disposeEngine();
             this.init = false;
 
@@ -75,7 +94,7 @@ namespace NEOONE
             BaseMethod baseMethod;
             if (Enum.TryParse<BaseMethod>(method, out baseMethod))
             {
-                return this.dispatchBaseMethod(baseMethod);
+                return this.dispatchBaseMethod(baseMethod, args);
             }
 
             EngineMethod engineMethod;

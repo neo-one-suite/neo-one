@@ -6,9 +6,6 @@ export type ExecutionContext = any;
 // TODO: not implemented
 export type Notifications = any;
 
-export type SnapshotName = 'main' | 'clone';
-export type SnapshotPartial = 'blocks' | 'transactions';
-
 export interface DispatchMethodNoArgs<Return = any> {
   readonly returnType: Return;
 }

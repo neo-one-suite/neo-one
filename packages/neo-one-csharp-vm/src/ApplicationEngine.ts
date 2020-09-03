@@ -1,10 +1,10 @@
-import { common } from '@neo-one/client-common';
-import { TriggerType, Verifiable } from '@neo-one/csharp-core';
+import { common, VMState } from '@neo-one/client-common';
+import { SnapshotName, TriggerType, Verifiable } from '@neo-one/csharp-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
 import { EngineMethods } from './Methods';
 import { parse as parseStackItems } from './StackItems';
-import { DispatcherFunc, SnapshotName } from './types';
+import { DispatcherFunc } from './types';
 
 export interface CreateOptions {
   readonly trigger: TriggerType;
@@ -44,9 +44,11 @@ export class ApplicationEngine {
   }
 
   public get state() {
-    return this.dispatch({
-      method: 'getvmstate',
-    });
+    return VMState[
+      this.dispatch({
+        method: 'getvmstate',
+      })
+    ];
   }
 
   public get resultStack() {
