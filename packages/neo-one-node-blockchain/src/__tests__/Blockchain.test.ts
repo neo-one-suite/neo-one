@@ -12,7 +12,7 @@ const createBlockchain = async ({ vm, storage }: { readonly vm: any; readonly st
     vm,
   });
 
-describe('Blockchain', () => {
+describe.skip('Blockchain', () => {
   let storage: any;
   let vm: any;
   beforeEach(() => {

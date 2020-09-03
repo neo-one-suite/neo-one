@@ -1,30 +1,32 @@
 import { ECPoint } from '@neo-one/client-common';
-import { BN } from 'bn.js';
 import { Block } from './Block';
-import { RegisterTransaction, TransactionType } from './transaction';
+import { BlockchainStorage } from './Storage';
 
-export interface VMSettings {
-  readonly storageContext: {
-    readonly v0: {
-      readonly index: number;
-    };
-  };
-}
-
-export interface Settings {
+export interface BlockchainSettings extends ProtocolSettings {
   readonly genesisBlock: Block;
-  readonly governingToken: RegisterTransaction;
-  readonly utilityToken: RegisterTransaction;
   readonly decrementInterval: number;
   readonly generationAmount: readonly number[];
-  readonly fees: { [K in TransactionType]?: BN };
-  readonly registerValidatorFee: BN;
-  readonly messageMagic: number;
-  readonly addressVersion: number;
   readonly privateKeyVersion: number;
   readonly standbyValidators: readonly ECPoint[];
-  readonly vm: VMSettings;
-  readonly secondsPerBlock: number;
-  readonly maxTransactionsPerBlock: number;
   readonly memPoolSize: number;
+}
+export interface ProtocolSettings {
+  readonly messageMagic: number;
+  readonly addressVersion: number;
+  readonly standbyCommittee: readonly string[];
+  readonly committeeMembersCount: number;
+  readonly validatorsCount: number;
+  readonly millisecondsPerBlock: number;
+  readonly memoryPoolMaxTransactions: number;
+}
+
+export interface PolicySettings {
+  readonly getMaxBlockSize: (storages: BlockchainStorage['storages']) => Promise<number>;
+  readonly getMaxTransactionsPerBlock: (storages: BlockchainStorage['storages']) => Promise<number>;
+  readonly getMaxBlockSystemFee: (storages: BlockchainStorage['storages']) => Promise<number>;
+  readonly getValidators: (storages: BlockchainStorage['storages']) => Promise<number>;
+}
+
+export interface NetworkSettings {
+  readonly seeds: readonly string[];
 }

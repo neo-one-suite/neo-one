@@ -2,7 +2,7 @@ import { common } from '@neo-one/client-common';
 import { StorageFlags, StorageItem, StorageItemKey, StorageItemsKey, StorageItemUpdate } from '@neo-one/node-core';
 import { ReadGetAllAddUpdateDeleteStorageCache } from '../StorageCache';
 
-describe('StorageCache', () => {
+describe.skip('StorageCache', () => {
   const hash = common.asUInt160(Buffer.from('197ff6783d512a740d42f4cc4f5572955fa44c95', 'hex'));
   const key = common.asUInt160(Buffer.from('f3812db982f3b0089a21a278988efeec6a027b25', 'hex'));
 

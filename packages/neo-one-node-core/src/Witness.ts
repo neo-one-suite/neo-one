@@ -1,4 +1,5 @@
 import { crypto, IOHelper, JSONHelper, WitnessJSON, WitnessModel } from '@neo-one/client-common';
+import { WITNESS_INVOCATION_SIZE, WITNESS_VERIFICATION_SIZE } from './constants';
 import {
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
@@ -12,15 +13,11 @@ export interface WitnessAdd {
   readonly invocation: Buffer;
 }
 
-// TODO: put these somewhere else https://github.com/neo-project/neo/blob/master/src/neo/Network/P2P/Payloads/Witness.cs
-const invocationSize = 663;
-const verificationSize = 361;
-
 export class Witness extends WitnessModel implements SerializableJSON<WitnessJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Witness {
     const { reader } = options;
-    const invocation = reader.readVarBytesLE(invocationSize);
-    const verification = reader.readVarBytesLE(verificationSize);
+    const invocation = reader.readVarBytesLE(WITNESS_INVOCATION_SIZE);
+    const verification = reader.readVarBytesLE(WITNESS_VERIFICATION_SIZE);
 
     return new Witness({
       invocation,

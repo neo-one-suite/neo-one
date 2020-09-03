@@ -12,7 +12,7 @@ import { BinaryReader, utils } from './utils';
 
 export type HeaderAdd = BlockBaseAdd;
 
-export class Header extends BlockBase implements SerializableWire<Header>, SerializableJSON<HeaderJSON> {
+export class Header extends BlockBase implements SerializableWire, SerializableJSON<HeaderJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Header {
     const { reader } = options;
     const blockBase = super.deserializeWireBase(options);

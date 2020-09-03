@@ -2,25 +2,16 @@ import {
   BinaryWriter,
   BlockJSON,
   common,
-  crypto,
-  ECPoint,
   InvalidFormatError,
   IOHelper,
   TransactionJSON,
-  UInt160,
   UInt256,
 } from '@neo-one/client-common';
-import { ContractModel } from '@neo-one/client-full-common/src';
-import { BN } from 'bn.js';
-import { Account, AccountKey } from './Account';
-import { Asset, AssetKey } from './Asset';
+import _ from 'lodash';
 import { BlockBase, BlockBaseAdd } from './BlockBase';
 import { ConsensusData } from './ConsensusData';
-import { ContractPropertyState } from './ContractPropertyState';
 import { MerkleTree } from './crypto';
-import { VerifyError } from './errors';
-import { Header, HeaderKey } from './Header';
-import { ScriptContainerType } from './ScriptContainer';
+import { Header } from './Header';
 import {
   DeserializeWireBaseOptions,
   DeserializeWireOptions,
@@ -28,29 +19,15 @@ import {
   SerializableWire,
   SerializeJSONContext,
 } from './Serializable';
-import {
-  // deserializeTransactionWireBase,
-  // FeeContext,
-  // Input,
-  // Output,
-  // OutputKey,
-  // RegisterTransaction,
-  Transaction,
-  // TransactionType,
-} from './transaction';
+import { Transaction } from './transaction';
 import { TrimmedBlock } from './TrimmedBlock';
 import { BinaryReader, utils } from './utils';
-import { Validator } from './Validator';
-import { VerifyScript } from './vm';
 import { Witness } from './Witness';
 
-export interface BlockAdd extends BlockBaseAdd {
+export interface BlockAdd extends Omit<BlockBaseAdd, 'merkleRoot'> {
+  readonly merkleRoot?: UInt256;
   readonly consensusData?: ConsensusData;
   readonly transactions: readonly Transaction[];
-}
-
-export interface BlockKey {
-  readonly hashOrIndex: UInt256 | number;
 }
 
 // export interface BlockVerifyOptions {
@@ -84,7 +61,7 @@ const getCombinedModels = (
   return init.concat(transactions);
 };
 
-export class Block extends BlockBase implements SerializableWire<Block>, SerializableJSON<BlockJSON> {
+export class Block extends BlockBase implements SerializableWire, SerializableJSON<BlockJSON> {
   public static readonly MaxContentsPerBlock = utils.USHORT_MAX;
   public static readonly MaxTransactionsPerBlock = utils.USHORT_MAX.subn(1);
   // public static async calculateNetworkFee(context: FeeContext, transactions: readonly Transaction[]): Promise<BN> {
@@ -101,7 +78,7 @@ export class Block extends BlockBase implements SerializableWire<Block>, Seriali
       throw new InvalidFormatError('Expected count to be greater than 0');
     }
     const consensusData = ConsensusData.deserializeWireBase(options);
-    const transactions = reader.readArray(() => Transaction.deserializeWireBase(options), 0x10000);
+    const transactions = _.range(count - 1).map(() => Transaction.deserializeWireBase(options));
 
     if (transactions.length !== count - 1) {
       throw new InvalidFormatError(`Expected ${count - 1} transactions on the block, found: ${transactions.length}`);

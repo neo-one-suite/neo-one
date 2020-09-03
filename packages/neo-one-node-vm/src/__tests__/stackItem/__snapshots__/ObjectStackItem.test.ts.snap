@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Object Stack Item toContractParameter 1`] = `
-Object {
-  "__$type": "InteropInterfaceContractParameter",
-  "size": 0,
-  "type": 240,
-}
-`;

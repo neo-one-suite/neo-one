@@ -1,4 +1,4 @@
-import { utils as clientUtils } from '@neo-one/client-common';
+import { InvalidFormatError, utils as clientUtils, WildcardContainerJSON } from '@neo-one/client-common';
 import BigNumber from 'bignumber.js';
 import { BN } from 'bn.js';
 import { randomBytes } from 'crypto';
@@ -183,6 +183,22 @@ function equals<T>(
   return (other): boolean => other != undefined && (thiz === other || (other instanceof clazz && equalsFunc(other)));
 }
 
+const wildCardFromJSON = <T>(json: WildcardContainerJSON, selector: (input: string) => T) => {
+  if (typeof json === 'string') {
+    if (json !== '*') {
+      // TODO: more descriptive;
+      throw new InvalidFormatError();
+    }
+
+    return '*';
+  }
+  if (Array.isArray(json)) {
+    return json.map(selector);
+  }
+
+  throw new InvalidFormatError();
+};
+
 export const utils = {
   ...clientUtils,
   toASCII,
@@ -195,4 +211,5 @@ export const utils = {
   lazyOrValue,
   weightedAverage,
   weightedFilter,
+  wildCardFromJSON,
 };

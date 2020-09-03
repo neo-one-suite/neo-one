@@ -1,3 +1,4 @@
+import { VersionJSON } from '@neo-one/client-common';
 import { Block } from './Block';
 import { Blockchain, VerifyTransactionResult } from './Blockchain';
 import { Endpoint } from './net';
@@ -19,14 +20,10 @@ export interface RelayTransactionResult {
 }
 
 export interface Node {
+  readonly version: VersionJSON;
   readonly blockchain: Blockchain;
   readonly relayTransaction: (
     transaction: Transaction,
-    options?: { readonly throwVerifyError?: boolean; readonly forceAdd?: boolean },
-  ) => Promise<RelayTransactionResult>;
-  readonly relayStrippedTransaction: (
-    verificationTransaction: Transaction,
-    relayTransaction: Transaction,
     options?: { readonly throwVerifyError?: boolean; readonly forceAdd?: boolean },
   ) => Promise<RelayTransactionResult>;
   readonly relayConsensusPayload: (payload: ConsensusPayload) => void;

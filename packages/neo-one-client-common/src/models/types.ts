@@ -239,7 +239,7 @@ export type WildcardContainerJSON = readonly string[] | Wildcard;
 export interface ContractMethodDescriptorJSON {
   readonly name: string;
   readonly parameters: readonly ContractParameterDefinitionJSON[];
-  readonly offset?: number;
+  readonly offset: number;
   readonly returnType: ContractParameterTypeJSON;
 }
 

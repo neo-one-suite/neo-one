@@ -1,81 +1,70 @@
-import { common, ECPoint, UInt160, UInt256, VMState } from '@neo-one/client-common';
-import { BN } from 'bn.js';
-import { Action } from './action';
+import { SerializableWire, UInt256, VMState } from '@neo-one/client-common';
 import { Block } from './Block';
-import { WriteBlockchain } from './Blockchain';
-import { ContractParameter } from './contractParameter';
-import { ScriptContainer } from './ScriptContainer';
-import { Witness } from './Witness';
-
-export interface VerifyScriptOptions {
-  readonly scriptContainer: ScriptContainer;
-  readonly hash: UInt160;
-  readonly witness: Witness;
-}
-
-export interface VerifyScriptResult {
-  readonly failureMessage?: string;
-  readonly hash: UInt160;
-  readonly witness: Witness;
-  readonly actions: readonly Action[];
-}
-
-export type VerifyScript = (options: VerifyScriptOptions) => Promise<VerifyScriptResult>;
+import { StackItem } from './StackItems';
+import { Transaction } from './transaction';
+import { Verifiable } from './Verifiable';
+import { CallFlags } from './CallFlags';
 
 export enum TriggerType {
   Verification = 0x00,
+  System = 0x01,
   Application = 0x10,
 }
 
-// Application
+export type SnapshotName = 'main' | 'clone';
 
-export interface Script {
-  readonly code: Buffer;
+export interface ApplicationEngineOptions {
+  readonly trigger: TriggerType;
+  readonly container?: Verifiable & SerializableWire;
+  readonly snapshot?: SnapshotName;
+  readonly gas: number;
+  readonly testMode?: boolean;
 }
 
-export const NULL_ACTION = {
-  blockIndex: -1,
-  blockHash: common.ZERO_UINT256,
-  transactionIndex: -1,
-  transactionHash: common.ZERO_UINT256,
-};
-
-export interface ExecutionAction {
-  readonly blockIndex: number;
-  readonly blockHash: UInt256;
-  readonly transactionIndex: number;
-  readonly transactionHash: UInt256;
-}
-
-export interface ExecuteScriptsResult {
+export interface ApplicationEngine {
+  readonly trigger: TriggerType;
+  readonly gasConsumed: number;
+  readonly resultStack: readonly StackItem[];
   readonly state: VMState;
-  readonly stack: readonly ContractParameter[];
-  readonly stackAlt: readonly ContractParameter[];
-  readonly gasConsumed: BN;
-  readonly gasCost: BN;
-  readonly errorMessage?: string;
+  readonly loadScript: (script: Buffer, flag?: CallFlags) => boolean;
+  readonly execute: () => keyof typeof VMState;
+  readonly loadClonedContext: (position: number) => boolean;
 }
 
-export interface VMListeners {
-  readonly onNotify?: (options: { readonly args: readonly ContractParameter[]; readonly scriptHash: UInt160 }) => void;
+export type SnapshotPartial = 'blocks' | 'transactions';
 
-  readonly onLog?: (options: { readonly message: string; readonly scriptHash: UInt160 }) => void;
-  readonly onMigrateContract?: (options: { readonly from: UInt160; readonly to: UInt160 }) => void;
-  readonly onSetVotes?: (options: { readonly address: UInt160; readonly votes: readonly ECPoint[] }) => void;
+export interface SnapshotHandler {
+  readonly addBlock: (block: Block) => boolean;
+  readonly addTransaction: (transaction: Transaction, index: number, state?: VMState) => boolean;
+  readonly deleteTransaction: (hash: UInt256) => boolean;
+  readonly commit: (partial?: SnapshotPartial) => boolean;
+  readonly reset: () => boolean;
+  readonly changeBlockHashIndex: (index: number, hash: UInt256) => boolean;
+  readonly changeHeaderHashIndex: (index: number, hash: UInt256) => boolean;
+  readonly setPersistingBlock: (block: Block) => boolean;
+  readonly getChangeSet: () => any;
+  readonly clone: () => void;
 }
 
-export type ExecuteScripts = (input: {
-  readonly scripts: readonly Script[];
-  readonly blockchain: WriteBlockchain;
-  readonly scriptContainer: ScriptContainer;
-  readonly triggerType: TriggerType;
-  readonly action: ExecutionAction;
-  readonly gas: BN;
-  readonly listeners?: VMListeners;
-  readonly skipWitnessVerify?: boolean;
-  readonly persistingBlock?: Block;
-}) => Promise<ExecuteScriptsResult>;
+// tslint:disable-next-line no-any TODO: implement
+export type Notification = any;
+
+export interface ApplicationExecuted {
+  readonly transaction?: Transaction;
+  readonly trigger: TriggerType;
+  readonly state: VMState;
+  readonly gasConsumed: number;
+  readonly stack: readonly StackItem[];
+  readonly notifications: readonly Notification[];
+}
 
 export interface VM {
-  readonly executeScripts: ExecuteScripts;
+  readonly withApplicationEngine: <T = void>(
+    options: ApplicationEngineOptions,
+    func: (engine: ApplicationEngine) => T,
+  ) => T;
+
+  readonly withSnapshots: <T = void>(
+    func: (snapshots: { readonly main: SnapshotHandler; readonly clone: Omit<SnapshotHandler, 'clone'> }) => T,
+  ) => T;
 }
