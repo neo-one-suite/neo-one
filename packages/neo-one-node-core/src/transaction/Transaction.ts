@@ -8,6 +8,7 @@ import {
   TransactionJSON,
   TransactionModel,
   TransactionModelAdd,
+  TransactionWithInvocationDataJSON,
   UInt160,
 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
@@ -29,7 +30,7 @@ export type TransactionAdd = TransactionModelAdd<Attribute, Witness, Signer>;
 
 export class Transaction
   extends TransactionModel<Attribute, Witness, Signer>
-  implements SerializableWire<Transaction>, SerializableJSON<TransactionJSON> {
+  implements SerializableWire, SerializableJSON<TransactionJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): Transaction {
     const {
       version,
@@ -172,13 +173,17 @@ export class Transaction
     return this.sizeInternal();
   }
 
+  public getScriptHashesForVerifying(): readonly UInt160[] {
+    return this.signers.map((signer) => signer.account);
+  }
+
   public serializeJSON(options: SerializeJSONContext): TransactionJSON {
     return {
       hash: JSONHelper.writeUInt256(this.hash),
       size: this.size,
       version: this.version,
       nonce: this.nonce,
-      sender: scriptHashToAddress(common.uInt160ToString(this.sender)),
+      sender: this.sender ? scriptHashToAddress(common.uInt160ToString(this.sender)) : undefined,
       sysfee: JSONHelper.writeUInt64LE(this.systemFee),
       netfee: JSONHelper.writeUInt64LE(this.networkFee),
       validuntilblock: this.validUntilBlock,
@@ -187,5 +192,12 @@ export class Transaction
       script: JSONHelper.writeBuffer(this.script),
       witnesses: this.witnesses.map((witness) => witness.serializeJSON(options)),
     };
+  }
+
+  public async serializeJSONWithInvocationData(
+    _options: SerializeJSONContext,
+  ): Promise<TransactionWithInvocationDataJSON> {
+    // TODO: Implement method similar to old InvocationTransaction.serializeJSON(), which includes extra invocation data
+    return Promise.reject();
   }
 }

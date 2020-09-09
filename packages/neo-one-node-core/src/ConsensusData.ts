@@ -1,5 +1,6 @@
 import { BinaryWriter, ConsensusDataJSON, crypto, IOHelper, UInt256 } from '@neo-one/client-common';
 import { BN } from 'bn.js';
+import { DEFAULT_VALIDATORS_COUNT } from './constants';
 import {
   createSerializeWire,
   DeserializeWireBaseOptions,
@@ -9,18 +10,15 @@ import {
 } from './Serializable';
 import { utils } from './utils';
 
-// TODO: could put this somewhere else it is possible it changes?
-const defaultValidatorsCount = new BN(7);
-
 export interface ConsensusDataAdd {
   readonly primaryIndex: number;
   readonly nonce: BN;
 }
 
-export class ConsensusData implements SerializableWire<ConsensusData>, SerializableJSON<ConsensusDataJSON> {
+export class ConsensusData implements SerializableWire, SerializableJSON<ConsensusDataJSON> {
   public static deserializeWireBase(options: DeserializeWireBaseOptions): ConsensusData {
     const { reader } = options;
-    const primaryIndex = reader.readVarUIntLE(defaultValidatorsCount.subn(1)).toNumber();
+    const primaryIndex = reader.readVarUIntLE(DEFAULT_VALIDATORS_COUNT.subn(1)).toNumber();
     const nonce = reader.readUInt64LE();
 
     return new this({

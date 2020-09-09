@@ -16,7 +16,3 @@ export const CoinClaimedError = makeErrorWithCode(
   'COIN_CLAIMED',
   (asset: string, value: string) => `Coin with asset: ${asset}, value: ${value} is already claimed.`,
 );
-export const CoinUnspentError = makeErrorWithCode(
-  'COIN_UNSPENT',
-  (unspentCoins: number) => `${unspentCoins} coins unspent.`,
-);

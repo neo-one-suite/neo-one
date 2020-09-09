@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`EquatableKey Stack Item toStructuralKey 1`] = `"AttributeBaseClass:129:fbe042a3403a59513625225b9132f3c48d0014283a837ba480c136f43d112106"`;

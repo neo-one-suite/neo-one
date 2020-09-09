@@ -1,59 +1,34 @@
-import {
-  BinaryWriter,
-  common,
-  IOHelper,
-  JSONHelper,
-  StorageItemJSON,
-  toJSONStorageFlags,
-  UInt160,
-} from '@neo-one/client-common';
-import { Equals, Equatable } from './Equatable';
-import {
-  createSerializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializableJSON,
-  SerializableWire,
-  SerializeJSONContext,
-  SerializeWire,
-} from './Serializable';
-import { StorageFlags } from './StorageFlags';
-import { BinaryReader, utils } from './utils';
+import { BinaryWriter, createSerializeWire, InvalidFormatError } from '@neo-one/client-common';
+import { BN } from 'bn.js';
+import { DeserializeWireBaseOptions, DeserializeWireOptions, SerializableWire } from './Serializable';
+import { BinaryReader } from './utils';
 
-export interface StorageItemAdd {
-  readonly hash: UInt160;
-  readonly key: Buffer;
+// TODO: Cache can also be 2 other things, we should definitely revisit this when we have more context
+export interface StorageItemCacheAdd {
+  readonly cache: BN;
+  readonly isConstant: boolean;
+}
+
+export interface StorageItemValueAdd {
   readonly value: Buffer;
-  readonly flags: StorageFlags;
+  readonly isConstant: boolean;
 }
 
-export interface StorageItemUpdate {
-  readonly value: Buffer;
-  readonly flags: StorageFlags;
-}
+// tslint:disable-next-line: no-any
+const isStorageItemCacheAdd = (value: any): value is StorageItemCacheAdd =>
+  value?.cache !== undefined && BN.isBN(value.cache);
 
-export interface StorageItemsKey {
-  readonly hash?: UInt160;
-  readonly prefix?: Buffer;
-}
+type StorageItemAdd = StorageItemCacheAdd | StorageItemValueAdd;
 
-export interface StorageItemKey {
-  readonly hash: UInt160;
-  readonly key: Buffer;
-}
-
-export class StorageItem implements SerializableWire<StorageItem>, Equatable, SerializableJSON<StorageItemJSON> {
-  public static deserializeWireBase({ reader }: DeserializeWireBaseOptions): StorageItem {
-    const hash = reader.readUInt160();
-    const key = reader.readVarBytesLE();
+export class StorageItem implements SerializableWire {
+  public static deserializeWireBase(options: DeserializeWireBaseOptions): StorageItem {
+    const { reader } = options;
     const value = reader.readVarBytesLE();
-    const flags = reader.readUInt8();
+    const isConstant = reader.readBoolean();
 
     return new this({
-      hash,
-      key,
       value,
-      flags,
+      isConstant,
     });
   }
 
@@ -64,62 +39,62 @@ export class StorageItem implements SerializableWire<StorageItem>, Equatable, Se
     });
   }
 
-  public readonly hash: UInt160;
-  public readonly key: Buffer;
-  public readonly value: Buffer;
-  public readonly flags: StorageFlags;
-  public readonly equals: Equals = utils.equals(
-    StorageItem,
-    this,
-    (other) =>
-      common.uInt160Equal(this.hash, other.hash) &&
-      this.key.equals(other.key) &&
-      this.value.equals(other.value) &&
-      this.flags === other.flags,
-  );
-  public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
-  private readonly sizeInternal: () => number;
+  public readonly serializeWire = createSerializeWire(this.serializeWireBase.bind(this));
+  public readonly isConstant: boolean;
 
-  public constructor({ hash, key, value, flags }: StorageItemAdd) {
-    this.hash = hash;
-    this.key = key;
-    this.value = value;
-    this.flags = flags;
-    this.sizeInternal = utils.lazy(
-      () =>
-        IOHelper.sizeOfUInt160 +
-        IOHelper.sizeOfVarBytesLE(this.key) +
-        IOHelper.sizeOfVarBytesLE(this.value) +
-        IOHelper.sizeOfUInt8,
-    );
+  private mutableValue: Buffer | undefined;
+  private mutableCache: BN | undefined;
+
+  public constructor(options: StorageItemAdd) {
+    this.isConstant = options.isConstant;
+    this.mutableValue = isStorageItemCacheAdd(options) ? undefined : options.value;
+    this.mutableCache = isStorageItemCacheAdd(options) ? options.cache : undefined;
   }
 
-  public get size(): number {
-    return this.sizeInternal();
+  public get value(): Buffer {
+    if (this.mutableValue !== undefined) {
+      return this.mutableValue;
+    }
+
+    if (this.mutableCache === undefined) {
+      throw new InvalidFormatError();
+    }
+
+    this.mutableValue = this.mutableCache.toBuffer();
+    this.mutableCache = undefined;
+
+    return this.mutableValue;
   }
 
-  public update({ value, flags }: StorageItemUpdate): StorageItem {
-    return new StorageItem({
-      hash: this.hash,
-      key: this.key,
-      value,
-      flags,
-    });
+  public set value(value: Buffer) {
+    this.mutableValue = value;
+    this.mutableCache = undefined;
   }
 
-  public serializeWireBase(writer: BinaryWriter): void {
-    writer.writeUInt160(this.hash);
-    writer.writeVarBytesLE(this.key);
+  public set(integer: BN) {
+    this.mutableCache = integer;
+    this.mutableValue = undefined;
+  }
+
+  public add(integer: BN) {
+    if (BN.isBN(this.mutableCache)) {
+      this.set(this.mutableCache.add(integer));
+    } else if (this.mutableValue !== undefined) {
+      this.set(new BN(this.mutableValue).add(integer));
+    } else {
+      throw new InvalidFormatError();
+    }
+  }
+
+  public serializeWireBase(writer: BinaryWriter) {
     writer.writeVarBytesLE(this.value);
-    writer.writeUInt8(this.flags);
+    writer.writeBoolean(this.isConstant);
   }
 
-  public serializeJSON(_context: SerializeJSONContext): StorageItemJSON {
-    return {
-      hash: JSONHelper.writeUInt160(this.hash),
-      key: JSONHelper.writeBuffer(this.key),
-      value: JSONHelper.writeBuffer(this.value),
-      flags: toJSONStorageFlags(this.flags),
-    };
+  public clone() {
+    return new StorageItem({
+      value: this.value,
+      isConstant: this.isConstant,
+    });
   }
 }

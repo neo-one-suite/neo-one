@@ -2,6 +2,7 @@ import {
   BinaryWriter,
   BlockBaseJSON,
   common,
+  createGetHashData,
   crypto,
   InvalidFormatError,
   IOHelper,
@@ -10,20 +11,12 @@ import {
   UInt256,
   UInt256Hex,
 } from '@neo-one/client-common';
-import { ContractModel } from '@neo-one/client-full-common';
 import { BN } from 'bn.js';
 import { Equals, EquatableKey } from './Equatable';
 import { UnsignedBlockError } from './errors';
-import { Header } from './Header';
-import {
-  createSerializeWire,
-  DeserializeWireBaseOptions,
-  DeserializeWireOptions,
-  SerializeJSONContext,
-  SerializeWire,
-} from './Serializable';
+import { createSerializeWire, DeserializeWireBaseOptions, SerializeJSONContext, SerializeWire } from './Serializable';
 import { utils } from './utils';
-import { SnapshotMethods } from './Verifiable';
+import { StorageMethods, VerifyWitnesses } from './Verifiable';
 import { Witness } from './Witness';
 
 export interface BlockBaseAdd {
@@ -85,7 +78,7 @@ export abstract class BlockBase implements EquatableKey {
   public readonly timestamp: BN;
   public readonly index: number;
   public readonly nextConsensus: UInt160;
-  public readonly getScriptHashesForVerifying = utils.lazyAsync(async ({ tryGetHeader }: SnapshotMethods) => {
+  public readonly getScriptHashesForVerifying = utils.lazyAsync(async ({ tryGetHeader }: StorageMethods) => {
     if (this.previousHash === common.ZERO_UINT256) {
       return [this.witness.scriptHash];
     }
@@ -107,7 +100,7 @@ export abstract class BlockBase implements EquatableKey {
   public readonly serializeWire: SerializeWire = createSerializeWire(this.serializeWireBase.bind(this));
   private readonly hashInternal: () => UInt256;
   private readonly hashHexInternal = utils.lazy(() => common.uInt256ToHex(this.hash));
-  private readonly messageInternal = utils.lazy(() => this.serializeUnsigned());
+  private readonly messageInternal = utils.lazy(() => createGetHashData(this.serializeUnsigned)());
   private readonly witnessInternal: Witness | undefined;
   private readonly sizeInternal = utils.lazy(
     () =>
@@ -167,6 +160,10 @@ export abstract class BlockBase implements EquatableKey {
     return this.witnessInternal;
   }
 
+  public get witnesses(): readonly Witness[] {
+    return [this.witness];
+  }
+
   public serializeUnsignedBase(writer: BinaryWriter): void {
     writer.writeUInt32LE(this.version);
     writer.writeUInt256(this.previousHash);
@@ -201,8 +198,8 @@ export abstract class BlockBase implements EquatableKey {
     };
   }
 
-  public async verify(options: SnapshotMethods) {
-    const prevHeader = await options.tryGetHeader(this.previousHash);
+  public async verify(storage: StorageMethods, verifyWitnesses: VerifyWitnesses) {
+    const prevHeader = await storage.tryGetHeader(this.previousHash);
     if (prevHeader === undefined) {
       return false;
     }
@@ -215,7 +212,7 @@ export abstract class BlockBase implements EquatableKey {
       return false;
     }
 
-    return this.verifyWitnesses(options, utils.ONE_HUNDRED_MILLION);
+    return verifyWitnesses(this, storage, 1);
   }
 
   protected readonly sizeExclusive: () => number = () => 0;
