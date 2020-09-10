@@ -1,30 +1,22 @@
-import { UInt256 } from '@neo-one/client-common';
 import {
-  Account,
-  AccountUnclaimed,
-  AccountUnspent,
-  Asset,
-  Block,
-  BlockData,
+  BinaryReader,
   BlockKey,
-  Contract,
-  deserializeActionWire,
+  ContractIDState,
+  ContractState,
   DeserializeWireContext,
-  Header,
-  HeaderKey,
-  InvocationData,
-  Output,
+  HashIndexState,
+  // InvocationData,
+  HeaderHashList,
   Storage,
+  // TransactionData,
   StorageItem,
-  TransactionData,
-  Validator,
-  ValidatorsCount,
+  TransactionState,
+  TrimmedBlock,
 } from '@neo-one/node-core';
 import { keys } from '@neo-one/node-storage-common';
 import { LevelUp } from 'levelup';
-import * as common from './common';
 import { convertChange } from './convertChange';
-import { KeyNotFoundError } from './errors';
+// import { KeyNotFoundError } from './errors';
 import * as read from './read';
 
 interface LevelUpStorageOptions {
@@ -33,193 +25,84 @@ interface LevelUpStorageOptions {
 }
 
 export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage => {
-  const getHash = async ({ hashOrIndex }: HeaderKey): Promise<UInt256> => {
-    let hash = hashOrIndex;
-    if (typeof hash === 'number') {
-      try {
-        const result = await db.get(keys.serializeHeaderIndexHashKey(hash));
-        hash = common.deserializeHeaderHash(result as Buffer);
-      } catch (error) {
-        if (error.notFound) {
-          throw new KeyNotFoundError(`${hash}`);
-        }
-        throw error;
-      }
-    }
+  // TODO: implement getting blockHash from an index
+  // const getHash = async ({ hashOrIndex }: HeaderKey): Promise<UInt256> => {
+  //   let hash = hashOrIndex;
+  //   if (typeof hash === 'number') {
+  //     try {
+  //       const result = await db.get(keys.serializeHeaderIndexHashKey(hash));
+  //       hash = common.deserializeHeaderHash(result as Buffer);
+  //     } catch (error) {
+  //       if (error.notFound) {
+  //         throw new KeyNotFoundError(`${hash}`);
+  //       }
+  //       throw error;
+  //     }
+  //   }
 
-    return hash;
-  };
-
-  const headerBase = read.createReadStorage({
-    db,
-    serializeKey: keys.typeKeyToSerializeKey.header,
-    deserializeValue: (buffer) =>
-      Header.deserializeWire({
-        context,
-        buffer,
-      }),
-  });
-
-  const getHeader = async ({ hashOrIndex }: HeaderKey): Promise<Header> => {
-    const hash = await getHash({ hashOrIndex });
-
-    return headerBase.get({ hash });
-  };
-
-  const header = {
-    get: getHeader,
-    tryGet: read.createTryGet({ get: getHeader }),
-    tryGetLatest: read.createTryGetLatest({
-      db,
-      latestKey: keys.maxHeaderHashKey,
-      deserializeResult: (result) => ({
-        hash: common.deserializeHeaderHash(result),
-      }),
-
-      get: headerBase.get,
-    }),
-  };
+  //   return hash;
+  // };
 
   const blockBase = read.createReadStorage({
     db,
-    serializeKey: keys.typeKeyToSerializeKey.block,
+    serializeKey: keys.createBlockKey,
     deserializeValue: (buffer) =>
-      Block.deserializeWire({
+      TrimmedBlock.deserializeWireBase({
         context,
-        buffer,
+        reader: new BinaryReader(buffer),
       }),
   });
 
-  const getBlock = async ({ hashOrIndex }: BlockKey): Promise<Block> => {
-    const hash = await getHash({ hashOrIndex });
+  const getBlock = async ({ hashOrIndex }: BlockKey): Promise<TrimmedBlock> => {
+    // TODO: implement getting block hash from index
+    if (typeof hashOrIndex === 'number') {
+      throw new Error('not implemented');
+    }
 
-    return blockBase.get({ hash });
+    return blockBase.get({ hashOrIndex });
   };
 
-  const block = {
+  // TODO: confirm when this is in storage blocks come back in order using this range
+  const blocks = {
     get: getBlock,
     tryGet: read.createTryGet({ get: getBlock }),
-    tryGetLatest: read.createTryGetLatest({
+    all$: read.createAll$({
       db,
-      latestKey: keys.maxBlockHashKey,
-      deserializeResult: (result) => ({
-        hash: common.deserializeBlockHash(result),
-      }),
-
-      get: blockBase.get,
+      range: { gte: keys.minBlockKey, lte: keys.maxBlockKey },
+      deserializeValue: (buffer) =>
+        TrimmedBlock.deserializeWire({
+          context,
+          buffer,
+        }),
     }),
   };
 
-  const transaction = read.createReadStorage({
-    db,
-    serializeKey: keys.typeKeyToSerializeKey.transaction,
-    deserializeValue: (buffer) =>
-      deserializeTransactionWire({
-        context,
-        buffer,
-      }),
-  });
-
-  const output = read.createReadStorage({
-    db,
-    serializeKey: keys.typeKeyToSerializeKey.output,
-    deserializeValue: (buffer) => Output.deserializeWire({ context, buffer }),
-  });
-
   return {
-    header,
-    block,
-    blockData: read.createReadStorage({
+    blocks,
+
+    transactions: read.createReadStorage({
       db,
-      serializeKey: keys.typeKeyToSerializeKey.blockData,
+      serializeKey: keys.createTransactionKey,
       deserializeValue: (buffer) =>
-        BlockData.deserializeWire({
+        TransactionState.deserializeWire({
           context,
           buffer,
         }),
     }),
 
-    account: read.createReadAllStorage({
+    contracts: read.createReadStorage({
       db,
-      serializeKey: keys.typeKeyToSerializeKey.account,
-      minKey: keys.accountMinKey,
-      maxKey: keys.accountMaxKey,
+      serializeKey: keys.createContractKey,
       deserializeValue: (buffer) =>
-        Account.deserializeWire({
+        ContractState.deserializeWire({
           context,
           buffer,
         }),
     }),
 
-    accountUnclaimed: read.createReadGetAllStorage({
+    storages: read.createReadStorage({
       db,
-      serializeKey: keys.typeKeyToSerializeKey.accountUnclaimed,
-      getMinKey: keys.getAccountUnclaimedKeyMin,
-      getMaxKey: keys.getAccountUnclaimedKeyMax,
-      deserializeValue: (buffer) =>
-        AccountUnclaimed.deserializeWire({
-          context,
-          buffer,
-        }),
-    }),
-
-    accountUnspent: read.createReadGetAllStorage({
-      db,
-      serializeKey: keys.typeKeyToSerializeKey.accountUnspent,
-      getMinKey: keys.getAccountUnspentKeyMin,
-      getMaxKey: keys.getAccountUnspentKeyMax,
-      deserializeValue: (buffer) =>
-        AccountUnspent.deserializeWire({
-          context,
-          buffer,
-        }),
-    }),
-
-    action: read.createReadGetAllStorage({
-      db,
-      serializeKey: keys.typeKeyToSerializeKey.action,
-      getMinKey: keys.getActionKeyMin,
-      getMaxKey: keys.getActionKeyMax,
-      deserializeValue: (buffer) =>
-        deserializeActionWire({
-          context,
-          buffer,
-        }),
-    }),
-
-    asset: read.createReadStorage({
-      db,
-      serializeKey: keys.typeKeyToSerializeKey.asset,
-      deserializeValue: (buffer) =>
-        Asset.deserializeWire({
-          context,
-          buffer,
-        }),
-    }),
-
-    transaction,
-    transactionData: read.createReadStorage({
-      db,
-      serializeKey: keys.typeKeyToSerializeKey.transactionData,
-      deserializeValue: (buffer) => TransactionData.deserializeWire({ context, buffer }),
-    }),
-
-    output,
-    contract: read.createReadStorage({
-      db,
-      serializeKey: keys.typeKeyToSerializeKey.contract,
-      deserializeValue: (buffer) =>
-        Contract.deserializeWire({
-          context,
-          buffer,
-        }),
-    }),
-
-    storageItem: read.createReadGetAllStorage({
-      db,
-      serializeKey: keys.typeKeyToSerializeKey.storageItem,
-      getMinKey: keys.getStorageItemKeyMin,
-      getMaxKey: keys.getStorageItemKeyMax,
+      serializeKey: keys.createStorageKey,
       deserializeValue: (buffer) =>
         StorageItem.deserializeWire({
           context,
@@ -227,36 +110,33 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
         }),
     }),
 
-    validator: read.createReadAllStorage({
+    headerHashList: read.createReadAllStorage({
       db,
-      serializeKey: keys.typeKeyToSerializeKey.validator,
-      minKey: keys.validatorMinKey,
-      maxKey: keys.validatorMaxKey,
+      range: { gte: keys.minHeaderHashListKey, lte: keys.maxHeaderHashListKey },
+      serializeKey: keys.createHeaderHashListKey,
       deserializeValue: (buffer) =>
-        Validator.deserializeWire({
+        HeaderHashList.deserializeWire({
           context,
           buffer,
         }),
     }),
 
-    invocationData: read.createReadStorage({
+    blockHashIndex: read.createReadMetadataStorage({
       db,
-      serializeKey: keys.typeKeyToSerializeKey.invocationData,
-      deserializeValue: (buffer) =>
-        InvocationData.deserializeWire({
-          context,
-          buffer,
-        }),
+      key: keys.blockHashIndexKey,
+      deserializeValue: (buffer) => HashIndexState.deserializeWire({ context, buffer }),
     }),
 
-    validatorsCount: read.createReadMetadataStorage({
+    headerHashIndex: read.createReadMetadataStorage({
       db,
-      key: keys.validatorsCountKey,
-      deserializeValue: (buffer) =>
-        ValidatorsCount.deserializeWire({
-          context,
-          buffer,
-        }),
+      key: keys.headerHashIndexKey,
+      deserializeValue: (buffer) => HashIndexState.deserializeWire({ context, buffer }),
+    }),
+
+    contractID: read.createReadMetadataStorage({
+      db,
+      key: keys.headerHashIndexKey,
+      deserializeValue: (buffer) => ContractIDState.deserializeWire({ context, buffer }),
     }),
 
     async close(): Promise<void> {
@@ -272,6 +152,9 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
         return acc;
       }, []);
       await db.batch(changes);
+    },
+    async commitBatch(batch): Promise<void> {
+      await db.batch(batch);
     },
     async reset(): Promise<void> {
       // tslint:disable-next-line readonly-array no-any
@@ -293,3 +176,62 @@ export const levelUpStorage = ({ db, context }: LevelUpStorageOptions): Storage 
     },
   };
 };
+// blockData: read.createReadStorage({
+//   db,
+//   serializeKey: keys.typeKeyToSerializeKey.blockData,
+//   deserializeValue: (buffer) =>
+//     BlockData.deserializeWire({
+//       context,
+//       buffer,
+//     }),
+// }),
+//
+// action: read.createReadGetAllStorage({
+//   db,
+//   serializeKey: keys.typeKeyToSerializeKey.action,
+//   getMinKey: keys.getActionKeyMin,
+//   getMaxKey: keys.getActionKeyMax,
+//   deserializeValue: (buffer) =>
+//     deserializeActionWire({
+//       context,
+//       buffer,
+//     }),
+// }),
+//
+// transactionData: read.createReadStorage({
+//   db,
+//   serializeKey: keys.typeKeyToSerializeKey.transactionData,
+//   deserializeValue: (buffer) => TransactionData.deserializeWire({ context, buffer }),
+// }),
+// validator: read.createReadAllStorage({
+//     db,
+//     serializeKey: keys.typeKeyToSerializeKey.validator,
+//     minKey: keys.validatorMinKey,
+//     maxKey: keys.validatorMaxKey,
+//     deserializeValue: (buffer) =>
+//       Validator.deserializeWire({
+//         context,
+//         buffer,
+//       }),
+//   }),
+
+//   invocationData: read.createReadStorage({
+//     db,
+//     serializeKey: keys.typeKeyToSerializeKey.invocationData,
+//     deserializeValue: (buffer) =>
+//       InvocationData.deserializeWire({
+//         context,
+//         buffer,
+//       }),
+//   }),
+
+//   validatorsCount: read.createReadMetadataStorage({
+//     db,
+//     key: keys.validatorsCountKey,
+//     deserializeValue: (buffer) =>
+//       ValidatorsCount.deserializeWire({
+//         context,
+//         buffer,
+//       }),
+//   }),
+// };

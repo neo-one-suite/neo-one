@@ -30,7 +30,7 @@ export class Dispatcher {
     this.init = this.initialize(this.options.levelDBPath);
   }
 
-  public withSnapshots<T>(
+  public withSnapshots<T = void>(
     func: (snapshots: { readonly main: SnapshotHandler; readonly clone: Omit<SnapshotHandler, 'clone'> }) => T,
   ) {
     this.resetSnapshots();
@@ -40,7 +40,10 @@ export class Dispatcher {
     return func({ main, clone });
   }
 
-  public withApplicationEngine<T>(options: CreateOptions, func: (engine: Omit<ApplicationEngine, 'create'>) => T) {
+  public withApplicationEngine<T = void>(
+    options: CreateOptions,
+    func: (engine: Omit<ApplicationEngine, 'create'>) => T,
+  ) {
     const engine = new ApplicationEngine(this);
     engine.create(options);
     const result = func(engine);
@@ -70,6 +73,12 @@ export class Dispatcher {
   public reset(): void {
     this.dispose();
     this.initialize(this.options.levelDBPath);
+  }
+
+  public test(): any {
+    return this.dispatch({
+      method: 'test',
+    });
   }
 
   private initialize(path?: string): boolean {

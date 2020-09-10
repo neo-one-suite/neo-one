@@ -1,132 +1,98 @@
-import { common, UInt160, UInt256 } from '@neo-one/client-common';
-import {
-  AccountInputKey,
-  AccountInputsKey,
-  ActionKey,
-  ActionsKey,
-  OutputKey,
-  StorageItemKey,
-  StorageItemsKey,
-  ValidatorKey,
-} from '@neo-one/node-core';
-import { utils } from '@neo-one/utils';
+import { BinaryWriter, common, UInt160, UInt256 } from '@neo-one/client-common';
+import { BlockKey, StorageKey } from '@neo-one/node-core';
 
-const DELIMITER = '\x00';
-const createPrefix = (value: string) => `${value}${DELIMITER}`;
-const MAX_CHAR = '\xff';
-const createMax = (value: string) => `${value}${MAX_CHAR}`;
+enum Prefix {
+  Block = 0x01,
+  Transaction = 0x02,
+  Contract = 0x50,
+  Storage = 0x70,
+  HeaderHashList = 0x80,
+  CurrentBlock = 0xc0,
+  CurrentHeader = 0xc1,
+  ContractID = 0xc2,
 
-const accountKeyPrefix = createPrefix('0');
-const accountUnclaimedKeyPrefix = createPrefix('1');
-const accountUnspentKeyPrefix = createPrefix('2');
-const actionKeyPrefix = createPrefix('3');
-const assetKeyPrefix = createPrefix('4');
-const blockKeyPrefix = createPrefix('5');
-const blockDataKeyPrefix = createPrefix('6');
-const headerKeyPrefix = createPrefix('7');
-const headerHashKeyPrefix = createPrefix('8');
-const transactionKeyPrefix = createPrefix('9');
-const outputKeyPrefix = createPrefix('a');
-const transactionDataKeyPrefix = createPrefix('b');
-const contractKeyPrefix = createPrefix('c');
-const storageItemKeyPrefix = createPrefix('d');
-const validatorKeyPrefix = createPrefix('e');
-const invocationDataKeyPrefix = createPrefix('f');
-const settingsPrefix = createPrefix('g');
-const validatorsCountKey = createPrefix('h');
+  // NEO•ONE prefix, watch out for future collisions with https://github.com/neo-project/neo/blob/master/src/neo/Persistence/Prefixes.cs
+  Settings = 0xdd,
+}
 
-const serializeHeaderIndexHashKey = (index: number) => `${headerHashKeyPrefix}${index}`;
+const getCreateKey = <Key>({
+  serializeKey,
+  prefix,
+}: {
+  readonly serializeKey: (key: Key) => Buffer;
+  readonly prefix: Prefix;
+}) => (key: Key) => Buffer.concat([Buffer.from([prefix]), serializeKey(key)]);
 
-const maxHeaderHashKey = `${settingsPrefix}0`;
-const maxBlockHashKey = `${settingsPrefix}1`;
+const getMetadataKey = ({ prefix }: { readonly prefix: Prefix }) => Buffer.from([prefix]);
 
-const createSerializeAccountInputKey = (prefix: string) => ({ hash, input }: AccountInputKey): string =>
-  `${prefix}${common.uInt160ToString(hash)}${common.uInt256ToString(input.hash)}${input.index}`;
-const createGetAccountInputKeyMin = (prefix: string) => ({ hash }: AccountInputsKey): string =>
-  `${prefix}${common.uInt160ToString(hash)}`;
-const createGetAccountInputKeyMax = (prefix: string) => ({ hash }: AccountInputsKey): string =>
-  createMax(`${prefix}${common.uInt160ToString(hash)}`);
+const serializeHeaderHashListKey = (key: number) => {
+  const writer = new BinaryWriter();
+  writer.writeUInt32LE(key);
 
-const getAccountUnclaimedKeyMin = createGetAccountInputKeyMin(accountUnclaimedKeyPrefix);
-const getAccountUnclaimedKeyMax = createGetAccountInputKeyMax(accountUnclaimedKeyPrefix);
-
-const getAccountUnspentKeyMin = createGetAccountInputKeyMin(accountUnspentKeyPrefix);
-const getAccountUnspentKeyMax = createGetAccountInputKeyMax(accountUnspentKeyPrefix);
-
-const serializeStorageItemKey = ({ hash, key }: StorageItemKey): string =>
-  `${storageItemKeyPrefix}${common.uInt160ToString(hash)}${key.toString('hex')}`;
-const getStorageItemKeyMin = ({ hash, prefix }: StorageItemsKey): string =>
-  [
-    storageItemKeyPrefix,
-    hash === undefined ? undefined : common.uInt160ToString(hash),
-    prefix === undefined ? undefined : prefix.toString('hex'),
-  ]
-    .filter(utils.notNull)
-    .join('');
-const getStorageItemKeyMax = (key: StorageItemsKey): string => createMax(getStorageItemKeyMin(key));
-
-const serializeActionKey = ({ index }: ActionKey): string => `${actionKeyPrefix}${index.toString(10, 8)}`;
-const getActionKeyMin = ({ indexStart }: ActionsKey): string =>
-  [actionKeyPrefix, indexStart === undefined ? undefined : indexStart.toString(10, 8)].filter(utils.notNull).join('');
-const getActionKeyMax = ({ indexStop }: ActionsKey): string =>
-  createMax(
-    [actionKeyPrefix, indexStop === undefined ? undefined : indexStop.toString(10, 8)].filter(utils.notNull).join(''),
-  );
-
-const serializeValidatorKey = ({ publicKey }: ValidatorKey): string =>
-  `${validatorKeyPrefix}${common.ecPointToString(publicKey)}`;
-const validatorMinKey = validatorKeyPrefix;
-const validatorMaxKey = createMax(validatorKeyPrefix);
-
-const serializeUInt160Key = ({ hash }: { readonly hash: UInt160 }): string => common.uInt160ToString(hash);
-const serializeUInt256Key = ({ hash }: { readonly hash: UInt256 }): string => common.uInt256ToString(hash);
-
-const createSerializeUInt160Key = (prefix: string) => (input: { readonly hash: UInt160 }): string =>
-  `${prefix}${serializeUInt160Key(input)}`;
-const createSerializeUInt256Key = (prefix: string) => (input: { readonly hash: UInt256 }): string =>
-  `${prefix}${serializeUInt256Key(input)}`;
-
-const accountMinKey = accountKeyPrefix;
-const accountMaxKey = createMax(accountKeyPrefix);
-
-const serializeOutputKey = ({ index, hash }: OutputKey): string =>
-  `${outputKeyPrefix}${common.uInt256ToString(hash)}${index}`;
-
-const typeKeyToSerializeKey = {
-  account: createSerializeUInt160Key(accountKeyPrefix),
-  accountUnclaimed: createSerializeAccountInputKey(accountUnclaimedKeyPrefix),
-  accountUnspent: createSerializeAccountInputKey(accountUnspentKeyPrefix),
-  action: serializeActionKey,
-  asset: createSerializeUInt256Key(assetKeyPrefix),
-  block: createSerializeUInt256Key(blockKeyPrefix),
-  blockData: createSerializeUInt256Key(blockDataKeyPrefix),
-  header: createSerializeUInt256Key(headerKeyPrefix),
-  transaction: createSerializeUInt256Key(transactionKeyPrefix),
-  output: serializeOutputKey,
-  transactionData: createSerializeUInt256Key(transactionDataKeyPrefix),
-  contract: createSerializeUInt160Key(contractKeyPrefix),
-  storageItem: serializeStorageItemKey,
-  validator: serializeValidatorKey,
-  invocationData: createSerializeUInt256Key(invocationDataKeyPrefix),
+  return writer.toBuffer();
 };
 
+const createBlockKey = getCreateKey<BlockKey>({
+  serializeKey: ({ hashOrIndex }) => {
+    if (typeof hashOrIndex === 'number') {
+      // TODO: implement getting a block by its index
+      throw new Error();
+    }
+
+    return hashOrIndex;
+  },
+  prefix: Prefix.Block,
+});
+
+const createTransactionKey = getCreateKey<UInt256>({
+  serializeKey: (key) => key,
+  prefix: Prefix.Transaction,
+});
+
+const createContractKey = getCreateKey<UInt160>({
+  serializeKey: (key) => key,
+  prefix: Prefix.Contract,
+});
+
+const createStorageKey = getCreateKey<StorageKey>({
+  serializeKey: (key) => key.serializeWire(),
+  prefix: Prefix.Storage,
+});
+
+const createHeaderHashListKey = getCreateKey<number>({
+  serializeKey: serializeHeaderHashListKey,
+  prefix: Prefix.HeaderHashList,
+});
+
+const blockHashIndexKey = getMetadataKey({
+  prefix: Prefix.CurrentBlock,
+});
+
+const headerHashIndexKey = getMetadataKey({
+  prefix: Prefix.CurrentHeader,
+});
+
+const contractIDKey = getMetadataKey({
+  prefix: Prefix.ContractID,
+});
+
+const minBlockKey = createBlockKey({ hashOrIndex: common.ZERO_UINT256 });
+const maxBlockKey = createBlockKey({ hashOrIndex: common.MAX_UINT256 });
+
+const minHeaderHashListKey = createHeaderHashListKey(0);
+const maxHeaderHashListKey = createHeaderHashListKey(0xffffffff);
+
 export const keys = {
-  validatorsCountKey,
-  serializeHeaderIndexHashKey,
-  maxHeaderHashKey,
-  maxBlockHashKey,
-  getAccountUnclaimedKeyMin,
-  getAccountUnclaimedKeyMax,
-  getAccountUnspentKeyMin,
-  getAccountUnspentKeyMax,
-  getStorageItemKeyMin,
-  getStorageItemKeyMax,
-  serializeActionKey,
-  getActionKeyMin,
-  getActionKeyMax,
-  validatorMinKey,
-  validatorMaxKey,
-  accountMinKey,
-  accountMaxKey,
-  typeKeyToSerializeKey,
+  createBlockKey,
+  createTransactionKey,
+  createContractKey,
+  createStorageKey,
+  createHeaderHashListKey,
+  blockHashIndexKey,
+  headerHashIndexKey,
+  contractIDKey,
+  minBlockKey,
+  maxBlockKey,
+  minHeaderHashListKey,
+  maxHeaderHashListKey,
 };

@@ -8,12 +8,11 @@ export interface BlockchainSettings extends ProtocolSettings {
   readonly generationAmount: readonly number[];
   readonly privateKeyVersion: number;
   readonly standbyValidators: readonly ECPoint[];
-  readonly memPoolSize: number;
 }
 export interface ProtocolSettings {
   readonly messageMagic: number;
   readonly addressVersion: number;
-  readonly standbyCommittee: readonly string[];
+  readonly standbyCommittee: readonly ECPoint[];
   readonly committeeMembersCount: number;
   readonly validatorsCount: number;
   readonly millisecondsPerBlock: number;
@@ -30,3 +29,5 @@ export interface PolicySettings {
 export interface NetworkSettings {
   readonly seeds: readonly string[];
 }
+
+export interface Settings extends BlockchainSettings {}

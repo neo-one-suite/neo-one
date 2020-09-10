@@ -1,5 +1,6 @@
 import { UInt256, VMState } from '@neo-one/client-common';
 import { Block, SnapshotName, SnapshotPartial, Transaction } from '@neo-one/node-core';
+import { parseChangeReturns } from './converters';
 import { SnapshotMethods } from './Methods';
 import { DispatcherFunc } from './types';
 
@@ -51,6 +52,16 @@ export class SnapshotHandler {
     });
   }
 
+  public deleteTransaction(hash: UInt256) {
+    return this.dispatch({
+      method: 'snapshot_transactions_delete',
+      args: {
+        hash,
+        snapshot: this.snapshot,
+      },
+    });
+  }
+
   public changeBlockHashIndex(index: number, hash: UInt256) {
     return this.dispatch({
       method: 'snapshot_change_block_hash_index',
@@ -96,12 +107,14 @@ export class SnapshotHandler {
   }
 
   public getChangeSet() {
-    return this.dispatch({
-      method: 'snapshot_get_change_set',
-      args: {
-        snapshot: this.snapshot,
-      },
-    });
+    return parseChangeReturns(
+      this.dispatch({
+        method: 'snapshot_get_change_set',
+        args: {
+          snapshot: this.snapshot,
+        },
+      }),
+    );
   }
 
   public clone() {

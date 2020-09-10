@@ -61,6 +61,7 @@ export type UInt256Hex = string;
 
 const UINT256_BUFFER_BYTES = 32;
 const ZERO_UINT256 = Buffer.alloc(UINT256_BUFFER_BYTES, 0) as UInt256;
+const MAX_UINT256 = Buffer.alloc(UINT256_BUFFER_BYTES, 0xff) as UInt256;
 
 const isUInt256 = (value: {}): value is UInt256 => value instanceof Buffer && value.length === UINT256_BUFFER_BYTES;
 
@@ -233,6 +234,7 @@ export const common = {
   UINT256_BUFFER_BYTES,
   ZERO_UINT160,
   ZERO_UINT256,
+  MAX_UINT256,
   NEGATIVE_SATOSHI_FIXED8,
   TEN_FIXED8,
   ONE_HUNDRED_FIXED8,

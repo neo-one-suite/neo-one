@@ -8,6 +8,9 @@ import { StorageKey } from './StorageKey';
 import { TransactionKey, TransactionState } from './transaction';
 import { BlockKey, TrimmedBlock } from './TrimmedBlock';
 
+// TODO: along with other storage definitions in node-vm `batch` definitions need to move to `node-core`.
+type AbstractBatch = any;
+
 export interface ReadMetadataStorage<Value> {
   readonly get: () => Promise<Value>;
   readonly tryGet: () => Promise<Value | undefined>;
@@ -117,9 +120,11 @@ export interface BlockchainStorage {
 }
 
 export interface Storage extends BlockchainStorage {
-  readonly blocks: ReadGetAllStorage<BlockKey, TrimmedBlock>;
-  readonly headerHashList: ReadGetAllStorage<HeaderKey, HeaderHashList>;
+  readonly blocks: ReadAllStorage<BlockKey, TrimmedBlock>;
+  readonly headerHashList: ReadAllStorage<HeaderKey, HeaderHashList>;
   readonly commit: (changeSet: ChangeSet) => Promise<void>;
+  // tslint:disable-next-line: readonly-array
+  readonly commitBatch: (batch: AbstractBatch[]) => Promise<void>;
   readonly close: () => Promise<void>;
   readonly reset: () => Promise<void>;
 }

@@ -14,7 +14,6 @@
   "dependencies": {
     "@neo-one/client-common": "^2.7.0",
     "@neo-one/node-core": "^2.7.0",
-    "@neo-one/node-vm": "^2.7.0",
     "@neo-one/logger": "^2.6.1",
     "@neo-one/utils": "^2.6.1",
     "bn.js": "^5.0.0",
@@ -24,9 +23,16 @@
   },
   "devDependencies": {
     "@neo-one/build-tools": "^1.0.0",
+    "@neo-one/node-neo-settings": "^2.7.0",
+    "@neo-one/node-storage-levelup": "^2.7.0",
+    "@neo-one/node-vm": "^2.7.0",
     "@types/jest": "^24.0.18",
     "@types/js-priority-queue": "^0.0.5",
+    "@types/levelup": "^3.1.1",
+    "@types/leveldown": "^4.0.0",
     "@types/lodash": "^4.14.138",
+    "leveldown": "^5.1.1",
+    "levelup": "4.1.0",
     "gulp": "~4.0.2",
     "tslib": "^1.10.0"
   }

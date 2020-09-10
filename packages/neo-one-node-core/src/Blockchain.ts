@@ -13,25 +13,28 @@ type CallReceipt = any;
 export interface Blockchain extends BlockchainStorage {
   readonly settings: BlockchainSettings;
   readonly deserializeWireContext: DeserializeWireContext;
-  readonly serializeJSONContext: SerializeJSONContext;
+  // readonly serializeJSONContext: SerializeJSONContext;
   // readonly feeContext: FeeContext;
 
   readonly currentBlock: Block;
   readonly previousBlock: Block | undefined;
-  readonly currentHeaderIndex: Header;
+  readonly currentHeaderIndex: number;
   readonly currentBlockIndex: number;
   readonly block$: Observable<Block>;
   readonly isPersistingBlock: boolean;
 
   readonly persistBlock: (options: { readonly block: Block; readonly unsafe?: boolean }) => Promise<void>;
-  readonly persistHeaders: (headers: readonly Header[]) => Promise<void>;
+  // readonly persistHeaders: (headers: readonly Header[]) => Promise<void>;
 
   readonly verifyWitnesses: VerifyWitnesses;
 
-  readonly invokeScript: (script: Buffer) => Promise<CallReceipt>;
-  readonly invokeTransaction: (transaction: Transaction) => Promise<CallReceipt>;
+  readonly invokeScript: (script: Buffer) => CallReceipt;
+  readonly invokeTransaction: <TTransaction extends { readonly script: Buffer }>(
+    transaction: TTransaction,
+    gas: number,
+  ) => CallReceipt;
 
-  readonly updateSettings: (settings: BlockchainSettings) => void;
+  // readonly updateSettings: (settings: BlockchainSettings) => void;
   readonly stop: () => Promise<void>;
   readonly reset: () => Promise<void>;
 }

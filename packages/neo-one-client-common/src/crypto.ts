@@ -268,6 +268,15 @@ const createWitnessForSignature = <TWitness extends WitnessModel>(
   return new Witness({ verification, invocation });
 };
 
+const createSignatureRedeemScript = (publicKey: ECPoint): Buffer => {
+  const builder = new ScriptBuilder();
+  builder.emitPushECPoint(publicKey);
+  builder.emitOp('PUSHNULL');
+  builder.emitSysCall('Neo.Crypto.VerifyWithECDsaSecp256r1');
+
+  return builder.build();
+};
+
 const createWitness = <TWitness extends WitnessModel>(
   message: Buffer,
   privateKey: PrivateKey,
@@ -346,9 +355,30 @@ const createMultiSignatureWitness = <TWitness extends WitnessModel>(
   return new Witness({ verification, invocation });
 };
 
+const createMultiSignatureRedeemScript = (mIn: number, publicKeys: readonly ECPoint[]) => {
+  const m = Math.floor(mIn);
+  if (m < 1 || m > publicKeys.length) {
+    throw new InvalidNumberOfKeysError(m, publicKeys.length);
+  }
+
+  if (publicKeys.length > 1024) {
+    throw new TooManyPublicKeysError(publicKeys.length);
+  }
+  const publicKeysSorted = publicKeys.length === 1 ? publicKeys : sortKeys(publicKeys);
+  const builder = new ScriptBuilder();
+
+  builder.emitPushInt(m);
+  publicKeysSorted.forEach((key) => builder.emitPushECPoint(key));
+  builder.emitPushInt(publicKeysSorted.length);
+  builder.emitOp('PUSHNULL');
+  builder.emitSysCall('Neo.Crypto.CheckMultisigWithECDsaSecp256r1');
+
+  return builder.build();
+};
+
 const getConsensusAddress = (validators: readonly ECPoint[]): UInt160 =>
   toScriptHash(
-    createMultiSignatureVerificationScript(Math.floor(validators.length - (validators.length - 1) / 3), validators),
+    createMultiSignatureRedeemScript(Math.floor(validators.length - (validators.length - 1) / 3), validators),
   );
 
 const wifToPrivateKey = (wif: string, privateKeyVersion: number): PrivateKey => {
@@ -800,10 +830,12 @@ export const crypto = {
   createVerificationScript,
   createWitness,
   createWitnessForSignature,
+  createSignatureRedeemScript,
   getVerificationScriptHash,
   createMultiSignatureInvocationScript,
   createMultiSignatureVerificationScript,
   createMultiSignatureWitness,
+  createMultiSignatureRedeemScript,
   getConsensusAddress,
   privateKeyToWIF,
   wifToPrivateKey,

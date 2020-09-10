@@ -5,6 +5,10 @@ using System.Dynamic;
 using System.Collections.Generic;
 using NEOONE.Storage;
 using Neo.Persistence;
+using LevelHelper = NEOONE.Storage.LevelDB.Helper;
+using Neo.IO;
+using Neo.SmartContract.Native;
+using Neo.Network.P2P.Payloads;
 
 namespace NEOONE
 {
@@ -19,6 +23,7 @@ namespace NEOONE
         {
             init,
             dispose,
+            test,
         }
 
         private dynamic dispatchBaseMethod(BaseMethod method, dynamic args)
@@ -35,6 +40,9 @@ namespace NEOONE
 
                 case BaseMethod.dispose:
                     return this._dispose();
+
+                case BaseMethod.test:
+                    return this._test();
 
                 default:
                     throw new InvalidOperationException();
@@ -78,6 +86,23 @@ namespace NEOONE
             this.init = false;
 
             return true;
+        }
+
+        private dynamic _test()
+        {
+            var tx = new Transaction()
+            {
+                Script = new byte[] { 0x01 },
+                Attributes = Array.Empty<TransactionAttribute>(),
+                Signers = Array.Empty<Signer>(),
+                NetworkFee = 0x02,
+                SystemFee = 0x03,
+                Nonce = 0x04,
+                ValidUntilBlock = 0x05,
+                Version = 0x06,
+                Witnesses = new Witness[] { new Witness() { VerificationScript = new byte[] { 0x07 } } },
+            };
+            return tx.Hash.ToArray();
         }
 
 #pragma warning disable 1998

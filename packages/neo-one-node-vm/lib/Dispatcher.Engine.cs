@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Threading;
 using Neo.Network.P2P.Payloads;
 using Neo.Persistence;
 using Neo.SmartContract;
@@ -22,6 +21,7 @@ namespace NEOONE
             getresultstack,
             gettrigger,
             getgasconsumed,
+            getnotifications,
             dispose_engine,
         }
 
@@ -58,6 +58,9 @@ namespace NEOONE
 
                 case EngineMethod.getgasconsumed:
                     return this._getGasConsumed();
+
+                case EngineMethod.getnotifications:
+                    return this._getNotifications();
 
                 case EngineMethod.dispose_engine:
                     this.disposeEngine();
@@ -126,6 +129,18 @@ namespace NEOONE
         private long _getGasConsumed()
         {
             return this.engine != null ? this.engine.GasConsumed : 0;
+        }
+
+        private ReturnHelpers.NotifyEventReturn[] _getNotifications()
+        {
+            this.isEngineInitialized();
+            var events = this.engine.Notifications;
+            if (events == null || events.Count == 0)
+            {
+                return new ReturnHelpers.NotifyEventReturn[] { };
+            }
+
+            return events.Select((p) => new ReturnHelpers.NotifyEventReturn(p)).ToArray();
         }
 
         private bool isEngineInitialized()

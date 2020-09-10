@@ -1,5 +1,6 @@
-import { UInt160 } from '@neo-one/client-common';
+import { SerializableWire, UInt160 } from '@neo-one/client-common';
 import { BlockchainStorage } from './Storage';
+import { VM } from './vm';
 import { Witness } from './Witness';
 
 export interface Verifiable {
@@ -14,4 +15,9 @@ export interface VerifyResult {
   readonly result: boolean;
 }
 
-export type VerifyWitnesses = (verifiable: Verifiable, storage: BlockchainStorage, gasIn: number) => Promise<boolean>;
+export type VerifyWitnesses = (
+  vm: VM,
+  verifiable: Verifiable & SerializableWire,
+  storage: BlockchainStorage,
+  gasIn: number,
+) => Promise<boolean>;

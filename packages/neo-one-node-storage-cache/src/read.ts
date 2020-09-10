@@ -67,15 +67,15 @@ export function createReadAllStorage<Key, Value>({
   };
 }
 
-export function createReadGetAllStorage<Key, Keys, Value>({
+export function createReadGetAllStorage<Key, Value>({
   cache,
   storage,
   serializeKeyString,
 }: {
   readonly cache: LRUCache<string, Value>;
-  readonly storage: ReadGetAllStorage<Key, Keys, Value>;
+  readonly storage: ReadGetAllStorage<Key, Value>;
   readonly serializeKeyString: SerializeKeyString<Key>;
-}): ReadGetAllStorage<Key, Keys, Value> {
+}): ReadGetAllStorage<Key, Value> {
   const readStorage = createReadStorage({
     cache,
     storage,

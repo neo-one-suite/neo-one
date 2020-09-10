@@ -22,29 +22,18 @@ export const cacheStorage = ({
     // length: (value, key) => value.size + Buffer.byteLength(key, 'utf8'),
   });
 
-  const serializeHeaderKey = ({ hashOrIndex }: { hashOrIndex: number | UInt256 }) =>
-    typeof hashOrIndex === 'number'
-      ? `header:${hashOrIndex}`
-      : keys.typeKeyToSerializeKey.header({ hash: hashOrIndex });
+  const serializeBlockKey = ({ hashOrIndex }: { hashOrIndex: number | UInt256 }) => {
+    if (typeof hashOrIndex === 'number') {
+      // TODO: implement getting a block by index
+      throw new Error('not implemented');
+    }
 
-  const headerBase = read.createReadStorage({
-    cache,
-    storage: storage.header,
-    serializeKeyString: serializeHeaderKey,
-  });
-
-  const header = {
-    get: headerBase.get,
-    tryGet: headerBase.tryGet,
-    tryGetLatest: storage.header.tryGetLatest,
+    return hashOrIndex;
   };
-
-  const serializeBlockKey = ({ hashOrIndex }: { hashOrIndex: number | UInt256 }) =>
-    typeof hashOrIndex === 'number' ? `block:${hashOrIndex}` : keys.typeKeyToSerializeKey.block({ hash: hashOrIndex });
 
   const blockBase = read.createReadStorage({
     cache,
-    storage: storage.block,
+    storage: storage.blocks,
     serializeKeyString: serializeBlockKey,
   });
 
