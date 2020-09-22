@@ -27,4 +27,5 @@ export interface Settings {
   readonly secondsPerBlock: number;
   readonly maxTransactionsPerBlock: number;
   readonly memPoolSize: number;
+  readonly getFreeGas?: (index: number) => BN;
 }

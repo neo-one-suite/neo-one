@@ -56,6 +56,7 @@ export const createTest = ({
     secondsPerBlock: secondsPerBlock === undefined ? commonSettings.secondsPerBlock : secondsPerBlock,
     maxTransactionsPerBlock: commonSettings.maxTransactionsPerBlock,
     memPoolSize: commonSettings.memPoolSize,
+    getFreeGas: commonSettings.getFreeGas,
     fees: {
       [TransactionType.Enrollment]: clientCommon.fixed8FromDecimal(10),
       [TransactionType.Issue]: clientCommon.fixed8FromDecimal(5),

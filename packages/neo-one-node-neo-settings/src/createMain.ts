@@ -54,7 +54,7 @@ export const createMain = ({
     decrementInterval: commonSettings.decrementInterval,
     generationAmount: commonSettings.generationAmount,
     secondsPerBlock: secondsPerBlock === undefined ? commonSettings.secondsPerBlock : secondsPerBlock,
-    maxTransactionsPerBlock: commonSettings.maxTransactionsPerBlock,
+    maxTransactionsPerBlock: 200,
     memPoolSize: commonSettings.memPoolSize,
     fees: {
       [TransactionType.Enrollment]: clientCommon.fixed8FromDecimal(1000),

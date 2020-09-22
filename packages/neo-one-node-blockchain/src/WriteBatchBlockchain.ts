@@ -90,6 +90,7 @@ interface WriteBatchBlockchainOptions {
   readonly storage: BlockchainStorage;
   readonly vm: VM;
   readonly getValidators: WriteBlockchain['getValidators'];
+  readonly freeGas: BN;
 }
 
 interface Caches {
@@ -133,6 +134,7 @@ interface OutputWithInput {
 
 export class WriteBatchBlockchain {
   public readonly settings: WriteBlockchain['settings'];
+  public readonly freeGas: BN;
   public readonly account: ReadAllAddUpdateDeleteStorageCache<AccountKey, Account, AccountUpdate>;
   public readonly accountUnspent: ReadGetAllAddDeleteStorageCache<
     AccountUnspentKey,
@@ -180,6 +182,7 @@ export class WriteBatchBlockchain {
     this.storage = options.storage;
     this.vm = options.vm;
     this.getValidators = options.getValidators;
+    this.freeGas = options.freeGas;
 
     const output = new OutputStorageCache(() => this.storage.output);
     this.caches = {
@@ -618,6 +621,7 @@ export class WriteBatchBlockchain {
         storage: this as any,
         vm: this.vm,
         getValidators: this.getValidators,
+        freeGas: this.freeGas,
       });
 
       const migratedContractHashes: Array<readonly [UInt160, UInt160]> = [];

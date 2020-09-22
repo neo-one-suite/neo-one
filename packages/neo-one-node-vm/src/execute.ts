@@ -12,14 +12,7 @@ import {
 } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import _ from 'lodash';
-import {
-  ExecutionContext,
-  ExecutionInit,
-  FREE_GAS,
-  MAX_INVOCATION_STACK_SIZE,
-  MAX_STACK_SIZE,
-  Options,
-} from './constants';
+import { ExecutionContext, ExecutionInit, MAX_INVOCATION_STACK_SIZE, MAX_STACK_SIZE, Options } from './constants';
 import {
   AltStackUnderflowError,
   InvocationStackOverflowError,
@@ -267,8 +260,10 @@ export const execute = async ({
     persistingBlock,
   };
 
+  const freeGas = blockchain.freeGas;
+
   let context;
-  const startingGas = gasIn.add(FREE_GAS);
+  const startingGas = gasIn.add(freeGas);
   let gas = startingGas;
   let errorMessage;
 
@@ -335,7 +330,7 @@ export const execute = async ({
   }
 
   const gasCost = startingGas.sub(finalContext.gasLeft);
-  let gasConsumed = gasCost.sub(FREE_GAS);
+  let gasConsumed = gasCost.sub(blockchain.freeGas);
   if (gasConsumed.lt(utils.ZERO)) {
     gasConsumed = utils.ZERO;
   }

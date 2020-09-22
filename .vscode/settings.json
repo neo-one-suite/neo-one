@@ -1,5 +1,5 @@
 {
-  "typescript.tsdk": "common/temp/node_modules/typescript/lib",
+  "typescript.tsdk": "/Users/danielbyrne/neo-one-master/common/temp/node_modules/typescript/lib",
   "typescript.format.insertSpaceBeforeFunctionParenthesis": false,
   "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
   "typescript.format.enable": false,

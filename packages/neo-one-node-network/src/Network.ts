@@ -324,8 +324,10 @@ export class Network<Message, PeerData, PeerHealth extends PeerHealthBase> {
       }
     }
 
+    const allEndpoints = endpoints.concat([...this.mutablePeerSeeds]);
+    logger.debug({ name: 'ALL_ENDPOINTS', allEndpoints });
     // tslint:disable-next-line promise-function-async
-    endpoints.concat([...this.mutablePeerSeeds]).forEach((endpoint) => this.connectToPeer({ endpoint }));
+    allEndpoints.forEach((endpoint) => this.connectToPeer({ endpoint }));
   }
 
   private checkPeerHealth(): void {

@@ -606,10 +606,6 @@ export interface TransactionResult<
  */
 export interface RawInvocationResultBase {
   /**
-   * GAS consumed by the operation. This is the total GAS consumed after the free GAS is subtracted.
-   */
-  readonly gasConsumed: BigNumber;
-  /**
    * The total GAS cost before subtracting the free GAS.
    */
   readonly gasCost: BigNumber;

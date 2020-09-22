@@ -135,6 +135,7 @@ export const common = ({ privateNet, address, consensusAddress }: Options) => {
     }),
     governingToken,
     utilityToken,
+    getFreeGas: () => clientCommon.TEN_FIXED8,
     decrementInterval: DECREMENT_INTERVAL,
     generationAmount: privateNet ? GENERATION_AMOUNT_PRIVATE : GENERATION_AMOUNT,
     secondsPerBlock: SECONDS_PER_BLOCK,

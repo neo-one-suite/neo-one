@@ -129,6 +129,7 @@ export interface Blockchain extends BlockchainStorage {
   readonly deserializeWireContext: DeserializeWireContext;
   readonly serializeJSONContext: SerializeJSONContext;
   readonly feeContext: FeeContext;
+  readonly freeGas: BN;
 
   readonly currentBlock: Block;
   readonly previousBlock: Block | undefined;
@@ -185,4 +186,5 @@ export interface WriteBlockchain {
   readonly validator: ReadAllAddStorage<ValidatorKey, Validator>;
   readonly invocationData: ReadAddStorage<InvocationDataKey, InvocationData>;
   readonly validatorsCount: ReadAddUpdateMetadataStorage<ValidatorsCount, ValidatorsCountUpdate>;
+  readonly freeGas: BN;
 }

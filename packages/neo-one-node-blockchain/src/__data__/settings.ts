@@ -108,6 +108,7 @@ export const settings: Settings = {
   generationAmount: GENERATION_AMOUNT,
   secondsPerBlock: 15,
   maxTransactionsPerBlock: 500,
+  getFreeGas: () => common.TEN_FIXED8,
   memPoolSize: 50000,
   fees: {
     [TransactionType.Enrollment]: common.fixed8FromDecimal(1000),

@@ -217,6 +217,10 @@ export class Blockchain {
     return this.mutablePersistingBlocks;
   }
 
+  public get freeGas(): BN {
+    return this.settings.getFreeGas ? this.settings.getFreeGas(this.currentBlock.index) : common.TEN_FIXED8;
+  }
+
   public get account(): BlockchainType['account'] {
     return this.storage.account;
   }
@@ -859,6 +863,7 @@ export class Blockchain {
       storage: this.storage,
       vm: this.vm,
       getValidators: this.getValidators,
+      freeGas: this.freeGas,
     });
   }
 }

@@ -1,3 +1,4 @@
+import { common } from '@neo-one/client-common';
 // tslint:disable no-any
 import { FullNodeCreateOptions } from '@neo-one/node';
 import { createMain, createTest, deserializeSettings, serializeSettings } from '@neo-one/node-neo-settings';
@@ -21,17 +22,27 @@ const DEFAULT_OPTIONS = {
 export const getOptions = (): FullNodeCreateOptions['options'] => {
   let options = rc('neo-one', DEFAULT_OPTIONS) as FullNodeCreateOptions['options'];
 
-  const { blockchain } = options;
-  if ((typeof blockchain as any) === 'string') {
+  const { blockchain: blockchainIn } = options;
+  if ((typeof blockchainIn as any) === 'string') {
     options = {
       ...options,
-      blockchain: serializeSettings((blockchain as any) === 'test' ? createTest() : createMain()) as any,
+      blockchain: serializeSettings((blockchainIn as any) === 'test' ? createTest() : createMain()) as any,
     };
   }
 
+  const getFreeGas =
+    (blockchainIn as any) === 'main'
+      ? (index: number) => (index >= 6195000 ? common.FIFTY_FIXED8 : common.TEN_FIXED8)
+      : undefined;
+
+  const blockchain = {
+    ...deserializeSettings(options.blockchain),
+    getFreeGas,
+  };
+
   options = {
     ...options,
-    blockchain: deserializeSettings(options.blockchain),
+    blockchain,
   };
 
   return options;

@@ -25,7 +25,6 @@ export const FEES = {
   ONE_THOUSAND: new BN(ratio * 1000),
 };
 
-export const FREE_GAS = common.TEN_FIXED8;
 export type ExecutionStack = readonly StackItem[];
 export interface ExecutionInit {
   readonly scriptContainer: ScriptContainer;

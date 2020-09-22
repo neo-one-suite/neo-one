@@ -207,6 +207,7 @@ const fixed8ToDecimal = (bn: BN): BigNumber => fixedToDecimal(bn, 8);
 
 const NEGATIVE_SATOSHI_FIXED8 = new BN(-1);
 const TEN_FIXED8 = fixed8FromDecimal(10);
+const FIFTY_FIXED8 = fixed8FromDecimal(50);
 const ONE_HUNDRED_FIXED8 = fixed8FromDecimal(100);
 const FOUR_HUNDRED_FIXED8 = fixed8FromDecimal(400);
 const FIVE_HUNDRED_FIXED8 = fixed8FromDecimal(500);
@@ -229,6 +230,7 @@ export const common = {
   ZERO_UINT256,
   NEGATIVE_SATOSHI_FIXED8,
   TEN_FIXED8,
+  FIFTY_FIXED8,
   ONE_HUNDRED_FIXED8,
   FOUR_HUNDRED_FIXED8,
   FIVE_HUNDRED_FIXED8,
