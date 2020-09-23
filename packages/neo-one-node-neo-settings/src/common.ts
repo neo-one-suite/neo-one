@@ -2,7 +2,7 @@ import { common as clientCommon, crypto, Op, ScriptBuilder, UInt160, WitnessScop
 import { Block, ConsensusData, Signer, Transaction, Witness } from '@neo-one/node-core';
 import { BN } from 'bn.js';
 
-export const GENERATION_AMOUNT: readonly number[] = [8, 7, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+export const GENERATION_AMOUNT: readonly number[] = [6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
 export const GENERATION_AMOUNT_PRIVATE: readonly number[] = [8, 7, 6];
 export const ISSUE_AMOUNT_PRIVATE = clientCommon.fixed8FromDecimal(58000000);

@@ -1,7 +1,7 @@
 import { Observable, Observer } from 'rxjs';
 
-export const streamToObservable = (getStream: () => NodeJS.ReadableStream): Observable<Buffer> =>
-  new Observable((observer: Observer<Buffer>) => {
+export const streamToObservable = <T = Buffer>(getStream: () => NodeJS.ReadableStream): Observable<T> =>
+  new Observable((observer: Observer<T>) => {
     const stream = getStream();
     let done = false;
     const cleanup = () => {
@@ -23,7 +23,7 @@ export const streamToObservable = (getStream: () => NodeJS.ReadableStream): Obse
       cleanup();
       observer.error(error);
     };
-    const onData = (data: Buffer) => observer.next(data);
+    const onData = (data: T) => observer.next(data);
 
     stream.once('error', onError);
     stream.once('end', onEnd);

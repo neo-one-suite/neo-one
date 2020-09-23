@@ -1,5 +1,13 @@
 import { common, ScriptBuilder, UInt256, WitnessScopeModel } from '@neo-one/client-common';
-import { ArrayStackItem, Block, ConsensusData, Signer, Transaction, TriggerType, Witness } from '@neo-one/node-core';
+import {
+  assertArrayStackItem,
+  Block,
+  ConsensusData,
+  Signer,
+  Transaction,
+  TriggerType,
+  Witness,
+} from '@neo-one/node-core';
 import { BN } from 'bn.js';
 import { Dispatcher } from '../Dispatcher';
 
@@ -64,9 +72,9 @@ describe('TS <--> C# Storage Test', () => {
           expect(newState).toEqual('HALT');
 
           const resultStack = engine.resultStack;
-          const arr = resultStack[0] as ArrayStackItem;
-          const hashFromStackItem = common.asUInt256(arr.value[0].value);
-          expect(hashFromStackItem).toEqual(block.hash);
+          const arr = assertArrayStackItem(resultStack[0]).array;
+          const hash = common.asUInt256(arr[0].getBuffer());
+          expect(hash).toEqual(block.hash);
         },
       );
     });
@@ -124,8 +132,8 @@ describe('TS <--> C# Storage Test', () => {
           expect(newState).toEqual('HALT');
 
           const resultStack = engine.resultStack;
-          const arr = resultStack[0] as ArrayStackItem;
-          const hashFromStackItem = common.asUInt256(arr.value[0].value);
+          const arr = assertArrayStackItem(resultStack[0]).array;
+          const hashFromStackItem = common.asUInt256(arr[0].getBuffer());
           expect(hashFromStackItem).toEqual(block.hash);
         },
       );

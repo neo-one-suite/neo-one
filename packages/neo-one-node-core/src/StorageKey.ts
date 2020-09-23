@@ -27,9 +27,12 @@ export class StorageKey implements Equatable, SerializableWire {
     });
   }
 
-  // TODO: Verify this
   public static createSearchPrefix(id: number, prefix: Buffer) {
-    return Buffer.concat([Buffer.from([id]), prefix]);
+    const writer = new BinaryWriter();
+    writer.writeInt32LE(id);
+    const buffer = writer.toBuffer();
+
+    return Buffer.concat([buffer, prefix]);
   }
 
   public readonly id: number;

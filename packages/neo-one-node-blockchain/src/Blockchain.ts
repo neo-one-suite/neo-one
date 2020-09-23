@@ -6,16 +6,16 @@ import {
   CallReceipt,
   DeserializeWireContext,
   Header,
+  NativeContainer,
   Storage,
-  Transaction,
-  TransactionState,
   TriggerType,
   VM,
 } from '@neo-one/node-core';
+import { Labels } from '@neo-one/utils';
 import PriorityQueue from 'js-priority-queue';
 import { Observable, Subject } from 'rxjs';
 import { flatMap, map, toArray } from 'rxjs/operators';
-import { GenesisBlockNotRegisteredError } from './errors';
+import { BlockVerifyError, GenesisBlockNotRegisteredError } from './errors';
 import { PersistingBlockchain } from './PersistingBlockchain';
 import { utils } from './utils';
 import { verifyWitnesses } from './verify';
@@ -28,6 +28,7 @@ export interface CreateBlockchainOptions {
   readonly onPersistNativeContractScript?: Buffer;
   readonly settings: BlockchainSettings;
   readonly storage: Storage;
+  readonly native: NativeContainer;
   readonly vm: VM;
 }
 
@@ -61,9 +62,8 @@ export const recoverHeaderIndex = async (storage: Storage) => {
     let extraHashes: readonly UInt256[] = [];
     if (hashIndex.index >= storedHeaderCount) {
       let hash = hashIndex.hash;
-      // tslint:disable-next-line
+      // tslint:disable-next-line: no-loop-statement possible-timing-attack
       while (hash !== initHeaderIndex[storedHeaderCount - 1]) {
-        // tslint:disable-next-line: no-array-mutation
         extraHashes = [hash].concat(extraHashes);
         const { previousHash } = await storage.blocks.get({ hashOrIndex: hash });
         hash = previousHash;
@@ -82,12 +82,13 @@ export const recoverHeaderIndex = async (storage: Storage) => {
 };
 
 export class Blockchain {
-  public static async create({ settings, storage, vm }: CreateBlockchainOptions): Promise<BlockchainType> {
+  public static async create({ settings, storage, native, vm }: CreateBlockchainOptions): Promise<BlockchainType> {
     const headerIndex = await recoverHeaderIndex(storage);
     const blockchain = new Blockchain({
       headerIndex,
       settings,
       storage,
+      native,
       vm,
     });
 
@@ -112,6 +113,7 @@ export class Blockchain {
   private readonly headerIndex: UInt256[];
   private readonly onPersistNativeContractScript: Buffer;
   private readonly storage: Storage;
+  private readonly native: NativeContainer;
   private readonly vm: VM;
 
   private mutableStoredHeaderCount: number;
@@ -132,6 +134,7 @@ export class Blockchain {
     this.mutableStoredHeaderCount = this.headerIndex.length;
     this.settings = options.settings;
     this.storage = options.storage;
+    this.native = options.native;
     this.vm = options.vm;
     this.onPersistNativeContractScript =
       options.onPersistNativeContractScript ?? utils.getOnPersistNativeContractScript();
@@ -239,8 +242,7 @@ export class Blockchain {
   public async verifyBlock(block: Block): Promise<void> {
     const verification = await block.verify(this.vm, this.storage, this.verifyWitnesses);
     if (!verification) {
-      // TODO: implement a makeError
-      throw new Error('Block Verification Failed');
+      throw new BlockVerifyError(block.hashHex);
     }
   }
 
@@ -311,7 +313,7 @@ export class Blockchain {
       while (this.mutableRunning && entry !== undefined && entry.block.index === this.currentBlockIndex + 1) {
         const entryNonNull = entry;
         const logData = {
-          // [Labels.NEO_BLOCK_INDEX]: entry.block.index, // TODO: bring Label over
+          [Labels.NEO_BLOCK_INDEX]: entry.block.index,
           name: 'neo_blockchain_persist_block_top_level',
         };
         try {
@@ -401,11 +403,6 @@ export class Blockchain {
       this.headerIndex.push(block.hash);
     }
 
-    /**
-     * TODO: this changeSet is NOT the `ChangeSet` type we expect for a `.commit(...)` like in `saveHeaderHashList`
-     * it is the already serialized changeSet coming from the C# VM Snapshot. There won't need to be as much storage
-     * change conversion with this changeSet so will probably make 2 different `commit` methods, 1 for each.
-     */
     const { changeBatch, applicationsExecuted } = blockchain.persistBlock(block, currentHeaderCount);
     await this.storage.commitBatch(changeBatch);
     await this.saveHeaderHashList();

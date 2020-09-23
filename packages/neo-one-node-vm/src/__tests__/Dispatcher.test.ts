@@ -38,7 +38,7 @@ describe('Dispatcher Tests', () => {
     expect(() => postEngine.execute()).toThrow();
   });
 
-  test.only('test', () => {
-    console.log(dispatcher.test());
+  test.only('', () => {
+    console.log(dispatcher.test().toString('hex'));
   });
 });

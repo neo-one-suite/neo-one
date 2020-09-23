@@ -16,3 +16,19 @@ export const CoinClaimedError = makeErrorWithCode(
   'COIN_CLAIMED',
   (asset: string, value: string) => `Coin with asset: ${asset}, value: ${value} is already claimed.`,
 );
+export const BlockVerifyError = makeErrorWithCode(
+  'BLOCK_VERIFICATION_FAILED',
+  (hash: string) => `Block with hash: ${hash} failed to verify.`,
+);
+export const PersistNativeContractsError = makeErrorWithCode(
+  'PERSIST_NATIVE_CONTRACTS_FAILED',
+  () => 'Engine state !== HALT when persisting native contract scripts',
+);
+export const ContractStateFetchError = makeErrorWithCode(
+  'FETCH_CONTRACT_FAILED',
+  (hash: string) => `failed to fetch contract state with hash: ${hash} from storage.`,
+);
+export const ContractMethodError = makeErrorWithCode(
+  'GET_CONTRACT_METHOD_FAILED',
+  (method: string, hash: string) => `failed to fetch method ${method} from contract manifest at hash: ${hash}.`,
+);

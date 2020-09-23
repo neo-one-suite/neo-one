@@ -11,6 +11,7 @@ export * from './Equatable';
 export * from './HashIndexState';
 export * from './Header';
 export * from './HeaderHashList';
+export * from './Native';
 export * from './Serializable';
 export * from './Settings';
 export * from './Signer';

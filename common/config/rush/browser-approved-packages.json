@@ -287,6 +287,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@neo-one/node-native",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@neo-one/node-neo-settings",
       "allowedCategories": [ "production", "web" ]
     },

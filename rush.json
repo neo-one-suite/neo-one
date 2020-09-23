@@ -222,6 +222,13 @@
       "versionPolicyName": "NodeReleasePolicy"
     },
     {
+      "packageName": "@neo-one/node-native",
+      "projectFolder": "packages/neo-one-node-native",
+      "reviewCategory": "production",
+      "shouldPublish": true,
+      "versionPolicyName": "NodeReleasePolicy"
+    },
+    {
       "packageName": "@neo-one/node-neo-settings",
       "projectFolder": "packages/neo-one-node-neo-settings",
       "reviewCategory": "production",

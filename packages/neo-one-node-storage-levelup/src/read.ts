@@ -1,11 +1,17 @@
 // tslint:disable no-var-before-return prefer-immediate-return
-import { ReadAllStorage, ReadMetadataStorage, ReadStorage } from '@neo-one/node-core';
+import {
+  ReadAllStorage,
+  ReadFindStorage,
+  ReadMetadataStorage,
+  ReadStorage,
+  StorageReturn,
+  StreamOptions,
+} from '@neo-one/node-core';
 import { LevelUp } from 'levelup';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { KeyNotFoundError } from './errors';
 import { streamToObservable } from './streamToObservable';
-import { StreamOptions } from './types';
 
 type SerializeKey<Key> = (key: Key) => Buffer;
 
@@ -115,6 +121,49 @@ export function createReadAllStorage<Key, Value>({
     get: readStorage.get,
     tryGet: readStorage.tryGet,
     all$: createAll$({ db, range, deserializeValue }),
+  };
+}
+
+export function createFind$<Key, Value>({
+  db,
+  deserializeKey,
+  deserializeValue,
+}: {
+  readonly db: LevelUp;
+  readonly deserializeKey: (key: Buffer) => Key;
+  readonly deserializeValue: (value: Buffer) => Value;
+}): (range: StreamOptions) => Observable<StorageReturn<Key, Value>> {
+  return (range: StreamOptions) =>
+    streamToObservable<StorageReturn<Buffer, Buffer>>(() => db.createReadStream(range)).pipe(
+      map(({ key, value }) => ({ key: deserializeKey(key), value: deserializeValue(value) })),
+    );
+}
+
+export function createReadFindStorage<Key, Value>({
+  db,
+  serializeKey,
+  deserializeKey,
+  deserializeValue,
+}: {
+  readonly db: LevelUp;
+  readonly serializeKey: SerializeKey<Key>;
+  readonly deserializeKey: (value: Buffer) => Key;
+  readonly deserializeValue: (value: Buffer) => Value;
+}): ReadFindStorage<Key, Value> {
+  const readStorage = createReadStorage({
+    db,
+    serializeKey,
+    deserializeValue,
+  });
+
+  return {
+    get: readStorage.get,
+    tryGet: readStorage.tryGet,
+    find$: createFind$({
+      db,
+      deserializeKey,
+      deserializeValue,
+    }),
   };
 }
 
